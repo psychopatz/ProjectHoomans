@@ -64,7 +64,7 @@ end
 local function manualCorpseHaul(record)
     local service = PNC.CorpseHaulService
     if not service or not service.RequestManual then return false end
-    return service.RequestManual(record) == true
+    return service.RequestManual(record)
 end
 
 local function stopActivity(record, reason)

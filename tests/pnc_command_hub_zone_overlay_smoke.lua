@@ -37,11 +37,31 @@ T.equal(fishingCalls[1][1], "clear", "wrong fishing cleanup operation")
 
 highlights = {}
 T.truthy(Overlay.SetActive("corpse_haul", {
-    sourceRegion = region, destinationRegion = region,
+    sourceRegion = region,
+    destinationRegion = { levels = { [0] = { rows = { [10] = { 11, 12 } } } } },
 }), "corpse overlay did not activate")
 Overlay.Render()
-T.equal(#highlights, 2,
-    "corpse overlay did not render source and destination regions")
+T.equal(#highlights, 3,
+    "corpse overlay did not split source, destination, and overlap tiles")
+T.equal(highlights[1][2], 10,
+    "corpse source-only tile was not rendered first")
+T.equal(highlights[2][2], 12,
+    "corpse destination-only tile was not rendered separately")
+T.equal(highlights[3][2], 11,
+    "corpse overlap tile was not rendered separately")
+T.near(highlights[3][7], 1.0,
+    "corpse overlap tile did not use the conflict color")
+T.near(highlights[3][8], 0.12,
+    "corpse overlap tile did not use the conflict color")
+
+highlights = {}
+PsychopatzCore = { UI = { GridRegionSelector = {
+    IsWorldInputOwned = function() return true end,
+} } }
+Overlay.Render()
+T.equal(#highlights, 0,
+    "zone overlay rendered while the region selector owned world input")
+PsychopatzCore = nil
 
 T.truthy(Overlay.SetActive("fishing", {
     valid = true, geometry = region,

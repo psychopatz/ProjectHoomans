@@ -2,10 +2,16 @@ local T = require "tests/support/test"
 T.addPackagePaths({ { "ProjectHoomans", "server" } })
 
 package.preload["PsychopatzCore/World/PC_ZoneRegistry"] = function()
-    return {}
+    return {
+        get = function() return { geometry = { id = "base-zone" } } end,
+    }
 end
 package.preload["PsychopatzCore/World/PC_GridRegion"] = function()
-    return {}
+    return {
+        normalize = function(region) return region end,
+        countTiles = function() return 1 end,
+        containsXY = function(_, x) return x <= 10 end,
+    }
 end
 
 local builder = {
@@ -15,6 +21,14 @@ local builder = {
     getPerkLevel = function() return 0 end,
 }
 local createdCursor
+local wideTile = { getSpriteName = function() return "wide_wall" end }
+local wideFace = {
+    getzLayers = function() return 1 end,
+    getWidth = function() return 2 end,
+    getHeight = function() return 1 end,
+    getTileInfo = function() return wideTile end,
+}
+local wideInfo = { getFace = function() return wideFace end }
 ISBuildIsoEntity = {
     new = function(_, character, info, nSprite, containers, logic)
         createdCursor = {
@@ -43,7 +57,7 @@ PNC = {
             return {
                 objectInfoName = name,
                 displayName = "Log Fence",
-                nativeObjectInfo = {},
+                nativeObjectInfo = name == "WideWall" and wideInfo or {},
                 nativeRecipe = {},
                 xpAwards = { { skillId = "Woodwork", amount = 4.5 } },
                 requirements = {},
@@ -62,7 +76,11 @@ PNC = {
             if operation == "BUILD_OBJECT" then completionHandler = handler end
         end,
     },
-    BaseService = { Get = function() return nil end },
+    BaseService = {
+        Get = function()
+            return { id = "base-1", baseZoneId = "base-zone" }
+        end,
+    },
     WorkInputService = { Commit = function() return true end },
     Registry = {
         GetLiveZombie = function() return builder end,
@@ -106,5 +124,22 @@ T.equal(order.payload.xpAwarded["1"], true,
     "completion persists the awarded recipe entry")
 completionHandler(order)
 T.equal(xpCalls, 1, "recipe XP is not duplicated on completion retry")
+
+local cursorBeforeRejectedWideBuild = createdCursor
+local wideOrder = {
+    id = "build-order-wide", status = "WORKING",
+    requiredWork = 100, progress = 100,
+    workerId = "npc-1",
+    payload = { blueprint = {
+        objectInfoName = "WideWall", nSprite = 1,
+        x = 10, y = 10, z = 0,
+    } },
+}
+local wideOK, wideReason = completionHandler(wideOrder)
+T.falsy(wideOK, "server accepted a footprint outside the base")
+T.equal(wideReason, "BUILD_TARGET_OUTSIDE_BASE",
+    "server returned the wrong footprint boundary reason")
+T.equal(createdCursor, cursorBeforeRejectedWideBuild,
+    "server created a building before rejecting its footprint")
 
 T.finish("pnc_building_completion_smoke")

@@ -17,6 +17,7 @@ require "PNC/Integrations/PNC_HoomansLLM"
 require "PNC/Integrations/PNC_ConversationMemorySync"
 require "PNC/Integrations/PNC_HoomansLLMBridge"
 require "PNC/Integrations/PNC_HoomansLLMInput"
+require "PNC/Conversation/PNC_SocialFlavorPresentation"
 
 require "PNC/Conversation/PortraitBackgrounds/PNC_BackgroundDawn"
 require "PNC/Conversation/PortraitBackgrounds/PNC_BackgroundSunrise"

@@ -9,9 +9,12 @@ PNC = PNC or {}
 PNC.HoomansLLM = PNC.HoomansLLM or {}
 PNC.HoomansLLM.Context = PNC.HoomansLLM.Context or {}
 
+require "PsychopatzCore/Conversation/PsychopatzNameParts"
+
 local Context = PNC.HoomansLLM.Context
 local Message = PsychopatzCore.Conversation.Message
 local ToolPolicy = PNC.ConversationLLMTools
+local NameParts = PsychopatzCore.Conversation.NameParts
 
 local NEED_TYPES = { "hunger", "thirst", "fatigue" }
 local NEED_LEVEL_WEIGHT = {
@@ -347,8 +350,19 @@ function Context.Build(view, message)
     local source = sourceFor(entry)
     local identity = source.identity or {}
     local npcID = text(definition.npcID or entry.id, "unknown-npc")
-    local npcName = text(presentation.npcName, npcID)
-    local playerName = text(presentation.playerName, "the player")
+    local npcParts = NameParts.Split(
+        text(presentation.npcFullName or presentation.npcName, npcID),
+        presentation.npcFirstName,
+        presentation.npcSurname or presentation.npcLastName
+    )
+    local playerParts = NameParts.Split(
+        text(presentation.playerFullName or presentation.playerName,
+            "the player"),
+        presentation.playerFirstName,
+        presentation.playerSurname or presentation.playerLastName
+    )
+    local npcName = npcParts.fullName or npcID
+    local playerName = playerParts.addressName or "the player"
     local playerID = playerUUID(view)
     local worldHours = tonumber(
         Message and Message.GetWorldAgeHours and Message.GetWorldAgeHours()
@@ -449,6 +463,12 @@ function Context.Build(view, message)
         } or nil,
         npc_name = npcName,
         player_name = playerName,
+        npc_full_name = npcParts.fullName,
+        npc_first_name = npcParts.firstName,
+        npc_surname = npcParts.surname,
+        player_full_name = playerParts.fullName,
+        player_first_name = playerParts.firstName,
+        player_surname = playerParts.surname,
         game_day = gameDay,
         world_age_hours = worldHours,
         participants = participants,

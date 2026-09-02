@@ -49,7 +49,7 @@ local view = {
         characterUUID = "char_alex",
         context = {
             npcName = "Harley",
-            playerName = "Alex",
+            playerName = "Alexandra Maximilian Longsurname",
             npcType = "survivor",
             conversationRelationshipID = "Acquaintance",
             entry = {
@@ -81,6 +81,12 @@ local context = PNC.HoomansLLM.Context.Build(view, "Where is the shelter?")
 T.equal(context.world_uuid, "pz-save:Save One", "save-scoped world identity")
 T.equal(context.player_uuid, "char_alex", "stable player identity")
 T.equal(context.npc_uuid, "npc_12", "stable NPC identity")
+T.equal(context.player_name, "Alexandra",
+    "interactive LLM uses the player's first name for speech")
+T.equal(context.player_full_name, "Alexandra Maximilian Longsurname",
+    "interactive LLM retains the player's full identity separately")
+T.equal(context.player_surname, "Maximilian Longsurname",
+    "interactive LLM retains the player's surname separately")
 T.equal(context.character_card.archetype, "Scout", "canonical character card")
 T.equal(context.character_card.skills.Carpentry, 4,
     "canonical character card exposes NPC skill truth to the provider")

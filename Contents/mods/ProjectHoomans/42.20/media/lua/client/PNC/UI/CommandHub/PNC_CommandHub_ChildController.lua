@@ -17,7 +17,7 @@ local WidgetWindow = PsychopatzCore.UI.WidgetWindow or {}
 
 Controller.entries = Controller.entries or {}
 Controller.closeOrder = { "zone", "work", "settings", "events", "colonist",
-    "storage" }
+    "storage", "research" }
 Controller.activeID = nil
 Controller.closing = false
 
@@ -197,6 +197,8 @@ function Controller.ApplyOpacity(opacity)
         and PNC.ColonistUI.instance or nil, value)
     Options.ApplyWindowOpacity(PNC.ColonyStorageUI
         and PNC.ColonyStorageUI.instance or nil, value)
+    Options.ApplyWindowOpacity(PNC.ResearchUI
+        and PNC.ResearchUI.instance or nil, value)
     return value
 end
 
@@ -246,6 +248,12 @@ function Controller.SyncPositions()
         and type(storage.sync) == "function"
     then
         storage.sync(owner)
+    end
+    local research = Controller.entries.research
+    if Controller.IsOpen("research") and research
+        and type(research.sync) == "function"
+    then
+        research.sync(owner)
     end
     Controller.ApplyOpacity(Options.GetOpacity())
     return true
@@ -383,6 +391,33 @@ Controller.Register("storage", {
     sync = function(owner)
         placeWindow(PNC.ColonyStorageUI
             and PNC.ColonyStorageUI.instance or nil, owner)
+    end,
+})
+
+Controller.Register("research", {
+    open = function(owner)
+        local research = PNC.ResearchUI
+        return research and research.Open
+            and research.Open(owner) or false
+    end,
+    close = function()
+        local research = PNC.ResearchUI
+        if research and research.Close then research.Close() end
+    end,
+    isOpen = function()
+        return PNC.ResearchUI
+            and moduleIsVisible(PNC.ResearchUI) or false
+    end,
+    isDetached = function()
+        return PNC.ResearchUI
+            and moduleIsDetached(PNC.ResearchUI) or false
+    end,
+    focus = function()
+        return focusModule(PNC.ResearchUI)
+    end,
+    sync = function(owner)
+        placeWindow(PNC.ResearchUI
+            and PNC.ResearchUI.instance or nil, owner)
     end,
 })
 

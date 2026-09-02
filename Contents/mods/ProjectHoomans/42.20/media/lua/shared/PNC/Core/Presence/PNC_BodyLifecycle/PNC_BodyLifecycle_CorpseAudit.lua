@@ -45,7 +45,7 @@ function Internal.pumpPendingCorpses()
             end
             Internal.applyCorpseWornItems(found, pending.wornEntries)
             Internal.stampCorpse(record, found, pending.token)
-            Internal.transmitCorpseState(found)
+            Internal.transmitCorpseState(found, true)
             table.remove(Lifecycle.PendingCorpses, i)
         elseif pending.attempts >= 8 then
             if record then
@@ -71,6 +71,7 @@ function Internal.auditCorpseRecord(record)
     local state
     local now
     local markerId
+    local duplicates = {}
     local previousCorpseState
     local identityCardCreated = false
     if not cell or not record then
@@ -120,9 +121,18 @@ function Internal.auditCorpseRecord(record)
                 if tostring(markerId or "") ~= tostring(record.id) then
                     Internal.stampCorpse(record, corpse, token)
                 end
+            else
+                duplicates[#duplicates + 1] = corpse
             end
         end
     end)
+    for _, duplicate in ipairs(duplicates) do
+        -- Keep one marker-matched engine object. Extra bodies are independent
+        -- render/network entries (often carrying the same inventory), so
+        -- leaving them in the square produces the dark duplicate shadow and
+        -- makes corpse lookup nondeterministic.
+        Internal.removeCorpse(duplicate)
+    end
     if accepted and Internal.ensureCorpseIdentityCard then
         local _, created = Internal.ensureCorpseIdentityCard(record, accepted)
         identityCardCreated = created == true

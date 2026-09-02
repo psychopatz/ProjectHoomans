@@ -424,6 +424,8 @@ function Client.SendCompanionCommand(commandID, npcId, scope, context)
         id = npcId and tostring(npcId) or nil,
         scope = scope and tostring(scope) or nil,
         radius = tonumber(Const.COMPANION_COMMAND_RADIUS) or 20,
+        requestID = type(context) == "table" and context.requestID or nil,
+        commandSource = type(context) == "table" and context.source or nil,
     }
     if Core.IsClientOnly and Core.IsClientOnly() then
         if not sendClientCommand then

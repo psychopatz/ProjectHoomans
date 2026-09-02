@@ -7,12 +7,14 @@ PNC.NameplateRelationshipFeedbackRenderer =
 local Renderer = PNC.NameplateRelationshipFeedbackRenderer
 local Feedback = PNC.NameplateRelationshipFeedback
 local Presentation = PNC.NameplatePresentation
+local DisplaySettings = PNC.NameplateDisplaySettings
 
 local UP_COLOR = { r = 0.18, g = 1.0, b = 0.30, a = 1.0 }
 local DOWN_COLOR = { r = 1.0, g = 0.22, b = 0.18, a = 1.0 }
 local OUTLINE_COLOR = { r = 0.0, g = 0.0, b = 0.0, a = 1.0 }
 
-Renderer.ARROW_SIZE = 16
+Renderer.ARROW_SIZE = 12
+Renderer.MIN_ARROW_SIZE = 4
 
 local RELATIONSHIP_AXES = {
     {
@@ -73,10 +75,13 @@ local function relationshipDetails(feedback)
     return details
 end
 
-local function detailFont()
+local function detailFont(scale)
+    if DisplaySettings and DisplaySettings.GetRelationshipFeedbackFont then
+        return DisplaySettings.GetRelationshipFeedbackFont()
+    end
     if Presentation and Presentation.Fonts then
         return Presentation.Fonts.relationship
-            or Presentation.Fonts.speech
+            or Presentation.Fonts.name
             or Presentation.Fonts.debug
     end
     return UIFont and (UIFont.Medium or UIFont.Small) or nil
@@ -149,8 +154,12 @@ function Renderer.Draw(manager, npcID, screenX, nameY, options)
         and Feedback.Get(npcID, options.currentTime) or nil
     if not feedback then return false end
     local zoom = math.max(1, tonumber(options.zoom) or 1)
-    local scale = 1 / zoom
-    local size = math.max(10, math.floor((Renderer.ARROW_SIZE * scale) + 0.5))
+    local feedbackScale = DisplaySettings
+        and DisplaySettings.GetRelationshipFeedbackScale
+        and DisplaySettings.GetRelationshipFeedbackScale() or 1
+    local scale = feedbackScale / zoom
+    local size = math.max(Renderer.MIN_ARROW_SIZE,
+        math.floor((Renderer.ARROW_SIZE * scale) + 0.5))
     local nameWidth = tonumber(options.nameWidth) or 0
     local alpha = (tonumber(options.alpha) or 1)
         * (tonumber(feedback.alpha) or 1)
@@ -165,7 +174,7 @@ function Renderer.Draw(manager, npcID, screenX, nameY, options)
         and Presentation and Presentation.DrawOutlinedText
     then
         local details = relationshipDetails(feedback)
-        local font = detailFont()
+        local font = detailFont(feedbackScale)
         local lineHeight = detailLineHeight(font)
         local detailTop = top
             - (((#details - 1) * lineHeight) * 0.5)

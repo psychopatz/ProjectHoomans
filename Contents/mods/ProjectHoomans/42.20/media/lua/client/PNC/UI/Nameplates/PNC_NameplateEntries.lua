@@ -15,8 +15,16 @@ local Identity = PNC.NPCIdentityPresentation
 local Speech = PNC.NameplateSpeech
 local Scopes = PNC.NameplateScopes
 local Diagnostics = PNC.PerformanceScalingDiagnostics
+local DisplaySettings = PNC.NameplateDisplaySettings
 
 local UPDATE_RATE = 6
+
+local function nameplateFont()
+    if DisplaySettings and DisplaySettings.GetNameplateFont then
+        return DisplaySettings.GetNameplateFont()
+    end
+    return Presentation.Fonts.name
+end
 
 local function rounded(value)
     value = tonumber(value) or 0
@@ -217,6 +225,7 @@ Entries.BuildCommunityDebugLines = communityDebugLines
 
 local function cacheMetrics(entry, snapshot, zombie, settings, speech, scopes)
     local fonts = Presentation.Fonts
+    local nameFont = nameplateFont()
     local showDebug = settings and (
         settings.showAIDebug == true or settings.showCampDebug == true
     )
@@ -273,7 +282,7 @@ local function cacheMetrics(entry, snapshot, zombie, settings, speech, scopes)
     entry.actionVisible = entry.identityVisible and actionText ~= ""
     entry.speech = speech
     entry.speechVisible = entry.conversationVisible and speechText ~= ""
-    Presentation.CacheTextMetric(entry, "name", name, fonts.name)
+    Presentation.CacheTextMetric(entry, "name", name, nameFont)
     Presentation.CacheTextMetric(entry, "debugText", debugText, fonts.debug)
     Presentation.CacheTextMetric(
         entry,

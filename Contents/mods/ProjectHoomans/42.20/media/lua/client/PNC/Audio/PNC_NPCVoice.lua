@@ -261,7 +261,7 @@ local function play(body, sound, mode, options)
     local stressHumans
     if isServerRuntime() or not body then return 0, nil end
     options = options or {}
-    profile = Voice.Bind(options.snapshot, body)
+    profile = options.profile or Voice.Bind(options.snapshot, body)
     if not profile then return 0, nil end
     alias = resolveAlias(profile, sound)
     if not alias or not body.playSoundLocal then return 0, profile end
@@ -351,6 +351,14 @@ end
 
 function Voice.PlayLocal(body, sound, options)
     return play(body, sound, Voice.MODE_LOCAL, options)
+end
+
+-- Debug and presentation tools may need to preview a voice profile without
+-- changing the character descriptor. Keep this on the same emitter path as
+-- ordinary NPC voice playback so CharacterVoiceType and CharacterVoicePitch
+-- affect the sound that was just started.
+function Voice.PlayPreview(body, sound, profile)
+    return Voice.PlayLocal(body, sound, { profile = profile })
 end
 
 function Voice.PlayWorld(body, sound, options)

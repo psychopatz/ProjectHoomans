@@ -5,6 +5,7 @@ local Presentation = PNC.NameplatePresentation
 local Speech = PNC.NameplateSpeech
 local RelationshipFeedbackRenderer =
     PNC.NameplateRelationshipFeedbackRenderer
+local DisplaySettings = PNC.NameplateDisplaySettings
 local Scopes = PNC.NameplateScopes
 local Layout = Presentation.Layout
 local Fonts = Presentation.Fonts
@@ -21,6 +22,13 @@ local SCENE_TRACK_COLOR = { r = 0.52, g = 0.82, b = 1.0, a = 1.0 }
 local INFECTION_COLOR = { r = 1.0, g = 0.12, b = 0.08, a = 1.0 }
 
 local scopeVisible = Internal.ScopeVisible
+
+local function nameplateFont()
+    if DisplaySettings and DisplaySettings.GetNameplateFont then
+        return DisplaySettings.GetNameplateFont()
+    end
+    return Fonts.name
+end
 
 local function drawStatusBar(manager, left, top, width, height, ratio, color, alpha, backgroundAlpha)
     manager:drawRect(
@@ -63,8 +71,9 @@ end
 
 local function drawStamina(manager, entry, metrics, barLeft, barTop, alpha)
     if not entry.staminaVisible then return nil end
+    local barGap = metrics.barGap or (6 / metrics.zoom)
     local top = entry.healthVisible
-        and (barTop + metrics.barHeight + (6 / metrics.zoom)) or barTop
+        and (barTop + metrics.barHeight + barGap) or barTop
     drawStatusBar(
         manager,
         barLeft,
@@ -274,7 +283,7 @@ local function drawDebugOnly(manager, entry, metrics)
             nameY,
             entry.nameColor,
             0.9,
-            Fonts.name
+            nameplateFont()
         )
     end
     if scopeVisible(entry, Scopes.DEBUG, true) then
@@ -400,7 +409,7 @@ local function drawLive(manager, entry, metrics, currentTime, settings)
             nameY,
             entry.nameColor,
             entry.nameColor.a * alpha,
-            Fonts.name
+            nameplateFont()
         )
     end
     if RelationshipFeedbackRenderer

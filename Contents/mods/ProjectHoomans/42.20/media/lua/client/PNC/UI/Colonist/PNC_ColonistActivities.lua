@@ -234,6 +234,16 @@ function Activities.BuildRows(context)
             Shared.Tr("UI_PNC_Activities_Phase", "PHASE"),
             tostring(info.phase))
     end
+    local diagnostic = person.corpseHaulManualDiagnostic
+    if type(diagnostic) == "table" and diagnostic.reason then
+        local stage = tostring(diagnostic.details
+            and diagnostic.details.stage or "request")
+        rows[#rows + 1] = Presentation.Detail(
+            Shared.Tr("UI_PNC_Activities_LastCorpseHaulDiagnostic",
+                "LAST CORPSE HAUL DIAGNOSTIC"),
+            stage .. " = " .. tostring(diagnostic.reason),
+            diagnostic.result == true and "accent" or "warning")
+    end
     if tostring(person.manualActivityDisabled or "") == "sleep" then
         rows[#rows + 1] = Presentation.Detail(
             Shared.Tr("UI_PNC_Activities_SleepDisabled", "SLEEP CONTROL"),

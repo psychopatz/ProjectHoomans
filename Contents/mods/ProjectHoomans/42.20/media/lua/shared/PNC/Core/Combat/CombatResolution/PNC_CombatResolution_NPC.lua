@@ -14,6 +14,20 @@ function Resolution.ApplyNPCDamage(targetRecord, targetBody, hit)
     if not applied then return false, "npc_damage_rejected", result end
     if hit and hit.attackerKind == "npc"
         and hit.attackerID
+        and PNC.SocialEventHooksInternal
+        and PNC.SocialEventHooksInternal.RecordNPCDamagedByNPC
+    then
+        pcall(
+            PNC.SocialEventHooksInternal.RecordNPCDamagedByNPC,
+            targetRecord,
+            targetBody,
+            PNC.Registry and PNC.Registry.Get
+                and PNC.Registry.Get(hit.attackerID) or nil,
+            hit
+        )
+    end
+    if hit and hit.attackerKind == "npc"
+        and hit.attackerID
         and PNC.Factions
         and PNC.Factions.OnNPCAggression
     then

@@ -38,6 +38,18 @@ local function snapshot()
         and PNC.Network.ClientState.colonyManagement or {}
 end
 
+local function actionResultText(result)
+    if type(result) ~= "table"
+        or result.action ~= "corpse_haul_zones_set"
+        or result.ok ~= false
+    then return nil end
+    if result.reason == "CORPSE_HAUL_ZONES_OVERLAP" then
+        return tr("UI_PNC_CommandHub_CorpseHaul_Overlap",
+            "Collect and dump areas cannot overlap.")
+    end
+    return tostring(result.reason or "CORPSE_HAUL_SAVE_FAILED")
+end
+
 ISPNCCommandHubZoneWindow = AttachedWindow:derive(
     "ISPNCCommandHubZoneWindow"
 )
@@ -55,6 +67,7 @@ function ISPNCCommandHubZoneWindow:createChildren()
     self.statusText = ""
     self.lastRevision = -1
     self.lastRequestAt = 0
+    self.lastActionResultRevision = nil
     local definition = Registry.Get(self.definitionID)
     for _, section in ipairs(definition and definition.sections or {}) do
         local createButton = UI.CreateButton(self, {
@@ -116,6 +129,13 @@ function ISPNCCommandHubZoneWindow:refresh()
     local zone = self:getZoneState()
     if ZoneOverlay and ZoneOverlay.SetActive then
         ZoneOverlay.SetActive(self.definitionID, zone)
+    end
+    local networkState = PNC.Network and PNC.Network.ClientState or {}
+    local revision = tonumber(networkState.colonyManagementRevision) or 0
+    if revision ~= self.lastActionResultRevision then
+        self.lastActionResultRevision = revision
+        local message = actionResultText(snapshot().actionResult)
+        if message then self:setStatus(message) end
     end
     for _, section in ipairs(definition.sections or {}) do
         local controls = self.controls[section.id]

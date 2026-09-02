@@ -35,8 +35,96 @@ function Service.IsRecordProtected(record)
     return taskId ~= nil and Service.IsLifecycleProtected(taskId)
 end
 
-local function clearCorpseTaskMarker(x, y, z, token)
-    local corpse = Service.GetCorpseAt(x, y, z, token)
+-- Keep the operation boundary observable. WorkTaskProvider intentionally
+-- releases a failed lease so another worker can retry, which otherwise erases
+-- the failure from the durable order and leaves only a generic WAITING state.
+-- The task/order retain the last reason while console output is throttled per
+-- stage/reason pair.
+local function operationDiagnostic(order, task, record, stage, reason, kind)
+    if not order then return end
+    local now = Core.Now()
+    local normalizedStage = tostring(stage or "UNKNOWN")
+    local normalizedReason = tostring(reason or "UNKNOWN")
+    local key = normalizedStage .. ":" .. normalizedReason
+    local shouldLog = true
+    local stateChanged = order.lastDiagnosticReason ~= normalizedReason
+        or order.lastDiagnosticStage ~= normalizedStage
+    local failureChanged = tostring(kind or "FAIL") == "FAIL"
+        and (order.lastExecutionFailureReason ~= normalizedReason
+            or order.lastExecutionFailurePhase
+                ~= tostring(order.phase or ""))
+    local previousKey = task and task.lastDiagnosticKey
+        or order.lastDiagnosticKey
+    local previousAt = task and tonumber(task.lastDiagnosticAt)
+        or tonumber(order.lastDiagnosticLogAt)
+    local interval = tonumber(Service.CORPSE_HAUL_DIAGNOSTIC_INTERVAL_MS)
+        or 2000
+    if previousKey == key and previousAt
+        and now - previousAt < interval
+    then
+        shouldLog = false
+    end
+    if shouldLog and task then
+        task.lastDiagnosticKey = key
+        task.lastDiagnosticAt = now
+    end
+    if shouldLog then
+        order.lastDiagnosticKey = key
+        order.lastDiagnosticLogAt = now
+    end
+    record = record or Registry and Registry.Get
+        and Registry.Get(order.workerId) or nil
+    if stateChanged then
+        order.lastDiagnosticReason = normalizedReason
+        order.lastDiagnosticStage = normalizedStage
+        order.lastDiagnosticAt = now
+    end
+    if failureChanged then
+        order.lastExecutionFailureReason = normalizedReason
+        order.lastExecutionFailurePhase = tostring(order.phase or "")
+        order.lastExecutionFailureAt = now
+    end
+    if (stateChanged or failureChanged or shouldLog)
+        and WorkRepository and WorkRepository.MarkDirty
+    then
+        WorkRepository.MarkDirty()
+    end
+    if shouldLog and Core.Log then
+        local payload = order.payload or {}
+        local live = record and Registry and Registry.GetLiveZombie
+            and Registry.GetLiveZombie(record.id) or nil
+        local x = tonumber(live and live.getX and live:getX())
+            or tonumber(record and record.x) or "?"
+        local y = tonumber(live and live.getY and live:getY())
+            or tonumber(record and record.y) or "?"
+        local z = tonumber(live and live.getZ and live:getZ())
+            or tonumber(record and record.z) or "?"
+        Core.Log("WARN", "corpse_haul_diagnostic stage="
+            .. normalizedStage .. " kind=" .. tostring(kind or "FAIL")
+            .. " order=" .. tostring(order.id or "unknown")
+            .. " npc=" .. tostring(order.workerId or record and record.id
+                or "unknown")
+            .. " phase=" .. tostring(order.phase or "")
+            .. " status=" .. tostring(order.status or "")
+            .. " reason=" .. normalizedReason
+            .. " pos=" .. tostring(x) .. "," .. tostring(y) .. ","
+            .. tostring(z)
+            .. " source=" .. tostring(payload.sourceX or "?") .. ","
+            .. tostring(payload.sourceY or "?") .. ","
+            .. tostring(payload.sourceZ or "?")
+            .. " token=" .. tostring(payload.haulToken or "?")
+            .. " death=" .. tostring(payload.deathMarkerId
+                or payload.corpseId or "?"))
+    end
+end
+
+local function operationFailure(order, task, record, stage, reason)
+    operationDiagnostic(order, task, record, stage, reason, "FAIL")
+    return false, reason
+end
+
+local function clearCorpseTaskMarker(x, y, z, token, deathMarkerId)
+    local corpse = Service.GetCorpseAt(x, y, z, token, deathMarkerId)
     local data = corpse and corpse.getModData and corpse:getModData() or nil
     local changed = false
     if data and tostring(data.PNC_CorpseHaulTaskId or "") ~= "" then
@@ -62,6 +150,7 @@ local function assignmentForWorkOrder(order)
     then return nil end
     return {
         taskId = tostring(order.id), haulToken = token,
+        deathMarkerId = payload.deathMarkerId or payload.corpseId,
         baseId = order.baseId, facilityId = payload.facilityId,
         sourceX = sourceX, sourceY = sourceY, sourceZ = sourceZ,
         interactionX = tonumber(payload.interactionX) or sourceX,
@@ -82,7 +171,8 @@ local function workTaskFor(order, lease, assignment)
     local task = Service.Runtime.byTask[taskId]
     local record = Registry and Registry.Get and Registry.Get(lease.npcId) or nil
     local corpse = Service.GetCorpseAt(assignment.sourceX, assignment.sourceY,
-        assignment.sourceZ, assignment.haulToken)
+        assignment.sourceZ, assignment.haulToken,
+        assignment.deathMarkerId)
     if not task then
         task = {
             taskId = taskId, haulToken = assignment.haulToken,
@@ -267,9 +357,11 @@ local function clearWorkRuntime(order, reason)
     if assignment then
         if not preserveCarriedCorpse then
             clearCorpseTaskMarker(assignment.sourceX, assignment.sourceY,
-                assignment.sourceZ, assignment.haulToken)
+                assignment.sourceZ, assignment.haulToken,
+                assignment.deathMarkerId)
             clearCorpseTaskMarker(assignment.dropX, assignment.dropY,
-                assignment.dropZ, assignment.haulToken)
+                assignment.dropZ, assignment.haulToken,
+                assignment.deathMarkerId)
         end
         Service.Runtime.byToken[assignment.haulToken] = nil
         Service.Runtime.byDrop[Internal.pointKey(assignment.dropX,
@@ -298,20 +390,35 @@ local function workTargetProvider(order, worker, live)
     local targetX
     local targetY
     local targetZ
-    if not live then return { ok = false, reason = "LIVE_WORKER_REQUIRED" } end
-    if not assignment then return { ok = false, reason = "CORPSE_PAYLOAD_INVALID" } end
+    if not live then
+        operationDiagnostic(order, nil, worker, "TARGET",
+            "LIVE_WORKER_REQUIRED", "FAIL")
+        return { ok = false, reason = "LIVE_WORKER_REQUIRED" }
+    end
+    if not assignment then
+        operationDiagnostic(order, nil, worker, "TARGET",
+            "CORPSE_PAYLOAD_INVALID", "FAIL")
+        return { ok = false, reason = "CORPSE_PAYLOAD_INVALID" }
+    end
     corpse = Service.GetCorpseAt(assignment.sourceX, assignment.sourceY,
-        assignment.sourceZ, assignment.haulToken)
+        assignment.sourceZ, assignment.haulToken,
+        assignment.deathMarkerId)
     if not corpse and tostring(order.phase or "") == "CARRYING"
         and Internal.resolveCorpseForCarry
     then
         corpse = Internal.resolveCorpseForCarry(order, nil, live)
     end
-    if not corpse then return { ok = false, reason = "CORPSE_NOT_FOUND" } end
+    if not corpse then
+        operationDiagnostic(order, nil, worker, "TARGET", "CORPSE_NOT_FOUND",
+            "FAIL")
+        return { ok = false, reason = "CORPSE_NOT_FOUND" }
+    end
     data = corpse.getModData and corpse:getModData() or nil
     if data and data.PNC_CorpseHaulTaskId
         and tostring(data.PNC_CorpseHaulTaskId) ~= tostring(order.id)
     then
+        operationDiagnostic(order, nil, worker, "TARGET",
+            "CORPSE_ALREADY_RESERVED", "FAIL")
         return { ok = false, reason = "CORPSE_ALREADY_RESERVED" }
     end
     phase = tostring(order.phase or "SOURCE_APPROACH")
@@ -354,18 +461,9 @@ end
 
 local function waitForWorld(order, task, reason)
     local now = Core.Now()
-    local changed = not task or task.worldWaitReason ~= reason
+    operationDiagnostic(order, task, nil, "WORLD_WAIT", reason, "WAIT")
     if task then
         task.worldWaitReason = reason
-        if changed or now >= (tonumber(task.lastWorldWaitLogAt) or 0)
-            + Service.CORPSE_COUNT_CACHE_MS
-        then
-            task.lastWorldWaitLogAt = now
-            if Core.LogWarn then
-                Core.LogWarn("corpse_haul_waiting order=" .. tostring(order.id)
-                    .. " reason=" .. tostring(reason))
-            end
-        end
     end
     order.status = Status.WORKING
     order.blockedReason = reason
@@ -398,24 +496,32 @@ local function transferCorpse(order, assignment, task)
     end
     if not corpse then
         corpse = Service.GetCorpseAt(assignment.sourceX,
-            assignment.sourceY, assignment.sourceZ, assignment.haulToken)
+            assignment.sourceY, assignment.sourceZ, assignment.haulToken,
+            assignment.deathMarkerId)
     end
     if not corpse then
         corpse = Service.GetCorpseAt(assignment.dropX, assignment.dropY,
-            assignment.dropZ, assignment.haulToken)
+            assignment.dropZ, assignment.haulToken,
+            assignment.deathMarkerId)
         if corpse then
             local progressed, progressReason = Work.Commands.AddProgress(
                 order.id, order.workerId, order.requiredWork)
-            return progressed == true, progressReason
+            if progressed ~= true then
+                return operationFailure(order, task, nil, "TRANSFER",
+                    progressReason or "PROGRESS_REJECTED")
+            end
+            return true
         end
-        return false, "CORPSE_NOT_FOUND"
+        return operationFailure(order, task, nil, "TRANSFER",
+            "CORPSE_NOT_FOUND")
     end
     if not Lifecycle or not Lifecycle.Internal
         or (task and task.carrying and not Lifecycle.Internal.followCorpse)
         or (not task or (not task.carrying
             and not Lifecycle.Internal.moveCorpse))
     then
-        return false, "CORPSE_TRANSFER_UNAVAILABLE"
+        return operationFailure(order, task, nil, "TRANSFER",
+            "CORPSE_TRANSFER_UNAVAILABLE")
     end
     if task and task.carrying and Lifecycle.Internal.followCorpse then
         ok, reason = Lifecycle.Internal.followCorpse(corpse,
@@ -425,7 +531,10 @@ local function transferCorpse(order, assignment, task)
         ok, reason = Lifecycle.Internal.moveCorpse(corpse, destinationSquare,
             assignment.dropX, assignment.dropY, assignment.dropZ)
     end
-    if not ok then return false, reason end
+    if not ok then
+        return operationFailure(order, task, nil, "TRANSFER",
+            reason or "CORPSE_TRANSFER_FAILED")
+    end
     local data = corpse.getModData and corpse:getModData() or nil
     if data then
         data.PNC_CorpseHaulTaskId = order.id
@@ -433,15 +542,26 @@ local function transferCorpse(order, assignment, task)
     end
     local progressed, progressReason = Work.Commands.AddProgress(
         order.id, order.workerId, order.requiredWork)
-    return progressed == true, progressReason
+    if progressed ~= true then
+        return operationFailure(order, task, nil, "TRANSFER",
+            progressReason or "PROGRESS_REJECTED")
+    end
+    return true
 end
 
 local function completeWorkOrder(order)
     local assignment = assignmentForWorkOrder(order)
+    local task = Service.Runtime.byTask[tostring(order and order.id or "")]
+    local record = order and Registry and Registry.Get
+        and Registry.Get(order.workerId) or nil
     local corpse = assignment and Service.GetCorpseAt(assignment.dropX,
-        assignment.dropY, assignment.dropZ, assignment.haulToken) or nil
+        assignment.dropY, assignment.dropZ, assignment.haulToken,
+        assignment.deathMarkerId) or nil
     local data = corpse and corpse.getModData and corpse:getModData() or nil
-    if not corpse or not data then return false, "CORPSE_NOT_AT_DESTINATION" end
+    if not corpse or not data then
+        return operationFailure(order, task, record, "COMPLETION",
+            "CORPSE_NOT_AT_DESTINATION")
+    end
     data.PNC_CorpseHaulTaskId = nil
     Internal.transmit(corpse)
     local marker = data.PNC_DeathMarkerID
@@ -480,7 +600,8 @@ local function tickWorkOrder(order, lease)
     local now = Core.Now()
     local distance
     if not assignment or not record or not body then
-        return false, "LIVE_WORKER_REQUIRED"
+        return operationFailure(order, nil, record, "EXECUTE",
+            "LIVE_WORKER_REQUIRED")
     end
     task = workTaskFor(order, lease, assignment)
     task.phase = tostring(order.phase or task.phase or "SOURCE_APPROACH")
@@ -501,7 +622,8 @@ local function tickWorkOrder(order, lease)
     if task.phase == "GRAB_PENDING" then
         local sequenceState, sequenceReason = actionStatus(record, order)
         if sequenceState == "failed" then
-            return false, sequenceReason
+            return operationFailure(order, task, record, "GRAB",
+                sequenceReason or "WORK_SEQUENCE_FAILED")
         end
         if sequenceState == "completed" then
             if not Internal.squareAt(assignment.sourceX, assignment.sourceY,
@@ -510,14 +632,19 @@ local function tickWorkOrder(order, lease)
                 return waitForWorld(order, task, "SOURCE_CHUNK_LOADING")
             end
             if not Service.GetCorpseAt(assignment.sourceX,
-                assignment.sourceY, assignment.sourceZ, assignment.haulToken)
+                assignment.sourceY, assignment.sourceZ, assignment.haulToken,
+                assignment.deathMarkerId)
             then
-                return false, "CORPSE_NOT_FOUND_AFTER_GRAB"
+                return operationFailure(order, task, record, "GRAB",
+                    "CORPSE_NOT_FOUND_AFTER_GRAB")
             end
             if Service.CORPSE_CARRY_ENABLED and Internal.beginCorpseCarry then
                 local carrying, carryReason = Internal.beginCorpseCarry(
                     order, task, body, assignment)
-                if not carrying then return false, carryReason end
+                if not carrying then
+                    return operationFailure(order, task, record, "GRAB",
+                        carryReason or "CORPSE_CARRY_FAILED")
+                end
                 setWorkPhase(order, lease, "CARRYING",
                     Status.TRAVEL_TO_STATION, {
                         x = assignment.dropX, y = assignment.dropY,
@@ -533,13 +660,15 @@ local function tickWorkOrder(order, lease)
         elseif now - (tonumber(task.phaseStartedAt) or now)
             > Service.INTERACTION_TIMEOUT_MS
         then
-            return false, "GRAB_TIMEOUT"
+            return operationFailure(order, task, record, "GRAB",
+                "GRAB_TIMEOUT")
         end
         return true
     end
     if task.phase == "CARRYING" then
         if not isDropPointAllowed(assignment) then
-            return false, "DROP_REGION_INVALID"
+            return operationFailure(order, task, record, "CARRY",
+                "DROP_REGION_INVALID")
         end
         local carried
         local carryReason
@@ -561,9 +690,11 @@ local function tickWorkOrder(order, lease)
                 then
                     return waitForWorld(order, task, "CARRY_CORPSE_LOADING")
                 end
-                return false, "CORPSE_CARRY_LOST"
+                return operationFailure(order, task, record, "CARRY",
+                    "CORPSE_CARRY_LOST")
             end
-            return false, carryReason
+            return operationFailure(order, task, record, "CARRY",
+                carryReason or "CORPSE_CARRY_FAILED")
         end
         task.carryMissingSince = nil
         distance = Core.Distance(body:getX(), body:getY(),
@@ -578,7 +709,8 @@ local function tickWorkOrder(order, lease)
     end
     if task.phase == "DESTINATION_APPROACH" then
         if not isDropPointAllowed(assignment) then
-            return false, "DROP_REGION_INVALID"
+            return operationFailure(order, task, record, "DESTINATION",
+                "DROP_REGION_INVALID")
         end
         distance = Core.Distance(body:getX(), body:getY(),
             assignment.dropX, assignment.dropY)
@@ -593,18 +725,21 @@ local function tickWorkOrder(order, lease)
     if task.phase == "DROP_PENDING" then
         local sequenceState, sequenceReason = actionStatus(record, order)
         if sequenceState == "failed" then
-            return false, sequenceReason
+            return operationFailure(order, task, record, "DROP",
+                sequenceReason or "WORK_SEQUENCE_FAILED")
         end
         if sequenceState == "completed" then
             return transferCorpse(order, assignment, task)
         elseif now - (tonumber(task.phaseStartedAt) or now)
             > Service.INTERACTION_TIMEOUT_MS
         then
-            return false, "DROP_TIMEOUT"
+            return operationFailure(order, task, record, "DROP",
+                "DROP_TIMEOUT")
         end
         return true
     end
-    return false, "UNKNOWN_HAUL_PHASE"
+    return operationFailure(order, task, record, "EXECUTE",
+        "UNKNOWN_HAUL_PHASE")
 end
 
 local function bindWorkService()

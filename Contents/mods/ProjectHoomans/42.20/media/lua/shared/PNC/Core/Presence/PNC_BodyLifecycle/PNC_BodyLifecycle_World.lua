@@ -36,13 +36,54 @@ local function setCorpsePosition(corpse, x, y, z, square)
     corpse:setX(tonumber(x))
     corpse:setY(tonumber(y))
     corpse:setZ(tonumber(z))
-    -- addCorpse() owns square membership. Only cross-tile transfers update the
-    -- moving object's current square; repeatedly calling setCurrent() on a
-    -- static body while it remains in one square can leave a stale render
-    -- entry and produce the oversized shadow/duplicate-body artifact.
+    -- IsoGridSquare:addCorpse() does not synchronize IsoObject.square or
+    -- IsoMovingObject.current. Keep both fields authoritative before insertion;
+    -- otherwise the next transfer removes from the stale square and leaves the
+    -- same body in multiple staticMovingObjects lists.
+    if square and corpse.setSquare then corpse:setSquare(square) end
     if square and corpse.setCurrent then corpse:setCurrent(square) end
     invalidateCorpseRender(corpse)
     return true
+end
+
+local function removeCorpseFromSquareList(square, corpse)
+    local list
+    local i
+    if not square or not corpse or not square.getStaticMovingObjects then
+        return
+    end
+    list = square:getStaticMovingObjects()
+    if not list or not list.remove then return end
+    for i = list:size() - 1, 0, -1 do
+        if list:get(i) == corpse then
+            pcall(list.remove, list, i)
+        end
+    end
+end
+
+local function corpseSquares(corpse)
+    local visible = corpse and corpse.getSquare and corpse:getSquare() or nil
+    local current = corpse and corpse.getCurrentSquare
+        and corpse:getCurrentSquare() or nil
+    local raw = visible
+    if current and corpse.setCurrent then
+        -- getSquare() prefers current; briefly clear it to recover the raw
+        -- IsoObject.square left behind by the engine remove path.
+        corpse:setCurrent(nil)
+        raw = corpse.getSquare and corpse:getSquare() or raw
+        corpse:setCurrent(current)
+    end
+    return visible, current, raw
+end
+
+local function detachCorpseMembership(corpse, visible, current, raw)
+    if current then removeCorpseFromSquareList(current, corpse) end
+    if visible and visible ~= current then
+        removeCorpseFromSquareList(visible, corpse)
+    end
+    if raw and raw ~= visible and raw ~= current then
+        removeCorpseFromSquareList(raw, corpse)
+    end
 end
 
 local function announceCorpse(corpse)
@@ -56,6 +97,8 @@ local function announceCorpse(corpse)
         pcall(GameServer.sendCorpse, corpse)
     end
 end
+
+Internal.announceCorpse = announceCorpse
 
 function Internal.worldHour()
     local gameTime = getGameTime and getGameTime() or nil
@@ -113,13 +156,21 @@ end
 
 function Internal.removeCorpse(corpse)
     local square
+    local current
+    local raw
     if not corpse then
         return false
     end
-    square = corpse.getSquare and corpse:getSquare() or nil
+    square, current, raw = corpseSquares(corpse)
     if square and square.transmitRemoveItemFromSquare then
         pcall(square.transmitRemoveItemFromSquare, square, corpse)
     end
+    if current and current ~= square
+        and current.transmitRemoveItemFromSquare
+    then
+        pcall(current.transmitRemoveItemFromSquare, current, corpse)
+    end
+    detachCorpseMembership(corpse, square, current, raw)
     if corpse.removeFromWorld then
         pcall(corpse.removeFromWorld, corpse)
     end
@@ -129,11 +180,18 @@ function Internal.removeCorpse(corpse)
     if corpse.setSquare then
         pcall(corpse.setSquare, corpse, nil)
     end
+    if corpse.setCurrent then
+        pcall(corpse.setCurrent, corpse, nil)
+    end
     return true
 end
 
 function Internal.moveCorpse(corpse, destination, x, y, z)
     local source = corpse and corpse.getSquare and corpse:getSquare() or nil
+    local current = corpse and corpse.getCurrentSquare
+        and corpse:getCurrentSquare() or nil
+    local raw
+    local visible
     local oldX = corpse and corpse.getX and corpse:getX() or nil
     local oldY = corpse and corpse.getY and corpse:getY() or nil
     local oldZ = corpse and corpse.getZ and corpse:getZ() or nil
@@ -158,13 +216,23 @@ function Internal.moveCorpse(corpse, destination, x, y, z)
         return false, "CORPSE_TRANSFER_POSITION_INVALID"
     end
 
+    visible, current, raw = corpseSquares(corpse)
+    source = visible or source
+    detachCorpseMembership(corpse, source, current, raw)
+
     -- Move the existing engine object. This preserves the corpse's clothing,
     -- inventory, and mod data, while the square APIs keep the server/client
     -- world representation authoritative in both singleplayer and MP.
     source:removeCorpse(corpse, false)
+    raw = corpse.getSquare and corpse:getSquare() or raw
+    if raw and raw ~= source then
+        removeCorpseFromSquareList(raw, corpse)
+    end
     corpse:setX(newX + 0.5)
     corpse:setY(newY + 0.5)
     corpse:setZ(newZ)
+    if corpse.setSquare then corpse:setSquare(destination) end
+    if corpse.setCurrent then corpse:setCurrent(destination) end
     destination:addCorpse(corpse, false)
 
     Internal.forEachCorpse(destination, function(candidate)
@@ -178,9 +246,12 @@ function Internal.moveCorpse(corpse, destination, x, y, z)
     -- Do not leave a corpse detached if the engine rejected the destination
     -- insertion. Restore the exact prior object and coordinates.
     destination:removeCorpse(corpse, false)
+    removeCorpseFromSquareList(destination, corpse)
     corpse:setX(oldX)
     corpse:setY(oldY)
     corpse:setZ(oldZ)
+    if corpse.setSquare then corpse:setSquare(source) end
+    if corpse.setCurrent then corpse:setCurrent(source) end
     source:addCorpse(corpse, false)
     announceCorpse(corpse)
     return false, "CORPSE_TRANSFER_NOT_ATTACHED"
@@ -188,6 +259,10 @@ end
 
 function Internal.followCorpse(corpse, x, y, z)
     local source = corpse and corpse.getSquare and corpse:getSquare() or nil
+    local current = corpse and corpse.getCurrentSquare
+        and corpse:getCurrentSquare() or nil
+    local raw
+    local visible
     local destination = squareAt(x, y, z)
     local oldX = corpse and corpse.getX and corpse:getX() or nil
     local oldY = corpse and corpse.getY and corpse:getY() or nil
@@ -204,16 +279,35 @@ function Internal.followCorpse(corpse, x, y, z)
         return false, "CORPSE_FOLLOW_API_UNAVAILABLE"
     end
 
+    visible, current, raw = corpseSquares(corpse)
+    source = visible or source
+
     -- Position updates inside one tile do not need a remove/add cycle. The
     -- corpse remains a real IsoDeadBody, so its vanilla renderer follows the
     -- coordinates while the square still owns the object.
     if source == destination then
-        return setCorpsePosition(corpse, x, y, z, nil)
+        detachCorpseMembership(corpse, source, current, raw)
+        local positioned = setCorpsePosition(corpse, x, y, z, source)
+        if positioned then
+            -- This is a local membership repair, not a network handoff. The
+            -- remote flag prevents a listen-server client from receiving an
+            -- unmatched AddCorpse packet for an object that never left its
+            -- tile.
+            source:addCorpse(corpse, true)
+        end
+        return positioned
     end
 
+    detachCorpseMembership(corpse, source, current, raw)
     source:removeCorpse(corpse, false)
+    raw = corpse.getSquare and corpse:getSquare() or raw
+    if raw and raw ~= source then
+        removeCorpseFromSquareList(raw, corpse)
+    end
     local positioned = setCorpsePosition(corpse, x, y, z, destination)
     if not positioned then
+        if corpse.setSquare then corpse:setSquare(source) end
+        if corpse.setCurrent then corpse:setCurrent(source) end
         source:addCorpse(corpse, false)
         return false, "CORPSE_POSITION_API_UNAVAILABLE"
     end
@@ -230,6 +324,7 @@ function Internal.followCorpse(corpse, x, y, z)
     -- Roll back a failed square insertion so a transient/unloaded destination
     -- cannot strand the corpse outside the world.
     destination:removeCorpse(corpse, false)
+    removeCorpseFromSquareList(destination, corpse)
     setCorpsePosition(corpse, oldX, oldY, oldZ, source)
     source:addCorpse(corpse, false)
     announceCorpse(corpse)

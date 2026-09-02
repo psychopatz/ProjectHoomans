@@ -1,6 +1,7 @@
 -- In-game NPC free-text chat over the bounded PsychopatzCore bridge.
 require "PsychopatzCore/UI/Conversation/PsychopatzConversationLayout"
 require "PsychopatzCore/Conversation/PsychopatzConversationMessage"
+require "PsychopatzCore/Conversation/PsychopatzNameParts"
 require "PNC/Conversation/PNC_ConversationLLMTools"
 require "PNC/Conversation/PNC_ConversationToolReplies"
 require "PNC/Integrations/PNC_HoomansLLMContext"
@@ -12,6 +13,7 @@ PNC.Conversation = PNC.Conversation or {}
 PNC.HoomansLLM = PNC.HoomansLLM or {}
 
 local Integration = PNC.HoomansLLM
+local NameParts = PsychopatzCore.Conversation.NameParts
 local Layout = PsychopatzCore.Conversation.Layout
 local Context = PNC.HoomansLLM.Context
 local LLMTools = PNC.ConversationLLMTools
@@ -42,6 +44,7 @@ local MAX_INPUT_LENGTH = 4000
 local MAX_LOG_TEXT = 900
 local Pending = nil
 local PendingQueue = {}
+local AmbientPending = nil
 local ActiveSpeech = {}
 local serial = 0
 
@@ -98,9 +101,41 @@ local function cleanResponseText(value)
     return trim(value)
 end
 
+local function replaceAmbientIdentity(text, fullName, firstName, surname)
+    local names = { fullName, surname }
+    local replacement = tostring(firstName or "")
+    if replacement == "" then return text end
+    for _, name in ipairs(names) do
+        name = trim(name)
+        if name ~= "" and name ~= replacement then
+            -- Escape Lua pattern punctuation so names such as "O'Neil" and
+            -- hyphenated surnames are treated as literal text.
+            local pattern = string.gsub(name, "([^%w])", "%%%1")
+            text = string.gsub(text, pattern, replacement)
+        end
+    end
+    return text
+end
+
+local function enforceAmbientNamePolicy(text, packet)
+    local context = packet and packet.conversation_context or {}
+    text = replaceAmbientIdentity(
+        text,
+        context.player_full_name,
+        context.player_first_name,
+        context.player_surname
+    )
+    return replaceAmbientIdentity(
+        text,
+        context.victim_full_name,
+        context.victim_first_name,
+        context.victim_surname
+    )
+end
+
 local function logText(value)
     value = trim(value)
-    value = string.gsub(value, "[%r\n]+", " ")
+    value = string.gsub(value, "[\r\n]+", " ")
     if #value > MAX_LOG_TEXT then
         value = string.sub(value, 1, MAX_LOG_TEXT - 1) .. "…"
     end
@@ -163,6 +198,123 @@ local function buildPacket(view, requestID, message)
         })
     end
     return packet
+end
+
+local function buildAmbientPacket(item, requestID)
+    local source = item and item.context or {}
+    local npcID = tostring(item and item.speakerID or source.npcID or "")
+    local playerID = tostring(item and item.playerUUID
+        or source.playerUUID or "ambient-player")
+    local npc = NameParts.Split(
+        source.speakerFullName
+            or item and item.speakerName
+            or source.name or npcID or "the survivor",
+        source.speakerFirstName or source.firstName,
+        source.speakerSurname or source.surname
+    )
+    local player = NameParts.Split(
+        source.playerFullName or source.playerName
+            or source.player or "the player",
+        source.playerFirstName,
+        source.playerSurname
+    )
+    local npcFullName = npc.fullName or "the survivor"
+    local npcFirstName = npc.firstName or npcFullName
+    local npcSurname = npc.surname or ""
+    local playerFullName = player.fullName or "the player"
+    local playerFirstName = player.firstName or playerFullName
+    local playerSurname = player.surname or ""
+    local victimID = tostring(source.victimNPCID or "")
+    local victim = NameParts.Split(
+        source.victimFullName or source.victimName
+            or source.victim or "your teammate",
+        source.victimFirstName,
+        source.victimSurname or source.victimLastName
+    )
+    local victimFullName = victim.fullName or "your teammate"
+    local victimFirstName = victim.firstName or victimFullName
+    local worldUUID = Message.GetSaveID()
+    local sessionID = "pnc_ambient_" .. tostring(requestID)
+    local eventType = tostring(source.eventType or item and item.family
+        or "ambient_social")
+    local context = {
+        world_uuid = worldUUID,
+        player_uuid = playerID,
+        npc_uuid = npcID,
+        session_id = sessionID,
+        npc_name = npcFullName,
+        player_name = playerFirstName,
+        npc_full_name = npcFullName,
+        npc_first_name = npcFirstName,
+        npc_surname = npcSurname,
+        player_full_name = playerFullName,
+        player_first_name = playerFirstName,
+        player_surname = playerSurname,
+        victim_npc_id = victimID ~= "" and victimID or nil,
+        victim_name = victimFirstName,
+        victim_full_name = victimFullName,
+        victim_first_name = victimFirstName,
+        victim_surname = victim.surname or "",
+        message = eventType == "witnessed_teammate_hurt"
+            and (
+                "Write one brief in-character reaction because you witnessed "
+                .. "your teammate take damage from a zombie. If you address "
+                .. "the teammate, use only their first name ("
+                .. victimFirstName .. "). Do not use their surname or full name. "
+                .. "Do not mention being an AI, prompts, or game systems. "
+                .. "Keep it under one sentence."
+            )
+            or (
+                "Write one brief in-character reaction because you witnessed "
+                .. "the player kill a zombie. Do not mention being an AI, prompts, "
+                .. "or game systems. If you address the player, use only their first "
+                .. "name; never repeat their surname or full name. Keep it under one "
+                .. "sentence."
+            ),
+        character_card = {},
+        relationship_snapshot = {
+            state = source.relationshipState,
+            category = source.relationshipState,
+            npcType = source.socialRole or source.npcType,
+            relationshipTier = source.relationshipTier,
+        },
+        relationship_capabilities = {
+            server_authoritative = true,
+            available_reactions = {},
+        },
+        current_state = {},
+        scene = {
+            current_speaker_id = npcID,
+            addressed_targets = { playerID },
+        },
+        recent_conversation = {},
+        available_tools = {},
+        metadata = {
+            source = "project-hoomans",
+            mode = "ambient_social",
+            family = tostring(item and item.family or "ambient"),
+            event_type = eventType,
+            victim_npc_id = victimID ~= "" and victimID or nil,
+            victim_first_name = victimFirstName,
+            social_role = source.socialRole or source.npcType,
+            relationship_state = source.relationshipState,
+            relationship_tier = source.relationshipTier,
+            llm_instruction = "Return dialogue only; no actions or analysis.",
+        },
+    }
+    return {
+        status = "pending",
+        request_id = requestID,
+        npc_id = npcID,
+        world_uuid = worldUUID,
+        player_uuid = playerID,
+        session_id = sessionID,
+        npc_name = npcFullName,
+        player_name = playerFirstName,
+        victim_name = victimFirstName,
+        model = "default",
+        conversation_context = context,
+    }
 end
 
 local function recipientViews(view, part)
@@ -404,8 +556,62 @@ function Integration.Submit(view, value, part)
     return true
 end
 
+-- Ambient requests share pollChat/deliverChat with interactive conversation,
+-- but have no gameplay tools and never reserve an authoritative conversation
+-- token.  They are best-effort: the Core queue always has a deterministic
+-- fallback if this client-only provider is unavailable or too slow.
+function Integration.SubmitAmbientFlavor(item, callback)
+    if not bridgeEnabled() then return false, "bridge_disabled" end
+    if Pending or #PendingQueue > 0 or AmbientPending then
+        return false, "llm_request_pending"
+    end
+    if type(item) ~= "table" or type(callback) ~= "function" then
+        return false, "ambient_request_invalid"
+    end
+    serial = serial + 1
+    local requestID = "pnc_ambient_llm_" .. tostring(now()) .. "_"
+        .. tostring(serial)
+    AmbientPending = {
+        requestID = requestID,
+        eventID = tostring(item.eventID or ""),
+        npcID = tostring(item.speakerID or ""),
+        packet = buildAmbientPacket(item, requestID),
+        callback = callback,
+        claimed = false,
+    }
+    log(
+        "ambient_request_queued",
+        "npc=" .. AmbientPending.npcID .. " event=" .. AmbientPending.eventID
+            .. " request=" .. requestID
+    )
+    return true, requestID
+end
+
+function Integration.CancelAmbientFlavor(eventID)
+    if AmbientPending and tostring(AmbientPending.eventID or "")
+        == tostring(eventID or "")
+    then
+        log("ambient_request_cancelled", "event=" .. tostring(eventID))
+        AmbientPending = nil
+        return true
+    end
+    return false
+end
+
 function Integration.Poll()
-    if not Pending or Pending.claimed then return { status = "idle" } end
+    if not Pending then
+        if not AmbientPending or AmbientPending.claimed then
+            return { status = "idle" }
+        end
+        AmbientPending.claimed = true
+        log(
+            "ambient_task_polled",
+            "npc=" .. tostring(AmbientPending.npcID)
+                .. " request=" .. tostring(AmbientPending.requestID)
+        )
+        return AmbientPending.packet
+    end
+    if Pending.claimed then return { status = "idle" } end
     Pending.claimed = true
     log(
         "task_polled",
@@ -788,6 +994,30 @@ end
 function Integration.Deliver(arguments)
     arguments = type(arguments) == "table" and arguments or {}
     local requestID = tostring(arguments.request_id or "")
+    if AmbientPending and AmbientPending.requestID == requestID
+        and AmbientPending.claimed
+    then
+        local pending = AmbientPending
+        AmbientPending = nil
+        local response = cleanResponseText(arguments.response_text)
+        response = enforceAmbientNamePolicy(response, pending.packet)
+        if response ~= "" then
+            pending.callback(response)
+            log(
+                "ambient_response_delivered",
+                "npc=" .. tostring(pending.npcID)
+                    .. " event=" .. tostring(pending.eventID)
+                    .. " chars=" .. tostring(#response)
+            )
+            return { accepted = true, presentation = "social_flavor" }
+        end
+        log(
+            "ambient_response_empty",
+            "npc=" .. tostring(pending.npcID)
+                .. " event=" .. tostring(pending.eventID)
+        )
+        return { accepted = false, reason = "ambient_response_empty" }
+    end
     if not Pending or Pending.requestID ~= requestID or not Pending.claimed then
         return nil, "NOT_AVAILABLE", "LLM request is no longer active."
     end

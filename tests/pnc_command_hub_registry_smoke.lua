@@ -25,6 +25,8 @@ T.equal(categories[4].id, "colonist",
     "colonist is not fourth in the manual hierarchy")
 T.equal(categories[5].id, "storage",
     "storage is not fifth in the manual hierarchy")
+T.equal(categories[6].id, "research",
+    "research is not sixth in the manual hierarchy")
 for _, id in ipairs({
     "structure", "production", "furniture", "external_furniture",
     "genetics", "power", "pipe_networks", "security", "misc", "floors",
@@ -49,6 +51,8 @@ T.truthy(PNC.CommandHub.Gates
     "command hub does not expose the base and stockpile gate")
 T.truthy(Registry.Get("storage").onClick,
     "storage category does not expose its standalone workflow")
+T.truthy(Registry.Get("research").onClick,
+    "research category does not expose its standalone workflow")
 
 PNC.ColonyManagementClient = {
     ReadSnapshot = function()
@@ -101,6 +105,7 @@ local openedWork = false
 local openedEvents = false
 local openedColonist = false
 local openedStorage = false
+local openedResearch = false
 PNC.CommandHub.WorkUI = {
     Open = function()
         openedWork = true
@@ -135,6 +140,12 @@ PNC.ColonyStorageUI = {
         return true
     end,
 }
+PNC.ResearchUI = {
+    Open = function()
+        openedResearch = true
+        return true
+    end,
+}
 Registry.Get("work").onClick()
 T.truthy(openedWork, "work category is not wired to its window")
 T.truthy(Registry.IsEnabled(Registry.Get("events")),
@@ -145,6 +156,8 @@ Registry.Get("colonist").onClick()
 T.truthy(openedColonist, "colonist category is not wired to its window")
 Registry.Get("storage").onClick()
 T.truthy(openedStorage, "storage category is not wired to its window")
+Registry.Get("research").onClick()
+T.truthy(openedResearch, "research category is not wired to its window")
 zone.actions[1].onClick()
 zone.actions[2].onClick()
 zone.actions[3].onClick()
@@ -168,12 +181,26 @@ local workWindowSource = T.read("ProjectHoomans", "client",
     "PNC/UI/CommandHub/PNC_CommandHub_WorkWindow.lua")
 local settingsWindowSource = T.read("ProjectHoomans", "client",
     "PNC/UI/CommandHub/PNC_CommandHub_SettingsWindow.lua")
+local displaySettingsSource = T.read("ProjectHoomans", "client",
+    "PNC/UI/Nameplates/PNC_NameplateDisplaySettings.lua")
 T.contains(settingsWindowSource, "GetSurfaceOpacityLift",
     "settings does not expose surface opacity lift")
 T.contains(settingsWindowSource, "GetDetailOpacityLift",
     "settings does not expose detail opacity lift")
 T.contains(settingsWindowSource, "GetTitlebarControlScale",
     "settings does not expose title-bar control scale")
+T.contains(settingsWindowSource, "PNC_NameplateDisplaySettings",
+    "settings does not expose the Hoomans relationship display adapter")
+T.contains(settingsWindowSource, "relationshipFeedbackScale",
+    "settings does not expose relationship feedback size")
+T.contains(settingsWindowSource, "nameplateTextScale",
+    "settings does not expose nameplate text size")
+T.contains(settingsWindowSource, "nameplateBarScale",
+    "settings does not expose nameplate bar size")
+T.contains(displaySettingsSource, "PNC.SettingsStore",
+    "relationship display settings do not use the Hoomans settings store")
+T.falsy(string.find(displaySettingsSource, "PsychopatzCore_CommandHub", 1, true),
+    "relationship display settings leaked into the Core command-hub store")
 T.contains(settingsWindowSource, "slider = row.control",
     "settings lift fields do not expose their slider contract")
 T.contains(settingsWindowSource, "ApplyRegisteredToolbarScale",
@@ -263,6 +290,8 @@ local composition = T.read("ProjectHoomans", "client",
     "PNC/Composition/PNC_ClientComposition.lua")
 T.contains(composition, "PNC/UI/CommandHub/PNC_CommandHub",
     "command hub is not in the client composition")
+T.contains(composition, "PNC/UI/Research/PNC_ResearchWindow",
+    "research widget is not in the client composition")
 T.falsy(string.find(composition, "PNC/UI/Orders/", 1, true),
     "legacy Orders UI is still in the client composition")
 

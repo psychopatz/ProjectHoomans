@@ -4,6 +4,29 @@ local LayoutOverlay = require "PNC/UI/Communities/ColonyManagement/PNC_Settlemen
 
 local Support = {}
 
+local function snapshotFor(window)
+    local localSnapshot = window and window.snapshot
+    local state = PNC.Network and PNC.Network.ClientState or nil
+    local networkSnapshot = state and state.colonyManagement or nil
+    if type(localSnapshot) == "table"
+        and type(localSnapshot.settlement) == "table"
+    then
+        local geometry = localSnapshot.settlement.geometry
+        if type(geometry) == "table" and type(geometry.region) == "table"
+            and (not GridRegion.countTiles
+                or GridRegion.countTiles(geometry.region) > 0)
+        then
+            return localSnapshot
+        end
+    end
+    if type(networkSnapshot) == "table" then return networkSnapshot end
+    return type(localSnapshot) == "table" and localSnapshot or {}
+end
+
+function Support.Settlement(window)
+    return snapshotFor(window).settlement
+end
+
 function Support.Tr(key, fallback)
     local value = getText and getText(key) or nil
     if not value or value == key then return fallback end
@@ -13,8 +36,8 @@ end
 function Support.EmptyRegion() return { levels = {} } end
 
 function Support.BaseRegion(window)
-    local geometry = window.snapshot and window.snapshot.settlement
-        and window.snapshot.settlement.geometry
+    local settlement = Support.Settlement(window)
+    local geometry = settlement and settlement.geometry
     return geometry and geometry.region or Support.EmptyRegion()
 end
 
@@ -89,7 +112,7 @@ function Support.ComponentById(facility, componentId)
 end
 
 function Support.UsedGuideLayers(window, excludedComponentId)
-    local settlement = window.snapshot and window.snapshot.settlement or nil
+    local settlement = Support.Settlement(window)
     local layers = LayoutOverlay.BuildLayers(settlement, false)
     local filtered = {}
     local index
@@ -115,6 +138,21 @@ function Support.OpenSelector(window, options)
     options.ownerWindow = window
     options.player = getSpecificPlayer(0)
     options.playerNum = 0
+    options.inputOwner = options.inputOwner
+        or "ProjectHoomans.FacilityAreaSelector"
+    local guide = options.guideRegion
+    local guideTiles = GridRegion.countTiles and GridRegion.countTiles(guide)
+        or 0
+    options.suppressPersistentOverlays = options.suppressPersistentOverlays ~= false
+        and guideTiles > 0
+    local bounds = GridRegion.bounds and GridRegion.bounds(guide) or nil
+    local message = "[FacilityAreaSelector] open label="
+        .. tostring(options.debugLabel or "unknown")
+        .. " guideTiles=" .. tostring(guideTiles)
+        .. " guidePresent=" .. tostring(guide ~= nil)
+        .. " guideZ=" .. tostring(bounds and bounds.minZ or "none")
+    if PNC.Core and PNC.Core.LogInfo then PNC.Core.LogInfo(message)
+    else print("[PNC][INFO] " .. message) end
     return Selector.Open(options)
 end
 

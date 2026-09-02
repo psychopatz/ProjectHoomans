@@ -82,6 +82,10 @@ function H.Place(order)
     local blueprint = payload.blueprint or {}
     if payload.placed == true then return true end
     local descriptor = Catalog.Get(blueprint.objectInfoName)
+    local base = PNC.BaseService.Get(order.baseId)
+    if not H.TargetValid(base, blueprint, descriptor) then
+        return false, "BUILD_TARGET_OUTSIDE_BASE"
+    end
     local info = descriptor and descriptor.nativeObjectInfo or nil
     local builder = H.BuilderFor(order)
     if not info or not builder then return false, "BUILD_REQUIRES_LIVE_BUILDER" end
@@ -121,4 +125,3 @@ function H.Place(order)
     Repository.MarkDirty()
     return true
 end
-

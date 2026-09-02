@@ -42,12 +42,30 @@ package.preload["PsychopatzCore/World/PC_ZoneRegistry"] = function()
     return { get = function() return nil end }
 end
 package.preload["PsychopatzCore/World/PC_GridRegion"] = function()
+    local function intersects(left, right)
+        for z, level in pairs(left and left.levels or {}) do
+            local rightLevel = right and right.levels and right.levels[z]
+            for y, spans in pairs(level.rows or {}) do
+                local other = rightLevel and rightLevel.rows
+                    and rightLevel.rows[y] or nil
+                for index = 1, #spans, 2 do
+                    for otherIndex = 1, #(other or {}), 2 do
+                        if spans[index] <= other[otherIndex + 1]
+                            and other[otherIndex] <= spans[index + 1]
+                        then return true end
+                    end
+                end
+            end
+        end
+        return false
+    end
     return {
         normalize = function(region) return region end,
         countTiles = function() return 1 end,
         validate = function(region) return true, nil, region end,
         isConnected = function() return true end,
         containsPoint = function() return true end,
+        intersects = intersects,
     }
 end
 
@@ -161,6 +179,17 @@ local Provider = T.load("ProjectHoomans", "server",
     "PNC/Tasking/PNC_WorkTaskProvider.lua")
 local CorpseService = T.load("ProjectHoomans", "server",
     "PNC/Tasking/PNC_CorpseHaulService.lua")
+
+local rejected, rejectionReason = CorpseService.SetConfiguration({}, {
+    baseId = base.id,
+    sourceRegion = { levels = { [0] = { rows = { [40] = { 40, 41 } } } } },
+    destinationRegion = { levels = { [0] = { rows = { [40] = { 41, 42 } } } } },
+})
+T.falsy(rejected, "server accepted overlapping corpse-haul zones")
+T.equal(rejectionReason, "CORPSE_HAUL_ZONES_OVERLAP",
+    "server returned the wrong overlap rejection reason")
+T.equal(base.corpseHaul.destinationRegion.levels[0].rows[60][1], 60,
+    "overlap rejection mutated the saved corpse destination")
 
 local saved, saveReason = CorpseService.SetConfiguration({}, {
     baseId = base.id,

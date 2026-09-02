@@ -112,10 +112,12 @@ local function visibleIdentityArguments(
         playerFullName = playerFull or stranger,
         playerFirstName = playerFirst or playerFull or stranger,
         playerLastName = playerLast or "",
+        playerSurname = playerLast or "",
         npcName = npcFull or stranger,
         npcFullName = npcFull or stranger,
         npcFirstName = npcFirst or npcFull or stranger,
         npcLastName = npcLast or "",
+        npcSurname = npcLast or "",
     }
 end
 

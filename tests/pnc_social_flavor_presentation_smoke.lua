@@ -1,0 +1,113 @@
+local T = require "tests/support/test"
+
+T.addPackagePaths({
+    { "ProjectHoomans", "client" },
+    { "ProjectHoomans", "shared" },
+    { "PsychopatzCore", "common" },
+    { "PsychopatzCore", "common_client" },
+})
+
+local now = 1000
+getTimeInMillis = function() return now end
+getCurrentSaveName = function() return "presentation-test" end
+getText = function(key) return key end
+Events = { OnTick = { Add = function() end } }
+getSpecificPlayer = function()
+    return {
+        getUsername = function() return "tester" end,
+        getDisplayName = function()
+            return "Alexandra Maximilian Longsurname"
+        end,
+        getDescriptor = function()
+            return {
+                getForename = function() return "Alexandra" end,
+                getSurname = function() return "Maximilian Longsurname" end,
+            }
+        end,
+    }
+end
+
+PsychopatzCore = { Conversation = {} }
+PNC = {
+    Conversation = {},
+    Network = {
+        ClientState = {
+            snapshots = {
+                ["npc-one"] = { id = "npc-one", name = "Mara" },
+                ["npc-two"] = {
+                    id = "npc-two",
+                    name = "Jordan Longsurname",
+                },
+            },
+        },
+    },
+    NPCIdentityPresentation = {
+        GetName = function(value) return value.name or value.id end,
+    },
+}
+
+local EventBus = require "PsychopatzCore/Events/PC_EventBus"
+local Message = require "PsychopatzCore/Conversation/PsychopatzConversationMessage"
+local Client = require "PsychopatzCore/Conversation/PsychopatzSocialFlavorClient"
+local Presentation = require "PNC/Conversation/PNC_SocialFlavorPresentation"
+local Diary = PNC.Conversation.Diary
+local received
+EventBus.subscribe(Message.EVENT_TYPE, function(message)
+    received = message
+end, "presentation-message-test")
+
+Client.Reset()
+local accepted = Presentation.Receive({
+    eventID = "social:event:one",
+    flavorID = "social.witnessed_player_kill",
+    family = "combat_commentary",
+    npcID = "npc-one",
+    socialRole = "neutral",
+    llmEligible = false,
+}, {
+    npcID = "npc-one",
+    state = "neutral",
+}, {
+    relationshipBefore = { state = "neutral" },
+})
+T.truthy(accepted, "Hoomans adapter accepts a social event")
+Client.Pump(now)
+T.truthy(received, "adapter reaches the Core message bus")
+T.equal(received.speakerID, "npc-one", "adapter preserves NPC identity")
+T.equal(received.speakerName, "Mara", "adapter resolves NPC display name")
+T.truthy(received.text ~= "", "adapter resolves relationship-aware text")
+T.truthy(string.find(received.text, "Alexandra", 1, true),
+    "dialogue addresses the player by first name")
+T.falsy(string.find(received.text, "Maximilian", 1, true),
+    "dialogue does not repeat the player's surname")
+local entries = Diary.Get("npc-one")
+T.equal(#entries, 1, "adapter records the delivered flavor in the diary")
+T.equal(entries[1].kind, "social_flavor", "diary identifies reusable flavor")
+T.equal(entries[1].eventID, "social:event:one", "diary preserves event identity")
+
+Client.Reset()
+received = nil
+local teammateAccepted = Presentation.Receive({
+    eventID = "social:event:teammate",
+    flavorID = "social.witnessed_teammate_hurt",
+    family = "combat_commentary",
+    npcID = "npc-one",
+    socialRole = "neutral",
+    llmEligible = false,
+    context = { victimNPCID = "npc-two" },
+}, {
+    npcID = "npc-one",
+    state = "neutral",
+}, {
+    relationshipBefore = { state = "neutral" },
+})
+T.truthy(teammateAccepted, "teammate flavor is accepted")
+Client.Pump(now)
+T.truthy(received, "teammate flavor reaches the Core message bus")
+T.truthy(string.find(received.text, "Jordan", 1, true),
+    "teammate flavor addresses the injured NPC by first name")
+T.falsy(string.find(received.text, "Longsurname", 1, true),
+    "teammate flavor does not repeat the injured NPC surname")
+
+EventBus.clearOwner("presentation-message-test")
+T.finish("pnc_social_flavor_presentation_smoke")

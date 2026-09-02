@@ -21,9 +21,17 @@ local attackerBody = {
     getY = function() return 0 end,
     getZ = function() return 0 end,
 }
-local witness = { id = "witness", alive = true }
+local witness = {
+    id = "witness",
+    alive = true,
+    affiliation = { factionID = "team" },
+}
 local attackerRecord = { id = "attacker", alive = true }
-local damagedRecord = { id = "damaged", alive = true }
+local damagedRecord = {
+    id = "damaged",
+    alive = true,
+    affiliation = { factionID = "team" },
+}
 
 isServer = function() return true end
 isClient = function() return false end
@@ -57,6 +65,10 @@ PNC = {
         ForEachLive = function(callback)
             callback(witness, attackerBody, witness.id)
             callback(attackerRecord, attackerBody, attackerRecord.id)
+        end,
+        GetLiveZombie = function(id)
+            if id == "attacker" then return attackerBody end
+            return nil
         end,
     },
     SocialEventHooks = {
@@ -184,11 +196,81 @@ T.truthy(events[1].id ~= events[2].id,
     "combat observations receive unique event IDs")
 T.truthy(#logs >= 6, "combat observation stages are logged")
 
+local teammateBody = {
+    getX = function() return 1 end,
+    getY = function() return 0 end,
+    getZ = function() return 0 end,
+}
+local zombie = {
+    getX = function() return 2 end,
+    getY = function() return 0 end,
+    getZ = function() return 0 end,
+}
+local teammateCount, teammateCandidates, teammateReason =
+    H.RecordNPCDamagedByZombie(
+        damagedRecord,
+        teammateBody,
+        zombie,
+        {
+            amount = 7,
+            healthLoss = 7,
+            woundType = "scratch",
+            attackerID = "zombie:test",
+        }
+    )
+T.equal(teammateCount, 1,
+    "same-faction nearby NPC receives teammate hurt flavor")
+T.equal(teammateCandidates, 1,
+    "teammate hurt scan finds one visible teammate")
+T.equal(teammateReason, "teammates_notified",
+    "teammate hurt flavor dispatch succeeds")
+T.equal(#events, 2,
+    "teammate hurt flavor does not mutate relationship state")
+T.equal(#presentations, 3,
+    "teammate hurt flavor uses the existing presentation transport")
+T.equal(presentations[3].reason, "witnessed_teammate_hurt",
+    "teammate hurt flavor reason is preserved")
+T.equal(
+    presentations[3].context.ambientFlavor.flavorID,
+    "social.witnessed_teammate_hurt",
+    "teammate hurt flavor ID is reusable")
+T.equal(
+    presentations[3].context.ambientFlavor.context.victimNPCID,
+    damagedRecord.id,
+    "teammate hurt flavor carries victim identity for client name resolution")
+T.equal(
+    presentations[3].context.ambientFlavor.context.woundType,
+    "scratch",
+    "teammate hurt flavor carries wound type")
+
+clock = 3000
+local npcAttackerCount, npcAttackerCandidates, npcAttackerReason =
+    H.RecordNPCDamagedByNPC(
+        damagedRecord,
+        teammateBody,
+        attackerRecord,
+        {
+            amount = 11,
+            attackerID = attackerRecord.id,
+            woundType = "laceration",
+        }
+    )
+T.equal(npcAttackerCount, 1,
+    "same-faction teammate hurt by an NPC is also observed")
+T.equal(npcAttackerCandidates, 1,
+    "NPC battle hurt scan finds one visible teammate")
+T.equal(npcAttackerReason, "teammates_notified",
+    "NPC battle teammate flavor dispatch succeeds")
+T.equal(#presentations, 4,
+    "NPC battle teammate flavor uses the presentation transport")
+T.equal(presentations[4].context.ambientFlavor.context.attackerKind, "npc",
+    "NPC battle teammate flavor preserves attacker kind")
+
 T.equal(#tickHandlers, 1, "vanilla damage poll registers once")
 tickHandlers[1]()
 bodyPart.health = 92
 bodyPart.scratchTime = 8
-clock = 1100
+clock = 5100
 tickHandlers[1]()
 T.equal(events[3].type, "witnessed_player_hurt",
     "vanilla zombie wound is converted to a hurt event")

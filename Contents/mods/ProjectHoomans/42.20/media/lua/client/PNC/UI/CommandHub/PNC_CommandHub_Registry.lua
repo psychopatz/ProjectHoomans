@@ -209,7 +209,23 @@ local function openStorage(_, owner)
     return false
 end
 
-Registry.SetCategoryOrder({ "work", "zone", "events", "colonist", "storage" })
+local function openResearch(_, owner)
+    trace("pnc_research_open_start", "has_owner=" .. tostring(owner ~= nil)
+        .. " available=" .. tostring(PNC.ResearchUI ~= nil
+            and PNC.ResearchUI.Open ~= nil))
+    local research = PNC.ResearchUI
+    if research and type(research.Open) == "function" then
+        local result = research.Open(owner)
+        trace("pnc_research_open_result", "result=" .. tostring(result ~= nil))
+        return result
+    end
+    trace("pnc_research_open_result",
+        "result=false reason=missing_research_ui")
+    return false
+end
+
+Registry.SetCategoryOrder({ "work", "zone", "events", "colonist", "storage",
+    "research" })
 
 Registry.RegisterCategory({
     id = "work",
@@ -326,6 +342,21 @@ Registry.RegisterCategory({
     disabledTooltip = Gates.BaseAndStockpileDisabledTooltip,
     onClick = toggleChild("storage", openStorage),
     selected = function() return isOpen("storage") end,
+    closeHub = false,
+})
+
+Registry.RegisterCategory({
+    id = "research",
+    source = "ProjectHoomans",
+    order = 70,
+    childID = "research",
+    useChildren = false,
+    titleKey = "UI_PNC_CommandHub_Category_Research",
+    titleFallback = "Research",
+    tooltipKey = "UI_PNC_CommandHub_ResearchHelp",
+    tooltipFallback = "Plan colony upgrades and study research sources",
+    onClick = toggleChild("research", openResearch),
+    selected = function() return isOpen("research") end,
     closeHub = false,
 })
 

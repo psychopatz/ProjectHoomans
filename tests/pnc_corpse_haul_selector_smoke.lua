@@ -14,6 +14,28 @@ local Selector = {
 package.preload["PsychopatzCore/UI/World/PsychopatzGridRegionSelector"] =
     function() return Selector end
 package.preload["PsychopatzCore/World/PC_GridRegion"] = function()
+    local function containsPoint(region, x, y, z)
+        local level = region and region.levels and region.levels[z]
+        local spans = level and level.rows and level.rows[y]
+        for index = 1, #(spans or {}), 2 do
+            if x >= spans[index] and x <= spans[index + 1] then
+                return true
+            end
+        end
+        return false
+    end
+    local function intersects(left, right)
+        for z, level in pairs(left and left.levels or {}) do
+            for y, spans in pairs(level.rows or {}) do
+                for index = 1, #spans, 2 do
+                    for x = spans[index], spans[index + 1] do
+                        if containsPoint(right, x, y, z) then return true end
+                    end
+                end
+            end
+        end
+        return false
+    end
     return {
         countTiles = function(region)
             local count = 0
@@ -27,6 +49,8 @@ package.preload["PsychopatzCore/World/PC_GridRegion"] = function()
             return count
         end,
         isConnected = function() return true end,
+        containsPoint = containsPoint,
+        intersects = intersects,
     }
 end
 
@@ -62,6 +86,18 @@ opened[1].onConfirm(source)
 T.equal(#opened, 2, "source confirmation opens the destination selector")
 T.contains(opened[2].title, "DESTINATION",
     "second selector chooses corpse destination")
+
+local overlappingDestination = {
+    levels = { [0] = { rows = { [12] = { 13, 14 } } } },
+}
+local overlapValid, overlapReason = opened[2].validate(overlappingDestination)
+T.falsy(overlapValid, "destination selector allowed collect/dump overlap")
+T.contains(overlapReason, "overlap",
+    "destination selector did not explain the overlap rejection")
+local tileValid, tileReason = opened[2].tileValidator(13, 12, 0)
+T.falsy(tileValid, "destination selector did not mark overlap tiles invalid")
+T.contains(tileReason, "overlap",
+    "invalid overlap tile did not provide a useful reason")
 
 local destination = { levels = { [0] = { rows = { [20] = { 20, 21 } } } } }
 opened[2].onConfirm(destination)

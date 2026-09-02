@@ -9,6 +9,11 @@ local function validateTarget(zombie, npcBody, record)
     local laneClear
     local laneReason
     if not zombie or not npcBody or not record
+        or zombie.isDead and zombie:isDead()
+        or record.alive == false
+        or record.health and record.health.state == "dead"
+        or record.presenceState ~= Const.PRESENCE_LIVE
+        or npcBody.isDead and npcBody:isDead()
         or BiteInternal.ShouldPreventZombieAttack(record)
     then
         return false

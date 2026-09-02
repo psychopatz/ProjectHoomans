@@ -85,12 +85,30 @@ package.preload["PsychopatzCore/World/PC_ZoneRegistry"] = function()
     return { get = function() return nil end }
 end
 package.preload["PsychopatzCore/World/PC_GridRegion"] = function()
+    local function intersects(left, right)
+        for z, level in pairs(left and left.levels or {}) do
+            local rightLevel = right and right.levels and right.levels[z]
+            for y, spans in pairs(level.rows or {}) do
+                local other = rightLevel and rightLevel.rows
+                    and rightLevel.rows[y] or nil
+                for index = 1, #spans, 2 do
+                    for otherIndex = 1, #(other or {}), 2 do
+                        if spans[index] <= other[otherIndex + 1]
+                            and other[otherIndex] <= spans[index + 1]
+                        then return true end
+                    end
+                end
+            end
+        end
+        return false
+    end
     return {
         normalize = function(region) return region end,
         countTiles = function() return 1 end,
         validate = function(region) return true, nil, region end,
         isConnected = function() return true end,
         containsPoint = function() return true end,
+        intersects = intersects,
     }
 end
 
@@ -330,6 +348,12 @@ local awayManual, awayManualReason = CorpseService.RequestManual(record)
 T.falsy(awayManual, "away resident cannot manually start corpse work")
 T.equal(awayManualReason, "NPC_NOT_AT_HOME",
     "home authorization remains separate from corpse eligibility")
+T.truthy(record.runtime.corpseHaulManualDiagnostic,
+    "manual corpse rejection stores a diagnostic record")
+T.equal(record.runtime.corpseHaulManualDiagnostic.reason,
+    "NPC_NOT_AT_HOME", "manual rejection diagnostic preserves its reason")
+T.equal(record.runtime.corpseHaulManualDiagnostic.details.atHome, false,
+    "manual rejection diagnostic records the home authorization result")
 
 atHome = true
 record.allowedJobs = { CorpseHaul = false }
@@ -343,6 +367,8 @@ T.truthy(#manualLogs > 0 and string.find(
     1,
     true
 ), "manual corpse command logs its result reason")
+T.equal(record.runtime.corpseHaulManualDiagnostic.details.stage,
+    "dispatch", "manual success diagnostic records its dispatch stage")
 T.equal(Work.Queries.Get(order.id).priority, 100,
     "manual corpse order uses forced priority")
 T.equal(Work.Queries.Get(order.id).requiredWorkerId, record.id,
@@ -408,6 +434,9 @@ T.truthy(Provider.Tick(lease),
 T.equal(Work.Queries.Get(order.id).blockedReason,
     "DESTINATION_CHUNK_LOADING",
     "unloaded destination records a retryable world reason")
+T.equal(Work.Queries.Get(order.id).lastDiagnosticReason,
+    "DESTINATION_CHUNK_LOADING",
+    "world waits retain the last corpse-haul diagnostic reason")
 squares["60:60:0"] = destinationSquare
 T.truthy(Provider.Tick(lease), "drop animation completion moves the corpse")
 T.equal(Work.Queries.Get(order.id).status, Definitions.STATUS.COMPLETED,

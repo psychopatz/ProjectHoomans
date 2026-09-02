@@ -21,6 +21,7 @@ local publicFunctions = {
     "Recover",
     "CanRevive",
     "ApplyDamageToPlayer",
+    "IsDead",
     "Kill",
     "ApplyDamage",
     "ApplyStrainDamage",

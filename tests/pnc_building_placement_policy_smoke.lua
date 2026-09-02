@@ -27,4 +27,18 @@ PNC.Network.ClientState.colonyManagement = { settlement = settlement }
 valid = Policy.ValidateCurrentPoint(11, 10, 0)
 T.truthy(valid, "current settlement was not used by placement policy")
 
+local footprint = { levels = {
+    [0] = { rows = { [10] = { 11, 13 } } },
+} }
+local footprintValid, footprintReason, _, invalid =
+    Policy.ValidateFootprint(settlement, footprint)
+T.falsy(footprintValid, "footprint crossing the base boundary was accepted")
+T.equal(footprintReason, "BUILD_TARGET_OUTSIDE_BASE",
+    "footprint boundary returned the wrong placement reason")
+T.truthy(invalid and invalid.levels[0]
+    and invalid.levels[0].rows[10],
+    "invalid footprint did not identify the outside row")
+T.equal(invalid.levels[0].rows[10][1], 13,
+    "invalid footprint identified the wrong outside tile")
+
 T.finish("pnc_building_placement_policy_smoke")

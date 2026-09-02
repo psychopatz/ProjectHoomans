@@ -168,7 +168,7 @@ function Service.IsEligibleCorpse(corpse)
     return true
 end
 
-function Service.GetCorpseAt(x, y, z, token)
+function Service.GetCorpseAt(x, y, z, token, deathMarkerId)
     local square = squareAt(x, y, z)
     local found
     if not square or not Lifecycle or not Lifecycle.Internal
@@ -176,8 +176,19 @@ function Service.GetCorpseAt(x, y, z, token)
     then return nil end
     Lifecycle.Internal.forEachCorpse(square, function(corpse)
         local candidateToken = Service.GetCorpseToken(corpse, false)
+        local data = corpse and corpse.getModData
+            and corpse:getModData() or nil
+        local candidateMarker = data and (data.PNC_DeathMarkerID
+            or data.PNC_UUID) or nil
+        local tokenMatches = token == nil
+            or tostring(candidateToken or "") == tostring(token)
+        -- The haul token is authoritative for ordinary vanilla corpses. A
+        -- lifecycle marker is an additional identity check when present, but
+        -- older/untracked bodies may legitimately have no marker at all.
+        local markerMatches = deathMarkerId == nil or candidateMarker == nil
+            or tostring(candidateMarker or "") == tostring(deathMarkerId)
         if not found and Service.IsEligibleCorpse(corpse)
-            and (token == nil or tostring(candidateToken or "") == tostring(token))
+            and tokenMatches and markerMatches
         then
             found = corpse
         end
@@ -288,8 +299,11 @@ local function scanBaseCorpses(base)
         then
             Lifecycle.Internal.forEachCorpse(square, function(corpse)
                 local token
+                local data
                 if Service.IsEligibleCorpse(corpse) then
                     token = Service.GetCorpseToken(corpse, false)
+                    data = corpse and corpse.getModData
+                        and corpse:getModData() or nil
                     if not seen[corpse] then
                         seen[corpse] = true
                         found[#found + 1] = {
@@ -297,6 +311,10 @@ local function scanBaseCorpses(base)
                             x = math.floor(corpse:getX()),
                             y = math.floor(corpse:getY()),
                             z = math.floor(corpse:getZ()),
+                            squareX = x, squareY = y, squareZ = z,
+                            deathMarkerId = data and (data.PNC_DeathMarkerID
+                                or data.PNC_UUID) or nil,
+                            taskId = data and data.PNC_CorpseHaulTaskId or nil,
                         }
                     end
                 end

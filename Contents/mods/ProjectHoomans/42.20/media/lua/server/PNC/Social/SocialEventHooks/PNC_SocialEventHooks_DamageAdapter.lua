@@ -18,11 +18,13 @@ local Factions = PNC.Factions
 local POLL_INTERVAL_MS = 100
 local VANILLA_MARKER_WINDOW_MS = 500
 local WITNESS_RADIUS = tonumber(H.WitnessRadius) or 12
+local PLAYER_DELIVERY_RADIUS = math.max(WITNESS_RADIUS * 2, 24)
 
 Hooks.CombatEventSequence = Hooks.CombatEventSequence or 0
 Hooks.VanillaDamageSnapshots = Hooks.VanillaDamageSnapshots or {}
 Hooks.VanillaDamageMarkers = Hooks.VanillaDamageMarkers or {}
 Hooks.LastVanillaDamagePollAt = Hooks.LastVanillaDamagePollAt or 0
+Hooks.LastTeammateHurtAt = Hooks.LastTeammateHurtAt or {}
 
 local function call(object, method, ...)
     if not object or not object[method] then
@@ -280,6 +282,297 @@ end
 local function factionIDForMember(member)
     return member and member.affiliation
         and member.affiliation.factionID or nil
+end
+
+local function socialRole(record)
+    local interactions = PNC.VanillaEmoteInteractions
+    if interactions and type(interactions.ResolveNPCType) == "function" then
+        local ok, value = pcall(interactions.ResolveNPCType, record)
+        if ok and value then return tostring(value) end
+    end
+    if record and record.recruited == true then return "colonist" end
+    if record and record.tacticalClass == "hostile" then return "hostile" end
+    return "neutral"
+end
+
+local function distanceSqBetween(left, right)
+    local leftPosition = positionOf(left)
+    local rightPosition = positionOf(right)
+    if not leftPosition.x or not leftPosition.y
+        or not rightPosition.x or not rightPosition.y
+    then
+        return nil
+    end
+    return Core and Core.DistanceSq
+        and Core.DistanceSq(
+            leftPosition.x,
+            leftPosition.y,
+            rightPosition.x,
+            rightPosition.y
+        )
+        or ((leftPosition.x - rightPosition.x) ^ 2
+            + (leftPosition.y - rightPosition.y) ^ 2)
+end
+
+local function playerCanReceive(player, targetBody, targetRecord)
+    local target = targetBody or targetRecord
+    local distance = distanceSqBetween(player, target)
+    if not distance then return false end
+    return distance <= PLAYER_DELIVERY_RADIUS * PLAYER_DELIVERY_RADIUS
+end
+
+local function witnessCanSeeDamage(observer, observerBody, targetBody, attacker)
+    if not H.LiveNPCIsWitness then return false end
+    local ok, result = pcall(
+        H.LiveNPCIsWitness,
+        observer,
+        observerBody,
+        targetBody,
+        attacker,
+        WITNESS_RADIUS * WITNESS_RADIUS
+    )
+    return ok and result == true
+end
+
+local function damageAttackerID(attacker, hit)
+    return tostring(
+        hit and (hit.attackerID or hit.attackerZombieID)
+            or call(attacker, "getOnlineID")
+            or "unknown"
+    )
+end
+
+local function deliverTeammateDamageFlavor(
+    targetRecord,
+    targetBody,
+    attacker,
+    hit,
+    attackerKind
+)
+    local victimFactionID
+    local amount
+    local attackerID
+    local observers = {}
+    local candidates = 0
+    local emitted = 0
+    local attempted = 0
+    local eventType = "witnessed_teammate_hurt"
+    local playerCallback
+    local throttleKey
+    local currentTime
+    if not isAuthority() then
+        return 0, 0, "not_authority"
+    end
+    if not targetRecord or not targetRecord.id
+        or targetRecord.alive == false
+        or not targetBody
+    then
+        return 0, 0, "target_unavailable"
+    end
+    if not attacker then
+        return 0, 0, "attacker_unavailable"
+    end
+    if not Registry or type(Registry.ForEachLive) ~= "function" then
+        return 0, 0, "witness_registry_unavailable"
+    end
+    amount = tonumber(hit and (
+        hit.healthLoss or hit.damage or hit.amount
+    )) or 0
+    if amount <= 0 then return 0, 0, "invalid_damage" end
+    victimFactionID = factionIDForRecord(targetRecord)
+    if not victimFactionID then
+        audit({
+            "luaSide=server",
+            "event=TeammateHurtWitnessScan",
+            "phase=faction_resolution",
+            "result=false",
+            "reason=victim_faction_missing",
+            "victimNPCID=" .. tostring(targetRecord.id),
+        })
+        return 0, 0, "victim_faction_missing"
+    end
+    currentTime = nowMillis()
+    throttleKey = tostring(victimFactionID) .. ":"
+        .. tostring(targetRecord.id)
+    if Hooks.LastTeammateHurtAt[throttleKey]
+        and currentTime < Hooks.LastTeammateHurtAt[throttleKey]
+    then
+        audit({
+            "luaSide=server",
+            "event=TeammateHurtWitnessScan",
+            "phase=server_throttle",
+            "result=false",
+            "reason=target_cooldown",
+            "victimNPCID=" .. tostring(targetRecord.id),
+            "victimFactionID=" .. tostring(victimFactionID),
+            "damage=" .. tostring(amount),
+        })
+        return 0, 0, "target_cooldown"
+    end
+    Hooks.LastTeammateHurtAt[throttleKey] = currentTime + 1500
+    attackerID = damageAttackerID(attacker, hit)
+    Registry.ForEachLive(function(record, body, npcID)
+        local factionID
+        if not record or not body or not npcID
+            or record.alive == false
+            or (body.isDead and body:isDead())
+            or sameID(npcID, targetRecord.id)
+        then
+            return
+        end
+        factionID = factionIDForRecord(record)
+        if not sameID(factionID, victimFactionID) then return end
+        if not witnessCanSeeDamage(record, body, targetBody, attacker) then
+            return
+        end
+        candidates = candidates + 1
+        observers[#observers + 1] = {
+            id = tostring(npcID),
+            record = record,
+            body = body,
+        }
+    end)
+    if not Core or type(Core.ForEachPlayer) ~= "function" then
+        return 0, candidates, "player_iteration_unavailable"
+    end
+    playerCallback = function(player)
+        local playerKey
+        if not player or not playerCanReceive(
+            player,
+            targetBody,
+            targetRecord
+        ) then
+            return
+        end
+        playerKey = Hooks.ResolvePlayerKey(player) or "unknown"
+        for _, observer in ipairs(observers) do
+            local role = socialRole(observer.record)
+            local eventID = nextEventID(
+                eventType,
+                attackerID,
+                observer.id .. ":" .. tostring(targetRecord.id)
+            )
+            local context = {
+                eventType = eventType,
+                damage = amount,
+                healthLoss = tonumber(hit and hit.healthLoss) or amount,
+                woundType = hit and hit.woundType or nil,
+                attackerKind = attackerKind or "zombie",
+                attackerID = attackerID,
+                victimNPCID = tostring(targetRecord.id),
+                victimFactionID = tostring(victimFactionID),
+                relationshipScope = "teammate",
+                socialRole = role,
+                npcType = role,
+            }
+            attempted = attempted + 1
+            local sent, reason = false, nil
+            if Network
+                and type(Network.SendConversationRelationshipForNPC)
+                    == "function"
+            then
+                sent, reason = Network.SendConversationRelationshipForNPC(
+                    player,
+                    observer.id,
+                    eventType,
+                    {
+                        source = eventType,
+                        eventID = eventID,
+                        npcID = observer.id,
+                        ambientFlavor = {
+                            flavorID = "social.witnessed_teammate_hurt",
+                            eventType = eventType,
+                            family = "combat_commentary",
+                            priority = 55,
+                            llmEligible = true,
+                            llmPriority = 90,
+                            weight = 2,
+                            npcID = observer.id,
+                            npcType = role,
+                            socialRole = role,
+                            relationshipState = "unknown",
+                            relationshipTier = "reserved",
+                            mergeKey = observer.id .. ":combat_commentary",
+                            cooldowns = {
+                                familyMs = 20000,
+                                speakerMs = 20000,
+                                ambientMs = 4500,
+                                mergeWindowMs = 5000,
+                            },
+                            context = context,
+                        },
+                    }
+                )
+            else
+                reason = "relationship_transport_unavailable"
+            end
+            if sent == true then emitted = emitted + 1 end
+            audit({
+                "luaSide=server",
+                "event=TeammateHurtWitness",
+                "phase=flavor_dispatch",
+                "result=" .. tostring(sent == true),
+                "reason=" .. tostring(reason or "nil"),
+                "playerKey=" .. tostring(playerKey),
+                "observerNPCID=" .. observer.id,
+                "victimNPCID=" .. tostring(targetRecord.id),
+                "victimFactionID=" .. tostring(victimFactionID),
+                "attackerID=" .. attackerID,
+                "attackerKind=" .. tostring(attackerKind or "zombie"),
+                "damage=" .. tostring(amount),
+                "eventID=" .. eventID,
+            })
+        end
+    end
+    Core.ForEachPlayer(playerCallback)
+    audit({
+        "luaSide=server",
+        "event=TeammateHurtWitnessScan",
+        "phase=witness_scan",
+        "result=" .. tostring(emitted > 0),
+        "reason=" .. tostring(
+            emitted > 0 and "teammates_notified"
+                or attempted > 0 and "presentation_failed"
+                or candidates > 0 and "no_nearby_player"
+                or "no_visible_teammate"
+        ),
+        "victimNPCID=" .. tostring(targetRecord.id),
+        "victimFactionID=" .. tostring(victimFactionID),
+        "attackerID=" .. attackerID,
+        "attackerKind=" .. tostring(attackerKind or "zombie"),
+        "damage=" .. tostring(amount),
+        "candidateCount=" .. tostring(candidates),
+        "attemptedCount=" .. tostring(attempted),
+        "emittedCount=" .. tostring(emitted),
+    })
+    return emitted, candidates, emitted > 0
+        and "teammates_notified" or "no_teammate_event_emitted"
+end
+
+function H.RecordNPCDamagedByZombie(record, body, attacker, hit)
+    return deliverTeammateDamageFlavor(
+        record,
+        body,
+        attacker,
+        hit,
+        "zombie"
+    )
+end
+
+function H.RecordNPCDamagedByNPC(record, body, attackerRecord, hit)
+    local attackerBody
+    if not attackerRecord or not attackerRecord.id then
+        return 0, 0, "attacker_record_unavailable"
+    end
+    attackerBody = Registry and Registry.GetLiveZombie
+        and Registry.GetLiveZombie(attackerRecord.id) or nil
+    return deliverTeammateDamageFlavor(
+        record,
+        body,
+        attackerBody,
+        hit,
+        "npc"
+    )
 end
 
 function H.RecordFactionMemberAttack(player, record, hit, actorKey)

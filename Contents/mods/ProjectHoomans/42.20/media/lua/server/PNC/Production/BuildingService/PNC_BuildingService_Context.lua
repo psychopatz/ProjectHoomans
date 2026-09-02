@@ -11,6 +11,7 @@ local Catalog = PNC.BuildRecipeCatalog
 local Repository = PNC.WorkRepository
 local Zones = require "PsychopatzCore/World/PC_ZoneRegistry"
 local GridRegion = require "PsychopatzCore/World/PC_GridRegion"
+local Footprint = require "PNC/Core/Settlement/PNC_BuildingFootprint"
 
 function H.Copy(value)
     return PNC.Core and PNC.Core.DeepCopy and PNC.Core.DeepCopy(value) or value
@@ -36,13 +37,29 @@ function H.BlueprintFor(order)
     return payload and payload.blueprint or nil
 end
 
-function H.TargetValid(base, blueprint)
+function H.FootprintForBlueprint(blueprint, descriptor)
+    if not descriptor and blueprint and Catalog
+        and type(Catalog.Get) == "function"
+    then
+        descriptor = Catalog.Get(blueprint.objectInfoName)
+    end
+    return Footprint.FromObjectInfo(descriptor
+        and descriptor.nativeObjectInfo, blueprint and blueprint.nSprite,
+        blueprint and blueprint.x, blueprint and blueprint.y,
+        blueprint and blueprint.z)
+end
+
+function H.TargetValid(base, blueprint, descriptor)
     if not base or not blueprint then return false end
+    if not tonumber(blueprint.x) or not tonumber(blueprint.y)
+        or not tonumber(blueprint.z)
+    then return false end
     local zone = Zones.get(base.baseZoneId)
-    return zone and zone.geometry
-        and GridRegion.containsXY(zone.geometry,
-            math.floor(tonumber(blueprint.x) or 0),
-            math.floor(tonumber(blueprint.y) or 0)) == true
+    if not zone or not zone.geometry then return false end
+    local footprint = H.FootprintForBlueprint(blueprint, descriptor)
+    return Footprint.AllInside(footprint, function(x, y)
+        return GridRegion.containsXY(zone.geometry, x, y) == true
+    end)
 end
 
 function H.DuplicateAt(colonyId, blueprint)
@@ -95,4 +112,3 @@ function H.PublicDescriptor(descriptor, storageId)
         materials = H.RequirementSnapshot(storageId, descriptor.requirements),
     }
 end
-

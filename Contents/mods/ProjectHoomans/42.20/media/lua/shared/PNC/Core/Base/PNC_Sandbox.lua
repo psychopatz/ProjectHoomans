@@ -177,6 +177,20 @@ end
 function Settings.CanZombieTargetRecord(record, now)
     local health = record and record.health or nil
     local protectionUntil = tonumber(health and health.reviveProtectionUntil) or 0
+    local livePresence = PNC.Const and PNC.Const.PRESENCE_LIVE or nil
+    -- The downed-target preference only applies to living records.  A corpse
+    -- can retain an incapacitated health snapshot while its registry state has
+    -- already transitioned to dead/corpse, so that snapshot must never reopen
+    -- the zombie target gate.
+    if not record
+        or record.alive == false
+        or health and health.state == "dead"
+        or livePresence
+            and record.presenceState ~= nil
+            and record.presenceState ~= livePresence
+    then
+        return false
+    end
     if protectionUntil > 0 then
         now = tonumber(now) or Core.Now()
         if now < protectionUntil then

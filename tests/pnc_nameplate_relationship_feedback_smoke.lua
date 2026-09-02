@@ -7,24 +7,52 @@ T.addPackagePaths({
 
 local clock = 1000
 getTimeInMillis = function() return clock end
-UIFont = { Small = "Small", Medium = "Medium" }
+UIFont = { Small = "Small", Medium = "Medium", Large = "Large" }
 getTextManager = function()
     return {
         MeasureStringX = function(_, _, value) return #tostring(value) * 7 end,
         getFontHeight = function() return 12 end,
     }
 end
+getCore = function()
+    return { getZoom = function() return 1 end }
+end
 
 PNC = {
     Core = { Now = function() return clock end },
     Network = { ClientState = {} },
     Conversation = {},
+    Nameplates = {
+        Settings = {
+            relationshipFeedbackScale = 1.0,
+            nameplateTextScale = 1.0,
+            nameplateBarScale = 1.0,
+        },
+    },
+}
+PNC.SettingsStore = {
+    Set = function(_, key, value)
+        PNC.Nameplates.Settings[key] = value
+        return value
+    end,
 }
 
+T.load("ProjectHoomans", "client",
+    "PNC/UI/Nameplates/PNC_NameplateDisplaySettings.lua")
 T.load("ProjectHoomans", "client",
     "PNC/UI/Nameplates/PNC_NameplateRelationshipFeedback.lua")
 T.load("ProjectHoomans", "client",
     "PNC/UI/Nameplates/PNC_NameplatePresentation.lua")
+local defaultMetrics = PNC.NameplatePresentation.ScaleFor(0)
+PNC.NameplateDisplaySettings.SetNameplateBarScale(1.5, false)
+local largeMetrics = PNC.NameplatePresentation.ScaleFor(0)
+T.equal(largeMetrics.barWidth, defaultMetrics.barWidth * 1.5,
+    "nameplate bar setting scales health and stamina width")
+T.equal(largeMetrics.barHeight, defaultMetrics.barHeight * 1.5,
+    "nameplate bar setting scales health and stamina height")
+T.equal(largeMetrics.barGap, defaultMetrics.barGap * 1.5,
+    "nameplate bar setting scales the health-stamina gap")
+PNC.NameplateDisplaySettings.SetNameplateBarScale(1.0, false)
 T.load("ProjectHoomans", "client",
     "PNC/UI/Nameplates/PNC_NameplateRelationshipFeedbackRenderer.lua")
 T.load("ProjectHoomans", "client",
@@ -86,7 +114,7 @@ local observed = Feedback.Get("npc-observe", clock + 100)
 T.equal(observed.direction, "up",
     "relationship presentation changes enter the feedback pipe")
 
-local calls = { lines = {}, rects = {}, texts = {} }
+local calls = { lines = {}, rects = {}, texts = {}, fonts = {} }
 local manager = {
     drawLine2 = function(_, x1, y1, x2, y2, alpha, r, g, b)
         calls.lines[#calls.lines + 1] = {
@@ -98,7 +126,10 @@ local manager = {
             x, y, width, height, alpha, r, g, b,
         }
     end,
-    drawText = function(_, value) calls.texts[#calls.texts + 1] = value end,
+    drawText = function(_, value, _, _, _, _, _, _, font)
+        calls.texts[#calls.texts + 1] = value
+        calls.fonts[#calls.fonts + 1] = font
+    end,
 }
 local rendered = PNC.NameplateRelationshipFeedbackRenderer.Draw(
     manager,
@@ -110,8 +141,17 @@ local rendered = PNC.NameplateRelationshipFeedbackRenderer.Draw(
 T.truthy(rendered, "relationship feedback renderer draws an active record")
 T.truthy(#calls.lines > 0, "renderer emits arrow strokes")
 T.truthy(#calls.rects > 0, "renderer emits the arrow stem")
-T.truthy(PNC.NameplateRelationshipFeedbackRenderer.ARROW_SIZE > 12,
-    "renderer uses a larger readable arrow size")
+local defaultArrowHeight = calls.rects[1][4]
+T.truthy(defaultArrowHeight > 0,
+    "renderer uses a readable relationship arrow size")
+T.equal(PNC.NameplateDisplaySettings.GetRelationshipFeedbackFont(), UIFont.Small,
+    "relationship feedback defaults to the nameplate text font")
+T.equal(PNC.NameplateDisplaySettings.GetNameplateFont(), UIFont.Small,
+    "nameplate text defaults to the small nameplate font")
+PNC.NameplateDisplaySettings.SetNameplateTextScale(1.25, false)
+T.equal(PNC.NameplateDisplaySettings.GetNameplateFont(), UIFont.Medium,
+    "nameplate text size selects a larger readable font tier")
+PNC.NameplateDisplaySettings.SetNameplateTextScale(1.0, false)
 T.equal(calls.texts[1], "Approval +4.0",
     "renderer labels the approval relationship amount")
 T.equal(calls.texts[6], "Respect +2.0",
@@ -120,6 +160,24 @@ T.equal(PNC.NameplateRelationshipFeedbackRenderer.Colors.up.g, 1.0,
     "positive arrow uses green")
 T.equal(PNC.NameplateRelationshipFeedbackRenderer.Colors.down.r, 1.0,
     "negative arrow uses red")
+
+PNC.NameplateDisplaySettings.SetRelationshipFeedbackScale(0.5, false)
+calls.lines = {}
+calls.rects = {}
+calls.texts = {}
+calls.fonts = {}
+rendered = PNC.NameplateRelationshipFeedbackRenderer.Draw(
+    manager,
+    "npc-observe",
+    100,
+    80,
+    { currentTime = clock + 100, nameWidth = 30, zoom = 1 }
+)
+T.truthy(rendered, "relationship feedback remains drawable at minimum size")
+T.truthy(calls.rects[1][4] < defaultArrowHeight,
+    "relationship feedback setting scales the arrow geometry")
+T.equal(calls.fonts[1], UIFont.Small,
+    "relationship feedback setting selects smaller detail text")
 
 local handlers = {}
 PNC.Const = {

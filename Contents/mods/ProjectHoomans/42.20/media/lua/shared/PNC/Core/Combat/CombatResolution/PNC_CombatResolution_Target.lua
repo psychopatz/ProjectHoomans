@@ -7,6 +7,20 @@ function Resolution.ApplyTargetDamage(attackerRecord, attackerBody, target, opti
     if Core and Core.IsAuthority and not Core.IsAuthority() then
         return false, "not_authority"
     end
+    if attackerRecord
+        and (attackerRecord.alive == false
+            or attackerRecord.health
+                and attackerRecord.health.state == "dead"
+            or PNC.Const
+                and attackerRecord.presenceState == PNC.Const.PRESENCE_CORPSE)
+    then
+        return false, "attacker_dead"
+    end
+    if attackerBody and attackerBody.isDead
+        and attackerBody:isDead()
+    then
+        return false, "attacker_body_dead"
+    end
     if not target then return false, "missing_target" end
     hit = Resolution.BuildHitEvent(attackerRecord, target, options)
     if hit.amount <= 0 then return false, "invalid_damage", hit end

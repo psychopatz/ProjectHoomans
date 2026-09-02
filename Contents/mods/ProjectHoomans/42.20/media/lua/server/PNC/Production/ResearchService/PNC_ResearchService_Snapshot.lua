@@ -20,6 +20,11 @@ function Service.Queries.BuildSnapshot(colonyId)
         if definition then
             entries[#entries + 1] = { id = id, category = definition.category,
                 labelKey = definition.labelKey,
+                descriptionKey = definition.descriptionKey,
+                groupId = definition.groupId,
+                groupOrder = definition.groupOrder,
+                itemOrder = definition.itemOrder,
+                groupTitleKey = definition.groupTitleKey,
                 known = Service.Queries.HasTechnology(colonyId, id),
                 prerequisiteTechnology = definition.prerequisiteTechnology,
                 prerequisiteKnown = not definition.prerequisiteTechnology

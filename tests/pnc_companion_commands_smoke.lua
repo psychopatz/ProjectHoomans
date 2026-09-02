@@ -278,6 +278,20 @@ T.equal(manualCorpseHaulRequests, 1,
     "manual corpse haul uses the corpse haul service")
 T.equal(records.owned.manualCorpseHaulRequested, true,
     "manual corpse haul targets the selected companion")
+
+local requestManual = PNC.CorpseHaulService.RequestManual
+PNC.CorpseHaulService.RequestManual = function()
+    return false, "NPC_NOT_AT_HOME"
+end
+local rejectedCorpseAffected, rejectedCorpseReason =
+    PNC.CompanionCommands.Execute(player, {
+        id = "owned", commandID = "manual_corpse_haul",
+    })
+T.equal(rejectedCorpseAffected, 0,
+    "manual corpse rejection reports no affected companion")
+T.equal(rejectedCorpseReason, "NPC_NOT_AT_HOME",
+    "manual corpse rejection preserves the service reason")
+PNC.CorpseHaulService.RequestManual = requestManual
 T.equal(
     PNC.CompanionCommands.GetAttackTypeDefinition("auto").icon,
     "media/ui/emotes/yes.png",

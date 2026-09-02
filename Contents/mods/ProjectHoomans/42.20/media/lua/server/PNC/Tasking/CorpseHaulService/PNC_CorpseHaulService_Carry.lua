@@ -63,7 +63,8 @@ local function resolveCorpse(order, task, body)
 
     for _, point in ipairs(points) do
         corpse = Service.GetCorpseAt(point.x, point.y, point.z,
-            payload and payload.haulToken)
+            payload and payload.haulToken,
+            payload and (payload.deathMarkerId or payload.corpseId))
         if corpse then return corpse end
     end
     return nil

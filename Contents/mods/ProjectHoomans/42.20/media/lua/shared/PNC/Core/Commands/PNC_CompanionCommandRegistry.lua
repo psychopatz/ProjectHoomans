@@ -302,8 +302,12 @@ function Commands.Apply(record, player, commandID, radius)
     end
     applyAttackType(record, definition)
     if type(definition.apply) == "function" then
-        reason = definition.apply(record, player)
-        if reason == false then return false, "command_rejected" end
+        local applied
+        local applyReason
+        applied, applyReason = definition.apply(record, player)
+        if applied == false then
+            return false, applyReason or "command_rejected"
+        end
     end
     record.runtime = record.runtime or {}
     record.runtime.lastCompanionCommand = tostring(definition.id)

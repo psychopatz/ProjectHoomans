@@ -2,10 +2,12 @@ PNC = PNC or {}
 PNC.NameplatePresentation = PNC.NameplatePresentation or {}
 
 local Presentation = PNC.NameplatePresentation
+local DisplaySettings = PNC.NameplateDisplaySettings
 
 Presentation.Layout = {
     barWidth = 60,
     barHeight = 6,
+    barGap = 6,
     padding = 2,
     maxDrawDistance = 22,
     floorTolerance = 1,
@@ -377,10 +379,14 @@ function Presentation.ScaleFor(playerIndex)
     local zoom = getCore():getZoom(playerIndex)
     if zoom <= 0 then zoom = 1 end
     local divisor = zoom > 1 and (zoom * 1.15) or 1
+    local barScale = DisplaySettings
+        and DisplaySettings.GetNameplateBarScale
+        and DisplaySettings.GetNameplateBarScale() or 1
     return {
         zoom = zoom,
-        barWidth = Presentation.Layout.barWidth / divisor,
-        barHeight = Presentation.Layout.barHeight / divisor,
+        barWidth = (Presentation.Layout.barWidth * barScale) / divisor,
+        barHeight = (Presentation.Layout.barHeight * barScale) / divisor,
+        barGap = (Presentation.Layout.barGap * barScale) / zoom,
         nameYOffset = Presentation.Layout.nameYOffset / zoom,
         barYOffset = Presentation.Layout.barYOffset / zoom,
     }
@@ -388,8 +394,12 @@ end
 
 function Presentation.CacheTextMetric(entry, key, text, font)
     local widthKey = key .. "Width"
-    if entry[key] ~= text or not entry[widthKey] then
+    local fontKey = key .. "Font"
+    if entry[key] ~= text or not entry[widthKey]
+        or entry[fontKey] ~= font
+    then
         entry[key] = text
+        entry[fontKey] = font
         entry[widthKey] = getTextManager():MeasureStringX(font, text)
     end
 end

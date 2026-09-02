@@ -104,6 +104,18 @@ function Internal.applyCorpseWornItems(corpse, wornEntries)
     return applied > 0 or #wornEntries == 0
 end
 
-function Internal.transmitCorpseState(corpse)
-    return CorpseItems.Transmit(corpse)
+function Internal.transmitCorpseState(corpse, fullSync)
+    if not corpse then return false end
+    if fullSync == true then
+        -- A complete corpse packet is only needed when the body is first
+        -- materialized (or finalized after a delayed engine conversion).
+        -- Reusing that packet for ordinary haul/marker updates constructs a
+        -- second IsoDeadBody on clients because the packet is AddCorpse.
+        return CorpseItems.Transmit(corpse)
+    end
+    if corpse.transmitModData then
+        pcall(corpse.transmitModData, corpse)
+        return true
+    end
+    return false
 end

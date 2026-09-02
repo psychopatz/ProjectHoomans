@@ -1,6 +1,7 @@
 local Placement = {}
 local Policy = require
     "PNC/UI/Communities/ColonyManagement/PNC_BuildingPlacementPolicy"
+local Footprint = require "PNC/Core/Settlement/PNC_BuildingFootprint"
 
 local function call(object, method, ...)
     if not object or type(object[method]) ~= "function" then return nil end
@@ -30,6 +31,130 @@ local function fail(reason)
         PNC.Core.LogWarn("building placement failed: " .. tostring(reason))
     end
     return false, reason
+end
+
+local function tr(key, fallback)
+    local value = getText and getText(key) or nil
+    if not value or value == key or value == "" then return fallback end
+    return value
+end
+
+local function tooltipContent(cursor)
+    local reason = tostring(cursor and cursor.pncPlacementError or "")
+    if reason == "BUILD_TARGET_OUTSIDE_BASE" then
+        return tr("UI_PNC_BuildingPlacement_InvalidTitle",
+                "INVALID PLACEMENT"),
+            tr("UI_PNC_BuildingPlacement_OutsideBase",
+                "Outside home base. Select a location inside the highlighted base territory.")
+    end
+    if reason == "BUILD_BASE_UNAVAILABLE" then
+        return tr("UI_PNC_BuildingPlacement_InvalidTitle",
+                "INVALID PLACEMENT"),
+            tr("UI_PNC_BuildingPlacement_BaseUnavailable",
+                "Home-base territory is unavailable. Refresh the colony data and try again.")
+    end
+    if reason == "BUILD_TARGET_REQUIRED" then
+        return tr("UI_PNC_BuildingPlacement_InvalidTitle",
+                "INVALID PLACEMENT"),
+            tr("UI_PNC_BuildingPlacement_TargetRequired",
+                "Move the cursor over a valid world tile.")
+    end
+    if reason == "BUILD_TARGET_INVALID" then
+        return tr("UI_PNC_BuildingPlacement_InvalidTitle",
+                "INVALID PLACEMENT"),
+            tr("UI_PNC_BuildingPlacement_EngineInvalid",
+                "This building cannot be placed on the selected tile.")
+    end
+    return nil, nil
+end
+
+function Placement.HideTooltip(cursor)
+    local tooltip = cursor and cursor.tooltip or nil
+    if not tooltip then return end
+    if tooltip.removeFromUIManager then tooltip:removeFromUIManager() end
+    if tooltip.setVisible then tooltip:setVisible(false) end
+    cursor.tooltip = nil
+end
+
+function Placement.RenderTooltip(cursor)
+    local title, description = tooltipContent(cursor)
+    if not title or not description then
+        Placement.HideTooltip(cursor)
+        return
+    end
+    if not ISWorldObjectContextMenu then
+        pcall(require, "ISUI/ISWorldObjectContextMenu")
+    end
+    if not ISWorldObjectContextMenu
+        or type(ISWorldObjectContextMenu.addToolTip) ~= "function"
+    then return end
+    local tooltip = cursor.tooltip
+    if not tooltip then
+        tooltip = ISWorldObjectContextMenu.addToolTip()
+        cursor.tooltip = tooltip
+        if tooltip.setVisible then tooltip:setVisible(true) end
+        if tooltip.addToUIManager then tooltip:addToUIManager() end
+        tooltip.followMouse = true
+        tooltip.maxLineWidth = 760
+        if cursor.chosenSprite and tooltip.setTexture then
+            tooltip:setTexture(cursor.chosenSprite)
+        end
+    end
+    if tooltip.setName then tooltip:setName(title) end
+    tooltip.description = description
+end
+
+local function setBoundaryValidity(cursor, square)
+    local region = Footprint.FromCursor(cursor, square)
+    local valid, reason, normalized, invalid =
+        Policy.ValidateCurrentFootprint(region)
+    cursor.pncFootprint = normalized or region
+    cursor.pncInvalidFootprint = invalid
+    cursor.pncPlacementError = reason
+    cursor.pncBaseValid = valid == true
+    cursor.pncEngineValid = true
+    return valid == true
+end
+
+local function setEngineInvalid(cursor, square)
+    cursor.pncFootprint = nil
+    cursor.pncInvalidFootprint = nil
+    cursor.pncEngineValid = false
+    cursor.pncBaseValid = false
+    cursor.pncPlacementError = square and "BUILD_TARGET_INVALID"
+        or "BUILD_TARGET_REQUIRED"
+    return false
+end
+
+local function renderRegion(playerNum, region, color)
+    if not addAreaHighlightForPlayer or not region then return end
+    for z, level in pairs(region.levels or {}) do
+        for y, spans in pairs(level.rows or {}) do
+            for index = 1, #spans, 2 do
+                addAreaHighlightForPlayer(playerNum, spans[index], y,
+                    spans[index + 1] + 1, y + 1, z,
+                    color.r, color.g, color.b, color.a)
+            end
+        end
+    end
+end
+
+-- This is intentionally a placement-owned, frame-only guide. It does not
+-- toggle the persistent settlement overlay and therefore remains compatible
+-- with freestyle selectors such as chop-tree and fishing zones.
+function Placement.RenderBaseGuide()
+    local cursor = Placement.activeCursor
+    if not cursor or cursor.pncPlacement ~= true then return end
+    local player = getSpecificPlayer and getSpecificPlayer(0) or nil
+    local settlement = Policy.CurrentSettlement()
+    local region = settlement and settlement.geometry
+        and settlement.geometry.region or nil
+    if not player or not region then return end
+    local playerNum = player.getPlayerNum and player:getPlayerNum() or 0
+    renderRegion(playerNum, region,
+        { r = 0.10, g = 0.70, b = 1.00, a = 0.12 })
+    renderRegion(playerNum, cursor.pncInvalidFootprint,
+        { r = 1.00, g = 0.12, b = 0.08, a = 0.42 })
 end
 
 local function faceIndex(nSprite)
@@ -113,26 +238,26 @@ local function createFallbackCursorClass()
     end
 
     function class:isValid(square)
-        if not square then return false end
+        if not square then return setEngineInvalid(self, square) end
         local world = getWorld and getWorld() or nil
         if world and type(world.isValidSquare) == "function" then
             local x = call(square, "getX")
             local y = call(square, "getY")
             local z = call(square, "getZ")
             local valid = call(world, "isValidSquare", x, y, z)
-            if valid == false then return false end
+            if valid == false then return setEngineInvalid(self, square) end
         end
-        local valid, reason = Policy.ValidateCurrentSquare(square)
-        self.pncPlacementError = reason
-        self.pncBaseValid = valid == true
-        return valid == true
+        return setBoundaryValidity(self, square)
     end
 
     function class:render(x, y, z, square)
         self.square = square
         self.canBeBuild = self:isValid(square)
         local face = self:getFace()
-        if not face then return end
+        if not face then
+            Placement.RenderTooltip(self)
+            return
+        end
         local layers = tonumber(call(face, "getzLayers")) or 0
         local width = tonumber(call(face, "getWidth")) or 0
         local height = tonumber(call(face, "getHeight")) or 0
@@ -150,6 +275,7 @@ local function createFallbackCursorClass()
                 end
             end
         end
+        Placement.RenderTooltip(self)
     end
 
     function class:tryBuild(x, y, z)
@@ -175,6 +301,7 @@ local function createFallbackCursorClass()
     end
 
     function class:deactivate()
+        Placement.HideTooltip(self)
         if not self.placed and self.onCancel then self.onCancel() end
     end
 
@@ -191,16 +318,22 @@ local function createNativeCursorClass()
     end
     local class = ISBuildIsoEntity:derive("ISPNCBuildPlacementCursor")
     local nativeIsValid = class.isValid
+    local nativeRender = class.render
 
     function class:isValid(square)
         if nativeIsValid then
             local ok, valid = pcall(nativeIsValid, self, square)
-            if not ok or valid == false then return false end
+            if not ok or valid == false then
+                return setEngineInvalid(self, square)
+            end
         end
-        local valid, reason = Policy.ValidateCurrentSquare(square)
-        self.pncPlacementError = reason
-        self.pncBaseValid = valid == true
-        return valid == true
+        return setBoundaryValidity(self, square)
+    end
+
+    function class:render(x, y, z, square)
+        local result = nativeRender(self, x, y, z, square)
+        Placement.RenderTooltip(self)
+        return result
     end
 
     function class:getSprite()
@@ -230,6 +363,7 @@ local function createNativeCursorClass()
     end
 
     function class:deactivate()
+        Placement.HideTooltip(self)
         if not self.placed and self.onCancel then self.onCancel() end
     end
 
@@ -262,11 +396,21 @@ local function onDoTileBuilding(cursor, isRender, x, y, z, square)
 end
 
 local function installPlacementEvents()
-    if Placement.eventsInstalled or not Events then return end
-    if Events.OnDoTileBuilding2 and Events.OnDoTileBuilding2.Add then
+    if not Events then return end
+    if not Placement.doTileEventsInstalled
+        and Events.OnDoTileBuilding2 and Events.OnDoTileBuilding2.Add
+    then
         Events.OnDoTileBuilding2.Add(onDoTileBuilding)
-        Placement.eventsInstalled = true
+        Placement.doTileEventsInstalled = true
     end
+    if not Placement.guideEventInstalled
+        and Events.OnPreUIDraw and Events.OnPreUIDraw.Add
+    then
+        Events.OnPreUIDraw.Add(Placement.RenderBaseGuide)
+        Placement.guideEventInstalled = true
+    end
+    Placement.eventsInstalled = Placement.doTileEventsInstalled == true
+        or Placement.guideEventInstalled == true
 end
 
 installPlacementEvents()
@@ -288,6 +432,8 @@ function Placement.Cancel(window, options)
         cell:setDrag(nil, playerNum or 0)
         active.pncSuppressPlacementRestore = nil
     end
+    Placement.HideTooltip(active)
+    if Placement.activeCursor == active then Placement.activeCursor = nil end
     if window then window.buildPlacement = nil end
     closeFacilityPlacementUI(active, options.restorePrevious ~= false)
     Placement.lastError = nil
@@ -339,8 +485,8 @@ function Placement.Begin(window, recipe)
     cursor.dragNilAfterPlace = true
     cursor.pncFacilityPlacement = recipe.facilityDefinitionId ~= nil
     cursor.onPlacement = function(target)
-        local valid, reason = Policy.ValidateCurrentPoint(
-            target.x, target.y, target.z)
+        local valid, reason = Policy.ValidateCurrentFootprint(
+            cursor.pncFootprint)
         if not valid then
             fail(reason)
             cursor.canBeBuild = false
@@ -360,10 +506,14 @@ function Placement.Begin(window, recipe)
                 recipe.facilityExpectedRevision
         end
         PNC.Client.RequestColonyAction("building_queue", options)
+        Placement.HideTooltip(cursor)
+        if Placement.activeCursor == cursor then Placement.activeCursor = nil end
         if window then window.buildPlacement = nil end
         closeFacilityPlacementUI(cursor, true)
     end
     cursor.onCancel = function()
+        Placement.HideTooltip(cursor)
+        if Placement.activeCursor == cursor then Placement.activeCursor = nil end
         if window then window.buildPlacement = nil end
         closeFacilityPlacementUI(cursor,
             cursor.pncSuppressPlacementRestore ~= true)
@@ -374,6 +524,7 @@ function Placement.Begin(window, recipe)
         return fail("PLACEMENT_CELL_UNAVAILABLE")
     end
     window.buildPlacement = cursor
+    Placement.activeCursor = cursor
     cell:setDrag(cursor, cursor.player)
     if cursor.pncFacilityPlacement then
         local placementUI = require

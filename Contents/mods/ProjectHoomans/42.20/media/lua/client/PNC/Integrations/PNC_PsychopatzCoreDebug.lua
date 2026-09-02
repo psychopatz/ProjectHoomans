@@ -21,6 +21,35 @@ if PNC and PNC.ConversationDebugUI and PNC.ConversationDebugUI.Text then
     })
 end
 
+local function resolveText(value, key, fallback)
+    if value and value ~= "" and value ~= key then
+        return value
+    end
+    return fallback
+end
+
+PsychopatzCore.DebugHub.RegisterTool({
+    id = "pnc.audio",
+    source = "Project Hoomans",
+    order = 206,
+    title = resolveText(getText and getText("UI_PNC_AudioDebug_Title"),
+        "UI_PNC_AudioDebug_Title", "AUDIO DEBUG"),
+    description = resolveText(getText and getText("UI_PNC_AudioDebug_Description"),
+        "UI_PNC_AudioDebug_Description",
+        "Preview player voice aliases and registered game sound effects."),
+    available = function()
+        return PNC
+            and PNC.AudioDebugUI
+            and PNC.AudioDebugUI.Toggle
+            and PNC.Client
+            and PNC.Client.CanUseDebug
+            and PNC.Client.CanUseDebug()
+    end,
+    action = function()
+        PNC.AudioDebugUI.Toggle()
+    end,
+})
+
 PsychopatzCore.DebugHub.RegisterTool({
     id = "pnc.npcMonitor",
     source = "Project Hoomans",

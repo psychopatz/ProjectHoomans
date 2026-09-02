@@ -498,7 +498,12 @@ local function drawHoverLabel(drawer, marker)
 end
 
 function Overlay.Render()
-    if not Overlay.enabled or not addAreaHighlightForPlayer then return end
+    local selector = PsychopatzCore and PsychopatzCore.UI
+        and PsychopatzCore.UI.GridRegionSelector or nil
+    if not Overlay.enabled or not addAreaHighlightForPlayer
+        or selector and selector.instance
+        and selector.instance.suppressPersistentOverlays == true
+    then return end
     local player = getSpecificPlayer and getSpecificPlayer(0) or nil
     if not player then return end
     local playerNum = player.getPlayerNum and player:getPlayerNum() or 0

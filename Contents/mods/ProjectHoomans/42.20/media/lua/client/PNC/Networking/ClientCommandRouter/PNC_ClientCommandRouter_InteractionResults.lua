@@ -39,6 +39,16 @@ Internal.RegisterServerCommand(Const.CMD_CONVERSATION_RELATIONSHIP,
                 }
             )
         end
+        local flavorPresentation = PNC.SocialFlavorPresentation
+        if args.ambientFlavor and not flavorPresentation then
+            pcall(require, "PNC/Conversation/PNC_SocialFlavorPresentation")
+            flavorPresentation = PNC.SocialFlavorPresentation
+        end
+        if args.ambientFlavor and flavorPresentation
+            and flavorPresentation.Receive
+        then
+            flavorPresentation.Receive(args.ambientFlavor, summary, args)
+        end
         if hasChangeMetadata then
             ClientState.lastConversationDelta = {
                 npcID = npcID,

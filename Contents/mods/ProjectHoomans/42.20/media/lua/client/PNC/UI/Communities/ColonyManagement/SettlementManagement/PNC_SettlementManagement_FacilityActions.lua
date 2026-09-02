@@ -73,7 +73,7 @@ local function areaOptions(window, facility, existing, onConfirm, requestedRole)
     local movingStockpile = not isDraft
         and facility.definitionId == "stockpile"
         and role == "storage.stockpile"
-    local externalStockpile = facility
+    local externalStockpile = not isDraft and facility
         and facility.definitionId == "stockpile"
         and role == "storage.stockpile"
     local boundary
@@ -107,7 +107,11 @@ local function areaOptions(window, facility, existing, onConfirm, requestedRole)
         initialRegion = existing and existing.region or Support.EmptyRegion(),
         guideRegion = boundary,
         guideLayers = Support.UsedGuideLayers(window, existing and existing.id),
-        guideRenderZ = math.floor(getSpecificPlayer(0):getZ()),
+        guideRenderZ = nil,
+        guideColor = (isDraft or movingStockpile)
+            and { r = 0.10, g = 0.70, b = 1.00, a = 0.24 } or nil,
+        debugLabel = tostring(facility.definitionId or "facility")
+            .. ":" .. tostring(role),
         selectionKind = role == "work.zone" and "point" or "region",
         maxTiles = limit.maxTotalTiles,
         requiredSquareRule = role == "growing.plot" and nil or limit.worldRule,
@@ -143,12 +147,32 @@ local function areaOptions(window, facility, existing, onConfirm, requestedRole)
             end
             return ok, ok and nil or Shared.SettlementReason(reason)
         end,
+        tileValidator = boundary and function(x, y, z)
+            local inside
+            if isDraft or movingStockpile then
+                if GridRegion.containsXY then
+                    inside = GridRegion.containsXY(boundary, x, y)
+                else
+                    inside = GridRegion.containsPoint(
+                        boundary, x, y, z)
+                end
+            else
+                inside = GridRegion.containsPoint(boundary, x, y, z)
+            end
+            if not inside then
+                return false, Shared.SettlementReason(
+                    (isDraft or movingStockpile)
+                        and "OUTSIDE_BASE" or "OUTSIDE_FACILITY")
+            end
+            return true
+        end or nil,
         onConfirm = onConfirm,
     }
 end
 
 function Facility.BeginBuild(window, definitionId)
-    local settlement = window.snapshot and window.snapshot.settlement
+    local settlement = Support.Settlement and Support.Settlement(window)
+        or window.snapshot and window.snapshot.settlement
     if not settlement then return false end
     local definitions = PNC.FacilityDefinitions
     local definition = definitions and definitions.Get
@@ -292,7 +316,9 @@ function Facility.BeginPoint(window, _, facility, requestedRole, componentId)
         guideRegion = boundary,
         guideLayers = Support.UsedGuideLayers(window,
             existing and existing.id),
-        guideRenderZ = math.floor(getSpecificPlayer(0):getZ()),
+        guideRenderZ = nil,
+        debugLabel = tostring(facility.definitionId or "facility")
+            .. ":" .. tostring(role),
         validate = function(region)
             local bounds = GridRegion.bounds(region)
             if not bounds or not GridRegion.containsPoint(boundary,

@@ -5,11 +5,24 @@ local Const = PNC.Const
 local Registry = PNC.Registry
 local Settings = PNC.Sandbox
 
-local function canApplyDamage(record, amount, damageEvent, now)
+function Health.IsDead(record, body)
+    local health = record and record.health or nil
+    if not record or record.alive == false then
+        return true
+    end
+    if health and health.state == "dead" then
+        return true
+    end
+    return body and body.isDead and body:isDead() == true or false
+end
+
+local function canApplyDamage(record, body, amount, damageEvent, now)
     if Core and Core.IsAuthority and not Core.IsAuthority() then
         return false
     end
-    if record.alive == false or amount <= 0 then
+    if Health.IsDead(record, body)
+        or amount <= 0
+    then
         return false
     end
     return not (
@@ -112,7 +125,7 @@ function Health.ApplyDamage(record, zombie, damageEvent)
     local amount =
         tonumber(damageEvent and damageEvent.amount or 0) or 0
     local now = Core.Now()
-    if not canApplyDamage(record, amount, damageEvent, now) then
+    if not canApplyDamage(record, zombie, amount, damageEvent, now) then
         return false
     end
     rememberDamageSource(record, damageEvent, now)
@@ -148,7 +161,7 @@ function Health.ApplyStrainDamage(
         return false
     end
     if not record
-        or record.alive == false
+        or Health.IsDead(record)
         or not health
         or health.state == "incapacitated"
     then

@@ -6,6 +6,7 @@ local function list(values)
     return {
         size = function() return #values end,
         get = function(_, index) return values[index + 1] end,
+        remove = function(_, index) table.remove(values, index + 1) end,
     }
 end
 
@@ -20,8 +21,10 @@ local corpse = {
     data = { clothing = "preserved", PNC_CorpseHaulToken = "haul:one" },
 }
 corpse.square = source
+corpse.current = source
 local setCurrentCalls = 0
-function corpse:getSquare() return self.square end
+function corpse:getSquare() return self.current or self.square end
+function corpse:getCurrentSquare() return self.current end
 function corpse:getX() return self.x end
 function corpse:getY() return self.y end
 function corpse:getZ() return self.z end
@@ -30,38 +33,57 @@ function corpse:setY(value) self.y = value end
 function corpse:setZ(value) self.z = value end
 function corpse:setCurrent(square)
     setCurrentCalls = setCurrentCalls + 1
-    self.square = square
+    self.current = square
+end
+function corpse:setSquare(square) self.square = square end
+function corpse:removeFromWorld() end
+function corpse:removeFromSquare()
+    if self.square then
+        for index = #self.square.bodies, 1, -1 do
+            if self.square.bodies[index] == self then
+                table.remove(self.square.bodies, index)
+            end
+        end
+    end
+    self.current = nil
 end
 function corpse:getModData() return self.data end
 
 function source:getDeadBodys() return list(self.bodies) end
+function source:getStaticMovingObjects() return list(self.bodies) end
 function destination:getDeadBodys() return list(self.bodies) end
+function destination:getStaticMovingObjects() return list(self.bodies) end
 function source:removeCorpse(item)
-    for index = #self.bodies, 1, -1 do
-        if self.bodies[index] == item then table.remove(self.bodies, index) end
+    item:removeFromSquare()
+end
+function source:addCorpse(item)
+    local present = false
+    for index = 1, #self.bodies do
+        if self.bodies[index] == item then present = true end
     end
-    item.square = nil
+    if not present then self.bodies[#self.bodies + 1] = item end
 end
 function destination:removeCorpse(item)
-    for index = #self.bodies, 1, -1 do
-        if self.bodies[index] == item then table.remove(self.bodies, index) end
-    end
-    if item.square == self then item.square = nil end
+    item:removeFromSquare()
 end
 function destination:addCorpse(item)
-    self.bodies[#self.bodies + 1] = item
-    item.square = self
+    local present = false
+    for index = 1, #self.bodies do
+        if self.bodies[index] == item then present = true end
+    end
+    if not present then self.bodies[#self.bodies + 1] = item end
 end
 function carryDestination:getDeadBodys() return list(self.bodies) end
+function carryDestination:getStaticMovingObjects() return list(self.bodies) end
 function carryDestination:removeCorpse(item)
-    for index = #self.bodies, 1, -1 do
-        if self.bodies[index] == item then table.remove(self.bodies, index) end
-    end
-    if item.square == self then item.square = nil end
+    item:removeFromSquare()
 end
 function carryDestination:addCorpse(item)
-    self.bodies[#self.bodies + 1] = item
-    item.square = self
+    local present = false
+    for index = 1, #self.bodies do
+        if self.bodies[index] == item then present = true end
+    end
+    if not present then self.bodies[#self.bodies + 1] = item end
 end
 
 source.bodies[1] = corpse
@@ -77,7 +99,8 @@ getCell = function()
             then
                 return destination
             end
-            if x == carryDestination.x and y == carryDestination.y
+            if (x == carryDestination.x or x == 13)
+                and y == carryDestination.y
                 and z == carryDestination.z
             then
                 return carryDestination
@@ -103,6 +126,8 @@ T.equal(corpse.data.clothing, "preserved",
     "corpse transfer preserves corpse contents")
 T.equal(corpse.square, destination,
     "corpse transfer attaches the object to the destination square")
+T.equal(corpse.current, destination,
+    "corpse transfer synchronizes the moving square")
 T.equal(corpse.x, 30.5, "corpse transfer writes the destination x")
 T.equal(corpse.y, 40.5, "corpse transfer writes the destination y")
 T.equal(#source.bodies, 0, "corpse transfer removes the source membership")
@@ -115,6 +140,8 @@ T.truthy(followed, "visible carry follows the corpse across a tile: "
     .. tostring(followReason))
 T.equal(corpse.square, carryDestination,
     "visible carry updates corpse square membership")
+T.equal(corpse.current, carryDestination,
+    "visible carry synchronizes the moving square")
 T.equal(corpse.x, 12.25, "visible carry preserves fractional x position")
 T.equal(corpse.y, 20.75, "visible carry preserves fractional y position")
 T.equal(#source.bodies, 0, "visible carry removes old tile membership")
@@ -122,16 +149,26 @@ T.equal(#destination.bodies, 0, "visible carry leaves the prior tile")
 T.equal(#carryDestination.bodies, 1,
     "visible carry creates one new tile membership")
 
-local currentCallsAfterCrossTile = setCurrentCalls
 local followedInTile, inTileReason = Internal.followCorpse(
     corpse, 12.75, 20.25, 0)
 T.truthy(followedInTile, "visible carry follows within the current tile: "
     .. tostring(inTileReason))
 T.equal(corpse.square, carryDestination,
     "within-tile carry keeps the existing square membership")
-T.equal(setCurrentCalls, currentCallsAfterCrossTile,
-    "within-tile carry does not rewrite static corpse square ownership")
+T.equal(corpse.current, carryDestination,
+    "within-tile carry keeps moving square ownership synchronized")
 T.equal(corpse.x, 12.75, "within-tile carry updates fractional x")
 T.equal(corpse.y, 20.25, "within-tile carry updates fractional y")
+T.equal(#carryDestination.bodies, 1,
+    "within-tile carry does not duplicate the corpse membership")
+
+local movedAgain, movedAgainReason = Internal.followCorpse(
+    corpse, 13.25, 20.25, 0)
+T.truthy(movedAgain, "repeated visible carry remains attached: "
+    .. tostring(movedAgainReason))
+T.equal(#source.bodies, 0, "repeated carry leaves the original tile empty")
+T.equal(#destination.bodies, 0, "repeated carry leaves the first tile empty")
+T.equal(#carryDestination.bodies, 1,
+    "repeated visible carry keeps exactly one membership")
 
 T.finish("pnc_body_lifecycle_corpse_transfer_smoke")

@@ -14,6 +14,17 @@ local function findBaseAssignment(base)
     local destinationRegion = configuration and configuration.destinationRegion
     local facilities = destinationRegion and {} or Internal.stockpileFacilities(base)
     local corpses = Internal.scanBaseCorpses(base)
+    local sawReserved = false
+    local sawDropFailure = false
+    if not configuration or not configuration.sourceRegion then
+        return nil, "CORPSE_HAUL_NOT_CONFIGURED"
+    end
+    if #corpses <= 0 then
+        return nil, "NO_CORPSE_IN_SOURCE_REGION"
+    end
+    if not destinationRegion and #facilities <= 0 then
+        return nil, "NO_STOCKPILE_DESTINATION"
+    end
     for _, candidate in ipairs(corpses) do
         local data = candidate.corpse:getModData()
         local token = candidate.token
@@ -34,9 +45,12 @@ local function findBaseAssignment(base)
                         candidate.y, candidate.z, destinationRegion)
                     if drop then
                         token = Service.GetCorpseToken(candidate.corpse, true)
-                        if not token then return nil end
+                        if not token then
+                            return nil, "CORPSE_TOKEN_UNAVAILABLE"
+                        end
                         return {
                             haulToken = token,
+                            deathMarkerId = candidate.deathMarkerId,
                             baseId = base.id, facilityId = facilityId,
                             sourceX = candidate.x, sourceY = candidate.y,
                             sourceZ = candidate.z,
@@ -50,11 +64,19 @@ local function findBaseAssignment(base)
                                     or destinationRegion) or nil,
                         }
                     end
+                    sawDropFailure = true
                 end
             end
+        else
+            sawReserved = true
+        end
+        if not token and data and data.PNC_CorpseHaulTaskId then
+            sawReserved = true
         end
     end
-    return nil
+    if sawDropFailure then return nil, "NO_DROP_POINT" end
+    if sawReserved then return nil, "CORPSE_ALREADY_RESERVED" end
+    return nil, "NO_DROP_POINT"
 end
 
 local function homeBaseForRecord(record)
@@ -111,19 +133,63 @@ local function markManualOrder(order, record)
     return true, order
 end
 
+local function manualDiagnostic(record, ok, reason, order, details)
+    local runtime = record and record.runtime or nil
+    local current = order
+    local now = Core.Now()
+    local revision = tonumber(runtime and runtime.corpseHaulManualRevision)
+        or 0
+    local diagnostic = {
+        revision = revision + 1,
+        at = now,
+        result = ok == true,
+        reason = tostring(reason or "unknown"),
+        orderId = current and current.id or nil,
+        orderStatus = current and current.status or nil,
+        orderPhase = current and (current.phase or current.livePhase) or nil,
+        workerId = current and current.workerId or nil,
+        x = tonumber(record and record.x),
+        y = tonumber(record and record.y),
+        z = tonumber(record and record.z),
+        runtimeWorkOrderId = runtime and runtime.workOrderId or nil,
+        activeBehavior = record and record.activeBehavior or nil,
+        details = type(details) == "table"
+            and (Core.DeepCopy and Core.DeepCopy(details) or details) or nil,
+    }
+    if record then
+        record.runtime = runtime or {}
+        record.runtime.corpseHaulManualRevision = diagnostic.revision
+        record.runtime.corpseHaulManualDiagnostic = diagnostic
+        if PNC.Registry and PNC.Registry.MarkDirty then
+            PNC.Registry.MarkDirty(record, "corpse_haul_manual")
+        end
+        if ok ~= true and PNC.Network and PNC.Network.BroadcastRecord then
+            PNC.Network.BroadcastRecord(record, "manual_corpse_haul_result")
+        end
+    end
+    return diagnostic
+end
+
 local function manualResult(record, ok, reason, order, details)
+    local diagnostic = manualDiagnostic(record, ok, reason, order, details)
     if Core and Core.Log then
         local message = "manual_corpse_haul npc="
             .. tostring(record and record.id or "unknown")
             .. " result=" .. tostring(ok == true)
             .. " reason=" .. tostring(reason or "unknown")
+            .. " at=" .. tostring(diagnostic.at)
+            .. " pos=" .. tostring(diagnostic.x or "?") .. ","
+            .. tostring(diagnostic.y or "?") .. ","
+            .. tostring(diagnostic.z or "?")
         if order and order.id then
             message = message .. " order=" .. tostring(order.id)
         end
         if type(details) == "table" then
             for _, key in ipairs({ "corpses", "eligible", "dispatch",
                 "dispatchReason", "assigned", "status", "workerId",
-                "leaseId" }) do
+                "leaseId", "stage", "baseId", "atHome",
+                "assignmentReason", "hasTarget", "attackAction",
+                "currentOperation", "currentStatus", "currentPhase" }) do
                 if details[key] ~= nil then
                     message = message .. " " .. key .. "="
                         .. tostring(details[key])
@@ -132,7 +198,7 @@ local function manualResult(record, ok, reason, order, details)
         end
         Core.Log(ok == true and "INFO" or "WARN", message)
     end
-    return ok, reason, order
+    return ok, reason, order, diagnostic
 end
 
 local function findManualOrder(base, record)
@@ -153,7 +219,8 @@ local function findManualOrder(base, record)
             and (not order.requiredWorkerId
                 or tostring(order.requiredWorkerId) == tostring(record.id))
             and Service.GetCorpseAt(assignment.sourceX, assignment.sourceY,
-                assignment.sourceZ, assignment.haulToken)
+                assignment.sourceZ, assignment.haulToken,
+                assignment.deathMarkerId)
         then
             orders[#orders + 1] = order
         end
@@ -197,7 +264,7 @@ end
 local function reevaluateManualOrder(record, order)
     local tasking = PNC.Tasking and PNC.Tasking.Commands
     if tasking and tasking.ReevaluateNow then
-        local ok, result = tasking.ReevaluateNow({
+        local ok, result, reevaluateReason = tasking.ReevaluateNow({
             npcId = tostring(record.id), source = "CorpseHaulService",
             cause = "manual_corpse_haul_requested",
         })
@@ -211,7 +278,8 @@ local function reevaluateManualOrder(record, order)
             requeueManualOrder(current, record)
         end
         local dispatchReason = type(result) == "table" and "ASSIGNED"
-            or tostring(result or (ok and "OK" or "UNKNOWN"))
+            or tostring(reevaluateReason or result
+                or (ok and "OK" or "UNKNOWN"))
         return current, {
             dispatch = ok == true,
             dispatchReason = dispatchReason,
@@ -224,6 +292,7 @@ local function reevaluateManualOrder(record, order)
     return currentOrderSnapshot(order), {
         dispatch = false,
         dispatchReason = "TASKING_UNAVAILABLE",
+        assigned = false,
     }
 end
 
@@ -274,37 +343,65 @@ function Service.RequestManual(record)
     local sourceCorpses
     local eligibleCorpses
     local dispatchDetails
+    local assignmentReason
     local currentOrder
     local runtime = record and record.runtime or nil
     local now = Core.Now()
     if not record or record.alive == false then
-        return manualResult(record, false, "NPC_UNAVAILABLE")
+        return manualResult(record, false, "NPC_UNAVAILABLE", nil, {
+            stage = "validate",
+        })
     end
     if record.health and record.health.state == "incapacitated" then
-        return manualResult(record, false, "NPC_INCAPACITATED")
+        return manualResult(record, false, "NPC_INCAPACITATED", nil, {
+            stage = "validate",
+        })
     end
     if runtime and (runtime.attackAction or runtime.target
         or now < (tonumber(runtime.inCombatUntil) or 0))
     then
-        return manualResult(record, false, "NPC_BUSY")
+        return manualResult(record, false, "NPC_BUSY", nil, {
+            stage = "validate",
+            hasTarget = runtime.target ~= nil,
+            attackAction = runtime.attackAction ~= nil,
+        })
+    end
+    if Internal.reconcileActiveOrders then
+        Internal.reconcileActiveOrders(now, true)
     end
     current = currentWorkOrderFor(record)
     if current and current.operation ~= "CORPSE_HAUL" then
-        return manualResult(record, false, "NPC_BUSY")
+        return manualResult(record, false, "NPC_BUSY", current, {
+            stage = "validate",
+            currentOperation = current.operation,
+            currentStatus = current.status,
+            currentPhase = current.phase,
+        })
     end
     base = homeBaseForRecord(record)
-    if not base then return manualResult(record, false, "BASE_NOT_FOUND") end
+    if not base then
+        return manualResult(record, false, "BASE_NOT_FOUND", nil, {
+            stage = "authorize",
+        })
+    end
     configuration = Internal.configurationFor(base)
     if not PNC.HomeDutyService or not PNC.HomeDutyService.IsAtHome then
-        return manualResult(record, false, "HOME_SERVICE_UNAVAILABLE")
+        return manualResult(record, false, "HOME_SERVICE_UNAVAILABLE", nil, {
+            stage = "authorize", baseId = base.id,
+        })
     end
-    if not PNC.HomeDutyService.IsAtHome(record, base.id) then
-        return manualResult(record, false, "NPC_NOT_AT_HOME")
+    local atHome = PNC.HomeDutyService.IsAtHome(record, base.id)
+    if not atHome then
+        return manualResult(record, false, "NPC_NOT_AT_HOME", nil, {
+            stage = "authorize", baseId = base.id, atHome = false,
+        })
     end
     if not Registry or not Registry.GetLiveZombie
         or not Registry.GetLiveZombie(record.id)
     then
-        return manualResult(record, false, "LIVE_WORKER_REQUIRED")
+        return manualResult(record, false, "LIVE_WORKER_REQUIRED", nil, {
+            stage = "authorize", baseId = base.id, atHome = true,
+        })
     end
     if current then
         local accepted = markManualOrder(current, record)
@@ -312,6 +409,10 @@ function Service.RequestManual(record)
             currentOrder, dispatchDetails = reevaluateManualOrder(record,
                 current)
         end
+        dispatchDetails = dispatchDetails or {}
+        dispatchDetails.stage = "dispatch"
+        dispatchDetails.baseId = base.id
+        dispatchDetails.atHome = true
         return manualResult(record, accepted,
             accepted and "CORPSE_HAUL_ORDER_FORCED"
                 or "CORPSE_HAUL_ORDER_INVALID", accepted
@@ -324,14 +425,20 @@ function Service.RequestManual(record)
             currentOrder, dispatchDetails = reevaluateManualOrder(record,
                 existing)
         end
+        dispatchDetails = dispatchDetails or {}
+        dispatchDetails.stage = "dispatch"
+        dispatchDetails.baseId = base.id
+        dispatchDetails.atHome = true
         return manualResult(record, accepted,
             accepted and "CORPSE_HAUL_ORDER_FORCED" or acceptedReason,
             accepted and (currentOrder or existing) or nil, dispatchDetails)
     end
-    assignment = findBaseAssignment(base)
+    assignment, assignmentReason = findBaseAssignment(base)
     if not assignment then
         sourceCorpses, eligibleCorpses = Service.GetSourceCorpseCounts(base)
         return manualResult(record, false, "NO_CORPSE_HAUL_AVAILABLE", nil, {
+            stage = "dispatch", baseId = base.id, atHome = true,
+            assignmentReason = assignmentReason,
             corpses = sourceCorpses, eligible = eligibleCorpses,
         })
     end
@@ -345,6 +452,7 @@ function Service.RequestManual(record)
         phase = "SOURCE_APPROACH",
         payload = {
             haulToken = assignment.haulToken,
+            deathMarkerId = assignment.deathMarkerId,
             sourceX = assignment.sourceX, sourceY = assignment.sourceY,
             sourceZ = assignment.sourceZ,
             interactionX = assignment.interactionX,
@@ -359,9 +467,16 @@ function Service.RequestManual(record)
     })
     if not order then
         return manualResult(record, false,
-            reason or "CORPSE_HAUL_ORDER_FAILED")
+            reason or "CORPSE_HAUL_ORDER_FAILED", nil, {
+                stage = "queue", baseId = base.id, atHome = true,
+                assignmentReason = assignmentReason,
+            })
     end
     currentOrder, dispatchDetails = reevaluateManualOrder(record, order)
+    dispatchDetails = dispatchDetails or {}
+    dispatchDetails.stage = "dispatch"
+    dispatchDetails.baseId = base.id
+    dispatchDetails.atHome = true
     return manualResult(record, true, "CORPSE_HAUL_ORDER_FORCED",
         currentOrder or order, dispatchDetails)
 end
@@ -389,6 +504,7 @@ local function queuePendingOrders()
                     phase = "SOURCE_APPROACH",
                     payload = {
                         haulToken = assignment.haulToken,
+                        deathMarkerId = assignment.deathMarkerId,
                         sourceX = assignment.sourceX,
                         sourceY = assignment.sourceY,
                         sourceZ = assignment.sourceZ,

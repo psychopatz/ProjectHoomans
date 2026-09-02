@@ -177,6 +177,15 @@ T.equal(relationshipBroadcasts[1].context.relationshipDelta.approval, 2,
     "SP feedback carries the approval delta")
 T.equal(relationshipBroadcasts[1].context.relationshipDelta.respect, 4,
     "SP feedback carries the respect delta")
+T.equal(relationshipBroadcasts[1].context.ambientFlavor.flavorID,
+    "social.witnessed_player_kill",
+    "SP feedback carries the reusable flavor ID")
+T.equal(relationshipBroadcasts[1].context.ambientFlavor.socialRole,
+    "neutral",
+    "SP feedback classifies the witness for flavor")
+T.equal(relationshipBroadcasts[1].context.ambientFlavor.llmPriority,
+    90,
+    "SP feedback marks client LLM flavor as the highest social priority")
 T.truthy(#logs >= 3, "SP witness detection is logged")
 
 zombie.threatID = "online:test_mp"
@@ -193,5 +202,8 @@ T.equal(#relationshipBroadcasts, 2,
     "MP witness uses the relationship presentation transport")
 T.equal(relationshipBroadcasts[2].reason, "witnessed_player_kill",
     "MP feedback preserves the witness event reason")
+T.equal(relationshipBroadcasts[2].context.ambientFlavor.eventType,
+    "witnessed_player_kill",
+    "MP feedback carries the same client flavor event")
 
 T.finish("pnc_player_kill_witness_smoke")

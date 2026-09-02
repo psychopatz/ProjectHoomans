@@ -1,6 +1,5 @@
 local Registry = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Registry"
 local Presentation = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Presentation"
-local Research = require "PNC/UI/Communities/PNC_ColonyManagementResearchTab"
 local Workshop = require "PNC/UI/Communities/PNC_ColonyManagementWorkshopTab"
 local Building = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagementBuildingTab"
 local Shared = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Shared"
@@ -163,18 +162,15 @@ Registry.Register({
     title = "RESEARCH",
     detailTitle = "COLONY RESEARCH",
     showRoster = false,
-    showDetails = true,
-    create = function(window, UI)
-        Research.Create(window, UI, Shared.Tr)
-    end,
-    layout = function(window, Layout, content)
-        Research.Layout(window, Layout, content)
-    end,
-    apply = function(window, active, Layout)
-        Research.ApplyVisibility(window, active, Layout)
-    end,
-    rebuild = function(window, snapshot)
-        return Research.Rebuild(window, snapshot, Shared.Tr)
+    showDetails = false,
+    -- Research is now a detachable Command Hub widget. Keep the legacy tab
+    -- as a compatibility entry point so existing callers reach the same UI.
+    action = function(window)
+        local research = PNC.ResearchUI
+        if research and research.Toggle then
+            return research.Toggle(window)
+        end
+        return false
     end,
 })
 

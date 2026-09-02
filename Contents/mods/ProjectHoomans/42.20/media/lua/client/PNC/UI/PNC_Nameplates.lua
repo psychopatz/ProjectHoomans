@@ -30,6 +30,9 @@ PNC.SettingsStore = PNC.SettingsStore or PsychopatzCore.Settings.Open("ProjectHo
         debugShowInfection = true,
         debugShowAnimation = true,
         storageTransactionLogging = false,
+        relationshipFeedbackScale = 1.0,
+        nameplateTextScale = 1.0,
+        nameplateBarScale = 1.0,
     },
 })
 Nameplates.Settings = PNC.SettingsStore.values
@@ -65,6 +68,15 @@ local debugSettingDefaults = {
 for key, value in pairs(debugSettingDefaults) do
     if Nameplates.Settings[key] == nil then Nameplates.Settings[key] = value end
 end
+if Nameplates.Settings.relationshipFeedbackScale == nil then
+    Nameplates.Settings.relationshipFeedbackScale = 1.0
+end
+if Nameplates.Settings.nameplateTextScale == nil then
+    Nameplates.Settings.nameplateTextScale = 1.0
+end
+if Nameplates.Settings.nameplateBarScale == nil then
+    Nameplates.Settings.nameplateBarScale = 1.0
+end
 Nameplates.State = Nameplates.State or {
     managers = {},
 }
@@ -72,6 +84,7 @@ Nameplates.State = Nameplates.State or {
 require "PNC/UI/Nameplates/PNC_NameplatePresentation"
 require "PNC/UI/Nameplates/PNC_NameplateDebug"
 require "PNC/UI/Nameplates/PNC_NameplateBodies"
+require "PNC/UI/Nameplates/PNC_NameplateDisplaySettings"
 require "PNC/UI/Nameplates/PNC_NameplateRelationshipFeedback"
 require "PNC/UI/Nameplates/PNC_NameplateRelationshipFeedbackRenderer"
 require "PNC/UI/Nameplates/PNC_NameplateScopes"
@@ -83,6 +96,7 @@ require "PNC/UI/Nameplates/NameplateRenderer/PNC_NameplateRenderer"
 Nameplates.RelationshipFeedback = PNC.NameplateRelationshipFeedback
 Nameplates.RelationshipFeedbackRenderer =
     PNC.NameplateRelationshipFeedbackRenderer
+Nameplates.DisplaySettings = PNC.NameplateDisplaySettings
 
 local Settings = Nameplates.Settings
 local State = Nameplates.State

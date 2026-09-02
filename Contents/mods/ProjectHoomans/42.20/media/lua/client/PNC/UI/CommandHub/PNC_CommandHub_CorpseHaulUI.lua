@@ -9,6 +9,7 @@ local GridRegion = require "PsychopatzCore/World/PC_GridRegion"
 local Selector = require "PsychopatzCore/UI/World/PsychopatzGridRegionSelector"
 
 CorpseHaulUI.MAX_TILES = 100000
+local CORPSE_HAUL_ZONES_OVERLAP = "CORPSE_HAUL_ZONES_OVERLAP"
 
 local function tr(key, fallback)
     local value = getText and getText(key) or nil
@@ -44,6 +45,25 @@ local function validateRegion(region)
     return true
 end
 
+local function overlapMessage()
+    return tr("UI_PNC_CommandHub_CorpseHaul_Overlap",
+        "Collect and dump areas cannot overlap.")
+end
+
+local function regionsOverlap(sourceRegion, destinationRegion)
+    return type(GridRegion.intersects) == "function"
+        and GridRegion.intersects(sourceRegion, destinationRegion) == true
+end
+
+local function validateDestinationRegion(region, sourceRegion)
+    local valid, reason = validateRegion(region)
+    if not valid then return false, reason end
+    if regionsOverlap(sourceRegion, region) then
+        return false, overlapMessage()
+    end
+    return true
+end
+
 local function openDestination(sourceRegion, baseId, configuration,
     ownerWindow)
     return Selector.Open({
@@ -62,7 +82,18 @@ local function openDestination(sourceRegion, baseId, configuration,
         },
         highlightColor = { r = 0.18, g = 0.82, b = 1, a = 0.48 },
         previewColor = { r = 0.35, g = 0.9, b = 1, a = 0.28 },
-        validate = validateRegion,
+        invalidColor = { r = 1.0, g = 0.12, b = 0.08, a = 0.72 },
+        validate = function(region)
+            return validateDestinationRegion(region, sourceRegion)
+        end,
+        tileValidator = function(x, y, z)
+            if type(GridRegion.containsPoint) == "function"
+                and GridRegion.containsPoint(sourceRegion, x, y, z)
+            then
+                return false, overlapMessage()
+            end
+            return true
+        end,
         ownerWindow = ownerWindow,
         player = getSpecificPlayer and getSpecificPlayer(0) or nil,
         playerNum = 0,
@@ -80,6 +111,10 @@ local function openDestination(sourceRegion, baseId, configuration,
             end
             CorpseHaulUI.lastResult = ok
             CorpseHaulUI.lastError = ok and nil or reason
+            if ok == false and ownerWindow and ownerWindow.setStatus then
+                ownerWindow:setStatus(reason == CORPSE_HAUL_ZONES_OVERLAP
+                    and overlapMessage() or tostring(reason or ""))
+            end
             return ok ~= false
         end,
     })

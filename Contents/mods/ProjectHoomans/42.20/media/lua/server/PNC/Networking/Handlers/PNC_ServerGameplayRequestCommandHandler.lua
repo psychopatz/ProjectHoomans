@@ -11,7 +11,19 @@ local MapCommandService = PNC.MapCommandService
 Router.Register(Const.CMD_COMPANION_COMMAND, function(player, args)
     if not args.commandID then return end
     if CompanionCommands and CompanionCommands.Execute then
-        CompanionCommands.Execute(player, args)
+        local affected, reason = CompanionCommands.Execute(player, args)
+        if tostring(args.commandID) == "manual_corpse_haul"
+            and PNC.Core and PNC.Core.Log
+        then
+            PNC.Core.Log(tonumber(affected) and affected > 0
+                    and "INFO" or "WARN",
+                "manual_corpse_haul_command npc="
+                    .. tostring(args.id or "group")
+                    .. " affected=" .. tostring(affected or 0)
+                    .. " reason=" .. tostring(reason or "unknown")
+                    .. " requestID=" .. tostring(args.requestID or "")
+                    .. " source=" .. tostring(args.commandSource or "network"))
+        end
     end
 end)
 

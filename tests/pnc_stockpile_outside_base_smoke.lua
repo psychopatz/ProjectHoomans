@@ -128,6 +128,16 @@ local check = PNC.FacilityValidationService.NormalizeComponent(
 )
 T.truthy(check.ok, "external stockpile region passes component validation")
 
+local initialCheck = PNC.FacilityValidationService.NormalizeComponent(
+    { id = "base:1" },
+    { id = "facility:new", definitionId = "stockpile" },
+    { kind = "region", role = "storage.stockpile", region = region }
+)
+T.falsy(initialCheck.ok,
+    "initial stockpile creation must remain inside the base")
+T.equal(initialCheck.reason, "OUTSIDE_BASE",
+    "initial stockpile outside-base reason")
+
 PNC.BaseValidationService = {
     Internal = {
         Result = function(ok, reason, details)

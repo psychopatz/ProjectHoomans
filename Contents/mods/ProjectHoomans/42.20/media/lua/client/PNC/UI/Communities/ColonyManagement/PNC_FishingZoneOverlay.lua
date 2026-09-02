@@ -13,6 +13,16 @@ Overlay.owner = Overlay.owner or nil
 local ZONE_COLOR = { r = 0.12, g = 0.95, b = 0.35, a = 0.13 }
 local SPOT_COLOR = { r = 0.30, g = 1.00, b = 0.55, a = 0.52 }
 
+local function selectorOwnsWorldInput()
+    local ui = PsychopatzCore and PsychopatzCore.UI or nil
+    local selector = ui and ui.GridRegionSelector or nil
+    if not selector then return false end
+    if selector.IsWorldInputOwned then
+        return selector.IsWorldInputOwned() == true
+    end
+    return selector.instance ~= nil
+end
+
 local function copy(value)
     if PNC.Core and PNC.Core.DeepCopy then return PNC.Core.DeepCopy(value) end
     if type(value) ~= "table" then return value end
@@ -60,7 +70,9 @@ function Overlay.IsEnabled()
 end
 
 function Overlay.Render()
-    if not Overlay.IsEnabled() or not addAreaHighlightForPlayer then return end
+    if selectorOwnsWorldInput()
+        or not Overlay.IsEnabled() or not addAreaHighlightForPlayer
+    then return end
     local player = getSpecificPlayer and getSpecificPlayer(0) or nil
     if not player then return end
     local playerNum = player.getPlayerNum and player:getPlayerNum() or 0

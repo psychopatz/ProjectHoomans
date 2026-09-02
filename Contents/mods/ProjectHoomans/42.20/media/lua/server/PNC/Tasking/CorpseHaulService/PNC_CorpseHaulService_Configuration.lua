@@ -4,6 +4,7 @@ if PsychopatzCore and PsychopatzCore.RuntimeRole
 local Service = PNC.CorpseHaulService
 local Internal = Service.Internal
 local GridRegion = require "PsychopatzCore/World/PC_GridRegion"
+local CORPSE_HAUL_ZONES_OVERLAP = "CORPSE_HAUL_ZONES_OVERLAP"
 
 local function configuredRegion(region)
     if type(region) ~= "table" or not GridRegion.normalize
@@ -64,6 +65,12 @@ function Service.SetConfiguration(player, args)
     if not source then return false, reason end
     destination, reason = validateConfiguredRegion(args.destinationRegion)
     if not destination then return false, reason end
+    if type(GridRegion.intersects) ~= "function" then
+        return false, "REGION_VALIDATION_UNAVAILABLE"
+    end
+    if GridRegion.intersects(source, destination) then
+        return false, CORPSE_HAUL_ZONES_OVERLAP
+    end
     base.corpseHaul = {
         schemaVersion = 1,
         sourceRegion = source,

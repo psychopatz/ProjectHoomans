@@ -63,6 +63,10 @@ function Network.SendConversationRelationship(
         reason = reason,
         source = relationshipContext.source,
         eventID = relationshipContext.eventID,
+        -- This is only a compact client-presentation hint.  Relationship
+        -- values remain authoritative on the server; the Core client owns
+        -- wording, cooldowns, queue arbitration, and optional LLM handling.
+        ambientFlavor = relationshipContext.ambientFlavor,
         relationshipDelta = relationshipContext.relationshipDelta
             or relationshipContext.delta,
         relationshipBefore = relationshipContext.relationshipBefore

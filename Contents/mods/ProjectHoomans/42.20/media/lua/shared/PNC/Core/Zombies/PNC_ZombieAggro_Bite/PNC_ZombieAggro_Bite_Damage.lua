@@ -125,6 +125,17 @@ function BiteInternal.ApplyBiteDamage(entry, record, zombie, npcBody, now)
     local result
     local defense
     local avoided
+    if not record or record.alive == false
+        or record.health and record.health.state == "dead"
+        or record.presenceState ~= Const.PRESENCE_LIVE
+        or not npcBody
+        or npcBody.isDead and npcBody:isDead()
+    then
+        entry.outcome = "target_invalid"
+        entry.appliedDamage = true
+        BiteInternal.SetBiteDiagnostic(record, entry, "target_invalid")
+        return false
+    end
     prepareImpact(entry, record, zombie, npcBody, now)
     applied, result, defense, avoided = resolveAttack(
         entry, record, zombie, npcBody, now

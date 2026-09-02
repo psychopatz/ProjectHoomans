@@ -85,6 +85,13 @@ function Parts.BuildCommandFeedback(record)
     }
 end
 
+function Parts.BuildCorpseHaulDiagnostic(record)
+    local diagnostic = record and record.runtime
+        and record.runtime.corpseHaulManualDiagnostic or nil
+    if type(diagnostic) ~= "table" then return nil end
+    return Core.DeepCopy and Core.DeepCopy(diagnostic) or diagnostic
+end
+
 function Parts.BuildBandageFeedback(record)
     local runtime = record and record.runtime or nil
     local revision = tonumber(runtime and runtime.bandageCompletionRevision)

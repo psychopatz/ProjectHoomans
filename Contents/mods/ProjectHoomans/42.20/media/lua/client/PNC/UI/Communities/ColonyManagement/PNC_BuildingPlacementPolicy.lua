@@ -1,6 +1,7 @@
 PNC = PNC or {}
 
 local GridRegion = require "PsychopatzCore/World/PC_GridRegion"
+local Footprint = require "PNC/Core/Settlement/PNC_BuildingFootprint"
 local Policy = {}
 
 local function currentSettlement()
@@ -57,6 +58,43 @@ function Policy.ValidateSquare(settlement, square)
     return Policy.ValidatePoint(settlement, x, y, z)
 end
 
+local function addInvalidTile(levels, x, y, z)
+    levels[z] = levels[z] or { rows = {} }
+    local row = levels[z].rows[y] or {}
+    row[#row + 1], row[#row + 2] = x, x
+    levels[z].rows[y] = row
+end
+
+-- Validate every occupied tile, not only the blueprint anchor. The returned
+-- invalid region is used by the placement preview to tint the offending tiles
+-- without changing any persistent/freestyle zone overlay state.
+function Policy.ValidateFootprint(settlement, region)
+    if not settlement then return false, "BUILD_BASE_UNAVAILABLE", nil, nil end
+    if type(region) ~= "table" then
+        return false, "BUILD_TARGET_REQUIRED", nil, nil
+    end
+
+    local normalized = GridRegion.normalize(region)
+    if GridRegion.countTiles(normalized) <= 0 then
+        return false, "BUILD_TARGET_REQUIRED", normalized, nil
+    end
+
+    local invalidLevels = {}
+    local valid = true
+    Footprint.ForEachTile(normalized, function(x, y, z)
+        if not Policy.IsPointInsideBase(settlement, x, y, z) then
+            valid = false
+            addInvalidTile(invalidLevels, x, y, z)
+        end
+        return true
+    end)
+    local invalid = GridRegion.normalize({ levels = invalidLevels })
+    if not valid then
+        return false, "BUILD_TARGET_OUTSIDE_BASE", normalized, invalid
+    end
+    return true, nil, normalized, nil
+end
+
 function Policy.CurrentSettlement()
     return currentSettlement()
 end
@@ -67,6 +105,10 @@ end
 
 function Policy.ValidateCurrentSquare(square)
     return Policy.ValidateSquare(currentSettlement(), square)
+end
+
+function Policy.ValidateCurrentFootprint(region)
+    return Policy.ValidateFootprint(currentSettlement(), region)
 end
 
 return Policy

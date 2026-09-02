@@ -9,6 +9,45 @@ local Internal = Lifecycle.Internal
 local Core = PNC.Core
 local Const = PNC.Const
 
+local function findExistingCorpse(record, zombie)
+    local cell = getCell and getCell() or nil
+    local x = record and record.corpse and record.corpse.x
+        or zombie and zombie.getX and zombie:getX() or record and record.x
+    local y = record and record.corpse and record.corpse.y
+        or zombie and zombie.getY and zombie:getY() or record and record.y
+    local z = record and record.corpse and record.corpse.z
+        or zombie and zombie.getZ and zombie:getZ() or record and record.z
+    local square
+    local expectedToken = record and record.corpse
+        and record.corpse.token or record and record.corpseToken
+    local accepted
+    if not cell or not cell.getGridSquare or not record
+        or not Internal.forEachCorpse
+    then
+        return nil
+    end
+    square = cell:getGridSquare(
+        math.floor(tonumber(x) or 0),
+        math.floor(tonumber(y) or 0),
+        math.floor(tonumber(z) or 0)
+    )
+    if not square then return nil end
+    Internal.forEachCorpse(square, function(candidate)
+        local modData = candidate.getModData and candidate:getModData() or nil
+        local markerId = modData and (
+            modData.PNC_DeathMarkerID or modData.PNC_UUID
+        ) or nil
+        local token = modData and modData.PNC_CorpseToken or nil
+        if not accepted and tostring(markerId or "") == tostring(record.id)
+            and (not expectedToken or not token
+                or tostring(token) == tostring(expectedToken))
+        then
+            accepted = candidate
+        end
+    end)
+    return accepted
+end
+
 function Internal.makeCorpseInert(corpse, createdWorldHour)
     -- The engine owns this corpse, but an NPC body starts as an IsoZombie.
     -- Prevent that backing actor from scheduling a second local/client
@@ -102,8 +141,33 @@ function Lifecycle.CreateVanillaCorpse(record, zombie, reason)
     local converted = false
     local sourceWornItems
     local wornEntries
+    local existing
+    local runtime
     if not record or not zombie then
         return false, nil
+    end
+    runtime = Internal.ensureRuntime(record)
+    existing = findExistingCorpse(record, zombie)
+    if existing then
+        -- A death audit can revisit the same dead record after the engine has
+        -- already produced a body. Reuse that authoritative object and retire
+        -- the transient zombie shell instead of converting a second corpse.
+        token = record.corpse and record.corpse.token
+            or record.corpseToken or Core.GenerateID("corpse")
+        Internal.ensureCorpseIdentityCard(record, existing)
+        Internal.stampCorpse(record, existing, token)
+        Internal.clearBodyCombat(zombie)
+        Internal.removeZombie(zombie)
+        record.presenceState = Const.PRESENCE_CORPSE
+        Internal.detachLiveBody(record, reason or "death")
+        Internal.mark(record, "corpse", "inert_loaded", reason or "death")
+        runtime.corpseState = "inert_loaded"
+        return true, existing
+    end
+    if runtime.corpseState == "finalizing"
+        or runtime.corpseState == "inert_loaded"
+    then
+        return true, nil
     end
     x = zombie.getX and zombie:getX() or record.x
     y = zombie.getY and zombie:getY() or record.y
@@ -142,10 +206,10 @@ function Lifecycle.CreateVanillaCorpse(record, zombie, reason)
     if not corpse then
         if converted then
             Internal.scheduleCorpseFinalize(record, x, y, z, token, reason or "death", wornEntries)
-            Internal.ensureRuntime(record).corpseState = "finalizing"
+            runtime.corpseState = "finalizing"
         else
             Internal.removeZombie(zombie)
-            Internal.ensureRuntime(record).corpseState = "missing"
+            runtime.corpseState = "missing"
         end
     end
     record.presenceState = Const.PRESENCE_CORPSE
@@ -157,8 +221,8 @@ function Lifecycle.CreateVanillaCorpse(record, zombie, reason)
         Internal.ensureCorpseIdentityCard(record, corpse)
         Internal.applyCorpseWornItems(corpse, wornEntries)
         Internal.stampCorpse(record, corpse, token)
-        Internal.transmitCorpseState(corpse)
-        Internal.ensureRuntime(record).corpseState = "inert_loaded"
+        Internal.transmitCorpseState(corpse, true)
+        runtime.corpseState = "inert_loaded"
     end
     return converted, corpse
 end

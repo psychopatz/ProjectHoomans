@@ -144,6 +144,16 @@ local function retireDeadRecord(record)
 end
 
 function Health.Kill(record, zombie, reason)
+    if not record then
+        return false, nil
+    end
+    -- Death is an edge-trigger.  Repeated damage, infection ticks, or corpse
+    -- audits must not re-run cleanup and corpse conversion for the same record.
+    if record.alive == false
+        or record.health and record.health.state == "dead"
+    then
+        return false, nil
+    end
     local health = Health.Ensure(record)
     local deathMarker
     local retired

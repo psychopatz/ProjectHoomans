@@ -47,6 +47,33 @@ function ISPNCCommandHubSettingsWindow:onResponsiveLayout()
         controlHeight = controlHeight,
     })
     y = y + rowHeight + px(8)
+    self.fields.nameplateTextScale.row:place(rect.x, y, rect.width,
+        rowHeight, {
+            scale = scale,
+            labelWidth = 130,
+            valueWidth = 48,
+            gap = 8,
+            controlHeight = controlHeight,
+        })
+    y = y + rowHeight + px(8)
+    self.fields.nameplateBarScale.row:place(rect.x, y, rect.width,
+        rowHeight, {
+            scale = scale,
+            labelWidth = 130,
+            valueWidth = 48,
+            gap = 8,
+            controlHeight = controlHeight,
+        })
+    y = y + rowHeight + px(8)
+    self.fields.relationshipFeedbackScale.row:place(rect.x, y, rect.width,
+        rowHeight, {
+            scale = scale,
+            labelWidth = 145,
+            valueWidth = 48,
+            gap = 8,
+            controlHeight = controlHeight,
+        })
+    y = y + rowHeight + px(8)
     Layout.SetBounds(self.themeButton, rect.x, y, rect.width, controlHeight)
     y = y + controlHeight + px(8)
     Layout.SetBounds(self.branchButton, rect.x, y,

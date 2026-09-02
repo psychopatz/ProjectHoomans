@@ -79,6 +79,31 @@ local function relationshipDelta(before, after)
     }
 end
 
+local function relationshipState(relationship)
+    return tostring(relationship and (
+        relationship.state or relationship.category
+    ) or "unknown")
+end
+
+local function relationshipTier(relationship)
+    local state = relationshipState(relationship)
+    if state == "enemy" or state == "rival" then return "reserved" end
+    local approval = tonumber(relationship and relationship.approval) or 0
+    local familiarity = tonumber(relationship and relationship.familiarity) or 0
+    if state == "friend" or approval >= 30 then return "warm" end
+    if approval >= 10 or familiarity >= 5 then return "familiar" end
+    return "reserved"
+end
+
+local function socialRole(record)
+    local interactions = PNC.VanillaEmoteInteractions
+    if interactions and type(interactions.ResolveNPCType) == "function" then
+        local ok, value = pcall(interactions.ResolveNPCType, record)
+        if ok and value then return tostring(value) end
+    end
+    return "neutral"
+end
+
 local function liveNPCIsWitness(record, body, killer, zombie, radiusSq)
     local npcX = coordinate(body, "getX", record and record.x)
     local npcY = coordinate(body, "getY", record and record.y)
@@ -210,6 +235,10 @@ function H.RecordPlayerKillWitnesses(killer, zombie, context)
         if ok and processed and processed.ok == true then
             emitted = emitted + 1
             detail = processed.details and processed.details[1] or nil
+            local before = detail and detail.relationshipBefore or nil
+            local after = detail and detail.relationshipAfter or nil
+            local role = socialRole(record)
+            local state = relationshipState(before)
             if Network
                 and type(Network.SendConversationRelationshipForNPC)
                     == "function"
@@ -227,9 +256,36 @@ function H.RecordPlayerKillWitnesses(killer, zombie, context)
                             relationshipAfter = detail
                                 and detail.relationshipAfter or nil,
                             relationshipDelta = relationshipDelta(
-                                detail and detail.relationshipBefore or nil,
-                                detail and detail.relationshipAfter or nil
+                                before,
+                                after
                             ),
+                            ambientFlavor = {
+                                flavorID = "social.witnessed_player_kill",
+                                eventType = "witnessed_player_kill",
+                                family = "combat_commentary",
+                                priority = 35,
+                                llmEligible = true,
+                                llmPriority = 90,
+                                weight = 1,
+                                npcID = tostring(npcID),
+                                npcType = role,
+                                socialRole = role,
+                                relationshipState = state,
+                                relationshipTier = relationshipTier(before),
+                                mergeKey = tostring(npcID)
+                                    .. ":combat_commentary",
+                                context = {
+                                    eventType = "witnessed_player_kill",
+                                    threatID = threatID,
+                                    witnessNPCID = tostring(npcID),
+                                    npcType = role,
+                                    socialRole = role,
+                                    relationshipState = state,
+                                    relationshipTier = relationshipTier(before),
+                                    killerSource = context and context.killerSource
+                                        or context and context.source or "unknown",
+                                },
+                            },
                             npcID = tostring(npcID),
                         }
                     )

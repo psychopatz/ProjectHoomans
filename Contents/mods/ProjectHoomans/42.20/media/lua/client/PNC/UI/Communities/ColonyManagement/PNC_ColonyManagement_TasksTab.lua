@@ -105,6 +105,11 @@ local function taskDetail(task)
     if task.blockedReason and task.blockedReason ~= "" then
         details = details .. "  |  " .. tostring(task.blockedReason)
     end
+    if task.lastDiagnosticReason and task.lastDiagnosticReason ~= "" then
+        details = details .. "  |  LAST "
+            .. tostring(task.lastDiagnosticStage or "TASK") .. "="
+            .. tostring(task.lastDiagnosticReason)
+    end
     return details
 end
 

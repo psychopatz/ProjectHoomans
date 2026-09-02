@@ -11,6 +11,7 @@ local companion
 local map
 local toll
 local sent
+local commandLogs = {}
 
 PNC = {
     Const = {
@@ -23,6 +24,10 @@ PNC = {
     CompanionCommands = {
         Execute = function(receivedPlayer, args)
             companion = { player = receivedPlayer, args = args }
+            return args and args.commandID == "manual_corpse_haul"
+                and 0 or 1,
+                args and args.commandID == "manual_corpse_haul"
+                and "NPC_NOT_AT_HOME" or "commanded"
         end,
     },
     MapCommandService = {
@@ -38,6 +43,13 @@ PNC = {
     FactionTolls = {
         HandleResponse = function(receivedPlayer, args)
             toll = { player = receivedPlayer, args = args }
+        end,
+    },
+    Core = {
+        Log = function(level, message)
+            commandLogs[#commandLogs + 1] = {
+                level = level, message = message,
+            }
         end,
     },
 }
@@ -60,6 +72,15 @@ T.equal(Router.Handle("CompanionCommand", player, companionArgs), true,
     "companion command handled")
 T.equal(companion.player, player, "companion player")
 T.equal(companion.args, companionArgs, "companion payload identity")
+
+Router.Handle("CompanionCommand", player, {
+    commandID = "manual_corpse_haul", id = "npc:one",
+    requestID = "manual:one", commandSource = "colonist_activities",
+})
+T.truthy(commandLogs[#commandLogs]
+    and string.find(commandLogs[#commandLogs].message,
+        "reason=NPC_NOT_AT_HOME", 1, true),
+    "manual corpse command logs the server routing rejection reason")
 
 companion = nil
 T.equal(Router.Handle("CompanionCommand", player, nil), true,

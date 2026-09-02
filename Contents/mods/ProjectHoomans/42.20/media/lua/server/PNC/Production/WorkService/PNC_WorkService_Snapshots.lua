@@ -100,6 +100,13 @@ function Service.Queries.BuildTaskSnapshot(colonyId)
                 updatedAt = order.updatedAt,
                 lastProgressAt = order.lastProgressAt,
                 retryAt = order.retryAt,
+                lastDiagnosticReason = order.lastDiagnosticReason,
+                lastDiagnosticStage = order.lastDiagnosticStage,
+                lastDiagnosticAt = order.lastDiagnosticAt,
+                lastExecutionFailureReason =
+                    order.lastExecutionFailureReason,
+                lastExecutionFailurePhase = order.lastExecutionFailurePhase,
+                lastExecutionFailureAt = order.lastExecutionFailureAt,
                 phase = order.completionStarted == true and "ATOMIC_COMMIT"
                     or order.status,
                 locationState = worker and workLocationState

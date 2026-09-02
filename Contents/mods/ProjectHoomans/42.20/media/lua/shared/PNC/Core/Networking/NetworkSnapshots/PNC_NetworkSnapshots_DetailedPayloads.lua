@@ -17,6 +17,7 @@ local buildOrganizationalFactionSummary =
     Parts.BuildOrganizationalFactionSummary
 local buildCombatSummary = Parts.BuildCombatSummary
 local buildCommandFeedback = Parts.BuildCommandFeedback
+local buildCorpseHaulDiagnostic = Parts.BuildCorpseHaulDiagnostic
 local buildBandageFeedback = Parts.BuildBandageFeedback
 local buildActionInformation = Parts.BuildActionInformation
 local buildVisualState = Parts.BuildVisualState
@@ -147,6 +148,7 @@ function Network.BuildSnapshot(record)
         ownerUsername = ownership.ownerUsername,
         ownerOnlineID = ownership.ownerOnlineID,
         commandFeedback = buildCommandFeedback(record),
+        corpseHaulManualDiagnostic = buildCorpseHaulDiagnostic(record),
         bandageFeedback = buildBandageFeedback(record),
         actionInformation = buildActionInformation(record),
         lumberRuntime = record.runtime and record.runtime.lumber

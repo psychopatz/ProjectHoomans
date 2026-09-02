@@ -2,7 +2,22 @@ PNC = PNC or {}
 local Wounds = PNC.NPCWounds
 local Internal = Wounds.Internal
 local Core = PNC.Core
+local Const = PNC.Const
 local Settings = PNC.Sandbox
+local LIVE_PRESENCE = Const and Const.PRESENCE_LIVE or "live"
+
+local function isLiveZombieTarget(record, npcBody)
+    if not record or record.alive == false then
+        return false
+    end
+    if record.health and record.health.state == "dead" then
+        return false
+    end
+    if record.presenceState ~= LIVE_PRESENCE then
+        return false
+    end
+    return not (npcBody and npcBody.isDead and npcBody:isDead())
+end
 
 local function chooseWoundType()
     local roll = Internal.RandomPercent()
@@ -63,8 +78,16 @@ function Wounds.ResolveZombieAttack(
     attacker,
     attackerZombieId
 )
+    if not isLiveZombieTarget(record, npcBody) then
+        return false, { outcome = "target_invalid" }
+    end
     local part = Internal.ChoosePart()
     local woundType = chooseWoundType()
+    local body = Wounds.Ensure(record)
+    local previousWound = body.wounds[part.id]
+        and Core.DeepCopy(body.wounds[part.id]) or nil
+    local previousInfection = body.infection
+        and Core.DeepCopy(body.infection) or nil
     local protection =
         Wounds.GetProtection(npcBody, part, woundType)
     local baseChance = Settings.NPCZombieWoundChance()
@@ -89,7 +112,7 @@ function Wounds.ResolveZombieAttack(
         woundType,
         Core.Now()
     )
-    PNC.Health.ApplyDamage(record, npcBody, {
+    local applied = PNC.Health.ApplyDamage(record, npcBody, {
         amount = damage,
         partId = part.id,
         type = "zombie_" .. woundType,
@@ -102,7 +125,32 @@ function Wounds.ResolveZombieAttack(
         z = attacker and attacker.getZ
             and attacker:getZ() or record.z,
     })
+    if not applied then
+        body.wounds[part.id] = previousWound
+        body.infection = previousInfection
+        Wounds.Recalculate(record)
+        return false, { outcome = "damage_rejected", partId = part.id }
+    end
     recordZombieDamage(record, attacker, attackerZombieId)
+    local socialHooks = PNC.SocialEventHooksInternal
+    if socialHooks and socialHooks.RecordNPCDamagedByZombie then
+        pcall(
+            socialHooks.RecordNPCDamagedByZombie,
+            record,
+            npcBody,
+            attacker,
+            {
+                amount = damage,
+                damage = damage,
+                healthLoss = damage,
+                woundType = wound.type,
+                attackerKind = "zombie",
+                attackerZombieID = attackerZombieId,
+                attackerID = attackerZombieId,
+                source = "npc_zombie_attack",
+            }
+        )
+    end
     return true, {
         outcome = "wounded",
         partId = part.id,
@@ -178,6 +226,12 @@ local function applyResolvedDamage(
     attack,
     defenseResult
 )
+    if not isLiveZombieTarget(record, npcBody) then
+        return nil, {
+            outcome = "target_invalid",
+            partId = attack and attack.part and attack.part.id or nil,
+        }
+    end
     local part = attack.part
     local body = Wounds.Ensure(record)
     local previousWound = body.wounds[part.id]
@@ -219,7 +273,7 @@ local function applyResolvedDamage(
                 defenseResult and defenseResult.damageRoll or nil,
         }
     end
-    return wound
+    return wound, damage
 end
 
 local function buildResolvedResult(
@@ -273,11 +327,15 @@ function Wounds.ApplyResolvedZombieAttack(
     if Core and Core.IsAuthority and not Core.IsAuthority() then
         return false, { outcome = "not_authority" }
     end
+    if not isLiveZombieTarget(record, npcBody) then
+        return false, { outcome = "target_invalid" }
+    end
     local attack, result =
         resolveDamageModel(npcBody, defenseResult)
     if not attack then return false, result end
     local wound
-    wound, result = applyResolvedDamage(
+    local damage
+    wound, result, damage = applyResolvedDamage(
         record,
         npcBody,
         attacker,
@@ -287,6 +345,25 @@ function Wounds.ApplyResolvedZombieAttack(
     )
     if not wound then return false, result end
     recordZombieDamage(record, attacker, attackerZombieId)
+    local socialHooks = PNC.SocialEventHooksInternal
+    if socialHooks and socialHooks.RecordNPCDamagedByZombie then
+        pcall(
+            socialHooks.RecordNPCDamagedByZombie,
+            record,
+            npcBody,
+            attacker,
+            {
+                amount = tonumber(damage) or 0,
+                damage = tonumber(damage) or 0,
+                healthLoss = tonumber(damage) or 0,
+                woundType = wound.type,
+                attackerKind = "zombie",
+                attackerZombieID = attackerZombieId,
+                attackerID = attackerZombieId,
+                source = "npc_zombie_attack_resolved",
+            }
+        )
+    end
     return true, buildResolvedResult(
         record,
         wound,

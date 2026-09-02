@@ -14,6 +14,7 @@ local buildTravelSummary = Parts.BuildTravelSummary
 local resolveAIState = Parts.ResolveAIState
 local buildCombatSummary = Parts.BuildCombatSummary
 local buildCommandFeedback = Parts.BuildCommandFeedback
+local buildCorpseHaulDiagnostic = Parts.BuildCorpseHaulDiagnostic
 local buildBandageFeedback = Parts.BuildBandageFeedback
 local buildActionInformation = Parts.BuildActionInformation
 local buildVisualState = Parts.BuildVisualState
@@ -97,6 +98,7 @@ function Network.BuildPresenceDelta(record)
         healthState = record.health and record.health.state or nil,
         attackType = record.attackType or "auto",
         commandFeedback = buildCommandFeedback(record),
+        corpseHaulManualDiagnostic = buildCorpseHaulDiagnostic(record),
         bandageFeedback = buildBandageFeedback(record),
         actionInformation = buildActionInformation(record),
         treatmentState = PNC.BehaviorTreatment

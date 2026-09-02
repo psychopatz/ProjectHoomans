@@ -56,6 +56,14 @@ local function activeConversationOwns(message)
         == tostring(message and message.conversationID or "")
 end
 
+local function activeConversationOwnsSpeaker(message)
+    local conversation = PsychopatzCore and PsychopatzCore.Conversation
+    local view = conversation and conversation.instance or nil
+    local npcID = view and view.spec and view.spec.npcID or nil
+    return view and tostring(npcID or "")
+        == tostring(message and message.speakerID or "")
+end
+
 local function clearExpiredDay()
     local day = Message.GetGameDay()
     if observedDay == nil then
@@ -78,6 +86,12 @@ local function onMessage(message)
     local npcID = tostring(message.speakerID or "")
     local text = compactText(message.text)
     if npcID == "" or text == "" then return end
+    local presentation = message.presentationState
+    if type(presentation) == "table" and presentation.nameplate == false
+        and activeConversationOwnsSpeaker(message)
+    then
+        return
+    end
     clearExpiredDay()
     records[npcID] = {
         message = message,
@@ -97,7 +111,11 @@ function Speech.Get(npcID)
         records[npcID] = nil
         return nil
     end
-    if activeConversationOwns(record.message) then return nil end
+    if activeConversationOwns(record.message)
+        or activeConversationOwnsSpeaker(record.message)
+    then
+        return nil
+    end
     return record
 end
 

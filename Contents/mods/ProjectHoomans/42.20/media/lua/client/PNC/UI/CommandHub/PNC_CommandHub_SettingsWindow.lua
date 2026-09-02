@@ -13,6 +13,8 @@ local UI = PsychopatzCore.UI
 local Layout = UI.Layout
 local Theme = UI.Theme
 local WidgetWindow = UI.WidgetWindow
+local DisplaySettings = require
+    "PNC/UI/Nameplates/PNC_NameplateDisplaySettings"
 
 local function trace(event, message)
     local hub = UI.CommandHub
@@ -45,6 +47,18 @@ local function formatLift(value)
 end
 
 local function formatControlScale(value)
+    return tostring(math.floor((tonumber(value) or 0) + 0.5)) .. "%"
+end
+
+local function formatRelationshipFeedbackScale(value)
+    return tostring(math.floor((tonumber(value) or 0) + 0.5)) .. "%"
+end
+
+local function formatNameplateTextScale(value)
+    return tostring(math.floor((tonumber(value) or 0) + 0.5)) .. "%"
+end
+
+local function formatNameplateBarScale(value)
     return tostring(math.floor((tonumber(value) or 0) + 0.5)) .. "%"
 end
 
@@ -166,9 +180,96 @@ function ISPNCCommandHubSettingsWindow:createChildren()
         slider = titlebarScaleRow.control,
         valueLabel = titlebarScaleRow.valueLabel,
     }
+    local nameplateTextScaleRow
+    nameplateTextScaleRow = UI.CreateFormRow(self, {
+        id = "command-hub-setting-row:nameplate-text-scale",
+        label = tr("UI_PNC_CommandHub_Settings_NameplateTextScale",
+            "Nameplate text size"),
+        valueLabel = true,
+        valueText = formatNameplateTextScale(
+            DisplaySettings.GetNameplateTextScale() * 100),
+        createControl = function(parent)
+            return UI.CreateSlider(parent, {
+                id = "command-hub-nameplate-text-scale",
+                target = self,
+                min = DisplaySettings.MinNameplateTextScale * 100,
+                max = DisplaySettings.MaxNameplateTextScale * 100,
+                step = 1,
+                value = DisplaySettings.GetNameplateTextScale() * 100,
+                onChange = function(_, value)
+                    UI.SetLabelText(nameplateTextScaleRow.valueLabel,
+                        formatNameplateTextScale(value))
+                end,
+            })
+        end,
+    })
+    self.fields.nameplateTextScale = {
+        row = nameplateTextScaleRow,
+        label = nameplateTextScaleRow.label,
+        slider = nameplateTextScaleRow.control,
+        valueLabel = nameplateTextScaleRow.valueLabel,
+    }
+    local nameplateBarScaleRow
+    nameplateBarScaleRow = UI.CreateFormRow(self, {
+        id = "command-hub-setting-row:nameplate-bar-scale",
+        label = tr("UI_PNC_CommandHub_Settings_NameplateBarScale",
+            "Nameplate bar size"),
+        valueLabel = true,
+        valueText = formatNameplateBarScale(
+            DisplaySettings.GetNameplateBarScale() * 100),
+        createControl = function(parent)
+            return UI.CreateSlider(parent, {
+                id = "command-hub-nameplate-bar-scale",
+                target = self,
+                min = DisplaySettings.MinNameplateBarScale * 100,
+                max = DisplaySettings.MaxNameplateBarScale * 100,
+                step = 1,
+                value = DisplaySettings.GetNameplateBarScale() * 100,
+                onChange = function(_, value)
+                    UI.SetLabelText(nameplateBarScaleRow.valueLabel,
+                        formatNameplateBarScale(value))
+                end,
+            })
+        end,
+    })
+    self.fields.nameplateBarScale = {
+        row = nameplateBarScaleRow,
+        label = nameplateBarScaleRow.label,
+        slider = nameplateBarScaleRow.control,
+        valueLabel = nameplateBarScaleRow.valueLabel,
+    }
+    local relationshipFeedbackScaleRow
+    relationshipFeedbackScaleRow = UI.CreateFormRow(self, {
+        id = "command-hub-setting-row:relationship-feedback-scale",
+        label = tr("UI_PNC_CommandHub_Settings_RelationshipFeedbackScale",
+            "Relationship feedback size"),
+        valueLabel = true,
+        valueText = formatRelationshipFeedbackScale(
+            DisplaySettings.GetRelationshipFeedbackScale() * 100),
+        createControl = function(parent)
+            return UI.CreateSlider(parent, {
+                id = "command-hub-relationship-feedback-scale",
+                target = self,
+                min = DisplaySettings.MinRelationshipFeedbackScale * 100,
+                max = DisplaySettings.MaxRelationshipFeedbackScale * 100,
+                step = 1,
+                value = DisplaySettings.GetRelationshipFeedbackScale() * 100,
+                onChange = function(_, value)
+                    UI.SetLabelText(relationshipFeedbackScaleRow.valueLabel,
+                        formatRelationshipFeedbackScale(value))
+                end,
+            })
+        end,
+    })
+    self.fields.relationshipFeedbackScale = {
+        row = relationshipFeedbackScaleRow,
+        label = relationshipFeedbackScaleRow.label,
+        slider = relationshipFeedbackScaleRow.control,
+        valueLabel = relationshipFeedbackScaleRow.valueLabel,
+    }
     self.helpLabel = label(self,
         tr("UI_PNC_CommandHub_Settings_Help",
-            "Adjust opacity, child surface lifts, title-bar controls, theme, and panel side here."),
+            "Adjust opacity, nameplate text and bar sizes, relationship feedback, child surface lifts, title-bar controls, theme, and panel side here."),
         Theme.colors.textMuted)
     self.themeButton = UI.CreateButton(self, {
         id = "theme", title = themeTitle(), target = self,
@@ -263,6 +364,20 @@ function ISPNCCommandHubSettingsWindow:populate()
     self.fields.titlebarScale.slider:setValue(titlebarScale, true)
     UI.SetLabelText(self.fields.titlebarScale.valueLabel,
         formatControlScale(titlebarScale))
+    local nameplateTextScale = DisplaySettings.GetNameplateTextScale() * 100
+    self.fields.nameplateTextScale.slider:setValue(nameplateTextScale, true)
+    UI.SetLabelText(self.fields.nameplateTextScale.valueLabel,
+        formatNameplateTextScale(nameplateTextScale))
+    local nameplateBarScale = DisplaySettings.GetNameplateBarScale() * 100
+    self.fields.nameplateBarScale.slider:setValue(nameplateBarScale, true)
+    UI.SetLabelText(self.fields.nameplateBarScale.valueLabel,
+        formatNameplateBarScale(nameplateBarScale))
+    local relationshipFeedbackScale =
+        DisplaySettings.GetRelationshipFeedbackScale() * 100
+    self.fields.relationshipFeedbackScale.slider:setValue(
+        relationshipFeedbackScale, true)
+    UI.SetLabelText(self.fields.relationshipFeedbackScale.valueLabel,
+        formatRelationshipFeedbackScale(relationshipFeedbackScale))
     self.branchButton:setTitle(branchTitle())
     self.themeButton:setTitle(themeTitle())
 end
@@ -274,6 +389,9 @@ function ISPNCCommandHubSettingsWindow:onReset()
     if hub then
         Options.Reset()
         Theme.Reset()
+        DisplaySettings.ResetNameplateTextScale(true)
+        DisplaySettings.ResetNameplateBarScale(true)
+        DisplaySettings.ResetRelationshipFeedbackScale(true)
         applyOpacityToWindows(hub, Options.GetOpacity())
         Options.ApplyRegisteredToolbarScale()
     end
@@ -340,6 +458,18 @@ function ISPNCCommandHubSettingsWindow:onApply()
         math.floor(self.fields.detailLift.slider:getValue() + 0.5) / 100)
     Options.SetTitlebarControlScale(
         math.floor(self.fields.titlebarScale.slider:getValue() + 0.5) / 100)
+    DisplaySettings.SetNameplateTextScale(
+        math.floor(self.fields.nameplateTextScale.slider:getValue()
+            + 0.5) / 100,
+        true)
+    DisplaySettings.SetNameplateBarScale(
+        math.floor(self.fields.nameplateBarScale.slider:getValue()
+            + 0.5) / 100,
+        true)
+    DisplaySettings.SetRelationshipFeedbackScale(
+        math.floor(self.fields.relationshipFeedbackScale.slider:getValue()
+            + 0.5) / 100,
+        true)
     applyOpacityToWindows(hub, opacity / 100)
     Options.ApplyRegisteredToolbarScale()
     self:populate()
@@ -388,9 +518,9 @@ function SettingsUI.Open(owner)
             resizable = true,
             persistenceKey = "PNC.CommandHub.Settings",
             responsiveSpec = {
-                width = 420, height = 410,
-                minWidth = 340, minHeight = 390,
-                maxWidth = 700, maxHeight = 600,
+                width = 420, height = 530,
+                minWidth = 340, minHeight = 510,
+                maxWidth = 700, maxHeight = 720,
             },
         })
         window:initialise()
