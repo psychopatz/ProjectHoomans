@@ -263,6 +263,24 @@ function PlayerDamage.Apply(record, zombie, attacker, weapon, reportedDamage, so
             }
         )
     end
+    if applied
+        and PNC.SocialEventHooksInternal
+        and PNC.SocialEventHooksInternal.RecordPlayerDamagedNPC
+    then
+        pcall(
+            PNC.SocialEventHooksInternal.RecordPlayerDamagedNPC,
+            attacker,
+            record,
+            {
+                amount = amount,
+                damage = amount,
+                attackType = isRangedWeapon(weapon)
+                    and "ranged" or "melee",
+                attackKind = tostring(source or "player_weapon"),
+                source = source,
+            }
+        )
+    end
     if applied and not usedCombatService and Network and Network.BroadcastRecord then
         Network.BroadcastRecord(record, "player_damage")
     end

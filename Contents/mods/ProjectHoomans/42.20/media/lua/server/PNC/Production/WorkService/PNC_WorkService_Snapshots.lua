@@ -12,6 +12,8 @@ local Definitions = PNC.WorkDefinitions
 local Status = Definitions.STATUS
 local terminal = Internal.terminal
 local copy = Internal.copy
+local workLocationState = Internal.workLocationState
+local locationPolicy = Internal.locationPolicy
 
 local function provisionItemFullType(payload)
     if type(payload) ~= "table" then return nil end
@@ -32,6 +34,7 @@ function Service.Queries.BuildTaskSnapshot(colonyId)
         if not terminal(order) then
             local worker = order.workerId and PNC.Registry
                 and PNC.Registry.Get and PNC.Registry.Get(order.workerId) or nil
+            local policy = locationPolicy and locationPolicy(order) or nil
             local payload = order.payload or {}
             local facilityId = order.facilityId or payload.facilityId
             local facility = facilityId and PNC.SettlementRepository
@@ -99,6 +102,9 @@ function Service.Queries.BuildTaskSnapshot(colonyId)
                 retryAt = order.retryAt,
                 phase = order.completionStarted == true and "ATOMIC_COMMIT"
                     or order.status,
+                locationState = worker and workLocationState
+                    and workLocationState(worker, order) or nil,
+                locationPolicy = policy and copy(policy) or nil,
             }
         end
     end
@@ -166,6 +172,9 @@ function Service.BuildActionInformation(record)
     end
     local lumber = order.operation == "LUMBER" and record.runtime
         and record.runtime.lumber or nil
+    local activeLocation = workLocationState
+        and workLocationState(record, order) or nil
+    local activePolicy = locationPolicy and locationPolicy(order) or nil
     return {
         kind = "work_order",
         manual = order.manual == true,
@@ -191,6 +200,8 @@ function Service.BuildActionInformation(record)
         objectInfoName = blueprint.objectInfoName,
         buildDisplayName = buildDescriptor and buildDescriptor.displayName
             or blueprint.objectInfoName,
+        locationState = activeLocation,
+        locationPolicy = activePolicy and copy(activePolicy) or nil,
     }
 end
 

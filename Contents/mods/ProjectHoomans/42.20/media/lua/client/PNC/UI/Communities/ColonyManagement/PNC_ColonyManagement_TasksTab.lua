@@ -91,11 +91,16 @@ local function taskDetail(task)
         or Shared.Tr("UI_PNC_Task_Unassigned", "UNASSIGNED")
     local status = tostring(task.lifecycleState or task.status or "QUEUED")
     local mode = tostring(task.executionMode or "")
+    local location = tostring(task.locationState or "")
     local area = facilityName(task)
         or task.stationId and tostring(task.stationId)
         or Shared.Tr("UI_PNC_Task_BaseArea", "BASE AREA")
     local details = worker .. "  |  " .. status
     if mode ~= "" then details = details .. "  |  " .. mode end
+    if location == "AWAY_FOR_WORK" then
+        details = details .. "  |  "
+            .. Shared.Tr("UI_PNC_Task_AwayForWork", "AWAY FOR WORK")
+    end
     details = details .. "  |  " .. area
     if task.blockedReason and task.blockedReason ~= "" then
         details = details .. "  |  " .. tostring(task.blockedReason)

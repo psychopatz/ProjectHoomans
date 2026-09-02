@@ -203,7 +203,8 @@ function Adapter.EnsureOrder(job)
     local order, reason = Work.Commands.Queue({
         operation = "LUMBER", colonyId = "", factionId = "", baseId = "",
         requiredWorkerId = job.npcId, requiredWork = 1, priority = 90,
-        requiresHome = false, autoReturnHome = false,
+        locationPolicy = { start = "ANYWHERE", execution = "REMOTE",
+            returnHome = "STAY" },
         payload = {
             lumberJobId = job.id, zoneId = job.zoneId, npcId = job.npcId,
         },

@@ -8,6 +8,25 @@ local Core = PNC.Core
 local Const = PNC.Const
 local Stealth = PNC.Stealth
 
+local function hasPersonalEnemy(record)
+    local relationships = record
+        and record.social
+        and record.social.relationships or {}
+    local targetKey
+    local relationship
+    for targetKey, relationship in pairs(relationships) do
+        if PNC.EntityRef
+            and PNC.EntityRef.IsPlayer
+            and PNC.EntityRef.IsPlayer(targetKey)
+            and relationship
+            and relationship.state == "enemy"
+        then
+            return true
+        end
+    end
+    return false
+end
+
 function Perception.ResolveCompanionTarget(record)
     local owner
     local ownerThreatZombie
@@ -138,6 +157,7 @@ function Perception.ResolveHostileTarget(record)
     -- that authoritative check after a transfer or treaty change.
     if factionID
         or hostileConfig.attackPlayers ~= false
+        or hasPersonalEnemy(record)
     then
         playerTarget = Perception.FindNearestEnemyPlayer(record, 12)
     end
@@ -170,6 +190,7 @@ function Perception.ResolveRoamingTarget(record, radius)
     end
     if factionID
         or hostility.attackPlayers == true
+        or hasPersonalEnemy(record)
     then
         playerTarget = Perception.FindNearestEnemyPlayer(record, searchRadius)
     end

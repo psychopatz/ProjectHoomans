@@ -15,6 +15,7 @@ local EventsBus = PsychopatzCore and PsychopatzCore.Events
 local emit = Internal.emit
 local touch = Internal.touch
 local updateState = Internal.updateState
+local FacilityState = require "PNC/Core/Settlement/PNC_FacilityState"
 
 function Service.Upgrade(player, args)
     args = type(args) == "table" and args or {}
@@ -22,9 +23,9 @@ function Service.Upgrade(player, args)
     local base = facility and PNC.BaseService.Get(facility.baseId) or nil
     if not base then return { ok = false, reason = facility and "BASE_NOT_FOUND" or "FACILITY_NOT_FOUND" } end
     if not PNC.BaseValidationService.CanUse(player, base) then return { ok = false, reason = "NO_PERMISSION" } end
-    if facility.constructionState ~= nil
-        and facility.constructionState ~= "BUILT"
-    then return { ok = false, reason = "FACILITY_NOT_BUILT" } end
+    if not FacilityState.IsBuilt(facility) then
+        return { ok = false, reason = "FACILITY_NOT_BUILT" }
+    end
     local check = Validation.CanUpgrade(base, facility, args.expectedRevision)
     if not check.ok then return check end
     if not PNC.ConstructionService

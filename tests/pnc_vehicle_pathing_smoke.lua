@@ -382,6 +382,16 @@ T.equal(
     "continuous retarget reset movement cadence"
 )
 T.equal(lane.steeringIndex, 3, "look-ahead index captured")
+lane.lastGoalProgressAt = 100
+lane.lastPhysicalMoveAt = 0
+local stalledRetarget = PNC.PathService.Internal.retargetLaneGoal(
+    record,
+    lane,
+    { x = 10.5, y = 10.5, z = 0, mode = "walk", stopDistance = 0.7 }
+)
+T.equal(stalledRetarget, true, "stalled route accepts a follow retarget")
+T.equal(lane.lastGoalProgressAt, 100,
+    "follow retarget does not hide a native physical stall")
 T.finish("pnc_vehicle_pathing_smoke")
 
 T.finish("pnc_vehicle_pathing_smoke")

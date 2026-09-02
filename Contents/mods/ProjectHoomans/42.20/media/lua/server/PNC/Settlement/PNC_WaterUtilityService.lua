@@ -6,6 +6,7 @@ PNC.WaterUtilityService = PNC.WaterUtilityService or {}
 
 local Service = PNC.WaterUtilityService
 local Repository = PNC.SettlementRepository
+local FacilityState = require "PNC/Core/Settlement/PNC_FacilityState"
 local LITERS_PER_TANK = 25
 local MINUTES_PER_CATCH = 10
 
@@ -69,7 +70,7 @@ function Service.Tick(nowHours, forcedRaining)
             local elapsedHours = math.max(0,
                 math.min(1, now - state.lastWaterUpdateHour))
             local before = state.waterLiters
-            if raining and facility.constructionState == "BUILT"
+            if raining and FacilityState.IsBuilt(facility)
                 and catchers > 0 and tanks > 0 and spigots > 0
             then
                 local raw = state.rainCarry

@@ -15,10 +15,10 @@ local EventsBus = PsychopatzCore and PsychopatzCore.Events
 local emit = Internal.emit
 local touch = Internal.touch
 local updateState = Internal.updateState
+local FacilityState = require "PNC/Core/Settlement/PNC_FacilityState"
 
 local function isBuilt(facility)
-    return facility.constructionState == nil
-        or facility.constructionState == "BUILT"
+    return FacilityState.IsBuilt(facility)
 end
 
 local function validationFacilityWithoutRole(facility, role)

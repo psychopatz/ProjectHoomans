@@ -117,12 +117,12 @@ atHome = false
 
 local order = Work.Queries.Get(details.workOrderId)
 T.equal(order.operation, "PROVISION_PICKUP", "provision work operation")
-T.equal(order.requiresHome, true,
-    "provision pickup is a home-bound work order")
-T.equal(order.autoReturnHome, true,
+T.equal(order.locationPolicy.start, "HOME",
+    "provision pickup starts at home")
+T.equal(order.locationPolicy.execution, "HOME",
+    "provision pickup executes at home")
+T.equal(order.locationPolicy.returnHome, "HOME",
     "provision pickup returns an away worker home before retrying")
-T.truthy(Work.Internal.requiresHome({ operation = "PROVISION_PICKUP" }),
-    "legacy provision orders remain home-bound")
 T.equal(order.status, Definitions.STATUS.QUEUED, "provision order queued")
 returningHome = true
 T.falsy(Work.Internal.workerAvailable(record, order),

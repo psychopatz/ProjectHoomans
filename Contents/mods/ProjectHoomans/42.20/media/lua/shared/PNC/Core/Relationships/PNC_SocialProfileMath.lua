@@ -57,6 +57,25 @@ local function normalizedGender(value)
     return nil
 end
 
+local function combatDamageScale(eventType, eventSpec)
+    local context
+    local damage
+    local unit
+    if eventType ~= "witnessed_player_hurt"
+        and eventType ~= "player_damaged_npc"
+        and eventType ~= "faction_member_attacked"
+    then
+        return 1
+    end
+    context = type(eventSpec) == "table" and eventSpec.context or nil
+    damage = tonumber(context and (context.damage or context.healthLoss))
+    if not damage or damage <= 0 then
+        return 1
+    end
+    unit = eventType == "witnessed_player_hurt" and 8 or 10
+    return clamp(damage / unit, 0.25, 4)
+end
+
 function Math.IsGenderCompatible(profile, ownerGender, targetGender)
     profile = Types.NormalizePlayerSocialProfile(profile)
     ownerGender = normalizedGender(ownerGender)
@@ -119,6 +138,14 @@ function Math.ModifySocialEvent(
     }
     local breakdown = {}
     local factor
+    local damageScale = combatDamageScale(eventType, eventSpec)
+
+    if damageScale ~= 1 then
+        effects.approvalEffect = effects.approvalEffect * damageScale
+        effects.respectEffect = effects.respectEffect * damageScale
+        effects.moraleEffect = effects.moraleEffect * damageScale
+        breakdown.combatDamage = damageScale
+    end
 
     if eventType == "treated_wound"
         or eventType == "saved_from_incapacitation"
@@ -134,6 +161,7 @@ function Math.ModifySocialEvent(
         )
         breakdown.compassion = factor
     elseif eventType == "protected_from_attacker"
+        or eventType == "witnessed_player_kill"
         or eventType == "survived_combat_together"
     then
         factor = 1.15 - profile.bravery * 0.30

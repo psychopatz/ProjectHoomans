@@ -92,6 +92,7 @@ local cancelCount = 0
 local resetCount = 0
 local updateCount = 0
 local nextResult = BehaviorResult.Working
+local nextActionState = nil
 local body
 local serverMode = false
 isServer = function() return serverMode end
@@ -103,10 +104,18 @@ ZombieIdleState = {
 local behavior = {
     pathToLocation = function(self, x, y, z)
         self.target = { x = x, y = y, z = z }
+        -- The real Behavior2 request can leave the legacy WalkTowardState
+        -- active while it publishes path2. The planner must reclaim it in
+        -- the same request frame.
+        body.actionState = "walktoward"
         requestCount = requestCount + 1
     end,
     update = function()
         updateCount = updateCount + 1
+        if nextActionState then
+            body.actionState = nextActionState
+            nextActionState = nil
+        end
         return nextResult
     end,
     cancel = function() cancelCount = cancelCount + 1 end,
@@ -296,6 +305,8 @@ record.runtime.pathing.phase = "active"
 steering = PNC.EnginePathPlanner.GetSteeringTarget(record, body, target)
 T.truthy(steering == target, "pending native request changed the target")
 T.truthy(requestCount == 1, "building transition did not request native path")
+T.equal(body.actionState, "idle",
+    "native request left the vanilla WalkTowardState active")
 T.truthy(updateCount == 0,
     "Bandits-style request advanced PathFindBehavior2 during startup")
 T.truthy(wrapperRequestCount == 0,
@@ -317,6 +328,30 @@ T.truthy(body.useless == true,
 T.truthy(cancelCount == cancelsAfterStart
     and resetCount == resetsAfterStart,
     "working native path was cancelled or reset")
+
+local suppressedCount = 0
+PNC.LiveBodyControl = {
+    IsSuppressedActionState = function(actionState)
+        return actionState == "turnalerted" or actionState == "pathfind"
+    end,
+    SuppressZombieState = function(suppressedBody)
+        suppressedCount = suppressedCount + 1
+        suppressedBody.actionState = "idle"
+        suppressedBody:setUseless(true)
+    end,
+}
+body.actionState = "turnalerted"
+nextActionState = "turnalerted"
+handled, state = PNC.EnginePathPlanner.Pump(
+    record,
+    body,
+    "zombie_update"
+)
+T.truthy(handled, "native route did not survive a suppressed state")
+T.equal(body.actionState, "idle",
+    "turnalerted state retained a competing native movement owner")
+T.truthy(suppressedCount >= 1,
+    "native planner did not suppress the competing action state")
 
 now = now + 1000
 local movedTarget = {

@@ -134,7 +134,7 @@ local communityMarker = PNC.Registry.AddDeathMarker(communityRecord)
 T.equal(communityMarker, nil,
     "unaffiliated community NPC received a colony death marker")
 
-PNC.BodyLifecycle.CreateInertCorpse = function(killedRecord)
+PNC.BodyLifecycle.CreateVanillaCorpse = function(killedRecord)
     killedRecord.corpse = killedRecord.corpse or {
         token = "health_kill_token",
         x = killedRecord.x,

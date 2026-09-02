@@ -15,6 +15,11 @@ PNC = {
     Registry = {},
     Relationships = {},
     Stealth = {},
+    EntityRef = {
+        IsPlayer = function(value)
+            return string.sub(tostring(value), 1, 7) == "player:"
+        end,
+    },
     Factions = {
         GetFactionID = function(record)
             return record
@@ -79,6 +84,33 @@ T.truthy(
 )
 T.truthy(calls == 2,
     "legacy player hostility gate changed for unaffiliated NPC")
-T.finish("pnc_faction_target_gate_smoke")
 
+local personallyHostile = {
+    hostility = {
+        attackPlayers = false,
+        attackNPCs = false,
+        attackZombies = false,
+    },
+    social = {
+        relationships = {
+            ["player:tester:character"] = {
+                state = "enemy",
+            },
+        },
+    },
+}
+T.truthy(
+    PNC.Perception.ResolveHostileTarget(personallyHostile)
+        == playerTarget,
+    "personal enemy enables unaffiliated player search"
+)
+T.truthy(calls == 3,
+    "personal enemy was evaluated for hostile targeting")
+T.truthy(
+    PNC.Perception.ResolveRoamingTarget(personallyHostile, 12)
+        == playerTarget,
+    "personal enemy enables unaffiliated roaming search"
+)
+T.truthy(calls == 4,
+    "personal enemy was evaluated for roaming targeting")
 T.finish("pnc_faction_target_gate_smoke")

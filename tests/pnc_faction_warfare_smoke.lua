@@ -444,6 +444,26 @@ T.equal(traderNPC.recruited, false,
 T.equal(Factions.CanNPCTargetPlayer(traderNPC, player),
     false, "neutral trader ignores player")
 
+-- A directed personal enemy overrides the faction's neutral outsider policy
+-- for this player only; it must not require a faction-wide declaration of war.
+traderNPC.social = {
+    relationships = {
+        [playerKey] = { state = "enemy" },
+    },
+}
+local personalEnemyIntent = PNC.FactionBehavior.ResolveIntent(
+    traderNPC,
+    player,
+    {}
+)
+T.equal(personalEnemyIntent.reason, "personal_enemy",
+    "personal enemy intent reason")
+T.truthy(personalEnemyIntent.attackAllowed,
+    "personal enemy overrides neutral outsider policy")
+T.truthy(Factions.CanNPCTargetPlayer(traderNPC, player),
+    "personal enemy enables directed player targeting")
+traderNPC.social = nil
+
 -- Settlements use neutral outsider policy unless diplomacy or immediate
 -- self-defense explicitly escalates them.
 T.truthy(Factions.AddNPC(

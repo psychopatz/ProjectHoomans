@@ -20,6 +20,16 @@ local preflightObserver = Internal.PreflightObserver
 local personalRelationshipCommands =
     Internal.PersonalRelationshipCommands
 
+local function rejected(reason, fields, definition)
+    local output = result(false, reason, fields)
+    if PNC.SocialEventDebug
+        and PNC.SocialEventDebug.LogRejected
+    then
+        PNC.SocialEventDebug.LogRejected(output, definition)
+    end
+    return output
+end
+
 function SocialEvents.Process(eventSpec)
     local validated
     local event
@@ -31,18 +41,20 @@ function SocialEvents.Process(eventSpec)
     local observer
     local prepared
     local reason
+    local rejectionDetails
     local applied
     local mutationResult
     local details = {}
     local conductPrepared
     local conductDetails
     local conductDefinition
+    local conductRequired
     local conductApplied
     if not isAuthority() then
-        return result(false, "not_authority")
+        return rejected("not_authority")
     end
     if not enabled() then
-        return result(false, "feature_disabled")
+        return rejected("feature_disabled")
     end
     validated = SocialEvents.Validate(eventSpec)
     if not validated.ok then
@@ -52,11 +64,16 @@ function SocialEvents.Process(eventSpec)
     definition = validated.definition
     observers = observerSpecs(event, definition)
     if #observers == 0 then
-        return result(false, "no_npc_observer")
+        return rejected("no_npc_observer", {
+            eventID = event.id,
+            eventType = event.type,
+            actorKey = event.actorKey,
+            targetKey = event.targetKey,
+        }, definition)
     end
     for index = 1, #observers do
         observer = observers[index]
-        prepared, reason = preflightObserver(
+        prepared, reason, rejectionDetails = preflightObserver(
             event,
             definition,
             observer
@@ -66,43 +83,56 @@ function SocialEvents.Process(eventSpec)
         elseif reason == "duplicate_event" then
             skippedDuplicates = skippedDuplicates + 1
         else
-            return result(false, reason, {
+            return rejected(reason, {
                 eventID = event.id,
+                eventType = event.type,
+                actorKey = event.actorKey,
+                targetKey = event.targetKey,
+                observerNPCID = observer.observerNPCID,
+                aboutKey = observer.aboutKey,
+                rejectionDetails = rejectionDetails,
                 memoriesCreated = 0,
                 relationshipsChanged = 0,
-            })
+            }, definition)
         end
     end
     if #work == 0 and skippedDuplicates > 0 then
-        return result(false, "duplicate_event", {
+        return rejected("duplicate_event", {
             eventID = event.id,
+            eventType = event.type,
+            actorKey = event.actorKey,
+            targetKey = event.targetKey,
             memoriesCreated = 0,
             relationshipsChanged = 0,
-        })
+        }, definition)
     end
     conductDefinition = ConductDefinitions
         and ConductDefinitions[event.type] or nil
-    if not conductDefinition or not Conduct
-        or not Conduct.PrepareSocialEvent
-    then
-        return result(false, "conduct_definition_unavailable", {
-            eventID = event.id,
-            memoriesCreated = 0,
-            relationshipsChanged = 0,
-            conductEvidenceCreated = 0,
-        })
-    end
-    conductPrepared, reason = Conduct.PrepareSocialEvent(
-        event,
-        conductDefinition
-    )
-    if not conductPrepared then
-        return result(false, reason, {
-            eventID = event.id,
-            memoriesCreated = 0,
-            relationshipsChanged = 0,
-            conductEvidenceCreated = 0,
-        })
+    conductRequired = not conductDefinition
+        or conductDefinition.required ~= false
+    if conductRequired then
+        if not conductDefinition or not Conduct
+            or not Conduct.PrepareSocialEvent
+        then
+            return rejected("conduct_definition_unavailable", {
+                eventID = event.id,
+                memoriesCreated = 0,
+                relationshipsChanged = 0,
+                conductEvidenceCreated = 0,
+            }, definition)
+        end
+        conductPrepared, reason = Conduct.PrepareSocialEvent(
+            event,
+            conductDefinition
+        )
+        if not conductPrepared then
+            return rejected(reason, {
+                eventID = event.id,
+                memoriesCreated = 0,
+                relationshipsChanged = 0,
+                conductEvidenceCreated = 0,
+            }, definition)
+        end
     end
     for index = 1, #work do
         prepared = work[index]
@@ -113,11 +143,11 @@ function SocialEvents.Process(eventSpec)
                 prepared.mutation
             )
         if not applied then
-            return result(false, reason, {
+            return rejected(reason, {
                 eventID = event.id,
                 memoriesCreated = #details,
                 relationshipsChanged = #details,
-            })
+            }, definition)
         end
         details[#details + 1] = {
             observerNPCID = prepared.observerNPCID,
@@ -133,16 +163,18 @@ function SocialEvents.Process(eventSpec)
             modifiedEffects = prepared.modifiedEffects,
         }
     end
-    conductApplied, reason, conductDetails =
-        Conduct.CommitPrepared(conductPrepared)
-    if not conductApplied then
-        return result(false, reason, {
-            eventID = event.id,
-            memoriesCreated = #details,
-            relationshipsChanged = #details,
-            conductEvidenceCreated = 0,
-            transactionInvariantFailed = true,
-        })
+    if conductRequired then
+        conductApplied, reason, conductDetails =
+            Conduct.CommitPrepared(conductPrepared)
+        if not conductApplied then
+            return rejected(reason, {
+                eventID = event.id,
+                memoriesCreated = #details,
+                relationshipsChanged = #details,
+                conductEvidenceCreated = 0,
+                transactionInvariantFailed = true,
+            }, definition)
+        end
     end
     local output = result(true, nil, {
         eventID = event.id,

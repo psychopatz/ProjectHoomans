@@ -76,6 +76,28 @@ function Service.Commands.ReleaseWorker(workerId, reason)
     return true, copy(order)
 end
 
+-- Release the durable work claim and its Tasking lease as one operation.
+-- Tasking's work provider calls ReleaseWorker during lease cleanup, so this
+-- wrapper is only used by external scheduler/recovery paths.
+function Service.Commands.ReleaseAssignment(workerId, reason)
+    workerId = tostring(workerId or "")
+    local lease = PNC.TaskLeaseService and PNC.TaskLeaseService.ForNPC
+        and PNC.TaskLeaseService.ForNPC(workerId) or nil
+    if lease and PNC.Tasking and PNC.Tasking.Commands
+        and PNC.Tasking.Commands.CancelLease
+    then
+        local ok, state = PNC.Tasking.Commands.CancelLease(lease.leaseId,
+            reason or "work_assignment_released")
+        if ok ~= true then return false, state end
+        if PNC.TaskLeaseService.Get(lease.leaseId) then
+            return false, state == "CANCELLATION_DEFERRED"
+                and "TASK_CANCELLATION_DEFERRED" or "TASK_CLEANUP_PENDING"
+        end
+        return true
+    end
+    return Service.Commands.ReleaseWorker(workerId, reason)
+end
+
 function Service.Commands.Pause(orderId, paused)
     local order = Repository.Get(orderId)
     if not order or terminal(order) then return false, "WORK_ORDER_UNAVAILABLE" end
@@ -84,7 +106,13 @@ function Service.Commands.Pause(orderId, paused)
     end
     order.status = paused == false and Status.WAITING_FOR_WORKER or Status.PAUSED
     if paused ~= false then
-        releaseClaim(order, "paused", false, order.operation == "LUMBER")
+        -- Pausing relinquishes the live worker. Corpse interactions use
+        -- nonblocking presentation scenes, so they need the same operation
+        -- cleanup boundary as lumber or the scene can continue after the
+        -- worker has returned to its previous order.
+        releaseClaim(order, "paused", false,
+            order.operation == "LUMBER"
+                or order.operation == "CORPSE_HAUL")
     end
     order.revision = order.revision + 1; Repository.MarkDirty()
     return true, copy(order)

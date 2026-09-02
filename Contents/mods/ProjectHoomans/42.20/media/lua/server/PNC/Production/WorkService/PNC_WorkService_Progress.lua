@@ -21,6 +21,7 @@ local releaseClaim = Internal.releaseClaim
 local setLiveOrder = Internal.setLiveOrder
 local workerAvailable = Internal.workerAvailable
 local claimStation = Internal.claimStation
+local returnHomeAfterWork = Internal.returnHomeAfterWork
 
 function Service.Commands.CollectInputs(orderId, workerId)
     local order = Repository.Get(orderId)
@@ -64,6 +65,8 @@ end
 
 local function complete(order)
     if order.completionCommitted == true then return true end
+    local worker = order.workerId and PNC.Registry and PNC.Registry.Get
+        and PNC.Registry.Get(order.workerId) or nil
     local handler = Service.CompletionHandlers[order.operation]
     if not handler then
         order.status, order.blockedReason = Status.BLOCKED, "COMPLETION_HANDLER_MISSING"
@@ -96,6 +99,7 @@ local function complete(order)
         order.completionStarted = nil
         Repository.MarkDirty(); return false, order.blockedReason
     end
+    local completedWorker = worker
     order.completionCommitted = true
     order.terminalPersisted = false
     order.status, order.progress = Status.COMPLETED, order.requiredWork
@@ -106,6 +110,9 @@ local function complete(order)
     order.completedAt, order.updatedAt = now(), now()
     order.revision = order.revision + 1
     releaseClaim(order, "complete")
+    if returnHomeAfterWork then
+        returnHomeAfterWork(completedWorker, order)
+    end
     Repository.MarkDirty()
     emit(EventTypes.WORK_ORDER_COMPLETED, { workOrderId = order.id,
         colonyId = order.colonyId, operation = order.operation })

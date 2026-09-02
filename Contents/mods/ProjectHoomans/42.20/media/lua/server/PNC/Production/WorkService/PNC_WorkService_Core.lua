@@ -51,23 +51,8 @@ local function requirementsMet(record, requirements)
     return rate > 0, reason, rate
 end
 
-local function requiresHome(order)
-    if not order then return true end
-    -- Provision pickup is home-only. This also migrates orders written by the
-    -- previous world-space pickup behavior, even if they persisted
-    -- requiresHome=false.
-    if order.operation == "PROVISION_PICKUP" then return true end
-    if order.requiresHome ~= nil then return order.requiresHome ~= false end
-    return true
-end
-
-local function autoReturnHome(order)
-    if not order then return true end
-    -- Provision pickup is home-bound. If its worker is away, the scheduler
-    -- owns the return-home handoff before the order can be retried.
-    if order.operation == "PROVISION_PICKUP" then return true end
-    return order.autoReturnHome ~= false
-end
+local startsAtHome = Internal.startsAtHome
+local returnsHome = Internal.returnsHome
 
 local function isFollowing(record)
     if PNC.HomeDutyService and PNC.HomeDutyService.IsFollowing then
@@ -163,7 +148,7 @@ local function workerAvailable(record, order)
     if type(allowed) == "table" and allowed[job] == false
         and order.manual ~= true
     then return false end
-    if requiresHome(order) and PNC.HomeDutyService
+    if startsAtHome(order) and PNC.HomeDutyService
         and PNC.HomeDutyService.IsAtHome
         and not PNC.HomeDutyService.IsAtHome(record, order.baseId)
     then
@@ -216,7 +201,7 @@ local function findWorker(order)
     end
     if PNC.Registry.ForEach then PNC.Registry.ForEach(consider)
     else for _, record in pairs(PNC.Registry.Data or {}) do consider(record) end end
-    if not selected and away and autoReturnHome(order)
+    if not selected and away and returnsHome(order)
         and PNC.HomeDutyService
         and PNC.HomeDutyService.SendHome
     then
@@ -224,7 +209,7 @@ local function findWorker(order)
         return nil, "WORKER_RETURNING_HOME"
     end
     return selected, selected and nil
-        or (autoReturnHome(order) and "NO_QUALIFIED_WORKER"
+        or (returnsHome(order) and "NO_QUALIFIED_WORKER"
             or "NO_HOME_WORKER")
 end
 
@@ -276,8 +261,8 @@ Internal.now = now
 Internal.terminal = terminal
 Internal.copy = copy
 Internal.requirementsMet = requirementsMet
-Internal.requiresHome = requiresHome
-Internal.autoReturnHome = autoReturnHome
+Internal.startsAtHome = startsAtHome
+Internal.returnsHome = returnsHome
 Internal.isFollowing = isFollowing
 Internal.belongsToOrder = belongsToOrder
 Internal.markAssignmentDirty = markAssignmentDirty

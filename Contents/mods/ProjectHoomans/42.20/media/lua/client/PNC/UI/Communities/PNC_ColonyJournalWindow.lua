@@ -182,7 +182,7 @@ function ISPNCColonyJournalWindow:createChildren()
             frameDuration = 200,
         }) or nil
     self.rowCount = 0
-    self.lastContentOpacity = nil
+    self.lastContentOpacitySignature = nil
     self:requestResponsiveLayout(true)
     self:refreshRows()
     self:applyContentStyle()
@@ -201,14 +201,13 @@ function ISPNCColonyJournalWindow:createChildren()
 end
 
 function ISPNCColonyJournalWindow:applyContentStyle()
-    local opacity = Options.GetOpacity()
-    local lift = 0.04
-    if self.lastContentOpacity == opacity then return end
+    local signature = Options.GetContentOpacitySignature()
+    if self.lastContentOpacitySignature == signature then return end
     -- Keep the journal body just above the window opacity, matching the
     -- Work list while preserving the world visibility of the outer panel.
-    Options.ApplySurfaceOpacity(self.list, lift)
-    self.contentOpacity = Options.GetContentOpacity(lift)
-    self.lastContentOpacity = opacity
+    Options.ApplySurfaceOpacity(self.list, "detail")
+    self.contentOpacity = Options.GetContentOpacity("detail")
+    self.lastContentOpacitySignature = signature
 end
 
 function ISPNCColonyJournalWindow:onResponsiveLayout()

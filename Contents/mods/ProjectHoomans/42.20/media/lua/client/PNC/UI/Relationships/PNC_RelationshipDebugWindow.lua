@@ -16,6 +16,7 @@ local EVENTS = {
     { id = "treated_wound", title = "Treat Wound", variant = "success" },
     { id = "saved_from_incapacitation", title = "Save", variant = "success" },
     { id = "protected_from_attacker", title = "Protect", variant = "default" },
+    { id = "witnessed_player_kill", title = "Witness Kill", variant = "default" },
     { id = "survived_combat_together", title = "Survive Together", variant = "default" },
     { id = "abandoned_in_combat", title = "Abandon", variant = "danger" },
 }

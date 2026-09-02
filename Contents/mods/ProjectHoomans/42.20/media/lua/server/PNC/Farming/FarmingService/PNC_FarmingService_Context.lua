@@ -13,6 +13,7 @@ local Catalog = PNC.FarmingCatalog
 local Research = PNC.FarmingResearch
 local Adapter = PNC.PZFarmingAdapter
 local Repository = PNC.SettlementRepository
+local FacilityState = require "PNC/Core/Settlement/PNC_FacilityState"
 
 local function copy(value)
     return PNC.Core and PNC.Core.DeepCopy and PNC.Core.DeepCopy(value) or value
@@ -43,8 +44,7 @@ local function plotsFor(facility)
 end
 
 local function isBuilt(facility)
-    return facility and (facility.constructionState == nil
-        or facility.constructionState == "BUILT")
+    return FacilityState.IsBuilt(facility)
 end
 
 local function permission(player, facility)

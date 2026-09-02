@@ -80,6 +80,83 @@ Definitions.protected_from_attacker = {
     contributionCaps = { approval = 50, respect = 70 },
 }
 
+Definitions.witnessed_player_kill = {
+    id = "witnessed_player_kill",
+    allowedSourceSystems = { combat = true },
+    targetMemory = {
+        type = "witnessed_player_kill",
+        approvalEffect = 2,
+        respectEffect = 4,
+        moraleEffect = 1,
+        familiarityGain = 2,
+        strength = 1,
+        decayPerDay = 0.03,
+        permanent = false,
+        shareable = true,
+        knowledgeSource = "experienced",
+        tags = { combat = true, witnessed = true },
+    },
+}
+
+Definitions.witnessed_player_hurt = {
+    id = "witnessed_player_hurt",
+    allowedSourceSystems = { combat = true },
+    targetMemory = {
+        type = "witnessed_player_hurt",
+        approvalEffect = -2,
+        respectEffect = -3,
+        moraleEffect = -1,
+        familiarityGain = 0,
+        strength = 1,
+        decayPerDay = 0.03,
+        permanent = false,
+        shareable = true,
+        knowledgeSource = "experienced",
+        tags = { combat = true, witnessed = true, vulnerability = true },
+    },
+}
+
+Definitions.player_damaged_npc = {
+    id = "player_damaged_npc",
+    allowedSourceSystems = { combat = true },
+    targetMemory = {
+        type = "player_damaged_npc",
+        approvalEffect = -3,
+        respectEffect = -4,
+        moraleEffect = -1,
+        familiarityGain = 0,
+        strength = 1,
+        decayPerDay = 0.025,
+        permanent = false,
+        shareable = true,
+        knowledgeSource = "experienced",
+        tags = { combat = true, witnessed = false, hostility = true },
+    },
+}
+
+Definitions.faction_member_attacked = {
+    id = "faction_member_attacked",
+    allowedSourceSystems = { combat = true },
+    targetMemory = {
+        type = "faction_member_attacked",
+        approvalEffect = -2,
+        respectEffect = -3,
+        moraleEffect = -1,
+        familiarityGain = 0,
+        strength = 1,
+        decayPerDay = 0.025,
+        permanent = false,
+        shareable = true,
+        knowledgeSource = "community_rumor",
+        tags = {
+            combat = true,
+            faction = true,
+            retaliation = true,
+            hostility = true,
+        },
+    },
+}
+
 Definitions.survived_combat_together = {
     id = "survived_combat_together",
     allowedSourceSystems = { combat = true },
@@ -127,7 +204,10 @@ Definitions.player_emote_insult = {
         approvalEffect = -4,
         respectEffect = -3,
         moraleEffect = -1,
-        familiarityGain = 0,
+        -- Repeated direct abuse is still a real interaction.  A small
+        -- familiarity gain lets a previously unknown NPC cross the social
+        -- state gate instead of remaining permanently "unknown".
+        familiarityGain = 1,
         strength = 1,
         decayPerDay = 0.05,
         permanent = false,
@@ -135,7 +215,11 @@ Definitions.player_emote_insult = {
         knowledgeSource = "experienced",
         tags = { hostile = true, emote = true, abuse = true },
     },
-    contributionCaps = { approval = -40, respect = -35 },
+    -- Keep the cumulative contribution bounded by the normal relationship
+    -- range, but do not stop insults while the NPC is still only disliked.
+    -- The old -40/-35 caps made the enemy threshold unreachable from a
+    -- neutral baseline and silently turned later insults into no-ops.
+    contributionCaps = { approval = -100, respect = -100 },
 }
 
 Definitions.player_emote_thumbsdown = {

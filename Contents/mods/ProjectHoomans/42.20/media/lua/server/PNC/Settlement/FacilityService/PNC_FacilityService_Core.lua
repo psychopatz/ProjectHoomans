@@ -13,6 +13,7 @@ local Definitions = PNC.FacilityDefinitions
 local Costs = PNC.FacilityCostService
 local BuildCatalog = PNC.BuildRecipeCatalog
 local EventsBus = PsychopatzCore and PsychopatzCore.Events
+local FacilityState = require "PNC/Core/Settlement/PNC_FacilityState"
 local GridRegion = require "PsychopatzCore/World/PC_GridRegion"
 
 Service.ByType = Service.ByType or {}
@@ -20,7 +21,7 @@ Service.ByCapability = Service.ByCapability or {}
 Service.ComponentsByRole = Service.ComponentsByRole or {}
 
 local function calculatedState(base, facility)
-    local state = tostring(facility.constructionState or "BUILT")
+    local state = FacilityState.ConstructionState(facility)
     if state == "PLANNED" or state == "UNDER_CONSTRUCTION"
         or state == "RECONSTRUCTING" or state == "DECONSTRUCTING"
     then return state end
@@ -232,7 +233,7 @@ function Service.RefreshState(facilityOrId)
     touch(base, facility)
     updateState(base, facility)
     Service.RebuildIndexes()
-    if facility.constructionState == "BUILT"
+    if FacilityState.IsBuilt(facility)
         and PNC.FacilityResources
         and PNC.FacilityResources.Refresh
     then

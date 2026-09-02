@@ -1,4 +1,5 @@
 local GridRegion = require "PsychopatzCore/World/PC_GridRegion"
+local FacilityState = require "PNC/Core/Settlement/PNC_FacilityState"
 
 PNC = PNC or {}
 PNC.SettlementLayoutOverlay = PNC.SettlementLayoutOverlay or {}
@@ -33,8 +34,7 @@ local COLORS = {
 Overlay.ZoneColors = COLORS
 
 local function facilityColor(facility, color)
-    local state = tostring(facility.constructionState
-        or facility.cachedState or "BUILT")
+    local state = FacilityState.DisplayState(facility)
     if state == "UNDER_CONSTRUCTION" or state == "RECONSTRUCTING" then
         return COLORS.construction
     end
@@ -79,8 +79,7 @@ local function facilityWorkZoneEnabled(facility)
 end
 
 local function facilityZoneColor(facility, color)
-    local state = tostring(facility.constructionState
-        or facility.cachedState or "BUILT")
+    local state = FacilityState.DisplayState(facility)
     if state == "UNDER_CONSTRUCTION" or state == "RECONSTRUCTING" then
         return COLORS.construction
     end

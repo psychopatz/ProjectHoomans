@@ -223,7 +223,8 @@ end
 
 T.load(ROOT .. "Presence/PNC_BodyLifecycle.lua")
 
-local created, result = PNC.BodyLifecycle.CreateInertCorpse(record, zombie, "test_death")
+local created, result = PNC.BodyLifecycle.CreateVanillaCorpse(record, zombie,
+    "test_death")
 T.equal(created, true, "corpse creation")
 T.equal(result, corpse, "created corpse instance")
 T.equal(engineDeathCount, 1, "engine-networked death conversion count")

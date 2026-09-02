@@ -24,8 +24,9 @@ function Actions.HandleComponent(window, action, facility)
         if not storage or not storage.storageId or not access
             or access.hasStockpile ~= true
         then return false end
-        local StorageUI = require "PNC/UI/Communities/PNC_ColonyStorageWindow"
-        local storageWindow = StorageUI.Open()
+        local StorageUI = require "PNC/UI/Storage/PNC_Storage"
+        local hub = PNC.CommandHub and PNC.CommandHub.instance or nil
+        local storageWindow = StorageUI.Open(hub)
         if storageWindow and window.close then window:close() end
         return storageWindow ~= nil
     end

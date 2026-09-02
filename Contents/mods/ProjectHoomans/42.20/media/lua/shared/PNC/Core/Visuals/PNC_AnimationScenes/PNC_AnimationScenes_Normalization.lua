@@ -98,6 +98,8 @@ function Internal.NormalizeDefinition(sceneId, definition, steps)
         interrupts = Internal.CopyInterrupts(definition.interrupts),
         onTick = type(definition.onTick) == "function"
             and definition.onTick or nil,
+        onStart = type(definition.onStart) == "function"
+            and definition.onStart or nil,
         onStop = type(definition.onStop) == "function"
             and definition.onStop or nil,
     }

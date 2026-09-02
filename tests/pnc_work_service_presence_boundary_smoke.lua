@@ -4,6 +4,7 @@ local source = T.read(
     "ProjectHoomans", "server", "PNC/Production/PNC_WorkService.lua")
 local prefix = "PNC/Production/WorkService/"
 local providers = {
+    "PNC_WorkService_WorkLocation",
     "PNC_WorkService_Core",
     "PNC_WorkService_QueueAndClaims",
     "PNC_WorkService_WorkerReconciliation",
@@ -74,7 +75,7 @@ for name, _ in pairs(public.queries) do
         "entry point should preserve Queries." .. name)
 end
 T.equal(serviceCount, 9, "service function declaration count")
-T.equal(commandCount, 14, "command function declaration count")
+T.equal(commandCount, 15, "command function declaration count")
 T.equal(queryCount, 6, "query function declaration count")
 
 for i = 1, #providers do

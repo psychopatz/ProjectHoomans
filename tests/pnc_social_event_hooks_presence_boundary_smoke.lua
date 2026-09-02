@@ -9,7 +9,9 @@ local providers = {
     "PNC_SocialEventHooks_Treatment",
     "PNC_SocialEventHooks_Encounter",
     "PNC_SocialEventHooks_ThreatAttribution",
-    "PNC_SocialEventHooks_EventRegistration",
+    "PNC_SocialEventHooks_CombatAdapter",
+    "PNC_SocialEventHooks_DamageAdapter",
+    "PNC_SocialEventHooks_ClientKill",
 }
 
 local previous = 0
@@ -59,11 +61,13 @@ for name in pairs(publicFunctions) do
     T.equal(type(PNC.SocialEventHooks[name]), "function",
         "entry point preserves SocialEventHooks." .. name)
 end
-T.equal(publicCount, 13, "social-event-hooks public function count")
+T.equal(publicCount, 14, "social-event-hooks public function count")
 T.equal(type(PNC.SocialEventHooks.RescueContributions), "table",
     "rescue contributions remain initialized")
 T.equal(type(PNC.SocialEventHooks.ThreatAttributions), "table",
     "threat attributions remain initialized")
+T.equal(type(PNC.SocialEventHooks.HandleClientZombieKill), "function",
+    "client zombie-kill bridge remains available")
 T.equal(#weaponHandlers, 1, "weapon-hit engine hook registered once")
 T.equal(#zombieHandlers, 1, "zombie-dead engine hook registered once")
 

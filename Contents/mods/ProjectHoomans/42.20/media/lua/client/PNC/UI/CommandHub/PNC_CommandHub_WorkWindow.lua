@@ -76,12 +76,12 @@ function ISPNCCommandHubWorkWindow:createChildren()
 end
 
 function ISPNCCommandHubWorkWindow:applyContentStyle()
-    local opacity = Options.GetContentOpacity()
-    if self.lastContentOpacity == opacity then return end
+    local signature = Options.GetContentOpacitySignature()
+    if self.lastContentOpacitySignature == signature then return end
     Options.ApplySurfaceOpacity(self.peoplePanel)
     Options.ApplySurfaceOpacity(self.authorizationPanel)
-    Options.ApplySurfaceOpacity(self.peopleList, 0.04)
-    self.lastContentOpacity = opacity
+    Options.ApplySurfaceOpacity(self.peopleList, "detail")
+    self.lastContentOpacitySignature = signature
 end
 
 function ISPNCCommandHubWorkWindow:selectedPerson()

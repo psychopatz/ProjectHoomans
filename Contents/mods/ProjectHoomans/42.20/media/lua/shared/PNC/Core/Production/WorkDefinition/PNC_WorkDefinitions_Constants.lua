@@ -73,8 +73,8 @@ Definitions.MANUAL_PROGRESS = {
 }
 
 Definitions.REQUIRES_LIVE = {
-    -- Grapple actions operate on live IsoZombie objects and cannot be
-    -- completed by the abstract/offline work path.
+    -- Corpse hauling uses a live NPC for physical movement and the Lua
+    -- interaction sequence; it cannot be completed by the abstract path.
     CORPSE_HAUL = true,
 }
 

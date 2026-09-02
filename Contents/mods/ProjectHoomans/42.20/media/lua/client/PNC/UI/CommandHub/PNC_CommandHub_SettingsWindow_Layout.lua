@@ -7,26 +7,49 @@ local UI = PsychopatzCore.UI
 local Layout = UI.Layout
 
 function ISPNCCommandHubSettingsWindow:onResponsiveLayout()
-    local rect = self:getContentRect({ top = 30, bottom = 50 })
+    local rect = self:getContentRect({ top = 30, bottom = 48 })
     local scale = self.uiScale or Layout.Scale()
     local px = function(value) return Layout.Pixels(value, scale) end
-    local rowHeight = px(29)
+    local rowHeight = px(34)
     local controlHeight = px(26)
     local y = rect.y + px(24)
     Layout.SetBounds(self.helpLabel, rect.x, rect.y, rect.width, px(18))
-    for index, id in ipairs({ "x", "y", "width", "height", "opacity" }) do
-        local field = self.fields[id]
-        local rowY = y + (index - 1) * rowHeight
-        field.row:place(rect.x, rowY, rect.width, rowHeight, {
-            scale = scale,
-            labelWidth = 170,
-            valueWidth = field.slider and 48 or 0,
-            gap = 8,
-            controlHeight = 26,
-        })
-    end
-    local branchY = y + 5 * rowHeight + px(4)
-    Layout.SetBounds(self.branchButton, rect.x, branchY,
+    local opacity = self.fields.opacity
+    opacity.row:place(rect.x, y, rect.width, rowHeight, {
+        scale = scale,
+        labelWidth = 110,
+        valueWidth = 48,
+        gap = 8,
+        controlHeight = controlHeight,
+    })
+    y = y + rowHeight + px(8)
+    self.fields.surfaceLift.row:place(rect.x, y, rect.width, rowHeight, {
+        scale = scale,
+        labelWidth = 110,
+        valueWidth = 48,
+        gap = 8,
+        controlHeight = controlHeight,
+    })
+    y = y + rowHeight + px(8)
+    self.fields.detailLift.row:place(rect.x, y, rect.width, rowHeight, {
+        scale = scale,
+        labelWidth = 110,
+        valueWidth = 48,
+        gap = 8,
+        controlHeight = controlHeight,
+    })
+    y = y + rowHeight + px(8)
+    self.fields.titlebarScale.row:place(rect.x, y, rect.width, rowHeight, {
+        scale = scale,
+        labelWidth = 110,
+        valueWidth = 48,
+        gap = 8,
+        controlHeight = controlHeight,
+    })
+    y = y + rowHeight + px(8)
+    Layout.SetBounds(self.themeButton, rect.x, y, rect.width, controlHeight)
+    y = y + controlHeight + px(8)
+    Layout.SetBounds(self.branchButton, rect.x, y,
         math.max(px(140), rect.width), controlHeight)
     local buttonHeight = px(26)
     local buttonY = rect.y + rect.height - buttonHeight

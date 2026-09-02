@@ -361,6 +361,16 @@ T.equal(neutralLooter.intent, "attack",
     "looter neutral attack")
 T.equal(neutralLooter.attackAllowed, true,
     "looter default hostility")
+local personalEnemy = PNC.FactionIntent.Resolve({
+    archetypeID = "refugee",
+    policy = bravo.policy,
+    diplomaticState = "neutral",
+    personalState = "enemy",
+})
+T.equal(personalEnemy.intent, "attack",
+    "personal enemy attack intent")
+T.equal(personalEnemy.attackAllowed, true,
+    "personal enemy allows a directed attack")
 local pacifiedLooter = PNC.FactionIntent.Resolve({
     archetypeID = "looter",
     policy = bravo.policy,

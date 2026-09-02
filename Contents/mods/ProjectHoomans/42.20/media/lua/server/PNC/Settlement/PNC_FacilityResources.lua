@@ -13,6 +13,7 @@ PNC.FacilityResources = PNC.FacilityResources or {}
 local Resources = PNC.FacilityResources
 local GridRegion = require "PsychopatzCore/World/PC_GridRegion"
 local SquareRules = require "PsychopatzCore/World/PsychopatzSquareRules"
+local FacilityState = require "PNC/Core/Settlement/PNC_FacilityState"
 
 Resources.Detectors = Resources.Detectors or {}
 Resources.Cache = Resources.Cache or {}
@@ -224,8 +225,7 @@ function Resources.Refresh(facility)
     if type(facility) ~= "table" or not facility.id then
         return { status = "FACILITY_NOT_FOUND", resources = {} }
     end
-    local state = tostring(facility.constructionState or "BUILT")
-    if state ~= "BUILT" then
+    if not FacilityState.IsBuilt(facility) then
         local notBuilt = { status = "NOT_BUILT", resources = {}, scannedAt = 0 }
         Resources.Cache[tostring(facility.id)] = notBuilt
         return notBuilt

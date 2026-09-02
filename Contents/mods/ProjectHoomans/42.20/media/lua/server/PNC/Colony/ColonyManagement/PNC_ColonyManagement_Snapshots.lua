@@ -78,6 +78,38 @@ local function enrichSettlement(settlement, base, tasks)
     end
 end
 
+local function taskSnapshotForColony(colonyId)
+    if PNC.TaskRequestService and PNC.TaskRequestService.Queries
+        and PNC.TaskRequestService.Queries.BuildSnapshot
+    then
+        return PNC.TaskRequestService.Queries.BuildSnapshot(colonyId)
+    end
+    if PNC.WorkService and PNC.WorkService.Queries
+        and PNC.WorkService.Queries.BuildTaskSnapshot
+    then
+        return PNC.WorkService.Queries.BuildTaskSnapshot(colonyId)
+    end
+    return {}
+end
+
+-- Settlement consumers need a compact, authoritative refresh when a facility
+-- changes outside a command request (for example when construction completes).
+-- Keep this separate from the much heavier colony-management snapshot.
+function Internal.BuildSettlementSnapshot(baseOrId, tasks)
+    local base = type(baseOrId) == "table" and baseOrId
+        or PNC.BaseService and PNC.BaseService.Get(baseOrId) or nil
+    if not base or not PNC.BaseService
+        or not PNC.BaseService.BuildSnapshot
+    then
+        return nil
+    end
+    tasks = type(tasks) == "table" and tasks
+        or taskSnapshotForColony(base.colonyId)
+    local settlement = PNC.BaseService.BuildSnapshot(base)
+    enrichSettlement(settlement, base, tasks)
+    return settlement
+end
+
 function Management.BuildSnapshot(player, options)
     local people, attention, counts = {}, {}, { hunger={}, thirst={}, fatigue={} }
     local supplyShortages = { food = {}, hydration = {}, medical = {} }
@@ -148,12 +180,11 @@ function Management.BuildSnapshot(player, options)
         and PNC.ProvisionEvaluator.MeasureStorage(storageState) or {}
     local base = colony and PNC.BaseService
         and PNC.BaseService.GetForColony(colony.id) or nil
-    local settlement = base and PNC.BaseService.BuildSnapshot(base) or nil
+    local settlement = Internal.BuildSettlementSnapshot(base, tasks)
     local utilities = base and PNC.WaterUtilityService
         and PNC.WaterUtilityService.BuildSnapshot(base.id)
         or { waterLiters = 0, capacityLiters = 0, tanks = 0,
             catchers = 0, litersPerTenMinutes = 0, facilities = {} }
-    enrichSettlement(settlement, base, tasks)
     local factionSnapshot = playerFaction and {
         id = playerFaction.id,
         name = playerFaction.name,

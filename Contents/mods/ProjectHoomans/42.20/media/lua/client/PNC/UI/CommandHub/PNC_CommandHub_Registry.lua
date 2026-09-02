@@ -6,6 +6,7 @@ local Registry = CoreHub.Registry
 PNC.CommandHub.Registry = Registry
 PNC.CommandHub.Gates = PNC.CommandHub.Gates or {}
 local Gates = PNC.CommandHub.Gates
+local FacilityState = require "PNC/Core/Settlement/PNC_FacilityState"
 
 local function trace(event, message)
     if CoreHub.Trace then
@@ -48,21 +49,6 @@ local function toggleChild(childID, fallback)
             .. " result=" .. tostring(result))
         return result
     end
-end
-
-local function openHubSettings(_, owner)
-    trace("pnc_settings_open_start", "has_owner=" .. tostring(owner ~= nil)
-        .. " available=" .. tostring(PNC.CommandHub.SettingsUI ~= nil
-            and PNC.CommandHub.SettingsUI.Open ~= nil))
-    if PNC.CommandHub.SettingsUI
-        and PNC.CommandHub.SettingsUI.Open
-    then
-        local result = PNC.CommandHub.SettingsUI.Open(owner)
-        trace("pnc_settings_open_result", "result=" .. tostring(result ~= nil))
-        return result
-    end
-    trace("pnc_settings_open_result", "result=false reason=missing_settings_ui")
-    return false
 end
 
 local function openWork(_, owner)
@@ -123,22 +109,54 @@ function Gates.HasRadio()
     return hasRadio()
 end
 
-function Gates.HasBaseAndStockpile()
-    local snapshot = colonyManagementSnapshot()
-    local settlement = type(snapshot) == "table" and snapshot.settlement or nil
-    if type(settlement) ~= "table" then return false end
-
+local function hasBuiltStockpile(settlement)
     -- stockpileNodes are optional navigation/access points. The actual
     -- setup prerequisite is a built stockpile facility in the established
     -- base, so a valid base does not remain disabled just because no access
     -- point has been configured yet.
     for _, facility in ipairs(settlement.facilities or {}) do
         if tostring(facility.definitionId or "") == "stockpile" then
-            local state = tostring(facility.constructionState or "")
-            if state == "" or state == "BUILT" then return true end
+            if FacilityState.IsBuilt(facility) then return true end
         end
     end
     return false
+end
+
+function Gates.GetBaseAndStockpileStatus()
+    local snapshot = colonyManagementSnapshot()
+    local settlement = type(snapshot) == "table" and snapshot.settlement or nil
+    local hasBase = type(settlement) == "table"
+    local hasStockpile = hasBase and hasBuiltStockpile(settlement) or false
+    return {
+        hasBase = hasBase,
+        hasStockpile = hasStockpile,
+        enabled = hasBase and hasStockpile,
+    }
+end
+
+function Gates.HasBaseAndStockpile()
+    return Gates.GetBaseAndStockpileStatus().enabled
+end
+
+function Gates.BaseAndStockpileDisabledTooltip()
+    local status = Gates.GetBaseAndStockpileStatus()
+    if status.enabled then return nil end
+    if not status.hasBase and not status.hasStockpile then
+        return {
+            key = "UI_PNC_CommandHub_Disabled_NoBaseOrStockpile",
+            fallback = "Requires a colony base and a completed stockpile.",
+        }
+    end
+    if not status.hasBase then
+        return {
+            key = "UI_PNC_CommandHub_Disabled_NoBase",
+            fallback = "Requires a colony base.",
+        }
+    end
+    return {
+        key = "UI_PNC_CommandHub_Disabled_NoStockpile",
+        fallback = "Requires a completed stockpile in your colony base.",
+    }
 end
 
 local function isJournalOpen()
@@ -162,7 +180,36 @@ local function toggleEvents(_, owner)
     return false
 end
 
-Registry.SetCategoryOrder({ "work", "zone", "settings", "events" })
+local function openColonist(_, owner)
+    trace("pnc_colonist_open_start", "has_owner=" .. tostring(owner ~= nil)
+        .. " available=" .. tostring(PNC.ColonistUI ~= nil
+            and PNC.ColonistUI.Open ~= nil))
+    local colonist = PNC.ColonistUI
+    if colonist and type(colonist.Open) == "function" then
+        local result = colonist.Open(owner)
+        trace("pnc_colonist_open_result", "result=" .. tostring(result ~= nil))
+        return result
+    end
+    trace("pnc_colonist_open_result", "result=false reason=missing_colonist_ui")
+    return false
+end
+
+local function openStorage(_, owner)
+    trace("pnc_storage_open_start", "has_owner=" .. tostring(owner ~= nil)
+        .. " available=" .. tostring(PNC.ColonyStorageUI ~= nil
+            and PNC.ColonyStorageUI.Open ~= nil))
+    local storage = PNC.ColonyStorageUI
+    if storage and type(storage.Open) == "function" then
+        local result = storage.Open(owner)
+        trace("pnc_storage_open_result", "result=" .. tostring(result ~= nil))
+        return result
+    end
+    trace("pnc_storage_open_result",
+        "result=false reason=missing_storage_ui")
+    return false
+end
+
+Registry.SetCategoryOrder({ "work", "zone", "events", "colonist", "storage" })
 
 Registry.RegisterCategory({
     id = "work",
@@ -175,6 +222,7 @@ Registry.RegisterCategory({
     tooltipKey = "UI_PNC_CommandHub_WorkHelp",
     tooltipFallback = "Authorize colonists for automatic work",
     enabled = Gates.HasBaseAndStockpile,
+    disabledTooltip = Gates.BaseAndStockpileDisabledTooltip,
     onClick = toggleChild("work", openWork),
     selected = function() return isOpen("work") end,
     closeHub = false,
@@ -191,6 +239,7 @@ Registry.RegisterCategory({
     tooltipKey = "UI_PNC_CommandHub_ZoneHelp",
     tooltipFallback = "Assign work areas for colony activities",
     enabled = Gates.HasBaseAndStockpile,
+    disabledTooltip = Gates.BaseAndStockpileDisabledTooltip,
     onClick = toggleChild("zone"),
     selected = function() return isOpen("zone") end,
     closeHub = false,
@@ -235,21 +284,6 @@ Registry.RegisterCategory({
 })
 
 Registry.RegisterCategory({
-    id = "settings",
-    source = "ProjectHoomans",
-    order = 30,
-    childID = "settings",
-    useChildren = false,
-    titleKey = "UI_PNC_CommandHub_Category_Settings",
-    titleFallback = "Settings",
-    tooltipKey = "UI_PNC_CommandHub_Settings_Help",
-    tooltipFallback = "Edit the hub position, dimensions, and opacity",
-    onClick = toggleChild("settings", openHubSettings),
-    selected = function() return isOpen("settings") end,
-    closeHub = false,
-})
-
-Registry.RegisterCategory({
     id = "events",
     source = "ProjectHoomans",
     order = 40,
@@ -260,6 +294,38 @@ Registry.RegisterCategory({
     tooltipFallback = "Open the colony journal",
     onClick = toggleChild("events", toggleEvents),
     selected = isJournalOpen,
+    closeHub = false,
+})
+
+Registry.RegisterCategory({
+    id = "colonist",
+    source = "ProjectHoomans",
+    order = 50,
+    childID = "colonist",
+    useChildren = false,
+    titleKey = "UI_PNC_CommandHub_Category_Colonist",
+    titleFallback = "Colonist",
+    tooltipKey = "UI_PNC_CommandHub_ColonistHelp",
+    tooltipFallback = "Inspect colonist needs and details",
+    onClick = toggleChild("colonist", openColonist),
+    selected = function() return isOpen("colonist") end,
+    closeHub = false,
+})
+
+Registry.RegisterCategory({
+    id = "storage",
+    source = "ProjectHoomans",
+    order = 60,
+    childID = "storage",
+    useChildren = false,
+    titleKey = "UI_PNC_CommandHub_Category_Storage",
+    titleFallback = "Storage",
+    tooltipKey = "UI_PNC_CommandHub_StorageHelp",
+    tooltipFallback = "Open colony storage",
+    enabled = Gates.HasBaseAndStockpile,
+    disabledTooltip = Gates.BaseAndStockpileDisabledTooltip,
+    onClick = toggleChild("storage", openStorage),
+    selected = function() return isOpen("storage") end,
     closeHub = false,
 })
 

@@ -14,6 +14,7 @@ local WORK_SCENES =
 
 local now = 1000
 local played = {}
+local callbackStartPlayedCount
 local maintained = 0
 local finished = 0
 local held = 0
@@ -332,6 +333,9 @@ PNC.AnimationScenes.Register("test.lifecycle", {
         callbackTicks = callbackTicks + 1
         return false
     end,
+    onStart = function()
+        callbackStartPlayedCount = #played
+    end,
     onStop = function(_, _, _, reason)
         callbackStopReason = reason
     end,
@@ -343,6 +347,8 @@ T.truthy(started and PNC.AnimationScenes.Tick(record, body, now + 1) == false,
     "scene lifecycle callback did not complete the scene")
 T.truthy(callbackTicks == 1 and callbackStopReason == "callback_complete",
     "scene lifecycle callbacks were not dispatched")
+T.equal(callbackStartPlayedCount + 1, #played,
+    "scene start callback runs before bump playback")
 T.truthy(record.runtime.animationScene == nil,
     "callback-completed scene remained active")
 

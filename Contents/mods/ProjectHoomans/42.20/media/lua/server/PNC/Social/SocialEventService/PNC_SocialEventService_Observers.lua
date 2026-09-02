@@ -145,7 +145,24 @@ local function preflightObserver(event, definition, observer)
         cap.respect
     )
     if approvalEffect == 0 and respectEffect == 0 then
-        return nil, "contribution_saturated"
+        return nil, "contribution_saturated", {
+            observerNPCID = observer.observerNPCID,
+            aboutKey = observer.aboutKey,
+            relationshipState = tostring(
+                relationship.state or "unknown"
+            ),
+            approval = tonumber(relationship.approval) or 0,
+            respect = tonumber(relationship.respect) or 0,
+            familiarity = tonumber(relationship.familiarity) or 0,
+            saturationApproval = approvalCurrent,
+            saturationRespect = respectCurrent,
+            requestedApproval = tonumber(
+                modifiedEffects.approvalEffect
+            ) or 0,
+            requestedRespect = tonumber(
+                modifiedEffects.respectEffect
+            ) or 0,
+        }
     end
     evaluationAt = math.max(
         event.occurredAt,

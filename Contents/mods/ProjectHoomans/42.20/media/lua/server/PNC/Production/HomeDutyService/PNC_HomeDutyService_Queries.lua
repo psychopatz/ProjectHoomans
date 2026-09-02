@@ -53,13 +53,26 @@ function Service.BuildState(record)
     end
     if not base then return { state = "NO_BASE", atCamp = false } end
     local returning = Service.IsReturningHome(record, base.id)
+    local workState
+    if PNC.WorkService and PNC.WorkService.Internal
+        and PNC.WorkService.Internal.workLocationState
+    then
+        local orderId = record and record.runtime
+            and record.runtime.workOrderId or nil
+        local order = orderId and PNC.WorkRepository
+            and PNC.WorkRepository.Get(orderId) or nil
+        workState = PNC.WorkService.Internal.workLocationState(record, order)
+    end
+    local atHome = Service.IsAtHome(record, base.id)
     return {
         state = returning and "RETURNING_HOME"
-            or Service.IsAtHome(record, base.id) and "AT_HOME" or "AWAY",
+            or workState == "AWAY_FOR_WORK" and "AWAY_FOR_WORK"
+            or atHome and "AT_HOME" or "AWAY",
         baseId = base.id,
         returning = returning,
-        atHome = Service.IsAtHome(record, base.id),
+        atHome = atHome,
         atCamp = false,
+        workLocation = workState,
     }
 end
 

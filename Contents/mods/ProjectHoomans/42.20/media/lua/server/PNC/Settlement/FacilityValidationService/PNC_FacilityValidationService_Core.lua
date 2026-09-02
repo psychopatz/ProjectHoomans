@@ -8,6 +8,7 @@ local Zones = require "PsychopatzCore/World/PC_ZoneRegistry"
 local GridRegion = require "PsychopatzCore/World/PC_GridRegion"
 local Farming = PNC.Farming
 local H = Validation.Internal
+local FacilityState = require "PNC/Core/Settlement/PNC_FacilityState"
 
 function H.Result(ok, reason, details)
     return { ok = ok == true, reason = reason, details = details }
@@ -54,7 +55,7 @@ function H.ExistingStockpile(base, builtOnly)
         local facility = present == true and Repository.GetFacility(facilityId)
             or nil
         if facility and facility.definitionId == "stockpile"
-            and (not builtOnly or facility.constructionState == "BUILT")
+            and (not builtOnly or FacilityState.IsBuilt(facility))
         then
             return facility
         end
@@ -111,4 +112,3 @@ function Validation.CanUpgrade(base, facility, expectedRevision)
 end
 
 return Validation
-

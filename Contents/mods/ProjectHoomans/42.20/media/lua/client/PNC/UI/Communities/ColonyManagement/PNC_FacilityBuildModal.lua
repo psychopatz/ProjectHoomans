@@ -1,5 +1,6 @@
 require "ISUI/ISPanel"
 require "PsychopatzCore/UI/PsychopatzUI"
+local FacilityState = require "PNC/Core/Settlement/PNC_FacilityState"
 
 PNC = PNC or {}
 PNC.FacilityBuildUI = PNC.FacilityBuildUI or {}
@@ -644,8 +645,7 @@ local function stockpileState(settlement)
     for _, facility in ipairs(settlement and settlement.facilities or {}) do
         if facility.definitionId == "stockpile" then
             exists = true
-            built = facility.constructionState == nil
-                or facility.constructionState == "BUILT"
+            built = FacilityState.IsBuilt(facility)
             break
         end
     end

@@ -22,9 +22,25 @@ local collectionTarget = Internal.collectionTarget
 local requiresCollection = Internal.requiresCollection
 local setLiveOrder = Internal.setLiveOrder
 local claimStation = Internal.claimStation
-local requiresHome = Internal.requiresHome
-local autoReturnHome = Internal.autoReturnHome
+local startsAtHome = Internal.startsAtHome
+local returnsHome = Internal.returnsHome
+local observeWorkLocation = Internal.observeWorkLocation
 local isFollowing = Internal.isFollowing
+
+local function releaseAssignment(order, reason)
+    if not order then return false, "WORK_ORDER_UNAVAILABLE" end
+    if Service.Commands.ReleaseAssignment then
+        local released, releaseReason = Service.Commands.ReleaseAssignment(
+            order.workerId, reason)
+        if released == true then return true end
+        -- If no Tasking lease exists, release the durable work claim directly.
+        -- Never hide an active lease cleanup failure.
+        if releaseReason ~= "WORK_ORDER_UNAVAILABLE" then
+            return false, releaseReason
+        end
+    end
+    return releaseClaim(order, reason, false, true)
+end
 
 local function processOrder(order, at)
     if terminal(order) or order.status == Status.PAUSED then return end
@@ -50,7 +66,12 @@ local function processOrder(order, at)
     local worker = order.workerId and PNC.Registry and PNC.Registry.Get
         and PNC.Registry.Get(order.workerId) or nil
     if order.workerId and (not worker or worker.alive == false) then
-        releaseClaim(order, "worker_unavailable", false, true)
+        local released, releaseReason = releaseAssignment(order,
+            "worker_unavailable")
+        if released == false then
+            order.blockedReason = releaseReason or "WORKER_UNAVAILABLE"
+            Repository.MarkDirty(); return
+        end
         order.status, order.blockedReason = Status.WAITING_FOR_WORKER,
             "NO_QUALIFIED_WORKER"
         Repository.MarkDirty(); return
@@ -59,7 +80,13 @@ local function processOrder(order, at)
         if PNC.Tasking and PNC.Tasking.Providers
             and PNC.Tasking.Providers.work
         then
-            order.status = Status.WAITING_FOR_WORKER
+            if order.status ~= Status.WAITING_FOR_WORKER
+                or order.blockedReason ~= nil
+            then
+                order.status, order.blockedReason = Status.WAITING_FOR_WORKER, nil
+                order.updatedAt, order.revision = at, order.revision + 1
+                Repository.MarkDirty()
+            end
             local retryAt = tonumber(Service.AssignmentRetryAt
                 and Service.AssignmentRetryAt[order.id]) or 0
             if at >= retryAt then
@@ -82,21 +109,34 @@ local function processOrder(order, at)
             Repository.MarkDirty(); return
         end
     end
+    if observeWorkLocation then observeWorkLocation(worker, order, at) end
     local returningHome = PNC.HomeDutyService
         and PNC.HomeDutyService.IsReturningHome
         and PNC.HomeDutyService.IsReturningHome(worker, order.baseId)
     local followingDuringProvision = order.operation == "PROVISION_PICKUP"
         and isFollowing and isFollowing(worker)
     if returningHome or followingDuringProvision
-        or (requiresHome(order) and PNC.HomeDutyService
+        or (startsAtHome(order) and not Internal.executionIsRemote(order)
+        and PNC.HomeDutyService
         and PNC.HomeDutyService.IsAtHome
         and not PNC.HomeDutyService.IsAtHome(worker, order.baseId))
     then
-        releaseClaim(order, "worker_left_home", false, true)
+        local released, releaseReason
+        if Service.Commands.ReleaseAssignment then
+            released, releaseReason = releaseAssignment(order,
+                "worker_left_home")
+        else
+            released, releaseReason = releaseClaim(order,
+                "worker_left_home", false, true)
+        end
+        if released == false then
+            Repository.MarkDirty()
+            return
+        end
         order.status, order.blockedReason = Status.WAITING_FOR_WORKER,
-            autoReturnHome(order) and "WORKER_RETURNING_HOME"
+            returnsHome(order) and "WORKER_RETURNING_HOME"
                 or "WORKER_NOT_AT_HOME"
-        if autoReturnHome(order) and PNC.HomeDutyService
+        if returnsHome(order) and PNC.HomeDutyService
             and PNC.HomeDutyService.SendHome
         then
             PNC.HomeDutyService.SendHome(worker, order.baseId,
@@ -111,7 +151,12 @@ local function processOrder(order, at)
         local renewed = PNC.FacilityReservations.Start(
             order.facilityReservationId, 30000)
         if not renewed then
-            releaseClaim(order, "station_reservation_lost", false, true)
+            local released, releaseReason = releaseAssignment(order,
+                "station_reservation_lost")
+            if released == false then
+                order.blockedReason = releaseReason
+                Repository.MarkDirty(); return
+            end
             order.status, order.blockedReason = Status.WAITING_FOR_WORKER,
                 "STATION_RESERVATION_LOST"
             Repository.MarkDirty(); return
@@ -131,7 +176,12 @@ local function processOrder(order, at)
             local target = collectionTarget(order, worker, live)
             if requiresCollection(order) and not target
             then
-                releaseClaim(order, "stockpile_access_missing", false, true)
+                local released, releaseReason = releaseAssignment(order,
+                    "stockpile_access_missing")
+                if released == false then
+                    order.blockedReason = releaseReason
+                    Repository.MarkDirty(); return
+                end
                 order.status, order.blockedReason = Status.BLOCKED,
                     "NO_STOCKPILE_ACCESS_NODE"
                 Repository.MarkDirty()

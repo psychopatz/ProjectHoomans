@@ -78,6 +78,13 @@ function Intent.Resolve(spec)
         return result("cooperate", false, false, false,
             "faction_alliance")
     end
+    -- Personal relationship hostility is directed at this exact player.  It
+    -- is stronger than a neutral outsider policy, but remains below explicit
+    -- parley, ownership, pacification, and faction diplomacy decisions above.
+    if spec.personalState == "enemy" then
+        return result("attack", true, true, false,
+            "personal_enemy")
+    end
     -- Territorial looter settlements demand tribute inside their home
     -- radius. They do not inherit roaming-gang shoot-on-sight behavior;
     -- refusal can escalate through the normal war/incident path above.
@@ -138,10 +145,6 @@ function Intent.Resolve(spec)
     then
         return result("tolerate", false, false, false,
             "commercial_outsider_policy")
-    end
-    if spec.personalState == "enemy" then
-        return result("threaten", false, false, false,
-            "personal_enemy_nonofficial")
     end
     return result("observe", false, false, false,
         "neutral_outsider_policy")

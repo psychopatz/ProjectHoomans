@@ -19,10 +19,12 @@ T.truthy(zone, "zone category was not registered")
 local categories = Registry.All()
 T.equal(categories[1].id, "work", "work is not first in the manual hierarchy")
 T.equal(categories[2].id, "zone", "zone is not second in the manual hierarchy")
-T.equal(categories[3].id, "settings",
-    "settings is not third in the manual hierarchy")
-T.equal(categories[4].id, "events",
-    "events is not fourth in the manual hierarchy")
+T.equal(categories[3].id, "events",
+    "events is not third in the manual hierarchy")
+T.equal(categories[4].id, "colonist",
+    "colonist is not fourth in the manual hierarchy")
+T.equal(categories[5].id, "storage",
+    "storage is not fifth in the manual hierarchy")
 for _, id in ipairs({
     "structure", "production", "furniture", "external_furniture",
     "genetics", "power", "pipe_networks", "security", "misc", "floors",
@@ -34,8 +36,8 @@ T.equal(#zone.actions, 3, "zone action count changed")
 T.equal(zone.actions[1].id, "lumber", "chop wood is not first")
 T.equal(zone.actions[2].id, "corpse_haul", "grab corpse is not second")
 T.equal(zone.actions[3].id, "fishing", "fishing is not third")
-T.truthy(Registry.Get("settings").onClick,
-    "settings category does not expose its settings workflow")
+T.falsy(Registry.Get("settings"),
+    "settings remains registered as a root category")
 T.truthy(Registry.Get("work").onClick,
     "work category does not expose its authorization workflow")
 T.equal(Registry.Get("events").childID, "events",
@@ -45,16 +47,41 @@ T.truthy(Registry.IsEnabled(Registry.Get("events")),
 T.truthy(PNC.CommandHub.Gates
     and PNC.CommandHub.Gates.HasBaseAndStockpile,
     "command hub does not expose the base and stockpile gate")
+T.truthy(Registry.Get("storage").onClick,
+    "storage category does not expose its standalone workflow")
 
 PNC.ColonyManagementClient = {
     ReadSnapshot = function()
         return { snapshot = {} }
     end,
 }
+local gateStatus = PNC.CommandHub.Gates.GetBaseAndStockpileStatus()
+T.falsy(gateStatus.hasBase, "empty snapshot incorrectly reports a base")
+T.falsy(gateStatus.hasStockpile,
+    "empty snapshot incorrectly reports a stockpile")
+local disabledTooltip = Registry.Get("work").disabledTooltip(
+    Registry.Get("work"))
+T.equal(disabledTooltip.key,
+    "UI_PNC_CommandHub_Disabled_NoBaseOrStockpile",
+    "missing base and stockpile reason is not exposed")
+T.equal(disabledTooltip.fallback,
+    "Requires a colony base and a completed stockpile.",
+    "missing base and stockpile tooltip fallback changed")
 T.falsy(Registry.IsEnabled(Registry.Get("work")),
     "work remains enabled without a base and stockpile")
 T.falsy(Registry.IsEnabled(Registry.Get("zone")),
     "zone remains enabled without a base and stockpile")
+PNC.ColonyManagementClient.ReadSnapshot = function()
+    return { snapshot = { settlement = { facilities = {} } } }
+end
+disabledTooltip = Registry.Get("work").disabledTooltip(Registry.Get("work"))
+T.equal(disabledTooltip.key, "UI_PNC_CommandHub_Disabled_NoStockpile",
+    "missing stockpile reason is not exposed")
+T.equal(disabledTooltip.fallback,
+    "Requires a completed stockpile in your colony base.",
+    "missing stockpile tooltip fallback changed")
+T.falsy(Registry.IsEnabled(Registry.Get("work")),
+    "work enabled without a stockpile")
 PNC.ColonyManagementClient.ReadSnapshot = function()
     return {
         snapshot = { settlement = {
@@ -62,6 +89,9 @@ PNC.ColonyManagementClient.ReadSnapshot = function()
         } },
     }
 end
+gateStatus = PNC.CommandHub.Gates.GetBaseAndStockpileStatus()
+T.truthy(gateStatus.hasBase, "settlement incorrectly reports no base")
+T.truthy(gateStatus.hasStockpile, "built stockpile was not detected")
 T.truthy(Registry.IsEnabled(Registry.Get("work")),
     "work did not enable after a base and stockpile became available")
 T.truthy(Registry.IsEnabled(Registry.Get("zone")),
@@ -69,6 +99,8 @@ T.truthy(Registry.IsEnabled(Registry.Get("zone")),
 
 local openedWork = false
 local openedEvents = false
+local openedColonist = false
+local openedStorage = false
 PNC.CommandHub.WorkUI = {
     Open = function()
         openedWork = true
@@ -91,12 +123,28 @@ PNC.ColonyJournalUI = {
         return true
     end,
 }
+PNC.ColonistUI = {
+    Open = function()
+        openedColonist = true
+        return true
+    end,
+}
+PNC.ColonyStorageUI = {
+    Open = function()
+        openedStorage = true
+        return true
+    end,
+}
 Registry.Get("work").onClick()
 T.truthy(openedWork, "work category is not wired to its window")
 T.truthy(Registry.IsEnabled(Registry.Get("events")),
     "events category is disabled without a radio")
 Registry.Get("events").onClick()
 T.truthy(openedEvents, "events category is not wired to the colony journal")
+Registry.Get("colonist").onClick()
+T.truthy(openedColonist, "colonist category is not wired to its window")
+Registry.Get("storage").onClick()
+T.truthy(openedStorage, "storage category is not wired to its window")
 zone.actions[1].onClick()
 zone.actions[2].onClick()
 zone.actions[3].onClick()
@@ -118,12 +166,41 @@ T.equal(workRegistry.Get("Lumber").titleFallback, "LUMBER",
     "work registry does not expose lumber authorization")
 local workWindowSource = T.read("ProjectHoomans", "client",
     "PNC/UI/CommandHub/PNC_CommandHub_WorkWindow.lua")
+local settingsWindowSource = T.read("ProjectHoomans", "client",
+    "PNC/UI/CommandHub/PNC_CommandHub_SettingsWindow.lua")
+T.contains(settingsWindowSource, "GetSurfaceOpacityLift",
+    "settings does not expose surface opacity lift")
+T.contains(settingsWindowSource, "GetDetailOpacityLift",
+    "settings does not expose detail opacity lift")
+T.contains(settingsWindowSource, "GetTitlebarControlScale",
+    "settings does not expose title-bar control scale")
+T.contains(settingsWindowSource, "slider = row.control",
+    "settings lift fields do not expose their slider contract")
+T.contains(settingsWindowSource, "ApplyRegisteredToolbarScale",
+    "settings does not refresh title-bar controls")
+T.contains(settingsWindowSource, "Theme.GetPresetIDs",
+    "settings does not expose theme presets")
 T.contains(workWindowSource, "UI.CreateCheckbox",
     "work window does not create authorization checkboxes")
 T.contains(workWindowSource, "authorizationPanel",
     "work window does not provide a readable authorization surface")
 T.contains(workWindowSource, "job_permission_set",
     "work window does not use the server permission action")
+T.contains(workWindowSource, "GetContentOpacitySignature",
+    "work content styling does not track appearance changes")
+T.falsy(string.find(workWindowSource, "ApplySurfaceOpacity(self.peopleList, 0.04",
+    1, true), "work list keeps a hardcoded opacity lift")
+for _, subject in ipairs({
+    "PNC/UI/Colonist/PNC_ColonistController.lua",
+    "PNC/UI/Storage/PNC_StorageController.lua",
+    "PNC/UI/Communities/PNC_ColonyJournalWindow.lua",
+}) do
+    local source = T.read("ProjectHoomans", "client", subject)
+    T.contains(source, "GetContentOpacitySignature",
+        subject .. " does not track appearance changes")
+    T.falsy(string.find(source, "0.04", 1, true),
+        subject .. " keeps a hardcoded opacity lift")
+end
 local workLayoutSource = T.read("ProjectHoomans", "client",
     "PNC/UI/CommandHub/PNC_CommandHub_WorkWindow_Layout.lua")
 T.contains(workLayoutSource, "Layout.SetBounds(self.authorizationPanel",
@@ -193,12 +270,33 @@ local windowSource = T.read("ProjectHoomans", "client",
     "PNC/UI/CommandHub/PNC_CommandHub_Window.lua")
 T.contains(windowSource, "ChildController.Toggle",
     "command hub categories are not routed through the child controller")
+local coreWindowSource = T.read("PsychopatzCore", "client",
+    "PsychopatzCore/UI/PsychopatzCommandHubWindow.lua")
+T.contains(coreWindowSource, "syncButtonStates()",
+    "command hub does not refresh disabled tooltip state")
+local tooltipSource = T.read("PsychopatzCore", "client",
+    "PsychopatzCore/UI/PsychopatzCommandHubTooltip.lua")
+T.contains(tooltipSource, "disabledTooltip",
+    "command hub does not resolve disabled tooltip reasons")
+local Tooltip = T.load("PsychopatzCore", "client",
+    "PsychopatzCore/UI/PsychopatzCommandHubTooltip.lua")
+T.equal(Tooltip.For({ tooltipFallback = "Normal help",
+    disabledTooltip = { fallback = "Disabled reason" } }, nil, false),
+    "Disabled reason", "shared tooltip resolver ignores disabled reason")
 T.contains(windowSource, "persistenceKey = \"PNC.CommandHub\"",
     "command hub geometry is not persisted")
 T.falsy(string.find(windowSource, "PNC_CommandHub_Window_Layout", 1, true),
     "legacy command hub layout is still referenced")
 T.falsy(string.find(composition, "PNC_CommandHub_ActionsWindow", 1, true),
     "legacy command hub action window is still composed")
+local commandHubSource = T.read("ProjectHoomans", "client",
+    "PNC/UI/CommandHub/PNC_CommandHub.lua")
+T.contains(commandHubSource, "pnc-command-hub-settings-toolbar",
+    "colony settings were not moved to the title toolbar")
+T.contains(commandHubSource, "media/ui/MP/mp_ui_mods.png",
+    "colony settings toolbar does not use the gear icon")
+T.contains(commandHubSource, "Toolbar.Sync(window)",
+    "colony settings toolbar is not synchronized after installation")
 local childControllerSource = T.read("ProjectHoomans", "client",
     "PNC/UI/CommandHub/PNC_CommandHub_ChildController.lua")
 T.contains(childControllerSource, "CoreHub.Actions",
@@ -209,6 +307,14 @@ T.contains(childControllerSource, 'Controller.Register("events"',
     "colony journal is not managed by the child controller")
 T.contains(childControllerSource, "PNC.ColonyJournalUI",
     "child controller does not manage the colony journal instance")
+T.contains(childControllerSource, 'Controller.Register("colonist"',
+    "colonist window is not managed by the child controller")
+T.contains(childControllerSource, "PNC.ColonistUI",
+    "child controller does not manage the colonist instance")
+T.contains(childControllerSource, 'Controller.Register("storage"',
+    "storage window is not managed by the child controller")
+T.contains(childControllerSource, "PNC.ColonyStorageUI",
+    "child controller does not manage the storage instance")
 local zoneSource = T.read("ProjectHoomans", "client",
     "PNC/UI/CommandHub/PNC_CommandHub_ZoneWindow.lua")
 T.contains(zoneSource, "CoreHub.Actions",
@@ -223,8 +329,8 @@ T.contains(settingsSource, "PsychopatzCore/UI/PsychopatzCommandHub",
     "settings window does not consume Core services")
 T.falsy(string.find(settingsSource, "PNC_CommandHub_Options", 1, true),
     "settings window still uses the removed options shim")
-T.contains(settingsSource, "UI.CreateTextEntry",
-    "settings window has no editable fields")
+T.falsy(string.find(settingsSource, "UI.CreateTextEntry", 1, true),
+    "settings window still exposes redundant geometry fields")
 T.contains(settingsSource, "UI.CreateSlider",
     "settings window opacity is not using the shared slider")
 T.contains(settingsSource, "UI.SetLabelText",
@@ -235,6 +341,10 @@ T.contains(settingsSource, "onBranchToggle",
     "settings window cannot toggle action panel side")
 T.contains(settingsSource, "setStatus",
     "settings feedback is not routed through the status area")
+T.falsy(string.find(settingsSource, "ApplyGeometry", 1, true),
+    "settings window still owns geometry application")
+T.falsy(string.find(settingsSource, "ResetGeometry", 1, true),
+    "settings reset still owns geometry reset")
 local settingsLayoutSource = T.read("ProjectHoomans", "client",
     "PNC/UI/CommandHub/PNC_CommandHub_SettingsWindow_Layout.lua")
 T.contains(settingsLayoutSource, "onResponsiveLayout",

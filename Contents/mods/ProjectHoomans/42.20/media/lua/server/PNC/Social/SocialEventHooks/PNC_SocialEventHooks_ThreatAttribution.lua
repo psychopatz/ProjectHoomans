@@ -9,6 +9,9 @@ local Hooks = PNC.SocialEventHooks
 local H = PNC.SocialEventHooksInternal
 local EntityRef = PNC.EntityRef
 local Core = PNC.Core
+local Detector = PsychopatzCore
+    and PsychopatzCore.ZombieKillDetector
+    or require "PsychopatzCore/ZombieKillDetector/PsychopatzZombieKillDetector"
 
 function H.IsPlayer(character)
     if not character then
@@ -33,13 +36,7 @@ function H.IsZombie(character)
 end
 
 function H.ThreatIDFor(zombie)
-    if not zombie then
-        return nil
-    end
-    return zombie.getOnlineID and zombie:getOnlineID()
-        or zombie.getPersistentOutfitID
-            and zombie:getPersistentOutfitID()
-        or nil
+    return Detector.Internal.ThreatIDFor(zombie)
 end
 
 function H.ProtectedNPCKeyFor(zombie)
@@ -153,4 +150,3 @@ function Hooks.PruneThreatAttributions(occurredAt)
 end
 
 return Hooks
-

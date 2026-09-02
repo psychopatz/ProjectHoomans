@@ -26,6 +26,7 @@ function Service.Commands.Queue(spec)
     then
         return nil, "UNKNOWN_OPERATION"
     end
+    local locationPolicy = Internal.locationPolicy(spec)
     local order = {
         schemaVersion = Repository.SCHEMA_VERSION,
         id = Repository.NextId(), operation = operation,
@@ -46,11 +47,7 @@ function Service.Commands.Queue(spec)
         requiredWork = math.max(1, tonumber(spec.requiredWork) or 100),
         progress = math.max(0, tonumber(spec.progress) or 0),
         requiredSkills = copy(spec.requiredSkills or {}),
-        -- Most colony work starts at the home base. Some operations, such as
-        -- This flag is explicit for persisted work-order consumers; the
-        -- provision operation also enforces its home-only policy in Core.
-        requiresHome = spec.requiresHome ~= false,
-        autoReturnHome = spec.autoReturnHome ~= false,
+        locationPolicy = locationPolicy,
         manual = spec.manual == true,
         payload = copy(spec.payload or {}),
         phase = spec.phase,
@@ -67,6 +64,13 @@ end
 
 local function releaseClaim(order, reason, cancelInputs, cleanupOperation)
     if not order then return end
+    local carryHandoff = order.operation == "CORPSE_HAUL"
+        and tostring(order.phase or "") == "CARRYING"
+        and order.completionStarted ~= true
+        and order.status ~= Status.CANCELLING
+        and order.status ~= Status.CANCELLED
+        and order.status ~= Status.COMPLETED
+        and order.status ~= Status.FAILED
     if cleanupOperation == true and not order.completionCommitted
         and (order.operation == "PROVISION_PICKUP"
             or order.operation == "CORPSE_HAUL"
@@ -105,6 +109,9 @@ local function releaseClaim(order, reason, cancelInputs, cleanupOperation)
     if record and record.runtime and record.runtime.workOrderId == order.id then
         record.runtime.workOrderId = nil
         record.runtime.lastProductionWorkAt = nil
+        if Internal.clearWorkLocation then
+            Internal.clearWorkLocation(record, order.id)
+        end
         if PNC.OrderSystem and PNC.OrderSystem.SetOrder then
             PNC.OrderSystem.SetOrder(record, order.previousOrder)
         end
@@ -112,7 +119,15 @@ local function releaseClaim(order, reason, cancelInputs, cleanupOperation)
     order.workerId, order.stationId, order.facilityId = nil, nil, nil
     order.facilityReservationId, order.previousOrder = nil, nil
     order.stationTarget, order.collectionTarget = nil, nil
-    order.targetKind, order.phase, order.livePhase = nil, nil, nil
+    order.targetKind = nil
+    if not carryHandoff then
+        order.phase, order.livePhase = nil, nil
+    else
+        -- A worker release during visible carry drops the corpse in place but
+        -- keeps the durable phase/coordinate projection so another worker
+        -- can resume from that world square instead of searching the source.
+        order.phase, order.livePhase = "CARRYING", "CARRYING"
+    end
     order.executionMode, order.lastAbstractAt = nil, nil
     return true
 end

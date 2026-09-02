@@ -3,6 +3,7 @@ require "PsychopatzCore/UI/PsychopatzUI"
 local Components = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Components"
 local Shared = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Shared"
 local ComponentRows = require "PNC/UI/Communities/ColonyManagement/SettlementManagement/PNC_SettlementManagement_FacilityComponentRows"
+local FacilityState = require "PNC/Core/Settlement/PNC_FacilityState"
 
 local Browser = {}
 local UI = PsychopatzCore.UI
@@ -185,9 +186,7 @@ function Browser.RebuildComponents(window)
         })
         return
     end
-    if facility.constructionState ~= nil
-        and facility.constructionState ~= "BUILT"
-    then
+    if not FacilityState.IsBuilt(facility) then
         local task = facility.activeTask
         if task then
             list:addItem("construction_progress", {

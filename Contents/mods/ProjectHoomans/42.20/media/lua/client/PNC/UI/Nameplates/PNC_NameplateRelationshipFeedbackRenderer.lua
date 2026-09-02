@@ -12,6 +12,26 @@ local UP_COLOR = { r = 0.18, g = 1.0, b = 0.30, a = 1.0 }
 local DOWN_COLOR = { r = 1.0, g = 0.22, b = 0.18, a = 1.0 }
 local OUTLINE_COLOR = { r = 0.0, g = 0.0, b = 0.0, a = 1.0 }
 
+Renderer.ARROW_SIZE = 16
+
+local RELATIONSHIP_AXES = {
+    {
+        key = "approval",
+        labelKey = "UI_PNC_RelationshipApproval",
+        fallback = "Approval",
+    },
+    {
+        key = "respect",
+        labelKey = "UI_PNC_RelationshipRespect",
+        fallback = "Respect",
+    },
+    {
+        key = "familiarity",
+        labelKey = "UI_PNC_RelationshipFamiliarity",
+        fallback = "Familiarity",
+    },
+}
+
 local function rounded(value)
     value = tonumber(value) or 0
     return math.floor(value * 10 + (value < 0 and -0.5 or 0.5)) / 10
@@ -20,6 +40,57 @@ end
 local function signed(value)
     value = rounded(value)
     return (value > 0 and "+" or "") .. tostring(value)
+end
+
+local function translated(key, fallback)
+    local value = getText and getText(key) or nil
+    if value and value ~= "" and value ~= key then
+        return value
+    end
+    return fallback
+end
+
+local function relationshipDetails(feedback)
+    local details = {}
+    local delta = feedback and feedback.delta or nil
+    local index
+    local axis
+    local value
+    for index = 1, #RELATIONSHIP_AXES do
+        axis = RELATIONSHIP_AXES[index]
+        value = tonumber(delta and delta[axis.key]) or 0
+        if math.abs(value) > 0.05 then
+            details[#details + 1] = translated(axis.labelKey, axis.fallback)
+                .. " " .. signed(value)
+        end
+    end
+    if #details == 0 then
+        details[1] = translated(
+            "UI_PNC_RelationshipChange",
+            "Relationship"
+        ) .. " " .. signed(feedback and feedback.score or 0)
+    end
+    return details
+end
+
+local function detailFont()
+    if Presentation and Presentation.Fonts then
+        return Presentation.Fonts.relationship
+            or Presentation.Fonts.speech
+            or Presentation.Fonts.debug
+    end
+    return UIFont and (UIFont.Medium or UIFont.Small) or nil
+end
+
+local function detailLineHeight(font)
+    if getTextManager then
+        local textManager = getTextManager()
+        if textManager and textManager.getFontHeight then
+            local height = tonumber(textManager:getFontHeight(font))
+            if height and height > 0 then return height end
+        end
+    end
+    return 16
 end
 
 local function line(manager, x1, y1, x2, y2, color, alpha, size)
@@ -79,7 +150,7 @@ function Renderer.Draw(manager, npcID, screenX, nameY, options)
     if not feedback then return false end
     local zoom = math.max(1, tonumber(options.zoom) or 1)
     local scale = 1 / zoom
-    local size = math.max(8, math.floor((12 * scale) + 0.5))
+    local size = math.max(10, math.floor((Renderer.ARROW_SIZE * scale) + 0.5))
     local nameWidth = tonumber(options.nameWidth) or 0
     local alpha = (tonumber(options.alpha) or 1)
         * (tonumber(feedback.alpha) or 1)
@@ -93,15 +164,25 @@ function Renderer.Draw(manager, npcID, screenX, nameY, options)
     if options.showMagnitude ~= false and manager.drawText
         and Presentation and Presentation.DrawOutlinedText
     then
-        Presentation.DrawOutlinedText(
-            manager,
-            signed(feedback.score),
-            x + (size * 0.5) + (3 * scale),
-            top - (2 * scale),
-            color,
-            alpha,
-            Presentation.Fonts and Presentation.Fonts.debug or UIFont.Small
-        )
+        local details = relationshipDetails(feedback)
+        local font = detailFont()
+        local lineHeight = detailLineHeight(font)
+        local detailTop = top
+            - (((#details - 1) * lineHeight) * 0.5)
+            - (2 * scale)
+        local detailX = x + (size * 0.5) + (5 * scale)
+        local index
+        for index = 1, #details do
+            Presentation.DrawOutlinedText(
+                manager,
+                details[index],
+                detailX,
+                detailTop + ((index - 1) * lineHeight),
+                color,
+                alpha,
+                font
+            )
+        end
     end
     return true
 end

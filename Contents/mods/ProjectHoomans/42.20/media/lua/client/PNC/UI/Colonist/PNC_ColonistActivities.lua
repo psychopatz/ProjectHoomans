@@ -1,40 +1,36 @@
 require "PsychopatzCore/UI/PsychopatzUI"
+require "ISUI/ISPanel"
 
-local Components = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Components"
 local Presentation = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Presentation"
+local Selector = require "PNC/UI/Colonist/PNC_ColonistSelector"
 local Shared = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Shared"
 
-PNC = PNC or {}
-PNC.ColonyActivitiesTab = PNC.ColonyActivitiesTab or {}
-
-local Activities = PNC.ColonyActivitiesTab
+local Activities = {}
 local UI = PsychopatzCore.UI
+local Layout = UI.Layout
 
 local DEFINITIONS = {
     {
         id = "manual_eat",
-        capability = "survival.eat.inventory",
         capabilities = { "survival.eat.inventory", "food.dine" },
         key = "UI_PNC_CommandEat",
         fallback = "EAT",
     },
     {
         id = "manual_drink",
-        capability = "water.drink",
         capabilities = { "water.drink", "water.nearby" },
         key = "UI_PNC_CommandDrink",
         fallback = "DRINK",
     },
     {
         id = "manual_sleep",
-        capability = "sleep",
         capabilities = { "sleep" },
         key = "UI_PNC_CommandSleep",
         fallback = "SLEEP",
     },
     {
         id = "manual_provision",
-        capabilities = { "provision" },
+        operation = "PROVISION_PICKUP",
         key = "UI_PNC_CommandProvision",
         fallback = "GRAB PROVISION",
     },
@@ -46,18 +42,11 @@ local DEFINITIONS = {
     },
 }
 
-local function definitionFor(id)
-    for _, definition in ipairs(DEFINITIONS) do
-        if definition.id == tostring(id or "") then return definition end
-    end
-    return nil
-end
+Activities.Definitions = DEFINITIONS
 
-local function matches(definition, capability)
-    for _, value in ipairs(definition and definition.capabilities or {}) do
-        if value == tostring(capability or "") then return true end
-    end
-    return false
+local BY_ID = {}
+for _, definition in ipairs(DEFINITIONS) do
+    BY_ID[definition.id] = definition
 end
 
 local function activityInfo(person)
@@ -79,9 +68,7 @@ end
 
 local function currentActivity(person)
     local info = activityInfo(person)
-    if not info then
-        return Shared.Text(person and person.activity, "IDLE")
-    end
+    if not info then return Shared.Text(person and person.activity, "IDLE") end
     if info.kind == "work_order" then
         local operation = tostring(info.operation or "")
         local label
@@ -100,9 +87,8 @@ local function currentActivity(person)
         and Shared.Tr(info.labelKey, info.fallback)
         or Shared.Text(info.fallback or info.activityId, "IDLE")
     local item = itemName(info)
-    if not item then
-        item = info.activityItemLabelKey
-            and Shared.Tr(info.activityItemLabelKey, "item") or nil
+    if not item and info.activityItemLabelKey then
+        item = Shared.Tr(info.activityItemLabelKey, "item")
     end
     if item and item ~= "" then label = label .. " - " .. item end
     local phase = tostring(info.phase or "")
@@ -110,83 +96,117 @@ local function currentActivity(person)
     return label
 end
 
+local function matches(definition, capability)
+    for _, value in ipairs(definition.capabilities or {}) do
+        if value == tostring(capability or "") then return true end
+    end
+    return false
+end
+
 local function active(definition, person)
     local info = activityInfo(person)
-    if definition and definition.id == "manual_provision" then
-        return tostring(info and info.operation or "") == "PROVISION_PICKUP"
-    end
-    if definition and definition.operation then
+    if definition.operation then
         return info and info.kind == "work_order"
             and tostring(info.operation or "") == definition.operation
     end
     return matches(definition, info and info.capability)
 end
 
-local function updateButton(button, definition, person)
-    local isActive = active(definition, person)
-    local title = Shared.Tr(definition.key, definition.fallback)
-    if definition.id == "manual_sleep" then
-        title = title .. ": " .. Shared.Tr(
-            isActive and "UI_PNC_MonitorOn" or "UI_PNC_MonitorOff",
-            isActive and "ON" or "OFF")
-    elseif isActive then
-        title = title .. " (" .. Shared.Tr(
-            "UI_PNC_MonitorActive", "active") .. ")"
-    end
-    if button.setTitle then button:setTitle(title) else button.title = title end
-    button:setEnable(person ~= nil and person.alive ~= false)
-    UI.SetButtonVariant(button, isActive and "selected" or "default")
-end
-
 local function syncControls(window)
-    local person = Shared.ListValue(window.people)
+    local person = Selector.GetSelected(window.people)
     for _, definition in ipairs(DEFINITIONS) do
-        updateButton(window.activityControls[definition.id], definition, person)
+        local button = window.activityControls[definition.id]
+        local isActive = active(definition, person)
+        local title = Shared.Tr(definition.key, definition.fallback)
+        if definition.id == "manual_sleep" then
+            title = title .. ": " .. Shared.Tr(
+                isActive and "UI_PNC_MonitorOn" or "UI_PNC_MonitorOff",
+                isActive and "ON" or "OFF")
+        elseif isActive then
+            title = title .. " (" .. Shared.Tr(
+                "UI_PNC_MonitorActive", "active") .. ")"
+        end
+        if button.setTitle then button:setTitle(title) else button.title = title end
+        button:setEnable(person ~= nil and person.alive ~= false)
+        UI.SetButtonVariant(button, isActive and "selected" or "default")
     end
 end
 
-function Activities.Create(window)
+local function gridOptions(window, width)
+    local scale = window.uiScale or Layout.Scale()
+    local available = math.max(1, tonumber(width) or 1)
+    return {
+        scale = scale,
+        columns = available >= Layout.Pixels(460, scale) and 2 or 1,
+        gap = 8,
+        rowGap = 8,
+        height = 34,
+        stretchLastRow = true,
+    }
+end
+
+local function controlsHeight(window, width)
+    local options = gridOptions(window, width)
+    local header = Layout.Pixels(25, options.scale)
+    local result = Layout.Grid(window.activityControlList, {
+        x = 0,
+        y = header + Layout.Pixels(8, options.scale),
+        width = math.max(1, tonumber(width) or 1),
+        height = 1,
+    }, options)
+    return header + Layout.Pixels(8, options.scale) + result.height
+end
+
+function Activities.Create(window, _, host)
     window.activityControls = {}
     window.activityControlList = {}
     for _, definition in ipairs(DEFINITIONS) do
-        local button = UI.CreateButton(window, {
+        local button = UI.CreateButton(host or window, {
             id = definition.id,
             title = Shared.Tr(definition.key, definition.fallback),
             target = window,
-            onclick = ISPNCColonyManagementWindow.onActivitiesControl,
+            onclick = UI.ButtonCallback(function(control)
+                return window:onColonistControl(control)
+            end),
             variant = "default",
         })
+        button.activityCommandID = definition.id
         window.activityControls[definition.id] = button
         window.activityControlList[#window.activityControlList + 1] = button
     end
+    if host then
+        host.render = function(panel)
+            ISPanel.render(panel)
+            UI.DrawSectionTitle(panel,
+                Shared.Tr("UI_PNC_Activities_Commands", "MANUAL COMMANDS"),
+                0, 0, panel:getWidth())
+        end
+    end
+end
+
+function Activities.GetControlsHeight(window, width)
+    return controlsHeight(window, width)
 end
 
 function Activities.Apply(window, activeTab, Layout)
     for _, button in ipairs(window.activityControlList or {}) do
-        button:setVisible(activeTab)
+        button:setVisible(activeTab == true)
+    end
+    if window.tabControlsPane then
+        window.tabControlsPane:setVisible(activeTab == true)
     end
     if not activeTab then return end
     syncControls(window)
-    if not window.layout then return end
-    local rect = window.layout.details
-    local gap = Layout.Pixels(6, window.uiScale)
-    local height = Layout.Pixels(28, window.uiScale)
-    local count = #window.activityControlList
-    local columns = math.min(4, math.max(1, count))
-    local rows = math.ceil(count / columns)
-    local width = math.floor((rect.width - gap * (columns - 1)) / columns)
-    for index, button in ipairs(window.activityControlList or {}) do
-        local row = math.floor((index - 1) / columns)
-        local column = (index - 1) % columns
-        local x = rect.x + column * (width + gap)
-        local y = rect.y + row * (height + gap)
-        local lastWidth = column == columns - 1
-            and rect.width - (x - rect.x) or width
-        Layout.SetBounds(button, x, y, lastWidth, height)
-    end
-    local paneY = rect.y + rows * height + (rows - 1) * gap + gap
-    window:layoutPane(window.detailsPane, rect.x, paneY,
-        rect.width, math.max(60, rect.height - (paneY - rect.y)))
+    local pane = window.tabControlsPane
+    if not pane then return end
+    local options = gridOptions(window, pane:getWidth())
+    local header = Layout.Pixels(25, options.scale)
+    Layout.Grid(window.activityControlList, {
+        x = 0,
+        y = header + Layout.Pixels(8, options.scale),
+        width = pane:getWidth(),
+        height = 1,
+    }, options)
 end
 
 function Activities.BuildRows(context)
@@ -226,21 +246,23 @@ end
 
 function Activities.OnPersonSelected(window)
     syncControls(window)
+    if window.requestResponsiveLayout then window:requestResponsiveLayout(true) end
     return true
 end
 
 function Activities.OnControl(window, button)
-    local person = Shared.ListValue(window.people)
-    local commandID = tostring(button and button.internal or "")
-    local definition = definitionFor(commandID)
+    local person = Selector.GetSelected(window.people)
+    local commandID = button and (button.activityCommandID or button.internal)
+    local definition = BY_ID[tostring(commandID or "")]
     if not person or not definition or person.alive == false then return false end
     local client = PNC.Client
-    local execute = client and (client.ExecuteCompanionCommand
-        or client.SendCompanionCommand) or nil
+    local execute = client and client.ExecuteCompanionCommand or nil
     if not execute then return false end
-    local sent = execute(commandID, person.id)
+    local sent = execute(definition.id, person.id, nil, {
+        source = "colonist_activities",
+    })
     if window.requestSnapshot then
-        window:requestSnapshot("manual_activity_" .. commandID)
+        window:requestSnapshot("colonist_activity_" .. definition.id)
     end
     return sent == true
 end

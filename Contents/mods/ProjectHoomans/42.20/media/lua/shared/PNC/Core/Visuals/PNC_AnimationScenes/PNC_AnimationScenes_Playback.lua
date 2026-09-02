@@ -1,8 +1,38 @@
 local Scenes = PNC.AnimationScenes
 local Internal = Scenes.Internal
+local Core = PNC.Core
 
 local PERSISTENT_LEASE_MS = 10000
 local MIN_STEP_GAP_MS = 100
+
+local function notifyStart(definition, record, zombie, scene, step, now)
+    local ok
+    local result
+    if type(definition.onStart) ~= "function" then
+        return true
+    end
+    ok, result = pcall(
+        definition.onStart,
+        record,
+        zombie,
+        scene,
+        step,
+        now
+    )
+    if not ok then
+        if Core and Core.LogWarn then
+            Core.LogWarn(
+                "PNC animation scene start callback failed: "
+                    .. tostring(result)
+            )
+        end
+        return false, "scene_start_callback_failed"
+    end
+    if result == false then
+        return false, "scene_start_callback_rejected"
+    end
+    return true
+end
 
 function Internal.MarkSceneSync(record, eventName)
     if not record then return end
@@ -96,6 +126,10 @@ function Internal.ActivateStep(record, zombie, scene, definition, now)
     scene.nextStepAt = nil
     scene.playbackRevision =
         (tonumber(scene.playbackRevision) or 0) + 1
+    local started, startReason = notifyStart(
+        definition, record, zombie, scene, step, now
+    )
+    if not started then return false, startReason end
     if PNC.Animation and PNC.Animation.PlayBump then
         PNC.Animation.PlayBump(zombie, record, step.bump, {
             sceneId = definition.id,

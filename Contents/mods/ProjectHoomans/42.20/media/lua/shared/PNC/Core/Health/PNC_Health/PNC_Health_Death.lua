@@ -86,10 +86,8 @@ local function createCorpse(record, zombie, reason)
         return
     end
     if zombie.setHealth then zombie:setHealth(0) end
-    create = PNC.BodyLifecycle and (
-        PNC.BodyLifecycle.CreateVanillaCorpse
-        or PNC.BodyLifecycle.CreateInertCorpse
-    ) or nil
+    create = PNC.BodyLifecycle
+        and PNC.BodyLifecycle.CreateVanillaCorpse or nil
     if create then
         converted, result =
             create(record, zombie, reason or "death")

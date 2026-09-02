@@ -1,4 +1,6 @@
 local Placement = {}
+local Policy = require
+    "PNC/UI/Communities/ColonyManagement/PNC_BuildingPlacementPolicy"
 
 local function call(object, method, ...)
     if not object or type(object[method]) ~= "function" then return nil end
@@ -120,7 +122,10 @@ local function createFallbackCursorClass()
             local valid = call(world, "isValidSquare", x, y, z)
             if valid == false then return false end
         end
-        return true
+        local valid, reason = Policy.ValidateCurrentSquare(square)
+        self.pncPlacementError = reason
+        self.pncBaseValid = valid == true
+        return valid == true
     end
 
     function class:render(x, y, z, square)
@@ -149,7 +154,6 @@ local function createFallbackCursorClass()
 
     function class:tryBuild(x, y, z)
         if self.placed or not self.canBeBuild then return false end
-        self.placed = true
         local square = self.square or getCell():getGridSquare(x, y, z)
         local target = {
             x = call(square, "getX") or x,
@@ -159,7 +163,10 @@ local function createFallbackCursorClass()
             nSprite = tonumber(self.nSprite) or 1,
             sprite = self:getSprite(),
         }
-        if self.onPlacement then self.onPlacement(target) end
+        if self.onPlacement and self.onPlacement(target) == false then
+            return false
+        end
+        self.placed = true
         local cell = getCell and getCell() or nil
         if cell and type(cell.setDrag) == "function" then
             cell:setDrag(nil, self.player or 0)
@@ -183,6 +190,18 @@ local function createNativeCursorClass()
         return nil
     end
     local class = ISBuildIsoEntity:derive("ISPNCBuildPlacementCursor")
+    local nativeIsValid = class.isValid
+
+    function class:isValid(square)
+        if nativeIsValid then
+            local ok, valid = pcall(nativeIsValid, self, square)
+            if not ok or valid == false then return false end
+        end
+        local valid, reason = Policy.ValidateCurrentSquare(square)
+        self.pncPlacementError = reason
+        self.pncBaseValid = valid == true
+        return valid == true
+    end
 
     function class:getSprite()
         local spriteName = firstSpriteName(self)
@@ -194,14 +213,16 @@ local function createNativeCursorClass()
         if self.placed then return false end
         local square = getCell():getGridSquare(x, y, z)
         if not square or not self:isValid(square) then return false end
-        self.placed = true
         local target = {
             x = square:getX(), y = square:getY(), z = square:getZ(),
             north = self.north == true,
             nSprite = tonumber(self.nSprite) or 1,
             sprite = self:getSprite(),
         }
-        if self.onPlacement then self.onPlacement(target) end
+        if self.onPlacement and self.onPlacement(target) == false then
+            return false
+        end
+        self.placed = true
         if getCell() and getCell().setDrag then
             getCell():setDrag(nil, self.player or 0)
         end
@@ -318,6 +339,13 @@ function Placement.Begin(window, recipe)
     cursor.dragNilAfterPlace = true
     cursor.pncFacilityPlacement = recipe.facilityDefinitionId ~= nil
     cursor.onPlacement = function(target)
+        local valid, reason = Policy.ValidateCurrentPoint(
+            target.x, target.y, target.z)
+        if not valid then
+            fail(reason)
+            cursor.canBeBuild = false
+            return false
+        end
         local options = {
             recipeKey = cursor.recipeKey,
             objectInfoName = cursor.objectInfoName,

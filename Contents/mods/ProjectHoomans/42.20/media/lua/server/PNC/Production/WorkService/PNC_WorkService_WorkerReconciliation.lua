@@ -19,6 +19,18 @@ local releaseClaim = Internal.releaseClaim
 local assignedOrderForRecord = Internal.assignedOrderForRecord
 local restoreOrderIsSafe = Internal.restoreOrderIsSafe
 
+local function releaseAssignment(order, reason)
+    if Service.Commands and Service.Commands.ReleaseAssignment then
+        local released, releaseReason = Service.Commands.ReleaseAssignment(
+            order and order.workerId, reason)
+        if released == true then return true end
+        if releaseReason ~= "WORK_ORDER_UNAVAILABLE" then
+            return false, releaseReason
+        end
+    end
+    return releaseClaim(order, reason, false, true)
+end
+
 local function clearStaleWorkerState(record, workOrder, reason)
     if not record then return false end
     local runtime = record.runtime or {}
@@ -125,16 +137,22 @@ function Service.ReconcileWorkerState()
                 stations[tostring(order.stationId)] = order.id
             end
         else
-            releaseClaim(order, "stale_worker_claim", false, true)
-            if order.status ~= Status.PAUSED
-                and order.status ~= Status.CANCELLING
-            then
-                order.status = Status.WAITING_FOR_WORKER
-                order.blockedReason = nil
+            local released, releaseReason = releaseAssignment(order,
+                "stale_worker_claim")
+            if released == false then
+                order.blockedReason = releaseReason
+                Repository.MarkDirty()
+            else
+                if order.status ~= Status.PAUSED
+                    and order.status ~= Status.CANCELLING
+                then
+                    order.status = Status.WAITING_FOR_WORKER
+                    order.blockedReason = nil
+                end
+                order.updatedAt, order.revision = now(), order.revision + 1
+                Repository.MarkDirty()
+                markAssignmentDirty(order, "STALE_WORKER_CLAIM_RECOVERED")
             end
-            order.updatedAt, order.revision = now(), order.revision + 1
-            Repository.MarkDirty()
-            markAssignmentDirty(order, "STALE_WORKER_CLAIM_RECOVERED")
             repaired = repaired + 1
         end
     end

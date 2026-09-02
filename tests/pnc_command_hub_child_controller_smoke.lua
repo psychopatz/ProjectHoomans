@@ -38,9 +38,13 @@ local actionsWindow = fakeWindow(0, 0, 190, 150)
 local workWindow = fakeWindow(0, 0, 760, 560)
 local settingsWindow = fakeWindow(0, 0, 420, 340)
 local journalWindow = fakeWindow(0, 0, 640, 540)
+local colonistWindow = fakeWindow(0, 0, 920, 620)
+local storageWindow = fakeWindow(0, 0, 980, 700)
 workWindow.psychopatzWidgetEnabled = true
 settingsWindow.psychopatzWidgetEnabled = true
 journalWindow.psychopatzWidgetEnabled = true
+colonistWindow.psychopatzWidgetEnabled = true
+storageWindow.psychopatzWidgetEnabled = true
 
 local actionsUI = { instance = actionsWindow }
 function actionsUI.Open()
@@ -83,6 +87,22 @@ function journalUI.Open(owner)
 end
 function journalUI.Close() journalWindow.visible = false end
 
+local colonistUI = { instance = colonistWindow }
+function colonistUI.Open(owner)
+    colonistWindow.owner = owner
+    colonistWindow.visible = true
+    return colonistWindow
+end
+function colonistUI.Close() colonistWindow.visible = false end
+
+local storageUI = { instance = storageWindow }
+function storageUI.Open(owner)
+    storageWindow.owner = owner
+    storageWindow.visible = true
+    return storageWindow
+end
+function storageUI.Close() storageWindow.visible = false end
+
 PNC = {
     CommandHub = {
         instance = hub,
@@ -91,6 +111,8 @@ PNC = {
         SettingsUI = settingsUI,
     },
     ColonyJournalUI = journalUI,
+    ColonistUI = colonistUI,
+    ColonyStorageUI = storageUI,
 }
 
 local Controller = T.load("ProjectHoomans", "client",
@@ -114,6 +136,16 @@ T.truthy(Controller.Toggle("settings", hub),
     "settings did not replace the work branch")
 T.falsy(workWindow.visible, "work branch survived the settings switch")
 T.truthy(settingsWindow.visible, "settings window is not visible")
+
+T.truthy(Controller.Toggle("colonist", hub),
+    "colonist did not replace the settings branch")
+T.falsy(settingsWindow.visible, "settings branch survived colonist switch")
+T.truthy(colonistWindow.visible, "colonist window is not visible")
+
+T.truthy(Controller.Toggle("storage", hub),
+    "storage did not replace the colonist branch")
+T.falsy(colonistWindow.visible, "colonist branch survived the storage switch")
+T.truthy(storageWindow.visible, "storage window is not visible")
 
 T.truthy(Controller.Toggle("events", hub),
     "events did not open the colony journal child")
@@ -163,9 +195,14 @@ T.equal(settingsWindow.opacity, 0.4,
     "child opacity was not propagated")
 T.equal(journalWindow.opacity, 0.4,
     "journal opacity was not propagated")
+T.equal(colonistWindow.opacity, 0.4,
+    "colonist opacity was not propagated")
+T.equal(storageWindow.opacity, 0.4,
+    "storage opacity was not propagated")
 Controller.CloseAll()
 T.truthy(hub.visible, "closing children closed the parent hub")
 T.falsy(settingsWindow.visible, "settings child was not closed")
 T.falsy(workWindow.visible, "parent close did not close detached widget")
+T.falsy(storageWindow.visible, "storage child was not closed")
 
 T.finish("pnc_command_hub_child_controller_smoke")

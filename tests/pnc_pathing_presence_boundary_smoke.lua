@@ -348,6 +348,9 @@ T.equal(sharedCalls[presenceIndex - 3],
     "PNC/Core/Production/PNC_WorkAnimationScenes",
     "Production animation scene dependency")
 T.equal(sharedCalls[presenceIndex - 4],
+    "PNC/Core/Production/PNC_WorkSequence",
+    "Work sequence dependency precedes production scenes")
+T.equal(sharedCalls[presenceIndex - 5],
     "PNC/Core/Facilities/PNC_FacilityJobs_Behavior",
     "Production work follows facility job behavior")
 T.equal(sharedCalls[presenceIndex + 1],

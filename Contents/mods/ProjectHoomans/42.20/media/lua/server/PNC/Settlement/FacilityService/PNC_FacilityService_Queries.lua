@@ -15,6 +15,7 @@ local EventsBus = PsychopatzCore and PsychopatzCore.Events
 local calculatedState = Internal.calculatedState
 local emit = Internal.emit
 local updateState = Internal.updateState
+local FacilityState = require "PNC/Core/Settlement/PNC_FacilityState"
 
 function Service.ListByCapability(baseId, capability, stationId)
     local output = {}
@@ -43,7 +44,7 @@ function Service.ListByCapability(baseId, capability, stationId)
             end
             local hasRequestedWorkstation = false
             if string.sub(tostring(capability or ""), 1, 5) == "work."
-                and facility.constructionState == "BUILT"
+                and FacilityState.IsBuilt(facility)
             then
                 for componentId, _ in pairs(facility.componentIds or {}) do
                     local component = Repository.GetComponent(componentId)

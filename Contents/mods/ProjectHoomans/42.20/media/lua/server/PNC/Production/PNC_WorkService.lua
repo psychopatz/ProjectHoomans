@@ -9,6 +9,7 @@ PNC = PNC or {}
 PNC.WorkService = PNC.WorkService or {}
 PNC.WorkService.Internal = PNC.WorkService.Internal or {}
 
+require "PNC/Production/WorkService/PNC_WorkService_WorkLocation"
 require "PNC/Production/WorkService/PNC_WorkService_Core"
 require "PNC/Production/WorkService/PNC_WorkService_QueueAndClaims"
 require "PNC/Production/WorkService/PNC_WorkService_WorkerReconciliation"

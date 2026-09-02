@@ -72,7 +72,7 @@ PNC = {
         BroadcastRecord = function() broadcasts = broadcasts + 1 end,
     },
     BodyLifecycle = {
-        CreateInertCorpse = function() end,
+        CreateVanillaCorpse = function() end,
     },
     ZombieAggro = {
         ClearForNPCBody = function() clearedAggro = clearedAggro + 1 end,

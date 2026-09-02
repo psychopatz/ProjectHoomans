@@ -127,6 +127,14 @@ function Provider.Tick(lease)
     if handler then
         local ok, reason = handler(order, lease)
         if ok == false then
+            if PNC.Core and PNC.Core.LogWarn then
+                PNC.Core.LogWarn("work_execution_failed operation="
+                    .. tostring(order.operation)
+                    .. " order=" .. tostring(order.id)
+                    .. " npc=" .. tostring(lease.npcId)
+                    .. " reason=" .. tostring(reason
+                        or "work_operation_failed"))
+            end
             if PNC.Tasking.Commands.CancelLease then
                 PNC.Tasking.Commands.CancelLease(lease.leaseId,
                     reason or "work_operation_failed")

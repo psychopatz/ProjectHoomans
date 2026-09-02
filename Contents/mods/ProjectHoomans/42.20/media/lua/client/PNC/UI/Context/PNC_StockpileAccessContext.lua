@@ -1,6 +1,7 @@
 PNC = PNC or {}
 
 local GridRegion = require "PsychopatzCore/World/PC_GridRegion"
+local FacilityState = require "PNC/Core/Settlement/PNC_FacilityState"
 
 local function tr(key, fallback)
     local value = getText and getText(key) or nil
@@ -49,7 +50,7 @@ local function findStockpileAtSquare(square)
     local x, y, z = square:getX(), square:getY(), square:getZ()
     for _, facility in ipairs(settlement and settlement.facilities or {}) do
         if facility.definitionId == "stockpile"
-            and facility.constructionState == "BUILT"
+            and FacilityState.IsBuilt(facility)
         then
             for _, component in ipairs(facility.components or {}) do
                 if component.role == "storage.stockpile" and component.region
@@ -77,8 +78,9 @@ local function openStockpile()
         and access.hasStockpile == true
     then
         local StorageUI = PNC.ColonyStorageUI
-            or require "PNC/UI/Communities/PNC_ColonyStorageWindow"
-        return StorageUI.Open()
+            or require "PNC/UI/Storage/PNC_Storage"
+        local hub = PNC.CommandHub and PNC.CommandHub.instance or nil
+        return StorageUI.Open(hub)
     end
 end
 

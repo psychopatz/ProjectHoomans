@@ -130,4 +130,48 @@ function Debug.LogProcessed(processed, definition)
     return true
 end
 
+function Debug.FormatRejected(processed, definition)
+    local details = processed
+        and processed.rejectionDetails or {}
+    local lines = {
+        "[PNC SocialEvent]",
+        "Event rejected: " .. tostring(processed and processed.eventType),
+        "Reason: " .. tostring(processed and processed.reason),
+        "Event ID: " .. tostring(processed and processed.eventID),
+        "Actor: " .. tostring(processed and processed.actorKey),
+        "Target: " .. tostring(processed and processed.targetKey),
+    }
+    if type(details) == "table"
+        and details.observerNPCID ~= nil
+    then
+        lines[#lines + 1] = "Observer NPC: "
+            .. tostring(details.observerNPCID)
+        lines[#lines + 1] = "Relationship: "
+            .. tostring(details.relationshipState)
+            .. " approval=" .. tostring(details.approval)
+            .. " respect=" .. tostring(details.respect)
+            .. " familiarity=" .. tostring(details.familiarity)
+        lines[#lines + 1] = "Saturation: approval="
+            .. tostring(details.saturationApproval)
+            .. " respect=" .. tostring(details.saturationRespect)
+        lines[#lines + 1] = "Requested effect: approval="
+            .. tostring(details.requestedApproval)
+            .. " respect=" .. tostring(details.requestedRespect)
+    end
+    return table.concat(lines, "\n")
+end
+
+function Debug.LogRejected(processed, definition)
+    if not debugEnabled() then
+        return false
+    end
+    local text = Debug.FormatRejected(processed, definition)
+    if PNC.Core and PNC.Core.LogDebug then
+        PNC.Core.LogDebug(text)
+    elseif print then
+        print(text)
+    end
+    return true
+end
+
 return Debug

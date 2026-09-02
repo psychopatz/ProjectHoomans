@@ -115,7 +115,8 @@ function Lifecycle.AuditLoadedBodies(now, force)
                         record.runtime = record.runtime or {}
                         record.runtime.corpseRecoveryAttempts = (tonumber(record.runtime.corpseRecoveryAttempts) or 0) + 1
                         if record.runtime.corpseRecoveryAttempts <= (tonumber(Const.CORPSE_REANIMATE_RETRY_MAX) or 3) then
-                            Lifecycle.CreateInertCorpse(record, zombie, "corpse_reanimated")
+                            Lifecycle.CreateVanillaCorpse(record, zombie,
+                                "corpse_reanimated")
                         else
                             Internal.removeZombie(zombie)
                             Internal.ensureRuntime(record).corpseState = "missing"

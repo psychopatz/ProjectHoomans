@@ -61,7 +61,7 @@ PNC = {
         CanZombieTargetRecord = function() return true end,
     },
     BodyLifecycle = {
-        CreateInertCorpse = function() end,
+        CreateVanillaCorpse = function() end,
     },
     Network = {
         GetZombieOnlineID = function() return 77 end,

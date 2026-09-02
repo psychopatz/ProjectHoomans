@@ -62,6 +62,7 @@ function PNC.Registry.ForEach(callback)
     for _, record in pairs(PNC.Registry.Data) do callback(record) end
 end
 PNC.WorkService = { ClaimsByWorker = {}, Internal = {} }
+require "PNC/Production/WorkService/PNC_WorkService_WorkLocation"
 require "PNC/Production/WorkService/PNC_WorkService_Core"
 PNC.Registry.Data.low = { id = "low", alive = true,
     affiliation = { factionID = "f1", communityID = "c1" },

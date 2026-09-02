@@ -303,6 +303,31 @@ T.equal(definition.context.npcLastName, "Hale", "NPC last name")
 T.equal(definition.lifecycle.kind, "conversation_lifecycle", "lifecycle")
 T.truthy(#definition.nodes.greeting.choices >= 8,
     "registered category menu composed")
+local recruitChoice
+for _, choice in ipairs(definition.nodes.menu.choices or {}) do
+    if choice.id == "recruit" then recruitChoice = choice end
+end
+T.truthy(recruitChoice, "recruit choice is available for an un-recruited NPC")
+T.equal(type(recruitChoice.onHighlightChanged), "function",
+    "recruit choice exposes a reusable highlight callback")
+local hoveredRecruitRequirement
+PsychopatzCore.Conversation.instance = {
+    spec = { npcID = "npc-12" },
+    extensionParts = {
+        relationship = {
+            setRequirement = function(_, value)
+                hoveredRecruitRequirement = value
+            end,
+        },
+    },
+}
+recruitChoice.onHighlightChanged(recruitChoice, true)
+T.equal(hoveredRecruitRequirement, "recruit",
+    "recruit highlight shows the recruit threshold")
+recruitChoice.onHighlightChanged(recruitChoice, false)
+T.equal(hoveredRecruitRequirement, "inspect",
+    "leaving recruit highlight restores relationship inspection")
+PsychopatzCore.Conversation.instance = nil
 local askAboutChoice
 for _, choice in ipairs(definition.nodes.greeting.choices) do
     if choice.id == "projecthoomans:ask_about" then

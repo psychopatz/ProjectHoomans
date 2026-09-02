@@ -2,6 +2,7 @@ PNC = PNC or {}
 
 local KIND = "production_work"
 local JOB = "ProductionWork"
+local WorkSequence = PNC.WorkSequence
 local SCENE_BY_OPERATION = {
     RESEARCH = "production.research",
     CRAFT = "production.craft",
@@ -36,12 +37,6 @@ end
 local function tick(record, zombie)
     local order = record.orderSpec or {}
     if order.kind ~= KIND or not PNC.WorkService then return false end
-    if order.operation == "CORPSE_HAUL"
-        and PNC.BehaviorCorpseHaul
-        and PNC.BehaviorCorpseHaul.TickWork
-    then
-        return PNC.BehaviorCorpseHaul.TickWork(record, zombie, order) == true
-    end
     if order.operation == "LUMBER"
         and PNC.BehaviorLumber
         and PNC.BehaviorLumber.TickWork
@@ -51,6 +46,11 @@ local function tick(record, zombie)
     record.activeJob = PNC.WorkDefinitions.JOB_BY_OPERATION[order.operation]
         or JOB
     record.activeBehavior = "Work:" .. tostring(order.operation)
+    if WorkSequence and WorkSequence.Tick
+        and WorkSequence.Tick(record, zombie, order)
+    then
+        return true
+    end
     local distance = PNC.Core.Distance(record.x, record.y, order.x, order.y)
     if distance > 0.8 or math.abs((tonumber(record.z) or 0) - order.z) >= 0.5 then
         PNC.BehaviorCommon.ClearCombatTarget(record, "production_travel", zombie)

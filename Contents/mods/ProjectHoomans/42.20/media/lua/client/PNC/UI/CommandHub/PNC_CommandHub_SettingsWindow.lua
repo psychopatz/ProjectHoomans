@@ -25,30 +25,32 @@ local function tr(key, fallback)
     return value and value ~= "" and value ~= key and value or fallback
 end
 
-local function label(parent, text, color)
+local function label(parent, text, color, colorName)
     local value = color or Theme.colors.text
     local widget = ISLabel:new(0, 0, 22, text,
         value.r, value.g, value.b, value.a, UIFont.Small, true)
     widget:initialise()
+    widget.psychopatzThemeColorName = colorName
+        or (color == Theme.colors.textMuted and "textMuted" or "text")
     parent:addChild(widget)
     return widget
 end
 
-local function readInteger(entry, minimum, maximum)
-    local value = tonumber(entry and entry:getText() or nil)
-    if not value then return nil end
-    value = math.floor(value + 0.5)
-    if minimum and value < minimum then return nil end
-    if maximum and value > maximum then return nil end
-    return value
-end
-
-local function setEntry(entry, value)
-    if entry then entry:setText(tostring(math.floor(value or 0))) end
-end
-
 local function formatOpacity(value)
     return tostring(math.floor((tonumber(value) or 0) + 0.5)) .. "%"
+end
+
+local function formatLift(value)
+    return "+" .. tostring(math.floor((tonumber(value) or 0) + 0.5)) .. "%"
+end
+
+local function formatControlScale(value)
+    return tostring(math.floor((tonumber(value) or 0) + 0.5)) .. "%"
+end
+
+local function themeTitle()
+    return tr("UI_PNC_CommandHub_Settings_Theme", "THEME")
+        .. ": " .. Theme.GetPresetLabel()
 end
 
 local function branchTitle()
@@ -72,50 +74,107 @@ end
 function ISPNCCommandHubSettingsWindow:createChildren()
     PsychopatzWindow.createChildren(self)
     self.fields = {}
-    local definitions = {
-        { id = "x", labelKey = "UI_PNC_CommandHub_Settings_X" },
-        { id = "y", labelKey = "UI_PNC_CommandHub_Settings_Y" },
-        { id = "width", labelKey = "UI_PNC_CommandHub_Settings_Width" },
-        { id = "height", labelKey = "UI_PNC_CommandHub_Settings_Height" },
-        { id = "opacity", labelKey = "UI_PNC_CommandHub_Settings_Opacity" },
+    local opacityRow = UI.CreateFormRow(self, {
+        id = "command-hub-setting-row:opacity",
+        label = tr("UI_PNC_CommandHub_Settings_Opacity", "Opacity"),
+        valueLabel = true,
+        valueText = formatOpacity(Options.GetOpacityPercent()),
+        createControl = function(parent)
+            return UI.CreateSlider(parent, {
+                id = "command-hub-opacity",
+                target = self,
+                min = 20,
+                max = 100,
+                step = 1,
+                value = Options.GetOpacityPercent(),
+                onChange = function(_, value)
+                    self:updateOpacityLabel(value)
+                end,
+            })
+        end,
+    })
+    self.fields.opacity = {
+        row = opacityRow,
+        label = opacityRow.label,
+        slider = opacityRow.control,
+        valueLabel = opacityRow.valueLabel,
     }
-    for _, definition in ipairs(definitions) do
-        local opacity = definition.id == "opacity"
-        local row = UI.CreateFormRow(self, {
-            id = "command-hub-setting-row:" .. definition.id,
-            label = tr(definition.labelKey, definition.id),
-            valueLabel = opacity,
-            valueText = opacity and formatOpacity(
-                Options.GetOpacityPercent()) or nil,
+    local function createLiftField(id, labelKey, fallback, value)
+        local row
+        row = UI.CreateFormRow(self, {
+            id = id,
+            label = tr(labelKey, fallback),
+            valueLabel = true,
+            valueText = formatLift(value),
             createControl = function(parent)
-                if opacity then
-                    return UI.CreateSlider(parent, {
-                        id = "command-hub-opacity",
-                        target = self,
-                        min = 20,
-                        max = 100,
-                        step = 1,
-                        value = Options.GetOpacityPercent(),
-                        onChange = function(_, value)
-                            self:updateOpacityLabel(value)
-                        end,
-                    })
-                end
-                return UI.CreateTextEntry(parent, {
-                    onlyNumbers = true, maxTextLength = 5,
+                return UI.CreateSlider(parent, {
+                    id = id .. ":slider",
+                    target = self,
+                    min = 0,
+                    max = 25,
+                    step = 1,
+                    value = value,
+                    onChange = function(_, nextValue)
+                        UI.SetLabelText(row.valueLabel, formatLift(nextValue))
+                    end,
                 })
             end,
         })
-        local field = { row = row, label = row.label,
-            entry = not opacity and row.control or nil,
-            slider = opacity and row.control or nil,
-            valueLabel = row.valueLabel }
-        self.fields[definition.id] = field
+        -- Every field exposes the same contract: the layout owns the row,
+        -- while the settings logic owns the control and display label.
+        return {
+            row = row,
+            label = row.label,
+            slider = row.control,
+            valueLabel = row.valueLabel,
+        }
     end
+    self.fields.surfaceLift = createLiftField(
+        "command-hub-setting-row:surface-lift",
+        "UI_PNC_CommandHub_Settings_SurfaceLift",
+        "Surface opacity lift", Options.GetSurfaceOpacityLift() * 100)
+    self.fields.detailLift = createLiftField(
+        "command-hub-setting-row:detail-lift",
+        "UI_PNC_CommandHub_Settings_DetailLift",
+        "Detail opacity lift", Options.GetDetailOpacityLift() * 100)
+    local titlebarScaleRow
+    titlebarScaleRow = UI.CreateFormRow(self, {
+        id = "command-hub-setting-row:titlebar-scale",
+        label = tr("UI_PNC_CommandHub_Settings_TitlebarScale",
+            "Title-bar control size"),
+        valueLabel = true,
+        valueText = formatControlScale(
+            Options.GetTitlebarControlScale() * 100),
+        createControl = function(parent)
+            return UI.CreateSlider(parent, {
+                id = "command-hub-titlebar-scale",
+                target = self,
+                min = 50,
+                max = 125,
+                step = 1,
+                value = Options.GetTitlebarControlScale() * 100,
+                onChange = function(_, value)
+                    UI.SetLabelText(titlebarScaleRow.valueLabel,
+                        formatControlScale(value))
+                end,
+            })
+        end,
+    })
+    self.fields.titlebarScale = {
+        row = titlebarScaleRow,
+        label = titlebarScaleRow.label,
+        slider = titlebarScaleRow.control,
+        valueLabel = titlebarScaleRow.valueLabel,
+    }
     self.helpLabel = label(self,
         tr("UI_PNC_CommandHub_Settings_Help",
-            "Edit the hub position, dimensions, and opacity."),
+            "Adjust opacity, child surface lifts, title-bar controls, theme, and panel side here."),
         Theme.colors.textMuted)
+    self.themeButton = UI.CreateButton(self, {
+        id = "theme", title = themeTitle(), target = self,
+        onclick = ISPNCCommandHubSettingsWindow.onThemeCycle,
+        variant = "quiet",
+    })
     self.branchButton = UI.CreateButton(self, {
         id = "branch", title = branchTitle(), target = self,
         onclick = ISPNCCommandHubSettingsWindow.onBranchToggle,
@@ -189,14 +248,23 @@ end
 function ISPNCCommandHubSettingsWindow:populate()
     local hub = self:getHub()
     if not hub then return end
-    setEntry(self.fields.x.entry, hub:getX())
-    setEntry(self.fields.y.entry, hub:getY())
-    setEntry(self.fields.width.entry, hub:getWidth())
-    setEntry(self.fields.height.entry, hub:getHeight())
     local opacity = Options.GetOpacityPercent()
     self.fields.opacity.slider:setValue(opacity, true)
     self:updateOpacityLabel(opacity)
+    local surfaceLift = Options.GetSurfaceOpacityLift() * 100
+    self.fields.surfaceLift.slider:setValue(surfaceLift, true)
+    UI.SetLabelText(self.fields.surfaceLift.valueLabel,
+        formatLift(surfaceLift))
+    local detailLift = Options.GetDetailOpacityLift() * 100
+    self.fields.detailLift.slider:setValue(detailLift, true)
+    UI.SetLabelText(self.fields.detailLift.valueLabel,
+        formatLift(detailLift))
+    local titlebarScale = Options.GetTitlebarControlScale() * 100
+    self.fields.titlebarScale.slider:setValue(titlebarScale, true)
+    UI.SetLabelText(self.fields.titlebarScale.valueLabel,
+        formatControlScale(titlebarScale))
     self.branchButton:setTitle(branchTitle())
+    self.themeButton:setTitle(themeTitle())
 end
 
 function ISPNCCommandHubSettingsWindow:onReset()
@@ -204,13 +272,30 @@ function ISPNCCommandHubSettingsWindow:onReset()
         .. tostring(Hub.instance ~= nil))
     local hub = self:getHub()
     if hub then
-        Options.ResetGeometry(hub)
+        Options.Reset()
+        Theme.Reset()
         applyOpacityToWindows(hub, Options.GetOpacity())
+        Options.ApplyRegisteredToolbarScale()
     end
     self:populate()
     self:setStatus(tr("UI_PNC_CommandHub_Settings_Applied",
         "Settings applied."))
     trace("pnc_settings_reset_result", "result=true")
+end
+
+function ISPNCCommandHubSettingsWindow:onThemeCycle()
+    local ids = Theme.GetPresetIDs()
+    local current = Theme.GetPresetID()
+    local index = 1
+    for position, id in ipairs(ids) do
+        if id == current then index = position end
+    end
+    local nextIndex = index + 1
+    if nextIndex > #ids then nextIndex = 1 end
+    Theme.SetPreset(ids[nextIndex])
+    self.themeButton:setTitle(themeTitle())
+    self:setStatus(tr("UI_PNC_CommandHub_Settings_Applied",
+        "Settings applied."))
 end
 
 function ISPNCCommandHubSettingsWindow:onBranchToggle()
@@ -241,26 +326,27 @@ function ISPNCCommandHubSettingsWindow:onApply()
         trace("pnc_settings_apply_result", "result=false reason=missing_hub")
         return
     end
-    local x = readInteger(self.fields.x.entry, 0)
-    local y = readInteger(self.fields.y.entry, 0)
-    local width = readInteger(self.fields.width.entry, 1)
-    local height = readInteger(self.fields.height.entry, 1)
     local opacity = math.floor(self.fields.opacity.slider:getValue() + 0.5)
-    if not x or not y or not width or not height or not opacity then
+    if not opacity then
         self:setStatus(tr("UI_PNC_CommandHub_Settings_Invalid",
-            "Enter valid numeric values."))
+            "Enter a valid opacity value."))
         trace("pnc_settings_apply_result", "result=false reason=invalid_values")
         return
     end
-    Options.ApplyGeometry(hub, x, y, width, height)
     Options.SetOpacityPercent(opacity)
+    Options.SetSurfaceOpacityLift(
+        math.floor(self.fields.surfaceLift.slider:getValue() + 0.5) / 100)
+    Options.SetDetailOpacityLift(
+        math.floor(self.fields.detailLift.slider:getValue() + 0.5) / 100)
+    Options.SetTitlebarControlScale(
+        math.floor(self.fields.titlebarScale.slider:getValue() + 0.5) / 100)
     applyOpacityToWindows(hub, opacity / 100)
+    Options.ApplyRegisteredToolbarScale()
     self:populate()
     self:setStatus(tr("UI_PNC_CommandHub_Settings_Applied",
         "Settings applied."))
-    trace("pnc_settings_apply_result", "result=true x=" .. tostring(x)
-        .. " y=" .. tostring(y) .. " width=" .. tostring(width)
-        .. " height=" .. tostring(height) .. " opacity=" .. tostring(opacity))
+    trace("pnc_settings_apply_result", "result=true opacity="
+        .. tostring(opacity))
 end
 
 function ISPNCCommandHubSettingsWindow:onClose()
@@ -300,11 +386,11 @@ function SettingsUI.Open(owner)
         window = UI.NewWindow(ISPNCCommandHubSettingsWindow, {
             title = tr("UI_PNC_CommandHub_Settings_Title", "COMMAND HUB SETTINGS"),
             resizable = true,
-            persistenceKey = "PNC.CommandHub.Settings.v2",
+            persistenceKey = "PNC.CommandHub.Settings",
             responsiveSpec = {
-                width = 420, height = 340,
-                minWidth = 360, minHeight = 330,
-                maxWidth = 620, maxHeight = 540,
+                width = 420, height = 410,
+                minWidth = 340, minHeight = 390,
+                maxWidth = 700, maxHeight = 600,
             },
         })
         window:initialise()

@@ -7,10 +7,25 @@ local RESEARCH_LABEL = tr("UI_PNC_WorkScene_Research")
 local CRAFT_LABEL = tr("UI_PNC_WorkScene_Craft")
 local DISASSEMBLY_LABEL = tr("UI_PNC_WorkScene_Disassemble")
 local CONSTRUCTION_LABEL = tr("UI_PNC_WorkScene_Construct")
+local CORPSE_GRAB_LABEL = tr("UI_PNC_WorkScene_CorpseGrab")
+local CORPSE_DROP_LABEL = tr("UI_PNC_WorkScene_CorpseDrop")
 
 local function interrupts()
     return { movement = true, combat = true, externalBump = true,
         abstract = true }
+end
+
+local function startCorpseGrab(_, zombie)
+    if zombie and zombie.setVariable then
+        zombie:setVariable("PNCZombieBitingNPC", true)
+    end
+    return true
+end
+
+local function stopCorpseGrab(_, zombie)
+    if zombie and zombie.setVariable then
+        zombie:setVariable("PNCZombieBitingNPC", false)
+    end
 end
 
 Scenes.Register("production.research", {
@@ -64,5 +79,40 @@ Scenes.Register("production.construct", {
     },
     interrupts = interrupts(),
 })
+
+Scenes.Register("production.corpse_grab", {
+    label = CORPSE_GRAB_LABEL,
+    description = tr("UI_PNC_WorkScene_CorpseGrabDescription"),
+    category = "production", priority = 50, repeatMode = "once",
+    blocking = false, bump = "BiteLow", durationMs = 900,
+    onStart = startCorpseGrab,
+    onStop = stopCorpseGrab,
+    interrupts = interrupts(),
+})
+
+Scenes.Register("production.corpse_drop", {
+    label = CORPSE_DROP_LABEL,
+    description = tr("UI_PNC_WorkScene_CorpseDropDescription"),
+    category = "production", priority = 50, repeatMode = "once",
+    blocking = false, bump = "Loot", durationMs = 900,
+    interrupts = interrupts(),
+})
+
+if PNC.WorkSequence and PNC.WorkSequence.Register then
+    PNC.WorkSequence.Register("CORPSE_HAUL", {
+        actions = {
+            GRAB_PENDING = {
+                sceneId = "production.corpse_grab",
+                durationMs = 900,
+                reason = "corpse_haul_grab",
+            },
+            DROP_PENDING = {
+                sceneId = "production.corpse_drop",
+                durationMs = 900,
+                reason = "corpse_haul_drop",
+            },
+        },
+    })
+end
 
 return true

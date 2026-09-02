@@ -43,8 +43,19 @@ function Behavior.ResolveIntent(observerRecord, target, context)
         and Factions.Registry.byID[observerFactionID] or nil
     local targetFactionID, targetKey, targetRecord =
         targetContext(target)
+    local personal = targetKey and observerRecord.social
+        and observerRecord.social.relationships
+        and observerRecord.social.relationships[targetKey] or nil
     if not observerFaction then
-        local hostile = observerRecord.hostility
+        local owned = observerRecord.recruited == true
+            or tostring(observerRecord.ownerUsername or "") ~= ""
+            or observerRecord.ownerOnlineID ~= nil
+        local personalEnemy = EntityRef.IsPlayer(targetKey)
+            and targetRecord == nil
+            and personal
+            and personal.state == "enemy"
+            and not owned
+        local hostile = personalEnemy or observerRecord.hostility
             and (
                 targetRecord
                     and observerRecord.hostility.attackNPCs
@@ -56,7 +67,8 @@ function Behavior.ResolveIntent(observerRecord, target, context)
             attackAllowed = hostile,
             pursueAllowed = hostile,
             commandable = false,
-            reason = hostile and "tactical_hostility"
+            reason = personalEnemy and "personal_enemy"
+                or hostile and "tactical_hostility"
                 or "unaffiliated_neutral",
         }
         if context.returnDebugTrace == true then
@@ -85,9 +97,6 @@ function Behavior.ResolveIntent(observerRecord, target, context)
     local state = relation
         and PNC.FactionDiplomacyMath.ResolveState(relation, at)
         or "unknown"
-    local personal = targetKey and observerRecord.social
-        and observerRecord.social.relationships
-        and observerRecord.social.relationships[targetKey] or nil
     local samePlayerOwnedFaction = sameFaction
         and factionHasPlayerMembers(observerFaction)
     local targetIsOwner = targetKey ~= nil

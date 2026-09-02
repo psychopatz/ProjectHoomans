@@ -47,6 +47,12 @@ function Internal.BeginRequest(body, finalTarget, navigation, now, reason)
     if not multiplayerAuthority then
         local behavior = Internal.GetPathBehavior(body)
         behavior:pathToLocation(x, y, z)
+        -- PathFindBehavior2 may re-enter the vanilla WalkTowardState while
+        -- publishing path2.  The request owner is PNC's Behavior2 pump, so
+        -- release that stale state after the request as well as before it.
+        -- Otherwise IsoGameCharacter.doDeferredMovement sees both owners and
+        -- discards/slow-walks the native route.
+        Internal.EnsureNativeMovementOwner(body)
     end
     navigation.requestPending = true
     navigation.nativeActive = true

@@ -78,7 +78,7 @@ relationship.ReceivePresentation({
 relationship.ReceivePresentation({
     npcID = "npc-observe",
     approval = 14,
-    respect = 5,
+    respect = 7,
     familiarity = 2,
     revision = 2,
 })
@@ -110,7 +110,12 @@ local rendered = PNC.NameplateRelationshipFeedbackRenderer.Draw(
 T.truthy(rendered, "relationship feedback renderer draws an active record")
 T.truthy(#calls.lines > 0, "renderer emits arrow strokes")
 T.truthy(#calls.rects > 0, "renderer emits the arrow stem")
-T.equal(calls.texts[1], "+4.0", "renderer exposes the signed relationship amount")
+T.truthy(PNC.NameplateRelationshipFeedbackRenderer.ARROW_SIZE > 12,
+    "renderer uses a larger readable arrow size")
+T.equal(calls.texts[1], "Approval +4.0",
+    "renderer labels the approval relationship amount")
+T.equal(calls.texts[6], "Respect +2.0",
+    "renderer labels the respect relationship amount")
 T.equal(PNC.NameplateRelationshipFeedbackRenderer.Colors.up.g, 1.0,
     "positive arrow uses green")
 T.equal(PNC.NameplateRelationshipFeedbackRenderer.Colors.down.r, 1.0,

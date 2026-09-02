@@ -8,6 +8,7 @@ local Repository = PNC.SettlementRepository
 local EventsBus = PsychopatzCore and PsychopatzCore.Events
 local Zones = require "PsychopatzCore/World/PC_ZoneRegistry"
 local GridRegion = require "PsychopatzCore/World/PC_GridRegion"
+local FacilityState = require "PNC/Core/Settlement/PNC_FacilityState"
 
 local function numericKeys(source)
     local keys = {}
@@ -152,7 +153,7 @@ end
 local function facilityNode(base, facility, preferredX, preferredY, preferredZ,
     requireLoaded)
     if not facility or facility.definitionId ~= "stockpile"
-        or (facility.constructionState ~= "BUILT"
+        or (not FacilityState.IsBuilt(facility)
             and facility.constructionState ~= "RECONSTRUCTING")
     then return nil end
     local region

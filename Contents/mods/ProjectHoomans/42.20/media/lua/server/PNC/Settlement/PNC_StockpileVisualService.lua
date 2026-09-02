@@ -8,6 +8,7 @@ local Service = PNC.StockpileVisualService
 local Repository = PNC.SettlementRepository
 local Definitions = PNC.FacilityDefinitions
 local World = require "PNC/Settlement/PNC_StockpileVisualService_World"
+local FacilityState = require "PNC/Core/Settlement/PNC_FacilityState"
 local Pending = Service.Pending or {}
 local PendingDueAt = Service.PendingDueAt or {}
 local PointIndex = Service.PointIndex or {}
@@ -42,9 +43,7 @@ local function isStockpile(facility)
 end
 
 local function isBuilt(facility)
-    if not facility then return false end
-    local state = tostring(facility.constructionState or "")
-    return state == "" or state == "BUILT"
+    return FacilityState.IsBuilt(facility)
 end
 
 local function pointFromRegion(region)

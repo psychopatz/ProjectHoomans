@@ -247,8 +247,8 @@ function Scheduler.QueueLivePickup(record, storage, request, selected, state)
         factionId = storage.ownerFactionId, baseId = base.id,
         -- Provision is a home-only pickup. An away worker is returned home by
         -- WorkService before this durable order is retried.
-        requiresHome = true,
-        autoReturnHome = true,
+        locationPolicy = { start = "HOME", execution = "HOME",
+            returnHome = "HOME" },
         requiredWork = 1, priority = request.priority,
         payload = {
             storageId = storage.id, reservationId = reservation.id,

@@ -38,6 +38,19 @@ function Resolution.ApplyTargetDamage(attackerRecord, attackerBody, target, opti
                 }
             )
         end
+        if applied == true
+            and attackerRecord
+            and PNC.SocialEventHooksInternal
+            and PNC.SocialEventHooksInternal.RecordNPCDamagedPlayer
+        then
+            pcall(
+                PNC.SocialEventHooksInternal.RecordNPCDamagedPlayer,
+                target.player,
+                attackerRecord,
+                attackerBody,
+                hit
+            )
+        end
         return applied == true, applied == true and "hit_player" or "invalid_player_target", hit
     end
     if target.kind == "npc" then

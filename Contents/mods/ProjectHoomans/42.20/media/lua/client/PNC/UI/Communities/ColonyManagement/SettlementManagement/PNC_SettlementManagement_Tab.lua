@@ -3,6 +3,7 @@ require "PsychopatzCore/UI/PsychopatzUI"
 local Actions = require "PNC/UI/Communities/ColonyManagement/SettlementManagement/PNC_SettlementManagement_Actions"
 local Browser = require "PNC/UI/Communities/ColonyManagement/SettlementManagement/PNC_SettlementManagement_FacilityBrowser"
 local LayoutOverlay = require "PNC/UI/Communities/ColonyManagement/PNC_SettlementLayoutOverlay"
+local FacilityState = require "PNC/Core/Settlement/PNC_FacilityState"
 
 local Tab = {}
 local UI = PsychopatzCore.UI
@@ -61,8 +62,7 @@ end
 function Tab.UpdateContextControls(window)
     local facility = Browser.GetSelected(window)
     local active = window.tab == "base" and facility ~= nil
-    local built = active and (facility.constructionState == nil
-        or facility.constructionState == "BUILT")
+    local built = active and FacilityState.IsBuilt(facility)
     local index
     for index = 1, #(window.baseContextControls or {}) do
         local button = window.baseContextControls[index]

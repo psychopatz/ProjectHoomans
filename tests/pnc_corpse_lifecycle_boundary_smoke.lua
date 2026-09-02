@@ -1,0 +1,34 @@
+local T = require "tests/support/test"
+
+local deathSource = T.read(
+    "ProjectHoomans",
+    "shared",
+    "PNC/Core/Health/PNC_Health/PNC_Health_Death.lua"
+)
+local auditSource = T.read(
+    "ProjectHoomans",
+    "shared",
+    "PNC/Core/Presence/PNC_BodyLifecycle/PNC_BodyLifecycle_Audit.lua"
+)
+local corpseSource = T.read(
+    "ProjectHoomans",
+    "shared",
+    "PNC/Core/Presence/PNC_BodyLifecycle/PNC_BodyLifecycle_Corpses.lua"
+)
+
+T.contains(deathSource, "PNC.BodyLifecycle.CreateVanillaCorpse",
+    "death uses the canonical corpse conversion entry point")
+T.falsy(deathSource:find("CreateInertCorpse", 1, true),
+    "death has no removed corpse compatibility alias")
+T.contains(auditSource, "Lifecycle.CreateVanillaCorpse",
+    "body audit uses the canonical corpse conversion entry point")
+T.falsy(auditSource:find("CreateInertCorpse", 1, true),
+    "body audit has no removed corpse compatibility alias")
+T.contains(corpseSource, "zombie:becomeCorpseSilently()",
+    "corpse conversion uses the engine-owned handoff")
+T.falsy(corpseSource:find("IsoDeadBody.new", 1, true),
+    "corpse conversion has no direct-construction fallback")
+T.falsy(corpseSource:find("CreateInertCorpse", 1, true),
+    "body lifecycle exposes no removed compatibility alias")
+
+T.finish("pnc_corpse_lifecycle_boundary_smoke")

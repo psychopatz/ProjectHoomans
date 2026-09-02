@@ -139,12 +139,6 @@ function Lifecycle.CreateVanillaCorpse(record, zombie, reason)
         corpse = zombie:becomeCorpseSilently()
         converted = true
     end
-    -- Retain direct construction only as a compatibility fallback for engine
-    -- objects that do not expose the normal conversion method or reject it.
-    if not converted and IsoDeadBody and IsoDeadBody.new then
-        corpse = IsoDeadBody.new(zombie, false, true)
-        converted = corpse ~= nil
-    end
     if not corpse then
         if converted then
             Internal.scheduleCorpseFinalize(record, x, y, z, token, reason or "death", wornEntries)
@@ -158,9 +152,8 @@ function Lifecycle.CreateVanillaCorpse(record, zombie, reason)
     Internal.detachLiveBody(record, reason or "death")
     Internal.mark(record, "corpse", "missing", reason or "death")
     if corpse then
-        -- IsoDeadBody conversion can discard a source-body item on fallback
-        -- engine paths. Guarantee the stable quest identity on the final
-        -- vanilla-owned container before the one complete-corpse MP sync.
+        -- Guarantee the stable quest identity on the final vanilla-owned
+        -- container before the one complete-corpse MP sync.
         Internal.ensureCorpseIdentityCard(record, corpse)
         Internal.applyCorpseWornItems(corpse, wornEntries)
         Internal.stampCorpse(record, corpse, token)
@@ -169,6 +162,3 @@ function Lifecycle.CreateVanillaCorpse(record, zombie, reason)
     end
     return converted, corpse
 end
-
--- Compatibility for integrations written before engine-owned corpse handoff.
-Lifecycle.CreateInertCorpse = Lifecycle.CreateVanillaCorpse

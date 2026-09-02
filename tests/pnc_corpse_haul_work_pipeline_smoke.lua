@@ -8,8 +8,10 @@ PsychopatzCore = {
 
 local clock, sequence = 1000, 0
 local atHome = false
-local sentSync = {}
 local manualLogs = {}
+local actionStates = {}
+local pathResets = 0
+local sceneStops = 0
 local deepCopy
 deepCopy = function(value)
     if type(value) ~= "table" then return value end
@@ -20,50 +22,61 @@ end
 
 local corpse = {
     x = 40, y = 40, z = 0,
-    data = { PNC_DeathMarkerID = "dead:one", PNC_CorpseHaulToken = "corpse:one" },
+    data = {
+        PNC_DeathMarkerID = "dead:one",
+        PNC_CorpseToken = "lifecycle:one",
+        PNC_CorpseHaulToken = "corpse:one",
+    },
 }
 local untrackedCorpse = { x = 40, y = 40, z = 0, data = {} }
-local player = { x = 5, y = 5, onlineID = 77 }
-local grappleTarget = { onlineID = 501 }
-function player:getX() return self.x end
-function player:getY() return self.y end
-function player:getOnlineID() return self.onlineID end
-function grappleTarget:getOnlineID() return self.onlineID end
 function corpse:getX() return self.x end
 function corpse:getY() return self.y end
 function corpse:getZ() return self.z end
+function corpse:setX(value) self.x = value end
+function corpse:setY(value) self.y = value end
+function corpse:setZ(value) self.z = value end
 function corpse:getModData() return self.data end
 function corpse:transmitModData() self.transmitted = true end
+function corpse:getSquare() return self.square end
 function untrackedCorpse:getX() return self.x end
 function untrackedCorpse:getY() return self.y end
 function untrackedCorpse:getZ() return self.z end
 function untrackedCorpse:getModData() return self.data end
 
 local squares
-local body = { x = 5, y = 5, z = 0, dragging = false }
+local gridLookups = 0
+local body = {
+    x = 5, y = 5, z = 0,
+}
 function body:getX() return self.x end
 function body:getY() return self.y end
 function body:getZ() return self.z end
-function body:isDraggingCorpse() return self.dragging end
-function body:pickUpCorpse(targetCorpse)
-    self.dragging, self.targetCorpse = true, targetCorpse
-end
-function body:getGrapplingTarget() return grappleTarget end
-function body:setDoGrappleLetGo()
-    self.dragging = false
-    if self.targetCorpse then
-        self.targetCorpse.x, self.targetCorpse.y = 60, 60
-        squares["60:60:0"].corpses = { self.targetCorpse }
-        squares["40:40:0"].corpses = {}
-    end
+function body:getSquare()
+    return squares[tostring(math.floor(self.x)) .. ":"
+        .. tostring(math.floor(self.y)) .. ":0"]
 end
 
 squares = {
-    ["40:40:0"] = { corpses = { corpse, untrackedCorpse } },
-    ["60:60:0"] = { corpses = {} },
+    ["40:40:0"] = { corpses = {}, canReachTo = function() return true end },
+    ["60:60:0"] = { corpses = {}, canReachTo = function() return true end },
 }
+for _, square in pairs(squares) do
+    function square:removeCorpse(item)
+        for index = #self.corpses, 1, -1 do
+            if self.corpses[index] == item then table.remove(self.corpses, index) end
+        end
+        item.square = nil
+    end
+    function square:addCorpse(item)
+        self.corpses[#self.corpses + 1] = item
+        item.square = self
+    end
+end
+squares["40:40:0"].corpses = { corpse, untrackedCorpse }
+corpse.square = squares["40:40:0"]
 getCell = function()
     return { getGridSquare = function(_, x, y, z)
+        gridLookups = gridLookups + 1
         return squares[tostring(x) .. ":" .. tostring(y) .. ":" .. tostring(z)]
     end }
 end
@@ -82,7 +95,6 @@ package.preload["PsychopatzCore/World/PC_GridRegion"] = function()
 end
 
 PNC = {
-    Const = { CMD_CORPSE_HAUL_ACTION = "CorpseHaulAction" },
     Core = {
         Now = function() return clock end,
         Log = function(level, message)
@@ -99,10 +111,6 @@ PNC = {
             local dx, dy = x1 - x2, y1 - y2
             return math.sqrt(dx * dx + dy * dy)
         end,
-        ForEachPlayer = function(callback) callback(player) end,
-        ResolvePlayerByOnlineID = function(id)
-            return tonumber(id) == player.onlineID and player or nil
-        end,
     },
     Tasking = {
         Providers = {},
@@ -112,6 +120,27 @@ PNC = {
     Registry = { Data = {} },
     OrderSystem = {
         SetOrder = function(record, order) record.orderSpec = order end,
+    },
+    PathService = {
+        Commands = {
+            Reset = function(record)
+                pathResets = pathResets + 1
+                if record and record.runtime then
+                    record.runtime.pathing = nil
+                    record.runtime.moveIntent = nil
+                    record.runtime.localNavigation = nil
+                end
+            end,
+        },
+    },
+    AnimationScenes = {
+        Stop = function(record)
+            sceneStops = sceneStops + 1
+            if record and record.runtime then
+                record.runtime.animationScene = nil
+            end
+            return true
+        end,
     },
     HomeDutyService = {
         IsAtHome = function() return atHome end,
@@ -126,12 +155,26 @@ PNC = {
                 end
             end,
             stampCorpse = function() return true end,
-        },
-    },
-    Network = {
-        Internal = {
-            SendToPlayer = function(_, command, payload)
-                sentSync[#sentSync + 1] = { command = command, args = payload }
+            moveCorpse = function(item, destination, x, y, z)
+                local source = item.square
+                source:removeCorpse(item, false)
+                item.x, item.y, item.z = x + 0.5, y + 0.5, z
+                destination:addCorpse(item, false)
+                return true
+            end,
+            followCorpse = function(item, x, y, z)
+                local source = item.square
+                local destination = squares[tostring(math.floor(x)) .. ":"
+                    .. tostring(math.floor(y)) .. ":"
+                    .. tostring(math.floor(z))]
+                if not source or not destination then
+                    return false, "CORPSE_FOLLOW_DESTINATION_UNAVAILABLE"
+                end
+                if source ~= destination then
+                    source:removeCorpse(item, false)
+                    destination:addCorpse(item, false)
+                end
+                item.x, item.y, item.z = x, y, z
                 return true
             end,
         },
@@ -156,7 +199,13 @@ PNC = {
         Save = function() end,
     },
 }
-isMultiplayer = function() return true end
+PNC.WorkSequence = {
+    Status = function(_, order)
+        return actionStates[order.phase] or "pending"
+    end,
+    GetState = function() return nil end,
+    Reset = function() end,
+}
 
 PNC.BaseService = {
     Get = function(id)
@@ -203,6 +252,22 @@ local Provider = T.load("ProjectHoomans", "server",
     "PNC/Tasking/PNC_WorkTaskProvider.lua")
 local CorpseService = T.load("ProjectHoomans", "server",
     "PNC/Tasking/PNC_CorpseHaulService.lua")
+-- Keep the pipeline deterministic while still exercising the visible-carry
+-- phase; the low-level world-transfer smoke covers cross-tile membership.
+CorpseService.CORPSE_CARRY_OFFSET = 0
+
+local lifecycleOnlyCorpse = {
+    data = { PNC_CorpseToken = "lifecycle:only" },
+}
+function lifecycleOnlyCorpse:getModData() return self.data end
+T.falsy(CorpseService.GetCorpseToken(lifecycleOnlyCorpse, false),
+    "persistent lifecycle identity is not treated as a haul reservation")
+local generatedHaulToken = CorpseService.GetCorpseToken(
+    lifecycleOnlyCorpse, true)
+T.truthy(generatedHaulToken,
+    "a haul reservation gets its own token when needed")
+T.equal(lifecycleOnlyCorpse.data.PNC_CorpseHaulToken, generatedHaulToken,
+    "haul reservation is stored in the haul-specific field")
 
 local saved, saveReason = CorpseService.SetConfiguration({}, {
     baseId = "base:one",
@@ -221,6 +286,21 @@ local totalCorpses, eligibleCorpses = CorpseService.CountCorpsesInRegion(
 T.equal(totalCorpses, 2, "source zone reports every corpse object")
 T.equal(eligibleCorpses, 2,
     "ordinary human corpses are eligible without a Hoomans death marker")
+T.falsy(untrackedCorpse.data.PNC_CorpseHaulToken,
+    "corpse counting does not stamp haul tokens")
+local cachedTotal, cachedEligible = CorpseService.GetSourceCorpseCounts(
+    PNC.SettlementRepository.State.bases["base:one"])
+local lookupsAfterCount = gridLookups
+local cachedTotalAgain, cachedEligibleAgain = CorpseService.GetSourceCorpseCounts(
+    PNC.SettlementRepository.State.bases["base:one"])
+T.equal(cachedTotal, 2, "source count cache reports physical corpses")
+T.equal(cachedEligible, 2, "source count cache reports eligible corpses")
+T.equal(cachedTotalAgain, cachedTotal,
+    "source count cache returns the same physical count")
+T.equal(cachedEligibleAgain, cachedEligible,
+    "source count cache returns the same eligible count")
+T.equal(gridLookups, lookupsAfterCount,
+    "source count cache avoids a second world scan")
 
 CorpseService.Pump(1000)
 local order = T.truthy(Work.Queries.List()[1],
@@ -229,6 +309,20 @@ T.equal(order.operation, "CORPSE_HAUL",
     "scanner queues the corpse operation in WorkService")
 T.equal(order.payload.sourceX, 40, "queued source remains outside the home base")
 T.equal(order.payload.dropX, 60, "queued destination remains outside the home base")
+T.falsy(untrackedCorpse.data.PNC_CorpseHaulToken,
+    "corpse discovery does not stamp unselected corpses")
+CorpseService.Pump(3000)
+local pendingCorpseOrders = 0
+for _, queuedOrder in ipairs(Work.Queries.List()) do
+    if queuedOrder.operation == "CORPSE_HAUL"
+        and queuedOrder.status ~= Definitions.STATUS.COMPLETED
+        and queuedOrder.status ~= Definitions.STATUS.CANCELLED
+    then
+        pendingCorpseOrders = pendingCorpseOrders + 1
+    end
+end
+T.equal(pendingCorpseOrders, 1,
+    "automatic corpse hauling keeps one pending order per base")
 
 local candidates = Provider.GetCandidates(record.id)
 T.equal(#candidates, 0, "away resident cannot receive home-only corpse work")
@@ -280,13 +374,6 @@ T.equal(record.orderSpec.operation, "CORPSE_HAUL",
 
 local lease = T.truthy(Leases.Create(candidates[1], assignment),
     "shared task lease is created")
-local physicalAssignment = {
-    haulToken = order.payload.haulToken,
-    sourceX = order.payload.sourceX, sourceY = order.payload.sourceY,
-    sourceZ = order.payload.sourceZ, dropX = order.payload.dropX,
-    dropY = order.payload.dropY, dropZ = order.payload.dropZ,
-    destinationRegion = order.payload.destinationRegion,
-}
 PNC.Tasking.Commands.Complete = function() return true end
 PNC.Tasking.Commands.CancelLease = function() return true end
 T.truthy(Provider.Tick(lease), "shared work provider ticks corpse operation")
@@ -300,79 +387,55 @@ T.equal(corpse.data.PNC_CorpseHaulTaskId, order.id,
 body.x, body.y = 40, 40
 T.equal(lease.taskId, order.id, "lease points at the durable corpse task")
 T.truthy(CorpseService.GetTask(lease.taskId),
-    "durable corpse task is available to the action boundary")
-T.equal(type(isMultiplayer), "function", "MP fixture exposes the session role")
-T.equal(isMultiplayer(), true, "MP fixture identifies as multiplayer")
-T.truthy(PNC.Network and PNC.Network.Internal
-    and PNC.Network.Internal.SendToPlayer,
-    "MP fixture exposes the corpse sync transport")
-T.equal(type(PNC.Network.Internal.SendToPlayer), "function",
-    "MP fixture exposes a callable corpse sync transport")
-T.truthy(CorpseService.SendAction(lease, physicalAssignment, "grab"),
-    "the server applies the native grapple directly")
-T.truthy(body.dragging, "native grapple attaches the corpse")
-T.equal(CorpseService.GetTask(order.id).visualSyncPending, false,
-    "authoritative grapple completes its MP sync send")
-T.equal(#sentSync, 1, "authoritative grapple emits one MP sync command")
-T.equal(sentSync[1].args.action, "sync_grab",
-    "authoritative grapple sends an MP visual synchronization command")
-body.x, body.y = 60, 60
-local dropped, dropReason = CorpseService.SendAction(lease, physicalAssignment,
-    "drop")
-T.truthy(dropped, "the server applies the native release directly: "
-    .. tostring(dropReason))
-T.falsy(body.dragging, "native release detaches the corpse")
-T.equal(sentSync[2].args.action, "sync_drop",
-    "authoritative release sends an MP visual synchronization command")
-
-isMultiplayer = function() return false end
-body.x, body.y, body.dragging, body.targetCorpse = 40, 40, false, nil
-corpse.x, corpse.y = 40, 40
-squares["40:40:0"].corpses = { corpse }
-squares["60:60:0"].corpses = {}
-T.truthy(CorpseService.SendAction(lease, physicalAssignment, "grab"),
-    "the singleplayer server applies the native grapple directly")
-body.x, body.y = 60, 60
-T.truthy(CorpseService.SendAction(lease, physicalAssignment, "drop"),
-    "the singleplayer server applies the native release directly")
-T.equal(#sentSync, 2,
-    "singleplayer performs the grapple without an MP sync command")
-
--- Drive the operation through the shared provider tick. The real grapple
--- action boundary is covered separately; this verifies that the operation
--- phases are still owned by WorkService rather than a second task domain.
-CorpseService.SendAction = function(_, _, action)
-    if action == "grab" then body.dragging = true end
-    if action == "drop" then
-        body.dragging = false
-        corpse.x, corpse.y = 60, 60
-        squares["60:60:0"].corpses = { corpse }
-    end
-    return true
-end
+    "durable corpse task is available to the sequence boundary")
 body.x, body.y = 40, 40
-T.truthy(Provider.Tick(lease), "source grapple phase is dispatched by work")
+T.truthy(Provider.Tick(lease), "source approach is dispatched by work")
 T.equal(Work.Queries.Get(order.id).phase, "GRAB_PENDING",
-    "grab remains an operation phase on the durable order")
+    "grab animation remains an operation phase on the durable order")
+actionStates.GRAB_PENDING = "completed"
+T.truthy(Provider.Tick(lease), "grab animation completion is dispatched by work")
+T.equal(Work.Queries.Get(order.id).phase, "CARRYING",
+    "completed grab advances to visible corpse carry")
 body.x, body.y = 60, 60
-T.truthy(Provider.Tick(lease), "destination travel phase is dispatched by work")
-T.truthy(Provider.Tick(lease), "destination grapple phase is dispatched by work")
+T.truthy(Provider.Tick(lease), "visible corpse carry is dispatched by work")
 T.equal(Work.Queries.Get(order.id).phase, "DROP_PENDING",
-    "drop remains an operation phase on the durable order")
-T.truthy(Provider.Tick(lease), "drop completion is dispatched by work")
-T.truthy(Provider.Tick(lease), "completed corpse work is released by work")
+    "drop animation remains an operation phase on the durable order")
+actionStates.DROP_PENDING = "completed"
+local destinationSquare = squares["60:60:0"]
+squares["60:60:0"] = nil
+T.truthy(Provider.Tick(lease),
+    "drop waits instead of cancelling while the destination chunk is unloaded")
+T.equal(Work.Queries.Get(order.id).blockedReason,
+    "DESTINATION_CHUNK_LOADING",
+    "unloaded destination records a retryable world reason")
+squares["60:60:0"] = destinationSquare
+T.truthy(Provider.Tick(lease), "drop animation completion moves the corpse")
 T.equal(Work.Queries.Get(order.id).status, Definitions.STATUS.COMPLETED,
     "corpse completion uses the shared WorkService completion path")
+T.equal(corpse.square, squares["60:60:0"],
+    "completed corpse hauling moves the same world corpse to the dump zone")
+T.equal(corpse.x, 60.5, "corpse transfer preserves the destination position")
+T.equal(corpse.data.PNC_CorpseToken, "lifecycle:one",
+    "corpse hauling preserves the lifecycle identity token")
+T.falsy(corpse.data.PNC_CorpseHaulToken,
+    "completed corpse hauling clears its temporary haul token")
 T.falsy(record.runtime.workOrderId, "completed work releases the shared worker claim")
+T.truthy(pathResets > 0,
+    "completed corpse hauling resets the live movement lane")
+T.falsy(record.runtime.followState,
+    "completed corpse hauling clears stale follow ownership state")
 Leases.Release(lease.leaseId, "test_complete")
 
 -- Cancellation also goes through the durable operation cleanup hook, including
--- the corpse marker that protects lifecycle processing during a grapple.
+-- the corpse marker that protects lifecycle processing during the sequence.
 record.allowedJobs = nil
 corpse.x, corpse.y = 40, 40
 squares["40:40:0"].corpses = { corpse }
 squares["60:60:0"].corpses = {}
-CorpseService.Pump(4000)
+corpse.square = squares["40:40:0"]
+CorpseService.Pump(5000)
+T.falsy(Work.Queries.Get(order.id),
+    "terminal corpse orders are pruned from the durable work repository")
 local orderTwo
 for _, candidate in ipairs(Work.Queries.List()) do
     if candidate.status == Definitions.STATUS.QUEUED then
@@ -388,6 +451,13 @@ local leaseTwo = T.truthy(Leases.Create(candidatesTwo[1], assignmentTwo),
     "replacement corpse receives a shared lease")
 body.x, body.y = 5, 5
 T.truthy(Provider.Tick(leaseTwo), "replacement work records its physical state")
+record.runtime.animationScene = { id = "production.corpse_grab" }
+record.runtime.workSequence = { sceneId = "production.corpse_grab" }
+record.runtime.pathing = { phase = "active" }
+record.runtime.moveIntent = { kind = "move" }
+record.runtime.followState = { ownerMoving = true }
+local resetsBeforeCancel = pathResets
+local scenesBeforeCancel = sceneStops
 T.truthy(Work.Commands.Cancel(orderTwo.id, "test_cancel"),
     "corpse cancellation uses WorkService")
 T.equal(Work.Queries.Get(orderTwo.id).status, Definitions.STATUS.CANCELLED,
@@ -395,6 +465,13 @@ T.equal(Work.Queries.Get(orderTwo.id).status, Definitions.STATUS.CANCELLED,
 T.falsy(record.runtime.workOrderId, "cancellation releases the shared worker claim")
 T.falsy(corpse.data.PNC_CorpseHaulTaskId,
     "cancellation clears the corpse lifecycle marker")
+T.truthy(pathResets > resetsBeforeCancel,
+    "cancellation resets the live movement lane")
+T.truthy(sceneStops > scenesBeforeCancel,
+    "cancellation stops the active corpse interaction scene")
+T.falsy(record.runtime.followState,
+    "cancellation clears stale follow ownership state")
+Leases.Release(leaseTwo.leaseId, "test_cancel")
 
 -- A manual request must also be able to create the durable order directly
 -- when the automatic scanner has not queued it yet.
@@ -411,6 +488,47 @@ T.equal(createdOrder.requiredWorkerId, record.id,
     "direct manual corpse order binds to the selected worker")
 T.equal(createdOrder.payload.sourceX, 40,
     "direct manual corpse order preserves the external source zone")
+
+local createdCandidates = Provider.GetCandidates(record.id)
+local createdAssignment = T.truthy(Provider.Assign(createdCandidates[1]),
+    "manual corpse order can claim a worker before pause")
+local createdLease = T.truthy(Leases.Create(
+    createdCandidates[1],
+    createdAssignment
+), "paused corpse order receives a live lease")
+body.x, body.y = 40, 40
+T.truthy(Provider.Tick(createdLease),
+    "paused-order setup records the active corpse operation")
+actionStates.GRAB_PENDING = "completed"
+T.truthy(Provider.Tick(createdLease),
+    "paused-order setup enters visible corpse carry")
+T.equal(Work.Queries.Get(createdOrder.id).phase, "CARRYING",
+    "paused-order setup records the carry phase")
+T.truthy(Provider.Tick(createdLease),
+    "paused-order setup attaches the corpse to the worker projection")
+record.runtime.animationScene = { id = "production.corpse_drop" }
+record.runtime.workSequence = { sceneId = "production.corpse_drop" }
+record.runtime.pathing = { phase = "active" }
+record.runtime.moveIntent = { kind = "move" }
+local resetsBeforePause = pathResets
+local scenesBeforePause = sceneStops
+T.truthy(Work.Commands.Pause(createdOrder.id, true),
+    "pausing corpse work uses the operation cleanup boundary")
+T.equal(Work.Queries.Get(createdOrder.id).status, Definitions.STATUS.PAUSED,
+    "paused corpse order remains durable")
+T.truthy(pathResets > resetsBeforePause,
+    "pausing corpse work resets the live movement lane")
+T.truthy(sceneStops > scenesBeforePause,
+    "pausing corpse work stops the active interaction scene")
+T.falsy(record.runtime.followState,
+    "pausing corpse work clears stale follow ownership state")
+T.equal(corpse.data.PNC_CorpseHaulToken,
+    createdOrder.payload.haulToken,
+    "pausing visible carry preserves the corpse reservation for reassignment")
+T.equal(corpse.data.PNC_CorpseHaulTaskId,
+    createdOrder.id,
+    "pausing visible carry preserves the lifecycle protection marker")
+Leases.Release(createdLease.leaseId, "test_pause")
 
 local cleared, clearReason = CorpseService.ClearConfiguration({}, {
     baseId = "base:one",

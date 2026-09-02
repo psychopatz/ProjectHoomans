@@ -3,6 +3,7 @@ require "PNC/UI/Inventory/PNC_InventoryUI_List"
 local Workshop = {}
 local InventoryModel = require "PNC/UI/Inventory/PNC_InventoryUI_Model"
 local UI = PsychopatzCore and PsychopatzCore.UI or nil
+local FacilityState = require "PNC/Core/Settlement/PNC_FacilityState"
 local CATALOG_COLUMNS = {
     { key = "category", x = 0.43 }, { key = "quantity", x = 0.59 },
     { key = "availability", x = 0.72 }, { key = "action", x = 0.87 },
@@ -146,7 +147,7 @@ local function hasStation(snapshot, station)
     for _, facility in ipairs(snapshot.settlement
         and snapshot.settlement.facilities or {}) do
         if facility.definitionId == facilityId
-            and facility.constructionState == "BUILT"
+            and FacilityState.IsBuilt(facility)
         then
             for _, component in ipairs(facility.components or {}) do
                 if component.role == role then return true end

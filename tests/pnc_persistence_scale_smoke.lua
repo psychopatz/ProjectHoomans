@@ -177,7 +177,12 @@ for npcIndex = 1, 100 do
         persist = true,
         alive = true,
         recruited = false,
-        runtime = {},
+        runtime = {
+            workSequence = {
+                phase = "GRAB_PENDING",
+                startedAt = 1234,
+            },
+        },
         mapPresentation = {
             visibility = "known",
             knownBy = { scale_player = true },
@@ -270,6 +275,8 @@ T.truthy(totalBytes < 5 * 1024 * 1024,
         .. tostring(totalBytes))
 
 local restored = PNC.Persistence.DeserializeRecord(sample, "scale_npc_1")
+T.equal(restored.runtime.workSequence, nil,
+    "work sequence runtime state is rebuilt instead of persisted")
 T.equal(restored.health.body.parts.Head.current, 70,
     "compact health override round trip")
 T.equal(restored.health.body.parts.Neck.current, 92,

@@ -15,6 +15,7 @@ require "PNC/Social/RelationshipService/PNC_RelationshipService_InteractionJourn
 require "PNC/Social/RelationshipService/PNC_RelationshipService_Queries"
 require "PNC/Social/RelationshipService/PNC_RelationshipService_MemoryCommands"
 require "PNC/Social/RelationshipService/PNC_RelationshipService_EventMutation"
+require "PNC/Social/RelationshipService/PNC_RelationshipService_Consequences"
 require "PNC/Social/RelationshipService/PNC_RelationshipService_Maintenance"
 require "PNC/Social/RelationshipService/PNC_RelationshipService_PersonalBoundary"
 

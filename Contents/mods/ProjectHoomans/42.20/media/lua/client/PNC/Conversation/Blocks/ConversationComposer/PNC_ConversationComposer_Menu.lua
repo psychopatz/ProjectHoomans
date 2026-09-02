@@ -152,18 +152,24 @@ function Composer.BuildRootNode(context, options)
             or record.recruited == true
         if not recruited
         then
+            local function setRecruitPreview(highlighted)
+                if Relationship and Relationship.SetPreviewRequirement then
+                    Relationship.SetPreviewRequirement(
+                        context.npcID,
+                        highlighted and "recruit" or "inspect"
+                    )
+                end
+            end
             choices[#choices + 1] = {
                 id = "recruit",
                 text = dialoguePayload(
                     SYSTEM_SOURCE, "choice.recruit", context
                 ),
+                onHighlightChanged = function(_, highlighted)
+                    setRecruitPreview(highlighted)
+                end,
                 action = function()
-                    if Relationship and Relationship.SetPreviewRequirement then
-                        Relationship.SetPreviewRequirement(
-                            context.npcID,
-                            "recruit"
-                        )
-                    end
+                    setRecruitPreview(true)
                     Composer.RequestRecruit(context.npcID)
                 end,
             }

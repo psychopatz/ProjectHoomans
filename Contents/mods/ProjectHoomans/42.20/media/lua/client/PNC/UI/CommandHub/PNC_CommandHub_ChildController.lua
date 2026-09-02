@@ -16,7 +16,8 @@ local Layout = PsychopatzCore.UI.Layout
 local WidgetWindow = PsychopatzCore.UI.WidgetWindow or {}
 
 Controller.entries = Controller.entries or {}
-Controller.closeOrder = { "zone", "work", "settings", "events" }
+Controller.closeOrder = { "zone", "work", "settings", "events", "colonist",
+    "storage" }
 Controller.activeID = nil
 Controller.closing = false
 
@@ -192,6 +193,10 @@ function Controller.ApplyOpacity(opacity)
     Options.ApplyWindowOpacity(Hub.SettingsUI and Hub.SettingsUI.instance or nil, value)
     Options.ApplyWindowOpacity(PNC.ColonyJournalUI
         and PNC.ColonyJournalUI.instance or nil, value)
+    Options.ApplyWindowOpacity(PNC.ColonistUI
+        and PNC.ColonistUI.instance or nil, value)
+    Options.ApplyWindowOpacity(PNC.ColonyStorageUI
+        and PNC.ColonyStorageUI.instance or nil, value)
     return value
 end
 
@@ -229,6 +234,18 @@ function Controller.SyncPositions()
         and type(events.sync) == "function"
     then
         events.sync(owner)
+    end
+    local colonist = Controller.entries.colonist
+    if Controller.IsOpen("colonist") and colonist
+        and type(colonist.sync) == "function"
+    then
+        colonist.sync(owner)
+    end
+    local storage = Controller.entries.storage
+    if Controller.IsOpen("storage") and storage
+        and type(storage.sync) == "function"
+    then
+        storage.sync(owner)
     end
     Controller.ApplyOpacity(Options.GetOpacity())
     return true
@@ -312,6 +329,60 @@ Controller.Register("events", {
     sync = function(owner)
         placeWindow(PNC.ColonyJournalUI
             and PNC.ColonyJournalUI.instance or nil, owner)
+    end,
+})
+
+Controller.Register("colonist", {
+    open = function(owner)
+        local colonist = PNC.ColonistUI
+        return colonist and colonist.Open
+            and colonist.Open(owner) or false
+    end,
+    close = function()
+        local colonist = PNC.ColonistUI
+        if colonist and colonist.Close then colonist.Close() end
+    end,
+    isOpen = function()
+        return PNC.ColonistUI
+            and moduleIsVisible(PNC.ColonistUI) or false
+    end,
+    isDetached = function()
+        return PNC.ColonistUI
+            and moduleIsDetached(PNC.ColonistUI) or false
+    end,
+    focus = function()
+        return focusModule(PNC.ColonistUI)
+    end,
+    sync = function(owner)
+        placeWindow(PNC.ColonistUI
+            and PNC.ColonistUI.instance or nil, owner)
+    end,
+})
+
+Controller.Register("storage", {
+    open = function(owner)
+        local storage = PNC.ColonyStorageUI
+        return storage and storage.Open
+            and storage.Open(owner) or false
+    end,
+    close = function()
+        local storage = PNC.ColonyStorageUI
+        if storage and storage.Close then storage.Close() end
+    end,
+    isOpen = function()
+        return PNC.ColonyStorageUI
+            and moduleIsVisible(PNC.ColonyStorageUI) or false
+    end,
+    isDetached = function()
+        return PNC.ColonyStorageUI
+            and moduleIsDetached(PNC.ColonyStorageUI) or false
+    end,
+    focus = function()
+        return focusModule(PNC.ColonyStorageUI)
+    end,
+    sync = function(owner)
+        placeWindow(PNC.ColonyStorageUI
+            and PNC.ColonyStorageUI.instance or nil, owner)
     end,
 })
 

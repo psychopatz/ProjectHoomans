@@ -8,7 +8,6 @@ local DebugTab = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManageme
 local BaseTab = require "PNC/UI/Communities/ColonyManagement/SettlementManagement/PNC_SettlementManagement_Tab"
 local SettingsTab = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_SettingsTab"
 local JobsTab = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_JobsTab"
-local ActivitiesTab = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_ActivitiesTab"
 local ScavengeTab = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_ScavengeTab"
 local TasksTab = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_TasksTab"
 local UtilitiesTab = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_UtilitiesTab"
@@ -84,29 +83,6 @@ Registry.Register({
     buildRows = function(context) return JobsTab.BuildRows(context) end,
     onControl = function(window, button)
         return JobsTab.OnControl(window, button)
-    end,
-})
-
-Registry.Register({
-    id = "activities",
-    title = function()
-        return Shared.Tr("UI_PNC_Activities_Tab", "ACTIVITIES")
-    end,
-    detailTitle = Shared.Tr("UI_PNC_Activities_Title", "MANUAL ACTIVITIES"),
-    showRoster = true,
-    showDetails = true,
-    create = function(window) ActivitiesTab.Create(window) end,
-    apply = function(window, active, Layout)
-        ActivitiesTab.Apply(window, active, Layout)
-    end,
-    buildRows = function(context)
-        return ActivitiesTab.BuildRows(context)
-    end,
-    onPersonSelected = function(window)
-        return ActivitiesTab.OnPersonSelected(window)
-    end,
-    onControl = function(window, button)
-        return ActivitiesTab.OnControl(window, button)
     end,
 })
 

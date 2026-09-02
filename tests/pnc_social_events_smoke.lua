@@ -206,6 +206,18 @@ local function event(id, eventType, actorKey, targetKey, at)
     }
 end
 
+local function insultEvent(id, actorKey, targetKey, at)
+    return {
+        id = id,
+        type = "player_emote_insult",
+        actorKey = actorKey,
+        targetKey = targetKey,
+        occurredAt = at,
+        sourceSystem = "player_emote",
+        context = {},
+    }
+end
+
 local alice = newRecord("npc_social_alice")
 local bob = newRecord("npc_social_bob")
 local carol = newRecord("npc_social_carol")
@@ -222,7 +234,11 @@ local definitionCount = 0
 for _, _ in pairs(PNC.SocialEventDefinitions) do
     definitionCount = definitionCount + 1
 end
-T.equal(definitionCount, 14, "fourteen definitions")
+T.equal(definitionCount, 18, "eighteen definitions")
+T.truthy(PNC.SocialEventDefinitions.faction_member_attacked,
+    "faction attack definition")
+T.truthy(PNC.ConductDefinitions.faction_member_attacked,
+    "faction attack conduct definition")
 T.equal(
     PNC.SocialEvents.GetDefinition("treated_wound")
         .targetMemory.approvalEffect,
@@ -338,6 +354,70 @@ T.equal(evidenceCount(
     "treated_wound"
 ), 8, "saturation creates no conduct")
 
+-- 10b. Repeated direct insults can cross the enemy threshold instead of
+-- stopping at the old event-specific -40/-35 cap.
+local insultTarget = newRecord("npc_social_insult_target")
+local insultKey = PNC.EntityRef.ForNPC(insultTarget.id)
+for index = 1, 16 do
+    T.truthy(PNC.SocialEvents.Emit(insultEvent(
+        "social:insult:" .. tostring(index),
+        playerKey,
+        insultKey,
+        200 + index
+    )).ok, "insult event " .. tostring(index))
+end
+local insultRelationship = PNC.Relationships.Get(
+    insultTarget.id,
+    playerKey
+)
+T.equal(insultRelationship.familiarity, 16,
+    "direct insults establish familiarity")
+T.truthy(insultRelationship.approval <= -60,
+    "direct insults reach enemy approval threshold")
+T.equal(insultRelationship.state, "enemy",
+    "direct insults enter enemy state")
+T.truthy(insultRelationship.saturation.player_emote_insult.approval < -40,
+    "direct insult saturation no longer stops at old cap")
+
+-- The vanilla emote handler calls ApplyConversationEffect directly, so keep
+-- a regression check for that path in addition to SocialEvents.Emit above.
+local directInsultTarget = newRecord("npc_social_direct_insult")
+local directInsultKey = PNC.EntityRef.ForNPC(directInsultTarget.id)
+local insultMemory = PNC.SocialEventDefinitions.player_emote_insult
+    .targetMemory
+for index = 1, 16 do
+    local applied = PNC.Relationships.ApplyConversationEffect(
+        directInsultTarget.id,
+        playerKey,
+        {
+            memoryType = insultMemory.type,
+            interactionType = "player_emote_insult",
+            approval = insultMemory.approvalEffect,
+            respect = insultMemory.respectEffect,
+            familiarity = insultMemory.familiarityGain,
+            morale = insultMemory.moraleEffect,
+            decayPerDay = insultMemory.decayPerDay,
+            permanent = insultMemory.permanent,
+            shareable = insultMemory.shareable,
+            tags = insultMemory.tags,
+        },
+        {
+            eventID = "conversation:direct_insult:" .. tostring(index),
+            sourceSystem = "player_emote",
+            worldAgeHours = 400 + index,
+        }
+    )
+    T.truthy(applied, "vanilla direct insult " .. tostring(index))
+end
+local directInsultRelationship = PNC.Relationships.Get(
+    directInsultTarget.id,
+    playerKey
+)
+T.equal(directInsultRelationship.familiarity, 16,
+    "vanilla direct insults establish familiarity")
+T.equal(directInsultRelationship.state, "enemy",
+    "vanilla direct insults enter enemy state")
+
 -- 11-12. One rescue per episode and no nearest-player guessing.
 local rescue = event(
     "social:save:episode_1:" .. playerKey,
@@ -448,6 +528,65 @@ local unrelatedOK, unrelatedReason =
 T.truthy(unrelatedOK, "unrelated kill tracked as combat")
 T.equal(unrelatedReason, "neutralized_without_protection",
     "unrelated kill grants no protection")
+
+local witnessedKill = PNC.SocialEvents.Emit(event(
+    "social:witnessed_player_kill:1",
+    "witnessed_player_kill",
+    playerKey,
+    aliceKey,
+    82
+))
+T.truthy(witnessedKill.ok, "witnessed player kill accepted")
+T.equal(memoryCount(
+    PNC.Relationships.Get(alice.id, playerKey),
+    "witnessed_player_kill"
+), 1, "witnessed kill creates NPC relationship memory")
+T.equal(#PNC.Relationships.Get(alice.id, playerKey).interactionJournal,
+    1, "witnessed kill appears in interaction journal")
+T.equal(evidenceCount(
+    PNC.Conduct.GetForEntity(playerKey),
+    "witnessed_player_kill"
+), 1, "witnessed kill creates player conduct evidence")
+local conductBeforeFactionAttack = PNC.Conduct.GetForEntity(playerKey)
+local restraintBeforeFactionAttack =
+    conductBeforeFactionAttack.scores.restraint
+local compassionBeforeFactionAttack =
+    conductBeforeFactionAttack.scores.compassion
+local factionAttack = PNC.SocialEvents.Emit(event(
+    "social:faction_member_attacked:1",
+    "faction_member_attacked",
+    playerKey,
+    carolKey,
+    83
+))
+T.truthy(factionAttack.ok, "faction member attack accepted")
+T.equal(memoryCount(
+    PNC.Relationships.Get(carol.id, playerKey),
+    "faction_member_attacked"
+), 1, "faction member attack creates teammate memory")
+T.equal(evidenceCount(
+    PNC.Conduct.GetForEntity(playerKey),
+    "faction_member_attacked"
+), 0, "faction member fanout skips duplicate conduct evidence")
+T.equal(PNC.Conduct.GetForEntity(playerKey).scores.restraint,
+    restraintBeforeFactionAttack,
+    "faction fanout does not multiply restraint conduct")
+T.equal(PNC.Conduct.GetForEntity(playerKey).scores.compassion,
+    compassionBeforeFactionAttack,
+    "faction fanout does not multiply compassion conduct")
+local witnessedKillSecond = PNC.SocialEvents.Emit(event(
+    "social:witnessed_player_kill:2",
+    "witnessed_player_kill",
+    playerKey,
+    aliceKey,
+    82.1
+))
+T.truthy(witnessedKillSecond.ok,
+    "second witnessed player kill is not cooldown blocked")
+T.equal(memoryCount(
+    PNC.Relationships.Get(alice.id, playerKey),
+    "witnessed_player_kill"
+), 2, "witnessed kills are not contribution capped")
 
 -- 16-18. Shared combat is reciprocal for NPCs, one-sided for players, and
 -- trivial encounters do not qualify.
@@ -916,6 +1055,4 @@ T.equal(
     nil,
     "unsupported debug event rejected"
 )
-T.finish("pnc_social_events_smoke")
-
 T.finish("pnc_social_events_smoke")

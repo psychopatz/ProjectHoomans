@@ -93,6 +93,7 @@ function Resolution.ApplyPlayerDamage(player, amount, attackType, weaponItem, hi
     if player.sendPlayerStatsPacket then
         pcall(function() player:sendPlayerStatsPacket() end)
     end
+    hit.healthLoss = healthLoss
     return applied, hit
 end
 

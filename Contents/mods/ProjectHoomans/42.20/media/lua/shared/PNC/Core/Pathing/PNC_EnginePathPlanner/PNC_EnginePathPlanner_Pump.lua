@@ -5,6 +5,33 @@ local Internal = Planner.Internal
 local Core = PNC.Core
 local Diagnostics = PNC.PerformanceScalingDiagnostics
 
+local function suppressConflictingNativeState(body, navigation, now)
+    local liveBodyControl = PNC.LiveBodyControl
+    local actionState
+    if not body or not navigation
+        or navigation.controllerMode ~= "behavior2_move"
+        or not liveBodyControl
+        or not liveBodyControl.IsSuppressedActionState
+        or not liveBodyControl.SuppressZombieState
+    then
+        return false
+    end
+    -- Fence/window/wall states are a deliberate traversal handoff and must
+    -- remain owned by the traversal provider. Limit this repair to the two
+    -- vanilla states observed to compete with Behavior2: turnalerted and
+    -- pathfind. Combat bumps, attacks, lunge, and other action leases must
+    -- remain available to their respective owners.
+    actionState = body.getActionStateName
+        and string.lower(tostring(body:getActionStateName() or "")) or ""
+    if (actionState ~= "turnalerted" and actionState ~= "pathfind")
+        or not liveBodyControl.IsSuppressedActionState(actionState)
+    then
+        return false
+    end
+    liveBodyControl.SuppressZombieState(body, nil, now)
+    return true
+end
+
 function Planner.Pump(record, body, source)
     local navigation = record and record.runtime
         and record.runtime.localNavigation or nil
@@ -16,6 +43,7 @@ function Planner.Pump(record, body, source)
     end
     local now = Core and Core.Now and Core.Now() or 0
     source = tostring(source or "scheduled")
+    suppressConflictingNativeState(body, navigation, now)
     Internal.EnsureNativeMovementOwner(body)
     if Diagnostics then
         Diagnostics.RecordPathPump(record, source)
@@ -78,6 +106,12 @@ function Planner.Pump(record, body, source)
         local result = behavior:update()
         navigation.lastBehaviorResult = result
         navigation.lastBehaviorUpdateAt = now
+        -- A Behavior2 update can restore WalkTowardState after publishing its
+        -- path.  Clear it in the same frame so Java never owns movement in
+        -- parallel with path2.  Traversal states are intentionally excluded
+        -- by EnsureNativeMovementOwner and remain available for handoff.
+        Internal.EnsureNativeMovementOwner(body)
+        suppressConflictingNativeState(body, navigation, now)
         if Internal.ResultMatches(result, "Failed") then
             Internal.ClearEngineRequest(body, navigation)
             navigation.lastPlanReason = "native_behavior_failed"

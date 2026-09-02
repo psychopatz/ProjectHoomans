@@ -102,6 +102,8 @@ function Jobs.BuildRows(context)
             "RETURNING HOME - traveling through the world to the base."),
         AWAY = Shared.Tr("UI_PNC_Jobs_AwayHelp",
             "AWAY - colony duties remain unavailable until this NPC returns."),
+        AWAY_FOR_WORK = Shared.Tr("UI_PNC_Jobs_AwayForWorkHelp",
+            "AWAY FOR WORK - this NPC is executing a remote colony task."),
         NO_BASE = Shared.Tr("UI_PNC_Jobs_NoBaseHelp",
             "NO BASE - establish a settlement before assigning duties."),
     }
@@ -109,7 +111,8 @@ function Jobs.BuildRows(context)
         key = "home_state",
         label = Shared.Tr("UI_PNC_Jobs_HomeState", "HOME STATUS"),
         detail = homeDetails[homeState] or homeState,
-        colorName = (homeState == "AT_HOME" or homeState == "AT_CAMP") and "success"
+        colorName = (homeState == "AT_HOME" or homeState == "AT_CAMP"
+            or homeState == "AWAY_FOR_WORK") and "success"
             or homeState == "RETURNING_HOME" and "warning" or "muted",
     }
     for _, definition in ipairs(DEFINITIONS) do

@@ -3,6 +3,7 @@ require "PNC/UI/Inventory/PNC_InventoryUI_List"
 local ResearchTab = {}
 local InventoryModel = require "PNC/UI/Inventory/PNC_InventoryUI_Model"
 local UI = PsychopatzCore and PsychopatzCore.UI or nil
+local FacilityState = require "PNC/Core/Settlement/PNC_FacilityState"
 local CATALOG_COLUMNS = {
     { key = "category", x = 0.45 }, { key = "action", x = 0.65 },
     { key = "state", x = 0.80 },
@@ -162,7 +163,7 @@ local function hasLane(snapshot, role)
     for _, facility in ipairs(snapshot.settlement
         and snapshot.settlement.facilities or {}) do
         if facility.definitionId == "research_facility"
-            and facility.constructionState == "BUILT"
+            and FacilityState.IsBuilt(facility)
         then
             for _, component in ipairs(facility.components or {}) do
                 if component.role == role then return true end

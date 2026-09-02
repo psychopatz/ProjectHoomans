@@ -83,10 +83,14 @@ end
 
 function Internal.retargetLaneGoal(record, lane, goal)
     local now
+    local lastPhysicalMoveAt
+    local progressTimeoutMs
     if not lane or not goal then
         return false
     end
     now = Internal.Core.Now()
+    lastPhysicalMoveAt = tonumber(lane.lastPhysicalMoveAt) or 0
+    progressTimeoutMs = tonumber(Internal.PROGRESS_TIMEOUT_MS) or 2200
     lane.goalRevision = (tonumber(lane.goalRevision) or 0) + 1
     lane.goal = {
         x = goal.x,
@@ -106,7 +110,18 @@ function Internal.retargetLaneGoal(record, lane, goal)
     lane.bestGoalDistance = nil
     lane.lastProgressDelta = 0
     lane.lastProgressAt = now
-    lane.lastGoalProgressAt = now
+    -- Continuous follow steering may retarget faster than the native
+    -- controller can report a result. Do not let each retarget hide a real
+    -- physical stall; only refresh the goal watchdog when the body has moved
+    -- recently. The route timeout remains responsible for a moving body whose
+    -- distance to a moving owner is not monotonically decreasing.
+    if lastPhysicalMoveAt > 0
+        and now - lastPhysicalMoveAt < progressTimeoutMs
+    then
+        lane.lastGoalProgressAt = now
+    elseif lane.lastGoalProgressAt == nil then
+        lane.lastGoalProgressAt = now
+    end
     lane.nonProgressStepCount = 0
     lane.noProgressCount = 0
     lane.steeringSide = nil

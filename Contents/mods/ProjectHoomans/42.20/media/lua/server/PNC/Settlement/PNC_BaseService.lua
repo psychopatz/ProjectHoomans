@@ -186,10 +186,9 @@ function Service.BuildSnapshot(baseOrId)
         and PNC.Core.DeepCopy(base.corpseHaul) or nil
     local corpseHaul = PNC.CorpseHaulService
     if output.corpseHaul and corpseHaul
-        and corpseHaul.CountCorpsesInRegion
+        and corpseHaul.GetSourceCorpseCounts
     then
-        local total, eligible = corpseHaul.CountCorpsesInRegion(
-            output.corpseHaul.sourceRegion)
+        local total, eligible = corpseHaul.GetSourceCorpseCounts(base)
         output.corpseHaul.sourceCorpseCount = total
         output.corpseHaul.sourceEligibleCorpseCount = eligible
     end

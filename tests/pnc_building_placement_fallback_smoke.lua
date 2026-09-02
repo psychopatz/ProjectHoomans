@@ -1,5 +1,6 @@
 local T = require "tests/support/test"
-T.addPackagePaths({ { "ProjectHoomans", "client" } })
+T.addPackagePaths({ { "ProjectHoomans", "client" },
+    { "PsychopatzCore", "common" } })
 
 local function event()
     local value = { callback = nil }
@@ -38,6 +39,17 @@ local face = {
 local info = { getFace = function() return face end }
 local queued
 PNC = {
+    Network = {
+        ClientState = {
+            colonyManagement = {
+                settlement = {
+                    geometry = { region = { levels = {
+                        [0] = { rows = { [20] = { 0, 20 } } },
+                    } } },
+                },
+            },
+        },
+    },
     BuildRecipeCatalog = {
         Get = function() return { nativeObjectInfo = info } end,
     },
