@@ -1,6 +1,7 @@
 local T = require "tests/support/test"
 
 PNC = {
+    Core = {},
     Registry = {
         Data = {
             live = {
@@ -38,6 +39,10 @@ PNC = {
     },
 }
 
+local clock = 1000
+PNC.Core.Now = function() return clock end
+PNC.Core.LogInfo = function() end
+
 local Diagnostics = T.load(
     "ProjectHoomans",
     "shared",
@@ -49,6 +54,10 @@ T.equal(
     0,
     "safety counters start at zero"
 )
+
+local timerName, timerStart = Diagnostics.BeginTiming("test.phase", clock)
+clock = 1007
+Diagnostics.EndTiming(timerName, timerStart, "npc-test")
 
 local record = { runtime = { pathing = { phase = "active" } } }
 Diagnostics.BeginFrame()
@@ -91,6 +100,11 @@ T.equal(
 )
 T.equal(snapshot.breakdowns.dirtyMarksByReason.PATH_FAILED, 1,
     "dirty reason breakdown")
+T.equal(snapshot.timings["test.phase"].calls, 1, "timing sample count")
+T.near(snapshot.timings["test.phase"].lastMs, 7, 0.001,
+    "timing sample duration")
+T.equal(snapshot.timings["test.phase"].lastContext, "npc-test",
+    "timing context")
 
 local gauges = {}
 local rates = {}
@@ -109,6 +123,8 @@ T.equal(
     0,
     "first export establishes rate baseline"
 )
+T.equal(gauges["ProjectHoomans.Scaling.Timing.test.phase.LastMs"], 7,
+    "exported timing sample")
 Diagnostics.Increment("Pathing.PathPumps", 3)
 T.truthy(Diagnostics.Export(api), "second export")
 T.equal(

@@ -44,13 +44,32 @@ local function reconcileOrphanedActivities(at)
         if activity and activity.automatic == true and leaseId ~= ""
             and not Leases.Get(leaseId)
         then
-            local ok, stopped = pcall(PNC.FacilityJobs.Stop, record,
-                "orphaned_facility_activity")
+            local ok, stopped, stopReason = H.SafeCall(
+                "task_orphan_facility_stop",
+                PNC.FacilityJobs.Stop,
+                {
+                    npcId = record and record.id,
+                    leaseId = leaseId,
+                    domain = "NeedFacility",
+                },
+                record,
+                "orphaned_facility_activity"
+            )
             if ok and stopped == true then
                 recovered = recovered + 1
                 Events.Emit("ORPHANED_FACILITY_ACTIVITY_RECOVERED", {
                     record = record, source = "Tasking.OrphanRecovery",
                 })
+            elseif ok then
+                H.RecordFailure(
+                    "task_orphan_facility_stop",
+                    {
+                        npcId = record and record.id,
+                        leaseId = leaseId,
+                        domain = "NeedFacility",
+                    },
+                    stopReason or "ORPHAN_FACILITY_STOP_REJECTED"
+                )
             end
         end
     end)
@@ -61,6 +80,15 @@ function Tasking.Commands.Pump(at, budget)
     at = tonumber(at) or PNC.Core.Now()
     if at < Tasking.NextPumpAt then return 0 end
     Tasking.NextPumpAt = at + Tasking.PUMP_INTERVAL_MS
+    local timerName
+    local timerStart
+    if ScalingDiagnostics then
+        timerName, timerStart = ScalingDiagnostics.BeginTiming(
+            "Tasking.Pump", at)
+        ScalingDiagnostics.Increment("Tasking.PumpCalls")
+        ScalingDiagnostics.SetGauge("Tasking.ActiveLeases", #Leases.Active)
+        ScalingDiagnostics.SetGauge("Tasking.EventInboxSize", Inbox.Count())
+    end
     reconcileOrphanedActivities(at)
     if Tasking.Initialized ~= true then
         Tasking.Initialized = true
@@ -75,6 +103,12 @@ function Tasking.Commands.Pump(at, budget)
         end
     end
     local processed = 0
+    local reevaluationTimerName
+    local reevaluationTimerStart
+    if ScalingDiagnostics then
+        reevaluationTimerName, reevaluationTimerStart =
+            ScalingDiagnostics.BeginTiming("Tasking.Reevaluate", at)
+    end
     local maximum = math.max(1, math.floor(tonumber(budget)
         or Tasking.MAX_REEVALUATIONS_PER_PUMP))
     while processed < maximum and Inbox.Count() > 0 do
@@ -106,13 +140,30 @@ function Tasking.Commands.Pump(at, budget)
             processed = processed + 1
         end
     end
+    if reevaluationTimerName then
+        ScalingDiagnostics.EndTiming(
+            reevaluationTimerName, reevaluationTimerStart)
+    end
     local executorBudget = Tasking.MAX_EXECUTOR_TICKS_PER_PUMP
     local activeCount = #Leases.Active
     local executorSteps = math.min(activeCount, executorBudget)
+    local executorTimerName
+    local executorTimerStart
+    if ScalingDiagnostics then
+        executorTimerName, executorTimerStart = ScalingDiagnostics.BeginTiming(
+            "Tasking.Executor", at)
+    end
     for _ = 1, executorSteps do
         if #Leases.Active <= 0 then break end
         Tasking.ExecutorCursor = (Tasking.ExecutorCursor % #Leases.Active) + 1
         local lease = Leases.Get(Leases.Active[Tasking.ExecutorCursor])
+        local domainTimerName
+        local domainTimerStart
+        if ScalingDiagnostics and lease then
+            domainTimerName, domainTimerStart = ScalingDiagnostics.BeginTiming(
+                "Tasking.Domain." .. tostring(lease.sourceDomain or "unknown"),
+                at)
+        end
         promoteMaterializedLease(lease)
         local provider = lease and Tasking.Providers[lease.sourceDomain]
         local executor = provider and type(provider.Tick) == "function"
@@ -157,7 +208,21 @@ function Tasking.Commands.Pump(at, budget)
                     Tasking.Diagnostics.counters.executorTicks + 1
             end
         end
+        if domainTimerName then
+            ScalingDiagnostics.EndTiming(
+                domainTimerName, domainTimerStart, lease and lease.npcId)
+        end
     end
+    if executorTimerName then
+        ScalingDiagnostics.EndTiming(executorTimerName, executorTimerStart)
+    end
+    if ScalingDiagnostics then
+        ScalingDiagnostics.Increment("Tasking.ReevaluationsProcessed", processed)
+        ScalingDiagnostics.Increment("Tasking.ExecutorSteps", executorSteps)
+        ScalingDiagnostics.SetGauge("Tasking.ActiveLeases", #Leases.Active)
+        ScalingDiagnostics.SetGauge("Tasking.EventInboxSize", Inbox.Count())
+    end
+    if timerName then ScalingDiagnostics.EndTiming(timerName, timerStart) end
     return processed
 end
 

@@ -5,6 +5,7 @@ PNC.Animation.Internal = PNC.Animation.Internal or {}
 local Animation = PNC.Animation
 local Internal = Animation.Internal
 local Core = PNC.Core
+local Const = PNC.Const or {}
 local LiveBodyControl = PNC.LiveBodyControl
 local LocomotionProfiles = PNC.LocomotionProfiles
 local AnimationTrace = PNC.AnimationTrace
@@ -20,6 +21,9 @@ function Animation.SyncNativeLocomotionStyle(zombie, record)
     local animSpeed
     local actionState
     local nativeMoving
+    local now
+    local progressAt
+    local progressFresh
     if not zombie then
         return
     end
@@ -30,6 +34,7 @@ function Animation.SyncNativeLocomotionStyle(zombie, record)
     runtime = record and record.runtime or nil
     navigation = runtime and runtime.localNavigation or nil
     path = runtime and runtime.pathing or nil
+    now = Core and Core.Now and Core.Now() or 0
     profile = path and path.motionProfile or nil
     moveAnim = profile and profile.moveAnim
         or path and path.moveAnim
@@ -45,12 +50,23 @@ function Animation.SyncNativeLocomotionStyle(zombie, record)
             or path and path.animSpeed
     ) or 1.0
     actionState = Internal.getActionStateName(zombie)
-    nativeMoving = zombie.getPath2
-            and zombie:getPath2() ~= nil
-        or actionState == "climbfence"
-        or actionState == "climbwindow"
-        or actionState == "climbwall"
-        or zombie.isMoving and zombie:isMoving() == true
+    progressAt = tonumber(navigation and navigation.lastPhysicalProgressAt)
+        or tonumber(path and path.lastPhysicalMoveAt)
+        or 0
+    progressFresh = progressAt > 0 and now - progressAt < math.max(
+        250,
+        tonumber(Const.CLIENT_NATIVE_MOVEMENT_LEASE_MS) or 750
+    )
+    nativeMoving = actionState ~= "bumped"
+        and (
+            zombie.isMoving and zombie:isMoving() == true
+            or actionState == "climbfence"
+            or actionState == "climbwindow"
+            or actionState == "climbwall"
+            or zombie.getPath2
+                and zombie:getPath2() ~= nil
+                and progressFresh
+        )
     Internal.setPNCStateVars(
         zombie,
         record,

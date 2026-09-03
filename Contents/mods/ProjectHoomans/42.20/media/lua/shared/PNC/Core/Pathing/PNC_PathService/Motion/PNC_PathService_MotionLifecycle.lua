@@ -14,6 +14,8 @@ local function resetProgressState(lane, now)
     lane.lastRecoveryReason = nil
     lane.lastRecoverAt = 0
     lane.noProgressCount = 0
+    lane.nativeStallRecoveryCount = 0
+    lane.nativeBackoffUntil = 0
     lane.lastStepAt = 0
     lane.lastStepDistance = 0
     lane.lastPhysicalMoveAt = 0
@@ -163,6 +165,8 @@ function Internal.completeMove(zombie, record, lane, phase, reason)
     lane.lastRecoveryReason = nil
     lane.lastRecoverAt = 0
     lane.noProgressCount = 0
+    lane.nativeStallRecoveryCount = 0
+    lane.nativeBackoffUntil = 0
     lane.lastStepAt = 0
     lane.lastStepDistance = 0
     lane.lastPhysicalMoveAt = 0

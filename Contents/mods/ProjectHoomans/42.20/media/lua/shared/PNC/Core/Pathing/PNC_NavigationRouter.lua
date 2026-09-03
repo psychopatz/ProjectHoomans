@@ -5,10 +5,9 @@
     coordinator. A provider may adjust a steering target or ask PathService for
     a bounded native-engine movement handoff.
 
-    The direct provider remains available only as an explicit legacy policy.
-    It is never selected automatically. All normal embodied movement,
-    including unavailable/retrying requests and sub-tile corrections, stays
-    on one native movement lane.
+    The direct provider remains available only as an explicit fallback or
+    legacy policy. Healthy embodied movement, including unavailable/retrying
+    requests and sub-tile corrections, stays on one native movement lane.
 ]]
 
 PNC = PNC or {}
@@ -29,6 +28,10 @@ local function ensureState(record)
     record.runtime = record.runtime or {}
     record.runtime.navigationRouter = record.runtime.navigationRouter or {}
     return record.runtime.navigationRouter
+end
+
+local function nowMillis()
+    return PNC.Core and PNC.Core.Now and PNC.Core.Now() or 0
 end
 
 local function clearProvider(record, providerName)
@@ -56,6 +59,55 @@ function Router.RegisterPolicy(name, specification)
     end
     Router.Policies[name] = specification
     return true
+end
+
+-- A native route that stopped producing physical movement yields the whole
+-- movement lane for a short, bounded period. The direct provider here means
+-- PathService's scripted/fake locomotion fallback; normal policies remain
+-- native-engine paths.
+function Router.ActivateFallback(record, reason, durationMs)
+    local state = ensureState(record)
+    local now
+    local untilAt
+    if not state then return false end
+    now = nowMillis()
+    durationMs = math.max(
+        1000,
+        tonumber(durationMs)
+            or tonumber(PNC.Const and PNC.Const.ENGINE_PATH_FALLBACK_COOLDOWN_MS)
+            or 5000
+    )
+    untilAt = now + durationMs
+    if (tonumber(state.fallbackUntil) or 0) > untilAt then
+        untilAt = tonumber(state.fallbackUntil)
+    end
+    state.fallbackUntil = untilAt
+    state.fallbackReason = tostring(reason or "native_path_stall")
+    state.fallbackCount = (tonumber(state.fallbackCount) or 0) + 1
+    if state.provider and state.provider ~= Router.DIRECT_PROVIDER then
+        clearProvider(record, state.provider)
+    elseif record
+        and record.runtime
+        and record.runtime.localNavigation
+        and record.runtime.localNavigation.provider == "engine_path"
+    then
+        -- A watchdog may run after the planner has already invalidated the
+        -- request, before the router state is refreshed. Clean that orphaned
+        -- native controller as part of the fallback boundary too.
+        clearProvider(record, "engine_path")
+    end
+    state.policy = "fallback"
+    state.provider = Router.DIRECT_PROVIDER
+    state.lastFallbackReason = state.fallbackReason
+    return true
+end
+
+function Router.IsFallbackActive(record, now)
+    local state = record and record.runtime
+        and record.runtime.navigationRouter or nil
+    if not state then return false end
+    now = tonumber(now) or nowMillis()
+    return (tonumber(state.fallbackUntil) or 0) > now
 end
 
 local function isCombatRequest(record, reason)
@@ -101,12 +153,25 @@ local function inferPolicy(record, reason)
 end
 
 function Router.Resolve(record, reason, options, body)
+    local state = ensureState(record)
+    local fallbackActive = Router.IsFallbackActive(record)
     local requested = options and (
         options.navigationPolicy or options.policy
     ) or nil
-    local policyName = tostring(requested or inferPolicy(record, reason))
-    local policy = Router.Policies[policyName] or Router.Policies["local"]
-        or { provider = Router.DIRECT_PROVIDER }
+    local policyName
+    local policy
+    if fallbackActive then
+        policyName = "fallback"
+        policy = { provider = Router.DIRECT_PROVIDER }
+    else
+        policyName = tostring(requested or inferPolicy(record, reason))
+        policy = Router.Policies[policyName] or Router.Policies["local"]
+            or { provider = Router.DIRECT_PROVIDER }
+        if state then
+            state.fallbackUntil = 0
+            state.fallbackReason = nil
+        end
+    end
     local providerName = tostring(
         policy.provider or Router.DIRECT_PROVIDER
     )
@@ -120,7 +185,6 @@ function Router.Resolve(record, reason, options, body)
         nativeSafe, fallbackReason =
             planner.CanUseNativePath(body)
     end
-    local state = ensureState(record)
     if state and (
         state.policy ~= policyName or state.provider ~= providerName
     ) then
@@ -132,7 +196,8 @@ function Router.Resolve(record, reason, options, body)
         state.switches = (tonumber(state.switches) or 0) + 1
     end
     if state then
-        state.lastFallbackReason = fallbackReason
+        state.lastFallbackReason = fallbackActive
+            and state.fallbackReason or fallbackReason
     end
     return policyName, providerName, policy
 end

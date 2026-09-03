@@ -119,10 +119,8 @@ function Internal.logMoveWarning(record, zombie, lane, event, reason, extra)
         .. "|"
         .. tostring(lane and lane.phase or "nil")
         .. "|"
-        .. tostring(Internal.getActionStateName(zombie))
-        .. "|"
-        .. tostring(Internal.hasPath2(zombie))
-    if lane and lane.lastWarnKey == key and (now - (tonumber(lane.lastWarnAt) or 0)) < 1500 then
+        .. tostring(lane and lane.ownerMode or "none")
+    if lane and lane.lastWarnKey == key and (now - (tonumber(lane.lastWarnAt) or 0)) < 5000 then
         return
     end
     if lane then

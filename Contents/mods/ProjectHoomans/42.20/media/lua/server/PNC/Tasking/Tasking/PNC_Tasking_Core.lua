@@ -5,7 +5,10 @@ local Tasking = PNC.Tasking
 local Priority = PNC.TaskPriority
 local Leases = PNC.TaskLeaseService
 local ScalingDiagnostics = PNC.PerformanceScalingDiagnostics
+local Core = PNC.Core
 local H = Tasking.Internal
+local FAILURE_LOG_INTERVAL_MS = 5000
+local failureLogAt = {}
 
 function H.Copy(value)
     return PNC.Core and PNC.Core.DeepCopy and PNC.Core.DeepCopy(value) or value
@@ -27,6 +30,32 @@ function H.RecordFailure(stage, context, message)
     local recent = diagnostics.recentFailures
     recent[#recent + 1] = failure
     while #recent > 32 do table.remove(recent, 1) end
+    local key = failure.stage
+        .. "|"
+        .. tostring(failure.npcId or "nil")
+        .. "|"
+        .. tostring(failure.leaseId or "nil")
+        .. "|"
+        .. tostring(failure.domain or "nil")
+        .. "|"
+        .. failure.error
+    local lastLoggedAt = failureLogAt[key]
+    if lastLoggedAt == nil
+        or failure.at - lastLoggedAt >= FAILURE_LOG_INTERVAL_MS
+    then
+        failureLogAt[key] = failure.at
+        local warning = "task callback failure"
+            .. " stage=" .. failure.stage
+            .. " npc=" .. tostring(failure.npcId or "nil")
+            .. " lease=" .. tostring(failure.leaseId or "nil")
+            .. " domain=" .. tostring(failure.domain or "nil")
+            .. " error=" .. failure.error
+        if Core and Core.LogWarn then
+            Core.LogWarn(warning)
+        else
+            print("[PNC][WARN] " .. warning)
+        end
+    end
     return failure
 end
 

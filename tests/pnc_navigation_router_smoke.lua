@@ -6,8 +6,10 @@ local FILE = T.path("ProjectHoomans", "shared", "PNC/Core/")
 local plannerCalls = 0
 local plannerClears = 0
 local plannerInvalidations = 0
+local routerNow = 0
 
 PNC = {
+    Core = { Now = function() return routerNow end },
     EnginePathPlanner = {
         CanUseNativePath = function(body)
             if body and body.nativeUnsafe == true then
@@ -108,6 +110,31 @@ policy, provider = PNC.NavigationRouter.Resolve(
 T.truthy(policy == "combat" and provider == "engine_path")
 T.truthy(plannerClears == 1,
     "switching navigation policy did not clear the previous route")
+
+T.truthy(PNC.NavigationRouter.ActivateFallback(
+    travelRecord,
+    "native_stall_backoff",
+    2000
+), "native stall did not activate bounded fallback")
+policy, provider = PNC.NavigationRouter.Resolve(
+    travelRecord,
+    "journey:test",
+    { navigationPolicy = "travel" }
+)
+T.truthy(policy == "fallback" and provider == "direct",
+    "active native fallback did not take the direct scripted lane")
+T.truthy(PNC.NavigationRouter.IsFallbackActive(travelRecord, 1000),
+    "native fallback expired before its bounded cooldown")
+T.falsy(PNC.NavigationRouter.IsFallbackActive(travelRecord, 3000),
+    "native fallback did not expire")
+routerNow = 3000
+policy, provider = PNC.NavigationRouter.Resolve(
+    travelRecord,
+    "journey:test",
+    { navigationPolicy = "travel" }
+)
+T.truthy(policy == "travel" and provider == "engine_path",
+    "expired native fallback did not restore native policy")
 
 local tacticalCalls = 0
 T.truthy(PNC.NavigationRouter.RegisterProvider("kite_test", {

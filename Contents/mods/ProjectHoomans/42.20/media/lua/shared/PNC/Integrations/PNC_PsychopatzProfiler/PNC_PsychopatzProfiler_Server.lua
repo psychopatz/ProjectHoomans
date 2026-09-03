@@ -103,7 +103,8 @@ function Integration.WrapServerTick(callback)
     end
     local wrapped = Internal.Profiler.Wrap(
         "ProjectHoomans.Server.Update",
-        callback
+        callback,
+        { protectErrors = true }
     )
     Internal.Profiler.RegisterStopHook("ProjectHoomans.serverTick", function()
         if Events and Events.OnTick and Events.OnTick.Remove then

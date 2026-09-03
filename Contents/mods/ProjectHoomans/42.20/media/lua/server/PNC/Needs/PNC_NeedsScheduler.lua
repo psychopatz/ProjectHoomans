@@ -6,6 +6,7 @@ PNC.NeedsScheduler = PNC.NeedsScheduler or {}
 local Scheduler = PNC.NeedsScheduler
 local Definitions = PNC.NeedsDefinitions
 local Utils = PNC.NeedsUtils
+local ScalingDiagnostics = PNC.PerformanceScalingDiagnostics
 
 Scheduler.LastPumpAt = Scheduler.LastPumpAt or nil
 Scheduler.Profile = Scheduler.Profile or { groupUpdates = 0, individualUpdates = 0, lastDurationMs = 0 }
@@ -27,9 +28,23 @@ function Scheduler.Pump(now)
     now = tonumber(now) or (PNC.Core and PNC.Core.Now and PNC.Core.Now()) or 0
     if Scheduler.LastPumpAt and now - Scheduler.LastPumpAt < Definitions.SCHEDULER_INTERVAL_MS then return 0 end
     Scheduler.LastPumpAt = now
+    local timerName
+    local timerStart
+    if ScalingDiagnostics then
+        timerName, timerStart = ScalingDiagnostics.BeginTiming(
+            "Needs.Pump", now)
+        ScalingDiagnostics.Increment("Needs.PumpCalls")
+    end
     local profiling = PNC.NeedsDebug and PNC.NeedsDebug.ProfilingEnabled == true
     local started = profiling and PNC.Core and PNC.Core.Now and PNC.Core.Now() or now
     local count = 0
+    local individualUpdated = 0
+    local groupTimerName
+    local groupTimerStart
+    if ScalingDiagnostics then
+        groupTimerName, groupTimerStart = ScalingDiagnostics.BeginTiming(
+            "Needs.Groups", now)
+    end
     if PNC.Factions and PNC.Factions.List and PNC.GroupNeeds then
         for _, faction in ipairs(PNC.Factions.List()) do
             if PNC.GroupNeeds.IsGroup(faction) then
@@ -38,6 +53,16 @@ function Scheduler.Pump(now)
                 count = count + 1
             end
         end
+    end
+    if groupTimerName then
+        ScalingDiagnostics.EndTiming(groupTimerName, groupTimerStart)
+    end
+
+    local individualTimerName
+    local individualTimerStart
+    if ScalingDiagnostics then
+        individualTimerName, individualTimerStart =
+            ScalingDiagnostics.BeginTiming("Needs.Individuals", now)
     end
     if PNC.Registry and PNC.Registry.Data and PNC.IndividualNeeds then
         if Scheduler.IndividualCursor > #Scheduler.IndividualIDs then
@@ -80,12 +105,25 @@ function Scheduler.Pump(now)
                 end
                 if profiling then Scheduler.Profile.individualUpdates = Scheduler.Profile.individualUpdates + 1 end
                 count = count + 1
+                individualUpdated = individualUpdated + 1
             end
         end
+        if ScalingDiagnostics then
+            ScalingDiagnostics.Increment(
+                "Needs.IndividualsInspected", processed)
+        end
+    end
+    if individualTimerName then
+        ScalingDiagnostics.EndTiming(individualTimerName, individualTimerStart)
     end
     if profiling then
         Scheduler.Profile.lastDurationMs = ((PNC.Core and PNC.Core.Now and PNC.Core.Now()) or now) - started
     end
+    if ScalingDiagnostics then
+        ScalingDiagnostics.Increment(
+            "Needs.IndividualsUpdated", individualUpdated)
+    end
+    if timerName then ScalingDiagnostics.EndTiming(timerName, timerStart) end
     return count
 end
 

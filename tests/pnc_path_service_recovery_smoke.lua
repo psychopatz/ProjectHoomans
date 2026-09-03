@@ -34,6 +34,23 @@ T.equal(snapshot.lastProgressAt, 1200,
     "movement snapshot did not use the latest physical progress")
 T.equal(snapshot.provider, "engine_path", "movement provider was not exposed")
 
+PNC.NavigationRouter = {
+    IsFallbackActive = function() return true end,
+}
+record.runtime.navigationRouter = {
+    fallbackUntil = 6500,
+    fallbackReason = "native_stall_backoff",
+}
+snapshot = PathService.GetMovementRecoveryState(record, nil, now)
+T.falsy(snapshot.watchable,
+    "task recovery must not interrupt a native-to-scripted handoff")
+T.truthy(snapshot.nativeFallback,
+    "native fallback was not exposed to movement recovery")
+T.equal(snapshot.fallbackReason, "native_stall_backoff",
+    "native fallback reason was not exposed")
+PNC.NavigationRouter = nil
+record.runtime.navigationRouter = nil
+
 lane.traversalAction = { kind = "fence_climb", hardFinishAt = 1700 }
 snapshot = PathService.GetMovementRecoveryState(record, nil, now)
 T.falsy(snapshot.watchable,

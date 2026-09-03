@@ -4,10 +4,17 @@ if PsychopatzCore and PsychopatzCore.RuntimeRole
 local Server = PNC.Server
 local H = Server.Internal
 local Core = PNC.Core
+local Diagnostics = PNC.PerformanceScalingDiagnostics
 
 function Server.OnTick()
     local clockOK, now = H.SafePhase("server_tick.clock", Core.Now)
     if not clockOK then return end
+
+    local timerName
+    local timerStart
+    if Diagnostics then
+        timerName, timerStart = Diagnostics.BeginTiming("Server.Update", now)
+    end
 
     local prepareOK, due = H.SafePhase("server_tick.prepare", H.PrepareTick,
         nil, now)
@@ -20,4 +27,6 @@ function Server.OnTick()
         }, record, now)
     end
     H.SafePhase("server_tick.finish", H.FinishTick, nil, now)
+    if timerName then Diagnostics.EndTiming(timerName, timerStart) end
+    if Diagnostics then Diagnostics.LogRuntimeSummary(now) end
 end

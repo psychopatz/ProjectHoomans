@@ -19,6 +19,18 @@ Diagnostics.BreakdownSizes = Diagnostics.BreakdownSizes or {}
 Diagnostics.LastExported = Diagnostics.LastExported or {}
 Diagnostics.Frame = tonumber(Diagnostics.Frame) or 0
 Diagnostics.MAX_BREAKDOWN_KEYS = 64
+-- Runtime timing is sampled, rather than collected on every hot-path call.
+-- Keep this enabled while diagnosing the current server stall; the sampler
+-- only takes one sample per phase per second and summaries are rate-limited.
+Diagnostics.TimingEnabled = Diagnostics.TimingEnabled ~= false
+Diagnostics.TimingSampleIntervalMs =
+    tonumber(Diagnostics.TimingSampleIntervalMs) or 1000
+Diagnostics.RuntimeLogEnabled = Diagnostics.RuntimeLogEnabled ~= false
+Diagnostics.RuntimeLogIntervalMs =
+    tonumber(Diagnostics.RuntimeLogIntervalMs) or 10000
+Diagnostics.NextRuntimeLogAt = tonumber(Diagnostics.NextRuntimeLogAt) or 0
+Diagnostics.Timings = Diagnostics.Timings or {}
+Diagnostics.TimingLastSampleAt = Diagnostics.TimingLastSampleAt or {}
 
 local COUNTER_NAMES = {
     "Pathing.PathRequests",
@@ -26,6 +38,7 @@ local COUNTER_NAMES = {
     "Pathing.PathPumps",
     "Pathing.LogicalAdvances",
     "Pathing.DuplicatePumpSameFrame",
+    "Pathing.NativeFallbacks",
     "Pathing.DuplicateLogicalAdvanceSameFrame",
     "Pathing.Replans",
     "Pathing.Retries",
@@ -116,6 +129,155 @@ function Diagnostics.SetGauge(name, value)
     if name == "" then return 0 end
     Diagnostics.Gauges[name] = tonumber(value) or 0
     return Diagnostics.Gauges[name]
+end
+
+local function timingNow(fallback)
+    if fallback ~= nil then return tonumber(fallback) or 0 end
+    if PNC.Core and type(PNC.Core.Now) == "function" then
+        return tonumber(PNC.Core.Now()) or 0
+    end
+    if getTimeInMillis then return tonumber(getTimeInMillis()) or 0 end
+    return 0
+end
+
+-- Returns a timer token only when this phase is due for a sample. Callers can
+-- use the nil fast path to avoid allocations and a second clock read.
+function Diagnostics.BeginTiming(name, at)
+    if Diagnostics.TimingEnabled ~= true then return nil, nil end
+    name = tostring(name or "")
+    if name == "" then return nil, nil end
+    local current = timingNow(at)
+    local last = Diagnostics.TimingLastSampleAt[name]
+    if last ~= nil
+        and current - last < Diagnostics.TimingSampleIntervalMs
+    then
+        return nil, nil
+    end
+    Diagnostics.TimingLastSampleAt[name] = current
+    return name, timingNow()
+end
+
+local function timingState(name)
+    local state = Diagnostics.Timings[name]
+    if state then return state end
+    state = {
+        calls = 0, totalMs = 0, lastMs = 0, maxMs = 0,
+        lastContext = nil, slowCalls = 0,
+    }
+    Diagnostics.Timings[name] = state
+    return state
+end
+
+function Diagnostics.EndTiming(name, startedAt, context)
+    if not name or startedAt == nil then return 0 end
+    local elapsed = math.max(0, timingNow() - (tonumber(startedAt) or 0))
+    local state = timingState(name)
+    state.calls = state.calls + 1
+    state.totalMs = state.totalMs + elapsed
+    state.lastMs = elapsed
+    state.maxMs = math.max(state.maxMs, elapsed)
+    if context ~= nil then state.lastContext = tostring(context) end
+    if elapsed >= 5 then state.slowCalls = state.slowCalls + 1 end
+    return elapsed
+end
+
+function Diagnostics.SetRuntimeLoggingEnabled(enabled)
+    Diagnostics.RuntimeLogEnabled = enabled == true
+end
+
+local function timingText(name)
+    local state = Diagnostics.Timings[name]
+    if not state or (tonumber(state.calls) or 0) <= 0 then
+        return "-"
+    end
+    local calls = tonumber(state.calls) or 1
+    return string.format("%.2f/%.2f/%.2f/%d",
+        tonumber(state.lastMs) or 0,
+        (tonumber(state.totalMs) or 0) / calls,
+        tonumber(state.maxMs) or 0,
+        calls)
+end
+
+local function boundedIDs(values, limit)
+    local output = {}
+    local seen = {}
+    limit = tonumber(limit) or 8
+    for _, value in ipairs(values or {}) do
+        local id = tostring(value or "")
+        if id ~= "" and not seen[id] and #output < limit then
+            seen[id] = true
+            output[#output + 1] = id
+        end
+    end
+    return table.concat(output, ",")
+end
+
+function Diagnostics.LogRuntimeSummary(now)
+    if Diagnostics.RuntimeLogEnabled ~= true then return false end
+    now = timingNow(now)
+    if now < Diagnostics.NextRuntimeLogAt then return false end
+    Diagnostics.NextRuntimeLogAt = now + Diagnostics.RuntimeLogIntervalMs
+    Diagnostics.RefreshGauges()
+
+    local activeNPCs = {}
+    local leases = PNC.TaskLeaseService
+    for _, leaseID in ipairs(leases and leases.Active or {}) do
+        local lease = leases.Get and leases.Get(leaseID) or nil
+        if lease then activeNPCs[#activeNPCs + 1] = lease.npcId end
+    end
+    local provisionNPCs = {}
+    for _, entry in ipairs(PNC.ProvisionScheduler
+        and PNC.ProvisionScheduler.Queue or {}) do
+        provisionNPCs[#provisionNPCs + 1] = entry.npcID
+    end
+
+    local fields = {
+        "runtime_diag",
+        "live=" .. tostring(Diagnostics.Gauges["Scheduler.LiveRecords"] or 0),
+        "zombies=" .. tostring(Diagnostics.Gauges["ZombieAggro.LoadedZombieCount"] or 0),
+        "leases=" .. tostring(Diagnostics.Gauges["Tasking.ActiveLeases"] or 0),
+        "inbox=" .. tostring(Diagnostics.Gauges["Tasking.EventInboxSize"] or 0),
+        "work=" .. tostring(Diagnostics.Gauges["Tasking.WorkOrderCount"] or 0),
+        "provisionQueue=" .. tostring(Diagnostics.Gauges["Provision.QueueSize"] or 0),
+        "leaseNPCs=" .. boundedIDs(activeNPCs),
+        "provisionNPCs=" .. boundedIDs(provisionNPCs),
+        "pathPumps=" .. tostring(
+            Diagnostics.Counters["Pathing.PathPumps"] or 0
+        ),
+        "duplicatePathPumps=" .. tostring(
+            Diagnostics.Counters["Pathing.DuplicatePumpSameFrame"] or 0
+        ),
+        "nativeFallbacks=" .. tostring(
+            Diagnostics.Counters["Pathing.NativeFallbacks"] or 0
+        ),
+        "server=" .. timingText("Server.Update"),
+        "prepare=" .. timingText("Server.Prepare"),
+        "finish=" .. timingText("Server.Finish"),
+        "record=" .. timingText("Server.ProcessRecord"),
+        "tasking=" .. timingText("Tasking.Pump"),
+        "domains=" .. table.concat({
+            "work:" .. timingText("Tasking.Domain.work"),
+            "NeedFacility:" .. timingText("Tasking.Domain.NeedFacility"),
+            "farming:" .. timingText("Tasking.Domain.farming"),
+            "fishing:" .. timingText("Tasking.Domain.fishing"),
+            "lumber:" .. timingText("Tasking.Domain.lumber"),
+            "scavenge:" .. timingText("Tasking.Domain.scavenge"),
+        }, ","),
+        "workTick=" .. timingText("WorkService.Tick"),
+        "needs=" .. timingText("Needs.Pump"),
+        "provisionAudit=" .. timingText("Provision.Audit"),
+        "provisionProcess=" .. timingText("Provision.Process"),
+        "census=" .. timingText("WorldCensus.Refresh"),
+        "spatial=" .. timingText("Spatial.Rebuild"),
+        "corpse=" .. timingText("CorpseHaul.Pump"),
+    }
+    local message = table.concat(fields, " ")
+    if PNC.Core and PNC.Core.LogInfo then
+        PNC.Core.LogInfo(message)
+    else
+        print("[PNC][INFO] " .. message)
+    end
+    return true
 end
 
 function Diagnostics.BeginFrame()
@@ -249,6 +411,26 @@ function Diagnostics.RefreshGauges()
         "Tasking.DirtyQueueLiveSize",
         tasking and tasking.Dirty and countMap(tasking.Dirty.byNPC) or 0
     )
+    local leases = PNC.TaskLeaseService
+    Diagnostics.SetGauge(
+        "Tasking.ActiveLeases",
+        leases and #leases.Active or 0
+    )
+    Diagnostics.SetGauge(
+        "Tasking.EventInboxSize",
+        tasking and tasking.Inbox and tasking.Inbox.Count
+            and tasking.Inbox.Count() or 0
+    )
+
+    local provision = PNC.ProvisionScheduler
+    Diagnostics.SetGauge(
+        "Provision.QueueSize",
+        provision and #provision.Queue or 0
+    )
+    Diagnostics.SetGauge(
+        "Provision.QueuedLiveSize",
+        provision and countMap(provision.Queued) or 0
+    )
 
     for _, order in pairs(
         work and work.State and work.State.byId or {}
@@ -292,6 +474,16 @@ function Diagnostics.Export(api)
     for name, value in pairs(Diagnostics.Gauges) do
         api.SetGauge("ProjectHoomans.Scaling." .. name, value)
     end
+    for name, state in pairs(Diagnostics.Timings) do
+        local prefix = "ProjectHoomans.Scaling.Timing." .. name
+        local calls = tonumber(state.calls) or 0
+        api.SetGauge(prefix .. ".LastMs", tonumber(state.lastMs) or 0)
+        api.SetGauge(prefix .. ".AverageMs",
+            calls > 0 and (tonumber(state.totalMs) or 0) / calls or 0)
+        api.SetGauge(prefix .. ".MaxMs", tonumber(state.maxMs) or 0)
+        api.SetGauge(prefix .. ".Samples", calls)
+        api.SetGauge(prefix .. ".SlowSamples", tonumber(state.slowCalls) or 0)
+    end
     for breakdown, values in pairs(Diagnostics.Breakdowns) do
         for key, value in pairs(values) do
             exportCounter(
@@ -314,14 +506,19 @@ end
 function Diagnostics.Snapshot()
     Diagnostics.RefreshGauges()
     local breakdowns = {}
+    local timings = {}
     for name, values in pairs(Diagnostics.Breakdowns) do
         breakdowns[name] = copyMap(values)
+    end
+    for name, state in pairs(Diagnostics.Timings) do
+        timings[name] = copyMap(state)
     end
     return {
         frame = Diagnostics.Frame,
         counters = copyMap(Diagnostics.Counters),
         gauges = copyMap(Diagnostics.Gauges),
         breakdowns = breakdowns,
+        timings = timings,
     }
 end
 

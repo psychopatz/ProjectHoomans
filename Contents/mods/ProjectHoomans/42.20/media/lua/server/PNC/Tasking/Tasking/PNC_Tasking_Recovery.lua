@@ -91,11 +91,34 @@ end
 local function refreshProviderState(lease)
     local provider = lease and Tasking.Providers
         and Tasking.Providers[lease.sourceDomain]
+    local ok
+    local snapshot
     if not provider or type(provider.GetRecoveryState) ~= "function" then
         return nil
     end
-    local ok, snapshot = pcall(provider.GetRecoveryState, lease)
-    if not ok or type(snapshot) ~= "table" then return nil end
+    ok, snapshot = H.SafeCall(
+        "task_recovery_provider_state",
+        provider.GetRecoveryState,
+        {
+            npcId = lease and lease.npcId,
+            leaseId = lease and lease.leaseId,
+            domain = lease and lease.sourceDomain,
+        },
+        lease
+    )
+    if not ok then return nil end
+    if type(snapshot) ~= "table" then
+        H.RecordFailure(
+            "task_recovery_provider_state",
+            {
+                npcId = lease and lease.npcId,
+                leaseId = lease and lease.leaseId,
+                domain = lease and lease.sourceDomain,
+            },
+            "INVALID_RECOVERY_STATE"
+        )
+        return nil
+    end
     if snapshot.lastProgressAt ~= nil then
         lease.lastProgressAt = snapshot.lastProgressAt
     end
@@ -162,19 +185,13 @@ local function stopLease(lease, reason)
     if type(H.StopLease) ~= "function" then
         return false, "TASK_STOP_UNAVAILABLE"
     end
-    if type(H.SafeCall) == "function" then
-        local callOK, released, releaseReason = H.SafeCall(
-            "task_recovery_stop", H.StopLease, {
-                npcId = lease and lease.npcId,
-                leaseId = lease and lease.leaseId,
-                domain = lease and lease.sourceDomain,
-            }, lease, reason)
-        if not callOK then return false, released end
-        return released == true, releaseReason
-    end
-    local callOK, released, releaseReason = pcall(H.StopLease,
-        lease, reason)
-    if not callOK then return false, released end
+    local callOK, released, releaseReason = H.SafeCall(
+        "task_recovery_stop", H.StopLease, {
+            npcId = lease and lease.npcId,
+            leaseId = lease and lease.leaseId,
+            domain = lease and lease.sourceDomain,
+        }, lease, reason)
+    if not callOK then return false, releaseReason end
     return released == true, releaseReason
 end
 

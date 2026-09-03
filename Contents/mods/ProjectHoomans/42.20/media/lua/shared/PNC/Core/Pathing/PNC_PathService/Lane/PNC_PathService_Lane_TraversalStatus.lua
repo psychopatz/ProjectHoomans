@@ -57,6 +57,8 @@ function PathService.GetMovementRecoveryState(record, zombie, now)
     local traversalKind
     local traversal
     local navigation
+    local navigationRouter
+    local nativeFallback
     local hardFinishAt
     local active
     local watchable
@@ -71,6 +73,11 @@ function PathService.GetMovementRecoveryState(record, zombie, now)
     end
 
     navigation = runtime and runtime.localNavigation or nil
+    navigationRouter = runtime and runtime.navigationRouter or nil
+    nativeFallback = PNC.NavigationRouter
+        and PNC.NavigationRouter.IsFallbackActive
+        and PNC.NavigationRouter.IsFallbackActive(record, now)
+        or false
     traversalActive, traversalKind = PathService.IsTraversalActive(
         record, zombie)
     traversal = lane.traversalAction or lane.vanillaFenceAction
@@ -89,6 +96,19 @@ function PathService.GetMovementRecoveryState(record, zombie, now)
     active = lane.phase == "active" or lane.phase == "requested"
         or lane.pendingGoal ~= nil
     watchable = active
+    local nativeBackoffUntil = tonumber(lane.nativeBackoffUntil) or 0
+    local nativeBackoff = nativeBackoffUntil > now
+    if nativeBackoff then
+        -- A bounded native retry window is an intentional recovery state;
+        -- tasking must observe it without competing to cancel the lease.
+        watchable = false
+    end
+    if nativeFallback then
+        -- Native recovery owns the lease while the active lane transfers to
+        -- scripted locomotion. Needs/tasking may observe this state, but must
+        -- not cancel and recreate the same destination during the handoff.
+        watchable = false
+    end
     if traversalActive and hardFinishAt > now then
         -- Door/window/fence passage is a legitimate in-flight owner. The
         -- movement pump will finish or hard-timeout it; task recovery must
@@ -101,6 +121,16 @@ function PathService.GetMovementRecoveryState(record, zombie, now)
         phase = lane.phase or "idle",
         provider = lane.navigationProvider or "unknown",
         ownerMode = lane.ownerMode or "idle",
+        nativeStallRecoveryCount =
+            tonumber(lane.nativeStallRecoveryCount) or 0,
+        nativeBackoff = nativeBackoff,
+        nativeBackoffUntil = nativeBackoffUntil > 0
+            and nativeBackoffUntil or nil,
+        nativeFallback = nativeFallback,
+        fallbackUntil = nativeFallback and navigationRouter
+            and tonumber(navigationRouter.fallbackUntil) or nil,
+        fallbackReason = nativeFallback and navigationRouter
+            and navigationRouter.fallbackReason or nil,
         traversal = traversalActive == true,
         traversalKind = traversalKind,
         hardFinishAt = hardFinishAt > 0 and hardFinishAt or nil,

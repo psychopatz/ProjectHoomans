@@ -26,6 +26,7 @@ local startsAtHome = Internal.startsAtHome
 local returnsHome = Internal.returnsHome
 local observeWorkLocation = Internal.observeWorkLocation
 local isFollowing = Internal.isFollowing
+local ScalingDiagnostics = PNC.PerformanceScalingDiagnostics
 
 local function releaseAssignment(order, reason)
     if not order then return false, "WORK_ORDER_UNAVAILABLE" end
@@ -243,10 +244,27 @@ function Service.Tick(at)
     at = tonumber(at) or now()
     if at < Service.NextPassAt then return 0 end
     Service.NextPassAt = at + Definitions.BALANCE.schedulerCadenceMs
+    local timerName
+    local timerStart
+    if ScalingDiagnostics then
+        timerName, timerStart = ScalingDiagnostics.BeginTiming(
+            "WorkService.Tick", at)
+        ScalingDiagnostics.Increment("WorkService.PumpCalls")
+    end
     Repository.Load()
+    local reconciliationTimerName
+    local reconciliationTimerStart
+    if ScalingDiagnostics then
+        reconciliationTimerName, reconciliationTimerStart =
+            ScalingDiagnostics.BeginTiming("WorkService.Reconcile", at)
+    end
     Service.ReconcileWorkerState()
     for _, reconcile in pairs(Service.ReconcileHandlers) do
         reconcile()
+    end
+    if reconciliationTimerName then
+        ScalingDiagnostics.EndTiming(
+            reconciliationTimerName, reconciliationTimerStart)
     end
     local ids = {}
     for id, order in pairs(Repository.State.byId) do
@@ -258,11 +276,35 @@ function Service.Tick(at)
         return a.createdAt < b.createdAt
     end)
     local processed = math.min(#ids, Definitions.BALANCE.maxOrdersPerPass)
+    local orderTimerName
+    local orderTimerStart
+    if ScalingDiagnostics then
+        orderTimerName, orderTimerStart = ScalingDiagnostics.BeginTiming(
+            "WorkService.Orders", at)
+        ScalingDiagnostics.SetGauge("WorkService.PendingOrders", #ids)
+    end
     for index = 1, processed do processOrder(Repository.State.byId[ids[index]], at) end
+    if orderTimerName then
+        ScalingDiagnostics.EndTiming(orderTimerName, orderTimerStart)
+    end
+    if ScalingDiagnostics then
+        ScalingDiagnostics.Increment("WorkService.OrdersInspected", #ids)
+        ScalingDiagnostics.Increment("WorkService.OrdersProcessed", processed)
+    end
     if at >= Service.NextPruneAt then
         Service.NextPruneAt = at + 60000
+        local pruneTimerName
+        local pruneTimerStart
+        if ScalingDiagnostics then
+            pruneTimerName, pruneTimerStart = ScalingDiagnostics.BeginTiming(
+                "WorkService.Prune", at)
+        end
         pruneTerminalHistory()
+        if pruneTimerName then
+            ScalingDiagnostics.EndTiming(pruneTimerName, pruneTimerStart)
+        end
     end
+    if timerName then ScalingDiagnostics.EndTiming(timerName, timerStart) end
     return processed
 end
 

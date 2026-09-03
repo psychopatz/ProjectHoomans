@@ -28,6 +28,7 @@ function Internal.ClearEngineRequest(body, navigation)
         navigation.requestStartedAt = 0
         navigation.movingStartedAt = 0
         navigation.lastPumpAt = 0
+        navigation.lastPumpSource = nil
         navigation.nativeActive = false
         navigation.controllerMode = nil
         navigation.lastBehaviorResult = nil
@@ -48,6 +49,7 @@ function Internal.ClearEngineRequest(body, navigation)
         navigation.lastObservedY = nil
         navigation.lastObservedZ = nil
         navigation.lastPhysicalProgressAt = 0
+        navigation.nativeBumpStartedAt = 0
     end
 end
 

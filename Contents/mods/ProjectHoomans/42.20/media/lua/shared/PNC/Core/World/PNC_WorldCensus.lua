@@ -8,6 +8,7 @@ PNC.WorldCensus = PNC.WorldCensus or {}
 local Census = PNC.WorldCensus
 local Core = PNC.Core
 local Const = PNC.Const
+local Diagnostics = PNC.PerformanceScalingDiagnostics
 
 Census.AllZombies = Census.AllZombies or {}
 Census.OrdinaryZombies = Census.OrdinaryZombies or {}
@@ -76,6 +77,12 @@ function Census.Refresh(now, force)
         return false
     end
     Census.LastRefreshAt = now
+    local timerName
+    local timerStart
+    if Diagnostics then
+        timerName, timerStart = Diagnostics.BeginTiming(
+            "WorldCensus.Refresh", now)
+    end
     clearArray(Census.AllZombies)
     clearArray(Census.OrdinaryZombies)
     clearArray(Census.ManagedBodies)
@@ -116,6 +123,14 @@ function Census.Refresh(now, force)
     end
 
     Census.Generation = Census.Generation + 1
+    if Diagnostics then
+        Diagnostics.SetGauge("WorldCensus.AllZombies", #Census.AllZombies)
+        Diagnostics.SetGauge(
+            "WorldCensus.OrdinaryZombies", #Census.OrdinaryZombies)
+        Diagnostics.SetGauge(
+            "WorldCensus.ManagedBodies", #Census.ManagedBodies)
+    end
+    if timerName then Diagnostics.EndTiming(timerName, timerStart) end
     return true
 end
 

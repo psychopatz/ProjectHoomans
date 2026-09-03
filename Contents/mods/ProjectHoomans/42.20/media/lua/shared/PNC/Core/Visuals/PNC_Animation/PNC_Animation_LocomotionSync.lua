@@ -81,12 +81,16 @@ function Animation.SyncLocomotion(zombie, record)
         return
     end
     profile = path and path.motionProfile or nil
-    moving = path and (
-        path.phase == "requested"
-        or path.phase == "active"
-        or path.ownerMode == "fake_locomotion"
-        or now < (tonumber(path.visualMovingUntil) or 0)
-    ) or false
+    moving = path
+        and path.ownerMode ~= "native_backoff"
+        and now >= (tonumber(path.nativeBackoffUntil) or 0)
+        and (
+            path.phase == "requested"
+            or path.phase == "active"
+            or path.ownerMode == "fake_locomotion"
+            or now < (tonumber(path.visualMovingUntil) or 0)
+        )
+        or false
     moveAnim = path and path.moveAnim or zombie.getVariableString and zombie:getVariableString("PNCMoveAnim") or ""
     walkType = path and path.walkType or zombie.getVariableString and zombie:getVariableString("PNCWalkType") or ""
     engineWalkType = path and path.engineWalkType

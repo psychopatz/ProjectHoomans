@@ -318,9 +318,12 @@ local handled
 local state
 local cancelsAfterStart = cancelCount
 local resetsAfterStart = resetCount
-handled, state = PNC.EnginePathPlanner.Pump(record, body)
-T.truthy(handled and state == "native_behavior_pending",
-    "native path did not remain active while working")
+handled, state = PNC.EnginePathPlanner.Pump(
+    record,
+    body
+)
+T.truthy(not handled and state == "native_waiting_for_zombie_update",
+    "scheduled observer advanced the single-player native lane")
 T.truthy(updateCount == 0,
     "scheduled observer double-pumped PathFindBehavior2")
 T.truthy(body.useless == true,
@@ -378,7 +381,11 @@ T.equal(body.actionState, "idle",
 
 body.x = movedTarget.x
 body.y = movedTarget.y
-handled, state = PNC.EnginePathPlanner.Pump(record, body)
+handled, state = PNC.EnginePathPlanner.Pump(
+    record,
+    body,
+    "zombie_update"
+)
 T.truthy(handled and state == "engine_path_succeeded",
     "native path success was not consumed")
 T.truthy(cancelCount >= 2 and resetCount >= 2,
@@ -394,7 +401,11 @@ nextResult = BehaviorResult.Working
 PNC.EnginePathPlanner.GetSteeringTarget(record, body, target)
 body.actionState = "idle"
 now = now + 2500
-handled, state = PNC.EnginePathPlanner.Pump(record, body)
+handled, state = PNC.EnginePathPlanner.Pump(
+    record,
+    body,
+    "zombie_update"
+)
 T.truthy(handled and state == "engine_path_timeout",
     "engine path-state exit did not release movement ownership")
 
@@ -403,7 +414,12 @@ nextResult = BehaviorResult.Working
 PNC.EnginePathPlanner.GetSteeringTarget(record, body, target)
 local updatesBeforeTimeout = updateCount
 now = now + 15000
-handled, state = PNC.EnginePathPlanner.Pump(record, body)
+record.runtime.localNavigation.lastBehaviorUpdateAt = now
+handled, state = PNC.EnginePathPlanner.Pump(
+    record,
+    body,
+    "zombie_update"
+)
 T.truthy(handled and state == "engine_path_timeout",
     "non-progressing native route did not time out")
 T.truthy(updateCount == updatesBeforeTimeout,
@@ -606,6 +622,7 @@ PNC.PathService = {
 }
 body.collidedThisFrame = true
 local updatesBeforeCollision = updateCount
+now = now + 16
 handled, state = PNC.EnginePathPlanner.PumpFrame(record, body)
 T.truthy(handled and state == "fence_climb",
     "native collision was not handed to scripted traversal")
@@ -617,8 +634,8 @@ body.collidedThisFrame = false
 PNC.PathService = nil
 local updatesAfterFrame = updateCount
 handled, state = PNC.EnginePathPlanner.Pump(record, body)
-T.truthy(handled and state == "native_behavior_pending",
-    "scheduled fallback lost native ownership after frame pump")
+T.truthy(not handled and state == "native_waiting_for_zombie_update",
+    "scheduled observer advanced the single-player native lane")
 T.truthy(updateCount == updatesAfterFrame,
     "observer pump manually advanced PathFindBehavior2")
 
@@ -716,7 +733,7 @@ local serverSource = T.read(SERVER_FILE)
     )
 T.truthy(string.find(
         serverSource,
-        "PNC.EnginePathPlanner.PumpServerFrame()",
+        "\"PumpServerFrame\"",
         1,
         true
     ),

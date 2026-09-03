@@ -38,6 +38,18 @@ function Planner.GetSteeringTarget(record, body, finalTarget)
         navigation.steeringKind = "native_unavailable"
         return finalTarget
     end
+    local lane = record.runtime and record.runtime.pathing or nil
+    local nativeBackoffUntil = tonumber(
+        lane and lane.nativeBackoffUntil
+    ) or 0
+    if nativeBackoffUntil > now then
+        navigation.lastPlanReason = "native_stall_backoff"
+        navigation.steeringKind = "final_native_deferred"
+        return finalTarget
+    end
+    if lane and lane.ownerMode == "native_backoff" then
+        lane.ownerMode = "engine_path_waiting"
+    end
     local replanMs = math.max(
         250,
         tonumber(Const.ENGINE_PATH_REPLAN_MS) or 1000
@@ -101,7 +113,7 @@ function Planner.GetSteeringTarget(record, body, finalTarget)
         navigation.steeringKind = "final_direct"
         return finalTarget
     end
-    local lane = record.runtime and record.runtime.pathing or nil
+    lane = record.runtime and record.runtime.pathing or nil
     if not lane or lane.phase ~= "active" then
         navigation.lastPlanReason = "native_waiting_for_move_lane"
         navigation.steeringKind = "final_native_deferred"

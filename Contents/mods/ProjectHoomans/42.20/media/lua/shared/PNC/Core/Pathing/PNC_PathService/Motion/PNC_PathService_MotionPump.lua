@@ -104,7 +104,7 @@ local function startRequestedLane(record, zombie, lane)
     return started, state
 end
 
-local function updateActiveLane(record, zombie, lane, now)
+local function updateActiveLane(record, zombie, lane, now, caller)
     local enginePlanner = PNC.EnginePathPlanner
     local navigation = record.runtime
         and record.runtime.localNavigation or nil
@@ -132,7 +132,8 @@ local function updateActiveLane(record, zombie, lane, now)
             navigation,
             enginePlanner,
             enginePlanner.Pump,
-            now
+            now,
+            caller or "path_service"
         )
         if handled then
             return handled, state
@@ -170,7 +171,7 @@ function PathService.Pump(record, zombie, caller)
         return startRequestedLane(record, zombie, lane)
     end
     if lane.phase == "active" then
-        return updateActiveLane(record, zombie, lane, now)
+        return updateActiveLane(record, zombie, lane, now, caller)
     end
     if intentState == "arrived" then
         Internal.applyHoldAnimation(zombie, record, lane)

@@ -59,4 +59,7 @@ function Internal.ensureLaneProgressState(lane)
     lane.visualMovingUntil = tonumber(lane.visualMovingUntil) or 0
     lane.lastRecoverAt = tonumber(lane.lastRecoverAt) or 0
     lane.noProgressCount = tonumber(lane.noProgressCount) or 0
+    lane.nativeStallRecoveryCount =
+        tonumber(lane.nativeStallRecoveryCount) or 0
+    lane.nativeBackoffUntil = tonumber(lane.nativeBackoffUntil) or 0
 end

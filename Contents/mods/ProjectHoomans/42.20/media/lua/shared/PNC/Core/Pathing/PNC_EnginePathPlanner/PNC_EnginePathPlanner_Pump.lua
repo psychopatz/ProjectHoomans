@@ -43,6 +43,55 @@ function Planner.Pump(record, body, source)
     end
     local now = Core and Core.Now and Core.Now() or 0
     source = tostring(source or "scheduled")
+    -- In single-player, Behavior2 is advanced from OnZombieUpdate. The
+    -- scheduler may start a requested lane, but it must not advance the same
+    -- native controller from a second callback.
+    if not Internal.IsMultiplayerAuthority() and source ~= "zombie_update" then
+        navigation.lastPlanReason = "native_waiting_for_zombie_update"
+        return false, "native_waiting_for_zombie_update"
+    end
+    -- A route has one owner per simulation timestamp. This boundary is shared
+    -- by the per-NPC scheduler and the engine update event, so the guard must
+    -- live here instead of being duplicated in either caller.
+    if tonumber(navigation.lastPumpAt) == now then
+        if Diagnostics then
+            Diagnostics.RecordPathPump(record, source)
+        end
+        navigation.duplicatePumpCount =
+            (tonumber(navigation.duplicatePumpCount) or 0) + 1
+        return false, "native_duplicate_pump_skipped"
+    end
+    navigation.lastPumpAt = now
+    navigation.lastPumpSource = source
+    local recovered
+    local recoveryState
+    recovered, recoveryState = Internal.RecoverStaleNativeBump(
+        record,
+        body,
+        navigation,
+        now
+    )
+    if recovered then
+        Internal.InvalidateRecoveredNativeBump(
+            record,
+            body,
+            navigation,
+            recoveryState
+        )
+        local pathService = PNC.PathService
+        local pathInternal = pathService and pathService.Internal or nil
+        if pathInternal and pathInternal.logMoveWarning then
+            pathInternal.logMoveWarning(
+                record,
+                body,
+                record and record.runtime and record.runtime.pathing or nil,
+                "native_bump_recovery",
+                recoveryState,
+                "action=bumped"
+            )
+        end
+        return true, recoveryState
+    end
     suppressConflictingNativeState(body, navigation, now)
     Internal.EnsureNativeMovementOwner(body)
     if Diagnostics then
@@ -55,7 +104,6 @@ function Planner.Pump(record, body, source)
         and Internal.IsMultiplayerAuthority()
     then
         local traversalState = Internal.GetNativeTraversalState(body)
-        navigation.lastPumpAt = now
         navigation.requestPending = false
         navigation.nativeTraversalState = traversalState
         navigation.lastPlanReason = traversalState
@@ -80,7 +128,6 @@ function Planner.Pump(record, body, source)
             (tonumber(navigation.planFailures) or 0) + 1
         return true, "engine_path_failed"
     end
-    navigation.lastPumpAt = now
     if Internal.IsAtRequestGoal(body, navigation) then
         Internal.ClearEngineRequest(body, navigation)
         navigation.lastPlanReason = "native_path_succeeded"

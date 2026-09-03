@@ -45,6 +45,8 @@ function Internal.tryNativeAdjacentPassage(
     lane.ownerMode = kind or "passage_interact"
     lane.lastProgressAt = now
     lane.lastIssueAt = now
+    lane.nativeStallRecoveryCount = 0
+    lane.nativeBackoffUntil = 0
     Internal.logMoveDebug(
         record,
         zombie,
@@ -96,6 +98,8 @@ function Internal.tryNativeStallPassage(
     lane.lastProgressAt = now
     lane.lastGoalProgressAt = now
     lane.noProgressCount = 0
+    lane.nativeStallRecoveryCount = 0
+    lane.nativeBackoffUntil = 0
     Internal.logMoveWarning(
         record,
         zombie,

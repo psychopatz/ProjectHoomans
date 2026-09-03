@@ -6,6 +6,7 @@ local H = Scheduler.Internal
 local Registry = PNC.ProvisionRuleRegistry
 local Evaluator = PNC.ProvisionEvaluator
 local Metrics = PNC.SupplyMetrics
+local ScalingDiagnostics = PNC.PerformanceScalingDiagnostics
 
 function Scheduler.Bootstrap()
     if Scheduler.Bootstrapped then return 0 end
@@ -28,13 +29,28 @@ function Scheduler.Audit(now)
     if now - Scheduler.LastAuditAt < Scheduler.AUDIT_INTERVAL_MS then return 0 end
     Scheduler.LastAuditAt = now
     local queued = 0
+    local inspected = 0
+    local timerName
+    local timerStart
+    if ScalingDiagnostics then
+        timerName, timerStart = ScalingDiagnostics.BeginTiming(
+            "Provision.Audit", now)
+    end
     for _, record in pairs(PNC.Registry and PNC.Registry.Data or {}) do
         local factionID = record.affiliation and record.affiliation.factionID
         if record.alive ~= false and factionID then
+            inspected = inspected + 1
             if Scheduler.MarkAllDirty(record, nil, true) then
                 queued = queued + 1
             end
         end
+    end
+    if timerName then
+        ScalingDiagnostics.EndTiming(timerName, timerStart)
+    end
+    if ScalingDiagnostics then
+        ScalingDiagnostics.Increment("Provision.AuditNPCsInspected", inspected)
+        ScalingDiagnostics.Increment("Provision.AuditNPCsQueued", queued)
     end
     Metrics.Increment("provisionAuditedNPCs", queued)
     return queued

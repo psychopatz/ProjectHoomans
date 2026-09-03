@@ -9,7 +9,8 @@ function Internal.updateNativeMove(
     navigation,
     enginePlanner,
     pumpNative,
-    now
+    now,
+    source
 )
     local fromX = zombie:getX()
     local fromY = zombie:getY()
@@ -41,7 +42,10 @@ function Internal.updateNativeMove(
             )
         end
     end
-    handled, state = pumpNative(record, zombie, lane)
+    handled, state = pumpNative(record, zombie, lane, source)
+    if state == "native_duplicate_pump_skipped" then
+        return true, state
+    end
     if not handled then
         return nil
     end

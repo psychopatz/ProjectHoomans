@@ -40,6 +40,12 @@ function H.GetSyncInterval(record)
 end
 
 function H.ProcessRecord(record, now)
+    local timerName
+    local timerStart
+    if ScalingDiagnostics then
+        timerName, timerStart = ScalingDiagnostics.BeginTiming(
+            "Server.ProcessRecord", now)
+    end
     local zombie = Registry.GetLiveZombie(record.id)
     local forceSyncEvent
     local decisionInterval
@@ -96,6 +102,9 @@ function H.ProcessRecord(record, now)
         end
         if Spatial and Spatial.RemoveNPC then
             Spatial.RemoveNPC(record.id)
+        end
+        if timerName then
+            ScalingDiagnostics.EndTiming(timerName, timerStart, record.id)
         end
         return
     end
@@ -157,5 +166,8 @@ function H.ProcessRecord(record, now)
     end
     if Scheduler and Scheduler.Schedule then
         Scheduler.Schedule(record, now + Scheduler.GetCadence(record))
+    end
+    if timerName then
+        ScalingDiagnostics.EndTiming(timerName, timerStart, record.id)
     end
 end

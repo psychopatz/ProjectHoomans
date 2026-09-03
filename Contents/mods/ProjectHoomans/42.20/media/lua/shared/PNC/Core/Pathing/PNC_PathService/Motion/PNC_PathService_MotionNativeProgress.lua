@@ -2,6 +2,34 @@
 
 local Internal = PNC.PathService.Internal
 local Diagnostics = PNC.PerformanceScalingDiagnostics
+local Const = PNC.Const or {}
+
+local function activateNativeFallback(record, lane, now, reason)
+    local router = PNC.NavigationRouter
+    local durationMs = math.max(
+        1000,
+        tonumber(Const.ENGINE_PATH_FALLBACK_COOLDOWN_MS)
+            or tonumber(Const.NATIVE_STALL_BACKOFF_MS)
+            or 5000
+    )
+    if router and router.ActivateFallback then
+        router.ActivateFallback(record, reason, durationMs)
+    end
+    -- The current lane is already active. Drop only its native provider so
+    -- the very next PathService pump can use the bounded scripted mover;
+    -- tasking keeps the same lease and destination during recovery.
+    lane.navigationProvider = nil
+    lane.navigationPolicy = "fallback"
+    lane.ownerMode = "fake_locomotion"
+    lane.nativeBackoffUntil = 0
+    lane.fallbackCount = (tonumber(lane.fallbackCount) or 0) + 1
+    lane.recoveryCount = (tonumber(lane.recoveryCount) or 0) + 1
+    lane.lastRecoveryReason = tostring(reason or "native_path_fallback")
+    lane.lastRecoverAt = now
+    if Diagnostics then
+        Diagnostics.Increment("Pathing.NativeFallbacks")
+    end
+end
 
 local function handleNativeFailure(
     record,
@@ -56,6 +84,8 @@ local function recordPhysicalStep(
     lane.lastPhysicalMoveAt = now
     lane.lastX = toX
     lane.lastY = toY
+    lane.nativeStallRecoveryCount = 0
+    lane.nativeBackoffUntil = 0
     lane.visualMovingUntil = now + Internal.LOCOMOTION_VISUAL_LEASE_MS
     if Internal.MotionHints and Internal.MotionHints.Remember then
         Internal.MotionHints.Remember(
@@ -113,7 +143,15 @@ local function handleNativeTimeout(
         lane.blockReason,
         "goal=" .. Internal.describeGoal(lane.goal)
     )
-    if lane.noProgressCount >= 2 then
+    if lane.noProgressCount >= 3 then
+        if enginePlanner.Invalidate then
+            enginePlanner.Invalidate(
+                record,
+                "native_progress_timeout",
+                zombie
+            )
+        end
+        lane.lastNavigationInvalidatedAt = now
         return Internal.completeMove(
             zombie,
             record,
@@ -122,6 +160,52 @@ local function handleNativeTimeout(
             "native_progress_timeout"
         )
     end
+    if lane.noProgressCount >= 2 then
+        lane.nativeStallRecoveryCount =
+            (tonumber(lane.nativeStallRecoveryCount) or 0) + 1
+        if lane.nativeStallRecoveryCount >= 3 then
+            if enginePlanner.Invalidate then
+                enginePlanner.Invalidate(
+                    record,
+                    "native_progress_timeout",
+                    zombie
+                )
+            end
+            lane.lastNavigationInvalidatedAt = now
+            return Internal.completeMove(
+                zombie,
+                record,
+                lane,
+                "blocked",
+                "native_progress_timeout"
+            )
+        end
+        lane.nativeBackoffUntil = now + math.max(
+            1000,
+            tonumber(Const.NATIVE_STALL_BACKOFF_MS) or 5000
+        )
+        lane.ownerMode = "native_backoff"
+        lane.lastRecoveryReason = "native_stall_backoff"
+        lane.lastRecoverAt = now
+        if Diagnostics then
+            Diagnostics.Increment("Pathing.StallBackoffs")
+        end
+        if enginePlanner.Invalidate then
+            enginePlanner.Invalidate(
+                record,
+                "native_path_fallback",
+                zombie
+            )
+        end
+        lane.lastNavigationInvalidatedAt = now
+        activateNativeFallback(
+            record,
+            lane,
+            now,
+            "native_stall_backoff"
+        )
+        return true, "native_path_fallback"
+    end
     if enginePlanner.Invalidate then
         enginePlanner.Invalidate(
             record,
@@ -129,8 +213,8 @@ local function handleNativeTimeout(
             zombie
         )
     end
-    lane.lastGoalProgressAt = now
     lane.lastNavigationInvalidatedAt = now
+    lane.lastGoalProgressAt = now
     if Diagnostics then
         Diagnostics.Increment("Pathing.Replans")
         Diagnostics.Increment("Pathing.Retries")

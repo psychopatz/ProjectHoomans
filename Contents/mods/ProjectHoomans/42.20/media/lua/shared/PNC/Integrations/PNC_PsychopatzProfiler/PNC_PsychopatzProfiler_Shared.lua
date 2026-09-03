@@ -95,22 +95,6 @@ function Internal.InstallSharedPerformance()
             api.SetGauge("ProjectHoomans.NPCSupply." .. name,
                 supplyMetrics[name] or 0)
         end
-        local ModDataProfiler = Internal.ModDataProfiler
-        local report = ModDataProfiler and ModDataProfiler.Scan
-            and ModDataProfiler.Scan(false) or nil
-        if report then
-            api.SetGauge("ProjectHoomans.ModData.PersistedEstimatedBytes",
-                report.persisted.estimatedBytes)
-            api.SetGauge("ProjectHoomans.ModData.RuntimeEstimatedBytes",
-                report.runtimeRecords.estimatedBytes)
-            api.SetGauge("ProjectHoomans.ModData.InventoryEstimatedBytes",
-                report.inventories.estimatedBytes)
-            api.SetGauge("ProjectHoomans.ModData.InventoryItems",
-                report.inventories.itemCount)
-            api.SetGauge("ProjectHoomans.ModData.InventoryOperationLogEntries",
-                report.inventories.operationLogEntries)
-            api.SetGauge("ProjectHoomans.ModData.ScanMs", report.scanMs)
-        end
     end)
 end
 

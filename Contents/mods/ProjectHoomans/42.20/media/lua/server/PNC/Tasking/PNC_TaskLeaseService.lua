@@ -156,18 +156,39 @@ function Leases.Release(id, reason)
     local lease = Leases.Get(id)
     if not lease then return false, "LEASE_NOT_FOUND" end
     if lease.reservationId and PNC.FacilityReservations then
-        local ok, released = pcall(PNC.FacilityReservations.Release,
-            lease.reservationId,
-            reason == "complete" and "complete" or reason or "task_released")
+        local releaseReason = reason == "complete"
+            and "complete" or reason or "task_released"
+        local taskInternal = PNC.Tasking and PNC.Tasking.Internal
+        local ok
+        local released
+        local callbackReason
+        if taskInternal and type(taskInternal.SafeCall) == "function" then
+            ok, released, callbackReason = taskInternal.SafeCall(
+                "lease_reservation_release",
+                PNC.FacilityReservations.Release,
+                {
+                    npcId = lease.npcId,
+                    leaseId = lease.leaseId,
+                    domain = lease.sourceDomain,
+                },
+                lease.reservationId,
+                releaseReason
+            )
+        else
+            released = PNC.FacilityReservations.Release(
+                lease.reservationId,
+                releaseReason
+            )
+            ok = true
+        end
         if not ok or released == false then
-            if PNC.Tasking and PNC.Tasking.Internal
-                and PNC.Tasking.Internal.RecordFailure
+            if ok and taskInternal and taskInternal.RecordFailure
             then
-                PNC.Tasking.Internal.RecordFailure(
+                taskInternal.RecordFailure(
                     "lease_reservation_release", {
                         npcId = lease.npcId, leaseId = lease.leaseId,
                         domain = lease.sourceDomain,
-                    }, ok and "RESERVATION_RELEASE_REJECTED" or released)
+                    }, callbackReason or "RESERVATION_RELEASE_REJECTED")
             end
             return false, "RESERVATION_RELEASE_FAILED"
         end

@@ -14,6 +14,35 @@ function Planner.PumpFrame(record, body)
     end
     local navigation = record and record.runtime
         and record.runtime.localNavigation or nil
+    local recovered
+    local recoveryState
+    recovered, recoveryState = Internal.RecoverStaleNativeBump(
+        record,
+        body,
+        navigation,
+        Core and Core.Now and Core.Now() or 0
+    )
+    if recovered then
+        Internal.InvalidateRecoveredNativeBump(
+            record,
+            body,
+            navigation,
+            recoveryState
+        )
+        local pathService = PNC.PathService
+        local pathInternal = pathService and pathService.Internal or nil
+        if pathInternal and pathInternal.logMoveWarning then
+            pathInternal.logMoveWarning(
+                record,
+                body,
+                record and record.runtime and record.runtime.pathing or nil,
+                "native_bump_recovery",
+                recoveryState,
+                "action=bumped"
+            )
+        end
+        return true, recoveryState
+    end
     if (lane.traversalAction or lane.blockedStepToX ~= nil)
         and PNC.PathService
         and PNC.PathService.AdvanceScriptedPassage

@@ -10,7 +10,9 @@ function Internal.Wrap(owner, key, metricName)
         key = key,
         callback = owner[key],
     }
-    owner[key] = Internal.Profiler.Wrap(metricName, owner[key])
+    owner[key] = Internal.Profiler.Wrap(metricName, owner[key], {
+        protectErrors = true,
+    })
     return true
 end
 

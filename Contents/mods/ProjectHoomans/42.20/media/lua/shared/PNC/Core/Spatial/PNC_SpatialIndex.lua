@@ -165,6 +165,12 @@ function Spatial.Rebuild(now, force)
         return false
     end
     Spatial.LastRebuildAt = now
+    local timerName
+    local timerStart
+    if Diagnostics then
+        timerName, timerStart = Diagnostics.BeginTiming(
+            "Spatial.Rebuild", now)
+    end
     Spatial.PlayerCells = {}
     Spatial.PlayerByOnlineID = {}
     Spatial.PlayerByUsername = {}
@@ -234,6 +240,11 @@ function Spatial.Rebuild(now, force)
             end
         end
     end
+    if Diagnostics then
+        Diagnostics.SetGauge("Spatial.ZombieIDIndexSize",
+            Core.TableSize(Spatial.ZombieByID))
+    end
+    if timerName then Diagnostics.EndTiming(timerName, timerStart) end
     return true
 end
 

@@ -18,10 +18,33 @@ H.LastLivePositionSafetyRefreshAt =
 local function safeOptional(stage, owner, method, context, ...)
     local callback = owner and owner[method]
     if type(callback) ~= "function" then return true, nil end
-    return H.SafePhase(stage, callback, context, ...)
+    -- Server.OnTick already contains PrepareTick and FinishTick in an outer
+    -- SafePhase boundary. Keep these normal-path calls direct; wrapping every
+    -- subsystem in pcall on every frame adds avoidable Kahlua overhead. The
+    -- outer boundary still contains failures and the per-record boundary keeps
+    -- one broken NPC from aborting the rest of the due queue.
+    local timerName
+    local timerStart
+    if H.TimingSample == true and ScalingDiagnostics then
+        timerName, timerStart = ScalingDiagnostics.BeginTiming(
+            stage, H.TimingNow)
+    end
+    local result = callback(...)
+    if timerName then
+        ScalingDiagnostics.EndTiming(timerName, timerStart)
+    end
+    return true, result
 end
 
 function H.PrepareTick(now)
+    H.TimingNow = tonumber(now) or 0
+    local timerName
+    local timerStart
+    if ScalingDiagnostics then
+        timerName, timerStart = ScalingDiagnostics.BeginTiming(
+            "Server.Prepare", H.TimingNow)
+    end
+    H.TimingSample = timerName ~= nil
     safeOptional("server_prepare.scaling_begin", ScalingDiagnostics,
         "BeginFrame")
     safeOptional("server_prepare.presence_begin", Presence,
@@ -45,12 +68,10 @@ function H.PrepareTick(now)
     if PNC.FactionIncidentService
         and type(PNC.FactionIncidentService.PumpRuntime) == "function"
     then
-        H.SafePhase("server_prepare.faction_incidents", function()
-            local gameTime = getGameTime and getGameTime() or nil
-            local worldAge = gameTime and gameTime.getWorldAgeHours
-                and gameTime:getWorldAgeHours() or 0
-            PNC.FactionIncidentService.PumpRuntime(worldAge)
-        end)
+        local gameTime = getGameTime and getGameTime() or nil
+        local worldAge = gameTime and gameTime.getWorldAgeHours
+            and gameTime:getWorldAgeHours() or 0
+        PNC.FactionIncidentService.PumpRuntime(worldAge)
     end
     safeOptional("server_prepare.faction_tolls", PNC.FactionTolls, "Pump",
         nil, now)
@@ -101,11 +122,31 @@ function H.PrepareTick(now)
 
     local ok, due = H.SafePhase("server_prepare.scheduler_pop_due",
         PNC.Scheduler and PNC.Scheduler.PopDue, nil, Registry.Data, now)
-    if not ok or type(due) ~= "table" then return {} end
+    if not ok or type(due) ~= "table" then
+        if timerName then
+            ScalingDiagnostics.EndTiming(timerName, timerStart)
+        end
+        H.TimingSample = false
+        H.TimingNow = nil
+        return {}
+    end
+    if timerName then
+        ScalingDiagnostics.EndTiming(timerName, timerStart)
+    end
+    H.TimingSample = false
+    H.TimingNow = nil
     return due
 end
 
 function H.FinishTick(now)
+    H.TimingNow = tonumber(now) or 0
+    local timerName
+    local timerStart
+    if ScalingDiagnostics then
+        timerName, timerStart = ScalingDiagnostics.BeginTiming(
+            "Server.Finish", H.TimingNow)
+    end
+    H.TimingSample = timerName ~= nil
     safeOptional("server_finish.network_flush", Network, "FlushRosterDeltas",
         nil, now, false)
     safeOptional("server_finish.zombie_aggro", ZombieAggro, "Pump", nil, now)
@@ -129,4 +170,9 @@ function H.FinishTick(now)
             PNC.SocialGreeting.Pump(worldAge)
         end)
     end
+    if timerName then
+        ScalingDiagnostics.EndTiming(timerName, timerStart)
+    end
+    H.TimingSample = false
+    H.TimingNow = nil
 end

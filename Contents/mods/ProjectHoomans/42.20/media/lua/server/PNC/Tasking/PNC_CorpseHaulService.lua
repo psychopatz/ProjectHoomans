@@ -14,6 +14,7 @@ PNC.CorpseHaulService.Internal = PNC.CorpseHaulService.Internal or {}
 local Service = PNC.CorpseHaulService
 local Internal = Service.Internal
 local Core = PNC.Core
+local ScalingDiagnostics = PNC.PerformanceScalingDiagnostics
 
 Service.SCAN_INTERVAL_MS = 2000
 Service.INTERACTION_TIMEOUT_MS = 10000
@@ -63,11 +64,19 @@ function Service.Pump(now)
     now = tonumber(now) or Core.Now()
     if now < (tonumber(Service.Runtime.nextScanAt) or 0) then return end
     Service.Runtime.nextScanAt = now + Service.SCAN_INTERVAL_MS
+    local timerName
+    local timerStart
+    if ScalingDiagnostics then
+        timerName, timerStart = ScalingDiagnostics.BeginTiming(
+            "CorpseHaul.Pump", now)
+        ScalingDiagnostics.Increment("CorpseHaul.PumpCalls")
+    end
     if Internal.reconcileActiveOrders then
         Internal.reconcileActiveOrders(now)
     end
     Internal.pruneTerminalCorpseOrders()
     Internal.queuePendingOrders()
+    if timerName then ScalingDiagnostics.EndTiming(timerName, timerStart) end
 end
 
 if Events and Events.OnTick and not Service.TickHookRegistered then
