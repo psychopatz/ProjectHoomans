@@ -107,9 +107,6 @@ function LiveBodyControl.SuppressZombieState(
     if Internal.isDamageReactionState(actionState) then
         LiveBodyControl.ReleaseDamageReaction(zombie, actionState)
     end
-    if actionState == "turnalerted" and zombie.setTurnAlertedValues then
-        zombie:setTurnAlertedValues(0, 0)
-    end
     if zombie.setVariable and actionState == "climbfence" then
         zombie:setVariable("ClimbFenceStarted", false)
         zombie:setVariable("ClimbFenceFinished", true)
@@ -118,6 +115,8 @@ function LiveBodyControl.SuppressZombieState(
         zombie:setVariable("ClimbWindowStarted", false)
         zombie:setVariable("ClimbWindowOutcome", "")
     end
+    -- TurnAlerted is released by the state transition below. Its Java setter
+    -- takes sound coordinates and re-arms the alert; it is not a reset API.
     LiveBodyControl.SetManagedBodyUseless(zombie, true)
     if needsIdleReset
         and zombie.changeState

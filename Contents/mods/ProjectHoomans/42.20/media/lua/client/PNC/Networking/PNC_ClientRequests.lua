@@ -510,14 +510,19 @@ function Client.RequestDirectorDebug(groupID, locationID, populationSectorID)
     return true
 end
 
-function Client.RequestColonyManagement()
+function Client.RequestColonyManagement(taskBrainNpcID)
     local player = getSpecificPlayer and getSpecificPlayer(0) or nil
+    local options = {}
+    if taskBrainNpcID ~= nil and tostring(taskBrainNpcID) ~= "" then
+        options.taskBrainNpcID = tostring(taskBrainNpcID)
+    end
     if Core.IsClientOnly and Core.IsClientOnly() then
-        if player and sendClientCommand then sendClientCommand(player, Const.MODULE, Const.CMD_COLONY_MANAGEMENT_REQUEST, {}); return true end
+        if player and sendClientCommand then sendClientCommand(player, Const.MODULE, Const.CMD_COLONY_MANAGEMENT_REQUEST, options); return true end
         return false
     end
     if not PNC.ColonyManagement or not PNC.ColonyManagement.BuildSnapshot then return false end
-    ClientState.colonyManagement = PNC.ColonyManagement.BuildSnapshot(player)
+    ClientState.colonyManagement = PNC.ColonyManagement.BuildSnapshot(
+        player, options)
     ClientState.colonyManagementRevision =
         (tonumber(ClientState.colonyManagementRevision) or 0) + 1
     ClientState.lastColonyManagementReceiveAt = Core.Now()

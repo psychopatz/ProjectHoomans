@@ -58,7 +58,7 @@ end
 -- Hoomans owns the single-player Behavior2 pump directly from Lua. Keep the
 -- vanilla WalkTowardState out of that route: IsoGameCharacter's deferred
 -- movement guard discards path2 whenever WalkTowardState is still active.
--- Releasing only these stale states is important; entering PathFindState would
+-- Releasing only this stale state is important; entering PathFindState would
 -- make Java execute Behavior2 a second time during the same update.
 function Internal.EnsureNativeMovementOwner(body)
     local actionState
@@ -66,15 +66,12 @@ function Internal.EnsureNativeMovementOwner(body)
         return false
     end
     actionState = string.lower(tostring(body:getActionStateName() or ""))
-    if actionState ~= "walktoward" and actionState ~= "turnalerted"
+    if actionState ~= "walktoward"
         or not body.changeState
         or not ZombieIdleState
         or not ZombieIdleState.instance
     then
         return false
-    end
-    if actionState == "turnalerted" and body.setTurnAlertedValues then
-        body:setTurnAlertedValues(0, 0)
     end
     body:changeState(ZombieIdleState.instance())
     return true

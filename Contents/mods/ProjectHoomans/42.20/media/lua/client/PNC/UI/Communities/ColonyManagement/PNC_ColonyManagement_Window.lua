@@ -123,7 +123,9 @@ function ISPNCColonyManagementWindow:onActivitiesControl(button)
 end
 
 function ISPNCColonyManagementWindow:requestSnapshot(source)
-    local _, _, requestedAt = Client.RequestSnapshot()
+    local taskBrainNpcID = self.tab == "task"
+        and self.selectedPersonID or nil
+    local _, _, requestedAt = Client.RequestSnapshot(taskBrainNpcID)
     self.lastRequestAt = requestedAt
     Diagnostics.Log(self, "snapshot_requested", {
         source = source or "automatic",
@@ -161,7 +163,7 @@ end
 
 function ISPNCColonyManagementWindow:prerender()
     local currentTime = PNC.Core.Now()
-    if (self.tab == "tasks" or self.tab == "base"
+    if (self.tab == "tasks" or self.tab == "task" or self.tab == "base"
         or self.tab == "research" or self.tab == "building")
         and currentTime - (tonumber(self.lastWorkPollAt) or 0) >= 2000
     then

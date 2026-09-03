@@ -44,11 +44,18 @@ function ISPNCColonistWindow:onResponsiveLayout()
 end
 
 function ISPNCColonistWindow:onTab(button)
-    return Controller.SelectTab(self, button)
+    local selected = Controller.SelectTab(self, button)
+    if selected and self.tab == "task" then
+        self:requestSnapshot("task_tab")
+    end
+    return selected
 end
 
 function ISPNCColonistWindow:onPersonSelected()
     Controller.OnPersonSelected(self)
+    if self.tab == "task" then
+        self:requestSnapshot("task_person_selected")
+    end
 end
 
 function ISPNCColonistWindow:onColonistControl(button)
@@ -56,7 +63,9 @@ function ISPNCColonistWindow:onColonistControl(button)
 end
 
 function ISPNCColonistWindow:requestSnapshot(source)
-    local _, _, requestedAt = Client.RequestSnapshot()
+    local taskBrainNpcID = self.tab == "task"
+        and self.selectedPersonID or nil
+    local _, _, requestedAt = Client.RequestSnapshot(taskBrainNpcID)
     self.lastRequestAt = requestedAt
 end
 

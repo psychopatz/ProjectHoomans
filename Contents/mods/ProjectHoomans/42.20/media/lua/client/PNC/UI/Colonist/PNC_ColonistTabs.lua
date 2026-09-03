@@ -1,5 +1,6 @@
 local Registry = require "PNC/UI/Colonist/PNC_ColonistRegistry"
 local Activities = require "PNC/UI/Colonist/PNC_ColonistActivities"
+local Task = require "PNC/UI/Colonist/PNC_ColonistTask"
 local Presentation = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Presentation"
 
 -- The first tab deliberately delegates to the tested colony-management needs
@@ -42,6 +43,21 @@ Registry.Register({
     end,
     onControl = function(window, button)
         return Activities.OnControl(window, button)
+    end,
+})
+
+Registry.Register({
+    id = "task",
+    order = 30,
+    titleKey = "UI_PNC_Task_Tab",
+    titleFallback = "TASK",
+    detailTitleKey = "UI_PNC_TaskBrain_Title",
+    detailTitleFallback = "COLONIST TASK BRAIN",
+    buildRows = function(context)
+        return Task.BuildRows(context)
+    end,
+    onRow = function(window, row)
+        return Task.OnRow(window, row)
     end,
 })
 

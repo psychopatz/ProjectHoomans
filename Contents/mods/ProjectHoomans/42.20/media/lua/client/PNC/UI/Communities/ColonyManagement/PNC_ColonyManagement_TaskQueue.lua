@@ -196,8 +196,11 @@ function Tasks.BuildRows(context)
         local requestId = Presentation.RequestId(task, index)
         local pendingCancellation = pending and pending[requestId] ~= nil
         local cancelling = pendingCancellation or currentStatus == "CANCELLING"
-        local action = task.cancellable == false and nil or task.cancelAction
-            or (task.durable == false and "cancel_task" or "cancel_work")
+        local action
+        if task.cancellable ~= false then
+            action = task.cancelAction
+                or (task.durable == false and "cancel_task" or "cancel_work")
+        end
         local actionLabel = Shared.Tr("UI_PNC_Work_Cancel", "CANCEL")
         if cancelling then
             action = nil

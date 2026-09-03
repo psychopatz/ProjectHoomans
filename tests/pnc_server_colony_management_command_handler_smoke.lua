@@ -8,6 +8,7 @@ local buildCount = 0
 local actionArgs
 local colonyCall
 local deltaCall
+local requestArgs
 
 local function buildSnapshot()
     buildCount = buildCount + 1
@@ -38,8 +39,9 @@ PNC = {
         end,
     },
     ColonyManagement = {
-        BuildSnapshot = function(receivedPlayer)
+        BuildSnapshot = function(receivedPlayer, options)
             T.equal(receivedPlayer, player, "snapshot player")
+            requestArgs = options
             return buildSnapshot()
         end,
         HandleAction = function(receivedPlayer, args)
@@ -53,11 +55,13 @@ PNC = {
 local Router = require "PNC/Networking/PNC_ServerCommandRouter"
 require "PNC/Networking/Handlers/PNC_ServerColonyManagementCommandHandler"
 
-T.equal(Router.Handle("ColonyManagementRequest", player, nil), true,
+local brainRequest = { taskBrainNpcID = "npc-1" }
+T.equal(Router.Handle("ColonyManagementRequest", player, brainRequest), true,
     "colony snapshot request handled")
 T.equal(colonyCall.player, player, "colony snapshot response player")
 T.equal(colonyCall.snapshot.marker, "snapshot-1",
     "colony snapshot response")
+T.equal(requestArgs, brainRequest, "task brain selection reaches server")
 
 colonyCall = nil
 local ordinaryArgs = { action = "assign_work", npcID = "npc-1" }

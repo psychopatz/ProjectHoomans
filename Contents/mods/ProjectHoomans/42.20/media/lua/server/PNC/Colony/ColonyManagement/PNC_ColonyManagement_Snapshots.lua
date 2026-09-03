@@ -111,6 +111,7 @@ function Internal.BuildSettlementSnapshot(baseOrId, tasks)
 end
 
 function Management.BuildSnapshot(player, options)
+    options = type(options) == "table" and options or {}
     local people, attention, counts = {}, {}, { hunger={}, thirst={}, fatigue={} }
     local supplyShortages = { food = {}, hydration = {}, medical = {} }
     local playerFaction, colony
@@ -127,7 +128,7 @@ function Management.BuildSnapshot(player, options)
     end
     for _, record in pairs(PNC.Registry.Data or {}) do
         if record.alive ~= false and owned(record, player) then
-            local value = summary(record, player); people[#people+1]=value
+            local value = summary(record, player, options); people[#people+1]=value
             for _, needType in ipairs(Definitions.TYPES) do
                 local level=Definitions.GetLevel(needType, value.needs[needType]); counts[needType][level]=(counts[needType][level] or 0)+1
                 if level == "CRITICAL" or level == "SEVERE" or level == "MODERATE" then attention[#attention+1]={ severity=level, npcID=value.id, name=value.name, needType=needType, value=value.needs[needType] } end

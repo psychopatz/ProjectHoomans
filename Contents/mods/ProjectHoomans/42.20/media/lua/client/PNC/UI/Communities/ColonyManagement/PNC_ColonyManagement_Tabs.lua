@@ -9,6 +9,7 @@ local SettingsTab = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManag
 local JobsTab = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_JobsTab"
 local ScavengeTab = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_ScavengeTab"
 local TasksTab = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_TasksTab"
+local TaskBrainTab = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_TaskBrainTab"
 local UtilitiesTab = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_UtilitiesTab"
 
 Registry.Register({
@@ -103,6 +104,20 @@ Registry.Register({
     end,
     onRow = function(window, row, x, y)
         return TasksTab.OnRow(window, row, x, y)
+    end,
+})
+
+Registry.Register({
+    id = "task",
+    title = function() return Shared.Tr("UI_PNC_Task_Tab", "TASK") end,
+    detailTitle = function()
+        return Shared.Tr("UI_PNC_TaskBrain_Title", "COLONIST TASK BRAIN")
+    end,
+    showRoster = true,
+    showDetails = true,
+    buildRows = function(context) return TaskBrainTab.BuildRows(context) end,
+    onRow = function(window, row)
+        return TaskBrainTab.OnRow(window, row)
     end,
 })
 

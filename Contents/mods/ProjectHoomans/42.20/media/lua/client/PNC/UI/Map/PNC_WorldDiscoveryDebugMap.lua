@@ -202,69 +202,22 @@ function DebugMap.Open()
     return modal
 end
 
-local function numberFrom(object, field, method, fallback)
-    local value = object and tonumber(object[field]) or nil
-    if value == nil and object and type(object[method]) == "function" then
-        value = tonumber(object[method](object))
-    end
-    return value or fallback
-end
-
-function DebugMap.LayoutButton(map)
-    local button = map and map.pncDebugButton or nil
-    local panel = map and map.buttonPanel or nil
-    if not button or not panel then return false end
-    local gap = 8
-    local width = numberFrom(button, "width", "getWidth", 88)
-    local height = math.max(24,
-        numberFrom(panel, "height", "getHeight", 32))
-    local anchor = map.pncBasesButton
-    local x = anchor
-        and numberFrom(anchor, "x", "getX", 0) - width - gap
-        or numberFrom(panel, "x", "getX", 0) - width - gap
-    local y = numberFrom(panel, "y", "getY", 0)
-    if button.setX then button:setX(x) else button.x = x end
-    if button.setY then button:setY(y) else button.y = y end
-    if button.setHeight then button:setHeight(height)
-    else button.height = height end
-    if button.setVisible then button:setVisible(canDebug())
-    else button.visible = canDebug() end
-    return true
-end
-
-function DebugMap.EnsureButton(map)
-    if not map or not map.buttonPanel or not canDebug() then return nil end
-    if not map.pncDebugButton then
-        local button = ISButton:new(
-            0, 0, 88, 32,
-            text("UI_PNC_DebugDiscoveryButton", "DEBUG"),
-            map, function() DebugMap.Open() end
-        )
-        button:initialise()
-        button:instantiate()
-        button.anchorBottom = true
-        button.anchorRight = true
-        map:addChild(button)
-        map.pncDebugButton = button
-    end
-    DebugMap.LayoutButton(map)
-    return map.pncDebugButton
-end
-
-if ISWorldMap and not ISWorldMap._pncWorldDiscoveryDebugPatched then
-    ISWorldMap._pncWorldDiscoveryDebugPatched = true
-    local originalCreateChildren = ISWorldMap.createChildren
-    local originalPrerender = ISWorldMap.prerender
-
-    function ISWorldMap:createChildren()
-        originalCreateChildren(self)
-        DebugMap.EnsureButton(self)
-    end
-
-    function ISWorldMap:prerender()
-        DebugMap.EnsureButton(self)
-        if originalPrerender then originalPrerender(self) end
-    end
+if PNC.MapHoomansMenu and PNC.MapHoomansMenu.Register then
+    PNC.MapHoomansMenu.Register("npc_debug", {
+        order = 40,
+        visible = canDebug,
+        title = function()
+            return text("UI_PNC_DebugDiscoveryButton", "DEBUG")
+        end,
+        tooltip = function()
+            return text("UI_PNC_DebugDiscoveryButtonHelp",
+                "Open NPC World debug tools")
+        end,
+        onActivate = function()
+            PNC.MapHoomansMenu.Close()
+            return DebugMap.Open() ~= nil
+        end,
+    })
 end
 
 return DebugMap

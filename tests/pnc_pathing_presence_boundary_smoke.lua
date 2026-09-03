@@ -44,6 +44,7 @@ local expectedPathServiceCalls = {
     "PNC/Core/Pathing/PNC_TraversalAction",
     "PNC/Core/Pathing/PNC_PathService/PNC_PathService_Context",
     "PNC/Core/Pathing/PNC_PathService/PNC_PathService_Facing",
+    "PNC/Core/Pathing/PNC_PathService/PNC_PathService_AmbientFacing",
     "PNC/Core/Pathing/PNC_PathService/PNC_PathService_Logging",
     "PNC/Core/Pathing/PNC_PathService/PNC_PathService_Interactions",
     "PNC/Core/Pathing/PNC_PathService/PNC_PathService_TraversalRuntime",

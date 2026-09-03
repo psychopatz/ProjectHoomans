@@ -78,6 +78,15 @@ function Internal.HoldAndFaceOwner(record, zombie, owner, mode, reason)
             Animation.Apply(zombie, record, "Idle")
         end
     end
+    if PNC.PathService and PNC.PathService.RequestAmbientFacing
+        and PNC.PathService.RequestAmbientFacing(
+            record,
+            zombie,
+            "follow_owner"
+        )
+    then
+        return true
+    end
     if PNC.PathService and PNC.PathService.RequestIdleFacing then
         PNC.PathService.RequestIdleFacing(
             record,

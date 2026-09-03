@@ -52,14 +52,14 @@ for name in pairs(commandFunctions) do
     T.equal(type(Tasking.Commands[name]), "function",
         "entry point preserves Tasking.Commands." .. name)
 end
-T.equal(commandCount, 9, "tasking command function count")
+T.equal(commandCount, 10, "tasking command function count")
 local queryCount = 0
 for name in pairs(queryFunctions) do
     queryCount = queryCount + 1
     T.equal(type(Tasking.Queries[name]), "function",
         "entry point preserves Tasking.Queries." .. name)
 end
-T.equal(queryCount, 2, "tasking query function count")
+T.equal(queryCount, 3, "tasking query function count")
 
 local accepted, reason = Tasking.Commands.RegisterProvider("farming", {
     GetCandidates = function() return {} end,

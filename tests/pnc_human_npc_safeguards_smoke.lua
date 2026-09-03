@@ -35,6 +35,7 @@ local modData = { PNC_NPC = true }
 local managedRecord
 local nativeFramePumps = 0
 local registryFindCalls = 0
+local turnAlertedWrites = 0
 local emitter = {
     stopSoundByName = function(_, name)
         stopped[#stopped + 1] = name
@@ -77,6 +78,9 @@ local managedBody = {
     end,
     changeState = function()
         actionState = "idle"
+    end,
+    setTurnAlertedValues = function()
+        turnAlertedWrites = turnAlertedWrites + 1
     end,
 }
 
@@ -152,6 +156,23 @@ T.equal(
     writesAfterInitialMaintenance,
     "audio cadence triggered a full body safety rewrite"
 )
+
+actionState = "turnalerted"
+T.truthy(
+    PNC.LiveBodyControl.SuppressZombieState(
+        managedBody,
+        nil,
+        1000,
+        true
+    ),
+    "turn-alerted state was not suppressed"
+)
+T.equal(
+    turnAlertedWrites,
+    0,
+    "body safety never re-armed vanilla turn-alerted state"
+)
+T.equal(actionState, "idle", "turn-alerted state was released to idle")
 
 modData.PNC_BumpActionLease = true
 modData.PNC_BumpActionLeaseUntil = 2000

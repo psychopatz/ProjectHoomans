@@ -17,6 +17,12 @@ local function currentOrIdleScene(record, zombie, now, debugCycleActive)
         Scenes.TryIdle(record, zombie, now)
         scene = record and record.runtime
             and record.runtime.animationScene or nil
+        if not scene
+            and PNC.PathService
+            and PNC.PathService.RequestAmbientFacing
+        then
+            PNC.PathService.RequestAmbientFacing(record, zombie, "idle")
+        end
     end
     return scene
 end

@@ -117,7 +117,11 @@ end
 
 function Tasking.Commands.Reevaluate(npcId, cause, event)
     local record = PNC.Registry and PNC.Registry.Get and PNC.Registry.Get(npcId)
-    local diagnostics = { lastCause = tostring(cause or "manual"), candidates = {} }
+    local diagnostics = {
+        lastCause = tostring(cause or "manual"), candidates = {},
+        generatedAt = PNC.Core and PNC.Core.Now and PNC.Core.Now() or 0,
+        recordRevision = record and tonumber(record.recordRevision) or 0,
+    }
     if type(event) == "table" then
         diagnostics.eventId = event.id
         diagnostics.eventType = event.type

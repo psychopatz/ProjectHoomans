@@ -7,10 +7,10 @@ local Router = PNC.ServerCommandRouter
 local Const = PNC.Const
 local Network = PNC.Network
 
-Router.Register(Const.CMD_COLONY_MANAGEMENT_REQUEST, function(player)
+Router.Register(Const.CMD_COLONY_MANAGEMENT_REQUEST, function(player, args)
     Network.SendColonyManagement(
         player,
-        PNC.ColonyManagement.BuildSnapshot(player)
+        PNC.ColonyManagement.BuildSnapshot(player, args)
     )
 end)
 

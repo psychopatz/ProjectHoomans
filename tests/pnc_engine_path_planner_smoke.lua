@@ -91,6 +91,7 @@ local wrapperRequestCount = 0
 local cancelCount = 0
 local resetCount = 0
 local updateCount = 0
+local turnAlertedCalls = 0
 local nextResult = BehaviorResult.Working
 local nextActionState = nil
 local body
@@ -149,6 +150,9 @@ body = {
     end,
     changeState = function(self, state)
         self.actionState = state and state.name or "idle"
+    end,
+    setTurnAlertedValues = function()
+        turnAlertedCalls = turnAlertedCalls + 1
     end,
     isUseless = function(self) return self.useless end,
     setUseless = function(self, value) self.useless = value == true end,
@@ -331,6 +335,19 @@ T.truthy(body.useless == true,
 T.truthy(cancelCount == cancelsAfterStart
     and resetCount == resetsAfterStart,
     "working native path was cancelled or reset")
+
+body.actionState = "turnalerted"
+T.equal(
+    PNC.EnginePathPlanner.Internal.EnsureNativeMovementOwner(body),
+    false,
+    "native owner did not leave vanilla turn-alerted state alone"
+)
+T.equal(
+    turnAlertedCalls,
+    0,
+    "native planner never re-armed vanilla turn-alerted state"
+)
+body.actionState = "idle"
 
 local suppressedCount = 0
 PNC.LiveBodyControl = {

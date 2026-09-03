@@ -115,11 +115,11 @@ function Client.HasUpdate(lastRevision, lastReceiveAt)
         update
 end
 
-function Client.RequestSnapshot()
+function Client.RequestSnapshot(taskBrainNpcID)
     local ok = false
     local reason = "client_unavailable"
     if PNC.Client and PNC.Client.RequestColonyManagement then
-        ok, reason = PNC.Client.RequestColonyManagement()
+        ok, reason = PNC.Client.RequestColonyManagement(taskBrainNpcID)
     end
     return ok, reason, PNC.Core.Now()
 end

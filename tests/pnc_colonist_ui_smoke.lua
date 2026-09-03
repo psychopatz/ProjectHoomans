@@ -45,6 +45,10 @@ T.contains(tabsSource, "Presentation.BuildNeeds",
     "colonist needs tab does not use the tested needs presentation")
 T.contains(tabsSource, 'id = "activities"',
     "colonist activities tab is not registered")
+T.contains(tabsSource, 'id = "task"',
+    "colonist task tab is not registered in the target UI")
+T.contains(tabsSource, "PNC/UI/Colonist/PNC_ColonistTask",
+    "colonist task tab imports the wrong presentation path")
 T.contains(controllerSource, "selectedPersonID",
     "colonist selection identity is not persisted")
 T.contains(controllerSource, "Options.ApplySurfaceOpacity",
@@ -53,6 +57,8 @@ T.contains(windowSource, "WidgetWindow.Install",
     "colonist window has no reusable widget lifecycle")
 T.contains(windowSource, "Client.HasUpdate",
     "colonist window bypasses the snapshot update boundary")
+T.contains(windowSource, "taskBrainNpcID",
+    "colonist task tab does not request the selected NPC brain")
 T.contains(windowSource, "persistenceKey = \"PNC.CommandHub.Colonist\"",
     "colonist window geometry is not persisted")
 T.contains(compositionSource, "PNC/UI/Colonist/PNC_Colonist",

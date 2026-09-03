@@ -103,6 +103,8 @@ function Controller.CreateChildren(window)
     window.lastReceiveRevision = -1
     window.lastReceiveAt = 0
     window.lastRequestAt = 0
+    window.pendingTaskBrainCancellations = {}
+    window.lastTaskBrainRequestId = nil
 
     syncTabs(window)
     window.tabControlsPane = UI.CreatePanel(window)

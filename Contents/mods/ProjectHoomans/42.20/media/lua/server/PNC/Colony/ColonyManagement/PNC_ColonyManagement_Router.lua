@@ -28,7 +28,9 @@ function Management.HandleAction(player, args)
         or Internal.handleProductionAction(player, args, action)
         or Internal.handleWorkDebugAction(player, args, action)
         or { ok = false, reason = "unknown_colony_action" }
-    local snapshot = Management.BuildSnapshot(player)
+    local snapshot = Management.BuildSnapshot(player, {
+        taskBrainNpcID = args.taskBrainNpcID,
+    })
     return snapshot, {
         ok = outcome.ok == true,
         reason = outcome.reason,

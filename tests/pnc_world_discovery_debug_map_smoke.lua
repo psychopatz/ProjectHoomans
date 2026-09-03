@@ -1,6 +1,8 @@
 local T = require "tests/support/test"
 
 local ROOT = T.path("ProjectHoomans", "root", "")
+local MENU = T.path("ProjectHoomans", "client", "PNC/UI/Map/")
+    .. "PNC_MapHoomansMenu.lua"
 
 ISPanel = {}
 function ISPanel:derive()
@@ -45,7 +47,6 @@ local originalCalls = 0
 ISWorldMap = {
     createChildren = function(self)
         self.buttonPanel = { x = 300, y = 400, height = 32 }
-        self.pncBasesButton = { x = 52 }
     end,
     prerender = function() end,
     onRightMouseUp = function()
@@ -76,6 +77,7 @@ getCore = function()
         getScreenHeight = function() return 720 end }
 end
 
+T.load(MENU)
 T.load(ROOT .. "client/PNC/UI/Map/PNC_WorldDiscoveryDebugMap.lua")
 local map = { children = {}, addChild = ISPanel.addChild }
 setmetatable(map, { __index = ISWorldMap })
@@ -84,14 +86,15 @@ map:createChildren()
 T.equal(map:onRightMouseUp(10, 20), "vanilla",
     "PNC discovery debug leaves the vanilla teleport menu untouched")
 T.equal(originalCalls, 1, "vanilla right-click handler runs exactly once")
-T.truthy(map.pncDebugButton, "authorized map did not receive a debug button")
-T.equal(map.pncDebugButton.x, -44,
-    "debug button is laid out beside the NPC world controls")
-
-map.pncDebugButton.onclick()
+T.truthy(map.pncHoomansButton, "authorized map did not receive Hoomans settings")
+map.pncHoomansButton.onclick()
+local menu = PNC.MapHoomansMenu.instance
+T.truthy(menu and menu.entryButtons.npc_debug,
+    "Hoomans menu did not receive the debug entry")
+menu:onButton(menu.entryButtons.npc_debug)
 local modal = PNC.WorldDiscoveryDebugMap.instance
 T.truthy(modal and modal.allButton and modal.resetButton,
-    "debug button did not open the scalable settings modal")
+    "Hoomans debug entry did not open the scalable settings modal")
 modal:onButton(modal.allButton)
 T.equal(requests[#requests].action, "debug_discover_all",
     "modal discover-all uses the authoritative action")

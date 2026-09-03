@@ -14,6 +14,7 @@ PathService.Internal = PathService.Internal or {}
 require "PNC/Core/Pathing/PNC_TraversalAction"
 require "PNC/Core/Pathing/PNC_PathService/PNC_PathService_Context"
 require "PNC/Core/Pathing/PNC_PathService/PNC_PathService_Facing"
+require "PNC/Core/Pathing/PNC_PathService/PNC_PathService_AmbientFacing"
 require "PNC/Core/Pathing/PNC_PathService/PNC_PathService_Logging"
 require "PNC/Core/Pathing/PNC_PathService/PNC_PathService_Interactions"
 require "PNC/Core/Pathing/PNC_PathService/PNC_PathService_TraversalRuntime"
@@ -32,6 +33,7 @@ Commands.Pump = PathService.Pump
 Commands.AdvanceAbstract = PathService.AdvanceAbstract
 Commands.RequestCombatFacing = PathService.RequestCombatFacing
 Commands.RequestIdleFacing = PathService.RequestIdleFacing
+Commands.RequestAmbientFacing = PathService.RequestAmbientFacing
 Commands.ApplyTravelFacing = PathService.ApplyTravelFacing
 Commands.Reset = function(record, zombie, reason)
     return PathService.Reset(zombie, record, reason)

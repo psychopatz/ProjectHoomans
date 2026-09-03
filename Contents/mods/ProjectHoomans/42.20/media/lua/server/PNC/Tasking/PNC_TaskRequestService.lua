@@ -140,9 +140,34 @@ local function authorized(player, requestId)
     return order
 end
 
-function Service.Commands.CancelForPlayer(player, requestId, reason)
+local function revisionMatches(actual, expected)
+    if expected == nil then return true end
+    return tonumber(actual) ~= nil
+        and tonumber(actual) == tonumber(expected)
+end
+
+local function workIdentityMatches(order, options)
+    if type(options) ~= "table" then return true end
+    if options.sourceRef ~= nil
+        and tostring(options.sourceRef) ~= tostring(order.id)
+    then return false, "TASK_STALE" end
+    if options.taskId ~= nil
+        and tostring(options.taskId) ~= tostring(order.id)
+    then return false, "TASK_STALE" end
+    if order.workerId and (options.npcID or options.npcId)
+        and tostring(order.workerId) ~= tostring(options.npcID or options.npcId)
+    then return false, "TASK_STALE" end
+    if not revisionMatches(order.revision, options.expectedRevision) then
+        return false, "TASK_STALE"
+    end
+    return true
+end
+
+function Service.Commands.CancelForPlayer(player, requestId, reason, options)
     local order, denied = authorized(player, requestId)
     if not order then return false, denied end
+    local matches, mismatch = workIdentityMatches(order, options)
+    if not matches then return false, mismatch end
     return PNC.WorkService.Commands.Cancel(order.id, reason)
 end
 
@@ -199,9 +224,26 @@ local function authorizedMedical(player, requestId)
     return task
 end
 
-function Service.Commands.CancelMedicalForPlayer(player, requestId, reason)
+local function medicalIdentityMatches(task, options)
+    if type(options) ~= "table" then return true end
+    if options.sourceRef ~= nil
+        and tostring(options.sourceRef) ~= tostring(task.id)
+    then return false, "TASK_STALE" end
+    if task.actorId and (options.npcID or options.npcId)
+        and tostring(task.actorId) ~= tostring(options.npcID or options.npcId)
+    then return false, "TASK_STALE" end
+    if not revisionMatches(task.revision, options.expectedRevision) then
+        return false, "TASK_STALE"
+    end
+    return true
+end
+
+function Service.Commands.CancelMedicalForPlayer(player, requestId, reason,
+        options)
     local task, denied = authorizedMedical(player, requestId)
     if not task then return false, denied end
+    local matches, mismatch = medicalIdentityMatches(task, options)
+    if not matches then return false, mismatch end
     return PNC.MedicalCareService.Cancel(task.id, reason)
 end
 
@@ -230,7 +272,39 @@ local function ownedActivity(player, record, context)
     return true
 end
 
-function Service.Commands.CancelTransientForPlayer(player, requestId, reason)
+local function leaseIdentityMatches(lease, options)
+    if type(options) ~= "table" then return true end
+    if options.npcID or options.npcId then
+        if tostring(options.npcID or options.npcId)
+            ~= tostring(lease.npcId)
+        then return false, "TASK_STALE" end
+    end
+    if options.taskId ~= nil
+        and tostring(options.taskId) ~= tostring(lease.taskId)
+    then return false, "TASK_STALE" end
+    if options.sourceDomain ~= nil
+        and tostring(options.sourceDomain) ~= tostring(lease.sourceDomain)
+    then return false, "TASK_STALE" end
+    if options.sourceRef ~= nil
+        and tostring(options.sourceRef) ~= tostring(lease.sourceRef)
+    then return false, "TASK_STALE" end
+    if not revisionMatches(lease.revision, options.expectedRevision) then
+        return false, "TASK_STALE"
+    end
+    return true
+end
+
+local function reevaluateAfterCancellation(npcId, reason)
+    local tasking = PNC.Tasking
+    local commands = tasking and tasking.Commands
+    if commands and commands.ReevaluateAfterCancellation then
+        return commands.ReevaluateAfterCancellation(npcId, reason)
+    end
+    return false, "TASKING_REEVALUATION_UNAVAILABLE"
+end
+
+function Service.Commands.CancelTransientForPlayer(player, requestId, reason,
+        options)
     local context, contextReason = PNC.ProductionContext.ForPlayer(player)
     if not context then return false, contextReason end
     local lease = findLease(requestId)
@@ -243,11 +317,18 @@ function Service.Commands.CancelTransientForPlayer(player, requestId, reason)
             and PNC.Registry.Get(lease.npcId) or nil
         local allowed, denied = ownedActivity(player, record, context)
         if not allowed then return false, denied end
+        local matches, mismatch = leaseIdentityMatches(lease, options)
+        if not matches then return false, mismatch end
         if PNC.Tasking and PNC.Tasking.Commands
             and PNC.Tasking.Commands.CancelLease
         then
-            return PNC.Tasking.Commands.CancelLease(
+            local cancelled, state = PNC.Tasking.Commands.CancelLease(
                 lease.leaseId, reason or "player_cancelled")
+            if cancelled and state ~= "CANCELLATION_DEFERRED" then
+                reevaluateAfterCancellation(lease.npcId,
+                    reason or "player_cancelled")
+            end
+            return cancelled, state
         end
         return false, "TASKING_UNAVAILABLE"
     end
@@ -257,6 +338,9 @@ function Service.Commands.CancelTransientForPlayer(player, requestId, reason)
         return false, "TASK_REQUEST_NOT_FOUND"
     end
     local npcId = string.sub(requestId, 10)
+    if type(options) == "table" and (options.npcID or options.npcId)
+        and tostring(options.npcID or options.npcId) ~= npcId
+    then return false, "TASK_STALE" end
     record = PNC.Registry and PNC.Registry.Get
         and PNC.Registry.Get(npcId) or nil
     local allowed, denied = ownedActivity(player, record, context)
@@ -268,8 +352,13 @@ function Service.Commands.CancelTransientForPlayer(player, requestId, reason)
         if PNC.Tasking and PNC.Tasking.Commands
             and PNC.Tasking.Commands.CancelLease
         then
-            return PNC.Tasking.Commands.CancelLease(
+            local cancelled, state = PNC.Tasking.Commands.CancelLease(
                 activityLease.leaseId, reason or "player_cancelled")
+            if cancelled and state ~= "CANCELLATION_DEFERRED" then
+                reevaluateAfterCancellation(activityLease.npcId,
+                    reason or "player_cancelled")
+            end
+            return cancelled, state
         end
         return false, "TASKING_UNAVAILABLE"
     end

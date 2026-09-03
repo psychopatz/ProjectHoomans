@@ -1,42 +1,54 @@
 -- Per-client world-map presentation controls.
 
 require "ISUI/Maps/ISWorldMap"
-require "ISUI/ISButton"
 
 PNC = PNC or {}
 PNC.MapDisplay = PNC.MapDisplay or {}
 
 local Display = PNC.MapDisplay
+local Menu = PNC.MapHoomansMenu
 
 Display.NamesVisible = Display.NamesVisible == true
 if Display.BasesVisible == nil then Display.BasesVisible = true end
 
-local function numberFrom(object, field, method, fallback)
-    local value = object and tonumber(object[field]) or nil
-    if value == nil and object and type(object[method]) == "function" then
-        value = tonumber(object[method](object))
-    end
-    return value or fallback
+local function text(key, fallback)
+    local value = getText and getText(key) or nil
+    if value and value ~= "" and value ~= key then return value end
+    return fallback or key
 end
 
-local function syncNamesButton(button)
-    if not button then return end
-    local title = Display.NamesVisible
-        and "NPC NAMES: ON" or "NPC NAMES: OFF"
-    if button.setTitle then button:setTitle(title) else button.title = title end
-    button.tooltip = Display.NamesVisible
-        and "Hide ordinary NPC names (selected and hovered names remain visible)"
-        or "Show NPC names on the world map"
+function Display.GetNamesTitle()
+    return text(
+        Display.NamesVisible and "UI_PNC_MapNamesOn" or "UI_PNC_MapNamesOff",
+        Display.NamesVisible and "NPC NAMES: ON" or "NPC NAMES: OFF"
+    )
 end
 
-local function syncBasesButton(button)
-    if not button then return end
-    local title = Display.BasesVisible
-        and "NPC WORLD: ON" or "NPC WORLD: OFF"
-    if button.setTitle then button:setTitle(title) else button.title = title end
-    button.tooltip = Display.BasesVisible
-        and "Hide generated settlements and abstract survivor groups"
-        or "Show generated settlements and abstract survivor groups"
+function Display.GetNamesTooltip()
+    return text(
+        Display.NamesVisible and "UI_PNC_MapNamesOnHelp"
+            or "UI_PNC_MapNamesOffHelp",
+        Display.NamesVisible
+            and "Hide ordinary NPC names (selected and hovered names remain visible)"
+            or "Show NPC names on the world map"
+    )
+end
+
+function Display.GetBasesTitle()
+    return text(
+        Display.BasesVisible and "UI_PNC_MapWorldOn" or "UI_PNC_MapWorldOff",
+        Display.BasesVisible and "NPC WORLD: ON" or "NPC WORLD: OFF"
+    )
+end
+
+function Display.GetBasesTooltip()
+    return text(
+        Display.BasesVisible and "UI_PNC_MapWorldOnHelp"
+            or "UI_PNC_MapWorldOffHelp",
+        Display.BasesVisible
+            and "Hide generated settlements and abstract survivor groups"
+            or "Show generated settlements and abstract survivor groups"
+    )
 end
 
 function Display.AreNamesVisible()
@@ -45,7 +57,9 @@ end
 
 function Display.SetNamesVisible(visible)
     Display.NamesVisible = visible == true
-    syncNamesButton(Display.LastNamesButton)
+    if Menu and Menu.instance and Menu.instance.syncButtons then
+        Menu.instance:syncButtons()
+    end
     return Display.NamesVisible
 end
 
@@ -55,7 +69,6 @@ end
 
 function Display.SetBasesVisible(visible)
     Display.BasesVisible = visible == true
-    syncBasesButton(Display.LastBasesButton)
     if Display.BasesVisible
         and PNC.CommunityDebugOverlay
         and PNC.CommunityDebugOverlay.Update
@@ -67,6 +80,9 @@ function Display.SetBasesVisible(visible)
         and PNC.AbstractGroupMapLayer.Update
     then
         PNC.AbstractGroupMapLayer.Update(true)
+    end
+    if Menu and Menu.instance and Menu.instance.syncButtons then
+        Menu.instance:syncButtons()
     end
     return Display.BasesVisible
 end
@@ -81,98 +97,19 @@ function Display.ToggleNames()
     return Display.SetNamesVisible(not Display.NamesVisible)
 end
 
-function Display.LayoutButton(map)
-    local button = map and map.pncNamesButton or nil
-    local basesButton = map and map.pncBasesButton or nil
-    local panel = map and map.buttonPanel or nil
-    if not button or not basesButton or not panel then
-        return false
-    end
-    local gap = 8
-    local panelX = numberFrom(panel, "x", "getX", 0)
-    local panelY = numberFrom(panel, "y", "getY", 0)
-    local panelHeight = numberFrom(panel, "height", "getHeight", 32)
-    local width = numberFrom(button, "width", "getWidth", 116)
-    local height = math.max(24, panelHeight)
-    if button.setX then button:setX(panelX - width - gap)
-    else button.x = panelX - width - gap end
-    if button.setY then button:setY(panelY)
-    else button.y = panelY end
-    if button.setHeight then button:setHeight(height)
-    else button.height = height end
-    local basesWidth = numberFrom(
-        basesButton,
-        "width",
-        "getWidth",
-        116
-    )
-    local namesX = panelX - width - gap
-    if basesButton.setX then
-        basesButton:setX(namesX - basesWidth - gap)
-    else
-        basesButton.x = namesX - basesWidth - gap
-    end
-    if basesButton.setY then basesButton:setY(panelY)
-    else basesButton.y = panelY end
-    if basesButton.setHeight then
-        basesButton:setHeight(height)
-    else
-        basesButton.height = height
-    end
-    syncNamesButton(button)
-    syncBasesButton(basesButton)
-    return true
-end
-
-function Display.EnsureButton(map)
-    if not map then return nil end
-    if not map.buttonPanel or not ISButton or not ISButton.new then
-        return nil
-    end
-    if not map.pncNamesButton then
-        local button = ISButton:new(
-            0, 0, 116, 32, "", map,
-            function() Display.ToggleNames() end
-        )
-        if button.initialise then button:initialise() end
-        if button.instantiate then button:instantiate() end
-        button.anchorBottom = true
-        button.anchorRight = true
-        if map.addChild then map:addChild(button) end
-        map.pncNamesButton = button
-    end
-    if not map.pncBasesButton then
-        local button = ISButton:new(
-            0, 0, 116, 32, "", map,
-            function() Display.ToggleBases() end
-        )
-        if button.initialise then button:initialise() end
-        if button.instantiate then button:instantiate() end
-        button.anchorBottom = true
-        button.anchorRight = true
-        if map.addChild then map:addChild(button) end
-        map.pncBasesButton = button
-    end
-    Display.LastNamesButton = map.pncNamesButton
-    Display.LastBasesButton = map.pncBasesButton
-    Display.LayoutButton(map)
-    return map.pncNamesButton
-end
-
-if ISWorldMap and not ISWorldMap._pncMapDisplayPatched then
-    ISWorldMap._pncMapDisplayPatched = true
-    local originalCreateChildren = ISWorldMap.createChildren
-    local originalPrerender = ISWorldMap.prerender
-
-    function ISWorldMap:createChildren()
-        originalCreateChildren(self)
-        Display.EnsureButton(self)
-    end
-
-    function ISWorldMap:prerender()
-        Display.EnsureButton(self)
-        if originalPrerender then originalPrerender(self) end
-    end
+if Menu and Menu.Register then
+    Menu.Register("npc_names", {
+        order = 20,
+        title = function() return Display.GetNamesTitle() end,
+        tooltip = function() return Display.GetNamesTooltip() end,
+        onActivate = function() return Display.ToggleNames() end,
+    })
+    Menu.Register("npc_world", {
+        order = 30,
+        title = function() return Display.GetBasesTitle() end,
+        tooltip = function() return Display.GetBasesTooltip() end,
+        onActivate = function() return Display.ToggleBases() end,
+    })
 end
 
 return Display

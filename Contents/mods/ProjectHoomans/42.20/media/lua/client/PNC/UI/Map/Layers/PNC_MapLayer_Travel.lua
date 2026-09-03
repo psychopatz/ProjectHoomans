@@ -174,9 +174,7 @@ local function isOverControls(map, x, y)
     return isInsideVisibleChild(map.symbolsUI, x, y)
         or isInsideVisibleChild(map.keyUI, x, y)
         or isInsideVisibleChild(map.buttonPanel, x, y)
-        or isInsideVisibleChild(map.pncNamesButton, x, y)
-        or isInsideVisibleChild(map.pncBasesButton, x, y)
-        or isInsideVisibleChild(map.pncDebugButton, x, y)
+        or isInsideVisibleChild(map.pncHoomansButton, x, y)
         or isInsideVisibleChild(map.pncHoverPortrait, x, y)
 end
 
@@ -233,7 +231,6 @@ function TravelLayer.Render(map)
         end
         return
     end
-    if Display and Display.EnsureButton then Display.EnsureButton(map) end
     local entries = listProjectedEntries()
     local showLabels = Display and Display.AreNamesVisible
         and Display.AreNamesVisible() or false

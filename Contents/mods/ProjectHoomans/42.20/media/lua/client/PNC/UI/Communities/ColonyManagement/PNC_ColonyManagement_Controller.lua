@@ -126,8 +126,9 @@ function Controller.SelectTab(window, button)
     end
     if definition.selectable == false then return end
     window.tab = definition.id
-    if window.tab == "tasks" then
-        window:requestSnapshot("tasks_opened")
+    if window.tab == "tasks" or window.tab == "task" then
+        window:requestSnapshot(window.tab == "task"
+            and "task_brain_opened" or "tasks_opened")
     elseif window.tab == "building" then
         window:requestSnapshot("building_opened")
     end
@@ -180,6 +181,9 @@ function Controller.OnPersonSelected(window)
     end
     if definition and definition.showRoster ~= false then
         Controller.RebuildDetails(window)
+    end
+    if window.tab == "task" then
+        window:requestSnapshot("task_brain_selected")
     end
     Diagnostics.Log(window, "person_selected", {
         tab = window.tab,

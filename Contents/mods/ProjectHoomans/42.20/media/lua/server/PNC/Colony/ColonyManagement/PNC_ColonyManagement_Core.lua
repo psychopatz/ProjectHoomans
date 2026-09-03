@@ -69,7 +69,7 @@ local function specialOrderState(record)
     return output
 end
 
-local function summary(record, player)
+local function summary(record, player, options)
     local needs = PNC.IndividualNeeds.Ensure(record)
     local nutrition = PNC.IndividualNeeds.GetNutrition
         and PNC.IndividualNeeds.GetNutrition(record) or nil
@@ -98,6 +98,10 @@ local function summary(record, player)
         and (playerOnlineID ~= nil and targetOnlineID ~= nil
             and playerOnlineID == targetOnlineID
             or playerUsername ~= "" and playerUsername == targetUsername)
+    local taskBrainNpcID = options and options.taskBrainNpcID
+    local includeTaskBrain = taskBrainNpcID ~= nil
+        and tostring(taskBrainNpcID) ~= ""
+        and tostring(taskBrainNpcID) == tostring(record.id)
     return { id=record.id, name=tostring(record.name or record.id),
         role=record.affiliation and record.affiliation.communityRole or record.affiliation and record.affiliation.role or "companion",
         activity=PNC.IndividualNeeds.GetActivity(record), job=record.activeJob,
@@ -109,6 +113,10 @@ local function summary(record, player)
         needsView=needsView, morale=moraleView.score,
         moraleModifiers=moraleView.modifiers,
         presenceState=record.presenceState,
+        taskBrain=includeTaskBrain and PNC.Tasking
+            and PNC.Tasking.Queries
+            and PNC.Tasking.Queries.BuildBrain
+            and PNC.Tasking.Queries.BuildBrain(record.id) or nil,
         actionInformation=PNC.ActivityStatus
             and PNC.ActivityStatus.Build
             and PNC.ActivityStatus.Build(record) or nil,

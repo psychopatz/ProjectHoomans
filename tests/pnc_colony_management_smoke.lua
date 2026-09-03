@@ -19,6 +19,7 @@ local community = {
     status = "active",
     revision = 1,
 }
+local brainBuilds = 0
 local companion = {
     id = "npc_alex",
     name = "Alex Rivera",
@@ -199,6 +200,12 @@ PNC = {
                 facilityId = "facility_farm" }}
         end,
     } },
+    Tasking = { Queries = {
+        BuildBrain = function(id)
+            brainBuilds = brainBuilds + 1
+            return { npcId = id }
+        end,
+    } },
 }
 
 local Management = T.load(ROOT .. "Colony/PNC_ColonyManagement.lua")
@@ -222,6 +229,14 @@ T.equal(snapshot.people[1].allowedJobs.Researcher, true,
     "missing legacy permissions render as allowed")
 T.equal(snapshot.people[1].jobPriorities.Constructor, 3,
     "missing legacy permissions do not expose the default priority")
+T.equal(brainBuilds, 0,
+    "ordinary colony snapshots do not build every colonist brain")
+local brainSnapshot = Management.BuildSnapshot(player, {
+    taskBrainNpcID = companion.id,
+})
+T.equal(brainBuilds, 1, "selected task brain is built on demand")
+T.equal(brainSnapshot.people[1].taskBrain.npcId, companion.id,
+    "selected task brain is attached to its colonist")
 T.equal(#snapshot.tasks, 1, "active tasks included in colony snapshot")
 T.equal(snapshot.tasks[1].workerId, companion.id,
     "task snapshot includes assigned colonist")
