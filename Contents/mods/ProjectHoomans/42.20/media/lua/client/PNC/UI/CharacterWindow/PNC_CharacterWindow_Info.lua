@@ -107,7 +107,11 @@ function Tabs.RenderInfo(view, snapshot, payload, topY)
         traitText(view.npcId),
         x, y, labelWidth
     )
-    y = Shared.DrawLabelValue(view, "Status", resolved.aiState or resolved.activeBehavior or "Idle", x, y, labelWidth)
+    local activity = Shared.GetMedicalActivity
+        and Shared.GetMedicalActivity(snapshot, payload) or nil
+    y = Shared.DrawLabelValue(view, "Status",
+        activity and activity.label or resolved.aiState or resolved.activeBehavior or "Idle",
+        x, y, labelWidth)
     y = Shared.DrawLabelValue(view, "Health", hp, x, y, labelWidth)
     y = Shared.DrawLabelValue(view, "Stamina", stamina, x, y, labelWidth)
     y = Shared.DrawLabelValue(view, "Carry Weight", carryText, x, y, labelWidth)

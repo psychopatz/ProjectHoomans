@@ -59,6 +59,7 @@ function Network.BuildSnapshot(record)
     local firearmState
     local vehiclePassenger
     local treatmentState
+    local medicalCareState
     local needsSummary
     local attackMode
     local ownership
@@ -81,6 +82,9 @@ function Network.BuildSnapshot(record)
     treatmentState = PNC.BehaviorTreatment
         and PNC.BehaviorTreatment.BuildSnapshot
         and PNC.BehaviorTreatment.BuildSnapshot(record) or nil
+    medicalCareState = PNC.Treatment
+        and PNC.Treatment.BuildMedicalCareSnapshot
+        and PNC.Treatment.BuildMedicalCareSnapshot(record) or nil
     attackMode = record.runtime and (
         record.runtime.target ~= nil
         or (
@@ -172,6 +176,7 @@ function Network.BuildSnapshot(record)
         recentDamageUntil = record.health and record.health.recentDamageUntil or 0,
         bodyHealth = bodyHealth,
         treatmentState = treatmentState,
+        medicalCareState = medicalCareState,
         staminaCurrent = staminaInfo.current,
         staminaMax = staminaInfo.max,
         staminaBaseMax = staminaInfo.baseMax,

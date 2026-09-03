@@ -192,6 +192,12 @@ function Service.BuildSnapshot(baseOrId)
         output.corpseHaul.sourceCorpseCount = total
         output.corpseHaul.sourceEligibleCorpseCount = eligible
     end
+    if output.corpseHaul and corpseHaul
+        and corpseHaul.GetDestinationTileStats
+    then
+        output.corpseHaul.destinationTileStats =
+            corpseHaul.GetDestinationTileStats(base)
+    end
     local zone = Zones.get(base.baseZoneId)
     output.geometry = zone and {
         tileCount = zone.cachedTileCount, bounds = zone.cachedBounds,

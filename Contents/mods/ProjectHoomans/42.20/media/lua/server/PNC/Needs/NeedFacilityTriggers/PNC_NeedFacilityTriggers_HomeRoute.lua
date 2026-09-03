@@ -98,6 +98,11 @@ function Home.Assign(record, intent)
     if not acquired.ok or not acquired.target then
         return nil, acquired.reason or "NO_ACTIVITY_CAPACITY"
     end
+    if intent.capability == "sleep" then
+        acquired.sleepVariant = "HOME_BARRACKS"
+        acquired.sleepTargetPolicy = acquired.resourceKind == "sleep_surface"
+            and "BARRACKS_BED_FIRST" or "BARRACKS_FLOOR_FALLBACK"
+    end
     acquired.executionMode = live and "LIVE" or "ABSTRACT"
     return acquired
 end

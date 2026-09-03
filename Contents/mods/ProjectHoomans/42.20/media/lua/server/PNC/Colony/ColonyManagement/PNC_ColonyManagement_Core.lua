@@ -9,6 +9,8 @@ local Management = PNC.ColonyManagement
 local Internal = Management.Internal
 local Definitions = PNC.NeedsDefinitions
 local canUseDebug = Internal.canUseDebug
+local WorkPolicy = PNC.WorkPolicy
+    or require "PNC/Core/Production/WorkDefinition/PNC_WorkPolicy"
 
 local Management, Definitions = PNC.ColonyManagement, PNC.NeedsDefinitions
 Management.SettlementResults = Management.SettlementResults or {}
@@ -32,15 +34,18 @@ local function owned(record, player)
 end
 local canUseDebug
 local function effectiveAllowedJobs(record)
-    local configured = type(record.allowedJobs) == "table"
-        and record.allowedJobs or {}
     local output = {}
     local jobs = PNC.WorkDefinitions and PNC.WorkDefinitions.COLONY_JOBS
         or { "Constructor", "Researcher", "WorkshopWorker" }
     for _, job in ipairs(jobs) do
-        output[job] = configured[job] ~= false
+        output[job] = WorkPolicy.IsEnabled(record, job)
     end
     return output
+end
+
+local function effectiveJobPriorities(record)
+    return WorkPolicy.Snapshot(record,
+        PNC.WorkDefinitions and PNC.WorkDefinitions.COLONY_JOBS)
 end
 
 local function specialOrderState(record)
@@ -117,6 +122,8 @@ local function summary(record, player)
             and PNC.NPCSupplyService.GetDebugState(record) or {},
         journal=journal,
         allowedJobs=effectiveAllowedJobs(record),
+        jobPriorities=effectiveJobPriorities(record),
+        recordRevision=tonumber(record.recordRevision) or 0,
         specialOrders=specialOrderState(record),
         home=PNC.HomeDutyService and PNC.HomeDutyService.BuildState
             and PNC.HomeDutyService.BuildState(record) or nil,

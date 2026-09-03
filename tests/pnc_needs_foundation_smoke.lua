@@ -102,6 +102,23 @@ T.near(PNC.IndividualNeeds.GetRates(normal).thirst, 0.01728, 0.000001, "owned th
 T.near(PNC.IndividualNeeds.GetRates(normal).fatigue, 0.0268272, 0.000001, "owned fatigue uses colony pacing")
 T.truthy(0.25 / PNC.IndividualNeeds.GetRates(normal).hunger > 11.5,
     "idle food threshold is not reached within a few game hours")
+
+local sleepProbe = { id = "sleep_probe", recruited = true,
+    vanillaTraits = {}, vanillaTraitsAuthored = true,
+    activeJob = "Sleep", runtime = { facilityActivity = {
+        capability = "sleep", sleepSceneActive = false,
+    }}}
+PNC.IndividualNeeds.Ensure(sleepProbe, { fatigue = 0.50 })
+T.equal(PNC.IndividualNeeds.GetActivity(sleepProbe), "idle",
+    "sleep travel does not claim the sleeping activity")
+T.truthy(PNC.IndividualNeeds.GetRates(sleepProbe).fatigue > 0,
+    "sleep travel does not receive passive sleep recovery")
+sleepProbe.runtime.facilityActivity.sleepSceneActive = true
+T.equal(PNC.IndividualNeeds.GetActivity(sleepProbe), "sleeping",
+    "only the active sleep scene claims the sleeping activity")
+T.equal(PNC.IndividualNeeds.GetRates(sleepProbe).fatigue, 0,
+    "facility sleep owns fatigue recovery without passive duplication")
+
 T.equal(PNC.IndividualNeeds.GetRates(highThirst).thirst,
     PNC.IndividualNeeds.GetRates(normal).thirst * 2,
     "High Thirst vanilla multiplier")

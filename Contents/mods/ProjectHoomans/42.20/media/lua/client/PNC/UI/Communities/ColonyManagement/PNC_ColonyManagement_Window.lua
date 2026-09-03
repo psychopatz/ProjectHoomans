@@ -53,6 +53,17 @@ function ISPNCColonyManagementWindow:onTab(button)
     Controller.SelectTab(self, button)
 end
 
+function ISPNCColonyManagementWindow:onTaskFilter()
+    local function selectedData(combo, fallback)
+        if not combo or not combo.getOptionData then return fallback end
+        return combo:getOptionData(combo.selected) or fallback
+    end
+    self.taskGroupFilter = selectedData(self.taskGroupCombo, "all")
+    self.taskStatusFilter = selectedData(self.taskStatusCombo, "all")
+    self.taskSort = selectedData(self.taskSortCombo, "priority")
+    Controller.RebuildDetails(self)
+end
+
 function ISPNCColonyManagementWindow:onResearchControl(button)
     local Research = require "PNC/UI/Communities/PNC_ColonyManagementResearchTab"
     return Research.OnControl(self, button)

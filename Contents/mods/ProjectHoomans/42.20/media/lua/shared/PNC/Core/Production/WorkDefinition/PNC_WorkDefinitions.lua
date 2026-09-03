@@ -11,5 +11,6 @@ require "PNC/Core/Production/WorkDefinition/PNC_WorkDefinitions_Stations"
 require "PNC/Core/Production/WorkDefinition/PNC_WorkDefinitions_Routing"
 require "PNC/Core/Production/WorkDefinition/PNC_WorkDefinitions_Skills"
 require "PNC/Core/Production/WorkDefinition/PNC_WorkDefinitions_Rates"
+require "PNC/Core/Production/WorkDefinition/PNC_WorkPolicy"
 
 return Definitions

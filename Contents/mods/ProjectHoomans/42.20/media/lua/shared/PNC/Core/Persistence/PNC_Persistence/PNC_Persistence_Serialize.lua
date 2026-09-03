@@ -150,6 +150,10 @@ function Persistence.SerializeRecord(record)
                 or {},
             attached = Internal.copyStringMap(record.equipment and record.equipment.attached),
         },
+        allowedJobs = type(record.allowedJobs) == "table"
+            and Core.DeepCopy(record.allowedJobs) or {},
+        jobPriorities = type(record.jobPriorities) == "table"
+            and Core.DeepCopy(record.jobPriorities) or {},
         inventory = inventoryPayload,
         social = Internal.sanitizeSocial(
             record.social,

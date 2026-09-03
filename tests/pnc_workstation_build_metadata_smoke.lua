@@ -25,7 +25,10 @@ package.preload["PsychopatzCore/UI/PsychopatzUI"] = function()
     return PsychopatzCore.UI
 end
 
-getText = function(key) return key end
+getText = function(key)
+    return key == "UI_PNC_Facility_ResearchTable" and "RESEARCH TABLE"
+        or key
+end
 getItemNameFromFullType = function(fullType)
     return ({ ["Base.IronBar"] = "Iron Bar" })[fullType] or fullType
 end
@@ -91,6 +94,7 @@ function PNC.FacilityDefinitions.Get(id)
     end
     if id == "research_facility" then
         return { id = id, category = "technology", displayNameKey = id,
+            buildDisplayNameKey = "UI_PNC_Facility_ResearchTable",
             descriptionKey = id, directWorkstation = true,
             stationId = "research_facility", entityScript = "Base.Log_Table",
             buildRecipeObjectInfoName = "Base.Log_Table",
@@ -137,8 +141,8 @@ T.falsy(proper.enabled, "proper workstation remains research gated")
 T.equal(proper.status, "RESEARCH REQUIRED",
     "proper workstation exposes research gating")
 T.truthy(research, "research Log Table workstation is present")
-T.equal(research.name, "Log Table",
-    "research facility uses the native Log Table build name")
+T.equal(research.name, "RESEARCH TABLE",
+    "research facility uses its build-specific Research Table name")
 T.equal(research.texture, "native_log_table_texture",
     "research facility uses the native Log Table icon")
 T.equal(research.costText, "1 Base.Log (1 total)",

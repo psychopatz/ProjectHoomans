@@ -5,6 +5,31 @@ local Const = PNC.Const
 local Model = PNC.Travel.Model
 local Projection = PNC.Travel.Projection
 
+local function resetMovementForTravel(record, reason)
+    local registry = PNC.Registry
+    local pathService = PNC.PathService
+    local zombie
+    if registry and registry.GetLiveZombie then
+        zombie = registry.GetLiveZombie(record and record.id)
+    end
+    if pathService and pathService.Commands
+        and pathService.Commands.Reset
+    then
+        pathService.Commands.Reset(record, zombie, reason or "travel_started")
+        return true
+    end
+    if pathService and pathService.Reset then
+        pathService.Reset(zombie, record)
+        return true
+    end
+    if record and record.runtime then
+        record.runtime.moveIntent = nil
+        record.runtime.pathing = nil
+        record.runtime.localNavigation = nil
+    end
+    return false
+end
+
 function Service.Start(recordOrID, request)
     local record = Internal.ResolveRecord(recordOrID)
     if not record or record.alive == false then
@@ -24,6 +49,10 @@ function Service.Start(recordOrID, request)
     end
     local nowHour = Internal.WorldHour()
     local journey = Model.New(record, request, nowHour)
+    -- Travel is a movement-owner boundary. A completed work order can leave a
+    -- native path2/WalkTowardState pair alive for one deferred engine update;
+    -- clear that old owner before publishing the new durable travel order.
+    resetMovementForTravel(record, "travel_started")
     record.travel = journey
     record.orderSpec = {
         kind = Const.ORDER_TRAVEL or "travel",

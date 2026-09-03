@@ -35,6 +35,9 @@ function Network.BuildPresenceDelta(record)
         and Firearms.BuildDebugState(record)
         or nil
     local vehiclePassenger = record.runtime and record.runtime.vehiclePassenger or nil
+    local medicalCareState = PNC.Treatment
+        and PNC.Treatment.BuildMedicalCareSnapshot
+        and PNC.Treatment.BuildMedicalCareSnapshot(record) or nil
     aiState, inCombat = resolveAIState(record)
     local pathDebugState
     local lastPathDebugAt = record.runtime
@@ -104,6 +107,7 @@ function Network.BuildPresenceDelta(record)
         treatmentState = PNC.BehaviorTreatment
             and PNC.BehaviorTreatment.BuildSnapshot
             and PNC.BehaviorTreatment.BuildSnapshot(record) or nil,
+        medicalCareState = medicalCareState,
         recentDamageUntil = record.health and record.health.recentDamageUntil or 0,
         staminaCurrent = staminaInfo.current,
         staminaMax = staminaInfo.max,

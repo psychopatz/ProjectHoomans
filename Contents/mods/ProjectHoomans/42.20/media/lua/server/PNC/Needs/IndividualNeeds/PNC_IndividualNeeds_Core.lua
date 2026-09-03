@@ -31,7 +31,24 @@ end
 function H.Activity(record)
     local value = H.Runtime(record).activityOverride
     if Definitions.INDIVIDUAL_ACTIVITY[value] then return value end
-    if tostring(record.activeJob or "") == "Sleep" then return "sleeping" end
+    if tostring(record.activeJob or "") == "Sleep" then
+        local activity = record.runtime and record.runtime.facilityActivity
+        -- A sleep order can spend several ticks travelling or starting its
+        -- scene. Only the accepted sleep scene is allowed to grant the
+        -- sleeping activity rate.
+        if activity and activity.sleepSceneActive == true then
+            return "sleeping"
+        end
+        if record.travel and record.travel.state == "active" then
+            return "traveling"
+        end
+        if record.runtime and record.runtime.pathing
+            and record.runtime.pathing.phase == "active"
+        then
+            return "walking"
+        end
+        return "idle"
+    end
     if tostring(record.activeBehavior or "") == "resting" then return "resting" end
     if record.runtime and record.runtime.attackAction then return "fighting" end
     if record.travel and record.travel.state == "active" then return "traveling" end
@@ -130,7 +147,19 @@ function Needs.SetActivityOverride(record, value)
     return true
 end
 function Needs.GetRates(record)
-    return PlayerModel.GetRates(record, Needs.Ensure(record), H.Activity(record))
+    local activity = H.Activity(record)
+    local rates = PlayerModel.GetRates(record, Needs.Ensure(record), activity)
+    local facilityActivity = record.runtime
+        and record.runtime.facilityActivity or nil
+    -- FacilityJobs owns the sleep effect clock. Keep the normal sleeping
+    -- hunger/thirst model, but prevent its passive fatigue recovery from
+    -- running in parallel with NeedFacilityEffects.ApplyRest.
+    if activity == "sleeping" and facilityActivity
+        and tostring(facilityActivity.capability or "") == "sleep"
+    then
+        rates.fatigue = 0
+    end
+    return rates
 end
 
 function Needs.ModifyNutrition(record, calories, reason)
@@ -157,4 +186,3 @@ function H.WeightCategory(weight)
 end
 
 return Needs
-

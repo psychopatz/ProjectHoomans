@@ -9,6 +9,8 @@ local Management = PNC.ColonyManagement
 local Internal = Management.Internal
 local Definitions = PNC.NeedsDefinitions
 local owned = Internal.owned
+local WorkPolicy = PNC.WorkPolicy
+    or require "PNC/Core/Production/WorkDefinition/PNC_WorkPolicy"
 
 local function stopSpecialOrder(record, job, reason)
     local npcId = tostring(record and record.id or "")
@@ -122,24 +124,33 @@ local function setJobPermission(player, args)
         if candidate == job then known = true; break end
     end
     if not known then return false, "UNKNOWN_JOB" end
-    record.allowedJobs = record.allowedJobs or {}
-    record.allowedJobs[job] = args.enabled == true
-    if args.enabled ~= true
+    local requested = args.priority
+    if requested == nil then
+        requested = args.enabled == true and WorkPolicy.DEFAULT_PRIORITY or 0
+    end
+    local priority = WorkPolicy.SetPriority(record, job, requested)
+    if priority == nil then return false, "INVALID_JOB_PRIORITY" end
+    if priority <= WorkPolicy.MIN_PRIORITY
         and (job == "Fishing" or job == "Lumber" or job == "CorpseHaul")
     then
         local stopped, stopReason = stopSpecialOrder(record, job,
             "job_permission_disabled")
         if stopped == false then return false, stopReason end
     end
-    if args.enabled ~= true and record.runtime and record.runtime.workOrderId then
+    if priority <= WorkPolicy.MIN_PRIORITY and record.runtime
+        and record.runtime.workOrderId then
         local order = PNC.WorkRepository.Get(record.runtime.workOrderId)
         if order and PNC.WorkDefinitions.JOB_BY_OPERATION[order.operation] == job then
             PNC.WorkService.Commands.Cancel(order.id, "job_permission_disabled")
         end
     end
     if PNC.Registry.MarkDirty then PNC.Registry.MarkDirty(record, "allowed_jobs") end
-    return true, args.enabled == true and "JOB_ENABLED" or "JOB_DISABLED", {
-        npcID = record.id, job = job, enabled = args.enabled == true,
+    return true, priority > WorkPolicy.MIN_PRIORITY
+        and "JOB_ENABLED" or "JOB_DISABLED", {
+        npcID = record.id, job = job,
+        enabled = priority > WorkPolicy.MIN_PRIORITY,
+        priority = priority,
+        recordRevision = tonumber(record.recordRevision) or 0,
     }
 end
 

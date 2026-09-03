@@ -9,6 +9,8 @@ PNC.LumberExecutor = PNC.LumberExecutor or {}
 local Executor = PNC.LumberExecutor
 local Service = PNC.LumberService
 local Recovery = PNC.Tasking and PNC.Tasking.Internal
+local WorkPolicy = PNC.WorkPolicy
+    or require "PNC/Core/Production/WorkDefinition/PNC_WorkPolicy"
 
 local function recordFor(npcId)
     return PNC.Registry and PNC.Registry.Get
@@ -26,8 +28,7 @@ function Executor.GetCandidates(npcId)
     local record = recordFor(npcId)
     if not job or not zone or job.active ~= true
         or zone.enabled ~= true
-        or record and record.allowedJobs
-            and record.allowedJobs.Lumber == false
+        or record and not WorkPolicy.IsEnabled(record, "Lumber")
     then
         return {}
     end
@@ -46,6 +47,7 @@ function Executor.GetCandidates(npcId)
         taskId = tostring(job.id), npcId = tostring(npcId), kind = "LUMBER",
         sourceDomain = "lumber", sourceRef = tostring(job.id),
         precedence = "FORCED_ORDER", urgency = 0.72,
+        workPriority = WorkPolicy.GetPriority(record, "Lumber"),
         capability = "lumber", interruptPolicy = "NORMAL",
         revision = job.revision, createdAt = job.createdAt or 0,
     }}
@@ -58,8 +60,7 @@ function Executor.Validate(candidate)
     return Service and Service.ValidateJob
         and Service.ValidateJob(candidate and candidate.npcId,
             candidate and candidate.sourceRef)
-        and not (record and record.allowedJobs
-            and record.allowedJobs.Lumber == false)
+        and (not record or WorkPolicy.IsEnabled(record, "Lumber"))
         or false
 end
 

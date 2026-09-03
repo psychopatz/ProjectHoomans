@@ -16,6 +16,12 @@ Const.TRAVEL_SPEED_RUN_TILES_PER_HOUR = 480
 Const.TRAVEL_SPEED_VEHICLE_TILES_PER_HOUR = 1500
 Const.TRAVEL_ARRIVAL_RADIUS = 1.0
 Const.TRAVEL_POSITION_REFRESH_MS = 250
+-- A live journey must see physical progress within this window. The
+-- PathService/native planner has its own shorter request deadlines, but this
+-- boundary also covers a durable travel order whose movement lane vanished
+-- without producing a planner error.
+Const.TRAVEL_LIVE_PROGRESS_TIMEOUT_MS = 12000
+Const.TRAVEL_LIVE_RECOVERY_COOLDOWN_MS = 5000
 Const.TRAVEL_MAP_LABEL_MIN_ZOOM = 10
 Const.LIVE_TRAVEL_STEALTH_NEAR_RADIUS = 7
 Const.LIVE_TRAVEL_STEALTH_HORDE_RADIUS = 12

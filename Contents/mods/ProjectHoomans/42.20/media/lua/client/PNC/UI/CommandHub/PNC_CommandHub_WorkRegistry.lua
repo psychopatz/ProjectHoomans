@@ -64,8 +64,12 @@ local defaults = {
         titleKey = "UI_PNC_Job_Fishing", titleFallback = "FISHING" },
     { id = "Lumber", order = 60,
         titleKey = "UI_PNC_Job_Lumber", titleFallback = "LUMBER" },
-    { id = "CorpseHaul", order = 70,
+    { id = "Provisioner", order = 70,
+        titleKey = "UI_PNC_Job_Provisioner", titleFallback = "PROVISIONER" },
+    { id = "CorpseHaul", order = 80,
         titleKey = "UI_PNC_Job_CorpseHaul", titleFallback = "CORPSE HAUL" },
+    { id = "MedicalCare", order = 90,
+        titleKey = "UI_PNC_Job_MedicalCare", titleFallback = "MEDICAL CARE" },
 }
 
 for _, definition in ipairs(defaults) do

@@ -306,6 +306,63 @@ T.near(overshootRecord.y, 5, 0.001,
 T.truthy(PNC.Travel.Service.GetProgress(overshootRecord).state == "arrived",
     "live endpoint recovery left the journey en route")
 
+-- A live journey that remains physically stationary must release its old
+-- movement owner without losing the durable journey identity.
+local resetCount = 0
+local fallbackCount = 0
+PNC.Const.TRAVEL_LIVE_PROGRESS_TIMEOUT_MS = 1000
+PNC.Const.TRAVEL_LIVE_RECOVERY_COOLDOWN_MS = 1000
+PNC.Const.ENGINE_PATH_FALLBACK_COOLDOWN_MS = 2000
+PNC.PathService = {
+    Commands = {
+        Reset = function()
+            resetCount = resetCount + 1
+        end,
+    },
+}
+PNC.NavigationRouter = {
+    ActivateFallback = function(_, reason, durationMs)
+        fallbackCount = fallbackCount + 1
+        T.equal(reason, "travel_live_stall", "live stall reason")
+        T.equal(durationMs, 2000, "live stall fallback duration")
+        return true
+    end,
+}
+local stalledRecord = {
+    id = "live-stalled",
+    name = "Live Stalled",
+    x = 0,
+    y = 0,
+    z = 0,
+    alive = true,
+    presenceState = "live",
+    runtime = {},
+}
+records[stalledRecord.id] = stalledRecord
+local stalledJourney = T.truthy(PNC.Travel.Service.Start(stalledRecord, {
+    journeyId = "journey:live-stalled",
+    destination = { x = 40, y = 0, z = 0 },
+}))
+T.equal(resetCount, 1, "new travel did not reset the prior movement owner")
+local stalledBody = {
+    getX = function() return 0 end,
+    getY = function() return 0 end,
+    getZ = function() return 0 end,
+}
+local recovered, recoveryReason = PNC.Travel.Service.CheckLiveProgress(
+    stalledRecord, stalledBody, 1000)
+T.falsy(recovered, "first live progress sample recovered too early")
+recovered, recoveryReason = PNC.Travel.Service.CheckLiveProgress(
+    stalledRecord, stalledBody, 2501)
+T.truthy(recovered and recoveryReason == "recovered",
+    "stationary live journey did not self-recover")
+T.equal(stalledJourney.journeyId, "journey:live-stalled",
+    "live recovery replaced the durable journey")
+T.equal(stalledJourney.state, "en_route",
+    "live recovery changed the durable travel state")
+T.equal(fallbackCount, 1, "live stall did not activate fallback")
+T.equal(resetCount, 2, "live stall did not reset the movement owner")
+
 local customArrivalCalls = 0
 local customAction
 T.truthy(PNC.Travel.Arrivals.RegisterHandler("trading",

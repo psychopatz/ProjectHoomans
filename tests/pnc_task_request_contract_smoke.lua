@@ -17,6 +17,7 @@ local npc3 = { id = "npc-3", name = "Morgan",
     } } }
 local cancelledLease
 local stoppedActivity
+local cancelledMedical
 PNC = {
     Core = { Now = function() return 70000 end },
     Registry = { Get = function(id)
@@ -64,10 +65,30 @@ PNC.ProductionContext = { ForPlayer = function()
     return { colony = { id = "colony-1" }, faction = { id = "faction-1" } }
 end }
 
+local medicalTask = {
+    id = "medical:1", operation = "MEDICAL_CARE",
+    status = "WAITING_FOR_DOCTOR", phase = "WAITING_FOR_DOCTOR",
+    patientKind = "npc", patientId = "npc-3",
+    communityId = "colony-1", factionId = "faction-1",
+    woundParts = { "Hand_L", "ForeArm_L" }, currentWoundIndex = 1,
+    priority = 50, lastProgressAt = 69000,
+}
+PNC.MedicalCareService = {
+    TERMINAL = { COMPLETED = true, CANCELLED = true,
+        FAILED = true, QUARANTINED = true },
+    List = function() return { medicalTask } end,
+    Get = function(id) return id == medicalTask.id and medicalTask or nil end,
+    Cancel = function(id)
+        cancelledMedical = id
+        medicalTask.status = "CANCELLED"
+        return true
+    end,
+}
+
 local Requests = T.load("ProjectHoomans", "server",
     "PNC/Tasking/PNC_TaskRequestService.lua")
 local rows = Requests.Queries.BuildSnapshot("colony-1", 70000)
-T.equal(#rows, 3, "durable, leased, and active activities share one read model")
+T.equal(#rows, 4, "durable, medical, leased, and active activities share one read model")
 T.equal(rows[1].requestId, "work:1", "work order remains canonical ID")
 T.equal(rows[1].lifecycleState, "WORKING", "work lifecycle is normalized")
 T.truthy(rows[1].stalled, "stalled is derived from meaningful progress")
@@ -75,6 +96,12 @@ T.equal(rows[2].requestId, "need:npc-2:sleep", "lease appears as transient task"
 T.falsy(rows[2].durable, "transient task is not persisted as a request")
 T.equal(rows[3].requestId, "activity:npc-3",
     "lease-free active activity appears as a transient task")
+T.equal(rows[4].requestId, "medical:1", "medical request keeps canonical ID")
+T.equal(rows[4].taskGroup, "medical", "medical request is grouped for the UI")
+T.equal(rows[4].lifecycleState, "WAITING_WORKER",
+    "medical lifecycle is normalized for the shared task view")
+T.equal(rows[4].cancelAction, "cancel_medical",
+    "unclaimed medical request uses its durable cancellation action")
 T.truthy(Requests.Commands.CancelForPlayer({}, "work:1", "test"),
     "authorized cancel routes to state owner")
 T.equal(cancelled, "work:1", "request adapter delegates mutation")
@@ -85,5 +112,9 @@ T.truthy(Requests.Commands.CancelTransientForPlayer({},
     "activity:npc-3", "test"), "lease-free activity cancellation is authorized")
 T.equal(stoppedActivity, "npc-3",
     "lease-free activity cancellation stops the activity owner")
+T.truthy(Requests.Commands.CancelMedicalForPlayer({}, "medical:1", "test"),
+    "authorized medical cancellation routes to the medical owner")
+T.equal(cancelledMedical, "medical:1",
+    "medical cancellation targets the durable request")
 
 T.finish("pnc_task_request_contract_smoke")

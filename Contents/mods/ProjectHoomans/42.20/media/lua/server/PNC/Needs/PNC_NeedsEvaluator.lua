@@ -6,6 +6,8 @@ PNC.NeedsEvaluator = PNC.NeedsEvaluator or {}
 
 local Evaluator = PNC.NeedsEvaluator
 local Modifiers = PNC.MoraleModifierDefinitions
+local WorkPolicy = PNC.WorkPolicy
+    or require "PNC/Core/Production/WorkDefinition/PNC_WorkPolicy"
 Evaluator.Commands = Evaluator.Commands or {}
 Evaluator.Queries = Evaluator.Queries or {}
 
@@ -71,12 +73,7 @@ local function syncKnownConditions(record)
     local hasHome = tostring(runtime.homeBaseId or "") ~= ""
     Evaluator.Commands.SetCondition(record, "housing",
         hasHome and 0.12 or -0.20, hasHome and "HAS_HOME" or "NO_HOME")
-    local enabled, configured = false, false
-    for _, value in pairs(record.allowedJobs or {}) do
-        configured = true
-        if value ~= false then enabled = true; break end
-    end
-    if not configured then enabled = true end
+    local enabled = WorkPolicy.HasAnyEnabled(record)
     Evaluator.Commands.SetCondition(record, "employment",
         enabled and 0.06 or -0.10,
         enabled and "HAS_ELIGIBLE_WORK" or "NO_ELIGIBLE_WORK")

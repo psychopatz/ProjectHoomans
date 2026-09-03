@@ -120,10 +120,18 @@ local function applyNeed(record, definition, elapsed)
     if definition.needType == "fatigue" and PNC.IndividualNeeds.Commands
         and PNC.IndividualNeeds.Commands.ApplyRest
     then
+        local state = record.runtime
+            and record.runtime.facilityActivity or nil
+        local manualSleep = state and state.manual == true
+            and state.manualToggleable == true
         local ok, reason, value = PNC.IndividualNeeds.Commands.ApplyRest(
-            record, elapsed, "facility_need_route")
-        return ok, reason == "REST_COMPLETE"
-            or value ~= nil and value <= definition.completionThreshold,
+            record, elapsed, "facility_need_route", {
+                ignoreCompletion = manualSleep,
+                recoveryPerGameHour = definition.recoveryPerGameHour,
+            })
+        local complete = not manualSleep and (reason == "REST_COMPLETE"
+            or value ~= nil and value <= definition.completionThreshold)
+        return ok, complete,
             reason, value
     end
     local value = PNC.IndividualNeeds.Modify(record, definition.needType,

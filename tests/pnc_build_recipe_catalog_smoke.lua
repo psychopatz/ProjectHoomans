@@ -54,9 +54,23 @@ local craftRecipe = {
 local entityRecipe = {
     getCraftRecipe = function() return craftRecipe end,
 }
+local previewFace = {
+    getWidth = function() return 2 end,
+    getHeight = function() return 1 end,
+    getzLayers = function() return 1 end,
+    getMasterX = function() return 0 end,
+    getMasterY = function() return 0 end,
+    getMasterZ = function() return 0 end,
+    getTileInfo = function(_, x)
+        return { getSpriteName = function()
+            return x == 0 and "test_wall_a" or "test_wall_b"
+        end }
+    end,
+}
 local info = {
     getName = function() return "TestWall" end,
     getRecipe = function() return entityRecipe end,
+    getFace = function(_, face) return face == "single" and previewFace or nil end,
     getMainSpriteNameUI = function() return "test_wall_icon" end,
     getIconTexture = function() return "native_test_texture" end,
 }
@@ -90,6 +104,10 @@ T.equal(Catalog.Get("Base.TestWall").nativeObjectInfo, info,
     "full entity names resolve to short object-info names")
 T.equal(Catalog.Get("TestWall").iconTexture, "native_test_texture",
     "native UI texture stays available in the runtime descriptor")
+T.equal(#Catalog.Get("TestWall").previewTiles.tiles, 2,
+    "multi-tile native preview geometry is retained at runtime")
+T.equal(rows[1].previewTiles, nil,
+    "native preview objects stay out of the public catalog snapshot")
 T.equal(Catalog.Queries.FindForAliases({ "missing", "Test Wall" }),
     Catalog.Get("TestWall"), "display aliases resolve native descriptors")
 T.equal(Catalog.Queries.FindNativeObjectInfo("Base.TestWall"), info,

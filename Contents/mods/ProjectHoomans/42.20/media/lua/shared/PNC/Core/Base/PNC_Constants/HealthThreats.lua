@@ -19,6 +19,11 @@ Const.BANDAGE_TYPES = {
     "Base.AlcoholBandage", "Base.Bandage", "Base.Bandaid",
     "Base.AlcoholRippedSheets", "Base.RippedSheets",
 }
+-- Abstract factions may perform medical care without a physical bandage.
+-- This descriptor is not an inventory item; it records treatment provenance
+-- on the wound while leaving item ownership/economy untouched.
+Const.ABSTRACT_MEDICAL_TREATMENT_TYPE = "PNC.AbstractMedical"
+Const.ABSTRACT_MEDICAL_TREATMENT_NAME = "Abstract medical treatment"
 Const.BANDAGE_RANGE = 3.0
 Const.BANDAGE_COMPLETION_SOUND = "PNC_BandageComplete"
 Const.BANDAGE_COMPLETION_FEEDBACK_MS = 5000

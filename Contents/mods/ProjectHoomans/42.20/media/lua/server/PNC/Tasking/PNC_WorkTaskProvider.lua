@@ -6,6 +6,8 @@ local Provider = {}
 local Work = PNC.WorkService
 local Status = PNC.WorkDefinitions.STATUS
 local Recovery = PNC.Tasking and PNC.Tasking.Internal
+local WorkPolicy = PNC.WorkPolicy
+    or require "PNC/Core/Production/WorkDefinition/PNC_WorkPolicy"
 
 local function assignable(order)
     return order and not order.workerId
@@ -38,6 +40,8 @@ function Provider.GetCandidates(npcId)
                 or Work.Queries.CanAssign(order.id, npcId))
         if eligible == true then
             local priority = tonumber(order.priority) or 0
+            local job = PNC.WorkDefinitions.JOB_BY_OPERATION
+                and PNC.WorkDefinitions.JOB_BY_OPERATION[order.operation]
             output[#output + 1] = {
                 taskId = order.id, npcId = tostring(npcId),
                 kind = order.operation, sourceDomain = "work",
@@ -45,6 +49,8 @@ function Provider.GetCandidates(npcId)
                 precedence = priority >= 90 and "FORCED_ORDER"
                     or priority >= 50 and "HIGH_WORK" or "NORMAL_WORK",
                 urgency = math.max(0, math.min(1, (priority + 100) / 200)),
+                workPriority = job and WorkPolicy.GetPriority(record, job)
+                    or nil,
                 capability = PNC.WorkDefinitions.CAPABILITY_BY_OPERATION[
                     order.operation] or "work.construction",
                 interruptPolicy = "NORMAL", revision = order.revision,

@@ -132,7 +132,104 @@ local function buildDescriptorFor(definition)
 end
 
 local function descriptorTexture(descriptor)
-    return descriptor and ImageResolver.Resolve(descriptor) or nil
+    return descriptor
+        and (ImageResolver.Resolve(descriptor) or descriptor.iconTexture)
+        or nil
+end
+
+local function previewCall(object, method, ...)
+    if not object or type(object[method]) ~= "function" then return nil end
+    local ok, value = pcall(object[method], object, ...)
+    return ok and value or nil
+end
+
+local function previewTexture(spriteName)
+    if not spriteName then return nil end
+    if type(tryGetTexture) == "function" then
+        local ok, texture = pcall(tryGetTexture, tostring(spriteName))
+        if ok and texture and type(texture.getWidth) == "function"
+            and type(texture.getHeight) == "function"
+        then
+            return texture
+        end
+    end
+    if type(getTexture) == "function" then
+        local ok, texture = pcall(getTexture, tostring(spriteName))
+        if ok and texture and type(texture.getWidth) == "function"
+            and type(texture.getHeight) == "function"
+        then
+            return texture
+        end
+    end
+    if type(getSprite) == "function" then
+        local ok, sprite = pcall(getSprite, tostring(spriteName))
+        local texture = ok and previewCall(sprite, "getTexture") or nil
+        if texture then return texture end
+    end
+    return nil
+end
+
+local function previewTextureValue(texture, method, fallback)
+    local value = previewCall(texture, method)
+    value = tonumber(value)
+    return value or fallback
+end
+
+local function drawNativePreview(element, preview, x, y, width, height, alpha)
+    if type(preview) ~= "table" or type(preview.tiles) ~= "table"
+        or #preview.tiles < 2 or not element
+        or type(element.drawTextureScaled) ~= "function"
+    then
+        return false
+    end
+    local tileScale = tonumber(Core and Core.tileScale) or 1
+    local draws, minX, minY, maxX, maxY = {}, nil, nil, nil, nil
+    local masterX, masterY, masterZ = tonumber(preview.masterX) or 0,
+        tonumber(preview.masterY) or 0, tonumber(preview.masterZ) or 0
+    for _, tile in ipairs(preview.tiles) do
+        local texture = previewTexture(tile.spriteName)
+        if texture then
+            local textureWidth = previewTextureValue(texture, "getWidth", 0)
+            local textureHeight = previewTextureValue(texture, "getHeight", 0)
+            if textureWidth > 0 and textureHeight > 0 then
+                local tileX = tonumber(tile.x) or 0
+                local tileY = tonumber(tile.y) or 0
+                local tileZ = tonumber(tile.z) or 0
+                local dx = ((tileX - masterX) - (tileY - masterY))
+                    * 32 * tileScale
+                local dy = ((tileX - masterX) + (tileY - masterY))
+                    * 16 * tileScale
+                    - (tileZ - masterZ) * 96 * tileScale
+                local offsetX = previewTextureValue(texture, "getOffsetX", 0)
+                local offsetY = previewTextureValue(texture, "getOffsetY", 0)
+                local left, top = dx + offsetX, dy + offsetY
+                local right, bottom = left + textureWidth,
+                    top + textureHeight
+                minX = minX and math.min(minX, left) or left
+                minY = minY and math.min(minY, top) or top
+                maxX = maxX and math.max(maxX, right) or right
+                maxY = maxY and math.max(maxY, bottom) or bottom
+                draws[#draws + 1] = {
+                    texture = texture, x = left, y = top,
+                    width = textureWidth, height = textureHeight,
+                }
+            end
+        end
+    end
+    if #draws < 2 or not minX or not minY or not maxX or not maxY then
+        return false
+    end
+    local compositeWidth, compositeHeight = maxX - minX, maxY - minY
+    if compositeWidth <= 0 or compositeHeight <= 0 then return false end
+    local scale = math.min(width / compositeWidth, height / compositeHeight)
+    local originX = x + (width - compositeWidth * scale) / 2 - minX * scale
+    local originY = y + (height - compositeHeight * scale) / 2 - minY * scale
+    for _, draw in ipairs(draws) do
+        element:drawTextureScaled(draw.texture,
+            originX + draw.x * scale, originY + draw.y * scale,
+            draw.width * scale, draw.height * scale, alpha or 1, 1, 1, 1)
+    end
+    return true
 end
 
 local function recipeFor(definition, descriptor)
@@ -285,8 +382,13 @@ function FacilityCard:render()
         0.045, 0.06, 0.07)
     self:drawRectBorder(0, 0, self.width, self.height,
         border.a or 1, border.r, border.g, border.b)
-    ImageResolver.Draw(self, option.texture, padding, imageY,
-        contentWidth, imageHeight, option.enabled and 1 or 0.42)
+    local imageAlpha = option.enabled and 1 or 0.42
+    if not drawNativePreview(self, option.previewTiles, padding, imageY,
+        contentWidth, imageHeight, imageAlpha)
+    then
+        ImageResolver.Draw(self, option.texture, padding, imageY,
+            contentWidth, imageHeight, imageAlpha)
+    end
 
     local titleLines = wrapText(option.name, titleFont, contentWidth, 2)
     for index, line in ipairs(titleLines) do
@@ -723,7 +825,11 @@ local function buildOptions(settlement, storage, research)
             id = id,
             category = productionCategory(definition, buildDescriptor,
                 primarySkill),
-            name = buildDescriptor and buildDescriptor.displayName
+            name = definition.buildDisplayNameKey
+                and tr(definition.buildDisplayNameKey,
+                    buildDescriptor and buildDescriptor.displayName
+                    or tr(definition.displayNameKey, id))
+                or buildDescriptor and buildDescriptor.displayName
                 or tr(definition.displayNameKey, id),
             description = tr(definition.descriptionKey, id),
             texture = descriptorTexture(buildDescriptor)
@@ -736,6 +842,8 @@ local function buildOptions(settlement, storage, research)
             productionSkillId = primarySkill,
             productionSkills = skillProfile,
             buildRecipe = buildDescriptor,
+            previewTiles = buildDescriptor and buildDescriptor.previewTiles
+                or nil,
             buildRecipeObjectInfoName = buildDescriptor
                 and buildDescriptor.objectInfoName or nil,
             buildMaterials = costs,

@@ -134,6 +134,25 @@ T.equal(spec.id, "npc_ui", "portrait id")
 T.equal(spec.identitySeed, 42, "portrait seed")
 T.equal(spec.isFemale, true, "portrait gender")
 T.equal(spec.equipment.worn.Jacket, "Base.Jacket", "portrait equipment")
+
+local idleSignature = PNC.CharacterWindowShared.BuildActivitySignature(snapshot, nil)
+snapshot.treatmentState = {
+    phase = "bandaging",
+    partId = "Head",
+    startedAt = 100,
+    finishAt = 200,
+}
+local bandagingSignature = PNC.CharacterWindowShared.BuildActivitySignature(snapshot, nil)
+T.truthy(idleSignature ~= bandagingSignature,
+    "medical activity changes the character refresh signature")
+local activity = PNC.CharacterWindowShared.GetMedicalActivity(snapshot, nil)
+T.equal(activity.label, "Self-bandaging", "self-treatment activity label")
+T.equal(activity.partId, "Head", "self-treatment activity body part")
+PNC.Network = { ClientState = { snapshots = {
+    npc_ui = { id = "npc_ui", activeBehavior = "SelfBandage" },
+} } }
+T.equal(PNC.CharacterWindowShared.GetSnapshot(snapshot, { snapshot = snapshot }).activeBehavior,
+    "SelfBandage", "character window uses the canonical live snapshot")
 T.finish("pnc_character_window_data_smoke")
 
 T.finish("pnc_character_window_data_smoke")

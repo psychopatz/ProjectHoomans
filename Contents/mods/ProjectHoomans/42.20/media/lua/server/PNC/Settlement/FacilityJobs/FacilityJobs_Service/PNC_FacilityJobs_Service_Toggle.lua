@@ -21,6 +21,34 @@ function H.SameManualActivity(requested, active)
     return false
 end
 
+local function combatActive(record, now)
+    local runtime = record and record.runtime or {}
+    local target = runtime.target
+    local targetKind = type(target) == "table" and target.kind or nil
+    return runtime.attackAction ~= nil or runtime.combatTarget ~= nil
+        or targetKind ~= nil
+        or now < (tonumber(runtime.inCombatUntil) or 0)
+end
+
+local function releaseWorkAssignment(record, reason)
+    local commands = PNC.WorkService and PNC.WorkService.Commands or nil
+    if not commands then return false, "WORK_SERVICE_UNAVAILABLE" end
+    local ok
+    local result
+    if commands.ReleaseAssignment then
+        ok, result = commands.ReleaseAssignment(record.id, reason)
+    elseif commands.ReleaseWorker then
+        ok, result = commands.ReleaseWorker(record.id, reason)
+    else
+        return false, "WORK_SERVICE_UNAVAILABLE"
+    end
+    if ok ~= true then return false, result or "WORK_RELEASE_FAILED" end
+    if record.runtime and record.runtime.workOrderId then
+        return false, "WORK_RELEASE_PENDING"
+    end
+    return true
+end
+
 function Jobs.ToggleManual(record, capability)
     local runtime = record and record.runtime or nil
     local activity = runtime and runtime.facilityActivity or nil
@@ -40,7 +68,12 @@ function Jobs.ToggleManual(record, capability)
         end
         return stopped, reason
     end
-    if runtime and (runtime.workOrderId or runtime.attackAction
+    if requested == "sleep" then
+        -- Manual sleep overrides fatigue and ordinary work, but combat remains
+        -- an explicit safety boundary. Work is released through its durable
+        -- service so progress and reservations remain recoverable.
+        if combatActive(record, now) then return false, "NPC_IN_COMBAT" end
+    elseif runtime and (runtime.workOrderId or runtime.attackAction
         or runtime.target or now < (tonumber(runtime.inCombatUntil) or 0))
     then
         return false, "NPC_BUSY"
@@ -54,10 +87,16 @@ function Jobs.ToggleManual(record, capability)
             return false, "FACILITY_ACTIVITY_BUSY"
         end
     end
+    if requested == "sleep" and record.runtime
+        and record.runtime.workOrderId
+    then
+        local released, releaseReason = releaseWorkAssignment(record,
+            "manual_sleep_override")
+        if not released then return false, releaseReason end
+    end
     local started, reason = H.ManualStart(record, requested)
     if started and requested == "sleep" then
         record.runtime.manualActivityDisabled = nil
     end
     return started, reason
 end
-

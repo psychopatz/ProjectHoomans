@@ -167,6 +167,13 @@ function Behavior.Tick(record, zombie, now)
         return
     end
 
+    -- A doctor lease owns the actor before self-treatment and job selection.
+    -- Without this fence a wounded doctor could start self-bandaging while
+    -- the server medical executor was walking it to another patient.
+    if record.runtime and record.runtime.medicalCare then
+        return
+    end
+
     if Treatment and Treatment.Tick and Treatment.Tick(record, zombie, now) then
         return
     end

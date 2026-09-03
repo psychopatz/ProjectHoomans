@@ -8,6 +8,17 @@ PNC = {
         GetSnapshot = function(snapshot, payload)
             return payload and payload.snapshot or snapshot or {}
         end,
+        GetMedicalActivity = function(snapshot, payload)
+            local resolved = payload and payload.snapshot or snapshot or {}
+            local state = resolved.treatmentState
+            if not state or state.phase == "idle" then return nil end
+            return {
+                source = "self",
+                label = "Self-bandaging",
+                partId = state.partId,
+                bandageName = state.bandageName,
+            }
+        end,
         Text = function(_, fallback) return fallback end,
         Clamp = function(value, minimum, maximum)
             value = tonumber(value) or 0
@@ -80,6 +91,11 @@ local snapshot = {
         },
     },
     needs = { hunger = 0.90, thirst = 0.91, fatigue = 0 },
+    treatmentState = {
+        phase = "bandaging",
+        partId = "Head",
+        bandageName = "Bandage",
+    },
 }
 
 PNC.CharacterWindowTabs.RenderHealth(view, snapshot, {}, 0)
@@ -93,6 +109,9 @@ T.contains(text, "Fever: 60% - BUILDING",
     "health details identify Knox fever progression")
 T.contains(text, "Losing blood - Active bleeding",
     "health details show bleeding without a percentage")
+T.contains(text, "Medical Activity", "health details show medical activity")
+T.contains(text, "Self-bandaging | Head | Bandage: Bandage",
+    "health details show self-treatment target")
 T.equal(view.healthHitRegions[#view.healthHitRegions].partId, "WholeBody",
     "whole-body detail is a selectable health region")
 local region = view.healthHitRegions[#view.healthHitRegions]

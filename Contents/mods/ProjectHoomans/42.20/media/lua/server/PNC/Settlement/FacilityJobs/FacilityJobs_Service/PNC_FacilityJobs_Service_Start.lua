@@ -129,6 +129,14 @@ function Jobs.Start(record, facilityOrId, capability, options)
         automatic = options.automatic == true,
         manual = options.manual == true,
         manualToggleable = options.manualToggleable == true,
+        sleepVariant = tostring(options.sleepVariant
+            or acquired.sleepVariant or ""),
+        sleepTargetPolicy = tostring(options.sleepTargetPolicy
+            or acquired.sleepTargetPolicy or ""),
+        sleepCompletionPolicy = capability == "sleep"
+            and (options.manual == true and "MANUAL_TOGGLE"
+                or "FATIGUE_THRESHOLD") or "",
+        sleepSceneActive = false,
         taskLeaseId = tostring(options.taskLeaseId or ""),
         startupSceneId = sceneId,
         startupStartedAt = activityStartedAt,
@@ -199,6 +207,13 @@ function Jobs.Start(record, facilityOrId, capability, options)
         seating = seating,
         sceneId = sceneId,
         sleepSurface = target.sleepSurface,
+        sleepVariant = tostring(options.sleepVariant
+            or acquired.sleepVariant or ""),
+        sleepTargetPolicy = tostring(options.sleepTargetPolicy
+            or acquired.sleepTargetPolicy or ""),
+        sleepCompletionPolicy = capability == "sleep"
+            and (options.manual == true and "MANUAL_TOGGLE"
+                or "FATIGUE_THRESHOLD") or "",
         taskLeaseId = tostring(options.taskLeaseId or ""),
         debugHold = options.debugHold == true,
         resourceKind = tostring(resourceKind),

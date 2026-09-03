@@ -88,12 +88,21 @@ Registry.Register({
 Registry.Register({
     id = "tasks",
     title = function() return Shared.Tr("UI_PNC_Tasks_Tab", "TASKS") end,
-    detailTitle = "AVAILABLE COLONY TASKS",
+    detailTitle = function()
+        return Shared.Tr("UI_PNC_Tasks_Queue", "TASK QUEUE")
+    end,
     showRoster = false,
     showDetails = true,
+    create = function(window) TasksTab.Create(window) end,
+    apply = function(window, active, Layout)
+        TasksTab.Apply(window, active, Layout)
+    end,
     buildRows = function(context) return TasksTab.BuildRows(context) end,
-    onRow = function(window, row)
-        return TasksTab.OnRow(window, row)
+    afterRows = function(window, snapshot, rows)
+        TasksTab.AfterRows(window, snapshot, rows)
+    end,
+    onRow = function(window, row, x, y)
+        return TasksTab.OnRow(window, row, x, y)
     end,
 })
 

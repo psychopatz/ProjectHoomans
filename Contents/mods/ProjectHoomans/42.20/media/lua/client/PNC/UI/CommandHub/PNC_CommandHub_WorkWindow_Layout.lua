@@ -31,9 +31,17 @@ function ISPNCCommandHubWorkWindow:onResponsiveLayout()
     local y = bodyY + px(42)
     for _, definition in ipairs(self.workRegistry.All()) do
         local checkbox = self.jobCheckboxes[definition.id]
+        local priorityButton = self.jobPriorityButtons[definition.id]
         if checkbox then
-            Layout.SetBounds(checkbox, jobsX + px(10), y,
-                math.max(px(140), jobsWidth - px(20)), rowHeight)
+            local priorityWidth = px(58)
+            local leftWidth = math.max(px(120), jobsWidth - px(30)
+                - priorityWidth)
+            Layout.SetBounds(checkbox, jobsX + px(10), y, leftWidth, rowHeight)
+            if priorityButton then
+                Layout.SetBounds(priorityButton,
+                    jobsX + px(20) + leftWidth, y,
+                    priorityWidth, rowHeight)
+            end
             y = y + rowHeight + px(4)
         end
     end
@@ -53,7 +61,8 @@ function ISPNCCommandHubWorkWindow:render()
         Presentation.Translate("UI_PNC_Work_Colonists", "COLONISTS"),
         rect.x, rect.y, self.peopleList:getWidth())
     UI.DrawSectionTitle(self,
-        Presentation.Translate("UI_PNC_Work_Authorized", "AUTHORIZED WORK"),
+        Presentation.Translate("UI_PNC_Work_Authorized",
+            "AUTHORIZED WORK (P1 HIGHEST / P4 LOWEST)"),
         jobsX, rect.y, jobsWidth)
     local person = self:selectedPerson()
     if person then

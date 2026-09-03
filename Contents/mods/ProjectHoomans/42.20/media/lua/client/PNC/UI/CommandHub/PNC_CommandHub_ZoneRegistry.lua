@@ -141,6 +141,44 @@ local function corpseSourceSummary(zone)
         .. ": " .. tostring(eligible or 0)
 end
 
+local function corpseDestinationSummary(zone)
+    if not zone or not zone.destinationRegion then
+        return tr("UI_PNC_CommandHub_Zone_NotConfigured", "NOT CONFIGURED")
+    end
+    local summary = regionSummary(zone.destinationRegion)
+    local stats = zone.destinationTileStats
+    if type(stats) ~= "table" or stats.total == nil then
+        return summary .. " | " .. tr(
+            "UI_PNC_CommandHub_Zone_DestinationStatsUnavailable",
+            "FREE CAPACITY UNKNOWN")
+    end
+    local details = {}
+    if (tonumber(stats.occupied) or 0) > 0 then
+        details[#details + 1] = tr(
+            "UI_PNC_CommandHub_Zone_Occupied", "OCCUPIED") .. ": "
+            .. tostring(stats.occupied)
+    end
+    if (tonumber(stats.blocked) or 0) > 0 then
+        details[#details + 1] = tr(
+            "UI_PNC_CommandHub_Zone_Blocked", "BLOCKED") .. ": "
+            .. tostring(stats.blocked)
+    end
+    if (tonumber(stats.reserved) or 0) > 0 then
+        details[#details + 1] = tr(
+            "UI_PNC_CommandHub_Zone_Reserved", "RESERVED") .. ": "
+            .. tostring(stats.reserved)
+    end
+    if (tonumber(stats.unloaded) or 0) > 0 then
+        details[#details + 1] = tr(
+            "UI_PNC_CommandHub_Zone_Unloaded", "UNLOADED") .. ": "
+            .. tostring(stats.unloaded)
+    end
+    return summary .. " | " .. tr(
+        "UI_PNC_CommandHub_Zone_Free", "FREE") .. ": "
+        .. tostring(stats.free or 0) .. "/" .. tostring(stats.total)
+        .. (#details > 0 and " | " .. table.concat(details, " ") or "")
+end
+
 local function zoneSummary(zone, kind)
     if not zone then return tr("UI_PNC_CommandHub_Zone_NotConfigured",
         "NOT CONFIGURED") end
@@ -272,9 +310,7 @@ Registry.Register({
             id = "destination", titleKey = "UI_PNC_CommandHub_Zone_CorpseDump",
             titleFallback = "CORPSE DUMP",
             summary = function(zone)
-                return zone and zone.destinationRegion
-                    and regionSummary(zone.destinationRegion)
-                    or tr("UI_PNC_CommandHub_Zone_NotConfigured", "NOT CONFIGURED")
+                return corpseDestinationSummary(zone)
             end,
             open = function(window)
                 return openCorpse(window, "destination")

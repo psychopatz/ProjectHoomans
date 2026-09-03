@@ -26,6 +26,7 @@ Tasking.WATCHDOG_DOMAINS.farming = true
 Tasking.WATCHDOG_DOMAINS.fishing = true
 Tasking.WATCHDOG_DOMAINS.lumber = true
 Tasking.WATCHDOG_DOMAINS.scavenge = true
+Tasking.WATCHDOG_DOMAINS.medical = true
 
 local WATCHDOG_PHASES = {
     -- WorkService's clock currently represents collection/output progress,

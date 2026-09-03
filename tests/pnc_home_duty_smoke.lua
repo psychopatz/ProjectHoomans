@@ -145,6 +145,8 @@ T.equal(startedRequest.destination.x, 15, "journey targets base-zone x")
 T.equal(startedRequest.destination.y, 15, "journey targets base-zone y")
 T.equal(startedRequest.arrivalAction.type, "colony_home",
     "journey uses durable home arrival")
+T.equal(startedRequest.arrivalRadius, 3,
+    "home journey preserves the configured arrival radius")
 T.equal(startedRequest.metadata.purpose, "return_home",
     "journey metadata identifies home travel")
 T.equal(PNC.HomeDutyService.BuildState(npc).state, "RETURNING_HOME",
@@ -162,6 +164,26 @@ T.equal(PNC.HomeDutyService.BuildState(npc).state, "AT_HOME",
     "remembered home base survives missing legacy affiliation")
 T.equal(PNC.HomeDutyService.GetColonyId(npc), "colony-1",
     "remembered home base resolves colony eligibility")
+
+-- A loaded blocked center tile must not become the durable home anchor when
+-- another tile in the same sparse zone is usable.
+getCell = function()
+    return {
+        getGridSquare = function(_, x, y)
+            return {
+                isSolid = function() return false end,
+                isSolidTrans = function() return false end,
+                isFree = function()
+                    return not (x == 15 and y == 15)
+                end,
+            }
+        end,
+    }
+end
+local checkedHome = PNC.HomeDutyService.GetHomePoint(npc, "base-1")
+T.truthy(checkedHome and checkedHome.y ~= 15,
+    "home anchor selected a blocked center tile")
+getCell = nil
 
 local staleHome = {
     id = "npc-stale-home", alive = true, x = 15, y = 16, z = 0,

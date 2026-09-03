@@ -70,6 +70,17 @@ function Internal.AddWound(
         wound.type,
         severityDamage
     )
+    if PNC.MedicalCareService
+        and PNC.MedicalCareService.RequestNPC
+    then
+        PNC.MedicalCareService.RequestNPC(record, {
+            source = "wound",
+            sourceRef = tostring(record.id) .. ":" .. tostring(part.id),
+            severity = severityDamage,
+            incapacitated = record.health
+                and record.health.state == "incapacitated",
+        })
+    end
     return wound, stats.damage
 end
 

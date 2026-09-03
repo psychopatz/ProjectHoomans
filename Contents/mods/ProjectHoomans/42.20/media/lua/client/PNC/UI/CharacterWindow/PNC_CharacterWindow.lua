@@ -218,6 +218,8 @@ function ISPNCCharacterWindow:updateSnapshot()
     local payload = self.npcId and ClientState.characterPayloads and ClientState.characterPayloads[self.npcId] or self.payload
     local signature = table.concat({
         tostring(snapshot and snapshot.presenceRevision or 0),
+        Shared.BuildActivitySignature
+            and Shared.BuildActivitySignature(snapshot, payload) or "",
         tostring(snapshot and snapshot.inventorySummary and snapshot.inventorySummary.revision or 0),
         tostring(payload and payload.revision or 0),
         tostring(payload and payload.inventory and payload.inventory.revision or 0),

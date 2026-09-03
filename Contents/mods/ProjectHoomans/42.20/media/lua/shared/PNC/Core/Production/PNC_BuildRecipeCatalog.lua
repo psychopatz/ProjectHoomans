@@ -143,6 +143,50 @@ local function nativeObjectInfo(objectInfoName)
     return nil
 end
 
+local function previewFace(info)
+    if not info then return nil end
+    -- ObjectInfo's icon is only the first tile. Keep the native face geometry
+    -- as primitive metadata so client UI can compose the complete preview.
+    -- The placement cursor starts at nSprite 1, which maps to the west face
+    -- in Build 42. Prefer that orientation for the build-card preview.
+    local faces = { "w", "single", "n", "s", "e" }
+    for _, faceName in ipairs(faces) do
+        local face = call(info, "getFace", faceName)
+        local width = tonumber(call(face, "getWidth")) or 0
+        local height = tonumber(call(face, "getHeight")) or 0
+        local zLayers = tonumber(call(face, "getzLayers")) or 0
+        local tiles = {}
+        for z = 0, zLayers - 1 do
+            for x = 0, width - 1 do
+                for y = 0, height - 1 do
+                    local tile = call(face, "getTileInfo", x, y, z)
+                    local spriteName = call(tile, "getSpriteName")
+                    local empty = call(tile, "isEmpty")
+                    if spriteName and tostring(spriteName) ~= ""
+                        and empty ~= true
+                    then
+                        tiles[#tiles + 1] = {
+                            x = x, y = y, z = z,
+                            spriteName = tostring(spriteName),
+                        }
+                    end
+                end
+            end
+        end
+        if #tiles > 0 then
+            return {
+                face = faceName, width = width, height = height,
+                zLayers = zLayers,
+                masterX = tonumber(call(face, "getMasterX")) or 0,
+                masterY = tonumber(call(face, "getMasterY")) or 0,
+                masterZ = tonumber(call(face, "getMasterZ")) or 0,
+                tiles = tiles,
+            }
+        end
+    end
+    return nil
+end
+
 local function descriptor(info)
     local objectInfoName = tostring(call(info, "getName") or "")
     local entityRecipe = call(info, "getRecipe")
@@ -164,10 +208,11 @@ local function descriptor(info)
         recipeName = recipeName,
         category = category,
         iconName = iconName and tostring(iconName) or nil,
-        -- This is a native Texture object and intentionally remains runtime
-        -- only. Build 42's ObjectInfo icon is already in the format expected
-        -- by ISUI drawTextureScaledAspect; iconName is only a fallback key.
+        -- These are native runtime objects and intentionally remain runtime
+        -- only. iconTexture is a one-tile fallback; previewTiles contains the
+        -- complete native face for multi-tile object previews.
         iconTexture = iconTexture,
+        previewTiles = previewFace(info),
         buildWork = math.max(1, tonumber(call(recipe, "getTime")) or 100),
         requiredSkills = normalizeSkills(recipe),
         xpAwards = normalizeXPAwards(recipe),

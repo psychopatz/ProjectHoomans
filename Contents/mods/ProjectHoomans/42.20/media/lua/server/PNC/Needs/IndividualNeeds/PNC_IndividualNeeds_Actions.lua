@@ -57,15 +57,24 @@ function Needs.Queries.GetSleepIntent(record)
     }
 end
 
-function Needs.Commands.ApplyRest(record, elapsedHours, source)
+function Needs.Commands.ApplyRest(record, elapsedHours, source, options)
     if not record or record.alive == false then return false, "NPC_UNAVAILABLE" end
+    options = type(options) == "table" and options or {}
+    local elapsed = math.max(0, math.min(0.25, tonumber(elapsedHours) or 0))
+    if options.ignoreCompletion == true then
+        local value = Needs.Modify(record, "fatigue",
+            -(tonumber(options.recoveryPerGameHour)
+                or Definitions.SLEEP_TASK.recoveryPerGameHour) * elapsed,
+            tostring(source or "sleep_task"))
+        if value == nil then return false, "REST_FAILED" end
+        return true, "REST_APPLIED", value
+    end
     local metadata, reason = Needs.Queries.GetSleepIntent(record)
     local current = tonumber(Needs.Get(record, "fatigue")) or 0
     if not metadata and current <= Definitions.SLEEP_TASK.completion then
         return true, "REST_COMPLETE", current
     end
     if not metadata and reason ~= "NOT_ACTIONABLE" then return false, reason end
-    local elapsed = math.max(0, math.min(0.25, tonumber(elapsedHours) or 0))
     local value = Needs.Modify(record, "fatigue",
         -Definitions.SLEEP_TASK.recoveryPerGameHour * elapsed,
         tostring(source or "sleep_task"))

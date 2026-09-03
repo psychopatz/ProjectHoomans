@@ -18,6 +18,7 @@ local bundle = {
             GuardAnchor = true,
             PatrolRoute = true,
             Researcher = true,
+            MedicalCare = true,
         },
     },
     looks = {

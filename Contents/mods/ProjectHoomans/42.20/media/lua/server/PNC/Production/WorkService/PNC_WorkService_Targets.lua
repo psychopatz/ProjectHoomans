@@ -26,8 +26,15 @@ local function setLiveOrder(worker, order, target, phase)
         stockpileNodeId = target.nodeId,
         haulToken = payload.haulToken,
         sourceX = payload.sourceX, sourceY = payload.sourceY,
-        sourceZ = payload.sourceZ, interactionX = payload.interactionX,
-        interactionY = payload.interactionY, interactionZ = payload.interactionZ,
+        sourceZ = payload.sourceZ,
+        interactionX = target.interactionX or payload.interactionX,
+        interactionY = target.interactionY or payload.interactionY,
+        interactionZ = target.interactionZ or payload.interactionZ,
+        interactionFacing = target.interactionFacing
+            or payload.interactionFacing,
+        interactionTarget = target.interactionTarget == true
+            or payload.interactionTarget == true,
+        approachKey = target.approachKey or payload.approachKey,
         dropX = payload.dropX, dropY = payload.dropY, dropZ = payload.dropZ,
     })
     return true

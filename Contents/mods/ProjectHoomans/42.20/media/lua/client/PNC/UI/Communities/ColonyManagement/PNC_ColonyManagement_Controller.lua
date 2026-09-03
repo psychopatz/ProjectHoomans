@@ -62,7 +62,7 @@ function Controller.CreateChildren(window)
         local entry = list.items and list.items[list.selected] or nil
         local row = entry and entry.item or nil
         local definition = Registry.Get(window.tab)
-        if row and row.action and definition and definition.onRow then
+        if row and definition and definition.onRow then
             definition.onRow(window, row, x, y)
         end
     end
@@ -92,7 +92,13 @@ function Controller.ApplyTabLayout(window)
     LayoutModel.ApplyBase(window)
     local peopleCount = #(window.snapshot and window.snapshot.people or {})
     window.peoplePane:setHeader("COMPANIONS", peopleCount)
-    window.detailsPane:setHeader(definition.detailTitle or "COLONY STATUS")
+    local detailTitle = definition.detailTitle
+    if type(detailTitle) == "function" then
+        detailTitle = detailTitle(window.snapshot)
+    end
+    local detailSuffix = definition.id == "tasks"
+        and #(window.snapshot and window.snapshot.tasks or {}) or nil
+    window.detailsPane:setHeader(detailTitle or "COLONY STATUS", detailSuffix)
     window.peoplePane:setVisible(definition.showRoster ~= false)
     window.detailsPane:setVisible(definition.showDetails ~= false)
     for _, candidate in ipairs(Registry.All()) do
@@ -146,6 +152,9 @@ function Controller.RebuildDetails(window)
     if definition.buildRows then
         local rows = definition.buildRows(context)
         Components.SetRows(window.details, rows)
+        if definition.afterRows then
+            definition.afterRows(window, snapshot, rows)
+        end
         Diagnostics.Log(window, "details_bound", {
             tab = window.tab,
             selected = window.selectedPersonID or "none",
@@ -183,6 +192,9 @@ function Controller.Refresh(window, update)
     local selectedIndex
     update = update or Client.ReadSnapshot()
     window.snapshot = update.snapshot or {}
+    if Client.ReconcileWorkPolicies then
+        Client.ReconcileWorkPolicies(window.snapshot)
+    end
     local roster = Presentation.BuildRoster(window.snapshot)
     Components.SetRows(window.people, roster)
     for index, row in ipairs(roster) do

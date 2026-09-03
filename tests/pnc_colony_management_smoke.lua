@@ -220,6 +220,8 @@ T.equal(snapshot.people[1].allowedJobs.Constructor, true,
     "every NPC may construct by default")
 T.equal(snapshot.people[1].allowedJobs.Researcher, true,
     "missing legacy permissions render as allowed")
+T.equal(snapshot.people[1].jobPriorities.Constructor, 3,
+    "missing legacy permissions do not expose the default priority")
 T.equal(#snapshot.tasks, 1, "active tasks included in colony snapshot")
 T.equal(snapshot.tasks[1].workerId, companion.id,
     "task snapshot includes assigned colonist")
@@ -243,6 +245,8 @@ local jobsSnapshot, jobsResult = Management.HandleAction(player, {
 T.equal(jobsResult.ok, true, "constructor permission can be disabled")
 T.equal(jobsSnapshot.people[1].allowedJobs.Constructor, false,
     "explicit opt-out returns in the colony snapshot")
+T.equal(jobsSnapshot.people[1].jobPriorities.Constructor, 0,
+    "disabled job does not expose priority zero")
 jobsSnapshot, jobsResult = Management.HandleAction(player, {
     action = "job_permission_set", npcID = companion.id,
     job = "Constructor", enabled = true,
@@ -250,6 +254,8 @@ jobsSnapshot, jobsResult = Management.HandleAction(player, {
 T.equal(jobsResult.ok, true, "constructor permission can be restored")
 T.equal(jobsSnapshot.people[1].allowedJobs.Constructor, true,
     "restored permission returns in the colony snapshot")
+T.equal(jobsSnapshot.people[1].jobPriorities.Constructor, 3,
+    "restored legacy toggle does not restore default priority")
 T.equal(companion.lastDirtyReason, "allowed_jobs",
     "job permission persists through registry dirtiness")
 

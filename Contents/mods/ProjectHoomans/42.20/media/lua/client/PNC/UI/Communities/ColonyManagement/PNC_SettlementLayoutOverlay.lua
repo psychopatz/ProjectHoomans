@@ -1,4 +1,5 @@
 local GridRegion = require "PsychopatzCore/World/PC_GridRegion"
+local Footprint = require "PNC/Core/Settlement/PNC_BuildingFootprint"
 local FacilityState = require "PNC/Core/Settlement/PNC_FacilityState"
 
 PNC = PNC or {}
@@ -228,6 +229,62 @@ local function pointRegion(x, y, z)
     } })
 end
 
+local function workstationApproachEnabled(facility, component)
+    if not isDirectWorkstation(facility)
+        or not component or component.managedByFacility ~= true
+    then
+        return false
+    end
+    local definition = facilityDefinition(facility)
+    return component.targetResolver == "workstationEdge"
+        or definition and definition.workstationApproach == true
+end
+
+local function workstationApproachPoint(facility, component)
+    if not workstationApproachEnabled(facility, component) then return nil end
+    local saved = component.approachTarget
+    if type(saved) == "table" and tonumber(saved.x)
+        and tonumber(saved.y) and tonumber(saved.z)
+    then
+        return { x = tonumber(saved.x), y = tonumber(saved.y),
+            z = tonumber(saved.z) }
+    end
+    local occupied = component.occupiedRegion
+        or pointRegion(component.x, component.y, component.z)
+    local offsets = {
+        { x = 0, y = 1, order = 1 }, { x = 1, y = 0, order = 2 },
+        { x = 0, y = -1, order = 3 }, { x = -1, y = 0, order = 4 },
+    }
+    local candidates = {}
+    local anchorX = (tonumber(component.x) or 0) + 0.5
+    local anchorY = (tonumber(component.y) or 0) + 0.5
+    Footprint.ForEachTile(occupied, function(sourceX, sourceY, sourceZ)
+        for _, offset in ipairs(offsets) do
+            local x, y = sourceX + offset.x, sourceY + offset.y
+            if not GridRegion.containsPoint(occupied, x, y, sourceZ) then
+                local pointX, pointY = x + 0.5, y + 0.5
+                candidates[#candidates + 1] = {
+                    x = pointX, y = pointY, z = sourceZ,
+                    distance = (pointX - anchorX) * (pointX - anchorX)
+                        + (pointY - anchorY) * (pointY - anchorY),
+                    order = offset.order,
+                    key = tostring(x) .. ":" .. tostring(y) .. ":"
+                        .. tostring(sourceZ),
+                }
+            end
+        end
+        return true
+    end)
+    table.sort(candidates, function(left, right)
+        if left.distance ~= right.distance then
+            return left.distance < right.distance
+        end
+        if left.order ~= right.order then return left.order < right.order end
+        return left.key < right.key
+    end)
+    return candidates[1]
+end
+
 local function addLayer(layers, region, color, kind, id, role, componentId,
     hoverOnly)
     if region and GridRegion.countTiles(region) > 0 then
@@ -262,16 +319,25 @@ function Overlay.BuildLayers(settlement, includeBase)
             local workZone = component.role == "work.zone"
             if not workZone or workZoneEnabled then
                 if component.kind == "region" then hasRegion = true end
+                local approach = workstationApproachPoint(facility, component)
                 local region = component.kind == "region" and component.region
+                    or component.occupiedRegion
                     or pointRegion(component.x, component.y, component.z)
                 local componentColor = workZone and COLORS.workZone
                     or component.kind == "anchor" and COLORS.anchor or color
                 local layerKind = workZone and "work_zone"
                     or directWorkstation and component.kind == "anchor"
-                    and "workstation" or "facility"
+                    and (approach and "workstation_object" or "workstation")
+                    or "facility"
                 addLayer(layers, region, componentColor, layerKind,
                     facility.id, component.role, component.id,
                     component.kind == "region" and not workZone)
+                if approach then
+                    addLayer(layers,
+                        pointRegion(approach.x, approach.y, approach.z),
+                        COLORS.anchor, "workstation_approach", facility.id,
+                        component.role, component.id)
+                end
             end
         end
         -- Direct workstations have a one-tile construction footprint only so
@@ -337,10 +403,14 @@ function Overlay.BuildMarkers(settlement)
             elseif role ~= "work.zone" and component.kind == "anchor" then
                 local workstationMarker = directWorkstation
                     and component.managedByFacility == true
+                local approach = workstationMarker
+                    and workstationApproachPoint(facility, component) or nil
                 addMarker(markers, {
-                    x = (tonumber(component.x) or 0) + 0.5,
-                    y = (tonumber(component.y) or 0) + 0.5,
-                    z = tonumber(component.z) or 0,
+                    x = approach and approach.x
+                        or (tonumber(component.x) or 0) + 0.5,
+                    y = approach and approach.y
+                        or (tonumber(component.y) or 0) + 0.5,
+                    z = approach and approach.z or tonumber(component.z) or 0,
                 }, workstationMarker and "workstation" or "component",
                     component.id, component.role, 1)
                 markers[#markers].label = workstationMarker

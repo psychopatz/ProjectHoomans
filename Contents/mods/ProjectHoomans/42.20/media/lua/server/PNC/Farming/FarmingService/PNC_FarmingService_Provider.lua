@@ -11,6 +11,8 @@ local Farming = PNC.Farming
 local Repository = PNC.SettlementRepository
 local baseFor = Internal.BaseFor
 local Recovery = PNC.Tasking and PNC.Tasking.Internal
+local WorkPolicy = PNC.WorkPolicy
+    or require "PNC/Core/Production/WorkDefinition/PNC_WorkPolicy"
 
 local Provider = {}
 
@@ -27,7 +29,7 @@ end
 function Provider.GetCandidates(npcId)
     local record = recordFor(npcId)
     if not record or record.alive == false or not isFarmer(record)
-        or record.allowedJobs and record.allowedJobs[Farming.FARMER_JOB] == false
+        or not WorkPolicy.IsEnabled(record, Farming.FARMER_JOB)
     then return {} end
     local base = PNC.HomeDutyService and PNC.HomeDutyService.GetBase
         and PNC.HomeDutyService.GetBase(record) or nil
@@ -43,6 +45,8 @@ function Provider.GetCandidates(npcId)
                 npcId = tostring(record.id), kind = "FARM_MAINTENANCE",
                 sourceDomain = "farming", sourceRef = facility.id,
                 precedence = "NORMAL_WORK", urgency = 0.35,
+                workPriority = WorkPolicy.GetPriority(record,
+                    Farming.FARMER_JOB),
                 capability = "farm.work", revision = facility.revision,
             }
         end
@@ -54,6 +58,7 @@ function Provider.Validate(intent)
     local record = recordFor(intent and intent.npcId)
     local facility = intent and Repository.GetFacility(intent.sourceRef)
     return record ~= nil and record.alive ~= false and facility ~= nil
+        and WorkPolicy.IsEnabled(record, Farming.FARMER_JOB)
         and Service.HasConfiguredWork(facility)
 end
 

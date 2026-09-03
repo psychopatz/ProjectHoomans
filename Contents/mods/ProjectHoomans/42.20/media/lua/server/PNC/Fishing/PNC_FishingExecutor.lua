@@ -10,6 +10,8 @@ PNC.FishingExecutor = PNC.FishingExecutor or {}
 local Executor = PNC.FishingExecutor
 local Service = PNC.FishingService
 local Const = PNC.Const or {}
+local WorkPolicy = PNC.WorkPolicy
+    or require "PNC/Core/Production/WorkDefinition/PNC_WorkPolicy"
 
 local function liveBody(npcId)
     return PNC.Registry and PNC.Registry.GetLiveZombie
@@ -27,13 +29,14 @@ function Executor.GetCandidates(npcId)
     local record = recordFor(npcId)
     if not job or not zone or not record or job.active ~= true
         or zone.enabled ~= true or not Service.ValidateZone(zone)
-        or record.allowedJobs and record.allowedJobs.Fishing == false
+        or not WorkPolicy.IsEnabled(record, "Fishing")
         or not Service.IsNearby(record, zone)
     then return {} end
     return {{
         taskId = tostring(job.id), npcId = tostring(npcId), kind = "FISHING",
         sourceDomain = "fishing", sourceRef = tostring(job.id),
         precedence = "FORCED_ORDER", urgency = 0.72,
+        workPriority = WorkPolicy.GetPriority(record, "Fishing"),
         capability = "fishing", interruptPolicy = "NORMAL",
         revision = job.revision, createdAt = job.createdAt or 0,
     }}
@@ -47,8 +50,7 @@ function Executor.Validate(intent)
     return Service and Service.ValidateJob
         and Service.ValidateJob(npcId, intent and intent.sourceRef)
         and record ~= nil
-        and not (record.allowedJobs
-            and record.allowedJobs.Fishing == false)
+        and WorkPolicy.IsEnabled(record, "Fishing")
         and Service.IsNearby(record, zone) or false
 end
 

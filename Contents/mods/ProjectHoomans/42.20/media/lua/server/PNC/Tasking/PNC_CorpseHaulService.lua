@@ -42,12 +42,15 @@ Service.CORPSE_HAUL_RECONCILE_INTERVAL_MS = tonumber(
     Service.CORPSE_HAUL_RECONCILE_INTERVAL_MS) or 2000
 Service.Runtime = Service.Runtime or {
     byTask = {}, byToken = {}, byDrop = {}, countsByBase = {},
+    destinationStatsByBase = {},
     nextScanAt = 0, nextReconcileAt = 0,
 }
 Service.Runtime.byTask = Service.Runtime.byTask or {}
 Service.Runtime.byToken = Service.Runtime.byToken or {}
 Service.Runtime.byDrop = Service.Runtime.byDrop or {}
 Service.Runtime.countsByBase = Service.Runtime.countsByBase or {}
+Service.Runtime.destinationStatsByBase =
+    Service.Runtime.destinationStatsByBase or {}
 Service.Runtime.nextReconcileAt = Service.Runtime.nextReconcileAt or 0
 Service.MAX_CONFIGURED_REGION_TILES = 100000
 

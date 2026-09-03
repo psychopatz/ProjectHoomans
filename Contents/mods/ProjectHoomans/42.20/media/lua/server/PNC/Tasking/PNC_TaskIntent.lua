@@ -5,6 +5,8 @@ PNC = PNC or {}
 PNC.TaskIntent = PNC.TaskIntent or {}
 
 local Intent = PNC.TaskIntent
+local Policy = PNC.WorkPolicy
+    or require "PNC/Core/Production/WorkDefinition/PNC_WorkPolicy"
 local REQUIRED = { "taskId", "npcId", "kind", "sourceDomain",
     "sourceRef", "precedence", "capability" }
 
@@ -21,6 +23,12 @@ function Intent.Normalize(candidate)
     end
     output.urgency = math.max(0, math.min(1,
         tonumber(candidate.urgency or candidate.score) or 0))
+    if candidate.workPriority ~= nil then
+        output.workPriority = math.max(Policy.MIN_PRIORITY,
+            math.min(Policy.MAX_PRIORITY,
+                math.floor(tonumber(candidate.workPriority)
+                    or Policy.DEFAULT_PRIORITY)))
+    end
     output.interruptPolicy = tostring(candidate.interruptPolicy or "NORMAL")
     output.revision = math.max(1, math.floor(tonumber(candidate.revision) or 1))
     output.createdAt = tonumber(candidate.createdAt) or PNC.Core.Now()

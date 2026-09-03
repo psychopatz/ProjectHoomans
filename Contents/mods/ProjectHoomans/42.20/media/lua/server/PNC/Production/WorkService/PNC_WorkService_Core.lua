@@ -10,6 +10,8 @@ local Internal = Service.Internal
 local Repository = PNC.WorkRepository
 local Definitions = PNC.WorkDefinitions
 local Status = Definitions.STATUS
+local WorkPolicy = PNC.WorkPolicy
+    or require "PNC/Core/Production/WorkDefinition/PNC_WorkPolicy"
 local EventsBus = PsychopatzCore and PsychopatzCore.Events
 local EventTypes = PNC.EventTypes or {}
 
@@ -142,11 +144,10 @@ local function workerAvailable(record, order)
         return false
     end
     local job = Definitions.JOB_BY_OPERATION[order.operation]
-    local allowed = record.allowedJobs
     -- Colony jobs are opt-out. Archetype tables predate colony production and
     -- therefore missing keys must mean allowed, not disabled.
-    if type(allowed) == "table" and allowed[job] == false
-        and order.manual ~= true
+    if job and order.manual ~= true
+        and not WorkPolicy.CanAutoClaim(record, job)
     then return false end
     if startsAtHome(order) and PNC.HomeDutyService
         and PNC.HomeDutyService.IsAtHome
@@ -177,13 +178,12 @@ local function findWorker(order)
             return
         end
         local job = Definitions.JOB_BY_OPERATION[order.operation]
-        local allowed = record.allowedJobs
         local eligible = not Service.ClaimsByWorker[tostring(record.id)]
             and not (record.runtime and record.runtime.workOrderId)
             and not (order.requiredWorkerId
                 and tostring(order.requiredWorkerId) ~= tostring(record.id))
-            and not (type(allowed) == "table" and allowed[job] == false
-                and order.manual ~= true)
+            and (not job or order.manual == true
+                or WorkPolicy.CanAutoClaim(record, job))
             and recipeKnowledgeMet(record, order)
             and requirementsMet(record, order.requiredSkills)
         if not eligible then return end

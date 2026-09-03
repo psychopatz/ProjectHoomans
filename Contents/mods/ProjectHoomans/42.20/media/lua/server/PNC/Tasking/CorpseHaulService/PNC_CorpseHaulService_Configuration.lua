@@ -78,6 +78,7 @@ function Service.SetConfiguration(player, args)
         revision = (tonumber(base.corpseHaul and base.corpseHaul.revision) or 0) + 1,
     }
     Service.Runtime.countsByBase[tostring(base.id)] = nil
+    Service.Runtime.destinationStatsByBase[tostring(base.id)] = nil
     base.revision = (tonumber(base.revision) or 0) + 1
     if PNC.SettlementRepository and PNC.SettlementRepository.MarkDirty then
         PNC.SettlementRepository.MarkDirty()
@@ -105,6 +106,7 @@ function Service.ClearConfiguration(player, args)
     end
     base.corpseHaul = nil
     Service.Runtime.countsByBase[tostring(base.id)] = nil
+    Service.Runtime.destinationStatsByBase[tostring(base.id)] = nil
     base.revision = (tonumber(base.revision) or 0) + 1
     if PNC.SettlementRepository and PNC.SettlementRepository.MarkDirty then
         PNC.SettlementRepository.MarkDirty()

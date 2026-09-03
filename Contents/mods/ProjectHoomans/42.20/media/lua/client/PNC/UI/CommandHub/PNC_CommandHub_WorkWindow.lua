@@ -9,6 +9,8 @@ PNC.CommandHub.WorkUI = PNC.CommandHub.WorkUI or {}
 local WorkUI = PNC.CommandHub.WorkUI
 local Registry = require "PNC/UI/CommandHub/PNC_CommandHub_WorkRegistry"
 local Presentation = require "PNC/UI/CommandHub/PNC_CommandHub_WorkWindow_Presentation"
+local WorkPolicy = PNC.WorkPolicy
+    or require "PNC/Core/Production/WorkDefinition/PNC_WorkPolicy"
 local Options = require "PsychopatzCore/UI/PsychopatzCommandHubOptions"
 local UI = PsychopatzCore.UI
 local Layout = UI.Layout
@@ -33,6 +35,10 @@ function ISPNCCommandHubWorkWindow:createChildren()
     self.lastRevision = -1
     self.lastRequestAt = 0
     self.jobCheckboxes = {}
+    self.jobPriorityButtons = {}
+    self.pendingPermissions = {}
+    self.permissionStates = {}
+    self.requestSerial = 0
     self.workRegistry = Registry
     self.peoplePanel = UI.CreatePanel(self)
     self.authorizationPanel = UI.CreatePanel(self)
@@ -45,18 +51,30 @@ function ISPNCCommandHubWorkWindow:createChildren()
         self:onPersonSelected()
     end
     for _, definition in ipairs(Registry.All()) do
+        local jobID = definition.id
         local checkbox = UI.CreateCheckbox(self, {
-            id = "work:" .. definition.id,
+            id = "work:" .. jobID,
             label = Presentation.TitleFor(definition),
             target = self,
             value = true,
             font = UIFont.Small,
             onChange = function(_, value)
-                return self:onPermissionChanged(definition.id, value)
+                return self:onPermissionChanged(jobID, value)
             end,
         })
-        checkbox.workID = definition.id
-        self.jobCheckboxes[definition.id] = checkbox
+        checkbox.workID = jobID
+        self.jobCheckboxes[jobID] = checkbox
+        local priorityButton = UI.CreateButton(self, {
+            id = "work-priority:" .. jobID,
+            title = Presentation.PriorityLabel(WorkPolicy.DEFAULT_PRIORITY),
+            target = self,
+            onclick = function()
+                return self:onPriorityChanged(jobID)
+            end,
+            variant = "quiet",
+        })
+        priorityButton.workID = jobID
+        self.jobPriorityButtons[jobID] = priorityButton
     end
     self:applyContentStyle()
     self:requestResponsiveLayout(true)
@@ -125,39 +143,145 @@ function ISPNCCommandHubWorkWindow:updatePermissionControls()
     local person = self:selectedPerson()
     for _, definition in ipairs(Registry.All()) do
         local checkbox = self.jobCheckboxes[definition.id]
+        local priorityButton = self.jobPriorityButtons[definition.id]
         if checkbox then
             checkbox:setVisible(person ~= nil)
-        checkbox:setChecked(person
-            and Presentation.IsAllowed(person, definition.id) or false)
+            checkbox:setChecked(person
+                and Presentation.IsAllowed(person, definition.id) or false)
+        end
+        if priorityButton then
+            priorityButton:setVisible(person ~= nil)
+            priorityButton:setTitle(Presentation.PriorityLabel(person
+                and Presentation.PriorityFor(person, definition.id)
+                or WorkPolicy.MIN_PRIORITY))
+            UI.SetButtonVariant(priorityButton,
+                person and Presentation.IsAllowed(person, definition.id)
+                    and "success" or "quiet")
         end
     end
 end
 
-function ISPNCCommandHubWorkWindow:onPermissionChanged(job, enabled)
-    local person = self:selectedPerson()
+local function permissionKey(npcID, job)
+    return tostring(npcID or "") .. "|" .. tostring(job or "")
+end
+
+local function applyLocalPriority(person, job, priority)
+    if not person then return end
+    WorkPolicy.SetPriority(person, job, priority)
+end
+
+function ISPNCCommandHubWorkWindow:nextRequestID(person, job)
+    self.requestSerial = (tonumber(self.requestSerial) or 0) + 1
+    return "work-policy:" .. tostring(person and person.id or "") .. ":"
+        .. tostring(job or "") .. ":" .. tostring(self.requestSerial)
+end
+
+function ISPNCCommandHubWorkWindow:submitPriority(person, job, priority)
     if not person or not PNC.Client
         or not PNC.Client.RequestColonyAction
     then return false end
-    person.allowedJobs = person.allowedJobs or {}
-    local previous = Presentation.IsAllowed(person, job)
-    person.allowedJobs[job] = enabled == true
+    local key = permissionKey(person.id, job)
+    local previous = Presentation.PriorityFor(person, job)
+    priority = WorkPolicy.NormalizePriority(priority)
+    applyLocalPriority(person, job, priority)
+    local requestId = self:nextRequestID(person, job)
+    self.pendingPermissions[key] = {
+        requestId = requestId, priority = priority,
+        previous = previous,
+        sentAt = PNC.Core and PNC.Core.Now and PNC.Core.Now() or 0,
+    }
     local ok = PNC.Client.RequestColonyAction("job_permission_set", {
-        npcID = person.id, job = job, enabled = enabled == true,
+        npcID = person.id, job = job, priority = priority,
+        enabled = priority > WorkPolicy.MIN_PRIORITY,
+        requestId = requestId,
     })
     if ok == false then
-        if enabled == true then person.allowedJobs[job] = false
-        elseif previous then person.allowedJobs[job] = nil
-        else person.allowedJobs[job] = false end
+        applyLocalPriority(person, job, previous)
+        self.pendingPermissions[key] = nil
         self:updatePermissionControls()
         return false
     end
-    self:refreshPeople()
+    self:updatePermissionControls()
     return true
+end
+
+function ISPNCCommandHubWorkWindow:onPermissionChanged(job, enabled)
+    local person = self:selectedPerson()
+    local current = Presentation.PriorityFor(person, job)
+    local priority = enabled == true
+        and (current > WorkPolicy.MIN_PRIORITY and current
+            or WorkPolicy.DEFAULT_PRIORITY)
+        or WorkPolicy.MIN_PRIORITY
+    return self:submitPriority(person, job, priority)
+end
+
+function ISPNCCommandHubWorkWindow:onPriorityChanged(job)
+    local person = self:selectedPerson()
+    if not person then return false end
+    local current = Presentation.PriorityFor(person, job)
+    local nextPriority = current >= WorkPolicy.MAX_PRIORITY
+        and WorkPolicy.MIN_PRIORITY or current + 1
+    return self:submitPriority(person, job, nextPriority)
+end
+
+function ISPNCCommandHubWorkWindow:reconcilePending(value)
+    local result = value and value.actionResult or nil
+    local details = result and result.details or nil
+    if result and result.action == "job_permission_set" then
+        local key = details and permissionKey(details.npcID, details.job) or nil
+        local pending = key and self.pendingPermissions[key] or nil
+        if not pending and result.requestId then
+            for candidateKey, candidate in pairs(self.pendingPermissions) do
+                if tostring(candidate.requestId) == tostring(result.requestId) then
+                    key, pending = candidateKey, candidate
+                    break
+                end
+            end
+        end
+        if pending then
+            if result.ok == true and details then
+                local priority = WorkPolicy.NormalizePriority(details.priority,
+                    details.enabled == true and WorkPolicy.DEFAULT_PRIORITY or 0)
+                self.permissionStates[key] = {
+                    priority = priority,
+                    revision = tonumber(details.recordRevision) or 0,
+                }
+            end
+            self.pendingPermissions[key] = nil
+        end
+    end
+    local now = PNC.Core and PNC.Core.Now and PNC.Core.Now() or 0
+    for key, pending in pairs(self.pendingPermissions) do
+        if now - (tonumber(pending.sentAt) or now) >= 15000 then
+            self.pendingPermissions[key] = nil
+        end
+    end
+    for _, person in ipairs(value and value.people or {}) do
+        local id = tostring(person.id or "")
+        local incomingRevision = tonumber(person.recordRevision) or 0
+        for _, definition in ipairs(Registry.All()) do
+            local key = permissionKey(id, definition.id)
+            local state = self.permissionStates[key]
+            if state and incomingRevision < (tonumber(state.revision) or 0) then
+                applyLocalPriority(person, definition.id, state.priority)
+            else
+                self.permissionStates[key] = {
+                    priority = Presentation.PriorityFor(person, definition.id),
+                    revision = incomingRevision,
+                }
+            end
+            local pending = self.pendingPermissions[key]
+            if pending then
+                applyLocalPriority(person, definition.id, pending.priority)
+            end
+        end
+    end
 end
 
 function ISPNCCommandHubWorkWindow:refreshSnapshot()
     local update = Presentation.ReadSnapshot()
     local value = update.snapshot or {}
+    self:reconcilePending(value)
     self.people = value.people or {}
     local present = {}
     for _, person in ipairs(self.people) do

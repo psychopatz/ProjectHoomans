@@ -17,6 +17,15 @@ local Animation = PNC.Animation
 local MoveIntent = PNC.BehaviorMoveIntent
 local CombatTactics = PNC.CombatTactics
 
+local function requiresMedicalItem(Treatment, record)
+    if Treatment and Treatment.RequiresNPCMedicalItem then
+        return Treatment.RequiresNPCMedicalItem(record) == true
+    end
+    -- Compatibility with isolated/older test compositions. The real
+    -- treatment module always exposes the explicit ownership policy.
+    return true
+end
+
 local BANDAGE_ANIM_BY_PART = {
     Head = "BandageHead",
     Neck = "BandageHead",
@@ -95,6 +104,7 @@ local function clearAction(record, zombie, reason)
     state.finishAt = 0
     state.interruptedReason = reason
     record.runtime.tacticalState = nil
+    record.runtime.forceSyncEvent = "self_treatment_interrupted"
 end
 
 local function yieldToCombat(record, zombie, threat, now)
@@ -119,8 +129,11 @@ end
 
 local function startBandage(record, zombie, partId, now)
     local Treatment = PNC.Treatment
-    local supply = Treatment and Treatment.FindNPCBandage
-        and Treatment.FindNPCBandage(record) or nil
+    local supply = Treatment and Treatment.GetNPCBandagePlan
+        and Treatment.GetNPCBandagePlan(record) or nil
+    if not supply and Treatment and Treatment.FindNPCBandage then
+        supply = Treatment.FindNPCBandage(record)
+    end
     local state = ensureState(record)
     local emitter
     local modData
@@ -134,6 +147,7 @@ local function startBandage(record, zombie, partId, now)
     state.startedAt = now
     state.finishAt = now + Treatment.GetNPCBandageDuration(record)
     state.interruptedReason = nil
+    record.runtime.forceSyncEvent = "self_treatment_started"
     record.activeBehavior = "SelfBandage"
     record.runtime.tacticalState = "self_bandage"
     record.runtime.target = nil
@@ -188,8 +202,9 @@ local function tickAbstract(record, now, partId)
             + (tonumber(Const.ABSTRACT_SELF_BANDAGE_INTERVAL_MS) or 30000)
         return false
     end
-    if not Treatment or not Treatment.HasNPCBandage
-        or not Treatment.HasNPCBandage(record)
+    if requiresMedicalItem(Treatment, record)
+        and (not Treatment or not Treatment.HasNPCBandage
+            or not Treatment.HasNPCBandage(record))
     then
         if PNC.NeedSupplyBridge and PNC.NeedSupplyBridge.EnsureMedical then
             PNC.NeedSupplyBridge.EnsureMedical(record, "BANDAGE", partId, false)
@@ -232,7 +247,9 @@ function Behavior.Tick(record, zombie, now)
     if record.presenceState ~= Const.PRESENCE_LIVE or not zombie then
         return tickAbstract(record, now, partId)
     end
-    if not Treatment.HasNPCBandage(record) then
+    if requiresMedicalItem(Treatment, record)
+        and not Treatment.HasNPCBandage(record)
+    then
         if PNC.NeedSupplyBridge and PNC.NeedSupplyBridge.EnsureMedical then
             PNC.NeedSupplyBridge.EnsureMedical(record, "BANDAGE", partId, false)
         end

@@ -126,24 +126,41 @@ function PNC.FacilityService.AcquireActivity(baseId, npcId, capability,
                 component = H.ComponentForCapability(facility, capability)
             end
             if targetValid and component then
-                local ok, reservation = Reservations.Reserve(facility.id,
-                    component.id, npcId, capability, options.ttlMs, options)
-                if ok then
-                    local targets = PNC.FacilityInteractionTargets
-                        and PNC.FacilityInteractionTargets.Resolve(component) or {}
-                    local target = targets[1]
-                        or component.kind == "region" and H.RegionTarget(component)
-                    target = H.LaborTarget(facility, capability) or target
-                    return {
-                        ok = true,
-                        reservationId = reservation.id,
-                        facilityId = facility.id,
-                        componentId = component.id,
-                        role = component.role,
-                        target = target,
-                        targets = targets,
-                        abstract = options.abstract == true,
-                    }
+                local definition = Definitions.Get(facility.definitionId)
+                local targetContext = {}
+                for key, value in pairs(options) do
+                    targetContext[key] = value
+                end
+                targetContext.character = liveCharacter
+                targetContext.facility = facility
+                targetContext.capability = capability
+                if definition and definition.workstationApproach == true then
+                    targetContext.targetResolver = definition.workstationTargetResolver
+                        or "workstationEdge"
+                end
+                local targets = PNC.FacilityInteractionTargets
+                    and PNC.FacilityInteractionTargets.Resolve(component,
+                        targetContext) or {}
+                local target = targets[1]
+                    or component.kind == "region" and H.RegionTarget(component)
+                target = H.LaborTarget(facility, capability) or target
+                -- A strict workstation-edge resolver must not reserve a
+                -- station when the live object has no usable approach tile.
+                if target then
+                    local ok, reservation = Reservations.Reserve(facility.id,
+                        component.id, npcId, capability, options.ttlMs, options)
+                    if ok then
+                        return {
+                            ok = true,
+                            reservationId = reservation.id,
+                            facilityId = facility.id,
+                            componentId = component.id,
+                            role = component.role,
+                            target = target,
+                            targets = targets,
+                            abstract = options.abstract == true,
+                        }
+                    end
                 end
             end
         end

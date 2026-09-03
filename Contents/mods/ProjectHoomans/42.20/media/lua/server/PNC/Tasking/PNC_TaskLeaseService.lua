@@ -97,6 +97,7 @@ function Leases.Create(intent, assignment)
         taskId = intent.taskId, kind = intent.kind,
         sourceDomain = intent.sourceDomain, sourceRef = intent.sourceRef,
         precedence = intent.precedence, urgency = intent.urgency,
+        workPriority = intent.workPriority,
         capability = intent.capability, interruptPolicy = intent.interruptPolicy,
         facilityId = assignment and assignment.facilityId or nil,
         facilitySlotId = assignment and assignment.componentId or nil,

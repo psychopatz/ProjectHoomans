@@ -28,6 +28,7 @@ function Types.NewRecord(definition)
         ownerUsername = def.ownerUsername,
         ownerOnlineID = def.ownerOnlineID,
         allowedJobs = def.allowedJobs,
+        jobPriorities = def.jobPriorities,
         patrolPoints = def.patrolPoints,
         patrolIndex = 1,
         weaponMode = def.weaponMode,

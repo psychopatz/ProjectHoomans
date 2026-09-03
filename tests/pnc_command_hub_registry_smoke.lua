@@ -177,6 +177,10 @@ local workRegistry = T.load("ProjectHoomans", "client",
     "PNC/UI/CommandHub/PNC_CommandHub_WorkRegistry.lua")
 T.equal(workRegistry.Get("Lumber").titleFallback, "LUMBER",
     "work registry does not expose lumber authorization")
+T.truthy(workRegistry.Get("Provisioner"),
+    "work registry does not expose provisioner authorization")
+T.truthy(workRegistry.Get("MedicalCare"),
+    "work registry does not expose medical-care authorization")
 local workWindowSource = T.read("ProjectHoomans", "client",
     "PNC/UI/CommandHub/PNC_CommandHub_WorkWindow.lua")
 local settingsWindowSource = T.read("ProjectHoomans", "client",
@@ -213,6 +217,10 @@ T.contains(workWindowSource, "authorizationPanel",
     "work window does not provide a readable authorization surface")
 T.contains(workWindowSource, "job_permission_set",
     "work window does not use the server permission action")
+T.contains(workWindowSource, "pendingPermissions",
+    "work window does not reconcile asynchronous permission changes")
+T.contains(workWindowSource, "onPriorityChanged",
+    "work window does not expose numeric work priorities")
 T.contains(workWindowSource, "GetContentOpacitySignature",
     "work content styling does not track appearance changes")
 T.falsy(string.find(workWindowSource, "ApplySurfaceOpacity(self.peopleList, 0.04",

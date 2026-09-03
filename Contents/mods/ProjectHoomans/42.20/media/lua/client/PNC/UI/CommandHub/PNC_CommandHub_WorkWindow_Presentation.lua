@@ -3,6 +3,8 @@ PNC.CommandHub = PNC.CommandHub or {}
 
 local Presentation = {}
 local Registry = require "PNC/UI/CommandHub/PNC_CommandHub_WorkRegistry"
+local WorkPolicy = PNC.WorkPolicy
+    or require "PNC/Core/Production/WorkDefinition/PNC_WorkPolicy"
 local UI = PsychopatzCore.UI
 local Layout = UI.Layout
 local Theme = UI.Theme
@@ -38,8 +40,17 @@ function Presentation.PersonName(person)
 end
 
 function Presentation.IsAllowed(person, job)
-    local allowed = person and person.allowedJobs
-    return not allowed or allowed[job] ~= false
+    return WorkPolicy.IsEnabled(person, job)
+end
+
+function Presentation.PriorityFor(person, job)
+    return WorkPolicy.GetPriority(person, job)
+end
+
+function Presentation.PriorityLabel(priority)
+    priority = WorkPolicy.NormalizePriority(priority)
+    return priority == WorkPolicy.MIN_PRIORITY
+        and "OFF" or "P" .. tostring(priority)
 end
 
 local function activityFor(person)
@@ -53,7 +64,9 @@ end
 local function enabledCount(person)
     local count = 0
     for _, definition in ipairs(Registry.All()) do
-        if Presentation.IsAllowed(person, definition.id) then count = count + 1 end
+        if Presentation.IsAllowed(person, definition.id) then
+            count = count + 1
+        end
     end
     return count
 end

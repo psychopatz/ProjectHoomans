@@ -63,6 +63,20 @@ function Service.ListByCapability(baseId, capability, stationId)
             end
         end
     end
+    if tostring(capability or "") == "sleep" then
+        table.sort(output, function(left, right)
+            local leftDefinition = Definitions.Get(left.definitionId)
+            local rightDefinition = Definitions.Get(right.definitionId)
+            local leftPriority = tonumber(leftDefinition
+                and leftDefinition.sleepPriority) or 0
+            local rightPriority = tonumber(rightDefinition
+                and rightDefinition.sleepPriority) or 0
+            if leftPriority ~= rightPriority then
+                return leftPriority > rightPriority
+            end
+            return tostring(left.id or "") < tostring(right.id or "")
+        end)
+    end
     return output
 end
 

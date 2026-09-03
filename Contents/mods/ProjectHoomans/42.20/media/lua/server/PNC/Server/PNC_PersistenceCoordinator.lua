@@ -51,6 +51,8 @@ function Coordinator.Commit(reason)
             and PNC.ResearchRepository.Dirty == true,
         needs = PNC.NeedsRepository and PNC.NeedsRepository.Dirty == true,
         work = PNC.WorkRepository and PNC.WorkRepository.Dirty == true,
+        medicalCare = PNC.MedicalCareRepository
+            and PNC.MedicalCareRepository.Dirty == true,
         settlements = PNC.SettlementRepository
             and PNC.SettlementRepository.Dirty == true,
         abstractWorld = PNC.AbstractWorldStore
@@ -91,6 +93,9 @@ function Coordinator.Commit(reason)
         end
         if PNC.WorkRepository and initialDirty.work then
             PNC.WorkRepository.Dirty = true
+        end
+        if PNC.MedicalCareRepository and initialDirty.medicalCare then
+            PNC.MedicalCareRepository.Dirty = true
         end
         if PNC.SettlementRepository and initialDirty.settlements then
             PNC.SettlementRepository.Dirty = true
@@ -147,6 +152,8 @@ function Coordinator.Commit(reason)
     ok, why = save("needs", PNC.NeedsRepository)
     if not ok then return failure(why) end
     ok, why = save("work", PNC.WorkRepository)
+    if not ok then return failure(why) end
+    ok, why = save("medicalCare", PNC.MedicalCareRepository)
     if not ok then return failure(why) end
     -- Work save checkpoints can commit construction inputs into storage;
     -- persist storage after that checkpoint so both durable records agree.

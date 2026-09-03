@@ -7,13 +7,16 @@ Definitions.Register({
     id = "research_facility",
     category = "technology",
     displayNameKey = "UI_PNC_Facility_Research",
+    buildDisplayNameKey = "UI_PNC_Facility_ResearchTable",
     descriptionKey = "UI_PNC_Facility_ResearchDescription",
-    -- Research is a native Build 42 workstation now. The build menu uses
-    -- the Log Table recipe's native name, materials, and icon.
+    -- Research is backed by the native Build 42 Log Table. The player-facing
+    -- build card uses the Research Table name while the recipe stays native.
     iconPath = nil,
     buildRecipeObjectInfoName = "Base.Log_Table",
     entityScript = "Base.Log_Table",
     directWorkstation = true,
+    workstationApproach = true,
+    workstationTargetResolver = "workstationEdge",
     stationId = "research_facility",
     workstationRole = "work.research",
     buildCosts = {},
@@ -112,6 +115,8 @@ local function registerDirectWorkstation(station)
         requiredTechnology = station.requiredTechnology,
         allowMultipleRegions = true,
         directWorkstation = true,
+        workstationApproach = station.workstationApproach == true,
+        workstationTargetResolver = station.workstationTargetResolver,
         stationId = id,
         entityScript = station.entityScript,
         specializationSkills = station.specializationSkills,

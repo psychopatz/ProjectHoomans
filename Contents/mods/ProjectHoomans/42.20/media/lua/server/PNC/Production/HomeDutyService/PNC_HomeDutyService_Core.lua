@@ -48,6 +48,60 @@ local function homeBounds(zone, geometry)
     return type(geometry) == "table" and geometry or nil
 end
 
+local function worldCell(record)
+    local body
+    if record and PNC.Registry and PNC.Registry.GetLiveZombie then
+        body = PNC.Registry.GetLiveZombie(record.id)
+    end
+    if body and body.getCell then
+        local cell = body:getCell()
+        if cell and cell.getGridSquare then return cell end
+    end
+    if getCell then
+        local cell = getCell()
+        if cell and cell.getGridSquare then return cell end
+    end
+    return nil
+end
+
+-- Return nil when the map square is not currently loaded. Abstract NPCs can
+-- legitimately choose a home tile outside the loaded cell; a loaded blocked
+-- square, however, must never become a durable home target.
+local function homePointUsability(point, cell)
+    local square
+    local pathInternal
+    if not cell then return nil end
+    square = cell:getGridSquare(
+        math.floor(tonumber(point and point.x) or 0),
+        math.floor(tonumber(point and point.y) or 0),
+        math.floor(tonumber(point and point.z) or 0)
+    )
+    if not square then return nil end
+    pathInternal = PNC.PathService and PNC.PathService.Internal or nil
+    if pathInternal and pathInternal.isSquareWalkable then
+        return pathInternal.isSquareWalkable(
+            point.x, point.y, point.z) == true
+    end
+    if square.isSolid and square:isSolid() == true then return false end
+    if square.isSolidTrans and square:isSolidTrans() == true then
+        return false
+    end
+    if square.isFree and square:isFree(false) ~= true then return false end
+    return true
+end
+
+local function betterHomePoint(current, candidate)
+    if not candidate then return false end
+    if not current then return true end
+    if candidate.score ~= current.score then
+        return candidate.score < current.score
+    end
+    return candidate.z < current.z
+        or (candidate.z == current.z and candidate.y < current.y)
+        or (candidate.z == current.z and candidate.y == current.y
+            and candidate.x < current.x)
+end
+
 function H.HomeAnchorInZone(record, base)
     local order = record and record.orderSpec or nil
     local zone = base and base.baseZoneId and Zones.get(base.baseZoneId) or nil
@@ -73,8 +127,10 @@ function H.ZoneInteriorPoint(record, base)
         or tonumber(bounds.minZ) or tonumber(bounds.z) or 0
     local centerX = minX and maxX and (minX + maxX) / 2 or 0
     local centerY = minY and maxY and (minY + maxY) / 2 or 0
-    local best
+    local bestUsable
+    local bestUnknown
     local levels = geometry.levels
+    local cell = worldCell(record)
 
     -- Base zones are sparse span maps, so choose the valid tile closest to
     -- the zone's center instead of using the center of its bounding box.
@@ -94,15 +150,19 @@ function H.ZoneInteriorPoint(record, base)
                             local dx, dy = x - centerX, y - centerY
                             local score = dx * dx + dy * dy
                                 + math.abs(z - targetZ) * 1000000
-                            local better = not best or score < best.score
-                            if not better and best and score == best.score then
-                                better = z < best.z
-                                    or (z == best.z and y < best.y)
-                                    or (z == best.z and y == best.y
-                                        and x < best.x)
-                            end
-                            if better then
-                                best = { x = x, y = y, z = z, score = score }
+                            local candidate = {
+                                x = x, y = y, z = z, score = score,
+                            }
+                            local usability = homePointUsability(
+                                candidate, cell)
+                            if usability == true
+                                and betterHomePoint(bestUsable, candidate)
+                            then
+                                bestUsable = candidate
+                            elseif usability == nil
+                                and betterHomePoint(bestUnknown, candidate)
+                            then
+                                bestUnknown = candidate
                             end
                         end
                     end
@@ -111,9 +171,13 @@ function H.ZoneInteriorPoint(record, base)
         end
     end
 
+    local best = bestUsable or bestUnknown
     if best then
         return { x = best.x, y = best.y, z = best.z, radius = 3,
             homeZoneId = base.baseZoneId }
+    end
+    if type(levels) == "table" then
+        return nil, "HOME_LOCATION_BLOCKED"
     end
 
     -- Keep a compatibility fallback for older test/save geometry that only
@@ -141,13 +205,14 @@ function H.HomePoint(record, base)
             tonumber(record and record.y) or 0,
             tonumber(record and record.z) or 0
         ) or nil
-    local zonePoint = H.ZoneInteriorPoint(record, base)
+    local zonePoint, zoneReason = H.ZoneInteriorPoint(record, base)
     if zonePoint then
         -- Keep the ID for existing recovery/debug consumers, but never use
         -- the stockpile's coordinates as the NPC's home/idle destination.
         zonePoint.stockpileNodeId = node and node.id or nil
         return zonePoint
     end
+    if zoneReason then return nil, zoneReason end
     local snapshot = PNC.BaseService and PNC.BaseService.BuildSnapshot
         and PNC.BaseService.BuildSnapshot(base) or nil
     local bounds = snapshot and snapshot.geometry

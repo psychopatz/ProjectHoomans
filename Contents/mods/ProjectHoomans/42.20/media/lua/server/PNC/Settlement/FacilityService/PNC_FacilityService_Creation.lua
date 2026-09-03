@@ -17,6 +17,42 @@ local touch = Internal.touch
 local updateState = Internal.updateState
 local GridRegion = Internal.GridRegion
 local buildDefaultWorkZone = Internal.buildDefaultWorkZone
+local Footprint = require "PNC/Core/Settlement/PNC_BuildingFootprint"
+
+local function nativeWorkstationInfo(definition, placement)
+    local objectInfoName = placement and placement.objectInfoName
+        or definition and (definition.buildRecipeObjectInfoName
+            or definition.entityScript)
+    local catalog = PNC.BuildRecipeCatalog
+    if catalog and catalog.Get and objectInfoName then
+        local descriptor = catalog.Get(objectInfoName)
+        if descriptor and descriptor.nativeObjectInfo then
+            return descriptor.nativeObjectInfo
+        end
+    end
+    if catalog and catalog.Queries and catalog.Queries.FindForAliases
+        and objectInfoName
+    then
+        local descriptor = catalog.Queries.FindForAliases({ objectInfoName })
+        if descriptor and descriptor.nativeObjectInfo then
+            return descriptor.nativeObjectInfo
+        end
+    end
+    if catalog and catalog.Queries and catalog.Queries.FindNativeObjectInfo
+        and objectInfoName
+    then
+        local info = catalog.Queries.FindNativeObjectInfo(objectInfoName)
+        if info then return info end
+    end
+    if SpriteConfigManager and SpriteConfigManager.GetObjectInfo
+        and objectInfoName
+    then
+        local ok, info = pcall(SpriteConfigManager.GetObjectInfo,
+            objectInfoName)
+        if ok and info then return info end
+    end
+    return nil
+end
 
 function Service.Create(player, args)
     args = type(args) == "table" and args or {}
@@ -105,10 +141,18 @@ function Service.Create(player, args)
         managedWorkstation.managedByFacility = true
         managedWorkstation.workstationId = definition.stationId
         managedWorkstation.entityScript = definition.entityScript
+        managedWorkstation.objectInfoName = definition.buildRecipeObjectInfoName
+            or definition.entityScript
+        managedWorkstation.targetResolver = definition.workstationApproach == true
+            and (definition.workstationTargetResolver or "workstationEdge")
+            or nil
         facility.workstationPlacement = {
             kind = "workstation", stationId = definition.stationId,
             entityScript = definition.entityScript,
+            objectInfoName = definition.buildRecipeObjectInfoName
+                or definition.entityScript,
             x = bounds.minX, y = bounds.minY, z = bounds.minZ,
+            nSprite = 1, north = false,
             placed = false,
         }
     end
@@ -183,7 +227,35 @@ function Service.FinalizeNativeWorkstationBuild(facilityId, orderId, blueprint)
         placement.y = tonumber(blueprint.y) or placement.y
         placement.z = tonumber(blueprint.z) or placement.z
         placement.sprite = blueprint.sprite or placement.sprite
+        placement.nSprite = tonumber(blueprint.nSprite) or placement.nSprite or 1
+        placement.north = blueprint.north == true
+        placement.objectInfoName = blueprint.objectInfoName
+            or placement.objectInfoName
         placement.placed = true
+    end
+    local definition = Definitions.Get(facility.definitionId)
+    if placement and definition then
+        local info = nativeWorkstationInfo(definition, placement)
+        local occupied = Footprint.FromObjectInfo(info, placement.nSprite or 1,
+            placement.x, placement.y, placement.z)
+        for componentId, present in pairs(facility.componentIds or {}) do
+            if present == true then
+                local component = Repository.GetComponent(componentId)
+                if component and component.managedByFacility == true
+                    and tostring(component.workstationId or "")
+                        == tostring(placement.stationId or "")
+                then
+                    component.objectInfoName = placement.objectInfoName
+                    component.nSprite = placement.nSprite
+                    component.north = placement.north == true
+                    component.targetResolver = definition.workstationApproach == true
+                        and (definition.workstationTargetResolver
+                            or "workstationEdge") or nil
+                    component.occupiedRegion = PNC.Core.DeepCopy(occupied)
+                    component.revision = (tonumber(component.revision) or 0) + 1
+                end
+            end
+        end
     end
     facility.nativeBuildPending = nil
     facility.constructionState = "BUILT"

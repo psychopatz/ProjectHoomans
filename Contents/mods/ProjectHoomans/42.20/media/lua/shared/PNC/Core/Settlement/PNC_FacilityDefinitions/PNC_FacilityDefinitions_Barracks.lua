@@ -7,6 +7,9 @@ local definition = {
     displayNameKey = "UI_PNC_Facility_Bedroom",
     descriptionKey = "UI_PNC_Facility_BedroomDescription",
     iconPath = "media/ui/Facilities/BuildingMenu/livingRoom.png",
+    -- Sleep selection is deterministic across multiple housing facilities.
+    -- A future shelter can opt into sleep with a lower priority.
+    sleepPriority = 100,
     buildCosts = {{ fullType = "Base.Money", amount = 1 }},
     buildWork = 80,
     reconstructWork = 50,

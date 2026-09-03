@@ -24,6 +24,8 @@ local function normalize(_, spec)
         interactionX = tonumber(spec.interactionX) or 0,
         interactionY = tonumber(spec.interactionY) or 0,
         interactionZ = tonumber(spec.interactionZ) or 0,
+        interactionFacing = spec.interactionFacing,
+        interactionTarget = spec.interactionTarget == true,
         dropX = tonumber(spec.dropX) or 0,
         dropY = tonumber(spec.dropY) or 0,
         dropZ = tonumber(spec.dropZ) or 0,
@@ -68,7 +70,11 @@ local function tick(record, zombie)
         return true
     end
     if zombie and zombie.faceLocationF then
-        zombie:faceLocationF(order.x, order.y - 1)
+        if order.interactionTarget == true then
+            zombie:faceLocationF(order.interactionX, order.interactionY)
+        else
+            zombie:faceLocationF(order.x, order.y - 1)
+        end
     end
     record.runtime = record.runtime or {}
     local sceneId = SCENE_BY_OPERATION[order.operation]

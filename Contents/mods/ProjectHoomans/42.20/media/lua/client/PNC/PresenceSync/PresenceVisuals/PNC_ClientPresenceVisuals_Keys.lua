@@ -89,6 +89,7 @@ Sync.Internal.BuildHandsKey = buildHandsKey
 local function buildMotionKey(snapshot)
     local visualState = snapshot and snapshot.visualState or {}
     local treatment = snapshot and snapshot.treatmentState or {}
+    local medical = snapshot and snapshot.medicalCareState or {}
     return table.concat({
         tostring(snapshot and snapshot.presenceRevision or 0),
         tostring(snapshot and snapshot.healthState or "normal"),
@@ -114,6 +115,13 @@ local function buildMotionKey(snapshot)
         tostring(treatment.partId or ""),
         tostring(treatment.startedAt or 0),
         tostring(treatment.finishAt or 0),
+        tostring(medical.phase or "idle"),
+        tostring(medical.taskId or ""),
+        tostring(medical.patientId or ""),
+        tostring(medical.partId or ""),
+        tostring(medical.bump or ""),
+        tostring(medical.startedAt or 0),
+        tostring(medical.finishAt or 0),
         tostring(visualState.sceneActive == true),
         tostring(visualState.sceneId or ""),
         tostring(visualState.sceneBump or ""),

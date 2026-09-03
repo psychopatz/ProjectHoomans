@@ -79,6 +79,7 @@ local function buildDefinition(
         equipment = raw.equipment,
         inventory = inventoryData,
         allowedJobs = raw.allowedJobs,
+        jobPriorities = raw.jobPriorities,
         archetypeID = raw.archetypeID
             or (identity and identity.archetypeID) or nil,
         persist = raw.persist ~= false,

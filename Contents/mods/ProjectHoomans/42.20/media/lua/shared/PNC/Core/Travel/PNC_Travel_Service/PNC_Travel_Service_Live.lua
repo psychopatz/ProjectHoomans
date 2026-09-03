@@ -1,6 +1,146 @@
 local Service = PNC.Travel.Service
 local Internal = Service.Internal
 local Projection = PNC.Travel.Projection
+local Const = PNC.Const or {}
+local Core = PNC.Core
+
+local function liveBodyPosition(record, body)
+    return body and body.getX and body:getX() or tonumber(record and record.x) or 0,
+        body and body.getY and body:getY() or tonumber(record and record.y) or 0,
+        body and body.getZ and body:getZ() or tonumber(record and record.z) or 0
+end
+
+local function noteLiveProgress(journey, x, y, z, distance, now)
+    local previousX = tonumber(journey.liveLastX)
+    local previousY = tonumber(journey.liveLastY)
+    local previousZ = tonumber(journey.liveLastZ)
+    local previousDistance = tonumber(journey.liveLastDistance)
+    local moved
+    local routeMoved
+    if previousX == nil or previousY == nil or previousZ == nil then
+        journey.liveLastX = x
+        journey.liveLastY = y
+        journey.liveLastZ = z
+        journey.liveLastDistance = distance
+        journey.liveLastProgressAt = now
+        journey.liveStallCount = 0
+        return true
+    end
+    moved = ((x - previousX) * (x - previousX))
+        + ((y - previousY) * (y - previousY))
+        + ((z - previousZ) * (z - previousZ)) >= 0.0025
+    routeMoved = distance > (previousDistance or distance) + 0.001
+    journey.liveLastX = x
+    journey.liveLastY = y
+    journey.liveLastZ = z
+    journey.liveLastDistance = distance
+    if moved or routeMoved then
+        journey.liveLastProgressAt = now
+        journey.liveStallCount = 0
+        return true
+    end
+    return false
+end
+
+local function recoverLiveStall(record, body, journey, now)
+    local recoveryCooldown = math.max(
+        1000,
+        tonumber(Const.TRAVEL_LIVE_RECOVERY_COOLDOWN_MS) or 5000
+    )
+    local lastRecovery = tonumber(journey.liveLastRecoveryAt)
+    local reason = "travel_live_stall"
+    local fallback = false
+    local router = PNC.NavigationRouter
+    local planner = PNC.EnginePathPlanner
+    local pathService = PNC.PathService
+    if lastRecovery ~= nil and now - lastRecovery < recoveryCooldown then
+        return false
+    end
+
+    journey.liveLastRecoveryAt = now
+    journey.liveStallCount = (tonumber(journey.liveStallCount) or 0) + 1
+    journey.liveLastProgressAt = now
+
+    -- Release the native provider first. The next behavior tick will publish
+    -- the same travel target into the bounded scripted fallback lane, keeping
+    -- the durable journey and its task lease intact.
+    if router and router.ActivateFallback then
+        fallback = router.ActivateFallback(
+            record,
+            reason,
+            tonumber(Const.ENGINE_PATH_FALLBACK_COOLDOWN_MS) or 5000
+        ) == true
+    end
+    if not fallback and planner and planner.Invalidate then
+        planner.Invalidate(record, reason, body)
+    end
+    if pathService and pathService.Commands
+        and pathService.Commands.Reset
+    then
+        pathService.Commands.Reset(record, body, reason)
+    elseif pathService and pathService.Reset then
+        pathService.Reset(body, record)
+    elseif record and record.runtime then
+        record.runtime.moveIntent = nil
+        record.runtime.pathing = nil
+        record.runtime.localNavigation = nil
+    end
+
+    journey.liveRecoveryCount = (tonumber(journey.liveRecoveryCount) or 0) + 1
+    journey.lastStateReason = fallback
+        and "travel_live_stall_fallback"
+        or "travel_live_stall_replan"
+    journey.revision = (tonumber(journey.revision) or 0) + 1
+    if PNC.PerformanceScalingDiagnostics then
+        PNC.PerformanceScalingDiagnostics.Increment(
+            "Pathing.LiveTravelStalls")
+    end
+    if Core and Core.LogWarn then
+        Core.LogWarn(
+            "live_travel_recovery npc=" .. tostring(record and record.id)
+                .. " journey=" .. tostring(journey.journeyId)
+                .. " recovery=" .. tostring(journey.liveRecoveryCount)
+                .. " mode=" .. (fallback and "fallback" or "replan")
+        )
+    end
+    return true
+end
+
+function Service.CheckLiveProgress(recordOrID, body, now)
+    local record = Internal.ResolveRecord(recordOrID)
+    local journey = record and record.travel or nil
+    local x
+    local y
+    local z
+    local progressed
+    local lastProgress
+    local timeoutMs
+    local recovered
+    if not journey or journey.state ~= "en_route" or not body then
+        return false, "not_en_route"
+    end
+    now = tonumber(now) or (Core and Core.Now and Core.Now() or 0)
+    x, y, z = liveBodyPosition(record, body)
+    progressed = noteLiveProgress(
+        journey,
+        x,
+        y,
+        z,
+        tonumber(journey.distanceTravelled) or 0,
+        now
+    )
+    if progressed then return false, "progressing" end
+    lastProgress = tonumber(journey.liveLastProgressAt) or now
+    timeoutMs = math.max(
+        1000,
+        tonumber(Const.TRAVEL_LIVE_PROGRESS_TIMEOUT_MS) or 12000
+    )
+    if now - lastProgress < timeoutMs then
+        return false, "waiting_for_progress"
+    end
+    recovered = recoverLiveStall(record, body, journey, now)
+    return recovered, recovered and "recovered" or "recovery_cooldown"
+end
 
 function Service.TickLive(recordOrID, body, atWorldHour)
     local record = Internal.ResolveRecord(recordOrID)
@@ -56,6 +196,11 @@ function Service.TickLive(recordOrID, body, atWorldHour)
                 Service.ReachCurrentWaypoint(record, atWorldHour)
             end
         end
+    end
+
+    if journey.state == "en_route" then
+        Service.CheckLiveProgress(record, body, Core and Core.Now
+            and Core.Now() or 0)
     end
 
     if previousState ~= journey.state

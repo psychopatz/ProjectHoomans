@@ -59,7 +59,10 @@ function Types.NormalizeDefinition(definition)
         hostility = Types.NormalizeHostility(tacticalClass, def.hostility),
         equipment = Internal.NormalizeEquipment(def.equipment),
         inventory = Internal.NormalizeInventory(def.inventory),
-        allowedJobs = PNC.Core.DeepCopy(def.allowedJobs or {}),
+        allowedJobs = type(def.allowedJobs) == "table"
+            and PNC.Core.DeepCopy(def.allowedJobs) or nil,
+        jobPriorities = type(def.jobPriorities) == "table"
+            and PNC.Core.DeepCopy(def.jobPriorities) or nil,
         forceLive = def.forceLive == true,
         debug = def.debug == true,
         persist = def.persist ~= false,

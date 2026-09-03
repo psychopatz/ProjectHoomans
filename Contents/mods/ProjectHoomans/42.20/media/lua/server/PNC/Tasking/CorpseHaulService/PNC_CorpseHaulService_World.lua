@@ -256,6 +256,57 @@ local function hasCorpse(square)
     return result
 end
 
+-- The zone editor needs to distinguish configured geometry from the drop
+-- points that the dispatcher can actually use. Keep this scan on the server
+-- and use the same walkability/corpse/reservation rules as findDropPoint so
+-- the UI cannot promise a slot that dispatch will reject.
+function Service.GetDestinationTileStats(baseOrId)
+    local base = type(baseOrId) == "table" and baseOrId
+        or PNC.BaseService and PNC.BaseService.Get
+            and PNC.BaseService.Get(baseOrId) or nil
+    local configuration = Internal.configurationFor(base)
+    local baseId = tostring(base and base.id or "")
+    local now = Core.Now()
+    local cached = Service.Runtime.destinationStatsByBase[baseId]
+    local region = configuration and configuration.destinationRegion or nil
+    local stats
+    if not region then return nil end
+    if cached and cached.revision == configuration.revision
+        and now < cached.updatedAt + Service.CORPSE_COUNT_CACHE_MS
+    then
+        return cached
+    end
+    stats = {
+        revision = configuration.revision,
+        total = 0,
+        free = 0,
+        occupied = 0,
+        blocked = 0,
+        reserved = 0,
+        unloaded = 0,
+        updatedAt = now,
+    }
+    Internal.forEachRegionTile(region, function(x, y, z)
+        local square = Internal.squareAt(x, y, z)
+        stats.total = stats.total + 1
+        if not square then
+            stats.unloaded = stats.unloaded + 1
+            return
+        end
+        if squareState(x, y, z) ~= "walkable" then
+            stats.blocked = stats.blocked + 1
+        elseif hasCorpse(square) then
+            stats.occupied = stats.occupied + 1
+        elseif dropReserved(x, y, z) then
+            stats.reserved = stats.reserved + 1
+        else
+            stats.free = stats.free + 1
+        end
+    end)
+    Service.Runtime.destinationStatsByBase[baseId] = stats
+    return stats
+end
+
 local function findDropPoint(facilityId, preferredX, preferredY, preferredZ,
     allowedRegion)
     local region = allowedRegion

@@ -6,6 +6,8 @@ PNC.ColonyManagement = PNC.ColonyManagement or {}
 PNC.ColonyManagement.Internal = PNC.ColonyManagement.Internal or {}
 
 local Internal = PNC.ColonyManagement.Internal
+local WorkPolicy = PNC.WorkPolicy
+    or require "PNC/Core/Production/WorkDefinition/PNC_WorkPolicy"
 
 local function playerKey(player)
     if player and type(player.getUsername) == "function" then
@@ -47,8 +49,7 @@ local function authorizedNPCs(player, job)
         or not commands or type(commands.IsOwnedByPlayer) ~= "function"
     then return output end
     for _, record in pairs(PNC.Registry.Data) do
-        local allowed = not record.allowedJobs
-            or record.allowedJobs[job] ~= false
+        local allowed = WorkPolicy.IsEnabled(record, job)
         if record.alive ~= false and allowed
             and commands.IsOwnedByPlayer(record, player) == true
         then

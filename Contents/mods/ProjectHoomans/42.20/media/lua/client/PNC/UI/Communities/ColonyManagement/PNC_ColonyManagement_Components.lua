@@ -31,7 +31,8 @@ end
 
 local function drawDetailRow(list, y, entry, alternate)
     local item = entry.item or {}
-    UI.DrawListSelection(list, y, list.itemheight, false, alternate)
+    UI.DrawListSelection(list, y, list.itemheight, item.selected == true,
+        alternate)
     local labelColor = item.colorName and Theme.colors[item.colorName]
         or Theme.colors.text
     local actionWidth = item.actionLabel and 96 or 0

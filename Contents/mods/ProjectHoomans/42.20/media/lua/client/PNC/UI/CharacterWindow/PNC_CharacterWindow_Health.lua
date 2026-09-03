@@ -166,6 +166,47 @@ local function overallStatus(current, maximum, incapacitated)
     return Shared.Text("IGUI_health_Crital_damage", "Critical damage")
 end
 
+local function activityPartLabel(partId)
+    partId = tostring(partId or "")
+    if partId == "" then return nil end
+    return Shared.Text(BODY_PART_TEXT[partId], partId)
+end
+
+local function renderMedicalActivity(view, x, y, width, fontHeight, snapshot, payload)
+    local activity = Shared.GetMedicalActivity
+        and Shared.GetMedicalActivity(snapshot, payload) or nil
+    local detail
+    local partLabel
+    local progress
+    if not activity then return y end
+    detail = activity.label
+    partLabel = activityPartLabel(activity.partId)
+    if partLabel then detail = detail .. " | " .. partLabel end
+    if activity.source == "medical" and activity.patientId then
+        detail = detail .. " | Patient: " .. tostring(activity.patientId)
+    elseif activity.bandageName then
+        detail = detail .. " | Bandage: " .. tostring(activity.bandageName)
+    end
+    progress = activity.progress
+    if progress ~= nil then
+        detail = detail .. string.format(" | Progress: %.0f%%", progress * 100)
+    end
+    if activity.blockedReason then
+        detail = detail .. " | Blocked: " .. tostring(activity.blockedReason)
+    elseif activity.interruptedReason then
+        detail = detail .. " | Interrupted: " .. tostring(activity.interruptedReason)
+    end
+    if view.drawRect then
+        view:drawRect(x, y, width, fontHeight * 2 + 8,
+            0.78, 0.08, 0.16, 0.20)
+    end
+    view:drawText(Shared.Text("UI_PNC_Medical_Activity", "Medical Activity"),
+        x + 6, y + 3, 0.45, 0.85, 1, 1, UIFont.Small)
+    view:drawText(detail, x + 6, y + 3 + fontHeight,
+        1, 1, 1, 1, UIFont.Small)
+    return y + fontHeight * 2 + 12
+end
+
 local function needLevel(needType, value)
     local definitions = PNC.NeedsDefinitions
     if definitions and definitions.GetLevel then
@@ -343,6 +384,7 @@ function Tabs.RenderHealth(view, snapshot, payload, topY)
     view:drawText(overallStatus(hpCurrent, hpMax, state == "incapacitated"), x, y,
         1, 1 - injuryTint, 1 - injuryTint, 1, UIFont.Small)
     y = y + fontHeight
+    y = renderMedicalActivity(view, x, y, width, fontHeight, snapshot, payload)
     if debugAllowed then
         local infection = body.infection
         local infected = infection

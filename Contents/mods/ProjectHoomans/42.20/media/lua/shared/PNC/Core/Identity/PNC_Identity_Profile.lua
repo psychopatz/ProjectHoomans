@@ -97,7 +97,12 @@ function Identity.ApplyRecordIdentity(record, source)
     record.name = resolvedIdentity.displayName
     record.visualProfile = normalizeString(source and source.visualProfile or record.visualProfile) or archetype.visualProfile
     record.outfit = normalizeString(source and source.outfit or record.outfit) or nil
-    record.allowedJobs = PNC.Core.DeepCopy(archetype.allowedJobs or record.allowedJobs or {})
+    -- Defaults belong only at record creation. Applying identity during a
+    -- snapshot/load/reconciliation pass must preserve player-edited work
+    -- policy, otherwise a UI refresh silently restores archetype values.
+    record.allowedJobs = PNC.Core.DeepCopy(record.allowedJobs
+        or archetype.allowedJobs or {})
+    record.jobPriorities = PNC.Core.DeepCopy(record.jobPriorities or {})
     return record
 end
 

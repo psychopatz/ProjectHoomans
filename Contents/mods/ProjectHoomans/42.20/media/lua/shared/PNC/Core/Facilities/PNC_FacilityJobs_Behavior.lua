@@ -629,6 +629,7 @@ local function finish(record, zombie, reason, restoreOrder)
     local runtime = state(record)
     if not runtime or runtime.finishing == true then return false end
     runtime.finishing = true
+    runtime.sleepSceneActive = false
     restorePosition(record, zombie, runtime)
     if PNC.FacilityReservations and runtime.reservationId ~= ""
         and not hasLiveTaskLease(runtime.taskLeaseId)
@@ -741,6 +742,7 @@ function Jobs.Stop(record, reason)
     zombie = PNC.Registry and PNC.Registry.GetLiveZombie
         and PNC.Registry.GetLiveZombie(record.id) or nil
     runtime.stopRequested = true
+    runtime.sleepSceneActive = false
     -- Cleanup must continue even if scene interruption throws. Otherwise the
     -- activity and its reservation survive without an owner.
     stopAnimationScene(record, zombie, reason)
@@ -767,8 +769,15 @@ function Jobs.OnSceneTick(record, zombie, scene, now)
     if not runtime or not definition or scene.id ~= sceneId then
         return false
     end
-    runtime.phase = runtime.seating == true
-        and "SEATED" or definition.activityLabel or "WORKING"
+    if tostring(runtime.capability or "") == "sleep" then
+        -- Sleep effects and sleep-specific recovery begin only after the
+        -- animation scene has been accepted. Reaching the bed is not sleep.
+        runtime.sleepSceneActive = true
+        runtime.phase = "SLEEPING"
+    else
+        runtime.phase = runtime.seating == true
+            and "SEATED" or definition.activityLabel or "WORKING"
+    end
     if PNC.FacilityReservations and runtime.reservationId ~= ""
         and now >= (tonumber(runtime.nextReservationRenewAt) or 0)
     then
@@ -821,6 +830,7 @@ end
 function Jobs.OnSceneStopped(record, zombie, scene, reason)
     local runtime = state(record)
     if not runtime then return end
+    runtime.sleepSceneActive = false
     clearFurnitureSeat(record, zombie, runtime)
     restorePosition(record, zombie, runtime)
     runtime.arrivalSettled = false

@@ -1,6 +1,8 @@
 require "PsychopatzCore/UI/PsychopatzUI"
 
 local Shared = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Shared"
+local WorkPolicy = PNC.WorkPolicy
+    or require "PNC/Core/Production/WorkDefinition/PNC_WorkPolicy"
 local Jobs = {}
 local UI = PsychopatzCore.UI
 
@@ -12,6 +14,14 @@ local DEFINITIONS = {
     { id = "WorkshopWorker", key = "UI_PNC_Job_WorkshopWorker",
         fallback = "WORKSHOP WORKER" },
     { id = "Farmer", key = "UI_PNC_Job_Farmer", fallback = "FARMER" },
+    { id = "Fishing", key = "UI_PNC_Job_Fishing", fallback = "FISHING" },
+    { id = "Lumber", key = "UI_PNC_Job_Lumber", fallback = "LUMBER" },
+    { id = "Provisioner", key = "UI_PNC_Job_Provisioner",
+        fallback = "PROVISIONER" },
+    { id = "CorpseHaul", key = "UI_PNC_Job_CorpseHaul",
+        fallback = "CORPSE HAUL" },
+    { id = "MedicalCare", key = "UI_PNC_Job_MedicalCare",
+        fallback = "MEDICAL CARE" },
 }
 
 function Jobs.Create(window)
@@ -61,13 +71,16 @@ function Jobs.Apply(window, active, Layout)
     local rect = window.layout.details
     local gap = Layout.Pixels(6, window.uiScale)
     local height = Layout.Pixels(28, window.uiScale)
-    local width = math.floor((rect.width - gap * (#DEFINITIONS - 1))
-        / #DEFINITIONS)
+    local columns = math.min(3, #DEFINITIONS)
+    local rows = math.ceil(#DEFINITIONS / columns)
+    local width = math.floor((rect.width - gap * (columns - 1)) / columns)
     for index, button in ipairs(window.jobControls) do
-        Layout.SetBounds(button, rect.x + (index - 1) * (width + gap),
-            rect.y, width, height)
+        local column = math.fmod(index - 1, columns)
+        local row = math.floor((index - 1) / columns)
+        Layout.SetBounds(button, rect.x + column * (width + gap),
+            rect.y + row * (height + gap), width, height)
     end
-    local actionY = rect.y + height + gap
+    local actionY = rect.y + rows * (height + gap)
     local actionWidth = math.floor((rect.width - gap * 2) / 3)
     Layout.SetBounds(window.returnHomeControl, rect.x, actionY,
         actionWidth, height)
@@ -116,12 +129,12 @@ function Jobs.BuildRows(context)
             or homeState == "RETURNING_HOME" and "warning" or "muted",
     }
     for _, definition in ipairs(DEFINITIONS) do
-        local enabled = not person.allowedJobs
-            or person.allowedJobs[definition.id] ~= false
+        local priority = WorkPolicy.GetPriority(person, definition.id)
+        local enabled = priority > WorkPolicy.MIN_PRIORITY
         local button = window.jobControls and window.jobControls[definition.id]
         if button then
             button:setTitle(Shared.Tr(definition.key, definition.fallback)
-                .. (enabled and "  ON" or "  OFF"))
+                .. (enabled and "  P" .. tostring(priority) or "  OFF"))
             UI.SetButtonVariant(button, enabled and "success" or "quiet")
         end
         rows[#rows + 1] = {
@@ -129,7 +142,8 @@ function Jobs.BuildRows(context)
             label = Shared.Tr(definition.key, definition.fallback),
             detail = enabled
                 and Shared.Tr("UI_PNC_Jobs_AllowedHelp",
-                    "ALLOWED - this NPC may automatically claim this work.")
+                    "ALLOWED - priority " .. tostring(priority)
+                        .. " (1 is highest; 4 is lowest).")
                 or Shared.Tr("UI_PNC_Jobs_DisabledHelp",
                     "DISABLED - this NPC will not claim this work."),
             colorName = enabled and "success" or "warning",
@@ -158,10 +172,29 @@ function Jobs.OnControl(window, button)
         })
     end
     if not window.jobControls[job] then return false end
-    local enabled = not person.allowedJobs or person.allowedJobs[job] ~= false
-    return PNC.Client.RequestColonyAction("job_permission_set", {
-        npcID = person.id, job = job, enabled = not enabled,
+    local previous = WorkPolicy.GetPriority(person, job)
+    local priority = previous > WorkPolicy.MIN_PRIORITY
+        and WorkPolicy.MIN_PRIORITY or WorkPolicy.DEFAULT_PRIORITY
+    WorkPolicy.SetPriority(person, job, priority)
+    local requestId = PNC.ColonyManagementClient
+        and PNC.ColonyManagementClient.QueueWorkPolicy
+        and PNC.ColonyManagementClient.QueueWorkPolicy(
+            person.id, job, priority) or nil
+    local ok = PNC.Client.RequestColonyAction("job_permission_set", {
+        npcID = person.id, job = job,
+        priority = priority,
+        enabled = priority > WorkPolicy.MIN_PRIORITY,
+        requestId = requestId,
     })
+    if ok == false then
+        WorkPolicy.SetPriority(person, job, previous)
+        if PNC.ColonyManagementClient
+            and PNC.ColonyManagementClient.ClearWorkPolicy
+        then
+            PNC.ColonyManagementClient.ClearWorkPolicy(person.id, job)
+        end
+    end
+    return ok
 end
 
 return Jobs

@@ -582,6 +582,9 @@ function Service.AcquireSleep(record, options)
         resource = resource, resourceKey = resource.resourceKey,
         resourceKind = resource.resourceKind, target = target,
         approachCandidates = targets, campId = campId, campActivity = true,
+        sleepVariant = "CAMP_NEARBY",
+        sleepTargetPolicy = resource.resourceKind == "sleep_surface"
+            and "CAMP_NEARBY_BED" or "CAMP_FLOOR_FALLBACK",
         campX = order.x, campY = order.y, campZ = order.z,
         campRadius = number(order.radius, Const.CAMP_RADIUS or 3),
         resourceRadius = number(order.resourceRadius,

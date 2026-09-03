@@ -9,6 +9,7 @@ local Const = PNC.Const
 local Registry = PNC.Registry
 local Inventory = PNC.Inventory
 local Skills = PNC.Skills
+local Types = PNC.Types
 
 local BANDAGE_NAMES = {
     ["Base.AlcoholBandage"] = "Sterilized Bandage",
@@ -82,14 +83,16 @@ local function findNPCBandage(record)
     local types
     local i
     local item
+    local stack
     if not record then return nil end
     inv = Inventory and Inventory.EnsureRecordInventory
         and Inventory.EnsureRecordInventory(record) or record.inventory
     types = bandageTypes()
     for i = 1, #types do
         for _, item in pairs(inv and inv.items or {}) do
+            stack = item and tonumber(item.stack) or 1
             if item and tostring(item.type or "") == tostring(types[i])
-                and math.max(1, tonumber(item.stack) or 1) > 0
+                and stack > 0
             then
                 return {
                     itemID = item.id,
@@ -103,7 +106,7 @@ local function findNPCBandage(record)
     return nil
 end
 
-local function consumeNPCBandage(record, supply)
+local function consumeNPCBandage(record, supply, reason)
     if not record or not supply then return false, nil end
     if PNC.SupplyInventory and PNC.SupplyInventory.Consume then
         local ok, _, effect = PNC.SupplyInventory.Consume(
@@ -113,6 +116,7 @@ local function consumeNPCBandage(record, supply)
                 resourceKind = "MEDICAL",
                 treatment = "BANDAGE",
                 required = {},
+                source = reason or "npc_bandage",
             }
         )
         return ok, effect and effect.undo or nil
@@ -128,7 +132,7 @@ local function consumeNPCBandage(record, supply)
     local op = stack > 1
         and { op = "update", itemID = item.id, stack = stack - 1 }
         or { op = "remove", itemID = item.id }
-    local applied = Inventory.ApplyDelta(record, { op }, "self_bandage") == true
+    local applied = Inventory.ApplyDelta(record, { op }, reason or "npc_bandage") == true
     return applied, applied and function()
         record.inventory = undo
         return true
@@ -172,12 +176,60 @@ function Treatment.IsPlayerOwnedNPC(record)
     return isPlayerOwned(record)
 end
 
+-- Item consumption is an ownership/economy policy, not an execution detail.
+-- Colonists represent the player-managed economy and must use a real item.
+-- Abstract/non-colonist actors may resolve the same treatment without an
+-- inventory item. A non-colonist caller can explicitly opt into item use,
+-- but a colonist cannot silently opt out through a normal task payload.
+function Treatment.RequiresNPCMedicalItem(record, options)
+    options = type(options) == "table" and options or {}
+    local colonist = Types and Types.IsColonist
+        and Types.IsColonist(record) == true
+        or tostring(record and record.tacticalClass or "")
+            == tostring(Const.TACTICAL_CLASS_COLONIST or "colonist")
+    if colonist then return true end
+    return options.consumeItem == true
+end
+
+function Treatment.GetNPCMedicalPolicy(record, options)
+    local requiresItem = Treatment.RequiresNPCMedicalItem(record, options)
+    local constants = PNC.Const or {}
+    return {
+        mode = requiresItem and "inventory" or "abstract",
+        requiresItem = requiresItem,
+        bandageType = requiresItem and nil
+            or constants.ABSTRACT_MEDICAL_TREATMENT_TYPE
+                or "PNC.AbstractMedical",
+        bandageName = requiresItem and nil
+            or constants.ABSTRACT_MEDICAL_TREATMENT_NAME
+                or "Abstract medical treatment",
+    }
+end
+
 function Treatment.FindNPCBandage(record)
     return findNPCBandage(record)
 end
 
 function Treatment.HasNPCBandage(record)
     return findNPCBandage(record) ~= nil
+end
+
+function Treatment.GetNPCBandagePlan(record, options)
+    local policy = Treatment.GetNPCMedicalPolicy(record, options)
+    local supply
+    if not policy.requiresItem then
+        return {
+            fullType = policy.bandageType,
+            displayName = policy.bandageName,
+            mode = policy.mode,
+            requiresItem = false,
+        }
+    end
+    supply = findNPCBandage(record)
+    if not supply then return nil end
+    supply.mode = policy.mode
+    supply.requiresItem = true
+    return supply
 end
 
 function Treatment.GetNPCBandageDuration(record)
@@ -212,6 +264,12 @@ function Treatment.ApplyBandage(record, partId, options)
     if Registry and Registry.MarkDirty then
         Registry.MarkDirty(record, "wounds")
     end
+    if PNC.MedicalCareService
+        and PNC.MedicalCareService.ResolveForPatient
+    then
+        PNC.MedicalCareService.ResolveForPatient(
+            "npc", record.id, "patient_wound_resolved")
+    end
     if options.broadcast ~= false
         and PNC.Network and PNC.Network.BroadcastRecord
     then
@@ -220,20 +278,42 @@ function Treatment.ApplyBandage(record, partId, options)
     return true, "bandaged"
 end
 
-function Treatment.TryNPCBandage(record, partId)
+function Treatment.TryNPCMedicalTreatment(actorRecord, targetRecord, partId, options)
+    local policy
     local supply
     local applied
     local reason
+    local consumed
+    local undo
+    local firstAid
+    local resultLabel
+    options = type(options) == "table" and options or {}
     if not Core.IsAuthority() then return false, "not_authority" end
-    supply = findNPCBandage(record)
-    if not supply then return false, "missing_bandage" end
-    local consumed, undo = consumeNPCBandage(record, supply)
-    if not consumed then return false, "bandage_consumption_failed" end
-    applied, reason = Treatment.ApplyBandage(record, partId, {
-        bandageType = supply.fullType,
-        bandageName = supply.displayName,
-        firstAidLevel = Treatment.GetNPCFirstAidLevel(record),
-        syncEvent = "self_bandaged",
+    if not actorRecord or actorRecord.alive == false then
+        return false, "actor_missing"
+    end
+    if not targetRecord or targetRecord.alive == false then
+        return false, "target_missing"
+    end
+    policy = Treatment.GetNPCMedicalPolicy(actorRecord, options)
+    if policy.requiresItem then
+        supply = findNPCBandage(actorRecord)
+        if not supply then return false, "missing_bandage" end
+        consumed, undo = consumeNPCBandage(
+            actorRecord,
+            supply,
+            options.consumeReason or "npc_medical_treatment"
+        )
+        if not consumed then return false, "bandage_consumption_failed" end
+    end
+    firstAid = Treatment.GetNPCFirstAidLevel(actorRecord)
+    applied, reason = Treatment.ApplyBandage(targetRecord, partId, {
+        bandageType = supply and supply.fullType or policy.bandageType,
+        bandageName = supply and supply.displayName or policy.bandageName,
+        firstAidLevel = firstAid,
+        syncEvent = options.syncEvent
+            or (actorRecord == targetRecord and "self_bandaged"
+                or "npc_treated"),
         broadcast = false,
     })
     if not applied then
@@ -241,15 +321,48 @@ function Treatment.TryNPCBandage(record, partId)
         return false, reason
     end
     if Skills and Skills.AddXP then
-        Skills.AddXP(record, "FirstAid", 1)
+        Skills.AddXP(actorRecord, "FirstAid", 1)
     end
     if Core and Core.LogRecordDebug then
-        Core.LogRecordDebug(record, "NPC " .. tostring(record.id)
-            .. " self-bandaged part=" .. tostring(partId)
-            .. " item=" .. tostring(supply.fullType)
-            .. " firstAid=" .. tostring(Treatment.GetNPCFirstAidLevel(record)))
+        Core.LogRecordDebug(actorRecord, "NPC " .. tostring(actorRecord.id)
+            .. " treated target=" .. tostring(targetRecord.id)
+            .. " part=" .. tostring(partId)
+            .. " mode=" .. tostring(policy.mode)
+            .. " item=" .. tostring(supply and supply.fullType or "none")
+            .. " firstAid=" .. tostring(firstAid))
     end
-    return true, supply.displayName
+    if PNC.Network and PNC.Network.BroadcastRecord then
+        PNC.Network.BroadcastRecord(targetRecord, options.syncEvent
+            or (actorRecord == targetRecord and "self_bandaged"
+                or "npc_treated"))
+    end
+    resultLabel = supply and supply.displayName or policy.bandageName
+    return true, resultLabel
+end
+
+function Treatment.TryNPCBandage(record, partId, options)
+    return Treatment.TryNPCMedicalTreatment(record, record, partId, options)
+end
+
+function Treatment.BuildMedicalCareSnapshot(record)
+    local state = record and record.runtime
+        and record.runtime.medicalCare or nil
+    if type(state) ~= "table" or state.phase == nil
+        or tostring(state.phase) == "idle"
+    then
+        return nil
+    end
+    return {
+        phase = tostring(state.phase),
+        taskId = state.taskId,
+        patientId = state.patientId,
+        partId = state.partId,
+        bump = state.bump,
+        lootPosition = state.lootPosition,
+        startedAt = state.startedAt,
+        finishAt = state.finishAt,
+        revision = state.revision,
+    }
 end
 
 function Treatment.IsPlayerInBandageRange(player, npcId)
