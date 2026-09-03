@@ -89,13 +89,18 @@ local map = { children = {}, addChild = ISPanel.addChild }
 setmetatable(map, { __index = ISWorldMap })
 map:createChildren()
 T.truthy(map.pncHoomansButton, "Hoomans settings button was not attached")
-T.equal(map.pncHoomansButton.image,
+T.equal(map.pncHoomansButton.title, "Hoomans",
+    "Hoomans settings button has a readable label")
+T.equal(map.pncHoomansButton.iconTexture,
     "media/ui/inventoryPanes/Button_Settings.png",
     "Hoomans reuses the vanilla settings cog")
-T.equal(map.pncHoomansButton.x, 244,
-    "Hoomans button is placed beside vanilla map controls")
+T.equal(map.pncHoomansButton.tooltip, "Open Hoomans map settings",
+    "Hoomans tooltip does not expose a raw translation key")
+T.equal(map.pncHoomansButton.x, 188,
+    "Hoomans button is laid out left of the vanilla map controls")
 T.falsy(map.pncNamesButton, "NPC names still owns a map button")
 T.falsy(map.pncBasesButton, "NPC world still owns a map button")
+T.falsy(map.pncTrackButton, "Track is not registered in the settings menu")
 
 map.pncHoomansButton.onclick()
 local modal = Menu.instance

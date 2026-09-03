@@ -130,6 +130,31 @@ local function distanceTo(player, target)
     return math.sqrt(dx * dx + dy * dy)
 end
 
+function Tracking.GetBaseDistance()
+    local target = Tracking.GetBaseTarget()
+    local player = getSpecificPlayer and getSpecificPlayer(0) or nil
+    return distanceTo(player, target)
+end
+
+function Tracking.IsAtBase()
+    local snapshot = readSnapshot()
+    local settlement = type(snapshot) == "table" and snapshot.settlement
+        or nil
+    local player = getSpecificPlayer and getSpecificPlayer(0) or nil
+    if not player or type(player.getX) ~= "function"
+        or type(player.getY) ~= "function"
+    then
+        return false
+    end
+    return Target.ContainsSettlementPoint(
+        settlement, player:getX(), player:getY()
+    )
+end
+
+function Tracking.CanTrackBase()
+    return Tracking.HasBase() and not Tracking.IsAtBase()
+end
+
 function Tracking.ClearBase()
     markerRemove(MARKER_ID)
     Tracking.BaseTracked = false
@@ -188,9 +213,10 @@ function Tracking.UpdateBaseMarker(force)
         return false
     end
 
-    local player = getSpecificPlayer and getSpecificPlayer(0) or nil
-    local distance = distanceTo(player, target)
-    if distance and distance <= ARRIVAL_DISTANCE then
+    local distance = Tracking.GetBaseDistance()
+    if Tracking.IsAtBase()
+        or distance and distance <= ARRIVAL_DISTANCE
+    then
         Tracking.ClearBase()
         return false
     end

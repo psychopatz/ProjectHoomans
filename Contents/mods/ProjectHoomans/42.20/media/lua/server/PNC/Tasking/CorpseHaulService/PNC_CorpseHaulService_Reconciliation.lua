@@ -461,14 +461,16 @@ local function reconcileOrder(order, baseCandidates, now)
         or payload.deathMarkerId
             and tostring(payload.deathMarkerId) ~= "") and 60 or 20
     if candidate and score >= minimumScore then
-        rebindOrder(order, candidate, task, now)
+        local reboundChanged = rebindOrder(order, candidate, task, now)
         local removed = removeDuplicateCorpses(candidates, candidate, order)
         if removed > 0 then
             Service.Runtime.countsByBase[tostring(order.baseId or "")] = nil
         end
-        reconcileDiagnostic(order, "BOUND", "CORPSE_REBOUND", candidate,
-            removed > 0 and ("duplicatesRemoved=" .. tostring(removed))
-                or nil)
+        if reboundChanged or removed > 0 then
+            reconcileDiagnostic(order, "BOUND", "CORPSE_REBOUND", candidate,
+                removed > 0 and ("duplicatesRemoved=" .. tostring(removed))
+                    or nil)
+        end
         return "BOUND"
     end
     sourceSquare = Internal.squareAt(payload.sourceX, payload.sourceY,

@@ -1,9 +1,35 @@
 -- Selects a stable, valid tile inside a serialized base region.
 
+local GridRegion = require "PsychopatzCore/World/PC_GridRegion"
+
 PNC = PNC or {}
 PNC.MapTrackingTarget = PNC.MapTrackingTarget or {}
 
 local Target = PNC.MapTrackingTarget
+
+function Target.ContainsSettlementPoint(settlement, x, y)
+    local geometry = settlement and settlement.geometry or nil
+    local tileX, tileY = tonumber(x), tonumber(y)
+    if type(geometry) ~= "table" or not tileX or not tileY then
+        return false
+    end
+    tileX, tileY = math.floor(tileX), math.floor(tileY)
+
+    local region = geometry.region
+    if type(region) == "table"
+        and GridRegion and type(GridRegion.containsXY) == "function"
+    then
+        return GridRegion.containsXY(region, tileX, tileY) == true
+    end
+
+    local bounds = geometry.bounds
+    if type(bounds) ~= "table" then return false end
+    local minX, maxX = tonumber(bounds.minX), tonumber(bounds.maxX)
+    local minY, maxY = tonumber(bounds.minY), tonumber(bounds.maxY)
+    return minX and maxX and minY and maxY
+        and tileX >= minX and tileX <= maxX
+        and tileY >= minY and tileY <= maxY or false
+end
 
 local function regionTarget(region)
     if type(region) ~= "table" or type(region.levels) ~= "table" then

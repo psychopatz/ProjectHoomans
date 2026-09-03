@@ -1,13 +1,13 @@
 -- Map toolbar button and modal for home-base tracking.
 
-require "ISUI/Maps/ISWorldMap"
 require "ISUI/ISPanel"
 require "ISUI/ISButton"
 
 PNC = PNC or {}
 local Tracking = PNC.MapTracking
     or require "PNC/UI/Map/PNC_MapTracking"
-local Menu = PNC.MapHoomansMenu
+local Toolbar = PNC.MapToolbar
+    or require "PNC/UI/Map/PNC_MapToolbar"
 
 local function text(key, fallback)
     local value = getText and getText(key) or nil
@@ -47,7 +47,9 @@ end
 function ISPNCMapTrackingModal:syncButtons()
     if not self.baseButton then return end
     local tracked = Tracking.IsBaseTracked()
-    local available = Tracking.HasBase()
+    local hasBase = Tracking.HasBase()
+    local atBase = hasBase and Tracking.IsAtBase()
+    local available = hasBase and not atBase
     local title = text(
         tracked and "UI_PNC_MapTrack_BaseOn" or "UI_PNC_MapTrack_BaseOff",
         tracked and "BASE: ON" or "BASE: OFF"
@@ -56,18 +58,23 @@ function ISPNCMapTrackingModal:syncButtons()
     else self.baseButton.title = title end
     if self.baseButton.setEnable then self.baseButton:setEnable(available)
     else self.baseButton.enable = available end
+    local helpKey = not hasBase and "UI_PNC_MapTrack_BaseMissing"
+        or atBase and "UI_PNC_MapTrack_BaseArrived"
+        or "UI_PNC_MapTrack_BaseHelp"
+    local helpFallback = not hasBase
+        and "Create a base zone before tracking your base."
+        or atBase and "You are already at your base."
+        or "Toggle the marker that guides you to your base."
     self.baseButton.tooltip = text(
-        available and "UI_PNC_MapTrack_BaseHelp"
-            or "UI_PNC_MapTrack_BaseMissing",
-        available and "Toggle the marker that guides you to your base."
-            or "Create a base zone before tracking your base."
+        helpKey,
+        helpFallback
     )
 end
 
 function ISPNCMapTrackingModal:onButton(button)
     local id = button and button.internal or ""
     if id == "BASE" then
-        if not Tracking.HasBase() then return false end
+        if not Tracking.CanTrackBase() then return false end
         local result = Tracking.ToggleBase()
         self:syncButtons()
         return result ~= false
@@ -145,35 +152,26 @@ function Tracking.Close()
     if Tracking.instance then Tracking.instance:close() end
 end
 
-if ISWorldMap and not ISWorldMap._pncMapTrackingPatched then
-    ISWorldMap._pncMapTrackingPatched = true
-    local originalClose = ISWorldMap.close
-
-    function ISWorldMap:close()
-        Tracking.Close()
-        if originalClose then return originalClose(self) end
-        return false
-    end
-end
-
-if Menu and Menu.Register then
-    local trackIcon = getTexture
-        and getTexture("media/ui/MP/mp_ui_internet.png") or nil
-    Menu.Register("track", {
+if Toolbar and Toolbar.Register then
+    Toolbar.Register("track", {
         order = 10,
+        field = "pncTrackButton",
+        width = 92,
         title = function()
-            return getText and getText("UI_PNC_MapTrack_Button") or "Track"
+            local value = getText and getText("UI_PNC_MapTrack_Button")
+            return value and value ~= ""
+                and value ~= "UI_PNC_MapTrack_Button" and value or "Track"
         end,
         tooltip = function()
-            return getText and getText("UI_PNC_MapTrack_ButtonHelp")
-                or "Open Hoomans tracking options."
+            local value = getText and getText("UI_PNC_MapTrack_ButtonHelp")
+            return value and value ~= ""
+                and value ~= "UI_PNC_MapTrack_ButtonHelp"
+                and value or "Open Hoomans tracking options."
         end,
-        icon = trackIcon,
+        icon = "media/ui/MP/mp_ui_internet.png",
         iconSize = 22,
-        onActivate = function()
-            Menu.Close()
-            return Tracking.Open() ~= nil
-        end,
+        onActivate = function() return Tracking.Open() ~= nil end,
+        onMapClose = Tracking.Close,
     })
 end
 

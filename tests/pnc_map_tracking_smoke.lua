@@ -44,6 +44,21 @@ package.preload["ISUI/ISPanel"] = function() return ISPanel end
 package.preload["ISUI/ISButton"] = function() return ISButton end
 package.preload["PsychopatzCore/EventMarkers/PsychopatzEventMarkerHandler"] =
     function() return markerHandler end
+package.preload["PsychopatzCore/World/PC_GridRegion"] = function()
+    return {
+        containsXY = function(region, x, y)
+            local level = region and region.levels and region.levels[0]
+            local rows = level and (level.rows or level) or {}
+            local spans = rows[y]
+            for index = 1, #(spans or {}), 2 do
+                if x >= spans[index] and x <= spans[index + 1] then
+                    return true
+                end
+            end
+            return false
+        end,
+    }
+end
 
 ISPanel = {}
 function ISPanel:derive()
@@ -122,6 +137,7 @@ local translations = {
     UI_PNC_MapTrack_BaseOff = "BASE: OFF",
     UI_PNC_MapTrack_BaseHelp = "Toggle the marker that guides you to your base.",
     UI_PNC_MapTrack_BaseMissing = "Create a base zone before tracking your base.",
+    UI_PNC_MapTrack_BaseArrived = "You are already at your base.",
     UI_PNC_MapTrack_Marker = "Base",
 }
 getText = function(key) return translations[key] or key end
@@ -186,15 +202,13 @@ setmetatable(map, { __index = ISWorldMap })
 map:createChildren()
 
 T.truthy(map.pncHoomansButton, "map did not receive Hoomans settings")
-T.falsy(map.pncTrackButton, "Track retained a standalone map button")
-map.pncHoomansButton.onclick()
-local menu = PNC.MapHoomansMenu.instance
-local trackButton = menu and menu.entryButtons.track
-T.truthy(trackButton, "Hoomans menu did not receive Track")
-T.equal(trackButton.title, "Track", "Track translation")
-T.equal(trackButton.iconTexture, "media/ui/MP/mp_ui_internet.png",
+T.truthy(map.pncTrackButton, "map did not receive standalone Track")
+T.equal(map.pncTrackButton.title, "Track", "Track translation")
+T.equal(map.pncTrackButton.iconTexture, "media/ui/MP/mp_ui_internet.png",
     "Track uses the multiplayer internet icon")
-menu:onButton(trackButton)
+T.equal(map.pncTrackButton.tooltip, "Open Hoomans tracking options.",
+    "Track tooltip does not expose a raw translation key")
+map.pncTrackButton.onclick()
 local modal = Tracking.instance
 T.truthy(modal and modal.baseButton, "Track button did not open its modal")
 T.truthy(modal.baseButton.enabled, "Base button disabled despite valid base geometry")
@@ -229,6 +243,32 @@ T.falsy(modal:onButton(modal.baseButton), "Base toggle-off returned active")
 T.falsy(markerHandler.markers[Tracking.MarkerID],
     "untoggle did not remove the base marker")
 
+player.x, player.y = target.x, target.y
+modal:syncButtons()
+T.falsy(modal.baseButton.enabled,
+    "Base button stayed enabled when player was already home")
+T.equal(modal.baseButton.tooltip, "You are already at your base.",
+    "already-home tooltip was not shown")
+T.falsy(modal:onButton(modal.baseButton),
+    "already-home Base button still attempted to toggle")
+
+local geometry = PNC.Network.ClientState.colonyManagement.settlement.geometry
+geometry.revision = 2
+geometry.bounds = { minX = 100, minY = 100, maxX = 124, maxY = 100 }
+geometry.region = { levels = { [0] = { rows = {
+    [100] = { 100, 124 },
+} } } }
+PNC.Network.ClientState.colonyManagementRevision = 2
+player.x, player.y = 100.5, 100.5
+modal:syncButtons()
+T.truthy(Tracking.IsAtBase(),
+    "base containment did not recognize the settlement border")
+T.falsy(modal.baseButton.enabled,
+    "Base button stayed enabled inside a large settlement")
+T.equal(modal.baseButton.tooltip, "You are already at your base.",
+    "large-settlement already-home tooltip was not shown")
+
+player.x, player.y = 0, 0
 PNC.Network.ClientState.colonyManagementRevision = 2
 PNC.Network.ClientState.colonyManagement = {}
 modal:syncButtons()
@@ -236,9 +276,7 @@ T.falsy(modal.baseButton.enabled, "Base button stayed enabled without a base")
 T.falsy(modal:onButton(modal.baseButton),
     "disabled Base button still toggled tracking")
 
-map.pncHoomansButton.onclick()
-menu = PNC.MapHoomansMenu.instance
-menu:onButton(menu.entryButtons.track)
+map.pncTrackButton.onclick()
 T.truthy(Tracking.instance, "Track modal could not be reopened")
 map:close()
 T.falsy(Tracking.instance, "closing the map did not close Track modal")

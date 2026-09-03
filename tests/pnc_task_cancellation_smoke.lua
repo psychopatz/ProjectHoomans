@@ -43,6 +43,35 @@ PNC.WorkInputService = { Cancel = function() cancelledInputs = true end }
 PNC.FacilityReservations = { Release = function(id)
     releasedReservation = id; return true
 end }
+PNC.Tasking = { Internal = {
+    SafeCall = function(_, callback, _, ...)
+        local callbackOK, first, second = pcall(callback, ...)
+        if not callbackOK then return false, nil, first end
+        return true, first, second
+    end,
+} }
+local staleLease = T.truthy(Leases.Create({
+    npcId = "stale-npc", taskId = "stale-task", kind = "SLEEP",
+    sourceDomain = "needs", sourceRef = "fatigue",
+    precedence = "NORMAL_NEED", urgency = 0.8, capability = "sleep.bed",
+    interruptPolicy = "NORMAL",
+}, { reservationId = "already-released" }))
+PNC.FacilityReservations.Release = function(id)
+    if id == "already-released" then
+        return false, "RESERVATION_NOT_FOUND"
+    end
+    releasedReservation = id
+    return true
+end
+ok, reason = Leases.Release(staleLease.leaseId, "stale_cleanup")
+T.truthy(ok, "missing facility reservation is idempotent at lease cleanup")
+T.equal(reason.leaseId, staleLease.leaseId,
+    "stale lease still returns its released record")
+T.equal(Leases.Get(staleLease.leaseId), nil,
+    "stale lease is removed after reservation already disappeared")
+T.equal(Leases.ForNPC("stale-npc"), nil,
+    "stale npc lease index is removed after cleanup")
+PNC.Tasking = nil
 PNC.Registry = { Get = function() return { id = "npc", runtime = {
     workOrderId = order.id,
 } } end }

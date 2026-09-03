@@ -176,11 +176,22 @@ function Leases.Release(id, reason)
                 releaseReason
             )
         else
-            released = PNC.FacilityReservations.Release(
+            released, callbackReason = PNC.FacilityReservations.Release(
                 lease.reservationId,
                 releaseReason
             )
             ok = true
+        end
+        -- Reservation cleanup is deliberately idempotent at the lease
+        -- boundary.  A facility can already have released its reservation
+        -- during teardown, but the task lease still owns the cleanup step.
+        -- Treat that specific result as success so the lease can be removed;
+        -- preserve failures for every other rejection.
+        if ok and released == false
+            and tostring(callbackReason or "") == "RESERVATION_NOT_FOUND"
+        then
+            lease.reservationId = nil
+            released = true
         end
         if not ok or released == false then
             if ok and taskInternal and taskInternal.RecordFailure
@@ -193,6 +204,7 @@ function Leases.Release(id, reason)
             end
             return false, "RESERVATION_RELEASE_FAILED"
         end
+        lease.reservationId = nil
     end
     Leases.ByID[lease.leaseId], Leases.ByNPC[lease.npcId] = nil, nil
     removeActive(lease.leaseId)

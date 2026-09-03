@@ -19,10 +19,13 @@ Sync.UnresolvedLogAtByID = Sync.UnresolvedLogAtByID or {}
 Sync.MotionLogByID = Sync.MotionLogByID or {}
 Sync.PrunedRevisionByID = Sync.PrunedRevisionByID or {}
 Sync.LocalSnapshotAtByID = Sync.LocalSnapshotAtByID or {}
+Sync.RemoteSnapshotStateByID = Sync.RemoteSnapshotStateByID or {}
 Sync.Internal = Sync.Internal or {}
 Sync.lastBodyScanAt = Sync.lastBodyScanAt or 0
 Sync.lastLocalSnapshotBuildAt = Sync.lastLocalSnapshotBuildAt or 0
 Sync.lastLocalVisualMaintainAt = Sync.lastLocalVisualMaintainAt or 0
+Sync.lastRemoteSnapshotStatePruneAt =
+    Sync.lastRemoteSnapshotStatePruneAt or 0
 
 require "PNC/PresenceSync/PNC_ClientPresenceRuntime"
 require "PNC/PresenceSync/PNC_ClientPresenceFacing"
@@ -42,10 +45,12 @@ local function onResetLua()
     Sync.MotionLogByID = {}
     Sync.PrunedRevisionByID = {}
     Sync.LocalSnapshotAtByID = {}
+    Sync.RemoteSnapshotStateByID = {}
     Sync.hasLocalIncapacitatedSnapshots = nil
     Sync.lastBodyScanAt = 0
     Sync.lastLocalSnapshotBuildAt = 0
     Sync.lastLocalVisualMaintainAt = 0
+    Sync.lastRemoteSnapshotStatePruneAt = 0
     if Sync.Internal.ClearNativePathControllers then
         Sync.Internal.ClearNativePathControllers()
     end

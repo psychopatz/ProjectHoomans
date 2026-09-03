@@ -175,6 +175,7 @@ local function isOverControls(map, x, y)
         or isInsideVisibleChild(map.keyUI, x, y)
         or isInsideVisibleChild(map.buttonPanel, x, y)
         or isInsideVisibleChild(map.pncHoomansButton, x, y)
+        or isInsideVisibleChild(map.pncTrackButton, x, y)
         or isInsideVisibleChild(map.pncHoverPortrait, x, y)
 end
 
