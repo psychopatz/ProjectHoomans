@@ -119,11 +119,13 @@ T.truthy(Client.Enqueue({
 }), "LLM-eligible event enters queue")
 T.equal(Client.Pump(now), false, "LLM event waits during its grace period")
 T.truthy(completeLLM, "client provider receives an async completion callback")
-completeLLM("LLM reaction")
+completeLLM("LLM reaction", { ttsManaged = true })
 now = now + 1
 T.truthy(Client.Pump(now), "LLM result becomes deliverable")
 T.equal(messages[3].text, "LLM reaction", "LLM text wins over fallback")
 T.equal(messages[3].source.llm, true, "LLM provenance is preserved")
+T.equal(messages[3].presentationState.tts, false,
+    "streamed ambient TTS suppresses the final duplicate voice packet")
 
 Client.Reset()
 Client.SetLLMProvider(nil)

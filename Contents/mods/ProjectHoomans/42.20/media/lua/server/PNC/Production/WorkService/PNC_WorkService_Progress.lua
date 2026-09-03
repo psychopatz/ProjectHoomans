@@ -49,6 +49,10 @@ function Service.Commands.CollectInputs(orderId, workerId)
     order.collectionTarget = nil
     order.status, order.blockedReason = Status.TRAVEL_TO_STATION, nil
     order.updatedAt, order.lastProgressAt = now(), now()
+    order.recoveryAttempts = nil
+    order.lastRecoveryAt = nil
+    order.lastRecoveryReason = nil
+    order.recoveryQuarantined = nil
     order.revision = order.revision + 1
     setLiveOrder(worker, order, order.stationTarget, "WORK_AT_STATION")
     Repository.MarkDirty()
@@ -155,7 +159,13 @@ function Service.Commands.AddProgress(orderId, workerId, amount)
     local before = order.progress
     order.progress = math.min(order.requiredWork,
         order.progress + math.max(0, tonumber(amount) or 0))
-    if order.progress > before then order.lastProgressAt = now() end
+    if order.progress > before then
+        order.lastProgressAt = now()
+        order.recoveryAttempts = nil
+        order.lastRecoveryAt = nil
+        order.lastRecoveryReason = nil
+        order.recoveryQuarantined = nil
+    end
     order.updatedAt, order.revision = now(), order.revision + 1
     Repository.MarkDirty()
     if order.progress >= order.requiredWork then return complete(order) end

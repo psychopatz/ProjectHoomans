@@ -290,6 +290,9 @@ T.equal(lastMove.bob.x, 1.5,
     "container target is an adjacent interaction tile")
 T.equal(sceneRequests[1].poolName, "scavenge.loot",
     "search requests one randomized loot animation")
+local recovery = Executor.GetRecoveryState(lease)
+T.truthy(recovery.watchable, "scavenge exposes active scene recovery")
+T.equal(recovery.phase, "WORKING", "scavenge scene recovery phase")
 local interruptsBeforeCombat = sceneInterrupts
 records.bob.runtime.target = { kind = "zombie" }
 T.truthy(Executor.Tick(lease), "combat temporarily owns scavenger")

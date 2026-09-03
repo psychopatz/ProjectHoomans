@@ -2,6 +2,10 @@ local T = require "tests/support/test"
 
 local source = T.read(
     "ProjectHoomans", "server", "PNC/Farming/PNC_FarmingService.lua")
+local providerSource = T.read("ProjectHoomans", "server",
+    "PNC/Farming/FarmingService/PNC_FarmingService_Provider.lua")
+T.contains(providerSource, "function Provider.GetRecoveryState",
+    "farming provider exposes recovery state")
 local prefix = "PNC/Farming/FarmingService/"
 local providers = {
     "PNC_FarmingService_Context",

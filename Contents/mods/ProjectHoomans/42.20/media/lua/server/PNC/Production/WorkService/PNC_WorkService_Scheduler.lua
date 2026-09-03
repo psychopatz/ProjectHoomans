@@ -44,6 +44,15 @@ end
 
 local function processOrder(order, at)
     if terminal(order) or order.status == Status.PAUSED then return end
+    if order.recoveryQuarantined == true then
+        local changed = order.status ~= Status.BLOCKED
+            or order.blockedReason == nil
+        order.status = Status.BLOCKED
+        order.blockedReason = order.blockedReason
+            or "TASK_RECOVERY_EXHAUSTED"
+        if changed then Repository.MarkDirty() end
+        return
+    end
     if order.status == Status.CANCELLING
         or order.cancellationRequested == true
     then

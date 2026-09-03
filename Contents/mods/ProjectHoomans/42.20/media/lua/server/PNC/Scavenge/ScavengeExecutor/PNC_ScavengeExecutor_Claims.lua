@@ -131,7 +131,8 @@ local function beginLootScene(session, worker, record, body)
                 and "scavenge_search" or "scavenge_take",
         })
     end
-    worker.actionUntil = PNC.Core.Now() + LOOT_SCENE_DURATION_MS
+    worker.actionStartedAt = PNC.Core.Now()
+    worker.actionUntil = worker.actionStartedAt + LOOT_SCENE_DURATION_MS
     worker.actionScene = sceneId
     setWorkerPhase(session, worker,
         worker.currentKind == "search" and "SEARCHING_SOURCE" or "LOOTING",
@@ -157,6 +158,7 @@ local function clearWorkerAction(worker)
     worker.currentGroup = nil
     worker.currentEntry = nil
     worker.actionUntil = nil
+    worker.actionStartedAt = nil
     worker.actionScene = nil
 end
 

@@ -230,6 +230,38 @@ T.equal(move.x, 10.25, "seat retry keeps the alternate approach x")
 T.equal(move.y, 6.75, "seat retry moves to the alternate approach y")
 T.truthy(retryRecord.runtime.facilityActivity.failedApproaches["E:Front"],
     "blocked chair approach is remembered as failed")
+
+local originalSceneRequest = PNC.AnimationScenes.Request
+PNC.AnimationScenes.Request = function() return false, "scene_missing" end
+local failedStart = normalizer({}, {
+    capability = "sleep", facilityId = "barracks_a",
+    x = 0, y = 0, z = 0,
+})
+local failedStartRecord = {
+    id = "npc:scene-start-failure", x = 0, y = 0, z = 0,
+    orderSpec = failedStart,
+    runtime = { facilityActivity = {
+        capability = "sleep", taskLeaseId = "", lastProgressAt = 1,
+    } },
+}
+local failedStartBody = {
+    getX = function() return 0 end,
+    getY = function() return 0 end,
+    getZ = function() return 0 end,
+}
+T.equal(handler(failedStartRecord, failedStartBody, jobName, 0), true,
+    "scene startup failure remains recoverable on the first attempt")
+T.truthy(failedStartRecord.runtime.facilityActivity,
+    "scene startup failure cleared the activity too early")
+T.equal(handler(failedStartRecord, failedStartBody, jobName, 0), true,
+    "scene startup failure retries on the second attempt")
+T.truthy(failedStartRecord.runtime.facilityActivity,
+    "scene startup retry cleared the activity too early")
+T.equal(handler(failedStartRecord, failedStartBody, jobName, 0), true,
+    "scene startup failure completes its bounded retry window")
+T.equal(failedStartRecord.runtime.facilityActivity, nil,
+    "repeated scene startup failure left a stale facility activity")
+PNC.AnimationScenes.Request = originalSceneRequest
 T.finish("pnc_facility_debug_work_smoke")
 
 T.finish("pnc_facility_debug_work_smoke")

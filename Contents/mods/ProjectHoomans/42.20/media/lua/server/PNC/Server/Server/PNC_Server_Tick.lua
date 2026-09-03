@@ -6,11 +6,18 @@ local H = Server.Internal
 local Core = PNC.Core
 
 function Server.OnTick()
-    local now = Core.Now()
-    local due = H.PrepareTick(now)
+    local clockOK, now = H.SafePhase("server_tick.clock", Core.Now)
+    if not clockOK then return end
+
+    local prepareOK, due = H.SafePhase("server_tick.prepare", H.PrepareTick,
+        nil, now)
+    if not prepareOK or type(due) ~= "table" then due = {} end
     local i
     for i = 1, #due do
-        H.ProcessRecord(due[i], now)
+        local record = due[i]
+        H.SafePhase("server_tick.process_record", H.ProcessRecord, {
+            npcId = record and record.id or "unknown",
+        }, record, now)
     end
-    H.FinishTick(now)
+    H.SafePhase("server_tick.finish", H.FinishTick, nil, now)
 end

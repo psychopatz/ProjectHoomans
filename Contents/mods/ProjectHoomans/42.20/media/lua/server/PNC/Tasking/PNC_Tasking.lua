@@ -47,6 +47,18 @@ Tasking.Diagnostics.counters.leaseTransitionFailures =
     Tasking.Diagnostics.counters.leaseTransitionFailures or 0
 Tasking.Diagnostics.counters.candidateTruncations =
     Tasking.Diagnostics.counters.candidateTruncations or 0
+Tasking.Diagnostics.counters.stallRecoveries =
+    Tasking.Diagnostics.counters.stallRecoveries or 0
+Tasking.Diagnostics.counters.stallRecoveryFailures =
+    Tasking.Diagnostics.counters.stallRecoveryFailures or 0
+Tasking.Diagnostics.counters.stallQuarantines =
+    Tasking.Diagnostics.counters.stallQuarantines or 0
+Tasking.Diagnostics.counters.executorRecoveries =
+    Tasking.Diagnostics.counters.executorRecoveries or 0
+Tasking.Diagnostics.counters.executorRecoveryFailures =
+    Tasking.Diagnostics.counters.executorRecoveryFailures or 0
+Tasking.Diagnostics.counters.executorQuarantines =
+    Tasking.Diagnostics.counters.executorQuarantines or 0
 Tasking.MAX_REEVALUATIONS_PER_PUMP = 8
 Tasking.MAX_EXECUTOR_TICKS_PER_PUMP = 16
 Tasking.MAX_CANDIDATES_PER_PROVIDER = 64
@@ -61,6 +73,7 @@ require "PNC/Tasking/Tasking/PNC_Tasking_EventInbox"
 require "PNC/Tasking/Tasking/PNC_Tasking_Assignment"
 require "PNC/Tasking/Tasking/PNC_Tasking_Evaluation"
 require "PNC/Tasking/Tasking/PNC_Tasking_Lifecycle"
+require "PNC/Tasking/Tasking/PNC_Tasking_Recovery"
 require "PNC/Tasking/Tasking/PNC_Tasking_Pump"
 require "PNC/Tasking/Tasking/PNC_Tasking_Queries"
 

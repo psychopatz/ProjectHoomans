@@ -11,6 +11,7 @@ local KIND = "facility_activity"
 local JOB = "FacilityActivity"
 local SEAT_STOP_DISTANCE = 0.10
 local SEAT_ARRIVAL_TOLERANCE = 0.14
+local MAX_SCENE_START_ATTEMPTS = 3
 
 PNC.SeatingRuntime = PNC.SeatingRuntime or {}
 PNC.SeatingRuntime.LiveObjects = PNC.SeatingRuntime.LiveObjects or {}
@@ -66,6 +67,11 @@ end
 
 local function state(record)
     return record and record.runtime and record.runtime.facilityActivity or nil
+end
+
+local function currentTime(runtime)
+    if PNC.Core and PNC.Core.Now then return PNC.Core.Now() end
+    return tonumber(runtime and runtime.lastProgressAt) or 1
 end
 
 local function liveSeatObject(record, runtime)
@@ -742,6 +748,17 @@ function Jobs.Stop(record, reason)
     return finished == true, "facility_activity_stopped"
 end
 
+-- Facility work is the owner of the effect clock. Tasking may observe this
+-- value for recovery, but it must never infer progress from an executor tick
+-- or a reservation renewal alone.
+function Jobs.RecordProgress(record, at, reason)
+    local runtime = state(record)
+    if not runtime then return false end
+    runtime.lastProgressAt = tonumber(at) or PNC.Core.Now()
+    runtime.lastProgressReason = tostring(reason or "facility_progress")
+    return true
+end
+
 function Jobs.OnSceneTick(record, zombie, scene, now)
     local runtime = state(record)
     local definition = runtime and Definitions.Get(runtime.capability) or nil
@@ -786,6 +803,9 @@ function Jobs.OnSceneTick(record, zombie, scene, now)
             runtime.failedReason = effectReason or "NEED_EFFECT_FAILED"
             runtime.completionRequested = true
             return false
+        end
+        if effectReason and Jobs.RecordProgress then
+            Jobs.RecordProgress(record, now, effectReason)
         end
         if runtime.debugHold ~= true and complete then
             runtime.completionRequested = true
@@ -842,6 +862,7 @@ function Jobs.Tick(record, zombie)
     local sceneId
     local started
     local startReason
+    local startupNow
     if order.kind ~= KIND or not runtime or not definition then return false end
     if not refreshCampActivity(record, zombie) then
         local leaseId = runtime.taskLeaseId
@@ -1007,7 +1028,19 @@ function Jobs.Tick(record, zombie)
     end
     scene = record.runtime.animationScene
     if not scene or scene.id ~= sceneId then
+        startupNow = currentTime(runtime)
+        if tostring(runtime.startupSceneId or "") ~= tostring(sceneId)
+            or runtime.startupStartedAt == nil
+        then
+            runtime.startupSceneId = sceneId
+            runtime.startupStartedAt = startupNow
+            runtime.startupAttempts = 0
+        end
+        runtime.startupAttempts = (tonumber(runtime.startupAttempts) or 0) + 1
+        runtime.startupLastAttemptAt = startupNow
         runtime.phase = "STARTING"
+        runtime.lastProgressAt = startupNow
+        runtime.lastProgressReason = "facility_scene_starting"
         runtime.lastEffectWorldHour = PNC.NeedsUtils
             and PNC.NeedsUtils.WorldAgeHours() or nil
         started, startReason = PNC.AnimationScenes.Request(record, zombie, sceneId, {
@@ -1023,6 +1056,24 @@ function Jobs.Tick(record, zombie)
             runtime.interruptReason = tostring(
                 startReason or "scene_request_failed"
             )
+            if runtime.startupAttempts >= MAX_SCENE_START_ATTEMPTS then
+                local leaseId = runtime.taskLeaseId
+                local failure = "FACILITY_SCENE_START_FAILED"
+                runtime.failedReason = failure
+                finish(record, zombie, failure)
+                if leaseId ~= "" and PNC.Tasking
+                    and PNC.Tasking.Commands
+                    and PNC.Tasking.Commands.CancelForNPC
+                then
+                    PNC.Tasking.Commands.CancelForNPC(record.id, failure)
+                end
+                return true
+            end
+        else
+            runtime.startupAttempts = 0
+            runtime.startupStartedAt = nil
+            runtime.lastProgressAt = startupNow
+            runtime.lastProgressReason = "facility_scene_started"
         end
     end
     return true

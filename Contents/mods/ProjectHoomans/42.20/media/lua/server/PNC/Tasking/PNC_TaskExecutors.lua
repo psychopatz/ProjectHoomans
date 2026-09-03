@@ -65,6 +65,9 @@ function Abstract.Tick(lease)
             reason or "ABSTRACT_NEED_EFFECT_FAILED")
         return false
     end
+    if reason and PNC.FacilityJobs and PNC.FacilityJobs.RecordProgress then
+        PNC.FacilityJobs.RecordProgress(record, PNC.Core.Now(), reason)
+    end
     if complete then
         PNC.Tasking.Commands.Complete(lease.leaseId,
             reason or "NEED_COMPLETE")

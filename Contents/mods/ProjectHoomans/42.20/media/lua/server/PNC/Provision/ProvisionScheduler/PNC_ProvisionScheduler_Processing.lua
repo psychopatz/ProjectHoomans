@@ -37,6 +37,21 @@ local function setIncomingProjection(record, ruleID, request)
     end
 end
 
+local function clearProvisionState(runtime, ruleID)
+    if not runtime then return end
+    if runtime.pending then runtime.pending[ruleID] = nil end
+    if runtime.incoming then runtime.incoming[ruleID] = nil end
+    runtime.incomingProjection = runtime.incomingProjection or {}
+    runtime.incomingProjection[ruleID] = nil
+end
+
+local function quarantineRule(runtime, ruleID, reason)
+    if not runtime then return end
+    runtime.quarantined = runtime.quarantined or {}
+    runtime.quarantined[ruleID] = true
+    runtime.lastRequestResult = reason
+end
+
 function H.Process(entry)
     local record = PNC.Registry and PNC.Registry.Get(entry.npcID)
     if not record or record.alive == false then
@@ -69,6 +84,16 @@ function H.Process(entry)
         local order = work and work.Queries and work.Queries.Get
             and work.Queries.Get(pending.workOrderId) or nil
         local status = order and order.status or nil
+        if order and order.recoveryQuarantined == true then
+            clearProvisionState(existingRuntime, entry.ruleID)
+            quarantineRule(existingRuntime, entry.ruleID,
+                "provision_pickup_quarantined")
+            return true, nil, {
+                ruleId = definition.id, ok = false, attempted = true,
+                reason = "provision_pickup_quarantined",
+                workOrderId = order.id,
+            }
+        end
         if order and status ~= "COMPLETED" and status ~= "CANCELLED"
             and status ~= "FAILED"
         then
@@ -77,11 +102,7 @@ function H.Process(entry)
                 reason = "provision_pickup_in_progress",
             }
         end
-        existingRuntime.pending[entry.ruleID] = nil
-        existingRuntime.incoming[entry.ruleID] = nil
-        existingRuntime.incomingProjection = existingRuntime.incomingProjection
-            or {}
-        existingRuntime.incomingProjection[entry.ruleID] = nil
+        clearProvisionState(existingRuntime, entry.ruleID)
     end
     local runtime = record.runtime and record.runtime.provision
     if runtime then runtime.dirtyRules[entry.ruleID] = nil end
@@ -94,9 +115,22 @@ function H.Process(entry)
         }
     end
     if evaluation.satisfied then
+        if runtime then
+            runtime.quarantined = runtime.quarantined or {}
+            runtime.quarantined[entry.ruleID] = nil
+        end
         return true, nil, {
             ruleId = definition.id, ok = true, attempted = false,
             reason = "satisfied", onHand = evaluation.onHand,
+        }
+    end
+    if runtime and runtime.quarantined
+        and runtime.quarantined[entry.ruleID] == true
+    then
+        runtime.lastRequestResult = "provision_pickup_quarantined"
+        return true, nil, {
+            ruleId = definition.id, ok = false, attempted = false,
+            reason = "provision_pickup_quarantined", onHand = evaluation.onHand,
         }
     end
     if evaluation.incoming > 0 then
@@ -126,6 +160,8 @@ function H.Process(entry)
     if reason == "provision_pickup_queued" then
         setIncomingProjection(record, entry.ruleID, request)
         runtime.pending = runtime.pending or {}
+        runtime.quarantined = runtime.quarantined or {}
+        runtime.quarantined[entry.ruleID] = nil
         runtime.pending[entry.ruleID] = {
             workOrderId = details and details.workOrderId or nil,
         }
@@ -138,6 +174,10 @@ function H.Process(entry)
     end
     runtime.incoming[entry.ruleID] = nil
     runtime.incomingProjection[entry.ruleID] = nil
+    if ok then
+        runtime.quarantined = runtime.quarantined or {}
+        runtime.quarantined[entry.ruleID] = nil
+    end
     runtime.lastRequestResult = reason
     if ok then
         Metrics.Increment("provisionRequestsSucceeded")
@@ -206,6 +246,8 @@ function Scheduler.RequestManual(recordOrID)
             PNC.NPCSupplyService.ClearRetry(record, kind)
         end
     end
+    local provision = record.runtime and record.runtime.provision
+    if provision then provision.quarantined = {} end
     local _, results = Scheduler.ReconcileRecord(record)
     local failed = false
     local attempted = false

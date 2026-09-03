@@ -17,6 +17,7 @@ then
 end
 
 require "PNC/Server/Server/PNC_Server_RecordProcessing"
+require "PNC/Server/Server/PNC_Server_SafePhase"
 require "PNC/Server/Server/PNC_Server_SubsystemPumps"
 require "PNC/Server/Server/PNC_Server_Tick"
 require "PNC/Server/Server/PNC_Server_Lifecycle"

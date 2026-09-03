@@ -289,6 +289,7 @@ local function buildAmbientPacket(item, requestID)
         },
         recent_conversation = {},
         available_tools = {},
+        voice_binding = source.voiceBinding or source.voice_binding,
         metadata = {
             source = "project-hoomans",
             mode = "ambient_social",
@@ -1002,7 +1003,9 @@ function Integration.Deliver(arguments)
         local response = cleanResponseText(arguments.response_text)
         response = enforceAmbientNamePolicy(response, pending.packet)
         if response ~= "" then
-            pending.callback(response)
+            pending.callback(response, {
+                ttsManaged = arguments.tts_managed == true,
+            })
             log(
                 "ambient_response_delivered",
                 "npc=" .. tostring(pending.npcID)

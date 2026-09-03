@@ -14,6 +14,7 @@ local workerFor = Internal.WorkerFor
 local clearWorkerAction = Internal.ClearWorkerAction
 local combatBlockReason = Internal.CombatBlockReason
 local tickWorker = Internal.TickWorker
+local Recovery = PNC.Tasking and PNC.Tasking.Internal
 
 function Executor.GetCandidates(npcId)
     local session = sessionForNPC(npcId)
@@ -73,6 +74,45 @@ function Executor.CanContinue(lease)
     return session ~= nil and session.runActive == true
         and session.workers
         and session.workers[tostring(lease.npcId)] ~= nil
+end
+
+function Executor.GetRecoveryState(lease)
+    local session = Service.GetSession(lease and lease.sourceRef)
+    if not session or session.runActive ~= true then return { terminal = true } end
+    local worker = session.workers
+        and session.workers[tostring(lease and lease.npcId or "")] or nil
+    if not worker then
+        return {
+            invalid = true, phase = "WAITING", watchable = true,
+            timeoutMs = 15000, recoveryReason = "scavenge_worker_missing",
+            lastProgressAt = session.updatedAt or lease and lease.lastProgressAt,
+        }
+    end
+    local phase = tostring(worker.phase or "READY")
+    local snapshot = {
+        phase = phase,
+        lastProgressAt = worker.actionStartedAt
+            or worker.lastProgressAt or session.updatedAt
+            or lease and lease.lastProgressAt,
+        watchable = false,
+    }
+    if phase == "TRAVELING_TO_LOOT_SOURCE"
+        or phase == "TRAVELING_TO_SEARCH_SOURCE"
+    then
+        snapshot.phase = "TRAVEL"
+        snapshot.watchable = true
+        if Recovery and Recovery.ApplyMovementRecovery then
+            snapshot = Recovery.ApplyMovementRecovery(snapshot, lease,
+                PNC.Registry and PNC.Registry.Get
+                    and PNC.Registry.Get(lease.npcId) or nil)
+        end
+    elseif worker.actionUntil then
+        snapshot.phase = "WORKING"
+        snapshot.watchable = true
+        snapshot.timeoutMs = 15000
+        snapshot.recoveryReason = "scavenge_action_timeout"
+    end
+    return snapshot
 end
 
 function Executor.Tick(lease)

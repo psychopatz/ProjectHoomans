@@ -15,7 +15,7 @@ function H.ProvisionRuntime(record)
     record.runtime = record.runtime or {}
     record.runtime.provision = record.runtime.provision or {
         incoming = {}, incomingProjection = {}, refilling = {},
-        evaluations = {}, dirtyRules = {},
+        evaluations = {}, dirtyRules = {}, quarantined = {},
     }
     local runtime = record.runtime.provision
     runtime.incoming = runtime.incoming or {}
@@ -23,6 +23,7 @@ function H.ProvisionRuntime(record)
     runtime.refilling = runtime.refilling or {}
     runtime.evaluations = runtime.evaluations or {}
     runtime.dirtyRules = runtime.dirtyRules or {}
+    runtime.quarantined = runtime.quarantined or {}
     return runtime
 end
 

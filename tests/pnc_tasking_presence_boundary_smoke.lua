@@ -61,6 +61,15 @@ for name in pairs(queryFunctions) do
 end
 T.equal(queryCount, 2, "tasking query function count")
 
+local accepted, reason = Tasking.Commands.RegisterProvider("farming", {
+    GetCandidates = function() return {} end,
+    Validate = function() return true end,
+    Assign = function() return {} end,
+})
+T.falsy(accepted, "watchdog provider without recovery must be rejected")
+T.equal(reason, "TASK_PROVIDER_RECOVERY_UNSUPPORTED",
+    "watchdog provider rejection reason")
+
 for i = 1, #providers do
     package.loaded[prefix .. providers[i]] = nil
 end

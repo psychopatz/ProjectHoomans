@@ -5,11 +5,23 @@ PNC = PNC or {}
 local Provider = {}
 local Work = PNC.WorkService
 local Status = PNC.WorkDefinitions.STATUS
+local Recovery = PNC.Tasking and PNC.Tasking.Internal
 
 local function assignable(order)
     return order and not order.workerId
+        and order.recoveryQuarantined ~= true
         and (order.status == Status.QUEUED
             or order.status == Status.WAITING_FOR_WORKER)
+end
+
+local function phaseFor(order)
+    return order.completionStarted == true and "ATOMIC_COMMIT"
+        or order.phase == "DROP_PENDING" and "ATOMIC_COMMIT"
+        or order.phase == "GRAB_PENDING" and "WAITING"
+        or order.status == Status.TRAVEL_TO_STOCKPILE
+            and "TRAVEL"
+        or order.status == Status.TRAVEL_TO_STATION and "TRAVEL"
+        or order.status == Status.WORKING and "WORKING" or "WAITING"
 end
 
 function Provider.GetCandidates(npcId)
@@ -85,13 +97,62 @@ function Provider.Cancel(lease, reason)
         lease.reservationId = nil
         return true
     end
+    local recovery = reason == "task_progress_timeout"
+        or reason == "task_executor_failed"
+    local recoveryState
+    if recovery and Work.Commands.RecordRecovery then
+        local recorded, recordedState = Work.Commands.RecordRecovery(
+            order.id, reason, PNC.Tasking
+                and PNC.Tasking.MAX_STALL_RECOVERY_ATTEMPTS)
+        if recorded ~= true then
+            lease.reservationId = nil
+            return false, recordedState or "WORK_RECOVERY_RECORD_FAILED"
+        end
+        recoveryState = recordedState
+    end
     local ok, result = Work.Commands.ReleaseWorker(lease.npcId,
         reason or "task_lease_released")
     lease.reservationId = nil
+    if recovery and recoveryState == "QUARANTINE" then
+        if ok == true and Work.Commands.Quarantine then
+            local quarantined, quarantineResult = Work.Commands.Quarantine(
+                order.id, "TASK_RECOVERY_EXHAUSTED")
+            if quarantined == true then return true, quarantineResult end
+            result = quarantineResult
+        end
+        if Work.Commands.Cancel then
+            local cancelled, cancelledResult = Work.Commands.Cancel(order.id,
+                "TASK_RECOVERY_EXHAUSTED")
+            if cancelled == true then return true, cancelledResult end
+            result = cancelledResult or result
+        end
+    end
     return ok, result
 end
 
 function Provider.Complete() return true end
+
+function Provider.GetRecoveryState(lease)
+    local order = Work and Work.Queries.Get(lease.sourceRef)
+    if not order then return { terminal = true } end
+    if order.status == Status.CANCELLED
+        or order.status == Status.COMPLETED or order.status == Status.FAILED
+    then
+        return { terminal = true }
+    end
+    local snapshot = {
+        lastProgressAt = order.lastProgressAt,
+        phase = phaseFor(order),
+    }
+    if snapshot.phase == "TRAVEL"
+        and Recovery and Recovery.ApplyMovementRecovery
+    then
+        local record = PNC.Registry and PNC.Registry.Get
+            and PNC.Registry.Get(lease.npcId) or nil
+        snapshot = Recovery.ApplyMovementRecovery(snapshot, lease, record)
+    end
+    return snapshot
+end
 
 function Provider.Tick(lease)
     local order = Work and Work.Queries.Get(lease.sourceRef)
@@ -109,13 +170,7 @@ function Provider.Tick(lease)
         })
         return false
     end
-    local phase = order.completionStarted == true and "ATOMIC_COMMIT"
-        or order.phase == "DROP_PENDING" and "ATOMIC_COMMIT"
-        or order.phase == "GRAB_PENDING" and "WAITING"
-        or order.status == Status.TRAVEL_TO_STOCKPILE
-            and "TRAVEL"
-        or order.status == Status.TRAVEL_TO_STATION and "TRAVEL"
-        or order.status == Status.WORKING and "WORKING" or "WAITING"
+    local phase = phaseFor(order)
     if lease.phase ~= phase then
         PNC.TaskLeaseService.SetPhase(lease.leaseId, phase)
     end

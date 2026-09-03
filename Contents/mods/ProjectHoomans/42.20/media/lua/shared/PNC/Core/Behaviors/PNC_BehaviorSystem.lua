@@ -30,6 +30,7 @@ local Behavior = PNC.BehaviorSystem
 local JobSystem = PNC.JobSystem
 local Animation = PNC.Animation
 local Common = PNC.BehaviorCommon
+local OrderSystem = PNC.OrderSystem
 local Registry = PNC.BehaviorRegistry
 local Incapacitated = PNC.BehaviorIncapacitated
 local Treatment = PNC.BehaviorTreatment
@@ -91,6 +92,17 @@ function Behavior.Tick(record, zombie, now)
         if zombie then
             Animation.Apply(zombie, record, "Idle")
         end
+        return
+    end
+
+    -- Direct follow/guard/patrol/roam/travel orders do not own a Tasking
+    -- lease, so give them the same bounded liveness boundary. The recovery
+    -- probe observes PathService and re-issues the order only after a real
+    -- movement/action timeout; legitimate holds and traversal passages pass
+    -- through untouched.
+    if OrderSystem and OrderSystem.RecoverStalled
+        and OrderSystem.RecoverStalled(record, zombie, now)
+    then
         return
     end
 

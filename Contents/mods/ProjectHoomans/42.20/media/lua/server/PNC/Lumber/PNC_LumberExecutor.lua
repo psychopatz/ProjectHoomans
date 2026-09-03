@@ -8,6 +8,7 @@ PNC.LumberExecutor = PNC.LumberExecutor or {}
 
 local Executor = PNC.LumberExecutor
 local Service = PNC.LumberService
+local Recovery = PNC.Tasking and PNC.Tasking.Internal
 
 local function recordFor(npcId)
     return PNC.Registry and PNC.Registry.Get
@@ -23,21 +24,22 @@ function Executor.GetCandidates(npcId)
     local job = Service and Service.GetJob and Service.GetJob(npcId)
     local zone = job and Service.GetZone(job.zoneId) or nil
     local record = recordFor(npcId)
-    local workOrder = job and job.workOrderId and PNC.WorkService
-        and PNC.WorkService.Queries and PNC.WorkService.Queries.Get
-        and PNC.WorkService.Queries.Get(job.workOrderId) or nil
-    if PNC.LumberWorkAdapter and workOrder
-        and workOrder.status ~= "CANCELLED"
-        and workOrder.status ~= "COMPLETED"
-        and workOrder.status ~= "FAILED"
-    then
-        return {}
-    end
     if not job or not zone or job.active ~= true
         or zone.enabled ~= true
         or record and record.allowedJobs
             and record.allowedJobs.Lumber == false
     then
+        return {}
+    end
+    -- WorkService is the sole durable lumber authority in production. The
+    -- adapter creates/reconciles the LUMBER order; keeping this legacy
+    -- provider registered alongside it would let Tasking race two leases for
+    -- the same tree job. The direct route remains available to isolated
+    -- compatibility loads where WorkService is absent.
+    if PNC.LumberWorkAdapter and PNC.WorkService then
+        if PNC.LumberWorkAdapter.EnsureOrder then
+            PNC.LumberWorkAdapter.EnsureOrder(job)
+        end
         return {}
     end
     return {{
@@ -50,16 +52,9 @@ function Executor.GetCandidates(npcId)
 end
 
 function Executor.Validate(candidate)
+    if PNC.LumberWorkAdapter and PNC.WorkService then return false end
     local record = recordFor(candidate and candidate.npcId)
     local job = Service and Service.GetJob(candidate and candidate.npcId)
-    local workOrder = job and job.workOrderId and PNC.WorkService
-        and PNC.WorkService.Queries and PNC.WorkService.Queries.Get
-        and PNC.WorkService.Queries.Get(job.workOrderId) or nil
-    if PNC.LumberWorkAdapter and workOrder
-        and workOrder.status ~= "CANCELLED"
-        and workOrder.status ~= "COMPLETED"
-        and workOrder.status ~= "FAILED"
-    then return false end
     return Service and Service.ValidateJob
         and Service.ValidateJob(candidate and candidate.npcId,
             candidate and candidate.sourceRef)
@@ -69,6 +64,9 @@ function Executor.Validate(candidate)
 end
 
 function Executor.Assign(candidate)
+    if PNC.LumberWorkAdapter and PNC.WorkService then
+        return nil, "LUMBER_WORK_AUTHORITY"
+    end
     local job = Service and Service.GetJob(candidate and candidate.npcId)
     if not job or tostring(job.id) ~= tostring(candidate and candidate.sourceRef) then
         return nil, "lumber_job_missing"
@@ -88,6 +86,25 @@ function Executor.CanContinue(lease)
     return job ~= nil and job.active == true
         and tostring(job.id) == tostring(lease and lease.sourceRef)
         and tostring(job.leaseId or "") == tostring(lease and lease.leaseId)
+end
+
+function Executor.GetRecoveryState(lease)
+    local job = Service and Service.GetJob
+        and Service.GetJob(lease and lease.npcId) or nil
+    if not job or job.active ~= true then return { terminal = true } end
+    local phase = tostring(job.phase or job.state or "WAITING")
+    local snapshot = {
+        phase = phase,
+        lastProgressAt = job.lastProgressAt or lease and lease.lastProgressAt,
+        watchable = phase == "CHOPPING",
+    }
+    if phase == "TRAVEL"
+        and Recovery and Recovery.ApplyMovementRecovery
+    then
+        snapshot = Recovery.ApplyMovementRecovery(snapshot, lease,
+            recordFor(lease.npcId))
+    end
+    return snapshot
 end
 
 function Executor.Tick(lease)
@@ -131,7 +148,8 @@ function Executor.Complete(lease)
     return true
 end
 
-if PNC.Tasking and PNC.Tasking.Commands
+if not (PNC.LumberWorkAdapter and PNC.WorkService)
+    and PNC.Tasking and PNC.Tasking.Commands
     and PNC.Tasking.Commands.RegisterProvider
 then
     PNC.Tasking.Commands.RegisterProvider("lumber", Executor)

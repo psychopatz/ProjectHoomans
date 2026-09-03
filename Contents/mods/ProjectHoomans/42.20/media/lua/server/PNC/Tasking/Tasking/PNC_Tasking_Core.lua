@@ -53,6 +53,10 @@ function Tasking.Commands.RegisterProvider(domain, provider)
         or type(provider.Validate) ~= "function"
         or type(provider.Assign) ~= "function"
     then return false, "INVALID_TASK_PROVIDER" end
+    if Tasking.WATCHDOG_DOMAINS
+        and Tasking.WATCHDOG_DOMAINS[domain] == true
+        and type(provider.GetRecoveryState) ~= "function"
+    then return false, "TASK_PROVIDER_RECOVERY_UNSUPPORTED" end
     if Tasking.Providers[domain] then
         return false, "TASK_PROVIDER_ALREADY_REGISTERED"
     end

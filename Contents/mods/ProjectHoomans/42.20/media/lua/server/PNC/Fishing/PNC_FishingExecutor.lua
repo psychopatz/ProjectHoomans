@@ -74,6 +74,18 @@ function Executor.CanContinue(lease)
         and tostring(job.leaseId or "") == tostring(lease and lease.leaseId)
 end
 
+function Executor.GetRecoveryState(lease)
+    local job = Service and Service.GetJob
+        and Service.GetJob(lease and lease.npcId) or nil
+    if not job or job.active ~= true then return { terminal = true } end
+    local phase = tostring(job.phase or job.state or "WAITING")
+    return {
+        phase = phase,
+        lastProgressAt = job.lastProgressAt or lease and lease.lastProgressAt,
+        watchable = phase == "WORKING",
+    }
+end
+
 function Executor.Tick(lease)
     local ok, complete, reason = Service.TickJob(lease)
     if not ok then

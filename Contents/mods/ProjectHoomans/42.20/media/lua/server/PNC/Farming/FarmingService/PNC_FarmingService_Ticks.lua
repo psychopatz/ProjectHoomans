@@ -47,6 +47,10 @@ function Service.TickLive(record, body, runtime, now)
         if ok then
             runtime.phase = "WORKING"
             runtime.lastFarmingOperation = reason
+            if PNC.FacilityJobs and PNC.FacilityJobs.RecordProgress then
+                PNC.FacilityJobs.RecordProgress(record, now,
+                    "farming_" .. tostring(reason or "operation"))
+            end
             if reason == "HARVESTED" then
                 runtime.harvestedTiles = runtime.harvestedTiles or {}
                 runtime.harvestedTiles[tostring(tile.x) .. ":"

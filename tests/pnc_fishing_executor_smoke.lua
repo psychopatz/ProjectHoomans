@@ -52,6 +52,15 @@ local assignment = Executor.Assign(candidates[1])
 T.equal(assignment.executionMode, "ABSTRACT", "abstract assignment")
 T.truthy(Executor.Start({ npcId = "npc", leaseId = "lease:1" }),
     "fishing start")
+jobs.npc.phase, jobs.npc.lastProgressAt = "WORKING", 100
+local recovery = Executor.GetRecoveryState({ npcId = "npc",
+    lastProgressAt = 0 })
+T.truthy(recovery.watchable, "fishing exposes active work recovery")
+T.equal(recovery.lastProgressAt, 100,
+    "fishing recovery uses service progress")
+jobs.npc.phase = "WAITING"
+recovery = Executor.GetRecoveryState({ npcId = "npc" })
+T.falsy(recovery.watchable, "fishing waiting state is not treated as a stall")
 T.falsy(Executor.Tick({ npcId = "npc", leaseId = "lease:1" }),
     "terminal fishing tick")
 T.equal(PNC.FishingCancelReason, "fishing_npc_tired", "tick cancellation")

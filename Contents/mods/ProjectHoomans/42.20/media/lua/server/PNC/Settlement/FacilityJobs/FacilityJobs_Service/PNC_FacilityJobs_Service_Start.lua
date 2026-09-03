@@ -101,6 +101,7 @@ function Jobs.Start(record, facilityOrId, capability, options)
     local sceneId = tostring(target.sceneId or definition.sceneId or "")
     local facilityDefinition = PNC.FacilityDefinitions.Get(facility.definitionId)
     local previousOrder = PNC.Core.DeepCopy(record.orderSpec)
+    local activityStartedAt = PNC.Core.Now()
     record.runtime = record.runtime or {}
     record.runtime.facilityActivity = {
         capability = capability,
@@ -113,6 +114,9 @@ function Jobs.Start(record, facilityOrId, capability, options)
         sceneId = sceneId,
         sleepSurface = tostring(target.sleepSurface or ""),
         phase = "QUEUED",
+        startedAt = activityStartedAt,
+        lastProgressAt = activityStartedAt,
+        lastProgressReason = "facility_activity_started",
         target = { x = target.x, y = target.y, z = target.z },
         seatAnchor = target.seatAnchorX and {
             x = tonumber(target.seatAnchorX),
@@ -126,6 +130,10 @@ function Jobs.Start(record, facilityOrId, capability, options)
         manual = options.manual == true,
         manualToggleable = options.manualToggleable == true,
         taskLeaseId = tostring(options.taskLeaseId or ""),
+        startupSceneId = sceneId,
+        startupStartedAt = activityStartedAt,
+        startupAttempts = 0,
+        startupLastAttemptAt = 0,
         abstract = options.abstract == true,
         resourceKind = tostring(resourceKind),
         resourceKey = tostring(resourceKey),

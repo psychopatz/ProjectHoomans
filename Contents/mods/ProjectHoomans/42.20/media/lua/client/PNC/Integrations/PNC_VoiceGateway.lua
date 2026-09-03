@@ -156,6 +156,15 @@ function Adapter.IsBrainAvailable()
     return brainAvailable()
 end
 
+function Adapter.GetNPCBinding(npcID)
+    npcID = trim(npcID)
+    if npcID == "" then return nil end
+    return profileFor({
+        npcUUID = npcID,
+        speakerID = npcID,
+    })
+end
+
 function Adapter.Register()
     if registered then return true end
     if not bridgeConfigured() then return false, "bridge_disabled" end

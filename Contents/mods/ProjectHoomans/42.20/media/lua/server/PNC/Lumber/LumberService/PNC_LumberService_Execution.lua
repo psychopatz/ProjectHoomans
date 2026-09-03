@@ -142,6 +142,7 @@ local function tickLive(job, record, body, tree, at)
         end
         persistLiveToolCondition(record, tool.item)
         job.lastHitAt = at
+        job.lastProgressAt = at
         if type(actual.getHealth) == "function" then
             local healthOK, health = pcall(actual.getHealth, actual)
             if healthOK and tonumber(health) then

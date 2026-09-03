@@ -10,6 +10,7 @@ local Internal = Service.Internal
 local Farming = PNC.Farming
 local Repository = PNC.SettlementRepository
 local baseFor = Internal.BaseFor
+local Recovery = PNC.Tasking and PNC.Tasking.Internal
 
 local Provider = {}
 
@@ -93,6 +94,45 @@ function Provider.CanContinue(lease)
     local live = PNC.Registry.GetLiveZombie
         and PNC.Registry.GetLiveZombie(record.id) or nil
     return (lease.executionMode == "LIVE") == (live ~= nil)
+end
+
+function Provider.GetRecoveryState(lease)
+    local record = recordFor(lease and lease.npcId)
+    local activity = record and record.runtime
+        and record.runtime.facilityActivity or nil
+    local progressAt = activity and activity.lastProgressAt
+        or lease and lease.lastProgressAt
+    if not record or record.alive == false then
+        return { terminal = true, phase = "WAITING",
+            lastProgressAt = progressAt }
+    end
+    if not activity or tostring(activity.taskLeaseId or "")
+        ~= tostring(lease and lease.leaseId or "")
+    then
+        return {
+            invalid = true, phase = "WAITING", watchable = true,
+            timeoutMs = 15000, recoveryReason = "farming_activity_missing",
+            lastProgressAt = progressAt,
+        }
+    end
+    local phase = tostring(activity.phase or lease and lease.phase or "WAITING")
+    if phase == "TRAVELLING" then phase = "TRAVEL" end
+    local snapshot = {
+        phase = phase,
+        lastProgressAt = progressAt,
+        watchable = phase == "WORKING" or phase == "FARMING",
+    }
+    if phase == "QUEUED" or phase == "STARTING"
+        or phase == "INTERRUPTED"
+    then
+        snapshot.watchable = true
+        snapshot.timeoutMs = 15000
+        snapshot.recoveryReason = "farming_scene_start_timeout"
+    end
+    if phase == "TRAVEL"
+        and Recovery and Recovery.ApplyMovementRecovery
+    then snapshot = Recovery.ApplyMovementRecovery(snapshot, lease, record) end
+    return snapshot
 end
 
 function Provider.Tick(lease)

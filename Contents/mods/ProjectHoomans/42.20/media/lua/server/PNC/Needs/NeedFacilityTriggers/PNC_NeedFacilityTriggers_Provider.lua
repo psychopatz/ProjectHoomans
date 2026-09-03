@@ -8,6 +8,7 @@ local HomeRoute = PNC.NeedFacilityHomeRoute
 local Events = require "PsychopatzCore/Events/PC_EventBus"
 local EventTypes = require "PNC/Core/Events/PNC_EventDefinitions"
 local TaskEvents = PNC.Tasking and PNC.Tasking.Events
+local Recovery = PNC.Tasking and PNC.Tasking.Internal
 
 local function recordFor(id)
     return PNC.Registry and PNC.Registry.Get and PNC.Registry.Get(id) or nil
@@ -26,6 +27,26 @@ local function hasRoute(record, definition)
     return not AwayRoutes.IsAwayCompanion(record)
         and HomeRoute.IsAvailable(record, definition)
         or resolveAwayRoute(record, definition) ~= nil
+end
+
+local function definitionFor(lease)
+    local route = AwayRoutes.Get(lease and lease.sourceRef)
+    return Definitions.Get(route and route.needId or lease and lease.sourceRef)
+end
+
+local function taskPhaseFor(activity, lease)
+    -- Abstract execution does not run the scene state machine, so its lease
+    -- phase is the authoritative phase after the provider starts it.
+    if lease and tostring(lease.executionMode or "") == "ABSTRACT" then
+        return lease.phase == "WORKING" and "WORKING" or "WAITING"
+    end
+    local phase = tostring(activity and activity.phase or "")
+    if phase == "TRAVELLING" then return "TRAVEL" end
+    if phase == "QUEUED" or phase == "STARTING"
+        or phase == "REPATHING" or phase == "RESEATING"
+        or phase == "INTERRUPTED"
+    then return "WAITING" end
+    return "WORKING"
 end
 
 local function manuallyDisabled(record, definition)
@@ -166,7 +187,7 @@ end
 function Triggers.CanContinue(lease)
     local record = recordFor(lease.npcId)
     local route = AwayRoutes.Get(lease.sourceRef)
-    local definition = Definitions.Get(route and route.needId or lease.sourceRef)
+    local definition = definitionFor(lease)
     if not record or record.alive == false or not definition then return false end
     if record.health and record.health.state == "incapacitated"
         or AwayRoutes.IsCombatActive(record)
@@ -180,10 +201,100 @@ function Triggers.CanContinue(lease)
         and Definitions.Evaluate(definition, record, true) == true
 end
 
+function Triggers.GetRecoveryState(lease)
+    local record = recordFor(lease and lease.npcId)
+    local activity = record and record.runtime
+        and record.runtime.facilityActivity or nil
+    local progressAt = activity and activity.lastProgressAt
+        or lease and lease.lastProgressAt
+    if not record or record.alive == false or not activity
+        or tostring(activity.taskLeaseId or "")
+            ~= tostring(lease and lease.leaseId or "")
+    then
+        return {
+            invalid = true,
+            phase = lease and lease.phase or "WAITING",
+            lastProgressAt = progressAt,
+        }
+    end
+    local definition = definitionFor(lease)
+    -- Activities without a logical effect (for example a plain living-room
+    -- pose) have no truthful progress signal yet. Keep them out of the
+    -- effect watchdog until their owner exposes one.
+    local activityDefinition = PNC.FacilityJobDefinitions
+        and PNC.FacilityJobDefinitions.Get
+        and PNC.FacilityJobDefinitions.Get(
+            activity.capability or lease and lease.capability)
+    if not definition or not activityDefinition
+        or not activityDefinition.needEffect
+    then
+        return { phase = "WAITING", lastProgressAt = progressAt }
+    end
+    local phase = taskPhaseFor(activity, lease)
+    local snapshot = {
+        phase = phase,
+        lastProgressAt = progressAt,
+        watchable = false,
+    }
+    if phase == "TRAVEL" then
+        if Recovery and Recovery.ApplyMovementRecovery then
+            snapshot = Recovery.ApplyMovementRecovery(snapshot, lease, record)
+        else
+            -- Keep isolated provider tests and partial-load diagnostics
+            -- compatible with the same PathService observation contract.
+            local pathService = PNC.PathService
+            local zombie = PNC.Registry and PNC.Registry.GetLiveZombie
+                and PNC.Registry.GetLiveZombie(record.id) or nil
+            local movement = pathService
+                and pathService.GetMovementRecoveryState
+                and pathService.GetMovementRecoveryState(record, zombie)
+                or nil
+            if movement then
+                if tonumber(movement.lastProgressAt)
+                    and tonumber(movement.lastProgressAt) > 0
+                then
+                    snapshot.lastProgressAt = movement.lastProgressAt
+                end
+                snapshot.movement = movement
+                if movement.active == true then
+                    snapshot.watchable = movement.watchable == true
+                    snapshot.forceRecovery = movement.forceRecovery == true
+                    snapshot.recoveryReason = movement.forceRecovery == true
+                        and "path_traversal_timeout" or nil
+                else
+                    snapshot.watchable = true
+                    snapshot.timeoutMs = 15000
+                    snapshot.recoveryReason = "path_lane_inactive"
+                end
+            else
+                snapshot.watchable = true
+                snapshot.timeoutMs = 15000
+                snapshot.recoveryReason = "path_lane_missing"
+            end
+        end
+    elseif phase == "WORKING" then
+        snapshot.watchable = true
+    elseif activity.phase == "QUEUED"
+        or activity.phase == "STARTING"
+        or activity.phase == "INTERRUPTED"
+    then
+        -- Scene startup and a failed startup retry are preparation, not
+        -- effect progress. They still need a short bounded cleanup window so
+        -- a stale blocking scene cannot retain the reservation forever.
+        snapshot.watchable = true
+        snapshot.timeoutMs = 15000
+        snapshot.recoveryReason = "facility_scene_start_timeout"
+    end
+    return snapshot
+end
+
 local function stop(lease, reason)
     local record = recordFor(lease.npcId)
-    if record and record.runtime and record.runtime.facilityActivity then
-        PNC.FacilityJobs.Stop(record, reason)
+    if record and record.runtime and record.runtime.facilityActivity
+        and PNC.FacilityJobs and PNC.FacilityJobs.Stop
+    then
+        local stopped, stopReason = PNC.FacilityJobs.Stop(record, reason)
+        return stopped == true, stopReason
     end
     return true
 end

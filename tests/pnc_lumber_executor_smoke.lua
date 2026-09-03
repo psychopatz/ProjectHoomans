@@ -76,6 +76,15 @@ T.truthy(Executor.Start({ npcId = "worker", leaseId = "lease:1",
     sourceRef = "job:worker", executionMode = assignment.executionMode }),
     "provider start")
 T.truthy(started, "service start called")
+jobs.worker.phase, jobs.worker.lastProgressAt = "CHOPPING", 100
+local recovery = Executor.GetRecoveryState({ npcId = "worker",
+    lastProgressAt = 0 })
+T.truthy(recovery.watchable, "lumber exposes active chop recovery")
+T.equal(recovery.lastProgressAt, 100,
+    "lumber recovery uses service progress")
+jobs.worker.phase = "WAITING_FOR_TOOL"
+recovery = Executor.GetRecoveryState({ npcId = "worker" })
+T.falsy(recovery.watchable, "lumber tool wait is not treated as a stall")
 T.truthy(Executor.CanContinue({
     npcId = "worker", leaseId = "lease:1", sourceRef = "job:worker",
 }), "provider can continue")
@@ -88,5 +97,15 @@ T.truthy(cancelled, "service cancel called")
 live = false
 assignment = Executor.Assign(candidates[1])
 T.equal(assignment.executionMode, "ABSTRACT", "abstract execution mode")
+
+-- In the complete server composition the WorkService adapter is present. The
+-- compatibility executor must then stay unregistered so one lumber job cannot
+-- be claimed by both durable routes.
+PNC.LumberWorkAdapter = { EnsureOrder = function() return true end }
+PNC.WorkService = {}
+PNC.LumberExecutorRegisteredDomain = nil
+T.load("ProjectHoomans", "server", "PNC/Lumber/PNC_LumberExecutor.lua")
+T.equal(PNC.LumberExecutorRegisteredDomain, nil,
+    "direct lumber provider is fenced when WorkService is available")
 
 T.finish("pnc_lumber_executor_smoke")

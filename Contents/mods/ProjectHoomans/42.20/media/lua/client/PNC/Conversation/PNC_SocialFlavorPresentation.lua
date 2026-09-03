@@ -145,6 +145,16 @@ function Presentation.Receive(ambientFlavor, summary, networkArgs)
     context.socialRole = context.socialRole or role
     context.relationshipState = context.relationshipState or relationshipState
     context.relationshipTier = context.relationshipTier or relationshipTier
+    local voiceGateway = PNC.VoiceGateway
+    if not context.voiceBinding
+        and voiceGateway
+        and type(voiceGateway.GetNPCBinding) == "function"
+    then
+        local ok, binding = pcall(voiceGateway.GetNPCBinding, npcID)
+        if ok and type(binding) == "table" then
+            context.voiceBinding = binding
+        end
+    end
     -- Full names remain available for identity-bearing UI, while ordinary
     -- dialogue aliases address people by their first name.
     context.name = speaker.addressName
@@ -183,6 +193,7 @@ function Presentation.Receive(ambientFlavor, summary, networkArgs)
         -- Nameplates and history retain the NPC's full display identity.
         speakerName = speaker.fullName,
         playerUUID = playerUUID(),
+        voiceBinding = context.voiceBinding,
         npcType = role,
         socialRole = role,
         relationshipState = relationshipState,

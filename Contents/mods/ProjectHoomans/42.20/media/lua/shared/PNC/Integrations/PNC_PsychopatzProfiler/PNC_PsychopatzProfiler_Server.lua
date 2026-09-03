@@ -1,8 +1,12 @@
-local Integration = PNC.ProfilerIntegration
-local Internal = Integration.Internal
+local Integration = PNC and PNC.ProfilerIntegration or nil
+local Internal = Integration and Integration.Internal or nil
 
 function Integration.InstallServer()
-    if not Internal.Profiler.IsSectionEnabled("performance") then
+    local Profiler = Internal and Internal.Profiler or nil
+    if not Profiler
+        or type(Profiler.IsSectionEnabled) ~= "function"
+        or not Profiler.IsSectionEnabled("performance")
+    then
         return false
     end
     if Integration.serverInstalled then return false end
@@ -89,8 +93,12 @@ function Integration.InstallServer()
 end
 
 function Integration.WrapServerTick(callback)
+    local Profiler = Internal and Internal.Profiler or nil
     if type(callback) ~= "function" then return callback end
-    if not Internal.Profiler.IsSectionEnabled("performance") then
+    if not Profiler
+        or type(Profiler.IsSectionEnabled) ~= "function"
+        or not Profiler.IsSectionEnabled("performance")
+    then
         return callback
     end
     local wrapped = Internal.Profiler.Wrap(

@@ -39,5 +39,6 @@ end
 
 local Queries = PathService.Queries
 Queries.IsTraversalActive = PathService.IsTraversalActive
+Queries.GetMovementRecoveryState = PathService.GetMovementRecoveryState
 
 return PathService

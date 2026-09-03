@@ -76,6 +76,43 @@ function Service.Commands.ReleaseWorker(workerId, reason)
     return true, copy(order)
 end
 
+-- Recovery attempts are durable at the work-order level. A Tasking lease can
+-- be replaced while the same order remains queued, so lease-local retry state
+-- alone cannot prevent an order from cycling through every worker forever.
+function Service.Commands.RecordRecovery(orderId, reason, maxAttempts)
+    local order = Repository.Get(orderId)
+    if not order or terminal(order) then
+        return false, "WORK_ORDER_UNAVAILABLE"
+    end
+    local attempts = (tonumber(order.recoveryAttempts) or 0) + 1
+    local limit = math.max(1, math.floor(tonumber(maxAttempts) or 2))
+    order.recoveryAttempts = attempts
+    order.lastRecoveryAt = now()
+    order.lastRecoveryReason = tostring(reason or "task_recovery")
+    order.recoveryQuarantined = attempts >= limit or nil
+    order.updatedAt, order.revision = now(), order.revision + 1
+    Repository.MarkDirty()
+    return true, attempts >= limit and "QUARANTINE" or "REQUEUE"
+end
+
+function Service.Commands.Quarantine(orderId, reason)
+    local order = Repository.Get(orderId)
+    if not order then return false, "WORK_ORDER_UNAVAILABLE" end
+    if terminal(order) then return true, copy(order) end
+    if order.workerId or order.stationId or order.facilityReservationId then
+        local released, releaseReason = releaseClaim(order,
+            reason or "TASK_RECOVERY_EXHAUSTED", false, true)
+        if released == false then return false, releaseReason end
+    end
+    order.status = Status.BLOCKED
+    order.blockedReason = tostring(reason or "TASK_RECOVERY_EXHAUSTED")
+    order.recoveryQuarantined = true
+    order.updatedAt, order.revision = now(), order.revision + 1
+    Repository.MarkDirty()
+    markAssignmentDirty(order, "WORK_REQUEST_QUARANTINED")
+    return true, copy(order)
+end
+
 -- Release the durable work claim and its Tasking lease as one operation.
 -- Tasking's work provider calls ReleaseWorker during lease cleanup, so this
 -- wrapper is only used by external scheduler/recovery paths.
@@ -130,6 +167,10 @@ function Service.Commands.Resume(orderId)
     end
     order.status = Status.WAITING_FOR_WORKER
     order.blockedReason = nil
+    order.recoveryAttempts = nil
+    order.lastRecoveryAt = nil
+    order.lastRecoveryReason = nil
+    order.recoveryQuarantined = nil
     order.updatedAt, order.revision = now(), order.revision + 1
     Repository.MarkDirty()
     markAssignmentDirty(order, "WORK_REQUEST_RESUMED")

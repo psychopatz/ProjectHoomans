@@ -117,7 +117,19 @@ function Tasking.Commands.Pump(at, budget)
         local provider = lease and Tasking.Providers[lease.sourceDomain]
         local executor = provider and type(provider.Tick) == "function"
             and provider or lease and Tasking.Executors[lease.executionMode]
-        if lease and lease.cancellationRequested == true
+        local recoveryState
+        if lease and lease.cancellationRequested ~= true then
+            _, recoveryState = H.RecoverStalledLease(lease, at)
+            recoveryState = recoveryState or H.GetRecoveryState(lease, at)
+        end
+        if recoveryState == "RECOVERED"
+            or recoveryState == "RECOVERY_BACKOFF"
+            or recoveryState == "RECOVERY_PENDING"
+            or recoveryState == "QUARANTINED"
+        then
+            -- A recovery attempt owns this executor slot. Do not let the
+            -- stale executor run again while cleanup is pending/backing off.
+        elseif lease and lease.cancellationRequested == true
             and not (PNC.TaskRequestDefinitions
                 and PNC.TaskRequestDefinitions.NON_INTERRUPTIBLE_PHASE[lease.phase])
         then
@@ -130,11 +142,15 @@ function Tasking.Commands.Pump(at, budget)
             if not ok or result == false then
                 Tasking.Diagnostics.counters.executorFailures =
                     Tasking.Diagnostics.counters.executorFailures + 1
+                local recovered, recoveryResult = H.RecoverExecutorFailure(
+                    lease, at, "task_executor_failed")
                 Events.Emit("TASK_EXECUTOR_FAILED", {
                     npcId = lease.npcId, source = "Tasking.Pump",
                     entityId = lease.leaseId,
                     payload = { reason = reason or "EXECUTOR_REJECTED",
-                        sourceDomain = lease.sourceDomain },
+                        sourceDomain = lease.sourceDomain,
+                        recovery = recoveryResult,
+                        recovered = recovered == true },
                 })
             else
                 Tasking.Diagnostics.counters.executorTicks =

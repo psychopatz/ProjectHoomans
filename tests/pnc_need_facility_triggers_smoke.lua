@@ -297,6 +297,59 @@ T.equal(supplyCalls, beforeCombatWater + 1,
     "combat remains active while hydration falls back to inventory")
 record.runtime.target = nil
 
+PNC.FacilityJobDefinitions = {
+    Get = function(capability)
+        if capability == "food.dine" then
+            return { needEffect = "primitive" }
+        end
+        return nil
+    end,
+}
+PNC.PathService = {
+    GetMovementRecoveryState = function()
+        return {
+            active = true, watchable = true,
+            lastProgressAt = 1200, provider = "engine_path",
+        }
+    end,
+}
+record.runtime.facilityActivity = {
+    taskLeaseId = "lease:travel",
+    capability = "food.dine",
+    phase = "TRAVELLING",
+    lastProgressAt = 1000,
+}
+local recovery = Triggers.GetRecoveryState({
+    npcId = record.id, sourceRef = "hunger", leaseId = "lease:travel",
+    capability = "food.dine", phase = "TRAVEL",
+})
+T.equal(recovery.phase, "TRAVEL",
+    "NeedFacility did not preserve the PathService travel phase")
+T.truthy(recovery.watchable,
+    "NeedFacility did not consume the PathService movement watchdog")
+T.equal(recovery.lastProgressAt, 1200,
+    "NeedFacility did not use PathService movement progress")
+
+PNC.PathService.GetMovementRecoveryState = function()
+    return { active = false, watchable = false, lastProgressAt = 1200 }
+end
+recovery = Triggers.GetRecoveryState({
+    npcId = record.id, sourceRef = "hunger", leaseId = "lease:travel",
+    capability = "food.dine", phase = "TRAVEL",
+})
+T.truthy(recovery.watchable and recovery.timeoutMs == 15000,
+    "an inactive PathService lane did not get a bounded recovery window")
+
+record.runtime.facilityActivity.phase = "STARTING"
+record.runtime.facilityActivity.lastProgressAt = 2000
+recovery = Triggers.GetRecoveryState({
+    npcId = record.id, sourceRef = "hunger", leaseId = "lease:travel",
+    capability = "food.dine", phase = "WAITING",
+})
+T.truthy(recovery.watchable and recovery.timeoutMs == 15000,
+    "NeedFacility scene startup did not have a bounded watchdog")
+record.runtime.facilityActivity = nil
+
 atHome = true
 record.needs.fatigue = 0.90
 record.runtime.manualActivityDisabled = "sleep"

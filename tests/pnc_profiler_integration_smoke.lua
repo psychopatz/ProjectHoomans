@@ -53,6 +53,19 @@ PNC = { SpatialIndex = { Rebuild = offOriginal } }
 require "PNC/Integrations/PNC_PsychopatzProfiler"
 T.equal(PNC.SpatialIndex.Rebuild, offOriginal, "OFF integration changed the hot path")
 T.equal(Profiler.GetState(), nil, "OFF integration created profiler state")
+
+-- A live bridge can still load the Hoomans integration while PsychopatzCore is
+-- OFF. The server installer must treat the missing profiler object as a
+-- disabled feature instead of crashing during composition.
+PNC = { ProfilerIntegration = { Internal = {} } }
+package.loaded["PNC/Integrations/PNC_PsychopatzProfiler/PNC_PsychopatzProfiler_Server"] = nil
+local disabledServerIntegration = require
+    "PNC/Integrations/PNC_PsychopatzProfiler/PNC_PsychopatzProfiler_Server"
+T.falsy(disabledServerIntegration.InstallServer(),
+    "missing profiler state was not treated as disabled")
+T.equal(disabledServerIntegration.WrapServerTick(offOriginal), offOriginal,
+    "missing profiler state changed the server tick")
+
 T.finish("pnc_profiler_integration_smoke")
 
 T.finish("pnc_profiler_integration_smoke")

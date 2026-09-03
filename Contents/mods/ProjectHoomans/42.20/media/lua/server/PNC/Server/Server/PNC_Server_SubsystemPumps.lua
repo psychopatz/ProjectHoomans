@@ -15,119 +15,118 @@ local ZombieAggro = PNC.ZombieAggro
 H.LastLivePositionSafetyRefreshAt =
     tonumber(H.LastLivePositionSafetyRefreshAt) or 0
 
+local function safeOptional(stage, owner, method, context, ...)
+    local callback = owner and owner[method]
+    if type(callback) ~= "function" then return true, nil end
+    return H.SafePhase(stage, callback, context, ...)
+end
+
 function H.PrepareTick(now)
-    if ScalingDiagnostics then
-        ScalingDiagnostics.BeginFrame()
-    end
-    if Presence.BeginServerTick then
-        Presence.BeginServerTick(now)
-    end
-    Registry.EnsureLoaded()
+    safeOptional("server_prepare.scaling_begin", ScalingDiagnostics,
+        "BeginFrame")
+    safeOptional("server_prepare.presence_begin", Presence,
+        "BeginServerTick", nil, now)
+    safeOptional("server_prepare.registry_load", Registry, "EnsureLoaded")
+
+    local shouldPumpLifecycle = true
     if PlayerCharacterLifecycle
-        and PlayerCharacterLifecycle.Pump
-        and (
-            not PlayerCharacterLifecycle.IsDue
-            or PlayerCharacterLifecycle.IsDue(now, false)
-        )
+        and type(PlayerCharacterLifecycle.IsDue) == "function"
     then
-        PlayerCharacterLifecycle.Pump(now, false)
+        local ok, isDue = H.SafePhase("server_prepare.lifecycle_due",
+            PlayerCharacterLifecycle.IsDue, nil, now, false)
+        shouldPumpLifecycle = ok and isDue ~= false
     end
-    if PNC.FactionBehavior
-        and PNC.FactionBehavior.PumpReconciliation
-    then
-        PNC.FactionBehavior.PumpReconciliation()
+    if shouldPumpLifecycle then
+        safeOptional("server_prepare.lifecycle_pump", PlayerCharacterLifecycle,
+            "Pump", nil, now, false)
     end
+    safeOptional("server_prepare.faction_reconciliation",
+        PNC.FactionBehavior, "PumpReconciliation")
     if PNC.FactionIncidentService
-        and PNC.FactionIncidentService.PumpRuntime
+        and type(PNC.FactionIncidentService.PumpRuntime) == "function"
     then
-        PNC.FactionIncidentService.PumpRuntime(
-            getGameTime and getGameTime()
-                and getGameTime().getWorldAgeHours
-                and getGameTime():getWorldAgeHours() or 0
-        )
+        H.SafePhase("server_prepare.faction_incidents", function()
+            local gameTime = getGameTime and getGameTime() or nil
+            local worldAge = gameTime and gameTime.getWorldAgeHours
+                and gameTime:getWorldAgeHours() or 0
+            PNC.FactionIncidentService.PumpRuntime(worldAge)
+        end)
     end
-    if PNC.FactionTolls and PNC.FactionTolls.Pump then
-        PNC.FactionTolls.Pump(now)
+    safeOptional("server_prepare.faction_tolls", PNC.FactionTolls, "Pump",
+        nil, now)
+    safeOptional("server_prepare.needs", PNC.NeedsScheduler, "Pump", nil,
+        now)
+    safeOptional("server_prepare.living_room", PNC.LivingRoomService, "Pump",
+        nil, now)
+    safeOptional("server_prepare.provision", PNC.ProvisionScheduler, "Pump",
+        nil, now)
+    safeOptional("server_prepare.lumber", PNC.LumberService, "Pump", nil,
+        now)
+    safeOptional("server_prepare.engine_path", PNC.EnginePathPlanner,
+        "PumpServerFrame")
+    if PNC.Travel and PNC.Travel.Service then
+        safeOptional("server_prepare.abstract_travel",
+            PNC.Travel.Service, "RefreshAbstractPositions", nil, now, false)
     end
-    if PNC.NeedsScheduler and PNC.NeedsScheduler.Pump then
-        PNC.NeedsScheduler.Pump(now)
-    end
-    if PNC.LivingRoomService and PNC.LivingRoomService.Pump then
-        PNC.LivingRoomService.Pump(now)
-    end
-    if PNC.ProvisionScheduler and PNC.ProvisionScheduler.Pump then
-        PNC.ProvisionScheduler.Pump(now)
-    end
-    if PNC.LumberService and PNC.LumberService.Pump then
-        PNC.LumberService.Pump(now)
-    end
-    if PNC.EnginePathPlanner
-        and PNC.EnginePathPlanner.PumpServerFrame
-    then
-        PNC.EnginePathPlanner.PumpServerFrame()
-    end
-    if PNC.Travel and PNC.Travel.Service
-        and PNC.Travel.Service.RefreshAbstractPositions
-    then
-        PNC.Travel.Service.RefreshAbstractPositions(now, false)
-    end
-    if BodyLifecycle and BodyLifecycle.PumpStartupBodyCleanup then
-        BodyLifecycle.PumpStartupBodyCleanup(now, false)
-    end
-    if BodyLifecycle and BodyLifecycle.AuditLoadedBodies then
-        BodyLifecycle.AuditLoadedBodies(now, false)
-    end
-    if PNC.CompanionVehicle and PNC.CompanionVehicle.AuditLoadedReservations then
-        PNC.CompanionVehicle.AuditLoadedReservations(now, false)
-    end
+    safeOptional("server_prepare.body_startup_cleanup", BodyLifecycle,
+        "PumpStartupBodyCleanup", nil, now, false)
+    safeOptional("server_prepare.body_audit", BodyLifecycle,
+        "AuditLoadedBodies", nil, now, false)
+    safeOptional("server_prepare.vehicle_reservations", PNC.CompanionVehicle,
+        "AuditLoadedReservations", nil, now, false)
     if now - H.LastLivePositionSafetyRefreshAt
         >= (tonumber(Const.LIVE_POSITION_SAFETY_REFRESH_MS) or 1000)
     then
-        Registry.RefreshLivePositions(false)
-        H.LastLivePositionSafetyRefreshAt = now
+        local ok = safeOptional("server_prepare.live_positions", Registry,
+            "RefreshLivePositions", nil, false)
+        if ok then H.LastLivePositionSafetyRefreshAt = now end
     end
-    Spatial.Rebuild(now, false)
+    safeOptional("server_prepare.spatial_rebuild", Spatial, "Rebuild", nil,
+        now, false)
     -- Player buckets must be current before the Director evaluates abstract
     -- arrivals or encounter observation safety.
-    if PNC.WorldDirector and PNC.WorldDirector.Pump then
-        PNC.WorldDirector.Pump()
-    elseif PNC.MobileGroupDirector and PNC.MobileGroupDirector.Pump then
-        PNC.MobileGroupDirector.Pump(now)
+    if PNC.WorldDirector and type(PNC.WorldDirector.Pump) == "function" then
+        safeOptional("server_prepare.world_director", PNC.WorldDirector,
+            "Pump")
+    elseif PNC.MobileGroupDirector
+        and type(PNC.MobileGroupDirector.Pump) == "function"
+    then
+        safeOptional("server_prepare.mobile_group_director",
+            PNC.MobileGroupDirector, "Pump", nil, now)
     end
-    if Presence.RefreshMaterializationCandidates then
-        Presence.RefreshMaterializationCandidates(now, false)
-    end
-    if Network.RefreshInterestSets then
-        Network.RefreshInterestSets(now)
-    end
-    return PNC.Scheduler.PopDue(Registry.Data, now)
+    safeOptional("server_prepare.presence_candidates", Presence,
+        "RefreshMaterializationCandidates", nil, now, false)
+    safeOptional("server_prepare.network_interest", Network,
+        "RefreshInterestSets", nil, now)
+
+    local ok, due = H.SafePhase("server_prepare.scheduler_pop_due",
+        PNC.Scheduler and PNC.Scheduler.PopDue, nil, Registry.Data, now)
+    if not ok or type(due) ~= "table" then return {} end
+    return due
 end
 
 function H.FinishTick(now)
-    if Network.FlushRosterDeltas then
-        Network.FlushRosterDeltas(now, false)
-    end
-    if ZombieAggro and ZombieAggro.Pump then
-        ZombieAggro.Pump(now)
-    end
+    safeOptional("server_finish.network_flush", Network, "FlushRosterDeltas",
+        nil, now, false)
+    safeOptional("server_finish.zombie_aggro", ZombieAggro, "Pump", nil, now)
     if PNC.SocialEncounterTracker
         and PNC.SocialEncounterTracker.Pump
         and PNC.SocialEventHooks
     then
-        if PNC.SocialEventHooks.PruneThreatAttributions then
-            PNC.SocialEventHooks.PruneThreatAttributions(
-                PNC.SocialEventHooks.WorldAgeHours()
-            )
-        end
-        PNC.SocialEncounterTracker.Pump(
-            PNC.SocialEventHooks.WorldAgeHours()
-        )
+        H.SafePhase("server_finish.social_encounters", function()
+            local worldAge = PNC.SocialEventHooks.WorldAgeHours()
+            if PNC.SocialEventHooks.PruneThreatAttributions then
+                PNC.SocialEventHooks.PruneThreatAttributions(worldAge)
+            end
+            PNC.SocialEncounterTracker.Pump(worldAge)
+        end)
     end
     if PNC.SocialGreeting and PNC.SocialGreeting.Pump then
-        PNC.SocialGreeting.Pump(
-            PNC.SocialEventHooks and PNC.SocialEventHooks.WorldAgeHours
-                and PNC.SocialEventHooks.WorldAgeHours()
-                or nil
-        )
+        H.SafePhase("server_finish.social_greeting", function()
+            local worldAge = PNC.SocialEventHooks
+                and PNC.SocialEventHooks.WorldAgeHours
+                and PNC.SocialEventHooks.WorldAgeHours() or nil
+            PNC.SocialGreeting.Pump(worldAge)
+        end)
     end
 end

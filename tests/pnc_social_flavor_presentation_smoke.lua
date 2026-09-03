@@ -44,6 +44,15 @@ PNC = {
     NPCIdentityPresentation = {
         GetName = function(value) return value.name or value.id end,
     },
+    VoiceGateway = {
+        GetNPCBinding = function(npcID)
+            return {
+                npc_uuid = tostring(npcID),
+                slot = "VoiceFemale:0",
+                pitch = 0,
+            }
+        end,
+    },
 }
 
 local EventBus = require "PsychopatzCore/Events/PC_EventBus"
@@ -108,6 +117,33 @@ T.truthy(string.find(received.text, "Jordan", 1, true),
     "teammate flavor addresses the injured NPC by first name")
 T.falsy(string.find(received.text, "Longsurname", 1, true),
     "teammate flavor does not repeat the injured NPC surname")
+
+local capturedBinding
+Client.SetLLMProvider(function(item, complete)
+    capturedBinding = item.context and item.context.voiceBinding
+    complete("Stay close.", { ttsManaged = true })
+    return true
+end)
+Client.Reset()
+local llmAccepted = Presentation.Receive({
+    eventID = "social:event:voice-binding",
+    flavorID = "social.witnessed_player_kill",
+    family = "voice_binding",
+    npcID = "npc-one",
+    socialRole = "neutral",
+    llmEligible = true,
+}, {
+    npcID = "npc-one",
+    state = "neutral",
+}, {
+    relationshipBefore = { state = "neutral" },
+})
+T.truthy(llmAccepted, "voice-bound flavor is accepted")
+Client.Pump(now)
+T.truthy(capturedBinding, "ambient flavor resolves an NPC voice binding")
+T.equal(capturedBinding.slot, "VoiceFemale:0",
+    "ambient flavor preserves the reusable voice slot")
+Client.SetLLMProvider(nil)
 
 EventBus.clearOwner("presentation-message-test")
 T.finish("pnc_social_flavor_presentation_smoke")
