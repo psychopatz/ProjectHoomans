@@ -19,10 +19,9 @@ passage, and fence-edge queries. It does not move bodies or play animations.
   can handle them explicitly.
 - Full wall and blocked-edge checks prevent free destination squares on the
   other side of a wall from being treated as reachable.
-- `IsoGridSquare:isVehicleIntersecting()` is part of destination occupancy.
-  `PNC_VehicleAvoidance` also caches authoritative loaded-vehicle footprints
-  to cover briefly stale multiplayer square flags. Exact chassis tiles remain
-  occupied, and route planning adds a one-tile clearance ring.
+- `IsoGridSquare:isVehicleIntersecting()` is part of destination occupancy for
+  exact chassis tiles. PNC does not add a vehicle footprint cache or a
+  proximity clearance ring; native movement remains responsible for contact.
 - Doors, windows, and fences return distinct block reasons. A direct passage
   block is offered to the interaction owner before wall-follow steering.
 - `FindPassageToward` probes the dominant goal axis and then the secondary

@@ -19,6 +19,168 @@ local buildVisualKey = Internal.BuildVisualKey
 local buildHandsKey = Internal.BuildHandsKey
 local syncTreatmentSound = Internal.SyncTreatmentSound
 
+local function resolveActivityHands(snapshot)
+    local action = snapshot and snapshot.actionInformation or nil
+    local visual = snapshot and snapshot.visualState or nil
+    local capability = tostring(action and action.capability or "")
+    local actionKind = tostring(action and action.kind or "")
+    local operation = tostring(action and action.operation or "")
+    local treatmentPhase = tostring(action and action.phase or "")
+    local medical = snapshot and snapshot.medicalCareState or nil
+    local medicalPhase = tostring(medical and medical.phase or "")
+    local sceneId = tostring(visual and visual.sceneId or "")
+    local fullType = tostring(action and action.activityItemFullType or "")
+    local medicalType = tostring(medical and medical.bandageType or "")
+    if snapshot and snapshot.attackMode == true
+        or visual and visual.attackActive == true
+    then
+        return nil
+    end
+    if (capability == "food.dine"
+        or capability == "survival.eat.inventory")
+        and sceneId == "survival.eat.inventory"
+    then
+        return {
+            source = "food",
+            activityItemFullType = fullType,
+            hand = "primary",
+            sceneId = sceneId,
+            stepId = visual and visual.sceneStepId or nil,
+            revision = visual and visual.sceneStartedAt or nil,
+        }
+    end
+    if capability == "water.nearby"
+        and sceneId == "facility.water.drink.nearby"
+    then
+        return {
+            source = "nearby_water",
+            activityItemFullType = fullType,
+            hand = "primary",
+            sceneId = sceneId,
+            stepId = visual and visual.sceneStepId or nil,
+            revision = visual and visual.sceneStartedAt or nil,
+        }
+    end
+    if actionKind == "treatment" and treatmentPhase == "bandaging" then
+        local treatment = snapshot and snapshot.treatmentState or nil
+        if fullType == "" then return nil end
+        return {
+            source = "self_treatment",
+            activityItemFullType = fullType,
+            hand = "primary",
+            revision = treatment and treatment.startedAt or nil,
+        }
+    end
+    if medicalPhase == "treating" and medicalType ~= "" then
+        return {
+            source = "medical_care",
+            activityItemFullType = medicalType,
+            hand = "primary",
+            revision = medical and medical.startedAt or nil,
+        }
+    end
+    if operation == "CRAFT"
+        and sceneId == "production.craft"
+        and fullType ~= ""
+    then
+        return {
+            source = "crafting",
+            activityItemFullType = fullType,
+            hand = "primary",
+            sceneId = sceneId,
+            stepId = visual and visual.sceneStepId or nil,
+            revision = visual and visual.sceneStartedAt or nil,
+        }
+    end
+    if operation == "DISASSEMBLE"
+        and sceneId == "production.disassemble"
+        and fullType ~= ""
+    then
+        return {
+            source = "disassembly",
+            activityItemFullType = fullType,
+            hand = "primary",
+            sceneId = sceneId,
+            stepId = visual and visual.sceneStepId or nil,
+            revision = visual and visual.sceneStartedAt or nil,
+        }
+    end
+    if capability == "farm.work"
+        and sceneId == "facility.farm.work"
+        and fullType ~= ""
+    then
+        return {
+            source = "farming",
+            activityItemFullType = fullType,
+            hand = "primary",
+            sceneId = sceneId,
+            stepId = visual and visual.sceneStepId or nil,
+            revision = visual and visual.sceneStartedAt or nil,
+        }
+    end
+    if (tostring(action and action.job or "") == "Fishing"
+        or tostring(action and action.orderKind or "") == "fishing")
+        and sceneId == "fishing.cast"
+        and fullType ~= ""
+    then
+        return {
+            source = "fishing",
+            activityItemFullType = fullType,
+            hand = "primary",
+            sceneId = sceneId,
+            stepId = visual and visual.sceneStepId or nil,
+            revision = visual and visual.sceneStartedAt or nil,
+        }
+    end
+    if (tostring(action and action.job or "") == "Scavenge"
+        or tostring(action and action.orderKind or "") == "scavenge")
+        and (sceneId == "scavenge.loot"
+            or sceneId == "scavenge.loot_high"
+            or sceneId == "scavenge.loot_low")
+        and fullType ~= ""
+    then
+        return {
+            source = "scavenging",
+            activityItemFullType = fullType,
+            hand = "primary",
+            sceneId = sceneId,
+            stepId = visual and visual.sceneStepId or nil,
+            revision = visual and visual.sceneStartedAt or nil,
+        }
+    end
+    if (operation == "CONSTRUCT"
+        or operation == "RECONSTRUCT"
+        or operation == "DECONSTRUCT"
+        or operation == "BUILD_OBJECT")
+        and sceneId == "production.construct"
+        and fullType ~= ""
+    then
+        return {
+            source = "construction",
+            activityItemFullType = fullType,
+            hand = "primary",
+            sceneId = sceneId,
+            stepId = visual and visual.sceneStepId or nil,
+            revision = visual and visual.sceneStartedAt or nil,
+        }
+    end
+    if operation == "LUMBER"
+        and sceneId == "lumber.chop"
+        and fullType ~= ""
+    then
+        return {
+            source = "lumber",
+            activityItemFullType = fullType,
+            hand = "primary",
+            sceneId = sceneId,
+            stepId = visual and visual.sceneStepId or nil,
+            revision = visual and visual.sceneStartedAt or nil,
+        }
+    end
+    if fullType == "" then return nil end
+    return nil
+end
+
 local function applyIdentityVars(zombie, snapshot)
     if not zombie or not zombie.setVariable then
         return
@@ -125,6 +287,9 @@ local function applyBodyPresentation(
     then
         Equipment.EnsureCombatHands(zombie, recordView)
     end
+    if Equipment and Equipment.ApplyActivityHands then
+        Equipment.ApplyActivityHands(zombie, resolveActivityHands(snapshot))
+    end
     if AnimationTrace and AnimationTrace.Sample then
         AnimationTrace.Sample(zombie, "client_post_equipment", now)
     end
@@ -135,3 +300,4 @@ end
 
 Internal.ApplyIdentityVars = applyIdentityVars
 Internal.ApplyBodyPresentation = applyBodyPresentation
+Internal.ResolveActivityHands = resolveActivityHands

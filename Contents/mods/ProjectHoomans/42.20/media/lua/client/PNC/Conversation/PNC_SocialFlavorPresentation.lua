@@ -228,7 +228,16 @@ local function onDelivered(payload)
     if type(payload) ~= "table" then return end
     local item = payload.item or {}
     local message = payload.message
+    local source = item.source or {}
     local npcID = tostring(item.speakerID or "")
+    -- Interaction speech has its own exchange/diary owner.  The ambient
+    -- listener must not reinterpret player lines or command replies as new
+    -- proximity commentary when they share Core's arbitration queue.
+    if item.speakerKind == "player"
+        or source.kind == "emote_interaction"
+    then
+        return
+    end
     if npcID == "" or type(message) ~= "table" then return end
     Diary.Append(npcID, {
         kind = "social_flavor",

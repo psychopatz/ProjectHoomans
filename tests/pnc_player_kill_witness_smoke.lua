@@ -73,6 +73,7 @@ isClient = function() return false end
 isServer = function() return true end
 
 PNC = {
+    Config = { Relationships = { DebugCombatCallbacks = true } },
     Const = { ZOMBIE_TARGET_RADIUS = 12 },
     Core = {
         DistanceSq = function(x1, y1, x2, y2)

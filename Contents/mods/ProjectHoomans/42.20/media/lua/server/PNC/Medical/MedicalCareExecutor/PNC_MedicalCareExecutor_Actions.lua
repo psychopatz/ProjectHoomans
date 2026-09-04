@@ -65,10 +65,11 @@ local function finishRequest(lease, task, record, body, reason)
     return true
 end
 
-local function treatmentOptions(task)
+local function treatmentOptions(task, state)
     return {
         consumeItem = task.policy ~= nil
             and task.policy.requireItem == true or false,
+        bandageType = state and state.bandageType or nil,
         consumeReason = "medical_care",
         syncEvent = "npc_treated",
     }
@@ -112,9 +113,15 @@ end
 
 local function beginTreatment(lease, task, record, body, patient, patientBody, now)
     local partId = Internal.CurrentPart(patient)
+    local plan = Treatment and Treatment.GetNPCBandagePlan
+        and Treatment.GetNPCBandagePlan(record, treatmentOptions(task))
+        or nil
     local lootPosition
     local state
     if not partId then return false, "patient_wound_resolved" end
+    if task.policy and task.policy.requireItem == true and not plan then
+        return false, "missing_bandage"
+    end
     lootPosition = Internal.ResolveLootPosition(patient, partId, patientBody)
     state = record.runtime.medicalCare or {}
     state.phase = "treating"
@@ -123,6 +130,10 @@ local function beginTreatment(lease, task, record, body, patient, patientBody, n
     state.partId = partId
     state.lootPosition = lootPosition
     state.bump = Internal.ResolveLootBump(lootPosition)
+    state.bandageType = plan and plan.requiresItem == true
+        and plan.fullType or nil
+    state.bandageName = plan and plan.requiresItem == true
+        and plan.displayName or nil
     state.startedAt = now
     state.finishAt = now + Treatment.GetNPCBandageDuration(record)
     state.revision = (tonumber(state.revision) or 0) + 1
@@ -165,7 +176,7 @@ local function finishLiveTreatment(lease, task, record, body)
         return false, "medical_treatment_state_missing"
     end
     applied, reason = Treatment.TryNPCMedicalTreatment(
-        record, patient, state.partId, treatmentOptions(task))
+        record, patient, state.partId, treatmentOptions(task, state))
     if body and Animation and Animation.FinishBump then
         Animation.FinishBump(body, true)
     end
@@ -192,6 +203,8 @@ function Executor.Tick(lease)
     local state
     local moved
     local movement
+    local started
+    local startReason
     if not task then return false, "medical_task_missing" end
     if not record or record.alive == false then
         Service.Cancel(task.id, "medical_actor_unavailable")
@@ -236,7 +249,12 @@ function Executor.Tick(lease)
     end
     if Internal.InTreatmentRange(record, body, patient, patientBody) then
         Service.SetPhase(task.id, Status.AT_PATIENT, { actorId = lease.npcId })
-        return beginTreatment(lease, task, record, body, patient, patientBody, now)
+        started, startReason = beginTreatment(
+            lease, task, record, body, patient, patientBody, now)
+        if not started and startReason == "missing_bandage" then
+            return failForSupply(lease, task, record, body)
+        end
+        return started, startReason
     end
     if task.status ~= Status.TRAVELING then
         Service.SetPhase(task.id, Status.TRAVELING, {

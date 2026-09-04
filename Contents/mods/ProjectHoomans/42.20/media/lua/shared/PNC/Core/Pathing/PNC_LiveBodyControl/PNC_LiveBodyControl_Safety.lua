@@ -115,8 +115,6 @@ function LiveBodyControl.SuppressZombieState(
         zombie:setVariable("ClimbWindowStarted", false)
         zombie:setVariable("ClimbWindowOutcome", "")
     end
-    -- TurnAlerted is released by the state transition below. Its Java setter
-    -- takes sound coordinates and re-arms the alert; it is not a reset API.
     LiveBodyControl.SetManagedBodyUseless(zombie, true)
     if needsIdleReset
         and zombie.changeState

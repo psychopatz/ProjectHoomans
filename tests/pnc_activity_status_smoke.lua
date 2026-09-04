@@ -22,6 +22,12 @@ PNC = {
                 activityText = "Drinking",
             }
         end
+        if capability == "farm.work" then
+            return {
+                activityLabelKey = "UI_PNC_Activity_Farming",
+                activityText = "Farming",
+            }
+        end
     end },
     SettlementRepository = { GetFacility = function(id)
         return id == "barracks:1"
@@ -109,6 +115,67 @@ local drinking = Status.Build({
 })
 T.equal(drinking.activityItemLabelKey, "UI_PNC_Action_WaterTarget",
     "drinking activity exposes its water fallback")
+
+local farming = Status.Build({
+    alive = true,
+    runtime = { facilityActivity = {
+        capability = "farm.work", phase = "WORKING",
+        activityItemFullType = "Base.WateringCan",
+    } },
+})
+T.equal(farming.activityItemFullType, "Base.WateringCan",
+    "farming activity exposes the selected material")
+
+local fishing = Status.Build({
+    alive = true,
+    activeJob = "Fishing",
+    activeBehavior = "Fishing:WORKING",
+    orderSpec = { kind = "fishing" },
+    runtime = { fishing = {
+        phase = "WORKING",
+        activityItemFullType = "Base.CraftedFishingRod",
+    } },
+})
+T.equal(fishing.activityItemFullType, "Base.CraftedFishingRod",
+    "fishing activity exposes the equipped rod")
+
+PNC.Const = { ORDER_SCAVENGE = "scavenge" }
+PNC.ScavengeService = { Internal = {
+    SessionForNPC = function(id)
+        return id == "bob" and { workers = {
+            bob = {
+                currentKind = "loot", phase = "LOOTING",
+                currentEntry = { fullType = "Base.CannedBeans" },
+            },
+        } } or nil
+    end,
+} }
+local scavenging = Status.Build({
+    id = "bob",
+    alive = true,
+    activeJob = "Scavenge",
+    activeBehavior = "Scavenge",
+    orderSpec = { kind = "scavenge" },
+    runtime = {},
+})
+T.equal(scavenging.activityItemFullType, "Base.CannedBeans",
+    "scavenging activity exposes the exact queued loot item")
+T.equal(scavenging.phase, "LOOTING",
+    "scavenging activity exposes the worker loot phase")
+
+PNC.ScavengeService.Internal.SessionForNPC = function()
+    return { workers = { bob = {
+        currentKind = "search", phase = "SEARCHING_SOURCE",
+        currentEntry = { fullType = "Base.CannedBeans" },
+    } } }
+end
+local searching = Status.Build({
+    id = "bob", alive = true, activeJob = "Scavenge",
+    activeBehavior = "Scavenge", orderSpec = { kind = "scavenge" },
+    runtime = {},
+})
+T.falsy(searching.activityItemFullType,
+    "searching never guesses an item before loot is selected")
 
 local combat = Status.Build({
     alive = true,

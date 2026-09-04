@@ -77,10 +77,11 @@ end
 
 function Network.BroadcastRemoval(id, reason)
     local payload = { id = id, reason = reason }
+    local removalReason = tostring(reason or "")
     if not Core.IsAuthority() then
         return
     end
-    if tostring(reason or "") == "death"
+    if string.sub(removalReason, 1, 5) == "death"
         and broadcastDeathRemoval(id, reason)
     then
         return

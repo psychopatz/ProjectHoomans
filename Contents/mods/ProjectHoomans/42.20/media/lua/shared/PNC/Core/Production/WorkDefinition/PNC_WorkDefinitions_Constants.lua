@@ -17,6 +17,8 @@ Definitions.STATUS = {
     CLAIMED = "CLAIMED", TRAVEL_TO_STOCKPILE = "TRAVEL_TO_STOCKPILE",
     TRAVEL_TO_STATION = "TRAVEL_TO_STATION",
     WORKING = "WORKING", WAITING_RESOURCE = "WAITING_RESOURCE",
+    WAITING_FOR_WORLD = "WAITING_FOR_WORLD",
+    WORLD_EFFECT_PENDING = "WORLD_EFFECT_PENDING",
     PAUSED = "PAUSED", BLOCKED = "BLOCKED", CANCELLING = "CANCELLING",
     CANCELLED = "CANCELLED", COMPLETED = "COMPLETED",
     FAILED = "FAILED",
@@ -72,10 +74,25 @@ Definitions.MANUAL_PROGRESS = {
     LUMBER = true,
 }
 
-Definitions.REQUIRES_LIVE = {
-    -- Corpse hauling uses a live NPC for physical movement and the Lua
-    -- interaction sequence; it cannot be completed by the abstract path.
-    CORPSE_HAUL = true,
+-- Operations in this table genuinely require a live body. Corpse hauling is
+-- hybrid: visible workers use the physical path, while abstract workers
+-- commit a durable world effect when their simulated progress ends.
+Definitions.REQUIRES_LIVE = {}
+
+Definitions.EXECUTION_POLICY = {
+    CORPSE_HAUL = "HYBRID",
 }
+
+Definitions.WORLD_EFFECT_BY_OPERATION = {
+    CORPSE_HAUL = "CORPSE_TRANSFER",
+}
+
+function Definitions.ExecutionPolicy(operation)
+    operation = tostring(operation or "")
+    local explicit = Definitions.EXECUTION_POLICY[operation]
+    if explicit then return explicit end
+    if Definitions.REQUIRES_LIVE[operation] then return "LIVE_ONLY" end
+    return "ABSTRACT_SAFE"
+end
 
 return Definitions

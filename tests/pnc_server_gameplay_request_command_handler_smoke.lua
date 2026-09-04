@@ -17,6 +17,7 @@ PNC = {
     Const = {
         MODULE = "PNC",
         CMD_COMPANION_COMMAND = "CompanionCommand",
+        CMD_COMPANION_COMMAND_RESULT = "CompanionCommandResult",
         CMD_MAP_COMMAND = "MapCommand",
         CMD_MAP_COMMAND_RESULT = "MapCommandResult",
         CMD_FACTION_TOLL_RESPONSE = "FactionTollResponse",
@@ -24,10 +25,13 @@ PNC = {
     CompanionCommands = {
         Execute = function(receivedPlayer, args)
             companion = { player = receivedPlayer, args = args }
-            return args and args.commandID == "manual_corpse_haul"
-                and 0 or 1,
-                args and args.commandID == "manual_corpse_haul"
-                and "NPC_NOT_AT_HOME" or "commanded"
+            if args and args.commandID == "manual_corpse_haul" then
+                return 0, "NPC_NOT_AT_HOME"
+            end
+            if args and args.commandID == "camp" then
+                return 0, "camp_requires_building"
+            end
+            return 1, "commanded"
         end,
     },
     MapCommandService = {
@@ -72,6 +76,19 @@ T.equal(Router.Handle("CompanionCommand", player, companionArgs), true,
     "companion command handled")
 T.equal(companion.player, player, "companion player")
 T.equal(companion.args, companionArgs, "companion payload identity")
+
+sent = nil
+Router.Handle("CompanionCommand", player, {
+    commandID = "camp", id = "npc:one", requestID = "camp:one",
+})
+T.equal(sent.command, "CompanionCommandResult",
+    "unsafe camp rejection response command")
+T.equal(sent.args.reason, "camp_requires_building",
+    "unsafe camp rejection response reason")
+T.equal(sent.args.requestID, "camp:one",
+    "unsafe camp rejection response request identity")
+T.equal(sent.args.accepted, false,
+    "unsafe camp rejection response accepted state")
 
 Router.Handle("CompanionCommand", player, {
     commandID = "manual_corpse_haul", id = "npc:one",

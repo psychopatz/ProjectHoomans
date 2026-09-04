@@ -99,8 +99,9 @@ local liveVisual = {
 local sourceWorn = makeWornItems()
 local corpseWorn = makeWornItems()
 local transmitCount = 0
-local engineDeathCount = 0
 local directCorpseCount = 0
+local corpseAnnouncementCount = 0
+local bodyRemovalCount = 0
 local corpseModData = {}
 local corpse = {
     getContainer = function() return container end,
@@ -131,22 +132,11 @@ local zombie = {
     getX = function() return 10 end,
     getY = function() return 20 end,
     getZ = function() return 0 end,
+    getPersistentOutfitID = function() return 123 end,
+    getOnlineID = function() return 42 end,
     setReanimate = function() end,
     setReanim = function() end,
     setUseless = function() end,
-    becomeCorpseSilently = function()
-        engineDeathCount = engineDeathCount + 1
-        -- Reproduce an engine conversion that occasionally omits a source-body
-        -- item. Finalization must restore the card on the returned corpse.
-        local i
-        for i = #inventoryValues, 1, -1 do
-            if inventoryValues[i] == identityCard then
-                table.remove(inventoryValues, i)
-            end
-        end
-        identityCard.container = nil
-        return corpse
-    end,
 }
 local record = {
     id = "npc_corpse_clothes",
@@ -208,15 +198,37 @@ PNC = {
         end,
         MarkDirty = function() end,
     },
+    Network = {
+        BroadcastBodyRemoval = function(id, instanceID, onlineID, reason)
+            T.equal(id, record.id, "removed corpse source NPC identity")
+            T.equal(instanceID, "123", "removed corpse source instance identity")
+            T.equal(onlineID, 42, "removed corpse source online identity")
+            T.equal(reason, "test_death", "removed corpse source reason")
+            bodyRemovalCount = bodyRemovalCount + 1
+        end,
+    },
 }
 
 IsoDeadBody = {
     new = function()
         directCorpseCount = directCorpseCount + 1
+        -- Reproduce an engine conversion that occasionally omits a source-body
+        -- item. Finalization must restore the card on the returned corpse.
+        local i
+        for i = #inventoryValues, 1, -1 do
+            if inventoryValues[i] == identityCard then
+                table.remove(inventoryValues, i)
+            end
+        end
+        identityCard.container = nil
         return corpse
     end,
 }
 isServer = function() return true end
+sendCorpse = function(body)
+    T.equal(body, corpse, "announced corpse instance")
+    corpseAnnouncementCount = corpseAnnouncementCount + 1
+end
 getGameTime = function()
     return { getWorldAgeHours = function() return 5 end }
 end
@@ -227,8 +239,9 @@ local created, result = PNC.BodyLifecycle.CreateVanillaCorpse(record, zombie,
     "test_death")
 T.equal(created, true, "corpse creation")
 T.equal(result, corpse, "created corpse instance")
-T.equal(engineDeathCount, 1, "engine-networked death conversion count")
-T.equal(directCorpseCount, 0, "direct corpse fallback bypassed engine death")
+T.equal(directCorpseCount, 1, "native engine corpse conversion count")
+T.equal(corpseAnnouncementCount, 1, "multiplayer corpse announcement count")
+T.equal(bodyRemovalCount, 1, "managed source body removal broadcast count")
 T.equal(#inventoryValues, 2, "corpse inventory count")
 T.equal(identityCard.customName, "ID Card: Corpse Clothes", "physical ID card name")
 T.equal(cardModData.PNC_IDCard, true, "physical ID card marker")
@@ -237,14 +250,22 @@ T.equal(identityCardCreateCount, 2, "lost ID card recreated after corpse convers
 T.equal(sourceWorn:getItem(shirtBodyLocation), shirt, "source worn shirt")
 T.equal(corpseWorn:getItem(shirtBodyLocation), shirt, "corpse worn shirt")
 T.equal(visualCopies, 1, "live clothing visual copy count")
-T.equal(transmitCount, 1, "multiplayer corpse transmission count")
+T.equal(transmitCount, 0, "no duplicate AddItem corpse transmission")
 T.equal(corpseModData.PNC_NPC, nil, "corpse released from NPC ownership")
 T.equal(corpseModData.PNC_UUID, nil, "corpse released from NPC UUID")
 T.equal(corpseModData.PNC_DeathMarkerID, record.id, "corpse death marker id")
 T.equal(record.runtime.lifecycle.corpseState, "inert_loaded", "corpse lifecycle state")
 
--- Delayed becomeCorpseSilently finalization must apply the same guarantee using
--- only the compact death marker after the full live record is retired.
+-- Singleplayer owns the body locally and must not attempt a network packet.
+isServer = function() return false end
+T.truthy(PNC.BodyLifecycle.Internal.announceCorpse(corpse),
+    "singleplayer keeps the local corpse")
+T.equal(corpseAnnouncementCount, 1,
+    "singleplayer emits no corpse network announcement")
+isServer = function() return true end
+
+-- Delayed finalization must apply the same guarantee using only the compact
+-- death marker after the full live record is retired.
 for index = #inventoryValues, 1, -1 do
     if inventoryValues[index] == identityCard then
         table.remove(inventoryValues, index)
@@ -275,7 +296,5 @@ PNC.BodyLifecycle.Internal.pumpPendingCorpses()
 T.equal(#PNC.BodyLifecycle.PendingCorpses, 0, "delayed corpse finalized")
 T.equal(#inventoryValues, 2, "delayed corpse restored identity card")
 T.equal(identityCardCreateCount, 3, "delayed corpse recreated identity card")
-T.equal(transmitCount, 2, "delayed corpse single completed-state transmission")
-T.finish("pnc_corpse_clothing_smoke")
-
+T.equal(corpseAnnouncementCount, 2, "delayed corpse single AddCorpse announcement")
 T.finish("pnc_corpse_clothing_smoke")

@@ -10,6 +10,8 @@ local Stockpile = PNC.StockpileAccessService
 local Work = PNC.WorkService
 local WorkRepository = PNC.WorkRepository
 local Status = PNC.WorkDefinitions and PNC.WorkDefinitions.STATUS or {}
+local WorldEffects = PNC.WorldEffectService
+local Definitions = PNC.WorkDefinitions
 local WorkSequence = PNC.WorkSequence
 local GridRegion = require "PsychopatzCore/World/PC_GridRegion"
 
@@ -57,8 +59,10 @@ local function operationDiagnostic(order, task, record, stage, reason, kind)
         or order.lastDiagnosticKey
     local previousAt = task and tonumber(task.lastDiagnosticAt)
         or tonumber(order.lastDiagnosticLogAt)
-    local interval = tonumber(Service.CORPSE_HAUL_DIAGNOSTIC_INTERVAL_MS)
-        or 2000
+    local interval = kind == "WAIT"
+        and (tonumber(Service.CORPSE_HAUL_WORLD_WAIT_DIAGNOSTIC_INTERVAL_MS)
+            or 30000)
+        or tonumber(Service.CORPSE_HAUL_DIAGNOSTIC_INTERVAL_MS) or 2000
     if previousKey == key and previousAt
         and now - previousAt < interval
     then
@@ -99,7 +103,8 @@ local function operationDiagnostic(order, task, record, stage, reason, kind)
             or tonumber(record and record.y) or "?"
         local z = tonumber(live and live.getZ and live:getZ())
             or tonumber(record and record.z) or "?"
-        Core.Log("WARN", "corpse_haul_diagnostic stage="
+        Core.Log(kind == "WAIT" and "INFO" or "WARN",
+            "corpse_haul_diagnostic stage="
             .. normalizedStage .. " kind=" .. tostring(kind or "FAIL")
             .. " order=" .. tostring(order.id or "unknown")
             .. " npc=" .. tostring(order.workerId or record and record.id
@@ -390,15 +395,24 @@ local function workTargetProvider(order, worker, live)
     local targetX
     local targetY
     local targetZ
-    if not live then
-        operationDiagnostic(order, nil, worker, "TARGET",
-            "LIVE_WORKER_REQUIRED", "FAIL")
-        return { ok = false, reason = "LIVE_WORKER_REQUIRED" }
-    end
     if not assignment then
         operationDiagnostic(order, nil, worker, "TARGET",
             "CORPSE_PAYLOAD_INVALID", "FAIL")
         return { ok = false, reason = "CORPSE_PAYLOAD_INVALID" }
+    end
+    if not live then
+        -- Abstract claiming reserves only the durable identity and target
+        -- coordinates. It must not inspect or navigate the corpse: its source
+        -- chunk may be unloaded, which is a normal state for simulation.
+        phase = tostring(order.phase or "SOURCE_APPROACH")
+        return {
+            ok = true, componentId = "corpse:" .. assignment.haulToken,
+            claimKey = "corpse:" .. assignment.haulToken,
+            targetKind = "corpse_transfer", target = {
+                x = assignment.dropX, y = assignment.dropY,
+                z = assignment.dropZ,
+            }, phase = phase,
+        }
     end
     corpse = Service.GetCorpseAt(assignment.sourceX, assignment.sourceY,
         assignment.sourceZ, assignment.haulToken,
@@ -461,14 +475,19 @@ end
 
 local function waitForWorld(order, task, reason)
     local now = Core.Now()
+    local sameState = order.status == (Status.WAITING_FOR_WORLD
+        or "WAITING_FOR_WORLD")
+        and tostring(order.blockedReason or "") == tostring(reason or "")
     operationDiagnostic(order, task, nil, "WORLD_WAIT", reason, "WAIT")
     if task then
         task.worldWaitReason = reason
     end
-    order.status = Status.WORKING
+    order.status = Status.WAITING_FOR_WORLD or "WAITING_FOR_WORLD"
     order.blockedReason = reason
-    order.updatedAt = now
-    if WorkRepository then WorkRepository.MarkDirty() end
+    if not sameState then
+        order.updatedAt = now
+        if WorkRepository then WorkRepository.MarkDirty() end
+    end
     return true
 end
 
@@ -587,6 +606,213 @@ local function cancelWorkOrder(order)
         order and order.cancellationReason or "corpse_haul_cancelled"
     )
     return true
+end
+
+local function deferredEffectFor(order, assignment)
+    local payload = order and order.payload or {}
+    local sourceX = tonumber(payload.carryX) or assignment.sourceX
+    local sourceY = tonumber(payload.carryY) or assignment.sourceY
+    local sourceZ = tonumber(payload.carryZ) or assignment.sourceZ
+    return {
+        kind = "CORPSE_TRANSFER", state = "PENDING",
+        sourceX = sourceX, sourceY = sourceY, sourceZ = sourceZ,
+        destinationX = assignment.dropX, destinationY = assignment.dropY,
+        destinationZ = assignment.dropZ,
+        haulToken = assignment.haulToken,
+        deathMarkerId = assignment.deathMarkerId,
+        createdAt = Core.Now(), updatedAt = Core.Now(),
+    }
+end
+
+local function deferredWait(order, effect, reason)
+    local now = Core.Now()
+    local status = Status.WORLD_EFFECT_PENDING or "WORLD_EFFECT_PENDING"
+    local sameState = order.status == status
+        and tostring(effect.waitReason or "") == tostring(reason or "")
+    effect.state = "PENDING"
+    effect.waitReason = tostring(reason or "WORLD_UNAVAILABLE")
+    if not sameState then effect.updatedAt = now end
+    order.status = status
+    order.blockedReason = effect.waitReason
+    order.phase = "WORLD_EFFECT_PENDING"
+    order.livePhase = nil
+    if not sameState then
+        order.lastProgressAt, order.updatedAt = now, now
+        order.revision = (tonumber(order.revision) or 0) + 1
+    end
+    if WorldEffects and WorldEffects.MarkPending then
+        WorldEffects.MarkPending("WORK_ORDER", order, effect,
+            effect.waitReason)
+    elseif Internal.indexPendingWorldEffect then
+        Internal.indexPendingWorldEffect(order)
+    end
+    if not sameState and WorkRepository then WorkRepository.MarkDirty() end
+    return true, "WORLD_EFFECT_PENDING"
+end
+
+local function anyCorpseInSquare(square)
+    local found = false
+    if not square or not Lifecycle or not Lifecycle.Internal
+        or not Lifecycle.Internal.forEachCorpse
+    then return false end
+    Lifecycle.Internal.forEachCorpse(square, function()
+        found = true
+    end)
+    return found
+end
+
+local function finishDeferredTransfer(order, effect, corpse)
+    if effect.state ~= "APPLIED" then
+        effect.state = "APPLIED"
+        effect.appliedAt = Core.Now()
+        effect.updatedAt = effect.appliedAt
+        if corpse and corpse.getModData then
+            local data = corpse:getModData()
+            if data then
+                data.PNC_CorpseHaulTaskId = order.id
+                Internal.transmit(corpse)
+            end
+        end
+    end
+    local completed, completionResult = Work.Commands.CompleteDeferred(
+        order.id, "corpse_transfer_applied")
+    if completed ~= true then
+        -- Keep the identity token until the durable order reaches COMPLETED;
+        -- a retry can still find the already-moved corpse after a save or
+        -- transient command failure.
+        effect.state = "PENDING"
+        effect.waitReason = "WORLD_COMPLETION_RETRY"
+        effect.updatedAt = Core.Now()
+        if Internal.indexPendingWorldEffect then
+            Internal.indexPendingWorldEffect(order)
+        end
+        if WorkRepository then WorkRepository.MarkDirty() end
+        return false, completionResult or "WORLD_COMPLETION_RETRY"
+    end
+    -- Runtime cleanup is safe only after the same corpse object has been
+    -- verified at the destination and the durable order is terminal. It also
+    -- removes the temporary token.
+    clearWorkRuntime(order, "corpse_transfer_applied")
+    if Internal.indexPendingWorldEffect then
+        Internal.indexPendingWorldEffect(order)
+    end
+    if WorkRepository then WorkRepository.MarkDirty() end
+    return true, completionResult
+end
+
+local function applyDeferredTransfer(order)
+    local assignment = assignmentForWorkOrder(order)
+    local effect = order and order.worldEffect
+    local sourceSquare
+    local destinationSquare
+    local corpse
+    if not order or not assignment or type(effect) ~= "table" then
+        return false, "WORLD_EFFECT_PAYLOAD_INVALID"
+    end
+    if effect.state == "APPLIED" then
+        return finishDeferredTransfer(order, effect)
+    end
+    sourceSquare = Internal.squareAt(effect.sourceX, effect.sourceY,
+        effect.sourceZ)
+    destinationSquare = Internal.squareAt(effect.destinationX,
+        effect.destinationY, effect.destinationZ)
+    if not sourceSquare then
+        return deferredWait(order, effect, "SOURCE_CHUNK_LOADING")
+    end
+    if not destinationSquare then
+        return deferredWait(order, effect, "DESTINATION_CHUNK_LOADING")
+    end
+    corpse = Service.GetCorpseAt(effect.destinationX, effect.destinationY,
+        effect.destinationZ, effect.haulToken, effect.deathMarkerId)
+    if corpse then
+        return finishDeferredTransfer(order, effect, corpse)
+    end
+    if anyCorpseInSquare(destinationSquare) then
+        return deferredWait(order, effect, "DESTINATION_OCCUPIED")
+    end
+    corpse = Service.GetCorpseAt(effect.sourceX, effect.sourceY,
+        effect.sourceZ, effect.haulToken, effect.deathMarkerId)
+    if not corpse then
+        return deferredWait(order, effect, "SOURCE_CORPSE_MISSING")
+    end
+    if not Lifecycle or not Lifecycle.Internal
+        or not Lifecycle.Internal.moveCorpse
+    then
+        return deferredWait(order, effect, "CORPSE_TRANSFER_UNAVAILABLE")
+    end
+    local moved, moveReason = Lifecycle.Internal.moveCorpse(corpse,
+        destinationSquare, effect.destinationX, effect.destinationY,
+        effect.destinationZ)
+    if not moved then
+        return deferredWait(order, effect,
+            moveReason or "CORPSE_TRANSFER_RETRY")
+    end
+    return finishDeferredTransfer(order, effect, corpse)
+end
+
+local function releaseAbstractWorker(order)
+    if not order or not order.workerId or not Work
+        or not Work.Commands or not Work.Commands.ReleaseWorker
+    then return true end
+    local released, reason = Work.Commands.ReleaseWorker(order.workerId,
+        "world_effect_pending")
+    return released == true, reason or "WORLD_EFFECT_WORKER_RELEASE_FAILED"
+end
+
+local function tickAbstractWorkOrder(order)
+    order = WorkRepository and WorkRepository.Get(order and order.id) or order
+    if not order then return false, "WORK_ORDER_UNAVAILABLE" end
+    if order.status == Status.WORLD_EFFECT_PENDING then
+        return applyDeferredTransfer(order)
+    end
+    local assignment = assignmentForWorkOrder(order)
+    local record = order.workerId and Registry and Registry.Get
+        and Registry.Get(order.workerId) or nil
+    if not assignment then
+        return operationFailure(order, nil, record, "ABSTRACT",
+            "CORPSE_PAYLOAD_INVALID")
+    end
+    if not record or record.alive == false then
+        return operationFailure(order, nil, record, "ABSTRACT",
+            "ABSTRACT_WORKER_UNAVAILABLE")
+    end
+    local current = Core.Now()
+    local previous = tonumber(order.lastAbstractAt)
+        or tonumber(order.lastProgressAt) or current
+    local elapsed = math.max(0, math.min(
+        tonumber(Definitions.BALANCE.maxElapsedSeconds) or 10,
+        (current - previous) / 1000))
+    local rate, rateReason = Definitions.WorkRate(record,
+        order.requiredSkills, 1, 1)
+    order.lastAbstractAt = current
+    if rate <= 0 then
+        return operationFailure(order, nil, record, "ABSTRACT",
+            rateReason or "ABSTRACT_WORK_RATE_UNAVAILABLE")
+    end
+    if elapsed <= 0 then return true end
+    order.status = Status.WORKING
+    order.progress = math.min(order.requiredWork,
+        (tonumber(order.progress) or 0) + rate * elapsed)
+    order.lastProgressAt, order.updatedAt = current, current
+    order.revision = (tonumber(order.revision) or 0) + 1
+    if order.progress < order.requiredWork then
+        if WorkRepository then WorkRepository.MarkDirty() end
+        return true
+    end
+    order.progress = order.requiredWork
+    order.worldEffect = order.worldEffect or deferredEffectFor(order, assignment)
+    order.worldEffect.kind = "CORPSE_TRANSFER"
+    local waited, waitReason = deferredWait(order, order.worldEffect,
+        "WORLD_EFFECT_READY")
+    if waited ~= true then return false, waitReason end
+    local applied, applyReason = applyDeferredTransfer(order)
+    if applied == true and order.status == Status.COMPLETED then return true end
+    local released, releaseReason = releaseAbstractWorker(order)
+    if released ~= true then
+        return operationFailure(order, nil, record, "ABSTRACT",
+            releaseReason)
+    end
+    return true, applyReason
 end
 
 local function tickWorkOrder(order, lease)
@@ -745,10 +971,12 @@ end
 local function bindWorkService()
     if not Work or not Work.RegisterTargetProvider
         or not Work.RegisterExecution
+        or not Work.RegisterAbstractExecution
         or not Work.RegisterCompletion
     then return false end
     Work.RegisterTargetProvider("CORPSE_HAUL", workTargetProvider)
     Work.RegisterExecution("CORPSE_HAUL", tickWorkOrder)
+    Work.RegisterAbstractExecution("CORPSE_HAUL", tickAbstractWorkOrder)
     Work.RegisterCompletion("CORPSE_HAUL", completeWorkOrder)
     Work.CancellationHandlers = Work.CancellationHandlers or {}
     Work.CancellationHandlers.CORPSE_HAUL = cancelWorkOrder
@@ -757,6 +985,23 @@ end
 
 Internal.assignmentForWorkOrder = assignmentForWorkOrder
 Internal.clearWorkRuntime = clearWorkRuntime
+Internal.applyDeferredCorpseTransfer = applyDeferredTransfer
 Internal.bindWorkService = bindWorkService
+
+if WorldEffects and WorldEffects.Register then
+    WorldEffects.Register("CORPSE_TRANSFER", {
+        Apply = function(order)
+            return applyDeferredTransfer(order)
+        end,
+        GetPoints = function(_, effect)
+            return {
+                { role = "source", x = effect.sourceX,
+                    y = effect.sourceY, z = effect.sourceZ },
+                { role = "destination", x = effect.destinationX,
+                    y = effect.destinationY, z = effect.destinationZ },
+            }
+        end,
+    })
+end
 
 return Service

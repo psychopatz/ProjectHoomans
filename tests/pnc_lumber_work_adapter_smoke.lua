@@ -19,6 +19,8 @@ local tickComplete = false
 local addedProgress = 0
 local releasedTree = nil
 local queueCalls = 0
+local worldEffectProviders = {}
+local worldEffectHandlers = {}
 
 local status = {
     CANCELLED = "CANCELLED", COMPLETED = "COMPLETED", FAILED = "FAILED",
@@ -64,7 +66,21 @@ PNC = {
             registrations.execution = { operation, handler }
             return true
         end,
+        RegisterAbstractExecution = function(operation, handler)
+            registrations.abstract = { operation, handler }
+            return true
+        end,
         CompletionHandlers = {}, CancellationHandlers = {},
+    },
+    WorldEffectService = {
+        RegisterProvider = function(id, provider)
+            worldEffectProviders[id] = provider
+            return true
+        end,
+        Register = function(kind, handler)
+            worldEffectHandlers[kind] = handler
+            return true
+        end,
     },
     LumberService = {
         Data = { jobs = { worker = job } },
@@ -78,6 +94,7 @@ PNC = {
         FindApproach = function() return nil end,
         TickJob = function() return true, tickComplete, "zone_exhausted" end,
         ReleaseTree = function(key) releasedTree = key end,
+        ApplyDeferredTreeRemoval = function() return true, "TREE_REMOVED" end,
     },
     Registry = { Get = function(id) return records[tostring(id)] end },
 }
@@ -86,6 +103,12 @@ local Adapter = T.load("ProjectHoomans", "server",
     "PNC/Lumber/PNC_LumberWorkAdapter.lua")
 T.equal(registrations.target[1], "LUMBER", "lumber target registration")
 T.equal(registrations.execution[1], "LUMBER", "lumber execution registration")
+T.equal(registrations.abstract[1], "LUMBER",
+    "abstract lumber execution registration")
+T.truthy(worldEffectProviders.LUMBER,
+    "lumber world-effect provider registration")
+T.truthy(worldEffectHandlers.TREE_REMOVE,
+    "tree removal world-effect registration")
 
 local ensured, queued = Adapter.EnsureOrder(job)
 T.truthy(ensured, "work order created")

@@ -256,31 +256,36 @@ function ISEmoteRadialMenu:emote(emote)
     local targets
     local sent = false
     local player
+    local commandResult
+    local commandReason
+    local commandContext
+    local respondent
+    local interactionOutcome
     local vanillaDefinition
     local socialRecipients
     local socialContext
-    if string.sub(emoteName, 1, string.len(CLOSEST_GROUP_PREFIX))
+    if string.sub(emoteName, 1, #CLOSEST_GROUP_PREFIX)
         == CLOSEST_GROUP_PREFIX
     then
         return Emotes.OpenNestedGroup(self, emoteName)
     end
-    if string.sub(emoteName, 1, string.len(CLOSEST_COMMAND_PREFIX))
+    if string.sub(emoteName, 1, #CLOSEST_COMMAND_PREFIX)
         == CLOSEST_COMMAND_PREFIX
     then
         scope = "closest"
         commandID = string.sub(
             emoteName,
-            string.len(CLOSEST_COMMAND_PREFIX) + 1
+            #CLOSEST_COMMAND_PREFIX + 1
         )
         target = self.PNCClosestCompanion
         targets = target and { target } or {}
-    elseif string.sub(emoteName, 1, string.len(GROUP_COMMAND_PREFIX))
+    elseif string.sub(emoteName, 1, #GROUP_COMMAND_PREFIX)
         == GROUP_COMMAND_PREFIX
     then
         scope = "group"
         commandID = string.sub(
             emoteName,
-            string.len(GROUP_COMMAND_PREFIX) + 1
+            #GROUP_COMMAND_PREFIX + 1
         )
         targets = self.PNCNearbyCompanions or {}
     else
@@ -302,15 +307,29 @@ function ISEmoteRadialMenu:emote(emote)
                     and Core.GenerateID("emote") or tostring(Core.Now()),
                 targets = socialRecipients and socialRecipients.targets or {},
             }
+            socialContext.playerActor = player
+            socialContext.commandID = vanillaDefinition.flavorID
             if socialContext.targets and #socialContext.targets > 0
                 and PNC.CompanionCommandPresentation
-                and PNC.CompanionCommandPresentation.ShowPlayerFlavor
             then
-                PNC.CompanionCommandPresentation.ShowPlayerFlavor(
-                    player,
-                    vanillaDefinition.flavorID,
-                    socialContext
-                )
+                if PNC.CompanionCommandPresentation.EnqueueFlavor then
+                    PNC.CompanionCommandPresentation.EnqueueFlavor(
+                        vanillaDefinition.flavorID,
+                        "player",
+                        player,
+                        socialContext,
+                        {
+                            eventID = socialContext.requestID,
+                            family = "emote_interaction",
+                        }
+                    )
+                elseif PNC.CompanionCommandPresentation.ShowPlayerFlavor then
+                    PNC.CompanionCommandPresentation.ShowPlayerFlavor(
+                        player,
+                        vanillaDefinition.flavorID,
+                        socialContext
+                    )
+                end
             end
             if PNC.Client and PNC.Client.ExecutePlayerEmoteInteraction then
                 PNC.Client.ExecutePlayerEmoteInteraction(
@@ -323,29 +342,78 @@ function ISEmoteRadialMenu:emote(emote)
     end
     definition = Commands and Commands.Get(commandID) or nil
     if not definition then return false end
+    player = self.character
+        or getSpecificPlayer and getSpecificPlayer(self.playerNum or 0)
+        or nil
+    respondent = target or targets and targets[1] or nil
+    commandContext = {
+        origin = "companion_emote",
+        commandID = commandID,
+        requestID = Core and Core.GenerateID
+            and Core.GenerateID("command_emote")
+            or tostring(Core and Core.Now and Core.Now() or 0),
+        target = target,
+        targets = targets,
+        scope = scope,
+        dialogueID = respondent and respondent.id or nil,
+    }
     local execute = PNC.Client and (PNC.Client.ExecuteCompanionCommand
         or PNC.Client.SendCompanionCommand)
     if execute then
-        sent = execute(
+        commandResult, commandReason = execute(
             commandID,
             target and target.id or nil,
             scope,
-            target
-        ) == true
+            commandContext
+        )
+        sent = commandResult == true
     end
-    player = getSpecificPlayer
-        and getSpecificPlayer(self.playerNum or 0) or self.character
-    if sent and PNC.CompanionCommandPresentation
+    if commandID == "camp" then
+        if not respondent or commandReason == "no_targets" then
+            interactionOutcome = "none"
+        elseif sent and commandReason == "network_queued" then
+            interactionOutcome = "pending"
+        elseif sent then
+            interactionOutcome = "valid"
+        elseif commandReason == "camp_requires_building" then
+            interactionOutcome = "invalid"
+        end
+    elseif sent and commandReason == "network_queued" then
+        interactionOutcome = "pending"
+    elseif sent then
+        interactionOutcome = "valid"
+    end
+    if PNC.CompanionCommandPresentation
+        and PNC.CompanionCommandPresentation.ShowCommandInteraction
+    then
+        if interactionOutcome then
+            PNC.CompanionCommandPresentation.ShowCommandInteraction(
+                player,
+                commandID,
+                target,
+                targets,
+                interactionOutcome,
+                commandContext
+            )
+        end
+    elseif interactionOutcome and commandID == "camp"
+        and PNC.CompanionCommandPresentation
+        and PNC.CompanionCommandPresentation.ShowCampInteraction
+    then
+        PNC.CompanionCommandPresentation.ShowCampInteraction(
+            player,
+            target,
+            targets,
+            interactionOutcome,
+            commandContext
+        )
+    elseif sent and PNC.CompanionCommandPresentation
         and PNC.CompanionCommandPresentation.ShowPlayerFlavor
     then
         PNC.CompanionCommandPresentation.ShowPlayerFlavor(
             player,
             commandID,
-            {
-                scope = scope,
-                target = target,
-                targets = targets,
-            }
+            commandContext
         )
     end
     if definition.clientOnly == true then return sent end

@@ -116,6 +116,21 @@ PsychopatzCore.DebugHub.RegisterTool({
 })
 
 PsychopatzCore.DebugHub.RegisterTool({
+    id = "pnc.worldEffects",
+    source = "Project Hoomans",
+    order = 227,
+    title = "World Effects",
+    description = "Inspect durable world mutations waiting for loaded squares.",
+    available = function()
+        return PNC and PNC.WorldEffectDebugUI
+            and PNC.WorldEffectDebugUI.Toggle
+            and PNC.Client and PNC.Client.CanUseDebug
+            and PNC.Client.CanUseDebug()
+    end,
+    action = function() PNC.WorldEffectDebugUI.Toggle() end,
+})
+
+PsychopatzCore.DebugHub.RegisterTool({
     id = "pnc.communityOverlay",
     source = "Project Hoomans",
     order = 231,

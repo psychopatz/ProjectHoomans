@@ -11,6 +11,35 @@ local Animation = PNC.Animation
 local Const = PNC.Const
 local Core = PNC.Core
 
+local function isWithinCamp(record, zombie, anchorX, anchorY, anchorZ, radius)
+    local distance = Core.Distance(record.x, record.y, anchorX, anchorY)
+    local query = PNC.TraversalQuery
+    local anchorSquare
+    local bodySquare
+    local anchorIndoor
+    local bodyIndoor
+    if distance > radius then return false end
+    if not zombie or not query
+        or not query.GetSquare
+        or not query.GetInteriorState
+    then
+        return true
+    end
+
+    anchorSquare = query.GetSquare(anchorX, anchorY, anchorZ)
+    anchorIndoor = query.GetInteriorState(anchorSquare)
+    if anchorIndoor ~= true then
+        return true
+    end
+
+    bodySquare = zombie.getCurrentSquare
+        and zombie:getCurrentSquare() or nil
+    bodyIndoor = query.GetInteriorState(bodySquare)
+    -- An indoor camp is not complete while the body is still outside, even
+    -- when the Euclidean camp radius overlaps the exterior side of a wall.
+    return bodyIndoor ~= false
+end
+
 local function normalize(record, spec)
     spec = type(spec) == "table" and spec or {}
     return {
@@ -55,7 +84,9 @@ function AtCamp.Tick(record, zombie)
         return true
     end
 
-    if Core.Distance(record.x, record.y, anchorX, anchorY) > radius then
+    if not isWithinCamp(
+        record, zombie, anchorX, anchorY, anchorZ, radius
+    ) then
         record.activeBehavior = "AtCamp:returning"
         Common.ClearCombatTarget(record, "returning_to_camp", zombie)
         Common.MoveRecord(

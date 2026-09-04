@@ -10,6 +10,7 @@ local Lifecycle = PNC.BodyLifecycle
 local Work = PNC.WorkService
 local WorkRepository = PNC.WorkRepository
 local Status = PNC.WorkDefinitions and PNC.WorkDefinitions.STATUS or {}
+local WorldEffects = PNC.WorldEffectService
 
 local function terminal(order)
     local status = order and tostring(order.status or "") or ""
@@ -391,6 +392,26 @@ local function reconcileDiagnostic(order, stage, reason, candidate, extra)
         .. (extra and " " .. tostring(extra) or ""))
 end
 
+local function pendingEffect(order)
+    return order and order.status == Status.WORLD_EFFECT_PENDING
+        and type(order.worldEffect) == "table"
+        and tostring(order.worldEffect.state or "PENDING") ~= "APPLIED"
+        and order.worldEffect or nil
+end
+
+-- Compatibility seams remain for older callers and tests, but the pending
+-- world-effect index and retry loop now belong to WorldEffectService.
+function Internal.indexPendingWorldEffect(order)
+    return WorldEffects and WorldEffects.IndexOrder
+        and WorldEffects.IndexOrder(order) or false
+end
+
+function Internal.reconcilePendingWorldEffects(now, pointKey, limit)
+    if not WorldEffects or not WorldEffects.Reconcile then return 0 end
+    local applied = WorldEffects.Reconcile(now, pointKey, limit)
+    return applied or 0
+end
+
 local function retireOrder(order, candidates, reason, now)
     clearReservationMarkers(order, candidates)
     if Internal.clearWorkRuntime then
@@ -442,6 +463,10 @@ local function reconcileOrder(order, baseCandidates, now)
     if not order or terminal(order)
         or tostring(order.status or "") == "CANCELLING"
     then return "SKIP" end
+    if pendingEffect(order) then
+        Internal.indexPendingWorldEffect(order)
+        return "WORLD_EFFECT_PENDING"
+    end
     if type(payload) ~= "table" or not tonumber(payload.sourceX)
         or not tonumber(payload.sourceY) or not tonumber(payload.sourceZ)
     then
@@ -476,7 +501,17 @@ local function reconcileOrder(order, baseCandidates, now)
     sourceSquare = Internal.squareAt(payload.sourceX, payload.sourceY,
         payload.sourceZ)
     if not sourceSquare then
-        reconcileDiagnostic(order, "WORLD", "SOURCE_CHUNK_UNLOADED", nil)
+        local changed = order.workerId ~= nil
+            and order.status ~= Status.WAITING_FOR_WORLD
+        if changed then
+            order.status = Status.WAITING_FOR_WORLD
+            order.blockedReason = "SOURCE_CHUNK_LOADING"
+            order.updatedAt, order.lastProgressAt = now, now
+            order.revision = (tonumber(order.revision) or 0) + 1
+            if WorkRepository and WorkRepository.MarkDirty then
+                WorkRepository.MarkDirty()
+            end
+        end
         return "UNLOADED"
     end
     missingAt = tonumber(order.corpseReconcileMissingAt)
@@ -523,11 +558,27 @@ function Internal.reconcileActiveOrders(now, force, baseFilter)
     for _, order in ipairs(orders) do
         local baseId = tostring(order.baseId or "")
         local base = baseForOrder(order)
-        if scannedByBase[baseId] == nil then
-            scannedByBase[baseId] = base and Internal.scanBaseCorpses(base)
-                or {}
+        local payload = order.payload or {}
+        local sourceLoaded = payload.sourceX and payload.sourceY
+            and payload.sourceZ
+            and Internal.squareAt(payload.sourceX, payload.sourceY,
+                payload.sourceZ) ~= nil
+        local baseCandidates
+        if pendingEffect(order) or order.status == Status.WAITING_FOR_WORLD
+            or not sourceLoaded
+        then
+            -- Active world waits only need their identity points checked. A
+            -- full source-region walk is unnecessary while the relevant
+            -- chunk is absent and becomes expensive with large zones.
+            baseCandidates = {}
+        else
+            if scannedByBase[baseId] == nil then
+                scannedByBase[baseId] = base and Internal.scanBaseCorpses(base)
+                    or {}
+            end
+            baseCandidates = scannedByBase[baseId]
         end
-        local result = reconcileOrder(order, scannedByBase[baseId], now)
+        local result = reconcileOrder(order, baseCandidates, now)
         if result == "BOUND" then bound = bound + 1 end
         if result == "RETIRED" then retired = retired + 1 end
     end

@@ -117,7 +117,7 @@ T.equal(ok, false, "research capacity or eligibility blocks second")
 local gated = queue("CRAFT", 10, 5)
 ok, reason = Work.Commands.Assign(gated.id, "unskilled")
 T.equal(ok, false, "skill gate")
-T.equal(reason, "NO_QUALIFIED_WORKER", "skill blocker")
+T.equal(reason, "SKILL_TOO_LOW", "skill blocker")
 
 clock = clock + 5000
 T.truthy(Work.Commands.AddElapsed(craft1.id, "crafter1", 5),
@@ -140,7 +140,7 @@ PNC.Registry.Data.crafter1.orderSpec = {
 }
 ok, reason = Work.Commands.Assign(pinnedLumber.id, "crafter2")
 T.equal(ok, false, "lumber order rejects a non-selected worker")
-T.equal(reason, "NO_QUALIFIED_WORKER", "lumber worker pin blocker")
+T.equal(reason, "REQUIRED_WORKER_MISMATCH", "lumber worker pin blocker")
 T.truthy(Work.Commands.Assign(pinnedLumber.id, "crafter1"),
     "lumber order accepts the selected worker")
 T.equal(Work.Queries.Get(pinnedLumber.id).previousOrder, nil,

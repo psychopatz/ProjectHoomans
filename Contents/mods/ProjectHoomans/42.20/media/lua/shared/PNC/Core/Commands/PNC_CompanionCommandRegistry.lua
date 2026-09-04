@@ -117,6 +117,24 @@ function Commands.Get(commandID)
     return Commands.Definitions[tostring(commandID or "")]
 end
 
+-- Command-specific eligibility stays at the player-command authority
+-- boundary. Faction behavior and other server-owned order producers call
+-- OrderSystem directly and intentionally do not inherit player restrictions.
+function Commands.CanApply(record, player, commandID)
+    local definition = Commands.Get(commandID)
+    local allowed
+    local reason
+    if not definition then return false, "unknown_command" end
+    if type(definition.canApply) ~= "function" then
+        return true, "commandable"
+    end
+    allowed, reason = definition.canApply(record, player)
+    if allowed ~= true then
+        return false, reason or "command_rejected"
+    end
+    return true, reason or "commandable"
+end
+
 function Commands.List()
     local output = {}
     local i
@@ -295,6 +313,8 @@ function Commands.Apply(record, player, commandID, radius)
     end
     allowed, reason = Commands.CanPlayerCommand(record, player, radius)
     if not allowed then return false, reason end
+    allowed, reason = Commands.CanApply(record, player, commandID)
+    if not allowed then return false, reason end
     if type(definition.buildOrder) == "function" then
         orderSpec = definition.buildOrder(record, player)
         if type(orderSpec) ~= "table" then return false, "invalid_order" end
@@ -341,6 +361,7 @@ function Commands.Execute(player, args)
     local y
     local z
     local distSq
+    local affectedTargets = {}
     if commandID == "" or not definition then
         return 0, "unknown_command"
     end
@@ -373,7 +394,10 @@ function Commands.Execute(player, args)
             commandID,
             radius
         )
-        return applied and 1 or 0, reason
+        if applied then
+            affectedTargets[1] = tostring(closestRecord.id)
+        end
+        return applied and 1 or 0, reason, affectedTargets
     end
     if targetID ~= nil then
         applied, reason = Commands.Apply(
@@ -382,7 +406,8 @@ function Commands.Execute(player, args)
             commandID,
             radius
         )
-        return applied and 1 or 0, reason
+        if applied then affectedTargets[1] = tostring(targetID) end
+        return applied and 1 or 0, reason, affectedTargets
     end
     if definition.attackType ~= nil then
         return 0, "personalized_command"
@@ -391,11 +416,13 @@ function Commands.Execute(player, args)
         applied, reason = Commands.Apply(record, player, commandID, radius)
         if applied then
             affected = affected + 1
+            affectedTargets[#affectedTargets + 1] = tostring(record.id)
         elseif reason ~= "not_companion" and reason ~= "not_owner" then
             lastReason = reason
         end
     end)
-    return affected, affected > 0 and "commanded" or lastReason
+    return affected, affected > 0 and "commanded" or lastReason,
+        affectedTargets
 end
 
 return Commands

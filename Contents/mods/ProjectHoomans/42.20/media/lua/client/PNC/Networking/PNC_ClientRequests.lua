@@ -510,6 +510,34 @@ function Client.RequestDirectorDebug(groupID, locationID, populationSectorID)
     return true
 end
 
+function Client.RequestWorldEffectDebug(state, kind, limit)
+    local player = getSpecificPlayer and getSpecificPlayer(0) or nil
+    local args = { state = state, kind = kind, limit = limit }
+    if not Client.CanUseDebug() then
+        ClientState.worldEffectDebugAuthorized = false
+        ClientState.worldEffectDebug = nil
+        ClientState.worldEffectDebugReason = "not_authorized"
+        return false
+    end
+    ClientState.lastWorldEffectDebugRequestAt = Core.Now()
+    if Core.IsClientOnly and Core.IsClientOnly() then
+        if player and sendClientCommand then
+            sendClientCommand(player, Const.MODULE,
+                Const.CMD_WORLD_EFFECT_DEBUG_REQUEST, args)
+            return true
+        end
+        return false
+    end
+    if not PNC.WorldEffectService
+        or not PNC.WorldEffectService.BuildSnapshot
+    then return false end
+    ClientState.worldEffectDebugAuthorized = true
+    ClientState.worldEffectDebug = PNC.WorldEffectService.BuildSnapshot(args)
+    ClientState.worldEffectDebugReason = nil
+    ClientState.lastWorldEffectDebugReceiveAt = Core.Now()
+    return true
+end
+
 function Client.RequestColonyManagement(taskBrainNpcID)
     local player = getSpecificPlayer and getSpecificPlayer(0) or nil
     local options = {}

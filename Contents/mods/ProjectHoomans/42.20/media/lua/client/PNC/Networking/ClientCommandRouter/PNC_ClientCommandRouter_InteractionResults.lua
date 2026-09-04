@@ -2,6 +2,7 @@ local Internal = PNC.Client.Internal
 local Const = PNC.Const
 local Core = PNC.Core
 local ClientState = PNC.Network.ClientState
+local Registry = PNC.Registry
 
 Internal.RegisterServerCommand(Const.CMD_CONVERSATION_RELATIONSHIP,
     function(args)
@@ -174,6 +175,105 @@ Internal.RegisterServerCommand(Const.CMD_PLAYER_EMOTE_INTERACTION_RESULT,
             )
         end
     end)
+
+if Const.CMD_COMPANION_COMMAND_RESULT then
+    Internal.RegisterServerCommand(Const.CMD_COMPANION_COMMAND_RESULT,
+        function(args)
+            local player
+            local actor
+            local target
+            local targets
+            local targetEntry
+            local targetID
+            local commandSource
+            local outcome
+            args = type(args) == "table" and args or {}
+            player = getSpecificPlayer and getSpecificPlayer(0) or nil
+            commandSource = tostring(args.commandSource or "")
+            if commandSource == "companion_emote" then
+                targets = {}
+                for _, value in ipairs(args.targets or {}) do
+                    targetID = tostring(value or "")
+                    if targetID ~= "" then
+                        targetEntry = Registry and Registry.Get
+                            and Registry.Get(targetID) or nil
+                        targetEntry = targetEntry or ClientState.snapshots
+                            and ClientState.snapshots[targetID] or nil
+                        targets[#targets + 1] = targetEntry
+                            or { id = targetID }
+                    end
+                end
+                targetID = args.dialogueID or args.id
+                if #targets == 0 and targetID then
+                    targetID = tostring(targetID)
+                    target = Registry and Registry.Get and Registry.Get(targetID)
+                        or nil
+                    target = target or ClientState.snapshots
+                        and ClientState.snapshots[targetID] or nil
+                    if target then targets[1] = target end
+                end
+                target = targets[1]
+                if not target then return end
+                outcome = args.accepted == true and "valid"
+                    or tostring(args.reason or "")
+                        == "camp_requires_building" and "invalid"
+                    or nil
+                if not outcome
+                    or not PNC.CompanionCommandPresentation
+                    or not PNC.CompanionCommandPresentation.ShowCommandInteraction
+                then
+                    return
+                end
+                PNC.CompanionCommandPresentation.ShowCommandInteraction(
+                    player,
+                    args.commandID,
+                    target,
+                    targets,
+                    outcome,
+                    {
+                        origin = commandSource,
+                        commandID = args.commandID,
+                        target = target,
+                        targets = targets,
+                        playerActor = player,
+                        requestID = args.requestID,
+                        seed = args.requestID,
+                    },
+                    { playerAlreadySpoke = true }
+                )
+                return
+            end
+            if tostring(args.commandID or "") ~= "camp" then
+                return
+            end
+            targetID = args.dialogueID or args.id
+            actor = Registry and Registry.GetLiveZombie and targetID
+                and Registry.GetLiveZombie(targetID) or nil
+            target = Registry and Registry.Get and targetID
+                and Registry.Get(targetID) or nil
+            target = target or ClientState.snapshots
+                and targetID
+                and ClientState.snapshots[tostring(targetID)] or nil
+            if tostring(args.reason or "") ~= "camp_requires_building"
+                or not PNC.CompanionCommandPresentation
+                or not PNC.CompanionCommandPresentation.ShowCommandRejection
+            then
+                return
+            end
+            PNC.CompanionCommandPresentation.ShowCommandRejection(
+                player,
+                actor,
+                args.commandID,
+                args.reason,
+                {
+                    target = target,
+                    playerActor = player,
+                    requestID = args.requestID,
+                    seed = args.requestID,
+                }
+            )
+        end)
+end
 
 if Const.CMD_SOCIAL_GREETING then
     Internal.RegisterServerCommand(Const.CMD_SOCIAL_GREETING, function(args)

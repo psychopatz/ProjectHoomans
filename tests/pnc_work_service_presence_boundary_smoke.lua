@@ -74,9 +74,9 @@ for name, _ in pairs(public.queries) do
     T.equal(type(PNC.WorkService.Queries[name]), "function",
         "entry point should preserve Queries." .. name)
 end
-T.equal(serviceCount, 9, "service function declaration count")
-T.equal(commandCount, 17, "command function declaration count")
-T.equal(queryCount, 6, "query function declaration count")
+T.equal(serviceCount, 10, "service function declaration count")
+T.equal(commandCount, 18, "command function declaration count")
+T.equal(queryCount, 7, "query function declaration count")
 
 for i = 1, #providers do
     package.loaded[prefix .. providers[i]] = nil

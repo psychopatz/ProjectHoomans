@@ -101,3 +101,24 @@ Router.Register(Const.CMD_DIRECTOR_DEBUG_REQUEST,
         )
     end
 )
+
+Router.Register(Const.CMD_WORLD_EFFECT_DEBUG_REQUEST,
+    function(player, args, rawArgs)
+        if not Router.CanUseDebug(player) then
+            Network.SendWorldEffectDebug(player, nil, false,
+                "not_authorized")
+            return
+        end
+        local service = PNC.WorldEffectService
+        if not service or not service.BuildSnapshot then
+            Network.SendWorldEffectDebug(player, nil, true,
+                "world_effect_service_unavailable")
+            return
+        end
+        Network.SendWorldEffectDebug(player, service.BuildSnapshot({
+            state = rawArgs and rawArgs.state,
+            kind = rawArgs and rawArgs.kind,
+            limit = rawArgs and rawArgs.limit,
+        }), true, nil)
+    end
+)

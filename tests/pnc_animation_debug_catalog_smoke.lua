@@ -8,8 +8,8 @@ PNC = {}
 T.load(CATALOG_FILE)
 
 local catalog = PNC.AnimationDebugCatalog
-T.truthy(catalog.generatedCount == 545, "catalog must include every zombie XML node")
-T.truthy(#catalog.entries == 545, "catalog entry count mismatch")
+T.truthy(catalog.generatedCount == 535, "catalog must include every zombie XML node")
+T.truthy(#catalog.entries == 535, "catalog entry count mismatch")
 T.truthy(catalog.stateCounts.hitreaction == 41, "nested hitreaction nodes missing")
 T.truthy(catalog.stateCounts.bumped == 237, "bumped node inventory mismatch")
 

@@ -5,6 +5,7 @@ PNC = PNC or {}
 local Provider = {}
 local Work = PNC.WorkService
 local Status = PNC.WorkDefinitions.STATUS
+local Definitions = PNC.WorkDefinitions
 local Recovery = PNC.Tasking and PNC.Tasking.Internal
 local WorkPolicy = PNC.WorkPolicy
     or require "PNC/Core/Production/WorkDefinition/PNC_WorkPolicy"
@@ -17,6 +18,9 @@ local function assignable(order)
 end
 
 local function phaseFor(order)
+    if order.status == Status.WORLD_EFFECT_PENDING then
+        return "WORLD_EFFECT_PENDING"
+    end
     return order.completionStarted == true and "ATOMIC_COMMIT"
         or order.phase == "DROP_PENDING" and "ATOMIC_COMMIT"
         or order.phase == "GRAB_PENDING" and "WAITING"
@@ -65,6 +69,27 @@ function Provider.Validate(intent)
     local order = Work and Work.Queries.Get(intent.sourceRef)
     return assignable(order) and Work.Queries.CanAssign(
         intent.sourceRef, intent.npcId) == true
+end
+
+-- The task arbiter only needs GetCandidates during normal evaluation. The
+-- diagnostic path is intentionally separate so inspecting one NPC does not
+-- add a full repository explanation pass to every tasking pump.
+function Provider.GetDiagnostics(npcId)
+    if not Work or not Work.Queries
+        or not Work.Queries.BuildAssignmentDiagnostics
+    then
+        return {
+            totalOrders = 0,
+            statusCounts = {},
+            assignableOrders = 0,
+            eligibleOrders = 0,
+            rejectionCounts = {},
+            eligibleOperations = {},
+            samples = {},
+            unavailable = "WORK_DIAGNOSTICS_UNAVAILABLE",
+        }
+    end
+    return Work.Queries.BuildAssignmentDiagnostics(npcId)
 end
 
 function Provider.Assign(intent)
@@ -183,8 +208,21 @@ function Provider.Tick(lease)
     if tonumber(order.lastProgressAt) ~= tonumber(lease.lastProgressAt) then
         lease.lastProgressAt = order.lastProgressAt
     end
-    local handler = Work.ExecutionHandlers
-        and Work.ExecutionHandlers[order.operation]
+    local mode = tostring(order.executionMode or lease.executionMode or "LIVE")
+    local handler
+    if mode == "ABSTRACT" then
+        handler = Work.AbstractExecutionHandlers
+            and Work.AbstractExecutionHandlers[order.operation]
+    else
+        handler = Work.ExecutionHandlers
+            and Work.ExecutionHandlers[order.operation]
+    end
+    if mode == "ABSTRACT" and not handler
+        and Definitions.ExecutionPolicy
+        and Definitions.ExecutionPolicy(order.operation) ~= "ABSTRACT_SAFE"
+    then
+        return false, "ABSTRACT_EXECUTION_UNSUPPORTED"
+    end
     if handler then
         local ok, reason = handler(order, lease)
         if ok == false then
@@ -204,6 +242,10 @@ function Provider.Tick(lease)
             return false, reason or "WORK_OPERATION_FAILED"
         end
         local updated = Work.Queries.Get(lease.sourceRef)
+        if updated and updated.status == Status.WORLD_EFFECT_PENDING then
+            return PNC.Tasking.Commands.Complete(lease.leaseId,
+                updated.status)
+        end
         if updated and (updated.status == Status.CANCELLED
             or updated.status == Status.COMPLETED
             or updated.status == Status.FAILED)

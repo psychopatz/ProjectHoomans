@@ -41,12 +41,7 @@ function TraversalQuery.CanOccupy(x, y, z, cell)
 end
 
 function TraversalQuery.GetTraversalOccupancyReason(x, y, z, cell)
-    local reason = TraversalQuery.GetOccupancyReason(x, y, z, cell)
-    if reason then return reason end
-    if VehicleAvoidance and VehicleAvoidance.GetReason then
-        return VehicleAvoidance.GetReason(x, y, z, cell, true)
-    end
-    return nil
+    return TraversalQuery.GetOccupancyReason(x, y, z, cell)
 end
 
 function TraversalQuery.CanTraverseAt(x, y, z, cell)
@@ -69,10 +64,6 @@ function TraversalQuery.GetMaterializationOccupancyReason(x, y, z, cell)
     local reason = TraversalQuery.GetOccupancyReason(x, y, z, cell)
     if reason then
         return reason
-    end
-    if VehicleAvoidance and VehicleAvoidance.GetReason then
-        reason = VehicleAvoidance.GetReason(x, y, z, cell, true)
-        if reason then return reason end
     end
     if square.hasFloor and not square:hasFloor() then
         return "no_floor"

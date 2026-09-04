@@ -84,10 +84,17 @@ PNC.ColonyStorageService = {
             items[#items + 1] = { fullType = fullType, amount = amount,
                 consumed = row.consumed ~= false }
         end
-        local id = "r:" .. tostring(nextReservation)
-        nextReservation = nextReservation + 1
-        reservations[id] = { id = id, items = items, owner = owner,
-            storageId = "s1" }
+    local id = "r:" .. tostring(nextReservation)
+    nextReservation = nextReservation + 1
+    local selectedRequirements = {}
+    for _, item in ipairs(items) do
+        selectedRequirements[#selectedRequirements + 1] = {
+            selectedType = item.fullType,
+            consumed = item.consumed,
+        }
+    end
+    reservations[id] = { id = id, items = items,
+        requirements = selectedRequirements, owner = owner, storageId = "s1" }
         for _, item in ipairs(items) do
             reserved[item.fullType] = (reserved[item.fullType] or 0) + item.amount
         end
@@ -249,6 +256,63 @@ T.truthy(Work.Commands.Cancel(provisionDisplayOrder.id),
     "provision display fixture cancellation")
 PNC.Registry.Data.worker.runtime.workOrderId = nil
 PNC.Registry.Data.worker.orderSpec = nil
+
+local constructionDisplayOrder = T.truthy(Work.Commands.Queue({
+    operation = "CONSTRUCT", colonyId = "c1", factionId = "f1",
+    baseId = "b1", payload = {
+        input = { staged = true,
+            records = { { fullType = "Base.Plank" } } },
+    },
+}))
+PNC.Registry.Data.worker.runtime.workOrderId = constructionDisplayOrder.id
+local constructionDisplay = Work.BuildActionInformation(
+    PNC.Registry.Data.worker)
+T.equal(constructionDisplay.activityItemFullType, "Base.Plank",
+    "construction action snapshot exposes staged item")
+WorkRepository.Remove(constructionDisplayOrder.id)
+PNC.Registry.Data.worker.runtime.workOrderId = nil
+
+local craftingDisplayOrder = T.truthy(Work.Commands.Queue({
+    operation = "CRAFT", colonyId = "c1", factionId = "f1",
+    baseId = "b1", payload = {
+        activityItemFullType = "Base.Hammer",
+        input = { staged = true,
+            records = { { fullType = "Base.Plank" } } },
+    },
+}))
+PNC.Registry.Data.worker.runtime.workOrderId = craftingDisplayOrder.id
+local craftingDisplay = Work.BuildActionInformation(PNC.Registry.Data.worker)
+T.equal(craftingDisplay.activityItemFullType, "Base.Hammer",
+    "crafting action snapshot exposes retained tool")
+WorkRepository.Remove(craftingDisplayOrder.id)
+PNC.Registry.Data.worker.runtime.workOrderId = nil
+
+local disassemblyDisplayOrder = T.truthy(Work.Commands.Queue({
+    operation = "DISASSEMBLE", colonyId = "c1", factionId = "f1",
+    baseId = "b1", payload = { specimenFullType = "Base.Crate" },
+}))
+PNC.Registry.Data.worker.runtime.workOrderId = disassemblyDisplayOrder.id
+local disassemblyDisplay = Work.BuildActionInformation(
+    PNC.Registry.Data.worker)
+T.equal(disassemblyDisplay.activityItemFullType, "Base.Crate",
+    "disassembly action snapshot exposes specimen")
+WorkRepository.Remove(disassemblyDisplayOrder.id)
+PNC.Registry.Data.worker.runtime.workOrderId = nil
+
+local lumberDisplayOrder = T.truthy(Work.Commands.Queue({
+    operation = "LUMBER", payload = { lumberJobId = "lumber:display" },
+}))
+PNC.Registry.Data.worker.runtime.workOrderId = lumberDisplayOrder.id
+PNC.Registry.Data.worker.runtime.lumber = {
+    phase = "CHOPPING", activityItemFullType = "Base.HandAxe",
+}
+local lumberDisplay = Work.BuildActionInformation(PNC.Registry.Data.worker)
+T.equal(lumberDisplay.activityItemFullType, "Base.HandAxe",
+    "lumber action snapshot exposes resolved tool")
+WorkRepository.Remove(lumberDisplayOrder.id)
+PNC.Registry.Data.worker.runtime.workOrderId = nil
+PNC.Registry.Data.worker.runtime.lumber = nil
+
 T.truthy(Research.Commands.UnlockRecipe("c1", 1, "f1"), "seed known recipe")
 
 local technology = T.truthy(Research.Commands.QueueTechnology({},
@@ -300,6 +364,8 @@ T.truthy(Work.Commands.Cancel(legacyHigh.id),
     "legacy research reconciliation fixture cancellation")
 
 local first = T.truthy(Crafting.Commands.QueueCraft({}, 1, 1))
+T.equal(first.payload.activityItemFullType, "Base.Hammer",
+    "craft queue carries the exact retained tool")
 local blocked, reason = Crafting.Commands.QueueCraft({}, 1, 1)
 T.equal(blocked, nil, "reservation blocks double spend")
 T.equal(reason, "MISSING_MATERIALS", "material blocker")

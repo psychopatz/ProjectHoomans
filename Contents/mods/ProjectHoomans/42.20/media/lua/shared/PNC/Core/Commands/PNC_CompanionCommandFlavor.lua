@@ -10,6 +10,17 @@ PNC = PNC or {}
 PNC.CompanionCommandFlavor = PNC.CompanionCommandFlavor or {}
 
 local Flavor = PNC.CompanionCommandFlavor
+local CoreFlavor
+
+local function getCoreFlavor()
+    if CoreFlavor then return CoreFlavor end
+    CoreFlavor = PsychopatzCore and PsychopatzCore.SocialFlavor or nil
+    if not CoreFlavor then
+        pcall(require, "PsychopatzCore/Conversation/PsychopatzSocialFlavor")
+        CoreFlavor = PsychopatzCore and PsychopatzCore.SocialFlavor or nil
+    end
+    return CoreFlavor
+end
 
 Flavor.Groups = Flavor.Groups or {}
 
@@ -28,6 +39,7 @@ local function normalizeLines(lines)
             output[#output + 1] = {
                 key = line.key and tostring(line.key) or nil,
                 fallback = tostring(line.fallback or line.key or ""),
+                weight = tonumber(line.weight) or nil,
             }
         end
     end
@@ -36,11 +48,23 @@ end
 
 function Flavor.Register(commandID, definition)
     local id = tostring(commandID or "")
+    local normalized
+    local core
     if id == "" or type(definition) ~= "table" then return false end
-    Flavor.Groups[id] = {
+    normalized = {
         player = normalizeLines(definition.player),
         npc = normalizeLines(definition.npc),
     }
+    Flavor.Groups[id] = normalized
+    -- Keep the legacy command API available to callers, but make Core's
+    -- shared flavor registry the canonical source for queue-backed speech.
+    core = getCoreFlavor()
+    if core and core.Register then
+        core.Register(id, {
+            id = id,
+            default = normalized,
+        })
+    end
     return true
 end
 
@@ -88,9 +112,13 @@ local function formatTokens(text, context)
 end
 
 function Flavor.Resolve(commandID, speaker, seed, context)
+    local core = getCoreFlavor()
     local group = Flavor.Get(commandID)
     local lines = group and group[tostring(speaker or "")] or nil
     local index
+    if core and core.Resolve then
+        return core.Resolve(commandID, speaker, seed, context)
+    end
     if not lines or #lines <= 0 then return nil end
     index = (stableHash(
         tostring(commandID or "")

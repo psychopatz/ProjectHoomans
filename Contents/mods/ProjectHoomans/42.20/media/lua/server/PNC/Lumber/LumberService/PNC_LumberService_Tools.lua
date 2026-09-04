@@ -14,6 +14,7 @@ local function resolveAbstractTool(record)
         if override.canChop ~= false then
             return {
                 canChop = true,
+                fullType = tostring(override.fullType or ""),
                 treeDamage = math.max(1, tonumber(override.treeDamage) or 10),
                 itemID = override.itemID,
                 condition = tonumber(override.condition),
@@ -41,7 +42,7 @@ local function resolveAbstractTool(record)
         and 40 or string.find(lower, "hatchet", 1, true)
         and 15 or 35
     return {
-        canChop = true, treeDamage = damage,
+        canChop = true, fullType = fullType, treeDamage = damage,
         itemID = item and item.id or nil,
         condition = item and tonumber(item.cond) or nil,
     }

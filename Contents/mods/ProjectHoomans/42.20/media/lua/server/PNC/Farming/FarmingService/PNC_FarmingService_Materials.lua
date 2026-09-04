@@ -12,6 +12,24 @@ local Catalog = PNC.FarmingCatalog
 local Adapter = PNC.PZFarmingAdapter
 local baseFor = Internal.BaseFor
 
+local function itemFullType(item)
+    local direct = tostring(item and (item.fullType or item.type) or "")
+    if direct ~= "" then return direct end
+    if item and type(item.getFullType) == "function" then
+        local ok, fullType = pcall(item.getFullType, item)
+        fullType = ok and tostring(fullType or "") or ""
+        if fullType ~= "" then return fullType end
+    end
+    return nil
+end
+
+local function reservationItemFullType(reservation)
+    local requirement = reservation and reservation.requirements
+        and reservation.requirements[1] or nil
+    local fullType = tostring(requirement and requirement.selectedType or "")
+    return fullType ~= "" and fullType or nil
+end
+
 local function storageFor(facility)
     local base = baseFor(facility)
     if not base or not PNC.ColonyStorageRepository
@@ -42,12 +60,18 @@ local function retrieveMaterial(record, facility, itemTypes, runtime)
         PNC.ColonyStorageService.ReleaseProductionReservation(reservation.id)
         return false, details or "MATERIAL_RETRIEVAL_FAILED"
     end
+    if runtime then
+        runtime.activityItemFullType = reservationItemFullType(reservation)
+    end
     return true, "MATERIAL_RETRIEVED"
 end
 
 local function ensureSeed(record, facility, entry, runtime)
-    local itemID = Adapter.FindSeed(record, nil, entry)
-    if itemID then return true end
+    local itemID, item = Adapter.FindSeed(record, nil, entry)
+    if itemID then
+        runtime.activityItemFullType = itemFullType(item)
+        return true
+    end
     return retrieveMaterial(record, facility, entry.seedTypes, runtime)
 end
 
@@ -69,7 +93,11 @@ local function storageWaterTypes(storage)
 end
 
 local function ensureWater(record, facility, runtime, body)
-    if Adapter.FindWater(record, body) then return true end
+    local water = Adapter.FindWater(record, body)
+    if water then
+        runtime.activityItemFullType = itemFullType(water.item)
+        return true
+    end
     local storage = storageFor(facility)
     local types = storageWaterTypes(storage)
     if #types <= 0 then return false, "WATER_MATERIAL_MISSING" end

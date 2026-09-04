@@ -36,10 +36,30 @@ register("camp", {
     { key = "UI_PNC_Flavor_Camp_Player_1", fallback = "Make camp here, {names}." },
     { key = "UI_PNC_Flavor_Camp_Player_2", fallback = "Settle in here, {names}." },
     { key = "UI_PNC_Flavor_Camp_Player_3", fallback = "We'll camp here for now, {names}." },
+    { key = "UI_PNC_Flavor_Camp_Player_4", fallback = "We could make camp here, {names}." },
+    { key = "UI_PNC_Flavor_Camp_Player_5", fallback = "Let's make this our camp, {names}." },
 }, {
     { key = "UI_PNC_Flavor_Camp_NPC_1", fallback = "We'll make camp here." },
     { key = "UI_PNC_Flavor_Camp_NPC_2", fallback = "Settling in here." },
     { key = "UI_PNC_Flavor_Camp_NPC_3", fallback = "I'll hold this camp." },
+    { key = "UI_PNC_Flavor_Camp_NPC_4", fallback = "A roof sounds good. Let's settle in." },
+    { key = "UI_PNC_Flavor_Camp_NPC_5", fallback = "This works for me. We can camp here." },
+})
+
+register("camp_no_npc", {
+    { key = "UI_PNC_Flavor_CampNoNPC_Player_1", fallback = "..." },
+})
+
+register("camp_rejected", {
+    { key = "UI_PNC_Flavor_CampRejected_Player_1", fallback = "No camp here. This place isn't safe without a building." },
+    { key = "UI_PNC_Flavor_CampRejected_Player_2", fallback = "We need shelter before we make camp." },
+    { key = "UI_PNC_Flavor_CampRejected_Player_3", fallback = "This isn't safe for camping. Find a building first." },
+}, {
+    { key = "UI_PNC_Flavor_CampRejected_NPC_1", fallback = "I can't camp here. This place isn't safe without a building." },
+    { key = "UI_PNC_Flavor_CampRejected_NPC_2", fallback = "Not here. We need shelter before we make camp." },
+    { key = "UI_PNC_Flavor_CampRejected_NPC_3", fallback = "This isn't safe for a camp. Let's find a building." },
+    { key = "UI_PNC_Flavor_CampRejected_NPC_4", fallback = "We're too exposed out here. We need a roof." },
+    { key = "UI_PNC_Flavor_CampRejected_NPC_5", fallback = "No. Camp somewhere safe, with walls around us." },
 })
 
 register("return_home", {

@@ -1,8 +1,8 @@
 -- GENERATED FILE. Do not edit by hand.
--- Source: common/media/AnimSets/zombie (545 XML nodes)
+-- Source: common/media/AnimSets/zombie (535 XML nodes)
 PNC = PNC or {}
 PNC.AnimationDebugCatalog = {
-    generatedCount = 545,
+    generatedCount = 535,
     stateCounts = {
         ["attack"] = 18,
         ["attack-network"] = 18,
@@ -23,7 +23,6 @@ PNC.AnimationDebugCatalog = {
         ["pathfind"] = 51,
         ["staggerback"] = 8,
         ["thump"] = 6,
-        ["turnalerted"] = 10,
         ["walktoward"] = 56,
         ["walktoward-network"] = 56,
     },
@@ -2248,8 +2247,8 @@ PNC.AnimationDebugCatalog = {
             extends = nil,
             node = "PNC_Anim_ChopTree",
             anim = "Bob_IdleChopDownTree",
-            looped = true,
-            speed = 1.0,
+            looped = false,
+            speed = 0.8,
             playable = true,
             transitionCount = 0,
             conditions = {
@@ -2258,7 +2257,6 @@ PNC.AnimationDebugCatalog = {
             },
             events = {
                 { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
-                { name = "ChopTree", time = "0.35", parameter = "" },
             },
         },
         {
@@ -8624,186 +8622,6 @@ PNC.AnimationDebugCatalog = {
             },
             events = {
                 { name = "ThumpFrame", time = "0.55", parameter = "" },
-            },
-        },
-        {
-            state = "turnalerted",
-            folder = "turnalerted",
-            file = "PNC_Anim_Default.xml",
-            path = "media/AnimSets/zombie/turnalerted/PNC_Anim_Default.xml",
-            extends = nil,
-            node = "PNC_Anim_Default",
-            anim = "ZSZombie_Turn00_Alerted",
-            looped = false,
-            speed = 1.04,
-            playable = true,
-            transitionCount = 0,
-            conditions = {
-                { name = "PNCActor", kind = "BOOL", value = "true" },
-            },
-            events = {
-            },
-        },
-        {
-            state = "turnalerted",
-            folder = "turnalerted",
-            file = "PNC_Anim_TurnL135.xml",
-            path = "media/AnimSets/zombie/turnalerted/PNC_Anim_TurnL135.xml",
-            extends = "PNC_Anim_Default.xml",
-            node = "PNC_Anim_TurnL135",
-            anim = "Bob_IdleAim1Hand_Turn180L",
-            looped = false,
-            speed = 1.04,
-            playable = true,
-            transitionCount = 0,
-            conditions = {
-                { name = "PNCActor", kind = "BOOL", value = "true" },
-            },
-            events = {
-            },
-        },
-        {
-            state = "turnalerted",
-            folder = "turnalerted",
-            file = "PNC_Anim_TurnL180.xml",
-            path = "media/AnimSets/zombie/turnalerted/PNC_Anim_TurnL180.xml",
-            extends = "PNC_Anim_Default.xml",
-            node = "PNC_Anim_TurnL180",
-            anim = "Bob_IdleAim1Hand_Turn180L",
-            looped = false,
-            speed = 1.04,
-            playable = true,
-            transitionCount = 0,
-            conditions = {
-                { name = "PNCActor", kind = "BOOL", value = "true" },
-            },
-            events = {
-            },
-        },
-        {
-            state = "turnalerted",
-            folder = "turnalerted",
-            file = "PNC_Anim_TurnL45.xml",
-            path = "media/AnimSets/zombie/turnalerted/PNC_Anim_TurnL45.xml",
-            extends = "PNC_Anim_Default.xml",
-            node = "PNC_Anim_TurnL45",
-            anim = "Bob_IdleAim1Hand_Turn45L",
-            looped = false,
-            speed = 1.04,
-            playable = true,
-            transitionCount = 0,
-            conditions = {
-                { name = "PNCActor", kind = "BOOL", value = "true" },
-            },
-            events = {
-            },
-        },
-        {
-            state = "turnalerted",
-            folder = "turnalerted",
-            file = "PNC_Anim_TurnL90.xml",
-            path = "media/AnimSets/zombie/turnalerted/PNC_Anim_TurnL90.xml",
-            extends = "PNC_Anim_Default.xml",
-            node = "PNC_Anim_TurnL90",
-            anim = "Bob_IdleAim1Hand_Turn90L",
-            looped = false,
-            speed = 1.04,
-            playable = true,
-            transitionCount = 0,
-            conditions = {
-                { name = "PNCActor", kind = "BOOL", value = "true" },
-            },
-            events = {
-            },
-        },
-        {
-            state = "turnalerted",
-            folder = "turnalerted",
-            file = "PNC_Anim_TurnR135.xml",
-            path = "media/AnimSets/zombie/turnalerted/PNC_Anim_TurnR135.xml",
-            extends = "PNC_Anim_Default.xml",
-            node = "PNC_Anim_TurnR135",
-            anim = "Bob_IdleAim1Hand_Turn180R",
-            looped = false,
-            speed = 1.04,
-            playable = true,
-            transitionCount = 0,
-            conditions = {
-                { name = "PNCActor", kind = "BOOL", value = "true" },
-            },
-            events = {
-            },
-        },
-        {
-            state = "turnalerted",
-            folder = "turnalerted",
-            file = "PNC_Anim_TurnR180.xml",
-            path = "media/AnimSets/zombie/turnalerted/PNC_Anim_TurnR180.xml",
-            extends = "PNC_Anim_Default.xml",
-            node = "PNC_Anim_TurnR180",
-            anim = "Bob_IdleAim1Hand_Turn180R",
-            looped = false,
-            speed = 1.04,
-            playable = true,
-            transitionCount = 0,
-            conditions = {
-                { name = "PNCActor", kind = "BOOL", value = "true" },
-            },
-            events = {
-            },
-        },
-        {
-            state = "turnalerted",
-            folder = "turnalerted",
-            file = "PNC_Anim_TurnR45.xml",
-            path = "media/AnimSets/zombie/turnalerted/PNC_Anim_TurnR45.xml",
-            extends = "PNC_Anim_Default.xml",
-            node = "PNC_Anim_TurnR45",
-            anim = "Bob_IdleAim1Hand_Turn45R",
-            looped = false,
-            speed = 1.04,
-            playable = true,
-            transitionCount = 0,
-            conditions = {
-                { name = "PNCActor", kind = "BOOL", value = "true" },
-            },
-            events = {
-            },
-        },
-        {
-            state = "turnalerted",
-            folder = "turnalerted",
-            file = "PNC_Anim_TurnR90.xml",
-            path = "media/AnimSets/zombie/turnalerted/PNC_Anim_TurnR90.xml",
-            extends = "PNC_Anim_Default.xml",
-            node = "PNC_Anim_TurnR90",
-            anim = "Bob_IdleAim1Hand_Turn90R",
-            looped = false,
-            speed = 1.04,
-            playable = true,
-            transitionCount = 0,
-            conditions = {
-                { name = "PNCActor", kind = "BOOL", value = "true" },
-            },
-            events = {
-            },
-        },
-        {
-            state = "turnalerted",
-            folder = "turnalerted",
-            file = "PNC_Anim_ragdollVehicleCollision.xml",
-            path = "media/AnimSets/zombie/turnalerted/PNC_Anim_ragdollVehicleCollision.xml",
-            extends = nil,
-            node = "PNC_Anim_ragdollVehicleCollision",
-            anim = nil,
-            looped = false,
-            speed = 1.0,
-            playable = false,
-            transitionCount = 0,
-            conditions = {
-                { name = "PNCActor", kind = "BOOL", value = "true" },
-            },
-            events = {
             },
         },
         {

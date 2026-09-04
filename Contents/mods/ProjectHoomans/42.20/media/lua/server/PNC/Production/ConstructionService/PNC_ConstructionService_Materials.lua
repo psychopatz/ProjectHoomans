@@ -22,6 +22,23 @@ function Internal.RequirementsFromCosts(costs, count)
     return output
 end
 
+-- A retained recipe input (for example a hammer) is reserved for the
+-- project but is not collected into the worker's inventory. Keep the exact
+-- type chosen by the reservation available to the activity snapshot so the
+-- client can present the same tool instead of guessing from recipe options.
+function Internal.ActivityItemFullType(requirements, reservation)
+    local reserved = reservation and reservation.requirements or nil
+    for index, requirement in ipairs(requirements or {}) do
+        if requirement and requirement.consumed == false then
+            local selected = reserved and reserved[index]
+                and reserved[index].selectedType or nil
+            selected = tostring(selected or "")
+            if selected ~= "" then return selected end
+        end
+    end
+    return nil
+end
+
 function Internal.RecipeRevisionFor(definition, facility, kind)
     local level = PNC.FacilityDefinitions and PNC.FacilityDefinitions.GetLevel
         and PNC.FacilityDefinitions.GetLevel(

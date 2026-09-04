@@ -69,10 +69,64 @@ local function treeYield(tree)
     return 1
 end
 
+function Service.ApplyDeferredTreeRemoval(tree, effect)
+    if not tree or type(effect) ~= "table" then
+        return false, "TREE_EFFECT_INVALID"
+    end
+    if tostring(effect.state or "") == "APPLIED" then
+        return true, "TREE_ALREADY_APPLIED"
+    end
+    local actual, square = Service.GetTreeAt(effect.x or tree.x,
+        effect.y or tree.y, effect.z or tree.z)
+    if not square then return false, "TREE_CHUNK_LOADING" end
+    if not actual then
+        -- The expected tree was removed by another authoritative action. The
+        -- abstract reward has already crossed its work boundary, so this is
+        -- an idempotent success rather than a second reward or a retry loop.
+        effect.state = "APPLIED"
+        effect.appliedAt = now()
+        effect.updatedAt = effect.appliedAt
+        effect.lastReason = "TREE_ALREADY_REMOVED"
+        tree.worldReconciledAt = effect.appliedAt
+        markDirty()
+        return true, "TREE_ALREADY_REMOVED"
+    end
+    local expected = effect.signature or effect.identity
+        and effect.identity.signature or tree.signature
+    if tostring(expected or "") ~= tostring(treeSignature(actual)) then
+        effect.state = "CONFLICT"
+        effect.conflictReason = "TREE_REPLACED"
+        effect.lastReason = "TREE_REPLACED"
+        effect.updatedAt = now()
+        tree.status = "INVALID"
+        tree.invalidReason = "abstract_tree_replaced"
+        markDirty()
+        return false, "TREE_REPLACED"
+    end
+    if type(square.transmitRemoveItemFromSquare) ~= "function" then
+        return false, "TREE_REMOVE_UNAVAILABLE"
+    end
+    local ok, result = pcall(square.transmitRemoveItemFromSquare,
+        square, actual)
+    if not ok then return false, tostring(result) end
+    if result == -1 then return false, "TREE_REMOVE_REJECTED" end
+    effect.state = "APPLIED"
+    effect.appliedAt = now()
+    effect.updatedAt = effect.appliedAt
+    effect.lastReason = "TREE_REMOVED"
+    tree.worldReconciledAt = effect.appliedAt
+    markDirty()
+    return true, "TREE_REMOVED"
+end
+
 local function reconcileAbstractTree(tree, actual, square)
     if not tree or tree.status ~= "DEPLETED"
-        or tree.completedMode ~= "abstract" or not actual or not square
+        or tree.completedMode ~= "abstract" or not square
     then return false end
+    if tree.worldEffect then
+        return Service.ApplyDeferredTreeRemoval(tree, tree.worldEffect)
+    end
+    if not actual then return false end
     if tree.signature ~= treeSignature(actual) then
         tree.status = "INVALID"
         tree.invalidReason = "abstract_tree_replaced"
@@ -97,10 +151,15 @@ local function reconcileLoadedSquare(square)
     local z = square.getZ and square:getZ() or square.z or 0
     if x == nil or y == nil then return end
     local tree = square.getTree and square:getTree() or nil
-    if not tree then return end
     local key = tostring(x) .. ":" .. tostring(y) .. ":" .. tostring(z)
-    reconcileAbstractTree(Service.Data and Service.Data.trees[key],
-        tree, square)
+    local ledgerTree = Service.Data and Service.Data.trees[key]
+    if ledgerTree and ledgerTree.worldEffect then
+        Service.ApplyDeferredTreeRemoval(ledgerTree,
+            ledgerTree.worldEffect)
+        return
+    end
+    if not tree then return end
+    reconcileAbstractTree(ledgerTree, tree, square)
 end
 
 local function upsertTree(zone, x, y, z, tree)
@@ -410,6 +469,7 @@ end
 
 
 Internal.ReconcileLoadedSquare = reconcileLoadedSquare
+Internal.ApplyDeferredTreeRemoval = Service.ApplyDeferredTreeRemoval
 Internal.ExpireClaims = expireClaims
 Internal.EnsureTreeClaim = ensureTreeClaim
 Internal.SelectClaimedTarget = selectClaimedTarget

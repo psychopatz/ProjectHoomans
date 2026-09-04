@@ -13,6 +13,7 @@ local sentHome = {}
 local releasedWorkers = {}
 local manualProvisionRequests = 0
 local manualCorpseHaulRequests = 0
+local campIndoor = true
 
 local function companion(id, owner, x)
     return {
@@ -65,6 +66,19 @@ PNC = {
             local dx = x2 - x1
             local dy = y2 - y1
             return dx * dx + dy * dy
+        end,
+    },
+    TraversalQuery = {
+        GetSquare = function()
+            return {
+                isInARoom = function()
+                    return campIndoor
+                end,
+            }
+        end,
+        GetInteriorState = function(square)
+            return square and square.isInARoom
+                and square:isInARoom() or nil
         end,
     },
     Registry = {
@@ -156,6 +170,12 @@ T.truthy(string.find(
     1,
     true
 ), "camp command intent metadata is registered")
+T.truthy(string.find(
+    PNC.CompanionCommands.Get("camp").llmDescription,
+    "inside a building",
+    1,
+    true
+), "camp command indoor requirement metadata is registered")
 T.equal(PNC.CompanionCommands.Get("manual_sleep").contextOnly, true,
     "manual sleep stays out of the radial command list")
 T.load(SHARED_ROOT .. "PNC_CompanionCommandFlavorDefinitions.lua")
@@ -166,6 +186,15 @@ T.truthy(PNC.CompanionCommandFlavor.Resolve("follow", "npc", "seed"),
     "built-in NPC flavor missing")
 T.truthy(PNC.CompanionCommandFlavor.Resolve("camp", "player", "seed"),
     "built-in camp player flavor missing")
+T.equal(PNC.CompanionCommandFlavor.Resolve(
+    "camp_no_npc", "player", "seed"
+), "...", "camp without an NPC should use an ellipsis flavor")
+local campRejectedFlavor = PNC.CompanionCommandFlavor.Get("camp_rejected")
+T.truthy(campRejectedFlavor and campRejectedFlavor.npc
+    and #campRejectedFlavor.npc > 0,
+    "camp rejection NPC flavor missing")
+T.contains(campRejectedFlavor.npc[1].fallback, "safe",
+    "camp rejection flavor does not explain outdoor camping is unsafe")
 T.equal(PNC.CompanionCommandFlavor.Register("extension_command", {
     player = {
         { key = "UI_Extension_Command", fallback = "Extension fallback." },
@@ -321,6 +350,37 @@ affected, reason = PNC.CompanionCommands.Execute(player, {
     id = "owned",
     commandID = "camp",
 })
+T.equal(affected, 1, "indoor camp command target count")
+T.equal(reason, "commanded", "indoor camp command result")
+T.equal(records.owned.orderSpec.kind, "camp", "indoor camp order")
+T.equal(records.owned.orderSpec.x, 3.5, "indoor camp live-body anchor x")
+T.equal(records.owned.orderSpec.y, 1.5, "indoor camp live-body anchor y")
+T.equal(records.owned.orderSpec.radius, 3, "indoor camp order radius")
+
+campIndoor = false
+affected, reason = PNC.CompanionCommands.Execute(player, {
+    id = "owned",
+    commandID = "camp",
+})
+T.equal(affected, 0, "outdoor player camp command rejected")
+T.equal(reason, "camp_requires_building",
+    "outdoor player camp rejection reason")
+T.equal(records.owned.orderSpec.kind, "camp",
+    "rejected outdoor camp does not replace the existing order")
+
+-- Faction behavior is a server-owned order producer, not a player command.
+-- It remains able to create an outdoor camp order when its policy requires it.
+PNC.OrderSystem.SetOrder(records.neutral, {
+    kind = "camp", x = 2, y = 2, z = 0,
+})
+T.equal(records.neutral.orderSpec.kind, "camp",
+    "faction-owned order path can override the player camp restriction")
+
+campIndoor = true
+affected, reason = PNC.CompanionCommands.Execute(player, {
+    id = "owned",
+    commandID = "camp",
+})
 T.equal(affected, 1, "camp command target count")
 T.equal(reason, "commanded", "camp command result")
 T.equal(records.owned.orderSpec.kind, "camp", "camp order")
@@ -442,6 +502,67 @@ for _ in pairs(spokenVariants) do
 end
 T.truthy(spokenVariantCount >= 2,
     "presented player flavor remained repetitive")
+
+local npcSpeech = {}
+local spokenBeforeRejection = #spoken
+liveBodies.owned.Say = function(_, text)
+    npcSpeech[#npcSpeech + 1] = text
+end
+T.equal(PNC.CompanionCommandPresentation.ShowCommandRejection(
+    player,
+    liveBodies.owned,
+    "camp",
+    "camp_requires_building",
+    { target = records.owned, seed = "camp-rejection" }
+), true, "camp rejection flavor was not presented")
+T.truthy(#spoken > spokenBeforeRejection,
+    "camp rejection did not make the player speak")
+T.truthy(string.find(spoken[#spoken], "safe", 1, true)
+    or string.find(spoken[#spoken], "shelter", 1, true)
+    or string.find(spoken[#spoken], "building", 1, true),
+    "camp rejection player speech did not explain the safety restriction")
+T.truthy(string.find(npcSpeech[#npcSpeech], "safe", 1, true)
+    or string.find(npcSpeech[#npcSpeech], "shelter", 1, true)
+    or string.find(npcSpeech[#npcSpeech], "building", 1, true),
+    "camp rejection speech did not explain why outdoor camping is unsafe")
+
+local campExchangePlayerSpeech = #spoken
+local campExchangeNPCSpeech = #npcSpeech
+T.equal(PNC.CompanionCommandPresentation.ShowCampInteraction(
+    player,
+    records.owned,
+    { records.owned },
+    "invalid",
+    { seed = "camp-invalid-exchange" }
+), true, "invalid camp exchange was not presented")
+T.truthy(#spoken > campExchangePlayerSpeech,
+    "invalid camp exchange omitted the player proposal")
+T.truthy(#npcSpeech > campExchangeNPCSpeech,
+    "invalid camp exchange omitted the NPC response")
+
+local validExchangePlayerSpeech = #spoken
+local validExchangeNPCSpeech = #npcSpeech
+T.equal(PNC.CompanionCommandPresentation.ShowCampInteraction(
+    player,
+    records.owned,
+    { records.owned },
+    "valid",
+    { seed = "camp-valid-exchange" }
+), true, "valid camp exchange was not presented")
+T.truthy(#spoken > validExchangePlayerSpeech,
+    "valid camp exchange omitted the player proposal")
+T.truthy(#npcSpeech > validExchangeNPCSpeech,
+    "valid camp exchange omitted the NPC response")
+
+T.equal(PNC.CompanionCommandPresentation.ShowCampInteraction(
+    player,
+    nil,
+    {},
+    "none",
+    { seed = "camp-no-npc" }
+), true, "empty camp exchange was not presented")
+T.equal(spoken[#spoken], "...",
+    "empty camp exchange did not use the ellipsis flavor")
 
 local registeredProvider
 local sent = {}

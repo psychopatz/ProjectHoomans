@@ -13,6 +13,7 @@ local Adapter = PNC.LumberWorkAdapter
 local Work = PNC.WorkService
 local Service = PNC.LumberService
 local Status = PNC.WorkDefinitions and PNC.WorkDefinitions.STATUS or {}
+local WorldEffects = PNC.WorldEffectService
 
 local function recordFor(npcId)
     return PNC.Registry and PNC.Registry.Get and PNC.Registry.Get(
@@ -248,11 +249,52 @@ end
 if Work and Work.RegisterExecution then
     Work.RegisterExecution("LUMBER", Adapter.Execute)
 end
+if Work and Work.RegisterAbstractExecution then
+    Work.RegisterAbstractExecution("LUMBER", Adapter.Execute)
+end
 if Work then
     Work.CompletionHandlers = Work.CompletionHandlers or {}
     Work.CompletionHandlers.LUMBER = Adapter.Complete
     Work.CancellationHandlers = Work.CancellationHandlers or {}
     Work.CancellationHandlers.LUMBER = Adapter.Cancel
+end
+
+if WorldEffects and WorldEffects.RegisterProvider
+    and WorldEffects.Register
+then
+    WorldEffects.RegisterProvider("LUMBER", {
+        List = function()
+            local output = {}
+            for _, tree in pairs(Service.Data and Service.Data.trees or {}) do
+                if type(tree) == "table" and type(tree.worldEffect) == "table" then
+                    output[#output + 1] = tree
+                end
+            end
+            return output
+        end,
+        GetOwnerID = function(tree) return tree and tree.key end,
+        GetEffects = function(tree)
+            return tree and type(tree.worldEffect) == "table"
+                and { tree.worldEffect } or {}
+        end,
+        IsPending = function(_, effect)
+            local state = tostring(effect and effect.state or "PENDING")
+            return state ~= "APPLIED" and state ~= "CANCELLED"
+                and state ~= "CONFLICT" and state ~= "FAILED"
+        end,
+        MarkDirty = function() Service.Dirty = true end,
+    })
+    WorldEffects.Register("TREE_REMOVE", {
+        Apply = function(tree, effect)
+            return Service.ApplyDeferredTreeRemoval(tree, effect)
+        end,
+        GetPoints = function(tree, effect)
+            return { {
+                role = "target", x = effect.x or tree.x,
+                y = effect.y or tree.y, z = effect.z or tree.z,
+            } }
+        end,
+    })
 end
 
 return Adapter

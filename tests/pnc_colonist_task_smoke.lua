@@ -70,6 +70,19 @@ local person = {
         candidateCount = 2,
         hasMore = false,
         providerFailures = {},
+        providerDiagnostics = {
+            work = {
+                totalOrders = 3, assignableOrders = 2,
+                eligibleOrders = 0,
+                statusCounts = { WAITING_FOR_WORKER = 2, COMPLETED = 1 },
+                rejectionCounts = { WORKER_NOT_AT_HOME = 2 },
+                samples = {
+                    { orderId = "work:corpse-2", operation = "CORPSE_HAUL",
+                        status = "WAITING_FOR_WORKER",
+                        reason = "WORKER_NOT_AT_HOME" },
+                },
+            },
+        },
     },
 }
 
@@ -102,6 +115,32 @@ T.falsy(needRow.action,
     "derived needs candidate was incorrectly presented as cancellable")
 T.contains(needRow.detail, "DERIVED / NOT QUEUED",
     "derived candidate did not explain why it cannot be cancelled")
+
+local providerRow
+local rejectionRow
+for _, row in ipairs(rows) do
+    if row.key == "task_brain_provider:work" then providerRow = row end
+    if row.key == "task_brain_provider_rejection:work:WORKER_NOT_AT_HOME" then
+        rejectionRow = row
+    end
+end
+T.truthy(providerRow, "task tab omitted work-provider diagnostics")
+T.contains(providerRow.detail, "QUEUED/WAITING 2",
+    "provider diagnostics omitted the assignable queue count")
+T.contains(providerRow.detail, "ELIGIBLE 0",
+    "provider diagnostics omitted the eligible count")
+T.truthy(rejectionRow, "task tab omitted the worker gate reason")
+T.contains(rejectionRow.label, "WORKER NOT AT HOME",
+    "task tab did not humanize the worker gate reason")
+local sampleRow
+for _, row in ipairs(rows) do
+    if row.key == "task_brain_provider_sample:work:work:corpse-2" then
+        sampleRow = row
+    end
+end
+T.truthy(sampleRow, "task tab omitted the blocked order sample")
+T.contains(sampleRow.label, "CORPSE HAUL",
+    "task tab did not identify the blocked operation")
 
 T.truthy(Task.OnRow(window, corpseRow),
     "target task tab did not open cancellation confirmation")

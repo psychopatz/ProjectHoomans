@@ -78,9 +78,10 @@ local function isPlayerOwned(record)
         or false
 end
 
-local function findNPCBandage(record)
+local function findNPCBandage(record, requestedType)
     local inv
     local types
+    local searchTypes
     local i
     local item
     local stack
@@ -88,10 +89,16 @@ local function findNPCBandage(record)
     inv = Inventory and Inventory.EnsureRecordInventory
         and Inventory.EnsureRecordInventory(record) or record.inventory
     types = bandageTypes()
-    for i = 1, #types do
+    if requestedType ~= nil then
+        if not isBandageType(requestedType) then return nil end
+        searchTypes = { tostring(requestedType) }
+    else
+        searchTypes = types
+    end
+    for i = 1, #searchTypes do
         for _, item in pairs(inv and inv.items or {}) do
             stack = item and tonumber(item.stack) or 1
-            if item and tostring(item.type or "") == tostring(types[i])
+            if item and tostring(item.type or "") == tostring(searchTypes[i])
                 and stack > 0
             then
                 return {
@@ -225,7 +232,7 @@ function Treatment.GetNPCBandagePlan(record, options)
             requiresItem = false,
         }
     end
-    supply = findNPCBandage(record)
+    supply = findNPCBandage(record, options and options.bandageType)
     if not supply then return nil end
     supply.mode = policy.mode
     supply.requiresItem = true
@@ -297,7 +304,7 @@ function Treatment.TryNPCMedicalTreatment(actorRecord, targetRecord, partId, opt
     end
     policy = Treatment.GetNPCMedicalPolicy(actorRecord, options)
     if policy.requiresItem then
-        supply = findNPCBandage(actorRecord)
+        supply = findNPCBandage(actorRecord, options.bandageType)
         if not supply then return false, "missing_bandage" end
         consumed, undo = consumeNPCBandage(
             actorRecord,
@@ -359,6 +366,8 @@ function Treatment.BuildMedicalCareSnapshot(record)
         partId = state.partId,
         bump = state.bump,
         lootPosition = state.lootPosition,
+        bandageType = state.bandageType,
+        bandageName = state.bandageName,
         startedAt = state.startedAt,
         finishAt = state.finishAt,
         revision = state.revision,

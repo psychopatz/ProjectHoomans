@@ -28,6 +28,7 @@ Service.PreparationHandlers = Service.PreparationHandlers or {}
 Service.CollectionHandlers = Service.CollectionHandlers or {}
 Service.TargetProviders = Service.TargetProviders or {}
 Service.ExecutionHandlers = Service.ExecutionHandlers or {}
+Service.AbstractExecutionHandlers = Service.AbstractExecutionHandlers or {}
 Service.ReconcileHandlers = Service.ReconcileHandlers or {}
 Service.ClaimsByStation = Service.ClaimsByStation or {}
 Service.ClaimsByWorker = Service.ClaimsByWorker or {}
@@ -124,45 +125,68 @@ local function markAssignmentDirty(order, cause)
 end
 
 local function workerAvailable(record, order)
-    if not record or record.alive == false or not belongsToOrder(record, order) then
-        return false
+    if not record then return false, "WORKER_NOT_FOUND" end
+    if record.alive == false then return false, "WORKER_DEAD" end
+    if not belongsToOrder(record, order) then
+        return false, "ORDER_OWNERSHIP_MISMATCH"
+    end
+    if order.operation == "PROVISION_PICKUP" and isFollowing(record) then
+        return false, "FOLLOWING_DURING_PROVISION"
+    end
+    -- Follow is a direct player order. Automatic colony work must not steal a
+    -- follower, even when the player happens to be inside the home zone. A
+    -- manually forced order is explicit and may still override follow.
+    if order.manual ~= true and isFollowing(record) then
+        return false, "FOLLOWING_ACTIVE"
     end
     if order.requiredWorkerId
         and tostring(order.requiredWorkerId) ~= tostring(record.id)
     then
-        return false
+        return false, "REQUIRED_WORKER_MISMATCH"
     end
-    if order.operation == "PROVISION_PICKUP" and isFollowing(record) then
-        return false
+    if Service.ClaimsByWorker[tostring(record.id)] then
+        return false, "WORKER_ALREADY_CLAIMED"
     end
-    if Service.ClaimsByWorker[tostring(record.id)] then return false end
     local runtime = record.runtime
-    if runtime and runtime.workOrderId then return false end
+    if runtime and runtime.workOrderId then
+        return false, "WORKER_ALREADY_HAS_ORDER"
+    end
     if PNC.HomeDutyService and PNC.HomeDutyService.IsReturningHome
         and PNC.HomeDutyService.IsReturningHome(record, order.baseId)
     then
-        return false
+        return false, "WORKER_RETURNING_HOME"
     end
     local job = Definitions.JOB_BY_OPERATION[order.operation]
     -- Colony jobs are opt-out. Archetype tables predate colony production and
     -- therefore missing keys must mean allowed, not disabled.
     if job and order.manual ~= true
         and not WorkPolicy.CanAutoClaim(record, job)
-    then return false end
+    then return false, "JOB_DISABLED" end
     if startsAtHome(order) and PNC.HomeDutyService
         and PNC.HomeDutyService.IsAtHome
         and not PNC.HomeDutyService.IsAtHome(record, order.baseId)
     then
-        return false
+        return false, "WORKER_NOT_AT_HOME"
     end
-    if Definitions.REQUIRES_LIVE and Definitions.REQUIRES_LIVE[order.operation]
+    local executionPolicy = Definitions.ExecutionPolicy
+        and Definitions.ExecutionPolicy(order.operation)
+        or Definitions.REQUIRES_LIVE and Definitions.REQUIRES_LIVE[order.operation]
+            and "LIVE_ONLY" or "ABSTRACT_SAFE"
+    if executionPolicy == "LIVE_ONLY"
         and (not PNC.Registry or not PNC.Registry.GetLiveZombie
             or not PNC.Registry.GetLiveZombie(record.id))
     then
-        return false
+        return false, "LIVE_BODY_REQUIRED"
     end
-    if not recipeKnowledgeMet(record, order) then return false end
-    return requirementsMet(record, order.requiredSkills)
+    if not recipeKnowledgeMet(record, order) then
+        return false, "RECIPE_KNOWLEDGE_MISSING"
+    end
+    local requirementsOK, requirementsReason = requirementsMet(
+        record, order.requiredSkills)
+    if not requirementsOK then
+        return false, requirementsReason or "REQUIRED_SKILL_MISSING"
+    end
+    return true
 end
 
 local function findWorker(order)
@@ -187,7 +211,8 @@ local function findWorker(order)
             and recipeKnowledgeMet(record, order)
             and requirementsMet(record, order.requiredSkills)
         if not eligible then return end
-        if workerAvailable(record, order) then
+        local available, availableReason = workerAvailable(record, order)
+        if available then
             local score = specializationScore(record, order)
             local recordId = tostring(record.id or "")
             if not selected or score > selectedScore
@@ -195,7 +220,10 @@ local function findWorker(order)
             then
                 selected, selectedScore, selectedId = record, score, recordId
             end
-        elseif not away then
+        elseif availableReason ~= "FOLLOWING_ACTIVE"
+            and availableReason ~= "FOLLOWING_DURING_PROVISION"
+            and not away
+        then
             away = record
         end
     end
@@ -245,6 +273,13 @@ function Service.RegisterExecution(operation, handler)
     operation = tostring(operation or "")
     if operation == "" or type(handler) ~= "function" then return false end
     Service.ExecutionHandlers[operation] = handler
+    return true
+end
+
+function Service.RegisterAbstractExecution(operation, handler)
+    operation = tostring(operation or "")
+    if operation == "" or type(handler) ~= "function" then return false end
+    Service.AbstractExecutionHandlers[operation] = handler
     return true
 end
 

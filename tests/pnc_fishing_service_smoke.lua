@@ -10,6 +10,7 @@ local records = {
     npc = {
         id = "npc", alive = true, recruited = true,
         x = 1.5, y = 1.5, z = 0, presenceState = "abstract",
+        equipment = { primaryFullType = "Base.FishingRod" },
     },
 }
 local squares = {}
@@ -145,6 +146,10 @@ T.equal(shapedZone.geometry, selectedRegion,
 
 local lease = { npcId = "npc", leaseId = "lease:fishing", executionMode = "ABSTRACT" }
 T.truthy(Service.StartJob(lease), "abstract fishing start")
+T.equal(Service.GetJob("npc").activityItemFullType, "Base.FishingRod",
+    "fishing job captures the equipped rod")
+T.equal(records.npc.runtime.fishing.activityItemFullType, "Base.FishingRod",
+    "fishing runtime exposes the equipped rod")
 now = 12000
 local ticked, _, tickReason = Service.TickJob(lease)
 T.truthy(ticked, tickReason or "abstract fishing tick")

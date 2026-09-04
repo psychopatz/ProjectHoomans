@@ -47,7 +47,9 @@ function Service.QueueReconstruct(player, facility, change)
             facilityId = facility.id, change = change,
             storageId = context.storage.id, materialKind = change.action,
             materialRole = component and component.role or change.role,
-            materialCount = count, recipeRevision = revision },
+            materialCount = count, recipeRevision = revision,
+            activityItemFullType = Internal.ActivityItemFullType(
+                requirements, reservation) },
             context.storage.id, reservation.id, "component_construction")
     end
     local requiredWork = definition and definition.reconstructWork or 60

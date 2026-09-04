@@ -307,9 +307,93 @@ local function play(body, sound, mode, options)
     return handle, profile
 end
 
+local function playAt(snapshot, sound, mode, options)
+    local profile
+    local alias
+    local world
+    local emitter
+    local handle
+    local x
+    local y
+    local z
+    local radius
+    local volume
+    local stressHumans
+    local ok
+    if isServerRuntime() or type(snapshot) ~= "table" then
+        return 0, nil
+    end
+    options = options or {}
+    profile = options.profile or Voice.GetProfile(snapshot, nil)
+    if not profile then return 0, nil end
+    alias = resolveAlias(profile, sound)
+    x = math.floor(tonumber(snapshot.x) or 0)
+    y = math.floor(tonumber(snapshot.y) or 0)
+    z = math.floor(tonumber(snapshot.z) or 0)
+    if not alias or not getWorld then return 0, profile end
+    ok, world = pcall(getWorld)
+    if not ok or not world or not world.getFreeEmitter then
+        return 0, profile
+    end
+    ok, emitter = pcall(
+        world.getFreeEmitter,
+        world,
+        x + 0.5,
+        y + 0.5,
+        z
+    )
+    if not ok or not emitter then return 0, profile end
+    if emitter.playSoundImpl then
+        ok, handle = pcall(
+            emitter.playSoundImpl,
+            emitter,
+            alias,
+            nil
+        )
+    elseif emitter.playSound then
+        ok, handle = pcall(emitter.playSound, emitter, alias)
+    end
+    if not ok or not handle or handle == 0 then
+        return 0, profile
+    end
+    applyVoiceParameters(emitter, handle, profile)
+    if mode == Voice.MODE_WORLD
+        and WorldSoundManager
+        and WorldSoundManager.instance
+        and WorldSoundManager.instance.addSound
+    then
+        radius = math.max(
+            0,
+            math.floor(tonumber(options.radius) or Voice.DEFAULT_WORLD_RADIUS)
+        )
+        volume = math.max(
+            0,
+            math.floor(tonumber(options.volume) or Voice.DEFAULT_WORLD_VOLUME)
+        )
+        stressHumans = options.stressHumans
+        if stressHumans == nil then
+            stressHumans = Voice.DEFAULT_STRESS_HUMANS
+        else
+            stressHumans = stressHumans == true
+        end
+        pcall(
+            WorldSoundManager.instance.addSound,
+            WorldSoundManager.instance,
+            nil,
+            x,
+            y,
+            z,
+            radius,
+            volume,
+            stressHumans
+        )
+    end
+    return handle, profile
+end
+
 function Voice.GetProfile(snapshot, body)
-    if isServerRuntime() or not body then return nil end
-    local profile = PROFILE_BY_BODY[body]
+    if isServerRuntime() or (not body and not snapshot) then return nil end
+    local profile = body and PROFILE_BY_BODY[body] or nil
     local seed = getSeed(snapshot, body)
     local isFemale = getGender(snapshot, body)
     local snapshotHasSeed = snapshot
@@ -335,7 +419,7 @@ function Voice.GetProfile(snapshot, body)
     if profile and profile.cacheKey == fresh.cacheKey then
         return profile
     end
-    PROFILE_BY_BODY[body] = fresh
+    if body then PROFILE_BY_BODY[body] = fresh end
     return fresh
 end
 
@@ -363,6 +447,10 @@ end
 
 function Voice.PlayWorld(body, sound, options)
     return play(body, sound, Voice.MODE_WORLD, options)
+end
+
+function Voice.PlayWorldAt(snapshot, sound, options)
+    return playAt(snapshot, sound, Voice.MODE_WORLD, options)
 end
 
 function Voice.Play(body, sound, mode, options)

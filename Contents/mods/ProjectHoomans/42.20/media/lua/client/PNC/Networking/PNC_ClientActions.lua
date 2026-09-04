@@ -407,6 +407,110 @@ function Client.SendBandage(npcId, partId, debugFree, bandageType)
     return PNCBandageAction.Queue(player, npcId, partId, debugFree, bandageType)
 end
 
+local function commandRecord(npcId, context)
+    local record = npcId and Registry and Registry.Get
+        and Registry.Get(npcId) or nil
+    if not record and npcId and ClientState and ClientState.snapshots then
+        record = ClientState.snapshots[tostring(npcId)]
+    end
+    if record then return record end
+    if type(context) == "table" then
+        return context.record or context.source or context.snapshot
+            or context.target and context.target.source
+            or context.target
+    end
+    return nil
+end
+
+local function isCampEmoteContext(context)
+    return type(context) == "table"
+        and tostring(context.origin or "") == "companion_emote"
+end
+
+local function showCampRejection(player, npcId, reason, context, record)
+    local presentation = PNC.CompanionCommandPresentation
+    local actor
+    local presentationContext
+    if tostring(reason or "") ~= "camp_requires_building" then
+        return false
+    end
+    if not presentation then
+        pcall(require, "PNC/Commands/PNC_CompanionCommandPresentation")
+        presentation = PNC.CompanionCommandPresentation
+    end
+    if not presentation or not presentation.ShowCommandRejection then
+        return false
+    end
+    actor = npcId and Registry and Registry.GetLiveZombie
+        and Registry.GetLiveZombie(npcId) or nil
+    presentationContext = type(context) == "table" and context or {}
+    presentationContext.target = presentationContext.target or record
+    presentationContext.playerActor = player
+    presentation.ShowCommandRejection(
+        player,
+        actor,
+        "camp",
+        reason,
+        presentationContext
+    )
+    return true
+end
+
+local function rejectUnsafeCampLocally(player, npcId, scope, context)
+    local commands = PNC.CompanionCommands
+    local record = commandRecord(npcId, context)
+    local radius = tonumber(Const.COMPANION_COMMAND_RADIUS) or 20
+    local allowed
+    local reason
+    local hasTarget = false
+    local hasSafeTarget = false
+    if not commands or not commands.CanApply then return false end
+    if npcId ~= nil then
+        if not record then return false end
+        if commands.CanPlayerCommand
+            and commands.CanPlayerCommand(record, player, radius) ~= true
+        then
+            return false
+        end
+        allowed, reason = commands.CanApply(record, player, "camp")
+        if allowed == true then return false end
+        if not isCampEmoteContext(context) then
+            showCampRejection(player, npcId, reason, context, record)
+        end
+        return reason == "camp_requires_building"
+    end
+    if string.lower(tostring(scope or "")) ~= "group"
+        or not Registry or not Registry.ForEach
+    then
+        return false
+    end
+    Registry.ForEach(function(candidate)
+        local playerCommandable = true
+        local candidateAllowed
+        local candidateReason
+        if commands.CanPlayerCommand then
+            playerCommandable = commands.CanPlayerCommand(
+                candidate, player, radius
+            ) == true
+        end
+        if not playerCommandable then return end
+        hasTarget = true
+        candidateAllowed, candidateReason = commands.CanApply(
+            candidate, player, "camp"
+        )
+        if candidateAllowed == true then
+            hasSafeTarget = true
+        elseif candidateReason ~= "camp_requires_building" then
+            hasSafeTarget = true
+        end
+    end)
+    if not hasTarget or hasSafeTarget then return false end
+    if not isCampEmoteContext(context) then
+        showCampRejection(player, nil, "camp_requires_building", context, nil)
+    end
+    return true
+end
+
 function Client.SendCompanionCommand(commandID, npcId, scope, context)
     local player = getSpecificPlayer and getSpecificPlayer(0) or nil
     local args
@@ -417,7 +521,16 @@ function Client.SendCompanionCommand(commandID, npcId, scope, context)
             status = "rejected",
             reason = "invalid_player_or_command",
         })
-        return false
+        return false, "invalid_player_or_command"
+    end
+    if tostring(commandID or "") == "camp"
+        and rejectUnsafeCampLocally(player, npcId, scope, context)
+    then
+        traceCompanionCommand(commandID, npcId, scope, context, {
+            status = "rejected",
+            reason = "camp_requires_building",
+        })
+        return false, "camp_requires_building"
     end
     args = {
         commandID = tostring(commandID),
@@ -425,7 +538,10 @@ function Client.SendCompanionCommand(commandID, npcId, scope, context)
         scope = scope and tostring(scope) or nil,
         radius = tonumber(Const.COMPANION_COMMAND_RADIUS) or 20,
         requestID = type(context) == "table" and context.requestID or nil,
-        commandSource = type(context) == "table" and context.source or nil,
+        commandSource = type(context) == "table"
+            and (context.commandSource or context.source or context.origin)
+            or nil,
+        dialogueID = type(context) == "table" and context.dialogueID or nil,
     }
     if Core.IsClientOnly and Core.IsClientOnly() then
         if not sendClientCommand then
@@ -433,7 +549,7 @@ function Client.SendCompanionCommand(commandID, npcId, scope, context)
                 status = "rejected",
                 reason = "network_api_unavailable",
             })
-            return false
+            return false, "network_api_unavailable"
         end
         sendClientCommand(
             player,
@@ -444,15 +560,28 @@ function Client.SendCompanionCommand(commandID, npcId, scope, context)
         traceCompanionCommand(commandID, npcId, scope, context, {
             status = "network_queued",
         })
-        return true
+        return true, "network_queued"
     end
-    local affected = PNC.CompanionCommands.Execute(player, args)
+    local affected, reason, affectedTargets =
+        PNC.CompanionCommands.Execute(player, args)
     local succeeded = (tonumber(affected) or 0) > 0
+    if not succeeded and reason == "camp_requires_building"
+        and not isCampEmoteContext(context)
+    then
+        showCampRejection(
+            player,
+            npcId,
+            reason,
+            context,
+            commandRecord(npcId, context)
+        )
+    end
     traceCompanionCommand(commandID, npcId, scope, context, {
         status = succeeded and "applied" or "rejected",
         affected = tonumber(affected) or 0,
+        reason = reason,
     })
-    return succeeded
+    return succeeded, reason, affectedTargets
 end
 
 function Client.ExecuteLLMSocialReaction(npcID, kind, intensity, context)

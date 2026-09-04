@@ -6,6 +6,7 @@ local source = assert(io.open(
 local providers = {
     "PNC_Equipment_Descriptors",
     "PNC_Equipment_VisualState",
+    "PNC_Equipment_ActivityHands",
     "PNC_Equipment_Worn",
     "PNC_Equipment_Attached",
     "PNC_Equipment_Hands",

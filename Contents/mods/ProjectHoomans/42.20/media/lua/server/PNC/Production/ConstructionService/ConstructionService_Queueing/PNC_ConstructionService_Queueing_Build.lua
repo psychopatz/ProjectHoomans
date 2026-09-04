@@ -33,7 +33,9 @@ function Service.QueueBuild(player, facility, definition)
     local payload = PNC.WorkInputService.Bind({ mode = "build",
         facilityId = facility.id, storageId = context.storage.id,
         materialKind = "build", recipeRevision =
-            Internal.RecipeRevisionFor(definition, facility, "build") },
+            Internal.RecipeRevisionFor(definition, facility, "build"),
+        activityItemFullType = Internal.ActivityItemFullType(
+            requirements, reservation) },
         context.storage.id, reservation.id, "construction_materials")
     local order
     order, reason = PNC.WorkService.Commands.Queue({ operation = "CONSTRUCT",

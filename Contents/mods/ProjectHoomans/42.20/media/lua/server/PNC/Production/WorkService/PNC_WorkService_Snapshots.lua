@@ -15,6 +15,11 @@ local copy = Internal.copy
 local workLocationState = Internal.workLocationState
 local locationPolicy = Internal.locationPolicy
 
+local CoreInventory = require
+    "PsychopatzCore/Inventory/PsychopatzInventory"
+local InventoryConstants = require
+    "PsychopatzCore/Inventory/PsychopatzInventoryConstants"
+
 local function provisionItemFullType(payload)
     if type(payload) ~= "table" then return nil end
     local direct = tostring(payload.activityItemFullType or "")
@@ -26,6 +31,70 @@ local function provisionItemFullType(payload)
         if fullType ~= "" then return fullType end
     end
     return nil
+end
+
+local function recordFullType(record)
+    local direct = tostring(record and (record.fullType
+        or record.itemFullType or "") or "")
+    if direct ~= "" then return direct end
+    local typeId = type(record) == "table"
+        and record[InventoryConstants.TYPE_ID] or nil
+    if typeId == nil then return nil end
+    local ok, fullType = pcall(
+        CoreInventory.getItemFullType, typeId)
+    fullType = ok and tostring(fullType or "") or ""
+    return fullType ~= "" and fullType or nil
+end
+
+local function stagedInputItemFullType(payload)
+    local input = type(payload) == "table" and payload.input or nil
+    if type(input) ~= "table" or input.staged ~= true then return nil end
+    for index = 1, #(input.records or {}) do
+        local fullType = recordFullType(input.records[index])
+        if fullType then return fullType end
+    end
+    return nil
+end
+
+local function constructionItemFullType(payload)
+    if type(payload) ~= "table" then return nil end
+    local direct = tostring(payload.activityItemFullType or "")
+    if direct ~= "" then return direct end
+    return stagedInputItemFullType(payload)
+end
+
+local function constructionOperation(operation)
+    return operation == "CONSTRUCT"
+        or operation == "RECONSTRUCT"
+        or operation == "DECONSTRUCT"
+        or operation == "BUILD_OBJECT"
+end
+
+local function productionOperation(operation)
+    return operation == "CRAFT" or operation == "DISASSEMBLE"
+end
+
+local function productionItemFullType(payload, operation)
+    if type(payload) ~= "table" then return nil end
+    if operation == "CRAFT" then
+        local direct = tostring(payload.activityItemFullType or "")
+        if direct ~= "" then return direct end
+        return stagedInputItemFullType(payload)
+    end
+    local staged = stagedInputItemFullType(payload)
+    if staged then return staged end
+    local specimen = tostring(payload.specimenFullType or "")
+    return specimen ~= "" and specimen or nil
+end
+
+local function lumberItemFullType(record)
+    local lumber = record and record.runtime
+        and record.runtime.lumber or nil
+    local direct = tostring(lumber and lumber.activityItemFullType or "")
+    if direct ~= "" then return direct end
+    local diagnostic = lumber and lumber.tool or nil
+    direct = tostring(diagnostic and diagnostic.selectedFullType or "")
+    return direct ~= "" and direct or nil
 end
 
 function Service.Queries.BuildTaskSnapshot(colonyId)
@@ -42,6 +111,13 @@ function Service.Queries.BuildTaskSnapshot(colonyId)
             local activityItemFullType
             if order.operation == "PROVISION_PICKUP" then
                 activityItemFullType = provisionItemFullType(payload)
+            elseif productionOperation(order.operation) then
+                activityItemFullType = productionItemFullType(payload,
+                    order.operation)
+            elseif constructionOperation(order.operation) then
+                activityItemFullType = constructionItemFullType(payload)
+            elseif order.operation == "LUMBER" then
+                activityItemFullType = lumberItemFullType(worker)
             end
             local required = math.max(1, tonumber(order.requiredWork) or 1)
             local progress = math.max(0, math.min(required,
@@ -176,6 +252,13 @@ function Service.BuildActionInformation(record)
     local activityItemFullType
     if order.operation == "PROVISION_PICKUP" then
         activityItemFullType = provisionItemFullType(payload)
+    elseif productionOperation(order.operation) then
+        activityItemFullType = productionItemFullType(payload,
+            order.operation)
+    elseif constructionOperation(order.operation) then
+        activityItemFullType = constructionItemFullType(payload)
+    elseif order.operation == "LUMBER" then
+        activityItemFullType = lumberItemFullType(record)
     end
     local lumber = order.operation == "LUMBER" and record.runtime
         and record.runtime.lumber or nil

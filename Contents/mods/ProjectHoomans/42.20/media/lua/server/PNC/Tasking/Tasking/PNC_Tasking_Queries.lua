@@ -6,11 +6,40 @@ local Priority = PNC.TaskPriority
 local Leases = PNC.TaskLeaseService
 local ScalingDiagnostics = PNC.PerformanceScalingDiagnostics
 local H = Tasking.Internal
+local providerDiagnosticCache = {}
+local PROVIDER_DIAGNOSTICS_CACHE_MS = 1000
 
 function Tasking.Queries.GetLease(npcId) return H.Copy(Leases.ForNPC(npcId)) end
 
 local function now()
     return PNC.Core and PNC.Core.Now and PNC.Core.Now() or 0
+end
+
+local function providerDiagnostics(npcId)
+    npcId = tostring(npcId or "")
+    local at = now()
+    local cached = providerDiagnosticCache[npcId]
+    if cached and at - cached.at < PROVIDER_DIAGNOSTICS_CACHE_MS then
+        return H.Copy(cached.value)
+    end
+    local output = {}
+    for providerID, provider in pairs(Tasking.Providers or {}) do
+        if type(provider.GetDiagnostics) == "function" then
+            local context = { npcId = npcId, domain = providerID }
+            local ok, report, reason = H.SafeCall(
+                "provider_get_diagnostics", provider.GetDiagnostics,
+                context, npcId)
+            if ok and type(report) == "table" then
+                output[providerID] = H.Copy(report)
+            else
+                output[providerID] = {
+                    unavailable = reason or "PROVIDER_DIAGNOSTICS_FAILED",
+                }
+            end
+        end
+    end
+    providerDiagnosticCache[npcId] = { at = at, value = H.Copy(output) }
+    return output
 end
 
 local function sourceRevision(item)
@@ -114,6 +143,7 @@ function Tasking.Queries.BuildBrain(npcId, limit)
         eventType = diagnostics and diagnostics.eventType or nil,
         providerFailures = diagnostics
             and H.Copy(diagnostics.providerFailures) or {},
+        providerDiagnostics = providerDiagnostics(npcId),
     }
 end
 

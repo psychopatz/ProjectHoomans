@@ -6,6 +6,39 @@ PNC = PNC or {}
 local Commands = PNC.CompanionCommands
 local Const = PNC.Const
 
+local function currentPosition(record)
+    local zombie = record and record.id and PNC.Registry
+        and PNC.Registry.GetLiveZombie
+        and PNC.Registry.GetLiveZombie(record.id) or nil
+    if zombie and (not zombie.isDead or not zombie:isDead()) then
+        return zombie:getX(), zombie:getY(), zombie:getZ()
+    end
+    return tonumber(record and record.x) or 0,
+        tonumber(record and record.y) or 0,
+        tonumber(record and record.z) or 0
+end
+
+local function playerCampEligibility(record)
+    local query = PNC.TraversalQuery
+    local x
+    local y
+    local z
+    local square
+    local indoor
+    if not query or type(query.GetSquare) ~= "function"
+        or type(query.GetInteriorState) ~= "function"
+    then
+        return false, "camp_requires_building"
+    end
+    x, y, z = currentPosition(record)
+    square = query.GetSquare(x, y, z)
+    indoor = query.GetInteriorState(square)
+    if indoor ~= true then
+        return false, "camp_requires_building"
+    end
+    return true, "camp_inside_building"
+end
+
 Commands.RegisterGroup({
     id = "movement",
     nested = false,
@@ -33,18 +66,6 @@ local function followOrder(_, player)
         ownerUsername = player.getUsername and player:getUsername() or nil,
         ownerOnlineID = player.getOnlineID and player:getOnlineID() or nil,
     }
-end
-
-local function currentPosition(record)
-    local zombie = record and record.id and PNC.Registry
-        and PNC.Registry.GetLiveZombie
-        and PNC.Registry.GetLiveZombie(record.id) or nil
-    if zombie and (not zombie.isDead or not zombie:isDead()) then
-        return zombie:getX(), zombie:getY(), zombie:getZ()
-    end
-    return tonumber(record and record.x) or 0,
-        tonumber(record and record.y) or 0,
-        tonumber(record and record.z) or 0
 end
 
 local function manualActivity(record, capability)
@@ -120,9 +141,10 @@ Commands.Register({
     group = "movement",
     labelKey = "UI_PNC_CommandCamp",
     label = "Camp Here",
-    llmDescription = "Order this companion to stop following and make a temporary camp at their current location. Use for requests such as 'let's just stay here for now', 'make camp', or 'rest here'. Unlike Wait Here, camp allows the companion to satisfy needs such as sleep, food, and water without requiring a home.",
+    llmDescription = "Order this companion to stop following and make a temporary camp at their current location. Player-issued camps require the companion to be inside a building. NPC faction AI may override that restriction for its own camps. Use for requests such as 'let's just stay here for now', 'make camp', or 'rest here'. Unlike Wait Here, camp allows the companion to satisfy needs such as sleep, food, and water without requiring a home.",
     emote = "freeze",
     icon = "media/ui/Emotes/PNC_EmoteStay.png",
+    canApply = playerCampEligibility,
     buildOrder = function(record)
         local x, y, z = currentPosition(record)
         return {

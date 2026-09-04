@@ -30,6 +30,7 @@ local fluid = {
 local waterItem = {
     isWaterSource = function() return true end,
     getFluidContainer = function() return fluid end,
+    getFullType = function() return "Base.WateringCan" end,
     syncItemFields = function(self) self.synced = true end,
 }
 
@@ -91,6 +92,12 @@ getCell = function()
 end
 
 PNC = {
+    Core = { Now = function() return 1000 end },
+    FarmingService = { Internal = {
+        BaseFor = function()
+            return { factionId = "f1", colonyId = "c1" }
+        end,
+    } },
     Farming = {
         RectangleInfo = function()
             return true, nil, {
@@ -128,6 +135,43 @@ T.falsy(string.find(source, "pcall", 1, true),
 
 local Adapter = T.load("ProjectHoomans", "server",
     "PNC/Farming/PNC_PZFarmingAdapter.lua")
+PNC.ColonyStorageRepository = {
+    GetPrimary = function() return { id = "storage-1" } end,
+}
+PNC.ColonyStorageService = {
+    ReserveProductionMaterials = function(storageId, requirements)
+        T.equal(storageId, "storage-1", "farming material storage")
+        T.equal(requirements[1].itemTypes[1], "Base.TomatoSeed",
+            "farming material request")
+        return {
+            id = "reservation-1",
+            requirements = {{ selectedType = "Base.TomatoSeed" }},
+        }
+    end,
+    CollectProductionReservation = function()
+        return true, { records = {}, itemIds = {} }
+    end,
+    ReleaseProductionReservation = function() return true end,
+}
+local farmingMaterials = T.load("ProjectHoomans", "server",
+    "PNC/Farming/FarmingService/PNC_FarmingService_Materials.lua")
+local seedRuntime = {}
+T.truthy(farmingMaterials.EnsureSeed(record, nil, {
+    seedTypes = { "Base.CabbageSeed" },
+}, seedRuntime), "existing seed is selected")
+T.equal(seedRuntime.activityItemFullType, "Base.CabbageSeed",
+    "existing seed exposes its full type")
+local waterRuntime = {}
+T.truthy(farmingMaterials.EnsureWater(record, nil, waterRuntime, body),
+    "existing water container is selected")
+T.equal(waterRuntime.activityItemFullType, "Base.WateringCan",
+    "existing water container exposes its full type")
+local retrievedRuntime = {}
+T.truthy(farmingMaterials.RetrieveMaterial(record, { id = "farm-1" }, {
+    "Base.TomatoSeed",
+}, retrievedRuntime), "reserved farming material is collected")
+T.equal(retrievedRuntime.activityItemFullType, "Base.TomatoSeed",
+    "collected farming material keeps the reserved full type")
 local component = { region = {} }
 local tile = { x = 10, y = 20, z = 0 }
 

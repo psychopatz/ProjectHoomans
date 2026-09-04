@@ -51,6 +51,9 @@ local NPC_BODY_INDEX = {
     buckets = {},
 }
 
+-- TurnAlerted is still a vanilla engine transition. PNC no longer produces,
+-- suppresses, or resets it, but the client aggro lane must not claim a zombie
+-- while that engine-owned transition is active.
 local ACTION_OWNED_ELSEWHERE = {
     bumped = true,
     climbfence = true,

@@ -24,10 +24,12 @@ T.contains(auditSource, "Lifecycle.CreateVanillaCorpse",
     "body audit uses the canonical corpse conversion entry point")
 T.falsy(auditSource:find("CreateInertCorpse", 1, true),
     "body audit has no removed corpse compatibility alias")
-T.contains(corpseSource, "zombie:becomeCorpseSilently()",
-    "corpse conversion uses the engine-owned handoff")
-T.falsy(corpseSource:find("IsoDeadBody.new", 1, true),
-    "corpse conversion has no direct-construction fallback")
+T.contains(corpseSource, "IsoDeadBody.new",
+    "corpse conversion uses the Build 42 engine constructor")
+T.falsy(corpseSource:find("becomeCorpseSilently", 1, true),
+    "corpse conversion does not call an unavailable engine method")
+T.contains(corpseSource, "Internal.announceCorpse(corpse)",
+    "corpse conversion explicitly owns multiplayer corpse replication")
 T.falsy(corpseSource:find("CreateInertCorpse", 1, true),
     "body lifecycle exposes no removed compatibility alias")
 

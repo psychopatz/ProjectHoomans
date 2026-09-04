@@ -12,6 +12,5 @@ require "PNC/Core/Pathing/PNC_PathService/Lane/PNC_PathService_Lane_StateDefault
 require "PNC/Core/Pathing/PNC_PathService/Lane/PNC_PathService_Lane_StateOwnership"
 require "PNC/Core/Pathing/PNC_PathService/Lane/PNC_PathService_Lane_State"
 require "PNC/Core/Pathing/PNC_PathService/Lane/PNC_PathService_Lane_NativeGoalBlock"
-require "PNC/Core/Pathing/PNC_PathService/Lane/PNC_PathService_Lane_VehicleGoalBlock"
 require "PNC/Core/Pathing/PNC_PathService/Lane/PNC_PathService_Lane_GoalState"
 require "PNC/Core/Pathing/PNC_PathService/Lane/PNC_PathService_Lane_Intent"

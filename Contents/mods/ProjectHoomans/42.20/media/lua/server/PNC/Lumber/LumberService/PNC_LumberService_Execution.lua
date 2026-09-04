@@ -15,8 +15,10 @@ local expireClaims = Internal.ExpireClaims
 local resolveAbstractTool = Internal.ResolveAbstractTool
 local resolveLiveTool = Internal.ResolveLiveTool
 local toolDiagnostic = Internal.ToolDiagnostic
+local toolFullType = Internal.ToolFullType
 local persistLiveToolCondition = Internal.PersistLiveToolCondition
 local skillRate = Internal.SkillRate
+local WorldEffects = PNC.WorldEffectService
 
 local function adjacentToTree(body, tree)
     if not body or not tree then return false end
@@ -118,10 +120,12 @@ local function tickLive(job, record, body, tree, at)
     faceTree(body, tree)
     local tool, toolReason = resolveLiveTool(record, body)
     if not tool then
+        job.activityItemFullType = nil
         job.state, job.phase = "WAITING", "WAITING_FOR_TOOL"
         updateRuntime(record, job, tree)
         return true, false, toolReason
     end
+    job.activityItemFullType = toolFullType and toolFullType(tool.item) or nil
     if type(body.isEnduranceSufficientForAction) == "function" then
         local ok, enough = pcall(body.isEnduranceSufficientForAction, body)
         if ok and enough == false then
@@ -154,6 +158,7 @@ local function tickLive(job, record, body, tree, at)
     end
     local stillThere = Service.GetTreeAt(tree.x, tree.y, tree.z)
     if not stillThere or tonumber(tree.remainingWork) <= 0 then
+        job.activityItemFullType = nil
         stopChopAnimation(record, body)
         Service.CompleteTree(tree.key, "live")
         job.targetKey, job.approach, job.lastHitAt = nil, nil, nil
@@ -185,9 +190,34 @@ local function flushAbstractOutput(job, record)
         local ok = PNC.Inventory.AddItems(record, {
             { type = output.fullType, stack = output.quantity },
         }, "root", "lumber_abstract_output")
-        if ok then job.pendingOutput = nil; return true end
+        if ok then
+            job.pendingOutput = nil
+            return true
+        end
     end
     return false
+end
+
+local function ensureDeferredTreeEffect(tree)
+    if type(tree) ~= "table" then return nil end
+    if type(tree.worldEffect) == "table" then return tree.worldEffect end
+    local effectID = PNC.Core and PNC.Core.GenerateID
+        and PNC.Core.GenerateID("tree_remove")
+        or "tree_remove:" .. tostring(tree.key)
+    local effect = {
+        id = tostring(effectID), kind = "TREE_REMOVE", state = "PENDING",
+        treeKey = tree.key, x = tree.x, y = tree.y, z = tree.z,
+        signature = tree.signature,
+        identity = { treeKey = tree.key, signature = tree.signature },
+        createdAt = now(), updatedAt = now(), nextRetryAt = 0,
+    }
+    tree.worldEffect = effect
+    markDirty()
+    if WorldEffects and WorldEffects.MarkPending then
+        WorldEffects.MarkPending("LUMBER", tree, effect,
+            "TREE_CHUNK_LOADING")
+    end
+    return effect
 end
 
 local function tickAbstract(job, record, tree, at)
@@ -213,10 +243,12 @@ local function tickAbstract(job, record, tree, at)
     end
     local tool, toolReason = resolveAbstractTool(record)
     if not tool then
+        job.activityItemFullType = nil
         job.state, job.phase = "WAITING", "WAITING_FOR_TOOL"
         updateRuntime(record, job, tree)
         return true, false, toolReason
     end
+    job.activityItemFullType = tool.fullType
     local previous = tonumber(job.lastProgressAt) or at
     local elapsed = math.max(0, math.min(Service.ABSTRACT_MAX_ELAPSED_MS,
         at - previous))
@@ -229,6 +261,8 @@ local function tickAbstract(job, record, tree, at)
     updateAbstractToolWear(record, job, tool)
     markDirty()
     if tree.remainingWork <= 0 then
+        job.activityItemFullType = nil
+        local effect = ensureDeferredTreeEffect(tree)
         Service.CompleteTree(tree.key, "abstract")
         job.pendingOutput = {
             fullType = "Base.Log", quantity = tree.logYield,
@@ -297,6 +331,7 @@ local function tickJob(lease)
             return true, false, "scanning"
         end
         job.state, job.phase = "COMPLETED", "COMPLETE"
+        job.activityItemFullType = nil
         updateRuntime(record, job, nil)
         return true, true, "zone_exhausted"
     end

@@ -31,6 +31,8 @@ local tabsSource = T.read("ProjectHoomans", "client",
     "PNC/UI/Colonist/PNC_ColonistTabs.lua")
 local controllerSource = T.read("ProjectHoomans", "client",
     "PNC/UI/Colonist/PNC_ColonistController.lua")
+local selectorSource = T.read("ProjectHoomans", "client",
+    "PNC/UI/Colonist/PNC_ColonistSelector.lua")
 local windowSource = T.read("ProjectHoomans", "client",
     "PNC/UI/Colonist/PNC_ColonistWindow.lua")
 local compositionSource = T.read("ProjectHoomans", "client",
@@ -39,6 +41,10 @@ T.contains(registrySource, "Registry.Revision",
     "colonist registry has no dynamic injection revision")
 T.contains(controllerSource, "Selector.Create",
     "colonist shell has no reusable roster selector")
+T.contains(selectorSource, "ActivityPresentation.Current",
+    "colonist selector does not use canonical activity information")
+T.contains(selectorSource, "PNC_ColonistActivityPresentation",
+    "colonist selector does not import the activity formatter")
 T.contains(controllerSource, "SyncTabComponents",
     "colonist shell cannot initialize injected tab components")
 T.contains(tabsSource, "Presentation.BuildNeeds",

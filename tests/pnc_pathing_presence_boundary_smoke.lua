@@ -96,7 +96,6 @@ local expectedPathLaneCalls = {
     "PNC/Core/Pathing/PNC_PathService/Lane/PNC_PathService_Lane_StateOwnership",
     "PNC/Core/Pathing/PNC_PathService/Lane/PNC_PathService_Lane_State",
     "PNC/Core/Pathing/PNC_PathService/Lane/PNC_PathService_Lane_NativeGoalBlock",
-    "PNC/Core/Pathing/PNC_PathService/Lane/PNC_PathService_Lane_VehicleGoalBlock",
     "PNC/Core/Pathing/PNC_PathService/Lane/PNC_PathService_Lane_GoalState",
     "PNC/Core/Pathing/PNC_PathService/Lane/PNC_PathService_Lane_Intent",
 }
@@ -244,6 +243,7 @@ local traversalQueryCalls = capture(
 local expectedTraversalQueryCalls = {
     "PNC/Core/Pathing/TraversalQuery/PNC_TraversalQuery_Internal",
     "PNC/Core/Pathing/TraversalQuery/PNC_TraversalQuery_Squares",
+    "PNC/Core/Pathing/TraversalQuery/PNC_TraversalQuery_Interior",
     "PNC/Core/Pathing/TraversalQuery/PNC_TraversalQuery_Objects",
     "PNC/Core/Pathing/TraversalQuery/PNC_TraversalQuery_Fences",
     "PNC/Core/Pathing/TraversalQuery/PNC_TraversalQuery_Passages",

@@ -34,29 +34,6 @@ function Internal.captureIntentContext(record, lane, intent)
     lane.steeringKind = intent and intent.steeringKind or nil
 end
 
-local function consumeVehicleBlockedIntent(record, lane, intent)
-    Internal.captureIntentContext(record, lane, intent)
-    lane.pendingGoal = nil
-    lane.pendingGoalAt = 0
-    lane.cancelReason = "vehicle_path_blocked"
-    if lane.phase == "active" or lane.phase == "requested" then
-        Internal.setLanePhase(
-            record,
-            lane,
-            "cancel_pending",
-            "vehicle_path_blocked"
-        )
-    elseif lane.phase ~= "idle" and lane.phase ~= "cancel_pending" then
-        Internal.setLanePhase(
-            record,
-            lane,
-            "idle",
-            "vehicle_path_blocked"
-        )
-    end
-    return "vehicle_blocked"
-end
-
 local function consumeTraversalIntent(record, lane, intent, goalTolerance)
     local goal
     Internal.captureIntentContext(record, lane, intent)
@@ -152,9 +129,6 @@ function Internal.consumeMoveIntent(record, lane, zombie)
         return "hold"
     end
     goalTolerance = continuousGoalTolerance(intent)
-    if Internal.isVehicleBlockedGoal(lane, intent) then
-        return consumeVehicleBlockedIntent(record, lane, intent)
-    end
     if lane and lane.traversalAction then
         return consumeTraversalIntent(record, lane, intent, goalTolerance)
     end

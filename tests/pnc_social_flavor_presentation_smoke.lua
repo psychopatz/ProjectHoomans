@@ -95,6 +95,22 @@ T.equal(entries[1].kind, "social_flavor", "diary identifies reusable flavor")
 T.equal(entries[1].eventID, "social:event:one", "diary preserves event identity")
 
 Client.Reset()
+local diaryCountBeforeInteraction = #Diary.Get("npc-one")
+T.truthy(Client.Enqueue({
+    eventID = "emote:event:player",
+    text = "Let's camp here.",
+    family = "emote_interaction",
+    priority = 100,
+    weight = 100,
+    speakerID = "tester",
+    speakerKind = "player",
+    source = { kind = "emote_interaction" },
+}), "interaction line enters the shared queue")
+Client.Pump(now)
+T.equal(#Diary.Get("npc-one"), diaryCountBeforeInteraction,
+    "ambient presentation ignores queued player interaction lines")
+
+Client.Reset()
 received = nil
 local teammateAccepted = Presentation.Receive({
     eventID = "social:event:teammate",

@@ -29,6 +29,7 @@ function Service.StartJob(lease)
     job.leaseId, job.executionMode = lease.leaseId, tostring(lease.executionMode or "ABSTRACT")
     job.lastProgressAt = H.Now()
     job.state, job.phase = "READY", "WAITING"
+    job.activityItemFullType = H.FishingToolFullType(record)
     job.revision = (tonumber(job.revision) or 0) + 1
     H.UpdateFishingRuntime(record, job, zone, "WAITING")
     if PNC.OrderSystem and PNC.OrderSystem.SetOrder then

@@ -7,7 +7,6 @@ local ROOT = T.path("ProjectHoomans", "shared", "PNC/Core/")
 
 local now = 1000
 local faceCalls = 0
-local turnAlertedWrites = 0
 local targets = {}
 local forward = {
     getX = function() return 1 end,
@@ -49,9 +48,6 @@ local body = {
     faceLocation = function(_, x, y)
         faceCalls = faceCalls + 1
         targets[#targets + 1] = { x = x, y = y }
-    end,
-    setTurnAlertedValues = function()
-        turnAlertedWrites = turnAlertedWrites + 1
     end,
 }
 local record = {
@@ -97,9 +93,6 @@ T.truthy(
     "normal owner facing did not resume after ambient lease"
 )
 T.equal(faceCalls, 2, "owner facing was not restored after ambient lease")
-T.equal(turnAlertedWrites, 0,
-    "ambient facing re-armed vanilla turn-alerted state")
-
 local state = record.runtime.ambientFacing
 local function expectIneligible(label, mutate)
     state.activeUntil = 0

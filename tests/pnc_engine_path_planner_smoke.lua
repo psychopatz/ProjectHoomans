@@ -91,7 +91,6 @@ local wrapperRequestCount = 0
 local cancelCount = 0
 local resetCount = 0
 local updateCount = 0
-local turnAlertedCalls = 0
 local nextResult = BehaviorResult.Working
 local nextActionState = nil
 local body
@@ -150,9 +149,6 @@ body = {
     end,
     changeState = function(self, state)
         self.actionState = state and state.name or "idle"
-    end,
-    setTurnAlertedValues = function()
-        turnAlertedCalls = turnAlertedCalls + 1
     end,
     isUseless = function(self) return self.useless end,
     setUseless = function(self, value) self.useless = value == true end,
@@ -340,13 +336,10 @@ body.actionState = "turnalerted"
 T.equal(
     PNC.EnginePathPlanner.Internal.EnsureNativeMovementOwner(body),
     false,
-    "native owner did not leave vanilla turn-alerted state alone"
+    "native owner claimed the removed turn-alerted action"
 )
-T.equal(
-    turnAlertedCalls,
-    0,
-    "native planner never re-armed vanilla turn-alerted state"
-)
+T.equal(body.actionState, "turnalerted",
+    "native owner changed the vanilla turn-alerted state")
 body.actionState = "idle"
 
 local suppressedCount = 0
@@ -368,10 +361,10 @@ handled, state = PNC.EnginePathPlanner.Pump(
     "zombie_update"
 )
 T.truthy(handled, "native route did not survive a suppressed state")
-T.equal(body.actionState, "idle",
-    "turnalerted state retained a competing native movement owner")
-T.truthy(suppressedCount >= 1,
-    "native planner did not suppress the competing action state")
+T.equal(body.actionState, "turnalerted",
+    "native planner changed the removed turn-alerted state")
+T.equal(suppressedCount, 0,
+    "native planner still suppressed the removed turn-alerted state")
 
 now = now + 1000
 local movedTarget = {

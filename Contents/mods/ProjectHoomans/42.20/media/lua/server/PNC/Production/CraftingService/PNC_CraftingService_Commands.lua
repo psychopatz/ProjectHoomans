@@ -16,6 +16,20 @@ local function requiredStationId(descriptor, operation)
     return station and station.id or "workshop"
 end
 
+local function retainedActivityItemFullType(requirements, reservation)
+    local reserved = reservation and reservation.requirements or nil
+    for index = 1, #(requirements or {}) do
+        local requirement = requirements[index]
+        if requirement and requirement.consumed == false then
+            local selected = reserved and reserved[index]
+                and reserved[index].selectedType or nil
+            selected = tostring(selected or "")
+            if selected ~= "" then return selected end
+        end
+    end
+    return nil
+end
+
 function Service.Commands.QueueCraft(player, recipeId, quantity)
     local ctx, reason = H.Context(player)
     recipeId = math.floor(tonumber(recipeId) or 0)
@@ -55,7 +69,9 @@ function Service.Commands.QueueCraft(player, recipeId, quantity)
         requiredWork = math.max(20, resolved.descriptor.craftTime * quantity),
         requiredSkills = resolved.descriptor.requiredSkills,
         payload = PNC.WorkInputService.Bind({ storageId = ctx.storage.id,
-            reservationId = reservation.id, requirements = requirements },
+            reservationId = reservation.id, requirements = requirements,
+            activityItemFullType = retainedActivityItemFullType(
+                requirements, reservation) },
             ctx.storage.id, reservation.id, "craft_inputs") })
     if not order then
         PNC.ColonyStorageService.ReleaseProductionReservation(reservation.id)

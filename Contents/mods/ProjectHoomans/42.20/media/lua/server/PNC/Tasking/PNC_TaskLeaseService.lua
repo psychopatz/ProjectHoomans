@@ -12,7 +12,10 @@ Leases.ActiveIndex = Leases.ActiveIndex or {}
 Leases.PHASES = { ASSIGNED = true, TRAVEL = true, WAITING = true,
     WORKING = true, CANCELLING = true, ATOMIC_COMMIT = true,
     COMPLETING = true, DONE = true }
-Leases.PHASE_ALIASES = { WAITING_FOR_WORLD = "WAITING" }
+Leases.PHASE_ALIASES = {
+    WAITING_FOR_WORLD = "WAITING",
+    WORLD_EFFECT_PENDING = "WAITING",
+}
 Leases.TRANSITIONS = {
     ASSIGNED = { TRAVEL = true, WAITING = true, WORKING = true,
         CANCELLING = true, ATOMIC_COMMIT = true, COMPLETING = true },

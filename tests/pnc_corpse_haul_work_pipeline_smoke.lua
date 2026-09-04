@@ -48,6 +48,7 @@ local gridLookups = 0
 local body = {
     x = 5, y = 5, z = 0,
 }
+local bodyAvailable = true
 function body:getX() return self.x end
 function body:getY() return self.y end
 function body:getZ() return self.z end
@@ -242,7 +243,7 @@ PNC.Registry.ForEach = function(callback)
     for _, record in pairs(PNC.Registry.Data) do callback(record) end
 end
 PNC.Registry.GetLiveZombie = function(id)
-    return tostring(id) == "npc:one" and body or nil
+    return bodyAvailable and tostring(id) == "npc:one" and body or nil
 end
 
 local record = {
@@ -558,6 +559,109 @@ T.equal(corpse.data.PNC_CorpseHaulTaskId,
     createdOrder.id,
     "pausing visible carry preserves the lifecycle protection marker")
 Leases.Release(createdLease.leaseId, "test_pause")
+
+-- When the worker is abstract, corpse hauling must use elapsed simulation and
+-- the durable world-effect boundary instead of entering the live animation
+-- sequence. The same corpse object is applied immediately here because both
+-- endpoint squares are loaded.
+bodyAvailable = false
+local resumed, resumedReason = Work.Commands.Resume(createdOrder.id)
+T.truthy(resumed, "paused corpse work can resume into abstract execution: "
+    .. tostring(resumedReason))
+clock = 2000
+local abstractCandidate
+for _, candidate in ipairs(Provider.GetCandidates(record.id)) do
+    if candidate.sourceRef == createdOrder.id then
+        abstractCandidate = candidate
+        break
+    end
+end
+T.truthy(abstractCandidate,
+    "resumed corpse work remains claimable without a live body")
+local abstractAssignment = T.truthy(Provider.Assign(abstractCandidate),
+    "abstract corpse work claims its world target without loading the source")
+T.equal(abstractAssignment.executionMode, "ABSTRACT",
+    "corpse hauling selects abstract execution without a live body")
+local abstractLease = T.truthy(Leases.Create(
+    abstractCandidate, abstractAssignment
+), "abstract corpse work receives a shared lease")
+for _ = 1, 20 do
+    clock = clock + 10000
+    T.truthy(Provider.Tick(abstractLease),
+        "abstract corpse work advances through its elapsed-time handler")
+    if Work.Queries.Get(createdOrder.id).status
+        == Definitions.STATUS.COMPLETED
+    then break end
+end
+T.equal(Work.Queries.Get(createdOrder.id).status, Definitions.STATUS.COMPLETED,
+    "abstract corpse work completes after its deferred world effect applies")
+T.equal(corpse.square, squares["60:60:0"],
+    "abstract corpse work transfers the same corpse object")
+T.falsy(record.runtime.workOrderId,
+    "abstract corpse completion releases the shared worker claim")
+Leases.Release(abstractLease.leaseId, "test_abstract_complete")
+
+-- If the destination is not loaded when abstract progress reaches 100%, the
+-- transfer remains durable and is applied by the next service pump after the
+-- square becomes available.
+squares["60:60:0"].corpses = {}
+corpse.square = squares["40:40:0"]
+corpse.x, corpse.y, corpse.z = 40, 40, 0
+squares["40:40:0"].corpses = { corpse }
+squares["60:60:0"] = nil
+local deferredToken = CorpseService.GetCorpseToken(corpse, true)
+local deferredOrder, deferredCreateReason = Work.Commands.Queue({
+    operation = "CORPSE_HAUL", colonyId = "colony:one",
+    factionId = "faction:one", baseId = "base:one",
+    requiredWorkerId = record.id, manual = true, priority = 100,
+    requiredWork = 1,
+    payload = {
+        haulToken = deferredToken, deathMarkerId = "dead:one",
+        sourceX = 40, sourceY = 40, sourceZ = 0,
+        interactionX = 40, interactionY = 40, interactionZ = 0,
+        dropX = 60, dropY = 60, dropZ = 0,
+        destinationRegion = PNC.SettlementRepository.State.bases[
+            "base:one"].corpseHaul.destinationRegion,
+    },
+})
+T.truthy(deferredOrder, "abstract test can queue a second corpse transfer: "
+    .. tostring(deferredCreateReason))
+local deferredCandidate
+for _, candidate in ipairs(Provider.GetCandidates(record.id)) do
+    if candidate.sourceRef == deferredOrder.id then
+        deferredCandidate = candidate
+        break
+    end
+end
+local deferredAssignment = T.truthy(Provider.Assign(deferredCandidate),
+    "abstract deferred transfer claims its worker")
+local deferredLease = T.truthy(Leases.Create(
+    deferredCandidate, deferredAssignment
+), "abstract deferred transfer receives a lease")
+for _ = 1, 20 do
+    clock = clock + 10000
+    T.truthy(Provider.Tick(deferredLease),
+        "abstract deferred transfer advances while destination is absent")
+    if Work.Queries.Get(deferredOrder.id).status
+        == Definitions.STATUS.WORLD_EFFECT_PENDING
+    then break end
+end
+T.equal(Work.Queries.Get(deferredOrder.id).status,
+    Definitions.STATUS.WORLD_EFFECT_PENDING,
+    "unloaded destination leaves a durable world effect pending")
+T.equal(Work.Queries.Get(deferredOrder.id).blockedReason,
+    "DESTINATION_CHUNK_LOADING",
+    "deferred transfer exposes the unloaded destination reason")
+T.falsy(record.runtime.workOrderId,
+    "deferred transfer releases the abstract worker claim")
+squares["60:60:0"] = destinationSquare
+CorpseService.Internal.reconcilePendingWorldEffects(clock, nil, 8)
+T.equal(Work.Queries.Get(deferredOrder.id).status,
+    Definitions.STATUS.COMPLETED,
+    "loaded-square retry completes the durable deferred transfer")
+T.equal(corpse.square, destinationSquare,
+    "loaded-square retry applies the same corpse object at the destination")
+bodyAvailable = true
 
 local cleared, clearReason = CorpseService.ClearConfiguration({}, {
     baseId = "base:one",

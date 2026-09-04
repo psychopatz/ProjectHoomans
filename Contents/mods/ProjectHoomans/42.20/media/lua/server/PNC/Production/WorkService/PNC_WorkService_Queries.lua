@@ -29,8 +29,9 @@ function Service.Queries.CanAssign(orderId, workerId)
     if not order or terminal(order) or order.workerId
         or order.status == Status.PAUSED or order.status == Status.CANCELLING
     then return false, "WORK_ORDER_UNAVAILABLE" end
-    if not workerAvailable(worker, order) then
-        return false, "NO_QUALIFIED_WORKER"
+    local available, reason = workerAvailable(worker, order)
+    if not available then
+        return false, reason or "NO_QUALIFIED_WORKER"
     end
     return true
 end
@@ -66,6 +67,73 @@ function Service.Queries.ListAssignableForWorker(workerId, limit)
         return left.createdAt < right.createdAt
     end)
     while #output > limit do output[#output] = nil end
+    return output
+end
+
+-- Read-only assignment diagnostics for the task-brain UI. This deliberately
+-- reports the durable queue separately from worker eligibility: a repository
+-- can contain many orders without having any order that this worker may claim.
+function Service.Queries.BuildAssignmentDiagnostics(workerId)
+    local output = {
+        workerId = tostring(workerId or ""),
+        totalOrders = 0,
+        statusCounts = {},
+        assignableOrders = 0,
+        eligibleOrders = 0,
+        recoveryQuarantined = 0,
+        rejectionCounts = {},
+        eligibleOperations = {},
+        samples = {},
+    }
+    local function increment(bucket, key)
+        key = tostring(key or "UNKNOWN")
+        bucket[key] = (tonumber(bucket[key]) or 0) + 1
+    end
+    local function sample(order, reason)
+        if #output.samples >= 8 then return end
+        output.samples[#output.samples + 1] = {
+            orderId = order and order.id,
+            operation = order and order.operation,
+            status = order and order.status,
+            reason = reason,
+        }
+    end
+    Repository.Load()
+    for _, order in pairs(Repository.State.byId) do
+        output.totalOrders = output.totalOrders + 1
+        increment(output.statusCounts, order and order.status)
+        if assignable(order) then
+            output.assignableOrders = output.assignableOrders + 1
+            if order.recoveryQuarantined == true then
+                output.recoveryQuarantined = output.recoveryQuarantined + 1
+                increment(output.rejectionCounts,
+                    "TASK_RECOVERY_QUARANTINED")
+                sample(order, "TASK_RECOVERY_QUARANTINED")
+            else
+                local available, reason = Service.Queries.CanAssign(
+                    order.id, workerId)
+                if available then
+                    output.eligibleOrders = output.eligibleOrders + 1
+                    increment(output.eligibleOperations, order.operation)
+                else
+                    reason = reason or "NO_QUALIFIED_WORKER"
+                    increment(output.rejectionCounts, reason)
+                    sample(order, reason)
+                end
+            end
+        end
+    end
+    table.sort(output.samples, function(left, right)
+        local leftOperation = tostring(left.operation or "")
+        local rightOperation = tostring(right.operation or "")
+        if leftOperation ~= rightOperation then
+            return leftOperation < rightOperation
+        end
+        local leftStatus = tostring(left.status or "")
+        local rightStatus = tostring(right.status or "")
+        if leftStatus ~= rightStatus then return leftStatus < rightStatus end
+        return tostring(left.orderId or "") < tostring(right.orderId or "")
+    end)
     return output
 end
 

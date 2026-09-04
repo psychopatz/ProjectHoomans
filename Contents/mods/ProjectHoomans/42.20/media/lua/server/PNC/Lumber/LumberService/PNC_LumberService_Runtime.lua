@@ -106,7 +106,14 @@ end
 if Events and Events.LoadGridsquare and not Service.LoadSquareHookRegistered then
     Events.LoadGridsquare.Add(function(square)
         if not Service.Loaded then Service.Load(true) end
-        reconcileLoadedSquare(square)
+        -- WorldEffectService is authoritative once the WorkAdapter has
+        -- registered the lumber provider. Keep this fallback for isolated
+        -- service loads and older save/test compositions.
+        local effects = PNC.WorldEffectService
+        local providers = effects and effects.Providers or nil
+        if not providers or not providers.LUMBER then
+            reconcileLoadedSquare(square)
+        end
     end)
     Service.LoadSquareHookRegistered = true
 end

@@ -124,9 +124,30 @@ T.equal(order.locationPolicy.execution, "HOME",
 T.equal(order.locationPolicy.returnHome, "HOME",
     "provision pickup returns an away worker home before retrying")
 T.equal(order.status, Definitions.STATUS.QUEUED, "provision order queued")
+-- Tasking owns the eventual claim once its provider is installed. WorkService
+-- must still initiate the home handoff for a home-only order.
+local taskingEvents = 0
+PNC.Tasking = {
+    Providers = { work = {} },
+    Commands = {},
+    Events = { Emit = function() taskingEvents = taskingEvents + 1 end },
+}
 returningHome = true
-T.falsy(Work.Internal.workerAvailable(record, order),
+local workerAvailable, workerReason = Work.Internal.workerAvailable(record, order)
+T.falsy(workerAvailable,
     "provision does not reacquire a worker already returning home")
+T.equal(workerReason, "WORKER_RETURNING_HOME",
+    "provision reports the worker return-home gate")
+local assignmentDiagnostics = Work.Queries.BuildAssignmentDiagnostics(
+    record.id)
+T.equal(assignmentDiagnostics.totalOrders, 1,
+    "assignment diagnostics count the durable order")
+T.equal(assignmentDiagnostics.assignableOrders, 1,
+    "assignment diagnostics count the waiting order")
+T.equal(assignmentDiagnostics.eligibleOrders, 0,
+    "assignment diagnostics reject the returning worker")
+T.equal(assignmentDiagnostics.rejectionCounts.WORKER_RETURNING_HOME, 1,
+    "assignment diagnostics retain the rejection reason")
 returningHome = false
 Work.Tick(now + 1)
 order = Work.Queries.Get(order.id)
@@ -136,6 +157,11 @@ T.equal(order.blockedReason, "WORKER_RETURNING_HOME",
     "away provision reports the return-home handoff")
 T.equal(homeRequests, 1,
     "away provision redirects the NPC home")
+T.truthy(taskingEvents > 0,
+    "home handoff wakes the tasking arbiter")
+-- The remainder of this workflow exercises the legacy direct scheduler path;
+-- the assertions above cover the task-provider handoff itself.
+PNC.Tasking.Providers.work = nil
 atHome = true
 T.truthy(Work.Commands.Assign(order.id, record.id),
     "home worker claims the provision order")

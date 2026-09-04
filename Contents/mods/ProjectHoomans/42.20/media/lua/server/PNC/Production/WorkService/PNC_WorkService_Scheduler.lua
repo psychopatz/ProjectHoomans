@@ -45,6 +45,10 @@ end
 
 local function processOrder(order, at)
     if terminal(order) or order.status == Status.PAUSED then return end
+    -- A completed abstract operation owns a durable world effect, not a
+    -- worker claim. Let the corpse service apply it when both endpoint
+    -- squares are loaded instead of sending it back through normal claiming.
+    if order.status == Status.WORLD_EFFECT_PENDING then return end
     if order.recoveryQuarantined == true then
         local changed = order.status ~= Status.BLOCKED
             or order.blockedReason == nil
@@ -102,6 +106,17 @@ local function processOrder(order, at)
             if at >= retryAt then
                 Service.AssignmentRetryAt = Service.AssignmentRetryAt or {}
                 Service.AssignmentRetryAt[order.id] = at + 5000
+                -- Tasking owns the actual claim, but WorkService still owns
+                -- the durable location handoff. Without this probe a
+                -- home-only order can wait forever: the task provider rejects
+                -- an away worker, while no subsystem sends that worker home.
+                if startsAtHome(order) and returnsHome(order) then
+                    local _, waitingReason = findWorker(order)
+                    if waitingReason == "WORKER_RETURNING_HOME" then
+                        order.blockedReason = waitingReason
+                        Repository.MarkDirty()
+                    end
+                end
                 markAssignmentDirty(order, "WORK_REQUEST_WAITING")
             end
             return
@@ -156,6 +171,20 @@ local function processOrder(order, at)
         return
     end
     local live = PNC.Registry.GetLiveZombie and PNC.Registry.GetLiveZombie(worker.id)
+    local executionPolicy = Definitions.ExecutionPolicy
+        and Definitions.ExecutionPolicy(order.operation)
+        or "ABSTRACT_SAFE"
+    if executionPolicy == "LIVE_ONLY" and not live then
+        local released, releaseReason = releaseAssignment(order,
+            "live_body_required")
+        if released == false then
+            order.blockedReason = releaseReason or "LIVE_BODY_REQUIRED"
+            Repository.MarkDirty(); return
+        end
+        order.status, order.blockedReason = Status.WAITING_FOR_WORKER,
+            "LIVE_BODY_REQUIRED"
+        Repository.MarkDirty(); return
+    end
     local mode = live and "LIVE" or "ABSTRACT"
     if order.facilityReservationId and PNC.FacilityReservations then
         local renewed = PNC.FacilityReservations.Start(

@@ -129,6 +129,7 @@ local function updateRuntime(record, job, tree)
         approachY = job.approach and job.approach.y or nil,
         approachZ = job.approach and job.approach.z or nil,
         phase = job.phase, state = job.state,
+        activityItemFullType = job.activityItemFullType,
         remainingWork = tree and tree.remainingWork or nil,
         maxWork = tree and tree.maxWork or nil,
     }

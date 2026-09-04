@@ -250,6 +250,7 @@ local function refreshLocalAuthoritySnapshots(now)
     local snapshots
     local builtAtByID
     local seen = {}
+    local changedIDs = {}
     local rebuilt = false
     local id
     local previous
@@ -300,6 +301,7 @@ local function refreshLocalAuthoritySnapshots(now)
             id = tostring(snapshot.id)
             snapshots[id] = snapshot
             builtAtByID[id] = now
+            changedIDs[id] = true
             rebuilt = true
         end
     end
@@ -318,12 +320,14 @@ local function refreshLocalAuthoritySnapshots(now)
         if not seen[tostring(id)] then
             snapshots[id] = nil
             builtAtByID[tostring(id)] = nil
+            changedIDs[tostring(id)] = true
             rebuilt = true
         end
     end
     ClientState.snapshots = snapshots
     ClientState.lastSyncReceiveAt = now
     Sync.hasLocalIncapacitatedSnapshots = hasIncapacitated
+    Sync.LocalSnapshotChangedByID = changedIDs
     return rebuilt
 end
 
@@ -374,6 +378,8 @@ function Sync.OnTick()
     local body
     local remoteReplica
     local localSnapshotsRebuilt
+    local localSnapshotChangedByID
+    local localVisualMaintainDue
     local applyLocalVisuals
     local snapshotState
     local snapshotChanged
@@ -400,11 +406,16 @@ function Sync.OnTick()
     if remoteReplica then
         requestSyncIfStale(now)
     end
+    Sync.LocalSnapshotChangedByID = {}
     localSnapshotsRebuilt = refreshLocalAuthoritySnapshots(now)
+    localSnapshotChangedByID = Sync.LocalSnapshotChangedByID or {}
+    localVisualMaintainDue = now >= (
+        (tonumber(Sync.lastLocalVisualMaintainAt) or 0)
+            + (tonumber(Const.CLIENT_LOCAL_VISUAL_MAINTAIN_MS) or 250)
+    )
     applyLocalVisuals = remoteReplica
         or localSnapshotsRebuilt
-        or now >= ((tonumber(Sync.lastLocalVisualMaintainAt) or 0)
-            + (tonumber(Const.CLIENT_LOCAL_VISUAL_MAINTAIN_MS) or 250))
+        or localVisualMaintainDue
     if not remoteReplica and applyLocalVisuals then
         Sync.lastLocalVisualMaintainAt = now
     end
@@ -471,13 +482,12 @@ function Sync.OnTick()
                             applySnapshotFacing(body, snapshot)
                         end
                     else
-                        snapshotChanged = true
-                        presentationDue = true
+                        snapshotChanged = localSnapshotChangedByID[
+                            tostring(id)
+                        ] == true
+                        presentationDue = localVisualMaintainDue
                     end
-                    if not remoteReplica
-                        or snapshotChanged
-                        or presentationDue
-                    then
+                    if snapshotChanged or presentationDue then
                         pruneSnapshotDuplicates(snapshot, body)
                         -- The embodied NPC is already an engine-replicated
                         -- IsoZombie.  Project Zomboid smooths its authoritative

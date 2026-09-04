@@ -64,6 +64,9 @@ end
 
 local function releaseClaim(order, reason, cancelInputs, cleanupOperation)
     if not order then return end
+    local worldEffectPending = order.status == Status.WORLD_EFFECT_PENDING
+        and type(order.worldEffect) == "table"
+        and tostring(order.worldEffect.state or "PENDING") ~= "APPLIED"
     local carryHandoff = order.operation == "CORPSE_HAUL"
         and tostring(order.phase or "") == "CARRYING"
         and order.completionStarted ~= true
@@ -71,7 +74,8 @@ local function releaseClaim(order, reason, cancelInputs, cleanupOperation)
         and order.status ~= Status.CANCELLED
         and order.status ~= Status.COMPLETED
         and order.status ~= Status.FAILED
-    if cleanupOperation == true and not order.completionCommitted
+    if cleanupOperation == true and not worldEffectPending
+        and not order.completionCommitted
         and (order.operation == "PROVISION_PICKUP"
             or order.operation == "CORPSE_HAUL"
             or order.operation == "LUMBER")

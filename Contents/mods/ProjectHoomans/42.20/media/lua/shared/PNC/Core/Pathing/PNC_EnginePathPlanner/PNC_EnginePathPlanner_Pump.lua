@@ -17,13 +17,13 @@ local function suppressConflictingNativeState(body, navigation, now)
         return false
     end
     -- Fence/window/wall states are a deliberate traversal handoff and must
-    -- remain owned by the traversal provider. Limit this repair to the two
-    -- vanilla states observed to compete with Behavior2: turnalerted and
-    -- pathfind. Combat bumps, attacks, lunge, and other action leases must
+    -- remain owned by the traversal provider. Limit this repair to the
+    -- vanilla pathfind state observed to compete with Behavior2. Combat
+    -- bumps, attacks, lunge, and other action leases must
     -- remain available to their respective owners.
     actionState = body.getActionStateName
         and string.lower(tostring(body:getActionStateName() or "")) or ""
-    if (actionState ~= "turnalerted" and actionState ~= "pathfind")
+    if actionState ~= "pathfind"
         or not liveBodyControl.IsSuppressedActionState(actionState)
     then
         return false

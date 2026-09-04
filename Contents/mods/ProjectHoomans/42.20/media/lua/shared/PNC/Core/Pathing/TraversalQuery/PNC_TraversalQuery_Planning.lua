@@ -10,7 +10,6 @@ function TraversalQuery.CanStep(fromX, fromY, fromZ, toX, toY, toZ, cell)
     local toSquare
     local passage
     local fence
-    local fromReason
     local toReason
     fromSquare = TraversalQuery.GetSquare(fromX, fromY, fromZ, cell)
     toSquare = TraversalQuery.GetSquare(toX, toY, toZ, cell)
@@ -23,30 +22,14 @@ function TraversalQuery.CanStep(fromX, fromY, fromZ, toX, toY, toZ, cell)
         toZ,
         cell
     )
-    -- Vehicle safety must win over passage handling. Otherwise a window or
-    -- fence on the same edge can start a traversal whose landing tile is a
-    -- synchronized vehicle footprint.
+    -- Exact vehicle occupancy must win over passage handling. Otherwise a
+    -- window or fence on the same edge could start a traversal whose landing
+    -- tile is inside a vehicle chassis.
     if toReason == "vehicle" then
         return false, toReason
     end
-    if toReason == "vehicle_clearance" then
-        fromReason = TraversalQuery.GetTraversalOccupancyReason(
-            fromX,
-            fromY,
-            fromZ,
-            cell
-        )
-        if fromReason ~= "vehicle_clearance" then
-            return false, toReason
-        end
-    end
     if fromSquare == toSquare then
         if not toReason then return true, "clear" end
-        if toReason == "vehicle_clearance"
-            and fromReason == "vehicle_clearance"
-        then
-            return true, "clear"
-        end
         return false, toReason
     end
     passage = TraversalQuery.GetPassageBetween(fromSquare, toSquare)
@@ -66,14 +49,7 @@ function TraversalQuery.CanStep(fromX, fromY, fromZ, toX, toY, toZ, cell)
     if fromSquare.isBlockedTo and fromSquare:isBlockedTo(toSquare) then
         return false, "blocked_edge"
     end
-    if toReason then
-        if toReason == "vehicle_clearance"
-            and fromReason == "vehicle_clearance"
-        then
-            return true, "clear"
-        end
-        return false, toReason
-    end
+    if toReason then return false, toReason end
     return true, "clear"
 end
 

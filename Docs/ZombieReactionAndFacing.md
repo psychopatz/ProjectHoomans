@@ -24,8 +24,8 @@ Zombie aggro pumping is organized as a thin world-list loop plus one-zombie hand
 - Combat may lease facing briefly for attack windup, attack follow-through, or
   close repositioning.
 - Re-publishing a combat lease does not force another engine facing request.
-  Direction/interval throttling remains authoritative so `turnalerted` cannot
-  race locomotion on every update.
+  Direction/interval throttling remains authoritative so optional facing leases
+  cannot race locomotion on every update.
 - Outside those leases, locomotion owns facing and points the NPC along travel
   direction.
 - Each movement snapshot carries the normalized direction of the server's last

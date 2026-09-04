@@ -9,6 +9,45 @@ local H = Service.Internal
 Service.Runtime.spotClaims = Service.Runtime.spotClaims or {}
 Service.Runtime.previousOrders = Service.Runtime.previousOrders or {}
 
+local FISHING_TOOL_TYPES = {
+    ["Base.FishingRod"] = true,
+    ["Base.CraftedFishingRod"] = true,
+}
+
+local function itemFullType(item)
+    local fullType = tostring(item and (item.fullType or item.type) or "")
+    if fullType ~= "" then return fullType end
+    if item and type(item.getFullType) == "function" then
+        local ok, value = pcall(item.getFullType, item)
+        value = ok and tostring(value or "") or ""
+        if value ~= "" then return value end
+    end
+    return nil
+end
+
+local function fishingToolFullType(record)
+    local body = PNC.Registry and PNC.Registry.GetLiveZombie
+        and PNC.Registry.GetLiveZombie(record and record.id) or nil
+    local item
+    local fullType
+    if body and type(body.getPrimaryHandItem) == "function" then
+        local ok, primary = pcall(body.getPrimaryHandItem, body)
+        item = ok and primary or nil
+        fullType = itemFullType(item)
+        if fullType and FISHING_TOOL_TYPES[fullType] then
+            return fullType
+        end
+    end
+    local inventory = record and record.inventory
+    item = inventory and inventory.equipped and inventory.items
+        and inventory.items[inventory.equipped.primary] or nil
+    fullType = itemFullType(item)
+    if fullType and FISHING_TOOL_TYPES[fullType] then return fullType end
+    fullType = tostring(record and record.equipment
+        and record.equipment.primaryFullType or "")
+    return FISHING_TOOL_TYPES[fullType] and fullType or nil
+end
+
 local function distanceSq(record, x, y)
     local rx, ry = tonumber(record and record.x) or 0, tonumber(record and record.y) or 0
     local dx, dy = rx - x, ry - y
@@ -138,6 +177,7 @@ local function updateRuntime(record, job, zone, phase)
         requiredWorkPoints = PNC.Fishing.RequiredWorkPoints(zone),
         attemptIndex = tonumber(job.attemptIndex) or 0,
         catches = tonumber(job.catches) or 0, lastRoll = H.Copy(job.lastRoll),
+        activityItemFullType = job.activityItemFullType,
     }
 end
 
@@ -145,5 +185,6 @@ H.ReleaseFishingSpot = releaseSpot
 H.ReserveFishingSpot = reserveSpot
 H.RenewFishingSpot = renewSpot
 H.UpdateFishingRuntime = updateRuntime
+H.FishingToolFullType = fishingToolFullType
 
 return Service

@@ -5,8 +5,9 @@
 -- know how the roster list is built or how native list selection works.
 
 local Components = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Components"
-local Presentation = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Presentation"
 local Shared = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Shared"
+local ActivityPresentation = require
+    "PNC/UI/Colonist/PNC_ColonistActivityPresentation"
 
 local Selector = {}
 
@@ -40,7 +41,21 @@ function Selector.GetSelected(list)
 end
 
 function Selector.BuildRows(snapshot)
-    return Presentation.BuildRoster(snapshot)
+    local rows = {}
+    for _, person in ipairs(snapshot and snapshot.people or {}) do
+        local level, needType = Shared.WorstNeed(person)
+        rows[#rows + 1] = {
+            id = person.id,
+            key = person.id,
+            label = Shared.Text(person.name, person.id),
+            detail = string.upper(Shared.Text(person.role, "Companion"))
+                .. "  -  " .. ActivityPresentation.Current(person)
+                .. "  -  " .. string.upper(needType),
+            value = person,
+            worstLevel = level,
+        }
+    end
+    return rows
 end
 
 function Selector.SetRows(list, snapshot, selectedID)

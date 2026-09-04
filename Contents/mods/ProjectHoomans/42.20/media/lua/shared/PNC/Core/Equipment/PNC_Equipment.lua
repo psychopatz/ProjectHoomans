@@ -6,6 +6,7 @@ PNC.Equipment.PRESENTATION_REVISION = 3
 
 require "PNC/Core/Equipment/PNC_Equipment/PNC_Equipment_Descriptors"
 require "PNC/Core/Equipment/PNC_Equipment/PNC_Equipment_VisualState"
+require "PNC/Core/Equipment/PNC_Equipment/PNC_Equipment_ActivityHands"
 require "PNC/Core/Equipment/PNC_Equipment/PNC_Equipment_Worn"
 require "PNC/Core/Equipment/PNC_Equipment/PNC_Equipment_Attached"
 require "PNC/Core/Equipment/PNC_Equipment/PNC_Equipment_Hands"

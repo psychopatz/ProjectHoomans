@@ -11,6 +11,19 @@ local Catalog = PNC.BuildRecipeCatalog
 local Repository = PNC.WorkRepository
 local Definitions = PNC.WorkDefinitions
 
+local function activityItemFullType(requirements, reservation)
+    local reserved = reservation and reservation.requirements or nil
+    for index, requirement in ipairs(requirements or {}) do
+        if requirement and requirement.consumed == false then
+            local selected = reserved and reserved[index]
+                and reserved[index].selectedType or nil
+            selected = tostring(selected or "")
+            if selected ~= "" then return selected end
+        end
+    end
+    return nil
+end
+
 function Service.Queue(player, args)
     args = type(args) == "table" and args or {}
     local context, reason = H.ContextFor(player)
@@ -84,6 +97,7 @@ function Service.Queue(player, args)
         materialKind = "build_object",
         storageId = context.storage.id,
         materialRequirements = requirements,
+        activityItemFullType = activityItemFullType(requirements, reservation),
         blueprint = blueprint,
         requesterOnlineID = player and player.getOnlineID
             and tonumber(player:getOnlineID()) or nil,

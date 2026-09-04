@@ -12,6 +12,7 @@ local function isOwnerSpaceCandidate(owner, x, y, z)
     local candidateBuilding
     local ownerRoom
     local candidateRoom
+    local sameInteriorContext
     if TraversalQuery and TraversalQuery.CanOccupy
         and not TraversalQuery.CanOccupy(x, y, z)
     then
@@ -32,6 +33,15 @@ local function isOwnerSpaceCandidate(owner, x, y, z)
     ownerRoom = ownerSquare.getRoom and ownerSquare:getRoom() or nil
     candidateRoom = candidateSquare.getRoom
         and candidateSquare:getRoom() or nil
+    sameInteriorContext = TraversalQuery
+        and TraversalQuery.AreSameInteriorContext
+        and TraversalQuery.AreSameInteriorContext(
+            ownerSquare,
+            candidateSquare
+        )
+    if sameInteriorContext ~= nil then
+        return sameInteriorContext
+    end
     return ownerBuilding == candidateBuilding
         and (ownerBuilding == nil or ownerRoom == candidateRoom)
 end

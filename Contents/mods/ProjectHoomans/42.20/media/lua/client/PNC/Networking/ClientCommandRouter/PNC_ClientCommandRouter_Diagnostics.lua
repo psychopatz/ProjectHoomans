@@ -55,4 +55,11 @@ Internal.RegisterServerCommand(Const.CMD_DIRECTOR_DEBUG, function(args)
     ClientState.lastDirectorDebugReceiveAt = Core.Now()
 end)
 
+Internal.RegisterServerCommand(Const.CMD_WORLD_EFFECT_DEBUG, function(args)
+    ClientState.worldEffectDebugAuthorized = args.authorized == true
+    ClientState.worldEffectDebug = args.snapshot
+    ClientState.worldEffectDebugReason = args.reason
+    ClientState.lastWorldEffectDebugReceiveAt = Core.Now()
+end)
+
 return PNC.Client

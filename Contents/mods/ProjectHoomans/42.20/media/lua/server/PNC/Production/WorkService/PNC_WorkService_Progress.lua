@@ -63,7 +63,8 @@ function Service.Commands.Assign(orderId, workerId)
     local order = Repository.Get(orderId)
     local worker = PNC.Registry and PNC.Registry.Get and PNC.Registry.Get(workerId)
     if not order or terminal(order) then return false, "WORK_ORDER_UNAVAILABLE" end
-    if not workerAvailable(worker, order) then return false, "NO_QUALIFIED_WORKER" end
+    local available, reason = workerAvailable(worker, order)
+    if not available then return false, reason or "NO_QUALIFIED_WORKER" end
     return claimStation(order, worker)
 end
 
@@ -181,6 +182,43 @@ function Service.Commands.AddElapsed(orderId, workerId, elapsedSeconds)
     local elapsed = math.max(0, math.min(Definitions.BALANCE.maxElapsedSeconds,
         tonumber(elapsedSeconds) or 0))
     return Service.Commands.AddProgress(orderId, workerId, rate * elapsed)
+end
+
+-- Completes an order whose physical side effect was already applied by its
+-- domain adapter. This is deliberately separate from AddProgress: deferred
+-- world effects must never call the ordinary completion handler again, since
+-- that handler quite reasonably expects a live, loaded world object.
+function Service.Commands.CompleteDeferred(orderId, reason)
+    local order = Repository.Get(orderId)
+    if not order or terminal(order) then
+        return false, "WORK_ORDER_UNAVAILABLE"
+    end
+    if order.status ~= Status.WORLD_EFFECT_PENDING
+        or type(order.worldEffect) ~= "table"
+        or tostring(order.worldEffect.state or "") ~= "APPLIED"
+    then
+        return false, "WORLD_EFFECT_NOT_APPLIED"
+    end
+    local completedWorker = order.workerId and PNC.Registry
+        and PNC.Registry.Get and PNC.Registry.Get(order.workerId) or nil
+    order.completionCommitted = true
+    order.completionStarted = nil
+    order.cancellationRequested, order.cancellationReason = nil, nil
+    order.terminalPersisted = false
+    order.status, order.progress = Status.COMPLETED, order.requiredWork
+    order.blockedReason = nil
+    order.completedAt, order.updatedAt = now(), now()
+    order.completionReason = tostring(reason or "deferred_world_effect")
+    order.revision = (tonumber(order.revision) or 0) + 1
+    releaseClaim(order, order.completionReason, false, false)
+    if returnHomeAfterWork and completedWorker then
+        returnHomeAfterWork(completedWorker, order)
+    end
+    Repository.MarkDirty()
+    emit(EventTypes.WORK_ORDER_COMPLETED, { workOrderId = order.id,
+        colonyId = order.colonyId, operation = order.operation,
+        deferred = true })
+    return true, copy(order)
 end
 
 

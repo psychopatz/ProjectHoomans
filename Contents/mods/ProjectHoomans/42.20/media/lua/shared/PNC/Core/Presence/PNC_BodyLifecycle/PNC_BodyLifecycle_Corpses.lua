@@ -131,6 +131,24 @@ function Internal.scheduleCorpseFinalize(record, x, y, z, token, reason, wornEnt
     }
 end
 
+local function createEngineCorpse(zombie)
+    local constructor
+    local ok
+    local corpse
+    if not IsoDeadBody or not IsoDeadBody.new then
+        return nil, "engine_corpse_constructor_unavailable"
+    end
+    constructor = IsoDeadBody.new
+    ok, corpse = pcall(constructor, zombie, false, true)
+    if not ok then
+        return nil, "engine_corpse_constructor_failed"
+    end
+    if not corpse then
+        return nil, "engine_corpse_constructor_returned_nil"
+    end
+    return corpse
+end
+
 function Lifecycle.CreateVanillaCorpse(record, zombie, reason)
     local x
     local y
@@ -139,10 +157,13 @@ function Lifecycle.CreateVanillaCorpse(record, zombie, reason)
     local createdWorldHour
     local corpse
     local converted = false
+    local failureReason
     local sourceWornItems
     local wornEntries
     local existing
     local runtime
+    local sourceBodyInstanceID
+    local sourceBodyOnlineID
     if not record or not zombie then
         return false, nil
     end
@@ -194,35 +215,48 @@ function Lifecycle.CreateVanillaCorpse(record, zombie, reason)
     Internal.prepareCorpseItems(record, zombie)
     sourceWornItems = zombie.getWornItems and zombie:getWornItems() or nil
     wornEntries = Internal.captureWornEntries(sourceWornItems)
-    -- Use the character death path first. On a multiplayer server this invokes
-    -- the engine's zombie-death networking and gives every client the same
-    -- corpse object ID. Constructing IsoDeadBody directly removes the source
-    -- zombie locally but does not emit that death packet, leaving clients with
-    -- either no corpse or an orphan corpse that reanimation cannot consume.
-    if zombie.becomeCorpseSilently then
-        corpse = zombie:becomeCorpseSilently()
-        converted = true
-    end
+    sourceBodyInstanceID = Internal.GetStartupBodyInstanceID
+        and Internal.GetStartupBodyInstanceID(zombie)
+        or zombie.getPersistentOutfitID
+            and zombie:getPersistentOutfitID() or nil
+    sourceBodyOnlineID = Internal.normalizeOnlineID(zombie)
+    -- IsoDeadBody is the Build 42 engine-owned corpse constructor. It copies
+    -- the prepared inventory, worn items, visuals, and ModData, removes the
+    -- source zombie, and inserts one real corpse into the square. Multiplayer
+    -- replication is announced explicitly below with AddCorpseToMap because
+    -- this constructor does not invoke the character-death listener.
+    corpse, failureReason = createEngineCorpse(zombie)
+    converted = corpse ~= nil
     if not corpse then
-        if converted then
-            Internal.scheduleCorpseFinalize(record, x, y, z, token, reason or "death", wornEntries)
-            runtime.corpseState = "finalizing"
-        else
-            Internal.removeZombie(zombie)
-            runtime.corpseState = "missing"
-        end
+        Internal.removeZombie(zombie)
+        runtime.corpseState = "missing"
     end
     record.presenceState = Const.PRESENCE_CORPSE
     Internal.detachLiveBody(record, reason or "death")
-    Internal.mark(record, "corpse", "missing", reason or "death")
     if corpse then
         -- Guarantee the stable quest identity on the final vanilla-owned
         -- container before the one complete-corpse MP sync.
         Internal.ensureCorpseIdentityCard(record, corpse)
         Internal.applyCorpseWornItems(corpse, wornEntries)
         Internal.stampCorpse(record, corpse, token)
-        Internal.transmitCorpseState(corpse, true)
+        Internal.mark(record, "corpse", "inert_loaded", reason or "death")
+        Internal.announceCorpse(corpse)
         runtime.corpseState = "inert_loaded"
+    else
+        Internal.mark(record, "corpse", "missing", reason or "death")
     end
-    return converted, corpse
+    if isServer and isServer() == true
+        and PNC.Network and PNC.Network.BroadcastBodyRemoval
+    then
+        -- The native AddCorpse packet does not identify the managed live-body
+        -- shell. Remove that shell on every client using the IDs captured
+        -- before IsoDeadBody detached the source zombie.
+        PNC.Network.BroadcastBodyRemoval(
+            record.id,
+            sourceBodyInstanceID,
+            sourceBodyOnlineID,
+            reason or "death"
+        )
+    end
+    return converted, corpse or failureReason
 end

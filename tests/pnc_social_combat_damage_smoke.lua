@@ -37,7 +37,12 @@ isServer = function() return true end
 isClient = function() return false end
 
 PNC = {
-    Config = { Relationships = { EnableSocialEvents = true } },
+    Config = {
+        Relationships = {
+            EnableSocialEvents = true,
+            DebugCombatCallbacks = true,
+        },
+    },
     Core = {
         IsAuthority = function() return true end,
         Now = function() return clock end,

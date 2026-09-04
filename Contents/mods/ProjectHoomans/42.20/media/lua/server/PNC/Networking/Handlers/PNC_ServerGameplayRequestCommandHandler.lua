@@ -11,7 +11,31 @@ local MapCommandService = PNC.MapCommandService
 Router.Register(Const.CMD_COMPANION_COMMAND, function(player, args)
     if not args.commandID then return end
     if CompanionCommands and CompanionCommands.Execute then
-        local affected, reason = CompanionCommands.Execute(player, args)
+        local affected, reason, affectedTargets =
+            CompanionCommands.Execute(player, args)
+        if sendServerCommand
+            and (tostring(args.commandID) == "camp"
+                or tostring(args.commandSource or "")
+                    == "companion_emote")
+        then
+            sendServerCommand(
+                player,
+                Const.MODULE,
+                Const.CMD_COMPANION_COMMAND_RESULT,
+                {
+                    commandID = tostring(args.commandID),
+                    id = args.id,
+                    dialogueID = args.dialogueID,
+                    scope = args.scope,
+                    affected = tonumber(affected) or 0,
+                    accepted = (tonumber(affected) or 0) > 0,
+                    reason = tostring(reason),
+                    targets = affectedTargets,
+                    requestID = args.requestID,
+                    commandSource = args.commandSource,
+                }
+            )
+        end
         if tostring(args.commandID) == "manual_corpse_haul"
             and PNC.Core and PNC.Core.Log
         then

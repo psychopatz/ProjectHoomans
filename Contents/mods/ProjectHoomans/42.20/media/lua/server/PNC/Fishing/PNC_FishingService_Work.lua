@@ -47,6 +47,7 @@ function Service.TickJob(lease)
     if not Service.ValidateZone(zone) then return false, false, "fishing_zone_invalid" end
     if isTired(record) then return false, false, "fishing_npc_tired" end
     if not Service.IsNearby(record, zone) then return false, false, "fishing_npc_not_nearby" end
+    job.activityItemFullType = H.FishingToolFullType(record)
     if not H.RenewFishingSpot(job, zone) then
         return false, false, "fishing_spot_lost"
     end

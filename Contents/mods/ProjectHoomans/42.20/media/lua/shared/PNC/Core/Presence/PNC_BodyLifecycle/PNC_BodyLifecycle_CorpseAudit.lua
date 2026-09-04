@@ -45,7 +45,7 @@ function Internal.pumpPendingCorpses()
             end
             Internal.applyCorpseWornItems(found, pending.wornEntries)
             Internal.stampCorpse(record, found, pending.token)
-            Internal.transmitCorpseState(found, true)
+            Internal.announceCorpse(found)
             table.remove(Lifecycle.PendingCorpses, i)
         elseif pending.attempts >= 8 then
             if record then

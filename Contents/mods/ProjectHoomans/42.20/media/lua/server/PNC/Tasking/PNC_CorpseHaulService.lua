@@ -1,4 +1,5 @@
--- Server-authoritative physical corpse hauling.
+-- Server-authoritative corpse hauling. Live workers use the physical carry
+-- path; abstract workers commit a durable world transfer when work completes.
 --
 -- Corpses are deliberately not put into ColonyStorageRepository: a corpse is
 -- an engine world object. Discovery is read-only; only a selected corpse gets
@@ -23,6 +24,8 @@ Service.CORPSE_COUNT_CACHE_MS = 2000
 -- but repeated executor ticks must not flood console.txt.
 Service.CORPSE_HAUL_DIAGNOSTIC_INTERVAL_MS = tonumber(
     Service.CORPSE_HAUL_DIAGNOSTIC_INTERVAL_MS) or 2000
+Service.CORPSE_HAUL_WORLD_WAIT_DIAGNOSTIC_INTERVAL_MS = tonumber(
+    Service.CORPSE_HAUL_WORLD_WAIT_DIAGNOSTIC_INTERVAL_MS) or 30000
 Service.MAX_PENDING_CORPSE_ORDERS_PER_BASE = 1
 -- Visible carry is simulated with the real IsoDeadBody object. Keep the
 -- cadence deliberately coarse: movement remains owned by PathService while
@@ -57,6 +60,9 @@ Service.MAX_CONFIGURED_REGION_TILES = 100000
 require "PNC/Tasking/CorpseHaulService/PNC_CorpseHaulService_Configuration"
 require "PNC/Tasking/CorpseHaulService/PNC_CorpseHaulService_World"
 require "PNC/Tasking/CorpseHaulService/PNC_CorpseHaulService_Carry"
+if not PNC.WorldEffectService then
+    require "PNC/Production/WorldEffects/PNC_WorldEffectService"
+end
 require "PNC/Tasking/CorpseHaulService/PNC_CorpseHaulService_WorkAdapter"
 require "PNC/Tasking/CorpseHaulService/PNC_CorpseHaulService_Reconciliation"
 require "PNC/Tasking/CorpseHaulService/PNC_CorpseHaulService_Dispatch"

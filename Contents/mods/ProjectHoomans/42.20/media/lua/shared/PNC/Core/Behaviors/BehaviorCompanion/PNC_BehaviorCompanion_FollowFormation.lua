@@ -4,6 +4,7 @@ local Internal = PNC.BehaviorCompanion.Internal
 local Core = PNC.Core
 local Const = PNC.Const
 local Registry = PNC.Registry
+local TraversalQuery = PNC.TraversalQuery
 local FollowFormationCache = {}
 
 local function isSameFollowGroup(record, other)
@@ -97,6 +98,7 @@ function Internal.ResolveFollowSlot(record, owner, ownerMoving)
     local lateral
     local trailing
     local target
+    local sameInteriorContext
     if not owner then
         return nil
     end
@@ -162,7 +164,14 @@ function Internal.ResolveFollowSlot(record, owner, ownerMoving)
             and slotSquare:getBuilding() or nil
         local ownerRoom = ownerSquare.getRoom and ownerSquare:getRoom() or nil
         local slotRoom = slotSquare.getRoom and slotSquare:getRoom() or nil
-        if ownerBuilding ~= slotBuilding
+        sameInteriorContext = TraversalQuery
+            and TraversalQuery.AreSameInteriorContext
+            and TraversalQuery.AreSameInteriorContext(
+                ownerSquare,
+                slotSquare
+            )
+        if sameInteriorContext == false
+            or ownerBuilding ~= slotBuilding
             or (ownerBuilding ~= nil and ownerRoom ~= slotRoom)
         then
             target.x = owner:getX()

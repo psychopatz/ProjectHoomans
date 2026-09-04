@@ -68,8 +68,10 @@ function Service.Commands.ReleaseWorker(workerId, reason)
     local released, releaseReason = releaseClaim(order,
         reason or "worker_released", false, true)
     if released == false then return false, releaseReason end
-    order.status = Status.WAITING_FOR_WORKER
-    order.blockedReason = nil
+    if order.status ~= Status.WORLD_EFFECT_PENDING then
+        order.status = Status.WAITING_FOR_WORKER
+        order.blockedReason = nil
+    end
     order.updatedAt, order.revision = now(), order.revision + 1
     Repository.MarkDirty()
     markAssignmentDirty(order, "WORKER_RELEASED")

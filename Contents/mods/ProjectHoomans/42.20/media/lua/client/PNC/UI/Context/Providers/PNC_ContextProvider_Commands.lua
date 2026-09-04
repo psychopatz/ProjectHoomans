@@ -55,6 +55,13 @@ function Provider.addOptions(menu, entry, player)
             and definition.isVisible(commandTarget(entry)) ~= true
         then
             definition = nil
+        elseif type(definition.canApply) == "function"
+            and Commands.CanApply
+            and Commands.CanApply(
+                commandTarget(entry), player, definition.id
+            ) ~= true
+        then
+            definition = nil
         end
         if definition then
         local commandID = definition.id

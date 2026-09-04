@@ -1,4 +1,4 @@
--- Invalid live-position recovery and vehicle-goal quarantine.
+-- Invalid live-position recovery for immutable world geometry.
 
 PNC = PNC or {}
 PNC.PathService = PNC.PathService or {}
@@ -7,50 +7,12 @@ PNC.PathService.Internal = PNC.PathService.Internal or {}
 local Internal = PNC.PathService.Internal
 local Core = Internal.Core
 
-local function activeMovementGoal(record, lane)
-    local intent = record and record.runtime and record.runtime.moveIntent or nil
-    if intent and intent.kind == "move" then
-        return intent
-    end
-    return lane and (lane.pendingGoal or lane.goal) or nil
-end
-
-local function quarantineVehicleBlockedGoal(record, lane, fromX, fromY, fromZ, now)
-    local goal = activeMovementGoal(record, lane)
-    if not lane or not goal then
-        return
-    end
-    lane.vehicleBlockedGoalX = tonumber(goal.x)
-    lane.vehicleBlockedGoalY = tonumber(goal.y)
-    lane.vehicleBlockedGoalZ = tonumber(goal.z)
-    lane.vehicleBlockedFromX = tonumber(fromX)
-    lane.vehicleBlockedFromY = tonumber(fromY)
-    lane.vehicleBlockedFromZ = tonumber(fromZ)
-    lane.vehicleBlockedAt = tonumber(now) or Core.Now()
-    lane.vehicleBlockedReason = tostring(
-        goal.reason or lane.intentReason or "vehicle_path_blocked"
-    )
-    lane.pendingGoal = nil
-    lane.cancelReason = "vehicle_path_blocked"
-    if lane.phase == "active" or lane.phase == "requested"
-        or lane.phase == "cancel_pending"
-    then
-        lane.phase = "cancel_pending"
-    else
-        lane.phase = "idle"
-        lane.ownerMode = "idle"
-    end
-end
-
 local function applyRecoveredBody(
     record,
     zombie,
     lane,
     now,
     reason,
-    fromX,
-    fromY,
-    fromZ,
     safeX,
     safeY,
     safeZ
@@ -76,23 +38,6 @@ local function applyRecoveredBody(
     Internal.clearBlockedStep(lane)
     lane.steeringSide = nil
     lane.directStepCount = 0
-    if reason == "vehicle" then
-        if lane.traversalAction and Internal.clearTraversalAction then
-            Internal.clearTraversalAction(
-                zombie,
-                lane,
-                "vehicle_position_recovery"
-            )
-        end
-        quarantineVehicleBlockedGoal(
-            record,
-            lane,
-            fromX,
-            fromY,
-            fromZ,
-            now
-        )
-    end
 end
 
 local function recordRecovery(
@@ -183,8 +128,10 @@ function Internal.repairInvalidBodyPosition(record, zombie, lane, now)
     fromZ = zombie:getZ()
     reason = query.GetOccupancyReason(fromX, fromY, fromZ)
     -- The current body naturally makes some square APIs report occupied.
-    -- Repair only immutable geometry or a vehicle footprint here.
-    if reason ~= "vehicle" and reason ~= "solid" and reason ~= "solid_trans" then
+    -- Do not relocate bodies merely because native movement is resolving
+    -- vehicle contact. Vehicle collision remains engine-owned; recovery is
+    -- reserved for immutable geometry.
+    if reason ~= "solid" and reason ~= "solid_trans" then
         return false, reason
     end
     safeX, safeY, safeZ = query.FindNearestOccupable(
@@ -202,9 +149,6 @@ function Internal.repairInvalidBodyPosition(record, zombie, lane, now)
         lane,
         now,
         reason,
-        fromX,
-        fromY,
-        fromZ,
         safeX,
         safeY,
         safeZ

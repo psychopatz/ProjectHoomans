@@ -328,7 +328,7 @@ local function playEvent(snapshot, body, eventID, now)
     local policy = Catalog and Catalog.Get and Catalog.Get(eventID) or nil
     local options
     local handle
-    if not policy or not body or isServerRuntime() then
+    if not policy or isServerRuntime() then
         return false
     end
     now = nowMillis(now)
@@ -339,8 +339,12 @@ local function playEvent(snapshot, body, eventID, now)
         stressHumans = policy.stressHumans,
     }
     if policy.mode == Voice.MODE_WORLD then
-        handle = Voice.PlayWorld(body, policy.suffix, options)
-    else
+        if body then
+            handle = Voice.PlayWorld(body, policy.suffix, options)
+        elseif Voice.PlayWorldAt then
+            handle = Voice.PlayWorldAt(snapshot, policy.suffix, options)
+        end
+    elseif body then
         handle = Voice.PlayLocal(body, policy.suffix, options)
     end
     return handle ~= nil and handle ~= 0
@@ -555,15 +559,33 @@ end
 
 function Triggers.ObserveDeath(snapshot, body, now)
     local state
+    local previous
+    local clientState
+    local previousSnapshot
     if isServerRuntime() or type(snapshot) ~= "table" then
         return false
     end
     body = body or resolveBodyForID(snapshot.id)
+    clientState = PNC.Network and PNC.Network.ClientState or nil
+    previousSnapshot = clientState and clientState.snapshots
+        and clientState.snapshots[tostring(snapshot.id or "")] or nil
+    previous = previousSnapshot
+    if previous then
+        -- Death-marker snapshots are intentionally compact. Reuse identity
+        -- fields from the last live snapshot so position-only playback still
+        -- selects the NPC's established voice profile.
+        if snapshot.identitySeed == nil then
+            snapshot.identitySeed = previous.identitySeed
+        end
+        if snapshot.isFemale == nil then
+            snapshot.isFemale = previous.isFemale
+        end
+        if snapshot.identity == nil then
+            snapshot.identity = previous.identity
+        end
+    end
     state = stateFor(snapshot, body)
     if state and state.terminalPlayed then
-        return false
-    end
-    if not body then
         return false
     end
     if playEvent(snapshot, body, "death.alone", nowMillis(now)) then

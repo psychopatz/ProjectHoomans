@@ -25,6 +25,41 @@ local emitter = {
     end,
 }
 
+local positionalEmitter = {
+    playSoundImpl = function(_, alias)
+        calls.positionedAlias = alias
+        return 77
+    end,
+    setParameterValueByName = emitter.setParameterValueByName,
+}
+
+local positionedWorldSound
+getWorld = function()
+    return {
+        getFreeEmitter = function(_, x, y, z)
+            calls.positionedX = x
+            calls.positionedY = y
+            calls.positionedZ = z
+            return positionalEmitter
+        end,
+    }
+end
+WorldSoundManager = {
+    instance = {
+        addSound = function(_, source, x, y, z, radius, volume, stressHumans)
+            positionedWorldSound = {
+                source = source,
+                x = x,
+                y = y,
+                z = z,
+                radius = radius,
+                volume = volume,
+                stressHumans = stressHumans,
+            }
+        end,
+    },
+}
+
 local body = {
     isFemale = function() return true end,
     playSoundLocal = function(_, alias)
@@ -91,5 +126,32 @@ T.equal(calls.world[1].volume, 14, "world volume was not forwarded")
 T.falsy(calls.world[1].stressHumans,
     "world voice unexpectedly stressed humans")
 T.equal(#calls.stopped, 1, "new voice did not stop the previous lane")
+
+T.truthy(voice.PlayWorldAt({
+    id = "voice-profile",
+    identitySeed = 321,
+    isFemale = true,
+    x = 10,
+    y = 20,
+    z = 0,
+}, "DeathAlone", {
+    radius = 18,
+    volume = 20,
+    stressHumans = false,
+}) ~= 0, "position-only world voice did not start")
+T.equal(calls.positionedAlias, "VoiceFemaleDeathAlone",
+    "position-only world voice used the wrong alias")
+T.equal(calls.positionedX, 10.5, "position-only emitter X was wrong")
+T.equal(calls.positionedY, 20.5, "position-only emitter Y was wrong")
+T.equal(calls.positionedZ, 0, "position-only emitter Z was wrong")
+T.equal(positionedWorldSound.x, 10, "position-only world sound X was wrong")
+T.equal(positionedWorldSound.y, 20, "position-only world sound Y was wrong")
+T.equal(positionedWorldSound.z, 0, "position-only world sound Z was wrong")
+T.equal(positionedWorldSound.radius, 18,
+    "position-only world sound radius was wrong")
+T.equal(positionedWorldSound.volume, 20,
+    "position-only world sound volume was wrong")
+T.falsy(positionedWorldSound.stressHumans,
+    "position-only world sound stressed humans")
 
 T.finish("pnc_npc_voice_smoke")

@@ -110,8 +110,10 @@ function Internal.transmitCorpseState(corpse, fullSync)
         -- A complete corpse packet is only needed when the body is first
         -- materialized (or finalized after a delayed engine conversion).
         -- Reusing that packet for ordinary haul/marker updates constructs a
-        -- second IsoDeadBody on clients because the packet is AddCorpse.
-        return CorpseItems.Transmit(corpse)
+        -- second body on clients. The world helper uses the engine's native
+        -- AddCorpseToMap packet for first materialization.
+        return Internal.announceCorpse
+            and Internal.announceCorpse(corpse) or false
     end
     if corpse.transmitModData then
         pcall(corpse.transmitModData, corpse)

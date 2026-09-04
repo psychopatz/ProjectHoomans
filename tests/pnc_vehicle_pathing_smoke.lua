@@ -5,10 +5,7 @@ T.addPackagePaths({ { "ProjectHoomans", "shared" } })
 local ROOT = T.path("ProjectHoomans", "shared", "PNC/Core/Pathing/")
 
 PNC = {
-    Const = {
-        VEHICLE_AVOIDANCE_CACHE_MS = 250,
-        VEHICLE_AVOIDANCE_CLEARANCE_TILES = 1,
-    },
+    Const = {},
     Core = {
         Now = function() return 1000 end,
         Distance = function(x1, y1, x2, y2)
@@ -66,43 +63,10 @@ local vehicleSquare = makeSquare(true)
 vehicleSquare.isVehicleIntersecting = function()
     return vehicleBlocking
 end
-local cachedVehicleBlocking = true
-local cachedVehicle = {
-    getPolyPlusRadius = function()
-        return {
-            x1 = 4,
-            y1 = 0,
-            x2 = 5,
-            y2 = 0,
-            x3 = 5,
-            y3 = 1,
-            x4 = 4,
-            y4 = 1,
-            z = 0,
-        }
-    end,
-    isIntersectingSquare = function(_, x, y, z)
-        return cachedVehicleBlocking and x == 4 and y == 0 and z == 0
-    end,
-    isRemovedFromWorld = function() return false end,
-}
-local vehicles = {
-    iterator = function()
-        local consumed = false
-        return {
-            hasNext = function() return not consumed end,
-            next = function()
-                consumed = true
-                return cachedVehicle
-            end,
-        }
-    end,
-}
 local cell = {
     getGridSquare = function(_, x)
         return x == 1 and vehicleSquare or clearSquare
     end,
-    getVehicles = function() return vehicles end,
 }
 getCell = function() return cell end
 
@@ -127,12 +91,18 @@ T.equal(safeX, 0.5, "nearest safe recovery x")
 T.equal(safeY, 0.5, "nearest safe recovery y")
 T.equal(safeZ, 0, "nearest safe recovery z")
 T.equal(recoveryReason, "vehicle", "nearest safe recovery reason")
-T.equal(
-    PNC.TraversalQuery.GetOccupancyReason(4.5, 0.5, 0, cell),
-    "vehicle",
-    "vehicle registry supplements stale square cache"
-)
 local canStep, stepReason = PNC.TraversalQuery.CanStep(
+    0.5,
+    0.5,
+    0,
+    1.5,
+    0.5,
+    0,
+    cell
+)
+T.equal(canStep, false, "route does not enter exact vehicle footprint")
+T.equal(stepReason, "vehicle", "exact vehicle reason")
+canStep, stepReason = PNC.TraversalQuery.CanStep(
     2.5,
     0.5,
     0,
@@ -141,31 +111,20 @@ local canStep, stepReason = PNC.TraversalQuery.CanStep(
     0,
     cell
 )
-T.equal(canStep, false, "route does not enter vehicle clearance")
-T.equal(stepReason, "vehicle_clearance", "vehicle clearance reason")
-canStep = PNC.TraversalQuery.CanStep(
-    3.5,
-    0.5,
-    0,
-    2.5,
-    0.5,
-    0,
-    cell
-)
-T.equal(canStep, true, "route may escape vehicle clearance")
+T.equal(canStep, true, "route may pass near vehicle clearance")
+T.equal(stepReason, "clear", "nearby vehicle is not a clearance block")
 
 local windowObject = {
     isDestroyed = function() return false end,
     IsOpen = function() return false end,
 }
 local windowFromSquare = makeSquare(false)
-local windowVehicleSquare = makeSquare(false)
+local windowVehicleSquare = makeSquare(true)
 windowFromSquare.getWindowTo = function() return windowObject end
 local windowCell = {
     getGridSquare = function(_, x)
         return x == 4 and windowVehicleSquare or windowFromSquare
     end,
-    getVehicles = function() return vehicles end,
 }
 PNC.VehicleAvoidance.Invalidate()
 canStep, stepReason = PNC.TraversalQuery.CanStep(
@@ -179,58 +138,6 @@ canStep, stepReason = PNC.TraversalQuery.CanStep(
 )
 T.equal(canStep, false, "vehicle landing blocks window traversal")
 T.equal(stepReason, "vehicle", "vehicle wins over window interaction")
-
-local nonTablePoly = coroutine.create(function() end)
-local javaLikeVehicle = {
-    getPolyPlusRadius = function()
-        return nonTablePoly
-    end,
-    getX = function() return 7.5 end,
-    getY = function() return 8.5 end,
-    getZ = function() return 0 end,
-    getScript = function()
-        return {
-            getExtents = function()
-                return {
-                    x = function() return 0.9 end,
-                    z = function() return 2.4 end,
-                }
-            end,
-        }
-    end,
-    isRemovedFromWorld = function() return false end,
-    isIntersectingSquare = function(_, x, y, z)
-        return x == 7 and y == 8 and z == 0
-    end,
-}
-local javaLikeVehicles = {
-    iterator = function()
-        local consumed = false
-        return {
-            hasNext = function() return not consumed end,
-            next = function()
-                consumed = true
-                return javaLikeVehicle
-            end,
-        }
-    end,
-}
-local javaLikeCell = {
-    getGridSquare = function() return clearSquare end,
-    getVehicles = function() return javaLikeVehicles end,
-}
-PNC.VehicleAvoidance.Invalidate()
-T.equal(
-    PNC.VehicleAvoidance.GetReason(
-        7.5,
-        8.5,
-        0,
-        javaLikeCell,
-        false
-    ),
-    "vehicle",
-    "non-table Build 42 VehiclePoly footprint"
-)
 
 PNC.LocomotionProfiles = {
     GetBaseProfile = function()
@@ -276,6 +183,9 @@ PNC.Registry = {
     end,
 }
 T.load(ROOT .. "PNC_PathService/PNC_PathService_Context.lua")
+PNC._dirtyDomain = nil
+PNC._lastWarning = nil
+PNC._warningCount = 0
 position.x = 1.5
 position.y = 0.5
 position.z = 0
@@ -309,32 +219,13 @@ lane = {
 }
 local repaired, repairedReason =
     PNC.PathService.Internal.repairInvalidBodyPosition(record, body, lane, 2000)
-T.equal(repaired, true, "live vehicle position repaired")
-T.equal(repairedReason, "vehicle", "live repair reason")
-T.equal(position.x, 0.5, "live repair destination x")
-T.equal(record.x, position.x, "live repair record x")
-T.equal(record.runtime.forceSyncEvent, "position_recovery", "live repair multiplayer sync")
-T.equal(record.runtime.positionRecovery.lastEvent, "live_unstuck", "live repair metadata")
-T.equal(PNC._dirtyDomain, "position_recovery", "live repair persisted")
-T.equal(lane.phase, "cancel_pending", "vehicle path lane invalidated")
-T.equal(lane.vehicleBlockedGoalX, 8.5, "vehicle-blocked goal quarantined")
-T.truthy(
-    string.find(PNC._lastWarning or "", "event=live_unstuck", 1, true),
-    "live repair warning was not logged"
-)
-
-position.x = 1.5
-position.y = 0.5
-repaired = PNC.PathService.Internal.repairInvalidBodyPosition(
-    record,
-    body,
-    lane,
-    2500
-)
-T.equal(repaired, true, "repeated vehicle position repaired")
-T.equal(PNC._warningCount, 1, "repeated recovery warning throttled")
-T.equal(record.runtime.positionRecovery.suppressedLogs, 1,
-    "suppressed recovery warning counted")
+T.equal(repaired, false, "vehicle contact is not forcibly relocated")
+T.equal(repairedReason, "vehicle", "vehicle contact remains observable")
+T.equal(position.x, 1.5, "vehicle position remains engine-owned")
+T.equal(record.x, 1.5, "record is not rewritten by vehicle contact")
+T.equal(record.runtime.positionRecovery, nil, "vehicle contact has no recovery metadata")
+T.equal(PNC._dirtyDomain, nil, "vehicle contact is not persisted as recovery")
+T.equal(lane.phase, "active", "vehicle contact does not cancel lane")
 
 PNC.PathService.Internal.logMoveTransition = function() end
 T.load(ROOT .. "PNC_PathService/PNC_PathService_Lane.lua")
@@ -344,19 +235,8 @@ local intentState = PNC.PathService.Internal.consumeMoveIntent(
     lane,
     body
 )
-T.equal(intentState, "vehicle_blocked",
-    "same vehicle-blocked goal remains quarantined")
-T.equal(lane.phase, "idle", "quarantined goal does not restart lane")
-
-vehicleBlocking = false
-intentState = PNC.PathService.Internal.consumeMoveIntent(
-    record,
-    lane,
-    body
-)
-T.equal(intentState, "requested", "goal released after vehicle moved")
-T.equal(lane.phase, "requested", "released goal restarts lane")
-T.equal(lane.vehicleBlockedGoalX, nil, "vehicle quarantine cleared")
+T.equal(intentState, "requested", "same goal remains restartable")
+T.equal(lane.phase, "requested", "vehicle contact does not quarantine goal")
 
 lane.phase = "active"
 lane.lastStepAt = 777

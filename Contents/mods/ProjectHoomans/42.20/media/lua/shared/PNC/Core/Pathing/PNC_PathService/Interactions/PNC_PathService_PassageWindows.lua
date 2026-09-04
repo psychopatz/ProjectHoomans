@@ -42,19 +42,7 @@ end
 
 local function resolveClimbDestination(context, object, actionKey, objectKey)
     local destSquare
-    if context.blockedFromSquare and context.blockedSquare
-        and TraversalQuery and TraversalQuery.GetPassageBetween
-        and TraversalQuery.GetPassageBetween(
-            context.blockedFromSquare,
-            context.blockedSquare
-        ) == object
-    then
-        destSquare = context.blockedSquare
-    elseif object.getOppositeSquare then
-        destSquare = Internal.passageWindowDestination(
-            object, context.actorSquare
-        )
-    end
+    destSquare = Internal.windowDestinationForContext(context, object)
     if not destSquare or not Internal.isSquareWalkable(
         destSquare:getX() + 0.5,
         destSquare:getY() + 0.5,
@@ -238,6 +226,17 @@ function Internal.tryWindowPassageCandidate(context, object, candidate)
         return nil, nil, false
     end
     if not objectSquare then return nil, nil, false end
+
+    local interiorBlocked, interiorReason =
+        Internal.isInteriorBoundaryBlocked(context, object)
+    if interiorBlocked then
+        Internal.logTraversalReject(
+            context.record, zombie, context.lane,
+            "traversal_rejected", interiorReason,
+            "object=" .. tostring(objectKey or "nil")
+        )
+        return false, nil, true
+    end
 
     local handled, reason, decided = Internal.tryWindowBreach(
         context, object, objectSquare, objectKey

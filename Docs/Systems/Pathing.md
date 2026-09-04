@@ -70,16 +70,11 @@
   then falls back to blocked-step, collision, and no-progress recovery
 - traversal candidates must be ahead of the goal-facing lane, improve distance toward the live goal, and avoid immediate re-cross of the same obstacle from the same side
 - active move lanes keep short traversal memory so repeated same-side window climbs are rejected and logged instead of re-executed every tick
-- vehicle-intersecting squares are hard occupancy failures for fake
-  locomotion, steering NPCs around vehicle collision geometry instead of
-  allowing a Lua-authored step into the chassis
-- `PNC_VehicleAvoidance` supplements the square flag with a shared 250 ms
-  footprint cache built from loaded `BaseVehicle` polygons. This covers the
-  multiplayer window where a vehicle is synchronized before the grid-square
-  intersection cache catches up, without scanning every vehicle per NPC step
-- planned travel treats the one-tile ring around a chassis as clearance:
-  routes cannot enter that ring from outside, while an NPC already inside it
-  may move outward. Exact chassis tiles remain hard-blocked in both directions
+- exact vehicle-intersecting squares remain occupancy failures for fake
+  locomotion, preventing a Lua-authored SP step directly into the chassis
+- vehicle proximity is not treated as a clearance obstacle. Native movement
+  owns physical contact, and a vehicle contact does not relocate the body or
+  quarantine its active goal
 - authoritative NPC position writes synchronize the engine previous-position
   fields. This prevents Java collision handling from reinterpreting controlled
   motion as a player-style traversal on an embodied `IsoZombie` without

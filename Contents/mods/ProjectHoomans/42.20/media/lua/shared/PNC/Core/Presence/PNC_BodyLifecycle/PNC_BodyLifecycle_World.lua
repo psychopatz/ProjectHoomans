@@ -91,11 +91,18 @@ local function announceCorpse(corpse)
     -- dedicated server path requires GameServer.sendCorpse(). Announce only
     -- after membership has been verified so a failed handoff cannot create a
     -- client-side duplicate.
-    if sendCorpse and corpse then
-        pcall(sendCorpse, corpse)
-    elseif GameServer and GameServer.sendCorpse and corpse then
-        pcall(GameServer.sendCorpse, corpse)
+    if not corpse then
+        return false
     end
+    if isServer and isServer() == true then
+        if sendCorpse then
+            return pcall(sendCorpse, corpse)
+        elseif GameServer and GameServer.sendCorpse then
+            return pcall(GameServer.sendCorpse, corpse)
+        end
+    end
+    -- Singleplayer already owns the local corpse; there is no packet to send.
+    return true
 end
 
 Internal.announceCorpse = announceCorpse

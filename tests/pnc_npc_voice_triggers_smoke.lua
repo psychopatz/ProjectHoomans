@@ -21,6 +21,11 @@ PNC = {
     NPCVoice = {
         MODE_LOCAL = "local",
         MODE_WORLD = "world",
+        PlayWorldAt = function(_, suffix)
+            calls.worldCount = calls.worldCount + 1
+            calls.worldSuffix = suffix
+            return 303
+        end,
     },
 }
 
@@ -140,7 +145,7 @@ T.truthy(
         isFemale = true,
         alive = false,
         deathMarker = true,
-    }, body, 4000),
+    }, nil, 4000),
     "terminal death did not emit world voice"
 )
 T.equal(calls.worldCount, 2, "terminal death did not use world lane")

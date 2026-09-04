@@ -89,6 +89,23 @@ local function supplyItemFullType(record, kind)
         and tostring(candidate.fullType) or nil
 end
 
+local function scavengeActivity(record)
+    local service = PNC.ScavengeService
+    local internal = service and service.Internal or nil
+    local session = internal and internal.SessionForNPC
+        and internal.SessionForNPC(record and record.id) or nil
+    local worker = session and session.workers
+        and session.workers[tostring(record and record.id or "")] or nil
+    if not worker or worker.currentKind ~= "loot" then return nil end
+    local entry = worker.currentEntry
+    local fullType = tostring(entry and entry.fullType or "")
+    if fullType == "" then return nil end
+    return {
+        fullType = fullType,
+        phase = tostring(worker.phase or ""),
+    }
+end
+
 local function facilityItem(record, runtime, capability)
     if capability == "food.dine"
         or capability == "survival.eat.inventory"
@@ -112,6 +129,10 @@ local function facilityItem(record, runtime, capability)
     end
     if capability == "water.drink" then
         return nil, "UI_PNC_Action_WaterTarget"
+    end
+    if capability == "farm.work" then
+        local selected = tostring(runtime.activityItemFullType or "")
+        if selected ~= "" then return selected, nil end
     end
 end
 
@@ -148,7 +169,12 @@ Status.Register("treatment", 85, function(record)
         and PNC.BehaviorTreatment.BuildSnapshot(record) or nil
     local phase = tostring(treatment and treatment.phase or "")
     if phase ~= "" and phase ~= "idle" and phase ~= "complete" then
-        return { kind = "treatment", phase = phase }
+        return {
+            kind = "treatment",
+            phase = phase,
+            activityItemFullType = treatment.bandageType,
+            activityItemLabel = treatment.bandageName,
+        }
     end
 end)
 
@@ -221,9 +247,26 @@ Status.Register("current_job", 10, function(record)
         behavior = tostring(record.activeBehavior or ""),
         orderKind = tostring(record.orderSpec and record.orderSpec.kind or ""),
     }
+    if tostring(record.activeJob or "") == "Scavenge"
+        or tostring(record.orderSpec and record.orderSpec.kind or "")
+            == tostring(PNC.Const and PNC.Const.ORDER_SCAVENGE or "scavenge")
+    then
+        local scavenge = scavengeActivity(record)
+        if scavenge then
+            information.phase = scavenge.phase
+            information.activityItemFullType = scavenge.fullType
+        end
+    end
+    local fishing = runtime.fishing
+    if fishing and information.orderKind == "fishing" then
+        information.phase = tostring(fishing.phase or "")
+        information.activityItemFullType = fishing.activityItemFullType
+    end
     local lumber = runtime.lumber
     if tostring(record.activeJob or "") == "Lumber" and lumber then
         information.phase = tostring(lumber.phase or "")
+        information.activityItemFullType = lumber.activityItemFullType
+            or lumber.tool and lumber.tool.selectedFullType
         information.waitingFor = lumber.waitingFor
         information.waitingReason = lumber.waitingReason
         information.toolDiagnostic = Core and Core.DeepCopy

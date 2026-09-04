@@ -105,6 +105,91 @@ local function taskRow(task, label, rank, pending)
     return row
 end
 
+local function sortedCountEntries(counts)
+    local output = {}
+    for key, value in pairs(counts or {}) do
+        output[#output + 1] = {
+            key = tostring(key), count = tonumber(value) or 0,
+        }
+    end
+    table.sort(output, function(left, right)
+        if left.count ~= right.count then return left.count > right.count end
+        return left.key < right.key
+    end)
+    return output
+end
+
+local function countSummary(counts, maximum)
+    local output = {}
+    for index, entry in ipairs(sortedCountEntries(counts)) do
+        if index > (maximum or 4) then break end
+        output[#output + 1] = display(entry.key, "UNKNOWN")
+            .. " " .. tostring(entry.count)
+    end
+    return table.concat(output, ", ")
+end
+
+local function addProviderDiagnosticRows(rows, brain)
+    local reports = brain and brain.providerDiagnostics or {}
+    local providerIDs = {}
+    for providerID in pairs(reports) do
+        providerIDs[#providerIDs + 1] = tostring(providerID)
+    end
+    table.sort(providerIDs)
+    for _, providerID in ipairs(providerIDs) do
+        local report = reports[providerID] or {}
+        local total = tonumber(report.totalOrders) or 0
+        local assignable = tonumber(report.assignableOrders) or 0
+        local eligible = tonumber(report.eligibleOrders) or 0
+        local detail
+        if report.unavailable then
+            detail = display(report.unavailable,
+                "DIAGNOSTICS UNAVAILABLE")
+        else
+            detail = "TOTAL " .. tostring(total)
+                .. " | QUEUED/WAITING " .. tostring(assignable)
+                .. " | ELIGIBLE " .. tostring(eligible)
+            local statuses = countSummary(report.statusCounts, 4)
+            if statuses ~= "" then detail = detail .. " | " .. statuses end
+        end
+        rows[#rows + 1] = {
+            key = "task_brain_provider:" .. providerID,
+            label = Shared.Tr("UI_PNC_TaskBrain_ProviderDiagnostics",
+                "PROVIDER DIAGNOSTICS") .. "  " .. domain(providerID),
+            detail = detail,
+            colorName = eligible > 0 and "success" or "warning",
+        }
+        local rejections = sortedCountEntries(report.rejectionCounts)
+        for index, entry in ipairs(rejections) do
+            if index > 4 then break end
+            rows[#rows + 1] = {
+                key = "task_brain_provider_rejection:" .. providerID
+                    .. ":" .. entry.key,
+                label = Shared.Tr("UI_PNC_TaskBrain_ProviderRejected",
+                    "REJECTED") .. "  " .. display(entry.key, "UNKNOWN"),
+                detail = Shared.TrFormat(
+                    "UI_PNC_TaskBrain_ProviderRejectedHelp",
+                    "%s order(s) failed this gate.", tostring(entry.count)),
+                colorName = "muted",
+            }
+        end
+        for index, sample in ipairs(report.samples or {}) do
+            if index > 4 then break end
+            rows[#rows + 1] = {
+                key = "task_brain_provider_sample:" .. providerID .. ":"
+                    .. tostring(sample.orderId or index),
+                label = Shared.Tr("UI_PNC_TaskBrain_ProviderSample",
+                    "BLOCKED") .. "  "
+                    .. operation({ operation = sample.operation }),
+                detail = display(sample.status, "UNKNOWN") .. " | "
+                    .. display(sample.reason, "UNKNOWN") .. " | ORDER "
+                    .. text(sample.orderId, "-"),
+                colorName = "muted",
+            }
+        end
+    end
+end
+
 local function isCancellationResult(result)
     local action = result and tostring(result.action or "") or ""
     return action == "work_cancel" or action == "medical_cancel"
@@ -239,6 +324,8 @@ function Task.BuildRows(context)
             colorName = "danger",
         }
     end
+
+    addProviderDiagnosticRows(rows, brain)
 
     addResultRow(rows, window, result)
     return rows

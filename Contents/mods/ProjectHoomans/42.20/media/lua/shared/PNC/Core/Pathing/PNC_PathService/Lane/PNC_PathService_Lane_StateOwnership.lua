@@ -71,18 +71,4 @@ function Internal.ensureLaneTraversalAndFacingState(lane)
     lane.lastFacingDirY = lane.lastFacingDirY ~= nil and tonumber(lane.lastFacingDirY) or nil
     lane.lastFacingX = lane.lastFacingX ~= nil and tonumber(lane.lastFacingX) or nil
     lane.lastFacingY = lane.lastFacingY ~= nil and tonumber(lane.lastFacingY) or nil
-    lane.vehicleBlockedGoalX = lane.vehicleBlockedGoalX ~= nil
-        and tonumber(lane.vehicleBlockedGoalX) or nil
-    lane.vehicleBlockedGoalY = lane.vehicleBlockedGoalY ~= nil
-        and tonumber(lane.vehicleBlockedGoalY) or nil
-    lane.vehicleBlockedGoalZ = lane.vehicleBlockedGoalZ ~= nil
-        and tonumber(lane.vehicleBlockedGoalZ) or nil
-    lane.vehicleBlockedFromX = lane.vehicleBlockedFromX ~= nil
-        and tonumber(lane.vehicleBlockedFromX) or nil
-    lane.vehicleBlockedFromY = lane.vehicleBlockedFromY ~= nil
-        and tonumber(lane.vehicleBlockedFromY) or nil
-    lane.vehicleBlockedFromZ = lane.vehicleBlockedFromZ ~= nil
-        and tonumber(lane.vehicleBlockedFromZ) or nil
-    lane.vehicleBlockedAt = tonumber(lane.vehicleBlockedAt) or 0
-    lane.vehicleBlockedReason = lane.vehicleBlockedReason or nil
 end

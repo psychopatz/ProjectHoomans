@@ -36,7 +36,6 @@ Internal.SUPPRESSED_STATES = {
     ["sitonground"] = true,
     ["staggerback"] = true,
     ["staggerback-knockeddown"] = true,
-    ["turnalerted"] = true,
     ["thump"] = true,
 }
 Internal.IDLE_RESET_STATES = {
@@ -51,7 +50,6 @@ Internal.IDLE_RESET_STATES = {
     ["climbwindow"] = true,
     ["lunge"] = true,
     ["pathfind"] = true,
-    ["turnalerted"] = true,
     ["thump"] = true,
 }
 

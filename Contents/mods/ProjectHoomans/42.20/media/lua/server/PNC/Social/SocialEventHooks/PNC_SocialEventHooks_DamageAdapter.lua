@@ -38,6 +38,12 @@ local function call(object, method, ...)
 end
 
 local function audit(fields)
+    if not (PNC.Config
+        and PNC.Config.Relationships
+        and PNC.Config.Relationships.DebugCombatCallbacks == true)
+    then
+        return
+    end
     local message = "[RelationshipCombatAudit] " .. table.concat(fields, " ")
     if Core and Core.LogInfo then
         Core.LogInfo(message)

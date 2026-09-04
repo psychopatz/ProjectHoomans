@@ -8,6 +8,7 @@ require "PNC/Production/PNC_ProductionContext"
 require "PNC/Production/PNC_WorkInputService"
 require "PNC/Production/PNC_HomeDutyService"
 require "PNC/Production/PNC_WorkService"
+require "PNC/Production/WorldEffects/PNC_WorldEffectService"
 if PNC.ProvisionScheduler and PNC.ProvisionScheduler.BindWorkService then
     PNC.ProvisionScheduler.BindWorkService(PNC.WorkService)
 end

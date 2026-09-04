@@ -125,6 +125,37 @@ function Presentation.ShowNPCFlavor(actor, flavorID, context)
     return speak(actor, text), text
 end
 
+function Presentation.ShowCommandRejection(player, actor, commandID, reason,
+    context)
+    if tostring(commandID or "") ~= "camp"
+        or tostring(reason or "") ~= "camp_requires_building"
+    then
+        return false
+    end
+    context = type(context) == "table" and context or {}
+    context.playerActor = context.playerActor or player
+    context.liveActor = context.liveActor or actor
+    if Presentation.ShowCommandInteraction then
+        return Presentation.ShowCommandInteraction(
+            player,
+            commandID,
+            context.target,
+            context.targets,
+            "invalid",
+            context
+        )
+    end
+    local playerShown = Presentation.ShowPlayerFlavor(
+        player,
+        "camp_rejected",
+        context
+    )
+    local shown = actor
+        and Presentation.ShowNPCFlavor(actor, "camp_rejected", context)
+        or false
+    return playerShown == true or shown == true
+end
+
 local function publishNPCMessage(actor, text, context)
     local target = type(context) == "table" and context.target or nil
     local player = type(context) == "table" and context.playerActor or nil
@@ -319,25 +350,31 @@ function Presentation.HandlePlayerEmoteInteractionResult(result)
             )
             local replyText
             local playerText
-            if body and target.replyFlavorID then
-                _, replyText = Presentation.ShowNPCFlavor(body, target.replyFlavorID, {
-                    target = snapshot,
-                    playerActor = player,
-                    seed = target.eventID or key,
-                })
-            elseif target.replyFlavorID and Flavor and Flavor.Resolve then
-                replyText = Flavor.Resolve(
+            if target.replyFlavorID then
+                _, _, replyText = Presentation.EnqueueFlavor(
                     target.replyFlavorID,
                     "npc",
-                    target.eventID or key,
-                    flavorContext
+                    body,
+                    {
+                        target = snapshot,
+                        targets = { snapshot },
+                        npcID = npcID,
+                        playerActor = player,
+                        commandID = "vanilla_emote_"
+                            .. tostring(result.emote),
+                        seed = target.eventID or key,
+                    },
+                    {
+                        eventID = target.eventID or key,
+                        family = "emote_interaction",
+                    }
                 )
             end
             if Flavor and Flavor.Resolve then
                 playerText = Flavor.Resolve(
                     "vanilla_emote_" .. tostring(result.emote or ""),
                     "player",
-                    requestID .. ":" .. npcID,
+                    requestID,
                     flavorContext
                 )
             end
@@ -428,8 +465,9 @@ function Presentation.HandlePlayerEmoteInteractionResult(result)
     return true
 end
 
-function Presentation.PlayCommand(player, commandID, target)
+function Presentation.PlayCommand(player, commandID, target, context, outcome)
     local definition = Commands and Commands.Get(commandID) or nil
+    context = type(context) == "table" and context or {}
     if not player or not definition
         or player.isDead and player:isDead()
     then
@@ -438,9 +476,30 @@ function Presentation.PlayCommand(player, commandID, target)
     if definition.emote and player.playEmote then
         player:playEmote(definition.emote)
     end
-    Presentation.ShowPlayerFlavor(player, commandID, {
-        target = target,
-    })
+    context.playerActor = player
+    context.commandID = context.commandID or commandID
+    context.target = context.target or target
+    context.targets = context.targets or (target and { target } or nil)
+    if outcome and Presentation.ShowCommandInteraction then
+        Presentation.ShowCommandInteraction(
+            player,
+            commandID,
+            context.target,
+            context.targets,
+            outcome,
+            context
+        )
+    elseif Presentation.EnqueueFlavor then
+        Presentation.EnqueueFlavor(
+            commandID,
+            "player",
+            player,
+            context,
+            { family = "emote_interaction" }
+        )
+    else
+        Presentation.ShowPlayerFlavor(player, commandID, context)
+    end
     return true
 end
 
@@ -469,6 +528,14 @@ function Presentation.SyncAcknowledgement(zombie, snapshot, modData)
     -- Consume feedback even when it belongs to another player so ownership
     -- changes never replay an old acknowledgement locally.
     modData.PNC_CommandAckToken = token
+    if Presentation.IsCommandAcknowledgementSuppressed
+        and Presentation.IsCommandAcknowledgementSuppressed(
+            feedback.id,
+            snapshot and snapshot.id
+        )
+    then
+        return false
+    end
     if not isLocalOwner(snapshot, player) then return false end
     text = Flavor and Flavor.Resolve
         and Flavor.Resolve(
@@ -486,5 +553,7 @@ function Presentation.SyncAcknowledgement(zombie, snapshot, modData)
         or nil
     return speak(zombie, text)
 end
+
+require "PNC/Commands/PNC_CompanionCommandInteraction"
 
 return Presentation
