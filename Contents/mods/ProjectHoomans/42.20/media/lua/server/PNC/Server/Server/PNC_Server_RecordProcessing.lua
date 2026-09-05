@@ -139,7 +139,7 @@ function H.ProcessRecord(record, now)
         )
     )
     if pathDue then
-        PathService.Pump(record, zombie)
+        PathService.Pump(record, zombie, "server_path_service")
         if Registry.RefreshLivePosition then
             Registry.RefreshLivePosition(record, zombie, false)
         end

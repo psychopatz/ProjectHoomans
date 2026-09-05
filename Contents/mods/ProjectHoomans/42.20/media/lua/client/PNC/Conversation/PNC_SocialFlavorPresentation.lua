@@ -20,7 +20,9 @@ local Client = PsychopatzCore.SocialFlavorClient
 local EventBus = PsychopatzCore.Events
 local Diary = PNC.Conversation.Diary
 local NameParts = PsychopatzCore.Conversation.NameParts
+local Targets = PNC.CompanionTargetResolver
 local OWNER_TOKEN = Presentation
+local MAX_PLAYER_SPEECH_RECIPIENTS = 8
 
 local function clean(value, fallback)
     value = tostring(value or "")
@@ -223,6 +225,120 @@ function Presentation.Receive(ambientFlavor, summary, networkArgs)
         .. " role=" .. role .. " accepted=" .. tostring(accepted == true)
         .. " reason=" .. tostring(reason or ""))
     return accepted, reason
+end
+
+local function speechTargets(player, context)
+    local explicit = type(context) == "table" and context.targets or nil
+    if type(explicit) == "table" and #explicit > 0 then
+        return explicit
+    end
+    if type(context) == "table" and context.target then
+        return { context.target }
+    end
+    if Targets and Targets.CollectOwnedCompanions then
+        return Targets.CollectOwnedCompanions(player)
+    end
+    return {}
+end
+
+local function speechTargetID(target)
+    return clean(target and (
+        target.id or target.npcID or target.npcUUID
+            or target.source and target.source.id
+    ), nil)
+end
+
+-- Player speech reactions stay entirely on the receiving client.  This is
+-- intentionally separate from Receive(), which consumes server-authoritative
+-- social events.  The server never receives or generates this flavor text.
+function Presentation.ReceivePlayerSpeech(player, text, sourceContext)
+    text = clean(text, "")
+    if text == "" or not player then return false end
+    text = string.sub(text, 1, Client.MAX_TEXT_LENGTH or 420)
+    local context = type(sourceContext) == "table" and sourceContext or {}
+    local targets = speechTargets(player, context)
+    local playerIdentityValue = playerIdentity()
+    local playerIDValue = playerUUID()
+    if not playerIDValue then
+        playerIDValue = clean(
+            playerIdentityValue.addressName,
+            "local-player"
+        )
+    end
+    local accepted = 0
+    local nowValue = PNC.Core and PNC.Core.Now and PNC.Core.Now()
+        or getTimeInMillis and getTimeInMillis() or 0
+    local index
+    for index = 1, math.min(#targets, MAX_PLAYER_SPEECH_RECIPIENTS) do
+        local target = targets[index]
+        local npcID = speechTargetID(target)
+        if npcID then
+            local active = activeConversationFor(npcID)
+            local speaker = npcIdentity(npcID, target.name)
+            local eventID = "player-speech:" .. tostring(playerIDValue)
+                .. ":" .. tostring(nowValue) .. ":" .. tostring(index)
+            local targetContext = {
+                eventType = "player_spoke",
+                playerMessage = text,
+                npcID = npcID,
+                socialRole = clean(
+                    target.socialRole or target.npcType
+                        or target.source and (
+                            target.source.socialRole or target.source.npcType
+                        ),
+                    "colonist"
+                ),
+                speakerFullName = speaker.fullName,
+                speakerFirstName = speaker.firstName,
+                speakerSurname = speaker.surname,
+                player = playerIdentityValue.addressName,
+                playerName = playerIdentityValue.addressName,
+                playerFullName = playerIdentityValue.fullName,
+                playerFirstName = playerIdentityValue.firstName,
+                playerSurname = playerIdentityValue.surname,
+                speechScope = "owned_colonists",
+                sourceCommandID = context.commandID,
+            }
+            local ok = Client.Enqueue({
+                eventID = eventID,
+                flavorID = "social.player_spoke",
+                family = "player_speech_reaction",
+                priority = 35,
+                llmPriority = 90,
+                weight = 1,
+                speakerID = npcID,
+                speakerName = speaker.fullName,
+                playerUUID = playerIDValue,
+                context = targetContext,
+                seed = eventID,
+                llmEligible = true,
+                memoryEligible = false,
+                llmGraceMs = 2500,
+                cooldowns = {
+                    ambientMs = 2500,
+                    familyMs = 8000,
+                    speakerMs = 8000,
+                    mergeWindowMs = 2500,
+                },
+                mergeKey = "player-speech:" .. npcID,
+                presentationState = {
+                    nameplate = not active,
+                    conversationUI = active,
+                    interrupt = false,
+                    tts = true,
+                },
+                source = {
+                    kind = "social_flavor",
+                    channel = "player_speech",
+                    eventType = "player_spoke",
+                    contextEligible = false,
+                    speechScope = "owned_colonists",
+                },
+            })
+            if ok == true then accepted = accepted + 1 end
+        end
+    end
+    return accepted > 0
 end
 
 local function onDelivered(payload)

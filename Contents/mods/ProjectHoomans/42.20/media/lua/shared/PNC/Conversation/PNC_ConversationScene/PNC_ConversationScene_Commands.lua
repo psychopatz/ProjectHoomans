@@ -14,6 +14,7 @@ function Scene.HandleClientCommand(player, command, args)
             maximumDistance = args.maximumDistance,
             dangerRadius = args.dangerRadius,
             allowHostileParley = args.allowHostileParley == true,
+            enforceDistance = args.enforceDistance ~= false,
         })
     end
     if command == Scene.CMD_END then

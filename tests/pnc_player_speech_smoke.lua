@@ -10,6 +10,7 @@ local packets = {}
 local bridgeActive = true
 local playerSpeechEnabled = false
 local sayCount = 0
+local reactionCount = 0
 local now = 1000
 
 PsychopatzCore.BridgeBootstrap = {
@@ -57,6 +58,12 @@ getSpecificPlayer = function() return player end
 PNC.CompanionCommandFlavor = {
     Resolve = function() return "Hello from the player." end,
 }
+PNC.SocialFlavorPresentation = {
+    ReceivePlayerSpeech = function()
+        reactionCount = reactionCount + 1
+        return true
+    end,
+}
 
 T.load("PsychopatzCore", "common", "PsychopatzCore/Events/PC_EventBus.lua")
 T.load("PsychopatzCore", "common", "PsychopatzCore/Voice/PsychopatzVoiceGateway.lua")
@@ -69,6 +76,8 @@ local Presentation = PNC.CompanionCommandPresentation
 Presentation.ShowPlayerFlavor(player, "wave", {})
 T.equal(sayCount, 1, "disabled player voice falls back to standard Say")
 T.equal(#packets, 0, "disabled player voice publishes no packet")
+T.equal(reactionCount, 1,
+    "disabled player voice still reaches local social flavor")
 
 playerSpeechEnabled = true
 Presentation.ShowPlayerFlavor(player, "wave", { eventID = "event-one" })
@@ -77,10 +86,14 @@ T.equal(#packets, 1, "enabled player voice uses the canonical endpoint")
 T.equal(packets[1].packet.speaker_kind, "player", "player packet kind")
 T.equal(packets[1].packet.speaker_id, "player-one", "player packet identity")
 T.equal(packets[1].packet.text, "Hello from the player.", "player packet text")
+T.equal(reactionCount, 2,
+    "enabled player speech reaches local social flavor once")
 
 bridgeActive = false
 Presentation.ShowPlayerFlavor(player, "wave", {})
 T.equal(sayCount, 3, "inactive brain falls back to standard Say")
 T.equal(#packets, 1, "inactive brain publishes no player packet")
+T.equal(reactionCount, 3,
+    "inactive brain still allows deterministic local flavor fallback")
 
 T.finish("pnc_player_speech_smoke")

@@ -36,6 +36,15 @@ local records = {
         y = 100,
         z = 0,
     },
+    {
+        id = "far-colonist",
+        name = "Far Colonist",
+        recruited = true,
+        ownerUsername = "player-one",
+        x = 1000,
+        y = 1000,
+        z = 0,
+    },
 }
 
 local snapshotOnly = {
@@ -113,6 +122,12 @@ T.equal(#colonists, 1,
     "the existing companion collection remains owner-scoped")
 T.equal(colonists[1].id, "colonist-owned",
     "colonist scope keeps the player-owned companion")
+
+local speechRecipients = Resolver.CollectOwnedCompanions(player)
+T.equal(#speechRecipients, 2,
+    "player speech includes owned colonists outside interaction radius")
+T.equal(speechRecipients[2].id, "far-colonist",
+    "player speech retains the distant owned colonist")
 
 local other = Resolver.CollectNearbyTargets(
     player,

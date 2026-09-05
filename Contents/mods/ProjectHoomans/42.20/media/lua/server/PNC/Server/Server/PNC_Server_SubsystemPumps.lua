@@ -83,8 +83,12 @@ function H.PrepareTick(now)
         nil, now)
     safeOptional("server_prepare.lumber", PNC.LumberService, "Pump", nil,
         now)
-    safeOptional("server_prepare.engine_path", PNC.EnginePathPlanner,
-        "PumpServerFrame")
+    -- Native engine-path routes are pumped by PathService.Pump from
+    -- ProcessRecord. Keeping a second planner pump here races the per-record
+    -- pump at the same timestamp: the duplicate guard then suppresses the
+    -- progress/watchdog handoff, leaving a client-owned route active after it
+    -- has stopped. The per-record path pump is the single authority for this
+    -- bookkeeping.
     if PNC.Travel and PNC.Travel.Service then
         safeOptional("server_prepare.abstract_travel",
             PNC.Travel.Service, "RefreshAbstractPositions", nil, now, false)

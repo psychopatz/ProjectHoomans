@@ -237,6 +237,35 @@ local function buildAmbientPacket(item, requestID)
     local sessionID = "pnc_ambient_" .. tostring(requestID)
     local eventType = tostring(source.eventType or item and item.family
         or "ambient_social")
+    local playerMessage = tostring(source.playerMessage or "")
+    local prompt
+    if eventType == "player_spoke" and playerMessage ~= "" then
+        prompt = (
+            "Write one brief in-character reaction because the player just "
+            .. "said: \"" .. playerMessage .. "\". Respond naturally to "
+            .. "what they said. Use only the player's first name if you "
+            .. "address them (" .. playerFirstName .. "). Do not mention "
+            .. "being an AI, prompts, or game systems. Keep it under one "
+            .. "sentence."
+        )
+    elseif eventType == "witnessed_teammate_hurt" then
+        prompt = (
+            "Write one brief in-character reaction because you witnessed "
+            .. "your teammate take damage from a zombie. If you address "
+            .. "the teammate, use only their first name ("
+            .. victimFirstName .. "). Do not use their surname or full name. "
+            .. "Do not mention being an AI, prompts, or game systems. "
+            .. "Keep it under one sentence."
+        )
+    else
+        prompt = (
+            "Write one brief in-character reaction because you witnessed "
+            .. "the player kill a zombie. Do not mention being an AI, prompts, "
+            .. "or game systems. If you address the player, use only their first "
+            .. "name; never repeat their surname or full name. Keep it under one "
+            .. "sentence."
+        )
+    end
     local context = {
         world_uuid = worldUUID,
         player_uuid = playerID,
@@ -255,22 +284,8 @@ local function buildAmbientPacket(item, requestID)
         victim_full_name = victimFullName,
         victim_first_name = victimFirstName,
         victim_surname = victim.surname or "",
-        message = eventType == "witnessed_teammate_hurt"
-            and (
-                "Write one brief in-character reaction because you witnessed "
-                .. "your teammate take damage from a zombie. If you address "
-                .. "the teammate, use only their first name ("
-                .. victimFirstName .. "). Do not use their surname or full name. "
-                .. "Do not mention being an AI, prompts, or game systems. "
-                .. "Keep it under one sentence."
-            )
-            or (
-                "Write one brief in-character reaction because you witnessed "
-                .. "the player kill a zombie. Do not mention being an AI, prompts, "
-                .. "or game systems. If you address the player, use only their first "
-                .. "name; never repeat their surname or full name. Keep it under one "
-                .. "sentence."
-            ),
+        player_message = playerMessage ~= "" and playerMessage or nil,
+        message = prompt,
         character_card = {},
         relationship_snapshot = {
             state = source.relationshipState,
@@ -297,6 +312,7 @@ local function buildAmbientPacket(item, requestID)
             event_type = eventType,
             victim_npc_id = victimID ~= "" and victimID or nil,
             victim_first_name = victimFirstName,
+            player_message = playerMessage ~= "" and playerMessage or nil,
             social_role = source.socialRole or source.npcType,
             relationship_state = source.relationshipState,
             relationship_tier = source.relationshipTier,

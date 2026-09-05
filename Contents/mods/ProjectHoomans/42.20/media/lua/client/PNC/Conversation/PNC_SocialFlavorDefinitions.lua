@@ -192,4 +192,24 @@ Flavor.Register("social.follower_abandoned_hostile_npc", {
     },
 })
 
+Flavor.Register("social.player_spoke", {
+    id = "social.player_spoke",
+    family = "player_speech_reaction",
+    npc = {
+        "I heard you, {playerFirstName}.",
+        "Right, {playerFirstName}. I am listening.",
+        "Understood, {playerFirstName}.",
+    },
+    variants = {
+        {
+            id = "colonist",
+            when = { socialRole = "colonist" },
+            npc = {
+                "I heard you, {playerFirstName}. We will handle it together.",
+                "Understood, {playerFirstName}. I am with you.",
+            },
+        },
+    },
+})
+
 return PNC.SocialFlavorDefinitions

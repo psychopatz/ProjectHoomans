@@ -31,6 +31,7 @@ local invalidations = {}
 local intentConsumptions = 0
 local activeMoveCalls = 0
 local nativePumpCalls = 0
+local nativePumpSource
 local steeringCalls = 0
 local passageProbeCalls = 0
 
@@ -49,8 +50,9 @@ PNC = {
         GetSteeringTarget = function()
             steeringCalls = steeringCalls + 1
         end,
-        Pump = function()
+        Pump = function(_, _, source)
             nativePumpCalls = nativePumpCalls + 1
+            nativePumpSource = source
             return true, "native_behavior_pending"
         end,
     },
@@ -60,6 +62,11 @@ local Internal = PNC.PathService.Internal
 Internal.LiveBodyControl = PNC.LiveBodyControl
 Internal.Core = {
     Now = function() return now end,
+    Distance = function(x1, y1, x2, y2)
+        local dx = x2 - x1
+        local dy = y2 - y1
+        return math.sqrt(dx * dx + dy * dy)
+    end,
 }
 Internal.ensureMoveLane = function() return lane end
 Internal.repairInvalidBodyPosition = function() return false end
@@ -75,9 +82,22 @@ Internal.hasClosedPassageToward = function()
     return false
 end
 Internal.applyHoldAnimation = function() end
+Internal.tryNativeAdjacentPassage = function() return false end
+Internal.refreshResolvedLocomotion = function() return "walk" end
+Internal.setWalkAnim = function() end
+Internal.recordNativeMove = function(_, _, _, _, _, _, nativeState)
+    return true, nativeState
+end
 
 T.load("ProjectHoomans", "shared",
     "PNC/Core/Pathing/PNC_PathService/PNC_PathService_Motion.lua")
+
+-- The loaded progress/passage providers define their production helpers;
+-- keep this ownership test focused on the pump boundary itself.
+Internal.tryNativeAdjacentPassage = function() return false end
+Internal.recordNativeMove = function(_, _, _, _, _, _, nativeState)
+    return true, nativeState
+end
 
 local handled
 local state
@@ -130,5 +150,16 @@ T.equal(activeMoveCalls, 1,
     "native waiting lane invoked fake locomotion")
 T.equal(passageProbeCalls, 0,
     "native waiting lane performed a proactive passage scan")
+
+-- Multiplayer native movement is pumped by PathService. The planner must
+-- receive the caller label as its third argument; passing the lane table here
+-- hides the actual pump source and makes duplicate-pump diagnosis unreliable.
+PNC.LiveBodyControl.IsMultiplayer = function() return true end
+navigation.nativeActive = true
+handled, state = PNC.PathService.Pump(record, body, "ownership_test")
+T.truthy(handled and state == "native_behavior_pending",
+    "multiplayer native lane did not reach the planner")
+T.equal(nativePumpSource, "ownership_test",
+    "native planner received the route lane instead of the caller label")
 
 T.finish("pnc_path_service_motion_ownership_smoke")

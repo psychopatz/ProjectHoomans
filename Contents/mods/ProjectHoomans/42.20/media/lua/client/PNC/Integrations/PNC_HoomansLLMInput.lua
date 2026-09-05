@@ -19,6 +19,9 @@ local MAX_INPUT_LENGTH = 4000
 local INLINE_WIDTH = 320
 local INLINE_HEIGHT = 108
 local INLINE_PLAYER_Y_OFFSET = 36
+local INLINE_LIFECYCLE_INTERVAL_MS = 100
+local INLINE_CONTEXT_REFRESH_INTERVAL_MS = 500
+local INLINE_CONTROLS_REFRESH_INTERVAL_MS = 250
 local INLINE_MODE_NEAREST = "nearest"
 local INLINE_MODE_NEARBY = "nearby"
 local INLINE_SCOPE_COLONISTS = "colonists"
@@ -336,6 +339,9 @@ function Integration.CloseInline(reason)
     Inline.target = nil
     Inline.targetID = nil
     Inline.directTarget = nil
+    Inline.nextLifecycleAt = nil
+    Inline.nextContextRefreshAt = nil
+    Inline.nextControlsRefreshAt = nil
     Inline.focusAfterTriggerRelease = false
     Inline.triggerBinding = nil
     return true
@@ -630,6 +636,34 @@ local function rebuildInlineHosts(player, resolved)
     return true
 end
 
+-- Keep the selected target/host stable while the compact UI is open. Refresh
+-- live body and snapshot references opportunistically, but never re-run the
+-- acquisition radius gate or rebuild headless hosts just because the NPC
+-- moved.
+local function refreshLockedInlineEntries(player)
+    local entries = Inline.entries or {}
+    local hosts = Inline.hosts or {}
+    for index, entry in ipairs(entries) do
+        local refreshed = Targets.BuildConversationEntry({
+            id = entry.id,
+            source = entry.source,
+            record = entry.record,
+            snapshot = entry.snapshot,
+            zombie = entry.zombie,
+        })
+        if refreshed and tostring(refreshed.id or "") ~= "" then
+            refreshed.name = refreshed.name or entry.name
+            entries[index] = refreshed
+            refreshInlineHostContext(hosts[index], refreshed, player)
+            if Inline.targetID
+                and tostring(Inline.targetID) == tostring(refreshed.id)
+            then
+                Inline.target = refreshed
+            end
+        end
+    end
+end
+
 function Integration.SetInlineMode(_, mode, part)
     if part and part ~= Inline.part then return false end
     if not Inline.part then return false end
@@ -647,6 +681,9 @@ function Integration.SetInlineMode(_, mode, part)
         Inline.mode = previousMode
         return false
     end
+    Inline.nextLifecycleAt = 0
+    Inline.nextContextRefreshAt = 0
+    Inline.nextControlsRefreshAt = 0
     refreshInlineHighlights(0)
     Inline.part.owner = Inline.host
     Inline.part:refreshControls()
@@ -672,6 +709,9 @@ function Integration.SetInlineScope(_, value, part)
         Inline.scope = previousScope
         return false
     end
+    Inline.nextLifecycleAt = 0
+    Inline.nextContextRefreshAt = 0
+    Inline.nextControlsRefreshAt = 0
     refreshInlineHighlights(0)
     Inline.part.owner = Inline.host
     Inline.part:refreshControls()
@@ -717,6 +757,9 @@ function Integration.OpenInline(binding)
     end
     if Inline.part then Integration.CloseInline("retargeted") end
     if not rebuildInlineHosts(player, resolved) then return false end
+    Inline.nextLifecycleAt = 0
+    Inline.nextContextRefreshAt = 0
+    Inline.nextControlsRefreshAt = 0
     local part = LLMInput:new(0, 0, INLINE_WIDTH, INLINE_HEIGHT, {
         owner = Inline.host,
         partID = "llmInlineInput",
@@ -772,24 +815,36 @@ function Integration.UpdateInline()
         Integration.CloseInline("bridge_disabled")
         return
     end
-    for _, host in ipairs(Inline.hosts or {}) do
-        if host and host.updateLifecycle then host:updateLifecycle() end
+    local now = currentTime()
+    if now >= (tonumber(Inline.nextLifecycleAt) or 0) then
+        for _, host in ipairs(Inline.hosts or {}) do
+            if host and host.updateLifecycle then
+                local interruption = host:updateLifecycle()
+                if interruption or host.closed then
+                    Integration.CloseInline(
+                        interruption or "conversation_interrupted"
+                    )
+                    return
+                end
+            end
+        end
+        Inline.nextLifecycleAt = now + INLINE_LIFECYCLE_INTERVAL_MS
     end
     local player = getSpecificPlayer and getSpecificPlayer(0)
         or getPlayer and getPlayer() or nil
-    local resolved = resolveInlineRecipients(player)
-    if not resolved then
-        Integration.CloseInline("target_unavailable")
-        return
-    end
-    if not rebuildInlineHosts(player, resolved) then
-        Integration.CloseInline("target_unavailable")
-        return
+    if now >= (tonumber(Inline.nextContextRefreshAt) or 0) then
+        refreshLockedInlineEntries(player)
+        Inline.nextContextRefreshAt = now
+            + INLINE_CONTEXT_REFRESH_INTERVAL_MS
     end
     refreshInlineHighlights(0)
     Inline.part.owner = Inline.host
     Inline.part.title = INLINE_TITLE
-    Inline.part:refreshControls()
+    if now >= (tonumber(Inline.nextControlsRefreshAt) or 0) then
+        Inline.part:refreshControls()
+        Inline.nextControlsRefreshAt = now
+            + INLINE_CONTROLS_REFRESH_INTERVAL_MS
+    end
     positionInline(0, player)
     focusInlineInputWhenReady()
 end

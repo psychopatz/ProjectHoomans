@@ -76,6 +76,16 @@ local function firstTarget(context)
     return nil
 end
 
+local function publishLocalSocialReaction(player, text, context)
+    local presentation = PNC.SocialFlavorPresentation
+    if not presentation
+        or type(presentation.ReceivePlayerSpeech) ~= "function"
+    then
+        return false
+    end
+    return presentation.ReceivePlayerSpeech(player, text, context) == true
+end
+
 local function playerID(player)
     local id = trim(call(player, "getUsername"))
     if id ~= "" then return id end
@@ -156,6 +166,11 @@ end
 function Speech.Speak(player, text, context)
     text = trim(text)
     if text == "" or not player then return false end
+    context = type(context) == "table" and context or {}
+    -- Flavor generation is deliberately client-local.  The server is not
+    -- involved in this handoff; the local SocialFlavorClient decides whether
+    -- to use PBrainZ or its deterministic fallback.
+    publishLocalSocialReaction(player, text, context)
     local voiced = Speech.Publish(player, text, context) == true
     if type(player.Say) == "function" then
         player:Say(text)

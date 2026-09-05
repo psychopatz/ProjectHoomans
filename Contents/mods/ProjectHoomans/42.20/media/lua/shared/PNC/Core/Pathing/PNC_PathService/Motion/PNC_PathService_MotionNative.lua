@@ -42,7 +42,10 @@ function Internal.updateNativeMove(
             )
         end
     end
-    handled, state = pumpNative(record, zombie, lane, source)
+    -- Planner.Pump accepts record, body, and source. Passing lane here used
+    -- the route table as the source and discarded the caller label, which
+    -- made duplicate-pump diagnostics misleading.
+    handled, state = pumpNative(record, zombie, source)
     if state == "native_duplicate_pump_skipped" then
         return true, state
     end

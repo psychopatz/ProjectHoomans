@@ -60,6 +60,10 @@ local function send(command, state, reason, extra)
         reason = reason,
         maximumDistance = Safety.GetMaximumDistance(),
         dangerRadius = Safety.GetDangerRadius(),
+        -- Distance is an opening gate only. Once the lease exists, movement
+        -- and the compact UI must not end the conversation.
+        enforceDistance = state.enforceDistance == true
+            and state.started ~= true,
         allowHostileParley = state.allowHostileParley == true,
     }
     if type(extra) == "table" then
@@ -89,6 +93,8 @@ local function refresh(state, spec)
             {
                 maximumDistance = Safety.GetMaximumDistance(),
                 dangerRadius = Safety.GetDangerRadius(),
+                enforceDistance = state.enforceDistance == true
+                    and state.started ~= true,
                 allowHostileParley = state.allowHostileParley == true,
             }
         )
@@ -120,11 +126,14 @@ function Lifecycle.Create()
                 cachedSafetyReason = nil,
                 allowHostileParley = spec and spec.context
                     and spec.context.allowHostileParley == true,
+                enforceDistance = not isNameplateConversation(spec),
+                started = false,
             }
             local started, startReason = refresh(state, spec)
             if not isNetworkClient() and started ~= true then
                 return false, startReason or "npc_unavailable"
             end
+            state.started = true
             state.lastHeartbeatAt = currentTime()
             spec.context.conversationLifecycleState = state
             return state

@@ -193,12 +193,33 @@ T.equal(started, true, "same lease heartbeat")
 T.equal(held, 1, "heartbeat does not restart the idle scene")
 
 player.x = 12
-T.equal(Scene.Pump(record, npc, now), true,
-    "server ends out-of-range conversation")
-T.equal(record.runtime.conversationLease, nil, "lease cleared")
-T.equal(stoppedReason, "conversation_distance",
-    "distance stop reason")
-T.equal(record.nextThinkAt, now, "AI is scheduled to resume immediately")
+local activeHeartbeat = Scene.Begin(
+    record,
+    npc,
+    player,
+    "lease-1",
+    {
+        maximumDistance = 5.5,
+        dangerRadius = 8,
+        enforceDistance = false,
+    }
+)
+T.equal(activeHeartbeat, true,
+    "active lease heartbeat may continue after the NPC leaves the radius")
+T.equal(Scene.Pump(record, npc, now), false,
+    "server keeps an active conversation when the NPC moves away")
+T.truthy(record.runtime.conversationLease,
+    "active lease survives conversation distance")
+T.equal(stoppedReason, nil,
+    "distance does not stop the active conversation")
+local farReserved = Scene.ReserveLLMRequest(
+    record, npc, player, "lease-1", "request-far"
+)
+T.equal(farReserved, true,
+    "active LLM request is not rejected by conversation distance")
+Scene.ClearLLMRequest(record, "test")
+Scene.End(record, npc, "lease-1", "test")
+T.equal(record.runtime.conversationLease, nil, "explicit end clears lease")
 
 player.x = 0
 candidates = { npc }

@@ -147,6 +147,76 @@ function Resolver.CollectNearbySocialTargets(player, radius)
     return Resolver.CollectNearbyTargets(player, radius, SCOPE_SOCIAL)
 end
 
+-- Player speech is a territory/colony-local presentation event, not a
+-- proximity interaction.  Keep ownership and liveness validation, but do not
+-- discard a colonist merely because FollowOwner has carried them away from
+-- the player or because the server currently represents them abstractly.
+local function isSpeechRecipient(source, player)
+    if not source or not player or source.alive == false then
+        return false
+    end
+    if not isCompanion(source) then return false end
+    if hasOwnerIdentity(source)
+        and (not Commands.IsOwnedByPlayer
+            or not Commands.IsOwnedByPlayer(source, player))
+    then
+        return false
+    end
+    return true
+end
+
+local function pushSpeechRecipient(output, seen, player, source)
+    local id = source and source.id and tostring(source.id) or nil
+    local x = source and tonumber(source.x) or nil
+    local y = source and tonumber(source.y) or nil
+    local dx
+    local dy
+    if not id or seen[id] or not isSpeechRecipient(source, player) then
+        return
+    end
+    if x ~= nil and y ~= nil and player.getX and player.getY then
+        dx = x - player:getX()
+        dy = y - player:getY()
+    end
+    seen[id] = true
+    output[#output + 1] = {
+        id = id,
+        name = targetName(source),
+        distSq = dx and dy and (dx * dx) + (dy * dy) or math.huge,
+        source = source,
+    }
+end
+
+function Resolver.CollectOwnedCompanions(player)
+    local output = {}
+    local seen = {}
+    local id
+    local snapshot
+    if not player or player.isDead and player:isDead() then
+        return output
+    end
+    if Registry and Registry.ForEach then
+        Registry.ForEach(function(record)
+            pushSpeechRecipient(output, seen, player, record)
+        end)
+    end
+    for id, snapshot in pairs(
+        ClientState and ClientState.snapshots or {}
+    ) do
+        pushSpeechRecipient(output, seen, player, snapshot)
+    end
+    table.sort(output, function(left, right)
+        if left.distSq ~= right.distSq then
+            return left.distSq < right.distSq
+        end
+        if left.name ~= right.name then
+            return left.name < right.name
+        end
+        return left.id < right.id
+    end)
+    return output
+end
+
 function Resolver.NormalizeMode(mode)
     mode = tostring(mode or "nearest")
     if mode == "nearby" or mode == "multiple" or mode == "group" then

@@ -123,6 +123,7 @@ function Scene.Begin(record, zombie, player, token, options)
     local maximumDistance
     local dangerRadius
     local hostileParley
+    local enforceDistance
     local registered
     local reason
     local currentTime
@@ -132,13 +133,15 @@ function Scene.Begin(record, zombie, player, token, options)
     local lease
     local pending
     options, maximumDistance, dangerRadius = sceneOptions(options)
+    enforceDistance = options.enforceDistance ~= false
     if not record or record.alive == false
         or not Internal.IsAlive(zombie)
     then
         return false, "npc_unavailable"
     end
-    if Internal.DistanceSq(player, zombie)
-        > maximumDistance * maximumDistance
+    if enforceDistance
+        and Internal.DistanceSq(player, zombie)
+            > maximumDistance * maximumDistance
     then
         return false, "distance"
     end
@@ -230,12 +233,6 @@ function Scene.ReserveLLMRequest(record, zombie, player, token, requestID)
     if not Internal.IsAlive(zombie) then
         return false, "npc_unavailable"
     end
-    if Internal.DistanceSq(player, zombie)
-        > (tonumber(lease.maximumDistance) or Scene.START_DISTANCE)
-            ^ 2
-    then
-        return false, "distance"
-    end
     if Scene.HasThreat(
         record,
         zombie,
@@ -319,12 +316,6 @@ function Scene.ValidateLLMRequest(record, zombie, player, token, requestID)
     end
     if not Internal.IsAlive(zombie) then
         return false, "npc_unavailable"
-    end
-    if Internal.DistanceSq(player, zombie)
-        > (tonumber(pending.maximumDistance) or Scene.START_DISTANCE)
-            ^ 2
-    then
-        return false, "distance"
     end
     if Scene.HasThreat(
         record,
@@ -412,17 +403,12 @@ function Scene.Pump(record, zombie, currentTime)
     local lease = runtime and runtime.conversationLease or nil
     local pending = runtime and runtime.llmRequestLease or nil
     local player
-    local maximumDistance
     currentTime = tonumber(currentTime) or Internal.Now()
     if pending then
         player = resolveLeasePlayer(pending)
-        maximumDistance = tonumber(pending.maximumDistance)
-            or Scene.START_DISTANCE
         if currentTime >= (tonumber(pending.expiresAt) or 0) then
             Scene.ClearLLMRequest(record, "request_timeout")
         elseif not player or not Internal.IsAlive(zombie)
-            or Internal.DistanceSq(player, zombie)
-                > maximumDistance * maximumDistance
             or Scene.HasThreat(
                 record,
                 zombie,
@@ -441,13 +427,9 @@ function Scene.Pump(record, zombie, currentTime)
             record, zombie, lease.token, "conversation_timeout"
         )
     end
-    maximumDistance = tonumber(lease.maximumDistance)
-        or Scene.START_DISTANCE
-    if not player or Internal.DistanceSq(player, zombie)
-        > maximumDistance * maximumDistance
-    then
+    if not player or not Internal.IsAlive(zombie) then
         return Scene.End(
-            record, zombie, lease.token, "conversation_distance"
+            record, zombie, lease.token, "conversation_unavailable"
         )
     end
     if Scene.HasThreat(

@@ -815,13 +815,23 @@ local serverSource = T.read(SERVER_FILE)
         T.path("ProjectHoomans", "server", "PNC/")
             .. "Server/Server/PNC_Server_SubsystemPumps.lua"
     )
-T.truthy(string.find(
+local serverRecordSource = T.read(
+    "ProjectHoomans",
+    "server",
+    "PNC/Server/Server/PNC_Server_RecordProcessing.lua"
+)
+T.falsy(string.find(
         serverSource,
-        "\"PumpServerFrame\"",
+        'safeOptional("server_prepare.engine_path"',
         1,
         true
     ),
-    "server tick does not advance native routes when OnZombieUpdate is absent")
+    "server tick must not duplicate the per-record native planner pump")
+T.contains(
+    serverRecordSource,
+    'PathService.Pump(record, zombie, "server_path_service")',
+    "server records must own native progress and watchdog accounting"
+)
 T.finish("pnc_engine_path_planner_smoke")
 
 T.finish("pnc_engine_path_planner_smoke")

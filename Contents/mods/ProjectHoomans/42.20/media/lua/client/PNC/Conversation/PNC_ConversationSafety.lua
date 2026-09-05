@@ -39,6 +39,21 @@ local function isNetworkClient()
     return isClient and isClient() == true
 end
 
+local function enforceConversationDistance(spec)
+    local context = spec and spec.context or {}
+    local state = context.conversationLifecycleState
+    local entry = context.entry or {}
+    local record = entry.record
+    -- Compact/headless conversations already selected a target through the
+    -- interaction resolver. Their active lease must not be cancelled when
+    -- FollowOwner carries the NPC away from the player.
+    if context.nameplateConversation == true then return false end
+    if record and record.runtime and record.runtime.conversationLease then
+        return false
+    end
+    return not (type(state) == "table" and state.started == true)
+end
+
 local function snapshotFor(spec)
     local context = spec and spec.context or {}
     local entry = context.entry or {}
@@ -222,13 +237,14 @@ function Safety.HasDanger(
         return true
     end
     local cell = getCell and getCell() or nil
-    local list = cell and cell.getZombieList
-        and cell:getZombieList() or nil
-    if not list then return false end
     radius = tonumber(radius) or Safety.GetDangerRadius()
     local radiusSq = radius * radius
-    for index = 0, list:size() - 1 do
-        local candidate = list:get(index)
+    local spatial = PNC.SpatialIndex
+    local indexed = spatial and spatial.QueryZombies
+        and player and player.getX and player.getY
+        and spatial.QueryZombies(player:getX(), player:getY(), radius)
+        or nil
+    local function candidateIsDanger(candidate)
         local hostile
         local candidateRecord
         hostile, candidateRecord = managedCandidateIsEnemy(
@@ -253,6 +269,19 @@ function Safety.HasDanger(
         then
             return true
         end
+        return false
+    end
+    if type(indexed) == "table" then
+        for _, candidate in ipairs(indexed) do
+            if candidateIsDanger(candidate) then return true end
+        end
+        return false
+    end
+    local list = cell and cell.getZombieList
+        and cell:getZombieList() or nil
+    if not list then return false end
+    for index = 0, list:size() - 1 do
+        if candidateIsDanger(list:get(index)) then return true end
     end
     return false
 end
@@ -264,12 +293,14 @@ function Safety.Check(spec)
     if not alive(zombie) and not snapshotConversation then
         return "npc_unavailable"
     end
-    local maximumDistance = Safety.GetMaximumDistance()
-    local targetDistance = alive(zombie)
-        and distanceSq(player, zombie)
-        or snapshotDistanceSq(player, snapshot)
-    if targetDistance > maximumDistance * maximumDistance then
-        return "distance"
+    if enforceConversationDistance(spec) then
+        local maximumDistance = Safety.GetMaximumDistance()
+        local targetDistance = alive(zombie)
+            and distanceSq(player, zombie)
+            or snapshotDistanceSq(player, snapshot)
+        if targetDistance > maximumDistance * maximumDistance then
+            return "distance"
+        end
     end
     if settingsValue("closeConversationOnDanger", true) == true
         and Safety.HasDanger(

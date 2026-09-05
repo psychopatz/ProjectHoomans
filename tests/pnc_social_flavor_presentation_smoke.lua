@@ -135,8 +135,12 @@ T.falsy(string.find(received.text, "Longsurname", 1, true),
     "teammate flavor does not repeat the injured NPC surname")
 
 local capturedBinding
+local capturedSpeechMessage
 Client.SetLLMProvider(function(item, complete)
     capturedBinding = item.context and item.context.voiceBinding
+    if item.context and item.context.eventType == "player_spoke" then
+        capturedSpeechMessage = item.context.playerMessage
+    end
     complete("Stay close.", { ttsManaged = true })
     return true
 end)
@@ -159,6 +163,21 @@ Client.Pump(now)
 T.truthy(capturedBinding, "ambient flavor resolves an NPC voice binding")
 T.equal(capturedBinding.slot, "VoiceFemale:0",
     "ambient flavor preserves the reusable voice slot")
+
+Client.Reset()
+received = nil
+local speechAccepted = Presentation.ReceivePlayerSpeech(
+    getSpecificPlayer(),
+    "The road is clear.",
+    { targets = { { id = "npc-one", name = "Mara" } } }
+)
+T.truthy(speechAccepted, "player speech enters local social flavor")
+Client.Pump(now)
+T.equal(capturedSpeechMessage, "The road is clear.",
+    "PBrainZ receives the raw player speech context")
+T.truthy(received, "player speech reaction reaches the Core message bus")
+T.equal(received.speakerID, "npc-one",
+    "player speech reaction is voiced by the colonist")
 Client.SetLLMProvider(nil)
 
 EventBus.clearOwner("presentation-message-test")
