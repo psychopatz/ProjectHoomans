@@ -26,6 +26,34 @@ function Internal.sanitizeCorpse(rawCorpse, record)
     }
 end
 
+-- A single pending follow-abandonment marker is persisted outside the social
+-- relationship schema.  Social state is normalized as a closed shape, so
+-- placing this transient presentation state there would silently discard it
+-- during every relationship normalization.
+function Internal.sanitizeFollowerAbandonment(raw)
+    local source = type(raw) == "table" and raw or nil
+    local eventID
+    local hostileKind
+    if not source then return nil end
+    eventID = Internal.normalizeString(source.eventID)
+    hostileKind = Internal.normalizeString(source.hostileKind)
+    if not eventID or (hostileKind ~= "zombie" and hostileKind ~= "npc") then
+        return nil
+    end
+    return {
+        eventID = string.sub(eventID, 1, 256),
+        ownerKey = Internal.normalizeString(source.ownerKey),
+        ownerUsername = Internal.normalizeString(source.ownerUsername),
+        ownerOnlineID = source.ownerOnlineID ~= nil
+            and (tonumber(source.ownerOnlineID) or tostring(source.ownerOnlineID))
+            or nil,
+        hostileKind = hostileKind,
+        hostileID = Internal.normalizeString(source.hostileID),
+        capturedAt = math.max(0, Internal.normalizeNumber(source.capturedAt, 0)),
+        relationshipApplied = source.relationshipApplied == true,
+    }
+end
+
 function Internal.sanitizeStamina(rawStamina, record)
     local output
     if type(rawStamina) ~= "table" then

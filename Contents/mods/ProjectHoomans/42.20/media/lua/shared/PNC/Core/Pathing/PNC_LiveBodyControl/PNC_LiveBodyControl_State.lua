@@ -103,6 +103,7 @@ function LiveBodyControl.IsGrounded(zombie)
     actionState = LiveBodyControl.GetActionStateName(zombie)
     if Internal.GROUNDED_STATES[actionState] == true
         or string.find(actionState, "knockeddown", 1, true) ~= nil
+        or string.find(actionState, "ragdoll", 1, true) ~= nil
     then
         return true, actionState
     end
@@ -139,6 +140,14 @@ function LiveBodyControl.SuppressVanillaIntent(
     keepEngineMovementActive
 )
     if not Internal.clearVanillaIntent(zombie) then return false end
+    if zombie.setVariable then
+        -- A managed body is an IsoZombie carrier. Clearing target references
+        -- is not enough: the native zombie brain can reacquire a player
+        -- between this call and the next maintenance pass.
+        zombie:setVariable("NoLungeTarget", true)
+        zombie:setVariable("NoLungeAttack", true)
+        zombie:setVariable("PNCLive", true)
+    end
     LiveBodyControl.SetManagedBodyUseless(
         zombie,
         true,

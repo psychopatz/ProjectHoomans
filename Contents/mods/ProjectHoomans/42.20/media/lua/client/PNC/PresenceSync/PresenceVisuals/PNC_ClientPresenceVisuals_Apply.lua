@@ -96,6 +96,19 @@ local function applySnapshotToBody(snapshot, zombie, remoteReplica)
                 or false,
         }, now)
     end
+    -- Apply gender/appearance before body maintenance.  IsoZombie's gender
+    -- setter rewrites its native voice and hurt-sound channels, so running
+    -- the safety pass first leaves a freshly bound replica audible as a
+    -- zombie until the next update callback.
+    recordView = buildRecordView(snapshot)
+    applyBodyPresentation(
+        snapshot,
+        zombie,
+        remoteReplica,
+        recordView,
+        modData,
+        now
+    )
     if AnimationTrace and AnimationTrace.Sample then
         AnimationTrace.Sample(zombie, "client_pre_maintain", now)
     end
@@ -141,16 +154,6 @@ local function applySnapshotToBody(snapshot, zombie, remoteReplica)
             now
         )
     end
-
-    recordView = buildRecordView(snapshot)
-    applyBodyPresentation(
-        snapshot,
-        zombie,
-        remoteReplica,
-        recordView,
-        modData,
-        now
-    )
     motionKey = buildMotionKey(snapshot)
     local motionState = {
         visualState = visualState,

@@ -47,6 +47,17 @@ local resetCount = 0
 local nativePassageObject
 local windowSmashStarted = 0
 local windowSmashFinished = 0
+local windowClimbStarted = 0
+local passageFromSquare = {
+    getX = function() return 1 end,
+    getY = function() return 1 end,
+    getZ = function() return 0 end,
+}
+local passageToSquare = {
+    getX = function() return 2 end,
+    getY = function() return 1 end,
+    getZ = function() return 0 end,
+}
 local bodyModData = {
     PNC_NPC = true,
     PNC_UUID = "remote_replica",
@@ -109,6 +120,7 @@ local body = {
     setBumpType = function(self, value)
         self.bumpType = value
     end,
+    getSquare = function() return passageFromSquare end,
     changeState = function(self, value)
         self.actionState = value and value.name or "idle"
     end,
@@ -189,7 +201,11 @@ PNC.ClientPresenceSync = {
 PNC.TraversalQuery = {
     FindPassageToward = function()
         return nativePassageObject
-            and { object = nativePassageObject }
+            and {
+                object = nativePassageObject,
+                fromSquare = passageFromSquare,
+                toSquare = passageToSquare,
+            }
             or nil
     end,
     IsDoor = function(object)
@@ -218,9 +234,13 @@ PNC.PathService = {
 }
 PNC.Animation = {
     PlayBump = function(_, _, bumpType)
-        T.truthy(bumpType == "PNC_WindowSmash",
-            "native breach selected the wrong animation")
-        windowSmashStarted = windowSmashStarted + 1
+        if bumpType == "PNC_WindowSmash" then
+            windowSmashStarted = windowSmashStarted + 1
+        else
+            T.equal(bumpType, "PNC_ClimbWindow",
+                "native window climb selected the wrong animation")
+            windowClimbStarted = windowClimbStarted + 1
+        end
         return true
     end,
     FinishBump = function()
@@ -444,6 +464,8 @@ local breachWindow = {
     IsOpen = function(self) return self.open end,
     isSmashed = function(self) return self.smashed end,
     canClimbThrough = function(self) return self.smashed end,
+    getSquare = function() return passageFromSquare end,
+    getOppositeSquare = function() return passageToSquare end,
 }
 nativePassageObject = breachWindow
 body.actionState = "idle"
@@ -477,16 +499,19 @@ runZombieUpdates(body)
 T.truthy(windowSmashFinished == 1,
     "window breach animation did not release")
 -- A climbable window must be intercepted immediately. Waiting for the normal
--- stall-recovery interval lets PathFindBehavior2 call
--- IsoGameCharacter.climbThroughWindow(), which emits player-only equipment
--- packets for this managed IsoZombie in multiplayer.
+-- stall-recovery interval lets PathFindBehavior2 call its player-oriented
+-- window state on this managed IsoZombie in multiplayer.
 clientNow = clientNow + 100
 body.actionState = "idle"
 runZombieUpdates(body)
-T.truthy(body.actionState == "climbwindow",
-    "smashed native-route window was returned to unsafe engine pathing")
-T.truthy(body.bumpType == "ClimbWindow",
-    "forced window climb did not use the engine traversal selector")
+T.equal(windowClimbStarted, 1,
+    "smashed native-route window did not start the PNC climb action")
+T.equal(body.actionState, "idle",
+    "smashed native-route window entered unsafe engine pathing")
+T.equal(
+    PNC.ClientPresenceSync.NativePathStateByBody[body].passageAction.kind,
+    "window_climb",
+    "smashed native-route window did not retain its PNC action")
 
 local tickSource = T.read(CLIENT_TICK)
 T.truthy(not string.find(

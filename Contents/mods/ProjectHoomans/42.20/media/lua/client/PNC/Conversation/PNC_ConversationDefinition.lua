@@ -204,7 +204,10 @@ local function portraitSpec(entry)
         }, "|"),
         identitySeed = snapshot.identitySeed or record.identitySeed or 1,
         isFemale = snapshot.isFemale == true or record.isFemale == true,
-        preferDescriptor = entry and entry.zombie == nil,
+        -- Live NPCs use IsoZombie carriers for engine animation/replication.
+        -- Conversation portraits must render the descriptor-backed human
+        -- preview instead of exposing that carrier's zombie appearance.
+        preferDescriptor = true,
         faceOnly = true,
         appearance = snapshot.appearance or record.appearance or {},
         equipment = snapshot.equipmentSummary or record.equipment or { worn = {} },

@@ -1,5 +1,10 @@
-local Integration = PNC.ProfilerIntegration
+local Integration = PNC and PNC.ProfilerIntegration or nil
+if not Integration or Integration._loadingProviders ~= true then
+    return Integration
+end
+
 local Internal = Integration.Internal
+if type(Internal) ~= "table" then return Integration end
 
 function Integration.ApplyCaptureConfig(config)
     Internal.Profiler = PsychopatzCore and PsychopatzCore.Profiler

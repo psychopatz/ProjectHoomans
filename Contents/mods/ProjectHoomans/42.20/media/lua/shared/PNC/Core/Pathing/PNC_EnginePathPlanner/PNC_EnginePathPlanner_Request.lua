@@ -4,6 +4,38 @@ local Planner = PNC.EnginePathPlanner
 local Internal = Planner.Internal
 local Diagnostics = PNC.PerformanceScalingDiagnostics
 
+local function isSeatingNavigation(navigation)
+    local record = navigation and navigation.record
+    local runtime = record and record.runtime or nil
+    return runtime and (
+        runtime.facilityActivity and runtime.facilityActivity.seating == true
+        or runtime.animationScene
+            and runtime.animationScene.id == "facility.living.sitFurniture"
+    )
+end
+
+local function auditPathRequest(body, navigation, eventName, reason, now)
+    if not Diagnostics or Diagnostics.SeatingAuditEnabled ~= true
+        or not Diagnostics.LogSeatingAudit
+        or not isSeatingNavigation(navigation)
+    then
+        return
+    end
+    Diagnostics.LogSeatingAudit(eventName, {
+        "npc=" .. tostring(navigation.record and navigation.record.id or ""),
+        "reason=" .. tostring(reason or ""),
+        "bodyAction=" .. tostring(body and body.getActionStateName
+            and body:getActionStateName() or ""),
+        "pathPhase=" .. tostring(navigation.record.runtime.pathing
+            and navigation.record.runtime.pathing.phase or ""),
+        "nativeActive=" .. tostring(navigation.nativeActive == true),
+        "controller=" .. tostring(navigation.controllerMode or ""),
+        "revision=" .. tostring(navigation.requestRevision or ""),
+        "requestPending=" .. tostring(navigation.requestPending == true),
+        "at=" .. tostring(now or ""),
+    })
+end
+
 function Planner.CanUseNativePath(body)
     if not body then return false, "native_path_unavailable" end
     if Internal.IsMultiplayerAuthority
@@ -30,6 +62,15 @@ function Internal.BeginRequest(body, finalTarget, navigation, now, reason)
     local unsafeReason
     nativeSafe, unsafeReason = Planner.CanUseNativePath(body)
     if not nativeSafe then
+        if Diagnostics and Diagnostics.SeatingAuditEnabled == true then
+            auditPathRequest(
+                body,
+                navigation,
+                "path_request_rejected",
+                unsafeReason,
+                now
+            )
+        end
         navigation.lastPlanReason = unsafeReason
         navigation.plannedAt = now
         navigation.planFailures =
@@ -82,6 +123,9 @@ function Internal.BeginRequest(body, finalTarget, navigation, now, reason)
         and "engine_native_client"
         or "engine_native_behavior2"
     Internal.SetServerMovementLease(body, navigation, true)
+    if Diagnostics and Diagnostics.SeatingAuditEnabled == true then
+        auditPathRequest(body, navigation, "path_request", reason, now)
+    end
     if not multiplayerAuthority then
         local handedOff = Internal.HandoffUpcomingPassage(
             navigation.record,

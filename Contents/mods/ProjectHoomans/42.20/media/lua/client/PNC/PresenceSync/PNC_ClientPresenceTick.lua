@@ -24,10 +24,26 @@ local applySnapshotFacing = Internal.ApplySnapshotFacing
 local applySnapshotToBody = Internal.ApplySnapshotToBody
 local pruneSnapshotDuplicates = Internal.PruneSnapshotDuplicates
 local refreshBodyMap = Internal.RefreshBodyMap
+local resolveSnapshotBody = Internal.ResolveSnapshotBody
 local bindNativePathSnapshot =
     Internal.BindNativePathSnapshot
 local voiceTriggers = PNC.NPCVoice
     and PNC.NPCVoice.Triggers or nil
+
+local function resolveSnapshotBodyFromIndexes(snapshot)
+    local id
+    if type(snapshot) ~= "table" or snapshot.id == nil then
+        return nil
+    end
+    id = tostring(snapshot.id)
+    return Sync.BodyByLease[
+        id .. ":" .. tostring(snapshot.liveBodyLease or "")
+    ] or Sync.BodyByInstanceID[
+        tostring(snapshot.liveBodyInstanceID or "")
+    ] or Sync.BodyByID[id] or Sync.BodyByOnlineID[
+        tostring(snapshot.liveBodyOnlineID or "")
+    ]
+end
 
 local function remoteSnapshotInterval(snapshot)
     local visualState = snapshot and snapshot.visualState or nil
@@ -427,14 +443,9 @@ function Sync.OnTick()
         if snapshot and snapshot.interestDetailed ~= false
             and snapshot.presenceState == Const.PRESENCE_LIVE and snapshot.alive ~= false
         then
-            body = Sync.BodyByOnlineID[tostring(snapshot.liveBodyOnlineID or "")]
-            if not body and snapshot.liveBodyLease then
-                body = Sync.BodyByLease[tostring(id) .. ":" .. tostring(snapshot.liveBodyLease)]
-            end
-            if not body and not snapshot.liveBodyLease then
-                body = Sync.BodyByID[tostring(id)]
-            end
-            body = body or Sync.BodyByInstanceID[tostring(snapshot.liveBodyInstanceID or "")]
+            body = resolveSnapshotBody
+                and resolveSnapshotBody(snapshot)
+                or resolveSnapshotBodyFromIndexes(snapshot)
             if body then
                 if applyLocalVisuals
                     or snapshot.healthState == "incapacitated"

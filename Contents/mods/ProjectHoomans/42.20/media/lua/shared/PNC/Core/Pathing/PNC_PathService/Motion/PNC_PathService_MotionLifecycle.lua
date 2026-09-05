@@ -16,6 +16,7 @@ local function resetProgressState(lane, now)
     lane.noProgressCount = 0
     lane.nativeStallRecoveryCount = 0
     lane.nativeBackoffUntil = 0
+    lane.nextPassageProbeAt = nil
     lane.lastStepAt = 0
     lane.lastStepDistance = 0
     lane.lastPhysicalMoveAt = 0
@@ -115,6 +116,7 @@ function Internal.startRequestedMove(zombie, record, lane)
     )
     lane.bestGoalDistance = lane.goalDistance
     lane.lastGoalProgressAt = now
+    lane.nextPassageProbeAt = nil
     lane.nonProgressStepCount = 0
     lane.steeringSide = nil
     lane.directStepCount = 0
@@ -167,6 +169,7 @@ function Internal.completeMove(zombie, record, lane, phase, reason)
     lane.noProgressCount = 0
     lane.nativeStallRecoveryCount = 0
     lane.nativeBackoffUntil = 0
+    lane.nextPassageProbeAt = nil
     lane.lastStepAt = 0
     lane.lastStepDistance = 0
     lane.lastPhysicalMoveAt = 0
@@ -181,6 +184,16 @@ function Internal.completeMove(zombie, record, lane, phase, reason)
     finishOwnerReset(zombie, record, lane, preserveVisualMotion)
     lane.ownerMode = phase == "blocked" and "blocked" or "idle"
     Internal.setLanePhase(record, lane, phase, reason)
+    if phase == "blocked" and Internal.logMoveWarning then
+        Internal.logMoveWarning(
+            record,
+            zombie,
+            lane,
+            "route_failed",
+            reason or "blocked",
+            "goal=" .. Internal.describeGoal(lane.goal)
+        )
+    end
     Internal.logMoveTransition(record, zombie, lane, "complete", reason)
     if preserveVisualMotion then
         Internal.setWalkAnim(

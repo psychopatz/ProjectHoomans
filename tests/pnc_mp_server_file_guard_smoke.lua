@@ -10,7 +10,7 @@ for path in listing:lines() do
     serverOnlyFiles[#serverOnlyFiles + 1] = path
 end
 listing:close()
-T.equal(#serverOnlyFiles, 667,
+T.equal(#serverOnlyFiles, 669,
     "server Lua inventory changed without updating the MP loader gate")
 
 isClient = function() return true end

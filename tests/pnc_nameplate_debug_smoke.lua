@@ -16,6 +16,23 @@ UIFont = { Small = "Small", Medium = "Medium" }
 T.load(ROOT .. "PNC/UI/Nameplates/PNC_NameplateDebug.lua")
 T.load(ROOT .. "PNC/UI/Nameplates/PNC_NameplatePresentation.lua")
 
+local outlineDraws = {}
+local outlineManager = {
+    drawText = function(_, text, x, y, r, g, b, alpha)
+        outlineDraws[#outlineDraws + 1] = {
+            text = text, x = x, y = y,
+            r = r, g = g, b = b, alpha = alpha,
+        }
+    end,
+}
+PNC.NameplatePresentation.DrawOutlinedText(
+    outlineManager, "nil-color-safe", 10, 20, nil, nil, UIFont.Small
+)
+T.equal(#outlineDraws, 5, "outlined text tolerates missing color")
+T.equal(outlineDraws[5].r, 1, "missing color defaults red")
+T.equal(outlineDraws[5].g, 1, "missing color defaults green")
+T.equal(outlineDraws[5].b, 1, "missing color defaults blue")
+
 local snapshot = {
     id = "npc_debug",
     presenceState = "LIVE",

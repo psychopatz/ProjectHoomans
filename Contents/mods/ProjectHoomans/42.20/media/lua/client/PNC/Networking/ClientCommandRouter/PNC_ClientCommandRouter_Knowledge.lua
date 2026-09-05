@@ -3,6 +3,28 @@ local Const = PNC.Const
 local Core = PNC.Core
 local ClientState = PNC.Network.ClientState
 
+local function clearPendingBootstrap()
+    ClientState.pendingBootstrap = nil
+end
+
+local function rejectBootstrapStream(reason)
+    clearPendingBootstrap()
+    ClientState.bootstrapState = "error"
+    ClientState.bootstrapReason = reason or "invalid_bootstrap_stream"
+end
+
+local function isStaleKnowledge(current, incoming)
+    local currentRevision
+    local incomingRevision
+    if type(current) ~= "table" or type(incoming) ~= "table" then
+        return false
+    end
+    currentRevision = tonumber(current.revision)
+    incomingRevision = tonumber(incoming.revision)
+    return currentRevision ~= nil and incomingRevision ~= nil
+        and incomingRevision <= currentRevision
+end
+
 local function identityNameFact(snapshot)
     for _, category in ipairs(snapshot and snapshot.categories or {}) do
         for _, descriptor in ipairs(category.descriptors or {}) do
@@ -33,6 +55,9 @@ function Internal.ApplyNPCKnowledgeSnapshot(snapshot, reason)
         local npcID = tostring(snapshot.npcID)
         ClientState.npcKnowledge = ClientState.npcKnowledge or {}
         local previous = ClientState.npcKnowledge[npcID]
+        if isStaleKnowledge(previous, snapshot) then
+            return false
+        end
         ClientState.npcKnowledge[npcID] = snapshot
         if PNC.KnowledgePresentation
             and PNC.KnowledgePresentation.ShowLearnedFacts
@@ -80,10 +105,15 @@ function Internal.ApplyNPCPresentation(payload)
         and tonumber(payload.knowledgeRevision)
             < (tonumber(current.knowledgeRevision) or 0)
     then return false end
-    ClientState.npcPresentations[npcID] = payload
     if payload.snapshot then
-        Internal.ApplyNPCKnowledgeSnapshot(payload.snapshot, payload.reason)
+        if not Internal.ApplyNPCKnowledgeSnapshot(
+            payload.snapshot,
+            payload.reason
+        ) then
+            return false
+        end
     end
+    ClientState.npcPresentations[npcID] = payload
     if PNC.Conversation and PNC.Conversation.ReceiveIdentityPresentation then
         PNC.Conversation.ReceiveIdentityPresentation(payload)
     end
@@ -95,41 +125,162 @@ Internal.RegisterServerCommand(Const.CMD_NPC_KNOWLEDGE, function(args)
 end)
 
 Internal.RegisterServerCommand(Const.CMD_PLAYER_BOOTSTRAP, function(args)
+    local streamID
+    local chunkIndex
+    local chunkCount
+    local incomingRevision
+    local pending
+    local snapshot
+    local snapshotID
+    local i
+    local previousCharacterUUID
+    local incomingCharacterUUID
+    local characterChanged
+    local scope
     if ClientState.activeBootstrapRequestID and args.requestID
         and args.requestID ~= ClientState.activeBootstrapRequestID
     then return end
     local currentRevision = tonumber(ClientState.bootstrapKnowledgeRevision) or -1
-    local incomingRevision = tonumber(args.knowledgeRevision) or 0
+    incomingRevision = tonumber(args.knowledgeRevision) or 0
     if incomingRevision < currentRevision then return end
-    local previousCharacterUUID = ClientState.playerContext
+    if args.state == "error" then
+        rejectBootstrapStream(args.reason or "bootstrap_failed")
+        return
+    end
+    streamID = args.requestID and tostring(args.requestID) or "legacy"
+    if ClientState.completedBootstrapRequestID
+        and ClientState.completedBootstrapRequestID == streamID
+    then
+        return
+    end
+    chunkIndex = tonumber(args.chunkIndex) or 1
+    chunkCount = tonumber(args.chunkCount) or 1
+    if chunkCount < 1 or chunkCount ~= math.floor(chunkCount)
+        or chunkIndex < 1 or chunkIndex > chunkCount
+        or chunkIndex ~= math.floor(chunkIndex)
+        or type(args.snapshots) ~= "table"
+    then
+        rejectBootstrapStream("invalid_bootstrap_chunk")
+        return
+    end
+    scope = args.scope or "all"
+    previousCharacterUUID = ClientState.playerContext
         and ClientState.playerContext.characterUUID or nil
-    ClientState.bootstrapState = args.state or "error"
-    ClientState.bootstrapReason = args.reason
     if args.context then ClientState.playerContext = args.context end
-    local incomingCharacterUUID = ClientState.playerContext
+    incomingCharacterUUID = ClientState.playerContext
         and ClientState.playerContext.characterUUID or nil
-    local characterChanged = previousCharacterUUID ~= nil
+    characterChanged = previousCharacterUUID ~= nil
         and tostring(previousCharacterUUID)
             ~= tostring(incomingCharacterUUID or "")
-    if tonumber(args.chunkIndex) == 1 and projectionIsCurrent(args)
-        and (args.scope ~= "live"
-            and args.scope ~= "interest" or characterChanged)
+    if not projectionIsCurrent(args) then
+        return
+    end
+    pending = ClientState.pendingBootstrap
+    if pending and (
+        pending.requestID ~= streamID
+            or pending.chunkCount ~= chunkCount
+            or pending.knowledgeRevision ~= incomingRevision
+            or pending.scope ~= scope
+    ) then
+        if chunkIndex == 1 then
+            clearPendingBootstrap()
+            pending = nil
+        else
+            return
+        end
+    end
+    if not pending then
+        pending = {
+            requestID = streamID,
+            chunkCount = chunkCount,
+            knowledgeRevision = incomingRevision,
+            scope = scope,
+            chunks = {},
+            chunkStates = {},
+            snapshotsByID = {},
+            seenNPCIDs = {},
+            receivedChunks = 0,
+            characterChanged = characterChanged,
+            replace = scope ~= "live" and scope ~= "interest"
+                or characterChanged,
+        }
+        ClientState.pendingBootstrap = pending
+    end
+    if pending.chunks[chunkIndex] ~= nil then
+        return
+    end
+    if args.state and args.state ~= "loading"
+        and args.state ~= "known"
     then
-        ClientState.npcKnowledge = {}
-        ClientState.npcPresentations = {}
+        rejectBootstrapStream("invalid_bootstrap_state")
+        return
+    end
+    if args.state == "known" and chunkIndex ~= chunkCount then
+        rejectBootstrapStream("early_bootstrap_completion")
+        return
+    end
+    if args.state == "loading" and chunkIndex == chunkCount then
+        rejectBootstrapStream("incomplete_bootstrap_completion")
+        return
+    end
+    for i = 1, #args.snapshots do
+        snapshot = args.snapshots[i]
+        snapshotID = snapshot and snapshot.npcID
+            and tostring(snapshot.npcID) or nil
+        if not snapshotID or pending.seenNPCIDs[snapshotID] then
+            rejectBootstrapStream("duplicate_bootstrap_snapshot")
+            return
+        end
+        pending.seenNPCIDs[snapshotID] = true
+        pending.snapshotsByID[snapshotID] = snapshot
+    end
+    pending.chunks[chunkIndex] = args.snapshots
+    pending.chunkStates[chunkIndex] = args.state
+    pending.receivedChunks = pending.receivedChunks + 1
+    ClientState.bootstrapState = "loading"
+    ClientState.bootstrapReason = args.reason
+    if pending.receivedChunks < pending.chunkCount then
+        return
+    end
+    for i = 1, pending.chunkCount do
+        if pending.chunks[i] == nil then
+            return
+        end
+    end
+    if pending.replace then
+        local previousKnowledge = ClientState.npcKnowledge or {}
+        local previousPresentations = ClientState.npcPresentations or {}
+        local protectedKnowledge = {}
+        local protectedPresentations = {}
+        if not pending.characterChanged then
+            for snapshotID, previous in pairs(previousKnowledge) do
+                snapshot = pending.snapshotsByID[snapshotID]
+                if snapshot and isStaleKnowledge(snapshot and previous, snapshot) then
+                    protectedKnowledge[snapshotID] = previous
+                    if previousPresentations[snapshotID] then
+                        protectedPresentations[snapshotID] = previousPresentations[snapshotID]
+                    end
+                end
+            end
+        end
+        ClientState.npcKnowledge = protectedKnowledge
+        ClientState.npcPresentations = protectedPresentations
         ClientState.conversationHistory = {}
         ClientState.conversationDiary = {}
         ClientState.conversationDiaryRevision = 0
         ClientState.lastConversationDelta = nil
         ClientState.lastConversationDeltas = {}
-        ClientState.bootstrapKnowledgeRevision = incomingRevision
     end
-    if projectionIsCurrent(args) then
-        for _, snapshot in ipairs(args.snapshots or {}) do
+    for i = 1, pending.chunkCount do
+        for _, snapshot in ipairs(pending.chunks[i]) do
             Internal.ApplyNPCKnowledgeSnapshot(snapshot)
         end
     end
-    if args.state == "known" then ClientState.bootstrapRetryAttempt = 0 end
+    ClientState.bootstrapKnowledgeRevision = incomingRevision
+    ClientState.bootstrapState = "known"
+    ClientState.bootstrapRetryAttempt = 0
+    ClientState.completedBootstrapRequestID = streamID
+    clearPendingBootstrap()
 end)
 
 Internal.RegisterServerCommand(Const.CMD_NPC_PRESENTATION, function(args)

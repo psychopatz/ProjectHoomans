@@ -8,6 +8,7 @@ local Internal = PNC.PathService.Internal
 local TraversalQuery = PNC.TraversalQuery
 local TraversalProfiles = PNC.TraversalProfiles
 local LiveBodyControl = PNC.LiveBodyControl
+local Core = PNC.Core
 local VANILLA_FENCE_TIMEOUT_MS = 4000
 local VANILLA_FENCE_START_GRACE_MS = 300
 
@@ -31,6 +32,13 @@ end
 
 local function enterVanillaFenceState(zombie, direction)
     local result
+    if Core and Core.IsManagedNPCBody
+        and Core.IsManagedNPCBody(zombie)
+    then
+        -- Managed NPC carriers are IsoZombie instances without player
+        -- BodyDamage. Their traversal must stay inside the PNC action runtime.
+        return false
+    end
     if zombie and zombie.climbOverFence then
         result = zombie:climbOverFence(direction)
         if result ~= false

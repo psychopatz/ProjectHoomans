@@ -5,6 +5,32 @@ local Internal = LiveBodyControl.Internal
 local Core = PNC.Core
 local Diagnostics = PNC.PerformanceScalingDiagnostics
 
+local function isRagdollSimulationActive(zombie)
+    return zombie
+        and zombie.isRagdollSimulationActive
+        and zombie:isRagdollSimulationActive() == true
+        or false
+end
+
+local function promoteSettledRagdoll(zombie, actionState)
+    local groundedState
+    if not actionState
+        or string.find(actionState, "ragdoll", 1, true) == nil
+        or isRagdollSimulationActive(zombie)
+        or not zombie.changeState
+        or not ZombieOnGroundState
+        or not ZombieOnGroundState.instance
+    then
+        return actionState
+    end
+    groundedState = ZombieOnGroundState.instance()
+    if groundedState then
+        zombie:changeState(groundedState)
+        return LiveBodyControl.GetActionStateName(zombie)
+    end
+    return actionState
+end
+
 function LiveBodyControl.RecoverGroundedBody(record, zombie, reason)
     local now
     local recovery
@@ -20,6 +46,11 @@ function LiveBodyControl.RecoverGroundedBody(record, zombie, reason)
         record.runtime.attackAction = nil
     end
     Internal.prepareNativeGetUp(zombie)
+    if zombie.setVariable then
+        -- PathFindBehavior2 uses this callback-owned variable to select the
+        -- get-up transition after a settled floor/ragdoll state.
+        zombie:setVariable("ShouldStandUp", true)
+    end
     now = Core and Core.Now and Core.Now() or 0
     recovery = record and record.runtime
         and record.runtime.groundedRecovery or nil
@@ -44,6 +75,7 @@ function LiveBodyControl.TickGroundedRecovery(record, zombie, now)
     local state = record and record.runtime
         and record.runtime.groundedRecovery or nil
     local attacker
+    now = tonumber(now) or (Core and Core.Now and Core.Now() or 0)
     if Internal.intentionallyGrounded(record) then
         if record and record.runtime then
             record.runtime.groundedRecovery = nil
@@ -51,8 +83,23 @@ function LiveBodyControl.TickGroundedRecovery(record, zombie, now)
         Internal.clearNativeGetUpLease(zombie)
         return false
     end
+    -- Ragdoll simulation owns the body until it settles.  Starting the get-up
+    -- lease while physics is still active leaves the carrier in a permanent
+    -- floor pose and makes the next animation state fight the physics state.
+    if isRagdollSimulationActive(zombie) then
+        record.runtime = record.runtime or {}
+        state = record.runtime.groundedRecovery or {}
+        state.startedAt = now
+        record.runtime.groundedRecovery = state
+        record.activeBehavior = "Grounded:ragdoll"
+        if PNC.BehaviorMoveIntent and PNC.BehaviorMoveIntent.Hold then
+            PNC.BehaviorMoveIntent.Hold(record, "actor_ragdoll")
+        end
+        LiveBodyControl.SetManagedBodyUseless(zombie, true)
+        Internal.clearVanillaIntent(zombie)
+        return true
+    end
     if state and state.getUpStarted == true then
-        now = tonumber(now) or (Core and Core.Now and Core.Now() or 0)
         if grounded or Internal.GETUP_STATES[actionState] == true then
             if not Internal.hasNativeGetUpLease(zombie, now) then
                 Internal.beginNativeGetUpLease(zombie, now)
@@ -78,13 +125,13 @@ function LiveBodyControl.TickGroundedRecovery(record, zombie, now)
         end
         return Internal.GETUP_STATES[actionState] == true
     end
-    now = tonumber(now) or (Core and Core.Now and Core.Now() or 0)
     record.runtime = record.runtime or {}
     state = record.runtime.groundedRecovery or {
         startedAt = now,
         counterAttempted = false,
     }
     record.runtime.groundedRecovery = state
+    actionState = promoteSettledRagdoll(zombie, actionState)
     record.activeBehavior = "Grounded:recovering"
     if PNC.Combat and PNC.Combat.CancelAttackAction then
         PNC.Combat.CancelAttackAction(record, zombie, nil, "actor_grounded")

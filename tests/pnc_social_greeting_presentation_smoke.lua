@@ -81,6 +81,8 @@ T.equal(
 local speech = Speech.Get("npc-one")
 T.truthy(speech, "ambient greeting reaches nameplate speech")
 T.equal(speech.message.speakerKind, "npc", "ambient greeting is NPC speech")
+T.equal(speech.message.presentationState.tts, true,
+    "ambient greeting remains eligible for shared NPC TTS")
 T.truthy(speech.text and speech.text ~= "",
     "ambient greeting resolves dynamic flavor text")
 T.equal(#diaryEntries, 1, "ambient greeting is written to the diary")

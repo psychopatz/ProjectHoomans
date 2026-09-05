@@ -182,13 +182,21 @@ local function resolveActivityHands(snapshot)
 end
 
 local function applyIdentityVars(zombie, snapshot)
+    local isFemale
     if not zombie or not zombie.setVariable then
         return
     end
     zombie:setVariable("PNCActor", true)
     zombie:setVariable("PNCLive", snapshot and snapshot.presenceState == Const.PRESENCE_LIVE)
+    isFemale = snapshot and snapshot.isFemale == true
     if zombie.setFemaleEtc then
-        zombie:setFemaleEtc(snapshot and snapshot.isFemale == true)
+        -- IsoZombie:setFemaleEtc also rewrites the descriptor voice prefix to
+        -- MaleZombie/FemaleZombie.  Repeating that write for every snapshot
+        -- re-enables native zombie vocals after LiveBodyControl has silenced
+        -- the carrier.  Only touch the engine gender when it actually differs.
+        if not zombie.isFemale or zombie:isFemale() ~= isFemale then
+            zombie:setFemaleEtc(isFemale)
+        end
     end
 end
 

@@ -16,8 +16,31 @@ require "PNC/Core/Pathing/PNC_PathService/Interactions/PNC_PathService_PassageFe
 
 local Internal = PNC.PathService.Internal
 local TraversalQuery = PNC.TraversalQuery
+local Const = PNC.Const or {}
+local PASSAGE_PROBE_COOLDOWN_MS = math.max(
+    100,
+    tonumber(Const.PASSAGE_PROBE_COOLDOWN_MS) or 250
+)
 
-local function buildContext(zombie, record, lane, goalX, goalY, goalZ)
+local function passageProbeAllowed(lane, now)
+    if not lane then return false end
+    local nextProbeAt = tonumber(lane.nextPassageProbeAt) or 0
+    if now < nextProbeAt then
+        return false
+    end
+    lane.nextPassageProbeAt = now + PASSAGE_PROBE_COOLDOWN_MS
+    return true
+end
+
+local function buildContext(
+    zombie,
+    record,
+    lane,
+    goalX,
+    goalY,
+    goalZ,
+    knownPassage
+)
     if not zombie or not getCell then return nil end
     local cell = getCell()
     local zx = math.floor(zombie:getX())
@@ -45,7 +68,13 @@ local function buildContext(zombie, record, lane, goalX, goalY, goalZ)
         and TraversalQuery.GetPassageBetween(
             blockedFromSquare, blockedSquare
         ) or nil
-    if not blockedPassage and TraversalQuery
+    if not blockedPassage and knownPassage
+        and knownPassage.object
+    then
+        blockedPassage = knownPassage.object
+        blockedFromSquare = knownPassage.fromSquare
+        blockedSquare = knownPassage.toSquare
+    elseif not blockedPassage and TraversalQuery
         and TraversalQuery.FindPassageToward
     then
         local passage = TraversalQuery.FindPassageToward(
@@ -116,10 +145,16 @@ local function buildCandidates(context)
 end
 
 function Internal.tryDoorOrWindowInteraction(
-    zombie, record, lane, goalX, goalY, goalZ
+    zombie, record, lane, goalX, goalY, goalZ, knownPassage
 )
     local context = buildContext(
-        zombie, record, lane, goalX, goalY, goalZ
+        zombie,
+        record,
+        lane,
+        goalX,
+        goalY,
+        goalZ,
+        knownPassage
     )
     if not context then return false, nil end
 
@@ -165,6 +200,12 @@ function Internal.hasClosedPassageToward(zombie, goalX, goalY, goalZ)
         return false
     end
     local passage = query.FindPassageToward(zombie, goalX, goalY, goalZ)
-    return passage ~= nil and passage.object ~= nil
+    if passage ~= nil and passage.object ~= nil
         and query.IsClosedPassage(passage.object)
+    then
+        return true, passage
+    end
+    return false, nil
 end
+
+Internal.PassageProbeAllowed = passageProbeAllowed

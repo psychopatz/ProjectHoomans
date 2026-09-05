@@ -56,6 +56,7 @@ local function submitPathRequest(
     state.failed = false
     state.startedAt = now
     state.lastProgressAt = now
+    state.nextPassageProbeAt = now
     state.lastX = body:getX()
     state.lastY = body:getY()
     state.lastZ = body:getZ()
@@ -74,4 +75,3 @@ local function submitPathRequest(
 end
 
 Controller.SubmitPathRequest = submitPathRequest
-

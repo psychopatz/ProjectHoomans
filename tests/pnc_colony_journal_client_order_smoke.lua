@@ -32,6 +32,26 @@ T.equal(journal.rows[1][1], 2, "latest journal row is first")
 T.equal(journal.rows[2][1], 1, "older journal row follows latest")
 local revision = PNC.Network.ClientState.colonyJournalRevision
 
+apply({
+    rows = { row(1), row(2) },
+    afterCursor = 2,
+    nextCursor = 2,
+    latestSequence = 2,
+})
+T.equal(#journal.rows, 2,
+    "replayed journal page does not duplicate rows")
+local replayRevision = PNC.Network.ClientState.colonyJournalRevision
+apply({
+    rows = { row(1) },
+    afterCursor = 0,
+    nextCursor = 1,
+    latestSequence = 2,
+})
+T.equal(#journal.rows, 2,
+    "older journal response is ignored")
+T.equal(PNC.Network.ClientState.colonyJournalRevision, replayRevision,
+    "older journal response does not redraw the journal")
+
 apply({ rows = {}, nextCursor = 2, latestSequence = 2 })
 T.equal(PNC.Network.ClientState.colonyJournalRevision, revision,
     "empty polling response does not redraw the journal")

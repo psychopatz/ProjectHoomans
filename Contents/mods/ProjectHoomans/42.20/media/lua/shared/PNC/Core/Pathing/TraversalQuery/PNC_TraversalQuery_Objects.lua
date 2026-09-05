@@ -120,6 +120,9 @@ function TraversalQuery.CanUseWindow(object, body)
         local ok
         local canClimb
         ok, canClimb = pcall(object.canClimbThrough, object, body)
+        if not ok and Internal.ReportCallError then
+            Internal.ReportCallError("canClimbThrough", canClimb)
+        end
         return ok and canClimb == true
     end
     return true

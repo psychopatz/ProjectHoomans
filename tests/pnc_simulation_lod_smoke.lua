@@ -108,6 +108,23 @@ local follower = {
     health = { current = 100, max = 100 },
     runtime = {},
 }
+local abstractFollower = {
+    x = 0,
+    y = 0,
+    presenceState = "abstract",
+    orderSpec = { kind = "follow" },
+    health = { current = 100, max = 100 },
+    runtime = {},
+}
+T.truthy(PNC.SimulationLOD.Resolve(abstractFollower) == "abstract_follow",
+    "far abstract follower did not receive the follower LOD")
+T.truthy(PNC.SimulationLOD.GetCadence(abstractFollower) == 3000,
+    "abstract follower retained the far dormant cadence")
+T.truthy(PNC.SimulationLOD.GetDecisionInterval(abstractFollower) == 3000,
+    "abstract follower decision cadence was not bounded")
+abstractFollower.runtime.target = { kind = "zombie" }
+T.truthy(PNC.SimulationLOD.Resolve(abstractFollower) == "abstract_follow",
+    "stale abstract combat target displaced follower LOD")
 T.truthy(PNC.SimulationLOD.Resolve(follower) == "follow_owner",
     "stationary follower was incorrectly classified as idle")
 T.truthy(PNC.SimulationLOD.GetCadence(follower) == 100,

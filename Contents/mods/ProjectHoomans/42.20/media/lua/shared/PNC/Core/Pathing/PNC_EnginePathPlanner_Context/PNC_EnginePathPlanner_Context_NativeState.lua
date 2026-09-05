@@ -56,10 +56,13 @@ function Internal.GetNativeMovementState(body)
 end
 
 -- Hoomans owns the single-player Behavior2 pump directly from Lua. Keep the
--- vanilla WalkTowardState out of that route: IsoGameCharacter's deferred
--- movement guard discards path2 whenever WalkTowardState is still active.
--- Releasing only this stale state is important; entering PathFindState would
--- make Java execute Behavior2 a second time during the same update.
+-- vanilla WalkTowardState out of that route once a native path is actually
+-- published: IsoGameCharacter's deferred movement guard discards path2
+-- whenever WalkTowardState is still active. Do not clear WalkTowardState
+-- before path2 exists, because that is the vanilla follow/request owner while
+-- Behavior2 is still acquiring the route. Releasing only this stale state is
+-- important; entering PathFindState would make Java execute Behavior2 a second
+-- time during the same update.
 function Internal.EnsureNativeMovementOwner(body)
     local actionState
     if not body or not body.getActionStateName then
@@ -71,6 +74,9 @@ function Internal.EnsureNativeMovementOwner(body)
         or not ZombieIdleState
         or not ZombieIdleState.instance
     then
+        return false
+    end
+    if body.getPath2 and body:getPath2() == nil then
         return false
     end
     body:changeState(ZombieIdleState.instance())

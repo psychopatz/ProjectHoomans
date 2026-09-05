@@ -151,7 +151,10 @@ function Presentation.EnqueueFlavor(flavorID, speaker, actor, context, options)
     presentationState = {
         conversationUI = false,
         nameplate = speaker == "npc" and not actor,
-        tts = speaker == "player",
+        -- Both sides of a local interaction are canonical speech.  Player
+        -- speech still passes through its own opt-in setting in the voice
+        -- adapter; NPC canned replies must remain eligible for PBrainZ TTS.
+        tts = true,
     }
     accepted, reason = SocialFlavorClient.Enqueue({
         eventID = eventID,

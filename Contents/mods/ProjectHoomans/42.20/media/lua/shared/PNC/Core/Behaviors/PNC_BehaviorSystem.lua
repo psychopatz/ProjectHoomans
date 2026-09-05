@@ -28,6 +28,7 @@ PNC.BehaviorSystem = PNC.BehaviorSystem or {}
 
 local Behavior = PNC.BehaviorSystem
 local JobSystem = PNC.JobSystem
+local Const = PNC.Const
 local Animation = PNC.Animation
 local Common = PNC.BehaviorCommon
 local OrderSystem = PNC.OrderSystem
@@ -70,8 +71,57 @@ local function clearStaleFacilityState(record, zombie)
     return false
 end
 
+local function isAbstractFollowRecord(record)
+    local runtime
+    local order
+    if not record or record.presenceState ~= Const.PRESENCE_ABSTRACT then
+        return false
+    end
+    runtime = record.runtime or {}
+    order = record.orderSpec or {}
+    if runtime.vehiclePassenger and runtime.vehiclePassenger.active == true then
+        return false
+    end
+    return tostring(order.kind or "") == tostring(
+        Const.ORDER_FOLLOW or "follow"
+    )
+end
+
+local function finishFollowerReconcile(record, job, handled, now)
+    local runtime = record and record.runtime or nil
+    local owner
+    if not runtime or runtime.followReconcilePending ~= true then
+        return
+    end
+    runtime.followReconcilePending = nil
+    if not ScalingDiagnostics
+        or not ScalingDiagnostics.IsFollowerPresenceAuditEnabled
+        or ScalingDiagnostics.IsFollowerPresenceAuditEnabled() ~= true
+        or not ScalingDiagnostics.LogFollowerPresence
+    then
+        return
+    end
+    owner = Common.GetOwner(record)
+    ScalingDiagnostics.LogFollowerPresence("materialize_follow_reconcile", {
+        "npc=" .. tostring(record.id),
+        "job=" .. tostring(job or "nil"),
+        "handled=" .. tostring(handled == true),
+        "owner=" .. tostring(record.ownerUsername or "nil"),
+        "ownerOnlineID=" .. tostring(record.ownerOnlineID or "nil"),
+        "ownerResolved=" .. tostring(owner ~= nil),
+        "activeBehavior=" .. tostring(record.activeBehavior or "nil"),
+        "followMode=" .. tostring(runtime.followState
+            and runtime.followState.mode or "nil"),
+        "moveIntent=" .. tostring(runtime.moveIntent ~= nil),
+        "pathPhase=" .. tostring(runtime.pathing
+            and runtime.pathing.phase or "nil"),
+        "at=" .. tostring(now or "nil"),
+    })
+end
+
 function Behavior.Tick(record, zombie, now)
     local job
+    local companionHandled
     local previousJob = record and record.activeJob or nil
 
     if ScalingDiagnostics then
@@ -120,6 +170,19 @@ function Behavior.Tick(record, zombie, now)
             )
         end
         Incapacitated.Tick(record, zombie)
+        return
+    end
+
+    -- Abstract followers have no IsoZombie and therefore must not pass
+    -- through live-only seating, perception, animation, or engine-pathing
+    -- gates. Their durable follow order is advanced by a bounded lightweight
+    -- controller until presence reconciliation materializes them again.
+    if isAbstractFollowRecord(record)
+        and Companion
+        and Companion.Internal
+        and Companion.Internal.TickAbstractFollowOwner
+    then
+        Companion.Internal.TickAbstractFollowOwner(record, now)
         return
     end
 
@@ -197,7 +260,9 @@ function Behavior.Tick(record, zombie, now)
         return
     end
 
-    if Companion.Tick(record, zombie, job) then
+    companionHandled = Companion.Tick(record, zombie, job)
+    finishFollowerReconcile(record, job, companionHandled, now)
+    if companionHandled then
         return
     end
 

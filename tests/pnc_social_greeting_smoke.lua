@@ -12,6 +12,7 @@ local player = {
     getY = function(self) return self.y end,
     getZ = function(self) return self.z end,
     getUsername = function() return "Mara" end,
+    CanSee = function() return true end,
 }
 
 local records = {
@@ -40,12 +41,14 @@ local bodies = {
         getY = function() return 0 end,
         getZ = function() return 0 end,
         isDead = function() return false end,
+        CanSee = function() return true end,
     },
     ["npc-hostile"] = {
         getX = function() return 4 end,
         getY = function() return 0 end,
         getZ = function() return 0 end,
         isDead = function() return false end,
+        CanSee = function() return true end,
     },
 }
 
@@ -73,6 +76,7 @@ local relationships = {
 local applied = {}
 local relationshipBroadcasts = {}
 local speechBroadcasts = {}
+local abandonmentCalls = 0
 
 PNC = {
     Core = {
@@ -142,9 +146,11 @@ PNC = {
 
 T.load(SHARED .. "PNC/Core/Relationships/PNC_SocialEventDefinitions.lua")
 T.load(SHARED .. "PNC/Core/Commands/PNC_VanillaEmoteInteractions.lua")
+T.load(SERVER .. "PNC/Social/PNC_SocialMeetingService.lua")
 T.load(SERVER .. "PNC/Social/PNC_SocialGreetingService.lua")
 
 local Service = PNC.SocialGreeting
+local Meeting = PNC.SocialMeeting
 local Interactions = PNC.VanillaEmoteInteractions
 local relationship = relationships["npc-good"]
 
@@ -168,6 +174,28 @@ T.equal(
     "wavehi sees the automatic greeting as today's greeting"
 )
 
+local meets
+local meetingReason
+player.visible = false
+player.CanSee = function() return player.visible ~= false end
+meets, meetingReason = Meeting.CanPlayerMeetNPC(
+    player,
+    records["npc-good"],
+    bodies["npc-good"],
+    10
+)
+T.equal(meets, false, "meeting gate rejects an NPC outside player LOS")
+T.equal(meetingReason, "not_visible", "meeting gate reports the LOS reason")
+player.visible = true
+meets, meetingReason = Meeting.CanPlayerMeetNPC(
+    player,
+    records["npc-good"],
+    bodies["npc-good"],
+    10
+)
+T.equal(meets, true, "meeting gate accepts a visible nearby NPC")
+T.equal(meetingReason, "visible", "meeting gate reports a visible meeting")
+
 T.equal(Service.Pump(24.01), 0, "standing nearby does not retrigger greeting")
 T.equal(#applied, 1, "standing nearby does not add relationship points")
 
@@ -182,6 +210,27 @@ T.equal(
     2,
     "next-day greeting carries the authoritative day index"
 )
+
+PNC.FollowerAbandonment = {
+    HasPending = function(record)
+        return record and record.id == "npc-good"
+    end,
+    TryDeliver = function(_, record, _, _, meeting)
+        abandonmentCalls = abandonmentCalls + 1
+        T.equal(meeting.meetingEligible, true,
+            "abandonment delivery receives the reusable meeting result")
+        T.equal(record.id, "npc-good",
+            "abandonment delivery is attempted for the pending follower")
+        return true, "delivered"
+    end,
+}
+Service.Reset()
+T.equal(Service.Pump(72), 0,
+    "pending return commentary consumes the follower meeting edge")
+T.equal(abandonmentCalls, 1,
+    "greeting pump delegates pending follower returns once")
+T.equal(#speechBroadcasts, 2,
+    "pending return commentary does not add a duplicate daily greeting")
 
 T.equal(
     Interactions.IsAutomaticGreetingEligible(

@@ -42,6 +42,8 @@ end
 
 function Core.IsManagedNPCBody(zombie)
     local modData
+    local onlineID
+    local clientBodyIDs
     if not zombie or not zombie.getModData then
         return false
     end
@@ -55,10 +57,30 @@ function Core.IsManagedNPCBody(zombie)
     -- PNCLive is persisted by some older body versions even when their Lua
     -- modData tag was only partially written. Reanimation explicitly clears
     -- this variable before releasing a corpse-created zombie to vanilla.
-    return zombie.getVariableBoolean
+    if zombie.getVariableBoolean
         and (zombie:getVariableBoolean("PNCLive") == true
             or zombie:getVariableBoolean("PNCActor") == true)
-        or false
+    then
+        return true
+    end
+
+    -- A native network packet can update an IsoZombie before the presence
+    -- presentation writes its modData/variables. The roster-side index is
+    -- client-only, O(1), and contains only live NPC body online identities.
+    if PNC.Network and PNC.Network.ClientState
+        and PNC.Network.ClientState.managedBodyOnlineIDsReady == true
+        and zombie.getOnlineID
+        and Core.IsClientOnly()
+    then
+        onlineID = tonumber(zombie:getOnlineID())
+        clientBodyIDs = PNC.Network.ClientState.managedBodyOnlineIDs
+        if onlineID ~= nil and clientBodyIDs
+            and clientBodyIDs[tostring(onlineID)] == true
+        then
+            return true
+        end
+    end
+    return false
 end
 
 -- Live IsoZombie instances use their ItemVisual script definitions when the

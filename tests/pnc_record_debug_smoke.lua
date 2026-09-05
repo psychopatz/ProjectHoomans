@@ -31,6 +31,31 @@ T.equal(PNC.Core.IsManagedNPCBody(legacyManagedBody), true,
 T.equal(PNC.Core.IsManagedNPCBody(releasedZombie), false,
     "released reanimation remains an ordinary zombie")
 
+-- The native network update can arrive before the presence presentation has
+-- written carrier modData. The client identity index must close that first
+-- frame without classifying an unrelated zombie by online ID alone.
+PNC.Network = {
+    ClientState = {
+        managedBodyOnlineIDs = { ["73"] = true },
+        managedBodyOnlineIDsReady = true,
+    },
+}
+PNC.Core.IsClientOnly = function() return true end
+local untaggedReplica = {
+    getModData = function() return {} end,
+    getVariableBoolean = function() return false end,
+    getOnlineID = function() return 73 end,
+}
+local unrelatedZombie = {
+    getModData = function() return {} end,
+    getVariableBoolean = function() return false end,
+    getOnlineID = function() return 74 end,
+}
+T.equal(PNC.Core.IsManagedNPCBody(untaggedReplica), true,
+    "roster identity recognizes an unpresented remote carrier")
+T.equal(PNC.Core.IsManagedNPCBody(unrelatedZombie), false,
+    "roster identity does not classify an unrelated zombie")
+
 local quietRecord = { id = "npc_quiet", runtime = {} }
 local recordedRecord = { id = "npc_recorded", runtime = { debug = true } }
 PNC.Core.LogRecordDebug(quietRecord, "quiet record")

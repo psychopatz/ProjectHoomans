@@ -12,6 +12,8 @@ local BehaviorCombat = PNC.BehaviorCombat
 local Common = PNC.BehaviorCommon
 local Scenes = PNC.AnimationScenes
 local Const = PNC.Const
+local Core = PNC.Core
+local Diagnostics = PNC.PerformanceScalingDiagnostics
 
 local FACILITY_ORDER = "facility_activity"
 local CAMP_ORDER = "camp"
@@ -121,6 +123,96 @@ local function shouldScan(runtime, now)
     return true
 end
 
+local function auditThreat(record, target, context, now, accepted, phase)
+    local body
+    local observer
+    local modData
+    local runtime
+    local recent
+    local observed
+    local source
+    local actionState
+    local targetBody
+    local observerAction
+    if not Diagnostics or Diagnostics.SeatingAuditEnabled ~= true
+        or not Diagnostics.LogSeatingAudit
+    then
+        return
+    end
+    runtime = record and record.runtime or {}
+    body = Perception and Perception.FindZombieByID
+        and Perception.FindZombieByID(target and target.zombieId or nil)
+        or nil
+    observer = PNC.Registry and PNC.Registry.GetLiveZombie
+        and PNC.Registry.GetLiveZombie(record and record.id or nil)
+        or nil
+    modData = body and body.getModData and body:getModData() or nil
+    recent = runtime.recentThreat
+    observed = runtime.zombieAttacker
+    source = tostring(target and target.visibilityKind or "frame")
+    if source == "recent_attacker" then
+        source = "recent_threat"
+    elseif source == "aggro_observed" then
+        source = "zombie_aggro"
+    elseif source == "immediate_threat" then
+        source = "perception_frame"
+    end
+    if recent and tostring(recent.id or "")
+        == tostring(target and target.zombieId or "")
+        and now <= (tonumber(recent.expiresAt) or 0)
+    then
+        source = "recent_threat"
+    elseif observed and tostring(observed.zombieId or "")
+        == tostring(target and target.zombieId or "")
+        and now - (tonumber(observed.observedAt) or 0) <= 1500
+    then
+        source = "zombie_aggro"
+    end
+    actionState = body and body.getActionStateName
+        and tostring(body:getActionStateName() or "") or ""
+    targetBody = body and body.getTarget and body:getTarget() or nil
+    observerAction = observer and observer.getActionStateName
+        and tostring(observer:getActionStateName() or "") or ""
+    Diagnostics.LogSeatingAudit(phase or "threat_candidate", {
+        "npc=" .. tostring(record and record.id or ""),
+        "accepted=" .. tostring(accepted == true),
+        "source=" .. source,
+        "targetId=" .. tostring(target and target.zombieId or ""),
+        "targetBodyFound=" .. tostring(body ~= nil),
+        "targetDead=" .. tostring(body and body.isDead
+            and body:isDead() == true),
+        "distSq=" .. tostring(target and target.distSq or ""),
+        "visible=" .. tostring(target and target.visible ~= false),
+        "threatening=" .. tostring(target and target.threatening == true),
+        "selfDefense=" .. tostring(
+            target and target.immediateSelfDefense == true
+        ),
+        "targetManaged=" .. tostring(
+            body and Core and Core.IsManagedNPCBody
+                and Core.IsManagedNPCBody(body) or false
+        ),
+        "targetPNC_NPC=" .. tostring(modData and modData.PNC_NPC == true),
+        "targetPersistedShell=" .. tostring(
+            modData and modData.PNC_PersistedShell == true
+        ),
+        "targetBodyKind=" .. tostring(modData and modData.PNC_BodyKind or ""),
+        "targetPNCLive=" .. tostring(body and body.getVariableBoolean
+            and body:getVariableBoolean("PNCLive") == true),
+        "targetPNCActor=" .. tostring(body and body.getVariableBoolean
+            and body:getVariableBoolean("PNCActor") == true),
+        "targetPNCSeated=" .. tostring(body and body.getVariableBoolean
+            and body:getVariableBoolean("PNCSeated") == true),
+        "targetAction=" .. actionState,
+        "targetEngineTarget=" .. tostring(targetBody ~= nil),
+        "observerAction=" .. observerAction,
+        "pathPhase=" .. tostring(runtime.pathing
+            and runtime.pathing.phase or ""),
+        "scene=" .. tostring(runtime.animationScene
+            and runtime.animationScene.id or ""),
+        "context=" .. tostring(context and context.kind or ""),
+    })
+end
+
 local function resolveTarget(record, runtime, context, now)
     local current
     local target
@@ -151,7 +243,11 @@ local function resolveTarget(record, runtime, context, now)
         return nil
     end
     target = Perception.FindImmediateZombieThreat(record, context.radius)
-    if not isSeatedThreat(target) or not withinContext(target, context) then
+    local accepted = isSeatedThreat(target) and withinContext(target, context)
+    if target and Diagnostics and Diagnostics.SeatingAuditEnabled == true then
+        auditThreat(record, target, context, now, accepted, "threat_candidate")
+    end
+    if not accepted then
         return nil
     end
     runtime.seatedThreatNextValidateAt = now + VALIDATE_MS
@@ -175,8 +271,21 @@ end
 local function continueCombat(record, zombie, now, state)
     local runtime = record.runtime or {}
     local context = activityContext(record)
+    local previousTarget = runtime.target
     local target = resolveTarget(record, runtime, context, now)
     if not target then
+        if Diagnostics and Diagnostics.SeatingAuditEnabled == true then
+            Diagnostics.LogSeatingAudit("threat_lost", {
+                "npc=" .. tostring(record and record.id or ""),
+                "targetId=" .. tostring(
+                    previousTarget and previousTarget.zombieId or ""
+                ),
+                "pathPhase=" .. tostring(runtime.pathing
+                    and runtime.pathing.phase or ""),
+                "scene=" .. tostring(runtime.animationScene
+                    and runtime.animationScene.id or ""),
+            })
+        end
         clearTransientState(record, zombie, "seated_combat_resolved")
         return false
     end
@@ -196,6 +305,9 @@ local function enterCombat(record, zombie, now, scene)
     local interrupted
     if not target then return false end
     if not Scenes or not Scenes.Interrupt then return false end
+    if Diagnostics and Diagnostics.SeatingAuditEnabled == true then
+        auditThreat(record, target, context, now, true, "enter_combat")
+    end
     interrupted = Scenes.Interrupt(record, zombie, "combat")
     if interrupted ~= true then return false end
     runtime.target = target

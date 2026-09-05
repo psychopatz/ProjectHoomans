@@ -160,6 +160,9 @@ function Persistence.SerializeRecord(record)
             record.identitySeed,
             record.archetypeID
         ),
+        followerAbandonment = Internal.sanitizeFollowerAbandonment(
+            record.followerAbandonment
+        ),
         affiliation = FactionTypes
             and FactionTypes.NormalizeAffiliation(
                 record.affiliation

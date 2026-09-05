@@ -1,5 +1,10 @@
-local Integration = PNC.ProfilerIntegration
+local Integration = PNC and PNC.ProfilerIntegration or nil
+if not Integration or Integration._loadingProviders ~= true then
+    return Integration
+end
+
 local Internal = Integration.Internal
+if type(Internal) ~= "table" then return Integration end
 
 function Internal.Wrap(owner, key, metricName)
     if not owner or type(owner[key]) ~= "function" then return false end

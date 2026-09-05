@@ -3,9 +3,15 @@ T.addPackagePaths()
 
 local LLMInput = {}
 local keyDown = true
+local registeredPress
 local keybinds = {
+    TYPE_PRESS = "press",
     TYPE_LONG_PRESS = "longpress",
-    RegisterLongPress = function() end,
+    RegisterPress = function(definition)
+        definition.type = "press"
+        registeredPress = definition
+        return definition
+    end,
     IsDown = function() return keyDown end,
 }
 PsychopatzCore = {
@@ -25,9 +31,12 @@ PNC = {
     HoomansLLM = {
         IsBridgeEnabled = function() return true end,
     },
-    CompanionTargetResolver = {},
+    CompanionTargetResolver = { SCOPE_SOCIAL = "social" },
 }
 UIFont = { Small = "Small", Medium = "Medium" }
+getKeyCode = function(name)
+    return name == "V" and 47 or 0
+end
 
 package.preload["PsychopatzCore/Input/PsychopatzKeybinds"] =
     function()
@@ -50,6 +59,40 @@ T.load(
 )
 
 local Integration = PNC.HoomansLLM
+
+T.equal(registeredPress.type, keybinds.TYPE_PRESS,
+    "LLM talk action uses a single press")
+T.equal(registeredPress.defaultKey, 47,
+    "LLM talk key defaults to V")
+
+local targetPlayer = {
+    getX = function() return 100 end,
+    getY = function() return 100 end,
+    getZ = function() return 0 end,
+}
+local requestedScopes = {}
+PNC.CompanionTargetResolver.NormalizeMode = function(mode)
+    return mode or "nearest"
+end
+PNC.CompanionTargetResolver.NormalizeScope = function(scope)
+    return scope or "colonists"
+end
+PNC.CompanionTargetResolver.ResolveRecipients = function(_, _, _, scope)
+    requestedScopes[#requestedScopes + 1] = scope
+    if scope == "social" then
+        local target = { id = "network-npc", name = "Network NPC" }
+        return { scope = scope, target = target, targets = { target } }
+    end
+    return { scope = scope, target = nil, targets = {} }
+end
+getSpecificPlayer = function() return targetPlayer end
+local inlineResolved = Integration.ResolveInlineRecipients(targetPlayer)
+T.truthy(inlineResolved and inlineResolved.primary,
+    "keybind recipient resolver falls back to social MP NPCs")
+T.equal(inlineResolved.primary.id, "network-npc",
+    "social fallback selected the network NPC")
+T.equal(requestedScopes[1], "colonists", "companion scope remains first")
+T.equal(requestedScopes[2], "social", "social scope is used as fallback")
 local first = { highlights = {}, colors = {} }
 local second = { highlights = {}, colors = {} }
 function first:setOutlineHighlight(playerIndex, enabled)

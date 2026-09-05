@@ -405,13 +405,21 @@ function Presentation.CacheTextMetric(entry, key, text, font)
 end
 
 function Presentation.DrawOutlinedText(manager, text, x, y, color, alpha, font)
+    local textAlpha
+    local red
+    local green
+    local blue
     if not text or text == "" then return end
-    local outlineAlpha = math.min(1, (alpha or 1) * 0.95)
+    textAlpha = alpha or 1
+    red = color and tonumber(color.r) or 1
+    green = color and tonumber(color.g) or 1
+    blue = color and tonumber(color.b) or 1
+    local outlineAlpha = math.min(1, textAlpha * 0.95)
     manager:drawText(text, x - 1, y, 0, 0, 0, outlineAlpha, font)
     manager:drawText(text, x + 1, y, 0, 0, 0, outlineAlpha, font)
     manager:drawText(text, x, y - 1, 0, 0, 0, outlineAlpha, font)
     manager:drawText(text, x, y + 1, 0, 0, 0, outlineAlpha, font)
-    manager:drawText(text, x, y, color.r, color.g, color.b, alpha, font)
+    manager:drawText(text, x, y, red, green, blue, textAlpha, font)
 end
 
 function Presentation.CreateSpeechTextObject(text, color, maxCharsPerLine)

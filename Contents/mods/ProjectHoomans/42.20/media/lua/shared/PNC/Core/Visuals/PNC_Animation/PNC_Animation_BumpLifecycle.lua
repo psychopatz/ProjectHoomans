@@ -8,6 +8,7 @@ local Core = PNC.Core
 local LiveBodyControl = PNC.LiveBodyControl
 local LocomotionProfiles = PNC.LocomotionProfiles
 local AnimationTrace = PNC.AnimationTrace
+local Diagnostics = PNC.PerformanceScalingDiagnostics
 
 -- Long actions such as self-treatment own the selector for their whole
 -- authority window. Extend a healthy selector without replaying it; if the
@@ -67,6 +68,20 @@ function Animation.FinishBump(zombie, forceIdle)
         )
     end
     modData = zombie.getModData and zombie:getModData() or nil
+    if Diagnostics and Diagnostics.SeatingAuditEnabled == true
+        and Diagnostics.LogSeatingAudit
+    then
+        Diagnostics.LogSeatingAudit("bump_finish", {
+            "bodyId=" .. tostring(modData and (
+                modData.PNC_UUID or modData.PNC_NPC_ID
+            ) or ""),
+            "bodyAction=" .. tostring(zombie.getActionStateName
+                and zombie:getActionStateName() or ""),
+            "bumpType=" .. tostring(modData
+                and modData.PNC_BumpRequestedType or ""),
+            "forceIdle=" .. tostring(forceIdle == true),
+        })
+    end
     if zombie.setBumpDone then
         zombie:setBumpDone(true)
     end
@@ -138,6 +153,19 @@ function Animation.PumpBumpRelease(zombie, now)
     if actionState == "bumped"
         and (now - releaseAt) >= Internal.BUMP_RELEASE_HARD_TIMEOUT_MS
     then
+        if Diagnostics and Diagnostics.SeatingAuditEnabled == true
+            and Diagnostics.LogSeatingAudit
+        then
+            Diagnostics.LogSeatingAudit("bump_release_recovered", {
+                "bodyId=" .. tostring(modData.PNC_UUID
+                    or modData.PNC_NPC_ID or ""),
+                "bodyAction=" .. actionState,
+                "requested=" .. tostring(
+                    modData.PNC_BumpRequestedType or ""
+                ),
+                "ageMs=" .. tostring(now - releaseAt),
+            })
+        end
         if zombie.reportEvent then
             zombie:reportEvent("ActiveAnimFinishing")
         end
@@ -169,6 +197,16 @@ function Animation.PumpBumpRelease(zombie, now)
     modData.PNC_BumpActionLeaseStartedAt = nil
     modData.PNC_BumpRequestedType = nil
     modData.PNC_BumpKeepUseless = nil
+    if Diagnostics and Diagnostics.SeatingAuditEnabled == true
+        and Diagnostics.LogSeatingAudit
+    then
+        Diagnostics.LogSeatingAudit("bump_release_complete", {
+            "bodyId=" .. tostring(modData.PNC_UUID
+                or modData.PNC_NPC_ID or ""),
+            "bodyAction=" .. actionState,
+            "ageMs=" .. tostring(now - releaseAt),
+        })
+    end
     if AnimationTrace and AnimationTrace.End then
         AnimationTrace.End(
             zombie,

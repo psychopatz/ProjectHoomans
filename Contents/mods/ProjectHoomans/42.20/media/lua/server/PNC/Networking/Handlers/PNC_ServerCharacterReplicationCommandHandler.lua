@@ -21,8 +21,12 @@ local function buildSnapshotList()
     return list
 end
 
-Router.Register(Const.CMD_FULL_SYNC_REQUEST, function(player)
-    PNC.Network.BroadcastFullSync(player, buildSnapshotList())
+Router.Register(Const.CMD_FULL_SYNC_REQUEST, function(player, args)
+    PNC.Network.BroadcastFullSync(
+        player,
+        buildSnapshotList(),
+        args and (args.requestID or args.syncID) or nil
+    )
 end)
 
 Router.Register(Const.CMD_REQUEST_CHARACTER, function(player, args)

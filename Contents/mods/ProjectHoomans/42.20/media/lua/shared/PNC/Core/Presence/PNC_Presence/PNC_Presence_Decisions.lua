@@ -2,6 +2,7 @@ local Presence = PNC.Presence
 local Internal = Presence.Internal
 local Core = PNC.Core
 local Const = PNC.Const
+local Common = PNC.BehaviorCommon
 
 function Presence.ShouldMaterialize(record, nearest)
     nearest = nearest or Internal.FindNearestPlayer(record)
@@ -39,7 +40,13 @@ function Presence.ShouldAbstract(record, nearest)
     if record.presenceState ~= Const.PRESENCE_LIVE then return false end
     if record.runtime and record.runtime.forceLive then return false end
     if record.runtime and record.runtime.forceAbstract then return true end
-    if record.runtime and record.runtime.target then return false end
+    if record.runtime and record.runtime.target
+        and not (Common
+            and Common.IsActiveFollowCombatTarget
+            and Common.IsActiveFollowCombatTarget(record, Core.Now()))
+    then
+        return false
+    end
     return (not nearest) or nearest.distSq
         >= (Const.ABSTRACT_DISTANCE * Const.ABSTRACT_DISTANCE)
 end

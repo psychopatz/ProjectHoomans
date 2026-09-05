@@ -83,6 +83,7 @@ local function makeEntry()
     function entry:setHeight(value) self.height = value end
     function entry:setEditable(value) self.editable = value end
     function entry:focus() self.focused = true end
+    function entry:unfocus() self.unfocused = true end
 
     return entry
 end
@@ -95,6 +96,7 @@ local function makeButton()
     function button:setHeight(value) self.height = value end
     function button:setEnable(value) self.enabled = value end
     function button:setTitle(value) self.title = value end
+    function button:setImage(value) self.image = value end
     return button
 end
 
@@ -106,7 +108,10 @@ local UI = {
     end,
     CreateButton = function(_, options)
         local button = makeButton()
-        if options then button:setTitle(options.title) end
+        if options then
+            button:setTitle(options.title)
+            if options.image then button:setImage(options.image) end
+        end
         return button
     end,
     SetButtonVariant = function() end,
@@ -172,6 +177,24 @@ T.equal(#submitted, 1, "Shift+Enter does not submit")
 T.equal(entry:getText(), "hello\n world", "Shift+Enter inserts a newline at the caret")
 T.equal(entry:getCursorPos(), 6, "newline leaves the caret after the inserted line break")
 T.truthy(input.inputHeight > 26, "newline expands the input height")
+
+input:focusInput()
+T.truthy(input:blurInput(), "input exposes a reusable blur operation")
+T.truthy(entry.unfocused, "blur operation releases the native text entry")
+
+local modeInput = PsychopatzConversationLLMInput:new(0, 0, 320, 108, {
+    modeButtons = {
+        { id = "nearest", title = "NEAREST NPC", image = "single.png" },
+        { id = "nearby", title = "NEARBY NPCS", image = "group.png" },
+    },
+})
+modeInput:createChildren()
+T.equal(modeInput.modeButtons[1].button.image, "single.png",
+    "single-target mode carries its icon")
+T.equal(modeInput.modeButtons[2].button.image, "group.png",
+    "multiple-target mode carries its icon")
+T.equal(modeInput.modeButtons[1].button.title, "",
+    "icon mode buttons do not overlap their labels")
 
 local toggleChanges = {}
 local toggleInput = PsychopatzConversationLLMInput:new(0, 0, 320, 108, {

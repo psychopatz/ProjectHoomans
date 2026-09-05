@@ -200,7 +200,9 @@ local function publishNPCMessage(actor, text, context)
         presentationState = {
             conversationUI = false,
             nameplate = true,
-            tts = false,
+            -- This is a canonical NPC greeting, not a legacy TTS callback.
+            -- Leave it eligible for the shared Core voice stream.
+            tts = true,
         },
     })
     ok = pcall(Message.Publish, message)

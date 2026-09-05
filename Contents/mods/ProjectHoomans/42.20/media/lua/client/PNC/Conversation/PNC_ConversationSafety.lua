@@ -35,6 +35,56 @@ local function alive(value)
         and (not value.isDead or value:isDead() ~= true)
 end
 
+local function isNetworkClient()
+    return isClient and isClient() == true
+end
+
+local function snapshotFor(spec)
+    local context = spec and spec.context or {}
+    local entry = context.entry or {}
+    local snapshots = PNC.Network
+        and PNC.Network.ClientState
+        and PNC.Network.ClientState.snapshots
+        or nil
+    local npcID = tostring(spec and spec.npcID or entry.id or "")
+    local current = snapshots and snapshots[npcID] or nil
+    if type(current) == "table" then return current end
+    return entry.snapshot
+        or entry.source and entry.source.snapshot
+end
+
+local function snapshotHasPosition(snapshot)
+    return type(snapshot) == "table"
+        and snapshot.alive ~= false
+        and tonumber(snapshot.x) ~= nil
+        and tonumber(snapshot.y) ~= nil
+        and tonumber(snapshot.z) ~= nil
+end
+
+local function allowsSnapshotConversation(spec, zombie)
+    local context = spec and spec.context or {}
+    return isNetworkClient()
+        and context.nameplateConversation == true
+        and not alive(zombie)
+        and snapshotHasPosition(snapshotFor(spec))
+end
+
+local function snapshotDistanceSq(player, snapshot)
+    if not player or not snapshot or not player.getX or not player.getY
+        or not player.getZ
+    then
+        return math.huge
+    end
+    if math.floor(tonumber(snapshot.z) or 0)
+        ~= math.floor(tonumber(player:getZ()) or 0)
+    then
+        return math.huge
+    end
+    local dx = tonumber(snapshot.x) - player:getX()
+    local dy = tonumber(snapshot.y) - player:getY()
+    return dx * dx + dy * dy
+end
+
 local function targetMatches(target, player, zombie, npcID)
     if not target then return false end
     if target == player or target == zombie then return true end
@@ -209,9 +259,16 @@ end
 
 function Safety.Check(spec)
     local player, zombie, record, npcID = Safety.ResolveActors(spec)
-    if not alive(zombie) then return "npc_unavailable" end
+    local snapshot = snapshotFor(spec)
+    local snapshotConversation = allowsSnapshotConversation(spec, zombie)
+    if not alive(zombie) and not snapshotConversation then
+        return "npc_unavailable"
+    end
     local maximumDistance = Safety.GetMaximumDistance()
-    if distanceSq(player, zombie) > maximumDistance * maximumDistance then
+    local targetDistance = alive(zombie)
+        and distanceSq(player, zombie)
+        or snapshotDistanceSq(player, snapshot)
+    if targetDistance > maximumDistance * maximumDistance then
         return "distance"
     end
     if settingsValue("closeConversationOnDanger", true) == true

@@ -47,6 +47,7 @@ function LiveBodyControl.ApplyHumanizedBodyFlags(
 )
     local descriptor
     local modData
+    local preserveGroundedState
     if not zombie then return end
     modData = zombie.getModData and zombie:getModData() or nil
     if Internal.hasBumpActionLease(zombie) then
@@ -56,29 +57,45 @@ function LiveBodyControl.ApplyHumanizedBodyFlags(
     if PNC.AnimationTrace and PNC.AnimationTrace.Sample then
         PNC.AnimationTrace.Sample(zombie, "humanize_before")
     end
+    -- A landing is reported through the native floor/knockdown state.  Do not
+    -- erase that signal in the same maintenance pass that is supposed to let
+    -- TickGroundedRecovery start the native get-up animation.
+    preserveGroundedState = LiveBodyControl.IsGrounded
+        and LiveBodyControl.IsGrounded(zombie) == true
     if zombie.setVariable then
         zombie:setVariable("ZombieHitReaction", "Chainsaw")
         zombie:setVariable("NoLungeTarget", true)
         zombie:setVariable("NoLungeAttack", true)
         zombie:setVariable("bBecomeCrawler", false)
         zombie:setVariable("bCrawling", false)
-        zombie:setVariable("FallOnFront", false)
-        zombie:setVariable("BumpFall", false)
-        zombie:setVariable("BumpFallType", "")
+        if not preserveGroundedState then
+            zombie:setVariable("FallOnFront", false)
+            zombie:setVariable("BumpFall", false)
+            zombie:setVariable("BumpFallType", "")
+        end
         zombie:setVariable("PNCLive", true)
     end
-    if zombie.setKnockedDown
+    if not preserveGroundedState
+        and zombie.setKnockedDown
         and zombie.isKnockedDown
         and zombie:isKnockedDown()
     then
         zombie:setKnockedDown(false)
     end
-    if zombie.setBumpFall then zombie:setBumpFall(false) end
+    if not preserveGroundedState and zombie.setBumpFall then
+        zombie:setBumpFall(false)
+    end
     if zombie.setSitAgainstWall then zombie:setSitAgainstWall(false) end
-    if zombie.setOnFloor and zombie.isOnFloor and zombie:isOnFloor() then
+    if not preserveGroundedState
+        and zombie.setOnFloor
+        and zombie.isOnFloor
+        and zombie:isOnFloor()
+    then
         zombie:setOnFloor(false)
     end
-    if zombie.setFallOnFront then zombie:setFallOnFront(false) end
+    if not preserveGroundedState and zombie.setFallOnFront then
+        zombie:setFallOnFront(false)
+    end
     if zombie.setCrawler then zombie:setCrawler(false) end
     if zombie.setFakeDead then zombie:setFakeDead(false) end
     if zombie.setCanWalk then zombie:setCanWalk(true) end

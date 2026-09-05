@@ -54,6 +54,77 @@ local function removeLocalBody(body)
     return true
 end
 
+local function bodyConflictsWithSnapshot(body, snapshot, id)
+    local modData
+    local bodyID
+    local expectedLease
+    local bodyLease
+    if not body then
+        return true
+    end
+    modData = body.getModData and body:getModData() or nil
+    bodyID = modData and modData.PNC_UUID or nil
+    if modData and modData.PNC_NPC == true
+        and bodyID ~= nil
+        and tostring(bodyID) ~= tostring(id)
+    then
+        return true
+    end
+    expectedLease = snapshot and snapshot.liveBodyLease or nil
+    bodyLease = modData and modData.PNC_BodyLease or nil
+    return expectedLease ~= nil
+        and bodyLease ~= nil
+        and tostring(expectedLease) ~= tostring(bodyLease)
+end
+
+local function resolveIndexedBody(index, key, snapshot, id)
+    local body
+    if key == nil then
+        return nil
+    end
+    body = index and index[tostring(key)] or nil
+    if body == false or bodyConflictsWithSnapshot(body, snapshot, id) then
+        return nil
+    end
+    return body
+end
+
+local function resolveSnapshotBody(snapshot)
+    local id
+    local body
+    if type(snapshot) ~= "table" or snapshot.id == nil then
+        return nil
+    end
+    id = tostring(snapshot.id)
+    if snapshot.liveBodyLease ~= nil then
+        body = resolveIndexedBody(
+            Sync.BodyByLease,
+            id .. ":" .. tostring(snapshot.liveBodyLease),
+            snapshot,
+            id
+        )
+    end
+    body = body or resolveIndexedBody(
+        Sync.BodyByInstanceID,
+        snapshot.liveBodyInstanceID,
+        snapshot,
+        id
+    )
+    body = body or resolveIndexedBody(
+        Sync.BodyByID,
+        id,
+        snapshot,
+        id
+    )
+    body = body or resolveIndexedBody(
+        Sync.BodyByOnlineID,
+        snapshot.liveBodyOnlineID,
+        snapshot,
+        id
+    )
+    return body
+end
+
 function Sync.RemoveBodyInstance(args)
     local cell
     local zombieList
@@ -88,6 +159,7 @@ function Sync.RemoveBodyInstance(args)
             and tostring(modData.PNC_UUID) ~= wantedID
         if wantedOnline ~= nil then
             identifierMatch = onlineID == wantedOnline
+                and not identityConflict
         elseif wantedInstance then
             identifierMatch = getBodyInstanceID(body) == wantedInstance
                 and not identityConflict
@@ -241,7 +313,14 @@ local function refreshBodyMap(now)
         end
         onlineID = Network and Network.GetZombieOnlineID and Network.GetZombieOnlineID(body) or nil
         if onlineID ~= nil then
-            Sync.BodyByOnlineID[tostring(onlineID)] = body
+            onlineID = tostring(onlineID)
+            if Sync.BodyByOnlineID[onlineID] ~= nil
+                and Sync.BodyByOnlineID[onlineID] ~= body
+            then
+                Sync.BodyByOnlineID[onlineID] = false
+            elseif Sync.BodyByOnlineID[onlineID] == nil then
+                Sync.BodyByOnlineID[onlineID] = body
+            end
         end
         if body and body.getPersistentOutfitID then
             instanceKey = tostring(body:getPersistentOutfitID() or "")
@@ -257,4 +336,5 @@ local function refreshBodyMap(now)
 end
 
 Internal.RefreshBodyMap = refreshBodyMap
+Internal.ResolveSnapshotBody = resolveSnapshotBody
 Internal.PruneSnapshotDuplicates = pruneSnapshotDuplicates

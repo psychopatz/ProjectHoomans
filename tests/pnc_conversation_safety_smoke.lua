@@ -105,6 +105,11 @@ PNC = {
             return "player:Tester:char_tester", "resolved"
         end,
     },
+    Network = {
+        ClientState = {
+            snapshots = {},
+        },
+    },
     Factions = {
         GetFactionID = function()
             return "faction_hostile"
@@ -434,6 +439,56 @@ T.equal(expiredReason, "llm_request_expired",
     "expired LLM request has a diagnostic reason")
 T.equal(record.runtime.llmRequestLease, nil,
     "expired LLM request is cleaned up")
+
+-- In multiplayer the client can retain the NPC's replicated snapshot while
+-- the local live zombie body is absent. The nameplate LLM host is allowed to
+-- perform its client-side distance/liveness gate from that snapshot; the
+-- authoritative server lease still resolves and validates its live body.
+local snapshotOnly = {
+    id = "snapshot-npc",
+    x = 2,
+    y = 0,
+    z = 0,
+    alive = true,
+    presenceState = "live",
+    hostility = { attackPlayers = false },
+}
+PNC.Network.ClientState.snapshots["snapshot-npc"] = snapshotOnly
+isClient = function() return true end
+local snapshotSpec = {
+    npcID = "snapshot-npc",
+    context = {
+        player = player,
+        nameplateConversation = true,
+        entry = { id = "snapshot-npc", snapshot = snapshotOnly },
+    },
+}
+T.equal(Safety.Check(snapshotSpec), nil,
+    "MP nameplate LLM accepts a snapshot-only NPC")
+snapshotSpec.context.entry.snapshot = {
+    id = "snapshot-npc",
+    x = 100,
+    y = 0,
+    z = 0,
+    alive = true,
+    presenceState = "live",
+}
+T.equal(Safety.Check(snapshotSpec), nil,
+    "MP safety prefers the current snapshot over a stale entry")
+local sentClientCommand
+sendClientCommand = function(module, command, args)
+    sentClientCommand = { module = module, command = command, args = args }
+end
+local snapshotState, snapshotReason = lifecycle.begin({}, snapshotSpec)
+T.truthy(type(snapshotState) == "table" and snapshotReason == nil,
+    "MP snapshot-only lifecycle starts locally")
+T.equal(sentClientCommand.command, Scene.CMD_BEGIN,
+    "MP snapshot-only lifecycle sends authoritative begin")
+lifecycle.finish({}, snapshotSpec, snapshotState, "test")
+T.equal(sentClientCommand.command, Scene.CMD_END,
+    "MP snapshot-only lifecycle sends authoritative end")
+sendClientCommand = nil
+isClient = function() return false end
 T.finish("pnc_conversation_safety_smoke")
 
 T.finish("pnc_conversation_safety_smoke")

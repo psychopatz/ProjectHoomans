@@ -310,6 +310,53 @@ T.equal(State.npcPresentations.npc_bootstrap.state, "known",
 T.equal(State.npcPresentations.npc_bootstrap.displayName, "Persisted Name",
     "restart bootstrap restores the learned NPC name")
 
+-- Bootstrap chunks may be delivered out of order. Do not expose the final
+-- state until every validated chunk has arrived.
+State.activeBootstrapRequestID = "bootstrap:out-of-order"
+Client.HandleServerCommand("PlayerBootstrap", {
+    requestID = "bootstrap:out-of-order",
+    scope = "interest",
+    state = "known",
+    context = { characterUUID = "player:restart", bindingRevision = 1 },
+    knowledgeRevision = 4,
+    chunkIndex = 2,
+    chunkCount = 2,
+    snapshots = {
+        { npcID = "npc_bootstrap_two", revision = 1, categories = {} },
+    },
+})
+T.equal(State.bootstrapState, "loading",
+    "final bootstrap chunk alone does not complete the stream")
+T.equal(State.npcKnowledge.npc_bootstrap_two, nil,
+    "bootstrap chunk is staged before commit")
+Client.HandleServerCommand("PlayerBootstrap", {
+    requestID = "bootstrap:out-of-order",
+    scope = "interest",
+    state = "loading",
+    context = { characterUUID = "player:restart", bindingRevision = 1 },
+    knowledgeRevision = 4,
+    chunkIndex = 1,
+    chunkCount = 2,
+    snapshots = {
+        { npcID = "npc_bootstrap_one", revision = 1, categories = {} },
+    },
+})
+T.equal(State.bootstrapState, "known",
+    "out-of-order bootstrap commits after all chunks arrive")
+T.equal(State.npcKnowledge.npc_bootstrap_one.npcID, "npc_bootstrap_one",
+    "first out-of-order bootstrap chunk committed")
+T.equal(State.npcKnowledge.npc_bootstrap_two.npcID, "npc_bootstrap_two",
+    "final out-of-order bootstrap chunk committed")
+
+Client.HandleServerCommand("NPCKnowledge", {
+    snapshot = { npcID = "npc_bootstrap_one", revision = 5, categories = {} },
+})
+Client.HandleServerCommand("NPCKnowledge", {
+    snapshot = { npcID = "npc_bootstrap_one", revision = 4, categories = {} },
+})
+T.equal(State.npcKnowledge.npc_bootstrap_one.revision, 5,
+    "stale direct knowledge snapshot was rejected")
+
 Client.HandleServerCommand("FullSync", {
     snapshots = {
         { id = "npc_full", x = 1 },
@@ -320,12 +367,18 @@ T.equal(State.npcKnowledge.npc_bootstrap.npcID, "npc_bootstrap",
     "legacy full sync cannot erase bootstrapped NPC knowledge")
 
 Client.HandleServerCommand("RosterSyncBegin", {
+    syncID = "roster:happy",
     directoryRevision = 4,
+    total = 1,
     chunkCount = 1,
 })
 T.equal(State.npcKnowledge.npc_bootstrap.npcID, "npc_bootstrap",
     "roster sync begin cannot erase bootstrapped NPC knowledge")
 Client.HandleServerCommand("RosterSyncChunk", {
+    syncID = "roster:happy",
+    directoryRevision = 4,
+    total = 1,
+    chunkCount = 1,
     chunkIndex = 1,
     snapshots = {
         {
@@ -337,7 +390,10 @@ Client.HandleServerCommand("RosterSyncChunk", {
     },
 })
 Client.HandleServerCommand("RosterSyncEnd", {
+    syncID = "roster:happy",
     directoryRevision = 4,
+    total = 1,
+    chunkCount = 1,
 })
 T.equal(State.rosterRevision, 4, "roster revision")
 T.equal(
@@ -361,8 +417,87 @@ T.equal(
     "record delta retained route"
 )
 
+-- Removal commands can arrive with a numeric wire id. Snapshot storage uses
+-- canonical string keys, so the removal must use the same key or stale live
+-- body identity can survive into a later carrier allocation.
+State.snapshots[123] = { id = 123, presenceState = "live" }
+Client.HandleServerCommand("RosterDelta", {
+    directoryRevision = 5,
+    entries = { { id = 123, revision = 5, removed = true } },
+})
+T.equal(State.snapshots["123"], nil,
+    "numeric roster removal clears canonical snapshot key")
+T.equal(State.snapshots[123], nil,
+    "numeric roster removal clears legacy numeric snapshot key")
+
+-- A full sync captured before a newer live update must not replace the newer
+-- per-record snapshot when its chunks finally commit.
+Client.HandleServerCommand("RosterSyncBegin", {
+    syncID = "roster:late",
+    directoryRevision = 4,
+    total = 1,
+    chunkCount = 1,
+})
+Client.HandleServerCommand("SyncRecord", {
+    event = "tick",
+    directoryRevision = 4,
+    snapshot = {
+        id = "npc_roster",
+        replicaSequence = 12,
+        x = 12,
+    },
+})
+Client.HandleServerCommand("RosterSyncChunk", {
+    syncID = "roster:late",
+    directoryRevision = 4,
+    total = 1,
+    chunkCount = 1,
+    chunkIndex = 1,
+    snapshots = {
+        { id = "npc_roster", replicaSequence = 10, x = 10 },
+    },
+})
+Client.HandleServerCommand("RosterSyncEnd", {
+    syncID = "roster:late",
+    directoryRevision = 4,
+    total = 1,
+    chunkCount = 1,
+})
+T.equal(State.snapshots.npc_roster.x, 12,
+    "late full sync did not replace newer live snapshot")
+
+Client.HandleServerCommand("SyncRecord", {
+    event = "tick",
+    snapshot = {
+        id = "npc_roster",
+        replicaSequence = 13,
+        x = 13,
+    },
+})
+Client.HandleServerCommand("SyncRecord", {
+    event = "tick",
+    snapshot = {
+        id = "npc_roster",
+        replicaSequence = 12,
+        x = 4,
+    },
+})
+T.equal(State.snapshots.npc_roster.x, 13,
+    "stale record snapshot was rejected")
+Client.HandleServerCommand("SyncRecord", {
+    event = "tick",
+    snapshot = {
+        id = "npc_roster",
+        replicaSequence = 14,
+        x = 14,
+    },
+})
+T.equal(State.snapshots.npc_roster.x, 14,
+    "newer record snapshot was accepted")
+
 Client.HandleServerCommand("CharacterPayload", {
     npcId = "npc_roster",
+    revision = 5,
     snapshot = { id = "npc_roster", x = 10 },
     inventory = {
         items = {
@@ -394,6 +529,87 @@ T.equal(
     2,
     "inventory revision applied"
 )
+
+Client.HandleServerCommand("InventoryDelta", {
+    npcId = "npc_roster",
+    fromRevision = 2,
+    inventoryRevision = 3,
+    ops = {
+        { op = "add", item = { id = "item_2", stack = 1 } },
+    },
+    summary = { revision = 3 },
+})
+T.truthy(State.characterPayloads.npc_roster.inventory.items.item_2,
+    "inventory add delta applied")
+Client.HandleServerCommand("InventoryDelta", {
+    npcId = "npc_roster",
+    fromRevision = 2,
+    inventoryRevision = 3,
+    ops = {
+        { op = "add", item = { id = "item_2", stack = 99 } },
+    },
+    summary = { revision = 3 },
+})
+T.equal(State.characterPayloads.npc_roster.inventory.items.item_2.stack, 1,
+    "replayed inventory delta did not overwrite current state")
+Client.HandleServerCommand("InventoryDelta", {
+    npcId = "npc_roster",
+    fromRevision = 2,
+    inventoryRevision = 4,
+    ops = {
+        { op = "update", itemID = "item_1", stack = 99 },
+    },
+    summary = { revision = 4 },
+})
+T.equal(State.characterPayloads.npc_roster.inventory.items.item_1.stack, 3,
+    "out-of-order inventory delta did not mutate current state")
+Client.HandleServerCommand("CharacterPayload", {
+    npcId = "npc_roster",
+    revision = 4,
+    snapshot = { id = "npc_roster", replicaSequence = 10, x = 4 },
+    inventory = {
+        revision = 1,
+        items = { item_1 = { id = "item_1", stack = 1 } },
+        containers = {},
+        summary = { revision = 1 },
+    },
+})
+T.equal(State.characterPayloads.npc_roster.inventory.revision, 3,
+    "stale character payload did not regress inventory")
+T.equal(State.snapshots.npc_roster.x, 14,
+    "stale character payload did not regress roster snapshot")
+
+-- Invalid roster streams are rejected instead of being committed as partial
+-- state. The retry starts a new request-scoped stream.
+sentCommand = nil
+PNC.Core.IsClientOnly = function() return true end
+Client.HandleServerCommand("RosterSyncBegin", {
+    syncID = "roster:invalid",
+    directoryRevision = 4,
+    total = 2,
+    chunkCount = 2,
+})
+Client.HandleServerCommand("RosterSyncChunk", {
+    syncID = "roster:invalid",
+    directoryRevision = 4,
+    total = 2,
+    chunkCount = 2,
+    chunkIndex = 1,
+    snapshots = { { id = "npc_invalid_one" } },
+})
+Client.HandleServerCommand("RosterSyncChunk", {
+    syncID = "roster:invalid",
+    directoryRevision = 4,
+    total = 2,
+    chunkCount = 2,
+    chunkIndex = 1,
+    snapshots = { { id = "npc_invalid_one" } },
+})
+T.equal(State.snapshots.npc_invalid_one, nil,
+    "duplicate roster chunk was not committed")
+T.equal(State.pendingRoster, nil,
+    "invalid roster stream was cleared")
+PNC.Core.IsClientOnly = function() return false end
 
 State.snapshots.npc_roster.inventory = { heavyweight = true }
 Client.HandleServerCommand("SyncRecord", {

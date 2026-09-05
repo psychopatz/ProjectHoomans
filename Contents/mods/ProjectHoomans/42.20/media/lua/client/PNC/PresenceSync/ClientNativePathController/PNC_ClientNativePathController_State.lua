@@ -125,6 +125,7 @@ local function clearOwnedPath(body, state)
     state.requestKey = nil
     state.completed = false
     state.failed = false
+    state.nextPassageProbeAt = 0
     state.forcedTraversalUntil = nil
     state.forcedTraversalState = nil
     state.forcedTraversalAction = nil

@@ -10,6 +10,7 @@ T.addPackagePaths()
 local maintained = 0
 local locomotionWrites = 0
 local humanizedWrites = 0
+local femaleWrites = 0
 local modData = {}
 local variables = {}
 local body = {
@@ -19,8 +20,10 @@ local body = {
         variables[name] = value
     end,
     setFemaleEtc = function(_, value)
+        femaleWrites = femaleWrites + 1
         variables.female = value
     end,
+    isFemale = function() return variables.female == true end,
 }
 
 PNC = {
@@ -69,7 +72,20 @@ PNC.ClientPresenceSync.Internal.ApplySnapshotToBody({
     },
 }, body, true)
 
-T.truthy(maintained == 1, "debug player did not retain snapshot ownership")
+PNC.ClientPresenceSync.Internal.ApplySnapshotToBody({
+    id = "debug-npc",
+    presenceState = "live",
+    isFemale = true,
+    visualState = {
+        moving = true,
+        anim = "Run",
+        nativeMoveActive = true,
+    },
+}, body, true)
+
+T.truthy(maintained == 2, "debug player did not retain snapshot ownership")
+T.equal(femaleWrites, 1,
+    "repeated debug snapshots reset the native voice identity")
 T.truthy(humanizedWrites == 0, "normal body maintenance raced debug playback")
 T.truthy(locomotionWrites == 0, "snapshot locomotion overwrote debug playback")
 T.truthy(variables.PNCActor == true, "NPC identity variable was not maintained")

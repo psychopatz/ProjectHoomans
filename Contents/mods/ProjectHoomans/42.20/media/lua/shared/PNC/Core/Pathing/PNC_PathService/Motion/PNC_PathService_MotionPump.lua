@@ -80,16 +80,28 @@ local function ownsScriptedPassage(zombie, lane)
             and (
                 Internal.isDoorCollision
                 and Internal.isDoorCollision(zombie)
-                or Internal.hasClosedPassageToward
-                and lane.goal
-                and Internal.hasClosedPassageToward(
-                    zombie,
-                    lane.goal.x,
-                    lane.goal.y,
-                    lane.goal.z
-                )
             )
         )
+end
+
+local function singlePlayerNativeOwner(zombie, lane, navigation)
+    local liveBodyControl = Internal.LiveBodyControl
+    if not lane
+        or lane.phase ~= "active"
+        or lane.navigationProvider ~= "engine_path"
+        or not navigation
+        or navigation.provider ~= "engine_path"
+        or navigation.nativeActive ~= true
+        or not liveBodyControl
+        or not liveBodyControl.IsMultiplayer
+        or liveBodyControl.IsMultiplayer()
+    then
+        return false
+    end
+    -- A collision/traversal lane is deliberately handed back to PathService.
+    -- The ordinary native lane is the one that must have a single callback
+    -- owner in single-player.
+    return not ownsScriptedPassage(zombie, lane)
 end
 
 local function startRequestedLane(record, zombie, lane)
@@ -157,19 +169,36 @@ function PathService.Pump(record, zombie, caller)
     end
     local lane = Internal.ensureMoveLane(record)
     local now = Internal.Core.Now()
-    prepareLane(record, zombie, lane, now)
-    local handled, state = holdAttackLease(record, zombie, lane, now)
+    local handled
+    local state
+    local navigation = record.runtime and record.runtime.localNavigation or nil
+    local intentState
+    handled, state = holdAttackLease(record, zombie, lane, now)
     if handled then
         return handled, state
     end
-    local intentState = Internal.consumeMoveIntent(record, lane, zombie)
+    -- Intent consumption remains on the scheduler boundary. It is cheap Lua
+    -- state work, and skipping it would make a new follow target or hold
+    -- request wait behind a native route forever.
+    intentState = Internal.consumeMoveIntent(record, lane, zombie)
     if lane.phase == "cancel_pending" then
         Internal.finalizeCancel(zombie, record, lane)
         intentState = Internal.consumeMoveIntent(record, lane, zombie)
     end
     if lane.phase == "requested" then
+        prepareLane(record, zombie, lane, now)
         return startRequestedLane(record, zombie, lane)
     end
+    -- In single-player, OnZombieUpdate owns the live Behavior2 route. Do not
+    -- run the scheduler's repair, animation, or native-pump work for the same
+    -- lane. Scripted passages still pass through below when the body is
+    -- actually colliding or a traversal has already been staged.
+    if lane.phase == "active"
+        and singlePlayerNativeOwner(zombie, lane, navigation)
+    then
+        return true, "native_waiting_for_zombie_update"
+    end
+    prepareLane(record, zombie, lane, now)
     if lane.phase == "active" then
         return updateActiveLane(record, zombie, lane, now, caller)
     end

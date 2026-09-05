@@ -9,6 +9,66 @@ local Visuals = PNC.Visuals
 local Equipment = PNC.Equipment
 local LiveBodyControl = PNC.LiveBodyControl
 local MaterializationSafety = PNC.MaterializationSafety
+local Diagnostics = PNC.PerformanceScalingDiagnostics
+
+local function isFollower(record)
+    return record
+        and record.orderSpec
+        and tostring(record.orderSpec.kind or "") == tostring(
+            Const.ORDER_FOLLOW or "follow"
+        )
+end
+
+local function prepareMaterializedFollower(record)
+    local companion = PNC.BehaviorCompanion
+    local internal = companion and companion.Internal or nil
+    record.runtime = record.runtime or {}
+    record.runtime.followReconcilePending = true
+    -- A bodyless follower cannot complete a native attack action. Drop any
+    -- stale action lease before the recreated body reaches live behavior.
+    record.runtime.attackAction = nil
+    record.runtime.inCombatUntil = 0
+    if internal and internal.ResetFollowMoveIssue then
+        -- Abstraction clears the native path state, while the follow issue
+        -- cache survives. Reset it so the first live tick always republishes
+        -- a movement target after the body is recreated.
+        internal.ResetFollowMoveIssue(record)
+    end
+end
+
+local function logFollowerTransition(record, fromState, toState, reason, zombie)
+    local orderKind
+    if not Diagnostics
+        or not Diagnostics.IsFollowerPresenceAuditEnabled
+        or Diagnostics.IsFollowerPresenceAuditEnabled() ~= true
+        or not Diagnostics.LogFollowerPresence
+    then
+        return
+    end
+    orderKind = record.orderSpec and record.orderSpec.kind or nil
+    if tostring(orderKind or "") ~= tostring(Const.ORDER_FOLLOW or "follow") then
+        return
+    end
+    Diagnostics.LogFollowerPresence("presence_transition", {
+        "npc=" .. tostring(record.id),
+        "name=" .. tostring(record.name or "nil"),
+        "authority=server",
+        "from=" .. tostring(fromState),
+        "to=" .. tostring(toState),
+        "reason=" .. tostring(reason or "unknown"),
+        "order=" .. tostring(orderKind),
+        "owner=" .. tostring(record.ownerUsername or "nil"),
+        "ownerOnlineID=" .. tostring(record.ownerOnlineID or "nil"),
+        "position=" .. tostring(record.x) .. "," .. tostring(record.y)
+            .. "," .. tostring(record.z),
+        "nearestDistSq=" .. tostring(record.runtime
+            and record.runtime.nearestPlayerDistSq or "nil"),
+        "bodyPresent=" .. tostring(zombie ~= nil),
+        "bodyLease=" .. tostring(record.runtime
+            and record.runtime.bodyLease or "nil"),
+        "presenceRevision=" .. tostring(record.presenceRevision or "nil"),
+    })
+end
 
 local function startupReady()
     return not PNC.BodyLifecycle
@@ -147,8 +207,9 @@ local function configureBody(record, zombie)
 end
 
 local function finishMaterialization(
-    record, zombie, position, original, net
+    record, zombie, position, original, net, reason
 )
+    local fromState = record.presenceState
     record.x = position.x
     record.y = position.y
     record.z = position.z
@@ -191,6 +252,16 @@ local function finishMaterialization(
     end
     Health.Update(record, zombie, Core.Now())
     if record.alive == false then return nil end
+    if isFollower(record) then
+        prepareMaterializedFollower(record)
+        logFollowerTransition(
+            record,
+            fromState or Const.PRESENCE_ABSTRACT,
+            Const.PRESENCE_LIVE,
+            reason or "materialize",
+            zombie
+        )
+    end
     Animation.Apply(zombie, record, "Idle")
     if net and net.BroadcastRecord then
         net.BroadcastRecord(record, "materialize")
@@ -227,5 +298,12 @@ function Presence.Materialize(record, reason, nearest)
     zombie = spawnBody(record, position, reason)
     if not zombie then return nil end
     configureBody(record, zombie)
-    return finishMaterialization(record, zombie, position, original, net)
+    return finishMaterialization(
+        record,
+        zombie,
+        position,
+        original,
+        net,
+        reason
+    )
 end

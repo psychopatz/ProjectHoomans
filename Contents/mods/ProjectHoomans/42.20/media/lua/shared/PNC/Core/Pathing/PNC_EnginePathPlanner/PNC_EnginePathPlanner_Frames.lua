@@ -4,6 +4,48 @@ local Planner = PNC.EnginePathPlanner
 local Internal = Planner.Internal
 local Core = PNC.Core
 
+local function recordSinglePlayerNativeFrame(
+    record,
+    body,
+    lane,
+    navigation,
+    now,
+    state,
+    fromX,
+    fromY,
+    fromZ
+)
+    local pathService = PNC.PathService
+    local pathInternal = pathService and pathService.Internal or nil
+    local terminalResult = state == "engine_path_succeeded"
+        or state == "engine_path_failed"
+        or state == "engine_path_timeout"
+    if not navigation
+        or (navigation.nativeActive ~= true and not terminalResult)
+        or lane.traversalAction
+        or lane.blockedStepToX ~= nil
+        or not pathInternal
+        or not pathInternal.recordNativeMove
+    then
+        return nil
+    end
+    -- PathService.Pump is intentionally bypassed for an active single-player
+    -- native lane. Reuse its progress/timeout/passage accounting after the
+    -- one authoritative Behavior2 update, without pumping Behavior2 again.
+    return pathInternal.recordNativeMove(
+        record,
+        body,
+        lane,
+        navigation,
+        Planner,
+        now,
+        state,
+        fromX,
+        fromY,
+        fromZ
+    )
+end
+
 function Planner.PumpFrame(record, body)
     if Core and Core.IsAuthority and not Core.IsAuthority() then
         return false, "client_replica"
@@ -14,6 +56,11 @@ function Planner.PumpFrame(record, body)
     end
     local navigation = record and record.runtime
         and record.runtime.localNavigation or nil
+    local fromX
+    local fromY
+    local fromZ
+    local handled
+    local state
     local recovered
     local recoveryState
     recovered, recoveryState = Internal.RecoverStaleNativeBump(
@@ -67,7 +114,28 @@ function Planner.PumpFrame(record, body)
         end
         return true, "native_collision_waiting"
     end
-    return Planner.Pump(record, body, "zombie_update")
+    fromX = body:getX()
+    fromY = body:getY()
+    fromZ = body:getZ()
+    handled, state = Planner.Pump(record, body, "zombie_update")
+    if handled then
+        local progressedHandled, progressedState =
+            recordSinglePlayerNativeFrame(
+                record,
+                body,
+                lane,
+                navigation,
+                Core and Core.Now and Core.Now() or 0,
+                state,
+                fromX,
+                fromY,
+                fromZ
+            )
+        if progressedHandled ~= nil then
+            return progressedHandled, progressedState
+        end
+    end
+    return handled, state
 end
 
 function Planner.PumpServerFrame()

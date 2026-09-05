@@ -10,6 +10,8 @@ PNC = PNC or {}
 PNC.Network = PNC.Network or {}
 PNC.Network.ClientState = PNC.Network.ClientState or {
     snapshots = {},
+    managedBodyOnlineIDs = {},
+    managedBodyOnlineIDsReady = false,
     characterPayloads = {},
     debugRoster = {},
     debugAuthorized = false,
@@ -27,6 +29,8 @@ PNC.Network.ClientState = PNC.Network.ClientState or {
     playerEmoteInteractionResults = {},
     playerEmoteInteractionResultOrder = {},
     playerContext = nil,
+    rosterRevision = 0,
+    rosterEntryRevisions = {},
     bootstrapState = "idle",
     knowledgeDebug = nil,
     knowledgeDebugAuthorized = false,
@@ -42,14 +46,23 @@ PNC.Network.ClientState = PNC.Network.ClientState or {
     directorDebugAuthorized = false,
     colonyManagement = nil,
     colonyManagementRevision = 0,
-    colonyJournal = { rows = {}, cursor = 0, latestSequence = 0 },
+    colonyJournal = {
+        rows = {}, cursor = 0, latestSequence = 0, rowSequences = {},
+    },
     colonyJournalRevision = 0,
     worldDiscovery = nil,
 }
+if PNC.Network.ClientState.managedBodyOnlineIDs == nil then
+    PNC.Network.ClientState.managedBodyOnlineIDs = {}
+end
+if PNC.Network.ClientState.managedBodyOnlineIDsReady == nil then
+    PNC.Network.ClientState.managedBodyOnlineIDsReady = false
+end
 PNC.Network.ServerState = PNC.Network.ServerState or {
     interests = {},
     rosterDeltas = {},
     rosterRevision = 0,
+    fullSyncSerial = 0,
     lastInterestRefreshAt = 0,
     lastRosterFlushAt = 0,
 }
@@ -66,6 +79,32 @@ PNC.Network.Internal = PNC.Network.Internal or {}
 
 local Network = PNC.Network
 local ServerState = Network.ServerState
+
+-- Native IsoZombie updates run before the client presence tick. Keep a small
+-- identity index beside the roster so the early OnZombieUpdate safety hook
+-- can recognize a carrier before presentation has written PNC modData.
+-- Rebuilding is explicit and only happens when roster state changes; it is
+-- never a per-zombie or per-frame scan.
+function Network.RefreshClientBodyIdentityIndex()
+    local index = {}
+    local snapshot
+    local onlineID
+    for _, candidate in pairs(Network.ClientState.snapshots or {}) do
+        snapshot = candidate
+        if type(snapshot) == "table"
+            and snapshot.presenceState == "live"
+            and snapshot.alive ~= false
+        then
+            onlineID = tonumber(snapshot.liveBodyOnlineID)
+            if onlineID ~= nil and onlineID >= 0 then
+                index[tostring(onlineID)] = true
+            end
+        end
+    end
+    Network.ClientState.managedBodyOnlineIDs = index
+    Network.ClientState.managedBodyOnlineIDsReady = true
+    return index
+end
 
 function Network.ResetServerState()
     ServerState.interests = {}

@@ -10,7 +10,17 @@ PNC = {
         } end,
         Get = function() return { id = "npc-one" } end,
     },
-    Network = { ClientState = { snapshots = {} } },
+    Network = {
+        ClientState = {
+            snapshots = {
+                ["snapshot-only"] = {
+                    id = "snapshot-only",
+                    identitySeed = 17,
+                    isFemale = true,
+                },
+            },
+        },
+    },
 }
 local packets = {}
 PsychopatzCore.Bridge = {
@@ -103,5 +113,21 @@ T.equal(packets[2].packet.voice_binding.speaker_kind, "player", "player binding 
 T.equal(packets[2].packet.voice_binding.player_uuid, "player-one", "player binding identity is preserved")
 T.equal(packets[2].packet.voice_binding.slot, "VoiceFemale:2", "player descriptor selects voice slot")
 T.equal(packets[2].packet.voice_binding.pitch, 7, "player descriptor pitch is rounded safely")
+
+Message.Publish(Message.New({
+    saveUUID = "voice-save",
+    conversationID = "voice-conversation-snapshot",
+    sequence = 1,
+    speaker = "npc",
+    speakerID = "snapshot-only",
+    speakerName = "Snapshot Only",
+    speakerKind = "npc",
+    npcUUID = "snapshot-only",
+    text = "I am still loading.",
+    worldAgeHours = 72,
+}))
+T.equal(#packets, 3, "snapshot-only MP NPC publishes a voice packet")
+T.equal(packets[3].packet.voice_binding.npc_uuid, "snapshot-only",
+    "snapshot-only NPC binding preserves identity")
 
 T.finish("pnc_voice_gateway_smoke")

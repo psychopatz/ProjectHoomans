@@ -5,6 +5,17 @@ local Const = PNC.Const
 local MotionHints = PNC.MotionHints
 local ServerState = Network.ServerState
 
+local function nextReplicaSequence(record)
+    local runtime
+    if not record then
+        return 0
+    end
+    runtime = record.runtime or {}
+    record.runtime = runtime
+    runtime.replicaSequence = (tonumber(runtime.replicaSequence) or 0) + 1
+    return runtime.replicaSequence
+end
+
 function Network.BroadcastRecord(record, eventName)
     local payload
     local path
@@ -22,6 +33,7 @@ function Network.BroadcastRecord(record, eventName)
     then
         return
     end
+    nextReplicaSequence(record)
     Internal.QueueBroadcastRoster(record, eventName)
     recipients = Internal.CollectRecordRecipients(record)
     if isServer and isServer() and #recipients <= 0 then return end
@@ -77,6 +89,7 @@ end
 
 function Network.BroadcastRemoval(id, reason)
     local payload = { id = id, reason = reason }
+    local entry
     local removalReason = tostring(reason or "")
     if not Core.IsAuthority() then
         return
@@ -87,11 +100,16 @@ function Network.BroadcastRemoval(id, reason)
         return
     end
     Network.QueueRosterDelta(id, true, reason)
+    entry = ServerState.rosterDeltas[tostring(id)]
+    if entry then
+        payload.revision = entry.revision
+    end
     sendInterestRemoval(id, Const.CMD_REMOVE_RECORD, payload)
 end
 
 function Network.BroadcastDeathMarkerRemoval(id, reason)
     local payload
+    local entry
     if not Core.IsAuthority() or id == nil then
         return false
     end
@@ -101,6 +119,10 @@ function Network.BroadcastDeathMarkerRemoval(id, reason)
         reason = tostring(reason or "corpse_removed"),
     }
     Network.QueueRosterDelta(id, true, payload.reason)
+    entry = ServerState.rosterDeltas[id]
+    if entry then
+        payload.revision = entry.revision
+    end
     if isServer and isServer() then
         Core.ForEachPlayer(function(player)
             Internal.SendToPlayer(player, Const.CMD_REMOVE_RECORD, payload)
@@ -145,17 +167,24 @@ function Network.BroadcastBodyRemoval(id, bodyInstanceID, bodyOnlineID, reason)
     return true
 end
 
-function Network.BroadcastFullSync(targetPlayer, records)
+function Network.BroadcastFullSync(targetPlayer, records, requestID)
     local chunkSize = math.max(1, tonumber(Const.ROSTER_CHUNK_SIZE) or 50)
     local total = #(records or {})
     local chunkCount = math.ceil(total / chunkSize)
+    local syncID
+    local directoryRevision = tonumber(ServerState.rosterRevision) or 0
     local chunkIndex
     local startIndex
     local finishIndex
     local chunk
     local i
+    ServerState.fullSyncSerial = (tonumber(ServerState.fullSyncSerial) or 0) + 1
+    syncID = requestID and tostring(requestID)
+        or "server:roster:" .. tostring(Core.Now()) .. ":"
+            .. tostring(ServerState.fullSyncSerial)
     Internal.SendToPlayer(targetPlayer, Const.CMD_ROSTER_SYNC_BEGIN, {
-        directoryRevision = ServerState.rosterRevision,
+        syncID = syncID,
+        directoryRevision = directoryRevision,
         total = total,
         chunkCount = chunkCount,
     })
@@ -167,14 +196,19 @@ function Network.BroadcastFullSync(targetPlayer, records)
             chunk[#chunk + 1] = records[i]
         end
         Internal.SendToPlayer(targetPlayer, Const.CMD_ROSTER_SYNC_CHUNK, {
-            directoryRevision = ServerState.rosterRevision,
+            syncID = syncID,
+            directoryRevision = directoryRevision,
+            total = total,
+            chunkCount = chunkCount,
             chunkIndex = chunkIndex,
             snapshots = chunk,
         })
     end
     Internal.SendToPlayer(targetPlayer, Const.CMD_ROSTER_SYNC_END, {
-        directoryRevision = ServerState.rosterRevision,
+        syncID = syncID,
+        directoryRevision = directoryRevision,
         total = total,
+        chunkCount = chunkCount,
     })
     if isServer and isServer() and targetPlayer then
         local state = ServerState.interests[Internal.PlayerKey(targetPlayer)]

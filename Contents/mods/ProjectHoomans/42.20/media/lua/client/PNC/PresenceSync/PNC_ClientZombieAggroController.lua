@@ -50,11 +50,14 @@ local NPC_BODY_INDEX = {
     builtAt = 0,
     buckets = {},
 }
+local NATIVE_ATTACK_ESCAPE_LOGGED = setmetatable({}, { __mode = "k" })
 
 -- TurnAlerted is still a vanilla engine transition. PNC no longer produces,
 -- suppresses, or resets it, but the client aggro lane must not claim a zombie
 -- while that engine-owned transition is active.
 local ACTION_OWNED_ELSEWHERE = {
+    ["attack"] = true,
+    ["attack-network"] = true,
     bumped = true,
     climbfence = true,
     climbwindow = true,
@@ -63,6 +66,25 @@ local ACTION_OWNED_ELSEWHERE = {
     staggerback = true,
     turnalerted = true,
 }
+
+local function hasActiveBiteReplica(zombie, now)
+    local onlineID
+    local replica
+    if not zombie or not zombie.getOnlineID
+        or not PNC.Client or type(PNC.Client.BiteReplicas) ~= "table"
+    then
+        return false
+    end
+    onlineID = tonumber(zombie:getOnlineID())
+    if onlineID == nil or onlineID < 0 then
+        return false
+    end
+    replica = PNC.Client.BiteReplicas[tostring(onlineID)]
+    if not replica or replica.phase == "release" then
+        return false
+    end
+    return now < (tonumber(replica.localReleaseAt) or math.huge)
+end
 
 local function isManagedBody(body)
     return Core
@@ -330,6 +352,12 @@ local function releaseManagedTarget(zombie)
     if isManagedBody(attackedBy) and zombie.setAttackedBy then
         zombie:setAttackedBy(nil)
     end
+    if zombie.setTargetSeenTime then
+        zombie:setTargetSeenTime(0)
+    end
+    if zombie.clearAggroList then
+        zombie:clearAggroList()
+    end
     if zombie.setVariable then
         zombie:setVariable("NoLungeAttack", false)
         zombie:setVariable("ZombieBiteDone", false)
@@ -341,6 +369,7 @@ end
 
 function Internal.UpdateClientZombieAggro(zombie, now)
     local actionState
+    local currentTarget
     local body
     local distanceSq
     now = tonumber(now) or (Core and Core.Now and Core.Now() or 0)
@@ -356,6 +385,28 @@ function Internal.UpdateClientZombieAggro(zombie, now)
             zombie:getActionStateName() or ""
         ))
         or ""
+    currentTarget = zombie.getTarget and zombie:getTarget() or nil
+    if (actionState == "attack" or actionState == "attack-network")
+        and isManagedBody(currentTarget)
+    then
+        if hasActiveBiteReplica(zombie, now) then
+            return false
+        end
+        releaseManagedTarget(zombie)
+        if zombie.changeState
+            and ZombieIdleState
+            and ZombieIdleState.instance
+        then
+            zombie:changeState(ZombieIdleState.instance())
+        end
+        if not NATIVE_ATTACK_ESCAPE_LOGGED[zombie] and Core and Core.LogWarn then
+            NATIVE_ATTACK_ESCAPE_LOGGED[zombie] = true
+            Core.LogWarn(
+                "native_attack_escape target=managed_npc reason=no_bite_replica"
+            )
+        end
+        return true
+    end
     if ACTION_OWNED_ELSEWHERE[actionState]
         or (zombie.isProne and zombie:isProne())
     then

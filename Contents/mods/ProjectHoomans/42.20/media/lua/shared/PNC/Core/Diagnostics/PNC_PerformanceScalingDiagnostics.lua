@@ -19,6 +19,10 @@ Diagnostics.BreakdownSizes = Diagnostics.BreakdownSizes or {}
 Diagnostics.LastExported = Diagnostics.LastExported or {}
 Diagnostics.Frame = tonumber(Diagnostics.Frame) or 0
 Diagnostics.MAX_BREAKDOWN_KEYS = 64
+-- Preserve the legacy default when the core registry is unavailable (for
+-- example, in an isolated smoke test). A real game session resolves this
+-- through PsychopatzCore.DebugSettings during startup.
+Diagnostics.Enabled = Diagnostics.Enabled ~= false
 -- Runtime timing is sampled, rather than collected on every hot-path call.
 -- Keep this enabled while diagnosing the current server stall; the sampler
 -- only takes one sample per phase per second and summaries are rate-limited.
@@ -31,6 +35,96 @@ Diagnostics.RuntimeLogIntervalMs =
 Diagnostics.NextRuntimeLogAt = tonumber(Diagnostics.NextRuntimeLogAt) or 0
 Diagnostics.Timings = Diagnostics.Timings or {}
 Diagnostics.TimingLastSampleAt = Diagnostics.TimingLastSampleAt or {}
+-- Seating auditing is intentionally independent from the normal runtime
+-- summaries. It is off by default and only runs when its startup setting is
+-- active, or when an explicit emergency runtime override is used.
+Diagnostics.SeatingAuditEnabled = false
+Diagnostics.FollowerPresenceAuditEnabled = false
+Diagnostics.FollowerAbandonmentAuditEnabled = false
+
+local PERFORMANCE_SETTING_ID = "ProjectHoomans.PerformanceDiagnostics"
+local SEATING_AUDIT_SETTING_ID = "ProjectHoomans.SeatingAudit"
+local FOLLOWER_PRESENCE_AUDIT_SETTING_ID =
+    "ProjectHoomans.FollowerPresenceAudit"
+local FOLLOWER_ABANDONMENT_AUDIT_SETTING_ID =
+    "ProjectHoomans.FollowerAbandonmentAudit"
+local function initializeCentralDebugSettings()
+    local settings = PsychopatzCore and PsychopatzCore.DebugSettings
+    if not settings or type(settings.Register) ~= "function" then
+        pcall(require, "PsychopatzCore/Debug/PsychopatzDebugSettings")
+        settings = PsychopatzCore and PsychopatzCore.DebugSettings
+    end
+    if not settings or type(settings.Register) ~= "function" then return end
+    settings.Register({
+        id = PERFORMANCE_SETTING_ID,
+        source = "Project Hoomans",
+        order = 50,
+        title = "Performance scaling diagnostics",
+        description = "Enables counters, gauges, sampled timings, and summaries.",
+        -- This is an existing diagnostic surface. Preserve its current
+        -- behavior for existing installs; new diagnostic registrations should
+        -- normally use defaultEnabled = false.
+        defaultEnabled = true,
+        runtimeMutable = true,
+        apply = function(enabled)
+            Diagnostics.Enabled = enabled == true
+            Diagnostics.TimingEnabled = Diagnostics.Enabled
+            Diagnostics.RuntimeLogEnabled = Diagnostics.Enabled
+        end,
+    })
+    settings.Register({
+        id = SEATING_AUDIT_SETTING_ID,
+        source = "Project Hoomans",
+        order = 100,
+        title = "Seating threat audit",
+        description = "Captures seated threat, scene, path, and bump handoffs.",
+        defaultEnabled = false,
+        runtimeMutable = true,
+        apply = function(enabled)
+            Diagnostics.SeatingAuditEnabled = enabled == true
+        end,
+    })
+    settings.Register({
+        id = FOLLOWER_PRESENCE_AUDIT_SETTING_ID,
+        source = "Project Hoomans",
+        order = 110,
+        title = "Follower presence audit",
+        description = "Logs abstract/live follower transitions and movement.",
+        defaultEnabled = false,
+        runtimeMutable = true,
+        apply = function(enabled)
+            Diagnostics.FollowerPresenceAuditEnabled = enabled == true
+        end,
+    })
+    settings.Register({
+        id = FOLLOWER_ABANDONMENT_AUDIT_SETTING_ID,
+        source = "Project Hoomans",
+        order = 120,
+        title = "Follower abandonment audit",
+        description = "Logs follow combat departure and return commentary.",
+        defaultEnabled = false,
+        runtimeMutable = true,
+        apply = function(enabled)
+            Diagnostics.FollowerAbandonmentAuditEnabled = enabled == true
+        end,
+    })
+    Diagnostics.Enabled = settings.IsEnabled(PERFORMANCE_SETTING_ID) == true
+    Diagnostics.TimingEnabled = Diagnostics.Enabled
+        and Diagnostics.TimingEnabled ~= false
+    Diagnostics.RuntimeLogEnabled = Diagnostics.Enabled
+        and Diagnostics.RuntimeLogEnabled ~= false
+    -- The registry applies these two cheap diagnostic gates at startup or
+    -- after an explicit Debug Settings Apply action. Direct callers can still
+    -- use SetSeatingAuditEnabled as a temporary emergency runtime override.
+    Diagnostics.SeatingAuditEnabled = settings.IsEnabled(
+        SEATING_AUDIT_SETTING_ID) == true
+    Diagnostics.FollowerPresenceAuditEnabled = settings.IsEnabled(
+        FOLLOWER_PRESENCE_AUDIT_SETTING_ID) == true
+    Diagnostics.FollowerAbandonmentAuditEnabled = settings.IsEnabled(
+        FOLLOWER_ABANDONMENT_AUDIT_SETTING_ID) == true
+end
+
+initializeCentralDebugSettings()
 
 local COUNTER_NAMES = {
     "Pathing.PathRequests",
@@ -116,6 +210,7 @@ local function incrementMap(values, key, amount, sizeKey)
 end
 
 function Diagnostics.Increment(name, amount)
+    if Diagnostics.Enabled ~= true then return 0 end
     name = tostring(name or "")
     if name == "" then return 0 end
     Diagnostics.Counters[name] =
@@ -125,6 +220,7 @@ function Diagnostics.Increment(name, amount)
 end
 
 function Diagnostics.SetGauge(name, value)
+    if Diagnostics.Enabled ~= true then return 0 end
     name = tostring(name or "")
     if name == "" then return 0 end
     Diagnostics.Gauges[name] = tonumber(value) or 0
@@ -143,7 +239,9 @@ end
 -- Returns a timer token only when this phase is due for a sample. Callers can
 -- use the nil fast path to avoid allocations and a second clock read.
 function Diagnostics.BeginTiming(name, at)
-    if Diagnostics.TimingEnabled ~= true then return nil, nil end
+    if Diagnostics.Enabled ~= true or Diagnostics.TimingEnabled ~= true then
+        return nil, nil
+    end
     name = tostring(name or "")
     if name == "" then return nil, nil end
     local current = timingNow(at)
@@ -169,7 +267,7 @@ local function timingState(name)
 end
 
 function Diagnostics.EndTiming(name, startedAt, context)
-    if not name or startedAt == nil then return 0 end
+    if Diagnostics.Enabled ~= true or not name or startedAt == nil then return 0 end
     local elapsed = math.max(0, timingNow() - (tonumber(startedAt) or 0))
     local state = timingState(name)
     state.calls = state.calls + 1
@@ -182,7 +280,94 @@ function Diagnostics.EndTiming(name, startedAt, context)
 end
 
 function Diagnostics.SetRuntimeLoggingEnabled(enabled)
-    Diagnostics.RuntimeLogEnabled = enabled == true
+    Diagnostics.RuntimeLogEnabled = Diagnostics.Enabled == true
+        and enabled == true
+end
+
+function Diagnostics.IsEnabled()
+    return Diagnostics.Enabled == true
+end
+
+function Diagnostics.SetSeatingAuditEnabled(enabled)
+    Diagnostics.SeatingAuditEnabled = enabled == true
+    if Diagnostics.SeatingAuditEnabled == true then
+        if PNC.Core and PNC.Core.LogInfo then
+            PNC.Core.LogInfo("seating_audit event=enabled")
+        else
+            print("[PNC][INFO] seating_audit event=enabled")
+        end
+    end
+    return Diagnostics.SeatingAuditEnabled
+end
+
+function Diagnostics.IsSeatingAuditEnabled()
+    return Diagnostics.SeatingAuditEnabled == true
+end
+
+function Diagnostics.IsFollowerPresenceAuditEnabled()
+    return Diagnostics.FollowerPresenceAuditEnabled == true
+end
+
+function Diagnostics.IsFollowerAbandonmentAuditEnabled()
+    return Diagnostics.FollowerAbandonmentAuditEnabled == true
+end
+
+-- Callers guard this function before assembling fields. That keeps the
+-- disabled path free of snapshots, clocks, tables, and string concatenation.
+function Diagnostics.LogSeatingAudit(eventName, fields)
+    local output
+    if Diagnostics.SeatingAuditEnabled ~= true then return false end
+    output = { "seating_audit", "event=" .. tostring(eventName or "unknown") }
+    for _, field in ipairs(fields or {}) do
+        output[#output + 1] = tostring(field)
+    end
+    local message = table.concat(output, " ")
+    if PNC.Core and PNC.Core.LogInfo then
+        PNC.Core.LogInfo(message)
+    else
+        print("[PNC][INFO] " .. message)
+    end
+    return true
+end
+
+-- Follower presence auditing is intentionally separate from the general
+-- performance and seating streams. Callers must check the gate before
+-- assembling fields so disabled gameplay pays only a boolean check.
+function Diagnostics.LogFollowerPresence(eventName, fields)
+    local output
+    if Diagnostics.FollowerPresenceAuditEnabled ~= true then return false end
+    output = { "follower_presence", "event=" .. tostring(eventName or "unknown") }
+    for _, field in ipairs(fields or {}) do
+        output[#output + 1] = tostring(field)
+    end
+    local message = table.concat(output, " ")
+    if PNC.Core and PNC.Core.LogInfo then
+        PNC.Core.LogInfo(message)
+    else
+        print("[PNC][INFO] " .. message)
+    end
+    return true
+end
+
+-- Callers guard this function before assembling fields so disabled gameplay
+-- pays only a boolean check.
+function Diagnostics.LogFollowerAbandonment(eventName, fields)
+    local output
+    if Diagnostics.FollowerAbandonmentAuditEnabled ~= true then return false end
+    output = {
+        "follower_abandonment",
+        "event=" .. tostring(eventName or "unknown"),
+    }
+    for _, field in ipairs(fields or {}) do
+        output[#output + 1] = tostring(field)
+    end
+    local message = table.concat(output, " ")
+    if PNC.Core and PNC.Core.LogInfo then
+        PNC.Core.LogInfo(message)
+    else
+        print("[PNC][INFO] " .. message)
+    end
+    return true
 end
 
 local function timingText(name)
@@ -213,7 +398,9 @@ local function boundedIDs(values, limit)
 end
 
 function Diagnostics.LogRuntimeSummary(now)
-    if Diagnostics.RuntimeLogEnabled ~= true then return false end
+    if Diagnostics.Enabled ~= true or Diagnostics.RuntimeLogEnabled ~= true then
+        return false
+    end
     now = timingNow(now)
     if now < Diagnostics.NextRuntimeLogAt then return false end
     Diagnostics.NextRuntimeLogAt = now + Diagnostics.RuntimeLogIntervalMs
@@ -281,6 +468,7 @@ function Diagnostics.LogRuntimeSummary(now)
 end
 
 function Diagnostics.BeginFrame()
+    if Diagnostics.Enabled ~= true then return Diagnostics.Frame end
     Diagnostics.Frame = Diagnostics.Frame + 1
     return Diagnostics.Frame
 end
@@ -292,6 +480,7 @@ local function routeDiagnostics(record)
 end
 
 function Diagnostics.RecordPathPump(record, caller)
+    if Diagnostics.Enabled ~= true then return end
     Diagnostics.Increment("Pathing.PathPumps")
     incrementMap(
         Diagnostics.Breakdowns.pathPumpsByCaller,
@@ -309,6 +498,7 @@ function Diagnostics.RecordPathPump(record, caller)
 end
 
 function Diagnostics.RecordLogicalAdvance(record, caller)
+    if Diagnostics.Enabled ~= true then return end
     Diagnostics.Increment("Pathing.LogicalAdvances")
     incrementMap(
         Diagnostics.Breakdowns.logicalAdvancesByCaller,
@@ -328,6 +518,7 @@ function Diagnostics.RecordLogicalAdvance(record, caller)
 end
 
 function Diagnostics.RecordDirtyMark(reason)
+    if Diagnostics.Enabled ~= true then return end
     Diagnostics.Increment("NPCDecisions.DirtyMarks")
     incrementMap(
         Diagnostics.Breakdowns.dirtyMarksByReason,
@@ -338,6 +529,7 @@ function Diagnostics.RecordDirtyMark(reason)
 end
 
 function Diagnostics.RefreshGauges()
+    if Diagnostics.Enabled ~= true then return false end
     local registry = PNC.Registry
     local scheduler = PNC.Scheduler
     local aggro = PNC.ZombieAggro and PNC.ZombieAggro.ActiveSet or nil
@@ -466,7 +658,11 @@ local function exportCounter(api, name, value)
 end
 
 function Diagnostics.Export(api)
-    if not api or not api.SetGauge or not api.RecordRate then return false end
+    if Diagnostics.Enabled ~= true
+        or not api or not api.SetGauge or not api.RecordRate
+    then
+        return false
+    end
     Diagnostics.RefreshGauges()
     for name, value in pairs(Diagnostics.Counters) do
         exportCounter(api, name, tonumber(value) or 0)
@@ -504,6 +700,13 @@ local function copyMap(values)
 end
 
 function Diagnostics.Snapshot()
+    if Diagnostics.Enabled ~= true then
+        return {
+            disabled = true,
+            frame = Diagnostics.Frame,
+            counters = {}, gauges = {}, breakdowns = {}, timings = {},
+        }
+    end
     Diagnostics.RefreshGauges()
     local breakdowns = {}
     local timings = {}

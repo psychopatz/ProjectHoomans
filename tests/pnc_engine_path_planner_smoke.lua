@@ -94,6 +94,8 @@ local updateCount = 0
 local nextResult = BehaviorResult.Working
 local nextActionState = nil
 local body
+local selectedPath = {}
+local publishPath = false
 local serverMode = false
 isServer = function() return serverMode end
 ZombieIdleState = {
@@ -106,7 +108,8 @@ local behavior = {
         self.target = { x = x, y = y, z = z }
         -- The real Behavior2 request can leave the legacy WalkTowardState
         -- active while it publishes path2. The planner must reclaim it in
-        -- the same request frame.
+        -- the same request frame, but not before path2 exists.
+        if publishPath then body.path2 = selectedPath end
         body.actionState = "walktoward"
         requestCount = requestCount + 1
     end,
@@ -187,7 +190,6 @@ squares["0:10"] = pathSquare0
 squares["1:10"] = pathSquare1
 squares["2:10"] = pathSquare2
 local pathFence = {}
-local selectedPath = {}
 local pathBody = {
     getX = function() return 0.5 end,
     getY = function() return 10.5 end,
@@ -305,8 +307,8 @@ record.runtime.pathing.phase = "active"
 steering = PNC.EnginePathPlanner.GetSteeringTarget(record, body, target)
 T.truthy(steering == target, "pending native request changed the target")
 T.truthy(requestCount == 1, "building transition did not request native path")
-T.equal(body.actionState, "idle",
-    "native request left the vanilla WalkTowardState active")
+T.equal(body.actionState, "walktoward",
+    "native request changed follow before a native route was published")
 T.truthy(updateCount == 0,
     "Bandits-style request advanced PathFindBehavior2 during startup")
 T.truthy(wrapperRequestCount == 0,
@@ -342,6 +344,24 @@ T.equal(body.actionState, "turnalerted",
     "native owner changed the vanilla turn-alerted state")
 body.actionState = "idle"
 
+body.actionState = "walktoward"
+body.path2 = nil
+T.equal(
+    PNC.EnginePathPlanner.Internal.EnsureNativeMovementOwner(body),
+    false,
+    "native owner cleared follow before a native route was published"
+)
+T.equal(body.actionState, "walktoward",
+    "native owner changed follow while path2 was unavailable")
+body.path2 = selectedPath
+T.equal(
+    PNC.EnginePathPlanner.Internal.EnsureNativeMovementOwner(body),
+    true,
+    "native owner did not release stale WalkTowardState after path2 publish"
+)
+T.equal(body.actionState, "idle",
+    "native owner did not release the published native route state")
+
 local suppressedCount = 0
 PNC.LiveBodyControl = {
     IsSuppressedActionState = function(actionState)
@@ -353,8 +373,39 @@ PNC.LiveBodyControl = {
         suppressedBody:setUseless(true)
     end,
 }
+body.path2 = nil
+body.actionState = "pathfind"
+nextActionState = "pathfind"
+now = now + 16
+handled, state = PNC.EnginePathPlanner.Pump(
+    record,
+    body,
+    "zombie_update"
+)
+T.truthy(handled, "native route did not survive path startup")
+T.equal(suppressedCount, 0,
+    "native planner reset path startup before a route was published")
+T.equal(body.actionState, "pathfind",
+    "native planner changed the vanilla startup state without path2")
+
+body.path2 = selectedPath
+body.actionState = "pathfind"
+now = now + 16
+handled, state = PNC.EnginePathPlanner.Pump(
+    record,
+    body,
+    "zombie_update"
+)
+T.truthy(handled, "native route did not survive a published path")
+T.equal(suppressedCount, 1,
+    "native planner did not repair the published pathfind conflict")
+T.equal(body.actionState, "idle",
+    "published pathfind conflict was not released")
+
+suppressedCount = 0
 body.actionState = "turnalerted"
 nextActionState = "turnalerted"
+now = now + 16
 handled, state = PNC.EnginePathPlanner.Pump(
     record,
     body,
@@ -378,6 +429,7 @@ local movedTarget = {
 -- task or animation update. The native owner must release it before Behavior2
 -- can publish path2 again.
 body.actionState = "walktoward"
+publishPath = true
 local requestsBeforeMovingReplan = requestCount
 PNC.EnginePathPlanner.GetSteeringTarget(
     record,
@@ -402,6 +454,7 @@ T.truthy(cancelCount >= 2 and resetCount >= 2,
     "native behavior was not released after success")
 T.truthy(not record.runtime.localNavigation.nativeActive,
     "native movement ownership was not released")
+publishPath = false
 body.x = 0.5
 body.y = 0.5
 body.actionState = "idle"
@@ -615,6 +668,15 @@ PNC.Core.IsAuthority = function() return true end
 now = now + 2000
 record.runtime.pathing.phase = "active"
 nextResult = BehaviorResult.Working
+local nativeFrameProgressCalls = 0
+PNC.PathService = {
+    Internal = {
+        recordNativeMove = function(_, _, _, _, _, _, nativeState)
+            nativeFrameProgressCalls = nativeFrameProgressCalls + 1
+            return true, nativeState
+        end,
+    },
+}
 PNC.EnginePathPlanner.GetSteeringTarget(record, body, target)
 local updatesBeforeFrame = updateCount
 now = now + 16
@@ -623,6 +685,8 @@ T.truthy(handled and state == "native_behavior_pending",
     "authoritative frame lost Bandits-style native movement")
 T.truthy(updateCount == updatesBeforeFrame + 1,
     "zombie frame did not advance PathFindBehavior2 exactly once")
+T.equal(nativeFrameProgressCalls, 1,
+    "authoritative frame did not record native progress after its single pump")
 local collisionHandoffCount = 0
 PNC.PathService = {
     AdvanceScriptedPassage = function()
@@ -651,6 +715,14 @@ T.truthy(updateCount == updatesAfterFrame,
 
 nextResult = BehaviorResult.Failed
 now = now + 16
+PNC.PathService = {
+    Internal = {
+        recordNativeMove = function(_, _, _, _, _, _, nativeState)
+            nativeFrameProgressCalls = nativeFrameProgressCalls + 1
+            return true, nativeState
+        end,
+    },
+}
 handled, state = PNC.EnginePathPlanner.PumpFrame(record, body)
 T.truthy(handled and state == "engine_path_failed",
     "Bandits-style behavior failure did not release native ownership")
@@ -658,6 +730,8 @@ T.truthy(not record.runtime.localNavigation.nativeActive,
     "failed PathFindBehavior2 retained movement ownership")
 T.truthy(body.useless == true,
     "failed native route did not restore managed-body safety")
+T.equal(nativeFrameProgressCalls, 2,
+    "terminal native result skipped the frame progress handoff")
 
 serverMode = true
 now = now + 2000

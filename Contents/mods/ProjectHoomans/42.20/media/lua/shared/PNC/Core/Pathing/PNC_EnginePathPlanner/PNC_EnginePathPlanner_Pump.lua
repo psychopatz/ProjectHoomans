@@ -28,6 +28,13 @@ local function suppressConflictingNativeState(body, navigation, now)
     then
         return false
     end
+    -- PathFindState without path2 is still the vanilla request/follow
+    -- startup path. Resetting it here prevents Behavior2 from ever acquiring
+    -- the route and leaves the NPC idle forever. Only repair the actual
+    -- ownership conflict after the engine has published path2.
+    if not body.getPath2 or body:getPath2() == nil then
+        return false
+    end
     liveBodyControl.SuppressZombieState(body, nil, now)
     return true
 end

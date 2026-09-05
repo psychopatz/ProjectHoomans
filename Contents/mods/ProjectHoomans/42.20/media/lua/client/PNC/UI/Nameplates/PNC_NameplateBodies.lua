@@ -46,7 +46,7 @@ function Bodies.Index(zombieList)
             local onlineID = PNC.Network and PNC.Network.GetZombieOnlineID
                 and PNC.Network.GetZombieOnlineID(zombie) or nil
             if onlineID ~= nil then
-                index.byOnlineID[tostring(onlineID)] = zombie
+                addUnique(index.byOnlineID, onlineID, zombie)
             end
             local instanceID = zombie.getPersistentOutfitID and zombie:getPersistentOutfitID() or nil
             addUnique(index.byInstanceID, instanceID, zombie)

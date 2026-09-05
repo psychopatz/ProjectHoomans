@@ -22,6 +22,36 @@ function Resolution.ApplyTargetDamage(attackerRecord, attackerBody, target, opti
         return false, "attacker_body_dead"
     end
     if not target then return false, "missing_target" end
+    if target.kind == "player" then
+        if not target.player then
+            return false, "missing_player_target"
+        end
+        if target.player.isDead and target.player:isDead() then
+            return false, "player_target_dead"
+        end
+        if PNC.Stealth then
+            if PNC.Stealth.ShouldSuppressCompanionCombat
+                and PNC.Stealth.ShouldSuppressCompanionCombat(attackerRecord)
+            then
+                return false, "player_target_hidden"
+            end
+            if PNC.Stealth.ShouldSuppressZombieAggro
+                and PNC.Stealth.ShouldSuppressZombieAggro(attackerRecord)
+            then
+                return false, "player_target_hidden"
+            end
+        end
+        if PNC.Factions and PNC.Factions.CanNPCTargetPlayer
+            and PNC.Factions.CanNPCTargetPlayer(
+                attackerRecord,
+                target.player
+            ) ~= true
+        then
+            -- Revalidate at damage time. A committed attack may outlive a
+            -- stealth/faction transition and must not hit from stale intent.
+            return false, "player_target_not_allowed"
+        end
+    end
     hit = Resolution.BuildHitEvent(attackerRecord, target, options)
     if hit.amount <= 0 then return false, "invalid_damage", hit end
     if target.kind == "player" then

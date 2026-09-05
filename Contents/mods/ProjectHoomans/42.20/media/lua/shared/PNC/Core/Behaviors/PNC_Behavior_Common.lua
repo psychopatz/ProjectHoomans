@@ -96,6 +96,42 @@ function Common.GetOwner(record)
     return Core.ResolvePlayerByOnlineID(record.ownerOnlineID) or Core.ResolvePlayerByUsername(record.ownerUsername)
 end
 
+-- Returns the already-selected hostile target only while a follow-order
+-- companion still has an active combat lane.  This is deliberately a pure
+-- state check: callers must not use it as a reason to start a perception
+-- scan.  Presence and social systems use this same predicate so an abstract
+-- transition cannot disagree with the abandonment attribution.
+function Common.IsActiveFollowCombatTarget(record, now)
+    local orderSpec = record and record.orderSpec or nil
+    local runtime = record and record.runtime or nil
+    local target = runtime and runtime.target or nil
+    local followState = runtime and runtime.followState or nil
+    local mode = followState and tostring(followState.mode or "") or ""
+    local attack = runtime and runtime.attackAction or nil
+    local attackActive = false
+    local modeActive = mode == "combat"
+        or mode == "combat_self_defense"
+        or mode == "combat_retreat"
+    local kind
+    if not orderSpec
+        or tostring(orderSpec.kind or "") ~= tostring(Const.ORDER_FOLLOW or "follow")
+        or type(target) ~= "table"
+    then
+        return nil
+    end
+    kind = tostring(target.kind or "")
+    if kind ~= "zombie" and kind ~= "npc" then return nil end
+    now = tonumber(now)
+    if now == nil and Core and Core.Now then now = Core.Now() end
+    if type(attack) == "table" and now ~= nil then
+        attackActive = tonumber(attack.finishAt) ~= nil
+            and now < tonumber(attack.finishAt)
+    end
+    if not modeActive and not attackActive then return nil end
+    return target, kind, modeActive and "follow_combat_mode"
+        or "follow_attack_action"
+end
+
 function Common.MoveRecord(
     record,
     zombie,

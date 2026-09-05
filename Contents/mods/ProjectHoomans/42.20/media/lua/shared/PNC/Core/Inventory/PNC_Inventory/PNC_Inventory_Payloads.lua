@@ -84,6 +84,7 @@ function Inventory.BuildDeltaPayload(record, sinceRevision)
     if sinceRevision > (tonumber(inv.revision) or 0) then
         return {
             npcId = record.id,
+            fromRevision = sinceRevision,
             inventoryRevision = inv.revision,
             fullRequired = true,
         }
@@ -91,6 +92,7 @@ function Inventory.BuildDeltaPayload(record, sinceRevision)
     if sinceRevision == (tonumber(inv.revision) or 0) then
         return {
             npcId = record.id,
+            fromRevision = sinceRevision,
             inventoryRevision = inv.revision,
             ops = {},
             summary = Inventory.BuildSummaryPayload(record),
@@ -102,21 +104,42 @@ function Inventory.BuildDeltaPayload(record, sinceRevision)
     then
         return {
             npcId = record.id,
+            fromRevision = sinceRevision,
             inventoryRevision = inv.revision,
             fullRequired = true,
         }
     end
+    local expectedRevision = sinceRevision
     for i = 1, #runtime.opLog do
         entry = runtime.opLog[i]
         if entry and (tonumber(entry.revision) or 0) > sinceRevision then
+            if tonumber(entry.revision) ~= expectedRevision
+                and tonumber(entry.revision) ~= expectedRevision + 1
+            then
+                return {
+                    npcId = record.id,
+                    fromRevision = sinceRevision,
+                    inventoryRevision = inv.revision,
+                    fullRequired = true,
+                }
+            end
             payload[#payload + 1] = Core.DeepCopy(entry.op)
+            if tonumber(entry.revision) == expectedRevision + 1 then
+                expectedRevision = tonumber(entry.revision)
+            end
         end
     end
-    if #payload <= 0 then
-        return nil
+    if #payload <= 0 or expectedRevision ~= tonumber(inv.revision) then
+        return {
+            npcId = record.id,
+            fromRevision = sinceRevision,
+            inventoryRevision = inv.revision,
+            fullRequired = true,
+        }
     end
     return {
         npcId = record.id,
+        fromRevision = sinceRevision,
         inventoryRevision = inv.revision,
         ops = payload,
         summary = Inventory.BuildSummaryPayload(record),

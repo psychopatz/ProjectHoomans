@@ -2,6 +2,21 @@
 
 local Internal = PNC.PathService.Internal
 
+local function shouldProbeNativePassage(zombie, lane, now)
+    local blocked = lane and lane.blockedStepToX ~= nil
+    local collided = Internal.isDoorCollision
+        and Internal.isDoorCollision(zombie) or false
+    local fresh = lane and lane.nextPassageProbeAt == nil
+    local stalled = lane
+        and now - (tonumber(lane.lastGoalProgressAt) or now)
+            >= Internal.INTERACTION_STALL_MS
+    if not blocked and not collided and not fresh and not stalled then
+        return false
+    end
+    return not Internal.PassageProbeAllowed
+        or Internal.PassageProbeAllowed(lane, now)
+end
+
 function Internal.tryNativeAdjacentPassage(
     record,
     zombie,
@@ -9,25 +24,31 @@ function Internal.tryNativeAdjacentPassage(
     enginePlanner,
     now
 )
-    if not lane.goal
-        or not Internal.hasClosedPassageToward
-        or not Internal.hasClosedPassageToward(
-            zombie,
-            lane.goal.x,
-            lane.goal.y,
-            lane.goal.z
-        )
+    local closedPassage
+    local passage
+    if not lane.goal or not Internal.hasClosedPassageToward
         or not Internal.tryDoorOrWindowInteraction
     then
         return nil
     end
+    if not shouldProbeNativePassage(zombie, lane, now) then
+        return nil
+    end
+    closedPassage, passage = Internal.hasClosedPassageToward(
+        zombie,
+        lane.goal.x,
+        lane.goal.y,
+        lane.goal.z
+    )
+    if not closedPassage then return nil end
     local interacted, kind = Internal.tryDoorOrWindowInteraction(
         zombie,
         record,
         lane,
         lane.goal.x,
         lane.goal.y,
-        lane.goal.z
+        lane.goal.z,
+        passage
     )
     if not interacted then
         return nil
@@ -70,6 +91,11 @@ function Internal.tryNativeStallPassage(
         or now - (tonumber(lane.lastGoalProgressAt) or now)
             < Internal.INTERACTION_STALL_MS
         or not Internal.tryDoorOrWindowInteraction
+    then
+        return nil
+    end
+    if Internal.PassageProbeAllowed
+        and not Internal.PassageProbeAllowed(lane, now)
     then
         return nil
     end

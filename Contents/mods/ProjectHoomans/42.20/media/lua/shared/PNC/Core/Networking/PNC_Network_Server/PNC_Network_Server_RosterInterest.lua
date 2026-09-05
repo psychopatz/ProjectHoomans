@@ -107,6 +107,7 @@ local function collectVisibleIDs(player, state)
                         Const.CMD_SYNC_RECORD,
                         {
                             event = "interest_enter",
+                            directoryRevision = ServerState.rosterRevision,
                             snapshot = Network.BuildSnapshot(record),
                         }
                     )
@@ -132,6 +133,7 @@ local function sendInterestExits(player, previousIDs, nextIDs)
                     Const.CMD_SYNC_RECORD,
                     {
                         event = "interest_exit",
+                        directoryRevision = ServerState.rosterRevision,
                         snapshot = Network.BuildRosterSnapshot(record),
                     }
                 )
@@ -221,6 +223,7 @@ end
 function Internal.BuildRecordPayload(record, eventName)
     return {
         event = eventName or "update",
+        directoryRevision = ServerState.rosterRevision,
         snapshot = eventName == "tick" and Network.BuildPresenceDelta(record)
             or Network.BuildSnapshot(record),
     }

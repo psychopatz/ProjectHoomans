@@ -41,4 +41,19 @@ for role, functions in pairs(ownedFunctions) do
     end
 end
 
+-- PZ also auto-executes nested files under media/lua. Providers must be
+-- harmless when that loader reaches them outside the aggregator's require
+-- window.
+for i = 1, #providers do
+    local provider = providers[i]
+    PNC = { ProfilerIntegration = {} }
+    local loaded = T.load(
+        "ProjectHoomans",
+        "shared",
+        prefix .. provider .. ".lua"
+    )
+    T.equal(loaded, PNC.ProfilerIntegration,
+        provider .. " direct auto-load boundary")
+end
+
 T.finish("pnc_psychopatz_profiler_presence_boundary_smoke")

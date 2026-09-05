@@ -59,11 +59,24 @@ end
 
 local function onResetLua()
     ClientState.snapshots = {}
+    ClientState.managedBodyOnlineIDs = {}
+    ClientState.managedBodyOnlineIDsReady = false
     ClientState.npcKnowledge = {}
     ClientState.npcPresentations = {}
     ClientState.playerContext = nil
     ClientState.bootstrapState = "idle"
+    ClientState.rosterRevision = 0
+    ClientState.pendingRosterRevision = nil
+    ClientState.pendingRosterExpectedChunks = nil
+    ClientState.pendingRosterExpectedTotal = nil
+    ClientState.pendingRosterSyncID = nil
+    ClientState.pendingRosterChunks = nil
+    ClientState.pendingRosterChunkRecords = nil
+    ClientState.pendingRosterReceivedTotal = nil
     ClientState.activeBootstrapRequestID = nil
+    ClientState.completedBootstrapRequestID = nil
+    ClientState.pendingBootstrap = nil
+    ClientState.rosterEntryRevisions = {}
     ClientState.bootstrapKnowledgeRevision = nil
     ClientState.lastBootstrapRequestAt = nil
     ClientState.bootstrapRetryAttempt = nil
@@ -121,7 +134,9 @@ local function onResetLua()
     ClientState.directorDebugReason = nil
     ClientState.colonyManagement = nil
     ClientState.colonyManagementRevision = 0
-    ClientState.colonyJournal = { rows = {}, cursor = 0, latestSequence = 0 }
+    ClientState.colonyJournal = {
+        rows = {}, cursor = 0, latestSequence = 0, rowSequences = {},
+    }
     ClientState.colonyJournalRevision = 0
     ClientState.worldDiscovery = nil
     ClientState.scavengeSessions = {}

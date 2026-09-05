@@ -343,15 +343,39 @@ local function playAt(snapshot, sound, mode, options)
         z
     )
     if not ok or not emitter then return 0, profile end
-    if emitter.playSoundImpl then
+    -- Build 42's FMODSoundEmitter can dereference a nil square in the
+    -- IsoGridSquare overload even when the emitter already has a position.
+    -- playSound(alias) is the positional emitter API and is safe for a
+    -- snapshot-only MP NPC. Keep the impl overload only as a guarded fallback
+    -- when an older runtime does not expose playSound.
+    if emitter.playSound then
+        ok, handle = pcall(
+            emitter.playSound,
+            emitter,
+            alias
+        )
+    elseif emitter.playSoundImpl then
+        local square
+        local cell
+        if world.getCell then
+            ok, cell = pcall(world.getCell, world)
+            if ok and cell and cell.getGridSquare then
+                ok, square = pcall(
+                    cell.getGridSquare,
+                    cell,
+                    x,
+                    y,
+                    z
+                )
+            end
+        end
+        if not square then return 0, profile end
         ok, handle = pcall(
             emitter.playSoundImpl,
             emitter,
             alias,
-            nil
+            square
         )
-    elseif emitter.playSound then
-        ok, handle = pcall(emitter.playSound, emitter, alias)
     end
     if not ok or not handle or handle == 0 then
         return 0, profile

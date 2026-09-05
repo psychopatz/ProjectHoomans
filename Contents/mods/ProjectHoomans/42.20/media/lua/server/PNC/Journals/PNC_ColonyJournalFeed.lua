@@ -254,6 +254,8 @@ function Feed.GetDelta(player, args)
     if not more then lastSequence = latest end
     return {
         v = Protocol.VERSION,
+        requestID = args.requestID,
+        afterCursor = after,
         rows = rows,
         reset = reset,
         latestSequence = latest,

@@ -56,10 +56,14 @@ local function profileFor(message)
     local entry = activeEntry(message)
     local body = entry and (entry.zombie or entry.body) or nil
     body = body or liveBody(npcID)
-    if not body then return nil end
+    local sourceSnapshot = snapshot(npcID, entry)
+    -- A replicated MP NPC can have a valid identity/voice snapshot before its
+    -- local zombie body is materialized. NPCVoice.GetProfile supports that
+    -- client-only case and lets the bridge carry a stable voice binding.
+    if not body and not sourceSnapshot then return nil end
     local voice = PNC and PNC.NPCVoice or nil
     if not voice or type(voice.GetProfile) ~= "function" then return nil end
-    local ok, profile = pcall(voice.GetProfile, snapshot(npcID, entry), body)
+    local ok, profile = pcall(voice.GetProfile, sourceSnapshot, body)
     if not ok or type(profile) ~= "table" then return nil end
     local prefix = trim(profile.prefix)
     local voiceType = tonumber(profile.voiceType)

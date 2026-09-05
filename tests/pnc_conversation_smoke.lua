@@ -288,6 +288,8 @@ local player = {
 local definition = PNC.Conversation.BuildDefinition(entry, player, "dawn")
 T.equal(definition.namespace, "ProjectHoomans", "history namespace")
 T.equal(definition.npcID, "npc-12", "NPC id")
+T.equal(definition.portrait.preferDescriptor, true,
+    "live NPC portrait uses the human descriptor preview")
 T.equal(definition.backgroundID, "dawn", "background definition")
 T.equal(definition.context.relationshipID, "Crossroads Exchange",
     "faction subtitle")

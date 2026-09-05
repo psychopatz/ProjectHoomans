@@ -76,6 +76,17 @@ local unrelatedNaked = makeBody({
     y = 30,
     naked = true,
 })
+local onlineIDCollision = makeBody({
+    instanceID = 1005,
+    onlineID = 11,
+    x = 40,
+    y = 40,
+    modData = {
+        PNC_NPC = true,
+        PNC_UUID = "different_npc",
+        PNC_BodyLease = "different-lease",
+    },
+})
 
 getCell = function()
     return {
@@ -136,6 +147,10 @@ T.equal(canonical.wasRemoved(), false, "canonical client body preserved")
 T.equal(duplicate.wasRemoved(), true, "old UUID body pruned")
 T.equal(nakedLegacy.wasRemoved(), true, "nearby naked legacy body pruned")
 T.equal(unrelatedNaked.wasRemoved(), false, "unrelated naked body preserved")
+T.equal(onlineIDCollision.wasRemoved(), false,
+    "online-ID collision body preserved")
+T.equal(onlineIDCollision:getModData().PNC_UUID, "different_npc",
+    "online-ID collision was not rebound to the wrong NPC")
 
 local exact = makeBody({
     instanceID = 2001,
@@ -144,6 +159,13 @@ local exact = makeBody({
     y = 5,
     modData = { PNC_NPC = true, PNC_UUID = "other" },
 })
+local removalCollision = makeBody({
+    instanceID = 2002,
+    onlineID = 21,
+    x = 5.2,
+    y = 5,
+    modData = { PNC_NPC = true, PNC_UUID = "not_other" },
+})
 T.equal(PNC.ClientPresenceSync.RemoveBodyInstance({
     id = "other",
     bodyInstanceID = "2001",
@@ -151,6 +173,8 @@ T.equal(PNC.ClientPresenceSync.RemoveBodyInstance({
     reason = "server_startup_cleanup",
 }), 1, "exact client body removal count")
 T.equal(exact.wasRemoved(), true, "exact server-directed body removed")
+T.equal(removalCollision.wasRemoved(), false,
+    "online-ID collision was not removed with another NPC")
 T.finish("pnc_client_body_cleanup_smoke")
 
 T.finish("pnc_client_body_cleanup_smoke")

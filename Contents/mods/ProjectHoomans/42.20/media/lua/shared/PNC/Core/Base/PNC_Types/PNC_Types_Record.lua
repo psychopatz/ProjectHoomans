@@ -55,6 +55,7 @@ function Types.NewRecord(definition)
         affiliation = PNC.FactionTypes
             and PNC.FactionTypes.NewAffiliation() or nil,
         social = nil,
+        followerAbandonment = nil,
         health = {
             current = def.hpMax,
             max = def.hpMax,

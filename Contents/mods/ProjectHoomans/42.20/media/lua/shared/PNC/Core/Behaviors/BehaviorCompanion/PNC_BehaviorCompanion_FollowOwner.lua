@@ -9,6 +9,121 @@ local CompanionVehicle = PNC.CompanionVehicle
 local CombatTactics = PNC.CombatTactics
 local BehaviorCombat = PNC.BehaviorCombat
 local Perception = PNC.Perception
+local Diagnostics = PNC.PerformanceScalingDiagnostics
+
+local function followerPresenceAuditEnabled()
+    return Diagnostics
+        and Diagnostics.IsFollowerPresenceAuditEnabled
+        and Diagnostics.IsFollowerPresenceAuditEnabled() == true
+end
+
+-- Bodyless followers use only owner resolution and direct abstract movement.
+-- This deliberately avoids the live follow pipeline's zombie perception,
+-- threat response, formation scan, animation, and engine pathing work.
+function Internal.TickAbstractFollowOwner(record, now)
+    local owner = Common.GetOwner(record)
+    local runtime = record.runtime or {}
+    local state = Internal.GetFollowState(record)
+    local beforeX = tonumber(record.x) or 0
+    local beforeY = tonumber(record.y) or 0
+    local beforeZ = tonumber(record.z) or 0
+    local targetX
+    local targetY
+    local targetZ
+    local stopDistance
+    local reason
+    local ownerResolved = owner ~= nil
+    local distanceBefore
+    local distanceAfter
+    local auditEnabled = followerPresenceAuditEnabled()
+    local arrived = false
+    local moved = false
+    now = tonumber(now) or (Core.Now and Core.Now() or 0)
+    record.runtime = runtime
+    record.activeJob = "FollowOwner"
+    if owner then
+        if owner.getUsername then
+            record.ownerUsername = owner:getUsername()
+        end
+        if owner.getOnlineID then
+            record.ownerOnlineID = owner:getOnlineID()
+        end
+        targetX = tonumber(owner:getX()) or beforeX
+        targetY = tonumber(owner:getY()) or beforeY
+        targetZ = tonumber(owner:getZ()) or beforeZ
+        stopDistance = tonumber(Const.FOLLOW_DISTANCE) or 1.8
+        reason = "abstract_follow_owner"
+        state.mode = "abstract_follow"
+        if auditEnabled then
+            runtime.abstractFollowOwnerResolved = true
+        end
+    else
+        targetX = tonumber(record.anchorX) or beforeX
+        targetY = tonumber(record.anchorY) or beforeY
+        targetZ = tonumber(record.anchorZ) or beforeZ
+        stopDistance = 0.8
+        reason = "abstract_follow_owner_missing_return_anchor"
+        state.mode = "returning_to_anchor"
+        if auditEnabled then
+            runtime.abstractFollowOwnerResolved = false
+        end
+    end
+    record.activeBehavior = owner
+        and "FollowOwner:abstract"
+        or "FollowOwner:abstract_owner_missing"
+    runtime.target = nil
+    runtime.attackAction = nil
+    runtime.inCombatUntil = 0
+    runtime.combatBlockReason = reason
+    distanceBefore = Core.Distance(
+        beforeX,
+        beforeY,
+        targetX,
+        targetY
+    )
+    if distanceBefore <= stopDistance and beforeZ == targetZ then
+        arrived = true
+    else
+        Common.MoveRecord(
+            record,
+            nil,
+            targetX,
+            targetY,
+            targetZ,
+            "walk",
+            stopDistance,
+            reason
+        )
+        moved = true
+    end
+    if auditEnabled and Diagnostics.LogFollowerPresence then
+        distanceAfter = Core.Distance(
+            tonumber(record.x) or beforeX,
+            tonumber(record.y) or beforeY,
+            targetX,
+            targetY
+        )
+        runtime.abstractFollowLastTickAt = now
+        Diagnostics.LogFollowerPresence("abstract_follow_tick", {
+            "npc=" .. tostring(record.id),
+            "owner=" .. tostring(record.ownerUsername or "nil"),
+            "ownerOnlineID=" .. tostring(record.ownerOnlineID or "nil"),
+            "ownerResolved=" .. tostring(ownerResolved),
+            "from=" .. tostring(beforeX) .. "," .. tostring(beforeY)
+                .. "," .. tostring(beforeZ),
+            "to=" .. tostring(record.x) .. "," .. tostring(record.y)
+                .. "," .. tostring(record.z),
+            "target=" .. tostring(targetX) .. "," .. tostring(targetY)
+                .. "," .. tostring(targetZ),
+            "distanceBefore=" .. tostring(distanceBefore),
+            "distanceAfter=" .. tostring(distanceAfter),
+            "moved=" .. tostring(moved),
+            "arrived=" .. tostring(arrived),
+            "cadenceMs=" .. tostring(PNC.Const.TICK_ABSTRACT_MS or 3000),
+        })
+    end
+    return true
+end
 
 function Internal.TickFollowOwner(record, zombie)
     local owner = Common.GetOwner(record)

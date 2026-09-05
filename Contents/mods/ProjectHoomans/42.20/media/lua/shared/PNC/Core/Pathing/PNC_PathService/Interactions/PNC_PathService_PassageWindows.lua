@@ -43,14 +43,10 @@ end
 local function resolveClimbDestination(context, object, actionKey, objectKey)
     local destSquare
     destSquare = Internal.windowDestinationForContext(context, object)
-    if not destSquare or not Internal.isSquareWalkable(
-        destSquare:getX() + 0.5,
-        destSquare:getY() + 0.5,
-        destSquare:getZ()
-    ) then
+    if not destSquare then
         Internal.logTraversalReject(
             context.record, context.zombie, context.lane,
-            "traversal_rejected", "window_dest_blocked",
+            "traversal_rejected", "window_dest_unavailable",
             "object=" .. tostring(objectKey or "nil")
         )
         return nil, nil, nil, nil, true
@@ -59,39 +55,6 @@ local function resolveClimbDestination(context, object, actionKey, objectKey)
     local destX = destSquare:getX() + 0.5
     local destY = destSquare:getY() + 0.5
     local destZ = destSquare:getZ()
-    if object ~= context.blockedPassage
-        and not Internal.passageImprovesGoalDistance(
-            context.fromX,
-            context.fromY,
-            destX,
-            destY,
-            context.goalX,
-            context.goalY
-        )
-    then
-        if Internal.noteTraversalAttempt then
-            Internal.noteTraversalAttempt(
-                context.lane,
-                "window_climb",
-                actionKey,
-                context.fromX,
-                context.fromY,
-                context.fromZ,
-                destX,
-                destY,
-                destZ,
-                context.now,
-                context.lane and context.lane.goalRevision or 0
-            )
-        end
-        Internal.logTraversalReject(
-            context.record, context.zombie, context.lane,
-            "traversal_rejected", "window_dest_not_progressive",
-            "object=" .. tostring(objectKey or "nil")
-                .. " to=" .. Internal.describeSquare(destSquare)
-        )
-        return nil, nil, nil, nil, true
-    end
     return destSquare, destX, destY, destZ, false
 end
 

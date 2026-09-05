@@ -101,7 +101,17 @@ function Census.Refresh(now, force)
                 local managed = Core.IsManagedNPCBody(zombie)
                 Census.AllZombies[#Census.AllZombies + 1] = zombie
                 if onlineID and onlineID >= 0 then
-                    Census.ByOnlineID[tostring(onlineID)] = zombie
+                    local onlineKey = tostring(onlineID)
+                    if Census.ByOnlineID[onlineKey] ~= nil
+                        and Census.ByOnlineID[onlineKey] ~= zombie
+                    then
+                        -- An online ID is not sufficient to distinguish two
+                        -- engine bodies. Fail closed until identity-aware
+                        -- resolution can select the correct instance.
+                        Census.ByOnlineID[onlineKey] = false
+                    elseif Census.ByOnlineID[onlineKey] == nil then
+                        Census.ByOnlineID[onlineKey] = zombie
+                    end
                 end
                 if managed then
                     Census.ManagedBodies[#Census.ManagedBodies + 1] = zombie
@@ -159,7 +169,9 @@ function Census.GetGeneration()
 end
 
 function Census.FindByOnlineID(onlineID, now)
+    local body
     if onlineID == nil then return nil end
     Census.Refresh(now, false)
-    return Census.ByOnlineID[tostring(onlineID)]
+    body = Census.ByOnlineID[tostring(onlineID)]
+    return body ~= false and body or nil
 end

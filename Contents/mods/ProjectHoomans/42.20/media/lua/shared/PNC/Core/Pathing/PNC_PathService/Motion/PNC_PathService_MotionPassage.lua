@@ -2,6 +2,33 @@
 
 local Internal = PNC.PathService.Internal
 
+local function repairTimedOutTraversal(zombie, record, lane, now)
+    if not lane or lane.lastTraversalFinishReason ~= "hard_timeout" then
+        return false
+    end
+    if lane.navigationProvider == "engine_path"
+        and PNC.EnginePathPlanner
+        and PNC.EnginePathPlanner.Invalidate
+    then
+        PNC.EnginePathPlanner.Invalidate(
+            record,
+            "traversal_repaired",
+            zombie
+        )
+        lane.lastNavigationInvalidatedAt = now
+        lane.ownerMode = "engine_path_waiting"
+    end
+    Internal.logMoveWarning(
+        record,
+        zombie,
+        lane,
+        "route_failed",
+        "traversal_hard_timeout",
+        "goal=" .. Internal.describeGoal(lane.goal)
+    )
+    return true
+end
+
 local function setPassageOwner(lane, interactType, now)
     if interactType == "door_open" then
         lane.ownerMode = "door_open"
@@ -25,14 +52,15 @@ local function setPassageOwner(lane, interactType, now)
     end
 end
 
-local function tryPassage(zombie, record, lane, goal)
+local function tryPassage(zombie, record, lane, goal, knownPassage)
     return Internal.tryDoorOrWindowInteraction(
         zombie,
         record,
         lane,
         goal.x,
         goal.y,
-        goal.z
+        goal.z,
+        knownPassage
     )
 end
 
@@ -91,6 +119,11 @@ function Internal.updateScriptedSpecialMove(zombie, record, lane, now)
             )
             return true, traversalState or lane.ownerMode
         end
+        if traversalState == "completed"
+            and repairTimedOutTraversal(zombie, record, lane, now)
+        then
+            return true, "traversal_repaired"
+        end
         if traversalState == "completed" then
             Internal.logMoveDebug(
                 record,
@@ -137,18 +170,18 @@ function Internal.tryImmediateScriptedPassage(
         return nil
     end
     local label
-    if lane.blockedStepToX ~= nil
-        or Internal.hasClosedPassageToward
-            and Internal.hasClosedPassageToward(
-                zombie, goal.x, goal.y, goal.z
-            )
-    then
+    if lane.blockedStepToX ~= nil then
         label = "passage_interact"
     elseif Internal.isDoorCollision
         and Internal.isDoorCollision(zombie)
     then
         label = "collision_interact"
     else
+        return nil
+    end
+    if Internal.PassageProbeAllowed
+        and not Internal.PassageProbeAllowed(lane, now)
+    then
         return nil
     end
     local interacted, interactType = tryPassage(

@@ -30,6 +30,7 @@ function Network.FindZombieByOnlineID(onlineID)
     local cell
     local zombieList
     local zombie
+    local match
     local i
     onlineID = tonumber(onlineID)
     if onlineID == nil or not getCell then
@@ -49,10 +50,13 @@ function Network.FindZombieByOnlineID(onlineID)
     for i = zombieList:size() - 1, 0, -1 do
         zombie = zombieList:get(i)
         if Network.GetZombieOnlineID(zombie) == onlineID then
-            return zombie
+            if match and match ~= zombie then
+                return nil
+            end
+            match = zombie
         end
     end
-    return nil
+    return match
 end
 
 function Network.BroadcastZombieReaction(targetZombie, attackerZombie, options)

@@ -18,11 +18,15 @@ function LiveBodyControl.EnforceManagedSafety(zombie, source)
     local keepEngineMovementActive
     local now
     local actionLeaseActive
+    local unsafeNativeTraversalState
     local needsImmediateRepair
     if not zombie or not Core or not Core.IsManagedNPCBody
         or not Core.IsManagedNPCBody(zombie)
     then
         return false
+    end
+    if LiveBodyControl.RefreshNativeRemoteHeartbeat then
+        LiveBodyControl.RefreshNativeRemoteHeartbeat(zombie)
     end
     if PNC.Registry and PNC.Registry.FindRecordByZombie then
         record = PNC.Registry.FindRecordByZombie(zombie)
@@ -36,6 +40,8 @@ function LiveBodyControl.EnforceManagedSafety(zombie, source)
     wasGrappleOnly = zombie.isReanimatedForGrappleOnly
         and zombie:isReanimatedForGrappleOnly() or false
     actionState = LiveBodyControl.GetActionStateName(zombie)
+    unsafeNativeTraversalState = actionState == "climbfence"
+        or actionState == "climbwindow"
     actionLeaseActive = Internal.hasBumpActionLease(zombie, now)
         or Internal.hasNativeGetUpLease(zombie, now)
         or keepEngineMovementActive
@@ -49,7 +55,7 @@ function LiveBodyControl.EnforceManagedSafety(zombie, source)
         or hadTeeth
         or wasGrappleOnly
         or (
-            not keepEngineMovementActive
+            (not keepEngineMovementActive or unsafeNativeTraversalState)
             and not actionLeaseActive
             and LiveBodyControl.IsSuppressedActionState(actionState)
         )
@@ -59,7 +65,7 @@ function LiveBodyControl.EnforceManagedSafety(zombie, source)
         keepEngineMovementActive,
         needsImmediateRepair
     )
-    if not keepEngineMovementActive
+    if (not keepEngineMovementActive or unsafeNativeTraversalState)
         and not actionLeaseActive
         and LiveBodyControl.IsSuppressedActionState(actionState)
     then

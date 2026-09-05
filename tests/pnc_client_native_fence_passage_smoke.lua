@@ -13,6 +13,8 @@ IsoDirections = {
 }
 
 local fence = {}
+local window = {}
+local passageKind = "fence"
 local fenceTall = false
 local fromSquare = {
     getX = function() return 0 end,
@@ -34,6 +36,13 @@ local holdRequests = 0
 PNC = {
     TraversalQuery = {
         FindPassageToward = function()
+            if passageKind == "window" then
+                return {
+                    object = window,
+                    fromSquare = fromSquare,
+                    toSquare = toSquare,
+                }
+            end
             return {
                 object = fence,
                 fromSquare = fromSquare,
@@ -44,6 +53,9 @@ PNC = {
         end,
         IsFence = function(object)
             return object == fence, fenceTall
+        end,
+        IsWindow = function(object)
+            return object == window
         end,
         IsFenceApproachReady = function() return true end,
         CanTraverseAt = function() return true end,
@@ -102,7 +114,15 @@ local body = {
     setLx = function() end,
     setLy = function() end,
     faceThisObject = function() end,
+    changeState = function()
+        error("managed window traversal entered a vanilla state")
+    end,
 }
+
+window.IsOpen = function() return true end
+window.canClimbThrough = function() return true end
+window.getSquare = function() return fromSquare end
+window.getOppositeSquare = function() return toSquare end
 
 T.load("ProjectHoomans", "shared",
     "PNC/Core/Pathing/TraversalQuery/PNC_TraversalQuery_Internal.lua")
@@ -205,5 +225,58 @@ T.truthy(handled, "tall fence did not complete")
 T.equal(reason, "native_fence_crossed", "tall fence completion reason")
 T.equal(state.passageAction, nil, "tall fence action did not clear")
 T.equal(position.x, 1.5, "tall fence did not reach the landing point")
+
+-- Open-window traversal must use the PNC-owned action/position contract. The
+-- vanilla ClimbThroughWindowState assumes player BodyDamage and is invalid for
+-- an IsoZombie carrier.
+passageKind = "window"
+position.x, position.y, position.z = 0.5, 0.23, 0
+actionState = "pathfind"
+state = {}
+bumpType = nil
+handled, reason = Controller.TryNativePassage(
+    { id = "window-npc" }, body, state,
+    { x = 3.5, y = 0.5, z = 0 }, 5000)
+T.truthy(handled, "open window was not intercepted")
+T.equal(reason, "native_window_climb", "window traversal reason")
+T.equal(bumpType, "PNC_ClimbWindow", "window did not select the PNC clip")
+T.equal(state.passageAction.kind, "window_climb",
+    "window traversal did not create a PNC action")
+T.equal(state.passageAction.toX, 1.5,
+    "window traversal did not target the opposite square")
+
+handled, reason = Controller.UpdateWindowSmash(body, state, 5750)
+T.truthy(handled, "window climb released before its animation tail")
+T.equal(reason, "native_window_climb", "window climb midpoint reason")
+T.equal(position.x, 1.5, "window climb did not reach its landing point")
+
+handled, reason = Controller.UpdateWindowSmash(body, state, 6101)
+T.truthy(handled, "window climb did not complete")
+T.equal(reason, "native_window_crossed", "window climb completion reason")
+T.equal(state.passageAction, nil, "window climb action did not clear")
+
+-- An occupied landing is still attempted because the native route selected
+-- the window. Completion must release the bump and briefly yield the same
+-- edge so the engine can route around the obstruction.
+PNC.TraversalQuery.CanTraverseAt = function() return false end
+position.x, position.y, position.z = 0.5, 0.23, 0
+state = {}
+handled, reason = Controller.TryNativePassage(
+    { id = "blocked-window-npc" }, body, state,
+    { x = 3.5, y = 0.5, z = 0 }, 7000)
+T.truthy(handled, "blocked window was not attempted")
+handled, reason = Controller.UpdateWindowSmash(body, state, 8050)
+T.truthy(handled, "blocked window was not repaired")
+T.equal(reason, "native_window_landing_repaired",
+    "blocked window did not report a repaired landing")
+T.equal(state.passageAction, nil,
+    "blocked window repair did not clear the passage action")
+T.equal(state.windowRetryObject, window,
+    "blocked window repair did not defer the same edge")
+handled, reason = Controller.TryNativePassage(
+    { id = "blocked-window-npc" }, body, state,
+    { x = 3.5, y = 0.5, z = 0 }, 8100)
+T.falsy(handled, "blocked window was retried during its repair backoff")
+PNC.TraversalQuery.CanTraverseAt = function() return true end
 
 T.finish("pnc_client_native_fence_passage_smoke")

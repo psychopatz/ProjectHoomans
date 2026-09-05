@@ -45,6 +45,9 @@ function Network.BuildRosterSnapshot(record, includeTravelRoute)
             Parts.BuildOrganizationalFactionSummary(record),
         worldDiscovery = Parts.BuildWorldDiscoverySummary(record),
         presenceState = record.presenceState,
+        presenceRevision = record.presenceRevision,
+        replicaSequence = record.runtime
+            and record.runtime.replicaSequence or nil,
         zombieTargetable = Settings
             and Settings.CanZombieTargetRecord
             and Settings.CanZombieTargetRecord(record)

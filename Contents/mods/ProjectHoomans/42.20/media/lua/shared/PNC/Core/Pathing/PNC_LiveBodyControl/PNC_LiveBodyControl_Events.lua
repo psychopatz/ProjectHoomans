@@ -132,6 +132,10 @@ function LiveBodyControl.ScanLoadedManagedBodies(source)
 end
 
 function LiveBodyControl.OnZombieUpdate(zombie)
+    local record
+    local navigation
+    local now
+    local animation = PNC.Animation
     if not LiveBodyControl.EnforceManagedSafety(
         zombie,
         "zombie_update"
@@ -156,7 +160,7 @@ function LiveBodyControl.OnZombieUpdate(zombie)
         and PNC.EnginePathPlanner
         and PNC.EnginePathPlanner.PumpFrame
     then
-        local record = PNC.Registry.FindRecordByZombie(zombie)
+        record = PNC.Registry.FindRecordByZombie(zombie)
         if record then
             if Diagnostics
                 and record.presenceState == PNC.Const.PRESENCE_ABSTRACT
@@ -164,6 +168,26 @@ function LiveBodyControl.OnZombieUpdate(zombie)
                 Diagnostics.Increment("LiveAbstract.AbstractBodyUpdates")
             end
             PNC.EnginePathPlanner.PumpFrame(record, zombie)
+            navigation = record.runtime and record.runtime.localNavigation
+                or nil
+            now = Core.Now and Core.Now() or 0
+            if navigation
+                and navigation.controllerMode == "behavior2_move"
+                and navigation.nativeActive == true
+                and animation
+                and animation.SyncLocomotion
+                and (
+                    navigation.lastNativeLocomotionSyncAt == nil
+                    or now - navigation.lastNativeLocomotionSyncAt >= 100
+                )
+            then
+                -- Native Behavior2 is advanced here in single-player, so its
+                -- locomotion presentation must be synchronized here as well.
+                -- The scheduler is deliberately not allowed to write Walk/Idle
+                -- between these frames.
+                navigation.lastNativeLocomotionSyncAt = now
+                animation.SyncLocomotion(zombie, record)
+            end
         end
     end
 end

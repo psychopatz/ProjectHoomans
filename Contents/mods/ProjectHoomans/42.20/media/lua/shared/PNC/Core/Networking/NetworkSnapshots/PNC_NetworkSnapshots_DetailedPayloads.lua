@@ -199,6 +199,8 @@ function Network.BuildSnapshot(record)
             boardedAt = vehiclePassenger.boardedAt,
         } or nil,
         presenceRevision = record.presenceRevision,
+        replicaSequence = record.runtime
+            and record.runtime.replicaSequence or nil,
         liveBodyInstanceID = record.liveBodyInstanceID,
         liveBodyOnlineID = record.liveBodyOnlineID,
         liveBodyLease = record.runtime and record.runtime.bodyLease or nil,

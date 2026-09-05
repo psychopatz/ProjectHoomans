@@ -5,6 +5,41 @@ local Const = PNC.Const
 local Registry = PNC.Registry
 local PathService = PNC.PathService
 local ZombieAggro = PNC.ZombieAggro
+local Diagnostics = PNC.PerformanceScalingDiagnostics
+
+local function logFollowerTransition(record, fromState, toState, reason, zombie)
+    local orderKind
+    if not Diagnostics
+        or not Diagnostics.IsFollowerPresenceAuditEnabled
+        or Diagnostics.IsFollowerPresenceAuditEnabled() ~= true
+        or not Diagnostics.LogFollowerPresence
+    then
+        return
+    end
+    orderKind = record.orderSpec and record.orderSpec.kind or nil
+    if tostring(orderKind or "") ~= tostring(Const.ORDER_FOLLOW or "follow") then
+        return
+    end
+    Diagnostics.LogFollowerPresence("presence_transition", {
+        "npc=" .. tostring(record.id),
+        "name=" .. tostring(record.name or "nil"),
+        "authority=server",
+        "from=" .. tostring(fromState),
+        "to=" .. tostring(toState),
+        "reason=" .. tostring(reason or "unknown"),
+        "order=" .. tostring(orderKind),
+        "owner=" .. tostring(record.ownerUsername or "nil"),
+        "ownerOnlineID=" .. tostring(record.ownerOnlineID or "nil"),
+        "position=" .. tostring(record.x) .. "," .. tostring(record.y)
+            .. "," .. tostring(record.z),
+        "nearestDistSq=" .. tostring(record.runtime
+            and record.runtime.nearestPlayerDistSq or "nil"),
+        "bodyPresent=" .. tostring(zombie ~= nil),
+        "bodyLease=" .. tostring(record.runtime
+            and record.runtime.bodyLease or "nil"),
+        "presenceRevision=" .. tostring(record.presenceRevision or "nil"),
+    })
+end
 
 local function worldAgeHours()
     return getGameTime and getGameTime()
@@ -103,6 +138,20 @@ function Presence.Abstract(record, reason)
     then
         return false
     end
+    -- Capture the exact follow/combat state before live runtime is cleared.
+    -- The server-side service stores only one compact pending marker; all
+    -- player-facing delivery waits for the reusable social meeting gate.
+    if tostring(reason or "") == "range_exit"
+        and PNC.FollowerAbandonment
+        and PNC.FollowerAbandonment.CaptureAtRangeExit
+    then
+        pcall(
+            PNC.FollowerAbandonment.CaptureAtRangeExit,
+            record,
+            zombie,
+            worldAgeHours()
+        )
+    end
     notifyAbstraction(record, reason)
     clearLiveRuntime(record)
     if zombie then
@@ -118,6 +167,13 @@ function Presence.Abstract(record, reason)
         )
     end
     record.presenceState = Const.PRESENCE_ABSTRACT
+    logFollowerTransition(
+        record,
+        Const.PRESENCE_LIVE,
+        Const.PRESENCE_ABSTRACT,
+        reason,
+        zombie
+    )
     if net and net.BroadcastRemoval then
         net.BroadcastRemoval(record.id, reason or "abstract")
     end

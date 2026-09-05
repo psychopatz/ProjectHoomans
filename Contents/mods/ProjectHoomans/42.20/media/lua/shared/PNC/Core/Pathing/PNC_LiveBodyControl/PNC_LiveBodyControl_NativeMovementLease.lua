@@ -8,6 +8,14 @@ local Core = PNC.Core
 local LEASE_KEY = "PNC_NativeMovementLease"
 local LEASE_UNTIL_KEY = "PNC_NativeMovementLeaseUntil"
 
+-- Compatibility hook retained for callers from the earlier remote-carrier
+-- experiment. IsoZombie.lastRemoteUpdate is a Java field, but assigning it
+-- from Kahlua is not a supported bridge and raises an MP runtime error. The
+-- carrier lifecycle must be maintained through supported body leases instead.
+function LiveBodyControl.RefreshNativeRemoteHeartbeat(zombie)
+    return false
+end
+
 function LiveBodyControl.IsMultiplayer()
     local world = getWorld and getWorld() or nil
     local gameMode = world and world.getGameMode

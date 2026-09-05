@@ -117,6 +117,8 @@ function Network.BuildPresenceDelta(record)
         encumbranceLevel = staminaInfo.encumbranceLevel,
         encumbranceRatio = staminaInfo.encumbranceRatio,
         presenceRevision = record.presenceRevision,
+        replicaSequence = record.runtime
+            and record.runtime.replicaSequence or nil,
         liveBodyInstanceID = record.liveBodyInstanceID,
         liveBodyOnlineID = record.liveBodyOnlineID,
         liveBodyLease = record.runtime and record.runtime.bodyLease or nil,

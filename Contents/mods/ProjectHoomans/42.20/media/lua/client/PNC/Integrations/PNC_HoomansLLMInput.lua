@@ -23,6 +23,7 @@ local INLINE_MODE_NEAREST = "nearest"
 local INLINE_MODE_NEARBY = "nearby"
 local INLINE_SCOPE_COLONISTS = "colonists"
 local INLINE_SCOPE_OTHER = "other"
+local INLINE_SCOPE_SOCIAL = "social"
 local INLINE_HIGHLIGHT_COLOR = {
     r = 0.0,
     g = 1.0,
@@ -42,6 +43,7 @@ local INLINE_MODE_BUTTONS = {
             key = "llm.mode.nearest",
             fallback = "NEAREST NPC",
         },
+        image = "media/ui/MP/mp_ui_emptyServer.png",
     },
     {
         id = INLINE_MODE_NEARBY,
@@ -50,6 +52,7 @@ local INLINE_MODE_BUTTONS = {
             key = "llm.mode.nearby",
             fallback = "NEARBY NPCS",
         },
+        image = "media/ui/MP/mp_ui_playerCount.png",
     },
 }
 local INLINE_SCOPE_TOGGLE = {
@@ -70,6 +73,23 @@ local function label(key, fallback)
         domain = "pnc.system.shared.categories",
         fallback = fallback,
     }, fallback)
+end
+
+local function logSubmitRejection(view, reason)
+    if not print then return end
+    local spec = view and view.spec or {}
+    local interactive = view and view.isConversationInteractive
+        and view:isConversationInteractive() == true
+        or false
+    local pending = Integration.GetPending
+        and Integration.GetPending() ~= nil or false
+    print(
+        "[PNC][LLM] chat_submit_rejected "
+            .. "npc=" .. tostring(spec.npcID or "unknown")
+            .. " reason=" .. tostring(reason or "rejected")
+            .. " interactive=" .. tostring(interactive)
+            .. " pending=" .. tostring(pending)
+    )
 end
 
 local function stateFor(view)
@@ -284,6 +304,11 @@ end
 
 local function closePart(part)
     if not part then return end
+    if part.blurInput then
+        part:blurInput()
+    elseif part.entry and part.entry.unfocus then
+        part.entry:unfocus()
+    end
     if part.setVisible then part:setVisible(false) end
     if part.removeFromUIManager then part:removeFromUIManager() end
 end
@@ -450,6 +475,24 @@ local function resolveInlineRecipients(player)
         Inline.scope
     )
     if not resolved then return nil end
+    -- The closed key entry point cannot be switched to OTHER NPCS until it
+    -- has opened once.  In multiplayer the nearby NPC is commonly a
+    -- replicated social target rather than a player-owned companion, so fall
+    -- through to the resolver's social scope when the companion scope is
+    -- empty.  Keep Inline.scope as the user's requested scope so the existing
+    -- colonist/other toggle remains stable after the window opens.
+    if not resolved.target
+        and Inline.scope == INLINE_SCOPE_COLONISTS
+        and Targets.SCOPE_SOCIAL
+    then
+        local social = Targets.ResolveRecipients(
+            player,
+            Inline.mode,
+            nil,
+            INLINE_SCOPE_SOCIAL
+        )
+        if social and social.target then resolved = social end
+    end
     local primary = resolved.target
     if Inline.targetID then
         local candidates = resolved.targets
@@ -482,8 +525,13 @@ local function resolveInlineRecipients(player)
     return {
         primary = primary,
         targets = resolved.targets,
+        scope = resolved.scope,
     }
 end
+
+-- Kept public for diagnostics and focused tests. The keybind and mode/scope
+-- controls all use this same recipient path.
+Integration.ResolveInlineRecipients = resolveInlineRecipients
 
 local function buildInlineHost(entry, player)
     if not Conversation.BuildDefinition
@@ -495,9 +543,33 @@ local function buildInlineHost(entry, player)
     definition.context = definition.context or {}
     definition.context.nameplateConversation = true
     local host = PsychopatzCore.Conversation.CreateHeadless(definition)
-    if not host or host.lifecycleError then return nil end
+    if not host then
+        if print then
+            print("[PNC][LLM] inline_host_failed reason=create_headless")
+        end
+        return nil
+    end
+    if host.lifecycleError then
+        if print then
+            print(
+                "[PNC][LLM] inline_host_failed reason=lifecycle "
+                    .. tostring(host.lifecycleError)
+            )
+        end
+        return nil
+    end
     host.hoomansLLM = true
     return host
+end
+
+local function refreshInlineHostContext(host, entry, player)
+    if not host or not host.spec then return end
+    local context = host.spec.context or {}
+    context.entry = entry
+    context.player = player
+    context.nameplateConversation = true
+    host.spec.context = context
+    host.spec.character = entry and entry.zombie or nil
 end
 
 local function rebuildInlineHosts(player, resolved)
@@ -532,6 +604,7 @@ local function rebuildInlineHosts(player, resolved)
             end
             return false
         end
+        refreshInlineHostContext(host, entry, player)
         oldHosts[id] = nil
         entries[#entries + 1] = entry
         newHosts[#newHosts + 1] = host
@@ -610,6 +683,8 @@ function Integration.SubmitInline(view, value, part)
     local accepted, reason = Integration.Submit(view, value, part)
     if accepted == true then
         Integration.CloseInline("message_submitted")
+    else
+        logSubmitRejection(view, reason)
     end
     return accepted, reason
 end
@@ -629,13 +704,8 @@ function Integration.OpenInline(binding)
     Inline.scope = Targets.NormalizeScope(
         Inline.scope or INLINE_SCOPE_COLONISTS
     )
-    local resolved = Targets.ResolveRecipients(
-        player,
-        Inline.mode,
-        nil,
-        Inline.scope
-    )
-    local candidate = resolved and resolved.target
+    local resolved = resolveInlineRecipients(player)
+    local candidate = resolved and resolved.primary
     if not candidate then return false end
     if Inline.part and tostring(Inline.targetID) == tostring(candidate.id)
         and Inline.mode == (Inline.part.inputMode or Inline.mode)
@@ -730,13 +800,13 @@ local function closeOnEscape(key)
     end
 end
 
-if Keybinds and Keybinds.RegisterLongPress then
-    Keybinds.RegisterLongPress({
+if Keybinds and Keybinds.RegisterPress then
+    Keybinds.RegisterPress({
         id = "ProjectHoomans.LLMChat",
-        label = "UI_PNC_HoomansLLM_LongPressKey",
-        tooltip = "UI_PNC_HoomansLLM_LongPressTooltip",
-        defaultKey = getKeyCode and getKeyCode("T") or 20,
-        longPressMs = 600,
+        label = "UI_PNC_HoomansLLM_TalkKey",
+        tooltip = "UI_PNC_HoomansLLM_TalkTooltip",
+        defaultKey = getKeyCode and (tonumber(getKeyCode("V")) or 47)
+            or 47,
         isEnabled = function()
             return Integration.IsBridgeEnabled
                 and Integration.IsBridgeEnabled()

@@ -14,6 +14,9 @@ local spottedCalls = 0
 local aggroCalls = 0
 local faced = 0
 local noLunge
+local targetSeenTime
+local aggroCleared = 0
+local stateChanges = 0
 local managed = false
 local playerIsTarget = false
 
@@ -46,6 +49,7 @@ local zombie = {
     getX = function(self) return self.x end,
     getY = function(self) return self.y end,
     getZ = function(self) return self.z end,
+    getOnlineID = function() return 17 end,
     getActionStateName = function(self)
         return self.actionState
     end,
@@ -71,6 +75,12 @@ local zombie = {
     setTarget = function(_, value)
         target = value
     end,
+    setTargetSeenTime = function(_, value)
+        targetSeenTime = value
+    end,
+    clearAggroList = function()
+        aggroCleared = aggroCleared + 1
+    end,
     getAttackedBy = function() return attackedBy end,
     setAttackedBy = function(_, value)
         attackedBy = value
@@ -94,6 +104,10 @@ local zombie = {
     setNoTeeth = function() end,
     setVariable = function(_, key, value)
         if key == "NoLungeAttack" then noLunge = value end
+    end,
+    changeState = function(self, value)
+        stateChanges = stateChanges + 1
+        self.actionState = value and value.name or "idle"
     end,
 }
 
@@ -141,6 +155,12 @@ Events = {
         Add = function(handler) registered = handler end,
         Remove = function() end,
     },
+}
+
+ZombieIdleState = {
+    instance = function()
+        return { name = "idle" }
+    end,
 }
 
 T.load(FILE)
@@ -194,6 +214,47 @@ now = 2400
 registered(zombie)
 T.truthy(pathRequests == 1,
     "managed NPC body entered vanilla zombie aggro control")
+
+-- A client-side native bite is not a PNC bite transaction. It must be
+-- released unless the server's replicated bite command has already arrived.
+managed = false
+zombie.actionState = "attack"
+target = npcBody
+attackedBy = npcBody
+targetSeenTime = 22
+now = 2800
+registered(zombie)
+T.truthy(target == nil and attackedBy == nil,
+    "unowned native attack retained the managed NPC target")
+T.equal(targetSeenTime, 0,
+    "unowned native attack retained target memory")
+T.truthy(aggroCleared > 0 and stateChanges > 0,
+    "unowned native attack was not returned to idle")
+
+-- Once the server bite command has arrived, the native attack state belongs
+-- to the replicated PNC presentation and must not be escaped by the aggro
+-- controller.
+PNC.Client = {
+    BiteReplicas = {
+        ["17"] = {
+            phase = "windup",
+            localReleaseAt = now + 500,
+        },
+    },
+}
+zombie.actionState = "attack-network"
+target = npcBody
+attackedBy = npcBody
+targetSeenTime = 31
+local changesBeforeReplica = stateChanges
+now = 2850
+registered(zombie)
+T.truthy(target == npcBody and attackedBy == npcBody,
+    "active replicated bite was incorrectly released")
+T.equal(targetSeenTime, 31,
+    "active replicated bite target memory was cleared")
+T.equal(stateChanges, changesBeforeReplica,
+    "active replicated bite was incorrectly returned to idle")
 
 local serverSource = T.read(
     "ProjectHoomans", "shared", "PNC/Core/Zombies/PNC_ZombieAggro_Update.lua"

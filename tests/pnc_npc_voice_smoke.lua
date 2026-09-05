@@ -26,7 +26,7 @@ local emitter = {
 }
 
 local positionalEmitter = {
-    playSoundImpl = function(_, alias)
+    playSound = function(_, alias)
         calls.positionedAlias = alias
         return 77
     end,

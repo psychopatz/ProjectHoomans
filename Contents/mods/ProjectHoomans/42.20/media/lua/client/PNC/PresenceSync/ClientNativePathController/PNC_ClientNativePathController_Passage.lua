@@ -26,6 +26,10 @@ local logState = Controller.LogState
 local describeBody = Controller.DescribeBody
 local STALL_TIMEOUT_MS = Controller.STALL_TIMEOUT_MS
 local RETRY_BASE_MS = Controller.RETRY_BASE_MS
+local PASSAGE_PROBE_COOLDOWN_MS =
+    Controller.PASSAGE_PROBE_COOLDOWN_MS or 250
+local PASSAGE_STALL_PROBE_MS =
+    Controller.PASSAGE_STALL_PROBE_MS or 750
 local WINDOW_SMASH_IMPACT_MS =
     Controller.WINDOW_SMASH_IMPACT_MS
 local WINDOW_SMASH_FINISH_MS =
@@ -109,6 +113,33 @@ end
 local function objectBool(object, methodName)
     local method = object and object[methodName] or nil
     return type(method) == "function" and method(object) == true
+end
+
+local function bodyMethodTrue(body, methodName)
+    local method = body and body[methodName] or nil
+    if type(method) == "function" then
+        return method(body) == true
+    end
+    return method == true
+end
+
+local function shouldProbePassage(body, state, now)
+    local nextProbeAt = tonumber(state and state.nextPassageProbeAt) or 0
+    local lastProgressAt = tonumber(state and state.lastProgressAt) or now
+    local newRequest = not state or state.requestKey == nil
+    local collided = bodyMethodTrue(body, "isCollidedWithDoor")
+        or bodyMethodTrue(body, "isCollidedThisFrame")
+        or bodyMethodTrue(body, "isCollided")
+    local stalled = state
+        and state.owned == true
+        and now - lastProgressAt >= PASSAGE_STALL_PROBE_MS
+    if now < nextProbeAt
+        or (not collided and not stalled and not newRequest)
+    then
+        return false
+    end
+    state.nextPassageProbeAt = now + PASSAGE_PROBE_COOLDOWN_MS
+    return true
 end
 
 local function actionStateName(body)
@@ -216,6 +247,77 @@ local function updateWindowSmash(body, state, now)
     if body.faceThisObject and action.object then
         body:faceThisObject(action.object)
     end
+    if action.kind == "window_climb" then
+        local phase
+        local progress
+        local landingBlocked = false
+        local observedPhase = traversalPhase(body)
+        phase, progress = TraversalAction.Evaluate(
+            action,
+            now,
+            observedPhase
+        )
+        action.phase = phase
+        local x = action.fromX + (action.toX - action.fromX) * progress
+        local y = action.fromY + (action.toY - action.fromY) * progress
+        if LiveBodyControl and LiveBodyControl.SetAuthoritativePosition then
+            LiveBodyControl.SetAuthoritativePosition(body, x, y, action.toZ)
+        end
+        if body.setLx then body:setLx(x) end
+        if body.setLy then body:setLy(y) end
+        if progress < 1
+            or (not bumpFinished(body)
+                and traversalPhase(body) ~= "finished"
+                and now < action.finishAt)
+        then
+            beginMovementLease(body, state, action.key, now)
+            state.lastProgressAt = now
+            return true, "native_window_climb"
+        end
+        if action.toSquare
+            and TraversalQuery
+            and TraversalQuery.CanTraverseAt
+        then
+            landingBlocked = not TraversalQuery.CanTraverseAt(
+                action.toSquare:getX() + 0.5,
+                action.toSquare:getY() + 0.5,
+                action.toSquare:getZ()
+            )
+        end
+        finishPassageBump(body)
+        state.passageAction = nil
+        state.requestKey = nil
+        state.failed = true
+        state.retryAt = now + RETRY_BASE_MS
+        if landingBlocked then
+            state.windowRetryObject = action.object
+            state.windowRetryAt = state.retryAt
+            if state.windowRepairLoggedObject ~= action.object
+                and Core
+                and Core.LogWarn
+            then
+                Core.LogWarn(
+                    "[PNC][PATH] native_window_landing_repaired npc="
+                        .. tostring(
+                            state.snapshot and state.snapshot.id or "nil"
+                        )
+                        .. " "
+                        .. describeBody(body)
+                )
+                state.windowRepairLoggedObject = action.object
+            end
+            logState(
+                state.snapshot,
+                "native_window_landing_repaired",
+                describeBody(body)
+            )
+            return true, "native_window_landing_repaired"
+        end
+        if state.windowRepairLoggedObject == action.object then
+            state.windowRepairLoggedObject = nil
+        end
+        return true, "native_window_crossed"
+    end
     if action.kind == "fence_climb" then
         local phase
         local observedPhase
@@ -320,6 +422,13 @@ end
 
 local function enterVanillaFenceState(body, direction)
     local result
+    if Core and Core.IsManagedNPCBody
+        and Core.IsManagedNPCBody(body)
+    then
+        -- Managed NPC carriers are IsoZombie instances without player
+        -- BodyDamage. Never enter the vanilla fence state machine for them.
+        return false
+    end
     if body and body.climbOverFence then
         result = body:climbOverFence(direction)
         if result ~= false then
@@ -604,40 +713,121 @@ local function startWindowSmash(
     return true, "native_window_smash"
 end
 
-local function forceWindowClimb(
+local function resolveWindowDestination(body, object, passage)
+    local actorSquare = body and body.getSquare
+        and body:getSquare() or nil
+    local destination = passage and passage.toSquare or nil
+    local objectSquare
+    local oppositeSquare
+    if destination then return destination end
+    if PathInternal and PathInternal.passageWindowDestination then
+        return PathInternal.passageWindowDestination(object, actorSquare)
+    end
+    objectSquare = object and object.getSquare and object:getSquare() or nil
+    oppositeSquare = object and object.getOppositeSquare
+        and object:getOppositeSquare() or nil
+    if actorSquare and objectSquare
+        and actorSquare:getX() == objectSquare:getX()
+        and actorSquare:getY() == objectSquare:getY()
+        and actorSquare:getZ() == objectSquare:getZ()
+    then
+        return oppositeSquare
+    end
+    if actorSquare and oppositeSquare
+        and actorSquare:getX() == oppositeSquare:getX()
+        and actorSquare:getY() == oppositeSquare:getY()
+        and actorSquare:getZ() == oppositeSquare:getZ()
+    then
+        return objectSquare
+    end
+    return nil
+end
+
+local function startWindowClimb(
     snapshot,
     body,
     state,
     object,
+    passage,
     now
 )
-    if not ClimbThroughWindowState
-        or not ClimbThroughWindowState.instance
-        or not body.changeState
-    then
-        return false, nil
+    local destination = resolveWindowDestination(body, object, passage)
+    local profile
+    local travelDuration
+    local finishHold
+    local finishAt
+    local key
+    if not destination then
+        return false, "native_window_destination_unavailable"
     end
-    local climbState = ClimbThroughWindowState.instance()
-    if not climbState or not climbState.setParams then
-        return false, nil
-    end
+    profile = TraversalProfiles
+        and TraversalProfiles.Resolve
+        and TraversalProfiles.Resolve(
+            "window_climb",
+            {
+                body = body,
+                snapshot = snapshot,
+                state = state,
+                obstacle = object,
+            },
+            "default"
+        ) or {}
+    travelDuration = math.max(
+        250,
+        tonumber(profile.travelDurationMs) or 700
+    )
+    finishHold = math.max(120, tonumber(profile.finishHoldMs) or 320)
+    finishAt = now + travelDuration + math.min(finishHold, 320)
     clearOwnedPath(body, state)
-    climbState:setParams(body, object)
-    body:changeState(climbState)
-    if body.setBumpType then
-        body:setBumpType("ClimbWindow")
+    -- Vanilla ClimbThroughWindowState assumes a player BodyDamage object and
+    -- can throw while entering or finishing on an IsoZombie carrier. Use the
+    -- same PNC-owned bump/position contract as fence traversal instead.
+    if LiveBodyControl and LiveBodyControl.SuppressZombieState then
+        LiveBodyControl.SuppressZombieState(body, state, now)
     end
-    state.forcedTraversalUntil = now + STALL_TIMEOUT_MS
-    state.forcedTraversalState = "climbwindow"
+    key = "window_climb:"
+        .. tostring(snapshot and snapshot.id or "npc")
+        .. ":" .. tostring(now)
+    state.passageAction = {
+        kind = "window_climb",
+        key = key,
+        object = object,
+        fromSquare = body.getSquare and body:getSquare() or nil,
+        toSquare = destination,
+        startedAt = now,
+        phase = "single",
+        travelDurationMs = travelDuration,
+        finishHoldMs = finishHold,
+        finishAt = finishAt,
+        fromX = body:getX(),
+        fromY = body:getY(),
+        fromZ = body:getZ(),
+        toX = destination:getX() + 0.5,
+        toY = destination:getY() + 0.5,
+        toZ = destination:getZ(),
+    }
+    if body.faceThisObject then body:faceThisObject(object) end
+    if Animation and Animation.PlayBump then
+        Animation.PlayBump(
+            body,
+            snapshot,
+            profile.anim or "PNC_ClimbWindow",
+            {
+                sceneId = "native_window_climb",
+                leaseUntil = finishAt,
+                keepManagedUseless = true,
+            }
+        )
+    elseif body.setBumpType then
+        body:setBumpType(profile.anim or "PNC_ClimbWindow")
+    end
+    beginMovementLease(body, state, key, now)
+    state.lastProgressAt = now
+    state.forcedTraversalUntil = nil
+    state.forcedTraversalState = nil
     state.forcedTraversalAction = nil
     state.requestKey = nil
-    beginMovementLease(
-        body,
-        state,
-        "window_climb:" .. tostring(now),
-        now
-    )
-    logState(snapshot, "native_window_climb_forced", describeBody(body))
+    logState(snapshot, "native_window_climb_start", describeBody(body))
     return true, "native_window_climb"
 end
 
@@ -662,6 +852,13 @@ local function tryNativePassage(
     )
     local object = passage and passage.object or nil
     if not object then return false, nil end
+    if state.windowRetryObject == object then
+        if now < (tonumber(state.windowRetryAt) or 0) then
+            return false, nil
+        end
+        state.windowRetryObject = nil
+        state.windowRetryAt = nil
+    end
     if TraversalQuery.IsFence
         and TraversalQuery.IsFence(object) == true
     then
@@ -727,21 +924,23 @@ local function tryNativePassage(
             now
         )
     end
-    if object.canClimbThrough
-        and object:canClimbThrough(body)
-    then
-        -- Never hand an equipped managed IsoZombie back to vanilla between
-        -- detecting a climbable window and entering the climb state. In B42
-        -- multiplayer, IsoGameCharacter.climbThroughWindow() calls
-        -- dropHeavyItems(), which emits player-only packets and casts this
-        -- locally controlled IsoZombie to IsoPlayer. Entering the already
-        -- parameterized state directly preserves the native climb animation
-        -- without invoking that unsafe packet path.
-        return forceWindowClimb(
+    local canClimb = false
+    if TraversalQuery.CanUseWindow then
+        canClimb = TraversalQuery.CanUseWindow(object, body) == true
+    elseif object.canClimbThrough then
+        canClimb = object:canClimbThrough(body) == true
+    end
+    if canClimb then
+        -- Never hand an equipped managed IsoZombie to vanilla window state.
+        -- The native state assumes player BodyDamage and was the source of
+        -- the transient zombie animation/freeze and ClimbThroughWindowState
+        -- failures seen during multiplayer traversal.
+        return startWindowClimb(
             snapshot,
             body,
             state,
             object,
+            passage,
             now
         )
     end
@@ -753,3 +952,4 @@ Controller.FinishPassageBump = finishPassageBump
 Controller.UpdateWindowSmash = updateWindowSmash
 Controller.UpdateVanillaFenceClimb = updateVanillaFenceClimb
 Controller.TryNativePassage = tryNativePassage
+Controller.ShouldProbePassage = shouldProbePassage

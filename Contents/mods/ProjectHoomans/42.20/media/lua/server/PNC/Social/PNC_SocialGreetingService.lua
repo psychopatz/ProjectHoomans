@@ -23,6 +23,12 @@ local Interactions = PNC.VanillaEmoteInteractions
 local Relationships = PNC.Relationships
 local Presentation = PNC.RelationshipPresentation
 local Network = PNC.Network
+local Meeting = PNC.SocialMeeting
+if not Meeting then
+    pcall(require, "PNC/Social/PNC_SocialMeetingService")
+    Meeting = PNC.SocialMeeting
+end
+local bodyPosition = Meeting and Meeting.GetBodyPosition
 
 Service.PUMP_INTERVAL_HOURS = 1 / 3600
 Service.GREETING_RADIUS = 10
@@ -83,16 +89,9 @@ local function liveBody(id)
     return body
 end
 
-local function bodyPosition(body, record)
-    local x = body and body.getX and tonumber(body:getX())
-        or tonumber(record and record.x)
-    local y = body and body.getY and tonumber(body:getY())
-        or tonumber(record and record.y)
-    local z = body and body.getZ and tonumber(body:getZ())
-        or tonumber(record and record.z)
-    if x == nil or y == nil or z == nil then return nil end
-    return x, y, z
-end
+-- Compatibility façade for older callers. New player-approach systems should
+-- use PNC.SocialMeeting directly.
+Service.CanPlayerMeetNPC = Meeting and Meeting.CanPlayerMeetNPC
 
 local function relationshipSummary(value, exists, npcID)
     local summary
@@ -151,6 +150,8 @@ local function nearbyTargets(player)
     local pz = player and player.getZ and tonumber(player:getZ()) or nil
     local radius = Service.RESET_RADIUS
     local radiusSq = radius * radius
+    local meetingRadiusSq = Service.GREETING_RADIUS
+        * Service.GREETING_RADIUS
     local function add(record, id)
         local body
         local x
@@ -158,6 +159,9 @@ local function nearbyTargets(player)
         local z
         local dx
         local dy
+        local distSq
+        local meetingEligible
+        local meetingReason
         id = tostring(id or record and record.id or "")
         if id == "" or seen[id] or not record then return end
         body = liveBody(id)
@@ -167,8 +171,18 @@ local function nearbyTargets(player)
         if math.floor(z) ~= math.floor(pz or 0) then return end
         dx = x - px
         dy = y - py
-        if dx * dx + dy * dy <= radiusSq then
+        distSq = dx * dx + dy * dy
+        if distSq <= radiusSq then
             seen[id] = true
+            if distSq <= meetingRadiusSq then
+                meetingEligible, meetingReason =
+                    Meeting.CanPlayerMeetNPC(
+                        player,
+                        record,
+                        body,
+                        Service.GREETING_RADIUS
+                    )
+            end
             output[#output + 1] = {
                 id = id,
                 record = record,
@@ -176,7 +190,9 @@ local function nearbyTargets(player)
                 x = x,
                 y = y,
                 z = z,
-                distSq = dx * dx + dy * dy,
+                distSq = distSq,
+                meetingEligible = meetingEligible == true,
+                meetingReason = meetingReason,
             }
         end
     end
@@ -231,11 +247,24 @@ function Service.TryGreet(player, target, at, actorKey)
     local delta
     local greetingState
     local flavorID
+    local meetingOK
+    local meetingReason
     if npcID == "" or not record or not player then
         return false, "invalid_target"
     end
     if player.isDead and player:isDead() then
         return false, "player_unavailable"
+    end
+    if target.meetingEligible == false then
+        return false, target.meetingReason or "not_meeting"
+    elseif target.meetingEligible ~= true then
+        meetingOK, meetingReason = Meeting.CanPlayerMeetNPC(
+            player,
+            record,
+            target.body,
+            Service.GREETING_RADIUS
+        )
+        if not meetingOK then return false, meetingReason end
     end
     actorKey = tostring(actorKey or playerKey(player))
     at = worldAgeHours(at)
@@ -380,27 +409,51 @@ function Service.Pump(occurredAt)
         local seen = {}
         local attempts = 0
         for _, target in ipairs(targets) do
-            local inside = target.distSq <= Service.GREETING_RADIUS
-                * Service.GREETING_RADIUS
+            local inside = target.meetingEligible == true
+            local abandonmentDelivered = false
             seen[target.id] = true
             if not inside then
-                if target.distSq > Service.RESET_RADIUS
+                if target.meetingReason == "not_visible"
+                    or target.distSq > Service.RESET_RADIUS
                     * Service.RESET_RADIUS
                 then
                     state.inside[target.id] = false
                 end
-            elseif state.inside[target.id] ~= true then
-                if attempts < Service.MAX_GREETING_EVENTS_PER_PLAYER then
+            else
+                -- Pending abandonment flavor is independent of the daily
+                -- greeting edge and its per-player chorus budget.
+                local abandonment = PNC.FollowerAbandonment
+                if abandonment
+                    and abandonment.HasPending
+                    and abandonment.HasPending(target.record)
+                    and abandonment.TryDeliver
+                then
+                    abandonmentDelivered = abandonment.TryDeliver(
+                        player,
+                        target.record,
+                        target.body,
+                        now,
+                        target
+                    )
+                end
+                if abandonmentDelivered == true then
+                    -- The return complaint owns this meeting edge; do not
+                    -- stack a normal daily greeting on the same reunion.
                     state.inside[target.id] = true
-                    local ok = Service.TryGreet(player, target, now, key)
-                    if ok then
-                        emitted = emitted + 1
-                        attempts = attempts + 1
+                elseif state.inside[target.id] ~= true then
+                    if attempts < Service.MAX_GREETING_EVENTS_PER_PLAYER then
+                        state.inside[target.id] = true
+                        local ok = Service.TryGreet(player, target, now, key)
+                        if ok then
+                            emitted = emitted + 1
+                            attempts = attempts + 1
+                        end
+                    else
+                        -- Leave the edge pending so a dense group is drained
+                        -- over later pumps instead of making a single-frame
+                        -- chorus.
+                        state.inside[target.id] = false
                     end
-                else
-                    -- Leave the edge pending so a dense group is drained over
-                    -- later pumps instead of making a single-frame chorus.
-                    state.inside[target.id] = false
                 end
             end
         end
@@ -414,5 +467,6 @@ end
 Internal.WorldAgeHours = worldAgeHours
 Internal.NearbyTargets = nearbyTargets
 Internal.PlayerKey = playerKey
+Internal.CanPlayerMeetNPC = Service.CanPlayerMeetNPC
 
 return Service

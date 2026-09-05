@@ -16,6 +16,8 @@ local thumpTargetClears = 0
 local onFloorWrites = 0
 local stateChanges = 0
 local authority = true
+local ragdollSimulationActive = false
+local variables = {}
 
 local friendlyPlayer = {
     getObjectName = function() return "Player" end,
@@ -36,6 +38,9 @@ local hostileZombie = {
 local modData = {}
 local body = {
     getActionStateName = function() return stateName end,
+    isRagdollSimulationActive = function()
+        return ragdollSimulationActive
+    end,
     isOnFloor = function() return onFloor end,
     isKnockedDown = function() return knockedDown end,
     isUseless = function() return useless end,
@@ -69,7 +74,7 @@ local body = {
     setReanimateTimer = function(_, value) reanimateTimer = value end,
     getReanimateTimer = function() return reanimateTimer end,
     setCanWalk = function() end,
-    setVariable = function() end,
+    setVariable = function(_, key, value) variables[key] = value end,
     setSitAgainstWall = function() end,
     setCrawler = function() end,
     setFakeDead = function() end,
@@ -166,6 +171,13 @@ T.truthy(PNC.LiveBodyControl.EnforceManagedSafety(body, "test"),
 T.equal(onFloorWrites, floorWritesBeforeSafety,
     "managed safety cleared floor state during native get-up")
 
+local floorWritesBeforeGroundedMaintenance = onFloorWrites
+PNC.LiveBodyControl.ApplyHumanizedBodyFlags(body)
+T.equal(onFloorWrites, floorWritesBeforeGroundedMaintenance,
+    "periodic body maintenance erased a landing signal")
+T.truthy(onFloor and knockedDown,
+    "periodic body maintenance cleared the grounded pose")
+
 stateName = "getup-fromonback"
 T.truthy(PNC.LiveBodyControl.TickGroundedRecovery(record, body, now + 200),
     "native get-up state released movement ownership")
@@ -201,6 +213,8 @@ T.equal(stateName, "onground",
     "hostile recovery bypassed the action context")
 T.equal(reanimateTimer, 0,
     "hostile knockdown did not trigger native get-up after timeout")
+T.equal(variables.ShouldStandUp, true,
+    "grounded recovery did not request the native stand-up transition")
 T.truthy(cancelled >= 2 and held >= 2,
     "ground recovery did not suppress combat and movement")
 
@@ -234,6 +248,29 @@ T.truthy(PNC.LiveBodyControl.ShouldKeepEngineMovementActive(record, body),
 PNC.LiveBodyControl.MaintainHumanizedBody(body, now, true, true)
 T.equal(onFloorWrites, replicaFloorWrites,
     "replica safety cleared floor state during native get-up")
+
+local ragdollStateChanges = stateChanges
+stateName = "falldown-ragdoll"
+onFloor = false
+knockedDown = true
+ragdollSimulationActive = true
+record.runtime.groundedRecovery = nil
+T.truthy(PNC.LiveBodyControl.TickGroundedRecovery(record, body, now + 100),
+    "active ragdoll was not held for physics settlement")
+T.equal(stateChanges, ragdollStateChanges,
+    "active ragdoll was forced into a grounded animation state")
+ZombieOnGroundState = {
+    instance = function() return "ground_state" end,
+}
+ragdollSimulationActive = false
+T.truthy(PNC.LiveBodyControl.TickGroundedRecovery(record, body, now + 200),
+    "settled ragdoll was not handed to native ground recovery")
+T.truthy(stateChanges > ragdollStateChanges,
+    "settled ragdoll never left the ragdoll state")
+stateName = "idle"
+onFloor = false
+knockedDown = false
+record.runtime.groundedRecovery = nil
 
 local bodyControlSource = T.read(
     "ProjectHoomans",

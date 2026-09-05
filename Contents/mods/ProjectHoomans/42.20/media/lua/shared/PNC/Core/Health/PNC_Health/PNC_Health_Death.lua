@@ -42,6 +42,7 @@ local function markDeadState(record, health, reason)
         Core.Now() + Const.RECENT_DAMAGE_SHOW_MS
     record.alive = false
     record.presenceState = Const.PRESENCE_CORPSE
+    record.followerAbandonment = nil
     record.runtime.forceLive = false
     record.runtime.target = nil
     record.runtime.attackAction = nil

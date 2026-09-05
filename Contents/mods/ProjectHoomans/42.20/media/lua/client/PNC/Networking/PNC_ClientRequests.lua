@@ -57,6 +57,8 @@ function Client.RequestPlayerBootstrap()
         (tonumber(ClientState.bootstrapRetryAttempt) or 0) + 1
     ClientState.bootstrapState = "loading"
     ClientState.activeBootstrapRequestID = args.requestID
+    ClientState.completedBootstrapRequestID = nil
+    ClientState.pendingBootstrap = nil
     return dispatchIdentity(player, Const.CMD_PLAYER_BOOTSTRAP_REQUEST,
         args, "HandleBootstrap")
 end
@@ -104,12 +106,15 @@ end
 
 local function requestFullSync()
     local player = getSpecificPlayer(0)
+    local syncID = requestID("roster")
     if not isWorldReady() then
         return
     end
     ClientState.lastFullSyncRequestAt = Core.Now()
     if player and sendClientCommand then
-        sendClientCommand(player, Const.MODULE, Const.CMD_FULL_SYNC_REQUEST, {})
+        sendClientCommand(player, Const.MODULE, Const.CMD_FULL_SYNC_REQUEST, {
+            requestID = syncID,
+        })
         Client.EnsurePlayerBootstrap(Core.Now(), false)
         if Client.RequestWorldDiscovery then
             Client.RequestWorldDiscovery("snapshot")
@@ -120,8 +125,11 @@ local function requestFullSync()
         ClientState.snapshots = {}
         PNC.Registry.ForEach(function(record)
             local snapshot = PNC.Network.BuildSnapshot(record)
-            ClientState.snapshots[snapshot.id] = snapshot
+            ClientState.snapshots[tostring(snapshot.id)] = snapshot
         end)
+        if PNC.Network.RefreshClientBodyIdentityIndex then
+            PNC.Network.RefreshClientBodyIdentityIndex()
+        end
         ClientState.lastSyncReceiveAt = Core.Now()
         if Client.EnsurePlayerBootstrap then
             Client.EnsurePlayerBootstrap(Core.Now(), false)
@@ -567,6 +575,7 @@ function Client.RequestColonyJournal(after, limit)
         after = math.max(0, math.floor(tonumber(after)
             or tonumber(state.cursor) or 0)),
         limit = math.min(32, math.max(1, math.floor(tonumber(limit) or 32))),
+        requestID = requestID("journal"),
     }
     ClientState.lastColonyJournalRequestAt = Core.Now()
     if Core.IsClientOnly and Core.IsClientOnly() then
@@ -838,13 +847,17 @@ function Client.RequestCharacterPayload(npcId)
     if not npcId then
         return false
     end
+    npcId = tostring(npcId)
     if not sendClientCommand and PNC.API and PNC.API.GetCharacterPayload then
         payload = PNC.API.GetCharacterPayload(npcId)
         if payload then
             ClientState.characterPayloads = ClientState.characterPayloads or {}
             ClientState.characterPayloads[npcId] = payload
             if payload.snapshot and payload.snapshot.id then
-                ClientState.snapshots[payload.snapshot.id] = payload.snapshot
+                ClientState.snapshots[tostring(payload.snapshot.id)] = payload.snapshot
+                if PNC.Network.RefreshClientBodyIdentityIndex then
+                    PNC.Network.RefreshClientBodyIdentityIndex()
+                end
             end
             return true
         end

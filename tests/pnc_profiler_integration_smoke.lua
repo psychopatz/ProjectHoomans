@@ -58,9 +58,11 @@ T.equal(Profiler.GetState(), nil, "OFF integration created profiler state")
 -- OFF. The server installer must treat the missing profiler object as a
 -- disabled feature instead of crashing during composition.
 PNC = { ProfilerIntegration = { Internal = {} } }
+PNC.ProfilerIntegration._loadingProviders = true
 package.loaded["PNC/Integrations/PNC_PsychopatzProfiler/PNC_PsychopatzProfiler_Server"] = nil
 local disabledServerIntegration = require
     "PNC/Integrations/PNC_PsychopatzProfiler/PNC_PsychopatzProfiler_Server"
+PNC.ProfilerIntegration._loadingProviders = nil
 T.falsy(disabledServerIntegration.InstallServer(),
     "missing profiler state was not treated as disabled")
 T.equal(disabledServerIntegration.WrapServerTick(offOriginal), offOriginal,

@@ -55,6 +55,8 @@ local record = {
     anchorZ = 0,
     activeJob = "FollowOwner",
     activeBehavior = "FollowOwner:moving",
+    orderSpec = { kind = "follow" },
+    followerAbandonment = { eventID = "pending-follow-return" },
     runtime = {
         moveIntent = { kind = "move", x = 20, y = 20 },
         pathing = { goal = { x = 20, y = 20 } },
@@ -78,6 +80,8 @@ T.truthy(record.runtime.moveIntent == nil and record.runtime.pathing == nil,
     "stale follow movement survived order change")
 T.truthy(record.runtime.target == nil and record.runtime.followState == nil,
     "stale follow/combat runtime survived order change")
+T.falsy(record.followerAbandonment,
+    "pending follow commentary was cleared at the order boundary")
 T.truthy(record.activeJob == nil and record.activeBehavior == nil,
     "old behavior remained active after order change")
 

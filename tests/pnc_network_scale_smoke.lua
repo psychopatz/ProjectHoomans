@@ -20,6 +20,7 @@ end
 
 local sent = {}
 local debugVisibleZombieEntries = {}
+local firstReplicaSequence
 sendServerCommand = function(player, module, command, payload)
     sent[#sent + 1] = { player = player, module = module, command = command, payload = payload }
 end
@@ -276,6 +277,34 @@ PNC.Registry = {
 }
 
 T.load(FILE)
+
+PNC.Network.ClientState.snapshots = {
+    live = {
+        id = "live",
+        presenceState = "live",
+        alive = true,
+        liveBodyOnlineID = 73,
+    },
+    abstract = {
+        id = "abstract",
+        presenceState = "abstract",
+        alive = true,
+        liveBodyOnlineID = 74,
+    },
+    dead = {
+        id = "dead",
+        presenceState = "live",
+        alive = false,
+        liveBodyOnlineID = 75,
+    },
+}
+local bodyIdentityIndex = PNC.Network.RefreshClientBodyIdentityIndex()
+T.equal(bodyIdentityIndex["73"], true,
+    "client body identity index includes live carrier")
+T.equal(bodyIdentityIndex["74"], nil,
+    "client body identity index excludes abstract carrier")
+T.equal(bodyIdentityIndex["75"], nil,
+    "client body identity index excludes dead carrier")
 
 nearbyRecord.ownerUsername = "player_1"
 T.equal(
@@ -700,6 +729,12 @@ sent = {}
 PNC.Network.BroadcastRecord(nearbyRecord, "tick")
 T.equal(#sent, 8, "targeted live snapshot recipient count")
 T.equal(sent[1].payload.snapshot.skillLevels, nil, "tick snapshot leaked detailed skills")
+firstReplicaSequence = sent[1].payload.snapshot.replicaSequence
+T.truthy(type(firstReplicaSequence) == "number",
+    "tick snapshot did not carry replica sequence")
+T.equal(PNC.Network.BuildRosterSnapshot(nearbyRecord).replicaSequence,
+    firstReplicaSequence,
+    "roster snapshot did not carry the current replica sequence")
 
 nearbyRecord.x = 100
 sent = {}
@@ -708,6 +743,10 @@ T.equal(#sent, 16, "interest enter/exit transition count")
 sent = {}
 PNC.Network.BroadcastRecord(nearbyRecord, "tick")
 T.equal(#sent, 8, "interest recipients did not switch")
+T.truthy(
+    sent[1].payload.snapshot.replicaSequence > firstReplicaSequence,
+    "replica sequence did not advance between server broadcasts"
+)
 
 local loopbackEvents = 0
 triggerEvent = function()

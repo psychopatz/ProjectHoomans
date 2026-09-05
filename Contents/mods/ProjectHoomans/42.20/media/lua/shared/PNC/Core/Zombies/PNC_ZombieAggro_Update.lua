@@ -57,7 +57,10 @@ end
 local function suppressForStealth(zombie, record)
     Internal.clearZombieTarget(zombie)
     ZombieAggro.ClearBiteEntryForZombie(zombie)
-    setNoLungeAttack(zombie, false)
+    -- clearZombieTarget intentionally restores the ordinary zombie default.
+    -- Stealth suppression must override that default on the same frame or a
+    -- stale native target can still lunge before the next aggro tick.
+    setNoLungeAttack(zombie, true)
     record.runtime = record.runtime or {}
     record.runtime.combatBlockReason = Stealth
         and Stealth.IsTravelStealthActive

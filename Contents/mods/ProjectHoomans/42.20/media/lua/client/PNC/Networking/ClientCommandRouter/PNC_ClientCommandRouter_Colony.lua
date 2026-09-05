@@ -3,24 +3,56 @@ local Const = PNC.Const
 local Core = PNC.Core
 local ClientState = PNC.Network.ClientState
 
+local function journalRowSequence(row)
+    return type(row) == "table" and tonumber(row[1]) or nil
+end
+
 local function applyColonyJournal(delta)
     delta = type(delta) == "table" and delta or {}
     local journal = ClientState.colonyJournal or {}
     journal.rows = journal.rows or {}
+    journal.rowSequences = journal.rowSequences or {}
     local incoming = type(delta.rows) == "table" and delta.rows or {}
-    local changed = delta.reset == true or #incoming > 0
-    if delta.reset == true then journal.rows = {} end
+    local currentCursor = tonumber(journal.cursor) or 0
+    local afterCursor = tonumber(delta.afterCursor)
+    local sequence
+    local changed = delta.reset == true
+    if afterCursor ~= nil and not delta.reset and afterCursor < currentCursor then
+        return
+    end
+    if delta.reset == true then
+        journal.rows = {}
+        journal.rowSequences = {}
+    else
+        for index = 1, #journal.rows do
+            sequence = journalRowSequence(journal.rows[index])
+            if sequence ~= nil then journal.rowSequences[sequence] = true end
+        end
+    end
     -- The server sends each batch in chronological order. Prepending each
     -- row in that order leaves the newest row at index one without sorting or
     -- copying the entire bounded history on every poll.
     for index = 1, #incoming do
-        table.insert(journal.rows, 1, incoming[index])
+        sequence = journalRowSequence(incoming[index])
+        if sequence == nil or not journal.rowSequences[sequence] then
+            table.insert(journal.rows, 1, incoming[index])
+            if sequence ~= nil then journal.rowSequences[sequence] = true end
+            changed = true
+        end
     end
     local maxRows = 128
     while #journal.rows > maxRows do table.remove(journal.rows) end
-    local cursor = tonumber(delta.nextCursor) or tonumber(journal.cursor) or 0
-    local latestSequence = tonumber(delta.latestSequence)
-        or journal.latestSequence or 0
+    journal.rowSequences = {}
+    for index = 1, #journal.rows do
+        sequence = journalRowSequence(journal.rows[index])
+        if sequence ~= nil then journal.rowSequences[sequence] = true end
+    end
+    local cursor = tonumber(delta.nextCursor) or currentCursor
+    if not delta.reset then cursor = math.max(cursor, currentCursor) end
+    local latestSequence = math.max(
+        tonumber(journal.latestSequence) or 0,
+        tonumber(delta.latestSequence) or 0
+    )
     if cursor ~= (tonumber(journal.cursor) or 0)
         or latestSequence ~= (tonumber(journal.latestSequence) or 0)
         or delta.error ~= journal.error

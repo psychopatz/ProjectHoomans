@@ -142,6 +142,16 @@ function OrderSystem.SetOrder(record, orderSpec)
     end
 
     record.orderSpec = OrderSystem.Normalize(record, orderSpec)
+    -- A return complaint belongs only to the follow order that created it.
+    -- Clear it at the durable order boundary so an NPC that is reassigned
+    -- while abstract cannot later deliver stale follow-phase commentary.
+    if previousKind == tostring(Const.ORDER_FOLLOW or "follow")
+        and tostring(record.orderSpec.kind or "")
+            ~= tostring(Const.ORDER_FOLLOW or "follow")
+        and record.followerAbandonment
+    then
+        record.followerAbandonment = nil
+    end
     if record.orderSpec.kind == Const.ORDER_FOLLOW then
         record.ownerUsername = record.orderSpec.ownerUsername
         record.ownerOnlineID = record.orderSpec.ownerOnlineID

@@ -22,6 +22,7 @@ local updateVanillaFenceClimb = Controller.UpdateVanillaFenceClimb
 local requestKey = Controller.RequestKey
 local beginMovementLease = Controller.BeginMovementLease
 local tryNativePassage = Controller.TryNativePassage
+local shouldProbePassage = Controller.ShouldProbePassage
 local submitPathRequest = Controller.SubmitPathRequest
 local rememberProgress = Controller.RememberProgress
 local distanceToGoalSquared = Controller.DistanceToGoalSquared
@@ -138,13 +139,17 @@ function Internal.UpdateNativePathController(
     end
     local passageHandled
     local passageState
-    passageHandled, passageState = tryNativePassage(
-        snapshot,
-        body,
-        state,
-        goal,
-        now
-    )
+    if shouldProbePassage
+        and shouldProbePassage(body, state, now)
+    then
+        passageHandled, passageState = tryNativePassage(
+            snapshot,
+            body,
+            state,
+            goal,
+            now
+        )
+    end
     if passageHandled then
         return true, passageState
     end

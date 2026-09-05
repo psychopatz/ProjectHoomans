@@ -3,6 +3,17 @@ PNC.EnginePathPlanner = PNC.EnginePathPlanner or {}
 PNC.EnginePathPlanner.Internal = PNC.EnginePathPlanner.Internal or {}
 
 local Internal = PNC.EnginePathPlanner.Internal
+local Diagnostics = PNC.PerformanceScalingDiagnostics
+
+local function isSeatingNavigation(navigation)
+    local record = navigation and navigation.record
+    local runtime = record and record.runtime or nil
+    return runtime and (
+        runtime.facilityActivity and runtime.facilityActivity.seating == true
+        or runtime.animationScene
+            and runtime.animationScene.id == "facility.living.sitFurniture"
+    )
+end
 
 function Internal.ClearEngineRequest(body, navigation)
     body = body or (navigation and navigation.body)
@@ -15,6 +26,22 @@ function Internal.ClearEngineRequest(body, navigation)
     local actionState = body and body.getActionStateName
         and string.lower(tostring(body:getActionStateName() or ""))
         or ""
+    if Diagnostics and Diagnostics.SeatingAuditEnabled == true
+        and isSeatingNavigation(navigation)
+        and Diagnostics.LogSeatingAudit
+    then
+        Diagnostics.LogSeatingAudit("path_clear", {
+            "npc=" .. tostring(navigation.record
+                and navigation.record.id or ""),
+            "bodyAction=" .. actionState,
+            "pathPhase=" .. tostring(navigation.record.runtime.pathing
+                and navigation.record.runtime.pathing.phase or ""),
+            "nativeActive=" .. tostring(navigation.nativeActive == true),
+            "requestPending=" .. tostring(navigation.requestPending == true),
+            "reason=" .. tostring(navigation.lastPlanReason or ""),
+            "revision=" .. tostring(navigation.requestRevision or ""),
+        })
+    end
     if actionState == "pathfind"
         and body.changeState
         and ZombieIdleState

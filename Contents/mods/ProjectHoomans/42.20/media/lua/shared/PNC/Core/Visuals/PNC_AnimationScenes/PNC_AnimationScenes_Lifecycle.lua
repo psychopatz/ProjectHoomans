@@ -2,6 +2,46 @@ local Scenes = PNC.AnimationScenes
 local Internal = Scenes.Internal
 local Core = PNC.Core
 local Const = PNC.Const
+local Diagnostics = PNC.PerformanceScalingDiagnostics
+
+local function isSeatingScene(runtime, scene)
+    local activity = runtime and runtime.facilityActivity or nil
+    return scene and (
+        scene.id == "facility.living.sitFurniture"
+        or activity and activity.seating == true
+    )
+end
+
+local function auditScene(
+    record,
+    runtime,
+    scene,
+    eventName,
+    reason,
+    release,
+    zombie
+)
+    if not Diagnostics or Diagnostics.SeatingAuditEnabled ~= true
+        or not Diagnostics.LogSeatingAudit
+        or not isSeatingScene(runtime, scene)
+    then
+        return
+    end
+    Diagnostics.LogSeatingAudit(eventName, {
+        "npc=" .. tostring(record and record.id or ""),
+        "scene=" .. tostring(scene and scene.id or ""),
+        "revision=" .. tostring(scene and scene.revision or ""),
+        "step=" .. tostring(scene and scene.stepId or ""),
+        "reason=" .. tostring(reason or ""),
+        "release=" .. tostring(release == true),
+        "pathPhase=" .. tostring(runtime and runtime.pathing
+            and runtime.pathing.phase or ""),
+        "nativeActive=" .. tostring(runtime and runtime.localNavigation
+            and runtime.localNavigation.nativeActive == true),
+        "bodyAction=" .. tostring(zombie and zombie.getActionStateName
+            and zombie:getActionStateName() or ""),
+    })
+end
 
 local function notifyStop(definition, record, zombie, scene, reason)
     local ok
@@ -34,6 +74,17 @@ function Internal.ClearScene(record, zombie, reason, release)
     scene = runtime.animationScene
     if not scene then return false end
     definition = Scenes.Get(scene.id)
+    if Diagnostics and Diagnostics.SeatingAuditEnabled == true then
+        auditScene(
+            record,
+            runtime,
+            scene,
+            "scene_stop",
+            reason or "stopped",
+            release,
+            zombie
+        )
+    end
     runtime.lastAnimationScene = {
         id = scene.id,
         revision = scene.revision,
@@ -157,6 +208,23 @@ function Scenes.Request(record, zombie, sceneId, options)
     end
     runtime = record.runtime or {}
     record.runtime = runtime
+    if Diagnostics and Diagnostics.SeatingAuditEnabled == true
+        and (sceneId == "facility.living.sitFurniture"
+            or runtime.facilityActivity
+                and runtime.facilityActivity.seating == true)
+    then
+        Diagnostics.LogSeatingAudit("scene_request", {
+            "npc=" .. tostring(record.id or ""),
+            "scene=" .. tostring(sceneId or ""),
+            "reason=" .. tostring(options.reason or ""),
+            "current=" .. tostring(runtime.animationScene
+                and runtime.animationScene.id or ""),
+            "pathPhase=" .. tostring(runtime.pathing
+                and runtime.pathing.phase or ""),
+            "nativeActive=" .. tostring(runtime.localNavigation
+                and runtime.localNavigation.nativeActive == true),
+        })
+    end
     if not canReplaceCurrent(runtime, definition, options) then
         return false, "lower_priority"
     end
@@ -178,9 +246,27 @@ function Scenes.Request(record, zombie, sceneId, options)
     )
     if not started then
         runtime.animationScene = nil
+        if Diagnostics and Diagnostics.SeatingAuditEnabled == true then
+            Diagnostics.LogSeatingAudit("scene_start_failed", {
+                "npc=" .. tostring(record.id or ""),
+                "scene=" .. tostring(sceneId or ""),
+                "reason=" .. tostring(result or "unknown"),
+            })
+        end
         return false, result
     end
     Internal.MarkSceneSync(record, "animation_scene_start")
+    if Diagnostics and Diagnostics.SeatingAuditEnabled == true then
+        auditScene(
+            record,
+            runtime,
+            scene,
+            "scene_started",
+            options.reason,
+            false,
+            zombie
+        )
+    end
     return true, scene
 end
 

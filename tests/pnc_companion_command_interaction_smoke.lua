@@ -112,6 +112,8 @@ T.truthy(Client.Pump(now), "NPC line was not delivered")
 T.equal(#messages, 2, "queue did not publish both interaction messages")
 T.equal(messages[1].speakerKind, "player", "player line speaker kind")
 T.equal(messages[2].speakerKind, "npc", "NPC line speaker kind")
+T.equal(messages[2].presentationState.tts, true,
+    "queued NPC canned reply remains eligible for shared TTS")
 T.equal(#playerSpeech, 1, "queued player line was not spoken")
 T.equal(#npcSpeech, 1, "queued NPC line was not spoken")
 

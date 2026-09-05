@@ -210,6 +210,7 @@ function Presentation.Receive(ambientFlavor, summary, networkArgs)
             nameplate = not active,
             conversationUI = active,
             interrupt = false,
+            tts = true,
         },
         source = {
             kind = "social_flavor",

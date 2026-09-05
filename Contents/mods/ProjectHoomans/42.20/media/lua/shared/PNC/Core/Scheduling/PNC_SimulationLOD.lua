@@ -90,11 +90,14 @@ function LOD.Resolve(record)
         then
             return "abstract_near"
         end
-        if record.runtime and record.runtime.target then
-            return "abstract_active"
-        end
         if isTraveling(record) then
             return "abstract_travel"
+        end
+        if isFollowingOwner(record) then
+            return "abstract_follow"
+        end
+        if record.runtime and record.runtime.target then
+            return "abstract_active"
         end
         if isAbstractDormant(record) then
             return "abstract_dormant"
@@ -143,7 +146,7 @@ function LOD.GetCadence(record)
         return math.min(tonumber(Const.TICK_LIVE_WARM_MS) or 250, 100)
     end
     if tier == "abstract_near" or tier == "abstract_active"
-        or tier == "abstract_travel"
+        or tier == "abstract_travel" or tier == "abstract_follow"
     then
         return tonumber(Const.TICK_ABSTRACT_MS) or 3000
     end
@@ -177,7 +180,7 @@ function LOD.GetDecisionInterval(record)
     if tier == "moving" or tier == "vehicle" then return 250 end
     if tier == "incapacitated" then return 250 end
     if tier == "abstract_near" or tier == "abstract_active"
-        or tier == "abstract_travel"
+        or tier == "abstract_travel" or tier == "abstract_follow"
     then
         return tonumber(Const.TICK_ABSTRACT_MS) or 3000
     end
@@ -198,7 +201,7 @@ function LOD.GetVitalsInterval(record)
         return tonumber(Const.SIMULATION_VITALS_HOT_MS) or 250
     end
     if tier == "abstract_near" or tier == "abstract_active"
-        or tier == "abstract_travel"
+        or tier == "abstract_travel" or tier == "abstract_follow"
     then
         return tonumber(Const.SIMULATION_VITALS_ABSTRACT_MS) or 5000
     end

@@ -12,6 +12,7 @@ local JOB = "FacilityActivity"
 local SEAT_STOP_DISTANCE = 0.10
 local SEAT_ARRIVAL_TOLERANCE = 0.14
 local MAX_SCENE_START_ATTEMPTS = 3
+local Diagnostics = PNC.PerformanceScalingDiagnostics
 
 PNC.SeatingRuntime = PNC.SeatingRuntime or {}
 PNC.SeatingRuntime.LiveObjects = PNC.SeatingRuntime.LiveObjects or {}
@@ -866,6 +867,9 @@ function Jobs.Tick(record, zombie)
     local refreshed
     local seatReason
     local targetChanged
+    local previousSeatKey
+    local previousSeatAnchorX
+    local previousSeatAnchorY
     local positioned
     local positionReason
     local scene
@@ -927,6 +931,11 @@ function Jobs.Tick(record, zombie)
         return true
     end
     if runtime.seating == true and zombie then
+        previousSeatKey = runtime.approachKey
+        previousSeatAnchorX = runtime.seatAnchor
+            and runtime.seatAnchor.x or nil
+        previousSeatAnchorY = runtime.seatAnchor
+            and runtime.seatAnchor.y or nil
         refreshed, seatReason, targetChanged = refreshLiveSeatTarget(
             record, zombie, runtime, order)
         if not refreshed then
@@ -935,6 +944,22 @@ function Jobs.Tick(record, zombie)
             return true
         end
         if targetChanged then
+            if Diagnostics and Diagnostics.SeatingAuditEnabled == true
+                and Diagnostics.LogSeatingAudit
+            then
+                Diagnostics.LogSeatingAudit("seat_anchor_changed", {
+                    "npc=" .. tostring(record and record.id or ""),
+                    "oldKey=" .. tostring(previousSeatKey or ""),
+                    "newKey=" .. tostring(order.approachKey or ""),
+                    "oldX=" .. tostring(previousSeatAnchorX or ""),
+                    "oldY=" .. tostring(previousSeatAnchorY or ""),
+                    "newX=" .. tostring(order.x or ""),
+                    "newY=" .. tostring(order.y or ""),
+                    "seatEntered=" .. tostring(runtime.seatEntered == true),
+                    "bodyAction=" .. tostring(zombie.getActionStateName
+                        and zombie:getActionStateName() or ""),
+                })
+            end
             if runtime.seatEntered == true then
                 clearFurnitureSeat(record, zombie, runtime)
             end
@@ -988,6 +1013,21 @@ function Jobs.Tick(record, zombie)
         -- Arrival transfers movement ownership to a stationary interaction.
         -- A queued Behavior2 route otherwise remains visible to the scene
         -- safety arbiter and repeatedly interrupts/restarts the sleep bump.
+        if Diagnostics and Diagnostics.SeatingAuditEnabled == true
+            and Diagnostics.LogSeatingAudit
+        then
+            Diagnostics.LogSeatingAudit("facility_arrival", {
+                "npc=" .. tostring(record and record.id or ""),
+                "bodyAction=" .. tostring(zombie.getActionStateName
+                    and zombie:getActionStateName() or ""),
+                "pathPhase=" .. tostring(runtime.pathing
+                    and runtime.pathing.phase or ""),
+                "nativeActive=" .. tostring(runtime.localNavigation
+                    and runtime.localNavigation.nativeActive == true),
+                "seatEntered=" .. tostring(runtime.seatEntered == true),
+                "positioned=" .. tostring(runtime.positioned == true),
+            })
+        end
         resetPath(record, zombie, "facility_arrival")
         runtime.arrivalSettled = true
     end

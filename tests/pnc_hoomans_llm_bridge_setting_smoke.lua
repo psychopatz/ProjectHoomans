@@ -34,6 +34,10 @@ PsychopatzCore = {
     BridgeBootstrap = bootstrap,
     Bridge = bridge,
 }
+-- Prevent unrelated Core composition imports from replacing this focused
+-- bridge-setting fixture with the real bootstrap implementation.
+function bootstrap.Initialize() return bootstrap.enabled end
+package.loaded["PsychopatzCore/Bridge/PsychopatzBridgeBootstrap"] = bootstrap
 local originalRequire = require
 require = function(name)
     if name ~= "PsychopatzCore/UI/Conversation/PsychopatzConversationLayout" then
@@ -55,6 +59,10 @@ PNC = {
         Deliver = function() return { accepted = true } end,
     },
 }
+-- Keep this bootstrap smoke focused on the Hoomans integration. The current
+-- 42.20 package path can otherwise load Core's real shared initializer while
+-- loading the integration, which replaces the deliberately injected mock.
+package.loaded["PNC/Integrations/PNC_HoomansLLM"] = PNC.HoomansLLM
 Events = { OnTick = {
     Add = function(callback) onTick = callback end,
 } }

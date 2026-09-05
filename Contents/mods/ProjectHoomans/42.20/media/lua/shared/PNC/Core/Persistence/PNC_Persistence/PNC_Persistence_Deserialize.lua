@@ -182,6 +182,9 @@ function Persistence.DeserializeRecord(raw, fallbackID)
         record.identitySeed,
         record.archetypeID
     )
+    record.followerAbandonment = Internal.sanitizeFollowerAbandonment(
+        raw.followerAbandonment
+    )
     record.affiliation = FactionTypes
         and FactionTypes.NormalizeAffiliation(
             migrateLegacyAffiliation(raw.affiliation)

@@ -5,6 +5,33 @@ PNC.TraversalQuery = PNC.TraversalQuery or {}
 PNC.TraversalQuery.Internal = PNC.TraversalQuery.Internal or {}
 
 local Internal = PNC.TraversalQuery.Internal
+local REPORTED_CALL_ERRORS = {}
+
+Internal.NativeQueryErrorCounts =
+    Internal.NativeQueryErrorCounts or {}
+
+function Internal.ReportCallError(methodName, errorValue)
+    local key = tostring(methodName or "unknown")
+    local count = (tonumber(Internal.NativeQueryErrorCounts[key]) or 0) + 1
+    local core = PNC.Core
+    Internal.NativeQueryErrorCounts[key] = count
+    if REPORTED_CALL_ERRORS[key]
+        or not core
+        or not core.LogWarn
+    then
+        return
+    end
+    REPORTED_CALL_ERRORS[key] = true
+    local message = tostring(errorValue or "unknown")
+    if #message > 240 then
+        message = string.sub(message, 1, 240)
+    end
+    core.LogWarn(
+        "[PNC][PATH] native_query_error method=" .. key
+            .. " count=" .. tostring(count)
+            .. " error=" .. message
+    )
+end
 
 function Internal.CallFirst(object, names, ...)
     local i
@@ -20,6 +47,9 @@ function Internal.CallFirst(object, names, ...)
             -- Passage APIs differ slightly between PZ point releases. Keep
             -- that compatibility uncertainty isolated to this query seam.
             ok, result = pcall(method, object, ...)
+            if not ok then
+                Internal.ReportCallError(names[i], result)
+            end
             if ok and result ~= nil then
                 return result
             end

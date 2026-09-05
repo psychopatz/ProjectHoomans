@@ -32,6 +32,7 @@ local noTeeth = false
 local vanillaTarget = {}
 local actionState = "idle"
 local modData = { PNC_NPC = true }
+local variables = {}
 local managedRecord
 local nativeFramePumps = 0
 local registryFindCalls = 0
@@ -56,6 +57,7 @@ local managedBody = {
     end,
     isUseless = function() return useless end,
     setNoTeeth = function(_, value) noTeeth = value end,
+    setVariable = function(_, key, value) variables[key] = value end,
     isNoTeeth = function() return noTeeth end,
     getTarget = function() return vanillaTarget end,
     setTarget = function(_, value) vanillaTarget = value end,
@@ -70,6 +72,7 @@ local managedBody = {
     isAlive = function() return true end,
     isDead = function() return false end,
     getActionStateName = function() return actionState end,
+    isRemoteZombie = function() return true end,
     setBumpFall = function(_, value)
         if value == false and actionState == "bumped" then
             actionState = "idle"
@@ -127,6 +130,14 @@ T.equal(
     "ordinary zombie update reached the managed NPC registry"
 )
 
+isClient = function() return true end
+managedBody.lastRemoteUpdate = 500
+T.falsy(PNC.LiveBodyControl.RefreshNativeRemoteHeartbeat(managedBody),
+    "unsupported managed remote heartbeat bridge remained active")
+T.equal(managedBody.lastRemoteUpdate, 500,
+    "managed remote heartbeat compatibility hook mutated a Java field")
+isClient = function() return false end
+
 T.equal(PNC.LiveBodyControl.SuppressZombieSounds(managedBody), true,
     "specific zombie channels suppressed")
 T.equal(voicePrefix, "NotAZombie", "human voice prefix")
@@ -136,6 +147,8 @@ PNC.LiveBodyControl.MaintainHumanizedBody(managedBody, 1000)
 T.equal(useless, true, "humanized useless flag reasserted")
 T.equal(noTeeth, true, "humanized no-teeth fail-safe reasserted")
 T.equal(vanillaTarget, nil, "humanized vanilla target cleared")
+T.equal(variables.NoLungeAttack, true,
+    "humanized carrier did not retain the native lunge gate")
 T.equal(#stopped, 12, "first maintenance suppresses voices")
 local writesAfterInitialMaintenance = uselessWrites
 PNC.LiveBodyControl.MaintainHumanizedBody(managedBody, 1100)
@@ -152,6 +165,30 @@ T.equal(
     writesAfterInitialMaintenance,
     "audio cadence triggered a full body safety rewrite"
 )
+
+-- The native carrier can expose a gender/speed-specific channel and a cached
+-- hurt channel that are not covered by the six stable voice names.
+local stoppedBeforeDynamicChannels = #stopped
+local silentHurtSound
+descriptor.getVoicePrefix = function() return "MaleZombie" end
+managedBody.getVoiceSoundName = function()
+    return "MaleZombieSprinterVoiceB"
+end
+managedBody.getBiteSoundName = function()
+    return "MaleZombieSprinterBiteB"
+end
+managedBody.getHurtSound = function()
+    return "MaleZombieHurt"
+end
+managedBody.setHurtSound = function(_, value)
+    silentHurtSound = value
+end
+T.truthy(PNC.LiveBodyControl.SuppressZombieSounds(managedBody),
+    "dynamic zombie channels were not suppressed")
+T.equal(#stopped, stoppedBeforeDynamicChannels + 21,
+    "dynamic and cached zombie channels were not fully suppressed")
+T.equal(silentHurtSound, "NotAZombieHurt",
+    "native hurt channel was not replaced with the silent prefix")
 
 actionState = "turnalerted"
 T.falsy(
@@ -210,6 +247,13 @@ T.equal(useless, true, "zombie update repairs persisted useless flag")
 T.equal(noTeeth, true, "zombie update repairs persisted teeth flag")
 T.equal(grappleOnly, false, "zombie update repairs leaked grapple-only flag")
 T.equal(vanillaTarget, nil, "zombie update clears persisted target")
+
+vanillaTarget = {}
+variables.NoLungeAttack = false
+PNC.LiveBodyControl.SuppressVanillaIntent(managedBody, true)
+T.equal(vanillaTarget, nil, "native intent suppression retained its target")
+T.equal(variables.NoLungeAttack, true,
+    "native intent suppression left the carrier able to lunge")
 
 managedRecord = {
     runtime = {
