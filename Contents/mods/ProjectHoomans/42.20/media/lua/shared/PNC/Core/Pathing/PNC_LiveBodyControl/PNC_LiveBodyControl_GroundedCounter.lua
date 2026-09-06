@@ -1,5 +1,7 @@
 -- Attacker resolution and grounded counter-stagger policy.
 
+require "PNC/Core/Combat/PNC_PlayerReaction"
+
 local Internal = PNC.LiveBodyControl.Internal
 local Core = PNC.Core
 
@@ -79,11 +81,18 @@ function Internal.counterStagger(record, zombie, attacker)
     if attacker.getObjectName
         and tostring(attacker:getObjectName() or "") == "Player"
     then
-        if attacker.clearVariable then attacker:clearVariable("BumpFallType") end
-        if attacker.setBumpType then attacker:setBumpType("stagger") end
-        if attacker.setBumpFall then attacker:setBumpFall(false) end
-        if attacker.setBumpStaggered then attacker:setBumpStaggered(true) end
-        return true
+        if PNC.PlayerReaction and PNC.PlayerReaction.StartCounterStagger then
+            return PNC.PlayerReaction.StartCounterStagger(attacker, zombie, {
+                kind = "counter_stagger",
+                durationMs = PNC.Const
+                    and PNC.Const.NPC_GROUNDED_COUNTER_STAGGER_DURATION_MS
+                    or 650,
+                timeoutMs = PNC.Const
+                    and PNC.Const.NPC_GROUNDED_COUNTER_STAGGER_TIMEOUT_MS
+                    or 1400,
+            }) == true
+        end
+        return false
     end
     if PNC.CombatZombieReaction and PNC.CombatZombieReaction.Start then
         return PNC.CombatZombieReaction.Start(zombie, attacker, {

@@ -151,6 +151,9 @@ local function onResetLua()
     ClientState.lastWorldDiscoveryRequestAt = nil
     Client.BiteReplicas = {}
     Client.ZombieReactionReplicas = {}
+    if PNC.PlayerReaction and PNC.PlayerReaction.Reset then
+        PNC.PlayerReaction.Reset()
+    end
     if PNC.ClientFirearmEffects and PNC.ClientFirearmEffects.Reset then
         PNC.ClientFirearmEffects.Reset()
     end

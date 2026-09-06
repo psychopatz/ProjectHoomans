@@ -18,6 +18,11 @@ local stateChanges = 0
 local authority = true
 local ragdollSimulationActive = false
 local variables = {}
+local playerHitReaction = ""
+local playerStateName = "idle"
+local playerIgnoreMovement = false
+local playerReactionEvents = 0
+local playerBumpWrites = 0
 
 local friendlyPlayer = {
     getObjectName = function() return "Player" end,
@@ -26,6 +31,28 @@ local friendlyPlayer = {
     getX = function() return 1 end,
     getY = function() return 0 end,
     getZ = function() return 0 end,
+}
+
+local hostilePlayer = {
+    getObjectName = function() return "Player" end,
+    getOnlineID = function() return 8 end,
+    getUsername = function() return "bob" end,
+    getX = function() return 1 end,
+    getY = function() return 0 end,
+    getZ = function() return 0 end,
+    getHitReaction = function() return playerHitReaction end,
+    getActionStateName = function() return playerStateName end,
+    setHitReaction = function(_, value) playerHitReaction = value end,
+    reportEvent = function(_, event)
+        T.equal(event, "washit", "wrong player reaction event")
+        playerReactionEvents = playerReactionEvents + 1
+        playerStateName = "hitreaction"
+    end,
+    setIgnoreMovement = function(_, value) playerIgnoreMovement = value end,
+    setBumpType = function() playerBumpWrites = playerBumpWrites + 1 end,
+    setBumpFall = function() playerBumpWrites = playerBumpWrites + 1 end,
+    setBumpStaggered = function() playerBumpWrites = playerBumpWrites + 1 end,
+    setBlockMovement = function() playerBumpWrites = playerBumpWrites + 1 end,
 }
 
 local hostileZombie = {
@@ -94,6 +121,8 @@ PNC = {
         NPC_GROUNDED_RECOVERY_MS = 1400,
         NPC_GROUNDED_COUNTER_STAGGER_CHANCE = 0.40,
         NPC_GROUNDED_COUNTER_STAGGER_RANGE = 2.25,
+        NPC_GROUNDED_COUNTER_STAGGER_DURATION_MS = 650,
+        NPC_GROUNDED_COUNTER_STAGGER_TIMEOUT_MS = 1400,
     },
     Core = {
         Now = function() return now end,
@@ -200,6 +229,25 @@ T.equal(stateName, "onground", "hostile early recovery state")
 T.equal(reactions, 1, "grounded counter count")
 T.equal(record.runtime.attackAction, nil,
     "grounded hostile victim retained an attack")
+
+stateName = "onground"
+onFloor = true
+knockedDown = true
+attackedBy = hostilePlayer
+record.runtime.groundedRecovery = nil
+record.runtime.attackAction = { attackType = "melee" }
+T.truthy(PNC.LiveBodyControl.TickGroundedRecovery(record, body, now + 50),
+    "hostile player knockdown was not held for recovery")
+T.equal(playerReactionEvents, 1, "player counter-stagger was not presented")
+T.equal(playerHitReaction, "HitReaction", "wrong player reaction state")
+T.equal(playerBumpWrites, 0,
+    "player counter-stagger used the NPC bump lifecycle")
+T.equal(record.runtime.attackAction, nil,
+    "grounded player attacker retained an NPC attack")
+PNC.PlayerReaction.Pump(now + 1600)
+T.equal(playerHitReaction, "", "player counter-stagger did not release")
+T.falsy(playerIgnoreMovement,
+    "player counter-stagger retained native movement ownership")
 
 now = now + 500
 T.truthy(PNC.LiveBodyControl.TickGroundedRecovery(record, body, now),

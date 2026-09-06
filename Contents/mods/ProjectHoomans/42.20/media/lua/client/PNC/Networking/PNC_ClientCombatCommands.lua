@@ -16,6 +16,24 @@ local ClientState = PNC.Network.ClientState
 Client.BiteReplicas = Client.BiteReplicas or {}
 Client.ZombieReactionReplicas = Client.ZombieReactionReplicas or {}
 
+local function applyPlayerReaction(args)
+    local player
+    if not args or not PNC.PlayerReaction
+        or not PNC.PlayerReaction.ApplyLocalCounterStagger
+    then
+        return false
+    end
+    player = getSpecificPlayer and getSpecificPlayer(0)
+        or getPlayer and getPlayer() or nil
+    if not player then return false end
+    if args.targetOnlineID ~= nil and player.getOnlineID
+        and tonumber(player:getOnlineID()) ~= tonumber(args.targetOnlineID)
+    then
+        return false
+    end
+    return PNC.PlayerReaction.ApplyLocalCounterStagger(player, args) == true
+end
+
 local function applyZombieReaction(args)
     local targetZombie
     local attackerZombie
@@ -153,6 +171,9 @@ local function pumpCombatReplicas()
     local zombie
     local asn
     local reaction
+    if PNC.PlayerReaction and PNC.PlayerReaction.Pump then
+        PNC.PlayerReaction.Pump(now)
+    end
     for key, state in pairs(Client.BiteReplicas) do
         zombie = PNC.Network and PNC.Network.FindZombieByOnlineID
             and PNC.Network.FindZombieByOnlineID(state.attackerOnlineID) or nil
@@ -204,6 +225,12 @@ Internal.PumpBiteReplicas = pumpCombatReplicas
 Internal.RegisterServerCommand(Const.CMD_ZOMBIE_REACTION, function(args)
     applyZombieReaction(args)
 end)
+
+if Const.CMD_PLAYER_REACTION then
+    Internal.RegisterServerCommand(Const.CMD_PLAYER_REACTION, function(args)
+        applyPlayerReaction(args)
+    end)
+end
 
 Internal.RegisterServerCommand(Const.CMD_ZOMBIE_BITE, function(args)
     applyZombieBite(args)

@@ -104,6 +104,17 @@ local function singlePlayerNativeOwner(zombie, lane, navigation)
     return not ownsScriptedPassage(zombie, lane)
 end
 
+local function hasUnconsumedIntent(runtime, lane)
+    local intent = runtime and runtime.moveIntent or nil
+    local revision = intent and tonumber(intent.revision) or nil
+    if revision == nil or lane.intentRevision == nil then
+        -- Older live records do not have an intent revision. Let one normal
+        -- pump migrate them before the fast path becomes eligible.
+        return true
+    end
+    return revision ~= tonumber(lane.intentRevision)
+end
+
 local function startRequestedLane(record, zombie, lane)
     local started, state = Internal.startRequestedMove(zombie, record, lane)
     if started
@@ -162,9 +173,9 @@ local function updateActiveLane(record, zombie, lane, now, caller)
 end
 
 function PathService.Pump(record, zombie, caller)
-    recordPumpDiagnostics(record, zombie, caller)
     local runtime = record and record.runtime or nil
     if not zombie or not runtime then
+        recordPumpDiagnostics(record, zombie, caller)
         return false, "no_live_body"
     end
     local lane = Internal.ensureMoveLane(record)
@@ -173,6 +184,17 @@ function PathService.Pump(record, zombie, caller)
     local state
     local navigation = record.runtime and record.runtime.localNavigation or nil
     local intentState
+    -- In single-player the native Behavior2 route advances from
+    -- OnZombieUpdate. Once the current behavior intent has been consumed,
+    -- the scheduler has no movement work to perform for this lane. Holds and
+    -- new targets still pass through immediately because they increment the
+    -- intent revision.
+    if singlePlayerNativeOwner(zombie, lane, navigation)
+        and not hasUnconsumedIntent(runtime, lane)
+    then
+        return true, "native_waiting_for_zombie_update"
+    end
+    recordPumpDiagnostics(record, zombie, caller)
     handled, state = holdAttackLease(record, zombie, lane, now)
     if handled then
         return handled, state
@@ -185,6 +207,9 @@ function PathService.Pump(record, zombie, caller)
         Internal.finalizeCancel(zombie, record, lane)
         intentState = Internal.consumeMoveIntent(record, lane, zombie)
     end
+    lane.intentRevision = runtime.moveIntent
+        and (tonumber(runtime.moveIntent.revision) or 0)
+        or 0
     if lane.phase == "requested" then
         prepareLane(record, zombie, lane, now)
         return startRequestedLane(record, zombie, lane)
@@ -194,7 +219,11 @@ function PathService.Pump(record, zombie, caller)
     -- lane. Scripted passages still pass through below when the body is
     -- actually colliding or a traversal has already been staged.
     if lane.phase == "active"
-        and singlePlayerNativeOwner(zombie, lane, navigation)
+        and singlePlayerNativeOwner(
+            zombie,
+            lane,
+            record.runtime and record.runtime.localNavigation or navigation
+        )
     then
         return true, "native_waiting_for_zombie_update"
     end

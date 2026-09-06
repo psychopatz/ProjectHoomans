@@ -63,6 +63,9 @@ Tasking.MAX_REEVALUATIONS_PER_PUMP = 8
 Tasking.MAX_EXECUTOR_TICKS_PER_PUMP = 16
 Tasking.MAX_CANDIDATES_PER_PROVIDER = 64
 Tasking.PUMP_INTERVAL_MS = 250
+-- Tasking work is resumable through the inbox and executor cursor. Keep each
+-- pump bounded so a backlog cannot monopolize a single server frame.
+Tasking.TIME_BUDGET_MS = 2
 Tasking.NextPumpAt = Tasking.NextPumpAt or 0
 Tasking.ExecutorCursor = Tasking.ExecutorCursor or 0
 Tasking.ORPHAN_RECONCILE_INTERVAL_MS = 5000

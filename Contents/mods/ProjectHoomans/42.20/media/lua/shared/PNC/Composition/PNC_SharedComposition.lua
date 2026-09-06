@@ -1,5 +1,6 @@
 -- Deterministic shared-runtime composition root. Require order is contractual.
 require "PNC/Core/Base/PNC_Core"
+require "PNC/Core/Perception/PNC_HumanNPCThreatSafeguards"
 require "PNC/Core/Base/PNC_Constants"
 require "PNC/Core/Diagnostics/PNC_PerformanceScalingDiagnostics"
 require "PNC/Core/Events/PNC_EventDefinitions"

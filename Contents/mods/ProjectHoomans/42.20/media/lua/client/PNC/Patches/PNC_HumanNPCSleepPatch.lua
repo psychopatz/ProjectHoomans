@@ -16,13 +16,32 @@ local function readThreatCounters(playerObj)
             and stats:get(CharacterStat.PANIC) or nil
 end
 
+local function refreshForPlayer(player)
+    local playerObj = getSpecificPlayer and getSpecificPlayer(player) or nil
+    local safeguards = PNC.ClientHumanNPCSafeguards
+    if playerObj and safeguards and safeguards.RefreshVanillaThreatCounters then
+        return safeguards.RefreshVanillaThreatCounters(playerObj), playerObj
+    end
+    return false, playerObj
+end
+
+-- Java creates the sleep option before Lua's onSleepWalkToComplete callback.
+-- Refresh on the pre-fill event so the initial option is not marked unsafe.
+if Events and Events.OnPreFillWorldObjectContextMenu
+    and not Patch.PreFillRegistered
+then
+    Patch.PreFillRegistered = true
+    Events.OnPreFillWorldObjectContextMenu.Add(function(player)
+        refreshForPlayer(player)
+    end)
+end
+
 if not Patch.OriginalOnSleepWalkToComplete then
     Patch.OriginalOnSleepWalkToComplete =
         ISWorldObjectContextMenu.onSleepWalkToComplete
 
     function ISWorldObjectContextMenu.onSleepWalkToComplete(player, bed)
-        local playerObj = getSpecificPlayer and getSpecificPlayer(player) or nil
-        local safeguards = PNC.ClientHumanNPCSafeguards
+        local playerObj
         local beforeVisible
         local beforeChasing
         local beforeClose
@@ -30,16 +49,16 @@ if not Patch.OriginalOnSleepWalkToComplete then
         local afterChasing
         local afterClose
         local panic
-        local refreshed = false
-        if playerObj and safeguards
-            and safeguards.RefreshVanillaThreatCounters
-        then
-            -- This exact LOS refresh excludes managed human bodies only. Any
-            -- ordinary zombie remains in the vanilla counters and the original
-            -- sleep function below still rejects the unsafe sleep attempt.
+        local refreshed
+        playerObj = getSpecificPlayer and getSpecificPlayer(player) or nil
+        if playerObj then
             beforeVisible, beforeChasing, beforeClose =
                 readThreatCounters(playerObj)
-            refreshed = safeguards.RefreshVanillaThreatCounters(playerObj)
+            refreshed = PNC.ClientHumanNPCSafeguards
+                and PNC.ClientHumanNPCSafeguards.RefreshVanillaThreatCounters
+                and PNC.ClientHumanNPCSafeguards.RefreshVanillaThreatCounters(
+                    playerObj
+                ) or false
             afterVisible, afterChasing, afterClose, panic =
                 readThreatCounters(playerObj)
             if PNC.Core and PNC.Core.LogDebug then

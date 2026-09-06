@@ -12,6 +12,26 @@ Scheduler.LastPumpAt = Scheduler.LastPumpAt or nil
 Scheduler.Profile = Scheduler.Profile or { groupUpdates = 0, individualUpdates = 0, lastDurationMs = 0 }
 Scheduler.IndividualIDs = Scheduler.IndividualIDs or {}
 Scheduler.IndividualCursor = Scheduler.IndividualCursor or 1
+Scheduler.NextCycleAt = Scheduler.NextCycleAt or 0
+Scheduler.CycleActive = Scheduler.CycleActive == true
+
+local function clockNow(fallback)
+    if PNC.Core and type(PNC.Core.Now) == "function" then
+        return tonumber(PNC.Core.Now()) or fallback
+    end
+    return fallback
+end
+
+local function sliceExhausted(startedAt, processed)
+    if processed >= (tonumber(Definitions.SCHEDULER_BATCH_SIZE) or 1) then
+        return true
+    end
+    local budget = math.max(
+        1,
+        tonumber(Definitions.SCHEDULER_TIME_BUDGET_MS) or 2
+    )
+    return clockNow(startedAt) - startedAt >= budget
+end
 
 local function refreshIndividuals()
     Scheduler.IndividualIDs = {}
@@ -26,8 +46,15 @@ end
 
 function Scheduler.Pump(now)
     now = tonumber(now) or (PNC.Core and PNC.Core.Now and PNC.Core.Now()) or 0
-    if Scheduler.LastPumpAt and now - Scheduler.LastPumpAt < Definitions.SCHEDULER_INTERVAL_MS then return 0 end
-    Scheduler.LastPumpAt = now
+    local cycleStarted = false
+    if Scheduler.CycleActive ~= true then
+        if now < (tonumber(Scheduler.NextCycleAt) or 0) then return 0 end
+        Scheduler.CycleActive = true
+        Scheduler.LastPumpAt = now
+        Scheduler.NextCycleAt = now + Definitions.SCHEDULER_INTERVAL_MS
+        refreshIndividuals()
+        cycleStarted = true
+    end
     local timerName
     local timerStart
     if ScalingDiagnostics then
@@ -41,11 +68,11 @@ function Scheduler.Pump(now)
     local individualUpdated = 0
     local groupTimerName
     local groupTimerStart
-    if ScalingDiagnostics then
+    if cycleStarted and ScalingDiagnostics then
         groupTimerName, groupTimerStart = ScalingDiagnostics.BeginTiming(
             "Needs.Groups", now)
     end
-    if PNC.Factions and PNC.Factions.List and PNC.GroupNeeds then
+    if cycleStarted and PNC.Factions and PNC.Factions.List and PNC.GroupNeeds then
         for _, faction in ipairs(PNC.Factions.List()) do
             if PNC.GroupNeeds.IsGroup(faction) then
                 PNC.GroupNeeds.UpdateToNow(faction, "passive_decay")
@@ -65,12 +92,9 @@ function Scheduler.Pump(now)
             ScalingDiagnostics.BeginTiming("Needs.Individuals", now)
     end
     if PNC.Registry and PNC.Registry.Data and PNC.IndividualNeeds then
-        if Scheduler.IndividualCursor > #Scheduler.IndividualIDs then
-            refreshIndividuals()
-        end
         local processed = 0
-        while processed < Definitions.SCHEDULER_BATCH_SIZE
-            and Scheduler.IndividualCursor <= #Scheduler.IndividualIDs do
+        local sliceStartedAt = clockNow(now)
+        while Scheduler.IndividualCursor <= #Scheduler.IndividualIDs do
             local id = Scheduler.IndividualIDs[Scheduler.IndividualCursor]
             Scheduler.IndividualCursor = Scheduler.IndividualCursor + 1
             processed = processed + 1
@@ -107,6 +131,7 @@ function Scheduler.Pump(now)
                 count = count + 1
                 individualUpdated = individualUpdated + 1
             end
+            if sliceExhausted(sliceStartedAt, processed) then break end
         end
         if ScalingDiagnostics then
             ScalingDiagnostics.Increment(
@@ -122,6 +147,14 @@ function Scheduler.Pump(now)
     if ScalingDiagnostics then
         ScalingDiagnostics.Increment(
             "Needs.IndividualsUpdated", individualUpdated)
+    end
+    if Scheduler.CycleActive == true
+        and Scheduler.IndividualCursor > #Scheduler.IndividualIDs
+    then
+        Scheduler.CycleActive = false
+        if Scheduler.NextCycleAt <= now then
+            Scheduler.NextCycleAt = now + Definitions.SCHEDULER_INTERVAL_MS
+        end
     end
     if timerName then ScalingDiagnostics.EndTiming(timerName, timerStart) end
     return count

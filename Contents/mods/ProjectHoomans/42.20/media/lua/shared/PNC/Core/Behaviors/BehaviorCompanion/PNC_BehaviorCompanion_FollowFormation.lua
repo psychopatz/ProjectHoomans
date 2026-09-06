@@ -31,20 +31,6 @@ local function sortFollowerRecords(a, b)
     return tostring(a and a.id or "") < tostring(b and b.id or "")
 end
 
-local function resolveFollowOwnerKey(record, owner)
-    local onlineID = owner and owner.getOnlineID
-        and tonumber(owner:getOnlineID())
-        or tonumber(record and record.ownerOnlineID)
-    if onlineID ~= nil then
-        return "id:" .. tostring(onlineID)
-    end
-    return "user:" .. tostring(
-        owner and owner.getUsername and owner:getUsername()
-            or record and record.ownerUsername
-            or ""
-    )
-end
-
 local function buildFollowFormation(record, owner, now, ownerMoving)
     local followers = {}
     local slots = {}
@@ -103,7 +89,7 @@ function Internal.ResolveFollowSlot(record, owner, ownerMoving)
         return nil
     end
     now = Core.Now and Core.Now() or 0
-    ownerKey = resolveFollowOwnerKey(record, owner)
+    ownerKey = Internal.GetFollowOwnerKey(record, owner)
     cache = FollowFormationCache[ownerKey]
     if not cache
         or now >= (tonumber(cache.expiresAt) or 0)

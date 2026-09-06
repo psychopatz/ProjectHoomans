@@ -9,6 +9,18 @@ local H = Tasking.Internal
 local Events = Tasking.Events
 local Inbox = Tasking.Inbox
 
+local function clockNow(fallback)
+    if PNC.Core and type(PNC.Core.Now) == "function" then
+        return tonumber(PNC.Core.Now()) or fallback
+    end
+    return fallback
+end
+
+local function budgetExhausted(startedAt)
+    local budget = math.max(1, tonumber(Tasking.TIME_BUDGET_MS) or 2)
+    return clockNow(startedAt) - startedAt >= budget
+end
+
 local function promoteMaterializedLease(lease)
     if not lease or tostring(lease.executionMode or "") ~= "ABSTRACT" then
         return
@@ -80,6 +92,7 @@ function Tasking.Commands.Pump(at, budget)
     at = tonumber(at) or PNC.Core.Now()
     if at < Tasking.NextPumpAt then return 0 end
     Tasking.NextPumpAt = at + Tasking.PUMP_INTERVAL_MS
+    local pumpStartedAt = clockNow(at)
     local timerName
     local timerStart
     if ScalingDiagnostics then
@@ -139,6 +152,7 @@ function Tasking.Commands.Pump(at, budget)
             end
             processed = processed + 1
         end
+        if budgetExhausted(pumpStartedAt) then break end
     end
     if reevaluationTimerName then
         ScalingDiagnostics.EndTiming(
@@ -146,15 +160,17 @@ function Tasking.Commands.Pump(at, budget)
     end
     local executorBudget = Tasking.MAX_EXECUTOR_TICKS_PER_PUMP
     local activeCount = #Leases.Active
-    local executorSteps = math.min(activeCount, executorBudget)
+    local executorSteps = 0
     local executorTimerName
     local executorTimerStart
     if ScalingDiagnostics then
         executorTimerName, executorTimerStart = ScalingDiagnostics.BeginTiming(
             "Tasking.Executor", at)
     end
-    for _ = 1, executorSteps do
+    for _ = 1, math.min(activeCount, executorBudget) do
+        if budgetExhausted(pumpStartedAt) then break end
         if #Leases.Active <= 0 then break end
+        executorSteps = executorSteps + 1
         Tasking.ExecutorCursor = (Tasking.ExecutorCursor % #Leases.Active) + 1
         local lease = Leases.Get(Leases.Active[Tasking.ExecutorCursor])
         local domainTimerName

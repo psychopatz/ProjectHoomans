@@ -73,6 +73,7 @@ function PathService.MoveToward(
     intent.steeringKind = navigation
         and tostring(navigation.steeringKind or "") or nil
     intent.updatedAt = Internal.Core.Now()
+    intent.revision = (tonumber(intent.revision) or 0) + 1
     if zombie and Internal.isAtGoal(
         zombie,
         Internal.buildGoal(targetX, targetY, targetZ, mode, stopDistance),

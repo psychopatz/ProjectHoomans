@@ -20,6 +20,20 @@ function Internal.SetFollowMode(record, mode)
     return state, changed
 end
 
+function Internal.GetFollowOwnerKey(record, owner)
+    local onlineID = owner and owner.getOnlineID
+        and tonumber(owner:getOnlineID())
+        or tonumber(record and record.ownerOnlineID)
+    if onlineID ~= nil then
+        return "id:" .. tostring(onlineID)
+    end
+    return "user:" .. tostring(
+        owner and owner.getUsername and owner:getUsername()
+            or record and record.ownerUsername
+            or ""
+    )
+end
+
 function Internal.ResetFollowMoveIssue(record)
     local state = Internal.GetFollowState(record)
     state.issuedTargetX = nil
@@ -36,6 +50,8 @@ function Internal.ShouldIssueFollowMove(record, target, mode, now)
     local dx
     local dy
     local changed
+    local navigation
+    local safetyRefresh
     if not target then return true end
     dx = (tonumber(target.x) or 0) - (
         tonumber(state.issuedTargetX) or math.huge
@@ -43,6 +59,23 @@ function Internal.ShouldIssueFollowMove(record, target, mode, now)
     dy = (tonumber(target.y) or 0) - (
         tonumber(state.issuedTargetY) or math.huge
     )
+    navigation = record.runtime and record.runtime.localNavigation or nil
+    safetyRefresh = now - (tonumber(state.issuedAt) or 0)
+        >= (tonumber(Const.FOLLOW_MOVE_INTENT_REFRESH_MS) or 2000)
+    -- A live native route does not need to be reissued just because the
+    -- follower has been walking for a while. Keep the safety refresh for a
+    -- stalled route, but let a route with recent physical progress continue
+    -- under its existing native controller.
+    if safetyRefresh
+        and navigation
+        and navigation.provider == "engine_path"
+        and navigation.nativeActive == true
+        and now - (tonumber(navigation.lastPhysicalProgressAt) or now) < (
+            tonumber(Const.FOLLOW_MOVE_INTENT_REFRESH_MS) or 2000
+        )
+    then
+        safetyRefresh = false
+    end
     changed = state.issuedTargetX == nil
         or (dx * dx) + (dy * dy) >= epsilon * epsilon
         or math.abs(
@@ -51,9 +84,7 @@ function Internal.ShouldIssueFollowMove(record, target, mode, now)
         ) >= 1
         or tostring(state.issuedMode or "") ~= tostring(mode or "walk")
         or (state.issuedAvoidance == true) ~= (target.avoidance == true)
-        or now - (tonumber(state.issuedAt) or 0) >= (
-            tonumber(Const.FOLLOW_MOVE_INTENT_REFRESH_MS) or 1500
-        )
+        or safetyRefresh
     if not changed then return false end
     state.issuedTargetX = tonumber(target.x)
     state.issuedTargetY = tonumber(target.y)
@@ -151,6 +182,7 @@ function Internal.UpdateOwnerMotionState(record, owner, now)
     end
 
     state.ownerMoving = moved
+    state.ownerMovingChanged = moved ~= wasMoving
     if moved and not wasMoving then
         state.nextThreatScanAt = 0
     end

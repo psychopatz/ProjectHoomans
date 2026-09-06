@@ -148,6 +148,8 @@ function Internal.TickFollowOwner(record, zombie)
     local combatHordeCount
     local attackRetreatTriggered
     local combatTarget
+    local combatHordeCacheDue
+    local followStateChanged
     if Stealth and Stealth.UpdateFollowState then
         Stealth.UpdateFollowState(record, owner)
     end
@@ -185,12 +187,14 @@ function Internal.TickFollowOwner(record, zombie)
     record.ownerOnlineID = owner:getOnlineID()
     followState = Internal.UpdateOwnerMotionState(record, owner, now)
     ownerEngaged = Internal.UpdateOwnerCombatState(record, owner, now)
+    followStateChanged = followState.ownerMovingChanged == true
     -- A follower may still be inside its formation tolerance when the owner
     -- first moves. End ambient presentation immediately instead of waiting
     -- for MoveRecord to be requested several ticks later.
     if followState.ownerMoving == true
         and PNC.AnimationScenes
         and PNC.AnimationScenes.Interrupt
+        and followStateChanged
     then
         PNC.AnimationScenes.Interrupt(record, zombie, "movement")
     end
@@ -237,6 +241,8 @@ function Internal.TickFollowOwner(record, zombie)
         hazard = record.runtime.followHazard
         hazard.count = 0
         hazard.active = false
+        hazard.combatCount = 0
+        hazard.combatCountReady = false
         hazard.nearestDistance = nil
         hazard.expiresAt = 0
     end
@@ -302,10 +308,25 @@ function Internal.TickFollowOwner(record, zombie)
     -- A near miss does not necessarily populate recentThreat, but it still
     -- arms the combat retreat marker. Do not let owner-priority formation
     -- logic hide that marker while a four-zombie horde is present.
-    combatHordeCount = hordeCount
-    if Perception and Perception.CountEnemyZombies then
+    combatHordeCount = hazard and hazard.combatCountReady
+        and tonumber(hazard.combatCount) or nil
+    if combatHordeCount == nil then
+        combatHordeCacheDue = now >= (
+            tonumber(followState.nextCombatHordeCountAt) or 0
+        )
+        combatHordeCount = tonumber(followState.combatHordeCount) or hordeCount
+    end
+    if combatHordeCount == nil then combatHordeCount = 0 end
+    if combatHordeCacheDue
+        and Perception
+        and Perception.CountEnemyZombies
+    then
         combatHordeCount = Perception.CountEnemyZombies(
             record, Const.COMBAT_HORDE_RADIUS
+        )
+        followState.combatHordeCount = combatHordeCount
+        followState.nextCombatHordeCountAt = now + (
+            tonumber(Const.FOLLOW_COMBAT_HORDE_CACHE_MS) or 350
         )
     end
     attackRetreatTriggered = CombatTactics

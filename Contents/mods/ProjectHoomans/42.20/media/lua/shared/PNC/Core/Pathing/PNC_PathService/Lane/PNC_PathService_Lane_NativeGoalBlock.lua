@@ -68,7 +68,11 @@ function Internal.noteNativeGoalFailure(lane, goal, now)
     local followGoal = string.sub(tostring(lane.intentReason or ""), 1, 12)
         == "follow_owner"
     if followGoal then
-        failureLimit = 1
+        -- Follow routes are especially sensitive to a one-frame native
+        -- handoff (player stop/start, formation retarget, or stale state).
+        -- Do not turn the first transient Behavior2 failure into a blocked
+        -- route; the normal engine limit already allows one retry.
+        failureLimit = math.max(2, failureLimit)
     end
     if lane.nativeFailureCount < math.max(
         1,

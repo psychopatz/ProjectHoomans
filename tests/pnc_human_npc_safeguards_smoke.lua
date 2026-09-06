@@ -3,6 +3,11 @@ local T = require "tests/support/test"
 T.addPackagePaths({ { "ProjectHoomans", "shared" } })
 
 local LIVE_BODY_FILE = T.path("ProjectHoomans", "shared", "PNC/Core/Pathing/PNC_LiveBodyControl.lua")
+local SHARED_THREAT_FILE = T.path(
+    "ProjectHoomans",
+    "shared",
+    "PNC/Core/Perception/PNC_HumanNPCThreatSafeguards.lua"
+)
 local CLIENT_FILE = T.path("ProjectHoomans", "client", "PNC/PNC_ClientHumanNPCSafeguards.lua")
 local SLEEP_PATCH_FILE = T.path("ProjectHoomans", "client", "PNC/Patches/PNC_HumanNPCSleepPatch.lua")
 
@@ -345,6 +350,13 @@ local player = {
     getX = function() return 0 end,
     getY = function() return 0 end,
     getZ = function() return 0 end,
+    getCell = function()
+        return {
+            getZombieList = function()
+                return makeList({ managedBody })
+            end,
+        }
+    end,
     isJustMoved = function() return false end,
     isPlayerMoving = function() return false end,
     isAiming = function() return false end,
@@ -384,10 +396,16 @@ getSpecificPlayer = function() return player end
 getNumActivePlayers = function() return 1 end
 isClient = function() return false end
 
+T.load(SHARED_THREAT_FILE)
 T.load(CLIENT_FILE)
 
 -- Establish a pre-NPC panic baseline.
 PNC.ClientHumanNPCSafeguards.OnPlayerUpdate(player)
+zombieUpdateHandler(managedBody)
+T.falsy(grappleOnly,
+    "NPC maintenance does not inherit a native threat LOS lease")
+player:updateLOS()
+PNC.ClientHumanNPCSafeguards.OnTick()
 panic = 5
 visibleZombies = 3
 chasingZombies = 2
@@ -395,8 +413,11 @@ veryCloseZombies = 1
 grappleOnly = false
 spottedValues[1] = managedBody
 PNC.ClientPresenceSync.BodyByID.npc_1 = managedBody
+grappleOnly = true
 
 PNC.ClientHumanNPCSafeguards.OnPlayerUpdate(player)
+player:updateLOS()
+PNC.ClientHumanNPCSafeguards.OnTick()
 T.equal(panic, 2, "false NPC zombie panic increase removed")
 T.equal(visibleZombies, 0, "false visible zombie count removed")
 T.equal(chasingZombies, 0, "false chasing zombie count removed")
@@ -416,6 +437,8 @@ visibleZombies = 2
 chasingZombies = 2
 veryCloseZombies = 2
 PNC.ClientHumanNPCSafeguards.OnPlayerUpdate(player)
+player:updateLOS()
+PNC.ClientHumanNPCSafeguards.OnTick()
 T.equal(panic, 6, "real zombie panic remains untouched")
 T.equal(visibleZombies, 1, "real zombie visible count survives exact recount")
 T.equal(veryCloseZombies, 1, "real zombie close count survives exact recount")
@@ -425,12 +448,11 @@ controls:ButtonClicked("Fast Forward x 2")
 local playerSpeedButtonCalls = speedButtonCalls
 PNC.ClientHumanNPCSafeguards.OnPlayerUpdate(player)
 player:updateLOS()
-T.equal(speed, 1, "vanilla LOS attempted managed-body speed reset")
 PNC.ClientHumanNPCSafeguards.OnTick()
-T.equal(speed, 3, "post-LOS safeguard restores requested fast-forward")
-T.equal(multiplier, 20, "post-LOS safeguard restores vanilla multiplier")
+T.equal(speed, 3, "managed human body does not cancel fast-forward")
+T.equal(multiplier, 20, "managed human body preserves vanilla multiplier")
 T.equal(speedButtonCalls, playerSpeedButtonCalls + 1,
-    "safeguard delegates restoration through vanilla speed controls")
+    "post-LOS safeguard restores requested fast-forward")
 T.equal(controls.ButtonClicked, originalButtonClicked,
     "safeguard leaves Java-owned method untouched")
 

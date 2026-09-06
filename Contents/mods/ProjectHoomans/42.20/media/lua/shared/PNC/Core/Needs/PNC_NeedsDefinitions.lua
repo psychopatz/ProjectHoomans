@@ -97,7 +97,10 @@ Definitions.ABSTRACT_SCAVENGE = {
 }
 Definitions.DEBUG_HISTORY_LIMIT = 40
 Definitions.SCHEDULER_INTERVAL_MS = 30000
-Definitions.SCHEDULER_BATCH_SIZE = 100
+-- Individual need updates are spread across server ticks. The batch count is
+-- only a safety cap; the time budget below is the primary hitch guard.
+Definitions.SCHEDULER_BATCH_SIZE = 4
+Definitions.SCHEDULER_TIME_BUDGET_MS = 2
 Definitions.MAX_CATCHUP_HOURS = 168
 Definitions.NUTRITION = {
     defaultCalories = 0, minimumCalories = -12000, maximumCalories = 12000,

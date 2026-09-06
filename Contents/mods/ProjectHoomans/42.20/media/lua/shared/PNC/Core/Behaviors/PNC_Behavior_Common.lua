@@ -263,6 +263,21 @@ function Common.HaltMovement(record, zombie, reason)
         and moveIntent and moveIntent.Hold
     then
         moveIntent.Hold(record, reason or "hold")
+        -- A live engine route must be relinquished before callers apply an
+        -- idle presentation.  Deferring this to the next PathService pump
+        -- leaves Behavior2/path2 alive while Animation.Apply writes the
+        -- vanilla locomotion state, which makes doDeferredMovement reject the
+        -- route as WalkTowardState + path2 ownership conflict.
+        local planner = PNC.EnginePathPlanner
+        local navigation = record.runtime and record.runtime.localNavigation
+            or nil
+        if navigation
+            and navigation.provider == "engine_path"
+            and planner
+            and planner.Invalidate
+        then
+            planner.Invalidate(record, reason or "hold", zombie)
+        end
         return
     end
     if zombie and PathService and PathService.Reset then

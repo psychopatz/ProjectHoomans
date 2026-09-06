@@ -140,6 +140,18 @@ T.equal(nativePumpCalls, 0,
 T.equal(intentConsumptions, intentBeforeNative + 1,
     "single-player scheduler did not process native movement intent")
 
+-- Once a native intent has been consumed, the scheduler should yield before
+-- running the same active-route preamble again. A new revision still remains
+-- eligible for immediate consumption in the production path.
+record.runtime.moveIntent = { kind = "move", revision = 1 }
+lane.intentRevision = 1
+local stableIntentCount = intentConsumptions
+handled, state = PNC.PathService.Pump(record, body, "ownership_test")
+T.truthy(handled and state == "native_waiting_for_zombie_update",
+    "single-player native route did not yield after intent consumption")
+T.equal(intentConsumptions, stableIntentCount,
+    "single-player native route re-consumed a stable intent")
+
 navigation.nativeActive = false
 handled, state = PNC.PathService.Pump(record, body, "ownership_test")
 T.truthy(handled and state == "native_waiting",

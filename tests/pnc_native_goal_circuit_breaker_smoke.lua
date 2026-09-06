@@ -38,4 +38,13 @@ T.truthy(not Internal.isNativeGoalBlocked(
     "meaningfully changed goal remained suppressed")
 T.truthy(lane.nativeFailureCount == 0,
     "changed goal did not reset native failure history")
+
+-- Follow goals need the same one-retry grace as ordinary engine routes. A
+-- transient single-player handoff failure must not immediately block a
+-- companion's route.
+lane = { intentReason = "follow_owner_walk" }
+T.truthy(not Internal.noteNativeGoalFailure(lane, goal, now),
+    "follow goal blocked after its first native failure")
+T.truthy(Internal.noteNativeGoalFailure(lane, goal, now + 100),
+    "follow goal did not block after its retry failed")
 T.finish("pnc_native_goal_circuit_breaker_smoke")

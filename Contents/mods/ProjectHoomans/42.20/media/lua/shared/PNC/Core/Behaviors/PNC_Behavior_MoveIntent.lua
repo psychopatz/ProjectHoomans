@@ -66,6 +66,7 @@ function MoveIntent.RequestMove(
     intent.steeringKind = navigation
         and tostring(navigation.steeringKind or "") or nil
     intent.updatedAt = Core.Now()
+    intent.revision = (tonumber(intent.revision) or 0) + 1
     return true
 end
 
@@ -91,6 +92,7 @@ function MoveIntent.Hold(record, reason)
         record.orderSpec and record.orderSpec.kind or "none"
     )
     intent.updatedAt = Core.Now()
+    intent.revision = (tonumber(intent.revision) or 0) + 1
     return true
 end
 
