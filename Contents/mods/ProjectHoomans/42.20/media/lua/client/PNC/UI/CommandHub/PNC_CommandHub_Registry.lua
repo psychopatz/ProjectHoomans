@@ -224,8 +224,24 @@ local function openResearch(_, owner)
     return false
 end
 
+local function openBuilding(_, owner)
+    trace("pnc_building_open_start", "has_owner=" .. tostring(owner ~= nil)
+        .. " available=" .. tostring(PNC.BuildingUI ~= nil
+            and PNC.BuildingUI.Open ~= nil))
+    local building = PNC.BuildingUI
+    if building and type(building.Open) == "function" then
+        local result = building.Open(owner)
+        trace("pnc_building_open_result",
+            "result=" .. tostring(result ~= nil))
+        return result
+    end
+    trace("pnc_building_open_result",
+        "result=false reason=missing_building_ui")
+    return false
+end
+
 Registry.SetCategoryOrder({ "work", "zone", "events", "colonist", "storage",
-    "research" })
+    "research", "building" })
 
 Registry.RegisterCategory({
     id = "work",
@@ -357,6 +373,23 @@ Registry.RegisterCategory({
     tooltipFallback = "Plan colony upgrades and study research sources",
     onClick = toggleChild("research", openResearch),
     selected = function() return isOpen("research") end,
+    closeHub = false,
+})
+
+Registry.RegisterCategory({
+    id = "building",
+    source = "ProjectHoomans",
+    order = 80,
+    childID = "building",
+    useChildren = false,
+    titleKey = "UI_PNC_CommandHub_Category_Building",
+    titleFallback = "Building",
+    tooltipKey = "UI_PNC_CommandHub_BuildingHelp",
+    tooltipFallback = "Plan and place colony buildings",
+    enabled = Gates.HasBaseAndStockpile,
+    disabledTooltip = Gates.BaseAndStockpileDisabledTooltip,
+    onClick = toggleChild("building", openBuilding),
+    selected = function() return isOpen("building") end,
     closeHub = false,
 })
 

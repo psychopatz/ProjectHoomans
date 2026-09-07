@@ -76,8 +76,13 @@ end
 
 function ISPNCColonyManagementWindow:onBuildingControl(button)
     local definition = Registry.Get("building")
-    return definition and definition.onControl
-        and definition.onControl(self, button) or false
+    if definition and definition.onControl then
+        return definition.onControl(self, button)
+    end
+    if definition and definition.action then
+        return definition.action(self)
+    end
+    return false
 end
 
 function ISPNCColonyManagementWindow:onBaseControl(button)
@@ -164,7 +169,7 @@ end
 function ISPNCColonyManagementWindow:prerender()
     local currentTime = PNC.Core.Now()
     if (self.tab == "tasks" or self.tab == "task" or self.tab == "base"
-        or self.tab == "research" or self.tab == "building")
+        or self.tab == "research")
         and currentTime - (tonumber(self.lastWorkPollAt) or 0) >= 2000
     then
         self.lastWorkPollAt = currentTime

@@ -17,7 +17,7 @@ local WidgetWindow = PsychopatzCore.UI.WidgetWindow or {}
 
 Controller.entries = Controller.entries or {}
 Controller.closeOrder = { "zone", "work", "settings", "events", "colonist",
-    "storage", "research" }
+    "storage", "research", "building" }
 Controller.activeID = nil
 Controller.closing = false
 
@@ -199,6 +199,8 @@ function Controller.ApplyOpacity(opacity)
         and PNC.ColonyStorageUI.instance or nil, value)
     Options.ApplyWindowOpacity(PNC.ResearchUI
         and PNC.ResearchUI.instance or nil, value)
+    Options.ApplyWindowOpacity(PNC.BuildingUI
+        and PNC.BuildingUI.instance or nil, value)
     return value
 end
 
@@ -254,6 +256,12 @@ function Controller.SyncPositions()
         and type(research.sync) == "function"
     then
         research.sync(owner)
+    end
+    local building = Controller.entries.building
+    if Controller.IsOpen("building") and building
+        and type(building.sync) == "function"
+    then
+        building.sync(owner)
     end
     Controller.ApplyOpacity(Options.GetOpacity())
     return true
@@ -418,6 +426,33 @@ Controller.Register("research", {
     sync = function(owner)
         placeWindow(PNC.ResearchUI
             and PNC.ResearchUI.instance or nil, owner)
+    end,
+})
+
+Controller.Register("building", {
+    open = function(owner)
+        local building = PNC.BuildingUI
+        return building and building.Open
+            and building.Open(owner) or false
+    end,
+    close = function()
+        local building = PNC.BuildingUI
+        if building and building.Close then building.Close() end
+    end,
+    isOpen = function()
+        return PNC.BuildingUI
+            and moduleIsVisible(PNC.BuildingUI) or false
+    end,
+    isDetached = function()
+        return PNC.BuildingUI
+            and moduleIsDetached(PNC.BuildingUI) or false
+    end,
+    focus = function()
+        return focusModule(PNC.BuildingUI)
+    end,
+    sync = function(owner)
+        placeWindow(PNC.BuildingUI
+            and PNC.BuildingUI.instance or nil, owner)
     end,
 })
 

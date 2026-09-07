@@ -212,4 +212,61 @@ Flavor.Register("social.player_spoke", {
     },
 })
 
+Flavor.Register("social.conversation_safety_danger", {
+    id = "social.conversation_safety_danger",
+    family = "conversation_safety",
+    npc = {
+        "Not safe to talk right now, {playerFirstName}. Eyes up and stay vigilant.",
+        "Hold that thought. Trouble is close; stay vigilant, {playerFirstName}.",
+        "We need to stop talking for now. Keep watch, {playerFirstName}.",
+    },
+    variants = {
+        {
+            id = "hostile",
+            when = { socialRole = "hostile" },
+            npc = {
+                "We're done here. Danger is closing in; stay vigilant.",
+                "Not safe to talk with that threat nearby. Keep your eyes open.",
+                "Eyes up. I won't keep you exposed. Stay vigilant.",
+            },
+        },
+        {
+            id = "neutral",
+            when = { socialRole = "neutral" },
+            npc = {
+                "Not safe to talk right now, {playerFirstName}. Stay vigilant.",
+                "Something is moving nearby. We should stop talking and stay vigilant.",
+                "Let's pause this. Keep watch until the danger passes.",
+            },
+        },
+        {
+            id = "colonist",
+            when = { socialRole = { "colonist", "member" } },
+            npc = {
+                "Conversation's over for now. Something's close; stay vigilant, {playerFirstName}.",
+                "Eyes up, {playerFirstName}. We can talk again when the camp is safe.",
+                "Hold on the discussion. Keep watch and stay vigilant, everyone.",
+            },
+        },
+        {
+            id = "lover",
+            when = { socialRole = "lover" },
+            npc = {
+                "We need to stop talking, love. Something's close; stay vigilant.",
+                "Not safe to talk right now, {playerFirstName}. Stay close and keep watch.",
+                "Eyes up, love. We'll finish this when the danger passes.",
+            },
+        },
+        {
+            id = "family",
+            when = { socialRole = "family" },
+            npc = {
+                "Not safe to talk right now, {playerFirstName}. Stay close and stay vigilant.",
+                "Something's nearby. We can talk later; keep your guard up, family.",
+                "Hold that thought. Watch each other's backs until it's clear.",
+            },
+        },
+    },
+})
+
 return PNC.SocialFlavorDefinitions

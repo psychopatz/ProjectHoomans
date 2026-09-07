@@ -42,7 +42,7 @@ end
 
 local function button(window, builder, id, title, variant)
     return builder.CreateButton(window, { id = id, title = title,
-        target = window, onclick = ISPNCColonyManagementWindow.onBuildingControl,
+        target = window, onclick = window.onBuildingControl,
         variant = variant })
 end
 
@@ -585,7 +585,11 @@ local function rebuildQueue(window, queue)
 end
 
 function Building.Rebuild(window, snapshot)
-    if window.tab ~= "building" then return false end
+    if window.tab and window.tab ~= "building"
+        and window.buildingActive ~= true
+    then
+        return false
+    end
     local building = snapshot.building or {}
     local recipes = building.recipes or {}
     QueueOverlay.SetQueue(building.queue or {})

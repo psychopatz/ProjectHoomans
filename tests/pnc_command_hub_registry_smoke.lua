@@ -27,6 +27,8 @@ T.equal(categories[5].id, "storage",
     "storage is not fifth in the manual hierarchy")
 T.equal(categories[6].id, "research",
     "research is not sixth in the manual hierarchy")
+T.equal(categories[7].id, "building",
+    "building is not seventh in the manual hierarchy")
 for _, id in ipairs({
     "structure", "production", "furniture", "external_furniture",
     "genetics", "power", "pipe_networks", "security", "misc", "floors",
@@ -53,6 +55,8 @@ T.truthy(Registry.Get("storage").onClick,
     "storage category does not expose its standalone workflow")
 T.truthy(Registry.Get("research").onClick,
     "research category does not expose its standalone workflow")
+T.truthy(Registry.Get("building").onClick,
+    "building category does not expose its standalone workflow")
 
 PNC.ColonyManagementClient = {
     ReadSnapshot = function()
@@ -106,6 +110,7 @@ local openedEvents = false
 local openedColonist = false
 local openedStorage = false
 local openedResearch = false
+local openedBuilding = false
 PNC.CommandHub.WorkUI = {
     Open = function()
         openedWork = true
@@ -146,6 +151,12 @@ PNC.ResearchUI = {
         return true
     end,
 }
+PNC.BuildingUI = {
+    Open = function()
+        openedBuilding = true
+        return true
+    end,
+}
 Registry.Get("work").onClick()
 T.truthy(openedWork, "work category is not wired to its window")
 T.truthy(Registry.IsEnabled(Registry.Get("events")),
@@ -158,6 +169,8 @@ Registry.Get("storage").onClick()
 T.truthy(openedStorage, "storage category is not wired to its window")
 Registry.Get("research").onClick()
 T.truthy(openedResearch, "research category is not wired to its window")
+Registry.Get("building").onClick()
+T.truthy(openedBuilding, "building category is not wired to its window")
 zone.actions[1].onClick()
 zone.actions[2].onClick()
 zone.actions[3].onClick()
@@ -300,6 +313,8 @@ T.contains(composition, "PNC/UI/CommandHub/PNC_CommandHub",
     "command hub is not in the client composition")
 T.contains(composition, "PNC/UI/Research/PNC_ResearchWindow",
     "research widget is not in the client composition")
+T.contains(composition, "PNC/UI/Building/PNC_Building",
+    "building widget is not in the client composition")
 T.falsy(string.find(composition, "PNC/UI/Orders/", 1, true),
     "legacy Orders UI is still in the client composition")
 
@@ -352,12 +367,30 @@ T.contains(childControllerSource, 'Controller.Register("storage"',
     "storage window is not managed by the child controller")
 T.contains(childControllerSource, "PNC.ColonyStorageUI",
     "child controller does not manage the storage instance")
+T.contains(childControllerSource, 'Controller.Register("building"',
+    "building window is not managed by the child controller")
+T.contains(childControllerSource, "PNC.BuildingUI",
+    "child controller does not manage the building instance")
 local zoneSource = T.read("ProjectHoomans", "client",
     "PNC/UI/CommandHub/PNC_CommandHub_ZoneWindow.lua")
 T.contains(zoneSource, "CoreHub.Actions",
     "zone panels are not anchored to the Core action window")
 local workSource = T.read("ProjectHoomans", "client",
     "PNC/UI/CommandHub/PNC_CommandHub_WorkWindow.lua")
+local buildingWindowSource = T.read("ProjectHoomans", "client",
+    "PNC/UI/Building/PNC_BuildingWindow.lua")
+T.contains(buildingWindowSource, "WidgetWindow.Install",
+    "building window does not support detached widgets")
+T.contains(buildingWindowSource, "pnc-command-hub-building-widget",
+    "building window does not have a stable widget control id")
+T.contains(buildingWindowSource, "PNC.CommandHub.Building",
+    "building window does not persist its geometry independently")
+local buildingTabSource = T.read("ProjectHoomans", "client",
+    "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagementBuildingTab.lua")
+T.contains(buildingTabSource, "building_debug_get_items",
+    "building surface dropped its debug material action")
+T.contains(buildingTabSource, "CanUseDebug",
+    "building surface dropped its debug availability gate")
 T.contains(workSource, "PsychopatzCore/UI/PsychopatzCommandHubOptions",
     "work window does not consume Core options")
 local settingsSource = T.read("ProjectHoomans", "client",

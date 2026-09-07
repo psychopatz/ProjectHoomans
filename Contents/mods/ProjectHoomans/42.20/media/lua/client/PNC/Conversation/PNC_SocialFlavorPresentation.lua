@@ -42,6 +42,12 @@ local function currentPlayer()
     return getSpecificPlayer and getSpecificPlayer(0) or nil
 end
 
+local function currentTime()
+    return PNC.Core and PNC.Core.Now and PNC.Core.Now()
+        or getTimeInMillis and getTimeInMillis()
+        or 0
+end
+
 local function playerIdentity()
     local state = PNC.Network and PNC.Network.ClientState or {}
     return NameParts.ForPlayer(currentPlayer(), state.playerContext)
@@ -339,6 +345,103 @@ function Presentation.ReceivePlayerSpeech(player, text, sourceContext)
         end
     end
     return accepted > 0
+end
+
+-- A safety interruption is still authored social speech.  Queue it through
+-- Core so the same resolved line can reach conversation history, the diary,
+-- and the shared voice stream before the UI finishes its closing animation.
+function Presentation.EnqueueConversationSafety(spec, state, reason)
+    local context = spec and spec.context or {}
+    local entry = context.entry or {}
+    local npcID = clean(
+        state and state.npcID or spec and spec.npcID or entry.id,
+        nil
+    )
+    local player = context.player or currentPlayer()
+    local identity = playerIdentity()
+    local role
+    local speaker
+    local eventID
+    local safetyContext
+    local accepted
+    local enqueueReason
+    if tostring(reason or "") ~= "danger" then
+        return false, "not_danger"
+    end
+    if not npcID then return false, "identity_required" end
+    if state and state.safetyFeedbackShown == true then
+        return false, "already_presented"
+    end
+    if state then state.safetyFeedbackShown = true end
+    role = clean(
+        context.socialRole or context.npcType
+            or entry.socialRole or entry.npcType,
+        "neutral"
+    )
+    speaker = npcIdentity(npcID, "Companion")
+    eventID = "conversation-safety:" .. npcID .. ":"
+        .. tostring(state and state.token or currentTime())
+    safetyContext = {
+        eventType = "conversation_safety",
+        reason = "danger",
+        npcID = npcID,
+        npcType = role,
+        socialRole = role,
+        player = identity.addressName,
+        playerName = identity.addressName,
+        playerFullName = identity.fullName,
+        playerFirstName = identity.firstName,
+        playerSurname = identity.surname,
+        speakerFullName = speaker.fullName,
+        speakerFirstName = speaker.firstName,
+        speakerSurname = speaker.surname,
+        relationshipState = context.relationshipState,
+        relationshipTier = context.relationshipTier,
+    }
+    accepted, enqueueReason = Client.Enqueue({
+        eventID = eventID,
+        flavorID = "social.conversation_safety_danger",
+        family = "conversation_safety",
+        priority = Client.CRITICAL_PRIORITY or 100,
+        weight = 100,
+        speakerID = npcID,
+        speakerName = speaker.fullName,
+        playerUUID = playerUUID() or identity.addressName,
+        npcType = role,
+        socialRole = role,
+        relationshipState = context.relationshipState,
+        relationshipTier = context.relationshipTier,
+        context = safetyContext,
+        seed = state and state.token or eventID,
+        llmEligible = false,
+        memoryEligible = false,
+        cooldowns = {
+            familyMs = 0,
+            speakerMs = 0,
+            ambientMs = 0,
+        },
+        presentationState = {
+            nameplate = false,
+            conversationUI = true,
+            interrupt = false,
+            tts = true,
+        },
+        source = {
+            kind = "social_flavor",
+            channel = "conversation_safety",
+            eventType = "conversation_safety",
+            reason = "danger",
+            contextEligible = false,
+        },
+        ttlMs = 4000,
+        holdMs = 1500,
+    })
+    if accepted ~= true then return false, enqueueReason end
+    if type(Client.Pump) == "function" then
+        local delivered, deliveryReason = Client.Pump(currentTime())
+        return delivered == true, deliveryReason or enqueueReason
+    end
+    return true, enqueueReason
 end
 
 local function onDelivered(payload)

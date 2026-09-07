@@ -101,6 +101,22 @@ local function refresh(state, spec)
         or false
 end
 
+local function presentSafetyFeedback(spec, state, reason)
+    if tostring(reason or "") ~= "danger" then return false end
+    local presentation = PNC.SocialFlavorPresentation
+    if not presentation then
+        local ok, loaded = pcall(
+            require,
+            "PNC/Conversation/PNC_SocialFlavorPresentation"
+        )
+        presentation = ok and loaded or PNC.SocialFlavorPresentation
+    end
+    return presentation
+        and type(presentation.EnqueueConversationSafety) == "function"
+        and presentation.EnqueueConversationSafety(spec, state, reason)
+        or false
+end
+
 function Lifecycle.Create()
     return {
         begin = function(view, spec)
@@ -162,6 +178,7 @@ function Lifecycle.Create()
             return nil
         end,
         finish = function(_, spec, state, reason)
+            presentSafetyFeedback(spec, state, reason)
             if PNC.Core and PNC.Core.LogInfo then
                 PNC.Core.LogInfo(table.concat({
                     "Conversation closed",
