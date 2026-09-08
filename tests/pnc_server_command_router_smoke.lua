@@ -1,5 +1,8 @@
 local T = require "tests/support/test"
-T.addPackagePaths({ { "ProjectHoomans", "server" } })
+T.addPackagePaths({
+    { "ProjectHoomans", "shared" },
+    { "ProjectHoomans", "server" },
+})
 
 local transferArgs
 local actionArgs

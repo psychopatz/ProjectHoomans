@@ -40,8 +40,19 @@ function IdentityChoice.Build(npcID, projection, identityArguments)
             args = identityArguments,
         },
         action = function()
-            projection.state = "loading"
-            IdentityChoice.Request(npcID)
+            -- Keep the identity projection unknown while the disclosure is
+            -- in flight. Only the request lifecycle is loading; the social
+            -- category menu must remain usable.
+            projection.state = "unknown"
+            projection.requestState = "loading"
+            projection.knowledgePending = true
+            projection.canAskName = false
+            local accepted = IdentityChoice.Request(npcID)
+            if accepted ~= true then
+                projection.requestState = "error"
+                projection.knowledgePending = false
+                projection.canAskName = true
+            end
         end,
     }
 end

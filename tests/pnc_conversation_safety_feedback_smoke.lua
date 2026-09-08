@@ -48,6 +48,7 @@ getSpecificPlayer = function() return player end
 local EventBus = require "PsychopatzCore/Events/PC_EventBus"
 local Message = require "PsychopatzCore/Conversation/PsychopatzConversationMessage"
 local Client = require "PsychopatzCore/Conversation/PsychopatzSocialFlavorClient"
+local NameplateSpeech = require "PNC/UI/Nameplates/PNC_NameplateSpeech"
 local Presentation = require "PNC/Conversation/PNC_SocialFlavorPresentation"
 local Flavor = require "PsychopatzCore/Conversation/PsychopatzSocialFlavor"
 
@@ -78,13 +79,31 @@ T.equal(reason, "delivered", "danger warning is delivered immediately")
 T.equal(#view.historyPart.messages, 1,
     "danger warning reaches the closing conversation history")
 local message = view.historyPart.messages[1]
+local warningText = string.lower(message.text or "")
 T.equal(message.speakerID, "npc-one", "warning preserves NPC speaker identity")
 T.equal(message.presentationState.conversationUI, true,
     "warning targets the conversation UI")
+T.equal(message.presentationState.nameplate, true,
+    "warning remains visible after the conversation view closes")
+T.equal(message.presentationState.interrupt, true,
+    "warning can interrupt ordinary speech")
 T.equal(message.source.eventType, "conversation_safety",
     "warning keeps its social flavor event type")
-T.contains(string.lower(message.text), "stay vigilant",
-    "warning tells the player to stay vigilant")
+T.equal(message.source.priority, 100,
+    "warning uses the critical social flavor priority")
+T.truthy(
+    string.find(warningText, "safe", 1, true)
+        or string.find(warningText, "danger", 1, true)
+        or string.find(warningText, "threat", 1, true)
+        or string.find(warningText, "watch", 1, true)
+        or string.find(warningText, "alert", 1, true)
+        or string.find(warningText, "guard", 1, true),
+    "warning explains that danger prevents the conversation"
+)
+PsychopatzCore.Conversation.instance = nil
+T.truthy(NameplateSpeech.Get("npc-one"),
+    "danger warning remains available to the NPC nameplate")
+PsychopatzCore.Conversation.instance = view
 T.equal(state.safetyFeedbackShown, true,
     "warning is marked as presented")
 T.falsy(Presentation.EnqueueConversationSafety(
@@ -152,10 +171,10 @@ T.equal(sceneEnded, true, "active danger close ends the scene lease")
 
 local definition = Flavor.Get("social.conversation_safety_danger")
 T.truthy(definition, "danger warning is registered in the flavor registry")
-T.equal(#definition.npc, 3, "danger warning has base line variety")
+T.truthy(#definition.npc >= 9, "danger warning has broad base line variety")
 T.equal(#definition.variants, 5, "danger warning has relationship variety")
 for _, variant in ipairs(definition.variants) do
-    T.equal(#variant.npc, 3,
+    T.truthy(#variant.npc >= 9,
         "danger warning role variant has line variety: " .. variant.id)
 end
 

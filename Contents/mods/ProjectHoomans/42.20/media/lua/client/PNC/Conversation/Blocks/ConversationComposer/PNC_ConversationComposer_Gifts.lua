@@ -2,7 +2,6 @@ local Conversation = PNC.Conversation
 local Composer = Conversation.Composer
 local Registry = Conversation.Registry
 local Loader = Conversation.TextLoader
-local Relationship = Conversation.Relationship
 local Internal = Composer.Internal
 
 local NEEDS_FALLBACK_SOURCE = Internal.NEEDS_FALLBACK_SOURCE
@@ -77,11 +76,12 @@ function Composer.ReceiveGiftResult(args)
                 and args.relationshipAfter.revision,
         }
     )
-    if Relationship and Relationship.RequestPresentation then
+    local relationship = Conversation.Relationship
+    if relationship and relationship.RequestPresentation then
         -- The authoritative effect is committed before this callback. Refresh
         -- the live conversation panel so its marker and attitude use the same
         -- relationship snapshot that the debug laboratory displays.
-        Relationship.RequestPresentation(args.npcId)
+        relationship.RequestPresentation(args.npcId)
     end
     if PNC.InventoryWindow and PNC.InventoryWindow.Close then
         PNC.InventoryWindow.Close()

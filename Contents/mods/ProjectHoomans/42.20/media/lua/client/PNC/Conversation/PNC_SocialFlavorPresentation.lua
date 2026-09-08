@@ -403,7 +403,9 @@ function Presentation.EnqueueConversationSafety(spec, state, reason)
         flavorID = "social.conversation_safety_danger",
         family = "conversation_safety",
         priority = Client.CRITICAL_PRIORITY or 100,
-        weight = 100,
+        -- Safety speech must win over ordinary ambient commentary, even when
+        -- another flavor is already occupying the presentation lane.
+        weight = 1000,
         speakerID = npcID,
         speakerName = speaker.fullName,
         playerUUID = playerUUID() or identity.addressName,
@@ -421,9 +423,12 @@ function Presentation.EnqueueConversationSafety(spec, state, reason)
             ambientMs = 0,
         },
         presentationState = {
-            nameplate = false,
+            -- The full conversation view may already be closing (or may have
+            -- been rejected before its session was created).  Keep this
+            -- visible in the detached nameplate speech lane as well.
+            nameplate = true,
             conversationUI = true,
-            interrupt = false,
+            interrupt = true,
             tts = true,
         },
         source = {

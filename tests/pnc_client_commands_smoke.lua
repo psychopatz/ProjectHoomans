@@ -148,6 +148,53 @@ T.equal(State.npcKnowledge.npc_direct.categories[1].descriptors[1].value,
     "Burton Gilmore", "single-player disclosure uses shared cache receiver")
 T.equal(knowledgeRefreshes, 2,
     "single-player disclosure refreshes active conversation")
+local knownPresentation = State.npcPresentations.npc_direct
+T.equal(knownPresentation.state, "known",
+    "disclosure stores a known identity presentation")
+Client.HandleServerCommand("NPCPresentation", {
+    npcID = "npc_direct",
+    state = "loading",
+    presenceState = "live",
+})
+T.equal(State.npcPresentations.npc_direct.state, "known",
+    "generic presentation cannot regress a known identity")
+T.equal(State.npcPresentations.npc_direct.displayName,
+    "Burton Gilmore",
+    "generic presentation preserves the learned name")
+T.equal(State.npcPresentations.npc_direct.presenceState, "live",
+    "generic presentation metadata still reaches the known projection")
+Client.HandleServerCommand("NPCPresentation", {
+    npcID = "npc_pending",
+    state = "loading",
+})
+T.equal(State.npcPresentations.npc_pending.state, "unknown",
+    "pending identity remains a visible unknown presentation")
+T.equal(State.npcPresentations.npc_pending.requestState, "loading",
+    "pending identity keeps transport state as metadata")
+T.equal(State.npcPresentations.npc_pending.canAskName, true,
+    "pending identity keeps Ask Name available")
+Client.HandleServerCommand("NPCPresentation", {
+    npcID = "npc_error",
+    state = "error",
+    reason = "knowledge_command_handler_unavailable",
+})
+T.equal(State.npcPresentations.npc_error.state, "unknown",
+    "identity request errors do not replace the conversation menu")
+T.equal(State.npcPresentations.npc_error.requestState, "error",
+    "identity request error remains diagnosable")
+PNC.PlayerKnowledgeCommands.HandlePresentation = function(_, args)
+    return {
+        npcID = args.npcID,
+        state = "unknown",
+        canAskName = true,
+    }
+end
+T.equal(Client.RequestNPCKnowledge("npc_request"), true,
+    "single-player identity refresh is accepted")
+T.equal(State.npcPresentations.npc_request.state, "unknown",
+    "identity refresh does not use loading as the presentation state")
+T.equal(State.npcPresentations.npc_request.requestState, "loading",
+    "identity refresh records the request state")
 PNC.PlayerKnowledgeCommands.HandleDisclosure = function()
     return { success = false, reason = "insufficient_familiarity" }
 end

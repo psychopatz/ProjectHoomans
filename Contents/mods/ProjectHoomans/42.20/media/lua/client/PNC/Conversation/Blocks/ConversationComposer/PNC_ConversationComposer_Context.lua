@@ -2,9 +2,13 @@ PNC = PNC or {}
 PNC.Conversation = PNC.Conversation or {}
 
 local Conversation = PNC.Conversation
+if not Conversation.Audience then
+    require "PNC/Conversation/PNC_ConversationAudience"
+end
 local Composer = Conversation.Composer
 local Registry = Conversation.Registry
 local Loader = Conversation.TextLoader
+local Audience = Conversation.Audience
 
 local TIME_HOURS = {
     dawn = 5.5,
@@ -20,25 +24,6 @@ local function worldAgeHours()
         and math.max(0, tonumber(time:getWorldAgeHours()) or 0) or 0
 end
 
-local function audienceMap(entry, relationshipID)
-    local snapshot = entry and entry.snapshot or {}
-    local record = entry and entry.record or {}
-    local hostility = snapshot.hostility or record.hostility or {}
-    -- `record.tacticalClass == "hostile"` is the canonical tactical state.
-    -- used when an organizational faction is fighting another NPC faction.
-    -- Only an explicit player-hostility bit makes this player a hostile
-    -- conversation audience. Missing replica data must fail closed.
-    local hostile = hostility.attackPlayers == true
-    return {
-        hostile = hostile,
-        neutral = not hostile and relationshipID ~= "Member"
-            and relationshipID ~= "Lover",
-        member = not hostile and relationshipID == "Member",
-        special = not hostile and relationshipID == "Lover",
-        shared = true,
-    }
-end
-
 function Composer.BuildContext(entry, player, timeID, relationshipID)
     local state = PNC.Network and PNC.Network.ClientState or {}
     local playerContext = state.playerContext or {}
@@ -48,6 +33,12 @@ function Composer.BuildContext(entry, player, timeID, relationshipID)
     local relationship = Conversation.Relationship
         and Conversation.Relationship.GetPresentation(npcID) or {}
     local at = worldAgeHours()
+    local profile = Audience.BuildProfile(
+        entry,
+        player,
+        relationshipID,
+        colonyManagement.settlement ~= nil
+    )
     local context = {
         entry = entry,
         player = player,
@@ -63,12 +54,17 @@ function Composer.BuildContext(entry, player, timeID, relationshipID)
         playerPersonality = playerContext.socialProfile,
         npcPersonality = record.personality or record.socialProfile,
         npcTraits = record.traits or record.socialTraits,
-        audiences = audienceMap(entry, relationshipID),
-        allowHostileParley = audienceMap(entry, relationshipID).hostile,
+        audience = profile.audience,
+        conversationAudience = profile.audience,
+        conversationProfile = profile,
+        tacticalClass = profile.tacticalClass,
+        playerHostile = profile.playerHostile,
+        audiences = profile.audiences,
+        allowHostileParley = profile.playerHostile,
         worldAgeHours = at,
         hour = TIME_HOURS[timeID] or at % 24,
         worldID = "world",
-        baseEstablished = colonyManagement.settlement ~= nil,
+        baseEstablished = profile.baseEstablished,
     }
     context.blockValidator = function(block)
         return Loader.EnsureSource(

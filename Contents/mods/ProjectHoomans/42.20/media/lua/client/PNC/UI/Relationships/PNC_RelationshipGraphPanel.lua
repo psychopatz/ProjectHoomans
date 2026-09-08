@@ -407,15 +407,18 @@ function ISPNCRelationshipGraphPanel:render()
                 UIFont.Small
             )
         end
-        self:drawHover(
-            graphX,
-            graphY,
-            graphSize,
-            markerX,
-            markerY,
-            evaluation
-        )
     end
+    -- Conversation panels use graphOnly to save space, but the hover
+    -- explanation is still the only direct way to inspect why a point is in
+    -- the green acceptance region. Keep it available in that presentation.
+    self:drawHover(
+        graphX,
+        graphY,
+        graphSize,
+        markerX,
+        markerY,
+        evaluation
+    )
 end
 
 function ISPNCRelationshipGraphPanel:new(x, y, width, height)

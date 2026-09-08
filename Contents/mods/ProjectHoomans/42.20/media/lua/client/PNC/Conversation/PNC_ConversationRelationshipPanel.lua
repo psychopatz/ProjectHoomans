@@ -15,6 +15,21 @@ ISPNCConversationRelationshipPanel = PsychopatzConversationPart:derive(
 local Conversation = PNC.Conversation
 local Presentation = PNC.RelationshipPresentation
 
+local function signed(value)
+    return string.format("%+.1f", tonumber(value) or 0)
+end
+
+local function previewText(evaluation)
+    local requirement = evaluation and evaluation.requirement or nil
+    if not requirement then return nil end
+    local id = string.upper(tostring(requirement.id or ""))
+    if id == "" then return nil end
+    if requirement.enabled ~= true then
+        return id
+    end
+    return "REQ " .. id .. " >= " .. signed(evaluation.threshold)
+end
+
 local function partCoordinate(part, panel, value, axis)
     local coordinate = tonumber(value) or 0
     local current = panel
@@ -192,6 +207,28 @@ function ISPNCConversationRelationshipPanel:prerender()
     -- conversation windows. Graph-only applies to the graph's inspector
     -- footer, not to this conversation-window presentation.
     PsychopatzConversationPart.prerender(self)
+    local evaluation = self.graph and self.graph.getEvaluation
+        and self.graph:getEvaluation() or nil
+    local text = previewText(evaluation)
+    if not text then return end
+    local accent = self:getAccentColor()
+    local color = accent
+    if evaluation.requirement.enabled == true then
+        color = evaluation.insideSuccessRegion
+            and { r = 0.35, g = 0.92, b = 0.48 }
+            or { r = 0.96, g = 0.58, b = 0.35 }
+    end
+    local x = math.max(112, self.width - 18 - #text * 7)
+    self:drawText(
+        text,
+        x,
+        5,
+        color.r,
+        color.g,
+        color.b,
+        self:getContentOpacity(),
+        UIFont.Small
+    )
 end
 
 function ISPNCConversationRelationshipPanel:setRelationship(summary)
@@ -233,15 +270,17 @@ end
 function ISPNCConversationRelationshipPanel:setRequirement(requirement, context)
     self.requirement = requirement or "inspect"
     self.requirementContext = type(context) == "table" and context or {}
-    if self.graph then
-        self.graph:setEvaluation(
-            Presentation.BuildEvaluation(
-                self.relationship or {},
-                self.requirement,
-                self.requirementContext
-            )
-        )
+    if not self.graph or not self.graph.setEvaluation then
+        return false, "relationship_graph_unavailable"
     end
+    self.graph:setEvaluation(
+        Presentation.BuildEvaluation(
+            self.relationship or {},
+            self.requirement,
+            self.requirementContext
+        )
+    )
+    return true
 end
 
 function ISPNCConversationRelationshipPanel:onPartResize()

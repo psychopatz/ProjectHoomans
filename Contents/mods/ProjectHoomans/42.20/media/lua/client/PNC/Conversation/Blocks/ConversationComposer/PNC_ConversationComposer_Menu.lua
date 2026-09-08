@@ -3,7 +3,6 @@ local Composer = Conversation.Composer
 local Registry = Conversation.Registry
 local Selector = Conversation.Selector
 local Loader = Conversation.TextLoader
-local Relationship = Conversation.Relationship
 local Internal = Composer.Internal
 
 local SYSTEM_SOURCE = Internal.SYSTEM_SOURCE
@@ -39,20 +38,86 @@ local GOODBYE_SOURCE = {
     domain = "pnc.goodbye.shared.goodbye",
 }
 
+local function evaluateCategory(context, category)
+    local categoryEligible, categoryReason = Selector.IsCategoryEligible(
+        category.id, context, false
+    )
+    local categoryTextValid, categoryTextReason = Loader.EnsureSource(
+        category.textSource,
+        { category.labelKey }
+    )
+    local selected, selection = Selector.SelectBlock(category.id, context)
+    local textValid
+    local textReason
+    if selected then
+        textValid, textReason = ensureBlockText(selected)
+    end
+
+    local visible = categoryEligible and selected and textValid
+        and categoryTextValid or false
+    local reason = "visible"
+    if not categoryEligible then
+        reason = categoryReason or "category_ineligible"
+    elseif not categoryTextValid then
+        reason = categoryTextReason or "category_text_invalid"
+    elseif not selected then
+        reason = "no_eligible_block"
+        for _, candidate in ipairs(selection and selection.candidates or {}) do
+            if candidate.reason then
+                reason = candidate.reason
+                break
+            end
+        end
+    elseif not textValid then
+        reason = textReason or "block_text_invalid"
+    end
+
+    return {
+        category = category,
+        categoryEligible = categoryEligible == true,
+        categoryReason = categoryReason,
+        selected = selected,
+        selection = selection,
+        textValid = textValid == true,
+        categoryTextValid = categoryTextValid == true,
+        visible = visible == true,
+        reason = reason,
+    }
+end
+
+function Composer.BuildCategoryDiagnostics(context)
+    local diagnostics = {}
+    for _, category in ipairs(Registry.ListCategories()) do
+        local result = evaluateCategory(context, category)
+        local candidates = result.selection
+            and result.selection.candidates or {}
+        diagnostics[#diagnostics + 1] = {
+            id = category.id,
+            labelKey = category.labelKey,
+            visible = result.visible,
+            reason = result.reason,
+            categoryEligible = result.categoryEligible,
+            categoryReason = result.categoryReason,
+            categoryTextValid = result.categoryTextValid,
+            selectedBlockID = result.selected and result.selected.id or nil,
+            blockEligibleCount = result.selection
+                and result.selection.eligibleCount or 0,
+            candidates = candidates,
+        }
+    end
+    return diagnostics
+end
+
 local function categoryChoices(context)
     local choices = {}
-    for _, category in ipairs(Registry.ListCategories()) do
-        local categoryEligible = Selector.IsCategoryEligible(
-            category.id, context, false
-        )
-        local categoryTextValid = Loader.EnsureSource(
-            category.textSource,
-            { category.labelKey }
-        )
-        local selected = Selector.SelectBlock(category.id, context)
-        local textValid = selected and ensureBlockText(selected)
-        if categoryEligible and selected and textValid and categoryTextValid then
-            local selectedCategory = category
+    local diagnostics = context.categoryDiagnostics
+    if type(diagnostics) ~= "table" then
+        diagnostics = Composer.BuildCategoryDiagnostics(context)
+        context.categoryDiagnostics = diagnostics
+    end
+    for _, diagnostic in ipairs(diagnostics) do
+        if diagnostic.visible then
+            local selectedCategory = Registry.GetCategory(diagnostic.id)
             choices[#choices + 1] = {
                 id = selectedCategory.id,
                 text = payload(
@@ -113,6 +178,7 @@ end
 
 function Composer.BuildRootNode(context, options)
     options = type(options) == "table" and options or {}
+    context.categoryDiagnostics = Composer.BuildCategoryDiagnostics(context)
     local greeting, greetingBlock = Composer.BuildGreeting(context)
     local choices = {}
     if context.audiences.hostile then
@@ -153,11 +219,20 @@ function Composer.BuildRootNode(context, options)
         if not recruited
         then
             local function setRecruitPreview(highlighted)
-                if Relationship and Relationship.SetPreviewRequirement then
-                    Relationship.SetPreviewRequirement(
+                local relationship = Conversation.Relationship
+                    or PNC.Conversation.Relationship
+                if relationship and relationship.SetPreviewRequirement then
+                    local ok, reason = relationship.SetPreviewRequirement(
                         context.npcID,
                         highlighted and "recruit" or "inspect"
                     )
+                    if not ok and PNC.Core and PNC.Core.LogWarn then
+                        PNC.Core.LogWarn(
+                            "Conversation relationship preview unavailable npc="
+                                .. tostring(context.npcID or "")
+                                .. " reason=" .. tostring(reason or "unknown")
+                        )
+                    end
                 end
             end
             choices[#choices + 1] = {

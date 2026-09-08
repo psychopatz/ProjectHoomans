@@ -19,6 +19,7 @@ local warnings = {}
 local apiCalls = {}
 local networkCalls = {}
 local relationshipCalls = {}
+local companionBaseline
 local diagnosticCalls = {}
 local knowledgeDisclosure
 local knowledgeSnapshot
@@ -62,6 +63,26 @@ PNC = {
     Factions = {
         EnsurePlayerFaction = function()
             return true, nil, { id = "faction_debug" }
+        end,
+    },
+    PlayerCharacters = {
+        GetEntityKey = function(receivedPlayer, context)
+            T.equal(receivedPlayer, player,
+                "debug companion resolves the spawning player identity")
+            T.equal(context.callback, "debug_companion_spawn",
+                "debug companion identity resolution is contextual")
+            return "player:DebugAdmin:character-debug", "resolved"
+        end,
+    },
+    Relationships = {
+        SetInitialBaseline = function(npcID, targetKey, standing, at)
+            companionBaseline = {
+                npcID = npcID,
+                targetKey = targetKey,
+                standing = standing,
+                at = at,
+            }
+            return standing
         end,
     },
     API = {
@@ -233,6 +254,16 @@ T.equal(spawned.tacticalClass, "colonist", "debug companion tactical class")
 T.equal(spawned.factionID, "faction_debug",
     "debug companion resolves the player faction ID")
 T.equal(spawned.recruited, true, "debug companion recruited state")
+T.equal(companionBaseline.npcID, "spawned-1",
+    "debug companion initializes the spawned NPC relationship")
+T.equal(companionBaseline.targetKey, "player:DebugAdmin:character-debug",
+    "debug companion relationship targets the spawning character")
+T.equal(companionBaseline.standing.approval, 75,
+    "debug companion uses Has-a-friend approval")
+T.equal(companionBaseline.standing.respect, 65,
+    "debug companion uses Has-a-friend respect")
+T.equal(companionBaseline.standing.familiarity, 90,
+    "debug companion uses Has-a-friend familiarity")
 T.equal(knowledgeDisclosure.player, player,
     "debug companion reveals knowledge for the spawning player")
 T.equal(knowledgeDisclosure.npcID, "spawned-1",

@@ -6,10 +6,14 @@ if not PNC.NPCIdentityPresentation then
     require "PNC/Knowledge/PNC_NPCIdentityPresentation"
 end
 require "PNC/Conversation/Blocks/PNC_ConversationIdentityChoice"
+if not PNC.Conversation.Audience then
+    require "PNC/Conversation/PNC_ConversationAudience"
+end
 
 local Conversation = PNC.Conversation
 local Time = Conversation.Time
 local Relationship = Conversation.Relationship
+local Audience = Conversation.Audience
 local Lifecycle = Conversation.Lifecycle
 local Composer = Conversation.Composer
 local Backgrounds = Conversation.Backgrounds
@@ -143,12 +147,7 @@ end
 
 Conversation.FormatRoleLabel = roleLabel
 
-local function isAggressive(entry)
-    local snapshot = entry and entry.snapshot or {}
-    local record = entry and entry.record or {}
-    local hostility = snapshot.hostility or record.hostility or {}
-    return hostility.attackPlayers == true
-end
+local isAggressive = Audience.IsPlayerHostile
 
 function Conversation.RequestCeasefire(context)
     return Lifecycle and Lifecycle.RequestCeasefire
@@ -220,9 +219,10 @@ local function identityProjection(entry)
     local projection = clientState.npcPresentations
         and clientState.npcPresentations[npcID] or nil
     local learnedName = IdentityPresentation.GetFact(entry, "identity.name")
-    local state = learnedName and "known" or projection and projection.state
-        or (not PNC.Network and IdentityPresentation.IsNameKnown(entry)
-            and "known" or "loading")
+    local identityKnown = IdentityPresentation.IsNameKnown(entry)
+    local state = learnedName and "known"
+        or projection and projection.state == "known" and "known"
+        or identityKnown and "known" or "unknown"
     local name = state == "known"
         and tostring(learnedName and learnedName.value
             or projection and projection.displayName
@@ -255,6 +255,13 @@ function Conversation.BuildDefinition(entry, player, forcedTime)
         player = player,
         npcName = name,
         identityState = identityState,
+        -- Transport state is deliberately separate from what the player is
+        -- allowed to see. A pending snapshot must not erase the social menu.
+        identityRequestState = projection and (
+            projection.requestState
+            or projection.state == "loading" and "loading"
+            or projection.state == "error" and "error"
+        ) or nil,
         timeID = faction and faction.role or timeID,
         relationshipID = faction and faction.name or relationshipID,
         conversationTimeID = timeID,
@@ -264,14 +271,21 @@ function Conversation.BuildDefinition(entry, player, forcedTime)
         factionRole = faction and faction.role or nil,
         factionEmblem = faction and faction.emblem or nil,
         npcType = Palette.ResolveType(entry),
-        allowHostileParley = isAggressive(entry),
+        audience = blockContext.audience,
+        conversationAudience = blockContext.conversationAudience,
+        tacticalClass = blockContext.tacticalClass,
+        playerHostile = blockContext.playerHostile,
+        conversationProfile = blockContext.conversationProfile,
+        allowHostileParley = blockContext.playerHostile,
         conversationBlockContext = blockContext,
     }
     for key, value in pairs(identityArguments) do
         presentationContext[key] = value
     end
     local askNameChoice
-    if identityState == "unknown" and projection and projection.canAskName == true then
+    if identityState == "unknown" and projection
+        and (projection.canAskName == true or projection.state == "loading")
+    then
         askNameChoice = IdentityChoice.Build(
             npcID,
             projection,
@@ -296,23 +310,13 @@ function Conversation.BuildDefinition(entry, player, forcedTime)
     }
     blockContext.conversationMenuOptions = menuOptions
     local root = Composer.BuildRootNode(blockContext, menuOptions)
-    if identityState == "loading" then
-        local goodbyeChoice
-        for _, choice in ipairs(root.choices or {}) do
-            if choice.id == "goodbye" then goodbyeChoice = choice end
-        end
-        root.choices = {
-            {
-                id = "identity_loading",
-                text = {
-                    key = "status.loading",
-                    domain = "pnc.system.shared.categories",
-                },
-                enabled = false,
-            },
-        }
-        if goodbyeChoice then root.choices[#root.choices + 1] = goodbyeChoice end
+    presentationContext.categoryDiagnostics = blockContext.categoryDiagnostics
+    local displayedChoiceIDs = {}
+    for _, choice in ipairs(root.choices or {}) do
+        displayedChoiceIDs[#displayedChoiceIDs + 1] = choice.id
     end
+    presentationContext.displayedChoiceIDs = displayedChoiceIDs
+    presentationContext.choiceSuppressionReason = nil
     return {
         namespace = "ProjectHoomans",
         npcID = npcID,
@@ -383,10 +387,23 @@ function Conversation.Open(entry, player, forcedTime)
         state.npcPresentations = state.npcPresentations or {}
         local current = state.npcPresentations[npcID]
         if not current or current.state ~= "known" then
-            state.npcPresentations[npcID] = {
-                npcID = npcID,
-                state = "loading",
-            }
+            current = current or { npcID = npcID }
+            current.npcID = npcID
+            if IdentityPresentation.IsNameKnown(entry) then
+                current.state = "known"
+                current.canAskName = false
+                current.knowledgePending = false
+                state.npcPresentations[npcID] = current
+            else
+                -- Unknown identity is a valid conversational state. The
+                -- request for the player's latest knowledge is a separate
+                -- transport concern and must never replace the category menu.
+                if current.state ~= "unknown" then current.state = "unknown" end
+                if current.canAskName == nil then current.canAskName = true end
+                current.requestState = "loading"
+                current.knowledgePending = true
+                state.npcPresentations[npcID] = current
+            end
         end
     end
     local definition = Conversation.BuildDefinition(entry, player, forcedTime)
@@ -430,8 +447,24 @@ local function refreshForNPC(npcID)
             updatedContext.conversationBlockContext
         )
     end
-    return view.refreshConversationSpec
-        and view:refreshConversationSpec(updated) == true
+    if not view.refreshConversationSpec
+        or view:refreshConversationSpec(updated) ~= true
+    then
+        return false
+    end
+    -- Core refreshes the session and portrait, while extension parts are
+    -- owned by this integration. Keep the live relationship graph in sync
+    -- when its authoritative presentation arrives after the window opened.
+    for _, extension in ipairs(updated.extensionParts or {}) do
+        local part = view.extensionParts
+            and view.extensionParts[extension.partID] or nil
+        if part and extension.partID == "relationship"
+            and part.setRelationship
+        then
+            part:setRelationship(extension.relationship)
+        end
+    end
+    return true
 end
 
 function Conversation.ReceiveKnowledgeSnapshot(snapshot)

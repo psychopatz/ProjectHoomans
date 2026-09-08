@@ -294,7 +294,8 @@ function Relationship.SetPreviewRequirement(npcID, requirement, context)
     if not panel or not panel.setRequirement then
         return false, "relationship_panel_unavailable"
     end
-    panel:setRequirement(requirement, context)
+    local ok, reason = panel:setRequirement(requirement, context)
+    if ok == false then return false, reason end
     return true
 end
 

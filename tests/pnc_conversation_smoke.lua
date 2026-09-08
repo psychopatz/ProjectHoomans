@@ -62,7 +62,6 @@ T.load(SHARED .. "PNC/Conversation/Blocks/PNC_ConversationTextLoader.lua")
 T.load(CLIENT .. "PNC/Knowledge/PNC_NPCIdentityPresentation.lua")
 T.load(CLIENT .. "PNC/Conversation/PNC_ConversationTime.lua")
 T.load(CLIENT .. "PNC/Conversation/PNC_ConversationBackgrounds.lua")
-T.load(CLIENT .. "PNC/Conversation/PNC_ConversationRelationship.lua")
 T.load(CLIENT .. "PNC/UI/PNC_NPCTypePalette.lua")
 PNC.Conversation.Lifecycle = {
     Create = function() return { kind = "conversation_lifecycle" } end,
@@ -74,6 +73,7 @@ for _, value in ipairs({ "Dawn", "Sunrise", "Sunset", "Dusk", "Twilight" }) do
 end
 T.load(CLIENT .. "PNC/Conversation/PNC_ConversationDiary.lua")
 T.load(CLIENT .. "PNC/Conversation/Blocks/ConversationComposer/PNC_ConversationComposer.lua")
+T.load(CLIENT .. "PNC/Conversation/PNC_ConversationRelationship.lua")
 T.load(CLIENT .. "PNC/Conversation/PNC_ConversationDefinition.lua")
 T.load(CLIENT .. "PNC/Conversation/Debug/PNC_ConversationDebugModel.lua")
 T.load(CLIENT .. "PNC/UI/Context/Providers/PNC_ContextProvider_Conversation.lua")
@@ -296,6 +296,10 @@ T.equal(definition.context.relationshipID, "Crossroads Exchange",
 T.equal(definition.context.timeID, "Lead Scavenger", "role subtitle")
 T.equal(definition.context.conversationRelationshipID, "Acquaintance",
     "semantic relationship")
+T.equal(definition.context.conversationAudience, "neutral",
+    "acquaintance relationship uses neutral audience")
+T.equal(definition.context.tacticalClass, "neutral",
+    "presentation keeps tactical class separate from audience")
 T.equal(definition.context.playerFullName, "Alex Mercer", "player full name")
 T.equal(definition.context.playerFirstName, "Alex", "player first name")
 T.equal(definition.context.playerLastName, "Mercer", "player last name")
@@ -312,6 +316,162 @@ end
 T.truthy(recruitChoice, "recruit choice is available for an un-recruited NPC")
 T.equal(type(recruitChoice.onHighlightChanged), "function",
     "recruit choice exposes a reusable highlight callback")
+
+local memberEntry = {
+    id = "npc-member",
+    name = "Member Colonist",
+    snapshot = {
+        displayName = "Member Colonist",
+        survivor = { forename = "Member", surname = "Colonist" },
+        tacticalClass = "colonist",
+        relationshipCategory = "Member",
+        recruited = true,
+    },
+}
+local memberDefinition = PNC.Conversation.BuildDefinition(
+    memberEntry, player, "dawn"
+)
+T.equal(memberDefinition.context.conversationAudience, "member",
+    "member relationship projects to member audience")
+T.equal(memberDefinition.context.tacticalClass, "colonist",
+    "member profile preserves colonist tactical class")
+local territoryChoice
+for _, choice in ipairs(memberDefinition.nodes.menu.choices or {}) do
+    if choice.id == "projecthoomans:set_territory" then
+        territoryChoice = choice
+    end
+end
+T.truthy(territoryChoice,
+    "member menu exposes territory choice before a base is established")
+local territoryDiagnostic
+for _, diagnostic in ipairs(
+    memberDefinition.context.categoryDiagnostics or {}
+) do
+    if diagnostic.id == "projecthoomans:set_territory" then
+        territoryDiagnostic = diagnostic
+    end
+end
+T.truthy(territoryDiagnostic, "territory diagnostic is exposed")
+T.truthy(territoryDiagnostic.visible,
+    "territory diagnostic marks member choice visible")
+T.equal(territoryDiagnostic.reason, "visible",
+    "territory diagnostic reason")
+
+local savedNetwork = PNC.Network
+PNC.Network = { ClientState = { npcPresentations = {} } }
+local knownCompanionDefinition = PNC.Conversation.BuildDefinition(
+    memberEntry, player, "dawn"
+)
+T.equal(knownCompanionDefinition.context.identityState, "known",
+    "companion ownership is enough to recognize identity")
+T.equal(knownCompanionDefinition.context.npcName, "Member Colonist",
+    "recognized companion uses its display name")
+PNC.Network = savedNetwork
+
+PNC.Network = { ClientState = {
+    npcPresentations = {
+        [memberEntry.id] = { state = "known", displayName = "Member Colonist" },
+    },
+    colonyManagement = { settlement = { id = "existing-base" } },
+} }
+local establishedDefinition = PNC.Conversation.BuildDefinition(
+    memberEntry, player, "dawn"
+)
+local establishedTerritoryChoice
+for _, choice in ipairs(establishedDefinition.nodes.menu.choices or {}) do
+    if choice.id == "projecthoomans:set_territory" then
+        establishedTerritoryChoice = choice
+    end
+end
+T.falsy(establishedTerritoryChoice,
+    "territory choice is hidden after a base is established")
+local establishedTerritoryDiagnostic
+for _, diagnostic in ipairs(
+    establishedDefinition.context.categoryDiagnostics or {}
+) do
+    if diagnostic.id == "projecthoomans:set_territory" then
+        establishedTerritoryDiagnostic = diagnostic
+    end
+end
+T.equal(establishedTerritoryDiagnostic.reason, "locked.base_established",
+    "territory diagnostic explains established-base lock")
+PNC.Network = savedNetwork
+
+PNC.Network = { ClientState = {
+    npcPresentations = {
+        ["npc-member-pending"] = { state = "loading", canAskName = true },
+    },
+} }
+local pendingMemberEntry = {
+    id = "npc-member-pending",
+    name = "Pending Member",
+    snapshot = {
+        displayName = "Pending Member",
+        survivor = { forename = "Pending", surname = "Member" },
+        tacticalClass = "colonist",
+        relationshipCategory = "Member",
+        recruited = false,
+    },
+}
+local loadingMemberDefinition = PNC.Conversation.BuildDefinition(
+    pendingMemberEntry, player, "dawn"
+)
+T.equal(loadingMemberDefinition.context.identityState, "unknown",
+    "pending identity remains an unknown presentation")
+T.equal(loadingMemberDefinition.context.identityRequestState, "loading",
+    "identity request loading is exposed separately")
+T.equal(loadingMemberDefinition.context.conversationAudience, "member",
+    "loading identity does not change the underlying member audience")
+T.falsy(loadingMemberDefinition.context.choiceSuppressionReason,
+    "pending identity does not suppress the conversation menu")
+local loadingAskNameChoice
+local loadingTerritoryChoice
+for _, choice in ipairs(loadingMemberDefinition.nodes.menu.choices or {}) do
+    if choice.id == "ask_name" then
+        loadingAskNameChoice = choice
+    elseif choice.id == "projecthoomans:set_territory" then
+        loadingTerritoryChoice = choice
+    end
+end
+T.truthy(loadingAskNameChoice,
+    "pending identity keeps Ask Name available")
+T.truthy(loadingTerritoryChoice,
+    "pending identity keeps the underlying member menu visible")
+local loadingTerritoryDiagnostic
+for _, diagnostic in ipairs(
+    loadingMemberDefinition.context.categoryDiagnostics or {}
+) do
+    if diagnostic.id == "projecthoomans:set_territory" then
+        loadingTerritoryDiagnostic = diagnostic
+    end
+end
+T.truthy(loadingTerritoryDiagnostic.visible,
+    "identity loading preserves underlying category eligibility")
+PNC.Network = savedNetwork
+
+local savedClient = PNC.Client
+PNC.Network = { ClientState = { npcPresentations = {} } }
+PNC.Client = {
+    RequestNPCKnowledge = function() return true end,
+}
+local firstOpenDefinition = PNC.Conversation.Open(entry, player, "dawn")
+local firstOpenProjection = PNC.Network.ClientState.npcPresentations[entry.id]
+T.equal(firstOpenProjection.state, "unknown",
+    "first conversation open does not enter a blocking identity state")
+T.equal(firstOpenProjection.requestState, "loading",
+    "first conversation open records the knowledge request state")
+local firstOpenAskName
+local firstOpenRecruit
+for _, choice in ipairs(firstOpenDefinition.nodes.menu.choices or {}) do
+    if choice.id == "ask_name" then firstOpenAskName = choice end
+    if choice.id == "recruit" then firstOpenRecruit = choice end
+end
+T.truthy(firstOpenAskName, "first neutral conversation offers Ask Name")
+T.truthy(firstOpenRecruit, "first neutral conversation offers Recruit")
+PNC.Client = savedClient
+PNC.Network = savedNetwork
+PsychopatzCore.Conversation.instance = nil
+
 local hoveredRecruitRequirement
 PsychopatzCore.Conversation.instance = {
     spec = { npcID = "npc-12" },

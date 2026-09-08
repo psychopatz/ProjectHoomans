@@ -6,36 +6,7 @@ local Router = PNC.ServerCommandRouter
 local Const = PNC.Const
 local H = Handler.Internal
 
-local function revealDebugCompanionKnowledge(player, npcID, at)
-    local knowledge = PNC.NPCKnowledge
-    if not knowledge then return end
-
-    -- Debug companions must enter the same known-at-creation pipeline as
-    -- starter companions, including faction identity and presentation data.
-    if knowledge.DiscoverAllForPlayer then
-        knowledge.DiscoverAllForPlayer(
-            player, npcID, at, "lifelong_relationship", true
-        )
-    elseif knowledge.DiscoverTopicForPlayer then
-        knowledge.DiscoverTopicForPlayer(
-            player, npcID, "identity_name", at,
-            "direct_disclosure", true
-        )
-    end
-
-    if knowledge.BuildPlayerSnapshotForPlayer
-        and PNC.Network and PNC.Network.SendNPCKnowledge
-    then
-        local snapshot = knowledge.BuildPlayerSnapshotForPlayer(
-            player, npcID
-        )
-        if snapshot then
-            PNC.Network.SendNPCKnowledge(
-                player, snapshot, "lifelong_relationship"
-            )
-        end
-    end
-end
+local CompanionInitialization = require "PNC/Core/Companions/PNC_DebugCompanionInitialization"
 
 function Handler.ConfigureTeleport(value)
     H.Teleport = value
@@ -145,7 +116,34 @@ function H.HandleDebugSpawn(player, args)
         debug = true,
     })
     if colonist and record then
-        revealDebugCompanionKnowledge(player, record.id, worldAgeHours)
+        local initialized, initializationResult =
+            CompanionInitialization.ApplyKnownCompanion(
+                player, record.id, worldAgeHours
+            )
+        if initialized and type(initializationResult) == "table"
+            and initializationResult.relationshipApplied ~= true
+        then
+            PNC.Core.LogWarn(
+                "PNC debug companion relationship initialization failed npc="
+                    .. tostring(record.id)
+                    .. " reason="
+                    .. tostring(initializationResult.relationshipReason)
+            )
+        end
+        if initialized and type(initializationResult) == "table"
+            and initializationResult.knowledgeApplied ~= true
+        then
+            PNC.Core.LogWarn(
+                "PNC debug companion knowledge initialization failed npc="
+                    .. tostring(record.id)
+            )
+        elseif not initialized then
+            PNC.Core.LogWarn(
+                "PNC debug companion initialization failed npc="
+                    .. tostring(record.id)
+                    .. " reason=" .. tostring(initializationResult)
+            )
+        end
     end
     PNC.Core.LogInfo("PNC debug spawn variant=" .. variant
         .. " tacticalClass=" .. tacticalClass

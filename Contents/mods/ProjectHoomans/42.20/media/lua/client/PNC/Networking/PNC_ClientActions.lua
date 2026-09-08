@@ -13,6 +13,7 @@ local Const = PNC.Const
 local Core = PNC.Core
 local Registry = PNC.Registry
 local ClientState = PNC.Network.ClientState
+local CompanionInitialization = require "PNC/Core/Companions/PNC_DebugCompanionInitialization"
 
 local function traceCompanionCommand(commandID, npcId, scope, context, result)
     local trace = PsychopatzCore and PsychopatzCore.DebugTrace
@@ -248,7 +249,7 @@ function Client.SendDebug(action, payload)
             end
             playerFactionID = playerFaction.id
         end
-        return PNC.API.Spawn({
+        local record = PNC.API.Spawn({
             tacticalClass = tacticalClass,
             x = x, y = y, z = z,
             ownerUsername = ownerUsername,
@@ -277,7 +278,44 @@ function Client.SendDebug(action, payload)
             ),
             forceLive = true,
             debug = true,
-        }) ~= nil
+        })
+        if record and colonist then
+            local gameTime = getGameTime and getGameTime() or nil
+            local worldAgeHours = gameTime
+                and gameTime.getWorldAgeHours
+                and gameTime:getWorldAgeHours() or 0
+            local initialized, initializationResult =
+                CompanionInitialization.ApplyKnownCompanion(
+                    player, record.id, worldAgeHours
+                )
+            if initialized and type(initializationResult) == "table"
+                and initializationResult.relationshipApplied ~= true
+                and Core.LogWarn
+            then
+                Core.LogWarn(
+                    "PNC debug companion relationship initialization failed npc="
+                        .. tostring(record.id)
+                        .. " reason="
+                        .. tostring(initializationResult.relationshipReason)
+                )
+            elseif not initialized and Core.LogWarn then
+                Core.LogWarn(
+                    "PNC debug companion initialization failed npc="
+                        .. tostring(record.id)
+                        .. " reason=" .. tostring(initializationResult)
+                )
+            end
+            if initialized and type(initializationResult) == "table"
+                and initializationResult.knowledgeApplied ~= true
+                and Core.LogWarn
+            then
+                Core.LogWarn(
+                    "PNC debug companion knowledge initialization failed npc="
+                        .. tostring(record.id)
+                )
+            end
+        end
+        return record ~= nil
     end
     if PNC.API and args.id then
         return PNC.API.DebugCommand(args.id, action, args)

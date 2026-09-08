@@ -12,7 +12,6 @@ local Registry = Conversation.Registry
 local Selector = Conversation.Selector
 local Rules = Conversation.Rules
 local Loader = Conversation.TextLoader
-local Relationship = Conversation.Relationship
 local Diary = Conversation.Diary
 Composer.requestSerial = tonumber(Composer.requestSerial) or 0
 Composer.localRequests = Composer.localRequests or {}
@@ -71,8 +70,9 @@ local function receiveRelationshipAfter(npcID, after, delta, metadata)
         previousState = after.previousState,
         revision = after.revision,
     }
-    if Relationship and Relationship.ReceivePresentation then
-        Relationship.ReceivePresentation(summary, delta, metadata)
+    local relationship = Conversation.Relationship
+    if relationship and relationship.ReceivePresentation then
+        relationship.ReceivePresentation(summary, delta, metadata)
     end
     local view = activeView(npcID)
     local context = view and view.spec and view.spec.context
