@@ -1256,6 +1256,8 @@
     "UI_PNC_CommandHub_Category_Building": "Building",
     "UI_PNC_CommandHub_BuildingHelp": "Plan and place colony buildings",
     "UI_PNC_Building_WindowTitle": "COLONY BUILDING",
+    "UI_PNC_CommandHub_Category_Stockpile": "BUILD STOCKPILE",
+    "UI_PNC_CommandHub_StockpileHelp": "Create the colony's first stockpile",
     "UI_PNC_Research_WindowTitle": "COLONY RESEARCH",
     "UI_PNC_Research_CatalogTitle": "RESEARCH TREE",
     "UI_PNC_Research_QueueTitle": "ACTIVE QUEUE",

@@ -27,8 +27,10 @@ T.equal(categories[5].id, "storage",
     "storage is not fifth in the manual hierarchy")
 T.equal(categories[6].id, "research",
     "research is not sixth in the manual hierarchy")
-T.equal(categories[7].id, "building",
-    "building is not seventh in the manual hierarchy")
+T.equal(categories[7].id, "stockpile",
+    "stockpile bootstrap is not seventh in the manual hierarchy")
+T.equal(categories[8].id, "building",
+    "building is not eighth in the manual hierarchy")
 for _, id in ipairs({
     "structure", "production", "furniture", "external_furniture",
     "genetics", "power", "pipe_networks", "security", "misc", "floors",
@@ -55,6 +57,8 @@ T.truthy(Registry.Get("storage").onClick,
     "storage category does not expose its standalone workflow")
 T.truthy(Registry.Get("research").onClick,
     "research category does not expose its standalone workflow")
+T.truthy(Registry.Get("stockpile").onClick,
+    "stockpile category does not expose its bootstrap workflow")
 T.truthy(Registry.Get("building").onClick,
     "building category does not expose its standalone workflow")
 
@@ -79,6 +83,10 @@ T.falsy(Registry.IsEnabled(Registry.Get("work")),
     "work remains enabled without a base and stockpile")
 T.falsy(Registry.IsEnabled(Registry.Get("zone")),
     "zone remains enabled without a base and stockpile")
+T.falsy(Registry.IsEnabled(Registry.Get("stockpile")),
+    "stockpile bootstrap remains enabled without a base")
+T.falsy(Registry.IsEnabled(Registry.Get("building")),
+    "building remains enabled without a base")
 PNC.ColonyManagementClient.ReadSnapshot = function()
     return { snapshot = { settlement = { facilities = {} } } }
 end
@@ -90,6 +98,10 @@ T.equal(disabledTooltip.fallback,
     "missing stockpile tooltip fallback changed")
 T.falsy(Registry.IsEnabled(Registry.Get("work")),
     "work enabled without a stockpile")
+T.truthy(Registry.IsEnabled(Registry.Get("stockpile")),
+    "stockpile bootstrap did not enable with a base before the stockpile exists")
+T.falsy(Registry.IsEnabled(Registry.Get("building")),
+    "building enabled before the stockpile exists")
 PNC.ColonyManagementClient.ReadSnapshot = function()
     return {
         snapshot = { settlement = {
@@ -391,6 +403,16 @@ T.contains(buildingTabSource, "building_debug_get_items",
     "building surface dropped its debug material action")
 T.contains(buildingTabSource, "CanUseDebug",
     "building surface dropped its debug availability gate")
+local registrySource = T.read("ProjectHoomans", "client",
+    "PNC/UI/CommandHub/PNC_CommandHub_Registry.lua")
+T.falsy(string.find(buildingTabSource, '"build_stockpile"', 1, true),
+    "stockpile bootstrap leaked into the Building child UI")
+T.contains(registrySource, 'id = "stockpile"',
+    "stockpile bootstrap is not registered on the root hub")
+T.contains(registrySource, 'Facility.BeginBuild(owner, "stockpile")',
+    "root stockpile bootstrap bypasses the facility build protocol")
+T.contains(registrySource, "stockpileBootstrapVisible",
+    "root stockpile bootstrap does not own one-time visibility")
 T.contains(workSource, "PsychopatzCore/UI/PsychopatzCommandHubOptions",
     "work window does not consume Core options")
 local settingsSource = T.read("ProjectHoomans", "client",

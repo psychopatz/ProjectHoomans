@@ -109,27 +109,30 @@ function Gates.HasRadio()
     return hasRadio()
 end
 
-local function hasBuiltStockpile(settlement)
-    -- stockpileNodes are optional navigation/access points. The actual
-    -- setup prerequisite is a built stockpile facility in the established
-    -- base, so a valid base does not remain disabled just because no access
-    -- point has been configured yet.
+local function stockpileStatus(settlement)
+    local exists, built = false, false
     for _, facility in ipairs(settlement.facilities or {}) do
         if tostring(facility.definitionId or "") == "stockpile" then
-            if FacilityState.IsBuilt(facility) then return true end
+            exists = true
+            built = FacilityState.IsBuilt(facility)
+            break
         end
     end
-    return false
+    return exists, built
 end
 
 function Gates.GetBaseAndStockpileStatus()
     local snapshot = colonyManagementSnapshot()
     local settlement = type(snapshot) == "table" and snapshot.settlement or nil
     local hasBase = type(settlement) == "table"
-    local hasStockpile = hasBase and hasBuiltStockpile(settlement) or false
+    local stockpileExists, hasStockpile = false, false
+    if hasBase then
+        stockpileExists, hasStockpile = stockpileStatus(settlement)
+    end
     return {
         hasBase = hasBase,
         hasStockpile = hasStockpile,
+        hasStockpileFacility = stockpileExists,
         enabled = hasBase and hasStockpile,
     }
 end
@@ -240,8 +243,36 @@ local function openBuilding(_, owner)
     return false
 end
 
+local function stockpileBootstrapVisible()
+    return not Gates.GetBaseAndStockpileStatus().hasStockpileFacility
+end
+
+local function stockpileBootstrapEnabled()
+    local status = Gates.GetBaseAndStockpileStatus()
+    return status.hasBase and not status.hasStockpileFacility
+end
+
+local function stockpileBootstrapDisabledTooltip()
+    local status = Gates.GetBaseAndStockpileStatus()
+    if status.hasBase then return nil end
+    return {
+        key = "UI_PNC_CommandHub_Disabled_NoBase",
+        fallback = "Requires a colony base.",
+    }
+end
+
+local function buildStockpile(_, owner)
+    trace("pnc_stockpile_build_start", "has_owner=" .. tostring(owner ~= nil))
+    local Facility = require
+        "PNC/UI/Communities/ColonyManagement/SettlementManagement/PNC_SettlementManagement_FacilityActions"
+    local result, reason = Facility.BeginBuild(owner, "stockpile")
+    trace("pnc_stockpile_build_result",
+        "result=" .. tostring(result) .. " reason=" .. tostring(reason))
+    return result
+end
+
 Registry.SetCategoryOrder({ "work", "zone", "events", "colonist", "storage",
-    "research", "building" })
+    "research", "stockpile", "building" })
 
 Registry.RegisterCategory({
     id = "work",
@@ -373,6 +404,22 @@ Registry.RegisterCategory({
     tooltipFallback = "Plan colony upgrades and study research sources",
     onClick = toggleChild("research", openResearch),
     selected = function() return isOpen("research") end,
+    closeHub = false,
+})
+
+Registry.RegisterCategory({
+    id = "stockpile",
+    source = "ProjectHoomans",
+    order = 75,
+    useChildren = false,
+    titleKey = "UI_PNC_CommandHub_Category_Stockpile",
+    titleFallback = "BUILD STOCKPILE",
+    tooltipKey = "UI_PNC_CommandHub_StockpileHelp",
+    tooltipFallback = "Create the colony's first stockpile",
+    visible = stockpileBootstrapVisible,
+    enabled = stockpileBootstrapEnabled,
+    disabledTooltip = stockpileBootstrapDisabledTooltip,
+    onClick = buildStockpile,
     closeHub = false,
 })
 

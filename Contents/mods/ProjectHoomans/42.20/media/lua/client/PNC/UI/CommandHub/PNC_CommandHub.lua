@@ -9,6 +9,7 @@ local CoreHub = require "PsychopatzCore/UI/PsychopatzCommandHub"
 local Toolbar = require "PsychopatzCore/UI/Components/PsychopatzWindowToolbar"
 local UI = PsychopatzCore.UI
 local Theme = UI.Theme
+local Registry = CoreHub.Registry
 
 require "PNC/UI/CommandHub/PNC_CommandHub_CorpseHaulUI"
 require "PNC/UI/CommandHub/PNC_CommandHub_ZoneOverlay"
@@ -65,6 +66,25 @@ local function installToolbar(window)
     return button
 end
 
+local function syncStockpileBootstrap(window)
+    if not window or not window.categoryButtons then return end
+    local category = Registry and Registry.Get
+        and Registry.Get("stockpile") or nil
+    if not category then return end
+    local visible = Registry.IsVisible(category, window)
+    local button = window.categoryButtons.stockpile
+    if visible and not button and window.syncButtons then
+        window:syncButtons()
+        button = window.categoryButtons.stockpile
+    end
+    if not button or button:getIsVisible() == visible then return end
+    button:setVisible(visible)
+    if window.fitToContent then window:fitToContent(false) end
+    if window.requestResponsiveLayout then
+        window:requestResponsiveLayout(true)
+    end
+end
+
 -- Keep PNC's child controller synchronized with the Core-owned host even
 -- when another mod opens the shared hub directly through PsychopatzCore.
 CoreHub.RegisterObserver("ProjectHoomans.CommandHub", function(event, window)
@@ -82,6 +102,7 @@ CoreHub.RegisterObserver("ProjectHoomans.CommandHub", function(event, window)
     if event == "prerender" and Hub.ChildController
         and Hub.ChildController.SyncPositions
     then
+        syncStockpileBootstrap(window)
         Hub.ChildController.SyncPositions()
     end
 end)
