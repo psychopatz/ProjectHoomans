@@ -179,9 +179,9 @@ local function addResource(resources, seen, resource)
     resources[#resources + 1] = copy
 end
 
-local function describeBed(square, object)
+local function describeSleepResource(square, object, detectorId)
     local detector = Resources and Resources.GetDetector
-        and Resources.GetDetector("bed") or nil
+        and Resources.GetDetector(detectorId) or nil
     if not detector or type(detector.matches) ~= "function"
         or type(detector.describe) ~= "function"
     then return nil end
@@ -192,10 +192,14 @@ local function describeBed(square, object)
     matched = primitiveCopy(matched)
     matched.resourceKey = type(detector.key) == "function"
         and detector.key(matched) or bedKey(matched)
-    matched.detectorId = "bed"
-    matched.targetResolver = "bed"
+    matched.detectorId = detectorId
+    matched.targetResolver = detectorId
     matched.resourceKind = matched.resourceKind or "sleep_surface"
-    matched.role = matched.role or "sleep.bed"
+    matched.role = matched.role or detector.role
+    matched.sleepSurface = matched.sleepSurface or detector.sleepSurface
+        or detectorId
+    matched.sleepPriority = matched.sleepPriority
+        or detector.sleepPriority or 0
     matched.exclusive = matched.exclusive ~= false
     matched.available = true
     matched.originX = square and square.getX and square:getX() or matched.originX
@@ -271,11 +275,22 @@ Service.RegisterProvider("bed", {
         if detector and detector.collect then
             detector.collect(square, function(object)
                 emitted[object] = true
-                add(describeBed(square, object))
+                add(describeSleepResource(square, object, "bed"))
             end)
         end
         eachObject(square, function(object)
-            if not emitted[object] then add(describeBed(square, object)) end
+            if not emitted[object] then
+                add(describeSleepResource(square, object, "bed"))
+            end
+        end)
+    end,
+})
+
+Service.RegisterProvider("sofa", {
+    resourceKind = "sleep_surface",
+    CaptureSquare = function(square, add)
+        eachObject(square, function(object)
+            add(describeSleepResource(square, object, "sofa"))
         end)
     end,
 })
@@ -410,7 +425,7 @@ local function reserved(resource, excludeKey)
         and PNC.FacilityReservations.ByResource[key] ~= nil
 end
 
-local function resolveBed(resource, abstract)
+local function resolveSleep(resource, abstract)
     local targets = Targets and Targets.ResolveResource
         and Targets.ResolveResource(resource, { abstract = abstract == true }) or {}
     return targets[1], targets
@@ -471,16 +486,31 @@ function Service.FindSleep(record, options)
     options = type(options) == "table" and options or {}
     local state = Service.GetSnapshot(record, options.force == true)
     local resources = state and state.resources or {}
+    local selected
     for index = 1, #resources do
         local resource = resources[index]
         if tostring(resource.resourceKind or "") == "sleep_surface"
             and not reserved(resource, options.excludeKey)
         then
-            local target, targets = resolveBed(resource, options.abstract)
+            local target, targets = resolveSleep(resource, options.abstract)
             if target and targetWithinCamp(record, target) then
-                return resource, target, targets
+                local priority = tonumber(resource.sleepPriority) or 0
+                if not selected
+                    or priority > selected.priority
+                    or (priority == selected.priority
+                        and tostring(resource.resourceKey or "")
+                            < tostring(selected.resource.resourceKey or ""))
+                then
+                    selected = {
+                        resource = resource, target = target, targets = targets,
+                        priority = priority,
+                    }
+                end
             end
         end
+    end
+    if selected then
+        return selected.resource, selected.target, selected.targets
     end
     if options.allowFloor ~= false then
         local resource = floorSlot(record, campContext(record) or {})
@@ -583,8 +613,10 @@ function Service.AcquireSleep(record, options)
         resourceKind = resource.resourceKind, target = target,
         approachCandidates = targets, campId = campId, campActivity = true,
         sleepVariant = "CAMP_NEARBY",
-        sleepTargetPolicy = resource.resourceKind == "sleep_surface"
-            and "CAMP_NEARBY_BED" or "CAMP_FLOOR_FALLBACK",
+        sleepTargetPolicy = resource.sleepSurface == "sofa"
+            and "CAMP_NEARBY_SOFA"
+            or resource.resourceKind == "sleep_surface"
+                and "CAMP_NEARBY_BED" or "CAMP_FLOOR_FALLBACK",
         campX = order.x, campY = order.y, campZ = order.z,
         campRadius = number(order.radius, Const.CAMP_RADIUS or 3),
         resourceRadius = number(order.resourceRadius,
@@ -716,7 +748,7 @@ function Service.ResolveActivityTarget(record)
                 target, _, resolvedResource = resolveWaterTarget(
                     record, resource, abstract)
             else
-                target = resolveBed(resource, abstract)
+                target = resolveSleep(resource, abstract)
             end
             if target and targetWithinCamp(record, target) then
                 target.campResource = true

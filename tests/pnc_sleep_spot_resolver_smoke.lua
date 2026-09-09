@@ -50,6 +50,28 @@ T.equal(target.x, 10.5, "floor sleep x")
 T.equal(target.y, 20.5, "floor sleep y")
 T.equal(target.interactionX, nil, "floor sleep does not teleport")
 
+local sofaProperties = {
+    get = function(_, key)
+        local values = { CustomName = "Sofa", Facing = "E" }
+        return values[key]
+    end,
+}
+local sofaSprite = {
+    getName = function() return "furniture_seating_01_0" end,
+    getProperties = function() return sofaProperties end,
+    tilesetName = "furniture_seating",
+}
+local sofaObject = {
+    getSprite = function() return sofaSprite end,
+    getProperties = function() return sofaProperties end,
+}
+bedObjects[1] = sofaObject
+target = Targets.Resolve(component)[1]
+T.equal(target.sceneId, "facility.sleep.sofa",
+    "legacy sleep spots recognize approved sofas")
+T.equal(target.sleepSurface, "sofa",
+    "legacy sofa targets preserve their sleep classification")
+
 local properties = {
     get = function(_, key)
         local values = { CustomName = "Bed", BedType = "GoodBed", Facing = "E" }

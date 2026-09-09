@@ -3,6 +3,7 @@ PNC.BuildingQueueOverlay = PNC.BuildingQueueOverlay or {}
 
 local Overlay = PNC.BuildingQueueOverlay
 local Catalog = PNC.BuildRecipeCatalog
+local Footprint = require "PNC/Core/Settlement/PNC_BuildingFootprint"
 
 Overlay.enabled = Overlay.enabled == true
 Overlay.queue = Overlay.queue or {}
@@ -72,6 +73,14 @@ local function nativeInfoFor(order)
         info = ok and resolved or nil
     end
     return info
+end
+
+local function footprintFor(order)
+    local blueprint = blueprintFor(order)
+    return Footprint.FromObjectInfo(nativeInfoFor(order),
+        blueprint and blueprint.nSprite,
+        blueprint and blueprint.x, blueprint and blueprint.y,
+        blueprint and blueprint.z)
 end
 
 local function buildGhost(order, character)
@@ -156,6 +165,56 @@ local function drawLabel(drawer, playerNum, order, point)
         UIFont and UIFont.Small)
 end
 
+local function renderRegion(playerNum, region, color)
+    if not addAreaHighlightForPlayer or not region then return end
+    for z, level in pairs(region.levels or {}) do
+        for y, spans in pairs(level.rows or {}) do
+            for index = 1, #spans, 2 do
+                addAreaHighlightForPlayer(playerNum, spans[index], y,
+                    spans[index + 1] + 1, y + 1, z,
+                    color.r, color.g, color.b, color.a)
+            end
+        end
+    end
+end
+
+local function renderQueue(playerNum, queue, includeGhosts)
+    local character = getSpecificPlayer and getSpecificPlayer(0) or nil
+    local drawer = includeGhosts and drawerFor(playerNum) or nil
+    for _, order in ipairs(queue or {}) do
+        if active(order) then
+            local point = pointFor(order)
+            local region = footprintFor(order)
+            if point and region then
+                renderRegion(playerNum, region, statusColor(order))
+                if includeGhosts then
+                    local cursor = buildGhost(order, character)
+                    if cursor and cursor.render and getCell then
+                        local square = getCell():getGridSquare(
+                            point.x, point.y, point.z)
+                        pcall(cursor.render, cursor, point.x, point.y,
+                            point.z, square)
+                    end
+                    drawLabel(drawer, playerNum, order, point)
+                end
+            elseif point then
+                local color = statusColor(order)
+                addAreaHighlightForPlayer(playerNum, point.x, point.y,
+                    point.x + 1, point.y + 1, point.z,
+                    color.r, color.g, color.b, color.a)
+            end
+        end
+    end
+end
+
+local function currentQueue()
+    local network = PNC.Network
+    local state = network and network.ClientState or nil
+    local snapshot = state and state.colonyManagement or nil
+    local building = snapshot and snapshot.building or nil
+    return building and building.queue or Overlay.queue
+end
+
 function Overlay.SetQueue(queue)
     local nextQueue = {}
     local live = {}
@@ -190,23 +249,20 @@ function Overlay.Render()
     local character = getSpecificPlayer and getSpecificPlayer(0) or nil
     if not character then return end
     local playerNum = character.getPlayerNum and character:getPlayerNum() or 0
-    local drawer = drawerFor(playerNum)
-    for _, order in ipairs(Overlay.queue or {}) do
-        local point = pointFor(order)
-        if point then
-            local color = statusColor(order)
-            addAreaHighlightForPlayer(playerNum, point.x, point.y,
-                point.x + 1, point.y + 1, point.z,
-                color.r, color.g, color.b, color.a)
-            local cursor = buildGhost(order, character)
-            if cursor and cursor.render and getCell then
-                local square = getCell():getGridSquare(
-                    point.x, point.y, point.z)
-                pcall(cursor.render, cursor, point.x, point.y, point.z, square)
-            end
-            drawLabel(drawer, playerNum, order, point)
-        end
+    renderQueue(playerNum, currentQueue(), true)
+end
+
+-- Placement always shows queued blueprint footprints. The persistent overlay
+-- may already be enabled, in which case its normal draw pass handles this so
+-- the same tiles are not highlighted twice.
+function Overlay.RenderPlacement(playerNum)
+    if Overlay.enabled or not addAreaHighlightForPlayer then return end
+    if playerNum == nil then
+        local character = getSpecificPlayer and getSpecificPlayer(0) or nil
+        if not character then return end
+        playerNum = character.getPlayerNum and character:getPlayerNum() or 0
     end
+    renderQueue(playerNum, currentQueue(), true)
 end
 
 function Overlay.Reset()

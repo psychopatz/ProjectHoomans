@@ -92,4 +92,40 @@ T.truthy(cancelledInputs, "input reservation cleanup shares cancellation path")
 T.truthy(Work.Commands.Cancel(order.id, "player_again"),
     "terminal cancellation remains idempotent")
 
+Work.CancellationHandlers = Work.CancellationHandlers or {}
+local failedOrder = { id = "work:failed-cancel", operation = "BUILD_OBJECT",
+    status = "BLOCKED", blockedReason = "WORKER_UNAVAILABLE", revision = 1,
+    payload = { input = { consume = true } } }
+local originalGet = PNC.WorkRepository.Get
+PNC.WorkRepository.Get = function(id)
+    if id == failedOrder.id then return failedOrder end
+    return originalGet(id)
+end
+Work.CancellationHandlers.BUILD_OBJECT = function()
+    return false, "CLEANUP_FAILED"
+end
+ok, reason = Work.Commands.Cancel(failedOrder.id, "player")
+T.falsy(ok, "failed cleanup was reported as a successful cancellation")
+T.equal(reason, "CLEANUP_FAILED", "cleanup failure reason was lost")
+T.equal(failedOrder.status, "BLOCKED",
+    "failed cancellation did not restore the blocked status")
+T.equal(failedOrder.cancellationFailureReason, "CLEANUP_FAILED",
+    "failed cancellation did not retain its diagnostic reason")
+
+PNC.ColonyStorageService = {
+    ReleaseProductionReservation = function()
+        return false, "reservation_not_found"
+    end,
+}
+local Input = T.load("ProjectHoomans", "server",
+    "PNC/Production/PNC_WorkInputService.lua")
+local compactedOrder = { id = "work:compacted", payload = {
+    input = { consume = true, committed = false },
+} }
+T.truthy(Input.Cancel(compactedOrder),
+    "compacted building input could not be cancelled idempotently")
+compactedOrder.payload.input.reservationId = "already-released"
+T.truthy(Input.Cancel(compactedOrder),
+    "already-released reservation blocked cancellation")
+
 T.finish("pnc_task_cancellation_smoke")

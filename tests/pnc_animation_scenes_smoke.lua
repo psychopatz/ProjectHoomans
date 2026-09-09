@@ -102,6 +102,8 @@ T.truthy(PNC.AnimationScenes.Get("facility.sleep.bed").steps[1].loop == true,
     "bed sleep must remain in one persistent XML playback")
 T.truthy(PNC.AnimationScenes.Get("facility.sleep.bed").steps[1].durationMs == 0,
     "bed sleep must not be force-finished on a timer")
+T.truthy(PNC.AnimationScenes.Get("facility.sleep.sofa").bump == "SleepBed",
+    "sofa sleep must use an explicit sleep scene")
 local livingScene = PNC.AnimationScenes.Get("facility.living.sit")
 T.truthy(livingScene and livingScene.repeatMode == "loop"
         and #livingScene.steps == 4,

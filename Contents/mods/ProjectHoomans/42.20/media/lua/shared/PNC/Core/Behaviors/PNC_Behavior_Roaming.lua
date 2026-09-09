@@ -22,6 +22,8 @@ Roaming.Modes = Roaming.Modes or {}
 
 local LEGACY_PAUSE_MIN_MS = 2500
 local LEGACY_PAUSE_MAX_MS = 7000
+local PREVIOUS_DEFAULT_PAUSE_MIN_MS = 5000
+local PREVIOUS_DEFAULT_PAUSE_MAX_MS = 12000
 
 local function randomFraction()
     return ZombRandFloat(0, 10000) / 10000
@@ -97,14 +99,27 @@ local function areaStateChanged(record, order, state)
         or state.radius ~= math.max(0.5, tonumber(order.radius) or Const.ROAM_DEFAULT_RADIUS)
 end
 
+local function hasActivePassage(record)
+    local pathing = record and record.runtime
+        and record.runtime.pathing or nil
+    return pathing ~= nil
+        and (
+            pathing.traversalAction ~= nil
+            or pathing.vanillaFenceAction ~= nil
+            or pathing.blockedStepToX ~= nil
+        )
+end
+
 local function beginAreaPause(record, zombie, order, state, now)
     local pauseMinMs = math.max(0, tonumber(order.pauseMinMs) or Const.ROAM_PAUSE_MIN_MS)
     local pauseMaxMs = math.max(pauseMinMs, tonumber(order.pauseMaxMs) or Const.ROAM_PAUSE_MAX_MS)
     -- Existing saves materialized the old defaults into orderSpec. Treat that
     -- exact pair as a default profile so the calmer dwell policy applies
     -- without requiring players to recreate every roaming order.
-    if pauseMinMs == LEGACY_PAUSE_MIN_MS
-        and pauseMaxMs == LEGACY_PAUSE_MAX_MS
+    if (pauseMinMs == LEGACY_PAUSE_MIN_MS
+        and pauseMaxMs == LEGACY_PAUSE_MAX_MS)
+        or (pauseMinMs == PREVIOUS_DEFAULT_PAUSE_MIN_MS
+            and pauseMaxMs == PREVIOUS_DEFAULT_PAUSE_MAX_MS)
     then
         pauseMinMs = tonumber(Const.ROAM_PAUSE_MIN_MS)
             or pauseMinMs
@@ -116,7 +131,18 @@ local function beginAreaPause(record, zombie, order, state, now)
     end
     if pauseMaxMs <= 0 then return false end
 
+    -- A roam goal can be reached while a window/fence passage still owns the
+    -- movement lane. Do not publish an idle pause over that traversal: the
+    -- traversal intent deliberately outranks a hold and would otherwise keep
+    -- the NPC in an idle-looking, timing-out passage state.
+    if hasActivePassage(record) then
+        state.pausePending = true
+        return false, true
+    end
+
+    state.pausePending = nil
     state.waitUntil = now + pauseMinMs + (randomFraction() * (pauseMaxMs - pauseMinMs))
+    state.idleSince = now
     state.phase = "idle"
     Common.ClearCombatTarget(record, "roam_pausing")
     Common.HaltMovement(record, zombie, "roam_pause")
@@ -174,16 +200,18 @@ local function areaMode(record, zombie, order)
             or pathing.blockReason == "native_goal_cooldown"
         )
     then
-        state.goalX = nil
-        state.goalY = nil
-        state.goalZ = nil
-        if beginAreaPause(
+        local paused, deferred = beginAreaPause(
             record,
             zombie,
             order,
             state,
             now
-        ) then
+        )
+        if deferred then return true end
+        state.goalX = nil
+        state.goalY = nil
+        state.goalZ = nil
+        if paused then
             return true
         end
     end
@@ -211,6 +239,28 @@ local function areaMode(record, zombie, order)
         )
     end
 
+    if state.pausePending then
+        if hasActivePassage(record) then
+            Common.ClearCombatTarget(record, "roam_pause_deferred", zombie)
+            Common.MoveRecord(
+                record,
+                zombie,
+                state.goalX,
+                state.goalY,
+                state.goalZ,
+                tostring(order.moveMode or "walk"),
+                math.max(0.1, tonumber(order.reachedDistance)
+                    or Const.ROAM_REACHED_DISTANCE),
+                "roam_area"
+            )
+            return true
+        end
+        state.pausePending = nil
+        if beginAreaPause(record, zombie, order, state, now) then
+            return true
+        end
+    end
+
     local reachedDistance = math.max(0.1, tonumber(order.reachedDistance) or Const.ROAM_REACHED_DISTANCE)
 
     if areaStateChanged(record, order, state) then
@@ -230,6 +280,12 @@ local function areaMode(record, zombie, order)
         if now < state.waitUntil then
             state.phase = "idle"
             record.activeBehavior = "Roam:area:idle"
+            if PNC.RoamingSeat and PNC.RoamingSeat.TryStart
+                and PNC.RoamingSeat.TryStart(
+                    record, zombie, order, state, now)
+            then
+                return true
+            end
             return true
         end
         state.waitUntil = nil
@@ -237,7 +293,28 @@ local function areaMode(record, zombie, order)
     elseif not state.goalX then
         chooseAreaGoal(record, order, state)
     elseif Core.Distance(record.x, record.y, state.goalX, state.goalY) <= reachedDistance then
-        if beginAreaPause(record, zombie, order, state, now) then return true end
+        local paused, deferred = beginAreaPause(
+            record,
+            zombie,
+            order,
+            state,
+            now
+        )
+        if paused then return true end
+        if deferred then
+            Common.ClearCombatTarget(record, "roam_pause_deferred", zombie)
+            Common.MoveRecord(
+                record,
+                zombie,
+                state.goalX,
+                state.goalY,
+                state.goalZ,
+                tostring(order.moveMode or "walk"),
+                reachedDistance,
+                "roam_area"
+            )
+            return true
+        end
         chooseAreaGoal(record, order, state)
     end
 

@@ -2,6 +2,8 @@ local Placement = {}
 local Policy = require
     "PNC/UI/Communities/ColonyManagement/PNC_BuildingPlacementPolicy"
 local Footprint = require "PNC/Core/Settlement/PNC_BuildingFootprint"
+local QueueOverlay = require
+    "PNC/UI/Communities/ColonyManagement/PNC_BuildingQueueOverlay"
 
 local function call(object, method, ...)
     if not object or type(object[method]) ~= "function" then return nil end
@@ -65,6 +67,12 @@ local function tooltipContent(cursor)
             tr("UI_PNC_BuildingPlacement_EngineInvalid",
                 "This building cannot be placed on the selected tile.")
     end
+    if reason == "BUILD_TARGET_ALREADY_QUEUED" then
+        return tr("UI_PNC_BuildingPlacement_InvalidTitle",
+                "INVALID PLACEMENT"),
+            tr("UI_PNC_BuildingPlacement_QueuedCollision",
+                "This area overlaps another queued blueprint. Select a clear area before placing this blueprint.")
+    end
     return nil, nil
 end
 
@@ -106,10 +114,11 @@ end
 
 local function setBoundaryValidity(cursor, square)
     local region = Footprint.FromCursor(cursor, square)
-    local valid, reason, normalized, invalid =
+    local valid, reason, normalized, invalid, conflictingOrder =
         Policy.ValidateCurrentFootprint(region)
     cursor.pncFootprint = normalized or region
     cursor.pncInvalidFootprint = invalid
+    cursor.pncCollisionOrder = conflictingOrder
     cursor.pncPlacementError = reason
     cursor.pncBaseValid = valid == true
     cursor.pncEngineValid = true
@@ -119,6 +128,7 @@ end
 local function setEngineInvalid(cursor, square)
     cursor.pncFootprint = nil
     cursor.pncInvalidFootprint = nil
+    cursor.pncCollisionOrder = nil
     cursor.pncEngineValid = false
     cursor.pncBaseValid = false
     cursor.pncPlacementError = square and "BUILD_TARGET_INVALID"
@@ -153,6 +163,9 @@ function Placement.RenderBaseGuide()
     local playerNum = player.getPlayerNum and player:getPlayerNum() or 0
     renderRegion(playerNum, region,
         { r = 0.10, g = 0.70, b = 1.00, a = 0.12 })
+    if QueueOverlay and QueueOverlay.RenderPlacement then
+        QueueOverlay.RenderPlacement(playerNum)
+    end
     renderRegion(playerNum, cursor.pncInvalidFootprint,
         { r = 1.00, g = 0.12, b = 0.08, a = 0.42 })
 end
@@ -485,8 +498,12 @@ function Placement.Begin(window, recipe)
     cursor.dragNilAfterPlace = true
     cursor.pncFacilityPlacement = recipe.facilityDefinitionId ~= nil
     cursor.onPlacement = function(target)
-        local valid, reason = Policy.ValidateCurrentFootprint(
-            cursor.pncFootprint)
+        local valid, reason, normalized, invalid, conflictingOrder =
+            Policy.ValidateCurrentFootprint(cursor.pncFootprint)
+        cursor.pncFootprint = normalized or cursor.pncFootprint
+        cursor.pncInvalidFootprint = invalid
+        cursor.pncCollisionOrder = conflictingOrder
+        cursor.pncPlacementError = reason
         if not valid then
             fail(reason)
             cursor.canBeBuild = false

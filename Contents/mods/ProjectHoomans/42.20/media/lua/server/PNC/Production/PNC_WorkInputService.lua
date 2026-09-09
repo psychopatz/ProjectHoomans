@@ -139,10 +139,22 @@ function Service.Cancel(order)
         PNC.WorkRepository.MarkDirty()
         return true
     end
-    if input.reservationId ~= "" then
-        return PNC.ColonyStorageService.ReleaseProductionReservation(
-            input.reservationId)
+    local reservationId = input.reservationId
+    if reservationId ~= nil and tostring(reservationId) ~= "" then
+        local released, reason =
+            PNC.ColonyStorageService.ReleaseProductionReservation(
+                reservationId)
+        -- Reservation cleanup is intentionally idempotent. Construction
+        -- inputs are compacted during save/load, and an earlier recovery pass
+        -- may already have released the runtime-only reservation.
+        if released or reason == "reservation_not_found" then
+            input.reservationId = ""
+            PNC.WorkRepository.MarkDirty()
+            return true
+        end
+        return false, reason
     end
+    input.reservationId = ""
     return true
 end
 

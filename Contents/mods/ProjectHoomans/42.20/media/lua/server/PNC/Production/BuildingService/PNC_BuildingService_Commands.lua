@@ -59,7 +59,7 @@ function Service.Queue(player, args)
         end
     end
     Repository.Load()
-    if H.DuplicateAt(context.colony.id, blueprint) then
+    if H.DuplicateAt(context.colony.id, blueprint, descriptor) then
         return nil, "BUILD_TARGET_ALREADY_QUEUED"
     end
     local requirements = H.Copy(descriptor.requirements or {})

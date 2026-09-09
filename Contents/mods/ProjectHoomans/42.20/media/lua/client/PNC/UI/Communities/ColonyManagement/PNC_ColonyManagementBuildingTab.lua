@@ -5,6 +5,8 @@ local InventoryModel = require "PNC/UI/Inventory/PNC_InventoryUI_Model"
 local Placement = require "PNC/UI/Communities/ColonyManagement/PNC_BuildingPlacement"
 local QueueOverlay = require
     "PNC/UI/Communities/ColonyManagement/PNC_BuildingQueueOverlay"
+local QueueActions = require
+    "PNC/UI/Communities/ColonyManagement/PNC_BuildingQueueActions"
 
 local function trace(event, message)
     local hub = PNC.CommandHub
@@ -469,9 +471,7 @@ function Building.OnQueueCell(window, row, key)
         .. tostring(row and row.order and row.order.id or "")
         .. " cell=" .. tostring(key or "row"))
     if row and row.order and key == "action" then
-        PNC.Client.RequestColonyAction("work_cancel", {
-            workOrderId = row.order.id,
-        })
+        QueueActions.RequestCancel(window, row.order)
     end
 end
 
@@ -852,7 +852,7 @@ local function rebuildQueue(window, queue)
                 worker = worker,
                 progress = tostring(order.percent or 0) .. "% "
                     .. tostring(order.status or "QUEUED"),
-                action = "CANCEL",
+                action = QueueActions.ActionLabel(window, order),
             },
             catalogColors = {
                 progress = blocked and "warning" or "accent",
@@ -867,6 +867,8 @@ local function rebuildQueue(window, queue)
 end
 
 function Building.Rebuild(window, snapshot)
+    snapshot = snapshot or window.snapshot or {}
+    window.snapshot = snapshot
     local integrated = window.baseIntegrated == true
         and window.tab == "buildings"
     if window.tab and window.tab ~= "building" and not integrated
@@ -875,6 +877,7 @@ function Building.Rebuild(window, snapshot)
         return false
     end
     local building = snapshot.building or {}
+    QueueActions.Reconcile(window, snapshot, building.queue or {})
     local recipes = Building.FilterFacilityRecipes(building.recipes or {})
     QueueOverlay.SetQueue(building.queue or {})
     rebuildCategories(window, recipes)
@@ -934,8 +937,7 @@ function Building.OnControl(window, buttonValue)
     elseif action == "cancel_order" then
         local order = selectedQueue(window)
         if order then
-            PNC.Client.RequestColonyAction("work_cancel",
-                { workOrderId = order.id })
+            QueueActions.RequestCancel(window, order)
         end
         return true
     end

@@ -251,6 +251,37 @@ Scenes.Register("facility.living.sit", {
     end,
 })
 
+Scenes.Register("facility.sleep.sofa", {
+    label = "Sleep on Sofa",
+    description = "A persistent sofa sleep loop owned by a facility job.",
+    category = "facility",
+    -- Keep the same lying pose as a bed until the in-game sofa validation
+    -- pass confirms whether a dedicated sofa animation is needed.
+    bump = "SleepBed",
+    priority = 45,
+    repeatMode = "loop",
+    blocking = true,
+    interrupts = {
+        movement = true,
+        combat = true,
+        externalBump = true,
+        abstract = true,
+    },
+    onTick = function(record, zombie, scene, now)
+        local jobs = PNC and PNC.FacilityJobs
+        if jobs and jobs.OnSceneTick then
+            return jobs.OnSceneTick(record, zombie, scene, now)
+        end
+        return true
+    end,
+    onStop = function(record, zombie, scene, reason)
+        local jobs = PNC and PNC.FacilityJobs
+        if jobs and jobs.OnSceneStopped then
+            jobs.OnSceneStopped(record, zombie, scene, reason)
+        end
+    end,
+})
+
 Scenes.Register("facility.living.sitFurniture", {
     label = "Sit on Furniture",
     description = "A persistent chair pose anchored to a discovered seat.",
@@ -278,6 +309,40 @@ Scenes.Register("facility.living.sitFurniture", {
         local jobs = PNC and PNC.FacilityJobs
         if jobs and jobs.OnSceneStopped then
             jobs.OnSceneStopped(record, zombie, scene, reason)
+        end
+    end,
+})
+
+Scenes.Register("ambient.roam.sitFurniture", {
+    label = "Ambient Roam Sit",
+    description = "A transient chair pose for an idle roaming NPC.",
+    category = "ambient",
+    priority = 20,
+    repeatMode = "loop",
+    blocking = true,
+    steps = {
+        { id = "sit_chair", bump = "SitChair", durationMs = 0, loop = true },
+    },
+    interrupts = {
+        movement = true,
+        combat = true,
+        externalBump = true,
+        abstract = true,
+    },
+    onTick = function(record, zombie, scene, now)
+        local service = PNC and PNC.RoamingSeat
+        if service and service.OnSceneTick then
+            return service.OnSceneTick(record, zombie, scene, now)
+        end
+        -- The authoritative server owns this transient service. A client
+        -- without the server module should keep rendering the synchronized
+        -- presentation lease rather than clearing it locally.
+        return true
+    end,
+    onStop = function(record, zombie, scene, reason)
+        local service = PNC and PNC.RoamingSeat
+        if service and service.OnSceneStopped then
+            service.OnSceneStopped(record, zombie, scene, reason)
         end
     end,
 })

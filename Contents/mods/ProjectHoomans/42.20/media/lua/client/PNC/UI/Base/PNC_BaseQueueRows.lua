@@ -74,8 +74,8 @@ function QueueRows.Draw(list, y, entry, alternate)
     list:drawRectBorder(actionX, y + 8, actionWidth, 27, 0.9,
         Theme.colors.danger.r, Theme.colors.danger.g,
         Theme.colors.danger.b)
-    list:drawTextCentre(row.kind == "native"
-        and tr("UI_PNC_Building_CancelOrder", "CANCEL ORDER")
+    list:drawTextCentre(row.kind == "native" and (row.actionLabel
+        or tr("UI_PNC_Building_CancelOrder", "CANCEL ORDER"))
         or tr("UI_PNC_Work_CancelConstruction", "CANCEL CONSTRUCTION"),
         actionX + actionWidth / 2, y + 14,
         Theme.colors.danger.r, Theme.colors.danger.g,

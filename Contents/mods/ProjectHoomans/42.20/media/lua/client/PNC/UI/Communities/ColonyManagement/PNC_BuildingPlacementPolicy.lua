@@ -2,13 +2,41 @@ PNC = PNC or {}
 
 local GridRegion = require "PsychopatzCore/World/PC_GridRegion"
 local Footprint = require "PNC/Core/Settlement/PNC_BuildingFootprint"
+local QueueCollision = require
+    "PNC/Core/Settlement/PNC_BuildingQueueCollision"
 local Policy = {}
 
-local function currentSettlement()
+local function currentSnapshot()
     local network = PNC.Network
     local state = network and network.ClientState or nil
     local snapshot = state and state.colonyManagement or nil
-    return type(snapshot) == "table" and snapshot.settlement or nil
+    return type(snapshot) == "table" and snapshot or nil
+end
+
+local function currentSettlement()
+    local snapshot = currentSnapshot()
+    return snapshot and snapshot.settlement or nil
+end
+
+local function nativeObjectInfoFor(blueprint)
+    local catalog = PNC.BuildRecipeCatalog
+    local descriptor = catalog and catalog.Get and blueprint
+        and catalog.Get(blueprint.objectInfoName) or nil
+    local info = descriptor and descriptor.nativeObjectInfo or nil
+    if not info and SpriteConfigManager
+        and SpriteConfigManager.GetObjectInfo and blueprint
+    then
+        local ok, resolved = pcall(SpriteConfigManager.GetObjectInfo,
+            blueprint.objectInfoName)
+        info = ok and resolved or nil
+    end
+    return info
+end
+
+local function currentQueue()
+    local snapshot = currentSnapshot()
+    local building = snapshot and snapshot.building or nil
+    return building and building.queue or {}
 end
 
 local function pointFromSquare(square)
@@ -68,7 +96,7 @@ end
 -- Validate every occupied tile, not only the blueprint anchor. The returned
 -- invalid region is used by the placement preview to tint the offending tiles
 -- without changing any persistent/freestyle zone overlay state.
-function Policy.ValidateFootprint(settlement, region)
+function Policy.ValidateFootprint(settlement, region, queue)
     if not settlement then return false, "BUILD_BASE_UNAVAILABLE", nil, nil end
     if type(region) ~= "table" then
         return false, "BUILD_TARGET_REQUIRED", nil, nil
@@ -92,11 +120,21 @@ function Policy.ValidateFootprint(settlement, region)
     if not valid then
         return false, "BUILD_TARGET_OUTSIDE_BASE", normalized, invalid
     end
+    local conflictingOrder, collision = QueueCollision.Find(normalized,
+        queue or currentQueue(), nativeObjectInfoFor)
+    if conflictingOrder then
+        return false, "BUILD_TARGET_ALREADY_QUEUED", normalized, collision,
+            conflictingOrder
+    end
     return true, nil, normalized, nil
 end
 
 function Policy.CurrentSettlement()
     return currentSettlement()
+end
+
+function Policy.CurrentQueue()
+    return currentQueue()
 end
 
 function Policy.ValidateCurrentPoint(x, y, z)
@@ -107,8 +145,8 @@ function Policy.ValidateCurrentSquare(square)
     return Policy.ValidateSquare(currentSettlement(), square)
 end
 
-function Policy.ValidateCurrentFootprint(region)
-    return Policy.ValidateFootprint(currentSettlement(), region)
+function Policy.ValidateCurrentFootprint(region, queue)
+    return Policy.ValidateFootprint(currentSettlement(), region, queue)
 end
 
 return Policy

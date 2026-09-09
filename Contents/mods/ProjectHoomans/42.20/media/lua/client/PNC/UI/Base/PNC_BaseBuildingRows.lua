@@ -45,7 +45,9 @@ function Rows.NativeQueue(list, y, entry, alternate)
         .. tostring(row.status or "QUEUED"), list:getWidth() - 112,
         y + 17, Theme.colors.accent.r, Theme.colors.accent.g,
         Theme.colors.accent.b, Theme.colors.accent.a, UIFont.Small)
-    list:drawTextRight("CANCEL", list:getWidth() - 10, y + 17,
+    list:drawTextRight(row.actionLabel or tr(
+        "UI_PNC_Building_CancelOrder", "CANCEL ORDER"),
+        list:getWidth() - 10, y + 17,
         Theme.colors.warning.r, Theme.colors.warning.g,
         Theme.colors.warning.b, Theme.colors.warning.a, UIFont.Small)
     return y + list.itemheight

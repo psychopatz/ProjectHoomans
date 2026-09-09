@@ -394,6 +394,15 @@ T.equal(claimed.stationId, "corpse:corpse:one",
     "world-object claim has a durable collision key")
 T.equal(claimed.phase, "SOURCE_APPROACH",
     "corpse operation starts with its source phase")
+local elapsedBeforeManualGuard = claimed.progress
+local elapsedAccepted, elapsedReason = Work.Commands.AddElapsed(
+    order.id, record.id, 10)
+T.falsy(elapsedAccepted,
+    "generic elapsed progress cannot advance corpse hauling")
+T.equal(elapsedReason, "MANUAL_PROGRESS_OPERATION",
+    "manual corpse progress exposes its ownership boundary")
+T.equal(Work.Queries.Get(order.id).progress, elapsedBeforeManualGuard,
+    "manual progress guard leaves corpse progress unchanged")
 T.truthy(record.orderSpec and record.orderSpec.kind == "production_work",
     "NPC receives the shared production order kind")
 T.equal(record.orderSpec.operation, "CORPSE_HAUL",
@@ -662,6 +671,73 @@ T.equal(Work.Queries.Get(deferredOrder.id).status,
 T.equal(corpse.square, destinationSquare,
     "loaded-square retry applies the same corpse object at the destination")
 bodyAvailable = true
+
+-- Legacy live orders can have reached 100% before the corpse was moved. The
+-- completion recovery boundary must release the durable claim and make the
+-- physical corpse eligible for a fresh reconciliation pass.
+corpse.x, corpse.y, corpse.z = 40, 40, 0
+squares["40:40:0"].corpses = { corpse }
+squares["60:60:0"].corpses = {}
+local legacyToken = CorpseService.GetCorpseToken(corpse, true)
+local legacyOrder = T.truthy(Work.Commands.Queue({
+    operation = "CORPSE_HAUL", colonyId = "colony:one",
+    factionId = "faction:one", baseId = "base:one",
+    requiredWork = 1, requiredWorkerId = record.id, manual = true,
+    priority = 100,
+    payload = {
+        haulToken = legacyToken, deathMarkerId = "dead:one",
+        sourceX = 40, sourceY = 40, sourceZ = 0,
+        interactionX = 40, interactionY = 40, interactionZ = 0,
+        dropX = 60, dropY = 60, dropZ = 0,
+        destinationRegion = PNC.SettlementRepository.State.bases[
+            "base:one"].corpseHaul.destinationRegion,
+    },
+}), "legacy completion test queues a corpse order")
+local legacyCandidate
+for _, candidate in ipairs(Provider.GetCandidates(record.id)) do
+    if candidate.sourceRef == legacyOrder.id then
+        legacyCandidate = candidate
+        break
+    end
+end
+T.truthy(legacyCandidate, "legacy completion test finds its worker candidate")
+T.truthy(Provider.Assign(legacyCandidate),
+    "legacy completion test claims its worker")
+local legacyCompleted, legacyReason = Work.Commands.AddProgress(
+    legacyOrder.id, record.id, legacyOrder.requiredWork)
+T.falsy(legacyCompleted,
+    "premature corpse completion is converted into a retry")
+T.equal(legacyReason, "CORPSE_HAUL_COMPLETION_RETRY",
+    "premature corpse completion exposes the retry reason")
+local recoveredLegacy = Work.Queries.Get(legacyOrder.id)
+T.equal(recoveredLegacy.status, Definitions.STATUS.WAITING_FOR_WORKER,
+    "premature corpse completion releases the worker claim")
+T.equal(recoveredLegacy.progress, 0,
+    "premature corpse completion resets progress before retry")
+T.falsy(recoveredLegacy.workerId,
+    "premature corpse completion clears the durable worker")
+T.falsy(recoveredLegacy.payload.haulToken,
+    "premature corpse completion clears the stale reservation token")
+
+-- A saved order may retain BLOCKED state after its live lease has disappeared.
+-- The corpse service must repair that durable-only state on its next pass.
+local persistedLegacy = PNC.WorkRepository.Get(legacyOrder.id)
+local persistedToken = CorpseService.GetCorpseToken(corpse, true)
+persistedLegacy.payload.haulToken = persistedToken
+persistedLegacy.status = Definitions.STATUS.BLOCKED
+persistedLegacy.blockedReason = "CORPSE_NOT_AT_DESTINATION"
+persistedLegacy.progress = persistedLegacy.requiredWork
+persistedLegacy.phase = "SOURCE_APPROACH"
+persistedLegacy.workerId = nil
+CorpseService.Runtime.nextReconcileAt = 0
+CorpseService.Pump(clock + 60000)
+local reconciledLegacy = Work.Queries.Get(legacyOrder.id)
+T.equal(reconciledLegacy.status, Definitions.STATUS.WAITING_FOR_WORKER,
+    "saved premature corpse completion is reconciled without a lease")
+T.equal(reconciledLegacy.progress, 0,
+    "saved premature corpse completion resets stale progress")
+T.truthy(reconciledLegacy.payload.haulToken,
+    "saved premature corpse completion receives a fresh corpse reservation")
 
 local cleared, clearReason = CorpseService.ClearConfiguration({}, {
     baseId = "base:one",

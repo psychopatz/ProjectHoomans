@@ -35,6 +35,8 @@ function Service.BuildSnapshot(player, storage, colony)
                     operation = order.operation,
                     status = order.status,
                     blockedReason = order.blockedReason,
+                    cancellationFailureReason =
+                        order.cancellationFailureReason,
                     progress = progress,
                     requiredWork = required,
                     percent = math.floor(progress / required * 100 + 0.5),
@@ -58,4 +60,3 @@ function Service.BuildSnapshot(player, storage, colony)
     return { recipes = recipes, queue = queue,
         generation = Catalog.Generation }
 end
-

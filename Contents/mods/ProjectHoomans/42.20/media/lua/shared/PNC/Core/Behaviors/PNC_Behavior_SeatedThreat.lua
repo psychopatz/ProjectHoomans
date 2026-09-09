@@ -39,6 +39,19 @@ local function isFacilityActivity(record)
         and (previousKind == CAMP_ORDER or previousKind == HOME_ORDER)
 end
 
+local function isRoamingSeat(record)
+    local runtime = record and record.runtime or nil
+    local order = record and record.orderSpec or nil
+    local seat = runtime and runtime.roamingSeat or nil
+    local kind = tostring(order and order.kind or "")
+    return seat ~= nil
+        and kind == tostring(Const.ORDER_ROAM or "roam")
+end
+
+local function isSeatedActivity(record)
+    return isFacilityActivity(record) or isRoamingSeat(record)
+end
+
 local function isSeatingScene(scene)
     return scene and scene.blocking == true
 end
@@ -46,6 +59,7 @@ end
 local function activityContext(record)
     local runtime = record and record.runtime or nil
     local activity = runtime and runtime.facilityActivity or {}
+    local roamingSeat = runtime and runtime.roamingSeat or nil
     local previous = activity.previousOrder or {}
     local kind = tostring(previous.kind or "")
     local x = tonumber(previous.x)
@@ -61,6 +75,21 @@ local function activityContext(record)
         or tonumber(record and record.z)
         or 0
     local radius
+    if isRoamingSeat(record) then
+        return {
+            kind = tostring(record.orderSpec and record.orderSpec.kind
+                or "roam"),
+            x = tonumber(roamingSeat and roamingSeat.x)
+                or tonumber(record and record.x) or 0,
+            y = tonumber(roamingSeat and roamingSeat.y)
+                or tonumber(record and record.y) or 0,
+            z = tonumber(roamingSeat and roamingSeat.z)
+                or tonumber(record and record.z) or 0,
+            radius = math.max(0.5, tonumber(record.orderSpec
+                and record.orderSpec.targetRadius)
+                or tonumber(Const and Const.ROAM_TARGET_RADIUS) or 3),
+        }
+    end
     if kind == CAMP_ORDER then
         radius = tonumber(Const and Const.CAMP_ENGAGE_RADIUS)
             or tonumber(activity.campRadius)
@@ -328,20 +357,21 @@ end
 function SeatedThreat.Tick(record, zombie, now)
     local runtime = record and record.runtime or nil
     local activity = runtime and runtime.facilityActivity or nil
+    local roamingSeat = runtime and runtime.roamingSeat or nil
     local scene = runtime and runtime.animationScene or nil
     local state = runtime and runtime.seatedThreat or nil
     now = currentTime(now)
-    if not runtime or not activity then return false end
+    if not runtime or (not activity and not roamingSeat) then return false end
 
     if state and state.active == true then
-        if not isFacilityActivity(record) or not zombie then
+        if not isSeatedActivity(record) or not zombie then
             runtime.seatedThreat = nil
             return false
         end
         return continueCombat(record, zombie, now, state)
     end
 
-    if not zombie or not isFacilityActivity(record)
+    if not zombie or not isSeatedActivity(record)
         or not isSeatingScene(scene)
     then
         return false

@@ -5,6 +5,8 @@ local Components = require
 local QueueRows = require "PNC/UI/Base/PNC_BaseQueueRows"
 local FacilityActions = require
     "PNC/UI/Communities/ColonyManagement/SettlementManagement/PNC_SettlementManagement_Actions"
+local QueueActions = require
+    "PNC/UI/Communities/ColonyManagement/PNC_BuildingQueueActions"
 
 local Queue = {}
 local UI = PsychopatzCore.UI
@@ -39,10 +41,10 @@ function Queue.Create(window)
         local actionX = right - actionWidth
         if x >= actionX and x <= right then
             if row.kind == "native" then
+                -- Native blueprint cancellation uses the canonical work_cancel
+                -- request, just like the legacy Buildings queue.
                 if PNC.Client and PNC.Client.RequestColonyAction then
-                    PNC.Client.RequestColonyAction("work_cancel", {
-                        workOrderId = row.id,
-                    })
+                    QueueActions.RequestCancel(window, row.order)
                 end
             elseif row.task then
                 FacilityActions.HandleComponent(window, {
@@ -115,6 +117,7 @@ function Queue.Rebuild(window, snapshot)
                 title = order.displayName or order.objectInfoName
                     or tr("UI_PNC_Base_BlueprintQueue", "BLUEPRINT QUEUE"),
                 worker = order.workerName or "UNASSIGNED",
+                actionLabel = QueueActions.ActionLabel(window, order),
             }
         end
     end

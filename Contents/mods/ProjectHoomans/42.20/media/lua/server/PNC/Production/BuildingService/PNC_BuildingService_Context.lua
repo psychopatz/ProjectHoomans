@@ -12,6 +12,8 @@ local Repository = PNC.WorkRepository
 local Zones = require "PsychopatzCore/World/PC_ZoneRegistry"
 local GridRegion = require "PsychopatzCore/World/PC_GridRegion"
 local Footprint = require "PNC/Core/Settlement/PNC_BuildingFootprint"
+local QueueCollision = require
+    "PNC/Core/Settlement/PNC_BuildingQueueCollision"
 
 function H.Copy(value)
     return PNC.Core and PNC.Core.DeepCopy and PNC.Core.DeepCopy(value) or value
@@ -62,17 +64,25 @@ function H.TargetValid(base, blueprint, descriptor)
     end)
 end
 
-function H.DuplicateAt(colonyId, blueprint)
+function H.DuplicateAt(colonyId, blueprint, descriptor)
+    local candidate = QueueCollision.FootprintForBlueprint(blueprint,
+        descriptor and descriptor.nativeObjectInfo)
+    if not candidate then return false end
+    local orders = {}
     for _, order in pairs(Repository.State.byId or {}) do
-        local other = H.BlueprintFor(order)
         if H.Active(order) and order.operation == "BUILD_OBJECT"
             and tostring(order.colonyId) == tostring(colonyId)
-            and other and tonumber(other.x) == tonumber(blueprint.x)
-            and tonumber(other.y) == tonumber(blueprint.y)
-            and tonumber(other.z) == tonumber(blueprint.z)
-        then return true end
+        then
+            orders[#orders + 1] = order
+        end
     end
-    return false
+    local function resolveNativeObjectInfo(otherBlueprint)
+        local otherDescriptor = otherBlueprint and Catalog.Get(
+            otherBlueprint.objectInfoName) or nil
+        return otherDescriptor and otherDescriptor.nativeObjectInfo or nil
+    end
+    return QueueCollision.Find(candidate, orders, resolveNativeObjectInfo)
+        ~= nil
 end
 
 function H.RequirementSnapshot(storageId, requirements)

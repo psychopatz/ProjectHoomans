@@ -14,6 +14,7 @@ local Work = PNC.WorkService
 local Service = PNC.LumberService
 local Status = PNC.WorkDefinitions and PNC.WorkDefinitions.STATUS or {}
 local WorldEffects = PNC.WorldEffectService
+local Repository = PNC.WorkRepository
 
 local function recordFor(npcId)
     return PNC.Registry and PNC.Registry.Get and PNC.Registry.Get(
@@ -87,23 +88,96 @@ local function bind(order, lease, job)
     return true
 end
 
+local function statusForJob(job)
+    local phase = tostring(job and job.phase or "")
+    if phase == "CHOPPING" or phase == "GRAB_PENDING"
+        or phase == "DEPOSIT_PENDING"
+    then
+        return Status.WORKING or "WORKING"
+    end
+    if phase == "WAITING_FOR_WORKER" then
+        return Status.WAITING_FOR_WORKER or "WAITING_FOR_WORKER"
+    end
+    if phase == "WAITING_FOR_TOOL"
+        or phase == "WAITING_FOR_ENDURANCE"
+        or phase == "WAITING_FOR_STOCKPILE"
+    then
+        return Status.WAITING_RESOURCE or "WAITING_RESOURCE"
+    end
+    if phase == "WAITING_FOR_TREE_CHUNK"
+        or phase == "WAITING_FOR_MATERIALIZATION"
+    then
+        return Status.WAITING_FOR_WORLD or "WAITING_FOR_WORLD"
+    end
+    if phase == "OUTPUT_DESTINATION_APPROACH"
+        or phase == "CARRYING"
+    then
+        return Status.TRAVEL_TO_STOCKPILE or "TRAVEL_TO_STOCKPILE"
+    end
+    if phase == "TRAVEL" or phase == "OUTPUT_APPROACH" then
+        return Status.TRAVEL_TO_STATION or "TRAVEL_TO_STATION"
+    end
+    return Status.WAITING_RESOURCE or "WAITING_RESOURCE"
+end
+
 local function updateLiveTarget(order, job)
-    if not order or not job or not job.approach or not order.workerId then
+    if not order or not job or not order.workerId then
         return
     end
     local record = recordFor(order.workerId)
     if not record or not record.orderSpec
         or record.orderSpec.kind ~= "production_work"
     then return end
+    local projectionChanged = false
+    local projectedStatus = statusForJob(job)
+    if projectedStatus
+        and order.status ~= Status.CANCELLED
+        and order.status ~= Status.COMPLETED
+        and order.status ~= Status.FAILED
+        and order.status ~= Status.CANCELLING
+        and order.status ~= projectedStatus
+    then
+        order.status = projectedStatus
+        projectionChanged = true
+    end
+    local progressAt = tonumber(job.lastProgressAt)
+    if progressAt and tonumber(order.lastProgressAt) ~= progressAt then
+        order.lastProgressAt = progressAt
+        projectionChanged = true
+    end
+    local target = job.approach
+    local targetKind = "lumber_tree"
+    if job.pendingOutput then
+        targetKind = "lumber_output"
+        if job.phase == "OUTPUT_DESTINATION_APPROACH"
+            and job.outputDestination
+        then
+            target = job.outputDestination
+        else
+            local tree = Service.GetTree(job.pendingOutput.treeKey)
+            target = tree and {
+                x = tree.x + 0.5, y = tree.y + 0.5, z = tree.z,
+            } or target
+        end
+    end
+    if not target then
+        if projectionChanged and Repository and Repository.MarkDirty then
+            Repository.MarkDirty()
+        end
+        return
+    end
     order.stationTarget = {
-        x = job.approach.x, y = job.approach.y, z = job.approach.z,
+        x = target.x, y = target.y, z = target.z,
     }
-    order.targetKind = "lumber_tree"
+    order.targetKind = targetKind
+    order.phase = job.phase
     order.livePhase = job.phase
     local setLiveOrder = Work and Work.Internal and Work.Internal.setLiveOrder
     if setLiveOrder then
-        setLiveOrder(record, order, order.stationTarget,
-            job.phase == "CHOPPING" and "WORK_AT_STATION" or "TRAVEL")
+        setLiveOrder(record, order, order.stationTarget, job.phase)
+    end
+    if projectionChanged and Repository and Repository.MarkDirty then
+        Repository.MarkDirty()
     end
 end
 
@@ -201,8 +275,17 @@ function Adapter.EnsureOrder(job)
         publishWorkerWait(job, existing)
         return true, existing
     end
+    local worker = recordFor(job.npcId)
+    local base = PNC.HomeDutyService and PNC.HomeDutyService.GetBase
+        and PNC.HomeDutyService.GetBase(worker, job.baseId) or nil
+    local baseId = tostring(job.baseId or "")
+    if baseId == "" and base then baseId = tostring(base.id or "") end
+    if base and base.id then job.baseId = base.id end
     local order, reason = Work.Commands.Queue({
-        operation = "LUMBER", colonyId = "", factionId = "", baseId = "",
+        operation = "LUMBER",
+        colonyId = base and base.colonyId or "",
+        factionId = base and base.factionId or "",
+        baseId = baseId,
         requiredWorkerId = job.npcId, requiredWork = 1, priority = 90,
         locationPolicy = { start = "ANYWHERE", execution = "REMOTE",
             returnHome = "STAY" },
@@ -266,7 +349,10 @@ then
         List = function()
             local output = {}
             for _, tree in pairs(Service.Data and Service.Data.trees or {}) do
-                if type(tree) == "table" and type(tree.worldEffect) == "table" then
+                if type(tree) == "table"
+                    and (type(tree.worldEffect) == "table"
+                        or type(tree.outputEffect) == "table")
+                then
                     output[#output + 1] = tree
                 end
             end
@@ -274,10 +360,22 @@ then
         end,
         GetOwnerID = function(tree) return tree and tree.key end,
         GetEffects = function(tree)
-            return tree and type(tree.worldEffect) == "table"
-                and { tree.worldEffect } or {}
+            local output = {}
+            if type(tree and tree.worldEffect) == "table" then
+                output[#output + 1] = tree.worldEffect
+            end
+            if type(tree and tree.outputEffect) == "table" then
+                output[#output + 1] = tree.outputEffect
+            end
+            return output
         end,
+        -- LUMBER_OUTPUT is visible in the same ledger snapshot but is not a
+        -- generic loaded-square mutation. Its state machine is owned by the
+        -- lumber worker, so the world-effects pump must not auto-apply it.
         IsPending = function(_, effect)
+            if tostring(effect and effect.kind or "") ~= "TREE_REMOVE" then
+                return false
+            end
             local state = tostring(effect and effect.state or "PENDING")
             return state ~= "APPLIED" and state ~= "CANCELLED"
                 and state ~= "CONFLICT" and state ~= "FAILED"

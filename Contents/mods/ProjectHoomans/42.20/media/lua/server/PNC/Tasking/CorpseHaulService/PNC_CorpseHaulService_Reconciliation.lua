@@ -438,6 +438,102 @@ local function retireOrder(order, candidates, reason, now)
     return true
 end
 
+local function candidateMatchesIdentity(candidate, order)
+    local payload = order and order.payload or {}
+    local marker = payload.deathMarkerId or payload.corpseId
+    return candidate
+        and (same(candidate.token, payload.haulToken)
+            or same(candidate.taskId, order and order.id)
+            or same(candidate.deathMarkerId, marker))
+end
+
+local function releaseBlockedAssignment(order, reason)
+    if not order or not order.workerId then return true end
+    local released
+    local releaseReason
+    if Work and Work.Commands and Work.Commands.ReleaseAssignment then
+        released, releaseReason = Work.Commands.ReleaseAssignment(
+            order.workerId, reason)
+    elseif Work and Work.Commands and Work.Commands.ReleaseWorker then
+        released, releaseReason = Work.Commands.ReleaseWorker(order.workerId,
+            reason)
+    elseif Work and Work.Internal and Work.Internal.releaseClaim then
+        released, releaseReason = Work.Internal.releaseClaim(order, reason,
+            false, true)
+    end
+    return released == true, releaseReason
+end
+
+-- Repair orders written by the old shared behavior, which could mark a corpse
+-- haul BLOCKED at 100% while the corpse was still at its source. This path is
+-- intentionally identity- and location-gated; it does not guess what to do
+-- with unrelated blocked corpse orders.
+local function recoverLegacyCompletion(order, candidates, now)
+    if tostring(order and order.status or "") ~= Status.BLOCKED
+        or tostring(order and order.blockedReason or "")
+            ~= "CORPSE_NOT_AT_DESTINATION"
+    then
+        return nil
+    end
+    local payload = order.payload or {}
+    local phase = tostring(order.phase or "")
+    if phase ~= "SOURCE_APPROACH" and phase ~= "" then return nil end
+    local destinationCandidate
+    local sourceCandidate
+    for _, candidate in ipairs(candidates or {}) do
+        if candidateMatchesIdentity(candidate, order) then
+            if pointMatches(candidate, payload.dropX, payload.dropY,
+                payload.dropZ)
+            then
+                destinationCandidate = destinationCandidate or candidate
+            elseif pointMatches(candidate, payload.sourceX, payload.sourceY,
+                payload.sourceZ)
+            then
+                sourceCandidate = sourceCandidate or candidate
+            end
+        end
+    end
+    if destinationCandidate and order.workerId
+        and Work and Work.Commands and Work.Commands.AddProgress
+    then
+        local completed = Work.Commands.AddProgress(order.id, order.workerId,
+            order.requiredWork)
+        if completed == true and order.status == Status.COMPLETED then
+            reconcileDiagnostic(order, "RECOVER", "CORPSE_ALREADY_AT_DESTINATION",
+                destinationCandidate)
+            return "COMPLETED"
+        end
+    end
+    if not sourceCandidate then return nil end
+    local released, releaseReason = releaseBlockedAssignment(order,
+        "corpse_haul_legacy_completion_retry")
+    if not released then
+        reconcileDiagnostic(order, "RECOVER", releaseReason
+            or "WORK_ASSIGNMENT_RELEASE_FAILED", sourceCandidate)
+        return "WAITING"
+    end
+    if payload then payload.haulToken = nil end
+    order.progress = 0
+    order.status = Status.WAITING_FOR_WORKER
+    order.blockedReason = "CORPSE_NOT_AT_DESTINATION"
+    order.phase, order.livePhase = nil, nil
+    order.updatedAt = now
+    order.revision = (tonumber(order.revision) or 0) + 1
+    -- Rebind immediately so the next task-evaluation pass does not observe a
+    -- waiting order with an already-cleared corpse token.
+    rebindOrder(order, sourceCandidate, nil, now)
+    if WorkRepository and WorkRepository.MarkDirty then
+        WorkRepository.MarkDirty()
+    end
+    reconcileDiagnostic(order, "RECOVER", "CORPSE_HAUL_REQUEUED",
+        sourceCandidate)
+    if Work and Work.Internal and Work.Internal.markAssignmentDirty then
+        Work.Internal.markAssignmentDirty(order,
+            "CORPSE_HAUL_LEGACY_COMPLETION_RECOVERED")
+    end
+    return "RETRYING"
+end
+
 local function baseForOrder(order)
     if PNC.BaseService and PNC.BaseService.Get then
         local base = PNC.BaseService.Get(order and order.baseId)
@@ -481,6 +577,8 @@ local function reconcileOrder(order, baseCandidates, now)
         return "WAITING"
     end
     candidates = candidatesForOrder(order, baseCandidates)
+    local legacyRecovery = recoverLegacyCompletion(order, candidates, now)
+    if legacyRecovery then return legacyRecovery end
     candidate, score = chooseCandidate(candidates, order, task)
     minimumScore = (payload.haulToken and tostring(payload.haulToken) ~= ""
         or payload.deathMarkerId

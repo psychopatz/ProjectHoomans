@@ -41,4 +41,34 @@ T.truthy(invalid and invalid.levels[0]
 T.equal(invalid.levels[0].rows[10][1], 13,
     "invalid footprint identified the wrong outside tile")
 
+local queuedTile = { getSpriteName = function() return "queued_wall" end }
+local queuedFace = {
+    getzLayers = function() return 1 end,
+    getWidth = function() return 2 end,
+    getHeight = function() return 1 end,
+    getTileInfo = function() return queuedTile end,
+}
+local queuedInfo = { getFace = function() return queuedFace end }
+PNC.BuildRecipeCatalog = {
+    Get = function() return { nativeObjectInfo = queuedInfo } end,
+}
+PNC.Network.ClientState.colonyManagement.building = { queue = {
+    { id = "work:queued", status = "BLOCKED", blueprint = {
+        objectInfoName = "QueuedWall", nSprite = 1,
+        x = 12, y = 10, z = 0,
+    } },
+} }
+local collisionValid, collisionReason, _, collisionRegion,
+    conflictingOrder = Policy.ValidateCurrentFootprint({ levels = {
+        [0] = { rows = { [10] = { 11, 12 } } },
+    } })
+T.falsy(collisionValid, "overlapping queued blueprint was accepted")
+T.equal(collisionReason, "BUILD_TARGET_ALREADY_QUEUED",
+    "queued blueprint collision returned the wrong reason")
+T.truthy(collisionRegion and collisionRegion.levels[0]
+    and collisionRegion.levels[0].rows[10],
+    "collision did not identify the overlapping tiles")
+T.equal(conflictingOrder.id, "work:queued",
+    "collision did not identify the conflicting order")
+
 T.finish("pnc_building_placement_policy_smoke")

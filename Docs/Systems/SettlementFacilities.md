@@ -104,17 +104,18 @@ and completion threshold. The server acquires and renews a reservation, while
 the shared behavior owns travel, interaction positioning, scene playback, and
 order restoration.
 
-Barracks sleep reserves one `sleep.bed` spot and examines its loaded square at
-job acquisition time. With no real bed, the NPC paths directly to the spot and
-loops `facility.sleep.floor` through `BumpType=PNC_Sleep`
-(`Bob_SitGround_SleepIdle`). With a real bed, the NPC instead paths to a free
-cardinal neighbor, then is authoritatively positioned at the center of the
-possibly multi-tile bed, aligned to its long axis, and loops
-`facility.sleep.bed` through `BumpType=PNC_SleepBed` (`Bob_Asleep`). Furniture
-changes are detected without rebuilding the component. Both scenes reduce
-fatigue using elapsed game hours, complete at the rested threshold, and restore
-the preceding order. Idle guards above the fatigue threshold automatically seek
-an operational sleep spot.
+Barracks sleep reserves the highest-priority approved sleep surface and examines
+its loaded square at job acquisition time. Beds take priority over approved
+sofas; ordinary chairs and stools remain seating-only. With no approved surface,
+the NPC paths directly to the spot and loops `facility.sleep.floor` through
+`BumpType=PNC_Sleep` (`Bob_SitGround_SleepIdle`). With a real bed or sofa, the
+NPC instead paths to a free cardinal neighbor, is authoritatively positioned at
+the furniture center and surface height, and loops its explicit sleep scene
+through `BumpType=PNC_SleepBed` (`Bob_Asleep`). Furniture changes are detected
+without rebuilding the component. All sleep scenes reduce fatigue using elapsed
+game hours, complete at the rested threshold, and restore the preceding order.
+Idle guards above the fatigue threshold automatically seek an operational sleep
+surface.
 
 Animation scenes now expose guarded tick/stop lifecycle callbacks. Combat,
 movement, damage, abstraction, and external bumps still interrupt through the

@@ -28,7 +28,8 @@ local definition = {
             capabilities = { "sleep", "rest" },
             resourceBindings = {
                 sleep = {
-                    detectorId = "bed", role = "sleep.bed",
+                    detectorId = "bed", detectorIds = { "bed", "sofa" },
+                    role = "sleep.bed",
                     resourceKind = "sleep_surface",
                     virtual = { key = "floor", resourceKind = "floor_sleep",
                         exclusive = false, sceneId = "facility.sleep.floor",
@@ -47,7 +48,8 @@ local definition = {
             capabilities = { "sleep", "rest" },
             resourceBindings = {
                 sleep = {
-                    detectorId = "bed", role = "sleep.bed",
+                    detectorId = "bed", detectorIds = { "bed", "sofa" },
+                    role = "sleep.bed",
                     resourceKind = "sleep_surface",
                     virtual = { key = "floor", resourceKind = "floor_sleep",
                         exclusive = false, sceneId = "facility.sleep.floor",
@@ -66,7 +68,8 @@ local definition = {
             capabilities = { "sleep", "rest" },
             resourceBindings = {
                 sleep = {
-                    detectorId = "bed", role = "sleep.bed",
+                    detectorId = "bed", detectorIds = { "bed", "sofa" },
+                    role = "sleep.bed",
                     resourceKind = "sleep_surface",
                     virtual = { key = "floor", resourceKind = "floor_sleep",
                         exclusive = false, sceneId = "facility.sleep.floor",

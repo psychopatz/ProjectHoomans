@@ -260,9 +260,22 @@ end
 function Resources.GetResources(facility, detectorId, force)
     local scan = Resources.GetScan(facility, force)
     local resources = {}
+    local detectorIds = type(detectorId) == "table" and detectorId or nil
+    local function matchesDetector(resource)
+        if not detectorId then return true end
+        if detectorIds then
+            for index = 1, #detectorIds do
+                if tostring(resource.detectorId) == tostring(detectorIds[index]) then
+                    return true
+                end
+            end
+            return false
+        end
+        return tostring(resource.detectorId) == tostring(detectorId)
+    end
     for index = 1, #(scan.resources or {}) do
         local resource = scan.resources[index]
-        if not detectorId or tostring(resource.detectorId) == tostring(detectorId) then
+        if matchesDetector(resource) then
             resources[#resources + 1] = resource
         end
     end
@@ -282,6 +295,21 @@ local function binding(facility, capability)
             facility.level) or nil
     return level and level.resourceBindings
         and level.resourceBindings[tostring(capability or "")] or nil
+end
+
+local function bindingDetectorMatches(resourceBinding, resource)
+    if not resourceBinding then return false end
+    local detectorIds = resourceBinding.detectorIds
+    if type(detectorIds) == "table" and #detectorIds > 0 then
+        for index = 1, #detectorIds do
+            if tostring(resource.detectorId) == tostring(detectorIds[index]) then
+                return true
+            end
+        end
+        return false
+    end
+    return not resourceBinding.detectorId
+        or tostring(resource.detectorId) == tostring(resourceBinding.detectorId)
 end
 
 function Resources.GetBinding(facility, capability)
@@ -327,9 +355,7 @@ function Resources.GetCapacity(facility, capability, suppliedScan)
         local count = 0
         for index = 1, #(scan.resources or {}) do
             local resource = scan.resources[index]
-            if not resourceBinding.detectorId
-                or tostring(resource.detectorId)
-                    == tostring(resourceBinding.detectorId)
+            if bindingDetectorMatches(resourceBinding, resource)
             then
                 count = count + 1
             end
@@ -383,7 +409,18 @@ function Resources.Select(facility, capability, options)
     local bindingData = binding(facility, capability)
     if not bindingData then return nil end
     local resources, scanStatus = Resources.GetResources(
-        facility, bindingData.detectorId)
+        facility, bindingData.detectorIds or bindingData.detectorId)
+    if tostring(capability or "") == "sleep" then
+        table.sort(resources, function(left, right)
+            local leftPriority = tonumber(left.sleepPriority) or 0
+            local rightPriority = tonumber(right.sleepPriority) or 0
+            if leftPriority ~= rightPriority then
+                return leftPriority > rightPriority
+            end
+            return tostring(left.resourceKey or "")
+                < tostring(right.resourceKey or "")
+        end)
+    end
     local requestedKey = tostring(options.resourceKey or "")
     for index = 1, #resources do
         local resource = resources[index]
@@ -421,6 +458,7 @@ function Resources.BuildSnapshot(facility)
     local resources = {}
     local components = {}
     local counts = {}
+    local sleepSurfaceCount = 0
     for index = 1, #(scan.resources or {}) do
         local resource = scan.resources[index]
         local copy = copyDescriptor(resource)
@@ -430,8 +468,12 @@ function Resources.BuildSnapshot(facility)
         copy.kind = "discovered"
         copy.readOnly = true
         components[#components + 1] = copy
+        if tostring(copy.resourceKind or "") == "sleep_surface" then
+            sleepSurfaceCount = sleepSurfaceCount + 1
+        end
     end
     local bedCount = tonumber(counts["sleep.bed"]) or 0
+    local sofaCount = tonumber(counts["sleep.sofa"]) or 0
     if not binding(facility, "sleep") then
         return { resources = resources, components = components }
     end
@@ -442,16 +484,18 @@ function Resources.BuildSnapshot(facility)
         scanStatus = scan.status,
         resourceCounts = counts,
         bedCount = bedCount,
+        sofaCount = sofaCount,
+        sleepSurfaceCount = sleepSurfaceCount,
         capacity = capacity,
         capacityOverride = configuredCapacity,
         capacityMode = configuredCapacity and "configured" or capacityMode,
-        classification = (configuredCapacity or bedCount) > 1
+        classification = (configuredCapacity or sleepSurfaceCount) > 1
             and "barracks" or "bedroom",
-        roomLabelKey = (configuredCapacity or bedCount) > 1
+        roomLabelKey = (configuredCapacity or sleepSurfaceCount) > 1
             and "UI_PNC_Facility_Barracks"
             or "UI_PNC_Facility_Bedroom",
     }
-    if bedCount == 0 then profile.sleepSurface = "floor" end
+    if sleepSurfaceCount == 0 then profile.sleepSurface = "floor" end
     return { resources = resources, components = components, profile = profile }
 end
 
@@ -838,22 +882,50 @@ end
 Resources.Register("bed", {
     resourceKind = "sleep_surface",
     role = "sleep.bed",
+    sleepSurface = "bed",
+    sleepPriority = 100,
     collect = function(square, add)
         local object = SquareRules.FindBed(square)
         if object then add(object) end
     end,
     matches = function(_, object)
-        return SquareRules.IsActualBed(object)
+        return SquareRules.ClassifySleepSurface(object) == "bed"
     end,
     describe = function(square, object)
-        local bed = SquareRules.DescribeBed(square, object)
+        local bed = SquareRules.DescribeSleepSurface(square, object)
         if not bed then return nil end
+        if SquareRules.ClassifySleepSurface(object) ~= "bed" then return nil end
         bed.resourceKind = "sleep_surface"
         bed.role = "sleep.bed"
+        bed.sleepSurface = "bed"
         return bed
     end,
     key = function(resource)
         return "bed:" .. tostring(math.floor((tonumber(resource.x) or 0) * 2 + 0.5))
+            .. ":" .. tostring(math.floor((tonumber(resource.y) or 0) * 2 + 0.5))
+            .. ":" .. tostring(tonumber(resource.z) or 0)
+    end,
+})
+
+Resources.Register("sofa", {
+    resourceKind = "sleep_surface",
+    role = "sleep.sofa",
+    sleepSurface = "sofa",
+    sleepPriority = 50,
+    matches = function(_, object)
+        return SquareRules.ClassifySleepSurface(object) == "sofa"
+    end,
+    describe = function(square, object)
+        local sofa = SquareRules.DescribeSleepSurface(square, object)
+        if not sofa then return nil end
+        if SquareRules.ClassifySleepSurface(object) ~= "sofa" then return nil end
+        sofa.resourceKind = "sleep_surface"
+        sofa.role = "sleep.sofa"
+        sofa.sleepSurface = "sofa"
+        return sofa
+    end,
+    key = function(resource)
+        return "sofa:" .. tostring(math.floor((tonumber(resource.x) or 0) * 2 + 0.5))
             .. ":" .. tostring(math.floor((tonumber(resource.y) or 0) * 2 + 0.5))
             .. ":" .. tostring(tonumber(resource.z) or 0)
     end,

@@ -97,8 +97,12 @@ Const.PATROL_REACHED_DISTANCE = 0.8
 Const.ROAM_DEFAULT_RADIUS = 6.0
 Const.ROAM_REACHED_DISTANCE = 1.0
 Const.ROAM_TARGET_RADIUS = 12.0
-Const.ROAM_PAUSE_MIN_MS = 5000
-Const.ROAM_PAUSE_MAX_MS = 12000
+-- Area roamers should dwell like people instead of selecting a new
+-- destination every few seconds. Existing 5-12 second defaults are treated
+-- as legacy by the roaming behavior so this also improves existing orders
+-- without rewriting their persisted ModData.
+Const.ROAM_PAUSE_MIN_MS = 20000
+Const.ROAM_PAUSE_MAX_MS = 60000
 Const.ROAM_THREAT_MOVING_SCAN_MS = 250
 Const.ROAM_THREAT_IDLE_SCAN_MS = 500
 Const.ROAM_IDLE_TICK_INTERVAL_MS = 500

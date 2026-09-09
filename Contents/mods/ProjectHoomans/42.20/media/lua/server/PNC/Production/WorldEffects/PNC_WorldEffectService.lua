@@ -427,12 +427,27 @@ local function debugRow(providerID, provider, owner, effect)
     for _, point in ipairs(points) do
         endpoints[#endpoints + 1] = endpointSnapshot(point)
     end
-    local workerID = owner.workerId or owner.npcId
+    local workerID = effect.workerID or owner.workerId or owner.npcId
     local worker = workerID and PNC.Registry and PNC.Registry.Get
         and PNC.Registry.Get(workerID) or nil
-    local required = math.max(1, tonumber(owner.requiredWork) or 1)
-    local progress = math.max(0, math.min(required,
-        tonumber(owner.progress) or 0))
+    local required
+    local progress
+    if tostring(effect.kind or "") == "LUMBER_OUTPUT" then
+        required = math.max(1, tonumber(effect.totalQuantity)
+            or tonumber(effect.quantity) or 1)
+        progress = 0
+        for _, item in ipairs(effect.items or {}) do
+            if item.delivered then
+                progress = progress + math.max(1,
+                    math.floor(tonumber(item.quantity) or 1))
+            end
+        end
+        progress = math.min(required, progress)
+    else
+        required = math.max(1, tonumber(owner.requiredWork) or 1)
+        progress = math.max(0, math.min(required,
+            tonumber(owner.progress) or 0))
+    end
     return {
         effectId = tostring(effect.id or effect.effectId or ""),
         providerID = tostring(providerID), ownerID = ownerID,
@@ -449,6 +464,18 @@ local function debugRow(providerID, provider, owner, effect)
         nextRetryAt = effect.nextRetryAt,
         waitReason = effect.waitReason, lastReason = effect.lastReason,
         lastAttemptAt = effect.lastAttemptAt,
+        phase = effect.phase,
+        treeKey = effect.treeKey,
+        destinationNodeId = effect.destinationNodeId,
+        destinationStorageId = effect.destinationStorageId,
+        sourceMode = effect.sourceMode,
+        deliveryMode = effect.deliveryMode,
+        lootSource = effect.lootSource,
+        pickupState = effect.pickupState,
+        quantity = effect.quantity,
+        actualQuantity = effect.actualQuantity or effect.totalQuantity,
+        expectedLogYield = effect.expectedLogYield,
+        items = copy(effect.items),
         endpoints = endpoints,
         identity = copy(effect.identity or {
             haulToken = effect.haulToken,

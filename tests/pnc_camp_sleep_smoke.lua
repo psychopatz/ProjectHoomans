@@ -27,9 +27,11 @@ local function newSquare(x, y, z, objects)
 end
 
 local bed = { bed = true }
+local sofa = { sofa = true }
 local faucet = { faucet = true }
 squares[squareKey(10, 10, 0)] = newSquare(10, 10, 0, { bed })
 squares[squareKey(11, 10, 0)] = newSquare(11, 10, 0, { faucet })
+squares[squareKey(11, 11, 0)] = newSquare(11, 11, 0, { sofa })
 
 local bedDetector = {
     matches = function(_, object) return object.bed == true end,
@@ -43,6 +45,24 @@ local bedDetector = {
     key = function(resource)
         return "bed:" .. tostring(resource.x) .. ":" .. tostring(resource.y)
     end,
+    sleepSurface = "bed",
+    sleepPriority = 100,
+}
+
+local sofaDetector = {
+    matches = function(_, object) return object.sofa == true end,
+    describe = function(square)
+        return {
+            x = square:getX() + 0.5, y = square:getY() + 0.5,
+            z = square:getZ(), axis = "x", facing = "E",
+            surfaceOffset = 0,
+        }
+    end,
+    key = function(resource)
+        return "sofa:" .. tostring(resource.x) .. ":" .. tostring(resource.y)
+    end,
+    sleepSurface = "sofa",
+    sleepPriority = 50,
 }
 
 local bedValid = true
@@ -57,7 +77,9 @@ PNC = {
     Registry = { MarkDirty = function() end },
     FacilityResources = {
         GetDetector = function(id)
-            return id == "bed" and bedDetector or nil
+            if id == "bed" then return bedDetector end
+            if id == "sofa" then return sofaDetector end
+            return nil
         end,
         ApplyMaterializationTarget = function(_, _, target)
             return target.interactionX ~= nil
@@ -65,14 +87,18 @@ PNC = {
     },
     FacilityInteractionTargets = {
         ResolveResource = function(resource)
-            if resource.resourceKind ~= "sleep_surface" or not bedValid then
+            if resource.resourceKind ~= "sleep_surface"
+                or (resource.sleepSurface == "bed" and not bedValid)
+            then
                 return {}
             end
+            local sleepSurface = resource.sleepSurface or "bed"
             return { {
                 x = resource.x + 1, y = resource.y, z = resource.z,
                 interactionX = resource.x, interactionY = resource.y,
                 interactionZ = resource.z, interactionFacing = resource.facing,
-                sceneId = "facility.sleep.bed", sleepSurface = "bed",
+                sceneId = "facility.sleep." .. sleepSurface,
+                sleepSurface = sleepSurface,
                 resourceKey = resource.resourceKey,
                 resourceKind = resource.resourceKind,
             } }
@@ -138,12 +164,14 @@ local record = {
 }
 
 local snapshot = Service.Capture(record, true)
-T.equal(#snapshot.resources, 2,
-    "camp snapshot captures beds and faucets in the search radius")
+T.equal(#snapshot.resources, 3,
+    "camp snapshot captures beds, sofas, and faucets in the search radius")
 T.equal(snapshot.resources[1].resourceKind, "sleep_surface",
     "camp resource descriptors are deterministically ordered")
 T.equal(snapshot.resources[2].resourceKind, "water_source",
     "camp snapshot retains faucet descriptors for future needs")
+T.equal(snapshot.resources[3].sleepSurface, "sofa",
+    "camp snapshot preserves sofa sleep classification")
 T.falsy(snapshot.resources[1].object,
     "camp snapshots do not retain world object references")
 
@@ -186,6 +214,8 @@ T.truthy(assignment and assignment.ok,
     "camp sleep acquires an abstract-capable reservation")
 T.equal(assignment.resourceKind, "sleep_surface",
     "camp sleep prefers a discovered bed")
+T.equal(assignment.resource.sleepSurface, "bed",
+    "camp sleep prioritizes beds over sofas")
 T.equal(assignment.executionMode, "ABSTRACT",
     "unmaterialized camp sleep uses the abstract executor")
 
@@ -211,13 +241,14 @@ squares[squareKey(10, 10, 0)] = newSquare(10, 10, 0, {})
 local refreshed = Service.RefreshActivity(record)
 T.truthy(refreshed,
     "camp sleep refreshes a stale bed reservation instead of getting stuck")
-T.equal(record.runtime.facilityActivity.resourceKind, "floor_sleep",
-    "stale camp bed activity falls back to floor sleep")
+T.equal(record.runtime.facilityActivity.sleepSurface, "sofa",
+    "stale camp bed activity reassigns to an approved sofa")
 T.falsy(reservations[assignment.reservationId],
     "stale bed reservation is released after fallback")
 
+squares[squareKey(11, 11, 0)] = newSquare(11, 11, 0, {})
 local floorResource = Service.FindSleep(record, {
-    abstract = true, excludeKey = assignment.resourceKey,
+    abstract = true, force = true, excludeKey = assignment.resourceKey,
 })
 T.equal(floorResource.resourceKind, "floor_sleep",
     "a reserved bed falls back to a deterministic floor sleep slot")

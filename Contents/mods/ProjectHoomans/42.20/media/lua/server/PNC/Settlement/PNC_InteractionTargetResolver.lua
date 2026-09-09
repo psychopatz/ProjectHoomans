@@ -218,8 +218,8 @@ Targets.Register("workstationEdge", workstationEdgeTargets)
 
 local function sleepSpotTargets(component)
     local square = SquareRules.GetSquare(component.x, component.y, component.z)
-    local bed = SquareRules.DescribeBed(square)
-    if not bed then
+    local surface = SquareRules.DescribeSleepSurface(square)
+    if not surface then
         return { {
             x = component.x + 0.5,
             y = component.y + 0.5,
@@ -228,6 +228,7 @@ local function sleepSpotTargets(component)
             sleepSurface = "floor",
         } }
     end
+    local sleepSurface = SquareRules.ClassifySleepSurface(surface.object)
     local offsets = {
         { 0, 1 }, { 1, 0 }, { 0, -1 }, { -1, 0 },
     }
@@ -239,31 +240,34 @@ local function sleepSpotTargets(component)
         if isApproachSquare(square) then
             return { {
                 x = x + 0.5, y = y + 0.5, z = component.z,
-                interactionX = bed.x,
-                interactionY = bed.y,
-                interactionZ = bed.z,
-                interactionAxis = bed.axis,
-                interactionFacing = bed.facing,
-                sceneId = "facility.sleep.bed",
-                sleepSurface = "bed",
-                object = bed.object,
+                interactionX = surface.x,
+                interactionY = surface.y,
+                interactionZ = surface.z,
+                interactionAxis = surface.axis,
+                interactionFacing = surface.facing,
+                sceneId = "facility.sleep." .. sleepSurface,
+                sleepSurface = sleepSurface,
+                object = surface.object,
             } }
         end
     end
     return { {
         x = component.x + 0.5, y = component.y + 0.5, z = component.z,
-        interactionX = bed.x,
-        interactionY = bed.y,
-        interactionZ = bed.z,
-        interactionAxis = bed.axis,
-        interactionFacing = bed.facing,
-        sceneId = "facility.sleep.bed",
-        sleepSurface = "bed",
-        object = bed.object,
+        interactionX = surface.x,
+        interactionY = surface.y,
+        interactionZ = surface.z,
+        interactionAxis = surface.axis,
+        interactionFacing = surface.facing,
+        sceneId = "facility.sleep." .. sleepSurface,
+        sleepSurface = sleepSurface,
+        object = surface.object,
     } }
 end
 
-local function resourceBedTargets(resource, context)
+local function resourceSleepTargets(resource, context)
+    local sleepSurface = tostring(resource.sleepSurface
+        or resource.detectorId or "")
+    if sleepSurface ~= "bed" and sleepSurface ~= "sofa" then return {} end
     local originX = math.floor(tonumber(resource.originX)
         or tonumber(resource.x) or 0)
     local originY = math.floor(tonumber(resource.originY)
@@ -271,10 +275,17 @@ local function resourceBedTargets(resource, context)
     local originZ = math.floor(tonumber(resource.originZ)
         or tonumber(resource.z) or 0)
     local square = SquareRules.GetSquare(originX, originY, originZ)
-    local bed = square and SquareRules.DescribeBed(square) or nil
+    local object = square and (sleepSurface == "sofa"
+        and SquareRules.FindSofa(square) or SquareRules.FindBed(square)) or nil
+    local surface = square and object
+        and SquareRules.DescribeSleepSurface(square, object) or nil
     local loaded = square ~= nil
-    if loaded and not bed then return {} end
-    bed = bed or {
+    if loaded and (not surface
+        or SquareRules.ClassifySleepSurface(surface.object) ~= sleepSurface)
+    then
+        return {}
+    end
+    surface = surface or {
         object = resource.object,
         x = tonumber(resource.x) or originX + 0.5,
         y = tonumber(resource.y) or originY + 0.5,
@@ -283,12 +294,12 @@ local function resourceBedTargets(resource, context)
         facing = resource.facing,
         surfaceOffset = resource.surfaceOffset,
     }
-    local interactionZ = tonumber(bed.z) or originZ
-    local surfaceOffset = tonumber(bed.surfaceOffset)
+    local interactionZ = tonumber(surface.z) or originZ
+    local surfaceOffset = tonumber(surface.surfaceOffset)
     if surfaceOffset and surfaceOffset > 0 then
         -- Project Zomboid stores furniture surface height in pixels. Match
         -- Offline Survivor's supported-bed placement conversion so the live
-        -- NPC and its abstract position use the mattress height.
+        -- NPC and its abstract position use the furniture surface height.
         interactionZ = interactionZ + (surfaceOffset + 1) / 96
     end
     local offsets = { { 0, 1 }, { 1, 0 }, { 0, -1 }, { -1, 0 } }
@@ -299,23 +310,26 @@ local function resourceBedTargets(resource, context)
         if isApproachSquare(approach) then
             return { {
                 x = x + 0.5, y = y + 0.5, z = originZ,
-                interactionX = bed.x, interactionY = bed.y,
-                interactionZ = interactionZ, interactionAxis = bed.axis,
-                interactionFacing = bed.facing,
-                interactionSurfaceOffset = bed.surfaceOffset,
-                sceneId = "facility.sleep.bed", sleepSurface = "bed",
-                object = bed.object, resourceKey = resource.resourceKey,
+                interactionX = surface.x, interactionY = surface.y,
+                interactionZ = interactionZ, interactionAxis = surface.axis,
+                interactionFacing = surface.facing,
+                interactionSurfaceOffset = surface.surfaceOffset,
+                sceneId = "facility.sleep." .. sleepSurface,
+                sleepSurface = sleepSurface,
+                object = surface.object, resourceKey = resource.resourceKey,
                 resourceKind = resource.resourceKind,
             } }
         end
     end
     return { {
         x = originX + 0.5, y = originY + 0.5, z = originZ,
-        interactionX = bed.x, interactionY = bed.y, interactionZ = interactionZ,
-        interactionAxis = bed.axis, interactionFacing = bed.facing,
-        interactionSurfaceOffset = bed.surfaceOffset,
-        sceneId = "facility.sleep.bed", sleepSurface = "bed",
-        object = bed.object, resourceKey = resource.resourceKey,
+        interactionX = surface.x, interactionY = surface.y,
+        interactionZ = interactionZ, interactionAxis = surface.axis,
+        interactionFacing = surface.facing,
+        interactionSurfaceOffset = surface.surfaceOffset,
+        sceneId = "facility.sleep." .. sleepSurface,
+        sleepSurface = sleepSurface,
+        object = surface.object, resourceKey = resource.resourceKey,
         resourceKind = resource.resourceKind,
     } }
 end
@@ -474,7 +488,8 @@ end
 Targets.Register("sleepSpot", sleepSpotTargets)
 -- Compatibility for components saved before sleep spots became furniture-optional.
 Targets.Register("bed", sleepSpotTargets)
-Targets.RegisterResource("bed", resourceBedTargets)
+Targets.RegisterResource("bed", resourceSleepTargets)
+Targets.RegisterResource("sofa", resourceSleepTargets)
 Targets.RegisterResource("seat", resourceSeatTargets)
 
 return Targets

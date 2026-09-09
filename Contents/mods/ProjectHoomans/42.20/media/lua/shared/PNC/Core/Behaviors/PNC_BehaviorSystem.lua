@@ -215,6 +215,17 @@ function Behavior.Tick(record, zombie, now)
         return
     end
 
+    -- A roaming seat is a transient presentation lease. It owns only the
+    -- live route/scene while active; the durable roam order remains intact.
+    -- The server service is loaded after this shared coordinator, so resolve
+    -- it dynamically instead of capturing a nil module at load time.
+    local roamingSeat = PNC.RoamingSeat
+    if roamingSeat and roamingSeat.Tick
+        and roamingSeat.Tick(record, zombie, now)
+    then
+        return
+    end
+
     -- Automatic ambient seating is a blocking presentation scene. Give it a
     -- narrow perception/combat handoff before the scene can consume the tick;
     -- the arbiter keeps the facility activity alive for later resumption.

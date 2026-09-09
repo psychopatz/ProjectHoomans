@@ -25,6 +25,11 @@ local worldEffectHandlers = {}
 local status = {
     CANCELLED = "CANCELLED", COMPLETED = "COMPLETED", FAILED = "FAILED",
     CANCELLING = "CANCELLING",
+    TRAVEL_TO_STATION = "TRAVEL_TO_STATION", WORKING = "WORKING",
+    WAITING_RESOURCE = "WAITING_RESOURCE",
+    WAITING_FOR_WORLD = "WAITING_FOR_WORLD",
+    WAITING_FOR_WORKER = "WAITING_FOR_WORKER",
+    TRAVEL_TO_STOCKPILE = "TRAVEL_TO_STOCKPILE",
 }
 
 PNC = {
@@ -83,7 +88,18 @@ PNC = {
         end,
     },
     LumberService = {
-        Data = { jobs = { worker = job } },
+        Data = {
+            jobs = { worker = job },
+            trees = {
+                ["tree:1"] = {
+                    key = "tree:1",
+                    worldEffect = { id = "remove:1", kind = "TREE_REMOVE",
+                        state = "PENDING" },
+                    outputEffect = { id = "output:1", kind = "LUMBER_OUTPUT",
+                        state = "PENDING" },
+                },
+            },
+        },
         GetJob = function() return job end,
         GetZone = function() return {
             enabled = true,
@@ -97,6 +113,7 @@ PNC = {
         ApplyDeferredTreeRemoval = function() return true, "TREE_REMOVED" end,
     },
     Registry = { Get = function(id) return records[tostring(id)] end },
+    WorkRepository = { MarkDirty = function() end },
 }
 
 local Adapter = T.load("ProjectHoomans", "server",
@@ -109,6 +126,16 @@ T.truthy(worldEffectProviders.LUMBER,
     "lumber world-effect provider registration")
 T.truthy(worldEffectHandlers.TREE_REMOVE,
     "tree removal world-effect registration")
+local lumberProvider = worldEffectProviders.LUMBER
+local ledgerOwners = lumberProvider.List()
+T.equal(#ledgerOwners, 1, "lumber provider lists output-bearing trees")
+local ledgerEffects = lumberProvider.GetEffects(ledgerOwners[1])
+T.equal(#ledgerEffects, 2,
+    "lumber provider exposes removal and output effects")
+T.truthy(lumberProvider.IsPending(ledgerOwners[1], ledgerEffects[1]),
+    "tree removal remains owned by the world-effects pump")
+T.falsy(lumberProvider.IsPending(ledgerOwners[1], ledgerEffects[2]),
+    "lumber output is not auto-applied as a world mutation")
 
 local ensured, queued = Adapter.EnsureOrder(job)
 T.truthy(ensured, "work order created")
@@ -119,6 +146,7 @@ T.equal(records.worker.activeBehavior, "Lumber:WAITING_FOR_WORKER",
     "queued lumber order publishes its worker wait")
 T.equal(records.worker.runtime.lumber.waitingFor, "worker",
     "queued lumber order identifies the missing lease")
+order.workerId = "worker"
 
 local target = registrations.target[2](order, records.worker)
 T.truthy(target.ok, "zone target acquired")
@@ -131,6 +159,17 @@ local executed = registrations.execution[2](order, {
 T.truthy(executed, "tree execution delegated")
 T.equal(job.leaseId, "lease:1", "work lease bound to tree job")
 T.equal(job.workOrderId, order.id, "work order bound to tree job")
+
+job.approach = { x = 11.5, y = 21.5, z = 0 }
+job.phase = "CHOPPING"
+executed = registrations.execution[2](order, {
+    npcId = "worker", leaseId = "lease:1", executionMode = "LIVE",
+})
+T.truthy(executed, "chopping phase remains executable")
+T.equal(order.status, status.WORKING,
+    "lumber phase projects working status to the scheduler")
+T.equal(order.phase, "CHOPPING",
+    "lumber phase projects the live phase to the order")
 
 tickComplete = true
 executed = registrations.execution[2](order, {

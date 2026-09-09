@@ -24,4 +24,24 @@ Scenes.Register("lumber.chop", {
     },
 })
 
+Scenes.Register("lumber.grab", {
+    label = tr("UI_PNC_LumberScene_Grab"),
+    description = tr("UI_PNC_LumberScene_GrabDescription"),
+    category = "lumber", priority = 45, repeatMode = "once",
+    blocking = false, bump = "Loot", durationMs = 900,
+    interrupts = {
+        movement = true, combat = true, externalBump = true, abstract = true,
+    },
+})
+
+Scenes.Register("lumber.deposit", {
+    label = tr("UI_PNC_LumberScene_Deposit"),
+    description = tr("UI_PNC_LumberScene_DepositDescription"),
+    category = "lumber", priority = 45, repeatMode = "once",
+    blocking = false, bump = "Loot", durationMs = 900,
+    interrupts = {
+        movement = true, combat = true, externalBump = true, abstract = true,
+    },
+})
+
 return true

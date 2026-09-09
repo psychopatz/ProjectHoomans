@@ -24,6 +24,20 @@ function Service.Commands.Cancel(orderId, reason)
     if not order then return false, "WORK_ORDER_UNAVAILABLE" end
     if order.status == Status.CANCELLED then return true, copy(order) end
     if terminal(order) then return false, "WORK_ORDER_UNAVAILABLE" end
+    if order.status ~= Status.CANCELLING then
+        order.cancellationPreviousStatus = order.status
+        order.cancellationPreviousRequested = order.cancellationRequested
+        order.cancellationPreviousReason = order.cancellationReason
+        order.cancellationPreviousBlockedReason = order.blockedReason
+    elseif order.cancellationPreviousStatus == nil and order.blockedReason ~= nil then
+        -- Recover orders written by the older cancellation path. A blocked
+        -- order retains its blocked reason even though that path left its
+        -- status at CANCELLING after cleanup failed.
+        order.cancellationPreviousStatus = Status.BLOCKED
+        order.cancellationPreviousRequested = nil
+        order.cancellationPreviousReason = nil
+        order.cancellationPreviousBlockedReason = order.blockedReason
+    end
     if order.completionStarted == true then
         order.cancellationRequested = true
         order.cancellationReason = tostring(reason or "cancelled")
@@ -43,13 +57,36 @@ function Service.Commands.Cancel(orderId, reason)
     if cancellation then
         local cancelled, cancellationReason = cancellation(order)
         if cancelled == false then
+            local restoreStatus = order.cancellationPreviousStatus
+            if restoreStatus and restoreStatus ~= Status.CANCELLING then
+                order.status = restoreStatus
+                order.cancellationRequested =
+                    order.cancellationPreviousRequested
+                order.cancellationReason = order.cancellationPreviousReason
+                order.blockedReason =
+                    order.cancellationPreviousBlockedReason
+                order.cancellationPreviousStatus = nil
+                order.cancellationPreviousRequested = nil
+                order.cancellationPreviousReason = nil
+                order.cancellationPreviousBlockedReason = nil
+            end
+            order.cancellationFailureReason =
+                cancellationReason or "CANCELLATION_FAILED"
+            order.updatedAt, order.revision = now(), order.revision + 1
+            Repository.MarkDirty()
             return false, cancellationReason or "CANCELLATION_FAILED"
         end
     end
     releaseClaim(order, order.cancellationReason, true, false)
     order.status, order.cancelledAt = Status.CANCELLED, now()
     order.terminalPersisted = false
-    order.blockedReason, order.revision = nil, order.revision + 1
+    order.blockedReason = nil
+    order.cancellationFailureReason = nil
+    order.cancellationPreviousStatus = nil
+    order.cancellationPreviousRequested = nil
+    order.cancellationPreviousReason = nil
+    order.cancellationPreviousBlockedReason = nil
+    order.revision = order.revision + 1
     Repository.MarkDirty()
     emit(EventTypes.WORK_ORDER_CANCELLED, { workOrderId = order.id,
         colonyId = order.colonyId, operation = order.operation })

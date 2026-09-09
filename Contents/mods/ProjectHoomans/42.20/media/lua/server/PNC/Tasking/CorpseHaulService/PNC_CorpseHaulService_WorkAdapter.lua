@@ -600,6 +600,57 @@ local function completeWorkOrder(order)
     return true
 end
 
+-- This is a migration guard for orders written by the old shared behavior.
+-- Those orders could reach 100% during SOURCE_APPROACH and then become
+-- BLOCKED before the corpse was touched. Release the stale assignment and let
+-- reconciliation bind the source corpse again. Do not apply this blindly to a
+-- drop-phase failure: a corpse may already have been physically transferred.
+local function recoverCompletionFailure(order, reason)
+    if tostring(order and order.operation or "") ~= "CORPSE_HAUL"
+        or tostring(reason or "") ~= "CORPSE_NOT_AT_DESTINATION"
+    then
+        return false
+    end
+    local phase = tostring(order.phase or "")
+    if phase ~= "SOURCE_APPROACH" and phase ~= "" then return false end
+    local released
+    local releaseReason
+    order.completionStarted = nil
+    if Work.Commands.ReleaseAssignment and order.workerId then
+        released, releaseReason = Work.Commands.ReleaseAssignment(
+            order.workerId, "corpse_haul_completion_retry")
+    elseif Work.Commands.ReleaseWorker and order.workerId then
+        released, releaseReason = Work.Commands.ReleaseWorker(order.workerId,
+            "corpse_haul_completion_retry")
+    elseif Work.Internal and Work.Internal.releaseClaim then
+        released, releaseReason = Work.Internal.releaseClaim(order,
+            "corpse_haul_completion_retry", false, true)
+    end
+    if released ~= true and Work.Commands.ReleaseWorker and order.workerId then
+        -- A stale or partially materialized Tasking lease must not prevent the
+        -- durable claim from being repaired. CanContinue will invalidate that
+        -- lease on its next reconciliation pass.
+        released, releaseReason = Work.Commands.ReleaseWorker(order.workerId,
+            "corpse_haul_completion_retry")
+    end
+    if released ~= true then return false, releaseReason end
+    -- clearWorkRuntime releases the old corpse reservation. Clearing the
+    -- durable token too lets reconciliation score the physical source corpse
+    -- by location and stamp a fresh reservation safely.
+    if order.payload then order.payload.haulToken = nil end
+    order.status = Status.WAITING_FOR_WORKER
+    order.progress = 0
+    order.blockedReason = "CORPSE_NOT_AT_DESTINATION"
+    order.updatedAt = Core.Now()
+    order.revision = (tonumber(order.revision) or 0) + 1
+    if WorkRepository then WorkRepository.MarkDirty() end
+    if Work.Internal and Work.Internal.markAssignmentDirty then
+        Work.Internal.markAssignmentDirty(order,
+            "CORPSE_HAUL_COMPLETION_RETRY")
+    end
+    return true, "CORPSE_HAUL_COMPLETION_RETRY"
+end
+
 local function cancelWorkOrder(order)
     clearWorkRuntime(
         order,
@@ -978,6 +1029,10 @@ local function bindWorkService()
     Work.RegisterExecution("CORPSE_HAUL", tickWorkOrder)
     Work.RegisterAbstractExecution("CORPSE_HAUL", tickAbstractWorkOrder)
     Work.RegisterCompletion("CORPSE_HAUL", completeWorkOrder)
+    if Work.RegisterCompletionRecovery then
+        Work.RegisterCompletionRecovery("CORPSE_HAUL",
+            recoverCompletionFailure)
+    end
     Work.CancellationHandlers = Work.CancellationHandlers or {}
     Work.CancellationHandlers.CORPSE_HAUL = cancelWorkOrder
     return true

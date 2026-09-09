@@ -11,6 +11,8 @@ local BuildUI = require
     "PNC/UI/Communities/ColonyManagement/PNC_FacilityBuildModal"
 local QueueOverlay = require
     "PNC/UI/Communities/ColonyManagement/PNC_BuildingQueueOverlay"
+local QueueActions = require
+    "PNC/UI/Communities/ColonyManagement/PNC_BuildingQueueActions"
 
 local View = {}
 local UI = PsychopatzCore.UI
@@ -42,6 +44,9 @@ end
 
 local function rebuildNativeQueue(window, snapshot)
     local rows = Data.NativeQueueRows(snapshot)
+    for _, row in ipairs(rows) do
+        row.actionLabel = QueueActions.ActionLabel(window, row.order)
+    end
     Components.SetRowsStable(window.baseBuildingNativeQueue, rows)
     window.baseBuildingNativeQueue.selected = #rows > 0 and 1 or 0
     window.baseBuildingNativeQueueSelectedID = rows[1] and rows[1].id or nil
@@ -124,9 +129,7 @@ function View.Create(window)
             if x >= list:getWidth() - 120
                 and PNC.Client and PNC.Client.RequestColonyAction
             then
-                PNC.Client.RequestColonyAction("work_cancel", {
-                    workOrderId = row.id,
-                })
+                QueueActions.RequestCancel(window, row.order)
             end
         end
         return true
@@ -178,7 +181,11 @@ function View.Apply(window, active)
 end
 
 function View.Rebuild(window, snapshot)
+    snapshot = snapshot or window.snapshot or {}
+    window.snapshot = snapshot
     local settlement = snapshot.settlement
+    QueueActions.Reconcile(window, snapshot,
+        snapshot.building and snapshot.building.queue or {})
     QueueOverlay.SetQueue(snapshot.building and snapshot.building.queue or {})
     local allOptions = settlement and BuildUI.BuildOptions(
         settlement, snapshot.storage, snapshot.research) or {}

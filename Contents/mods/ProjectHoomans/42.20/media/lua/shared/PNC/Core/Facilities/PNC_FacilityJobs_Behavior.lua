@@ -1133,4 +1133,17 @@ PNC.OrderSystem.RegisterNormalizer(KIND, normalize)
 PNC.JobSystem.RegisterOrder(KIND, JOB)
 PNC.BehaviorRegistry.Register(JOB, Jobs.Tick)
 
+-- Ambient roaming seats use the same live furniture validation and cleanup
+-- as durable facility activities, but keep their owner order untouched. Keep
+-- these seams narrow so the transient service cannot mutate facility state or
+-- accidentally enter the persistence path.
+Jobs.Seating = Jobs.Seating or {}
+Jobs.Seating.ClearFurnitureSeat = clearFurnitureSeat
+Jobs.Seating.EnterFurnitureSeat = enterFurnitureSeat
+Jobs.Seating.RefreshLiveSeatTarget = refreshLiveSeatTarget
+Jobs.Seating.PositionAtSeatAnchor = positionAtSeatAnchor
+Jobs.Seating.ResetPath = resetPath
+Jobs.Seating.RestorePosition = restorePosition
+Jobs.Seating.RetryApproach = retrySeatApproach
+
 return Jobs

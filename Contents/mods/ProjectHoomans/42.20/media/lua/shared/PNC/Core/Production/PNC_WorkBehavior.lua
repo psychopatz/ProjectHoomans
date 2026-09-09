@@ -3,6 +3,7 @@ PNC = PNC or {}
 local KIND = "production_work"
 local JOB = "ProductionWork"
 local WorkSequence = PNC.WorkSequence
+local WorkDefinitions = PNC.WorkDefinitions
 local SCENE_BY_OPERATION = {
     RESEARCH = "production.research",
     CRAFT = "production.craft",
@@ -92,6 +93,15 @@ local function tick(record, zombie)
     record.runtime.lastProductionWorkAt = at
     if zombie and zombie.setVariable then
         zombie:setVariable("PNCWorkOperation", tostring(order.operation))
+    end
+    -- Manual-progress operations own their progress inside the operation
+    -- adapter. Corpse hauling must reach its physical drop/commit phase before
+    -- WorkService is allowed to complete it; generic elapsed progress would
+    -- otherwise finish a requiredWork=1 order during SOURCE_APPROACH.
+    if WorkDefinitions and WorkDefinitions.MANUAL_PROGRESS
+        and WorkDefinitions.MANUAL_PROGRESS[order.operation]
+    then
+        return true
     end
     PNC.WorkService.Commands.AddElapsed(order.workOrderId, record.id,
         math.max(0, (at - previous) / 1000))

@@ -111,4 +111,43 @@ T.equal(all.summary.applied, 1, "applied effect remains inspectable")
 T.equal(all.rows[1].state, "APPLIED", "all-state filter exposes applied row")
 T.truthy(dirty > 0, "effect lifecycle marks its provider dirty")
 
+local lumberOwner = {
+    id = "tree:one",
+    outputEffect = {
+        id = "lumber-output:one", kind = "LUMBER_OUTPUT",
+        operation = "LUMBER_OUTPUT", state = "PENDING", phase = "CARRYING",
+        sourceMode = "LIVE", deliveryMode = "WORLD_FLOOR",
+        lootSource = "vanilla_tree_loot", pickupState = "NPC_INVENTORY",
+        x = 10, y = 20, z = 0, quantity = 2, expectedLogYield = 2,
+        sourceX = 10, sourceY = 20, sourceZ = 0,
+        destinationX = 30, destinationY = 40, destinationZ = 0,
+        destinationNodeId = "node:one", destinationStorageId = "storage:one",
+        totalQuantity = 3, actualQuantity = 3,
+        items = {
+            { fullType = "Base.Log", quantity = 1, delivered = true },
+            { fullType = "Base.Splinters", quantity = 2 },
+        },
+    },
+}
+T.truthy(Effects.RegisterProvider("lumber", {
+    List = function() return { lumberOwner } end,
+    GetOwnerID = function(value) return value.id end,
+    GetEffects = function(value) return { value.outputEffect } end,
+}), "lumber provider registration")
+local lumberSnapshot = Effects.BuildSnapshot({
+    state = "ALL", kind = "LUMBER_OUTPUT",
+})
+T.equal(#lumberSnapshot.rows, 1,
+    "lumber output is visible through the world-effects snapshot")
+T.equal(lumberSnapshot.rows[1].actualQuantity, 3,
+    "lumber debug row exposes actual captured item quantity")
+T.equal(lumberSnapshot.rows[1].progress, 1,
+    "lumber debug row reports delivered item progress")
+T.equal(lumberSnapshot.rows[1].phase, "CARRYING",
+    "lumber debug row exposes the delivery phase")
+T.equal(#lumberSnapshot.rows[1].endpoints, 2,
+    "lumber debug row exposes floor and stockpile endpoints")
+T.equal(lumberSnapshot.rows[1].endpoints[2].loaded, false,
+    "lumber debug row reports an unloaded stockpile endpoint")
+
 T.finish("pnc_world_effect_service_smoke")

@@ -24,6 +24,7 @@ local function emit(eventType, payload)
 end
 
 Service.CompletionHandlers = Service.CompletionHandlers or {}
+Service.CompletionRecoveryHandlers = Service.CompletionRecoveryHandlers or {}
 Service.PreparationHandlers = Service.PreparationHandlers or {}
 Service.CollectionHandlers = Service.CollectionHandlers or {}
 Service.TargetProviders = Service.TargetProviders or {}
@@ -245,6 +246,13 @@ function Service.RegisterCompletion(operation, handler)
     operation = tostring(operation or "")
     if operation == "" or type(handler) ~= "function" then return false end
     Service.CompletionHandlers[operation] = handler
+    return true
+end
+
+function Service.RegisterCompletionRecovery(operation, handler)
+    operation = tostring(operation or "")
+    if operation == "" or type(handler) ~= "function" then return false end
+    Service.CompletionRecoveryHandlers[operation] = handler
     return true
 end
 

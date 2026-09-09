@@ -132,4 +132,72 @@ Resources.Refresh(emptyFacility)
 local empty = Resources.BuildSnapshot(emptyFacility)
 T.equal(empty.profile.bedCount, 0, "empty room has no discovered beds")
 T.equal(empty.profile.sleepSurface, "floor", "empty room uses floor fallback")
+
+local sofaProperties = {
+    get = function(_, key)
+        local values = {
+            CustomName = "Sofa", FurnitureType = "Seating",
+        }
+        return values[key]
+    end,
+}
+local sofaGrid = {
+    getWidth = function() return 2 end,
+    getHeight = function() return 1 end,
+}
+local sofaSprite = {
+    getName = function() return "furniture_seating_01_0" end,
+    getProperties = function() return sofaProperties end,
+    getSpriteGrid = function() return sofaGrid end,
+    tilesetName = "furniture_seating",
+}
+local sofa = {
+    getName = function() return "Sofa" end,
+    getSprite = function() return sofaSprite end,
+    getProperties = function() return sofaProperties end,
+    getSurfaceOffsetNoTable = function() return 0.10 end,
+}
+makeSquare(31, 20, { sofa })
+makeSquare(31, 21, {})
+local sofaFacility = {
+    id = "bedroom:sofa", constructionState = "BUILT",
+    constructionRegion = { levels = { [0] = { rows = { [20] = { 31, 31 } } } } },
+}
+local sofaScan = Resources.Refresh(sofaFacility)
+T.equal(#sofaScan.resources, 1, "sofa detector finds an approved sofa")
+T.equal(sofaScan.resources[1].detectorId, "sofa",
+    "sofa remains separate from generic seating resources")
+T.equal(sofaScan.resources[1].sleepSurface, "sofa",
+    "sofa resource carries its sleep surface classification")
+local sofaTarget = Targets.ResolveResource(
+    sofaScan.resources[1], { abstract = true })[1]
+T.equal(sofaTarget.sceneId, "facility.sleep.sofa",
+    "sofa resource selects the dedicated sofa sleep scene")
+T.equal(sofaTarget.sleepSurface, "sofa",
+    "sofa target preserves its sleep surface classification")
+
+PNC.FacilityDefinitions = {
+    GetLevel = function()
+        return { resourceBindings = {
+            sleep = {
+                detectorId = "bed", detectorIds = { "bed", "sofa" },
+                role = "sleep.bed", resourceKind = "sleep_surface",
+                virtual = { key = "floor", resourceKind = "floor_sleep",
+                    sceneId = "facility.sleep.floor", sleepSurface = "floor" },
+            },
+        } }
+    end,
+}
+local sofaSnapshot = Resources.BuildSnapshot(sofaFacility)
+T.equal(sofaSnapshot.profile.sofaCount, 1,
+    "room profile counts discovered sofas")
+T.equal(sofaSnapshot.profile.sleepSurfaceCount, 1,
+    "sofas count as physical sleep surfaces")
+T.equal(sofaSnapshot.profile.sleepSurface, nil,
+    "sofa-only rooms do not use the floor profile")
+local selectedSofa = Resources.Select(sofaFacility, "sleep")
+T.equal(selectedSofa.resourceKey, sofaScan.resources[1].resourceKey,
+    "sleep selection can acquire a sofa resource")
+T.equal(selectedSofa.target.sceneId, "facility.sleep.sofa",
+    "sleep selection does not route sofas through chair seating")
 T.finish("pnc_facility_resources_smoke")

@@ -29,6 +29,18 @@ local function endpointText(row)
     return table.concat(output, " | ")
 end
 
+local function itemText(row)
+    local output = {}
+    for _, item in ipairs(row.items or {}) do
+        if type(item) == "table" then
+            local fullType = item.type or item.fullType or "?"
+            local quantity = item.stack or item.quantity or "?"
+            output[#output + 1] = text(fullType) .. " x" .. text(quantity)
+        end
+    end
+    return #output > 0 and table.concat(output, " | ") or "unknown / vanilla"
+end
+
 local function drawEffect(list, y, entry, alternate)
     local row = entry.item
     UI.DrawListSelection(list, y, list.itemheight,
@@ -69,6 +81,7 @@ function ISPNCWorldEffectDebugWindow:createChildren()
         { "conflict", "CONFLICT", "danger" },
         { "corpse", "CORPSE", "quiet" },
         { "tree", "TREE", "quiet" },
+        { "lumber", "LUMBER", "quiet" },
     }) do
         self.controls[#self.controls + 1] = UI.CreateButton(self, {
             id = definition[1], title = definition[2], target = self,
@@ -143,6 +156,7 @@ function ISPNCWorldEffectDebugWindow:refreshSnapshot()
             { "Operation", row.operation },
             { "Kind", row.kind },
             { "State", row.state },
+            { "Phase", row.phase },
             { "Order status", row.orderStatus },
             { "Worker", row.workerName or row.workerID },
             { "Progress", string.format("%d%% (%s/%s)",
@@ -155,6 +169,17 @@ function ISPNCWorldEffectDebugWindow:refreshSnapshot()
             { "Last reason", row.lastReason },
             { "Endpoints", endpointText(row) },
         }
+        if tostring(row.kind or "") == "LUMBER_OUTPUT" then
+            rows[#rows + 1] = { "Tree", row.treeKey }
+            rows[#rows + 1] = { "Source", row.sourceMode }
+            rows[#rows + 1] = { "Delivery", row.deliveryMode }
+            rows[#rows + 1] = { "Loot", row.lootSource }
+            rows[#rows + 1] = { "Stockpile node", row.destinationNodeId }
+            rows[#rows + 1] = { "Storage", row.destinationStorageId }
+            rows[#rows + 1] = { "Expected logs", row.expectedLogYield }
+            rows[#rows + 1] = { "Actual items", row.actualQuantity or row.quantity }
+            rows[#rows + 1] = { "Items", itemText(row) }
+        end
         for index, item in ipairs(rows) do
             self.details:addItem("row_" .. tostring(index), {
                 label = item[1], value = text(item[2]),
@@ -181,6 +206,8 @@ function ISPNCWorldEffectDebugWindow:onAction(button)
         self.filterState, self.filterKind = "ALL", "CORPSE_TRANSFER"
     elseif id == "tree" then
         self.filterState, self.filterKind = "ALL", "TREE_REMOVE"
+    elseif id == "lumber" then
+        self.filterState, self.filterKind = "ALL", "LUMBER_OUTPUT"
     end
     self:requestSnapshot()
 end
@@ -245,4 +272,3 @@ function WorldEffectUI.Toggle()
     end
     return WorldEffectUI.Open() ~= nil
 end
-

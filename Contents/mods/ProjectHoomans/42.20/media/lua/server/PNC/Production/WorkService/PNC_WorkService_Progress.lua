@@ -99,6 +99,21 @@ local function complete(order)
             Repository.MarkDirty()
             return true, "CANCELLED_AFTER_ATOMIC_FAILURE"
         end
+        local recovery = Service.CompletionRecoveryHandlers
+            and Service.CompletionRecoveryHandlers[order.operation]
+        if recovery then
+            local recoveryOK, recovered, recoveryReason = pcall(recovery,
+                order, tostring(reason or "COMPLETION_FAILED"), worker)
+            if recoveryOK and recovered == true then
+                order.completionStarted = nil
+                Repository.MarkDirty()
+                return false, recoveryReason or reason
+            end
+            if not recoveryOK and PNC.Core and PNC.Core.LogWarn then
+                PNC.Core.LogWarn("work completion recovery exception order="
+                    .. tostring(order.id) .. " error=" .. tostring(recovered))
+            end
+        end
         order.status, order.blockedReason = Status.BLOCKED,
             tostring(reason or "COMPLETION_FAILED")
         order.completionStarted = nil
@@ -177,6 +192,11 @@ function Service.Commands.AddElapsed(orderId, workerId, elapsedSeconds)
     local order = Repository.Get(orderId)
     local worker = PNC.Registry and PNC.Registry.Get and PNC.Registry.Get(workerId)
     if not order or not worker then return false, "WORKER_UNAVAILABLE" end
+    if Definitions.MANUAL_PROGRESS
+        and Definitions.MANUAL_PROGRESS[order.operation]
+    then
+        return false, "MANUAL_PROGRESS_OPERATION"
+    end
     local rate, reason = Definitions.WorkRate(worker, order.requiredSkills, 1, 1)
     if rate <= 0 then return false, reason end
     local elapsed = math.max(0, math.min(Definitions.BALANCE.maxElapsedSeconds,

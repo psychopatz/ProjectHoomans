@@ -120,6 +120,7 @@ function Provider.CanContinue(lease)
         and order.status ~= Status.CANCELLED
         and order.status ~= Status.COMPLETED
         and order.status ~= Status.FAILED
+        and order.status ~= Status.BLOCKED
 end
 
 function Provider.Cancel(lease, reason)
@@ -193,6 +194,17 @@ function Provider.Tick(lease)
         lease.reservationId = nil
         return PNC.Tasking.Commands.Complete(lease.leaseId,
             order and order.status or "WORK_ORDER_REMOVED")
+    end
+    if order.status == Status.BLOCKED then
+        -- A blocked durable order must not retain an executor lease. The
+        -- provider cancellation path releases the domain claim and operation
+        -- runtime, allowing the order's domain reconciler or UI to retry it.
+        if PNC.Tasking.Commands.CancelLease then
+            local stopped = PNC.Tasking.Commands.CancelLease(lease.leaseId,
+                "blocked_order_recovery")
+            if stopped then return true end
+        end
+        return false, order.blockedReason or "WORK_ORDER_BLOCKED"
     end
     if tostring(order.workerId or "") ~= lease.npcId then
         PNC.Tasking.Events.Emit("WORK_ASSIGNMENT_LOST", {
