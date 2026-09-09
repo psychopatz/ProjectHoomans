@@ -5,6 +5,12 @@ local InventoryModel = require "PNC/UI/Inventory/PNC_InventoryUI_Model"
 local Placement = require "PNC/UI/Communities/ColonyManagement/PNC_BuildingPlacement"
 local QueueOverlay = require
     "PNC/UI/Communities/ColonyManagement/PNC_BuildingQueueOverlay"
+
+local function trace(event, message)
+    local hub = PNC.CommandHub
+    if hub and hub.Trace then hub.Trace(event, message) end
+end
+
 local function tr(key, fallback)
     local value = getText and getText(key) or nil
     if not value or value == key then return fallback end
@@ -46,11 +52,6 @@ local function button(window, builder, id, title, variant)
         variant = variant })
 end
 
-local function header(list, name, cells)
-    list:addItem(name, { name = name, restricted = true,
-        catalogHeader = true, catalogCells = cells })
-end
-
 local function labelFor(fullType)
     if getItemNameFromFullType then
         return tostring(getItemNameFromFullType(fullType) or fullType)
@@ -60,6 +61,39 @@ end
 
 local function activeRecipe(window)
     return window.buildSelectedRecipe
+end
+
+-- A facility-backed native object belongs to FACILITIES because its world
+-- object is managed by the NPC facility system. Keep the vanilla recipe
+-- browser complete, but remove those identities from its list so a Research
+-- Table or forge cannot be queued once as a generic building and once as a
+-- managed workstation.
+local function facilityRecipeIdentities()
+    local identities = {}
+    local definitions = PNC.FacilityDefinitions
+    for _, definition in pairs(definitions and definitions.ByID or {}) do
+        if definition.legacyOnly ~= true then
+            local objectInfoName = definition.buildRecipeObjectInfoName
+                or definition.entityScript
+            if objectInfoName and tostring(objectInfoName) ~= "" then
+                identities[tostring(objectInfoName)] = true
+            end
+        end
+    end
+    return identities
+end
+
+function Building.FilterFacilityRecipes(recipes)
+    local identities = facilityRecipeIdentities()
+    local output = {}
+    for _, recipe in ipairs(recipes or {}) do
+        local objectInfoName = recipe and (recipe.objectInfoName
+            or recipe.recipeKey or recipe.id) or nil
+        if not objectInfoName or not identities[tostring(objectInfoName)] then
+            output[#output + 1] = recipe
+        end
+    end
+    return output
 end
 
 local function giveRecipeMaterials(window, recipe)
@@ -82,6 +116,156 @@ local function nativeRecipe(recipe)
     local descriptor = objectInfoName and catalog and catalog.Get
         and catalog.Get(objectInfoName) or nil
     return descriptor and descriptor.nativeRecipe or nil
+end
+
+local function recipeDescriptor(recipe)
+    local key = recipe and (recipe.objectInfoName or recipe.recipeKey
+        or recipe.id) or nil
+    local catalog = PNC.BuildRecipeCatalog
+    if not key or not catalog then return nil end
+    if catalog.Get then
+        local descriptor = catalog.Get(key)
+        if descriptor then return descriptor end
+    end
+    if catalog.Queries and catalog.Queries.FindForAliases then
+        return catalog.Queries.FindForAliases({ key,
+            recipe.recipeName, recipe.displayName })
+    end
+    return nil
+end
+
+local function facilityBuildUI()
+    local buildUI = PNC.FacilityBuildUI
+    if buildUI and buildUI.DrawNativePreview then return buildUI end
+    local ok, loaded = pcall(require,
+        "PNC/UI/Communities/ColonyManagement/PNC_FacilityBuildModal")
+    if ok and loaded then return loaded end
+    return buildUI
+end
+
+local function previewTexture(recipe, descriptor)
+    local texture = descriptor and descriptor.iconTexture or nil
+    if texture then return texture end
+    local iconName = descriptor and descriptor.iconName
+        or recipe and recipe.iconName
+    if iconName and type(getTexture) == "function" then
+        local ok, resolved = pcall(getTexture, tostring(iconName))
+        if ok and resolved then return resolved end
+    end
+    return nil
+end
+
+local function previewText(ui, value, width)
+    local text = tostring(value or "")
+    local layout = ui and ui.Layout
+    if layout and layout.Ellipsize then
+        return layout.Ellipsize(text, UIFont.Small, math.max(1, width))
+    end
+    return text
+end
+
+local PreviewPanelClass
+
+local function previewPanelClass()
+    if PreviewPanelClass then return PreviewPanelClass end
+    if not ISPanel then pcall(require, "ISUI/ISPanel") end
+    if not ISPanel or type(ISPanel.derive) ~= "function" then return nil end
+
+    PreviewPanelClass = ISPanel:derive("PNCBuildingRecipePreview")
+    function PreviewPanelClass:new(x, y, width, height, owner)
+        local object = ISPanel:new(x, y, width, height)
+        setmetatable(object, self); self.__index = self
+        object.owner = owner
+        object.background = false
+        return object
+    end
+
+    function PreviewPanelClass:render()
+        ISPanel.render(self)
+        local ui = PsychopatzCore and PsychopatzCore.UI or nil
+        local theme = ui and ui.Theme or nil
+        local colors = theme and theme.colors or {}
+        local surface = colors.surfaceRaised
+            or { r = 0.035, g = 0.05, b = 0.06, a = 1 }
+        local border = colors.borderStrong or colors.border
+            or { r = 0.22, g = 0.45, b = 0.50, a = 1 }
+        local text = colors.text
+            or { r = 0.91, g = 0.94, b = 0.96, a = 1 }
+        local muted = colors.textMuted
+            or { r = 0.65, g = 0.72, b = 0.76, a = 1 }
+        local accent = colors.accent
+            or { r = 0.22, g = 0.78, b = 0.94, a = 1 }
+        local alpha = self.owner and self.owner.contentSurfaceAlpha or 0.9
+        alpha = math.max(0.84, math.min(0.98, tonumber(alpha) or 0.9))
+        self:drawRect(0, 0, self.width, self.height, alpha,
+            surface.r, surface.g, surface.b)
+        self:drawRectBorder(0, 0, self.width, self.height,
+            border.a or 1, border.r, border.g, border.b)
+        self:drawText("SELECTED BUILDING", 10, 7,
+            muted.r, muted.g, muted.b, 1, UIFont.Small)
+
+        local recipe = self.owner and self.owner.buildSelectedRecipe or nil
+        if not recipe then
+            self:drawTextCentre("SELECT A BUILDING TO PREVIEW",
+                self.width / 2, math.max(20, self.height / 2 - 8),
+                muted.r, muted.g, muted.b, 1, UIFont.Small)
+            return
+        end
+
+        local descriptor = recipeDescriptor(recipe)
+        local imageX, imageY = 10, 25
+        local imageWidth = math.max(1, self.width - 20)
+        local imageHeight = math.max(38, math.min(116, self.height - 78))
+        local buildUI = facilityBuildUI()
+        local drew = false
+        if buildUI and buildUI.DrawNativePreview then
+            local ok, result = pcall(buildUI.DrawNativePreview, self,
+                descriptor and descriptor.previewTiles or nil,
+                imageX, imageY, imageWidth, imageHeight, 1)
+            drew = ok and result == true
+        end
+        if not drew then
+            local texture = previewTexture(recipe, descriptor)
+            if texture and self.drawTextureScaledAspect then
+                local ok = pcall(self.drawTextureScaledAspect, self, texture,
+                    imageX, imageY, imageWidth, imageHeight, 1, 1, 1, 1)
+                drew = ok
+            end
+        end
+        if not drew then
+            self:drawTextCentre("PREVIEW UNAVAILABLE", self.width / 2,
+                imageY + math.floor(imageHeight / 2),
+                muted.r, muted.g, muted.b, 1, UIFont.Small)
+        end
+
+        local title = descriptor and descriptor.displayName
+            or recipe.displayName or recipe.recipeName
+            or recipe.objectInfoName or "BUILDING"
+        local category = recipe.category or descriptor and descriptor.category
+            or "Miscellaneous"
+        local ready = true
+        for _, material in ipairs(recipe.materials or {}) do
+            if material.ready ~= true then ready = false; break end
+        end
+        local status = ready and "READY TO PLACE" or "MATERIALS REQUIRED"
+        local statusColor = ready and (colors.success or accent)
+            or (colors.warning or { r = 0.96, g = 0.68, b = 0.20, a = 1 })
+        local titleY = imageY + imageHeight + 5
+        self:drawText(previewText(ui, title, self.width - 20), 10, titleY,
+            text.r, text.g, text.b, 1, UIFont.Small)
+        self:drawText(previewText(ui, tostring(category) .. "  |  " .. status,
+            self.width - 20), 10, titleY + 19, statusColor.r,
+            statusColor.g, statusColor.b, 1, UIFont.Small)
+    end
+    return PreviewPanelClass
+end
+
+local function createRecipePreview(window)
+    local class = previewPanelClass()
+    if not class then return nil end
+    local panel = class:new(0, 0, 1, 1, window)
+    panel:initialise(); panel:instantiate(); window:addChild(panel)
+    return panel
 end
 
 local function favoriteKey(recipe)
@@ -171,14 +355,66 @@ local function selectedQueue(window)
     return row and row.order or nil
 end
 
+local Components
+local componentsLoadAttempted = false
+
+local function setCatalogRows(list, rows)
+    -- Keep the catalog usable in lightweight/headless callers that provide
+    -- only the legacy list stub. The game path uses the shared component
+    -- helper; the local fallback preserves the same stable-key contract.
+    if not Components and not componentsLoadAttempted then
+        componentsLoadAttempted = true
+        local ok, loaded = pcall(require,
+            "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Components")
+        if ok then
+            Components = loaded
+        end
+    end
+    if Components and Components.SetRowsStable then
+        Components.SetRowsStable(list, rows)
+        return
+    end
+    local items = list and list.items or {}
+    if #items ~= #rows then
+        list:clear()
+        for _, row in ipairs(rows or {}) do
+            list:addItem(tostring(row.key or row.label or row.name or ""), row)
+        end
+        return
+    end
+    local function rowKey(row, index)
+        return (row and row.kind or "") .. ":"
+            .. tostring(row and (row.key or row.id or row.fullType
+                or row.label or row.name or index) or index)
+    end
+    for index, row in ipairs(rows or {}) do
+        local old = items[index] and items[index].item or nil
+        if rowKey(old, index) ~= rowKey(row, index) then
+            list:clear()
+            for _, replacement in ipairs(rows or {}) do
+                list:addItem(tostring(replacement.key or replacement.label
+                    or replacement.name or ""), replacement)
+            end
+            return
+        end
+    end
+    for index, row in ipairs(rows or {}) do
+        items[index].item = row
+        items[index].text = tostring(row.key or row.label or row.name or "")
+    end
+end
+
 local function rebuildMaterials(window)
     local list = window.buildMaterialList
     if not list then return end
     local state = listState(list, function(row)
         return row and row.fullType or row and row.name
     end)
-    list:clear()
-    header(list, "REQUIRED ITEMS", { required = "REQUIRED", available = "STOCK" })
+    local rows = {{
+        kind = "catalog_header", key = "materials", name = "REQUIRED ITEMS",
+        restricted = true, catalogHeader = true,
+        catalogCells = { required = "REQUIRED", available = "STOCK" },
+    }}
     local recipe = activeRecipe(window)
     local selectedOrder = selectedQueue(window)
     local materials = selectedOrder and selectedOrder.materials
@@ -188,7 +424,8 @@ local function rebuildMaterials(window)
         local metadata = InventoryModel.Probe(first)
         local required = tonumber(material.amount) or 1
         local available = tonumber(material.available) or 0
-        list:addItem(labelFor(first), {
+        rows[#rows + 1] = {
+            kind = "material", key = tostring(first or "unknown"),
             name = labelFor(first), texture = metadata.texture,
             restricted = not material.ready,
             catalogCells = {
@@ -200,8 +437,9 @@ local function rebuildMaterials(window)
                 available = material.ready and "success" or "warning",
             },
             fullType = first,
-        })
+        }
     end
+    setCatalogRows(list, rows)
     restoreListState(list, state, function(row)
         return row and row.fullType or row and row.name
     end)
@@ -210,6 +448,10 @@ end
 function Building.OnRecipeCell(window, row, key)
     if row and row.recipe then
         window.buildSelectedRecipe = row.recipe
+        trace("pnc_building_recipe_click", "key="
+            .. tostring(row.recipe.objectInfoName or row.recipe.recipeKey)
+            .. " cell=" .. tostring(key or "row") .. " enabled="
+            .. tostring(row.enabled == true))
         rebuildMaterials(window)
         updateFavoriteControls(window)
         if key == "action" then
@@ -223,6 +465,9 @@ function Building.OnRecipeCell(window, row, key)
 end
 
 function Building.OnQueueCell(window, row, key)
+    trace("pnc_building_queue_click", "key="
+        .. tostring(row and row.order and row.order.id or "")
+        .. " cell=" .. tostring(key or "row"))
     if row and row.order and key == "action" then
         PNC.Client.RequestColonyAction("work_cancel", {
             workOrderId = row.order.id,
@@ -239,6 +484,7 @@ function Building.Create(window, builder)
         Building.OnQueueCell)
     window.buildMaterialList = makeList(window, "build_material",
         MATERIAL_COLUMNS)
+    window.buildRecipePreview = createRecipePreview(window)
     window.buildPlace = button(window, builder, "place",
         "PLACE BLUEPRINT", "accent")
     window.buildCancelPlacement = button(window, builder,
@@ -262,9 +508,12 @@ function Building.Create(window, builder)
     window.buildFavoritesFilter = button(window, builder,
         "toggle_favorites", "SHOW FAVORITES", "quiet")
     window.buildCategoryList.onMouseDown = function(list, x, y)
-        ISScrollingListBox.onMouseDown(list, x, y)
+        local inputX, inputY = list:resolveMouse(x, y)
+        ISScrollingListBox.onMouseDown(list, inputX, inputY)
         local row = list:selectedRow()
         if row and row.category then
+            trace("pnc_building_category_click", "category="
+                .. tostring(row.category))
             window.buildCategory = row.category
             Building.Rebuild(window, window.snapshot or {})
         end
@@ -274,9 +523,7 @@ function Building.Create(window, builder)
         ISPNCInventoryList.onMouseDown(list, x, y)
         local row = list:selectedRow()
         if row and row.recipe then
-            window.buildSelectedRecipe = row.recipe
-            rebuildMaterials(window)
-            updateFavoriteControls(window)
+            Building.OnRecipeCell(window, row, "row")
         end
         return true
     end
@@ -325,6 +572,7 @@ function Building.Layout(window, Layout, content)
     window.buildRecipeList.catalogColumns = compact
         and RECIPE_COLUMNS_COMPACT or RECIPE_COLUMNS
     local rowHeight = compact and height < 520 and 28 or 32
+    window.buildRecipePreviewCompact = compact
     for _, list in ipairs({ window.buildCategoryList,
         window.buildRecipeList, window.buildQueueList,
         window.buildMaterialList }) do
@@ -371,6 +619,9 @@ function Building.Layout(window, Layout, content)
             queueWidth, bottomHeight)
         Layout.SetBounds(window.buildMaterialList, materialX, bottomY,
             materialWidth, bottomHeight)
+        if window.buildRecipePreview then
+            window.buildRecipePreview:setVisible(false)
+        end
         return
     end
 
@@ -397,11 +648,21 @@ function Building.Layout(window, Layout, content)
     local recipeListTop = top + controlHeight + controlGap
     Layout.SetBounds(window.buildRecipeList, middleX, recipeListTop, middle,
         math.max(1, height - controlHeight - controlGap))
-    local queueHeight = math.max(1, math.floor((height - gap) * 0.52))
-    Layout.SetBounds(window.buildQueueList, rightX, top, right, queueHeight)
+    local previewHeight = math.max(130, math.min(210,
+        math.floor(height * 0.30)))
+    if window.buildRecipePreview then
+        Layout.SetBounds(window.buildRecipePreview, rightX, top, right,
+            previewHeight)
+        window.buildRecipePreview:setVisible(window.tab == "buildings")
+    end
+    local lowerTop = top + previewHeight + gap
+    local lowerHeight = math.max(1, height - previewHeight - gap)
+    local queueHeight = math.max(1, math.floor(lowerHeight * 0.48))
+    Layout.SetBounds(window.buildQueueList, rightX, lowerTop, right,
+        queueHeight)
     Layout.SetBounds(window.buildMaterialList, rightX,
-        top + queueHeight + gap, right, math.max(1,
-            height - queueHeight - gap))
+        lowerTop + queueHeight + gap, right, math.max(1,
+            lowerHeight - queueHeight - gap))
 end
 
 function Building.Apply(window, active)
@@ -424,8 +685,15 @@ function Building.Apply(window, active)
     window.buildSearch:setVisible(active)
     window.buildFavoriteButton:setVisible(active)
     window.buildFavoritesFilter:setVisible(active)
+    if window.buildRecipePreview then
+        window.buildRecipePreview:setVisible(active
+            and window.buildRecipePreviewCompact ~= true)
+    end
     updateFavoriteControls(window)
-    if not active then Placement.Cancel(window) end
+    if not active then
+        Placement.Cancel(window, window.baseIntegrated
+            and { restorePrevious = false } or nil)
+    end
     if active and window.detailsPane then window.detailsPane:setVisible(false) end
 end
 
@@ -453,13 +721,17 @@ local function rebuildCategories(window, recipes)
         return row and row.category
     end)
     state.key = state.key or window.buildCategory or "ALL"
-    list:clear()
-    header(list, "CATEGORIES", {})
+    local rows = {{
+        kind = "catalog_header", key = "categories", name = "CATEGORIES",
+        restricted = true, catalogHeader = true, catalogCells = {},
+    }}
     for _, category in ipairs(categories(recipes)) do
-        list:addItem(category, { name = category, category = category,
+        rows[#rows + 1] = { kind = "category", key = tostring(category),
+            name = category, category = category,
             restricted = category ~= "ALL" and category
-                ~= window.buildCategory })
+                ~= window.buildCategory }
     end
+    setCatalogRows(list, rows)
     restoreListState(list, state, function(row)
         return row and row.category
     end)
@@ -471,10 +743,13 @@ local function rebuildRecipes(window, recipes)
         local recipe = row and row.recipe
         return recipe and (recipe.objectInfoName or recipe.recipeKey)
     end)
-    list:clear()
-    header(list, "BUILDABLE RECIPES", {
-        category = "CATEGORY", stock = "STOCK", action = "ACTION",
-    })
+    local rows = {{
+        kind = "catalog_header", key = "recipes", name = "BUILDABLE RECIPES",
+        restricted = true, catalogHeader = true,
+        catalogCells = {
+            category = "CATEGORY", stock = "STOCK", action = "ACTION",
+        },
+    }}
     local search = window.buildSearch and window.buildSearch:getText() or ""
     search = string.lower(tostring(search or ""))
     local chosen = activeRecipe(window)
@@ -506,6 +781,9 @@ local function rebuildRecipes(window, recipes)
                 }
                 local debugGrantEnabled = window.buildDebugAvailable == true
                 local row = {
+                    kind = "recipe",
+                    key = tostring(recipe.objectInfoName
+                        or recipe.recipeKey or recipe.id or recipe.displayName),
                     rowKind = "recipe", recipe = recipe, enabled = ready,
                     debugGrantEnabled = debugGrantEnabled,
                     restricted = not ready,
@@ -521,7 +799,7 @@ local function rebuildRecipes(window, recipes)
                         action = ready and "accent" or "warning",
                     },
                 }
-                list:addItem(row.name, row)
+                rows[#rows + 1] = row
                 if chosen and chosen.objectInfoName
                     == recipe.objectInfoName
                 then
@@ -530,16 +808,16 @@ local function rebuildRecipes(window, recipes)
             end
         end
     end
-    if #list.items == 1 then
+    if #rows == 1 then
         local message = window.buildFavoritesOnly == true
             and "NO FAVORITED RECIPES" or "NO MATCHING RECIPES"
-        list:addItem(message, {
-            name = message, restricted = true,
-        })
+        rows[#rows + 1] = {
+            kind = "empty", key = "recipes", name = message, restricted = true,
+        }
     end
+    setCatalogRows(list, rows)
     if not found then
-        window.buildSelectedRecipe = list.items and list.items[2]
-            and list.items[2].item and list.items[2].item.recipe or nil
+        window.buildSelectedRecipe = rows[2] and rows[2].recipe or nil
         local fallback = window.buildSelectedRecipe
         state.key = fallback and (fallback.objectInfoName
             or fallback.recipeKey) or nil
@@ -556,15 +834,18 @@ local function rebuildQueue(window, queue)
     local state = listState(list, function(row)
         return row and row.order and row.order.id
     end)
-    list:clear()
-    header(list, "BUILD QUEUE", {
-        worker = "WORKER", progress = "PROGRESS", action = "ACTION",
-    })
+    local rows = {{
+        kind = "catalog_header", key = "queue", name = "BUILD QUEUE",
+        restricted = true, catalogHeader = true,
+        catalogCells = {
+            worker = "WORKER", progress = "PROGRESS", action = "ACTION",
+        },
+    }}
     for _, order in ipairs(queue or {}) do
         local worker = order.workerName or "UNASSIGNED"
         local blocked = order.blockedReason
-        list:addItem(tostring(order.displayName or order.objectInfoName
-            or "BUILD"), {
+        rows[#rows + 1] = {
+            kind = "queue", key = tostring(order.id or "unknown"),
             name = tostring(order.displayName or order.objectInfoName
                 or "BUILD"), order = order, restricted = false,
             catalogCells = {
@@ -577,21 +858,24 @@ local function rebuildQueue(window, queue)
                 progress = blocked and "warning" or "accent",
                 action = "warning",
             },
-        })
+        }
     end
+    setCatalogRows(list, rows)
     restoreListState(list, state, function(row)
         return row and row.order and row.order.id
     end)
 end
 
 function Building.Rebuild(window, snapshot)
-    if window.tab and window.tab ~= "building"
+    local integrated = window.baseIntegrated == true
+        and window.tab == "buildings"
+    if window.tab and window.tab ~= "building" and not integrated
         and window.buildingActive ~= true
     then
         return false
     end
     local building = snapshot.building or {}
-    local recipes = building.recipes or {}
+    local recipes = Building.FilterFacilityRecipes(building.recipes or {})
     QueueOverlay.SetQueue(building.queue or {})
     rebuildCategories(window, recipes)
     rebuildRecipes(window, recipes)

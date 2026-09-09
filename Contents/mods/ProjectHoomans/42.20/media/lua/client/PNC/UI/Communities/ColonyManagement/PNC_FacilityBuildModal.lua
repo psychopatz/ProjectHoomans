@@ -232,6 +232,11 @@ local function drawNativePreview(element, preview, x, y, width, height, alpha)
     return true
 end
 
+-- Shared by the facilities cards and the integrated Buildings tab. Keeping
+-- the native face compositor here ensures both tabs show the same world
+-- object orientation and multi-tile footprint.
+BuildUI.DrawNativePreview = drawNativePreview
+
 local function recipeFor(definition, descriptor)
     if descriptor and type(descriptor.requirements) == "table" then
         return descriptor.requirements
@@ -347,6 +352,11 @@ end
 
 local FacilityCard = ISPanel:derive("PNCFacilityBuildCard")
 
+-- The Base widget uses the same card surface as the original modal. Exporting
+-- the class keeps the visual contract in one place while allowing the modal
+-- itself to remain available to legacy callers during migration.
+BuildUI.FacilityCard = FacilityCard
+
 function FacilityCard:onMouseDown()
     self.owner:setSelected(self.option.id)
     return true
@@ -361,9 +371,9 @@ function FacilityCard:render()
         or themeColor("border", { r = 0.23, g = 0.28, b = 0.32, a = 0.9 })
     local textTint = option.enabled
         and themeColor("text", { r = 0.91, g = 0.94, b = 0.96, a = 1 })
-        or themeColor("textMuted", { r = 0.58, g = 0.65, b = 0.7, a = 1 })
+        or { r = 0.76, g = 0.81, b = 0.84, a = 1 }
     local warning = themeColor("warning", { r = 0.94, g = 0.7, b = 0.27, a = 1 })
-    local muted = themeColor("textMuted", { r = 0.58, g = 0.65, b = 0.7, a = 1 })
+    local muted = { r = 0.70, g = 0.76, b = 0.80, a = 1 }
     local statusTint = option.enabled
         and themeColor("success", { r = 0.39, g = 0.78, b = 0.48, a = 1 })
         or themeColor("danger", { r = 0.94, g = 0.36, b = 0.31, a = 1 })
@@ -378,7 +388,12 @@ function FacilityCard:render()
         math.floor(self.height * 0.44)))
     local imageY, textY = 6, imageHeight + 8
 
-    self:drawRect(0, 0, self.width, self.height, selected and 0.92 or 0.78,
+    local surfaceAlpha = self.owner and self.owner.window
+        and self.owner.window.contentSurfaceAlpha or 0.92
+    surfaceAlpha = math.max(0.84, math.min(0.98,
+        tonumber(surfaceAlpha) or 0.92))
+    self:drawRect(0, 0, self.width, self.height, selected
+        and math.min(0.98, surfaceAlpha + 0.04) or surfaceAlpha,
         0.045, 0.06, 0.07)
     self:drawRectBorder(0, 0, self.width, self.height,
         border.a or 1, border.r, border.g, border.b)

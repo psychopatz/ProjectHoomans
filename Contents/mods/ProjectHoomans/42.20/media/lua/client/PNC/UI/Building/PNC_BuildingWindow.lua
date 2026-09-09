@@ -1,6 +1,21 @@
+PNC = PNC or {}
+
+-- This file is retained as a compatibility loader for older callers.  Project
+-- Zomboid auto-loads client Lua files, so leaving the old implementation live
+-- here would overwrite PNC.BaseUI.Open when this file is evaluated after the
+-- Base module.  The visible building surface now belongs to the Base widget.
+local BaseUI = require "PNC/UI/Base/PNC_Base"
+if BaseUI then
+    PNC.BuildingUI = BaseUI
+    return BaseUI
+end
+
+-- Legacy fallback below is intentionally preserved for source compatibility,
+-- including its WidgetWindow.Install id "pnc-command-hub-building-widget" and
+-- persistence key "PNC.CommandHub.Building".  Normal mod loading never reaches
+-- it because the Base module is required above.
 require "PsychopatzCore/UI/PsychopatzUI"
 
-PNC = PNC or {}
 PNC.BuildingUI = PNC.BuildingUI or {}
 
 local BuildingUI = PNC.BuildingUI

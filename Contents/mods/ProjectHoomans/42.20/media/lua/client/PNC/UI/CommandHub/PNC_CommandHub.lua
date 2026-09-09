@@ -14,7 +14,7 @@ local Registry = CoreHub.Registry
 require "PNC/UI/CommandHub/PNC_CommandHub_CorpseHaulUI"
 require "PNC/UI/CommandHub/PNC_CommandHub_ZoneOverlay"
 require "PNC/UI/CommandHub/PNC_CommandHub_ZoneWindow"
-require "PNC/UI/Building/PNC_Building"
+require "PNC/UI/Base/PNC_Base"
 require "PNC/UI/CommandHub/PNC_CommandHub_Registry"
 require "PNC/UI/CommandHub/PNC_CommandHub_Window"
 require "PNC/UI/CommandHub/PNC_CommandHub_SettingsWindow"

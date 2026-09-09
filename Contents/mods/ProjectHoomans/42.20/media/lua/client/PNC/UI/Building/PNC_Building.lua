@@ -1,6 +1,9 @@
 PNC = PNC or {}
 PNC.BuildingUI = PNC.BuildingUI or {}
 
-require "PNC/UI/Building/PNC_BuildingWindow"
+-- Compatibility shim: the visible building surface now belongs to the
+-- detachable Base widget. Existing callers may continue requiring this
+-- module without reopening the legacy standalone window.
+require "PNC/UI/Base/PNC_Base"
 
-return PNC.BuildingUI
+return PNC.BaseUI or PNC.BuildingUI

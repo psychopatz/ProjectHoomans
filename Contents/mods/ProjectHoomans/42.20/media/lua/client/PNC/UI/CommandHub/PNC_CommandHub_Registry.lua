@@ -229,9 +229,9 @@ end
 
 local function openBuilding(_, owner)
     trace("pnc_building_open_start", "has_owner=" .. tostring(owner ~= nil)
-        .. " available=" .. tostring(PNC.BuildingUI ~= nil
-            and PNC.BuildingUI.Open ~= nil))
-    local building = PNC.BuildingUI
+        .. " available=" .. tostring((PNC.BaseUI or PNC.BuildingUI) ~= nil
+            and (PNC.BaseUI or PNC.BuildingUI).Open ~= nil))
+    local building = PNC.BaseUI or PNC.BuildingUI
     if building and type(building.Open) == "function" then
         local result = building.Open(owner)
         trace("pnc_building_open_result",
@@ -429,8 +429,8 @@ Registry.RegisterCategory({
     order = 80,
     childID = "building",
     useChildren = false,
-    titleKey = "UI_PNC_CommandHub_Category_Building",
-    titleFallback = "Building",
+    titleKey = "UI_PNC_CommandHub_Category_Base",
+    titleFallback = "Base",
     tooltipKey = "UI_PNC_CommandHub_BuildingHelp",
     tooltipFallback = "Plan and place colony buildings",
     enabled = Gates.HasBaseAndStockpile,

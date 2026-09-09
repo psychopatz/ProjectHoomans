@@ -177,19 +177,23 @@ end
 function Browser.RebuildComponents(window)
     local facility = Browser.GetSelected(window)
     local list = window.baseComponentList
-    Components.SetRows(list, {})
     if not facility then
-        list:addItem("empty", {
+        Components.SetRowsStable(list, {{
+            key = "empty",
             label = tr("UI_PNC_Facility_NoSelection", "NO BUILDING SELECTED"),
             detail = tr("UI_PNC_Facility_NoSelectionHelp",
                 "Build a facility to begin defining its rooms and stations."),
-        })
+        }})
+        window.baseComponentPane:setHeader(
+            tr("UI_PNC_Facility_Inspector", "FACILITY INSPECTOR"), "")
         return
     end
     if not FacilityState.IsBuilt(facility) then
         local task = facility.activeTask
+        local rows = {}
         if task then
-            list:addItem("construction_progress", {
+            rows[#rows + 1] = {
+                key = "construction_progress",
                 label = tr("UI_PNC_Facility_ConstructionProgress",
                     "CONSTRUCTION PROGRESS") .. "  " .. progressText(task),
                 detail = (tostring(task.workerName
@@ -215,22 +219,24 @@ function Browser.RebuildComponents(window)
                     refundPercent = task.refundPercent },
                 secondaryActionLabel = tr("UI_PNC_Work_CancelConstruction",
                     "CANCEL CONSTRUCTION"),
-            })
+            }
         end
-        list:addItem("construction_locked", {
+        rows[#rows + 1] = {
+            key = "construction_locked",
             label = tr("UI_PNC_Facility_ComponentsLocked",
                 "COMPONENTS LOCKED"),
             detail = tr("UI_PNC_Facility_ComponentsLockedHelp",
                 "Finish construction before assigning rooms or stations."),
             complete = false,
-        })
+        }
+        Components.SetRowsStable(list, rows)
         window.baseComponentPane:setHeader(
             string.upper(facility.displayName or facility.definitionId),
             stateText(facility.cachedState)
                 .. (task and "  •  " .. progressText(task) or ""))
         return
     end
-    Components.SetRows(list, Browser.BuildComponentRows(
+    Components.SetRowsStable(list, Browser.BuildComponentRows(
         facility, window.snapshot and window.snapshot.storage))
     window.baseComponentPane:setHeader(
         string.upper(facility.displayName or facility.definitionId),
@@ -323,7 +329,7 @@ function Browser.Rebuild(window, snapshot)
         rows[#rows + 1] = facility
         if facility.id == previousId then selected = index end
     end
-    Components.SetRows(window.baseFacilityList, rows)
+    Components.SetRowsStable(window.baseFacilityList, rows)
     window.baseFacilityList.selected = #rows > 0 and selected or 0
     window.baseFacilityPane:setHeader("BUILDINGS", tostring(#rows))
     Browser.RebuildComponents(window)

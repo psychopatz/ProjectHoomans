@@ -7,8 +7,11 @@ ISPNCInventoryList = ISScrollingListBox:derive("ISPNCInventoryList")
 local Layout = PsychopatzCore and PsychopatzCore.UI
     and PsychopatzCore.UI.Layout or nil
 
-local function catalogColor(value, dimmed)
-    if dimmed then return 0.38, 0.38, 0.42 end
+local function catalogColor(value, dimmed, readable)
+    if dimmed then
+        if readable then return 0.60, 0.63, 0.68 end
+        return 0.38, 0.38, 0.42
+    end
     if value == "success" then return 0.35, 0.86, 0.50 end
     if value == "warning" then return 0.96, 0.68, 0.20 end
     if value == "accent" then return 0.22, 0.78, 0.94 end
@@ -30,7 +33,8 @@ local function drawCatalogColumns(self, y, row, dimmed)
             * (tonumber(nextColumn.x) or 1)) or self.width
         local available = math.max(1, right - x - 4)
         local r, g, b = catalogColor(row.catalogColors
-            and row.catalogColors[column.key], dimmed)
+            and row.catalogColors[column.key], dimmed,
+            self.readableRestricted == true)
         local text = tostring(value or "")
         if Layout and Layout.Ellipsize then
             text = Layout.Ellipsize(text, UIFont.Small, available)
@@ -64,7 +68,8 @@ function ISPNCInventoryList:doDrawItem(y, listItem, alt)
         end
     end
     if row.texture then
-        local tint = dimmed and 0.42 or 1
+        local tint = dimmed and (self.readableRestricted and 0.62 or 0.42)
+            or 1
         self:drawTextureScaledAspect(
             row.texture, 5 + indent, y + 3, 26, 26, 1, tint, tint, tint
         )
@@ -72,20 +77,23 @@ function ISPNCInventoryList:doDrawItem(y, listItem, alt)
     if row.favorite and self.favoriteStar then
         self:drawTexture(
             self.favoriteStar, 5 + indent, y + 19,
-            1, dimmed and 0.42 or 1, dimmed and 0.42 or 1,
-            dimmed and 0.42 or 1
+            1, dimmed and (self.readableRestricted and 0.62 or 0.42) or 1,
+            dimmed and (self.readableRestricted and 0.62 or 0.42) or 1,
+            dimmed and (self.readableRestricted and 0.62 or 0.42) or 1
         )
     end
     if row.equipped and self.equippedItemIcon then
         self:drawTexture(
             self.equippedItemIcon, 21 + indent, y + 19,
-            1, dimmed and 0.42 or 1, dimmed and 0.42 or 1,
-            dimmed and 0.42 or 1
+            1, dimmed and (self.readableRestricted and 0.62 or 0.42) or 1,
+            dimmed and (self.readableRestricted and 0.62 or 0.42) or 1,
+            dimmed and (self.readableRestricted and 0.62 or 0.42) or 1
         )
     end
     local countText = row.stack and row.stack > 1
         and (" (" .. tostring(row.stack) .. ")") or ""
-    local textColor = dimmed and 0.40 or 0.86
+    local textColor = dimmed
+        and (self.readableRestricted and 0.62 or 0.40) or 0.86
     local custom = drawCatalogColumns(self, y, row, dimmed)
     local categoryX = math.floor(self.width * 0.64)
     local nameWidth = math.max(1, self.width - 49 - indent)
@@ -126,9 +134,12 @@ function ISPNCInventoryList:doDrawItem(y, listItem, alt)
         self:drawText(
             category,
             categoryX, y + 7,
-            dimmed and 0.38 or 0.64,
-            dimmed and 0.38 or 0.64,
-            dimmed and 0.42 or 0.82,
+            dimmed and (self.readableRestricted and 0.60 or 0.38)
+                or 0.64,
+            dimmed and (self.readableRestricted and 0.60 or 0.38)
+                or 0.64,
+            dimmed and (self.readableRestricted and 0.64 or 0.42)
+                or 0.82,
             1, UIFont.Small
         )
     end
@@ -140,13 +151,33 @@ function ISPNCInventoryList:selectedRow()
     return entry and entry.item or nil
 end
 
+-- PZ sends list callbacks with coordinates that can be stale when the list is
+-- inside a resized/scrolling parent.  The native list itself resolves the
+-- current cursor through getMouseX/Y for hover handling, so use that same
+-- coordinate space for selection and catalog cells.  This is especially
+-- important for the Base building catalog, which is refreshed while the
+-- window remains open.
+function ISPNCInventoryList:resolveMouse(x, y)
+    if type(self.getMouseX) == "function"
+        and type(self.getMouseY) == "function"
+    then
+        local okX, mouseX = pcall(self.getMouseX, self)
+        local okY, mouseY = pcall(self.getMouseY, self)
+        if okX and okY and tonumber(mouseX) and tonumber(mouseY) then
+            return tonumber(mouseX), tonumber(mouseY)
+        end
+    end
+    return tonumber(x) or 0, tonumber(y) or 0
+end
+
 function ISPNCInventoryList:onMouseDown(x, y)
+    local inputX, inputY = self:resolveMouse(x, y)
     if ISScrollingListBox.onMouseDown then
-        ISScrollingListBox.onMouseDown(self, x, y)
+        ISScrollingListBox.onMouseDown(self, inputX, inputY)
     end
     local row = self:selectedRow()
     if row and self.ownerWindow then
-        if row.groupHeader and x <= 16
+        if row.groupHeader and inputX <= 16
             and self.ownerWindow.toggleInventoryGroup
         then
             self.ownerWindow:toggleInventoryGroup(self.role, row.groupKey)
@@ -158,12 +189,12 @@ function ISPNCInventoryList:onMouseDown(x, y)
             for index = #self.catalogColumns, 1, -1 do
                 local column = self.catalogColumns[index]
                 local left = math.floor(self.width * (tonumber(column.x) or 0))
-                if x >= left then
+                if inputX >= left then
                     local nextColumn = self.catalogColumns[index + 1]
                     local right = nextColumn and math.floor(self.width
                         * (tonumber(nextColumn.x) or 1)) or self.width
                     self.onCatalogCell(self.ownerWindow, row, column.key,
-                        x - left, math.max(1, right - left))
+                        inputX - left, math.max(1, right - left))
                     return true
                 end
             end
@@ -199,8 +230,9 @@ function ISPNCInventoryList:onMouseUpOutside(x, y)
 end
 
 function ISPNCInventoryList:onRightMouseUp(x, y)
+    local inputX, inputY = self:resolveMouse(x, y)
     if ISScrollingListBox.onMouseDown then
-        ISScrollingListBox.onMouseDown(self, x, y)
+        ISScrollingListBox.onMouseDown(self, inputX, inputY)
     end
     local row = self:selectedRow()
     if row and self.ownerWindow and self.ownerWindow.showItemContext then

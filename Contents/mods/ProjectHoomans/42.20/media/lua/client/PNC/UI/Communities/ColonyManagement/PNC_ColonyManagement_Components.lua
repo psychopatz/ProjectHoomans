@@ -159,6 +159,44 @@ function Components.SetRows(list, rows)
     end
 end
 
+-- Refresh row payloads without clearing a live list. Clearing an
+-- ISScrollingListBox during a network refresh briefly removes its children,
+-- resets its scroll position, and can steal the mouse capture from a click.
+-- Use this for stable-key projections that update in place.
+function Components.SetRowsStable(list, rows)
+    if not list then return false end
+    rows = rows or {}
+    local items = list.items or {}
+    if #items ~= #rows then
+        Components.SetRows(list, rows)
+        return false
+    end
+    for index, row in ipairs(rows) do
+        local entry = items[index]
+        local old = entry and entry.item or nil
+        local oldKey = old and (old.kind or "") .. ":"
+            .. tostring(old.key or old.id or old.fullType
+                or old.label or old.name or index) or tostring(index)
+        local newKey = row and (row.kind or "") .. ":"
+            .. tostring(row.key or row.id or row.fullType
+                or row.label or row.name or index) or tostring(index)
+        if not entry or oldKey ~= newKey then
+            Components.SetRows(list, rows)
+            return false
+        end
+    end
+    for index, row in ipairs(rows) do
+        local entry = items[index]
+        entry.item = row
+        entry.text = tostring(row.key or row.label or row.name or "")
+    end
+    list.count = #rows
+    if list.selected and list.selected > #rows then
+        list.selected = #rows
+    end
+    return true
+end
+
 function Components.AddRow(list, row)
     list:addItem(tostring(row.key or row.label or ""), row)
 end

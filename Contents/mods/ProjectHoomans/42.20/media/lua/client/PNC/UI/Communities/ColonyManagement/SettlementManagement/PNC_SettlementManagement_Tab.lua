@@ -35,17 +35,22 @@ local function createButtons(window, definitions, destination)
     local index
     for index = 1, #definitions do
         local definition = definitions[index]
-        local button = UI.CreateButton(window, {
-            id = definition[1],
-            title = tr(definition[2], definition[3]),
-            target = window,
-            onclick = ISPNCColonyManagementWindow.onBaseControl,
-            variant = definition[4],
-        })
-        destination[#destination + 1] = button
-        destination[definition[1]] = button
-        window.baseControls[#window.baseControls + 1] = button
-        window.baseControls[definition[1]] = button
+        if not (window.baseIntegrated
+            and definition[1] == "build_facility")
+        then
+            local button = UI.CreateButton(window, {
+                id = definition[1],
+                title = tr(definition[2], definition[3]),
+                target = window,
+                onclick = window.baseControlHandler
+                    or ISPNCColonyManagementWindow.onBaseControl,
+                variant = definition[4],
+            })
+            destination[#destination + 1] = button
+            destination[definition[1]] = button
+            window.baseControls[#window.baseControls + 1] = button
+            window.baseControls[definition[1]] = button
+        end
     end
 end
 
@@ -66,11 +71,15 @@ function Tab.UpdateContextControls(window)
     local index
     for index = 1, #(window.baseContextControls or {}) do
         local button = window.baseContextControls[index]
+        local task = facility and facility.activeTask or nil
+        local hasConstructionTask = facility
+            and (facility.constructionWorkOrderId ~= nil
+                or task and task.id ~= nil) or false
         local visible = active and ((built
             and button.internal ~= "facility_cancel_construction")
             or (not built
                 and button.internal == "facility_cancel_construction"
-                and facility.constructionWorkOrderId ~= nil))
+                and hasConstructionTask))
         if active and facility.definitionId == "stockpile"
             and button.internal == "facility_destroy"
         then

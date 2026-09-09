@@ -225,7 +225,11 @@ Registry.Register({
     -- The actual building surface now lives beside the Colony Command Hub and
     -- is still a single shared window when opened from either entry point.
     action = function(window)
-        local building = PNC.BuildingUI
+        local building = PNC.BaseUI or PNC.BuildingUI
+        if not building then
+            require "PNC/UI/Base/PNC_Base"
+            building = PNC.BaseUI or PNC.BuildingUI
+        end
         if building and building.Toggle then
             return building.Toggle(window)
         end
