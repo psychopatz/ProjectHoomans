@@ -9,12 +9,9 @@ local Tab = {}
 local UI = PsychopatzCore.UI
 
 local TOOLBAR = {
-    { "claim", "UI_PNC_Base_ClaimAction", "CLAIM TERRITORY", "success" },
     { "overlay", "UI_PNC_Base_ShowLayout", "SHOW BASE LAYOUT", "selected" },
     { "fishing_zone", "UI_PNC_Fishing_ZoneAction", "CREATE FISHING ZONE", "primary" },
     { "build_facility", "UI_PNC_Facility_BuildAction", "BUILD A BUILDING", "success" },
-    { "expand", "UI_PNC_Base_ExpandAction", "EXPAND", "primary" },
-    { "shrink", "UI_PNC_Base_ShrinkAction", "SHRINK", "warning" },
     { "barricade", "UI_PNC_Base_BarricadeAction", "REINFORCE", "primary" },
     { "hq", "UI_PNC_Base_UpgradeAction", "UPGRADE HQ", "primary" },
 }
@@ -23,12 +20,6 @@ local CONTEXT = {
     { "facility_upgrade", "UI_PNC_Facility_Upgrade", "UPGRADE BUILDING", "success" },
     { "facility_cancel_construction", "UI_PNC_Work_CancelConstruction", "CANCEL CONSTRUCTION", "danger" },
     { "facility_destroy", "UI_PNC_Facility_Destroy", "DECONSTRUCT", "danger" },
-}
-
-local TERRITORY_ACTIONS = {
-    claim = true,
-    expand = true,
-    shrink = true,
 }
 
 local function tr(key, fallback)
@@ -41,24 +32,18 @@ local function createButtons(window, definitions, destination)
     local index
     for index = 1, #definitions do
         local definition = definitions[index]
-        if not ((not window.baseIntegrated
-                and TERRITORY_ACTIONS[definition[1]])
-            or (window.baseIntegrated
-                and definition[1] == "build_facility"))
-        then
-            local button = UI.CreateButton(window, {
-                id = definition[1],
-                title = tr(definition[2], definition[3]),
-                target = window,
-                onclick = window.baseControlHandler
-                    or ISPNCColonyManagementWindow.onBaseControl,
-                variant = definition[4],
-            })
-            destination[#destination + 1] = button
-            destination[definition[1]] = button
-            window.baseControls[#window.baseControls + 1] = button
-            window.baseControls[definition[1]] = button
-        end
+        local button = UI.CreateButton(window, {
+            id = definition[1],
+            title = tr(definition[2], definition[3]),
+            target = window,
+            onclick = window.baseControlHandler
+                or ISPNCColonyManagementWindow.onBaseControl,
+            variant = definition[4],
+        })
+        destination[#destination + 1] = button
+        destination[definition[1]] = button
+        window.baseControls[#window.baseControls + 1] = button
+        window.baseControls[definition[1]] = button
     end
 end
 
@@ -163,9 +148,7 @@ function Tab.Apply(window, active)
     local index
     for index = 1, #window.baseToolbarControls do
         local button = window.baseToolbarControls[index]
-        button:setVisible(active and (
-            button.internal == "claim" and not established
-            or button.internal ~= "claim" and established))
+        button:setVisible(active and established)
         if active and established and button.internal == "hq"
         then
             local current = math.max(1,

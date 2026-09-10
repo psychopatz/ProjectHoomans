@@ -36,18 +36,26 @@ local hub = fakeWindow(100, 80, 260, 390)
 hub.visible = true
 local actionsWindow = fakeWindow(0, 0, 190, 150)
 local workWindow = fakeWindow(0, 0, 760, 560)
+local workshopWindow = fakeWindow(0, 0, 1080, 700)
 local settingsWindow = fakeWindow(0, 0, 420, 340)
 local journalWindow = fakeWindow(0, 0, 640, 540)
 local colonistWindow = fakeWindow(0, 0, 920, 620)
 local storageWindow = fakeWindow(0, 0, 980, 700)
+local provisionWindow = fakeWindow(0, 0, 680, 680)
+local namePromptWindow = fakeWindow(0, 0, 430, 170)
+local emblemEditorWindow = fakeWindow(0, 0, 720, 360)
 workWindow.psychopatzWidgetEnabled = true
+workshopWindow.psychopatzWidgetEnabled = true
 settingsWindow.psychopatzWidgetEnabled = true
 journalWindow.psychopatzWidgetEnabled = true
 colonistWindow.psychopatzWidgetEnabled = true
 storageWindow.psychopatzWidgetEnabled = true
+provisionWindow.psychopatzWidgetEnabled = true
 
 local actionsUI = { instance = actionsWindow }
-function actionsUI.Open()
+function actionsUI.Open(parentID, owner)
+    actionsWindow.parentID = parentID
+    actionsWindow.owner = owner
     actionsWindow.visible = true
     return actionsWindow
 end
@@ -74,6 +82,14 @@ function zoneUI.SyncPositions() end
 local workUI = { instance = workWindow }
 function workUI.Open() workWindow.visible = true return workWindow end
 function workUI.Close() workWindow.visible = false end
+
+local workshopUI = { instance = workshopWindow }
+function workshopUI.Open(owner)
+    workshopWindow.owner = owner
+    workshopWindow.visible = true
+    return workshopWindow
+end
+function workshopUI.Close() workshopWindow.visible = false end
 
 local settingsUI = { instance = settingsWindow }
 function settingsUI.Open() settingsWindow.visible = true return settingsWindow end
@@ -103,16 +119,36 @@ function storageUI.Open(owner)
 end
 function storageUI.Close() storageWindow.visible = false end
 
+local provisionUI = { instance = provisionWindow }
+function provisionUI.Open(owner)
+    provisionWindow.owner = owner
+    provisionWindow.visible = true
+    return provisionWindow
+end
+function provisionUI.Close() provisionWindow.visible = false end
+
+local namePromptUI = { instance = namePromptWindow }
+function namePromptUI.Close() namePromptWindow.visible = false end
+
+local emblemEditorUI = { instance = emblemEditorWindow }
+function emblemEditorUI.Close() emblemEditorWindow.visible = false end
+
 PNC = {
     CommandHub = {
         instance = hub,
         ZoneUI = zoneUI,
         WorkUI = workUI,
+        WorkshopUI = workshopUI,
         SettingsUI = settingsUI,
+        ProvisionUI = provisionUI,
     },
     ColonyJournalUI = journalUI,
     ColonistUI = colonistUI,
     ColonyStorageUI = storageUI,
+    ProvisionSettingsUI = provisionUI,
+    ColonyNamePrompt = namePromptUI,
+    FactionEmblemEditor = emblemEditorUI,
+    WorkshopUI = workshopUI,
 }
 
 local Controller = T.load("ProjectHoomans", "client",
@@ -131,6 +167,11 @@ T.truthy(Controller.Toggle("work", hub),
 T.falsy(actionsWindow.visible, "zone branch survived the work switch")
 T.truthy(workWindow.visible, "work window is not visible")
 T.truthy(hub.visible, "switching branches closed the parent hub")
+
+T.truthy(Controller.Toggle("workshop", hub),
+    "workshop did not replace the work branch")
+T.falsy(workWindow.visible, "work branch survived the workshop switch")
+T.truthy(workshopWindow.visible, "workshop window is not visible")
 
 T.truthy(Controller.Toggle("settings", hub),
     "settings did not replace the work branch")
@@ -157,6 +198,28 @@ T.truthy(Controller.Toggle("work", hub),
     "work did not replace the attached events branch")
 T.falsy(journalWindow.visible,
     "attached events branch survived the work switch")
+
+T.truthy(Controller.Toggle("colony", hub),
+    "colony did not open its command-hub action panel")
+T.truthy(actionsWindow.visible, "colony action panel is not visible")
+T.equal(actionsWindow.parentID, "colony",
+    "colony branch opened the wrong action panel")
+T.truthy(provisionUI.Open(hub), "provision settings fixture did not open")
+namePromptWindow.visible = true
+emblemEditorWindow.visible = true
+T.truthy(Controller.IsOpen("colony"),
+    "colony branch does not include identity editors")
+provisionWindow.psychopatzWidgetDetached = true
+T.truthy(Controller.Toggle("work", hub),
+    "work did not replace the colony action panel")
+T.falsy(actionsWindow.visible,
+    "colony action panel survived the work switch")
+T.falsy(namePromptWindow.visible,
+    "rename modal survived the colony branch switch")
+T.falsy(emblemEditorWindow.visible,
+    "emblem editor survived the colony branch switch")
+T.truthy(provisionWindow.visible,
+    "detached provision settings was closed by a sibling switch")
 
 T.truthy(Controller.Toggle("events", hub),
     "events did not reopen after a sibling switch")
@@ -189,6 +252,19 @@ T.falsy(Controller.Toggle("work", hub),
 T.falsy(workWindow.visible,
     "detached work widget remained visible after its parent was re-clicked")
 
+T.truthy(Controller.Toggle("workshop", hub), "workshop did not reopen")
+workshopWindow.psychopatzWidgetDetached = true
+T.truthy(Controller.Toggle("zone", hub),
+    "zone did not open beside a detached workshop widget")
+T.truthy(workshopWindow.visible,
+    "detached workshop widget was closed by a sibling branch switch")
+T.truthy(Controller.Toggle("workshop", hub),
+    "detached workshop widget could not be focused")
+T.falsy(Controller.Toggle("workshop", hub),
+    "second click did not close the detached workshop widget")
+T.falsy(workshopWindow.visible,
+    "detached workshop widget remained visible after its parent was re-clicked")
+
 Controller.ApplyOpacity(0.4)
 T.equal(hub.opacity, 0.4, "parent opacity was not propagated")
 T.equal(settingsWindow.opacity, 0.4,
@@ -199,10 +275,19 @@ T.equal(colonistWindow.opacity, 0.4,
     "colonist opacity was not propagated")
 T.equal(storageWindow.opacity, 0.4,
     "storage opacity was not propagated")
+T.equal(workshopWindow.opacity, 0.4,
+    "workshop opacity was not propagated")
+T.equal(provisionWindow.opacity, 0.4,
+    "provision opacity was not propagated")
+T.equal(namePromptWindow.opacity, 0.4,
+    "rename modal opacity was not propagated")
+T.equal(emblemEditorWindow.opacity, 0.4,
+    "emblem editor opacity was not propagated")
 Controller.CloseAll()
 T.truthy(hub.visible, "closing children closed the parent hub")
 T.falsy(settingsWindow.visible, "settings child was not closed")
 T.falsy(workWindow.visible, "parent close did not close detached widget")
 T.falsy(storageWindow.visible, "storage child was not closed")
+T.falsy(provisionWindow.visible, "provision child was not closed")
 
 T.finish("pnc_command_hub_child_controller_smoke")

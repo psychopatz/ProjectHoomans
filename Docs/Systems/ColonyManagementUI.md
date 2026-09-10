@@ -7,6 +7,17 @@ The client UI is a registered-tab subsystem rooted at:
 The entry file loads providers in dependency order and preserves the public
 `PNC.ColonyManagementUI` API.
 
+Provision Settings, Change Name, and Change Emblem are now owned by the main
+Command Hub's `Colony` branch. Change Name opens the shared faction-name modal;
+Change Emblem opens the reusable layered faction-emblem editor. Both retain
+the existing authoritative client request paths. The legacy Colony Management
+window now retains only the faction summary.
+
+Workshop is now owned by the Command Hub's `Workshop` branch. It opens as the
+persisted, detachable `PNC.WorkshopUI` widget; the legacy production renderer
+is retained only as the shared catalog/action compatibility layer, and the
+legacy Colony Management navigation no longer exposes a Workshop tab.
+
 ## Responsibilities
 
 - `Components` owns panes, list renderers, and deterministic row binding.
@@ -16,6 +27,8 @@ The entry file loads providers in dependency order and preserves the public
 - `Tabs` registers built-in tabs and adapts storage/research providers.
 - `Controller` owns selection, refresh, tab switching, and row binding.
 - `Diagnostics` owns the debug-only, event-focused UI trace.
+- `UI/Workshop` owns the standalone Workshop widget lifecycle and delegates
+  production rendering/actions through its controller.
 - `DebugTab` owns authorized colonist need controls and its dedicated control
   container; it sends authoritative colony actions and never mutates snapshot
   rows locally.

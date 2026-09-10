@@ -33,9 +33,53 @@ local function setEnabled(button, enabled)
     else button.enable = enabled == true end
 end
 
-local function snapshot()
+local function snapshot(definitionID)
+    local client = PNC.ColonyManagementClient
+    if definitionID == "base_zone" and client
+        and type(client.ReadBaseSnapshot) == "function"
+    then
+        local update = client.ReadBaseSnapshot()
+        if type(update) == "table" and type(update.snapshot) == "table" then
+            return update.snapshot
+        end
+    end
     return PNC.Network and PNC.Network.ClientState
-        and PNC.Network.ClientState.colonyManagement or {}
+        and (PNC.Network.ClientState.colonyManagement
+            or PNC.Network.ClientState.colonyBase) or {}
+end
+
+local function revision(definitionID)
+    local client = PNC.ColonyManagementClient
+    if definitionID == "base_zone" and client
+        and type(client.ReadBaseSnapshot) == "function"
+    then
+        local update = client.ReadBaseSnapshot()
+        if type(update) == "table" then return tonumber(update.revision) or 0 end
+    end
+    local state = PNC.Network and PNC.Network.ClientState or {}
+    return tonumber(state.colonyManagementRevision) or 0
+end
+
+local function defaultControls()
+    return {
+        {
+            id = "create", action = "create",
+            titleKey = "UI_PNC_CommandHub_Zone_Create",
+            titleFallback = "CREATE ZONE", variant = "primary",
+        },
+        {
+            id = "clear", action = "clear",
+            titleKey = "UI_PNC_CommandHub_Zone_Delete",
+            titleFallback = "DELETE ZONE", variant = "danger",
+        },
+    }
+end
+
+local function isPendingSnapshotReason(reason)
+    return reason == "COLONY_STATE_UNAVAILABLE"
+        or reason == "FACTION_STATE_UNAVAILABLE"
+        or reason == "BASE_STATE_UNAVAILABLE"
+        or reason == "PLAYER_UNAVAILABLE"
 end
 
 local function actionResultText(result)
@@ -70,28 +114,24 @@ function ISPNCCommandHubZoneWindow:createChildren()
     self.lastActionResultRevision = nil
     local definition = Registry.Get(self.definitionID)
     for _, section in ipairs(definition and definition.sections or {}) do
-        local createButton = UI.CreateButton(self, {
-            id = "zone-create:" .. tostring(section.id),
-            title = tr("UI_PNC_CommandHub_Zone_Create", "CREATE ZONE"),
-            target = self,
-            onclick = ISPNCCommandHubZoneWindow.onControl,
-            variant = "primary",
-        })
-        createButton.zoneSectionID = section.id
-        createButton.zoneAction = "create"
-        local clearButton = UI.CreateButton(self, {
-            id = "zone-clear:" .. tostring(section.id),
-            title = tr("UI_PNC_CommandHub_Zone_Delete", "DELETE ZONE"),
-            target = self,
-            onclick = ISPNCCommandHubZoneWindow.onControl,
-            variant = "danger",
-        })
-        clearButton.zoneSectionID = section.id
-        clearButton.zoneAction = "clear"
+        local buttons = {}
+        for _, control in ipairs(section.controls or defaultControls()) do
+            local action = tostring(control.action or control.id or "")
+            local button = UI.CreateButton(self, {
+                id = "zone-" .. action .. ":" .. tostring(section.id),
+                title = tr(control.titleKey, control.titleFallback or action),
+                target = self,
+                onclick = ISPNCCommandHubZoneWindow.onControl,
+                variant = control.variant or "primary",
+            })
+            button.zoneSectionID = section.id
+            button.zoneAction = action
+            button.zoneControl = control
+            buttons[#buttons + 1] = button
+        end
         self.controls[section.id] = {
             definition = section,
-            createButton = createButton,
-            clearButton = clearButton,
+            buttons = buttons,
         }
     end
     self:refresh()
@@ -106,7 +146,7 @@ end
 function ISPNCCommandHubZoneWindow:getZoneState()
     local definition = self:getDefinition()
     return definition and definition.getState
-        and definition.getState(snapshot()) or nil
+        and definition.getState(snapshot(self.definitionID)) or nil
 end
 
 function ISPNCCommandHubZoneWindow:isConfigured(section)
@@ -114,6 +154,9 @@ function ISPNCCommandHubZoneWindow:isConfigured(section)
     if not zone then return false end
     if self.definitionID == "corpse_haul" then
         return zone.sourceRegion ~= nil and zone.destinationRegion ~= nil
+    end
+    if self.definitionID == "base_zone" then
+        return zone.id ~= nil and zone.geometry ~= nil
     end
     return zone.enabled ~= false and zone.id ~= nil
 end
@@ -130,36 +173,58 @@ function ISPNCCommandHubZoneWindow:refresh()
     if ZoneOverlay and ZoneOverlay.SetActive then
         ZoneOverlay.SetActive(self.definitionID, zone)
     end
-    local networkState = PNC.Network and PNC.Network.ClientState or {}
-    local revision = tonumber(networkState.colonyManagementRevision) or 0
-    if revision ~= self.lastActionResultRevision then
-        self.lastActionResultRevision = revision
-        local message = actionResultText(snapshot().actionResult)
+    local currentRevision = revision(self.definitionID)
+    if currentRevision ~= self.lastActionResultRevision then
+        self.lastActionResultRevision = currentRevision
+        if definition.applyResult then
+            definition.applyResult(self, snapshot(self.definitionID))
+        end
+        local message = actionResultText(snapshot(self.definitionID).actionResult)
         if message then self:setStatus(message) end
     end
     for _, section in ipairs(definition.sections or {}) do
         local controls = self.controls[section.id]
         if controls then
             local configured = self:isConfigured(section)
-            controls.createButton:setTitle(configured
-                and tr("UI_PNC_CommandHub_Zone_ConfiguredButton", "CONFIGURED")
-                or tr("UI_PNC_CommandHub_Zone_Create", "CREATE ZONE"))
-            controls.clearButton:setTitle(self.definitionID == "corpse_haul"
-                and tr("UI_PNC_CommandHub_Zone_Clear", "CLEAR ZONES")
-                or tr("UI_PNC_CommandHub_Zone_Delete", "DELETE ZONE"))
-            setEnabled(controls.createButton, not configured)
-            setEnabled(controls.clearButton, configured)
-            UI.StyleButton(controls.createButton,
-                configured and "quiet" or "primary")
-            UI.StyleButton(controls.clearButton,
-                configured and "danger" or "quiet")
+            for _, button in ipairs(controls.buttons or {}) do
+                local action = button.zoneAction
+                local control = button.zoneControl or {}
+                local enabled
+                if type(section.isActionEnabled) == "function" then
+                    enabled = section.isActionEnabled(action, configured,
+                        self:getZoneState())
+                elseif action == "create" then
+                    enabled = not configured
+                elseif action == "clear" then
+                    enabled = configured
+                else
+                    enabled = configured
+                end
+                local title = tr(control.titleKey, control.titleFallback
+                    or action)
+                if action == "create" and configured then
+                    title = tr("UI_PNC_CommandHub_Zone_ConfiguredButton",
+                        "CONFIGURED")
+                elseif action == "clear" and self.definitionID == "corpse_haul"
+                then
+                    title = tr("UI_PNC_CommandHub_Zone_Clear", "CLEAR ZONES")
+                end
+                button:setTitle(title)
+                setEnabled(button, enabled)
+                UI.StyleButton(button, enabled
+                    and (control.variant or "primary") or "quiet")
+            end
         end
     end
     self:requestResponsiveLayout(true)
 end
 
 function ISPNCCommandHubZoneWindow:requestSnapshot()
-    if PNC.Client and PNC.Client.RequestColonyManagement then
+    if self.definitionID == "base_zone"
+        and PNC.Client and PNC.Client.RequestBaseBootstrap
+    then
+        PNC.Client.RequestBaseBootstrap()
+    elseif PNC.Client and PNC.Client.RequestColonyManagement then
         PNC.Client.RequestColonyManagement()
     end
     self.lastRequestAt = PNC.Core and PNC.Core.Now and PNC.Core.Now() or 0
@@ -170,10 +235,10 @@ function ISPNCCommandHubZoneWindow:onControl(button)
     local section = controls and controls.definition or nil
     local definition = self:getDefinition()
     if not section or not definition then return false end
-    if button.zoneAction == "create" then
+    if button.zoneAction ~= "clear" then
         local result, reason
         if type(section.open) == "function" then
-            result, reason = section.open(self)
+            result, reason = section.open(self, button.zoneAction)
         else
             result, reason = Registry.OpenSelector(self, definition, section)
         end
@@ -209,6 +274,44 @@ function ISPNCCommandHubZoneWindow:onControl(button)
     return false
 end
 
+function ISPNCCommandHubZoneWindow:tryStartPendingOperation()
+    local operation = self.pendingOperation
+    if not operation then return false end
+    if Selector and Selector.instance
+        and Selector.instance.ownerWindow == self
+    then
+        self.pendingOperation = nil
+        return true
+    end
+    local current = snapshot(self.definitionID)
+    if operation == "create"
+        and (type(current.colony) ~= "table"
+            or not current.colony.id
+            or not (current.colony.factionID or current.colony.factionId))
+    then
+        return false
+    end
+    local definition = self:getDefinition()
+    local result, reason
+    local section = definition and definition.sections
+        and definition.sections[1] or nil
+    if section and type(section.open) == "function" then
+        result, reason = section.open(self, operation)
+    else
+        result, reason = false, "SELECTOR_UNAVAILABLE"
+    end
+    if result == false or result == nil then
+        if isPendingSnapshotReason(reason) then return false end
+        self.pendingOperation = nil
+        self:setStatus(tostring(reason or tr(
+            "UI_PNC_CommandHub_Zone_SelectorUnavailable",
+            "ZONE SELECTOR UNAVAILABLE")))
+        return false
+    end
+    self.pendingOperation = nil
+    return true
+end
+
 function ISPNCCommandHubZoneWindow:prerender()
     if self.owner and self.owner.getIsVisible
         and not self.owner:getIsVisible()
@@ -221,12 +324,12 @@ function ISPNCCommandHubZoneWindow:prerender()
         self.uiScale = scale
         self:requestResponsiveLayout(true)
     end
-    local current = PNC.Network and PNC.Network.ClientState or {}
-    local revision = tonumber(current.colonyManagementRevision) or 0
-    if revision ~= (tonumber(self.lastRevision) or -1) then
-        self.lastRevision = revision
+    local currentRevision = revision(self.definitionID)
+    if currentRevision ~= (tonumber(self.lastRevision) or -1) then
+        self.lastRevision = currentRevision
         self:refresh()
     end
+    self:tryStartPendingOperation()
     local now = PNC.Core and PNC.Core.Now and PNC.Core.Now() or 0
     if now - (tonumber(self.lastRequestAt) or 0) >= 2000 then
         self:requestSnapshot()
@@ -262,7 +365,7 @@ end
 
 require "PNC/UI/CommandHub/PNC_CommandHub_ZoneWindow_Layout"
 
-function ZoneUI.Open(definitionID, owner)
+function ZoneUI.Open(definitionID, owner, openOptions)
     local definition = Registry.Get(definitionID)
     if not definition then return nil end
 
@@ -271,6 +374,13 @@ function ZoneUI.Open(definitionID, owner)
     if ZoneUI.activeDefinitionID == id
         and current and current.getIsVisible and current:getIsVisible()
     then
+        if type(openOptions) == "table" and openOptions.startOperation then
+            current.pendingOperation = openOptions.startOperation
+            current:bringToTop()
+            current:refresh()
+            current:tryStartPendingOperation()
+            return current
+        end
         ZoneUI.Close(id)
         return nil
     end
@@ -306,11 +416,14 @@ function ZoneUI.Open(definitionID, owner)
         window.owner = owner or window.owner
     end
     ZoneUI.activeDefinitionID = id
+    window.pendingOperation = type(openOptions) == "table"
+        and openOptions.startOperation or nil
     window:addToUIManager()
     window:setVisible(true)
     window:bringToTop()
     window:refresh()
     window:requestSnapshot()
+    window:tryStartPendingOperation()
     ZoneUI.SyncPositions()
     return window
 end

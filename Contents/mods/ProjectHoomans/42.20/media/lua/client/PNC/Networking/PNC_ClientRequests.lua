@@ -18,6 +18,18 @@ local isWorldReady = Internal.IsWorldReady
 ClientState.identityRequestSerial = ClientState.identityRequestSerial or 0
 local BOOTSTRAP_RETRY_MS = 4000
 local BOOTSTRAP_RETRY_MAX_MS = 30000
+local BASE_SNAPSHOT_ACTIONS = {
+    base_create = true, base_expand = true, base_shrink = true,
+    barricade_build = true, hq_upgrade = true,
+    facility_create = true, facility_upgrade = true,
+    facility_capacity_set = true, facility_component_set = true,
+    facility_component_remove = true, facility_destroy = true,
+    stockpile_node_create = true, stockpile_node_remove = true,
+    farm_plot_crop = true, farm_plot_policy = true, farm_plot_debug = true,
+    facility_anchor_role_replace = true,
+    building_queue = true, building_debug_get_items = true,
+    work_cancel = true, work_resume = true,
+}
 
 local function requestID(prefix)
     ClientState.identityRequestSerial = ClientState.identityRequestSerial + 1
@@ -555,26 +567,47 @@ function Client.RequestWorldEffectDebug(state, kind, limit)
     return true
 end
 
-function Client.RequestColonyManagement(taskBrainNpcID)
+function Client.RequestColonyManagement(taskBrainNpcID, snapshotScope)
     local player = getSpecificPlayer and getSpecificPlayer(0) or nil
     local options = {}
     if taskBrainNpcID ~= nil and tostring(taskBrainNpcID) ~= "" then
         options.taskBrainNpcID = tostring(taskBrainNpcID)
     end
+    if snapshotScope ~= nil and tostring(snapshotScope) ~= "" then
+        options.snapshotScope = tostring(snapshotScope)
+    end
     if Core.IsClientOnly and Core.IsClientOnly() then
         if player and sendClientCommand then sendClientCommand(player, Const.MODULE, Const.CMD_COLONY_MANAGEMENT_REQUEST, options); return true end
         return false
     end
-    if not PNC.ColonyManagement or not PNC.ColonyManagement.BuildSnapshot then return false end
-    ClientState.colonyManagement = PNC.ColonyManagement.BuildSnapshot(
-        player, options)
-    ClientState.colonyManagementRevision =
-        (tonumber(ClientState.colonyManagementRevision) or 0) + 1
-    ClientState.lastColonyManagementReceiveAt = Core.Now()
+    if not PNC.ColonyManagement then return false end
+    local builder
+    if options.snapshotScope == "base" then
+        builder = PNC.ColonyManagement.BuildBaseSnapshot
+    else
+        builder = PNC.ColonyManagement.BuildSnapshot
+    end
+    if not builder then return false end
+    local snapshot = builder(player, options)
+    if options.snapshotScope == "base" then
+        ClientState.colonyBase = snapshot
+        ClientState.colonyBaseRevision =
+            (tonumber(ClientState.colonyBaseRevision) or 0) + 1
+        ClientState.lastColonyBaseReceiveAt = Core.Now()
+    else
+        ClientState.colonyManagement = snapshot
+        ClientState.colonyManagementRevision =
+            (tonumber(ClientState.colonyManagementRevision) or 0) + 1
+        ClientState.lastColonyManagementReceiveAt = Core.Now()
+    end
     if PNC.ColonyNamePrompt and PNC.ColonyNamePrompt.OpenIfNeeded then
-        PNC.ColonyNamePrompt.OpenIfNeeded(ClientState.colonyManagement)
+        PNC.ColonyNamePrompt.OpenIfNeeded(snapshot)
     end
     return true
+end
+
+function Client.RequestBaseBootstrap()
+    return Client.RequestColonyManagement(nil, "base")
 end
 
 function Client.RequestColonyJournal(after, limit)
@@ -609,6 +642,9 @@ function Client.RequestColonyAction(action, options)
     local args = type(options) == "table" and Core.DeepCopy(options) or {}
     args.action = tostring(action or "")
     args.requestId = args.requestId or requestID("colony")
+    if BASE_SNAPSHOT_ACTIONS[args.action] then
+        args.snapshotScope = "base"
+    end
     if PNC.Nameplates and PNC.Nameplates.Settings
         and PNC.Nameplates.Settings.storageTransactionLogging == true
     then
@@ -627,11 +663,19 @@ function Client.RequestColonyAction(action, options)
         return false, "colony_management_unavailable", args.requestId
     end
     local snapshot, result = PNC.ColonyManagement.HandleAction(player, args)
+    snapshot = snapshot or {}
     snapshot.actionResult = result
-    ClientState.colonyManagement = snapshot
-    ClientState.colonyManagementRevision =
-        (tonumber(ClientState.colonyManagementRevision) or 0) + 1
-    ClientState.lastColonyManagementReceiveAt = Core.Now()
+    if args.snapshotScope == "base" or BASE_SNAPSHOT_ACTIONS[args.action] then
+        ClientState.colonyBase = snapshot
+        ClientState.colonyBaseRevision =
+            (tonumber(ClientState.colonyBaseRevision) or 0) + 1
+        ClientState.lastColonyBaseReceiveAt = Core.Now()
+    else
+        ClientState.colonyManagement = snapshot
+        ClientState.colonyManagementRevision =
+            (tonumber(ClientState.colonyManagementRevision) or 0) + 1
+        ClientState.lastColonyManagementReceiveAt = Core.Now()
+    end
     if (result.action == "storage_player_deposit"
             or result.action == "storage_player_withdraw"
             or result.action == "storage_npc_deposit"
@@ -645,15 +689,21 @@ function Client.RequestColonyAction(action, options)
 end
 
 function Client.RequestCreateBase(options)
-    return Client.RequestColonyAction("base_create", options)
+    local request = type(options) == "table" and Core.DeepCopy(options) or {}
+    request.snapshotScope = "base"
+    return Client.RequestColonyAction("base_create", request)
 end
 
 function Client.RequestExpandBase(options)
-    return Client.RequestColonyAction("base_expand", options)
+    local request = type(options) == "table" and Core.DeepCopy(options) or {}
+    request.snapshotScope = "base"
+    return Client.RequestColonyAction("base_expand", request)
 end
 
 function Client.RequestShrinkBase(options)
-    return Client.RequestColonyAction("base_shrink", options)
+    local request = type(options) == "table" and Core.DeepCopy(options) or {}
+    request.snapshotScope = "base"
+    return Client.RequestColonyAction("base_shrink", request)
 end
 
 function Client.RequestBuildBarricade(options)

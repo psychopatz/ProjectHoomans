@@ -132,6 +132,8 @@ function Scene.Begin(record, zombie, player, token, options)
     local started
     local lease
     local pending
+    local previousState
+    local previousProcessedRequests
     options, maximumDistance, dangerRadius = sceneOptions(options)
     enforceDistance = options.enforceDistance ~= false
     if not record or record.alive == false
@@ -179,6 +181,13 @@ function Scene.Begin(record, zombie, player, token, options)
     end
     started, reason = requestScene(record, zombie, currentTime)
     if not started then return false, reason end
+    if current and (tonumber(current.expiresAt) or 0) > currentTime
+        and tostring(current.token or "") == token
+        and playerOwnsLease(player, current)
+    then
+        previousState = current.conversationState
+        previousProcessedRequests = current.processedConversationRequests
+    end
     lease = createLease(
         record,
         player,
@@ -194,6 +203,12 @@ function Scene.Begin(record, zombie, player, token, options)
         )
     then
         return false, "player_identity_unavailable"
+    end
+    if type(previousState) == "table" then
+        lease.conversationState = previousState
+    end
+    if type(previousProcessedRequests) == "table" then
+        lease.processedConversationRequests = previousProcessedRequests
     end
     record.runtime.conversationLease = lease
     record.nextThinkAt = currentTime

@@ -67,8 +67,10 @@
   contains managed human NPC bodies. PNC uses the supported `Stats` API for
   visible/chasing counters and, because Build 42 has no very-close-counter
   setter, performs a synchronous second LOS pass with only managed bodies
-  temporarily excluded through the engine's grapple-only LOS flag. The flag is
-  restored before the callback returns and is never persisted or replicated
+  temporarily excluded through the engine's native corpse-drag flag
+  (`ReanimatedForGrappleOnly`). This is not a grapple action or corpse carry;
+  the borrowed flag is released before the callback returns and must never
+  survive into ordinary NPC updates, persistence, or network state
 - the corrected counters feed vanilla sleep unchanged, so a nearby PNC human
   no longer produces `IGUI_Sleep_NotSafe` or wakes a sleeping player as a
   zombie. A dedicated client patch refreshes those counters immediately before
@@ -80,9 +82,10 @@
   PNC invokes the unmodified vanilla speed-control method; it never replaces a
   Java-owned UI method. Player interruptions and ordinary zombies still cancel
   time acceleration normally
-- human-body maintenance clears any leaked grapple-only flag from older saves,
-  recovering the NPC's standing posture; the flag exists only during the
-  synchronous filtered LOS recount and cannot reach NPC update or replication
+- human-body maintenance clears any leaked native corpse-drag flag from older
+  saves, recovering the NPC's standing posture; the flag exists only during
+  the synchronous filtered LOS recount and cannot reach ordinary NPC update or
+  replication
 - while the AI debug overlay is enabled, the safeguard emits cadence-bounded
   `human_safeguard` counter decisions and one `sleep_gate` line per sleep
   attempt with visible/chasing/very-close counters before and after correction

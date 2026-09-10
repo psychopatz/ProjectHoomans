@@ -22,7 +22,7 @@ local GridRegion = {
 local selectorOptions
 local createRequest
 local expandRequest
-local snapshot = {}
+local baseSnapshot = {}
 
 package.preload["PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Shared"] = function()
     return {
@@ -53,7 +53,10 @@ PNC = {
     SettlementDefinitions = { STARTING_TERRITORY = 270 },
     ColonyManagementClient = {
         ReadSnapshot = function()
-            return { snapshot = snapshot }
+            return { snapshot = baseSnapshot }
+        end,
+        ReadBaseSnapshot = function()
+            return { snapshot = baseSnapshot }
         end,
     },
     Client = {
@@ -76,7 +79,7 @@ local Territory = T.load("ProjectHoomans", "client",
     "PNC/UI/CommandHub/PNC_CommandHub_BaseTerritoryActions.lua")
 
 local window = {}
-snapshot = {
+baseSnapshot = {
     colony = { id = "colony-old", factionID = "faction-old" },
 }
 local selector = Territory.Begin(window, "create")
@@ -84,7 +87,7 @@ T.truthy(selector, "create territory selector did not open")
 T.equal(selectorOptions.debugLabel, "base_territory_create",
     "create selector is missing its Command Hub identity")
 
-snapshot.colony = { id = "colony-new", factionID = "faction-new" }
+baseSnapshot.colony = { id = "colony-new", factionID = "faction-new" }
 T.truthy(selectorOptions.onConfirm({ tileCount = 12 }),
     "create selector rejected a valid request")
 T.equal(createRequest.colonyId, "colony-new",
@@ -105,17 +108,17 @@ T.falsy(Territory.ApplyResult(window, {
     },
 }), "the same territory result was applied twice")
 
-window.baseRegion = { tileCount = 20 }
-snapshot = {
+baseSnapshot = {
     colony = { id = "colony-new", factionID = "faction-new" },
     settlement = {
         id = "base-1", revision = 1,
+        geometry = { tileCount = 20 },
         territory = { territoryCapacity = 100 },
     },
 }
 selector = Territory.Begin(window, "expand")
 T.truthy(selector, "expand territory selector did not open")
-snapshot.settlement.revision = 7
+baseSnapshot.settlement.revision = 7
 T.truthy(selectorOptions.onConfirm({ tileCount = 3 }),
     "expand selector rejected a valid request")
 T.equal(expandRequest.baseId, "base-1",

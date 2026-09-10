@@ -21,7 +21,7 @@ end
 
 local function button(window, UIBuilder, id, key, variant)
     return UIBuilder.CreateButton(window, { id = id, title = getText(key),
-        target = window, onclick = ISPNCColonyManagementWindow.onWorkshopControl,
+        target = window, onclick = window.onWorkshopControl,
         variant = variant })
 end
 

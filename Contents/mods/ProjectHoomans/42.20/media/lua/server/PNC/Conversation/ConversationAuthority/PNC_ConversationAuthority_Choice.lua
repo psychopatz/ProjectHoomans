@@ -38,7 +38,10 @@ function Authority.HandleChoice(player, args)
         return false, "replayed_request"
     end
     local state = lease and lease.conversationState or nil
-    if not ok or not state then reason = reason or "conversation_state_missing" end
+    if not ok then reason = reason or "conversation_state_missing" end
+    if not state then
+        ok, reason = false, "conversation_state_missing"
+    end
     if ok and (not requestIsCurrent(args)
         or state.registryFingerprint ~= Registry.GetFingerprint())
     then ok, reason = false, "registry_mismatch" end

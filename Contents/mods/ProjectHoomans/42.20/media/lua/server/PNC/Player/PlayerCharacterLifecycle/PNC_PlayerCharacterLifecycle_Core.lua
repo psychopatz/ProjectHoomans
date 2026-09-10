@@ -47,10 +47,13 @@ function H.EnsureIdentityAndProfile(player, callback, at)
         local granted = PNC.StartingCompanions.Ensure(player, uuid, at)
         if granted == true and PNC.Network
             and PNC.Network.SendColonyManagement and PNC.ColonyManagement
-            and PNC.ColonyManagement.BuildSnapshot
         then
+            local builder = PNC.ColonyManagement.BuildBaseSnapshot
+                or PNC.ColonyManagement.BuildSnapshot
+            if not builder then return uuid, reason end
             PNC.Network.SendColonyManagement(player,
-                PNC.ColonyManagement.BuildSnapshot(player))
+                builder(player),
+                PNC.ColonyManagement.BuildBaseSnapshot and "base" or nil)
         end
     end
     return uuid, reason

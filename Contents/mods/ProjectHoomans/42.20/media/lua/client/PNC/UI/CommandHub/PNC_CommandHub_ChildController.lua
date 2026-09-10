@@ -16,8 +16,8 @@ local Layout = PsychopatzCore.UI.Layout
 local WidgetWindow = PsychopatzCore.UI.WidgetWindow or {}
 
 Controller.entries = Controller.entries or {}
-Controller.closeOrder = { "zone", "work", "settings", "events", "colonist",
-    "storage", "research", "building" }
+Controller.closeOrder = { "zone", "colony", "work", "workshop", "settings", "events", "colonist",
+    "storage", "research", "base" }
 Controller.activeID = nil
 Controller.closing = false
 
@@ -32,6 +32,26 @@ end
 
 local function moduleWindow(module)
     return module and module.instance or nil
+end
+
+local function provisionWindow()
+    return PNC.ProvisionSettingsUI
+        and PNC.ProvisionSettingsUI.instance or nil
+end
+
+local function colonyNamePromptWindow()
+    return PNC.ColonyNamePrompt
+        and PNC.ColonyNamePrompt.instance or nil
+end
+
+local function colonyEmblemEditorWindow()
+    return PNC.FactionEmblemEditor
+        and PNC.FactionEmblemEditor.instance or nil
+end
+
+local function colonyActionsOpen()
+    local window = Actions and Actions.instance or nil
+    return isVisible(window) and tostring(window.parentID or "") == "colony"
 end
 
 local function windowIsDetached(window)
@@ -112,7 +132,7 @@ function Controller.CloseBranch(id, reason)
         if type(entry.focus) == "function" then entry.focus() end
         return true
     end
-    if type(entry.close) == "function" then entry.close() end
+    if type(entry.close) == "function" then entry.close(reason) end
     if Controller.activeID == tostring(id or "") then
         Controller.activeID = nil
     end
@@ -130,7 +150,7 @@ function Controller.CloseAll(reason)
         then
             return
         end
-        if type(entry.close) == "function" then entry.close() end
+        if type(entry.close) == "function" then entry.close(reason) end
     end
     for _, id in ipairs(Controller.closeOrder) do
         local entry = Controller.entries[id]
@@ -190,6 +210,8 @@ function Controller.ApplyOpacity(opacity)
         Options.ApplyWindowOpacity(window, value)
     end
     Options.ApplyWindowOpacity(Hub.WorkUI and Hub.WorkUI.instance or nil, value)
+    Options.ApplyWindowOpacity(PNC.WorkshopUI
+        and PNC.WorkshopUI.instance or nil, value)
     Options.ApplyWindowOpacity(Hub.SettingsUI and Hub.SettingsUI.instance or nil, value)
     Options.ApplyWindowOpacity(PNC.ColonyJournalUI
         and PNC.ColonyJournalUI.instance or nil, value)
@@ -199,8 +221,11 @@ function Controller.ApplyOpacity(opacity)
         and PNC.ColonyStorageUI.instance or nil, value)
     Options.ApplyWindowOpacity(PNC.ResearchUI
         and PNC.ResearchUI.instance or nil, value)
-    Options.ApplyWindowOpacity(PNC.BuildingUI
-        and PNC.BuildingUI.instance or nil, value)
+    local base = PNC.BaseUI or PNC.BuildingUI
+    Options.ApplyWindowOpacity(base and base.instance or nil, value)
+    Options.ApplyWindowOpacity(provisionWindow(), value)
+    Options.ApplyWindowOpacity(colonyNamePromptWindow(), value)
+    Options.ApplyWindowOpacity(colonyEmblemEditorWindow(), value)
     return value
 end
 
@@ -221,11 +246,23 @@ function Controller.SyncPositions()
     then
         zone.sync(owner)
     end
+    local colony = Controller.entries.colony
+    if Controller.IsOpen("colony") and colony
+        and type(colony.sync) == "function"
+    then
+        colony.sync(owner)
+    end
     local work = Controller.entries.work
     if Controller.IsOpen("work") and work
         and type(work.sync) == "function"
     then
         work.sync(owner)
+    end
+    local workshop = Controller.entries.workshop
+    if Controller.IsOpen("workshop") and workshop
+        and type(workshop.sync) == "function"
+    then
+        workshop.sync(owner)
     end
     local settings = Controller.entries.settings
     if Controller.IsOpen("settings") and settings
@@ -257,15 +294,46 @@ function Controller.SyncPositions()
     then
         research.sync(owner)
     end
-    local building = Controller.entries.building
-    if Controller.IsOpen("building") and building
-        and type(building.sync) == "function"
+    local base = Controller.entries.base
+    if Controller.IsOpen("base") and base
+        and type(base.sync) == "function"
     then
-        building.sync(owner)
+        base.sync(owner)
     end
     Controller.ApplyOpacity(Options.GetOpacity())
     return true
 end
+
+Controller.Register("colony", {
+    open = function(owner)
+        if not Actions or not Actions.Open then return false end
+        return Actions.Open("colony", owner)
+    end,
+    close = function(reason)
+        if colonyActionsOpen() and Actions and Actions.Close then
+            Actions.Close()
+        end
+        closeModule(PNC.ColonyNamePrompt)
+        closeModule(PNC.FactionEmblemEditor)
+        local provision = PNC.ProvisionSettingsUI
+        if reason == "switch" and moduleIsDetached(provision) then
+            return
+        end
+        closeModule(provision)
+    end,
+    isOpen = function()
+        return colonyActionsOpen()
+            or moduleIsVisible(PNC.ProvisionSettingsUI)
+            or isVisible(colonyNamePromptWindow())
+            or isVisible(colonyEmblemEditorWindow())
+    end,
+    sync = function(owner)
+        if colonyActionsOpen() and Actions and Actions.SyncPosition then
+            Actions.SyncPosition(owner)
+        end
+        placeWindow(provisionWindow(), owner)
+    end,
+})
 
 Controller.Register("zone", {
     open = function(owner)
@@ -305,6 +373,33 @@ Controller.Register("work", {
     focus = function() return focusModule(Hub.WorkUI) end,
     sync = function(owner)
         placeWindow(Hub.WorkUI and Hub.WorkUI.instance, owner)
+    end,
+})
+
+Controller.Register("workshop", {
+    open = function(owner)
+        local workshop = PNC.WorkshopUI
+        return workshop and workshop.Open
+            and workshop.Open(owner) or false
+    end,
+    close = function()
+        local workshop = PNC.WorkshopUI
+        if workshop and workshop.Close then workshop.Close() end
+    end,
+    isOpen = function()
+        return PNC.WorkshopUI
+            and moduleIsVisible(PNC.WorkshopUI) or false
+    end,
+    isDetached = function()
+        return PNC.WorkshopUI
+            and moduleIsDetached(PNC.WorkshopUI) or false
+    end,
+    focus = function()
+        return focusModule(PNC.WorkshopUI)
+    end,
+    sync = function(owner)
+        placeWindow(PNC.WorkshopUI
+            and PNC.WorkshopUI.instance or nil, owner)
     end,
 })
 
@@ -429,30 +524,30 @@ Controller.Register("research", {
     end,
 })
 
-Controller.Register("building", {
+Controller.Register("base", {
     open = function(owner)
-        local building = PNC.BuildingUI
-        return building and building.Open
-            and building.Open(owner) or false
+        local base = PNC.BaseUI or PNC.BuildingUI
+        return base and base.Open
+            and base.Open(owner) or false
     end,
     close = function()
-        local building = PNC.BuildingUI
-        if building and building.Close then building.Close() end
+        local base = PNC.BaseUI or PNC.BuildingUI
+        if base and base.Close then base.Close() end
     end,
     isOpen = function()
-        return PNC.BuildingUI
-            and moduleIsVisible(PNC.BuildingUI) or false
+        local base = PNC.BaseUI or PNC.BuildingUI
+        return base and moduleIsVisible(base) or false
     end,
     isDetached = function()
-        return PNC.BuildingUI
-            and moduleIsDetached(PNC.BuildingUI) or false
+        local base = PNC.BaseUI or PNC.BuildingUI
+        return base and moduleIsDetached(base) or false
     end,
     focus = function()
-        return focusModule(PNC.BuildingUI)
+        return focusModule(PNC.BaseUI or PNC.BuildingUI)
     end,
     sync = function(owner)
-        placeWindow(PNC.BuildingUI
-            and PNC.BuildingUI.instance or nil, owner)
+        local base = PNC.BaseUI or PNC.BuildingUI
+        placeWindow(base and base.instance or nil, owner)
     end,
 })
 

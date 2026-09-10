@@ -33,8 +33,10 @@ end
 
 local function snapshotFor(window)
     local client = PNC.ColonyManagementClient
-    if client and type(client.ReadSnapshot) == "function" then
-        local update = client.ReadSnapshot()
+    local reader = client and client.ReadBaseSnapshot
+        or client and client.ReadSnapshot
+    if type(reader) == "function" then
+        local update = reader()
         if type(update) == "table" and type(update.snapshot) == "table" then
             return update.snapshot
         end
@@ -138,7 +140,8 @@ function Territory.Begin(window, operation)
     end
     local currentSnapshot = snapshotFor(window)
     local settlement = currentSnapshot.settlement
-    local current = settlement and Support.BaseRegion(window)
+    local geometry = settlement and settlement.geometry or nil
+    local current = geometry and (geometry.region or geometry)
         or Support.EmptyRegion()
     local currentCount = GridRegion.countTiles(current)
     local territory = settlement and settlement.territory or {}

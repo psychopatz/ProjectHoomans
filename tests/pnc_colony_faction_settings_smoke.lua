@@ -73,24 +73,6 @@ package.preload["PsychopatzCore/UI/PsychopatzUI"] = function()
     return PsychopatzCore.UI
 end
 ISPNCColonyManagementWindow = { onColonySettingsControl = function() end }
-local renamed
-local savedEmblem
-PNC.Client.RenameFaction = function(name)
-    renamed = name
-    return true, "renamed"
-end
-PNC.Client.SetFactionEmblem = function(emblem)
-    savedEmblem = emblem
-    return true
-end
-PNC.FactionEmblemEditor = {
-    Open = function(options)
-        options.onSave({ revision = 4, backgroundColorID = "blue" },
-            options.context)
-        return true
-    end,
-}
-
 local Settings = require(
     "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_SettingsTab"
 )
@@ -105,17 +87,16 @@ local window = {
 }
 Settings.Create(window)
 Settings.Rebuild(window, snapshot)
-T.equal(window.factionNameEntry:getText(), "Morgan Clan",
-    "settings binds current faction name")
-window.factionNameEntry:setText("Morgan Wardens")
-T.equal(Settings.OnControl(window, window.factionRenameButton), true,
-    "settings submits faction rename")
-T.equal(renamed, "Morgan Wardens", "settings submits edited name")
-T.equal(window.refreshed, true, "settings refreshes after local rename")
-T.equal(Settings.OnControl(window, window.factionEmblemButton), true,
-    "settings opens the faction emblem editor")
-T.equal(savedEmblem.backgroundColorID, "blue",
-    "settings saves the edited player faction emblem")
+T.falsy(window.factionNameEntry,
+    "legacy settings still owns the faction name entry")
+T.falsy(window.factionRenameButton,
+    "legacy settings still owns the faction rename button")
+T.falsy(window.factionEmblemButton,
+    "legacy settings still owns the faction emblem button")
+T.falsy(Settings.OnControl(window, { internal = "faction_rename" }),
+    "legacy settings still handles faction rename directly")
+T.falsy(Settings.OnControl(window, { internal = "faction_emblem" }),
+    "legacy settings still handles faction emblem directly")
 T.finish("pnc_colony_faction_settings_smoke")
 
 T.finish("pnc_colony_faction_settings_smoke")

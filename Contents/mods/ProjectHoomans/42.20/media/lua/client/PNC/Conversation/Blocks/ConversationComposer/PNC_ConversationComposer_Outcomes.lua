@@ -135,13 +135,10 @@ function Composer.ReceiveOutcome(args)
         if effect.type == "pnc:open_territory_claim"
             and effect.result and effect.result.openClaim == true
         then
-            local opened = PNC.CommandHub
-                and PNC.CommandHub.OpenBase
-                and PNC.CommandHub.OpenBase() or false
-            if not opened and PNC.ColonyManagementUI
-                and PNC.ColonyManagementUI.OpenClaimTerritory
-            then
-                PNC.ColonyManagementUI.OpenClaimTerritory()
+            if PNC.CommandHub and PNC.CommandHub.OpenTerritorySetup then
+                PNC.CommandHub.OpenTerritorySetup()
+            elseif PNC.Core and PNC.Core.LogWarn then
+                PNC.Core.LogWarn("Set Territory outcome received before Command Hub loaded")
             end
         end
     end

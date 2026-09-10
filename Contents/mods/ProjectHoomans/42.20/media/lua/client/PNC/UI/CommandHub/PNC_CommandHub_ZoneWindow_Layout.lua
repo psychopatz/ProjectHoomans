@@ -39,18 +39,27 @@ function ISPNCCommandHubZoneWindow:onResponsiveLayout()
             local headerY = cursor
             local buttonY = headerY + headerHeight + buttonGap
             local columnGap = px(8)
-            local half = math.floor((rect.width - columnGap) / 2)
-            local secondWidth = rect.width - half - columnGap
-            Layout.SetBounds(value.createButton, rect.x, buttonY, half,
-                buttonHeight)
-            Layout.SetBounds(value.clearButton, rect.x + half + columnGap,
-                buttonY, math.max(px(80), secondWidth), buttonHeight)
+            local buttons = value.buttons or {}
+            local columns = #buttons >= 2 and 2 or 1
+            local buttonWidth = columns == 1 and rect.width
+                or math.floor((rect.width - columnGap) / columns)
+            for index, button in ipairs(buttons) do
+                local column = (index - 1) % columns
+                local row = math.floor((index - 1) / columns)
+                Layout.SetBounds(button,
+                    rect.x + column * (buttonWidth + columnGap),
+                    buttonY + row * (buttonHeight + buttonGap),
+                    buttonWidth, buttonHeight)
+            end
             local summaryY = buttonY + buttonHeight + summaryGap
             controls[#controls + 1] = {
                 definition = section, x = rect.x, width = rect.width,
                 headerY = headerY, buttonY = buttonY, summaryY = summaryY,
             }
-            cursor = summaryY + summaryHeight + sectionGap
+            local rows = math.ceil(#buttons / columns)
+            cursor = buttonY + rows * buttonHeight
+                + math.max(0, rows - 1) * buttonGap
+                + summaryGap + summaryHeight + sectionGap
         end
     end
     local statusHeight = math.max(px(14), Theme.FontHeight(UIFont.Small))

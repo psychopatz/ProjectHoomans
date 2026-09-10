@@ -134,6 +134,9 @@ local function onResetLua()
     ClientState.directorDebugReason = nil
     ClientState.colonyManagement = nil
     ClientState.colonyManagementRevision = 0
+    ClientState.colonyBase = nil
+    ClientState.colonyBaseRevision = 0
+    ClientState.lastColonyBaseReceiveAt = nil
     ClientState.colonyJournal = {
         rows = {}, cursor = 0, latestSequence = 0, rowSequences = {},
     }

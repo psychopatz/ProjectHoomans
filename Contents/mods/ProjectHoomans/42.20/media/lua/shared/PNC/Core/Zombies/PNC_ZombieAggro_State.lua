@@ -176,6 +176,63 @@ function Internal.isCloseLivePlayerTarget(zombie, target)
     return ((dx * dx) + (dy * dy)) <= (Const.ZOMBIE_TARGET_PLAYER_KEEP_RADIUS * Const.ZOMBIE_TARGET_PLAYER_KEEP_RADIUS)
 end
 
+function Internal.findNearestLivePlayer(zombie, radius)
+    local bestPlayer
+    local bestDistSq = math.huge
+    local seenPlayers = {}
+    local limitSq = (tonumber(radius) or math.huge)
+        ^ 2
+    local zombieX
+    local zombieY
+    local zombieZ
+    local currentTarget
+
+    if not zombie then
+        return nil, math.huge
+    end
+    zombieX = zombie:getX()
+    zombieY = zombie:getY()
+    zombieZ = zombie:getZ()
+    currentTarget = zombie.getTarget and zombie:getTarget() or nil
+
+    local function consider(player, allowOutsideRadius)
+        local dx
+        local dy
+        local distanceSq
+        if not player
+            or not instanceof
+            or not instanceof(player, "IsoPlayer")
+            or seenPlayers[player]
+            or (player.isDead and player:isDead())
+            or math.abs(player:getZ() - zombieZ) >= 1
+        then
+            return
+        end
+        seenPlayers[player] = true
+        dx = player:getX() - zombieX
+        dy = player:getY() - zombieY
+        distanceSq = (dx * dx) + (dy * dy)
+        if (allowOutsideRadius or distanceSq <= limitSq)
+            and distanceSq < bestDistSq
+        then
+            bestPlayer = player
+            bestDistSq = distanceSq
+        end
+    end
+
+    -- Keep the engine's existing player target in the comparison even if it
+    -- is outside the NPC search radius. This prevents a closer NPC from
+    -- displacing a player that the native zombie is already pursuing unless
+    -- the NPC is genuinely nearer.
+    consider(currentTarget, true)
+    if Core and Core.ForEachPlayer then
+        Core.ForEachPlayer(function(player)
+            consider(player, false)
+        end)
+    end
+    return bestPlayer, bestDistSq
+end
+
 function Internal.findNearestLiveNPC(zombie, radius)
     local bestRecord
     local bestBody

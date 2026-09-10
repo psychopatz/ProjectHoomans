@@ -11,7 +11,7 @@ function LiveBodyControl.EnforceManagedSafety(zombie, source)
     local hadTarget
     local wasUseless
     local hadTeeth
-    local wasGrappleOnly
+    local hadNativeCorpseDragFlag
     local modData
     local npcId
     local record
@@ -37,7 +37,7 @@ function LiveBodyControl.EnforceManagedSafety(zombie, source)
     hadTarget = zombie.getTarget and zombie:getTarget() ~= nil or false
     wasUseless = zombie.isUseless and zombie:isUseless() or false
     hadTeeth = zombie.isNoTeeth and not zombie:isNoTeeth() or false
-    wasGrappleOnly = zombie.isReanimatedForGrappleOnly
+    hadNativeCorpseDragFlag = zombie.isReanimatedForGrappleOnly
         and zombie:isReanimatedForGrappleOnly() or false
     actionState = LiveBodyControl.GetActionStateName(zombie)
     unsafeNativeTraversalState = actionState == "climbfence"
@@ -53,7 +53,7 @@ function LiveBodyControl.EnforceManagedSafety(zombie, source)
     needsImmediateRepair = hadTarget
         or (not wasUseless and not keepEngineMovementActive)
         or hadTeeth
-        or wasGrappleOnly
+        or hadNativeCorpseDragFlag
         or (
             (not keepEngineMovementActive or unsafeNativeTraversalState)
             and not actionLeaseActive
@@ -75,7 +75,7 @@ function LiveBodyControl.EnforceManagedSafety(zombie, source)
             hadTarget
             or (not wasUseless and not keepEngineMovementActive)
             or hadTeeth
-            or wasGrappleOnly
+            or hadNativeCorpseDragFlag
         )
         and not SAFETY_REPAIR_LOGGED[zombie]
         and Core.LogWarn
@@ -88,7 +88,7 @@ function LiveBodyControl.EnforceManagedSafety(zombie, source)
             .. " target=" .. tostring(hadTarget)
             .. " useless=" .. tostring(wasUseless)
             .. " hadTeeth=" .. tostring(hadTeeth)
-            .. " grappleOnly=" .. tostring(wasGrappleOnly))
+            .. " nativeCorpseDragFlag=" .. tostring(hadNativeCorpseDragFlag))
     end
     return true
 end

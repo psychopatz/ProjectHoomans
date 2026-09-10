@@ -485,12 +485,20 @@ T.equal(reason, "snapshot_requested", "client boundary snapshot reason")
 local windowSource = T.read(
     "ProjectHoomans", "client", "PNC/UI/Provision/PNC_ProvisionSettingsWindow.lua"
 )
+local layoutSource = T.read(
+    "ProjectHoomans", "client",
+    "PNC/UI/Provision/PNC_ProvisionSettingsWindow_Layout.lua"
+)
 T.equal(windowSource:find("PNC.Client.", 1, true), nil,
     "Provision window bypasses client boundary")
 T.equal(windowSource:find("PNC.Network.ClientState", 1, true), nil,
     "Provision window reads raw network state")
 T.truthy(windowSource:find("Client.ReadUpdate", 1, true),
     "Provision window consumes client update boundary")
+T.contains(windowSource, "PNC_ProvisionSettingsWindow_Layout",
+    "Provision window does not load its modular layout")
+T.contains(layoutSource, "function ISPNCProvisionSettingsWindow:onResponsiveLayout",
+    "Provision layout module does not own responsive layout")
 T.finish("pnc_provision_smoke")
 
 T.finish("pnc_provision_smoke")

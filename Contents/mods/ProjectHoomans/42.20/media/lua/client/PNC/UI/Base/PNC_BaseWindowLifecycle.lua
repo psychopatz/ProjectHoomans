@@ -53,7 +53,8 @@ function ISPNCBaseWindow:applyContentStyle()
 end
 
 function ISPNCBaseWindow:requestSnapshot(source)
-    local _, _, requestedAt = Client.RequestSnapshot()
+    local request = Client.RequestBaseSnapshot or Client.RequestSnapshot
+    local _, _, requestedAt = request()
     self.lastRequestAt = requestedAt
     if PNC.CommandHub and PNC.CommandHub.Trace then
         PNC.CommandHub.Trace("pnc_base_snapshot_requested",
@@ -63,7 +64,8 @@ function ISPNCBaseWindow:requestSnapshot(source)
 end
 
 function ISPNCBaseWindow:refresh(update)
-    update = update or Client.ReadSnapshot()
+    update = update or (Client.ReadBaseSnapshot and Client.ReadBaseSnapshot()
+        or Client.ReadSnapshot())
     self.snapshot = update.snapshot or {}
     Territory.ApplyResult(self, self.snapshot)
     self:applyContentStyle()
@@ -103,7 +105,8 @@ function ISPNCBaseWindow:prerender()
     if now - (tonumber(self.lastRequestAt) or 0) >= 2000 then
         self:requestSnapshot("poll")
     end
-    local changed, update = Client.HasUpdate(
+    local hasUpdate = Client.HasBaseUpdate or Client.HasUpdate
+    local changed, update = hasUpdate(
         self.lastReceiveRevision, self.lastReceiveAt)
     if changed then self:refresh(update) end
     PsychopatzWindow.prerender(self)

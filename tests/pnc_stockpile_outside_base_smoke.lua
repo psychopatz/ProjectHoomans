@@ -112,6 +112,7 @@ package.preload["PsychopatzCore/World/PC_GridRegion"] = function()
         countTiles = function() return 2 end,
         intersects = function() return false end,
         subtract = function(region) return region end,
+        containsRegion = function() return false end,
         isConnected = function() return true end,
     }
 end
@@ -126,7 +127,8 @@ local check = PNC.FacilityValidationService.NormalizeComponent(
     { id = "component:stockpile", kind = "region", role = "storage.stockpile",
         region = region }
 )
-T.truthy(check.ok, "external stockpile region passes component validation")
+T.falsy(check.ok, "stockpile storage can be moved outside the base")
+T.equal(check.reason, "OUTSIDE_BASE", "external stockpile move reason")
 
 local initialCheck = PNC.FacilityValidationService.NormalizeComponent(
     { id = "base:1" },
@@ -158,7 +160,9 @@ local territoryCheck = PNC.BaseValidationService.CanChange(
     { levels = { [0] = { rows = { [10] = { 30, 31 } } } } },
     "REMOVE"
 )
-T.truthy(territoryCheck.ok,
-    "external stockpile region does not block base territory shrinking")
+T.falsy(territoryCheck.ok,
+    "external stockpile region blocks base territory shrinking")
+T.equal(territoryCheck.details.anchorType, "facility_component",
+    "stockpile shrink guard identifies the anchored component")
 
 T.finish("pnc_stockpile_outside_base_smoke")

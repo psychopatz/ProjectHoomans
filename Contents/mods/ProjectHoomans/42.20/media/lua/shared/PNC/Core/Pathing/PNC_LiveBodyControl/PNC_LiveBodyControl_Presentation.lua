@@ -4,10 +4,10 @@ local LiveBodyControl = PNC.LiveBodyControl
 local Internal = LiveBodyControl.Internal
 local Core = PNC.Core
 
-local function threatLeaseActive(zombie)
+local function nativeLosLeaseActive(zombie)
     local safeguards = PNC.HumanNPCThreatSafeguards
-    return safeguards and safeguards.IsBodyLeased
-        and safeguards.IsBodyLeased(zombie) == true
+    return safeguards and safeguards.IsBodyLOSLeaseActive
+        and safeguards.IsBodyLOSLeaseActive(zombie) == true
 end
 
 function Internal.hasBumpActionLease(zombie, now)
@@ -31,7 +31,7 @@ function Internal.applyActionLeaseSafeguards(zombie, modData)
         zombie:setVariable("PNCLive", true)
     end
     if zombie.setNoTeeth then zombie:setNoTeeth(true) end
-    if zombie.setReanimatedForGrappleOnly and not threatLeaseActive(zombie) then
+    if zombie.setReanimatedForGrappleOnly and not nativeLosLeaseActive(zombie) then
         zombie:setReanimatedForGrappleOnly(false)
     end
     if zombie.getDescriptor then
@@ -113,7 +113,7 @@ function LiveBodyControl.ApplyHumanizedBodyFlags(
         keepEngineMovementActive
     )
     if zombie.setNoTeeth then zombie:setNoTeeth(true) end
-    if zombie.setReanimatedForGrappleOnly and not threatLeaseActive(zombie) then
+    if zombie.setReanimatedForGrappleOnly and not nativeLosLeaseActive(zombie) then
         zombie:setReanimatedForGrappleOnly(false)
     end
     if zombie.getDescriptor then

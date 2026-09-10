@@ -110,6 +110,45 @@ function Internal.BuildSettlementSnapshot(baseOrId, tasks)
     return settlement
 end
 
+local function activeColonyForFaction(playerFaction)
+    if not playerFaction or not PNC.Communities
+        or not PNC.Communities.GetForFaction
+    then
+        return nil
+    end
+    for _, value in ipairs(PNC.Communities.GetForFaction(
+        playerFaction.id) or {}) do
+        if value.status == "active" then return value end
+    end
+    return nil
+end
+
+-- Base claim and the Command Hub only need identity plus settlement state.
+-- Keep this projection separate from the much heavier colony-management
+-- payload so it remains safe to send through the MP command buffer.
+function Management.BuildBaseSnapshot(player)
+    local playerFaction = PNC.Factions and PNC.Factions.GetPlayerFaction
+        and PNC.Factions.GetPlayerFaction(player) or nil
+    local colony = activeColonyForFaction(playerFaction)
+    local base = colony and PNC.BaseService
+        and PNC.BaseService.GetForColony(colony.id) or nil
+    local faction = playerFaction and {
+        id = playerFaction.id,
+        name = playerFaction.name,
+        revision = playerFaction.revision,
+    } or nil
+    local colonySnapshot = colony and {
+        id = colony.id,
+        factionID = playerFaction and playerFaction.id or nil,
+    } or nil
+    return {
+        colony = colonySnapshot,
+        faction = faction,
+        settlement = base and Internal.BuildSettlementSnapshot(base, {}) or nil,
+        generatedAt = PNC.NeedsUtils.WorldAgeHours(),
+    }
+end
+
 function Management.BuildSnapshot(player, options)
     options = type(options) == "table" and options or {}
     local people, attention, counts = {}, {}, { hunger={}, thirst={}, fatigue={} }
@@ -123,9 +162,7 @@ function Management.BuildSnapshot(player, options)
         end
     end
     if PNC.Factions and PNC.Factions.GetPlayerFaction then playerFaction = PNC.Factions.GetPlayerFaction(player) end
-    if playerFaction and PNC.Communities and PNC.Communities.GetForFaction then
-        for _, value in ipairs(PNC.Communities.GetForFaction(playerFaction.id) or {}) do if value.status == "active" then colony=value; break end end
-    end
+    colony = activeColonyForFaction(playerFaction)
     for _, record in pairs(PNC.Registry.Data or {}) do
         if record.alive ~= false and owned(record, player) then
             local value = summary(record, player, options); people[#people+1]=value

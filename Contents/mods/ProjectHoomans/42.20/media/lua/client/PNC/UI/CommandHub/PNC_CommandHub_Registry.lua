@@ -105,6 +105,15 @@ local function colonyManagementSnapshot()
     return state and state.colonyManagement or {}
 end
 
+local function baseSnapshot()
+    local client = PNC.ColonyManagementClient
+    if client and type(client.ReadBaseSnapshot) == "function" then
+        local update = client.ReadBaseSnapshot()
+        if type(update) == "table" then return update.snapshot or {} end
+    end
+    return colonyManagementSnapshot()
+end
+
 function Gates.HasRadio()
     return hasRadio()
 end
@@ -122,7 +131,7 @@ local function stockpileStatus(settlement)
 end
 
 function Gates.GetBaseAndStockpileStatus()
-    local snapshot = colonyManagementSnapshot()
+    local snapshot = baseSnapshot()
     local settlement = type(snapshot) == "table" and snapshot.settlement or nil
     local hasBase = type(settlement) == "table"
     local stockpileExists, hasStockpile = false, false
@@ -137,12 +146,28 @@ function Gates.GetBaseAndStockpileStatus()
     }
 end
 
+function Gates.HasBase()
+    return Gates.GetBaseAndStockpileStatus().hasBase == true
+end
+
+function Gates.BaseZoneDisabledTooltip()
+    if Gates.HasBase() then return nil end
+    return {
+        key = "UI_PNC_CommandHub_Disabled_NoBase",
+        fallback = "Requires a colony base.",
+    }
+end
+
 function Gates.HasBaseAndStockpile()
     return Gates.GetBaseAndStockpileStatus().enabled
 end
 
 function Gates.HasColony()
-    local snapshot = colonyManagementSnapshot()
+    local state = PNC.Network and PNC.Network.ClientState or nil
+    if state and state.colonyManagement == nil and state.colonyBase == nil then
+        return false
+    end
+    local snapshot = baseSnapshot()
     local colony = type(snapshot) == "table" and snapshot.colony or nil
     return type(colony) == "table" and tostring(colony.id or "") ~= ""
 end
@@ -241,19 +266,19 @@ local function openResearch(_, owner)
     return false
 end
 
-local function openBuilding(_, owner)
-    trace("pnc_building_open_start", "has_owner=" .. tostring(owner ~= nil)
+local function openBase(_, owner)
+    trace("pnc_base_open_start", "has_owner=" .. tostring(owner ~= nil)
         .. " available=" .. tostring((PNC.BaseUI or PNC.BuildingUI) ~= nil
             and (PNC.BaseUI or PNC.BuildingUI).Open ~= nil))
-    local building = PNC.BaseUI or PNC.BuildingUI
-    if building and type(building.Open) == "function" then
-        local result = building.Open(owner)
-        trace("pnc_building_open_result",
+    local base = PNC.BaseUI or PNC.BuildingUI
+    if base and type(base.Open) == "function" then
+        local result = base.Open(owner)
+        trace("pnc_base_open_result",
             "result=" .. tostring(result ~= nil))
         return result
     end
-    trace("pnc_building_open_result",
-        "result=false reason=missing_building_ui")
+    trace("pnc_base_open_result",
+        "result=false reason=missing_base_ui")
     return false
 end
 
@@ -285,8 +310,8 @@ local function buildStockpile(_, owner)
     return result
 end
 
-Registry.SetCategoryOrder({ "work", "zone", "events", "colonist", "storage",
-    "research", "stockpile", "building" })
+Registry.SetCategoryOrder({ "work", "workshop", "zone", "colony", "events", "colonist", "storage",
+    "research", "stockpile", "base" })
 
 Registry.RegisterCategory({
     id = "work",
@@ -315,12 +340,27 @@ Registry.RegisterCategory({
     titleFallback = "Zone",
     tooltipKey = "UI_PNC_CommandHub_ZoneHelp",
     tooltipFallback = "Assign work areas for colony activities",
-    enabled = Gates.HasBaseAndStockpile,
-    disabledTooltip = Gates.BaseAndStockpileDisabledTooltip,
+    enabled = Gates.HasBase,
+    disabledTooltip = Gates.BaseZoneDisabledTooltip,
     onClick = toggleChild("zone"),
     selected = function() return isOpen("zone") end,
     closeHub = false,
     actions = {
+        {
+            id = "base_zone",
+            source = "ProjectHoomans",
+            order = 5,
+            titleKey = "UI_PNC_CommandHub_Zone_Base",
+            titleFallback = "Base Zone",
+            tooltipKey = "UI_PNC_CommandHub_Zone_BaseHelp",
+            tooltipFallback = "Edit the territory that anchors your facilities and storage",
+            visible = Gates.HasBase,
+            enabled = Gates.HasBase,
+            disabledTooltip = Gates.BaseZoneDisabledTooltip,
+            onClick = openZone("base_zone"),
+            selected = function() return isZoneActionOpen("base_zone") end,
+            closeHub = false,
+        },
         {
             id = "lumber",
             source = "ProjectHoomans",
@@ -329,6 +369,8 @@ Registry.RegisterCategory({
             titleFallback = "Chop wood",
             tooltipKey = "UI_PNC_CommandHub_Zone_ChopWoodHelp",
             tooltipFallback = "Set a tree-cutting zone",
+            enabled = Gates.HasBaseAndStockpile,
+            disabledTooltip = Gates.BaseAndStockpileDisabledTooltip,
             onClick = openZone("lumber"),
             selected = function() return isZoneActionOpen("lumber") end,
             closeHub = false,
@@ -341,6 +383,8 @@ Registry.RegisterCategory({
             titleFallback = "Grab corpse",
             tooltipKey = "UI_PNC_CommandHub_Zone_GrabCorpseHelp",
             tooltipFallback = "Choose a corpse source and destination area",
+            enabled = Gates.HasBaseAndStockpile,
+            disabledTooltip = Gates.BaseAndStockpileDisabledTooltip,
             onClick = openZone("corpse_haul"),
             selected = function() return isZoneActionOpen("corpse_haul") end,
             closeHub = false,
@@ -353,6 +397,8 @@ Registry.RegisterCategory({
             titleFallback = "Fishing",
             tooltipKey = "UI_PNC_CommandHub_Zone_FishingHelp",
             tooltipFallback = "Set a shoreline fishing zone",
+            enabled = Gates.HasBaseAndStockpile,
+            disabledTooltip = Gates.BaseAndStockpileDisabledTooltip,
             onClick = openZone("fishing"),
             selected = function() return isZoneActionOpen("fishing") end,
             closeHub = false,
@@ -438,19 +484,19 @@ Registry.RegisterCategory({
 })
 
 Registry.RegisterCategory({
-    id = "building",
+    id = "base",
     source = "ProjectHoomans",
     order = 80,
-    childID = "building",
+    childID = "base",
     useChildren = false,
     titleKey = "UI_PNC_CommandHub_Category_Base",
     titleFallback = "Base",
-    tooltipKey = "UI_PNC_CommandHub_BuildingHelp",
+    tooltipKey = "UI_PNC_CommandHub_BaseHelp",
     tooltipFallback = "Plan and place colony buildings",
     enabled = Gates.HasColony,
     disabledTooltip = Gates.BaseDisabledTooltip,
-    onClick = toggleChild("building", openBuilding),
-    selected = function() return isOpen("building") end,
+    onClick = toggleChild("base", openBase),
+    selected = function() return isOpen("base") end,
     closeHub = false,
 })
 

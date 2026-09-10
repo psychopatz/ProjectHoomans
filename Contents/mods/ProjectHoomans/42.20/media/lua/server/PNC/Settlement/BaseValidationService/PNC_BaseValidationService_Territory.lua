@@ -7,6 +7,124 @@ local GridRegion = require "PsychopatzCore/World/PC_GridRegion"
 local Zones = require "PsychopatzCore/World/PC_ZoneRegistry"
 local Definitions = PNC.SettlementDefinitions
 
+local function pointRegion(x, y, z)
+    x, y, z = tonumber(x), tonumber(y), tonumber(z)
+    if not x or not y or not z then return nil end
+    return { levels = { [z] = { rows = { [y] = { x, x } } } } }
+end
+
+local function activeOrder(order)
+    local status = tostring(order and order.status or "")
+    return status ~= "COMPLETED" and status ~= "CANCELLED"
+        and status ~= "FAILED"
+end
+
+local function buildingOrderFootprint(order)
+    local building = PNC.BuildingServiceInternal
+    local payload = order and order.payload or nil
+    local blueprint = payload and payload.blueprint or nil
+    if not building or type(building.FootprintForBlueprint) ~= "function"
+        or not blueprint
+    then return nil end
+    return building.FootprintForBlueprint(blueprint)
+end
+
+local function pendingComponentRegion(component)
+    if type(component) ~= "table" then return nil end
+    if component.kind == "anchor" then
+        return pointRegion(component.x, component.y, component.z)
+    end
+    return component.occupiedRegion or component.region
+end
+
+local function anchor(anchors, anchorType, anchorID, role, region)
+    if type(region) ~= "table"
+        or GridRegion.countTiles(region) <= 0
+    then return end
+    anchors[#anchors + 1] = {
+        type = anchorType,
+        id = anchorID,
+        role = role,
+        region = Validation.ProjectFootprint(region),
+    }
+end
+
+-- Returns the durable world footprint that a base territory must continue to
+-- contain. This is intentionally derived from server records rather than the
+-- client snapshot so shrink decisions cannot strand a facility or stockpile.
+function Validation.RequiredAnchors(base)
+    local anchors = {}
+    local repository = PNC.SettlementRepository
+    if not base or not repository then return anchors end
+
+    for facilityID, _ in pairs(base.facilityIds or {}) do
+        local facility = repository.GetFacility(facilityID)
+        if facility then
+            anchor(anchors, "facility", facility.id, "facility.footprint",
+                facility.constructionRegion)
+            for componentID, _ in pairs(facility.componentIds or {}) do
+                local component = repository.GetComponent(componentID)
+                if component then
+                    local region = component.kind == "anchor"
+                        and pointRegion(component.x, component.y, component.z)
+                        or component.occupiedRegion or component.region
+                    anchor(anchors, "facility_component", component.id,
+                        component.role, region)
+                end
+            end
+        end
+    end
+
+    for nodeID, _ in pairs(base.stockpileNodeIds or {}) do
+        local node = repository.GetStockpileNode(nodeID)
+        if node then
+            anchor(anchors, "stockpile_node", node.id, "storage.access",
+                pointRegion(node.x, node.y, node.z))
+        end
+    end
+
+    local work = PNC.WorkRepository
+    for orderID, order in pairs(work and work.State
+        and work.State.byId or {}) do
+        local sameBase = tostring(order.baseId or "")
+            == tostring(base.id or "")
+        if activeOrder(order) and sameBase
+            and order.operation == "BUILD_OBJECT" then
+            anchor(anchors, "building_order", orderID, "building.footprint",
+                buildingOrderFootprint(order))
+        end
+        if activeOrder(order) and sameBase
+            and order.operation == "RECONSTRUCT" then
+            local payload = order.payload or {}
+            local change = payload.change or {}
+            if change.action == "set" and change.component then
+                local component = change.component
+                anchor(anchors, "pending_component",
+                    component.id or orderID, component.role,
+                    pendingComponentRegion(component))
+            elseif change.action == "replace_role"
+                and type(change.anchors) == "table"
+            then
+                for index, component in ipairs(change.anchors) do
+                    anchor(anchors, "pending_component",
+                        tostring(orderID) .. ":" .. tostring(index),
+                        change.role, pointRegion(component.x, component.y,
+                            component.z))
+                end
+            end
+        end
+    end
+    return anchors
+end
+
+function Validation.RequiredFootprint(base)
+    local footprint = { levels = {} }
+    for _, required in ipairs(Validation.RequiredAnchors(base)) do
+        footprint = GridRegion.union(footprint, required.region)
+    end
+    return footprint
+end
+
 function Validation.CanChange(base, current, delta, operation, expectedRevision)
     if not base then return H.Result(false, "BASE_NOT_FOUND") end
     if expectedRevision ~= nil and tonumber(expectedRevision) ~= base.revision then
@@ -25,32 +143,14 @@ function Validation.CanChange(base, current, delta, operation, expectedRevision)
         return H.Result(false, "BASE_CAPACITY_EXCEEDED", {
             claimed = claimed, capacity = capacity })
     end
-    if operation == "REMOVE" and PNC.SettlementRepository then
-        for facilityId, _ in pairs(base.facilityIds or {}) do
-            local facility = PNC.SettlementRepository.GetFacility(facilityId)
-            for componentId, _ in pairs(facility and facility.componentIds or {}) do
-                local component = PNC.SettlementRepository.GetComponent(componentId)
-                if component and component.kind == "anchor"
-                    and not GridRegion.containsXY(candidate, component.x, component.y)
-                then
-                    return H.Result(false, "OUTSIDE_BASE", { componentId = componentId })
-                end
-                local externalStockpileRegion = facility
-                    and facility.definitionId == "stockpile"
-                    and component and component.role == "storage.stockpile"
-                if component and component.kind == "region"
-                    and not externalStockpileRegion
-                    and not GridRegion.containsRegion(candidate,
-                        Validation.ProjectFootprint(component.region))
-                then
-                    return H.Result(false, "OUTSIDE_BASE", { componentId = componentId })
-                end
-            end
-        end
-        for nodeId, _ in pairs(base.stockpileNodeIds or {}) do
-            local node = PNC.SettlementRepository.GetStockpileNode(nodeId)
-            if node and not GridRegion.containsXY(candidate, node.x, node.y) then
-                return H.Result(false, "OUTSIDE_BASE", { nodeId = nodeId })
+    if operation == "REMOVE" then
+        for _, required in ipairs(Validation.RequiredAnchors(base)) do
+            if not GridRegion.containsRegion(candidate, required.region) then
+                return H.Result(false, "OUTSIDE_BASE", {
+                    anchorType = required.type,
+                    anchorId = required.id,
+                    role = required.role,
+                })
             end
         end
     end

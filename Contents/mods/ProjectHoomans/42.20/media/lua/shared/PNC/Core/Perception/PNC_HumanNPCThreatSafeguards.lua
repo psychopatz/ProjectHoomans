@@ -1,10 +1,12 @@
 -- Keep PNC live bodies compatible with vanilla IsoPlayer threat evaluation.
 --
--- PNC actors intentionally remain IsoZombie instances for animation and
--- replication. IsoPlayer.updateLOS() therefore needs a synchronous exclusion
--- around an exact native pass. The flag must never survive into the normal
--- IsoZombie update, because the live-body safety path treats it as native NPC
--- state and may otherwise remove the actor.
+-- IMPORTANT: PNC does not perform a grapple attack or drag a corpse here.
+-- Build 42 does not expose a neutral "ignore this object during updateLOS"
+-- switch, so the threat recount currently borrows IsoZombie's native
+-- ReanimatedForGrappleOnly flag for one synchronous LOS pass. That flag is
+-- actually corpse-drag lifecycle state: it affects targeting, networking and
+-- death handling. It must be set only around updateLOS() and released before
+-- this callback returns; it must never become a persistent NPC state.
 
 PNC = PNC or {}
 PNC.HumanNPCThreatSafeguards = PNC.HumanNPCThreatSafeguards or {}
@@ -15,8 +17,12 @@ local Core = PNC.Core
 Safeguards.PlayerState = Safeguards.PlayerState or {}
 Safeguards.KnownBodies = Safeguards.KnownBodies
     or setmetatable({}, { __mode = "k" })
-Safeguards.LeasedBodies = Safeguards.LeasedBodies
+-- Reuse the old field once during hot reload so a prior lease is still
+-- released by OnResetLua instead of being stranded under the old name.
+Safeguards.LOSLeaseBodies = Safeguards.LOSLeaseBodies
+    or Safeguards.LeasedBodies
     or setmetatable({}, { __mode = "k" })
+Safeguards.LeasedBodies = nil
 
 local function listSize(list)
     if not list then return 0 end
@@ -205,7 +211,7 @@ local function seedManagedBodies(player, bodies)
     end
 end
 
-local function restoreLease(state)
+local function releaseLOSLease(state)
     local body
     local entry
     local leaseCount
@@ -214,14 +220,13 @@ local function restoreLease(state)
         entry = state.bodies[i]
         body = entry.body
         if body then
-            leaseCount = (Safeguards.LeasedBodies[body] or 1) - 1
+            leaseCount = (Safeguards.LOSLeaseBodies[body] or 1) - 1
             if leaseCount > 0 then
-                Safeguards.LeasedBodies[body] = leaseCount
+                Safeguards.LOSLeaseBodies[body] = leaseCount
             else
-                Safeguards.LeasedBodies[body] = nil
-                -- Also clear a flag left by a prior hot reload of the old
-                -- cross-tick implementation. Managed bodies must never leave
-                -- this native state set between LOS passes.
+                Safeguards.LOSLeaseBodies[body] = nil
+                -- Clear the borrowed native corpse-drag flag. This releases a
+                -- LOS lease; it does not start or end vanilla grappling.
                 if body.setReanimatedForGrappleOnly then
                     pcall(body.setReanimatedForGrappleOnly, body, false)
                 end
@@ -283,8 +288,8 @@ function Safeguards.RegisterHumanBody(body)
     return true
 end
 
-function Safeguards.IsBodyLeased(body)
-    return body and (Safeguards.LeasedBodies[body] or 0) > 0 or false
+function Safeguards.IsBodyLOSLeaseActive(body)
+    return body and (Safeguards.LOSLeaseBodies[body] or 0) > 0 or false
 end
 
 function Safeguards.BeginPlayerUpdate(player)
@@ -292,7 +297,7 @@ function Safeguards.BeginPlayerUpdate(player)
     local state = Safeguards.PlayerState[key] or {}
     if not player then return false end
     -- OnPlayerUpdate is raised immediately before the engine's own LOS pass.
-    -- Only remember the frame here; holding the native grapple-only flag until
+    -- Only remember the frame here; holding the borrowed corpse-drag flag until
     -- OnTick changes the live NPC's normal IsoZombie update and can kill it.
     state.pending = true
     state.panicBefore = readPanic(player)
@@ -329,15 +334,15 @@ function Safeguards.RefreshVanillaThreatCounters(player)
         previous = body.isReanimatedForGrappleOnly
             and body:isReanimatedForGrappleOnly() or false
         entries[i] = { body = body, previous = previous }
-        Safeguards.LeasedBodies[body] =
-            (Safeguards.LeasedBodies[body] or 0) + 1
+        Safeguards.LOSLeaseBodies[body] =
+            (Safeguards.LOSLeaseBodies[body] or 0) + 1
         if not previous then body:setReanimatedForGrappleOnly(true) end
     end
     local ok = pcall(player.updateLOS, player)
     refreshed = ok == true
     realVisible = hasRealZombieVisible(player)
     seedManagedBodies(player, entries)
-    restoreLease({ bodies = entries })
+    releaseLOSLease({ bodies = entries })
     state.lastRealVisible = realVisible
     state.pending = false
     Safeguards.PlayerState[key] = state
@@ -389,14 +394,14 @@ end
 
 function Safeguards.OnResetLua()
     local body
-    for body, _ in pairs(Safeguards.LeasedBodies) do
+    for body, _ in pairs(Safeguards.LOSLeaseBodies) do
         if body and body.setReanimatedForGrappleOnly then
             pcall(body.setReanimatedForGrappleOnly, body, false)
         end
     end
     Safeguards.PlayerState = {}
     Safeguards.KnownBodies = setmetatable({}, { __mode = "k" })
-    Safeguards.LeasedBodies = setmetatable({}, { __mode = "k" })
+    Safeguards.LOSLeaseBodies = setmetatable({}, { __mode = "k" })
 end
 
 if Events and Events.OnPlayerUpdate then

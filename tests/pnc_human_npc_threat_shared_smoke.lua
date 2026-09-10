@@ -30,7 +30,7 @@ local visible = 0
 local close = 0
 local spotted = {}
 local lastSpotted = {}
-local grappleOnly = false
+local nativeCorpseDragFlag = false
 local managedData = { PNC_NPC = true }
 
 local managedBody = {
@@ -41,8 +41,8 @@ local managedBody = {
     getX = function() return 2 end,
     getY = function() return 2 end,
     getZ = function() return 0 end,
-    isReanimatedForGrappleOnly = function() return grappleOnly end,
-    setReanimatedForGrappleOnly = function(_, value) grappleOnly = value end,
+    isReanimatedForGrappleOnly = function() return nativeCorpseDragFlag end,
+    setReanimatedForGrappleOnly = function(_, value) nativeCorpseDragFlag = value end,
 }
 
 local player = {
@@ -126,7 +126,8 @@ safeguards.OnTick()
 T.equal(visible, 0, "authority LOS excludes managed human bodies")
 T.equal(close, 0, "authority close counter excludes managed human bodies")
 T.equal(panic, 2, "authority panic does not increase for managed human bodies")
-T.falsy(grappleOnly, "authority LOS lease restores the native flag")
+T.falsy(nativeCorpseDragFlag,
+    "authority LOS lease releases the native corpse-drag flag")
 
 spotted[2] = ordinaryZombie
 panic = 3
@@ -136,6 +137,7 @@ safeguards.OnTick()
 T.equal(visible, 1, "authority LOS keeps ordinary zombies")
 T.equal(close, 1, "authority close counter keeps ordinary zombies")
 T.equal(panic, 3, "authority panic remains available for ordinary zombies")
-T.falsy(grappleOnly, "authority lease does not leak with ordinary zombies")
+T.falsy(nativeCorpseDragFlag,
+    "authority LOS lease does not leak with ordinary zombies")
 
 T.finish("pnc_human_npc_threat_shared_smoke")

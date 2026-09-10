@@ -107,7 +107,7 @@ function ISPNCBaseWindow:onResponsiveLayout()
     local baseActive = self.tab == "base"
     self.baseSummary:setVisible(baseActive)
     if baseActive then
-        local summaryHeight = Layout.Pixels(54, self.uiScale)
+        local summaryHeight = Layout.Pixels(68, self.uiScale)
         Layout.SetBounds(self.baseSummary, body.x, body.y,
             body.width, summaryHeight)
         body.y = body.y + summaryHeight + gap

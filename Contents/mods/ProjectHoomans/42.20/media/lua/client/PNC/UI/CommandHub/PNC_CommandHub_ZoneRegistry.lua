@@ -11,6 +11,7 @@ local Registry = PNC.CommandHub.ZoneRegistry
 local GridRegion = require "PsychopatzCore/World/PC_GridRegion"
 local Selector = require "PsychopatzCore/UI/World/PsychopatzGridRegionSelector"
 local FishingActions = require "PNC/UI/Communities/ColonyManagement/SettlementManagement/PNC_SettlementManagement_FishingActions"
+local BaseTerritory = require "PNC/UI/CommandHub/PNC_CommandHub_BaseTerritoryActions"
 local CorpseHaulUI = PNC.CommandHub.CorpseHaulUI
 
 Registry.Definitions = Registry.Definitions or {}
@@ -109,6 +110,9 @@ local function validateFishing(region, stats, selector)
 end
 
 local function stateFor(snapshot, id)
+    if id == "base_zone" then
+        return snapshot and snapshot.settlement or nil
+    end
     if id == "corpse_haul" then
         return snapshot and snapshot.settlement
             and snapshot.settlement.corpseHaul or nil
@@ -182,6 +186,11 @@ end
 local function zoneSummary(zone, kind)
     if not zone then return tr("UI_PNC_CommandHub_Zone_NotConfigured",
         "NOT CONFIGURED") end
+    if kind == "base_zone" then
+        local geometry = zone.geometry
+        local region = geometry and (geometry.region or geometry) or nil
+        return regionSummary(region)
+    end
     if kind == "lumber" then
         return tostring(zone.available or 0) .. " "
             .. tr("UI_PNC_CommandHub_Zone_TreesReady", "TREES READY")
@@ -192,6 +201,40 @@ local function zoneSummary(zone, kind)
     end
     return tr("UI_PNC_CommandHub_Zone_Configured", "CONFIGURED")
 end
+
+Registry.Register({
+    id = "base_zone", order = 5,
+    titleKey = "UI_PNC_CommandHub_Zone_Base",
+    titleFallback = "Base Zone",
+    helpKey = "UI_PNC_CommandHub_Zone_BaseHelp",
+    helpFallback = "Protect the facilities and storage that anchor your base.",
+    getState = function(snapshot) return stateFor(snapshot, "base_zone") end,
+    applyResult = BaseTerritory.ApplyResult,
+    sections = {
+        {
+            id = "base", titleKey = "UI_PNC_CommandHub_Zone_BaseArea",
+            titleFallback = "BASE ZONE",
+            controls = {
+                {
+                    id = "expand", action = "expand",
+                    titleKey = "UI_PNC_Base_ExpandAction",
+                    titleFallback = "EXPAND TERRITORY",
+                    variant = "primary",
+                },
+                {
+                    id = "shrink", action = "shrink",
+                    titleKey = "UI_PNC_Base_ShrinkAction",
+                    titleFallback = "SHRINK TERRITORY",
+                    variant = "warning",
+                },
+            },
+            open = function(window, operation)
+                return BaseTerritory.Begin(window, operation)
+            end,
+            summary = function(zone) return zoneSummary(zone, "base_zone") end,
+        },
+    },
+})
 
 local function openRegion(window, definition, section)
     local zone = window:getZoneState()

@@ -211,6 +211,18 @@ PNC = {
 local Management = T.load(ROOT .. "Colony/PNC_ColonyManagement.lua")
 local player = { getUsername = function() return "Tester" end }
 local snapshot = Management.BuildSnapshot(player)
+local baseSnapshot = Management.BuildBaseSnapshot(player)
+
+T.equal(baseSnapshot.colony.id, community.id,
+    "base bootstrap resolves the active player colony")
+T.equal(baseSnapshot.colony.factionID, faction.id,
+    "base bootstrap preserves the owning faction")
+T.equal(baseSnapshot.settlement.id, "base_player",
+    "base bootstrap resolves the existing base")
+T.equal(baseSnapshot.people, nil,
+    "base bootstrap does not include the full colonist payload")
+T.equal(baseSnapshot.building, nil,
+    "base bootstrap does not include the full building catalog")
 
 T.equal(#snapshot.people, 1, "owned companion appears")
 T.equal(snapshot.people[1].name, "Alex Rivera", "companion identity presented")

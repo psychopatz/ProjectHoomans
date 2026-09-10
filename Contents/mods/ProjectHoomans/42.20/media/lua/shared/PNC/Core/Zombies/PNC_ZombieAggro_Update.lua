@@ -73,6 +73,9 @@ local function refreshPursuitPath(zombie, npcBody, now)
     local modData = Internal.getZombieModData(zombie)
     local targetX = npcBody:getX()
     local targetY = npcBody:getY()
+    local dx = targetX - zombie:getX()
+    local dy = targetY - zombie:getY()
+    local distanceSq = (dx * dx) + (dy * dy)
     local lastX = modData and tonumber(modData.PNC_AggroPathX) or nil
     local lastY = modData and tonumber(modData.PNC_AggroPathY) or nil
     local movedSq = lastX and lastY and Core.DistanceSq(lastX, lastY, targetX, targetY) or math.huge
@@ -99,9 +102,30 @@ local function refreshPursuitPath(zombie, npcBody, now)
         modData.PNC_AggroPathX = targetX
         modData.PNC_AggroPathY = targetY
     end
-    -- Coordinate pursuit works for an embodied NPC even though its engine type
-    -- is IsoZombie. pathToCharacter may reject zombie-shaped targets.
-    if zombie.pathToLocationF then
+    -- The path request is only a transient behavior request. In singleplayer
+    -- the next WalkTowardState update follows zombie.target, so keep the
+    -- selected NPC as the native target for the full pursuit interval.
+    if zombie.setTarget
+        and (not zombie.getTarget or zombie:getTarget() ~= npcBody)
+    then
+        zombie:setTarget(npcBody)
+        if distanceSq > (3.5 * 3.5) and zombie.spotted then
+            zombie:spotted(npcBody, false)
+        end
+    end
+    -- Build 42 accepts IsoGameCharacter targets here, and the managed NPC
+    -- body is an IsoZombie-shaped IsoGameCharacter. Use the moving character
+    -- goal when visible, with coordinate pursuit as the robust fallback.
+    local canSee = true
+    if zombie.CanSee then
+        canSee = zombie:CanSee(npcBody) == true
+    end
+    if canSee and zombie.pathToCharacter then
+        zombie:pathToCharacter(npcBody)
+        if Diagnostics then
+            Diagnostics.Increment("ZombieAggro.PathRequests")
+        end
+    elseif zombie.pathToLocationF then
         zombie:pathToLocationF(targetX, targetY, npcBody:getZ())
         if Diagnostics then
             Diagnostics.Increment("ZombieAggro.PathRequests")
@@ -143,8 +167,15 @@ local function pursueForcedTarget(zombie, npcBody, record, now)
         end
     elseif not isMultiplayerServer() then
         -- SP/local authority owns the native zombie path. In MP the owning
-        -- client performs coordinate-only pursuit while this server code owns
-        -- only the forced-target lease, bite validation, and damage.
+        -- client performs native pursuit while this server code owns only the
+        -- forced-target lease, bite validation, and damage.
+        if zombie.isUseless and zombie.setUseless
+            and zombie:isUseless()
+        then
+            -- Match Bandits for the active ordinary-zombie lane. Do this only
+            -- while a pursuit is active; distant zombies retain engine tiering.
+            zombie:setUseless(false)
+        end
         refreshPursuitPath(zombie, npcBody, now)
     end
 end
@@ -153,7 +184,17 @@ local function acquireNearestTarget(zombie, closerThanDistSq)
     local nearestRecord
     local nearestBody
     local nearestDistSq
+    local nearestPlayer
+    local nearestPlayerDistSq
     nearestRecord, nearestBody, nearestDistSq = Internal.findNearestLiveNPC(zombie, Const.ZOMBIE_AGGRO_RADIUS)
+    nearestPlayer, nearestPlayerDistSq = Internal.findNearestLivePlayer(
+        zombie,
+        Const.ZOMBIE_AGGRO_RADIUS
+    )
+    if nearestPlayer and nearestPlayerDistSq <= nearestDistSq then
+        setNoLungeAttack(zombie, false)
+        return nil, nil
+    end
     if nearestRecord and nearestBody and (not closerThanDistSq or nearestDistSq < closerThanDistSq) then
         Internal.forceAggro(zombie, nearestBody)
         setNoLungeAttack(zombie, math.sqrt(nearestDistSq) <= Const.ZOMBIE_AGGRO_KEEP_RADIUS)

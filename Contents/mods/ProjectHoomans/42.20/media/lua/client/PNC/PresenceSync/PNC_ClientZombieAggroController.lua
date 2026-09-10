@@ -51,6 +51,7 @@ local NPC_BODY_INDEX = {
     buckets = {},
 }
 local NATIVE_ATTACK_ESCAPE_LOGGED = setmetatable({}, { __mode = "k" })
+local releaseManagedTarget
 
 -- TurnAlerted is still a vanilla engine transition. PNC no longer produces,
 -- suppresses, or resets it, but the client aggro lane must not claim a zombie
@@ -120,12 +121,26 @@ end
 
 local function rebuildNPCBodyIndex(now)
     local buckets = {}
+    local seenBodies = {}
     local id
+    local snapshot
     local body
     local key
     local bucket
-    for id, body in pairs(Sync.BodyByID or {}) do
-        if body then
+    local snapshots = ClientState and ClientState.snapshots or {}
+    for id, snapshot in pairs(snapshots) do
+        body = nil
+        if snapshot
+            and snapshot.interestDetailed ~= false
+            and snapshot.presenceState == Const.PRESENCE_LIVE
+            and snapshot.alive ~= false
+        then
+            body = Internal.ResolveSnapshotBody
+                and Internal.ResolveSnapshotBody(snapshot)
+                or Sync.BodyByID and Sync.BodyByID[tostring(id)] or nil
+        end
+        if body and not seenBodies[body] then
+            seenBodies[body] = true
             key = bucketKey(
                 cellCoordinate(body:getX()),
                 cellCoordinate(body:getY()),
@@ -206,19 +221,106 @@ local function findNearestNPCBody(zombie, now)
     return bestBody, bestDistanceSq
 end
 
-local function currentPlayerDistanceSq(zombie)
-    local target = zombie.getTarget and zombie:getTarget() or nil
-    local dx
-    local dy
-    if not target
-        or not instanceof
-        or not instanceof(target, "IsoPlayer")
-    then
-        return math.huge
+local function isLivePlayer(player)
+    return player
+        and instanceof
+        and instanceof(player, "IsoPlayer")
+        and not (player.isDead and player:isDead())
+end
+
+local function findNearestPlayer(zombie)
+    local bestPlayer
+    local bestDistanceSq = math.huge
+    local seenPlayers = {}
+    local currentTarget = zombie.getTarget
+        and zombie:getTarget() or nil
+    local zombieZ = zombie:getZ()
+    local zombieX = zombie:getX()
+    local zombieY = zombie:getY()
+
+    local function consider(player)
+        local dx
+        local dy
+        local distanceSq
+        if not isLivePlayer(player) or seenPlayers[player]
+            or math.abs(player:getZ() - zombieZ) >= 1
+        then
+            return
+        end
+        seenPlayers[player] = true
+        dx = player:getX() - zombieX
+        dy = player:getY() - zombieY
+        distanceSq = (dx * dx) + (dy * dy)
+        if distanceSq < bestDistanceSq then
+            bestPlayer = player
+            bestDistanceSq = distanceSq
+        end
     end
-    dx = target:getX() - zombie:getX()
-    dy = target:getY() - zombie:getY()
-    return (dx * dx) + (dy * dy)
+
+    -- Preserve the engine's current player target as a candidate even when
+    -- it is outside the local player list. This prevents an NPC inside the
+    -- search radius from displacing a farther player unless it is actually
+    -- the nearer target.
+    consider(currentTarget)
+
+    if getOnlinePlayers then
+        local players = getOnlinePlayers()
+        local i
+        if players and players.size then
+            for i = 0, players:size() - 1 do
+                consider(players:get(i))
+            end
+        end
+    end
+    if getNumActivePlayers and getSpecificPlayer then
+        local i
+        for i = 0, getNumActivePlayers() - 1 do
+            consider(getSpecificPlayer(i))
+        end
+    end
+    return bestPlayer, bestDistanceSq
+end
+
+local function findNearestTarget(zombie, now)
+    local npcBody
+    local npcDistanceSq
+    local player
+    local playerDistanceSq
+    npcBody, npcDistanceSq = findNearestNPCBody(zombie, now)
+    player, playerDistanceSq = findNearestPlayer(zombie)
+    if npcBody and npcDistanceSq < playerDistanceSq then
+        return npcBody, npcDistanceSq, true
+    end
+    return player, playerDistanceSq, false
+end
+
+local function clearHeldItems(zombie)
+    -- Build 42's multiplayer dropHeavyItems path sends a player-only packet.
+    -- Ordinary zombies can reach that path while pursuing a managed NPC, so
+    -- mirror Bandits and remove carried items before native pursuit continues.
+    if zombie.getPrimaryHandItem and zombie:getPrimaryHandItem()
+        and zombie.setPrimaryHandItem
+    then
+        zombie:setPrimaryHandItem(nil)
+    end
+    if zombie.getSecondaryHandItem and zombie:getSecondaryHandItem()
+        and zombie.setSecondaryHandItem
+    then
+        zombie:setSecondaryHandItem(nil)
+    end
+end
+
+local function nativeLocalOwnership(zombie)
+    if zombie and zombie.isLocal then
+        -- Build 42 already knows which client owns this zombie. Prefer that
+        -- signal over a nearest-player approximation so only the native
+        -- simulation owner drives pursuit and target state.
+        return zombie:isLocal() == true
+    end
+    if zombie and zombie.isRemoteZombie then
+        return zombie:isRemoteZombie() ~= true
+    end
+    return nil
 end
 
 local function isLocalOwner(zombie, now)
@@ -234,8 +336,11 @@ local function isLocalOwner(zombie, now)
     if entry.owned == nil
         or now >= (tonumber(entry.nextAt) or 0)
     then
-        entry.owned = not Internal.IsLocalZombieController
-            or Internal.IsLocalZombieController(zombie)
+        entry.owned = nativeLocalOwnership(zombie)
+        if entry.owned == nil then
+            entry.owned = not Internal.IsLocalZombieController
+                or Internal.IsLocalZombieController(zombie)
+        end
         entry.nextAt = now + CONTROLLER_CHECK_MS
     end
     return entry.owned == true
@@ -279,6 +384,7 @@ end
 local function applyAggro(zombie, body, distanceSq, now)
     local currentTarget
     local canSee = true
+    clearHeldItems(zombie)
     if body.setZombiesDontAttack then
         body:setZombiesDontAttack(false)
     end
@@ -288,6 +394,20 @@ local function applyAggro(zombie, body, distanceSq, now)
         zombie:setUseless(false)
     end
     currentTarget = zombie.getTarget and zombie:getTarget() or nil
+    -- The path request alone is transient. Build 42's WalkTowardState will
+    -- reissue a route to zombie.target on the next engine update, so make the
+    -- selected NPC the native target before requesting its path, including at
+    -- distances greater than the abstract damage range.
+    if currentTarget ~= body and zombie.setTarget then
+        zombie:setTarget(body)
+        if distanceSq > (3.5 * 3.5) and zombie.spotted then
+            -- Replace Build 42's remembered player location as well as the
+            -- native target. Otherwise WalkTowardState can continue using a
+            -- stale lastTargetSeen position even after the path handoff.
+            zombie:spotted(body, false)
+        end
+        currentTarget = body
+    end
     if zombie.CanSee then
         canSee = zombie:CanSee(body) == true
     end
@@ -342,7 +462,21 @@ local function applyAggro(zombie, body, distanceSq, now)
     end
 end
 
-local function releaseManagedTarget(zombie)
+local function applyPlayerTarget(zombie, player)
+    local currentTarget = zombie.getTarget and zombie:getTarget() or nil
+    if isManagedBody(currentTarget) then
+        releaseManagedTarget(zombie)
+        currentTarget = zombie.getTarget and zombie:getTarget() or nil
+    end
+    if player and currentTarget ~= player and zombie.setTarget then
+        zombie:setTarget(player)
+    end
+    if zombie.setVariable then
+        zombie:setVariable("NoLungeAttack", false)
+    end
+end
+
+releaseManagedTarget = function(zombie)
     local target = zombie.getTarget and zombie:getTarget() or nil
     local attackedBy = zombie.getAttackedBy
         and zombie:getAttackedBy() or nil
@@ -369,9 +503,10 @@ end
 
 function Internal.UpdateClientZombieAggro(zombie, now)
     local actionState
-    local currentTarget
     local body
     local distanceSq
+    local target
+    local targetIsNPC
     now = tonumber(now) or (Core and Core.Now and Core.Now() or 0)
     if not zombie
         or isManagedBody(zombie)
@@ -385,9 +520,8 @@ function Internal.UpdateClientZombieAggro(zombie, now)
             zombie:getActionStateName() or ""
         ))
         or ""
-    currentTarget = zombie.getTarget and zombie:getTarget() or nil
     if (actionState == "attack" or actionState == "attack-network")
-        and isManagedBody(currentTarget)
+        and isManagedBody(zombie.getTarget and zombie:getTarget() or nil)
     then
         if hasActiveBiteReplica(zombie, now) then
             return false
@@ -415,9 +549,17 @@ function Internal.UpdateClientZombieAggro(zombie, now)
     if not isScheduledAggroTier(zombie, now) then
         return false
     end
-    body, distanceSq = findNearestNPCBody(zombie, now)
+    target, distanceSq, targetIsNPC = findNearestTarget(zombie, now)
+    if not target then
+        releaseManagedTarget(zombie)
+        return false
+    end
+    if not targetIsNPC then
+        applyPlayerTarget(zombie, target)
+        return false
+    end
+    body = target
     if not body
-        or currentPlayerDistanceSq(zombie) <= distanceSq
     then
         releaseManagedTarget(zombie)
         return false

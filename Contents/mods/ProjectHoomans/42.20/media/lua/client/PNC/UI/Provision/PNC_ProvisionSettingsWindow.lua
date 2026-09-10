@@ -1,4 +1,5 @@
 require "PsychopatzCore/UI/PsychopatzUI"
+require "PsychopatzCore/UI/Components/PsychopatzWidgetWindow"
 require "ISUI/ISLabel"
 require "ISUI/ISComboBox"
 local Model = require "PNC/UI/Provision/PNC_ProvisionSettingsModel"
@@ -11,11 +12,24 @@ PNC.ProvisionSettingsUI = PNC.ProvisionSettingsUI or {}
 local ProvisionUI = PNC.ProvisionSettingsUI
 local Client = PNC.ProvisionSettingsClient
 local UI = PsychopatzCore.UI
-local Layout = UI.Layout
+local Options = require "PsychopatzCore/UI/PsychopatzCommandHubOptions"
+local WidgetWindow = UI.WidgetWindow
 
 local function tr(key)
     local value = getText and getText(key) or nil
     return value and value ~= "" and value ~= key and value or key
+end
+
+local function syncCommandHub()
+    local hub = PNC.CommandHub
+    local owner = hub and hub.instance or nil
+    if not owner or not owner.getIsVisible or not owner:getIsVisible() then
+        return
+    end
+    local controller = hub.ChildController
+    if controller and controller.SyncPositions then
+        controller.SyncPositions()
+    end
 end
 
 ISPNCProvisionSettingsWindow = PsychopatzWindow:derive(
@@ -24,6 +38,7 @@ ISPNCProvisionSettingsWindow = PsychopatzWindow:derive(
 
 function ISPNCProvisionSettingsWindow:initialise()
     PsychopatzWindow.initialise(self)
+    Options.ApplyOpacity(self, Options.GetOpacity())
 end
 
 function ISPNCProvisionSettingsWindow:createChildren()
@@ -63,6 +78,12 @@ function ISPNCProvisionSettingsWindow:createChildren()
     self:buildRuleRows()
     self:requestResponsiveLayout(true)
     self:requestSnapshot()
+    if WidgetWindow then
+        WidgetWindow.Install(self, {
+            id = "pnc-command-hub-colony-provision-widget",
+            onDetachedChanged = syncCommandHub,
+        })
+    end
 end
 
 function ISPNCProvisionSettingsWindow:buildRuleRows()
@@ -86,47 +107,6 @@ function ISPNCProvisionSettingsWindow:buildRuleRows()
             self.scroll, definition, self.model, tr
         )
     end
-end
-
-function ISPNCProvisionSettingsWindow:layoutRows()
-    local y = 8
-    local categoryIndex = 1
-    local currentCategory
-    local width = math.max(260, self.scroll:getWidth() - 18)
-    for _, row in ipairs(self.ruleRows or {}) do
-        if row.definition.category ~= currentCategory then
-            local category = self.categoryLabels[categoryIndex]
-            Layout.SetBounds(category.widget, 8, y,
-                math.max(1, width - 16), 24)
-            y = y + 31
-            categoryIndex = categoryIndex + 1
-            currentCategory = row.definition.category
-        end
-        y = RulePanel.Layout(row, width, y)
-        y = y + 8
-    end
-    self.scroll.contentHeight = y + 8
-    self.scroll:setScrollHeight(self.scroll.contentHeight)
-end
-
-function ISPNCProvisionSettingsWindow:onResponsiveLayout()
-    local rect = self:getContentRect({ top = 30, bottom = 12 })
-    Layout.SetBounds(self.policyLabel, rect.x, rect.y + 5, 68, 24)
-    Layout.SetBounds(self.policyCombo, rect.x + 72, rect.y,
-        math.min(260, rect.width - 72), 26)
-    local footerHeight = 66
-    Layout.SetBounds(self.scroll, rect.x, rect.y + 36, rect.width,
-        rect.height - footerHeight - 36)
-    local statusY = rect.y + rect.height - footerHeight + 5
-    local buttonY = rect.y + rect.height - 30
-    Layout.SetBounds(self.resetButton, rect.x, buttonY,
-        140, 28)
-    Layout.SetBounds(self.cancelButton,
-        rect.x + rect.width - 190, buttonY, 88, 28)
-    Layout.SetBounds(self.applyButton,
-        rect.x + rect.width - 94, buttonY, 94, 28)
-    Layout.SetBounds(self.statusLabel, rect.x, statusY, rect.width, 20)
-    self:layoutRows()
 end
 
 function ISPNCProvisionSettingsWindow:readRows()
@@ -188,9 +168,11 @@ function ISPNCProvisionSettingsWindow:prerender()
         self.lastReceiveAt = update.receivedAt
     end
     PsychopatzWindow.prerender(self)
+    if WidgetWindow then WidgetWindow.Sync(self) end
 end
 
 function ISPNCProvisionSettingsWindow:close()
+    self:saveGeometry(true)
     self:setVisible(false)
     self:removeFromUIManager()
     ProvisionUI.instance = nil
@@ -203,7 +185,9 @@ function ISPNCProvisionSettingsWindow:new(x, y, width, height, options)
     return object
 end
 
-function ProvisionUI.Open()
+require "PNC/UI/Provision/PNC_ProvisionSettingsWindow_Layout"
+
+function ProvisionUI.Open(owner)
     local window = ProvisionUI.instance
     if not window then
         window = UI.NewWindow(ISPNCProvisionSettingsWindow, {
@@ -218,11 +202,17 @@ function ProvisionUI.Open()
         window:instantiate()
         ProvisionUI.instance = window
     end
+    window.owner = owner or window.owner
     window:addToUIManager()
     window:setVisible(true)
+    Options.ApplyOpacity(window, Options.GetOpacity())
     window:bringToTop()
     window:requestSnapshot()
     return window
+end
+
+function ProvisionUI.Close()
+    if ProvisionUI.instance then ProvisionUI.instance:close() end
 end
 
 return ProvisionUI

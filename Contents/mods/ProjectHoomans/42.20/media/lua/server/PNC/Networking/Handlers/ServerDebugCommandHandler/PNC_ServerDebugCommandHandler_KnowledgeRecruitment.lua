@@ -35,11 +35,15 @@ function H.HandleKnowledgeOrRecruitAction(player, args)
                 .. tostring(args.npcID or args.id or "unknown")
                 .. " reason=" .. tostring(reason))
         elseif PNC.ColonyManagement
-            and PNC.ColonyManagement.BuildSnapshot
+            and (PNC.ColonyManagement.BuildBaseSnapshot
+                or PNC.ColonyManagement.BuildSnapshot)
         then
+            local builder = PNC.ColonyManagement.BuildBaseSnapshot
+                or PNC.ColonyManagement.BuildSnapshot
             network.SendColonyManagement(
                 player,
-                PNC.ColonyManagement.BuildSnapshot(player)
+                builder(player),
+                PNC.ColonyManagement.BuildBaseSnapshot and "base" or nil
             )
         end
         return true

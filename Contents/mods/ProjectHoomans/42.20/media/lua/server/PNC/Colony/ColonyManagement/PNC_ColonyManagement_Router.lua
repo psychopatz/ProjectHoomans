@@ -8,6 +8,18 @@ PNC.ColonyManagement.Internal = PNC.ColonyManagement.Internal or {}
 local Management = PNC.ColonyManagement
 local Internal = Management.Internal
 local Definitions = PNC.NeedsDefinitions
+local BASE_SNAPSHOT_ACTIONS = {
+    base_create = true, base_expand = true, base_shrink = true,
+    barricade_build = true, hq_upgrade = true,
+    facility_create = true, facility_upgrade = true,
+    facility_capacity_set = true, facility_component_set = true,
+    facility_component_remove = true, facility_destroy = true,
+    stockpile_node_create = true, stockpile_node_remove = true,
+    farm_plot_crop = true, farm_plot_policy = true, farm_plot_debug = true,
+    facility_anchor_role_replace = true,
+    building_queue = true, building_debug_get_items = true,
+    work_cancel = true, work_resume = true,
+}
 
 
 function Management.HandleAction(player, args)
@@ -28,7 +40,13 @@ function Management.HandleAction(player, args)
         or Internal.handleProductionAction(player, args, action)
         or Internal.handleWorkDebugAction(player, args, action)
         or { ok = false, reason = "unknown_colony_action" }
-    local snapshot = Management.BuildSnapshot(player, {
+    local snapshotBuilder = (args.snapshotScope == "base"
+        or BASE_SNAPSHOT_ACTIONS[action])
+        and Management.BuildBaseSnapshot or Management.BuildSnapshot
+    if type(snapshotBuilder) ~= "function" then
+        snapshotBuilder = Management.BuildSnapshot
+    end
+    local snapshot = snapshotBuilder(player, {
         taskBrainNpcID = args.taskBrainNpcID,
     })
     return snapshot, {

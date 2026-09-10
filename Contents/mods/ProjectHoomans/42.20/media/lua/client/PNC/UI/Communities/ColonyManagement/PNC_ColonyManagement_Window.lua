@@ -257,20 +257,10 @@ function ColonyUI.Open()
 end
 
 function ColonyUI.OpenClaimTerritory()
-    if PNC.CommandHub and PNC.CommandHub.OpenBase then
-        return PNC.CommandHub.OpenBase()
+    if PNC.Core and PNC.Core.LogWarn then
+        PNC.Core.LogWarn("Territory setup is conversation-gated")
     end
-    local window = ColonyUI.Open()
-    if not window then return false end
-    window.pendingBaseAction = "claim"
-    window:requestSnapshot("conversation_set_territory")
-    local snapshot = Client.ReadSnapshot().snapshot or {}
-    if snapshot.settlement then
-        window.pendingBaseAction = nil
-    elseif snapshot.colony then
-        window:refresh()
-    end
-    return true
+    return false, "TERRITORY_SETUP_REQUIRES_CONVERSATION"
 end
 
 function ColonyUI.Toggle()

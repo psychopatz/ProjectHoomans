@@ -21,7 +21,8 @@ end
 
 function RulePanel.Create(parent, definition, model, tr)
     local values = model:Get(definition.id) or definition.defaults
-    local row = { definition = definition, entries = {}, height = 126 }
+    local row = { definition = definition, entries = {},
+        height = Layout.Pixels(126, Layout.Scale()) }
     row.panel = ISPanel:new(0, 0, 100, row.height)
     row.panel:initialise()
     row.panel:instantiate()
@@ -104,19 +105,27 @@ function RulePanel.Refresh(row, model)
     end
 end
 
-function RulePanel.Layout(row, width, y)
+function RulePanel.Layout(row, width, y, uiScale)
     row.y = y
-    local padding = 12
-    local compact = width < 420
-    local panelWidth = math.max(200, width - 8)
-    Layout.SetBounds(row.panel, 4, y, panelWidth,
+    local scale = uiScale or Layout.Scale()
+    local padding = Layout.Pixels(12, scale)
+    local compact = width < Layout.Pixels(420, scale)
+    local panelWidth = math.max(Layout.Pixels(200, scale),
+        width - Layout.Pixels(8, scale))
+    Layout.SetBounds(row.panel, Layout.Pixels(4, scale), y, panelWidth,
         math.max(1, row.height or 1))
     local innerWidth = row.panel:getWidth()
-    Layout.SetBounds(row.title, 12, 9, math.max(1, innerWidth - 24), 24)
-    local enabledX = compact and 12 or math.max(180, innerWidth - 126)
-    Layout.SetBounds(row.enabled, enabledX, compact and 31 or 3,
-        math.max(1, row.enabled.width or 70), 24)
-    local descriptionY = compact and 59 or 36
+    Layout.SetBounds(row.title, padding, Layout.Pixels(9, scale),
+        math.max(1, innerWidth - padding * 2), Layout.Pixels(24, scale))
+    local enabledX = compact and padding
+        or math.max(Layout.Pixels(180, scale),
+            innerWidth - Layout.Pixels(126, scale))
+    Layout.SetBounds(row.enabled, enabledX,
+        compact and Layout.Pixels(31, scale) or Layout.Pixels(3, scale),
+        math.max(1, row.enabled.width or Layout.Pixels(70, scale)),
+        Layout.Pixels(24, scale))
+    local descriptionY = compact and Layout.Pixels(59, scale)
+        or Layout.Pixels(36, scale)
     local lines = wrap(row.descriptionText, innerWidth - padding * 2)
     local visibleLines = math.min(3, #lines)
     for index, widget in ipairs(row.descriptionLines) do
@@ -124,22 +133,31 @@ function RulePanel.Layout(row, width, y)
         if index <= visibleLines then
             UI.SetLabelText(widget, lines[index])
             Layout.SetBounds(widget, padding,
-                descriptionY + (index - 1) * 18,
-                math.max(1, innerWidth - padding * 2), 18)
+                descriptionY + (index - 1) * Layout.Pixels(18, scale),
+                math.max(1, innerWidth - padding * 2),
+                Layout.Pixels(18, scale))
         end
     end
-    local fieldY = descriptionY + visibleLines * 18 + 9
+    local fieldY = descriptionY + visibleLines * Layout.Pixels(18, scale)
+        + Layout.Pixels(9, scale)
     for _, item in ipairs(row.entries) do
-        Layout.SetBounds(item.label, 18, fieldY + 4,
-            math.max(1, innerWidth - 118), 24)
-        Layout.SetBounds(item.entry, math.max(150, innerWidth - 94),
-            fieldY, 76, 24)
-        fieldY = fieldY + 29
+        Layout.SetBounds(item.label, Layout.Pixels(18, scale),
+            fieldY + Layout.Pixels(4, scale),
+            math.max(1, innerWidth - Layout.Pixels(118, scale)),
+            Layout.Pixels(24, scale))
+        Layout.SetBounds(item.entry,
+            math.max(Layout.Pixels(150, scale),
+                innerWidth - Layout.Pixels(94, scale)),
+            fieldY, Layout.Pixels(76, scale), Layout.Pixels(24, scale))
+        fieldY = fieldY + Layout.Pixels(29, scale)
     end
-    Layout.SetBounds(row.measure, 18, fieldY + 2,
-        math.max(1, innerWidth - 36), 24)
-    row.height = fieldY + 28
-    Layout.SetBounds(row.panel, 4, y, panelWidth, row.height)
+    Layout.SetBounds(row.measure, Layout.Pixels(18, scale),
+        fieldY + Layout.Pixels(2, scale),
+        math.max(1, innerWidth - Layout.Pixels(36, scale)),
+        Layout.Pixels(24, scale))
+    row.height = fieldY + Layout.Pixels(28, scale)
+    Layout.SetBounds(row.panel, Layout.Pixels(4, scale), y, panelWidth,
+        row.height)
     return y + row.height
 end
 

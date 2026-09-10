@@ -19,6 +19,9 @@ local LUMBER_COLOR = { r = 0.20, g = 1.00, b = 0.28, a = 0.24 }
 local CORPSE_SOURCE_COLOR = { r = 1.00, g = 0.62, b = 0.12, a = 0.28 }
 local CORPSE_DESTINATION_COLOR = { r = 0.18, g = 0.82, b = 1.00, a = 0.28 }
 local CORPSE_CONFLICT_COLOR = { r = 1.00, g = 0.12, b = 0.08, a = 0.62 }
+local BASE_ZONE_COLOR = { r = 0.12, g = 0.68, b = 1.00, a = 0.18 }
+local BASE_FACILITY_COLOR = { r = 0.98, g = 0.82, b = 0.20, a = 0.34 }
+local BASE_STOCKPILE_COLOR = { r = 0.72, g = 0.35, b = 1.00, a = 0.42 }
 
 local function fishingOverlay()
     -- Resolve lazily so providers can load this manager before the fishing
@@ -53,6 +56,32 @@ local function renderRegion(playerNum, region, color)
                     color.r, color.g, color.b, color.a)
             end
         end
+    end
+end
+
+local function renderPoint(playerNum, point, color)
+    if type(point) ~= "table" then return end
+    local x, y, z = tonumber(point.x), tonumber(point.y), tonumber(point.z)
+    if not x or not y or not z then return end
+    addAreaHighlightForPlayer(playerNum, x, y, x + 1, y + 1, z,
+        color.r, color.g, color.b, color.a)
+end
+
+local function renderBase(playerNum, settlement)
+    local geometry = settlement and settlement.geometry or nil
+    local region = geometry and (geometry.region or geometry) or nil
+    renderRegion(playerNum, region, BASE_ZONE_COLOR)
+
+    for _, facility in ipairs(settlement and settlement.facilities or {}) do
+        renderRegion(playerNum, facility.constructionRegion,
+            BASE_FACILITY_COLOR)
+        if tostring(facility.definitionId or "") == "stockpile" then
+            renderRegion(playerNum, facility.constructionRegion,
+                BASE_STOCKPILE_COLOR)
+        end
+    end
+    for _, node in ipairs(settlement and settlement.stockpileNodes or {}) do
+        renderPoint(playerNum, node, BASE_STOCKPILE_COLOR)
     end
 end
 
@@ -117,6 +146,8 @@ function Overlay.Render()
 
     if Overlay.activeDefinitionID == "lumber" then
         renderRegion(playerNum, Overlay.zone.geometry, LUMBER_COLOR)
+    elseif Overlay.activeDefinitionID == "base_zone" then
+        renderBase(playerNum, Overlay.zone)
     elseif Overlay.activeDefinitionID == "corpse_haul" then
         local sourceRegion = Overlay.zone.sourceRegion
         local destinationRegion = Overlay.zone.destinationRegion

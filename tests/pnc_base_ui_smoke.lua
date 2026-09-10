@@ -34,6 +34,8 @@ local territorySource = T.read("ProjectHoomans", "client",
     "PNC/UI/CommandHub/PNC_CommandHub_BaseTerritoryActions.lua")
 local outcomesSource = T.read("ProjectHoomans", "client",
     "PNC/Conversation/Blocks/ConversationComposer/PNC_ConversationComposer_Outcomes.lua")
+local clientRequestsSource = T.read("ProjectHoomans", "client",
+    "PNC/Networking/PNC_ClientRequests.lua")
 
 T.contains(windowSource, 'id = "pnc-command-hub-base-widget"',
     "Base window is not installed as a detachable widget")
@@ -93,6 +95,10 @@ T.contains(hubSource, "PNC/UI/Base/PNC_Base",
     "Command Hub does not load the Base widget")
 T.contains(hubWindowSource, "function Hub.OpenBase",
     "Command Hub does not expose the Base branch opener")
+T.contains(hubWindowSource, "function Hub.OpenTerritorySetup",
+    "Command Hub does not expose the conversation territory setup opener")
+T.contains(hubWindowSource, "requestColonySnapshot()",
+    "Command Hub does not bootstrap its colony snapshot")
 T.contains(registrySource, "UI_PNC_CommandHub_Category_Base",
     "Command Hub category is not named Base")
 T.contains(registrySource, "enabled = Gates.HasColony",
@@ -101,10 +107,16 @@ T.contains(registrySource, "PNC.BaseUI or PNC.BuildingUI",
     "Command Hub does not prefer the Base widget")
 T.contains(territorySource, "local latest = snapshotFor(window)",
     "Base territory requests still capture stale multiplayer state")
-T.contains(outcomesSource, "PNC.CommandHub.OpenBase",
-    "Conversation territory outcome does not target the Command Hub Base")
-T.contains(baseTabSource, "window.baseIntegrated",
-    "Base tab cannot suppress its duplicate build toolbar")
+T.contains(outcomesSource, "PNC.CommandHub.OpenTerritorySetup",
+    "Conversation territory outcome does not target the Base Zone selector")
+T.contains(clientRequestsSource, 'return true, "sent", args.requestId',
+    "Colony actions do not expose their async request id to Base")
+T.falsy(baseTabSource:find('"claim"', 1, true),
+    "Base tab still exposes a duplicate territory claim control")
+T.falsy(baseTabSource:find('"expand"', 1, true),
+    "Base tab still exposes a duplicate territory expand control")
+T.falsy(baseTabSource:find('"shrink"', 1, true),
+    "Base tab still exposes a duplicate territory shrink control")
 T.contains(baseTabSource, "task and task.id ~= nil",
     "Base tab does not recognize active construction tasks")
 T.contains(queueSource, "Components.SetRowsStable",

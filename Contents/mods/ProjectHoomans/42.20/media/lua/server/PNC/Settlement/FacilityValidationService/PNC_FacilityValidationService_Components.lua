@@ -113,21 +113,15 @@ function Validation.NormalizeComponent(base, facility, input)
         if not GridRegion.isConnected(region, 4) then
             return H.Result(false, "FACILITY_REGION_DISCONNECTED")
         end
-        -- A stockpile can be relocated outside the base only after the
-        -- initial facility has an established construction region. The first
-        -- stockpile is still a facility creation and must remain inside the
-        -- owning base territory.
+        -- A stockpile may be relocated through reconstruction, but the new
+        -- storage region must remain inside the Base Zone. That keeps the
+        -- stockpile a durable territory anchor after the move.
+        if not H.BaseContainsRegion(base, region) then
+            return H.Result(false, "OUTSIDE_BASE")
+        end
         local movingStockpile = facility.definitionId == "stockpile"
             and input.role == "storage.stockpile"
             and facility.constructionRegion ~= nil
-        -- Once established, the stockpile's physical storage area is
-        -- intentionally mobile. It remains owned by this base, but its world
-        -- region may be placed outside the base geometry. Other facility
-        -- regions remain base-constrained; a separate facility.footprint is
-        -- still validated by NormalizeFootprint.
-        if not movingStockpile and not H.BaseContainsRegion(base, region) then
-            return H.Result(false, "OUTSIDE_BASE")
-        end
         if facility.constructionRegion and not movingStockpile then
             local connected = input.role == "work.zone"
                 and regionTouchesFacility(facility, region)

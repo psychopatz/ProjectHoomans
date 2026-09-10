@@ -101,9 +101,26 @@ end
 function Client.ReadSnapshot()
     local state = clientState()
     return {
-        snapshot = state.colonyManagement or {},
-        revision = tonumber(state.colonyManagementRevision) or 0,
-        receivedAt = state.lastColonyManagementReceiveAt,
+        snapshot = state.colonyManagement or state.colonyBase or {},
+        revision = state.colonyManagement
+            and (tonumber(state.colonyManagementRevision) or 0)
+            or (tonumber(state.colonyBaseRevision) or 0),
+        receivedAt = state.colonyManagement
+            and state.lastColonyManagementReceiveAt
+            or state.lastColonyBaseReceiveAt,
+    }
+end
+
+function Client.ReadBaseSnapshot()
+    local state = clientState()
+    return {
+        snapshot = state.colonyBase or state.colonyManagement or {},
+        revision = state.colonyBase
+            and (tonumber(state.colonyBaseRevision) or 0)
+            or (tonumber(state.colonyManagementRevision) or 0),
+        receivedAt = state.colonyBase
+            and state.lastColonyBaseReceiveAt
+            or state.lastColonyManagementReceiveAt,
     }
 end
 
@@ -115,11 +132,28 @@ function Client.HasUpdate(lastRevision, lastReceiveAt)
         update
 end
 
+function Client.HasBaseUpdate(lastRevision, lastReceiveAt)
+    local update = Client.ReadBaseSnapshot()
+    return update.revision > (tonumber(lastRevision) or 0)
+        or (tonumber(update.receivedAt) or 0)
+            > (tonumber(lastReceiveAt) or 0),
+        update
+end
+
 function Client.RequestSnapshot(taskBrainNpcID)
     local ok = false
     local reason = "client_unavailable"
     if PNC.Client and PNC.Client.RequestColonyManagement then
         ok, reason = PNC.Client.RequestColonyManagement(taskBrainNpcID)
+    end
+    return ok, reason, PNC.Core.Now()
+end
+
+function Client.RequestBaseSnapshot()
+    local ok = false
+    local reason = "client_unavailable"
+    if PNC.Client and PNC.Client.RequestBaseBootstrap then
+        ok, reason = PNC.Client.RequestBaseBootstrap()
     end
     return ok, reason, PNC.Core.Now()
 end

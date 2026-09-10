@@ -103,11 +103,18 @@ continue through `PNC.Inventory.AddItems` / `ApplyDelta`.
 
 ## Settings and authority
 
-Colony Management opens a separate scrollable Provision Settings window. The
-window iterates registry categories and rule UI descriptors; it has no food,
-hydration, or bandage-specific widget creation. Edits live in
+The Command Hub's `Colony` branch opens a separate scrollable Provision Settings
+window. The window iterates registry categories and rule UI descriptors; it has
+no food, hydration, or bandage-specific widget creation. Edits live in
 `PNC_ProvisionSettingsModel` until Apply. Reset Defaults also changes only the
 working copy.
+
+The Provision Settings window remains independently callable for compatibility,
+but the legacy Colony Management navigation no longer registers it. The Colony
+command provider exposes a reusable action-registration seam. Its Change Name
+action reuses the shared faction-name modal and the existing authoritative
+`faction_rename` request; Change Emblem similarly delegates to the reusable
+layered emblem editor and the `faction_emblem` request.
 
 The client feature has an explicit four-part boundary:
 

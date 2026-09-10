@@ -10,6 +10,31 @@ local Theme = UI.Theme
 
 Prompt.shownRevisions = Prompt.shownRevisions or {}
 
+local function tr(key, fallback)
+    local value = getText and getText(key) or nil
+    if not value or value == key then return fallback end
+    return value
+end
+
+local function presentation(mode)
+    if mode == "rename" then
+        return {
+            windowTitle = tr("UI_PNC_ColonyNamePrompt_RenameTitle", "CHANGE NAME"),
+            prompt = tr("UI_PNC_ColonyNamePrompt_RenameDescription",
+                "Enter a new faction name:"),
+            save = tr("UI_PNC_ColonyNamePrompt_RenameSave", "SAVE"),
+            cancel = tr("UI_PNC_ColonyNamePrompt_RenameCancel", "CANCEL"),
+        }
+    end
+    return {
+        windowTitle = tr("UI_PNC_ColonyNamePrompt_FirstTitle", "NAME YOUR FACTION"),
+        prompt = tr("UI_PNC_ColonyNamePrompt_FirstDescription",
+            "Your first companion has joined. Name your faction:"),
+        save = tr("UI_PNC_ColonyNamePrompt_FirstSave", "Name Faction"),
+        cancel = tr("UI_PNC_ColonyNamePrompt_FirstCancel", "Later"),
+    }
+end
+
 ISPNCColonyNamePrompt = PsychopatzWindow:derive("ISPNCColonyNamePrompt")
 
 function ISPNCColonyNamePrompt:initialise()
@@ -18,22 +43,25 @@ end
 
 function ISPNCColonyNamePrompt:createChildren()
     PsychopatzWindow.createChildren(self)
+    local copy = presentation(self.mode)
+    self.promptText = copy.prompt
     self.nameEntry = UI.CreateTextEntry(self, {
         width = 1,
         height = 1,
+        maxTextLength = 80,
     })
     self.saveButton = UI.CreateButton(self, {
         id = "save",
-        title = "Name Faction",
+        title = copy.save,
         target = self,
         onclick = ISPNCColonyNamePrompt.onSave,
         variant = "primary",
     })
-    self.laterButton = UI.CreateButton(self, {
-        id = "later",
-        title = "Later",
+    self.cancelButton = UI.CreateButton(self, {
+        id = "cancel",
+        title = copy.cancel,
         target = self,
-        onclick = ISPNCColonyNamePrompt.onLater,
+        onclick = ISPNCColonyNamePrompt.onCancel,
         variant = "quiet",
     })
     self:requestResponsiveLayout(true)
@@ -41,7 +69,7 @@ end
 
 function ISPNCColonyNamePrompt:onResponsiveLayout()
     local rect = self:getContentRect({ top = 30, bottom = 12 })
-    local entryY = rect.y + 38
+    local entryY = rect.y + Layout.Pixels(38, self.uiScale)
     Layout.SetBounds(
         self.nameEntry,
         rect.x,
@@ -50,7 +78,7 @@ function ISPNCColonyNamePrompt:onResponsiveLayout()
         Layout.Pixels(28, self.uiScale)
     )
     local buttons = Layout.Flow(
-        { self.saveButton, self.laterButton },
+        { self.saveButton, self.cancelButton },
         { x = rect.x, y = entryY + Layout.Pixels(40, self.uiScale), width = rect.width },
         { scale = self.uiScale, minWidth = 100 }
     )
@@ -61,27 +89,35 @@ function ISPNCColonyNamePrompt:onSave()
     local name = self.nameEntry and self.nameEntry:getText() or ""
     local ok
     local reason
+    self.errorText = nil
     if PNC.Client and PNC.Client.RenameFaction then
         ok, reason = PNC.Client.RenameFaction(name)
     else
-        ok, reason = false, "rename_unavailable"
+        ok, reason = false, "faction_rename_unavailable"
     end
     if ok then
         self:close()
     else
-        self.errorText = tostring(reason or "Unable to rename faction")
+        self.errorText = tostring(reason or tr(
+            "UI_PNC_ColonyNamePrompt_RenameError",
+            "Unable to rename faction"))
     end
 end
 
-function ISPNCColonyNamePrompt:onLater()
+function ISPNCColonyNamePrompt:onCancel()
     self:close()
+end
+
+function ISPNCColonyNamePrompt:onLater()
+    self:onCancel()
 end
 
 function ISPNCColonyNamePrompt:render()
     PsychopatzWindow.render(self)
     local rect = self:getContentRect({ top = 30, bottom = 12 })
     self:drawText(
-        "Your first companion has joined. Name your faction:",
+        self.promptText or tr("UI_PNC_ColonyNamePrompt_FirstDescription",
+            "Your first companion has joined. Name your faction:"),
         rect.x,
         rect.y + 8,
         Theme.colors.text.r,
@@ -114,22 +150,32 @@ function ISPNCColonyNamePrompt:new(x, y, width, height, options)
     local object = PsychopatzWindow:new(x, y, width, height, options)
     setmetatable(object, self)
     self.__index = self
+    object.mode = options and options.mode or "first"
     return object
 end
 
-function Prompt.OpenIfNeeded(snapshot)
-    local faction = snapshot and snapshot.faction or nil
-    if not faction or faction.renamePending ~= true
-        or #(snapshot.people or {}) < 1
-    then
-        return false
+function Prompt.Close()
+    if Prompt.instance then
+        Prompt.instance:close()
+        return true
     end
-    local revision = tonumber(faction.revision) or 0
-    if Prompt.shownRevisions[faction.id] == revision then return false end
-    Prompt.shownRevisions[faction.id] = revision
-    if Prompt.instance then Prompt.instance:close() end
+    return false
+end
+
+function Prompt.Open(options)
+    options = type(options) == "table" and options or {}
+    local snapshot = type(options.snapshot) == "table"
+        and options.snapshot or {}
+    local faction = type(options.faction) == "table"
+        and options.faction or snapshot.faction or nil
+    if type(faction) ~= "table" then return false end
+
+    local mode = options.mode == "rename" and "rename" or "first"
+    local copy = presentation(mode)
+    Prompt.Close()
     local window = UI.NewWindow(ISPNCColonyNamePrompt, {
-        title = "NAME YOUR FACTION",
+        title = copy.windowTitle,
+        mode = mode,
         resizable = false,
         persistGeometry = false,
         responsiveSpec = {
@@ -144,13 +190,27 @@ function Prompt.OpenIfNeeded(snapshot)
     })
     window:initialise()
     window:instantiate()
-    window.nameEntry:setText(tostring(faction.name or "Survivor Group"))
+    window.nameEntry:setText(tostring(faction.name or tr(
+        "UI_PNC_ColonyNamePrompt_DefaultName", "Survivor Group")))
     window:addToUIManager()
     window:setVisible(true)
     window:bringToTop()
     if window.nameEntry.focus then window.nameEntry:focus() end
     Prompt.instance = window
     return true
+end
+
+function Prompt.OpenIfNeeded(snapshot)
+    local faction = snapshot and snapshot.faction or nil
+    if not faction or faction.renamePending ~= true
+        or #(snapshot.people or {}) < 1
+    then
+        return false
+    end
+    local revision = tonumber(faction.revision) or 0
+    if Prompt.shownRevisions[faction.id] == revision then return false end
+    Prompt.shownRevisions[faction.id] = revision
+    return Prompt.Open({ snapshot = snapshot, mode = "first" })
 end
 
 return Prompt

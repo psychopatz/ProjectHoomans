@@ -336,6 +336,24 @@ T.equal(accepted, false, "registry mismatch rejected")
 T.equal(reason, "registry_mismatch", "registry mismatch reason")
 T.equal(sent[#sent].payload.npcID, record.id,
     "registry rejection identifies the active conversation")
+
+record.runtime.conversationLease.conversationState = nil
+local missingState, missingStateReason = Authority.HandleChoice(player, {
+    requestID = "choice-missing-state",
+    npcID = record.id,
+    token = "lease-token",
+    blockID = categoryResult.payload.blockID,
+    nodeID = "opening",
+    choiceID = "detail",
+    registryFingerprint = fingerprint,
+})
+T.equal(missingState, false,
+    "choice without server conversation state was not rejected")
+T.equal(missingStateReason, "conversation_state_missing",
+    "missing conversation state reported the wrong reason")
+T.equal(sent[#sent].payload.success, false,
+    "missing conversation state did not return a client outcome")
+
 T.finish("pnc_conversation_authority_smoke")
 
 T.finish("pnc_conversation_authority_smoke")

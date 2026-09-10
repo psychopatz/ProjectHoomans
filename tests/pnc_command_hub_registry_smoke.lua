@@ -11,6 +11,10 @@ PNC = { CommandHub = {} }
 
 local Registry = T.load("ProjectHoomans", "client",
     "PNC/UI/CommandHub/PNC_CommandHub_Registry.lua")
+local Colony = T.load("ProjectHoomans", "client",
+    "PNC/UI/CommandHub/PNC_CommandHub_Colony.lua")
+local Workshop = T.load("ProjectHoomans", "client",
+    "PNC/UI/CommandHub/PNC_CommandHub_Workshop.lua")
 
 T.falsy(Registry.Get("orders"),
     "obsolete Orders category was registered")
@@ -18,19 +22,23 @@ local zone = Registry.Get("zone")
 T.truthy(zone, "zone category was not registered")
 local categories = Registry.All()
 T.equal(categories[1].id, "work", "work is not first in the manual hierarchy")
-T.equal(categories[2].id, "zone", "zone is not second in the manual hierarchy")
-T.equal(categories[3].id, "events",
-    "events is not third in the manual hierarchy")
-T.equal(categories[4].id, "colonist",
-    "colonist is not fourth in the manual hierarchy")
-T.equal(categories[5].id, "storage",
-    "storage is not fifth in the manual hierarchy")
-T.equal(categories[6].id, "research",
-    "research is not sixth in the manual hierarchy")
-T.equal(categories[7].id, "stockpile",
-    "stockpile bootstrap is not seventh in the manual hierarchy")
-T.equal(categories[8].id, "building",
-    "building is not eighth in the manual hierarchy")
+T.equal(categories[2].id, "workshop",
+    "workshop is not second in the manual hierarchy")
+T.equal(categories[3].id, "zone", "zone is not third in the manual hierarchy")
+T.equal(categories[4].id, "colony",
+    "colony is not fourth in the manual hierarchy")
+T.equal(categories[5].id, "events",
+    "events is not fifth in the manual hierarchy")
+T.equal(categories[6].id, "colonist",
+    "colonist is not sixth in the manual hierarchy")
+T.equal(categories[7].id, "storage",
+    "storage is not seventh in the manual hierarchy")
+T.equal(categories[8].id, "research",
+    "research is not eighth in the manual hierarchy")
+T.equal(categories[9].id, "stockpile",
+    "stockpile bootstrap is not ninth in the manual hierarchy")
+T.equal(categories[10].id, "base",
+    "base is not tenth in the manual hierarchy")
 for _, id in ipairs({
     "structure", "production", "furniture", "external_furniture",
     "genetics", "power", "pipe_networks", "security", "misc", "floors",
@@ -38,12 +46,30 @@ for _, id in ipairs({
 }) do
     T.falsy(Registry.Get(id), "placeholder category survived: " .. id)
 end
-T.equal(#zone.actions, 3, "zone action count changed")
-T.equal(zone.actions[1].id, "lumber", "chop wood is not first")
-T.equal(zone.actions[2].id, "corpse_haul", "grab corpse is not second")
-T.equal(zone.actions[3].id, "fishing", "fishing is not third")
+T.equal(#zone.actions, 4, "zone action count changed")
+T.equal(zone.actions[1].id, "base_zone", "base zone is not first")
+T.equal(zone.actions[2].id, "lumber", "chop wood is not second")
+T.equal(zone.actions[3].id, "corpse_haul", "grab corpse is not third")
+T.equal(zone.actions[4].id, "fishing", "fishing is not fourth")
 T.falsy(Registry.Get("settings"),
     "settings remains registered as a root category")
+local colony = Registry.Get("colony")
+T.truthy(colony, "colony category was not registered")
+T.equal(colony.childID, "colony",
+    "colony category is not managed as a command-hub child")
+T.equal(#colony.actions, 3, "colony action count changed")
+T.equal(colony.actions[1].id, "provision_settings",
+    "provision settings is not the first colony action")
+T.equal(colony.actions[2].id, "change_name",
+    "change name is not the second colony action")
+T.equal(colony.actions[3].id, "change_emblem",
+    "change emblem is not the third colony action")
+T.truthy(Colony.Register, "colony provider does not expose action registration")
+local workshop = Registry.Get("workshop")
+T.truthy(workshop, "workshop category was not registered")
+T.equal(workshop.childID, "workshop",
+    "workshop category is not managed as a command-hub child")
+T.truthy(Workshop, "workshop provider did not load")
 T.truthy(Registry.Get("work").onClick,
     "work category does not expose its authorization workflow")
 T.equal(Registry.Get("events").childID, "events",
@@ -55,25 +81,35 @@ T.truthy(PNC.CommandHub.Gates
     "command hub does not expose the base and stockpile gate")
 T.truthy(PNC.CommandHub.Gates.HasColony,
     "command hub does not expose the colony gate for Base")
+T.truthy(PNC.CommandHub.Gates.HasBase,
+    "command hub does not expose the base gate for Base Zone")
 T.truthy(Registry.Get("storage").onClick,
     "storage category does not expose its standalone workflow")
 T.truthy(Registry.Get("research").onClick,
     "research category does not expose its standalone workflow")
 T.truthy(Registry.Get("stockpile").onClick,
     "stockpile category does not expose its bootstrap workflow")
-T.truthy(Registry.Get("building").onClick,
-    "building category does not expose its standalone workflow")
+T.truthy(Registry.Get("base").onClick,
+    "base category does not expose its standalone workflow")
 
 PNC.ColonyManagementClient = {
     ReadSnapshot = function()
         return { snapshot = {} }
     end,
 }
+local disabledTooltip = colony.actions[2].disabledTooltip(colony.actions[2])
+T.falsy(Registry.IsEnabled(colony.actions[2]),
+    "change name enabled without faction data")
+T.equal(disabledTooltip.key, "UI_PNC_CommandHub_Disabled_ColonyName",
+    "missing faction reason is not exposed for change name")
+disabledTooltip = colony.actions[3].disabledTooltip(colony.actions[3])
+T.equal(disabledTooltip.key, "UI_PNC_CommandHub_Disabled_ColonyEmblem",
+    "missing faction reason is not exposed for change emblem")
 local gateStatus = PNC.CommandHub.Gates.GetBaseAndStockpileStatus()
 T.falsy(gateStatus.hasBase, "empty snapshot incorrectly reports a base")
 T.falsy(gateStatus.hasStockpile,
     "empty snapshot incorrectly reports a stockpile")
-local disabledTooltip = Registry.Get("work").disabledTooltip(
+disabledTooltip = Registry.Get("work").disabledTooltip(
     Registry.Get("work"))
 T.equal(disabledTooltip.key,
     "UI_PNC_CommandHub_Disabled_NoBaseOrStockpile",
@@ -87,8 +123,12 @@ T.falsy(Registry.IsEnabled(Registry.Get("zone")),
     "zone remains enabled without a base and stockpile")
 T.falsy(Registry.IsEnabled(Registry.Get("stockpile")),
     "stockpile bootstrap remains enabled without a base")
-T.falsy(Registry.IsEnabled(Registry.Get("building")),
-    "building remains enabled without a base")
+T.falsy(Registry.IsEnabled(Registry.Get("base")),
+    "base remains enabled without a colony")
+PNC.Network = { ClientState = {} }
+T.falsy(Registry.IsEnabled(Registry.Get("base")),
+    "Base remains enabled while the multiplayer snapshot is pending")
+PNC.Network = nil
 PNC.ColonyManagementClient.ReadSnapshot = function()
     return { snapshot = {
         colony = { id = "colony-1" },
@@ -105,7 +145,7 @@ T.falsy(Registry.IsEnabled(Registry.Get("work")),
     "work enabled without a stockpile")
 T.truthy(Registry.IsEnabled(Registry.Get("stockpile")),
     "stockpile bootstrap did not enable with a base before the stockpile exists")
-T.truthy(Registry.IsEnabled(Registry.Get("building")),
+T.truthy(Registry.IsEnabled(Registry.Get("base")),
     "Base remained blocked before a stockpile existed")
 PNC.ColonyManagementClient.ReadSnapshot = function()
     return {
@@ -126,14 +166,89 @@ T.truthy(Registry.IsEnabled(Registry.Get("zone")),
     "zone did not enable after a base and stockpile became available")
 
 local openedWork = false
+local openedWorkshop = false
+local openedColony = false
+local openedProvision = false
+local provisionOwner
+local openedChangeName = false
+local changeNameOptions
+local openedChangeEmblem = false
+local emblemOptions
+local savedEmblem
 local openedEvents = false
 local openedColonist = false
 local openedStorage = false
 local openedResearch = false
-local openedBuilding = false
+local openedBase = false
 PNC.CommandHub.WorkUI = {
     Open = function()
         openedWork = true
+        return true
+    end,
+}
+PNC.CommandHub.ChildController = {
+    Toggle = function(id, owner)
+        if id == "colony" then openedColony = true end
+        if id == "work" and PNC.CommandHub.WorkUI
+            and PNC.CommandHub.WorkUI.Open
+        then
+            PNC.CommandHub.WorkUI.Open(owner)
+        end
+        if id == "workshop" then openedWorkshop = true end
+        if id == "events" and PNC.ColonyJournalUI
+            and PNC.ColonyJournalUI.Toggle
+        then
+            PNC.ColonyJournalUI.Toggle(owner)
+        end
+        if id == "colonist" and PNC.ColonistUI
+            and PNC.ColonistUI.Open
+        then
+            PNC.ColonistUI.Open(owner)
+        end
+        if id == "storage" and PNC.ColonyStorageUI
+            and PNC.ColonyStorageUI.Open
+        then
+            PNC.ColonyStorageUI.Open(owner)
+        end
+        if id == "research" and PNC.ResearchUI
+            and PNC.ResearchUI.Open
+        then
+            PNC.ResearchUI.Open(owner)
+        end
+        if id == "base" and PNC.BuildingUI
+            and PNC.BuildingUI.Open
+        then
+            openedBase = true
+            PNC.BuildingUI.Open(owner)
+        end
+        return true
+    end,
+    IsOpen = function() return false end,
+}
+PNC.ProvisionSettingsUI = {
+    Open = function(owner)
+        openedProvision = true
+        provisionOwner = owner
+        return true
+    end,
+}
+PNC.ColonyNamePrompt = {
+    Open = function(options)
+        openedChangeName = true
+        changeNameOptions = options
+        return true
+    end,
+}
+PNC.FactionEmblemEditor = {
+    Open = function(options)
+        openedChangeEmblem = true
+        emblemOptions = options
+        return true
+    end,
+}
+PNC.Client = {
+    SetFactionEmblem = function(emblem)
+        savedEmblem = emblem
         return true
     end,
 }
@@ -179,6 +294,40 @@ PNC.BuildingUI = {
 }
 Registry.Get("work").onClick()
 T.truthy(openedWork, "work category is not wired to its window")
+Registry.Get("workshop").onClick()
+T.truthy(openedWorkshop, "workshop category is not wired to its window")
+Registry.Get("colony").onClick(nil, {})
+T.truthy(openedColony, "colony category is not wired to its child branch")
+Registry.Get("colony").actions[1].onClick(nil, {})
+T.truthy(openedProvision, "provision settings action is not wired")
+T.truthy(provisionOwner, "provision settings did not receive its hub owner")
+PNC.ColonyManagementClient.ReadSnapshot = function()
+    return { snapshot = {
+        faction = {
+            id = "faction-player", name = "Morgan Clan",
+            archetypeID = "settler", emblem = { backgroundColorID = "blue" },
+        },
+    } }
+end
+T.truthy(Registry.IsEnabled(Registry.Get("colony").actions[2]),
+    "change name remains disabled with an established faction")
+Registry.Get("colony").actions[2].onClick(nil, {})
+T.truthy(openedChangeName, "change name action is not wired")
+T.equal(changeNameOptions.mode, "rename",
+    "change name action did not request rename mode")
+T.equal(changeNameOptions.snapshot.faction.name, "Morgan Clan",
+    "change name action did not pass the current faction snapshot")
+Registry.Get("colony").actions[3].onClick(nil, {})
+T.truthy(openedChangeEmblem, "change emblem action is not wired")
+T.equal(emblemOptions.archetypeID, "settler",
+    "change emblem action did not pass the faction archetype")
+T.equal(emblemOptions.seed, "faction-player",
+    "change emblem action did not pass the faction seed")
+T.equal(emblemOptions.emblem.backgroundColorID, "blue",
+    "change emblem action did not pass the current emblem")
+emblemOptions.onSave({ backgroundColorID = "red" })
+T.equal(savedEmblem.backgroundColorID, "red",
+    "change emblem action did not preserve the authoritative save callback")
 T.truthy(Registry.IsEnabled(Registry.Get("events")),
     "events category is disabled without a radio")
 Registry.Get("events").onClick()
@@ -189,19 +338,21 @@ Registry.Get("storage").onClick()
 T.truthy(openedStorage, "storage category is not wired to its window")
 Registry.Get("research").onClick()
 T.truthy(openedResearch, "research category is not wired to its window")
-Registry.Get("building").onClick()
-T.truthy(openedBuilding, "building category is not wired to its window")
+Registry.Get("base").onClick()
+T.truthy(openedBase, "base category is not wired to its window")
 zone.actions[1].onClick()
 zone.actions[2].onClick()
 zone.actions[3].onClick()
-T.equal(openedZones[1], "lumber", "chop wood workflow is not wired")
-T.equal(openedZones[2], "corpse_haul", "grab corpse workflow is not wired")
-T.equal(openedZones[3], "fishing", "fishing workflow is not wired")
+zone.actions[4].onClick()
+T.equal(openedZones[1], "base_zone", "base zone workflow is not wired")
+T.equal(openedZones[2], "lumber", "chop wood workflow is not wired")
+T.equal(openedZones[3], "corpse_haul", "grab corpse workflow is not wired")
+T.equal(openedZones[4], "fishing", "fishing workflow is not wired")
 PNC.CommandHub.ZoneUI.activeDefinitionID = "fishing"
 PNC.CommandHub.ZoneUI.instances = {
     fishing = { getIsVisible = function() return true end },
 }
-T.truthy(Registry.IsSelected(zone.actions[3]),
+T.truthy(Registry.IsSelected(zone.actions[4]),
     "active fishing zone action is not selected")
 T.falsy(Registry.IsSelected(zone.actions[1]),
     "inactive zone action is selected")
@@ -329,10 +480,40 @@ T.equal(Registry.GetAction("future_category", "future_action"), action,
 
 local composition = T.read("ProjectHoomans", "client",
     "PNC/Composition/PNC_ClientComposition.lua")
+local workshopWindowSource = T.read("ProjectHoomans", "client",
+    "PNC/UI/Workshop/PNC_WorkshopWindow.lua")
+local workshopControllerSource = T.read("ProjectHoomans", "client",
+    "PNC/UI/Workshop/PNC_WorkshopController.lua")
+T.contains(workshopWindowSource, "WidgetWindow.Install",
+    "workshop window does not support detachable widgets")
+T.contains(workshopWindowSource, "pnc-command-hub-workshop-widget",
+    "workshop window does not have a stable widget control id")
+T.contains(workshopWindowSource, "PNC.CommandHub.Workshop",
+    "workshop window does not persist its geometry independently")
+T.contains(workshopWindowSource, "PNC.ColonyManagementClient.HasUpdate",
+    "workshop window does not consume colony-management updates")
+T.contains(workshopControllerSource, "Workshop.Rebuild",
+    "workshop controller does not delegate its production surface")
+T.contains(workshopControllerSource, "ApplyResponsiveLayout",
+    "workshop controller does not expose responsive layout")
+local legacyWorkshopSource = T.read("ProjectHoomans", "client",
+    "PNC/UI/Communities/PNC_ColonyManagementWorkshopTab.lua")
+T.contains(legacyWorkshopSource, "onclick = window.onWorkshopControl",
+    "workshop controls are not compatible with the standalone window")
+local workshopCommandSource = T.read("ProjectHoomans", "client",
+    "PNC/UI/CommandHub/PNC_CommandHub_Workshop.lua")
+T.contains(workshopCommandSource, 'childID = "workshop"',
+    "workshop command provider does not identify its child branch")
+T.contains(workshopCommandSource, "HasBaseAndStockpile",
+    "workshop command provider lost its production gate")
+T.contains(workshopCommandSource, "UI_PNC_CommandHub_WorkshopHelp",
+    "workshop command provider lost its tooltip key")
 T.contains(composition, "PNC/UI/CommandHub/PNC_CommandHub",
     "command hub is not in the client composition")
 T.contains(composition, "PNC/UI/Research/PNC_ResearchWindow",
     "research widget is not in the client composition")
+T.contains(composition, "PNC/UI/Workshop/PNC_Workshop",
+    "workshop widget is not in the client composition")
 T.contains(composition, "PNC/UI/Building/PNC_Building",
     "building widget is not in the client composition")
 T.falsy(string.find(composition, "PNC/UI/Orders/", 1, true),
@@ -363,12 +544,34 @@ T.falsy(string.find(composition, "PNC_CommandHub_ActionsWindow", 1, true),
     "legacy command hub action window is still composed")
 local commandHubSource = T.read("ProjectHoomans", "client",
     "PNC/UI/CommandHub/PNC_CommandHub.lua")
+local colonySource = T.read("ProjectHoomans", "client",
+    "PNC/UI/CommandHub/PNC_CommandHub_Colony.lua")
 T.contains(commandHubSource, "pnc-command-hub-settings-toolbar",
     "colony settings were not moved to the title toolbar")
 T.contains(commandHubSource, "media/ui/MP/mp_ui_mods.png",
     "colony settings toolbar does not use the gear icon")
 T.contains(commandHubSource, "Toolbar.Sync(window)",
     "colony settings toolbar is not synchronized after installation")
+T.contains(commandHubSource, "PNC_CommandHub_Colony",
+    "colony command provider is not in the command-hub composition")
+T.contains(colonySource, 'id = "colony"',
+    "colony command provider does not register its root category")
+T.contains(colonySource, 'id = "provision_settings"',
+    "colony command provider does not register provision settings")
+T.contains(colonySource, 'id = "change_name"',
+    "colony command provider does not register change name")
+T.contains(colonySource, "PNC_ColonyNamePrompt",
+    "change name does not use the shared colony name prompt")
+T.contains(colonySource, 'mode = "rename"',
+    "change name does not open the prompt in rename mode")
+T.contains(colonySource, 'id = "change_emblem"',
+    "colony command provider does not register change emblem")
+T.contains(colonySource, "PNC_FactionEmblemEditor",
+    "change emblem does not use the shared faction emblem editor")
+T.contains(colonySource, "SetFactionEmblem",
+    "change emblem does not preserve the authoritative save request")
+T.contains(colonySource, "function Colony.Register",
+    "colony command provider has no extension point for future settings")
 local childControllerSource = T.read("ProjectHoomans", "client",
     "PNC/UI/CommandHub/PNC_CommandHub_ChildController.lua")
 T.contains(childControllerSource, "CoreHub.Actions",
@@ -387,10 +590,14 @@ T.contains(childControllerSource, 'Controller.Register("storage"',
     "storage window is not managed by the child controller")
 T.contains(childControllerSource, "PNC.ColonyStorageUI",
     "child controller does not manage the storage instance")
-T.contains(childControllerSource, 'Controller.Register("building"',
-    "building window is not managed by the child controller")
+T.contains(childControllerSource, 'Controller.Register("base"',
+    "base window is not managed by the child controller")
 T.contains(childControllerSource, "PNC.BuildingUI",
     "child controller does not manage the building instance")
+T.contains(childControllerSource, 'Controller.Register("colony"',
+    "colony branch is not managed by the child controller")
+T.contains(childControllerSource, "PNC.ProvisionSettingsUI",
+    "colony branch does not manage provision settings")
 local zoneSource = T.read("ProjectHoomans", "client",
     "PNC/UI/CommandHub/PNC_CommandHub_ZoneWindow.lua")
 T.contains(zoneSource, "CoreHub.Actions",
@@ -465,9 +672,17 @@ T.falsy(string.find(animationSceneSource, "self.gapEntry:setX", 1, true),
     "animation scene field still uses manual geometry")
 local provisionSettingsSource = T.read("ProjectHoomans", "client",
     "PNC/UI/Provision/PNC_ProvisionSettingsWindow.lua")
+local provisionSettingsLayoutSource = T.read("ProjectHoomans", "client",
+    "PNC/UI/Provision/PNC_ProvisionSettingsWindow_Layout.lua")
+T.contains(provisionSettingsSource, "WidgetWindow.Install",
+    "provision settings does not support detachable widgets")
+T.contains(provisionSettingsSource, "owner = owner or window.owner",
+    "provision settings does not retain its command-hub owner")
+T.contains(provisionSettingsLayoutSource, "Layout.Pixels",
+    "provision settings layout is not scale-aware")
 T.contains(provisionSettingsSource, "UI.SetLabelText(self.statusLabel",
     "provision status label can jump after text changes")
-T.contains(provisionSettingsSource, "Layout.SetBounds(self.statusLabel",
+T.contains(provisionSettingsLayoutSource, "Layout.SetBounds(self.statusLabel",
     "provision status label bypasses shared bounds")
 T.falsy(string.find(provisionSettingsSource, "statusLabel:setName",
     1, true), "provision settings still mutates labels unsafely")
@@ -479,6 +694,18 @@ T.contains(provisionRuleSource, "Layout.SetBounds(row.panel",
     "provision rule panels bypass shared bounds")
 T.falsy(string.find(provisionRuleSource, "widget:setName",
     1, true), "provision rules still mutate labels unsafely")
+local legacyTabsSource = T.read("ProjectHoomans", "client",
+    "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Tabs.lua")
+T.falsy(string.find(legacyTabsSource, 'id = "provision"', 1, true),
+    "legacy Colony Management still exposes Provision Settings")
+local legacySettingsSource = T.read("ProjectHoomans", "client",
+    "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_SettingsTab.lua")
+T.falsy(string.find(legacySettingsSource, "factionNameEntry", 1, true),
+    "legacy Colony Management still exposes the inline faction name field")
+T.falsy(string.find(legacySettingsSource, "factionEmblemButton", 1, true),
+    "legacy Colony Management still exposes the inline faction emblem button")
+T.falsy(string.find(legacyTabsSource, 'id = "workshop"', 1, true),
+    "legacy Colony Management still exposes Workshop")
 T.contains(childControllerSource, "function Controller.Toggle",
     "command hub child toggling is not centralized")
 T.contains(childControllerSource, "function Controller.CloseAll",

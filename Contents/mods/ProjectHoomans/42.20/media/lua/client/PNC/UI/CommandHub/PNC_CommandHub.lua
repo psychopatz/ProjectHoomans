@@ -22,6 +22,8 @@ require "PNC/UI/CommandHub/PNC_CommandHub_SettingsWindow"
 require "PNC/UI/CommandHub/PNC_CommandHub_WorkRegistry"
 require "PNC/UI/CommandHub/PNC_CommandHub_WorkWindow"
 require "PNC/UI/CommandHub/PNC_CommandHub_ChildController"
+require "PNC/UI/CommandHub/PNC_CommandHub_Colony"
+require "PNC/UI/CommandHub/PNC_CommandHub_Workshop"
 
 local function tr(key, fallback)
     if not key or key == "" then return fallback end

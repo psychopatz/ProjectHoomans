@@ -34,10 +34,10 @@ PNC.ColonyManagementClient = {
 }
 
 local stockpile = Registry.Get("stockpile")
-local building = Registry.Get("building")
+local building = Registry.Get("base")
 T.truthy(stockpile, "stockpile bootstrap is not registered on the hub")
 T.truthy(stockpile.onClick, "stockpile bootstrap has no hub action")
-T.truthy(building, "building category is missing")
+T.truthy(building, "base category is missing")
 
 T.truthy(Registry.IsVisible(stockpile),
     "stockpile bootstrap disappeared without a settlement")

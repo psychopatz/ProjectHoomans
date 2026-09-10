@@ -80,6 +80,14 @@ Internal.RegisterServerCommand(Const.CMD_COLONY_JOURNAL, function(args)
 end)
 
 Internal.RegisterServerCommand(Const.CMD_COLONY_MANAGEMENT, function(args)
+    args = type(args) == "table" and args or {}
+    if args.scope == "base" then
+        ClientState.colonyBase = args.snapshot or {}
+        ClientState.colonyBaseRevision =
+            (tonumber(ClientState.colonyBaseRevision) or 0) + 1
+        ClientState.lastColonyBaseReceiveAt = Core.Now()
+        return
+    end
     ClientState.colonyManagement = args.snapshot
     ClientState.colonyManagementRevision =
         (tonumber(ClientState.colonyManagementRevision) or 0) + 1
@@ -100,14 +108,24 @@ Internal.RegisterServerCommand(Const.CMD_COLONY_MANAGEMENT, function(args)
 end)
 
 Internal.RegisterServerCommand(Const.CMD_SETTLEMENT_DELTA, function(args)
-    local snapshot = ClientState.colonyManagement or {}
-    snapshot.settlement = args.settlement
-    if args.storage then snapshot.storage = args.storage end
-    snapshot.actionResult = args.actionResult
-    ClientState.colonyManagement = snapshot
-    ClientState.colonyManagementRevision =
-        (tonumber(ClientState.colonyManagementRevision) or 0) + 1
-    ClientState.lastColonyManagementReceiveAt = Core.Now()
+    args = type(args) == "table" and args or {}
+    local baseSnapshot = ClientState.colonyBase
+    if type(baseSnapshot) == "table" then
+        baseSnapshot.settlement = args.settlement
+        baseSnapshot.actionResult = args.actionResult
+        ClientState.colonyBaseRevision =
+            (tonumber(ClientState.colonyBaseRevision) or 0) + 1
+        ClientState.lastColonyBaseReceiveAt = Core.Now()
+    end
+    local snapshot = ClientState.colonyManagement
+    if type(snapshot) == "table" then
+        snapshot.settlement = args.settlement
+        if args.storage then snapshot.storage = args.storage end
+        snapshot.actionResult = args.actionResult
+        ClientState.colonyManagementRevision =
+            (tonumber(ClientState.colonyManagementRevision) or 0) + 1
+        ClientState.lastColonyManagementReceiveAt = Core.Now()
+    end
 end)
 
 Internal.RegisterServerCommand(Const.CMD_COLONY_KNOWLEDGE_DELTA, function(args)

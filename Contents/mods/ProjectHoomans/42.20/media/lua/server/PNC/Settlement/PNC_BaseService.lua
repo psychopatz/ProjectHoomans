@@ -39,8 +39,11 @@ local function finishRequest(requestId, response)
     return response
 end
 
-local function response(ok, reason, entity, event)
-    return { ok = ok == true, reason = reason, base = entity, event = event }
+local function response(ok, reason, entity, event, details)
+    return {
+        ok = ok == true, reason = reason, base = entity, event = event,
+        details = details,
+    }
 end
 
 local function touch(base)
@@ -122,7 +125,8 @@ local function changeGeometry(player, args, operation)
     local check = Validation.CanChange(base, zone and zone.geometry,
         args.regionDelta, operation, args.expectedRevision)
     if not check.ok then
-        return finishRequest(requestId, response(false, check.reason, base))
+        return finishRequest(requestId,
+            response(false, check.reason, base, nil, check.details))
     end
     local ok, updated = Zones.updateGeometry(base.baseZoneId,
         check.details.footprint, zone.revision)

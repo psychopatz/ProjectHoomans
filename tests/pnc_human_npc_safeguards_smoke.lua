@@ -32,7 +32,7 @@ local stopped = {}
 local voicePrefix
 local useless = false
 local uselessWrites = 0
-local grappleOnly = false
+local nativeCorpseDragFlag = false
 local noTeeth = false
 local vanillaTarget = {}
 local actionState = "idle"
@@ -68,8 +68,8 @@ local managedBody = {
     setTarget = function(_, value) vanillaTarget = value end,
     clearAggroList = function() end,
     setAttackedBy = function() end,
-    isReanimatedForGrappleOnly = function() return grappleOnly end,
-    setReanimatedForGrappleOnly = function(_, value) grappleOnly = value end,
+    isReanimatedForGrappleOnly = function() return nativeCorpseDragFlag end,
+    setReanimatedForGrappleOnly = function(_, value) nativeCorpseDragFlag = value end,
     getX = function() return 2 end,
     getY = function() return 2 end,
     getZ = function() return 0 end,
@@ -245,12 +245,13 @@ T.equal(
 
 useless = false
 noTeeth = false
-grappleOnly = true
+nativeCorpseDragFlag = true
 vanillaTarget = {}
 zombieUpdateHandler(managedBody)
 T.equal(useless, true, "zombie update repairs persisted useless flag")
 T.equal(noTeeth, true, "zombie update repairs persisted teeth flag")
-T.equal(grappleOnly, false, "zombie update repairs leaked grapple-only flag")
+T.equal(nativeCorpseDragFlag, false,
+    "zombie update repairs leaked native corpse-drag flag")
 T.equal(vanillaTarget, nil, "zombie update clears persisted target")
 
 vanillaTarget = {}
@@ -402,7 +403,7 @@ T.load(CLIENT_FILE)
 -- Establish a pre-NPC panic baseline.
 PNC.ClientHumanNPCSafeguards.OnPlayerUpdate(player)
 zombieUpdateHandler(managedBody)
-T.falsy(grappleOnly,
+T.falsy(nativeCorpseDragFlag,
     "NPC maintenance does not inherit a native threat LOS lease")
 player:updateLOS()
 PNC.ClientHumanNPCSafeguards.OnTick()
@@ -410,10 +411,10 @@ panic = 5
 visibleZombies = 3
 chasingZombies = 2
 veryCloseZombies = 1
-grappleOnly = false
+nativeCorpseDragFlag = false
 spottedValues[1] = managedBody
 PNC.ClientPresenceSync.BodyByID.npc_1 = managedBody
-grappleOnly = true
+nativeCorpseDragFlag = true
 
 PNC.ClientHumanNPCSafeguards.OnPlayerUpdate(player)
 player:updateLOS()
@@ -422,7 +423,8 @@ T.equal(panic, 2, "false NPC zombie panic increase removed")
 T.equal(visibleZombies, 0, "false visible zombie count removed")
 T.equal(chasingZombies, 0, "false chasing zombie count removed")
 T.equal(veryCloseZombies, 0, "false very-close zombie count recalculated")
-T.equal(grappleOnly, false, "temporary LOS exclusion restored")
+T.equal(nativeCorpseDragFlag, false,
+    "temporary LOS exclusion releases the native corpse-drag flag")
 T.equal(lastSpottedValues[1], managedBody, "human body pre-seeded as already spotted")
 
 local normalZombie = {

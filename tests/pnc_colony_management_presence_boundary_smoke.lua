@@ -46,7 +46,7 @@ for name, _ in pairs(publicFunctions) do
     T.equal(type(PNC.ColonyManagement[name]), "function",
         "entry point should preserve ColonyManagement." .. name)
 end
-T.equal(publicCount, 5, "public function declaration count")
+T.equal(publicCount, 6, "public function declaration count")
 T.equal(type(PNC.ColonyManagement.CanUseDebug), "function",
     "debug authorization entry")
 

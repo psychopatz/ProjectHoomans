@@ -3,8 +3,9 @@ local Internal = Network.Internal
 local Core = PNC.Core
 local Const = PNC.Const
 
-function Network.SendColonyManagement(targetPlayer, snapshot)
+function Network.SendColonyManagement(targetPlayer, snapshot, scope)
     local payload = { snapshot=snapshot, serverTime=Core.Now() }
+    if scope ~= nil then payload.scope = tostring(scope) end
     if isServer and isServer() and targetPlayer then sendServerCommand(targetPlayer, Const.MODULE, Const.CMD_COLONY_MANAGEMENT, payload)
     elseif not isServer or not isServer() then triggerEvent("OnServerCommand", Const.MODULE, Const.CMD_COLONY_MANAGEMENT, payload) end
 end
