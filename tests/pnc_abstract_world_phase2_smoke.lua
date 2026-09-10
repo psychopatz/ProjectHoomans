@@ -76,6 +76,7 @@ end }
 
 T.load(SHARED .. "Director/PNC_DirectorConfig.lua")
 T.load(SHARED .. "Director/PNC_AbstractWorldTypes.lua")
+T.load(SHARED .. "Factions/PNC_FactionConstants.lua")
 T.load(SHARED .. "Scheduling/PNC_Scheduler.lua")
 T.load(SERVER .. "PNC_AbstractWorldStore.lua")
 T.load(SERVER .. "PNC_AbstractLocationManager.lua")

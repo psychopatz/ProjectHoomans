@@ -14,7 +14,9 @@ local Targets = PNC.FacilityInteractionTargets
 local Water = PNC.NearbyWaterService
 local Locator = PNC.NearbyResourceLocator
 
-Service.SCHEMA_VERSION = 1
+-- Bump this whenever resource classification or target metadata changes. Old
+-- camp snapshots are world-state caches, not authoritative sleep decisions.
+Service.SCHEMA_VERSION = 3
 Service.Providers = Service.Providers or {}
 
 local function number(value, fallback)
@@ -315,6 +317,7 @@ Service.RegisterProvider("seat", {
 
 local function snapshotMatches(state, order, radius, campRadius)
     return type(state) == "table"
+        and tonumber(state.schemaVersion) == tonumber(Service.SCHEMA_VERSION)
         and tostring(state.campId or "") == tostring(order.campId or "")
         and tonumber(state.anchorX) == tonumber(order.x)
         and tonumber(state.anchorY) == tonumber(order.y)
@@ -426,8 +429,22 @@ local function reserved(resource, excludeKey)
 end
 
 local function resolveSleep(resource, abstract)
+    local sleepSurface = tostring(resource and resource.sleepSurface or "")
+    local detectorId = tostring(resource and resource.detectorId or "")
+    if type(resource) ~= "table"
+        or tostring(resource.resourceKind or "") ~= "sleep_surface"
+        or (sleepSurface ~= "bed" and sleepSurface ~= "sofa")
+        or detectorId ~= sleepSurface
+    then
+        return nil, {}
+    end
     local targets = Targets and Targets.ResolveResource
         and Targets.ResolveResource(resource, { abstract = abstract == true }) or {}
+    if targets[1] and Resources and Resources.IsValidSleepTarget
+        and not Resources.IsValidSleepTarget(resource, targets[1])
+    then
+        return nil, targets
+    end
     return targets[1], targets
 end
 
@@ -489,7 +506,10 @@ function Service.FindSleep(record, options)
     local selected
     for index = 1, #resources do
         local resource = resources[index]
+        local sleepSurface = tostring(resource.sleepSurface or "")
         if tostring(resource.resourceKind or "") == "sleep_surface"
+            and tostring(resource.detectorId or "") == sleepSurface
+            and (sleepSurface == "bed" or sleepSurface == "sofa")
             and not reserved(resource, options.excludeKey)
         then
             local target, targets = resolveSleep(resource, options.abstract)
@@ -687,6 +707,13 @@ local function applyTarget(record, target)
     order.interactionSurfaceOffset = target.interactionSurfaceOffset
     order.interactionAxis, order.interactionFacing = target.interactionAxis,
         target.interactionFacing
+    order.sleepAnchorX, order.sleepAnchorY, order.sleepAnchorZ =
+        target.sleepAnchorX, target.sleepAnchorY, target.sleepAnchorZ
+    order.sleepAxis, order.sleepFacing = target.sleepAxis, target.sleepFacing
+    order.sleepSprite = target.sleepSprite
+    order.sleepGridX, order.sleepGridY = target.sleepGridX, target.sleepGridY
+    order.sleepGridWidth, order.sleepGridHeight = target.sleepGridWidth,
+        target.sleepGridHeight
     order.seatDirection, order.seatSide = target.seatDirection,
         target.seatSide
     if target.approachKey ~= nil then order.approachKey = target.approachKey end
@@ -707,6 +734,11 @@ local function applyTarget(record, target)
         z = tonumber(target.seatAnchorZ or target.z),
     } or nil
     activity.sceneId, activity.sleepSurface = order.sceneId, order.sleepSurface
+    if tostring(activity.capability or "") == "sleep" then
+        PNC.SleepRuntime = PNC.SleepRuntime or {}
+        PNC.SleepRuntime.LiveObjects = PNC.SleepRuntime.LiveObjects or {}
+        PNC.SleepRuntime.LiveObjects[tostring(record.id)] = target.object
+    end
     activity.seatDirection, activity.seatSide = order.seatDirection,
         order.seatSide
     activity.approachKey = order.approachKey or activity.approachKey
@@ -778,6 +810,24 @@ function Service.ResolveActivityTarget(record)
         local target = activity.target or {
             x = activity.x, y = activity.y, z = activity.z,
         }
+        if not Resources or not Resources.IsValidSleepTarget
+            or not Resources.IsValidSleepTarget({
+                resourceKind = "floor_sleep", sleepSurface = "floor",
+            }, {
+                sceneId = target.sceneId,
+                sleepSurface = target.sleepSurface,
+                seating = target.seating,
+            })
+        then
+            target = nil
+        end
+        if not target then
+            local floor = floorSlot(record, campContext(record) or {})
+            target = {
+                x = floor.x, y = floor.y, z = floor.z,
+                sceneId = floor.sceneId, sleepSurface = floor.sleepSurface,
+            }
+        end
         target.resourceKey = target.resourceKey or key
         target.resourceKind = target.resourceKind or activity.resourceKind
         target.sleepSurface = target.sleepSurface or activity.sleepSurface

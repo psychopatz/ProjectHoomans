@@ -81,6 +81,17 @@ function Groups.RefreshLOD(groupOrID, at)
         end
         Groups.SetState(group, "ACTIVE", at, at)
         Store.Emit("GROUP_MATERIALIZED", { groupId = group.id })
+    elseif live and lod == "ACTIVE" and group.mobileAmbient == true
+        and group.state == "TRAVELING"
+    then
+        -- Ambient groups are moved by their live member behavior. An ambient
+        -- objective refresh can encounter an older abstract travel shadow;
+        -- clear that shadow instead of leaving the group permanently stuck in
+        -- TRAVELING while AbstractTraversal returns active_simulation. Keep
+        -- directed live journeys untouched by requiring mobileAmbient above.
+        group.targetLocation = nil
+        Groups.SetState(group, "ACTIVE", at, at)
+        Store.Emit("GROUP_LIVE_TRAVEL_REPAIRED", { groupId = group.id })
     elseif not live and lod == "ACTIVE" then
         group.simulation.lod = "ABSTRACT"
         Groups.SetState(group, "ARRIVED", at, at)
@@ -89,4 +100,3 @@ function Groups.RefreshLOD(groupOrID, at)
     end
     return live and "ACTIVE" or "ABSTRACT", "refreshed"
 end
-

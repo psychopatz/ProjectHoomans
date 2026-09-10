@@ -9,14 +9,21 @@ local Shared = PNC.CharacterWindowShared
 local Layout = PsychopatzCore.UI.Layout
 local IdentityPresentation = PNC.NPCIdentityPresentation
 
+-- Temporary shared artwork until the Project Hoomans trait icon set is
+-- generated. Keep this fallback centralized so the generated paths can be
+-- added without changing the trait presentation flow.
+local TRAIT_ICON_PLACEHOLDER = "media/ui/Traits/trait_artisan.png"
+local TRAIT_ICON_PATHS = {}
+local TRAIT_ICON_SIZE = 18
+
 local function knowledgeSnapshot(npcID)
     local state = PNC.Network and PNC.Network.ClientState or nil
     return state and state.npcKnowledge and state.npcKnowledge[tostring(npcID)] or nil
 end
 
-local function traitText(npcID)
+local function traitEntries(npcID)
     local knowledge = knowledgeSnapshot(npcID)
-    local labels = {}
+    local entries = {}
     local known = false
     for _, category in ipairs(knowledge and knowledge.categories or {}) do
         for _, descriptor in ipairs(category.descriptors or {}) do
@@ -24,19 +31,79 @@ local function traitText(npcID)
             if presentation.topicID == "traits" and descriptor.value ~= nil then
                 known = true
                 if descriptor.value == true then
-                    labels[#labels + 1] = Shared.Text(
-                        presentation.labelKey, presentation.traitID
-                    )
+                    local traitID = tostring(presentation.traitID or "")
+                    entries[#entries + 1] = {
+                        id = traitID,
+                        label = Shared.Text(
+                            presentation.labelKey, presentation.traitID
+                        ),
+                        iconPath = TRAIT_ICON_PATHS[traitID]
+                            or presentation.iconPath
+                            or TRAIT_ICON_PLACEHOLDER,
+                    }
                 end
             end
         end
     end
+    table.sort(entries, function(left, right)
+        return tostring(left.label) < tostring(right.label)
+    end)
+    return entries, known
+end
+
+local function traitText(npcID, entries, known)
+    if not entries or not known then
+        entries, known = traitEntries(npcID)
+    end
     if not known then return "Unknown" end
-    if #labels == 0 then
+    if #entries == 0 then
         return Shared.Text("UI_PNC_Character_Traits_None", "None")
     end
-    table.sort(labels)
+    local labels = {}
+    for index = 1, #entries do labels[index] = entries[index].label end
     return table.concat(labels, ", ")
+end
+
+local function loadTraitIcon(path)
+    if type(path) ~= "string" or not getTexture then return nil end
+    return getTexture(path)
+end
+
+local function drawTraitIcons(view, entries, x, y, availableWidth)
+    if type(entries) ~= "table" or #entries == 0
+        or availableWidth <= 0
+    then
+        return 0
+    end
+    local gap = 3
+    local columns = math.max(1, math.floor(
+        (availableWidth + gap) / (TRAIT_ICON_SIZE + gap)
+    ))
+    local drawn = 0
+    local index
+    for index = 1, #entries do
+        local texture = loadTraitIcon(entries[index].iconPath)
+        if texture then
+            local column = drawn % columns
+            local row = math.floor(drawn / columns)
+            local iconX = x + column * (TRAIT_ICON_SIZE + gap)
+            local iconY = y + row * (TRAIT_ICON_SIZE + gap)
+            if view.drawTextureScaledAspect then
+                view:drawTextureScaledAspect(
+                    texture, iconX, iconY,
+                    TRAIT_ICON_SIZE, TRAIT_ICON_SIZE, 1, 1, 1, 1
+                )
+            else
+                view:drawTextureScaled(
+                    texture, iconX, iconY,
+                    TRAIT_ICON_SIZE, TRAIT_ICON_SIZE, 1, 1, 1, 1
+                )
+            end
+            drawn = drawn + 1
+        end
+    end
+    if drawn == 0 then return 0 end
+    return math.ceil(drawn / columns) * (TRAIT_ICON_SIZE + gap) - gap
 end
 
 function Tabs.CreateInfoChildren(view)
@@ -90,6 +157,7 @@ function Tabs.RenderInfo(view, snapshot, payload, topY)
     local y = topY
     local name = IdentityPresentation.GetName(view.npcId)
     local archetype = IdentityPresentation.GetArchetype(view.npcId)
+    local traitList, traitsKnown = traitEntries(view.npcId)
     local hp = tostring(math.floor(tonumber(resolved.hpCurrent) or 0)) .. "/" .. tostring(math.floor(tonumber(resolved.hpMax) or 0))
     local stamina = tostring(math.floor(tonumber(resolved.staminaCurrent) or 0)) .. "/" .. tostring(math.floor(tonumber(resolved.staminaMax) or 0))
     local carryText = tostring(Shared.Round(carry.usedWeight or 0, 1)) .. "/" .. tostring(Shared.Round(carry.maxWeight or 0, 1))
@@ -104,9 +172,14 @@ function Tabs.RenderInfo(view, snapshot, payload, topY)
     y = Shared.DrawLabelValue(
         view,
         Shared.Text("UI_PNC_Character_Traits", "Traits"),
-        traitText(view.npcId),
+        traitText(view.npcId, traitList, traitsKnown),
         x, y, labelWidth
     )
+    local traitIconHeight = drawTraitIcons(
+        view, traitList, x + labelWidth + 10, y + 1,
+        width - labelWidth - 10
+    )
+    if traitIconHeight > 0 then y = y + traitIconHeight + 4 end
     local activity = Shared.GetMedicalActivity
         and Shared.GetMedicalActivity(snapshot, payload) or nil
     y = Shared.DrawLabelValue(view, "Status",

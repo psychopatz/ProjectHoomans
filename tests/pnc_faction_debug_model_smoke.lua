@@ -253,6 +253,21 @@ local mobileRows = PNC.FactionDebugModel.BuildRows({
             active = true,
             controlMode = "strategic",
             pathMode = "player",
+            activity = "traveling_to_settlement",
+            groupState = "TRAVELING",
+            presence = "abstract",
+            travel = {
+                kind = "settlement",
+                startedAt = 24,
+                departureDay = 1,
+                destination = {
+                    kind = "ai_settlement",
+                    locationID = "aloc_settlement",
+                    x = 80,
+                    y = 90,
+                    z = 0,
+                },
+            },
             strategicTarget = {
                 kind = "player_base",
                 baseID = "base_player",
@@ -271,8 +286,136 @@ local mobileRows = PNC.FactionDebugModel.BuildRows({
     currentPlayerFactionID = "faction_player",
 }, true, nil)
 expectRowContaining(mobileRows, "Group type", "control=strategic")
+expectRowContaining(mobileRows, "Mobile state", "EN ROUTE")
 expectRowContaining(mobileRows, "Mobile objective", "player base")
-expectRowContaining(mobileRows, "Mobile target", "base_player")
+expectRowContaining(mobileRows, "Mobile target", "aloc_settlement")
+expectRowContaining(mobileRows, "Settlement travel", "day 1")
+
+local mobilePoolSnapshot = {
+    currentPlayerFactionID = "faction_player",
+    mobileGroups = {
+        {
+            id = "faction_road",
+            name = "Street Nav Group",
+            archetypeID = "trader",
+            mobile = {
+                active = true,
+                activity = "street_roaming",
+                ambient = { objective = "road" },
+                presence = "abstract",
+            },
+        },
+        {
+            id = "faction_ai_travel",
+            name = "AI Settlement Travelers",
+            archetypeID = "refugee",
+            mobile = {
+                active = true,
+                activity = "traveling_to_settlement",
+                groupState = "TRAVELING",
+                presence = "abstract",
+                travel = {
+                    destination = {
+                        kind = "ai_settlement",
+                        factionID = "faction_ai",
+                        locationID = "ai_settlement",
+                        x = 100,
+                        y = 110,
+                        z = 0,
+                    },
+                },
+            },
+        },
+        {
+            id = "faction_player_travel",
+            name = "Player Colony Raiders",
+            archetypeID = "looter",
+            mobile = {
+                active = true,
+                activity = "traveling_to_settlement",
+                groupState = "TRAVELING",
+                presence = "abstract",
+                travel = {
+                    destination = {
+                        kind = "player_colony",
+                        factionID = "faction_player",
+                        baseID = "base_player",
+                        locationID = "player_colony",
+                        x = 200,
+                        y = 210,
+                        z = 0,
+                    },
+                },
+            },
+        },
+        {
+            id = "faction_street",
+            name = "Street Wanderers",
+            archetypeID = "trader",
+            mobile = {
+                active = true,
+                activity = "street_roaming",
+                ambient = { objective = "shelter" },
+                presence = "live",
+            },
+        },
+    },
+    selectedFaction = {
+        id = "faction_player_travel",
+        name = "Player Colony Raiders",
+        mobile = {
+            active = true,
+            activity = "traveling_to_settlement",
+            groupState = "TRAVELING",
+            presence = "abstract",
+            travel = {
+                startedAt = 50,
+                departureDay = 2,
+                destination = {
+                    kind = "player_colony",
+                    factionID = "faction_player",
+                    baseID = "base_player",
+                    locationID = "player_colony",
+                    x = 200,
+                    y = 210,
+                    z = 0,
+                },
+            },
+        },
+    },
+}
+local mobileItems = PNC.FactionDebugModel.BuildMobileItems(
+    mobilePoolSnapshot)
+T.equal(#mobileItems, 4, "mobile tab lists every mobile group")
+T.equal(mobileItems[1].pool, "staging",
+    "mobile tab starts with the road staging pool")
+T.equal(mobileItems[3].pool, "player_colony",
+    "mobile tab isolates groups traveling toward the player colony")
+local poolCounts = PNC.FactionDebugModel.BuildMobilePoolCounts(
+    mobilePoolSnapshot)
+T.equal(poolCounts.staging, 1, "staging pool count")
+T.equal(poolCounts.en_route, 2, "en-route pool count includes player target")
+T.equal(poolCounts.player_colony, 1, "player colony pool count")
+T.equal(poolCounts.ai_settlement, 1, "AI settlement pool count")
+T.equal(poolCounts.street_roaming, 1, "street roaming pool count")
+local playerFilterItems = PNC.FactionDebugModel.BuildMobileItems(
+    mobilePoolSnapshot, "player_colony")
+T.equal(#playerFilterItems, 1,
+    "player colony filter only shows player-bound travelers")
+T.equal(playerFilterItems[1].category, "player_colony",
+    "player colony filter category")
+local aiFilterItems = PNC.FactionDebugModel.BuildMobileItems(
+    mobilePoolSnapshot, "ai_settlement")
+T.equal(#aiFilterItems, 1,
+    "AI settlement filter only shows AI-bound travelers")
+T.equal(aiFilterItems[1].category, "ai_settlement",
+    "AI settlement filter category")
+local mobileTabRows = PNC.FactionDebugModel.BuildGUIRows(
+    mobilePoolSnapshot, true, nil, "mobile")
+expectRowContaining(mobileTabRows, "WAITING ON ROAD", "1 group")
+expectRowContaining(mobileTabRows, "TRAVELING TO PLAYER COLONY", "1 group")
+expectRowContaining(mobileTabRows, "TRAVELING TO AI SETTLEMENT", "1 group")
+expectRowContaining(mobileTabRows, "Destination", "base_player")
 
 local diplomacy = PNC.FactionDebugModel.BuildGUIRows(
     snapshot, true, nil, "diplomacy"

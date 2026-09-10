@@ -248,6 +248,9 @@ local normalized = PNC.FactionTypes.NormalizeFaction(
 )
 T.equal(normalized.mobile.site.id, siteTwo.id,
     "mobile persistence normalizes staging site")
+T.equal(normalized.mobile.activity,
+    PNC.FactionConstants.MOBILE_ACTIVITY_STREET_ROAMING,
+    "mobile groups begin in the street-roaming activity")
 T.equal(deepEqual(
     normalized,
     PNC.FactionTypes.NormalizeFaction(normalized, faction.id)
@@ -300,6 +303,23 @@ T.equal(labels[faction.id], "Mobile Looter Group",
     "inspector distinguishes mobile looters from settlements")
 T.equal(labels[caravan.id], "Trading Caravan",
     "inspector identifies traders as mobile caravans")
-T.finish("pnc_mobile_group_smoke")
 
+PNC.Factions.IDGenerator = function() return "faction_debug_mobile" end
+PNC.MobileGroupDirectorInternal.FindRoadTarget = function()
+    return {
+        kind = "nav",
+        x = 650, y = 750, z = 0, radius = 20,
+        bounds = { minX = 640, minY = 740, maxX = 660, maxY = 760 },
+    }, "debug_test_nav"
+end
+local spawned = PNC.FactionDebug.PerformAction(nil, {
+    factionAction = "create_mobile_road_group",
+    archetypeID = "looter",
+    groupSize = 2,
+    presenceMode = "abstract",
+})
+T.truthy(spawned.actionResult.ok,
+    "debug inspector can spawn a road mobile group")
+T.equal(spawned.selectedFaction.mobile.debugState, "road_roaming",
+    "spawned debug group enters the road lobby")
 T.finish("pnc_mobile_group_smoke")

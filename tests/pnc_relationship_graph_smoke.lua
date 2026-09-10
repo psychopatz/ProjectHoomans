@@ -11,6 +11,8 @@ local PRESENTATION =
     .. "Relationships/PNC_RelationshipPresentation.lua"
 
 PNC = {}
+T.load("ProjectHoomans", "shared",
+    "PNC/Core/Relationships/PNC_RecruitmentPersonalityPolicy.lua")
 T.load(FILE)
 T.load(PRESENTATION)
 
@@ -51,10 +53,27 @@ T.equal(Graph.ResolveAttitude(20, 4), "sympathetic",
 T.equal(Graph.ResolveAttitude(4, 20), "impressed",
     "neutral approval positive respect")
 
-local recruit = Graph.Evaluate(50, 50, "recruit")
+local recruit = Graph.Evaluate(85, 85, "recruit")
 T.truthy(recruit.insideSuccessRegion,
     "high approval and respect recruit")
 T.equal(recruit.attitude, "admire", "evaluation attitude")
+
+local lowLoyaltyRecruit = Graph.EvaluateRecruitment(85, 85, {
+    loyalty = 0,
+    bravery = 0,
+})
+local highLoyaltyRecruit = Graph.EvaluateRecruitment(85, 85, {
+    loyalty = 1,
+    bravery = 0,
+})
+T.near(lowLoyaltyRecruit.score, 85,
+    "recruitment preserves relationship score without loyalty penalty")
+T.near(highLoyaltyRecruit.score, 65,
+    "recruitment applies policy loyalty penalty")
+T.near(highLoyaltyRecruit.personalityBreakdown.admire.scoreModifier, -20,
+    "recruitment exposes admire policy breakdown")
+T.near(highLoyaltyRecruit.personalityBreakdown.fear.scoreModifier, -20,
+    "fear breakdown includes loyalty")
 
 local feared = Graph.Evaluate(-30, 80, "challenge_extorter")
 T.truthy(feared.insideSuccessRegion,

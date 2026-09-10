@@ -163,6 +163,7 @@ function Factions.TransferNPC(npcID, destinationFactionID, options)
     local rank
     local membershipStatus
     local at
+    local leaveReason
     if not Internal.authority() then return false, "not_authority" end
     Factions.EnsureLoaded()
     options = type(options) == "table" and options or {}
@@ -189,6 +190,8 @@ function Factions.TransferNPC(npcID, destinationFactionID, options)
         return false, "invalid_membership_status"
     end
     at = Internal.finiteTimestamp(options.worldAgeHours, 0)
+    leaveReason = Constants.VALID_LEAVE_REASONS[options.leaveReason]
+        and options.leaveReason or "transferred"
     former = affiliation.formerFactionIDs
     if source then
         if PNC.Communities
@@ -200,7 +203,7 @@ function Factions.TransferNPC(npcID, destinationFactionID, options)
             affiliation,
             source.id,
             at,
-            "transferred"
+            leaveReason
         )
         source.memberIDs[npcID] = nil
         if source.leaderNPCID == npcID then

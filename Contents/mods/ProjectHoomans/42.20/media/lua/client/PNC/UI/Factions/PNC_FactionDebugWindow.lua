@@ -28,9 +28,15 @@ local CONTROLS = {
     { id = "refresh", titleKey = "UI_PNC_MonitorRefresh", variant = "quiet" },
     { id = "overlay", titleKey = "UI_PNC_FactionToggleOverlay", variant = "quiet" },
     { id = "view_overview", titleKey = "UI_PNC_FactionViewOverview", variant = "quiet" },
+    { id = "view_mobile", titleKey = "UI_PNC_FactionViewMobile", variant = "warning" },
     { id = "view_diplomacy", titleKey = "UI_PNC_FactionViewDiplomacy", variant = "quiet" },
     { id = "view_members", titleKey = "UI_PNC_FactionViewMembers", variant = "quiet" },
     { id = "view_diagnostics", titleKey = "UI_PNC_FactionViewDiagnostics", variant = "quiet" },
+    { id = "mobile_filter_all", titleKey = "UI_PNC_FactionMobileFilterAll", variant = "selected", views = views("mobile") },
+    { id = "mobile_filter_staging", titleKey = "UI_PNC_FactionMobileFilterStaging", variant = "quiet", views = views("mobile") },
+    { id = "mobile_filter_player", titleKey = "UI_PNC_FactionMobileFilterPlayer", variant = "quiet", views = views("mobile") },
+    { id = "mobile_filter_ai", titleKey = "UI_PNC_FactionMobileFilterAI", variant = "quiet", views = views("mobile") },
+    { id = "mobile_filter_street", titleKey = "UI_PNC_FactionMobileFilterStreet", variant = "quiet", views = views("mobile") },
     { id = "create_player_faction", titleKey = "UI_PNC_FactionCreatePlayer", variant = "success", views = views("overview") },
     { id = "edit_emblem", titleKey = "UI_PNC_FactionEditEmblem", variant = "default", views = views("overview") },
     { id = "create_settler", titleKey = "UI_PNC_FactionCreateSettler", variant = "success", views = views("overview") },
@@ -40,13 +46,21 @@ local CONTROLS = {
     { id = "create_strategic_looter_group", titleKey = "UI_PNC_FactionCreateStrategicLooterGroup", variant = "danger", views = views("overview") },
     { id = "create_trader", titleKey = "UI_PNC_FactionCreateTrader", variant = "default", views = views("overview") },
     { id = "create_refugee", titleKey = "UI_PNC_FactionCreateRefugee", variant = "default", views = views("overview") },
+    { id = "create_mobile_road_group", titleKey = "UI_PNC_FactionCreateMobileRoadGroup", variant = "warning", views = views("mobile") },
+    { id = "create_mobile_player_route_group", titleKey = "UI_PNC_FactionCreateMobilePlayerRouteGroup", variant = "danger", views = views("mobile") },
+    { id = "create_mobile_ai_route_group", titleKey = "UI_PNC_FactionCreateMobileAIRouteGroup", variant = "warning", views = views("mobile") },
     { id = "generate_group", titleKey = "UI_PNC_FactionGenerateGroup", variant = "success", views = views("overview") },
-    { id = "mobile_control_mode", titleKey = "UI_PNC_FactionMobileControlMode", variant = "quiet", views = views("overview") },
-    { id = "mobile_path_mode", titleKey = "UI_PNC_FactionMobilePathMode", variant = "quiet", views = views("overview") },
-    { id = "mobile_refresh", titleKey = "UI_PNC_FactionMobileRefresh", variant = "quiet", views = views("overview") },
-    { id = "mobile_relocate", titleKey = "UI_PNC_FactionMobileRelocate", variant = "quiet", views = views("overview") },
-    { id = "population_label", titleKey = "UI_PNC_FactionGroupSize", variant = "quiet", views = views("overview") },
-    { id = "presence_mode", titleKey = "UI_PNC_FactionPresenceMode", variant = "quiet", views = views("overview") },
+    { id = "mobile_control_mode", titleKey = "UI_PNC_FactionMobileControlMode", variant = "quiet", views = views("mobile") },
+    { id = "mobile_path_mode", titleKey = "UI_PNC_FactionMobilePathMode", variant = "quiet", views = views("mobile") },
+    { id = "mobile_refresh", titleKey = "UI_PNC_FactionMobileRefresh", variant = "quiet", views = views("mobile") },
+    { id = "mobile_relocate", titleKey = "UI_PNC_FactionMobileRelocate", variant = "quiet", views = views("mobile") },
+    { id = "force_mobile_road", titleKey = "UI_PNC_FactionForceMobileRoad", variant = "warning", views = views("mobile") },
+    { id = "force_mobile_departure", titleKey = "UI_PNC_FactionForceMobileDeparture", variant = "danger", views = views("mobile") },
+    { id = "force_mobile_arrival", titleKey = "UI_PNC_FactionForceMobileArrival", variant = "quiet", views = views("mobile") },
+    { id = "repair_mobile_travel", titleKey = "UI_PNC_FactionRepairMobileTravel", variant = "quiet", views = views("mobile") },
+    { id = "roll_mobile_departures", titleKey = "UI_PNC_FactionRollMobileDepartures", variant = "success", views = views("mobile") },
+    { id = "population_label", titleKey = "UI_PNC_FactionGroupSize", variant = "quiet", views = views("overview", "mobile") },
+    { id = "presence_mode", titleKey = "UI_PNC_FactionPresenceMode", variant = "quiet", views = views("overview", "mobile") },
     { id = "archive", titleKey = "UI_PNC_FactionArchive", variant = "danger", views = views("overview") },
     { id = "assign", titleKey = "UI_PNC_FactionAssignNPC", variant = "success", views = views("members") },
     { id = "manage_player_members", titleKey = "UI_PNC_FactionManageMembers", variant = "success", views = views("members") },
@@ -74,6 +88,14 @@ local CONTROLS = {
     { id = "check_registry", titleKey = "UI_PNC_FactionCheckRegistry", variant = "quiet", views = views("diagnostics") },
     { id = "repair_indexes", titleKey = "UI_PNC_FactionRepairIndexes", variant = "danger", views = views("diagnostics") },
     { id = "export_snapshot", titleKey = "UI_PNC_FactionExportSnapshot", variant = "default", views = views("diagnostics") },
+}
+
+local MOBILE_FILTER_CONTROL_MAP = {
+    mobile_filter_all = "all",
+    mobile_filter_staging = "staging",
+    mobile_filter_player = "player_colony",
+    mobile_filter_ai = "ai_settlement",
+    mobile_filter_street = "street_roaming",
 }
 
 local function drawEntity(list, y, entry, alternate)
@@ -107,6 +129,46 @@ local function drawEntity(list, y, entry, alternate)
     return y + list.itemheight
 end
 
+local function drawMobileEntity(list, y, entry, alternate)
+    local item = entry.item or {}
+    local height = list.itemheight
+    UI.DrawListSelection(
+        list, y, height, list.selected == entry.index, alternate
+    )
+    local font = Theme.Font(list.uiScale)
+    local textColor = Theme.colors.text
+    local muted = Theme.colors.textMuted
+    local badgeWidth = UI.DrawBadge(
+        list,
+        item.categoryLabel or "UNKNOWN",
+        list:getWidth() - 10,
+        y + 5,
+        item.categoryTone or "accent"
+    )
+    local available = math.max(80, list:getWidth() - badgeWidth - 28)
+    list:drawText(
+        Layout.Ellipsize(
+            item.name or item.id or "Unknown mobile group",
+            font,
+            available
+        ),
+        12, y + 5,
+        textColor.r, textColor.g, textColor.b, textColor.a,
+        font
+    )
+    list:drawText(
+        Layout.Ellipsize(
+            item.listDetail or item.detail or item.id,
+            font,
+            list:getWidth() - 24
+        ),
+        12, y + 28,
+        muted.r, muted.g, muted.b, muted.a,
+        font
+    )
+    return y + height
+end
+
 ISPNCFactionDebugWindow =
     PsychopatzWindow:derive("ISPNCFactionDebugWindow")
 
@@ -119,6 +181,10 @@ function ISPNCFactionDebugWindow:createChildren()
     self.factions = UI.CreateList(self, {
         itemHeight = Layout.Pixels(44, self.uiScale),
         doDrawItem = drawEntity,
+    })
+    self.mobileGroups = UI.CreateList(self, {
+        itemHeight = Layout.Pixels(52, self.uiScale),
+        doDrawItem = drawMobileEntity,
     })
     self.targets = UI.CreateList(self, {
         itemHeight = Layout.Pixels(44, self.uiScale),
@@ -149,6 +215,7 @@ function ISPNCFactionDebugWindow:createChildren()
     self.presenceMode = "auto"
     self.mobilePathMode = "random"
     self.mobileControlMode = "ambient"
+    self.mobileFilter = "all"
     self.viewMode = "overview"
     for _, definition in ipairs(CONTROLS) do
         local title = text(definition.titleKey)
@@ -197,7 +264,9 @@ function ISPNCFactionDebugWindow:onResponsiveLayout()
             end
         end
     end
-    if self.viewMode ~= "overview" then
+    if self.viewMode ~= "overview"
+        and self.viewMode ~= "mobile"
+    then
         self.groupSizeEntry:setVisible(false)
     end
     local controls = Layout.Flow(
@@ -208,10 +277,61 @@ function ISPNCFactionDebugWindow:onResponsiveLayout()
     local top = controls.bottom + Layout.Pixels(25, self.uiScale)
     local height = math.max(100, rect.y + rect.height - top)
     local gap = Layout.Pixels(8, self.uiScale)
+    local isMobileView = self.viewMode == "mobile"
+    if isMobileView then
+        local mobileWidth = math.max(
+            260,
+            math.min(420, math.floor((rect.width - gap) * 0.38))
+        )
+        self.layout = {
+            mobile = {
+                x = rect.x, y = top,
+                width = mobileWidth, height = height,
+            },
+            detail = {
+                x = rect.x + mobileWidth + gap,
+                y = top,
+                width = rect.width - mobileWidth - gap,
+                height = height,
+            },
+        }
+        self.factions:setVisible(false)
+        self.targets:setVisible(false)
+        self.npcs:setVisible(false)
+        self.mobileGroups:setVisible(true)
+        Layout.SetBounds(
+            self.mobileGroups,
+            self.layout.mobile.x,
+            self.layout.mobile.y,
+            self.layout.mobile.width,
+            self.layout.mobile.height
+        )
+        Layout.SetBounds(
+            self.details,
+            self.layout.detail.x,
+            self.layout.detail.y,
+            self.layout.detail.width,
+            self.layout.detail.height
+        )
+        Layout.SetBounds(
+            self.dashboard,
+            self.layout.detail.x,
+            self.layout.detail.y,
+            self.layout.detail.width,
+            self.layout.detail.height
+        )
+        self.dashboard:setVisible(false)
+        self.details:setVisible(true)
+        return
+    end
     local listWidth = math.max(
         150,
         math.floor((rect.width - gap * 3) * 0.19)
     )
+    self.factions:setVisible(true)
+    self.targets:setVisible(true)
+    self.npcs:setVisible(true)
+    self.mobileGroups:setVisible(false)
     self.layout = {
         faction = {
             x = rect.x, y = top,
@@ -234,6 +354,7 @@ function ISPNCFactionDebugWindow:onResponsiveLayout()
     }
     for widget, bounds in pairs({
         [self.factions] = self.layout.faction,
+        [self.mobileGroups] = self.layout.faction,
         [self.targets] = self.layout.target,
         [self.npcs] = self.layout.npc,
         [self.details] = self.layout.detail,
@@ -249,7 +370,12 @@ function ISPNCFactionDebugWindow:onResponsiveLayout()
 end
 
 function ISPNCFactionDebugWindow:getFaction()
-    local entry = self.factions and self.factions:getItem()
+    local list = self.viewMode == "mobile"
+        and self.mobileGroups or self.factions
+    local entry = list and list:getItem()
+    -- Keep the list wrapper here.  The rest of this window uses
+    -- faction.faction for the serialized faction payload, while the
+    -- wrapper itself supplies the stable selection id/label.
     return entry and entry.item or nil
 end
 
@@ -275,6 +401,28 @@ function ISPNCFactionDebugWindow:requestSnapshot()
         )
     end
     self.lastRequestAt = PNC.Core.Now()
+end
+
+function ISPNCFactionDebugWindow:refreshMobileFilterControls(snapshot)
+    local counts = Model.BuildMobilePoolCounts(snapshot)
+    for index, definition in ipairs(CONTROLS) do
+        local filter = MOBILE_FILTER_CONTROL_MAP[definition.id]
+        local button = self.controls[index]
+        if filter and button then
+            local count = Model.MobileFilterCount(counts, filter)
+            local title = Model.MobileFilterLabel(filter)
+                .. " (" .. tostring(count) .. ")"
+            if button.setTitle then
+                button:setTitle(title)
+            else
+                button.title = title
+            end
+            UI.SetButtonVariant(
+                button,
+                filter == self.mobileFilter and "selected" or "quiet"
+            )
+        end
+    end
 end
 
 local function restoreSelection(list, id)
@@ -305,6 +453,23 @@ function ISPNCFactionDebugWindow:refreshSnapshot()
         and (tonumber(self.factions.selected) or 0) < 1
     then
         self.factions.selected = 1
+    end
+    self.mobileGroups:clear()
+    for _, item in ipairs(Model.BuildMobileItems(
+        snapshot, self.mobileFilter
+    )) do
+        self.mobileGroups:addItem(item.label, item)
+    end
+    self:refreshMobileFilterControls(snapshot)
+    restoreSelection(
+        self.mobileGroups,
+        snapshot and snapshot.selectedFactionID
+            or oldFaction and oldFaction.id
+    )
+    if #self.mobileGroups.items > 0
+        and (tonumber(self.mobileGroups.selected) or 0) < 1
+    then
+        self.mobileGroups.selected = 1
     end
     self.targets:clear()
     for _, item in ipairs(
@@ -396,6 +561,14 @@ end
 
 function ISPNCFactionDebugWindow:onAction(button)
     local internal = button.internal
+    local mobileFilter = MOBILE_FILTER_CONTROL_MAP[internal]
+    if mobileFilter then
+        self.mobileFilter = mobileFilter
+        self:refreshSnapshot()
+        self:requestResponsiveLayout(true)
+        self:requestSnapshot()
+        return
+    end
     local faction = self:getFaction()
     local npc = self:getNPC()
     local target = self:getTargetFaction()
@@ -633,6 +806,29 @@ function ISPNCFactionDebugWindow:onAction(button)
         payload.archetypeID = "refugee"
         payload.creationKind = "mobile_group"
         payload.refreshMobileObjective = true
+    elseif internal == "create_mobile_road_group" then
+        payload.factionAction = internal
+        payload.archetypeID = "looter"
+        payload.creationKind = "mobile_group"
+        payload.mobilePathMode = "random"
+        payload.mobileControlMode = "ambient"
+        payload.refreshMobileObjective = false
+    elseif internal == "create_mobile_player_route_group" then
+        payload.factionAction = internal
+        payload.archetypeID = "looter"
+        payload.creationKind = "mobile_group"
+        payload.mobilePathMode = "player"
+        payload.mobileControlMode = "strategic"
+        payload.presenceMode = "abstract"
+        payload.refreshMobileObjective = false
+    elseif internal == "create_mobile_ai_route_group" then
+        payload.factionAction = internal
+        payload.archetypeID = "refugee"
+        payload.creationKind = "mobile_group"
+        payload.mobilePathMode = "random"
+        payload.mobileControlMode = "ambient"
+        payload.presenceMode = "abstract"
+        payload.refreshMobileObjective = false
     elseif internal == "mobile_relocate" then
         payload.factionAction = "mobile_relocate"
     elseif internal == "generate_group" then
@@ -645,6 +841,15 @@ function ISPNCFactionDebugWindow:onAction(button)
         payload.refreshMobileObjective = true
     elseif internal == "mobile_refresh" then
         payload.factionAction = "mobile_refresh"
+    elseif internal == "force_mobile_road"
+        or internal == "force_mobile_departure"
+        or internal == "force_mobile_arrival"
+        or internal == "repair_mobile_travel"
+    then
+        payload.factionAction = internal
+    elseif internal == "roll_mobile_departures" then
+        payload.factionAction = internal
+        payload.departureBudget = 12
     elseif string.sub(internal, 1, 7) == "create_" then
         payload.factionAction = "create"
         payload.archetypeID = string.sub(internal, 8)
@@ -716,6 +921,7 @@ function ISPNCFactionDebugWindow:prerender()
     local atWar = relation.atWar == true
     local allied = relation.allied == true
     local isMobileFaction = faction ~= nil
+        and faction.faction ~= nil
         and faction.faction.mobile ~= nil
         and faction.faction.mobile.active == true
     for index, button in ipairs(self.controls) do
@@ -727,6 +933,10 @@ function ISPNCFactionDebugWindow:prerender()
             or internal == "mobile_path_mode"
             or internal == "mobile_refresh"
             or internal == "mobile_relocate"
+            or internal == "force_mobile_road"
+            or internal == "force_mobile_departure"
+            or internal == "force_mobile_arrival"
+            or internal == "repair_mobile_travel"
         then
             visible = visible and isMobileFaction
         end
@@ -747,13 +957,22 @@ function ISPNCFactionDebugWindow:prerender()
         elseif internal == "generate_group" then
             enabled = faction ~= nil
                 and faction.faction.status == "active"
+        elseif internal == "create_mobile_player_route_group" then
+            local departure = snapshot.mobileDeparture or {}
+            enabled = (tonumber(departure.playerBaseCount) or 0) > 0
         elseif internal == "mobile_control_mode"
             or internal == "mobile_path_mode"
             or internal == "mobile_refresh"
+            or internal == "force_mobile_road"
+            or internal == "force_mobile_departure"
+            or internal == "force_mobile_arrival"
+            or internal == "repair_mobile_travel"
         then
             enabled = isMobileFaction
         elseif internal == "mobile_relocate" then
             enabled = isMobileFaction
+        elseif internal == "roll_mobile_departures" then
+            enabled = true
         elseif internal == "population_label" then
             enabled = false
         elseif internal == "presence_mode"
@@ -831,6 +1050,41 @@ end
 function ISPNCFactionDebugWindow:render()
     PsychopatzWindow.render(self)
     if not self.layout then return end
+    if self.viewMode == "mobile" then
+        local snapshot = ClientState.factionDebug or {}
+        local counts = Model.BuildMobilePoolCounts(snapshot)
+        local shown = #(self.mobileGroups.items or {})
+        local total = Model.MobileFilterCount(counts, "all")
+        local filterLabel = Model.MobileFilterLabel(self.mobileFilter)
+        local selected = self:getFaction()
+        local selectedFaction = selected and selected.faction or nil
+        local selectedMobile = selectedFaction
+            and selectedFaction.mobile or nil
+        local selectedCategory = selectedMobile
+            and Model.MobileCategory(
+                selectedMobile, snapshot.currentPlayerFactionID)
+            or nil
+        UI.DrawSectionTitle(
+            self,
+            text("UI_PNC_FactionSectionMobile"),
+            self.layout.mobile.x,
+            self.layout.mobile.y - Layout.Pixels(21, self.uiScale),
+            self.layout.mobile.width,
+            filterLabel .. "  /  " .. tostring(shown)
+                .. " shown of " .. tostring(total)
+        )
+        UI.DrawSectionTitle(
+            self,
+            text("UI_PNC_FactionSectionMobileDetails"),
+            self.layout.detail.x,
+            self.layout.detail.y - Layout.Pixels(21, self.uiScale),
+            self.layout.detail.width,
+            selectedCategory
+                and Model.MobileCategoryLabel(selectedCategory)
+                or "NO SELECTION"
+        )
+        return
+    end
     UI.DrawSectionTitle(
         self, text("UI_PNC_FactionSectionPersistent"),
         self.layout.faction.x,

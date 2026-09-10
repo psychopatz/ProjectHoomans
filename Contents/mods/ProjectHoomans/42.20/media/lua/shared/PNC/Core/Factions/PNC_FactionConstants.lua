@@ -61,6 +61,14 @@ Constants.MOBILE_AMBIENT_OBJECTIVE_HOURS = 6
 Constants.MOBILE_AMBIENT_RETRY_HOURS = 0.25
 Constants.MOBILE_AMBIENT_SHELTER_SEARCH_RADIUS = 160
 Constants.MOBILE_AMBIENT_ROAD_SEARCH_RADIUS = 900
+Constants.MOBILE_ACTIVITY_STREET_ROAMING = "street_roaming"
+Constants.MOBILE_ACTIVITY_TRAVELING_TO_SETTLEMENT =
+    "traveling_to_settlement"
+Constants.VALID_MOBILE_ACTIVITY_STATES = {
+    [Constants.MOBILE_ACTIVITY_STREET_ROAMING] = true,
+    [Constants.MOBILE_ACTIVITY_TRAVELING_TO_SETTLEMENT] = true,
+}
+Constants.MOBILE_TRAVEL_SETTLEMENT = "settlement"
 Constants.PLAYER_PACIFICATION_DEFAULT_HOURS = 24
 Constants.PLAYER_PACIFICATION_LIMIT = 64
 Constants.PLAYER_PACIFICATION_REASON_MAX_LENGTH = 96
@@ -248,6 +256,8 @@ end
 Constants.VALID_LEAVE_REASONS = {
     left = true,
     removed = true,
+    colonist_abandoned = true,
+    colonist_expelled = true,
     faction_archived = true,
     faction_destroyed = true,
     transferred = true,

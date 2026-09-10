@@ -28,6 +28,7 @@ function Debug.PerformAction(player, args)
     }
     local handlers = {
         Internal.handleCreationAction,
+        Internal.handleMobileGroupAction,
         Internal.handleMembershipAction,
         Internal.handleDiplomacyAction,
         Internal.handleDiagnosticAction,

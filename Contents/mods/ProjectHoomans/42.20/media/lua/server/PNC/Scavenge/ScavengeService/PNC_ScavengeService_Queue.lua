@@ -20,11 +20,27 @@ local restorePreviousOrder = Internal.RestorePreviousOrder
 local releaseReservations = Internal.ReleaseReservations
 local removeSession = Internal.RemoveSession
 
+local function isCamped(record)
+    return PNC.HomeDutyService
+        and PNC.HomeDutyService.IsCamped
+        and PNC.HomeDutyService.IsCamped(record) == true
+end
+
+local function hasCampedWorker(session)
+    for npcId, _ in pairs(session and session.workers or {}) do
+        local record = PNC.Registry and PNC.Registry.Get
+            and PNC.Registry.Get(npcId) or nil
+        if isCamped(record) then return true end
+    end
+    return false
+end
+
 function Service.QueueMultiple(player, arguments)
     arguments = type(arguments) == "table" and arguments or {}
     local session = Service.GetSession(arguments.sessionId)
     if not session then return false, "session_not_found" end
     if not ownerMatches(session, player) then return false, "session_not_owned" end
+    if hasCampedWorker(session) then return false, "NPC_CAMPED" end
     local reason
     if session.state == "ATOMIC_TRANSFER" then
         return false, "atomic_transfer_in_progress"

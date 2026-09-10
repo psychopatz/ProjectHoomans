@@ -309,6 +309,8 @@ T.equal(definition.context.npcLastName, "Hale", "NPC last name")
 T.equal(definition.lifecycle.kind, "conversation_lifecycle", "lifecycle")
 T.truthy(#definition.nodes.greeting.choices >= 8,
     "registered category menu composed")
+T.equal(definition.nodes.greeting.portraitAnimation, "greeting.wavehi",
+    "authored greeting animation reached the conversation root")
 local recruitChoice
 for _, choice in ipairs(definition.nodes.menu.choices or {}) do
     if choice.id == "recruit" then recruitChoice = choice end
@@ -320,6 +322,7 @@ T.equal(type(recruitChoice.onHighlightChanged), "function",
 local memberEntry = {
     id = "npc-member",
     name = "Member Colonist",
+    record = { recruited = true },
     snapshot = {
         displayName = "Member Colonist",
         survivor = { forename = "Member", surname = "Colonist" },
@@ -356,6 +359,31 @@ T.truthy(territoryDiagnostic.visible,
     "territory diagnostic marks member choice visible")
 T.equal(territoryDiagnostic.reason, "visible",
     "territory diagnostic reason")
+local disbandChoice
+for _, choice in ipairs(memberDefinition.nodes.menu.choices or {}) do
+    if choice.id == "disband" then disbandChoice = choice end
+end
+T.truthy(disbandChoice, "member menu exposes the disband choice")
+T.equal(type(disbandChoice.onHighlightChanged), "function",
+    "disband choice exposes the departure preview callback")
+local disbandPreviewRequirement
+PsychopatzCore.Conversation.instance = {
+    spec = { npcID = "npc-member" },
+    extensionParts = {
+        relationship = {
+            setRequirement = function(_, value)
+                disbandPreviewRequirement = value
+            end,
+        },
+    },
+}
+disbandChoice.onHighlightChanged(disbandChoice, true)
+T.equal(disbandPreviewRequirement, "departure",
+    "disband hover shows the departure threshold graph")
+disbandChoice.onHighlightChanged(disbandChoice, false)
+T.equal(disbandPreviewRequirement, "inspect",
+    "leaving disband clears the departure preview")
+PsychopatzCore.Conversation.instance = nil
 
 local savedNetwork = PNC.Network
 PNC.Network = { ClientState = { npcPresentations = {} } }
@@ -523,8 +551,12 @@ local fakeSession = {
         routedChoices = self.currentNode and self.currentNode.choices or nil
     end,
     setChoices = function(_, choices) routedChoices = choices end,
-    queueMessage = function(self, speaker, value)
-        self.queue[#self.queue + 1] = { speaker = speaker, value = value }
+    queueMessage = function(self, speaker, value, metadata)
+        self.queue[#self.queue + 1] = {
+            speaker = speaker,
+            value = value,
+            metadata = metadata,
+        }
     end,
     finishPending = function(self) self.finishedPending = true end,
 }
@@ -559,9 +591,13 @@ T.truthy(PNC.Conversation.Composer.ReceiveOutcome({
     choiceID = "background",
     outcomeID = "reply",
     responseKey = "response.background",
+    npcReaction = "declined",
     nextNodeID = "$root",
     close = false,
 }), "client accepts a menu-return outcome")
+T.equal(fakeSession.queue[#fakeSession.queue].metadata.portraitAnimation,
+    "reaction.thumbsdown",
+    "authored decline reaction reaches the close-up portrait")
 T.equal(fakeSession.pendingNext, "menu",
     "reserved root route maps back to the category menu")
 T.equal(definition.nodes.menu.npc, nil,

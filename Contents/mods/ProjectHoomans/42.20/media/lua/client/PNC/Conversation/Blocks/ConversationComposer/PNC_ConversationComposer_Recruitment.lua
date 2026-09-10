@@ -7,6 +7,7 @@ local activeView = Internal.ActiveView
 local appendDiary = Internal.AppendDiary
 local dialoguePayload = Internal.DialoguePayload
 local notifyFailure = Internal.NotifyFailure
+local portraitAnimationForReaction = Internal.PortraitAnimationForReaction
 local receiveRelationshipAfter = Internal.ReceiveRelationshipAfter
 local resolvedDialogue = Internal.ResolvedDialogue
 
@@ -78,7 +79,11 @@ function Composer.ReceiveRecruitOutcome(args)
                 args.responseKey,
                 context,
                 { route = args.route or "none" }
-            ))
+            ), {
+                portraitAnimation = portraitAnimationForReaction(
+                    args.npcReaction
+                ),
+            })
             view.spec.nodes.menu = Composer.BuildMenuNode(
                 context,
                 context and context.conversationMenuOptions

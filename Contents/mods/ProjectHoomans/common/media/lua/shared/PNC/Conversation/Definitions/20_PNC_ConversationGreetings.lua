@@ -13,6 +13,8 @@ Registry.RegisterBlock(H.PREFIX .. "hostile_parley", {
     nodes = {
         opening = {
             textKey = "opening",
+            -- Presentation metadata travels with the authored greeting node;
+            -- the conversation runtime turns it into a portrait state change.
             choices = {
                 {
                     id = "ceasefire",
@@ -56,7 +58,13 @@ for relationshipID, audience in pairs(relationships) do
                 { type = "pnc:relationship_state", value = relationshipID },
                 { type = "pnc:time", startHour = window[1], endHour = window[2] },
             },
-            nodes = { opening = { textKeys = keys, choices = {} } },
+            nodes = {
+                opening = {
+                    textKeys = keys,
+                    portraitAnimation = "greeting.wavehi",
+                    choices = {},
+                },
+            },
         })
     end
 end

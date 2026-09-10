@@ -101,6 +101,22 @@ local function cleanResponseText(value)
     return trim(value)
 end
 
+local function declinedPortraitAnimation(results)
+    for _, result in ipairs(type(results) == "table" and results or {}) do
+        local replyContext = type(result.replyContext) == "table"
+            and result.replyContext or nil
+        local authoritativeDecline = result.accepted ~= true
+            and replyContext
+            and replyContext.outcome == "rejected"
+            and (result.authoritative == true
+                or replyContext.authoritative == true)
+        if authoritativeDecline then
+            return "reaction.thumbsdown"
+        end
+    end
+    return nil
+end
+
 local function replaceAmbientIdentity(text, fullName, firstName, surname)
     local names = { fullName, surname }
     local replacement = tostring(firstName or "")
@@ -862,6 +878,7 @@ local function completeTextResponse(view, response, source)
     session:queueMessage("npc", { fallback = response }, {
         source = source,
         messageID = source.messageID,
+        portraitAnimation = source.portraitAnimation,
     })
     finishPendingRequest()
     return true
@@ -1119,6 +1136,7 @@ function Integration.Deliver(arguments)
             forceToolReply
         )
     end
+    local portraitAnimation = declinedPortraitAnimation(semanticResults)
     if traceEnabled() then
         Trace.Record({
             source = "ProjectHoomans",
@@ -1152,6 +1170,7 @@ function Integration.Deliver(arguments)
         Pending.conversationID = trim(arguments.conversation_id)
         Pending.responseText = response
         Pending.responseIsFailure = providerFailure == true
+        Pending.portraitAnimation = portraitAnimation
         session.llmPending = true
         session.busy = true
         view.historyPart:setTyping("npc")
@@ -1183,6 +1202,7 @@ function Integration.Deliver(arguments)
         messageID = "llm-response:" .. requestID,
         providerFailure = providerFailure == true,
         contextEligible = providerFailure ~= true,
+        portraitAnimation = portraitAnimation,
     })
     if traceEnabled() then
         Trace.Record({
@@ -1273,6 +1293,7 @@ function Integration.SpeechStarted(arguments)
             providerFailure = Pending.responseIsFailure == true,
             contextEligible = Pending.responseIsFailure ~= true,
         },
+        portraitAnimation = Pending.portraitAnimation,
     })
     view.historyPart:setTyping(nil)
     ActiveSpeech[Pending.utteranceID] = speech
@@ -1338,6 +1359,7 @@ function Integration.SpeechFallback(arguments)
                 messageID = "llm-response:" .. Pending.requestID,
                 providerFailure = Pending.responseIsFailure == true,
                 contextEligible = Pending.responseIsFailure ~= true,
+                portraitAnimation = Pending.portraitAnimation,
             })
             log(
                 "speech_fallback",

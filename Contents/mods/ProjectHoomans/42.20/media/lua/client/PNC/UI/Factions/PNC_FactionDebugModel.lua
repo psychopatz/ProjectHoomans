@@ -1,9 +1,12 @@
 -- Pure presentation model for the guarded faction inspector.
 
+require "PNC/UI/Mobile/PNC_MobileGroupDebugModel"
+
 PNC = PNC or {}
 PNC.FactionDebugModel = PNC.FactionDebugModel or {}
 
 local Model = PNC.FactionDebugModel
+local MobileModel = PNC.MobileGroupDebugModel
 
 function Model.ShortenID(value, maximum)
     value = tostring(value or "")
@@ -57,17 +60,356 @@ function Model.BuildFactionItems(snapshot)
     for _, faction in ipairs(
         snapshot and snapshot.factions or {}
     ) do
+        local mobile = faction.mobile
+        local detail = faction.archetypeLabel
+            .. " / " .. faction.status
+            .. (faction.ownerPlayerKey
+                and " / player-owned" or "")
+        if mobile and mobile.active == true then
+            detail = detail .. " | " .. MobileModel.StateText(mobile)
+        end
         output[#output + 1] = {
             id = faction.id,
             label = faction.name,
-            detail = faction.archetypeLabel
-                .. " / " .. faction.status
-                .. (faction.ownerPlayerKey
-                    and " / player-owned" or ""),
+            detail = detail,
             faction = faction,
         }
     end
     return output
+end
+
+local MOBILE_POOL_ORDER = {
+    staging = 1,
+    en_route = 2,
+    player_colony = 3,
+    street_roaming = 4,
+}
+
+local MOBILE_POOL_MEANINGS = {
+    staging = "Road-visible groups waiting for the daily departure roll.",
+    en_route = "Abstract traversal toward an AI-owned settlement.",
+    player_colony = "Abstract traversal toward a colony owned by your faction.",
+    street_roaming = "Ambient street behavior; may shelter at night.",
+}
+
+local MOBILE_CATEGORY_ORDER = {
+    staging = 1,
+    ai_settlement = 2,
+    player_colony = 3,
+    street_roaming = 4,
+}
+
+local MOBILE_CATEGORY_LABELS = {
+    staging = "WAITING ON ROAD",
+    player_colony = "TRAVELING TO PLAYER COLONY",
+    ai_settlement = "TRAVELING TO AI SETTLEMENT",
+    street_roaming = "STREET ROAMING",
+}
+
+local MOBILE_CATEGORY_TONES = {
+    staging = "success",
+    player_colony = "danger",
+    ai_settlement = "warning",
+    street_roaming = "accent",
+}
+
+local MOBILE_FILTER_LABELS = {
+    all = "ALL MOBILE GROUPS",
+    staging = "WAITING ON ROAD",
+    player_colony = "TO PLAYER COLONY",
+    ai_settlement = "TO AI SETTLEMENT",
+    street_roaming = "STREET ROAMING",
+}
+
+local MOBILE_FILTERS = {
+    all = true,
+    staging = true,
+    player_colony = true,
+    ai_settlement = true,
+    street_roaming = true,
+}
+
+local function mobileFactionList(snapshot)
+    if snapshot and snapshot.mobileGroups then
+        return snapshot.mobileGroups
+    end
+    return snapshot and snapshot.factions or {}
+end
+
+local function mobileTargetsPlayerColony(mobile, playerFactionID)
+    local target = MobileModel.Target(mobile)
+    if not target then return false end
+    if target.kind == "player_colony"
+        or target.kind == "player_base"
+    then
+        return true
+    end
+    return playerFactionID ~= nil
+        and target.factionID == playerFactionID
+end
+
+function Model.MobileCategory(mobile, playerFactionID)
+    local pool = Model.MobilePool(mobile, playerFactionID)
+    if pool == "staging" then return "staging" end
+    if pool == "player_colony" then return "player_colony" end
+    if pool == "en_route" then return "ai_settlement" end
+    return "street_roaming"
+end
+
+function Model.MobileCategoryLabel(category)
+    return MOBILE_CATEGORY_LABELS[category]
+        or tostring(category or "UNKNOWN MOBILE STATE")
+end
+
+function Model.MobileCategoryTone(category)
+    return MOBILE_CATEGORY_TONES[category] or "accent"
+end
+
+function Model.MobileFilterLabel(filter)
+    return MOBILE_FILTER_LABELS[filter] or MOBILE_FILTER_LABELS.all
+end
+
+function Model.NormalizeMobileFilter(filter)
+    filter = tostring(filter or "all")
+    return MOBILE_FILTERS[filter] and filter or "all"
+end
+
+function Model.MobileFilterCount(counts, filter)
+    counts = counts or {}
+    filter = Model.NormalizeMobileFilter(filter)
+    return tonumber(filter == "all" and counts.all
+        or counts[filter]) or 0
+end
+
+function Model.MobilePool(mobile, playerFactionID)
+    local state = MobileModel.State(mobile)
+    if state == "road_roaming" then return "staging" end
+    if state == "en_route" or state == "arrival_pending" then
+        if mobileTargetsPlayerColony(mobile, playerFactionID) then
+            return "player_colony"
+        end
+        return "en_route"
+    end
+    return "street_roaming"
+end
+
+function Model.BuildMobilePoolCounts(snapshot)
+    local counts = {
+        all = 0,
+        staging = 0,
+        en_route = 0,
+        player_colony = 0,
+        ai_settlement = 0,
+        street_roaming = 0,
+    }
+    local playerFactionID = snapshot
+        and snapshot.currentPlayerFactionID or nil
+    for _, faction in ipairs(mobileFactionList(snapshot)) do
+        if faction.mobile and faction.mobile.active == true then
+            counts.all = counts.all + 1
+            local pool = Model.MobilePool(
+                faction.mobile, playerFactionID)
+            local category = Model.MobileCategory(
+                faction.mobile, playerFactionID)
+            if pool == "staging" then
+                counts.staging = counts.staging + 1
+            elseif pool == "player_colony" then
+                counts.player_colony = counts.player_colony + 1
+                counts.en_route = counts.en_route + 1
+            elseif pool == "en_route" then
+                counts.en_route = counts.en_route + 1
+            else
+                counts.street_roaming = counts.street_roaming + 1
+            end
+            if category == "ai_settlement" then
+                counts.ai_settlement = counts.ai_settlement + 1
+            end
+        end
+    end
+    return counts
+end
+
+function Model.BuildMobileItems(snapshot, requestedFilter)
+    local output = {}
+    local filter = Model.NormalizeMobileFilter(requestedFilter)
+    local playerFactionID = snapshot
+        and snapshot.currentPlayerFactionID or nil
+    for _, faction in ipairs(mobileFactionList(snapshot)) do
+        if faction.mobile and faction.mobile.active == true then
+            local pool = Model.MobilePool(
+                faction.mobile, playerFactionID)
+            local category = Model.MobileCategory(
+                faction.mobile, playerFactionID)
+            if filter == "all" or filter == category then
+                local destination = MobileModel.TargetText(
+                    faction.mobile)
+                output[#output + 1] = {
+                    id = faction.id,
+                    name = faction.name,
+                    label = Model.MobileCategoryLabel(category)
+                        .. " / " .. tostring(faction.name),
+                    detail = MobileModel.StateText(faction.mobile)
+                        .. " / " .. tostring(faction.archetypeID)
+                        .. " / " .. tostring(faction.mobile.presence
+                            or "unknown")
+                        .. " / " .. destination,
+                    listDetail = MobileModel.StateText(faction.mobile)
+                        .. "  /  " .. tostring(faction.mobile.presence
+                            or "unknown")
+                        .. "  /  " .. destination,
+                    faction = faction,
+                    pool = pool,
+                    category = category,
+                    categoryLabel = Model.MobileCategoryLabel(category),
+                    categoryTone = Model.MobileCategoryTone(category),
+                }
+            end
+        end
+    end
+    table.sort(output, function(left, right)
+        local leftOrder = MOBILE_CATEGORY_ORDER[left.category]
+            or MOBILE_POOL_ORDER[left.pool] or 99
+        local rightOrder = MOBILE_CATEGORY_ORDER[right.category]
+            or MOBILE_POOL_ORDER[right.pool] or 99
+        if leftOrder ~= rightOrder then
+            return leftOrder < rightOrder
+        end
+        if left.label ~= right.label then
+            return left.label < right.label
+        end
+        return tostring(left.id) < tostring(right.id)
+    end)
+    return output
+end
+
+function Model.BuildMobileRows(snapshot, authorized, reason)
+    if authorized ~= true then
+        return {
+            row("Access", "Admin/debug mode required", "danger"),
+        }
+    end
+    snapshot = snapshot or {}
+    local counts = Model.BuildMobilePoolCounts(snapshot)
+    local departure = snapshot.mobileDeparture or {}
+    local playerBaseCount = math.max(
+        0, math.floor(tonumber(departure.playerBaseCount) or 0)
+    )
+    local rows = {
+        row("How to read this tab",
+            "Choose a filter above. Every group belongs to one visible pool.",
+            "success"),
+        row("Your current colony",
+            snapshot.currentPlayerFactionID or "not detected",
+            snapshot.currentPlayerFactionID and "success" or "warning"),
+        row("Player-colony gate",
+            playerBaseCount > 0
+                and ("OPEN / " .. tostring(playerBaseCount)
+                    .. " registered player base(s)")
+                or "LOCKED / no registered player base exists",
+            playerBaseCount > 0 and "success" or "danger"),
+        row("ALL MOBILE GROUPS",
+            tostring(counts.all)
+                .. " group(s) / all active mobile factions",
+            counts.all > 0 and "success" or "textMuted"),
+        row("WAITING ON ROAD",
+            tostring(counts.staging)
+                .. " group(s) / visible road lobby; not traveling yet",
+            counts.staging > 0 and "success" or "textMuted"),
+        row("TRAVELING TO PLAYER COLONY",
+            tostring(counts.player_colony)
+                .. " group(s) / abstract traversal toward your colony",
+            counts.player_colony > 0 and "danger" or "textMuted"),
+        row("TRAVELING TO AI SETTLEMENT",
+            tostring(counts.ai_settlement)
+                .. " group(s) / abstract traversal toward an AI settlement",
+            counts.ai_settlement > 0 and "warning" or "textMuted"),
+        row("STREET ROAMING",
+            tostring(counts.street_roaming)
+                .. " group(s) / ambient behavior or shelter",
+            counts.street_roaming > 0 and "warning" or "textMuted"),
+        row("Settlement travel total",
+            tostring(counts.en_route)
+                .. " group(s) / player + AI settlement destinations"),
+        row("Waiting on road means", MOBILE_POOL_MEANINGS.staging),
+        row("Player travel means", MOBILE_POOL_MEANINGS.player_colony),
+        row("AI travel means", MOBILE_POOL_MEANINGS.en_route),
+        row("Street roaming means", MOBILE_POOL_MEANINGS.street_roaming),
+        row("Quick test",
+            "Select a road group, then use Force Settlement Departure."
+                .. " It should move into a travel pool."),
+        row("Why groups may still be waiting",
+            playerBaseCount > 0
+                and "The daily roll is chance-based; force a departure to test immediately."
+                or "Player-colony travel is disabled until the player creates a base; AI travel still needs an AI settlement."),
+        row("Daily departure rule",
+            string.format(
+                "daytime / every %.0f h / base %.0f%% / sandbox x%.2f / budget %d",
+                tonumber(departure.intervalHours) or 24,
+                (tonumber(departure.baseChance) or 0.10) * 100,
+                tonumber(departure.sandboxMultiplier) or 1,
+                tonumber(departure.budget) or 12
+            )),
+    }
+    local selected = snapshot.selectedFaction
+    local mobile = selected and selected.mobile or nil
+    if mobile and mobile.active == true then
+        local pool = Model.MobilePool(
+            mobile, snapshot.currentPlayerFactionID)
+        local site = mobile.site or {}
+        local home = site.home or {}
+        rows[#rows + 1] = row(
+            "Selected mobile group",
+            tostring(selected.name) .. " / " .. tostring(selected.id),
+            "success"
+        )
+        rows[#rows + 1] = row(
+            "Selected pool",
+            Model.MobileCategoryLabel(Model.MobileCategory(
+                mobile, snapshot.currentPlayerFactionID)),
+            Model.MobileCategoryTone(Model.MobileCategory(
+                mobile, snapshot.currentPlayerFactionID))
+        )
+        rows[#rows + 1] = row(
+            "Lifecycle / presence",
+            MobileModel.StateText(mobile)
+                .. " / " .. tostring(mobile.presence or "unknown")
+        )
+        rows[#rows + 1] = row(
+            "Activity",
+            tostring(mobile.activity or "street_roaming")
+        )
+        rows[#rows + 1] = row(
+            "Destination",
+            MobileModel.TargetText(mobile),
+            pool == "player_colony" and "danger" or "text"
+        )
+        if mobile.travel then
+            rows[#rows + 1] = row(
+                "Travel started",
+                tostring(mobile.travel.startedAt or 0)
+                    .. " h / departure day "
+                    .. tostring(mobile.travel.departureDay or 0),
+                "danger"
+            )
+        end
+        rows[#rows + 1] = row(
+            "Staging site",
+            tostring(site.id or "unknown") .. " @ "
+                .. string.format(
+                    "%.0f, %.0f, %.0f",
+                    tonumber(home.x) or 0,
+                    tonumber(home.y) or 0,
+                    tonumber(home.z) or 0
+                )
+        )
+    else
+        rows[#rows + 1] = row(
+            "Selection",
+            reason or "Select a mobile group from the list.",
+            "textMuted"
+        )
+    end
+    return rows
 end
 
 function Model.BuildTargetFactionItems(snapshot)
@@ -200,6 +542,12 @@ function Model.BuildRows(snapshot, authorized, reason)
                 "warning"
             )
             rows[#rows + 1] = row(
+                "Mobile state",
+                MobileModel.StateText(mobile),
+                MobileModel.State(mobile) == "en_route"
+                    and "danger" or "warning"
+            )
+            rows[#rows + 1] = row(
                 "Mobile objective",
                 mobile.controlMode == "strategic"
                     and ("player base / "
@@ -211,21 +559,25 @@ function Model.BuildRows(snapshot, authorized, reason)
                 mobile.controlMode == "strategic"
                     and "danger" or "warning"
             )
-            if target then
+            if target or mobile.travel then
                 rows[#rows + 1] = row(
                     "Mobile target",
-                    tostring(target.kind or "location")
-                        .. " / "
-                        .. tostring(target.siteID or target.baseID
-                            or "anonymous")
-                        .. " @ " .. string.format(
-                            "%.1f, %.1f, %.0f",
-                            tonumber(target.x) or 0,
-                            tonumber(target.y) or 0,
-                            tonumber(target.z) or 0
-                        )
+                    MobileModel.TargetText(mobile)
                 )
             end
+            if mobile.travel then
+                rows[#rows + 1] = row(
+                    "Settlement travel",
+                    "started " .. tostring(mobile.travel.startedAt or 0)
+                        .. " h / day "
+                        .. tostring(mobile.travel.departureDay or 0),
+                    "danger"
+                )
+            end
+            rows[#rows + 1] = row(
+                "Last departure",
+                tostring(mobile.lastDepartureAt or -1) .. " h"
+            )
             rows[#rows + 1] = row(
                 "Mobile staging site",
                 tostring(site.id or "unknown")
@@ -569,6 +921,7 @@ Model.Views = {
     diplomacy = true,
     members = true,
     diagnostics = true,
+    mobile = true,
 }
 
 local function selectedNPC(snapshot)
@@ -645,6 +998,7 @@ function Model.BuildDashboard(snapshot, authorized, reason)
                 tonumber(source.communityPopulation) or 0,
             communitySupplies =
                 source.communitySupplies or {},
+            mobile = source.mobile,
         } or nil,
         target = target and {
             id = target.id,
@@ -764,6 +1118,9 @@ function Model.BuildGUIRows(
             row("Access", "Admin/debug mode required", "danger"),
         }
     end
+    if view == "mobile" then
+        return Model.BuildMobileRows(snapshot, authorized, reason)
+    end
     if dashboard.status ~= "ready" then
         local population = snapshot and snapshot.populationDirector or {}
         local starter = population.starter or {}
@@ -794,6 +1151,28 @@ function Model.BuildGUIRows(
             tostring(source.archetypeLabel)
                 .. " (" .. tostring(source.archetypeID) .. ")"
         )
+        if source.mobile and source.mobile.active == true then
+            rows[#rows + 1] = row(
+                "Mobile lifecycle",
+                MobileModel.StateText(source.mobile)
+                    .. " / " .. tostring(source.mobile.presence or "unknown"),
+                MobileModel.State(source.mobile) == "en_route"
+                    and "danger" or "warning"
+            )
+            rows[#rows + 1] = row(
+                "Mobile destination",
+                MobileModel.TargetText(source.mobile)
+            )
+            if source.mobile.travel then
+                rows[#rows + 1] = row(
+                    "Departure day",
+                    tostring(source.mobile.travel.departureDay or 0)
+                        .. " / started "
+                        .. tostring(source.mobile.travel.startedAt or 0)
+                        .. " h"
+                )
+            end
+        end
         rows[#rows + 1] = row("Faction status", source.status)
         rows[#rows + 1] = row(
             "Members",

@@ -56,6 +56,11 @@ PNC = {}
 T.load(
     "ProjectHoomans",
     "shared",
+    "PNC/Core/Relationships/PNC_RecruitmentPersonalityPolicy.lua"
+)
+T.load(
+    "ProjectHoomans",
+    "shared",
     "PNC/Core/Relationships/PNC_RelationshipGraph.lua"
 )
 T.load(
@@ -134,6 +139,17 @@ local view = {
     extensionParts = { relationship = panel },
 }
 PsychopatzCore = { Conversation = { instance = view } }
+PNC.Network = {
+    ClientState = {
+        conversationRelationships = {
+            ["npc-preview"] = {
+                recruitmentPreview = {
+                    graphContext = { bonus = -10 },
+                },
+            },
+        },
+    },
+}
 
 local ok, reason = PNC.Conversation.Relationship.SetPreviewRequirement(
     "npc-preview",
@@ -146,16 +162,18 @@ T.equal(capturedEvaluation.requirement.id, "recruit",
     "panel rebuilds a recruit evaluation")
 T.equal(capturedEvaluation.requirement.enabled, true,
     "recruit threshold is enabled")
-T.equal(capturedEvaluation.threshold, 35,
+T.equal(capturedEvaluation.contextBonus, -10,
+    "recruit preview carries the authoritative personality adjustment")
+T.equal(capturedEvaluation.threshold, 70,
     "recruit threshold reaches the graph evaluator")
 T.truthy(PNC.RelationshipGraph.BoundaryApprovalAtRespect(
-    0,
+    40,
     capturedEvaluation.requirement,
     capturedEvaluation.contextBonus
 ),
     "recruit evaluation exposes a visible boundary")
 panel:prerender()
-T.contains(panel.lastDrawText, "REQ RECRUIT >= +35.0",
+T.contains(panel.lastDrawText, "REQ RECRUIT >= +70.0",
     "relationship header exposes the active recruit threshold")
 
 PsychopatzCore.Conversation.Text = {
@@ -215,6 +233,28 @@ end
 graphPanel:render()
 T.truthy(successRects > 0,
     "graph-only UI renders the recruit acceptance region")
+
+local departureRects = 0
+local originalDrawRect = graphPanel.drawRect
+graphPanel.drawRect = function(self, x, y, width, height, red, green, blue, alpha)
+    if red and red > 0.90 and green and green < 0.20
+        and blue and blue < 0.20 and alpha and alpha > 0.80
+    then
+        departureRects = departureRects + 1
+    end
+    return originalDrawRect(self, x, y, width, height, red, green, blue, alpha)
+end
+graphPanel:setDeparturePreview({
+    approvalThreshold = -60,
+    respectThreshold = -60,
+})
+graphPanel:setEvaluation(
+    PNC.RelationshipGraph.Evaluate(-70, -70, "departure")
+)
+graphPanel:render()
+T.equal(departureRects, 2,
+    "departure preview renders red approval and respect thresholds")
+graphPanel:setDeparturePreview(nil)
 
 choices:onMouseMoveOutside()
 T.equal(panel.requirement, "inspect",

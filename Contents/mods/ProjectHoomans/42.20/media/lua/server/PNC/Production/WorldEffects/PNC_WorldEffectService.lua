@@ -432,7 +432,10 @@ local function debugRow(providerID, provider, owner, effect)
         and PNC.Registry.Get(workerID) or nil
     local required
     local progress
-    if tostring(effect.kind or "") == "LUMBER_OUTPUT" then
+    local debugRemaining
+    local debugMaximum
+    local effectKind = tostring(effect.kind or "")
+    if effectKind == "LUMBER_OUTPUT" then
         required = math.max(1, tonumber(effect.totalQuantity)
             or tonumber(effect.quantity) or 1)
         progress = 0
@@ -443,6 +446,22 @@ local function debugRow(providerID, provider, owner, effect)
             end
         end
         progress = math.min(required, progress)
+    elseif tostring(providerID or "") == "LUMBER"
+        and (effectKind == "TREE_REMOVE" or effectKind == "LUMBER_WORK")
+    then
+        required = math.max(1, tonumber(effect.requiredWork)
+            or tonumber(effect.maxWork) or tonumber(owner.maxWork) or 1)
+        local remaining = tonumber(effect.remainingWork)
+            or tonumber(owner.remainingWork)
+        progress = tonumber(effect.progress)
+        if progress == nil and remaining ~= nil then
+            progress = required - math.max(0, math.min(required, remaining))
+        end
+        progress = math.max(0, math.min(required, progress or 0))
+        debugRemaining = effect.remainingWork
+            or (effectKind == "TREE_REMOVE" and owner.remainingWork or nil)
+        debugMaximum = effect.maxWork
+            or (effectKind == "TREE_REMOVE" and owner.maxWork or nil)
     else
         required = math.max(1, tonumber(owner.requiredWork) or 1)
         progress = math.max(0, math.min(required,
@@ -469,9 +488,13 @@ local function debugRow(providerID, provider, owner, effect)
         destinationNodeId = effect.destinationNodeId,
         destinationStorageId = effect.destinationStorageId,
         sourceMode = effect.sourceMode,
+        activityItemFullType = effect.activityItemFullType,
         deliveryMode = effect.deliveryMode,
         lootSource = effect.lootSource,
         pickupState = effect.pickupState,
+        remainingWork = debugRemaining,
+        maxWork = debugMaximum,
+        debugOnly = effect.debugOnly == true,
         quantity = effect.quantity,
         actualQuantity = effect.actualQuantity or effect.totalQuantity,
         expectedLogYield = effect.expectedLogYield,
@@ -504,10 +527,14 @@ function Service.BuildSnapshot(options)
                     summary.total = summary.total + 1
                     summary[string.lower(state)] =
                         (summary[string.lower(state)] or 0) + 1
+                    local kindMatches = not requestedKind
+                        or requestedKind == tostring(effect.kind or "")
+                    if requestedKind == "LUMBER" then
+                        kindMatches = tostring(providerID) == "LUMBER"
+                    end
                     if (not requestedState or requestedState == "ALL"
                         or requestedState == state)
-                        and (not requestedKind
-                            or requestedKind == tostring(effect.kind or ""))
+                        and kindMatches
                     then
                         matched = matched + 1
                         rows[#rows + 1] = debugRow(providerID, provider,

@@ -269,6 +269,64 @@ T.near(liveArrivalRecord.orderSpec.x, 10, 0.001, "live arrival roam center x")
 T.near(liveArrivalRecord.orderSpec.y, 5, 0.001, "live arrival roam center y")
 T.near(liveArrivalRecord.orderSpec.radius, 9, 0.001, "live arrival roam radius")
 
+-- A home route may reach the authoritative home zone while its direct final
+-- tile is blocked by a fence. Zone entry must finish the journey so the
+-- return-home progress cannot remain active forever.
+local homeArrivalCalls = 0
+PNC.HomeDutyService = {
+    IsAtHome = function(record, baseId)
+        return baseId == "base:home" and (tonumber(record.x) or 0) >= 10
+    end,
+}
+T.truthy(PNC.Travel.Arrivals.RegisterHandler("colony_home",
+    function(record, _, action)
+        homeArrivalCalls = homeArrivalCalls + 1
+        record.orderSpec = {
+            kind = "colony_home", baseId = action.baseId,
+            x = action.x, y = action.y, z = action.z,
+            radius = action.radius,
+        }
+        return true, "at_home"
+    end
+), "home arrival handler did not register")
+local homeReachedRecord = {
+    id = "home-zone-arrival",
+    name = "Home Zone Arrival",
+    x = 0,
+    y = 0,
+    z = 0,
+    alive = true,
+    presenceState = "live",
+    runtime = {},
+}
+records[homeReachedRecord.id] = homeReachedRecord
+worldHour = 0
+local homeJourney = T.truthy(PNC.Travel.Service.Start(
+    homeReachedRecord,
+    {
+        journeyId = "journey:home-zone-arrival",
+        destination = { x = 100, y = 0, z = 0 },
+        arrivalAction = {
+            type = "colony_home", baseId = "base:home",
+            x = 100, y = 0, z = 0, radius = 3,
+        },
+    }
+))
+local homeBody = {
+    getX = function() return 10 end,
+    getY = function() return 0 end,
+    getZ = function() return 0 end,
+}
+PNC.Travel.Service.TickLive(homeReachedRecord, homeBody, worldHour)
+T.equal(homeJourney.state, "arrived",
+    "home-zone entry did not finalize the return journey")
+T.equal(homeJourney.lastStateReason, "home_zone_reached",
+    "home-zone arrival lost its diagnostic reason")
+T.equal(homeArrivalCalls, 1,
+    "home-zone arrival handler was not dispatched exactly once")
+T.equal(homeReachedRecord.orderSpec.kind, "colony_home",
+    "home-zone arrival did not install the durable home order")
+
 -- A live body can be just outside the stop radius while its route projection
 -- has already reached the endpoint. It must finalize arrival instead of
 -- remaining en_route with a permanent 100% progress bar.

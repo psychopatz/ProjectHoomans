@@ -18,10 +18,19 @@ local makeSessionRoom = Internal.MakeSessionRoom
 local normalizePolicy = Internal.NormalizePolicy
 local policyEnabled = Internal.PolicyEnabled
 
+local function isCamped(record)
+    return PNC.HomeDutyService
+        and PNC.HomeDutyService.IsCamped
+        and PNC.HomeDutyService.IsCamped(record) == true
+end
+
 function Service.StartSearch(player, arguments)
     arguments = type(arguments) == "table" and arguments or {}
     local records, reason = teamRecords(player, arguments)
     if not records then return false, reason end
+    for _, teamRecord in ipairs(records) do
+        if isCamped(teamRecord) then return false, "NPC_CAMPED" end
+    end
     local record = records[1]
     local sourcePolicy = normalizePolicy(arguments.sourcePolicy)
     if not policyEnabled(sourcePolicy) then return false, "source_policy_empty" end

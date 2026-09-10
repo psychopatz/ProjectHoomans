@@ -27,26 +27,18 @@ local function apply(record, mode, owner, reason, faction)
     local hostility
     local order
     local preservePlayerOrder
-    local recordOwnerUsername
-    local ownerUsername
-    local recordOwnerOnlineID
-    local ownerOnlineID
+    local ownerPlayerKey
     if not record or record.alive == false then
         return false, "invalid_record"
     end
-    recordOwnerUsername = tostring(record.ownerUsername or "")
-    ownerUsername = tostring(owner and owner.username or "")
-    recordOwnerOnlineID = tonumber(record.ownerOnlineID)
-    ownerOnlineID = tonumber(owner and owner.onlineID)
+    ownerPlayerKey = faction and faction.ownerPlayerKey or nil
+    -- The faction owner key is the durable identity.  Username is a display
+    -- value and onlineID is intentionally cleared during rehydration, so
+    -- neither can decide whether a saved player order survives a reload.
     preservePlayerOrder = mode == "player_owned"
         and record.recruited == true
-        and (
-            recordOwnerUsername ~= ""
-                and recordOwnerUsername == ownerUsername
-            or recordOwnerOnlineID ~= nil
-                and ownerOnlineID ~= nil
-                and recordOwnerOnlineID == ownerOnlineID
-        )
+        and ownerPlayerKey ~= nil
+        and ownerPlayerKey ~= ""
     if mode == "player_owned" then
         tacticalClass = Const.TACTICAL_CLASS_COLONIST
         hostility = Types.DefaultHostility(tacticalClass)
@@ -139,11 +131,13 @@ function Behavior.ApplyNPC(record, reason)
         parsed, livePlayer = ownerIdentity(faction)
         owner = {
             -- The faction key is durable, while RuntimeByUUID is populated
-            -- only after the player joins.  Startup reconciliation must use
-            -- the persisted account identity or it will mistake every
-            -- offline-owned companion for an unbound recruit and replace
-            -- saved orders (including colony_home) with Follow.
-            username = parsed and parsed.accountIdentity or nil,
+            -- only after the player joins.  Keep the saved display username
+            -- until a live player can provide the runtime username; the
+            -- faction key is used separately for durable ownership checks.
+            username = livePlayer and livePlayer.getUsername
+                and livePlayer:getUsername()
+                or record.ownerUsername
+                or (parsed and parsed.accountIdentity or nil),
             onlineID = livePlayer
                 and livePlayer.getOnlineID
                 and livePlayer:getOnlineID() or nil,

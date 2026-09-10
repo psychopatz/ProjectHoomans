@@ -106,6 +106,17 @@ local function recoverLiveStall(record, body, journey, now)
     return true
 end
 
+local function homeZoneReached(record, journey)
+    local action = journey and journey.arrivalAction or nil
+    local home = PNC.HomeDutyService
+    if not action or tostring(action.type or "") ~= "colony_home"
+        or not home or type(home.IsAtHome) ~= "function"
+    then
+        return false
+    end
+    return home.IsAtHome(record, action.baseId) == true
+end
+
 function Service.CheckLiveProgress(recordOrID, body, now)
     local record = Internal.ResolveRecord(recordOrID)
     local journey = record and record.travel or nil
@@ -154,6 +165,14 @@ function Service.TickLive(recordOrID, body, atWorldHour)
     )
 
     Service.SyncLivePosition(record, body, atWorldHour)
+    -- The home anchor is a valid arrival boundary. Direct home routes can
+    -- stop at a fence or furniture edge after the NPC has already entered the
+    -- authoritative base zone; leaving the journey en_route then makes the
+    -- return-home percentage persist forever and keeps the movement owner
+    -- alive against an unreachable final tile.
+    if journey.state == "en_route" and homeZoneReached(record, journey) then
+        Service.SetState(record, "arrived", "home_zone_reached")
+    end
     -- Live bodies can drift just beyond the final stop radius after their
     -- route projection has already reached the endpoint. Without this guard,
     -- the UI reports 100% forever while the live movement order keeps trying

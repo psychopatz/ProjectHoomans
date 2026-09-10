@@ -16,7 +16,20 @@ local combatBlockReason = Internal.CombatBlockReason
 local tickWorker = Internal.TickWorker
 local Recovery = PNC.Tasking and PNC.Tasking.Internal
 
+local function recordFor(npcId)
+    return PNC.Registry and PNC.Registry.Get
+        and PNC.Registry.Get(tostring(npcId or "")) or nil
+end
+
+local function isCamped(record)
+    return PNC.HomeDutyService
+        and PNC.HomeDutyService.IsCamped
+        and PNC.HomeDutyService.IsCamped(record) == true
+end
+
 function Executor.GetCandidates(npcId)
+    local record = recordFor(npcId)
+    if not record or isCamped(record) then return {} end
     local session = sessionForNPC(npcId)
     local worker = session and workerFor(session, npcId) or nil
     if not session or session.runActive ~= true or not worker then return {} end
@@ -39,6 +52,8 @@ function Executor.GetCandidates(npcId)
 end
 
 function Executor.Validate(intent)
+    local record = recordFor(intent and intent.npcId)
+    if not record or isCamped(record) then return false end
     local session = Service.GetSession(intent and intent.sourceRef)
     return session ~= nil and session.runActive == true
         and session.workers
@@ -46,6 +61,8 @@ function Executor.Validate(intent)
 end
 
 function Executor.Assign(intent)
+    local record = recordFor(intent and intent.npcId)
+    if not record or isCamped(record) then return nil, "NPC_CAMPED" end
     local session = Service.GetSession(intent and intent.sourceRef)
     if not session then return nil, "session_not_found" end
     return { executionMode = "LIVE", resourceKey = session.id,
@@ -54,8 +71,9 @@ end
 
 function Executor.Start(lease)
     local session = Service.GetSession(lease and lease.sourceRef)
-    local record = session and PNC.Registry.Get(lease.npcId) or nil
+    local record = session and recordFor(lease.npcId) or nil
     if not session or not record then return false, "session_or_npc_unavailable" end
+    if isCamped(record) then return false, "NPC_CAMPED" end
     local body = PNC.Registry.GetLiveZombie
         and PNC.Registry.GetLiveZombie(record.id) or nil
     local worker = workerFor(session, lease.npcId)
@@ -70,6 +88,8 @@ function Executor.Start(lease)
 end
 
 function Executor.CanContinue(lease)
+    local record = recordFor(lease and lease.npcId)
+    if not record or isCamped(record) then return false end
     local session = Service.GetSession(lease and lease.sourceRef)
     return session ~= nil and session.runActive == true
         and session.workers

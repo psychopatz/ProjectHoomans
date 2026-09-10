@@ -432,10 +432,16 @@ actionStates.GRAB_PENDING = "completed"
 T.truthy(Provider.Tick(lease), "grab animation completion is dispatched by work")
 T.equal(Work.Queries.Get(order.id).phase, "CARRYING",
     "completed grab advances to visible corpse carry")
-body.x, body.y = 60, 60
+-- A carried corpse can be one interaction envelope away from the selected
+-- tile when a fence or furniture edge prevents exact standing placement.
+-- The operation must commit instead of remaining in CARRYING forever.
+body.x, body.y = 60.9, 60.9
 T.truthy(Provider.Tick(lease), "visible corpse carry is dispatched by work")
 T.equal(Work.Queries.Get(order.id).phase, "DROP_PENDING",
     "drop animation remains an operation phase on the durable order")
+T.equal(record.orderSpec.stopDistance,
+    CorpseService.CORPSE_CARRY_DROP_DISTANCE,
+    "carried corpse publishes its wider interaction envelope")
 actionStates.DROP_PENDING = "completed"
 local destinationSquare = squares["60:60:0"]
 squares["60:60:0"] = nil

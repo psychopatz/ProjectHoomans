@@ -51,10 +51,25 @@ function Traversal.Arrive(groupOrID, at)
         or Groups.Get(groupOrID)
     at = tonumber(at) or Store.WorldAgeHours()
     if not group or not group.targetLocation then return false, "no_target" end
+    local faction = group.factionId and PNC.Factions
+        and PNC.Factions.Get(group.factionId) or nil
+    local mobile = faction and PNC.Factions.IsMobileGroup
+        and PNC.Factions.IsMobileGroup(faction)
+        and faction.mobile or nil
+    local settlementTraveling = mobile
+        and mobile.activity
+            == PNC.FactionConstants.MOBILE_ACTIVITY_TRAVELING_TO_SETTLEMENT
     local target = Locations.Get(group.targetLocation.id)
     if not target then
         group.targetLocation = nil
         Groups.SetState(group, "IDLE", at, at)
+        if settlementTraveling and PNC.Factions.UpdateMobileGroup then
+            PNC.Factions.UpdateMobileGroup(faction.id, {
+                activity = PNC.FactionConstants.MOBILE_ACTIVITY_STREET_ROAMING,
+                travel = nil,
+                ambient = nil,
+            }, "mobile_settlement_target_missing")
+        end
         return false, "target_missing"
     end
     group.location = Locations.Ref(target)
@@ -62,16 +77,25 @@ function Traversal.Arrive(groupOrID, at)
     group.visited[target.id] = true
     Groups.SetState(group, "ARRIVED", at, at)
     Groups.SynchronizeMembersAtLocation(group)
-    local faction = group.factionId and PNC.Factions
-        and PNC.Factions.Get(group.factionId) or nil
-    if faction and PNC.Factions.IsMobileGroup(faction)
-        and target.sourceSite and PNC.Factions.UpdateMobileGroup
+    if mobile and PNC.Factions.UpdateMobileGroup
     then
-        PNC.Factions.UpdateMobileGroup(faction.id, {
-            site = target.sourceSite, lastMovedAt = at,
+        local mobilePatch = {
+            lastMovedAt = at,
             nextMoveAt = at + (tonumber(faction.mobile.relocationHours) or 1),
             relocationCount = (tonumber(faction.mobile.relocationCount) or 0) + 1,
-        }, "abstract_group_arrival")
+        }
+        if target.sourceSite then mobilePatch.site = target.sourceSite end
+        if settlementTraveling then
+            -- Settlement travel is a one-shot activity. Leaving this flag set
+            -- after the abstract group arrives makes every later traversal
+            -- tick return mobile_settlement_arrival_pending forever.
+            mobilePatch.activity =
+                PNC.FactionConstants.MOBILE_ACTIVITY_STREET_ROAMING
+            mobilePatch.travel = nil
+            mobilePatch.ambient = nil
+        end
+        PNC.Factions.UpdateMobileGroup(
+            faction.id, mobilePatch, "abstract_group_arrival")
     end
     Locations.Arrive(group, at, 0)
     local reports = Encounters.DetectAt(target, group, at)
@@ -96,6 +120,14 @@ function Traversal.Advance(group, at)
             return Traversal.Arrive(group, at)
         end
         return false, "in_transit"
+    end
+    local faction = group.factionId and PNC.Factions
+        and PNC.Factions.Get(group.factionId) or nil
+    if faction and faction.mobile
+        and faction.mobile.activity
+            == PNC.FactionConstants.MOBILE_ACTIVITY_TRAVELING_TO_SETTLEMENT
+    then
+        return false, "mobile_settlement_arrival_pending"
     end
     if group.mobileAmbient and group.state ~= "ACTIVE" then
         return false, "mobile_ambient_hold"

@@ -39,7 +39,17 @@ T.load(ROOT .. "shared/PNC/Core/Identity/PNC_Identity.lua")
 T.load(ROOT .. "shared/PNC/Core/Needs/PNC_NeedsDefinitions.lua")
 T.load(ROOT .. "shared/PNC/Core/Needs/PNC_ConditionStats.lua")
 T.load(ROOT .. "shared/PNC/Core/Needs/PNC_PlayerNeedsModel.lua")
+T.load(ROOT .. "shared/PNC/Core/Traits/PNC_NPCTraitContext.lua")
 T.load(ROOT .. "shared/PNC/Core/Base/PNC_Types.lua")
+
+local combinedTraits = PNC.NPCTraitContext.Collect({
+    vanillaTraits = { overweight = true },
+    dynamicTraits = { pnc_ironnerves = true },
+})
+T.equal(combinedTraits.overweight, true,
+    "trait context includes stable NPC traits")
+T.equal(combinedTraits.pnc_ironnerves, true,
+    "trait context includes dynamic NPC traits")
 
 local generatedA = PNC.Types.NewRecord({
     id = "npc_generated_a", identitySeed = 321, archetypeID = "General",

@@ -11,6 +11,7 @@ require "PNC/Conversation/Blocks/ConversationComposer/PNC_ConversationComposer_R
 require "PNC/Conversation/Blocks/ConversationComposer/PNC_ConversationComposer_Blocks"
 require "PNC/Conversation/Blocks/ConversationComposer/PNC_ConversationComposer_Outcomes"
 require "PNC/Conversation/Blocks/ConversationComposer/PNC_ConversationComposer_Recruitment"
+require "PNC/Conversation/Blocks/ConversationComposer/PNC_ConversationComposer_Departure"
 require "PNC/Conversation/Blocks/ConversationComposer/PNC_ConversationComposer_GiftPresentation"
 require "PNC/Conversation/Blocks/ConversationComposer/PNC_ConversationComposer_Gifts"
 require "PNC/Conversation/Blocks/ConversationComposer/PNC_ConversationComposer_Menu"

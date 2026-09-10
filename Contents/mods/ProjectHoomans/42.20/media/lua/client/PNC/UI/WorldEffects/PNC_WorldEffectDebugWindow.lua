@@ -169,16 +169,21 @@ function ISPNCWorldEffectDebugWindow:refreshSnapshot()
             { "Last reason", row.lastReason },
             { "Endpoints", endpointText(row) },
         }
-        if tostring(row.kind or "") == "LUMBER_OUTPUT" then
+        if tostring(row.providerID or "") == "LUMBER" then
             rows[#rows + 1] = { "Tree", row.treeKey }
             rows[#rows + 1] = { "Source", row.sourceMode }
+            rows[#rows + 1] = { "Tool", row.activityItemFullType }
+            rows[#rows + 1] = { "Tree remaining", row.remainingWork }
+            rows[#rows + 1] = { "Tree maximum", row.maxWork }
             rows[#rows + 1] = { "Delivery", row.deliveryMode }
             rows[#rows + 1] = { "Loot", row.lootSource }
-            rows[#rows + 1] = { "Stockpile node", row.destinationNodeId }
-            rows[#rows + 1] = { "Storage", row.destinationStorageId }
-            rows[#rows + 1] = { "Expected logs", row.expectedLogYield }
-            rows[#rows + 1] = { "Actual items", row.actualQuantity or row.quantity }
-            rows[#rows + 1] = { "Items", itemText(row) }
+            if tostring(row.kind or "") == "LUMBER_OUTPUT" then
+                rows[#rows + 1] = { "Stockpile node", row.destinationNodeId }
+                rows[#rows + 1] = { "Storage", row.destinationStorageId }
+                rows[#rows + 1] = { "Expected logs", row.expectedLogYield }
+                rows[#rows + 1] = { "Actual items", row.actualQuantity or row.quantity }
+                rows[#rows + 1] = { "Items", itemText(row) }
+            end
         end
         for index, item in ipairs(rows) do
             self.details:addItem("row_" .. tostring(index), {
@@ -207,7 +212,7 @@ function ISPNCWorldEffectDebugWindow:onAction(button)
     elseif id == "tree" then
         self.filterState, self.filterKind = "ALL", "TREE_REMOVE"
     elseif id == "lumber" then
-        self.filterState, self.filterKind = "ALL", "LUMBER_OUTPUT"
+        self.filterState, self.filterKind = "ALL", "LUMBER"
     end
     self:requestSnapshot()
 end

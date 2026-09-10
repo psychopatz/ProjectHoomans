@@ -109,6 +109,12 @@ local mobileFactionSnapshot = {
     },
     selectedFactionID = "faction_mobile",
     mobileGroups = {},
+    mobileCounts = {
+        road_roaming = 1,
+        street_roaming = 0,
+        en_route = 2,
+        arrival_pending = 0,
+    },
 }
 mobileFactionSnapshot.mobileGroups[1] =
     mobileFactionSnapshot.factions[1]
@@ -117,8 +123,11 @@ local mobileItems =
         mobileFactionSnapshot
     )
 T.contains(mobileItems[1].detail,
-    "mobile/strategic/player-base=base_player",
+    "strategic/player-base=base_player",
     "mobile faction list detail")
+T.contains(mobileItems[1].detail,
+    "STREET ROAMING",
+    "mobile faction lifecycle detail")
 local mobileRows = PNC.CommunityDebugModel.BuildRows(
     mobileFactionSnapshot,
     true,
@@ -131,6 +140,9 @@ end
 T.contains(table.concat(mobileText, "\n"),
     "Mobile control=strategic / path=player",
     "mobile control debug row")
+T.contains(table.concat(mobileText, "\n"),
+    "Mobile states=road=1 street=0 en_route=2 pending=0",
+    "mobile lifecycle aggregate row")
 T.contains(table.concat(mobileText, "\n"),
     "Mobile types=looter:strategic",
     "mobile type debug row")

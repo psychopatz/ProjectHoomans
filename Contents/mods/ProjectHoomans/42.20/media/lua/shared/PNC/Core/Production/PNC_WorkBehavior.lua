@@ -30,6 +30,7 @@ local function normalize(_, spec)
         dropX = tonumber(spec.dropX) or 0,
         dropY = tonumber(spec.dropY) or 0,
         dropZ = tonumber(spec.dropZ) or 0,
+        stopDistance = tonumber(spec.stopDistance) or 0.7,
         facilityId = tostring(spec.facilityId or ""),
         stationId = tostring(spec.stationId or ""),
         stockpileNodeId = tostring(spec.stockpileNodeId or ""),
@@ -55,10 +56,13 @@ local function tick(record, zombie)
         return true
     end
     local distance = PNC.Core.Distance(record.x, record.y, order.x, order.y)
-    if distance > 0.8 or math.abs((tonumber(record.z) or 0) - order.z) >= 0.5 then
+    local stopDistance = math.max(0.1, tonumber(order.stopDistance) or 0.7)
+    if distance > stopDistance
+        or math.abs((tonumber(record.z) or 0) - order.z) >= 0.5
+    then
         PNC.BehaviorCommon.ClearCombatTarget(record, "production_travel", zombie)
         PNC.BehaviorCommon.MoveRecord(record, zombie, order.x, order.y, order.z,
-            "walk", 0.7, "production_work")
+            "walk", stopDistance, "production_work")
         return true
     end
     PNC.BehaviorCommon.ClearCombatTarget(record, "production_work", zombie)

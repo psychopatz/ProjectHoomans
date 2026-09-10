@@ -14,7 +14,41 @@ local sector = { id = "psector_7_11", active = true, relevant = true,
     groupSuppressionReason = "QUEUED",
     settlementSuppressionReason = "QUEUED" }
 local snapshot = {
-    metrics = {}, groups = {}, locations = {}, jobs = {},
+    metrics = {}, groups = {
+        {
+            id = "agroup_mobile",
+            factionId = "faction_mobile",
+            groupType = "LOOTER",
+            mission = "SCAVENGE",
+            state = "TRAVELING",
+            memberIds = { "npc_mobile" },
+            location = { id = "aloc_origin", x = 10, y = 20, z = 0 },
+            targetLocation = { id = "aloc_target" },
+            mobile = {
+                active = true,
+                activity = "traveling_to_settlement",
+                presence = "abstract",
+                travel = {
+                    departureDay = 2,
+                    startedAt = 48,
+                    destination = {
+                        kind = "player_colony",
+                        baseID = "base_player",
+                        locationID = "aloc_target",
+                        x = 110,
+                        y = 120,
+                        z = 0,
+                    },
+                },
+            },
+        },
+    }, locations = {}, jobs = {},
+    mobileCounts = {
+        road_roaming = 0,
+        street_roaming = 0,
+        en_route = 1,
+        arrival_pending = 0,
+    },
     population = {
         metrics = { enabled = true, paused = false, bootstrapPhase = "COMPLETE",
             players = 1, activeSectors = 1 },
@@ -42,6 +76,11 @@ local snapshot = {
 local sectors = PNC.DirectorDebugModel.SectorItems(snapshot)
 T.truthy(#sectors == 1, "sector list count")
 T.contains(sectors[1].detail, "sites 8", "sector candidate detail")
+local mobileItems = PNC.DirectorDebugModel.GroupItems(snapshot)
+T.contains(mobileItems[1].label, "MOBILE / LOOTER",
+    "mobile group list label")
+T.contains(mobileItems[1].detail, "EN ROUTE",
+    "mobile group lifecycle detail")
 local rows = PNC.DirectorDebugModel.DetailRows(snapshot, nil, nil, sector,
     true, nil)
 local output = {}
@@ -51,8 +90,18 @@ end
 local formatted = table.concat(output, "\n")
 T.contains(formatted, "WORLD-SEED / 12345", "world seed row")
 T.contains(formatted, "META_BUILDINGS_REGISTERED", "discovery row")
+T.contains(formatted, "en_route=1", "mobile aggregate row")
 T.contains(formatted, "priority=100.00", "starter queue row")
 T.contains(formatted, "population_starter_attempt", "persistence row")
+local mobileRows = PNC.DirectorDebugModel.DetailRows(
+    snapshot, snapshot.groups[1], nil, nil, true, nil)
+local mobileOutput = {}
+for _, item in ipairs(mobileRows) do
+    mobileOutput[#mobileOutput + 1] = item.label .. "=" .. item.value
+end
+T.contains(table.concat(mobileOutput, "\n"),
+    "Mobile destination=player_colony / base_player",
+    "mobile destination detail")
 T.finish("pnc_director_debug_model_smoke")
 
 T.finish("pnc_director_debug_model_smoke")

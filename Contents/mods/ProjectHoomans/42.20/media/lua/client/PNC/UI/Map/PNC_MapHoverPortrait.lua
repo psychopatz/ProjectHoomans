@@ -45,7 +45,10 @@ local function portraitSpec(entry)
         isFemale = portrait.isFemale == true,
         preferDescriptor = true,
         faceOnly = true,
+        includeCurrentClothing = true,
+        clothingMode = "current",
         appearance = portrait.appearance or {},
+        equipment = portrait.equipment or { worn = {} },
     }
 end
 

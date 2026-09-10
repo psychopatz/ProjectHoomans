@@ -14,6 +14,10 @@ local Config = PNC.DirectorConfig
 local Locations = PNC.AbstractLocations
 local Core = PNC.Core
 local Const = PNC.Const
+local FactionConstants = PNC.FactionConstants or {}
+local MOBILE_TRAVELING = FactionConstants
+    .MOBILE_ACTIVITY_TRAVELING_TO_SETTLEMENT
+    or "traveling_to_settlement"
 
 function Groups.ImportMobileFaction(factionOrID)
     if not H.Authority() then return nil, "not_authority" end
@@ -30,8 +34,12 @@ function Groups.ImportMobileFaction(factionOrID)
     if not location then return nil, reason end
     local existing = Groups.FindByFactionID(faction.id)
     if existing then
-        local ambient = faction.mobile.controlMode == "ambient"
+        local traveling = faction.mobile.activity
+            == MOBILE_TRAVELING
+        local ambient = not traveling
+            and faction.mobile.controlMode == "ambient"
         local objective = faction.mobile.ambient
+            and not traveling
             and faction.mobile.ambient.objective or nil
         if existing.mobileAmbient ~= ambient
             or existing.ambientObjective ~= objective
@@ -61,8 +69,10 @@ function Groups.ImportMobileFaction(factionOrID)
             medical = 10, materials = 0 },
         combatProfileDirty = true,
         combatProfileReason = "mobile_faction_import",
-        mobileAmbient = faction.mobile.controlMode == "ambient",
+        mobileAmbient = faction.mobile.activity ~= MOBILE_TRAVELING
+            and faction.mobile.controlMode == "ambient",
         ambientObjective = faction.mobile.ambient
+            and faction.mobile.activity ~= MOBILE_TRAVELING
             and faction.mobile.ambient.objective or nil,
         diagnostics = { memberSignature = H.MemberSignature(ids) },
     })

@@ -75,6 +75,52 @@ function Presentation.BuildEvaluation(summary, requirement, context)
     )
 end
 
+local function buildRecruitmentPreview(record, relationship)
+    local graph = PNC.RelationshipGraph
+    if not graph or not graph.EvaluateRecruitment then return nil end
+    local personality = graph.ResolveNPCPersonality
+        and graph.ResolveNPCPersonality(record) or {}
+    local evaluation = graph.EvaluateRecruitment(
+        relationship and relationship.approval,
+        relationship and relationship.respect,
+        personality
+    )
+    if not evaluation then return nil end
+    return {
+        -- This is a derived adjustment only; personality fields are not sent
+        -- to the client. The graph uses it to mirror the server score.
+        graphContext = { bonus = evaluation.contextBonus },
+        score = evaluation.score,
+        threshold = evaluation.threshold,
+        margin = evaluation.margin,
+        personalityBreakdown = evaluation.personalityBreakdown
+            and PNC.RecruitmentPersonalityPolicy
+            and PNC.RecruitmentPersonalityPolicy.CopyBreakdown
+            and PNC.RecruitmentPersonalityPolicy.CopyBreakdown(
+                evaluation.personalityBreakdown
+            ) or nil,
+        approvalMinimum = evaluation.requirement.minimumApproval,
+        respectMinimum = evaluation.requirement.minimumRespect,
+        meetsMinimums = evaluation.meetsMinimums == true,
+        normalEligible = evaluation.normal == true,
+        fearEligible = evaluation.fear == true,
+    }
+end
+
+local function buildDeparturePreview(record, relationship)
+    local policy = PNC.ColonistDeparturePolicy
+    local graph = PNC.RelationshipGraph
+    if not policy or not policy.Evaluate then return nil end
+    local personality = graph and graph.ResolveNPCPersonality
+        and graph.ResolveNPCPersonality(record) or {}
+    local evaluation = policy.Evaluate(
+        relationship and relationship.approval,
+        relationship and relationship.respect,
+        personality
+    )
+    return policy.CopyPreview and policy.CopyPreview(evaluation) or evaluation
+end
+
 -- This only exposes the current player's directed relationship with the
 -- requested NPC.  Detailed memories/personality remain debug-only.
 function Presentation.BuildForConversation(player, npcID)
@@ -100,6 +146,11 @@ function Presentation.BuildForConversation(player, npcID)
         relationship ~= nil
     )
     summary.npcID = tostring(record.id)
+    summary.recruitmentPreview = buildRecruitmentPreview(
+        record,
+        relationship
+    )
+    summary.departurePreview = buildDeparturePreview(record, relationship)
     -- These fields are intentionally part of the player's own presentation
     -- response. They make SP/MP identity drift diagnosable without exposing
     -- another player's relationship data.

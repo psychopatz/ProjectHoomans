@@ -119,19 +119,28 @@ function Service.CancelJob(npcId, reason)
 end
 
 local function updateRuntime(record, job, tree)
+    local displayTree = tree
+    if not displayTree and job.pendingOutput and Service.GetTree then
+        -- Keep the completed tree's ledger values visible while the worker
+        -- is carrying or depositing its output. Otherwise the UI falls back
+        -- to the parent work order, which only completes after delivery and
+        -- incorrectly shows 0% during the entire chopping/output boundary.
+        displayTree = Service.GetTree(job.pendingOutput.treeKey)
+    end
     record.runtime = record.runtime or {}
     record.runtime.lumber = {
         jobId = job.id, zoneId = job.zoneId,
-        treeKey = tree and tree.key or job.targetKey,
-        treeX = tree and tree.x or nil, treeY = tree and tree.y or nil,
-        treeZ = tree and tree.z or nil,
+        treeKey = displayTree and displayTree.key or job.targetKey,
+        treeX = displayTree and displayTree.x or nil,
+        treeY = displayTree and displayTree.y or nil,
+        treeZ = displayTree and displayTree.z or nil,
         approachX = job.approach and job.approach.x or nil,
         approachY = job.approach and job.approach.y or nil,
         approachZ = job.approach and job.approach.z or nil,
         phase = job.phase, state = job.state,
         activityItemFullType = job.activityItemFullType,
-        remainingWork = tree and tree.remainingWork or nil,
-        maxWork = tree and tree.maxWork or nil,
+        remainingWork = displayTree and displayTree.remainingWork or nil,
+        maxWork = displayTree and displayTree.maxWork or nil,
     }
 end
 

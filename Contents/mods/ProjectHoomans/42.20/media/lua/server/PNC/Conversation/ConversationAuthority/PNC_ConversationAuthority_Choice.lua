@@ -143,6 +143,7 @@ function Authority.HandleChoice(player, args)
         choiceID = choice.id,
         outcomeID = outcome.id,
         responseKey = outcome.responseKey,
+        npcReaction = outcome.npcReaction,
         nextNodeID = outcome.next,
         close = outcome.close == true,
         closeReason = outcome.close == true and table.concat({

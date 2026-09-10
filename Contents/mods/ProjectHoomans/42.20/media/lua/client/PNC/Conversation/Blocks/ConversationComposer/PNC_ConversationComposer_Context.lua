@@ -39,6 +39,8 @@ function Composer.BuildContext(entry, player, timeID, relationshipID)
         relationshipID,
         colonyManagement.settlement ~= nil
     )
+    local npcPersonality = record.personality or record.socialProfile
+        or record.social and record.social.personality or {}
     local context = {
         entry = entry,
         player = player,
@@ -52,8 +54,12 @@ function Composer.BuildContext(entry, player, timeID, relationshipID)
         relationshipState = relationshipID,
         playerSocialProfile = playerContext.socialProfile,
         playerPersonality = playerContext.socialProfile,
-        npcPersonality = record.personality or record.socialProfile,
-        npcTraits = record.traits or record.socialTraits,
+        npcPersonality = npcPersonality,
+        npcTraits = PNC.NPCTraitContext
+            and PNC.NPCTraitContext.Collect
+            and PNC.NPCTraitContext.Collect(record)
+            or record.vanillaTraits or record.dynamicTraits
+            or record.traits or record.socialTraits,
         audience = profile.audience,
         conversationAudience = profile.audience,
         conversationProfile = profile,

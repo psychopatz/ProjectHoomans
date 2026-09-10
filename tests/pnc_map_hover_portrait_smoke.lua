@@ -91,7 +91,8 @@ T.truthy(map.pncHoverPortrait.width == 128
 T.truthy(portraitTarget.id == portraitEntry.id
     and portraitTarget.preferDescriptor == true
     and portraitTarget.faceOnly == true
-    and portraitTarget.equipment == nil,
+    and portraitTarget.includeCurrentClothing == true
+    and portraitTarget.equipment.worn.Hat == "Base.Hat_HardHat",
     "hover portrait did not use descriptor rendering")
 T.truthy(portraitContext == portraitEntry,
     "hover portrait card did not receive NPC badge/name context")

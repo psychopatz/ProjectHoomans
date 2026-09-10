@@ -32,6 +32,20 @@ local function isHome(record, base)
         and PNC.HomeDutyService.IsAtHome(record, base.id) == true
 end
 
+local function sleepActionable(record)
+    local needs = PNC.IndividualNeeds
+    local queries = needs and needs.Queries
+    if queries and type(queries.GetSleepIntent) == "function" then
+        return queries.GetSleepIntent(record) ~= nil
+    end
+    local definitions = PNC.NeedsDefinitions
+    local policy = definitions and definitions.SLEEP_TASK
+    local fatigue = needs and type(needs.Get) == "function"
+        and tonumber(needs.Get(record, "fatigue")) or nil
+    return fatigue ~= nil and policy
+        and fatigue >= (tonumber(policy.actionable) or 0.70)
+end
+
 local function eligible(record, currentTime)
     if not record or record.alive == false
         or not PNC.CompanionCommands
@@ -42,7 +56,25 @@ local function eligible(record, currentTime)
     end
     if record.runtime and (record.runtime.workOrderId
         or record.runtime.facilityActivity)
-    then return false end
+    then
+        -- An automatic living-room activity may have been started in the same
+        -- server tick that fatigue crossed the sleep threshold. End that idle
+        -- presentation immediately; otherwise it can hold the chair until the
+        -- task inbox gets its next reevaluation.
+        if sleepActionable(record)
+            and record.runtime.facilityActivity
+            and record.runtime.facilityActivity.automatic == true
+            and tostring(record.runtime.facilityActivity.capability or "")
+                == "living"
+            and PNC.FacilityJobs and PNC.FacilityJobs.Stop
+        then
+            PNC.FacilityJobs.Stop(record, "sleep_need_priority")
+        end
+        return false
+    end
+    -- Needs emits the sleep wake-up before tasking consumes it. Keep the idle
+    -- service from reserving a dining chair during that arbitration window.
+    if sleepActionable(record) then return false end
     -- AtHome/AtCamp can keep their durable order while responding to a
     -- nearby threat. Ambient seating is only an idle presentation and must
     -- yield while the shared combat target is live.

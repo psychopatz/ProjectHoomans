@@ -110,6 +110,132 @@ function Relationship.GetPresentation(npcID)
         or nil
 end
 
+local function copyRecruitmentPreview(value)
+    if type(value) ~= "table" then return nil end
+    local function copyBreakdown(source)
+        if type(source) ~= "table" then return nil end
+        local output = {}
+        for _, route in ipairs({ "admire", "fear" }) do
+            local sourceRoute = source[route]
+            if type(sourceRoute) == "table" then
+                local routeCopy = {
+                    scoreModifier = tonumber(sourceRoute.scoreModifier) or 0,
+                    modifiers = {},
+                }
+                for _, item in ipairs(sourceRoute.modifiers or {}) do
+                    if type(item) == "table" then
+                        routeCopy.modifiers[#routeCopy.modifiers + 1] = {
+                            id = tostring(item.id or ""),
+                            label = tostring(item.label or ""),
+                            value = tonumber(item.value) or 0,
+                        }
+                    end
+                end
+                output[route] = routeCopy
+            end
+        end
+        return output
+    end
+    local graphContext = type(value.graphContext) == "table"
+        and { bonus = tonumber(value.graphContext.bonus) or 0 }
+        or nil
+    return {
+        graphContext = graphContext,
+        score = tonumber(value.score) or 0,
+        threshold = tonumber(value.threshold) or 0,
+        margin = tonumber(value.margin) or 0,
+        personalityBreakdown = copyBreakdown(value.personalityBreakdown),
+        approvalMinimum = tonumber(value.approvalMinimum),
+        respectMinimum = tonumber(value.respectMinimum),
+        meetsMinimums = value.meetsMinimums == true,
+        normalEligible = value.normalEligible == true,
+        fearEligible = value.fearEligible == true,
+    }
+end
+
+local function sameBreakdown(left, right)
+    if type(left) ~= "table" or type(right) ~= "table" then
+        return left == right
+    end
+    for _, route in ipairs({ "admire", "fear" }) do
+        local leftRoute = left[route]
+        local rightRoute = right[route]
+        if type(leftRoute) ~= type(rightRoute) then return false end
+        if type(leftRoute) == "table" then
+            if (tonumber(leftRoute.scoreModifier) or 0)
+                ~= (tonumber(rightRoute.scoreModifier) or 0)
+            then
+                return false
+            end
+            local leftModifiers = leftRoute.modifiers or {}
+            local rightModifiers = rightRoute.modifiers or {}
+            if #leftModifiers ~= #rightModifiers then return false end
+            for index = 1, #leftModifiers do
+                local leftItem = leftModifiers[index]
+                local rightItem = rightModifiers[index]
+                if tostring(leftItem.id or "")
+                    ~= tostring(rightItem.id or "")
+                    or tostring(leftItem.label or "")
+                        ~= tostring(rightItem.label or "")
+                    or (tonumber(leftItem.value) or 0)
+                        ~= (tonumber(rightItem.value) or 0)
+                then
+                    return false
+                end
+            end
+        end
+    end
+    return true
+end
+
+local function copyDeparturePreview(value)
+    if type(value) ~= "table" then return nil end
+    local output = {
+        version = tonumber(value.version) or 0,
+        approvalThreshold = tonumber(value.approvalThreshold) or -60,
+        respectThreshold = tonumber(value.respectThreshold) or -60,
+        recoveryApprovalThreshold =
+            tonumber(value.recoveryApprovalThreshold) or -45,
+        recoveryRespectThreshold =
+            tonumber(value.recoveryRespectThreshold) or -45,
+        bothAxesRequired = value.bothAxesRequired == true,
+        confirmationChecks = math.max(
+            1, math.floor(tonumber(value.confirmationChecks) or 2)
+        ),
+        modifiers = {},
+    }
+    for _, item in ipairs(value.modifiers or {}) do
+        if type(item) == "table" then
+            output.modifiers[#output.modifiers + 1] = {
+                id = tostring(item.id or ""),
+                label = tostring(item.label or ""),
+                value = tonumber(item.value) or 0,
+            }
+        end
+    end
+    return output
+end
+
+local function sameDeparturePreview(left, right)
+    left = left and left.departurePreview or nil
+    right = right and right.departurePreview or nil
+    if left == nil or right == nil then return left == right end
+    return (tonumber(left.approvalThreshold) or 0)
+            == (tonumber(right.approvalThreshold) or 0)
+        and (tonumber(left.respectThreshold) or 0)
+            == (tonumber(right.respectThreshold) or 0)
+        and (tonumber(left.recoveryApprovalThreshold) or 0)
+            == (tonumber(right.recoveryApprovalThreshold) or 0)
+        and (tonumber(left.recoveryRespectThreshold) or 0)
+            == (tonumber(right.recoveryRespectThreshold) or 0)
+        and (tonumber(left.confirmationChecks) or 0)
+            == (tonumber(right.confirmationChecks) or 0)
+        and sameBreakdown(
+            { admire = { modifiers = left.modifiers or {} } },
+            { admire = { modifiers = right.modifiers or {} } }
+        )
+end
+
 local function copyPresentation(summary)
     return {
         npcID = tostring(summary.npcID or ""),
@@ -124,7 +250,36 @@ local function copyPresentation(summary)
         socialRevision = tonumber(summary.socialRevision) or 0,
         identityKey = summary.identityKey,
         relationshipLookup = summary.relationshipLookup,
+        recruitmentPreview = copyRecruitmentPreview(
+            summary.recruitmentPreview
+        ),
+        departurePreview = copyDeparturePreview(summary.departurePreview),
     }
+end
+
+local function sameRecruitmentPreview(left, right)
+    left = left and left.recruitmentPreview or nil
+    right = right and right.recruitmentPreview or nil
+    if left == nil or right == nil then return left == right end
+    local leftContext = left.graphContext or {}
+    local rightContext = right.graphContext or {}
+    return (tonumber(left.score) or 0) == (tonumber(right.score) or 0)
+        and (tonumber(left.threshold) or 0)
+            == (tonumber(right.threshold) or 0)
+        and (tonumber(left.margin) or 0) == (tonumber(right.margin) or 0)
+        and (tonumber(left.approvalMinimum) or 0)
+            == (tonumber(right.approvalMinimum) or 0)
+        and (tonumber(left.respectMinimum) or 0)
+            == (tonumber(right.respectMinimum) or 0)
+        and (tonumber(leftContext.bonus) or 0)
+            == (tonumber(rightContext.bonus) or 0)
+        and sameBreakdown(
+            left.personalityBreakdown,
+            right.personalityBreakdown
+        )
+        and left.meetsMinimums == right.meetsMinimums
+        and left.normalEligible == right.normalEligible
+        and left.fearEligible == right.fearEligible
 end
 
 local function samePresentation(left, right)
@@ -143,6 +298,8 @@ local function samePresentation(left, right)
             == (tonumber(right.interactionRevision) or 0)
         and (tonumber(left.socialRevision) or 0)
             == (tonumber(right.socialRevision) or 0)
+        and sameRecruitmentPreview(left, right)
+        and sameDeparturePreview(left, right)
 end
 
 function Relationship.ReceivePresentation(summary, delta, metadata)
@@ -223,6 +380,7 @@ end
 
 function Relationship.ReceiveAfter(npcID, after, delta, metadata)
     if type(after) ~= "table" then return false end
+    local previous = Relationship.GetPresentation(npcID)
     return Relationship.ReceivePresentation({
         npcID = npcID,
         exists = true,
@@ -238,6 +396,10 @@ function Relationship.ReceiveAfter(npcID, after, delta, metadata)
         relationshipLookup = after.relationshipLookup,
         socialRevision = after.socialRevision,
         identityDiagnostics = after.identityDiagnostics,
+        recruitmentPreview = after.recruitmentPreview
+            or previous and previous.recruitmentPreview,
+        departurePreview = after.departurePreview
+            or previous and previous.departurePreview,
     }, delta, metadata)
 end
 
@@ -293,6 +455,14 @@ function Relationship.SetPreviewRequirement(npcID, requirement, context)
         and view.extensionParts.relationship or nil
     if not panel or not panel.setRequirement then
         return false, "relationship_panel_unavailable"
+    end
+    if tostring(requirement or "") == "recruit"
+        and type(context) ~= "table"
+    then
+        local presentation = Relationship.GetPresentation(npcID)
+        local preview = presentation
+            and presentation.recruitmentPreview or nil
+        context = preview and preview.graphContext or {}
     end
     local ok, reason = panel:setRequirement(requirement, context)
     if ok == false then return false, reason end

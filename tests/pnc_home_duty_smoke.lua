@@ -152,6 +152,23 @@ T.equal(startedRequest.metadata.purpose, "return_home",
 T.equal(PNC.HomeDutyService.BuildState(npc).state, "RETURNING_HOME",
     "home state exposes travel")
 
+-- A stale AtHome order must not keep owning the behavior tick while the
+-- return-home journey is still active.
+npc.x, npc.y = 15, 15
+npc.orderSpec = { kind = "colony_home", baseId = "base-1",
+    x = 15, y = 15, z = 0, radius = 3 }
+local alreadyReturning, alreadyReturningReason =
+    PNC.HomeDutyService.EnsureHomeAnchor(
+        npc, "base-1", "stale_home_order")
+T.equal(alreadyReturning, true,
+    "stale home order preserves the active return journey")
+T.equal(alreadyReturningReason, "RETURNING_HOME",
+    "stale home order returns the durable travel state")
+T.equal(npc.orderSpec.kind, "travel",
+    "stale home order restores travel ownership")
+T.equal(npc.orderSpec.journeyId, npc.travel.journeyId,
+    "restored travel order points at the active journey")
+
 npc.x, npc.y, npc.travel.state = 15, 15, "arrived"
 local arrived = arrivals.colony_home(npc, npc.travel,
     startedRequest.arrivalAction)
@@ -164,6 +181,21 @@ T.equal(PNC.HomeDutyService.BuildState(npc).state, "AT_HOME",
     "remembered home base survives missing legacy affiliation")
 T.equal(PNC.HomeDutyService.GetColonyId(npc), "colony-1",
     "remembered home base resolves colony eligibility")
+
+local activeFollower = {
+    id = "npc-active-follower", alive = true, x = 15, y = 15, z = 0,
+    runtime = {
+        facilityActivity = {
+            previousOrder = { kind = "follow" },
+        },
+    },
+    orderSpec = { kind = "facility_activity" },
+}
+T.truthy(PNC.HomeDutyService.IsFollowing(activeFollower),
+    "temporary facility activity preserves follower duty context")
+activeFollower.runtime.facilityActivity.previousOrder = { kind = "camp" }
+T.truthy(PNC.HomeDutyService.IsCamped(activeFollower),
+    "temporary facility activity preserves camp duty context")
 
 -- A loaded blocked center tile must not become the durable home anchor when
 -- another tile in the same sparse zone is usable.

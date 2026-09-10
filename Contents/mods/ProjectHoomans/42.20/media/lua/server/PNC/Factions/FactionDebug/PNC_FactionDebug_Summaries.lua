@@ -19,6 +19,10 @@ local IdentityVerifier = PNC.Identity
 local function factionSummary(faction)
     local archetype = Archetypes.Get(faction.archetypeID)
     local mobile = faction.mobile
+    local mobileView = copy(mobile)
+    local mobileGroup = mobile and PNC.AbstractGroups
+        and PNC.AbstractGroups.FindByFactionID
+        and PNC.AbstractGroups.FindByFactionID(faction.id) or nil
     local archetypeLabel = archetype and archetype.label
         or faction.archetypeID
     if mobile and mobile.active == true then
@@ -57,6 +61,33 @@ local function factionSummary(faction)
                 + (tonumber(amount) or 0)
         end
     end
+    if mobileView and mobileView.active == true then
+        local live = mobileGroup
+            and PNC.AbstractGroups.HasLiveMembers
+            and PNC.AbstractGroups.HasLiveMembers(mobileGroup) == true
+        mobileView.groupID = mobileGroup and mobileGroup.id or nil
+        mobileView.groupState = mobileGroup and mobileGroup.state or nil
+        mobileView.presence = live and "live"
+            or mobileGroup and mobileGroup.simulation
+                and mobileGroup.simulation.lod or "abstract"
+        mobileView.destination = copy(
+            mobileView.travel and mobileView.travel.destination
+                or mobileView.ambient and mobileView.ambient.target
+                or mobileView.strategicTarget
+                or mobileGroup and mobileGroup.targetLocation
+        )
+        if mobileView.activity == "traveling_to_settlement" then
+            mobileView.debugState = mobileGroup
+                and mobileGroup.state == "TRAVELING"
+                and "en_route" or "arrival_pending"
+        elseif mobileView.ambient
+            and mobileView.ambient.objective == "road"
+        then
+            mobileView.debugState = "road_roaming"
+        else
+            mobileView.debugState = "street_roaming"
+        end
+    end
     return {
         id = faction.id,
         name = faction.name,
@@ -73,7 +104,7 @@ local function factionSummary(faction)
         tags = copy(faction.tags),
         policy = copy(faction.policy),
         emblem = copy(faction.emblem),
-        mobile = copy(mobile),
+        mobile = mobileView,
         revision = faction.revision,
         communityCount = #communities,
         communityNames = communityNames,

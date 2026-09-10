@@ -44,6 +44,13 @@ local function dialoguePayload(source, key, context, args)
     return payload(source, key, merged)
 end
 
+local function portraitAnimationForReaction(reaction)
+    if tostring(reaction or "") == "declined" then
+        return "reaction.thumbsdown"
+    end
+    return nil
+end
+
 local function resolvedDialogue(value)
     if not value then return nil end
     local text = PsychopatzCore and PsychopatzCore.Conversation
@@ -198,6 +205,7 @@ Internal.SYSTEM_SOURCE = SYSTEM_SOURCE
 Internal.ActiveView = activeView
 Internal.Payload = payload
 Internal.DialoguePayload = dialoguePayload
+Internal.PortraitAnimationForReaction = portraitAnimationForReaction
 Internal.ResolvedDialogue = resolvedDialogue
 Internal.AppendDiary = appendDiary
 Internal.ReceiveRelationshipAfter = receiveRelationshipAfter

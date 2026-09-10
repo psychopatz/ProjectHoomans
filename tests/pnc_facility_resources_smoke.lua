@@ -85,6 +85,19 @@ T.equal(target.interactionSurfaceOffset, 0.15,
     "bed target carries surface offset")
 T.equal(target.interactionZ, (0.15 + 1) / 96,
     "bed target converts surface height to world Z")
+T.truthy(Resources.IsValidSleepTarget(scan.resources[1], target),
+    "bed target passes the physical sleep-target gate")
+T.falsy(Resources.IsValidSleepTarget(
+    { resourceKind = "seating_surface", sleepSurface = "bed" },
+    target), "seating resources cannot be reclassified as sleep")
+T.falsy(Resources.IsValidSleepTarget(
+    { resourceKind = "sleep_surface", detectorId = "seat",
+        sleepSurface = "bed" }, target),
+    "seat detectors cannot be reclassified as bed sleep")
+T.falsy(Resources.IsValidSleepTarget(
+    { resourceKind = "sleep_surface", sleepSurface = "bed" },
+    { sceneId = "facility.living.sitFurniture", sleepSurface = "bed" }),
+    "chair scenes cannot pass as bed sleep")
 
 PNC.FacilityDefinitions = {
     GetLevel = function()

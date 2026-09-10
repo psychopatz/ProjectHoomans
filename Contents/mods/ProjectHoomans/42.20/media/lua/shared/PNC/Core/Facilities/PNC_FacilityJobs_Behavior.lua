@@ -7,6 +7,7 @@ PNC.FacilityJobs = PNC.FacilityJobs or {}
 
 local Jobs = PNC.FacilityJobs
 local Definitions = PNC.FacilityJobDefinitions
+local SquareRules = require "PsychopatzCore/World/PsychopatzSquareRules"
 local KIND = "facility_activity"
 local JOB = "FacilityActivity"
 local SEAT_STOP_DISTANCE = 0.10
@@ -16,6 +17,8 @@ local Diagnostics = PNC.PerformanceScalingDiagnostics
 
 PNC.SeatingRuntime = PNC.SeatingRuntime or {}
 PNC.SeatingRuntime.LiveObjects = PNC.SeatingRuntime.LiveObjects or {}
+PNC.SleepRuntime = PNC.SleepRuntime or {}
+PNC.SleepRuntime.LiveObjects = PNC.SleepRuntime.LiveObjects or {}
 local applySeatFacing
 
 local function normalize(_, spec)
@@ -36,6 +39,16 @@ local function normalize(_, spec)
         interactionSurfaceOffset = tonumber(spec.interactionSurfaceOffset),
         interactionAxis = tostring(spec.interactionAxis or ""),
         interactionFacing = tostring(spec.interactionFacing or ""),
+        sleepAnchorX = tonumber(spec.sleepAnchorX),
+        sleepAnchorY = tonumber(spec.sleepAnchorY),
+        sleepAnchorZ = tonumber(spec.sleepAnchorZ),
+        sleepAxis = tostring(spec.sleepAxis or ""),
+        sleepFacing = tostring(spec.sleepFacing or ""),
+        sleepSprite = tostring(spec.sleepSprite or ""),
+        sleepGridX = tonumber(spec.sleepGridX),
+        sleepGridY = tonumber(spec.sleepGridY),
+        sleepGridWidth = tonumber(spec.sleepGridWidth),
+        sleepGridHeight = tonumber(spec.sleepGridHeight),
         seatDirection = tostring(spec.seatDirection or ""),
         seatSide = tostring(spec.seatSide or ""),
         approachKey = tostring(spec.approachKey or ""),
@@ -88,6 +101,108 @@ local function liveSeatObject(record, runtime)
         end
     end
     return object
+end
+
+local function liveSleepObject(record, runtime)
+    local objects = PNC.SleepRuntime and PNC.SleepRuntime.LiveObjects
+    local key = tostring(record and record.id or "")
+    local object = objects and objects[key]
+    if object then return object end
+    if runtime and runtime.resource and PNC.FacilityResources
+        and PNC.FacilityResources.ResolveLiveObject
+    then
+        object = PNC.FacilityResources.ResolveLiveObject(runtime.resource)
+        if object and objects and key ~= "" then objects[key] = object end
+    end
+    return object
+end
+
+local function clearSleepSurface(record, zombie, runtime, objectOverride,
+    surfaceOverride)
+    local surface = tostring(surfaceOverride or runtime
+        and runtime.sleepSurface or "")
+    local object = objectOverride or liveSleepObject(record, runtime)
+    if surface == "bed" or surface == "sofa" then
+        if object and object.setSatChair then object:setSatChair(false) end
+        if zombie then
+            if zombie.setIsResting then zombie:setIsResting(false) end
+            if zombie.setBed then zombie:setBed(nil) end
+            if zombie.setSitOnFurnitureObject then
+                zombie:setSitOnFurnitureObject(nil)
+            end
+            if zombie.setSitOnFurnitureDirection then
+                zombie:setSitOnFurnitureDirection(nil)
+            end
+            if zombie.clearVariable then
+                zombie:clearVariable("OnBedDirection")
+                zombie:clearVariable("OnBedStarted")
+                zombie:clearVariable("OnBedAnim")
+            end
+        end
+    end
+    if PNC.SleepRuntime and PNC.SleepRuntime.LiveObjects and record then
+        local key = tostring(record.id)
+        if objectOverride == nil
+            or PNC.SleepRuntime.LiveObjects[key] == objectOverride
+        then
+            PNC.SleepRuntime.LiveObjects[key] = nil
+        end
+    end
+    runtime.sleepSurfaceEntered = false
+end
+
+local function sleepDirection(order)
+    local directionName = tostring(order and order.sleepFacing or "")
+    local axis = tostring(order and (order.sleepAxis or order.interactionAxis)
+        or "")
+    if axis == "x" then directionName = "E"
+    elseif axis == "y" then directionName = "S" end
+    if directionName == "" then
+        directionName = tostring(order and order.interactionFacing or "")
+    end
+    if IsoDirections and IsoDirections[directionName] then
+        return IsoDirections[directionName]
+    end
+    return IsoDirections and IsoDirections.S or nil
+end
+
+local function prepareSleepSurface(record, zombie, runtime, order)
+    local surface = tostring(runtime and runtime.sleepSurface
+        or order and order.sleepSurface or "")
+    if surface ~= "bed" and surface ~= "sofa" then return true end
+    if runtime.sleepSurfaceEntered == true then return true end
+    if not zombie then return true end
+    local object = liveSleepObject(record, runtime)
+    if not object then return false, "SLEEP_OBJECT_UNAVAILABLE" end
+    -- Unit/integration doubles may only expose the occupancy mutators. A live
+    -- IsoObject exposes sprite/properties methods, so only physical objects
+    -- are subject to this final classification gate.
+    if object.getSprite or object.getProperties then
+        local classified = SquareRules.ClassifySleepSurface(object)
+        if classified ~= surface then
+            return false, "SLEEP_OBJECT_NOT_" .. string.upper(surface)
+        end
+    end
+    if object.isFurnitureOccupied
+        and object:isFurnitureOccupied(zombie) == true
+    then
+        return false, "SLEEP_SURFACE_OCCUPIED"
+    end
+    if object.setSatChair then object:setSatChair(true) end
+    if zombie.setOnFloor then zombie:setOnFloor(false) end
+    if zombie.setSitOnGround then zombie:setSitOnGround(false) end
+    if zombie.setSitOnFurnitureObject then
+        zombie:setSitOnFurnitureObject(object)
+    end
+    local direction = sleepDirection(order)
+    if direction and zombie.setSitOnFurnitureDirection then
+        zombie:setSitOnFurnitureDirection(direction)
+    end
+    if zombie.reportEvent then zombie:reportEvent("EventSitOnFurniture") end
+    if zombie.setIsResting then zombie:setIsResting(true) end
+    if zombie.setBed then zombie:setBed(object) end
+    runtime.sleepSurfaceEntered = true
+    return true
 end
 
 local function clearFurnitureSeat(record, zombie, runtime)
@@ -545,6 +660,37 @@ local function refreshCampActivity(record, zombie)
     return true
 end
 
+local function sleepTargetChanged(order, runtime, previous)
+    if not previous then return false end
+    if tostring(runtime and runtime.resourceKey or "")
+        ~= tostring(previous.resourceKey or "")
+        or tostring(runtime and runtime.sleepSurface or "")
+            ~= tostring(previous.sleepSurface or "")
+    then
+        return true
+    end
+    local fields = {
+        "x", "y", "z", "interactionX", "interactionY", "interactionZ",
+        "sleepAnchorX", "sleepAnchorY", "sleepAnchorZ", "sleepAxis",
+        "sleepFacing", "sleepSprite", "sleepGridX", "sleepGridY",
+        "sleepGridWidth", "sleepGridHeight",
+    }
+    for index = 1, #fields do
+        local field = fields[index]
+        local left = order and order[field]
+        local right = previous[field]
+        if type(left) == "number" or type(right) == "number" then
+            if math.abs((tonumber(left) or 0) - (tonumber(right) or 0)) > 0.02
+            then
+                return true
+            end
+        elseif tostring(left or "") ~= tostring(right or "") then
+            return true
+        end
+    end
+    return false
+end
+
 local function campActivityBounds(record, runtime)
     local state = record and record.campState or nil
     local anchorX = tonumber(runtime and runtime.campX)
@@ -640,11 +786,15 @@ local function finish(record, zombie, reason, restoreOrder)
             reason == "rested" and "complete" or tostring(reason or "stopped"))
     end
     local previous = runtime.previousOrder
+    clearSleepSurface(record, zombie, runtime)
     clearFurnitureSeat(record, zombie, runtime)
     if runtime.seating == true and PNC.SeatingRuntime
         and PNC.SeatingRuntime.LiveObjects
     then
         PNC.SeatingRuntime.LiveObjects[tostring(record.id)] = nil
+    end
+    if PNC.SleepRuntime and PNC.SleepRuntime.LiveObjects then
+        PNC.SleepRuntime.LiveObjects[tostring(record.id)] = nil
     end
     record.runtime.facilityActivity = nil
     record.runtime.facilityDebugWork = nil
@@ -832,6 +982,7 @@ function Jobs.OnSceneStopped(record, zombie, scene, reason)
     local runtime = state(record)
     if not runtime then return end
     runtime.sleepSceneActive = false
+    clearSleepSurface(record, zombie, runtime)
     clearFurnitureSeat(record, zombie, runtime)
     restorePosition(record, zombie, runtime)
     runtime.arrivalSettled = false
@@ -870,6 +1021,7 @@ function Jobs.Tick(record, zombie)
     local previousSeatKey
     local previousSeatAnchorX
     local previousSeatAnchorY
+    local previousSleep
     local positioned
     local positionReason
     local scene
@@ -878,6 +1030,29 @@ function Jobs.Tick(record, zombie)
     local startReason
     local startupNow
     if order.kind ~= KIND or not runtime or not definition then return false end
+    if runtime.campActivity == true
+        and tostring(runtime.capability or "") == "sleep"
+    then
+        previousSleep = {
+            resourceKey = runtime.resourceKey or order.resourceKey,
+            sleepSurface = runtime.sleepSurface or order.sleepSurface,
+            x = order.x, y = order.y, z = order.z,
+            interactionX = order.interactionX,
+            interactionY = order.interactionY,
+            interactionZ = order.interactionZ,
+            sleepAnchorX = order.sleepAnchorX,
+            sleepAnchorY = order.sleepAnchorY,
+            sleepAnchorZ = order.sleepAnchorZ,
+            sleepAxis = order.sleepAxis,
+            sleepFacing = order.sleepFacing,
+            sleepSprite = order.sleepSprite,
+            sleepGridX = order.sleepGridX,
+            sleepGridY = order.sleepGridY,
+            sleepGridWidth = order.sleepGridWidth,
+            sleepGridHeight = order.sleepGridHeight,
+            object = liveSleepObject(record, runtime),
+        }
+    end
     if not refreshCampActivity(record, zombie) then
         local leaseId = runtime.taskLeaseId
         local failure = runtime.failedReason
@@ -886,6 +1061,21 @@ function Jobs.Tick(record, zombie)
             PNC.Tasking.Commands.CancelForNPC(record.id, failure)
         end
         return true
+    end
+    if previousSleep and (sleepTargetChanged(order, runtime, previousSleep)
+        or previousSleep.object ~= liveSleepObject(record, runtime))
+    then
+        if runtime.sleepSurfaceEntered == true
+            or previousSleep.object ~= nil
+        then
+            clearSleepSurface(record, zombie, runtime, previousSleep.object,
+                previousSleep.sleepSurface)
+        end
+        resetPath(record, zombie, "sleep_surface_refreshed")
+        runtime.arrivalSettled = false
+        runtime.positioned = false
+        runtime.facingApplied = false
+        runtime.sleepSurfaceEntered = false
     end
     if runtime.resourceKind == "nearby_water" and not runtime.resource
         and PNC.NearbyWaterService and PNC.NearbyWaterService.Resolve
@@ -1075,6 +1265,22 @@ function Jobs.Tick(record, zombie)
             if direction then zombie:setForwardIsoDirection(direction) end
         end
         runtime.facingApplied = true
+    end
+    if tostring(runtime.capability or "") == "sleep" then
+        local prepared, sleepReason = prepareSleepSurface(
+            record, zombie, runtime, order)
+        if not prepared then
+            local leaseId = runtime.taskLeaseId
+            runtime.failedReason = sleepReason or "SLEEP_SURFACE_UNAVAILABLE"
+            finish(record, zombie, runtime.failedReason)
+            if leaseId ~= "" and PNC.Tasking and PNC.Tasking.Commands
+                and PNC.Tasking.Commands.CancelForNPC
+            then
+                PNC.Tasking.Commands.CancelForNPC(record.id,
+                    runtime.failedReason)
+            end
+            return true
+        end
     end
     scene = record.runtime.animationScene
     if not scene or scene.id ~= sceneId then

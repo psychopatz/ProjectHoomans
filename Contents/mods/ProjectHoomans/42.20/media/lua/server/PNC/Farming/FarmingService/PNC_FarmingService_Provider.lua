@@ -13,6 +13,8 @@ local baseFor = Internal.BaseFor
 local Recovery = PNC.Tasking and PNC.Tasking.Internal
 local WorkPolicy = PNC.WorkPolicy
     or require "PNC/Core/Production/WorkDefinition/PNC_WorkPolicy"
+local FatigueGate = PNC.WorkFatigueGate
+    or require "PNC/Core/Needs/PNC_WorkFatigueGate"
 
 local Provider = {}
 
@@ -26,11 +28,20 @@ local function isFarmer(record)
     return role == "farmer" or record and record.job == "Farmer"
 end
 
+local function isCamped(record)
+    return PNC.HomeDutyService
+        and PNC.HomeDutyService.IsCamped
+        and PNC.HomeDutyService.IsCamped(record) == true
+end
+
 function Provider.GetCandidates(npcId)
     local record = recordFor(npcId)
-    if not record or record.alive == false or not isFarmer(record)
+    if not record or record.alive == false or isCamped(record)
+        or not isFarmer(record)
         or not WorkPolicy.IsEnabled(record, Farming.FARMER_JOB)
     then return {} end
+    local fatigueOK = FatigueGate.Check(record)
+    if not fatigueOK then return {} end
     local base = PNC.HomeDutyService and PNC.HomeDutyService.GetBase
         and PNC.HomeDutyService.GetBase(record) or nil
     if not base then return {} end
@@ -56,14 +67,20 @@ end
 
 function Provider.Validate(intent)
     local record = recordFor(intent and intent.npcId)
+    if not record or isCamped(record) then return false end
+    local fatigueOK, fatigueReason = FatigueGate.Check(record)
+    if not fatigueOK then return false, fatigueReason end
     local facility = intent and Repository.GetFacility(intent.sourceRef)
-    return record ~= nil and record.alive ~= false and facility ~= nil
+    return record.alive ~= false and facility ~= nil
         and WorkPolicy.IsEnabled(record, Farming.FARMER_JOB)
         and Service.HasConfiguredWork(facility)
 end
 
 function Provider.Assign(intent)
     local record = recordFor(intent.npcId)
+    if not record or isCamped(record) then return nil, "NPC_CAMPED" end
+    local fatigueOK, fatigueReason = FatigueGate.Check(record)
+    if not fatigueOK then return nil, fatigueReason end
     local facility = Repository.GetFacility(intent.sourceRef)
     local base = baseFor(facility)
     local live = PNC.Registry.GetLiveZombie
@@ -81,6 +98,9 @@ end
 function Provider.Start(lease, assignment)
     local record = recordFor(lease.npcId)
     if not record then return false, "NPC_UNAVAILABLE" end
+    if isCamped(record) then return false, "NPC_CAMPED" end
+    local fatigueOK, fatigueReason = FatigueGate.Check(record)
+    if not fatigueOK then return false, fatigueReason end
     local ok, reason = PNC.FacilityJobs.Start(record, assignment.facilityId,
         "farm.work", { automatic = true, acquired = assignment,
             taskLeaseId = lease.leaseId,
@@ -94,8 +114,11 @@ function Provider.CanContinue(lease)
     local facility = Repository.GetFacility(lease and lease.facilityId)
     local record = recordFor(lease and lease.npcId)
     if not facility or not record or record.alive == false
+        or isCamped(record)
         or not Repository.GetComponent(lease.componentId)
     then return false end
+    local fatigueOK, fatigueReason = FatigueGate.Check(record)
+    if not fatigueOK then return false, fatigueReason end
     local live = PNC.Registry.GetLiveZombie
         and PNC.Registry.GetLiveZombie(record.id) or nil
     return (lease.executionMode == "LIVE") == (live ~= nil)
@@ -143,14 +166,29 @@ end
 function Provider.Tick(lease)
     local record = recordFor(lease.npcId)
     if not record then return false end
+    local fatigueOK, fatigueReason = FatigueGate.Check(record)
+    if not fatigueOK and PNC.Tasking.Commands.CancelLease then
+        local released = PNC.Tasking.Commands.CancelLease(lease.leaseId,
+            fatigueReason)
+        return released ~= false
+    end
     if lease.executionMode == "ABSTRACT" then Service.TickAbstract(record, lease) end
     return true
 end
 
-function Provider.Cancel(lease)
+function Provider.Cancel(lease, reason)
     local record = recordFor(lease and lease.npcId)
     if record and record.runtime and record.runtime.facilityActivity then
-        PNC.FacilityJobs.Stop(record, "farming_task_cancelled")
+        PNC.FacilityJobs.Stop(record, reason == "WORKER_NEEDS_REST"
+            and "work_fatigue_gate" or "farming_task_cancelled")
+    end
+    if record and reason == "WORKER_NEEDS_REST"
+        and PNC.HomeDutyService and PNC.HomeDutyService.SendHome
+        and PNC.HomeDutyService.IsAtHome
+        and not PNC.HomeDutyService.IsAtHome(record, lease.baseId)
+    then
+        PNC.HomeDutyService.SendHome(record, lease.baseId,
+            "work_fatigue_gate")
     end
     return true
 end

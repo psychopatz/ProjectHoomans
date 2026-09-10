@@ -213,7 +213,9 @@ function ISPNCConversationRelationshipPanel:prerender()
     if not text then return end
     local accent = self:getAccentColor()
     local color = accent
-    if evaluation.requirement.enabled == true then
+    if evaluation.requirement.id == "departure" then
+        color = { r = 0.98, g = 0.10, b = 0.10 }
+    elseif evaluation.requirement.enabled == true then
         color = evaluation.insideSuccessRegion
             and { r = 0.35, g = 0.92, b = 0.48 }
             or { r = 0.96, g = 0.58, b = 0.35 }
@@ -236,7 +238,12 @@ function ISPNCConversationRelationshipPanel:setRelationship(summary)
         summary,
         type(summary) == "table" and summary.exists == true
     )
+    self.departurePreview = type(summary) == "table"
+        and summary.departurePreview or nil
     if self.graph then
+        if self.graph.setDeparturePreview then
+            self.graph:setDeparturePreview(self.departurePreview)
+        end
         self.graph:setEvaluation(
             Presentation.BuildEvaluation(
                 self.relationship,
@@ -322,6 +329,7 @@ function ISPNCConversationRelationshipPanel:new(x, y, width, height, options)
         options
     )
     object.relationship = options.relationship
+    object.departurePreview = options.departurePreview
     object.requirement = options.requirement or "inspect"
     object.requirementContext = options.requirementContext or {}
     return object

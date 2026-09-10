@@ -52,6 +52,11 @@ function Authority.BuildContext(player, record, token)
         and relationshipQueries.Get(record.id, playerEntityKey) or nil
     relationship = type(relationship) == "table" and relationship or {}
     relationship.morale = record.social and record.social.morale or 0
+    local graph = PNC.RelationshipGraph
+    local npcPersonality = graph and graph.ResolveNPCPersonality
+        and graph.ResolveNPCPersonality(record)
+        or record.personality or record.socialProfile
+        or record.social and record.social.personality or {}
     local category = relationshipCategory(record, relationship)
     local faction, colony, base = playerSettlement(player)
     local playerProfile = PNC.SocialProfiles
@@ -70,8 +75,12 @@ function Authority.BuildContext(player, record, token)
         relationshipState = category,
         playerSocialProfile = playerProfile,
         playerPersonality = playerProfile,
-        npcPersonality = record.personality or record.socialProfile,
-        npcTraits = record.traits or record.socialTraits,
+        npcPersonality = npcPersonality,
+        npcTraits = PNC.NPCTraitContext
+            and PNC.NPCTraitContext.Collect
+            and PNC.NPCTraitContext.Collect(record)
+            or record.vanillaTraits or record.dynamicTraits
+            or record.traits or record.socialTraits,
         audiences = audienceMap(record, category),
         allowHostileParley = audienceMap(record, category).hostile,
         worldAgeHours = worldAgeHours(),

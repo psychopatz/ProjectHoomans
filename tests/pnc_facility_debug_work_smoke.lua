@@ -118,7 +118,12 @@ local bedZombie = {
     getZ = function() return 0 end,
     setForwardIsoDirection = function(_, value) facing = value end,
 }
+local bedObject = {
+    setSatChair = function() end,
+}
+PNC.SleepRuntime.LiveObjects["npc:bed"] = bedObject
 local bedRecord = {
+    id = "npc:bed",
     x = 11.5, y = 5.5, z = 0, orderSpec = bedOrder,
     needs = { fatigue = 0.8 },
     runtime = { facilityActivity = { capability = "sleep" } },

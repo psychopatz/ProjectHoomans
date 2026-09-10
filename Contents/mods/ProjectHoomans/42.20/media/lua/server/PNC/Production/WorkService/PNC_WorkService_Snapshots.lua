@@ -97,6 +97,22 @@ local function lumberItemFullType(record)
     return direct ~= "" and direct or nil
 end
 
+local function lumberProgress(record, order)
+    local required = math.max(1, tonumber(order and order.requiredWork) or 1)
+    local progress = math.max(0, math.min(required,
+        tonumber(order and order.progress) or 0))
+    local lumber = record and record.runtime
+        and record.runtime.lumber or nil
+    local maxWork = tonumber(lumber and lumber.maxWork)
+    local remainingWork = tonumber(lumber and lumber.remainingWork)
+    if maxWork and maxWork > 0 and remainingWork ~= nil then
+        required = math.max(1, maxWork)
+        remainingWork = math.max(0, math.min(required, remainingWork))
+        progress = required - remainingWork
+    end
+    return progress, required, lumber
+end
+
 function Service.Queries.BuildTaskSnapshot(colonyId)
     local output = {}
     for _, order in ipairs(Service.Queries.List(colonyId)) do
@@ -122,6 +138,10 @@ function Service.Queries.BuildTaskSnapshot(colonyId)
             local required = math.max(1, tonumber(order.requiredWork) or 1)
             local progress = math.max(0, math.min(required,
                 tonumber(order.progress) or 0))
+            local lumberRuntime
+            if order.operation == "LUMBER" then
+                progress, required, lumberRuntime = lumberProgress(worker, order)
+            end
             local refundPercent
             if (order.operation == "CONSTRUCT"
                 or order.operation == "RECONSTRUCT")
@@ -142,6 +162,13 @@ function Service.Queries.BuildTaskSnapshot(colonyId)
                 progress = progress,
                 requiredWork = required,
                 percent = math.floor((progress / required) * 100 + 0.5),
+                treeKey = lumberRuntime and lumberRuntime.treeKey or nil,
+                treeProgress = order.operation == "LUMBER" and progress or nil,
+                treeRequiredWork = order.operation == "LUMBER"
+                    and required or nil,
+                treeRemainingWork = lumberRuntime
+                    and lumberRuntime.remainingWork or nil,
+                treeMaxWork = lumberRuntime and lumberRuntime.maxWork or nil,
                 priority = order.priority,
                 workerId = order.workerId,
                 workerName = worker and tostring(worker.name or worker.id) or nil,
@@ -262,6 +289,9 @@ function Service.BuildActionInformation(record)
     end
     local lumber = order.operation == "LUMBER" and record.runtime
         and record.runtime.lumber or nil
+    if order.operation == "LUMBER" then
+        progress, required, lumber = lumberProgress(record, order)
+    end
     local activeLocation = workLocationState
         and workLocationState(record, order) or nil
     local activePolicy = locationPolicy and locationPolicy(order) or nil
@@ -279,6 +309,11 @@ function Service.BuildActionInformation(record)
         progress = progress,
         requiredWork = required,
         percent = math.floor((progress / required) * 100 + 0.5),
+        treeKey = lumber and lumber.treeKey or nil,
+        treeProgress = order.operation == "LUMBER" and progress or nil,
+        treeRequiredWork = order.operation == "LUMBER" and required or nil,
+        treeRemainingWork = lumber and lumber.remainingWork or nil,
+        treeMaxWork = lumber and lumber.maxWork or nil,
         facilityId = facilityId,
         facilityDefinitionId = facility and facility.definitionId or nil,
         recipeId = order.recipeId,

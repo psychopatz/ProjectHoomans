@@ -164,6 +164,8 @@ local record = {
 }
 
 local snapshot = Service.Capture(record, true)
+T.equal(snapshot.schemaVersion, Service.SCHEMA_VERSION,
+    "camp snapshots carry the current sleep-resource schema")
 T.equal(#snapshot.resources, 3,
     "camp snapshot captures beds, sofas, and faucets in the search radius")
 T.equal(snapshot.resources[1].resourceKind, "sleep_surface",
@@ -174,6 +176,12 @@ T.equal(snapshot.resources[3].sleepSurface, "sofa",
     "camp snapshot preserves sofa sleep classification")
 T.falsy(snapshot.resources[1].object,
     "camp snapshots do not retain world object references")
+
+snapshot.schemaVersion = 2
+record.campState = snapshot
+local migratedSnapshot = Service.Capture(record, false)
+T.equal(migratedSnapshot.schemaVersion, Service.SCHEMA_VERSION,
+    "old camp snapshots are rescanned after sleep classification changes")
 
 local waterAssignment = Service.AcquireWater(record, { abstract = true })
 T.truthy(waterAssignment and waterAssignment.ok,

@@ -23,11 +23,18 @@ local function recordFor(npcId)
         and PNC.Registry.Get(tostring(npcId or "")) or nil
 end
 
+local function isCamped(record)
+    return PNC.HomeDutyService
+        and PNC.HomeDutyService.IsCamped
+        and PNC.HomeDutyService.IsCamped(record) == true
+end
+
 function Executor.GetCandidates(npcId)
+    local record = recordFor(npcId)
+    if not record or isCamped(record) then return {} end
     local job = Service and Service.GetJob and Service.GetJob(npcId)
     local zone = job and Service.GetZone(job.zoneId) or nil
-    local record = recordFor(npcId)
-    if not job or not zone or not record or job.active ~= true
+    if not job or not zone or job.active ~= true
         or zone.enabled ~= true or not Service.ValidateZone(zone)
         or not WorkPolicy.IsEnabled(record, "Fishing")
         or not Service.IsNearby(record, zone)
@@ -44,17 +51,19 @@ end
 
 function Executor.Validate(intent)
     local npcId = intent and intent.npcId
+    local record = recordFor(npcId)
+    if not record or isCamped(record) then return false end
     local job = Service and Service.GetJob and Service.GetJob(npcId)
     local zone = job and Service.GetZone(job.zoneId) or nil
-    local record = recordFor(npcId)
     return Service and Service.ValidateJob
         and Service.ValidateJob(npcId, intent and intent.sourceRef)
-        and record ~= nil
         and WorkPolicy.IsEnabled(record, "Fishing")
         and Service.IsNearby(record, zone) or false
 end
 
 function Executor.Assign(intent)
+    local record = recordFor(intent and intent.npcId)
+    if not record or isCamped(record) then return nil, "NPC_CAMPED" end
     local job = Service and Service.GetJob and Service.GetJob(intent and intent.npcId)
     if not job or tostring(job.id) ~= tostring(intent and intent.sourceRef) then
         return nil, "fishing_job_missing"
@@ -70,8 +79,10 @@ function Executor.Start(lease)
 end
 
 function Executor.CanContinue(lease)
+    local record = recordFor(lease and lease.npcId)
     local job = Service and Service.GetJob(lease and lease.npcId)
-    return job ~= nil and job.active == true
+    return record ~= nil and not isCamped(record)
+        and job ~= nil and job.active == true
         and tostring(job.id) == tostring(lease and lease.sourceRef)
         and tostring(job.leaseId or "") == tostring(lease and lease.leaseId)
 end

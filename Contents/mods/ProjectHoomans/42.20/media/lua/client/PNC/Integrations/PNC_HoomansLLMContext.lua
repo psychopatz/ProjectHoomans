@@ -420,7 +420,15 @@ function Context.Build(view, message)
         or source.social and source.social.personality
         or {}
     local traits = block.npcTraits
+    if type(traits) ~= "table"
+        and PNC.NPCTraitContext
+        and PNC.NPCTraitContext.Collect
+    then
+        traits = PNC.NPCTraitContext.Collect(source)
+    end
+    traits = traits
         or source.vanillaTraits
+        or source.dynamicTraits
         or source.traits
         or source.socialTraits
         or {}

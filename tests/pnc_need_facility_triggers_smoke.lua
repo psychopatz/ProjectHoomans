@@ -252,6 +252,30 @@ T.equal(startedCapability, "survival.eat.inventory",
 T.equal(startedOptions.taskLeaseId, "lease:food",
     "follower food preserves its task lease")
 
+-- Starting the activity swaps the visible order to facility_activity. The
+-- previous follow order must still keep the away route valid until the scene
+-- completes, otherwise Tasking cancels the lease and interrupts eating.
+record.orderSpec = {
+    kind = "facility_activity", capability = "survival.eat.inventory",
+}
+record.runtime.facilityActivity = {
+    automatic = true, taskLeaseId = "lease:food",
+    previousOrder = { kind = "follow" },
+}
+T.truthy(PNC.NeedFacilityAwayRoutes.IsFollowing(record),
+    "facility eating preserves the follower context")
+T.truthy(PNC.NeedFacilityAwayRoutes.IsAwayCompanion(record),
+    "facility eating remains an away-companion activity")
+local activeValid, activeReason = Triggers.Validate(followerFood)
+T.truthy(activeValid, activeReason
+    or "active follower eating remains valid")
+T.truthy(Triggers.CanContinue({
+    npcId = record.id, sourceRef = "follower_food",
+    leaseId = "lease:food", capability = "survival.eat.inventory",
+}), "active follower eating lease remains continuable")
+record.runtime.facilityActivity = nil
+record.orderSpec = { kind = "follow" }
+
 hasPersonalFood = false
 record.needs.hunger = 0.65
 T.falsy(Triggers.PreferFacility(record, "hunger"),

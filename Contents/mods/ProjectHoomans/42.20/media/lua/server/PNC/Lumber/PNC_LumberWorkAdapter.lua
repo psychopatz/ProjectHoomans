@@ -99,7 +99,7 @@ local function statusForJob(job)
         return Status.WAITING_FOR_WORKER or "WAITING_FOR_WORKER"
     end
     if phase == "WAITING_FOR_TOOL"
-        or phase == "WAITING_FOR_ENDURANCE"
+        or phase == "WAITING_FOR_FATIGUE"
         or phase == "WAITING_FOR_STOCKPILE"
     then
         return Status.WAITING_RESOURCE or "WAITING_RESOURCE"
@@ -345,13 +345,57 @@ end
 if WorldEffects and WorldEffects.RegisterProvider
     and WorldEffects.Register
 then
+    local function activeJobForTree(tree)
+        if not tree then return nil end
+        for _, candidate in pairs(Service.Data
+            and Service.Data.jobs or {}) do
+            if type(candidate) == "table" and candidate.active == true then
+                local targetKey = candidate.targetKey
+                local outputKey = candidate.pendingOutput
+                    and candidate.pendingOutput.treeKey or nil
+                if tostring(targetKey or "") == tostring(tree.key or "")
+                    or tostring(outputKey or "") == tostring(tree.key or "")
+                then
+                    return candidate
+                end
+            end
+        end
+        return nil
+    end
+
+    local function activeTreeDebugEffect(tree, job)
+        if not tree or not job then return nil end
+        local record = PNC.Registry and PNC.Registry.Get
+            and PNC.Registry.Get(job.npcId) or nil
+        local runtime = record and record.runtime
+            and record.runtime.lumber or nil
+        local required = math.max(1, tonumber(tree.maxWork) or 1)
+        local remaining = math.max(0, math.min(required,
+            tonumber(tree.remainingWork) or required))
+        return {
+            id = "lumber_work:" .. tostring(tree.key),
+            kind = "LUMBER_WORK", operation = "LUMBER_WORK",
+            state = "PENDING", debugOnly = true,
+            treeKey = tree.key, x = tree.x, y = tree.y, z = tree.z,
+            workerID = job.npcId, phase = job.phase,
+            sourceMode = job.executionMode,
+            progress = required - remaining, requiredWork = required,
+            remainingWork = remaining, maxWork = required,
+            activityItemFullType = runtime
+                and runtime.activityItemFullType or job.activityItemFullType,
+            waitingReason = runtime and runtime.waitingReason or nil,
+            lastReason = runtime and runtime.lastReason or nil,
+        }
+    end
+
     WorldEffects.RegisterProvider("LUMBER", {
         List = function()
             local output = {}
             for _, tree in pairs(Service.Data and Service.Data.trees or {}) do
                 if type(tree) == "table"
                     and (type(tree.worldEffect) == "table"
-                        or type(tree.outputEffect) == "table")
+                        or type(tree.outputEffect) == "table"
+                        or activeJobForTree(tree))
                 then
                     output[#output + 1] = tree
                 end
@@ -366,6 +410,10 @@ then
             end
             if type(tree and tree.outputEffect) == "table" then
                 output[#output + 1] = tree.outputEffect
+            end
+            local active = activeJobForTree(tree)
+            if active then
+                output[#output + 1] = activeTreeDebugEffect(tree, active)
             end
             return output
         end,

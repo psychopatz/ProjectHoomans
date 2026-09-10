@@ -450,6 +450,9 @@ local function workTargetProvider(order, worker, live)
         claimKey = "corpse:" .. assignment.haulToken,
         targetKind = "corpse", target = {
             x = targetX, y = targetY, z = targetZ,
+            stopDistance = phase == "CARRYING"
+                and (tonumber(Service.CORPSE_CARRY_DROP_DISTANCE) or 1.75)
+                or nil,
         },
         phase = phase,
     }
@@ -926,6 +929,8 @@ local function tickWorkOrder(order, lease)
                     Status.TRAVEL_TO_STATION, {
                         x = assignment.dropX, y = assignment.dropY,
                         z = assignment.dropZ,
+                        stopDistance = tonumber(
+                            Service.CORPSE_CARRY_DROP_DISTANCE) or 1.75,
                     })
             else
                 setWorkPhase(order, lease, "DESTINATION_APPROACH",
@@ -976,10 +981,13 @@ local function tickWorkOrder(order, lease)
         task.carryMissingSince = nil
         distance = Core.Distance(body:getX(), body:getY(),
             assignment.dropX, assignment.dropY)
-        if distance <= 0.8 then
+        if distance <= (tonumber(Service.CORPSE_CARRY_DROP_DISTANCE) or 1.75)
+        then
             setWorkPhase(order, lease, "DROP_PENDING", Status.WORKING, {
                 x = assignment.dropX, y = assignment.dropY,
                 z = assignment.dropZ,
+                stopDistance = tonumber(
+                    Service.CORPSE_CARRY_DROP_DISTANCE) or 1.75,
             })
         end
         return true

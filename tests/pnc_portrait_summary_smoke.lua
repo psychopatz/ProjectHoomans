@@ -78,6 +78,13 @@ local record = {
             Jacket = "Base.Jacket_WhiteTINT",
             Shirt = "Base.Shirt_FormalWhite",
         },
+        wornVisuals = {
+            Jacket = {
+                fullType = "Base.Jacket_WhiteTINT",
+                textureChoice = 2,
+                tint = { r = 0.7, g = 0.8, b = 0.9 },
+            },
+        },
     },
     runtime = {},
 }
@@ -91,14 +98,19 @@ T.truthy((tonumber(portrait.revision) or 0) > 0,
     "portrait summary revision was not generated")
 T.equal(portrait.appearance.hairModel, "Short",
     "portrait hair model")
-T.equal(portrait.equipment, nil,
-    "portrait retained clothing metadata")
-T.equal(portrait.appearance.outfitItems, nil,
-    "portrait leaked the full outfit list")
+T.equal(portrait.equipment.worn.Hat, "Base.Hat_HardHat",
+    "portrait did not retain the current worn loadout")
+T.equal(portrait.equipment.wornVisuals.Jacket.textureChoice, 2,
+    "portrait did not retain the current clothing visual choice")
+T.truthy(type(portrait.appearance.outfitItems) == "table",
+    "portrait did not retain its bounded fallback outfit")
 
 record.equipment.worn.Hat = "Base.Hat_Beret"
-T.truthy(PNC.Identity.BuildPortraitSummary(record) == portrait,
-    "equipment-only change rebuilt the clothing-free portrait")
+local changedPortrait = PNC.Identity.BuildPortraitSummary(record)
+T.truthy(changedPortrait ~= portrait,
+    "equipment-only change did not invalidate the portrait")
+T.equal(changedPortrait.equipment.worn.Hat, "Base.Hat_Beret",
+    "portrait cache kept the stale hat")
 
 local normalized = PNC.Identity.NormalizePortraitSummary({
     id = "oversized",
@@ -113,10 +125,8 @@ local normalized = PNC.Identity.NormalizePortraitSummary({
         },
     },
 })
-T.equal(normalized.equipment, nil,
-    "normalized portrait accepted clothing metadata")
+T.equal(normalized.equipment.worn.Hat, "Base.Hat_HardHat",
+    "normalized portrait discarded clothing metadata")
 T.truthy(#normalized.appearance.hairModel <= 128,
     "portrait appearance string was not bounded")
-T.finish("pnc_portrait_summary_smoke")
-
 T.finish("pnc_portrait_summary_smoke")

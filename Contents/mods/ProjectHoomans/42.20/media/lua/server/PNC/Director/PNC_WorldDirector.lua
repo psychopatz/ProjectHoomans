@@ -15,6 +15,7 @@ local EncounterResolver = PNC.AbstractEncounterResolver
 local CombatResolver = PNC.AbstractCombatResolver
 local MobileAccidents = PNC.AbstractMobileAccidents
 local MobileGroupDirector = PNC.MobileGroupDirector
+local MobileGroupDirectorInternal = PNC.MobileGroupDirectorInternal
 local Scheduler = PNC.Scheduler
 local Config = PNC.DirectorConfig
 
@@ -100,6 +101,21 @@ function Director.Initialize(force)
         end,
         { budget = Config.DIRECTOR_JOB_BUDGET,
             startAt = now + Config.MOBILE_AMBIENT_INTERVAL_HOURS })
+    Scheduler.RegisterJob("MobileDepartures",
+        Config.MOBILE_DEPARTURE_INTERVAL_HOURS,
+        function(at, budget)
+            if Director.Paused or not MobileGroupDirector
+                or not MobileGroupDirector.PumpDepartures
+            then
+                return 0
+            end
+            return MobileGroupDirector.PumpDepartures(at, budget)
+        end,
+        { budget = Config.DIRECTOR_JOB_BUDGET,
+            startAt = MobileGroupDirectorInternal
+                and MobileGroupDirectorInternal.NextDailyDepartureAt
+                and MobileGroupDirectorInternal.NextDailyDepartureAt(now)
+                or now + Config.MOBILE_DEPARTURE_INTERVAL_HOURS })
     Scheduler.RegisterJob("AbstractTraversal", Config.TRAVERSAL_INTERVAL_HOURS,
         function(at, budget)
             if Director.Paused then return 0 end

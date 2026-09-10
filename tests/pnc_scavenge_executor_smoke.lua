@@ -83,6 +83,7 @@ local lastMove, sceneRequests = {}, {}
 local restored, captured, broadcasts, pathResets = 0, 0, 0, 0
 local behaviorHandler, threatResponses, sceneInterrupts = nil, 0, 0
 local poolRequests = 0
+local camped = false
 
 PNC = {
     Const = { ORDER_SCAVENGE = "scavenge", PRESENCE_LIVE = "live" },
@@ -94,6 +95,9 @@ PNC = {
         Get = function(id) return records[tostring(id)] end,
         GetLiveZombie = function(id) return bodies[tostring(id)] end,
         MarkDirty = function() end,
+    },
+    HomeDutyService = {
+        IsCamped = function() return camped end,
     },
     PathService = {
         MoveToward = function(record, _, x, y, z, _, stopDistance, reason,
@@ -271,6 +275,16 @@ local search = {
 }
 sessions.search = search
 local lease = leaseFor(search, "bob")
+camped = true
+T.equal(#Executor.GetCandidates("bob"), 0,
+    "camped NPC has no scavenging candidate")
+T.falsy(Executor.Validate({ npcId = "bob", sourceRef = search.id }),
+    "camped scavenging candidate does not validate")
+local _, campReason = Executor.Assign({ npcId = "bob", sourceRef = search.id })
+T.equal(campReason, "NPC_CAMPED", "camped scavenging assignment is rejected")
+T.falsy(Executor.CanContinue(lease),
+    "camped scavenging lease cannot continue")
+camped = false
 T.equal(Executor.GetCandidates("bob")[1].precedence, "FORCED_ORDER",
     "explicit scavenging order outranks ordinary needs and work")
 records.bob.runtime.pathing = { phase = "blocked", blockReason = "old_order" }

@@ -132,6 +132,14 @@ local function normalizeTargetPoint(value, fallbackKind)
         siteID = Internal.SafeString(value.siteID, Constants.ID_MAX_LENGTH),
         baseID = Internal.SafeString(value.baseID, Constants.ID_MAX_LENGTH),
         factionID = Internal.SafeString(value.factionID, Constants.ID_MAX_LENGTH),
+        communityID = Internal.SafeString(
+            value.communityID,
+            Constants.ID_MAX_LENGTH
+        ),
+        locationID = Internal.SafeString(
+            value.locationID,
+            Constants.ID_MAX_LENGTH
+        ),
         zoneID = Internal.SafeString(value.zoneID, Constants.ID_MAX_LENGTH),
     }
     local bounds = type(value.bounds) == "table"
@@ -182,6 +190,29 @@ local function normalizeStrategicTarget(value)
     return target
 end
 
+local function normalizeMobileTravel(value)
+    if type(value) ~= "table" then return nil end
+    local destination = normalizeTargetPoint(
+        value.destination or value.target,
+        Constants.MOBILE_TRAVEL_SETTLEMENT
+    )
+    if not destination then return nil end
+    local startedAt = Internal.Timestamp(value.startedAt, 0)
+    return {
+        kind = Constants.MOBILE_TRAVEL_SETTLEMENT,
+        destination = destination,
+        startedAt = startedAt,
+        departureDay = math.max(
+            0,
+            math.floor(Internal.Finite(
+                value.departureDay,
+                math.floor(startedAt / 24)
+            ))
+        ),
+        revision = Internal.Revision(value.revision),
+    }
+end
+
 -- Mobile groups deliberately store a primitive site snapshot rather than a
 -- Community record. A mobile faction has no reservation, population ledger,
 -- or home claim; the snapshot is only its current abstract staging point.
@@ -196,6 +227,8 @@ function Types.NormalizeMobileGroup(value)
     local controlMode
     local ambient
     local strategicTarget
+    local activity
+    local travel
     if source.active ~= true then return nil end
     if not CommunityTypes or not CommunityTypes.NormalizeSite then
         return nil
@@ -237,6 +270,15 @@ function Types.NormalizeMobileGroup(value)
     strategicTarget = normalizeStrategicTarget(
         source.strategicTarget
     )
+    travel = normalizeMobileTravel(source.travel)
+    activity = Constants.VALID_MOBILE_ACTIVITY_STATES[
+        source.activity
+    ] and source.activity or Constants.MOBILE_ACTIVITY_STREET_ROAMING
+    if activity == Constants.MOBILE_ACTIVITY_TRAVELING_TO_SETTLEMENT
+        and not travel
+    then
+        activity = Constants.MOBILE_ACTIVITY_STREET_ROAMING
+    end
     return {
         schemaVersion = Constants.MOBILE_GROUP_SCHEMA_VERSION,
         active = true,
@@ -244,6 +286,13 @@ function Types.NormalizeMobileGroup(value)
         controlMode = controlMode,
         strategicTarget = strategicTarget,
         ambient = ambient,
+        activity = activity,
+        travel = travel,
+        lastDepartureAt = source.lastDepartureAt == nil
+            and -1 or math.max(-1, math.floor(Internal.Finite(
+                source.lastDepartureAt,
+                -1
+            ))),
         site = site,
         lastMovedAt = lastMovedAt,
         nextMoveAt = nextMoveAt,

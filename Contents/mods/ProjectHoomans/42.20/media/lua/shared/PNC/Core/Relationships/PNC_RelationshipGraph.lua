@@ -9,6 +9,14 @@ local Graph = PNC.RelationshipGraph
 Graph.MINIMUM = -100
 Graph.MAXIMUM = 100
 Graph.NEUTRAL_BAND = 10
+Graph.RECRUIT_APPROVAL_MINIMUM = 25
+Graph.RECRUIT_RESPECT_MINIMUM = 35
+Graph.RECRUIT_SCORE_THRESHOLD = 70
+Graph.RECRUIT_LOYALTY_PENALTY = 20
+Graph.RECRUIT_FEAR_APPROVAL_MAXIMUM = -30
+Graph.RECRUIT_FEAR_RESPECT_MINIMUM = 70
+Graph.RECRUIT_FEAR_SCORE_THRESHOLD = 60
+Graph.RECRUIT_FEAR_BRAVERY_MAXIMUM = 0.85
 Graph.Requirements = Graph.Requirements or {}
 
 local function finite(value, fallback)
@@ -42,6 +50,74 @@ local function safeID(value)
         and value ~= ""
         and #value <= 96
         and string.match(value, "^[%w_%-]+$") ~= nil
+end
+
+local function personalityPolicy(personality, context)
+    local Policy = PNC.RecruitmentPersonalityPolicy
+    if Policy and Policy.Evaluate then
+        return Policy.Evaluate(personality, context)
+    end
+
+    -- Keep isolated legacy tests and partial load orders behavior-compatible.
+    local loyalty = clamp(personality and personality.loyalty, 0, 1)
+    local bravery = clamp(personality and personality.bravery, 0, 1)
+    local loyaltyPenalty = loyalty * finite(
+        context and context.loyaltyPenaltyScale,
+        Graph.RECRUIT_LOYALTY_PENALTY
+    )
+    local braveryPenalty = bravery * finite(
+        context and context.fearBraveryPenaltyScale,
+        25
+    )
+    return {
+        version = 0,
+        loyalty = loyalty,
+        bravery = bravery,
+        loyaltyPenalty = loyaltyPenalty,
+        braveryPenalty = braveryPenalty,
+        admire = { scoreModifier = -loyaltyPenalty, modifiers = {} },
+        fear = {
+            scoreModifier = -loyaltyPenalty - braveryPenalty,
+            modifiers = {},
+        },
+    }
+end
+
+local function rawNPCPersonality(record)
+    if type(record) ~= "table" then return {} end
+    if type(record.personality) == "table" then
+        return record.personality
+    end
+    if type(record.socialProfile) == "table" then
+        if type(record.socialProfile.personality) == "table" then
+            return record.socialProfile.personality
+        end
+        return record.socialProfile
+    end
+    if type(record.social) == "table"
+        and type(record.social.personality) == "table"
+    then
+        return record.social.personality
+    end
+    return {}
+end
+
+function Graph.ResolveNPCPersonality(record)
+    local raw = rawNPCPersonality(record)
+    local Types = PNC.SocialProfileTypes
+    if Types and Types.NormalizeNPCPersonality then
+        local identity = type(record) == "table"
+            and type(record.identity) == "table" and record.identity or {}
+        local social = type(record) == "table"
+            and type(record.social) == "table" and record.social or {}
+        return Types.NormalizeNPCPersonality(
+            raw,
+            record and (record.identitySeed or identity.seed),
+            record and (record.archetypeID or identity.archetypeID),
+            social.personalityOverrides
+        )
+    end
+    return raw
 end
 
 function Graph.Clamp(value)
@@ -101,6 +177,10 @@ function Graph.NormalizeRequirement(value, fallbackID)
         or id
     local description = type(source.description) == "string"
         and string.sub(source.description, 1, 256) or ""
+    local minimumApproval = source.minimumApproval ~= nil
+        and clamp(source.minimumApproval, -100, 100) or nil
+    local minimumRespect = source.minimumRespect ~= nil
+        and clamp(source.minimumRespect, -100, 100) or nil
     return {
         id = id,
         label = label,
@@ -121,6 +201,8 @@ function Graph.NormalizeRequirement(value, fallbackID)
             -200,
             200
         ),
+        minimumApproval = minimumApproval,
+        minimumRespect = minimumRespect,
         deterministic = source.deterministic == true,
     }
 end
@@ -199,6 +281,10 @@ function Graph.Evaluate(
         approval * requirement.approvalWeight
         + respect * requirement.respectWeight
     local finalScore = baseScore + contextBonus
+    local meetsMinimums = (requirement.minimumApproval == nil
+            or approval >= requirement.minimumApproval)
+        and (requirement.minimumRespect == nil
+            or respect >= requirement.minimumRespect)
     return {
         approval = approval,
         respect = respect,
@@ -214,8 +300,65 @@ function Graph.Evaluate(
         finalScore = finalScore,
         threshold = requirement.threshold,
         margin = finalScore - requirement.threshold,
+        meetsMinimums = meetsMinimums,
         insideSuccessRegion = requirement.enabled
-            and finalScore >= requirement.threshold or false,
+            and finalScore >= requirement.threshold
+            and meetsMinimums or false,
+    }
+end
+
+function Graph.EvaluateRecruitment(
+    approval,
+    respect,
+    personality,
+    context
+)
+    personality = type(personality) == "table" and personality or {}
+    local policy = personalityPolicy(personality, {
+        loyaltyPenaltyScale = Graph.RECRUIT_LOYALTY_PENALTY,
+        fearBraveryPenaltyScale = 25,
+    })
+    local loyalty = policy.loyalty
+    local bravery = policy.bravery
+    local loyaltyPenalty = policy.loyaltyPenalty
+    local graphContext = type(context) == "table" and copy(context) or {}
+    graphContext.bonus = finite(graphContext.bonus, 0)
+        + policy.admire.scoreModifier
+    local evaluation = Graph.Evaluate(
+        approval,
+        respect,
+        "recruit",
+        graphContext
+    )
+    local fearScore = evaluation.respect * 0.70
+        + math.max(0, -evaluation.approval) * 0.30
+        + policy.fear.scoreModifier
+    local normal = evaluation.insideSuccessRegion
+    local fear = evaluation.approval <= Graph.RECRUIT_FEAR_APPROVAL_MAXIMUM
+        and evaluation.respect >= Graph.RECRUIT_FEAR_RESPECT_MINIMUM
+        and fearScore >= Graph.RECRUIT_FEAR_SCORE_THRESHOLD
+        and bravery < Graph.RECRUIT_FEAR_BRAVERY_MAXIMUM
+    return {
+        approval = evaluation.approval,
+        respect = evaluation.respect,
+        attitude = evaluation.attitude,
+        requirement = evaluation.requirement,
+        score = evaluation.finalScore,
+        baseScore = evaluation.baseScore,
+        contextBonus = evaluation.contextBonus,
+        threshold = evaluation.threshold,
+        margin = evaluation.margin,
+        meetsMinimums = evaluation.meetsMinimums,
+        normal = normal,
+        fear = fear,
+        loyalty = loyalty,
+        bravery = bravery,
+        loyaltyPenalty = loyaltyPenalty,
+        braveryPenalty = policy.braveryPenalty,
+        personalityBreakdown = policy,
+        admireScore = evaluation.finalScore,
+        fearScore = fearScore,
+        graph = evaluation,
     }
 end
 
@@ -262,11 +405,21 @@ function Graph.BoundaryApprovalAtRespect(
     then
         return nil
     end
-    return (
+    respect = Graph.Clamp(respect)
+    if requirement.minimumRespect ~= nil
+        and respect < requirement.minimumRespect
+    then
+        return nil
+    end
+    local boundary = (
         requirement.threshold
         - finite(contextBonus, 0)
-        - requirement.respectWeight * Graph.Clamp(respect)
+        - requirement.respectWeight * respect
     ) / requirement.approvalWeight
+    if requirement.minimumApproval ~= nil then
+        boundary = math.max(boundary, requirement.minimumApproval)
+    end
+    return boundary
 end
 
 local DEFAULTS = {
@@ -277,12 +430,20 @@ local DEFAULTS = {
         enabled = false,
     },
     {
+        id = "departure",
+        label = "Disband threshold",
+        description = "Shows the relationship line at which a colonist leaves.",
+        enabled = false,
+    },
+    {
         id = "recruit",
         label = "Recruit",
         description = "Goodwill and recognized capability can both qualify.",
-        approvalWeight = 0.55,
-        respectWeight = 0.45,
-        threshold = 35,
+        approvalWeight = 0.45,
+        respectWeight = 0.55,
+        threshold = Graph.RECRUIT_SCORE_THRESHOLD,
+        minimumApproval = Graph.RECRUIT_APPROVAL_MINIMUM,
+        minimumRespect = Graph.RECRUIT_RESPECT_MINIMUM,
         deterministic = true,
     },
     {

@@ -10,6 +10,7 @@ local conversationDebugEnabled = Internal.ConversationDebugEnabled
 local dialoguePayload = Internal.DialoguePayload
 local lifecycleState = Internal.LifecycleState
 local notifyFailure = Internal.NotifyFailure
+local portraitAnimationForReaction = Internal.PortraitAnimationForReaction
 local receiveRelationshipAfter = Internal.ReceiveRelationshipAfter
 local rememberCategoryUse = Internal.RememberCategoryUse
 local resolvedDialogue = Internal.ResolvedDialogue
@@ -159,7 +160,11 @@ function Composer.ReceiveOutcome(args)
             block.textSource,
             args.responseKey,
             context
-        ))
+        ), {
+            portraitAnimation = portraitAnimationForReaction(
+                args.npcReaction
+            ),
+        })
     end
     if PNC.Core and PNC.Core.LogInfo then
         PNC.Core.LogInfo(table.concat({

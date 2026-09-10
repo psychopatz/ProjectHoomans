@@ -12,6 +12,8 @@ local Definitions = PNC.WorkDefinitions
 local Status = Definitions.STATUS
 local WorkPolicy = PNC.WorkPolicy
     or require "PNC/Core/Production/WorkDefinition/PNC_WorkPolicy"
+local FatigueGate = PNC.WorkFatigueGate
+    or require "PNC/Core/Needs/PNC_WorkFatigueGate"
 local EventsBus = PsychopatzCore and PsychopatzCore.Events
 local EventTypes = PNC.EventTypes or {}
 
@@ -65,6 +67,13 @@ local function isFollowing(record)
     local order = record and record.orderSpec or nil
     return tostring(order and order.kind or "") == tostring(
         PNC.Const and PNC.Const.ORDER_FOLLOW or "follow")
+end
+
+local function isCamped(record)
+    if PNC.HomeDutyService and PNC.HomeDutyService.IsCamped then
+        return PNC.HomeDutyService.IsCamped(record) == true
+    end
+    return false
 end
 
 local function specializationScore(record, order)
@@ -130,6 +139,15 @@ local function workerAvailable(record, order)
     if record.alive == false then return false, "WORKER_DEAD" end
     if not belongsToOrder(record, order) then
         return false, "ORDER_OWNERSHIP_MISMATCH"
+    end
+    if order.operation == "LUMBER" or order.operation == "CORPSE_HAUL" then
+        local fatigueOK, fatigueReason = FatigueGate.Check(record)
+        if not fatigueOK then return false, fatigueReason end
+    end
+    -- Camp is a durable movement order. Need and camp-local activity may
+    -- still run, but colony work must not acquire a worker lease here.
+    if isCamped(record) then
+        return false, "WORKER_CAMPED"
     end
     if order.operation == "PROVISION_PICKUP" and isFollowing(record) then
         return false, "FOLLOWING_DURING_PROVISION"
@@ -223,6 +241,7 @@ local function findWorker(order)
             end
         elseif availableReason ~= "FOLLOWING_ACTIVE"
             and availableReason ~= "FOLLOWING_DURING_PROVISION"
+            and availableReason ~= "WORKER_CAMPED"
             and not away
         then
             away = record

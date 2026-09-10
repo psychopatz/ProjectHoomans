@@ -22,6 +22,7 @@ local COLORS = {
     text = { 1, 0.88, 0.91, 0.94 },
     muted = { 1, 0.62, 0.68, 0.73 },
     border = { 0.95, 0.34, 0.76, 0.48 },
+    departure = { 0.98, 0.10, 0.10, 0.92 },
 }
 
 local function signed(value)
@@ -65,6 +66,10 @@ end
 
 function ISPNCRelationshipGraphPanel:setGraphOnly(enabled)
     self.graphOnly = enabled == true
+end
+
+function ISPNCRelationshipGraphPanel:setDeparturePreview(preview)
+    self.departurePreview = type(preview) == "table" and preview or nil
 end
 
 function ISPNCRelationshipGraphPanel:drawColorRect(
@@ -182,6 +187,34 @@ function ISPNCRelationshipGraphPanel:drawHover(
             "Respect: " .. signed(evaluation.respect),
             "Attitude: " .. capitalize(evaluation.attitude),
         }
+    elseif self.departurePreview
+        and (evaluation.requirement.id == "recruit"
+            or evaluation.requirement.id == "departure")
+        and mouseX >= graphX
+        and mouseX <= graphX + graphSize
+        and mouseY >= graphY
+        and mouseY <= graphY + graphSize
+    then
+        local respect = -100
+            + ((mouseX - graphX) / graphSize) * 200
+        local approval = 100
+            - ((mouseY - graphY) / graphSize) * 200
+        if approval <= (tonumber(self.departurePreview.approvalThreshold)
+                or -60)
+            and respect <= (tonumber(self.departurePreview.respectThreshold)
+                or -60)
+        then
+            lines = {
+                "DISBAND THRESHOLD",
+                "Approval: " .. signed(
+                    self.departurePreview.approvalThreshold
+                ) .. " or lower",
+                "Respect: " .. signed(
+                    self.departurePreview.respectThreshold
+                ) .. " or lower",
+                "Both lines must be crossed; personality modifies them.",
+            }
+        end
     elseif evaluation.requirement.enabled
         and mouseX >= graphX
         and mouseX <= graphX + graphSize
@@ -233,6 +266,39 @@ function ISPNCRelationshipGraphPanel:drawHover(
     end
 end
 
+function ISPNCRelationshipGraphPanel:drawDepartureThreshold(
+    graphX, graphY, graphSize, evaluation
+)
+    local preview = self.departurePreview
+    if not preview or not evaluation
+        or not evaluation.requirement
+        or (evaluation.requirement.id ~= "recruit"
+            and evaluation.requirement.id ~= "departure")
+    then
+        return
+    end
+    local approval = math.max(-100, math.min(100,
+        tonumber(preview.approvalThreshold) or -60))
+    local respect = math.max(-100, math.min(100,
+        tonumber(preview.respectThreshold) or -60))
+    local _, approvalY = Graph.RelationshipToScreen(
+        approval, -100, graphX, graphY, graphSize, graphSize
+    )
+    local respectX = Graph.RelationshipToScreen(
+        0, respect, graphX, graphY, graphSize, graphSize
+    )
+    self:drawRect(
+        graphX, approvalY, graphSize, 2,
+        COLORS.departure[1], COLORS.departure[2],
+        COLORS.departure[3], COLORS.departure[4]
+    )
+    self:drawRect(
+        respectX, graphY, 2, graphSize,
+        COLORS.departure[1], COLORS.departure[2],
+        COLORS.departure[3], COLORS.departure[4]
+    )
+end
+
 function ISPNCRelationshipGraphPanel:render()
     ISPanel.render(self)
     local evaluation = self.evaluation or Graph.Evaluate(
@@ -282,6 +348,9 @@ function ISPNCRelationshipGraphPanel:render()
         graphY,
         graphSize,
         evaluation
+    )
+    self:drawDepartureThreshold(
+        graphX, graphY, graphSize, evaluation
     )
     self:drawRect(
         graphX,

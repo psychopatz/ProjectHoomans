@@ -48,9 +48,11 @@ PNC = {
     FactionConstants = {},
     FactionBalance = {},
     EntityRef = {
-        Parse = function()
+        Parse = function(key)
+            local accountIdentity = string.match(
+                tostring(key or ""), "^player:([^:]+):")
             return {
-                accountIdentity = "alice",
+                accountIdentity = accountIdentity or "alice",
                 characterUUID = "character_alice",
             }
         end,
@@ -99,6 +101,7 @@ PNC = {
     JobSystem = { OrderJobs = {
         production_work = "ProductionWork",
         colony_home = "AtHome",
+        camp = "AtCamp",
     } },
 }
 
@@ -154,6 +157,7 @@ T.truthy(working.orderSpec.kind == "production_work"
 
 local atHomeAfterRestart = copy(waiting)
 atHomeAfterRestart.id = "at_home_after_restart"
+atHomeAfterRestart.ownerUsername = "Alice"
 atHomeAfterRestart.ownerOnlineID = nil
 atHomeAfterRestart.orderSpec = {
     kind = "colony_home",
@@ -167,15 +171,41 @@ atHomeAfterRestart.runtime = {}
 records.at_home_after_restart = atHomeAfterRestart
 
 -- Registry/faction loading runs before the player has a live runtime entry.
--- The durable owner key must still protect the persisted At Home order.
+-- The durable owner key must still protect persisted player orders even when
+-- it does not equal the display username used by the NPC record.
+faction.ownerPlayerKey = "player:sp_slot_0:character_alice"
 PNC.PlayerCharacters.RuntimeByUUID.character_alice = nil
 PNC.FactionBehavior.ApplyNPC(atHomeAfterRestart, "registry_load")
 T.truthy(atHomeAfterRestart.orderSpec.kind == "colony_home",
     "offline startup reconciliation replaced At Home with Follow")
 T.truthy(atHomeAfterRestart.orderSpec.baseId == "base-1",
     "offline startup reconciliation lost the remembered home base")
-T.truthy(atHomeAfterRestart.ownerUsername == "alice",
+T.truthy(atHomeAfterRestart.ownerUsername == "Alice",
     "offline startup reconciliation lost the durable owner identity")
+
+local campedAfterRestart = copy(atHomeAfterRestart)
+campedAfterRestart.id = "camped_after_restart"
+campedAfterRestart.orderSpec = {
+    kind = "camp",
+    campId = "camp:trailhead",
+    x = 42,
+    y = 43,
+    z = 0,
+    radius = 3,
+}
+campedAfterRestart.runtime = {}
+records.camped_after_restart = campedAfterRestart
+
+PNC.FactionBehavior.ApplyNPC(campedAfterRestart, "registry_load")
+T.truthy(campedAfterRestart.orderSpec.kind == "camp",
+    "offline startup reconciliation replaced Camp with Follow")
+T.truthy(campedAfterRestart.orderSpec.campId == "camp:trailhead",
+    "offline startup reconciliation lost the camp identity")
+T.truthy(campedAfterRestart.orderSpec.x == 42
+        and campedAfterRestart.orderSpec.y == 43,
+    "offline startup reconciliation changed the camp anchor")
+
+faction.ownerPlayerKey = "player:alice:character_alice"
 PNC.PlayerCharacters.RuntimeByUUID.character_alice = player
 
 local joining = copy(waiting)

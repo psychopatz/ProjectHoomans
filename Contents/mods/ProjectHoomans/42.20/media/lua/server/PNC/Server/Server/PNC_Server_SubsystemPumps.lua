@@ -65,6 +65,13 @@ function H.PrepareTick(now)
     end
     safeOptional("server_prepare.faction_reconciliation",
         PNC.FactionBehavior, "PumpReconciliation")
+    if PNC.ColonistDeparture and PNC.ColonistDeparture.Pump then
+        local gameTime = getGameTime and getGameTime() or nil
+        local worldAge = gameTime and gameTime.getWorldAgeHours
+            and gameTime:getWorldAgeHours() or 0
+        safeOptional("server_prepare.colonist_departure",
+            PNC.ColonistDeparture, "Pump", nil, worldAge)
+    end
     if PNC.FactionIncidentService
         and type(PNC.FactionIncidentService.PumpRuntime) == "function"
     then

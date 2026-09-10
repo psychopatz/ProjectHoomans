@@ -32,6 +32,9 @@ Const.FISHING_REQUIRED_WORK_POINTS = 100
 Const.FISHING_BASE_CATCH_CHANCE = 0.25
 Const.FISHING_SKILL_CATCH_BONUS = 0.05
 Const.FISHING_FATIGUE_STOP = 0.70
+-- Shared stop point for physical and abstract work. This is the NPC-owned
+-- fatigue deficit, not Project Zomboid's player Moodles/endurance state.
+Const.WORK_FATIGUE_STOP = 0.90
 
 Const.SCAVENGE_DEFAULT_RADIUS = 12
 Const.SCAVENGE_MAX_RADIUS = 24

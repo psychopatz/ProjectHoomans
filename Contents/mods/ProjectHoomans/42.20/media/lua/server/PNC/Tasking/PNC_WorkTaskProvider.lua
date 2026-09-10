@@ -9,6 +9,22 @@ local Definitions = PNC.WorkDefinitions
 local Recovery = PNC.Tasking and PNC.Tasking.Internal
 local WorkPolicy = PNC.WorkPolicy
     or require "PNC/Core/Production/WorkDefinition/PNC_WorkPolicy"
+local FatigueGate = PNC.WorkFatigueGate
+    or require "PNC/Core/Needs/PNC_WorkFatigueGate"
+
+local function needsFatigueGate(operation)
+    return operation == "LUMBER" or operation == "CORPSE_HAUL"
+end
+
+local function sendHomeForRest(record, order, reason)
+    if reason ~= "WORKER_NEEDS_REST" or not record or not order
+        or not PNC.HomeDutyService
+        or not PNC.HomeDutyService.SendHome
+        or not PNC.HomeDutyService.IsAtHome
+        or PNC.HomeDutyService.IsAtHome(record, order.baseId)
+    then return end
+    PNC.HomeDutyService.SendHome(record, order.baseId, "work_fatigue_gate")
+end
 
 local function assignable(order)
     return order and not order.workerId
@@ -116,6 +132,12 @@ end
 
 function Provider.CanContinue(lease)
     local order = Work and Work.Queries.Get(lease.sourceRef)
+    if order and needsFatigueGate(order.operation) then
+        local record = PNC.Registry and PNC.Registry.Get
+            and PNC.Registry.Get(lease.npcId) or nil
+        local fatigueOK, fatigueReason = FatigueGate.Check(record)
+        if not fatigueOK then return false, fatigueReason end
+    end
     return order ~= nil and tostring(order.workerId or "") == lease.npcId
         and order.status ~= Status.CANCELLED
         and order.status ~= Status.COMPLETED
@@ -144,6 +166,9 @@ function Provider.Cancel(lease, reason)
     end
     local ok, result = Work.Commands.ReleaseWorker(lease.npcId,
         reason or "task_lease_released")
+    local record = PNC.Registry and PNC.Registry.Get
+        and PNC.Registry.Get(lease.npcId) or nil
+    if ok then sendHomeForRest(record, order, reason) end
     lease.reservationId = nil
     if recovery and recoveryState == "QUARANTINE" then
         if ok == true and Work.Commands.Quarantine then
@@ -212,6 +237,16 @@ function Provider.Tick(lease)
             entityId = lease.sourceRef,
         })
         return false
+    end
+    if needsFatigueGate(order.operation) then
+        local record = PNC.Registry and PNC.Registry.Get
+            and PNC.Registry.Get(lease.npcId) or nil
+        local fatigueOK, fatigueReason = FatigueGate.Check(record)
+        if not fatigueOK and PNC.Tasking.Commands.CancelLease then
+            local released = PNC.Tasking.Commands.CancelLease(lease.leaseId,
+                fatigueReason)
+            return released ~= false
+        end
     end
     local phase = phaseFor(order)
     if lease.phase ~= phase then

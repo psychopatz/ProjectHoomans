@@ -14,6 +14,7 @@ local selectedTextKey = Internal.SelectedTextKey
 
 local RECRUIT_SYSTEM_KEYS = {
     "choice.recruit",
+    "choice.disband", "choice.disband_confirm", "choice.disband_cancel",
     "response.recruit.admire.1",
     "response.recruit.admire.2",
     "response.recruit.admire.3",
@@ -30,6 +31,8 @@ local RECRUIT_SYSTEM_KEYS = {
     "response.recruit.reject.general.1",
     "response.recruit.reject.general.2",
     "response.recruit.reject.general.3",
+    "response.departure.warning", "response.departure.confirmed",
+    "response.departure.rejected",
 }
 
 local GOODBYE_SOURCE = {
@@ -248,6 +251,68 @@ function Composer.BuildRootNode(context, options)
                     Composer.RequestRecruit(context.npcID)
                 end,
             }
+        else
+            local function setDeparturePreview(highlighted)
+                local relationship = Conversation.Relationship
+                    or PNC.Conversation.Relationship
+                if relationship and relationship.SetPreviewRequirement then
+                    local ok, reason = relationship.SetPreviewRequirement(
+                        context.npcID,
+                        highlighted and "departure" or "inspect"
+                    )
+                    if not ok and PNC.Core and PNC.Core.LogWarn then
+                        PNC.Core.LogWarn(
+                            "Conversation relationship preview unavailable npc="
+                                .. tostring(context.npcID or "")
+                                .. " reason=" .. tostring(reason or "unknown")
+                        )
+                    end
+                end
+            end
+            local warningPending = context.pendingDepartureWarning == true
+            if warningPending then
+                choices[#choices + 1] = {
+                    id = "disband_confirm",
+                    text = dialoguePayload(
+                        SYSTEM_SOURCE, "choice.disband_confirm", context
+                    ),
+                    onHighlightChanged = function(_, highlighted)
+                        setDeparturePreview(highlighted)
+                    end,
+                    action = function()
+                        setDeparturePreview(true)
+                        Composer.RequestDeparture(context.npcID, true)
+                    end,
+                }
+                choices[#choices + 1] = {
+                    id = "disband_cancel",
+                    text = dialoguePayload(
+                        SYSTEM_SOURCE, "choice.disband_cancel", context
+                    ),
+                    next = "menu",
+                    action = function()
+                        context.pendingDepartureWarning = nil
+                        local view = Internal.ActiveView(context.npcID)
+                        if view and view.spec and view.spec.context then
+                            view.spec.context.pendingDepartureWarning = nil
+                        end
+                    end,
+                }
+            else
+                choices[#choices + 1] = {
+                    id = "disband",
+                    text = dialoguePayload(
+                        SYSTEM_SOURCE, "choice.disband", context
+                    ),
+                    onHighlightChanged = function(_, highlighted)
+                        setDeparturePreview(highlighted)
+                    end,
+                    action = function()
+                        setDeparturePreview(true)
+                        Composer.RequestDeparture(context.npcID, false)
+                    end,
+                }
+            end
         end
     end
     local requiredSystemKeys = {
@@ -275,7 +340,16 @@ function Composer.BuildRootNode(context, options)
         }
     end
     addDebugChoice(choices, context)
-    return { npc = greeting, choices = choices }
+    local greetingNode = greetingBlock
+        and greetingBlock.nodes
+        and greetingBlock.nodes[greetingBlock.entryNode or "opening"]
+        or nil
+    return {
+        npc = greeting,
+        portraitAnimation = greetingNode
+            and greetingNode.portraitAnimation or nil,
+        choices = choices,
+    }
 end
 
 function Composer.BuildMenuNode(context, options)

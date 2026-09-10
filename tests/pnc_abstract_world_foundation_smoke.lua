@@ -44,6 +44,7 @@ end
 
 T.load(SHARED .. "Director/PNC_DirectorConfig.lua")
 T.load(SHARED .. "Director/PNC_AbstractWorldTypes.lua")
+T.load(SHARED .. "Factions/PNC_FactionConstants.lua")
 T.load(SHARED .. "Scheduling/PNC_Scheduler.lua")
 
 local faction = { id = "faction_test", archetypeID = "looter",

@@ -23,6 +23,7 @@ function Helpers.Outcome(id, responseKey, options)
         id = id,
         weight = options.weight or 1,
         responseKey = responseKey,
+        npcReaction = options.npcReaction,
         next = options.next,
         close = options.close == true,
         effects = options.effects or {},

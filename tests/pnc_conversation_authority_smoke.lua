@@ -8,6 +8,7 @@ T.addPackagePaths()
 local globalData = {}
 local sent = {}
 local relationshipEffects = 0
+local recruitmentCalls = 0
 local worldHours = 100
 Events = {
     OnInitGlobalModData = { Add = function() end },
@@ -192,6 +193,74 @@ local categoryHistory = History.Get(
 )
 T.equal(categoryHistory.useCount, 1, "category use slot advances after commit")
 
+PNC.Recruitment = {
+    TryConversation = function(_, _, relationship)
+        recruitmentCalls = recruitmentCalls + 1
+        T.equal(relationship.approval, 25,
+            "recruitment receives current approval")
+        return false, "relationship_threshold", {
+            eligible = false,
+            score = 35,
+            threshold = 70,
+        }
+    end,
+}
+local recruitFingerprint = Registry.GetFingerprint()
+local recruitAccepted, recruitReason = Authority.HandleRecruit(player, {
+    requestID = "recruit-1",
+    npcID = record.id,
+    token = "lease-token",
+    registryFingerprint = recruitFingerprint,
+})
+T.equal(recruitAccepted, false, "insufficient recruit relationship rejected")
+T.equal(recruitReason, "relationship_threshold",
+    "recruitment reports relationship threshold")
+T.equal(recruitmentCalls, 1, "first recruit attempt reaches evaluator")
+T.equal(relationshipEffects, 2,
+    "rejected recruitment applies its relationship penalty")
+T.equal(sent[#sent].payload.relationshipDelta.approval, -2,
+    "rejected recruitment lowers approval")
+T.equal(sent[#sent].payload.relationshipDelta.respect, -1,
+    "rejected recruitment lowers respect")
+T.equal(sent[#sent].payload.npcReaction, "declined",
+    "genuine recruitment refusal carries an NPC decline reaction")
+T.truthy(sent[#sent].payload.responseKey,
+    "genuine recruitment refusal carries authored dialogue")
+local repeatedRecruit, repeatedRecruitReason = Authority.HandleRecruit(player, {
+    requestID = "recruit-2",
+    npcID = record.id,
+    token = "lease-token",
+    registryFingerprint = recruitFingerprint,
+})
+T.equal(repeatedRecruit, false,
+    "repeated insufficient recruit relationship remains rejected")
+T.equal(repeatedRecruitReason, "relationship_threshold",
+    "repeated recruitment is evaluated instead of cooldown-gated")
+T.equal(recruitmentCalls, 2,
+    "repeated recruitment reaches evaluator without a time gate")
+T.equal(relationshipEffects, 3,
+    "each rejected recruitment attempt applies its annoyance penalty")
+T.equal(sent[#sent].payload.relationshipDelta.approval, -2,
+    "repeated rejection still lowers approval")
+T.equal(sent[#sent].payload.relationshipDelta.respect, -1,
+    "repeated rejection still lowers respect")
+T.equal(sent[#sent].payload.npcReaction, "declined",
+    "repeated genuine refusal carries an NPC decline reaction")
+
+local invalidRecruit, invalidRecruitReason = Authority.HandleRecruit(player, {
+    requestID = "recruit-invalid-lease",
+    npcID = record.id,
+    token = "wrong-token",
+    registryFingerprint = recruitFingerprint,
+})
+T.equal(invalidRecruit, false, "invalid recruit lease rejected")
+T.equal(invalidRecruitReason, "invalid_lease",
+    "invalid recruit lease reports its transport failure")
+T.equal(sent[#sent].payload.npcReaction, nil,
+    "invalid recruit lease has no NPC decline reaction")
+T.equal(sent[#sent].payload.responseKey, nil,
+    "invalid recruit lease has no authored NPC refusal")
+
 T.truthy(Authority.HandleChoice(player, {
     requestID = "choice-2",
     npcID = record.id,
@@ -204,7 +273,7 @@ T.truthy(Authority.HandleChoice(player, {
 local branchOutcome = sent[#sent]
 T.equal(branchOutcome.payload.nextNodeID, "followup",
     "daily topic can continue through multiple nodes")
-T.equal(relationshipEffects, 2,
+T.equal(relationshipEffects, 4,
     "each committed branch applies its relationship outcome once")
 
 local replayed, replayReason = Authority.HandleChoice(player, {
@@ -218,7 +287,7 @@ local replayed, replayReason = Authority.HandleChoice(player, {
 })
 T.equal(replayed, false, "replay rejected")
 T.equal(replayReason, "replayed_request", "replay rejection reason")
-T.equal(relationshipEffects, 2, "replay does not duplicate effect")
+T.equal(relationshipEffects, 4, "replay does not duplicate effect")
 T.equal(sent[#sent].payload.success, false, "replay response rejected")
 
 T.truthy(History.Save(false), "daily conversation history saves")

@@ -10,11 +10,33 @@ function Service.SendHome(record, baseId, reason, options)
     if not point then return false, pointReason end
     local forceDestination = type(options) == "table"
         and options.forceDestination == true
+    if Service.IsReturningHome(record, base.id) then
+        -- A stale colony_home order can outlive the travel journey that was
+        -- created to repair it. Without restoring the travel order here,
+        -- AtHome keeps owning the behavior tick and freezes the active
+        -- return-home journey at its last percentage.
+        local travel = record.travel
+        local travelKind = PNC.Const and PNC.Const.ORDER_TRAVEL or "travel"
+        local current = record.orderSpec
+        if not current
+            or tostring(current.kind or "") ~= tostring(travelKind)
+            or tostring(current.journeyId or "")
+                ~= tostring(travel and travel.journeyId or "")
+        then
+            local travelOrder = {
+                kind = travelKind,
+                journeyId = travel and travel.journeyId or nil,
+            }
+            if PNC.OrderSystem and PNC.OrderSystem.SetOrder then
+                PNC.OrderSystem.SetOrder(record, travelOrder)
+            else
+                record.orderSpec = travelOrder
+            end
+        end
+        return true, "RETURNING_HOME", record.travel
+    end
     if Service.IsAtHome(record, base.id) and not forceDestination then
         return H.SetAtHome(record, base, point)
-    end
-    if Service.IsReturningHome(record, base.id) then
-        return true, "RETURNING_HOME", record.travel
     end
     local journey, journeyReason = PNC.Travel.Service.Start(record, {
         destination = { x = point.x, y = point.y, z = point.z },

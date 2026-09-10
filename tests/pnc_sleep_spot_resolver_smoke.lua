@@ -102,6 +102,9 @@ T.equal(target.interactionX, 11, "multi-tile bed center x")
 T.equal(target.interactionY, 20.5, "multi-tile bed center y")
 T.equal(target.interactionAxis, "x", "bed long axis")
 T.equal(target.sleepSurface, "bed", "bed surface metadata")
+T.equal(target.sleepAnchorX, 11, "bed target carries the sprite-grid center")
+T.equal(target.sleepGridWidth, 2,
+    "bed target carries sprite-grid dimensions")
 
 bedObjects[1] = nil
 component.targetResolver = nil

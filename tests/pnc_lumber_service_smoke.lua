@@ -55,6 +55,7 @@ local now, serial = 1000, 0
 local records = {}
 local squares = {}
 local outputs = {}
+local fatigueReads = 0
 _G.getCell = function()
     return {
         getGridSquare = function(_, x, y, z)
@@ -107,6 +108,12 @@ PNC = {
         MarkDirty = function() end,
     },
     Tasking = { Events = { Emit = function() end } },
+    IndividualNeeds = {
+        Get = function(record, needType)
+            fatigueReads = fatigueReads + 1
+            return needType == "fatigue" and record.fatigue or nil
+        end,
+    },
     Inventory = {
         AddItems = function(_, specs)
             outputs[#outputs + 1] = specs[1]
@@ -257,12 +264,16 @@ liveTree.WeaponHit = function(self)
     liveSquare.worldObjects[#liveSquare.worldObjects + 1] = newWorldObject(splinters)
 end
 local axe = {
+    fullType = "Base.Axe",
     hasTag = function(_, tag) return tag == "chop" end,
     getTreeDamage = function() return 35 end,
     isBroken = function() return false end,
 }
+function axe:getFullType() return self.fullType end
+function axe:getID() return "axe:1" end
 local moveCalls = 0
 local liveToolCreated = false
+local enduranceChecks = 0
 local body = {
     x = 2.5, y = 4.5, z = 0, primary = nil,
     inventory = inventory,
@@ -271,8 +282,14 @@ local body = {
     getX = function(self) return self.x end,
     getY = function(self) return self.y end,
     getZ = function(self) return self.z end,
+    getMoodles = function() return nil end,
+    isEnduranceSufficientForAction = function()
+        enduranceChecks = enduranceChecks + 1
+        return false
+    end,
     setVariable = function() end,
     faceLocationF = function() end,
+    setPrimaryHandItem = function(self, item) self.primary = item end,
 }
 ItemTag = { CHOP_TREE = "chop" }
 PNC.BehaviorCommon = {
@@ -291,6 +308,7 @@ PNC.Equipment = {
 }
 records.live = {
     id = "live", alive = true, x = 2.5, y = 4.5, z = 0,
+    fatigue = 0,
     presenceState = "live", equipment = { primaryFullType = "Base.Axe" },
     runtime = {},
 }
@@ -325,6 +343,12 @@ body.x, records.live.x = 3.5, 3.5
 now = 8000
 T.truthy(Service.TickJob(liveLease), "live chopping tick")
 T.truthy(liveToolCreated, "live lumber materialized the configured axe")
+T.equal(body.primary, axe, "live lumber equips the axe in the primary hand")
+T.equal(#inventory.items, 1, "live lumber owns the axe in the inventory")
+T.truthy(fatigueReads > 0,
+    "live lumber reads the NPC-owned fatigue system")
+T.equal(enduranceChecks, 0,
+    "live lumber never probes player endurance or Moodles")
 T.equal(liveTree.hits, 1, "server live tree hit")
 T.equal(Service.GetTree(liveKey).status, "DEPLETED",
     "live tree depletion")
@@ -422,7 +446,8 @@ T.equal(liveOutputEffect.pickupState, "NPC_INVENTORY",
     "live output records the worker pickup")
 T.equal(#liveSquare.worldObjects, 0,
     "live pickup removes the tagged floor item")
-T.equal(#inventory.items, 2, "live pickup adds floor loot to the worker")
+T.equal(#inventory.items, 3,
+    "live pickup adds floor loot alongside the equipped axe")
 T.equal(Service.GetJob("live").phase, "OUTPUT_DESTINATION_APPROACH",
     "live pickup advances to stockpile travel")
 T.equal(liveOutputEffect.destinationNodeId, "node:1",

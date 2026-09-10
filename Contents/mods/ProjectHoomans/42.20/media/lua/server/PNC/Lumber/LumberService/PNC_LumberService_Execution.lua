@@ -19,6 +19,8 @@ local toolFullType = Internal.ToolFullType
 local persistLiveToolCondition = Internal.PersistLiveToolCondition
 local skillRate = Internal.SkillRate
 local WorldEffects = PNC.WorldEffectService
+local FatigueGate = PNC.WorkFatigueGate
+    or require "PNC/Core/Needs/PNC_WorkFatigueGate"
 
 local function adjacentToTree(body, tree)
     if not body or not tree then return false end
@@ -60,6 +62,10 @@ local function stopChopAnimation(record, body)
     if body and type(body.setVariable) == "function" then
         pcall(body.setVariable, body, "PNCLumbering", false)
     end
+end
+
+local function npcFatigueIsSufficient(record)
+    return FatigueGate.Check(record)
 end
 
 local ensureLumberOutputEffect
@@ -105,9 +111,15 @@ local function tickLive(job, record, body, tree, at)
     local bx = body and body.getX and body:getX() or record.x
     local by = body and body.getY and body:getY() or record.y
     local bz = body and body.getZ and body:getZ() or record.z
+    -- The approach point is a navigation hint, not the interaction point.
+    -- Bodies can stop slightly off the selected square while still being in
+    -- the valid tree interaction envelope. Test adjacency first so a visually
+    -- arrived worker does not remain in TRAVEL forever.
+    local adjacent = adjacentToTree(body, tree)
     local distance = math.abs((tonumber(bx) or 0) - approach.x)
         + math.abs((tonumber(by) or 0) - approach.y)
-    if distance > 1.0 or math.abs((tonumber(bz) or 0) - approach.z) > 0.6 then
+    if not adjacent and (distance > 1.0
+        or math.abs((tonumber(bz) or 0) - approach.z) > 0.6) then
         job.state, job.phase = "TRAVELING", "TRAVEL"
         if PNC.BehaviorCommon and PNC.BehaviorCommon.MoveRecord then
             PNC.BehaviorCommon.MoveRecord(record, body,
@@ -116,7 +128,7 @@ local function tickLive(job, record, body, tree, at)
         updateRuntime(record, job, tree)
         return true, false, "traveling"
     end
-    if not adjacentToTree(body, tree) then
+    if not adjacent then
         job.state, job.phase = "TRAVELING", "TRAVEL"
         if PNC.BehaviorCommon and PNC.BehaviorCommon.MoveRecord then
             PNC.BehaviorCommon.MoveRecord(record, body,
@@ -137,13 +149,10 @@ local function tickLive(job, record, body, tree, at)
         return true, false, toolReason
     end
     job.activityItemFullType = toolFullType and toolFullType(tool.item) or nil
-    if type(body.isEnduranceSufficientForAction) == "function" then
-        local ok, enough = pcall(body.isEnduranceSufficientForAction, body)
-        if ok and enough == false then
-            job.state, job.phase = "WAITING", "WAITING_FOR_ENDURANCE"
-            updateRuntime(record, job, tree)
-            return true, false, "endurance"
-        end
+    if not npcFatigueIsSufficient(record) then
+        job.state, job.phase = "WAITING", "WAITING_FOR_FATIGUE"
+        updateRuntime(record, job, tree)
+        return true, false, "fatigue"
     end
     beginChopAnimation(record, body)
     job.state, job.phase = "WORKING", "CHOPPING"
@@ -877,7 +886,7 @@ local function tickLiveOutput(job, record, body, at)
     return true, false, "lumber_output_pending"
 end
 
-local function ensureDeferredTreeEffect(tree)
+local function ensureDeferredTreeEffect(tree, workerID)
     if type(tree) ~= "table" then return nil end
     if type(tree.worldEffect) == "table" then return tree.worldEffect end
     local effectID = PNC.Core and PNC.Core.GenerateID
@@ -886,6 +895,7 @@ local function ensureDeferredTreeEffect(tree)
     local effect = {
         id = tostring(effectID), kind = "TREE_REMOVE", state = "PENDING",
         treeKey = tree.key, x = tree.x, y = tree.y, z = tree.z,
+        workerID = workerID,
         signature = tree.signature,
         identity = { treeKey = tree.key, signature = tree.signature },
         createdAt = now(), updatedAt = now(), nextRetryAt = 0,
@@ -927,6 +937,11 @@ local function tickAbstract(job, record, tree, at)
         updateRuntime(record, job, tree)
         return true, false, toolReason
     end
+    if not npcFatigueIsSufficient(record) then
+        job.state, job.phase = "WAITING", "WAITING_FOR_FATIGUE"
+        updateRuntime(record, job, tree)
+        return true, false, "fatigue"
+    end
     job.activityItemFullType = tool.fullType
     local previous = tonumber(job.lastProgressAt) or at
     local elapsed = math.max(0, math.min(Service.ABSTRACT_MAX_ELAPSED_MS,
@@ -941,7 +956,7 @@ local function tickAbstract(job, record, tree, at)
     markDirty()
     if tree.remainingWork <= 0 then
         job.activityItemFullType = nil
-        ensureDeferredTreeEffect(tree)
+        ensureDeferredTreeEffect(tree, record and record.id)
         local outputEffect = ensureLumberOutputEffect(tree, "ABSTRACT", {
             { fullType = "Base.Log", quantity = tree.logYield },
         }, "OUTPUT_PENDING", "ABSTRACT_OUTPUT_PENDING", record and record.id)
@@ -1046,7 +1061,7 @@ local function waitingFor(phase, reason)
         or string.find(tostring(reason or ""), "lumber_tool", 1, true)
         or reason == "tool_cannot_chop"
     then return "primary_tool" end
-    if phase == "WAITING_FOR_ENDURANCE" then return "endurance" end
+    if phase == "WAITING_FOR_FATIGUE" then return "fatigue" end
     if phase == "WAITING_FOR_MATERIALIZATION" then return "live_execution" end
     if phase == "WAITING_FOR_TREE_CHUNK" then return "world" end
     if phase == "WAITING_FOR_STOCKPILE" then return "stockpile" end

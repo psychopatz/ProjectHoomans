@@ -43,3 +43,13 @@ Router.Register(Const.CMD_CONVERSATION_RECRUIT_REQUEST, function(player, args)
         conversation.Authority.HandleRecruit(player, args)
     end
 end)
+
+Router.Register(Const.CMD_CONVERSATION_DEPARTURE_REQUEST,
+    function(player, args)
+        local conversation = PNC.Conversation
+        if conversation and conversation.Authority
+            and conversation.Authority.HandleDeparture
+        then
+            conversation.Authority.HandleDeparture(player, args)
+        end
+    end)

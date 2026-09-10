@@ -1,7 +1,10 @@
+require "PNC/UI/Mobile/PNC_MobileGroupDebugModel"
+
 PNC = PNC or {}
 PNC.DirectorDebugModel = PNC.DirectorDebugModel or {}
 
 local Model = PNC.DirectorDebugModel
+local MobileModel = PNC.MobileGroupDebugModel
 
 local function row(label, value, tone)
     return { label = tostring(label or ""),
@@ -11,9 +14,15 @@ end
 function Model.GroupItems(snapshot)
     local output = {}
     for _, group in ipairs(snapshot and snapshot.groups or {}) do
+        local mobile = group.mobile
+        local state = mobile and MobileModel.StateText(mobile, group)
+            or nil
         output[#output + 1] = { id = group.id, value = group,
-            label = group.groupType .. " / " .. group.id,
-            detail = group.mission .. " + " .. group.state }
+            label = (mobile and "MOBILE / " or "")
+                .. group.groupType .. " / " .. group.id,
+            detail = (state and state .. " / " or "")
+                .. group.mission .. " + " .. group.state
+                .. (mobile and " / " .. tostring(mobile.presence) or "") }
     end
     return output
 end
@@ -56,6 +65,13 @@ function Model.DetailRows(snapshot, group, location, sector, authorized, reason)
         "groups=%d traveling=%d active=%d actions=%d engaged=%d", metrics.groups or 0,
         metrics.traveling or 0, metrics.materialized or 0,
         metrics.activeActions or 0, metrics.engaged or 0))
+    local mobileCounts = snapshot and snapshot.mobileCounts or {}
+    rows[#rows + 1] = row("Mobile groups", string.format(
+        "road=%d street=%d en_route=%d pending=%d",
+        mobileCounts.road_roaming or 0,
+        mobileCounts.street_roaming or 0,
+        mobileCounts.en_route or 0,
+        mobileCounts.arrival_pending or 0))
     rows[#rows + 1] = row("World", string.format(
         "locations=%d encounters=%d jobs=%d", metrics.locations or 0,
         metrics.encounters or 0, metrics.scheduledJobs or 0))
@@ -237,6 +253,31 @@ function Model.DetailRows(snapshot, group, location, sector, authorized, reason)
             tostring(action.seed)) or "none")
         rows[#rows + 1] = row("Current location", group.location and group.location.id or "none")
         rows[#rows + 1] = row("Target", group.targetLocation and group.targetLocation.id or "none")
+        if group.mobile then
+            local mobile = group.mobile
+            local state = MobileModel.State(mobile, group)
+            rows[#rows + 1] = row("Mobile lifecycle",
+                MobileModel.StateText(mobile, group) .. " / "
+                    .. tostring(mobile.activity or "street_roaming")
+                    .. " / presence="
+                    .. tostring(MobileModel.Presence(mobile, group)),
+                state == "en_route" and "danger" or "warning")
+            rows[#rows + 1] = row("Mobile destination",
+                MobileModel.TargetText(mobile, group))
+            if mobile.travel then
+                local progress = MobileModel.Progress(
+                    mobile, group, snapshot.generatedAt)
+                rows[#rows + 1] = row("Mobile departure",
+                    "day " .. tostring(mobile.travel.departureDay or 0)
+                        .. " / started "
+                        .. tostring(mobile.travel.startedAt or 0)
+                        .. " h / progress "
+                        .. (progress and string.format("%.0f%%", progress * 100)
+                            or "unknown"))
+            end
+            rows[#rows + 1] = row("Mobile last departure",
+                tostring(mobile.lastDepartureAt or -1) .. " h")
+        end
         rows[#rows + 1] = row("State time", string.format("%.3f -> %.3f",
             group.stateStartedAt or 0, group.stateEndsAt or 0))
         local needs = group.needs or {}

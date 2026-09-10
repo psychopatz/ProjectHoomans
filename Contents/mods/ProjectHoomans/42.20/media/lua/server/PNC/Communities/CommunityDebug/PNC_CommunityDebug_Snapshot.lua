@@ -22,6 +22,12 @@ function Debug.BuildSnapshot(
     local communities = Communities.List()
     local factions = {}
     local mobileGroups = {}
+    local mobileCounts = {
+        road_roaming = 0,
+        street_roaming = 0,
+        en_route = 0,
+        arrival_pending = 0,
+    }
     local roster = {}
     local diagnostics = {}
     local selected
@@ -52,6 +58,8 @@ function Debug.BuildSnapshot(
         factions[#factions + 1] = summary
         if summary.mobile then
             mobileGroups[#mobileGroups + 1] = summary
+            local state = summary.mobile.debugState
+            mobileCounts[state] = (mobileCounts[state] or 0) + 1
         end
         local leader = faction.leaderNPCID
             and PNC.Registry.Get(faction.leaderNPCID) or nil
@@ -126,6 +134,7 @@ function Debug.BuildSnapshot(
         sites = Communities.ListSites(),
         factions = factions,
         mobileGroups = mobileGroups,
+        mobileCounts = mobileCounts,
         roster = roster,
         members = H.SelectedMembers(selected),
         selectedCommunity = H.Copy(selected),

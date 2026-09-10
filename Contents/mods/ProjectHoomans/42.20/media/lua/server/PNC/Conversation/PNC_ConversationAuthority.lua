@@ -15,6 +15,7 @@ require "PNC/Conversation/ConversationAuthority/PNC_ConversationAuthority_BuildC
 require "PNC/Conversation/ConversationAuthority/PNC_ConversationAuthority_Validation"
 require "PNC/Conversation/ConversationAuthority/PNC_ConversationAuthority_Category"
 require "PNC/Conversation/ConversationAuthority/PNC_ConversationAuthority_Recruit"
+require "PNC/Conversation/ConversationAuthority/PNC_ConversationAuthority_Departure"
 require "PNC/Conversation/ConversationAuthority/PNC_ConversationAuthority_Choice"
 
 return PNC.Conversation.Authority

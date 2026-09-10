@@ -404,6 +404,33 @@ local function virtualTarget(resource, bindingData)
     } }
 end
 
+-- A sleep activity is allowed to resolve only to a physical sleep surface or
+-- the explicit floor fallback. This guard is intentionally independent from
+-- detector selection because activities can outlive a scan and rehydrate by
+-- a saved resource key.
+function Resources.IsValidSleepTarget(resource, target)
+    if type(target) ~= "table" then return false end
+    if target.seating == true then return false end
+    local resourceKind = tostring(resource and resource.resourceKind or "")
+    if resourceKind == "seating_surface" then return false end
+    local surface = tostring(target.sleepSurface
+        or resource and resource.sleepSurface or "")
+    if surface == "floor" then
+        return tostring(target.sceneId or "") == "facility.sleep.floor"
+    end
+    if surface ~= "bed" and surface ~= "sofa" then return false end
+    local detectorId = tostring(resource and resource.detectorId or "")
+    if detectorId ~= "" and detectorId ~= surface then return false end
+    local object = target.object or target.furnitureObject
+        or resource and resource.object
+    if object and SquareRules.ClassifySleepSurface then
+        local ok, classified = pcall(SquareRules.ClassifySleepSurface, object)
+        if not ok or classified ~= surface then return false end
+    end
+    return tostring(target.sceneId or "") == "facility.sleep." .. surface
+        and (resourceKind == "" or resourceKind == "sleep_surface")
+end
+
 function Resources.Select(facility, capability, options)
     options = type(options) == "table" and options or {}
     local bindingData = binding(facility, capability)
@@ -434,7 +461,9 @@ function Resources.Select(facility, capability, options)
                     character = options.character,
                 }) or {}
             local target = targets[1]
-            if target then
+            if target and (tostring(capability or "") ~= "sleep"
+                or Resources.IsValidSleepTarget(resource, target))
+            then
                 return { resource = resource, target = target, targets = targets,
                     role = resource.role or bindingData.role,
                     resourceKind = resource.resourceKind or bindingData.resourceKind,
@@ -446,9 +475,14 @@ function Resources.Select(facility, capability, options)
     local virtual = virtualResource(facility, bindingData)
     if virtual and not resourceReserved(virtual) then
         local targets = virtualTarget(virtual, bindingData)
-        return { resource = virtual, target = targets[1], targets = targets,
-            role = virtual.role, resourceKind = virtual.resourceKind,
-            resourceKey = virtual.resourceKey, scanStatus = scanStatus }
+        local target = targets[1]
+        if tostring(capability or "") ~= "sleep"
+            or Resources.IsValidSleepTarget(virtual, target)
+        then
+            return { resource = virtual, target = target, targets = targets,
+                role = virtual.role, resourceKind = virtual.resourceKind,
+                resourceKey = virtual.resourceKey, scanStatus = scanStatus }
+        end
     end
     return nil
 end
@@ -518,7 +552,12 @@ function Resources.ResolveActivityTarget(record)
                     and PNC.FacilityInteractionTargets.ResolveResource(resource, {
                         abstract = live == nil, character = live,
                     }) or {}
-                if targets[1] then return targets[1], resource end
+                if targets[1]
+                    and (tostring(activity.capability or "") ~= "sleep"
+                        or Resources.IsValidSleepTarget(resource, targets[1]))
+                then
+                    return targets[1], resource
+                end
             end
         end
         return nil
@@ -541,7 +580,12 @@ function Resources.ResolveActivityTarget(record)
         then
             local virtual = virtualResource(facility, capabilityBinding)
             if virtual and virtual.resourceKey == resourceKey then
-                return virtualTarget(virtual, capabilityBinding)[1], virtual
+                local target = virtualTarget(virtual, capabilityBinding)[1]
+                if tostring(activity.capability or "") ~= "sleep"
+                    or Resources.IsValidSleepTarget(virtual, target)
+                then
+                    return target, virtual
+                end
             end
         end
     end

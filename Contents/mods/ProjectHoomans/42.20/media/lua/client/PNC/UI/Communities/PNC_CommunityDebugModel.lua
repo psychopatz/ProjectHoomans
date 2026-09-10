@@ -1,9 +1,12 @@
 -- Pure presentation model for the Community Inspector.
 
+require "PNC/UI/Mobile/PNC_MobileGroupDebugModel"
+
 PNC = PNC or {}
 PNC.CommunityDebugModel = PNC.CommunityDebugModel or {}
 
 local Model = PNC.CommunityDebugModel
+local MobileModel = PNC.MobileGroupDebugModel
 
 local function row(label, value, tone)
     return {
@@ -25,18 +28,19 @@ local function mobileDetail(mobile)
     if type(mobile) ~= "table" or mobile.active ~= true then
         return nil
     end
-    local target = mobile.target
+    local target = mobile.destination or mobile.target
+    local state = MobileModel.StateText(mobile)
     if mobile.controlMode == "strategic" then
-        return "mobile/strategic/player-base="
+        return state .. " / strategic/player-base="
             .. tostring(target and target.baseID or "pending")
     end
-    return "mobile/ambient/"
+    return state .. " / ambient/"
         .. tostring(mobile.phase or "pending") .. "/"
         .. tostring(mobile.objective or "pending")
 end
 
 local function mobileTargetText(mobile)
-    local target = mobile and mobile.target or nil
+    local target = mobile and (mobile.destination or mobile.target) or nil
     if not target then return "pending" end
     return tostring(target.kind or "location") .. " / "
         .. tostring(target.siteID or target.baseID or "anonymous")
@@ -136,6 +140,17 @@ function Model.BuildRows(snapshot, authorized, reason)
         #mobileGroups,
         #mobileGroups > 0 and "warning" or "textMuted"
     )
+    local mobileCounts = snapshot.mobileCounts or {}
+    rows[#rows + 1] = row(
+        "Mobile states",
+        string.format(
+            "road=%d street=%d en_route=%d pending=%d",
+            mobileCounts.road_roaming or 0,
+            mobileCounts.street_roaming or 0,
+            mobileCounts.en_route or 0,
+            mobileCounts.arrival_pending or 0
+        )
+    )
     if #mobileGroups > 0 then
         local types = {}
         for _, faction in ipairs(mobileGroups) do
@@ -152,6 +167,17 @@ function Model.BuildRows(snapshot, authorized, reason)
     end
     if selectedFaction and selectedFaction.mobile then
         local mobile = selectedFaction.mobile
+        rows[#rows + 1] = row(
+            "Mobile state",
+            MobileModel.StateText(mobile)
+                .. " / " .. tostring(mobile.presence or "unknown"),
+            MobileModel.State(mobile) == "en_route"
+                and "danger" or "warning"
+        )
+        rows[#rows + 1] = row(
+            "Mobile activity",
+            tostring(mobile.activity or "street_roaming")
+        )
         rows[#rows + 1] = row(
             "Selected faction type",
             tostring(selectedFaction.archetypeID)
@@ -172,6 +198,17 @@ function Model.BuildRows(snapshot, authorized, reason)
             "Mobile target",
             mobileTargetText(mobile)
         )
+        if mobile.travel then
+            rows[#rows + 1] = row(
+                "Settlement travel",
+                tostring(mobile.travel.kind or "settlement")
+                    .. " / day "
+                    .. tostring(mobile.travel.departureDay or 0)
+                    .. " / started "
+                    .. tostring(mobile.travel.startedAt or 0) .. " h",
+                "danger"
+            )
+        end
         rows[#rows + 1] = row(
             "Mobile staging",
             tostring(mobile.siteID or "unknown")

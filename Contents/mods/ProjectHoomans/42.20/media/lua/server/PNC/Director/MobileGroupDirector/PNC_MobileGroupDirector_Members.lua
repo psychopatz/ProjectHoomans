@@ -89,6 +89,10 @@ function H.BuildMobileState(site, mode, at, previous, moved, controlMode)
         strategicTarget = previous and H.Copy(previous.strategicTarget)
             or nil,
         ambient = previous and H.Copy(previous.ambient) or nil,
+        activity = previous and previous.activity
+            or Constants.MOBILE_ACTIVITY_STREET_ROAMING,
+        travel = previous and H.Copy(previous.travel) or nil,
+        lastDepartureAt = previous and previous.lastDepartureAt or -1,
         site = site,
         lastMovedAt = at,
         nextMoveAt = at + interval,

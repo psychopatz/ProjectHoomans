@@ -10,6 +10,7 @@ local jobs = {
 }
 local record = { id = "npc", alive = true, x = 1, y = 1, z = 0 }
 local cancelled
+local camped = false
 
 PNC = {
     Const = { ORDER_FISHING = "fishing" },
@@ -26,6 +27,9 @@ PNC = {
     Registry = {
         Get = function() return record end,
         GetLiveZombie = function() return nil end,
+    },
+    HomeDutyService = {
+        IsCamped = function() return camped end,
     },
     Tasking = {
         Commands = {
@@ -48,6 +52,17 @@ T.equal(PNC.FishingRegisteredDomain, "fishing", "provider registration")
 local candidates = Executor.GetCandidates("npc")
 T.equal(#candidates, 1, "nearby fishing candidate")
 T.truthy(Executor.Validate(candidates[1]), "fishing candidate validates")
+jobs.npc.leaseId = "lease:1"
+camped = true
+T.equal(#Executor.GetCandidates("npc"), 0,
+    "camped NPC has no fishing candidate")
+T.falsy(Executor.Validate(candidates[1]),
+    "camped fishing candidate does not validate")
+local _, campReason = Executor.Assign(candidates[1])
+T.equal(campReason, "NPC_CAMPED", "camped fishing assignment is rejected")
+T.falsy(Executor.CanContinue({ npcId = "npc", sourceRef = jobs.npc.id,
+    leaseId = "lease:1" }), "camped fishing lease cannot continue")
+camped = false
 local assignment = Executor.Assign(candidates[1])
 T.equal(assignment.executionMode, "ABSTRACT", "abstract assignment")
 T.truthy(Executor.Start({ npcId = "npc", leaseId = "lease:1" }),

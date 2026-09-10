@@ -9,7 +9,6 @@ PNC.Conversation.Authority = PNC.Conversation.Authority or {}
 local Authority = PNC.Conversation.Authority
 local Internal = Authority.Internal
 local Registry = PNC.Conversation.Registry
-local Rules = PNC.Conversation.Rules
 local History = PNC.Conversation.History
 local validateLease = Internal.ValidateLease
 local requestIsCurrent = Internal.RequestIsCurrent
@@ -31,15 +30,19 @@ function Authority.HandleRecruit(player, args)
             success = false,
             reason = rejection,
             npcID = tostring(args.npcID or ""),
-            responseKey = recruitReplyKey(
+        }
+        for key, value in pairs(type(details) == "table" and details or {}) do
+            payload[key] = value
+        end
+        -- Only a genuine NPC refusal receives authored dialogue. Transport,
+        -- lease, registry, and service failures must remain system errors.
+        if payload.npcReaction == "declined" then
+            payload.responseKey = recruitReplyKey(
                 args.npcID,
                 rejection,
                 nil,
                 worldAgeHours()
-            ),
-        }
-        for key, value in pairs(type(details) == "table" and details or {}) do
-            payload[key] = value
+            )
         end
         send(player, PNC.Const.CMD_CONVERSATION_RECRUIT_RESULT, payload)
         return false, rejection
@@ -57,12 +60,9 @@ function Authority.HandleRecruit(player, args)
     if not context then return reject(reason) end
     if context.audiences.hostile then return reject("hostile_audience") end
     local attemptID = "recruitment:" .. tostring(record.id)
-    local attemptPolicy = { scope = "pair", cooldownHours = 6 }
-    local attempt = History.Get(attemptID, attemptPolicy, context)
-    local available, availabilityReason = Rules.CheckRepeat(
-        attemptPolicy, attempt, context.worldAgeHours
-    )
-    if not available then return reject(availabilityReason) end
+    -- Recruitment has no time gate. History remains an audit trail, while
+    -- request IDs still protect the authoritative command from replays.
+    local attemptPolicy = { scope = "pair" }
     local service = PNC.Recruitment or PNC.DebugCompanionRecruit
     if not service or not service.TryConversation then
         return reject("recruitment_service_unavailable")
@@ -107,11 +107,16 @@ function Authority.HandleRecruit(player, args)
             end
         end
         History.Commit(attemptID, attemptPolicy, context, "rejected")
+        local npcReaction
+        if type(result) == "table" and result.eligible == false then
+            npcReaction = "declined"
+        end
         return reject(reason or "recruitment_rejected", {
             relationshipBefore = before,
             relationshipAfter = after,
             relationshipDelta = delta,
             recruitment = result,
+            npcReaction = npcReaction,
         })
     end
     History.Commit(attemptID, attemptPolicy, context, result and result.route)

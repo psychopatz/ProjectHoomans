@@ -11,6 +11,7 @@ local Communities = PNC.Communities
 local CommunityMath = PNC.CommunityMath
 local Constants = PNC.CommunityConstants
 local Core = PNC.Core
+local Groups = PNC.AbstractGroups
 
 local function mobileSummary(faction)
     local mobile = faction and faction.mobile or nil
@@ -18,11 +19,41 @@ local function mobileSummary(faction)
     local ambient = mobile.ambient or {}
     local target = mobile.controlMode == "strategic"
         and mobile.strategicTarget or ambient.target
+    local group = Groups and Groups.FindByFactionID
+        and Groups.FindByFactionID(faction.id) or nil
+    local live = group and Groups.HasLiveMembers
+        and Groups.HasLiveMembers(group) == true
+    local activity = mobile.activity or "street_roaming"
+    local destination = mobile.travel
+        and mobile.travel.destination
+        or target
+        or group and group.targetLocation
+    local debugState
+    if activity == "traveling_to_settlement" then
+        debugState = group and group.state == "TRAVELING"
+            and "en_route" or "arrival_pending"
+    elseif ambient.objective == "road" then
+        debugState = "road_roaming"
+    else
+        debugState = "street_roaming"
+    end
     return {
         active = true,
         archetypeID = faction.archetypeID,
         controlMode = mobile.controlMode,
         pathMode = mobile.pathMode,
+        activity = activity,
+        debugState = debugState,
+        presence = live and "live"
+            or group and group.simulation and group.simulation.lod
+            or "abstract",
+        groupID = group and group.id or nil,
+        groupState = group and group.state or nil,
+        groupLocation = H.Copy(group and group.location),
+        groupTargetLocation = H.Copy(group and group.targetLocation),
+        travel = H.Copy(mobile.travel),
+        destination = H.Copy(destination),
+        lastDepartureAt = mobile.lastDepartureAt,
         phase = ambient.phase,
         objective = ambient.objective,
         target = H.Copy(target),

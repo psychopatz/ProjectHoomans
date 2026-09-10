@@ -8,6 +8,9 @@ local providers = {
     "PNC_MobileGroupDirector_Sites",
     "PNC_MobileGroupDirector_Members",
     "PNC_MobileGroupDirector_Ambient",
+    "PNC_MobileGroupDirector_DepartureTargets",
+    "PNC_MobileGroupDirector_Departures",
+    "PNC_MobileGroupDirector_Debug",
     "PNC_MobileGroupDirector_Generation",
     "PNC_MobileGroupDirector_Relocation",
     "PNC_MobileGroupDirector_Pump",
@@ -40,7 +43,7 @@ for name in pairs(publicFunctions) do
     T.equal(type(PNC.MobileGroupDirector[name]), "function",
         "entry point preserves MobileGroupDirector." .. name)
 end
-T.equal(publicCount, 7, "mobile-group-director public function count")
+T.equal(publicCount, 11, "mobile-group-director public function count")
 T.equal(PNC.MobileGroupDirectorInternal.PumpIntervalMs, 5000,
     "pump interval remains initialized before pump provider")
 

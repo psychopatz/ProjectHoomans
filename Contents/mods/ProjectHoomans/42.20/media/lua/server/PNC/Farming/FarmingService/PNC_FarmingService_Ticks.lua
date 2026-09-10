@@ -60,6 +60,12 @@ function Service.TickLive(record, body, runtime, now)
             runtime.nextFarmingOperationAt = now + 1200
             return true
         end
+        if reason == "WORKER_NEEDS_REST" then
+            runtime.phase = "WAITING_FOR_REST"
+            runtime.lastFarmingReason = reason
+            runtime.nextFarmingOperationAt = now + 5000
+            return true
+        end
         runtime.activityItemFullType = nil
         if reason ~= "NO_ACTION" and reason ~= "PLANT_DOES_NOT_NEED_WATER"
             and reason ~= "FURROW_NOT_PLANTABLE"

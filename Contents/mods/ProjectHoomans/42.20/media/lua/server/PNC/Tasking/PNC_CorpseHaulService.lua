@@ -32,6 +32,11 @@ Service.MAX_PENDING_CORPSE_ORDERS_PER_BASE = 1
 -- this presentation layer only follows the worker's position.
 Service.CORPSE_CARRY_ENABLED = Service.CORPSE_CARRY_ENABLED ~= false
 Service.CORPSE_CARRY_OFFSET = tonumber(Service.CORPSE_CARRY_OFFSET) or 0.65
+-- A carried corpse can be committed from the worker's interaction envelope.
+-- Requiring the worker to stand on the exact destination tile makes a fence
+-- or furniture edge turn a valid carry into a permanent CARRYING order.
+Service.CORPSE_CARRY_DROP_DISTANCE = tonumber(
+    Service.CORPSE_CARRY_DROP_DISTANCE) or 1.75
 Service.CORPSE_CARRY_UPDATE_MS = tonumber(Service.CORPSE_CARRY_UPDATE_MS) or 100
 Service.CORPSE_CARRY_PERSIST_MS = tonumber(Service.CORPSE_CARRY_PERSIST_MS) or 500
 Service.CORPSE_CARRY_RECOVERY_TIMEOUT_MS = tonumber(

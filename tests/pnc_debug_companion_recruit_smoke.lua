@@ -5,6 +5,12 @@ local ROOT = T.path("ProjectHoomans", "server", "PNC/")
 local records = {
     hostile = { id = "hostile", tacticalClass = "hostile", alive = true },
     neutral = { id = "neutral", tacticalClass = "neutral", alive = true },
+    audit = {
+        id = "audit",
+        tacticalClass = "neutral",
+        alive = true,
+        social = { personality = { loyalty = 0.5, bravery = 0.4 } },
+    },
     companion = { id = "companion", tacticalClass = "colonist", recruited = true },
     stale = {
         id = "stale",
@@ -116,6 +122,7 @@ PNC = {
     ConversationScene = {
         End = function() endedCalls = endedCalls + 1 end,
     },
+    RelationshipGraph = {},
     CompanionCommands = {
         IsOwnedByPlayer = function(record, owner)
             return record.recruited == true
@@ -124,8 +131,48 @@ PNC = {
     },
 }
 
+T.load("ProjectHoomans", "shared",
+    "PNC/Core/Relationships/PNC_RecruitmentPersonalityPolicy.lua")
+T.load("ProjectHoomans", "shared",
+    "PNC/Core/Relationships/PNC_RelationshipGraph.lua")
 local Recruit = T.load(ROOT .. "Companions/PNC_DebugCompanionRecruit.lua")
 local player = { getUsername = function() return "Tester" end }
+
+local recruitRequirement = PNC.RelationshipGraph.GetRequirement("recruit")
+T.near(recruitRequirement.approvalWeight, 0.45,
+    "recruit approval weight")
+T.near(recruitRequirement.respectWeight, 0.55,
+    "recruit respect weight")
+T.near(recruitRequirement.threshold, 70, "recruit score threshold")
+T.near(recruitRequirement.minimumApproval, 25,
+    "recruit approval minimum")
+T.near(recruitRequirement.minimumRespect, 35,
+    "recruit respect minimum")
+local auditEligible = Recruit.EvaluateConversation(records.audit, {
+    approval = 85,
+    respect = 85,
+})
+T.equal(auditEligible.eligible, true,
+    "nested social personality can qualify recruitment")
+T.equal(auditEligible.route, "admire", "high relationship uses admire route")
+T.near(auditEligible.loyaltyPenalty, 10,
+    "recruitment applies persisted loyalty penalty")
+T.near(auditEligible.braveryPenalty, 10,
+    "recruitment reports fear bravery penalty")
+T.near(auditEligible.personalityBreakdown.admire.scoreModifier, -10,
+    "admire route exposes loyalty modifier")
+T.near(auditEligible.personalityBreakdown.fear.scoreModifier, -20,
+    "fear route exposes personality modifiers")
+T.near(auditEligible.score, 75, "authoritative recruit score")
+local auditRejected = Recruit.EvaluateConversation(records.audit, {
+    approval = 65,
+    respect = 65,
+})
+T.equal(auditRejected.eligible, false,
+    "raised recruit threshold rejects insufficient relationship")
+T.equal(auditRejected.reason, "relationship_threshold",
+    "threshold rejection remains explicit")
+T.near(auditRejected.score, 55, "rejected recruit score")
 
 T.equal(Recruit.IsEligible(records.hostile), true, "hostile eligible")
 T.equal(Recruit.IsEligible(records.neutral), true, "neutral eligible")

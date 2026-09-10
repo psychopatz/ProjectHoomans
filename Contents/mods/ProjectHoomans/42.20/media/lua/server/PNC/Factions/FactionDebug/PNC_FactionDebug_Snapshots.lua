@@ -136,11 +136,53 @@ function Debug.BuildSnapshot(
 )
     local at = worldAgeHours()
     local factions = {}
+    local mobileGroups = {}
+    local mobileCounts = {
+        road_roaming = 0,
+        street_roaming = 0,
+        en_route = 0,
+        arrival_pending = 0,
+    }
+    local directorConfig = PNC.DirectorConfig or {}
+    local mobileDeparture = {
+        intervalHours = directorConfig.MOBILE_DEPARTURE_INTERVAL_HOURS
+            or 24,
+        baseChance = directorConfig.MOBILE_DAILY_DEPARTURE_BASE_CHANCE
+            or 0.10,
+        budget = directorConfig.DIRECTOR_JOB_BUDGET or 12,
+        sandboxMultiplier = 1,
+        playerBaseCount = 0,
+    }
+    local mobileDirector = PNC.MobileGroupDirectorInternal
+    if mobileDirector and mobileDirector.PlayerBaseCount then
+        local ok, count = pcall(mobileDirector.PlayerBaseCount)
+        if ok then
+            mobileDeparture.playerBaseCount = tonumber(count) or 0
+        end
+    end
+    if PNC.PopulationSandbox
+        and PNC.PopulationSandbox.Resolve
+    then
+        local ok, sandbox = pcall(
+            PNC.PopulationSandbox.Resolve
+        )
+        if ok and sandbox then
+            mobileDeparture.sandboxMultiplier = tonumber(
+                sandbox.roamingGroupMultiplier
+            ) or 1
+        end
+    end
     Factions.EnsureLoaded()
     local playerKey, playerFaction, playerDiplomacyFaction =
         resolvePlayerContext(player, at)
     for _, faction in ipairs(Factions.List()) do
-        factions[#factions + 1] = factionSummary(faction)
+        local summary = factionSummary(faction)
+        factions[#factions + 1] = summary
+        if summary.mobile then
+            mobileGroups[#mobileGroups + 1] = summary
+            local state = summary.mobile.debugState
+            mobileCounts[state] = (mobileCounts[state] or 0) + 1
+        end
     end
     local roster, npcDiagnostics = buildRoster(
         player, playerKey, playerDiplomacyFaction, at)
@@ -155,6 +197,9 @@ function Debug.BuildSnapshot(
             PNC.FactionConstants.REGISTRY_SCHEMA_VERSION,
         registryRevision = Factions.Registry.revision,
         factions = factions,
+        mobileGroups = mobileGroups,
+        mobileCounts = mobileCounts,
+        mobileDeparture = mobileDeparture,
         selectedFaction = selection.selected,
         selectedFactionID = selection.selected
             and selection.selected.id or nil,

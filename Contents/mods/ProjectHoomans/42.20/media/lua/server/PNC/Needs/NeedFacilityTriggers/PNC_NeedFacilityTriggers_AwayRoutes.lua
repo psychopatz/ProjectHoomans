@@ -7,14 +7,28 @@ local Routes = PNC.NeedFacilityAwayRoutes
 Routes.BySource = Routes.BySource or {}
 Routes.Ordered = Routes.Ordered or {}
 
+-- Facility activities temporarily own orderSpec, but their previousOrder is
+-- the durable movement context that must remain visible to need routes.
+local function routeOrder(record)
+    local order = record and record.orderSpec or nil
+    local activity = record and record.runtime
+        and record.runtime.facilityActivity or nil
+    if tostring(order and order.kind or "") == "facility_activity"
+        and type(activity and activity.previousOrder) == "table"
+    then
+        return activity.previousOrder
+    end
+    return order or {}
+end
+
 function Routes.IsFollowing(record)
-    local order = record and record.orderSpec or {}
+    local order = routeOrder(record)
     return tostring(order.kind or "") == tostring(
         PNC.Const and PNC.Const.ORDER_FOLLOW or "follow")
 end
 
 function Routes.IsCamped(record)
-    local order = record and record.orderSpec or {}
+    local order = routeOrder(record)
     return tostring(order.kind or "") == tostring(
         PNC.Const and PNC.Const.ORDER_CAMP or "camp")
 end
@@ -243,7 +257,7 @@ Routes.Register({
         local resource = PNC.CampResourceService.FindWater(record, {
             abstract = live == nil,
         })
-        local order = record and record.orderSpec or {}
+        local order = routeOrder(record)
         return tostring(order.campId or "camp") .. ":"
             .. tostring(resource and resource.resourceKey or "unknown")
             .. ":" .. tostring(record.id)
@@ -321,7 +335,7 @@ Routes.Register({
         }
     end,
     Start = function(record, lease, assignment)
-        local order = record and record.orderSpec or {}
+        local order = routeOrder(record)
         local camped = Routes.IsCamped(record)
         return PNC.FacilityJobs.Start(record, {
             id = assignment.facilityId, baseId = "nearby",

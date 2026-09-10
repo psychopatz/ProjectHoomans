@@ -49,6 +49,45 @@ local function wakeRecord(record)
     end
 end
 
+local CAMP_BLOCKED_TASK_DOMAINS = {
+    work = true,
+    farming = true,
+    fishing = true,
+    scavenge = true,
+}
+
+local function releaseCampBlockedTask(record)
+    local runtime = record and record.runtime or nil
+    local lease = PNC.TaskLeaseService
+        and PNC.TaskLeaseService.ForNPC
+        and PNC.TaskLeaseService.ForNPC(record.id) or nil
+
+    -- These tasking domains are colony/remote activities, not camp-local
+    -- needs. Cancel them before installing camp so provider cleanup and
+    -- previous-order restoration cannot overwrite the camp order.
+    if lease and CAMP_BLOCKED_TASK_DOMAINS[tostring(lease.sourceDomain or "")]
+        and PNC.Tasking and PNC.Tasking.Commands
+        and PNC.Tasking.Commands.CancelLease
+    then
+        return PNC.Tasking.Commands.CancelLease(lease.leaseId, "camp_entered")
+    end
+
+    -- Keep a compatibility fallback for work assignments created before the
+    -- Tasking lease exists (or after a partial recovery).
+    if runtime and runtime.workOrderId
+        and PNC.WorkService and PNC.WorkService.Commands
+        and PNC.WorkService.Commands.ReleaseWorker
+    then
+        local released, reason = PNC.WorkService.Commands.ReleaseWorker(
+            record.id, "camp_entered")
+        if released == true or reason == "WORK_ORDER_UNAVAILABLE" then
+            return true
+        end
+        return false, reason or "WORK_ASSIGNMENT_RELEASE_FAILED"
+    end
+    return true
+end
+
 function OrderSystem.RegisterNormalizer(kind, normalizer)
     kind = tostring(kind or "")
     if kind == "" or type(normalizer) ~= "function" then return false end
@@ -127,6 +166,21 @@ function OrderSystem.SetOrder(record, orderSpec)
     local activeFacility = record.runtime
         and record.runtime.facilityActivity or nil
     record.runtime = record.runtime or {}
+
+    if requestedKind == tostring(Const.ORDER_CAMP or "camp") then
+        local released, releaseReason = releaseCampBlockedTask(record)
+        if released == false and Core.LogWarn then
+            Core.LogWarn("camp_task_release_failed npc="
+                .. tostring(record.id or "") .. " reason="
+                .. tostring(releaseReason or "unknown"))
+        end
+        -- Re-read these after lease cleanup. ReleaseWorker restores the
+        -- previous durable order through SetOrder before this camp order is
+        -- installed.
+        previousOrder = record.orderSpec
+        previousKind = tostring(previousOrder and previousOrder.kind or "")
+        activeFacility = record.runtime.facilityActivity
+    end
 
     -- A blocking facility scene owns the behavior tick until it is stopped.
     -- Commands such as follow/home must revoke that lease before the new order

@@ -9,6 +9,7 @@ local providers = {
     "PNC_FactionDebug_NPCDiagnostics",
     "PNC_FactionDebug_Snapshots",
     "PNC_FactionDebug_ActionCreation",
+    "PNC_FactionDebug_ActionMobileGroups",
     "PNC_FactionDebug_ActionMembership",
     "PNC_FactionDebug_ActionDiplomacy",
     "PNC_FactionDebug_ActionDiagnostics",

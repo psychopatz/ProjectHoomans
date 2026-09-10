@@ -13,10 +13,14 @@ local farmingSystem = Internal.FarmingSystem
 local cropState = Internal.CropState
 local nativeBody = Internal.NativeBody
 local farmingSkill = Internal.FarmingSkill
+local FatigueGate = PNC.WorkFatigueGate
+    or require "PNC/Core/Needs/PNC_WorkFatigueGate"
 
 function Adapter.Plant(record, body, component, tile, desiredCrop)
     body = nativeBody(record, body)
     if not body then return false, "WAITING_FOR_WORLD" end
+    local fatigueOK, fatigueReason = FatigueGate.Check(record)
+    if not fatigueOK then return false, fatigueReason end
     local plant = Adapter.GetPlantAt(tile.x, tile.y, tile.z)
     if not plant or cropState(plant) ~= "plow" then return false, "FURROW_NOT_PLANTABLE" end
     local entry, reason = Catalog.Resolve(desiredCrop)

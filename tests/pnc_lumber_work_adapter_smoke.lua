@@ -162,6 +162,18 @@ T.equal(job.workOrderId, order.id, "work order bound to tree job")
 
 job.approach = { x = 11.5, y = 21.5, z = 0 }
 job.phase = "CHOPPING"
+job.targetKey = "tree:1"
+local trackedTree = ledgerOwners[1]
+trackedTree.maxWork, trackedTree.remainingWork = 100, 60
+local activeLedgerEffects = lumberProvider.GetEffects(trackedTree)
+T.equal(#activeLedgerEffects, 3,
+    "lumber provider exposes the active tree ledger alongside effects")
+T.equal(activeLedgerEffects[3].kind, "LUMBER_WORK",
+    "active lumber ledger uses a debug-only work effect")
+T.equal(activeLedgerEffects[3].progress, 40,
+    "active lumber ledger reports tree progress")
+T.falsy(lumberProvider.IsPending(trackedTree, activeLedgerEffects[3]),
+    "active lumber ledger cannot be auto-applied as a world mutation")
 executed = registrations.execution[2](order, {
     npcId = "worker", leaseId = "lease:1", executionMode = "LIVE",
 })
@@ -171,6 +183,7 @@ T.equal(order.status, status.WORKING,
 T.equal(order.phase, "CHOPPING",
     "lumber phase projects the live phase to the order")
 
+job.targetKey = nil
 tickComplete = true
 executed = registrations.execution[2](order, {
     npcId = "worker", leaseId = "lease:1", executionMode = "LIVE",

@@ -13,6 +13,9 @@ function Service.StartJob(lease)
     local record = job and PNC.Registry and PNC.Registry.Get
         and PNC.Registry.Get(job.npcId) or nil
     if not job or not zone or not record then return false, "fishing_npc_not_found" end
+    if PNC.HomeDutyService and PNC.HomeDutyService.IsCamped
+        and PNC.HomeDutyService.IsCamped(record) == true
+    then return false, "NPC_CAMPED" end
     if not Service.ValidateZone(zone) then return false, "fishing_zone_invalid" end
     if not Service.IsNearby(record, zone) then return false, "fishing_npc_not_nearby" end
     local spot, spotReason = H.ReserveFishingSpot(zone, job, record)

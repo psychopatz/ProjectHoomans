@@ -7,6 +7,78 @@ local Service = PNC.LumberService
 local Internal = Service.Internal
 local CoreInventory = Internal.CoreInventory
 
+local function isChoppingFullType(fullType)
+    local lower = string.lower(tostring(fullType or ""))
+    return string.find(lower, "axe", 1, true) ~= nil
+        or string.find(lower, "hatchet", 1, true) ~= nil
+        or string.find(lower, "chopper", 1, true) ~= nil
+end
+
+local function canonicalItemFullType(item)
+    return item and tostring(item.type or item.fullType or "") or ""
+end
+
+local function canonicalItemBroken(item)
+    return item and tonumber(item.cond) ~= nil and tonumber(item.cond) <= 0
+end
+
+local function findCanonicalLumberTool(record)
+    local inventory = record and record.inventory
+    local items = inventory and inventory.items
+    if type(items) ~= "table" then return nil end
+
+    local primaryID = inventory.equipped and inventory.equipped.primary
+    local primary = primaryID and items[primaryID] or nil
+    if primary and isChoppingFullType(canonicalItemFullType(primary))
+        and not canonicalItemBroken(primary)
+    then
+        primary.id = primary.id or primaryID
+        return primary
+    end
+
+    for itemID, item in pairs(items) do
+        if type(item) == "table"
+            and isChoppingFullType(canonicalItemFullType(item))
+            and not canonicalItemBroken(item)
+        then
+            item.id = item.id or itemID
+            return item
+        end
+    end
+    return nil
+end
+
+local function ensureCanonicalLumberTool(record)
+    local item = findCanonicalLumberTool(record)
+    if item then
+        local inventory = record and record.inventory
+        local primaryID = inventory and inventory.equipped
+            and inventory.equipped.primary or nil
+        if tostring(primaryID or "") ~= tostring(item.id or "")
+            and PNC.Inventory
+            and type(PNC.Inventory.EquipPrimary) == "function"
+        then
+            pcall(PNC.Inventory.EquipPrimary, record, item.id,
+                "lumber_tool_select")
+        end
+        return item
+    end
+
+    -- Older records may only have the loadout representation. Promote that
+    -- configured axe into canonical inventory before materializing it.
+    local configured = record and record.equipment
+        and record.equipment.primaryFullType or nil
+    if isChoppingFullType(configured)
+        and PNC.Inventory
+        and type(PNC.Inventory.SyncFromEquipment) == "function"
+    then
+        pcall(PNC.Inventory.SyncFromEquipment, record,
+            "lumber_tool_inventory_sync")
+        return findCanonicalLumberTool(record)
+    end
+    return nil
+end
+
 local function resolveAbstractTool(record)
     local runtime = record and record.runtime or {}
     if type(runtime.lumberTool) == "table" then
@@ -22,12 +94,8 @@ local function resolveAbstractTool(record)
         end
         return nil, "tool_cannot_chop"
     end
-    local inventory = record and record.inventory
-    local item
-    if inventory and inventory.equipped and inventory.items then
-        item = inventory.items[inventory.equipped.primary]
-    end
-    local fullType = item and item.type
+    local item = ensureCanonicalLumberTool(record)
+    local fullType = item and canonicalItemFullType(item)
         or record and record.equipment and record.equipment.primaryFullType
     fullType = tostring(fullType or "")
     local lower = string.lower(fullType)
@@ -110,6 +178,76 @@ local function findLiveInventoryTool(body)
     return nil, "lumber_tool_missing"
 end
 
+local function addLiveItemToInventory(body, item)
+    local container
+    local physical
+    local ok
+    local added
+    if not body or not item or type(body.getInventory) ~= "function"
+        or not CoreInventory
+        or type(CoreInventory.wrapPhysicalInventory) ~= "function"
+    then
+        return nil, "physical_inventory_unavailable"
+    end
+    ok, container = pcall(body.getInventory, body)
+    if not ok or not container then
+        return nil, "physical_inventory_unavailable"
+    end
+    ok, physical = pcall(CoreInventory.wrapPhysicalInventory, container, {
+        recursive = true, syncOnMutation = true,
+    })
+    if not ok or not physical or type(physical.add) ~= "function" then
+        return nil, "physical_inventory_unavailable"
+    end
+    ok, added = pcall(physical.add, physical, item)
+    if ok and added ~= false then
+        return type(added) == "table" and added[1] or item
+    end
+
+    -- Keep a native-engine fallback for older/mock containers whose item
+    -- codec cannot inspect a freshly-created weapon. The live body still
+    -- owns the exact item, and the next physical query verifies it.
+    if type(container.AddItem) == "function" then
+        local nativeOK, nativeAdded = pcall(container.AddItem, container, item)
+        if nativeOK and nativeAdded ~= false then
+            return nativeAdded or item
+        end
+    end
+    return nil, "lumber_tool_inventory_add_failed"
+end
+
+local function equipLiveTool(body, item)
+    if not body or not item or type(body.setPrimaryHandItem) ~= "function" then
+        return nil, "lumber_tool_equip_unavailable"
+    end
+    local ok, result = pcall(body.setPrimaryHandItem, body, item)
+    if not ok or result == false then
+        return nil, "lumber_tool_equip_failed"
+    end
+
+    local bothHands = false
+    if type(item.isRequiresEquippedBothHands) == "function" then
+        local handsOK, requiresBoth = pcall(
+            item.isRequiresEquippedBothHands, item)
+        bothHands = handsOK and requiresBoth == true
+    end
+    if bothHands and type(body.setSecondaryHandItem) ~= "function" then
+        return nil, "lumber_tool_secondary_equip_unavailable"
+    end
+    if bothHands and type(body.setSecondaryHandItem) == "function" then
+        local secondaryOK, secondaryResult = pcall(
+            body.setSecondaryHandItem, body, item)
+        if not secondaryOK or secondaryResult == false then
+            return nil, "lumber_tool_secondary_equip_failed"
+        end
+    end
+
+    local equipped = inspectLiveTool(readLivePrimary(body))
+    if not equipped then return nil, "lumber_tool_equip_not_applied" end
+    equipped.equipped = true
+    return equipped
+end
+
 local function workToolFullType(record)
     local inventory = record and record.inventory
     local item
@@ -121,10 +259,26 @@ local function workToolFullType(record)
         or "")
 end
 
-local function materializeLiveTool(record)
+local function materializeLiveTool(record, body)
     local equipment = PNC.Equipment
-    local fullType = workToolFullType(record)
+    local canonical = ensureCanonicalLumberTool(record)
+    local fullType = canonical and canonicalItemFullType(canonical)
+        or workToolFullType(record)
     if fullType == "" then return nil, "lumber_tool_missing" end
+
+    -- Prefer the canonical item path so condition/visual state and the
+    -- persisted inventory ID stay associated with the physical axe.
+    if canonical and canonical.id and PNC.Inventory
+        and type(PNC.Inventory.MaterializeItem) == "function"
+    then
+        local materializeOK = pcall(
+            PNC.Inventory.MaterializeItem, record, body, canonical.id)
+        if materializeOK then
+            local inventoryTool = findLiveInventoryTool(body)
+            if inventoryTool then return inventoryTool.item end
+        end
+    end
+
     if not equipment or type(equipment.CreateItem) ~= "function" then
         return nil, "lumber_tool_materialization_unavailable"
     end
@@ -136,30 +290,38 @@ local function materializeLiveTool(record)
     if internal and type(internal.applyPrimaryInventoryState) == "function" then
         pcall(internal.applyPrimaryInventoryState, item, record)
     end
-    return item
+    local added, addReason = addLiveItemToInventory(body, item)
+    if not added then return nil, addReason end
+    return added
 end
 
 local function resolveLiveTool(record, body)
     if not body then return nil, "live_body_missing" end
+    ensureCanonicalLumberTool(record)
     local item = readLivePrimary(body)
     local tool, reason = inspectLiveTool(item)
-    if tool then return tool end
+    if tool then
+        -- A presentation-only primary item is not enough for lumber. Make
+        -- sure the same usable axe is owned by the live inventory first.
+        local inventoryTool = findLiveInventoryTool(body)
+        if not inventoryTool then
+            local added, addReason = addLiveItemToInventory(body, item)
+            if not added then return nil, addReason end
+            inventoryTool = findLiveInventoryTool(body)
+        end
+        local equipped, equipReason = equipLiveTool(body,
+            inventoryTool and inventoryTool.item or item)
+        if equipped then return equipped end
+        return nil, equipReason
+    end
 
     -- Prefer a real inventory item over creating a presentation copy from
     -- canonical metadata.
     tool, reason = findLiveInventoryTool(body)
     if tool then
-        local equipment = PNC.Equipment
-        local networked = equipment and equipment.Internal
-            and type(equipment.Internal.isNetworkedGame) == "function"
-            and equipment.Internal.isNetworkedGame() == true
-        if not networked and type(body.setPrimaryHandItem) == "function" then
-            pcall(body.setPrimaryHandItem, body, tool.item)
-            item = readLivePrimary(body)
-            local equippedTool = inspectLiveTool(item)
-            if equippedTool then return equippedTool end
-        end
-        return tool
+        local equipped, equipReason = equipLiveTool(body, tool.item)
+        if equipped then return equipped end
+        return nil, equipReason
     end
 
     local equipment = PNC.Equipment
@@ -171,14 +333,29 @@ local function resolveLiveTool(record, body)
         pcall(ensureHands, body, record)
         item = readLivePrimary(body)
         tool, reason = inspectLiveTool(item)
-        if tool then return tool end
+        if tool then
+            local inventoryTool = findLiveInventoryTool(body)
+            if not inventoryTool then
+                local added, addReason = addLiveItemToInventory(body, item)
+                if not added then return nil, addReason end
+                inventoryTool = findLiveInventoryTool(body)
+            end
+            local equipped, equipReason = equipLiveTool(body,
+                inventoryTool and inventoryTool.item or item)
+            if equipped then return equipped end
+            return nil, equipReason
+        end
     end
 
-    item, reason = materializeLiveTool(record)
+    item, reason = materializeLiveTool(record, body)
     tool, reason = inspectLiveTool(item)
     if tool then
-        tool.materialized = true
-        return tool
+        local equipped, equipReason = equipLiveTool(body, item)
+        if equipped then
+            equipped.materialized = true
+            return equipped
+        end
+        return nil, equipReason
     end
     return nil, reason or "lumber_tool_missing"
 end
@@ -211,7 +388,9 @@ local function toolDiagnostic(record, body)
         usable = false,
         source = "none",
     }
-    local canonicalFullType = workToolFullType(record)
+    local canonical = findCanonicalLumberTool(record)
+    local canonicalFullType = canonical and canonicalItemFullType(canonical)
+        or workToolFullType(record)
     diagnostic.canonicalPrimaryFullType = canonicalFullType ~= ""
         and canonicalFullType or nil
     local liveItem = body and readLivePrimary(body) or nil

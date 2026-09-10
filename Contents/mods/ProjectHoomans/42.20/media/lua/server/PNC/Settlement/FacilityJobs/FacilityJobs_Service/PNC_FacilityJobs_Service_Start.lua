@@ -100,6 +100,19 @@ function Jobs.Start(record, facilityOrId, capability, options)
     end
     local sceneId = tostring(target.sceneId or definition.sceneId or "")
     local facilityDefinition = PNC.FacilityDefinitions.Get(facility.definitionId)
+    if capability == "sleep" and PNC.FacilityResources
+        and PNC.FacilityResources.IsValidSleepTarget
+        and not PNC.FacilityResources.IsValidSleepTarget(
+            resource or { resourceKind = resourceKind }, target)
+    then
+        if acquired.reservationId and PNC.FacilityReservations
+            and PNC.FacilityReservations.Release
+        then
+            PNC.FacilityReservations.Release(
+                acquired.reservationId, "invalid_sleep_target")
+        end
+        return false, "INVALID_SLEEP_TARGET"
+    end
     local previousOrder = PNC.Core.DeepCopy(record.orderSpec)
     local activityStartedAt = PNC.Core.Now()
     record.runtime = record.runtime or {}
@@ -169,6 +182,11 @@ function Jobs.Start(record, facilityOrId, capability, options)
         approachIndex = 1,
         failedApproaches = {},
     }
+    if capability == "sleep" then
+        PNC.SleepRuntime = PNC.SleepRuntime or {}
+        PNC.SleepRuntime.LiveObjects = PNC.SleepRuntime.LiveObjects or {}
+        PNC.SleepRuntime.LiveObjects[tostring(record.id)] = liveObject
+    end
     if seating and live and liveObject and PNC.SeatingRuntime
         and PNC.SeatingRuntime.LiveObjects
     then
@@ -195,6 +213,16 @@ function Jobs.Start(record, facilityOrId, capability, options)
         interactionSurfaceOffset = target.interactionSurfaceOffset,
         interactionAxis = target.interactionAxis,
         interactionFacing = target.interactionFacing,
+        sleepAnchorX = target.sleepAnchorX,
+        sleepAnchorY = target.sleepAnchorY,
+        sleepAnchorZ = target.sleepAnchorZ,
+        sleepAxis = target.sleepAxis,
+        sleepFacing = target.sleepFacing,
+        sleepSprite = target.sleepSprite,
+        sleepGridX = target.sleepGridX,
+        sleepGridY = target.sleepGridY,
+        sleepGridWidth = target.sleepGridWidth,
+        sleepGridHeight = target.sleepGridHeight,
         approachKey = target.approachKey,
         seatDirection = target.seatDirection,
         seatSide = target.seatSide,

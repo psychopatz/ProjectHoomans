@@ -7,6 +7,21 @@ local H = Service.Internal
 local Zones = require "PsychopatzCore/World/PC_ZoneRegistry"
 local GridRegion = require "PsychopatzCore/World/PC_GridRegion"
 
+-- A facility activity temporarily replaces orderSpec. Keep the durable
+-- movement context visible to systems that decide whether home-only work or
+-- follower behavior is appropriate.
+local function dutyOrder(record)
+    local order = record and record.orderSpec or nil
+    local activity = record and record.runtime
+        and record.runtime.facilityActivity or nil
+    if tostring(order and order.kind or "") == "facility_activity"
+        and type(activity and activity.previousOrder) == "table"
+    then
+        return activity.previousOrder
+    end
+    return order or {}
+end
+
 function Service.IsAtHome(record, baseId)
     local base = H.BaseFor(record, baseId)
     local zone = base and Zones.get(base.baseZoneId) or nil
@@ -19,13 +34,13 @@ function Service.IsAtHome(record, baseId)
 end
 
 function Service.IsFollowing(record)
-    local order = record and record.orderSpec or nil
+    local order = dutyOrder(record)
     return tostring(order and order.kind or "") == tostring(
         PNC.Const and PNC.Const.ORDER_FOLLOW or "follow")
 end
 
 function Service.IsCamped(record)
-    local order = record and record.orderSpec or nil
+    local order = dutyOrder(record)
     return tostring(order and order.kind or "") == tostring(
         PNC.Const and PNC.Const.ORDER_CAMP or "camp")
 end

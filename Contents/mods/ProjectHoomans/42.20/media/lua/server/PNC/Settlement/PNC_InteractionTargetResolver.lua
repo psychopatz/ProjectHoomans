@@ -229,6 +229,11 @@ local function sleepSpotTargets(component)
         } }
     end
     local sleepSurface = SquareRules.ClassifySleepSurface(surface.object)
+    local surfaceZ = tonumber(surface.z) or tonumber(component.z) or 0
+    local surfaceOffset = tonumber(surface.surfaceOffset)
+    if surfaceOffset and surfaceOffset > 0 then
+        surfaceZ = surfaceZ + (surfaceOffset + 1) / 96
+    end
     local offsets = {
         { 0, 1 }, { 1, 0 }, { 0, -1 }, { -1, 0 },
     }
@@ -242,9 +247,15 @@ local function sleepSpotTargets(component)
                 x = x + 0.5, y = y + 0.5, z = component.z,
                 interactionX = surface.x,
                 interactionY = surface.y,
-                interactionZ = surface.z,
+                interactionZ = surfaceZ,
                 interactionAxis = surface.axis,
                 interactionFacing = surface.facing,
+                sleepAnchorX = surface.x, sleepAnchorY = surface.y,
+                sleepAnchorZ = surfaceZ, sleepAxis = surface.axis,
+                sleepFacing = surface.facing, sleepSprite = surface.spriteName,
+                sleepGridX = surface.gridX, sleepGridY = surface.gridY,
+                sleepGridWidth = surface.gridWidth,
+                sleepGridHeight = surface.gridHeight,
                 sceneId = "facility.sleep." .. sleepSurface,
                 sleepSurface = sleepSurface,
                 object = surface.object,
@@ -255,9 +266,15 @@ local function sleepSpotTargets(component)
         x = component.x + 0.5, y = component.y + 0.5, z = component.z,
         interactionX = surface.x,
         interactionY = surface.y,
-        interactionZ = surface.z,
+        interactionZ = surfaceZ,
         interactionAxis = surface.axis,
         interactionFacing = surface.facing,
+        sleepAnchorX = surface.x, sleepAnchorY = surface.y,
+        sleepAnchorZ = surfaceZ, sleepAxis = surface.axis,
+        sleepFacing = surface.facing, sleepSprite = surface.spriteName,
+        sleepGridX = surface.gridX, sleepGridY = surface.gridY,
+        sleepGridWidth = surface.gridWidth,
+        sleepGridHeight = surface.gridHeight,
         sceneId = "facility.sleep." .. sleepSurface,
         sleepSurface = sleepSurface,
         object = surface.object,
@@ -293,6 +310,10 @@ local function resourceSleepTargets(resource, context)
         axis = resource.axis,
         facing = resource.facing,
         surfaceOffset = resource.surfaceOffset,
+        spriteName = resource.spriteName or resource.sprite,
+        gridX = resource.gridX, gridY = resource.gridY,
+        gridWidth = resource.gridWidth,
+        gridHeight = resource.gridHeight,
     }
     local interactionZ = tonumber(surface.z) or originZ
     local surfaceOffset = tonumber(surface.surfaceOffset)
@@ -314,6 +335,12 @@ local function resourceSleepTargets(resource, context)
                 interactionZ = interactionZ, interactionAxis = surface.axis,
                 interactionFacing = surface.facing,
                 interactionSurfaceOffset = surface.surfaceOffset,
+                sleepAnchorX = surface.x, sleepAnchorY = surface.y,
+                sleepAnchorZ = interactionZ, sleepAxis = surface.axis,
+                sleepFacing = surface.facing, sleepSprite = surface.spriteName,
+                sleepGridX = surface.gridX, sleepGridY = surface.gridY,
+                sleepGridWidth = surface.gridWidth,
+                sleepGridHeight = surface.gridHeight,
                 sceneId = "facility.sleep." .. sleepSurface,
                 sleepSurface = sleepSurface,
                 object = surface.object, resourceKey = resource.resourceKey,
@@ -327,6 +354,12 @@ local function resourceSleepTargets(resource, context)
         interactionZ = interactionZ, interactionAxis = surface.axis,
         interactionFacing = surface.facing,
         interactionSurfaceOffset = surface.surfaceOffset,
+        sleepAnchorX = surface.x, sleepAnchorY = surface.y,
+        sleepAnchorZ = interactionZ, sleepAxis = surface.axis,
+        sleepFacing = surface.facing, sleepSprite = surface.spriteName,
+        sleepGridX = surface.gridX, sleepGridY = surface.gridY,
+        sleepGridWidth = surface.gridWidth,
+        sleepGridHeight = surface.gridHeight,
         sceneId = "facility.sleep." .. sleepSurface,
         sleepSurface = sleepSurface,
         object = surface.object, resourceKey = resource.resourceKey,

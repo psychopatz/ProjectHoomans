@@ -126,6 +126,12 @@ function Service.AssignWorker(zoneId, npcId)
     npcId = tostring(npcId or "")
     if not zone then return false, "fishing_zone_not_found" end
     if npcId == "" then return false, "fishing_npc_required" end
+    local record = PNC.Registry and PNC.Registry.Get
+        and PNC.Registry.Get(npcId) or nil
+    if record and PNC.HomeDutyService
+        and PNC.HomeDutyService.IsCamped
+        and PNC.HomeDutyService.IsCamped(record) == true
+    then return false, "NPC_CAMPED" end
     local current = Service.GetJob(npcId)
     if current and current.zoneId ~= zone.id then
         Service.CancelJob(npcId, "fishing_worker_reassigned")

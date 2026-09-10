@@ -234,6 +234,15 @@ function Service.EnsureHomeAnchor(record, baseId, reason)
     end
     local base = H.BaseFor(record, baseId)
     if not base then return false, "BASE_NOT_FOUND" end
+    -- The durable return journey remains authoritative until its arrival
+    -- action runs, even if the live body has already crossed into the base
+    -- zone. This also repairs a stale colony_home order before AtHome freezes
+    -- the movement lane.
+    if Service.IsReturningHome(record, base.id) and Service.SendHome then
+        return Service.SendHome(record, base.id, reason, {
+            forceDestination = true,
+        })
+    end
     local atHome = Service.IsAtHome(record, base.id)
     if atHome and H.HomeAnchorInZone(record, base) then
         -- The current position and the durable anchor are already valid. Do

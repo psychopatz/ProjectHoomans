@@ -12,6 +12,7 @@ local reservations = {}
 local releases = {}
 local identityRequests = {}
 local companionOrders = {}
+local socialReactionAccepted = true
 PsychopatzCore = {
     DebugTrace = {
         IsEnabled = function() return true end,
@@ -53,6 +54,15 @@ PNC = {
             return true, "released"
         end,
         ExecuteLLMSocialReaction = function()
+            if not socialReactionAccepted then
+                return false, "relationship_gate", {
+                    replyContext = {
+                        outcome = "rejected",
+                        authoritative = true,
+                        reason = "relationship_gate",
+                    },
+                }
+            end
             return true, "accepted"
         end,
         ExecuteCompanionCommand = function(commandID, npcID, scope)
@@ -327,5 +337,56 @@ T.equal(releases[4].requestID, secondBatchPacket.request_id,
     "second nearby request releases its lease")
 T.truthy(Speech.Get("npc-three"),
     "nearby mode did not expose the second NPC response")
+
+-- An authoritative social refusal animates the active close-up portrait, while
+-- the detached/nameplate paths above intentionally do not.
+socialReactionAccepted = false
+local activeMessages = {}
+local activeView = {
+    spec = {
+        npcID = "npc-four",
+        characterUUID = "player-one",
+        context = {
+            npcName = "Harley",
+            playerName = "Alex",
+            conversationLifecycleState = { token = "token-four" },
+        },
+    },
+    session = {
+        namespace = "Test",
+        characterUUID = "player-one",
+        currentNode = { choices = {} },
+        append = function() return nil end,
+        queueMessage = function(_, speaker, payload, metadata)
+            activeMessages[#activeMessages + 1] = {
+                speaker = speaker,
+                payload = payload,
+                metadata = metadata,
+            }
+        end,
+    },
+    historyPart = { setTyping = function() end },
+}
+function activeView:isConversationInteractive()
+    return self.session.busy ~= true
+end
+PsychopatzCore.Conversation.instance = activeView
+local activeSubmitted = Integration.Submit(activeView, "Please greet me.")
+T.truthy(activeSubmitted, "active refusal request was not submitted")
+local activePacket = Integration.Poll()
+local activeDelivered = Integration.Deliver({
+    request_id = activePacket.request_id,
+    semantic_tool_calls = {
+        {
+            id = "reaction-rejected",
+            name = "social_react",
+            arguments = { kind = "praise", intensity = "normal" },
+        },
+    },
+})
+T.truthy(activeDelivered.accepted, "active refusal response was not delivered")
+T.equal(activeMessages[1].metadata.portraitAnimation,
+    "reaction.thumbsdown",
+    "authoritative LLM refusal reaches the close-up portrait")
 
 T.finish("pnc_llm_closed_ui_delivery_smoke")

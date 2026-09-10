@@ -237,4 +237,58 @@ T.equal(PNC.Registry.Data.npc_ambient.orderSpec.roamMode,
     PNC.Const.ROAM_MODE_ROAD,
     "repaired ambient order returns to Nav roaming")
 
+local objectiveGroup = {
+    id = "agroup_mobile_live",
+    location = { id = "origin" },
+    state = "ACTIVE",
+    simulation = { lod = "ACTIVE" },
+}
+local abstractBeginCalls = 0
+PNC.AbstractGroups = {
+    FindByFactionID = function() return objectiveGroup end,
+    HasLiveMembers = function() return true end,
+    RefreshLOD = function() return "ACTIVE" end,
+}
+PNC.AbstractLocations = {
+    Register = function(location) return location end,
+}
+PNC.AbstractTraversal = {
+    Begin = function()
+        abstractBeginCalls = abstractBeginCalls + 1
+        return true
+    end,
+}
+PNC.AbstractGroupManagerInternal = { Touch = function() end }
+local synced = H.SyncAbstractObjective(
+    ambientFaction,
+    PNC.FactionConstants.MOBILE_AMBIENT_ROAD,
+    {
+        kind = "nav",
+        x = 450, y = 450, z = 0,
+        radius = 20,
+        bounds = { minX = 440, minY = 440, maxX = 460, maxY = 460 },
+    },
+    8
+)
+T.truthy(synced, "live ambient objective synchronizes")
+T.equal(abstractBeginCalls, 0,
+    "live ambient objective does not start abstract traversal")
+
+PNC.AbstractGroups.HasLiveMembers = function() return false end
+objectiveGroup.state = "ACTIVE"
+local abstractSynced = H.SyncAbstractObjective(
+    ambientFaction,
+    PNC.FactionConstants.MOBILE_AMBIENT_ROAD,
+    {
+        kind = "nav",
+        x = 500, y = 500, z = 0,
+        radius = 20,
+        bounds = { minX = 490, minY = 490, maxX = 510, maxY = 510 },
+    },
+    8
+)
+T.truthy(abstractSynced, "abstract ambient objective synchronizes")
+T.equal(abstractBeginCalls, 1,
+    "abstract ambient objective still starts traversal")
+
 T.finish("pnc_mobile_ambient_smoke")

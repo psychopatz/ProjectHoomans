@@ -22,6 +22,7 @@ local function setLiveOrder(worker, order, target, phase)
         kind = "production_work", workOrderId = order.id,
         operation = order.operation, phase = phase or order.livePhase,
         x = target.x, y = target.y, z = target.z,
+        stopDistance = target.stopDistance or payload.stopDistance,
         facilityId = order.facilityId, stationId = order.stationId,
         stockpileNodeId = target.nodeId,
         haulToken = payload.haulToken,

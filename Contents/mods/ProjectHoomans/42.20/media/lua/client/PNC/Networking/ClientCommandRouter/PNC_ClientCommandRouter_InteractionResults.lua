@@ -331,4 +331,15 @@ Internal.RegisterServerCommand(Const.CMD_CONVERSATION_RECRUIT_RESULT,
         end
     end)
 
+if Const.CMD_CONVERSATION_DEPARTURE_RESULT then
+    Internal.RegisterServerCommand(Const.CMD_CONVERSATION_DEPARTURE_RESULT,
+        function(args)
+            if PNC.Conversation and PNC.Conversation.Composer
+                and PNC.Conversation.Composer.ReceiveDepartureOutcome
+            then
+                PNC.Conversation.Composer.ReceiveDepartureOutcome(args or {})
+            end
+        end)
+end
+
 return PNC.Client

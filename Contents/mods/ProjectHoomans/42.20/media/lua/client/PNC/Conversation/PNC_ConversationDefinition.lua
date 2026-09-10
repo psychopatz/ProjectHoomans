@@ -191,25 +191,57 @@ local function factionPresentation(entry)
     }
 end
 
+local function stablePortraitSignature(value, depth)
+    local keys = {}
+    local parts = {}
+    local index
+    local key
+    depth = tonumber(depth) or 0
+    if type(value) ~= "table" then return tostring(value or "") end
+    if depth > 4 then return "[depth]" end
+    for key, _ in pairs(value) do keys[#keys + 1] = key end
+    table.sort(keys, function(left, right)
+        return tostring(left) < tostring(right)
+    end)
+    for index = 1, #keys do
+        key = keys[index]
+        parts[#parts + 1] = tostring(key) .. "="
+            .. stablePortraitSignature(value[key], depth + 1)
+    end
+    return "{" .. table.concat(parts, ";") .. "}"
+end
+
 local function portraitSpec(entry)
     local snapshot = entry and entry.snapshot or {}
     local record = entry and entry.record or {}
+    local summary = snapshot.portrait or {}
+    local equipment = snapshot.equipmentSummary
+        or summary.equipment
+        or record.equipment
+        or { worn = {} }
     return {
         id = entry and entry.id,
         key = table.concat({
             tostring(entry and entry.id or ""),
-            tostring(snapshot.identitySeed or record.identitySeed or 1),
+            tostring(snapshot.identitySeed or summary.identitySeed
+                or record.identitySeed or 1),
             tostring(snapshot.presenceRevision or 0),
+            stablePortraitSignature(equipment),
         }, "|"),
-        identitySeed = snapshot.identitySeed or record.identitySeed or 1,
-        isFemale = snapshot.isFemale == true or record.isFemale == true,
+        identitySeed = snapshot.identitySeed or summary.identitySeed
+            or record.identitySeed or 1,
+        isFemale = snapshot.isFemale == true
+            or summary.isFemale == true or record.isFemale == true,
         -- Live NPCs use IsoZombie carriers for engine animation/replication.
         -- Conversation portraits must render the descriptor-backed human
         -- preview instead of exposing that carrier's zombie appearance.
         preferDescriptor = true,
         faceOnly = true,
-        appearance = snapshot.appearance or record.appearance or {},
-        equipment = snapshot.equipmentSummary or record.equipment or { worn = {} },
+        includeCurrentClothing = true,
+        clothingMode = "current",
+        appearance = snapshot.appearance or summary.appearance
+            or record.appearance or {},
+        equipment = equipment,
     }
 end
 

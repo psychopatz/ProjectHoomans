@@ -19,10 +19,23 @@ local Core = PNC.Core
 function Debug.BuildSnapshot(selectedGroupID, selectedLocationID, action,
     requestedSectorID)
     Director.Initialize()
-    local groups, locations = {}, {}
+    local groups, mobileGroups, locations = {}, {}, {}
+    local mobileCounts = {
+        road_roaming = 0,
+        street_roaming = 0,
+        en_route = 0,
+        arrival_pending = 0,
+    }
     local selected = Groups.Get(selectedGroupID) or Groups.List()[1]
     for _, group in ipairs(Groups.List()) do
-        groups[#groups + 1] = H.GroupSummary(group, selected and group.id == selected.id)
+        local summary = H.GroupSummary(
+            group, selected and group.id == selected.id)
+        groups[#groups + 1] = summary
+        if summary.mobile then
+            mobileGroups[#mobileGroups + 1] = summary
+            local state = summary.mobile.debugState
+            mobileCounts[state] = (mobileCounts[state] or 0) + 1
+        end
     end
     local selectedLocation = Locations.Get(selectedLocationID)
         or selected and Locations.Get(selected.location.id) or Locations.List()[1]
@@ -52,7 +65,9 @@ function Debug.BuildSnapshot(selectedGroupID, selectedLocationID, action,
                 - Store.WorldAgeHours())
     end
     return {
-        metrics = Director.GetMetrics(), groups = groups, locations = locations,
+        metrics = Director.GetMetrics(), groups = groups,
+        mobileGroups = mobileGroups, mobileCounts = mobileCounts,
+        locations = locations,
         selectedGroupId = selected and selected.id,
         selectedLocationId = selectedLocation and selectedLocation.id,
         jobs = H.Copy(PNC.Scheduler.GetJobs()),

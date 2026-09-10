@@ -54,6 +54,47 @@ function Internal.sanitizeFollowerAbandonment(raw)
     }
 end
 
+-- Relationship-triggered colonist departure is a separate persisted marker
+-- from follow-phase combat abandonment. It is intentionally compact: a save
+-- only needs the debounce/audit edge, never a copied relationship payload.
+function Internal.sanitizeColonistDeparture(raw)
+    local source = type(raw) == "table" and raw or nil
+    local state
+    local eventID
+    if not source then return nil end
+    state = source.state == "completed" and "completed" or "pending"
+    eventID = Internal.normalizeString(source.eventID)
+    if not eventID then return nil end
+    return {
+        state = state,
+        eventID = string.sub(eventID, 1, 256),
+        ownerKey = Internal.normalizeString(source.ownerKey),
+        sourceFactionID = Internal.normalizeString(source.sourceFactionID),
+        destinationFactionID = Internal.normalizeString(
+            source.destinationFactionID
+        ),
+        cause = Internal.normalizeString(source.cause),
+        belowThresholdChecks = math.max(0, math.min(8, math.floor(
+            Internal.normalizeNumber(source.belowThresholdChecks, 0)
+        ))),
+        firstDetectedAt = math.max(
+            0, Internal.normalizeNumber(source.firstDetectedAt, 0)
+        ),
+        lastEvaluatedAt = math.max(
+            0, Internal.normalizeNumber(source.lastEvaluatedAt, 0)
+        ),
+        completedAt = source.completedAt ~= nil and math.max(
+            0, Internal.normalizeNumber(source.completedAt, 0)
+        ) or nil,
+        approvalThreshold = source.approvalThreshold ~= nil
+            and Internal.normalizeNumber(source.approvalThreshold, -60)
+            or nil,
+        respectThreshold = source.respectThreshold ~= nil
+            and Internal.normalizeNumber(source.respectThreshold, -60)
+            or nil,
+    }
+end
+
 function Internal.sanitizeStamina(rawStamina, record)
     local output
     if type(rawStamina) ~= "table" then

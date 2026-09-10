@@ -1,0 +1,55 @@
+INFO:  Loaded 4 plugins
+INFO:  JVM info: Ubuntu - 17.0.20 - 17.0.20+8-1-24.04-Ubuntu
+INFO:  Scanning classes from Java runtime /home/psychopatz/.steam/debian-installation/steamapps/common/ProjectZomboid/projectzomboid/jre64
+INFO:  Scanning classes from module com.azul.crs.client@25.0.1
+INFO:  Scanning classes from module com.azul.tooling@25.0.1
+INFO:  Scanning classes from module java.base@25.0.1
+INFO:  Scanning classes from module java.compiler@25.0.1
+INFO:  Scanning classes from module java.datatransfer@25.0.1
+INFO:  Scanning classes from module java.desktop@25.0.1
+INFO:  Scanning classes from module java.instrument@25.0.1
+INFO:  Scanning classes from module java.logging@25.0.1
+INFO:  Scanning classes from module java.management@25.0.1
+INFO:  Scanning classes from module java.management.rmi@25.0.1
+INFO:  Scanning classes from module java.naming@25.0.1
+INFO:  Scanning classes from module java.net.http@25.0.1
+INFO:  Scanning classes from module java.prefs@25.0.1
+INFO:  Scanning classes from module java.rmi@25.0.1
+INFO:  Scanning classes from module java.scripting@25.0.1
+INFO:  Scanning classes from module java.se@25.0.1
+INFO:  Scanning classes from module java.security.jgss@25.0.1
+INFO:  Scanning classes from module java.security.sasl@25.0.1
+INFO:  Scanning classes from module java.smartcardio@25.0.1
+INFO:  Scanning classes from module java.sql@25.0.1
+INFO:  Scanning classes from module java.sql.rowset@25.0.1
+INFO:  Scanning classes from module java.transaction.xa@25.0.1
+INFO:  Scanning classes from module java.xml@25.0.1
+INFO:  Scanning classes from module java.xml.crypto@25.0.1
+INFO:  Scanning classes from module jdk.accessibility@25.0.1
+INFO:  Scanning classes from module jdk.charsets@25.0.1
+INFO:  Scanning classes from module jdk.crypto.cryptoki@25.0.1
+INFO:  Scanning classes from module jdk.dynalink@25.0.1
+INFO:  Scanning classes from module jdk.graal.compiler@25.0.1
+INFO:  Scanning classes from module jdk.graal.compiler.management@25.0.1
+INFO:  Scanning classes from module jdk.httpserver@25.0.1
+INFO:  Scanning classes from module jdk.incubator.vector@25.0.1
+INFO:  Scanning classes from module jdk.internal.vm.ci@25.0.1
+INFO:  Scanning classes from module jdk.jdwp.agent@25.0.1
+INFO:  Scanning classes from module jdk.jfr@25.0.1
+INFO:  Scanning classes from module jdk.jsobject@25.0.1
+INFO:  Scanning classes from module jdk.localedata@25.0.1
+INFO:  Scanning classes from module jdk.management@25.0.1
+INFO:  Scanning classes from module jdk.management.agent@25.0.1
+INFO:  Scanning classes from module jdk.management.jfr@25.0.1
+INFO:  Scanning classes from module jdk.naming.dns@25.0.1
+INFO:  Scanning classes from module jdk.naming.rmi@25.0.1
+INFO:  Scanning classes from module jdk.net@25.0.1
+INFO:  Scanning classes from module jdk.nio.mapmode@25.0.1
+INFO:  Scanning classes from module jdk.sctp@25.0.1
+INFO:  Scanning classes from module jdk.security.auth@25.0.1
+INFO:  Scanning classes from module jdk.security.jgss@25.0.1
+INFO:  Scanning classes from module jdk.unsupported@25.0.1
+INFO:  Scanning classes from module jdk.xml.dom@25.0.1
+INFO:  Scanning classes from module jdk.zipfs@25.0.1
+INFO:  Scanning classes from Project Zomboid (inverted: false): /home/psychopatz/.steam/debian-installation/steamapps/common/ProjectZomboid/projectzomboid/projectzomboid.jar
+INFO:  Scanning classes from Project Zomboid (inverted: true): /home/psychopatz/.steam/debian-installation/steamapps/common/ProjectZomboid/projectzomboid/projectzomboid.jar

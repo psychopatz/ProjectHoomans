@@ -103,6 +103,14 @@ end
 
 function H.MobileOrder(faction, mobile, site)
     local home = site and site.home or {}
+    if mobile
+        and mobile.activity
+            == Constants.MOBILE_ACTIVITY_TRAVELING_TO_SETTLEMENT
+    then
+        return {
+            kind = Const.ORDER_GUARD,
+        }
+    end
     local mode = H.PathMode(mobile and mobile.pathMode)
     if H.AmbientOrder then
         local ambient = H.AmbientOrder(faction, mobile, site)

@@ -11,16 +11,19 @@ function H.ReconcileCurrentLease(npcId)
     if not current then return nil, true end
     local provider = Tasking.Providers[current.sourceDomain]
     local canContinue = false
+    local continuationReason
     if provider and provider.CanContinue then
-        local callbackOK, callbackResult = H.SafeCall(
+        local callbackOK, callbackResult, callbackReason = H.SafeCall(
             "provider_can_continue", provider.CanContinue, {
                 npcId = current.npcId, leaseId = current.leaseId,
                 domain = current.sourceDomain,
             }, current)
         canContinue = callbackOK and callbackResult == true
+        continuationReason = callbackReason
     end
     if canContinue then return current, true end
-    local stopped, stopReason = H.StopLease(current, "task_invalidated")
+    local stopped, stopReason = H.StopLease(current,
+        continuationReason or "task_invalidated")
     if not stopped then return current, false, stopReason end
     return nil, true
 end

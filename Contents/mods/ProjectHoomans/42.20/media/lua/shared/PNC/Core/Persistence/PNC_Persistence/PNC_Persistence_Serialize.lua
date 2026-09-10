@@ -163,6 +163,9 @@ function Persistence.SerializeRecord(record)
         followerAbandonment = Internal.sanitizeFollowerAbandonment(
             record.followerAbandonment
         ),
+        colonistDeparture = Internal.sanitizeColonistDeparture(
+            record.colonistDeparture
+        ),
         affiliation = FactionTypes
             and FactionTypes.NormalizeAffiliation(
                 record.affiliation

@@ -236,6 +236,13 @@ T.truthy(ambientStartOptions and ambientStartOptions.campActivity,
 T.truthy(ambientStartOptions and ambientStartOptions.seating,
     "ambient seating marks the activity as furniture seating")
 
+PNC.IndividualNeeds = {
+    Queries = { GetSleepIntent = function() return { urgency = 1 } end },
+}
+T.equal(Ambient.Pump(12000), 0,
+    "actionable sleep prevents ambient dining-chair selection")
+PNC.IndividualNeeds = nil
+
 T.load("ProjectHoomans", "client", "PNC/UI/Nameplates/PNC_NameplateDebug.lua")
 local seatingText = PNC.NameplateDebug.SeatingText({
     seatingDebug = {

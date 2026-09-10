@@ -25,6 +25,12 @@ function Composer.PumpLocalRequests()
             and Conversation.Authority.HandleRecruit
         then
             Conversation.Authority.HandleRecruit(request.player, request.payload)
+        elseif request.command == PNC.Const.CMD_CONVERSATION_DEPARTURE_REQUEST
+            and Conversation.Authority.HandleDeparture
+        then
+            Conversation.Authority.HandleDeparture(
+                request.player, request.payload
+            )
         end
     end
 end
@@ -110,5 +116,31 @@ function Composer.RequestRecruit(npcID)
     return sent, reason
 end
 
-return Composer
+function Composer.RequestDeparture(npcID, confirm)
+    local view = activeView(npcID)
+    local lifecycle = lifecycleState(view)
+    if not view then return false, "conversation_not_ready" end
+    if not lifecycle then
+        notifyFailure(view, "status.choice_rejected", "conversation_not_ready")
+        return false, "conversation_not_ready"
+    end
+    local id = requestID("departure")
+    view.spec.context.pendingConversationRequest = id
+    local sent, reason = sendRequest(
+        PNC.Const.CMD_CONVERSATION_DEPARTURE_REQUEST,
+        {
+            requestID = id,
+            npcID = tostring(npcID),
+            token = lifecycle.token,
+            confirm = confirm == true,
+            registryFingerprint = Registry.GetFingerprint(),
+        }
+    )
+    if not sent then
+        view.spec.context.pendingConversationRequest = nil
+        notifyFailure(view, "status.choice_rejected", reason)
+    end
+    return sent, reason
+end
 
+return Composer

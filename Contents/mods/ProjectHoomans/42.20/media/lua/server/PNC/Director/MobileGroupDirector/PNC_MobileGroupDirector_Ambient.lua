@@ -550,6 +550,12 @@ end
 function H.SyncAbstractObjective(faction, objective, target, at)
     local Groups = PNC.AbstractGroups
     local Traversal = PNC.AbstractTraversal
+    if faction and faction.mobile
+        and faction.mobile.activity
+            == Constants.MOBILE_ACTIVITY_TRAVELING_TO_SETTLEMENT
+    then
+        return false
+    end
     if not Groups or not Groups.FindByFactionID or not Traversal
         or not target
     then
@@ -557,11 +563,21 @@ function H.SyncAbstractObjective(faction, objective, target, at)
     end
     local group = Groups.FindByFactionID(faction.id)
     if not group then return false end
+    local live = Groups.HasLiveMembers
+        and Groups.HasLiveMembers(group) == true
+    if live then
+        group.mobileAmbient = true
+        group.ambientObjective = objective
+    end
+    if live and Groups.RefreshLOD then
+        Groups.RefreshLOD(group, at)
+    end
     local location = abstractTargetLocation(faction, target, objective)
     if type(location) == "table" and location.id then
         group.mobileAmbient = true
         group.ambientObjective = objective
-        if group.location and group.location.id ~= location.id
+        if not live
+            and group.location and group.location.id ~= location.id
             and group.state ~= "TRAVELING"
         then
             Traversal.Begin(group, location, at)
@@ -594,6 +610,11 @@ function H.RefreshStrategic(faction, at)
     then
         return faction, false
     end
+    if mobile.activity
+        == Constants.MOBILE_ACTIVITY_TRAVELING_TO_SETTLEMENT
+    then
+        return faction, false
+    end
     local target = H.FindPlayerBaseTarget(faction)
     local current = mobile.strategicTarget
     if target and not sameTarget(current, target) then
@@ -613,6 +634,11 @@ function H.RefreshAmbient(faction, at)
     local mobile = faction and faction.mobile or nil
     if not mobile
         or mobile.controlMode ~= Constants.MOBILE_CONTROL_AMBIENT
+    then
+        return faction, false
+    end
+    if mobile.activity
+        == Constants.MOBILE_ACTIVITY_TRAVELING_TO_SETTLEMENT
     then
         return faction, false
     end
