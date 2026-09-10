@@ -136,7 +136,9 @@ function Support.OpenSelector(window, options)
         return false, "INVALID_SELECTOR_OPTIONS"
     end
     options.ownerWindow = window
-    options.player = getSpecificPlayer(0)
+    options.player = type(getSpecificPlayer) == "function"
+        and getSpecificPlayer(0) or nil
+    if not options.player then return false, "PLAYER_UNAVAILABLE" end
     options.playerNum = 0
     options.inputOwner = options.inputOwner
         or "ProjectHoomans.FacilityAreaSelector"
@@ -146,7 +148,7 @@ function Support.OpenSelector(window, options)
     options.suppressPersistentOverlays = options.suppressPersistentOverlays ~= false
         and guideTiles > 0
     local bounds = GridRegion.bounds and GridRegion.bounds(guide) or nil
-    local message = "[FacilityAreaSelector] open label="
+    local message = "[GridRegionSelector] open label="
         .. tostring(options.debugLabel or "unknown")
         .. " guideTiles=" .. tostring(guideTiles)
         .. " guidePresent=" .. tostring(guide ~= nil)

@@ -29,7 +29,7 @@ Router.Register(Const.CMD_COLONY_MANAGEMENT_ACTION,
         end
         snapshot.actionResult = result
         local settlementAction = {
-            base_create = true, base_expand = true, base_shrink = true,
+            base_expand = true, base_shrink = true,
             barricade_build = true, hq_upgrade = true,
             facility_create = true, facility_upgrade = true,
             facility_capacity_set = true,

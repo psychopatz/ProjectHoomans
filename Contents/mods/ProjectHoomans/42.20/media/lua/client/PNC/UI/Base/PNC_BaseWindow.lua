@@ -157,6 +157,11 @@ function ISPNCBaseWindow:onBaseControl(button)
     return BaseTab.OnControl(self, button)
 end
 
+function ISPNCBaseWindow:setBaseStatus(value)
+    self.baseTerritoryStatus = tostring(value or "")
+    if self.invalidateLayout then self:invalidateLayout("base_status") end
+end
+
 function ISPNCBaseWindow:onBuildingControl(button)
     return BuildingTab.OnControl(self, button)
 end

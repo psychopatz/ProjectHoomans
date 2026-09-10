@@ -112,9 +112,23 @@ function H.MobileOrder(faction, mobile, site)
         }
     end
     local mode = H.PathMode(mobile and mobile.pathMode)
+    if faction.archetypeID ~= "looter"
+        and H.PlayerRoamAreaOrder
+        and H.IsPlayerRoamArea
+        and H.IsPlayerRoamArea(mobile)
+    then
+        return H.PlayerRoamAreaOrder(faction, mobile, site)
+    end
     if H.AmbientOrder then
         local ambient = H.AmbientOrder(faction, mobile, site)
         if ambient then return ambient end
+    end
+    if faction.archetypeID ~= "looter"
+        and H.PlayerRoamStreetPoolOrder
+        and H.IsPlayerRoamStreetPool
+        and H.IsPlayerRoamStreetPool(mobile)
+    then
+        return H.PlayerRoamStreetPoolOrder(faction, mobile, site)
     end
     if faction.archetypeID == "looter" then
         if mode == Constants.MOBILE_PATH_PLAYER then

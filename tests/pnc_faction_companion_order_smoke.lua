@@ -223,6 +223,26 @@ T.truthy(joining.orderSpec.kind == "follow",
     "new player-faction member did not receive its initial Follow order")
 T.truthy(joining.orderSpec.ownerUsername == "alice",
     "initial Follow order did not bind the faction owner")
+
+-- Mobile-faction planning must not outrank an explicit player-owned order.
+-- Before this boundary was moved ahead of the mobile branch, reconciliation
+-- changed this record back to area roaming whenever the site was active.
+faction.mobile = {
+    active = true,
+    pathMode = "area",
+    site = { home = { x = 30, y = 31, z = 0, radius = 6 } },
+}
+local mobileJoining = copy(joining)
+mobileJoining.id = "mobile_joining"
+mobileJoining.orderSpec = { kind = "follow",
+    ownerUsername = "alice", ownerOnlineID = 7 }
+mobileJoining.runtime = {}
+records.mobile_joining = mobileJoining
+PNC.FactionBehavior.ApplyNPC(mobileJoining, "mobile_reconciliation")
+T.truthy(mobileJoining.orderSpec.kind == "follow",
+    "active mobile faction overwrote player Follow order")
+T.truthy(mobileJoining.orderSpec.ownerUsername == "alice",
+    "mobile reconciliation changed Follow owner")
 T.finish("pnc_faction_companion_order_smoke")
 
 T.finish("pnc_faction_companion_order_smoke")

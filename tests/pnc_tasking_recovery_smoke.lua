@@ -162,8 +162,8 @@ local scheduler = T.read(ROOT
     .. "PNC/Production/WorkService/PNC_WorkService_Scheduler.lua")
 local needProvider = T.read(ROOT
     .. "PNC/Needs/NeedFacilityTriggers/PNC_NeedFacilityTriggers_Provider.lua")
-local facilityBehavior = T.read(T.path("ProjectHoomans", "shared", "")
-    .. "PNC/Core/Facilities/PNC_FacilityJobs_Behavior.lua")
+local facilityLifecycle = T.read(T.path("ProjectHoomans", "shared", "")
+    .. "PNC/Core/Facilities/FacilityJobsBehavior/PNC_FacilityJobsBehavior_Lifecycle.lua")
 local facilityStart = T.read(ROOT
     .. "PNC/Settlement/FacilityJobs/FacilityJobs_Service/PNC_FacilityJobs_Service_Start.lua")
 local provisionProcessing = T.read(ROOT
@@ -183,7 +183,7 @@ T.contains(needProvider, "function Triggers.GetRecoveryState",
     "NeedFacility progress contract")
 T.contains(needProvider, "return stopped == true",
     "NeedFacility cleanup result propagation")
-T.contains(facilityBehavior, "function Jobs.RecordProgress",
+T.contains(facilityLifecycle, "function Internal.RecordProgress",
     "facility effect progress owner")
 T.contains(facilityStart, "lastProgressAt = activityStartedAt",
     "facility activity progress baseline")

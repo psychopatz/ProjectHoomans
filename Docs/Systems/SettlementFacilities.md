@@ -153,15 +153,16 @@ overlap. Structured reason codes are returned for translation. Stable request
 IDs are cached at the Colony Management boundary, and Base commands also guard
 duplicates directly.
 
-The initial Colony Management response contains the settlement snapshot.
-Subsequent settlement mutations return a requester-only `SettlementDelta`
-payload containing the bounded settlement domain rather than retransmitting
-people, needs, inventory, research, and provision state. Domain event names are
-included in results and structured Core events are emitted after commits. The
-Base-tab editor previews locally and sends only the confirmed `regionDelta`;
-mouse movement is never networked. Settlement snapshots include the canonical
-Base footprint so edits can render the current territory and validate the
-candidate locally before the server repeats authoritative validation.
+The initial Colony Management response and a successful Base creation response
+contain the full colony-management snapshot. Subsequent settlement mutations
+return a requester-only `SettlementDelta` payload containing the bounded
+settlement domain rather than retransmitting people, needs, inventory,
+research, and provision state. Domain event names are included in results and
+structured Core events are emitted after commits. The Command Hub Base editor
+previews locally and sends only the confirmed `regionDelta`; mouse movement
+is never networked. Settlement snapshots include the canonical Base footprint
+so edits can render the current territory and validate the candidate locally
+before the server repeats authoritative validation.
 
 `PNC_Settlements_V1` stores schema version 1 maps for Bases, Facilities,
 Components, Stockpile Nodes, and Project Hoomans-owned Core Zones. Cached
@@ -174,9 +175,9 @@ calculation run only on load, explicit query, or mutation.
 
 ## Management and authoring flow
 
-Open Colony Management and select `BASE`. Before a Base exists, use `CLAIM
-TERRITORY`; drag in the world and use Replace/Add/Erase to form one connected
-footprint, then confirm. Once established, the tab exposes Expand, Shrink,
+Open the Colony Command Hub and select `BASE`. Before a Base exists, use
+`CLAIM TERRITORY`; drag in the world and use Replace/Add/Erase to form one
+connected footprint, then confirm. Once established, the tab exposes Expand, Shrink,
 Reinforce, Upgrade HQ, Build a Building, Assign Area, Assign Sleep Spot, Upgrade
 Facility, and Place Stockpile. `BUILD A BUILDING` opens a card chooser with the
 definition image, material cost, availability state, and description. The
@@ -227,8 +228,8 @@ reservations, and stockpile radius arrival. Core geometry has its own
 
 Manual in-game check:
 
-1. Open Colony Management, choose Base, claim an L-shaped territory with two
-   drag operations (`REPLACE`, then `ADD`), and confirm.
+1. Open the Colony Command Hub, choose Base, claim an L-shaped territory with
+   two drag operations (`REPLACE`, then `ADD`), and confirm.
 2. Reopen Base and verify claimed/capacity values and the green existing-zone
    guide. Try a disconnected expansion and confirm that it cannot be submitted.
 3. Toggle `SHOW BASE LAYOUT`, verify the territory footprint, then reinforce

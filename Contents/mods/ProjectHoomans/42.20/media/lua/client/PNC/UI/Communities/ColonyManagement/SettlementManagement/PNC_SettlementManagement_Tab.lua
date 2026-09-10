@@ -25,6 +25,12 @@ local CONTEXT = {
     { "facility_destroy", "UI_PNC_Facility_Destroy", "DECONSTRUCT", "danger" },
 }
 
+local TERRITORY_ACTIONS = {
+    claim = true,
+    expand = true,
+    shrink = true,
+}
+
 local function tr(key, fallback)
     local value = getText and getText(key) or nil
     if not value or value == key then return fallback end
@@ -35,8 +41,10 @@ local function createButtons(window, definitions, destination)
     local index
     for index = 1, #definitions do
         local definition = definitions[index]
-        if not (window.baseIntegrated
-            and definition[1] == "build_facility")
+        if not ((not window.baseIntegrated
+                and TERRITORY_ACTIONS[definition[1]])
+            or (window.baseIntegrated
+                and definition[1] == "build_facility"))
         then
             local button = UI.CreateButton(window, {
                 id = definition[1],

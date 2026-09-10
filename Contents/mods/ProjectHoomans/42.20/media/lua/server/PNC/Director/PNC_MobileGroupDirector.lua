@@ -9,6 +9,7 @@ PNC.MobileGroupDirector = PNC.MobileGroupDirector or {}
 require "PNC/Director/MobileGroupDirector/PNC_MobileGroupDirector_Core"
 require "PNC/Director/MobileGroupDirector/PNC_MobileGroupDirector_Sites"
 require "PNC/Director/MobileGroupDirector/PNC_MobileGroupDirector_Members"
+require "PNC/Director/MobileGroupDirector/PNC_MobileGroupDirector_PlayerRoam"
 require "PNC/Director/MobileGroupDirector/PNC_MobileGroupDirector_Ambient"
 require "PNC/Director/MobileGroupDirector/PNC_MobileGroupDirector_DepartureTargets"
 require "PNC/Director/MobileGroupDirector/PNC_MobileGroupDirector_Departures"

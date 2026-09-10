@@ -134,10 +134,15 @@ function Composer.ReceiveOutcome(args)
     for _, effect in ipairs(args.effectResults or {}) do
         if effect.type == "pnc:open_territory_claim"
             and effect.result and effect.result.openClaim == true
-            and PNC.ColonyManagementUI
-            and PNC.ColonyManagementUI.OpenClaimTerritory
         then
-            PNC.ColonyManagementUI.OpenClaimTerritory()
+            local opened = PNC.CommandHub
+                and PNC.CommandHub.OpenBase
+                and PNC.CommandHub.OpenBase() or false
+            if not opened and PNC.ColonyManagementUI
+                and PNC.ColonyManagementUI.OpenClaimTerritory
+            then
+                PNC.ColonyManagementUI.OpenClaimTerritory()
+            end
         end
     end
     local clientState = PNC.Network and PNC.Network.ClientState

@@ -204,8 +204,15 @@ function Director.PumpDepartures(at, budget)
         Factions.Registry and Factions.Registry.byID or {}
     ) do
         if faction.status == "active" and Factions.IsMobileGroup(faction)
-            and H.IsStreetRoaming(faction)
-            and finite(faction.mobile.lastDepartureAt, -1) < dayStart
+            and (
+                H.IsPlayerRoamStreetPool
+                    and H.IsPlayerRoamStreetPool(faction.mobile)
+                or H.IsStreetRoaming(faction)
+                    and faction.mobile.pathMode
+                        ~= Constants.MOBILE_PATH_PLAYER
+                    and finite(faction.mobile.lastDepartureAt, -1)
+                        < dayStart
+            )
         then
             factionIDs[#factionIDs + 1] = factionID
         end
@@ -213,7 +220,18 @@ function Director.PumpDepartures(at, budget)
     table.sort(factionIDs)
     for _, factionID in ipairs(factionIDs) do
         local faction = Factions.Get(factionID)
-        if faction and H.IsStreetRoaming(faction) then
+        if faction
+            and H.IsPlayerRoamStreetPool
+            and H.IsPlayerRoamStreetPool(faction.mobile)
+        then
+            if moved < budget and H.RollPlayerRoam then
+                local ok = H.RollPlayerRoam(faction, at)
+                if ok then moved = moved + 1 end
+            end
+        elseif faction and H.IsStreetRoaming(faction)
+            and faction.mobile.pathMode
+                ~= Constants.MOBILE_PATH_PLAYER
+        then
             local roll = H.DailyDepartureRoll(factionID, day)
             if roll < chance then
                 -- A daily departure budget is an execution cap, not a reason

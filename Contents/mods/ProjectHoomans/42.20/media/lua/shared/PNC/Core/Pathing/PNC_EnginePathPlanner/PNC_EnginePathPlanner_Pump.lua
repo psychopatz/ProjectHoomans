@@ -167,6 +167,19 @@ function Planner.Pump(record, body, source)
         Internal.EnsureNativeMovementOwner(body)
         suppressConflictingNativeState(body, navigation, now)
         if Internal.ResultMatches(result, "Failed") then
+            -- Behavior2 can report failure before the route has advanced far
+            -- enough for the normal post-update passage handoff.  A failed
+            -- native route is still allowed to yield to scripted traversal;
+            -- otherwise a follower at a doorway is completed as blocked and
+            -- the next behavior tick presents it as idle.
+            handedOff, handoffResult = Internal.HandoffUpcomingPassage(
+                record,
+                body,
+                navigation
+            )
+            if handedOff then
+                return true, handoffResult
+            end
             Internal.ClearEngineRequest(body, navigation)
             navigation.lastPlanReason = "native_behavior_failed"
             navigation.planFailures =

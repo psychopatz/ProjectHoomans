@@ -62,7 +62,7 @@ IsoDirections = { E = "east", S = "south" }
 
 require "PNC/Core/Facilities/PNC_FacilityJobs_Definitions"
 require "PNC/Needs/NeedFacilityTriggers/PNC_NeedFacilityEffects"
-require "PNC/Core/Facilities/PNC_FacilityJobs_Behavior"
+require "PNC/Core/Facilities/FacilityJobsBehavior/PNC_FacilityJobsBehavior"
 T.equal(jobName, "FacilityActivity", "facility activity job registration")
 T.equal(type(handler), "function", "facility behavior registration")
 

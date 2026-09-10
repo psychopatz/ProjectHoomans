@@ -723,15 +723,32 @@ PNC.PathService = {
         end,
     },
 }
+local originalHandoff =
+    PNC.EnginePathPlanner.Internal.HandoffUpcomingPassage
+local failedRouteHandoffCalls = 0
+PNC.EnginePathPlanner.Internal.HandoffUpcomingPassage = function()
+    failedRouteHandoffCalls = failedRouteHandoffCalls + 1
+    -- The first call is the normal pre-update probe. The second call is the
+    -- regression path: a terminal Behavior2 failure must still yield to
+    -- scripted passage ownership before the native request is released.
+    if failedRouteHandoffCalls == 1 then
+        return false, nil
+    end
+    record.runtime.localNavigation.nativeActive = false
+    return true, "native_passage_handoff"
+end
 handled, state = PNC.EnginePathPlanner.PumpFrame(record, body)
-T.truthy(handled and state == "engine_path_failed",
-    "Bandits-style behavior failure did not release native ownership")
+T.truthy(handled and state == "native_passage_handoff",
+    "native failure did not yield to scripted passage ownership")
 T.truthy(not record.runtime.localNavigation.nativeActive,
-    "failed PathFindBehavior2 retained movement ownership")
+    "passage handoff retained native movement ownership")
 T.truthy(body.useless == true,
-    "failed native route did not restore managed-body safety")
-T.equal(nativeFrameProgressCalls, 2,
-    "terminal native result skipped the frame progress handoff")
+    "passage handoff did not restore managed-body safety")
+T.equal(nativeFrameProgressCalls, 1,
+    "passage handoff incorrectly ran native progress twice")
+T.equal(failedRouteHandoffCalls, 2,
+    "terminal native result skipped the failure-time passage probe")
+PNC.EnginePathPlanner.Internal.HandoffUpcomingPassage = originalHandoff
 
 serverMode = true
 now = now + 2000

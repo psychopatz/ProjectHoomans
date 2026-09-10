@@ -28,7 +28,7 @@ end
 local function dispatchIdentity(player, command, args, localHandler)
     if Core.IsClientOnly and Core.IsClientOnly() then
         if not player or not sendClientCommand then
-            return false, "player_unavailable"
+            return false, "player_unavailable", args.requestId
         end
         sendClientCommand(player, Const.MODULE, command, args)
         return true, "sent"
@@ -621,10 +621,10 @@ function Client.RequestColonyAction(action, options)
         sendClientCommand(
             player, Const.MODULE, Const.CMD_COLONY_MANAGEMENT_ACTION, args
         )
-        return true, "sent"
+        return true, "sent", args.requestId
     end
     if not PNC.ColonyManagement or not PNC.ColonyManagement.HandleAction then
-        return false, "colony_management_unavailable"
+        return false, "colony_management_unavailable", args.requestId
     end
     local snapshot, result = PNC.ColonyManagement.HandleAction(player, args)
     snapshot.actionResult = result
@@ -641,7 +641,7 @@ function Client.RequestColonyAction(action, options)
     then
         PNC.InventoryWindow.OnColonyStorageResult(result)
     end
-    return result and result.ok == true, result and result.reason
+    return result and result.ok == true, result and result.reason, args.requestId
 end
 
 function Client.RequestCreateBase(options)

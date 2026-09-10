@@ -88,11 +88,39 @@ record.runtime.moveIntent = {
 }
 now = 130002
 T.truthy(OrderSystem.RecoverStalled(record, body, now),
-    "repeated stale direct order should use its safe fallback")
-T.equal(resetCalls, 2, "safe fallback resets the old movement owner")
-T.equal(record.orderSpec.kind, "guard",
-    "repeated direct order stalls fall back to a local guard")
-T.equal(record.orderSpec.x, record.x,
+    "repeated stale follow order should be retried")
+T.equal(resetCalls, 2, "follow retry resets the old movement owner")
+T.equal(record.orderSpec.kind, "follow",
+    "repeated follow stalls preserve the player order")
+T.equal(record.ownerUsername, "PlayerOne",
+    "follow recovery preserves the player owner")
+T.equal(record.runtime.orderRecovery.attempts, 0,
+    "preserved follow order gets a fresh recovery budget")
+
+local guardRecord = {
+    id = "direct-order-guard-npc", alive = true, x = 5, y = 5, z = 0,
+    anchorX = 5, anchorY = 5, anchorZ = 0,
+    orderSpec = { kind = "guard", x = 50, y = 50, z = 0 },
+    runtime = {
+        moveIntent = {
+            kind = "move", x = 50, y = 50, z = 0,
+            stopDistance = 0.7, requestedOrder = "guard",
+        },
+    },
+}
+now = 200000
+T.truthy(OrderSystem.RecoverStalled(guardRecord, body, now),
+    "stale autonomous order should still be reissued")
+guardRecord.runtime.moveIntent = {
+    kind = "move", x = 50, y = 50, z = 0,
+    stopDistance = 0.7, requestedOrder = "guard",
+}
+now = 260001
+T.truthy(OrderSystem.RecoverStalled(guardRecord, body, now),
+    "repeated stale autonomous order should use its safe fallback")
+T.equal(guardRecord.orderSpec.kind, "guard",
+    "repeated autonomous order stalls fall back to a local guard")
+T.equal(guardRecord.orderSpec.x, guardRecord.x,
     "safe guard fallback is anchored at the current body position")
 
 movement = {

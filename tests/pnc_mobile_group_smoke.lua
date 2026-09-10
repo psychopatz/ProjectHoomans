@@ -287,6 +287,65 @@ for _, npcID in ipairs(caravanGenerated.npcIDs) do
         "trading caravan roams across the map")
 end
 
+local caravanPathChanged = PNC.MobileGroupDirector.SetPathMode(
+    caravan.id, "player"
+)
+T.truthy(caravanPathChanged, "trading caravan enters player path mode")
+local caravanMember = PNC.Registry.Get(caravanGenerated.npcIDs[1])
+local enteredArea, areaReason =
+    PNC.MobileGroupDirectorInternal.EnterPlayerRoamArea(
+        caravanMember,
+        {
+            x = caravanMember.x,
+            y = caravanMember.y,
+            z = caravanMember.z,
+        },
+        worldHour
+    )
+T.truthy(enteredArea, areaReason)
+local caravanMobile = PNC.Factions.Get(caravan.id).mobile
+T.equal(caravanMobile.playerRoam.phase, "area",
+    "visible player arrival enters persistent area phase")
+T.equal(caravanMobile.playerRoam.untilAt, worldHour + 24,
+    "area phase uses a 24-hour world-age timer")
+T.equal(caravanMobile.controlMode, "ambient",
+    "area phase leaves strategic player control")
+for _, npcID in ipairs(caravanGenerated.npcIDs) do
+    local record = PNC.Registry.Get(npcID)
+    T.equal(record.orderSpec.roamMode, PNC.Const.ROAM_MODE_AREA,
+        "all mobile members receive the area-roam order")
+end
+
+worldHour = worldHour + 26
+local expired, expireReason =
+    PNC.MobileGroupDirectorInternal.ExpirePlayerRoamArea(
+        PNC.Factions.Get(caravan.id),
+        worldHour
+    )
+T.truthy(expired, expireReason)
+caravanMobile = PNC.Factions.Get(caravan.id).mobile
+T.equal(caravanMobile.playerRoam.phase, "street_pool",
+    "area phase expires into the street pool")
+
+PNC.MobileGroupDirector.DailyDepartureRoll = function() return 0 end
+local startedAgain, rollReason =
+    PNC.MobileGroupDirectorInternal.RollPlayerRoam(
+        PNC.Factions.Get(caravan.id),
+        worldHour
+    )
+T.truthy(startedAgain, rollReason)
+caravanMobile = PNC.Factions.Get(caravan.id).mobile
+T.equal(caravanMobile.playerRoam.phase, "approach",
+    "successful daily roll starts a new player approach")
+T.equal(caravanMobile.controlMode, "strategic",
+    "new approach restores strategic player control")
+for _, npcID in ipairs(caravanGenerated.npcIDs) do
+    local record = PNC.Registry.Get(npcID)
+    T.equal(record.orderSpec.roamMode, PNC.Const.ROAM_MODE_PLAYER,
+        "new approach restores player-roam orders")
+end
+PNC.MobileGroupDirector.DailyDepartureRoll = nil
+
 T.load(SERVER .. "Factions/PNC_FactionDebug.lua")
 local debugSnapshot = PNC.FactionDebug.BuildSnapshot(
     caravan.id,

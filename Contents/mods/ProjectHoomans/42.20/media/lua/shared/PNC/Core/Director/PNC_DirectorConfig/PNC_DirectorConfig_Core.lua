@@ -18,6 +18,10 @@ Config.MOBILE_ACCIDENT_INTERVAL_HOURS = 2
 Config.MOBILE_AMBIENT_INTERVAL_HOURS = 2 / 60
 Config.MOBILE_DEPARTURE_INTERVAL_HOURS = 24
 Config.MOBILE_DAILY_DEPARTURE_BASE_CHANCE = 0.10
+-- Player-path groups use the same deterministic daily-roll mechanism as
+-- ambient departures, but have their own chance so settlement travel tuning
+-- does not silently change player-roam frequency.
+Config.MOBILE_PLAYER_ROAM_BASE_CHANCE = 0.10
 Config.DIRECTOR_JOB_BUDGET = 12
 Config.ACTIVE_SIMULATION_RADIUS = 80
 Config.ENCOUNTER_HISTORY_LIMIT = 100

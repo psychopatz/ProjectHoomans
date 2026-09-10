@@ -44,13 +44,16 @@ T.truthy(Registry.IsVisible(stockpile),
 T.falsy(Registry.IsEnabled(stockpile),
     "stockpile bootstrap enabled without a colony base")
 
-snapshot = { settlement = { facilities = {} } }
+snapshot = {
+    colony = { id = "colony-1" },
+    settlement = { facilities = {} },
+}
 T.truthy(Registry.IsVisible(stockpile),
     "stockpile bootstrap disappeared before being built")
 T.truthy(Registry.IsEnabled(stockpile),
     "stockpile bootstrap did not enable with a colony base")
-T.falsy(Registry.IsEnabled(building),
-    "building safeguard was weakened before a stockpile existed")
+T.truthy(Registry.IsEnabled(building),
+    "Base did not open before a stockpile existed")
 
 local owner = {}
 local handled = stockpile.onClick(stockpile, owner)
@@ -60,9 +63,12 @@ T.equal(beginBuild.window, owner,
 T.equal(beginBuild.definitionId, "stockpile",
     "hub stockpile button did not use the stockpile definition")
 
-snapshot = { settlement = { facilities = {
-    { definitionId = "stockpile", constructionState = "PLANNED" },
-} } }
+snapshot = {
+    colony = { id = "colony-1" },
+    settlement = { facilities = {
+        { definitionId = "stockpile", constructionState = "PLANNED" },
+    } },
+}
 T.falsy(Registry.IsVisible(stockpile),
     "stockpile bootstrap remained visible after being planned")
 

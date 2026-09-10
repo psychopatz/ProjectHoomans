@@ -4,6 +4,17 @@ local Internal = PNC.PathService.Internal
 local Diagnostics = PNC.PerformanceScalingDiagnostics
 local Const = PNC.Const or {}
 
+local function isFollowOwnerLane(lane)
+    if not lane then return false end
+    if string.sub(tostring(lane.intentReason or ""), 1, 12)
+        == "follow_owner"
+    then
+        return true
+    end
+    return tostring(lane.requestedOrder or "")
+        == tostring(Const.ORDER_FOLLOW or "follow")
+end
+
 local function activateNativeFallback(record, lane, now, reason)
     local router = PNC.NavigationRouter
     local durationMs = math.max(
@@ -42,6 +53,33 @@ local function handleNativeFailure(
     lane.lastStepAt = now
     lane.lastStepDistance = 0
     lane.lastStepLabel = nativeState
+    if isFollowOwnerLane(lane) then
+        -- Follow is a durable player command.  Native failure is a provider
+        -- failure, not an order failure: keep the lane alive and give the
+        -- scripted mover the same destination so it can approach/interact
+        -- with a doorway or recover from a stale engine ownership state.
+        activateNativeFallback(
+            record,
+            lane,
+            now,
+            nativeState or "native_path_failed"
+        )
+        lane.lastProgressAt = now
+        lane.lastGoalProgressAt = now
+        lane.noProgressCount = 0
+        if Internal.clearNativeGoalBlock then
+            Internal.clearNativeGoalBlock(lane)
+        end
+        Internal.logMoveWarning(
+            record,
+            zombie,
+            lane,
+            "native_path_fallback",
+            nativeState or "native_path_failed",
+            "goal=" .. Internal.describeGoal(lane.goal)
+        )
+        return true, "native_path_fallback"
+    end
     if Internal.noteNativeGoalFailure
         and Internal.noteNativeGoalFailure(lane, lane.goal, now)
     then

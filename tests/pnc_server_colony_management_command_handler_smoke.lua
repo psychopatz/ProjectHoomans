@@ -87,19 +87,28 @@ for _, action in ipairs(settlementActions) do
     colonyCall = nil
     deltaCall = nil
     Router.Handle("ColonyManagementAction", player, { action = action })
-    T.equal(deltaCall.player, player, action .. " delta player")
-    T.equal(deltaCall.settlement.id, "settlement-1",
-        action .. " settlement")
-    T.equal(deltaCall.result.action, action, action .. " result")
-    T.equal(type(deltaCall.storage.revision), "number",
-        action .. " storage")
-    T.equal(colonyCall, nil, action .. " sent full snapshot")
+    if action == "base_create" then
+        T.equal(colonyCall.player, player, action .. " snapshot player")
+        T.equal(colonyCall.snapshot.marker, "snapshot-" .. tostring(buildCount),
+            action .. " snapshot")
+        T.equal(colonyCall.snapshot.actionResult.action, action,
+            action .. " result")
+        T.equal(deltaCall, nil, action .. " sent settlement delta")
+    else
+        T.equal(deltaCall.player, player, action .. " delta player")
+        T.equal(deltaCall.settlement.id, "settlement-1",
+            action .. " settlement")
+        T.equal(deltaCall.result.action, action, action .. " result")
+        T.equal(type(deltaCall.storage.revision), "number",
+            action .. " storage")
+        T.equal(colonyCall, nil, action .. " sent full snapshot")
+    end
 end
 
 local sendDelta = PNC.Network.SendSettlementDelta
 PNC.Network.SendSettlementDelta = nil
-Router.Handle("ColonyManagementAction", player, { action = "base_create" })
-T.equal(colonyCall.snapshot.actionResult.action, "base_create",
+Router.Handle("ColonyManagementAction", player, { action = "base_expand" })
+T.equal(colonyCall.snapshot.actionResult.action, "base_expand",
     "missing delta transport did not send full snapshot")
 PNC.Network.SendSettlementDelta = sendDelta
 

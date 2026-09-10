@@ -487,6 +487,24 @@ local function recoverDirectOrder(record, zombie, now, snapshot)
     state.lastRecoveryAt = now
     state.lastReason = reason
     if attempts >= OrderSystem.MAX_RECOVERY_ATTEMPTS then
+        if kind == tostring(Const.ORDER_FOLLOW or "follow") then
+            -- Follow is an explicit player command. A native path stall must
+            -- not silently turn it into a local guard order; clear the stale
+            -- movement lane and keep retrying the player's durable order.
+            OrderSystem.SetOrder(record, currentOrder)
+            record.runtime = record.runtime or {}
+            record.runtime.orderRecovery = {
+                kind = kind,
+                attempts = 0,
+                nextAttemptAt = now
+                    + OrderSystem.RECOVERY_RETRY_INTERVAL_MS,
+                missingSince = now,
+                lastRecoveryAt = now,
+                lastReason = reason,
+                preservedOrder = true,
+            }
+            return true
+        end
         OrderSystem.SetOrder(record, safeFallbackOrder(record, kind))
         record.runtime = record.runtime or {}
         record.runtime.orderRecovery = {

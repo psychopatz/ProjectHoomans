@@ -32,7 +32,7 @@ PNC = {
 }
 
 local Jobs = T.load("ProjectHoomans", "shared",
-    "PNC/Core/Facilities/PNC_FacilityJobs_Behavior.lua")
+    "PNC/Core/Facilities/FacilityJobsBehavior/PNC_FacilityJobsBehavior.lua")
 local record = {
     id = "npc:orphan",
     runtime = {

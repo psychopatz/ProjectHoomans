@@ -57,6 +57,13 @@ Const.NATIVE_BUMP_STALE_GRACE_MS = 750
 Const.NATIVE_STALL_BACKOFF_MS = 5000
 Const.ENGINE_PATH_FALLBACK_COOLDOWN_MS = 5000
 Const.PATH_CONTINUOUS_RETARGET_DISTANCE = 0.22
+-- Player-roam uses a slower target refresh than ordinary combat/follow
+-- steering. The native planner already replans when the target drifts enough;
+-- refreshing this often is sufficient without turning a moving player into a
+-- new route request every behavior tick.
+Const.ROAM_PLAYER_TARGET_REFRESH_MS = 1000
+Const.ROAM_PLAYER_ARRIVAL_DISTANCE = 3.0
+Const.ROAM_PLAYER_AREA_RADIUS = 24.0
 Const.CLIENT_ZOMBIE_AGGRO_INDEX_MS = 250
 Const.CLIENT_ZOMBIE_AGGRO_CELL_SIZE = 8
 Const.CLIENT_ZOMBIE_AGGRO_TIER_MS = 50

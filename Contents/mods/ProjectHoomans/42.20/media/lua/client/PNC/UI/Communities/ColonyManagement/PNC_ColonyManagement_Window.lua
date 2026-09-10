@@ -257,6 +257,9 @@ function ColonyUI.Open()
 end
 
 function ColonyUI.OpenClaimTerritory()
+    if PNC.CommandHub and PNC.CommandHub.OpenBase then
+        return PNC.CommandHub.OpenBase()
+    end
     local window = ColonyUI.Open()
     if not window then return false end
     window.pendingBaseAction = "claim"

@@ -2,6 +2,8 @@ local BaseTab = require
     "PNC/UI/Communities/ColonyManagement/SettlementManagement/PNC_SettlementManagement_Tab"
 local BuildingTab = require "PNC/UI/Base/PNC_BaseBuildingTab"
 local Queue = require "PNC/UI/Base/PNC_BaseQueue"
+local Territory = require
+    "PNC/UI/CommandHub/PNC_CommandHub_BaseTerritoryActions"
 local Placement = require
     "PNC/UI/Communities/ColonyManagement/PNC_BuildingPlacement"
 local Options = require "PsychopatzCore/UI/PsychopatzCommandHubOptions"
@@ -63,6 +65,7 @@ end
 function ISPNCBaseWindow:refresh(update)
     update = update or Client.ReadSnapshot()
     self.snapshot = update.snapshot or {}
+    Territory.ApplyResult(self, self.snapshot)
     self:applyContentStyle()
     BaseTab.Rebuild(self, self.snapshot)
     Queue.Rebuild(self, self.snapshot)

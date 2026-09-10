@@ -30,6 +30,26 @@ function Hub.ToggleChild(id, owner)
     return false
 end
 
+function Hub.OpenBase(owner)
+    local window = Hub.instance
+    if not window or not window.getIsVisible or not window:getIsVisible() then
+        window = Hub.Open()
+    end
+    if not window then return false end
+    local controller = Hub.ChildController
+    if not controller then return false end
+    if controller.IsOpen and controller.IsOpen("building") then
+        local base = PNC.BaseUI or PNC.BuildingUI
+        if base and base.instance and base.instance.bringToTop then
+            base.instance:bringToTop()
+        end
+        if controller.SyncPositions then controller.SyncPositions() end
+        return true
+    end
+    if not controller.Toggle then return false end
+    return controller.Toggle("building", owner or window) == true
+end
+
 function Hub.Sync()
     return CoreHub.Sync()
 end

@@ -77,6 +77,18 @@ function H.BuildMobileState(site, mode, at, previous, moved, controlMode)
     local relocationCount = tonumber(previous
         and previous.relocationCount) or 0
     local revision = tonumber(previous and previous.revision) or 0
+    local playerRoam = previous and H.Copy(previous.playerRoam) or nil
+    if mode == Constants.MOBILE_PATH_PLAYER then
+        playerRoam = playerRoam or {
+            phase = Constants.MOBILE_PLAYER_ROAM_PHASE_APPROACH,
+            area = nil,
+            untilAt = 0,
+            lastArrivalAt = 0,
+            lastRollDay = -1,
+        }
+    else
+        playerRoam = nil
+    end
     if moved == true then relocationCount = relocationCount + 1 end
     return {
         active = true,
@@ -92,6 +104,7 @@ function H.BuildMobileState(site, mode, at, previous, moved, controlMode)
         activity = previous and previous.activity
             or Constants.MOBILE_ACTIVITY_STREET_ROAMING,
         travel = previous and H.Copy(previous.travel) or nil,
+        playerRoam = playerRoam,
         lastDepartureAt = previous and previous.lastDepartureAt or -1,
         site = site,
         lastMovedAt = at,

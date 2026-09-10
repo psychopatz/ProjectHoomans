@@ -141,6 +141,20 @@ function Gates.HasBaseAndStockpile()
     return Gates.GetBaseAndStockpileStatus().enabled
 end
 
+function Gates.HasColony()
+    local snapshot = colonyManagementSnapshot()
+    local colony = type(snapshot) == "table" and snapshot.colony or nil
+    return type(colony) == "table" and tostring(colony.id or "") ~= ""
+end
+
+function Gates.BaseDisabledTooltip()
+    if Gates.HasColony() then return nil end
+    return {
+        key = "UI_PNC_CommandHub_Disabled_NoColony",
+        fallback = "Requires colony data before the base can be opened.",
+    }
+end
+
 function Gates.BaseAndStockpileDisabledTooltip()
     local status = Gates.GetBaseAndStockpileStatus()
     if status.enabled then return nil end
@@ -433,8 +447,8 @@ Registry.RegisterCategory({
     titleFallback = "Base",
     tooltipKey = "UI_PNC_CommandHub_BuildingHelp",
     tooltipFallback = "Plan and place colony buildings",
-    enabled = Gates.HasBaseAndStockpile,
-    disabledTooltip = Gates.BaseAndStockpileDisabledTooltip,
+    enabled = Gates.HasColony,
+    disabledTooltip = Gates.BaseDisabledTooltip,
     onClick = toggleChild("building", openBuilding),
     selected = function() return isOpen("building") end,
     closeHub = false,

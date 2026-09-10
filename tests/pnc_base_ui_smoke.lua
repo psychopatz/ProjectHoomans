@@ -24,10 +24,16 @@ local legacySource = T.read("ProjectHoomans", "client",
     "PNC/UI/Building/PNC_Building.lua")
 local hubSource = T.read("ProjectHoomans", "client",
     "PNC/UI/CommandHub/PNC_CommandHub.lua")
+local hubWindowSource = T.read("ProjectHoomans", "client",
+    "PNC/UI/CommandHub/PNC_CommandHub_Window.lua")
 local registrySource = T.read("ProjectHoomans", "client",
     "PNC/UI/CommandHub/PNC_CommandHub_Registry.lua")
 local baseTabSource = T.read("ProjectHoomans", "client",
     "PNC/UI/Communities/ColonyManagement/SettlementManagement/PNC_SettlementManagement_Tab.lua")
+local territorySource = T.read("ProjectHoomans", "client",
+    "PNC/UI/CommandHub/PNC_CommandHub_BaseTerritoryActions.lua")
+local outcomesSource = T.read("ProjectHoomans", "client",
+    "PNC/Conversation/Blocks/ConversationComposer/PNC_ConversationComposer_Outcomes.lua")
 
 T.contains(windowSource, 'id = "pnc-command-hub-base-widget"',
     "Base window is not installed as a detachable widget")
@@ -85,10 +91,18 @@ T.contains(legacySource, "PNC/UI/Base/PNC_Base",
     "legacy Building entry point does not resolve to Base")
 T.contains(hubSource, "PNC/UI/Base/PNC_Base",
     "Command Hub does not load the Base widget")
+T.contains(hubWindowSource, "function Hub.OpenBase",
+    "Command Hub does not expose the Base branch opener")
 T.contains(registrySource, "UI_PNC_CommandHub_Category_Base",
     "Command Hub category is not named Base")
+T.contains(registrySource, "enabled = Gates.HasColony",
+    "Base category is still gated behind stockpile completion")
 T.contains(registrySource, "PNC.BaseUI or PNC.BuildingUI",
     "Command Hub does not prefer the Base widget")
+T.contains(territorySource, "local latest = snapshotFor(window)",
+    "Base territory requests still capture stale multiplayer state")
+T.contains(outcomesSource, "PNC.CommandHub.OpenBase",
+    "Conversation territory outcome does not target the Command Hub Base")
 T.contains(baseTabSource, "window.baseIntegrated",
     "Base tab cannot suppress its duplicate build toolbar")
 T.contains(baseTabSource, "task and task.id ~= nil",

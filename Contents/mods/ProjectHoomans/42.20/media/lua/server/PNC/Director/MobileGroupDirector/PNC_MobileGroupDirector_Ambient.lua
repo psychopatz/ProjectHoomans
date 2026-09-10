@@ -610,6 +610,9 @@ function H.RefreshStrategic(faction, at)
     then
         return faction, false
     end
+    if H.IsPlayerRoamArea and H.IsPlayerRoamArea(mobile) then
+        return faction, false
+    end
     if mobile.activity
         == Constants.MOBILE_ACTIVITY_TRAVELING_TO_SETTLEMENT
     then
@@ -635,6 +638,9 @@ function H.RefreshAmbient(faction, at)
     if not mobile
         or mobile.controlMode ~= Constants.MOBILE_CONTROL_AMBIENT
     then
+        return faction, false
+    end
+    if H.IsPlayerRoamArea and H.IsPlayerRoamArea(mobile) then
         return faction, false
     end
     if mobile.activity
@@ -755,6 +761,15 @@ function Director.PumpAmbient(at, budget)
         if cursor > #factionIDs then cursor = 1 end
         local faction = Factions.Get(factionIDs[cursor])
         if faction then
+            if H.ExpirePlayerRoamArea then
+                local expired, _, updated = H.ExpirePlayerRoamArea(
+                    faction,
+                    at
+                )
+                if expired then faction = updated or Factions.Get(
+                    faction.id
+                ) or faction end
+            end
             if faction.mobile.controlMode
                 == Constants.MOBILE_CONTROL_STRATEGIC
             then

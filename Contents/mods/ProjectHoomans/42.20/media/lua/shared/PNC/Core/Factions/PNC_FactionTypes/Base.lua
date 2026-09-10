@@ -190,6 +190,35 @@ local function normalizeStrategicTarget(value)
     return target
 end
 
+local function normalizePlayerRoam(value)
+    if type(value) ~= "table" then return nil end
+    local phase = Constants.VALID_MOBILE_PLAYER_ROAM_PHASES[
+        value.phase
+    ] and value.phase or Constants.MOBILE_PLAYER_ROAM_PHASE_APPROACH
+    local area = normalizeTargetPoint(
+        value.area,
+        "player_roam_area"
+    )
+    local untilAt = Internal.Timestamp(value.untilAt, 0)
+    if phase == Constants.MOBILE_PLAYER_ROAM_PHASE_AREA
+        and (not area or untilAt <= 0)
+    then
+        phase = Constants.MOBILE_PLAYER_ROAM_PHASE_APPROACH
+        area = nil
+        untilAt = 0
+    end
+    return {
+        phase = phase,
+        area = area,
+        untilAt = untilAt,
+        lastArrivalAt = Internal.Timestamp(value.lastArrivalAt, 0),
+        lastRollDay = math.max(
+            -1,
+            math.floor(Internal.Finite(value.lastRollDay, -1))
+        ),
+    }
+end
+
 local function normalizeMobileTravel(value)
     if type(value) ~= "table" then return nil end
     local destination = normalizeTargetPoint(
@@ -229,6 +258,7 @@ function Types.NormalizeMobileGroup(value)
     local strategicTarget
     local activity
     local travel
+    local playerRoam
     if source.active ~= true then return nil end
     if not CommunityTypes or not CommunityTypes.NormalizeSite then
         return nil
@@ -279,6 +309,18 @@ function Types.NormalizeMobileGroup(value)
     then
         activity = Constants.MOBILE_ACTIVITY_STREET_ROAMING
     end
+    playerRoam = normalizePlayerRoam(source.playerRoam)
+    if pathMode == Constants.MOBILE_PATH_PLAYER then
+        playerRoam = playerRoam or {
+            phase = Constants.MOBILE_PLAYER_ROAM_PHASE_APPROACH,
+            area = nil,
+            untilAt = 0,
+            lastArrivalAt = 0,
+            lastRollDay = -1,
+        }
+    else
+        playerRoam = nil
+    end
     return {
         schemaVersion = Constants.MOBILE_GROUP_SCHEMA_VERSION,
         active = true,
@@ -288,6 +330,7 @@ function Types.NormalizeMobileGroup(value)
         ambient = ambient,
         activity = activity,
         travel = travel,
+        playerRoam = playerRoam,
         lastDepartureAt = source.lastDepartureAt == nil
             and -1 or math.max(-1, math.floor(Internal.Finite(
                 source.lastDepartureAt,

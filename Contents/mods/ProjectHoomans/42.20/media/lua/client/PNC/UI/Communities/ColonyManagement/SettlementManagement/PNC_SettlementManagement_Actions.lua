@@ -1,4 +1,4 @@
-local Territory = require "PNC/UI/Communities/ColonyManagement/SettlementManagement/PNC_SettlementManagement_TerritoryActions"
+local Territory = require "PNC/UI/CommandHub/PNC_CommandHub_BaseTerritoryActions"
 local Facility = require "PNC/UI/Communities/ColonyManagement/SettlementManagement/PNC_SettlementManagement_FacilityActions"
 local BuildModal = require "PNC/UI/Communities/ColonyManagement/PNC_FacilityBuildModal"
 local LayoutOverlay = require "PNC/UI/Communities/ColonyManagement/PNC_SettlementLayoutOverlay"
@@ -102,10 +102,16 @@ end
 
 function Actions.Handle(window, action, facility)
     local settlement = window.snapshot and window.snapshot.settlement
-    if action == "claim" then Territory.Begin(window, "create"); return true end
+    if action == "claim" then
+        return Territory.Begin(window, "create") ~= false
+    end
     if not settlement then return false end
-    if action == "expand" then Territory.Begin(window, "expand"); return true end
-    if action == "shrink" then Territory.Begin(window, "shrink"); return true end
+    if action == "expand" then
+        return Territory.Begin(window, "expand") ~= false
+    end
+    if action == "shrink" then
+        return Territory.Begin(window, "shrink") ~= false
+    end
     if action == "overlay" then LayoutOverlay.Toggle(settlement); return true end
     if action == "fishing_zone" then return Fishing.Begin(window) end
     if action == "build_facility" then

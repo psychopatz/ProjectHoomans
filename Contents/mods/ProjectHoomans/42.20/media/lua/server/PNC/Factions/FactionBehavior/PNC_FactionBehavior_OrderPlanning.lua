@@ -29,6 +29,28 @@ end
 local function desiredOrder(record, mode, owner, faction, preservePlayerOrder)
     local mobile = faction and faction.mobile
     local home = mobile and mobile.site and mobile.site.home
+    -- A player-owned order is an explicit command and must be resolved before
+    -- mobile-faction ambient planning.  Otherwise an active mobile site can
+    -- replace follow with roam/camp behavior on the next faction reconcile.
+    if mode == "player_owned" then
+        local current = record.orderSpec or {}
+        local kind = tostring(current.kind or "")
+        local registeredJob = PNC.JobSystem and PNC.JobSystem.OrderJobs
+            and PNC.JobSystem.OrderJobs[kind] or nil
+        if preservePlayerOrder == true and (
+            kind == Const.ORDER_GUARD
+            or kind == Const.ORDER_PATROL
+            or kind == Const.ORDER_TRAVEL
+            or registeredJob ~= nil
+        ) then
+            return Core.DeepCopy(current)
+        end
+        return {
+            kind = Const.ORDER_FOLLOW,
+            ownerUsername = owner.username,
+            ownerOnlineID = owner.onlineID,
+        }
+    end
     if mobile and mobile.active == true and home then
         local mobileDirector = PNC.MobileGroupDirectorInternal
         if mobileDirector and mobileDirector.MobileOrder then
@@ -68,25 +90,6 @@ local function desiredOrder(record, mode, owner, faction, preservePlayerOrder)
             y = home.y,
             z = home.z,
             radius = home.radius,
-        }
-    end
-    if mode == "player_owned" then
-        local current = record.orderSpec or {}
-        local kind = tostring(current.kind or "")
-        local registeredJob = PNC.JobSystem and PNC.JobSystem.OrderJobs
-            and PNC.JobSystem.OrderJobs[kind] or nil
-        if preservePlayerOrder == true and (
-            kind == Const.ORDER_GUARD
-            or kind == Const.ORDER_PATROL
-            or kind == Const.ORDER_TRAVEL
-            or registeredJob ~= nil
-        ) then
-            return Core.DeepCopy(current)
-        end
-        return {
-            kind = Const.ORDER_FOLLOW,
-            ownerUsername = owner.username,
-            ownerOnlineID = owner.onlineID,
         }
     end
     if mode == "aggressive" then

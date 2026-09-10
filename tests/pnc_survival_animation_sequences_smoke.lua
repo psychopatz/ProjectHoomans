@@ -50,7 +50,7 @@ PNC.NeedFacilityEffects = {
 T.load("ProjectHoomans", "shared",
     "PNC/Core/Facilities/PNC_FacilityJobs_Definitions.lua")
 T.load("ProjectHoomans", "shared",
-    "PNC/Core/Facilities/PNC_FacilityJobs_Behavior.lua")
+    "PNC/Core/Facilities/FacilityJobsBehavior/PNC_FacilityJobsBehavior.lua")
 
 local foodDefinition = PNC.FacilityJobDefinitions.Get("food.dine")
 T.equal(foodDefinition.sceneId, "survival.eat.inventory",

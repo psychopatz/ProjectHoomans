@@ -53,6 +53,8 @@ T.truthy(Registry.IsEnabled(Registry.Get("events")),
 T.truthy(PNC.CommandHub.Gates
     and PNC.CommandHub.Gates.HasBaseAndStockpile,
     "command hub does not expose the base and stockpile gate")
+T.truthy(PNC.CommandHub.Gates.HasColony,
+    "command hub does not expose the colony gate for Base")
 T.truthy(Registry.Get("storage").onClick,
     "storage category does not expose its standalone workflow")
 T.truthy(Registry.Get("research").onClick,
@@ -88,7 +90,10 @@ T.falsy(Registry.IsEnabled(Registry.Get("stockpile")),
 T.falsy(Registry.IsEnabled(Registry.Get("building")),
     "building remains enabled without a base")
 PNC.ColonyManagementClient.ReadSnapshot = function()
-    return { snapshot = { settlement = { facilities = {} } } }
+    return { snapshot = {
+        colony = { id = "colony-1" },
+        settlement = { facilities = {} },
+    } }
 end
 disabledTooltip = Registry.Get("work").disabledTooltip(Registry.Get("work"))
 T.equal(disabledTooltip.key, "UI_PNC_CommandHub_Disabled_NoStockpile",
@@ -100,13 +105,16 @@ T.falsy(Registry.IsEnabled(Registry.Get("work")),
     "work enabled without a stockpile")
 T.truthy(Registry.IsEnabled(Registry.Get("stockpile")),
     "stockpile bootstrap did not enable with a base before the stockpile exists")
-T.falsy(Registry.IsEnabled(Registry.Get("building")),
-    "building enabled before the stockpile exists")
+T.truthy(Registry.IsEnabled(Registry.Get("building")),
+    "Base remained blocked before a stockpile existed")
 PNC.ColonyManagementClient.ReadSnapshot = function()
     return {
-        snapshot = { settlement = {
-            facilities = { { definitionId = "stockpile", constructionState = "BUILT" } },
-        } },
+        snapshot = {
+            colony = { id = "colony-1" },
+            settlement = {
+                facilities = { { definitionId = "stockpile", constructionState = "BUILT" } },
+            },
+        },
     }
 end
 gateStatus = PNC.CommandHub.Gates.GetBaseAndStockpileStatus()

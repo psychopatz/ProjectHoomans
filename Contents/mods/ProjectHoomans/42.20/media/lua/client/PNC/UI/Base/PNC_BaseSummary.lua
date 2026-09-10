@@ -25,6 +25,13 @@ function SummaryPanel:render()
             "Claim territory before placing colony buildings."),
             12, 32, Theme.colors.textMuted.r, Theme.colors.textMuted.g,
             Theme.colors.textMuted.b, Theme.colors.textMuted.a, UIFont.Small)
+        local status = self.owner and self.owner.baseTerritoryStatus
+        if status and status ~= "" then
+            self:drawText(Layout.Ellipsize(status, UIFont.Small,
+                self.width - 24), 12, 47, Theme.colors.accent.r,
+                Theme.colors.accent.g, Theme.colors.accent.b,
+                Theme.colors.accent.a, UIFont.Small)
+        end
         return
     end
     local facilities = settlement.facilities or {}
@@ -58,6 +65,13 @@ function SummaryPanel:render()
         self:drawText(Layout.Ellipsize(value[2], UIFont.Medium,
             cellWidth - 20), x, 25, color.r, color.g, color.b,
             color.a or 1, UIFont.Medium)
+    end
+    local status = self.owner and self.owner.baseTerritoryStatus
+    if status and status ~= "" then
+        self:drawText(Layout.Ellipsize(status, UIFont.Small,
+            self.width - 24), 12, 47, Theme.colors.accent.r,
+            Theme.colors.accent.g, Theme.colors.accent.b,
+            Theme.colors.accent.a, UIFont.Small)
     end
 end
 
