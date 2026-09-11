@@ -52,6 +52,14 @@ local function clearStaleFacilityState(record, zombie)
     local definition
 
     if orderKind == "facility_activity" then return false end
+    -- A valid need activity is authoritative even if a passive order repair
+    -- briefly wrote follow/roam back into orderSpec. Explicit commands still
+    -- clear this runtime through AbortForOrderChange before reaching here.
+    if JobSystem and JobSystem.IsFacilityActivityActive
+        and JobSystem.IsFacilityActivityActive(record)
+    then
+        return false
+    end
     if activity and PNC.FacilityJobs
         and PNC.FacilityJobs.AbortForOrderChange
     then

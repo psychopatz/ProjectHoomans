@@ -498,7 +498,14 @@ function Sync.OnTick()
                         ] == true
                         presentationDue = localVisualMaintainDue
                     end
-                    if snapshotChanged or presentationDue then
+                    -- Incapacitated bodies need an idempotent repair pass even
+                    -- when the snapshot and its motion key are unchanged.
+                    -- The engine can reassert stagger/crawler flags between
+                    -- snapshot applications, so the health-state branch must
+                    -- not be throttled by normal presentation cadence.
+                    if snapshotChanged or presentationDue
+                        or snapshot.healthState == "incapacitated"
+                    then
                         pruneSnapshotDuplicates(snapshot, body)
                         -- The embodied NPC is already an engine-replicated
                         -- IsoZombie.  Project Zomboid smooths its authoritative

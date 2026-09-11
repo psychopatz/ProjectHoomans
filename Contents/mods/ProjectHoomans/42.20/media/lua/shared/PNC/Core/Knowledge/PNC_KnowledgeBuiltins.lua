@@ -23,6 +23,10 @@ for _, source in ipairs({
     { "witnessed_event", .75, false, false }, { "item_observation", .85, false, false },
     { "skill_observation", .85, false, false }, { "trusted_gossip", .65, false, false },
     { "rumor", .35, false, false }, { "debug", 1, true, true },
+    -- A radio self-introduction is an authoritative spoken fact, but it is
+    -- not a face-to-face disclosure and therefore must not use the normal
+    -- conversation lease/familiarity gate.
+    { "radio_disclosure", 1, true, true, true },
     { "lifelong_relationship", 1, true, true, true },
 }) do
     Sources.Register(source[1], {

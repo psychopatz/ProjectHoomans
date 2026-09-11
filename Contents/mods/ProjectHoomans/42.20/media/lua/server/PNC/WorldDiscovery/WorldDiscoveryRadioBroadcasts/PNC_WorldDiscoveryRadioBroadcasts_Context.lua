@@ -69,7 +69,21 @@ local function playerNames(player)
     if not full and player and player.getUsername then
         full, first, last = nameParts(player:getUsername())
     end
-    return full or "unknown listener", first or "listener", last or ""
+    return full or "unknown listener", first or "listener", last or "",
+        context
+end
+
+local function playerKnowsSpeakerName(playerContext, speakerID)
+    if not playerContext or not playerContext.characterUUID
+        or not speakerID
+        or not PNC.NPCKnowledge
+        or type(PNC.NPCKnowledge.GetDescriptor) ~= "function"
+    then return false end
+    local ok, descriptor = pcall(
+        PNC.NPCKnowledge.GetDescriptor,
+        playerContext.characterUUID, speakerID, "identity.name"
+    )
+    return ok and descriptor ~= nil
 end
 
 local function memberIDs(entity)
@@ -147,8 +161,11 @@ function Discovery.BuildRadioTemplateContext(player, entity, phase)
             .. tostring(math.floor(entity.y))
         or "grid " .. tostring(math.floor(entity.x / 100)) .. ", "
             .. tostring(math.floor(entity.y / 100))
-    local playerFull, playerFirst, playerLast = playerNames(player)
+    local playerFull, playerFirst, playerLast, playerContext = playerNames(player)
     local speaker, second = pickSpeakers(entity)
+    local playerNameKnown = playerKnowsSpeakerName(
+        playerContext, speaker and speaker.npcID or nil
+    )
     local introduced = speaker ~= nil and revealRoll()
     return {
         entityID = entity.entityID,
@@ -158,9 +175,12 @@ function Discovery.BuildRadioTemplateContext(player, entity, phase)
         phase = phase,
         location = location,
         settlementName = tostring(entity.name or "unknown enclave"),
-        playerFirstName = playerFirst,
-        playerLastName = playerLast,
-        playerFullName = playerFull,
+        -- Do not put the player's real name in the template context unless
+        -- this exact selected speaker is already known to this character.
+        playerFirstName = playerNameKnown and playerFirst or "listener",
+        playerLastName = playerNameKnown and playerLast or "",
+        playerFullName = playerNameKnown and playerFull or "unknown listener",
+        playerNameKnown = playerNameKnown,
         npcFirstName = introduced and speaker.firstName or "unknown caller",
         npcLastName = introduced and speaker.lastName or "",
         npcFullName = introduced and speaker.fullName or "unknown caller",
@@ -170,6 +190,7 @@ function Discovery.BuildRadioTemplateContext(player, entity, phase)
         hasSecondSpeaker = second ~= nil,
         factionName = introduced and factionName(entity) or "our group",
         speakerNPCID = speaker and speaker.npcID or nil,
+        secondarySpeakerNPCID = second and second.npcID or nil,
         identityIntroduced = introduced,
     }
 end
@@ -179,11 +200,34 @@ function Internal.PersistIntroduction(player, context)
         or not PNC.NPCKnowledge
         or not PNC.NPCKnowledge.DiscoverTopicForPlayer
     then return false end
-    local disclosure = PNC.NPCKnowledge.DiscoverTopicForPlayer(
-        player, context.speakerNPCID, "identity_name", nil,
-        "radio_disclosure"
-    )
-    if not disclosure then return false end
+    local characterContext = PNC.PlayerContext
+        and PNC.PlayerContext.Resolve
+        and PNC.PlayerContext.Resolve(player, "radio_knowledge") or nil
+    local characterUUID = characterContext
+        and characterContext.characterUUID or nil
+    local knowledge = PNC.NPCKnowledge
+    local function known(descriptorID)
+        if not characterUUID or type(knowledge.GetDescriptor) ~= "function" then
+            return false
+        end
+        local ok, value = pcall(knowledge.GetDescriptor,
+            characterUUID, context.speakerNPCID, descriptorID)
+        return ok and value ~= nil
+    end
+    local changed = false
+    if not known("identity.name") then
+        changed = knowledge.DiscoverTopicForPlayer(
+            player, context.speakerNPCID, "identity_name", nil,
+            "radio_disclosure"
+        ) ~= nil or changed
+    end
+    if not known("faction.identity") then
+        changed = knowledge.DiscoverTopicForPlayer(
+            player, context.speakerNPCID, "faction", nil,
+            "radio_disclosure"
+        ) ~= nil or changed
+    end
+    if not changed then return false end
     if PNC.Network and PNC.Network.SendNPCKnowledge
         and PNC.NPCKnowledge.BuildPlayerSnapshotForPlayer
     then
@@ -194,7 +238,7 @@ function Internal.PersistIntroduction(player, context)
             PNC.Network.SendNPCKnowledge(player, snapshot, "radio_disclosure")
         end
     end
-    return true
+    return changed
 end
 
 return Internal

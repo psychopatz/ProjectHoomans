@@ -404,7 +404,11 @@ function H.RepairMobileOrders(faction)
     if not expected then return 0 end
     local repaired = 0
     for _, record in ipairs(memberRecords(faction)) do
-        if not sameOrder(record.orderSpec, expected) then
+        local jobSystem = PNC.JobSystem
+        local facilityActive = jobSystem
+            and jobSystem.IsFacilityActivityActive
+            and jobSystem.IsFacilityActivityActive(record)
+        if not facilityActive and not sameOrder(record.orderSpec, expected) then
             if PNC.OrderSystem and PNC.OrderSystem.SetOrder then
                 PNC.OrderSystem.SetOrder(record, H.Copy(expected))
             else

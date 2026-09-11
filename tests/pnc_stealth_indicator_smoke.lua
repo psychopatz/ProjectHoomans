@@ -51,6 +51,16 @@ PNC = {
         end,
     },
 }
+PNC.Network.ClientState.snapshots = {
+    follower = {
+        alive = true,
+        recruited = true,
+        tacticalClass = "colonist",
+        orderKind = "follow",
+        ownerUsername = "local-player",
+    },
+}
+player.getUsername = function() return "local-player" end
 
 T.load(
     "ProjectHoomans",
@@ -59,6 +69,19 @@ T.load(
 )
 
 local indicator = PNC.NameplateStealthIndicator
+PNC.Network.ClientState.snapshots = {}
+T.equal(indicator.Render(manager, { showStealthIndicator = true }), false,
+    "icon rendered without a colonist follower")
+PNC.Network.ClientState.snapshots = {
+    follower = {
+        alive = true,
+        recruited = true,
+        tacticalClass = "colonist",
+        orderKind = "follow",
+        ownerUsername = "local-player",
+    },
+}
+now = 1300
 local visible = indicator.ResolveState(player, now)
 T.equal(visible, false, "single-player hidden state")
 T.equal(indicator.Render(manager, { showStealthIndicator = true }), true,
@@ -67,6 +90,7 @@ T.equal(draws[1].texture, offTexture, "hidden icon texture")
 T.equal(draws[1].width, 70, "native icon width")
 
 discovered = true
+now = 1500
 T.equal(indicator.Render(manager, { showStealthIndicator = true }), true,
     "discovered icon did not render")
 T.equal(draws[2].texture, onTexture, "discovered icon texture")
@@ -78,6 +102,7 @@ T.equal(indicator.Render(manager, { showStealthIndicator = true }), false,
 player.isSneaking = function() return true end
 isClientOnly = true
 PNC.Network.ClientState.stealthDiscovery = {
+    hasFollowingColonist = true,
     sneaking = true, discovered = true, revision = 1, expiresAt = 1200,
 }
 now = 1100

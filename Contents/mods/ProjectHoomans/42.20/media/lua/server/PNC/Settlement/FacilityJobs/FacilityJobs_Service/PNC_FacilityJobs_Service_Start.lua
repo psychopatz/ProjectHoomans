@@ -256,6 +256,11 @@ function Jobs.Start(record, facilityOrId, capability, options)
             options.resourceRadius or acquired.resourceRadius),
         activityItemFullType = activityItemFullType,
     })
+    -- Keep the normalized executor order beside the activity lease. Passive
+    -- mobile-group repair may rewrite record.orderSpec, but it must not make
+    -- the live facility executor lose its target or capability.
+    record.runtime.facilityActivity.activityOrder = PNC.Core.DeepCopy(
+        record.orderSpec)
     return true, "facility_activity_started", {
         npcID = record.id,
         facilityId = facility.id,

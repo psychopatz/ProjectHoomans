@@ -153,6 +153,23 @@ function Settings.ConstructionCancellationRefundMultiplier()
         0, 2)
 end
 
+function Settings.RadioDiscoveryEnabled()
+    return Settings.GetBoolean("RadioDiscoveryEnabled", true)
+end
+
+function Settings.RadioDiscoveryCooldownHours()
+    return Settings.GetNumber("RadioDiscoveryCooldownMinutes", 30, 1, 1440)
+        / 60
+end
+
+function Settings.RadioDiscoverySignalChance()
+    return Settings.GetNumber("RadioDiscoverySignalChance", 100, 0, 100)
+end
+
+function Settings.RadioDiscoveryLineSpacingSeconds()
+    return Settings.GetNumber("RadioDiscoveryLineSpacingSeconds", 2, 0, 10)
+end
+
 function Settings.PlayerOwnedNPCNeedMortalityEnabled()
     return Settings.GetBoolean("PlayerOwnedNPCNeedMortality", true)
 end

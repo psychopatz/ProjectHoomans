@@ -14,23 +14,26 @@ local function pack(id, priority, matches, messages)
     })
 end
 
-local function voiced(context, text)
-    local speaker = context.identityIntroduced
-        and context.npcFullName or "Unknown voice"
-    return speaker .. ": " .. text
+local function voiced(_, text)
+    return { text = text, speakerRole = "primary" }
 end
 
 local function reply(context, text)
     if context.hasSecondSpeaker ~= true then return nil end
-    local speaker = context.identityIntroduced
-        and context.npc2FirstName ~= ""
-        and context.npc2FirstName or "Second voice"
-    return speaker .. ": " .. text
+    return { text = text, speakerRole = "secondary" }
 end
 
 local function introduction(context)
     if not context.identityIntroduced then return nil end
-    return "My name is {npcFullName}. I speak for {factionName}."
+    return voiced(context, "My name is {npcFullName}. I speak for {factionName}.")
+end
+
+local function addressPlayer(context)
+    if context.playerNameKnown == true then
+        return voiced(context,
+            "{playerFirstName}, if that is you listening, please answer.")
+    end
+    return voiced(context, "If that is you listening, please answer.")
 end
 
 local function lines(...)
@@ -52,7 +55,7 @@ end, {
         reply(context, "Tell them about the wounded. The fever is getting worse."),
         voiced(context, "We're moving near {location}. We need medicine and food."),
         introduction(context),
-        voiced(context, "{playerFirstName}, if that is you listening, please answer."),
+        addressPlayer(context),
         "<fzzt>"
     ) end,
     function(context) return lines(

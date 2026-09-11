@@ -11,8 +11,8 @@ local MAX_SCENE_START_ATTEMPTS = Internal.MAX_SCENE_START_ATTEMPTS
 local Diagnostics = PNC.PerformanceScalingDiagnostics
 
 function Internal.Tick(record, zombie)
-    local order = record.orderSpec or {}
     local runtime = Internal.State(record)
+    local order = record.orderSpec or {}
     local definition = Definitions.Get(order.capability)
     local distance
     local arrivalDistance
@@ -31,6 +31,13 @@ function Internal.Tick(record, zombie)
     local started
     local startReason
     local startupNow
+    -- The durable order normally owns this data. If a passive group repair
+    -- replaced it while the activity remained live, use the canonical order
+    -- captured at activity start instead of falling through to FollowOwner.
+    if order.kind ~= KIND and runtime and runtime.activityOrder then
+        order = runtime.activityOrder
+        definition = Definitions.Get(order.capability)
+    end
     if order.kind ~= KIND or not runtime or not definition then return false end
     if runtime.campActivity == true
         and tostring(runtime.capability or "") == "sleep"

@@ -48,13 +48,41 @@ function H.SettlementEntity(community)
     }
 end
 
+local function liveGroupPosition(group)
+    local registry = PNC.Registry
+    local total = 0
+    local sumX = 0
+    local sumY = 0
+    local sumZ = 0
+    if not registry or not registry.Get then return nil end
+    for _, npcID in ipairs(group and group.memberIds or {}) do
+        local record = registry.Get(npcID)
+        local body = registry.GetLiveZombie
+            and registry.GetLiveZombie(npcID) or nil
+        local live = body or record and PNC.Const
+            and record.presenceState == PNC.Const.PRESENCE_LIVE
+        if live and record and record.alive ~= false
+            and tonumber(record.x) and tonumber(record.y)
+        then
+            total = total + 1
+            sumX = sumX + tonumber(record.x)
+            sumY = sumY + tonumber(record.y)
+            sumZ = sumZ + (tonumber(record.z) or 0)
+        end
+    end
+    if total <= 0 then return nil end
+    return sumX / total, sumY / total, sumZ / total
+end
+
 function H.MobileGroupEntity(group)
     local location = group and group.location
+    local liveX, liveY, liveZ
     if not group or not location
         or not tonumber(location.x) or not tonumber(location.y)
     then
         return nil
     end
+    liveX, liveY, liveZ = liveGroupPosition(group)
     return {
         entityID = tostring(group.id),
         kind = Types.KIND_MOBILE_GROUP,
@@ -63,9 +91,12 @@ function H.MobileGroupEntity(group)
         factionID = group.factionId,
         archetypeID = H.FactionArchetype(group.factionId),
         groupType = group.groupType,
-        x = tonumber(location.x),
-        y = tonumber(location.y),
-        z = tonumber(location.z) or 0,
+        -- Abstract groups use their strategic site.  Once members are live,
+        -- the marker follows their authoritative body centroid instead of a
+        -- stale abstract anchor.
+        x = liveX or tonumber(location.x),
+        y = liveY or tonumber(location.y),
+        z = liveZ or tonumber(location.z) or 0,
         population = #(group.memberIds or {}),
     }
 end

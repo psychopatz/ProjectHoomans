@@ -10,6 +10,7 @@ package.preload["PsychopatzCore/Radio/PsychopatzCustomRadioClient"] =
 local listener
 local halos = {}
 local published = {}
+local clock = 0
 local player = {}
 PsychopatzCore = {
     Conversation = {
@@ -24,6 +25,14 @@ PsychopatzCore = {
     RadioActions = { PLACEMENT_SIGNAL = "signal", Register = function() end },
 }
 PNC = {
+    VoiceGateway = {
+        GetNPCBinding = function(npcID)
+            if npcID == "npc_one" then
+                return { npc_uuid = npcID, slot = "VoiceFemale:1", pitch = -2 }
+            end
+            return { npc_uuid = npcID, slot = "VoiceMale:1", pitch = 3 }
+        end,
+    },
     Core = { Now = function() return 0 end },
     RadioDiscoveryChannel = {
         ID = "projecthoomans.frequency_scan", FREQUENCY = 69000,
@@ -40,6 +49,7 @@ getText = function(key)
     return values[key] or key
 end
 getSpecificPlayer = function() return player end
+getTimeInMillis = function() return clock end
 HaloTextHelper = {
     getColorGreen = function() return "green" end,
     addTextWithArrow = function(target, value, positive, color)
@@ -66,16 +76,49 @@ T.equal(PNC.RadioDiscoveryPresentation.ShowResult({ result = {
     kind = "settlement", phase = 1,
     radioBroadcast = {
         speech = { effect_profile = "radio", intensity = 0.85 },
-        lines = { "<wzzt>", "Unknown voice: Mayday, mayday." },
+        speakerNPCID = "npc_one",
+        secondarySpeakerNPCID = "npc_two",
+        lines = {
+            { text = "<wzzt>" },
+            {
+                text = "Mayday, mayday.",
+                speakerRole = "primary",
+                speakerNPCID = "npc_one",
+            },
+            {
+                text = "Tell them about the wounded.",
+                speakerRole = "secondary",
+                speakerNPCID = "npc_two",
+            },
+        },
     },
 } }), true, "broadcast result displays feedback")
-T.equal(#published, 1, "successful scan publishes one speakable radio line")
-T.equal(published[1].text, "Unknown voice: Mayday, mayday.",
-    "radio noise markers are not sent to TTS")
+T.equal(#published, 1,
+    "successful scan starts one radio line without a TTS burst")
+T.equal(published[1].text, "Mayday, mayday.",
+    "radio labels are not sent to TTS")
+T.equal(published[1].speakerID, "npc_one",
+    "primary radio line retains its internal speaker identity")
+T.equal(published[1].speakerName, nil,
+    "radio does not publish a player-facing speaker name")
+T.equal(published[1].voiceBinding.slot, "VoiceFemale:1",
+    "primary radio line resolves the selected NPC voice")
 T.equal(published[1].presentationState.speech.effect_profile, "radio",
     "radio broadcast selects the radio DSP profile")
-T.equal(published[1].voiceBinding.slot, "VoiceMale:0",
-    "radio broadcast supplies a fallback voice binding")
+T.equal(published[1].presentationState.speech.allow_overlap, false,
+    "radio speech explicitly disallows overlapping utterances")
+T.equal(published[1].presentationState.speech.can_interrupt, false,
+    "radio speech cannot interrupt an active utterance")
+clock = 2000
+PNC.RadioDiscoveryPresentation.Update()
+T.equal(#published, 2,
+    "the next radio line is released after the configured spacing")
+T.equal(published[2].text, "Tell them about the wounded.",
+    "serialized radio playback preserves line order")
+T.equal(published[2].speakerID, "npc_two",
+    "secondary radio line retains its internal speaker identity")
+T.equal(published[2].voiceBinding.slot, "VoiceMale:1",
+    "secondary radio line resolves a separate NPC voice")
 T.equal(PNC.RadioDiscoveryPresentation.ShowResult({ result = {
     ok = true, notificationID = "settlement:2:1",
     kind = "settlement", phase = 1,

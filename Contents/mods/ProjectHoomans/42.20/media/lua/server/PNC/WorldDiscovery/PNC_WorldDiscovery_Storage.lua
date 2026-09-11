@@ -56,6 +56,8 @@ local function normalizeRegistry(raw)
                     math.floor(tonumber(source.revision) or 0)),
                 lastRadioScanAt = math.max(0,
                     tonumber(source.lastRadioScanAt) or 0),
+                radioScanCount = math.max(0,
+                    math.floor(tonumber(source.radioScanCount) or 0)),
                 entities = { settlement = {}, mobile_group = {} },
             }
             for _, kind in ipairs({
@@ -79,6 +81,14 @@ local function normalizeRegistry(raw)
                                 tonumber(entry.updatedAt) or 0),
                             x = tonumber(entry.x), y = tonumber(entry.y),
                             z = tonumber(entry.z) or 0,
+                            arrivalState = Types.ArrivalState(
+                                entry.arrivalState),
+                            searchedAt = math.max(0,
+                                tonumber(entry.searchedAt) or 0),
+                            contactedAt = math.max(0,
+                                tonumber(entry.contactedAt) or 0),
+                            presenceStatus = Types.PresenceStatus(
+                                entry.presenceStatus),
                         }
                     end
                 end
@@ -123,6 +133,7 @@ function Internal.PlayerRecord(player, create)
         record = {
             revision = 0,
             lastRadioScanAt = 0,
+            radioScanCount = 0,
             entities = { settlement = {}, mobile_group = {} },
         }
         Discovery.Registry.players[uuid] = record
@@ -136,6 +147,7 @@ function Discovery.ResetPlayer(player)
     if not record then return false, uuid end
     record.entities = { settlement = {}, mobile_group = {} }
     record.lastRadioScanAt = 0
+    record.radioScanCount = 0
     record.revision = (tonumber(record.revision) or 0) + 1
     Discovery.Registry.revision =
         (tonumber(Discovery.Registry.revision) or 0) + 1

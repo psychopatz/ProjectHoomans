@@ -416,3 +416,41 @@ option ProjectHoomans.ConstructionCancellationRefundMultiplier
     page = ProjectHoomans,
     translation = ProjectHoomans.ConstructionCancellationRefundMultiplier,
 }
+
+option ProjectHoomans.RadioDiscoveryEnabled
+{
+    type = boolean,
+    default = true,
+    page = ProjectHoomans,
+    translation = ProjectHoomans.RadioDiscoveryEnabled,
+}
+
+option ProjectHoomans.RadioDiscoveryCooldownMinutes
+{
+    type = integer,
+    default = 30,
+    min = 1,
+    max = 1440,
+    page = ProjectHoomans,
+    translation = ProjectHoomans.RadioDiscoveryCooldownMinutes,
+}
+
+option ProjectHoomans.RadioDiscoverySignalChance
+{
+    type = double,
+    default = 100.0,
+    min = 0.0,
+    max = 100.0,
+    page = ProjectHoomans,
+    translation = ProjectHoomans.RadioDiscoverySignalChance,
+}
+
+option ProjectHoomans.RadioDiscoveryLineSpacingSeconds
+{
+    type = integer,
+    default = 2,
+    min = 0,
+    max = 10,
+    page = ProjectHoomans,
+    translation = ProjectHoomans.RadioDiscoveryLineSpacingSeconds,
+}

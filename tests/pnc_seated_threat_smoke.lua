@@ -15,6 +15,7 @@ local target = {
     y = 10,
     z = 0,
     visible = true,
+    threatening = true,
 }
 
 PNC = {
@@ -29,7 +30,9 @@ PNC = {
         UpdateTargetFromWorld = function(_, current)
             return threatActive and current or nil
         end,
-        ResolveRoamingEngageTarget = function(_, radius)
+    },
+    Perception = {
+        FindImmediateZombieThreat = function(_, radius)
             T.equal(radius, expectedRadius,
                 "seated threat search uses the stay engagement radius")
             return threatActive and target or nil
@@ -121,6 +124,7 @@ target = {
     y = 20,
     z = 0,
     visible = true,
+    threatening = true,
 }
 threatActive = true
 now = 2000

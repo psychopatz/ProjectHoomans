@@ -117,5 +117,13 @@
     "Sandbox_ProjectHoomans.NPCWeaponConditionLoss": "NPC Weapon Condition Loss",
     "Sandbox_ProjectHoomans.NPCWeaponConditionLoss_tooltip": "Allows equipped PNC NPC weapons to lose virtual condition when attacks hit.",
     "Sandbox_ProjectHoomans.ComponentDeconstructionRefundPercent": "Component Deconstruction Refund (%%)",
-    "Sandbox_ProjectHoomans.ComponentDeconstructionRefundPercent_tooltip": "Percentage of a component's Base.Money ingredients returned to colony storage when the component is deconstructed."
+    "Sandbox_ProjectHoomans.ComponentDeconstructionRefundPercent_tooltip": "Percentage of a component's Base.Money ingredients returned to colony storage when the component is deconstructed.",
+    "Sandbox_ProjectHoomans.RadioDiscoveryEnabled": "Radio Signal Discovery",
+    "Sandbox_ProjectHoomans.RadioDiscoveryEnabled_tooltip": "Allows tuned radios to discover survivor settlements and mobile groups.",
+    "Sandbox_ProjectHoomans.RadioDiscoveryCooldownMinutes": "Radio Discovery Cooldown (Minutes)",
+    "Sandbox_ProjectHoomans.RadioDiscoveryCooldownMinutes_tooltip": "Minimum in-game minutes between accepted radio scan attempts, including scans that find no usable signal.",
+    "Sandbox_ProjectHoomans.RadioDiscoverySignalChance": "Radio Signal Detection Chance (%%)",
+    "Sandbox_ProjectHoomans.RadioDiscoverySignalChance_tooltip": "Chance that a valid scan resolves a nearby undiscovered signal after the cooldown is satisfied.",
+    "Sandbox_ProjectHoomans.RadioDiscoveryLineSpacingSeconds": "Radio Line Spacing (Seconds)",
+    "Sandbox_ProjectHoomans.RadioDiscoveryLineSpacingSeconds_tooltip": "Real-time spacing between spoken lines in one radio transmission. Higher values reduce overlapping broadcasts."
 }

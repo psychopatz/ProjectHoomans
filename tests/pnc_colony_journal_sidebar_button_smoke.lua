@@ -61,10 +61,10 @@ T.contains(windowSource, 'id = "pnc-colony-journal-widget"',
     "journal widget does not have a stable toolbar id")
 T.contains(windowSource, "Options.ApplyOpacity(window, Options.GetOpacity())",
     "journal window does not consume shared command-hub opacity")
-T.contains(windowSource, "Options.ApplySurfaceOpacity(self.list, lift)",
-    "journal list does not use the shared content opacity lift")
-T.contains(windowSource, "self.contentOpacity = Options.GetContentOpacity(lift)",
-    "journal header does not use the shared content opacity lift")
+T.contains(windowSource, 'Options.ApplySurfaceOpacity(self.list, "detail")',
+    "journal list does not use the shared detail opacity role")
+T.contains(windowSource, 'self.contentOpacity = Options.GetContentOpacity("detail")',
+    "journal header does not use the shared detail opacity role")
 T.contains(windowSource, "window.owner = owner or window.owner",
     "journal window is not attached to its colony hub owner")
 T.contains(windowSource, "function JournalUI.Close()",

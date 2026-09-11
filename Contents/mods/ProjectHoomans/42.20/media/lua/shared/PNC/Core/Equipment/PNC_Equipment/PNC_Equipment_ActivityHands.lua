@@ -119,8 +119,14 @@ function Equipment.ApplyActivityHands(zombie, activity)
     if not zombie then
         return false, "missing_body"
     end
-    if fullType == "" then
+    if not activity then
         return clearActivityHands(zombie)
+    end
+    -- Keep the last valid activity item during a transient snapshot gap.
+    -- Clearing here would make a valid eating/drinking scene appear empty
+    -- until the next complete update arrives.
+    if fullType == "" then
+        return false, "activity_item_missing"
     end
     if hand ~= "both" then hand = "primary" end
 
@@ -143,7 +149,6 @@ function Equipment.ApplyActivityHands(zombie, activity)
 
     item, createReason = Equipment.CreateItem(fullType)
     if not item then
-        clearActivityHands(zombie)
         return false, createReason or "activity_item_create_failed"
     end
     if activity and activity.activityItemVisual

@@ -34,6 +34,7 @@ function Groups.ImportMobileFaction(factionOrID)
     if not location then return nil, reason end
     local existing = Groups.FindByFactionID(faction.id)
     if existing then
+        local at = Store.WorldAgeHours()
         local traveling = faction.mobile.activity
             == MOBILE_TRAVELING
         local ambient = not traveling
@@ -49,6 +50,23 @@ function Groups.ImportMobileFaction(factionOrID)
             H.Touch(existing, "mobile_ambient_import")
         end
         Groups.ReconcileMembers(existing, faction)
+        -- Relocation updates the faction site and member records first. Keep
+        -- the abstract group anchor in sync as well, otherwise discovery can
+        -- continue pointing at the previous site after a mobile move.
+        local live = Groups.HasLiveMembers
+            and Groups.HasLiveMembers(existing) or false
+        if not live and existing.state ~= "TRAVELING"
+            and existing.location
+            and existing.location.id ~= location.id
+        then
+            Locations.Depart(existing, at)
+            existing.location = Locations.Ref(location)
+            Locations.Arrive(existing, at, 0)
+            if Groups.SynchronizeMembersAtLocation then
+                Groups.SynchronizeMembersAtLocation(existing)
+            end
+            H.Touch(existing, "mobile_site_import")
+        end
         return existing, "existing"
     end
     local ids = H.MemberIDs(faction)

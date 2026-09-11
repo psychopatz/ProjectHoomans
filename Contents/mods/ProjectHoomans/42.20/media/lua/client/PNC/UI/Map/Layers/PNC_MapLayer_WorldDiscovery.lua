@@ -11,6 +11,7 @@ local Types = PNC.WorldDiscoveryTypes
 
 Layer.RefreshMs = 10000
 Layer.LastRefreshAt = Layer.LastRefreshAt or 0
+local isResolved
 
 local COLORS = {
     settlement = { r = 0.52, g = 0.38, b = 0.92 },
@@ -21,16 +22,26 @@ local COLORS = {
 local function visible()
     local snapshot = State.worldDiscovery
     if not snapshot then return false end
-    if PNC.MapDisplay
-        and PNC.MapDisplay.AreBasesVisible
-        and PNC.MapDisplay.AreBasesVisible()
-    then
-        return false
-    end
+    -- This layer is the player's earned knowledge.  It must remain visible
+    -- when the separate NPC WORLD/raw-entity overlay is enabled; otherwise
+    -- a radio discovery appears to vanish behind an unrelated map toggle.
     for _, entity in ipairs(snapshot.entities or {}) do
-        if entity.kind ~= Types.KIND_MOBILE_GROUP then return true end
+        if entity.kind == Types.KIND_SETTLEMENT
+            or entity.kind == Types.KIND_MOBILE_GROUP
+        then
+            if not isResolved(entity) and entity.x and entity.y then
+                return true
+            end
+        end
     end
     return false
+end
+
+isResolved = function(entity)
+    if not entity then return false end
+    return (tonumber(entity.phase) or 0) >= Types.PHASE_CONTACTED
+        or entity.arrivalState == "searched"
+        or entity.arrivalState == "contacted"
 end
 
 local function populationNPCVisible(snapshot)
@@ -147,7 +158,9 @@ function Layer.FindAt(map, mouseX, mouseY, padding)
     for _, entity in ipairs(State.worldDiscovery
         and State.worldDiscovery.entities or {})
     do
-        if entity.kind ~= Types.KIND_MOBILE_GROUP
+        if not isResolved(entity)
+            and (entity.kind == Types.KIND_SETTLEMENT
+                or entity.kind == Types.KIND_MOBILE_GROUP)
             and entity.x and entity.y
         then
             local x = map.mapAPI:worldToUIX(entity.x, entity.y)
@@ -176,7 +189,9 @@ function Layer.Render(map)
     local hovered
     local hoveredColor
     for _, entity in ipairs(State.worldDiscovery.entities or {}) do
-        if entity.kind ~= Types.KIND_MOBILE_GROUP
+        if not isResolved(entity)
+            and (entity.kind == Types.KIND_SETTLEMENT
+                or entity.kind == Types.KIND_MOBILE_GROUP)
             and entity.x and entity.y
         then
             local x = map.mapAPI:worldToUIX(entity.x, entity.y)

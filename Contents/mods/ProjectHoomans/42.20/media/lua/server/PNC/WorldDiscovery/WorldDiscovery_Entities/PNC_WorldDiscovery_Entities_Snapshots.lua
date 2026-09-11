@@ -45,6 +45,11 @@ function Discovery.BuildSnapshot(player, result)
                 source = entry.source,
                 discoveredAt = entry.discoveredAt,
                 updatedAt = entry.updatedAt,
+                arrivalState = Types.ArrivalState(entry.arrivalState),
+                searchedAt = tonumber(entry.searchedAt) or 0,
+                contactedAt = tonumber(entry.contactedAt) or 0,
+                presenceStatus = Types.PresenceStatus(
+                    entry.presenceStatus),
                 name = phase >= Types.PHASE_CONTACTED
                     and current and current.name
                     or kind == Types.KIND_SETTLEMENT
@@ -72,7 +77,7 @@ function Discovery.BuildSnapshot(player, result)
         revision = tonumber(record.revision) or 0,
         entities = entities,
         result = result,
-        radioCooldownHours = Discovery.RADIO_COOLDOWN_HOURS,
+        radioCooldownHours = Discovery.RadioCooldownHours(),
         lastRadioScanAt = tonumber(record.lastRadioScanAt) or 0,
         serverWorldHour = Internal.WorldHour(),
     }

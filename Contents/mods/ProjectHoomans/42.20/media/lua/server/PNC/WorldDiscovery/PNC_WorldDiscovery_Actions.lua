@@ -6,14 +6,46 @@ local Discovery = PNC.WorldDiscovery
 local Internal = Discovery.Internal
 local Types = PNC.WorldDiscoveryTypes
 
+local function lineSpeaker(context, line)
+    local role = type(line) == "table" and line.speakerRole or nil
+    role = tostring(role or "primary")
+    if role == "secondary" then
+        return role, context and context.secondarySpeakerNPCID or nil
+    end
+    return "primary", context and context.speakerNPCID or nil
+end
+
+local function signalRollPasses()
+    local chance = Discovery.RadioSignalChance()
+    if chance <= 0 then return false end
+    if chance >= 100 then return true end
+    local roll
+    if type(Discovery.RadioSignalRoll) == "function" then
+        roll = Discovery.RadioSignalRoll()
+    elseif ZombRand then
+        roll = ZombRand(100)
+    else
+        roll = math.random(0, 99)
+    end
+    return (tonumber(roll) or 99) < chance
+end
+
+local function markRadioAttempt(record, at)
+    record.lastRadioScanAt = at
+    record.radioScanCount = (tonumber(record.radioScanCount) or 0) + 1
+    Discovery.Dirty = true
+end
+
 local function compactRadioBroadcast(message, context)
     if type(message) ~= "table" or type(message.lines) ~= "table" then
         return nil
     end
     local output = {
         packID = tostring(message.packID or ""),
-        speakerNPCID = context and context.identityIntroduced == true
-            and context.speakerNPCID or nil,
+        -- This is an internal voice-continuity identity, not a player-facing
+        -- disclosure. IdentityIntroduced remains the only name-reveal gate.
+        speakerNPCID = context and context.speakerNPCID or nil,
+        secondarySpeakerNPCID = context and context.secondarySpeakerNPCID or nil,
         speech = {
             effect_profile = "radio",
             environment = "normal",
@@ -23,12 +55,17 @@ local function compactRadioBroadcast(message, context)
     }
     for _, line in ipairs(message.lines) do
         local value = type(line) == "table" and line.text or line
+        local speakerRole, speakerID = lineSpeaker(context, line)
         value = tostring(value or "")
         value = string.gsub(value, "<[^>]+>", "")
         value = string.gsub(value, "^%s+", "")
         value = string.gsub(value, "%s+$", "")
         if value ~= "" then
-            output.lines[#output.lines + 1] = string.sub(value, 1, 600)
+            output.lines[#output.lines + 1] = {
+                text = string.sub(value, 1, 600),
+                speakerRole = speakerRole,
+                speakerNPCID = speakerID,
+            }
         end
     end
     return #output.lines > 0 and output or nil
@@ -39,12 +76,32 @@ function Discovery.RadioScan(player, channelID, frequency)
     if not record then return Discovery.BuildSnapshot(player, {
         ok = false, reason = reason,
     }) end
+    if not Discovery.RadioDiscoveryEnabled() then
+        return Discovery.BuildSnapshot(player, {
+            ok = false, reason = "radio_discovery_disabled",
+        })
+    end
     local scanChannel = PNC.RadioDiscoveryChannel
     if tostring(channelID or "") ~= scanChannel.ID
         or math.floor(tonumber(frequency) or 0) ~= scanChannel.FREQUENCY
     then
         return Discovery.BuildSnapshot(player, {
             ok = false, reason = "invalid_channel",
+        })
+    end
+    local at = Internal.WorldHour()
+    local cooldownHours = Discovery.RadioCooldownHours()
+    local lastScanAt = tonumber(record.lastRadioScanAt)
+    local hasPreviousScan = (tonumber(record.radioScanCount) or 0) > 0
+        or lastScanAt ~= nil and lastScanAt > 0
+    local remaining = cooldownHours
+        - (at - (lastScanAt or 0))
+    if hasPreviousScan and remaining > 0 then
+        return Discovery.BuildSnapshot(player, {
+            ok = false,
+            reason = "radio_cooldown",
+            cooldownSeconds = math.ceil(remaining * 3600),
+            channelID = scanChannel.ID,
         })
     end
     local best
@@ -61,27 +118,23 @@ function Discovery.RadioScan(player, channelID, frequency)
         end
     end
     if not best then
+        markRadioAttempt(record, at)
         Discovery.Save()
         return Discovery.BuildSnapshot(player, {
             ok = false, reason = "no_signal",
             channelID = scanChannel.ID,
         })
     end
-    local at = Internal.WorldHour()
-    local remaining = Discovery.RADIO_COOLDOWN_HOURS
-        - (at - (tonumber(record.lastRadioScanAt) or 0))
-    if record.lastRadioScanAt and record.lastRadioScanAt > 0
-        and remaining > 0
-    then
+    if not signalRollPasses() then
+        markRadioAttempt(record, at)
+        Discovery.Save()
         return Discovery.BuildSnapshot(player, {
             ok = false,
-            reason = "radio_cooldown",
-            cooldownSeconds = math.ceil(remaining * 3600),
+            reason = "no_signal",
             channelID = scanChannel.ID,
         })
     end
-    record.lastRadioScanAt = at
-    Discovery.Dirty = true
+    markRadioAttempt(record, at)
     local existing = record.entities[best.kind][best.entityID]
     local nextPhase = existing and Types.PHASE_LOCATED
         or Types.PHASE_RUMORED
@@ -201,11 +254,26 @@ function Discovery.DiscoverNPCContext(player, npcID)
         and PNC.Registry.Get(npcID) or nil
     local affiliation = npc and npc.affiliation or {}
     local changed = false
+    local dirty = false
     if affiliation.communityID then
-        local _, reason = Discovery.SetPhase(player,
-            Types.KIND_SETTLEMENT, affiliation.communityID,
-            Types.PHASE_CONTACTED, "conversation")
+        local entity = Discovery.ResolveEntity(
+            Types.KIND_SETTLEMENT, affiliation.communityID)
+        local _, reason = Discovery.SetPhase(
+            player,
+            Types.KIND_SETTLEMENT,
+            affiliation.communityID,
+            Types.PHASE_CONTACTED,
+            "conversation",
+            true
+        )
         changed = changed or reason == "advanced"
+        dirty = dirty or reason == "advanced"
+        if entity then
+            local _, arrivalReason = Discovery.MarkContacted(
+                player, entity, "conversation", true)
+            changed = changed or arrivalReason == "advanced"
+            dirty = dirty or arrivalReason == "advanced"
+        end
     end
     if affiliation.factionID and PNC.AbstractGroups
         and PNC.AbstractGroups.FindByFactionID
@@ -213,12 +281,27 @@ function Discovery.DiscoverNPCContext(player, npcID)
         local group = PNC.AbstractGroups.FindByFactionID(
             affiliation.factionID)
         if group then
-            local _, reason = Discovery.SetPhase(player,
-                Types.KIND_MOBILE_GROUP, group.id,
-                Types.PHASE_CONTACTED, "conversation")
+            local entity = Discovery.ResolveEntity(
+                Types.KIND_MOBILE_GROUP, group.id)
+            local _, reason = Discovery.SetPhase(
+                player,
+                Types.KIND_MOBILE_GROUP,
+                group.id,
+                Types.PHASE_CONTACTED,
+                "conversation",
+                true
+            )
             changed = changed or reason == "advanced"
+            dirty = dirty or reason == "advanced"
+            if entity then
+                local _, arrivalReason = Discovery.MarkContacted(
+                    player, entity, "conversation", true)
+                changed = changed or arrivalReason == "advanced"
+                dirty = dirty or arrivalReason == "advanced"
+            end
         end
     end
+    if dirty then Discovery.Save() end
     if changed and PNC.Network and PNC.Network.SendWorldDiscovery then
         PNC.Network.SendWorldDiscovery(player,
             Discovery.BuildSnapshot(player, {

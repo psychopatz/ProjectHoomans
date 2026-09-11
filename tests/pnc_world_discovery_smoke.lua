@@ -140,12 +140,25 @@ T.equal(PNC.RadioDiscoveryChannel.FREQUENCY, 69000,
     "scan channel uses 69.0 MHz")
 
 local disclosures = {}
+local knownNames = {}
+PNC.PlayerContext = {
+    Resolve = function()
+        return { characterUUID = characterUUID }
+    end,
+}
 PNC.NPCKnowledge = {
     DiscoverTopicForPlayer = function(_, npcID, topicID, _, sourceType)
         disclosures[#disclosures + 1] = {
             npcID = npcID, topicID = topicID, sourceType = sourceType,
         }
         return { revealed = { "identity.name", "faction.identity" } }
+    end,
+    GetDescriptor = function(_, npcID, descriptorID)
+        if descriptorID == "identity.name" and knownNames[npcID] then
+            return { value = npcID == "npc_one" and "Mara Cole"
+                or "Jonas Reed" }
+        end
+        return nil
     end,
     BuildPlayerSnapshotForPlayer = function(_, npcID)
         return { npcID = npcID, categories = {} }
@@ -223,10 +236,27 @@ T.truthy(#radio.result.radioBroadcast.lines > 0,
     "radio scan result carries speakable broadcast lines")
 T.equal(#airedBroadcasts, 1,
     "a discovery trigger airs one native custom-channel broadcast")
+local primaryRadioLine
+local secondaryRadioLine
+for _, line in ipairs(radio.result.radioBroadcast.lines) do
+    if line.speakerRole == "secondary" then
+        secondaryRadioLine = line
+    elseif line.speakerRole == "primary" then
+        primaryRadioLine = line
+    end
+end
+T.equal(primaryRadioLine and primaryRadioLine.speakerNPCID,
+    airedBroadcasts[1].context.speakerNPCID,
+    "radio result keeps the selected primary speaker for voice continuity")
+T.equal(secondaryRadioLine and secondaryRadioLine.speakerNPCID,
+    airedBroadcasts[1].context.secondarySpeakerNPCID,
+    "radio result keeps the selected secondary speaker for voice continuity")
 T.equal(airedBroadcasts[1].context.groupType, "REFUGEE",
     "broadcast context identifies the discovered group kind")
-T.equal(airedBroadcasts[1].context.playerFirstName, "Casey",
-    "broadcast templates expose the player's first name")
+T.equal(airedBroadcasts[1].context.playerFirstName, "listener",
+    "unknown radio speakers do not receive the player's name")
+T.equal(airedBroadcasts[1].context.playerNameKnown, false,
+    "radio name addressing is scoped to the selected speaker's knowledge")
 T.equal(airedBroadcasts[1].context.npcFullName, "Mara Cole",
     "radio speaker identity comes from a real group member")
 T.equal(airedBroadcasts[1].context.factionName, "Road Refugees",
@@ -235,17 +265,29 @@ T.equal(disclosures[1].npcID, "npc_one",
     "radio introduction persists knowledge for the speaking NPC")
 T.equal(disclosures[1].topicID, "identity_name",
     "radio introduction uses the same identity topic as asking a name")
+T.equal(disclosures[2].topicID, "faction",
+    "radio introduction persists the explicitly claimed faction")
+local throttled = Discovery.RadioScan(player,
+    PNC.RadioDiscoveryChannel.ID, PNC.RadioDiscoveryChannel.FREQUENCY)
+T.equal(throttled.result.reason, "radio_cooldown",
+    "radio scans are server-throttled after a successful attempt")
+T.equal(throttled.result.cooldownSeconds, 1800,
+    "the default radio cooldown is thirty in-game minutes")
 airedBroadcasts[1].context.random = function() return 1 end
 local dynamicFlavor = PsychopatzCore.CustomRadio.SelectMessage(
     PNC.RadioDiscoveryChannel.ID, "discovery",
     airedBroadcasts[1].context
 )
 T.equal(dynamicFlavor.lines[2].text,
-    "Mara Cole: Mayday, mayday. Is anyone still listening?",
-    "native chatter names the real selected group member")
+    "Mayday, mayday. Is anyone still listening?",
+    "native chatter does not add a speaker label")
+T.equal(dynamicFlavor.lines[2].speakerRole, "primary",
+    "native chatter marks the primary speaker separately from its text")
 T.equal(dynamicFlavor.lines[3].text,
-    "Jonas: Tell them about the wounded. The fever is getting worse.",
-    "background reply uses another real group member")
+    "Tell them about the wounded. The fever is getting worse.",
+    "background reply does not add a speaker label")
+T.equal(dynamicFlavor.lines[3].speakerRole, "secondary",
+    "background reply marks the secondary speaker separately from its text")
 T.equal(Discovery.RADIO_IDENTITY_REVEAL_CHANCE, 35,
     "radio identity introductions remain chance based")
 Discovery.RadioIdentityRevealRoll = function() return 99 end
@@ -258,6 +300,29 @@ T.equal(anonymousContext.identityIntroduced, false,
     "most broadcasts can remain anonymous")
 T.equal(anonymousContext.npcFullName, "unknown caller",
     "anonymous broadcasts do not leak the selected member name")
+T.equal(anonymousContext.speakerNPCID, "npc_one",
+    "anonymous broadcasts still retain an internal voice-continuity identity")
+knownNames.npc_one = true
+local knownContext = Discovery.BuildRadioTemplateContext(
+    player,
+    Discovery.ResolveEntity(Types.KIND_MOBILE_GROUP, "group_one"),
+    Types.PHASE_RUMORED
+)
+T.equal(knownContext.playerFirstName, "Casey",
+    "a known speaker may address the player by name")
+T.equal(knownContext.playerNameKnown, true,
+    "known-name state is attached to the selected radio speaker")
+local knownFlavor = PsychopatzCore.CustomRadio.SelectMessage(
+    PNC.RadioDiscoveryChannel.ID, "discovery", knownContext
+)
+local addressedByName = false
+for _, line in ipairs(knownFlavor.lines or {}) do
+    if string.find(line.text or "", "Casey", 1, true) then
+        addressedByName = true
+    end
+end
+T.truthy(addressedByName,
+    "known radio speakers may use the player's name in flavor text")
 Discovery.RadioIdentityRevealRoll = function() return 0 end
 
 hour = 12
@@ -268,6 +333,19 @@ T.equal(located.result.phase, Types.PHASE_LOCATED,
 T.equal(#airedBroadcasts, 2,
     "each successful discovery can randomize a fresh broadcast")
 
+local mobileEntity = Discovery.ResolveEntity(
+    Types.KIND_MOBILE_GROUP, "group_one")
+local _, arrivalReason = Discovery.MarkArrived(
+    player, mobileEntity, Types.PRESENCE_ABSENT, "traversal")
+T.equal(arrivalReason, "advanced",
+    "physical traversal records a separate arrival state")
+local arrived = entityOf(Discovery.BuildSnapshot(player),
+    Types.KIND_MOBILE_GROUP)
+T.equal(arrived.arrivalState, Types.ARRIVAL_SEARCHED,
+    "arrival state is included in the player snapshot")
+T.equal(arrived.presenceStatus, Types.PRESENCE_ABSENT,
+    "arrival preserves whether a physical group was found")
+
 Discovery.DiscoverNPCContext(player, "npc_one")
 local contacted = Discovery.BuildSnapshot(player)
 T.equal(entityOf(contacted, Types.KIND_SETTLEMENT).phase,
@@ -276,6 +354,12 @@ T.equal(entityOf(contacted, Types.KIND_SETTLEMENT).phase,
 T.equal(entityOf(contacted, Types.KIND_MOBILE_GROUP).phase,
     Types.PHASE_CONTACTED,
     "conversation contacts mobile group")
+T.equal(entityOf(contacted, Types.KIND_MOBILE_GROUP).arrivalState,
+    Types.ARRIVAL_CONTACTED,
+    "conversation upgrades the arrival state without deleting knowledge")
+T.equal(entityOf(contacted, Types.KIND_MOBILE_GROUP).presenceStatus,
+    Types.PRESENCE_PRESENT,
+    "conversation confirms physical presence")
 T.equal(entityOf(contacted, Types.KIND_SETTLEMENT).name, "Haven",
     "contact reveals settlement identity")
 
@@ -303,6 +387,26 @@ T.equal(reset.result.ok, true,
     "debug modal can reset an accidentally revealed character")
 T.equal(#reset.entities, 0,
     "reset restores radio discovery to an empty character map")
+PNC.Sandbox = {
+    RadioDiscoveryEnabled = function() return false end,
+    RadioDiscoveryCooldownHours = function() return 0.5 end,
+    RadioDiscoverySignalChance = function() return 100 end,
+}
+local disabledRadio = Discovery.RadioScan(player,
+    PNC.RadioDiscoveryChannel.ID, PNC.RadioDiscoveryChannel.FREQUENCY)
+T.equal(disabledRadio.result.reason, "radio_discovery_disabled",
+    "sandbox can disable passive radio discovery")
+PNC.Sandbox.RadioDiscoveryEnabled = function() return true end
+PNC.Sandbox.RadioDiscoverySignalChance = function() return 0 end
+local missedSignal = Discovery.RadioScan(player,
+    PNC.RadioDiscoveryChannel.ID, PNC.RadioDiscoveryChannel.FREQUENCY)
+T.equal(missedSignal.result.reason, "no_signal",
+    "sandbox signal chance can suppress a valid candidate")
+local throttledMiss = Discovery.RadioScan(player,
+    PNC.RadioDiscoveryChannel.ID, PNC.RadioDiscoveryChannel.FREQUENCY)
+T.equal(throttledMiss.result.reason, "radio_cooldown",
+    "failed signal attempts still receive request pacing")
+PNC.Sandbox = nil
 
 local manyGroups = {}
 for index = 1, 100 do

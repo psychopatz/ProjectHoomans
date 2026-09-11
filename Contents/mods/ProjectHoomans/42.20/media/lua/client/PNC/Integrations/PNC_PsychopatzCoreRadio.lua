@@ -22,6 +22,29 @@ local PROBE_INTERVAL_MS = 40000
 PNC.RadioDiscoveryPresentation = PNC.RadioDiscoveryPresentation or {}
 local Presentation = PNC.RadioDiscoveryPresentation
 Presentation.lastNotificationID = Presentation.lastNotificationID or nil
+Presentation.pendingBroadcasts = Presentation.pendingBroadcasts or {}
+Presentation.pendingNotificationIDs = Presentation.pendingNotificationIDs or {}
+
+local MAX_PENDING_BROADCASTS = 4
+
+local function nowMs()
+    if getTimeInMillis then return tonumber(getTimeInMillis()) or 0 end
+    if getTimestampMs then return tonumber(getTimestampMs()) or 0 end
+    local time = getGameTime and getGameTime() or nil
+    if time and time.getWorldAgeHours then
+        return (tonumber(time:getWorldAgeHours()) or 0) * 3600000
+    end
+    return 0
+end
+
+local function lineSpacingMs()
+    local settings = PNC.Sandbox
+    if settings and type(settings.RadioDiscoveryLineSpacingSeconds) == "function" then
+        return math.max(0, tonumber(settings.RadioDiscoveryLineSpacingSeconds())
+            or 2) * 1000
+    end
+    return 2000
+end
 
 local function tr(key, fallback)
     local value = getText and getText(key) or nil
@@ -51,6 +74,128 @@ local function broadcastLineText(value)
     return value
 end
 
+local FALLBACK_RADIO_VOICE_SLOTS = {
+    "VoiceFemale:0",
+    "VoiceMale:0",
+    "VoiceFemale:1",
+    "VoiceMale:1",
+    "VoiceFemale:2",
+    "VoiceMale:2",
+    "VoiceFemale:3",
+    "VoiceMale:3",
+}
+
+local function fallbackVoiceSlot(speakerID)
+    speakerID = tostring(speakerID or "")
+    if string.sub(speakerID, 1, 6) == "radio:" then
+        return "VoiceMale:0"
+    end
+    local hash = 0
+    for index = 1, #speakerID do
+        hash = (hash * 31 + (string.byte(speakerID, index) or 0))
+            % #FALLBACK_RADIO_VOICE_SLOTS
+    end
+    return FALLBACK_RADIO_VOICE_SLOTS[hash + 1]
+end
+
+local function voiceBindingFor(speakerID)
+    local gateway = PNC and PNC.VoiceGateway or nil
+    if gateway and type(gateway.GetNPCBinding) == "function" then
+        local ok, binding = pcall(gateway.GetNPCBinding, speakerID)
+        if ok and type(binding) == "table"
+            and tostring(binding.slot or "") ~= ""
+        then
+            return binding
+        end
+    end
+    return {
+        npc_uuid = speakerID,
+        slot = fallbackVoiceSlot(speakerID),
+        pitch = 0,
+    }
+end
+
+local function speakerForLine(broadcast, line, notificationID)
+    local role = type(line) == "table"
+        and (line.speakerRole or line.speaker_role) or nil
+    role = tostring(role or "primary")
+    local speakerID = type(line) == "table"
+        and (line.speakerNPCID or line.speakerID or line.speaker_id) or nil
+    if not speakerID then
+        speakerID = role == "secondary"
+            and broadcast.secondarySpeakerNPCID or broadcast.speakerNPCID
+    end
+    speakerID = tostring(speakerID or "")
+    if speakerID == "" then
+        speakerID = "radio:" .. notificationID .. ":" .. role
+    end
+    return role, speakerID
+end
+
+local function publishBroadcastLine(item, line)
+    local broadcast = item.broadcast
+    local notificationID = item.notificationID
+    local text = broadcastLineText(line)
+    if text == "" then return false end
+    local speakerRole, speakerID = speakerForLine(
+        broadcast, line, notificationID
+    )
+    local messageID = "radio-broadcast:" .. notificationID
+        .. ":" .. tostring(item.index)
+    Message.Publish(Message.New({
+        messageID = messageID,
+        conversationID = "radio:" .. notificationID,
+        sequence = item.index,
+        speaker = "npc",
+        speakerID = speakerID,
+        speakerKind = "npc",
+        npcUUID = speakerID,
+        namespace = "ProjectHoomans.Radio",
+        text = text,
+        payload = {
+            text = text,
+            style = "radio_broadcast",
+            speakerRole = speakerRole,
+        },
+        source = {
+            kind = "radio_broadcast",
+            channel = "radio",
+            requestID = notificationID,
+        },
+        voiceBinding = voiceBindingFor(speakerID),
+        presentationState = {
+            conversationUI = false,
+            nameplate = false,
+            tts = true,
+            speech = item.speech,
+        },
+    }))
+    return true
+end
+
+function Presentation.Update()
+    local queue = Presentation.pendingBroadcasts
+    local item = queue[1]
+    if not item then return false end
+    local at = nowMs()
+    if at < (tonumber(item.nextAt) or 0) then return false end
+    if not activeRadio() then
+        Presentation.pendingNotificationIDs[item.notificationID] = nil
+        table.remove(queue, 1)
+        return false
+    end
+    local line = item.lines[item.index]
+    if line then publishBroadcastLine(item, line) end
+    item.index = item.index + 1
+    if item.index > #item.lines then
+        Presentation.pendingNotificationIDs[item.notificationID] = nil
+        table.remove(queue, 1)
+    else
+        item.nextAt = at + lineSpacingMs()
+    end
+    return true
+end
+
 function Presentation.PlayBroadcast(payload)
     local result = payload and payload.result or nil
     local broadcast = result and result.radioBroadcast or nil
@@ -61,57 +206,42 @@ function Presentation.PlayBroadcast(payload)
         or type(broadcast.lines) ~= "table"
         or notificationID == ""
         or not activeRadio()
+        or Presentation.pendingNotificationIDs[notificationID]
+        or #Presentation.pendingBroadcasts >= MAX_PENDING_BROADCASTS
     then
         return false
     end
-    local speakerID = tostring(
-        broadcast.speakerNPCID or "radio:" .. notificationID
-    )
     local speech = type(broadcast.speech) == "table"
         and broadcast.speech or {
             effect_profile = "radio",
             environment = "normal",
             intensity = 0.85,
         }
-    local published = 0
-    for index, line in ipairs(broadcast.lines) do
-        local text = broadcastLineText(line)
-        if text ~= "" then
-            local messageID = "radio-broadcast:" .. notificationID
-                .. ":" .. tostring(index)
-            Message.Publish(Message.New({
-                messageID = messageID,
-                conversationID = "radio:" .. notificationID,
-                sequence = index,
-                speaker = "npc",
-                speakerID = speakerID,
-                speakerName = "Radio contact",
-                speakerKind = "npc",
-                npcUUID = speakerID,
-                namespace = "ProjectHoomans.Radio",
-                text = text,
-                payload = { text = text, style = "radio_broadcast" },
-                source = {
-                    kind = "radio_broadcast",
-                    channel = "radio",
-                    requestID = notificationID,
-                },
-                voiceBinding = {
-                    npc_uuid = speakerID,
-                    slot = "VoiceMale:0",
-                    pitch = 0,
-                },
-                presentationState = {
-                    conversationUI = false,
-                    nameplate = false,
-                    tts = true,
-                    speech = speech,
-                },
-            }))
-            published = published + 1
+    -- Make the non-overlap contract explicit for the Core/PBrainZ bridge;
+    -- the client queue below also prevents a burst before the bridge sees it.
+    if speech.mode == nil then speech.mode = "RESPONSE" end
+    if speech.allow_overlap == nil then speech.allow_overlap = false end
+    if speech.can_interrupt == nil then speech.can_interrupt = false end
+    local lines = {}
+    for _, line in ipairs(broadcast.lines) do
+        if broadcastLineText(line) ~= "" then
+            lines[#lines + 1] = line
         end
     end
-    return published > 0
+    if #lines == 0 then return false end
+    Presentation.pendingNotificationIDs[notificationID] = true
+    Presentation.pendingBroadcasts[#Presentation.pendingBroadcasts + 1] = {
+        broadcast = broadcast,
+        lines = lines,
+        notificationID = notificationID,
+        speech = speech,
+        index = 1,
+        nextAt = nowMs(),
+    }
+    -- Deliver the first line immediately; subsequent lines are serialized on
+    -- the game tick so one discovery cannot create a TTS burst.
+    Presentation.Update()
+    return true
 end
 
 local function noticeKey(result)
@@ -161,9 +291,34 @@ function Presentation.ShowResult(payload)
     return true
 end
 
+local function resetPresentationQueue()
+    Presentation.pendingBroadcasts = {}
+    Presentation.pendingNotificationIDs = {}
+end
+
+if Events and Events.OnResetLua and Events.OnResetLua.Add
+    and not Presentation._resetHookInstalled
+then
+    Events.OnResetLua.Add(resetPresentationQueue)
+    Presentation._resetHookInstalled = true
+end
+
+if Events and Events.OnTick and Events.OnTick.Add
+    and not Presentation._tickInstalled
+then
+    Events.OnTick.Add(Presentation.Update)
+    Presentation._tickInstalled = true
+end
+
 if CustomRadio and CustomRadio.RegisterListener and ScanChannel then
     CustomRadio.RegisterListener(ScanChannel.ID,
         "projecthoomans.discovery", function(context)
+            local settings = PNC.Sandbox
+            if settings and type(settings.RadioDiscoveryEnabled) == "function"
+                and settings.RadioDiscoveryEnabled() ~= true
+            then
+                return true
+            end
             local player = context and context.player
             local key = player and player.getUsername
                 and tostring(player:getUsername())

@@ -43,6 +43,12 @@ ok, reason = PNC.Equipment.ApplyActivityHands(body, {
 T.truthy(ok, reason)
 T.equal(body.refreshes, 1, "same activity item is latched")
 
+ok, reason = PNC.Equipment.ApplyActivityHands(body, {})
+T.falsy(ok, "an unresolved activity item is reported")
+T.equal(reason, "activity_item_missing", "missing activity item reason")
+T.equal(body.primary.fullType, "Base.Apple",
+    "transient missing item does not clear the visible activity item")
+
 ok, reason = PNC.Equipment.ApplyActivityHands(body, nil)
 T.truthy(ok, reason)
 T.equal(body.primary, nil, "activity item cleared")

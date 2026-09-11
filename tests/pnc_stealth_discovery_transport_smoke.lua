@@ -30,6 +30,7 @@ T.load(
 T.truthy(commandHandler, "stealth command handler")
 T.truthy(commandHandler({
     sneaking = true,
+    hasFollowingColonist = true,
     discovered = false,
     reason = "owner_hidden",
     revision = 2,
@@ -37,11 +38,14 @@ T.truthy(commandHandler({
 }), "initial payload accepted")
 T.equal(PNC.Network.ClientState.stealthDiscovery.discovered, false,
     "hidden payload")
+T.equal(PNC.Network.ClientState.stealthDiscovery.hasFollowingColonist, true,
+    "follower gate payload")
 T.equal(PNC.Network.ClientState.stealthDiscovery.expiresAt, 1250,
     "client-relative stealth lease")
 
 T.falsy(commandHandler({
     sneaking = true,
+    hasFollowingColonist = true,
     discovered = true,
     reason = "owner_seen",
     revision = 1,
@@ -52,6 +56,7 @@ T.equal(PNC.Network.ClientState.stealthDiscovery.revision, 2,
 
 T.truthy(commandHandler({
     sneaking = true,
+    hasFollowingColonist = true,
     discovered = true,
     reason = "owner_seen",
     revision = 3,

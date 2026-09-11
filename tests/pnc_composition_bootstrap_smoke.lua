@@ -95,12 +95,25 @@ T.equal(serverCalls[settlementIndex - 1], "PNC/Communities/PNC_CommunityService"
     "server Settlement initialization predecessor")
 local facilityJobsIndex = indexOf(serverCalls,
     "PNC/Settlement/FacilityJobs/PNC_FacilityJobs_Service")
+local roamingSeatIndex = indexOf(serverCalls,
+    "PNC/Settlement/FacilityJobs/PNC_RoamingSeatService")
+local nearbyResourceIndex = indexOf(serverCalls,
+    "PNC/World/PNC_NearbyResourceLocator")
+local nearbyWaterIndex = indexOf(serverCalls,
+    "PNC/World/PNC_NearbyWaterService")
+local campResourceIndex = indexOf(serverCalls,
+    "PNC/World/PNC_CampResourceService")
+local taskingIndex = indexOf(serverCalls, "PNC/Tasking/PNC_Tasking")
 T.equal(serverCalls[facilityJobsIndex + 1],
-    "PNC/World/PNC_NearbyResourceLocator",
-    "nearby resource services load before Tasking")
-T.equal(serverCalls[facilityJobsIndex + 3], "PNC/World/PNC_CampResourceService",
-    "camp resources load after nearby resource services")
-T.equal(serverCalls[facilityJobsIndex + 4], "PNC/Tasking/PNC_Tasking",
+    "PNC/Settlement/FacilityJobs/PNC_RoamingSeatService",
+    "roaming seat service loads after facility jobs")
+T.truthy(nearbyResourceIndex > roamingSeatIndex,
+    "nearby resource services load after roaming seat service")
+T.truthy(nearbyResourceIndex < nearbyWaterIndex,
+    "nearby water loads after nearby resources")
+T.truthy(nearbyWaterIndex < campResourceIndex,
+    "camp resources load after nearby water")
+T.truthy(campResourceIndex < taskingIndex,
     "Tasking loads after nearby resource services")
 T.equal(serverCalls[settlementIndex + 1], "PNC/Journals/PNC_JournalRoutes",
     "server Settlement initialization successor")

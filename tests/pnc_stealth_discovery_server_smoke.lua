@@ -37,6 +37,30 @@ PNC = {
             end,
         },
     },
+    Registry = {
+        Data = {
+            follower = {
+                alive = true,
+                tacticalClass = "colonist",
+                recruited = true,
+                ownerUsername = "local-player",
+                orderSpec = {
+                    kind = "follow",
+                    ownerUsername = "local-player",
+                },
+            },
+            roam_group = {
+                alive = true,
+                tacticalClass = "neutral",
+                recruited = false,
+                ownerUsername = "local-player",
+                orderSpec = {
+                    kind = "roam",
+                    ownerUsername = "local-player",
+                },
+            },
+        },
+    },
     Stealth = {
         IsOwnerActuallySneaking = function() return true end,
         IsOwnerDiscovered = function()
@@ -58,6 +82,8 @@ T.equal(#sent, 1, "initial stealth packet count")
 T.equal(sent[1].command, "StealthDiscovery", "stealth command")
 T.equal(sent[1].payload.discovered, false, "hidden state")
 T.equal(sent[1].payload.sneaking, true, "sneaking state")
+T.equal(sent[1].payload.hasFollowingColonist, true,
+    "colonist follower gate")
 
 now = 1100
 T.equal(service.Pump(now), 0, "pump ignored its update cadence")
@@ -72,5 +98,13 @@ now = 2200
 T.equal(service.Pump(now), 1, "discovery transition was not sent")
 T.equal(sent[3].payload.discovered, true, "discovered state")
 T.equal(sent[3].payload.reason, "owner_seen", "discovery reason")
+
+PNC.Registry.Data.follower = nil
+now = 2400
+T.equal(service.Pump(now), 1, "follower removal was not sent")
+T.equal(sent[4].payload.hasFollowingColonist, false,
+    "non-follower state")
+T.equal(sent[4].payload.discovered, false,
+    "non-follower discovery was not cleared")
 
 T.finish("pnc_stealth_discovery_server_smoke")

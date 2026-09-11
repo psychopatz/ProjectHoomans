@@ -67,14 +67,23 @@ PNC.Network.ClientState.worldDiscovery.entities = {
     { kind = "settlement", entityID = "home", x = 11, y = 11 },
 }
 T.equal(PNC.WorldDiscoveryMapLayer.FindAt(map, 10, 10, 12).kind,
-    "settlement", "mobile group retained a static map hit target")
+    "mobile_group", "mobile discovery has a map hit target")
 PNC.Network.ClientState.worldDiscovery.entities = {
     { kind = "mobile_group", entityID = "mobile", x = 10, y = 10 },
 }
-T.equal(registered.definition.isVisible(), false,
-    "mobile-only discovery state retained a visible map layer")
+PNC.MapDisplay = { AreBasesVisible = function() return true end }
+T.equal(registered.definition.isVisible(), true,
+    "earned discovery remains visible with the raw NPC map toggle on")
+T.equal(PNC.WorldDiscoveryMapLayer.FindAt(map, 10, 10, 12).kind,
+    "mobile_group", "mobile discovery renders a map marker")
+PNC.Network.ClientState.worldDiscovery.entities = {
+    { kind = "mobile_group", entityID = "searched", x = 10, y = 10,
+        phase = 2, arrivalState = "searched" },
+}
+T.falsy(registered.definition.isVisible(),
+    "searched signal does not keep the discovery layer open")
 T.equal(PNC.WorldDiscoveryMapLayer.FindAt(map, 10, 10, 12), nil,
-    "mobile group retained a static map marker")
+    "searched signal no longer has a map hit target")
 T.finish("pnc_world_discovery_map_visibility_smoke")
 
 T.finish("pnc_world_discovery_map_visibility_smoke")

@@ -110,9 +110,6 @@ local function resolveState(player, now)
     if not player or (player.isDead and player:isDead()) then
         return nil
     end
-    if not isSneaking(player) then
-        return nil
-    end
     if isMultiplayerClient() then
         state = ClientState.stealthDiscovery
         if not state or now >= (tonumber(state.expiresAt) or 0) then
@@ -126,6 +123,16 @@ local function resolveState(player, now)
         end
         return state.discovered == true, state.reason
     end
+    if not isSneaking(player) then
+        Indicator.SingleplayerState = {
+            player = player,
+            visible = false,
+            expiresAt = now + (
+                tonumber(Const.STEALTH_INDICATOR_UPDATE_MS) or 200
+            ),
+        }
+        return nil
+    end
     cached = Indicator.SingleplayerState
     if cached.player == player and now < (tonumber(cached.expiresAt) or 0) then
         if cached.visible == true then
@@ -133,7 +140,7 @@ local function resolveState(player, now)
         end
         return nil
     end
-    visible = hasFollowingColonist(player, now) and isSneaking(player)
+    visible = hasFollowingColonist(player, now)
     if not visible then
         Indicator.SingleplayerState = {
             player = player,
