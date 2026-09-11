@@ -3,6 +3,90 @@ local Internal = Scenes.Internal
 local Core = PNC.Core
 local Const = PNC.Const
 local Diagnostics = PNC.PerformanceScalingDiagnostics
+local LiveBodyControl = PNC.LiveBodyControl
+
+local function isWaterScene(sceneId)
+    return string.find(
+        tostring(sceneId or ""),
+        "facility.water.",
+        1,
+        true
+    ) == 1
+end
+
+local function activeTraversalOwner(record, zombie, now)
+    local runtime = record and record.runtime or nil
+    local lane = runtime and runtime.pathing or nil
+    local navigation = runtime and runtime.localNavigation or nil
+    local nativeState
+    local nativeAction
+    local modData
+    local requested
+    local leaseUntil
+    local leaseActive
+    if lane and lane.traversalAction then
+        return true, lane.traversalAction.kind or "traversal"
+    end
+    if lane and lane.vanillaFenceAction then
+        return true, "fence_climb_vanilla"
+    end
+    if navigation and navigation.nativeTraversalState ~= nil then
+        return true, "native_" .. tostring(navigation.nativeTraversalState)
+    end
+    -- MP native passage state is deliberately kept in the client controller,
+    -- not in runtime.localNavigation. Check it before a blocking scene resets
+    -- the shared movement lane out from underneath the passage owner.
+    nativeState = PNC.ClientPresenceSync
+        and PNC.ClientPresenceSync.NativePathStateByBody
+        and PNC.ClientPresenceSync.NativePathStateByBody[zombie]
+        or nil
+    nativeAction = nativeState and nativeState.passageAction or nil
+    if nativeAction then
+        return true, nativeAction.kind or "native_passage"
+    end
+    modData = zombie and zombie.getModData
+        and zombie:getModData() or nil
+    requested = modData and tostring(
+        modData.PNC_BumpRequestedType or ""
+    ) or ""
+    leaseActive = modData
+        and (modData.PNC_BumpActionLease == true
+            or modData.PNC_BumpReleasePending == true)
+    leaseUntil = modData and tonumber(modData.PNC_BumpActionLeaseUntil)
+    if leaseActive and leaseUntil and now > leaseUntil
+        and modData.PNC_BumpReleasePending ~= true
+    then
+        leaseActive = false
+    end
+    if leaseActive
+        and LiveBodyControl
+        and LiveBodyControl.IsTraversalBumpType
+        and LiveBodyControl.IsTraversalBumpType(requested)
+    then
+        return true, requested
+    end
+    return false, nil
+end
+
+local function logWaterSceneEvent(record, zombie, eventName, sceneId,
+    stepId, bump, reason, traversalKind)
+    local actionState
+    if not isWaterScene(sceneId) or not Core or not Core.LogInfo then
+        return
+    end
+    actionState = zombie and zombie.getActionStateName
+        and zombie:getActionStateName() or ""
+    Core.LogInfo(
+        "[PNC][ANIM] " .. tostring(eventName)
+            .. " npc=" .. tostring(record and record.id or "nil")
+            .. " scene=" .. tostring(sceneId or "")
+            .. " step=" .. tostring(stepId or "")
+            .. " bump=" .. tostring(bump or "")
+            .. " action=" .. tostring(actionState)
+            .. " traversal=" .. tostring(traversalKind or "none")
+            .. " reason=" .. tostring(reason or "")
+    )
+end
 
 local function isSeatingScene(runtime, scene)
     local activity = runtime and runtime.facilityActivity or nil
@@ -74,6 +158,15 @@ function Internal.ClearScene(record, zombie, reason, release)
     scene = runtime.animationScene
     if not scene then return false end
     definition = Scenes.Get(scene.id)
+    logWaterSceneEvent(
+        record,
+        zombie,
+        "scene_stop",
+        scene.id,
+        scene.stepId,
+        scene.bump,
+        reason or "stopped"
+    )
     if Diagnostics and Diagnostics.SeatingAuditEnabled == true then
         auditScene(
             record,
@@ -199,6 +292,8 @@ function Scenes.Request(record, zombie, sceneId, options)
     local now
     local started
     local result
+    local traversalActive
+    local traversalKind
     options = type(options) == "table" and options or {}
     if not record or not definition then
         return false, definition and "record_missing" or "scene_missing"
@@ -208,6 +303,38 @@ function Scenes.Request(record, zombie, sceneId, options)
     end
     runtime = record.runtime or {}
     record.runtime = runtime
+    now = tonumber(options.now) or Core.Now()
+    traversalActive, traversalKind = activeTraversalOwner(
+        record,
+        zombie,
+        now
+    )
+    if traversalActive and options.allowDuringTraversal ~= true then
+        -- A drink is a blocking scene. Starting it here used to clear the
+        -- shared path lane and then overwrite the traversal BumpType while
+        -- the client passage controller still owned its window/fence action.
+        -- Keep the request pending; the facility behavior will retry after
+        -- the bounded passage completes.
+        if isWaterScene(sceneId) then
+            local lastDeferredAt = tonumber(
+                runtime.lastWaterSceneDeferredAt
+            ) or 0
+            if now - lastDeferredAt >= 1000 then
+                runtime.lastWaterSceneDeferredAt = now
+                logWaterSceneEvent(
+                    record,
+                    zombie,
+                    "scene_deferred",
+                    sceneId,
+                    nil,
+                    "Drink",
+                    "traversal_active",
+                    traversalKind
+                )
+            end
+        end
+        return false, "traversal_active"
+    end
     if Diagnostics and Diagnostics.SeatingAuditEnabled == true
         and (sceneId == "facility.living.sitFurniture"
             or runtime.facilityActivity
@@ -231,7 +358,6 @@ function Scenes.Request(record, zombie, sceneId, options)
     if runtime.animationScene then
         Internal.ClearScene(record, zombie, "scene_replaced", false)
     end
-    now = tonumber(options.now) or Core.Now()
     if definition.blocking then
         quiesceBlockingMovement(record, zombie, runtime, definition.id)
     end
@@ -255,6 +381,15 @@ function Scenes.Request(record, zombie, sceneId, options)
         end
         return false, result
     end
+    logWaterSceneEvent(
+        record,
+        zombie,
+        "scene_started",
+        scene.id,
+        scene.stepId,
+        scene.bump,
+        options.reason
+    )
     Internal.MarkSceneSync(record, "animation_scene_start")
     if Diagnostics and Diagnostics.SeatingAuditEnabled == true then
         auditScene(

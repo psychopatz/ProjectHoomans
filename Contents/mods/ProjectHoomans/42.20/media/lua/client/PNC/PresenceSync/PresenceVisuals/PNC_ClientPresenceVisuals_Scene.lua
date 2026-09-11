@@ -10,6 +10,59 @@ PNC.ClientPresenceSync.Internal =
 local Sync = PNC.ClientPresenceSync
 local Internal = Sync.Internal
 local Animation = PNC.Animation
+local Core = PNC.Core
+
+local function isWaterScene(sceneId)
+    return string.find(
+        tostring(sceneId or ""),
+        "facility.water.",
+        1,
+        true
+    ) == 1
+end
+
+local function sceneBodyState(zombie)
+    local modData
+    local actionState
+    local contextState
+    if not zombie then
+        return "action= context= bump= lease=false"
+    end
+    modData = zombie.getModData and zombie:getModData() or nil
+    actionState = zombie.getActionStateName
+        and zombie:getActionStateName() or ""
+    contextState = PNC.LiveBodyControl
+        and PNC.LiveBodyControl.GetActionContextStateName
+        and PNC.LiveBodyControl.GetActionContextStateName(zombie) or ""
+    return "action=" .. tostring(actionState)
+        .. " context=" .. tostring(contextState)
+        .. " bump=" .. tostring(
+            zombie.getBumpType and zombie:getBumpType()
+                or modData and modData.PNC_BumpRequestedType or ""
+        )
+        .. " lease=" .. tostring(
+            modData and modData.PNC_BumpActionLease == true or false
+        )
+end
+
+local function logSceneReplica(eventName, recordView, presentation,
+    zombie, reason)
+    if not presentation
+        or not isWaterScene(presentation.id)
+        or not Core
+        or not Core.LogInfo
+    then
+        return
+    end
+    Core.LogInfo(
+        "[PNC][ANIM] " .. tostring(eventName)
+            .. " npc=" .. tostring(recordView and recordView.id or "nil")
+            .. " scene=" .. tostring(presentation.id or "")
+            .. " bump=" .. tostring(presentation.bump or "")
+            .. " " .. sceneBodyState(zombie)
+            .. " reason=" .. tostring(reason or "")
+    )
+end
 
 local function getScenePresentation(snapshot, now)
     local visualState = snapshot and snapshot.visualState or {}
@@ -48,6 +101,7 @@ local function syncAnimationScene(
     modData,
     presentation
 )
+    local previousPresentation
     if not modData then
         return presentation ~= nil, false
     end
@@ -55,17 +109,33 @@ local function syncAnimationScene(
         if modData.PNC_ClientAnimationSceneKey == nil then
             return false, false
         end
+        previousPresentation = {
+            id = modData.PNC_ClientAnimationSceneId,
+            bump = modData.PNC_ClientAnimationSceneBump,
+        }
+        logSceneReplica(
+            "scene_replica_stopped",
+            recordView,
+            previousPresentation,
+            zombie,
+            "snapshot_inactive"
+        )
         if Animation and Animation.FinishBump then
             Animation.FinishBump(zombie, true)
         end
         modData.PNC_ClientAnimationSceneKey = nil
+        modData.PNC_ClientAnimationSceneId = nil
+        modData.PNC_ClientAnimationSceneBump = nil
         return false, true
     end
     if modData.PNC_ClientAnimationSceneKey
         ~= presentation.key
     then
         if Animation and Animation.PlayBump then
-            Animation.PlayBump(
+            local played
+            local playReason
+            played,
+                playReason = Animation.PlayBump(
                 zombie,
                 recordView,
                 presentation.bump,
@@ -74,9 +144,28 @@ local function syncAnimationScene(
                     leaseUntil = presentation.leaseUntil,
                 }
             )
+            if played == false then
+                logSceneReplica(
+                    "scene_replica_deferred",
+                    recordView,
+                    presentation,
+                    zombie,
+                    playReason or "bump_rejected"
+                )
+                return true, false
+            end
         end
+        logSceneReplica(
+            "scene_replica_started",
+            recordView,
+            presentation,
+            zombie,
+            "snapshot"
+        )
         modData.PNC_ClientAnimationSceneKey =
             presentation.key
+        modData.PNC_ClientAnimationSceneId = presentation.id
+        modData.PNC_ClientAnimationSceneBump = presentation.bump
     elseif presentation.loop
         and Animation
         and Animation.MaintainBump
@@ -97,4 +186,3 @@ end
 
 Internal.GetScenePresentation = getScenePresentation
 Internal.SyncAnimationScene = syncAnimationScene
-

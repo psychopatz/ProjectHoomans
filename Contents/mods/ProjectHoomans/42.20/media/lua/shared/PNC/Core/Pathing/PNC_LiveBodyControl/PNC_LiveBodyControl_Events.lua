@@ -190,6 +190,17 @@ function LiveBodyControl.OnZombieUpdate(zombie)
             end
         end
     end
+    -- This runs before IsoZombie.updateInternal() reaches its post-event
+    -- tryThump() call. If vanilla sees a window on the feeler tile, stop the
+    -- zombie movement state here so it cannot enter the player-only climb
+    -- implementation.
+    if LiveBodyControl.BlockVanillaPassage then
+        LiveBodyControl.BlockVanillaPassage(
+            zombie,
+            nil,
+            Core and Core.Now and Core.Now() or 0
+        )
+    end
 end
 
 function LiveBodyControl.OnTick()

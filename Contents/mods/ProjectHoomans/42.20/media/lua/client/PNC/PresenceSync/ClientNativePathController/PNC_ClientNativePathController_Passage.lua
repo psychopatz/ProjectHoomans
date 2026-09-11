@@ -39,6 +39,8 @@ local FENCE_CLIMB_CROSS_MS = 560
 local FENCE_TALL_CLIMB_FINISH_MS = 900
 local FENCE_RETRY_BACKOFF_MS = 900
 local FENCE_COOLDOWN_MS = 900
+local WINDOW_COOLDOWN_MS = 900
+local WINDOW_LANDING_BACKOFF_MS = 2500
 local VANILLA_FENCE_TIMEOUT_MS = 4000
 local VANILLA_FENCE_START_GRACE_MS = 300
 
@@ -167,6 +169,52 @@ local function squareKey(square)
         .. ":" .. tostring(square:getZ())
 end
 
+local function logPassageEvent(snapshot, body, state, action, eventName,
+    reason)
+    local objectSquare
+    local modData
+    local actionState
+    local contextState
+    local bumpType
+    if not Core or not Core.LogInfo then return end
+    objectSquare = action and action.object
+        and action.object.getSquare
+        and action.object:getSquare() or nil
+    modData = body and body.getModData and body:getModData() or nil
+    actionState = body and body.getActionStateName
+        and body:getActionStateName() or ""
+    contextState = LiveBodyControl
+        and LiveBodyControl.GetActionContextStateName
+        and LiveBodyControl.GetActionContextStateName(body) or ""
+    bumpType = body and body.getBumpType
+        and body:getBumpType() or modData
+        and modData.PNC_BumpRequestedType or ""
+    Core.LogInfo(
+        "[PNC][PATH] passage_" .. tostring(eventName or "event")
+            .. " npc=" .. tostring(snapshot and snapshot.id or "nil")
+            .. " kind=" .. tostring(action and action.kind or "")
+            .. " key=" .. tostring(action and action.key or "")
+            .. " objectSquare=" .. tostring(squareKey(objectSquare)
+                or "nil")
+            .. " from=" .. tostring(action and (
+                action.fromX or action.startX) or "nil")
+            .. "," .. tostring(action and (
+                action.fromY or action.startY) or "nil")
+            .. "," .. tostring(action and (
+                action.fromZ or action.startZ) or "nil")
+            .. " to=" .. tostring(action and (
+                action.toX or action.endX) or "nil")
+            .. "," .. tostring(action and (
+                action.toY or action.endY) or "nil")
+            .. "," .. tostring(action and (
+                action.toZ or action.endZ) or "nil")
+            .. " action=" .. tostring(actionState)
+            .. " context=" .. tostring(contextState)
+            .. " bump=" .. tostring(bumpType or "")
+            .. " reason=" .. tostring(reason or "")
+    )
+end
+
 local function fenceKey(object, passage)
     local objectSquare = object and object.getSquare
         and object:getSquare() or nil
@@ -240,9 +288,20 @@ local function updateWindowSmash(body, state, now)
     local action = state and state.passageAction or nil
     if not action then return false, nil end
     if not Internal.IsLocalZombieController(body) then
+        logPassageEvent(
+            state.snapshot,
+            body,
+            state,
+            action,
+            "owner_changed",
+            "nearest_client_changed"
+        )
         finishPassageBump(body)
         state.passageAction = nil
         return false, "native_passage_owner_changed"
+    end
+    if LiveBodyControl and LiveBodyControl.ResetNativeMovementState then
+        LiveBodyControl.ResetNativeMovementState(body)
     end
     if body.faceThisObject and action.object then
         body:faceThisObject(action.object)
@@ -285,10 +344,18 @@ local function updateWindowSmash(body, state, now)
             )
         end
         finishPassageBump(body)
+        logPassageEvent(
+            state.snapshot,
+            body,
+            state,
+            action,
+            "complete",
+            landingBlocked and "landing_blocked" or "crossed"
+        )
         state.passageAction = nil
         state.requestKey = nil
         state.failed = true
-        state.retryAt = now + RETRY_BASE_MS
+        state.retryAt = now + WINDOW_LANDING_BACKOFF_MS
         if landingBlocked then
             state.windowRetryObject = action.object
             state.windowRetryAt = state.retryAt
@@ -316,6 +383,8 @@ local function updateWindowSmash(body, state, now)
         if state.windowRepairLoggedObject == action.object then
             state.windowRepairLoggedObject = nil
         end
+        state.windowCooldownObject = action.object
+        state.windowCooldownUntil = now + WINDOW_COOLDOWN_MS
         return true, "native_window_crossed"
     end
     if action.kind == "fence_climb" then
@@ -380,6 +449,15 @@ local function updateWindowSmash(body, state, now)
             return true, "native_fence_climb"
         end
         finishPassageBump(body)
+        logPassageEvent(
+            state.snapshot,
+            body,
+            state,
+            action,
+            "complete",
+            fenceCrossed(body, action)
+                and "crossed" or "same_side"
+        )
         state.passageAction = nil
         state.requestKey = nil
         if fenceCrossed(body, action) then
@@ -413,6 +491,14 @@ local function updateWindowSmash(body, state, now)
         return true, "native_window_smash"
     end
     finishPassageBump(body)
+    logPassageEvent(
+        state.snapshot,
+        body,
+        state,
+        action,
+        "complete",
+        "smashed"
+    )
     state.passageAction = nil
     state.requestKey = nil
     state.failed = true
@@ -534,6 +620,14 @@ local function startVanillaFenceClimb(
     state.forcedTraversalUntil = fenceAction.finishAt
     state.requestKey = nil
     beginMovementLease(body, state, key, now)
+    logPassageEvent(
+        snapshot,
+        body,
+        state,
+        fenceAction,
+        "start",
+        "vanilla_fallback"
+    )
     logState(snapshot, "native_fence_vanilla_start", describeBody(body))
     return true, "native_fence_vanilla"
 end
@@ -611,6 +705,9 @@ local function startFenceClimb(snapshot, body, state, passage, object, now)
             or FENCE_TALL_CLIMB_FINISH_MS)
         or upDuration + crossingDuration + finishHold
     clearOwnedPath(body, state)
+    if LiveBodyControl and LiveBodyControl.ResetNativeMovementState then
+        LiveBodyControl.ResetNativeMovementState(body)
+    end
     -- PathFindBehavior2 may have entered vanilla ClimbOverFenceState on the
     -- collision frame before this controller observed the passage. Reset that
     -- state before installing the PNC bump scene; NPCs do not own player
@@ -666,6 +763,14 @@ local function startFenceClimb(snapshot, body, state, passage, object, now)
     state.fenceDebugPhase = nil
     state.fenceDebugTimerFallbackLogged = nil
     state.lastProgressAt = now
+    logPassageEvent(
+        snapshot,
+        body,
+        state,
+        state.passageAction,
+        "start",
+        tall == true and "tall_fence" or "low_fence"
+    )
     logState(snapshot, "native_fence_climb_start", describeBody(body))
     return true, "native_fence_climb"
 end
@@ -678,6 +783,9 @@ local function startWindowSmash(
     now
 )
     clearOwnedPath(body, state)
+    if LiveBodyControl and LiveBodyControl.ResetNativeMovementState then
+        LiveBodyControl.ResetNativeMovementState(body)
+    end
     local key = "window_smash:"
         .. tostring(snapshot and snapshot.id or "npc")
         .. ":" .. tostring(now)
@@ -709,6 +817,14 @@ local function startWindowSmash(
         body:setBumpType("PNC_WindowSmash")
     end
     beginMovementLease(body, state, key, now)
+    logPassageEvent(
+        snapshot,
+        body,
+        state,
+        state.passageAction,
+        "start",
+        "window_smash"
+    )
     logState(snapshot, "native_window_smash_start", describeBody(body))
     return true, "native_window_smash"
 end
@@ -779,6 +895,9 @@ local function startWindowClimb(
     finishHold = math.max(120, tonumber(profile.finishHoldMs) or 320)
     finishAt = now + travelDuration + math.min(finishHold, 320)
     clearOwnedPath(body, state)
+    if LiveBodyControl and LiveBodyControl.ResetNativeMovementState then
+        LiveBodyControl.ResetNativeMovementState(body)
+    end
     -- Vanilla ClimbThroughWindowState assumes a player BodyDamage object and
     -- can throw while entering or finishing on an IsoZombie carrier. Use the
     -- same PNC-owned bump/position contract as fence traversal instead.
@@ -815,7 +934,10 @@ local function startWindowClimb(
             {
                 sceneId = "native_window_climb",
                 leaseUntil = finishAt,
-                keepManagedUseless = true,
+                -- This is the MP native controller, not the SP fake-body
+                -- traversal lane. Keep ActionContext ticking while the
+                -- custom window clip is active.
+                keepManagedUseless = false,
             }
         )
     elseif body.setBumpType then
@@ -827,6 +949,14 @@ local function startWindowClimb(
     state.forcedTraversalState = nil
     state.forcedTraversalAction = nil
     state.requestKey = nil
+    logPassageEvent(
+        snapshot,
+        body,
+        state,
+        state.passageAction,
+        "start",
+        "window_climb"
+    )
     logState(snapshot, "native_window_climb_start", describeBody(body))
     return true, "native_window_climb"
 end
@@ -858,6 +988,13 @@ local function tryNativePassage(
         end
         state.windowRetryObject = nil
         state.windowRetryAt = nil
+    end
+    if state.windowCooldownObject == object then
+        if now < (tonumber(state.windowCooldownUntil) or 0) then
+            return true, "native_window_cooldown"
+        end
+        state.windowCooldownObject = nil
+        state.windowCooldownUntil = nil
     end
     if TraversalQuery.IsFence
         and TraversalQuery.IsFence(object) == true
@@ -894,6 +1031,14 @@ local function tryNativePassage(
             clearOwnedPath(body, state)
             state.failed = true
             state.retryAt = now + 180
+            logPassageEvent(
+                snapshot,
+                body,
+                state,
+                { kind = "door_open", object = object },
+                "door_open",
+                "opened"
+            )
             logState(snapshot, "native_door_open", describeBody(body))
             return true, "native_door_open"
         end
@@ -913,6 +1058,14 @@ local function tryNativePassage(
             clearOwnedPath(body, state)
             state.failed = true
             state.retryAt = now + 250
+            logPassageEvent(
+                snapshot,
+                body,
+                state,
+                { kind = "window_open", object = object },
+                "window_open",
+                "opened"
+            )
             logState(snapshot, "native_window_open", describeBody(body))
             return true, "native_window_open"
         end
@@ -931,6 +1084,41 @@ local function tryNativePassage(
         canClimb = object:canClimbThrough(body) == true
     end
     if canClimb then
+        local destination = resolveWindowDestination(body, object, passage)
+        if destination
+            and TraversalQuery.CanTraverseAt
+            and not TraversalQuery.CanTraverseAt(
+                destination:getX() + 0.5,
+                destination:getY() + 0.5,
+                destination:getZ()
+            )
+        then
+            -- Do not enter a window animation when the opposite square is
+            -- already occupied. The old flow started the climb, discovered
+            -- the blocked landing only at completion, and immediately
+            -- selected the same window again on the next retry.
+            clearOwnedPath(body, state)
+            state.failed = true
+            state.retryAt = now + WINDOW_LANDING_BACKOFF_MS
+            state.windowRetryObject = object
+            state.windowRetryAt = state.retryAt
+            logPassageEvent(
+                snapshot,
+                body,
+                state,
+                { kind = "window_climb", object = object,
+                    toSquare = destination },
+                "landing_blocked",
+                "preflight"
+            )
+            logState(
+                snapshot,
+                "native_window_landing_wait",
+                "backoff=" .. tostring(WINDOW_LANDING_BACKOFF_MS)
+                    .. " " .. describeBody(body)
+            )
+            return true, "native_window_landing_wait"
+        end
         -- Never hand an equipped managed IsoZombie to vanilla window state.
         -- The native state assumes player BodyDamage and was the source of
         -- the transient zombie animation/freeze and ClimbThroughWindowState

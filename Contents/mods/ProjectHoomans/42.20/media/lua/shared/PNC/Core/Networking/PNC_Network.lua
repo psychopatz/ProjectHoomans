@@ -51,6 +51,7 @@ PNC.Network.ClientState = PNC.Network.ClientState or {
     },
     colonyJournalRevision = 0,
     worldDiscovery = nil,
+    zombiePursuitDirectives = {},
 }
 if PNC.Network.ClientState.managedBodyOnlineIDs == nil then
     PNC.Network.ClientState.managedBodyOnlineIDs = {}
@@ -74,6 +75,9 @@ if PNC.Network.ClientState.colonyManagementRevision == nil then
 end
 if PNC.Network.ClientState.directorDebugAuthorized == nil then
     PNC.Network.ClientState.directorDebugAuthorized = false
+end
+if PNC.Network.ClientState.zombiePursuitDirectives == nil then
+    PNC.Network.ClientState.zombiePursuitDirectives = {}
 end
 PNC.Network.Internal = PNC.Network.Internal or {}
 

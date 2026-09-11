@@ -51,6 +51,9 @@ local function onResetLua()
     Sync.lastLocalSnapshotBuildAt = 0
     Sync.lastLocalVisualMaintainAt = 0
     Sync.lastRemoteSnapshotStatePruneAt = 0
+    if Sync.Internal.ResetClientZombieAggro then
+        Sync.Internal.ResetClientZombieAggro()
+    end
     if Sync.Internal.ClearNativePathControllers then
         Sync.Internal.ClearNativePathControllers()
     end

@@ -14,6 +14,7 @@ local Sync = PNC.ClientPresenceSync
 local Internal = Sync.Internal
 local Core = PNC.Core
 local Const = PNC.Const or {}
+local Network = PNC.Network
 local ClientState = PNC.Network and PNC.Network.ClientState or nil
 
 local PATH_REFRESH_MS = tonumber(
@@ -25,10 +26,9 @@ local PATH_REFRESH_DISTANCE = tonumber(
 local AGGRO_RADIUS = tonumber(Const.ZOMBIE_AGGRO_RADIUS) or 12
 local BITE_DISTANCE = tonumber(Const.ZOMBIE_BITE_DISTANCE) or 1.2
 local NATIVE_TARGET_DISTANCE = 3
-local CONTROLLER_CHECK_MS = 250
 local INDEX_REFRESH_MS = math.max(
-    50,
-    tonumber(Const.CLIENT_ZOMBIE_AGGRO_INDEX_MS) or 250
+    250,
+    tonumber(Const.CLIENT_BODY_SCAN_MS) or 750
 )
 local INDEX_CELL_SIZE = math.max(
     2,
@@ -50,8 +50,10 @@ local NPC_BODY_INDEX = {
     builtAt = 0,
     buckets = {},
 }
-local NATIVE_ATTACK_ESCAPE_LOGGED = setmetatable({}, { __mode = "k" })
+local DIRECTIVE_BODY_CACHE = {}
+local DIRECTIVE_BODY_LOOKUP_MS = 250
 local releaseManagedTarget
+local applyAggro
 
 -- TurnAlerted is still a vanilla engine transition. PNC no longer produces,
 -- suppresses, or resets it, but the client aggro lane must not claim a zombie
@@ -68,23 +70,24 @@ local ACTION_OWNED_ELSEWHERE = {
     turnalerted = true,
 }
 
-local function hasActiveBiteReplica(zombie, now)
-    local onlineID
-    local replica
-    if not zombie or not zombie.getOnlineID
-        or not PNC.Client or type(PNC.Client.BiteReplicas) ~= "table"
-    then
-        return false
-    end
-    onlineID = tonumber(zombie:getOnlineID())
-    if onlineID == nil or onlineID < 0 then
-        return false
-    end
-    replica = PNC.Client.BiteReplicas[tostring(onlineID)]
-    if not replica or replica.phase == "release" then
-        return false
-    end
-    return now < (tonumber(replica.localReleaseAt) or math.huge)
+local function isActionOwnedElsewhere(actionState)
+    return ACTION_OWNED_ELSEWHERE[actionState] == true
+        or string.find(actionState, "hitreaction", 1, true) == 1
+        or string.find(actionState, "staggerback", 1, true) == 1
+        or string.find(actionState, "knockdown", 1, true) == 1
+        or string.find(actionState, "falldown", 1, true) == 1
+        or string.find(actionState, "ragdoll", 1, true) == 1
+        or string.find(actionState, "lunge", 1, true) == 1
+end
+
+local function isMultiplayerActionOwnedElsewhere(actionState)
+    return actionState == "thump"
+        or isActionOwnedElsewhere(actionState)
+end
+
+local function isMultiplayerMode()
+    return (isServer and isServer() == true)
+        or (isClient and isClient() == true)
 end
 
 local function isManagedBody(body)
@@ -102,11 +105,21 @@ local function snapshotFor(id)
 end
 
 local function isTargetable(snapshot, body)
-    return snapshot
-        and snapshot.presenceState == Const.PRESENCE_LIVE
-        and snapshot.zombieTargetable == true
-        and body
-        and not (body.isDead and body:isDead())
+    local modData
+    if not body or (body.isDead and body:isDead()) then
+        return false
+    end
+    if snapshot then
+        return snapshot.presenceState == Const.PRESENCE_LIVE
+            and snapshot.alive ~= false
+            and snapshot.zombieTargetable == true
+    end
+    modData = body.getModData and body:getModData() or nil
+    return modData
+        and modData.PNC_NPC == true
+        and modData.PNC_UUID ~= nil
+        and tostring(modData.PNC_BodyKind or "live") ~= "corpse"
+        or false
 end
 
 local function cellCoordinate(value)
@@ -127,34 +140,66 @@ local function rebuildNPCBodyIndex(now)
     local body
     local key
     local bucket
-    local snapshots = ClientState and ClientState.snapshots or {}
-    for id, snapshot in pairs(snapshots) do
-        body = nil
-        if snapshot
-            and snapshot.interestDetailed ~= false
-            and snapshot.presenceState == Const.PRESENCE_LIVE
-            and snapshot.alive ~= false
-        then
-            body = Internal.ResolveSnapshotBody
-                and Internal.ResolveSnapshotBody(snapshot)
-                or Sync.BodyByID and Sync.BodyByID[tostring(id)] or nil
+    local foundBody = false
+    local bodyByID = Sync.BodyByID or {}
+    local ambiguousIDs = {}
+
+    for candidateID, candidate in pairs(bodyByID) do
+        if candidate == false then
+            ambiguousIDs[tostring(candidateID)] = true
         end
-        if body and not seenBodies[body] then
-            seenBodies[body] = true
-            key = bucketKey(
-                cellCoordinate(body:getX()),
-                cellCoordinate(body:getY()),
-                body:getZ()
-            )
-            bucket = buckets[key]
-            if not bucket then
-                bucket = {}
-                buckets[key] = bucket
+    end
+
+    local function addBody(candidate, candidateID, candidateSnapshot)
+        if not candidate or seenBodies[candidate]
+            or not isTargetable(candidateSnapshot, candidate)
+        then
+            return
+        end
+        seenBodies[candidate] = true
+        key = bucketKey(
+            cellCoordinate(candidate:getX()),
+            cellCoordinate(candidate:getY()),
+            candidate:getZ()
+        )
+        bucket = buckets[key]
+        if not bucket then
+            bucket = {}
+            buckets[key] = bucket
+        end
+        bucket[#bucket + 1] = {
+            id = candidateID,
+            body = candidate,
+        }
+        foundBody = true
+    end
+
+    -- BodyByID is populated by PNC_ClientPresenceBodies from the actual local
+    -- cell zombie list. Unlike the old snapshot loop, it also contains bodies
+    -- whose roster entry is not detailed for this client.
+    for id, body in pairs(bodyByID) do
+        snapshot = snapshotFor(id)
+        addBody(body, id, snapshot)
+    end
+
+    -- Cover the short window before the shared body map sees a newly streamed
+    -- shell. This is deliberately throttled with the index refresh interval.
+    if not foundBody and getCell then
+        local cell = getCell()
+        local zombieList = cell and cell.getZombieList
+            and cell:getZombieList() or nil
+        local index
+        if zombieList then
+            for index = 0, zombieList:size() - 1 do
+                body = zombieList:get(index)
+                local modData = body and body.getModData
+                    and body:getModData() or nil
+                id = modData and modData.PNC_UUID or nil
+                snapshot = id and snapshotFor(id) or nil
+                if id == nil or not ambiguousIDs[tostring(id)] then
+                    addBody(body, id, snapshot)
+                end
             end
-            bucket[#bucket + 1] = {
-                id = id,
-                body = body,
-            }
         end
     end
     NPC_BODY_INDEX.buckets = buckets
@@ -308,22 +353,30 @@ local function clearHeldItems(zombie)
     then
         zombie:setSecondaryHandItem(nil)
     end
+    -- Bandits also clear the equipped/attached visual state in MP. Keep this
+    -- traversal safeguard out of the restored singleplayer lane.
+    if isMultiplayerMode() then
+        if zombie.resetEquippedHandsModels then
+            zombie:resetEquippedHandsModels()
+        end
+        if zombie.clearAttachedItems then
+            zombie:clearAttachedItems()
+        end
+    end
 end
 
-local function nativeLocalOwnership(zombie)
-    if zombie and zombie.isLocal then
-        -- Build 42 already knows which client owns this zombie. Prefer that
-        -- signal over a nearest-player approximation so only the native
-        -- simulation owner drives pursuit and target state.
-        return zombie:isLocal() == true
-    end
-    if zombie and zombie.isRemoteZombie then
-        return zombie:isRemoteZombie() ~= true
-    end
-    return nil
+local function clearNativeCombatTarget(zombie)
+    -- NPCs are IsoZombie shells. Never place one in IsoZombie.target or
+    -- attackedBy: Build 42 AttackState casts those native combat slots to
+    -- IsoPlayer during animation events. Movement uses pathToCharacter while
+    -- damage is handled by the abstract server lane.
+    if zombie.setTarget then zombie:setTarget(nil) end
+    if zombie.setAttackedBy then zombie:setAttackedBy(nil) end
+    if zombie.setTargetSeenTime then zombie:setTargetSeenTime(0) end
+    if zombie.clearAggroList then zombie:clearAggroList() end
 end
 
-local function isLocalOwner(zombie, now)
+local function ensureControllerEntry(zombie)
     local entry = CONTROLLER_BY_ZOMBIE[zombie]
     if not entry then
         entry = {
@@ -333,31 +386,126 @@ local function isLocalOwner(zombie, now)
             (NEXT_UPDATE_TIER + 1) % AGGRO_TIER_COUNT
         CONTROLLER_BY_ZOMBIE[zombie] = entry
     end
-    if entry.owned == nil
-        or now >= (tonumber(entry.nextAt) or 0)
-    then
-        entry.owned = nativeLocalOwnership(zombie)
-        if entry.owned == nil then
-            entry.owned = not Internal.IsLocalZombieController
-                or Internal.IsLocalZombieController(zombie)
-        end
-        entry.nextAt = now + CONTROLLER_CHECK_MS
-    end
-    return entry.owned == true
+    return entry
 end
 
 local function isScheduledAggroTier(zombie, now)
-    local entry = CONTROLLER_BY_ZOMBIE[zombie]
+    local entry = ensureControllerEntry(zombie)
     local currentTier = math.floor(now / AGGRO_TIER_MS)
         % AGGRO_TIER_COUNT
-    return entry ~= nil and entry.updateTier == currentTier
+    return entry.updateTier == currentTier
 end
 
-local function shouldRefreshPath(zombie, body, now)
+local function isLocalZombieUpdate(zombie)
+    -- Build 42 raises OnZombieUpdate for the local simulation lane. Keep this
+    -- guard for the short remote-shell update window without touching the
+    -- non-exposed server-side UdpConnection owner object.
+    return not zombie.isRemoteZombie or zombie:isRemoteZombie() ~= true
+end
+
+local function isMultiplayerDirectiveLane()
+    return isMultiplayerMode()
+end
+
+local function getMPTargetDirective(zombie, now)
+    local onlineID
+    local directives
+    local key
+    local directive
+    if not isMultiplayerDirectiveLane()
+        or not Network
+        or not Network.GetZombieOnlineID
+        or not ClientState
+    then
+        return nil
+    end
+    onlineID = Network.GetZombieOnlineID(zombie)
+    if onlineID == nil then
+        return nil
+    end
+    directives = ClientState.zombiePursuitDirectives or {}
+    key = tostring(onlineID)
+    directive = directives[key]
+    if directive and now >= (tonumber(directive.expiresAt) or 0) then
+        directives[key] = nil
+        if PNC.PerformanceScalingDiagnostics
+            and PNC.PerformanceScalingDiagnostics.Increment
+        then
+            PNC.PerformanceScalingDiagnostics.Increment(
+                "ZombieAggro.MPDirectiveExpired"
+            )
+        end
+        directive = nil
+    end
+    return directive
+end
+
+local function resolveDirectiveBody(npcId, now)
+    local key
+    local cached
+    local body
+    local cell
+    local zombieList
+    local index
+    local candidate
+    local modData
+    local matchCount
+    if npcId == nil then
+        return nil
+    end
+    key = tostring(npcId)
+    cached = DIRECTIVE_BODY_CACHE[key]
+    if cached and now - (tonumber(cached.checkedAt) or 0)
+        < DIRECTIVE_BODY_LOOKUP_MS
+    then
+        return cached.body
+    end
+    body = Sync.BodyByID and Sync.BodyByID[key] or nil
+    if body == false then
+        body = nil
+    end
+    -- BodyByID is the normal O(1) route. A bounded fallback covers the
+    -- replication window where the shell has arrived before the periodic
+    -- body-map scan has indexed it. Refuse ambiguous duplicates.
+    if not body and getCell then
+        cell = getCell()
+        zombieList = cell and cell.getZombieList
+            and cell:getZombieList() or nil
+        matchCount = 0
+        if zombieList then
+            for index = 0, zombieList:size() - 1 do
+                candidate = zombieList:get(index)
+                modData = candidate and candidate.getModData
+                    and candidate:getModData() or nil
+                if modData
+                    and modData.PNC_NPC == true
+                    and tostring(modData.PNC_UUID or "") == key
+                    and tostring(modData.PNC_BodyKind or "live") ~= "corpse"
+                then
+                    matchCount = matchCount + 1
+                    body = candidate
+                end
+            end
+        end
+        if matchCount ~= 1 then
+            body = nil
+        end
+    end
+    if body and body.isDead and body:isDead() then
+        body = nil
+    end
+    DIRECTIVE_BODY_CACHE[key] = {
+        body = body,
+        checkedAt = now,
+    }
+    return body
+end
+
+local function shouldRefreshPath(zombie, targetX, targetY, now)
     local modData = zombie.getModData
         and zombie:getModData() or nil
-    local x = body:getX()
-    local y = body:getY()
+    local x = tonumber(targetX) or zombie:getX()
+    local y = tonumber(targetY) or zombie:getY()
     local lastX = modData
         and tonumber(modData.PNC_ClientAggroPathX) or nil
     local lastY = modData
@@ -381,7 +529,7 @@ local function shouldRefreshPath(zombie, body, now)
     return true
 end
 
-local function applyAggro(zombie, body, distanceSq, now)
+local function applySingleplayerAggro(zombie, body, distanceSq, now)
     local currentTarget
     local canSee = true
     clearHeldItems(zombie)
@@ -394,16 +542,11 @@ local function applyAggro(zombie, body, distanceSq, now)
         zombie:setUseless(false)
     end
     currentTarget = zombie.getTarget and zombie:getTarget() or nil
-    -- The path request alone is transient. Build 42's WalkTowardState will
-    -- reissue a route to zombie.target on the next engine update, so make the
-    -- selected NPC the native target before requesting its path, including at
-    -- distances greater than the abstract damage range.
+    -- Restore the prior SP movement handoff. The path request is transient;
+    -- WalkTowardState continues from zombie.target on the next engine update.
     if currentTarget ~= body and zombie.setTarget then
         zombie:setTarget(body)
         if distanceSq > (3.5 * 3.5) and zombie.spotted then
-            -- Replace Build 42's remembered player location as well as the
-            -- native target. Otherwise WalkTowardState can continue using a
-            -- stale lastTargetSeen position even after the path handoff.
             zombie:spotted(body, false)
         end
         currentTarget = body
@@ -412,7 +555,13 @@ local function applyAggro(zombie, body, distanceSq, now)
         canSee = zombie:CanSee(body) == true
     end
     if distanceSq > NATIVE_TARGET_DISTANCE * NATIVE_TARGET_DISTANCE then
-        if shouldRefreshPath(zombie, body, now) then
+        if shouldRefreshPath(
+            zombie,
+            body:getX(),
+            body:getY(),
+            now
+        )
+        then
             if canSee and zombie.pathToCharacter then
                 zombie:pathToCharacter(body)
             elseif zombie.pathToLocationF then
@@ -424,8 +573,6 @@ local function applyAggro(zombie, body, distanceSq, now)
             end
         end
     else
-        -- Bandits establishes all four native relationships. Merely walking
-        -- to coordinates never puts the zombie into its attack state.
         if zombie.spotted then
             zombie:spotted(body, true)
         end
@@ -442,10 +589,7 @@ local function applyAggro(zombie, body, distanceSq, now)
             if zombie.faceThisObject then
                 zombie:faceThisObject(body)
             elseif zombie.faceLocation then
-                zombie:faceLocation(
-                    body:getX(),
-                    body:getY()
-                )
+                zombie:faceLocation(body:getX(), body:getY())
             end
         end
     end
@@ -460,6 +604,98 @@ local function applyAggro(zombie, body, distanceSq, now)
     then
         zombie:setNoTeeth(true)
     end
+end
+
+local function applyMultiplayerAggro(
+    zombie,
+    body,
+    distanceSq,
+    now,
+    targetX,
+    targetY,
+    targetZ,
+    directiveRevision
+)
+    local modData = zombie.getModData
+        and zombie:getModData() or nil
+    local canSee
+    local pathRequested = false
+    targetX = body and body:getX() or tonumber(targetX)
+    targetY = body and body:getY() or tonumber(targetY)
+    targetZ = body and body:getZ() or tonumber(targetZ)
+    if modData and directiveRevision ~= nil
+        and tostring(modData.PNC_ClientAggroDirectiveRevision or "")
+            ~= tostring(directiveRevision)
+    then
+        modData.PNC_ClientAggroDirectiveRevision = directiveRevision
+        modData.PNC_ClientAggroPathAt = 0
+        modData.PNC_ClientAggroPathX = nil
+        modData.PNC_ClientAggroPathY = nil
+    end
+    clearHeldItems(zombie)
+    clearNativeCombatTarget(zombie)
+    if body and body.setZombiesDontAttack then
+        body:setZombiesDontAttack(false)
+    end
+    if zombie.isUseless and zombie.setUseless
+        and zombie:isUseless()
+    then
+        zombie:setUseless(false)
+    end
+    -- Match Bandits for movement, but do not copy its native combat-target
+    -- handoff. PNC damage is abstract, so path toward the NPC at every range.
+    if shouldRefreshPath(zombie, targetX, targetY, now) then
+        -- Bandits only request native character pursuit after the exposed LOS
+        -- check. This avoids repeatedly pushing a zombie into a traversal
+        -- transition that can invoke the player-only drop-items packet.
+        canSee = body and zombie.CanSee and zombie:CanSee(body) or false
+        if body and canSee and zombie.pathToCharacter then
+            zombie:pathToCharacter(body)
+            pathRequested = true
+        elseif not body and targetX and targetY and targetZ
+            and zombie.pathToLocationF
+        then
+            -- The server directive carries a coordinate fallback for the
+            -- brief shell-streaming gap. Once the shell is visible, the LOS
+            -- guarded pathToCharacter branch takes over.
+            zombie:pathToLocationF(targetX, targetY, targetZ)
+            pathRequested = true
+        elseif PNC.PerformanceScalingDiagnostics
+            and PNC.PerformanceScalingDiagnostics.Increment
+        then
+            PNC.PerformanceScalingDiagnostics.Increment(
+                "ZombieAggro.MPPathSkippedNoLOS"
+            )
+        end
+        if pathRequested
+            and PNC.PerformanceScalingDiagnostics
+            and PNC.PerformanceScalingDiagnostics.Increment
+        then
+            PNC.PerformanceScalingDiagnostics.Increment(
+                "ZombieAggro.MPPathRequests"
+            )
+        end
+    end
+    if body and distanceSq <= BITE_DISTANCE * BITE_DISTANCE then
+        if zombie.faceThisObject then
+            zombie:faceThisObject(body)
+        elseif zombie.faceLocation then
+            zombie:faceLocation(
+                body:getX(),
+                body:getY()
+            )
+        end
+    end
+    if zombie.setVariable then
+        zombie:setVariable("NoLungeAttack", true)
+    end
+end
+
+applyAggro = function(...)
+    if isMultiplayerDirectiveLane() then
+        return applyMultiplayerAggro(...)
+    end
+    return applySingleplayerAggro(...)
 end
 
 local function applyPlayerTarget(zombie, player)
@@ -501,6 +737,15 @@ releaseManagedTarget = function(zombie)
     end
 end
 
+function Internal.ResetClientZombieAggro()
+    CONTROLLER_BY_ZOMBIE = setmetatable({}, { __mode = "k" })
+    NEXT_UPDATE_TIER = 0
+    NPC_BODY_INDEX.initialized = false
+    NPC_BODY_INDEX.builtAt = 0
+    NPC_BODY_INDEX.buckets = {}
+    DIRECTIVE_BODY_CACHE = {}
+end
+
 function Internal.UpdateClientZombieAggro(zombie, now)
     local actionState
     local body
@@ -511,7 +756,7 @@ function Internal.UpdateClientZombieAggro(zombie, now)
     if not zombie
         or isManagedBody(zombie)
         or (zombie.isDead and zombie:isDead())
-        or not isLocalOwner(zombie, now)
+        or not isLocalZombieUpdate(zombie)
     then
         return false
     end
@@ -520,28 +765,10 @@ function Internal.UpdateClientZombieAggro(zombie, now)
             zombie:getActionStateName() or ""
         ))
         or ""
-    if (actionState == "attack" or actionState == "attack-network")
-        and isManagedBody(zombie.getTarget and zombie:getTarget() or nil)
-    then
-        if hasActiveBiteReplica(zombie, now) then
-            return false
-        end
-        releaseManagedTarget(zombie)
-        if zombie.changeState
-            and ZombieIdleState
-            and ZombieIdleState.instance
-        then
-            zombie:changeState(ZombieIdleState.instance())
-        end
-        if not NATIVE_ATTACK_ESCAPE_LOGGED[zombie] and Core and Core.LogWarn then
-            NATIVE_ATTACK_ESCAPE_LOGGED[zombie] = true
-            Core.LogWarn(
-                "native_attack_escape target=managed_npc reason=no_bite_replica"
-            )
-        end
-        return true
-    end
-    if ACTION_OWNED_ELSEWHERE[actionState]
+    if (isMultiplayerDirectiveLane()
+        and isMultiplayerActionOwnedElsewhere(actionState))
+        or (not isMultiplayerDirectiveLane()
+            and ACTION_OWNED_ELSEWHERE[actionState] == true)
         or (zombie.isProne and zombie:isProne())
     then
         return false
@@ -549,6 +776,55 @@ function Internal.UpdateClientZombieAggro(zombie, now)
     if not isScheduledAggroTier(zombie, now) then
         return false
     end
+
+    -- Multiplayer target selection is server-authoritative. Do not run a
+    -- client-side nearest-NPC scan here: it has no knowledge of the zombie's
+    -- owning simulation lane and is exactly why clients kept choosing players.
+    if isMultiplayerDirectiveLane() then
+        local directive = getMPTargetDirective(zombie, now)
+        local targetBody
+        local targetDistanceSq
+        local targetX
+        local targetY
+        local targetZ
+        if not directive then
+            releaseManagedTarget(zombie)
+            return false
+        end
+        targetBody = resolveDirectiveBody(directive.npcId, now)
+        targetX = targetBody and targetBody:getX() or directive.x
+        targetY = targetBody and targetBody:getY() or directive.y
+        targetZ = targetBody and targetBody:getZ() or directive.z
+        if not targetX or not targetY or not targetZ then
+            releaseManagedTarget(zombie)
+            return false
+        end
+        targetDistanceSq = Core.DistanceSq(
+            zombie:getX(),
+            zombie:getY(),
+            targetX,
+            targetY
+        )
+        applyAggro(
+            zombie,
+            targetBody,
+            targetDistanceSq,
+            now,
+            targetX,
+            targetY,
+            targetZ,
+            directive.revision
+        )
+        if PNC.PerformanceScalingDiagnostics
+            and PNC.PerformanceScalingDiagnostics.Increment
+        then
+            PNC.PerformanceScalingDiagnostics.Increment(
+                "ZombieAggro.MPDirectiveApplied"
+            )
+        end
+        return true
+    end
+
     target, distanceSq, targetIsNPC = findNearestTarget(zombie, now)
     if not target then
         releaseManagedTarget(zombie)

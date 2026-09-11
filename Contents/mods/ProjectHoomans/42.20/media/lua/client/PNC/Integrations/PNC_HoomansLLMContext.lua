@@ -10,11 +10,13 @@ PNC.HoomansLLM = PNC.HoomansLLM or {}
 PNC.HoomansLLM.Context = PNC.HoomansLLM.Context or {}
 
 require "PsychopatzCore/Conversation/PsychopatzNameParts"
+require "PNC/Integrations/PNC_HoomansLLMIdentity"
 
 local Context = PNC.HoomansLLM.Context
 local Message = PsychopatzCore.Conversation.Message
 local ToolPolicy = PNC.ConversationLLMTools
 local NameParts = PsychopatzCore.Conversation.NameParts
+local MemoryIdentity = PNC.HoomansLLM.Identity
 
 local NEED_TYPES = { "hunger", "thirst", "fatigue" }
 local NEED_LEVEL_WEIGHT = {
@@ -164,6 +166,10 @@ local function worldUUID()
         or getWorld and getWorld()
         or "default"
     return "pz-save:" .. text(saveName, "default")
+end
+
+function Context.GetMemoryIdentity()
+    return MemoryIdentity.Current()
 end
 
 local function playerUUID(view)
@@ -457,8 +463,13 @@ function Context.Build(view, message)
     }
     local definitions = availableTools(entry)
     local catalogID, availableToolIDs = toolCatalogReference(definitions)
+    local memoryIdentity = Context.GetMemoryIdentity()
     local context = {
         world_uuid = worldUUID(),
+        world_mode = memoryIdentity.world_mode,
+        save_relative_path = memoryIdentity.save_relative_path,
+        server_instance_id = memoryIdentity.server_instance_id,
+        server_world_generation = memoryIdentity.server_world_generation,
         player_uuid = playerID,
         npc_uuid = npcID,
         conversation_id = view.session and view.session.llmSessionID or nil,

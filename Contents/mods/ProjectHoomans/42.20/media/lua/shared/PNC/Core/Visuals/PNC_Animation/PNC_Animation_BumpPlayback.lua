@@ -17,6 +17,19 @@ local function notifyExternalScene(record, zombie, bumpType, options)
     end
 end
 
+local function logOwnershipRejection(zombie, record, requested, reason,
+    currentState, currentBump)
+    if not Core or not Core.LogWarn then return end
+    Core.LogWarn(
+        "[PNC][ANIM] bump_rejected npc="
+            .. tostring(record and record.id or "nil")
+            .. " requested=" .. tostring(requested or "")
+            .. " current=" .. tostring(currentBump or "")
+            .. " action=" .. tostring(currentState or "")
+            .. " reason=" .. tostring(reason or "")
+    )
+end
+
 local function beginTrace(zombie, record, requested, resolved, now)
     if not AnimationTrace or not AnimationTrace.Ensure then
         return
@@ -149,9 +162,46 @@ function Animation.PlayBump(zombie, record, bumpType, options)
     if not zombie then
         return false, "no_body"
     end
-    notifyExternalScene(record, zombie, bumpType, options)
     local now = Core and Core.Now and Core.Now() or 0
     local resolvedBumpType = Animation.ResolveBumpType(bumpType)
+    if LiveBodyControl and LiveBodyControl.CheckBumpOwnership then
+        local allowed
+        local ownershipReason
+        local currentState
+        local currentBump
+        allowed,
+            ownershipReason,
+            currentState,
+            currentBump = LiveBodyControl.CheckBumpOwnership(
+                zombie,
+                resolvedBumpType,
+                now
+            )
+        if allowed == false then
+            logOwnershipRejection(
+                zombie,
+                record,
+                resolvedBumpType,
+                ownershipReason,
+                currentState,
+                currentBump
+            )
+            return false, ownershipReason or "bump_owner"
+        end
+        if ownershipReason == "orphaned_passage_recovered"
+            and Core
+            and Core.LogWarn
+        then
+            Core.LogWarn(
+                "[PNC][ANIM] orphaned_passage_context_recovered npc="
+                    .. tostring(record and record.id or "nil")
+                    .. " requested=" .. tostring(resolvedBumpType)
+                    .. " previousAction=" .. tostring(currentState)
+                    .. " previousBump=" .. tostring(currentBump)
+            )
+        end
+    end
+    notifyExternalScene(record, zombie, bumpType, options)
     beginTrace(
         zombie,
         record,
@@ -186,4 +236,3 @@ function Animation.PlayBump(zombie, record, bumpType, options)
     triggerSelector(zombie, record, resolvedBumpType, now)
     return true, "bump_type_setter"
 end
-

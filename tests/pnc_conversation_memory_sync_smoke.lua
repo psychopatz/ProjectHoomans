@@ -8,6 +8,11 @@ local worldHours = 49
 local modData = {}
 getTimeInMillis = function() return now end
 getCurrentSaveName = function() return "Save One" end
+getWorld = function()
+    return {
+        getGameMode = function() return "Apocalypse" end,
+    }
+end
 getGameTime = function()
     return {
         getWorldAgeHours = function() return worldHours end,
@@ -60,6 +65,9 @@ T.equal(batch.messages[1].messageID, message.messageID, "canonical ID crosses br
 T.equal(batch.messages[1].role, "user", "player message role")
 T.equal(batch.messages[1].playerUUID, "player-one", "player scope crosses bridge")
 T.equal(batch.messages[1].npcUUID, "npc-one", "NPC scope crosses bridge")
+T.equal(batch.messages[1].worldMode, "singleplayer", "sync world mode")
+T.equal(batch.messages[1].saveRelativePath, "Apocalypse/Save One",
+    "sync portable save-relative path")
 T.equal(batch.messages[1].gameDay, 2, "game day crosses bridge")
 T.equal(#batch.messages[1].participants, 3, "multi-NPC participants cross bridge")
 

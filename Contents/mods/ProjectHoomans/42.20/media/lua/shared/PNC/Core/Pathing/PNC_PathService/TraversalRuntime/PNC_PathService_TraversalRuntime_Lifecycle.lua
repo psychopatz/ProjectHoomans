@@ -66,6 +66,9 @@ function Internal.beginTraversalAction(zombie, record, lane, spec)
     end
     if zombie.setTarget then zombie:setTarget(nil) end
     if zombie.setPath2 then zombie:setPath2(nil) end
+    if LiveBodyControl and LiveBodyControl.ResetNativeMovementState then
+        LiveBodyControl.ResetNativeMovementState(zombie)
+    end
     if LiveBodyControl and LiveBodyControl.SetManagedBodyUseless then
         LiveBodyControl.SetManagedBodyUseless(zombie, true)
     end
@@ -99,6 +102,22 @@ function Internal.beginTraversalAction(zombie, record, lane, spec)
         )
     elseif zombie.setBumpType then
         zombie:setBumpType(lane.traversalAction.anim)
+    end
+    if Internal.logTraversalEvent then
+        Internal.logTraversalEvent(
+            record,
+            zombie,
+            lane,
+            "start",
+            lane.traversalAction.kind,
+            "anim=" .. tostring(lane.traversalAction.anim or "")
+                .. " from=" .. tostring(lane.traversalAction.startX)
+                .. "," .. tostring(lane.traversalAction.startY)
+                .. "," .. tostring(lane.traversalAction.startZ)
+                .. " to=" .. tostring(lane.traversalAction.endX)
+                .. "," .. tostring(lane.traversalAction.endY)
+                .. "," .. tostring(lane.traversalAction.endZ)
+        )
     end
     if Internal.MotionHints and Internal.MotionHints.Remember then
         Internal.MotionHints.Remember(

@@ -3,6 +3,23 @@ local Const = PNC.Const
 local Core = PNC.Core
 local ClientState = PNC.Network.ClientState
 
+local function memoryPipeline()
+    if PNC.HoomansLLM and PNC.HoomansLLM.Memory then
+        return PNC.HoomansLLM.Memory
+    end
+    local ok = pcall(require, "PNC/Integrations/PNC_HoomansLLMMemory")
+    return ok and PNC.HoomansLLM and PNC.HoomansLLM.Memory or nil
+end
+
+local function queueSnapshotMemoryPrimitives(snapshot)
+    local memory = memoryPipeline()
+    if memory and memory.EnqueueSnapshotPrimitives
+        and snapshot and snapshot.memory_primitives
+    then
+        memory.EnqueueSnapshotPrimitives(snapshot.memory_primitives)
+    end
+end
+
 local function clearPendingBootstrap()
     ClientState.pendingBootstrap = nil
 end
@@ -51,6 +68,7 @@ end
 
 -- Multiplayer replies and direct in-process calls share this cache receiver.
 function Internal.ApplyNPCKnowledgeSnapshot(snapshot, reason)
+    queueSnapshotMemoryPrimitives(snapshot)
     if type(snapshot) == "table" and snapshot.npcID then
         local npcID = tostring(snapshot.npcID)
         ClientState.npcKnowledge = ClientState.npcKnowledge or {}
@@ -353,6 +371,17 @@ Internal.RegisterServerCommand(Const.CMD_KNOWLEDGE_DISCLOSURE, function(args)
         Internal.ApplyNPCPresentation(args.presentation or {
             npcID = args.npcID, state = "error", reason = args.reason,
         })
+    end
+    if args.success == true and args.topicID == "identity_name" then
+        local presentation = args.presentation or {}
+        local memory = memoryPipeline()
+        if memory and memory.EnqueueFirstMeeting then
+            memory.EnqueueFirstMeeting(
+                args.npcID,
+                presentation.displayName or presentation.name,
+                args.requestID
+            )
+        end
     end
     if PNC.Conversation and PNC.Conversation.ReceiveDisclosureResult then
         PNC.Conversation.ReceiveDisclosureResult(args)

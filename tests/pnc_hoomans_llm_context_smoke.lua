@@ -40,6 +40,11 @@ PsychopatzCore = {
 T.load(SHARED .. "PNC/Core/Needs/PNC_NeedsDefinitions.lua")
 T.load(SHARED .. "PNC/Conversation/PNC_ConversationLLMTools.lua")
 getCurrentSaveName = function() return "Save One" end
+getWorld = function()
+    return {
+        getGameMode = function() return "Apocalypse" end,
+    }
+end
 
 T.load(CLIENT .. "PNC/Integrations/PNC_HoomansLLMContext.lua")
 
@@ -79,6 +84,9 @@ local view = {
 
 local context = PNC.HoomansLLM.Context.Build(view, "Where is the shelter?")
 T.equal(context.world_uuid, "pz-save:Save One", "save-scoped world identity")
+T.equal(context.world_mode, "singleplayer", "memory world mode")
+T.equal(context.save_relative_path, "Apocalypse/Save One",
+    "portable save-relative memory path")
 T.equal(context.player_uuid, "char_alex", "stable player identity")
 T.equal(context.npc_uuid, "npc_12", "stable NPC identity")
 T.equal(context.player_name, "Alexandra",

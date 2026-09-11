@@ -471,6 +471,54 @@ PNC.ClientPresenceSync.Internal.ApplySnapshotToBody(
 )
 T.truthy(calls.finish == finishesBeforeScene + 1,
     "MP animation scene did not release on stop")
+
+-- A remote drink snapshot must remain retryable when a native passage still
+-- owns the body-local bump channel. Latching the scene key on a rejected
+-- PlayBump made the drink disappear from the animation path permanently.
+local deferredSceneBody = body()
+local originalPlayBump = PNC.Animation.PlayBump
+local deferredSceneSnapshot = {
+    id = "deferred_drink_replica",
+    alive = true,
+    attackMode = false,
+    healthState = "normal",
+    presenceRevision = 1,
+    presenceState = "live",
+    visualState = {
+        anim = "Drink",
+        moving = false,
+        sceneActive = true,
+        sceneId = "facility.water.drink",
+        sceneBump = "Drink",
+        sceneRevision = 1,
+        scenePlaybackRevision = 1,
+        sceneFinishAt = 5000,
+        sceneLoop = false,
+    },
+}
+PNC.Animation.PlayBump = function(zombie, recordView, anim, options)
+    if anim == "Drink" then
+        return false, "traversal_owner"
+    end
+    return originalPlayBump(zombie, recordView, anim, options)
+end
+PNC.ClientPresenceSync.Internal.ApplySnapshotToBody(
+    deferredSceneSnapshot,
+    deferredSceneBody,
+    true
+)
+T.equal(deferredSceneBody:getModData().PNC_ClientAnimationSceneKey,
+    nil,
+    "rejected drink scene was incorrectly latched as started")
+PNC.Animation.PlayBump = originalPlayBump
+PNC.ClientPresenceSync.Internal.ApplySnapshotToBody(
+    deferredSceneSnapshot,
+    deferredSceneBody,
+    true
+)
+T.truthy(deferredSceneBody:getModData().PNC_ClientAnimationSceneKey
+        == "facility.water.drink:1:1",
+    "deferred drink scene did not retry after traversal ownership ended")
 T.finish("pnc_client_animation_authority_smoke")
 
 T.finish("pnc_client_animation_authority_smoke")

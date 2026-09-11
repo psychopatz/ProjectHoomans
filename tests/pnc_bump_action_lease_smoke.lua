@@ -37,8 +37,30 @@ local bumpType = ""
 local bumpDone = true
 local useless = true
 local actionState = "idle"
+local actionContextState = "idle"
+local legacyState = "idle_state"
+local pathFindState = "pathfind_state"
 ZombieIdleState = {
     instance = function() return "idle_state" end,
+}
+PathFindState = {
+    instance = function() return pathFindState end,
+}
+local actionContext = {
+    getCurrentStateName = function()
+        return actionContextState
+    end,
+    getGroup = function()
+        return {
+            getInitialState = function() return "idle" end,
+        }
+    end,
+    clearActionContextEvents = function() end,
+    setCurrentState = function(_, value)
+        T.equal(value, "idle", "native passage context reset state")
+        actionContextState = value
+        actionState = value
+    end,
 }
 local body = {
     getModData = function()
@@ -46,6 +68,12 @@ local body = {
     end,
     getActionStateName = function()
         return actionState
+    end,
+    getActionContext = function()
+        return actionContext
+    end,
+    isCurrentState = function(_, state)
+        return legacyState == state
     end,
     getBumpType = function()
         return bumpType
@@ -65,6 +93,7 @@ local body = {
     setBumpFall = function() end,
     changeState = function(_, value)
         T.equal(value, "idle_state", "forced bump recovery state")
+        legacyState = value
         actionState = "idle"
     end,
     setRunning = function() end,
@@ -181,6 +210,17 @@ T.equal(
     false,
     "SP attack does not reactivate the engine zombie controller"
 )
+legacyState = pathFindState
+T.equal(
+    PNC.LiveBodyControl.ResetNativeMovementState(body),
+    true,
+    "legacy movement state was not reset before custom traversal"
+)
+T.equal(
+    legacyState,
+    "idle_state",
+    "legacy movement state did not return to idle"
+)
 authority = false
 T.equal(
     PNC.LiveBodyControl.ShouldKeepEngineMovementActive(record, body),
@@ -236,6 +276,17 @@ T.equal(
     false,
     "traversal bump was incorrectly classified as combat"
 )
+actionState = "climbwindow"
+actionContextState = "climbwindow"
+local drinkStarted, drinkReason = PNC.Animation.PlayBump(
+    body,
+    record,
+    "Drink"
+)
+T.equal(drinkStarted, false,
+    "drink replaced an active native passage owner")
+T.equal(drinkReason, "traversal_owner",
+    "passage ownership rejection reason")
 T.equal(
     modData.PNC_BumpKeepUseless,
     true,
@@ -254,10 +305,75 @@ T.equal(
     "scripted traversal bump released"
 )
 T.equal(
+    actionContextState,
+    "idle",
+    "stuck native passage ActionContext was not reset on release"
+)
+T.equal(
     modData.PNC_BumpKeepUseless,
     nil,
     "scripted traversal body-mode lease cleared"
 )
+
+-- A replicated passage can outlive the local traversal lease. Non-traversal
+-- scenes must still be rejected until the ActionContext is back at idle.
+actionState = "climbwindow"
+actionContextState = "climbwindow"
+bumpType = ""
+local staleDrinkStarted, staleDrinkReason = PNC.Animation.PlayBump(
+    body,
+    record,
+    "Drink"
+)
+T.equal(staleDrinkStarted, false,
+    "stale native passage allowed a drink scene to claim the body")
+T.equal(staleDrinkReason, "native_passage_owner",
+    "stale native passage rejection reason")
+T.equal(actionContextState, "idle",
+    "stale native passage ActionContext was not recovered")
+
+-- The engine performs IsoZombie.tryThump after OnZombieUpdate, so clearing
+-- only thumpTarget is too late. Verify the feeler-tile guard hands a window
+-- collision back to the managed idle/retry lane.
+local guardObject = {}
+local guardActionState = "pathfind"
+local guardSquare = {
+    testCollideSpecialObjects = function()
+        return guardObject
+    end,
+}
+local previousInstanceof = instanceof
+instanceof = function(object, className)
+    return object == guardObject and className == "IsoWindow"
+end
+local guardBody = {
+    getCurrentSquare = function() return guardSquare end,
+    getFeelerTile = function() return {} end,
+    getFeelersize = function() return 0.5 end,
+    getActionStateName = function() return guardActionState end,
+    getModData = function() return {} end,
+    getPathFindBehavior2 = function()
+        return {
+            cancel = function() end,
+            reset = function() end,
+        }
+    end,
+    setPath2 = function() end,
+    setUseless = function() end,
+    setVariable = function() end,
+    changeState = function(_, value)
+        T.equal(value, "idle_state", "vanilla passage guard idle state")
+        guardActionState = "idle"
+    end,
+}
+local guarded, guardedKind = PNC.LiveBodyControl.BlockVanillaPassage(
+    guardBody,
+    nil,
+    now
+)
+T.equal(guarded, true, "vanilla window passage was not guarded")
+T.equal(guardedKind, "window", "vanilla passage guard classified window")
+instanceof = previousInstanceof
 
 now = 1300
 started = PNC.Animation.PlayBump(

@@ -24,6 +24,7 @@ require "PNC/Networking/PNC_ClientRequests"
 require "PNC/Networking/PNC_ClientRosterCommands"
 require "PNC/Networking/PNC_ClientInventoryCommands"
 require "PNC/Networking/PNC_ClientActions"
+require "PNC/Networking/PNC_ClientZombieAggroCommands"
 
 local function onFillWorldObjectContextMenu(playerNum, context, worldobjects, test)
     local square
@@ -76,6 +77,11 @@ local function onResetLua()
     ClientState.activeBootstrapRequestID = nil
     ClientState.completedBootstrapRequestID = nil
     ClientState.pendingBootstrap = nil
+    if Internal.ResetZombiePursuitDirectives then
+        Internal.ResetZombiePursuitDirectives()
+    else
+        ClientState.zombiePursuitDirectives = {}
+    end
     ClientState.rosterEntryRevisions = {}
     ClientState.bootstrapKnowledgeRevision = nil
     ClientState.lastBootstrapRequestAt = nil

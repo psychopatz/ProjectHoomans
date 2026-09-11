@@ -131,12 +131,22 @@ function Internal.ActivateStep(record, zombie, scene, definition, now)
     )
     if not started then return false, startReason end
     if PNC.Animation and PNC.Animation.PlayBump then
-        PNC.Animation.PlayBump(zombie, record, step.bump, {
+        local played
+        local playReason
+        played, playReason = PNC.Animation.PlayBump(
+            zombie,
+            record,
+            step.bump,
+            {
             sceneId = definition.id,
             sceneRevision = scene.revision,
             playbackRevision = scene.playbackRevision,
             leaseUntil = Internal.SceneLeaseUntil(scene, now),
-        })
+            }
+        )
+        if played == false then
+            return false, playReason or "scene_bump_rejected"
+        end
     end
     Internal.MarkStepKey(zombie, scene)
     Internal.MarkSceneSync(record, "animation_scene_step")

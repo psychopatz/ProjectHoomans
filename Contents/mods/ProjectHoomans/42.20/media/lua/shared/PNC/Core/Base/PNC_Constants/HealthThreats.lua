@@ -79,6 +79,12 @@ Const.ZOMBIE_TARGET_PLAYER_KEEP_RADIUS = 2.0
 Const.ZOMBIE_NPC_AGGRO_LEASE_MS = 8000
 Const.ZOMBIE_NPC_PATH_REFRESH_MS = 350
 Const.ZOMBIE_NPC_PATH_REFRESH_DISTANCE = 0.6
+-- Server-selected MP movement directives are short-lived. The server
+-- refreshes them only when the target changes/moves or this interval elapses;
+-- clients stop pursuing automatically when the lease expires.
+Const.ZOMBIE_NPC_DIRECTIVE_SEND_MS = 400
+Const.ZOMBIE_NPC_DIRECTIVE_TTL_MS = 1100
+Const.ZOMBIE_NPC_DIRECTIVE_RADIUS = 72
 Const.ZOMBIE_ATTACK_RANGE = 0.95
 Const.ZOMBIE_ATTACK_COOLDOWN_MS = 1500
 Const.ZOMBIE_ATTACK_DAMAGE = 12

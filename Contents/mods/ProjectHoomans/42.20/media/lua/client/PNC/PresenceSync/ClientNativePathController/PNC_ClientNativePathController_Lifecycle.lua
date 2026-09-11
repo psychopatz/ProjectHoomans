@@ -22,6 +22,10 @@ function Internal.OnNativePathZombieUpdate(body)
     local state = body
         and Sync.NativePathStateByBody[body] or nil
     local snapshot = state and state.snapshot or nil
+    local modData = body and body.getModData and body:getModData() or nil
+    local actionState = LiveBodyControl
+        and LiveBodyControl.GetActionContextStateName
+        and LiveBodyControl.GetActionContextStateName(body) or ""
     if state and state.releasePending == true then
         clearOwnedPath(body, state)
         Sync.NativePathStateByBody[body] = nil
@@ -29,6 +33,37 @@ function Internal.OnNativePathZombieUpdate(body)
     end
     if not snapshot then
         return
+    end
+    -- Recover a vanilla passage ActionContext that survived after the native
+    -- controller lost its action record. A live PNC passage is protected by
+    -- state.passageAction or its traversal bump lease and must be left alone.
+    if LiveBodyControl
+        and LiveBodyControl.ResetNativePassageActionContext
+        and LiveBodyControl.IsNativePassageState
+        and LiveBodyControl.IsNativePassageState(actionState)
+        and not (state and state.passageAction)
+        and not (
+            modData
+            and modData.PNC_BumpActionLease == true
+            and LiveBodyControl.IsTraversalBumpType
+            and LiveBodyControl.IsTraversalBumpType(
+                modData.PNC_BumpRequestedType
+            )
+        )
+    then
+        if LiveBodyControl.ResetNativePassageActionContext(body)
+            and Core
+            and Core.LogWarn
+        then
+            Core.LogWarn(
+                "[PNC][PATH] orphaned_passage_context_recovered"
+                    .. " npc=" .. tostring(snapshot.id or "nil")
+                    .. " action=" .. tostring(actionState)
+                    .. " bump=" .. tostring(
+                        modData and modData.PNC_BumpRequestedType or ""
+                    )
+            )
+        end
     end
     -- Match Bandits' ManageActionState boundary on every zombie frame. The
     -- engine owns locomotion/traversal, but never target selection or zombie
@@ -45,6 +80,16 @@ function Internal.OnNativePathZombieUpdate(body)
         body,
         Core and Core.Now and Core.Now() or 0
     )
+    -- On MP clients this handler owns the native path lane. Run the same
+    -- pre-tryThump guard after the PNC passage probe so a missed geometry
+    -- match cannot fall through to IsoZombie.tryThump().
+    if LiveBodyControl and LiveBodyControl.BlockVanillaPassage then
+        LiveBodyControl.BlockVanillaPassage(
+            body,
+            state,
+            Core and Core.Now and Core.Now() or 0
+        )
+    end
 end
 
 function Internal.ClearNativePathControllers()
@@ -93,4 +138,3 @@ if Events and Events.OnZombieUpdate then
 end
 
 return Internal
-

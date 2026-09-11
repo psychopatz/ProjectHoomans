@@ -64,6 +64,29 @@ function H.ApplyLifelongKnowledge(player, character, npcID, spec, at)
             player, npcID
         )
         if snapshot then
+            local record = PNC.Registry and PNC.Registry.Get
+                and PNC.Registry.Get(npcID) or nil
+            local identity = record and PNC.Identity
+                and PNC.Identity.GetCharacterSummary
+                and PNC.Identity.GetCharacterSummary(record) or {}
+            snapshot.memory_primitives = {
+                {
+                    primitive_type = "pre_outbreak_relationship",
+                    memory_type = "PERSONAL_EVENT",
+                    player_uuid = character.uuid,
+                    npc_uuid = npcID,
+                    npc_name = identity.displayName or record and record.name,
+                    relationship_kind = spec.relationshipKind,
+                    variant_key = spec.id,
+                    event_time = {
+                        kind = "pre_outbreak",
+                        phase = "before_outbreak",
+                        label = "Before the outbreak",
+                    },
+                    source = "lifelong_relationship",
+                    authoritative = true,
+                },
+            }
             PNC.Network.SendNPCKnowledge(
                 player, snapshot, "lifelong_relationship"
             )
@@ -72,4 +95,3 @@ function H.ApplyLifelongKnowledge(player, character, npcID, spec, at)
 end
 
 return Starting
-

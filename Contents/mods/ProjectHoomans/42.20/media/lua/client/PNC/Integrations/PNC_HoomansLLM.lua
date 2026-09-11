@@ -6,6 +6,7 @@ require "PNC/Conversation/PNC_ConversationLLMTools"
 require "PNC/Conversation/PNC_ConversationToolReplies"
 require "PNC/Integrations/PNC_HoomansLLMContext"
 require "PNC/Integrations/PNC_ConversationMemorySync"
+require "PNC/Integrations/PNC_HoomansLLMIdentity"
 require "PNC/UI/Nameplates/PNC_NameplateSpeech"
 
 PNC = PNC or {}
@@ -16,6 +17,7 @@ local Integration = PNC.HoomansLLM
 local NameParts = PsychopatzCore.Conversation.NameParts
 local Layout = PsychopatzCore.Conversation.Layout
 local Context = PNC.HoomansLLM.Context
+local MemoryIdentity = PNC.HoomansLLM.Identity
 local LLMTools = PNC.ConversationLLMTools
 local ToolReplies = PNC.Conversation and PNC.Conversation.ToolReplies
 local Message = PsychopatzCore.Conversation.Message
@@ -198,6 +200,10 @@ local function buildPacket(view, requestID, message)
         request_id = requestID,
         npc_id = context.npc_uuid,
         world_uuid = context.world_uuid,
+        world_mode = context.world_mode,
+        save_relative_path = context.save_relative_path,
+        server_instance_id = context.server_instance_id,
+        server_world_generation = context.server_world_generation,
         player_uuid = context.player_uuid,
         session_id = context.session_id,
         npc_name = context.npc_name,
@@ -250,6 +256,7 @@ local function buildAmbientPacket(item, requestID)
     local victimFullName = victim.fullName or "your teammate"
     local victimFirstName = victim.firstName or victimFullName
     local worldUUID = Message.GetSaveID()
+    local memoryIdentity = MemoryIdentity.Current()
     local sessionID = "pnc_ambient_" .. tostring(requestID)
     local eventType = tostring(source.eventType or item and item.family
         or "ambient_social")
@@ -284,6 +291,10 @@ local function buildAmbientPacket(item, requestID)
     end
     local context = {
         world_uuid = worldUUID,
+        world_mode = memoryIdentity.world_mode,
+        save_relative_path = memoryIdentity.save_relative_path,
+        server_instance_id = memoryIdentity.server_instance_id,
+        server_world_generation = memoryIdentity.server_world_generation,
         player_uuid = playerID,
         npc_uuid = npcID,
         session_id = sessionID,
@@ -340,6 +351,10 @@ local function buildAmbientPacket(item, requestID)
         request_id = requestID,
         npc_id = npcID,
         world_uuid = worldUUID,
+        world_mode = memoryIdentity.world_mode,
+        save_relative_path = memoryIdentity.save_relative_path,
+        server_instance_id = memoryIdentity.server_instance_id,
+        server_world_generation = memoryIdentity.server_world_generation,
         player_uuid = playerID,
         session_id = sessionID,
         npc_name = npcFullName,

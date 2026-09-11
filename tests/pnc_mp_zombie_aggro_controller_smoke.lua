@@ -120,6 +120,11 @@ PNC = {
     },
     Core = {
         Now = function() return now end,
+        DistanceSq = function(x1, y1, x2, y2)
+            local dx = x1 - x2
+            local dy = y1 - y2
+            return (dx * dx) + (dy * dy)
+        end,
         IsManagedNPCBody = function(candidate)
             return candidate == npcBody
                 or (managed and candidate == zombie)
@@ -134,7 +139,18 @@ PNC = {
                     zombieTargetable = true,
                 },
             },
+            zombiePursuitDirectives = {
+                ["17"] = {
+                    npcId = "npc",
+                    x = 5,
+                    y = 0,
+                    z = 0,
+                    expiresAt = math.huge,
+                    revision = 1,
+                },
+            },
         },
+        GetZombieOnlineID = function() return 17 end,
     },
     ClientPresenceSync = {
         BodyByID = { npc = npcBody },
@@ -183,27 +199,28 @@ T.truthy(pathRequests == 1,
 npcBody.x = 2
 now = 1600
 registered(zombie)
-T.truthy(pathRequests == 1,
-    "near pursuit unexpectedly submitted another path")
-T.truthy(target == npcBody and attackedBy == npcBody,
-    "near pursuit did not bind the native NPC target")
-T.truthy(spottedCalls == 1 and aggroCalls == 1,
-    "near pursuit did not establish native zombie aggro")
+T.truthy(pathRequests == 2,
+    "moving NPC directive did not submit a refreshed path")
+T.truthy(target == nil and attackedBy == nil,
+    "MP pursuit bound the NPC to native combat state")
+T.truthy(spottedCalls == 0 and aggroCalls == 0,
+    "MP pursuit established native zombie combat aggro")
 
 npcBody.x = 0.8
 now = 2000
 registered(zombie)
-T.truthy(pathRequests == 1 and faced == 1,
-    "bite-range pursuit submitted another path instead of facing")
-T.truthy(target == npcBody and attackedBy == npcBody,
-    "bite-range pursuit released the native NPC target")
+T.truthy(pathRequests == 3 and faced == 1,
+    "bite-range pursuit did not refresh movement and face the NPC")
+T.truthy(target == nil and attackedBy == nil,
+    "bite-range pursuit retained native NPC combat state")
 
 playerIsTarget = true
 player.x = 0.5
 target = nil
+PNC.Network.ClientState.zombiePursuitDirectives["17"] = nil
 now = 2200
 registered(zombie)
-T.truthy(pathRequests == 1,
+T.truthy(pathRequests == 3,
     "closer live player target was incorrectly replaced")
 T.truthy(noLunge == false,
     "player targeting retained the NPC no-lunge override")
@@ -212,65 +229,38 @@ playerIsTarget = false
 managed = true
 now = 2400
 registered(zombie)
-T.truthy(pathRequests == 1,
+T.truthy(pathRequests == 3,
     "managed NPC body entered vanilla zombie aggro control")
 
--- A client-side native bite is not a PNC bite transaction. It must be
--- released unless the server's replicated bite command has already arrived.
+-- The MP directive lane must yield to an engine-owned action and must not
+-- rewrite the native player target while that action is active.
 managed = false
 zombie.actionState = "attack"
-target = npcBody
-attackedBy = npcBody
+target = player
+attackedBy = nil
 targetSeenTime = 22
 now = 2800
 registered(zombie)
-T.truthy(target == nil and attackedBy == nil,
-    "unowned native attack retained the managed NPC target")
-T.equal(targetSeenTime, 0,
-    "unowned native attack retained target memory")
-T.truthy(aggroCleared > 0 and stateChanges > 0,
-    "unowned native attack was not returned to idle")
-
--- Once the server bite command has arrived, the native attack state belongs
--- to the replicated PNC presentation and must not be escaped by the aggro
--- controller.
-PNC.Client = {
-    BiteReplicas = {
-        ["17"] = {
-            phase = "windup",
-            localReleaseAt = now + 500,
-        },
-    },
-}
-zombie.actionState = "attack-network"
-target = npcBody
-attackedBy = npcBody
-targetSeenTime = 31
-local changesBeforeReplica = stateChanges
-now = 2850
-registered(zombie)
-T.truthy(target == npcBody and attackedBy == npcBody,
-    "active replicated bite was incorrectly released")
-T.equal(targetSeenTime, 31,
-    "active replicated bite target memory was cleared")
-T.equal(stateChanges, changesBeforeReplica,
-    "active replicated bite was incorrectly returned to idle")
+T.truthy(target == player and attackedBy == nil,
+    "engine-owned MP action was rewritten by the aggro controller")
+T.equal(targetSeenTime, 22,
+    "engine-owned MP action changed target memory")
 
 local serverSource = T.read(
     "ProjectHoomans", "shared", "PNC/Core/Zombies/PNC_ZombieAggro_Update.lua"
 )
 T.truthy(string.find(
     serverSource,
-    "elseif not isMultiplayerServer() then",
+    "publishMPTargetDirective",
     1,
     true
-), "MP server still owns zombie movement alongside the client")
-T.truthy(not string.find(
+), "MP server does not publish zombie movement directives")
+T.truthy(string.find(
     serverSource,
-    "zombie:setTarget(npcBody)",
+    "if isMultiplayerServer() then",
     1,
     true
-), "MP server binds the IsoZombie NPC as a network character goal")
+), "MP server movement branch is not explicit")
 
 local stateSource = T.read(
     "ProjectHoomans", "shared", "PNC/Core/Zombies/PNC_ZombieAggro_State.lua"

@@ -5,6 +5,8 @@
 -- safe because the receiver enforces the same IDs at its SQLite boundary.
 require "PsychopatzCore/Conversation/PsychopatzConversationMessage"
 require "PsychopatzCore/Events/PC_EventBus"
+require "PNC/Integrations/PNC_HoomansLLMIdentity"
+require "PNC/Integrations/PNC_HoomansLLMMemory"
 
 PNC = PNC or {}
 PNC.HoomansLLM = PNC.HoomansLLM or {}
@@ -13,6 +15,8 @@ PNC.ConversationMemorySync = PNC.ConversationMemorySync or {}
 local Sync = PNC.ConversationMemorySync
 local Message = PsychopatzCore.Conversation.Message
 local Events = PsychopatzCore.Events
+local MemoryIdentity = PNC.HoomansLLM.Identity
+local MemoryPrimitives = PNC.HoomansLLM.Memory
 
 Sync.VERSION = 1
 Sync.STORAGE_KEY = "PNC_ConversationMemorySync"
@@ -104,10 +108,15 @@ local function wireMessage(message)
     if #text > Sync.MAX_CONTENT_LENGTH then
         text = string.sub(text, 1, Sync.MAX_CONTENT_LENGTH)
     end
+    local memoryIdentity = MemoryIdentity.Current()
     return {
         version = Sync.VERSION,
         messageID = tostring(message.messageID or ""),
         saveUUID = tostring(message.saveUUID or Message.GetSaveID()),
+        worldMode = memoryIdentity.world_mode,
+        saveRelativePath = memoryIdentity.save_relative_path,
+        serverInstanceId = memoryIdentity.server_instance_id,
+        serverWorldGeneration = memoryIdentity.server_world_generation,
         conversationID = tostring(message.conversationID or ""),
         namespace = tostring(message.namespace or ""),
         sequence = tonumber(message.sequence) or 0,
@@ -180,11 +189,19 @@ function Sync.Poll()
     for index = 1, math.min(#root.records, Sync.MAX_BATCH) do
         records[#records + 1] = root.records[index]
     end
+    local primitiveBatch = MemoryPrimitives and MemoryPrimitives.Poll
+        and MemoryPrimitives.Poll() or { memory_primitives = {}, pendingCount = 0 }
+    local memoryContext = MemoryPrimitives and MemoryPrimitives.CurrentContext
+        and MemoryPrimitives.CurrentContext() or MemoryIdentity.Current()
     return {
-        status = #records > 0 and "pending" or "idle",
+        status = (#records > 0 or #(primitiveBatch.memory_primitives or {}) > 0)
+            and "pending" or "idle",
         version = Sync.VERSION,
         messages = records,
+        memory_primitives = primitiveBatch.memory_primitives or {},
+        memory_context = memoryContext,
         pendingCount = #root.records,
+        primitivePendingCount = primitiveBatch.pendingCount or 0,
         overflow = tonumber(root.overflow) or 0,
     }
 end
@@ -210,12 +227,15 @@ function Sync.Ack(arguments)
         end
     end
     root.records = kept
+    local primitiveAcknowledged = MemoryPrimitives and MemoryPrimitives.Ack
+        and MemoryPrimitives.Ack(arguments) or 0
     if removed > 0 and print then
         print("[PNC][LLM] conversation_sync_acknowledged count="
             .. tostring(removed) .. " pending=" .. tostring(#root.records))
     end
     return {
         acknowledged = removed,
+        primitivesAcknowledged = primitiveAcknowledged,
         pendingCount = #root.records,
     }
 end

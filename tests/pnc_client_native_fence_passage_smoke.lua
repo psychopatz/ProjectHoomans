@@ -29,6 +29,7 @@ local toSquare = {
 local position = { x = 0.5, y = 0.23, z = 0 }
 local actionState = "pathfind"
 local bumpType
+local bumpOptions
 local climbDirection
 local leases = 0
 local holdRequests = 0
@@ -62,8 +63,9 @@ PNC = {
     },
     PathService = { Internal = {} },
     Animation = {
-        PlayBump = function(_, _, value)
+        PlayBump = function(_, _, value, options)
             bumpType = value
+            bumpOptions = options
             return true
         end,
         FinishBump = function() return true end,
@@ -207,6 +209,7 @@ position.x, position.y, position.z = 0.5, 0.23, 0
 actionState = "pathfind"
 state = {}
 bumpType = nil
+bumpOptions = nil
 handled, reason = Controller.TryNativePassage(
     { id = "tall-fence-npc" }, body, state,
     { x = 3.5, y = 0.5, z = 0 }, 3000)
@@ -240,6 +243,11 @@ handled, reason = Controller.TryNativePassage(
 T.truthy(handled, "open window was not intercepted")
 T.equal(reason, "native_window_climb", "window traversal reason")
 T.equal(bumpType, "PNC_ClimbWindow", "window did not select the PNC clip")
+T.equal(
+    bumpOptions.keepManagedUseless,
+    false,
+    "native window climb incorrectly selected fake-body usefulness"
+)
 T.equal(state.passageAction.kind, "window_climb",
     "window traversal did not create a PNC action")
 T.equal(state.passageAction.toX, 1.5,
@@ -254,17 +262,24 @@ handled, reason = Controller.UpdateWindowSmash(body, state, 6101)
 T.truthy(handled, "window climb did not complete")
 T.equal(reason, "native_window_crossed", "window climb completion reason")
 T.equal(state.passageAction, nil, "window climb action did not clear")
+handled, reason = Controller.TryNativePassage(
+    { id = "window-npc" }, body, state,
+    { x = 3.5, y = 0.5, z = 0 }, 6200)
+T.truthy(handled, "window repeat was not suppressed")
+T.equal(reason, "native_window_cooldown",
+    "window repeat cooldown reason")
 
--- An occupied landing is still attempted because the native route selected
--- the window. Completion must release the bump and briefly yield the same
--- edge so the engine can route around the obstruction.
-PNC.TraversalQuery.CanTraverseAt = function() return false end
+-- A landing may be known to be occupied before the climb, but it can also
+-- become blocked during the animation. Keep the latter completion-path
+-- repair assertion below.
+PNC.TraversalQuery.CanTraverseAt = function() return true end
 position.x, position.y, position.z = 0.5, 0.23, 0
 state = {}
 handled, reason = Controller.TryNativePassage(
     { id = "blocked-window-npc" }, body, state,
     { x = 3.5, y = 0.5, z = 0 }, 7000)
 T.truthy(handled, "blocked window was not attempted")
+PNC.TraversalQuery.CanTraverseAt = function() return false end
 handled, reason = Controller.UpdateWindowSmash(body, state, 8050)
 T.truthy(handled, "blocked window was not repaired")
 T.equal(reason, "native_window_landing_repaired",

@@ -35,6 +35,13 @@ PNC = {
     Core = {
         Now = function() return now end,
     },
+    LiveBodyControl = {
+        IsTraversalBumpType = function(value)
+            value = string.lower(tostring(value or ""))
+            return string.find(value, "climbwindow", 1, true) ~= nil
+                or string.find(value, "climbfence", 1, true) ~= nil
+        end,
+    },
     Animation = {
         PlayBump = function(_, _, bump, options)
             played[#played + 1] = {
@@ -122,6 +129,22 @@ local drinkScene = PNC.AnimationScenes.Get("facility.water.drink")
 T.truthy(drinkScene and drinkScene.bump == "Drink"
         and drinkScene.repeatMode == "once",
     "spigot drinking scene must be a one-shot drink")
+bodyModData.PNC_BumpActionLease = true
+bodyModData.PNC_BumpActionLeaseUntil = now + 10000
+bodyModData.PNC_BumpRequestedType = "PNC_ClimbWindow"
+local deferredDrink, deferredReason = PNC.AnimationScenes.Request(
+    record,
+    body,
+    "facility.water.drink",
+    { now = now }
+)
+T.equal(deferredDrink, false,
+    "drink scene replaced a live traversal owner")
+T.equal(deferredReason, "traversal_active",
+    "drink deferral reason was not traversal ownership")
+bodyModData.PNC_BumpActionLease = nil
+bodyModData.PNC_BumpActionLeaseUntil = nil
+bodyModData.PNC_BumpRequestedType = nil
 T.truthy(PNC.AnimationScenes.Get("production.craft").blocking == false,
     "production animation must not block work progress ticks")
 local researchDefinition =

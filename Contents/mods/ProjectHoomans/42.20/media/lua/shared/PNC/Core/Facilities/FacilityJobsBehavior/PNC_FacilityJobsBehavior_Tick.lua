@@ -307,6 +307,18 @@ function Internal.Tick(record, zombie)
                 and "once" or "loop",
         })
         if started ~= true then
+            if startReason == "traversal_active" then
+                -- Native window/fence passage owns the body until its
+                -- bounded completion or recovery edge. Do not count the
+                -- deliberately deferred drink as a scene-start failure.
+                runtime.phase = "WAITING_TRAVERSAL"
+                runtime.interruptReason = "traversal_active"
+                runtime.startupAttempts = 0
+                runtime.lastProgressAt = startupNow
+                runtime.lastProgressReason =
+                    "facility_waiting_for_traversal"
+                return true
+            end
             -- Do not leave the nameplate in STARTING when scene setup fails.
             -- The next decision may retry the activity, but the failure is
             -- now observable and cannot masquerade as a stuck preparation.

@@ -98,6 +98,9 @@ function Internal.updateTraversalAction(zombie, record, lane, now)
     if LiveBodyControl and LiveBodyControl.SetManagedBodyUseless then
         LiveBodyControl.SetManagedBodyUseless(zombie, true)
     end
+    if LiveBodyControl and LiveBodyControl.ResetNativeMovementState then
+        LiveBodyControl.ResetNativeMovementState(zombie)
+    end
     if zombie.setPath2 then zombie:setPath2(nil) end
     if zombie.setTarget then zombie:setTarget(nil) end
     previousPhase = action.phase
@@ -197,6 +200,23 @@ function Internal.updateTraversalAction(zombie, record, lane, now)
     finishReason = crossed
         and (finished and "anim_finished" or "hard_timeout")
         or "same_side"
+    if Internal.logTraversalEvent then
+        Internal.logTraversalEvent(
+            record,
+            zombie,
+            lane,
+            crossed and "complete" or "failed",
+            finishReason,
+            "kind=" .. tostring(action.kind or "")
+                .. " anim=" .. tostring(action.anim or "")
+                .. " elapsedMs=" .. tostring(
+                    now - (tonumber(action.startedAt) or now)
+                )
+                .. " crossed=" .. tostring(crossed == true)
+                .. " finished=" .. tostring(finished == true)
+                .. " timedOut=" .. tostring(timedOut == true)
+        )
+    end
     if finishReason == "hard_timeout" and Internal.logMoveWarning then
         Internal.logMoveWarning(
             record,

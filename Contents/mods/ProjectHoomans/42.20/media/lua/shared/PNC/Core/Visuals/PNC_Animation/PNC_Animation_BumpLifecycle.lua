@@ -111,6 +111,7 @@ function Animation.PumpBumpRelease(zombie, now)
     local modData
     local releaseAt
     local actionState
+    local contextState
     if not zombie then
         return false
     end
@@ -131,6 +132,10 @@ function Animation.PumpBumpRelease(zombie, now)
         zombie:setVariable("BumpAnimFinished", true)
     end
     actionState = Internal.getActionStateName(zombie)
+    contextState = LiveBodyControl
+        and LiveBodyControl.GetActionContextStateName
+        and LiveBodyControl.GetActionContextStateName(zombie)
+        or actionState
     if (now - releaseAt) < Internal.BUMP_RELEASE_SETTLE_MS
         or (
             actionState == "bumped"
@@ -145,6 +150,32 @@ function Animation.PumpBumpRelease(zombie, now)
             )
         end
         return true
+    end
+    -- A native window/fence handoff can leave the Java ActionContext in
+    -- climbwindow/climbfence even after the PNC bump completion latches have
+    -- fired. Clearing only BumpType does not leave that context, so the NPC
+    -- keeps rendering the passage pose until something physically bumps it.
+    if LiveBodyControl
+        and LiveBodyControl.ResetNativePassageActionContext
+        and LiveBodyControl.IsNativePassageState
+        and (
+            LiveBodyControl.IsNativePassageState(actionState)
+            or LiveBodyControl.IsNativePassageState(contextState)
+        )
+    then
+        if LiveBodyControl.ResetNativePassageActionContext(zombie) then
+            if Core and Core.LogWarn then
+                Core.LogWarn(
+                    "[PNC][ANIM] native_passage_action_context_recovered"
+                        .. " action=" .. tostring(contextState)
+                        .. " requested=" .. tostring(
+                            modData.PNC_BumpRequestedType or ""
+                        )
+                        .. " ageMs=" .. tostring(now - releaseAt)
+                )
+            end
+            actionState = Internal.getActionStateName(zombie)
+        end
     end
     -- BumpedState occasionally misses both completion latches after a native
     -- path/traversal handoff. Waiting forever leaves the NPC frozen in a
