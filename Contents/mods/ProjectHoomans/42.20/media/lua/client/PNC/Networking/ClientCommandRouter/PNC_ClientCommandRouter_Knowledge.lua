@@ -3,6 +3,18 @@ local Const = PNC.Const
 local Core = PNC.Core
 local ClientState = PNC.Network.ClientState
 
+local function logDisclosure(args, result, reason)
+    if not print then return end
+    local success = args and (args.success == true
+        or tostring(args.success or "") == "true") or false
+    print("[PNC][LLM] knowledge_disclosure_received npc="
+        .. tostring(args and args.npcID or "")
+        .. " topic=" .. tostring(args and (args.topicID or args.topicId) or "")
+        .. " success=" .. tostring(success)
+        .. " memory=" .. tostring(result == true)
+        .. " reason=" .. tostring(reason or ""))
+end
+
 local function memoryPipeline()
     if PNC.HoomansLLM and PNC.HoomansLLM.Memory then
         return PNC.HoomansLLM.Memory
@@ -372,17 +384,23 @@ Internal.RegisterServerCommand(Const.CMD_KNOWLEDGE_DISCLOSURE, function(args)
             npcID = args.npcID, state = "error", reason = args.reason,
         })
     end
-    if args.success == true and args.topicID == "identity_name" then
+    local disclosureSuccess = args.success == true
+        or tostring(args.success or "") == "true"
+    local topicID = tostring(args.topicID or args.topicId or "")
+    local memoryQueued = nil
+    local memoryReason = nil
+    if disclosureSuccess and topicID == "identity_name" then
         local presentation = args.presentation or {}
         local memory = memoryPipeline()
         if memory and memory.EnqueueFirstMeeting then
-            memory.EnqueueFirstMeeting(
+            memoryQueued, memoryReason = memory.EnqueueFirstMeeting(
                 args.npcID,
                 presentation.displayName or presentation.name,
                 args.requestID
             )
         end
     end
+    logDisclosure(args, memoryQueued, memoryReason)
     if PNC.Conversation and PNC.Conversation.ReceiveDisclosureResult then
         PNC.Conversation.ReceiveDisclosureResult(args)
     end

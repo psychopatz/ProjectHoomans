@@ -188,6 +188,12 @@ local function isOwnerActuallySneaking(owner, ownerDist)
     return true
 end
 
+-- The player-facing diagnostic uses the same posture rules as follower
+-- stealth.  The optional distance remains available to follower callers;
+-- the player indicator passes nil because it describes the player's own
+-- posture rather than a follower's separation from its owner.
+Stealth.IsOwnerActuallySneaking = isOwnerActuallySneaking
+
 function Stealth.UpdateFollowState(record, owner)
     local runtime
     local ownerSneaking

@@ -25,6 +25,7 @@ require "PNC/Networking/PNC_ClientRosterCommands"
 require "PNC/Networking/PNC_ClientInventoryCommands"
 require "PNC/Networking/PNC_ClientActions"
 require "PNC/Networking/PNC_ClientZombieAggroCommands"
+require "PNC/Networking/PNC_ClientStealthDiscovery"
 
 local function onFillWorldObjectContextMenu(playerNum, context, worldobjects, test)
     local square
@@ -81,6 +82,11 @@ local function onResetLua()
         Internal.ResetZombiePursuitDirectives()
     else
         ClientState.zombiePursuitDirectives = {}
+    end
+    if Internal.ResetStealthDiscovery then
+        Internal.ResetStealthDiscovery()
+    else
+        ClientState.stealthDiscovery = nil
     end
     ClientState.rosterEntryRevisions = {}
     ClientState.bootstrapKnowledgeRevision = nil

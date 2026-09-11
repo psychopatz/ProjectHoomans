@@ -9,8 +9,15 @@ package.preload["PsychopatzCore/Radio/PsychopatzCustomRadioClient"] =
 
 local listener
 local halos = {}
+local published = {}
 local player = {}
 PsychopatzCore = {
+    Conversation = {
+        Message = {
+            New = function(spec) return spec end,
+            Publish = function(message) published[#published + 1] = message end,
+        },
+    },
     CustomRadio = {
         RegisterListener = function(_, _, callback) listener = callback end,
     },
@@ -53,11 +60,27 @@ T.equal(halos[1].value, "Found an enclave",
     "discovery uses a native-style positive arrow notification")
 T.equal(halos[2].value, "Radio contact identified",
     "identity introduction displays separate feedback")
+T.equal(#published, 0, "radio speech waits for a successful broadcast payload")
 T.equal(PNC.RadioDiscoveryPresentation.ShowResult({ result = {
-    ok = true, notificationID = "settlement:1:1",
+    ok = true, notificationID = "settlement:2:1",
+    kind = "settlement", phase = 1,
+    radioBroadcast = {
+        speech = { effect_profile = "radio", intensity = 0.85 },
+        lines = { "<wzzt>", "Unknown voice: Mayday, mayday." },
+    },
+} }), true, "broadcast result displays feedback")
+T.equal(#published, 1, "successful scan publishes one speakable radio line")
+T.equal(published[1].text, "Unknown voice: Mayday, mayday.",
+    "radio noise markers are not sent to TTS")
+T.equal(published[1].presentationState.speech.effect_profile, "radio",
+    "radio broadcast selects the radio DSP profile")
+T.equal(published[1].voiceBinding.slot, "VoiceMale:0",
+    "radio broadcast supplies a fallback voice binding")
+T.equal(PNC.RadioDiscoveryPresentation.ShowResult({ result = {
+    ok = true, notificationID = "settlement:2:1",
     kind = "settlement", phase = 1,
 } }), false, "replayed snapshots do not duplicate feedback")
-T.equal(#halos, 2, "duplicate notification produces no extra halo")
+T.equal(#halos, 3, "duplicate notification produces no extra halo")
 T.finish("pnc_radio_discovery_presentation_smoke")
 
 T.finish("pnc_radio_discovery_presentation_smoke")

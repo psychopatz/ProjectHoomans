@@ -166,6 +166,59 @@ local function log(event, details)
     end
 end
 
+local function memoryPipeline()
+    if PNC.HoomansLLM and PNC.HoomansLLM.Memory then
+        return PNC.HoomansLLM.Memory
+    end
+    local ok = pcall(require, "PNC/Integrations/PNC_HoomansLLMMemory")
+    return ok and PNC.HoomansLLM and PNC.HoomansLLM.Memory or nil
+end
+
+local function disclosureName(view, npcID)
+    local context = view and view.spec and view.spec.context or {}
+    local identity = PNC.NPCIdentityPresentation
+    if identity and identity.GetDisclosureName and context.entry then
+        local name = trim(identity.GetDisclosureName(context.entry))
+        if name ~= "" and name ~= identity.UnknownName then return name end
+    end
+    local state = PNC.Network and PNC.Network.ClientState or {}
+    local projection = state.npcPresentations
+        and state.npcPresentations[tostring(npcID)] or nil
+    local name = projection and (projection.displayName or projection.name)
+    if name and trim(name) ~= "" then return trim(name) end
+    return trim(context.npcFullName or context.npcName)
+end
+
+local function queueNameQuestionMemory(item, value, inputMessage)
+    local memory = memoryPipeline()
+    if not memory or not memory.IsNameQuestion
+        or not memory.IsNameQuestion(value)
+        or not memory.EnqueueFirstMeeting
+    then return end
+    local view = item and item.view
+    local npcID = item and item.npcID or view and view.spec
+        and view.spec.npcID or ""
+    local context = view and view.spec and view.spec.context or {}
+    local name = disclosureName(view, npcID)
+    local playerID = context.characterUUID
+    if playerID == "unbound" or playerID == "unbound-player" then
+        playerID = nil
+    end
+    local queued, reason = memory.EnqueueFirstMeeting(
+        npcID,
+        name,
+        inputMessage and inputMessage.messageID or item and item.requestID,
+        playerID
+    )
+    log(
+        "memory_name_question",
+        "npc=" .. tostring(npcID)
+            .. " name=" .. tostring(name)
+            .. " queued=" .. tostring(queued == true)
+            .. " reason=" .. tostring(reason or "")
+    )
+end
+
 local function traceEnabled()
     return Trace and Trace.IsEnabled and Trace.IsEnabled() == true
 end
@@ -332,6 +385,7 @@ local function buildAmbientPacket(item, requestID)
         recent_conversation = {},
         available_tools = {},
         voice_binding = source.voiceBinding or source.voice_binding,
+        audio_presentation = Context.GetAudioPresentation(source),
         metadata = {
             source = "project-hoomans",
             mode = "ambient_social",
@@ -449,6 +503,7 @@ local function prepareQueueItem(item, value)
         },
     })
     if inputMessage then item.packet.message_id = inputMessage.messageID end
+    queueNameQuestionMemory(item, value, inputMessage)
     session.pendingChoices = pendingChoices
     session.pendingNext = nil
     session.pendingClose = nil
@@ -945,7 +1000,11 @@ local function publishDetachedResponse(pending, response, source)
         worldAgeHours = Message.GetWorldAgeHours(),
         participants = context.participants,
         source = source,
-        presentationState = { conversationUI = false, nameplate = true },
+        presentationState = {
+            conversationUI = false,
+            nameplate = true,
+            speech = context.audio_presentation,
+        },
     })
     local History = PsychopatzCore.Conversation.History
         or require "PsychopatzCore/UI/Conversation/PsychopatzConversationHistory"

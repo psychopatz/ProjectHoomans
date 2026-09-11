@@ -161,6 +161,13 @@ function H.FinishTick(now)
     safeOptional("server_finish.network_flush", Network, "FlushRosterDeltas",
         nil, now, false)
     safeOptional("server_finish.zombie_aggro", ZombieAggro, "Pump", nil, now)
+    safeOptional(
+        "server_finish.stealth_discovery",
+        PNC.ServerStealthDiscovery,
+        "Pump",
+        nil,
+        now
+    )
     if PNC.SocialEncounterTracker
         and PNC.SocialEncounterTracker.Pump
         and PNC.SocialEventHooks

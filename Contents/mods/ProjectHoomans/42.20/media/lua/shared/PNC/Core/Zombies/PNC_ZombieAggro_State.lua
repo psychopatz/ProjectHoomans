@@ -176,6 +176,21 @@ function Internal.isCloseLivePlayerTarget(zombie, target)
     return ((dx * dx) + (dy * dy)) <= (Const.ZOMBIE_TARGET_PLAYER_KEEP_RADIUS * Const.ZOMBIE_TARGET_PLAYER_KEEP_RADIUS)
 end
 
+local function isFreshSneakingPlayerDetected(zombie, player, distanceSq, isRememberedTarget)
+    local contactDistance
+    if isRememberedTarget
+        or not player.isSneaking
+        or player:isSneaking() ~= true
+    then
+        return true
+    end
+    contactDistance = tonumber(Const.STEALTH_BREAK_CONTACT_DISTANCE) or 1.2
+    if distanceSq <= (contactDistance * contactDistance) then
+        return true
+    end
+    return zombie.CanSee and zombie:CanSee(player) == true
+end
+
 function Internal.findNearestLivePlayer(zombie, radius)
     local bestPlayer
     local bestDistSq = math.huge
@@ -195,7 +210,7 @@ function Internal.findNearestLivePlayer(zombie, radius)
     zombieZ = zombie:getZ()
     currentTarget = zombie.getTarget and zombie:getTarget() or nil
 
-    local function consider(player, allowOutsideRadius)
+    local function consider(player, allowOutsideRadius, isRememberedTarget)
         local dx
         local dy
         local distanceSq
@@ -208,10 +223,23 @@ function Internal.findNearestLivePlayer(zombie, radius)
         then
             return
         end
-        seenPlayers[player] = true
         dx = player:getX() - zombieX
         dy = player:getY() - zombieY
         distanceSq = (dx * dx) + (dy * dy)
+        -- Match Stealth.IsOwnerDiscovered's detection rule: contact is a
+        -- detection, while a fresh sneaking player must pass this zombie's
+        -- own CanSee check. The native target is a remembered detection, so
+        -- keep it eligible. This is shared by SP and the MP server's
+        -- authoritative target selection.
+        if not isFreshSneakingPlayerDetected(
+            zombie,
+            player,
+            distanceSq,
+            isRememberedTarget
+        ) then
+            return
+        end
+        seenPlayers[player] = true
         if (allowOutsideRadius or distanceSq <= limitSq)
             and distanceSq < bestDistSq
         then
@@ -224,7 +252,7 @@ function Internal.findNearestLivePlayer(zombie, radius)
     -- is outside the NPC search radius. This prevents a closer NPC from
     -- displacing a player that the native zombie is already pursuing unless
     -- the NPC is genuinely nearer.
-    consider(currentTarget, true)
+    consider(currentTarget, true, currentTarget ~= nil)
     if Core and Core.ForEachPlayer then
         Core.ForEachPlayer(function(player)
             consider(player, false)

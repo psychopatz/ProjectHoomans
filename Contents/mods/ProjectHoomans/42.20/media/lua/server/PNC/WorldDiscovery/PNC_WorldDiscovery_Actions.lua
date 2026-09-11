@@ -6,6 +6,34 @@ local Discovery = PNC.WorldDiscovery
 local Internal = Discovery.Internal
 local Types = PNC.WorldDiscoveryTypes
 
+local function compactRadioBroadcast(message, context)
+    if type(message) ~= "table" or type(message.lines) ~= "table" then
+        return nil
+    end
+    local output = {
+        packID = tostring(message.packID or ""),
+        speakerNPCID = context and context.identityIntroduced == true
+            and context.speakerNPCID or nil,
+        speech = {
+            effect_profile = "radio",
+            environment = "normal",
+            intensity = 0.85,
+        },
+        lines = {},
+    }
+    for _, line in ipairs(message.lines) do
+        local value = type(line) == "table" and line.text or line
+        value = tostring(value or "")
+        value = string.gsub(value, "<[^>]+>", "")
+        value = string.gsub(value, "^%s+", "")
+        value = string.gsub(value, "%s+$", "")
+        if value ~= "" then
+            output.lines[#output.lines + 1] = string.sub(value, 1, 600)
+        end
+    end
+    return #output.lines > 0 and output or nil
+end
+
 function Discovery.RadioScan(player, channelID, frequency)
     local record, reason = Internal.PlayerRecord(player, true)
     if not record then return Discovery.BuildSnapshot(player, {
@@ -59,10 +87,9 @@ function Discovery.RadioScan(player, channelID, frequency)
         or Types.PHASE_RUMORED
     Discovery.SetPhase(player, best.kind, best.entityID,
         nextPhase, "radio")
-    local _, _, broadcast = Discovery.BroadcastRadioDiscovery(
-        player, best, nextPhase
-    )
-    return Discovery.BuildSnapshot(player, {
+    local aired, broadcastMessage, broadcastContext =
+        Discovery.BroadcastRadioDiscovery(player, best, nextPhase)
+    local result = {
         ok = true,
         reason = nextPhase == Types.PHASE_RUMORED
             and "signal_detected" or "signal_located",
@@ -70,13 +97,19 @@ function Discovery.RadioScan(player, channelID, frequency)
         kind = best.kind,
         phase = nextPhase,
         groupType = best.groupType,
-        identityRevealed = broadcast
-            and broadcast.identityIntroduced == true or false,
+        identityRevealed = broadcastContext
+            and broadcastContext.identityIntroduced == true or false,
         notificationID = tostring(best.entityID) .. ":"
             .. tostring(nextPhase) .. ":"
             .. tostring(record.revision or 0),
         channelID = scanChannel.ID,
-    })
+    }
+    if aired then
+        result.radioBroadcast = compactRadioBroadcast(
+            broadcastMessage, broadcastContext
+        )
+    end
+    return Discovery.BuildSnapshot(player, result)
 end
 
 function Discovery.CanUseDebug(player)

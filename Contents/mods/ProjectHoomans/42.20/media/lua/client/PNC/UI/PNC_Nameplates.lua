@@ -10,6 +10,7 @@ PNC.SettingsStore = PNC.SettingsStore or PsychopatzCore.Settings.Open("ProjectHo
     fileName = "ProjectHoomans_Config.txt",
     defaults = {
         enabled = true,
+        showStealthIndicator = true,
         showAIDebug = false,
         showCampDebug = false,
         showPathDebug = false,
@@ -37,6 +38,9 @@ PNC.SettingsStore = PNC.SettingsStore or PsychopatzCore.Settings.Open("ProjectHo
 })
 Nameplates.Settings = PNC.SettingsStore.values
 if Nameplates.Settings.enabled == nil then Nameplates.Settings.enabled = true end
+if Nameplates.Settings.showStealthIndicator == nil then
+    Nameplates.Settings.showStealthIndicator = true
+end
 if Nameplates.Settings.showAIDebug == nil then Nameplates.Settings.showAIDebug = false end
 if Nameplates.Settings.showCampDebug == nil then Nameplates.Settings.showCampDebug = false end
 if Nameplates.Settings.showPathDebug == nil then Nameplates.Settings.showPathDebug = false end
@@ -88,6 +92,7 @@ require "PNC/UI/Nameplates/PNC_NameplateDisplaySettings"
 require "PNC/UI/Nameplates/PNC_NameplateRelationshipFeedback"
 require "PNC/UI/Nameplates/PNC_NameplateRelationshipFeedbackRenderer"
 require "PNC/UI/Nameplates/PNC_NameplateScopes"
+require "PNC/UI/Nameplates/PNC_NameplateStealthIndicator"
 require "PNC/UI/Nameplates/PNC_NameplateEntries"
 require "PNC/UI/Nameplates/NameplateRenderer/PNC_NameplateRenderer"
 
@@ -103,6 +108,7 @@ local State = Nameplates.State
 local Debug = PNC.NameplateDebug
 local Entries = PNC.NameplateEntries
 local Renderer = PNC.NameplateRenderer
+local StealthIndicator = PNC.NameplateStealthIndicator
 
 local overlayDefinitions = {
     { id = "ai", setting = "showAIDebug", label = "AI" },
@@ -179,6 +185,9 @@ end
 
 function ISPNCNameplateManager:render()
     Renderer.Render(self, Settings)
+    if StealthIndicator and StealthIndicator.Render then
+        StealthIndicator.Render(self, Settings)
+    end
 end
 
 function ISPNCNameplateManager:new(playerIndex, player)

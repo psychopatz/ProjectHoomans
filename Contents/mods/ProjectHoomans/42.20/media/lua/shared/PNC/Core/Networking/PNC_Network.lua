@@ -52,6 +52,7 @@ PNC.Network.ClientState = PNC.Network.ClientState or {
     colonyJournalRevision = 0,
     worldDiscovery = nil,
     zombiePursuitDirectives = {},
+    stealthDiscovery = nil,
 }
 if PNC.Network.ClientState.managedBodyOnlineIDs == nil then
     PNC.Network.ClientState.managedBodyOnlineIDs = {}

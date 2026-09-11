@@ -82,6 +82,7 @@ require "PNC/Social/PNC_SocialEventHooks"
 require "PNC/Conversation/PNC_ConversationServer"
 require "PNC/Server/PNC_ServerInventory"
 require "PNC/Networking/PNC_ServerCommandRouting"
+require "PNC/Stealth/PNC_ServerStealthDiscovery"
 if PNC.ProfilerIntegration and PNC.ProfilerIntegration.InstallServer then
     PNC.ProfilerIntegration.InstallServer()
 end

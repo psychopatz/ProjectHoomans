@@ -43,7 +43,12 @@ T.truthy(Gateway.RegisterSource("TestMod", {
                 slot = "VoiceFemale:2",
                 pitch = 4,
             },
-            speech = { mode = "RESPONSE" },
+            speech = {
+                mode = "RESPONSE",
+                effect_profile = "walkie-talkie",
+                environment = "water",
+                intensity = 0.75,
+            },
         }
     end,
 }), "source registers")
@@ -71,6 +76,22 @@ T.equal(packet.text, "What is your name?", "packet carries resolved text")
 T.equal(packet.text_key, "npc.name", "packet keeps compact text reference")
 T.equal(packet.game_day, 2, "packet carries save-aware game day")
 T.equal(packet.voice_binding.slot, "VoiceFemale:2", "packet carries voice binding")
+T.equal(packet.speech.effect_profile, "walkie-talkie",
+    "packet carries audio effect profile")
+T.equal(packet.speech.environment, "water",
+    "packet carries audio environment")
+T.equal(packet.speech.intensity, 0.75,
+    "packet carries audio effect intensity")
+
+local explicitBinding = Message.New({
+    speaker = "npc",
+    speakerID = "radio:one",
+    speakerKind = "npc",
+    text = "Radio test",
+    voiceBinding = { npc_uuid = "radio:one", slot = "VoiceMale:0" },
+})
+T.equal(explicitBinding.voiceBinding.slot, "VoiceMale:0",
+    "canonical messages preserve explicit radio voice bindings")
 
 Message.Publish(Message.New({
     conversationID = "voice-conversation",

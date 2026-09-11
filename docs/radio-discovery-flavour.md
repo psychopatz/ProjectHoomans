@@ -24,3 +24,9 @@ or register a separate pack against
 channel `projecthoomans.frequency_scan` and event type `discovery`. Pack
 `matches(context)` and `priority` select specialized siege, treasure, distress,
 or faction-event traffic while the generic packs remain fallbacks.
+
+When a scan successfully airs a pack, its speakable lines are also returned to
+the client as a bounded radio presentation. If PBrainZ TTS is enabled and the
+radio is still powered, audible, and unmuted, those lines enter the Core voice
+channel with the `radio` DSP profile. Static marker lines such as `<wzzt>` are
+kept for the native radio broadcast but are not sent to TTS.

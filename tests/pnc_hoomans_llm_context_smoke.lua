@@ -57,6 +57,11 @@ local view = {
             playerName = "Alexandra Maximilian Longsurname",
             npcType = "survivor",
             conversationRelationshipID = "Acquaintance",
+            audio_presentation = {
+                effect_profile = "radio",
+                environment = "normal",
+                intensity = 0.8,
+            },
             entry = {
                 id = "npc_12",
                 snapshot = {
@@ -89,6 +94,10 @@ T.equal(context.save_relative_path, "Apocalypse/Save One",
     "portable save-relative memory path")
 T.equal(context.player_uuid, "char_alex", "stable player identity")
 T.equal(context.npc_uuid, "npc_12", "stable NPC identity")
+T.equal(context.audio_presentation.effect_profile, "radio",
+    "interactive LLM carries audio effect profile")
+T.equal(context.audio_presentation.intensity, 0.8,
+    "interactive LLM carries audio effect intensity")
 T.equal(context.player_name, "Alexandra",
     "interactive LLM uses the player's first name for speech")
 T.equal(context.player_full_name, "Alexandra Maximilian Longsurname",

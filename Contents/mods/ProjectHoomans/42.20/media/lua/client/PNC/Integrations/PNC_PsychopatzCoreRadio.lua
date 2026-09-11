@@ -7,6 +7,14 @@ PNC = PNC or {}
 
 local RadioActions = PsychopatzCore and PsychopatzCore.RadioActions
 local CustomRadio = PsychopatzCore and PsychopatzCore.CustomRadio
+local RadioDeviceState = PsychopatzCore and PsychopatzCore.RadioDeviceState
+local Message = PsychopatzCore and PsychopatzCore.Conversation
+    and PsychopatzCore.Conversation.Message
+if not Message then
+    pcall(require, "PsychopatzCore/Conversation/PsychopatzConversationMessage")
+    Message = PsychopatzCore and PsychopatzCore.Conversation
+        and PsychopatzCore.Conversation.Message
+end
 local ScanChannel = PNC.RadioDiscoveryChannel
 local lastProbeAt = {}
 local PROBE_INTERVAL_MS = 40000
@@ -18,6 +26,92 @@ Presentation.lastNotificationID = Presentation.lastNotificationID or nil
 local function tr(key, fallback)
     local value = getText and getText(key) or nil
     return value and value ~= "" and value ~= key and value or fallback
+end
+
+local function activeRadio()
+    if not RadioDeviceState
+        or type(RadioDeviceState.FindAudiblePlayerDevice) ~= "function"
+    then
+        return true
+    end
+    local player = getSpecificPlayer and getSpecificPlayer(0) or nil
+    if not player then return false end
+    local ok, device = pcall(
+        RadioDeviceState.FindAudiblePlayerDevice, player
+    )
+    return ok and device ~= nil
+end
+
+local function broadcastLineText(value)
+    value = type(value) == "table" and value.text or value
+    value = tostring(value or "")
+    value = string.gsub(value, "<[^>]+>", "")
+    value = string.gsub(value, "^%s+", "")
+    value = string.gsub(value, "%s+$", "")
+    return value
+end
+
+function Presentation.PlayBroadcast(payload)
+    local result = payload and payload.result or nil
+    local broadcast = result and result.radioBroadcast or nil
+    local notificationID = result and tostring(result.notificationID or "")
+    if not Message or type(Message.New) ~= "function"
+        or type(Message.Publish) ~= "function"
+        or type(broadcast) ~= "table"
+        or type(broadcast.lines) ~= "table"
+        or notificationID == ""
+        or not activeRadio()
+    then
+        return false
+    end
+    local speakerID = tostring(
+        broadcast.speakerNPCID or "radio:" .. notificationID
+    )
+    local speech = type(broadcast.speech) == "table"
+        and broadcast.speech or {
+            effect_profile = "radio",
+            environment = "normal",
+            intensity = 0.85,
+        }
+    local published = 0
+    for index, line in ipairs(broadcast.lines) do
+        local text = broadcastLineText(line)
+        if text ~= "" then
+            local messageID = "radio-broadcast:" .. notificationID
+                .. ":" .. tostring(index)
+            Message.Publish(Message.New({
+                messageID = messageID,
+                conversationID = "radio:" .. notificationID,
+                sequence = index,
+                speaker = "npc",
+                speakerID = speakerID,
+                speakerName = "Radio contact",
+                speakerKind = "npc",
+                npcUUID = speakerID,
+                namespace = "ProjectHoomans.Radio",
+                text = text,
+                payload = { text = text, style = "radio_broadcast" },
+                source = {
+                    kind = "radio_broadcast",
+                    channel = "radio",
+                    requestID = notificationID,
+                },
+                voiceBinding = {
+                    npc_uuid = speakerID,
+                    slot = "VoiceMale:0",
+                    pitch = 0,
+                },
+                presentationState = {
+                    conversationUI = false,
+                    nameplate = false,
+                    tts = true,
+                    speech = speech,
+                },
+            }))
+            published = published + 1
+        end
+    end
+    return published > 0
 end
 
 local function noticeKey(result)
@@ -63,6 +157,7 @@ function Presentation.ShowResult(payload)
             true, HaloTextHelper.getColorGreen()
         )
     end
+    Presentation.PlayBroadcast(payload)
     return true
 end
 

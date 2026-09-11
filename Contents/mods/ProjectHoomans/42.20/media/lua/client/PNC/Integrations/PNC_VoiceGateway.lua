@@ -101,6 +101,35 @@ local function playerSpeechEnabled()
     return ok and enabled == true
 end
 
+local function speechFor(message)
+    local state = type(message and message.presentationState) == "table"
+        and message.presentationState or {}
+    local requested = state.speech or state.speechPolicy
+    local speech = {
+        mode = "RESPONSE",
+        allow_overlap = false,
+        can_interrupt = false,
+    }
+    if type(requested) ~= "table" then return speech end
+    local fields = {
+        "effect_profile", "effectProfile",
+        "audio_effect_profile", "audioEffectProfile",
+        "environment", "audio_environment", "audioEnvironment",
+        "intensity", "effect_intensity", "effectIntensity",
+    }
+    for index = 1, #fields do
+        local key = fields[index]
+        local value = requested[key]
+        if type(value) == "string"
+            or type(value) == "number"
+            or type(value) == "boolean"
+        then
+            speech[key] = value
+        end
+    end
+    return speech
+end
+
 local function brainAvailable()
     if not Gateway or type(Gateway.IsBridgeReady) ~= "function" then
         return false
@@ -144,11 +173,7 @@ local function enrich(message)
     if not binding then return {} end
     return {
         voice_binding = binding,
-        speech = {
-            mode = "RESPONSE",
-            allow_overlap = false,
-            can_interrupt = false,
-        },
+        speech = speechFor(message),
     }
 end
 

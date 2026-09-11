@@ -191,6 +191,11 @@ function Sync.Poll()
     end
     local primitiveBatch = MemoryPrimitives and MemoryPrimitives.Poll
         and MemoryPrimitives.Poll() or { memory_primitives = {}, pendingCount = 0 }
+    if print and #(primitiveBatch.memory_primitives or {}) > 0 then
+        print("[PNC][LLM] memory_primitive_polled count="
+            .. tostring(#primitiveBatch.memory_primitives)
+            .. " pending=" .. tostring(primitiveBatch.pendingCount or 0))
+    end
     local memoryContext = MemoryPrimitives and MemoryPrimitives.CurrentContext
         and MemoryPrimitives.CurrentContext() or MemoryIdentity.Current()
     return {

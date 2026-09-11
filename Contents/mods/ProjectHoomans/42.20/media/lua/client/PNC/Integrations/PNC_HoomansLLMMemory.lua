@@ -60,6 +60,16 @@ local function playerUUID(explicit)
     return text(explicit or context.characterUUID, 256)
 end
 
+local function logPrimitive(primitiveType, npcID, result, reason, pending)
+    if not print then return end
+    print("[PNC][LLM] memory_primitive_"
+        .. (result == true and "queued" or "rejected")
+        .. " type=" .. text(primitiveType, 64)
+        .. " npc=" .. text(npcID, 128)
+        .. " result=" .. tostring(reason or "unknown")
+        .. " pending=" .. tostring(pending or 0))
+end
+
 local function playerName()
     local current = player()
     if not current then return "" end
@@ -231,20 +241,44 @@ function Memory.Enqueue(event)
     if event.event_time == nil then event.event_time = context.event_time end
     if not event.event_time then return false, "memory_event_time_required" end
     local root = storage()
-    if root.index[event.event_id] then return true, "duplicate" end
+    if root.index[event.event_id] then
+        if primitiveType == "first_meeting" then
+            logPrimitive(primitiveType, npcID, true, "duplicate", #root.records)
+        end
+        return true, "duplicate"
+    end
     if #root.records >= Memory.MAX_PENDING then
+        if primitiveType == "first_meeting" then
+            logPrimitive(primitiveType, npcID, false, "memory_outbox_full", #root.records)
+        end
         return false, "memory_outbox_full"
     end
     root.records[#root.records + 1] = event
     root.index[event.event_id] = true
+    if primitiveType == "first_meeting" then
+        logPrimitive(primitiveType, npcID, true, "queued", #root.records)
+    end
     return true, "queued"
 end
 
-function Memory.EnqueueFirstMeeting(npcID, npcName, sourceEventID)
+function Memory.IsNameQuestion(value)
+    local normalized = string.lower(text(value, 512))
+    normalized = string.gsub(normalized, "['’]", "")
+    normalized = string.gsub(normalized, "[^%w%s]", " ")
+    normalized = string.gsub(normalized, "%s+", " ")
+    normalized = text(normalized, 512)
+    return string.find(normalized, "what is your name", 1, true) ~= nil
+        or string.find(normalized, "whats your name", 1, true) ~= nil
+        or string.find(normalized, "what s your name", 1, true) ~= nil
+end
+
+function Memory.EnqueueFirstMeeting(npcID, npcName, sourceEventID, explicitPlayerID)
     local context = Memory.CurrentContext()
-    local playerID = playerUUID()
+    local playerID = playerUUID(explicitPlayerID)
     local targetID = text(npcID, 256)
     if playerID == "" or targetID == "" then
+        logPrimitive("first_meeting", targetID, false,
+            "memory_event_identity_required", 0)
         return false, "memory_event_identity_required"
     end
     return Memory.Enqueue({
@@ -313,6 +347,11 @@ function Memory.Ack(arguments)
         end
     end
     root.records = kept
+    if removed > 0 and print then
+        print("[PNC][LLM] memory_primitive_acknowledged count="
+            .. tostring(removed)
+            .. " pending=" .. tostring(#root.records))
+    end
     return removed
 end
 

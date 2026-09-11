@@ -59,6 +59,34 @@ local function copyMap(source, keys)
     return output
 end
 
+local AUDIO_PRESENTATION_KEYS = {
+    "effect_profile", "effectProfile",
+    "audio_effect_profile", "audioEffectProfile",
+    "environment", "audio_environment", "audioEnvironment",
+    "intensity", "effect_intensity", "effectIntensity",
+}
+
+local function audioPresentationFor(source)
+    if type(source) ~= "table" then return nil end
+    local requested = source.audio_presentation
+        or source.audioPresentation
+        or source.audio_context
+        or source.audioContext
+        or source.speech
+        or source.speechPolicy
+        or source
+    if type(requested) ~= "table" then return nil end
+    local output = copyMap(requested, AUDIO_PRESENTATION_KEYS)
+    for index = 1, #AUDIO_PRESENTATION_KEYS do
+        if output[AUDIO_PRESENTATION_KEYS[index]] ~= nil then return output end
+    end
+    return nil
+end
+
+function Context.GetAudioPresentation(source)
+    return audioPresentationFor(source)
+end
+
 local function buildNeedsDigest(npcID, source)
     local values = source and source.needs
     if type(values) ~= "table" then return nil end
@@ -480,6 +508,8 @@ function Context.Build(view, message)
                 .. ":" .. tostring(voiceProfile.voiceType or 0),
             pitch = tonumber(voiceProfile.pitch) or 0,
         } or nil,
+        audio_presentation = audioPresentationFor(presentation)
+            or audioPresentationFor(source),
         npc_name = npcName,
         player_name = playerName,
         npc_full_name = npcParts.fullName,

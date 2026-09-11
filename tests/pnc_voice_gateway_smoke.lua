@@ -57,11 +57,24 @@ Message.Publish(Message.New({
     npcUUID = "npc-one",
     text = "Hello there.",
     worldAgeHours = 72,
+    presentationState = {
+        speech = {
+            effect_profile = "walkie-talkie",
+            environment = "water",
+            intensity = 0.75,
+        },
+    },
 }))
 
 T.equal(#packets, 1, "Hoomans adapter publishes NPC voice packet")
 T.equal(packets[1].packet.voice_binding.npc_uuid, "npc-one", "adapter binds NPC")
 T.equal(packets[1].packet.voice_binding.slot, "VoiceFemale:0", "adapter uses NPC profile")
+T.equal(packets[1].packet.speech.effect_profile, "walkie-talkie",
+    "adapter forwards the requested audio effect")
+T.equal(packets[1].packet.speech.environment, "water",
+    "adapter forwards the requested audio environment")
+T.equal(packets[1].packet.speech.intensity, 0.75,
+    "adapter forwards the requested audio intensity")
 
 local player = {
     isFemale = function() return true end,

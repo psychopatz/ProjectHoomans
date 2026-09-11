@@ -52,7 +52,9 @@ PsychopatzCore.CustomRadio.AirEvent = function(channelID, eventType, context)
         eventType = eventType,
         context = context,
     }
-    return true
+    return true, PsychopatzCore.CustomRadio.SelectMessage(
+        channelID, eventType, context
+    )
 end
 T.load(ROOT .. "shared/PNC/Core/Discovery/PNC_WorldDiscoveryTypes.lua")
 T.load(ROOT .. "shared/PNC/Core/Discovery/PNC_RadioDiscoveryChannel.lua")
@@ -213,6 +215,12 @@ local radio = Discovery.RadioScan(player,
 T.equal(radio.result.ok, true, "radio finds an undiscovered mobile group")
 T.equal(radio.result.phase, Types.PHASE_RUMORED,
     "first radio hit records a rumor")
+T.equal(radio.result.identityRevealed, true,
+    "radio scan result preserves the broadcast identity reveal")
+T.equal(radio.result.radioBroadcast.speech.effect_profile, "radio",
+    "radio scan result selects the radio DSP profile")
+T.truthy(#radio.result.radioBroadcast.lines > 0,
+    "radio scan result carries speakable broadcast lines")
 T.equal(#airedBroadcasts, 1,
     "a discovery trigger airs one native custom-channel broadcast")
 T.equal(airedBroadcasts[1].context.groupType, "REFUGEE",

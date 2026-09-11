@@ -48,6 +48,12 @@ T.load("ProjectHoomans", "client",
     "PNC/Integrations/PNC_HoomansLLMMemory.lua")
 
 local Memory = PNC.HoomansLLM.Memory
+T.truthy(Memory.IsNameQuestion("What's your name?"),
+    "natural-language name question is recognized")
+T.truthy(Memory.IsNameQuestion("what is your name"),
+    "plain name question is recognized")
+T.falsy(Memory.IsNameQuestion("Where are you going?"),
+    "unrelated question is not recognized")
 local ok, state = Memory.EnqueueFirstMeeting("npc-one", "Harley", "request-one")
 T.truthy(ok, "first meeting queues")
 T.equal(state, "queued", "first meeting queue state")
