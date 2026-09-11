@@ -289,10 +289,15 @@ local function pursueForcedTarget(zombie, npcBody, record, now)
     end
     if isMultiplayerServer() then
         -- In MP the server selects the target, while the client that owns
-        -- this zombie performs native movement. Never put the NPC shell in
-        -- native combat slots; only replicate this movement directive.
+        -- this zombie performs native movement through the vanilla sound
+        -- responder. Never put the NPC shell in native combat slots.
         setNoLungeAttack(zombie, true)
-        publishMPTargetDirective(zombie, record, npcBody, now)
+        if dist >= Const.ZOMBIE_BITE_DISTANCE
+            and ZombieAggro.Stimulus
+            and ZombieAggro.Stimulus.Emit
+        then
+            ZombieAggro.Stimulus.Emit(record, npcBody, now)
+        end
     else
         -- Restore the prior SP state machine. The client-side SP controller
         -- owns the abstract NPC damage gate and this flag is not its target
@@ -450,9 +455,9 @@ local function processZombie(zombie, now)
     end
     record, npcBody = acquireNearestTarget(zombie)
     if isMultiplayerServer() then
-        if record and npcBody then
-            publishMPTargetDirective(zombie, record, npcBody, now)
-        else
+        -- Existing directives are cleared for hot-reload compatibility, but
+        -- new MP movement no longer depends on the custom per-zombie packet.
+        if not record or not npcBody then
             clearMPTargetDirective(zombie, now)
         end
     end

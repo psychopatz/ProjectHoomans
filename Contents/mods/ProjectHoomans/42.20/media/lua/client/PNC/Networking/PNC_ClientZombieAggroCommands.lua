@@ -1,8 +1,8 @@
--- Client receiver for server-selected zombie movement directives.
+-- Legacy receiver for server-selected zombie movement directives.
 --
--- The server owns target selection in multiplayer. This module only stores a
--- short-lived directive; the zombie owner consumes it through the exposed
--- native movement methods in PNC_ClientZombieAggroController.
+-- Multiplayer movement now uses the vanilla WorldSoundManager path. Keep this
+-- receiver only so stale directives from an older loaded state can be safely
+-- discarded; the client zombie controller no longer consumes them in MP.
 
 PNC = PNC or {}
 PNC.Client = PNC.Client or {}

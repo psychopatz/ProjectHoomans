@@ -70,8 +70,8 @@ local function createSupplyItems(record, base, supplies, prefix, bagContainerID,
     end
 end
 
-function Internal.buildTemplateSnapshot(record)
-    local base = Internal.createBaseInventory(record)
+function Internal.buildTemplateSnapshot(record, options)
+    local base = Internal.createBaseInventory(record, options)
     local template = buildIdentityTemplate(record)
     local appearanceItems = template.appearance and template.appearance.outfitItems or {}
     local lookCounts = {}
@@ -186,12 +186,13 @@ function Inventory.CreateFromTemplate(record, options)
     if not record then
         return nil
     end
-    inv = Internal.buildTemplateSnapshot(record)
+    inv = Internal.buildTemplateSnapshot(record, options)
     generatedTemplate = inv.template or {}
     inv.template = {
         archetypeID = record.archetypeID,
         seed = record.identitySeed,
         generatorVersion = PNC.Const and PNC.Const.GENERATOR_VERSION or 1,
+        createdAtHours = generatedTemplate.createdAtHours,
         equipmentPoolID = generatedTemplate.equipmentPoolID,
         weaponMode = generatedTemplate.weaponMode,
     }

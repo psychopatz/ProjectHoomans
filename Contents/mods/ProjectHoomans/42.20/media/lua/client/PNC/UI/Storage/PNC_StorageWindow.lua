@@ -69,6 +69,18 @@ function ISPNCColonyStorageWindow:toggleInventoryGroup(role, groupKey)
     return Controller.ToggleInventoryGroup(self, role, groupKey)
 end
 
+function ISPNCColonyStorageWindow:onInventoryHover(list)
+    return Controller.OnInventoryHover(self, list)
+end
+
+function ISPNCColonyStorageWindow:onInventoryHoverOutside(list)
+    return Controller.OnInventoryHoverOutside(self, list)
+end
+
+function ISPNCColonyStorageWindow:updateInventoryTooltip()
+    return Controller.UpdateInventoryTooltip(self)
+end
+
 function ISPNCColonyStorageWindow:onStorageControl(button)
     return Controller.OnControl(self, button)
 end
@@ -96,6 +108,7 @@ function ISPNCColonyStorageWindow:prerender()
     local changed, update = Client.HasUpdate(
         self.lastReceiveRevision, self.lastReceiveAt)
     if changed then self:refresh(update) end
+    self:updateInventoryTooltip()
     PsychopatzWindow.prerender(self)
     if WidgetWindow then WidgetWindow.Sync(self) end
 end
@@ -123,6 +136,9 @@ end
 
 function ISPNCColonyStorageWindow:close()
     self:saveGeometry(true)
+    if self.psychopatzInventoryTooltip then
+        self.psychopatzInventoryTooltip:hide()
+    end
     self:setVisible(false)
     self:removeFromUIManager()
     if StorageUI.instance == self then StorageUI.instance = nil end

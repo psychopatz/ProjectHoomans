@@ -73,9 +73,10 @@ local function portableCompactItemState(record, item)
         state.visualTintG = visual.tint and tonumber(visual.tint.g) or nil
         state.visualTintB = visual.tint and tonumber(visual.tint.b) or nil
     end
-    state.condition = item and (item.cond or state.condition) or state.condition
-    state.usedDelta = item and (item.uses or state.usedDelta) or state.usedDelta
-    state.ammoCount = item and (item.ammoCount or state.ammoCount) or state.ammoCount
+    state.condition = item and item.cond ~= nil and item.cond or state.condition
+    state.usedDelta = item and item.uses ~= nil and item.uses or state.usedDelta
+    state.ammoCount = item and item.ammoCount ~= nil and item.ammoCount
+        or state.ammoCount
     state.favorite = item and item.fav == true or false
     state.customName = item and (item.customName or state.customName) or state.customName
     return state

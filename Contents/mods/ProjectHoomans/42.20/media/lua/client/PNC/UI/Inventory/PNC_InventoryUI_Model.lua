@@ -4,6 +4,10 @@ PNC = PNC or {}
 PNC.InventoryUIModel = PNC.InventoryUIModel or {}
 
 local Model = PNC.InventoryUIModel
+local TooltipModel = require
+    "PsychopatzCore/UI/Inventory/PsychopatzInventoryTooltipModel"
+local TooltipOptions = require
+    "PNC/UI/Inventory/PNC_InventoryUI_CoreTooltipOptions"
 local PROBE_CACHE = {}
 local ROOT_INVENTORY_TEXTURE = getTexture
     and getTexture("media/ui/Icon_InventoryBasic.png")
@@ -19,9 +23,9 @@ local function isNPCDepositForbidden(item)
         or item.identityNPCName ~= nil
 end
 
-local function safeCall(object, method, fallback)
+local function safeCall(object, method, fallback, ...)
     if not object or not object[method] then return fallback end
-    local ok, value = pcall(object[method], object)
+    local ok, value = pcall(object[method], object, ...)
     if not ok or value == nil then return fallback end
     return value
 end
@@ -47,6 +51,7 @@ local function probe(fullType)
             safeCall(item, "getActualWeight", nil)
             or safeCall(item, "getWeight", 0)
         ) or 0,
+        conditionMax = tonumber(safeCall(item, "getConditionMax", nil)),
     }
     PROBE_CACHE[fullType] = result
     return result
@@ -92,13 +97,16 @@ end
 local function playerItemRow(item, containerKey, player)
     local fullType = tostring(safeCall(item, "getFullType", ""))
     local metadata = probe(fullType)
-    local customName = safeCall(item, "getName", nil)
+    local customName = safeCall(item, "getName", nil, player)
+    if customName == nil then
+        customName = safeCall(item, "getName", nil)
+    end
     local displayName = tostring(customName or metadata.name or fullType)
     local giftScore = PNC.Gifts and PNC.Gifts.GetItemScore
         and PNC.Gifts.GetItemScore(fullType) or nil
     local giftValid = giftScore and PNC.Gifts.IsValidItemType
         and PNC.Gifts.IsValidItemType(fullType) == true or false
-    return {
+    local row = {
         source = "player",
         id = tostring(safeCall(item, "getID", "")),
         nativeItem = item,
@@ -107,14 +115,21 @@ local function playerItemRow(item, containerKey, player)
         category = metadata.category,
         texture = metadata.texture,
         weight = metadata.weight,
+        unitWeight = metadata.weight,
         container = containerKey,
         stack = 1,
+        conditionMax = metadata.conditionMax,
         equipped = isPlayerItemEquipped(player, item),
         favorite = safeCall(item, "isFavorite", false) == true,
         restricted = false,
         giftScore = giftScore,
         giftValid = giftValid,
     }
+    -- Grouping must ignore quantity/weight, while the tooltip cache still
+    -- tracks them when it evaluates the row directly.
+    row.stateKey = TooltipModel.StateSignature(row, player, false,
+        TooltipOptions.modelOptions)
+    return row
 end
 
 local function groupKey(row)
@@ -126,6 +141,7 @@ local function groupKey(row)
         row.favorite == true and "favorite" or "ordinary",
         row.equipped == true and "equipped" or "carried",
         row.restricted == true and "restricted" or "interactive",
+        tostring(row.stateKey or ""),
     }, "\031")
 end
 
@@ -331,6 +347,9 @@ function Model.BuildNPCRows(inventory, containerID, expandedGroups)
                 category = metadata.category,
                 texture = metadata.texture,
                 weight = metadata.weight * math.max(1, tonumber(item.stack) or 1),
+                unitWeight = metadata.weight,
+                conditionMax = metadata.conditionMax,
+                stateful = true,
                 container = item.container,
                 stack = math.max(1, tonumber(item.stack) or 1),
                 equipped = item.equipSlot ~= nil
@@ -340,6 +359,8 @@ function Model.BuildNPCRows(inventory, containerID, expandedGroups)
                 restricted = isNPCDepositForbidden(item),
                 restrictionReason = item.interactionLockReason,
             }
+            rows[#rows].stateKey = TooltipModel.StateSignature(
+                rows[#rows], nil, false, TooltipOptions.modelOptions)
         end
     end
     table.sort(rows, function(a, b)

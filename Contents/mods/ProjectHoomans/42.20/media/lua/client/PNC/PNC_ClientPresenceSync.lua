@@ -33,6 +33,7 @@ require "PNC/PresenceSync/PresenceVisuals/PNC_ClientPresenceVisuals"
 require "PNC/PresenceSync/PNC_ClientPresenceBodies"
 require "PNC/PresenceSync/ClientNativePathController/PNC_ClientNativePathController"
 require "PNC/PresenceSync/PNC_ClientZombieAggroController"
+require "PNC/PresenceSync/PNC_ClientZombieStimulus"
 require "PNC/PresenceSync/PNC_ClientPresenceTick"
 
 local function onResetLua()
@@ -53,6 +54,9 @@ local function onResetLua()
     Sync.lastRemoteSnapshotStatePruneAt = 0
     if Sync.Internal.ResetClientZombieAggro then
         Sync.Internal.ResetClientZombieAggro()
+    end
+    if Sync.Internal.ResetClientZombieStimulus then
+        Sync.Internal.ResetClientZombieStimulus()
     end
     if Sync.Internal.ClearNativePathControllers then
         Sync.Internal.ClearNativePathControllers()

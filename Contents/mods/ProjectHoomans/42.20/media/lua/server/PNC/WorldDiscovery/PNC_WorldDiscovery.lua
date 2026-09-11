@@ -28,6 +28,16 @@ Discovery.RADIO_RANGE = 10000
 -- Kept as a compatibility fallback for callers that loaded before the
 -- sandbox accessor. Runtime scans use RadioCooldownHours() below.
 Discovery.RADIO_COOLDOWN_HOURS = 0.5
+Discovery.RADIO_AMBIENT_INTERVAL_MS = 90000
+Discovery.RADIO_AMBIENT_GLOBAL_GAP_MS = 60000
+Discovery.RADIO_AMBIENT_CHANCE = 65
+Discovery.RadioAmbientState = Discovery.RadioAmbientState or {
+    lastAiredAt = nil,
+    hasAired = false,
+    lastVariant = nil,
+    sequence = 0,
+    lastRequestAtByPlayer = {},
+}
 
 function Discovery.RadioDiscoveryEnabled()
     local settings = PNC.Sandbox
@@ -53,6 +63,33 @@ function Discovery.RadioSignalChance()
             tonumber(settings.RadioDiscoverySignalChance()) or 100))
     end
     return 100
+end
+
+function Discovery.RadioAmbientEnabled()
+    local settings = PNC.Sandbox
+    if settings and type(settings.RadioAmbientEnabled) == "function" then
+        return settings.RadioAmbientEnabled() == true
+    end
+    return true
+end
+
+function Discovery.RadioAmbientIntervalMs()
+    local settings = PNC.Sandbox
+    if settings and type(settings.RadioAmbientIntervalSeconds) == "function" then
+        return math.max(1000, tonumber(settings.RadioAmbientIntervalSeconds())
+            or Discovery.RADIO_AMBIENT_INTERVAL_MS / 1000) * 1000
+    end
+    return Discovery.RADIO_AMBIENT_INTERVAL_MS
+end
+
+function Discovery.RadioAmbientChance()
+    local settings = PNC.Sandbox
+    if settings and type(settings.RadioAmbientChance) == "function" then
+        return math.max(0, math.min(100,
+            tonumber(settings.RadioAmbientChance())
+                or Discovery.RADIO_AMBIENT_CHANCE))
+    end
+    return Discovery.RADIO_AMBIENT_CHANCE
 end
 
 require "PNC/WorldDiscovery/PNC_WorldDiscovery_Storage"

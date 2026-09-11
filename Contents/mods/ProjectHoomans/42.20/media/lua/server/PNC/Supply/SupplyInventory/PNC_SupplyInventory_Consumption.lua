@@ -48,12 +48,56 @@ local function removePhysicalUnit(adapter, nativeItem)
     return true, function() adapter:_nativeAdd(nativeItem) end
 end
 
+local function fluidStateAfterUse(item, current, remaining)
+    local source = item and item.itemState
+    local effective = PNC.Inventory.ResolveItemState
+        and PNC.Inventory.ResolveItemState(item) or source
+    local amount
+    local ratio
+    local state
+    if type(effective) ~= "table" then return nil end
+    amount = tonumber(effective.fluidAmount)
+    if amount == nil then return nil end
+    state = PNC.Core.DeepCopy(type(source) == "table" and source or {})
+    ratio = current > 0 and remaining / current or 0
+    state.fluidAmount = math.max(0, amount * ratio)
+    if type(source) == "table" and type(source.fluids) == "table" then
+        state.fluids = {}
+        for index = 1, #source.fluids do
+            local entry = source.fluids[index]
+            if type(entry) == "table" and tonumber(entry.amount) then
+                state.fluids[#state.fluids + 1] = {
+                    type = entry.type,
+                    amount = math.max(0, tonumber(entry.amount) * ratio),
+                }
+            end
+        end
+    end
+    if state.fluidAmount <= 0.0001 then
+        state.fluidType = nil
+        state.fluidPrimaryType = nil
+        state.fluids = nil
+    end
+    return state
+end
+
+local function currentUseDelta(item)
+    local current = tonumber(item and item.uses)
+    local resolved
+    if current == nil and PNC.Inventory.ResolveItemState then
+        resolved = PNC.Inventory.ResolveItemState(item)
+        current = resolved and tonumber(resolved.usedDelta) or nil
+    end
+    return current or 1
+end
+
 function H.CanonicalConsumptionOps(item, descriptor)
     local stack = math.max(1, math.floor(tonumber(item.stack) or 1))
     if descriptor.hydration and descriptor.useDelta > 0 then
-        local current = tonumber(item.uses) or 1
+        local current = currentUseDelta(item)
         local remaining = math.max(0, current - descriptor.useDelta)
         if remaining > 0.0001 then
+            local fluidState = fluidStateAfterUse(item, current, remaining)
             if stack > 1 then
                 local split = {}
                 for key, value in pairs(item) do
@@ -64,13 +108,17 @@ function H.CanonicalConsumptionOps(item, descriptor)
                 end
                 split.stack = 1
                 split.uses = remaining
+                if fluidState then split.itemState = fluidState end
                 return {
                     { op = "update", itemID = item.id, stack = stack - 1 },
                     { op = "add", item = split },
                 }, remaining
             end
-            return {{ op = "update", itemID = item.id, uses = remaining }},
-                remaining
+            local update = {
+                op = "update", itemID = item.id, uses = remaining,
+            }
+            if fluidState then update.itemState = fluidState end
+            return { update }, remaining
         end
     end
     if stack > 1 then
@@ -80,6 +128,9 @@ function H.CanonicalConsumptionOps(item, descriptor)
 end
 
 function SupplyInventory.Consume(record, itemID, request)
+    if InventoryCommands.AdvanceFoodLifecycle then
+        InventoryCommands.AdvanceFoodLifecycle(record)
+    end
     local inv = InventoryCommands.EnsureRecordInventory(record)
     local item = inv and inv.items and inv.items[tostring(itemID or "")] or nil
     if not item then return false, "item_not_found" end

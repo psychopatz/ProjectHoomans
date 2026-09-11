@@ -45,6 +45,79 @@ function Discovery.SetPhase(player, kind, entityID, phase, source, deferSave)
         player, entity, phase, source, deferSave)
 end
 
+local function cleanFactionName(value)
+    value = value ~= nil and tostring(value) or nil
+    if not value then return nil end
+    value = string.gsub(value, "^%s+", "")
+    value = string.gsub(value, "%s+$", "")
+    if value == "" or value == "our group"
+        or value == "an unnamed group"
+    then
+        return nil
+    end
+    return value
+end
+
+function Discovery.MarkFactionRevealed(
+    player, entity, factionName, source, deferSave
+)
+    if not entity or not Types.IsKind(entity.kind) then
+        return nil, "invalid_entity"
+    end
+    local name = cleanFactionName(factionName)
+    if not name then return nil, "invalid_faction" end
+    local record, uuid = Internal.PlayerRecord(player, true)
+    if not record then return nil, uuid end
+    local kind = entity.kind
+    local entries = record.entities[kind]
+    local current = entries[entity.entityID]
+    local at = Internal.WorldHour()
+    local changed = false
+    if not current then
+        current = {
+            entityID = entity.entityID,
+            kind = kind,
+            phase = Types.PHASE_RUMORED,
+            source = tostring(source or "unknown"),
+            discoveredAt = at,
+            updatedAt = at,
+            x = entity.x,
+            y = entity.y,
+            z = entity.z,
+            arrivalState = Types.ARRIVAL_UNCHECKED,
+            searchedAt = 0,
+            contactedAt = 0,
+            presenceStatus = Types.PRESENCE_UNKNOWN,
+        }
+        entries[entity.entityID] = current
+        changed = true
+    end
+    if current.factionKnown ~= true
+        or tostring(current.factionName or "") ~= name
+    then
+        current.factionKnown = true
+        current.factionName = name
+        changed = true
+    end
+    if entity.factionID ~= nil
+        and tostring(current.factionID or "")
+            ~= tostring(entity.factionID)
+    then
+        current.factionID = tostring(entity.factionID)
+        changed = true
+    end
+    if not changed then return current, "unchanged" end
+    current.source = tostring(source or current.source or "unknown")
+    current.updatedAt = at
+    current.x, current.y, current.z = entity.x, entity.y, entity.z
+    record.revision = (tonumber(record.revision) or 0) + 1
+    Discovery.Registry.revision =
+        (tonumber(Discovery.Registry.revision) or 0) + 1
+    Discovery.Dirty = true
+    if deferSave ~= true then Discovery.Save() end
+    return current, "advanced"
+end
+
 local function setArrivalState(
     player, entity, arrivalState, presenceStatus, source, deferSave
 )

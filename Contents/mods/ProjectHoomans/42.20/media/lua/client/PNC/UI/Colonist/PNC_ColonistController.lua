@@ -35,16 +35,38 @@ local function detailTitle(definition)
             or definition.detailTitle or "COLONIST DETAILS"))
 end
 
+local function isAvailable(definition, window)
+    if type(definition.available) == "function" then
+        return definition.available(window) == true
+    end
+    return definition.available ~= false
+end
+
+local function availableDefinitions(window)
+    local definitions = {}
+    local signature = {}
+    for _, definition in ipairs(Registry.All()) do
+        if isAvailable(definition, window) then
+            definitions[#definitions + 1] = definition
+            signature[#signature + 1] = definition.id
+        end
+    end
+    return definitions, table.concat(signature, "|")
+end
+
 local function syncTabs(window)
+    local definitions, availabilitySignature = availableDefinitions(window)
     if window.tabRegistryRevision == Registry.Revision
+        and window.tabAvailabilitySignature == availabilitySignature
         and window.tabOrder then
         return false
     end
 
     window.tabButtons = window.tabButtons or {}
     window.tabOrder = {}
+    window.tabDefinitions = definitions
     local active = {}
-    for _, definition in ipairs(Registry.All()) do
+    for _, definition in ipairs(definitions) do
         local id = definition.id
         active[id] = true
         local button = window.tabButtons[id]
@@ -69,11 +91,13 @@ local function syncTabs(window)
         if not active[id] then button:setVisible(false) end
     end
 
-    if not Registry.Get(window.tab) then
-        local first = Registry.All()[1]
+    local current = Registry.Get(window.tab)
+    if not current or not isAvailable(current, window) then
+        local first = definitions[1]
         window.tab = first and first.id or nil
     end
     window.tabRegistryRevision = Registry.Revision
+    window.tabAvailabilitySignature = availabilitySignature
     return true
 end
 
@@ -83,11 +107,25 @@ end
 
 function Controller.SyncTabComponents(window)
     window.tabComponents = window.tabComponents or {}
-    for _, definition in ipairs(Registry.All()) do
+    for _, definition in ipairs(window.tabDefinitions or Registry.All()) do
         local id = definition.id
-        if not window.tabComponents[id] and definition.create then
-            definition.create(window, UI, window.tabControlsPane)
-            window.tabComponents[id] = true
+        if window.tabComponents[id] == nil and definition.create then
+            local component = definition.create(window, UI)
+            window.tabComponents[id] = component or true
+        end
+    end
+end
+
+local function getTabComponent(window, definition)
+    local component = definition and window.tabComponents
+        and window.tabComponents[definition.id] or nil
+    return type(component) == "table" and component or nil
+end
+
+local function hideTabComponents(window)
+    for _, component in pairs(window.tabComponents or {}) do
+        if type(component) == "table" and component.pane then
+            component.pane:setVisible(false)
         end
     end
 end
@@ -107,8 +145,6 @@ function Controller.CreateChildren(window)
     window.lastTaskBrainRequestId = nil
 
     syncTabs(window)
-    window.tabControlsPane = UI.CreatePanel(window)
-    window.tabControlsPane:setVisible(false)
     window.peoplePane, window.people = Selector.Create(window, function()
         window:onPersonSelected()
     end)
@@ -130,25 +166,39 @@ end
 
 function Controller.ApplyContentStyle(window)
     local signature = Options.GetContentOpacitySignature()
-    if window.lastContentOpacitySignature == signature then return end
-    Options.ApplySurfaceOpacity(window.people, "detail")
-    Options.ApplySurfaceOpacity(window.details, "detail")
-    Options.ApplySurfaceOpacity(window.tabControlsPane, "detail")
-    window.lastContentOpacitySignature = signature
+    if window.lastContentOpacitySignature ~= signature then
+        Options.ApplySurfaceOpacity(window.people, "detail")
+        Options.ApplySurfaceOpacity(window.details, "detail")
+        window.lastContentOpacitySignature = signature
+    end
+    for _, component in pairs(window.tabComponents or {}) do
+        if type(component) == "table" and component.pane
+            and component.contentOpacitySignature ~= signature
+        then
+            Options.ApplySurfaceOpacity(component.pane, "detail")
+            component.contentOpacitySignature = signature
+        end
+    end
 end
 
 function Controller.ApplyResponsiveLayout(window)
     syncTabs(window)
     Controller.SyncTabComponents(window)
     local definition = Registry.Get(window.tab)
-    window.layout = LayoutModel.Calculate(window, window.tabOrder, definition)
+    local component = getTabComponent(window, definition)
+    window.activeTabControlsPane = component and component.pane or nil
+    window.layout = LayoutModel.Calculate(window, window.tabOrder, definition,
+        component)
     LayoutModel.Apply(window)
     Controller.ApplyTabLayout(window)
 end
 
 function Controller.ApplyTabLayout(window)
     if not window.layout then return end
-    local definition = Registry.Get(window.tab) or Registry.All()[1]
+    local definition = Registry.Get(window.tab)
+    if not definition or not isAvailable(definition, window) then
+        definition = window.tabDefinitions and window.tabDefinitions[1]
+    end
     if definition then window.tab = definition.id end
     local count = #(window.snapshot and window.snapshot.people or {})
     Selector.SetHeader(window.peoplePane, "COLONISTS", count)
@@ -157,16 +207,19 @@ function Controller.ApplyTabLayout(window)
     -- tab may change its detail rendering, but cannot orphan selection.
     window.peoplePane:setVisible(true)
     window.detailsPane:setVisible(true)
-    if window.tabControlsPane then window.tabControlsPane:setVisible(false) end
-    for _, candidate in ipairs(Registry.All()) do
-        if candidate.apply then
-            candidate.apply(window, candidate == definition, UI.Layout)
-        end
+    hideTabComponents(window)
+    local component = getTabComponent(window, definition)
+    window.activeTabControlsPane = component and component.pane or nil
+    if component and component.pane and window.layout.controls then
+        component.pane:setVisible(true)
+    end
+    if definition and definition.apply then
+        definition.apply(window, true, UI.Layout, component)
     end
 end
 
 function Controller.UpdateTabStyles(window)
-    for _, definition in ipairs(Registry.All()) do
+    for _, definition in ipairs(window.tabDefinitions or Registry.All()) do
         local button = window.tabButtons[definition.id]
         if button then
             local selected = definition.id == window.tab
@@ -181,7 +234,7 @@ function Controller.SelectTab(window, button)
         id = id:gsub("^colonist%-tab:", "")
     end
     local definition = Registry.Get(id)
-    if not definition then return false end
+    if not definition or not isAvailable(definition, window) then return false end
     if definition.action then
         definition.action(window)
         return true
@@ -199,8 +252,9 @@ end
 
 function Controller.OnControl(window, button)
     local definition = Registry.Get(window.tab)
-    if definition and definition.onControl then
-        return definition.onControl(window, button) == true
+    if definition and isAvailable(definition, window) and definition.onControl then
+        return definition.onControl(window, button,
+            getTabComponent(window, definition)) == true
     end
     return false
 end
@@ -208,6 +262,10 @@ end
 function Controller.RebuildDetails(window)
     Components.SetRows(window.details, {})
     local definition = Registry.Get(window.tab)
+    if not definition or not isAvailable(definition, window) then
+        definition = window.tabDefinitions and window.tabDefinitions[1]
+        if definition then window.tab = definition.id end
+    end
     if not definition then
         Components.SetRows(window.details, {
             Presentation.Detail("NO COLONIST TABS", "No tab is registered."),
@@ -219,6 +277,7 @@ function Controller.RebuildDetails(window)
         selectedPerson = Selector.GetSelected(window.people),
         window = window,
         client = Client,
+        component = getTabComponent(window, definition),
     }
     if definition.buildRows then
         Components.SetRows(window.details,
@@ -232,8 +291,10 @@ function Controller.OnPersonSelected(window)
     local person = Selector.GetSelected(window.people)
     window.selectedPersonID = person and person.id or nil
     local definition = Registry.Get(window.tab)
-    if definition and definition.onPersonSelected then
-        definition.onPersonSelected(window, person)
+    if definition and isAvailable(definition, window)
+        and definition.onPersonSelected then
+        definition.onPersonSelected(window, person,
+            getTabComponent(window, definition))
     end
     Controller.RebuildDetails(window)
 end
@@ -247,6 +308,7 @@ function Controller.Refresh(window, update)
     window.roster = roster
     window.selectedPersonID = person and person.id or nil
     syncTabs(window)
+    Controller.SyncTabComponents(window)
     Controller.UpdateTabStyles(window)
     Controller.ApplyTabLayout(window)
     local definition = Registry.Get(window.tab)

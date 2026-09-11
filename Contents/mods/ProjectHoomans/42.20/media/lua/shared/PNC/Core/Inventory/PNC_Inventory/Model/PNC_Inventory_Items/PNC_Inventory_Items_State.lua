@@ -1,5 +1,6 @@
 local Inventory = PNC.Inventory
 local Internal = Inventory.Internal
+local Portable = require "PsychopatzCore/Inventory/PsychopatzPortableItemState"
 local SCALAR_FIELDS = {
     "condition",
     "headCondition",
@@ -11,6 +12,38 @@ local SCALAR_FIELDS = {
     "ammoCount",
     "fluidAmount",
     "fluidType",
+    "fluidPrimaryType",
+    "fluidCapacity",
+    "fluidInputLocked",
+    "fluidCanPlayerEmpty",
+    "fluidRainCatcher",
+    "age",
+    "cooked",
+    "burnt",
+    "frozen",
+    "freezingTime",
+    "hungChange",
+    "thirstChange",
+    "dangerousUncooked",
+    "poison",
+    "poisonDetectionLevel",
+    "poisonLevelForRecipe",
+    "poisonPower",
+    "rottenTime",
+    "cookedInMicrowave",
+    "tainted",
+    "fertilized",
+    "fertilizedTime",
+    "heat",
+    "lastCookMinute",
+    "cookingTime",
+    "foodLastAgedHours",
+    "foodCreatedAtHours",
+    "roundChambered",
+    "jammed",
+    "wetness",
+    "bloodLevel",
+    "dirtyness",
     "visualBaseTexture",
     "visualTextureChoice",
     "visualDecal",
@@ -90,6 +123,27 @@ local function copyModData(raw)
     return copied > 0 and output or nil
 end
 
+local function copyFluidEntries(raw)
+    local output = {}
+    local maxEntries = 8
+    local i
+    local entry
+    local fluidType
+    local amount
+    if type(raw) ~= "table" then return nil end
+    for i = 1, math.min(#raw, maxEntries) do
+        entry = raw[i]
+        if type(entry) == "table" then
+            fluidType = Internal.boundedItemStateString(entry.type)
+            amount = Internal.sanitizeItemStateScalar(entry.amount)
+            if fluidType and fluidType ~= "" and amount and amount >= 0 then
+                output[#output + 1] = { type = fluidType, amount = amount }
+            end
+        end
+    end
+    return #output > 0 and output or nil
+end
+
 function Internal.sanitizeItemState(raw)
     local output = {}
     local i
@@ -104,7 +158,21 @@ function Internal.sanitizeItemState(raw)
     if type(raw.modData) == "table" then
         output.modData = copyModData(raw.modData)
     end
+    output.fluids = copyFluidEntries(raw.fluids)
     return output
+end
+
+function Internal.sanitizeNetworkItemState(raw, item)
+    local exclude = {}
+    item = type(item) == "table" and item or {}
+    if item.cond ~= nil then exclude.condition = true end
+    if item.uses ~= nil then exclude.usedDelta = true end
+    if item.fav == true then exclude.favorite = true end
+    if item.customName ~= nil then exclude.customName = true end
+    if item.ammoCount ~= nil then exclude.ammoCount = true end
+    return Portable.ProjectNetworkState(raw, {
+        exclude = exclude, fullType = item.type,
+    })
 end
 
 function Inventory.SanitizeItemState(raw)

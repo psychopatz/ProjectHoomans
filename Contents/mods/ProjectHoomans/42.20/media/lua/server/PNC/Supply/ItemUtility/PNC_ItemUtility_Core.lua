@@ -75,6 +75,18 @@ function H.ReadNumber(item, scriptItem, methods, fallback)
     return fallback
 end
 
+function H.ReadString(item, scriptItem, methods, fallback)
+    local value
+    for index = 1, #methods do
+        value = H.Call(item, methods[index])
+        if value == nil then value = H.Call(scriptItem, methods[index]) end
+        if value ~= nil and tostring(value) ~= "" then
+            return tostring(value)
+        end
+    end
+    return fallback
+end
+
 function H.ReadBoolean(item, scriptItem, methods)
     for index = 1, #methods do
         local value = H.Call(item, methods[index])

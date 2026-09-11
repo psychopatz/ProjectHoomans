@@ -6,6 +6,7 @@ local Scopes = PNC.NameplateScopes
 local scopeVisible = Internal.ScopeVisible
 local drawPathGoal = Internal.DrawPathGoal
 local drawCombatDebug = Renderer.RenderCombatDebug
+local drawZombieDebug = Renderer.RenderZombieDebug
 local drawSeatingDebug = Renderer.RenderSeatingDebug
 local drawCampResourceDebug = Renderer.RenderCampResourceDebug
 local drawCampResourceHover = Renderer.DrawCampResourceHover
@@ -46,6 +47,22 @@ function Renderer.Render(manager, settings)
                 and scopeVisible(entry, Scopes.DEBUG, true)
             then
                 drawCombatDebug(manager, entry)
+            end
+        end
+    end
+    if settings.showZombieDebug then
+        local drawnZombieDebug = {}
+        local now = getTimeInMillis()
+        for _, entry in pairs(manager.entries) do
+            if not entry.debugOnly
+                and scopeVisible(entry, Scopes.DEBUG, true)
+            then
+                drawZombieDebug(
+                    manager,
+                    entry,
+                    drawnZombieDebug,
+                    now
+                )
             end
         end
     end

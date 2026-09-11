@@ -54,11 +54,17 @@ function H.CollectPersonal(inv, request, required, includeItem)
 end
 
 function SupplyInventory.FindPersonal(record, request, required)
+    if InventoryCommands.AdvanceFoodLifecycle then
+        InventoryCommands.AdvanceFoodLifecycle(record)
+    end
     local inv = InventoryCommands.EnsureRecordInventory(record)
     return H.CollectPersonal(inv, request, required, true)
 end
 
 function SupplyInventory.QueryPersonal(record, request, required)
+    if InventoryCommands.AdvanceFoodLifecycle then
+        InventoryCommands.AdvanceFoodLifecycle(record)
+    end
     local inv = record and record.inventory or nil
     return H.CollectPersonal(inv, request, required, false)
 end
@@ -75,4 +81,3 @@ SupplyInventory.Commands.EnsurePersonalInventory =
 SupplyInventory.Queries.FindPersonal = SupplyInventory.QueryPersonal
 
 return SupplyInventory
-

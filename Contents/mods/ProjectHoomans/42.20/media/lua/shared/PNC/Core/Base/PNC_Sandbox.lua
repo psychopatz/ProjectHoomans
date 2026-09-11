@@ -170,6 +170,18 @@ function Settings.RadioDiscoveryLineSpacingSeconds()
     return Settings.GetNumber("RadioDiscoveryLineSpacingSeconds", 2, 0, 10)
 end
 
+function Settings.RadioAmbientEnabled()
+    return Settings.GetBoolean("RadioAmbientEnabled", true)
+end
+
+function Settings.RadioAmbientIntervalSeconds()
+    return Settings.GetNumber("RadioAmbientIntervalSeconds", 90, 30, 600)
+end
+
+function Settings.RadioAmbientChance()
+    return Settings.GetNumber("RadioAmbientChance", 65, 0, 100)
+end
+
 function Settings.PlayerOwnedNPCNeedMortalityEnabled()
     return Settings.GetBoolean("PlayerOwnedNPCNeedMortality", true)
 end

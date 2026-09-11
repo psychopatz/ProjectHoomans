@@ -1,5 +1,6 @@
 local Registry = require "PNC/UI/Colonist/PNC_ColonistRegistry"
 local Activities = require "PNC/UI/Colonist/PNC_ColonistActivities"
+local Debug = require "PNC/UI/Colonist/PNC_ColonistDebug"
 local Task = require "PNC/UI/Colonist/PNC_ColonistTask"
 local Presentation = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Presentation"
 
@@ -26,20 +27,20 @@ Registry.Register({
     titleFallback = "ACTIVITIES",
     detailTitleKey = "UI_PNC_Activities_Title",
     detailTitleFallback = "ACTIVITY STATUS",
-    create = function(window, UI, host)
-        Activities.Create(window, UI, host)
+    create = function(window, UI)
+        return Activities.Create(window, UI)
     end,
-    getControlsHeight = function(window, width, Layout)
-        return Activities.GetControlsHeight(window, width, Layout)
+    getControlsHeight = function(window, width, Layout, component)
+        return Activities.GetControlsHeight(window, width, Layout, component)
     end,
-    apply = function(window, active, Layout)
-        Activities.Apply(window, active, Layout)
+    apply = function(window, active, Layout, component)
+        Activities.Apply(window, active, Layout, component)
     end,
     buildRows = function(context)
         return Activities.BuildRows(context)
     end,
-    onPersonSelected = function(window, person)
-        return Activities.OnPersonSelected(window, person)
+    onPersonSelected = function(window, person, component)
+        return Activities.OnPersonSelected(window, person, component)
     end,
     onControl = function(window, button)
         return Activities.OnControl(window, button)
@@ -58,6 +59,38 @@ Registry.Register({
     end,
     onRow = function(window, row)
         return Task.OnRow(window, row)
+    end,
+})
+
+Registry.Register({
+    id = "debug",
+    order = 40,
+    titleKey = "UI_PNC_ColonyDebug_Tab",
+    titleFallback = "DEBUG",
+    detailTitleKey = "UI_PNC_ColonyDebug_Title",
+    detailTitleFallback = "COLONIST DEBUG",
+    available = function()
+        return Debug.IsAvailable()
+    end,
+    create = function(window, UI)
+        return Debug.Create(window, UI)
+    end,
+    getControlsHeight = function(window, width, Layout, component)
+        return Debug.GetControlsHeight(window, width, Layout, component)
+    end,
+    apply = function(window, active, Layout, component)
+        Debug.Apply(window, active, Layout, component)
+    end,
+    buildRows = function(context)
+        return Debug.BuildRows(
+            context.selectedPerson, context.snapshot, context.window,
+            context.component)
+    end,
+    onPersonSelected = function(window, person, component)
+        return Debug.OnPersonSelected(window, person, component)
+    end,
+    onControl = function(window, button, component)
+        return Debug.OnControl(window, button, component)
     end,
 })
 

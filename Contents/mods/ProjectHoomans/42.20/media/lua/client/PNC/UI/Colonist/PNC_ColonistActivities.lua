@@ -2,6 +2,7 @@ require "PsychopatzCore/UI/PsychopatzUI"
 require "ISUI/ISPanel"
 
 local Presentation = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Presentation"
+local JournalPresentation = require "PNC/UI/Communities/PNC_ColonistJournalPresentation"
 local Selector = require "PNC/UI/Colonist/PNC_ColonistSelector"
 local Shared = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Shared"
 
@@ -112,10 +113,37 @@ local function active(definition, person)
     return matches(definition, info and info.capability)
 end
 
-local function syncControls(window)
+local function appendJournalRows(rows, person)
+    local journalRows = JournalPresentation.Rows(person and person.journal)
+    rows[#rows + 1] = Presentation.Detail(
+        Shared.Tr("UI_PNC_Journal_Title", "COLONIST JOURNAL"),
+        Shared.TrFormat("UI_PNC_Journal_EntryCount", "%s entries",
+            tostring(#journalRows)), "accent")
+    if #journalRows == 0 then
+        rows[#rows + 1] = Presentation.Detail(
+            Shared.Tr("UI_PNC_Journal_Empty", "No recorded history yet"), "")
+        return
+    end
+    for _, journalRow in ipairs(journalRows) do
+        rows[#rows + 1] = Presentation.Detail(
+            journalRow.message, journalRow.time)
+    end
+end
+
+local function getComponent(window, component)
+    if component then return component end
+    if window and window.tabComponents then
+        component = window.tabComponents.activities
+    end
+    return component or (window and window.activityComponent)
+end
+
+local function syncControls(window, component)
+    component = getComponent(window, component)
+    if not component then return end
     local person = Selector.GetSelected(window.people)
     for _, definition in ipairs(DEFINITIONS) do
-        local button = window.activityControls[definition.id]
+        local button = component.controls[definition.id]
         local isActive = active(definition, person)
         local title = Shared.Tr(definition.key, definition.fallback)
         if definition.id == "manual_sleep" then
@@ -145,23 +173,37 @@ local function gridOptions(window, width)
     }
 end
 
-local function controlsHeight(window, width)
+local function controlsHeight(window, width, component)
+    component = getComponent(window, component)
+    if not component then return 0 end
     local options = gridOptions(window, width)
     local header = Layout.Pixels(25, options.scale)
-    local result = Layout.Grid(window.activityControlList, {
+    local result = Layout.Grid(component.controlList, {
         x = 0,
         y = header + Layout.Pixels(8, options.scale),
         width = math.max(1, tonumber(width) or 1),
         height = 1,
-    }, options)
+    }, options) or {}
     return header + Layout.Pixels(8, options.scale) + result.height
 end
 
-function Activities.Create(window, _, host)
-    window.activityControls = {}
-    window.activityControlList = {}
+function Activities.Create(window, _)
+    local pane = UI.CreatePanel(window)
+    pane:setVisible(false)
+    local component = {
+        pane = pane,
+        controls = {},
+        controlList = {},
+    }
+    window.activityComponent = component
+    pane.render = function(panel)
+        ISPanel.render(panel)
+        UI.DrawSectionTitle(panel,
+            Shared.Tr("UI_PNC_Activities_Commands", "MANUAL COMMANDS"),
+            0, 0, panel:getWidth())
+    end
     for _, definition in ipairs(DEFINITIONS) do
-        local button = UI.CreateButton(host or window, {
+        local button = UI.CreateButton(pane, {
             id = definition.id,
             title = Shared.Tr(definition.key, definition.fallback),
             target = window,
@@ -171,37 +213,30 @@ function Activities.Create(window, _, host)
             variant = "default",
         })
         button.activityCommandID = definition.id
-        window.activityControls[definition.id] = button
-        window.activityControlList[#window.activityControlList + 1] = button
+        component.controls[definition.id] = button
+        component.controlList[#component.controlList + 1] = button
     end
-    if host then
-        host.render = function(panel)
-            ISPanel.render(panel)
-            UI.DrawSectionTitle(panel,
-                Shared.Tr("UI_PNC_Activities_Commands", "MANUAL COMMANDS"),
-                0, 0, panel:getWidth())
-        end
-    end
+    return component
 end
 
-function Activities.GetControlsHeight(window, width)
-    return controlsHeight(window, width)
+function Activities.GetControlsHeight(window, width, _, component)
+    return controlsHeight(window, width, component)
 end
 
-function Activities.Apply(window, activeTab, Layout)
-    for _, button in ipairs(window.activityControlList or {}) do
+function Activities.Apply(window, activeTab, Layout, component)
+    component = getComponent(window, component)
+    if not component then return end
+    local pane = component.pane
+    if pane then pane:setVisible(activeTab == true) end
+    for _, button in ipairs(component.controlList or {}) do
         button:setVisible(activeTab == true)
     end
-    if window.tabControlsPane then
-        window.tabControlsPane:setVisible(activeTab == true)
-    end
     if not activeTab then return end
-    syncControls(window)
-    local pane = window.tabControlsPane
+    syncControls(window, component)
     if not pane then return end
     local options = gridOptions(window, pane:getWidth())
     local header = Layout.Pixels(25, options.scale)
-    Layout.Grid(window.activityControlList, {
+    Layout.Grid(component.controlList, {
         x = 0,
         y = header + Layout.Pixels(8, options.scale),
         width = pane:getWidth(),
@@ -248,14 +283,15 @@ function Activities.BuildRows(context)
         rows[#rows + 1] = Presentation.Detail(
             Shared.Tr("UI_PNC_Activities_SleepDisabled", "SLEEP CONTROL"),
             Shared.Tr("UI_PNC_Activities_SleepDisabledHelp",
-                "OFF - automatic sleep is suppressed until Sleep is enabled."),
+            "OFF - automatic sleep is suppressed until Sleep is enabled."),
             "warning")
     end
+    appendJournalRows(rows, person)
     return rows
 end
 
-function Activities.OnPersonSelected(window)
-    syncControls(window)
+function Activities.OnPersonSelected(window, _, component)
+    syncControls(window, component)
     if window.requestResponsiveLayout then window:requestResponsiveLayout(true) end
     return true
 end

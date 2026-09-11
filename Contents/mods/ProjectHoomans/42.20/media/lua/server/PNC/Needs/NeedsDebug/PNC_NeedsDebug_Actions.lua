@@ -4,6 +4,14 @@ if PsychopatzCore and PsychopatzCore.RuntimeRole
 local Debug = PNC.NeedsDebug
 local H = Debug.Internal
 
+local function normalizeNeedValue(value)
+    value = tonumber(value)
+    if not value then return value end
+    -- Legacy controls sent percentages while the persisted contract is 0..1.
+    if math.abs(value) > 1 then return value / 100 end
+    return value
+end
+
 function Debug.PerformAction(args)
     args = type(args) == "table" and args or {}
     local target = tostring(args.target or "")
@@ -27,16 +35,16 @@ function Debug.PerformAction(args)
         or target == "individual" and PNC.Registry.Get(args.ownerID) or nil
     local ok, reason, value = false, "owner_not_found", nil
     if owner and target == "group" then
-        if operation == "set" then value = PNC.GroupNeeds.Set(owner, args.needType, args.value, "debug")
-        elseif operation == "modify" then value = PNC.GroupNeeds.Modify(owner, args.needType, args.amount, "debug")
+        if operation == "set" then value = PNC.GroupNeeds.Set(owner, args.needType, normalizeNeedValue(args.value), "debug")
+        elseif operation == "modify" then value = PNC.GroupNeeds.Modify(owner, args.needType, normalizeNeedValue(args.amount), "debug")
         elseif operation == "reset" then ok, reason = PNC.GroupNeeds.Reset(owner), "reset"
         elseif operation == "simulate" then ok, reason = PNC.NeedsScheduler.SimulateGroup(owner, args.hours), "simulated"
         elseif operation == "scavenge" then value = PNC.GroupNeeds.DebugAbstractScavenge(owner); ok, reason = value ~= nil, "debug_abstract_scavenge"
         elseif operation == "activity" then ok, reason = PNC.GroupNeeds.SetDebugActivity(owner, args.activity), "activity_set" end
         if value ~= nil then ok, reason = true, "updated" end
     elseif owner and target == "individual" then
-        if operation == "set" then value = PNC.IndividualNeeds.Set(owner, args.needType, args.value, "debug")
-        elseif operation == "modify" then value = PNC.IndividualNeeds.Modify(owner, args.needType, args.amount, "debug")
+        if operation == "set" then value = PNC.IndividualNeeds.Set(owner, args.needType, normalizeNeedValue(args.value), "debug")
+        elseif operation == "modify" then value = PNC.IndividualNeeds.Modify(owner, args.needType, normalizeNeedValue(args.amount), "debug")
         elseif operation == "reset" then ok, reason = PNC.IndividualNeeds.Reset(owner), "reset"
         elseif operation == "simulate" then ok, reason = PNC.NeedsScheduler.SimulateIndividual(owner, args.hours), "simulated" end
         if operation == "force_supply_evaluation" then

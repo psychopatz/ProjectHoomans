@@ -48,6 +48,11 @@ local definitions = {
         get = function() return currentFlag("showCombatDebug", false) end,
     },
     {
+        id = "showZombieDebug",
+        label = "UI_PNC_Settings_ShowZombieDebug",
+        get = function() return currentFlag("showZombieDebug", false) end,
+    },
+    {
         id = "showFactionDebug",
         label = "UI_PNC_Settings_ShowFactionDebug",
         get = function()
@@ -160,11 +165,11 @@ if ModOptions and not Settings.nativeRegistered then
     options:addTitle("UI_PNC_Settings_OverlaySection")
     local index
     for index = 1, #definitions do
-        if index == 8 then
+        if index == 10 then
             options:addSeparator()
             options:addTitle("UI_PNC_Settings_OverlayPartsSection")
         end
-        if index == 20 then
+        if index == 21 then
             options:addSeparator()
             options:addTitle("UI_PNC_Settings_LoggingSection")
         end

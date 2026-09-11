@@ -219,12 +219,11 @@ snapshot construction and all colony/settlement/storage policy remain unchanged.
 
 ## Debugging
 
-`NPC Needs Debug` is registered in the PsychopatzCore debug hub. It requests
-server-owned snapshots and offers group and individual modes, condition/rate
-details, a 40-entry runtime-only history, Need selection, clamped set/modify
-controls, reset, simulated elapsed time, group activity override, and debug
-abstract scavenging. The profiler is opt-in so normal simulation does not time
-or count updates.
+The PsychopatzCore debug-hub entry now opens the gated Colonists `DEBUG` tab.
+The former standalone `NPC Needs Debug` window is no longer loaded as a client
+surface. Its server action handlers remain as compatibility paths for existing
+diagnostic toggles and external callers, with legacy percentage values
+normalized to the persisted 0..1 need contract.
 
 Debug networking is request/action based. Need values are not continuously
 broadcast to clients.

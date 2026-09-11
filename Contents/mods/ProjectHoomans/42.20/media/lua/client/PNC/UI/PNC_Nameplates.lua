@@ -15,6 +15,7 @@ PNC.SettingsStore = PNC.SettingsStore or PsychopatzCore.Settings.Open("ProjectHo
         showCampDebug = false,
         showPathDebug = false,
         showCombatDebug = false,
+        showZombieDebug = false,
         showFactionDebug = false,
         showCommunityDebug = false,
         showAnimationDebug = false,
@@ -45,6 +46,9 @@ if Nameplates.Settings.showAIDebug == nil then Nameplates.Settings.showAIDebug =
 if Nameplates.Settings.showCampDebug == nil then Nameplates.Settings.showCampDebug = false end
 if Nameplates.Settings.showPathDebug == nil then Nameplates.Settings.showPathDebug = false end
 if Nameplates.Settings.showCombatDebug == nil then Nameplates.Settings.showCombatDebug = false end
+if Nameplates.Settings.showZombieDebug == nil then
+    Nameplates.Settings.showZombieDebug = false
+end
 if Nameplates.Settings.showFactionDebug == nil then
     Nameplates.Settings.showFactionDebug = false
 end
@@ -116,6 +120,12 @@ local overlayDefinitions = {
     { id = "path", setting = "showPathDebug", label = "Paths" },
     { id = "combat", setting = "showCombatDebug", label = "Combat" },
     {
+        id = "zombie",
+        setting = "showZombieDebug",
+        label = "",
+        labelKey = "UI_PNC_Settings_ShowZombieDebug",
+    },
+    {
         id = "animation",
         setting = "showAnimationDebug",
         label = "Animation",
@@ -153,6 +163,9 @@ end
 
 function Nameplates.GetOverlayLabel(id)
     local definition = overlayDefinitionByID[tostring(id or "")]
+    if definition and definition.labelKey and getText then
+        return getText(definition.labelKey)
+    end
     return definition and definition.label or tostring(id or "Overlay")
 end
 
@@ -161,7 +174,7 @@ function Nameplates.GetOverlaySummary()
     local definition
     for _, definition in ipairs(overlayDefinitions) do
         if Settings[definition.setting] == true then
-            active[#active + 1] = definition.label
+            active[#active + 1] = Nameplates.GetOverlayLabel(definition.id)
         end
     end
     return #active > 0
@@ -354,6 +367,29 @@ function Nameplates.ToggleCombatDebug()
     return Settings.showCombatDebug
 end
 
+function Nameplates.IsZombieDebugEnabled()
+    return Settings.showZombieDebug == true
+end
+
+function Nameplates.ToggleZombieDebug()
+    local player = getSpecificPlayer(0)
+    Settings.showZombieDebug = not Settings.showZombieDebug
+    PNC.SettingsStore:Set(
+        "showZombieDebug",
+        Settings.showZombieDebug,
+        true
+    )
+    if player and HaloTextHelper and HaloTextHelper.addText then
+        HaloTextHelper.addText(
+            player,
+            Settings.showZombieDebug
+                and "PNC zombie AI overlay enabled"
+                or "PNC zombie AI overlay disabled"
+        )
+    end
+    return Settings.showZombieDebug
+end
+
 function Nameplates.IsAnimationDebugEnabled()
     return Settings.showAnimationDebug == true
 end
@@ -410,6 +446,7 @@ function Nameplates.ToggleOverlay(id)
     if id == "camp" then return Nameplates.ToggleCampDebug() end
     if id == "path" then return Nameplates.TogglePathDebug() end
     if id == "combat" then return Nameplates.ToggleCombatDebug() end
+    if id == "zombie" then return Nameplates.ToggleZombieDebug() end
     if id == "animation" then
         return Nameplates.ToggleAnimationDebug()
     end

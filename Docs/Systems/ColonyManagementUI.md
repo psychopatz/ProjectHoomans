@@ -29,9 +29,9 @@ legacy Colony Management navigation no longer exposes a Workshop tab.
 - `Diagnostics` owns the debug-only, event-focused UI trace.
 - `UI/Workshop` owns the standalone Workshop widget lifecycle and delegates
   production rendering/actions through its controller.
-- `DebugTab` owns authorized colonist need controls and its dedicated control
-  container; it sends authoritative colony actions and never mutates snapshot
-  rows locally.
+- The Colonist `DEBUG` tab owns authorized storage/provision diagnostics and
+  its dedicated control container; it sends authoritative colony actions and
+  never mutates snapshot rows locally.
 - `Window` owns the Project Zomboid window lifecycle and summary rendering.
 
 ## Adding a tab
@@ -74,10 +74,13 @@ an `UI DIAGNOSTICS` checkbox. It logs only layout changes, snapshot requests
 and application, tab/companion selection, and detail row counts. It never logs
 per-frame render activity or full snapshot payloads.
 
-The same authorization exposes the `DEBUG` tab. Its selected-colonist controls
-increase hunger, thirst, or fatigue by 0.25, reset needs, or force an immediate
-provision evaluation. Every action is authorized and applied on the server (or
-the single-player authority) and returns a fresh Colony Management snapshot.
+The same authorization exposes the `DEBUG` tab in the Colonists window. Its
+selected-colonist view contains only the storage/provision diagnostics and
+facility controls; need meters remain on the `NEEDS` tab. Increase hunger,
+thirst, or fatigue by 0.25, reset needs, force provisions, inspect provision
+diagnostics, or run a facility test. Every action is authorized and applied on
+the server (or the single-player authority) and returns a fresh Colony
+Management snapshot.
 The tab's `Provision Diagnostics` control opens a separate responsive modal for
 the selected colonist. The same modal is available as `Provision Stats` in the
 debug NPC Monitor/directory.

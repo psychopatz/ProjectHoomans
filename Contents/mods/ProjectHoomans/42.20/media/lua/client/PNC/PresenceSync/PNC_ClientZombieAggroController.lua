@@ -1,9 +1,8 @@
--- Multiplayer zombie pursuit owner.
+-- Singleplayer zombie pursuit fallback.
 --
--- Build 42 delegates nearby IsoZombie simulation to a client. The server
--- remains authoritative for PNC health and bite damage, while this controller
--- owns native pursuit and targeting on the owning client. This follows the
--- proven Bandits pattern for human NPCs represented by IsoZombie shells.
+-- The multiplayer lane now uses the vanilla WorldSoundManager/RespondToSound
+-- path so the engine owns client-side movement. This controller preserves the
+-- prior singleplayer target/path behavior and remains inert in multiplayer.
 
 PNC = PNC or {}
 PNC.ClientPresenceSync = PNC.ClientPresenceSync or {}
@@ -758,6 +757,14 @@ function Internal.UpdateClientZombieAggro(zombie, now)
         or (zombie.isDead and zombie:isDead())
         or not isLocalZombieUpdate(zombie)
     then
+        return false
+    end
+    -- Multiplayer movement is now driven by the exposed vanilla
+    -- WorldSoundManager/RespondToSound path. The old directive lane cleared
+    -- native targets when a packet or NPC shell was missing, which could
+    -- suppress the sound responder and make zombies appear frozen. Keep the
+    -- controller available for the restored singleplayer branch only.
+    if isMultiplayerDirectiveLane() then
         return false
     end
     actionState = zombie.getActionStateName

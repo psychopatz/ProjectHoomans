@@ -8,6 +8,14 @@ local Inventory = require "PsychopatzCore/Inventory/PsychopatzInventory"
 local C = require "PsychopatzCore/Inventory/PsychopatzInventoryConstants"
 local ItemRecord = require "PsychopatzCore/Inventory/PsychopatzItemRecord"
 
+local function displayStateFor(record)
+    local projected, known = ItemRecord.projectDisplayState(record, {
+        network = true,
+    })
+    if not known then return nil end
+    return projected
+end
+
 local function lower(value)
     return string.lower(tostring(value or ""))
 end
@@ -25,6 +33,7 @@ local function rowFor(record, index)
         totalWeight = (tonumber(record[C.UNIT_WEIGHT]) or 0)
             * math.max(1, math.floor(tonumber(record[C.QUANTITY]) or 1)),
         stateful = not ItemRecord.isBatchable(record),
+        tooltipState = displayStateFor(record),
     }
 end
 

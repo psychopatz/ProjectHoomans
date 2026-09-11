@@ -14,4 +14,11 @@ function Discovery.BroadcastRadioDiscovery(player, entity, phase)
     return aired, reason, context
 end
 
+function Discovery.BroadcastRadioAmbient(player)
+    if not Radio.AirEvent then return false, "radio_engine_unavailable" end
+    local context = Discovery.BuildAmbientTemplateContext()
+    local aired, reason = Radio.AirEvent(Channel.ID, "ambient", context)
+    return aired, reason, context
+end
+
 return Discovery

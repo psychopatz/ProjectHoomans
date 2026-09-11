@@ -147,6 +147,9 @@ local function applyInventoryDelta(args)
             if op.stack ~= nil then item.stack = op.stack end
             if op.uses ~= nil then item.uses = op.uses end
             if op.cond ~= nil then item.cond = op.cond end
+            if op.itemState ~= nil then
+                item.itemState = Core.DeepCopy(op.itemState)
+            end
             if op.ammoCount ~= nil then item.ammoCount = op.ammoCount end
             if op.fav ~= nil then item.fav = op.fav == true end
             if op.interactionLocked ~= nil then
@@ -154,6 +157,17 @@ local function applyInventoryDelta(args)
                 item.interactionLockReason = item.interactionLocked
                     and op.interactionLockReason or nil
             end
+        elseif op.op == "replace" and op.itemID
+            and inventory.items[op.itemID] and op.type
+        then
+            item = inventory.items[op.itemID]
+            item.type = op.type
+            if op.itemState ~= nil then
+                item.itemState = Core.DeepCopy(op.itemState)
+            end
+        elseif op.op == "replace" then
+            Client.RequestCharacterPayload(npcID)
+            return false
         elseif op.op == "move" or op.op == "update" then
             Client.RequestCharacterPayload(npcID)
             return false

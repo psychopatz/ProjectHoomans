@@ -331,6 +331,22 @@ local function nativeItem(fullType)
     item.isFood = food
     item.isDrainable = water
     item.usedDelta = water and 1 or nil
+    if water then
+        local primary = {
+            getFluidTypeString = function() return "Water" end,
+            getFluidType = function() return "Water" end,
+        }
+        local container = {
+            getAmount = function() return 1 end,
+            getCapacity = function() return 1 end,
+            isInputLocked = function() return false end,
+            canPlayerEmpty = function() return true end,
+            getRainCatcher = function() return 0 end,
+            getPrimaryFluid = function() return primary end,
+            getSpecificFluidAmount = function() return 1 end,
+        }
+        function item:getFluidContainer() return container end
+    end
     function item:getFullType() return self.fullType end
     function item:getCondition() return self.condition end
     function item:getConditionMax() return 10 end
@@ -611,6 +627,54 @@ require "PNC/Supply/PNC_SupplyInventory"
 require "PNC/Journals/PNC_JournalRoutes"
 require "PNC/Supply/PNC_NPCSupplyService"
 require "PNC/Needs/PNC_NeedSupplyBridge"
+
+local fluidOps, fluidRemaining =
+    PNC.SupplyInventoryInternal.CanonicalConsumptionOps({
+        id = "abstract_water", type = "Base.WaterBottle", stack = 1,
+        itemState = {
+            fluidAmount = 1, fluidCapacity = 1,
+            fluidPrimaryType = "Water",
+            fluids = { { type = "Water", amount = 1 } },
+        },
+    }, { hydration = true, useDelta = 0.25 })
+T.near(fluidRemaining, 0.75, 0.000001,
+    "abstract hydration keeps remaining uses")
+T.near(fluidOps[1].itemState.fluidAmount, 0.75, 0.000001,
+    "abstract hydration drains fluid amount")
+T.near(fluidOps[1].itemState.fluids[1].amount, 0.75, 0.000001,
+    "abstract hydration drains mixture component")
+
+PsychopatzCore.Inventory.getItemTypeId("Base.WaterBottle", true)
+local directWaterProbe = InventoryItemFactory.CreateItem("Base.WaterBottle")
+T.truthy(directWaterProbe, "water factory probe was unavailable")
+T.truthy(directWaterProbe.getFluidContainer,
+    "water factory probe lacked a fluid container")
+local waterDefinition = PNC.Inventory.GetItemDefinitionState("Base.WaterBottle")
+T.truthy(waterDefinition, "default water definition was not resolved")
+T.equal(waterDefinition.fluidAmount, 1,
+    "default water definition did not expose its fluid amount")
+local defaultDescriptor = PNC.ItemUtility.DescribeNPCItem({
+    id = "default_water", type = "Base.WaterBottle", stack = 1,
+})
+T.equal(defaultDescriptor.hydration, true,
+    "metadata-free default water was not usable for hydration")
+local emptyDescriptor = PNC.ItemUtility.DescribeNPCItem({
+    id = "empty_water", type = "Base.WaterBottle", stack = 1,
+    itemState = { fluidAmount = 0 },
+})
+T.equal(emptyDescriptor.hydration, false,
+    "explicitly empty water was still usable for hydration")
+local defaultFluidOps, defaultFluidRemaining =
+    PNC.SupplyInventoryInternal.CanonicalConsumptionOps({
+        id = "default_water", type = "Base.WaterBottle", stack = 1,
+    }, defaultDescriptor)
+T.near(defaultFluidRemaining, 0.75, 0.000001,
+    "default fluid consumption used the definition use delta")
+T.near(defaultFluidOps[1].itemState.fluidAmount, 0.75, 0.000001,
+    "default fluid consumption did not materialize a sparse amount delta")
+T.equal(defaultFluidOps[1].itemState.fluids, nil,
+    "default fluid consumption stored a redundant single-fluid list")
+
 PNC.Skills = PNC.Skills or {}
 PNC.Skills.AddXP = function() end
 PNC.NPCWounds = {
@@ -1173,8 +1237,12 @@ local reloadedWater
 for _, compact in pairs(saveReloaded.inventory.items) do
     if compact.type == "Base.WaterBottle" then reloadedWater = compact end
 end
-T.truthy(reloadedWater and math.abs((reloadedWater.uses or 0) - 1) < 0.001,
-    "acquired drainable state did not survive save/load")
+T.truthy(reloadedWater, "acquired drainable item did not survive save/load")
+T.equal(reloadedWater.uses, nil,
+    "default drainable uses were redundantly persisted")
+local reloadedWaterState = PNC.Inventory.ResolveItemState(reloadedWater)
+T.near(reloadedWaterState.usedDelta, 1, 0.000001,
+    "default drainable state did not resolve after save/load")
 
 -- Consuming one baseline bandage records one missing template item.
 loadout.supplies = {{ key = "baseline_bandage", type = "Base.Bandage",

@@ -593,5 +593,6 @@ local function drawCombatDebug(manager, entry)
 end
 
 Renderer.RenderCombatDebug = drawCombatDebug
+Renderer.ResolveZombieAttacker = resolveZombieAttacker
 
 return Renderer

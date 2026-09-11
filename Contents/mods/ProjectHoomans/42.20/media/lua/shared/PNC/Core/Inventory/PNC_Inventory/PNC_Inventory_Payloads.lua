@@ -42,6 +42,11 @@ function Inventory.BuildSummaryPayload(record)
 end
 
 function Inventory.BuildFullPayload(record)
+    if Inventory.AdvanceFoodLifecycle
+        and type(isServer) == "function" and isServer() == true
+    then
+        Inventory.AdvanceFoodLifecycle(record)
+    end
     local inv = Inventory.EnsureRecordInventory(record)
     local items = {}
     local containers = {}
@@ -50,7 +55,7 @@ function Inventory.BuildFullPayload(record)
         return nil
     end
     for id, _ in pairs(inv.items or {}) do
-        items[id] = Internal.itemToPayload(inv.items[id])
+        items[id] = Internal.itemToNetworkPayload(inv.items[id])
     end
     for id, _ in pairs(inv.containers or {}) do
         containers[id] = {
@@ -72,6 +77,11 @@ function Inventory.BuildFullPayload(record)
 end
 
 function Inventory.BuildDeltaPayload(record, sinceRevision)
+    if Inventory.AdvanceFoodLifecycle
+        and type(isServer) == "function" and isServer() == true
+    then
+        Inventory.AdvanceFoodLifecycle(record)
+    end
     local runtime = Internal.getRuntimeState(record)
     local inv = Inventory.EnsureRecordInventory(record)
     local payload = {}

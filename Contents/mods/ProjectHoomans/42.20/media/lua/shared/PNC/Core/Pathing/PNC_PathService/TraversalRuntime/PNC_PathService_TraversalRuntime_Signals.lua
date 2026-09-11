@@ -101,6 +101,7 @@ function Runtime.resetEngineTraversalVariables(zombie, kind)
         zombie:setVariable("ClimbFenceOutcome", "")
     elseif kind == "window_climb" then
         zombie:setVariable("ClimbWindowStarted", false)
+        zombie:setVariable("ClimbWindowFinished", true)
         zombie:setVariable("ClimbWindowOutcome", "")
     end
 end

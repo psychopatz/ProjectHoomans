@@ -51,12 +51,28 @@ function Network.BuildPresenceDelta(record)
     local combatDebugState
     local lastCombatDebugAt = record.runtime
         and tonumber(record.runtime.combatDebugReplicatedAt) or 0
+    local zombieAttackerAt = record.runtime
+        and tonumber(record.runtime.zombieAttacker
+            and record.runtime.zombieAttacker.observedAt) or 0
+    local zombieStimulusAt = record.runtime
+        and tonumber(record.runtime.zombieStimulus
+            and record.runtime.zombieStimulus.emittedAt) or 0
+    local zombieDebugActive =
+        (zombieAttackerAt > 0
+            and now - zombieAttackerAt <= 1500)
+        or (zombieStimulusAt > 0
+            and now - zombieStimulusAt <= 1500)
+    local zombieDebugTransitioned = record.runtime
+        and record.runtime.zombieDebugWasActive ~= zombieDebugActive
+        or false
     local combatDebugTransitioned = record.runtime
         and record.runtime.combatDebugWasActive ~= inCombat
         or false
     if lastCombatDebugAt <= 0
         or combatDebugTransitioned
+        or zombieDebugTransitioned
         or (inCombat and now - lastCombatDebugAt >= 150)
+        or (zombieDebugActive and now - lastCombatDebugAt >= 350)
     then
         local equipmentInfo = Equipment
             and Equipment.Describe
@@ -74,6 +90,7 @@ function Network.BuildPresenceDelta(record)
     end
     if record.runtime then
         record.runtime.combatDebugWasActive = inCombat
+        record.runtime.zombieDebugWasActive = zombieDebugActive
     end
     return {
         interestDetailed = true,

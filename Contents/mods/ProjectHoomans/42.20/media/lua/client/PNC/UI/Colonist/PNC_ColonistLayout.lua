@@ -10,7 +10,7 @@ local function setPane(window, pane, rect)
     pane:layoutContent()
 end
 
-function LayoutModel.Calculate(window, tabButtons, tabDefinition)
+function LayoutModel.Calculate(window, tabButtons, tabDefinition, tabComponent)
     -- Keep the two-pane relationship even at the smallest supported size:
     -- the colonist roster is permanent and tab content never replaces it.
     local rect = window:getContentRect({ top = 30, bottom = 12 })
@@ -34,7 +34,7 @@ function LayoutModel.Calculate(window, tabButtons, tabDefinition)
     local controlsHeight = 0
     if tabDefinition and tabDefinition.getControlsHeight then
         controlsHeight = math.max(0, tonumber(tabDefinition.getControlsHeight(
-            window, detailsWidth, Layout)) or 0)
+            window, detailsWidth, Layout, tabComponent)) or 0)
     end
     local controlsGap = controlsHeight > 0 and px(8) or 0
     local detailsY = bodyY + controlsHeight + controlsGap
@@ -72,14 +72,15 @@ end
 function LayoutModel.Apply(window)
     setPane(window, window.peoplePane, window.layout.people)
     setPane(window, window.detailsPane, window.layout.details)
-    if window.tabControlsPane then
+    local controlsPane = window.activeTabControlsPane
+    if controlsPane then
         if window.layout.controls then
-            Layout.SetBounds(window.tabControlsPane,
+            Layout.SetBounds(controlsPane,
                 window.layout.controls.x, window.layout.controls.y,
                 window.layout.controls.width, window.layout.controls.height)
-            window.tabControlsPane.uiScale = window.uiScale
+            controlsPane.uiScale = window.uiScale
         else
-            Layout.SetBounds(window.tabControlsPane, 0, 0, 1, 1)
+            Layout.SetBounds(controlsPane, 0, 0, 1, 1)
         end
     end
 end

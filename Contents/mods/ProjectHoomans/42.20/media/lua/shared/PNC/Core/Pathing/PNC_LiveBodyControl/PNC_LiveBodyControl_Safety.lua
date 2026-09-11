@@ -119,6 +119,7 @@ function LiveBodyControl.SuppressZombieState(
         zombie:setVariable("ClimbFenceOutcome", "")
     elseif zombie.setVariable and actionState == "climbwindow" then
         zombie:setVariable("ClimbWindowStarted", false)
+        zombie:setVariable("ClimbWindowFinished", true)
         zombie:setVariable("ClimbWindowOutcome", "")
     end
     LiveBodyControl.SetManagedBodyUseless(zombie, true)

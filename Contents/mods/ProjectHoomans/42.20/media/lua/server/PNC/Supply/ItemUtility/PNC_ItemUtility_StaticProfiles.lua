@@ -40,6 +40,9 @@ function H.BuildStatic(fullType, typeID)
             { "getUseDelta" }, 0) or 0),
         offAge = H.ReadNumber(item, scriptItem, { "getOffAge" }),
         offAgeMax = H.ReadNumber(item, scriptItem, { "getOffAgeMax" }),
+        replaceOnRotten = H.ReadString(
+            item, scriptItem, { "getReplaceOnRotten" }
+        ),
         food = typeString == "food" or hungerChange < 0
             or H.HasAny(tags, { "food", "edible" }),
         hydration = thirstChange < 0
@@ -74,6 +77,13 @@ function Utility.GetStatic(typeID, fullType)
     cached = H.BuildStatic(fullType, typeID)
     Utility.StaticByTypeID[typeID] = cached
     return cached
+end
+
+if PNC.Inventory and PNC.Inventory.RegisterFoodProfileProvider then
+    PNC.Inventory.RegisterFoodProfileProvider(function(fullType)
+        local typeID = CoreInventory.getItemTypeId(fullType, false)
+        return typeID and Utility.GetStatic(typeID, fullType) or nil
+    end)
 end
 
 return Utility

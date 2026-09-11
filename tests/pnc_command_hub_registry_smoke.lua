@@ -7,7 +7,35 @@ package.preload["PsychopatzCore/UI/PsychopatzCommandHub"] = function()
     return { Registry = CoreRegistry }
 end
 
-PNC = { CommandHub = {} }
+local carriedMoney = 0
+local playerInventory = {
+    getItemsFromType = function(_, fullType)
+        if fullType ~= "Base.Money" then
+            return { size = function() return 0 end }
+        end
+        return { size = function() return carriedMoney end }
+    end,
+}
+local player = {
+    getInventory = function() return playerInventory end,
+}
+function getSpecificPlayer()
+    return player
+end
+
+PNC = {
+    CommandHub = {},
+    FacilityDefinitions = {
+        Get = function(id)
+            if id ~= "stockpile" then return nil end
+            return {
+                buildCosts = {
+                    { fullType = "Base.Money", amount = 1 },
+                },
+            }
+        end,
+    },
+}
 
 local Registry = T.load("ProjectHoomans", "client",
     "PNC/UI/CommandHub/PNC_CommandHub_Registry.lua")
@@ -143,8 +171,16 @@ T.equal(disabledTooltip.fallback,
     "missing stockpile tooltip fallback changed")
 T.falsy(Registry.IsEnabled(Registry.Get("work")),
     "work enabled without a stockpile")
+T.falsy(Registry.IsEnabled(Registry.Get("stockpile")),
+    "stockpile bootstrap enabled without its required material")
+disabledTooltip = Registry.Get("stockpile").disabledTooltip(
+    Registry.Get("stockpile"))
+T.equal(disabledTooltip.key,
+    "UI_PNC_CommandHub_Disabled_NoStockpileMaterials",
+    "missing stockpile material reason is not exposed")
+carriedMoney = 1
 T.truthy(Registry.IsEnabled(Registry.Get("stockpile")),
-    "stockpile bootstrap did not enable with a base before the stockpile exists")
+    "stockpile bootstrap did not enable with its required material")
 T.truthy(Registry.IsEnabled(Registry.Get("base")),
     "Base remained blocked before a stockpile existed")
 PNC.ColonyManagementClient.ReadSnapshot = function()

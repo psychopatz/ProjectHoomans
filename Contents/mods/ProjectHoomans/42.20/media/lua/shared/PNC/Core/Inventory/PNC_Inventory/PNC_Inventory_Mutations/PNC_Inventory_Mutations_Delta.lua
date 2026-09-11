@@ -9,7 +9,7 @@ local function applyAddOperation(record, inv, op)
     item = Internal.createItem(record, inv, op.item)
     if not item then return nil end
     return Internal.buildOperation("add", {
-        item = Internal.itemToPayload(item),
+        item = Internal.itemToNetworkPayload(item),
         container = item.container,
     })
 end
@@ -39,6 +39,27 @@ local function applyRemoveOperation(inv, op)
     return Internal.buildOperation("remove", { itemID = op.itemID })
 end
 
+local function applyReplaceOperation(inv, op)
+    local itemID = Internal.normalizeString(op.itemID)
+    local item = itemID and inv.items[op.itemID] or nil
+    local fullType = Internal.normalizeItemType(op.type)
+    if not item or not fullType or fullType == item.type then return nil end
+    item.type = fullType
+    if op.itemState ~= nil then
+        item.itemState = Internal.sanitizeItemState(op.itemState)
+        if Inventory.NormalizeItemState then
+            Inventory.NormalizeItemState(item)
+        end
+    end
+    return Internal.buildOperation("replace", {
+        itemID = item.id,
+        type = item.type,
+        itemState = Internal.sanitizeNetworkItemState(
+            item.itemState, item
+        ),
+    })
+end
+
 local function applyUpdateOperation(inv, op)
     local itemID = Internal.normalizeString(op.itemID)
     local item = itemID and inv.items[op.itemID] or nil
@@ -49,6 +70,12 @@ local function applyUpdateOperation(inv, op)
     end
     if op.uses ~= nil then item.uses = tonumber(op.uses) end
     if op.cond ~= nil then item.cond = tonumber(op.cond) end
+    if op.itemState ~= nil then
+        item.itemState = Internal.sanitizeItemState(op.itemState)
+        if Inventory.NormalizeItemState then
+            Inventory.NormalizeItemState(item)
+        end
+    end
     if op.ammoCount ~= nil then
         item.ammoCount = math.max(0,
             math.floor(tonumber(op.ammoCount) or item.ammoCount or 0))
@@ -64,16 +91,24 @@ local function applyUpdateOperation(inv, op)
             op.interactionLockReason
         )
     end
-    return Internal.buildOperation("update", {
-        itemID = item.id,
-        stack = item.stack,
-        uses = item.uses,
-        cond = item.cond,
-        ammoCount = item.ammoCount,
-        fav = item.fav == true,
-        interactionLocked = item.interactionLocked == true,
-        interactionLockReason = item.interactionLockReason,
-    })
+    local applied = { itemID = item.id }
+    if op.stack ~= nil then applied.stack = item.stack end
+    if op.uses ~= nil then applied.uses = item.uses end
+    if op.cond ~= nil then applied.cond = item.cond end
+    if op.itemState ~= nil then
+        applied.itemState = Internal.sanitizeNetworkItemState(
+            item.itemState, item
+        )
+    end
+    if op.ammoCount ~= nil then applied.ammoCount = item.ammoCount end
+    if op.fav ~= nil then applied.fav = item.fav == true end
+    if op.interactionLocked ~= nil then
+        applied.interactionLocked = item.interactionLocked == true
+        applied.interactionLockReason = item.interactionLockReason
+    elseif op.interactionLockReason ~= nil then
+        applied.interactionLockReason = item.interactionLockReason
+    end
+    return Internal.buildOperation("update", applied)
 end
 
 local function applyInventoryOperation(record, inv, op)
@@ -81,6 +116,7 @@ local function applyInventoryOperation(record, inv, op)
     if op.op == "add" then return applyAddOperation(record, inv, op) end
     if op.op == "move" then return applyMoveOperation(inv, op) end
     if op.op == "remove" then return applyRemoveOperation(inv, op) end
+    if op.op == "replace" then return applyReplaceOperation(inv, op) end
     if op.op == "update" then return applyUpdateOperation(inv, op) end
     return nil
 end

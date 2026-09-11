@@ -5,6 +5,10 @@ local Internal = Discovery.RadioBroadcastsInternal
 local Types = PNC.WorldDiscoveryTypes
 
 Discovery.RADIO_IDENTITY_REVEAL_CHANCE = 35
+Discovery.RADIO_AMBIENT_VARIANTS = {
+    "open_band",
+    "cross_talk",
+}
 
 local function clean(value)
     value = value ~= nil and tostring(value) or nil
@@ -195,11 +199,61 @@ function Discovery.BuildRadioTemplateContext(player, entity, phase)
     }
 end
 
+local function nextAmbientVariant()
+    local state = Discovery.RadioAmbientState
+        or { lastAiredAt = nil, hasAired = false,
+            lastVariant = nil, sequence = 0 }
+    Discovery.RadioAmbientState = state
+    local previous = tostring(state.lastVariant or "")
+    local variant = Discovery.RADIO_AMBIENT_VARIANTS[1]
+    if previous == variant then
+        variant = Discovery.RADIO_AMBIENT_VARIANTS[2]
+    end
+    state.lastVariant = variant
+    state.sequence = (tonumber(state.sequence) or 0) + 1
+    return variant, state.sequence
+end
+
+function Discovery.BuildAmbientTemplateContext()
+    local variant, sequence = nextAmbientVariant()
+    local prefix = "radio:ambient:" .. tostring(sequence)
+    return {
+        eventType = "ambient",
+        ambientVariant = variant,
+        ambientSequence = sequence,
+        -- These IDs only keep the two generic radio voices consistent through
+        -- the client TTS bridge. They are deliberately not NPC identities.
+        speakerNPCID = prefix .. ":primary",
+        secondarySpeakerNPCID = prefix .. ":secondary",
+        hasSecondSpeaker = variant == "cross_talk",
+    }
+end
+
 function Internal.PersistIntroduction(player, context)
     if not context.identityIntroduced or not context.speakerNPCID
-        or not PNC.NPCKnowledge
-        or not PNC.NPCKnowledge.DiscoverTopicForPlayer
     then return false end
+    local factionChanged = false
+    local disclosedFaction = clean(context.factionName)
+    if disclosedFaction and disclosedFaction ~= "our group"
+        and disclosedFaction ~= "an unnamed group"
+        and context.kind and context.entityID
+        and Discovery.MarkFactionRevealed
+    then
+        local entity = Discovery.ResolveEntity(
+            context.kind, context.entityID)
+        if entity then
+            local _, reason = Discovery.MarkFactionRevealed(
+                player, entity, disclosedFaction,
+                "radio_disclosure", true)
+            factionChanged = reason == "advanced"
+        end
+    end
+    if not PNC.NPCKnowledge
+        or not PNC.NPCKnowledge.DiscoverTopicForPlayer
+    then
+        if factionChanged then Discovery.Save() end
+        return factionChanged
+    end
     local characterContext = PNC.PlayerContext
         and PNC.PlayerContext.Resolve
         and PNC.PlayerContext.Resolve(player, "radio_knowledge") or nil
@@ -227,7 +281,10 @@ function Internal.PersistIntroduction(player, context)
             "radio_disclosure"
         ) ~= nil or changed
     end
-    if not changed then return false end
+    if not changed then
+        if factionChanged then Discovery.Save() end
+        return factionChanged
+    end
     if PNC.Network and PNC.Network.SendNPCKnowledge
         and PNC.NPCKnowledge.BuildPlayerSnapshotForPlayer
     then
@@ -238,7 +295,8 @@ function Internal.PersistIntroduction(player, context)
             PNC.Network.SendNPCKnowledge(player, snapshot, "radio_disclosure")
         end
     end
-    return changed
+    if factionChanged then Discovery.Save() end
+    return changed or factionChanged
 end
 
 return Internal

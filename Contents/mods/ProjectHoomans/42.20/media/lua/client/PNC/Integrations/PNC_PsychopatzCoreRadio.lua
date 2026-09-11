@@ -17,6 +17,7 @@ if not Message then
 end
 local ScanChannel = PNC.RadioDiscoveryChannel
 local lastProbeAt = {}
+local lastAmbientProbeAt = {}
 local PROBE_INTERVAL_MS = 40000
 
 PNC.RadioDiscoveryPresentation = PNC.RadioDiscoveryPresentation or {}
@@ -44,6 +45,23 @@ local function lineSpacingMs()
             or 2) * 1000
     end
     return 2000
+end
+
+local function ambientEnabled()
+    local settings = PNC.Sandbox
+    if settings and type(settings.RadioAmbientEnabled) == "function" then
+        return settings.RadioAmbientEnabled() == true
+    end
+    return true
+end
+
+local function ambientIntervalMs()
+    local settings = PNC.Sandbox
+    if settings and type(settings.RadioAmbientIntervalSeconds) == "function" then
+        return math.max(1000, tonumber(settings.RadioAmbientIntervalSeconds())
+            or 90) * 1000
+    end
+    return 90000
 end
 
 local function tr(key, fallback)
@@ -200,6 +218,9 @@ function Presentation.PlayBroadcast(payload)
     local result = payload and payload.result or nil
     local broadcast = result and result.radioBroadcast or nil
     local notificationID = result and tostring(result.notificationID or "")
+    local eventType = result and result.eventType
+        or broadcast and broadcast.eventType or "discovery"
+    local isAmbient = eventType == "ambient"
     if not Message or type(Message.New) ~= "function"
         or type(Message.Publish) ~= "function"
         or type(broadcast) ~= "table"
@@ -210,6 +231,11 @@ function Presentation.PlayBroadcast(payload)
         or #Presentation.pendingBroadcasts >= MAX_PENDING_BROADCASTS
     then
         return false
+    end
+    if isAmbient then
+        for _, pending in ipairs(Presentation.pendingBroadcasts) do
+            if pending.eventType == "ambient" then return false end
+        end
     end
     local speech = type(broadcast.speech) == "table"
         and broadcast.speech or {
@@ -230,14 +256,20 @@ function Presentation.PlayBroadcast(payload)
     end
     if #lines == 0 then return false end
     Presentation.pendingNotificationIDs[notificationID] = true
-    Presentation.pendingBroadcasts[#Presentation.pendingBroadcasts + 1] = {
+    local item = {
         broadcast = broadcast,
         lines = lines,
+        eventType = eventType,
         notificationID = notificationID,
         speech = speech,
         index = 1,
         nextAt = nowMs(),
     }
+    if isAmbient then
+        Presentation.pendingBroadcasts[#Presentation.pendingBroadcasts + 1] = item
+    else
+        table.insert(Presentation.pendingBroadcasts, 1, item)
+    end
     -- Deliver the first line immediately; subsequent lines are serialized on
     -- the game tick so one discovery cannot create a TTS burst.
     Presentation.Update()
@@ -271,6 +303,9 @@ function Presentation.ShowResult(payload)
         or notificationID == Presentation.lastNotificationID
     then return false end
     Presentation.lastNotificationID = notificationID
+    if result.eventType == "ambient" then
+        return Presentation.PlayBroadcast(payload)
+    end
     local player = getSpecificPlayer and getSpecificPlayer(0) or nil
     if not player or not HaloTextHelper
         or not HaloTextHelper.addTextWithArrow
@@ -332,6 +367,18 @@ if CustomRadio and CustomRadio.RegisterListener and ScanChannel then
                     channelID = ScanChannel.ID,
                     frequency = ScanChannel.FREQUENCY,
                 })
+                if ambientEnabled() then
+                    local ambientPrevious = lastAmbientProbeAt[key]
+                    if not ambientPrevious then
+                        lastAmbientProbeAt[key] = at
+                    elseif at - ambientPrevious >= ambientIntervalMs() then
+                        lastAmbientProbeAt[key] = at
+                        PNC.Client.RequestWorldDiscovery("radio_ambient", {
+                            channelID = ScanChannel.ID,
+                            frequency = ScanChannel.FREQUENCY,
+                        })
+                    end
+                end
             end
             return true
         end)

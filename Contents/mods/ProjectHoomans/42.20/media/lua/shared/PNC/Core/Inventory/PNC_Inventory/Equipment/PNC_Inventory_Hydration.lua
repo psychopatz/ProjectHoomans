@@ -13,6 +13,7 @@ function Inventory.EnsureRecordInventory(record)
     local item
     local generatorVersion
     local currentGenerator
+    local stateChanged = false
     if not record then return nil end
     if type(record.inventory) ~= "table" and type(record.persistedInventory) == "table" then
         local persisted = record.persistedInventory
@@ -55,7 +56,7 @@ function Inventory.EnsureRecordInventory(record)
             item.id = Internal.normalizeString(item.id) or tostring(itemID)
             item.type = Internal.normalizeItemType(item.type)
             item.container = Internal.normalizeString(item.container) or "root"
-            item.stack = math.max(1, math.floor(tonumber(item.stack) or tonumber(item.uses) or 1))
+            item.stack = math.max(1, math.floor(tonumber(item.stack) or 1))
             item.uses = tonumber(item.uses)
             item.cond = tonumber(item.cond)
             item.ammoCount = item.ammoCount ~= nil
@@ -94,6 +95,11 @@ function Inventory.EnsureRecordInventory(record)
                 item.maxWeight = profile.capacity
                 item.bagContainer = item.bagContainer or ("bag_" .. tostring(item.id))
             end
+            if Inventory.NormalizeItemState
+                and Inventory.NormalizeItemState(item)
+            then
+                stateChanged = true
+            end
             inv.items[item.id] = item
             Internal.ensureContainer(inv, item.container,
                 item.container == "root" and inv.rootMaxWeight or 0)
@@ -110,6 +116,9 @@ function Inventory.EnsureRecordInventory(record)
         Internal.ensureIdentityCard(record, inv)
         inv.template = inv.template or {}
         inv.template.generatorVersion = currentGenerator
+    end
+    if stateChanged and PNC.Registry and PNC.Registry.MarkDirty then
+        PNC.Registry.MarkDirty(record, "inventory_state_normalized")
     end
     Inventory.SyncEquipmentFromInventory(record)
     Inventory.RebuildCaches(record)

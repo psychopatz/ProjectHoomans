@@ -1,6 +1,6 @@
 local Internal = PNC.Inventory.Internal
 
-function Internal.itemToPayload(item)
+local function buildItemPayload(item, itemState)
     if not item or not item.id or not item.type then return nil end
     return {
         id = item.id,
@@ -25,8 +25,47 @@ function Internal.itemToPayload(item)
         customName = item.customName,
         identityNPCId = item.identityNPCId,
         identityNPCName = item.identityNPCName,
-        itemState = Internal.sanitizeItemState(item.itemState),
+        itemState = itemState,
     }
+end
+
+function Internal.itemToPayload(item)
+    return buildItemPayload(item, Internal.sanitizeItemState(item and item.itemState))
+end
+
+local function networkItemState(item)
+    if not item then return {} end
+    return Internal.sanitizeNetworkItemState(item.itemState, item)
+end
+
+local function changedNumber(value, defaultValue)
+    local number = tonumber(value)
+    return number ~= tonumber(defaultValue) and number or nil
+end
+
+local function definitionDefault(item, field, fallback)
+    local state = item and Internal.getItemDefinitionState
+        and Internal.getItemDefinitionState(item.type) or nil
+    if state and state[field] ~= nil then return state[field] end
+    return fallback
+end
+
+-- Standalone item descriptions sent to clients omit persistence-only modData,
+-- duplicate scalar fields, and redundant single-fluid component entries.
+function Internal.itemToNetworkPayload(item)
+    local payload = buildItemPayload(item, networkItemState(item))
+    if not payload then return nil end
+    -- The receiver resolves omitted scalar defaults through the shared Core
+    -- definition provider.  Keep standalone network items compact too.
+    payload.stack = (tonumber(item.stack) or 1) ~= 1
+        and math.max(1, math.floor(tonumber(item.stack) or 1)) or nil
+    payload.uses = changedNumber(item.uses,
+        definitionDefault(item, "usedDelta", nil))
+    payload.cond = changedNumber(item.cond,
+        definitionDefault(item, "condition", nil))
+    payload.ammoCount = changedNumber(item.ammoCount,
+        definitionDefault(item, "ammoCount", nil))
+    return payload
 end
 
 local function persistentItemState(item)
@@ -40,11 +79,6 @@ local function persistentItemState(item)
     return itemState
 end
 
-local function changedNumber(value, defaultValue)
-    local number = tonumber(value)
-    return number ~= tonumber(defaultValue) and number or nil
-end
-
 -- Persistence omits values reconstructable from the script item. Network
 -- payloads remain complete standalone descriptions through itemToPayload.
 function Internal.itemToPersistencePayload(item)
@@ -56,9 +90,12 @@ function Internal.itemToPersistencePayload(item)
         type = item.type,
         stack = (tonumber(item.stack) or 1) ~= 1
             and math.max(1, math.floor(tonumber(item.stack) or 1)) or nil,
-        uses = tonumber(item.uses),
-        cond = tonumber(item.cond),
-        ammoCount = tonumber(item.ammoCount),
+        uses = changedNumber(item.uses,
+            definitionDefault(item, "usedDelta", nil)),
+        cond = changedNumber(item.cond,
+            definitionDefault(item, "condition", nil)),
+        ammoCount = changedNumber(item.ammoCount,
+            definitionDefault(item, "ammoCount", nil)),
         fav = item.fav == true or nil,
         interactionLocked = item.interactionLocked == true or nil,
         interactionLockReason = item.interactionLocked == true

@@ -20,6 +20,7 @@ local function debugEnabled(settings)
         settings.showAIDebug == true
             or settings.showPathDebug == true
             or settings.showCombatDebug == true
+            or settings.showZombieDebug == true
             or settings.showAnimationDebug == true
             or settings.showAnimationSceneDebug == true
             or settings.showFactionDebug == true

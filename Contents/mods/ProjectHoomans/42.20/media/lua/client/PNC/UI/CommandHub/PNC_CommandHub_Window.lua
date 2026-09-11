@@ -23,7 +23,7 @@ end
 local function titleText()
     local value = getText and getText("UI_PNC_CommandHub_Title") or nil
     return value and value ~= "" and value ~= "UI_PNC_CommandHub_Title"
-        and value or "COLONY"
+        and value or "COMMAND HUB"
 end
 
 local function requestColonySnapshot()

@@ -228,6 +228,11 @@ local radio = Discovery.RadioScan(player,
 T.equal(radio.result.ok, true, "radio finds an undiscovered mobile group")
 T.equal(radio.result.phase, Types.PHASE_RUMORED,
     "first radio hit records a rumor")
+T.equal(entityOf(radio, Types.KIND_MOBILE_GROUP).factionKnown, true,
+    "an introduced radio faction is added to the strategic contact")
+T.equal(entityOf(radio, Types.KIND_MOBILE_GROUP).factionName,
+    "Road Refugees",
+    "the disclosed faction name is visible in the contact snapshot")
 T.equal(radio.result.identityRevealed, true,
     "radio scan result preserves the broadcast identity reveal")
 T.equal(radio.result.radioBroadcast.speech.effect_profile, "radio",
@@ -324,6 +329,27 @@ end
 T.truthy(addressedByName,
     "known radio speakers may use the player's name in flavor text")
 Discovery.RadioIdentityRevealRoll = function() return 0 end
+
+characterUUID = "character:call-contact"
+Discovery.SetPhase(player, Types.KIND_MOBILE_GROUP, "group_one",
+    Types.PHASE_RUMORED, "radio")
+Discovery.MarkFactionRevealed(player,
+    Discovery.ResolveEntity(Types.KIND_MOBILE_GROUP, "group_one"),
+    "Road Refugees", "radio_disclosure", true)
+Discovery.Save()
+local called = Discovery.HandleAction(player, {
+    action = "call_contact",
+    kind = Types.KIND_MOBILE_GROUP,
+    entityID = "group_one",
+})
+T.equal(called.result.reason, "contact_located",
+    "calling a known rumor triangulates its exact position")
+T.equal(entityOf(called, Types.KIND_MOBILE_GROUP).approximate, false,
+    "a called contact returns an exact map position")
+T.equal(entityOf(called, Types.KIND_MOBILE_GROUP).factionName,
+    "Road Refugees",
+    "calling a contact preserves its previously disclosed faction")
+characterUUID = "character:test"
 
 hour = 12
 local located = Discovery.RadioScan(player,
@@ -435,6 +461,57 @@ nowMS = 10100
 Discovery.UpdateProximity()
 T.equal(Discovery.ProximityStateByPlayer[characterUUID].cursor, 11,
     "large discovery scans resume from their cursor instead of restarting")
+
+local airedBeforeAmbient = #airedBroadcasts
+Discovery.RadioAmbientState = {
+    lastAiredAt = nil,
+    hasAired = false,
+    lastVariant = nil,
+    sequence = 0,
+    lastRequestAtByPlayer = {},
+}
+Discovery.RadioAmbientRoll = function() return 0 end
+nowMS = 20000
+local ambient = Discovery.RadioAmbient(player,
+    PNC.RadioDiscoveryChannel.ID, PNC.RadioDiscoveryChannel.FREQUENCY)
+T.equal(ambient.result.ok, true,
+    "ambient radio can air without a discovery target")
+T.equal(ambient.result.eventType, "ambient",
+    "ambient radio uses a separate event type")
+T.equal(ambient.result.radioBroadcast.packID,
+    "projecthoomans.ambient_open_band",
+    "ambient radio starts with the open-band variant")
+T.equal(#airedBroadcasts, airedBeforeAmbient + 1,
+    "ambient radio airs one native broadcast")
+T.equal(Discovery.BuildSnapshot(player).result, nil,
+    "ambient radio does not add a discovery result")
+
+nowMS = 20000
+local ambientThrottled = Discovery.RadioAmbient(player,
+    PNC.RadioDiscoveryChannel.ID, PNC.RadioDiscoveryChannel.FREQUENCY)
+T.equal(ambientThrottled.result.reason, "ambient_request_cooldown",
+    "ambient requests are throttled per listener")
+
+nowMS = 110000
+Discovery.RadioAmbientRoll = function() return 99 end
+local ambientMissed = Discovery.RadioAmbient(player,
+    PNC.RadioDiscoveryChannel.ID, PNC.RadioDiscoveryChannel.FREQUENCY)
+T.equal(ambientMissed.result.reason, "ambient_missed",
+    "ambient chatter is not guaranteed at every eligible trigger")
+T.equal(#airedBroadcasts, airedBeforeAmbient + 1,
+    "a missed ambient roll does not air a broadcast")
+
+nowMS = 200000
+Discovery.RadioAmbientRoll = function() return 0 end
+local ambientCrossTalk = Discovery.RadioAmbient(player,
+    PNC.RadioDiscoveryChannel.ID, PNC.RadioDiscoveryChannel.FREQUENCY)
+T.equal(ambientCrossTalk.result.radioBroadcast.packID,
+    "projecthoomans.ambient_cross_talk",
+    "ambient selection rotates to the cross-talk variant")
+T.equal(airedBroadcasts[#airedBroadcasts].context.hasSecondSpeaker, true,
+    "cross-talk ambience carries a separate secondary radio voice")
+T.equal(#airedBroadcasts, airedBeforeAmbient + 2,
+    "only successful ambient rolls add broadcasts")
 T.finish("pnc_world_discovery_smoke")
 
 T.finish("pnc_world_discovery_smoke")

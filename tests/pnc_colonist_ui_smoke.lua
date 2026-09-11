@@ -31,10 +31,16 @@ local tabsSource = T.read("ProjectHoomans", "client",
     "PNC/UI/Colonist/PNC_ColonistTabs.lua")
 local controllerSource = T.read("ProjectHoomans", "client",
     "PNC/UI/Colonist/PNC_ColonistController.lua")
+local activitiesSource = T.read("ProjectHoomans", "client",
+    "PNC/UI/Colonist/PNC_ColonistActivities.lua")
 local selectorSource = T.read("ProjectHoomans", "client",
     "PNC/UI/Colonist/PNC_ColonistSelector.lua")
 local windowSource = T.read("ProjectHoomans", "client",
     "PNC/UI/Colonist/PNC_ColonistWindow.lua")
+local hubSource = T.read("ProjectHoomans", "client",
+    "PNC/Integrations/PNC_PsychopatzCoreDebug.lua")
+local colonyTabsSource = T.read("ProjectHoomans", "client",
+    "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Tabs.lua")
 local compositionSource = T.read("ProjectHoomans", "client",
     "PNC/Composition/PNC_ClientComposition.lua")
 T.contains(registrySource, "Registry.Revision",
@@ -47,16 +53,30 @@ T.contains(selectorSource, "PNC_ColonistActivityPresentation",
     "colonist selector does not import the activity formatter")
 T.contains(controllerSource, "SyncTabComponents",
     "colonist shell cannot initialize injected tab components")
+T.contains(controllerSource, "activeTabControlsPane",
+    "colonist shell does not activate a tab-owned controls pane")
+T.falsy(controllerSource:find("tabControlsPane", 1, true),
+    "colonist shell still owns a shared controls pane")
+T.falsy(activitiesSource:find("window.tabControlsPane", 1, true),
+    "activities tab still depends on the shared controls pane")
 T.contains(tabsSource, "Presentation.BuildNeeds",
     "colonist needs tab does not use the tested needs presentation")
 T.contains(tabsSource, 'id = "activities"',
     "colonist activities tab is not registered")
 T.contains(tabsSource, 'id = "task"',
     "colonist task tab is not registered in the target UI")
+T.contains(tabsSource, 'id = "debug"',
+    "colonist debug tab is not registered in the target UI")
+T.contains(tabsSource, "Debug.IsAvailable",
+    "colonist debug tab has no authorization gate")
 T.contains(tabsSource, "PNC/UI/Colonist/PNC_ColonistTask",
     "colonist task tab imports the wrong presentation path")
 T.contains(controllerSource, "selectedPersonID",
     "colonist selection identity is not persisted")
+T.contains(controllerSource, "tabAvailabilitySignature",
+    "colonist tabs do not react to authorization changes")
+T.contains(controllerSource, "isAvailable(definition, window)",
+    "colonist controller does not filter unavailable tabs")
 T.contains(controllerSource, "Options.ApplySurfaceOpacity",
     "colonist panes do not follow command-hub content opacity")
 T.contains(windowSource, "WidgetWindow.Install",
@@ -67,7 +87,19 @@ T.contains(windowSource, "taskBrainNpcID",
     "colonist task tab does not request the selected NPC brain")
 T.contains(windowSource, "persistenceKey = \"PNC.CommandHub.Colonist\"",
     "colonist window geometry is not persisted")
+T.contains(windowSource, "Controller.SyncTabs(self)",
+    "colonist window does not refresh tab authorization")
+T.contains(windowSource, "function ColonistUI.OpenDebug",
+    "debug hub has no Colonist DEBUG opener")
+T.contains(hubSource, "PNC.ColonistUI.OpenDebug",
+    "debug hub still targets the removed standalone needs window")
+T.falsy(hubSource:find("PNC.NeedsDebugUI.Toggle", 1, true),
+    "debug hub still invokes the removed standalone needs window")
+T.falsy(colonyTabsSource:find('id = "debug"', 1, true),
+    "Colony Management still exposes the migrated debug tab")
 T.contains(compositionSource, "PNC/UI/Colonist/PNC_Colonist",
     "colonist menu is missing from client composition")
+T.falsy(compositionSource:find("PNC/UI/Needs/PNC_NeedsDebugWindow", 1, true),
+    "legacy needs debug window is still loaded in client composition")
 
 T.finish("pnc_colonist_ui_smoke")

@@ -33,6 +33,23 @@ function Discovery.BuildSnapshot(player, result)
             local phase = Types.ClampPhase(entry.phase)
             local x = current and current.x or entry.x
             local y = current and current.y or entry.y
+            local factionKnown = entry.factionKnown == true
+                or phase >= Types.PHASE_CONTACTED
+            local factionID = factionKnown
+                and (entry.factionID or current and current.factionID)
+                or nil
+            local factionName = factionKnown and entry.factionName or nil
+            if factionKnown and not factionName and factionID
+                and Internal.FactionName
+            then
+                factionName = Internal.FactionName(factionID, nil)
+            end
+            if factionName == "Unknown signal"
+                or factionName == "an unnamed group"
+            then
+                factionName = nil
+            end
+            factionKnown = factionID ~= nil or factionName ~= nil
             if phase == Types.PHASE_RUMORED then
                 x = Internal.ApproximateCoordinate(x, entityID, "x")
                 y = Internal.ApproximateCoordinate(y, entityID, "y")
@@ -55,7 +72,9 @@ function Discovery.BuildSnapshot(player, result)
                     or kind == Types.KIND_SETTLEMENT
                         and "Unknown settlement" or "Unknown mobile signal",
                 factionID = phase >= Types.PHASE_CONTACTED
-                    and current and current.factionID or nil,
+                    and current and current.factionID or factionID,
+                factionKnown = factionKnown,
+                factionName = factionName,
                 groupType = phase >= Types.PHASE_LOCATED
                     and current and current.groupType or nil,
                 population = phase >= Types.PHASE_CONTACTED

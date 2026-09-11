@@ -95,10 +95,14 @@ PsychopatzCore.DebugHub.RegisterTool({
     id = "pnc.needs",
     source = "Project Hoomans",
     order = 225,
-    title = "NPC Needs Debug",
-    description = "Inspect and test server-authoritative individual and mobile-group Need reserves.",
-    available = function() return PNC and PNC.NeedsDebugUI and PNC.NeedsDebugUI.Toggle and PNC.Client and PNC.Client.CanUseDebug and PNC.Client.CanUseDebug() end,
-    action = function() PNC.NeedsDebugUI.Toggle() end,
+    title = "COLONIST DEBUG",
+    description = "Inspect provision storage and run targeted colonist debug actions.",
+    available = function()
+        return PNC and PNC.ColonistUI and PNC.ColonistUI.OpenDebug
+            and PNC.Client and PNC.Client.CanUseDebug
+            and PNC.Client.CanUseDebug()
+    end,
+    action = function() PNC.ColonistUI.OpenDebug() end,
 })
 
 PsychopatzCore.DebugHub.RegisterTool({

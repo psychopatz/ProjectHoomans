@@ -7,7 +7,7 @@ local function addedWeight(spec)
     end
     return Internal.getItemWeight(spec.type)
         * math.max(1,
-            math.floor(tonumber(spec.stack) or tonumber(spec.uses) or 1))
+            math.floor(tonumber(spec.stack) or 1))
 end
 
 function Inventory.CanAccept(record, specs, containerID)

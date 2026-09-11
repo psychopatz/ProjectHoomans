@@ -3,6 +3,16 @@ local T = require "tests/support/test"
 local CLIENT_ROOT = T.path("ProjectHoomans", "client", "")
 local SHARED_ROOT = T.path("ProjectHoomans", "shared", "")
 
+T.addPackagePaths({
+    { "ProjectHoomans", "shared" },
+    { "ProjectHoomans", "server" },
+    { "ProjectHoomans", "client" },
+    { "ProjectHoomans", "common_lua" },
+    { "PsychopatzCore", "common" },
+    { "PsychopatzCore", "client" },
+    { "PsychopatzCore", "shared" },
+})
+
 local WindowBase = {}
 function WindowBase:derive()
     local derived = {}
@@ -53,16 +63,79 @@ end
 
 T.load(CLIENT_ROOT .. "PNC/UI/Inventory/PNC_InventoryUI_Model.lua")
 T.load(CLIENT_ROOT .. "PNC/UI/Communities/PNC_ColonyStorageViewModel.lua")
+local tooltipModel = require
+    "PsychopatzCore/UI/Inventory/PsychopatzInventoryTooltipModel"
+local profiles = require
+    "PsychopatzCore/Inventory/PsychopatzItemTypeProfile"
+profiles.Register("Base.WaterBottle", {
+    fluid = true, condition = true, conditionWhenDamaged = true,
+})
+T.truthy(tooltipModel ~= nil, "inventory tooltip model missing")
 local storageRows = PNC.ColonyStorageViewModel.BuildInventoryRows({ rows = {
     { recordIndex = 1, fullType = "Base.Crisps", name = "Crisps",
-        quantity = 3, totalWeight = 0.6 },
+        quantity = 3, totalWeight = 0.6,
+        tooltipState = { age = 1, hungChange = -0.2 } },
     { recordIndex = 2, fullType = "Base.Bandage", name = "Bandage",
         quantity = 2, totalWeight = 0.2 },
 } }, "", "name", {})
 T.equal(storageRows[1].groupHeader, true,
     "storage inventory category header missing")
-T.equal(storageRows[2].texture ~= nil, true,
+local storageCrispsRow
+for _, row in ipairs(storageRows) do
+    if row.fullType == "Base.Crisps" then storageCrispsRow = row end
+end
+T.equal(storageCrispsRow.texture ~= nil, true,
     "storage inventory row texture missing")
+T.equal(storageCrispsRow.tooltipState.age, 1,
+    "storage tooltip state was not projected to the row")
+
+local waterTooltip = tooltipModel.Build({
+    source = "npc", id = "water_1", fullType = "Base.WaterBottle",
+    name = "Plastic Bottle", category = "Water", weight = 1.1, stack = 1,
+    conditionMax = 5,
+    compactItem = {
+        type = "Base.WaterBottle",
+        cond = 3,
+        uses = 0.5,
+        itemState = {
+            fluidAmount = 1, fluidCapacity = 1,
+            fluidPrimaryType = "Water",
+            fluids = { { type = "Water", amount = 1 } },
+        },
+    },
+})
+T.truthy(string.find(waterTooltip.title, "Water", 1, true),
+    "fluid tooltip does not include the primary liquid")
+local waterAmountLine
+for _, line in ipairs(waterTooltip.lines) do
+    if line.label == "Amount" then waterAmountLine = line end
+end
+T.equal(waterAmountLine ~= nil, true, "fluid amount line missing")
+T.equal(waterAmountLine.value, "1.00 / 1.00",
+    "fluid amount line does not preserve capacity")
+local waterConditionLine
+local waterRemainingLine
+for _, line in ipairs(waterTooltip.lines) do
+    if line.label == "Condition" then waterConditionLine = line end
+    if line.label == "Remaining" then waterRemainingLine = line end
+end
+T.equal(waterConditionLine.value, "3 / 5",
+    "compact condition was not displayed")
+T.equal(waterRemainingLine, nil,
+    "fluid tooltip should not display generic drainable remaining")
+
+local freshFood = tooltipModel.Build({
+    source = "npc", id = "food_1", fullType = "Base.Crisps",
+    name = "Crisps", category = "Food", weight = 0.2, stack = 1,
+    compactItem = {
+        type = "Base.Crisps",
+        itemState = { age = 1, cooked = true, hungChange = -0.2 },
+    },
+})
+T.truthy(string.find(freshFood.title, "Fresh", 1, true),
+    "food tooltip status prefix missing")
+T.truthy(string.find(freshFood.title, "Cooked", 1, true),
+    "food tooltip cooked prefix missing")
 local collapsedStorageRows = PNC.ColonyStorageViewModel.BuildInventoryRows({ rows = {
     { recordIndex = 1, fullType = "Base.Crisps", name = "Crisps",
         quantity = 3, totalWeight = 0.6 },
@@ -290,6 +363,13 @@ end
 T.equal(npcRowsByID["npc_bag"].favorite, true, "NPC favorite row state")
 T.equal(npcRowsByID["npc_bag"].equipped, true, "NPC equipped row state")
 T.equal(npcNailsGroup.stack, 5, "compact NPC stacks combine")
+local groupedNailsTooltip = tooltipModel.Build(npcNailsGroup)
+local groupedNailsAmount
+for _, line in ipairs(groupedNailsTooltip.lines) do
+    if line.label == "Amount" then groupedNailsAmount = line end
+end
+T.equal(groupedNailsAmount.value, "5",
+    "grouped NPC tooltip did not expose aggregate quantity")
 local npcNailsSelection = PNC.InventoryUIModel.BuildTransferSelection(
     npcNailsGroup,
     4
@@ -297,6 +377,20 @@ local npcNailsSelection = PNC.InventoryUIModel.BuildTransferSelection(
 T.equal(#npcNailsSelection.itemIDs, 2, "quantity spans compact stacks")
 T.equal(npcRowsByID["identity_card"].restricted, true,
     "identity card remains off-limits without lock metadata")
+
+local stateSeparatedRows = PNC.InventoryUIModel.BuildNPCRows({
+    items = {
+        food_a = { id = "food_a", type = "Base.Crisps", container = "root",
+            itemState = { age = 1 } },
+        food_b = { id = "food_b", type = "Base.Crisps", container = "root",
+            itemState = { age = 2 } },
+    },
+    containers = { root = { items = { "food_a", "food_b" } } },
+}, "root")
+T.equal(#stateSeparatedRows, 2,
+    "stateful NPC food rows were incorrectly grouped")
+T.equal(stateSeparatedRows[1].groupHeader, nil,
+    "stateful NPC food row became a misleading group header")
 
 T.load(T.path("ProjectHoomans", "client", "PNC/Knowledge/PNC_NPCIdentityPresentation.lua"))
 package.preload["PNC/Knowledge/PNC_NPCIdentityPresentation"] =

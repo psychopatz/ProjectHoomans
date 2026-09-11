@@ -156,6 +156,7 @@ function Bridge.captureLoose(record, body)
             if not fullType then return false, "npc_item_type_unavailable" end
             local spec = StateCodec.readState(encoded)
             spec.type, spec.container = fullType, "root"
+            spec.origin = "world"
             capturedSpecs[#capturedSpecs + 1] = spec
         end
     end

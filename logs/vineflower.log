@@ -52,4 +52,158 @@ INFO:  Scanning classes from module jdk.unsupported@25.0.1
 INFO:  Scanning classes from module jdk.xml.dom@25.0.1
 INFO:  Scanning classes from module jdk.zipfs@25.0.1
 INFO:  Scanning classes from Project Zomboid (inverted: false): /home/psychopatz/.steam/debian-installation/steamapps/common/ProjectZomboid/projectzomboid/projectzomboid.jar
+INFO:  Loading Class: zombie/inventory/types/WeaponType from Project Zomboid (inverted: false): /home/psychopatz/.steam/debian-installation/steamapps/common/ProjectZomboid/projectzomboid/projectzomboid.jar
+INFO:  Loading Class: zombie/inventory/types/WeaponPart from Project Zomboid (inverted: false): /home/psychopatz/.steam/debian-installation/steamapps/common/ProjectZomboid/projectzomboid/projectzomboid.jar
+INFO:  Loading Class: zombie/inventory/types/Radio from Project Zomboid (inverted: false): /home/psychopatz/.steam/debian-installation/steamapps/common/ProjectZomboid/projectzomboid/projectzomboid.jar
+INFO:  Loading Class: zombie/inventory/types/Moveable from Project Zomboid (inverted: false): /home/psychopatz/.steam/debian-installation/steamapps/common/ProjectZomboid/projectzomboid/projectzomboid.jar
+INFO:  Loading Class: zombie/inventory/types/MapItem from Project Zomboid (inverted: false): /home/psychopatz/.steam/debian-installation/steamapps/common/ProjectZomboid/projectzomboid/projectzomboid.jar
+INFO:  Loading Class: zombie/inventory/types/Literature from Project Zomboid (inverted: false): /home/psychopatz/.steam/debian-installation/steamapps/common/ProjectZomboid/projectzomboid/projectzomboid.jar
+INFO:  Loading Class: zombie/inventory/types/KeyRing from Project Zomboid (inverted: false): /home/psychopatz/.steam/debian-installation/steamapps/common/ProjectZomboid/projectzomboid/projectzomboid.jar
+INFO:  Loading Class: zombie/inventory/types/Key from Project Zomboid (inverted: false): /home/psychopatz/.steam/debian-installation/steamapps/common/ProjectZomboid/projectzomboid/projectzomboid.jar
+INFO:  Loading Class: zombie/inventory/types/Key$HighlightDoor from Project Zomboid (inverted: false): /home/psychopatz/.steam/debian-installation/steamapps/common/ProjectZomboid/projectzomboid/projectzomboid.jar
+INFO:  Loading Class: zombie/inventory/types/InventoryContainer from Project Zomboid (inverted: false): /home/psychopatz/.steam/debian-installation/steamapps/common/ProjectZomboid/projectzomboid/projectzomboid.jar
+INFO:  Loading Class: zombie/inventory/types/IAlarmClock from Project Zomboid (inverted: false): /home/psychopatz/.steam/debian-installation/steamapps/common/ProjectZomboid/projectzomboid/projectzomboid.jar
+INFO:  Loading Class: zombie/inventory/types/HandWeapon from Project Zomboid (inverted: false): /home/psychopatz/.steam/debian-installation/steamapps/common/ProjectZomboid/projectzomboid/projectzomboid.jar
+INFO:  Loading Class: zombie/inventory/types/Food from Project Zomboid (inverted: false): /home/psychopatz/.steam/debian-installation/steamapps/common/ProjectZomboid/projectzomboid/projectzomboid.jar
+INFO:  Loading Class: zombie/inventory/types/DrainableComboItem from Project Zomboid (inverted: false): /home/psychopatz/.steam/debian-installation/steamapps/common/ProjectZomboid/projectzomboid/projectzomboid.jar
+INFO:  Loading Class: zombie/inventory/types/Drainable from Project Zomboid (inverted: false): /home/psychopatz/.steam/debian-installation/steamapps/common/ProjectZomboid/projectzomboid/projectzomboid.jar
+INFO:  Loading Class: zombie/inventory/types/ComboItem from Project Zomboid (inverted: false): /home/psychopatz/.steam/debian-installation/steamapps/common/ProjectZomboid/projectzomboid/projectzomboid.jar
+INFO:  Loading Class: zombie/inventory/types/Clothing from Project Zomboid (inverted: false): /home/psychopatz/.steam/debian-installation/steamapps/common/ProjectZomboid/projectzomboid/projectzomboid.jar
+INFO:  Loading Class: zombie/inventory/types/Clothing$WetDryState from Project Zomboid (inverted: false): /home/psychopatz/.steam/debian-installation/steamapps/common/ProjectZomboid/projectzomboid/projectzomboid.jar
+INFO:  Loading Class: zombie/inventory/types/Clothing$ClothingPatchFabricType from Project Zomboid (inverted: false): /home/psychopatz/.steam/debian-installation/steamapps/common/ProjectZomboid/projectzomboid/projectzomboid.jar
+INFO:  Loading Class: zombie/inventory/types/Clothing$ClothingPatch from Project Zomboid (inverted: false): /home/psychopatz/.steam/debian-installation/steamapps/common/ProjectZomboid/projectzomboid/projectzomboid.jar
+INFO:  Loading Class: zombie/inventory/types/AnimalInventoryItem from Project Zomboid (inverted: false): /home/psychopatz/.steam/debian-installation/steamapps/common/ProjectZomboid/projectzomboid/projectzomboid.jar
+INFO:  Loading Class: zombie/inventory/types/AlarmClockClothing from Project Zomboid (inverted: false): /home/psychopatz/.steam/debian-installation/steamapps/common/ProjectZomboid/projectzomboid/projectzomboid.jar
+INFO:  Loading Class: zombie/inventory/types/AlarmClock from Project Zomboid (inverted: false): /home/psychopatz/.steam/debian-installation/steamapps/common/ProjectZomboid/projectzomboid/projectzomboid.jar
 INFO:  Scanning classes from Project Zomboid (inverted: true): /home/psychopatz/.steam/debian-installation/steamapps/common/ProjectZomboid/projectzomboid/projectzomboid.jar
+INFO:  Loading Class: java/lang/invoke/MethodHandles$Lookup from module java.base@25.0.1
+INFO:  Loading Class: java/lang/invoke/MethodHandles from module java.base@25.0.1
+INFO:  Preprocessing class zombie/inventory/types/Radio
+INFO:  Preprocessing class zombie/inventory/types/WeaponType
+INFO:  Preprocessing class zombie/inventory/types/WeaponPart
+INFO:  Preprocessing class zombie/inventory/types/Moveable
+INFO:  Preprocessing class zombie/inventory/types/MapItem
+INFO:  Preprocessing class zombie/inventory/types/Literature
+INFO:      Loading Class: java/lang/Object from module java.base@25.0.1
+INFO:      Loading Class: java/lang/Enum from module java.base@25.0.1
+INFO:  Preprocessing class zombie/inventory/types/KeyRing
+INFO:      Loading Class: java/lang/constant/Constable from module java.base@25.0.1
+INFO:      Loading Class: java/lang/Comparable from module java.base@25.0.1
+INFO:      Loading Class: java/io/Serializable from module java.base@25.0.1
+INFO:  Preprocessing class zombie/inventory/types/Key
+INFO:  Preprocessing class zombie/inventory/types/InventoryContainer
+INFO:  Preprocessing class zombie/inventory/types/IAlarmClock
+INFO:  ... done
+INFO:  Preprocessing class zombie/inventory/types/Food
+INFO:  Preprocessing class zombie/inventory/types/HandWeapon
+INFO:  Preprocessing class zombie/inventory/types/DrainableComboItem
+INFO:              Loading Class: java/util/ArrayList from module java.base@25.0.1
+INFO:              Loading Class: java/util/AbstractList from module java.base@25.0.1
+INFO:              Loading Class: java/util/AbstractCollection from module java.base@25.0.1
+INFO:              Loading Class: java/util/Collection from module java.base@25.0.1
+INFO:              Loading Class: java/lang/Iterable from module java.base@25.0.1
+INFO:  ... done
+INFO:  Preprocessing class zombie/inventory/types/Drainable
+INFO:  ... done
+INFO:  Preprocessing class zombie/inventory/types/ComboItem
+INFO:  ... done
+INFO:              Loading Class: java/lang/Throwable from module java.base@25.0.1
+INFO:  Preprocessing class zombie/inventory/types/Clothing
+INFO:              Loading Class: java/lang/Exception from module java.base@25.0.1
+INFO:              Loading Class: java/io/FileOutputStream from module java.base@25.0.1
+INFO:              Loading Class: java/io/OutputStream from module java.base@25.0.1
+INFO:              Loading Class: java/io/Closeable from module java.base@25.0.1
+INFO:              Loading Class: java/io/BufferedOutputStream from module java.base@25.0.1
+INFO:              Loading Class: java/io/FilterOutputStream from module java.base@25.0.1
+INFO:              Loading Class: java/lang/AutoCloseable from module java.base@25.0.1
+INFO:              Loading Class: java/io/Flushable from module java.base@25.0.1
+INFO:  ... done
+INFO:  Preprocessing class zombie/inventory/types/AnimalInventoryItem
+INFO:              Loading Class: java/io/FileInputStream from module java.base@25.0.1
+INFO:              Loading Class: java/io/InputStream from module java.base@25.0.1
+INFO:              Loading Class: java/io/BufferedInputStream from module java.base@25.0.1
+INFO:              Loading Class: java/io/FilterInputStream from module java.base@25.0.1
+INFO:  ... done
+INFO:  Preprocessing class zombie/inventory/types/AlarmClockClothing
+INFO:  ... done
+INFO:  Preprocessing class zombie/inventory/types/AlarmClock
+INFO:  ... done
+INFO:  ... done
+INFO:  ... done
+INFO:              Loading Class: java/lang/Integer from module java.base@25.0.1
+INFO:              Loading Class: java/lang/Number from module java.base@25.0.1
+INFO:              Loading Class: java/lang/constant/ConstantDesc from module java.base@25.0.1
+INFO:              Loading Class: java/lang/String from module java.base@25.0.1
+INFO:              Loading Class: java/lang/CharSequence from module java.base@25.0.1
+INFO:  ... done
+INFO:  ... done
+INFO:  ... done
+INFO:              Loading Class: java/lang/Double from module java.base@25.0.1
+INFO:              Loading Class: java/util/List from module java.base@25.0.1
+INFO:  ... done
+INFO:              Loading Class: java/util/SequencedCollection from module java.base@25.0.1
+INFO:  ... done
+INFO:  ... done
+INFO:              Loading Class: java/util/HashMap from module java.base@25.0.1
+INFO:  ... done
+INFO:  ... done
+INFO:  ... done
+INFO:  Decompiling class zombie/inventory/types/WeaponType
+INFO:  Decompiling class zombie/inventory/types/Moveable
+INFO:  Decompiling class zombie/inventory/types/Radio
+INFO:  Decompiling class zombie/inventory/types/WeaponPart
+INFO:  Decompiling class zombie/inventory/types/KeyRing
+INFO:  Decompiling class zombie/inventory/types/InventoryContainer
+INFO:  Decompiling class zombie/inventory/types/IAlarmClock
+INFO:  Decompiling class zombie/inventory/types/HandWeapon
+INFO:  Decompiling class zombie/inventory/types/Food
+INFO:  Decompiling class zombie/inventory/types/Literature
+INFO:  Decompiling class zombie/inventory/types/MapItem
+INFO:  Decompiling class zombie/inventory/types/Key
+INFO:          Loading Class: java/util/RandomAccess from module java.base@25.0.1
+INFO:          Loading Class: java/lang/Cloneable from module java.base@25.0.1
+INFO:  ... done
+INFO:          Loading Class: java/nio/ByteBuffer from module java.base@25.0.1
+INFO:  Decompiling class zombie/inventory/types/DrainableComboItem
+INFO:          Loading Class: java/io/File from module java.base@25.0.1
+INFO:          Loading Class: java/util/Comparator from module java.base@25.0.1
+INFO:          Loading Class: java/lang/Math from module java.base@25.0.1
+INFO:          Loading Class: java/util/function/ToIntFunction from module java.base@25.0.1
+INFO:          Loading Class: java/nio/Buffer from module java.base@25.0.1
+INFO:  ... done
+INFO:  Decompiling class zombie/inventory/types/Drainable
+INFO:  ... done
+INFO:  Decompiling class zombie/inventory/types/ComboItem
+INFO:  ... done
+INFO:  Decompiling class zombie/inventory/types/Clothing
+INFO:          Loading Class: java/io/PrintStream from module java.base@25.0.1
+INFO:          Loading Class: java/lang/Boolean from module java.base@25.0.1
+INFO:          Loading Class: java/lang/System from module java.base@25.0.1
+INFO:          Loading Class: java/util/HashSet from module java.base@25.0.1
+INFO:          Loading Class: java/lang/Float from module java.base@25.0.1
+INFO:          Loading Class: java/util/Arrays from module java.base@25.0.1
+INFO:  ... done
+INFO:  Decompiling class zombie/inventory/types/AnimalInventoryItem
+INFO:          Loading Class: java/io/IOException from module java.base@25.0.1
+INFO:  ... done
+INFO:  ... done
+INFO:  Decompiling class zombie/inventory/types/AlarmClockClothing
+INFO:  Decompiling class zombie/inventory/types/AlarmClock
+INFO:  ... done
+INFO:  ... done
+INFO:  ... done
+INFO:          Loading Class: java/lang/Byte from module java.base@25.0.1
+INFO:          Loading Class: java/util/Set from module java.base@25.0.1
+INFO:  ... done
+INFO:  ... done
+INFO:  ... done
+INFO:  ... done
+INFO:  ... done
+INFO:          Loading Class: java/lang/Long from module java.base@25.0.1
+INFO:  ... done
+INFO:          Loading Class: java/util/stream/Stream from module java.base@25.0.1
+INFO:          Loading Class: java/util/function/Predicate from module java.base@25.0.1
+INFO:          Loading Class: java/lang/Class from module java.base@25.0.1
+INFO:  ... done
+INFO:  ... done
+INFO:  ... done

@@ -5,6 +5,7 @@ if PsychopatzCore and PsychopatzCore.RuntimeRole and not PsychopatzCore.RuntimeR
 local Discovery = PNC.WorldDiscovery
 local Internal = Discovery.Internal
 local Types = PNC.WorldDiscoveryTypes
+local Core = PNC.Core
 
 local function lineSpeaker(context, line)
     local role = type(line) == "table" and line.speakerRole or nil
@@ -15,19 +16,23 @@ local function lineSpeaker(context, line)
     return "primary", context and context.speakerNPCID or nil
 end
 
-local function signalRollPasses()
-    local chance = Discovery.RadioSignalChance()
+local function chancePasses(chance, hookName)
     if chance <= 0 then return false end
     if chance >= 100 then return true end
     local roll
-    if type(Discovery.RadioSignalRoll) == "function" then
-        roll = Discovery.RadioSignalRoll()
+    local hook = Discovery[hookName]
+    if type(hook) == "function" then
+        roll = hook()
     elseif ZombRand then
         roll = ZombRand(100)
     else
         roll = math.random(0, 99)
     end
     return (tonumber(roll) or 99) < chance
+end
+
+local function signalRollPasses()
+    return chancePasses(Discovery.RadioSignalChance(), "RadioSignalRoll")
 end
 
 local function markRadioAttempt(record, at)
@@ -42,6 +47,7 @@ local function compactRadioBroadcast(message, context)
     end
     local output = {
         packID = tostring(message.packID or ""),
+        eventType = context and context.eventType or "discovery",
         -- This is an internal voice-continuity identity, not a player-facing
         -- disclosure. IdentityIntroduced remains the only name-reveal gate.
         speakerNPCID = context and context.speakerNPCID or nil,
@@ -69,6 +75,86 @@ local function compactRadioBroadcast(message, context)
         end
     end
     return #output.lines > 0 and output or nil
+end
+
+function Discovery.RadioAmbient(player, channelID, frequency)
+    local record, reason = Internal.PlayerRecord(player, true)
+    if not record then return Discovery.BuildSnapshot(player, {
+        ok = false, eventType = "ambient", reason = reason,
+    }) end
+    if not Discovery.RadioDiscoveryEnabled()
+        or not Discovery.RadioAmbientEnabled()
+    then
+        return Discovery.BuildSnapshot(player, {
+            ok = false, eventType = "ambient",
+            reason = "radio_ambient_disabled",
+        })
+    end
+    local scanChannel = PNC.RadioDiscoveryChannel
+    if tostring(channelID or "") ~= scanChannel.ID
+        or math.floor(tonumber(frequency) or 0) ~= scanChannel.FREQUENCY
+    then
+        return Discovery.BuildSnapshot(player, {
+            ok = false, eventType = "ambient", reason = "invalid_channel",
+        })
+    end
+    local state = Discovery.RadioAmbientState
+        or { lastAiredAt = nil, hasAired = false,
+            lastVariant = nil, sequence = 0 }
+    state.lastRequestAtByPlayer = state.lastRequestAtByPlayer or {}
+    Discovery.RadioAmbientState = state
+    local now = Core and Core.Now and Core.Now() or 0
+    local key = Internal.CharacterUUID(player) or tostring(player)
+    local interval = Discovery.RadioAmbientIntervalMs()
+    local previousRequest = tonumber(state.lastRequestAtByPlayer[key]) or 0
+    if state.lastRequestAtByPlayer[key] ~= nil
+        and now - previousRequest < interval
+    then
+        return Discovery.BuildSnapshot(player, {
+            ok = false, eventType = "ambient",
+            reason = "ambient_request_cooldown",
+        })
+    end
+    state.lastRequestAtByPlayer[key] = now
+    local globalGap = math.max(1000,
+        tonumber(Discovery.RADIO_AMBIENT_GLOBAL_GAP_MS) or 60000)
+    if state.hasAired == true
+        and now - (tonumber(state.lastAiredAt) or 0) < globalGap
+    then
+        return Discovery.BuildSnapshot(player, {
+            ok = false, eventType = "ambient",
+            reason = "ambient_channel_cooldown",
+        })
+    end
+    if not chancePasses(Discovery.RadioAmbientChance(),
+        "RadioAmbientRoll")
+    then
+        return Discovery.BuildSnapshot(player, {
+            ok = false, eventType = "ambient", reason = "ambient_missed",
+        })
+    end
+    local aired, broadcastMessage, broadcastContext =
+        Discovery.BroadcastRadioAmbient(player)
+    if not aired then
+        return Discovery.BuildSnapshot(player, {
+            ok = false, eventType = "ambient", reason = broadcastMessage,
+        })
+    end
+    state.lastAiredAt = now
+    state.hasAired = true
+    local sequence = broadcastContext and broadcastContext.ambientSequence
+        or state.sequence
+    local result = {
+        ok = true,
+        eventType = "ambient",
+        reason = "ambient_broadcast",
+        notificationID = "ambient:" .. tostring(sequence) .. ":"
+            .. tostring(math.floor(now / 1000)),
+        channelID = scanChannel.ID,
+    }
+    result.radioBroadcast = compactRadioBroadcast(
+        broadcastMessage, broadcastContext)
+    return Discovery.BuildSnapshot(player, result)
 end
 
 function Discovery.RadioScan(player, channelID, frequency)
@@ -165,6 +251,64 @@ function Discovery.RadioScan(player, channelID, frequency)
     return Discovery.BuildSnapshot(player, result)
 end
 
+function Discovery.CallContact(player, kind, entityID)
+    local record, reason = Internal.PlayerRecord(player, true)
+    if not record then
+        return Discovery.BuildSnapshot(player, {
+            ok = false, reason = reason,
+        })
+    end
+    kind = tostring(kind or "")
+    entityID = tostring(entityID or "")
+    if not Types.IsKind(kind) or entityID == "" then
+        return Discovery.BuildSnapshot(player, {
+            ok = false, reason = "invalid_contact",
+        })
+    end
+    local entry = record.entities[kind]
+        and record.entities[kind][entityID] or nil
+    local phase = Types.ClampPhase(entry and entry.phase)
+    if not entry or phase < Types.PHASE_RUMORED then
+        return Discovery.BuildSnapshot(player, {
+            ok = false, reason = "contact_not_known",
+            entityID = entityID, kind = kind,
+        })
+    end
+    local entity = Discovery.ResolveEntity(kind, entityID)
+    if not entity then
+        return Discovery.BuildSnapshot(player, {
+            ok = false, reason = "entity_not_found",
+            entityID = entityID, kind = kind,
+        })
+    end
+    local updated, advanceReason
+    if phase < Types.PHASE_LOCATED then
+        updated, advanceReason = Discovery.SetResolvedPhase(
+            player, entity, Types.PHASE_LOCATED, "contact_call", true)
+        if not updated then
+            return Discovery.BuildSnapshot(player, {
+                ok = false, reason = advanceReason,
+                entityID = entityID, kind = kind,
+            })
+        end
+        Discovery.Save()
+        phase = Types.PHASE_LOCATED
+    else
+        updated = entry
+    end
+    return Discovery.BuildSnapshot(player, {
+        ok = true,
+        reason = phase == Types.PHASE_LOCATED
+            and advanceReason == "advanced"
+            and "contact_located" or "contact_already_located",
+        entityID = entityID,
+        kind = kind,
+        phase = phase,
+        mapUpdated = advanceReason == "advanced",
+        factionKnown = updated and updated.factionKnown == true or false,
+    })
+end
+
 function Discovery.CanUseDebug(player)
     local coreDebug = PsychopatzCore and PsychopatzCore.Debug
     if not coreDebug or type(coreDebug.CanUse) ~= "function" then
@@ -178,8 +322,14 @@ end
 function Discovery.HandleAction(player, args)
     args = type(args) == "table" and args or {}
     local action = tostring(args.action or "snapshot")
+    if action == "radio_ambient" then
+        return Discovery.RadioAmbient(player, args.channelID, args.frequency)
+    end
     if action == "radio_scan" then
         return Discovery.RadioScan(player, args.channelID, args.frequency)
+    end
+    if action == "call_contact" then
+        return Discovery.CallContact(player, args.kind, args.entityID)
     end
     if action == "debug_discover" then
         if not Discovery.CanUseDebug(player) then

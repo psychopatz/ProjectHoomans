@@ -85,7 +85,8 @@ function ISPNCColonistWindow:prerender()
         self:requestResponsiveLayout(true)
     end
     Controller.ApplyContentStyle(self)
-    if self.tabRegistryRevision ~= PNC.ColonistUI.TabRegistry.Revision then
+    local tabsChanged = Controller.SyncTabs(self)
+    if tabsChanged then
         self:requestResponsiveLayout(true)
     end
     local now = PNC.Core.Now()
@@ -160,6 +161,20 @@ function ColonistUI.Toggle(owner)
         return false
     end
     return ColonistUI.Open(owner) ~= nil
+end
+
+function ColonistUI.OpenDebug(owner)
+    local client = PNC and PNC.Client
+    if not client or type(client.CanUseDebug) ~= "function"
+        or client.CanUseDebug() ~= true
+    then
+        return nil
+    end
+    local window = ColonistUI.Open(owner)
+    local button = window and window.tabButtons
+        and window.tabButtons.debug or nil
+    if button and window.onTab then window:onTab(button) end
+    return window
 end
 
 return ColonistUI

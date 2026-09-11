@@ -134,20 +134,21 @@ debugPerson.provision = { evaluations = {
     hydration = { onHand = 0.7, target = 0.7, refilling = false },
 } }
 local debugRows = DebugTab.BuildRows(debugPerson, {})
-T.equal(#debugRows, 8, "debug tab need, storage, and provision rows")
-T.equal(debugRows[1].meter, true, "debug tab reuses need meters")
-T.equal(debugRows[1].value, 0.12,
-    "debug hunger meter uses the selected colonist value")
-T.equal(debugRows[2].value, 0.95,
-    "debug thirst meter uses the selected colonist value")
-T.equal(debugRows[7].key, "debug_provision_food",
+T.equal(#debugRows, 5, "debug tab storage and provision rows")
+T.equal(debugRows[1].key, "debug_storage_food",
+    "debug tab starts with storage diagnostics")
+T.falsy(debugRows[1].meter, "debug tab does not duplicate need meters")
+T.equal(debugRows[4].key, "debug_provision_food",
     "debug tab exposes food provision state")
 local requestedAction
 local requestedOptions
-PNC.Client = { RequestColonyAction = function(action, options)
+PNC.Client = {
+    CanUseDebug = function() return true end,
+    RequestColonyAction = function(action, options)
     requestedAction, requestedOptions = action, options
     return true
-end }
+    end,
+}
 T.truthy(DebugTab.OnControl({ people = selectedRoster }, {
     internal = "force_nearby_water",
 }), "nearby-water debug control submits an action")
@@ -155,6 +156,10 @@ T.equal(requestedAction, "debug_need",
     "nearby-water debug control uses the needs debug route")
 T.equal(requestedOptions.operation, "force_nearby_water",
     "nearby-water debug operation reaches the server command")
+PNC.Client.CanUseDebug = function() return false end
+T.falsy(DebugTab.OnControl({ people = selectedRoster }, {
+    internal = "force_nearby_water",
+}), "debug control bypasses the client authorization gate")
 local bound = {
     items = { { stale = true } },
     yScroll = -900,

@@ -40,7 +40,7 @@ function ISPNCCommandHubZoneWindow:onResponsiveLayout()
             local buttonY = headerY + headerHeight + buttonGap
             local columnGap = px(8)
             local buttons = value.buttons or {}
-            local columns = #buttons >= 2 and 2 or 1
+            local columns = rect.width >= px(260) and 2 or 1
             local buttonWidth = columns == 1 and rect.width
                 or math.floor((rect.width - columnGap) / columns)
             for index, button in ipairs(buttons) do

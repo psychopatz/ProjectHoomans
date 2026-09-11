@@ -109,48 +109,19 @@ function LiveBodyControl.GetActionStateName(zombie)
 end
 
 -- Read the action-context state through IsoGameCharacter's exposed wrapper.
--- getActionContext() returns a Java ActionContext userdata in Build 42; it is
--- not a Lua table, so inspecting actionContext.getCurrentStateName directly
--- raises "attempted index ... of non-table".
+-- getActionContext() returns an internal Java ActionContext userdata in Build
+-- 42. Its methods are not exposed as a Lua object, so do not index it here.
 function LiveBodyControl.GetActionContextStateName(zombie)
-    local actionContext
     local value
-    local ok
     if not zombie then
-        return LiveBodyControl.GetActionStateName(zombie)
+        return ""
     end
     if zombie.getCurrentActionContextStateName then
-        ok, value = pcall(function()
-            return zombie:getCurrentActionContextStateName()
-        end)
-        if not ok then
-            value = nil
-        end
-        if value ~= nil then
-            value = string.lower(tostring(value))
-            if value ~= "" then
-                return value
-            end
-        end
+        value = zombie:getCurrentActionContextStateName()
+    elseif zombie.getActionStateName then
+        value = zombie:getActionStateName()
     end
-    -- Compatibility fallback for bindings that do not expose the direct
-    -- IsoGameCharacter wrapper. Never inspect fields on ActionContext: the
-    -- returned value is Java userdata in the live game.
-    if zombie.getActionContext then
-        actionContext = zombie:getActionContext()
-        if actionContext then
-            ok, value = pcall(function()
-                return actionContext:getCurrentStateName()
-            end)
-            if ok and value ~= nil then
-                value = string.lower(tostring(value))
-                if value ~= "" then
-                    return value
-                end
-            end
-        end
-    end
-    return LiveBodyControl.GetActionStateName(zombie)
+    return string.lower(tostring(value or ""))
 end
 
 function LiveBodyControl.IsNativePassageState(actionState)
@@ -272,16 +243,12 @@ function LiveBodyControl.BlockVanillaPassage(zombie, lane, now)
     return true, kind
 end
 
--- Recover a stale vanilla passage through ActionContext first. The previous
--- implementation only reset the legacy state machine, which left the engine
--- ActionContext at climbwindow on MP replicas and allowed the next scene
--- snapshot to stack a drink on top of it.
+-- Recover a stale vanilla passage through the exposed character state and
+-- traversal variables. ActionContext itself is internal Java userdata and
+-- cannot be indexed or mutated from Lua in Build 42.
 function LiveBodyControl.ResetNativePassageActionContext(zombie)
-    local actionContext
-    local group
-    local initialState
-    local ok
     local actionState
+    local recovered = false
     if not zombie then
         return false
     end
@@ -289,43 +256,21 @@ function LiveBodyControl.ResetNativePassageActionContext(zombie)
     if not LiveBodyControl.IsNativePassageState(actionState) then
         return false
     end
-    if zombie.getActionContext then
-        actionContext = zombie:getActionContext()
-        if actionContext then
-            ok, group = pcall(function()
-                return actionContext:getGroup()
-            end)
-            if ok and group then
-                ok, initialState = pcall(function()
-                    return group:getInitialState()
-                end)
-                if ok and initialState ~= nil then
-                    pcall(function()
-                        actionContext:clearActionContextEvents()
-                    end)
-                    ok = pcall(function()
-                        actionContext:setCurrentState(initialState)
-                    end)
-                    if ok then
-                        return true
-                    end
-                end
-            end
-        end
+
+    -- Set the normal completion latch first so the engine ActionContext can
+    -- transition climbfence/climbwindow back to idle on its next update.
+    if LiveBodyControl.SuppressZombieState then
+        recovered = LiveBodyControl.SuppressZombieState(
+            zombie, nil, nil
+        ) == true
     end
+
     if LiveBodyControl.ResetNativeMovementState
         and LiveBodyControl.ResetNativeMovementState(zombie)
     then
-        return true
+        recovered = true
     end
-    -- This fallback is state-name based and therefore still works when the
-    -- legacy singleton state objects are not exposed by the Lua binding.
-    if LiveBodyControl.SuppressZombieState
-        and LiveBodyControl.SuppressZombieState(zombie, nil, nil) == true
-    then
-        return true
-    end
-    return false
+    return recovered
 end
 
 -- Animation scenes and native passage playback share the same BumpType and

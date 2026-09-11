@@ -10,6 +10,7 @@ local Inventory = PNC.Inventory
 Inventory.Internal = Inventory.Internal or {}
 
 require "PNC/Core/Inventory/PNC_Inventory/PNC_Inventory_Model"
+require "PNC/Core/Inventory/PNC_Inventory/Model/PNC_Inventory_FoodLifecycle"
 require "PNC/Core/Inventory/PNC_Inventory/Equipment/PNC_Inventory_EquipmentGeneration"
 require "PNC/Core/Inventory/PNC_Inventory/PNC_Inventory_Templates"
 require "PNC/Core/Inventory/PNC_Inventory/PNC_Inventory_Equipment"
@@ -24,3 +25,4 @@ Inventory.Commands.ApplyDelta = Inventory.ApplyDelta
 Inventory.Commands.AddItems = Inventory.AddItems
 Inventory.Commands.RemoveItems = Inventory.RemoveItems
 Inventory.Commands.RebuildCaches = Inventory.RebuildCaches
+Inventory.Commands.AdvanceFoodLifecycle = Inventory.AdvanceFoodLifecycle

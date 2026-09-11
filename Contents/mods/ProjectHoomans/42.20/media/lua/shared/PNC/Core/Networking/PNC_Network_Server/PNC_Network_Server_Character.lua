@@ -9,6 +9,9 @@ function Network.SendCharacterPayload(targetPlayer, record)
     if not record then
         return
     end
+    if Inventory and Inventory.AdvanceFoodLifecycle then
+        Inventory.AdvanceFoodLifecycle(record)
+    end
     payload = Network.BuildCharacterPayload(record)
     if not payload then
         return
@@ -47,6 +50,9 @@ function Network.CanViewCharacter(player, record)
 end
 
 function Network.SendInventoryDelta(targetPlayer, record, sinceRevision)
+    if Inventory and Inventory.AdvanceFoodLifecycle then
+        Inventory.AdvanceFoodLifecycle(record)
+    end
     local delta = Inventory and Inventory.BuildDeltaPayload and Inventory.BuildDeltaPayload(record, sinceRevision) or nil
     if not delta or delta.fullRequired == true then
         Network.SendCharacterPayload(targetPlayer, record)

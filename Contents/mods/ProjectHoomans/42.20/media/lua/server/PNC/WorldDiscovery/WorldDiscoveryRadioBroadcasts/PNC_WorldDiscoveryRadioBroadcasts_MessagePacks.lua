@@ -4,10 +4,10 @@ local Types = PNC.WorldDiscoveryTypes
 local Channel = PNC.RadioDiscoveryChannel
 local Radio = PsychopatzCore.CustomRadio
 
-local function pack(id, priority, matches, messages)
+local function pack(id, priority, matches, messages, eventType)
     Radio.RegisterMessagePack("projecthoomans." .. id, {
         channel = Channel.ID,
-        eventType = "discovery",
+        eventType = eventType or "discovery",
         priority = priority,
         matches = matches,
         messages = messages,
@@ -139,5 +139,66 @@ end, {
         introduction(context)
     ) end,
 })
+
+pack("ambient_open_band", 20, function(context)
+    return context.eventType == "ambient"
+        and context.ambientVariant == "open_band"
+end, {
+    function(context) return lines(
+        "<fzzt>",
+        voiced(context, "...copy that... no, start again."),
+        voiced(context, "If anyone is awake, keep the channel clear."),
+        "<wzzt>"
+    ) end,
+    function(context) return lines(
+        "<bzzt>",
+        voiced(context, "Static on the line. Thought I heard somebody."),
+        voiced(context, "Never mind. Just the wind and a bad connection."),
+        "<fzzt>"
+    ) end,
+    function(context) return lines(
+        voiced(context, "Check, check... still transmitting."),
+        voiced(context, "No response. Leave it open for another minute."),
+        "<wzzt>"
+    ) end,
+    function(context) return lines(
+        "<wzzt>",
+        voiced(context, "The last one was garbled. Send it slow."),
+        voiced(context, "I said slow. Forget it, just listen for the tone."),
+        "<bzzt>"
+    ) end,
+}, "ambient")
+
+pack("ambient_cross_talk", 20, function(context)
+    return context.eventType == "ambient"
+        and context.ambientVariant == "cross_talk"
+end, {
+    function(context) return lines(
+        "<fzzt>",
+        voiced(context, "Did you mark the channel?"),
+        reply(context, "Which channel? No, say that again."),
+        voiced(context, "Never mind. I can barely hear you."),
+        "<wzzt>"
+    ) end,
+    function(context) return lines(
+        voiced(context, "Tell the west side to hold."),
+        reply(context, "The west side of what?"),
+        voiced(context, "Exactly. That is why I said hold."),
+        "<bzzt>"
+    ) end,
+    function(context) return lines(
+        "<wzzt>",
+        voiced(context, "You are breaking up around the—"),
+        reply(context, "Around the what?"),
+        voiced(context, "The thing. The big thing. Just stay put."),
+        "<fzzt>"
+    ) end,
+    function(context) return lines(
+        voiced(context, "Read that back to me."),
+        reply(context, "I did. You were not listening."),
+        voiced(context, "I am listening. The radio is not."),
+        "<bzzt>"
+    ) end,
+}, "ambient")
 
 return PNC.WorldDiscovery

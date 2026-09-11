@@ -125,5 +125,11 @@
     "Sandbox_ProjectHoomans.RadioDiscoverySignalChance": "Radio Signal Detection Chance (%%)",
     "Sandbox_ProjectHoomans.RadioDiscoverySignalChance_tooltip": "Chance that a valid scan resolves a nearby undiscovered signal after the cooldown is satisfied.",
     "Sandbox_ProjectHoomans.RadioDiscoveryLineSpacingSeconds": "Radio Line Spacing (Seconds)",
-    "Sandbox_ProjectHoomans.RadioDiscoveryLineSpacingSeconds_tooltip": "Real-time spacing between spoken lines in one radio transmission. Higher values reduce overlapping broadcasts."
+    "Sandbox_ProjectHoomans.RadioDiscoveryLineSpacingSeconds_tooltip": "Real-time spacing between spoken lines in one radio transmission. Higher values reduce overlapping broadcasts.",
+    "Sandbox_ProjectHoomans.RadioAmbientEnabled": "Ambient Radio Chatter",
+    "Sandbox_ProjectHoomans.RadioAmbientEnabled_tooltip": "Allows harmless background chatter on the frequency without changing discovery or knowledge.",
+    "Sandbox_ProjectHoomans.RadioAmbientIntervalSeconds": "Ambient Chatter Interval (Seconds)",
+    "Sandbox_ProjectHoomans.RadioAmbientIntervalSeconds_tooltip": "Minimum real-time interval before a tuned radio may request another ambient transmission.",
+    "Sandbox_ProjectHoomans.RadioAmbientChance": "Ambient Chatter Chance (%%)",
+    "Sandbox_ProjectHoomans.RadioAmbientChance_tooltip": "Chance that an eligible ambient-radio trigger produces background chatter. It is not guaranteed every interval."
 }

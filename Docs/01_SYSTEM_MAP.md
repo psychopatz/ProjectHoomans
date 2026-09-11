@@ -217,10 +217,11 @@
   `PNC_CommunityDebugOverlay`, and `PNC_MapLayer_Communities`: guarded
   fixed-community inspection, service-backed controls, NPC diagnostics,
   hideout map shapes, and vacant-site claim dispatch
-- `PNC_NeedsDebugWindow`: admin/debug-only inspection and testing of
-  individual and mobile-group Need reserves
+- `PNC_ColonistWindow`: normal player-facing roster, Needs, Activities, and
+  Task pages, plus the gated storage/provision `DEBUG` tab
 - `PNC_ColonyManagementWindow`: normal player-facing overview, people, and
-  Needs pages opened from the in-game radio UI
+  colony-management pages opened from the in-game radio UI; its migrated
+  debug tab is no longer exposed
 - `PNC_DebugSpawnMenu`: nested faction/equipment debug-spawn presentation
 - `PNC_ClientPresenceSync`: multiplayer live-body reconciliation for nearby
   embodied NPCs, including canonical-instance selection and duplicate shell

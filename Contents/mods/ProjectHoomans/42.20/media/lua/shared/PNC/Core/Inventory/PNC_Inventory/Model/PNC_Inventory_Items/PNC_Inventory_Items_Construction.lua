@@ -1,5 +1,6 @@
 local Inventory = PNC.Inventory
 local Internal = Inventory.Internal
+local Portable = require "PsychopatzCore/Inventory/PsychopatzPortableItemState"
 
 local function buildItem(record, spec, fullType, profile)
     return {
@@ -8,7 +9,7 @@ local function buildItem(record, spec, fullType, profile)
         type = fullType,
         stack = math.max(
             1,
-            math.floor(tonumber(spec.stack) or tonumber(spec.uses) or 1)
+            math.floor(tonumber(spec.stack) or 1)
         ),
         uses = tonumber(spec.uses),
         cond = tonumber(spec.cond),
@@ -67,8 +68,12 @@ local function attachItem(inv, item)
 end
 
 function Internal.createItem(record, inv, spec)
+    spec = type(spec) == "table" and spec or {}
     local fullType = Internal.normalizeItemType(spec.type)
     local item
+    local profile
+    local state
+    local now
     if not fullType then return nil end
     item = buildItem(
         record,
@@ -76,6 +81,21 @@ function Internal.createItem(record, inv, spec)
         fullType,
         Internal.getContainerProfile(fullType)
     )
+    profile = Inventory.GetFoodProfile(fullType)
+    state = item.itemState or {}
+    if profile and profile.food == true
+        and spec.origin ~= "world"
+        and spec.templateKey == nil
+        and state.foodLastAgedHours == nil
+        and state.foodCreatedAtHours == nil
+    then
+        now = Portable.GetWorldAgeHours()
+        if now ~= nil then state.foodCreatedAtHours = now end
+    end
+    item.itemState = Internal.sanitizeItemState(state)
+    if Inventory.NormalizeItemState then
+        Inventory.NormalizeItemState(item)
+    end
     attachItem(inv, item)
     return item
 end

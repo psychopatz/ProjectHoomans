@@ -454,3 +454,31 @@ option ProjectHoomans.RadioDiscoveryLineSpacingSeconds
     page = ProjectHoomans,
     translation = ProjectHoomans.RadioDiscoveryLineSpacingSeconds,
 }
+
+option ProjectHoomans.RadioAmbientEnabled
+{
+    type = boolean,
+    default = true,
+    page = ProjectHoomans,
+    translation = ProjectHoomans.RadioAmbientEnabled,
+}
+
+option ProjectHoomans.RadioAmbientIntervalSeconds
+{
+    type = integer,
+    default = 90,
+    min = 30,
+    max = 600,
+    page = ProjectHoomans,
+    translation = ProjectHoomans.RadioAmbientIntervalSeconds,
+}
+
+option ProjectHoomans.RadioAmbientChance
+{
+    type = double,
+    default = 65.0,
+    min = 0.0,
+    max = 100.0,
+    page = ProjectHoomans,
+    translation = ProjectHoomans.RadioAmbientChance,
+}

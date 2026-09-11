@@ -89,6 +89,11 @@ local function normalizeRegistry(raw)
                                 tonumber(entry.contactedAt) or 0),
                             presenceStatus = Types.PresenceStatus(
                                 entry.presenceStatus),
+                            factionKnown = entry.factionKnown == true,
+                            factionID = entry.factionID ~= nil
+                                and tostring(entry.factionID) or nil,
+                            factionName = entry.factionName ~= nil
+                                and tostring(entry.factionName) or nil,
                         }
                     end
                 end

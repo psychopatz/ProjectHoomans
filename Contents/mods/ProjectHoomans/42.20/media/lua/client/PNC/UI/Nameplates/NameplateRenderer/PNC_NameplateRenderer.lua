@@ -15,6 +15,7 @@ require "PNC/UI/Nameplates/NameplateRenderer/PNC_NameplateRenderer_DebugText"
 require "PNC/UI/Nameplates/NameplateRenderer/PNC_NameplateRenderer_WorldPrimitives"
 require "PNC/UI/Nameplates/NameplateRenderer/PNC_NameplateRenderer_PathDebug"
 require "PNC/UI/Nameplates/NameplateRenderer/PNC_NameplateRenderer_CombatDebug"
+require "PNC/UI/Nameplates/NameplateRenderer/PNC_NameplateRenderer_ZombieDebug"
 require "PNC/UI/Nameplates/NameplateRenderer/PNC_NameplateRenderer_CampDebug"
 require "PNC/UI/Nameplates/NameplateRenderer/PNC_NameplateRenderer_Api"
 

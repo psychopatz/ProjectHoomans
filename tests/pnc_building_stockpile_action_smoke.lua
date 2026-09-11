@@ -24,7 +24,32 @@ package.preload["PNC/UI/Communities/ColonyManagement/SettlementManagement/PNC_Se
     }
 end
 
-PNC = { CommandHub = {} }
+local playerInventory = {
+    getItemsFromType = function(_, fullType)
+        return {
+            size = function()
+                return fullType == "Base.Money" and 1 or 0
+            end,
+        }
+    end,
+}
+function getSpecificPlayer()
+    return { getInventory = function() return playerInventory end }
+end
+
+PNC = {
+    CommandHub = {},
+    FacilityDefinitions = {
+        Get = function(id)
+            if id ~= "stockpile" then return nil end
+            return {
+                buildCosts = {
+                    { fullType = "Base.Money", amount = 1 },
+                },
+            }
+        end,
+    },
+}
 local Registry = T.load("ProjectHoomans", "client",
     "PNC/UI/CommandHub/PNC_CommandHub_Registry.lua")
 

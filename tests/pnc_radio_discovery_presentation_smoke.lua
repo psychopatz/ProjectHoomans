@@ -10,6 +10,7 @@ package.preload["PsychopatzCore/Radio/PsychopatzCustomRadioClient"] =
 local listener
 local halos = {}
 local published = {}
+local requests = {}
 local clock = 0
 local player = {}
 PsychopatzCore = {
@@ -37,7 +38,11 @@ PNC = {
     RadioDiscoveryChannel = {
         ID = "projecthoomans.frequency_scan", FREQUENCY = 69000,
     },
-    Client = { RequestWorldDiscovery = function() end },
+    Client = {
+        RequestWorldDiscovery = function(action)
+            requests[#requests + 1] = action
+        end,
+    },
     ContactsUI = { Open = function() end },
     ColonyManagementUI = { Open = function() end },
 }
@@ -62,6 +67,16 @@ HaloTextHelper = {
 
 T.load(ROOT .. "client/PNC/Integrations/PNC_PsychopatzCoreRadio.lua")
 T.equal(type(listener), "function", "scan listener registers")
+listener({ player = player, playerNum = 0, now = 0 })
+listener({ player = player, playerNum = 0, now = 40000 })
+listener({ player = player, playerNum = 0, now = 80000 })
+T.equal(#requests, 3,
+    "radio polling does not request ambient chatter before its interval")
+listener({ player = player, playerNum = 0, now = 120000 })
+T.equal(requests[4], "radio_scan",
+    "the normal discovery probe remains separate from ambience")
+T.equal(requests[5], "radio_ambient",
+    "ambient chatter is requested only after its independent interval")
 T.equal(PNC.RadioDiscoveryPresentation.ShowResult({ result = {
     ok = true, notificationID = "settlement:1:1",
     kind = "settlement", phase = 1, identityRevealed = true,
@@ -119,11 +134,42 @@ T.equal(published[2].speakerID, "npc_two",
     "secondary radio line retains its internal speaker identity")
 T.equal(published[2].voiceBinding.slot, "VoiceMale:1",
     "secondary radio line resolves a separate NPC voice")
+
 T.equal(PNC.RadioDiscoveryPresentation.ShowResult({ result = {
     ok = true, notificationID = "settlement:2:1",
     kind = "settlement", phase = 1,
 } }), false, "replayed snapshots do not duplicate feedback")
 T.equal(#halos, 3, "duplicate notification produces no extra halo")
+
+local ambientShown = PNC.RadioDiscoveryPresentation.ShowResult({ result = {
+    ok = true, eventType = "ambient", notificationID = "ambient:2:20",
+    radioBroadcast = {
+        eventType = "ambient",
+        speech = { effect_profile = "radio", intensity = 0.7 },
+        speakerNPCID = "radio:ambient:2:primary",
+        secondarySpeakerNPCID = "radio:ambient:2:secondary",
+        lines = {
+            {
+                text = "Static on the line.",
+                speakerRole = "primary",
+                speakerNPCID = "radio:ambient:2:primary",
+            },
+            {
+                text = "Say again?",
+                speakerRole = "secondary",
+                speakerNPCID = "radio:ambient:2:secondary",
+            },
+        },
+    },
+} })
+T.equal(ambientShown, true,
+    "ambient broadcast is playable through the existing radio queue")
+T.equal(#halos, 3,
+    "ambient chatter does not create a discovery notification")
+T.equal(#published, 3,
+    "ambient chatter publishes its first line without a TTS burst")
+T.equal(published[3].presentationState.speech.effect_profile, "radio",
+    "ambient chatter uses the radio DSP profile")
 T.finish("pnc_radio_discovery_presentation_smoke")
 
 T.finish("pnc_radio_discovery_presentation_smoke")

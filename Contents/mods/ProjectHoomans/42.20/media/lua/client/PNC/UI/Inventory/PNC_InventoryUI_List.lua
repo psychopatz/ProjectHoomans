@@ -170,6 +170,36 @@ function ISPNCInventoryList:resolveMouse(x, y)
     return tonumber(x) or 0, tonumber(y) or 0
 end
 
+function ISPNCInventoryList:hoveredRowIndex()
+    if not self.isMouseOver or not self:isMouseOver() then return -1 end
+    if self.isMouseOverScrollBar and self:isMouseOverScrollBar() then
+        return -1
+    end
+    local inputX, inputY = self:resolveMouse(
+        self.getMouseX and self:getMouseX() or 0,
+        self.getMouseY and self:getMouseY() or 0
+    )
+    return self:rowAt(inputX, inputY)
+end
+
+function ISPNCInventoryList:onMouseMove(dx, dy)
+    if ISScrollingListBox.onMouseMove then
+        ISScrollingListBox.onMouseMove(self, dx, dy)
+    end
+    if self.ownerWindow and self.ownerWindow.onInventoryHover then
+        self.ownerWindow:onInventoryHover(self)
+    end
+end
+
+function ISPNCInventoryList:onMouseMoveOutside(x, y)
+    if ISScrollingListBox.onMouseMoveOutside then
+        ISScrollingListBox.onMouseMoveOutside(self, x, y)
+    end
+    if self.ownerWindow and self.ownerWindow.onInventoryHoverOutside then
+        self.ownerWindow:onInventoryHoverOutside(self)
+    end
+end
+
 function ISPNCInventoryList:onMouseDown(x, y)
     local inputX, inputY = self:resolveMouse(x, y)
     if ISScrollingListBox.onMouseDown then

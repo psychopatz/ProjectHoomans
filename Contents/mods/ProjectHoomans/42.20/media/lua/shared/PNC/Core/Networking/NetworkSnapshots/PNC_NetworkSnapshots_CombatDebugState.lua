@@ -20,17 +20,54 @@ function Parts.BuildCombatDebugState(record, combat, firearmState)
     local action = runtime.attackAction
     local now = Core.Now()
     local zombieAttacker = runtime.zombieAttacker
+    local zombieStimulus = runtime.zombieStimulus
     local attackLane = runtime.zombieAttackLane
     local zombieAttackerAge = zombieAttacker
         and math.max(
             0,
             now - (tonumber(zombieAttacker.observedAt) or now)
         ) or nil
+    local zombieStimulusAge = zombieStimulus
+        and math.max(
+            0,
+            now - (tonumber(zombieStimulus.emittedAt) or now)
+        ) or nil
+    local zombieStimulusDebug
     local viewZombies
     local visibleZombieCount
     local nearbyZombieCount
     viewZombies, visibleZombieCount, nearbyZombieCount =
         Parts.BuildCombatDebugObservations(record, target)
+    if type(zombieStimulus) == "table"
+        and zombieStimulusAge <= (
+            tonumber(Const.ZOMBIE_ATTACKER_OBSERVATION_MS) or 1500
+        )
+    then
+        zombieStimulusDebug = {
+            sequence = zombieStimulus.sequence,
+            state = zombieStimulus.state,
+            reason = zombieStimulus.reason,
+            ageMs = zombieStimulusAge,
+            emittedAt = zombieStimulus.emittedAt,
+            x = zombieStimulus.x,
+            y = zombieStimulus.y,
+            z = zombieStimulus.z,
+            radius = zombieStimulus.radius,
+            volume = zombieStimulus.volume,
+        }
+    elseif runtime.combatBlockReason == "follow_stealth_hidden"
+        or runtime.combatBlockReason == "travel_stealth_hidden"
+    then
+        zombieStimulusDebug = {
+            state = "suppressed",
+            reason = runtime.combatBlockReason,
+            ageMs = 0,
+            emittedAt = now,
+            x = record.x,
+            y = record.y,
+            z = record.z,
+        }
+    end
     return {
         target = target and {
             kind = target.kind,
@@ -112,6 +149,7 @@ function Parts.BuildCombatDebugState(record, combat, firearmState)
                 path2Active =
                     zombieAttacker.path2Active == true,
             } or nil,
+        zombieStimulus = zombieStimulusDebug,
         aimConfidence = aim.confidence,
         aimReadyInMs = aim.readyAt
             and math.max(0, (tonumber(aim.readyAt) or now) - now)

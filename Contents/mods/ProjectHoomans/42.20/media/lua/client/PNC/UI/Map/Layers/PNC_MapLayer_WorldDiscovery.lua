@@ -101,6 +101,11 @@ end
 
 local function labelFor(entity)
     local label = tostring(entity.name or getText("UI_PNC_UnknownSignal"))
+    if entity.factionKnown == true and entity.factionName
+        and (tonumber(entity.phase) or 0) < Types.PHASE_CONTACTED
+    then
+        label = tostring(entity.factionName)
+    end
     if tonumber(entity.phase) == Types.PHASE_RUMORED then
         return label .. " (?)"
     end
@@ -130,6 +135,9 @@ local function drawHover(map, entity, x, y, color)
         entity.kind == Types.KIND_SETTLEMENT
             and "Settlement signal" or "Mobile group signal",
     }
+    if entity.factionKnown == true and entity.factionName then
+        lines[#lines + 1] = "Faction: " .. tostring(entity.factionName)
+    end
     if entity.population then
         lines[#lines + 1] = "Population: " .. tostring(entity.population)
     end

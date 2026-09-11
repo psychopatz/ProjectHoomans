@@ -20,6 +20,20 @@ local QuantityModal = PNC.InventoryQuantityModal
 local TransferEndpoint = PNC.InventoryTransferEndpoint
 local UI = PsychopatzCore.UI
 local Layout = UI.Layout
+local TooltipHost
+local TooltipOptions
+
+local function getTooltipHost()
+    TooltipHost = TooltipHost or require
+        "PsychopatzCore/UI/Inventory/PsychopatzInventoryTooltipHost"
+    return TooltipHost
+end
+
+local function getTooltipOptions()
+    TooltipOptions = TooltipOptions or require
+        "PNC/UI/Inventory/PNC_InventoryUI_CoreTooltipOptions"
+    return TooltipOptions
+end
 
 local function tr(key, fallback)
     local value = getText and getText(key) or nil
@@ -93,6 +107,7 @@ function ISPNCInventoryWindow:createChildren()
     self.depositStorageButton:instantiate()
     self.depositStorageButton:setVisible(true)
     self:addChild(self.depositStorageButton)
+    getTooltipHost().Install(self, getTooltipOptions())
     self:onResponsiveLayout()
     self:refreshInventory(true)
 end
@@ -325,6 +340,7 @@ function ISPNCInventoryWindow:refreshInventory(force)
             row.equipped == true and "e" or "-",
             tostring(row.stack or 1),
             table.concat(row.itemIDs or { row.id or "" }, ","),
+            tostring(row.stateKey or ""),
         }, "")
     end
     local playerCount = player and player.getInventory and player:getInventory()
@@ -723,6 +739,21 @@ function ISPNCInventoryWindow:toggleInventoryGroup(role, groupKey)
     return true
 end
 
+function ISPNCInventoryWindow:onInventoryHover(list)
+    getTooltipHost().OnHover(self, list)
+end
+
+function ISPNCInventoryWindow:onInventoryHoverOutside(list)
+    if self.psychopatzInventoryTooltipList == list then
+        self.psychopatzInventoryTooltipList = nil
+    end
+    getTooltipHost().Update(self)
+end
+
+function ISPNCInventoryWindow:updateInventoryTooltip()
+    getTooltipHost().Update(self)
+end
+
 function ISPNCInventoryWindow:getSelectedContainer(role)
     if role == "player" then return self.selectedPlayerContainer end
     return self.selectedNPCContainer
@@ -766,6 +797,7 @@ end
 
 function ISPNCInventoryWindow:prerender()
     self:refreshInventory(false)
+    self:updateInventoryTooltip()
     UI.Window.prerender(self)
     local player = getSpecificPlayer and getSpecificPlayer(0) or getPlayer and getPlayer() or nil
     local headingY = self.headingY or self:titleBarHeight() + 8
@@ -882,6 +914,7 @@ function ISPNCInventoryWindow:close()
     if QuantityModal and QuantityModal.instance then
         QuantityModal.instance:close()
     end
+    getTooltipHost().Hide(self)
     InventoryWindow.instance = nil
     UI.Window.close(self)
 end

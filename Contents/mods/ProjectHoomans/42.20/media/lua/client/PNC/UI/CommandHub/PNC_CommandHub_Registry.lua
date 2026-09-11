@@ -130,6 +130,71 @@ local function stockpileStatus(settlement)
     return exists, built
 end
 
+local function costTypes(cost)
+    local types = cost and (cost.itemTypes or cost.types or cost.items)
+    if type(types) == "table" then return types end
+    if type(types) == "string" then return { types } end
+    if cost and (cost.fullType or cost.itemType or cost.type) then
+        return { cost.fullType or cost.itemType or cost.type }
+    end
+    return {}
+end
+
+local function playerItemCount(types)
+    local player = type(getSpecificPlayer) == "function"
+        and getSpecificPlayer(0) or nil
+    local inventory = player and type(player.getInventory) == "function"
+        and player:getInventory() or nil
+    if not inventory or type(inventory.getItemsFromType) ~= "function" then
+        return 0
+    end
+    local available = 0
+    for _, fullType in ipairs(types or {}) do
+        local items = inventory:getItemsFromType(fullType, true)
+        local count = 0
+        if items then
+            if type(items.size) == "function" then
+                count = items:size()
+            elseif type(items.size) == "number" then
+                count = items.size
+            elseif type(items) == "table" then
+                count = #items
+            end
+        end
+        available = math.max(available, math.floor(tonumber(count) or 0))
+    end
+    return available
+end
+
+function Gates.GetStockpileMaterialStatus()
+    local definitions = PNC.FacilityDefinitions
+    local definition = definitions and type(definitions.Get) == "function"
+        and definitions.Get("stockpile") or nil
+    local costs = definition and (definition.buildCosts
+        or definition.buildCost) or nil
+    if type(costs) ~= "table" then
+        return { affordable = false, reason = "MATERIAL_DEFINITION_UNAVAILABLE" }
+    end
+    if costs.fullType or costs.itemType or costs.type then costs = { costs } end
+    for _, cost in ipairs(costs) do
+        local required = math.max(0, math.floor(tonumber(
+            cost.amount or cost.quantity) or 0))
+        if required > 0 then
+            local types = costTypes(cost)
+            local available = playerItemCount(types)
+            if available < required then
+                return {
+                    affordable = false,
+                    available = available,
+                    required = required,
+                    fullType = types[1],
+                }
+            end
+        end
+    end
+    return { affordable = true }
+end
+
 function Gates.GetBaseAndStockpileStatus()
     local snapshot = baseSnapshot()
     local settlement = type(snapshot) == "table" and snapshot.settlement or nil
@@ -289,19 +354,34 @@ end
 local function stockpileBootstrapEnabled()
     local status = Gates.GetBaseAndStockpileStatus()
     return status.hasBase and not status.hasStockpileFacility
+        and Gates.GetStockpileMaterialStatus().affordable == true
 end
 
 local function stockpileBootstrapDisabledTooltip()
     local status = Gates.GetBaseAndStockpileStatus()
-    if status.hasBase then return nil end
-    return {
-        key = "UI_PNC_CommandHub_Disabled_NoBase",
-        fallback = "Requires a colony base.",
-    }
+    if not status.hasBase then
+        return {
+            key = "UI_PNC_CommandHub_Disabled_NoBase",
+            fallback = "Requires a colony base.",
+        }
+    end
+    if status.hasStockpileFacility then return nil end
+    local materials = Gates.GetStockpileMaterialStatus()
+    if not materials.affordable then
+        return {
+            key = "UI_PNC_CommandHub_Disabled_NoStockpileMaterials",
+            fallback = "Requires the materials needed to build the first stockpile.",
+        }
+    end
+    return nil
 end
 
 local function buildStockpile(_, owner)
     trace("pnc_stockpile_build_start", "has_owner=" .. tostring(owner ~= nil))
+    if not stockpileBootstrapEnabled() then
+        trace("pnc_stockpile_build_result", "result=false reason=missing_materials")
+        return false
+    end
     local Facility = require
         "PNC/UI/Communities/ColonyManagement/SettlementManagement/PNC_SettlementManagement_FacilityActions"
     local result, reason = Facility.BeginBuild(owner, "stockpile")

@@ -6,6 +6,7 @@ PNC.Inventory = PNC.Inventory or {}
 local Inventory = PNC.Inventory
 Inventory.Internal = Inventory.Internal or {}
 local Internal = Inventory.Internal
+local Portable = require "PsychopatzCore/Inventory/PsychopatzPortableItemState"
 
 local LEGACY_ITEM_TYPES = {
     ["Base.WaterBottleFull"] = "Base.WaterBottle",
@@ -120,8 +121,9 @@ function Internal.buildBaseCarryWeight(record)
     return math.max(6, 6 + (tonumber(strength) or 0) + ((tonumber(fitness) or 0) * 0.5))
 end
 
-function Internal.createBaseInventory(record)
+function Internal.createBaseInventory(record, options)
     local maxWeight = Internal.buildBaseCarryWeight(record)
+    options = type(options) == "table" and options or {}
     return {
         revision = 0,
         cachedWeight = 0,
@@ -138,6 +140,8 @@ function Internal.createBaseInventory(record)
             archetypeID = record and record.archetypeID or "General",
             seed = record and record.identitySeed or 1,
             generatorVersion = PNC.Const and PNC.Const.GENERATOR_VERSION or 1,
+            createdAtHours = tonumber(options.createdAtHours)
+                or Portable.GetWorldAgeHours(),
         },
         persistenceMode = "SEED_ONLY",
     }

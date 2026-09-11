@@ -18,6 +18,8 @@ local function baseline(record, inv)
         equipmentPoolID = inv and inv.template
             and inv.template.equipmentPoolID or nil,
         weaponMode = inv and inv.template and inv.template.weaponMode or nil,
+        createdAtHours = inv and inv.template
+            and tonumber(inv.template.createdAtHours) or nil,
     }
 end
 
@@ -35,6 +37,11 @@ function Inventory.GetPersistenceMode(record)
 end
 
 function Inventory.Serialize(record)
+    if Inventory.AdvanceFoodLifecycle
+        and type(isServer) == "function" and isServer() == true
+    then
+        Inventory.AdvanceFoodLifecycle(record)
+    end
     local inv = Inventory.EnsureRecordInventory(record)
     if record.inventoryPersistenceMode == "FULL" or not supportsBaseline(record) then
         return { NPC_PERSISTENCE_SCHEMA, "FULL", Bridge.serialize(record) }
@@ -70,6 +77,7 @@ function Inventory.Deserialize(record, rawInventory)
     end
     local inv
     local reason
+    local baselinePayload
     if tonumber(rawInventory[1]) ~= NPC_PERSISTENCE_SCHEMA then
         inv, reason = Bridge.deserialize(record, rawInventory)
     else
@@ -79,7 +87,11 @@ function Inventory.Deserialize(record, rawInventory)
             inv, reason = Bridge.deserialize(record, rawInventory[3])
             if inv then record.inventoryPersistenceMode = "FULL" end
         else
-            inv = Inventory.CreateFromTemplate(record)
+            baselinePayload = type(rawInventory[4]) == "table"
+                and rawInventory[4] or {}
+            inv = Inventory.CreateFromTemplate(record, {
+                createdAtHours = baselinePayload.createdAtHours,
+            })
             if mode == "BASELINE_DELTA" then
                 local applied
                 applied, reason = Delta.apply(record, inv, rawInventory[5])

@@ -10,6 +10,20 @@ local LayoutModule = require "PNC/UI/Storage/PNC_StorageLayout"
 local Client = require "PNC/UI/Storage/PNC_StorageClient"
 
 local SORT_LABEL_KEY = "UI_PNC_Storage_Sort"
+local TooltipHost
+local TooltipOptions
+
+local function getTooltipHost()
+    TooltipHost = TooltipHost or require
+        "PsychopatzCore/UI/Inventory/PsychopatzInventoryTooltipHost"
+    return TooltipHost
+end
+
+local function getTooltipOptions()
+    TooltipOptions = TooltipOptions or require
+        "PNC/UI/Inventory/PNC_InventoryUI_CoreTooltipOptions"
+    return TooltipOptions
+end
 
 local function tr(key, fallback)
     return Shared.Tr(key, fallback)
@@ -42,6 +56,7 @@ function Controller.CreateChildren(window)
     window.storageList:initialise()
     window.storageList:instantiate()
     window:addChild(window.storageList)
+    getTooltipHost().Install(window, getTooltipOptions())
     window.storageActivityPane, window.storageActivityList =
         Components.CreatePane(window, 24, Presentation.DrawActivityRow)
     window.storageActivityPane:setHeader(
@@ -133,6 +148,21 @@ function Controller.ToggleInventoryGroup(window, role, groupKey)
         window.storageCollapsedGroups[groupKey] ~= true
     window:rebuild()
     return true
+end
+
+function Controller.OnInventoryHover(window, list)
+    getTooltipHost().OnHover(window, list)
+end
+
+function Controller.OnInventoryHoverOutside(window, list)
+    if window.psychopatzInventoryTooltipList == list then
+        window.psychopatzInventoryTooltipList = nil
+    end
+    getTooltipHost().Update(window)
+end
+
+function Controller.UpdateInventoryTooltip(window)
+    getTooltipHost().Update(window)
 end
 
 local function rebuildStorage(window, snapshot)
