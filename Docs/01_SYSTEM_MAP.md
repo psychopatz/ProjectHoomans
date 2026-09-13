@@ -238,5 +238,5 @@
   an abstract NPC reservation token and reports the named occupant
 - `PNC_ContextHub`: central reusable NPC selection and right-click hub
 - `PNC_NPCSelection`: cursor-space NPC selection helper used by context providers
-- `PNC_Nameplates`: overhead name, HP, stamina, and AI debug overlay
+- `PNC_Nameplates`: overhead name, HP, stamina, and nameplate debug overlay
 - `PNC_CharacterWindow`: vanilla-like NPC character shell and tabs

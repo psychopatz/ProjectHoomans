@@ -140,6 +140,7 @@ function Network.BuildPresenceDelta(record)
         liveBodyOnlineID = record.liveBodyOnlineID,
         liveBodyLease = record.runtime and record.runtime.bodyLease or nil,
         aiState = aiState,
+        activeBehavior = record.activeBehavior,
         inCombat = inCombat,
         attackMode = record.runtime and record.runtime.target ~= nil or false,
         firearmState = firearmState,

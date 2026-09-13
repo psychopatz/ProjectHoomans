@@ -8,6 +8,11 @@ local ROOT_INVENTORY_TEXTURE = getTexture
 
 ISPNCInventoryContainerList = ISScrollingListBox:derive("ISPNCInventoryContainerList")
 
+local function scaledOpacity(self, value)
+    local multiplier = tonumber(self.contentOpacity) or 1
+    return math.max(0, math.min(1, (tonumber(value) or 0) * multiplier))
+end
+
 function ISPNCInventoryContainerList:doDrawItem(y, listItem, alt)
     local container = listItem and listItem.item or nil
     if not container then return y + self.itemheight end
@@ -18,12 +23,12 @@ function ISPNCInventoryContainerList:doDrawItem(y, listItem, alt)
     local selected = tostring(selectedID or "") == tostring(container.id or "")
     if selected then
         self:drawRect(1, y + 1, self.width - 2, self.itemheight - 2,
-            0.72, 0.48, 0.40, 0.24)
+            scaledOpacity(self, 0.72), 0.48, 0.40, 0.24)
         self:drawRectBorder(1, y + 1, self.width - 2, self.itemheight - 2,
-            0.95, 0.82, 0.68, 0.28)
+            scaledOpacity(self, 0.95), 0.82, 0.68, 0.28)
     elseif (listItem.index or 0) % 2 == 0 then
         self:drawRect(1, y + 1, self.width - 2, self.itemheight - 2,
-            0.30, 0.14, 0.14, 0.14)
+            scaledOpacity(self, 0.30), 0.14, 0.14, 0.14)
     end
 
     local texture = container.texture
@@ -43,6 +48,11 @@ end
 function ISPNCInventoryContainerList:selectedContainer()
     local entry = self.items and self.items[self.selected or 0] or nil
     return entry and entry.item or nil
+end
+
+function ISPNCInventoryContainerList:setContentOpacity(alpha)
+    self.contentOpacity = math.max(0.1, math.min(1, tonumber(alpha) or 1))
+    return self.contentOpacity
 end
 
 function ISPNCInventoryContainerList:onMouseDown(x, y)

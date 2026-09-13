@@ -124,7 +124,11 @@ function ISPNCNPCMonitor:onProvisionDiagnostics()
 end
 
 function ISPNCNPCMonitor:onOverlay()
-    if PNC.Nameplates and PNC.Nameplates.ToggleDebug then PNC.Nameplates.ToggleDebug() end
+    if PNC.Nameplates and PNC.Nameplates.ToggleNameplateDebug then
+        PNC.Nameplates.ToggleNameplateDebug()
+    elseif PNC.Nameplates and PNC.Nameplates.ToggleDebug then
+        PNC.Nameplates.ToggleDebug()
+    end
 end
 
 function ISPNCNPCMonitor:onOverlayType(button)

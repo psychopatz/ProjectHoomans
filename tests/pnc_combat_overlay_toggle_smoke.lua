@@ -5,6 +5,8 @@ local FILE =
 
 local writes = {}
 local halos = {}
+local settingsStore
+local nameplateDebugBootHook
 
 ISUIElement = {}
 function ISUIElement:derive()
@@ -27,13 +29,14 @@ package.preload["PsychopatzCore/Settings/PsychopatzSettings"] = function()
             for key, value in pairs(specification.defaults or {}) do
                 values[key] = value
             end
-            return {
+            settingsStore = {
                 values = values,
                 Set = function(_, key, value)
                     values[key] = value
                     writes[#writes + 1] = { key = key, value = value }
                 end,
             }
+            return settingsStore
         end,
     }
     return PsychopatzCore.Settings
@@ -70,6 +73,7 @@ PNC = {
 }
 Events = {
     OnCreatePlayer = { Add = function() end },
+    OnGameBoot = { Add = function(callback) nameplateDebugBootHook = callback end },
     OnGameStart = { Add = function() end },
     OnPreUIDraw = { Add = function() end },
     OnResetLua = { Add = function() end },
@@ -222,8 +226,33 @@ T.equal(writes[10].value, false,
 
 T.equal(
     #PNC.Nameplates.GetOverlayDefinitions(),
-    8,
+    9,
     "all overlay types share one registry"
+)
+T.equal(
+    PNC.Nameplates.ToggleOverlay("nameplate_debug"),
+    true,
+    "canonical nameplate debug overlay toggles on"
+)
+T.equal(
+    writes[11].key,
+    "showNameplateDebug",
+    "nameplate debug setting persisted under canonical key"
+)
+T.equal(
+    PNC.Nameplates.IsOverlayEnabled("ai"),
+    true,
+    "legacy AI overlay id resolves to nameplate debug"
+)
+T.equal(
+    PNC.Nameplates.ToggleOverlay("ai"),
+    false,
+    "legacy AI overlay id toggles canonical setting off"
+)
+T.equal(
+    writes[12].key,
+    "showNameplateDebug",
+    "legacy AI overlay id persists canonical setting"
 )
 T.equal(
     PNC.Nameplates.GetOverlaySummary(),
@@ -245,6 +274,15 @@ T.equal(
     "ON: Paths",
     "central overlay summary lists active type"
 )
+settingsStore.values.showNameplateDebug = false
+settingsStore.values.showAIDebug = true
+nameplateDebugBootHook()
+T.equal(PNC.Nameplates.Settings.showNameplateDebug, true,
+    "legacy AI setting migrates to canonical nameplate debug setting")
+T.equal(writes[14].key, "showNameplateDebug",
+    "legacy setting migration stages canonical key first")
+T.equal(writes[15].key, "showAIDebug",
+    "legacy setting migration clears old key")
 T.finish("pnc_combat_overlay_toggle_smoke")
 
 T.finish("pnc_combat_overlay_toggle_smoke")

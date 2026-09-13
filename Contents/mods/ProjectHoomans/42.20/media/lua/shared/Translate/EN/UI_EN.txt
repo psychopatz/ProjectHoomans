@@ -691,4 +691,8 @@ UI_EN = {
     UI_PNC_AudioDebug_PlayFailed = "PLAY FAILED",
     UI_PNC_AudioDebug_Stopped = "STOPPED",
     UI_PNC_AudioDebug_ResetDone = "RESET TO PLAYER",
+    UI_PNC_Settings_ShowNameplateDebug = "Nameplate Debug",
+    UI_PNC_NameplateDebug_Behavior = "Behavior",
+    UI_PNC_NameplateDebugEnabled = "Nameplate debug enabled",
+    UI_PNC_NameplateDebugDisabled = "Nameplate debug disabled",
 }

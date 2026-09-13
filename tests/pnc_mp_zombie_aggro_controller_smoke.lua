@@ -19,6 +19,7 @@ local aggroCleared = 0
 local stateChanges = 0
 local managed = false
 local playerIsTarget = false
+local managedSafetyCalls = 0
 
 local npcBody = {
     x = 5,
@@ -227,10 +228,20 @@ T.truthy(noLunge == false,
 
 playerIsTarget = false
 managed = true
+PNC.LiveBodyControl = {
+    EnforceManagedSafety = function(_, source)
+        T.equal(source, "client_zombie_aggro_guard",
+            "managed shell uses the late client safety guard")
+        managedSafetyCalls = managedSafetyCalls + 1
+    end,
+}
 now = 2400
 registered(zombie)
 T.truthy(pathRequests == 3,
     "managed NPC body entered vanilla zombie aggro control")
+T.equal(managedSafetyCalls, 1,
+    "managed NPC body bypassed the late client safety guard")
+PNC.LiveBodyControl = nil
 
 -- The MP directive lane must yield to an engine-owned action and must not
 -- rewrite the native player target while that action is active.

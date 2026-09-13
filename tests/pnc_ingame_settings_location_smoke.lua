@@ -62,8 +62,8 @@ T.equal(createdID, "ProjectHoomans",
     "native mod-options registration id")
 T.equal(createdName, "UI_PNC_Settings_Title",
     "native mod-options translated title")
-T.truthy(options:getOption("showAIDebug"),
-    "AI overlay missing from native options")
+T.truthy(options:getOption("showNameplateDebug"),
+    "nameplate debug overlay missing from native options")
 T.truthy(options:getOption("showCampDebug"),
     "camp facility overlay missing from native options")
 T.truthy(options:getOption("debugShowAnimation"),
@@ -71,12 +71,12 @@ T.truthy(options:getOption("debugShowAnimation"),
 T.truthy(options:getOption("storageTransactionLogging"),
     "storage transaction logging missing from native options")
 
-options:getOption("showAIDebug").value = true
+options:getOption("showNameplateDebug").value = true
 options:apply()
-T.equal(PNC.Nameplates.Settings.showAIDebug, true,
-    "native settings did not apply AI overlay")
-T.equal(writes.showAIDebug, true,
-    "native settings did not persist AI overlay")
+T.equal(PNC.Nameplates.Settings.showNameplateDebug, true,
+    "native settings did not apply nameplate debug overlay")
+T.equal(writes.showNameplateDebug, true,
+    "native settings did not persist nameplate debug overlay")
 options:getOption("storageTransactionLogging").value = true
 options:apply()
 T.equal(PNC.Nameplates.Settings.storageTransactionLogging, true,

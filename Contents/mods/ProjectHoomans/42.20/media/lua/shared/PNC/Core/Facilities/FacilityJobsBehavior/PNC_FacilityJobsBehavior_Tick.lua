@@ -213,20 +213,23 @@ function Internal.Tick(record, zombie)
         end
         if targetChanged then
             if Diagnostics and Diagnostics.SeatingAuditEnabled == true
-                and Diagnostics.LogSeatingAudit
+                and Diagnostics.LogSeatingState
             then
-                Diagnostics.LogSeatingAudit("seat_anchor_changed", {
-                    "npc=" .. tostring(record and record.id or ""),
-                    "oldKey=" .. tostring(previousSeatKey or ""),
-                    "newKey=" .. tostring(order.approachKey or ""),
-                    "oldX=" .. tostring(previousSeatAnchorX or ""),
-                    "oldY=" .. tostring(previousSeatAnchorY or ""),
-                    "newX=" .. tostring(order.x or ""),
-                    "newY=" .. tostring(order.y or ""),
-                    "seatEntered=" .. tostring(runtime.seatEntered == true),
-                    "bodyAction=" .. tostring(zombie.getActionStateName
-                        and zombie:getActionStateName() or ""),
-                })
+                Diagnostics.LogSeatingState(
+                    "seat_anchor_changed",
+                    record,
+                    zombie,
+                    runtime.animationScene,
+                    "seat_target_refreshed",
+                    {
+                        "oldKey=" .. tostring(previousSeatKey or ""),
+                        "newKey=" .. tostring(order.approachKey or ""),
+                        "oldX=" .. tostring(previousSeatAnchorX or ""),
+                        "oldY=" .. tostring(previousSeatAnchorY or ""),
+                        "newX=" .. tostring(order.x or ""),
+                        "newY=" .. tostring(order.y or ""),
+                    }
+                )
             end
             if runtime.seatEntered == true then
                 Internal.ClearFurnitureSeat(record, zombie, runtime)
@@ -282,19 +285,15 @@ function Internal.Tick(record, zombie)
         -- A queued Behavior2 route otherwise remains visible to the scene
         -- safety arbiter and repeatedly interrupts/restarts the sleep bump.
         if Diagnostics and Diagnostics.SeatingAuditEnabled == true
-            and Diagnostics.LogSeatingAudit
+            and Diagnostics.LogSeatingState
         then
-            Diagnostics.LogSeatingAudit("facility_arrival", {
-                "npc=" .. tostring(record and record.id or ""),
-                "bodyAction=" .. tostring(zombie.getActionStateName
-                    and zombie:getActionStateName() or ""),
-                "pathPhase=" .. tostring(runtime.pathing
-                    and runtime.pathing.phase or ""),
-                "nativeActive=" .. tostring(runtime.localNavigation
-                    and runtime.localNavigation.nativeActive == true),
-                "seatEntered=" .. tostring(runtime.seatEntered == true),
-                "positioned=" .. tostring(runtime.positioned == true),
-            })
+            Diagnostics.LogSeatingState(
+                "facility_arrival",
+                record,
+                zombie,
+                runtime.animationScene,
+                "facility_arrival"
+            )
         end
         Internal.ResetPath(record, zombie, "facility_arrival")
         runtime.arrivalSettled = true

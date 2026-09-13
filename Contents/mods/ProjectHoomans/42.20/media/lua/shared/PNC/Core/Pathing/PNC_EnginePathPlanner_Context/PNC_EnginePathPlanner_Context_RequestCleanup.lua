@@ -10,8 +10,11 @@ local function isSeatingNavigation(navigation)
     local runtime = record and record.runtime or nil
     return runtime and (
         runtime.facilityActivity and runtime.facilityActivity.seating == true
+        or runtime.roamingSeat and runtime.roamingSeat.seating == true
         or runtime.animationScene
-            and runtime.animationScene.id == "facility.living.sitFurniture"
+            and (runtime.animationScene.id
+                == "facility.living.sitFurniture"
+                or runtime.animationScene.id == "ambient.roam.sitFurniture")
     )
 end
 
@@ -28,19 +31,36 @@ function Internal.ClearEngineRequest(body, navigation)
         or ""
     if Diagnostics and Diagnostics.SeatingAuditEnabled == true
         and isSeatingNavigation(navigation)
-        and Diagnostics.LogSeatingAudit
+        and (Diagnostics.LogSeatingState or Diagnostics.LogSeatingAudit)
     then
-        Diagnostics.LogSeatingAudit("path_clear", {
-            "npc=" .. tostring(navigation.record
-                and navigation.record.id or ""),
-            "bodyAction=" .. actionState,
-            "pathPhase=" .. tostring(navigation.record.runtime.pathing
-                and navigation.record.runtime.pathing.phase or ""),
-            "nativeActive=" .. tostring(navigation.nativeActive == true),
-            "requestPending=" .. tostring(navigation.requestPending == true),
-            "reason=" .. tostring(navigation.lastPlanReason or ""),
-            "revision=" .. tostring(navigation.requestRevision or ""),
-        })
+        if Diagnostics.LogSeatingState then
+            Diagnostics.LogSeatingState(
+                "path_clear",
+                navigation.record,
+                body,
+                navigation.record.runtime.animationScene,
+                navigation.lastPlanReason or "",
+                {
+                    "requestPending=" .. tostring(
+                        navigation.requestPending == true),
+                    "requestRevision=" .. tostring(
+                        navigation.requestRevision or ""),
+                }
+            )
+        else
+            Diagnostics.LogSeatingAudit("path_clear", {
+                "npc=" .. tostring(navigation.record
+                    and navigation.record.id or ""),
+                "bodyAction=" .. actionState,
+                "pathPhase=" .. tostring(navigation.record.runtime.pathing
+                    and navigation.record.runtime.pathing.phase or ""),
+                "nativeActive=" .. tostring(navigation.nativeActive == true),
+                "requestPending=" .. tostring(
+                    navigation.requestPending == true),
+                "reason=" .. tostring(navigation.lastPlanReason or ""),
+                "revision=" .. tostring(navigation.requestRevision or ""),
+            })
+        end
     end
     if actionState == "pathfind"
         and body.changeState

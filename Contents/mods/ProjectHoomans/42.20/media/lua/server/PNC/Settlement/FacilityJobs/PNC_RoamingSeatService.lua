@@ -15,6 +15,7 @@ local Targets = PNC.FacilityInteractionTargets
 local Reservations = PNC.FacilityReservations
 local Targeting = PNC.BehaviorTargeting
 local Combat = PNC.BehaviorCombat
+local Diagnostics = PNC.PerformanceScalingDiagnostics
 
 Service.NextAttemptAt = Service.NextAttemptAt or {}
 Service.CADENCE_MS = 5000
@@ -343,10 +344,26 @@ function Service.TryStart(record, zombie, order, roaming, at)
         failedApproaches = {},
         nextSeatValidationAt = at,
         nextReservationRenewAt = at + 10000,
+        seatSessionId = Diagnostics and Diagnostics.NewSeatingSessionId
+            and Diagnostics.NewSeatingSessionId(record.id) or "",
     }
     runtime.roamingSeat = state
     if PNC.SeatingRuntime and PNC.SeatingRuntime.LiveObjects then
         PNC.SeatingRuntime.LiveObjects[id] = candidate.object
+    end
+    if Diagnostics and Diagnostics.LogSeatingState then
+        Diagnostics.LogSeatingState(
+            "seat_session_started",
+            record,
+            zombie,
+            nil,
+            "ambient_roam_seat",
+            {
+                "targetX=" .. tostring(candidate.target.x or ""),
+                "targetY=" .. tostring(candidate.target.y or ""),
+                "targetZ=" .. tostring(candidate.target.z or ""),
+            }
+        )
     end
     return Service.Tick(record, zombie, at)
 end
@@ -472,7 +489,23 @@ function Service.OnSceneTick(record, zombie, scene, at)
     if Reservations and Reservations.Start
         and at >= (tonumber(state.nextReservationRenewAt) or 0)
     then
-        Reservations.Start(state.reservationId, 30000)
+        local renewed, renewal = Reservations.Start(
+            state.reservationId, 30000)
+        if Diagnostics and Diagnostics.LogSeatingState then
+            Diagnostics.LogSeatingState(
+                "seat_reservation_renewed",
+                record,
+                zombie,
+                scene,
+                renewed == true and "renewed" or "renew_failed",
+                {
+                    "renewalResult=" .. tostring(type(renewal) == "table"
+                        and renewal.state or renewal or ""),
+                    "expiresAt=" .. tostring(type(renewal) == "table"
+                        and renewal.expiresAt or ""),
+                }
+            )
+        end
         state.nextReservationRenewAt = at + 10000
     end
     return at < (tonumber(state.seatUntil) or at)
@@ -483,6 +516,15 @@ function Service.OnSceneStopped(record, zombie, scene, reason)
     local state = runtime and runtime.roamingSeat or nil
     local seating = Jobs and Jobs.Seating
     if not state or not scene or scene.id ~= SCENE_ID then return end
+    if Diagnostics and Diagnostics.LogSeatingState then
+        Diagnostics.LogSeatingState(
+            "seat_scene_stopped",
+            record,
+            zombie,
+            scene,
+            reason or "roaming_seat_scene_stopped"
+        )
+    end
     if seating and seating.ClearFurnitureSeat then
         seating.ClearFurnitureSeat(record, zombie, state)
     end

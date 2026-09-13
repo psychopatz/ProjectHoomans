@@ -3,6 +3,7 @@ if PsychopatzCore and PsychopatzCore.RuntimeRole
 
 local Reservations = PNC.FacilityReservations
 local H = Reservations.Internal
+local Diagnostics = PNC.PerformanceScalingDiagnostics
 
 function H.IsExclusiveComponent(component)
     return component and (component.kind == "anchor"
@@ -22,6 +23,34 @@ end
 
 function H.Now()
     return PNC.Core.Now()
+end
+
+local function isSeatingReservation(reservation, purpose)
+    return reservation and (
+        tostring(reservation.resourceKind or "") == "seating_surface"
+        or tostring(purpose or reservation.purpose or "")
+            == "ambient_roam_seat"
+    )
+end
+
+local function auditReservation(eventName, reservation, reason)
+    if not Diagnostics or Diagnostics.SeatingAuditEnabled ~= true
+        or not Diagnostics.LogSeatingAudit
+        or not isSeatingReservation(reservation)
+    then
+        return
+    end
+    Diagnostics.LogSeatingAudit(eventName, {
+        "npc=" .. tostring(reservation.npcId or ""),
+        "reservationId=" .. tostring(reservation.id or ""),
+        "facilityId=" .. tostring(reservation.facilityId or ""),
+        "resourceKey=" .. tostring(reservation.resourceKey or ""),
+        "resourceKind=" .. tostring(reservation.resourceKind or ""),
+        "purpose=" .. tostring(reservation.purpose or ""),
+        "state=" .. tostring(reservation.state or ""),
+        "expiresAt=" .. tostring(reservation.expiresAt or ""),
+        "reason=" .. tostring(reason or ""),
+    })
 end
 
 function H.HasActivityCapacity(facilityId, purpose)
@@ -47,6 +76,7 @@ end
 function Reservations.Release(id, reason)
     local reservation = Reservations.ByID[tostring(id or "")]
     if not reservation then return false, "RESERVATION_NOT_FOUND" end
+    auditReservation("seat_reservation_released", reservation, reason)
     Reservations.ByID[reservation.id] = nil
     if reservation.componentId and reservation.componentId ~= ""
         and Reservations.ByComponent[reservation.componentId] == reservation.id
@@ -188,6 +218,7 @@ function Reservations.ReserveResource(facilityId, resource, npcId, purpose,
     local npc = Reservations.ByNPC[reservation.npcId]
     if not npc then npc = {}; Reservations.ByNPC[reservation.npcId] = npc end
     npc[id] = true
+    auditReservation("seat_reservation_acquired", reservation)
     return true, reservation
 end
 
@@ -203,6 +234,7 @@ function Reservations.Start(id, ttlMs)
     reservation.state = "ACTIVE"
     reservation.expiresAt = H.Now() + math.max(1000,
         math.floor(tonumber(ttlMs) or Reservations.DEFAULT_TTL_MS))
+    auditReservation("seat_reservation_renewed", reservation)
     return true, reservation
 end
 

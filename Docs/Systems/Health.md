@@ -69,7 +69,7 @@
 ## Client Visuals
 - live NPCs render overhead nameplates with their name and HP bar; exact HP numbers are intentionally hidden from both the nameplate and Health panel
 - incapacitated NPCs use a pulsing red bar variant
-- AI debug overlay can be toggled from the NPC monitor, Project Hoomans settings, or the PsychopatzCore debug hub
+- Nameplate debug overlay can be toggled from the NPC monitor or Project Hoomans settings; the PsychopatzCore debug hub remains the separate global diagnostics switch
 - each debug overlay component (presence, AI, job, order, target, combat,
   stamina, block reason, infection, and animation) can be enabled separately
   in Project Hoomans' in-game settings

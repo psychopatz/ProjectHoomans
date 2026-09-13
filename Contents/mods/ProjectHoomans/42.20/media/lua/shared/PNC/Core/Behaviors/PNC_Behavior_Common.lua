@@ -15,6 +15,7 @@ local PathService = PNC.PathService
 local Equipment = PNC.Equipment
 local Combat = PNC.Combat
 local NavigationRouter = PNC.NavigationRouter
+local Diagnostics = PNC.PerformanceScalingDiagnostics
 
 local function resolveMoveIntent()
     return PNC.BehaviorMoveIntent
@@ -157,6 +158,62 @@ function Common.MoveRecord(
     local steeringTarget
     local intentNavigation = navigationOptions
     local moveIntent
+    local runtime = record and record.runtime or nil
+    local scene = runtime and runtime.animationScene or nil
+    local state = runtime and runtime.facilityActivity
+        and runtime.facilityActivity.seating == true
+        and runtime.facilityActivity
+        or runtime and runtime.roamingSeat
+    local liveBodyControl = PNC.LiveBodyControl
+    local now = Core and Core.Now and Core.Now() or 0
+    if liveBodyControl
+        and liveBodyControl.IsSeated
+        and liveBodyControl.IsSeated(record) == true
+        and liveBodyControl.IsSeatedCombatActive
+        and not liveBodyControl.IsSeatedCombatActive(record, now)
+    then
+        if Diagnostics and Diagnostics.LogSeatingState
+            and Diagnostics.IsSeatingRuntime
+            and Diagnostics.IsSeatingRuntime(runtime, scene)
+        then
+            Diagnostics.LogSeatingState(
+                "behavior_move_blocked_seated",
+                record,
+                zombie,
+                scene,
+                moveReason
+            )
+        end
+        if liveBodyControl.ReleaseSeatedMovement then
+            liveBodyControl.ReleaseSeatedMovement(
+                record,
+                zombie,
+                "behavior_move_blocked_seated"
+            )
+        end
+        Common.HaltMovement(record, zombie, "seated_hold")
+        return false, "seated_hold"
+    end
+    if Diagnostics and Diagnostics.LogSeatingState
+        and Diagnostics.IsSeatingRuntime
+        and Diagnostics.IsSeatingRuntime(runtime, scene)
+        and (state and state.seatEntered == true or scene)
+    then
+        Diagnostics.LogSeatingState(
+            "behavior_move_request_while_seated",
+            record,
+            zombie,
+            scene,
+            moveReason,
+            {
+                "requestedX=" .. tostring(tx or ""),
+                "requestedY=" .. tostring(ty or ""),
+                "requestedZ=" .. tostring(tz or ""),
+                "requestedMode=" .. tostring(mode or ""),
+                "requestedStopDistance=" .. tostring(stopDistance or ""),
+            }
+        )
+    end
     if record.presenceState == Const.PRESENCE_LIVE then
         if shouldInterruptScene(record, finalX, finalY, finalZ, mode,
             stopDistance)

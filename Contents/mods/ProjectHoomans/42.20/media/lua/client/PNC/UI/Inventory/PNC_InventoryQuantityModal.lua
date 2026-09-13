@@ -1,6 +1,7 @@
 require "ISUI/ISPanel"
 require "ISUI/ISButton"
 require "RadioCom/ISUIRadio/ISSliderPanel"
+local Options = require "PsychopatzCore/UI/PsychopatzCommandHubOptions"
 
 PNC = PNC or {}
 PNC.InventoryQuantityModal = PNC.InventoryQuantityModal or {}
@@ -72,10 +73,22 @@ function ISPNCInventoryQuantityModal:onButton(button)
     self:close()
 end
 
+function ISPNCInventoryQuantityModal:applyOpacityStyle()
+    local signature = Options.GetContentOpacitySignature()
+    if self.lastContentOpacitySignature == signature then return false end
+    self.contentSurfaceOpacity = Options.GetContentOpacity("surface")
+    self.lastContentOpacitySignature = signature
+    return true
+end
+
 function ISPNCInventoryQuantityModal:prerender()
+    self:applyOpacityStyle()
     ISPanel.prerender(self)
-    self:drawRect(0, 0, self.width, self.height, 0.96, 0.04, 0.04, 0.04)
-    self:drawRectBorder(0, 0, self.width, self.height, 0.95, 0.65, 0.65, 0.65)
+    local surfaceOpacity = self.contentSurfaceOpacity or 1
+    self:drawRect(0, 0, self.width, self.height,
+        0.96 * surfaceOpacity, 0.04, 0.04, 0.04)
+    self:drawRectBorder(0, 0, self.width, self.height,
+        0.95 * surfaceOpacity, 0.65, 0.65, 0.65)
     self:drawTextCentre(
         tr("UI_PNC_Inventory_SelectQuantity", "Select transfer quantity"),
         self.width / 2, 14, 0.95, 0.95, 0.95, 1, UIFont.Medium

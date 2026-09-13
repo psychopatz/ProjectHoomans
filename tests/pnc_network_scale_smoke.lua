@@ -307,6 +307,11 @@ T.equal(bodyIdentityIndex["75"], nil,
     "client body identity index excludes dead carrier")
 
 nearbyRecord.ownerUsername = "player_1"
+nearbyRecord.activeBehavior = "FollowOwner:idle"
+local followDelta = PNC.Network.BuildPresenceDelta(nearbyRecord)
+T.equal(followDelta.activeBehavior, "FollowOwner:idle",
+    "presence delta carries the current behavior for nameplate debug")
+nearbyRecord.activeBehavior = nil
 T.equal(
     PNC.Network.BuildRosterSnapshot(nearbyRecord).zombieTargetable,
     true,

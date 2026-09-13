@@ -87,9 +87,14 @@ end
 
 local function isSeatingScene(runtime, scene)
     local activity = runtime and runtime.facilityActivity or nil
+    local roaming = runtime and runtime.roamingSeat or nil
     return scene and (
-        scene.id == "facility.living.sitFurniture"
+        Diagnostics and Diagnostics.IsSeatingSceneId
+            and Diagnostics.IsSeatingSceneId(scene.id)
+        or scene.id == "facility.living.sitFurniture"
+        or scene.id == "ambient.roam.sitFurniture"
         or activity and activity.seating == true
+        or roaming and roaming.seating == true
     )
 end
 
@@ -108,20 +113,34 @@ local function auditScene(
     then
         return
     end
-    Diagnostics.LogSeatingAudit(eventName, {
-        "npc=" .. tostring(record and record.id or ""),
-        "scene=" .. tostring(scene and scene.id or ""),
-        "revision=" .. tostring(scene and scene.revision or ""),
-        "step=" .. tostring(scene and scene.stepId or ""),
-        "reason=" .. tostring(reason or ""),
-        "release=" .. tostring(release == true),
-        "pathPhase=" .. tostring(runtime and runtime.pathing
-            and runtime.pathing.phase or ""),
-        "nativeActive=" .. tostring(runtime and runtime.localNavigation
-            and runtime.localNavigation.nativeActive == true),
-        "bodyAction=" .. tostring(zombie and zombie.getActionStateName
-            and zombie:getActionStateName() or ""),
-    })
+    if Diagnostics.LogSeatingState then
+        Diagnostics.LogSeatingState(
+            eventName,
+            record,
+            zombie,
+            scene,
+            reason,
+            {
+                "step=" .. tostring(scene and scene.stepId or ""),
+                "release=" .. tostring(release == true),
+            }
+        )
+    else
+        Diagnostics.LogSeatingAudit(eventName, {
+            "npc=" .. tostring(record and record.id or ""),
+            "scene=" .. tostring(scene and scene.id or ""),
+            "revision=" .. tostring(scene and scene.revision or ""),
+            "step=" .. tostring(scene and scene.stepId or ""),
+            "reason=" .. tostring(reason or ""),
+            "release=" .. tostring(release == true),
+            "pathPhase=" .. tostring(runtime and runtime.pathing
+                and runtime.pathing.phase or ""),
+            "nativeActive=" .. tostring(runtime and runtime.localNavigation
+                and runtime.localNavigation.nativeActive == true),
+            "bodyAction=" .. tostring(zombie and zombie.getActionStateName
+                and zombie:getActionStateName() or ""),
+        })
+    end
 end
 
 local function notifyStop(definition, record, zombie, scene, reason)
@@ -333,21 +352,39 @@ function Scenes.Request(record, zombie, sceneId, options)
         return false, "traversal_active"
     end
     if Diagnostics and Diagnostics.SeatingAuditEnabled == true
-        and (sceneId == "facility.living.sitFurniture"
+        and ((Diagnostics.IsSeatingSceneId
+            and Diagnostics.IsSeatingSceneId(sceneId))
+            or sceneId == "facility.living.sitFurniture"
             or runtime.facilityActivity
-                and runtime.facilityActivity.seating == true)
+                and runtime.facilityActivity.seating == true
+            or runtime.roamingSeat
+                and runtime.roamingSeat.seating == true)
     then
-        Diagnostics.LogSeatingAudit("scene_request", {
-            "npc=" .. tostring(record.id or ""),
-            "scene=" .. tostring(sceneId or ""),
-            "reason=" .. tostring(options.reason or ""),
-            "current=" .. tostring(runtime.animationScene
-                and runtime.animationScene.id or ""),
-            "pathPhase=" .. tostring(runtime.pathing
-                and runtime.pathing.phase or ""),
-            "nativeActive=" .. tostring(runtime.localNavigation
-                and runtime.localNavigation.nativeActive == true),
-        })
+        if Diagnostics.LogSeatingState then
+            Diagnostics.LogSeatingState(
+                "scene_request",
+                record,
+                zombie,
+                { id = sceneId },
+                options.reason or "",
+                {
+                    "current=" .. tostring(runtime.animationScene
+                        and runtime.animationScene.id or ""),
+                }
+            )
+        else
+            Diagnostics.LogSeatingAudit("scene_request", {
+                "npc=" .. tostring(record.id or ""),
+                "scene=" .. tostring(sceneId or ""),
+                "reason=" .. tostring(options.reason or ""),
+                "current=" .. tostring(runtime.animationScene
+                    and runtime.animationScene.id or ""),
+                "pathPhase=" .. tostring(runtime.pathing
+                    and runtime.pathing.phase or ""),
+                "nativeActive=" .. tostring(runtime.localNavigation
+                    and runtime.localNavigation.nativeActive == true),
+            })
+        end
     end
     if not canReplaceCurrent(runtime, definition, options) then
         return false, "lower_priority"

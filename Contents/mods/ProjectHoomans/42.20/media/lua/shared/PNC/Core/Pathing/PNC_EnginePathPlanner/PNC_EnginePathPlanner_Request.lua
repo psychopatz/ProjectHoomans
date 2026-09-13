@@ -9,8 +9,11 @@ local function isSeatingNavigation(navigation)
     local runtime = record and record.runtime or nil
     return runtime and (
         runtime.facilityActivity and runtime.facilityActivity.seating == true
+        or runtime.roamingSeat and runtime.roamingSeat.seating == true
         or runtime.animationScene
-            and runtime.animationScene.id == "facility.living.sitFurniture"
+            and (runtime.animationScene.id
+                == "facility.living.sitFurniture"
+                or runtime.animationScene.id == "ambient.roam.sitFurniture")
     )
 end
 

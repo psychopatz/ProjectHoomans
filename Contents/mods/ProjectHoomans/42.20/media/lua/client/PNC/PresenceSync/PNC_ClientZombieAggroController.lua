@@ -96,6 +96,23 @@ local function isManagedBody(body)
         or false
 end
 
+local function enforceManagedSafetyGuard(zombie)
+    if not isManagedBody(zombie) then return false end
+    -- This handler runs late in the client OnZombieUpdate chain. Keep the
+    -- managed shell in the same final safety gate even though it is not
+    -- eligible for ordinary-zombie target selection; this closes the window
+    -- where vanilla alert/path state can be restored after shared safety.
+    if PNC.LiveBodyControl
+        and PNC.LiveBodyControl.EnforceManagedSafety
+    then
+        PNC.LiveBodyControl.EnforceManagedSafety(
+            zombie,
+            "client_zombie_aggro_guard"
+        )
+    end
+    return true
+end
+
 local function snapshotFor(id)
     return ClientState
         and ClientState.snapshots
@@ -753,12 +770,12 @@ function Internal.UpdateClientZombieAggro(zombie, now)
     local targetIsNPC
     now = tonumber(now) or (Core and Core.Now and Core.Now() or 0)
     if not zombie
-        or isManagedBody(zombie)
         or (zombie.isDead and zombie:isDead())
         or not isLocalZombieUpdate(zombie)
     then
         return false
     end
+    if enforceManagedSafetyGuard(zombie) then return false end
     -- Multiplayer movement is now driven by the exposed vanilla
     -- WorldSoundManager/RespondToSound path. The old directive lane cleared
     -- native targets when a packet or NPC shell was missing, which could

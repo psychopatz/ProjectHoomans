@@ -11,6 +11,7 @@ PNC.SettingsStore = PNC.SettingsStore or PsychopatzCore.Settings.Open("ProjectHo
     defaults = {
         enabled = true,
         showStealthIndicator = true,
+        showNameplateDebug = false,
         showAIDebug = false,
         showCampDebug = false,
         showPathDebug = false,
@@ -42,7 +43,33 @@ if Nameplates.Settings.enabled == nil then Nameplates.Settings.enabled = true en
 if Nameplates.Settings.showStealthIndicator == nil then
     Nameplates.Settings.showStealthIndicator = true
 end
-if Nameplates.Settings.showAIDebug == nil then Nameplates.Settings.showAIDebug = false end
+local function normalizeNameplateDebugSetting()
+    local legacyNameplateDebug = Nameplates.Settings.showAIDebug
+    if legacyNameplateDebug == true
+        and Nameplates.Settings.showNameplateDebug ~= true
+    then
+        Nameplates.Settings.showNameplateDebug = true
+        PNC.SettingsStore:Set("showNameplateDebug", true, false)
+        PNC.SettingsStore:Set("showAIDebug", false, true)
+    end
+    if Nameplates.Settings.showNameplateDebug == nil then
+        Nameplates.Settings.showNameplateDebug = false
+    end
+    if Nameplates.Settings.showAIDebug == nil then
+        Nameplates.Settings.showAIDebug = false
+    end
+    Nameplates.Settings.showAIDebug = Nameplates.Settings.showNameplateDebug
+    local pncSettings = PNC.Settings
+    local options = pncSettings and pncSettings.Options or nil
+    local option = options and options.getOption
+        and options:getOption("showNameplateDebug") or nil
+    if option and type(option.setValue) == "function" then
+        option:setValue(Nameplates.Settings.showNameplateDebug)
+    elseif option and option.value ~= nil then
+        option.value = Nameplates.Settings.showNameplateDebug
+    end
+end
+normalizeNameplateDebugSetting()
 if Nameplates.Settings.showCampDebug == nil then Nameplates.Settings.showCampDebug = false end
 if Nameplates.Settings.showPathDebug == nil then Nameplates.Settings.showPathDebug = false end
 if Nameplates.Settings.showCombatDebug == nil then Nameplates.Settings.showCombatDebug = false end
@@ -115,7 +142,11 @@ local Renderer = PNC.NameplateRenderer
 local StealthIndicator = PNC.NameplateStealthIndicator
 
 local overlayDefinitions = {
-    { id = "ai", setting = "showAIDebug", label = "AI" },
+    {
+        id = "nameplate_debug",
+        setting = "showNameplateDebug",
+        labelKey = "UI_PNC_Settings_ShowNameplateDebug",
+    },
     { id = "camp", setting = "showCampDebug", label = "Camp" },
     { id = "path", setting = "showPathDebug", label = "Paths" },
     { id = "combat", setting = "showCombatDebug", label = "Combat" },
@@ -150,6 +181,7 @@ local overlayDefinitionByID = {}
 for _, definition in ipairs(overlayDefinitions) do
     overlayDefinitionByID[definition.id] = definition
 end
+overlayDefinitionByID.ai = overlayDefinitionByID.nameplate_debug
 
 function Nameplates.GetOverlayDefinitions()
     return overlayDefinitions
@@ -222,9 +254,11 @@ function ISPNCNameplateManager:new(playerIndex, player)
     return o
 end
 
-function Nameplates.IsDebugEnabled()
-    return Settings.showAIDebug == true
+function Nameplates.IsNameplateDebugEnabled()
+    return Settings.showNameplateDebug == true
 end
+
+Nameplates.IsDebugEnabled = Nameplates.IsNameplateDebugEnabled
 
 function Nameplates.IsCampDebugEnabled()
     return Settings.showCampDebug == true
@@ -246,18 +280,27 @@ function Nameplates.ToggleCampDebug()
     return Settings.showCampDebug
 end
 
-function Nameplates.ToggleDebug()
+function Nameplates.ToggleNameplateDebug()
     local player = getSpecificPlayer(0)
-    Settings.showAIDebug = not Settings.showAIDebug
-    PNC.SettingsStore:Set("showAIDebug", Settings.showAIDebug, true)
+    Settings.showNameplateDebug = not Settings.showNameplateDebug
+    Settings.showAIDebug = Settings.showNameplateDebug
+    PNC.SettingsStore:Set(
+        "showNameplateDebug",
+        Settings.showNameplateDebug,
+        true
+    )
     PNC.Runtime = PNC.Runtime or {}
-    PNC.Runtime.debugEnabled = Settings.showAIDebug == true
+    PNC.Runtime.nameplateDebugEnabled = Settings.showNameplateDebug == true
     if player and HaloTextHelper and HaloTextHelper.addText then
-        local messageKey = Settings.showAIDebug and "UI_PNC_AIOverlayEnabled" or "UI_PNC_AIOverlayDisabled"
+        local messageKey = Settings.showNameplateDebug
+            and "UI_PNC_NameplateDebugEnabled"
+            or "UI_PNC_NameplateDebugDisabled"
         HaloTextHelper.addText(player, getText(messageKey))
     end
-    return Settings.showAIDebug
+    return Settings.showNameplateDebug
 end
+
+Nameplates.ToggleDebug = Nameplates.ToggleNameplateDebug
 
 function Nameplates.IsPathDebugEnabled()
     return Settings.showPathDebug == true
@@ -442,7 +485,9 @@ end
 -- lists whose selected states drift apart.
 function Nameplates.ToggleOverlay(id)
     id = tostring(id or "")
-    if id == "ai" then return Nameplates.ToggleDebug() end
+    if id == "ai" or id == "nameplate_debug" then
+        return Nameplates.ToggleNameplateDebug()
+    end
     if id == "camp" then return Nameplates.ToggleCampDebug() end
     if id == "path" then return Nameplates.TogglePathDebug() end
     if id == "combat" then return Nameplates.ToggleCombatDebug() end
@@ -479,8 +524,9 @@ local function onCreatePlayer(playerIndex)
 end
 
 local function onGameStart()
+    normalizeNameplateDebugSetting()
     PNC.Runtime = PNC.Runtime or {}
-    PNC.Runtime.debugEnabled = Settings.showAIDebug == true
+    PNC.Runtime.nameplateDebugEnabled = Settings.showNameplateDebug == true
     for i = 0, getNumActivePlayers() - 1 do
         initForPlayer(i)
     end
@@ -502,6 +548,9 @@ local function onResetLua()
 end
 
 Events.OnCreatePlayer.Add(onCreatePlayer)
+if Events and Events.OnGameBoot then
+    Events.OnGameBoot.Add(normalizeNameplateDebugSetting)
+end
 Events.OnGameStart.Add(onGameStart)
 if Events and Events.OnPreUIDraw then
     Events.OnPreUIDraw.Add(onPreUIDraw)

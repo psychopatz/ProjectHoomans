@@ -20,6 +20,7 @@ function LiveBodyControl.EnforceManagedSafety(zombie, source)
     local actionLeaseActive
     local unsafeNativeTraversalState
     local needsImmediateRepair
+    local seatedLockActive
     if not zombie or not Core or not Core.IsManagedNPCBody
         or not Core.IsManagedNPCBody(zombie)
     then
@@ -32,6 +33,10 @@ function LiveBodyControl.EnforceManagedSafety(zombie, source)
         record = PNC.Registry.FindRecordByZombie(zombie)
     end
     now = Core.Now and Core.Now() or 0
+    seatedLockActive = LiveBodyControl.IsSeated
+        and LiveBodyControl.IsSeated(record)
+        and not LiveBodyControl.IsSeatedCombatActive(record, now)
+        or false
     keepEngineMovementActive =
         LiveBodyControl.ShouldKeepEngineMovementActive(record, zombie)
     hadTarget = zombie.getTarget and zombie:getTarget() ~= nil or false
@@ -54,6 +59,8 @@ function LiveBodyControl.EnforceManagedSafety(zombie, source)
         or (not wasUseless and not keepEngineMovementActive)
         or hadTeeth
         or hadNativeCorpseDragFlag
+        or seatedLockActive
+            and LiveBodyControl.IsSeatedNativeResetState(actionState)
         or (
             (not keepEngineMovementActive or unsafeNativeTraversalState)
             and not actionLeaseActive
@@ -70,6 +77,20 @@ function LiveBodyControl.EnforceManagedSafety(zombie, source)
         and LiveBodyControl.IsSuppressedActionState(actionState)
     then
         LiveBodyControl.SuppressZombieState(zombie, nil, now, true)
+    end
+    if seatedLockActive and not actionLeaseActive then
+        -- The shared suppressed-state list intentionally does not claim
+        -- turnalerted. Seating does: it is a native zombie alert transition
+        -- that can otherwise reacquire movement after this callback.
+        LiveBodyControl.ReleaseSeatedMovement(
+            record,
+            zombie,
+            "seated_safety"
+        )
+        Internal.clearVanillaIntent(zombie)
+        if LiveBodyControl.IsSeatedNativeResetState(actionState) then
+            LiveBodyControl.ResetSeatedNativeMovementState(zombie)
+        end
     end
     if (
             hadTarget

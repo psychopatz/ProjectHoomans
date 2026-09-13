@@ -30,11 +30,35 @@ function PathService.MoveToward(
     reason,
     navigation
 )
+    local runtime = record and record.runtime or nil
+    local state = runtime and runtime.facilityActivity
+        and runtime.facilityActivity.seating == true
+        and runtime.facilityActivity
+        or runtime and runtime.roamingSeat
+    local scene = runtime and runtime.animationScene or nil
     if Diagnostics
         and record
         and record.presenceState == PNC.Const.PRESENCE_ABSTRACT
     then
         Diagnostics.Increment("LiveAbstract.AbstractPathRequests")
+    end
+    if Diagnostics and Diagnostics.LogSeatingState
+        and Diagnostics.IsSeatingRuntime
+        and Diagnostics.IsSeatingRuntime(runtime, scene)
+        and (state and state.seatEntered == true or scene)
+    then
+        Diagnostics.LogSeatingState(
+            "path_service_move_while_seated",
+            record,
+            zombie,
+            scene,
+            reason or "path_service_move",
+            {
+                "requestedX=" .. tostring(targetX or ""),
+                "requestedY=" .. tostring(targetY or ""),
+                "requestedZ=" .. tostring(targetZ or ""),
+            }
+        )
     end
     record.runtime = record.runtime or {}
     local intent = record.runtime.moveIntent

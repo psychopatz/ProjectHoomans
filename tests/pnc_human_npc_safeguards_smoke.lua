@@ -292,6 +292,29 @@ T.equal(useless, true,
 PNC.Core.IsAuthority = function() return true end
 managedRecord = nil
 
+-- Seating owns the native carrier after entry. A stale turn-alerted state is
+-- reset without broadening the normal global suppressed-state policy.
+actionState = "turnalerted"
+useless = false
+vanillaTarget = {}
+managedRecord = {
+    runtime = {
+        facilityActivity = {
+            seating = true,
+            seatEntered = true,
+            phase = "SEATED",
+        },
+    },
+}
+zombieUpdateHandler(managedBody)
+T.equal(actionState, "idle",
+    "seated carrier retained the native turn-alerted state")
+T.equal(useless, true,
+    "seated carrier did not retain human-shell isolation")
+T.equal(vanillaTarget, nil,
+    "seated carrier retained a native target")
+managedRecord = nil
+
 local panic = 2
 local visibleZombies = 0
 local chasingZombies = 0

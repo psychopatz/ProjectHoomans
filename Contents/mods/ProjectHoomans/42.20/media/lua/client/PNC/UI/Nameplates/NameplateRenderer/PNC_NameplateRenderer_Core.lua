@@ -439,7 +439,8 @@ local function drawLive(manager, entry, metrics, currentTime, settings)
         staminaTop = drawStamina(manager, entry, metrics, barLeft, barTop, alpha)
     end
 
-    local showDebug = settings.showAIDebug == true
+    local showDebug = settings.showNameplateDebug == true
+        or settings.showAIDebug == true
     local showCamp = settings.showCampDebug == true
     local showAnimation = settings.showAnimationDebug == true
     local showScene =

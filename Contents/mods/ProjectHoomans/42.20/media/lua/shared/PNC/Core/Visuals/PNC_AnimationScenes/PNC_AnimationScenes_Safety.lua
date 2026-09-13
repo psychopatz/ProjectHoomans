@@ -7,30 +7,36 @@ local function auditSafety(record, zombie, runtime, scene, reason, now)
     local navigation = runtime and runtime.localNavigation or nil
     local followState = runtime and runtime.followState or nil
     if not Diagnostics or Diagnostics.SeatingAuditEnabled ~= true
-        or not Diagnostics.LogSeatingAudit
+        or not Diagnostics.LogSeatingState
+        or not Diagnostics.IsSeatingRuntime
+        or not Diagnostics.IsSeatingRuntime(runtime, scene)
     then
         return
     end
-    Diagnostics.LogSeatingAudit("safety_interrupt", {
-        "npc=" .. tostring(record and record.id or ""),
-        "scene=" .. tostring(scene and scene.id or ""),
-        "reason=" .. tostring(reason or ""),
-        "now=" .. tostring(now or ""),
-        "bodyAction=" .. tostring(zombie and zombie.getActionStateName
-            and zombie:getActionStateName() or ""),
-        "targetKind=" .. tostring(runtime and runtime.target
-            and runtime.target.kind or ""),
-        "attackAction=" .. tostring(runtime and runtime.attackAction or ""),
-        "pathPhase=" .. tostring(path and path.phase or ""),
-        "visualMovingUntil=" .. tostring(path and path.visualMovingUntil or ""),
-        "specialMoveUntil=" .. tostring(path and path.specialMoveUntil or ""),
-        "nativeActive=" .. tostring(navigation
-            and navigation.nativeActive == true),
-        "nativeTraversal=" .. tostring(navigation
-            and navigation.nativeTraversalState or ""),
-        "followOwnerMoving=" .. tostring(followState
-            and followState.ownerMoving == true),
-    })
+    Diagnostics.LogSeatingState(
+        "safety_interrupt",
+        record,
+        zombie,
+        scene,
+        reason,
+        {
+            "now=" .. tostring(now or ""),
+            "targetKind=" .. tostring(runtime and runtime.target
+                and runtime.target.kind or ""),
+            "attackAction=" .. tostring(runtime and runtime.attackAction
+                or ""),
+            "visualMovingUntil=" .. tostring(path
+                and path.visualMovingUntil or ""),
+            "specialMoveUntil=" .. tostring(path
+                and path.specialMoveUntil or ""),
+            "safetyNativeActive=" .. tostring(navigation
+                and navigation.nativeActive == true),
+            "safetyNativeTraversal=" .. tostring(navigation
+                and navigation.nativeTraversalState or ""),
+            "safetyFollowOwnerMoving=" .. tostring(followState
+                and followState.ownerMoving == true),
+        }
+    )
 end
 
 function Scenes.InterruptForSafety(record, zombie, now)

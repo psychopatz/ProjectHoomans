@@ -196,6 +196,25 @@ function Internal.TickFollowOwner(record, zombie)
         and PNC.AnimationScenes.Interrupt
         and followStateChanged
     then
+        if Diagnostics and Diagnostics.LogSeatingState
+            and Diagnostics.IsSeatingRuntime
+            and Diagnostics.IsSeatingRuntime(
+                record.runtime,
+                record.runtime and record.runtime.animationScene
+            )
+        then
+            Diagnostics.LogSeatingState(
+                "follow_movement_interrupt",
+                record,
+                zombie,
+                record.runtime and record.runtime.animationScene,
+                "follow_owner_moving",
+                {
+                    "followOwnerMovingChanged="
+                        .. tostring(followStateChanged),
+                }
+            )
+        end
         PNC.AnimationScenes.Interrupt(record, zombie, "movement")
     end
     ownerVehicle = owner.getVehicle and owner:getVehicle() or nil

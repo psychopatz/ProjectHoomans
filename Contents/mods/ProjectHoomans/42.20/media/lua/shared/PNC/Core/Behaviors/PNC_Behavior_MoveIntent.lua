@@ -10,6 +10,49 @@ PNC.BehaviorMoveIntent = PNC.BehaviorMoveIntent or {}
 
 local MoveIntent = PNC.BehaviorMoveIntent
 local Core = PNC.Core
+local Diagnostics = PNC.PerformanceScalingDiagnostics
+
+local function auditSeatedMove(
+    eventName,
+    record,
+    x,
+    y,
+    z,
+    mode,
+    stopDistance,
+    reason
+)
+    local runtime = record and record.runtime or nil
+    local state = runtime and runtime.facilityActivity
+        and runtime.facilityActivity.seating == true
+        and runtime.facilityActivity
+        or runtime and runtime.roamingSeat
+    local scene = runtime and runtime.animationScene or nil
+    if not Diagnostics or Diagnostics.SeatingAuditEnabled ~= true
+        or not Diagnostics.LogSeatingState
+        or not Diagnostics.IsSeatingRuntime
+        or not Diagnostics.IsSeatingRuntime(runtime, scene)
+        or not (state and (state.seatEntered == true
+            or state.phase == "SEATED"
+            or state.phase == "SITTING") or scene)
+    then
+        return
+    end
+    Diagnostics.LogSeatingState(
+        eventName,
+        record,
+        nil,
+        scene,
+        reason or "seated_move_request",
+        {
+            "requestedX=" .. tostring(x or ""),
+            "requestedY=" .. tostring(y or ""),
+            "requestedZ=" .. tostring(z or ""),
+            "requestedMode=" .. tostring(mode or ""),
+            "requestedStopDistance=" .. tostring(stopDistance or ""),
+        }
+    )
+end
 
 local function sameNumber(left, right)
     if left == nil or right == nil then
@@ -91,6 +134,16 @@ function MoveIntent.RequestMove(
         return false
     end
     runtime = ensureRuntime(record)
+    auditSeatedMove(
+        "movement_intent_request",
+        record,
+        x,
+        y,
+        z,
+        mode,
+        stopDistance,
+        reason
+    )
     intent = runtime.moveIntent
     if not intent or intent.kind ~= "move" then
         intent = {}
@@ -149,6 +202,18 @@ function MoveIntent.Hold(record, reason)
         return false
     end
     runtime = ensureRuntime(record)
+    if Diagnostics and Diagnostics.LogSeatingState
+        and Diagnostics.IsSeatingRuntime
+        and Diagnostics.IsSeatingRuntime(runtime, runtime.animationScene)
+    then
+        Diagnostics.LogSeatingState(
+            "movement_intent_hold",
+            record,
+            nil,
+            runtime.animationScene,
+            reason or "hold"
+        )
+    end
     intent = runtime.moveIntent
     if not intent or intent.kind ~= "hold" then
         intent = {}

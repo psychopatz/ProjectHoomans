@@ -4,6 +4,7 @@ PNC.FacilityJobsBehaviorInternal = PNC.FacilityJobsBehaviorInternal or {}
 local Internal = PNC.FacilityJobsBehaviorInternal
 local SEAT_STOP_DISTANCE = Internal.SEAT_STOP_DISTANCE
 local SEAT_ARRIVAL_TOLERANCE = Internal.SEAT_ARRIVAL_TOLERANCE
+local Diagnostics = PNC.PerformanceScalingDiagnostics
 
 local function seatSpotUsable(spot, failedApproaches, index)
     if type(spot) ~= "table"
@@ -191,12 +192,46 @@ function Internal.PositionAtSeatAnchor(record, zombie, runtime, order)
     local bodyX
     local bodyY
     if not runtime or runtime.seating ~= true or not zombie then return true end
-    if not x or not y or not z then return false, "SEAT_ANCHOR_INVALID" end
+    if not x or not y or not z then
+        if Diagnostics and Diagnostics.LogSeatingState then
+            Diagnostics.LogSeatingState(
+                "seat_anchor_failed",
+                record,
+                zombie,
+                runtime.animationScene,
+                "SEAT_ANCHOR_INVALID"
+            )
+        end
+        return false, "SEAT_ANCHOR_INVALID"
+    end
     if runtime.positioned == true then return true end
     if not PNC.LiveBodyControl
         or not PNC.LiveBodyControl.SetAuthoritativePosition
     then
+        if Diagnostics and Diagnostics.LogSeatingState then
+            Diagnostics.LogSeatingState(
+                "seat_anchor_failed",
+                record,
+                zombie,
+                runtime.animationScene,
+                "SEAT_POSITION_CONTROL_UNAVAILABLE"
+            )
+        end
         return false, "SEAT_POSITION_CONTROL_UNAVAILABLE"
+    end
+    if Diagnostics and Diagnostics.LogSeatingState then
+        Diagnostics.LogSeatingState(
+            "seat_anchor_position_begin",
+            record,
+            zombie,
+            runtime.animationScene,
+            "seat_anchor_position",
+            {
+                "anchorX=" .. tostring(x),
+                "anchorY=" .. tostring(y),
+                "anchorZ=" .. tostring(z),
+            }
+        )
     end
     bodyX = zombie.getX and zombie:getX() or record.x
     bodyY = zombie.getY and zombie:getY() or record.y
@@ -206,6 +241,15 @@ function Internal.PositionAtSeatAnchor(record, zombie, runtime, order)
     runtime.seatAnchor = { x = x, y = y, z = z }
     runtime.positioned = true
     runtime.phase = "SEAT_ENTRY"
+    if Diagnostics and Diagnostics.LogSeatingState then
+        Diagnostics.LogSeatingState(
+            "seat_anchor_position_complete",
+            record,
+            zombie,
+            runtime.animationScene,
+            "seat_anchor_position"
+        )
+    end
     return true
 end
 

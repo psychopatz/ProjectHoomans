@@ -226,8 +226,12 @@ Entries.BuildCommunityDebugLines = communityDebugLines
 local function cacheMetrics(entry, snapshot, zombie, settings, speech, scopes)
     local fonts = Presentation.Fonts
     local nameFont = nameplateFont()
+    local showNameplateDebug = settings and (
+        settings.showNameplateDebug == true
+            or settings.showAIDebug == true
+    )
     local showDebug = settings and (
-        settings.showAIDebug == true or settings.showCampDebug == true
+        showNameplateDebug or settings.showCampDebug == true
     )
     local name = Identity.GetName(snapshot)
     local debugText = showDebug

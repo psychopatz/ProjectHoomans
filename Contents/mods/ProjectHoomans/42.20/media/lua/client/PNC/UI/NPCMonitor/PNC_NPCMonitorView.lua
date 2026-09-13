@@ -141,7 +141,7 @@ function View.CreateChildren(window)
         { "provision_stats", "UI_PNC_MonitorProvisionStats", "Provision Stats", ISPNCNPCMonitor.onProvisionDiagnostics, "selected" },
         { "audit", "UI_PNC_MonitorAuditBodies", "Audit Bodies", ISPNCNPCMonitor.onAudit, "warning" },
         { "refresh", "UI_PNC_MonitorRefresh", "Refresh", ISPNCNPCMonitor.onRefresh, "quiet" },
-        { "overlay_ai", nil, overlayButtonTitle("ai"), ISPNCNPCMonitor.onOverlayType, "quiet", "ai" },
+        { "overlay_nameplate_debug", nil, overlayButtonTitle("nameplate_debug"), ISPNCNPCMonitor.onOverlayType, "quiet", "nameplate_debug" },
         { "overlay_camp", nil, overlayButtonTitle("camp"), ISPNCNPCMonitor.onOverlayType, "quiet", "camp" },
         { "overlay_path", nil, overlayButtonTitle("path"), ISPNCNPCMonitor.onOverlayType, "quiet", "path" },
         { "overlay_combat", nil, overlayButtonTitle("combat"), ISPNCNPCMonitor.onOverlayType, "quiet", "combat" },

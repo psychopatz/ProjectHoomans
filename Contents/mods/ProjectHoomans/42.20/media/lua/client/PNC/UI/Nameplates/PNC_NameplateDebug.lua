@@ -57,6 +57,26 @@ local function settingEnabled(settings, key)
     return not settings or settings[key] ~= false
 end
 
+local function nameplateDebugEnabled(settings)
+    return settings and (
+        settings.showNameplateDebug == true
+            or settings.showAIDebug == true
+    ) or false
+end
+
+local function translatedText(key, fallback)
+    local value = getText and getText(key) or nil
+    if value and tostring(value) ~= tostring(key) then
+        return tostring(value)
+    end
+    return fallback
+end
+
+local BEHAVIOR_LABEL = translatedText(
+    "UI_PNC_NameplateDebug_Behavior",
+    "Behavior"
+)
+
 function Debug.CampResourceText(snapshot, settings)
     local camp
     local activity
@@ -77,7 +97,8 @@ end
 
 function Debug.SeatingText(snapshot, settings)
     if not settings
-        or (settings.showAIDebug ~= true and settings.showCampDebug ~= true)
+        or (not nameplateDebugEnabled(settings)
+            and settings.showCampDebug ~= true)
     then return "" end
     local seating = snapshot and snapshot.seatingDebug
         or snapshot and snapshot.debugState
@@ -105,17 +126,25 @@ function Debug.BuildText(snapshot, hasBoundBody, settings)
     local debugState = snapshot and snapshot.debugState or nil
     local combatDebug = snapshot and snapshot.combatDebugState or nil
     local firearmState = snapshot and snapshot.firearmState or nil
+    local activeBehavior = debugState and debugState.activeBehavior
+        or snapshot and snapshot.activeBehavior or nil
     local parts = {}
     local campText = Debug.CampResourceText(snapshot, settings)
     local seatingText = Debug.SeatingText(snapshot, settings)
     local aiDebugVisible = not settings
-        or settings.showAIDebug == true
+        or nameplateDebugEnabled(settings)
         or settings.showCampDebug == nil
     if not debugState then
         local aiText = aiDebugVisible
             and settingEnabled(settings, "debugShowAI")
             and "AI: Unknown" or ""
+        local behaviorText = aiDebugVisible
+            and settingEnabled(settings, "debugShowAI")
+            and activeBehavior and tostring(activeBehavior) ~= ""
+            and BEHAVIOR_LABEL .. ": " .. tostring(activeBehavior) or ""
         local unknown = aiText
+        if behaviorText ~= "" then unknown = unknown ~= ""
+            and (unknown .. " | " .. behaviorText) or behaviorText end
         if campText ~= "" then unknown = unknown ~= ""
             and (unknown .. " | " .. campText) or campText end
         if seatingText ~= "" then unknown = unknown ~= ""
@@ -132,6 +161,10 @@ function Debug.BuildText(snapshot, hasBoundBody, settings)
     if aiDebugVisible and settingEnabled(settings, "debugShowAI") then
         parts[#parts + 1] =
             "AI: " .. tostring(debugState.aiState or snapshot.aiState or "Unknown")
+        if activeBehavior and tostring(activeBehavior) ~= "" then
+            parts[#parts + 1] =
+                BEHAVIOR_LABEL .. ": " .. tostring(activeBehavior)
+        end
     end
     if aiDebugVisible and settingEnabled(settings, "debugShowJob") then
         parts[#parts + 1] = "Job: " .. tostring(debugState.activeJob or "-")

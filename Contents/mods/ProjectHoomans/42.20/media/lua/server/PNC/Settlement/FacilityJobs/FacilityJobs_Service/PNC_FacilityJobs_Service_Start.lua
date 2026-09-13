@@ -8,6 +8,7 @@ PNC.FacilityJobsServiceInternal = PNC.FacilityJobsServiceInternal or {}
 local Jobs = PNC.FacilityJobs
 local H = PNC.FacilityJobsServiceInternal
 local Repository = PNC.SettlementRepository
+local Diagnostics = PNC.PerformanceScalingDiagnostics
 
 local function copyApproachCandidates(candidates)
     if type(candidates) ~= "table" then return nil end
@@ -108,6 +109,9 @@ function Jobs.Start(record, facilityOrId, capability, options)
     end
     local sceneId = tostring(target.sceneId or definition.sceneId or "")
     local facilityDefinition = PNC.FacilityDefinitions.Get(facility.definitionId)
+    local seatSessionId = seating and Diagnostics
+        and Diagnostics.NewSeatingSessionId
+        and Diagnostics.NewSeatingSessionId(record.id) or ""
     if capability == "sleep" and PNC.FacilityResources
         and PNC.FacilityResources.IsValidSleepTarget
         and not PNC.FacilityResources.IsValidSleepTarget(
@@ -193,6 +197,7 @@ function Jobs.Start(record, facilityOrId, capability, options)
         approachCandidates = approachCandidates,
         approachIndex = 1,
         failedApproaches = {},
+        seatSessionId = seatSessionId,
     }
     if capability == "sleep" then
         PNC.SleepRuntime = PNC.SleepRuntime or {}
@@ -203,6 +208,21 @@ function Jobs.Start(record, facilityOrId, capability, options)
         and PNC.SeatingRuntime.LiveObjects
     then
         PNC.SeatingRuntime.LiveObjects[tostring(record.id)] = liveObject
+    end
+    if seating and Diagnostics and Diagnostics.LogSeatingState then
+        Diagnostics.LogSeatingState(
+            "seat_session_started",
+            record,
+            live,
+            nil,
+            "facility_activity_started",
+            {
+                "capability=" .. tostring(capability or ""),
+                "targetX=" .. tostring(target.x or ""),
+                "targetY=" .. tostring(target.y or ""),
+                "targetZ=" .. tostring(target.z or ""),
+            }
+        )
     end
     if options.debugHold == true then
         record.runtime.facilityDebugWork = record.runtime.facilityActivity

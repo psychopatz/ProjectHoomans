@@ -399,7 +399,78 @@ T.load(CLIENT_ROOT .. "PNC/UI/Inventory/PNC_InventoryTransferEndpoint.lua")
 package.preload["PNC/UI/Inventory/PNC_InventoryTransferEndpoint"] = function()
     return PNC.InventoryTransferEndpoint
 end
+
+local opacityState = {
+    signature = "0.55:0.08:0.04",
+    window = 0.55,
+    surface = 0.63,
+    detail = 0.59,
+    registered = {},
+}
+local coreOptions = {}
+function coreOptions.GetOpacity() return opacityState.window end
+function coreOptions.GetContentOpacitySignature()
+    return opacityState.signature
+end
+function coreOptions.GetContentOpacity(role)
+    return role == "surface" and opacityState.surface or opacityState.detail
+end
+function coreOptions.ApplyOpacity(window, value)
+    if not window then return value end
+    window.backgroundColor = window.backgroundColor or {}
+    window.backgroundColor.a = value
+    window.opacity = value
+    return value
+end
+coreOptions.ApplyWindowOpacity = coreOptions.ApplyOpacity
+function coreOptions.ApplySurfaceOpacity(window, role)
+    if not window then return end
+    window.backgroundColor = window.backgroundColor or {}
+    window.backgroundColor.a = coreOptions.GetContentOpacity(role)
+    window.opacityRole = role
+    return window.backgroundColor.a
+end
+function coreOptions.RegisterTarget(id, window)
+    coreOptions.registered[id] = window
+    return true
+end
+function coreOptions.UnregisterTarget(id)
+    coreOptions.registered[id] = nil
+    return true
+end
+package.preload["PsychopatzCore/UI/PsychopatzCommandHubOptions"] = function()
+    return coreOptions
+end
 T.load(CLIENT_ROOT .. "PNC/UI/Inventory/PNC_InventoryWindow.lua")
+
+local styledWindow = setmetatable({
+    playerList = { backgroundColor = {} },
+    npcList = { backgroundColor = {} },
+    playerContainerList = { backgroundColor = {} },
+    npcContainerList = { backgroundColor = {} },
+}, { __index = ISPNCInventoryWindow })
+T.equal(styledWindow:applyOpacityStyle(), true,
+    "inventory opacity style did not apply on first pass")
+T.equal(styledWindow.backgroundColor, nil,
+    "content styling unexpectedly changed the window background")
+T.equal(styledWindow.contentSurfaceOpacity, 0.63,
+    "inventory surface opacity did not use shared settings")
+T.equal(styledWindow.contentDetailOpacity, 0.59,
+    "inventory detail opacity did not use shared settings")
+T.equal(styledWindow.playerList.backgroundColor.a, 0.59,
+    "inventory list did not receive shared detail opacity")
+T.equal(styledWindow.npcContainerList.opacityRole, "detail",
+    "inventory container rail did not receive shared detail role")
+T.equal(styledWindow:applyOpacityStyle(), false,
+    "inventory opacity style reapplied without a settings change")
+opacityState.signature = "0.42:0.12:0.07"
+opacityState.window = 0.42
+opacityState.surface = 0.54
+opacityState.detail = 0.49
+T.equal(styledWindow:applyOpacityStyle(), true,
+    "inventory opacity style did not react to settings change")
+T.equal(styledWindow.playerList.backgroundColor.a, 0.49,
+    "inventory list kept stale detail opacity after settings change")
 
 local storageEndpoint = PNC.InventoryTransferEndpoint.Storage("storage_a")
 PNC.Network.ClientState.colonyManagement = { storage = {
@@ -499,10 +570,21 @@ T.truthy(string.find(
 ), "vanilla collapsed-group texture missing")
 T.truthy(string.find(listSource, "row.restricted", 1, true),
     "off-limits row dimming missing")
+T.truthy(string.find(listSource, "setContentOpacity", 1, true),
+    "inventory item list has no shared content-opacity hook")
+local windowSource = T.read(
+    "ProjectHoomans", "client", "PNC/UI/Inventory/PNC_InventoryWindow.lua"
+)
+T.truthy(string.find(windowSource, "RegisterTarget", 1, true),
+    "inventory window is not registered for live opacity updates")
+T.truthy(string.find(windowSource, "GetContentOpacitySignature", 1, true),
+    "inventory window does not track shared opacity changes")
 
 local modalSource = T.read(
     "ProjectHoomans", "client", "PNC/UI/Inventory/PNC_InventoryQuantityModal.lua"
 )
+T.truthy(string.find(modalSource, "GetContentOpacitySignature", 1, true),
+    "quantity modal does not track shared opacity changes")
 T.truthy(string.find(
     modalSource,
     'require "RadioCom/ISUIRadio/ISSliderPanel"',

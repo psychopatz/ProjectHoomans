@@ -3,6 +3,20 @@ PNC.FacilityJobsBehaviorInternal = PNC.FacilityJobsBehaviorInternal or {}
 
 local Internal = PNC.FacilityJobsBehaviorInternal
 local SquareRules = require "PsychopatzCore/World/PsychopatzSquareRules"
+local Diagnostics = PNC.PerformanceScalingDiagnostics
+
+local function auditSeat(eventName, record, zombie, runtime, reason, extra)
+    if Diagnostics and Diagnostics.LogSeatingState then
+        Diagnostics.LogSeatingState(
+            eventName,
+            record,
+            zombie,
+            runtime and runtime.animationScene or nil,
+            reason,
+            extra
+        )
+    end
+end
 
 local function clearFurnitureOccupancy(zombie)
     if not zombie then return end
@@ -99,6 +113,7 @@ end
 
 function Internal.ClearFurnitureSeat(record, zombie, runtime)
     if not runtime or runtime.seating ~= true then return end
+    auditSeat("seat_clear_begin", record, zombie, runtime)
     local object = Internal.LiveSeatObject(record, runtime)
     if object and object.setSatChair then
         object:setSatChair(false)
@@ -120,22 +135,32 @@ function Internal.ClearFurnitureSeat(record, zombie, runtime)
     end
     runtime.seatEntered = false
     runtime.seatState = "STANDING"
+    auditSeat("seat_clear_complete", record, zombie, runtime)
 end
 
 function Internal.EnterFurnitureSeat(record, zombie, runtime, order)
     if not runtime or runtime.seating ~= true then return true end
+    auditSeat("seat_entry_attempt", record, zombie, runtime)
     if not zombie then
         -- Abstract execution records the chosen spot/resource; no Java body
         -- state exists until materialization.
         runtime.seatEntered = true
         runtime.phase = "SITTING"
+        auditSeat("seat_entry_complete", record, zombie, runtime,
+            "abstract")
         return true
     end
     if runtime.seatEntered == true then return true end
     local object = Internal.LiveSeatObject(record, runtime)
-    if not object then return false, "SEAT_OBJECT_UNAVAILABLE" end
+    if not object then
+        auditSeat("seat_entry_failed", record, zombie, runtime,
+            "SEAT_OBJECT_UNAVAILABLE")
+        return false, "SEAT_OBJECT_UNAVAILABLE"
+    end
     if object.isFurnitureOccupied then
         if object:isFurnitureOccupied(zombie) == true then
+            auditSeat("seat_entry_failed", record, zombie, runtime,
+                "SEAT_OCCUPIED")
             return false, "SEAT_OCCUPIED"
         end
     end
@@ -145,7 +170,11 @@ function Internal.EnterFurnitureSeat(record, zombie, runtime, order)
     if side == "" then side = tostring(order.seatSide or "") end
     if directionName == "" then directionName = "S" end
     if side == "" then side = "Front" end
-    if runtime.validSpot == false then return false, "SEAT_SPOT_INVALID" end
+    if runtime.validSpot == false then
+        auditSeat("seat_entry_failed", record, zombie, runtime,
+            "SEAT_SPOT_INVALID")
+        return false, "SEAT_SPOT_INVALID"
+    end
     local direction = IsoDirections and IsoDirections[directionName] or nil
     if not direction and IsoDirections and IsoDirections.fromString then
         direction = IsoDirections.fromString(directionName)
@@ -172,6 +201,8 @@ function Internal.EnterFurnitureSeat(record, zombie, runtime, order)
         zombie:setSittingOnFurniture(true)
     end
     if not Internal.ApplySeatFacing(zombie, direction, side) then
+        auditSeat("seat_entry_failed", record, zombie, runtime,
+            "SEAT_FACING_UNAVAILABLE", { "partialState=true" })
         return false, "SEAT_FACING_UNAVAILABLE"
     end
     if zombie.reportEvent then zombie:reportEvent("EventSitOnFurniture") end
@@ -179,6 +210,16 @@ function Internal.EnterFurnitureSeat(record, zombie, runtime, order)
     runtime.seatEntered = true
     runtime.seatState = "SEATED"
     runtime.phase = "SEATED"
+    if PNC.LiveBodyControl
+        and PNC.LiveBodyControl.StabilizeSeatedBody
+    then
+        PNC.LiveBodyControl.StabilizeSeatedBody(
+            record,
+            zombie,
+            PNC.Core and PNC.Core.Now and PNC.Core.Now() or 0
+        )
+    end
+    auditSeat("seat_entry_complete", record, zombie, runtime)
     return true
 end
 

@@ -41,6 +41,7 @@ local settingsWindow = fakeWindow(0, 0, 420, 340)
 local journalWindow = fakeWindow(0, 0, 640, 540)
 local colonistWindow = fakeWindow(0, 0, 920, 620)
 local storageWindow = fakeWindow(0, 0, 980, 700)
+local inventoryWindow = fakeWindow(0, 0, 760, 520)
 local provisionWindow = fakeWindow(0, 0, 680, 680)
 local namePromptWindow = fakeWindow(0, 0, 430, 170)
 local emblemEditorWindow = fakeWindow(0, 0, 720, 360)
@@ -145,6 +146,7 @@ PNC = {
     ColonyJournalUI = journalUI,
     ColonistUI = colonistUI,
     ColonyStorageUI = storageUI,
+    InventoryWindow = { instance = inventoryWindow },
     ProvisionSettingsUI = provisionUI,
     ColonyNamePrompt = namePromptUI,
     FactionEmblemEditor = emblemEditorUI,
@@ -275,6 +277,8 @@ T.equal(colonistWindow.opacity, 0.4,
     "colonist opacity was not propagated")
 T.equal(storageWindow.opacity, 0.4,
     "storage opacity was not propagated")
+T.equal(inventoryWindow.opacity, 0.4,
+    "inventory opacity was not propagated")
 T.equal(workshopWindow.opacity, 0.4,
     "workshop opacity was not propagated")
 T.equal(provisionWindow.opacity, 0.4,

@@ -20,8 +20,10 @@ local QuantityModal = PNC.InventoryQuantityModal
 local TransferEndpoint = PNC.InventoryTransferEndpoint
 local UI = PsychopatzCore.UI
 local Layout = UI.Layout
+local Options = require "PsychopatzCore/UI/PsychopatzCommandHubOptions"
 local TooltipHost
 local TooltipOptions
+local OPACITY_TARGET_ID = "ProjectHoomans.InventoryWindow"
 
 local function getTooltipHost()
     TooltipHost = TooltipHost or require
@@ -57,6 +59,33 @@ ISPNCInventoryWindow = UI.Window:derive("ISPNCInventoryWindow")
 
 function ISPNCInventoryWindow:initialise()
     UI.Window.initialise(self)
+    Options.ApplyOpacity(self, Options.GetOpacity())
+end
+
+function ISPNCInventoryWindow:applyOpacityStyle()
+    local signature = Options.GetContentOpacitySignature()
+    if self.lastContentOpacitySignature == signature then return false end
+
+    local surfaceOpacity = Options.GetContentOpacity("surface")
+    local detailOpacity = Options.GetContentOpacity("detail")
+    self.contentSurfaceOpacity = surfaceOpacity
+    self.contentDetailOpacity = detailOpacity
+    self.contentOpacity = detailOpacity
+
+    for _, list in ipairs({
+        self.playerList,
+        self.npcList,
+        self.playerContainerList,
+        self.npcContainerList,
+    }) do
+        Options.ApplySurfaceOpacity(list, "detail")
+        if list and list.setContentOpacity then
+            list:setContentOpacity(detailOpacity)
+        end
+    end
+
+    self.lastContentOpacitySignature = signature
+    return true
 end
 
 function ISPNCInventoryWindow:createChildren()
@@ -109,6 +138,7 @@ function ISPNCInventoryWindow:createChildren()
     self:addChild(self.depositStorageButton)
     getTooltipHost().Install(self, getTooltipOptions())
     self:onResponsiveLayout()
+    self:applyOpacityStyle()
     self:refreshInventory(true)
 end
 
@@ -796,6 +826,7 @@ local function selectedContainerLabel(containers, selected)
 end
 
 function ISPNCInventoryWindow:prerender()
+    self:applyOpacityStyle()
     self:refreshInventory(false)
     self:updateInventoryTooltip()
     UI.Window.prerender(self)
@@ -805,8 +836,11 @@ function ISPNCInventoryWindow:prerender()
     local playerX = self.playerPaneX or 8
     local npcX = self.npcPaneX or math.floor(self.width / 2)
     local paneWidth = self.paneWidth or math.floor((self.width - 24) / 2)
-    self:drawRect(playerX, headingY - 3, paneWidth, 19, 0.50, 0.10, 0.12, 0.14)
-    self:drawRect(npcX, headingY - 3, paneWidth, 19, 0.50, 0.14, 0.11, 0.08)
+    local surfaceOpacity = self.contentSurfaceOpacity or 1
+    self:drawRect(playerX, headingY - 3, paneWidth, 19,
+        0.50 * surfaceOpacity, 0.10, 0.12, 0.14)
+    self:drawRect(npcX, headingY - 3, paneWidth, 19,
+        0.50 * surfaceOpacity, 0.14, 0.11, 0.08)
     self:drawText(
         tr("UI_PNC_Inventory_PlayerHeading", "YOUR INVENTORY"),
         playerX + 4, headingY, 0.72, 0.86, 1.00, 1, UIFont.Small
@@ -915,6 +949,7 @@ function ISPNCInventoryWindow:close()
         QuantityModal.instance:close()
     end
     getTooltipHost().Hide(self)
+    Options.UnregisterTarget(OPACITY_TARGET_ID)
     InventoryWindow.instance = nil
     UI.Window.close(self)
 end
@@ -946,6 +981,7 @@ local function getOrCreateWindow()
         window:addToUIManager()
         InventoryWindow.instance = window
     end
+    Options.RegisterTarget(OPACITY_TARGET_ID, window)
     window:setVisible(true)
     return window
 end

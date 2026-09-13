@@ -66,7 +66,9 @@ function Renderer.Render(manager, settings)
             end
         end
     end
-    if settings.showAIDebug or settings.showCampDebug then
+    if (settings.showNameplateDebug or settings.showAIDebug)
+        or settings.showCampDebug
+    then
         for _, entry in pairs(manager.entries) do
             if not entry.debugOnly
                 and scopeVisible(entry, Scopes.DEBUG, true)

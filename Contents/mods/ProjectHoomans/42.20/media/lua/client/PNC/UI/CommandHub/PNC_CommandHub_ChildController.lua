@@ -219,6 +219,8 @@ function Controller.ApplyOpacity(opacity)
         and PNC.ColonistUI.instance or nil, value)
     Options.ApplyWindowOpacity(PNC.ColonyStorageUI
         and PNC.ColonyStorageUI.instance or nil, value)
+    Options.ApplyWindowOpacity(PNC.InventoryWindow
+        and PNC.InventoryWindow.instance or nil, value)
     Options.ApplyWindowOpacity(PNC.ResearchUI
         and PNC.ResearchUI.instance or nil, value)
     local base = PNC.BaseUI

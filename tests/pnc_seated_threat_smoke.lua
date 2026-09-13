@@ -168,6 +168,53 @@ T.falsy(SeatedThreat.Tick(homeRecord, body, now),
 T.truthy(homeRecord.runtime.facilityActivity,
     "resolved home combat preserves the facility activity for resumption")
 
+-- Guard orders can also own a manually/externally started seat activity. They
+-- use the guard anchor as the threat context instead of bypassing the seated
+-- threat arbiter entirely.
+expectedRadius = 3
+target = {
+    kind = "zombie",
+    zombieId = 44,
+    x = 12,
+    y = 10,
+    z = 0,
+    visible = true,
+    threatening = true,
+}
+threatActive = true
+now = 3000
+local guardRecord = {
+    id = "guard-seat-threat",
+    alive = true,
+    x = 10,
+    y = 10,
+    z = 0,
+    runtime = {
+        facilityActivity = {
+            automatic = true,
+            seating = true,
+            taskLeaseId = "",
+            previousOrder = {
+                kind = "guard",
+                x = 10,
+                y = 10,
+                z = 0,
+            },
+        },
+        animationScene = {
+            id = "facility.living.sitFurniture",
+            blocking = true,
+        },
+    },
+    orderSpec = { kind = "facility_activity" },
+}
+T.truthy(SeatedThreat.Tick(guardRecord, body, now),
+    "seated guard enters combat when a nearby zombie is visible")
+T.equal(interrupts, 3,
+    "seated guard scene is interrupted by a nearby hostile")
+T.equal(engagements, 3,
+    "seated guard threat uses the existing combat pipeline")
+
 T.load(
     "ProjectHoomans",
     "shared",

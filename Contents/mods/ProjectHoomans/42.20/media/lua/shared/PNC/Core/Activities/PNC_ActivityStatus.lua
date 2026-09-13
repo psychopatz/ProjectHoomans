@@ -71,6 +71,18 @@ local function activity(id, labelKey, fallback, extra)
     return output
 end
 
+local function behavior(id, fallback, extra)
+    local output = activity(
+        "job:" .. tostring(id or ""),
+        nil,
+        fallback or humanize(id),
+        extra
+    )
+    output.kind = "behavior"
+    output.behaviorId = tostring(id or "")
+    return output
+end
+
 local function fullTypeFromItem(item)
     if not item or type(item.getFullType) ~= "function" then return nil end
     local ok, fullType = pcall(item.getFullType, item)
@@ -302,7 +314,7 @@ Status.Register("current_job", 10, function(record)
         information.toolDiagnostic = Core and Core.DeepCopy
             and Core.DeepCopy(lumber.tool) or nil
     end
-    return activity("job:" .. current, nil, humanize(current), information)
+    return behavior(current, humanize(current), information)
 end)
 
 return Status

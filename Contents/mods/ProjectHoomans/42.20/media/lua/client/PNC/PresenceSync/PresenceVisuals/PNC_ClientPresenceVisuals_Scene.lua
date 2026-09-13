@@ -11,6 +11,7 @@ local Sync = PNC.ClientPresenceSync
 local Internal = Sync.Internal
 local Animation = PNC.Animation
 local Core = PNC.Core
+local Diagnostics = PNC.PerformanceScalingDiagnostics
 
 local function isWaterScene(sceneId)
     return string.find(
@@ -49,6 +50,24 @@ end
 
 local function logSceneReplica(eventName, recordView, presentation,
     zombie, reason)
+    if Diagnostics and Diagnostics.LogSeatingState
+        and Diagnostics.IsSeatingSceneId
+        and presentation
+        and Diagnostics.IsSeatingSceneId(presentation.id)
+    then
+        Diagnostics.LogSeatingState(
+            "client_" .. tostring(eventName or "scene"),
+            recordView,
+            zombie,
+            presentation,
+            reason,
+            {
+                "clientReplica=true",
+                "presentationKey=" .. tostring(presentation.key or ""),
+                "presentationBump=" .. tostring(presentation.bump or ""),
+            }
+        )
+    end
     if not presentation
         or not isWaterScene(presentation.id)
         or not Core

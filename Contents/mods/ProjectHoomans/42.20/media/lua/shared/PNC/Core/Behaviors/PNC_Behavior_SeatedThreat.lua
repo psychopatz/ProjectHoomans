@@ -18,6 +18,7 @@ local Diagnostics = PNC.PerformanceScalingDiagnostics
 local FACILITY_ORDER = "facility_activity"
 local CAMP_ORDER = "camp"
 local HOME_ORDER = "colony_home"
+local GUARD_ORDER = "guard"
 local SCAN_MS = tonumber(Const and Const.SEATED_THREAT_SCAN_MS) or 750
 local VALIDATE_MS = tonumber(Const and Const.SEATED_THREAT_VALIDATE_MS) or 250
 
@@ -36,7 +37,11 @@ local function isFacilityActivity(record)
         and activity.automatic == true
         and activity.seating == true
         and tostring(activity.taskLeaseId or "") == ""
-        and (previousKind == CAMP_ORDER or previousKind == HOME_ORDER)
+        and (
+            previousKind == CAMP_ORDER
+                or previousKind == HOME_ORDER
+                or previousKind == GUARD_ORDER
+        )
 end
 
 local function isRoamingSeat(record)

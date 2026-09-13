@@ -15,9 +15,16 @@ Scopes.DEBUG = "debug"
 Scopes.CONVERSATION = "conversation"
 Scopes.RELATIONSHIP_FEEDBACK = "relationship_feedback"
 
+local function nameplateDebugEnabled(settings)
+    return settings and (
+        settings.showNameplateDebug == true
+            or settings.showAIDebug == true
+    ) or false
+end
+
 local function debugEnabled(settings)
     return settings and (
-        settings.showAIDebug == true
+        nameplateDebugEnabled(settings)
             or settings.showPathDebug == true
             or settings.showCombatDebug == true
             or settings.showZombieDebug == true

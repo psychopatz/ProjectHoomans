@@ -86,7 +86,7 @@
   saves, recovering the NPC's standing posture; the flag exists only during
   the synchronous filtered LOS recount and cannot reach ordinary NPC update or
   replication
-- while the AI debug overlay is enabled, the safeguard emits cadence-bounded
+- while the global diagnostics switch is enabled, the safeguard emits cadence-bounded
   `human_safeguard` counter decisions and one `sleep_gate` line per sleep
   attempt with visible/chasing/very-close counters before and after correction
   plus the remaining panic value

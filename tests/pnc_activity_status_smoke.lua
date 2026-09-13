@@ -215,8 +215,23 @@ local generic = Status.Build({
     activeBehavior = "GuardAnchor",
     runtime = {},
 })
+T.equal(generic.kind, "behavior",
+    "generic behavior is not exposed as a player-facing activity")
+T.equal(generic.behaviorId, "GuardAnchor",
+    "generic behavior keeps its machine-readable identity")
 T.equal(generic.fallback, "Guard Anchor",
-    "unknown future jobs receive a readable fallback automatically")
+    "unknown behaviors retain a readable compatibility fallback")
+
+local followOwner = Status.Build({
+    alive = true,
+    activeJob = "FollowOwner",
+    activeBehavior = "FollowOwner:idle",
+    runtime = {},
+})
+T.equal(followOwner.kind, "behavior",
+    "FollowOwner idle is classified as debug behavior")
+T.equal(followOwner.behaviorId, "FollowOwner:idle",
+    "FollowOwner idle keeps its diagnostic behavior identity")
 
 Status.Register("mod_activity", 95, function(record)
     if record.runtime and record.runtime.modActivity then

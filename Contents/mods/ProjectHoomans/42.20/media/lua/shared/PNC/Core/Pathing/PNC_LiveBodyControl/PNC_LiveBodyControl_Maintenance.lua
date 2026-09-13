@@ -63,6 +63,14 @@ function LiveBodyControl.ShouldKeepEngineMovementActive(record, zombie)
     local treatment = runtime and runtime.selfTreatment or nil
     local modData = zombie and zombie.getModData and zombie:getModData() or nil
     local now = Core and Core.Now and Core.Now() or 0
+    -- A chair is a stronger owner than a stale native movement lease. Combat
+    -- and damage still release the seat through the normal behavior arbiter.
+    if LiveBodyControl.IsSeated
+        and LiveBodyControl.IsSeated(record)
+        and not LiveBodyControl.IsSeatedCombatActive(record, now)
+    then
+        return false
+    end
     if Internal.hasNativeGetUpLease(zombie, now) then return true end
     if Core and Core.IsAuthority and not Core.IsAuthority() then
         local actionState = LiveBodyControl.GetActionStateName(zombie)

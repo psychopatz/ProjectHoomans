@@ -18,6 +18,11 @@ local function catalogColor(value, dimmed, readable)
     return 0.72, 0.74, 0.78
 end
 
+local function scaledOpacity(self, value)
+    local multiplier = tonumber(self.contentOpacity) or 1
+    return math.max(0, math.min(1, (tonumber(value) or 0) * multiplier))
+end
+
 local function drawCatalogColumns(self, y, row, dimmed)
     local columns = self.catalogColumns
     if type(columns) ~= "table" or type(row.catalogCells) ~= "table" then
@@ -52,11 +57,14 @@ function ISPNCInventoryList:doDrawItem(y, listItem, alt)
     local stripe = (listItem.index or 0) % 2 == 0
     local dimmed = row.restricted == true
     if selected then
-        self:drawRect(0, y, self.width, self.itemheight, 0.32, 0.32, 0.36, 0.40)
+        self:drawRect(0, y, self.width, self.itemheight,
+            scaledOpacity(self, 0.32), 0.32, 0.36, 0.40)
     elseif stripe then
-        self:drawRect(0, y, self.width, self.itemheight, 0.13, 0.13, 0.13, 0.46)
+        self:drawRect(0, y, self.width, self.itemheight,
+            scaledOpacity(self, 0.13), 0.13, 0.13, 0.46)
     else
-        self:drawRect(0, y, self.width, self.itemheight, 0.07, 0.07, 0.07, 0.46)
+        self:drawRect(0, y, self.width, self.itemheight,
+            scaledOpacity(self, 0.07), 0.07, 0.07, 0.46)
     end
     local indent = row.groupHeader and 12 or row.groupChild and 12 or 0
     if row.groupHeader then
@@ -149,6 +157,11 @@ end
 function ISPNCInventoryList:selectedRow()
     local entry = self.items and self.items[self.selected or 0] or nil
     return entry and entry.item or nil
+end
+
+function ISPNCInventoryList:setContentOpacity(alpha)
+    self.contentOpacity = math.max(0.1, math.min(1, tonumber(alpha) or 1))
+    return self.contentOpacity
 end
 
 -- PZ sends list callbacks with coordinates that can be stale when the list is

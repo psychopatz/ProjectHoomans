@@ -5,12 +5,13 @@ PNC.Settings = PNC.Settings or {}
 local Settings = PNC.Settings
 local ModOptions = PZAPI and PZAPI.ModOptions or nil
 
-local function setAIDebug(value)
+local function setNameplateDebug(value)
     value = value == true
+    PNC.Nameplates.Settings.showNameplateDebug = value
     PNC.Nameplates.Settings.showAIDebug = value
-    PNC.SettingsStore:Set("showAIDebug", value, true)
+    PNC.SettingsStore:Set("showNameplateDebug", value, true)
     PNC.Runtime = PNC.Runtime or {}
-    PNC.Runtime.debugEnabled = value
+    PNC.Runtime.nameplateDebugEnabled = value
 end
 
 local function setStoredFlag(id, value)
@@ -21,16 +22,19 @@ end
 
 local function currentFlag(id, fallback)
     local value = PNC.Nameplates.Settings[id]
+    if id == "showNameplateDebug" and value == nil then
+        value = PNC.Nameplates.Settings.showAIDebug
+    end
     if value == nil then return fallback == true end
     return value == true
 end
 
 local definitions = {
     {
-        id = "showAIDebug",
-        label = "UI_PNC_Settings_ShowAIDebug",
-        get = function() return currentFlag("showAIDebug", false) end,
-        set = setAIDebug,
+        id = "showNameplateDebug",
+        label = "UI_PNC_Settings_ShowNameplateDebug",
+        get = function() return currentFlag("showNameplateDebug", false) end,
+        set = setNameplateDebug,
     },
     {
         id = "showCampDebug",

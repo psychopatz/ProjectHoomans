@@ -5,6 +5,34 @@ local Core = PNC.Core
 local Const = PNC.Const
 local Common = PNC.BehaviorCommon
 
+local function holdSeatedGuard(record, zombie)
+    local LiveBodyControl = PNC.LiveBodyControl
+    local now
+    if not LiveBodyControl
+        or not LiveBodyControl.IsSeated
+        or LiveBodyControl.IsSeated(record) ~= true
+    then
+        return false
+    end
+    now = Core and Core.Now and Core.Now() or 0
+    if LiveBodyControl.IsSeatedCombatActive
+        and LiveBodyControl.IsSeatedCombatActive(record, now)
+    then
+        -- SeatedThreat/Combat owns the live movement lane while a threat is
+        -- active. Do not clear its target or replace its combat route here.
+        record.activeBehavior = "GuardAnchor:combat"
+        return true
+    end
+    -- GuardAnchor can be reached during an order/scene handoff. A seated
+    -- guard must hold its current presentation until the seat arbiter has
+    -- explicitly released it; returning to the anchor would recreate the
+    -- movement-vs-chair race that this order is meant to avoid.
+    record.activeBehavior = "GuardAnchor:seated"
+    Common.ClearCombatTarget(record, "guarding_seated", zombie)
+    Common.HaltMovement(record, zombie, "guarding_seated")
+    return true
+end
+
 function Internal.TickGuardAnchor(record, zombie)
     local order = record.orderSpec or {}
     local anchorX = tonumber(order.x) or record.anchorX
@@ -28,6 +56,7 @@ function Internal.TickGuardAnchor(record, zombie)
         record.activeBehavior = "GuardAnchor:combat"
         return true
     end
+    if holdSeatedGuard(record, zombie) then return true end
     record.activeBehavior = "GuardAnchor"
     Common.ClearCombatTarget(record, "guarding_anchor")
     Common.MoveRecord(

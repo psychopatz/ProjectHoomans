@@ -73,6 +73,35 @@ T.equal(filtered, "Target: zombie", "component filtering")
 T.falsy(string.find(tostring(filtered), tostring("AI:"), 1, true), "hidden AI component")
 T.falsy(string.find(tostring(filtered), tostring("Weapon:"), 1, true), "hidden combat component")
 
+snapshot.debugState.activeBehavior = "FollowOwner:idle"
+local behaviorSummary = PNC.NameplateDebug.BuildText(snapshot, true, {
+    showNameplateDebug = true,
+    showAIDebug = false,
+    debugShowPresence = false,
+    debugShowAI = true,
+    debugShowJob = false,
+    debugShowOrder = false,
+    debugShowTarget = false,
+    debugShowCombat = false,
+    debugShowMagazine = false,
+    debugShowStamina = false,
+    debugShowBlock = false,
+})
+T.contains(behaviorSummary, "Behavior: FollowOwner:idle",
+    "nameplate debug exposes the raw behavior state")
+
+local presenceBehaviorSummary = PNC.NameplateDebug.BuildText({
+    presenceState = "LIVE",
+    aiState = "Idle",
+    activeBehavior = "FollowOwner:idle",
+}, true, {
+    showNameplateDebug = true,
+    showAIDebug = false,
+    debugShowAI = true,
+})
+T.contains(presenceBehaviorSummary, "Behavior: FollowOwner:idle",
+    "presence-only snapshots expose the raw behavior state")
+
 snapshot.combatDebugState = {
     attackType = "auto",
     mode = "melee",
@@ -320,14 +349,14 @@ actionText = PNC.NameplatePresentation.ActionStatus(snapshot)
 T.contains(actionText, "Grabbing", "provision pickup action verb")
 T.contains(actionText, "Apple", "provision pickup actual item")
 snapshot.actionInformation = {
-    kind = "activity",
+    kind = "behavior",
+    behaviorId = "GuardAnchor",
     activityId = "job:GuardAnchor",
     fallback = "Guard Anchor",
 }
+snapshot.bodyHealth.wounds = {}
 actionText = PNC.NameplatePresentation.ActionStatus(snapshot)
-T.contains(actionText, "Guard Anchor", "generic job activity fallback")
-T.equal(actionText, "Guard Anchor",
-    "generic job activity does not invent an item suffix")
+T.equal(actionText, "", "behavior state is not rendered as an action")
 snapshot.actionInformation = nil
 
 local entriesSource = T.read(
@@ -982,7 +1011,8 @@ local overlayManager = {
 }
 PNC.NameplateEntries.Refresh(overlayManager, {
     enabled = true,
-    showAIDebug = true,
+    showNameplateDebug = true,
+    showAIDebug = false,
     debugShowAnimation = false,
 })
 T.truthy(overlayManager.entries["unknown-npc"] ~= nil,
@@ -1098,7 +1128,8 @@ local debugOnlyManager = {
 local debugTextCountBefore = #positionedText
 PNC.NameplateRenderer.Render(debugOnlyManager, {
     enabled = true,
-    showAIDebug = true,
+    showNameplateDebug = true,
+    showAIDebug = false,
 })
 T.equal(#positionedText, debugTextCountBefore + 1,
     "debug-only entry renders its independent overlay")

@@ -14,6 +14,19 @@ local NATIVE_PASSAGE_STATES = {
     ["climbwall"] = true,
 }
 
+-- A seated managed body must not retain a native zombie movement/alert state
+-- after the chair has become the presentation owner. Keep this narrower than
+-- SUPPRESSED_STATES: turnalerted is still meaningful to ordinary movement,
+-- but it is an unsafe native handoff while the body is seated.
+local SEATED_NATIVE_RESET_STATES = {
+    ["turnalerted"] = true,
+    ["pathfind"] = true,
+    ["walktoward"] = true,
+    ["walktowardnetwork"] = true,
+    ["lunge"] = true,
+    ["lungenetwork"] = true,
+}
+
 Internal.GROUNDED_STATES = {
     ["falldown"] = true,
     ["onground"] = true,
@@ -106,6 +119,76 @@ end
 function LiveBodyControl.GetActionStateName(zombie)
     if not zombie or not zombie.getActionStateName then return "" end
     return string.lower(tostring(zombie:getActionStateName() or ""))
+end
+
+function LiveBodyControl.IsSeated(record)
+    local runtime = record and record.runtime or nil
+    local activity = runtime and runtime.facilityActivity or nil
+    local roamingSeat = runtime and runtime.roamingSeat or nil
+    if activity and activity.seating == true
+        and (activity.seatEntered == true
+            or activity.phase == "SEAT_ENTRY"
+            or activity.phase == "SITTING"
+            or activity.phase == "SEATED")
+    then
+        return true
+    end
+    return roamingSeat and roamingSeat.seating == true
+        and (roamingSeat.seatEntered == true
+            or roamingSeat.phase == "SEAT_ENTRY"
+            or roamingSeat.phase == "SITTING"
+            or roamingSeat.phase == "SEATED")
+        or false
+end
+
+function LiveBodyControl.ReleaseSeatedMovement(record, zombie, reason)
+    local runtime = record and record.runtime or nil
+    local intent = runtime and runtime.moveIntent or nil
+    local hasMovementOwner = runtime and (
+        runtime.pathing ~= nil
+            or runtime.localNavigation ~= nil
+            or intent and intent.kind == "move"
+    )
+    if not hasMovementOwner then return false end
+    if PNC.PathService and PNC.PathService.Reset then
+        PNC.PathService.Reset(zombie, record)
+        return true
+    end
+    if PNC.EnginePathPlanner and PNC.EnginePathPlanner.Invalidate then
+        PNC.EnginePathPlanner.Invalidate(record, reason or "seated_hold", zombie)
+    end
+    if runtime then
+        runtime.moveIntent = nil
+        runtime.pathing = nil
+        runtime.localNavigation = nil
+    end
+    return true
+end
+
+function LiveBodyControl.IsSeatedCombatActive(record, now)
+    local runtime = record and record.runtime or nil
+    local health = record and record.health or nil
+    local attackAction = runtime and runtime.attackAction or nil
+    local target = runtime and runtime.target or nil
+    local seatedThreat = runtime and runtime.seatedThreat or nil
+    if not runtime then return false end
+    now = tonumber(now) or (PNC.Core and PNC.Core.Now
+        and PNC.Core.Now() or 0)
+    if type(target) == "table" and target.kind ~= nil then return true end
+    if type(attackAction) == "table"
+        and (attackAction.finishAt == nil
+            or now < (tonumber(attackAction.finishAt) or 0))
+    then
+        return true
+    end
+    if seatedThreat and seatedThreat.active == true then return true end
+    if now < (tonumber(runtime.inCombatUntil) or 0) then return true end
+    return now < (tonumber(health and health.recentDamageUntil) or 0)
+end
+
+function LiveBodyControl.IsSeatedNativeResetState(actionState)
+    actionState = string.lower(tostring(actionState or ""))
+    return SEATED_NATIVE_RESET_STATES[actionState] == true
 end
 
 -- Read the action-context state through IsoGameCharacter's exposed wrapper.
@@ -332,49 +415,48 @@ end
 function LiveBodyControl.ResetNativeMovementState(zombie)
     local moving = false
     if not zombie
-        or not zombie.isCurrentState
         or not zombie.changeState
         or not ZombieIdleState
         or not ZombieIdleState.instance
     then
         return false
     end
-    if PathFindState
+    if zombie.isCurrentState and PathFindState
         and PathFindState.instance
         and zombie:isCurrentState(PathFindState.instance())
     then
         moving = true
-    elseif WalkTowardState
+    elseif zombie.isCurrentState and WalkTowardState
         and WalkTowardState.instance
         and zombie:isCurrentState(WalkTowardState.instance())
     then
         moving = true
-    elseif WalkTowardNetworkState
+    elseif zombie.isCurrentState and WalkTowardNetworkState
         and WalkTowardNetworkState.instance
         and zombie:isCurrentState(WalkTowardNetworkState.instance())
     then
         moving = true
-    elseif LungeState
+    elseif zombie.isCurrentState and LungeState
         and LungeState.instance
         and zombie:isCurrentState(LungeState.instance())
     then
         moving = true
-    elseif LungeNetworkState
+    elseif zombie.isCurrentState and LungeNetworkState
         and LungeNetworkState.instance
         and zombie:isCurrentState(LungeNetworkState.instance())
     then
         moving = true
-    elseif ClimbThroughWindowState
+    elseif zombie.isCurrentState and ClimbThroughWindowState
         and ClimbThroughWindowState.instance
         and zombie:isCurrentState(ClimbThroughWindowState.instance())
     then
         moving = true
-    elseif ClimbOverFenceState
+    elseif zombie.isCurrentState and ClimbOverFenceState
         and ClimbOverFenceState.instance
         and zombie:isCurrentState(ClimbOverFenceState.instance())
     then
         moving = true
-    elseif ClimbOverWallState
+    elseif zombie.isCurrentState and ClimbOverWallState
         and ClimbOverWallState.instance
         and zombie:isCurrentState(ClimbOverWallState.instance())
     then
@@ -382,6 +464,55 @@ function LiveBodyControl.ResetNativeMovementState(zombie)
     end
     if not moving then return false end
     zombie:changeState(ZombieIdleState.instance())
+    return true
+end
+
+-- Seating has a second native-state lane that is not covered by the generic
+-- movement state classes (notably turnalerted). Keep that reset explicitly
+-- scoped to a live seat owner so combat and unrelated NPC movement cannot be
+-- cleared by a general recovery call.
+function LiveBodyControl.ResetSeatedNativeMovementState(zombie)
+    local actionState
+    if not zombie
+        or not zombie.changeState
+        or not ZombieIdleState
+        or not ZombieIdleState.instance
+    then
+        return false
+    end
+    actionState = LiveBodyControl.GetActionStateName(zombie)
+    if not LiveBodyControl.IsSeatedNativeResetState(actionState) then
+        return false
+    end
+    zombie:changeState(ZombieIdleState.instance())
+    return true
+end
+
+-- Seat entry can occur between zombie-update callbacks. Stabilize the native
+-- carrier at that ownership boundary so a stale walk/alert action cannot
+-- survive into the first furniture scene frame.
+function LiveBodyControl.StabilizeSeatedBody(record, zombie, now)
+    local modData
+    local actionState
+    if not zombie or not LiveBodyControl.IsSeated(record)
+        or LiveBodyControl.IsSeatedCombatActive(record, now)
+    then
+        return false
+    end
+    now = tonumber(now) or (PNC.Core and PNC.Core.Now
+        and PNC.Core.Now() or 0)
+    LiveBodyControl.ReleaseSeatedMovement(record, zombie, "seated_entry")
+    modData = zombie.getModData and zombie:getModData() or nil
+    if Internal.hasBumpActionLease(zombie, now) then
+        Internal.clearVanillaIntent(zombie)
+        Internal.applyActionLeaseSafeguards(zombie, modData)
+        return true
+    end
+    actionState = LiveBodyControl.GetActionStateName(zombie)
+    if LiveBodyControl.IsSeatedNativeResetState(actionState) then
+        LiveBodyControl.ResetSeatedNativeMovementState(zombie)
+    end
+    LiveBodyControl.ApplyHumanizedBodyFlags(zombie, false)
     return true
 end
 

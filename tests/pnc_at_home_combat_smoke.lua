@@ -117,6 +117,30 @@ T.truthy(PNC.BehaviorCompanion.Internal.TickGuardAnchor(stayRecord, {}),
 T.equal(stayRecord.activeBehavior, "GuardAnchor",
     "Stay returns to its idle behavior after combat")
 
+-- GuardAnchor must not reissue its anchor route if a seat presentation still
+-- owns the body during an order/scene handoff.
+local guardMoves = 0
+local guardHolds = 0
+PNC.BehaviorCommon.MoveRecord = function()
+    guardMoves = guardMoves + 1
+end
+PNC.BehaviorCommon.HaltMovement = function()
+    guardHolds = guardHolds + 1
+end
+PNC.LiveBodyControl = {
+    IsSeated = function() return true end,
+    IsSeatedCombatActive = function() return false end,
+}
+stayRecord.x = 20
+T.truthy(PNC.BehaviorCompanion.Internal.TickGuardAnchor(stayRecord, {}),
+    "seated guard stays handled by GuardAnchor")
+T.equal(stayRecord.activeBehavior, "GuardAnchor:seated",
+    "seated guard exposes its presentation hold")
+T.equal(guardMoves, 0,
+    "seated guard reissued movement to its anchor")
+T.equal(guardHolds, 1,
+    "seated guard did not hold its movement lane")
+
 T.finish("pnc_at_home_combat_smoke")
 
 T.finish("pnc_at_home_combat_smoke")
