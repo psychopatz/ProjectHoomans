@@ -4,7 +4,7 @@ T.addPackagePaths({ { "ProjectHoomans", "client" },
 
 PNC = { Network = { ClientState = {} } }
 local Policy = T.load("ProjectHoomans", "client",
-    "PNC/UI/Communities/ColonyManagement/PNC_BuildingPlacementPolicy.lua")
+    "PNC/UI/Base/PNC_BaseBuildingPlacementPolicy.lua")
 
 local settlement = { geometry = { region = { levels = {
     [0] = { rows = { [10] = { 10, 12 } } },

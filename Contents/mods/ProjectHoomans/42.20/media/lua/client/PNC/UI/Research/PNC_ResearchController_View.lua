@@ -4,7 +4,7 @@ require "PsychopatzCore/UI/PsychopatzUI"
 local View = {}
 local UI = PsychopatzCore.UI
 local Components = require
-    "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Components"
+    "PNC/UI/Shared/PNC_ColonyUIComponents"
 local Model = require "PNC/UI/Research/PNC_ResearchModel"
 local Presentation = require "PNC/UI/Research/PNC_ResearchPresentation"
 local Options = require "PsychopatzCore/UI/PsychopatzCommandHubOptions"

@@ -7,7 +7,7 @@ getSpecificPlayer = function()
 end
 
 package.preload[
-    "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Shared"
+    "PNC/UI/Shared/PNC_ColonyUIShared"
 ] = function()
     return { SettlementReason = function(reason) return reason end }
 end
@@ -21,7 +21,7 @@ local opened
 local request
 local baseRegion = { levels = { [0] = { rows = { [10] = { 10, 12 } } } } }
 package.preload[
-    "PNC/UI/Communities/ColonyManagement/SettlementManagement/PNC_SettlementManagement_SelectorSupport"
+    "PNC/UI/SettlementManagement/PNC_SettlementManagement_SelectorSupport"
 ] = function()
     return {
         Tr = function(_, fallback) return fallback end,
@@ -44,7 +44,7 @@ package.preload[
         ApplyLocalResult = function() end,
     }
 end
-package.preload["PNC/UI/Communities/ColonyManagement/PNC_BuildingPlacement"] =
+package.preload["PNC/UI/Base/PNC_BaseBuildingPlacement"] =
     function() return {} end
 
 PNC = {
@@ -70,7 +70,7 @@ PNC = {
 }
 
 local Facility = require(
-    "PNC/UI/Communities/ColonyManagement/SettlementManagement/"
+    "PNC/UI/SettlementManagement/"
     .. "PNC_SettlementManagement_FacilityActions")
 local region = { levels = { [0] = { rows = { [10] = { 10, 10 } } } } }
 local window = { snapshot = { settlement = {

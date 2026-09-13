@@ -190,6 +190,33 @@ if Const.CMD_COMPANION_COMMAND_RESULT then
             args = type(args) == "table" and args or {}
             player = getSpecificPlayer and getSpecificPlayer(0) or nil
             commandSource = tostring(args.commandSource or "")
+            if commandSource == "colonist_activities"
+                or string.match(tostring(args.commandID or ""), "^manual_")
+                    ~= nil
+            then
+                local targets = args.targets
+                local handled = false
+                if type(targets) == "table" then
+                    for _, value in ipairs(targets) do
+                        if PNC.Client
+                            and PNC.Client.RecordManualActivityDiagnostic
+                        then
+                            PNC.Client.RecordManualActivityDiagnostic(value,
+                                args.commandID, args.accepted == true,
+                                args.reason, args.requestID, args.details)
+                            handled = true
+                        end
+                    end
+                end
+                if not handled and args.id and PNC.Client
+                    and PNC.Client.RecordManualActivityDiagnostic
+                then
+                    PNC.Client.RecordManualActivityDiagnostic(args.id,
+                        args.commandID, args.accepted == true, args.reason,
+                        args.requestID, args.details)
+                end
+                return
+            end
             if commandSource == "companion_emote" then
                 targets = {}
                 for _, value in ipairs(args.targets or {}) do

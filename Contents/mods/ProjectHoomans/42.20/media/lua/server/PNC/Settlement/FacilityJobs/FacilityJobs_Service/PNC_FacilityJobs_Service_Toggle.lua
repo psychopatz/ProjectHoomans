@@ -14,7 +14,9 @@ function H.SameManualActivity(requested, active)
     active = tostring(active or "")
     if requested == active then return true end
     if requested == "survival.eat.inventory" and active == "food.dine"
-        or requested == "water.drink" and active == "water.nearby"
+        or requested == "survival.drink.inventory"
+            and (active == "survival.drink.world"
+                or active == "survival.drink.inventory")
     then
         return true
     end
@@ -49,7 +51,7 @@ local function releaseWorkAssignment(record, reason)
     return true
 end
 
-function Jobs.ToggleManual(record, capability)
+function Jobs.ToggleManual(record, capability, commandContext)
     local runtime = record and record.runtime or nil
     local activity = runtime and runtime.facilityActivity or nil
     local requested = tostring(capability or "")
@@ -94,7 +96,7 @@ function Jobs.ToggleManual(record, capability)
             "manual_sleep_override")
         if not released then return false, releaseReason end
     end
-    local started, reason = H.ManualStart(record, requested)
+    local started, reason = H.ManualStart(record, requested, commandContext)
     if started and requested == "sleep" then
         record.runtime.manualActivityDisabled = nil
     end

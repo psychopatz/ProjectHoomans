@@ -125,17 +125,17 @@ T.truthy(furnitureScene and furnitureScene.repeatMode == "loop"
         and furnitureScene.steps[1].loop == true
         and furnitureScene.steps[1].durationMs == 0,
     "furniture seating scene must hold the dedicated chair pose")
-local drinkScene = PNC.AnimationScenes.Get("facility.water.drink")
+local drinkScene = PNC.AnimationScenes.Get("survival.drink.world")
 T.truthy(drinkScene and drinkScene.bump == "Drink"
         and drinkScene.repeatMode == "once",
-    "spigot drinking scene must be a one-shot drink")
+    "world drinking scene must be a one-shot drink")
 bodyModData.PNC_BumpActionLease = true
 bodyModData.PNC_BumpActionLeaseUntil = now + 10000
 bodyModData.PNC_BumpRequestedType = "PNC_ClimbWindow"
 local deferredDrink, deferredReason = PNC.AnimationScenes.Request(
     record,
     body,
-    "facility.water.drink",
+    "survival.drink.world",
     { now = now }
 )
 T.equal(deferredDrink, false,

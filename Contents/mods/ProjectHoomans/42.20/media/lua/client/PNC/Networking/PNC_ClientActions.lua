@@ -15,6 +15,46 @@ local Registry = PNC.Registry
 local ClientState = PNC.Network.ClientState
 local CompanionInitialization = require "PNC/Core/Companions/PNC_DebugCompanionInitialization"
 
+-- Keep manual-activity feedback in the same client state that drives the
+-- Colonists window. This lets local and multiplayer command paths present the
+-- same rejection reason without adding a second activity-specific transport.
+function Client.RecordManualActivityDiagnostic(npcID, commandID, accepted,
+        reason, requestID, details)
+    local id = tostring(npcID or "")
+    local state = ClientState
+    local diagnostic
+    local snapshot
+    local person
+    local index
+    if id == "" then return false end
+    diagnostic = {
+        commandID = tostring(commandID or ""),
+        result = accepted == true,
+        reason = tostring(reason or (accepted and "commanded" or
+            "command_rejected")),
+        requestID = requestID,
+        details = Core.DeepCopy(details),
+        at = Core.Now(),
+    }
+    state.manualActivityDiagnostics = state.manualActivityDiagnostics or {}
+    state.manualActivityDiagnostics[id] = diagnostic
+    snapshot = state.colonyManagement
+    if type(snapshot) ~= "table" or type(snapshot.people) ~= "table" then
+        return true
+    end
+    for index = 1, #snapshot.people do
+        person = snapshot.people[index]
+        if person and tostring(person.id or "") == id then
+            person.manualActivityDiagnostic = diagnostic
+            state.colonyManagementRevision =
+                (tonumber(state.colonyManagementRevision) or 0) + 1
+            state.lastColonyManagementReceiveAt = Core.Now()
+            return true
+        end
+    end
+    return true
+end
+
 local function traceCompanionCommand(commandID, npcId, scope, context, result)
     local trace = PsychopatzCore and PsychopatzCore.DebugTrace
     if not trace or not trace.IsEnabled or not trace.IsEnabled() then
@@ -520,6 +560,21 @@ local function rejectUnsafeCampLocally(player, npcId, scope, context)
     if string.lower(tostring(scope or "")) ~= "group"
         or not Registry or not Registry.ForEach
     then
+        return false
+    end
+    if commands.CanCampAtPlayer then
+        allowed, reason = commands.CanCampAtPlayer(player)
+        if allowed ~= true then
+            if not isCampEmoteContext(context) then
+                showCampRejection(
+                    player, nil, reason or "camp_requires_building",
+                    context, nil)
+            end
+            return reason == "camp_requires_building"
+        end
+        -- The authoritative group command considers all owned followers,
+        -- including abstract and distant records. Do not apply the local
+        -- live-radius filter to the preview.
         return false
     end
     Registry.ForEach(function(candidate)

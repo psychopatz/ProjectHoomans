@@ -14,7 +14,7 @@ package.preload["PsychopatzCore/UI/PsychopatzUI"] = function()
     return PsychopatzCore.UI
 end
 package.preload[
-    "PNC/UI/Communities/ColonyManagement/SettlementManagement/PNC_SettlementManagement_Actions"
+    "PNC/UI/SettlementManagement/PNC_SettlementManagement_Actions"
 ] = function() return {
     Handle = function() return true end,
     NextAnchorRole = function() return "work.craft" end,
@@ -24,13 +24,13 @@ package.preload[
 local browserRebuilt = false
 local selectedFacility
 package.preload[
-    "PNC/UI/Communities/ColonyManagement/SettlementManagement/PNC_SettlementManagement_FacilityBrowser"
+    "PNC/UI/SettlementManagement/PNC_SettlementManagement_FacilityBrowser"
 ] = function() return {
     Rebuild = function() browserRebuilt = true end,
     GetSelected = function() return selectedFacility end,
 } end
 package.preload[
-    "PNC/UI/Communities/ColonyManagement/PNC_SettlementLayoutOverlay"
+    "PNC/UI/SettlementManagement/PNC_SettlementLayoutOverlay"
 ] = function()
     return {
         SetSettlement = function() end,
@@ -40,7 +40,7 @@ end
 
 PNC = { FacilityDefinitions = { Get = function() end } }
 local BaseTab = require(
-    "PNC/UI/Communities/ColonyManagement/SettlementManagement/PNC_SettlementManagement_Tab"
+    "PNC/UI/SettlementManagement/PNC_SettlementManagement_Tab"
 )
 local title
 local overlayButton = { setTitle = function(_, value) title = value end }

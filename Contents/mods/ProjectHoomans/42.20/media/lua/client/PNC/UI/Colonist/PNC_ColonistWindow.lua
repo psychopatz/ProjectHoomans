@@ -2,7 +2,7 @@ require "PsychopatzCore/UI/PsychopatzUI"
 
 local Controller = require "PNC/UI/Colonist/PNC_ColonistController"
 local Options = require "PsychopatzCore/UI/PsychopatzCommandHubOptions"
-local Shared = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Shared"
+local Shared = require "PNC/UI/Shared/PNC_ColonyUIShared"
 local WidgetWindow = PsychopatzCore.UI.WidgetWindow
 local Client = PNC.ColonyManagementClient
 local UI = PsychopatzCore.UI

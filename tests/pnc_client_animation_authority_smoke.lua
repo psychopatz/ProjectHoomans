@@ -488,7 +488,7 @@ local deferredSceneSnapshot = {
         anim = "Drink",
         moving = false,
         sceneActive = true,
-        sceneId = "facility.water.drink",
+        sceneId = "survival.drink.world",
         sceneBump = "Drink",
         sceneRevision = 1,
         scenePlaybackRevision = 1,
@@ -517,7 +517,7 @@ PNC.ClientPresenceSync.Internal.ApplySnapshotToBody(
     true
 )
 T.truthy(deferredSceneBody:getModData().PNC_ClientAnimationSceneKey
-        == "facility.water.drink:1:1",
+        == "survival.drink.world:1:1",
     "deferred drink scene did not retry after traversal ownership ended")
 T.finish("pnc_client_animation_authority_smoke")
 

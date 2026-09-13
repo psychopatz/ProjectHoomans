@@ -8,6 +8,13 @@ local Const = PNC.Const
 local CompanionCommands = PNC.CompanionCommands
 local MapCommandService = PNC.MapCommandService
 
+local function isColonistActivityCommand(args)
+    return tostring(args and args.commandSource or "")
+            == "colonist_activities"
+        or string.match(tostring(args and args.commandID or ""), "^manual_")
+            ~= nil
+end
+
 Router.Register(Const.CMD_COMPANION_COMMAND, function(player, args)
     if not args.commandID then return end
     if CompanionCommands and CompanionCommands.Execute then
@@ -15,8 +22,8 @@ Router.Register(Const.CMD_COMPANION_COMMAND, function(player, args)
             CompanionCommands.Execute(player, args)
         if sendServerCommand
             and (tostring(args.commandID) == "camp"
-                or tostring(args.commandSource or "")
-                    == "companion_emote")
+                or tostring(args.commandSource or "") == "companion_emote"
+                or isColonistActivityCommand(args))
         then
             sendServerCommand(
                 player,
@@ -35,6 +42,19 @@ Router.Register(Const.CMD_COMPANION_COMMAND, function(player, args)
                     commandSource = args.commandSource,
                 }
             )
+        end
+        if isColonistActivityCommand(args)
+            and PNC.Core and PNC.Core.Log
+        then
+            PNC.Core.Log(tonumber(affected) and affected > 0
+                    and "INFO" or "WARN",
+                "manual_activity_command npc="
+                    .. tostring(args.id or "group")
+                    .. " command=" .. tostring(args.commandID or "")
+                    .. " affected=" .. tostring(affected or 0)
+                    .. " reason=" .. tostring(reason or "unknown")
+                    .. " requestID=" .. tostring(args.requestID or "")
+                    .. " source=" .. tostring(args.commandSource or "network"))
         end
         if tostring(args.commandID) == "manual_corpse_haul"
             and PNC.Core and PNC.Core.Log

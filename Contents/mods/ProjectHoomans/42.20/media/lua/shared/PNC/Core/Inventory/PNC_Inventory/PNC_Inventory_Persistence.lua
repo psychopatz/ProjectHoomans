@@ -70,10 +70,10 @@ function Inventory.Serialize(record)
     }
 end
 
-function Inventory.Deserialize(record, rawInventory)
+function Inventory.Deserialize(record, rawInventory, options)
     if not record then return nil end
     if type(rawInventory) ~= "table" then
-        return Inventory.CreateFromTemplate(record)
+        return Inventory.CreateFromTemplate(record, options)
     end
     local inv
     local reason
@@ -91,6 +91,8 @@ function Inventory.Deserialize(record, rawInventory)
                 and rawInventory[4] or {}
             inv = Inventory.CreateFromTemplate(record, {
                 createdAtHours = baselinePayload.createdAtHours,
+                reconcileWaterContainer = options
+                    and options.reconcileWaterContainer,
             })
             if mode == "BASELINE_DELTA" then
                 local applied
@@ -108,5 +110,5 @@ function Inventory.Deserialize(record, rawInventory)
     if not inv and PNC.Core and PNC.Core.LogWarn then
         PNC.Core.LogWarn("PNC inventory rejected payload: " .. tostring(reason))
     end
-    return inv or Inventory.CreateFromTemplate(record)
+    return inv or Inventory.CreateFromTemplate(record, options)
 end

@@ -20,7 +20,9 @@ local syncResult = Internal.syncResult
 
 local function transferNPCToPlayer(player, record, args, sinceRevision)
     local requestedIDs = type(args.itemIDs) == "table" and args.itemIDs or {}
-    local inv = Inventory.EnsureRecordInventory(record)
+    local inv = Inventory.EnsureRecordInventory(record, {
+        reconcileWaterContainer = false,
+    })
     local maxItems = tonumber(Const.INVENTORY_TRANSFER_MAX_ITEMS) or 64
     local maxQuantity = tonumber(Const.INVENTORY_TRANSFER_MAX_QUANTITY) or 1024
     local requestedQuantity = args.bulk ~= true and args.quantity ~= nil

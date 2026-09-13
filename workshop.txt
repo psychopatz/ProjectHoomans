@@ -1,5 +1,6 @@
 version=1
+id=3799685526
 title=ProjectHoomans
-description=Standalone NPC framework for Project Zomboid Build 42.<LINE><LINE>Includes server-authoritative companion and hostile NPC foundations, live/abstract presence transitions, shared combat/health systems, and debug tooling.
-tags=Build 42;Framework;Multiplayer;Server;WIP
+description=Standalone NPC framework for Project Zomboid Build 42.
+tags=Build 42;Balance;Building;Framework;Multiplayer;Realistic;WIP
 visibility=private

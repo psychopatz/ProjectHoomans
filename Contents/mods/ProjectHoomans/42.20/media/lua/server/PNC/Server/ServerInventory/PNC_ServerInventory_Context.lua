@@ -11,6 +11,7 @@ local Const = PNC.Const
 local Registry = PNC.Registry
 local Inventory = PNC.Inventory
 local Network = PNC.Network
+local Core = PNC.Core
 local ItemTransfer =
     require "PsychopatzCore/Inventory/PsychopatzItemTransfer"
 
@@ -64,6 +65,7 @@ local function canGift(player, record, args)
             {
                 maximumDistance = lease.maximumDistance,
                 dangerRadius = lease.dangerRadius,
+                guardThreats = lease.guardThreats ~= false,
                 allowHostileParley = false,
             }
         )
@@ -96,11 +98,29 @@ local function canManage(player, record)
 end
 
 local function checkRevision(record, args)
-    local inv = Inventory.EnsureRecordInventory(record)
+    local inv = Inventory.EnsureRecordInventory(record, {
+        reconcileWaterContainer = false,
+    })
     local expected = tonumber(args and args.inventoryRevision)
+    local actual = tonumber(inv and inv.revision) or 0
     if expected == nil then return false, "revision_missing" end
-    if expected ~= tonumber(inv and inv.revision) then
-        return false, "revision_conflict"
+    if expected ~= actual then
+        if Core and Core.LogWarn then
+            Core.LogWarn(
+                "[PNC][INVENTORY] revision conflict npc="
+                    .. tostring(record and record.id or "")
+                    .. " action=" .. tostring(args and args.actionID
+                        or args and args.direction or "")
+                    .. " item=" .. tostring(args and args.itemID or "")
+                    .. " expected=" .. tostring(expected)
+                    .. " current=" .. tostring(actual)
+                    .. " request=" .. tostring(args and args.requestId or "")
+            )
+        end
+        return false, "revision_conflict", {
+            expectedInventoryRevision = expected,
+            currentInventoryRevision = actual,
+        }
     end
     return true, expected
 end

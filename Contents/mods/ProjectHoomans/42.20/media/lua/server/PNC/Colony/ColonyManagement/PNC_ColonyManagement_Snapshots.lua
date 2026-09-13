@@ -219,10 +219,6 @@ function Management.BuildSnapshot(player, options)
     local base = colony and PNC.BaseService
         and PNC.BaseService.GetForColony(colony.id) or nil
     local settlement = Internal.BuildSettlementSnapshot(base, tasks)
-    local utilities = base and PNC.WaterUtilityService
-        and PNC.WaterUtilityService.BuildSnapshot(base.id)
-        or { waterLiters = 0, capacityLiters = 0, tanks = 0,
-            catchers = 0, litersPerTenMinutes = 0, facilities = {} }
     local factionSnapshot = playerFaction and {
         id = playerFaction.id,
         name = playerFaction.name,
@@ -239,7 +235,7 @@ function Management.BuildSnapshot(player, options)
         supplyShortages=supplyShortages,
         provisionStorage=provisionStorage,
         provisionSettings=provisionSettings,
-        settlement=settlement, utilities=utilities,
+        settlement=settlement, utilities={ facilities = {} },
         zoneState={
             lumber=ownedZoneSnapshot(PNC.LumberService, player),
             fishing=ownedZoneSnapshot(PNC.FishingService, player),

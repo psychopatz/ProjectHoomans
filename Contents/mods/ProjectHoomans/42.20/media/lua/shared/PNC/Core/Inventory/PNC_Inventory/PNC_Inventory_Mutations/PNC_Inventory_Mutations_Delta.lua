@@ -122,7 +122,9 @@ local function applyInventoryOperation(record, inv, op)
 end
 
 function Inventory.ApplyDelta(record, ops, reason)
-    local inv = Inventory.EnsureRecordInventory(record)
+    local inv = Inventory.EnsureRecordInventory(record, {
+        reconcileWaterContainer = false,
+    })
     local appliedOps = {}
     local applied
     local i

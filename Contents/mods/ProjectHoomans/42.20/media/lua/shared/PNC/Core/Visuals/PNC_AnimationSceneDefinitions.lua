@@ -347,10 +347,10 @@ Scenes.Register("ambient.roam.sitFurniture", {
     end,
 })
 
-Scenes.Register("facility.water.drink", {
-    label = "Drink from Spigot",
-    description = "Drink clean water from the colony spigot.",
-    category = "facility",
+Scenes.Register("survival.drink.inventory", {
+    label = "Drink from Personal Inventory",
+    description = "Pause a follow order to drink from a carried item.",
+    category = "survival",
     priority = 60,
     repeatMode = "once",
     blocking = true,
@@ -377,15 +377,48 @@ Scenes.Register("facility.water.drink", {
     end,
 })
 
-Scenes.Register("facility.water.drink.nearby", {
-    label = "Drink from Nearby Water",
-    description = "Drink clean water from a nearby container.",
-    category = "facility",
+Scenes.Register("survival.drink.world", {
+    label = "Drink from World Water",
+    description = "Drink clean water from a valid nearby world object.",
+    category = "survival",
     priority = 60,
     repeatMode = "once",
     blocking = true,
     stepGapMs = 180,
     steps = DRINK_STEPS,
+    interrupts = {
+        movement = true,
+        combat = true,
+        externalBump = true,
+        abstract = true,
+    },
+    onTick = function(record, zombie, scene, now)
+        local jobs = PNC and PNC.FacilityJobs
+        if jobs and jobs.OnSceneTick then
+            return jobs.OnSceneTick(record, zombie, scene, now)
+        end
+        return true
+    end,
+    onStop = function(record, zombie, scene, reason)
+        local jobs = PNC and PNC.FacilityJobs
+        if jobs and jobs.OnSceneStopped then
+            jobs.OnSceneStopped(record, zombie, scene, reason)
+        end
+    end,
+})
+
+Scenes.Register("survival.fill.water", {
+    label = "Fill Water Container",
+    description = "Fill an empty liquid container from a clean world source.",
+    category = "survival",
+    priority = 59,
+    repeatMode = "once",
+    blocking = true,
+    stepGapMs = 180,
+    steps = {
+        { id = "fill", bump = "PourWateringCan", durationMs = 3800 },
+        { id = "wipe_brow", bump = "WipeBrow", durationMs = 1800 },
+    },
     interrupts = {
         movement = true,
         combat = true,

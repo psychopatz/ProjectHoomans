@@ -19,6 +19,7 @@ local function validateLease(player, record, token)
     local ok, reason = PNC.ConversationScene.Begin(record, zombie, player, token, {
         maximumDistance = lease.maximumDistance,
         dangerRadius = lease.dangerRadius,
+        guardThreats = lease.guardThreats ~= false,
         allowHostileParley = lease.hostileParley == true,
     })
     return ok == true, reason, lease

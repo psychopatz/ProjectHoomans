@@ -51,11 +51,10 @@
   "panel.llm_inline_input": "TALK TO",
   "llm.input_tooltip": "Type a message for this NPC.",
   "llm.send": "SEND",
-  "llm.mode.nearest": "NEAREST NPC",
+  "llm.mode.nearest": "SINGLE NPC",
   "llm.mode.nearby": "NEARBY NPCS",
   "llm.status.off": "LLM BRIDGE OFF",
   "llm.status.open": "OPEN A CONVERSATION",
   "llm.status.waiting": "WAITING FOR NPC RESPONSE...",
-  "llm.status.speaking": "NPC IS SPEAKING...",
-  "llm.status.ready": "LLM CHAT READY"
+  "llm.status.speaking": "NPC IS SPEAKING..."
 }

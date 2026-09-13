@@ -30,7 +30,7 @@ local GridRegion = require "PsychopatzCore/World/PC_GridRegion"
 local opened
 local request
 package.preload[
-    "PNC/UI/Communities/ColonyManagement/SettlementManagement/PNC_SettlementManagement_SelectorSupport"
+    "PNC/UI/SettlementManagement/PNC_SettlementManagement_SelectorSupport"
 ] = function()
     return {
         Tr = function(_, fallback) return fallback end,
@@ -61,7 +61,7 @@ PNC = {
 }
 
 local Actions = require(
-    "PNC/UI/Communities/ColonyManagement/SettlementManagement/"
+    "PNC/UI/SettlementManagement/"
     .. "PNC_SettlementManagement_FishingActions")
 local window = {
     selectedPersonID = "npc:1",

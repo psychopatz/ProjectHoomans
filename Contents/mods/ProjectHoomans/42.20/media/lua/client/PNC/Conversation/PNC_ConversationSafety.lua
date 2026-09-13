@@ -54,6 +54,16 @@ local function enforceConversationDistance(spec)
     return not (type(state) == "table" and state.started == true)
 end
 
+-- Threat interruption belongs to the visible conversation surface.  The
+-- compact V input is a headless channel attached to already-resolved NPCs;
+-- nearby danger must not destroy that input while the full conversation
+-- window remains guarded.
+function Safety.GuardsThreats(spec)
+    local context = spec and spec.context or {}
+    if context.nameplateConversation == true then return false end
+    return context.guardThreats ~= false
+end
+
 local function snapshotFor(spec)
     local context = spec and spec.context or {}
     local entry = context.entry or {}
@@ -66,6 +76,12 @@ local function snapshotFor(spec)
     if type(current) == "table" then return current end
     return entry.snapshot
         or entry.source and entry.source.snapshot
+end
+
+local function resolvePresenceBody(npcID, snapshot)
+    local sync = PNC.ClientPresenceSync
+    return sync and sync.ResolveBodyForNPC
+        and sync.ResolveBodyForNPC(npcID, snapshot) or nil
 end
 
 local function snapshotHasPosition(snapshot)
@@ -130,14 +146,56 @@ function Safety.ResolveActors(spec)
     local registry = PNC.Registry
     local record = registry and registry.Get and registry.Get(npcID)
         or entry.record
+    local snapshot = snapshotFor(spec)
     local zombie = registry and registry.GetLiveZombie
         and registry.GetLiveZombie(npcID)
+        or resolvePresenceBody(npcID, snapshot)
         or entry.zombie
         or spec and spec.character
     local player = context.player
         or getSpecificPlayer and getSpecificPlayer(0)
         or getPlayer and getPlayer()
     return player, zombie, record, npcID
+end
+
+-- Keep the availability decision inspectable without exposing engine objects
+-- to the log.  This is intentionally presentation-oriented: a logical NPC
+-- may still have a valid network snapshot while its local body is streaming
+-- or being rebound.
+function Safety.DescribeAvailability(spec)
+    local player, zombie, record, npcID = Safety.ResolveActors(spec)
+    local snapshot = snapshotFor(spec)
+    local context = spec and spec.context or {}
+    local entry = context.entry or {}
+    local registry = PNC.Registry
+    local registryBody = registry and registry.GetLiveZombie
+        and registry.GetLiveZombie(npcID) or nil
+    local presenceBody = resolvePresenceBody(npcID, snapshot)
+    local cachedBody = entry.zombie or spec and spec.character or nil
+    local snapshotPresent = type(snapshot) == "table"
+    local snapshotPosition = snapshotHasPosition(snapshot)
+    local liveBody = alive(zombie)
+    local runtime = record and record.runtime or {}
+    return {
+        npcID = npcID,
+        liveBodyPresent = zombie ~= nil,
+        liveBodyAlive = liveBody,
+        registryBodyPresent = registryBody ~= nil,
+        presenceBodyPresent = presenceBody ~= nil,
+        presenceBodyAlive = alive(presenceBody),
+        cachedBodyPresent = cachedBody ~= nil,
+        snapshotPresent = snapshotPresent,
+        snapshotAlive = snapshotPresent and snapshot.alive ~= false or false,
+        snapshotPosition = snapshotPosition,
+        snapshotConversation = allowsSnapshotConversation(spec, zombie),
+        networkClient = isNetworkClient(),
+        nameplateConversation = context.nameplateConversation == true,
+        presenceState = record and record.presenceState or nil,
+        recordAlive = record and record.alive ~= false or false,
+        bodyLease = runtime.bodyLease,
+        presenceRevision = record and record.presenceRevision or nil,
+        playerPresent = player ~= nil,
+    }
 end
 
 function Safety.GetMaximumDistance()
@@ -302,7 +360,8 @@ function Safety.Check(spec)
             return "distance"
         end
     end
-    if settingsValue("closeConversationOnDanger", true) == true
+    if Safety.GuardsThreats(spec)
+        and settingsValue("closeConversationOnDanger", true) == true
         and Safety.HasDanger(
             player,
             zombie,

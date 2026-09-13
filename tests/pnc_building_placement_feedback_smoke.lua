@@ -84,7 +84,7 @@ PNC = {
 }
 
 local Placement = T.load("ProjectHoomans", "client",
-    "PNC/UI/Communities/ColonyManagement/PNC_BuildingPlacement.lua")
+    "PNC/UI/Base/PNC_BaseBuildingPlacement.lua")
 local window = {}
 T.truthy(Placement.Begin(window, {
     recipeKey = "TestWall", objectInfoName = "TestWall",

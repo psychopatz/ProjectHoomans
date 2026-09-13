@@ -9,7 +9,7 @@ local Layout = UI.Layout
 local Options = require "PsychopatzCore/UI/PsychopatzCommandHubOptions"
 local WidgetWindow = UI.WidgetWindow
 local Shared = require
-    "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Shared"
+    "PNC/UI/Shared/PNC_ColonyUIShared"
 local Controller = require "PNC/UI/Workshop/PNC_WorkshopController"
 
 ISPNCWorkshopWindow = PsychopatzWindow:derive("ISPNCWorkshopWindow")

@@ -18,10 +18,10 @@ Use `requiredTechnology` on the facility definition to gate initial construction
 and on a level to gate that upgrade. Research only unlocks the capability; the
 Base tab still queues the construction work that applies the upgrade.
 
-## Water Collector example
+## Hydration note
 
-`water.spigot` is its physical anchor. `water.tank` and `water.catcher` are
-abstract modules whose maximum count is four per facility level. Each tank holds
-25 liters and each catcher adds one liter per ten in-game minutes while raining.
-The utility service ticks on `EveryTenMinutes` and derives collection from elapsed
-world age, so unloaded/off-screen bases do not need per-frame simulation.
+Hydration is not authored as a settlement facility. NPCs first use a valid
+drinkable fluid item in their inventory, then fall back to a clean valid world
+source such as a sink or well. World-source discovery is wider than the final
+interaction range so NPCs can path to an adjacent tile; the server validates
+the source and consumes the water only at the interaction step.

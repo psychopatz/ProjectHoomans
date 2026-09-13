@@ -82,4 +82,26 @@ T.equal(restored, nil, "order change abort does not call SetOrder")
 T.equal(released, "reservation:order_change",
     "order change releases an orphaned reservation")
 
+local foodRecord = {
+    id = "npc:interrupted-food",
+    runtime = {
+        facilityActivity = {
+            capability = "food.dine",
+            resourceKind = "",
+            reservationId = "",
+            taskLeaseId = "",
+            previousOrder = { kind = "follow" },
+        },
+    },
+}
+Jobs.OnSceneStopped(foodRecord, nil, {
+    id = "survival.eat.inventory",
+}, "interrupted")
+T.equal(foodRecord.runtime.facilityActivity, nil,
+    "interrupted home eating clears its activity")
+T.truthy((tonumber(foodRecord.runtime.personalFoodRetryAt) or 0) > 0,
+    "interrupted home eating receives a bounded retry cooldown")
+T.equal(restored.kind, "follow",
+    "interrupted home eating restores the previous order")
+
 T.finish("pnc_facility_activity_recovery_smoke")

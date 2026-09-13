@@ -28,6 +28,9 @@ PNC = {
             if args and args.commandID == "manual_corpse_haul" then
                 return 0, "NPC_NOT_AT_HOME"
             end
+            if args and args.commandID == "manual_refill" then
+                return 0, "WATER_CONTAINER_FULL"
+            end
             if args and args.commandID == "camp" then
                 return 0, "camp_requires_building"
             end
@@ -98,6 +101,20 @@ T.truthy(commandLogs[#commandLogs]
     and string.find(commandLogs[#commandLogs].message,
         "reason=NPC_NOT_AT_HOME", 1, true),
     "manual corpse command logs the server routing rejection reason")
+
+sent = nil
+Router.Handle("CompanionCommand", player, {
+    commandID = "manual_refill", id = "npc:one",
+    requestID = "manual:refill", commandSource = "colonist_activities",
+})
+T.equal(sent.command, "CompanionCommandResult",
+    "manual refill rejection response command")
+T.equal(sent.args.reason, "WATER_CONTAINER_FULL",
+    "manual refill response preserves the service rejection reason")
+T.equal(sent.args.requestID, "manual:refill",
+    "manual refill response preserves request identity")
+T.equal(sent.args.accepted, false,
+    "manual refill response reports the rejected state")
 
 companion = nil
 T.equal(Router.Handle("CompanionCommand", player, nil), true,

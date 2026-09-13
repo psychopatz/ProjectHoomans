@@ -332,18 +332,24 @@ local function nativeItem(fullType)
     item.isDrainable = water
     item.usedDelta = water and 1 or nil
     if water then
+        local amount = 1
         local primary = {
             getFluidTypeString = function() return "Water" end,
             getFluidType = function() return "Water" end,
         }
         local container = {
-            getAmount = function() return 1 end,
+            getAmount = function() return amount end,
             getCapacity = function() return 1 end,
             isInputLocked = function() return false end,
             canPlayerEmpty = function() return true end,
             getRainCatcher = function() return 0 end,
             getPrimaryFluid = function() return primary end,
-            getSpecificFluidAmount = function() return 1 end,
+            getSpecificFluidAmount = function() return amount end,
+            isEmpty = function() return amount <= 0 end,
+            removeFluid = function(_, value)
+                amount = math.max(0, amount - value)
+                return { release = function() end }
+            end,
         }
         function item:getFluidContainer() return container end
     end
@@ -738,6 +744,35 @@ supplyStorage.inventory:clear()
 local SupplyService = PNC.NPCSupplyService
 local CoreInventory = require "PsychopatzCore/Inventory/PsychopatzInventory"
 
+-- The facility food route must be able to consume the exact item selected by
+-- its assignment, using the same physical inventory transaction as normal
+-- supply fulfillment.
+do
+local exactFoodNPC = supplyNPC("supply_exact_food", {
+    emptyBaseline = true, hunger = 0.65,
+})
+T.truthy(PNC.Inventory.AddItems(exactFoodNPC, {
+    { type = "Base.Apple", stack = 1 },
+}, "root", "test_exact_food"))
+local exactFoodID
+for itemID, item in pairs(exactFoodNPC.inventory.items) do
+    if item.type == "Base.Apple" then exactFoodID = itemID end
+end
+T.truthy(exactFoodID, "exact food test item was not indexed")
+local exactFoodBefore = PNC.IndividualNeeds.Get(exactFoodNPC, "hunger")
+local exactFoodOK, exactFoodReason, exactFoodEffect =
+    SupplyService.ConsumePersonalItem(
+        exactFoodNPC, exactFoodID, 0.55, "FOOD")
+T.equal(exactFoodOK, true,
+    "exact personal food consumption failed: " .. tostring(exactFoodReason))
+T.equal(exactFoodEffect.fullType, "Base.Apple",
+    "exact personal food transaction consumed the wrong item type")
+T.falsy(exactFoodNPC.inventory.items[exactFoodID],
+    "exact personal food item remained in the physical inventory")
+T.truthy(PNC.IndividualNeeds.Get(exactFoodNPC, "hunger") < exactFoodBefore,
+    "exact personal food transaction did not apply hunger relief")
+end
+
 -- Build 42 uses Base.WaterBottle; the old Full/Empty names are model names.
 -- Existing compact records are migrated when their inventory is hydrated.
 local legacyWaterNPC = supplyNPC(
@@ -1079,6 +1114,82 @@ T.equal(liveUse, true, "live personal use " .. tostring(liveUseReason)
 T.equal(#liveSupplyItems, 0,
     "live food use did not mutate physical inventory")
 supplyBodies[liveSupplyNPC.id] = nil
+
+-- A live NPC must drain the native B42 FluidContainer as well as the compact
+-- record. The empty bottle remains available after the final sip.
+do
+T.truthy(CoreInventory.deposit(supplyStorage.inventory,
+    nativeItem("Base.WaterBottle"), 1))
+PNC.SupplyIndex.Invalidate(supplyStorage)
+local liveWaterNPC = supplyNPC("supply_live_water", {
+    emptyBaseline = true, thirst = 0.30,
+})
+local liveWaterItems = {}
+local liveWaterContainer = {}
+function liveWaterContainer:getItems() return javaList(liveWaterItems) end
+function liveWaterContainer:AddItem(value)
+    liveWaterItems[#liveWaterItems + 1] = value
+    value.owner = self
+    value.getContainer = function(self) return self.owner end
+    return value
+end
+function liveWaterContainer:DoRemoveItem(value)
+    for index = #liveWaterItems, 1, -1 do
+        if liveWaterItems[index] == value then
+            table.remove(liveWaterItems, index)
+            return true
+        end
+    end
+    return false
+end
+local liveWaterBody = {
+    getInventory = function() return liveWaterContainer end,
+    getX = function() return 10 end,
+    getY = function() return 10 end,
+    getZ = function() return 0 end,
+}
+supplyBodies[liveWaterNPC.id] = liveWaterBody
+local liveWaterAcquire = SupplyService.Process({
+    requesterId = liveWaterNPC.id, resourceKind = "HYDRATION",
+    required = { thirst = 0.20 }, priority = 90,
+}, { acquireOnly = true })
+T.equal(liveWaterAcquire, true, "live hydration acquisition")
+T.equal(#liveWaterItems, 1,
+    "live hydration acquisition did not enter physical inventory")
+local liveWaterCompactBefore
+for _, compact in pairs(liveWaterNPC.inventory.items) do
+    if compact.type == "Base.WaterBottle" then
+        liveWaterCompactBefore = compact
+    end
+end
+local liveWaterDescriptor = PNC.ItemUtility.DescribeNPCItem(
+    liveWaterCompactBefore)
+T.equal(liveWaterDescriptor.fluidHydration, true,
+    "live water descriptor uses the fluid transaction path")
+T.near(liveWaterDescriptor.fluidAmount, 1, 0.000001,
+    "live water descriptor exposes its native volume")
+local liveWaterUse, liveWaterReason = SupplyService.Process({
+    requesterId = liveWaterNPC.id, resourceKind = "HYDRATION",
+    required = { thirst = 0.20 }, priority = 90,
+})
+T.equal(liveWaterUse, true,
+    "live hydration use " .. tostring(liveWaterReason))
+local expectedLiveWaterAmount = 1 - 0.20
+    / liveWaterDescriptor.hydrationYieldPerLiter
+T.near(liveWaterItems[1]:getFluidContainer():getAmount(),
+    expectedLiveWaterAmount,
+    0.000001, "live hydration drained the native fluid container")
+local liveWaterCompact
+for _, compact in pairs(liveWaterNPC.inventory.items) do
+    if compact.type == "Base.WaterBottle" then liveWaterCompact = compact end
+end
+T.truthy(liveWaterCompact,
+    "live hydration removed the complete bottle instead of retaining it")
+T.near(PNC.Inventory.ResolveItemState(liveWaterCompact).fluidAmount,
+    expectedLiveWaterAmount,
+    0.000001, "live hydration compact state matches native fluid amount")
+supplyBodies[liveWaterNPC.id] = nil
+end
 
 -- Native Build 42 groups identical items into one InventoryItem count. A
 -- one-unit consume must decrement that count, not remove the whole stack;

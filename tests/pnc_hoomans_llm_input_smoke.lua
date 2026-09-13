@@ -94,13 +94,24 @@ local function makeButton()
     function button:setY(value) self.y = value end
     function button:setWidth(value) self.width = value end
     function button:setHeight(value) self.height = value end
-    function button:setEnable(value) self.enabled = value end
+    function button:setEnable(value)
+        -- Mirrors the relevant ISButton behavior: the native control keeps
+        -- the first enabled colors and restores them on later setEnable(true)
+        -- calls.  The style marker is intentionally not restored; this is
+        -- the stale-rendering case the production refresh must repair.
+        if self.enabledVariant == nil then self.enabledVariant = self.variant end
+        self.enabled = value
+        if value and self.enabledVariant ~= nil then
+            self.variant = self.enabledVariant
+        end
+    end
     function button:setTitle(value) self.title = value end
     function button:setImage(value) self.image = value end
     return button
 end
 
 local entry
+local variantCalls = 0
 local UI = {
     CreateTextEntry = function()
         entry = makeEntry()
@@ -114,7 +125,11 @@ local UI = {
         end
         return button
     end,
-    SetButtonVariant = function() end,
+    SetButtonVariant = function(button, variant)
+        variantCalls = variantCalls + 1
+        button.variant = variant
+        button.psychopatzVariant = variant
+    end,
 }
 
 PsychopatzCore = {
@@ -184,17 +199,98 @@ T.truthy(entry.unfocused, "blur operation releases the native text entry")
 
 local modeInput = PsychopatzConversationLLMInput:new(0, 0, 320, 108, {
     modeButtons = {
-        { id = "nearest", title = "NEAREST NPC", image = "single.png" },
-        { id = "nearby", title = "NEARBY NPCS", image = "group.png" },
+        { id = "nearest", mode = "nearest", title = "SINGLE NPC", image = "single.png" },
+        { id = "nearby", mode = "nearby", title = "NEARBY NPCS", image = "group.png" },
     },
 })
 modeInput:createChildren()
+local initialVariantCalls = variantCalls
 T.equal(modeInput.modeButtons[1].button.image, "single.png",
-    "single-target mode carries its icon")
+    "single-target mode keeps its icon")
 T.equal(modeInput.modeButtons[2].button.image, "group.png",
-    "multiple-target mode carries its icon")
+    "multiple-target mode keeps its icon")
 T.equal(modeInput.modeButtons[1].button.title, "",
-    "icon mode buttons do not overlap their labels")
+    "single-target mode uses its hover name instead of a visible label")
+T.equal(modeInput.modeButtons[1].button.tooltip, "SINGLE NPC",
+    "single-target mode exposes its distinct hover name")
+T.equal(modeInput.modeButtons[2].button.tooltip, "NEARBY NPCS",
+    "multiple-target mode exposes its distinct hover name")
+T.equal(modeInput.modeButtons[1].button.variant, "selected",
+    "nearest mode starts selected")
+T.equal(modeInput.modeButtons[2].button.variant, "quiet",
+    "nearby mode starts unselected")
+modeInput:updateModeButtonStyles()
+T.equal(variantCalls, initialVariantCalls,
+    "stable mode refresh does not repaint the mode buttons")
+T.equal(modeInput.modeButtons[1].button.variant, "selected",
+    "stable mode refresh does not change the selected state")
+local repairVariantCalls = variantCalls
+modeInput.modeButtons[2].button.variant = "selected"
+modeInput.modeButtons[2].button.psychopatzVariant = "selected"
+modeInput:updateModeButtonStyles()
+T.equal(variantCalls, repairVariantCalls + 1,
+    "mode refresh repairs a stale native button variant")
+T.equal(modeInput.modeButtons[2].button.variant, "quiet",
+    "mode refresh restores the unselected button variant")
+
+local refreshInput = PsychopatzConversationLLMInput:new(0, 0, 320, 108, {
+    modeButtons = {
+        { id = "nearest", mode = "nearest", title = "SINGLE NPC" },
+        { id = "nearby", mode = "nearby", title = "NEARBY NPCS" },
+    },
+    getState = function()
+        return { visible = true, enabled = true }
+    end,
+})
+refreshInput:createChildren()
+refreshInput:refreshControls()
+refreshInput.inputMode = "nearby"
+refreshInput:refreshControls()
+T.equal(refreshInput.modeButtons[1].button.variant, "quiet",
+    "control refresh clears the old single-target selected style")
+T.equal(refreshInput.modeButtons[2].button.variant, "selected",
+    "control refresh paints the nearby-target selected style last")
+
+local modeChanges = {}
+local selectableInput = PsychopatzConversationLLMInput:new(0, 0, 320, 108, {
+    modeButtons = {
+        { id = "nearest", mode = "nearest", title = "NEAREST NPC" },
+        { id = "nearby", mode = "nearby", title = "NEARBY NPCS" },
+    },
+    onModeChanged = function(_, mode)
+        modeChanges[#modeChanges + 1] = mode
+        return true
+    end,
+})
+selectableInput:createChildren()
+selectableInput:onModePressed("nearest")
+selectableInput:onModePressed("nearest")
+selectableInput:onModePressed("nearby")
+T.equal(modeChanges[1], "nearest",
+    "nearest mode invokes its integration callback")
+T.equal(modeChanges[2], "nearest",
+    "repeated nearest clicks invoke the callback for cycling")
+T.equal(modeChanges[3], "nearby",
+    "nearby mode invokes its integration callback live")
+
+local callbackMode
+local rejectingInput = PsychopatzConversationLLMInput:new(0, 0, 320, 108, {
+    modeButtons = {
+        { id = "nearest", mode = "nearest", title = "NEAREST NPC" },
+        { id = "nearby", mode = "nearby", title = "NEARBY NPCS" },
+    },
+    onModeChanged = function(_, mode, widget)
+        callbackMode = widget.inputMode
+        return mode ~= "nearby"
+    end,
+})
+rejectingInput:createChildren()
+T.falsy(rejectingInput:onModePressed("nearby"),
+    "rejected mode callback does not commit the new mode")
+T.equal(callbackMode, "nearest",
+    "mode callback observes the previously committed selection")
+T.equal(rejectingInput.inputMode, "nearest",
+    "rejected mode callback preserves the widget selection")
 
 local toggleChanges = {}
 local toggleInput = PsychopatzConversationLLMInput:new(0, 0, 320, 108, {

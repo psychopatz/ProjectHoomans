@@ -48,6 +48,7 @@ local actionExecuted
 local equipmentRefreshes = 0
 local canManage = true
 local materializedIDs = {}
+local conflictResult
 
 sendServerCommand = function(_, module, command, payload)
     sent[#sent + 1] = { module = module, command = command, payload = payload }
@@ -284,7 +285,7 @@ T.equal(actionExecuted, "equip_primary", "modular action routed")
 T.equal(equipmentRefreshes > 0, true, "live equipment refreshed")
 
 record.inventory.revision = 20
-ok, reason = Service.Transfer(player, {
+ok, reason, conflictResult = Service.Transfer(player, {
     id = record.id,
     direction = "npc_to_player",
     itemIDs = { "npc-item" },
@@ -293,6 +294,10 @@ ok, reason = Service.Transfer(player, {
 T.equal(ok, false, "revision conflict rejected")
 T.equal(reason, "revision_conflict", "revision conflict reason")
 T.equal(fullSyncs, 1, "conflict sends full payload")
+T.equal(conflictResult.expectedInventoryRevision, 19,
+    "conflict reports client revision")
+T.equal(conflictResult.currentInventoryRevision, 20,
+    "conflict reports server revision")
 
 canManage = true
 nativeFavorite = true

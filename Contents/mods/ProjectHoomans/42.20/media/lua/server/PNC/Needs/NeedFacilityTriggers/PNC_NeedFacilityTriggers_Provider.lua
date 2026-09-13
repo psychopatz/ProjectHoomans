@@ -9,6 +9,8 @@ local Events = require "PsychopatzCore/Events/PC_EventBus"
 local EventTypes = require "PNC/Core/Events/PNC_EventDefinitions"
 local TaskEvents = PNC.Tasking and PNC.Tasking.Events
 local Recovery = PNC.Tasking and PNC.Tasking.Internal
+local DRINK_RETRY_COOLDOWN_MS = 5000
+local PERSONAL_FOOD_RETRY_COOLDOWN_MS = 5000
 
 local function recordFor(id)
     return PNC.Registry and PNC.Registry.Get and PNC.Registry.Get(id) or nil
@@ -188,17 +190,21 @@ function Triggers.CanContinue(lease)
     local record = recordFor(lease.npcId)
     local route = AwayRoutes.Get(lease.sourceRef)
     local definition = definitionFor(lease)
+    local activity = record and record.runtime
+        and record.runtime.facilityActivity or nil
     if not record or record.alive == false or not definition then return false end
     if record.health and record.health.state == "incapacitated"
         or AwayRoutes.IsCombatActive(record)
         or record.runtime and record.runtime.workOrderId
     then return false end
     if route then
-        return route.CanContinue(record, lease)
-            and Definitions.Evaluate(definition, record, true) == true
+        if not route.CanContinue(record, lease) then return false end
+        if activity and activity.completionRequested == true then return true end
+        return Definitions.Evaluate(definition, record, true) == true
     end
-    return HomeRoute.CanContinue(record, lease)
-        and Definitions.Evaluate(definition, record, true) == true
+    if not HomeRoute.CanContinue(record, lease) then return false end
+    if activity and activity.completionRequested == true then return true end
+    return Definitions.Evaluate(definition, record, true) == true
 end
 
 function Triggers.GetRecoveryState(lease)
@@ -301,6 +307,30 @@ end
 
 function Triggers.Cancel(lease, reason)
     return stop(lease, reason or "task_cancelled")
+end
+
+-- Reservationless drink activities are deliberately short-lived, but a
+-- failed scene/path handoff must not be re-selected on the very next task
+-- pump. Keep this backoff beside the need provider so tasking stays generic.
+function Triggers.OnExecutorFailure(lease)
+    local record = recordFor(lease and lease.npcId)
+    local runtime = record and record.runtime or nil
+    local activity = runtime and runtime.facilityActivity or nil
+    local resourceKind = tostring(activity and activity.resourceKind or "")
+    local capability = tostring(activity and activity.capability or "")
+    local now = PNC.Core and PNC.Core.Now and tonumber(PNC.Core.Now()) or 0
+    if resourceKind == "world_water" then
+        runtime.worldWaterRetryAt = now + DRINK_RETRY_COOLDOWN_MS
+    elseif resourceKind == "water_refill" then
+        runtime.waterRefillRetryAt = now + DRINK_RETRY_COOLDOWN_MS
+    elseif resourceKind == "personal_drink" then
+        runtime.personalDrinkRetryAt = now + DRINK_RETRY_COOLDOWN_MS
+    elseif resourceKind == "personal_food"
+        or capability == "food.dine"
+        or capability == "survival.eat.inventory"
+    then
+        runtime.personalFoodRetryAt = now + PERSONAL_FOOD_RETRY_COOLDOWN_MS
+    end
 end
 
 function Triggers.Complete(lease)

@@ -33,6 +33,16 @@ Const.GUARD_ENGAGE_RADIUS = 3.0
 Const.CAMP_RADIUS = 3.0
 Const.CAMP_STOP_DISTANCE = 0.45
 Const.CAMP_ENGAGE_RADIUS = 3.0
+-- Camp resources are a bounded runtime cache. Keep the scan local enough to
+-- be useful while preventing a single camp from becoming a large ModData
+-- payload or an unbounded provider result.
+Const.CAMP_RESOURCE_RADIUS = 12.0
+Const.CAMP_RESOURCE_MAX = 32
+Const.CAMP_RESOURCE_SPOT_MAX = 8
+Const.CAMP_RESOURCE_REFRESH_COOLDOWN_MS = 1000
+-- Initial camp discovery is spread across server ticks. This is a square
+-- budget, not a per-NPC budget: members of one camp share the same scan.
+Const.CAMP_RESOURCE_SCAN_SQUARES_PER_TICK = 32
 Const.FOLLOW_DISTANCE = 1.8
 Const.FOLLOW_WALK_DISTANCE = 4.0
 -- Followers walk with the group and reserve running for a genuine separation.

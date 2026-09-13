@@ -22,21 +22,26 @@ end
 
 function H.ResolveFoodItemFullType(record, capability, options)
     local explicit = options and options.activityItemFullType or nil
+    local hydration = capability == "survival.drink.inventory"
+    local supplyKind = hydration and "HYDRATION" or "FOOD"
     local supply = record and record.runtime
         and record.runtime.supply and record.runtime.supply.byKind
-        and record.runtime.supply.byKind.FOOD or nil
+        and record.runtime.supply.byKind[supplyKind] or nil
     local used = supply and supply.lastUsedItem or nil
     local candidates = supply and supply.personalCandidates or nil
     local required = {
-        hunger = math.max(0.001, tonumber(record and record.needs
-            and record.needs.hunger) or 0.001),
-        thirst = 0,
+        hunger = hydration and 0 or math.max(0.001,
+            tonumber(record and record.needs and record.needs.hunger) or 0.001),
+        thirst = hydration and math.max(0.001,
+            tonumber(record and record.needs and record.needs.thirst) or 0.001)
+            or 0,
     }
     if explicit and tostring(explicit) ~= "" then
         return tostring(explicit)
     end
     if capability ~= "food.dine"
         and capability ~= "survival.eat.inventory"
+        and capability ~= "survival.drink.inventory"
     then return nil end
     if used and used.fullType then return tostring(used.fullType) end
     if candidates and candidates[1] and candidates[1].fullType then
@@ -46,7 +51,7 @@ function H.ResolveFoodItemFullType(record, capability, options)
         and PNC.NPCSupplyService.HasPersonalSupply
     then
         local _, fullType = PNC.NPCSupplyService.HasPersonalSupply(
-            record, "FOOD", required)
+            record, supplyKind, required)
         return fullType and tostring(fullType) or nil
     end
     return nil

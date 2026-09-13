@@ -9,6 +9,40 @@ local SEAT_STOP_DISTANCE = Internal.SEAT_STOP_DISTANCE
 local SEAT_ARRIVAL_TOLERANCE = Internal.SEAT_ARRIVAL_TOLERANCE
 local MAX_SCENE_START_ATTEMPTS = Internal.MAX_SCENE_START_ATTEMPTS
 local Diagnostics = PNC.PerformanceScalingDiagnostics
+local WATER_RETRY_COOLDOWN_MS = 5000
+local PERSONAL_FOOD_RETRY_COOLDOWN_MS = 5000
+
+local function deferActivityRetry(record, runtime)
+    local capability = tostring(runtime and runtime.capability or "")
+    local foodActivity = runtime and (
+        runtime.resourceKind == "personal_food"
+        or capability == "food.dine"
+        or capability == "survival.eat.inventory")
+    if runtime and runtime.resourceKind == "world_water" then
+        record.runtime.worldWaterRetryAt = Internal.CurrentTime(runtime)
+            + WATER_RETRY_COOLDOWN_MS
+    elseif runtime and runtime.resourceKind == "water_refill" then
+        record.runtime.waterRefillRetryAt = Internal.CurrentTime(runtime)
+            + WATER_RETRY_COOLDOWN_MS
+    elseif runtime and runtime.resourceKind == "personal_drink" then
+        record.runtime.personalDrinkRetryAt = Internal.CurrentTime(runtime)
+            + WATER_RETRY_COOLDOWN_MS
+    elseif foodActivity then
+        record.runtime.personalFoodRetryAt = Internal.CurrentTime(runtime)
+            + PERSONAL_FOOD_RETRY_COOLDOWN_MS
+    end
+end
+
+local function isRemovedWaterActivity(runtime, order)
+    local capability = tostring(runtime and runtime.capability
+        or order and order.capability or "")
+    local sceneId = tostring(runtime and runtime.sceneId
+        or order and order.sceneId or "")
+    local resourceKind = tostring(runtime and runtime.resourceKind or "")
+    return string.sub(capability, 1, 6) == "water."
+        or string.sub(sceneId, 1, 15) == "facility.water."
+        or resourceKind == "nearby_water"
+end
 
 function Internal.Tick(record, zombie)
     local runtime = Internal.State(record)
@@ -38,7 +72,25 @@ function Internal.Tick(record, zombie)
         order = runtime.activityOrder
         definition = Definitions.Get(order.capability)
     end
-    if order.kind ~= KIND or not runtime or not definition then return false end
+    if order.kind ~= KIND or not runtime then return false end
+    if not definition then
+        -- A save can contain a pre-migration spigot activity. It has no
+        -- executable definition after the facility provider is removed, so
+        -- release it once and restore the durable follow/home/camp order.
+        if isRemovedWaterActivity(runtime, order) then
+            local leaseId = tostring(runtime.taskLeaseId or "")
+            Internal.Finish(record, zombie, "WATER_FACILITY_REMOVED")
+            if leaseId ~= "" and PNC.Tasking
+                and PNC.Tasking.Commands
+                and PNC.Tasking.Commands.CancelForNPC
+            then
+                PNC.Tasking.Commands.CancelForNPC(
+                    record.id, "WATER_FACILITY_REMOVED")
+            end
+            return true
+        end
+        return false
+    end
     if runtime.campActivity == true
         and tostring(runtime.capability or "") == "sleep"
     then
@@ -86,16 +138,32 @@ function Internal.Tick(record, zombie)
         runtime.facingApplied = false
         runtime.sleepSurfaceEntered = false
     end
-    if runtime.resourceKind == "nearby_water" and not runtime.resource
-        and PNC.NearbyWaterService and PNC.NearbyWaterService.Resolve
+    -- Facility descriptors intentionally drop Java object references when
+    -- copied into runtime/save-safe state.  Rehydrate object-backed water
+    -- sources after that boundary; a stale descriptor must not make the NPC
+    -- continue toward an object that can no longer be used.
+    local needsWorldWaterSource = runtime.resourceKind == "world_water"
+        and (not runtime.resource or not runtime.resource.object
+            and not runtime.resource.item)
+    local needsWaterRefillSource = runtime.resourceKind == "water_refill"
+        and (not runtime.resource or not runtime.resource.object)
+    if (needsWorldWaterSource or needsWaterRefillSource)
+        and PNC.NearbyWaterService
     then
-        local resolved, resolveReason = PNC.NearbyWaterService.Resolve(record,
-            runtime.resourceKey)
+        local resolver = runtime.resourceKind == "water_refill"
+            and PNC.NearbyWaterService.ResolveFillSource
+            or PNC.NearbyWaterService.Resolve
+        local resolved
+        local resolveReason
+        if resolver then
+            resolved, resolveReason = resolver(record, runtime.resourceKey)
+        end
         runtime.resource = resolved
         if not resolved then
             local leaseId = runtime.taskLeaseId
             local failure = resolveReason or "WATER_SOURCE_UNAVAILABLE"
             runtime.failedReason = failure
+            deferActivityRetry(record, runtime)
             if leaseId ~= "" and PNC.Tasking and PNC.Tasking.Commands
                 and PNC.Tasking.Commands.CancelForNPC
             then
@@ -123,6 +191,7 @@ function Internal.Tick(record, zombie)
     if not Internal.RetryWaterApproach(record, zombie, order, runtime) then
         local leaseId = runtime.taskLeaseId
         local failure = runtime.failedReason
+        deferActivityRetry(record, runtime)
         Internal.Finish(record, zombie, failure)
         if leaseId ~= "" and PNC.Tasking and PNC.Tasking.Commands then
             PNC.Tasking.Commands.CancelForNPC(record.id, failure)
@@ -337,6 +406,7 @@ function Internal.Tick(record, zombie)
                 local leaseId = runtime.taskLeaseId
                 local failure = "FACILITY_SCENE_START_FAILED"
                 runtime.failedReason = failure
+                deferActivityRetry(record, runtime)
                 Internal.Finish(record, zombie, failure)
                 if leaseId ~= "" and PNC.Tasking
                     and PNC.Tasking.Commands

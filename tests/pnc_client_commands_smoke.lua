@@ -21,6 +21,7 @@ end
 PNC = {
     Const = {
         MODULE = "PNC",
+        CMD_COMPANION_COMMAND_RESULT = "CompanionCommandResult",
         CMD_DEBUG_ROSTER = "DebugRoster",
         CMD_FACTION_DEBUG = "FactionDebug",
         CMD_MAP_COMMAND_RESULT = "MapCommandResult",
@@ -100,6 +101,22 @@ T.load(FILE)
 
 local Client = PNC.Client
 local State = PNC.Network.ClientState
+
+State.colonyManagement = { people = { { id = "npc_refill" } } }
+Client.HandleServerCommand("CompanionCommandResult", {
+    commandID = "manual_refill",
+    id = "npc_refill",
+    accepted = false,
+    reason = "WATER_CONTAINER_FULL",
+    requestID = "manual:refill",
+    commandSource = "colonist_activities",
+})
+T.equal(State.manualActivityDiagnostics.npc_refill.reason,
+    "WATER_CONTAINER_FULL",
+    "client preserves the server's manual refill rejection reason")
+T.equal(State.colonyManagement.people[1].manualActivityDiagnostic.reason,
+    "WATER_CONTAINER_FULL",
+    "client attaches the manual refill diagnostic to the Activities snapshot")
 
 Client.HandleServerCommand("NPCKnowledge", {
     snapshot = { npcID = "npc_known", categories = {} },

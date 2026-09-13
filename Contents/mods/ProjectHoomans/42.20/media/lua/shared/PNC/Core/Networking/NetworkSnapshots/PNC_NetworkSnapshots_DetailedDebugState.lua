@@ -9,6 +9,9 @@ local Parts = Network.Internal.SnapshotParts
 local CAMP_RESOURCE_DEBUG_MAX = 8
 local SEATING_DEBUG_MAX = 12
 local SEATING_SPOT_DEBUG_MAX = 16
+local CAMP_DEBUG_CACHE_MAX = 64
+local campDebugCache = {}
+local campDebugCacheOrder = {}
 
 local function copyCampPoint(value)
     if type(value) ~= "table" then return nil end
@@ -22,6 +25,17 @@ local function copyCampPoint(value)
     }
 end
 
+local function cachedCampState(record)
+    local service = PNC.CampResourceService
+    if service and service.GetCachedSnapshot then
+        return service.GetCachedSnapshot(record)
+    end
+    -- Client-only/debug fixtures may not load the server service. Keep the
+    -- compatibility fallback, while production no longer serializes this
+    -- table into each NPC record.
+    return record and record.campState or nil
+end
+
 local function campResourceCategory(resource)
     local resourceKind = tostring(resource and resource.resourceKind or "")
     local detectorId = tostring(resource and resource.detectorId or "")
@@ -33,9 +47,11 @@ local function campResourceCategory(resource)
         return "bed"
     end
     if resourceKind == "water_source"
-        or resourceKind == "nearby_water"
+        or resourceKind == "world_water"
+        or resourceKind == "water_refill"
         or detectorId == "faucet"
         or string.sub(role, 1, 6) == "water."
+        or role == "survival.world_water"
     then
         return "water"
     end
@@ -131,6 +147,74 @@ local function copyCampResource(resource)
         blocked = blocked,
         selected = resource.selected == true,
     }
+end
+
+local function copyCampResourceView(resource, selected, available)
+    local output = {}
+    if type(resource) ~= "table" then return nil end
+    for key, value in pairs(resource) do output[key] = value end
+    output.selected = selected == true
+    output.available = available ~= false
+    return output
+end
+
+-- Resource classification is shared by every NPC in a camp. Keep one static
+-- diagnostic view per current runtime snapshot and only clone the small
+-- per-NPC reservation/selection overlay below. This reduces repeated table
+-- work while preserving the existing wire shape and per-NPC activity state.
+local function cachedCampDebugBase(state)
+    local campId
+    local cached
+    local output
+    local resources
+    if type(state) ~= "table" then return nil end
+    campId = tostring(state.campId or "")
+    cached = campDebugCache[campId]
+    if campId ~= "" and cached and cached.state == state then
+        return cached
+    end
+    resources = type(state.resources) == "table" and state.resources or {}
+    output = {
+        state = state,
+        resourceCount = #resources,
+        bedCount = 0,
+        waterCount = 0,
+        seatingCount = 0,
+        otherCount = 0,
+        facilities = {},
+        byKey = {},
+    }
+    for index = 1, #resources do
+        local resource = resources[index]
+        local category = campResourceCategory(resource)
+        local copied = copyCampResource(resource)
+        if category == "bed" then
+            output.bedCount = output.bedCount + 1
+        elseif category == "water" then
+            output.waterCount = output.waterCount + 1
+        elseif category == "seating" then
+            output.seatingCount = output.seatingCount + 1
+        else
+            output.otherCount = output.otherCount + 1
+        end
+        if copied then
+            local resourceKey = tostring(resource.resourceKey
+                or resource.key or "")
+            output.byKey[resourceKey] = copied
+            if #output.facilities < CAMP_RESOURCE_DEBUG_MAX then
+                output.facilities[#output.facilities + 1] = copied
+            end
+        end
+    end
+    if campId ~= "" then
+        if not cached then campDebugCacheOrder[#campDebugCacheOrder + 1] = campId end
+        campDebugCache[campId] = output
+        while #campDebugCacheOrder > CAMP_DEBUG_CACHE_MAX do
+            local expired = table.remove(campDebugCacheOrder, 1)
+            campDebugCache[expired] = nil
+        end
+    end
+    return output
 end
 
 local function copySeatingResource(resource, character, selectedKey,
@@ -251,7 +335,7 @@ function Parts.BuildSeatingDebugState(record)
     end
 
     if camped then
-        local state = record and record.campState or nil
+        local state = cachedCampState(record)
         for index = 1, #(state and state.resources or {}) do
             add(state.resources[index], tostring(
                 state and state.campId or activity and activity.campId or ""))
@@ -311,13 +395,14 @@ function Parts.BuildSeatingDebugState(record)
 end
 
 -- Compact, primitive-only camp diagnostics shared by detailed and presence
--- snapshots. The full campState remains server persistence; nameplates only
--- receive bounded information needed to explain what the NPC found.
+-- snapshots. The full camp resource state remains a bounded server runtime
+-- cache; nameplates only receive bounded information needed to explain what
+-- the NPC found.
 function Parts.BuildCampResourceDebugState(record)
     local order = record and record.orderSpec or nil
     local runtime = record and record.runtime or nil
     local activity = runtime and runtime.facilityActivity or nil
-    local state = record and record.campState or nil
+    local state = cachedCampState(record)
     local orderIsCamp = tostring(order and order.kind or "") == "camp"
     local activityIsCamp = activity and activity.campActivity == true or false
     local resources = state and state.resources or {}
@@ -329,11 +414,7 @@ function Parts.BuildCampResourceDebugState(record)
     local resourceRadius
     local facilities = {}
     local activeResource
-    local bedCount = 0
-    local waterCount = 0
-    local seatingCount = 0
-    local otherCount = 0
-
+    local static
     if type(resources) ~= "table" then resources = {} end
     if not orderIsCamp and not activityIsCamp and type(state) ~= "table" then
         return nil
@@ -362,41 +443,31 @@ function Parts.BuildCampResourceDebugState(record)
         or activity and activity.resourceRadius
         or order and order.resourceRadius or 12)
 
-    for index = 1, #resources do
-        local resource = resources[index]
-        local category = campResourceCategory(resource)
-        if category == "bed" then
-            bedCount = bedCount + 1
-        elseif category == "water" then
-            waterCount = waterCount + 1
-        elseif category == "seating" then
-            seatingCount = seatingCount + 1
-        else
-            otherCount = otherCount + 1
+    static = cachedCampDebugBase(state)
+    if static then
+        for index = 1, #static.facilities do
+            local base = static.facilities[index]
+            local resourceKey = tostring(base.resourceKey or "")
+            local selected = activity
+                and tostring(activity.resourceKey or "") ~= ""
+                and tostring(activity.resourceKey) == resourceKey
+            local reserved = PNC.FacilityReservations
+                and PNC.FacilityReservations.ByResource
+                and PNC.FacilityReservations.ByResource[resourceKey]
+                ~= nil
+            facilities[#facilities + 1] = copyCampResourceView(
+                base, selected == true,
+                base.available and (not reserved or selected == true)
+            )
         end
-        if #facilities < CAMP_RESOURCE_DEBUG_MAX then
-            local copied = copyCampResource(resource)
-            if copied then
-                local resourceKey = tostring(resource.resourceKey
-                    or resource.key or "")
-                local selected = activity
-                    and tostring(activity.resourceKey or "") ~= ""
-                    and tostring(activity.resourceKey) == resourceKey
-                local reserved = PNC.FacilityReservations
-                    and PNC.FacilityReservations.ByResource
-                    and PNC.FacilityReservations.ByResource[resourceKey]
-                    ~= nil
-                copied.selected = selected == true
-                copied.available = copied.available
-                    and (not reserved or copied.selected)
-                facilities[#facilities + 1] = copied
-            end
-        end
-        if activity and tostring(activity.resourceKey or "") ~= ""
-            and tostring(activity.resourceKey or "")
-                == tostring(resource and (resource.resourceKey or resource.key) or "")
-        then
-            activeResource = copyCampResource(resource)
+        if activity and tostring(activity.resourceKey or "") ~= "" then
+            activeResource = static.byKey[
+                tostring(activity.resourceKey or "")]
+            activeResource = copyCampResourceView(
+                activeResource,
+                activeResource and activeResource.selected or false,
+                activeResource and activeResource.available or nil
+            )
         end
     end
 
@@ -408,11 +479,11 @@ function Parts.BuildCampResourceDebugState(record)
         campRadius = campRadius,
         resourceRadius = resourceRadius,
         capturedAtWorldHour = tonumber(state and state.capturedAtWorldHour),
-        resourceCount = #resources,
-        bedCount = bedCount,
-        waterCount = waterCount,
-        seatingCount = seatingCount,
-        otherCount = otherCount,
+        resourceCount = static and static.resourceCount or #resources,
+        bedCount = static and static.bedCount or 0,
+        waterCount = static and static.waterCount or 0,
+        seatingCount = static and static.seatingCount or 0,
+        otherCount = static and static.otherCount or 0,
         facilities = facilities,
         facilitiesTruncated = #resources > #facilities,
             activeResource = activeResource,

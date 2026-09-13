@@ -8,6 +8,7 @@ local Lifecycle = PNC.Conversation.Lifecycle or {}
 PNC.Conversation.Lifecycle = Lifecycle
 local Safety = PNC.Conversation.Safety
 local Scene = PNC.ConversationScene
+local NAMEPLATE_UNAVAILABLE_GRACE_MS = 3000
 
 local function currentTime()
     return PNC.Core and PNC.Core.Now and PNC.Core.Now()
@@ -64,6 +65,7 @@ local function send(command, state, reason, extra)
         -- and the compact UI must not end the conversation.
         enforceDistance = state.enforceDistance == true
             and state.started ~= true,
+        guardThreats = state.guardThreats ~= false,
         allowHostileParley = state.allowHostileParley == true,
     }
     if type(extra) == "table" then
@@ -95,6 +97,7 @@ local function refresh(state, spec)
                 dangerRadius = Safety.GetDangerRadius(),
                 enforceDistance = state.enforceDistance == true
                     and state.started ~= true,
+                guardThreats = state.guardThreats ~= false,
                 allowHostileParley = state.allowHostileParley == true,
             }
         )
@@ -103,6 +106,8 @@ end
 
 local function presentSafetyFeedback(spec, state, reason)
     if tostring(reason or "") ~= "danger" then return false end
+    if state and state.guardThreats == false then return false end
+    if not Safety.GuardsThreats(spec) then return false end
     local presentation = PNC.SocialFlavorPresentation
     if not presentation then
         local ok, loaded = pcall(
@@ -117,6 +122,54 @@ local function presentSafetyFeedback(spec, state, reason)
         or false
 end
 
+local function logAvailability(state, spec, reason)
+    if not Safety or not Safety.DescribeAvailability then return end
+    local details = Safety.DescribeAvailability(spec)
+    local signature = table.concat({
+        tostring(reason or "available"),
+        tostring(details.liveBodyPresent),
+        tostring(details.liveBodyAlive),
+        tostring(details.registryBodyPresent),
+        tostring(details.presenceBodyPresent),
+        tostring(details.presenceBodyAlive),
+        tostring(details.cachedBodyPresent),
+        tostring(details.snapshotPresent),
+        tostring(details.snapshotAlive),
+        tostring(details.snapshotPosition),
+        tostring(details.snapshotConversation),
+        tostring(details.networkClient),
+        tostring(details.presenceState),
+        tostring(details.recordAlive),
+        tostring(details.bodyLease),
+        tostring(details.presenceRevision),
+    }, "|")
+    if state and state.lastAvailabilitySignature == signature then
+        return
+    end
+    if state then state.lastAvailabilitySignature = signature end
+    if not PNC.Core or not PNC.Core.LogInfo then return end
+    PNC.Core.LogInfo(table.concat({
+        "Inline availability",
+        "npc=" .. tostring(details.npcID),
+        "reason=" .. tostring(reason or "available"),
+        "liveBody=" .. tostring(details.liveBodyPresent),
+        "liveAlive=" .. tostring(details.liveBodyAlive),
+        "registryBody=" .. tostring(details.registryBodyPresent),
+        "presenceBody=" .. tostring(details.presenceBodyPresent),
+        "presenceAlive=" .. tostring(details.presenceBodyAlive),
+        "cachedBody=" .. tostring(details.cachedBodyPresent),
+        "snapshot=" .. tostring(details.snapshotPresent),
+        "snapshotAlive=" .. tostring(details.snapshotAlive),
+        "snapshotPosition=" .. tostring(details.snapshotPosition),
+        "snapshotAllowed=" .. tostring(details.snapshotConversation),
+        "networkClient=" .. tostring(details.networkClient),
+        "presence=" .. tostring(details.presenceState),
+        "recordAlive=" .. tostring(details.recordAlive),
+        "bodyLease=" .. tostring(details.bodyLease),
+        "presenceRevision=" .. tostring(details.presenceRevision),
+    }, " "))
+end
+
 function Lifecycle.Create()
     return {
         begin = function(view, spec)
@@ -128,7 +181,14 @@ function Lifecycle.Create()
                 return false, "nameplate_fallback"
             end
             local reason = Safety.Check(spec)
-            if reason then return false, reason end
+            if reason then
+                if reason == "npc_unavailable"
+                    and isNameplateConversation(spec)
+                then
+                    logAvailability(nil, spec, reason)
+                end
+                return false, reason
+            end
             local _, _, _, npcID = Safety.ResolveActors(spec)
             local state = {
                 npcID = npcID,
@@ -143,6 +203,7 @@ function Lifecycle.Create()
                 allowHostileParley = spec and spec.context
                     and spec.context.allowHostileParley == true,
                 enforceDistance = not isNameplateConversation(spec),
+                guardThreats = Safety.GuardsThreats(spec),
                 started = false,
             }
             local started, startReason = refresh(state, spec)
@@ -164,9 +225,30 @@ function Lifecycle.Create()
                 return "nameplate_fallback"
             end
             local time = currentTime()
+            local safetyChecked = false
             if time >= (tonumber(state.nextSafetyCheckAt) or 0) then
                 state.nextSafetyCheckAt = time + 180
                 state.cachedSafetyReason = Safety.Check(spec)
+                safetyChecked = true
+            end
+            if safetyChecked
+                and state.cachedSafetyReason == "npc_unavailable"
+                and isNameplateConversation(spec)
+            then
+                if not state.unavailableSince then
+                    state.unavailableSince = time
+                end
+                logAvailability(state, spec, state.cachedSafetyReason)
+                if time - state.unavailableSince
+                    < NAMEPLATE_UNAVAILABLE_GRACE_MS
+                then
+                    state.cachedSafetyReason = nil
+                    return nil
+                end
+            elseif safetyChecked and state.unavailableSince then
+                logAvailability(state, spec, "recovered")
+                state.unavailableSince = nil
+                state.lastAvailabilitySignature = nil
             end
             if state.cachedSafetyReason then
                 return state.cachedSafetyReason
@@ -185,6 +267,8 @@ function Lifecycle.Create()
                     "npc=" .. tostring(state and state.npcID
                         or spec and spec.npcID or "unknown"),
                     "token=" .. tostring(state and state.token or "none"),
+                    "guardThreats=" .. tostring(not state
+                        or state.guardThreats ~= false),
                     "reason=" .. tostring(reason or "closed"),
                 }, " "))
             end

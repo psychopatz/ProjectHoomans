@@ -6,16 +6,27 @@ PNC.NeedFacilityHomeRoute = PNC.NeedFacilityHomeRoute or {}
 local Home = PNC.NeedFacilityHomeRoute
 local Definitions = PNC.NeedFacilityTriggerDefinitions
 
-local function hasPersonalSupply(record, resourceKind, needType)
+local function personalSupply(record, resourceKind, needType)
     local service = PNC.NPCSupplyService
     local current = PNC.IndividualNeeds and PNC.IndividualNeeds.Get
         and PNC.IndividualNeeds.Get(record, needType)
         or record and record.needs and record.needs[needType]
     local required = { hunger = 0, thirst = 0 }
     required[needType] = math.max(0.001, tonumber(current) or 0.001)
-    return service and service.HasPersonalSupply
-        and service.HasPersonalSupply(record, resourceKind, required) == true
-        or false
+    if not service or not service.HasPersonalSupply then return false end
+    return service.HasPersonalSupply(record, resourceKind, required)
+end
+
+local function hasPersonalSupply(record, resourceKind, needType)
+    local available = personalSupply(record, resourceKind, needType)
+    return available == true
+end
+
+local function personalFoodRetryBlocked(record)
+    local runtime = record and record.runtime or nil
+    local retryAt = tonumber(runtime and runtime.personalFoodRetryAt) or 0
+    local now = PNC.Core and PNC.Core.Now and tonumber(PNC.Core.Now()) or 0
+    return retryAt > now
 end
 
 function Home.GetBase(record)
@@ -49,13 +60,14 @@ end
 
 local function hasRequiredPersonalSupply(record, definition)
     if definition and definition.needType == "hunger" then
-        return hasPersonalSupply(record, "FOOD", "hunger")
+        return not personalFoodRetryBlocked(record)
+            and hasPersonalSupply(record, "FOOD", "hunger")
     end
     if definition and definition.needType == "thirst" then
-        -- A carried drink, including a dual-purpose food such as an apple,
-        -- should be consumed by the personal-supply path before assigning a
-        -- trip to a water facility.
-        return not hasPersonalSupply(record, "HYDRATION", "thirst")
+        -- Hydration no longer belongs to a settlement facility. Route it
+        -- through the personal-item or valid-world-source lanes, including
+        -- when an old save still exposes a stale spigot capability.
+        return false
     end
     return true
 end
@@ -66,6 +78,9 @@ function Home.IsAvailable(record, definition)
 end
 
 function Home.Validate(record, definition)
+    if definition and definition.needType == "thirst" then
+        return false, "HOME_WATER_FACILITY_REMOVED"
+    end
     local base = Home.GetBase(record)
     if not base or not PNC.HomeDutyService.IsAtHome(record, base.id) then
         return false, "NOT_AT_HOME"
@@ -81,6 +96,9 @@ end
 
 function Home.Assign(record, intent)
     local base = record and Home.GetBase(record) or nil
+    local foodAvailable
+    local foodFullType
+    local foodItemID
     if not base then return nil, "BASE_NOT_FOUND" end
     if record.runtime and record.runtime.facilityActivity
         and record.runtime.facilityActivity.automatic == true
@@ -88,6 +106,14 @@ function Home.Assign(record, intent)
     then
         PNC.FacilityJobs.Stop(record,
             "need_trigger_" .. tostring(intent.sourceRef))
+    end
+    if intent.capability == "food.dine" then
+        foodAvailable, foodFullType, foodItemID = personalSupply(
+            record, "FOOD", "hunger")
+        if not foodAvailable then return nil, "PERSONAL_FOOD_MISSING" end
+        if personalFoodRetryBlocked(record) then
+            return nil, "PERSONAL_FOOD_RETRY_COOLDOWN"
+        end
     end
     local live = PNC.Registry.GetLiveZombie
         and PNC.Registry.GetLiveZombie(record.id) or nil
@@ -102,6 +128,10 @@ function Home.Assign(record, intent)
         acquired.sleepVariant = "HOME_BARRACKS"
         acquired.sleepTargetPolicy = acquired.resourceKind == "sleep_surface"
             and "BARRACKS_BED_FIRST" or "BARRACKS_FLOOR_FALLBACK"
+    elseif intent.capability == "food.dine" then
+        acquired.resourceKind = "personal_food"
+        acquired.activityItemID = foodItemID
+        acquired.activityItemFullType = foodFullType
     end
     acquired.executionMode = live and "LIVE" or "ABSTRACT"
     return acquired
@@ -111,7 +141,10 @@ function Home.Start(record, lease, assignment)
     local ok, reason = PNC.FacilityJobs.Start(record, assignment.facilityId,
         lease.capability, { automatic = true, acquired = assignment,
             taskLeaseId = lease.leaseId,
-            abstract = lease.executionMode == "ABSTRACT" })
+            abstract = lease.executionMode == "ABSTRACT",
+            resourceKind = assignment.resourceKind,
+            activityItemID = assignment.activityItemID,
+            activityItemFullType = assignment.activityItemFullType })
     if ok then
         PNC.TaskLeaseService.SetPhase(lease.leaseId,
             lease.executionMode == "LIVE" and "TRAVEL" or "WORKING")
@@ -120,8 +153,11 @@ function Home.Start(record, lease, assignment)
 end
 
 function Home.CanContinue(record, lease)
-    return PNC.SettlementRepository.GetFacility(lease.facilityId) ~= nil
-        and PNC.FacilityReservations.ByID[lease.reservationId] ~= nil
+    local facilityOK = PNC.SettlementRepository.GetFacility(lease.facilityId)
+        ~= nil
+    local reservationOK = lease.reservationId == nil
+        or PNC.FacilityReservations.ByID[lease.reservationId] ~= nil
+    return facilityOK and reservationOK
 end
 
 return Home

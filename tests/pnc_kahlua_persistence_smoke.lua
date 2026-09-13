@@ -196,14 +196,8 @@ T.truthy(payload.vanillaTraits.overweight == true,
     "vanilla weight trait was not serialized")
 T.truthy(payload.vanillaTraitsAuthored == true,
     "authored trait source was not serialized")
-T.truthy(payload.campState and payload.campState.resources[1],
-    "camp resource snapshot was not serialized")
-T.equal(payload.campState.resources[1].object, nil,
-    "camp resource snapshot did not strip world object references")
-T.equal(payload.campState.campRadius, 3,
-    "camp activity radius was not serialized")
-T.truthy(payload.campState.resources[1].seatSpots[1],
-    "primitive seat approach metadata was not serialized")
+T.equal(payload.campState, nil,
+    "camp resource cache was serialized into the NPC record")
 
 local restored = PNC.Persistence.DeserializeRecord(payload, record.id)
 T.truthy(restored, "deserialization failed without next()")
@@ -233,14 +227,8 @@ T.equal(restored.orderSpec, nil,
     "stale facility order was not repaired during deserialization")
 T.equal(restored.persistenceRepairVersions.facility_activity_runtime, 1,
     "facility repair revision was not recorded after deserialization")
-T.equal(restored.campState.campId, "camp:npc_kahlua",
-    "camp identity did not round trip")
-T.equal(restored.campState.resources[1].resourceKey, "bed:8:10:0",
-    "camp resource descriptor did not round trip")
-T.equal(restored.campState.campRadius, 3,
-    "camp activity radius did not round trip")
-T.equal(restored.campState.resources[1].seatSpots[1].approachKey,
-    "E:Front", "seat approach metadata did not round trip")
+T.equal(restored.campState, nil,
+    "legacy camp resource cache was restored into the NPC record")
 
 local repairedPayload = PNC.Persistence.SerializeRecord(restored)
 T.equal(repairedPayload.repairVersions.facility_activity_runtime, 1,

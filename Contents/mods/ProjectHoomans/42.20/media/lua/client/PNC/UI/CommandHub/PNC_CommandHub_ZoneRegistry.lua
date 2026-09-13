@@ -10,7 +10,7 @@ PNC.CommandHub.ZoneRegistry = PNC.CommandHub.ZoneRegistry or {}
 local Registry = PNC.CommandHub.ZoneRegistry
 local GridRegion = require "PsychopatzCore/World/PC_GridRegion"
 local Selector = require "PsychopatzCore/UI/World/PsychopatzGridRegionSelector"
-local FishingActions = require "PNC/UI/Communities/ColonyManagement/SettlementManagement/PNC_SettlementManagement_FishingActions"
+local FishingActions = require "PNC/UI/SettlementManagement/PNC_SettlementManagement_FishingActions"
 local BaseTerritory = require "PNC/UI/CommandHub/PNC_CommandHub_BaseTerritoryActions"
 local CorpseHaulUI = PNC.CommandHub.CorpseHaulUI
 

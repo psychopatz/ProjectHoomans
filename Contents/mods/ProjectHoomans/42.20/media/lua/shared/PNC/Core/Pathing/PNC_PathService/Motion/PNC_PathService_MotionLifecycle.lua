@@ -145,6 +145,17 @@ function Internal.completeMove(zombie, record, lane, phase, reason)
     local now = Internal.Core.Now()
     local preserveVisualMotion = phase == "arrived"
         and now < (tonumber(lane and lane.visualMovingUntil) or 0)
+    local activity = record and record.runtime
+        and record.runtime.facilityActivity or nil
+    if phase == "blocked" and activity
+        and (activity.resourceKind == "world_water"
+            or activity.resourceKind == "water_refill")
+    then
+        -- Facility behavior needs to advance its interaction candidate even
+        -- when the path lane is reset/rebuilt before the next behavior tick.
+        activity.worldWaterApproachRetry = true
+        activity.waterRefillApproachRetry = true
+    end
     if Diagnostics then
         if phase == "arrived" then
             Diagnostics.Increment("Pathing.CompletedRoutes")

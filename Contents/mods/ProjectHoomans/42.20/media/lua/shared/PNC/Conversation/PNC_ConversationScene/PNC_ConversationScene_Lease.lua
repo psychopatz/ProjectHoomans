@@ -80,7 +80,7 @@ end
 
 local function createLease(
     record, player, token, currentTime,
-    maximumDistance, dangerRadius, hostileParley
+    maximumDistance, dangerRadius, guardThreats, hostileParley
 )
     return {
         token = token,
@@ -94,6 +94,7 @@ local function createLease(
         previousBehavior = record.activeBehavior,
         maximumDistance = maximumDistance,
         dangerRadius = dangerRadius,
+        guardThreats = guardThreats,
         hostileParley = hostileParley,
     }
 end
@@ -122,6 +123,7 @@ end
 function Scene.Begin(record, zombie, player, token, options)
     local maximumDistance
     local dangerRadius
+    local guardThreats
     local hostileParley
     local enforceDistance
     local registered
@@ -135,6 +137,7 @@ function Scene.Begin(record, zombie, player, token, options)
     local previousState
     local previousProcessedRequests
     options, maximumDistance, dangerRadius = sceneOptions(options)
+    guardThreats = options.guardThreats ~= false
     enforceDistance = options.enforceDistance ~= false
     if not record or record.alive == false
         or not Internal.IsAlive(zombie)
@@ -148,7 +151,7 @@ function Scene.Begin(record, zombie, player, token, options)
         return false, "distance"
     end
     hostileParley = hostileParleyRequested(record, options)
-    if Scene.HasThreat(
+    if guardThreats and Scene.HasThreat(
         record,
         zombie,
         player,
@@ -195,6 +198,7 @@ function Scene.Begin(record, zombie, player, token, options)
         currentTime,
         maximumDistance,
         dangerRadius,
+        guardThreats,
         hostileParley
     )
     if hostileParley
@@ -248,7 +252,7 @@ function Scene.ReserveLLMRequest(record, zombie, player, token, requestID)
     if not Internal.IsAlive(zombie) then
         return false, "npc_unavailable"
     end
-    if Scene.HasThreat(
+    if lease.guardThreats ~= false and Scene.HasThreat(
         record,
         zombie,
         player,
@@ -266,6 +270,7 @@ function Scene.ReserveLLMRequest(record, zombie, player, token, requestID)
         expiresAt = currentTime + Scene.LLM_REQUEST_LEASE_MS,
         maximumDistance = lease.maximumDistance,
         dangerRadius = lease.dangerRadius,
+        guardThreats = lease.guardThreats ~= false,
         hostileParley = lease.hostileParley,
         llmToolCalls = {},
         consumed = false,
@@ -332,7 +337,7 @@ function Scene.ValidateLLMRequest(record, zombie, player, token, requestID)
     if not Internal.IsAlive(zombie) then
         return false, "npc_unavailable"
     end
-    if Scene.HasThreat(
+    if pending.guardThreats ~= false and Scene.HasThreat(
         record,
         zombie,
         player,
@@ -424,13 +429,13 @@ function Scene.Pump(record, zombie, currentTime)
         if currentTime >= (tonumber(pending.expiresAt) or 0) then
             Scene.ClearLLMRequest(record, "request_timeout")
         elseif not player or not Internal.IsAlive(zombie)
-            or Scene.HasThreat(
+            or (pending.guardThreats ~= false and Scene.HasThreat(
                 record,
                 zombie,
                 player,
                 tonumber(pending.dangerRadius) or Scene.DANGER_RADIUS,
                 { ignoreTalkingNPC = pending.hostileParley == true }
-            )
+            ))
         then
             Scene.ClearLLMRequest(record, "request_safety_failed")
         end
@@ -447,7 +452,7 @@ function Scene.Pump(record, zombie, currentTime)
             record, zombie, lease.token, "conversation_unavailable"
         )
     end
-    if Scene.HasThreat(
+    if lease.guardThreats ~= false and Scene.HasThreat(
         record,
         zombie,
         player,

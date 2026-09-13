@@ -1,7 +1,7 @@
 local LayoutModule = {}
 
 local Components = require
-    "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Components"
+    "PNC/UI/Shared/PNC_ColonyUIComponents"
 
 function LayoutModule.Measure(window, content)
     local Layout = PsychopatzCore.UI.Layout

@@ -4,7 +4,7 @@ require "PsychopatzCore/UI/PsychopatzUI"
 
 local Actions = require "PNC/UI/Colonist/PNC_ColonistDebugActions"
 local Rows = require "PNC/UI/Colonist/PNC_ColonistDebugRows"
-local Shared = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Shared"
+local Shared = require "PNC/UI/Shared/PNC_ColonyUIShared"
 
 local Debug = {}
 local UI = PsychopatzCore.UI

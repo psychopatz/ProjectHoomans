@@ -125,6 +125,31 @@ local function resolveSnapshotBody(snapshot)
     return body
 end
 
+-- Conversation and presentation code may ask for a body before the registry
+-- has been rebound on this client.  The presence scanner is still the
+-- authoritative local-body index in that interval, so expose the same
+-- lease/instance/UUID validation without making callers reach into Internal.
+function Sync.ResolveBodyForNPC(id, snapshot)
+    local requestedID = tostring(id or "")
+    local current = snapshot
+    local copy
+    if requestedID == "" then return nil end
+    if type(current) ~= "table" then
+        current = ClientState and ClientState.snapshots
+            and ClientState.snapshots[requestedID] or nil
+    end
+    if type(current) ~= "table" then
+        current = { id = requestedID }
+    elseif current.id == nil then
+        copy = { id = requestedID }
+        for key, value in pairs(current) do copy[key] = value end
+        current = copy
+    elseif tostring(current.id) ~= requestedID then
+        return nil
+    end
+    return resolveSnapshotBody(current)
+end
+
 function Sync.RemoveBodyInstance(args)
     local cell
     local zombieList

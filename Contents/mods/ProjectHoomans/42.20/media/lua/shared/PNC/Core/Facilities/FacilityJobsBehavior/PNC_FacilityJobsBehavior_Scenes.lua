@@ -3,6 +3,7 @@ PNC.FacilityJobsBehaviorInternal = PNC.FacilityJobsBehaviorInternal or {}
 
 local Internal = PNC.FacilityJobsBehaviorInternal
 local Definitions = PNC.FacilityJobDefinitions
+local PERSONAL_FOOD_RETRY_COOLDOWN_MS = 5000
 
 function Internal.OnSceneTick(record, zombie, scene, now)
     local runtime = Internal.State(record)
@@ -72,7 +73,45 @@ end
 
 function Internal.OnSceneStopped(record, zombie, scene, reason)
     local runtime = Internal.State(record)
+    local capability = tostring(runtime and runtime.capability or "")
+    local foodActivity = runtime and (
+        runtime.resourceKind == "personal_food"
+        or capability == "food.dine"
+        or capability == "survival.eat.inventory")
     if not runtime then return end
+    if not runtime.failedReason
+        and runtime.completionRequested ~= true
+        and runtime.stopRequested ~= true
+        and reason ~= "callback_complete"
+        and (foodActivity
+            or runtime.resourceKind == "personal_drink"
+            or runtime.resourceKind == "world_water"
+            or runtime.resourceKind == "water_refill")
+    then
+        -- One-shot survival scenes can stop before their delayed gameplay
+        -- effect callback. Do not leave the activity alive to restart the
+        -- same animation forever without consuming/filling anything.
+        runtime.failedReason = runtime.resourceKind == "water_refill"
+            and "WATER_REFILL_INTERRUPTED"
+            or runtime.resourceKind == "world_water"
+            and "WORLD_WATER_INTERRUPTED"
+            or runtime.resourceKind == "personal_drink"
+            and "PERSONAL_DRINK_INTERRUPTED"
+            or "PERSONAL_FOOD_INTERRUPTED"
+    end
+    if PNC.Core and PNC.Core.LogInfo then
+        PNC.Core.LogInfo(
+            "[PNC][ANIM] facility_scene_stop npc="
+                .. tostring(record and record.id or "")
+                .. " scene=" .. tostring(scene and scene.id or "")
+                .. " reason=" .. tostring(reason or "")
+                .. " activity=" .. capability
+                .. " resourceKind=" .. tostring(runtime.resourceKind or "")
+                .. " phase=" .. tostring(runtime.phase or "")
+                .. " failedReason=" .. tostring(runtime.failedReason or "")
+                .. " completionRequested="
+                .. tostring(runtime.completionRequested == true))
+    end
     runtime.sleepSceneActive = false
     Internal.ClearSleepSurface(record, zombie, runtime)
     Internal.ClearFurnitureSeat(record, zombie, runtime)
@@ -82,6 +121,28 @@ function Internal.OnSceneStopped(record, zombie, scene, reason)
     if runtime.failedReason then
         local leaseId = runtime.taskLeaseId
         local failure = runtime.failedReason
+        local now = PNC.Core and PNC.Core.Now and tonumber(PNC.Core.Now())
+            or 0
+        if runtime.resourceKind == "world_water" then
+            record.runtime.worldWaterRetryAt = now + 5000
+        elseif runtime.resourceKind == "water_refill" then
+            record.runtime.waterRefillRetryAt = now + 5000
+        elseif runtime.resourceKind == "personal_drink" then
+            record.runtime.personalDrinkRetryAt = now + 5000
+        elseif foodActivity then
+            record.runtime.personalFoodRetryAt = now
+                + PERSONAL_FOOD_RETRY_COOLDOWN_MS
+        end
+        if runtime.resourceKind == "water_refill"
+            and PNC.NeedFacilityEffects
+            and PNC.NeedFacilityEffects.ReportWaterRefillResult
+        then
+            PNC.NeedFacilityEffects.ReportWaterRefillResult(
+                record, runtime, false, failure, {
+                    stage = "scene_stop",
+                    sceneReason = reason,
+                })
+        end
         Internal.Finish(record, zombie, failure)
         if leaseId ~= "" and PNC.Tasking and PNC.Tasking.Commands then
             PNC.Tasking.Commands.CancelForNPC(record.id, failure)
@@ -90,6 +151,17 @@ function Internal.OnSceneStopped(record, zombie, scene, reason)
     end
     if runtime.completionRequested == true or reason == "callback_complete" then
         local leaseId = runtime.taskLeaseId
+        if runtime.resourceKind == "water_refill"
+            and PNC.NeedFacilityEffects
+            and PNC.NeedFacilityEffects.ReportWaterRefillResult
+        then
+            PNC.NeedFacilityEffects.ReportWaterRefillResult(
+                record, runtime, true, "WATER_REFILL_COMPLETE", {
+                    stage = "scene_stop",
+                    amount = runtime.effectValue,
+                    itemID = runtime.activityItemID,
+                })
+        end
         Internal.Finish(record, zombie, "complete")
         if leaseId ~= "" and PNC.Tasking and PNC.Tasking.Commands then
             PNC.Tasking.Commands.Complete(leaseId, "NEED_COMPLETE")

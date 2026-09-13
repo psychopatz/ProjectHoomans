@@ -114,7 +114,7 @@ Definitions.Register({
 })
 Definitions.Register({
     id = "hydration", kind = "DRINK", signal = "need", needType = "thirst",
-    capability = "water.drink",
+    capability = "survival.drink.world",
     critical = 0.70,
 })
 Definitions.Register({

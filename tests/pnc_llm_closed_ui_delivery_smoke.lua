@@ -233,6 +233,8 @@ T.truthy(inlinePending and inlinePending.pending,
 local inlinePacket = Integration.Poll()
 local inlineDelivered = Integration.Deliver({
     request_id = inlinePacket.request_id,
+    response_text = "Give me a moment.",
+    provider_failure = true,
     semantic_tool_calls = {
         {
             id = "reaction-1",
@@ -388,5 +390,30 @@ T.truthy(activeDelivered.accepted, "active refusal response was not delivered")
 T.equal(activeMessages[1].metadata.portraitAnimation,
     "reaction.thumbsdown",
     "authoritative LLM refusal reaches the close-up portrait")
+
+-- A provider failure may arrive with legacy generic prose. An authoritative
+-- identity result must still replace that prose in the active conversation.
+activeView.session.busy = false
+local activeNameSubmitted = Integration.Submit(activeView, "What is your name?")
+T.truthy(activeNameSubmitted, "active identity request was not submitted")
+local activeNamePacket = Integration.Poll()
+local activeNameDelivered = Integration.Deliver({
+    request_id = activeNamePacket.request_id,
+    response_text = "Give me a moment.",
+    provider_failure = true,
+    semantic_tool_calls = {
+        {
+            id = "identity-provider-failure",
+            name = "ask_name",
+            arguments = {},
+        },
+    },
+})
+T.truthy(activeNameDelivered.accepted,
+    "active identity fallback response was not delivered")
+T.truthy(string.find(
+    tostring(activeMessages[2].payload and activeMessages[2].payload.fallback or ""),
+    "Harley", 1, true
+), "provider fallback prose hid the authoritative name reply")
 
 T.finish("pnc_llm_closed_ui_delivery_smoke")

@@ -152,6 +152,22 @@ T.equal(resolved.scope, Resolver.SCOPE_OTHER,
 T.equal(#resolved.targets, 2,
     "nearby recipient resolution uses the selected non-colonist scope")
 
+local cycleFirst = Resolver.ResolveNearestCycle(
+    player, nil, nil, Resolver.SCOPE_OTHER
+)
+T.equal(cycleFirst.target.id, "other-npc",
+    "nearest cycle starts with the closest target")
+local cycleSecond = Resolver.ResolveNearestCycle(
+    player, cycleFirst.target.id, nil, Resolver.SCOPE_OTHER
+)
+T.equal(cycleSecond.target.id, "snapshot-npc",
+    "nearest cycle advances to the next sorted target")
+local cycleWrapped = Resolver.ResolveNearestCycle(
+    player, cycleSecond.target.id, nil, Resolver.SCOPE_OTHER
+)
+T.equal(cycleWrapped.target.id, "other-npc",
+    "nearest cycle wraps back to the closest target")
+
 -- A conversation handoff may carry the selected live body directly when the
 -- registry snapshot is one tick behind. Preserve that body and its entry
 -- metadata rather than rebuilding an unrelated target.

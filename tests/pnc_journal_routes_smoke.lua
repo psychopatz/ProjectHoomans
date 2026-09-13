@@ -46,13 +46,30 @@ T.equal(Adapter.HasNPC(abstractNPC.id), false, "abstract NPC journal stays lazy"
 
 Events.emit(EventTypes.NPC_FOOD_CONSUMED, owned, "Base.Apple", 0.2)
 Events.emit(EventTypes.NPC_DRINK_CONSUMED, owned, "Base.WaterBottle", 0.3)
+Events.emit(EventTypes.NPC_WATER_REFILLED, owned, "Base.WaterBottle", 0.75,
+    "sink:10:10:0")
 Events.emit(EventTypes.NPC_SKILL_LEVEL_UP, owned, "Axe", 4)
 Events.emit(EventTypes.NPC_WOUNDED, owned, "Hand_L", "laceration", 7)
-T.equal(#Adapter.GetNPC(owned.id), 4, "owned NPC events accepted")
-T.equal(Adapter.GetNPC(owned.id)[1][1], EventTypes.NPC_FOOD_CONSUMED,
+local ownedEntries = Adapter.GetNPC(owned.id)
+T.equal(#ownedEntries, 5, "owned NPC events accepted")
+T.equal(ownedEntries[1][1], EventTypes.NPC_FOOD_CONSUMED,
     "semantic event ID stored")
-T.equal(Adapter.GetNPC(owned.id)[1][3], "Base.Apple",
+T.equal(ownedEntries[1][3], "Base.Apple",
     "stable item identifier stored")
+local refillEntry
+for _, entry in ipairs(ownedEntries) do
+    if entry[1] == EventTypes.NPC_WATER_REFILLED then
+        refillEntry = entry
+        break
+    end
+end
+T.truthy(refillEntry, "water refill event was routed to the NPC journal")
+T.equal(refillEntry[3], "Base.WaterBottle",
+    "water refill journal stores the container type")
+T.equal(refillEntry[4], 0.75,
+    "water refill journal stores the amount filled")
+T.equal(refillEntry[5], "sink:10:10:0",
+    "water refill journal stores the source identity")
 T.equal(dirtied[#dirtied][2], "npc_journal", "NPC persistence marked dirty")
 
 for index = 1, 40 do

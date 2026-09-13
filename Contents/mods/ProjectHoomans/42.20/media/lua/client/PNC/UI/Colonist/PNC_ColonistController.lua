@@ -1,12 +1,12 @@
 require "PsychopatzCore/UI/PsychopatzUI"
 
-local Components = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Components"
+local Components = require "PNC/UI/Shared/PNC_ColonyUIComponents"
 local LayoutModel = require "PNC/UI/Colonist/PNC_ColonistLayout"
 local Options = require "PsychopatzCore/UI/PsychopatzCommandHubOptions"
-local Presentation = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Presentation"
+local Presentation = require "PNC/UI/Shared/PNC_ColonyPresentation"
 local Registry = require "PNC/UI/Colonist/PNC_ColonistRegistry"
 local Selector = require "PNC/UI/Colonist/PNC_ColonistSelector"
-local Shared = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Shared"
+local Shared = require "PNC/UI/Shared/PNC_ColonyUIShared"
 
 local Controller = {}
 local UI = PsychopatzCore.UI

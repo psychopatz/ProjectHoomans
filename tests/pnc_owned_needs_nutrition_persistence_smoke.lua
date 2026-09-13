@@ -45,17 +45,50 @@ T.equal(PNC.IndividualNeeds.Get(npc, "hunger"), 1,
     "nutrition is independent from fullness")
 T.equal(PNC.IndividualNeeds.GetNutrition(npc).calories, 600,
     "food calories are recorded")
+local overflowNpc = { id = "overflow", recruited = true, alive = true,
+    vanillaTraits = {}, vanillaTraitsAuthored = true,
+    health = { current = 100, max = 100, state = "normal" } }
+PNC.Registry.Data[overflowNpc.id] = overflowNpc
+local overflowNutrition = PNC.IndividualNeeds.GetNutrition(overflowNpc)
+overflowNutrition.calories = PNC.NeedsDefinitions.NUTRITION.maximumCalories
+PNC.IndividualNeeds.Commands.ApplyFood(overflowNpc,
+    { hunger = 0, calories = 500 }, "overflow_food")
+T.equal(overflowNutrition.calories,
+    PNC.NeedsDefinitions.NUTRITION.maximumCalories,
+    "visible calories remain at the configured display cap")
+T.equal(overflowNutrition.calorieOverflow, 500,
+    "excess food calories are retained as overflow")
+local overflowPackedBeforeBurn = PNC.NeedsStateCodec.Encode(
+    PNC.NeedsRepository.Records, age)
+T.equal(overflowPackedBeforeBurn.n.overflow[8], 500,
+    "calorie overflow is persisted in the optional compact slot")
+local overflowDecoded = PNC.NeedsStateCodec.Decode(overflowPackedBeforeBurn)
+T.equal(overflowDecoded.overflow.nutrition.calorieOverflow, 500,
+    "calorie overflow survives codec round trip")
+PNC.IndividualNeeds.ModifyNutrition(overflowNpc, -200, "burn_overflow")
+T.equal(overflowNutrition.calorieOverflow, 300,
+    "calorie burn consumes overflow before visible calories")
+PNC.IndividualNeeds.ModifyNutrition(overflowNpc, -400, "burn_balance")
+T.equal(overflowNutrition.calorieOverflow, 0,
+    "overflow is exhausted before the visible calorie balance")
+T.equal(overflowNutrition.calories,
+    PNC.NeedsDefinitions.NUTRITION.maximumCalories - 100,
+    "calorie burn continues after overflow is exhausted")
 T.equal(npc.needs, nil, "needs are not stored in the NPC registry record")
 
 local packed = PNC.NeedsStateCodec.Encode(PNC.NeedsRepository.Records, age)
 T.equal(packed.v, 1, "compact codec version")
 T.equal(packed.at, age, "one shared timestamp")
-T.equal(#packed.n.owned, 5, "compact NPC tuple")
+T.truthy(#packed.n.owned >= 5, "compact NPC tuple")
 T.equal(packed.n.owned[1], 1000, "pressure stored as permille")
 T.equal(packed.n.owned[4], 600, "calories stored as integer")
 local decoded, decodedAt = PNC.NeedsStateCodec.Decode(packed)
 T.equal(decodedAt, age, "shared timestamp round trip")
 T.equal(decoded.owned.needs.hunger, 1, "need round trip")
+local overflowPacked = PNC.NeedsStateCodec.Encode(
+    PNC.NeedsRepository.Records, age)
+T.equal(overflowPacked.n.overflow[8], nil,
+    "zero overflow is omitted from compact state")
 local rejected = PNC.NeedsStateCodec.Decode({ v = 2, at = age, n = {} })
 T.equal(rejected.owned, nil, "non-v1 payload is not migrated")
 

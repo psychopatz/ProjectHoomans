@@ -158,6 +158,8 @@ T.truthy(PNC.CompanionCommands.Get("manual_eat"),
     "manual eat command is registered")
 T.truthy(PNC.CompanionCommands.Get("manual_drink"),
     "manual drink command is registered")
+T.truthy(PNC.CompanionCommands.Get("manual_refill"),
+    "manual water refill command is registered")
 T.truthy(PNC.CompanionCommands.Get("manual_sleep"),
     "manual sleep command is registered")
 T.truthy(PNC.CompanionCommands.Get("manual_provision"),
@@ -280,7 +282,20 @@ records.owned.affiliation = { factionID = "faction_alice" }
 T.equal(PNC.CompanionCommands.IsOwnedByPlayer(records.owned, player),
     true, "single-player faction ownership uses canonical account key")
 
-T.equal(#PNC.CompanionCommands.List(), 15, "registered command count")
+PNC.FacilityJobs = {
+    ToggleManual = function()
+        return false, "WATER_CONTAINER_FULL"
+    end,
+}
+local manualRefillAffected, manualRefillReason = PNC.CompanionCommands.Execute(
+    player, { id = "owned", commandID = "manual_refill" })
+T.equal(manualRefillAffected, 0,
+    "manual refill rejection reports no affected companion")
+T.equal(manualRefillReason, "WATER_CONTAINER_FULL",
+    "manual refill preserves the facility rejection reason")
+PNC.FacilityJobs = nil
+
+T.equal(#PNC.CompanionCommands.List(), 16, "registered command count")
 T.equal(PNC.CompanionCommands.Get("scavenge_nearby").clientOnly, true,
     "scavenge command opens its client setup UI")
 T.equal(#PNC.CompanionCommands.ListGroups(), 3,
@@ -441,6 +456,30 @@ T.equal(records.owned.orderSpec.kind, "follow",
     "group follow did not update closest companion")
 T.equal(records.owned_second.orderSpec.kind, "follow",
     "group follow did not update second companion")
+-- Camp is intentionally a different group boundary from the live command
+-- radius: followers that are abstract or far away still receive the same
+-- player-anchored order and stop following the player.
+records.far.orderSpec = {
+    kind = "follow", ownerUsername = "alice", ownerOnlineID = 7,
+}
+records.abstract.orderSpec = {
+    kind = "follow", ownerUsername = "alice", ownerOnlineID = 7,
+}
+affected, reason = PNC.CompanionCommands.Execute(player, {
+    commandID = "camp", scope = "group",
+})
+T.equal(affected, 4, "group camp includes distant and abstract followers")
+T.equal(reason, "commanded", "group camp result")
+T.equal(records.owned.orderSpec.kind, "camp",
+    "group camp stopped the nearby follower")
+T.equal(records.far.orderSpec.kind, "camp",
+    "group camp stopped the distant follower")
+T.equal(records.abstract.orderSpec.kind, "camp",
+    "group camp stopped the abstract follower")
+T.equal(records.far.orderSpec.campId, records.owned.orderSpec.campId,
+    "group camp uses one shared camp cache identity")
+T.equal(records.abstract.orderSpec.x, player:getX(),
+    "group camp uses the player anchor for abstract followers")
 records.owned.runtime.workOrderId = "work-1"
 affected, reason = PNC.CompanionCommands.Execute(player, {
     id = "owned",
@@ -465,7 +504,7 @@ affected, reason = PNC.CompanionCommands.Execute(player, {
 })
 T.equal(affected, 1, "don't attack command")
 T.equal(records.owned.attackType, "none", "don't attack preference")
-T.equal(records.owned.orderSpec.kind, "follow",
+T.equal(records.owned.orderSpec.kind, "camp",
     "don't attack preserved movement order")
 T.equal(records.owned.runtime.attackAction, nil,
     "don't attack cancelled committed attack")

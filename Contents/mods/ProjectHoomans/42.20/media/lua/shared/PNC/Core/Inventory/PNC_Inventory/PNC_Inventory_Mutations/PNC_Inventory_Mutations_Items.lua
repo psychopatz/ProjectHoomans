@@ -11,7 +11,9 @@ local function addedWeight(spec)
 end
 
 function Inventory.CanAccept(record, specs, containerID)
-    local inv = Inventory.EnsureRecordInventory(record)
+    local inv = Inventory.EnsureRecordInventory(record, {
+        reconcileWaterContainer = false,
+    })
     local weightState = Inventory.GetWeightState(record)
     local incomingWeight = 0
     local destination
@@ -78,7 +80,9 @@ function Inventory.AddItems(record, specs, containerID, reason)
     local index
     local spec
     if not canAccept then return false, acceptReason, {} end
-    local inv = Inventory.EnsureRecordInventory(record)
+    local inv = Inventory.EnsureRecordInventory(record, {
+        reconcileWaterContainer = false,
+    })
     if not inv.containers[containerID] then
         return false, "container_not_found", {}
     end
@@ -94,6 +98,9 @@ function Inventory.AddItems(record, specs, containerID, reason)
         reason or "inventory_add"
     )
     if not applied then return false, "add_failed", {} end
+    if Inventory.ReconcileWaterContainer then
+        Inventory.ReconcileWaterContainer(record)
+    end
     local itemIDs = {}
     for index = 1, #appliedOps do
         if appliedOps[index].item and appliedOps[index].item.id then
@@ -104,7 +111,9 @@ function Inventory.AddItems(record, specs, containerID, reason)
 end
 
 function Inventory.RemoveItems(record, itemIDs, reason)
-    local inv = Inventory.EnsureRecordInventory(record)
+    local inv = Inventory.EnsureRecordInventory(record, {
+        reconcileWaterContainer = false,
+    })
     local ops = {}
     local seen = {}
     local index
@@ -122,6 +131,9 @@ function Inventory.RemoveItems(record, itemIDs, reason)
     end
     if not Inventory.ApplyDelta(record, ops, reason or "inventory_remove") then
         return false, "remove_failed"
+    end
+    if Inventory.ReconcileWaterContainer then
+        Inventory.ReconcileWaterContainer(record)
     end
     return true, "removed"
 end

@@ -18,6 +18,8 @@ local Locator = PNC.NearbyResourceLocator
 -- camp snapshots are world-state caches, not authoritative sleep decisions.
 Service.SCHEMA_VERSION = 3
 Service.Providers = Service.Providers or {}
+Service.Runtime = Service.Runtime or {}
+Service.Runtime.camps = Service.Runtime.camps or {}
 
 local function number(value, fallback)
     local result = tonumber(value)
@@ -51,16 +53,17 @@ local function campContext(record)
         kind = Const.ORDER_CAMP or "camp",
         campId = tostring(activity.campId or state and state.campId
             or "camp:" .. tostring(record.id)),
-        x = number(state and state.anchorX or activity.campX,
+        x = number(activity.campX or state and state.anchorX,
             record and record.anchorX or record and record.x or 0),
-        y = number(state and state.anchorY or activity.campY,
+        y = number(activity.campY or state and state.anchorY,
             record and record.anchorY or record and record.y or 0),
-        z = number(state and state.anchorZ or activity.campZ,
+        z = number(activity.campZ or state and state.anchorZ,
             record and record.anchorZ or record and record.z or 0),
-        radius = number(state and state.campRadius
-            or activity.campRadius, Const.CAMP_RADIUS or 3),
-        resourceRadius = number(state and state.resourceRadius
-            or activity.resourceRadius, Const.CAMP_RESOURCE_RADIUS or 12),
+        radius = number(activity.campRadius or state and state.campRadius,
+            Const.CAMP_RADIUS or 3),
+        resourceRadius = number(activity.resourceRadius
+            or state and state.resourceRadius,
+            Const.CAMP_RESOURCE_RADIUS or 12),
     }
 end
 
@@ -177,6 +180,13 @@ local function addResource(resources, seen, resource)
     copy.resourceKey = key
     copy.kind = copy.kind or "discovered"
     copy.readOnly = true
+    if type(copy.seatSpots) == "table" then
+        local maximum = math.max(1, math.floor(number(
+            Const.CAMP_RESOURCE_SPOT_MAX, 8)))
+        while #copy.seatSpots > maximum do
+            table.remove(copy.seatSpots)
+        end
+    end
     seen[key] = true
     resources[#resources + 1] = copy
 end
@@ -227,7 +237,7 @@ local function describeFaucet(square, object, ordinal)
     return {
         kind = "discovered", detectorId = "faucet",
         targetResolver = "faucet", resourceKind = "water_source",
-        role = "water.spigot", capability = "water.nearby",
+        role = "survival.world_water", capability = "survival.drink.world",
         resourceKey = key, key = key, x = x + 0.5, y = y + 0.5,
         z = z or 0, originX = x, originY = y, originZ = z or 0,
         sprite = spriteName(object), exclusive = false, available = true,
@@ -327,18 +337,93 @@ local function snapshotMatches(state, order, radius, campRadius)
         and type(state.resources) == "table"
 end
 
-function Service.Capture(record, force)
-    local order = campContext(record)
-    if not order then return nil, "NOT_CAMPED" end
-    local radius = math.max(1, math.min(24, number(order.resourceRadius,
+local function campDimensions(order)
+    local radius = math.max(1, math.min(24, number(
+        order and order.resourceRadius,
         number(Const.CAMP_RESOURCE_RADIUS, 12))))
-    local campRadius = math.max(0.5, math.min(24, number(order.radius,
+    local campRadius = math.max(0.5, math.min(24, number(
+        order and order.radius,
         number(Const.CAMP_RADIUS, 3))))
-    if not force and snapshotMatches(
-        record.campState, order, radius, campRadius
-    ) then
-        return record.campState
+    return radius, campRadius
+end
+
+local function campCacheKey(record, order)
+    return tostring(order and order.campId
+        or "camp:" .. tostring(record and record.id or "unknown"))
+end
+
+local function cacheEntry(record, order, create)
+    local key = campCacheKey(record, order)
+    local entry = Service.Runtime.camps[key]
+    if not entry and create ~= false then
+        entry = { campId = key, members = {}, state = nil }
+        Service.Runtime.camps[key] = entry
     end
+    return entry, key
+end
+
+local function detachRecord(record)
+    local runtime = record and record.runtime or nil
+    local key = runtime and runtime.campCacheId or nil
+    local entry
+    local memberID
+    local hasMembers
+    if not key then return end
+    entry = Service.Runtime.camps[tostring(key)]
+    memberID = tostring(record and record.id or "")
+    if entry and entry.members then entry.members[memberID] = nil end
+    if entry and entry.members then
+        hasMembers = false
+        for _ in pairs(entry.members) do
+            hasMembers = true
+            break
+        end
+        if not hasMembers then
+            Service.Runtime.camps[tostring(key)] = nil
+        end
+    end
+    runtime.campCacheId = nil
+    if record then record.campState = nil end
+end
+
+function Service.Attach(record, order)
+    local runtime
+    local entry
+    local key
+    local memberID
+    if not record then return nil end
+    order = order or campContext(record)
+    if not order then return nil end
+    runtime = record.runtime or {}
+    record.runtime = runtime
+    if runtime.campCacheId
+        and tostring(runtime.campCacheId) ~= campCacheKey(record, order)
+    then
+        detachRecord(record)
+    end
+    entry, key = cacheEntry(record, order, true)
+    memberID = tostring(record.id or "")
+    entry.members[memberID] = true
+    runtime.campCacheId = key
+    return entry
+end
+
+function Service.GetCachedSnapshot(record)
+    local order = campContext(record)
+    local entry
+    local radius
+    local campRadius
+    if not order then return nil end
+    entry = cacheEntry(record, order, false)
+    if not entry or type(entry.state) ~= "table" then return nil end
+    radius, campRadius = campDimensions(order)
+    if not snapshotMatches(entry.state, order, radius, campRadius) then
+        return nil
+    end
+    return entry.state
+end
+
+local function newCapture(entry, record, order, radius, campRadius)
     local state = {
         schemaVersion = Service.SCHEMA_VERSION,
         campId = tostring(order.campId or "camp:" .. tostring(record.id)),
@@ -350,45 +435,194 @@ function Service.Capture(record, force)
         capturedAtWorldHour = worldHour(),
         resources = {},
     }
-    local seen = {}
-    local live = PNC.Registry and PNC.Registry.GetLiveZombie
-        and PNC.Registry.GetLiveZombie(record.id) or nil
-    local cell = type(getCell) == "function" and getCell() or nil
-    local originX, originY = math.floor(state.anchorX), math.floor(state.anchorY)
-    if cell and type(cell.getGridSquare) == "function" then
-        for dx = -math.floor(radius), math.floor(radius) do
-            for dy = -math.floor(radius), math.floor(radius) do
-                if dx * dx + dy * dy <= radius * radius then
-                    local square = cell:getGridSquare(
-                        originX + dx, originY + dy, math.floor(state.anchorZ))
-                    if square then
-                        for _, provider in pairs(Service.Providers) do
-                            provider.CaptureSquare(
-                                square,
-                                function(resource)
-                                    addResource(state.resources, seen, resource)
-                                end,
-                                { record = record, character = live }
-                            )
-                        end
-                    end
-                end
-            end
-        end
-    end
+    return {
+        entry = entry,
+        record = record,
+        state = state,
+        seen = {},
+        cell = type(getCell) == "function" and getCell() or nil,
+        live = PNC.Registry and PNC.Registry.GetLiveZombie
+            and PNC.Registry.GetLiveZombie(record.id) or nil,
+        radius = radius,
+        originX = math.floor(state.anchorX),
+        originY = math.floor(state.anchorY),
+        originZ = math.floor(state.anchorZ),
+        span = math.floor(radius),
+        dx = -math.floor(radius),
+        dy = -math.floor(radius),
+    }
+end
+
+local function finishCapture(capture)
+    local entry = capture and capture.entry or nil
+    local state = capture and capture.state or nil
+    local maximum
+    local now
+    if not entry or not state then return nil end
     table.sort(state.resources, function(left, right)
         return tostring(left.resourceKey or "")
             < tostring(right.resourceKey or "")
     end)
-    local maximum = math.max(1, math.floor(number(Const.CAMP_RESOURCE_MAX, 64)))
+    maximum = math.max(1, math.floor(number(
+        Const.CAMP_RESOURCE_MAX, 32)))
     while #state.resources > maximum do table.remove(state.resources) end
-    record.campState = state
-    markDirty(record, "camp_resources_captured")
+    entry.state = state
+    entry.capture = nil
+    now = PNC.Core and PNC.Core.Now and PNC.Core.Now() or 0
+    entry.lastCaptureAt = now
+    if capture.record then capture.record.campState = state end
+    -- The resource table remains a runtime cache. Do not mark every camp
+    -- member dirty when discovery completes: that would create a needless
+    -- persistence/network fan-out for data that is intentionally not saved.
     return state
 end
 
+local function pumpCapture(capture, budget)
+    local processed = 0
+    local limit = math.max(1, math.floor(number(budget, 1)))
+    local square
+    local dx
+    local dy
+    if not capture then return nil, 0 end
+    if not capture.cell
+        or type(capture.cell.getGridSquare) ~= "function"
+    then
+        return finishCapture(capture), 0
+    end
+    while capture.dx <= capture.span and processed < limit do
+        dx, dy = capture.dx, capture.dy
+        capture.dy = dy + 1
+        if capture.dy > capture.span then
+            capture.dx = dx + 1
+            capture.dy = -capture.span
+        end
+        processed = processed + 1
+        if dx * dx + dy * dy <= capture.radius * capture.radius then
+            square = capture.cell:getGridSquare(
+                capture.originX + dx,
+                capture.originY + dy,
+                capture.originZ
+            )
+            if square then
+                for _, provider in pairs(Service.Providers) do
+                    provider.CaptureSquare(
+                        square,
+                        function(resource)
+                            addResource(
+                                capture.state.resources,
+                                capture.seen,
+                                resource
+                            )
+                        end,
+                        {
+                            record = capture.record,
+                            character = capture.live,
+                        }
+                    )
+                end
+            end
+        end
+    end
+    if capture.dx > capture.span then
+        return finishCapture(capture), processed
+    end
+    return nil, processed
+end
+
+local function requestCapture(record, force)
+    local order = campContext(record)
+    local radius
+    local campRadius
+    local entry
+    local legacyState
+    local cached
+    local now
+    local refreshCooldown
+    if not order then return nil, "NOT_CAMPED" end
+    radius, campRadius = campDimensions(order)
+    legacyState = record and record.campState or nil
+    entry = Service.Attach(record, order)
+    cached = entry and entry.state or nil
+    -- Tests and older runtime callers can still provide a transient state on
+    -- the record. It is adopted only in memory; it is never serialized.
+    if cached and legacyState and legacyState ~= cached
+        and not snapshotMatches(legacyState, order, radius, campRadius)
+    then
+        entry.state = nil
+        cached = nil
+    end
+    if cached and snapshotMatches(cached, order, radius, campRadius) then
+        now = PNC.Core and PNC.Core.Now and PNC.Core.Now() or 0
+        refreshCooldown = tonumber(Const.CAMP_RESOURCE_REFRESH_COOLDOWN_MS)
+            or 1000
+        if force ~= true
+            or now - (tonumber(entry.lastCaptureAt) or 0)
+                < refreshCooldown
+        then
+            record.campState = cached
+            return cached
+        end
+    end
+    if legacyState and legacyState ~= cached and snapshotMatches(
+        legacyState, order, radius, campRadius
+    ) then
+        entry.state = legacyState
+        record.campState = legacyState
+        return legacyState
+    end
+    if entry.capture
+        and not snapshotMatches(entry.capture.state, order, radius, campRadius)
+    then
+        -- The camp id can survive an anchor edit. Never finish a scan against
+        -- an obsolete anchor or let it poison the shared cache.
+        entry.capture = nil
+        entry.state = nil
+    end
+    if entry.capture then
+        return nil, "CAMP_RESOURCE_CAPTURE_PENDING"
+    end
+    entry.capture = newCapture(entry, record, order, radius, campRadius)
+    return nil, "CAMP_RESOURCE_CAPTURE_PENDING"
+end
+
+function Service.Capture(record, force)
+    local order = campContext(record)
+    local entry
+    local state
+    local reason
+    if not order then return nil, "NOT_CAMPED" end
+    state, reason = requestCapture(record, force)
+    if state then return state end
+    if reason ~= "CAMP_RESOURCE_CAPTURE_PENDING" then
+        return nil, reason
+    end
+    entry = Service.Attach(record, order)
+    while entry and entry.capture do
+        state = pumpCapture(entry.capture, 1000000)
+        if state then return state end
+    end
+    return entry and entry.state or nil
+end
+
 function Service.GetSnapshot(record, force)
-    return Service.Capture(record, force)
+    return requestCapture(record, force)
+end
+
+function Service.Pump(now)
+    local budget = math.max(1, math.floor(number(
+        Const.CAMP_RESOURCE_SCAN_SQUARES_PER_TICK, 32)))
+    local processed = 0
+    local used
+    local entry
+    for _, candidate in pairs(Service.Runtime.camps) do
+        if processed >= budget then break end
+        entry = candidate
+        if entry and entry.capture then
+            _, used = pumpCapture(entry.capture, budget - processed)
+            processed = processed + (tonumber(used) or 0)
+        end
+    end
+    return processed
 end
 
 local function floorSlot(record, order)
@@ -480,9 +714,9 @@ local function resolveWaterTarget(record, resource, abstract)
     if source and Water and Water.BuildApproach then
         target, targets = Water.BuildApproach(record, source)
         if target then
-            target.sceneId = target.sceneId or "facility.water.drink.nearby"
+            target.sceneId = target.sceneId or "survival.drink.world"
             target.resourceKey = resource.resourceKey
-            target.resourceKind = "nearby_water"
+            target.resourceKind = "world_water"
             return target, targets, source
         end
     end
@@ -491,9 +725,9 @@ local function resolveWaterTarget(record, resource, abstract)
             x = number(resource.x, resource.originX or 0),
             y = number(resource.y, resource.originY or 0),
             z = number(resource.z, resource.originZ or 0),
-            sceneId = "facility.water.drink.nearby",
+            sceneId = "survival.drink.world",
             resourceKey = resource.resourceKey,
-            resourceKind = "nearby_water",
+            resourceKind = "world_water",
         }, nil, resource
     end
     return nil, nil, source
@@ -613,7 +847,7 @@ local function reserveWater(record, resource, campId)
         return false, "CAMP_RESERVATIONS_UNAVAILABLE"
     end
     return reservations.ReserveResource(
-        campFacilityId(campId), resource, record.id, "water", 30000,
+        campFacilityId(campId), resource, record.id, "world_water", 30000,
         { campId = campId, campResource = true })
 end
 
@@ -681,9 +915,10 @@ function Service.AcquireWater(record, options)
     if not ok then return nil, reservation or "CAMP_WATER_RESERVATION_FAILED" end
     return {
         ok = true, facilityId = campFacilityId(campId), componentId = "",
-        reservationId = reservation.id, role = resource.role or "water.spigot",
+        reservationId = reservation.id,
+        role = resource.role or "survival.world_water",
         resource = resource, resourceKey = resource.resourceKey,
-        resourceKind = "nearby_water", target = target,
+        resourceKind = "world_water", target = target,
         approachCandidates = targets, campId = campId, campActivity = true,
         campX = order.x, campY = order.y, campZ = order.z,
         campRadius = number(order.radius, Const.CAMP_RADIUS or 3),
@@ -774,8 +1009,9 @@ function Service.ResolveActivityTarget(record)
             if tostring(activity.capability or "") == "living" then
                 target = resolveSeat(
                     resource, abstract, live, activity.approachKey)
-            elseif tostring(activity.capability or "") == "water.nearby"
-                or tostring(activity.resourceKind or "") == "nearby_water"
+            elseif tostring(activity.capability or "")
+                    == "survival.drink.world"
+                or tostring(activity.resourceKind or "") == "world_water"
             then
                 target, _, resolvedResource = resolveWaterTarget(
                     record, resource, abstract)
@@ -795,8 +1031,8 @@ function Service.ResolveActivityTarget(record)
         if target then target.campResource = true end
         return target
     end
-    if tostring(activity.capability or "") == "water.nearby"
-        or tostring(activity.resourceKind or "") == "nearby_water"
+    if tostring(activity.capability or "") == "survival.drink.world"
+        or tostring(activity.resourceKind or "") == "world_water"
     then
         local _, target, _, source = Service.FindWater(record, {
             abstract = abstract, force = true, excludeKey = key,
@@ -854,12 +1090,13 @@ function Service.RefreshActivity(record, zombie)
     if not runtime or runtime.campActivity ~= true
         or (tostring(runtime.capability or "") ~= "sleep"
             and tostring(runtime.capability or "") ~= "living"
-            and tostring(runtime.capability or "") ~= "water.nearby")
+            and tostring(runtime.capability or "")
+                ~= "survival.drink.world")
     then return true end
     local target, liveResource = Service.ResolveActivityTarget(record)
     if target
         and (tostring(runtime.capability or "") == "living"
-            or tostring(runtime.capability or "") == "water.nearby"
+            or tostring(runtime.capability or "") == "survival.drink.world"
             or tostring(target.sleepSurface or "")
                 == tostring(runtime.sleepSurface or ""))
         and (target.resourceKey == nil
@@ -876,7 +1113,8 @@ function Service.RefreshActivity(record, zombie)
     local abstract = live == nil
     local resource, replacement, targets, replacementSource
     local isLiving = tostring(runtime.capability or "") == "living"
-    local isWater = tostring(runtime.capability or "") == "water.nearby"
+    local isWater = tostring(runtime.capability or "")
+        == "survival.drink.world"
     if isLiving then
         resource, replacement, targets = Service.FindSeat(record, {
             abstract = abstract, force = true, excludeKey = oldKey,
@@ -916,7 +1154,7 @@ function Service.RefreshActivity(record, zombie)
     runtime.reservationId = reservation.id
     runtime.resource = replacementSource or resource
     runtime.resourceKey = tostring(resource.resourceKey or "")
-    runtime.resourceKind = isWater and "nearby_water"
+    runtime.resourceKind = isWater and "world_water"
         or tostring(resource.resourceKind or "")
     runtime.approachCandidates = targets
     runtime.approachIndex = 1
@@ -941,11 +1179,19 @@ function Service.OnOrderChanged(record, previous, current)
     local activityKind = "facility_activity"
     local previousKind = tostring(previous and previous.kind or "")
     local currentKind = tostring(current and current.kind or "")
+    local currentIsCampActivity = currentKind == activityKind
+        and current and current.campActivity == true
     if currentKind == campKind then
-        if previousKind ~= campKind then record.campState = nil end
-        Service.Capture(record, true)
-    elseif previousKind == campKind and currentKind ~= activityKind then
-        record.campState = nil
+        if previousKind ~= campKind then
+            detachRecord(record)
+        end
+        Service.Attach(record, current)
+    elseif currentIsCampActivity then
+        -- Need activities temporarily replace the durable camp order. Keep
+        -- the shared cache attached until the activity restores or ends.
+        Service.Attach(record, current)
+    elseif currentKind ~= activityKind then
+        detachRecord(record)
         markDirty(record, "camp_ended")
     end
 end

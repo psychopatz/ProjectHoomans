@@ -11,7 +11,7 @@ local buildingCardsSource = T.read("ProjectHoomans", "client",
 local buildingDataSource = T.read("ProjectHoomans", "client",
     "PNC/UI/Base/PNC_BaseBuildingData.lua")
 local buildingCatalogSource = T.read("ProjectHoomans", "client",
-    "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagementBuildingTab.lua")
+    "PNC/UI/Base/PNC_BaseBuildingCatalog.lua")
 local queueSource = T.read("ProjectHoomans", "client",
     "PNC/UI/Base/PNC_BaseQueue.lua")
 local lifecycleSource = T.read("ProjectHoomans", "client",
@@ -19,9 +19,7 @@ local lifecycleSource = T.read("ProjectHoomans", "client",
 local inventoryListSource = T.read("ProjectHoomans", "client",
     "PNC/UI/Inventory/PNC_InventoryUI_List.lua")
 local facilityModalSource = T.read("ProjectHoomans", "client",
-    "PNC/UI/Communities/ColonyManagement/PNC_FacilityBuildModal.lua")
-local legacySource = T.read("ProjectHoomans", "client",
-    "PNC/UI/Building/PNC_Building.lua")
+    "PNC/UI/SettlementManagement/PNC_SettlementManagement_FacilityBuildModal.lua")
 local hubSource = T.read("ProjectHoomans", "client",
     "PNC/UI/CommandHub/PNC_CommandHub.lua")
 local hubWindowSource = T.read("ProjectHoomans", "client",
@@ -29,7 +27,7 @@ local hubWindowSource = T.read("ProjectHoomans", "client",
 local registrySource = T.read("ProjectHoomans", "client",
     "PNC/UI/CommandHub/PNC_CommandHub_Registry.lua")
 local baseTabSource = T.read("ProjectHoomans", "client",
-    "PNC/UI/Communities/ColonyManagement/SettlementManagement/PNC_SettlementManagement_Tab.lua")
+    "PNC/UI/SettlementManagement/PNC_SettlementManagement_Tab.lua")
 local territorySource = T.read("ProjectHoomans", "client",
     "PNC/UI/CommandHub/PNC_CommandHub_BaseTerritoryActions.lua")
 local outcomesSource = T.read("ProjectHoomans", "client",
@@ -89,8 +87,6 @@ T.contains(queueSource, "work_cancel",
     "Base queue does not preserve cancellation protocol")
 T.contains(queueSource, "resume_work",
     "Base queue does not preserve the resume action route")
-T.contains(legacySource, "PNC/UI/Base/PNC_Base",
-    "legacy Building entry point does not resolve to Base")
 T.contains(hubSource, "PNC/UI/Base/PNC_Base",
     "Command Hub does not load the Base widget")
 T.contains(hubWindowSource, "function Hub.OpenBase",
@@ -103,8 +99,8 @@ T.contains(registrySource, "UI_PNC_CommandHub_Category_Base",
     "Command Hub category is not named Base")
 T.contains(registrySource, "enabled = Gates.HasColony",
     "Base category is still gated behind stockpile completion")
-T.contains(registrySource, "PNC.BaseUI or PNC.BuildingUI",
-    "Command Hub does not prefer the Base widget")
+T.contains(registrySource, "PNC.BaseUI",
+    "Command Hub does not use the Base widget")
 T.contains(territorySource, "local latest = snapshotFor(window)",
     "Base territory requests still capture stale multiplayer state")
 T.contains(outcomesSource, "PNC.CommandHub.OpenTerritorySetup",

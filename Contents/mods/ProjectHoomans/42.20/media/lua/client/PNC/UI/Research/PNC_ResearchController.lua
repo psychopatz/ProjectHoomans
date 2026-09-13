@@ -1,7 +1,7 @@
 require "PsychopatzCore/UI/PsychopatzUI"
 
 local Components = require
-    "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Components"
+    "PNC/UI/Shared/PNC_ColonyUIComponents"
 local DetailPane = require "PNC/UI/Research/PNC_ResearchDetailPane"
 local LayoutModel = require "PNC/UI/Research/PNC_ResearchLayout"
 local Model = require "PNC/UI/Research/PNC_ResearchModel"

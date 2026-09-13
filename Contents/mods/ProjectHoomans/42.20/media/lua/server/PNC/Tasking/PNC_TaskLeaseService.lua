@@ -107,6 +107,10 @@ function Leases.Create(intent, assignment)
         reservationId = assignment and assignment.reservationId or nil,
         resourceKey = assignment and assignment.resourceKey or nil,
         resourceKind = assignment and assignment.resourceKind or nil,
+        activityItemID = assignment and assignment.activityItemID or nil,
+        activityItemFullType = assignment
+            and assignment.activityItemFullType or nil,
+        manual = assignment and assignment.manual == true or false,
         phase = "ASSIGNED", startedAt = PNC.Core.Now(), revision = 1,
         lastProgressAt = PNC.Core.Now(), cancellationRequested = false,
         executionMode = assignment and assignment.executionMode or nil,

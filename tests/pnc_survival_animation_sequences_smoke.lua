@@ -26,9 +26,9 @@ T.equal(eat.steps[3].bump, "Eat", "eating repeats Eat three times")
 T.equal(eat.steps[4].bump, "WipeBrow", "eating then wipes brow")
 T.equal(eat.steps[5].bump, "WipeHead", "eating finishes by wiping head")
 
-local spigot = scenes["facility.water.drink"]
-local nearby = scenes["facility.water.drink.nearby"]
-for _, drink in ipairs({ spigot, nearby }) do
+local inventoryDrink = scenes["survival.drink.inventory"]
+local worldDrink = scenes["survival.drink.world"]
+for _, drink in ipairs({ inventoryDrink, worldDrink }) do
     T.equal(#drink.steps, 3, "drinking scene has three ordered steps")
     T.equal(drink.steps[1].bump, "Drink", "drinking starts with Drink")
     T.equal(drink.steps[2].bump, "WipeBrow", "drinking then wipes brow")
@@ -60,10 +60,18 @@ T.truthy(foodDefinition.completeWithScene,
 T.truthy(PNC.FacilityJobDefinitions.Get(
     "survival.eat.inventory").completeWithScene,
     "follower eating waits for its complete animation scene")
-T.truthy(PNC.FacilityJobDefinitions.Get("water.drink").completeWithScene,
-    "spigot drinking waits for its complete animation scene")
-T.truthy(PNC.FacilityJobDefinitions.Get("water.nearby").completeWithScene,
-    "nearby drinking waits for its complete animation scene")
+T.truthy(PNC.FacilityJobDefinitions.Get(
+    "survival.drink.inventory").completeWithScene,
+    "inventory drinking waits for its complete animation scene")
+T.truthy(PNC.FacilityJobDefinitions.Get(
+    "survival.drink.world").completeWithScene,
+    "world drinking waits for its complete animation scene")
+T.equal(PNC.FacilityJobDefinitions.Get(
+    "survival.drink.inventory").primitiveNeed, "thirst",
+    "inventory drinking consumes through the hydration supply path")
+T.equal(PNC.FacilityJobDefinitions.Get(
+    "survival.drink.world").needEffect, "world_water",
+    "world drinking commits against the live source")
 
 local record = {
     id = "npc:sequence",
@@ -110,13 +118,13 @@ PNC.BehaviorCommon = {
     end,
 }
 record.orderSpec = {
-    kind = "facility_activity", capability = "water.nearby",
+    kind = "facility_activity", capability = "survival.drink.world",
     x = 10.5, y = 10.5, z = 0, sceneId = "",
 }
 record.x, record.y, record.z = 1, 1, 0
 record.runtime.facilityActivity = {
-    capability = "water.nearby", sceneId = "facility.water.drink.nearby",
-    reservationId = "", taskLeaseId = "", resourceKind = "nearby_water",
+    capability = "survival.drink.world", sceneId = "survival.drink.world",
+    reservationId = "", taskLeaseId = "", resourceKind = "world_water",
     resource = {}, approachIndex = 1, failedApproaches = {},
     approachCandidates = {
         { x = 10.5, y = 10.5, z = 0, approachKey = "10:10:0" },
@@ -132,6 +140,21 @@ T.equal(record.orderSpec.x, 11.5,
 T.equal(record.orderSpec.interactionFacing, "W",
     "retry keeps the correct sink-facing direction")
 T.equal(movedTo.x, 11.5, "the replacement trajectory is issued immediately")
+
+-- A traversal timeout can leave the lane active while the passage repair is
+-- handed back to the engine. The water activity must still rotate its
+-- approach candidate on the next facility tick.
+record.orderSpec.x, record.orderSpec.y = 10.5, 10.5
+record.runtime.facilityActivity.approachIndex = 1
+record.runtime.facilityActivity.failedApproaches = {}
+record.runtime.facilityActivity.worldWaterApproachRetry = true
+record.runtime.pathing = { phase = "active", ownerMode = "engine_path_waiting" }
+T.truthy(PNC.FacilityJobs.Tick(record, {}),
+    "water behavior handles a path timeout left in engine waiting state")
+T.equal(record.orderSpec.x, 11.5,
+    "water path timeout rotates to the next approach square")
+T.falsy(record.runtime.facilityActivity.worldWaterApproachRetry,
+    "water path retry marker is consumed once")
 
 local requestedOptions, faced
 PNC.BehaviorCommon.HaltMovement = function() end
@@ -168,5 +191,49 @@ T.equal(record.runtime.facilityActivity.phase, "INTERRUPTED",
     "failed scene request left the activity in STARTING")
 T.equal(record.runtime.facilityActivity.interruptReason, "scene_missing",
     "failed scene request did not expose its reason")
+
+-- If playback ends before the delayed food effect runs, the activity must be
+-- finished and backed off. Leaving it in INTERRUPTED makes the behavior tick
+-- request the same eating scene forever without consuming food.
+PNC.Core.Now = function() return 1000 end
+local interruptedFood = {
+    id = "npc:food-interrupted",
+    orderSpec = { kind = "facility_activity" },
+    runtime = {
+        facilityActivity = {
+            capability = "survival.eat.inventory",
+            resourceKind = "personal_food",
+            reservationId = "", taskLeaseId = "",
+            previousOrder = { kind = "follow" },
+        },
+    },
+}
+PNC.FacilityJobs.OnSceneStopped(interruptedFood, nil, {
+    id = "survival.eat.inventory",
+}, "completed")
+T.falsy(interruptedFood.runtime.facilityActivity,
+    "unfinished food scene does not leave an immortal activity behind")
+T.equal(interruptedFood.runtime.personalFoodRetryAt, 6000,
+    "unfinished food scene installs a bounded retry cooldown")
+
+local interruptedRefill = {
+    id = "npc:refill-interrupted",
+    orderSpec = { kind = "facility_activity" },
+    runtime = {
+        facilityActivity = {
+            capability = "survival.fill.water",
+            resourceKind = "water_refill",
+            reservationId = "", taskLeaseId = "",
+            previousOrder = { kind = "follow" },
+        },
+    },
+}
+PNC.FacilityJobs.OnSceneStopped(interruptedRefill, nil, {
+    id = "survival.fill.water",
+}, "completed")
+T.falsy(interruptedRefill.runtime.facilityActivity,
+    "unfinished refill scene does not leave an immortal activity behind")
+T.equal(interruptedRefill.runtime.waterRefillRetryAt, 6000,
+    "unfinished refill scene installs a bounded retry cooldown")
 
 T.finish("pnc_survival_animation_sequences_smoke")

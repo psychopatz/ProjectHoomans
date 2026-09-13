@@ -30,7 +30,12 @@ end
 local function isSink(object)
     local sprite = call(call(object, "getSprite"), "getName")
     local name = string.lower(tostring(sprite or call(object, "getName") or ""))
-    return string.find(name, "sink", 1, true) ~= nil
+    local namedWaterObject = string.find(name, "sink", 1, true) ~= nil
+        or string.find(name, "well", 1, true) ~= nil
+        or string.find(name, "faucet", 1, true) ~= nil
+        or string.find(name, "waterpump", 1, true) ~= nil
+        or string.find(name, "water_pump", 1, true) ~= nil
+    return namedWaterObject
         and (call(object, "isWaterSource") == true
             or call(object, "hasFluid") == true
             or call(object, "getFluidContainer") ~= nil

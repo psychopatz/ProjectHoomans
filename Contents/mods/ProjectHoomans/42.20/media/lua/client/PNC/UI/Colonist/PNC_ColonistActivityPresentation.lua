@@ -1,5 +1,5 @@
 local Shared = require
-    "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Shared"
+    "PNC/UI/Shared/PNC_ColonyUIShared"
 
 local Presentation = {}
 

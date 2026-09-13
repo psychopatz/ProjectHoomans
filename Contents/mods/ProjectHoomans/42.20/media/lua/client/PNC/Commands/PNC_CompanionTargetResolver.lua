@@ -263,6 +263,37 @@ function Resolver.ResolveRecipients(player, mode, radius, scope)
     }
 end
 
+-- Return the next target in the same deterministic ordering used by nearby
+-- selection.  The inline chat uses this when the nearest-target control is
+-- pressed repeatedly, allowing the player to choose a specific NPC without
+-- changing the shared recipient filtering rules.
+function Resolver.ResolveNearestCycle(player, currentID, radius, scope)
+    local normalizedScope = Resolver.NormalizeScope(scope)
+    local candidates = Resolver.CollectNearbyTargets(
+        player, radius, normalizedScope
+    )
+    local nextIndex = 1
+    local current = currentID ~= nil and tostring(currentID) or nil
+
+    if current and current ~= "" then
+        for index, candidate in ipairs(candidates) do
+            if tostring(candidate.id) == current then
+                nextIndex = (index % #candidates) + 1
+                break
+            end
+        end
+    end
+
+    local target = candidates[nextIndex]
+    return {
+        mode = "nearest",
+        scope = normalizedScope,
+        target = target,
+        targets = target and { target } or {},
+        candidates = candidates,
+    }
+end
+
 -- Convert a target result into the richer entry shape consumed by the shared
 -- conversation definition.
 function Resolver.BuildConversationEntry(target)
@@ -275,10 +306,17 @@ function Resolver.BuildConversationEntry(target)
         or target and target.record
         or source and source.record
         or nil
-    local zombie = target and target.zombie
+    -- Prefer the registry's current body over a cached target body. A body
+    -- can be replaced during streaming or lease repair while the logical NPC
+    -- entry remains the same; retaining target.zombie here would keep stale
+    -- conversation and outline references alive.
+    local presenceSync = PNC.ClientPresenceSync
+    local zombie = Registry and Registry.GetLiveZombie
+        and Registry.GetLiveZombie(id)
+        or presenceSync and presenceSync.ResolveBodyForNPC
+        and presenceSync.ResolveBodyForNPC(id, snapshot)
+        or target and target.zombie
         or source and source.zombie
-        or Registry and Registry.GetLiveZombie
-            and Registry.GetLiveZombie(id)
         or nil
     if not record and not snapshot then
         record = source

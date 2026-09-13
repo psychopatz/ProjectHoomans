@@ -114,31 +114,46 @@ Definitions.Register("health.recover", {
     completionThreshold = 0.98,
 })
 
-Definitions.Register("water.drink", {
+-- Hydration is a survival action, not a settlement facility. Personal drinks
+-- and world water sources share the same executor, but neither requires a
+-- settlement water facility or an abstract water balance.
+Definitions.Register("survival.drink.inventory", {
     activeJob = "Drink",
     activityLabelKey = "UI_PNC_Activity_Drinking",
     activityText = "Drinking",
-    sceneId = "facility.water.drink",
-    role = "water.spigot",
+    sceneId = "survival.drink.inventory",
+    role = "survival.personal_drink",
     arrivalDistance = 0.85,
     activityLabel = "DRINKING",
-    needEffect = "water",
-    waterLiters = 1,
-    thirstRelief = 0.50,
+    needEffect = "primitive",
+    primitiveNeed = "thirst",
+    effectDelayMs = 1200,
+    completeWithScene = true,
+})
+
+Definitions.Register("survival.drink.world", {
+    activeJob = "Drink",
+    activityLabelKey = "UI_PNC_Activity_Drinking",
+    activityText = "Drinking",
+    sceneId = "survival.drink.world",
+    role = "survival.world_water",
+    arrivalDistance = 0.85,
+    activityLabel = "DRINKING",
+    needEffect = "world_water",
     effectDelayMs = 1800,
     completeWithScene = true,
 })
 
-Definitions.Register("water.nearby", {
-    activeJob = "Drink",
-    activityLabelKey = "UI_PNC_Activity_Drinking",
-    activityText = "Drinking",
-    sceneId = "facility.water.drink.nearby",
-    role = "water.nearby",
+Definitions.Register("survival.fill.water", {
+    activeJob = "Fill Water Container",
+    activityLabelKey = "UI_PNC_Activity_FillingWater",
+    activityText = "Filling Water",
+    sceneId = "survival.fill.water",
+    role = "survival.water_refill",
     arrivalDistance = 0.85,
-    activityLabel = "DRINKING",
-    needEffect = "nearby_water",
-    effectDelayMs = 1800,
+    activityLabel = "FILLING WATER",
+    needEffect = "water_refill",
+    effectDelayMs = 1200,
     completeWithScene = true,
 })
 

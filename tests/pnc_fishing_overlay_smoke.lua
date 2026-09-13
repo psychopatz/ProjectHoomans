@@ -12,7 +12,7 @@ end
 
 PNC = {}
 local Overlay = T.load("ProjectHoomans", "client",
-    "PNC/UI/Communities/ColonyManagement/PNC_FishingZoneOverlay.lua")
+    "PNC/UI/SettlementManagement/PNC_SettlementManagement_FishingZoneOverlay.lua")
 local zone = {
     valid = true,
     geometry = { levels = { [0] = { rows = { [0] = { 1, 2 } } } } },

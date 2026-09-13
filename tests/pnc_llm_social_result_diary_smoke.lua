@@ -88,6 +88,8 @@ T.equal(entries[1].kind, "llm_social_reaction",
     "diary identifies the LLM reaction")
 T.equal(entries[1].choiceID, "insult",
     "diary identifies the reaction kind")
+T.equal(entries[1].interactionType, "player_insulted",
+    "diary preserves the semantic interaction trigger")
 T.equal(entries[1].delta.approval, -4,
     "diary renders the authoritative approval delta")
 

@@ -159,16 +159,8 @@ T.equal(workshopLevel.componentLimits["work.craft"].minCount, 1,
     "craft station remains a workshop component")
 T.equal(workshopLevel.componentLimits["work.disassemble"].minCount, 1,
     "disassembly station remains a workshop component")
-local waterLevel = PNC.FacilityDefinitions.GetLevel("water_collector", 1)
-T.equal(waterLevel.componentLimits["water.spigot"].kind, "anchor",
-    "water spigot is a physical interaction component")
-T.equal(waterLevel.componentLimits["water.tank"].kind, "abstract",
-    "water tanks use reusable abstract components")
-T.equal(waterLevel.componentLimits["water.tank"].maxCount, 4,
-    "water level one permits four tanks")
-local waterLevelTen = PNC.FacilityDefinitions.GetLevel("water_collector", 10)
-T.equal(waterLevelTen.componentLimits["water.catcher"].maxCount, 40,
-    "water module limits scale through level ten")
+T.equal(PNC.FacilityDefinitions.Get("water_collector"), nil,
+    "settlement no longer registers a water collector facility")
 
 local playerZoneConflict = PNC.BaseService.Create({}, {
     colonyId = "community_other", factionId = "faction_test",

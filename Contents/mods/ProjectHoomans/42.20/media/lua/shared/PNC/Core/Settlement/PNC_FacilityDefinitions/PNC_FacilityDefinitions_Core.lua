@@ -25,9 +25,6 @@ Definitions.ComponentIconPaths = Definitions.ComponentIconPaths or {
     ["work.craft"] = "media/ui/Facilities/Components/workshop/workbench.png",
     ["work.disassemble"] = "media/ui/Facilities/Components/workshop/recycling_bench.png",
     ["work.zone"] = "media/ui/Facilities/Components/workshop/workbench.png",
-    ["water.spigot"] = "media/ui/Facilities/Components/water_station/pump_spigot.png",
-    ["water.tank"] = "media/ui/Facilities/Components/default.png",
-    ["water.catcher"] = "media/ui/Facilities/Components/default.png",
 }
 
 function Definitions.GetComponentIconPath(role)

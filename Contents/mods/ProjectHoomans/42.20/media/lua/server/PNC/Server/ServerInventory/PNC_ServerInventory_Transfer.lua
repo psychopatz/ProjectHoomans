@@ -28,12 +28,12 @@ function Service.Transfer(player, args)
         allowed, reason = canManage(player, record)
     end
     if not allowed then return notify(player, false, reason, args) end
-    local revisionOK, sinceRevision = checkRevision(record, args)
+    local revisionOK, sinceRevision, revisionDetails = checkRevision(record, args)
     if not revisionOK then
         if Network and Network.SendCharacterPayload then
             Network.SendCharacterPayload(player, record)
         end
-        return notify(player, false, sinceRevision, args)
+        return notify(player, false, sinceRevision, args, revisionDetails)
     end
     local success
     local details

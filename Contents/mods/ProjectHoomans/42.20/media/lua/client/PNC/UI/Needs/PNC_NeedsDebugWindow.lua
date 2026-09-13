@@ -10,6 +10,11 @@ local Definitions = PNC.NeedsDefinitions
 
 local function text(value) return getText and getText(value) or value end
 local function selected(list) local entry = list and list:getItem(); return entry and entry.item or nil end
+local function calorieBalance(nutrition)
+    nutrition = nutrition or {}
+    return tonumber(nutrition.calories) or 0,
+        math.max(0, tonumber(nutrition.calorieOverflow) or 0)
+end
 local function drawItem(list, y, entry, alternate)
     local item = entry.item
     UI.DrawListSelection(list, y, list.itemheight, list.selected == entry.index, alternate)
@@ -59,7 +64,14 @@ function ISPNCNeedsDebugWindow:refreshSnapshot()
     local oldGroup, oldNPC = selected(self.groups), selected(self.individuals)
     self.groups:clear(); self.individuals:clear(); self.details:clear()
     for _, group in ipairs(snapshot.groups or {}) do self.groups:addItem(group.name, { id=group.id, label=group.name, detail=string.format("%s | %d | H %.2f T %.2f F %.2f", group.type, group.members, group.needs.hunger, group.needs.thirst, group.needs.fatigue), value=group }) end
-    for _, npc in ipairs(snapshot.individuals or {}) do self.individuals:addItem(npc.name, { id=npc.id, label=npc.name, detail=string.format("H %.2f T %.2f F %.2f | %.0f kcal %.1f kg", npc.needs.hunger, npc.needs.thirst, npc.needs.fatigue, npc.nutrition and npc.nutrition.calories or 0, npc.nutrition and npc.nutrition.weight or 0), value=npc }) end
+    for _, npc in ipairs(snapshot.individuals or {}) do
+        local calories, overflow = calorieBalance(npc.nutrition)
+        self.individuals:addItem(npc.name, { id=npc.id, label=npc.name,
+            detail=string.format("H %.2f T %.2f F %.2f | %.0f kcal + %.0f reserve %.1f kg",
+                npc.needs.hunger, npc.needs.thirst, npc.needs.fatigue,
+                calories, overflow, npc.nutrition and npc.nutrition.weight or 0),
+            value=npc })
+    end
     local function restore(list, id)
         for index, entry in ipairs(list.items or {}) do
             if entry.item and entry.item.id == id then list.selected = index; return end

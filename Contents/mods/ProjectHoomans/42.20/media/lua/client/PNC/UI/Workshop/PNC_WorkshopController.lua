@@ -1,9 +1,9 @@
 require "PsychopatzCore/UI/PsychopatzUI"
 
 local Workshop = require
-    "PNC/UI/Communities/PNC_ColonyManagementWorkshopTab"
+    "PNC/UI/Workshop/PNC_WorkshopCatalog"
 local Shared = require
-    "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Shared"
+    "PNC/UI/Shared/PNC_ColonyUIShared"
 local Options = require "PsychopatzCore/UI/PsychopatzCommandHubOptions"
 
 local Controller = {}

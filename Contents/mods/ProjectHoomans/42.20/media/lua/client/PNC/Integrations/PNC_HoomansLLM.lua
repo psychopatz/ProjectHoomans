@@ -1052,6 +1052,12 @@ local function responseOrFailure(
             return dedicated, providerFailure == true
         end
     end
+    if providerFailure then
+        local dedicated = dedicatedToolReply(packet, semanticResults)
+        if dedicated and dedicated ~= "" then
+            return dedicated, true
+        end
+    end
     if response ~= "" then
         return response, providerFailure == true
     end
@@ -1195,7 +1201,15 @@ function Integration.Deliver(arguments)
         == "tool_ack"
     local response = forceToolReply and ""
         or cleanResponseText(arguments.response_text)
-    local providerFailure = false
+    local providerFailure = arguments and (
+        arguments.provider_failure == true
+        or arguments.providerFailure == true
+        or arguments.context_eligible == false
+        or arguments.contextEligible == false
+    )
+    -- Provider failures may still carry a legacy/generic response from an
+    -- older bridge. Let the authoritative semantic result own presentation.
+    if providerFailure then response = "" end
     if response == "" then
         local actionAccepted = false
         for _, result in ipairs(semanticResults) do

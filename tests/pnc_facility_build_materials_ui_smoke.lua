@@ -46,7 +46,7 @@ function PNC.FacilityDefinitions.GetLevel()
 end
 
 local BuildUI = require(
-    "PNC/UI/Communities/ColonyManagement/PNC_FacilityBuildModal")
+    "PNC/UI/SettlementManagement/PNC_SettlementManagement_FacilityBuildModal")
 local windowSpec = BuildUI.WindowSpec()
 T.equal(windowSpec.width, 1180,
     "facility build modal uses the responsive baseline width")
@@ -125,8 +125,8 @@ function buildActionWindow:close(restore)
 end
 ISPNCFacilityBuildWindow.onAction(buildActionWindow, { internal = "build" })
 T.equal(buildStarted, "forge", "build action invokes the placement callback")
-T.equal(restorePrevious, false,
-    "placement-starting build closes without restoring the hidden colony UI")
+T.equal(restorePrevious, nil,
+    "placement-starting build closes without legacy UI restore state")
 
 local refreshed = BuildUI.BuildOptions(settlement, {
     rows = {},

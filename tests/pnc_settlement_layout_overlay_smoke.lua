@@ -10,7 +10,7 @@ Events = {
     OnMainMenuEnter = { Add = function(callback) resetCallback = callback end },
 }
 
-local Overlay = require "PNC/UI/Communities/ColonyManagement/PNC_SettlementLayoutOverlay"
+local Overlay = require "PNC/UI/SettlementManagement/PNC_SettlementLayoutOverlay"
 local region = { levels = { [0] = { rows = { [4] = { 2, 5 } } } } }
 local layers = Overlay.BuildLayers({
     id = "base_a", geometry = { region = region },

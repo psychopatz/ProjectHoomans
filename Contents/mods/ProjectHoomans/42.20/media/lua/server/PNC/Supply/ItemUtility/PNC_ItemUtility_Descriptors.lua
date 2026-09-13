@@ -63,9 +63,26 @@ function H.Describe(profile, state, quantity)
     local hunger
     local thirst
     local negativeThirst
+    local fluidAmount
+    local fluidType
+    local fluidHydration
+    local fluidSafe
     hunger, thirst, negativeThirst = currentFoodValues(
         profile, state, foodStatus
     )
+    fluidAmount = H.Number(state.fluidAmount)
+    fluidType = tostring(state.fluidPrimaryType or state.fluidType or "")
+    fluidHydration = profile.fluidHydration == true
+        and profile.fluidContainer == true
+    if fluidHydration and fluidAmount and fluidAmount > 0.000001 then
+        thirst = fluidAmount
+            * (H.Number(profile.hydrationYieldPerLiter, 0.50) or 0.50)
+    end
+    fluidSafe = not fluidHydration
+        or fluidType == ""
+        or fluidType == "Water"
+        or fluidType == "CarbonatedWater"
+    if fluidType == "TaintedWater" then fluidSafe = false end
     local unsafe = state.rotten == true or state.poisoned == true
         or state.poison == true or state.tainted == true
         or H.Number(state.poisonPower, 0) > 0
@@ -84,10 +101,17 @@ function H.Describe(profile, state, quantity)
         thirst = thirst,
         calories = profile.calories,
         negativeThirst = negativeThirst,
+        fluidAmount = fluidAmount,
+        fluidType = fluidType ~= "" and fluidType or nil,
+        fluidHydration = fluidHydration,
+        hydrationYieldPerLiter = H.Number(
+            profile.hydrationYieldPerLiter, 0.50) or 0.50,
+        fluidSafe = fluidSafe,
         useDelta = useDelta,
         remainingUses = remainingUses,
         food = profile.food == true,
-        hydration = profile.hydration == true and remainingUses > 0
+        hydration = profile.hydration == true and fluidSafe
+            and remainingUses > 0
             and (state.fluidAmount == nil
                 or H.Number(state.fluidAmount, 0) > 0.000001),
         bandage = profile.bandage == true,
@@ -126,6 +150,7 @@ function Utility.Supports(descriptor, request)
     end
     if request.resourceKind == "HYDRATION" then
         return descriptor.hydration and descriptor.thirst > 0
+            and descriptor.fluidSafe ~= false
     end
     if request.resourceKind == "MEDICAL" then
         return request.treatment == "BANDAGE" and descriptor.bandage == true

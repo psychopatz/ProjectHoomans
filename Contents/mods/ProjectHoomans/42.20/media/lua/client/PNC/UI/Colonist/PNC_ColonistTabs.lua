@@ -2,7 +2,7 @@ local Registry = require "PNC/UI/Colonist/PNC_ColonistRegistry"
 local Activities = require "PNC/UI/Colonist/PNC_ColonistActivities"
 local Debug = require "PNC/UI/Colonist/PNC_ColonistDebug"
 local Task = require "PNC/UI/Colonist/PNC_ColonistTask"
-local Presentation = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Presentation"
+local Presentation = require "PNC/UI/Shared/PNC_ColonyPresentation"
 
 -- The first tab deliberately delegates to the tested colony-management needs
 -- presentation.  Future tabs only need to register another definition; the

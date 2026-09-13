@@ -35,7 +35,9 @@ Router.Register(Const.CMD_REQUEST_CHARACTER, function(player, args)
     local network = PNC.Network
     local record = registry.Get(args.id)
     if record and network.CanViewCharacter(player, record) then
-        if tonumber(args.inventoryRevision)
+        if args.forceFull == true then
+            network.SendCharacterPayload(player, record)
+        elseif tonumber(args.inventoryRevision)
             and tonumber(args.inventoryRevision) > 0
         then
             network.SendInventoryDelta(

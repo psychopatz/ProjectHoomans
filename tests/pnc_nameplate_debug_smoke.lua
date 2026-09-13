@@ -326,6 +326,8 @@ snapshot.actionInformation = {
 }
 actionText = PNC.NameplatePresentation.ActionStatus(snapshot)
 T.contains(actionText, "Guard Anchor", "generic job activity fallback")
+T.equal(actionText, "Guard Anchor",
+    "generic job activity does not invent an item suffix")
 snapshot.actionInformation = nil
 
 local entriesSource = T.read(

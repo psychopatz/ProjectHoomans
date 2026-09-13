@@ -53,6 +53,10 @@ end
 
 function Internal.CampActivityBounds(record, runtime)
     local state = record and record.campState or nil
+    local service = PNC.CampResourceService
+    if service and service.GetCachedSnapshot then
+        state = service.GetCachedSnapshot(record) or state
+    end
     local anchorX = tonumber(runtime and runtime.campX)
         or tonumber(state and state.anchorX)
         or tonumber(record and record.anchorX)

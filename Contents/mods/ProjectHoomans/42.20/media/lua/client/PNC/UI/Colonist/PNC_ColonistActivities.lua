@@ -1,10 +1,10 @@
 require "PsychopatzCore/UI/PsychopatzUI"
 require "ISUI/ISPanel"
 
-local Presentation = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Presentation"
+local Presentation = require "PNC/UI/Shared/PNC_ColonyPresentation"
 local JournalPresentation = require "PNC/UI/Communities/PNC_ColonistJournalPresentation"
 local Selector = require "PNC/UI/Colonist/PNC_ColonistSelector"
-local Shared = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Shared"
+local Shared = require "PNC/UI/Shared/PNC_ColonyUIShared"
 
 local Activities = {}
 local UI = PsychopatzCore.UI
@@ -19,9 +19,15 @@ local DEFINITIONS = {
     },
     {
         id = "manual_drink",
-        capabilities = { "water.drink", "water.nearby" },
+        capabilities = { "survival.drink.inventory", "survival.drink.world" },
         key = "UI_PNC_CommandDrink",
         fallback = "DRINK",
+    },
+    {
+        id = "manual_refill",
+        capabilities = { "survival.fill.water" },
+        key = "UI_PNC_CommandRefillWater",
+        fallback = "REFILL WATER",
     },
     {
         id = "manual_sleep",
@@ -89,7 +95,10 @@ local function currentActivity(person)
         or Shared.Text(info.fallback or info.activityId, "IDLE")
     local item = itemName(info)
     if not item and info.activityItemLabelKey then
-        item = Shared.Tr(info.activityItemLabelKey, "item")
+        local fallback = (info.resourceKind == "world_water"
+            or info.capability == "survival.drink.world")
+            and "water" or "item"
+        item = Shared.Tr(info.activityItemLabelKey, fallback)
     end
     if item and item ~= "" then label = label .. " - " .. item end
     local phase = tostring(info.phase or "")
@@ -269,14 +278,21 @@ function Activities.BuildRows(context)
             Shared.Tr("UI_PNC_Activities_Phase", "PHASE"),
             tostring(info.phase))
     end
-    local diagnostic = person.corpseHaulManualDiagnostic
+    local diagnostic = person.manualActivityDiagnostic
+        or person.corpseHaulManualDiagnostic
     if type(diagnostic) == "table" and diagnostic.reason then
         local stage = tostring(diagnostic.details
             and diagnostic.details.stage or "request")
+        local label = diagnostic.commandID
+            and Shared.Tr("UI_PNC_Activities_LastActivityDiagnostic",
+                "LAST ACTIVITY COMMAND")
+            or Shared.Tr("UI_PNC_Activities_LastCorpseHaulDiagnostic",
+                "LAST CORPSE HAUL DIAGNOSTIC")
         rows[#rows + 1] = Presentation.Detail(
-            Shared.Tr("UI_PNC_Activities_LastCorpseHaulDiagnostic",
-                "LAST CORPSE HAUL DIAGNOSTIC"),
-            stage .. " = " .. tostring(diagnostic.reason),
+            label,
+            diagnostic.commandID and tostring(diagnostic.commandID) .. " = "
+                .. tostring(diagnostic.reason)
+                or stage .. " = " .. tostring(diagnostic.reason),
             diagnostic.result == true and "accent" or "warning")
     end
     if tostring(person.manualActivityDisabled or "") == "sleep" then
@@ -304,9 +320,17 @@ function Activities.OnControl(window, button)
     local client = PNC.Client
     local execute = client and client.ExecuteCompanionCommand or nil
     if not execute then return false end
-    local sent = execute(definition.id, person.id, nil, {
+    local requestID = PNC.Core and PNC.Core.GenerateID
+        and PNC.Core.GenerateID("colonist_activity")
+        or tostring(person.id) .. ":" .. tostring(definition.id)
+    local sent, reason = execute(definition.id, person.id, nil, {
         source = "colonist_activities",
+        requestID = requestID,
     })
+    if client.RecordManualActivityDiagnostic then
+        client.RecordManualActivityDiagnostic(person.id, definition.id,
+            sent == true, reason, requestID)
+    end
     if window.requestSnapshot then
         window:requestSnapshot("colonist_activity_" .. definition.id)
     end

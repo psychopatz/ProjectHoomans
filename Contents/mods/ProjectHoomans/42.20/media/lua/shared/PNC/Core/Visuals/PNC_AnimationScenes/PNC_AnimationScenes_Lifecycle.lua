@@ -6,12 +6,9 @@ local Diagnostics = PNC.PerformanceScalingDiagnostics
 local LiveBodyControl = PNC.LiveBodyControl
 
 local function isWaterScene(sceneId)
-    return string.find(
-        tostring(sceneId or ""),
-        "facility.water.",
-        1,
-        true
-    ) == 1
+    local id = tostring(sceneId or "")
+    return string.find(id, "survival.drink.", 1, true) == 1
+        or string.find(id, "survival.fill.", 1, true) == 1
 end
 
 local function activeTraversalOwner(record, zombie, now)

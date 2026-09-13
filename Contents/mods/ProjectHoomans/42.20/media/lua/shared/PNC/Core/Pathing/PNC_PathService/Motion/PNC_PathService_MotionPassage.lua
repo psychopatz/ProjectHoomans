@@ -6,6 +6,14 @@ local function repairTimedOutTraversal(zombie, record, lane, now)
     if not lane or lane.lastTraversalFinishReason ~= "hard_timeout" then
         return false
     end
+    local activity = record and record.runtime
+        and record.runtime.facilityActivity or nil
+    if activity and (activity.resourceKind == "world_water"
+        or activity.resourceKind == "water_refill")
+    then
+        activity.worldWaterApproachRetry = true
+        activity.waterRefillApproachRetry = true
+    end
     if lane.navigationProvider == "engine_path"
         and PNC.EnginePathPlanner
         and PNC.EnginePathPlanner.Invalidate

@@ -28,6 +28,9 @@ local function normalize(state)
                 math.min(Definitions.NUTRITION.maximumCalories,
                     tonumber(nutrition.calories)
                         or Definitions.NUTRITION.defaultCalories)),
+            calorieOverflow = math.max(0,
+                math.min(Definitions.NUTRITION.maximumCalorieOverflow or 0,
+                    tonumber(nutrition.calorieOverflow) or 0)),
             weight = math.max(Definitions.NUTRITION.minimumWeight,
                 math.min(Definitions.NUTRITION.maximumWeight,
                     tonumber(nutrition.weight)

@@ -1,5 +1,5 @@
-local ProvisionDiagnostics = require "PNC/UI/Communities/ColonyManagement/PNC_ProvisionDiagnosticsModal"
-local Shared = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Shared"
+local ProvisionDiagnostics = require "PNC/UI/SettlementManagement/PNC_SettlementManagement_ProvisionDiagnosticsModal"
+local Shared = require "PNC/UI/Shared/PNC_ColonyUIShared"
 
 local Actions = {}
 
@@ -14,7 +14,7 @@ local DEFINITIONS = {
         fallback = "RESET NEEDS" },
     { id = "force_provision", key = "UI_PNC_ColonyDebug_Provision",
         fallback = "FORCE GRAB PROVISIONS" },
-    { id = "force_nearby_water", key = "UI_PNC_ColonyDebug_NearbyWater",
+    { id = "force_world_water", key = "UI_PNC_ColonyDebug_NearbyWater",
         fallback = "FORCE DRINK NEARBY WATER" },
     { id = "inspect_provision", key = "UI_PNC_ColonyDebug_InspectProvision",
         fallback = "PROVISION DIAGNOSTICS" },
@@ -69,8 +69,8 @@ function Actions.OnControl(window, button, component)
         options.amount = 0.25
     elseif id == "reset" then
         options.operation = "reset"
-    elseif id == "force_nearby_water" then
-        options.operation = "force_nearby_water"
+    elseif id == "force_world_water" then
+        options.operation = "force_world_water"
         return client.RequestColonyAction("debug_need", options)
     elseif id == "force_provision" then
         options.operation = "force_provision"

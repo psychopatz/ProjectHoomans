@@ -35,6 +35,64 @@ local function kindLabel(value)
     return string.upper(text)
 end
 
+local INTERACTION_TITLE_KEYS = {
+    player_insulted = {
+        key = "UI_PNC_Interaction_PlayerInsulted",
+        fallback = "PLAYER INSULTED",
+    },
+    player_praised = {
+        key = "UI_PNC_Interaction_PlayerPraised",
+        fallback = "PLAYER PRAISED",
+    },
+    player_admired = {
+        key = "UI_PNC_Interaction_PlayerAdmired",
+        fallback = "PLAYER ADMIRED",
+    },
+    player_comforted = {
+        key = "UI_PNC_Interaction_PlayerComforted",
+        fallback = "PLAYER COMFORTED",
+    },
+    player_apologized = {
+        key = "UI_PNC_Interaction_PlayerApologized",
+        fallback = "PLAYER APOLOGIZED",
+    },
+    player_flirted = {
+        key = "UI_PNC_Interaction_PlayerFlirted",
+        fallback = "PLAYER FLIRTED",
+    },
+}
+
+local REACTION_INTERACTION_TYPES = {
+    insult = "player_insulted",
+    praise = "player_praised",
+    admire = "player_admired",
+    comfort = "player_comforted",
+    apologize = "player_apologized",
+    flirt = "player_flirted",
+}
+
+local function interactionLabel(entry)
+    entry = type(entry) == "table" and entry or {}
+    local interactionType = tostring(entry.interactionType or "")
+    local descriptor = INTERACTION_TITLE_KEYS[interactionType]
+    if not descriptor and entry.kind == "llm_social_reaction" then
+        local reaction = tostring(entry.reaction or entry.choiceID or "")
+        local mappedType = REACTION_INTERACTION_TYPES[reaction]
+        descriptor = mappedType and INTERACTION_TITLE_KEYS[mappedType] or nil
+        if not descriptor and reaction ~= "" then
+            return kindLabel("player_" .. reaction)
+        end
+    end
+    if descriptor then
+        return translated(descriptor.key, descriptor.fallback)
+    end
+    return kindLabel(entry.kind)
+end
+
+-- Kept public for focused UI tests and for callers that need the same
+-- presentation label without duplicating the event-to-title mapping.
+Tabs.FormatInteractionTitle = interactionLabel
+
 local function text(value)
     value = tostring(value or "")
     return value ~= "" and value or "-"
@@ -169,8 +227,8 @@ function Tabs.RenderInteractions(view, _, _, topY)
         local deltaPositive = (tonumber(delta.approval) or 0)
             + (tonumber(delta.respect) or 0)
             + (tonumber(delta.familiarity) or 0) >= 0
-        local title = kindLabel(entry.kind)
-        if entry.choiceID then
+        local title = interactionLabel(entry)
+        if entry.kind ~= "llm_social_reaction" and entry.choiceID then
             title = title .. "  " .. tostring(entry.choiceID)
         end
         view:drawRect(pad, y - 3, width, 1, 0.55, 0.45, 0.45, 0.45)

@@ -18,6 +18,7 @@ Protocol.EVENT_CODES = Protocol.EVENT_CODES or {
     [EventTypes.STORAGE_ITEM_WITHDRAWN] = 2,
     [EventTypes.NPC_FOOD_CONSUMED] = 3,
     [EventTypes.NPC_DRINK_CONSUMED] = 4,
+    [EventTypes.NPC_WATER_REFILLED] = 10,
     [EventTypes.NPC_NEED_SEVERITY_CHANGED] = 5,
     [EventTypes.NPC_NEED_CRITICAL_DAMAGE] = 6,
     [EventTypes.NPC_WEIGHT_CATEGORY_CHANGED] = 7,

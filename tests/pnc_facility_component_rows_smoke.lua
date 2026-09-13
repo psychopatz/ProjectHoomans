@@ -11,10 +11,10 @@ package.preload["PsychopatzCore/UI/PsychopatzUI"] = function()
     return PsychopatzCore.UI
 end
 package.preload[
-    "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Components"
+    "PNC/UI/Shared/PNC_ColonyUIComponents"
 ] = function() return {} end
 package.preload[
-    "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Shared"
+    "PNC/UI/Shared/PNC_ColonyUIShared"
 ] = function() return {} end
 
 PNC = { FacilityDefinitions = {
@@ -31,7 +31,7 @@ PNC = { FacilityDefinitions = {
 } }
 
 local Browser = require(
-    "PNC/UI/Communities/ColonyManagement/SettlementManagement/"
+    "PNC/UI/SettlementManagement/"
     .. "PNC_SettlementManagement_FacilityBrowser")
 
 local rows = Browser.BuildComponentRows({

@@ -16,7 +16,9 @@ local function preserveWornItemVisual(record, inv, wornSlot)
 end
 
 function Inventory.SetEquipped(record, slot, itemID, reason)
-    local inv = Inventory.EnsureRecordInventory(record)
+    local inv = Inventory.EnsureRecordInventory(record, {
+        reconcileWaterContainer = false,
+    })
     local previousID
     local previous
     local item
@@ -59,8 +61,67 @@ function Inventory.EquipPrimary(record, itemID, reason)
     return Inventory.SetEquipped(record, "primary", itemID, reason)
 end
 
+-- Water is a logical utility slot. It is deliberately not mirrored into the
+-- hand loadout, so equipping a bottle never disarms the NPC's weapon.
+function Inventory.SetWaterContainer(record, itemID, reason)
+    local inv = Inventory.EnsureRecordInventory(record, {
+        reconcileWaterContainer = false,
+    })
+    local previousID
+    local previous
+    local item
+    local oldSlot
+    local op
+    if not inv then return false, "inventory_unavailable" end
+    itemID = Internal.normalizeString(itemID)
+    item = itemID and inv.items[itemID] or nil
+    if itemID and not item then return false, "item_not_found" end
+    if itemID and Inventory.IsWaterContainer
+        and not Inventory.IsWaterContainer(item)
+    then
+        return false, "item_not_water_container"
+    end
+    if item and (item.interactionLocked or item.wornSlot or item.attachedSlot) then
+        return false, "item_not_available"
+    end
+    previousID = inv.equipped and inv.equipped.waterContainer or nil
+    if previousID == itemID and (not item or item.equipSlot == "waterContainer") then
+        return true, "unchanged"
+    end
+    previous = previousID and inv.items[previousID] or nil
+    if previous and previous.equipSlot == "waterContainer" then
+        previous.equipSlot = nil
+    end
+    oldSlot = item and item.equipSlot or nil
+    if oldSlot and inv.equipped[oldSlot] == itemID then
+        inv.equipped[oldSlot] = nil
+    end
+    if item then item.equipSlot = "waterContainer" end
+    inv.equipped.waterContainer = itemID
+    op = Internal.buildOperation("equip", {
+        slot = "waterContainer",
+        itemID = itemID,
+        previousItemID = previousID,
+        oldSlot = oldSlot,
+    })
+    Internal.bumpRevision(record, { op }, reason or "equip_water_container")
+    Inventory.SyncEquipmentFromInventory(record)
+    Inventory.RebuildCaches(record)
+    if PNC.Registry and PNC.Registry.MarkDirty then
+        PNC.Registry.MarkDirty(record, "inventory")
+    end
+    return true, item and "equipped_water_container" or "water_container_cleared"
+end
+
+function Inventory.ClearWaterContainer(record, reason)
+    return Inventory.SetWaterContainer(record, nil,
+        reason or "unequip_water_container")
+end
+
 function Inventory.SetWorn(record, itemID, wornSlot, reason)
-    local inv = Inventory.EnsureRecordInventory(record)
+    local inv = Inventory.EnsureRecordInventory(record, {
+        reconcileWaterContainer = false,
+    })
     local item
     local previousItemID
     local previous
@@ -118,7 +179,9 @@ function Inventory.SetWorn(record, itemID, wornSlot, reason)
 end
 
 function Inventory.ClearWorn(record, itemID, reason)
-    local inv = Inventory.EnsureRecordInventory(record)
+    local inv = Inventory.EnsureRecordInventory(record, {
+        reconcileWaterContainer = false,
+    })
     local item = inv and inv.items
         and inv.items[Internal.normalizeString(itemID)] or nil
     if not item then return false, "item_not_found" end

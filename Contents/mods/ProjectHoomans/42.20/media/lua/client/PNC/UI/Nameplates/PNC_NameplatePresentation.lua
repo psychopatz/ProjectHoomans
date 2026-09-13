@@ -222,9 +222,19 @@ local function itemName(fullType, fallback)
 end
 
 local function activityItemName(info)
-    local fallback = info.activityItemLabelKey
-        and tr(info.activityItemLabelKey, "item") or nil
-    return itemName(info.activityItemFullType, fallback)
+    if type(info) ~= "table" then return nil end
+    local fullType = info.activityItemFullType
+    local labelKey = info.activityItemLabelKey
+    local worldWater = info.resourceKind == "world_water"
+        or info.capability == "survival.drink.world"
+    local hasFullType = fullType ~= nil and tostring(fullType) ~= ""
+    local hasLabelKey = type(labelKey) == "string" and labelKey ~= ""
+    if not hasFullType and not hasLabelKey and not worldWater then
+        return nil
+    end
+    local fallbackText = worldWater and "water" or "item"
+    local fallback = hasLabelKey and tr(labelKey, fallbackText) or fallbackText
+    return itemName(fullType, fallback)
 end
 
 local function recipeTarget(info)

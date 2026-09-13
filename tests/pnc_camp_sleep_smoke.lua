@@ -12,6 +12,7 @@ PsychopatzCore = {
 local squares = {}
 local reservations = {}
 local nextReservation = 0
+local gridSquareCalls = 0
 
 local function squareKey(x, y, z)
     return tostring(x) .. ":" .. tostring(y) .. ":" .. tostring(z)
@@ -71,6 +72,7 @@ PNC = {
     Const = {
         ORDER_CAMP = "camp", CAMP_RESOURCE_RADIUS = 2,
         CAMP_RESOURCE_MAX = 16,
+        CAMP_RESOURCE_SCAN_SQUARES_PER_TICK = 2,
     },
     Core = { Now = function() return 1000 end },
     NeedsUtils = { WorldAgeHours = function() return 12 end },
@@ -144,6 +146,7 @@ PNC = {
 getCell = function()
     return {
         getGridSquare = function(_, x, y, z)
+            gridSquareCalls = gridSquareCalls + 1
             return squares[squareKey(x, y, z)]
         end,
     }
@@ -177,6 +180,53 @@ T.equal(snapshot.resources[3].sleepSurface, "sofa",
 T.falsy(snapshot.resources[1].object,
     "camp snapshots do not retain world object references")
 
+local firstCaptureCalls = gridSquareCalls
+local peerRecord = {
+    id = "npc:camp-peer", alive = true, x = 20, y = 20, z = 0,
+    runtime = {}, orderSpec = {
+        kind = "camp", campId = "camp:test", x = 10, y = 10, z = 0,
+        resourceRadius = 2,
+    },
+}
+local peerSnapshot = Service.Capture(peerRecord, false)
+T.equal(gridSquareCalls, firstCaptureCalls,
+    "members of one camp reuse a single resource scan")
+T.equal(peerSnapshot, snapshot,
+    "members of one camp share the runtime resource snapshot")
+
+local asyncRecord = {
+    id = "npc:camp-async", alive = true, x = 10, y = 10, z = 0,
+    runtime = {}, orderSpec = {
+        kind = "camp", campId = "camp:async", x = 10, y = 10, z = 0,
+        resourceRadius = 2,
+    },
+}
+local callsBeforeAsync = gridSquareCalls
+local pendingSnapshot, pendingReason = Service.GetSnapshot(asyncRecord, false)
+T.falsy(pendingSnapshot,
+    "first production camp lookup queues discovery instead of scanning inline")
+T.equal(pendingReason, "CAMP_RESOURCE_CAPTURE_PENDING",
+    "queued camp discovery exposes a retryable pending result")
+T.equal(gridSquareCalls, callsBeforeAsync,
+    "queued camp discovery does not touch grid squares on the request path")
+local firstPumpCalls = gridSquareCalls
+local pumpedSquares = Service.Pump(1000)
+T.truthy(pumpedSquares > 0 and pumpedSquares <= 2,
+    "camp discovery respects the shared per-tick square budget")
+Service.Pump(1001)
+T.truthy(gridSquareCalls > firstPumpCalls,
+    "the camp pump advances discovery incrementally")
+local asyncSnapshot
+for index = 1, 32 do
+    Service.Pump(1000 + index)
+    asyncSnapshot = Service.GetCachedSnapshot(asyncRecord)
+    if asyncSnapshot then break end
+end
+T.truthy(asyncSnapshot,
+    "incremental camp discovery eventually publishes a shared snapshot")
+T.equal(#asyncSnapshot.resources, 3,
+    "incremental camp discovery preserves the complete bounded result")
+
 snapshot.schemaVersion = 2
 record.campState = snapshot
 local migratedSnapshot = Service.Capture(record, false)
@@ -186,8 +236,8 @@ T.equal(migratedSnapshot.schemaVersion, Service.SCHEMA_VERSION,
 local waterAssignment = Service.AcquireWater(record, { abstract = true })
 T.truthy(waterAssignment and waterAssignment.ok,
     "camp water acquires a captured faucet for an abstract NPC")
-T.equal(waterAssignment.resourceKind, "nearby_water",
-    "camp water uses the shared nearby-water activity capability")
+T.equal(waterAssignment.resourceKind, "world_water",
+    "camp water uses the shared world-water activity capability")
 T.equal(waterAssignment.executionMode, "ABSTRACT",
     "unmaterialized camp water uses the abstract executor")
 T.truthy(PNC.IndividualNeeds == nil,
@@ -207,7 +257,7 @@ record.runtime.facilityActivity = {
 local drank, drinkComplete = Effects.Tick(record, {
     resource = waterAssignment.resource,
     resourceKey = waterAssignment.resourceKey,
-}, { needEffect = "nearby_water", effectDelayMs = 0 }, 0, 1000)
+}, { needEffect = "world_water", effectDelayMs = 0 }, 0, 1000)
 T.truthy(drank and drinkComplete,
     "abstract camp water satisfies thirst from the captured faucet descriptor")
 T.near(record.needs.thirst, 0.10, 0.000001,

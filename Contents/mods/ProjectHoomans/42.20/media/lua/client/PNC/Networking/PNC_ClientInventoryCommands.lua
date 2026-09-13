@@ -13,6 +13,29 @@ local Const = PNC.Const
 local Core = PNC.Core
 local ClientState = PNC.Network.ClientState
 
+local function requestInventoryResync(npcID, reason)
+    local pending
+    local sent
+    if not npcID or not Client.RequestCharacterPayload then
+        return false
+    end
+    ClientState.inventoryResyncPending = ClientState.inventoryResyncPending or {}
+    pending = ClientState.inventoryResyncPending[npcID]
+    if pending == true then return true end
+    ClientState.inventoryResyncPending[npcID] = true
+    if Core and Core.LogWarn then
+        Core.LogWarn(
+            "[PNC][INVENTORY] client resync npc=" .. tostring(npcID)
+                .. " reason=" .. tostring(reason or "delta_rejected")
+        )
+    end
+    sent = Client.RequestCharacterPayload(npcID, true)
+    if sent ~= true then
+        ClientState.inventoryResyncPending[npcID] = nil
+    end
+    return sent == true
+end
+
 local function receiveRelationshipAfter(npcID, after, delta, source, eventID)
     local relationship = PNC.Conversation
         and PNC.Conversation.Relationship
@@ -93,7 +116,7 @@ local function applyInventoryDelta(args)
     local item
     local container
     if not inventory or type(inventory.items) ~= "table" or type(args.ops) ~= "table" then
-        Client.RequestCharacterPayload(npcID)
+        requestInventoryResync(npcID, "payload_missing")
         return false
     end
     currentRevision = tonumber(inventory.revision)
@@ -103,14 +126,14 @@ local function applyInventoryDelta(args)
     if args.fullRequired == true or incomingRevision == nil
         or incomingRevision < currentRevision
     then
-        Client.RequestCharacterPayload(npcID)
+        requestInventoryResync(npcID, "revision_invalid")
         return false
     end
     if incomingRevision == currentRevision then
         return #args.ops == 0
     end
     if fromRevision ~= nil and fromRevision ~= currentRevision then
-        Client.RequestCharacterPayload(npcID)
+        requestInventoryResync(npcID, "revision_gap")
         return false
     end
     inventory = Core.DeepCopy(inventory)
@@ -120,7 +143,7 @@ local function applyInventoryDelta(args)
         if op.op == "add" and type(op.item) == "table" and op.item.id then
             item = Core.DeepCopy(op.item)
             if inventory.items[item.id] then
-                Client.RequestCharacterPayload(npcID)
+                requestInventoryResync(npcID, "duplicate_item")
                 return false
             end
             inventory.items[item.id] = item
@@ -130,7 +153,7 @@ local function applyInventoryDelta(args)
             end
         elseif op.op == "remove" and op.itemID then
             if not inventory.items[op.itemID] then
-                Client.RequestCharacterPayload(npcID)
+                requestInventoryResync(npcID, "missing_item")
                 return false
             end
             removeFromContainer(inventory, op.itemID)
@@ -166,10 +189,10 @@ local function applyInventoryDelta(args)
                 item.itemState = Core.DeepCopy(op.itemState)
             end
         elseif op.op == "replace" then
-            Client.RequestCharacterPayload(npcID)
+            requestInventoryResync(npcID, "unsupported_delta")
             return false
         elseif op.op == "move" or op.op == "update" then
-            Client.RequestCharacterPayload(npcID)
+            requestInventoryResync(npcID, "missing_delta_item")
             return false
         elseif op.op == "equip" and op.slot then
             inventory.equipped = inventory.equipped or {}
@@ -201,6 +224,9 @@ local function applyInventoryDelta(args)
     inventory.summary.revision = tonumber(args.inventoryRevision) or inventory.summary.revision
     inventory.revision = inventory.summary.revision
     cached.inventory = inventory
+    if ClientState.inventoryResyncPending then
+        ClientState.inventoryResyncPending[npcID] = nil
+    end
     rebuildCachedEquipment(cached, args.equipment)
     return true
 end
@@ -254,6 +280,9 @@ Internal.RegisterServerCommand(Const.CMD_CHARACTER_PAYLOAD, function(args)
         args.inventory = currentPayload.inventory
     end
     ClientState.characterPayloads[id] = args
+    if ClientState.inventoryResyncPending then
+        ClientState.inventoryResyncPending[id] = nil
+    end
     if args.snapshot and args.snapshot.id then
         if Internal.StoreSnapshot then
             args.snapshot = Internal.StoreSnapshot(args.snapshot, false)

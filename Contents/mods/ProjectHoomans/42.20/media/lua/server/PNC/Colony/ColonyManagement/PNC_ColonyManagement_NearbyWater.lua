@@ -58,19 +58,20 @@ local function startNearbyWaterAction(player, args, debugOnly)
     local live = PNC.Registry.GetLiveZombie
         and PNC.Registry.GetLiveZombie(record.id) or nil
     local facility = {
-        id = "nearby_water:" .. (debugOnly and "debug:" or "command:")
+        id = "world_water:" .. (debugOnly and "debug:" or "command:")
             .. tostring(source.key),
-        baseId = "nearby", definitionId = "nearby_water",
+        baseId = "nearby", definitionId = "world_water",
     }
     local acquired = {
         ok = true, facilityId = facility.id, componentId = "",
         reservationId = "", target = target,
         approachCandidates = approaches,
     }
-    return PNC.FacilityJobs.Start(record, facility, "water.nearby", {
+    return PNC.FacilityJobs.Start(record, facility,
+        "survival.drink.world", {
         acquired = acquired, nearby = true, resource = source,
         resourceKey = source.key,
-        resourceKind = "nearby_water",
+        resourceKind = "world_water",
         approachCandidates = approaches,
         debugForceWater = debugOnly == true,
         abstract = live == nil,

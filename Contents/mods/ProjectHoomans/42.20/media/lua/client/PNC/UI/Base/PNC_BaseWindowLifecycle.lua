@@ -1,11 +1,11 @@
 local BaseTab = require
-    "PNC/UI/Communities/ColonyManagement/SettlementManagement/PNC_SettlementManagement_Tab"
+    "PNC/UI/SettlementManagement/PNC_SettlementManagement_Tab"
 local BuildingTab = require "PNC/UI/Base/PNC_BaseBuildingTab"
 local Queue = require "PNC/UI/Base/PNC_BaseQueue"
 local Territory = require
     "PNC/UI/CommandHub/PNC_CommandHub_BaseTerritoryActions"
 local Placement = require
-    "PNC/UI/Communities/ColonyManagement/PNC_BuildingPlacement"
+    "PNC/UI/Base/PNC_BaseBuildingPlacement"
 local Options = require "PsychopatzCore/UI/PsychopatzCommandHubOptions"
 local Layout = PsychopatzCore.UI.Layout
 local WidgetWindow = PsychopatzCore.UI.WidgetWindow
@@ -114,7 +114,7 @@ function ISPNCBaseWindow:prerender()
 end
 
 function ISPNCBaseWindow:close()
-    Placement.Cancel(self, { restorePrevious = false })
+    Placement.Cancel(self)
     self:saveGeometry(true)
     self:setVisible(false)
     self:removeFromUIManager()

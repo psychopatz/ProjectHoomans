@@ -106,6 +106,7 @@ function Inventory.SyncFromEquipment(record, reason)
     local previousInv
     local promotedBackItem
     local primaryItemID
+    local preservedWaterContainer
     local function assignItem(slotType, slotValue, fullType)
         local item
         if not fullType then return end
@@ -141,6 +142,16 @@ function Inventory.SyncFromEquipment(record, reason)
             if type(item) == "table" and not item.wornSlot and not item.attachedSlot and not item.equipSlot then
                 preserved[#preserved + 1] = Internal.itemToPayload(item)
             end
+        end
+        -- The logical water slot has no legacy loadout field. Preserve it
+        -- across a legacy equipment rebuild so set-loadout/migration cannot
+        -- silently delete the NPC's selected liquid container.
+        local waterID = previousInv.equipped
+            and previousInv.equipped.waterContainer or nil
+        item = waterID and previousInv.items[waterID] or nil
+        if type(item) == "table" then
+            preservedWaterContainer = Internal.itemToPayload(item)
+            preservedWaterContainer.equipSlot = "waterContainer"
         end
     end
 
@@ -182,6 +193,28 @@ function Inventory.SyncFromEquipment(record, reason)
         if not (key == "Back" and promotedBackItem) then
             assignItem("attached", key, equipment.attached[key])
         end
+    end
+    if preservedWaterContainer then
+        if preservedWaterContainer.container ~= "root"
+            and not inv.containers[preservedWaterContainer.container]
+        then
+            local equippedBag
+            for wornSlot, wornID in pairs(inv.worn or {}) do
+                local wornItem = inv.items[wornID]
+                if wornItem and wornItem.bagContainer then
+                    equippedBag = wornItem
+                    break
+                end
+            end
+            if preservedWaterContainer.preferredContainer == "bag"
+                and equippedBag
+            then
+                preservedWaterContainer.container = equippedBag.bagContainer
+            else
+                preservedWaterContainer.container = "root"
+            end
+        end
+        Internal.createItem(record, inv, preservedWaterContainer)
     end
     for key = 1, #preserved do
         local item = preserved[key]

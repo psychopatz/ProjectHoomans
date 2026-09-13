@@ -120,14 +120,32 @@ local function facilityItem(record, runtime, capability)
         return supplyItemFullType(record, "FOOD"),
             "UI_PNC_Action_FoodTarget"
     end
-    if capability == "water.nearby"
-        or runtime.resourceKind == "nearby_water"
+    if capability == "survival.drink.inventory"
+        or runtime.resourceKind == "personal_drink"
+    then
+        local selected = tostring(runtime.activityItemFullType
+            or record.orderSpec and record.orderSpec.activityItemFullType
+            or "")
+        if selected ~= "" then
+            return selected, "UI_PNC_Action_WaterTarget"
+        end
+        return supplyItemFullType(record, "HYDRATION"),
+            "UI_PNC_Action_WaterTarget"
+    end
+    if capability == "survival.drink.world"
+        or runtime.resourceKind == "world_water"
     then
         local resource = runtime.resource
         return fullTypeFromItem(resource and resource.item),
             "UI_PNC_Action_WaterTarget"
     end
-    if capability == "water.drink" then
+    if capability == "survival.fill.water"
+        or runtime.resourceKind == "water_refill"
+    then
+        local selected = tostring(runtime.activityItemFullType or "")
+        if selected ~= "" then
+            return selected, "UI_PNC_Action_WaterTarget"
+        end
         return nil, "UI_PNC_Action_WaterTarget"
     end
     if capability == "farm.work" then
@@ -197,6 +215,12 @@ Status.Register("facility_activity", 80, function(record)
             phase = tostring(runtime.phase or ""),
             facilityId = runtime.facilityId,
             facilityDefinitionId = facility and facility.definitionId or nil,
+            resourceKind = tostring(runtime.resourceKind or "") ~= ""
+                and runtime.resourceKind
+                or runtime.resource
+                and (runtime.resource.resourceKind
+                    or runtime.resource.detectorId
+                    or runtime.resource.kind),
             activityItemFullType = itemFullType,
             activityItemLabelKey = itemLabelKey,
         })
@@ -237,6 +261,12 @@ Status.Register("current_job", 10, function(record)
                     facilityId = facilityId,
                     facilityDefinitionId = facility
                         and facility.definitionId or nil,
+                    resourceKind = tostring(facilityRuntime.resourceKind or "")
+                        ~= "" and facilityRuntime.resourceKind
+                        or facilityRuntime.resource
+                        and (facilityRuntime.resource.resourceKind
+                            or facilityRuntime.resource.detectorId
+                            or facilityRuntime.resource.kind),
                     activityItemFullType = itemFullType,
                     activityItemLabelKey = itemLabelKey,
                 })

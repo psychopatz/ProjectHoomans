@@ -55,7 +55,7 @@ function Hub.OpenBase(owner)
     local controller = Hub.ChildController
     if not controller then return false end
     if controller.IsOpen and controller.IsOpen("base") then
-        local base = PNC.BaseUI or PNC.BuildingUI
+        local base = PNC.BaseUI
         if base and base.instance and base.instance.bringToTop then
             base.instance:bringToTop()
         end

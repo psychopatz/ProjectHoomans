@@ -384,7 +384,7 @@ nearbyRecord.campState = {
         {
             detectorId = "faucet",
             resourceKind = "water_source",
-            role = "water.spigot",
+            role = "survival.world_water",
             resourceKey = "faucet:2:2:0:1",
             x = 2.5, y = 2.5, z = 0,
         },

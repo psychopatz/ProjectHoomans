@@ -10,7 +10,7 @@ PNC = { Client = {
 } }
 
 local Actions = T.load("ProjectHoomans", "client",
-    "PNC/UI/Communities/ColonyManagement/PNC_BuildingQueueActions.lua")
+    "PNC/UI/Base/PNC_BaseBuildingQueueActions.lua")
 local order = { id = "work:queue-action", status = "BLOCKED" }
 local window = { snapshot = { building = { queue = { order } } } }
 

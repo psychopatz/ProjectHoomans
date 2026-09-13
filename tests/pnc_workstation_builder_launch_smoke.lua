@@ -4,14 +4,14 @@ T.addPackagePaths()
 local placement
 local selectorOpened = false
 package.preload[
-    "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Shared"
+    "PNC/UI/Shared/PNC_ColonyUIShared"
 ] = function() return { SettlementReason = function(reason) return reason end } end
 package.preload["PsychopatzCore/World/PC_GridRegion"] = function()
     return { bounds = function() return nil end,
         containsPoint = function() return true end }
 end
 package.preload[
-    "PNC/UI/Communities/ColonyManagement/SettlementManagement/PNC_SettlementManagement_SelectorSupport"
+    "PNC/UI/SettlementManagement/PNC_SettlementManagement_SelectorSupport"
 ] = function()
     return {
         OpenSelector = function() selectorOpened = true end,
@@ -22,7 +22,7 @@ package.preload[
     }
 end
 package.preload[
-    "PNC/UI/Communities/ColonyManagement/PNC_BuildingPlacement"
+    "PNC/UI/Base/PNC_BaseBuildingPlacement"
 ] = function()
     return {
         Begin = function(_, recipe)
@@ -50,7 +50,7 @@ PNC = {
 }
 
 local Facility = T.load("ProjectHoomans", "client",
-    "PNC/UI/Communities/ColonyManagement/SettlementManagement/"
+    "PNC/UI/SettlementManagement/"
     .. "PNC_SettlementManagement_FacilityActions.lua")
 local window = { snapshot = {
     settlement = { id = "base:1", revision = 7 },

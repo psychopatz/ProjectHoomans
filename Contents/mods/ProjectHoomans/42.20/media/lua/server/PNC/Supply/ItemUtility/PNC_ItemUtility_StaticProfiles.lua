@@ -14,6 +14,18 @@ function H.BuildStatic(fullType, typeID)
         { "getHungerChange", "getHungChange" }, 0)
     local thirstChange = H.ReadNumber(item, scriptItem,
         { "getThirstChange" }, 0)
+    local fluidContainer = H.Call(item, "getFluidContainer")
+        or H.Call(scriptItem, "getFluidContainer")
+    local fluidCapable = fluidContainer ~= nil
+        or H.ReadBoolean(item, scriptItem,
+            { "isFluidContainer", "IsFluidContainer" })
+    local knownWaterBottle = fullType == "Base.WaterBottle"
+        or fullType == "Base.WaterBottleFull"
+        or fullType == "Base.WaterBottleEmpty"
+    local fluidWaterSource = H.ReadBoolean(item, scriptItem,
+        { "isWaterSource", "isWaterOnlySource" })
+    local useDelta = math.max(0, H.ReadNumber(item, scriptItem,
+        { "getUseDelta" }, 0) or 0)
     hungerChange = H.NormalizeNeedChange(hungerChange)
     thirstChange = H.NormalizeNeedChange(thirstChange)
     local calories = H.ReadNumber(item, scriptItem, { "getCalories" }, 0)
@@ -36,8 +48,7 @@ function H.BuildStatic(fullType, typeID)
         thirst = math.max(0, -(thirstChange or 0)),
         calories = math.max(0, calories or 0),
         negativeThirst = math.max(0, thirstChange or 0),
-        useDelta = math.max(0, H.ReadNumber(item, scriptItem,
-            { "getUseDelta" }, 0) or 0),
+        useDelta = useDelta,
         offAge = H.ReadNumber(item, scriptItem, { "getOffAge" }),
         offAgeMax = H.ReadNumber(item, scriptItem, { "getOffAgeMax" }),
         replaceOnRotten = H.ReadString(
@@ -46,8 +57,14 @@ function H.BuildStatic(fullType, typeID)
         food = typeString == "food" or hungerChange < 0
             or H.HasAny(tags, { "food", "edible" }),
         hydration = thirstChange < 0
-            or H.ReadBoolean(item, scriptItem, { "isWaterSource" })
+            or fluidCapable
+            or fluidWaterSource
+            or knownWaterBottle
             or H.HasAny(tags, { "water", "drink", "hydration" }),
+        fluidContainer = fluidCapable == true,
+        fluidHydration = fluidCapable == true or fluidWaterSource,
+        hydrationYieldPerLiter = useDelta > 0 and thirstChange < 0
+            and math.max(0, -thirstChange / useDelta) or 0.50,
         bandage = bandage,
     }
     for index = 1, #Utility.Adapters do

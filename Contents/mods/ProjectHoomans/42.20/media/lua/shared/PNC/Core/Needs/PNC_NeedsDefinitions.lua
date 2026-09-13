@@ -15,7 +15,7 @@ Definitions.BY_ID = {
     thirst = { id = "thirst", translationKey = "UI_PNC_Need_Thirst",
         iconKey = "need.thirst", highIsBad = true, format = "percent",
         minimum = 0, maximum = 1, default = 0,
-        task = { kind = "DRINK", capability = "water.access" } },
+        task = { kind = "DRINK", capability = "survival.drink.inventory" } },
     fatigue = { id = "fatigue", translationKey = "UI_PNC_Need_Fatigue",
         iconKey = "need.fatigue", highIsBad = true, format = "percent",
         minimum = 0, maximum = 1, default = 0,
@@ -104,6 +104,7 @@ Definitions.SCHEDULER_TIME_BUDGET_MS = 2
 Definitions.MAX_CATCHUP_HOURS = 168
 Definitions.NUTRITION = {
     defaultCalories = 0, minimumCalories = -12000, maximumCalories = 12000,
+    maximumCalorieOverflow = 1000000,
     defaultWeight = 80, minimumWeight = 35, maximumWeight = 200,
     calorieBurnPerHour = 2000 / 24, caloriesPerKilogram = 7700,
 }
@@ -154,6 +155,10 @@ Definitions.SUPPLY = {
     },
     thirst = {
         resourceKind = "HYDRATION", trigger = 0.25, target = 0.10,
+        -- Manual drinking is an explicit player command. Give it a visible
+        -- sip even when the need is already below the automatic target;
+        -- automatic supply still consumes only the calculated deficit.
+        manualMinimum = 0.10,
         priorityBase = 70, retryHours = 0.20, urgentRetryHours = 0.04,
     },
     medical = {

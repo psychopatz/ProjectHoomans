@@ -20,11 +20,17 @@ function Internal.BodyDistance(zombie, x, y)
 end
 
 local function retryApproach(record, zombie, order, runtime, options)
+    local forceRetry = options.forceRetry
+        and options.forceRetry(runtime) == true
     if options.guard and not options.guard(runtime) then return true end
     local lane = record.runtime and record.runtime.pathing or nil
-    if not lane or (lane.phase ~= "blocked" and lane.ownerMode ~= "blocked") then
+    if not forceRetry
+        and (not lane
+            or (lane.phase ~= "blocked" and lane.ownerMode ~= "blocked"))
+    then
         return true
     end
+    if forceRetry and options.clearRetry then options.clearRetry(runtime) end
     local candidates = runtime.approachCandidates or {}
     runtime.failedApproaches = runtime.failedApproaches or {}
     local current = math.max(1, tonumber(runtime.approachIndex) or 1)
@@ -116,7 +122,16 @@ end
 function Internal.RetryWaterApproach(record, zombie, order, runtime)
     return retryApproach(record, zombie, order, runtime, {
         guard = function(activity)
-            return activity.resourceKind == "nearby_water"
+            return activity.resourceKind == "world_water"
+                or activity.resourceKind == "water_refill"
+        end,
+        forceRetry = function(activity)
+            return activity.worldWaterApproachRetry == true
+                or activity.waterRefillApproachRetry == true
+        end,
+        clearRetry = function(activity)
+            activity.worldWaterApproachRetry = nil
+            activity.waterRefillApproachRetry = nil
         end,
         usable = function(candidate, failedApproaches)
             return not failedApproaches[candidate.approachKey]

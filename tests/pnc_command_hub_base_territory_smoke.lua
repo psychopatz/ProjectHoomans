@@ -24,7 +24,7 @@ local createRequest
 local expandRequest
 local baseSnapshot = {}
 
-package.preload["PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Shared"] = function()
+package.preload["PNC/UI/Shared/PNC_ColonyUIShared"] = function()
     return {
         Tr = function(_, fallback) return fallback end,
         SettlementReason = function(reason) return tostring(reason or "") end,
@@ -33,7 +33,7 @@ end
 package.preload["PsychopatzCore/World/PC_GridRegion"] = function()
     return GridRegion
 end
-package.preload["PNC/UI/Communities/ColonyManagement/SettlementManagement/PNC_SettlementManagement_SelectorSupport"] = function()
+package.preload["PNC/UI/SettlementManagement/PNC_SettlementManagement_SelectorSupport"] = function()
     return {
         EmptyRegion = function() return { tileCount = 0 } end,
         BaseRegion = function(window) return window.baseRegion end,

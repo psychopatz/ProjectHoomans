@@ -64,6 +64,8 @@ local function attachItem(inv, item)
         inv.equipped.secondary = item.id
     elseif item.equipSlot == "bag" then
         inv.equipped.bag = item.id
+    elseif item.equipSlot == "waterContainer" then
+        inv.equipped.waterContainer = item.id
     end
 end
 

@@ -129,7 +129,10 @@ function Internal.createBaseInventory(record, options)
         cachedWeight = 0,
         maxWeight = maxWeight,
         rootMaxWeight = maxWeight,
-        equipped = { primary = nil, secondary = nil, bag = nil },
+        equipped = {
+            primary = nil, secondary = nil, bag = nil,
+            waterContainer = nil,
+        },
         worn = {},
         attached = {},
         items = {},

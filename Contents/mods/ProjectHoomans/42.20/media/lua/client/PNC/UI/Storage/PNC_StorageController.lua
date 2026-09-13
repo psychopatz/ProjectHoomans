@@ -2,9 +2,9 @@ require "PNC/UI/Inventory/PNC_InventoryUI_List"
 
 local Controller = {}
 local Shared = require
-    "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Shared"
+    "PNC/UI/Shared/PNC_ColonyUIShared"
 local Components = require
-    "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Components"
+    "PNC/UI/Shared/PNC_ColonyUIComponents"
 local Presentation = require "PNC/UI/Storage/PNC_StoragePresentation"
 local LayoutModule = require "PNC/UI/Storage/PNC_StorageLayout"
 local Client = require "PNC/UI/Storage/PNC_StorageClient"
@@ -137,7 +137,7 @@ end
 
 function Controller.AddDetail(window, label, detail, colorName)
     local PresentationBase = require
-        "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Presentation"
+        "PNC/UI/Shared/PNC_ColonyPresentation"
     Components.AddRow(window.details,
         PresentationBase.Detail(label, detail, colorName))
 end

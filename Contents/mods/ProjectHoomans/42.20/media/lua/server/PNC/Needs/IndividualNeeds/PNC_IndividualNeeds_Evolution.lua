@@ -28,12 +28,14 @@ function Needs.Update(record, elapsedHours, reason)
     if nutrition then
         local tuning = Definitions.NUTRITION
         local oldWeightCategory = H.WeightCategory(nutrition.weight)
-        local balanceBefore = nutrition.calories
+        local balanceBefore = (tonumber(nutrition.calories) or 0)
+            + math.max(0, tonumber(nutrition.calorieOverflow) or 0)
         local burn = math.max(0, tonumber(rates.calorieBurnRate) or 0)
             * elapsedHours
-        nutrition.calories = math.max(tuning.minimumCalories,
-            math.min(tuning.maximumCalories, balanceBefore - burn))
-        local averageBalance = (balanceBefore + nutrition.calories) / 2
+        Needs.ModifyNutrition(record, -burn, "passive_calorie_burn")
+        local balanceAfter = (tonumber(nutrition.calories) or 0)
+            + math.max(0, tonumber(nutrition.calorieOverflow) or 0)
+        local averageBalance = (balanceBefore + balanceAfter) / 2
         nutrition.weight = math.max(tuning.minimumWeight,
             math.min(tuning.maximumWeight, nutrition.weight
                 + (averageBalance / tuning.caloriesPerKilogram)
@@ -65,4 +67,3 @@ function Needs.UpdateToNow(record, reason)
 end
 
 return Needs
-

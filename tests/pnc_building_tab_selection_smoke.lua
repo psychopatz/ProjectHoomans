@@ -31,13 +31,13 @@ end
 package.preload["PNC/UI/Inventory/PNC_InventoryUI_Model"] = function()
     return { Probe = function() return {} end }
 end
-package.preload["PNC/UI/Communities/ColonyManagement/PNC_BuildingPlacement"] = function()
+package.preload["PNC/UI/Base/PNC_BaseBuildingPlacement"] = function()
     return { Cancel = function() end }
 end
 
 PNC = { Client = {} }
 local Building = T.load("ProjectHoomans", "client",
-    "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagementBuildingTab.lua")
+    "PNC/UI/Base/PNC_BaseBuildingCatalog.lua")
 
 local recipes = {
     { objectInfoName = "WallA", recipeKey = "WallA", displayName = "Wall A",

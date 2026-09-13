@@ -93,6 +93,14 @@ function Jobs.Start(record, facilityOrId, capability, options)
     local approachCandidates = copyApproachCandidates(
         options.approachCandidates or acquired.approachCandidates
             or acquired.targets)
+    if not activityItemFullType and resource and resource.item
+        and type(resource.item.getFullType) == "function"
+    then
+        local itemOK, fullType = pcall(resource.item.getFullType, resource.item)
+        if itemOK and tostring(fullType or "") ~= "" then
+            activityItemFullType = tostring(fullType)
+        end
+    end
     if resource and PNC.FacilityResources
         and PNC.FacilityResources.CopyDescriptor
     then
@@ -142,6 +150,9 @@ function Jobs.Start(record, facilityOrId, capability, options)
         automatic = options.automatic == true,
         manual = options.manual == true,
         manualToggleable = options.manualToggleable == true,
+        manualCommandID = tostring(options.manualCommandID or ""),
+        manualRequestID = options.manualRequestID,
+        manualCommandSource = tostring(options.manualCommandSource or ""),
         sleepVariant = tostring(options.sleepVariant
             or acquired.sleepVariant or ""),
         sleepTargetPolicy = tostring(options.sleepTargetPolicy
@@ -176,6 +187,7 @@ function Jobs.Start(record, facilityOrId, capability, options)
         campRadius = tonumber(options.campRadius or acquired.campRadius),
         resourceRadius = tonumber(
             options.resourceRadius or acquired.resourceRadius),
+        activityItemID = tostring(options.activityItemID or ""),
         activityItemFullType = activityItemFullType,
         resource = resource,
         approachCandidates = approachCandidates,

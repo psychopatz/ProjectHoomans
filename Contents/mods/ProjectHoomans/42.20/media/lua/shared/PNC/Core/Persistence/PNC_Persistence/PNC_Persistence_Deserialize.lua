@@ -165,7 +165,10 @@ function Persistence.DeserializeRecord(raw, fallbackID)
     if record.orderSpec and PNC.OrderSystem and PNC.OrderSystem.Normalize then
         record.orderSpec = PNC.OrderSystem.Normalize(record, record.orderSpec)
     end
-    record.campState = Internal.sanitizeCampState(raw.campState, record)
+    -- Camp resources are a server runtime cache, not durable NPC state.
+    -- Older saves may still contain campState; discard it here so loading a
+    -- save cannot recreate one copy of the resource table per NPC.
+    record.campState = nil
     record.hostility = Internal.sanitizeHostility(raw.hostility, record.tacticalClass)
     record.health = Internal.sanitizeHealth(raw.health or raw, record.health and record.health.max or Const.DEFAULT_HP_MAX)
     record.alive = tostring(record.health.state or "") ~= "dead"

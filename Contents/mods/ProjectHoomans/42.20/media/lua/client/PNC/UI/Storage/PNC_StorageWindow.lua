@@ -11,7 +11,7 @@ local UI = PsychopatzCore.UI
 local Layout = UI.Layout
 local Theme = UI.Theme
 local Shared = require
-    "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Shared"
+    "PNC/UI/Shared/PNC_ColonyUIShared"
 local Client = require "PNC/UI/Storage/PNC_StorageClient"
 local Controller = require "PNC/UI/Storage/PNC_StorageController"
 

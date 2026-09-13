@@ -4,8 +4,8 @@
 -- consume the selected snapshot through the controller; they never need to
 -- know how the roster list is built or how native list selection works.
 
-local Components = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Components"
-local Shared = require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Shared"
+local Components = require "PNC/UI/Shared/PNC_ColonyUIComponents"
+local Shared = require "PNC/UI/Shared/PNC_ColonyUIShared"
 local ActivityPresentation = require
     "PNC/UI/Colonist/PNC_ColonistActivityPresentation"
 

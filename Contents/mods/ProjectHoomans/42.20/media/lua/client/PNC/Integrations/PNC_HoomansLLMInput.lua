@@ -15,6 +15,12 @@ local Keybinds = PsychopatzCore.Keybinds
 local Targets = PNC.CompanionTargetResolver
 local LLMInput = PsychopatzConversationLLMInput
 
+local function inlineDiagnosticsEnabled()
+    local trace = PsychopatzCore and PsychopatzCore.DebugTrace
+    return trace and trace.IsEnabled
+        and trace.IsEnabled() == true
+end
+
 local MAX_INPUT_LENGTH = 4000
 local INLINE_WIDTH = 320
 local INLINE_HEIGHT = 108
@@ -22,6 +28,8 @@ local INLINE_PLAYER_Y_OFFSET = 36
 local INLINE_LIFECYCLE_INTERVAL_MS = 100
 local INLINE_CONTEXT_REFRESH_INTERVAL_MS = 500
 local INLINE_CONTROLS_REFRESH_INTERVAL_MS = 250
+local INLINE_RECOVERY_INTERVAL_MS = 250
+local INLINE_RECOVERY_GRACE_MS = 4000
 local INLINE_MODE_NEAREST = "nearest"
 local INLINE_MODE_NEARBY = "nearby"
 local INLINE_SCOPE_COLONISTS = "colonists"
@@ -44,7 +52,7 @@ local INLINE_MODE_BUTTONS = {
         mode = INLINE_MODE_NEAREST,
         title = {
             key = "llm.mode.nearest",
-            fallback = "NEAREST NPC",
+            fallback = "SINGLE NPC",
         },
         image = "media/ui/MP/mp_ui_emptyServer.png",
     },
@@ -76,6 +84,26 @@ local function label(key, fallback)
         domain = "pnc.system.shared.categories",
         fallback = fallback,
     }, fallback)
+end
+
+local describeInlineButtons
+
+local function logInlineMode(event, requested, committed, reason)
+    if not inlineDiagnosticsEnabled() then return end
+    if not PNC.Core or not PNC.Core.LogInfo then return end
+    PNC.Core.LogInfo(
+        "inline_mode event=" .. tostring(event or "unknown")
+            .. " requested=" .. tostring(requested or "nil")
+            .. " committed=" .. tostring(committed or "nil")
+            .. " ui=" .. tostring(Integration.Inline
+                and Integration.Inline.part
+                and Integration.Inline.part.inputMode or "nil")
+            .. " target=" .. tostring(Integration.Inline
+                and Integration.Inline.targetID or "nil")
+            .. " reason=" .. tostring(reason or "nil")
+            .. " " .. tostring(describeInlineButtons
+                and describeInlineButtons() or "buttons=unavailable")
+    )
 end
 
 local function logSubmitRejection(view, reason)
@@ -111,7 +139,9 @@ local function stateFor(view)
             status = label("llm.status.speaking", "NPC IS SPEAKING...")
         else
             enabled = true
-            status = label("llm.status.ready", "LLM CHAT READY")
+            -- The controls and input field already communicate readiness;
+            -- avoid spending a second line on a generic status banner.
+            status = ""
         end
     end
     return {
@@ -156,6 +186,213 @@ Conversation.CreateHoomansLLMInput = Integration.CreateInputPart
 local Inline = Integration.Inline or {}
 Integration.Inline = Inline
 
+local function nativeColorDescription(color)
+    if not color then return "nil" end
+    return table.concat({
+        tostring(color.r), tostring(color.g), tostring(color.b),
+        tostring(color.a),
+    }, ",")
+end
+
+local function nativeButtonValue(button, getter, field)
+    if not button then return nil end
+    if getter and button[getter] then return button[getter](button) end
+    return button[field]
+end
+
+local function nativeButtonDescription(definition, part)
+    local button = definition and definition.button
+    if not button then return "mode=" .. tostring(definition and definition.mode) .. ":nil" end
+    local x = nativeButtonValue(button, "getX", "x")
+    local y = nativeButtonValue(button, "getY", "y")
+    local width = nativeButtonValue(button, "getWidth", "width")
+    local height = nativeButtonValue(button, "getHeight", "height")
+    return table.concat({
+        "mode=" .. tostring(definition.mode),
+        "xywh=" .. tostring(x) .. "," .. tostring(y) .. ","
+            .. tostring(width) .. "," .. tostring(height),
+        "enable=" .. tostring(button.enable),
+        "variant=" .. tostring(button.psychopatzVariant),
+        "bg=" .. nativeColorDescription(button.backgroundColor),
+        "bgHover=" .. nativeColorDescription(button.backgroundColorMouseOver),
+        "border=" .. nativeColorDescription(button.borderColor),
+        "text=" .. nativeColorDescription(button.textColor),
+        "bgEnabled=" .. nativeColorDescription(button.backgroundColorEnabled),
+        "borderEnabled=" .. nativeColorDescription(button.borderColorEnabled),
+        "image=" .. tostring(button.image),
+        "tooltip=" .. tostring(button.tooltip),
+        "targetIsPart=" .. tostring(button.target == part),
+    }, " ")
+end
+
+describeInlineButtons = function()
+    local part = Inline.part
+    if not part then return "panel=nil modeButtons=0" end
+    local descriptions = {}
+    local seen = {}
+    local uniqueCount = 0
+    local duplicateCount = 0
+    local targetMismatchCount = 0
+    for _, definition in ipairs(part.modeButtons or {}) do
+        local button = definition and definition.button
+        if button and seen[button] then duplicateCount = duplicateCount + 1 end
+        if button and not seen[button] then
+            seen[button] = true
+            uniqueCount = uniqueCount + 1
+        end
+        if button and button.target ~= nil and button.target ~= part then
+            targetMismatchCount = targetMismatchCount + 1
+        end
+        descriptions[#descriptions + 1] = nativeButtonDescription(definition, part)
+    end
+    local children = part.getChildren and part:getChildren() or part.children
+    local childCount = 0
+    local modeChildCount = 0
+    if type(children) == "table" then
+        for _, child in ipairs(children) do
+            childCount = childCount + 1
+            if seen[child] then modeChildCount = modeChildCount + 1 end
+        end
+    end
+    return "panel=" .. tostring(part)
+        .. " modeButtons=" .. tostring(#(part.modeButtons or {}))
+        .. " uniqueButtons=" .. tostring(uniqueCount)
+        .. " duplicateButtons=" .. tostring(duplicateCount)
+        .. " targetMismatches=" .. tostring(targetMismatchCount)
+        .. " children=" .. tostring(childCount)
+        .. " modeChildren=" .. tostring(modeChildCount)
+        .. " buttons=[" .. table.concat(descriptions, " || ") .. "]"
+end
+
+local function colorsEqual(left, right)
+    if not left or not right then return false end
+    return math.abs((tonumber(left.r) or 0) - (tonumber(right.r) or 0)) < 0.0001
+        and math.abs((tonumber(left.g) or 0) - (tonumber(right.g) or 0)) < 0.0001
+        and math.abs((tonumber(left.b) or 0) - (tonumber(right.b) or 0)) < 0.0001
+        and math.abs((tonumber(left.a) or 0) - (tonumber(right.a) or 0)) < 0.0001
+end
+
+local function nativeButtonIsSelected(button)
+    local theme = PsychopatzCore and PsychopatzCore.UI
+        and PsychopatzCore.UI.Theme
+    if theme and theme.Color then
+        return colorsEqual(button.backgroundColor, theme.Color("accentDark"))
+            and colorsEqual(button.borderColor, theme.Color("accent"))
+    end
+    return button.psychopatzVariant == "selected"
+end
+
+local function inlineModeConsistency(event)
+    if not inlineDiagnosticsEnabled() then return true end
+    local part = Inline.part
+    if not part or not Targets then return true end
+    local committed = Targets.NormalizeMode(
+        Inline.mode or INLINE_MODE_NEAREST
+    )
+    local uiMode = part.inputMode and Targets.NormalizeMode(part.inputMode)
+        or nil
+    local selectedMode
+    local selectedCount = 0
+    local buttonsOK = true
+    local modeButtonCount = 0
+    local allModeButtonsEnabled = true
+    for _, definition in ipairs(part.modeButtons or {}) do
+        local button = definition and definition.button
+        if button then
+            modeButtonCount = modeButtonCount + 1
+            local isEnabled = button.enable ~= false
+            if not isEnabled then allModeButtonsEnabled = false end
+            local isSelected = isEnabled and nativeButtonIsSelected(button)
+                or false
+            if isSelected then
+                selectedCount = selectedCount + 1
+                selectedMode = definition.mode
+            end
+            local expectedSelected = definition.mode == committed
+            if button.psychopatzVariant
+                ~= (expectedSelected and "selected" or "quiet")
+            then
+                buttonsOK = false
+            end
+        end
+    end
+    -- Disabled native buttons are deliberately painted by ISButton:setEnable
+    -- with its disabled colors, so there is no selected color to assert in
+    -- that state.  Keep checking the logical marker, and resume the native
+    -- color assertion as soon as both mode controls are enabled again.
+    local nativeSelectionOK = not allModeButtonsEnabled
+        or (modeButtonCount == 2
+            and selectedCount == 1
+            and selectedMode == committed)
+
+    local expectedRecipients = {}
+    for _, entry in ipairs(Inline.entries or {}) do
+        local id = tostring(entry and entry.id or "")
+        if id ~= "" then expectedRecipients[id] = true end
+    end
+    local outlinedRecipients = Inline.highlightedZombies or {}
+    local outlinedCount = 0
+    local recipientsOK = true
+    for id in pairs(expectedRecipients) do
+        if outlinedRecipients[id] == nil then recipientsOK = false end
+    end
+    for id in pairs(outlinedRecipients) do
+        outlinedCount = outlinedCount + 1
+        if not expectedRecipients[id] then recipientsOK = false end
+    end
+    if uiMode ~= committed
+        or not nativeSelectionOK
+        or not buttonsOK
+        or not recipientsOK
+    then
+        if PNC.Core and PNC.Core.LogWarn then
+            PNC.Core.LogWarn(
+                "inline_mode_assertion_failed event=" .. tostring(event)
+                    .. " committed=" .. tostring(committed)
+                    .. " ui=" .. tostring(uiMode)
+                    .. " selected=" .. tostring(selectedMode)
+                    .. " selectedCount=" .. tostring(selectedCount)
+                    .. " nativeSelectionCheck=" .. tostring(
+                        allModeButtonsEnabled and "enabled" or "disabled")
+                    .. " outlined=" .. tostring(outlinedCount)
+                    .. " expectedOutlined=" .. tostring(#(Inline.entries or {}))
+                    .. " buttonsOK=" .. tostring(buttonsOK)
+                    .. " recipientsOK=" .. tostring(recipientsOK)
+            )
+        end
+        return false
+    end
+    return true
+end
+
+Integration.AssertInlineModeState = inlineModeConsistency
+
+local function onInlineVisualRefresh(_, part, event)
+    if not inlineDiagnosticsEnabled() then return end
+    if part ~= Inline.part then return end
+    logInlineMode("visual_refresh_" .. tostring(event or "unknown"),
+        Inline.mode, Inline.mode, nil)
+    inlineModeConsistency(event or "visual_refresh")
+end
+
+local function onInlineModeCommitted(_, mode, part)
+    if not inlineDiagnosticsEnabled() then return end
+    if part ~= Inline.part then return end
+    logInlineMode("mode_committed", mode, Inline.mode, nil)
+    inlineModeConsistency("mode_committed")
+end
+
+local function onInlineNativeControlState(_, part, event, button)
+    if not inlineDiagnosticsEnabled() then return end
+    if part ~= Inline.part then return end
+    logInlineMode(
+        "native_" .. tostring(event or "unknown"),
+        Inline.mode,
+        Inline.mode,
+        "button=" .. tostring(button and button.internal or "unknown")
+    )
+end
+
 local function isLongPressBinding(binding)
     local longPressType = Keybinds and Keybinds.TYPE_LONG_PRESS
         or "longpress"
@@ -198,13 +435,37 @@ local function prepareInlineInputFocus(binding)
 end
 
 local function resolveInlineZombie(entry)
-    if entry and entry.zombie then return entry.zombie end
     local registry = PNC.Registry
     local id = tostring(entry and entry.id or "")
     if id ~= "" and registry and registry.GetLiveZombie then
-        return registry.GetLiveZombie(id)
+        local live = registry.GetLiveZombie(id)
+        if live and (not live.isDead or live:isDead() ~= true) then
+            return live
+        end
+        local sync = PNC.ClientPresenceSync
+        local presenceBody = sync and sync.ResolveBodyForNPC
+            and sync.ResolveBodyForNPC(id, entry and entry.snapshot)
+        if presenceBody
+            and (not presenceBody.isDead or presenceBody:isDead() ~= true)
+        then
+            return presenceBody
+        end
+        return nil
+    end
+    if entry and entry.zombie
+        and (not entry.zombie.isDead or entry.zombie:isDead() ~= true)
+    then
+        return entry.zombie
     end
     return nil
+end
+
+local function refreshClientPresenceBodies()
+    local sync = PNC.ClientPresenceSync
+    local internal = sync and sync.Internal
+    if internal and internal.RefreshBodyMap then
+        internal.RefreshBodyMap(getTimeInMillis and getTimeInMillis() or 0)
+    end
 end
 
 local function clearInlineHighlights(playerIndex)
@@ -220,6 +481,7 @@ end
 local function refreshInlineHighlights(playerIndex)
     local previous = Inline.highlightedZombies or {}
     local current = {}
+    refreshClientPresenceBodies()
     for _, entry in ipairs(Inline.entries or {}) do
         local id = tostring(entry and entry.id or "")
         local zombie = resolveInlineZombie(entry)
@@ -342,6 +604,9 @@ function Integration.CloseInline(reason)
     Inline.nextLifecycleAt = nil
     Inline.nextContextRefreshAt = nil
     Inline.nextControlsRefreshAt = nil
+    Inline.recoveryStartedAt = nil
+    Inline.recoveryDeadlineAt = nil
+    Inline.nextRecoveryAt = nil
     Inline.focusAfterTriggerRelease = false
     Inline.triggerBinding = nil
     return true
@@ -349,6 +614,8 @@ end
 
 local function clearPendingInlineFallback()
     Inline.pendingTargetEntry = nil
+    Inline.pendingFallbackMode = nil
+    Inline.pendingFallbackScope = nil
     Inline.pendingFallbackReason = nil
     Inline.pendingFallbackDeadline = nil
     Inline.pendingFallbackNextAttemptAt = nil
@@ -358,10 +625,32 @@ local function queueInlineFallback(entry, reason)
     local id = tostring(entry and entry.id or "")
     if id == "" then return false end
     Inline.pendingTargetEntry = entry
-    Inline.targetID = id
-    Inline.directTarget = entry
-    Inline.mode = INLINE_MODE_NEAREST
-    Inline.scope = INLINE_SCOPE_OTHER
+    -- A fallback request may arrive while the compact input is already open
+    -- (for example, while a closing full conversation is still finishing).
+    -- Keep the player's committed mode/scope untouched until the fallback is
+    -- actually opened; otherwise the next inline tick silently changes the
+    -- mode button from nearby back to nearest.
+    Inline.pendingFallbackMode = INLINE_MODE_NEAREST
+    Inline.pendingFallbackScope = INLINE_SCOPE_OTHER
+    if not Inline.part then
+        Inline.targetID = id
+        Inline.directTarget = entry
+        Inline.mode = INLINE_MODE_NEAREST
+        Inline.scope = INLINE_SCOPE_OTHER
+        logInlineMode(
+            "fallback_queued",
+            INLINE_MODE_NEAREST,
+            Inline.mode,
+            reason
+        )
+    else
+        logInlineMode(
+            "fallback_deferred",
+            INLINE_MODE_NEAREST,
+            Inline.mode,
+            reason
+        )
+    end
     Inline.pendingFallbackReason = tostring(reason or "conversation_handoff")
     Inline.pendingFallbackDeadline = currentTime() + 5000
     Inline.pendingFallbackNextAttemptAt = 0
@@ -382,8 +671,8 @@ local function openQueuedInlineFallback(binding)
     Inline.pendingFallbackNextAttemptAt = now + 250
     Inline.targetID = tostring(entry.id)
     Inline.directTarget = entry
-    Inline.mode = INLINE_MODE_NEAREST
-    Inline.scope = INLINE_SCOPE_OTHER
+    Inline.mode = Inline.pendingFallbackMode or INLINE_MODE_NEAREST
+    Inline.scope = Inline.pendingFallbackScope or INLINE_SCOPE_OTHER
     if Integration.OpenInline(binding) then
         clearPendingInlineFallback()
         return true
@@ -468,18 +757,58 @@ local function positionInline(playerIndex, player)
     return true
 end
 
-local function resolveInlineRecipients(player)
+local function resolveNearestCycle(player, currentID, scope)
+    if Targets.ResolveNearestCycle then
+        return Targets.ResolveNearestCycle(player, currentID, nil, scope)
+    end
+
+    -- Compatibility fallback for older resolver implementations used by
+    -- focused tests or partially updated multiplayer clients.
+    local candidates = Targets.CollectNearbyTargets
+        and Targets.CollectNearbyTargets(player, nil, scope) or {}
+    local nextIndex = 1
+    local current = currentID ~= nil and tostring(currentID) or nil
+    if current and current ~= "" then
+        for index, candidate in ipairs(candidates) do
+            if tostring(candidate.id) == current then
+                nextIndex = (index % #candidates) + 1
+                break
+            end
+        end
+    end
+    local target = candidates[nextIndex]
+    return {
+        mode = INLINE_MODE_NEAREST,
+        scope = scope,
+        target = target,
+        targets = target and { target } or {},
+    }
+end
+
+local function resolveInlineRecipients(player, options)
+    options = options or {}
     if not player or not Targets then return nil end
-    Inline.mode = Targets.NormalizeMode(Inline.mode or INLINE_MODE_NEAREST)
-    Inline.scope = Targets.NormalizeScope(
-        Inline.scope or INLINE_SCOPE_COLONISTS
+    local mode = Targets.NormalizeMode(
+        options.mode or Inline.mode or INLINE_MODE_NEAREST
     )
-    local resolved = Targets.ResolveRecipients(
-        player,
-        Inline.mode,
-        nil,
-        Inline.scope
+    local scope = Targets.NormalizeScope(
+        options.scope or Inline.scope or INLINE_SCOPE_COLONISTS
     )
+    local resolved
+    if options.cycleNearest and mode == INLINE_MODE_NEAREST then
+        resolved = resolveNearestCycle(
+            player,
+            Inline.targetID,
+            scope
+        )
+    else
+        resolved = Targets.ResolveRecipients(
+            player,
+            mode,
+            nil,
+            scope
+        )
+    end
     if not resolved then return nil end
     -- The closed key entry point cannot be switched to OTHER NPCS until it
     -- has opened once.  In multiplayer the nearby NPC is commonly a
@@ -488,25 +817,37 @@ local function resolveInlineRecipients(player)
     -- empty.  Keep Inline.scope as the user's requested scope so the existing
     -- colonist/other toggle remains stable after the window opens.
     if not resolved.target
-        and Inline.scope == INLINE_SCOPE_COLONISTS
+        and scope == INLINE_SCOPE_COLONISTS
         and Targets.SCOPE_SOCIAL
     then
-        local social = Targets.ResolveRecipients(
-            player,
-            Inline.mode,
-            nil,
-            INLINE_SCOPE_SOCIAL
-        )
+        local social
+        if options.cycleNearest and mode == INLINE_MODE_NEAREST then
+            social = resolveNearestCycle(
+                player,
+                Inline.targetID,
+                INLINE_SCOPE_SOCIAL
+            )
+        else
+            social = Targets.ResolveRecipients(
+                player,
+                mode,
+                nil,
+                INLINE_SCOPE_SOCIAL
+            )
+        end
         if social and social.target then resolved = social end
     end
     local primary = resolved.target
-    if Inline.targetID then
+    if Inline.targetID
+        and not options.cycleNearest
+        and not options.selectClosest
+    then
         local candidates = resolved.targets
-        if Inline.mode == INLINE_MODE_NEAREST and #candidates == 0 then
+        if mode == INLINE_MODE_NEAREST and #candidates == 0 then
             candidates = Targets.CollectNearbyTargets(
                 player,
                 nil,
-                Inline.scope
+                scope
             )
         end
         local found = false
@@ -525,7 +866,7 @@ local function resolveInlineRecipients(player)
         if not found then return nil end
     end
     if not primary then return nil end
-    if Inline.mode == INLINE_MODE_NEAREST then
+    if mode == INLINE_MODE_NEAREST then
         resolved.targets = { primary }
     end
     return {
@@ -548,6 +889,7 @@ local function buildInlineHost(entry, player)
     local definition = Conversation.BuildDefinition(entry, player)
     definition.context = definition.context or {}
     definition.context.nameplateConversation = true
+    definition.context.guardThreats = false
     local host = PsychopatzCore.Conversation.CreateHeadless(definition)
     if not host then
         if print then
@@ -574,60 +916,78 @@ local function refreshInlineHostContext(host, entry, player)
     context.entry = entry
     context.player = player
     context.nameplateConversation = true
+    context.guardThreats = false
     host.spec.context = context
     host.spec.character = entry and entry.zombie or nil
 end
 
-local function rebuildInlineHosts(player, resolved)
+local function rebuildInlineHosts(player, resolved, requestedMode)
     local oldHosts = {}
     local newHosts = {}
     local createdHosts = {}
     local entries = {}
+    local targets = resolved and resolved.targets or {}
     local old
     local entry
     local host
     local id
-    local primaryTarget = resolved.primary or resolved.target
+    local primaryTarget = resolved
+        and (resolved.primary or resolved.target) or nil
+    local mode = Targets.NormalizeMode(
+        requestedMode or Inline.mode or INLINE_MODE_NEAREST
+    )
+    local primaryID = tostring(primaryTarget and primaryTarget.id or "")
+    local primaryIndex
     if not primaryTarget then return false end
     for _, old in ipairs(Inline.hosts or {}) do
-        id = tostring(old.spec and old.spec.npcID or "")
+        id = tostring(old and old.spec and old.spec.npcID or "")
         if id ~= "" then oldHosts[id] = old end
     end
-    for _, candidate in ipairs(resolved.targets) do
+    for _, candidate in ipairs(targets) do
         entry = Targets.BuildConversationEntry(candidate)
-        id = tostring(entry.id)
-        host = oldHosts[id]
-        if host and host.closed then host = nil end
-        if not host then
-            host = buildInlineHost(entry, player)
-            if host then createdHosts[#createdHosts + 1] = host end
-        end
-        if not host then
-            for _, created in ipairs(createdHosts) do
-                if created and created.close then
-                    created:close("inline_target_build_failed")
-                end
+        id = tostring(entry and entry.id or "")
+        if id ~= "" then
+            host = oldHosts[id]
+            if host and host.closed then
+                host = nil
+                oldHosts[id] = nil
             end
-            return false
+            if not host then
+                host = buildInlineHost(entry, player)
+                if host then createdHosts[#createdHosts + 1] = host end
+            end
+            if host then
+                refreshInlineHostContext(host, entry, player)
+                oldHosts[id] = nil
+                entries[#entries + 1] = entry
+                newHosts[#newHosts + 1] = host
+                if id == primaryID then
+                    primaryIndex = #entries
+                end
+            elseif mode ~= INLINE_MODE_NEARBY then
+                for _, created in ipairs(createdHosts) do
+                    if created and created.close then
+                        created:close("inline_target_build_failed")
+                    end
+                end
+                return false
+            end
         end
-        refreshInlineHostContext(host, entry, player)
-        oldHosts[id] = nil
-        entries[#entries + 1] = entry
-        newHosts[#newHosts + 1] = host
+    end
+    if #newHosts == 0 then
+        for _, created in ipairs(createdHosts) do
+            if created and created.close then
+                created:close("inline_target_build_failed")
+            end
+        end
+        return false
     end
     -- A mode switch is only available while no request is pending, so unused
     -- hosts have no in-flight bridge work and can be retired safely.
     for _, unused in pairs(oldHosts) do
         if unused and unused.close then unused:close("inline_retargeted") end
     end
-    local primaryID = tostring(primaryTarget.id or "")
-    local primaryIndex = 1
-    for index, candidate in ipairs(entries) do
-        if tostring(candidate.id) == primaryID then
-            primaryIndex = index
-            break
-        end
-    end
+    primaryIndex = primaryIndex or 1
     Inline.entries = entries
     Inline.hosts = newHosts
     Inline.target = entries[primaryIndex]
@@ -664,30 +1024,87 @@ local function refreshLockedInlineEntries(player)
     end
 end
 
+local function syncInlineModeButton()
+    local part = Inline.part
+    if not part then return end
+    local mode = Targets.NormalizeMode(
+        Inline.mode or INLINE_MODE_NEAREST
+    )
+    if part.inputMode
+        and Targets.NormalizeMode(part.inputMode) ~= mode
+    then
+        logInlineMode("mode_desync", part.inputMode, mode, "adapter_sync")
+    end
+    -- The Core input owns the UI projection and commits it after this
+    -- integration's recipient transaction returns true. This reconciliation
+    -- point is diagnostic-only; writing inputMode here creates a second mode
+    -- authority and can race the native button lifecycle.
+end
+
+local function resetInlineRecovery()
+    Inline.recoveryStartedAt = nil
+    Inline.recoveryDeadlineAt = nil
+    Inline.nextRecoveryAt = nil
+end
+
 function Integration.SetInlineMode(_, mode, part)
-    if part and part ~= Inline.part then return false end
-    if not Inline.part then return false end
-    if Integration.GetPending and Integration.GetPending() then return false end
-    local previousMode = Inline.mode
+    local previousMode = Targets.NormalizeMode(
+        Inline.mode or INLINE_MODE_NEAREST
+    )
+    local requestedMode = Targets.NormalizeMode(mode)
+    logInlineMode("mode_click", requestedMode, previousMode, "callback_begin")
+    if part and part ~= Inline.part then
+        logInlineMode("mode_rejected", requestedMode, previousMode,
+            "stale_part")
+        return false
+    end
+    if not Inline.part then
+        logInlineMode("mode_rejected", requestedMode, previousMode,
+            "panel_closed")
+        return false
+    end
+    if Integration.GetPending and Integration.GetPending() then
+        logInlineMode("mode_rejected", requestedMode, previousMode,
+            "llm_pending")
+        return false
+    end
     local player = getSpecificPlayer and getSpecificPlayer(0)
         or getPlayer and getPlayer() or nil
-    Inline.mode = Targets.NormalizeMode(mode)
-    local resolved = resolveInlineRecipients(player)
+    local cycleNearest = previousMode == INLINE_MODE_NEAREST
+        and requestedMode == INLINE_MODE_NEAREST
+    local selectClosest = previousMode == INLINE_MODE_NEARBY
+        and requestedMode == INLINE_MODE_NEAREST
+    refreshClientPresenceBodies()
+    local resolved = resolveInlineRecipients(player, {
+        mode = requestedMode,
+        cycleNearest = cycleNearest,
+        selectClosest = selectClosest,
+    })
     if not resolved or #resolved.targets == 0 then
-        Inline.mode = previousMode
+        logInlineMode("mode_rejected", requestedMode, previousMode,
+            "recipient_unavailable")
         return false
     end
-    if not rebuildInlineHosts(player, resolved) then
-        Inline.mode = previousMode
+    if not rebuildInlineHosts(player, resolved, requestedMode) then
+        logInlineMode("mode_rejected", requestedMode, previousMode,
+            "host_build_failed")
         return false
     end
+    -- Commit the adapter mode only after recipients and headless hosts have
+    -- been rebuilt successfully.  The Core widget commits its own visual
+    -- state immediately after this callback returns, so changing or
+    -- repainting the button here creates a one-frame disagreement.
+    Inline.mode = requestedMode
     Inline.nextLifecycleAt = 0
     Inline.nextContextRefreshAt = 0
     Inline.nextControlsRefreshAt = 0
+    resetInlineRecovery()
     refreshInlineHighlights(0)
     Inline.part.owner = Inline.host
-    Inline.part:refreshControls()
     positionInline(0, player)
+    -- The Core widget commits inputMode and paints the native buttons after
+    -- this callback returns. Do not write either UI field from the adapter.
+    logInlineMode("mode_transaction_accepted", requestedMode, Inline.mode, nil)
     return true
 end
 
@@ -695,26 +1112,32 @@ function Integration.SetInlineScope(_, value, part)
     if part and part ~= Inline.part then return false end
     if not Inline.part then return false end
     if Integration.GetPending and Integration.GetPending() then return false end
-    local previousScope = Inline.scope
+    local previousScope = Targets.NormalizeScope(
+        Inline.scope or INLINE_SCOPE_COLONISTS
+    )
+    local requestedScope = value == true
+        and INLINE_SCOPE_OTHER or INLINE_SCOPE_COLONISTS
+    local selectClosest = requestedScope ~= previousScope
     local player = getSpecificPlayer and getSpecificPlayer(0)
         or getPlayer and getPlayer() or nil
-    Inline.scope = value == true
-        and INLINE_SCOPE_OTHER or INLINE_SCOPE_COLONISTS
-    local resolved = resolveInlineRecipients(player)
+    refreshClientPresenceBodies()
+    local resolved = resolveInlineRecipients(player, {
+        scope = requestedScope,
+        selectClosest = selectClosest,
+    })
     if not resolved or #resolved.targets == 0 then
-        Inline.scope = previousScope
         return false
     end
-    if not rebuildInlineHosts(player, resolved) then
-        Inline.scope = previousScope
+    if not rebuildInlineHosts(player, resolved, Inline.mode) then
         return false
     end
+    Inline.scope = requestedScope
     Inline.nextLifecycleAt = 0
     Inline.nextContextRefreshAt = 0
     Inline.nextControlsRefreshAt = 0
+    resetInlineRecovery()
     refreshInlineHighlights(0)
     Inline.part.owner = Inline.host
-    Inline.part:refreshControls()
     positionInline(0, player)
     return true
 end
@@ -740,6 +1163,7 @@ function Integration.OpenInline(binding)
     local player = getSpecificPlayer and getSpecificPlayer(0)
         or getPlayer and getPlayer() or nil
     if not player or not Targets then return false end
+    refreshClientPresenceBodies()
     Inline.mode = Targets.NormalizeMode(Inline.mode or INLINE_MODE_NEAREST)
     Inline.scope = Targets.NormalizeScope(
         Inline.scope or INLINE_SCOPE_COLONISTS
@@ -775,6 +1199,9 @@ function Integration.OpenInline(binding)
         modeButtons = INLINE_MODE_BUTTONS,
         initialMode = Inline.mode,
         onModeChanged = Integration.SetInlineMode,
+        onModeCommitted = onInlineModeCommitted,
+        onVisualRefresh = onInlineVisualRefresh,
+        onNativeControlState = onInlineNativeControlState,
         toggleButton = INLINE_SCOPE_TOGGLE,
         initialToggleValue = Inline.scope == INLINE_SCOPE_OTHER,
         onToggleChanged = Integration.SetInlineScope,
@@ -800,6 +1227,91 @@ function Integration.OpenInline(binding)
     return true
 end
 
+local function updateInlineHostLifecycles()
+    local hosts = Inline.hosts or {}
+    local entries = Inline.entries or {}
+    local activeHosts = {}
+    local activeEntries = {}
+    local primaryHost = Inline.host
+    local primaryPresent = false
+    local primaryFailed = false
+    local primaryFailureReason
+    local failureReason
+
+    for index, host in ipairs(hosts) do
+        local interruption
+        if host and host.updateLifecycle then
+            interruption = host:updateLifecycle()
+        end
+        if interruption or host and host.closed then
+            failureReason = failureReason
+                or interruption or "conversation_interrupted"
+            -- Nearby mode is a batch of independent headless conversations.
+            -- A secondary NPC can disappear while the selected conversation is
+            -- still valid; remove only that recipient instead of destroying
+            -- the compact input for everyone.
+            if host == primaryHost then
+                primaryFailed = true
+                primaryFailureReason = interruption
+                    or "conversation_interrupted"
+            end
+        elseif host then
+            activeHosts[#activeHosts + 1] = host
+            activeEntries[#activeEntries + 1] = entries[index]
+            if host == primaryHost then primaryPresent = true end
+        end
+    end
+
+    if #activeHosts == 0 then
+        Inline.hosts = {}
+        Inline.entries = {}
+        Inline.host = nil
+        Inline.target = nil
+        clearInlineHighlights(0)
+        return false, failureReason or "conversation_interrupted"
+    end
+    if primaryFailed then
+        if Inline.mode ~= INLINE_MODE_NEARBY
+            or (primaryFailureReason ~= "npc_unavailable"
+                and primaryFailureReason ~= "conversation_interrupted")
+        then
+            return false, primaryFailureReason or "conversation_interrupted"
+        end
+        Inline.host = activeHosts[1]
+        Inline.target = activeEntries[1]
+        Inline.targetID = Inline.target
+            and tostring(Inline.target.id or "") or nil
+    elseif not primaryPresent then
+        return false, "conversation_interrupted"
+    end
+    Inline.hosts = activeHosts
+    Inline.entries = activeEntries
+    return true
+end
+
+local function recoverInlineHosts(player, now)
+    if not Inline.part or not player then return false end
+    if now < (tonumber(Inline.nextRecoveryAt) or 0) then return false end
+    if now > (tonumber(Inline.recoveryDeadlineAt) or 0) then
+        return false
+    end
+    Inline.nextRecoveryAt = now + INLINE_RECOVERY_INTERVAL_MS
+    local resolved = resolveInlineRecipients(player, {
+        selectClosest = true,
+    })
+    if not resolved or #resolved.targets == 0 then return false end
+    if not rebuildInlineHosts(player, resolved) then return false end
+    resetInlineRecovery()
+    Inline.nextLifecycleAt = now + INLINE_LIFECYCLE_INTERVAL_MS
+    Inline.nextContextRefreshAt = now
+    Inline.nextControlsRefreshAt = now
+    refreshInlineHighlights(0)
+    Inline.part.owner = Inline.host
+    Inline.part:refreshControls()
+    positionInline(0, player)
+    return true
+end
+
 function Integration.UpdateInline()
     if currentConversationView() then
         if Inline.part then Integration.CloseInline("conversation_opened") end
@@ -816,22 +1328,47 @@ function Integration.UpdateInline()
         return
     end
     local now = currentTime()
+    local player = getSpecificPlayer and getSpecificPlayer(0)
+        or getPlayer and getPlayer() or nil
     if now >= (tonumber(Inline.nextLifecycleAt) or 0) then
-        for _, host in ipairs(Inline.hosts or {}) do
-            if host and host.updateLifecycle then
-                local interruption = host:updateLifecycle()
-                if interruption or host.closed then
-                    Integration.CloseInline(
-                        interruption or "conversation_interrupted"
-                    )
+        local lifecycleActive, lifecycleReason = updateInlineHostLifecycles()
+        if not lifecycleActive then
+            if lifecycleReason == "npc_unavailable"
+                or lifecycleReason == "conversation_interrupted"
+            then
+                if not Inline.recoveryStartedAt then
+                    Inline.recoveryStartedAt = now
+                    Inline.recoveryDeadlineAt = now
+                        + INLINE_RECOVERY_GRACE_MS
+                    Inline.nextRecoveryAt = now
+                end
+                lifecycleActive = recoverInlineHosts(player, now)
+                if not lifecycleActive
+                    and now < (tonumber(Inline.recoveryDeadlineAt) or 0)
+                then
+                    refreshInlineHighlights(0)
+                    Inline.part.owner = nil
+                    Inline.nextLifecycleAt = now
+                        + INLINE_LIFECYCLE_INTERVAL_MS
+                    if now >= (tonumber(Inline.nextControlsRefreshAt) or 0)
+                        and Inline.part.refreshControls
+                    then
+                        Inline.part:refreshControls()
+                        Inline.nextControlsRefreshAt = now
+                            + INLINE_CONTROLS_REFRESH_INTERVAL_MS
+                    end
+                    positionInline(0, player)
                     return
                 end
             end
+            if not lifecycleActive then
+                Integration.CloseInline(lifecycleReason)
+                return
+            end
         end
+        resetInlineRecovery()
         Inline.nextLifecycleAt = now + INLINE_LIFECYCLE_INTERVAL_MS
     end
-    local player = getSpecificPlayer and getSpecificPlayer(0)
-        or getPlayer and getPlayer() or nil
     if now >= (tonumber(Inline.nextContextRefreshAt) or 0) then
         refreshLockedInlineEntries(player)
         Inline.nextContextRefreshAt = now
@@ -840,6 +1377,7 @@ function Integration.UpdateInline()
     refreshInlineHighlights(0)
     Inline.part.owner = Inline.host
     Inline.part.title = INLINE_TITLE
+    syncInlineModeButton()
     if now >= (tonumber(Inline.nextControlsRefreshAt) or 0) then
         Inline.part:refreshControls()
         Inline.nextControlsRefreshAt = now

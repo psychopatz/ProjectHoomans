@@ -1,7 +1,7 @@
 require "ISUI/ISContextMenu"
 
 local GridRegion = require "PsychopatzCore/World/PC_GridRegion"
-local LayoutOverlay = require "PNC/UI/Communities/ColonyManagement/PNC_SettlementLayoutOverlay"
+local LayoutOverlay = require "PNC/UI/SettlementManagement/PNC_SettlementLayoutOverlay"
 
 PNC = PNC or {}
 PNC.ColonyManagementContext = PNC.ColonyManagementContext or {}
@@ -37,8 +37,8 @@ function Context.ContainsSquare(settlement, square)
 end
 
 local function openManagement()
-    if PNC.ColonyManagementUI and PNC.ColonyManagementUI.Open then
-        PNC.ColonyManagementUI.Open()
+    if PNC.CommandHub and PNC.CommandHub.Open then
+        PNC.CommandHub.Open()
         return true
     end
     return false
@@ -59,7 +59,7 @@ function Context.Add(context, square)
     local submenu = ISContextMenu:getNew(context)
     context:addSubMenu(root, submenu)
     submenu:addOption(tr("UI_PNC_ColonyContext_Open",
-        "Open Colony Management"), nil, openManagement)
+        "Open Command Hub"), nil, openManagement)
     local overlayKey = LayoutOverlay.IsEnabled()
         and "UI_PNC_ColonyContext_HideOverlay"
         or "UI_PNC_ColonyContext_ShowOverlay"

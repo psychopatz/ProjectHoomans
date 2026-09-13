@@ -53,20 +53,22 @@ T.equal(categories[1].id, "work", "work is not first in the manual hierarchy")
 T.equal(categories[2].id, "workshop",
     "workshop is not second in the manual hierarchy")
 T.equal(categories[3].id, "zone", "zone is not third in the manual hierarchy")
-T.equal(categories[4].id, "colony",
-    "colony is not fourth in the manual hierarchy")
-T.equal(categories[5].id, "events",
-    "events is not fifth in the manual hierarchy")
-T.equal(categories[6].id, "colonist",
-    "colonist is not sixth in the manual hierarchy")
-T.equal(categories[7].id, "storage",
-    "storage is not seventh in the manual hierarchy")
-T.equal(categories[8].id, "research",
-    "research is not eighth in the manual hierarchy")
-T.equal(categories[9].id, "stockpile",
-    "stockpile bootstrap is not ninth in the manual hierarchy")
-T.equal(categories[10].id, "base",
-    "base is not tenth in the manual hierarchy")
+T.equal(categories[4].id, "scavenge",
+    "scavenge is not fourth in the manual hierarchy")
+T.equal(categories[5].id, "colony",
+    "colony is not fifth in the manual hierarchy")
+T.equal(categories[6].id, "events",
+    "events is not sixth in the manual hierarchy")
+T.equal(categories[7].id, "colonist",
+    "colonist is not seventh in the manual hierarchy")
+T.equal(categories[8].id, "storage",
+    "storage is not eighth in the manual hierarchy")
+T.equal(categories[9].id, "research",
+    "research is not ninth in the manual hierarchy")
+T.equal(categories[10].id, "stockpile",
+    "stockpile bootstrap is not tenth in the manual hierarchy")
+T.equal(categories[11].id, "base",
+    "base is not eleventh in the manual hierarchy")
 for _, id in ipairs({
     "structure", "production", "furniture", "external_furniture",
     "genetics", "power", "pipe_networks", "security", "misc", "floors",
@@ -216,6 +218,7 @@ local openedColonist = false
 local openedStorage = false
 local openedResearch = false
 local openedBase = false
+local openedScavenge = false
 PNC.CommandHub.WorkUI = {
     Open = function()
         openedWork = true
@@ -251,11 +254,11 @@ PNC.CommandHub.ChildController = {
         then
             PNC.ResearchUI.Open(owner)
         end
-        if id == "base" and PNC.BuildingUI
-            and PNC.BuildingUI.Open
+        if id == "base" and PNC.BaseUI
+            and PNC.BaseUI.Open
         then
             openedBase = true
-            PNC.BuildingUI.Open(owner)
+            PNC.BaseUI.Open(owner)
         end
         return true
     end,
@@ -322,11 +325,15 @@ PNC.ResearchUI = {
         return true
     end,
 }
-PNC.BuildingUI = {
+PNC.BaseUI = {
     Open = function()
         openedBuilding = true
         return true
     end,
+}
+PNC.ScavengeController = {
+    TeamIDs = function() return { "npc-1" } end,
+    Open = function() openedScavenge = true return true end,
 }
 Registry.Get("work").onClick()
 T.truthy(openedWork, "work category is not wired to its window")
@@ -376,6 +383,8 @@ Registry.Get("research").onClick()
 T.truthy(openedResearch, "research category is not wired to its window")
 Registry.Get("base").onClick()
 T.truthy(openedBase, "base category is not wired to its window")
+Registry.Get("scavenge").onClick(nil, {})
+T.truthy(openedScavenge, "scavenge category is not wired to its controller")
 zone.actions[1].onClick()
 zone.actions[2].onClick()
 zone.actions[3].onClick()
@@ -533,7 +542,7 @@ T.contains(workshopControllerSource, "Workshop.Rebuild",
 T.contains(workshopControllerSource, "ApplyResponsiveLayout",
     "workshop controller does not expose responsive layout")
 local legacyWorkshopSource = T.read("ProjectHoomans", "client",
-    "PNC/UI/Communities/PNC_ColonyManagementWorkshopTab.lua")
+    "PNC/UI/Workshop/PNC_WorkshopCatalog.lua")
 T.contains(legacyWorkshopSource, "onclick = window.onWorkshopControl",
     "workshop controls are not compatible with the standalone window")
 local workshopCommandSource = T.read("ProjectHoomans", "client",
@@ -550,8 +559,8 @@ T.contains(composition, "PNC/UI/Research/PNC_ResearchWindow",
     "research widget is not in the client composition")
 T.contains(composition, "PNC/UI/Workshop/PNC_Workshop",
     "workshop widget is not in the client composition")
-T.contains(composition, "PNC/UI/Building/PNC_Building",
-    "building widget is not in the client composition")
+T.falsy(string.find(composition, "PNC/UI/Building/PNC_Building", 1, true),
+    "retired Building widget remains in the client composition")
 T.falsy(string.find(composition, "PNC/UI/Orders/", 1, true),
     "legacy Orders UI is still in the client composition")
 
@@ -628,8 +637,8 @@ T.contains(childControllerSource, "PNC.ColonyStorageUI",
     "child controller does not manage the storage instance")
 T.contains(childControllerSource, 'Controller.Register("base"',
     "base window is not managed by the child controller")
-T.contains(childControllerSource, "PNC.BuildingUI",
-    "child controller does not manage the building instance")
+T.contains(childControllerSource, "PNC.BaseUI",
+    "child controller does not manage the Base instance")
 T.contains(childControllerSource, 'Controller.Register("colony"',
     "colony branch is not managed by the child controller")
 T.contains(childControllerSource, "PNC.ProvisionSettingsUI",
@@ -641,15 +650,15 @@ T.contains(zoneSource, "CoreHub.Actions",
 local workSource = T.read("ProjectHoomans", "client",
     "PNC/UI/CommandHub/PNC_CommandHub_WorkWindow.lua")
 local buildingWindowSource = T.read("ProjectHoomans", "client",
-    "PNC/UI/Building/PNC_BuildingWindow.lua")
+    "PNC/UI/Base/PNC_BaseWindow.lua")
 T.contains(buildingWindowSource, "WidgetWindow.Install",
-    "building window does not support detached widgets")
-T.contains(buildingWindowSource, "pnc-command-hub-building-widget",
-    "building window does not have a stable widget control id")
-T.contains(buildingWindowSource, "PNC.CommandHub.Building",
-    "building window does not persist its geometry independently")
+    "Base window does not support detached widgets")
+T.contains(buildingWindowSource, "pnc-command-hub-base-widget",
+    "Base window does not have a stable widget control id")
+T.contains(buildingWindowSource, "PNC.CommandHub.Base",
+    "Base window does not persist its geometry independently")
 local buildingTabSource = T.read("ProjectHoomans", "client",
-    "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagementBuildingTab.lua")
+    "PNC/UI/Base/PNC_BaseBuildingCatalog.lua")
 T.contains(buildingTabSource, "building_debug_get_items",
     "building surface dropped its debug material action")
 T.contains(buildingTabSource, "CanUseDebug",
@@ -730,18 +739,9 @@ T.contains(provisionRuleSource, "Layout.SetBounds(row.panel",
     "provision rule panels bypass shared bounds")
 T.falsy(string.find(provisionRuleSource, "widget:setName",
     1, true), "provision rules still mutate labels unsafely")
-local legacyTabsSource = T.read("ProjectHoomans", "client",
-    "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Tabs.lua")
-T.falsy(string.find(legacyTabsSource, 'id = "provision"', 1, true),
-    "legacy Colony Management still exposes Provision Settings")
-local legacySettingsSource = T.read("ProjectHoomans", "client",
-    "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_SettingsTab.lua")
-T.falsy(string.find(legacySettingsSource, "factionNameEntry", 1, true),
-    "legacy Colony Management still exposes the inline faction name field")
-T.falsy(string.find(legacySettingsSource, "factionEmblemButton", 1, true),
-    "legacy Colony Management still exposes the inline faction emblem button")
-T.falsy(string.find(legacyTabsSource, 'id = "workshop"', 1, true),
-    "legacy Colony Management still exposes Workshop")
+T.falsy(string.find(composition,
+    "PNC/UI/Communities/ColonyManagement", 1, true),
+    "legacy Colony Management remains in the client composition")
 T.contains(childControllerSource, "function Controller.Toggle",
     "command hub child toggling is not centralized")
 T.contains(childControllerSource, "function Controller.CloseAll",

@@ -209,6 +209,14 @@ function Tasking.Commands.Pump(at, budget)
             if not ok or result == false then
                 Tasking.Diagnostics.counters.executorFailures =
                     Tasking.Diagnostics.counters.executorFailures + 1
+                if provider and type(provider.OnExecutorFailure) == "function" then
+                    H.SafeCall("provider_executor_failure",
+                        provider.OnExecutorFailure, {
+                            npcId = lease.npcId,
+                            leaseId = lease.leaseId,
+                            domain = lease.sourceDomain,
+                        }, lease, reason or "EXECUTOR_REJECTED")
+                end
                 local recovered, recoveryResult = H.RecoverExecutorFailure(
                     lease, at, "task_executor_failed")
                 Events.Emit("TASK_EXECUTOR_FAILED", {

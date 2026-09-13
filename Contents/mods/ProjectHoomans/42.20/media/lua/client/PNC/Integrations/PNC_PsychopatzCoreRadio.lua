@@ -400,23 +400,6 @@ if RadioActions and RadioActions.Register then
             return true
         end,
     })
-    RadioActions.Register({
-        id = "projecthoomans.colony_management",
-        label = tr("UI_PNC_ColonyManagement", "Colony Management"),
-        signalLabel = tr(
-            "UI_PNC_ColonyManagement",
-            "Colony Management"
-        ),
-        placement = RadioActions.PLACEMENT_SIGNAL or "psychopatz.radio.signal",
-        order = 100,
-        isAvailable = function()
-            return PNC.ColonyManagementUI and PNC.ColonyManagementUI.Open ~= nil
-        end,
-        onClick = function()
-            PNC.ColonyManagementUI.Open()
-            return true
-        end,
-    })
 end
 
 return RadioActions

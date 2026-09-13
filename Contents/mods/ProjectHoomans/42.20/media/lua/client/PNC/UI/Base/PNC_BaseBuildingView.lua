@@ -2,17 +2,17 @@ require "PsychopatzCore/UI/PsychopatzUI"
 require "PNC/UI/Inventory/PNC_InventoryUI_List"
 
 local Components = require
-    "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Components"
+    "PNC/UI/Shared/PNC_ColonyUIComponents"
 local Data = require "PNC/UI/Base/PNC_BaseBuildingData"
 local Cards = require "PNC/UI/Base/PNC_BaseBuildingCards"
 local Rows = require "PNC/UI/Base/PNC_BaseBuildingRows"
 local LayoutModel = require "PNC/UI/Base/PNC_BaseBuildingLayout"
 local BuildUI = require
-    "PNC/UI/Communities/ColonyManagement/PNC_FacilityBuildModal"
+    "PNC/UI/SettlementManagement/PNC_SettlementManagement_FacilityBuildModal"
 local QueueOverlay = require
-    "PNC/UI/Communities/ColonyManagement/PNC_BuildingQueueOverlay"
+    "PNC/UI/Base/PNC_BaseBuildingQueueOverlay"
 local QueueActions = require
-    "PNC/UI/Communities/ColonyManagement/PNC_BuildingQueueActions"
+    "PNC/UI/Base/PNC_BaseBuildingQueueActions"
 
 local View = {}
 local UI = PsychopatzCore.UI

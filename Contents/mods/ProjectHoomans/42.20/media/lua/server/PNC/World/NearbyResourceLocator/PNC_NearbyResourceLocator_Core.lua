@@ -59,7 +59,9 @@ function H.CacheKey(originX, originY, originZ, options)
 end
 
 function H.ValidCached(cached, accept)
-    return cached and cached.value and (not accept or accept(cached.value))
+    if not cached then return false end
+    if cached.value == nil then return cached.negative == true end
+    return not accept or accept(cached.value)
 end
 
 function Locator.Invalidate(cacheKeyValue)

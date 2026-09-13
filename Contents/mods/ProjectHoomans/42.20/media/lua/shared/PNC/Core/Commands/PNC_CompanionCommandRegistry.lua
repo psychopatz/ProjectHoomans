@@ -213,6 +213,48 @@ local function livePosition(record)
         tonumber(record and record.z)
 end
 
+local function isFollowingPlayer(record, player)
+    local order = record and record.orderSpec or nil
+    local ownerOnlineID
+    local playerOnlineID
+    local ownerUsername
+    local playerUsername
+    if not record or not player
+        or tostring(order and order.kind or "")
+            ~= tostring(Const.ORDER_FOLLOW or "follow")
+    then
+        return false
+    end
+    if not Commands.IsCompanion(record)
+        or not Commands.IsOwnedByPlayer(record, player)
+    then
+        return false
+    end
+    ownerOnlineID = tonumber(order.ownerOnlineID or record.ownerOnlineID)
+    playerOnlineID = player.getOnlineID
+        and tonumber(player:getOnlineID()) or nil
+    if ownerOnlineID ~= nil and playerOnlineID ~= nil then
+        return ownerOnlineID == playerOnlineID
+    end
+    ownerUsername = tostring(order.ownerUsername or record.ownerUsername or "")
+    playerUsername = player.getUsername
+        and tostring(player:getUsername() or "") or ""
+    return ownerUsername ~= "" and ownerUsername == playerUsername
+end
+
+local function nextGroupCampID(player)
+    local ownerKey
+    local revision
+    Commands.GroupCampRevision = (tonumber(Commands.GroupCampRevision) or 0) + 1
+    revision = Commands.GroupCampRevision
+    ownerKey = player and player.getOnlineID and player:getOnlineID()
+    ownerKey = ownerKey ~= nil and tostring(ownerKey)
+        or player and player.getUsername and player:getUsername()
+        or "player"
+    return "camp:group:" .. tostring(ownerKey) .. ":"
+        .. tostring(Core.Now()) .. ":" .. tostring(revision)
+end
+
 function Commands.CanPlayerCommand(record, player, radius)
     local x
     local y
@@ -301,7 +343,7 @@ local function applyAttackType(record, definition)
     return true
 end
 
-function Commands.Apply(record, player, commandID, radius)
+function Commands.Apply(record, player, commandID, radius, commandContext)
     local definition = Commands.Get(commandID)
     local allowed
     local reason
@@ -324,7 +366,7 @@ function Commands.Apply(record, player, commandID, radius)
     if type(definition.apply) == "function" then
         local applied
         local applyReason
-        applied, applyReason = definition.apply(record, player)
+        applied, applyReason = definition.apply(record, player, commandContext)
         if applied == false then
             return false, applyReason or "command_rejected"
         end
@@ -341,6 +383,54 @@ function Commands.Apply(record, player, commandID, radius)
         "companion_command_" .. tostring(definition.id)
     )
     return true, "commanded"
+end
+
+function Commands.ApplyGroupCamp(player)
+    local definition = Commands.Get("camp")
+    local allowed
+    local reason
+    local anchorX
+    local anchorY
+    local anchorZ
+    local campID
+    local affected = 0
+    local affectedTargets = {}
+    if not Core.IsAuthority() then return 0, "not_authority", affectedTargets end
+    if not definition then return 0, "unknown_command", affectedTargets end
+    if not player or (player.isDead and player:isDead()) then
+        return 0, "invalid_player", affectedTargets
+    end
+    if not player.getX or not player.getY or not player.getZ then
+        return 0, "camp_requires_building", affectedTargets
+    end
+    if Commands.CanCampAtPlayer then
+        allowed, reason = Commands.CanCampAtPlayer(player)
+        if not allowed then return 0, reason, affectedTargets end
+    end
+    anchorX, anchorY, anchorZ = player:getX(), player:getY(), player:getZ()
+    campID = nextGroupCampID(player)
+    Registry.ForEach(function(record)
+        local orderSpec
+        if not isFollowingPlayer(record, player) then return end
+        if type(definition.buildOrder) ~= "function" then return end
+        orderSpec = definition.buildOrder(record, player, {
+            x = anchorX, y = anchorY, z = anchorZ, campId = campID,
+        })
+        if type(orderSpec) ~= "table" then return end
+        OrderSystem.SetOrder(record, orderSpec)
+        record.runtime = record.runtime or {}
+        record.runtime.lastCompanionCommand = "camp"
+        record.runtime.lastCompanionCommandAt = Core.Now()
+        record.runtime.lastCompanionCommandRevision =
+            (tonumber(record.runtime.lastCompanionCommandRevision) or 0) + 1
+        record.runtime.lastCompanionCommandOwner = player.getUsername
+            and tostring(player:getUsername() or "") or nil
+        Network.BroadcastRecord(record, "companion_command_camp")
+        affected = affected + 1
+        affectedTargets[#affectedTargets + 1] = tostring(record.id)
+    end)
+    return affected, affected > 0 and "commanded" or "no_targets",
+        affectedTargets
 end
 
 function Commands.Execute(player, args)
@@ -371,6 +461,9 @@ function Commands.Execute(player, args)
     if scope == "group" and definition.personalized == true then
         return 0, "personalized_command"
     end
+    if scope == "group" and commandID == "camp" then
+        return Commands.ApplyGroupCamp(player)
+    end
     if scope == "closest" then
         Registry.ForEach(function(record)
             local allowed = Commands.CanPlayerCommand(record, player, radius)
@@ -392,7 +485,8 @@ function Commands.Execute(player, args)
             closestRecord,
             player,
             commandID,
-            radius
+            radius,
+            args
         )
         if applied then
             affectedTargets[1] = tostring(closestRecord.id)
@@ -404,7 +498,8 @@ function Commands.Execute(player, args)
             Registry.Get(targetID),
             player,
             commandID,
-            radius
+            radius,
+            args
         )
         if applied then affectedTargets[1] = tostring(targetID) end
         return applied and 1 or 0, reason, affectedTargets
@@ -413,7 +508,7 @@ function Commands.Execute(player, args)
         return 0, "personalized_command"
     end
     Registry.ForEach(function(record)
-        applied, reason = Commands.Apply(record, player, commandID, radius)
+        applied, reason = Commands.Apply(record, player, commandID, radius, args)
         if applied then
             affected = affected + 1
             affectedTargets[#affectedTargets + 1] = tostring(record.id)

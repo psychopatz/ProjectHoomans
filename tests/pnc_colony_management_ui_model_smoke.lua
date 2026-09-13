@@ -29,7 +29,7 @@ getItemNameFromFullType = function(fullType)
 end
 
 local Presentation = require(
-    "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Presentation"
+    "PNC/UI/Shared/PNC_ColonyPresentation"
 )
 
 local snapshot = {
@@ -63,7 +63,7 @@ local selectedRoster = {
     getItem = function() return { item = roster[1] } end,
 }
 local Shared = require(
-    "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Shared"
+    "PNC/UI/Shared/PNC_ColonyUIShared"
 )
 T.equal(Shared.ListValue(selectedRoster), snapshot.people[1],
     "roster selection unwraps the colonist snapshot")
@@ -116,50 +116,9 @@ end
 package.preload["PsychopatzCore/UI/PsychopatzUI"] = function()
     return PsychopatzCore.UI
 end
-package.preload[
-    "PNC/UI/Communities/ColonyManagement/PNC_ProvisionDiagnosticsModal"
-] = function()
-    return { Open = function() end }
-end
-
 local Components = require(
-    "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Components"
+    "PNC/UI/Shared/PNC_ColonyUIComponents"
 )
-local DebugTab = require(
-    "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_DebugTab"
-)
-local debugPerson = snapshot.people[1]
-debugPerson.provision = { evaluations = {
-    food = { onHand = 0.2, target = 0.8, refilling = true },
-    hydration = { onHand = 0.7, target = 0.7, refilling = false },
-} }
-local debugRows = DebugTab.BuildRows(debugPerson, {})
-T.equal(#debugRows, 5, "debug tab storage and provision rows")
-T.equal(debugRows[1].key, "debug_storage_food",
-    "debug tab starts with storage diagnostics")
-T.falsy(debugRows[1].meter, "debug tab does not duplicate need meters")
-T.equal(debugRows[4].key, "debug_provision_food",
-    "debug tab exposes food provision state")
-local requestedAction
-local requestedOptions
-PNC.Client = {
-    CanUseDebug = function() return true end,
-    RequestColonyAction = function(action, options)
-    requestedAction, requestedOptions = action, options
-    return true
-    end,
-}
-T.truthy(DebugTab.OnControl({ people = selectedRoster }, {
-    internal = "force_nearby_water",
-}), "nearby-water debug control submits an action")
-T.equal(requestedAction, "debug_need",
-    "nearby-water debug control uses the needs debug route")
-T.equal(requestedOptions.operation, "force_nearby_water",
-    "nearby-water debug operation reaches the server command")
-PNC.Client.CanUseDebug = function() return false end
-T.falsy(DebugTab.OnControl({ people = selectedRoster }, {
-    internal = "force_nearby_water",
-}), "debug control bypasses the client authorization gate")
 local bound = {
     items = { { stale = true } },
     yScroll = -900,

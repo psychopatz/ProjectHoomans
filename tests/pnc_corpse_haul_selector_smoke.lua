@@ -125,7 +125,7 @@ T.equal(opened[3].guideLayers[1].region, source,
 PNC.CommandHub = PNC.CommandHub or {}
 PNC.CommandHub.CorpseHaulUI = UI
 package.preload[
-    "PNC/UI/Communities/ColonyManagement/SettlementManagement/PNC_SettlementManagement_FishingActions"
+    "PNC/UI/SettlementManagement/PNC_SettlementManagement_FishingActions"
 ] = function() return {} end
 local ZoneRegistry = T.load("ProjectHoomans", "client",
     "PNC/UI/CommandHub/PNC_CommandHub_ZoneRegistry.lua")

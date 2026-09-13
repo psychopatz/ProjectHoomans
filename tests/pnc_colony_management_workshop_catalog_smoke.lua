@@ -1,7 +1,7 @@
 local T = require "tests/support/test"
 
 local FILE = T.path("ProjectHoomans", "client", "PNC/")
-    .. "UI/Communities/PNC_ColonyManagementWorkshopTab.lua"
+    .. "UI/Workshop/PNC_WorkshopCatalog.lua"
 
 getText = function(key) return key end
 PNC = {
@@ -17,14 +17,14 @@ package.preload["PNC/UI/Inventory/PNC_InventoryUI_Model"] = function()
 end
 local buildStationCalls = {}
 package.preload[
-    "PNC/UI/Communities/ColonyManagement/PNC_FacilityBuildModal"
+    "PNC/UI/SettlementManagement/PNC_SettlementManagement_FacilityBuildModal"
 ] = function()
     return { Open = function(_, _, _, _, focusDefinitionId)
         buildStationCalls[#buildStationCalls + 1] = focusDefinitionId
     end }
 end
 package.preload[
-    "PNC/UI/Communities/ColonyManagement/SettlementManagement/PNC_SettlementManagement_FacilityActions"
+    "PNC/UI/SettlementManagement/PNC_SettlementManagement_FacilityActions"
 ] = function() return { BeginBuild = function() return true end } end
 
 local function fakeList()

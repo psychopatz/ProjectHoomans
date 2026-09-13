@@ -12,7 +12,7 @@ end
 
 PNC = { BuildRecipeCatalog = {} }
 local Overlay = T.load("ProjectHoomans", "client",
-    "PNC/UI/Communities/ColonyManagement/PNC_BuildingQueueOverlay.lua")
+    "PNC/UI/Base/PNC_BaseBuildingQueueOverlay.lua")
 Overlay.Reset()
 
 local queue = {

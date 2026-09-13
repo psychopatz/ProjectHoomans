@@ -35,6 +35,9 @@ function Request.Create(spec)
         debug = spec.debug == true,
         stateAware = spec.stateAware == true,
         selectionLimit = tonumber(spec.selectionLimit),
+        -- Fluid drinks may be consumed by volume. This is intentionally
+        -- request-scoped so ordinary drainable food keeps its use-delta path.
+        consumeAmount = tonumber(spec.consumeAmount),
     }
 end
 

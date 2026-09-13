@@ -111,7 +111,7 @@ function PNC.FacilityDefinitions.GetLevel()
 end
 
 local BuildUI = T.load("ProjectHoomans", "client",
-    "PNC/UI/Communities/ColonyManagement/PNC_FacilityBuildModal.lua")
+    "PNC/UI/SettlementManagement/PNC_SettlementManagement_FacilityBuildModal.lua")
 local options = BuildUI.BuildOptions({ hqLevel = 1, facilities = {
     { definitionId = "stockpile", constructionState = "BUILT" },
 } }, {

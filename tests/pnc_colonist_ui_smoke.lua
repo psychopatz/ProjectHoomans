@@ -39,8 +39,6 @@ local windowSource = T.read("ProjectHoomans", "client",
     "PNC/UI/Colonist/PNC_ColonistWindow.lua")
 local hubSource = T.read("ProjectHoomans", "client",
     "PNC/Integrations/PNC_PsychopatzCoreDebug.lua")
-local colonyTabsSource = T.read("ProjectHoomans", "client",
-    "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Tabs.lua")
 local compositionSource = T.read("ProjectHoomans", "client",
     "PNC/Composition/PNC_ClientComposition.lua")
 T.contains(registrySource, "Registry.Revision",
@@ -95,8 +93,6 @@ T.contains(hubSource, "PNC.ColonistUI.OpenDebug",
     "debug hub still targets the removed standalone needs window")
 T.falsy(hubSource:find("PNC.NeedsDebugUI.Toggle", 1, true),
     "debug hub still invokes the removed standalone needs window")
-T.falsy(colonyTabsSource:find('id = "debug"', 1, true),
-    "Colony Management still exposes the migrated debug tab")
 T.contains(compositionSource, "PNC/UI/Colonist/PNC_Colonist",
     "colonist menu is missing from client composition")
 T.falsy(compositionSource:find("PNC/UI/Needs/PNC_NeedsDebugWindow", 1, true),

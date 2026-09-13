@@ -211,5 +211,10 @@ function Inventory.CreateFromTemplate(record, options)
     Internal.refreshNextItemSerial(record, inv)
     Inventory.SyncEquipmentFromInventory(record)
     Inventory.RebuildCaches(record)
+    if (not options or options.reconcileWaterContainer ~= false)
+        and Inventory.ReconcileWaterContainer
+    then
+        Inventory.ReconcileWaterContainer(record)
+    end
     return record.inventory
 end

@@ -55,6 +55,10 @@ function Presentation.Row(entry)
         message = text("UI_PNC_Journal_DrinkConsumed",
             "Drank %s (+%s%% thirst relief)", itemName(entry[3]),
             percent(entry[4]))
+    elseif eventType == EventTypes.NPC_WATER_REFILLED then
+        message = text("UI_PNC_Journal_WaterRefilled",
+            "Filled %s (+%s L)", itemName(entry[3]),
+            string.format("%.2f", tonumber(entry[4]) or 0))
     elseif eventType == EventTypes.NPC_NEED_SEVERITY_CHANGED then
         message = string.format("%s changed from %s to %s",
             humanize(entry[3]), humanize(entry[4]), humanize(entry[5]))

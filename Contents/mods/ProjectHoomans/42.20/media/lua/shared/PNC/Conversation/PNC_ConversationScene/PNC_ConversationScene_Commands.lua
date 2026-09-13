@@ -13,6 +13,7 @@ function Scene.HandleClientCommand(player, command, args)
         return Scene.Begin(record, zombie, player, args.token, {
             maximumDistance = args.maximumDistance,
             dangerRadius = args.dangerRadius,
+            guardThreats = args.guardThreats ~= false,
             allowHostileParley = args.allowHostileParley == true,
             enforceDistance = args.enforceDistance ~= false,
         })

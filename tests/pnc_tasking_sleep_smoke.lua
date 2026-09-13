@@ -62,6 +62,26 @@ local second, reason = Tasking.Commands.Reevaluate("two", "NEED_STATE_CHANGED")
 T.truthy(not second and reason == "NO_ACTIVITY_CAPACITY",
     "two NPCs must not own the same bed")
 Tasking.Commands.CancelForNPC("one", "test_cancel")
+local metadataLease = Leases.Create({
+    npcId = "one", taskId = "food:one", kind = "EAT",
+    sourceDomain = "Needs", sourceRef = "hunger",
+    precedence = "NORMAL_NEED", urgency = 0.5,
+    capability = "food.dine",
+}, {
+    facilityId = "dining", componentId = "table",
+    resourceKind = "personal_food",
+    activityItemID = "food:apple",
+    activityItemFullType = "Base.Apple",
+    executionMode = "ABSTRACT",
+})
+T.equal(metadataLease.activityItemID, "food:apple",
+    "task leases preserve the exact food item identity")
+T.equal(metadataLease.activityItemFullType, "Base.Apple",
+    "task leases preserve the food full type")
+T.equal(metadataLease.resourceKind, "personal_food",
+    "task leases preserve the transactional food resource kind")
+T.truthy(Leases.Release(metadataLease.leaseId, "test_metadata"),
+    "food metadata lease releases cleanly")
 available = true
 T.truthy(Tasking.Commands.Reevaluate("two", "FACILITY_SLOT_RELEASED"),
     "released bed should become assignable")

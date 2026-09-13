@@ -52,7 +52,7 @@ local function debugNeedAction(player, args)
         local diagnostics, reason = PNC.ProvisionEvaluator.Inspect(record)
         return diagnostics ~= nil, reason or "provision_inspected", diagnostics
     end
-    if operation == "force_nearby_water" then
+    if operation == "force_world_water" then
         return debugNearbyWaterAction(player, args)
     end
     return false, "unknown_debug_operation"

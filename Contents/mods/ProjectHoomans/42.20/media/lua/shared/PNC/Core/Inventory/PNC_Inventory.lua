@@ -15,6 +15,7 @@ require "PNC/Core/Inventory/PNC_Inventory/Equipment/PNC_Inventory_EquipmentGener
 require "PNC/Core/Inventory/PNC_Inventory/PNC_Inventory_Templates"
 require "PNC/Core/Inventory/PNC_Inventory/PNC_Inventory_Equipment"
 require "PNC/Core/Inventory/PNC_Inventory/PNC_Inventory_Mutations"
+require "PNC/Core/Inventory/PNC_Inventory/PNC_Inventory_WaterContainers"
 require "PNC/Core/Inventory/PNC_Inventory/PNC_Inventory_Payloads"
 require "PNC/Core/Inventory/PNC_Inventory/PNC_Inventory_Persistence"
 
@@ -25,4 +26,6 @@ Inventory.Commands.ApplyDelta = Inventory.ApplyDelta
 Inventory.Commands.AddItems = Inventory.AddItems
 Inventory.Commands.RemoveItems = Inventory.RemoveItems
 Inventory.Commands.RebuildCaches = Inventory.RebuildCaches
+Inventory.Commands.SetWaterContainer = Inventory.SetWaterContainer
+Inventory.Commands.ClearWaterContainer = Inventory.ClearWaterContainer
 Inventory.Commands.AdvanceFoodLifecycle = Inventory.AdvanceFoodLifecycle

@@ -898,7 +898,7 @@ function Client.SetFactionEmblem(emblem)
     })
 end
 
-function Client.RequestCharacterPayload(npcId)
+function Client.RequestCharacterPayload(npcId, forceFull)
     local player = getSpecificPlayer(0)
     local payload
     local cached
@@ -930,7 +930,8 @@ function Client.RequestCharacterPayload(npcId)
         and tonumber(cached.inventory.summary.revision) or nil
     sendClientCommand(player, Const.MODULE, Const.CMD_REQUEST_CHARACTER, {
         id = npcId,
-        inventoryRevision = inventoryRevision,
+        inventoryRevision = forceFull == true and nil or inventoryRevision,
+        forceFull = forceFull == true,
     })
     return true
 end

@@ -15,10 +15,12 @@ local Core = PNC.Core
 local function isWaterScene(sceneId)
     return string.find(
         tostring(sceneId or ""),
-        "facility.water.",
+        "survival.drink.",
         1,
         true
     ) == 1
+        or string.find(tostring(sceneId or ""), "survival.fill.", 1, true)
+            == 1
 end
 
 local function sceneBodyState(zombie)

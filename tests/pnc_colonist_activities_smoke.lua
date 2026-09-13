@@ -12,6 +12,7 @@ end
 
 local variants = {}
 local commands = {}
+local diagnostics = {}
 local requestedSnapshot
 local gridCalls = 0
 local UI = {
@@ -81,7 +82,7 @@ package.preload["ISUI/ISComboBox"] = function()
     return ISComboBox
 end
 package.preload[
-    "PNC/UI/Communities/ColonyManagement/PNC_ProvisionDiagnosticsModal"
+    "PNC/UI/SettlementManagement/PNC_SettlementManagement_ProvisionDiagnosticsModal"
 ] = function()
     return { Open = function() end }
 end
@@ -93,6 +94,13 @@ PNC = {
                 commandID = commandID, npcID = npcID, context = context,
             }
             return true
+        end,
+        RecordManualActivityDiagnostic = function(npcID, commandID, accepted,
+                reason, requestID)
+            diagnostics[#diagnostics + 1] = {
+                npcID = npcID, commandID = commandID, accepted = accepted,
+                reason = reason, requestID = requestID,
+            }
         end,
     },
 }
@@ -129,6 +137,11 @@ Activities.Apply(window, true, UI.Layout, activities)
 T.equal(gridCalls, 1, "activities did not use the responsive command grid")
 T.truthy(activities.pane,
     "activities tab does not own its command pane")
+T.truthy(activities.controls.manual_refill,
+    "activities tab does not expose manual water refilling")
+T.equal(activities.controls.manual_refill.title,
+    "REFILL WATER",
+    "manual water refill uses the wrong activity label")
 
 local rows = Activities.BuildRows({ selectedPerson = person, window = window })
 T.equal(rows[1].detail, "Eating - Apple (PLAYING)",
@@ -143,6 +156,14 @@ T.equal(rows[5].label, "Reached Axe level 3",
     "activities tab does not render journal history")
 T.equal(rows[6].label, "Ate Apple (+20% hunger)",
     "activities tab does not preserve canonical journal formatting")
+local JournalPresentation = require
+    "PNC/UI/Communities/PNC_ColonistJournalPresentation"
+local refillRow = JournalPresentation.Row({
+    "projecthoomans.npc.needs.waterRefilled", 120,
+    "Base.WaterBottle", 0.75, "sink:10:10:0",
+})
+T.equal(refillRow.message, "Filled WaterBottle (+0.75 L)",
+    "activities journal does not render water refill entries")
 
 T.truthy(Activities.OnControl(window, {
     internal = "manual_eat",
@@ -156,6 +177,42 @@ T.equal(commands[1].context.source, "colonist_activities",
     "activities tab omitted its command source")
 T.equal(requestedSnapshot, "colonist_activity_manual_eat",
     "activities tab did not request a post-action snapshot")
+
+T.truthy(Activities.OnControl(window, {
+    internal = "manual_refill",
+    activityCommandID = "manual_refill",
+}), "activities tab did not dispatch manual water refilling")
+T.equal(commands[2].commandID, "manual_refill",
+    "activities tab dispatched the wrong refill command")
+T.equal(commands[2].npcID, person.id,
+    "activities tab dispatched refill to the wrong colonist")
+T.equal(commands[2].context.source, "colonist_activities",
+    "activities tab omitted the refill command source")
+T.truthy(commands[2].context.requestID,
+    "activities tab did not correlate the refill command")
+T.equal(diagnostics[2].commandID, "manual_refill",
+    "activities tab did not record the refill diagnostic")
+
+-- The server's precise rejection reason is rendered in the same Activities
+-- diagnostic row that is used by the local command path.
+person.manualActivityDiagnostic = {
+    commandID = "manual_refill", result = false,
+    reason = "WATER_CONTAINER_FULL",
+}
+local diagnosticRows = Activities.BuildRows({
+    selectedPerson = person, window = window,
+})
+local diagnosticRow
+for _, row in ipairs(diagnosticRows) do
+    if row.label == "LAST ACTIVITY COMMAND" then
+        diagnosticRow = row
+        break
+    end
+end
+T.truthy(diagnosticRow,
+    "activities tab does not display the last manual activity diagnostic")
+T.equal(diagnosticRow.detail, "manual_refill = WATER_CONTAINER_FULL",
+    "activities tab hides the precise refill rejection reason")
 
 local Registry = T.load(
     "ProjectHoomans", "client", "PNC/UI/Colonist/PNC_ColonistRegistry.lua")

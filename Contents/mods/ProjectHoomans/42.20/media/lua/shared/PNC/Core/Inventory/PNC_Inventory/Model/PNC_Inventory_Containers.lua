@@ -49,6 +49,9 @@ function Internal.clearItemRefs(inv, itemID)
     if inv.equipped.primary == itemID then inv.equipped.primary = nil end
     if inv.equipped.secondary == itemID then inv.equipped.secondary = nil end
     if inv.equipped.bag == itemID then inv.equipped.bag = nil end
+    if inv.equipped.waterContainer == itemID then
+        inv.equipped.waterContainer = nil
+    end
     for key, _ in pairs(inv.worn) do
         if inv.worn[key] == itemID then inv.worn[key] = nil end
     end

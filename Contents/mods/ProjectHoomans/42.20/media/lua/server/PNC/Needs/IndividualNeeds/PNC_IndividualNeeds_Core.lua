@@ -166,11 +166,24 @@ function Needs.ModifyNutrition(record, calories, reason)
     local state = Needs.GetState(record)
     if not state then return nil, "not_player_owned" end
     local tuning = Definitions.NUTRITION
-    local before = state.nutrition.calories
-    state.nutrition.calories = math.max(tuning.minimumCalories,
-        math.min(tuning.maximumCalories, before + (tonumber(calories) or 0)))
-    if before ~= state.nutrition.calories and PNC.NeedsRepository then
-        PNC.NeedsRepository.MarkDirty()
+    local before = tonumber(state.nutrition.calories)
+        or tuning.defaultCalories
+    local overflow = math.max(0, tonumber(state.nutrition.calorieOverflow) or 0)
+    local beforeBalance = before + overflow
+    local maximumOverflow = math.max(0,
+        tonumber(tuning.maximumCalorieOverflow) or 0)
+    local balance = math.max(tuning.minimumCalories,
+        math.min(tuning.maximumCalories + maximumOverflow,
+            beforeBalance + (tonumber(calories) or 0)))
+    state.nutrition.calories = math.min(tuning.maximumCalories, balance)
+    state.nutrition.calorieOverflow = math.max(0,
+        balance - tuning.maximumCalories)
+    if before ~= state.nutrition.calories
+        or overflow ~= state.nutrition.calorieOverflow
+    then
+        if PNC.NeedsRepository then
+            PNC.NeedsRepository.MarkDirty()
+        end
     end
     return state.nutrition.calories, reason
 end

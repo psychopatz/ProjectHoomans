@@ -88,6 +88,8 @@ function H.PrepareTick(now)
         nil, now)
     safeOptional("server_prepare.provision", PNC.ProvisionScheduler, "Pump",
         nil, now)
+    safeOptional("server_prepare.camp_resources",
+        PNC.CampResourceService, "Pump", nil, now)
     safeOptional("server_prepare.lumber", PNC.LumberService, "Pump", nil,
         now)
     -- Native engine-path routes are pumped by PathService.Pump from

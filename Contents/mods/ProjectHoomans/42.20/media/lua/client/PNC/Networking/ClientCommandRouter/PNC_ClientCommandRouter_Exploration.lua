@@ -36,9 +36,6 @@ function Internal.ApplyScavengeSnapshot(payload)
         if PNC.ScavengeUI and PNC.ScavengeUI.ReceiveSnapshot then
             PNC.ScavengeUI.ReceiveSnapshot(payload)
         end
-        if PNC.ColonyScavengeTab and PNC.ColonyScavengeTab.ReceiveSnapshot then
-            PNC.ColonyScavengeTab.ReceiveSnapshot(payload)
-        end
         return false
     end
     local current = sessionId and ClientState.scavengeSessions[sessionId] or nil
@@ -65,9 +62,6 @@ function Internal.ApplyScavengeSnapshot(payload)
     end
     if PNC.ScavengeUI and PNC.ScavengeUI.ReceiveSnapshot then
         PNC.ScavengeUI.ReceiveSnapshot(payload)
-    end
-    if PNC.ColonyScavengeTab and PNC.ColonyScavengeTab.ReceiveSnapshot then
-        PNC.ColonyScavengeTab.ReceiveSnapshot(payload)
     end
     return true
 end

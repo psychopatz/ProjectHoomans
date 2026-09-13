@@ -53,12 +53,21 @@ function Locator.FindObject(origin, options)
     if not cell or not cell.getGridSquare then return nil end
     local output, seen = {}, {}
     local baseX, baseY = math.floor(originX), math.floor(originY)
+    -- Include the whole origin square while excluding diagonal corners that
+    -- lie outside the requested tile radius.
+    local scanRadius = radius + 0.5
+    local radiusSq = scanRadius * scanRadius
     for dx = -radius, radius do
         for dy = -radius, radius do
-            local square = cell:getGridSquare(baseX + dx, baseY + dy, originZ)
-            if square then
-                H.ScanSquareObjects(output, seen, square, originX, originY,
+            local squareDX = baseX + dx + 0.5 - originX
+            local squareDY = baseY + dy + 0.5 - originY
+            if squareDX * squareDX + squareDY * squareDY <= radiusSq then
+                local square = cell:getGridSquare(baseX + dx, baseY + dy,
                     originZ)
+                if square then
+                    H.ScanSquareObjects(output, seen, square, originX,
+                        originY, originZ)
+                end
             end
         end
     end
@@ -73,6 +82,10 @@ function Locator.FindObject(origin, options)
             break
         end
     end
-    if key then Locator.Cache[key] = { at = timestamp, value = accepted } end
+    if key then
+        Locator.Cache[key] = {
+            at = timestamp, value = accepted, negative = accepted == nil,
+        }
+    end
     return accepted
 end

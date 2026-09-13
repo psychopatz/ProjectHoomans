@@ -59,7 +59,7 @@ PNC = {
 }
 
 local Placement = T.load("ProjectHoomans", "client",
-    "PNC/UI/Communities/ColonyManagement/PNC_BuildingPlacement.lua")
+    "PNC/UI/Base/PNC_BaseBuildingPlacement.lua")
 local window = {}
 local ok, reason = Placement.Begin(window, {
     recipeKey = "TestWall", objectInfoName = "TestWall",
@@ -78,12 +78,11 @@ T.falsy(cell:getDrag(), "cancel clears the IsoCell drag state")
 
 local placementControls
 package.preload[
-    "PNC/UI/Communities/ColonyManagement/PNC_BuildingPlacementModal"
+    "PNC/UI/Base/PNC_BaseBuildingPlacementModal"
 ] = function()
     return { Open = function(options) placementControls = options end }
 end
 PNC.FacilityBuildUI = {
-    RestorePrevious = function() end,
     Reopen = function() end,
 }
 local facilityWindow = {}
@@ -95,7 +94,7 @@ local facilityOk = Placement.Begin(facilityWindow, {
 T.equal(facilityOk, true, "facility placement creates the native cursor")
 T.truthy(placementControls,
     "facility placement opens the rotate/back placement controls")
-Placement.Cancel(facilityWindow, { restorePrevious = false })
+Placement.Cancel(facilityWindow)
 T.falsy(facilityWindow.buildPlacement,
     "facility placement back path clears the native cursor")
 

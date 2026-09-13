@@ -221,7 +221,7 @@ function Controller.ApplyOpacity(opacity)
         and PNC.ColonyStorageUI.instance or nil, value)
     Options.ApplyWindowOpacity(PNC.ResearchUI
         and PNC.ResearchUI.instance or nil, value)
-    local base = PNC.BaseUI or PNC.BuildingUI
+    local base = PNC.BaseUI
     Options.ApplyWindowOpacity(base and base.instance or nil, value)
     Options.ApplyWindowOpacity(provisionWindow(), value)
     Options.ApplyWindowOpacity(colonyNamePromptWindow(), value)
@@ -526,27 +526,27 @@ Controller.Register("research", {
 
 Controller.Register("base", {
     open = function(owner)
-        local base = PNC.BaseUI or PNC.BuildingUI
+        local base = PNC.BaseUI
         return base and base.Open
             and base.Open(owner) or false
     end,
     close = function()
-        local base = PNC.BaseUI or PNC.BuildingUI
+        local base = PNC.BaseUI
         if base and base.Close then base.Close() end
     end,
     isOpen = function()
-        local base = PNC.BaseUI or PNC.BuildingUI
+        local base = PNC.BaseUI
         return base and moduleIsVisible(base) or false
     end,
     isDetached = function()
-        local base = PNC.BaseUI or PNC.BuildingUI
+        local base = PNC.BaseUI
         return base and moduleIsDetached(base) or false
     end,
     focus = function()
-        return focusModule(PNC.BaseUI or PNC.BuildingUI)
+        return focusModule(PNC.BaseUI)
     end,
     sync = function(owner)
-        local base = PNC.BaseUI or PNC.BuildingUI
+        local base = PNC.BaseUI
         placeWindow(base and base.instance or nil, owner)
     end,
 })

@@ -6,7 +6,7 @@ PNC.Inventory = PNC.Inventory or {}
 local Inventory = PNC.Inventory
 local Internal = Inventory.Internal
 
-function Inventory.EnsureRecordInventory(record)
+function Inventory.EnsureRecordInventory(record, options)
     local inv
     local raw
     local itemID
@@ -14,6 +14,7 @@ function Inventory.EnsureRecordInventory(record)
     local generatorVersion
     local currentGenerator
     local stateChanged = false
+    options = type(options) == "table" and options or {}
     if not record then return nil end
     if type(record.inventory) ~= "table" and type(record.persistedInventory) == "table" then
         local persisted = record.persistedInventory
@@ -23,14 +24,14 @@ function Inventory.EnsureRecordInventory(record)
             and tonumber(persistedTemplate.generatorVersion) or nil
         local currentGenerator = PNC.Const and tonumber(PNC.Const.GENERATOR_VERSION) or 1
         record.persistedInventory = nil
-        local hydrated = Inventory.Deserialize(record, persisted)
+        local hydrated = Inventory.Deserialize(record, persisted, options)
         if persistedGenerator ~= currentGenerator and PNC.Registry and PNC.Registry.MarkDirty then
             PNC.Registry.MarkDirty(record, "inventory_rebase")
         end
         return hydrated
     end
     if type(record.inventory) ~= "table" or not record.inventory.items or not record.inventory.containers then
-        return Inventory.CreateFromTemplate(record)
+        return Inventory.CreateFromTemplate(record, options)
     end
 
     inv = record.inventory
@@ -42,7 +43,10 @@ function Inventory.EnsureRecordInventory(record)
     inv.maxWeight = tonumber(inv.maxWeight) or inv.rootMaxWeight
     inv.equipped = type(inv.equipped) == "table"
         and inv.equipped
-        or { primary = nil, secondary = nil, bag = nil }
+        or {
+            primary = nil, secondary = nil, bag = nil,
+            waterContainer = nil,
+        }
     inv.worn = type(inv.worn) == "table" and inv.worn or {}
     inv.attached = type(inv.attached) == "table" and inv.attached or {}
     inv.items = type(inv.items) == "table" and inv.items or {}
@@ -122,6 +126,11 @@ function Inventory.EnsureRecordInventory(record)
     end
     Inventory.SyncEquipmentFromInventory(record)
     Inventory.RebuildCaches(record)
+    if options.reconcileWaterContainer ~= false
+        and Inventory.ReconcileWaterContainer
+    then
+        Inventory.ReconcileWaterContainer(record)
+    end
     return record.inventory
 end
 

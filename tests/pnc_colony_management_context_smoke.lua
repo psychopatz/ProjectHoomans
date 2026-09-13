@@ -26,7 +26,7 @@ end
 local overlayEnabled = false
 local toggledSettlement
 package.preload[
-    "PNC/UI/Communities/ColonyManagement/PNC_SettlementLayoutOverlay"
+    "PNC/UI/SettlementManagement/PNC_SettlementLayoutOverlay"
 ] = function()
     return {
         IsEnabled = function() return overlayEnabled end,
@@ -61,7 +61,7 @@ PNC = {
         faction = { id = "faction:player" }, settlement = owned,
     } } },
     NPCSelection = { GetWorldSquare = function(objects) return objects[1] end },
-    ColonyManagementUI = { Open = function() opened = opened + 1 end },
+    CommandHub = { Open = function() opened = opened + 1 end },
     Client = { RequestColonyManagement = function()
         requested = requested + 1
     end },
@@ -92,7 +92,7 @@ T.truthy(Context.Add(context, square(10, 11, 0)) == true,
 T.truthy(context.options[1].label == "Manage Colony",
     "management submenu label")
 local submenu = context.options[1].submenu
-T.truthy(submenu.options[1].label == "Open Colony Management",
+T.truthy(submenu.options[1].label == "Open Command Hub",
     "open management option label")
 T.truthy(submenu.options[2].label == "Turn On Base Overlay",
     "hidden overlay option label")

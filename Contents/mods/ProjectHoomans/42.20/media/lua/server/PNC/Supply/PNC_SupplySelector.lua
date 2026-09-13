@@ -37,7 +37,10 @@ function Selector.Score(descriptor, request, remaining)
             - (descriptor.burnt and 12 or 0)
     end
     if request.resourceKind == "HYDRATION" then
-        local total = descriptor.thirst * math.max(1, descriptor.remainingUses)
+        local total = descriptor.thirst
+        if descriptor.fluidHydration ~= true then
+            total = total * math.max(1, descriptor.remainingUses)
+        end
         return math.min(remaining, total) * 5
             - math.max(0, total - remaining) * 0.15
     end
@@ -92,11 +95,13 @@ function Selector.SelectFromStorage(storage, request)
     for index = 1, #scored do
         if selectedUnits >= maxSelections or remaining <= 0 then break end
         local candidate = scored[index]
-        local contribution = request.resourceKind == "FOOD"
+            local contribution = request.resourceKind == "FOOD"
             and candidate.descriptor.hunger
             or request.resourceKind == "HYDRATION"
                 and candidate.descriptor.thirst
-                    * math.max(1, candidate.descriptor.remainingUses)
+                    * (candidate.descriptor.fluidHydration == true
+                        and 1 or math.max(1,
+                            candidate.descriptor.remainingUses))
                 or 1
         local available = math.max(0,
             storage.inventory:count(exactQuery(candidate.entry.record), false))

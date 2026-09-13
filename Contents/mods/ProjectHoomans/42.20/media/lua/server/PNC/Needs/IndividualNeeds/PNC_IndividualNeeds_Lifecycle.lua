@@ -16,6 +16,7 @@ function Needs.Reset(record)
     local nutrition = Needs.GetNutrition(record)
     if nutrition then
         nutrition.calories = Definitions.NUTRITION.defaultCalories
+        nutrition.calorieOverflow = 0
         nutrition.weight = PlayerModel.GetInitialWeight(record)
     end
     PNC.NeedsRepository.SetEvaluatedAt(record, Utils.WorldAgeHours())
@@ -28,4 +29,3 @@ function Needs.InitializeFromGroup(record, groupNeeds)
 end
 
 return Needs
-

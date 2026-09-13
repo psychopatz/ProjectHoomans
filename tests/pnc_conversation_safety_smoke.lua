@@ -170,6 +170,32 @@ local spec = {
     },
 }
 
+-- Client replica mode can resolve the visible NPC from the presence-body
+-- index before Registry.LiveByID is rebound. Conversation safety must use that
+-- same current body instead of reporting a false npc_unavailable result.
+local previousLiveResolver = PNC.Registry.GetLiveZombie
+PNC.Registry.GetLiveZombie = function() return nil end
+PNC.ClientPresenceSync = {
+    ResolveBodyForNPC = function(id)
+        return tostring(id) == "npc-1" and npc or nil
+    end,
+}
+local presenceSpec = {
+    npcID = "npc-1",
+    context = {
+        player = player,
+        entry = { id = "npc-1", record = record },
+    },
+}
+local _, presenceBody = Safety.ResolveActors(presenceSpec)
+T.equal(presenceBody, npc,
+    "conversation actors use the validated presence-index body")
+local availability = Safety.DescribeAvailability(presenceSpec)
+T.equal(availability.presenceBodyPresent, true,
+    "availability reports the resolved presence-index body")
+PNC.ClientPresenceSync = nil
+PNC.Registry.GetLiveZombie = previousLiveResolver
+
 local started = Scene.Begin(record, npc, player, "lease-1", {
     maximumDistance = 5.5,
     dangerRadius = 8,
@@ -252,6 +278,82 @@ T.equal(dangerReason, "danger", "server danger reason")
 T.equal(Safety.Check(spec), "danger",
     "client detects nearby enemy in combat")
 
+-- The compact V/headless channel is intentionally not threat guarded.  The
+-- authoritative lease must preserve that policy for begin, request reserve,
+-- request validation, and the server pump; a full conversation keeps the
+-- existing danger rejection above.
+local compactSpec = {
+    npcID = "npc-1",
+    character = npc,
+    context = {
+        player = player,
+        nameplateConversation = true,
+        guardThreats = false,
+        entry = { id = "npc-1", zombie = npc, record = record },
+    },
+}
+T.equal(Safety.GuardsThreats(compactSpec), false,
+    "compact conversation disables threat guarding")
+T.equal(Safety.Check(compactSpec), nil,
+    "compact conversation ignores nearby danger")
+record.runtime = {}
+local compactStarted, compactLease = Scene.Begin(
+    record,
+    npc,
+    player,
+    "lease-compact",
+    {
+        maximumDistance = 5.5,
+        dangerRadius = 8,
+        guardThreats = false,
+    }
+)
+T.equal(compactStarted, true,
+    "compact conversation begins while a nearby enemy is active")
+T.equal(compactLease.guardThreats, false,
+    "compact lease records its unguarded threat policy")
+local compactReserved, compactRequest = Scene.ReserveLLMRequest(
+    record,
+    npc,
+    player,
+    "lease-compact",
+    "request-compact"
+)
+T.equal(compactReserved, true,
+    "compact LLM request reserves through nearby danger")
+local compactValid = Scene.ValidateLLMRequest(
+    record,
+    npc,
+    player,
+    "lease-compact",
+    "request-compact"
+)
+T.equal(compactValid, true,
+    "compact LLM request validates through nearby danger")
+T.equal(Scene.Pump(record, npc, now), false,
+    "compact lease pump ignores nearby danger")
+T.truthy(record.runtime.conversationLease,
+    "compact lease remains active while danger is nearby")
+T.truthy(record.runtime.llmRequestLease == compactRequest,
+    "compact pending request remains active while danger is nearby")
+local compactSafetyFeedback = 0
+PNC.SocialFlavorPresentation = {
+    EnqueueConversationSafety = function()
+        compactSafetyFeedback = compactSafetyFeedback + 1
+        return true
+    end,
+}
+lifecycle.finish(
+    {},
+    compactSpec,
+    { npcID = "npc-1", token = "lease-compact", guardThreats = false },
+    "danger"
+)
+T.equal(compactSafetyFeedback, 0,
+    "compact danger never enqueues full-conversation safety speech")
+Scene.ClearLLMRequest(record, "test_cleanup")
+PNC.SocialFlavorPresentation = nil
+
 candidates = {}
 enemyTarget = nil
 player.x = 8
@@ -261,6 +363,44 @@ player.x = 0
 local state, reason = lifecycle.begin({}, spec)
 T.truthy(type(state) == "table" and reason == nil,
     "project lifecycle starts and leases NPC")
+
+-- A compact nameplate host tolerates a transient live-body registry gap and
+-- exposes enough state to diagnose whether a snapshot fallback exists.
+spec.context.nameplateConversation = true
+local getLiveZombie = PNC.Registry.GetLiveZombie
+PNC.Registry.GetLiveZombie = function() return nil end
+spec.context.entry.zombie = nil
+spec.character = nil
+now = now + 100
+T.equal(lifecycle.update({}, spec, state), nil,
+    "transient nameplate body loss does not close immediately")
+local availability = Safety.DescribeAvailability(spec)
+T.falsy(availability.liveBodyPresent,
+    "availability diagnostics report the missing live body")
+T.falsy(availability.registryBodyPresent,
+    "availability diagnostics report the missing registry body")
+T.falsy(availability.snapshotConversation,
+    "availability diagnostics report the missing snapshot fallback")
+PNC.Registry.GetLiveZombie = getLiveZombie
+spec.context.entry.zombie = npc
+spec.character = npc
+now = now + 1000
+T.equal(lifecycle.update({}, spec, state), nil,
+    "nameplate lifecycle recovers when the live body returns")
+PNC.Registry.GetLiveZombie = function() return nil end
+spec.context.entry.zombie = nil
+spec.character = nil
+now = now + 200
+T.equal(lifecycle.update({}, spec, state), nil,
+    "persistent nameplate body loss still gets its grace period")
+now = now + 3000
+T.equal(lifecycle.update({}, spec, state), "npc_unavailable",
+    "persistent nameplate body loss eventually closes the host")
+PNC.Registry.GetLiveZombie = getLiveZombie
+spec.context.entry.zombie = npc
+spec.character = npc
+spec.context.nameplateConversation = nil
+
 now = now + 1200
 T.equal(lifecycle.update({}, spec, state), nil,
     "safe heartbeat keeps conversation active")

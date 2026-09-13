@@ -15,7 +15,7 @@ package.preload["PNC/Core/Settlement/PNC_FacilityState"] = function()
 end
 
 local beginBuild
-package.preload["PNC/UI/Communities/ColonyManagement/SettlementManagement/PNC_SettlementManagement_FacilityActions"] = function()
+package.preload["PNC/UI/SettlementManagement/PNC_SettlementManagement_FacilityActions"] = function()
     return {
         BeginBuild = function(window, definitionId)
             beginBuild = { window = window, definitionId = definitionId }
@@ -106,7 +106,7 @@ T.falsy(Registry.IsVisible(stockpile),
     "stockpile bootstrap remained visible after being built")
 
 local buildingTabSource = T.read("ProjectHoomans", "client",
-    "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagementBuildingTab.lua")
+    "PNC/UI/Base/PNC_BaseBuildingCatalog.lua")
 T.falsy(string.find(buildingTabSource, '"build_stockpile"', 1, true),
     "stockpile bootstrap leaked back into the Building child UI")
 

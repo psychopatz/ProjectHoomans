@@ -16,7 +16,10 @@ local providerFunctions = {
     Delta = { "ApplyDelta" },
     Items = { "CanAccept", "AddItems", "RemoveItems" },
     Flags = { "SetFavorite", "SetInteractionLocked" },
-    Equipment = { "SetEquipped", "EquipPrimary", "SetWorn", "ClearWorn" },
+    Equipment = {
+        "SetEquipped", "EquipPrimary", "SetWaterContainer",
+        "ClearWaterContainer", "SetWorn", "ClearWorn",
+    },
 }
 
 local previous = 0

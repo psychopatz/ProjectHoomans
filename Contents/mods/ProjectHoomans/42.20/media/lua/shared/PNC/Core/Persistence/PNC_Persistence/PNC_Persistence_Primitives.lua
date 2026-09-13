@@ -203,7 +203,10 @@ function Internal.sanitizeCampState(raw, record)
         "direction", "side", "approachKey", "valid", "approachValid",
         "validationState", "rejectionReason", "routeStatus",
     }
-    local maximum = math.max(1, math.floor(Const.CAMP_RESOURCE_MAX or 64))
+    local maximum = math.max(1, math.floor(
+        tonumber(Const.CAMP_RESOURCE_MAX) or 32))
+    local spotMaximum = math.max(1, math.floor(
+        tonumber(Const.CAMP_RESOURCE_SPOT_MAX) or 8))
     for index = 1, math.min(maximum, #rawResources) do
         local source = rawResources[index]
         if type(source) == "table" then
@@ -220,7 +223,7 @@ function Internal.sanitizeCampState(raw, record)
             end
             if type(source.seatSpots) == "table" then
                 resource.seatSpots = {}
-                for spotIndex = 1, #source.seatSpots do
+                for spotIndex = 1, math.min(spotMaximum, #source.seatSpots) do
                     local sourceSpot = source.seatSpots[spotIndex]
                     if type(sourceSpot) == "table" then
                         local spot = {}

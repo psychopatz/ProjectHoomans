@@ -18,11 +18,8 @@ local function currentPosition(record)
         tonumber(record and record.z) or 0
 end
 
-local function playerCampEligibility(record)
+local function campDestinationEligibility(x, y, z)
     local query = PNC.TraversalQuery
-    local x
-    local y
-    local z
     local square
     local indoor
     if not query or type(query.GetSquare) ~= "function"
@@ -30,13 +27,30 @@ local function playerCampEligibility(record)
     then
         return false, "camp_requires_building"
     end
-    x, y, z = currentPosition(record)
     square = query.GetSquare(x, y, z)
     indoor = query.GetInteriorState(square)
     if indoor ~= true then
         return false, "camp_requires_building"
     end
     return true, "camp_inside_building"
+end
+
+local function playerCampEligibility(record)
+    return campDestinationEligibility(currentPosition(record))
+end
+
+-- Group camp uses the player's destination as the single authoritative
+-- anchor. Expose the same check to the client preview and the server command
+-- path so distant/abstract followers are not rejected for their old position.
+function Commands.CanCampAtPlayer(player)
+    if not player or (player.isDead and player:isDead()) then
+        return false, "invalid_player"
+    end
+    if not player.getX or not player.getY or not player.getZ then
+        return false, "camp_requires_building"
+    end
+    return campDestinationEligibility(
+        player:getX(), player:getY(), player:getZ())
 end
 
 Commands.RegisterGroup({
@@ -68,11 +82,11 @@ local function followOrder(_, player)
     }
 end
 
-local function manualActivity(record, capability)
+local function manualActivity(record, capability, commandContext)
     if not PNC.FacilityJobs or not PNC.FacilityJobs.ToggleManual then
-        return false
+        return false, "FACILITY_JOBS_UNAVAILABLE"
     end
-    return PNC.FacilityJobs.ToggleManual(record, capability) == true
+    return PNC.FacilityJobs.ToggleManual(record, capability, commandContext)
 end
 
 local function manualProvision(record)
@@ -145,15 +159,24 @@ Commands.Register({
     emote = "freeze",
     icon = "media/ui/Emotes/PNC_EmoteStay.png",
     canApply = playerCampEligibility,
-    buildOrder = function(record)
-        local x, y, z = currentPosition(record)
+    buildOrder = function(record, _, options)
+        local x
+        local y
+        local z
+        options = type(options) == "table" and options or {}
+        if options.x ~= nil and options.y ~= nil then
+            x, y, z = options.x, options.y, options.z
+        else
+            x, y, z = currentPosition(record)
+        end
         return {
             kind = Const.ORDER_CAMP or "camp",
             x = x,
             y = y,
             z = z,
             radius = tonumber(Const.CAMP_RADIUS) or 3,
-            campId = "camp:" .. tostring(record.id),
+            campId = tostring(options.campId
+                or ("camp:" .. tostring(record.id))),
             resourceRadius = tonumber(Const.CAMP_RESOURCE_RADIUS) or 12,
         }
     end,
@@ -225,8 +248,8 @@ Commands.Register({
     labelKey = "UI_PNC_CommandEat",
     label = "Eat",
     icon = "media/ui/Emotes/PNC_EmoteMenu.png",
-    apply = function(record)
-        return manualActivity(record, "survival.eat.inventory")
+    apply = function(record, _, commandContext)
+        return manualActivity(record, "survival.eat.inventory", commandContext)
     end,
 })
 
@@ -238,8 +261,21 @@ Commands.Register({
     labelKey = "UI_PNC_CommandDrink",
     label = "Drink",
     icon = "media/ui/Emotes/PNC_EmoteMenu.png",
-    apply = function(record)
-        return manualActivity(record, "water.drink")
+    apply = function(record, _, commandContext)
+        return manualActivity(record, "survival.drink.inventory", commandContext)
+    end,
+})
+
+Commands.Register({
+    id = "manual_refill",
+    group = "manual_activity",
+    contextOnly = true,
+    manualTabOnly = true,
+    labelKey = "UI_PNC_CommandRefillWater",
+    label = "Refill Water",
+    icon = "media/ui/Emotes/PNC_EmoteMenu.png",
+    apply = function(record, _, commandContext)
+        return manualActivity(record, "survival.fill.water", commandContext)
     end,
 })
 
@@ -251,8 +287,8 @@ Commands.Register({
     labelKey = "UI_PNC_CommandSleep",
     label = "Toggle Sleep",
     icon = "media/ui/Emotes/PNC_EmoteStay.png",
-    apply = function(record)
-        return manualActivity(record, "sleep")
+    apply = function(record, _, commandContext)
+        return manualActivity(record, "sleep", commandContext)
     end,
 })
 

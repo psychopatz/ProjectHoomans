@@ -1,7 +1,7 @@
 require "PsychopatzCore/UI/PsychopatzUI"
 
 local BaseTab = require
-    "PNC/UI/Communities/ColonyManagement/SettlementManagement/PNC_SettlementManagement_Tab"
+    "PNC/UI/SettlementManagement/PNC_SettlementManagement_Tab"
 local BuildingTab = require "PNC/UI/Base/PNC_BaseBuildingTab"
 local Queue = require "PNC/UI/Base/PNC_BaseQueue"
 local SummaryPanel = require "PNC/UI/Base/PNC_BaseSummary"
@@ -16,7 +16,7 @@ local Layout = UI.Layout
 local WidgetWindow = UI.WidgetWindow
 local Client = PNC.ColonyManagementClient
 if not Client then
-    require "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement"
+    require "PNC/Networking/PNC_ColonyManagementClient"
     Client = PNC.ColonyManagementClient
 end
 

@@ -16,6 +16,5 @@ require "PNC/Settlement/PNC_InteractionTargetResolver"
 require "PNC/Settlement/PNC_FacilityReservations"
 require "PNC/Settlement/PNC_StockpileAccessService"
 require "PNC/Settlement/PNC_SettlementDebug"
-require "PNC/Settlement/PNC_WaterUtilityService"
 
 return PNC

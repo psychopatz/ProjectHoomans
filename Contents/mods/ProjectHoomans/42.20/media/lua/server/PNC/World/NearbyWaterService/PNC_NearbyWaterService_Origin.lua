@@ -9,14 +9,6 @@ PNC.NearbyWaterServiceInternal =
 local Service = PNC.NearbyWaterService
 local H = PNC.NearbyWaterServiceInternal
 local Locator = PNC.NearbyResourceLocator
-local RADIUS = 12
-local MAX_DRINK_LITERS = 1
-local APPROACH_OFFSETS = {
-    { x = 0, y = 1 }, { x = 0, y = -1 },
-    { x = 1, y = 0 }, { x = -1, y = 0 },
-    { x = 1, y = 1 }, { x = -1, y = 1 },
-    { x = 1, y = -1 }, { x = -1, y = -1 },
-}
 
 function H.LiveBody(record)
     return PNC.Registry and PNC.Registry.GetLiveZombie
@@ -50,4 +42,3 @@ function H.SquarePosition(square)
 end
 
 return Service
-

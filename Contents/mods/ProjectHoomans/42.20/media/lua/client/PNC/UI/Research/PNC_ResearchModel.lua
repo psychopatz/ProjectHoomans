@@ -1,6 +1,6 @@
 local Items = require "PNC/UI/Research/PNC_ResearchModel_Items"
 local Shared = require
-    "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Shared"
+    "PNC/UI/Shared/PNC_ColonyUIShared"
 
 local Model = {}
 local GROUPS = {

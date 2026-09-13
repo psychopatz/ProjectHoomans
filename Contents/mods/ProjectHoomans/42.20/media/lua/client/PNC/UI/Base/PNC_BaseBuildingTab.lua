@@ -1,11 +1,11 @@
 local Data = require "PNC/UI/Base/PNC_BaseBuildingData"
 local View = require "PNC/UI/Base/PNC_BaseBuildingView"
 local BuildingCatalog = require
-    "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagementBuildingTab"
+    "PNC/UI/Base/PNC_BaseBuildingCatalog"
 local Placement = require
-    "PNC/UI/Communities/ColonyManagement/PNC_BuildingPlacement"
+    "PNC/UI/Base/PNC_BaseBuildingPlacement"
 local QueueOverlay = require
-    "PNC/UI/Communities/ColonyManagement/PNC_BuildingQueueOverlay"
+    "PNC/UI/Base/PNC_BaseBuildingQueueOverlay"
 
 local Building = {}
 
@@ -56,7 +56,7 @@ function Building.Apply(window, active)
     View.Apply(window, facilitiesActive)
     BuildingCatalog.Apply(window, buildingsActive)
     if not active then
-        Placement.Cancel(window, { restorePrevious = false })
+        Placement.Cancel(window)
     end
 end
 
@@ -101,7 +101,7 @@ function Building.OnControl(window, button)
     local option = Data.SelectedOption(window)
     if id == "build_selected" and option and option.enabled == true then
         local FacilityActions = require
-            "PNC/UI/Communities/ColonyManagement/SettlementManagement/PNC_SettlementManagement_FacilityActions"
+            "PNC/UI/SettlementManagement/PNC_SettlementManagement_FacilityActions"
         local started = FacilityActions.BeginBuild(window, option.id) ~= false
         View.Apply(window, true)
         window:requestResponsiveLayout(true)
@@ -124,7 +124,7 @@ function Building.OnControl(window, button)
         return false
     end
     if id == "cancel_placement" then
-        Placement.Cancel(window, { restorePrevious = false })
+        Placement.Cancel(window)
         return true
     end
     if id == "toggle_queue_overlay" then

@@ -1,12 +1,12 @@
 require "PsychopatzCore/UI/PsychopatzUI"
 
 local Components = require
-    "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Components"
+    "PNC/UI/Shared/PNC_ColonyUIComponents"
 local QueueRows = require "PNC/UI/Base/PNC_BaseQueueRows"
 local FacilityActions = require
-    "PNC/UI/Communities/ColonyManagement/SettlementManagement/PNC_SettlementManagement_Actions"
+    "PNC/UI/SettlementManagement/PNC_SettlementManagement_Actions"
 local QueueActions = require
-    "PNC/UI/Communities/ColonyManagement/PNC_BuildingQueueActions"
+    "PNC/UI/Base/PNC_BaseBuildingQueueActions"
 
 local Queue = {}
 local UI = PsychopatzCore.UI

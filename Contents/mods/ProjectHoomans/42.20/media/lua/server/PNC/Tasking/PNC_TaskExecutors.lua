@@ -5,12 +5,22 @@ local Live = {}
 local Abstract = {}
 local TaskEvents = PNC.Tasking.Events
 
+local function isReservationlessActivity(runtime)
+    local resourceKind = tostring(runtime and runtime.resourceKind or "")
+    return resourceKind == "personal_food"
+        or resourceKind == "personal_drink"
+        or resourceKind == "world_water"
+        or resourceKind == "water_refill"
+end
+
 function Live.Tick(lease)
     local record = PNC.Registry.Get(lease.npcId)
     local runtime = record and record.runtime and record.runtime.facilityActivity
     local reservation = lease.reservationId
         and PNC.FacilityReservations.ByID[lease.reservationId] or nil
-    if not runtime or not reservation then
+    if not runtime or (not reservation
+        and not isReservationlessActivity(runtime))
+    then
         TaskEvents.Emit("TASK_EXECUTOR_INVALID", {
             npcId = lease.npcId, source = "Tasking.LiveExecutor",
             entityId = lease.leaseId,
@@ -21,7 +31,7 @@ function Live.Tick(lease)
     -- bed/workstation owned by this task until the scene is actually running;
     -- OnSceneTick continues the same renewal once the NPC is settled.
     local now = PNC.Core.Now()
-    if now >= (tonumber(lease.nextReservationRenewAt) or 0) then
+    if reservation and now >= (tonumber(lease.nextReservationRenewAt) or 0) then
         local renewed = PNC.FacilityReservations.Start(
             lease.reservationId, 30000)
         if not renewed then
@@ -43,7 +53,13 @@ end
 
 function Abstract.Tick(lease)
     local record = PNC.Registry.Get(lease.npcId)
-    if not record or not PNC.FacilityReservations.ByID[lease.reservationId] then
+    local runtime = record and record.runtime
+        and record.runtime.facilityActivity or nil
+    local reservation = lease.reservationId
+        and PNC.FacilityReservations.ByID[lease.reservationId] or nil
+    if not record or (not reservation
+        and not isReservationlessActivity(runtime))
+    then
         TaskEvents.Emit("TASK_EXECUTOR_INVALID", {
             npcId = lease.npcId, source = "Tasking.AbstractExecutor",
             entityId = lease.leaseId,
@@ -54,7 +70,7 @@ function Abstract.Tick(lease)
     local previous = tonumber(lease.lastEffectWorldHour) or now
     local elapsed = math.max(0, math.min(0.25, now - previous))
     lease.lastEffectWorldHour = now
-    if lease.reservationId then PNC.FacilityReservations.Start(
+    if reservation then PNC.FacilityReservations.Start(
         lease.reservationId, 30000) end
     PNC.TaskLeaseService.SetPhase(lease.leaseId, "WORKING")
     local definition = PNC.FacilityJobDefinitions.Get(lease.capability)

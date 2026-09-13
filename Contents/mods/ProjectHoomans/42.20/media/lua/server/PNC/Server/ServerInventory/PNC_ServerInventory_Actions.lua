@@ -21,7 +21,9 @@ local refreshLiveEquipment = Internal.refreshLiveEquipment
 local syncResult = Internal.syncResult
 
 local function dropItem(player, record, item, sinceRevision)
-    local inv = Inventory.EnsureRecordInventory(record)
+    local inv = Inventory.EnsureRecordInventory(record, {
+        reconcileWaterContainer = false,
+    })
     if compactContainerHasItems(inv, item) then
         return false, "container_not_empty"
     end
@@ -59,14 +61,16 @@ function Service.Action(player, args)
     local record = args.id and Registry.Get(tostring(args.id)) or nil
     local allowed, reason = canManage(player, record)
     if not allowed then return notify(player, false, reason, args) end
-    local revisionOK, sinceRevision = checkRevision(record, args)
+    local revisionOK, sinceRevision, revisionDetails = checkRevision(record, args)
     if not revisionOK then
         if Network and Network.SendCharacterPayload then
             Network.SendCharacterPayload(player, record)
         end
-        return notify(player, false, sinceRevision, args)
+        return notify(player, false, sinceRevision, args, revisionDetails)
     end
-    local inv = Inventory.EnsureRecordInventory(record)
+    local inv = Inventory.EnsureRecordInventory(record, {
+        reconcileWaterContainer = false,
+    })
     local item = inv.items[tostring(args.itemID or "")]
     if not item then return notify(player, false, "item_not_found", args) end
     if item.interactionLocked == true then

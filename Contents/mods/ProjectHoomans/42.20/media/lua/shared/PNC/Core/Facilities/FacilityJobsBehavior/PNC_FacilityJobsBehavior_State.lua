@@ -63,6 +63,7 @@ function Internal.Normalize(_, spec)
         campZ = tonumber(spec.campZ),
         campRadius = tonumber(spec.campRadius),
         resourceRadius = tonumber(spec.resourceRadius),
+        activityItemID = tostring(spec.activityItemID or ""),
         activityItemFullType = tostring(spec.activityItemFullType or ""),
         debugHold = spec.debugHold == true,
     }

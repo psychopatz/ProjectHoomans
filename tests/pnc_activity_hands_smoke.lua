@@ -85,15 +85,15 @@ T.equal(activity.activityItemFullType, "Base.Apple", "food activity item")
 activity = resolve({
     actionInformation = {
         kind = "activity",
-        capability = "water.nearby",
+        capability = "survival.drink.world",
         activityItemFullType = "Base.BucketWithWater",
     },
     visualState = {
-        sceneId = "facility.water.drink.nearby",
+        sceneId = "survival.drink.world",
         sceneStartedAt = 20,
     },
 })
-T.equal(activity.source, "nearby_water", "water activity source")
+T.equal(activity.source, "world_water", "world water activity source")
 
 activity = resolve({
     actionInformation = {
@@ -276,10 +276,80 @@ T.equal(activity.activityItemFullType, "Base.HandAxe",
 T.falsy(resolve({
     actionInformation = {
         kind = "activity",
-        capability = "water.nearby",
+        capability = "survival.drink.world",
         activityItemFullType = "Base.BucketWithWater",
     },
-    visualState = { sceneId = "facility.water.drink" },
-}), "spigot scene does not claim a container")
+    visualState = { sceneId = "survival.drink.inventory" },
+}), "world-water resolver does not claim an inventory scene")
+
+local resolveDrinkSound = PNC.ClientPresenceSync.Internal.ResolveDrinkSound
+local bottleDrink = {
+    actionInformation = {
+        capability = "survival.drink.inventory",
+        activityItemFullType = "Base.WaterBottle",
+    },
+    visualState = {
+        sceneActive = true, sceneId = "survival.drink.inventory",
+        sceneStepId = "drink", sceneRevision = 1,
+        scenePlaybackRevision = 1, sceneStepStartedAt = 100,
+    },
+}
+T.equal(resolveDrinkSound(bottleDrink), "DrinkingFromBottlePlastic",
+    "water bottle uses the plastic drinking SFX")
+local faucetDrink = {
+    actionInformation = {
+        capability = "survival.drink.world", resourceKind = "faucet",
+    },
+    visualState = {
+        sceneActive = true, sceneId = "survival.drink.world",
+        sceneStepId = "drink", sceneRevision = 2,
+        scenePlaybackRevision = 1, sceneStepStartedAt = 200,
+    },
+}
+T.equal(resolveDrinkSound(faucetDrink), "DrinkingFromTap",
+    "world faucet uses the tap drinking SFX")
+local faucetFill = {
+    actionInformation = {
+        capability = "survival.fill.water", resourceKind = "water_refill",
+        activityItemFullType = "Base.WaterBottle",
+    },
+    visualState = {
+        sceneActive = true, sceneId = "survival.fill.water",
+        sceneStepId = "fill", sceneRevision = 3,
+        scenePlaybackRevision = 1, sceneStepStartedAt = 300,
+    },
+}
+T.equal(resolveDrinkSound(faucetFill), "GetWaterFromTap",
+    "water refill uses the tap fill SFX")
+local sounds = {}
+local stoppedSounds = {}
+local emitter = {
+    playSound = function(_, sound)
+        sounds[#sounds + 1] = sound
+        return #sounds
+    end,
+    stopSoundLocal = function(_, handle)
+        stoppedSounds[#stoppedSounds + 1] = handle
+    end,
+}
+local audioBody = {
+    getEmitter = function() return emitter end,
+}
+local audioModData = {}
+PNC.ClientPresenceSync.Internal.SyncDrinkSound(
+    audioBody, bottleDrink, audioModData)
+PNC.ClientPresenceSync.Internal.SyncDrinkSound(
+    audioBody, bottleDrink, audioModData)
+T.equal(#sounds, 1, "drink SFX is not replayed every presence snapshot")
+T.equal(sounds[1], "DrinkingFromBottlePlastic",
+    "drink SFX is sent through the body emitter")
+PNC.ClientPresenceSync.Internal.SyncDrinkSound(
+    audioBody,
+    { visualState = { sceneActive = false } },
+    audioModData)
+T.equal(#stoppedSounds, 1,
+    "drink SFX is stopped when the drink scene becomes inactive")
+T.equal(audioModData.PNC_ClientDrinkSoundHandle, nil,
+    "drink SFX handle is cleared after the scene stops")
 
 T.finish("pnc_activity_hands_smoke")

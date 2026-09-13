@@ -2,8 +2,8 @@ PNC = PNC or {}
 PNC.NeedsStateCodec = PNC.NeedsStateCodec or {}
 
 local Codec = PNC.NeedsStateCodec
--- Version 1 readers ignore the optional morale slots, so the compact layout
--- remains backward-compatible and does not force a ModData migration.
+-- Version 1 readers ignore optional slots after the original nutrition tuple,
+-- so the compact layout remains backward-compatible without a migration.
 Codec.VERSION = 1
 
 local function clamp(value, minimum, maximum)
@@ -28,6 +28,11 @@ function Codec.Encode(records, at)
             math.floor(tonumber(nutrition.calories) or 0),
             math.floor(clamp(nutrition.weight, 0, 1000) * 10 + 0.5),
         }
+        local calorieOverflow = math.max(0,
+            tonumber(nutrition.calorieOverflow) or 0)
+        if calorieOverflow > 0 then
+            packed[8] = math.floor(calorieOverflow + 0.5)
+        end
         local morale = state.morale or {}
         local modifiers = {}
         local hasModifiers = false
@@ -60,6 +65,8 @@ function Codec.Decode(raw)
                 },
                 nutrition = {
                     calories = math.floor(tonumber(packed[4]) or 0),
+                    calorieOverflow = math.max(0,
+                        tonumber(packed[8]) or 0),
                     weight = clamp(packed[5], 0, 2000) / 10,
                 },
                 morale = { conditions = {}, lastDay = tonumber(packed[7]) },

@@ -16,7 +16,7 @@ PNC = {
                 activityText = "Eating",
             }
         end
-        if capability == "water.drink" then
+        if capability == "survival.drink.world" then
             return {
                 activityLabelKey = "UI_PNC_Activity_Drinking",
                 activityText = "Drinking",
@@ -110,7 +110,7 @@ T.equal(eatingCandidate.activityItemFullType, "Base.Bread",
 local drinking = Status.Build({
     alive = true,
     runtime = { facilityActivity = {
-        capability = "water.drink", phase = "STARTING",
+        capability = "survival.drink.world", phase = "STARTING",
     } },
 })
 T.equal(drinking.activityItemLabelKey, "UI_PNC_Action_WaterTarget",

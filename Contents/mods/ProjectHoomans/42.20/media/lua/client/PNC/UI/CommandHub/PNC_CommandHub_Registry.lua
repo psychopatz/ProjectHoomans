@@ -333,9 +333,9 @@ end
 
 local function openBase(_, owner)
     trace("pnc_base_open_start", "has_owner=" .. tostring(owner ~= nil)
-        .. " available=" .. tostring((PNC.BaseUI or PNC.BuildingUI) ~= nil
-            and (PNC.BaseUI or PNC.BuildingUI).Open ~= nil))
-    local base = PNC.BaseUI or PNC.BuildingUI
+        .. " available=" .. tostring(PNC.BaseUI ~= nil
+            and PNC.BaseUI.Open ~= nil))
+    local base = PNC.BaseUI
     if base and type(base.Open) == "function" then
         local result = base.Open(owner)
         trace("pnc_base_open_result",
@@ -345,6 +345,44 @@ local function openBase(_, owner)
     trace("pnc_base_open_result",
         "result=false reason=missing_base_ui")
     return false
+end
+
+local function scavengeSnapshot()
+    local state = PNC.Network and PNC.Network.ClientState or nil
+    local sessionId = state and state.activeScavengeSessionId or nil
+    return sessionId and state.scavengeSessions
+        and state.scavengeSessions[sessionId] or nil
+end
+
+local function scavengeAvailable()
+    local controller = PNC.ScavengeController
+    local team = controller and controller.TeamIDs
+        and controller.TeamIDs() or {}
+    return #team > 0 or scavengeSnapshot() ~= nil
+end
+
+local function isScavengeOpen()
+    local scavenge = PNC.ScavengeUI
+    return scavenge and scavenge.instance
+        and scavenge.instance.getIsVisible
+        and scavenge.instance:getIsVisible() == true or false
+end
+
+local function openScavenge(_, owner)
+    local controller = PNC.ScavengeController
+    if not controller or type(controller.Open) ~= "function"
+        or not scavengeAvailable()
+    then
+        return false
+    end
+    local team = controller.TeamIDs and controller.TeamIDs() or {}
+    local snapshot = scavengeSnapshot()
+    local npcId = team[1] or snapshot and snapshot.npcId
+    return controller.Open(npcId, {
+        npcIds = team,
+        name = #team > 0 and (tostring(#team) .. " scavengers") or nil,
+        owner = owner,
+    })
 end
 
 local function stockpileBootstrapVisible()
@@ -383,14 +421,14 @@ local function buildStockpile(_, owner)
         return false
     end
     local Facility = require
-        "PNC/UI/Communities/ColonyManagement/SettlementManagement/PNC_SettlementManagement_FacilityActions"
+        "PNC/UI/SettlementManagement/PNC_SettlementManagement_FacilityActions"
     local result, reason = Facility.BeginBuild(owner, "stockpile")
     trace("pnc_stockpile_build_result",
         "result=" .. tostring(result) .. " reason=" .. tostring(reason))
     return result
 end
 
-Registry.SetCategoryOrder({ "work", "workshop", "zone", "colony", "events", "colonist", "storage",
+Registry.SetCategoryOrder({ "work", "workshop", "zone", "scavenge", "colony", "events", "colonist", "storage",
     "research", "stockpile", "base" })
 
 Registry.RegisterCategory({
@@ -497,6 +535,22 @@ Registry.RegisterCategory({
     tooltipFallback = "Open the colony journal",
     onClick = toggleChild("events", toggleEvents),
     selected = isJournalOpen,
+    closeHub = false,
+})
+
+Registry.RegisterCategory({
+    id = "scavenge",
+    source = "ProjectHoomans",
+    order = 30,
+    useChildren = false,
+    titleKey = "UI_PNC_CommandHub_Category_Scavenge",
+    titleFallback = "Scavenge",
+    tooltipKey = "UI_PNC_CommandHub_ScavengeHelp",
+    tooltipFallback = "Assign a scavenging team and search nearby loot",
+    visible = scavengeAvailable,
+    enabled = scavengeAvailable,
+    onClick = openScavenge,
+    selected = isScavengeOpen,
     closeHub = false,
 })
 

@@ -48,7 +48,7 @@ for name in pairs(publicFunctions) do
     T.equal(type(PNC.NPCSupplyService[name]), "function",
         "entry point preserves NPCSupplyService." .. name)
 end
-T.equal(publicCount, 5, "NPC-supply-service function declaration count")
+T.equal(publicCount, 6, "NPC-supply-service function declaration count")
 
 for i = 1, #providers do
     package.loaded[prefix .. providers[i]] = nil

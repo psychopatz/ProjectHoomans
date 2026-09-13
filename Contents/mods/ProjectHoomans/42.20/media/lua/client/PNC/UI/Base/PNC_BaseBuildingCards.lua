@@ -2,10 +2,10 @@ require "ISUI/ISPanel"
 require "PsychopatzCore/UI/PsychopatzUI"
 
 local Components = require
-    "PNC/UI/Communities/ColonyManagement/PNC_ColonyManagement_Components"
+    "PNC/UI/Shared/PNC_ColonyUIComponents"
 local Data = require "PNC/UI/Base/PNC_BaseBuildingData"
 local BuildUI = require
-    "PNC/UI/Communities/ColonyManagement/PNC_FacilityBuildModal"
+    "PNC/UI/SettlementManagement/PNC_SettlementManagement_FacilityBuildModal"
 
 local Cards = {}
 local UI = PsychopatzCore.UI

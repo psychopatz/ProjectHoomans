@@ -2,7 +2,9 @@ local Inventory = PNC.Inventory
 local Internal = Inventory.Internal
 
 function Inventory.SetFavorite(record, itemID, favorite, reason)
-    local inv = Inventory.EnsureRecordInventory(record)
+    local inv = Inventory.EnsureRecordInventory(record, {
+        reconcileWaterContainer = false,
+    })
     local item
     local applied
     itemID = Internal.normalizeString(itemID)
@@ -30,7 +32,9 @@ function Inventory.SetInteractionLocked(
     lockReason,
     mutationReason
 )
-    local inv = Inventory.EnsureRecordInventory(record)
+    local inv = Inventory.EnsureRecordInventory(record, {
+        reconcileWaterContainer = false,
+    })
     local item
     local applied
     itemID = Internal.normalizeString(itemID)

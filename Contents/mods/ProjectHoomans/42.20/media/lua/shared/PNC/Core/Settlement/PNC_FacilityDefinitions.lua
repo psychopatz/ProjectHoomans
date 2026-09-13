@@ -7,6 +7,5 @@ require "PNC/Core/Settlement/PNC_FacilityDefinitions/PNC_FacilityDefinitions_Bar
 require "PNC/Core/Settlement/PNC_FacilityDefinitions/PNC_FacilityDefinitions_Farm"
 require "PNC/Core/Settlement/PNC_FacilityDefinitions/PNC_FacilityDefinitions_CommonRooms"
 require "PNC/Core/Settlement/PNC_FacilityDefinitions/PNC_FacilityDefinitions_Workstations"
-require "PNC/Core/Settlement/PNC_FacilityDefinitions/PNC_FacilityDefinitions_Water"
 
 return PNC.FacilityDefinitions

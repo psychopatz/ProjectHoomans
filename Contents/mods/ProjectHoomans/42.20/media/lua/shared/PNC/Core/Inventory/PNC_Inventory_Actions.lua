@@ -176,9 +176,43 @@ Actions.Register({
         return item.equipSlot ~= "primary"
             and item.wornSlot == nil
             and item.bagContainer == nil
+            and not (Inventory.IsWaterContainer
+                and Inventory.IsWaterContainer(item))
     end,
     execute = function(_, record, item)
         return Inventory.SetEquipped(record, "primary", item.id, "inventory_action_equip")
+    end,
+})
+
+Actions.Register({
+    id = "equip_water_container",
+    labelKey = "UI_PNC_Inventory_EquipWaterContainer",
+    label = "Equip Water Container",
+    isAvailable = function(_, item)
+        return item.equipSlot ~= "waterContainer"
+            and item.wornSlot == nil
+            and item.attachedSlot == nil
+            and item.bagContainer == nil
+            and item.interactionLocked ~= true
+            and Inventory.IsWaterContainer
+            and Inventory.IsWaterContainer(item)
+    end,
+    execute = function(_, record, item)
+        return Inventory.SetWaterContainer(record, item.id,
+            "inventory_action_equip_water_container")
+    end,
+})
+
+Actions.Register({
+    id = "unequip_water_container",
+    labelKey = "UI_PNC_Inventory_UnequipWaterContainer",
+    label = "Unequip Water Container",
+    isAvailable = function(_, item)
+        return item.equipSlot == "waterContainer"
+    end,
+    execute = function(_, record, item)
+        return Inventory.ClearWaterContainer(record,
+            "inventory_action_unequip_water_container")
     end,
 })
 
@@ -187,7 +221,7 @@ Actions.Register({
     labelKey = "UI_PNC_Inventory_Unequip",
     label = "Unequip",
     isAvailable = function(_, item)
-        return item.equipSlot ~= nil
+        return item.equipSlot ~= nil and item.equipSlot ~= "waterContainer"
     end,
     execute = function(_, record, item)
         return Inventory.SetEquipped(
@@ -212,12 +246,13 @@ Actions.Register({
         local slot = resolveWornSlot(item)
         if not slot then return false, "not_wearable" end
         if item.equipSlot then
-            Inventory.SetEquipped(
-                record,
-                item.equipSlot,
-                nil,
-                "inventory_action_wear_clear_hand"
-            )
+            if item.equipSlot == "waterContainer" then
+                Inventory.ClearWaterContainer(record,
+                    "inventory_action_wear_clear_water_container")
+            else
+                Inventory.SetEquipped(record, item.equipSlot, nil,
+                    "inventory_action_wear_clear_hand")
+            end
         end
         return Inventory.SetWorn(record, item.id, slot, "inventory_action_wear")
     end,

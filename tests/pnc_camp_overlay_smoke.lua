@@ -83,4 +83,15 @@ T.truthy(debug.facilities[3].selected,
 T.truthy(debug.facilities[3].available,
     "active reservation remains available to its owner")
 
+record.runtime.facilityActivity.resourceKey = "bed:10:20:0"
+local secondDebug = Parts.BuildCampResourceDebugState(record)
+T.truthy(secondDebug.facilities[1].selected,
+    "camp diagnostics keep selection as a per-NPC overlay")
+T.falsy(secondDebug.facilities[3].selected,
+    "camp diagnostics do not leak another NPC's selection")
+T.falsy(secondDebug.facilities[3].available,
+    "camp diagnostics still apply reservations after static caching")
+T.truthy(debug.facilities[3].selected,
+    "cached static camp diagnostics do not mutate an earlier payload")
+
 T.finish("pnc_camp_overlay_smoke")

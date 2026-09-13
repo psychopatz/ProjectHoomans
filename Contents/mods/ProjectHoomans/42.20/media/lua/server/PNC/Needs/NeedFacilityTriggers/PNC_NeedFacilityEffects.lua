@@ -6,18 +6,110 @@ PNC.NeedFacilityEffects = PNC.NeedFacilityEffects or {}
 
 local Effects = PNC.NeedFacilityEffects
 local afterDelay
+local WORLD_WATER_RETRY_COOLDOWN_MS = 5000
+local WATER_REFILL_RETRY_COOLDOWN_MS = 5000
 
-local function applyNearbyWater(record, state, definition, now)
+local function resolveActivityOwner(record)
+    local core = PNC.Core
+    local order = record and record.orderSpec or {}
+    local activity = record and record.runtime
+        and record.runtime.facilityActivity or {}
+    local previousOrder = activity.previousOrder or {}
+    local player
+    local onlineID = record and record.ownerOnlineID
+        or order and order.ownerOnlineID
+        or previousOrder.ownerOnlineID
+    local username = record and record.ownerUsername
+        or order and order.ownerUsername
+        or previousOrder.ownerUsername
+    if core and core.ResolvePlayerByOnlineID and onlineID ~= nil then
+        player = core.ResolvePlayerByOnlineID(onlineID)
+        if player then return player end
+    end
+    if core and core.ResolvePlayerByUsername and username then
+        player = core.ResolvePlayerByUsername(username)
+        if player then return player end
+    end
+    if getSpecificPlayer then return getSpecificPlayer(0) end
+    return nil
+end
+
+-- The initial command reply only says that an activity was accepted. The
+-- refill transaction happens later at the scene effect boundary, so publish
+-- that final result through the same existing command-result transport.
+function Effects.ReportWaterRefillResult(record, state, accepted, reason, details)
+    local commandID
+    local player
+    local payload
+    if not state or state.manual ~= true
+        or state.manualActivityResultReported == true
+    then
+        return false
+    end
+    commandID = tostring(state.manualCommandID or "")
+    if commandID == "" then commandID = "manual_refill" end
+    state.manualActivityResultReported = true
+    payload = {
+        commandID = commandID,
+        id = record and record.id,
+        affected = accepted == true and 1 or 0,
+        accepted = accepted == true,
+        reason = tostring(reason or (accepted and "commanded"
+            or "WATER_REFILL_FAILED")),
+        targets = { record and tostring(record.id) or "" },
+        requestID = state.manualRequestID,
+        commandSource = state.manualCommandSource ~= ""
+            and state.manualCommandSource or "colonist_activities",
+        details = details,
+    }
+    player = resolveActivityOwner(record)
+    if player and type(sendServerCommand) == "function" then
+        sendServerCommand(player, PNC.Const.MODULE,
+            PNC.Const.CMD_COMPANION_COMMAND_RESULT, payload)
+    elseif type(triggerEvent) == "function" then
+        triggerEvent("OnServerCommand", PNC.Const.MODULE,
+            PNC.Const.CMD_COMPANION_COMMAND_RESULT, payload)
+    end
+    if PNC.Core and PNC.Core.LogInfo then
+        PNC.Core.LogInfo("manual_activity_result npc="
+            .. tostring(record and record.id or "")
+            .. " command=" .. commandID
+            .. " accepted=" .. tostring(accepted == true)
+            .. " reason=" .. tostring(payload.reason)
+            .. " requestID=" .. tostring(payload.requestID or ""))
+    end
+    return true
+end
+
+local function hasLiveWaterSource(source)
+    return source and (source.object ~= nil or source.item ~= nil)
+end
+
+local function worldWaterFailure(record, now, reason)
+    local runtime = record and record.runtime or nil
+    local current = tonumber(now)
+    if not current and PNC.Core and PNC.Core.Now then
+        current = tonumber(PNC.Core.Now())
+    end
+    if runtime then
+        runtime.worldWaterRetryAt = (current or 0)
+            + WORLD_WATER_RETRY_COOLDOWN_MS
+    end
+    return false, true, reason
+end
+
+local function applyWorldWater(record, state, definition, now)
     if state.effectAttempted == true or not afterDelay(state, definition, now) then
         return true, false
     end
-    state.effectAttempted = true
     local source = state.resource
-    if not source and PNC.NearbyWaterService
+    -- FacilityJobs intentionally stores only primitive resource descriptors in
+    -- the activity state. Rehydrate that descriptor at the effect boundary so
+    -- live item/IsoObject handles are never required to cross persistence.
+    if not hasLiveWaterSource(source) and PNC.NearbyWaterService
         and PNC.NearbyWaterService.Resolve
     then
         source = PNC.NearbyWaterService.Resolve(record, state.resourceKey)
-        state.resource = source
     end
     local activity = record and record.runtime
         and record.runtime.facilityActivity or nil
@@ -33,6 +125,9 @@ local function applyNearbyWater(record, state, definition, now)
         local liters = PNC.NearbyWaterService
             and PNC.NearbyWaterService.DesiredLiters
             and PNC.NearbyWaterService.DesiredLiters(record, nil) or 1
+        if (tonumber(liters) or 0) <= 0 then
+            return worldWaterFailure(record, now, "INSUFFICIENT_WATER")
+        end
         if PNC.IndividualNeeds and PNC.IndividualNeeds.Commands
             and PNC.IndividualNeeds.Commands.ApplyDrink
         then
@@ -40,6 +135,7 @@ local function applyNearbyWater(record, state, definition, now)
                 thirst = (tonumber(liters) or 0) / 2,
             }, "camp_water_drink_abstract")
         end
+        state.effectAttempted = true
         return true, true, "NEED_COMPLETE", liters
     end
     local container = source and source.item
@@ -52,12 +148,21 @@ local function applyNearbyWater(record, state, definition, now)
     then
         available = tonumber(source.object:getWaterAmount())
     end
+    if source and source.object and PNC.NearbyWaterService
+        and PNC.NearbyWaterService.IsInfiniteFaucet
+        and PNC.NearbyWaterService.IsInfiniteFaucet(source.object)
+    then
+        available = nil
+    end
     local liters = PNC.NearbyWaterService
         and PNC.NearbyWaterService.DesiredLiters
         and PNC.NearbyWaterService.DesiredLiters(record, available) or 0
     if state.debugForceWater == true and liters <= 0 then
         liters = (available == nil or available < 0)
             and 1 or math.min(1, available)
+    end
+    if (tonumber(liters) or 0) <= 0 then
+        return worldWaterFailure(record, now, "INSUFFICIENT_WATER")
     end
     local ok, consumed, reason = false, nil, nil
     if PNC.NearbyWaterService
@@ -66,15 +171,63 @@ local function applyNearbyWater(record, state, definition, now)
         ok, consumed, reason = PNC.NearbyWaterService.Consume(
             record, source, liters)
     end
-    if ok ~= true then return false, true, reason or "INSUFFICIENT_WATER" end
+    if ok ~= true then
+        return worldWaterFailure(record, now,
+            reason or "INSUFFICIENT_WATER")
+    end
+    if (tonumber(consumed) or 0) <= 0 then
+        return worldWaterFailure(record, now, "INSUFFICIENT_WATER")
+    end
     if PNC.IndividualNeeds and PNC.IndividualNeeds.Commands
         and PNC.IndividualNeeds.Commands.ApplyDrink
     then
         PNC.IndividualNeeds.Commands.ApplyDrink(record, {
             thirst = (tonumber(consumed) or 0) / 2,
-        }, "nearby_water_drink")
+        }, "world_water_drink")
     end
+    state.effectAttempted = true
     return true, true, "NEED_COMPLETE", consumed
+end
+
+local function applyWaterRefill(record, state, definition, now)
+    local source
+    local itemID
+    local ok
+    local filled
+    local reason
+    if state.effectAttempted == true or not afterDelay(state, definition, now) then
+        return true, false
+    end
+    source = state.resource
+    if (not source or not source.object)
+        and PNC.NearbyWaterService
+        and PNC.NearbyWaterService.ResolveFillSource
+    then
+        source = PNC.NearbyWaterService.ResolveFillSource(record,
+            state.resourceKey)
+    end
+    itemID = state.activityItemID
+        or record.runtime and record.runtime.activityItemID
+    if not PNC.WaterContainerService
+        or not PNC.WaterContainerService.Refill
+    then
+        reason = "WATER_CONTAINER_SERVICE_UNAVAILABLE"
+    else
+        ok, filled, reason = PNC.WaterContainerService.Refill(record, itemID,
+            source)
+    end
+    if ok ~= true then
+        record.runtime.waterRefillRetryAt = (tonumber(now) or 0)
+            + WATER_REFILL_RETRY_COOLDOWN_MS
+        Effects.ReportWaterRefillResult(record, state, false,
+            reason or "WATER_REFILL_FAILED", {
+                stage = "transaction",
+                itemID = itemID,
+            })
+        return false, true, reason or "WATER_REFILL_FAILED"
+    end
+    state.effectAttempted = true
+    return true, true, "WATER_REFILL_COMPLETE", filled
 end
 
 afterDelay = function(state, definition, now)
@@ -91,29 +244,58 @@ local function applyPrimitive(record, state, definition, now)
     local ok, reason = PNC.NeedSupplyBridge
         and PNC.NeedSupplyBridge.RequestForNeed
         and PNC.NeedSupplyBridge.RequestForNeed(
-            record, definition.primitiveNeed, false)
+            record, definition.primitiveNeed,
+            state.manual == true)
     return ok == true, true, reason or (ok and "NEED_COMPLETE"
         or "PROVISION_NOT_FOUND")
 end
 
-local function applyWater(record, state, definition, now)
+local function applyPersonalItem(record, state, definition, now)
+    local runtime = record and record.runtime
+        and record.runtime.facilityActivity or nil
+    local itemID = state and state.activityItemID
+        or runtime and runtime.activityItemID
+    local needs = PNC.IndividualNeeds
+    local needType = definition and definition.primitiveNeed
+    local resourceKind
+    local current
+    local target
+    local supply
+    local required
+    local ok
+    local reason
+    local effect
+    if needType ~= "hunger" and needType ~= "thirst" then
+        return applyPrimitive(record, state, definition, now)
+    end
+    if not itemID or tostring(itemID) == ""
+        or not PNC.NPCSupplyService
+        or not PNC.NPCSupplyService.ConsumePersonalItem
+    then
+        return applyPrimitive(record, state, definition, now)
+    end
     if state.effectAttempted == true or not afterDelay(state, definition, now) then
         return true, false
     end
-    state.effectAttempted = true
-    local ok, reason = PNC.WaterUtilityService
-        and PNC.WaterUtilityService.Consume
-        and PNC.WaterUtilityService.Consume(
-            state.facilityId, definition.waterLiters or 1)
-    if ok ~= true then return false, true, reason or "INSUFFICIENT_WATER" end
-    if PNC.IndividualNeeds and PNC.IndividualNeeds.Commands
-        and PNC.IndividualNeeds.Commands.ApplyDrink
-    then
-        PNC.IndividualNeeds.Commands.ApplyDrink(record, {
-            thirst = definition.thirstRelief or 0.50,
-        }, "facility_spigot_drink")
+    resourceKind = needType == "hunger" and "FOOD" or "HYDRATION"
+    current = needs and needs.Get and needs.Get(record, needType)
+        or record and record.needs and record.needs[needType]
+    supply = PNC.NeedsDefinitions and PNC.NeedsDefinitions.SUPPLY
+        and PNC.NeedsDefinitions.SUPPLY[needType] or nil
+    target = supply and tonumber(supply.target) or 0.10
+    required = math.max(0.001, (tonumber(current) or 0) - target)
+    if state.manual == true or runtime and runtime.manual == true then
+        required = math.max(required,
+            supply and tonumber(supply.manualMinimum) or 0.001)
     end
-    return true, true, "NEED_COMPLETE"
+    ok, reason, effect = PNC.NPCSupplyService.ConsumePersonalItem(
+        record, itemID, required, resourceKind)
+    if not ok then
+        state.effectAttempted = true
+        return false, true, reason or "PERSONAL_ITEM_CONSUME_FAILED"
+    end
+    state.effectAttempted = true
+    return true, true, "NEED_COMPLETE", effect and effect[needType]
 end
 
 local function applyNeed(record, definition, elapsed)
@@ -183,13 +365,13 @@ end
 function Effects.Tick(record, state, definition, elapsed, now)
     if not definition or not definition.needEffect then return true, false end
     if definition.needEffect == "primitive" then
-        return applyPrimitive(record, state, definition, now)
+        return applyPersonalItem(record, state, definition, now)
     end
-    if definition.needEffect == "water" then
-        return applyWater(record, state, definition, now)
+    if definition.needEffect == "world_water" then
+        return applyWorldWater(record, state, definition, now)
     end
-    if definition.needEffect == "nearby_water" then
-        return applyNearbyWater(record, state, definition, now)
+    if definition.needEffect == "water_refill" then
+        return applyWaterRefill(record, state, definition, now)
     end
     if elapsed <= 0 then return true, false end
     if definition.needEffect == "need" then

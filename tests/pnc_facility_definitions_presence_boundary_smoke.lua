@@ -13,7 +13,6 @@ local providers = {
     "PNC_FacilityDefinitions_Farm",
     "PNC_FacilityDefinitions_CommonRooms",
     "PNC_FacilityDefinitions_Workstations",
-    "PNC_FacilityDefinitions_Water",
 }
 local publicFunctions = {
     "GetComponentIconPath",
@@ -36,7 +35,6 @@ local facilityIDs = {
     "hospital",
     "research_facility",
     "workshop",
-    "water_collector",
 }
 
 local previous = 0
@@ -55,6 +53,8 @@ T.load(
     "shared",
     "PNC/Core/Settlement/PNC_FacilityDefinitions.lua"
 )
+T.equal(PNC.FacilityDefinitions.Get("water_collector"), nil,
+    "water collector is no longer a settlement facility")
 T.equal(PNC.FacilityDefinitions.SCHEMA_VERSION, 1, "schema version")
 for i = 1, #publicFunctions do
     local functionName = publicFunctions[i]

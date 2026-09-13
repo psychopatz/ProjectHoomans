@@ -62,7 +62,7 @@ Tasking.Commands.RegisterProvider("NeedTest", {
             taskId = "drink:npc:following", npcId = record.id,
             kind = "DRINK", sourceDomain = "NeedTest", sourceRef = "water",
             precedence = "NORMAL_NEED", urgency = 0.45,
-            capability = "water.nearby",
+            capability = "survival.drink.world",
         }}
     end,
     Validate = function() return true end,
