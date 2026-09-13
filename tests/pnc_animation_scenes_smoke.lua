@@ -59,6 +59,9 @@ PNC = {
             elseif bump == "SitChair" then
                 T.equal(options.keepManagedUseless, true,
                     "seat loop maintenance lost body isolation policy")
+            elseif bump == "Sleep" or bump == "SleepBed" then
+                T.equal(options.keepManagedUseless, true,
+                    "sleep loop maintenance lost body isolation policy")
             else
                 error("unexpected persistent scene bump: " .. tostring(bump))
             end
@@ -110,12 +113,21 @@ T.truthy(PNC.AnimationScenes.Get("idle.ambient").repeatMode == "loop",
     "idle scene repeat policy is not explicit")
 T.truthy(PNC.AnimationScenes.Get("facility.sleep.floor").steps[1].loop == true,
     "floor sleep must remain in one persistent XML playback")
+T.equal(PNC.AnimationScenes.Get("facility.sleep.floor").keepManagedUseless,
+    true,
+    "floor sleep must retain managed-body isolation")
 T.truthy(PNC.AnimationScenes.Get("facility.sleep.bed").steps[1].loop == true,
     "bed sleep must remain in one persistent XML playback")
+T.equal(PNC.AnimationScenes.Get("facility.sleep.bed").keepManagedUseless,
+    true,
+    "bed sleep must retain managed-body isolation")
 T.truthy(PNC.AnimationScenes.Get("facility.sleep.bed").steps[1].durationMs == 0,
     "bed sleep must not be force-finished on a timer")
 T.truthy(PNC.AnimationScenes.Get("facility.sleep.sofa").bump == "SleepBed",
     "sofa sleep must use an explicit sleep scene")
+T.equal(PNC.AnimationScenes.Get("facility.sleep.sofa").keepManagedUseless,
+    true,
+    "sofa sleep must retain managed-body isolation")
 local livingScene = PNC.AnimationScenes.Get("facility.living.sit")
 T.truthy(livingScene and livingScene.repeatMode == "loop"
         and #livingScene.steps == 4,
@@ -416,6 +428,21 @@ T.truthy(PNC.AnimationScenes.Tick(record, body, now + 1),
     "furniture seating scene did not maintain its loop")
 T.truthy(PNC.AnimationScenes.Interrupt(record, body, "movement"),
     "furniture seating scene did not release for movement")
+
+local sleepStarted, sleepScene = PNC.AnimationScenes.Request(
+    record,
+    body,
+    "facility.sleep.floor",
+    { now = now }
+)
+T.truthy(sleepStarted and sleepScene ~= nil,
+    "floor sleep scene did not start")
+T.equal(played[#played].options.keepManagedUseless, true,
+    "floor sleep playback did not retain managed-body isolation")
+T.truthy(PNC.AnimationScenes.Tick(record, body, now + 1),
+    "floor sleep scene did not maintain its loop")
+T.truthy(PNC.AnimationScenes.Interrupt(record, body, "combat"),
+    "floor sleep scene did not release for combat")
 
 record.runtime.pathing = { phase = "active" }
 record.runtime.localNavigation = {

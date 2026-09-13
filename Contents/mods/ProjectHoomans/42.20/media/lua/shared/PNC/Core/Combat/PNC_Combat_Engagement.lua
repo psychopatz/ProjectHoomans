@@ -159,6 +159,75 @@ local function activateRangedFallback(context, reason)
     return false
 end
 
+local function prepareMeleeLane(context, reason)
+    local switched
+    local switchReason
+    if context.mode ~= "mixed"
+        or not Equipment
+        or not Equipment.ActivateMeleeFallback
+    then
+        return false
+    end
+    switched, switchReason = Equipment.ActivateMeleeFallback(
+        context.record,
+        context.zombie,
+        reason
+    )
+    if not switched then
+        return false
+    end
+    context.equipment = Equipment.Describe(context.record)
+    context.mode = context.equipment.combatModeResolved
+    setDebug(
+        context,
+        switchReason or "switched_to_shove",
+        "melee",
+        switchReason == "switched_to_melee"
+            and "melee_fallback"
+            or "barehand_fallback"
+    )
+    return true
+end
+
+local function restoreMixedRanged(context)
+    local runtime = context.record and context.record.runtime or nil
+    local threshold
+    local restored
+    local reason
+    if context.mode ~= "melee"
+        or tostring(context.record.weaponMode or "") ~= "mixed"
+        or not runtime
+        or runtime.weaponFallbackTemporary ~= true
+    then
+        return false
+    end
+    if Combat and Combat.HasActiveAttack
+        and Combat.HasActiveAttack(context.record, Core.Now())
+    then
+        return false
+    end
+    threshold = tonumber(runtime.weaponFallbackRange)
+        or tonumber(Const.MIXED_MELEE_FALLBACK_RANGE)
+        or 4.0
+    if (tonumber(context.distance) or 0) <= threshold then
+        return false
+    end
+    if not Equipment.RestoreRangedFallback then
+        return false
+    end
+    restored, reason = Equipment.RestoreRangedFallback(
+        context.record,
+        context.zombie
+    )
+    if not restored then
+        return false
+    end
+    context.equipment = Equipment.Describe(context.record)
+    context.mode = context.equipment.combatModeResolved
+    setDebug(context, reason or "switched_to_ranged", context.mode)
+    return true
+end
+
 local function tryReposition(context, mode, reason, fallbackReason)
     local moved
     local moveReason
@@ -386,6 +455,7 @@ local function handleRanged(context, debugMode, stopFactor)
             <= (tonumber(Const.MIXED_MELEE_FALLBACK_RANGE) or 4.0)
     then
         clearRetreatFor(context)
+        prepareMeleeLane(context, "friendly_fire_risk")
         return handleMelee(context, "mixed", true)
     end
     if reason == "target_out_of_range" then
@@ -473,6 +543,7 @@ function Engagement.Tick(record, zombie, target)
     }
     context.mode = context.equipment.combatModeResolved
     refreshDistance(context)
+    restoreMixedRanged(context)
     if Defense and Defense.Refresh then
         Defense.Refresh(record, zombie)
     end
@@ -532,6 +603,7 @@ function Engagement.Tick(record, zombie, target)
             <= (tonumber(Const.MIXED_MELEE_SWITCH_RANGE) or 2.4)
     then
         clearRetreatFor(context)
+        prepareMeleeLane(context, "mixed_close")
         return handleMelee(context, "mixed", true)
     end
     if context.mode == "melee" then
@@ -546,6 +618,7 @@ function Engagement.Tick(record, zombie, target)
         or tonumber(Const.MELEE_APPROACH_STOP_DISTANCE)
         or 1.0
     if context.distance <= meleeCommitRange then
+        prepareMeleeLane(context, "mixed_close")
         return handleMelee(context, "mixed", false)
     end
     return handleRanged(context, "mixed", 0.85)

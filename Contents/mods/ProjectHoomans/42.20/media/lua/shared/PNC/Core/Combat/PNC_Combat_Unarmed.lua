@@ -55,14 +55,14 @@ function Unarmed.IsGroundTarget(target)
     return isGroundTarget(target)
 end
 
-function Unarmed.PlayShove(zombie, record, target)
+function Unarmed.PlayShove(zombie, record, target, options)
     if not zombie then
         return
     end
     if target and zombie.faceThisObject then
         zombie:faceThisObject(target)
     end
-    if zombie.playSound then
+    if zombie.playSound and not (options and options.deferAudio == true) then
         zombie:playSound("AttackShove")
         zombie:playSound(zombie:isFemale() and "VoiceFemaleMeleeAttack" or "VoiceMaleMeleeAttack")
     end
@@ -98,7 +98,7 @@ function Unarmed.ApplyZombieShove(attackerZombie, targetZombie, options)
     return true
 end
 
-function Unarmed.PlayGroundAttack(zombie, record, target)
+function Unarmed.PlayGroundAttack(zombie, record, target, options)
     local anim = "PNC_Attack2HStamp"
     if not zombie then
         return anim
@@ -106,7 +106,7 @@ function Unarmed.PlayGroundAttack(zombie, record, target)
     if target and (target.isCrawling and target:isCrawling() or target.isProne and target:isProne()) then
         anim = "PNC_Attack2HFloor"
     end
-    if zombie.playSound then
+    if zombie.playSound and not (options and options.deferAudio == true) then
         if anim == "PNC_Attack2HStamp" then
             zombie:playSound("AttackStomp")
             zombie:playSound(zombie:isFemale() and "VoiceFemaleMeleeStomp" or "VoiceMaleMeleeStomp")

@@ -46,14 +46,14 @@ local function lower(value)
     return string.lower(tostring(value or ""))
 end
 
-local function safeMethod(target, methodName)
+local function safeMethod(target, methodName, ...)
     local method
     local ok
     local value
     if not target then return nil end
     method = target[methodName]
     if type(method) ~= "function" then return nil end
-    ok, value = pcall(method, target)
+    ok, value = pcall(method, target, ...)
     return ok and value or nil
 end
 

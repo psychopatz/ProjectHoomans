@@ -28,10 +28,27 @@ function Combat.TryMelee(record, zombie, target)
     local zombieTarget
     local anim
     local weaponItem = Internal.resolveWeaponItem and Internal.resolveWeaponItem(record, zombie) or nil
+    local isFirearm = equipmentInfo
+        and equipmentInfo.hasUsableFirearm == true
+        or false
+    if not isFirearm
+        and Internal.isFirearmWeapon
+    then
+        isFirearm = Internal.isFirearmWeapon(
+            record,
+            weaponItem,
+            equipmentInfo
+        ) == true
+    end
+    if isFirearm then
+        weaponItem = nil
+    end
     -- WeaponType is primarily an animation-family resolver and may classify a
     -- valid modded weapon as barehand. Combat capability follows the actual
-    -- equipped InventoryItem instead.
-    local isBarehand = not (weaponItem and weaponItem.IsWeapon and weaponItem:IsWeapon())
+    -- equipped InventoryItem instead. Firearms are deliberately excluded from
+    -- this lane even if a stale hand item survives a logical weapon switch.
+    local isBarehand = isFirearm
+        or not (weaponItem and weaponItem.IsWeapon and weaponItem:IsWeapon())
     local cooldownMs = isBarehand and (tonumber(profile.unarmedCooldownMs) or Const.UNARMED_COOLDOWN_MS) or (tonumber(profile.meleeCooldownMs) or 900)
     local skillID = Skills and Skills.ResolveWeaponSkill and Skills.ResolveWeaponSkill(record, record.equipment and record.equipment.primaryFullType, "melee") or "Strength"
     local skillLevel = Skills and Skills.GetLevel and Skills.GetLevel(record, skillID) or 0
@@ -39,6 +56,7 @@ function Combat.TryMelee(record, zombie, target)
     local groundSafe
     local liveTarget
     local emergencyMelee
+    local attackAudio
 
     if not target then
         return false, "no_target"
@@ -124,8 +142,26 @@ function Combat.TryMelee(record, zombie, target)
                     and (tonumber(profile.unarmedGroundDamage)
                         or Const.UNARMED_GROUND_DAMAGE)
                     or damage * 1.15
-                anim = Unarmed and Unarmed.PlayGroundAttack and Unarmed.PlayGroundAttack(zombie, record, zombieTarget) or "PNC_Attack2HStamp"
-                Internal.buildAttackAction(record, target, "ground", "melee", anim, damage, skillID)
+                anim = Unarmed and Unarmed.PlayGroundAttack and Unarmed.PlayGroundAttack(zombie, record, zombieTarget, { deferAudio = true }) or "PNC_Attack2HStamp"
+                attackAudio = Internal.resolveMeleeAudio
+                    and Internal.resolveMeleeAudio(
+                        record,
+                        weaponItem,
+                        equipmentInfo,
+                        "ground",
+                        anim
+                    )
+                    or nil
+                Internal.buildAttackAction(
+                    record,
+                    target,
+                    "ground",
+                    "melee",
+                    anim,
+                    damage,
+                    skillID,
+                    attackAudio and { audio = attackAudio } or nil
+                )
                 return true, "ground_attack_started"
             end
         end
@@ -137,12 +173,26 @@ function Combat.TryMelee(record, zombie, target)
             and Internal.triggerUnarmedAttackAnim()
             or "PNC_AttackBareHands1"
     else
-        Internal.playAttackSound(zombie, record, weaponItem)
         anim = Internal.triggerMeleeWeaponAnim(
             zombie,
             record,
             equipmentInfo
         )
+    end
+    if Internal.resolveMeleeAudio then
+        attackAudio = Internal.resolveMeleeAudio(
+            record,
+            weaponItem,
+            equipmentInfo,
+            "melee",
+            anim
+        )
+    else
+        -- Compatibility fallback for stripped test compositions and older
+        -- saves that have not loaded the combat-audio composition module.
+        if not isBarehand then
+            Internal.playAttackSound(zombie, record, weaponItem)
+        end
     end
     Internal.buildAttackAction(
         record,
@@ -151,7 +201,8 @@ function Combat.TryMelee(record, zombie, target)
         "melee",
         anim or "PNC_Attack1H1",
         damage,
-        skillID
+        skillID,
+        attackAudio and { audio = attackAudio } or nil
     )
     return true, isBarehand
         and "unarmed_attack_started"
@@ -214,8 +265,11 @@ function Combat.TryShove(record, zombie, target, reason)
         reason or "tactical_shove"
     )
     if Unarmed and Unarmed.PlayShove then
-        Unarmed.PlayShove(zombie, record, zombieTarget)
+        Unarmed.PlayShove(zombie, record, zombieTarget, { deferAudio = true })
     end
+    local attackAudio = Internal.resolveMeleeAudio
+        and Internal.resolveMeleeAudio(record, nil, nil, "shove", "PNC_Shove")
+        or nil
     Internal.buildAttackAction(
         record,
         target,
@@ -223,7 +277,8 @@ function Combat.TryShove(record, zombie, target, reason)
         "melee",
         "PNC_Shove",
         tonumber(profile.shoveDamage) or Const.UNARMED_DAMAGE,
-        "Strength"
+        "Strength",
+        attackAudio and { audio = attackAudio } or nil
     )
     return true, reason or "shove_started"
 end

@@ -27,6 +27,10 @@ function Internal.buildAttackAction(record, target, attackKind, attackType, anim
     local timings = Internal.ATTACK_TIMINGS[attackKind] or Internal.ATTACK_TIMINGS.melee
     local hitDelay = type(extra) == "table" and tonumber(extra.hitDelayMs) or nil
     local duration = type(extra) == "table" and tonumber(extra.durationMs) or nil
+    local runtime = record.runtime or {}
+    local attackSequence = (tonumber(runtime.attackSequence) or 0) + 1
+    runtime.attackSequence = attackSequence
+    record.runtime = runtime
     local action = {
         attackKind = attackKind,
         attackType = attackType,
@@ -41,6 +45,7 @@ function Internal.buildAttackAction(record, target, attackKind, attackType, anim
         animationTriggerMode = "client_snapshot",
         animationStateEntered = false,
         animationActionState = nil,
+        attackSequence = attackSequence,
         target = AttackExecution.captureTargetRef(target),
     }
     local key
@@ -48,6 +53,9 @@ function Internal.buildAttackAction(record, target, attackKind, attackType, anim
         for key, value in pairs(extra) do
             action[key] = value
         end
+    end
+    if action.audio then
+        action.audio.sequence = attackSequence
     end
     record.runtime.attackAction = action
     -- Server.OnTick consumes this after movement pumping and sends exactly one

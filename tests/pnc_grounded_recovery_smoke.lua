@@ -279,6 +279,12 @@ T.falsy(PNC.LiveBodyControl.TickGroundedRecovery(record, body, now),
 T.equal(reanimateTimer, 60, "sleeping NPC get-up timer changed")
 T.equal(modData.PNC_NativeGetUpLease, nil,
     "sleeping NPC retained a native get-up lease")
+record.runtime.facilityActivity.phase = "WAKING"
+record.runtime.facilityActivity.sleepWakePending = true
+T.falsy(PNC.LiveBodyControl.TickGroundedRecovery(record, body, now),
+    "waking sleep NPC was forced into a competing get-up lease")
+T.equal(reanimateTimer, 60, "waking sleep NPC get-up timer changed")
+record.runtime.facilityActivity.sleepWakePending = nil
 
 record.activeJob = nil
 record.runtime.facilityActivity = nil

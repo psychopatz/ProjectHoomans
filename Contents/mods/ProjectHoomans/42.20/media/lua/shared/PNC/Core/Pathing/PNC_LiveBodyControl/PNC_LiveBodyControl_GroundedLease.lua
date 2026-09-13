@@ -76,6 +76,9 @@ function Internal.intentionallyGrounded(record)
             and record.health.state == "incapacitated"
         or runtime and runtime.activityOverride == "sleeping"
         or activity and activity.capability == "sleep"
-            and tostring(activity.phase or "") == "SLEEPING"
+            and (
+                tostring(activity.phase or "") == "SLEEPING"
+                or activity.sleepWakePending == true
+            )
         or false
 end

@@ -83,7 +83,7 @@ end
 
 function Effects.BuildShotPayload(record, shooter, target, weaponItem)
     local descriptor = Firearms and Firearms.Describe
-        and Firearms.Describe(record, weaponItem)
+        and Firearms.Describe(record, weaponItem, shooter)
         or nil
     local runtime
     local tx

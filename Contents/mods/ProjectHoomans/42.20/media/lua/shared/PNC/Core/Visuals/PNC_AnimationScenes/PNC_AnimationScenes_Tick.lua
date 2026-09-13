@@ -14,6 +14,11 @@ local function currentOrIdleScene(record, zombie, now, debugCycleActive)
     local scene = record and record.runtime
         and record.runtime.animationScene or nil
     if not scene and not debugCycleActive then
+        local activity = record and record.runtime
+            and record.runtime.facilityActivity or nil
+        if activity and activity.sleepWakePending == true then
+            return nil
+        end
         Scenes.TryIdle(record, zombie, now)
         scene = record and record.runtime
             and record.runtime.animationScene or nil

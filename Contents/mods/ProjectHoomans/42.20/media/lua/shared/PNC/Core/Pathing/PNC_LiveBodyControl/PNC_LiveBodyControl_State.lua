@@ -14,11 +14,11 @@ local NATIVE_PASSAGE_STATES = {
     ["climbwall"] = true,
 }
 
--- A seated managed body must not retain a native zombie movement/alert state
--- after the chair has become the presentation owner. Keep this narrower than
+-- A managed body must not retain a native zombie movement/alert state after a
+-- stationary presentation has become the owner. Keep this narrower than
 -- SUPPRESSED_STATES: turnalerted is still meaningful to ordinary movement,
--- but it is an unsafe native handoff while the body is seated.
-local SEATED_NATIVE_RESET_STATES = {
+-- but it is an unsafe native handoff while the body is seated or sleeping.
+local PRESENTATION_NATIVE_RESET_STATES = {
     ["turnalerted"] = true,
     ["pathfind"] = true,
     ["walktoward"] = true,
@@ -165,7 +165,7 @@ function LiveBodyControl.ReleaseSeatedMovement(record, zombie, reason)
     return true
 end
 
-function LiveBodyControl.IsSeatedCombatActive(record, now)
+function LiveBodyControl.IsPresentationCombatActive(record, now)
     local runtime = record and record.runtime or nil
     local health = record and record.health or nil
     local attackAction = runtime and runtime.attackAction or nil
@@ -186,9 +186,43 @@ function LiveBodyControl.IsSeatedCombatActive(record, now)
     return now < (tonumber(health and health.recentDamageUntil) or 0)
 end
 
+function LiveBodyControl.IsSeatedCombatActive(record, now)
+    return LiveBodyControl.IsPresentationCombatActive(record, now)
+end
+
 function LiveBodyControl.IsSeatedNativeResetState(actionState)
     actionState = string.lower(tostring(actionState or ""))
-    return SEATED_NATIVE_RESET_STATES[actionState] == true
+    return PRESENTATION_NATIVE_RESET_STATES[actionState] == true
+end
+
+function LiveBodyControl.IsSleeping(record)
+    local runtime = record and record.runtime or nil
+    local activity = runtime and runtime.facilityActivity or nil
+    local phase = activity and tostring(activity.phase or "") or ""
+    if not activity or tostring(activity.capability or "") ~= "sleep" then
+        return false
+    end
+    return activity.sleepWakePending == true
+        or activity.sleepSceneActive == true
+        or (phase == "STARTING" and activity.arrivalSettled == true)
+end
+
+function LiveBodyControl.IsSleepWakeActive(record)
+    local runtime = record and record.runtime or nil
+    local activity = runtime and runtime.facilityActivity or nil
+    return activity
+        and tostring(activity.capability or "") == "sleep"
+        and activity.sleepWakePending == true
+        or false
+end
+
+function LiveBodyControl.IsSleepingCombatActive(record, now)
+    return LiveBodyControl.IsPresentationCombatActive(record, now)
+end
+
+function LiveBodyControl.IsSleepingNativeResetState(actionState)
+    actionState = string.lower(tostring(actionState or ""))
+    return PRESENTATION_NATIVE_RESET_STATES[actionState] == true
 end
 
 -- Read the action-context state through IsoGameCharacter's exposed wrapper.
@@ -488,6 +522,23 @@ function LiveBodyControl.ResetSeatedNativeMovementState(zombie)
     return true
 end
 
+function LiveBodyControl.ResetSleepingNativeMovementState(zombie)
+    local actionState
+    if not zombie
+        or not zombie.changeState
+        or not ZombieIdleState
+        or not ZombieIdleState.instance
+    then
+        return false
+    end
+    actionState = LiveBodyControl.GetActionStateName(zombie)
+    if not LiveBodyControl.IsSleepingNativeResetState(actionState) then
+        return false
+    end
+    zombie:changeState(ZombieIdleState.instance())
+    return true
+end
+
 -- Seat entry can occur between zombie-update callbacks. Stabilize the native
 -- carrier at that ownership boundary so a stale walk/alert action cannot
 -- survive into the first furniture scene frame.
@@ -511,6 +562,42 @@ function LiveBodyControl.StabilizeSeatedBody(record, zombie, now)
     actionState = LiveBodyControl.GetActionStateName(zombie)
     if LiveBodyControl.IsSeatedNativeResetState(actionState) then
         LiveBodyControl.ResetSeatedNativeMovementState(zombie)
+    end
+    LiveBodyControl.ApplyHumanizedBodyFlags(zombie, false)
+    return true
+end
+
+-- Sleep entry can occur between zombie-update callbacks. Stabilize the native
+-- carrier at that ownership boundary so a stale walk/alert action cannot
+-- survive into the first sleep scene frame.
+function LiveBodyControl.StabilizeSleepingBody(record, zombie, now)
+    local modData
+    local actionState
+    if not zombie or not LiveBodyControl.IsSleeping(record)
+        or LiveBodyControl.IsSleepingCombatActive(record, now)
+    then
+        return false
+    end
+    now = tonumber(now) or (PNC.Core and PNC.Core.Now
+        and PNC.Core.Now() or 0)
+    LiveBodyControl.ReleaseSeatedMovement(record, zombie, "sleep_entry")
+    modData = zombie.getModData and zombie:getModData() or nil
+    if modData
+        and Internal.hasBumpActionLease(zombie, now)
+        and (tostring(modData.PNC_BumpRequestedType or "") == "PNC_Sleep"
+            or tostring(modData.PNC_BumpRequestedType or "")
+                == "PNC_SleepBed")
+    then
+        modData.PNC_BumpKeepUseless = true
+    end
+    if Internal.hasBumpActionLease(zombie, now) then
+        Internal.clearVanillaIntent(zombie)
+        Internal.applyActionLeaseSafeguards(zombie, modData)
+        return true
+    end
+    actionState = LiveBodyControl.GetActionStateName(zombie)
+    if LiveBodyControl.IsSleepingNativeResetState(actionState) then
+        LiveBodyControl.ResetSleepingNativeMovementState(zombie)
     end
     LiveBodyControl.ApplyHumanizedBodyFlags(zombie, false)
     return true

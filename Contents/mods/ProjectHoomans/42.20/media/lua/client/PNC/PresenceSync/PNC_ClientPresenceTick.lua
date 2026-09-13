@@ -29,6 +29,7 @@ local bindNativePathSnapshot =
     Internal.BindNativePathSnapshot
 local voiceTriggers = PNC.NPCVoice
     and PNC.NPCVoice.Triggers or nil
+local combatAudio = PNC.NPCCombatAudio
 
 local function resolveSnapshotBodyFromIndexes(snapshot)
     local id
@@ -517,6 +518,9 @@ function Sync.OnTick()
                         -- faced by PathService. Dedicated clients alone apply
                         -- replicated facing.
                         applySnapshotToBody(snapshot, body, remoteReplica)
+                        if combatAudio and combatAudio.Observe then
+                            combatAudio.Observe(snapshot, body, now)
+                        end
                         if voiceTriggers and voiceTriggers.Observe then
                             voiceTriggers.Observe(
                                 snapshot,

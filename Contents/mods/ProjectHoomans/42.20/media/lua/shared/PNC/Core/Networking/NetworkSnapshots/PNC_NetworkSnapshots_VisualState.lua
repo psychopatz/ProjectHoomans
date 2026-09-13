@@ -8,6 +8,18 @@ local Parts = Network.Internal.SnapshotParts
 local Core = PNC.Core
 local MotionHints = PNC.MotionHints
 
+local function buildAttackAudio(attack)
+    local audio = attack and attack.audio or nil
+    if type(audio) ~= "table" then return nil end
+    return {
+        sequence = audio.sequence,
+        swingSound = audio.swingSound,
+        voiceSuffix = audio.voiceSuffix,
+        hitSequence = audio.hitSequence,
+        hitSound = audio.hitSound,
+    }
+end
+
 function Parts.BuildVisualState(record)
     local runtime = record and record.runtime or nil
     local path = runtime and runtime.pathing or nil
@@ -116,6 +128,7 @@ function Parts.BuildVisualState(record)
         attackStartedAt = attack and attack.startedAt or 0,
         attackHitAt = attack and attack.hitAt or 0,
         attackFinishAt = attack and attack.finishAt or 0,
+        attackAudio = buildAttackAudio(attack),
         animSpeed = animSpeed,
         isRunning = isRunning,
         isCrawling = isCrawling,

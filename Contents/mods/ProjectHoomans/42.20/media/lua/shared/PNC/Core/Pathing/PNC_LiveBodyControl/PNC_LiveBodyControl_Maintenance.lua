@@ -71,6 +71,20 @@ function LiveBodyControl.ShouldKeepEngineMovementActive(record, zombie)
     then
         return false
     end
+    if LiveBodyControl.IsSleepWakeActive
+        and LiveBodyControl.IsSleepWakeActive(record)
+    then
+        return false
+    end
+    -- Sleep owns the carrier in the same way a stationary seat does. A
+    -- stale native movement lease must not make the sleeping zombie useful
+    -- to the vanilla brain while the sleep presentation is active.
+    if LiveBodyControl.IsSleeping
+        and LiveBodyControl.IsSleeping(record)
+        and not LiveBodyControl.IsSleepingCombatActive(record, now)
+    then
+        return false
+    end
     if Internal.hasNativeGetUpLease(zombie, now) then return true end
     if Core and Core.IsAuthority and not Core.IsAuthority() then
         local actionState = LiveBodyControl.GetActionStateName(zombie)

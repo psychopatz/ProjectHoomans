@@ -21,6 +21,8 @@ function LiveBodyControl.EnforceManagedSafety(zombie, source)
     local unsafeNativeTraversalState
     local needsImmediateRepair
     local seatedLockActive
+    local sleepLockActive
+    local bumpType
     if not zombie or not Core or not Core.IsManagedNPCBody
         or not Core.IsManagedNPCBody(zombie)
     then
@@ -32,25 +34,53 @@ function LiveBodyControl.EnforceManagedSafety(zombie, source)
     if PNC.Registry and PNC.Registry.FindRecordByZombie then
         record = PNC.Registry.FindRecordByZombie(zombie)
     end
+    if record
+        and record.runtime
+        and record.runtime.facilityActivity
+        and record.runtime.facilityActivity.sleepWakePending == true
+        and PNC.FacilityJobsBehaviorInternal
+        and PNC.FacilityJobsBehaviorInternal.TickSleepWake
+    then
+        -- A stopped sleep scene may be followed by an order change, which
+        -- removes FacilityActivity from normal job selection. Pump its wake
+        -- transaction from the shared safety heartbeat so native release and
+        -- surface cleanup cannot be stranded.
+        PNC.FacilityJobsBehaviorInternal.TickSleepWake(record, zombie)
+        return true
+    end
     modData = zombie.getModData and zombie:getModData() or nil
     now = Core.Now and Core.Now() or 0
     seatedLockActive = LiveBodyControl.IsSeated
         and LiveBodyControl.IsSeated(record)
         and not LiveBodyControl.IsSeatedCombatActive(record, now)
         or false
-    keepEngineMovementActive =
-        LiveBodyControl.ShouldKeepEngineMovementActive(record, zombie)
+    sleepLockActive = LiveBodyControl.IsSleeping
+        and LiveBodyControl.IsSleeping(record)
+        and not LiveBodyControl.IsSleepingCombatActive(record, now)
+        or false
+    bumpType = tostring(modData and modData.PNC_BumpRequestedType or "")
     -- A pre-fix seat lease may still carry the old default (false). Repair
     -- that state at the guard boundary so the lease cannot make this managed
     -- body useful while the seat owns the presentation.
     if seatedLockActive
         and modData
         and Internal.hasBumpActionLease(zombie, now)
-        and tostring(modData.PNC_BumpRequestedType or "")
-            == "PNC_SitChair"
+        and bumpType == "PNC_SitChair"
     then
         modData.PNC_BumpKeepUseless = true
     end
+    -- Sleep is also a persistent presentation lease. Older or replicated
+    -- bodies may still carry the historical default that made the zombie
+    -- engine useful, so repair it at the same shared safety boundary.
+    if sleepLockActive
+        and modData
+        and Internal.hasBumpActionLease(zombie, now)
+        and (bumpType == "PNC_Sleep" or bumpType == "PNC_SleepBed")
+    then
+        modData.PNC_BumpKeepUseless = true
+    end
+    keepEngineMovementActive =
+        LiveBodyControl.ShouldKeepEngineMovementActive(record, zombie)
     hadTarget = zombie.getTarget and zombie:getTarget() ~= nil or false
     wasUseless = zombie.isUseless and zombie:isUseless() or false
     hadTeeth = zombie.isNoTeeth and not zombie:isNoTeeth() or false
@@ -73,6 +103,8 @@ function LiveBodyControl.EnforceManagedSafety(zombie, source)
         or hadNativeCorpseDragFlag
         or seatedLockActive
             and LiveBodyControl.IsSeatedNativeResetState(actionState)
+        or sleepLockActive
+            and LiveBodyControl.IsSleepingNativeResetState(actionState)
         or (
             (not keepEngineMovementActive or unsafeNativeTraversalState)
             and not actionLeaseActive
@@ -90,18 +122,26 @@ function LiveBodyControl.EnforceManagedSafety(zombie, source)
     then
         LiveBodyControl.SuppressZombieState(zombie, nil, now, true)
     end
-    if seatedLockActive then
+    if seatedLockActive or sleepLockActive then
         -- The shared suppressed-state list intentionally does not claim
-        -- turnalerted. Seating does: it is a native zombie alert transition
-        -- that can otherwise reacquire movement after this callback.
+        -- turnalerted. Stationary presentation ownership does: it is a
+        -- native zombie alert transition that can otherwise reacquire
+        -- movement after this callback.
         LiveBodyControl.ReleaseSeatedMovement(
             record,
             zombie,
-            "seated_safety"
+            sleepLockActive and "sleep_safety" or "seated_safety"
         )
         Internal.clearVanillaIntent(zombie)
-        if LiveBodyControl.IsSeatedNativeResetState(actionState) then
+        if seatedLockActive
+            and LiveBodyControl.IsSeatedNativeResetState(actionState)
+        then
             LiveBodyControl.ResetSeatedNativeMovementState(zombie)
+        end
+        if sleepLockActive
+            and LiveBodyControl.IsSleepingNativeResetState(actionState)
+        then
+            LiveBodyControl.ResetSleepingNativeMovementState(zombie)
         end
     end
     if (

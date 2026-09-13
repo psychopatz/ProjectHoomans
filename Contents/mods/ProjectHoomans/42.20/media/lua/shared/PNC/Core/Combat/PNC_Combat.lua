@@ -228,14 +228,44 @@ function Internal.prepareAttackMovement(record, zombie, reason)
     return true
 end
 
+local function itemFullType(item)
+    local ok
+    local fullType
+    if not item or type(item.getFullType) ~= "function" then
+        return nil
+    end
+    ok, fullType = pcall(item.getFullType, item)
+    if not ok or fullType == nil or tostring(fullType) == "" then
+        return nil
+    end
+    return tostring(fullType)
+end
+
+local function normalizeItemType(value)
+    value = tostring(value or "")
+    return string.match(value, "^[^%.]+%.(.+)$") or value
+end
+
+local function sameItemType(left, right)
+    if left == nil or right == nil then return false end
+    return tostring(left) == tostring(right)
+        or normalizeItemType(left) == normalizeItemType(right)
+end
+
 function Internal.resolveWeaponItem(record, zombie)
     local fullType = record and record.equipment and record.equipment.primaryFullType or nil
     local item
+    local itemType
     local _
-    if zombie and zombie.getPrimaryHandItem then
+    if zombie and zombie.getPrimaryHandItem and fullType then
         item = zombie:getPrimaryHandItem()
         if item and item.IsWeapon and item:IsWeapon() then
-            return item
+            itemType = itemFullType(item)
+            -- The live hand can lag behind an authoritative inventory switch.
+            -- Never let that stale firearm become the logical melee weapon.
+            if itemType == nil or sameItemType(itemType, fullType) then
+                return item
+            end
         end
     end
     if not fullType then
@@ -245,6 +275,25 @@ function Internal.resolveWeaponItem(record, zombie)
         item, _ = Equipment.CreateItem(fullType)
     end
     return item
+end
+
+function Internal.isFirearmWeapon(record, weaponItem, equipmentInfo)
+    local fullType
+    local descriptor
+    if equipmentInfo and equipmentInfo.hasUsableFirearm == true then
+        return true
+    end
+    fullType = itemFullType(weaponItem)
+        or (record and record.equipment and record.equipment.primaryFullType)
+    if fullType
+        and Equipment
+        and Equipment.Internal
+        and Equipment.Internal.buildWeaponDescriptor
+    then
+        descriptor = Equipment.Internal.buildWeaponDescriptor(fullType, false)
+        return descriptor and descriptor.hasUsableFirearm == true
+    end
+    return false
 end
 
 function Internal.resolveMeleeAnimFamily(record, equipmentInfo)
@@ -302,6 +351,9 @@ function Internal.playAttackSound(zombie, record, weaponItem)
     local emitter
     local swingSound
     if not zombie or not zombie.getEmitter then
+        return
+    end
+    if Internal.isFirearmWeapon(record, weaponItem) then
         return
     end
     emitter = zombie:getEmitter()

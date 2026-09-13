@@ -87,7 +87,22 @@ function Equipment.ResolveWeaponMode(fullType)
     return Internal.buildWeaponDescriptor(fullType, false).resolvedMode
 end
 
-function Equipment.ActivateMeleeFallback(record, zombie)
+local function temporaryFallbackRange(reason)
+    local const = PNC.Const or {}
+    if reason == "friendly_fire_risk" then
+        return tonumber(const.MIXED_MELEE_FALLBACK_RANGE) or 4.0
+    end
+    return tonumber(const.MIXED_MELEE_SWITCH_RANGE) or 2.4
+end
+
+local function clearTemporaryFallback(runtime)
+    runtime.weaponFallbackTemporary = nil
+    runtime.weaponFallbackFromID = nil
+    runtime.weaponFallbackToID = nil
+    runtime.weaponFallbackRange = nil
+end
+
+function Equipment.ActivateMeleeFallback(record, zombie, fallbackReason)
     local inv = Inventory and Inventory.EnsureRecordInventory
         and Inventory.EnsureRecordInventory(record)
         or nil
@@ -102,6 +117,10 @@ function Equipment.ActivateMeleeFallback(record, zombie)
     local selectedID
     local ok
     local reason
+    local temporary
+    fallbackReason = tostring(fallbackReason or "out_of_ammo")
+    temporary = fallbackReason == "mixed_close"
+        or fallbackReason == "friendly_fire_risk"
     if not record or not inv or not Inventory.EquipPrimary then
         return false, "inventory_fallback_unavailable"
     end
@@ -129,10 +148,18 @@ function Equipment.ActivateMeleeFallback(record, zombie)
         selectedID and "combat_melee_fallback" or "combat_shove_fallback"
     )
     if not ok then return false, reason end
-    record.weaponMode = "melee"
     record.runtime = record.runtime or {}
+    if temporary then
+        record.runtime.weaponFallbackTemporary = true
+        record.runtime.weaponFallbackFromID = currentID
+        record.runtime.weaponFallbackToID = selectedID
+        record.runtime.weaponFallbackRange = temporaryFallbackRange(fallbackReason)
+    else
+        clearTemporaryFallback(record.runtime)
+        record.weaponMode = "melee"
+    end
     record.runtime.weaponFallbackFrom = currentType
-    record.runtime.weaponFallbackReason = "out_of_ammo"
+    record.runtime.weaponFallbackReason = fallbackReason
     record.runtime.forceSyncEvent = selectedID
         and "weapon_fallback_melee"
         or "weapon_fallback_shove"
@@ -141,4 +168,56 @@ function Equipment.ActivateMeleeFallback(record, zombie)
         Equipment.ApplyCombatState(zombie, record, true, true)
     end
     return true, selectedID and "switched_to_melee" or "switched_to_shove"
+end
+
+function Equipment.RestoreRangedFallback(record, zombie)
+    local inv = Inventory and Inventory.EnsureRecordInventory
+        and Inventory.EnsureRecordInventory(record)
+        or nil
+    local runtime = record and record.runtime or nil
+    local currentID
+    local fallbackID
+    local sourceItem
+    local descriptor
+    local ok
+    local reason
+    if not record or not inv or not runtime
+        or runtime.weaponFallbackTemporary ~= true
+    then
+        return false, "no_temporary_melee_fallback"
+    end
+    currentID = inv.equipped and inv.equipped.primary or nil
+    fallbackID = runtime.weaponFallbackToID
+    if currentID ~= fallbackID then
+        clearTemporaryFallback(runtime)
+        return false, "temporary_fallback_interrupted"
+    end
+    sourceItem = runtime.weaponFallbackFromID
+        and inv.items
+        and inv.items[runtime.weaponFallbackFromID]
+        or nil
+    descriptor = sourceItem
+        and Internal.buildWeaponDescriptor(sourceItem.type, false)
+        or nil
+    if not sourceItem or not descriptor
+        or descriptor.hasUsableFirearm ~= true
+    then
+        clearTemporaryFallback(runtime)
+        return false, "ranged_fallback_unavailable"
+    end
+    ok, reason = Inventory.EquipPrimary(
+        record,
+        runtime.weaponFallbackFromID,
+        "combat_ranged_restore"
+    )
+    if not ok then return false, reason end
+    clearTemporaryFallback(runtime)
+    runtime.weaponFallbackFrom = nil
+    runtime.weaponFallbackReason = nil
+    runtime.forceSyncEvent = "weapon_restore_ranged"
+    runtime.equipmentDescribeCache = nil
+    if zombie then
+        Equipment.ApplyCombatState(zombie, record, true, true)
+    end
+    return true, "switched_to_ranged"
 end

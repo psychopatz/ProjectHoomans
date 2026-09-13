@@ -13,6 +13,8 @@ Effects.ActiveLights = Effects.ActiveLights or {}
 Effects.ActiveTracers = Effects.ActiveTracers or {}
 Effects.SeenShots = Effects.SeenShots or {}
 Effects.Texture = Effects.Texture or (getTexture and getTexture("media/textures/mask_white.png") or nil)
+local NativeEffects = require "PNC/PNC_ClientNativeFirearmEffects"
+Effects.Native = NativeEffects
 
 local function safeMethod(target, methodName, ...)
     local method
@@ -23,6 +25,20 @@ local function safeMethod(target, methodName, ...)
     if type(method) ~= "function" then return nil end
     ok, value = pcall(method, target, ...)
     return ok and value or nil
+end
+
+local function recordNativeFailure(reason)
+    if NativeEffects and NativeEffects.RecordFailure then
+        NativeEffects.RecordFailure(reason)
+    end
+end
+
+local function sameWeaponType(weapon, fullType)
+    local weaponType
+    if not weapon then return false end
+    if not fullType or tostring(fullType) == "" then return true end
+    weaponType = safeMethod(weapon, "getFullType")
+    return tostring(weaponType or "") == tostring(fullType)
 end
 
 local function resolveBody(payload)
@@ -45,12 +61,18 @@ local function resolveBody(payload)
 end
 
 local function resolveWeapon(body, payload)
-    local weapon = body and safeMethod(body, "getPrimaryHandItem") or nil
-    local fullType = weapon and safeMethod(weapon, "getFullType") or nil
-    if weapon and (
-        not payload.weaponFullType
-        or tostring(fullType or "") == tostring(payload.weaponFullType)
-    ) then
+    local weapon
+    if not body then return nil end
+    weapon = safeMethod(body, "getPrimaryHandItem")
+    if sameWeaponType(weapon, payload and payload.weaponFullType) then
+        return weapon
+    end
+    weapon = safeMethod(body, "getUseHandWeapon")
+    if sameWeaponType(weapon, payload and payload.weaponFullType) then
+        return weapon
+    end
+    weapon = safeMethod(body, "getAttackingWeapon")
+    if sameWeaponType(weapon, payload and payload.weaponFullType) then
         return weapon
     end
     return nil
@@ -101,6 +123,11 @@ local function getMuzzlePosition(body, weapon, payload)
         y + (forwardY * forward) + (rightY * right),
         squareZ + up,
         squareZ
+end
+
+function Effects.GetNativeCapabilities(body, payload)
+    local weapon = resolveWeapon(body, payload or {})
+    return NativeEffects.GetCapabilities(body, weapon)
 end
 
 local function playShotAudio(body, weapon, payload)
@@ -196,13 +223,13 @@ local function directionDegrees(sx, sy, tx, ty)
     return radians * 57.29577951308232
 end
 
-local function addTracer(payload)
+local function addTracer(payload, muzzleX, muzzleY, muzzleZ)
     local toScreen = ISCoordConversion and ISCoordConversion.ToScreen
     local screenX
     local screenY
-    local sx = tonumber(payload.sx)
-    local sy = tonumber(payload.sy)
-    local sz = tonumber(payload.sz) or 0
+    local sx = tonumber(muzzleX) or tonumber(payload.sx)
+    local sy = tonumber(muzzleY) or tonumber(payload.sy)
+    local sz = tonumber(muzzleZ) or tonumber(payload.sz) or 0
     local tx = tonumber(payload.tx)
     local ty = tonumber(payload.ty)
     local count = math.max(1, math.min(16, math.floor(tonumber(payload.projectileCount) or 1)))
@@ -259,6 +286,8 @@ function Effects.Play(payload)
     local y
     local z
     local squareZ
+    local nativeResult
+    local nativeReason
     if type(payload) ~= "table" then return false end
     shotId = tostring(payload.shotId or "")
     if shotId ~= "" and Effects.SeenShots[shotId] then
@@ -269,13 +298,21 @@ function Effects.Play(payload)
     end
     body = resolveBody(payload)
     weapon = resolveWeapon(body, payload)
-    x, y, z, squareZ = getMuzzlePosition(body, weapon, payload)
-    if body and body.startMuzzleFlash then
-        pcall(body.startMuzzleFlash, body)
+    nativeResult, nativeReason = NativeEffects.PlayMuzzleFlash(body, weapon)
+    if not nativeResult then
+        recordNativeFailure(nativeReason)
+        x, y, z, squareZ = getMuzzlePosition(body, weapon, payload)
+        spawnLight(x, y, squareZ)
     end
     playShotAudio(body, weapon, payload)
-    spawnLight(x, y, squareZ)
-    addTracer(payload)
+    nativeResult, nativeReason = NativeEffects.PlayTracer(body, weapon, payload)
+    if not nativeResult then
+        recordNativeFailure(nativeReason)
+        if not x then
+            x, y, z = getMuzzlePosition(body, weapon, payload)
+        end
+        addTracer(payload, x, y, z)
+    end
     playImpact(payload)
     return true
 end

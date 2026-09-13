@@ -8,6 +8,7 @@ local shoveCount = 0
 local weaponAnimationCount = 0
 local groundAnimationCount = 0
 local unarmedAnimationCount = 0
+local attackSoundCount = 0
 local grounded = false
 local action
 local canSpendAttack = true
@@ -36,7 +37,7 @@ PNC = {
             canAttack = function() return true end,
             faceTarget = function() end,
             resolveWeaponItem = function() return mode == "armed" and equippedWeapon or nil end,
-            playAttackSound = function() end,
+            playAttackSound = function() attackSoundCount = attackSoundCount + 1 end,
             triggerMeleeWeaponAnim = function()
                 weaponAnimationCount = weaponAnimationCount + 1
                 return "PNC_Attack1H1"
@@ -56,7 +57,8 @@ PNC = {
             -- classification. It must still attack instead of shoving.
             return {
                 primaryType = "barehand",
-                hasWeapon = mode == "armed",
+                hasWeapon = mode == "armed" or mode == "firearm",
+                hasUsableFirearm = mode == "firearm",
             }
         end,
     },
@@ -151,6 +153,20 @@ T.equal(started, true, "armed tactical shove starts")
 T.equal(reason, "pressure_shove", "tactical shove reason")
 T.equal(action.attackKind, "shove", "tactical shove action kind")
 T.equal(shoveCount, 1, "tactical shove animation count")
+
+now = now + 1000
+mode = "firearm"
+action = nil
+local weaponAnimationsBeforeFirearm = weaponAnimationCount
+local soundsBeforeFirearm = attackSoundCount
+started, reason = PNC.Combat.TryMelee(record(), {}, target)
+T.equal(started, true, "firearm fallback melee starts")
+T.equal(reason, "unarmed_attack_started",
+    "firearm fallback melee uses the unarmed lane")
+T.equal(weaponAnimationCount, weaponAnimationsBeforeFirearm,
+    "firearm fallback does not trigger a melee weapon animation")
+T.equal(attackSoundCount, soundsBeforeFirearm,
+    "firearm fallback does not trigger weapon swing audio")
 
 now = now + 1000
 action = nil

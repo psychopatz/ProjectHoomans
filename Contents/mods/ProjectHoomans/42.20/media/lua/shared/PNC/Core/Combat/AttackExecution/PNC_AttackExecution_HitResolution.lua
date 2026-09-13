@@ -10,6 +10,12 @@ local Stamina = PNC.Stamina
 local Resolution = PNC.CombatResolution
 local FirearmEffects = PNC.FirearmEffects
 
+local function commitMeleeImpactAudio(record, action, target)
+    if Internal.commitMeleeImpactAudio then
+        Internal.commitMeleeImpactAudio(record, action, target)
+    end
+end
+
 function Internal.applyAttackActionHit(record, zombie, action, target)
     local zombieTarget
     local attackApplied
@@ -70,6 +76,7 @@ function Internal.applyAttackActionHit(record, zombie, action, target)
                     weaponItem = Internal.resolveWeaponItem(record),
                 })
             if attackApplied then
+                commitMeleeImpactAudio(record, action, target)
                 AttackExecution.applyWeaponWear(record)
                 if Stamina and Stamina.SpendAttack then
                     Stamina.SpendAttack(record, "melee", action.skillID)
@@ -91,6 +98,7 @@ function Internal.applyAttackActionHit(record, zombie, action, target)
                     weaponItem = Internal.resolveWeaponItem(record),
                 })
             if attackApplied then
+                commitMeleeImpactAudio(record, action, target)
                 AttackExecution.applyWeaponWear(record)
                 if Stamina and Stamina.SpendAttack then
                     Stamina.SpendAttack(record, "melee", action.skillID)
@@ -106,6 +114,7 @@ function Internal.applyAttackActionHit(record, zombie, action, target)
         if target.kind == "zombie" then
             attackApplied, attackReason = Internal.applyDamageToZombie(record, zombie, target, action.damage, "melee")
             if attackApplied then
+                commitMeleeImpactAudio(record, action, target)
                 AttackExecution.applyWeaponWear(record)
                 if Stamina and Stamina.SpendAttack then
                     Stamina.SpendAttack(record, "melee", action.skillID)

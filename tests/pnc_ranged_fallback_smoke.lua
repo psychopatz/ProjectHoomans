@@ -133,6 +133,55 @@ T.equal(shoveRecord.equipment.primaryFullType, nil, "barehand equipment synchron
 T.equal(shoveRecord.weaponMode, "melee", "shove mode is melee")
 T.equal(shoveRecord.runtime.forceSyncEvent, "weapon_fallback_shove", "shove sync requested")
 T.equal(equipCalls[2].reason, "combat_shove_fallback", "shove mutation reason")
+
+local mixedRecord = {
+    weaponMode = "mixed",
+    equipment = {
+        primaryFullType = "Base.Pistol",
+        worn = {},
+        attached = {},
+    },
+    inventory = {
+        equipped = { primary = "gun" },
+        items = {
+            gun = {
+                id = "gun",
+                type = "Base.Pistol",
+                equipSlot = "primary",
+            },
+            knife = {
+                id = "knife",
+                type = "Base.HuntingKnife",
+                templateKey = "tmpl:weapon:reserve",
+            },
+        },
+    },
+    runtime = {},
+}
+
+switched, reason = PNC.Equipment.ActivateMeleeFallback(
+    mixedRecord,
+    nil,
+    "mixed_close"
+)
+T.equal(switched, true, "mixed close melee switch")
+T.equal(reason, "switched_to_melee", "mixed close melee reason")
+T.equal(mixedRecord.weaponMode, "mixed",
+    "temporary melee switch preserves mixed loadout mode")
+T.equal(mixedRecord.runtime.weaponFallbackTemporary, true,
+    "temporary melee switch is marked for restoration")
+T.equal(mixedRecord.inventory.equipped.primary, "knife",
+    "mixed close switch equips reserve melee")
+
+switched, reason = PNC.Equipment.RestoreRangedFallback(mixedRecord, nil)
+T.equal(switched, true, "mixed ranged restore")
+T.equal(reason, "switched_to_ranged", "mixed ranged restore reason")
+T.equal(mixedRecord.inventory.equipped.primary, "gun",
+    "mixed ranged restore re-equips original firearm")
+T.equal(mixedRecord.weaponMode, "mixed",
+    "ranged restore preserves mixed loadout mode")
+T.falsy(mixedRecord.runtime.weaponFallbackTemporary,
+    "temporary fallback cleared after ranged restore")
 T.finish("pnc_ranged_fallback_smoke")
 
 T.finish("pnc_ranged_fallback_smoke")

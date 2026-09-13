@@ -98,11 +98,20 @@ local played = {}
 local rendered = 0
 local renderLines = {}
 local muzzleFlash = 0
+local nativeTracerCalls = 0
+local currentUseWeapon
+local controller
 local removedLights = 0
 local impactSound
 local freeEmitterSound
 local liveWeapon = {
     getFullType = function() return "ModdedGuns.TestRifle" end,
+    isAimedFirearm = function() return true end,
+    getMuzzleFlashModelKey = function() return "MuzzleFlash" end,
+    getAmmoType = function() return ammoKey end,
+    getMaxRange = function() return 18 end,
+    getProjectileCount = function() return 3 end,
+    getProjectileSpread = function() return 1.5 end,
     getSwingSound = function() return "LiveModdedRifleShot" end,
     getShellFallSound = function() return "LiveModdedShellFall" end,
     isTwoHandWeapon = function() return true end,
@@ -119,8 +128,15 @@ local body = {
     getZ = function() return 0 end,
     getAnimAngleRadians = function() return 0 end,
     getPrimaryHandItem = function() return liveWeapon end,
+    getUseHandWeapon = function() return currentUseWeapon end,
+    setUseHandWeapon = function(_, value) currentUseWeapon = value end,
+    getAttackingWeapon = function() return currentUseWeapon end,
+    updateBallistics = function() controller = {} end,
+    getBallisticsController = function() return controller end,
+    getAnimationPlayer = function()
+        return { isReady = function() return true end }
+    end,
     getEmitter = function() return emitter end,
-    startMuzzleFlash = function() muzzleFlash = muzzleFlash + 1 end,
 }
 local cell = {
     addLamppost = function() end,
@@ -180,37 +196,48 @@ Events = {
     OnPreUIDraw = { Add = function() end },
     OnResetLua = { Add = function() end },
 }
+local nativeEffectsManager = {
+    startMuzzleFlash = function() muzzleFlash = muzzleFlash + 1 end,
+}
+local nativeBulletTracerEffects = {
+    addEffect = function()
+        nativeTracerCalls = nativeTracerCalls + 1
+        return {}
+    end,
+}
+zombie = {
+    EffectsManager = {
+        getInstance = function() return nativeEffectsManager end,
+    },
+    iso = {
+        objects = {
+            IsoBulletTracerEffects = {
+                getInstance = function() return nativeBulletTracerEffects end,
+            },
+        },
+    },
+}
 
 T.load(CLIENT_FILE)
 
 T.equal(PNC.ClientFirearmEffects.Play(payload), true, "client shot rendered")
 T.equal(played[1], "LiveModdedRifleShot", "live equipped gun sound preferred")
 T.equal(played[2], "LiveModdedShellFall", "live equipped shell sound preferred")
-T.equal(muzzleFlash, 1, "native muzzle hook attempted")
-T.equal(#PNC.ClientFirearmEffects.ActiveLights, 1, "temporary muzzle light added")
-T.equal(#PNC.ClientFirearmEffects.ActiveTracers, 3, "weapon projectile count rendered")
+T.equal(muzzleFlash, 1, "native muzzle flash used")
+T.equal(nativeTracerCalls, 3, "native projectile count rendered")
+T.equal(currentUseWeapon, nil, "temporary native weapon state restored")
+T.equal(#PNC.ClientFirearmEffects.ActiveLights, 0, "fallback light avoided beside native flash")
+T.equal(#PNC.ClientFirearmEffects.ActiveTracers, 0, "fallback tracer avoided beside native tracer")
 T.equal(impactSound, "ModdedBulletImpact", "weapon impact sound")
 T.equal(PNC.ClientFirearmEffects.Play(payload), false, "duplicate shot ignored")
 PNC.ClientFirearmEffects.OnPreUIDraw()
-T.equal(rendered, 3, "each projectile tracer drawn")
-T.truthy(
-    renderLines[1].x1 ~= renderLines[1].x2 or renderLines[1].y1 ~= renderLines[1].y2,
-    "tracer line has no visible length"
-)
-local firstTracerX = renderLines[1].x1
+T.equal(rendered, 0, "native tracers bypass screen-space renderer")
 PNC.ClientFirearmEffects.OnPreUIDraw()
-T.truthy(
-    renderLines[4].x1 ~= firstTracerX,
-    "tracer did not advance between draw frames"
-)
-for _ = 1, 10 do
-    PNC.ClientFirearmEffects.OnPreUIDraw()
-end
-T.equal(#PNC.ClientFirearmEffects.ActiveTracers, 0, "tracers expire after flight")
+T.equal(rendered, 0, "native tracers remain outside fallback renderer")
 PNC.ClientFirearmEffects.OnTick()
 PNC.ClientFirearmEffects.OnTick()
 T.equal(#PNC.ClientFirearmEffects.ActiveLights, 0, "muzzle light cleaned")
-T.equal(removedLights, 1, "muzzle light removed from cell")
+T.equal(removedLights, 0, "native muzzle light is engine-owned")
 
 PNC.Network.FindZombieByOnlineID = function() return nil end
 local remotePayload = {}

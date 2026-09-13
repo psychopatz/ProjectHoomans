@@ -16,6 +16,8 @@ local calls = {
     play = 0,
     pump = 0,
     sync = 0,
+    lastPlayOptions = nil,
+    lastMaintainOptions = nil,
 }
 local now = 1000
 local engineMovementActive
@@ -43,14 +45,16 @@ PNC = {
             calls.finish = calls.finish + 1
             zombie:getModData().PNC_BumpReleasePending = true
         end,
-        PlayBump = function(zombie, _, anim)
+        PlayBump = function(zombie, _, anim, options)
             calls.play = calls.play + 1
+            calls.lastPlayOptions = options
             if zombie and zombie.setBumpType then
                 zombie:setBumpType(anim)
             end
         end,
-        MaintainBump = function(zombie, _, anim)
+        MaintainBump = function(zombie, _record, anim, _leaseUntil, options)
             calls.maintain = calls.maintain + 1
+            calls.lastMaintainOptions = options
             if zombie and zombie.setBumpType then
                 zombie:setBumpType(anim)
             end
@@ -471,6 +475,43 @@ PNC.ClientPresenceSync.Internal.ApplySnapshotToBody(
 )
 T.truthy(calls.finish == finishesBeforeScene + 1,
     "MP animation scene did not release on stop")
+
+local sleepSceneBody = body()
+local sleepSceneSnapshot = {
+    id = "sleep_scene_replica",
+    alive = true,
+    attackMode = false,
+    healthState = "normal",
+    presenceRevision = 1,
+    presenceState = "live",
+    visualState = {
+        anim = "Sleep",
+        moving = false,
+        sceneActive = true,
+        sceneId = "facility.sleep.floor",
+        sceneBump = "Sleep",
+        sceneRevision = 6,
+        scenePlaybackRevision = 1,
+        sceneStartedAt = 3500,
+        sceneFinishAt = 0,
+        sceneLoop = true,
+        sceneBlocking = true,
+    },
+}
+PNC.ClientPresenceSync.Internal.ApplySnapshotToBody(
+    sleepSceneSnapshot,
+    sleepSceneBody,
+    true
+)
+T.equal(calls.lastPlayOptions.keepManagedUseless, true,
+    "MP sleep scene did not retain managed-body isolation")
+PNC.ClientPresenceSync.Internal.ApplySnapshotToBody(
+    sleepSceneSnapshot,
+    sleepSceneBody,
+    true
+)
+T.equal(calls.lastMaintainOptions.keepManagedUseless, true,
+    "MP sleep scene lease was not maintained with body isolation")
 
 -- A remote drink snapshot must remain retryable when a native passage still
 -- owns the body-local bump channel. Latching the scene key on a rejected

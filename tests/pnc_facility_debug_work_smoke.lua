@@ -9,6 +9,12 @@ local positioned
 local facing
 local pathResets = 0
 local worldHour = 10
+local sleepSurfaceSat
+local sleepResting
+local sleepBed
+local sleepWakePumps = 0
+local sleepAwakeFinished = false
+local sleepAwakePlays = 0
 PNC = {
     Const = { PRESENCE_LIVE = "live" },
     Core = {
@@ -116,10 +122,22 @@ local bedZombie = {
     getX = function() return 11.5 end,
     getY = function() return 5.5 end,
     getZ = function() return 0 end,
+    setSitOnFurnitureObject = function(_, value) end,
+    setSitOnFurnitureDirection = function(_, value) end,
+    setIsResting = function(_, value) sleepResting = value end,
+    setBed = function(_, value) sleepBed = value end,
+    reportEvent = function() end,
+    setOnFloor = function() end,
+    setSitOnGround = function() end,
+    clearVariable = function() end,
+    getVariableBoolean = function(_, key)
+        return key == "BumpAnimFinished" and sleepAwakeFinished
+            or false
+    end,
     setForwardIsoDirection = function(_, value) facing = value end,
 }
 local bedObject = {
-    setSatChair = function() end,
+    setSatChair = function(_, value) sleepSurfaceSat = value end,
 }
 PNC.SleepRuntime.LiveObjects["npc:bed"] = bedObject
 local bedRecord = {
@@ -136,6 +154,53 @@ T.equal(facing, "east", "bed sleeper follows furniture axis")
 T.equal(requestedScene, "facility.sleep.bed", "bed XML scene selected")
 T.equal(bedRecord.runtime.facilityActivity.sleepSurface, "bed",
     "runtime exposes selected sleep surface")
+
+T.equal(sleepResting, true, "bed sleeper enters native resting state")
+T.equal(sleepBed, bedObject, "bed sleeper retains its native bed object")
+T.equal(sleepSurfaceSat, true, "bed surface is occupied during sleep")
+sleepWakePumps = 0
+PNC.Animation = {
+    PlayBump = function(_, _, bump)
+        if bump == "AwakeBed" then sleepAwakePlays = sleepAwakePlays + 1 end
+        return true
+    end,
+    MaintainBump = function() end,
+    FinishBump = function() end,
+    PumpBumpRelease = function()
+        sleepWakePumps = sleepWakePumps + 1
+        return sleepWakePumps == 1
+    end,
+}
+PNC.FacilityJobs.OnSceneStopped(
+    bedRecord,
+    bedZombie,
+    { id = "facility.sleep.bed" },
+    "interrupted:combat"
+)
+bedRecord.runtime.animationScene = nil
+T.equal(bedRecord.runtime.facilityActivity.sleepWakePending, true,
+    "sleep interruption enters the wake transaction")
+T.equal(sleepResting, true,
+    "sleep interruption clears resting state only after bump release")
+T.equal(sleepSurfaceSat, true,
+    "sleep interruption clears furniture occupancy only after bump release")
+T.equal(handler(bedRecord, bedZombie, jobName, 0), true,
+    "sleep wake waits for the native bump release boundary")
+T.equal(bedRecord.runtime.facilityActivity.sleepWakePending, true,
+    "sleep wake transaction ended before native release")
+sleepAwakeFinished = true
+T.equal(handler(bedRecord, bedZombie, jobName, 0), true,
+    "sleep wake starts the bed wake animation")
+T.equal(sleepAwakePlays, 1, "bed wake animation was not started")
+T.equal(handler(bedRecord, bedZombie, jobName, 0), true,
+    "sleep wake completes after the bed wake animation")
+T.equal(bedRecord.runtime.facilityActivity, nil,
+    "interrupted sleep activity is cleared after waking")
+T.equal(sleepResting, false,
+    "waking clears the native resting state")
+T.equal(sleepBed, nil, "waking clears the native bed object")
+T.equal(sleepSurfaceSat, false,
+    "waking releases the furniture occupancy")
 
 local seatSat
 local seatSitting

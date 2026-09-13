@@ -112,6 +112,26 @@ function Internal.OnSceneStopped(record, zombie, scene, reason)
                 .. " completionRequested="
                 .. tostring(runtime.completionRequested == true))
     end
+    if capability == "sleep" then
+        if reason == "interrupted:externalBump" then
+            -- An external bump is about to replace the sleep selector. There
+            -- is no deferred PNC sleep release to wait for in this path, so
+            -- finish the facility activity without touching the incoming
+            -- bump lease.
+            runtime.sleepSceneActive = false
+            Internal.ClearSleepSurface(record, zombie, runtime)
+            Internal.RestorePosition(record, zombie, runtime)
+            runtime.arrivalSettled = false
+            Internal.Finish(record, zombie, "sleep_external_bump")
+            return
+        end
+        -- Sleep cleanup is a transaction. FinishBump releases through the
+        -- native action context on a later pump, so do not clear bed/resting
+        -- state in this callback while the old sleep pose still owns the
+        -- carrier.
+        Internal.BeginSleepWake(record, zombie, reason)
+        return
+    end
     runtime.sleepSceneActive = false
     Internal.ClearSleepSurface(record, zombie, runtime)
     Internal.ClearFurnitureSeat(record, zombie, runtime)

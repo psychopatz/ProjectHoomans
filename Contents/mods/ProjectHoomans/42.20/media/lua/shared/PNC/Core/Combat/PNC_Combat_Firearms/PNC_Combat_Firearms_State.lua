@@ -22,13 +22,14 @@ function Firearms.HasUnlimitedReserve(record)
     return not Firearms.UsesInventoryAmmo(record)
 end
 
-function Firearms.Describe(record, weaponItem)
+function Firearms.Describe(record, weaponItem, character)
     local fullType = Internal.FullTypeOf(record, weaponItem)
     local scriptItem = Internal.ScriptItemFor(fullType)
     local weaponFamily
     local reloadFamily
     local ammoType
     local manuallyRemoveSpentRounds
+    local maxRange
     if not fullType then return nil end
     weaponFamily, reloadFamily = Internal.ResolveFamily(fullType, scriptItem)
     ammoType = Internal.SafeMethod(weaponItem, "getAmmoType")
@@ -37,6 +38,12 @@ function Firearms.Describe(record, weaponItem)
     if manuallyRemoveSpentRounds == nil then
         manuallyRemoveSpentRounds = Internal.SafeMethod(scriptItem, "isManuallyRemoveSpentRounds")
     end
+    if character then
+        maxRange = Internal.SafeMethod(weaponItem, "getMaxRange", character)
+    end
+    maxRange = tonumber(maxRange)
+        or tonumber(Internal.SafeMethod(weaponItem, "getMaxRange"))
+        or tonumber(Internal.SafeMethod(scriptItem, "getMaxRange"))
     return {
         fullType = fullType,
         -- Build 42 returns an ItemKey here, while older/modded weapons may
@@ -68,8 +75,7 @@ function Firearms.Describe(record, weaponItem)
         projectileSpread = tonumber(Internal.SafeMethod(weaponItem, "getProjectileSpread"))
             or tonumber(Internal.SafeMethod(scriptItem, "getProjectileSpread"))
             or 0,
-        maxRange = tonumber(Internal.SafeMethod(weaponItem, "getMaxRange"))
-            or tonumber(Internal.SafeMethod(scriptItem, "getMaxRange")),
+        maxRange = maxRange,
         piercing = Internal.SafeMethod(weaponItem, "isPiercingBullets") == true
             or Internal.SafeMethod(scriptItem, "isPiercingBullets") == true,
         impactSound = Internal.SafeMethod(weaponItem, "getImpactSound")

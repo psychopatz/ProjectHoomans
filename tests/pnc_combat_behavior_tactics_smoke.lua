@@ -57,6 +57,10 @@ PNC = {
                 hasWeapon = true,
             }
         end,
+        ActivateMeleeFallback = function(_, _, reason)
+            calls[#calls + 1] = "fallback:" .. tostring(reason)
+            return true, "switched_to_melee"
+        end,
         ApplyCombatState = function() end,
     },
     CombatTactics = {
@@ -142,7 +146,9 @@ mode = "mixed"
 target.distSq = 2.25
 PNC.BehaviorCombat.TickEngage(record, {}, target)
 T.equal(calls[1], "pre", "mixed close-range precheck runs")
-T.equal(calls[2], "melee",
+T.equal(calls[2], "fallback:mixed_close",
+    "mixed close-range selects the melee lane")
+T.equal(calls[3], "melee",
     "mixed close-range combat commits melee before ranged spacing")
 for i = 1, #calls do
     T.truthy(calls[i] ~= "spacing",

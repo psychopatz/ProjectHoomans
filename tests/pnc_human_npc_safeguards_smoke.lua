@@ -325,6 +325,41 @@ modData.PNC_BumpRequestedType = nil
 modData.PNC_BumpKeepUseless = nil
 managedRecord = nil
 
+-- Sleeping owns the native carrier just like a chair. Repair a stale legacy
+-- sleep lease and a vanilla alert/path state without suppressing ordinary
+-- combat outside the sleep presentation.
+actionState = "pathfind"
+useless = false
+vanillaTarget = {}
+managedRecord = {
+    runtime = {
+        facilityActivity = {
+            capability = "sleep",
+            sleepSceneActive = true,
+            phase = "SLEEPING",
+            arrivalSettled = true,
+        },
+    },
+}
+modData.PNC_BumpActionLease = true
+modData.PNC_BumpActionLeaseUntil = 10000
+modData.PNC_BumpRequestedType = "PNC_Sleep"
+modData.PNC_BumpKeepUseless = false
+zombieUpdateHandler(managedBody)
+T.equal(actionState, "idle",
+    "sleeping carrier retained the native pathfinding state")
+T.equal(useless, true,
+    "sleeping carrier did not retain human-shell isolation")
+T.equal(vanillaTarget, nil,
+    "sleeping carrier retained a native target")
+T.equal(modData.PNC_BumpKeepUseless, true,
+    "sleep lease was allowed to restore engine movement ownership")
+modData.PNC_BumpActionLease = nil
+modData.PNC_BumpActionLeaseUntil = nil
+modData.PNC_BumpRequestedType = nil
+modData.PNC_BumpKeepUseless = nil
+managedRecord = nil
+
 local panic = 2
 local visibleZombies = 0
 local chasingZombies = 0

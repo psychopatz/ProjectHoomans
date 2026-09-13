@@ -22,6 +22,20 @@ local function isFurnitureSeatingScene(sceneId)
     return nil
 end
 
+local function isSleepScene(sceneId)
+    return string.find(
+        tostring(sceneId or ""),
+        "facility.sleep.",
+        1,
+        true
+    ) == 1
+end
+
+local function keepsManagedBodyUseless(sceneId)
+    return isFurnitureSeatingScene(sceneId) == true
+        or isSleepScene(sceneId) == true
+end
+
 local function isWaterScene(sceneId)
     return string.find(
         tostring(sceneId or ""),
@@ -172,7 +186,7 @@ local function syncAnimationScene(
                 {
                     sceneId = presentation.id,
                     leaseUntil = presentation.leaseUntil,
-                    keepManagedUseless = isFurnitureSeatingScene(
+                    keepManagedUseless = keepsManagedBodyUseless(
                         presentation.id
                     ),
                 }
@@ -210,7 +224,7 @@ local function syncAnimationScene(
             presentation.leaseUntil,
             {
                 sceneId = presentation.id,
-                keepManagedUseless = isFurnitureSeatingScene(
+                keepManagedUseless = keepsManagedBodyUseless(
                     presentation.id
                 ),
             }

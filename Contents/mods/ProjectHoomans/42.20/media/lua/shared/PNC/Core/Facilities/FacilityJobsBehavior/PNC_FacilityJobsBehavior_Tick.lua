@@ -72,6 +72,12 @@ function Internal.Tick(record, zombie)
         order = runtime.activityOrder
         definition = Definitions.Get(order.capability)
     end
+    if runtime and runtime.sleepWakePending == true
+        and Internal.TickSleepWake
+    then
+        Internal.TickSleepWake(record, zombie)
+        return true
+    end
     if order.kind ~= KIND or not runtime then return false end
     if not definition then
         -- A save can contain a pre-migration spigot activity. It has no
@@ -126,6 +132,17 @@ function Internal.Tick(record, zombie)
     if previousSleep and (Internal.SleepTargetChanged(order, runtime, previousSleep)
         or previousSleep.object ~= Internal.LiveSleepObject(record, runtime))
     then
+        if runtime.animationScene
+            and tostring(runtime.capability or "") == "sleep"
+            and PNC.AnimationScenes
+            and PNC.AnimationScenes.Interrupt
+        then
+            -- Do not detach a bed/sofa from a live sleep animation. Let the
+            -- scene owner complete its wake transaction before a refreshed
+            -- target can start a new approach.
+            PNC.AnimationScenes.Interrupt(record, zombie, "movement")
+            return true
+        end
         if runtime.sleepSurfaceEntered == true
             or previousSleep.object ~= nil
         then
@@ -376,6 +393,16 @@ function Internal.Tick(record, zombie)
         runtime.lastProgressReason = "facility_scene_starting"
         runtime.lastEffectWorldHour = PNC.NeedsUtils
             and PNC.NeedsUtils.WorldAgeHours() or nil
+        if tostring(runtime.capability or "") == "sleep"
+            and PNC.LiveBodyControl
+            and PNC.LiveBodyControl.StabilizeSleepingBody
+        then
+            PNC.LiveBodyControl.StabilizeSleepingBody(
+                record,
+                zombie,
+                startupNow
+            )
+        end
         started, startReason = PNC.AnimationScenes.Request(record, zombie, sceneId, {
             reason = "facility_" .. tostring(order.capability),
             repeatMode = definition.completeWithScene == true

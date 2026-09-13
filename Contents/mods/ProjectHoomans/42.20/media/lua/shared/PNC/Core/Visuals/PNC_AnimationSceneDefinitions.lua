@@ -132,6 +132,9 @@ Scenes.Register("facility.sleep.floor", {
     priority = 45,
     repeatMode = "loop",
     blocking = true,
+    -- Sleeping is a presentation lease. Keep the managed body useless so
+    -- the vanilla zombie brain cannot reacquire alert/pathing ownership.
+    keepManagedUseless = true,
     interrupts = {
         movement = true,
         combat = true,
@@ -161,6 +164,9 @@ Scenes.Register("facility.sleep.bed", {
     priority = 45,
     repeatMode = "loop",
     blocking = true,
+    -- Sleeping is a presentation lease. Keep the managed body useless so
+    -- the vanilla zombie brain cannot reacquire alert/pathing ownership.
+    keepManagedUseless = true,
     interrupts = {
         movement = true,
         combat = true,
@@ -261,6 +267,9 @@ Scenes.Register("facility.sleep.sofa", {
     priority = 45,
     repeatMode = "loop",
     blocking = true,
+    -- Sleeping is a presentation lease. Keep the managed body useless so
+    -- the vanilla zombie brain cannot reacquire alert/pathing ownership.
+    keepManagedUseless = true,
     interrupts = {
         movement = true,
         combat = true,
