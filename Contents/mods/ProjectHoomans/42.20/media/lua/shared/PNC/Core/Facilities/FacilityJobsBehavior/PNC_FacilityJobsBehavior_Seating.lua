@@ -112,7 +112,6 @@ function Internal.RefreshLiveSeatTarget(record, zombie, runtime, order)
     order.routeStatus = spot.routeStatus or "UNTESTED"
     order.stopDistance = SEAT_STOP_DISTANCE
     order.arrivalDistance = SEAT_ARRIVAL_TOLERANCE
-    runtime.target = { x = spot.x, y = spot.y, z = spot.z }
     runtime.seatDirection = tostring(spot.direction or "")
     runtime.seatSide = tostring(spot.side or "")
     runtime.approachKey = tostring(spot.approachKey or "")

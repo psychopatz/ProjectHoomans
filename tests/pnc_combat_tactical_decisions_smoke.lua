@@ -116,6 +116,10 @@ PNC = {
         end,
     },
     BehaviorCommon = {
+        SetCombatTarget = function(record, target)
+            record.runtime.target = target
+            return true
+        end,
         GetOwner = function()
             return {
                 getX = function() return 10 end,

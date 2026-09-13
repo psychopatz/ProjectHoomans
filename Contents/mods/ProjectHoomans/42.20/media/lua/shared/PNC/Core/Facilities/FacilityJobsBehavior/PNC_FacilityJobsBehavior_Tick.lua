@@ -272,7 +272,6 @@ function Internal.Tick(record, zombie)
     runtime.sleepSurface = order.sleepSurface
     distance = Internal.BodyDistance(zombie, order.x, order.y)
         or PNC.Core.Distance(record.x, record.y, order.x, order.y)
-    runtime.target = { x = order.x, y = order.y, z = order.z }
     runtime.distance = distance
     arrivalDistance = runtime.seating == true
         and (tonumber(runtime.seatArrivalDistance)

@@ -46,6 +46,11 @@ PNC = {
         end,
     },
     BehaviorCommon = {
+        SetCombatTarget = function(record, target)
+            record.runtime = record.runtime or {}
+            record.runtime.target = target
+            return true
+        end,
         ClearCombatTarget = function(record)
             record.runtime = record.runtime or {}
             record.runtime.target = nil

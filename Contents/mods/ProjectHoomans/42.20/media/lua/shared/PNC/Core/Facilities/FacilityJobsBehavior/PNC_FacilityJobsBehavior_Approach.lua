@@ -59,7 +59,6 @@ local function retryApproach(record, zombie, order, runtime, options)
     runtime.approachIndex = nextIndex
     order.x, order.y, order.z = candidate.x, candidate.y, candidate.z
     options.apply(order, runtime, candidate)
-    runtime.target = { x = order.x, y = order.y, z = order.z }
     runtime.distance = nil
     runtime.phase = "REPATHING"
     Internal.ResetPath(record, zombie, options.resetReason)

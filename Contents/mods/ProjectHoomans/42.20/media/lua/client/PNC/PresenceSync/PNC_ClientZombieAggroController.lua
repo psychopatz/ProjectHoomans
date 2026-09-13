@@ -545,6 +545,23 @@ local function shouldRefreshPath(zombie, targetX, targetY, now)
     return true
 end
 
+local function requestCoordinatePath(zombie, targetX, targetY, targetZ)
+    local aggro = PNC.ZombieAggro
+    if aggro and aggro.RequestCoordinatePath then
+        return aggro.RequestCoordinatePath(
+            zombie,
+            targetX,
+            targetY,
+            targetZ
+        )
+    end
+    if zombie.pathToLocationF then
+        zombie:pathToLocationF(targetX, targetY, targetZ)
+        return true
+    end
+    return false
+end
+
 local function applySingleplayerAggro(zombie, body, distanceSq, now)
     clearHeldItems(zombie)
     -- PNC bodies are IsoZombie shells. Build 42's native attack and window
@@ -573,13 +590,12 @@ local function applySingleplayerAggro(zombie, body, distanceSq, now)
             now
         )
         then
-            if zombie.pathToLocationF then
-                zombie:pathToLocationF(
-                    body:getX(),
-                    body:getY(),
-                    body:getZ()
-                )
-            end
+            requestCoordinatePath(
+                zombie,
+                body:getX(),
+                body:getY(),
+                body:getZ()
+            )
         end
     else
         if zombie.faceLocation then
@@ -634,8 +650,7 @@ local function applyMultiplayerAggro(
         -- Coordinate movement keeps the shell out of native character-goal
         -- combat/traversal states even if this compatibility lane is called
         -- directly by a future multiplayer controller.
-        if zombie.pathToLocationF then
-            zombie:pathToLocationF(targetX, targetY, targetZ)
+        if requestCoordinatePath(zombie, targetX, targetY, targetZ) then
             pathRequested = true
         elseif PNC.PerformanceScalingDiagnostics
             and PNC.PerformanceScalingDiagnostics.Increment

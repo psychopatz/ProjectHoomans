@@ -28,14 +28,15 @@ function Internal.EngageResolvedTarget(record, zombie, target, constraint)
         Common.ClearCombatTarget(record, "target_outside_order_leash", zombie)
         return false
     end
-    record.runtime.target = target
+    if not Common.SetCombatTarget(record, target, "companion_threat") then
+        return false
+    end
     if Stealth and Stealth.SuspendForCombat then
         Stealth.SuspendForCombat(record, "combat_target")
     else
         record.runtime.stealthActive = false
     end
-    BehaviorCombat.TickEngage(record, zombie, target)
-    return true
+    return BehaviorCombat.TickEngage(record, zombie, target) ~= false
 end
 
 function Internal.ResolveThreatTarget(record, constraint, options)

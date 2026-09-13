@@ -55,6 +55,55 @@ local function setNoLungeAttack(zombie, disabled)
     end
 end
 
+local function incrementDiagnostic(name, amount)
+    if Diagnostics and Diagnostics.Increment then
+        Diagnostics.Increment(name, amount)
+    end
+end
+
+local function actionStateName(zombie)
+    return zombie
+        and zombie.getActionStateName
+        and string.lower(tostring(zombie:getActionStateName() or ""))
+        or ""
+end
+
+-- Use the vanilla coordinate-goal API without ever creating an NPC character
+-- goal. When a zombie is already in PathFindState, calling the character
+-- wrapper can be ignored by IsoZombie's allowRepathDelay guard. PathFindState
+-- already owns Behavior2:update(), so update its location goal directly in
+-- that state. In all other states the public wrapper remains responsible for
+-- entering the normal pathfind/movement animation contract.
+function ZombieAggro.RequestCoordinatePath(zombie, targetX, targetY, targetZ)
+    local behavior
+    local state
+    if not zombie then
+        return false, "missing_zombie"
+    end
+    behavior = zombie.getPathFindBehavior2
+        and zombie:getPathFindBehavior2() or nil
+    state = actionStateName(zombie)
+    if state == "pathfind"
+        and behavior
+        and behavior.pathToLocationF
+    then
+        behavior:pathToLocationF(targetX, targetY, targetZ)
+        incrementDiagnostic("ZombieAggro.Behavior2PathRequests")
+        return true, "behavior2"
+    end
+    if zombie.pathToLocationF then
+        zombie:pathToLocationF(targetX, targetY, targetZ)
+        incrementDiagnostic("ZombieAggro.CharacterPathRequests")
+        return true, "character_wrapper"
+    end
+    if behavior and behavior.pathToLocationF then
+        behavior:pathToLocationF(targetX, targetY, targetZ)
+        incrementDiagnostic("ZombieAggro.Behavior2FallbackRequests")
+        return true, "behavior2_fallback"
+    end
+    return false, "path_api_unavailable"
+end
+
 local function suppressForStealth(zombie, record)
     Internal.clearZombieTarget(zombie)
     ZombieAggro.ClearBiteEntryForZombie(zombie)
@@ -108,19 +157,24 @@ local function refreshPursuitPath(zombie, npcBody, now)
     -- animation event dereferences player-only state such as Moodles and
     -- BodyDamage. Keep SP pursuit coordinate-only; the abstract bite lane
     -- owns NPC damage separately.
-    if zombie.pathToLocationF then
+    local requested
+    if ZombieAggro.RequestCoordinatePath then
+        requested = ZombieAggro.RequestCoordinatePath(
+            zombie,
+            targetX,
+            targetY,
+            npcBody:getZ()
+        )
+    elseif zombie.pathToLocationF then
         zombie:pathToLocationF(targetX, targetY, npcBody:getZ())
+        requested = true
+    end
+    if requested then
         if Diagnostics then
             Diagnostics.Increment("ZombieAggro.PathRequests")
         end
     end
     return true
-end
-
-local function incrementDiagnostic(name, amount)
-    if Diagnostics and Diagnostics.Increment then
-        Diagnostics.Increment(name, amount)
-    end
 end
 
 local function isMPDirectiveServer()
@@ -257,6 +311,7 @@ local function pursueForcedTarget(zombie, npcBody, record, now)
     local dist
     local zombieSquare
     local npcSquare
+    local stimulusEmitted = false
     if npcBody.setZombiesDontAttack then
         -- This flag protects the IsoZombie shell from vanilla zombie attack
         -- acquisition. PNC's abstract bite lane does not use the native
@@ -275,16 +330,20 @@ local function pursueForcedTarget(zombie, npcBody, record, now)
             distSq
         )
     end
-    if isMultiplayerServer() then
-        -- In MP the server selects the target, while the client that owns
-        -- this zombie performs native movement through the vanilla sound
-        -- responder. Never put the NPC shell in native combat slots.
+    if isMultiplayerServer() or not (isClient and isClient() == true) then
+        -- The server selects the target in MP. In SP the local authority uses
+        -- the same vanilla responder locally. Both routes are coordinate-only
+        -- and never put the NPC shell in native combat slots.
         setNoLungeAttack(zombie, true)
         if dist >= Const.ZOMBIE_BITE_DISTANCE
             and ZombieAggro.Stimulus
             and ZombieAggro.Stimulus.Emit
         then
-            ZombieAggro.Stimulus.Emit(record, npcBody, now)
+            stimulusEmitted = ZombieAggro.Stimulus.Emit(
+                record,
+                npcBody,
+                now
+            ) == true
         end
     else
         -- The client-side SP controller owns the abstract NPC damage gate.
@@ -318,7 +377,9 @@ local function pursueForcedTarget(zombie, npcBody, record, now)
             -- while a pursuit is active; distant zombies retain engine tiering.
             zombie:setUseless(false)
         end
-        refreshPursuitPath(zombie, npcBody, now)
+        if not stimulusEmitted then
+            refreshPursuitPath(zombie, npcBody, now)
+        end
     end
 end
 
@@ -399,8 +460,8 @@ local function processZombie(zombie, now)
     end
 
     -- A recent NPC provocation wins for a bounded lease. This must be checked
-    -- before vanilla's nearby-player target or NPC hits are immediately lost,
-    -- but a genuinely nearer player still wins the ordinary movement choice.
+    -- before vanilla's nearby-player target or NPC hits are immediately lost;
+    -- only an immediate player threat can preempt that lease.
     record, npcBody = Internal.getForcedNPCBodyTarget(zombie, now)
     if isMultiplayerServer() and record and npcBody then
         nearestPlayer, nearestPlayerDistSq = Internal.findNearestLivePlayer(
@@ -413,7 +474,17 @@ local function processZombie(zombie, now)
             npcBody:getX(),
             npcBody:getY()
         )
-        if nearestPlayer and nearestPlayerDistSq <= forcedNPCDistSq then
+        -- A valid NPC lease is the authoritative pursuit decision. Only an
+        -- actually closer player inside the immediate-threat radius may
+        -- preempt it; a merely nearer player elsewhere must not erase the
+        -- NPC stimulus before the owning client can react.
+        local immediateThreatRadius = tonumber(
+            Const.TARGET_IMMEDIATE_THREAT_RADIUS
+        ) or 6
+        if nearestPlayer
+            and nearestPlayerDistSq <= forcedNPCDistSq
+            and nearestPlayerDistSq <= immediateThreatRadius * immediateThreatRadius
+        then
             Internal.clearZombieTarget(zombie)
             clearMPTargetDirective(zombie, now)
             acquireNearestTarget(zombie)

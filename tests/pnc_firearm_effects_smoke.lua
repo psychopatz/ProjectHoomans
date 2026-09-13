@@ -6,6 +6,7 @@ local CLIENT_FILE = T.path("ProjectHoomans", "client", "PNC/PNC_ClientFirearmEff
 local now = 1000
 local published
 local worldNoise
+local auditEvents = {}
 local ammoKey = {
     getItemKey = function() return "ModdedAmmo.556Tracer" end,
 }
@@ -54,6 +55,13 @@ PNC = {
         Now = function() return now end,
         IsAuthority = function() return true end,
     },
+    PerformanceScalingDiagnostics = {
+        FirearmAuditEnabled = true,
+        LogFirearmAudit = function(eventName)
+            auditEvents[eventName] = (auditEvents[eventName] or 0) + 1
+            return true
+        end,
+    },
     Firearms = {},
     Network = {
         GetZombieOnlineID = function() return 77 end,
@@ -93,6 +101,9 @@ T.equal(payload.projectileSpread, 1.5, "modded projectile spread")
 T.equal(payload.shellFallSound, "ModdedShellFall", "modded shell sound")
 T.equal(worldNoise.radius, 95, "weapon-driven world noise radius")
 T.equal(worldNoise.volume, 48, "weapon-driven world noise volume")
+T.truthy(auditEvents.emit_start, "firearm audit recorded authority entry")
+T.truthy(auditEvents.payload_built, "firearm audit recorded payload build")
+T.truthy(auditEvents.emit_complete, "firearm audit recorded authority dispatch")
 
 local played = {}
 local rendered = 0
@@ -261,9 +272,24 @@ T.equal(PNC.ClientFirearmEffects.Play(remotePayload), true, "unresolved remote s
 T.equal(freeEmitterSound, "ModdedRifleShot", "remote positional emitter uses packet weapon sound")
 T.equal(lightCreated, 1, "Bandits-compatible muzzle light created")
 T.equal(lastLight.args[8], 1, "muzzle light uses one-tick lifetime")
+T.equal(lastLight.args[4], 0.82, "muzzle light uses softened red channel")
+T.equal(lastLight.args[5], 0.70, "muzzle light uses softened green channel")
+T.equal(lastLight.args[6], 0.54, "muzzle light uses softened blue channel")
+T.equal(lastLight.args[7], 12, "muzzle light uses reduced radius")
+T.equal(#PNC.ClientFirearmEffects.ActiveMuzzleFlashes, 1,
+    "fallback muzzle flash queued at the weapon-forward point")
 T.equal(#PNC.ClientFirearmEffects.ActiveTracers, 3, "fallback tracers queued")
 PNC.ClientFirearmEffects.OnPreUIDraw()
 T.equal(rendered > 0, true, "fallback firearm effects rendered")
+T.truthy(renderLines[1], "fallback muzzle/tracer renderline submitted")
+T.truthy(renderLines[1].x1 ~= renderLines[1].x2
+    or renderLines[1].y1 ~= renderLines[1].y2,
+    "fallback renderline has visible trajectory")
+T.truthy(auditEvents.play_start, "firearm audit recorded client entry")
+T.truthy(auditEvents.muzzle_light_complete, "firearm audit recorded muzzle light")
+T.truthy(auditEvents.tracer_screen_queue_complete, "firearm audit recorded tracer queue")
+T.truthy(auditEvents.draw_begin, "firearm audit recorded draw entry")
+T.truthy(auditEvents.draw_renderline_complete, "firearm audit recorded renderline")
 T.finish("pnc_firearm_effects_smoke")
 
 T.finish("pnc_firearm_effects_smoke")

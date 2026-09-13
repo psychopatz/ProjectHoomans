@@ -17,11 +17,62 @@ local Tactics = PNC.CombatTactics
 local Defense = PNC.CombatDefense
 local Common = PNC.BehaviorCommon
 local PathService = PNC.PathService
+local Diagnostics = PNC.PerformanceScalingDiagnostics
 local COMBAT_NAVIGATION = {
     navigationPolicy = "combat",
     navigationProvider = "engine_path",
 }
 local maintainRangedSpacing
+
+local function logRangedDecision(context, attacked, reason, debugMode)
+    local record
+    local runtime
+    local state
+    local key
+    local now
+    local fields
+    if not Diagnostics
+        or Diagnostics.FirearmAuditEnabled ~= true
+        or type(Diagnostics.LogFirearmAudit) ~= "function"
+        or not context
+        or not context.record
+    then
+        return false
+    end
+    record = context.record
+    runtime = record.runtime or {}
+    record.runtime = runtime
+    state = runtime.firearmAuditRanged or {}
+    runtime.firearmAuditRanged = state
+    key = tostring(attacked == true) .. "|" .. tostring(reason or "")
+    now = Core.Now()
+    -- Failed tactical checks are sampled on reason changes or once per second;
+    -- successful shots are always recorded because they are the pipeline entry.
+    if attacked ~= true
+        and state.key == key
+        and (now - (tonumber(state.at) or 0)) < 1000
+    then
+        return false
+    end
+    state.key = key
+    state.at = now
+    fields = {
+        "side=authority",
+        "shotId=unassigned",
+        "npc=" .. tostring(record.id or ""),
+        "class=" .. tostring(record.tacticalClass or "unknown"),
+        "faction=" .. tostring(record.affiliation
+            and record.affiliation.factionID or ""),
+        "hostility=" .. tostring(record.hostility
+            and record.hostility.mode or ""),
+        "decision=" .. tostring(attacked == true and "attack_started" or "blocked"),
+        "reason=" .. tostring(reason or ""),
+        "debugMode=" .. tostring(debugMode or ""),
+        "distance=" .. tostring(context.distance or ""),
+        "t=" .. tostring(now),
+    }
+    return Diagnostics.LogFirearmAudit("ranged_decision", fields)
+end
 
 local function setDebug(context, reason, mode, weaponStatus)
     Common.SetCombatDebug(
@@ -437,6 +488,7 @@ local function handleRanged(context, debugMode, stopFactor)
         context.zombie,
         context.target
     )
+    logRangedDecision(context, attacked, reason, debugMode)
     if attacked then
         clearRetreatFor(context)
         haltForAttack(context, "attacking_ranged")

@@ -16,14 +16,16 @@ local function prepareImpact(entry, record, zombie, npcBody, now)
     if npcBody.setPlayerAttackPosition and npcBody.testDotSide then
         npcBody:setPlayerAttackPosition(npcBody:testDotSide(zombie))
     end
-    record.runtime.target = {
-        kind = "zombie",
-        zombieId = entry.zombieId,
-        x = zombie:getX(), y = zombie:getY(), z = zombie:getZ(),
-        distSq = Core.DistanceSq(
-            zombie:getX(), zombie:getY(), npcBody:getX(), npcBody:getY()
-        ),
-    }
+    if PNC.BehaviorCommon and PNC.BehaviorCommon.SetCombatTarget then
+        PNC.BehaviorCommon.SetCombatTarget(record, {
+            kind = "zombie",
+            zombieId = entry.zombieId,
+            x = zombie:getX(), y = zombie:getY(), z = zombie:getZ(),
+            distSq = Core.DistanceSq(
+                zombie:getX(), zombie:getY(), npcBody:getX(), npcBody:getY()
+            ),
+        }, "zombie_bite")
+    end
     record.runtime.targetKind = "zombie"
     record.runtime.combatBlockReason = "under_zombie_bite"
 end

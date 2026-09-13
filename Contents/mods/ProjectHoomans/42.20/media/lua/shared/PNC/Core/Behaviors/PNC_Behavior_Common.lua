@@ -63,12 +63,30 @@ function Common.SetCombatDebug(record, target, reason, modeResolved, weaponStatu
     record.runtime.combatBlockReason = reason or "idle"
 end
 
+-- The runtime target is a combat lease, never a movement destination. Keep
+-- every producer on one write path so a passive presentation can distinguish
+-- an owned combat handoff from stale or foreign state.
+function Common.SetCombatTarget(record, target, source)
+    local runtime
+    if not record or type(target) ~= "table" or target.kind == nil then
+        return false
+    end
+    record.runtime = record.runtime or {}
+    runtime = record.runtime
+    runtime.target = target
+    runtime.targetSource = tostring(source or "combat")
+    runtime.targetAt = Core and Core.Now and Core.Now() or nil
+    return true
+end
+
 function Common.ClearCombatTarget(record, reason, zombie)
     local equipmentInfo = Equipment.Describe(record)
     local combatTactics = PNC.CombatTactics
     local committedAttack
     record.runtime = record.runtime or {}
     record.runtime.target = nil
+    record.runtime.targetSource = nil
+    record.runtime.targetAt = nil
     if combatTactics and combatTactics.EndStaminaRecovery then
         combatTactics.EndStaminaRecovery(record)
     end

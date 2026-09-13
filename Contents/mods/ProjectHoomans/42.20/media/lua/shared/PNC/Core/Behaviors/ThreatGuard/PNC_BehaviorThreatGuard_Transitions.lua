@@ -38,6 +38,7 @@ function Internal.LogTransition(eventName, record, zombie, state, target, reason
         "targetKind=" .. tostring(target and target.kind or ""),
         "targetThreatening=" .. tostring(target
             and target.threatening == true),
+        "targetSource=" .. tostring(runtime.targetSource or ""),
         "attackType=" .. tostring(record and record.attackType or ""),
         "scene=" .. tostring(runtime.animationScene
             and runtime.animationScene.id or ""),
@@ -63,6 +64,8 @@ function Internal.RefreshTarget(record, state, threatContext, now)
         end
     end
     runtime.target = nil
+    runtime.targetSource = nil
+    runtime.targetAt = nil
     state.target = nil
     if now < (tonumber(state.nextScanAt) or 0) then return nil end
     state.nextScanAt = now + SCAN_MS
@@ -160,7 +163,13 @@ function Internal.Engage(record, zombie, state, target, threatContext)
     end
     state.phase = "engaged"
     state.target = target
-    record.runtime.target = target
+    if not Common.SetCombatTarget(
+        record,
+        target,
+        "threat_guard"
+    ) then
+        return false
+    end
     record.activeBehavior = "CombatGuard:engaged"
     if not Internal.EngageTarget(record, zombie, target, threatContext) then
         Common.ClearCombatTarget(record, "threat_guard_engage_failed", zombie)

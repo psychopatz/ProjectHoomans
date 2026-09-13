@@ -41,11 +41,16 @@ Diagnostics.TimingLastSampleAt = Diagnostics.TimingLastSampleAt or {}
 Diagnostics.SeatingAuditEnabled = false
 Diagnostics.FollowerPresenceAuditEnabled = false
 Diagnostics.FollowerAbandonmentAuditEnabled = false
+-- Firearm tracing is opt-in. It is intentionally disabled on a normal load
+-- because it assembles per-shot fields and can produce substantial console
+-- traffic during firefights.
+Diagnostics.FirearmAuditEnabled = false
 Diagnostics.SeatingSessionSequence =
     tonumber(Diagnostics.SeatingSessionSequence) or 0
 
 local PERFORMANCE_SETTING_ID = "ProjectHoomans.PerformanceDiagnostics"
 local SEATING_AUDIT_SETTING_ID = "ProjectHoomans.SeatingAudit"
+local FIREARM_AUDIT_SETTING_ID = "ProjectHoomans.FirearmEffectsAudit"
 local FOLLOWER_PRESENCE_AUDIT_SETTING_ID =
     "ProjectHoomans.FollowerPresenceAudit"
 local FOLLOWER_ABANDONMENT_AUDIT_SETTING_ID =
@@ -87,6 +92,18 @@ local function initializeCentralDebugSettings()
         end,
     })
     settings.Register({
+        id = FIREARM_AUDIT_SETTING_ID,
+        source = "Project Hoomans",
+        order = 105,
+        title = "Firearm effects audit",
+        description = "Logs each NPC shot through authority, network, audio, light, tracer, and draw stages.",
+        defaultEnabled = false,
+        runtimeMutable = true,
+        apply = function(enabled)
+            Diagnostics.FirearmAuditEnabled = enabled == true
+        end,
+    })
+    settings.Register({
         id = FOLLOWER_PRESENCE_AUDIT_SETTING_ID,
         source = "Project Hoomans",
         order = 110,
@@ -120,6 +137,8 @@ local function initializeCentralDebugSettings()
     -- use SetSeatingAuditEnabled as a temporary emergency runtime override.
     Diagnostics.SeatingAuditEnabled = settings.IsEnabled(
         SEATING_AUDIT_SETTING_ID) == true
+    Diagnostics.FirearmAuditEnabled = settings.IsEnabled(
+        FIREARM_AUDIT_SETTING_ID) == true
     Diagnostics.FollowerPresenceAuditEnabled = settings.IsEnabled(
         FOLLOWER_PRESENCE_AUDIT_SETTING_ID) == true
     Diagnostics.FollowerAbandonmentAuditEnabled = settings.IsEnabled(
@@ -150,7 +169,12 @@ local COUNTER_NAMES = {
     "ZombieAggro.Compactions",
     "ZombieAggro.PathRequests",
     "ZombieAggro.PathRequestsDeferred",
+    "ZombieAggro.Behavior2PathRequests",
+    "ZombieAggro.CharacterPathRequests",
+    "ZombieAggro.Behavior2FallbackRequests",
     "ZombieAggro.StimulusEmitted",
+    "ZombieAggro.StimulusNetworkedEmitted",
+    "ZombieAggro.StimulusLocalEmitted",
     "ZombieAggro.StimulusSuppressedStealth",
     "ZombieAggro.StimulusUnavailable",
     "ZombieAggro.StimulusUselessReactivated",
@@ -311,6 +335,22 @@ function Diagnostics.IsSeatingAuditEnabled()
     return Diagnostics.SeatingAuditEnabled == true
 end
 
+function Diagnostics.SetFirearmAuditEnabled(enabled)
+    Diagnostics.FirearmAuditEnabled = enabled == true
+    if Diagnostics.FirearmAuditEnabled == true then
+        if PNC.Core and PNC.Core.LogInfo then
+            PNC.Core.LogInfo("firearm_audit event=enabled")
+        else
+            print("[PNC][INFO] firearm_audit event=enabled")
+        end
+    end
+    return Diagnostics.FirearmAuditEnabled
+end
+
+function Diagnostics.IsFirearmAuditEnabled()
+    return Diagnostics.FirearmAuditEnabled == true
+end
+
 function Diagnostics.NewSeatingSessionId(npcId)
     Diagnostics.SeatingSessionSequence =
         Diagnostics.SeatingSessionSequence + 1
@@ -350,6 +390,27 @@ function Diagnostics.LogSeatingAudit(eventName, fields)
         output[#output + 1] = tostring(field)
     end
     local message = table.concat(output, " ")
+    if PNC.Core and PNC.Core.LogInfo then
+        PNC.Core.LogInfo(message)
+    else
+        print("[PNC][INFO] " .. message)
+    end
+    return true
+end
+
+-- Per-shot firearm tracing follows the seating audit format. Callers should
+-- guard expensive field assembly when the channel is disabled; this function
+-- itself is also safe for isolated client tests where the central diagnostics
+-- module is unavailable.
+function Diagnostics.LogFirearmAudit(eventName, fields)
+    local output
+    local message
+    if Diagnostics.FirearmAuditEnabled ~= true then return false end
+    output = { "firearm_audit", "event=" .. tostring(eventName or "unknown") }
+    for _, field in ipairs(fields or {}) do
+        output[#output + 1] = tostring(field)
+    end
+    message = table.concat(output, " ")
     if PNC.Core and PNC.Core.LogInfo then
         PNC.Core.LogInfo(message)
     else

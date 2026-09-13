@@ -112,6 +112,10 @@ PNC = {
     Animation = {},
     BehaviorCommon = {
         GetOwner = function() return owner end,
+        SetCombatTarget = function(current, target)
+            current.runtime.target = target
+            return true
+        end,
         ClearCombatTarget = function(current)
             current.runtime.target = nil
         end,

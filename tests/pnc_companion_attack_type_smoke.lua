@@ -43,6 +43,10 @@ PNC = {
     },
     BehaviorCommon = {
         GetOwner = function() return owner end,
+        SetCombatTarget = function(record, target)
+            record.runtime.target = target
+            return true
+        end,
         ClearCombatTarget = function(record, reason)
             cleared = cleared + 1
             record.runtime.target = nil

@@ -107,6 +107,20 @@ local treatmentAt = T.truthy(string.find(
 ))
 T.truthy(committedAt < treatmentAt,
     "self-treatment can preempt a committed attack")
+local guardAt = string.find(
+    behaviorSource,
+    "ThreatGuard.Tick(record, zombie, now)",
+    1,
+    true
+)
+local safetyAt = string.find(
+    behaviorSource,
+    "AnimationScenes.InterruptForSafety(",
+    1,
+    true
+)
+T.truthy(guardAt and safetyAt and guardAt < safetyAt,
+    "passive threat arbitration must precede presentation safety")
 T.finish("pnc_combat_commitment_smoke")
 
 T.finish("pnc_combat_commitment_smoke")

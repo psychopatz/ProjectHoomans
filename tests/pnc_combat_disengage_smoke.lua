@@ -26,8 +26,17 @@ local body = {}
 local record = { id = "npc:1", runtime = {
     target = { kind = "zombie" }, inCombatUntil = 9000,
 } }
+local target = { kind = "zombie", zombieId = 7 }
+T.truthy(Common.SetCombatTarget(record, target, "smoke_test"),
+    "combat target setter rejected a valid target")
+T.equal(record.runtime.target, target,
+    "combat target setter did not publish the target")
+T.equal(record.runtime.targetSource, "smoke_test",
+    "combat target setter did not retain its source")
 Common.ClearCombatTarget(record, "target_lost", body)
 T.equal(record.runtime.target, nil, "disengage clears target")
+T.equal(record.runtime.targetSource, nil,
+    "disengage clears the target source")
 T.equal(record.runtime.inCombatUntil, 0, "disengage clears combat lease")
 T.equal(appliedMode, false, "disengage restores non-combat hands")
 

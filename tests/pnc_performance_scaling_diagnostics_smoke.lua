@@ -40,8 +40,9 @@ PNC = {
 }
 
 local clock = 1000
+local logs = {}
 PNC.Core.Now = function() return clock end
-PNC.Core.LogInfo = function() end
+PNC.Core.LogInfo = function(message) logs[#logs + 1] = message end
 
 local Diagnostics = T.load(
     "ProjectHoomans",
@@ -98,6 +99,14 @@ T.equal(
     1,
     "duplicate logical advance"
 )
+T.falsy(Diagnostics.FirearmAuditEnabled, "firearm audit defaults off")
+Diagnostics.SetFirearmAuditEnabled(true)
+T.truthy(Diagnostics.LogFirearmAudit("test_stage", {
+    "side=authority",
+    "shotId=test-shot",
+}), "firearm audit emitted")
+T.contains(logs[#logs], "firearm_audit event=test_stage side=authority shotId=test-shot",
+    "firearm audit uses the dedicated log marker")
 T.equal(snapshot.breakdowns.dirtyMarksByReason.PATH_FAILED, 1,
     "dirty reason breakdown")
 T.equal(snapshot.timings["test.phase"].calls, 1, "timing sample count")

@@ -23,6 +23,8 @@ local function auditSafety(record, zombie, runtime, scene, reason, now)
             "now=" .. tostring(now or ""),
             "targetKind=" .. tostring(runtime and runtime.target
                 and runtime.target.kind or ""),
+            "targetSource=" .. tostring(runtime
+                and runtime.targetSource or ""),
             "attackAction=" .. tostring(runtime and runtime.attackAction
                 or ""),
             "visualMovingUntil=" .. tostring(path

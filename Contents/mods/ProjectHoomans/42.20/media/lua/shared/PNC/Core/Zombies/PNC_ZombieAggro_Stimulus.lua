@@ -24,6 +24,11 @@ local function isMultiplayerServer()
     return isServer and isServer() == true or false
 end
 
+local function isSingleplayerRuntime()
+    return not isMultiplayerServer()
+        and not (isClient and isClient() == true)
+end
+
 local function increment(name, amount)
     if Diagnostics and Diagnostics.Increment then
         Diagnostics.Increment(name, amount)
@@ -93,10 +98,13 @@ function Stimulus.Emit(record, body, now)
     local z
     local radius
     local volume
+    local doSend
     local ok
     local sound
     now = tonumber(now) or (Core and Core.Now and Core.Now() or 0)
-    if not isMultiplayerServer() or not isEligible(record, body, now) then
+    if not (isMultiplayerServer() or isSingleplayerRuntime())
+        or not isEligible(record, body, now)
+    then
         return false
     end
     id = record.id and tostring(record.id) or nil
@@ -126,10 +134,12 @@ function Stimulus.Emit(record, body, now)
         1,
         math.floor(tonumber(Const.ZOMBIE_NPC_STIMULUS_VOLUME) or 8)
     )
+    doSend = isMultiplayerServer()
     manager = WorldSoundManager.instance
     -- Use a nil source. An IsoZombie NPC shell is marked sourceIsZombie by
     -- the engine, and vanilla zombie hearing intentionally ignores those
-    -- sounds. This overload is the public AI-only, networked sound route.
+    -- sounds. The full overload keeps sourceIsZombie false and lets the
+    -- server replicate the AI-only stimulus to the owning client.
     ok, sound = pcall(
         manager.addSound,
         manager,
@@ -138,7 +148,13 @@ function Stimulus.Emit(record, body, now)
         y,
         z,
         radius,
-        volume
+        volume,
+        false,
+        0,
+        1,
+        false,
+        doSend,
+        false
     )
     Stimulus.NextEmitAtByNPC[id] = now
         + (tonumber(Const.ZOMBIE_NPC_STIMULUS_INTERVAL_MS) or 500)
@@ -153,8 +169,20 @@ function Stimulus.Emit(record, body, now)
         )
         return false
     end
-    setDebugState(record, body, "emitted", "npc_world_sound", now, sound)
+    setDebugState(
+        record,
+        body,
+        "emitted",
+        doSend and "npc_world_sound_networked"
+            or "npc_world_sound_local",
+        now,
+        sound
+    )
     increment("ZombieAggro.StimulusEmitted")
+    increment(
+        doSend and "ZombieAggro.StimulusNetworkedEmitted"
+            or "ZombieAggro.StimulusLocalEmitted"
+    )
     return true
 end
 

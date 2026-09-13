@@ -277,7 +277,15 @@ function Tactics.ShouldInterruptAttackForRetreat(record)
     zombieThreat = resolveImmediateZombieThreat(record)
     if zombieThreat then
         target = zombieThreat
-        runtime.target = zombieThreat
+        if PNC.BehaviorCommon
+            and PNC.BehaviorCommon.SetCombatTarget
+        then
+            PNC.BehaviorCommon.SetCombatTarget(
+                record,
+                zombieThreat,
+                "combat_retreat_probe"
+            )
+        end
     end
     if not target or target.kind ~= "zombie"
         or not Internal.AssessThreat

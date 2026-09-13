@@ -16,6 +16,7 @@ local Perception = PNC.Perception
 local Animation = PNC.Animation
 local MoveIntent = PNC.BehaviorMoveIntent
 local CombatTactics = PNC.CombatTactics
+local Common = PNC.BehaviorCommon
 
 local function requiresMedicalItem(Treatment, record)
     if Treatment and Treatment.RequiresNPCMedicalItem then
@@ -117,7 +118,7 @@ local function yieldToCombat(record, zombie, threat, now)
         record.runtime.tacticalState = nil
     end
     state.retryAt = now + (tonumber(Const.SELF_BANDAGE_RETRY_MS) or 5000)
-    record.runtime.target = threat
+    Common.SetCombatTarget(record, threat, "treatment_threat")
     -- Treatment must never choose movement while an enemy owns the tactical
     -- lane. The combat layer decides whether to counter, shove, or retreat.
     -- Returning false lets that decision happen in this same behavior tick.
@@ -150,7 +151,7 @@ local function startBandage(record, zombie, partId, now)
     record.runtime.forceSyncEvent = "self_treatment_started"
     record.activeBehavior = "SelfBandage"
     record.runtime.tacticalState = "self_bandage"
-    record.runtime.target = nil
+    Common.ClearCombatTarget(record, "self_treatment_started", zombie)
     record.runtime.attackAction = nil
     -- Treatment owns the tactical lane now. A previous melee/ranged action
     -- may have left the short combat presentation lease alive, which made

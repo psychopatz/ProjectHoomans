@@ -9,6 +9,7 @@ local Behavior = PNC.FactionBehavior
 local Internal = Behavior.Internal
 local Balance = PNC.FactionBalance
 local Core = PNC.Core
+local Common = PNC.BehaviorCommon
 local currentWorldAgeHours = Internal.currentWorldAgeHours
 local clearCombatRuntime = Internal.clearCombatRuntime
 
@@ -97,7 +98,13 @@ function Behavior.PumpReconciliation(maximum)
                     elseif intent and selfDefense
                         and record.runtime.target == nil
                     then
-                        record.runtime.target = target
+                        if Common and Common.SetCombatTarget then
+                            Common.SetCombatTarget(
+                                record,
+                                target,
+                                "faction_self_defense"
+                            )
+                        end
                     end
                 end
                 local afterReason = record.runtime

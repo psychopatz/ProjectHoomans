@@ -11,6 +11,46 @@ PNC.FirearmEffects = PNC.FirearmEffects or {}
 local Effects = PNC.FirearmEffects
 local Core = PNC.Core
 local Firearms = PNC.Firearms
+local Diagnostics = PNC.PerformanceScalingDiagnostics
+
+local function nowMs()
+    if Core and type(Core.Now) == "function" then
+        return tonumber(Core.Now()) or 0
+    end
+    if getTimeInMillis then return tonumber(getTimeInMillis()) or 0 end
+    return 0
+end
+
+local function logFirearmAudit(eventName, record, payload, ...)
+    local affiliation
+    local hostility
+    local fields
+    local i
+    if not Diagnostics
+        or Diagnostics.FirearmAuditEnabled ~= true
+        or type(Diagnostics.LogFirearmAudit) ~= "function"
+    then
+        return false
+    end
+    affiliation = record and record.affiliation or nil
+    hostility = record and record.hostility or nil
+    fields = {
+        "side=authority",
+        "shotId=" .. tostring(payload and payload.shotId or ""),
+        "npc=" .. tostring(record and record.id or payload and payload.npcId or ""),
+        "class=" .. tostring(record and record.tacticalClass
+            or payload and payload.tacticalClass or "unknown"),
+        "faction=" .. tostring(record and affiliation and affiliation.factionID
+            or payload and payload.factionID or ""),
+        "hostility=" .. tostring(record and hostility and hostility.mode
+            or payload and payload.hostilityMode or ""),
+        "t=" .. tostring(nowMs()),
+    }
+    for i = 1, select("#", ...) do
+        fields[#fields + 1] = tostring(select(i, ...))
+    end
+    return Diagnostics.LogFirearmAudit(eventName, fields)
+end
 
 local function readMethod(target, methodName, ...)
     local method
@@ -77,19 +117,34 @@ local function targetCoordinates(target)
 end
 
 function Effects.BuildShotPayload(record, shooter, target, weaponItem)
-    local descriptor = Firearms and Firearms.Describe
-        and Firearms.Describe(record, weaponItem, shooter)
-        or nil
+    local descriptor
     local runtime
     local tx
     local ty
     local tz
-    if not record or not descriptor then return nil end
+    local payload
+    local startedAt = nowMs()
+    logFirearmAudit("payload_build_start", record, nil,
+        "weapon=" .. tostring(weaponItem and readMethod(weaponItem, "getFullType") or ""))
+    if not record then
+        logFirearmAudit("payload_build_rejected", record, nil,
+            "reason=record_missing", "elapsedMs=" .. tostring(nowMs() - startedAt))
+        return nil
+    end
+    descriptor = Firearms and Firearms.Describe
+        and Firearms.Describe(record, weaponItem, shooter)
+        or nil
+    if not descriptor then
+        logFirearmAudit("payload_build_rejected", record, nil,
+            "reason=weapon_profile_unavailable",
+            "elapsedMs=" .. tostring(nowMs() - startedAt))
+        return nil
+    end
     runtime = record.runtime or {}
     record.runtime = runtime
     runtime.firearmShotSequence = (tonumber(runtime.firearmShotSequence) or 0) + 1
     tx, ty, tz = targetCoordinates(target)
-    return {
+    payload = {
         shotId = table.concat({
             tostring(record.id),
             tostring(runtime.bodyLease or "body"),
@@ -107,6 +162,9 @@ function Effects.BuildShotPayload(record, shooter, target, weaponItem)
         ty = ty,
         tz = tz,
         targetKind = target and tostring(target.kind or "") or nil,
+        tacticalClass = record.tacticalClass,
+        factionID = record.affiliation and record.affiliation.factionID or nil,
+        hostilityMode = record.hostility and record.hostility.mode or nil,
         weaponFullType = descriptor.fullType,
         ammoType = descriptor.ammoType,
         ammoPerShot = descriptor.ammoPerShot,
@@ -123,25 +181,57 @@ function Effects.BuildShotPayload(record, shooter, target, weaponItem)
             and descriptor.shellFallSound and tostring(descriptor.shellFallSound)
             or nil,
         rackAfterShoot = descriptor.rackAfterShoot == true,
-    }, descriptor
+    }
+    logFirearmAudit("payload_built", record, payload,
+        "weapon=" .. tostring(payload.weaponFullType or ""),
+        "targetKind=" .. tostring(payload.targetKind or ""),
+        "target=" .. tostring(payload.tx or "") .. ","
+            .. tostring(payload.ty or "") .. "," .. tostring(payload.tz or ""),
+        "projectiles=" .. tostring(payload.projectileCount or 1),
+        "elapsedMs=" .. tostring(nowMs() - startedAt))
+    return payload, descriptor
 end
 
 function Effects.Emit(record, shooter, target, weaponItem)
     local payload
     local descriptor
+    local startedAt = nowMs()
+    local soundPublished
+    local dispatched
+    local route
+    logFirearmAudit("emit_start", record, nil,
+        "targetKind=" .. tostring(target and target.kind or ""))
     if not Core or not Core.IsAuthority or not Core.IsAuthority() then
+        logFirearmAudit("emit_rejected", record, nil,
+            "reason=not_authority", "elapsedMs=" .. tostring(nowMs() - startedAt))
         return false, "not_authority"
     end
     payload, descriptor = Effects.BuildShotPayload(record, shooter, target, weaponItem)
     if not payload then
+        logFirearmAudit("emit_rejected", record, nil,
+            "reason=payload_unavailable", "elapsedMs=" .. tostring(nowMs() - startedAt))
         return false, "weapon_profile_unavailable"
     end
-    publishWorldSound(shooter, descriptor)
+    soundPublished = publishWorldSound(shooter, descriptor)
+    logFirearmAudit("world_sound_complete", record, payload,
+        "result=" .. tostring(soundPublished),
+        "radius=" .. tostring(payload.soundRadius or 0),
+        "volume=" .. tostring(payload.soundVolume or 0))
     if PNC.Network and PNC.Network.BroadcastFirearmShot then
-        PNC.Network.BroadcastFirearmShot(payload)
+        route = "network_broadcast"
+        dispatched = PNC.Network.BroadcastFirearmShot(payload)
     elseif (not isServer or not isServer()) and triggerEvent and PNC.Const then
+        route = "local_server_command"
         triggerEvent("OnServerCommand", PNC.Const.MODULE, PNC.Const.CMD_FIREARM_SHOT, payload)
+        dispatched = true
+    else
+        route = "none"
+        dispatched = false
     end
+    logFirearmAudit("emit_complete", record, payload,
+        "route=" .. tostring(route),
+        "dispatched=" .. tostring(dispatched),
+        "elapsedMs=" .. tostring(nowMs() - startedAt))
     return true, payload
 end
 

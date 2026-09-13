@@ -57,6 +57,12 @@ ModData = {
 PNC = {}
 T.load(SHARED .. "Base/PNC_Core.lua")
 T.load(SHARED .. "Base/PNC_Constants.lua")
+PNC.BehaviorCommon = {
+    SetCombatTarget = function(record, target)
+        record.runtime.target = target
+        return true
+    end,
+}
 T.load(SHARED .. "Relationships/PNC_EntityRef.lua")
 T.load(SHARED .. "Factions/PNC_FactionConstants.lua")
 T.load(SHARED .. "Factions/PNC_FactionBalance.lua")

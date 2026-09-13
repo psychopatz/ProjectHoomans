@@ -13,10 +13,18 @@ function JobSystem.IsFacilityActivityActive(record)
     local activity = runtime and runtime.facilityActivity or nil
     local leaseId
     local internal
-    if not activity
-        or activity.stopRequested == true
-        or activity.finishing == true
+    if not activity then
+        return false
+    end
+    -- Sleep teardown is a two-phase transaction. An order change marks the
+    -- activity as stopping, but the wake pump still owns the behavior tick
+    -- until native release and sleep-surface cleanup are complete.
+    if tostring(activity.capability or "") == "sleep"
+        and activity.sleepWakePending == true
     then
+        return true
+    end
+    if activity.stopRequested == true or activity.finishing == true then
         return false
     end
     leaseId = tostring(activity.taskLeaseId or "")

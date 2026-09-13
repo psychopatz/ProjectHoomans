@@ -47,10 +47,44 @@ T.truthy(JobSystem.IsFacilityActivityActive(record),
 T.equal(JobSystem.Select(record), "FacilityActivity",
     "manual activity also wins over follow")
 
+local facilityApproach = T.read(
+    "ProjectHoomans",
+    "shared",
+    "PNC/Core/Facilities/FacilityJobsBehavior/PNC_FacilityJobsBehavior_Approach.lua"
+)
+local facilitySeating = T.read(
+    "ProjectHoomans",
+    "shared",
+    "PNC/Core/Facilities/FacilityJobsBehavior/PNC_FacilityJobsBehavior_Seating.lua"
+)
+local facilityTick = T.read(
+    "ProjectHoomans",
+    "shared",
+    "PNC/Core/Facilities/FacilityJobsBehavior/PNC_FacilityJobsBehavior_Tick.lua"
+)
+T.falsy(string.find(facilityApproach, "runtime.target = {", 1, true),
+    "facility approach must not publish a combat target")
+T.falsy(string.find(facilitySeating, "runtime.target = {", 1, true),
+    "facility seating must not publish a combat target")
+T.falsy(string.find(facilityTick, "runtime.target = {", 1, true),
+    "facility ticking must not publish a combat target")
+
 record.runtime.facilityActivity.stopRequested = true
 T.falsy(JobSystem.IsFacilityActivityActive(record),
     "stopping activity releases behavior ownership")
 T.equal(JobSystem.Select(record), "FollowOwner",
     "follow resumes after activity stop is requested")
+
+-- A stopped sleep activity is different: its native wake transaction must
+-- retain ownership until the bed/resting surface is released.
+record.runtime.facilityActivity = {
+    capability = "sleep",
+    stopRequested = true,
+    sleepWakePending = true,
+}
+T.truthy(JobSystem.IsFacilityActivityActive(record),
+    "pending sleep wake retains behavior ownership")
+T.equal(JobSystem.Select(record), "FacilityActivity",
+    "facility wake transaction wins over follow")
 
 T.finish("pnc_facility_activity_ownership_smoke")

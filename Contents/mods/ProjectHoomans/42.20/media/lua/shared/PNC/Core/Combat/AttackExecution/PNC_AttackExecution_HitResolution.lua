@@ -9,6 +9,33 @@ local Skills = PNC.Skills
 local Stamina = PNC.Stamina
 local Resolution = PNC.CombatResolution
 local FirearmEffects = PNC.FirearmEffects
+local Diagnostics = PNC.PerformanceScalingDiagnostics
+
+local function logFirearmAudit(eventName, record, action, ...)
+    local fields
+    local i
+    if not Diagnostics
+        or Diagnostics.FirearmAuditEnabled ~= true
+        or type(Diagnostics.LogFirearmAudit) ~= "function"
+    then
+        return false
+    end
+    fields = {
+        "side=authority",
+        "shotId=unassigned",
+        "npc=" .. tostring(record and record.id or ""),
+        "class=" .. tostring(record and record.tacticalClass or "unknown"),
+        "faction=" .. tostring(record and record.affiliation
+            and record.affiliation.factionID or ""),
+        "hostility=" .. tostring(record and record.hostility
+            and record.hostility.mode or ""),
+        "actionType=" .. tostring(action and action.attackType or ""),
+    }
+    for i = 1, select("#", ...) do
+        fields[#fields + 1] = tostring(select(i, ...))
+    end
+    return Diagnostics.LogFirearmAudit(eventName, fields)
+end
 
 local function commitMeleeImpactAudio(record, action, target)
     if Internal.commitMeleeImpactAudio then
@@ -39,6 +66,8 @@ function Internal.applyAttackActionHit(record, zombie, action, target)
 
     if action.attackType == "ranged" and action.shotEffectDone ~= true then
         action.shotEffectDone = true
+        logFirearmAudit("attack_effect_gate", record, action,
+            "effectDone=true", "firearmEmitter=" .. tostring(FirearmEffects ~= nil))
         if FirearmEffects and FirearmEffects.Emit then
             FirearmEffects.Emit(
                 record,
@@ -46,6 +75,9 @@ function Internal.applyAttackActionHit(record, zombie, action, target)
                 target,
                 Internal.resolveWeaponItem and Internal.resolveWeaponItem(record, zombie) or nil
             )
+        else
+            logFirearmAudit("attack_effect_rejected", record, action,
+                "reason=firearm_effect_service_unavailable")
         end
     end
 

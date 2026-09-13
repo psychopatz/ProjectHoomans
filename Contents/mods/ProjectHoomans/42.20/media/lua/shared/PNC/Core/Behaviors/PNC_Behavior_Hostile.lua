@@ -20,7 +20,7 @@ function Hostile.Tick(record, zombie, job)
     if job == "HuntNearestPlayer" then
         target = Targeting.ResolveHostileEngageTarget(record)
         if target then
-            record.runtime.target = target
+            Common.SetCombatTarget(record, target, "hostile_target")
             BehaviorCombat.TickEngage(record, zombie, target)
             return true
         end
@@ -44,7 +44,7 @@ function Hostile.Tick(record, zombie, job)
         target = zombieThreat
             or Targeting.UpdateTargetFromWorld(record, record.runtime.target)
         if target then
-            record.runtime.target = target
+            Common.SetCombatTarget(record, target, "hostile_engage")
             BehaviorCombat.TickEngage(record, zombie, target)
             return true
         end

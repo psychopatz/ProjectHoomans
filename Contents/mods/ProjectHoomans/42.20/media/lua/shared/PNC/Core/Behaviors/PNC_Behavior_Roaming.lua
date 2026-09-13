@@ -224,7 +224,7 @@ local function areaMode(record, zombie, order)
     )
     if target then
         state.phase = "combat"
-        record.runtime.target = target
+        Common.SetCombatTarget(record, target, "roaming_threat")
         BehaviorCombat.TickEngage(record, zombie, target)
         return true
     end
@@ -532,7 +532,7 @@ local function roadMode(record, zombie, order)
     )
     if target then
         state.phase = "combat"
-        record.runtime.target = target
+        Common.SetCombatTarget(record, target, "roaming_threat")
         BehaviorCombat.TickEngage(record, zombie, target)
         return true
     end
@@ -594,7 +594,7 @@ local function shelterMode(record, zombie, order)
     )
     if target then
         state.phase = "combat"
-        record.runtime.target = target
+        Common.SetCombatTarget(record, target, "roaming_threat")
         BehaviorCombat.TickEngage(record, zombie, target)
         return true
     end

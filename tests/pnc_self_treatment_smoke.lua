@@ -93,6 +93,16 @@ PNC = {
             retreatClears = retreatClears + 1
         end,
     },
+    BehaviorCommon = {
+        SetCombatTarget = function(record, target)
+            record.runtime.target = target
+            return true
+        end,
+        ClearCombatTarget = function(record)
+            record.runtime.target = nil
+            record.runtime.inCombatUntil = 0
+        end,
+    },
 }
 
 T.load(FILE)

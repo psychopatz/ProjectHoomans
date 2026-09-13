@@ -45,6 +45,10 @@ PNC = {
         TickEngage = function() engagements = engagements + 1 end,
     },
     BehaviorCommon = {
+        SetCombatTarget = function(record, resolved)
+            record.runtime.target = resolved
+            return true
+        end,
         ClearCombatTarget = function(record)
             clears = clears + 1
             record.runtime.target = nil

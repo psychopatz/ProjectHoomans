@@ -17,6 +17,41 @@ local Stamina = PNC.Stamina
 local Resolution = PNC.CombatResolution
 local Firearms = PNC.Firearms
 local Tactics = PNC.CombatTactics
+local Diagnostics = PNC.PerformanceScalingDiagnostics
+
+local function readMethod(target, methodName, ...)
+    local method
+    if not target then return nil end
+    method = target[methodName]
+    if type(method) ~= "function" then return nil end
+    return method(target, ...)
+end
+
+local function logFirearmAudit(eventName, record, target, ...)
+    local fields
+    local i
+    if not Diagnostics
+        or Diagnostics.FirearmAuditEnabled ~= true
+        or type(Diagnostics.LogFirearmAudit) ~= "function"
+    then
+        return false
+    end
+    fields = {
+        "side=authority",
+        "shotId=unassigned",
+        "npc=" .. tostring(record and record.id or ""),
+        "class=" .. tostring(record and record.tacticalClass or "unknown"),
+        "faction=" .. tostring(record and record.affiliation
+            and record.affiliation.factionID or ""),
+        "hostility=" .. tostring(record and record.hostility
+            and record.hostility.mode or ""),
+        "targetKind=" .. tostring(target and target.kind or ""),
+    }
+    for i = 1, select("#", ...) do
+        fields[#fields + 1] = tostring(select(i, ...))
+    end
+    return Diagnostics.LogFirearmAudit(eventName, fields)
+end
 
 function Combat.TryRanged(record, zombie, target)
     local now = Core.Now()
@@ -145,5 +180,9 @@ function Combat.TryRanged(record, zombie, target)
     if Tactics and Tactics.MarkRangedShot then
         Tactics.MarkRangedShot(record)
     end
+    logFirearmAudit("ranged_attack_started", record, target,
+        "animation=" .. tostring(anim or "PNC_AttackPistol"),
+        "weapon=" .. tostring(weaponItem and readMethod(weaponItem, "getFullType") or ""),
+        "distance=" .. tostring(dist))
     return true, "ranged_attack_started"
 end

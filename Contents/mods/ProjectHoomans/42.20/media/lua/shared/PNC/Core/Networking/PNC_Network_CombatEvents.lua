@@ -11,8 +11,32 @@ local Network = PNC.Network
 local Internal = Network.Internal
 local Core = PNC.Core
 local Const = PNC.Const
+local Diagnostics = PNC.PerformanceScalingDiagnostics
 local sendToInterestedNPC = Internal.SendToInterestedNPC
 local sendToPlayer = Internal.SendToPlayer
+
+local function logFirearmAudit(eventName, payload, ...)
+    local fields
+    local i
+    if not Diagnostics
+        or Diagnostics.FirearmAuditEnabled ~= true
+        or type(Diagnostics.LogFirearmAudit) ~= "function"
+    then
+        return false
+    end
+    fields = {
+        "side=network",
+        "shotId=" .. tostring(payload and payload.shotId or ""),
+        "npc=" .. tostring(payload and payload.npcId or ""),
+        "class=" .. tostring(payload and payload.tacticalClass or "unknown"),
+        "faction=" .. tostring(payload and payload.factionID or ""),
+        "hostility=" .. tostring(payload and payload.hostilityMode or ""),
+    }
+    for i = 1, select("#", ...) do
+        fields[#fields + 1] = tostring(select(i, ...))
+    end
+    return Diagnostics.LogFirearmAudit(eventName, fields)
+end
 
 function Network.GetZombieOnlineID(zombie)
     local onlineID
@@ -126,11 +150,19 @@ end
 function Network.BroadcastFirearmShot(payload)
     local deliveryRadius
     local sent = 0
+    logFirearmAudit("broadcast_start", payload,
+        "authority=" .. tostring(Core and Core.IsAuthority and Core.IsAuthority()),
+        "server=" .. tostring(isServer and isServer()))
     if not Core.IsAuthority() or type(payload) ~= "table" then
+        logFirearmAudit("broadcast_rejected", payload, "reason=authority_or_payload")
         return false
     end
     if isServer and isServer() then
-        if not sendServerCommand then return false end
+        if not sendServerCommand then
+            logFirearmAudit("broadcast_rejected", payload,
+                "reason=sendServerCommand_unavailable")
+            return false
+        end
         -- A gunshot can be heard beyond an NPC's normal detailed-interest
         -- bubble. Deliver this transient event by the weapon's own noise
         -- radius, with the interest distance as the minimum visual range.
@@ -151,11 +183,17 @@ function Network.BroadcastFirearmShot(payload)
                 sent = sent + 1
             end
         end)
+        logFirearmAudit("broadcast_server_complete", payload,
+            "deliveryRadius=" .. tostring(deliveryRadius),
+            "playersSent=" .. tostring(sent))
         return sent > 0
     end
     if triggerEvent then
         triggerEvent("OnServerCommand", Const.MODULE, Const.CMD_FIREARM_SHOT, payload)
+        logFirearmAudit("broadcast_local_complete", payload,
+            "route=OnServerCommand", "playersSent=local")
         return true
     end
+    logFirearmAudit("broadcast_rejected", payload, "reason=triggerEvent_unavailable")
     return false
 end

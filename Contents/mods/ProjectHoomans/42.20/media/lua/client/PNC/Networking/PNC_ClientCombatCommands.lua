@@ -12,6 +12,30 @@ local Internal = Client.Internal
 local Const = PNC.Const
 local Core = PNC.Core
 local ClientState = PNC.Network.ClientState
+local Diagnostics = PNC.PerformanceScalingDiagnostics
+
+local function logFirearmAudit(eventName, payload, ...)
+    local fields
+    local i
+    if not Diagnostics
+        or Diagnostics.FirearmAuditEnabled ~= true
+        or type(Diagnostics.LogFirearmAudit) ~= "function"
+    then
+        return false
+    end
+    fields = {
+        "side=client_command",
+        "shotId=" .. tostring(payload and payload.shotId or ""),
+        "npc=" .. tostring(payload and payload.npcId or ""),
+        "class=" .. tostring(payload and payload.tacticalClass or "unknown"),
+        "faction=" .. tostring(payload and payload.factionID or ""),
+        "hostility=" .. tostring(payload and payload.hostilityMode or ""),
+    }
+    for i = 1, select("#", ...) do
+        fields[#fields + 1] = tostring(select(i, ...))
+    end
+    return Diagnostics.LogFirearmAudit(eventName, fields)
+end
 
 Client.BiteReplicas = Client.BiteReplicas or {}
 Client.ZombieReactionReplicas = Client.ZombieReactionReplicas or {}
@@ -237,7 +261,17 @@ Internal.RegisterServerCommand(Const.CMD_ZOMBIE_BITE, function(args)
 end)
 
 Internal.RegisterServerCommand(Const.CMD_FIREARM_SHOT, function(args)
+    local startedAt = Core and Core.Now and Core.Now() or 0
+    logFirearmAudit("command_received", args,
+        "payload=" .. tostring(type(args) == "table"))
     if PNC.ClientFirearmEffects and PNC.ClientFirearmEffects.Play then
-        PNC.ClientFirearmEffects.Play(args)
+        local played = PNC.ClientFirearmEffects.Play(args)
+        logFirearmAudit("command_complete", args,
+            "result=" .. tostring(played),
+            "elapsedMs=" .. tostring((Core and Core.Now and Core.Now() or 0) - startedAt))
+    else
+        logFirearmAudit("command_rejected", args,
+            "reason=client_effects_unavailable",
+            "elapsedMs=" .. tostring((Core and Core.Now and Core.Now() or 0) - startedAt))
     end
 end)

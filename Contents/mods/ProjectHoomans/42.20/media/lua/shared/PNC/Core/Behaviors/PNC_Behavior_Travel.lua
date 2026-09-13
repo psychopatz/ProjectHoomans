@@ -62,7 +62,7 @@ function Travel.Tick(record, zombie, _, _)
             Stealth.SetTravelCombatActive(record, zombie, true)
         end
         record.runtime = record.runtime or {}
-        record.runtime.target = combatTarget
+        Common.SetCombatTarget(record, combatTarget, "travel_recent_attacker")
         record.activeBehavior = "Travel:Combat:"
             .. tostring(combatTarget.kind or "unknown")
         BehaviorCombat.TickEngage(record, zombie, combatTarget)
