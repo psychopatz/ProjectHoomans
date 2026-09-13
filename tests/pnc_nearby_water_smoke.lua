@@ -240,6 +240,9 @@ planDescription.canDrink = true
 planDescription.canFill = true
 planDescription.amount = 1
 planDescription.freeCapacity = 0
+local refreshedDrinkPlan = Service.ResolveHydrationPlan(planRecord)
+T.equal(refreshedDrinkPlan.action, "drink_container",
+    "a stale cached refill plan is re-evaluated when the bottle becomes full")
 Service.InvalidateHydrationPlan(planRecord)
 local drinkPlan = Service.ResolveHydrationPlan(planRecord)
 T.equal(drinkPlan.action, "drink_container",
@@ -261,5 +264,15 @@ T.equal(worldPlan.action, "drink_source",
     "direct world drinking is the final fallback without a container")
 T.equal(worldPlan.sourceKey, selectedSourceKey,
     "the shared source identity remains stable across hydration decisions")
+
+PNC.NPCSupplyService.HasPersonalSupply = function()
+    return true, "Base.WaterBottle", "personal-bottle-1"
+end
+Service.InvalidateHydrationPlan(planRecord)
+local genericDrinkPlan = Service.ResolveHydrationPlan(planRecord)
+T.equal(genericDrinkPlan.action, "drink_container",
+    "generic personal hydration remains an inventory action")
+T.equal(genericDrinkPlan.activityItemID, "personal-bottle-1",
+    "generic personal hydration preserves the selected item identity")
 
 T.finish("pnc_nearby_water_smoke")

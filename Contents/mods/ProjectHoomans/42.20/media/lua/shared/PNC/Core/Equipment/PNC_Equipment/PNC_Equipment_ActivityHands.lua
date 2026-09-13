@@ -32,11 +32,18 @@ local function setHandItem(zombie, secondary, item)
     local method = secondary and "setSecondaryHandItem"
         or "setPrimaryHandItem"
     local ok
+    local current
     if not zombie or type(zombie[method]) ~= "function" then
         return false, "missing_method:" .. method
     end
     ok = pcall(zombie[method], zombie, item)
-    return ok, ok and nil or "set_failed:" .. method
+    if ok then return true end
+    -- Build 42 can report a Java void-call failure after the native setter has
+    -- already changed the hand. Preserve the completed postcondition instead
+    -- of treating the call-frame cleanup error as an equipment failure.
+    current = currentHandItem(zombie, secondary)
+    if current == item then return true, "set_completed_with_call_error" end
+    return false, "set_failed:" .. method
 end
 
 local function refreshHands(zombie)
@@ -55,6 +62,7 @@ end
 local function buildSignature(activity)
     return table.concat({
         tostring(activity and activity.activityItemFullType or ""),
+        tostring(activity and activity.activityItemID or ""),
         tostring(activity and activity.hand or "primary"),
         visualSignature(activity and activity.activityItemVisual),
         tostring(activity and activity.revision or ""),
@@ -73,6 +81,7 @@ local function clearActivityHands(zombie)
     modData.PNCActivityHandsSignature = nil
     modData.PNCActivityHandsFullType = nil
     modData.PNCActivityHandsMode = nil
+    modData.PNCActivityHandsItemID = nil
     modData.PNCActivityHandsItem = nil
     if zombie.setVariable then
         pcall(zombie.setVariable, zombie, "PNCActivityItem", "")
@@ -105,6 +114,7 @@ end
 function Equipment.ApplyActivityHands(zombie, activity)
     local fullType = tostring(activity
         and activity.activityItemFullType or "")
+    local activityItemID = activity and activity.activityItemID or nil
     local hand = tostring(activity and activity.hand or "primary")
     local signature
     local modData
@@ -132,6 +142,7 @@ function Equipment.ApplyActivityHands(zombie, activity)
 
     signature = buildSignature({
         activityItemFullType = fullType,
+        activityItemID = activityItemID,
         hand = hand,
         activityItemVisual = activity and activity.activityItemVisual,
         revision = activity and activity.revision,
@@ -178,6 +189,7 @@ function Equipment.ApplyActivityHands(zombie, activity)
         modData.PNCActivityHandsSignature = signature
         modData.PNCActivityHandsFullType = fullType
         modData.PNCActivityHandsMode = hand
+        modData.PNCActivityHandsItemID = activityItemID
         modData.PNCActivityHandsItem = item
     end
     return true, "activity_hands_applied"

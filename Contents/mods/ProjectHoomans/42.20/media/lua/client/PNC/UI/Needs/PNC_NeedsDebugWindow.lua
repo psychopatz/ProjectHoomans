@@ -65,11 +65,23 @@ function ISPNCNeedsDebugWindow:refreshSnapshot()
     self.groups:clear(); self.individuals:clear(); self.details:clear()
     for _, group in ipairs(snapshot.groups or {}) do self.groups:addItem(group.name, { id=group.id, label=group.name, detail=string.format("%s | %d | H %.2f T %.2f F %.2f", group.type, group.members, group.needs.hunger, group.needs.thirst, group.needs.fatigue), value=group }) end
     for _, npc in ipairs(snapshot.individuals or {}) do
-        local calories, overflow = calorieBalance(npc.nutrition)
+        local nutritionEnabled = type(npc.nutrition) == "table"
+            and ((PNC.Sandbox
+                and PNC.Sandbox.PlayerOwnedNPCNutritionRealismEnabled
+                and PNC.Sandbox.PlayerOwnedNPCNutritionRealismEnabled() == true)
+                or not (PNC.Sandbox
+                    and PNC.Sandbox.PlayerOwnedNPCNutritionRealismEnabled))
+        local calories, overflow = 0, 0
+        if nutritionEnabled then
+            calories, overflow = calorieBalance(npc.nutrition)
+        end
+        local nutritionText = nutritionEnabled
+            and string.format(" | %.0f kcal + %.0f reserve %.1f kg",
+                calories, overflow, npc.nutrition.weight or 0) or ""
         self.individuals:addItem(npc.name, { id=npc.id, label=npc.name,
-            detail=string.format("H %.2f T %.2f F %.2f | %.0f kcal + %.0f reserve %.1f kg",
+            detail=string.format("H %.2f T %.2f F %.2f%s",
                 npc.needs.hunger, npc.needs.thirst, npc.needs.fatigue,
-                calories, overflow, npc.nutrition and npc.nutrition.weight or 0),
+                nutritionText),
             value=npc })
     end
     local function restore(list, id)

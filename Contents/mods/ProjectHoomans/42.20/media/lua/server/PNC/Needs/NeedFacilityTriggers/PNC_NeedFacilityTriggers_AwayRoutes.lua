@@ -188,6 +188,12 @@ local function waterRefillRetryBlocked(record)
     return retryAt > now
 end
 
+local function activityFailed(activity)
+    return activity ~= nil
+        and (activity.failedReason ~= nil
+            or activity.failureRequested == true)
+end
+
 local function waterContainer(record)
     local inventory = PNC.Inventory
     if not inventory then return nil end
@@ -367,6 +373,7 @@ Routes.Register({
         if plan then
             return planned and liveBody(record) ~= nil
                 and not Routes.IsCombatActive(record)
+                and not waterRefillRetryBlocked(record)
         end
         local live = liveBody(record)
         local item = waterContainer(record)
@@ -383,6 +390,9 @@ Routes.Register({
         if plan then
             if not liveBody(record) then return false, "NPC_BODY_UNAVAILABLE" end
             if Routes.IsCombatActive(record) then return false, "NPC_BUSY" end
+            if waterRefillRetryBlocked(record) then
+                return false, "WATER_REFILL_RETRY_COOLDOWN"
+            end
             return planned, planned and nil or "WATER_FILL_SOURCE_UNAVAILABLE"
         end
         local item = waterContainer(record)
@@ -416,6 +426,9 @@ Routes.Register({
     end,
     Assign = function(record)
         local planned, plan = planAction(record, "fill_container", "refill")
+        if waterRefillRetryBlocked(record) then
+            return nil, "WATER_REFILL_RETRY_COOLDOWN"
+        end
         if plan then
             local target
             local approaches
@@ -442,7 +455,9 @@ Routes.Register({
         end
         local item = waterContainer(record)
         local source, sourceReason = fillableWaterSource(record)
-        if not item then return nil, "WATER_CONTAINER_NOT_REFILLABLE" end
+        if not item or not PNC.Inventory.IsRefillableWaterContainer(item) then
+            return nil, "WATER_CONTAINER_NOT_REFILLABLE"
+        end
         if not source then
             return nil, sourceReason or "WATER_FILL_SOURCE_UNAVAILABLE"
         end
@@ -489,9 +504,11 @@ Routes.Register({
         -- current shared planner to select a new action. This prevents the
         -- full bottle from re-entering the refill scene forever.
         if active then
+            if activityFailed(activity) then return false end
             if activity.completionRequested == true then
                 return true
             end
+            if waterRefillRetryBlocked(record) then return false end
             return not Routes.IsCombatActive(record)
                 and not Routes.HasPersonalHydration(record)
                 and waterContainer(record) ~= nil
@@ -499,6 +516,7 @@ Routes.Register({
                     waterContainer(record))
                 and fillableWaterSource(record) ~= nil
         end
+        if waterRefillRetryBlocked(record) then return false end
         if plan then
             return not Routes.IsCombatActive(record)
                 and planned

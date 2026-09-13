@@ -54,7 +54,11 @@ function Internal.OnSceneTick(record, zombie, scene, now)
         runtime.effectValue = value
         if not ok then
             runtime.failedReason = effectReason or "NEED_EFFECT_FAILED"
-            runtime.completionRequested = true
+            -- A failed effect is terminal for this activity. Marking it as
+            -- completed lets the task provider keep the failed lease alive
+            -- while the scene is being cleared, which can re-enter the same
+            -- scene before the retry cooldown is observed.
+            runtime.completionRequested = nil
             return false
         end
         if effectReason and Internal.RecordProgress then
@@ -164,6 +168,18 @@ function Internal.OnSceneStopped(record, zombie, scene, reason)
                 })
         end
         Internal.Finish(record, zombie, failure)
+        -- A failed scene has no commit left to protect. Normalize a lease
+        -- that was still marked WORKING before requesting cancellation so a
+        -- future phase policy cannot strand the lease after activity cleanup.
+        if leaseId ~= "" and PNC.TaskLeaseService
+            and PNC.TaskLeaseService.Get
+            and PNC.TaskLeaseService.SetPhase
+        then
+            local lease = PNC.TaskLeaseService.Get(leaseId)
+            if lease and lease.phase == "WORKING" then
+                PNC.TaskLeaseService.SetPhase(leaseId, "WAITING")
+            end
+        end
         if leaseId ~= "" and PNC.Tasking and PNC.Tasking.Commands then
             PNC.Tasking.Commands.CancelForNPC(record.id, failure)
         end

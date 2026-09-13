@@ -110,6 +110,37 @@ local function deepCopy(value)
     return result
 end
 
+local function sameFluidDescription(left, right)
+    local capacityMatches
+    if not left or not right then return false end
+    capacityMatches = left.capacity == nil or right.capacity == nil
+        or math.abs((tonumber(left.capacity) or 0)
+            - (tonumber(right.capacity) or 0)) <= EPSILON
+    return math.abs((tonumber(left.amount) or 0)
+            - (tonumber(right.amount) or 0)) <= EPSILON
+        and capacityMatches
+        and tostring(left.primaryType or "")
+            == tostring(right.primaryType or "")
+        and (left.inputLocked == true) == (right.inputLocked == true)
+end
+
+local function reconcileCompactDescription(record, item, compactDescription,
+    authoritativeDescription)
+    if sameFluidDescription(compactDescription, authoritativeDescription) then
+        return false
+    end
+    if not Inventory.ApplyDelta or not authoritativeDescription
+        or not authoritativeDescription.state
+    then
+        return false
+    end
+    return Inventory.ApplyDelta(record, {{
+        op = "update",
+        itemID = item.id,
+        itemState = authoritativeDescription.state,
+    }}, "water_refill_state_reconcile") == true
+end
+
 local function syncNative(item)
     if item and type(item.syncItemFields) == "function" then
         pcall(item.syncItemFields, item)
@@ -277,9 +308,43 @@ function Service.FindContainer(record, itemID)
     return item, description
 end
 
+-- Read the destination state from the live body before a refill scene is
+-- started.  The compact item can lag behind the native projection when a
+-- previous refill, inventory packet, or vanilla action changed the bottle.
+-- Keeping this check separate from Refill makes scene admission read-only;
+-- Refill remains the transaction boundary that commits the mutation.
+function Service.CanRefill(record, itemID)
+    local item
+    local compactDescription
+    local body
+    local selected
+    local native
+    local description
+    item, compactDescription = Service.FindContainer(record, itemID)
+    if not item then return false, compactDescription end
+    body = liveBody(record)
+    if not body then return false, "NPC_BODY_UNAVAILABLE" end
+    selected = SupplyInternal and SupplyInternal.NativeCandidates
+        and SupplyInternal.NativeCandidates(body, item) or {}
+    native = selected[1] and selected[1].item or nil
+    if not native then return false, "WATER_CONTAINER_PHYSICAL_MISSING" end
+    description = Inventory.DescribeLiquidContainer(item, native)
+    if not description then
+        return false, "WATER_CONTAINER_NOT_REFILLABLE"
+    end
+    if (tonumber(description.freeCapacity) or 0) <= EPSILON then
+        return false, "WATER_CONTAINER_FULL"
+    end
+    if description.canFill ~= true then
+        return false, "WATER_CONTAINER_NOT_REFILLABLE"
+    end
+    return true, "WATER_CONTAINER_REFILLABLE"
+end
+
 function Service.Refill(record, itemID, source)
     local item
     local description
+    local compactDescription
     local body
     local selected
     local materializeUndo
@@ -338,6 +403,7 @@ function Service.Refill(record, itemID, source)
     details.compactLiquidType = description and description.primaryType
     details.compactCanFill = description and description.canFill
     details.compactCanDrink = description and description.canDrink
+    compactDescription = description
     body = liveBody(record)
     if not body then return fail("NPC_BODY_UNAVAILABLE") end
     details.liveBodyAvailable = true
@@ -397,6 +463,12 @@ function Service.Refill(record, itemID, source)
     details.compactCanDrink = description and description.canDrink
     setStateDetails(details, "compact", description and description.state)
     if not capacity or freeCapacity <= EPSILON then
+        details.compactAmountBefore = compactDescription
+            and compactDescription.amount or nil
+        details.compactCapacityBefore = compactDescription
+            and compactDescription.capacity or nil
+        details.compactStateReconciled = reconcileCompactDescription(record,
+            item, compactDescription, description)
         if materializeUndo then pcall(materializeUndo) end
         return fail("WATER_CONTAINER_FULL")
     end

@@ -186,6 +186,19 @@ function Settings.PlayerOwnedNPCNeedMortalityEnabled()
     return Settings.GetBoolean("PlayerOwnedNPCNeedMortality", true)
 end
 
+-- One world-wide mode keeps the hot path branch predictable and avoids
+-- storing a mode flag on each NPC.  1 is the cheap hunger/thirst model; 2
+-- enables the player-shaped calorie, macro, and weight simulation.
+function Settings.PlayerOwnedNPCNutritionMode()
+    local vars = projectVars()
+    local mode = math.floor(tonumber(vars and vars.PlayerOwnedNPCNutritionMode) or 1)
+    return mode == 2 and "realism" or "simple"
+end
+
+function Settings.PlayerOwnedNPCNutritionRealismEnabled()
+    return Settings.PlayerOwnedNPCNutritionMode() == "realism"
+end
+
 function Settings.MobileGroupAccidentChance(groupType)
     local defaults = { REFUGEE = 30, LOOTER = 10, TRADER = 1 }
     local keys = {

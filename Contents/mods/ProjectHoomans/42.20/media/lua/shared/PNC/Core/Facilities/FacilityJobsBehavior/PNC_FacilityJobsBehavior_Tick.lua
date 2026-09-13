@@ -44,6 +44,44 @@ local function isRemovedWaterActivity(runtime, order)
         or resourceKind == "nearby_water"
 end
 
+local function waterRefillSceneReady(record, runtime)
+    local waterService = PNC.WaterContainerService
+    local inventory = PNC.Inventory
+    local inv
+    local item
+    local description
+    local freeCapacity
+    if tostring(runtime and runtime.resourceKind or "") ~= "water_refill"
+    then
+        return true
+    end
+    if not inventory or not inventory.EnsureRecordInventory
+        or not inventory.DescribeLiquidContainer
+    then
+        return true
+    end
+    if waterService and waterService.CanRefill then
+        return waterService.CanRefill(
+            record, runtime and runtime.activityItemID)
+    end
+    inv = inventory.EnsureRecordInventory(record, {
+        reconcileWaterContainer = false,
+    })
+    item = inv and inv.items
+        and inv.items[tostring(runtime.activityItemID or "")] or nil
+    if not item then return false, "WATER_CONTAINER_NOT_REFILLABLE" end
+    description = inventory.DescribeLiquidContainer(item)
+    if not description then return false, "WATER_CONTAINER_NOT_REFILLABLE" end
+    freeCapacity = tonumber(description.freeCapacity)
+        or (tonumber(description.capacity) or 0)
+            - (tonumber(description.amount) or 0)
+    if freeCapacity <= 0 then return false, "WATER_CONTAINER_FULL" end
+    if description.canFill ~= true then
+        return false, "WATER_CONTAINER_NOT_REFILLABLE"
+    end
+    return true
+end
+
 function Internal.Tick(record, zombie)
     local runtime = Internal.State(record)
     local order = record.orderSpec or {}
@@ -65,6 +103,8 @@ function Internal.Tick(record, zombie)
     local started
     local startReason
     local startupNow
+    local refillReady
+    local refillReason
     -- The durable order normally owns this data. If a passive group repair
     -- replaced it while the activity remained live, use the canonical order
     -- captured at activity start instead of falling through to FollowOwner.
@@ -402,6 +442,28 @@ function Internal.Tick(record, zombie)
                 startupNow,
                 "sleep"
             )
+        end
+        refillReady, refillReason = waterRefillSceneReady(record, runtime)
+        if not refillReady then
+            local leaseId = runtime.taskLeaseId
+            runtime.failedReason = refillReason
+            deferActivityRetry(record, runtime)
+            Internal.Finish(record, zombie, refillReason)
+            if leaseId ~= "" and PNC.TaskLeaseService
+                and PNC.TaskLeaseService.Get
+                and PNC.TaskLeaseService.SetPhase
+            then
+                local lease = PNC.TaskLeaseService.Get(leaseId)
+                if lease and lease.phase == "WORKING" then
+                    PNC.TaskLeaseService.SetPhase(leaseId, "WAITING")
+                end
+            end
+            if leaseId ~= "" and PNC.Tasking and PNC.Tasking.Commands
+                and PNC.Tasking.Commands.CancelForNPC
+            then
+                PNC.Tasking.Commands.CancelForNPC(record.id, refillReason)
+            end
+            return true
         end
         started, startReason = PNC.AnimationScenes.Request(record, zombie, sceneId, {
             reason = "facility_" .. tostring(order.capability),

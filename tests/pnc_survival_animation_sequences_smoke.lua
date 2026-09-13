@@ -90,6 +90,29 @@ T.truthy(keepPlaying,
 T.truthy(record.runtime.facilityActivity.completionRequested,
     "food task records completion while wipe steps continue")
 
+-- A failed delayed effect must stop the scene without advertising completion;
+-- otherwise task reevaluation can keep the failed lease alive.
+local originalNeedEffectTick = PNC.NeedFacilityEffects.Tick
+PNC.NeedFacilityEffects.Tick = function()
+    return false, false, "WATER_CONTAINER_FULL"
+end
+record.runtime.facilityActivity = {
+    capability = "survival.fill.water",
+    sceneId = "survival.fill.water",
+    reservationId = "", taskLeaseId = "lease:failed-effect",
+    resourceKind = "water_refill",
+}
+local failedSceneResult = PNC.FacilityJobs.OnSceneTick(record, {}, {
+    id = "survival.fill.water",
+}, 1500)
+T.falsy(failedSceneResult, "failed refill effect stops the scene")
+T.equal(record.runtime.facilityActivity.failedReason,
+    "WATER_CONTAINER_FULL",
+    "failed refill effect preserves its transaction reason")
+T.falsy(record.runtime.facilityActivity.completionRequested,
+    "failed refill effect is not mislabeled as completed")
+PNC.NeedFacilityEffects.Tick = originalNeedEffectTick
+
 record.runtime.facilityActivity = {
     capability = "sleep", sceneId = "facility.sleep.floor",
     reservationId = "", taskLeaseId = "",
@@ -179,6 +202,92 @@ T.truthy(PNC.FacilityJobs.Tick(record, live),
 T.equal(requestedOptions.repeatMode, "once",
     "drink sequences cannot be overridden into an endless loop")
 T.equal(faced, "west", "the NPC faces the sink from the adjacent square")
+
+-- Do not play a refill scene when the selected bottle is already full by the
+-- time the NPC reaches the source. This is the last-mile guard for a stale
+-- assignment made while the bottle was still empty.
+PNC.Core.Now = function() return 1000 end
+local originalInventory = PNC.Inventory
+local refillSceneRequests = 0
+PNC.Inventory = {
+    EnsureRecordInventory = function()
+        return { items = {
+            ["full-bottle"] = { id = "full-bottle", type = "Base.WaterBottle" },
+        } }
+    end,
+    DescribeLiquidContainer = function()
+        return { amount = 1, capacity = 1, freeCapacity = 0,
+            canFill = false, canDrink = true }
+    end,
+}
+PNC.AnimationScenes.Request = function()
+    refillSceneRequests = refillSceneRequests + 1
+    return true
+end
+local staleRefill = {
+    id = "npc:stale-refill",
+    orderSpec = {
+        kind = "facility_activity", capability = "survival.fill.water",
+        x = 11.5, y = 10.5, z = 0, sceneId = "survival.fill.water",
+    },
+    runtime = { facilityActivity = {
+        capability = "survival.fill.water",
+        sceneId = "survival.fill.water",
+        resourceKind = "water_refill",
+        activityItemID = "full-bottle",
+        taskLeaseId = "",
+        previousOrder = { kind = "follow" },
+    } },
+    x = 11.5, y = 10.5, z = 0,
+}
+T.truthy(PNC.FacilityJobs.Tick(staleRefill, live),
+    "stale refill assignment is handled before scene start")
+T.equal(refillSceneRequests, 0,
+    "full bottle does not start another refill animation")
+T.equal(staleRefill.runtime.waterRefillRetryAt, 6000,
+    "last-mile full-bottle rejection installs a bounded retry cooldown")
+T.equal(staleRefill.runtime.facilityActivity, nil,
+    "last-mile full-bottle rejection cleans up the activity")
+PNC.Inventory = originalInventory
+
+-- Failed one-shot scenes must not leave a WORKING task lease stranded after
+-- the activity has already been cleaned up.
+local originalTasking = PNC.Tasking
+local originalTaskLeaseService = PNC.TaskLeaseService
+local leasePhase
+local cancelledLease
+PNC.TaskLeaseService = {
+    Get = function() return { phase = "WORKING" } end,
+    SetPhase = function(_, phase) leasePhase = phase; return true end,
+}
+PNC.Tasking = {
+    Commands = {
+        CancelForNPC = function(_, reason)
+            cancelledLease = reason
+            return true
+        end,
+    },
+}
+local failedRefill = {
+    id = "npc:failed-refill",
+    orderSpec = { kind = "facility_activity" },
+    runtime = { facilityActivity = {
+        capability = "survival.fill.water",
+        resourceKind = "water_refill",
+        taskLeaseId = "lease:failed-refill",
+        failedReason = "WATER_CONTAINER_FULL",
+        previousOrder = { kind = "follow" },
+    } },
+}
+PNC.FacilityJobs.OnSceneStopped(failedRefill, nil, {
+    id = "survival.fill.water",
+}, "callback_complete")
+T.equal(leasePhase, "WAITING",
+    "failed refill moves a working lease to a cancellable phase")
+T.equal(cancelledLease, "WATER_CONTAINER_FULL",
+    "failed refill cancellation preserves the transaction reason")
+PNC.Tasking = originalTasking
+PNC.TaskLeaseService = originalTaskLeaseService
 
 PNC.AnimationScenes.Request = function()
     return false, "scene_missing"

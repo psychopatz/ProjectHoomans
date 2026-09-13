@@ -18,24 +18,44 @@ local function nowHours()
     return PNC.NeedsUtils and PNC.NeedsUtils.WorldAgeHours() or 0
 end
 
+local function realismEnabled()
+    return PNC.Sandbox
+        and PNC.Sandbox.PlayerOwnedNPCNutritionRealismEnabled
+        and PNC.Sandbox.PlayerOwnedNPCNutritionRealismEnabled() == true
+end
+
+local function normalizeNutrition(nutrition)
+    if type(nutrition) ~= "table" then return nil end
+    return {
+        calories = math.max(Definitions.NUTRITION.minimumCalories,
+            math.min(Definitions.NUTRITION.maximumCalories,
+                tonumber(nutrition.calories)
+                    or Definitions.NUTRITION.defaultCalories)),
+        calorieOverflow = 0,
+        carbohydrates = math.max(Definitions.NUTRITION.minimumMacro,
+            math.min(Definitions.NUTRITION.maximumMacro,
+                tonumber(nutrition.carbohydrates)
+                    or Definitions.NUTRITION.defaultCarbohydrates)),
+        proteins = math.max(Definitions.NUTRITION.minimumMacro,
+            math.min(Definitions.NUTRITION.maximumMacro,
+                tonumber(nutrition.proteins)
+                    or Definitions.NUTRITION.defaultProteins)),
+        lipids = math.max(Definitions.NUTRITION.minimumMacro,
+            math.min(Definitions.NUTRITION.maximumMacro,
+                tonumber(nutrition.lipids)
+                    or Definitions.NUTRITION.defaultLipids)),
+        weight = math.max(Definitions.NUTRITION.minimumWeight,
+            math.min(Definitions.NUTRITION.maximumWeight,
+                tonumber(nutrition.weight)
+                    or Definitions.NUTRITION.defaultWeight)),
+    }
+end
+
 local function normalize(state)
     state = type(state) == "table" and state or {}
-    local nutrition = state.nutrition or {}
     return {
         needs = PNC.NeedsUtils.NormalizeState(state.needs or state, 0),
-        nutrition = {
-            calories = math.max(Definitions.NUTRITION.minimumCalories,
-                math.min(Definitions.NUTRITION.maximumCalories,
-                    tonumber(nutrition.calories)
-                        or Definitions.NUTRITION.defaultCalories)),
-            calorieOverflow = math.max(0,
-                math.min(Definitions.NUTRITION.maximumCalorieOverflow or 0,
-                    tonumber(nutrition.calorieOverflow) or 0)),
-            weight = math.max(Definitions.NUTRITION.minimumWeight,
-                math.min(Definitions.NUTRITION.maximumWeight,
-                    tonumber(nutrition.weight)
-                        or Definitions.NUTRITION.defaultWeight)),
-        },
+        nutrition = normalizeNutrition(state.nutrition),
         morale = {
             conditions = type(state.morale) == "table"
                 and type(state.morale.conditions) == "table"
@@ -50,14 +70,25 @@ function Repository.Load(force)
     if Repository.Loaded and force ~= true then return Repository.Records end
     local raw = ModData and ModData.getOrCreate
         and ModData.getOrCreate(Repository.MODDATA_KEY) or nil
-    local decoded, at = Codec.Decode(raw)
+    local decoded, at, reason = Codec.Decode(raw)
+    local reset = reason == "version_mismatch" or reason == "invalid_state"
     Repository.Records, Repository.EvaluatedAt = {}, {}
     Repository.PersistedAt = at
     for id, state in pairs(decoded) do
         Repository.Records[id] = normalize(state)
         Repository.EvaluatedAt[id] = at
     end
-    Repository.Loaded, Repository.Dirty = true, false
+    Repository.Loaded, Repository.Dirty = true, reset
+    Repository.LastReset = reset and {
+        reason = reason,
+        fromVersion = type(raw) == "table" and tonumber(raw.v) or nil,
+        toVersion = Codec.VERSION,
+    } or nil
+    if reset and PNC.Core and PNC.Core.LogWarn then
+        PNC.Core.LogWarn("PNC needs state reset reason=" .. tostring(reason)
+            .. " fromVersion=" .. tostring(Repository.LastReset.fromVersion)
+            .. " toVersion=" .. tostring(Codec.VERSION))
+    end
     return Repository.Records
 end
 
@@ -69,8 +100,13 @@ function Repository.Get(recordOrID, create)
     local state = Repository.Records[id]
     if not state and create ~= false then
         state = normalize(nil)
-        if record and PNC.PlayerNeedsModel and PNC.PlayerNeedsModel.GetInitialWeight then
-            state.nutrition.weight = PNC.PlayerNeedsModel.GetInitialWeight(record)
+        if realismEnabled() then
+            state.nutrition = normalizeNutrition({
+                weight = record and PNC.PlayerNeedsModel
+                    and PNC.PlayerNeedsModel.GetInitialWeight
+                    and PNC.PlayerNeedsModel.GetInitialWeight(record)
+                    or Definitions.NUTRITION.defaultWeight,
+            })
         end
         Repository.Records[id] = state
         Repository.EvaluatedAt[id] = nowHours()

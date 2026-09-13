@@ -235,6 +235,7 @@ Status.Register("facility_activity", 80, function(record)
                 and (runtime.resource.resourceKind
                     or runtime.resource.detectorId
                     or runtime.resource.kind),
+            activityItemID = runtime.activityItemID,
             activityItemFullType = itemFullType,
             activityItemLabelKey = itemLabelKey,
         })
@@ -281,6 +282,7 @@ Status.Register("current_job", 10, function(record)
                         and (facilityRuntime.resource.resourceKind
                             or facilityRuntime.resource.detectorId
                             or facilityRuntime.resource.kind),
+                    activityItemID = facilityRuntime.activityItemID,
                     activityItemFullType = itemFullType,
                     activityItemLabelKey = itemLabelKey,
                 })

@@ -6,6 +6,7 @@ local prefix = "PNC/Needs/IndividualNeeds/"
 local providers = {
     "PNC_IndividualNeeds_Core",
     "PNC_IndividualNeeds_Actions",
+    "PNC_IndividualNeeds_Nutrition",
     "PNC_IndividualNeeds_Evolution",
     "PNC_IndividualNeeds_Lifecycle",
 }
@@ -49,7 +50,7 @@ for name in pairs(directFunctions) do
     T.equal(type(Needs[name]), "function",
         "entry point preserves IndividualNeeds." .. name)
 end
-T.equal(directCount, 21, "individual-needs direct function count")
+T.equal(directCount, 24, "individual-needs direct function count")
 local commandCount = 0
 for name in pairs(commandFunctions) do
     commandCount = commandCount + 1

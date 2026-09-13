@@ -34,7 +34,7 @@ end
 
 function Model.GetInitialWeight(record)
     local traits = Model.GetTraits(record)
-    if traits[Model.TRAITS.OBESE] then return 110 end
+    if traits[Model.TRAITS.OBESE] then return 105 end
     if traits[Model.TRAITS.OVERWEIGHT] then return 95 end
     if traits[Model.TRAITS.EMACIATED] then return 50 end
     if traits[Model.TRAITS.VERY_UNDERWEIGHT] then return 60 end

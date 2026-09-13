@@ -30,8 +30,6 @@ local function currentFoodValues(profile, state, status)
     if hungerChange ~= nil then
         if state.cooked == true then
             hungerChange = hungerChange * 1.3
-        elseif state.burnt == true then
-            hungerChange = hungerChange / 3
         elseif status.rotten then
             hungerChange = hungerChange / 2.2
         elseif status.stale then
@@ -40,9 +38,7 @@ local function currentFoodValues(profile, state, status)
         hunger = math.max(0, -hungerChange)
     end
     if thirstChange ~= nil then
-        if state.burnt == true then
-            thirstChange = thirstChange / 5
-        elseif state.cooked == true then
+        if state.cooked == true then
             thirstChange = thirstChange / 2
         end
         thirst = math.max(0, -thirstChange)
@@ -93,14 +89,25 @@ function H.Describe(profile, state, quantity)
     then
         expiry = math.max(0, math.min(1, age / profile.offAgeMax))
     end
+    local burntMultiplier = state.burnt == true and 0.20 or 1
     return {
         typeId = profile.typeId,
         fullType = profile.fullType,
         quantity = math.max(1, math.floor(H.Number(quantity, 1) or 1)),
-        hunger = hunger,
-        thirst = thirst,
-        calories = profile.calories,
-        negativeThirst = negativeThirst,
+        -- Descriptor values are the contribution used by selectors and
+        -- provisioning. Consumption applies only the partial-use fraction,
+        -- so burnt items are not accidentally reduced twice.
+        hunger = hunger * burntMultiplier,
+        thirst = thirst * burntMultiplier,
+        calories = (H.Number(profile.calories, 0) or 0) * burntMultiplier,
+        carbohydrates = profile.carbohydrates ~= nil
+            and (H.Number(profile.carbohydrates, 0) or 0) * burntMultiplier
+            or nil,
+        proteins = profile.proteins ~= nil
+            and (H.Number(profile.proteins, 0) or 0) * burntMultiplier or nil,
+        lipids = profile.lipids ~= nil
+            and (H.Number(profile.lipids, 0) or 0) * burntMultiplier or nil,
+        negativeThirst = negativeThirst * burntMultiplier,
         fluidAmount = fluidAmount,
         fluidType = fluidType ~= "" and fluidType or nil,
         fluidHydration = fluidHydration,
@@ -117,6 +124,8 @@ function H.Describe(profile, state, quantity)
         bandage = profile.bandage == true,
         unsafe = unsafe,
         burnt = state.burnt == true,
+        burntMultiplier = burntMultiplier,
+        effectiveValues = true,
         frozen = state.frozen == true,
         expiry = expiry,
         state = state,

@@ -272,10 +272,10 @@ T.equal(PNC.ClientFirearmEffects.Play(remotePayload), true, "unresolved remote s
 T.equal(freeEmitterSound, "ModdedRifleShot", "remote positional emitter uses packet weapon sound")
 T.equal(lightCreated, 1, "Bandits-compatible muzzle light created")
 T.equal(lastLight.args[8], 1, "muzzle light uses one-tick lifetime")
-T.equal(lastLight.args[4], 0.82, "muzzle light uses softened red channel")
-T.equal(lastLight.args[5], 0.70, "muzzle light uses softened green channel")
-T.equal(lastLight.args[6], 0.54, "muzzle light uses softened blue channel")
-T.equal(lastLight.args[7], 12, "muzzle light uses reduced radius")
+T.equal(lastLight.args[4], 0.78, "muzzle light uses softened red channel")
+T.equal(lastLight.args[5], 0.68, "muzzle light uses softened green channel")
+T.equal(lastLight.args[6], 0.52, "muzzle light uses softened blue channel")
+T.equal(lastLight.args[7], 9, "muzzle light uses reduced radius")
 T.equal(#PNC.ClientFirearmEffects.ActiveMuzzleFlashes, 1,
     "fallback muzzle flash queued at the weapon-forward point")
 T.equal(#PNC.ClientFirearmEffects.ActiveTracers, 3, "fallback tracers queued")
@@ -285,6 +285,16 @@ T.truthy(renderLines[1], "fallback muzzle/tracer renderline submitted")
 T.truthy(renderLines[1].x1 ~= renderLines[1].x2
     or renderLines[1].y1 ~= renderLines[1].y2,
     "fallback renderline has visible trajectory")
+local cappedPayload = {}
+for key, value in pairs(remotePayload) do cappedPayload[key] = value end
+cappedPayload.shotId = "npc_modded_rifle:remote:3:1100"
+cappedPayload.projectileCount = 16
+T.equal(PNC.ClientFirearmEffects.Play(cappedPayload), true,
+    "high-count fallback shot rendered")
+T.equal(#PNC.ClientFirearmEffects.ActiveTracers, 8,
+    "fallback visual projectile budget caps a high-count shot")
+T.equal(lightCreated, 2,
+    "fallback light budget limits world lights in a burst")
 T.truthy(auditEvents.play_start, "firearm audit recorded client entry")
 T.truthy(auditEvents.muzzle_light_complete, "firearm audit recorded muzzle light")
 T.truthy(auditEvents.tracer_screen_queue_complete, "firearm audit recorded tracer queue")

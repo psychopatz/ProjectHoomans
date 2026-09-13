@@ -29,15 +29,19 @@ function body:setVariable(key, value) self.variables[key] = value end
 
 local ok, reason = PNC.Equipment.ApplyActivityHands(body, {
     activityItemFullType = "Base.Apple",
+    activityItemID = "food-1",
     hand = "primary",
 })
 T.truthy(ok, reason)
 T.equal(body.primary.fullType, "Base.Apple", "primary activity item")
 T.equal(body.secondary, nil, "food leaves secondary hand empty")
 T.equal(body.variables.PNCActivityItem, "Base.Apple", "activity variable")
+T.equal(body.modData.PNCActivityHandsItemID, "food-1",
+    "activity hand latch keeps the exact item identity")
 
 ok, reason = PNC.Equipment.ApplyActivityHands(body, {
     activityItemFullType = "Base.Apple",
+    activityItemID = "food-1",
     hand = "primary",
 })
 T.truthy(ok, reason)
@@ -53,6 +57,26 @@ ok, reason = PNC.Equipment.ApplyActivityHands(body, nil)
 T.truthy(ok, reason)
 T.equal(body.primary, nil, "activity item cleared")
 T.equal(body.modData.PNCActivityHandsSignature, nil, "activity latch cleared")
+T.equal(body.modData.PNCActivityHandsItemID, nil,
+    "activity item identity clears with the visual latch")
+
+local callErrorBody = { modData = {}, variables = {} }
+function callErrorBody:getModData() return self.modData end
+function callErrorBody:setPrimaryHandItem(item)
+    self.primary = item
+    error("simulated Kahlua return-frame failure")
+end
+function callErrorBody:setSecondaryHandItem(item) self.secondary = item end
+function callErrorBody:getPrimaryHandItem() return self.primary end
+function callErrorBody:getSecondaryHandItem() return self.secondary end
+function callErrorBody:resetEquippedHandsModels() end
+function callErrorBody:setVariable(key, value) self.variables[key] = value end
+ok, reason = PNC.Equipment.ApplyActivityHands(callErrorBody, {
+    activityItemFullType = "Base.Bread",
+})
+T.truthy(ok, reason)
+T.equal(callErrorBody.primary.fullType, "Base.Bread",
+    "a completed hand setter is accepted after a return-frame error")
 
 ok, reason = PNC.Equipment.ApplyActivityHands(body, {
     activityItemFullType = "Base.Invalid",
@@ -72,6 +96,7 @@ local activity = resolve({
     actionInformation = {
         kind = "activity",
         capability = "food.dine",
+        activityItemID = "food-1",
         activityItemFullType = "Base.Apple",
     },
     visualState = {
@@ -81,6 +106,41 @@ local activity = resolve({
 })
 T.equal(activity.source, "food", "food activity source")
 T.equal(activity.activityItemFullType, "Base.Apple", "food activity item")
+T.equal(activity.activityItemID, "food-1", "food activity item identity")
+
+activity = resolve({
+    actionInformation = {
+        kind = "activity",
+        capability = "survival.drink.inventory",
+        activityItemID = "bottle-1",
+        activityItemFullType = "Base.WaterBottle",
+    },
+    visualState = {
+        sceneId = "survival.drink.inventory",
+        sceneStartedAt = 15,
+    },
+})
+T.equal(activity.source, "hydration", "inventory drink activity source")
+T.equal(activity.activityItemID, "bottle-1",
+    "inventory drink preserves the exact selected item")
+
+activity = resolve({
+    actionInformation = {
+        kind = "activity",
+        capability = "survival.fill.water",
+        resourceKind = "water_refill",
+        activityItemID = "bottle-2",
+        activityItemFullType = "Base.WaterBottle",
+    },
+    visualState = {
+        sceneActive = true,
+        sceneId = "survival.fill.water",
+        sceneStartedAt = 18,
+    },
+})
+T.equal(activity.source, "water_refill", "water refill activity source")
+T.equal(activity.activityItemID, "bottle-2",
+    "water refill preserves the exact selected item")
 
 activity = resolve({
     actionInformation = {

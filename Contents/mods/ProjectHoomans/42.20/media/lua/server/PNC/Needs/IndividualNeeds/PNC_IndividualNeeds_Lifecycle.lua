@@ -17,6 +17,9 @@ function Needs.Reset(record)
     if nutrition then
         nutrition.calories = Definitions.NUTRITION.defaultCalories
         nutrition.calorieOverflow = 0
+        nutrition.carbohydrates = Definitions.NUTRITION.defaultCarbohydrates
+        nutrition.proteins = Definitions.NUTRITION.defaultProteins
+        nutrition.lipids = Definitions.NUTRITION.defaultLipids
         nutrition.weight = PlayerModel.GetInitialWeight(record)
     end
     PNC.NeedsRepository.SetEvaluatedAt(record, Utils.WorldAgeHours())

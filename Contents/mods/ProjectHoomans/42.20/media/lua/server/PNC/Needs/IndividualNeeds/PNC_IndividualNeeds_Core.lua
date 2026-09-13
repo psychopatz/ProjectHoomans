@@ -8,6 +8,7 @@ local PlayerModel = PNC.PlayerNeedsModel
 local EventBus = require "PsychopatzCore/Events/PC_EventBus"
 local EventTypes = PNC.EventTypes
 local H = Needs.Internal
+local MACRO_FIELDS = { "carbohydrates", "proteins", "lipids" }
 
 Needs.Listeners = Needs.Listeners or {}
 function Needs.RegisterListener(eventName, listener)
@@ -75,6 +76,12 @@ end
 
 function Needs.IsEligible(record) return H.Owned(record) end
 
+function Needs.IsNutritionRealismEnabled()
+    return PNC.Sandbox
+        and PNC.Sandbox.PlayerOwnedNPCNutritionRealismEnabled
+        and PNC.Sandbox.PlayerOwnedNPCNutritionRealismEnabled() == true
+end
+
 function Needs.Ensure(record, initial)
     if not H.Owned(record) then return nil, "not_player_owned" end
     if PlayerModel and PlayerModel.EnsureTraits then
@@ -91,6 +98,12 @@ function Needs.Ensure(record, initial)
         end
     end
     H.Runtime(record)
+    if Needs.IsNutritionRealismEnabled() then
+        -- Existing SIMPLE-mode records are upgraded lazily the first time
+        -- their owner enters REALISM; new SIMPLE records remain allocation-
+        -- free beyond the primitive need state.
+        Needs.EnsureNutrition(record)
+    end
     return entry.needs
 end
 
@@ -100,8 +113,35 @@ function Needs.GetState(record)
 end
 
 function Needs.GetNutrition(record)
+    if not Needs.IsNutritionRealismEnabled() then return nil end
     local state = Needs.GetState(record)
     return state and state.nutrition or nil
+end
+
+function Needs.EnsureNutrition(record)
+    if not H.Owned(record) then return nil, "not_player_owned" end
+    if not Needs.IsNutritionRealismEnabled() then
+        return nil, "nutrition_disabled"
+    end
+    local state = Needs.GetState(record)
+    if not state then return nil, "repository_unavailable" end
+    if not state.nutrition then
+        local tuning = Definitions.NUTRITION
+        local weight = PlayerModel and PlayerModel.GetInitialWeight
+            and PlayerModel.GetInitialWeight(record) or tuning.defaultWeight
+        state.nutrition = {
+            calories = tuning.defaultCalories,
+            calorieOverflow = 0,
+            carbohydrates = tuning.defaultCarbohydrates,
+            proteins = tuning.defaultProteins,
+            lipids = tuning.defaultLipids,
+            weight = math.max(tuning.minimumWeight,
+                math.min(tuning.maximumWeight, tonumber(weight)
+                    or tuning.defaultWeight)),
+        }
+        if PNC.NeedsRepository then PNC.NeedsRepository.MarkDirty() end
+    end
+    return state.nutrition
 end
 
 function Needs.Get(record, needType)
@@ -163,38 +203,54 @@ function Needs.GetRates(record)
 end
 
 function Needs.ModifyNutrition(record, calories, reason)
-    local state = Needs.GetState(record)
-    if not state then return nil, "not_player_owned" end
+    local nutrition, nutritionReason = Needs.EnsureNutrition(record)
+    if not nutrition then return nil, nutritionReason end
     local tuning = Definitions.NUTRITION
-    local before = tonumber(state.nutrition.calories)
+    local before = tonumber(nutrition.calories)
         or tuning.defaultCalories
-    local overflow = math.max(0, tonumber(state.nutrition.calorieOverflow) or 0)
-    local beforeBalance = before + overflow
-    local maximumOverflow = math.max(0,
-        tonumber(tuning.maximumCalorieOverflow) or 0)
-    local balance = math.max(tuning.minimumCalories,
-        math.min(tuning.maximumCalories + maximumOverflow,
-            beforeBalance + (tonumber(calories) or 0)))
-    state.nutrition.calories = math.min(tuning.maximumCalories, balance)
-    state.nutrition.calorieOverflow = math.max(0,
-        balance - tuning.maximumCalories)
-    if before ~= state.nutrition.calories
-        or overflow ~= state.nutrition.calorieOverflow
-    then
+    local after = math.max(tuning.minimumCalories,
+        math.min(tuning.maximumCalories,
+            before + (tonumber(calories) or 0)))
+    nutrition.calories = after
+    nutrition.calorieOverflow = 0
+    if before ~= after then
         if PNC.NeedsRepository then
             PNC.NeedsRepository.MarkDirty()
         end
     end
-    return state.nutrition.calories, reason
+    return after, reason
+end
+
+function Needs.ModifyNutritionMacros(record, effect, reason)
+    local nutrition, nutritionReason = Needs.EnsureNutrition(record)
+    if not nutrition then return nil, nutritionReason end
+    local tuning = Definitions.NUTRITION
+    local changed = false
+    for _, field in ipairs(MACRO_FIELDS) do
+        local defaultKey = "default" .. string.upper(string.sub(field, 1, 1))
+            .. string.sub(field, 2)
+        local before = tonumber(nutrition[field])
+            or tonumber(tuning[defaultKey]) or 0
+        local after = math.max(tuning.minimumMacro,
+            math.min(tuning.maximumMacro,
+                before + (tonumber(effect and effect[field]) or 0)))
+        nutrition[field] = after
+        if before ~= after then changed = true end
+    end
+    if changed and PNC.NeedsRepository then PNC.NeedsRepository.MarkDirty() end
+    return nutrition, reason
 end
 
 function H.WeightCategory(weight)
     weight = tonumber(weight) or Definitions.NUTRITION.defaultWeight
-    if weight < 55 then return "EMACIATED" end
-    if weight < 65 then return "VERY_UNDERWEIGHT" end
-    if weight < 75 then return "UNDERWEIGHT" end
-    if weight >= 105 then return "OBESE" end
-    if weight >= 90 then return "OVERWEIGHT" end
+    -- These are the player Nutrition trait boundaries, rather than the
+    -- previous broad NPC display buckets.  The lower bands intentionally
+    -- preserve the base game's boundary behavior at 50/65/75.
+    if weight <= 50 then return "EMACIATED" end
+    if weight <= 65 then return "VERY_UNDERWEIGHT" end
+    if weight <= 75 then return "UNDERWEIGHT" end
+    if weight >= 100 then return "OBESE" end
+    if weight >= 85 then return "OVERWEIGHT" end
     return "NORMAL"
 end
 

@@ -11,6 +11,7 @@ PNC.IndividualNeeds.Internal = PNC.IndividualNeeds.Internal or {}
 
 require "PNC/Needs/IndividualNeeds/PNC_IndividualNeeds_Core"
 require "PNC/Needs/IndividualNeeds/PNC_IndividualNeeds_Actions"
+require "PNC/Needs/IndividualNeeds/PNC_IndividualNeeds_Nutrition"
 require "PNC/Needs/IndividualNeeds/PNC_IndividualNeeds_Evolution"
 require "PNC/Needs/IndividualNeeds/PNC_IndividualNeeds_Lifecycle"
 

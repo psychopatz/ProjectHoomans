@@ -82,6 +82,7 @@ local eating = Status.Build({
         facilityActivity = {
             capability = "survival.eat.inventory",
             phase = "STARTING",
+            activityItemID = "food-1",
         },
         supply = {
             byKind = {
@@ -92,6 +93,8 @@ local eating = Status.Build({
 })
 T.equal(eating.activityItemFullType, "Base.Apple",
     "food activity exposes the selected item type")
+T.equal(eating.activityItemID, "food-1",
+    "food activity preserves the exact selected item")
 T.equal(eating.activityItemLabelKey, "UI_PNC_Action_FoodTarget",
     "food activity exposes its item fallback")
 

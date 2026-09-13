@@ -29,6 +29,30 @@ function H.BuildStatic(fullType, typeID)
     hungerChange = H.NormalizeNeedChange(hungerChange)
     thirstChange = H.NormalizeNeedChange(thirstChange)
     local calories = H.ReadNumber(item, scriptItem, { "getCalories" }, 0)
+    local carbohydrates
+    local proteins
+    local lipids
+    local realism = PNC.Sandbox
+        and PNC.Sandbox.PlayerOwnedNPCNutritionRealismEnabled
+        and PNC.Sandbox.PlayerOwnedNPCNutritionRealismEnabled() == true
+    if realism then
+        local properties = H.Call(fluidContainer, "getProperties")
+        carbohydrates = H.ReadNumber(item, scriptItem,
+            { "getCarbohydrates", "getCarbs" }, 0)
+        proteins = H.ReadNumber(item, scriptItem,
+            { "getProteins", "getProtein" }, 0)
+        lipids = H.ReadNumber(item, scriptItem,
+            { "getLipids" }, 0)
+        if properties then
+            calories = H.ReadNumber(properties, nil, { "getCalories" }, calories)
+            carbohydrates = H.ReadNumber(properties, nil,
+                { "getCarbohydrates", "getCarbs" }, carbohydrates)
+            proteins = H.ReadNumber(properties, nil,
+                { "getProteins", "getProtein" }, proteins)
+            lipids = H.ReadNumber(properties, nil,
+                { "getLipids" }, lipids)
+        end
+    end
     local typeString = string.lower(tostring(
         H.Call(scriptItem, "getTypeString")
             or H.Call(item, "getType") or ""))
@@ -47,6 +71,9 @@ function H.BuildStatic(fullType, typeID)
         hunger = math.max(0, -(hungerChange or 0)),
         thirst = math.max(0, -(thirstChange or 0)),
         calories = math.max(0, calories or 0),
+        carbohydrates = carbohydrates,
+        proteins = proteins,
+        lipids = lipids,
         negativeThirst = math.max(0, thirstChange or 0),
         useDelta = useDelta,
         offAge = H.ReadNumber(item, scriptItem, { "getOffAge" }),
@@ -87,6 +114,14 @@ end
 function Utility.GetStatic(typeID, fullType)
     typeID = math.floor(tonumber(typeID) or 0)
     if typeID <= 0 then return nil end
+    local realism = PNC.Sandbox
+        and PNC.Sandbox.PlayerOwnedNPCNutritionRealismEnabled
+        and PNC.Sandbox.PlayerOwnedNPCNutritionRealismEnabled() == true
+    local mode = realism and "realism" or "simple"
+    if Utility.StaticNutritionMode ~= mode then
+        Utility.StaticByTypeID = {}
+        Utility.StaticNutritionMode = mode
+    end
     local cached = Utility.StaticByTypeID[typeID]
     if cached then return cached end
     fullType = fullType or CoreInventory.getItemFullType(typeID)

@@ -8,6 +8,22 @@ local Core = PNC.Core
 local Visuals = PNC.Visuals
 local Inventory = PNC.Inventory
 
+local function nativeHandMatches(zombie, secondary, expected)
+    local method = secondary and "getSecondaryHandItem"
+        or "getPrimaryHandItem"
+    local ok
+    local actual
+    if not zombie or type(zombie[method]) ~= "function" then
+        return false
+    end
+    ok, actual = pcall(zombie[method], zombie)
+    return ok and actual == expected
+end
+
+local function acceptCompletedNativeHandCall(zombie, secondary, item, ok)
+    return ok == true or nativeHandMatches(zombie, secondary, item)
+end
+
 function Internal.isAttackMode(record)
     local runtime = record and record.runtime or nil
     if runtime and runtime.target ~= nil then
@@ -52,14 +68,14 @@ function Internal.applyHands(zombie, record, equipment, descriptor, attackMode)
 
     primaryType = descriptor.primaryType
     ok, errorMessage = Internal.safeInvoke(zombie, "setPrimaryHandItem", item)
-    if not ok then
+    if not acceptCompletedNativeHandCall(zombie, false, item, ok) then
         Internal.setEquipmentVariables(zombie, "barehand", nil, nil)
         return false, "primary_equip_failed:" .. tostring(errorMessage)
     end
 
     if item.isRequiresEquippedBothHands and item:isRequiresEquippedBothHands() then
         ok, errorMessage = Internal.safeInvoke(zombie, "setSecondaryHandItem", item)
-        if not ok then
+        if not acceptCompletedNativeHandCall(zombie, true, item, ok) then
             Internal.setEquipmentVariables(zombie, primaryType, descriptor.fullType, nil)
             Internal.refreshHands(zombie)
             return false, "secondary_both_hands_failed:" .. tostring(errorMessage)
@@ -70,7 +86,9 @@ function Internal.applyHands(zombie, record, equipment, descriptor, attackMode)
             secondaryItem, secondaryReason = Equipment.CreateItem(secondaryFullType)
             if secondaryItem then
                 ok, errorMessage = Internal.safeInvoke(zombie, "setSecondaryHandItem", secondaryItem)
-                if not ok then
+                if not acceptCompletedNativeHandCall(
+                    zombie, true, secondaryItem, ok)
+                then
                     secondaryFullType = nil
                     Core.LogWarn("PNC equipment failed to equip secondary " .. tostring(equipment.secondaryFullType) .. ": " .. tostring(errorMessage))
                 end

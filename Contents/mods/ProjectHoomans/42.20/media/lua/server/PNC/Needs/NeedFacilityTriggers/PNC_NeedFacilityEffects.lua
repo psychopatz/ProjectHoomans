@@ -217,14 +217,18 @@ local function applyWaterRefill(record, state, definition, now)
             source)
     end
     if ok ~= true then
+        -- Refill returns (false, reason) on failure and
+        -- (true, amount, itemID) on success. Preserve the transaction
+        -- reason when forwarding it to the activity/scene layer.
+        reason = reason or filled or "WATER_REFILL_FAILED"
         record.runtime.waterRefillRetryAt = (tonumber(now) or 0)
             + WATER_REFILL_RETRY_COOLDOWN_MS
         Effects.ReportWaterRefillResult(record, state, false,
-            reason or "WATER_REFILL_FAILED", {
+            reason, {
                 stage = "transaction",
                 itemID = itemID,
             })
-        return false, true, reason or "WATER_REFILL_FAILED"
+        return false, true, reason
     end
     state.effectAttempted = true
     return true, true, "WATER_REFILL_COMPLETE", filled

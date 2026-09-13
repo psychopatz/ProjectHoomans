@@ -197,6 +197,16 @@ function Triggers.CanContinue(lease)
         or AwayRoutes.IsCombatActive(record)
         or record.runtime and record.runtime.workOrderId
     then return false end
+    local activityOwnsLease = activity
+        and tostring(activity.taskLeaseId or "")
+            == tostring(lease and lease.leaseId or "")
+        and tostring(lease and lease.leaseId or "") ~= ""
+    if activityOwnsLease
+        and (activity.failedReason ~= nil
+            or activity.failureRequested == true)
+    then
+        return false
+    end
     if route then
         if not route.CanContinue(record, lease) then return false end
         if activity and activity.completionRequested == true then return true end

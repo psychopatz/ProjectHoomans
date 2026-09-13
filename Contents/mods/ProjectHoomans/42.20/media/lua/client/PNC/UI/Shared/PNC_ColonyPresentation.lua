@@ -8,6 +8,19 @@ local function calorieBalance(nutrition)
         + math.max(0, tonumber(nutrition.calorieOverflow) or 0)
 end
 
+local function nutritionVisible(value)
+    if value and value.nutritionMode then
+        return value.nutritionMode == "realism"
+            and type(value.nutrition) == "table"
+    end
+    if PNC.Sandbox and PNC.Sandbox.PlayerOwnedNPCNutritionRealismEnabled then
+        return type(value and value.nutrition) == "table"
+            and PNC.Sandbox.PlayerOwnedNPCNutritionRealismEnabled() == true
+    end
+    -- Keep older test/snapshot producers readable until they add the mode.
+    return true
+end
+
 local function regionFloor(region)
     local minimum
     for z, _ in pairs(type(region) == "table"
@@ -212,13 +225,15 @@ function Presentation.BuildPeople(person)
             needType, value.needs and value.needs[needType]
         )
     end
-    rows[#rows + 1] = Presentation.Detail(
-        Shared.Tr("UI_PNC_Nutrition_Calories", "CALORIE BALANCE"),
-        string.format("%.0f kcal", calorieBalance(value.nutrition)), "accent")
-    rows[#rows + 1] = Presentation.Detail(
-        Shared.Tr("UI_PNC_Nutrition_Weight", "WEIGHT"),
-        string.format("%.1f kg", tonumber(value.nutrition
-            and value.nutrition.weight) or 0), "accent")
+    if nutritionVisible(value) then
+        rows[#rows + 1] = Presentation.Detail(
+            Shared.Tr("UI_PNC_Nutrition_Calories", "CALORIE BALANCE"),
+            string.format("%.0f kcal", calorieBalance(value.nutrition)), "accent")
+        rows[#rows + 1] = Presentation.Detail(
+            Shared.Tr("UI_PNC_Nutrition_Weight", "WEIGHT"),
+            string.format("%.1f kg", tonumber(value.nutrition
+                and value.nutrition.weight) or 0), "accent")
+    end
     local journalRows = JournalPresentation.Rows(value.journal)
     rows[#rows + 1] = Presentation.Detail(Shared.Tr(
         "UI_PNC_Journal_Title", "COLONIST JOURNAL"), Shared.TrFormat(
@@ -252,13 +267,15 @@ function Presentation.BuildNeeds(person)
             needType, value.needs and value.needs[needType]
         )
     end
-    rows[#rows + 1] = Presentation.Detail(
-        Shared.Tr("UI_PNC_Nutrition_Calories", "CALORIE BALANCE"),
-        string.format("%.0f kcal", calorieBalance(value.nutrition)), "accent")
-    rows[#rows + 1] = Presentation.Detail(
-        Shared.Tr("UI_PNC_Nutrition_Weight", "WEIGHT"),
-        string.format("%.1f kg", tonumber(value.nutrition
-            and value.nutrition.weight) or 0), "accent")
+    if nutritionVisible(value) then
+        rows[#rows + 1] = Presentation.Detail(
+            Shared.Tr("UI_PNC_Nutrition_Calories", "CALORIE BALANCE"),
+            string.format("%.0f kcal", calorieBalance(value.nutrition)), "accent")
+        rows[#rows + 1] = Presentation.Detail(
+            Shared.Tr("UI_PNC_Nutrition_Weight", "WEIGHT"),
+            string.format("%.1f kg", tonumber(value.nutrition
+                and value.nutrition.weight) or 0), "accent")
+    end
     for _, statType in ipairs(PNC.ConditionStats
         and PNC.ConditionStats.TYPES or {})
     do

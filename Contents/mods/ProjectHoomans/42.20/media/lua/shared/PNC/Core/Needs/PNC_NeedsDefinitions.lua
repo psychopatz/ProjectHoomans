@@ -103,11 +103,16 @@ Definitions.SCHEDULER_BATCH_SIZE = 4
 Definitions.SCHEDULER_TIME_BUDGET_MS = 2
 Definitions.MAX_CATCHUP_HOURS = 168
 Definitions.NUTRITION = {
-    defaultCalories = 0, minimumCalories = -12000, maximumCalories = 12000,
-    maximumCalorieOverflow = 1000000,
+    -- These bounds mirror the player Nutrition class.  Nutrition is optional
+    -- on a runtime state, but when realism is enabled it uses this fixed,
+    -- compact shape for every player-owned colonist.
+    defaultCalories = 800, minimumCalories = -2200, maximumCalories = 3700,
+    defaultCarbohydrates = 0, defaultProteins = 0, defaultLipids = 0,
+    minimumMacro = -500, maximumMacro = 1000,
     defaultWeight = 80, minimumWeight = 35, maximumWeight = 200,
     calorieBurnPerHour = 2000 / 24, caloriesPerKilogram = 7700,
 }
+Definitions.NUTRITION_MODES = { SIMPLE = "simple", REALISM = "realism" }
 Definitions.CONSEQUENCES = {
     criticalThreshold = 0.84, nonlethalHealthFloor = 10,
 }

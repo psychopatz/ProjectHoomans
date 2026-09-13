@@ -17,6 +17,7 @@ local function applyConsumable(record, effect, source)
         source or "food_consumed")
     Needs.ModifyNutrition(record, tonumber(effect.calories) or 0,
         source or "food_consumed")
+    Needs.ModifyNutritionMacros(record, effect, source or "food_consumed")
     return true, Needs.GetState(record)
 end
 

@@ -85,6 +85,7 @@ local function buildHandsKey(snapshot)
         tostring(action.operation or ""),
         tostring(action.activityId or ""),
         tostring(action.phase or ""),
+        tostring(action.activityItemID or ""),
         tostring(action.activityItemFullType or ""),
     }, "|")
 end

@@ -8,6 +8,23 @@ local Core = PNC.Core
 local Visuals = PNC.Visuals
 local Inventory = PNC.Inventory
 
+local function nativeAttachmentMatches(zombie, location, expected)
+    local ok
+    local actual
+    if not zombie or type(zombie.getAttachedItem) ~= "function" then
+        return false
+    end
+    ok, actual = pcall(zombie.getAttachedItem, zombie, location)
+    return ok and actual == expected
+end
+
+local function acceptCompletedNativeCall(zombie, location, item, ok)
+    -- Build 42 can throw while Kahlua copies a Java void-call return value
+    -- even after setAttachedItem() has already updated the native map.  Treat
+    -- that result as successful only when the postcondition is observable.
+    return ok == true or nativeAttachmentMatches(zombie, location, item)
+end
+
 function Internal.applyAttachedItems(
     zombie,
     equipment,
@@ -62,7 +79,7 @@ function Internal.applyAttachedItems(
                     entry.location,
                     item
                 )
-                if ok then
+                if acceptCompletedNativeCall(zombie, entry.location, item, ok) then
                     if item.setAttachedToModel then
                         item:setAttachedToModel(entry.location)
                     end
@@ -99,7 +116,7 @@ function Internal.applyAttachedItems(
             )
             if holsterLocation then
                 ok, errorMessage = Internal.safeInvoke(zombie, "setAttachedItem", holsterLocation, item)
-                if ok then
+                if acceptCompletedNativeCall(zombie, holsterLocation, item, ok) then
                     if item.setAttachedToModel then
                         item:setAttachedToModel(holsterLocation)
                     end

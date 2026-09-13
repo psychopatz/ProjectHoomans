@@ -8,6 +8,15 @@ option ProjectHoomans.PlayerOwnedNPCNeedMortality
     translation = ProjectHoomans.PlayerOwnedNPCNeedMortality,
 }
 
+option ProjectHoomans.PlayerOwnedNPCNutritionMode
+{
+    type = enum,
+    numValues = 2,
+    default = 1,
+    page = ProjectHoomans,
+    translation = ProjectHoomans.PlayerOwnedNPCNutritionMode,
+}
+
 option ProjectHoomans.NPCPopulation
 {
     type = enum,

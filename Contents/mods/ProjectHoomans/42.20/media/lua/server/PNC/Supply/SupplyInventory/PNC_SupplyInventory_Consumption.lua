@@ -167,7 +167,11 @@ function H.CanonicalConsumptionOps(item, descriptor, request)
         local remainingUses = currentAmount > 0
             and currentUses * math.max(0,
                 (currentAmount - drained) / currentAmount) or 0
-        if not fluidState or drained <= 0.000001 then return nil, 0, 0 end
+        if not fluidState or drained <= 0.000001 then
+            return nil, 0, 0, 0
+        end
+        local consumedFraction = currentAmount > 0
+            and math.min(1, drained / currentAmount) or 1
         if stack > 1 then
             return {
                 { op = "update", itemID = item.id, stack = stack - 1 },
@@ -176,16 +180,24 @@ function H.CanonicalConsumptionOps(item, descriptor, request)
                     split.uses = remainingUses
                     return split
                 end)() },
-            }, remainingUses, drained
+            }, remainingUses, drained, consumedFraction
         end
         return {{ op = "update", itemID = item.id, uses = remainingUses,
-            itemState = fluidState }}, remainingUses, drained
+            itemState = fluidState }}, remainingUses, drained,
+            consumedFraction
     end
-    if descriptor.hydration and descriptor.useDelta > 0 then
+    if (descriptor.hydration or descriptor.food) and descriptor.useDelta > 0 then
         local current = currentUseDelta(item)
         local remaining = math.max(0, current - descriptor.useDelta)
         if remaining > 0.0001 then
-            local fluidState = fluidStateAfterUse(item, current, remaining)
+            local fluidState = descriptor.hydration
+                and fluidStateAfterUse(item, current, remaining) or nil
+            -- usedDelta is the amount remaining in the current item unit;
+            -- useDelta is the portion consumed by this action.  Scale against
+            -- the original unit, not against the shrinking remainder, so
+            -- four quarter-uses contribute exactly one full serving.
+            local consumedFraction = math.min(1, math.max(0,
+                math.min(current, descriptor.useDelta)))
             if stack > 1 then
                 local split = {}
                 for key, value in pairs(item) do
@@ -200,19 +212,49 @@ function H.CanonicalConsumptionOps(item, descriptor, request)
                 return {
                     { op = "update", itemID = item.id, stack = stack - 1 },
                     { op = "add", item = split },
-                }, remaining, nil
+                }, remaining, nil, consumedFraction
             end
             local update = {
                 op = "update", itemID = item.id, uses = remaining,
             }
             if fluidState then update.itemState = fluidState end
-            return { update }, remaining, nil
+            return { update }, remaining, nil, consumedFraction
         end
     end
     if stack > 1 then
-        return {{ op = "update", itemID = item.id, stack = stack - 1 }}, 0, nil
+        return {{ op = "update", itemID = item.id, stack = stack - 1 }}, 0, nil, 1
     end
-    return {{ op = "remove", itemID = item.id }}, 0, nil
+    return {{ op = "remove", itemID = item.id }}, 0, nil, 1
+end
+
+function H.BuildConsumptionEffect(descriptor, consumedFraction)
+    local fraction = math.max(0, math.min(1,
+        tonumber(consumedFraction) or 1))
+    local burntMultiplier = descriptor.burntMultiplier
+        or (descriptor.burnt == true and 0.20 or 1)
+    local valueMultiplier = descriptor.effectiveValues == true
+        and 1 or burntMultiplier
+    local multiplier = fraction * valueMultiplier
+    local realism = PNC.Sandbox
+        and PNC.Sandbox.PlayerOwnedNPCNutritionRealismEnabled
+        and PNC.Sandbox.PlayerOwnedNPCNutritionRealismEnabled() == true
+    local effect = {
+        hunger = (tonumber(descriptor.hunger) or 0) * multiplier,
+        thirst = (tonumber(descriptor.thirst) or 0) * multiplier,
+        calories = realism and (tonumber(descriptor.calories) or 0)
+            * multiplier or 0,
+        consumedFraction = fraction,
+        burntMultiplier = burntMultiplier,
+        fullType = descriptor.fullType,
+        typeId = descriptor.typeId,
+    }
+    if realism then
+        effect.carbohydrates = (tonumber(descriptor.carbohydrates) or 0)
+            * multiplier
+        effect.proteins = (tonumber(descriptor.proteins) or 0) * multiplier
+        effect.lipids = (tonumber(descriptor.lipids) or 0) * multiplier
+    end
+    return effect
 end
 
 local function drainPhysicalFluid(nativeItem, amount)
@@ -275,7 +317,8 @@ function SupplyInventory.Consume(record, itemID, request)
         for key, value in pairs(request) do consumptionRequest[key] = value end
         consumptionRequest.consumeAmount = descriptor.fluidAmount
     end
-    local ops, remainingUses, drainedAmount = H.CanonicalConsumptionOps(
+    local ops, remainingUses, drainedAmount, consumedFraction =
+        H.CanonicalConsumptionOps(
         item, descriptor, consumptionRequest)
     if not ops then return false, "fluid_volume_unavailable" end
     local body = H.LiveBody(record)
@@ -315,7 +358,8 @@ function SupplyInventory.Consume(record, itemID, request)
                     return restored
                 end
                 syncPhysicalItem(selected.item)
-            elseif descriptor.hydration and descriptor.useDelta > 0
+            elseif (descriptor.hydration or descriptor.food)
+                and descriptor.useDelta > 0
                 and remainingUses > 0.0001
             then
                 local before = selected.item.getUsedDelta
@@ -354,21 +398,9 @@ function SupplyInventory.Consume(record, itemID, request)
     then
         Metrics.Increment("deltaInventoryCompactions")
     end
-    local effect = {
-        hunger = descriptor.hunger,
-        thirst = descriptor.thirst,
-        calories = descriptor.calories,
-        fullType = descriptor.fullType,
-        typeId = descriptor.typeId,
-        remainingUses = remainingUses,
-        physicalProjectionMissing = false,
-    }
-    if descriptor.fluidHydration == true and drainedAmount
-        and descriptor.fluidAmount and descriptor.fluidAmount > 0.000001
-    then
-        effect.thirst = descriptor.thirst
-            * math.min(1, drainedAmount / descriptor.fluidAmount)
-    end
+    local effect = H.BuildConsumptionEffect(descriptor, consumedFraction)
+    effect.remainingUses = remainingUses
+    effect.physicalProjectionMissing = false
     effect.undo = function()
         record.inventory = inventoryUndo
         InventoryCommands.RebuildCaches(record)

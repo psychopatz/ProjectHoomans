@@ -650,6 +650,37 @@ T.near(fluidOps[1].itemState.fluidAmount, 0.75, 0.000001,
 T.near(fluidOps[1].itemState.fluids[1].amount, 0.75, 0.000001,
     "abstract hydration drains mixture component")
 
+PNC.Sandbox.PlayerOwnedNPCNutritionRealismEnabled = function() return true end
+PNC._testFoodOps, PNC._testFoodRemaining, PNC._testFoodUnused,
+    PNC._testFoodFraction =
+    PNC.SupplyInventoryInternal.CanonicalConsumptionOps({
+        id = "fractional_food", type = "Base.FractionalApple", stack = 1,
+        uses = 1,
+    }, { food = true, hydration = false, useDelta = 0.25 })
+T.near(PNC._testFoodRemaining, 0.75, 0.000001,
+    "food use-delta keeps a partial serving remainder")
+T.near(PNC._testFoodFraction, 0.25, 0.000001,
+    "food consumption reports the consumed fraction")
+PNC._testBurntEffect = PNC.SupplyInventoryInternal.BuildConsumptionEffect({
+    hunger = 0.40, thirst = 0, calories = 100,
+    carbohydrates = 20, proteins = 10, lipids = 5,
+    burnt = true, fullType = "Base.FractionalApple",
+}, PNC._testFoodFraction)
+T.near(PNC._testBurntEffect.hunger, 0.02, 0.000001,
+    "burnt food hunger is reduced to one fifth after partial use")
+T.near(PNC._testBurntEffect.calories, 5, 0.000001,
+    "burnt food calories are reduced to one fifth after partial use")
+PNC.Sandbox.PlayerOwnedNPCNutritionRealismEnabled = function() return false end
+PNC._testSimpleEffect = PNC.SupplyInventoryInternal.BuildConsumptionEffect({
+    hunger = 0.40, thirst = 0, calories = 100,
+    carbohydrates = 20, proteins = 10, lipids = 5,
+    burnt = true,
+}, 1)
+T.near(PNC._testSimpleEffect.hunger, 0.08, 0.000001,
+    "simple mode still applies the burnt food multiplier")
+T.equal(PNC._testSimpleEffect.calories, 0,
+    "simple mode avoids detailed nutrition work")
+
 PsychopatzCore.Inventory.getItemTypeId("Base.WaterBottle", true)
 local directWaterProbe = InventoryItemFactory.CreateItem("Base.WaterBottle")
 T.truthy(directWaterProbe, "water factory probe was unavailable")

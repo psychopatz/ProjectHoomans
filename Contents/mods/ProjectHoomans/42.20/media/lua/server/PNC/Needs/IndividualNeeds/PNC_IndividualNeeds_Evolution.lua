@@ -8,6 +8,7 @@ local PlayerModel = PNC.PlayerNeedsModel
 local EventBus = require "PsychopatzCore/Events/PC_EventBus"
 local EventTypes = PNC.EventTypes
 local H = Needs.Internal
+local NutritionModel = PNC.NPCNutrition
 
 function Needs.Update(record, elapsedHours, reason)
     local state = Needs.Ensure(record)
@@ -24,24 +25,15 @@ function Needs.Update(record, elapsedHours, reason)
         PNC.NeedHealthConsequences.Apply(record, beforeState, state, rates,
             elapsedHours)
     end
-    local nutrition = Needs.GetNutrition(record)
-    if nutrition then
-        local tuning = Definitions.NUTRITION
-        local oldWeightCategory = H.WeightCategory(nutrition.weight)
-        local balanceBefore = (tonumber(nutrition.calories) or 0)
-            + math.max(0, tonumber(nutrition.calorieOverflow) or 0)
-        local burn = math.max(0, tonumber(rates.calorieBurnRate) or 0)
-            * elapsedHours
-        Needs.ModifyNutrition(record, -burn, "passive_calorie_burn")
-        local balanceAfter = (tonumber(nutrition.calories) or 0)
-            + math.max(0, tonumber(nutrition.calorieOverflow) or 0)
-        local averageBalance = (balanceBefore + balanceAfter) / 2
-        nutrition.weight = math.max(tuning.minimumWeight,
-            math.min(tuning.maximumWeight, nutrition.weight
-                + (averageBalance / tuning.caloriesPerKilogram)
-                    * (elapsedHours / 24)))
-        local newWeightCategory = H.WeightCategory(nutrition.weight)
-        if oldWeightCategory ~= newWeightCategory then
+    local nutrition = Needs.IsNutritionRealismEnabled()
+        and Needs.EnsureNutrition(record) or nil
+    if nutrition and NutritionModel then
+        local oldWeightCategory, newWeightCategory, changed =
+            NutritionModel.Update(nutrition, elapsedHours * 3600,
+                Needs.GetActivity(record),
+                PlayerModel.HasTrait(record, "weightgain"),
+                PlayerModel.HasTrait(record, "weightloss"), 1, 1)
+        if changed then
             EventBus.emit(EventTypes.NPC_WEIGHT_CATEGORY_CHANGED, record,
                 oldWeightCategory, newWeightCategory, nutrition.weight)
         end

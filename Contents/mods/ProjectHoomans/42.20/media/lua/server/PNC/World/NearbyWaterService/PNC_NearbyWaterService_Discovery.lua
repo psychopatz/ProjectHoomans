@@ -178,7 +178,15 @@ local function cachedPlanValid(cached, record, revision, now, x, y, z,
     if cached.inventoryRevision ~= revision
         or cached.originX ~= x or cached.originY ~= y or cached.originZ ~= z
     then return false end
-    if mode ~= "hydrate" or cached.action ~= "drink_container"
+    -- A fill plan is mutable: the physical bottle can become full while the
+    -- NPC is travelling, without the compact inventory revision changing.
+    -- Never replay that plan from the hydrate cache. Negative plans are also
+    -- cheap to recompute and must not hide a newly drinkable bottle/source.
+    if cached.noPlan == true or cached.action == "fill_container" then
+        return false
+    end
+    if mode ~= "hydrate" then return false end
+    if cached.action ~= "drink_container"
         and now - (tonumber(cached.createdAt) or 0)
             > HYDRATION_PLAN_CACHE_MS
     then return false end
@@ -192,8 +200,9 @@ local function genericPersonalDrink(record)
         or record and record.needs and record.needs.thirst
     local available
     local fullType
+    local itemID
     if not service or not service.HasPersonalSupply then return nil end
-    available, fullType = service.HasPersonalSupply(record, "HYDRATION", {
+    available, fullType, itemID = service.HasPersonalSupply(record, "HYDRATION", {
         hunger = 0,
         thirst = math.max(0.001, tonumber(thirst) or 0.001),
     })
@@ -201,6 +210,7 @@ local function genericPersonalDrink(record)
     return {
         action = "drink_container",
         resourceKind = "personal_drink",
+        activityItemID = itemID,
         capability = "survival.drink.inventory",
         activityItemFullType = fullType,
     }

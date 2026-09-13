@@ -142,6 +142,7 @@ local function resolveActivityHands(snapshot)
     local medicalPhase = tostring(medical and medical.phase or "")
     local sceneId = tostring(visual and visual.sceneId or "")
     local fullType = tostring(action and action.activityItemFullType or "")
+    local activityItemID = action and action.activityItemID or nil
     local medicalType = tostring(medical and medical.bandageType or "")
     if snapshot and snapshot.attackMode == true
         or visual and visual.attackActive == true
@@ -154,6 +155,7 @@ local function resolveActivityHands(snapshot)
     then
         return {
             source = "food",
+            activityItemID = activityItemID,
             activityItemFullType = fullType,
             hand = "primary",
             sceneId = sceneId,
@@ -166,6 +168,20 @@ local function resolveActivityHands(snapshot)
     then
         return {
             source = "hydration",
+            activityItemID = activityItemID,
+            activityItemFullType = fullType,
+            hand = "primary",
+            sceneId = sceneId,
+            stepId = visual and visual.sceneStepId or nil,
+            revision = visual and visual.sceneStartedAt or nil,
+        }
+    end
+    if capability == "survival.fill.water"
+        and sceneId == "survival.fill.water"
+    then
+        return {
+            source = "water_refill",
+            activityItemID = activityItemID,
             activityItemFullType = fullType,
             hand = "primary",
             sceneId = sceneId,
@@ -178,6 +194,7 @@ local function resolveActivityHands(snapshot)
     then
         return {
             source = "world_water",
+            activityItemID = activityItemID,
             activityItemFullType = fullType,
             hand = "primary",
             sceneId = sceneId,

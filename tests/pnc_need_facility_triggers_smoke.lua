@@ -600,7 +600,32 @@ refillPlanValid = false
 T.falsy(refillRoute.CanContinue(activeRefillRecord, activeRefillLease),
     "a full destination invalidates the stale refill lease")
 activeRefillRecord.runtime.facilityActivity.completionRequested = true
-T.truthy(refillRoute.CanContinue(activeRefillRecord, activeRefillLease),
-    "one cleanup tick remains allowed after refill completion or failure")
+activeRefillRecord.runtime.facilityActivity.failedReason =
+    "WATER_CONTAINER_FULL"
+T.falsy(refillRoute.CanContinue(activeRefillRecord, activeRefillLease),
+    "a failed refill cannot continue just because completion was requested")
+activeRefillRecord.runtime.facilityActivity.failedReason = nil
+
+-- A queued candidate can retain its original refill plan after the effect has
+-- failed. Every planned-route admission path must still honor the cooldown.
+refillPlanValid = true
+activeRefillRecord.runtime.facilityActivity = nil
+activeRefillRecord.runtime.waterRefillRetryAt = 6000
+local originalGetLiveZombie = PNC.Registry.GetLiveZombie
+PNC.Registry.GetLiveZombie = function() return {} end
+T.falsy(refillRoute.IsAvailable(activeRefillRecord),
+    "planned refill availability honors the failure cooldown")
+local refillValid, refillReason = refillRoute.Validate(activeRefillRecord)
+T.falsy(refillValid,
+    "planned refill validation honors the failure cooldown")
+T.equal(refillReason, "WATER_REFILL_RETRY_COOLDOWN",
+    "planned refill validation exposes the cooldown reason")
+local refillAssignment, assignmentReason = refillRoute.Assign(
+    activeRefillRecord)
+T.falsy(refillAssignment,
+    "stale queued refill assignment is rejected during the cooldown")
+T.equal(assignmentReason, "WATER_REFILL_RETRY_COOLDOWN",
+    "stale queued refill assignment exposes the cooldown reason")
+PNC.Registry.GetLiveZombie = originalGetLiveZombie
 
 T.finish("pnc_need_facility_triggers_smoke")

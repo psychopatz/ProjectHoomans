@@ -230,6 +230,48 @@ T.truthy(string.find(refillLogs[#refillLogs],
     "compactFreeCapacity=0", 1, true),
     "full-container failure log includes compact capacity state")
 
+-- If the compact entry is stale, reconcile it from the authoritative native
+-- item before returning the full-container rejection.
+record.inventory.items.can.itemState = {
+    fluidAmount = 0, fluidCapacity = 1, fluidPrimaryType = "Water",
+    fluids = {},
+}
+local revisionBeforeReconcile = record.inventory.revision
+local reconcileOK, reconcileReason = Service.Refill(record, "can", source)
+T.falsy(reconcileOK, "physical full bottle still rejects refill")
+T.equal(reconcileReason, "WATER_CONTAINER_FULL",
+    "physical full rejection keeps its reason")
+T.equal(record.inventory.items.can.itemState.fluidAmount, 1,
+    "physical full state repairs compact amount")
+T.equal(Inventory.ResolveItemState(record.inventory.items.can).fluidAmount, 1,
+    "physical full state is visible through the effective compact state")
+T.truthy(Inventory.DescribeLiquidContainer(record.inventory.items.can).canDrink,
+    "reconciled physical full state is eligible for drinking")
+T.truthy(record.inventory.revision > revisionBeforeReconcile,
+    "compact reconciliation advances inventory revision")
+
+local NeedFacilityEffects = T.load("ProjectHoomans", "server",
+    "PNC/Needs/NeedFacilityTriggers/PNC_NeedFacilityEffects.lua")
+record.runtime.facilityActivity = {
+    capability = "water_refill",
+    resourceKind = "water_refill",
+    resource = source,
+    resourceKey = source.key,
+    activityItemID = "can",
+    manual = false,
+}
+local effectOK, effectComplete, effectReason = NeedFacilityEffects.Tick(record, {
+    effectReadyAt = 0,
+    effectAttempted = false,
+}, {
+    needEffect = "water_refill",
+    effectDelayMs = 0,
+}, 0, 1)
+T.falsy(effectOK, "effect boundary reports failed refill")
+T.truthy(effectComplete, "failed refill requests scene completion")
+T.equal(effectReason, "WATER_CONTAINER_FULL",
+    "effect boundary preserves transaction failure reason")
+
 -- If source consumption fails after destination mutation, both sides roll
 -- back and no journal event is emitted.
 destinationContainer:adjustAmount(0.25)
