@@ -6,6 +6,8 @@ PNC.Conversation = PNC.Conversation or {}
 
 local History = PNC.Conversation.History or {}
 PNC.Conversation.History = History
+local Reset = (PNC.Persistence and PNC.Persistence.Reset)
+    or require "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset"
 History.MODDATA_KEY = "PNC_ConversationHistory"
 History.VERSION = 1
 History.Registry = History.Registry or { version = History.VERSION, entries = {} }
@@ -42,15 +44,19 @@ function History.BuildKey(scope, characterUUID, npcID, subjectID)
 end
 
 function History.Load()
-    local raw = ModData and ModData.getOrCreate
-        and ModData.getOrCreate(History.MODDATA_KEY) or nil
-    raw = type(raw) == "table" and raw or {}
+    local raw = Reset.Read(History.MODDATA_KEY)
+    local reason = Reset.Check(raw, History.VERSION, "version",
+        function(value) return type(value.entries) == "table" end)
     History.Registry = {
         version = History.VERSION,
-        entries = type(raw.entries) == "table" and copy(raw.entries) or {},
+        entries = reason == nil and copy(raw.entries) or {},
     }
     History.Loaded = true
-    History.Dirty = false
+    History.Dirty = reason ~= nil and reason ~= "empty_state"
+    if History.Dirty then
+        Reset.Mark(History, raw, History.VERSION, reason,
+            "conversation_history", "version")
+    end
     return true
 end
 
@@ -62,11 +68,11 @@ end
 function History.Save(flush)
     History.EnsureLoaded()
     if not History.Dirty then return false, "not_dirty" end
-    local target = ModData and ModData.getOrCreate
-        and ModData.getOrCreate(History.MODDATA_KEY) or nil
-    if type(target) ~= "table" then return false end
-    target.version = History.VERSION
-    target.entries = copy(History.Registry.entries)
+    local written = Reset.Write(History.MODDATA_KEY, {
+        version = History.VERSION,
+        entries = copy(History.Registry.entries),
+    })
+    if not written then return false, "moddata_unavailable" end
     if flush ~= false and GlobalModData and GlobalModData.save then
         GlobalModData.save()
     end

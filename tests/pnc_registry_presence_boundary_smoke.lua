@@ -7,7 +7,7 @@ local source = T.read(
 )
 local providers = {
     "PNC_Registry_StorageCore",
-    "PNC_Registry_StorageMigration",
+    "PNC_Registry_StorageMaintenance",
     "PNC_Registry_LoadDirty",
     "PNC_Registry_Records",
     "PNC_Registry_LivePositions",

@@ -21,6 +21,7 @@ end
 
 function TraitContext.Collect(record)
     local output = {}
+    local dynamicTraits
     if type(record) ~= "table" then return output end
 
     if PNC.PlayerNeedsModel
@@ -32,11 +33,10 @@ function TraitContext.Collect(record)
     end
 
     if PNC.ConditionStats
-        and PNC.ConditionStats.NormalizeTraits
+        and PNC.ConditionStats.EnsureTraits
     then
-        addSource(output, PNC.ConditionStats.NormalizeTraits(
-            record.dynamicTraits
-        ))
+        dynamicTraits = PNC.ConditionStats.EnsureTraits(record)
+        addSource(output, dynamicTraits)
     else
         addSource(output, record.dynamicTraits)
     end

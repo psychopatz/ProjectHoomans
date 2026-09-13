@@ -558,6 +558,9 @@ local function transferCorpse(order, assignment, task)
             reason or "CORPSE_TRANSFER_FAILED")
     end
     local data = corpse.getModData and corpse:getModData() or nil
+    if data and Service.EnsureCorpseHaulMarker then
+        data = Service.EnsureCorpseHaulMarker(corpse, true) or data
+    end
     if data then
         data.PNC_CorpseHaulTaskId = order.id
         Internal.transmit(corpse)
@@ -722,6 +725,9 @@ local function finishDeferredTransfer(order, effect, corpse)
         effect.updatedAt = effect.appliedAt
         if corpse and corpse.getModData then
             local data = corpse:getModData()
+            if Service.EnsureCorpseHaulMarker then
+                data = Service.EnsureCorpseHaulMarker(corpse, true) or data
+            end
             if data then
                 data.PNC_CorpseHaulTaskId = order.id
                 Internal.transmit(corpse)

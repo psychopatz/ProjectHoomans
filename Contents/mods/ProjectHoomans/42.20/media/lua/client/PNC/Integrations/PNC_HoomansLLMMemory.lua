@@ -14,6 +14,8 @@ PNC.HoomansLLM.Memory = PNC.HoomansLLM.Memory or {}
 local Memory = PNC.HoomansLLM.Memory
 local Message = PsychopatzCore.Conversation.Message
 local Identity = PNC.HoomansLLM.Identity
+local Reset = (PNC.Persistence and PNC.Persistence.Reset)
+    or require "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset"
 
 Memory.VERSION = 1
 Memory.STORAGE_KEY = "PNC_HoomansLLMMemory"
@@ -24,6 +26,7 @@ Memory.MAX_EVENT_ID = 256
 local OWNER_TOKEN = Memory
 local memoryRoot = Memory.memoryRoot or {}
 Memory.memoryRoot = memoryRoot
+local storageValidated = false
 local monthNames = {
     "January", "February", "March", "April", "May", "June",
     "July", "August", "September", "October", "November", "December",
@@ -171,6 +174,28 @@ end
 
 local function storage()
     local root
+    if not storageValidated then
+        local raw = Reset.Read(Memory.STORAGE_KEY)
+        local reason = Reset.Check(raw, Memory.VERSION, "version",
+            function(value) return type(value.records) == "table" end)
+        if reason ~= nil and reason ~= "empty_state" then
+            Memory.LastReset = Reset.Info(raw, Memory.VERSION, reason,
+                "llm_memory", "version")
+            if ModData and ModData.getOrCreate then
+                Reset.Write(Memory.STORAGE_KEY, {
+                    version = Memory.VERSION, records = {}, index = {},
+                    indexReady = true,
+                })
+            else
+                for key, _ in pairs(memoryRoot) do memoryRoot[key] = nil end
+            end
+            if PNC.Core and PNC.Core.LogWarn then
+                PNC.Core.LogWarn("PNC persistence reset owner=llm_memory reason="
+                    .. tostring(reason))
+            end
+        end
+        storageValidated = true
+    end
     if ModData and ModData.getOrCreate then
         root = ModData.getOrCreate(Memory.STORAGE_KEY)
     else

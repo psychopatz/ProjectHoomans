@@ -11,6 +11,7 @@ local RegistryRepository = PNC.KnowledgeRepository
 local Registry = PNC.RecipeKnowledgeRegistry
 local Definitions = PNC.ColonyResearchDefinitions
 local queue = Internal.Queue
+local PRODUCTION_METADATA_VERSION = 1
 
 function Service.Commands.CreateBlueprint(player, recipeKey)
     local context, reason = PNC.ProductionContext.ForPlayer(player)
@@ -23,7 +24,8 @@ function Service.Commands.CreateBlueprint(player, recipeKey)
     local recipeId = RegistryRepository.GetOrCreateId(descriptor.key)
     local ok, result = PNC.ColonyStorageService.DepositProductionItems(
         context.storage.id, {{ fullType = "PNC.RecipeBlueprint", quantity = 1,
-            modData = { PNC = { blueprint = { v = 1, rid = recipeId } } } }})
+            modData = { PNC = { blueprint = {
+                v = PRODUCTION_METADATA_VERSION, rid = recipeId } } } }})
     return ok, ok and recipeId or result
 end
 
@@ -54,11 +56,17 @@ function Service.Commands.CreateSpearTestKit(player)
             products[#products + 1] = { fullType = input.itemTypes[1], quantity = 1 }
         end
     end
-    products[#products + 1] = { fullType = "PNC.RecipeBlueprint", quantity = 1,
-        modData = { PNC = { blueprint = { v = 1, rid = recipeId } } } }
+    products[#products + 1] = {
+        fullType = "PNC.RecipeBlueprint", quantity = 1,
+        modData = { PNC = { blueprint = {
+            v = PRODUCTION_METADATA_VERSION, rid = recipeId } } },
+    }
     products[#products + 1] = { fullType = "Base.SpearCrafted", quantity = 1 }
-    products[#products + 1] = { fullType = "Base.SpearCrafted", quantity = 1,
-        modData = { PNC = { production = { v = 1, rid = recipeId } } } }
+    products[#products + 1] = {
+        fullType = "Base.SpearCrafted", quantity = 1,
+        modData = { PNC = { production = {
+            v = PRODUCTION_METADATA_VERSION, rid = recipeId } } },
+    }
     local ok, deposit = PNC.ColonyStorageService.DepositProductionItems(
         context.storage.id, products)
     if not ok then return false, deposit end

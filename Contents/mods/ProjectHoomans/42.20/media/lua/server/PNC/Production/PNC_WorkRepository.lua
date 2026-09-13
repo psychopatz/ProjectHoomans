@@ -5,6 +5,8 @@ PNC = PNC or {}
 PNC.WorkRepository = PNC.WorkRepository or {}
 
 local Repository = PNC.WorkRepository
+local Reset = (PNC.Persistence and PNC.Persistence.Reset)
+    or require "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset"
 Repository.SCHEMA_VERSION = 1
 Repository.MODDATA_KEY = "PNC_WorkOrders_V1"
 Repository.State = Repository.State or { schemaVersion = 1, nextId = 1, byId = {} }
@@ -52,25 +54,6 @@ local function compactConstruction(order)
     return order
 end
 
--- Older saves compacted construction inputs down to `consume`, even after
--- the project had made progress.  That left the scheduler looking for a
--- runtime-only reservation that can no longer exist after a reload.
-local function recoverCompactedConstructionInput(order)
-    local input = order and order.payload and order.payload.input or nil
-    local progress = order and tonumber(order.progress) or nil
-    if type(input) ~= "table" or not progress or progress <= 0
-        or order.funded == true
-        or input.funded == true or input.committed == true
-    then return end
-    if (input.storageId == nil or input.storageId == "")
-        and (input.reservationId == nil or input.reservationId == "")
-    then
-        order.funded = true
-        input.funded, input.committed = true, true
-        input.legacyRecovered = true
-    end
-end
-
 local function recover(order)
     order.revision = math.max(0, math.floor(tonumber(order.revision) or 0))
     order.progress = math.max(0, tonumber(order.progress) or 0)
@@ -99,7 +82,6 @@ local function recover(order)
                 committed = order.payload.input.committed == true
                     or order.payload.input.funded == true,
             }
-            recoverCompactedConstructionInput(order)
         end
     elseif order.status == "CLAIMED" or order.status == "TRAVEL_TO_STOCKPILE"
         or order.status == "TRAVEL_TO_STATION"
@@ -136,9 +118,16 @@ end
 
 function Repository.Load(force)
     if Repository.Loaded and force ~= true then return Repository.State end
-    local raw = ModData and ModData.getOrCreate
-        and ModData.getOrCreate(Repository.MODDATA_KEY) or nil
-    return Repository.Import(raw)
+    local raw = Reset.Read(Repository.MODDATA_KEY)
+    local reason = Reset.Check(raw, Repository.SCHEMA_VERSION, nil,
+        function(value) return type(value.byId) == "table" end)
+    local state = Repository.Import(reason == nil and raw or nil)
+    if reason ~= nil and reason ~= "empty_state" then
+        Reset.Mark(Repository, raw, Repository.SCHEMA_VERSION, reason, "work")
+    else
+        Repository.Dirty = false
+    end
+    return state
 end
 
 function Repository.NextId()
@@ -176,19 +165,6 @@ local function checkpointConstructionInputs()
         then
             local committed = PNC.WorkInputService.Commit(
                 order, "construction_save_checkpoint")
-            if committed ~= true and tonumber(order.progress) > 0
-                and (input.storageId == nil or input.storageId == "")
-                and (input.reservationId == nil or input.reservationId == "")
-                and input.staged ~= true and input.itemIds == nil
-            then
-                -- A pre-fix save may already have discarded the reservation.
-                -- In-progress construction has already crossed the material
-                -- boundary, so preserve that fact instead of re-blocking it.
-                order.funded = true
-                input.funded, input.committed = true, true
-                input.legacyRecovered = true
-                Repository.Dirty = true
-            end
         end
     end
 end
@@ -197,13 +173,10 @@ function Repository.Save()
     Repository.Load()
     checkpointConstructionInputs()
     if not Repository.Dirty then return false, "not_dirty" end
-    local target = ModData and ModData.getOrCreate
-        and ModData.getOrCreate(Repository.MODDATA_KEY) or nil
-    if not target then return false, "moddata_unavailable" end
     local payload = copy(Repository.State)
     for _, order in pairs(payload.byId) do compactConstruction(order) end
-    for key, _ in pairs(target) do target[key] = nil end
-    for key, value in pairs(payload) do target[key] = value end
+    local written = Reset.Write(Repository.MODDATA_KEY, payload)
+    if not written then return false, "moddata_unavailable" end
     Repository.Dirty = false
     for _, order in pairs(Repository.State.byId) do
         if order.status == "COMPLETED" or order.status == "CANCELLED" then

@@ -21,6 +21,7 @@ local skillRate = Internal.SkillRate
 local WorldEffects = PNC.WorldEffectService
 local FatigueGate = PNC.WorkFatigueGate
     or require "PNC/Core/Needs/PNC_WorkFatigueGate"
+local LUMBER_OUTPUT_MARKER_VERSION = 1
 
 local function adjacentToTree(body, tree)
     if not body or not tree then return false end
@@ -326,10 +327,31 @@ local function tagOutputItem(item, worldObject, effectID)
     local data = call(item, "getModData")
     if type(data) == "table" then
         data.PNC_LumberOutputEffectID = tostring(effectID)
+        data.PNC_LumberOutputEffectVersion =
+            LUMBER_OUTPUT_MARKER_VERSION
     end
     if type(worldObject and worldObject.transmitModData) == "function" then
         pcall(worldObject.transmitModData, worldObject)
     end
+end
+
+local function hasCurrentOutputMarker(data, effectID)
+    if type(data) ~= "table"
+        or tostring(data.PNC_LumberOutputEffectID or "")
+            ~= tostring(effectID or "")
+    then
+        return false
+    end
+    if tonumber(data.PNC_LumberOutputEffectVersion)
+        ~= LUMBER_OUTPUT_MARKER_VERSION
+    then
+        -- Old item provenance is not migrated. Drop it when the item is
+        -- observed so a current effect can establish a fresh marker.
+        data.PNC_LumberOutputEffectID = nil
+        data.PNC_LumberOutputEffectVersion = nil
+        return false
+    end
+    return true
 end
 
 captureOutputItems = function(square, before, effect, snapshotOnly)
@@ -343,9 +365,7 @@ captureOutputItems = function(square, before, effect, snapshotOnly)
             if not snapshotOnly and effect then
                 local item = call(worldObject, "getItem")
                 local data = call(item, "getModData")
-                local tagged = type(data) == "table"
-                    and tostring(data.PNC_LumberOutputEffectID or "")
-                        == tostring(effect.id)
+                local tagged = hasCurrentOutputMarker(data, effect.id)
                 local isNew = (before and before[worldObject] ~= true)
                     or tagged
                 if isNew and item then
@@ -446,9 +466,7 @@ local function descriptorMatches(item, descriptor, effectID)
     local descriptorID = descriptor.id and tostring(descriptor.id) or nil
     local id = itemID(item)
     local data = call(item, "getModData")
-    local tagged = type(data) == "table"
-        and tostring(data.PNC_LumberOutputEffectID or "")
-            == tostring(effectID or "")
+    local tagged = hasCurrentOutputMarker(data, effectID)
     if descriptorID and id then
         return descriptorID == tostring(id)
     end

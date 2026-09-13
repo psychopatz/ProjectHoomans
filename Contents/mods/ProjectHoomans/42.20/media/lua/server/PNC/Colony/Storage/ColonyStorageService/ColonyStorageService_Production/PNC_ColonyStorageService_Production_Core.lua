@@ -13,6 +13,9 @@ local Internal = Service.Internal
 local Inventory = require "PsychopatzCore/Inventory/PsychopatzInventory"
 local C = require "PsychopatzCore/Inventory/PsychopatzInventoryConstants"
 
+H.PRODUCTION_METADATA_VERSION =
+    tonumber(H.PRODUCTION_METADATA_VERSION) or 1
+
 local ACTIVITY_REASON = {
     construction_materials = "construction",
     craft_inputs = "crafting",

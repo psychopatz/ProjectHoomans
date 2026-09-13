@@ -154,10 +154,20 @@ function Types.NormalizeNPCPersonality(
     local source = type(value) == "table" and value or nil
     local normalizedOverrides =
         Types.NormalizeNPCPersonalityOverrides(overrides)
+    local currentVersion = math.max(1, math.floor(finite(
+        Constants.NPC_GENERATION_VERSION,
+        1
+    )))
+    local sourceVersion = source and revision(source.generationVersion) or 0
+    local sourceIsGenerated = not source
+        or source.generatedFromSeed == true
+        or (source.generatedFromSeed == nil and sourceVersion > 0)
+    local shouldRegenerate = not source
+        or (sourceIsGenerated and sourceVersion ~= currentVersion)
     local generated = Generator.Generate(
         identitySeed,
         archetypeID,
-        source and nil or normalizedOverrides
+        shouldRegenerate and normalizedOverrides or nil
     )
     local generationVersion
     local output
@@ -166,13 +176,10 @@ function Types.NormalizeNPCPersonality(
     if not source then
         return generated
     end
-    generationVersion = math.max(
-        1,
-        math.floor(finite(
-            source.generationVersion,
-            Constants.NPC_GENERATION_VERSION
-        ))
-    )
+    if shouldRegenerate then
+        return generated
+    end
+    generationVersion = sourceVersion
     output = {
         schemaVersion = Constants.NPC_PERSONALITY_SCHEMA_VERSION,
         orientation = Types.NormalizeEnum(
@@ -200,7 +207,7 @@ function Types.NormalizeNPCPersonality(
             Constants.VALID_SOCIAL_STYLES,
             generated.socialStyle
         ),
-        generatedFromSeed = source.generatedFromSeed ~= false,
+        generatedFromSeed = sourceIsGenerated,
         generationVersion = generationVersion,
     }
     for index = 1, #Constants.NUMERIC_DIMENSIONS do

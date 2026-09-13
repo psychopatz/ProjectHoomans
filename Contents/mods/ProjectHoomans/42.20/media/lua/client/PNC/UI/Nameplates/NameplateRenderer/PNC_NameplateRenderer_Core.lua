@@ -9,6 +9,7 @@ local DisplaySettings = PNC.NameplateDisplaySettings
 local Scopes = PNC.NameplateScopes
 local Layout = Presentation.Layout
 local Fonts = Presentation.Fonts
+local FirearmAnchor = PNC.NameplateFirearmAnchor
 
 local DEBUG_COLOR = { r = 0.8, g = 0.9, b = 1.0, a = 1.0 }
 local FACTION_COLORS = {
@@ -367,6 +368,37 @@ local function drawLive(manager, entry, metrics, currentTime, settings)
     local screenX = isoToScreenX(manager.playerIndex, zombie:getX(), zombie:getY(), zombie:getZ()) - manager.x
     local screenY = isoToScreenY(manager.playerIndex, zombie:getX(), zombie:getY(), zombie:getZ()) - manager.y
     local nameY = screenY - metrics.nameYOffset
+    if FirearmAnchor and FirearmAnchor.Update then
+        FirearmAnchor.Update(
+            zombie,
+            entry.uuid or entry.snapshot and entry.snapshot.id,
+            manager.playerIndex,
+            manager.x,
+            manager.y,
+            metrics.zoom,
+            screenX,
+            nameY,
+            screenX,
+            screenY,
+            zombie:getX(),
+            zombie:getY(),
+            zombie:getZ()
+        )
+    end
+    if FirearmAnchor and FirearmAnchor.Render then
+        FirearmAnchor.Render(
+            manager,
+            zombie,
+            entry.uuid or entry.snapshot and entry.snapshot.id,
+            screenX,
+            nameY,
+            screenX,
+            screenY,
+            zombie:getX(),
+            zombie:getY(),
+            zombie:getZ()
+        )
+    end
     local barLeft = screenX - (metrics.barWidth / 2)
     local barTop = screenY - metrics.barYOffset
     local identityVisible = scopeVisible(entry, Scopes.IDENTITY, true)

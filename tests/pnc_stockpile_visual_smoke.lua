@@ -297,15 +297,16 @@ loadSquareCallback(squareB)
 T.equal(#squareB.objects, 1,
     "square-load repair applies when the stockpile square loads again")
 
--- A visual saved by the previous plain-object implementation must migrate to
--- the persistent thumpable furniture path on the next reconcile.
+-- A visual saved by the previous plain-object implementation has no current
+-- schema and must reset on the next reconcile.
 local legacyObject = squareB.objects[1]
 legacyObject.objectType = "isoobject"
 legacyObject.data.PNC_StockpileVisual.objectType = "isoobject"
+legacyObject.data.PNC_StockpileVisual.schemaVersion = nil
 ok, object = Service.Apply(facility)
-T.equal(ok, true, "legacy stockpile visual is replaced")
+T.equal(ok, true, "old stockpile visual is reset and replaced")
 T.equal(object.objectType, "thumpable",
-    "legacy visual migrates to the persistent furniture object")
+    "reset visual uses the persistent furniture object")
 T.equal(object.container, nil,
     "migrated visual has no container")
 

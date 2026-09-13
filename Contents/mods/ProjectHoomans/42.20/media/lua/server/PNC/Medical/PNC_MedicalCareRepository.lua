@@ -9,6 +9,8 @@ PNC.MedicalCareRepository = PNC.MedicalCareRepository or {}
 
 local Repository = PNC.MedicalCareRepository
 local Core = PNC.Core
+local Reset = (PNC.Persistence and PNC.Persistence.Reset)
+    or require "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset"
 
 Repository.SCHEMA_VERSION = 1
 Repository.MODDATA_KEY = "PNC_MedicalCare_V1"
@@ -180,9 +182,17 @@ end
 
 function Repository.Load(force)
     if Repository.Loaded and force ~= true then return Repository.State end
-    local raw = ModData and ModData.getOrCreate
-        and ModData.getOrCreate(Repository.MODDATA_KEY) or nil
-    return Repository.Import(raw)
+    local raw = Reset.Read(Repository.MODDATA_KEY)
+    local reason = Reset.Check(raw, Repository.SCHEMA_VERSION, nil,
+        function(value) return type(value.byId) == "table" end)
+    local state = Repository.Import(reason == nil and raw or nil)
+    if reason ~= nil and reason ~= "empty_state" then
+        Reset.Mark(Repository, raw, Repository.SCHEMA_VERSION, reason,
+            "medical_care")
+    else
+        Repository.Dirty = false
+    end
+    return state
 end
 
 function Repository.NextId()
@@ -223,9 +233,6 @@ end
 function Repository.Save()
     Repository.Load()
     if not Repository.Dirty then return false, "not_dirty" end
-    local target = ModData and ModData.getOrCreate
-        and ModData.getOrCreate(Repository.MODDATA_KEY) or nil
-    if not target then return false, "moddata_unavailable" end
     local payload = copy(Repository.State)
     for _, task in pairs(payload.byId or {}) do
         -- Do not persist transient ownership or runtime reservation handles.
@@ -241,8 +248,8 @@ function Repository.Save()
             task.blockedReason = "RECOVERED_AFTER_LOAD"
         end
     end
-    for key, _ in pairs(target) do target[key] = nil end
-    for key, value in pairs(payload) do target[key] = value end
+    local written = Reset.Write(Repository.MODDATA_KEY, payload)
+    if not written then return false, "moddata_unavailable" end
     Repository.Dirty = false
     return true, "saved"
 end

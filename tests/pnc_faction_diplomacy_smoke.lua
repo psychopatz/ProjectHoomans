@@ -591,43 +591,31 @@ authorityEnabled = true
 T.equal(Factions.Registry.revision, rejectedRevision,
     "rejections revision-neutral")
 
--- V2 migration is deterministic, idempotent, directed, and save-safe.
-local legacy = {
-    schemaVersion = 2,
+-- Unsupported diplomacy data is not migrated. Current normalizers retain only
+-- current-version faction fields and never synthesize directed relations from
+-- the removed top-level pair table.
+local currentOnly = Types.NormalizeFactionRegistry({
+    schemaVersion = 6,
     revision = 4,
     byID = {
-        faction_legacy_a = {
-            id = "faction_legacy_a",
-            name = "Legacy A",
-            archetypeID = "settler",
-        },
-        faction_legacy_b = {
-            id = "faction_legacy_b",
-            name = "Legacy B",
-            archetypeID = "trader",
-        },
+        [alpha.id] = alpha,
+        [bravo.id] = bravo,
     },
     diplomacy = {
-        ["faction_legacy_a|faction_legacy_b"] = {
-            factionAID = "faction_legacy_a",
-            factionBID = "faction_legacy_b",
-            state = "war",
-            changedAt = 12,
-            revision = 3,
+        [alpha.id .. "|" .. bravo.id] = {
+            factionAID = alpha.id, factionBID = bravo.id,
+            state = "war", changedAt = 12, revision = 3,
         },
     },
-}
-local migratedOnce = Types.NormalizeFactionRegistry(legacy)
-local migratedTwice =
-    Types.NormalizeFactionRegistry(migratedOnce)
-T.truthy(Types.AreEqual(migratedOnce, migratedTwice),
-    "migration idempotent")
-T.truthy(migratedOnce.byID.faction_legacy_a
-    .relations.faction_legacy_b.atWar,
-    "legacy forward treaty")
-T.truthy(migratedOnce.byID.faction_legacy_b
-    .relations.faction_legacy_a.atWar,
-    "legacy reverse treaty")
+})
+T.truthy(currentOnly.byID[alpha.id],
+    "current faction remains normalizable")
+T.truthy(currentOnly.byID[bravo.id],
+    "current second faction remains normalizable")
+T.equal(currentOnly.byID[alpha.id].relations[bravo.id], nil,
+    "removed pair table does not synthesize a forward treaty")
+T.equal(currentOnly.byID[bravo.id].relations[alpha.id], nil,
+    "removed pair table does not synthesize a reverse treaty")
 
 local manyIncidents = {
     {

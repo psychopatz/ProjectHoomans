@@ -138,7 +138,7 @@ local record = {
     equipmentSpawnMode = "ranged",
     equipmentPoolID = "Default",
     equipment = { worn = {}, attached = {} },
-    progression = { skillLevels = { Strength = 5 }, skillXP = {} },
+    progression = { skillLevelDeltas = { Strength = 3 }, skillXP = {} },
     persistedInventory = { revision = 0 },
     liveBodyInstanceID = 9191,
     liveBodyOnlineID = 91,
@@ -176,7 +176,7 @@ local record = {
 
 local payload = PNC.Persistence.SerializeRecord(record)
 T.truthy(payload, "serialization failed without next()")
-T.truthy(payload.progression.skillLevelDeltas.Strength == 3, "legacy skill delta conversion failed")
+T.truthy(payload.progression.skillLevelDeltas.Strength == 3, "skill delta serialization failed")
 T.truthy(payload.health.body.wounds.ForeArm_L, "body wound was not serialized")
 T.truthy(payload.health.body.infection.active == true, "infection was not serialized")
 T.truthy(payload.health.body.infection.stage == "nauseous", "infection stage was not serialized")

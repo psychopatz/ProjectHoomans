@@ -23,6 +23,15 @@ local function deepEqual(left, right, seen)
     return true
 end
 
+local function deepCopy(value)
+    if type(value) ~= "table" then return value end
+    local output = {}
+    for key, item in pairs(value) do
+        output[key] = deepCopy(item)
+    end
+    return output
+end
+
 local function validatePersistedValue(value, seen)
     local valueType = type(value)
     local key
@@ -313,6 +322,26 @@ T.equal(
     generatedA.compassion,
     "valid profile does not reroll"
 )
+local staleGenerated = deepCopy(generatedA)
+staleGenerated.generationVersion = 99
+local regenerated = Types.NormalizeNPCPersonality(
+    staleGenerated, 3819401, "General")
+T.equal(regenerated.generationVersion,
+    Constants.NPC_GENERATION_VERSION,
+    "stale generated personality records current version")
+T.truthy(deepEqual(
+    regenerated,
+    Profiles.GenerateNPCProfile(3819401, "General")
+), "stale generated personality regenerates from identity")
+local authoredPersonality = deepCopy(generatedA)
+authoredPersonality.generatedFromSeed = false
+authoredPersonality.generationVersion = 99
+local preservedAuthored = Types.NormalizeNPCPersonality(
+    authoredPersonality, 999, "Doctor")
+T.equal(preservedAuthored.compassion, authoredPersonality.compassion,
+    "authored personality is not regenerated")
+T.equal(preservedAuthored.generationVersion, 99,
+    "authored personality version is preserved")
 local normalizedTwice = Types.NormalizeNPCPersonality(
     Types.NormalizeNPCPersonality(nil, 42, "Mechanic"),
     42,
@@ -376,6 +405,16 @@ T.truthy(deepEqual(
     authoredNPC.social.personality,
     loaded.social.personality
 ), "save/load does not reroll")
+local staleSocialPayload = deepCopy(serialized)
+staleSocialPayload.social.personality.generationVersion = 99
+local healedSocialNPC = PNC.Persistence.DeserializeRecord(staleSocialPayload)
+T.equal(healedSocialNPC.social.personality.generationVersion,
+    Constants.NPC_GENERATION_VERSION,
+    "deserialization heals stale personality generation")
+T.equal(healedSocialNPC.social.personality.orientation, "gay",
+    "personality healing reapplies authored enum override")
+T.equal(healedSocialNPC.social.personality.compassion, 0.88,
+    "personality healing reapplies authored numeric override")
 T.equal(serialized.schemaVersion, 15, "NPC schema V15")
 validatePersistedValue(serialized.social)
 
@@ -397,23 +436,7 @@ local oldNPC = PNC.Persistence.DeserializeRecord({
         recentEventIDs = { "social:old" },
     },
 })
-T.equal(oldNPC.social.schemaVersion, 3, "old NPC social migrated")
-T.equal(oldNPC.social.revision, 3,
-    "social migration preserves revision")
-T.equal(oldNPC.social.recentEventIDs[1], "social:old",
-    "social cache preserved")
-T.equal(oldNPC.social.conduct.scores.courage, 0,
-    "old NPC receives neutral conduct")
-T.equal(#oldNPC.social.conduct.evidence, 0,
-    "old relationship history not inferred as conduct")
-local oldProfileFirst = oldNPC.social.personality
-local oldNPCSecond = PNC.Persistence.DeserializeRecord(
-    PNC.Persistence.SerializeRecord(oldNPC)
-)
-T.truthy(deepEqual(
-    oldProfileFirst,
-    oldNPCSecond.social.personality
-), "NPC migration idempotent")
+T.equal(oldNPC, nil, "unsupported NPC schema resets instead of migrating")
 
 PNC.Registry.Data[authoredNPC.id] = authoredNPC
 local readNPC = Profiles.GetNPCProfile(authoredNPC.id)
@@ -437,28 +460,21 @@ T.equal(malformedNPC.recordRevision, beforeRecordRevision + 1,
 T.equal(malformedNPC.social.revision,
     beforeSocialRevision + 1, "NPC profile repair social revision")
 
--- Player-registry V2 migration gives historical identities neutral profiles.
+-- Unsupported player-registry versions reset instead of running migrations.
 PNC.PlayerCharacters.Load()
 local historical = PNC.PlayerCharacters.GetRegistryRecord(
     "char_historical"
 )
 T.equal(PNC.PlayerCharacters.GetRegistrySnapshot().schemaVersion, 6,
-    "player registry V2 migration")
-T.equal(historical.socialProfile.orientation, "straight",
-    "historical profile neutral orientation")
-T.equal(historical.socialProfile.resolvedAt, 0,
-    "historical profile not guessed")
-T.equal(historical.conduct.scores.reliability, 0,
-    "dead historical character receives neutral conduct")
-T.equal(#historical.conduct.evidence, 0,
-    "historical conduct not inferred")
+    "player registry reset version")
+T.equal(historical, nil, "unsupported historical identity was restored")
 local normalizedRegistry = PNC.PlayerCharacterTypes.NormalizeRegistry(
     PNC.PlayerCharacters.GetRegistrySnapshot()
 )
 T.truthy(deepEqual(
     normalizedRegistry,
     PNC.PlayerCharacterTypes.NormalizeRegistry(normalizedRegistry)
-), "player migration idempotent")
+), "player reset state is idempotent")
 
 -- Authoritative player resolution, revision idempotence, and UUID isolation.
 local uuidIndex = 0

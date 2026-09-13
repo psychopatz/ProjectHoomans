@@ -145,7 +145,6 @@ PNC.Factions = {
 T.load(SERVER .. "Player/PNC_PlayerCharacterService.lua")
 PNC.PlayerCharacters.Load()
 T.load(SERVER .. "Server/PNC_PersistenceCoordinator.lua")
-T.load(SERVER .. "Player/PNC_PlayerIdentityMigration.lua")
 
 local username = "Bob"
 local mirror = { PNC_CharacterUUID = "char_legacy_6" }
@@ -167,70 +166,14 @@ local player = {
 }
 
 local context, reason = PNC.PlayerContext.Resolve(player, "fixture_bootstrap")
-T.equal(reason, "reused", "migration binds canonical mirror")
+T.equal(reason, "new_identity", "unsupported registry starts a fresh identity")
 T.equal(context.accountKey, "sp_slot_0", "SP account key ignores username")
-T.equal(context.characterUUID, "char_legacy_6", "valid mirror wins canonical choice")
-T.equal(PNC.PlayerCharacters.Registry.migration.status, "complete",
-    "migration completes")
-T.truthy(store.PNC_PlayerCharacters_v3_Backup.created,
-    "v3 registry backup retained")
-T.equal(globalSaves, 1, "migration flushes GlobalModData once")
-
-local active = 0
-for uuid, record in pairs(PNC.PlayerCharacters.Registry.byUUID) do
-    if record.status == "active" then active = active + 1 end
-    if uuid ~= "char_legacy_6" then
-        T.equal(record.supersededBy, "char_legacy_6", "duplicate tombstone alias")
-        T.equal(PNC.PlayerCharacters.Registry.uuidAliases[uuid],
-            "char_legacy_6", "UUID alias retained")
-    end
-end
-T.equal(active, 1, "one active SP survivor remains")
-T.equal(PNC.NPCKnowledge.Registry.byCharacter.char_legacy_6.byNPC
-    .npc_doyle.discovered["identity.name"].value,
-    "Doyle Wild", "Doyle knowledge merged into canonical survivor")
-local canonicalKey = "player:sp_slot_0:char_legacy_6"
-T.truthy(npc.social.relationships[canonicalKey] ~= nil,
-    "relationship rekeyed to canonical entity")
-T.equal(npc.social.relationships[oldRelationshipKey], nil,
-    "legacy relationship key removed")
-T.equal(PNC.Factions.Registry.byPlayerKey[canonicalKey], "faction_two",
-    "canonical player faction retained")
-T.equal(PNC.Factions.Registry.byID.faction_one.status, "archived",
-    "duplicate player faction archived")
-
-username = "Psychopatz"
-local second = PNC.PlayerContext.Resolve(player, "username_changed")
-T.equal(second.characterUUID, context.characterUUID,
-    "username change cannot invalidate runtime binding")
-local again, againReason = PNC.PlayerIdentityMigration.RunForPlayer(
-    player, "sp_slot_0", 501
-)
-T.equal(again, "char_legacy_6", "idempotent migration canonical UUID")
-T.equal(againReason, "already_migrated", "migration is idempotent")
-
-PNC.PlayerCharacters.Unbind(player, "fixture_restart", 502, true)
-local restarted = setmetatable({
-    getModData = function() return {} end,
-    getUsername = function() return "Bob" end,
-}, { __index = player })
-local restartContext = PNC.PlayerContext.Resolve(
-    restarted, "restart_without_mirror"
-)
-T.equal(restartContext.characterUUID, "char_legacy_6",
-    "restart without player mirror recovers canonical SP survivor")
-
-T.truthy(PNC.PlayerCharacters.MarkDead(restarted, 503, "fixture_death"),
-    "genuine death retires canonical survivor")
-local successor = setmetatable({
-    getModData = function() return {} end,
-    getUsername = function() return "Psychopatz" end,
-}, { __index = player })
-local successorContext = PNC.PlayerContext.Resolve(successor, "post_death_survivor")
-T.equal(successorContext.characterUUID, "char_new",
-    "genuine post-death survivor receives new UUID")
-T.equal(PNC.NPCKnowledge.Registry.byCharacter[successorContext.characterUUID], nil,
-    "new survivor does not inherit canonical knowledge")
+T.equal(context.characterUUID, "char_new", "reset registry mints a new UUID")
+T.equal(PNC.PlayerCharacters.Registry.migration, nil,
+    "reset registry has no migration state")
+T.equal(store.PNC_PlayerCharacters_v3_Backup, nil,
+    "reset registry does not create a migration backup")
+T.equal(globalSaves, 0, "identity reset does not force an extra global save")
 T.finish("pnc_identity_v4_migration_smoke")
 
 T.finish("pnc_identity_v4_migration_smoke")

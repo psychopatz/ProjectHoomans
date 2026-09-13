@@ -5,7 +5,10 @@ local Registry = PNC.Registry
 local Internal = Registry.Internal
 local Core = PNC.Core
 local Const = PNC.Const
-local Persistence = PNC.Persistence
+local Persistence = PNC.Persistence or {}
+PNC.Persistence = Persistence
+local Reset = Persistence.Reset
+    or require "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset"
 
 Registry.Data = Registry.Data or {}
 Registry.LiveByID = Registry.LiveByID or {}
@@ -75,7 +78,7 @@ Registry.StorageKeyForID = storageKeyForID
 local function getDirectory()
     local directory = ModData.getOrCreate(Const.MODDATA_KEY)
     directory.layoutVersion = tonumber(directory.layoutVersion) or 0
-    directory.schemaVersion = tonumber(directory.schemaVersion or directory.Version) or 0
+    directory.schemaVersion = tonumber(directory.schemaVersion) or 0
     directory.directoryRevision = math.max(0, math.floor(tonumber(directory.directoryRevision) or 0))
     directory.records = type(directory.records) == "table" and directory.records or {}
     directory.deathMarkers = type(directory.deathMarkers) == "table"

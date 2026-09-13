@@ -16,7 +16,7 @@ function Internal.InspectSeatReservations(vehicle, seat, removeStale)
     Internal.ForEachContainerItem(container, function(item)
         local data = Internal.ReservationData(item)
         local positionMatches
-        if data then
+        if CompanionVehicle.IsReservationItem(item) and data then
             positionMatches =
                 tostring(data.vehicleId or "") == tostring(vehicleId)
                 and tonumber(data.seat) == tonumber(seat)
@@ -28,6 +28,8 @@ function Internal.InspectSeatReservations(vehicle, seat, removeStale)
             else
                 staleItems[#staleItems + 1] = item
             end
+        elseif CompanionVehicle.IsReservationItem(item) then
+            staleItems[#staleItems + 1] = item
         end
     end)
     if removeStale and Core.IsAuthority() then

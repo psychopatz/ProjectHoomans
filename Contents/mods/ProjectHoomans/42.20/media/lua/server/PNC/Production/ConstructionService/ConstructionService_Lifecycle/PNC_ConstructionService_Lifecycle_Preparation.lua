@@ -27,38 +27,21 @@ function Internal.Prepare(order)
         PNC.FacilityService.RefreshState(facility)
     end
     local input = order.payload and order.payload.input or nil
-    if input and tonumber(order.progress) and tonumber(order.progress) > 0
-        and not order.funded
-        and input.funded ~= true and input.committed ~= true
-        and (input.storageId == nil or input.storageId == "")
-        and (input.reservationId == nil or input.reservationId == "")
-    then
-        -- Compatibility for a construction record compacted by an older
-        -- save path. Its progress proves that the material boundary was
-        -- crossed, but the old runtime reservation was not durable.
-        order.funded = true
-        input.funded, input.committed = true, true
-        input.legacyRecovered = true
-        PNC.WorkRepository.MarkDirty()
-        return true
-    end
     if order.funded == true or input and (input.funded == true
         or input.committed == true)
     then order.funded = true; return true end
+    -- A reconstruction that carries no input payload is a structural change
+    -- with no material boundary (for example an empty test/edit operation).
+    -- It remains runnable without treating an old, compacted save as funded.
+    if not input and order.operation == "RECONSTRUCT" then
+        order.funded = true
+        return true
+    end
     if input then
         if PNC.WorkInputService.IsReady(order) then return true end
         return false, "CONSTRUCTION_INPUTS_UNAVAILABLE"
-    end
-    if order.progress > 0 or order.createdAt then
-        order.funded = true
-        order.payload = order.payload or {}
-        order.payload.input = { consume = true, funded = true,
-            committed = true, legacyRecovered = true }
-        PNC.WorkRepository.MarkDirty()
-        return true
     end
     return false, "CONSTRUCTION_NOT_FUNDED"
 end
 
 return Service
-

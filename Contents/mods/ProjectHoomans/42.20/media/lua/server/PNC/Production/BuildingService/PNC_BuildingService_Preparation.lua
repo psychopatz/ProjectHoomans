@@ -32,17 +32,6 @@ function H.Prepare(order)
         return false, "BUILD_TARGET_INVALID"
     end
     local input = order.payload and order.payload.input or nil
-    if input and tonumber(order.progress) and tonumber(order.progress) > 0
-        and not order.funded and input.funded ~= true
-        and input.committed ~= true and (input.storageId == nil
-            or input.storageId == "") and (input.reservationId == nil
-            or input.reservationId == "")
-    then
-        order.funded = true
-        input.funded, input.committed, input.legacyRecovered = true, true, true
-        Repository.MarkDirty()
-        return true
-    end
     if order.funded == true or input and (input.funded == true
         or input.committed == true)
     then order.funded = true; return true end
@@ -50,4 +39,3 @@ function H.Prepare(order)
     return false, input and "BUILDING_INPUTS_UNAVAILABLE"
         or "BUILDING_INPUTS_MISSING"
 end
-

@@ -772,53 +772,22 @@ T.truthy(Factions.IsTerritorialTollFaction(
 T.equal(looterNPC.tacticalClass, "neutral",
     "legacy looter base stops shoot-on-sight behavior")
 
--- V2 diplomacy migrates to directed relations, emblems, and V6
--- player-scoped pacification storage.
-local migrated = PNC.FactionTypes.NormalizeFactionRegistry({
-    schemaVersion = 2,
+-- The removed V2 migration must not synthesize relations. Current-version
+-- inputs still normalize normally.
+local current = PNC.FactionTypes.NormalizeFactionRegistry({
+    schemaVersion = 6,
     revision = 3,
     byID = {
-        faction_old_a = {
-            id = "faction_old_a",
-            name = "Old A",
-            archetypeID = "settler",
-        },
-        faction_old_b = {
-            id = "faction_old_b",
-            name = "Old B",
-            archetypeID = "looter",
-        },
-    },
-    diplomacy = {
-        ["faction_old_a|faction_old_b"] = {
-            factionAID = "faction_old_a",
-            factionBID = "faction_old_b",
-            state = "war",
-            changedAt = 20,
-            revision = 2,
-        },
+        [playerFaction.id] = playerFaction,
     },
 })
-T.equal(migrated.schemaVersion, 6, "registry migrated to V6")
-T.truthy(type(migrated.byPlayerKey) == "table",
-    "player index added")
-T.equal(migrated.diplomacy, nil,
-    "legacy pair table removed")
-T.truthy(migrated.byID.faction_old_a
-    .relations.faction_old_b.atWar,
-    "forward war migrated")
-T.truthy(migrated.byID.faction_old_b
-    .relations.faction_old_a.atWar,
-    "reverse war migrated")
-T.truthy(#migrated.byID.faction_old_a.emblem.layers > 0,
-    "old faction receives deterministic emblem")
-T.truthy(type(migrated.byID.faction_old_a
-    .playerPacifications) == "table",
-    "old faction receives pacification table")
-T.truthy(PNC.FactionTypes.AreEqual(
-    migrated,
-    PNC.FactionTypes.NormalizeFactionRegistry(migrated)
-), "V6 faction migration idempotent")
+T.equal(current.schemaVersion, 6, "current registry remains V6")
+T.truthy(type(current.byPlayerKey) == "table",
+    "current player index remains available")
+T.truthy(current.byID[playerFaction.id],
+    "current faction remains available")
+T.equal(current.byID[playerFaction.id].relations[playerFaction.id], nil,
+    "current normalization does not create self-relations")
 
 local memberSnapshot = PNC.FactionMembership.BuildSnapshot(player)
 T.equal(memberSnapshot.faction.id, playerFaction.id,

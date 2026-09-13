@@ -90,8 +90,6 @@ function Commands.HandleBootstrap(player, args)
                 bindingRevision = context.bindingRevision,
                 bootstrapRevision = knowledgeRevision,
                 knowledgeRevision = knowledgeRevision,
-                migrationResult = PNC.PlayerCharacters.Registry.migration
-                    and PNC.PlayerCharacters.Registry.migration.status,
                 aliases = Core.DeepCopy(
                     PNC.PlayerCharacters.Registry.uuidAliases or {}
                 ),

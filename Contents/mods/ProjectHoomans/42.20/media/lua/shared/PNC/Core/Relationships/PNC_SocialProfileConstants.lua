@@ -10,6 +10,7 @@ local Config = PNC.Config.Relationships
 
 Constants.PLAYER_PROFILE_SCHEMA_VERSION = 1
 Constants.NPC_PERSONALITY_SCHEMA_VERSION = 1
+-- Bump when seed-derived NPC personality output changes; authored values stay.
 Constants.NPC_GENERATION_VERSION = 1
 
 Constants.ORIENTATION_STRAIGHT = "straight"

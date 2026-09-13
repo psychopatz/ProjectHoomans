@@ -7,6 +7,8 @@ PNC.NeedsRepository = PNC.NeedsRepository or {}
 local Repository = PNC.NeedsRepository
 local Codec = PNC.NeedsStateCodec
 local Definitions = PNC.NeedsDefinitions
+local Reset = (PNC.Persistence and PNC.Persistence.Reset)
+    or require "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset"
 Repository.MODDATA_KEY = "PNC_PlayerOwnedNeeds_V1"
 Repository.Records = Repository.Records or {}
 Repository.EvaluatedAt = Repository.EvaluatedAt or {}
@@ -68,10 +70,16 @@ end
 
 function Repository.Load(force)
     if Repository.Loaded and force ~= true then return Repository.Records end
-    local raw = ModData and ModData.getOrCreate
-        and ModData.getOrCreate(Repository.MODDATA_KEY) or nil
-    local decoded, at, reason = Codec.Decode(raw)
-    local reset = reason == "version_mismatch" or reason == "invalid_state"
+    local raw = Reset.Read(Repository.MODDATA_KEY)
+    local reason = Reset.Check(raw, Codec.VERSION, "v",
+        function(value) return type(value.n) == "table" end)
+    local decoded, at
+    if reason == nil then
+        decoded, at = Codec.Decode(raw)
+    else
+        decoded, at = {}, 0
+    end
+    local reset = reason ~= nil and reason ~= "empty_state"
     Repository.Records, Repository.EvaluatedAt = {}, {}
     Repository.PersistedAt = at
     for id, state in pairs(decoded) do
@@ -79,15 +87,10 @@ function Repository.Load(force)
         Repository.EvaluatedAt[id] = at
     end
     Repository.Loaded, Repository.Dirty = true, reset
-    Repository.LastReset = reset and {
-        reason = reason,
-        fromVersion = type(raw) == "table" and tonumber(raw.v) or nil,
-        toVersion = Codec.VERSION,
-    } or nil
-    if reset and PNC.Core and PNC.Core.LogWarn then
-        PNC.Core.LogWarn("PNC needs state reset reason=" .. tostring(reason)
-            .. " fromVersion=" .. tostring(Repository.LastReset.fromVersion)
-            .. " toVersion=" .. tostring(Codec.VERSION))
+    Repository.LastReset = nil
+    if reset then
+        Reset.Mark(Repository, raw, Codec.VERSION, reason,
+            "player_owned_needs", "v")
     end
     return Repository.Records
 end
@@ -153,12 +156,9 @@ function Repository.Save()
             end
         end
     end
-    local target = ModData and ModData.getOrCreate
-        and ModData.getOrCreate(Repository.MODDATA_KEY) or nil
-    if not target then return false, "moddata_unavailable" end
     local packed = Codec.Encode(Repository.Records, at)
-    for key, _ in pairs(target) do target[key] = nil end
-    for key, value in pairs(packed) do target[key] = value end
+    local written = Reset.Write(Repository.MODDATA_KEY, packed)
+    if not written then return false, "moddata_unavailable" end
     Repository.PersistedAt = at
     Repository.Dirty = false
     return true, "saved"

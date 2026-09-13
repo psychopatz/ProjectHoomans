@@ -26,6 +26,38 @@ function Settings.GetNumber(key, fallback, minimum, maximum)
     return value
 end
 
+local function populationOption(key)
+    return Settings.GetNumber(key, 4, 1, 6)
+end
+
+function Settings.NPCPopulation()
+    return populationOption("NPCPopulation")
+end
+
+function Settings.SettlementDensity()
+    return populationOption("SettlementDensity")
+end
+
+function Settings.RoamingGroupDensity()
+    return populationOption("RoamingGroupDensity")
+end
+
+function Settings.PopulationRegeneration()
+    return populationOption("PopulationRegeneration")
+end
+
+function Settings.SettlementRegeneration()
+    return populationOption("SettlementRegeneration")
+end
+
+function Settings.MultiplayerPopulationScaling()
+    return populationOption("MultiplayerPopulationScaling")
+end
+
+function Settings.PopulationGenerationDistance()
+    return populationOption("PopulationGenerationDistance")
+end
+
 function Settings.NPCMeleeWeaponSpawnChance()
     return Settings.GetNumber("NPCMeleeWeaponSpawnChance", 70, 0, 100)
 end
@@ -140,6 +172,26 @@ function Settings.CompanionAmmoRealismEnabled()
     return Settings.GetBoolean("NPCAmmoConsumption", false)
 end
 
+function Settings.NPCWeaponDamageEnabled()
+    return Settings.GetBoolean("EnableWeaponDamage", true)
+end
+
+function Settings.NPCDamageDealtMultiplier()
+    return Settings.GetNumber("NPCDamageDealtMultiplier", 1, 0, 10)
+end
+
+function Settings.NPCPlayerWoundsEnabled()
+    return Settings.GetBoolean("NPCPlayerWounds", true)
+end
+
+function Settings.NPCAmmoConsumptionEnabled()
+    return Settings.GetBoolean("NPCAmmoConsumption", false)
+end
+
+function Settings.NPCWeaponConditionLossEnabled()
+    return Settings.GetBoolean("NPCWeaponConditionLoss", false)
+end
+
 function Settings.NPCSupplyTransactionLoggingEnabled()
     return Settings.GetBoolean("NPCSupplyTransactionLogging", false)
 end
@@ -210,6 +262,18 @@ function Settings.MobileGroupAccidentChance(groupType)
     local key = keys[groupType]
     if not key then return 0 end
     return Settings.GetNumber(key, defaults[groupType], 0, 100)
+end
+
+function Settings.RefugeeAccidentDeathChance()
+    return Settings.GetNumber("RefugeeAccidentDeathChance", 30, 0, 100)
+end
+
+function Settings.LooterAccidentDeathChance()
+    return Settings.GetNumber("LooterAccidentDeathChance", 10, 0, 100)
+end
+
+function Settings.CaravanAccidentDeathChance()
+    return Settings.GetNumber("CaravanAccidentDeathChance", 1, 0, 100)
 end
 
 function Settings.ZombiesTargetDownedNPC()

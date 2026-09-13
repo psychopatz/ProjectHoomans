@@ -51,6 +51,8 @@ function Coordinator.Commit(reason)
             and PNC.ResearchRepository.Dirty == true,
         needs = PNC.NeedsRepository and PNC.NeedsRepository.Dirty == true,
         work = PNC.WorkRepository and PNC.WorkRepository.Dirty == true,
+        fishing = PNC.FishingService and PNC.FishingService.Dirty == true,
+        lumber = PNC.LumberService and PNC.LumberService.Dirty == true,
         medicalCare = PNC.MedicalCareRepository
             and PNC.MedicalCareRepository.Dirty == true,
         settlements = PNC.SettlementRepository
@@ -93,6 +95,12 @@ function Coordinator.Commit(reason)
         end
         if PNC.WorkRepository and initialDirty.work then
             PNC.WorkRepository.Dirty = true
+        end
+        if PNC.FishingService and initialDirty.fishing then
+            PNC.FishingService.Dirty = true
+        end
+        if PNC.LumberService and initialDirty.lumber then
+            PNC.LumberService.Dirty = true
         end
         if PNC.MedicalCareRepository and initialDirty.medicalCare then
             PNC.MedicalCareRepository.Dirty = true
@@ -152,6 +160,10 @@ function Coordinator.Commit(reason)
     ok, why = save("needs", PNC.NeedsRepository)
     if not ok then return failure(why) end
     ok, why = save("work", PNC.WorkRepository)
+    if not ok then return failure(why) end
+    ok, why = save("fishing", PNC.FishingService)
+    if not ok then return failure(why) end
+    ok, why = save("lumber", PNC.LumberService)
     if not ok then return failure(why) end
     ok, why = save("medicalCare", PNC.MedicalCareRepository)
     if not ok then return failure(why) end

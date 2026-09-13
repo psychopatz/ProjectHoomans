@@ -17,6 +17,8 @@ local Message = PsychopatzCore.Conversation.Message
 local Events = PsychopatzCore.Events
 local MemoryIdentity = PNC.HoomansLLM.Identity
 local MemoryPrimitives = PNC.HoomansLLM.Memory
+local Reset = (PNC.Persistence and PNC.Persistence.Reset)
+    or require "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset"
 
 Sync.VERSION = 1
 Sync.STORAGE_KEY = "PNC_ConversationMemorySync"
@@ -27,9 +29,32 @@ Sync.MAX_CONTENT_LENGTH = 12000
 local OWNER_TOKEN = Sync
 local memoryRoot = Sync.memoryRoot or {}
 Sync.memoryRoot = memoryRoot
+local storageValidated = false
 
 local function storage()
     local root
+    if not storageValidated then
+        local raw = Reset.Read(Sync.STORAGE_KEY)
+        local reason = Reset.Check(raw, Sync.VERSION, "version",
+            function(value) return type(value.records) == "table" end)
+        if reason ~= nil and reason ~= "empty_state" then
+            Sync.LastReset = Reset.Info(raw, Sync.VERSION, reason,
+                "conversation_memory_sync", "version")
+            if ModData and ModData.getOrCreate then
+                Reset.Write(Sync.STORAGE_KEY, {
+                    version = Sync.VERSION, records = {}, index = {},
+                    indexReady = true,
+                })
+            else
+                for key, _ in pairs(memoryRoot) do memoryRoot[key] = nil end
+            end
+            if PNC.Core and PNC.Core.LogWarn then
+                PNC.Core.LogWarn("PNC persistence reset owner=conversation_memory_sync reason="
+                    .. tostring(reason))
+            end
+        end
+        storageValidated = true
+    end
     if ModData and ModData.getOrCreate then
         root = ModData.getOrCreate(Sync.STORAGE_KEY)
     else

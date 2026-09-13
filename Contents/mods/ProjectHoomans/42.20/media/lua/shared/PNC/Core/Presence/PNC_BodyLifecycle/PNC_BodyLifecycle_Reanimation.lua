@@ -25,6 +25,7 @@ local CONTROL_MODDATA_KEYS = {
     "PNC_CommandAckRevision", "PNC_CommandAckToken",
     "PNC_ClientVisualKey", "PNC_DebugAnimCycleKey",
     "PNC_DebugAnimCycleStartAt", "PNC_DeathMarkerID", "PNC_DeathName",
+    "PNC_ReanimatedFrom", "PNC_ReanimatedFromVersion",
 }
 
 local CONTROL_VARIABLES = {
@@ -47,6 +48,7 @@ local function clearManagedState(record, zombie)
             modData[CONTROL_MODDATA_KEYS[i]] = nil
         end
         modData.PNC_ReanimatedFrom = tostring(record.id)
+        modData.PNC_ReanimatedFromVersion = 1
     end
     for i = 1, #CONTROL_VARIABLES do
         if zombie.clearVariable then

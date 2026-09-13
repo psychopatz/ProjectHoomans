@@ -99,10 +99,6 @@ if Events and Events.OnInitGlobalModData and not Service.LoadHookRegistered then
     Events.OnInitGlobalModData.Add(function() Service.Load(true) end)
     Service.LoadHookRegistered = true
 end
-if Events and Events.OnSave and not Service.SaveHookRegistered then
-    Events.OnSave.Add(function() Service.Save() end)
-    Service.SaveHookRegistered = true
-end
 if Events and Events.LoadGridsquare and not Service.LoadSquareHookRegistered then
     Events.LoadGridsquare.Add(function(square)
         if not Service.Loaded then Service.Load(true) end

@@ -4,7 +4,28 @@ PNC.ConditionStats = PNC.ConditionStats or {}
 
 local Stats = PNC.ConditionStats
 
+local function ensureCurrentTraits(record)
+    local currentVersion
+    local version
+    if type(record) ~= "table" or record.dynamicTraits == nil
+        or record.dynamicTraitsAuthored == true
+        or not Stats.EnsureTraits
+    then
+        return
+    end
+    currentVersion = math.max(1, math.floor(
+        tonumber(Stats.TRAIT_GENERATION_VERSION) or 1
+    ))
+    version = math.max(0, math.floor(
+        tonumber(record.dynamicTraitsGenerationVersion) or 0
+    ))
+    if version ~= currentVersion then
+        Stats.EnsureTraits(record)
+    end
+end
+
 Stats.VERSION = 1
+-- Bump when the seed-derived dynamic trait catalog or rules change.
 Stats.TRAIT_GENERATION_VERSION = 1
 Stats.TYPES = { "stress", "boredom", "panic" }
 Stats.DEFINITIONS = {
@@ -113,6 +134,7 @@ function Stats.ResolveInitialTraits(source, seed, archetypeID, authored)
 end
 
 function Stats.HasTrait(record, id)
+    ensureCurrentTraits(record)
     return Stats.NormalizeTraits(record and record.dynamicTraits)[traitID(id)]
         == true
 end
@@ -130,9 +152,17 @@ end
 
 function Stats.EnsureTraits(record)
     if type(record) ~= "table" then return nil, false end
+    local currentVersion = math.max(1, math.floor(
+        tonumber(Stats.TRAIT_GENERATION_VERSION) or 1
+    ))
     local version = math.max(0, math.floor(
         tonumber(record.dynamicTraitsGenerationVersion) or 0))
-    if record.dynamicTraitsAuthored == true or version > 0 then
+    if record.dynamicTraitsAuthored == true then
+        record.dynamicTraits = Stats.NormalizeTraits(record.dynamicTraits)
+        record.dynamicTraitsGenerationVersion = 0
+        return record.dynamicTraits, false
+    end
+    if version == currentVersion then
         record.dynamicTraits = Stats.NormalizeTraits(record.dynamicTraits)
         return record.dynamicTraits, false
     end
@@ -141,7 +171,7 @@ function Stats.EnsureTraits(record)
     for _, enabled in pairs(existing) do
         if enabled == true then hasExisting = true break end
     end
-    if hasExisting then
+    if version == 0 and hasExisting then
         record.dynamicTraits = existing
         record.dynamicTraitsAuthored = true
         record.dynamicTraitsGenerationVersion = 0
@@ -149,15 +179,18 @@ function Stats.EnsureTraits(record)
         record.dynamicTraits = Stats.GenerateTraits(
             record.identitySeed, record.archetypeID)
         record.dynamicTraitsAuthored = false
-        record.dynamicTraitsGenerationVersion = Stats.TRAIT_GENERATION_VERSION
+        record.dynamicTraitsGenerationVersion = currentVersion
     end
     if PNC.Registry and PNC.Registry.MarkDirty then
-        PNC.Registry.MarkDirty(record, "dynamic_traits_initialized")
+        PNC.Registry.MarkDirty(record, version == 0 and hasExisting
+            and "dynamic_traits_initialized"
+            or "dynamic_traits_regenerated")
     end
     return record.dynamicTraits, true
 end
 
 function Stats.GetActiveTraitIDs(source)
+    ensureCurrentTraits(source)
     local traits = Stats.NormalizeTraits(source and source.dynamicTraits or source)
     local output = {}
     for index = 1, #Stats.TRAIT_DEFINITIONS do

@@ -195,21 +195,4 @@ function Registry.RemoveDeathMarker(id, reason)
     return true
 end
 
-function Registry.MigrateDeadRecords()
-    local dead = {}
-    local id
-    local record
-    for id, record in pairs(Registry.Data) do
-        if record.alive == false then dead[#dead + 1] = record end
-    end
-    for id = 1, #dead do
-        record = dead[id]
-        if not Registry.GetDeathMarker(record.id) then
-            Registry.AddDeathMarker(record)
-        end
-        Registry.RemoveRecord(record.id)
-    end
-    return #dead
-end
-
 return Registry

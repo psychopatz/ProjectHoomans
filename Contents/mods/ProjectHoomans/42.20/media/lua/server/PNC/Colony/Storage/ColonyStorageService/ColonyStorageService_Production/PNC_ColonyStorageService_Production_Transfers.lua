@@ -64,7 +64,8 @@ function Service.DepositProductionItems(storageId, products, provenance,
         if provenance and item.getModData then
             local data = item:getModData()
             data.PNC = data.PNC or {}
-            data.PNC.production = { v = 1, rid = provenance.recipeId }
+            data.PNC.production = { v = H.PRODUCTION_METADATA_VERSION,
+                rid = provenance.recipeId }
         end
         if type(product.modData) == "table" and item.getModData then
             local target = item:getModData()
@@ -96,4 +97,3 @@ function Service.DepositProductionItems(storageId, products, provenance,
     Repository.MarkDirty()
     return true, records
 end
-

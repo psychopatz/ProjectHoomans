@@ -15,17 +15,6 @@ local FactionTypes = PNC.FactionTypes
 
 local function prepareProgression(record)
     local progression = Internal.sanitizeProgression(record.progression)
-    if Internal.hasTableEntries(progression.legacySkillLevels) then
-        for skillID, level in pairs(progression.legacySkillLevels) do
-            local base = PNC.Skills and PNC.Skills.GetBaseLevel
-                and PNC.Skills.GetBaseLevel(record, skillID) or 0
-            progression.skillLevelDeltas[skillID] = math.max(
-                -10,
-                math.min(10, level - base)
-            )
-        end
-    end
-    progression.legacySkillLevels = nil
     progression.recruited = record.recruited == true
     if not Internal.hasTableEntries(progression.skillLevelDeltas) then
         progression.skillLevelDeltas = nil

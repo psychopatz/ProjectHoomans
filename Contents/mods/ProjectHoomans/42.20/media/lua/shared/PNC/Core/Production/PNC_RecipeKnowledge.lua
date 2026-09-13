@@ -40,9 +40,9 @@ local function copyList(source)
     return output
 end
 
-local function rawList(raw, longName, shortName, legacyName)
+local function compactList(raw, longName, shortName)
     if type(raw) ~= "table" then return nil end
-    return raw[longName] or raw[shortName] or raw[legacyName]
+    return raw[longName] or raw[shortName]
 end
 
 function Knowledge.Normalize(raw)
@@ -50,14 +50,10 @@ function Knowledge.Normalize(raw)
     return {
         schemaVersion = SCHEMA_VERSION,
         revision = math.max(0, math.floor(tonumber(raw.revision or raw.n) or 0)),
-        learnedRecipeKeys = cleanList(
-            rawList(raw, "learnedRecipeKeys", "r", "recipes"),
-            MAX_RECIPES, MAX_KEY_LENGTH
-        ),
-        readBookTypes = cleanList(
-            rawList(raw, "readBookTypes", "b", "books"),
-            MAX_BOOKS, MAX_KEY_LENGTH
-        ),
+        learnedRecipeKeys = cleanList(compactList(
+            raw, "learnedRecipeKeys", "r"), MAX_RECIPES, MAX_KEY_LENGTH),
+        readBookTypes = cleanList(compactList(
+            raw, "readBookTypes", "b"), MAX_BOOKS, MAX_KEY_LENGTH),
     }
 end
 

@@ -4,6 +4,8 @@ PNC.PlayerNeedsModel = PNC.PlayerNeedsModel or {}
 local Model = PNC.PlayerNeedsModel
 Model.Internal = Model.Internal or {}
 
+-- Bump when seed-derived trait content changes. Existing generated records
+-- re-roll lazily; authored records and mutable NPC state are preserved.
 Model.GENERATION_VERSION = 1
 
 Model.TRAITS = {

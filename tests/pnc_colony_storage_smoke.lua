@@ -425,12 +425,12 @@ T.equal(#serialized.activityJournal[2].entries, 10,
 T.equal(#serialized.activityJournal[2].entries[1], 6,
     "compact semantic journal entry")
 local legacyID = "legacy_storage"
-T.truthy(Journal.Deserialize({ 1, {{
+T.equal(Journal.Deserialize({ 1, {{
     Journal.OPERATION.STORE, 123, "legacy_actor",
     serialized.activityJournal[2].entries[1][4], 2, "scavenging",
-}} }, legacyID), "legacy journal migration")
-T.equal(Journal.Snapshot(legacyID)[1][Journal.FIELD.ACTOR], "legacy_actor",
-    "legacy journal actor retained")
+}} }, legacyID), false, "old journal payload is rejected")
+T.equal(#Journal.Snapshot(legacyID), 0,
+    "old journal payload resets to an empty journal")
 snapshot = Service.BuildSnapshot(playerA)
 T.equal(#snapshot.activity, 10, "snapshot activity cap")
 T.equal(snapshot.access.writable, true, "snapshot exposes writable base access")

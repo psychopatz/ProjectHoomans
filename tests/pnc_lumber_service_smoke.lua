@@ -369,6 +369,9 @@ T.equal(liveOutputEffect.items[2].fullType, "Base.Splinters",
     "live output captures secondary vanilla loot")
 T.equal(liveOutputEffect.actualQuantity, 2,
     "live output captures the complete loot quantity")
+T.equal(liveSquare.worldObjects[1]:getItem():getModData().PNC_LumberOutputEffectVersion,
+    1,
+    "live output uses the current item marker schema")
 T.equal(#outputs, 1, "live output is owned by vanilla")
 
 PNC.Registry.GetLiveZombie = function() return nil end

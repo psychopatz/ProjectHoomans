@@ -1,35 +1,26 @@
 local Resolution = PNC.CombatResolution
-local Settings = PNC.Sandbox
-
-local function sandbox()
-    return SandboxVars and SandboxVars.ProjectHoomans or nil
-end
-
-local function enabled(key, fallback)
-    if Settings and Settings.GetBoolean then
-        return Settings.GetBoolean(key, fallback)
-    end
-    local vars = sandbox()
-    if vars and vars[key] ~= nil then
-        return vars[key] == true
+local function enabled(accessor, fallback)
+    local settings = PNC.Sandbox
+    if settings and type(settings[accessor]) == "function" then
+        return settings[accessor]() == true
     end
     return fallback == true
 end
 
 function Resolution.IsWeaponDamageEnabled()
-    return enabled("EnableWeaponDamage", true)
+    return enabled("NPCWeaponDamageEnabled", true)
 end
 
 function Resolution.IsAmmoConsumptionEnabled()
-    return enabled("NPCAmmoConsumption", false)
+    return enabled("NPCAmmoConsumptionEnabled", false)
 end
 
 function Resolution.IsWeaponConditionEnabled()
-    return enabled("NPCWeaponConditionLoss", false)
+    return enabled("NPCWeaponConditionLossEnabled", false)
 end
 
 function Resolution.ArePlayerWoundsEnabled()
-    return enabled("NPCPlayerWounds", true)
+    return enabled("NPCPlayerWoundsEnabled", true)
 end
 
 return Resolution

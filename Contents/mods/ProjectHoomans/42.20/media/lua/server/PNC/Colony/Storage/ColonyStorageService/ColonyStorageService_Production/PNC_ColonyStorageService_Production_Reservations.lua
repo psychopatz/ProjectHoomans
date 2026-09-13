@@ -82,9 +82,13 @@ function Service.ReserveProductionMatchingRecord(storageId, match, quantity, own
             local matches = true
             if match.recipeId then
                 local item = Inventory.decodeItem(record)
-                local data = item and item.getModData and item:getModData() or nil
-                local recipeId = data and data.PNC and data.PNC.blueprint
-                    and tonumber(data.PNC.blueprint.rid) or nil
+                local data = item and H.ResetProductionRecordMetadata
+                    and H.ResetProductionRecordMetadata(storage, recordIndex, item)
+                    or item and item.getModData and item:getModData() or nil
+                local blueprint = data and data.PNC and data.PNC.blueprint
+                local recipeId = H.ValidProductionTag
+                    and H.ValidProductionTag(blueprint)
+                    and tonumber(blueprint.rid) or nil
                 matches = recipeId == tonumber(match.recipeId)
             end
             if matches then
@@ -105,4 +109,3 @@ function Service.ReleaseProductionReservation(id)
     Service.ProductionReservations[reservation.id] = nil
     return true
 end
-

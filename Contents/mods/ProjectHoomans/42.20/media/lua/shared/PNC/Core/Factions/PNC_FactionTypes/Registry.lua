@@ -51,43 +51,6 @@ local function indexPlayerMemberships(output, factionIDs)
     end
 end
 
-local function migrateRelation(diplomacy, sourceFaction, targetFaction)
-    local atWar
-    if sourceFaction.relations[targetFaction.id] then return end
-    atWar = diplomacy.state == Constants.DIPLOMACY_WAR
-    sourceFaction.relations[targetFaction.id] = Types.NormalizeRelation({
-        atWar = atWar,
-        state = atWar and "war" or "neutral",
-        previousState = "unknown",
-        warStartedAt = atWar and diplomacy.changedAt or 0,
-        warEndedAt = atWar and 0 or diplomacy.changedAt,
-        warReason = atWar and "unknown" or nil,
-        initiatingFactionID = diplomacy.instigatorFactionID,
-        lastEvaluatedAt = diplomacy.changedAt,
-        revision = diplomacy.revision,
-    }, sourceFaction.id, targetFaction.id)
-end
-
-local function migrateLegacyDiplomacy(source, output)
-    -- V2 stored one symmetric pair record. V3 migrates it into two directed
-    -- relations while preserving the official war/peace state.
-    for pairKey, raw in pairs(
-        type(source.diplomacy) == "table"
-            and source.diplomacy or {}
-    ) do
-            local diplomacy = Types.NormalizeDiplomacy(raw, pairKey)
-        if diplomacy
-            and output.byID[diplomacy.factionAID]
-            and output.byID[diplomacy.factionBID]
-        then
-            local first = output.byID[diplomacy.factionAID]
-            local second = output.byID[diplomacy.factionBID]
-            migrateRelation(diplomacy, first, second)
-            migrateRelation(diplomacy, second, first)
-        end
-    end
-end
-
 function Types.NormalizeFactionRegistry(value)
     local source = type(value) == "table" and value or {}
     local output = {
@@ -99,7 +62,6 @@ function Types.NormalizeFactionRegistry(value)
     }
     local factionIDs = normalizeFactions(source, output)
     indexPlayerMemberships(output, factionIDs)
-    migrateLegacyDiplomacy(source, output)
     return output
 end
 

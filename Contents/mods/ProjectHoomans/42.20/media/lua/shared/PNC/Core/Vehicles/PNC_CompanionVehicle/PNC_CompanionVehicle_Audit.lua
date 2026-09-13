@@ -21,7 +21,7 @@ local function auditContainer(
         local data = Internal.ReservationData(item)
         local key
         local valid
-        if data then
+        if CompanionVehicle.IsReservationItem(item) and data then
             key =
                 tostring(data.npcId or "")
                 .. ":" .. tostring(data.seat or "")
@@ -40,6 +40,8 @@ local function auditContainer(
             else
                 stale[#stale + 1] = item
             end
+        elseif CompanionVehicle.IsReservationItem(item) then
+            stale[#stale + 1] = item
         end
     end)
     for i = 1, #stale do

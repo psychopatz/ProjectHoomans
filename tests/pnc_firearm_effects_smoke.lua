@@ -240,6 +240,11 @@ zombie = {
     },
 }
 
+PNC.NameplateFirearmAnchor = {
+    GetRenderMuzzle = function()
+        return 1234, 5678, {}
+    end,
+}
 isServer = function() return false end
 isIngameState = function() return true end
 T.load(CLIENT_FILE)
@@ -279,6 +284,14 @@ T.equal(lastLight.args[7], 9, "muzzle light uses reduced radius")
 T.equal(#PNC.ClientFirearmEffects.ActiveMuzzleFlashes, 1,
     "fallback muzzle flash queued at the weapon-forward point")
 T.equal(#PNC.ClientFirearmEffects.ActiveTracers, 3, "fallback tracers queued")
+T.equal(PNC.ClientFirearmEffects.ActiveMuzzleFlashes[1].x, 1234,
+    "fallback muzzle flash uses cached nameplate anchor")
+T.equal(PNC.ClientFirearmEffects.ActiveMuzzleFlashes[1].y, 5678,
+    "fallback muzzle flash uses cached nameplate shoulder offset")
+T.equal(PNC.ClientFirearmEffects.ActiveTracers[1].x, 1234,
+    "fallback tracer uses cached nameplate anchor")
+T.equal(PNC.ClientFirearmEffects.ActiveTracers[1].y, 5678,
+    "fallback tracer uses cached nameplate shoulder offset")
 PNC.ClientFirearmEffects.OnPreUIDraw()
 T.equal(rendered > 0, true, "fallback firearm effects rendered")
 T.truthy(renderLines[1], "fallback muzzle/tracer renderline submitted")
@@ -300,6 +313,44 @@ T.truthy(auditEvents.muzzle_light_complete, "firearm audit recorded muzzle light
 T.truthy(auditEvents.tracer_screen_queue_complete, "firearm audit recorded tracer queue")
 T.truthy(auditEvents.draw_begin, "firearm audit recorded draw entry")
 T.truthy(auditEvents.draw_renderline_complete, "firearm audit recorded renderline")
+
+PNC.ClientFirearmEffects.Reset()
+T.equal(
+    PNC.ClientFirearmEffects.SimulateShot(body, "debug_npc", 0),
+    true,
+    "debug firearm simulation renders without authority or weapon state"
+)
+T.equal(PNC.ClientFirearmEffects.ActiveMuzzleFlashes[1].x, 1234,
+    "debug simulation uses cached muzzle anchor")
+T.equal(PNC.ClientFirearmEffects.ActiveMuzzleFlashes[1].anchorSource,
+    "nameplate_cache",
+    "debug simulation records the nameplate anchor source")
+T.equal(PNC.ClientFirearmEffects.ActiveTracers[1].x, 1234,
+    "debug simulation starts tracer at cached muzzle anchor")
+PNC.ClientFirearmEffects.Reset()
+now = 1000
+T.equal(
+    PNC.ClientFirearmEffects.ToggleSimulation(body, "debug_npc", 0),
+    true,
+    "debug firearm simulation toggles on"
+)
+T.truthy(
+    PNC.ClientFirearmEffects.IsSimulationActive(body, "debug_npc"),
+    "debug firearm simulation remains active"
+)
+now = 1500
+PNC.ClientFirearmEffects.OnTick()
+T.equal(#PNC.ClientFirearmEffects.ActiveTracers, 2,
+    "active firearm simulation emits a repeated tracer")
+T.equal(
+    PNC.ClientFirearmEffects.ToggleSimulation(body, "debug_npc", 0),
+    false,
+    "debug firearm simulation toggles off"
+)
+T.falsy(
+    PNC.ClientFirearmEffects.IsSimulationActive(body, "debug_npc"),
+    "debug firearm simulation stops emitting"
+)
 T.finish("pnc_firearm_effects_smoke")
 
 T.finish("pnc_firearm_effects_smoke")

@@ -12,19 +12,8 @@ local Inventory = PNC.Inventory
 local RelationshipTypes = PNC.RelationshipTypes
 local RelationshipMath = PNC.RelationshipMath
 local FactionTypes = PNC.FactionTypes
-
-local function migrateLegacyAffiliation(value)
-    if type(value) ~= "table" then return value end
-    if value.factionId == nil and value.communityId == nil then
-        return value
-    end
-    local output = Core.DeepCopy(value)
-    output.factionID = output.factionID or output.factionId
-    output.communityID = output.communityID or output.communityId
-    output.factionId = nil
-    output.communityId = nil
-    return output
-end
+local Reset = Persistence.Reset
+    or require "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset"
 
 local function buildDefinition(
     raw,
@@ -34,18 +23,19 @@ local function buildDefinition(
     position,
     anchor
 )
+    local vanillaTraitsVersion = math.max(0, math.floor(
+        tonumber(raw.vanillaTraitsGenerationVersion) or 0
+    ))
+    local dynamicTraitsVersion = math.max(0, math.floor(
+        tonumber(raw.dynamicTraitsGenerationVersion) or 0
+    ))
     return {
         id = raw.id or fallbackID,
         displayName = raw.displayName or raw.name
             or (identity and identity.displayName) or nil,
         name = raw.displayName or raw.name
             or (identity and identity.displayName) or nil,
-        -- Older saves serialized the NPC tactical class as `faction`.
-        -- NormalizeDefinition consumes this compatibility input and emits
-        -- only the canonical tacticalClass field on the runtime record.
-        tacticalClass = raw.tacticalClass ~= nil and raw.tacticalClass
-            or raw.faction ~= nil and raw.faction
-            or raw.role,
+        tacticalClass = raw.tacticalClass,
         visualProfile = raw.visualProfile,
         outfit = raw.outfit,
         isFemale = raw.isFemale == true
@@ -83,9 +73,7 @@ local function buildDefinition(
         archetypeID = raw.archetypeID
             or (identity and identity.archetypeID) or nil,
         persist = raw.persist ~= false,
-        recruited = raw.recruited == true
-            or (raw.progression and raw.progression.recruited == true)
-            or false,
+        recruited = raw.recruited == true,
         social = Internal.sanitizeSocial(
             raw.social,
             raw.identitySeed or (identity and identity.seed),
@@ -94,18 +82,16 @@ local function buildDefinition(
         affiliation = raw.affiliation,
         mapPresentation = raw.mapPresentation,
         generation = raw.generation,
-        vanillaTraits = raw.vanillaTraits or raw.physiologicalTraits,
+        vanillaTraits = raw.vanillaTraits,
         vanillaTraitsAuthored = raw.vanillaTraitsAuthored == true
             or (raw.vanillaTraitsAuthored == nil
-                and Internal.hasTableEntries(
-                    raw.vanillaTraits or raw.physiologicalTraits
-                )),
-        dynamicTraits = raw.dynamicTraits or raw.pncTraits,
+                and vanillaTraitsVersion == 0
+                and Internal.hasTableEntries(raw.vanillaTraits)),
+        dynamicTraits = raw.dynamicTraits,
         dynamicTraitsAuthored = raw.dynamicTraitsAuthored == true
             or (raw.dynamicTraitsAuthored == nil
-                and Internal.hasTableEntries(
-                    raw.dynamicTraits or raw.pncTraits
-                )),
+                and dynamicTraitsVersion == 0
+                and Internal.hasTableEntries(raw.dynamicTraits)),
         recipeKnowledge = raw.recipeKnowledge,
     }
 end
@@ -120,14 +106,20 @@ function Persistence.DeserializeRecord(raw, fallbackID)
     local progression
     local inventoryData
     local bodyHint
-    if type(raw) ~= "table" then
+    local reason = Reset.Check(raw, Const.PERSISTENCE_VERSION, nil,
+        function(value)
+            return type(value.id) == "string" and value.id ~= ""
+        end)
+    if reason ~= nil then
         return nil
     end
     position = raw.position or raw
     spawn = raw.spawn or raw
     anchor = raw.anchor or raw
-    identity = Internal.migrateLegacyIdentity(raw)
-    inventoryData = Internal.migrateLegacyInventory(raw)
+    identity = type(raw.identity) == "table"
+        and Core.DeepCopy(raw.identity) or nil
+    inventoryData = type(raw.inventory) == "table"
+        and Core.DeepCopy(raw.inventory) or nil
     definition = buildDefinition(
         raw,
         fallbackID,
@@ -192,9 +184,7 @@ function Persistence.DeserializeRecord(raw, fallbackID)
         raw.colonistDeparture
     )
     record.affiliation = FactionTypes
-        and FactionTypes.NormalizeAffiliation(
-            migrateLegacyAffiliation(raw.affiliation)
-        )
+        and FactionTypes.NormalizeAffiliation(raw.affiliation)
         or nil
     record.persist = raw.persist ~= false
     record.generation = type(raw.generation) == "table"

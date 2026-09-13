@@ -80,23 +80,6 @@ function PlayerCharacters.EnsureIdentity(player, context)
         })
         return nil, "account_identity_unavailable"
     end
-    if not PlayerCharacters.RuntimeByPlayer[player]
-        and PNC.PlayerIdentityMigration
-        and PNC.PlayerIdentityMigration.RunForPlayer
-    then
-        local _, migrationReason =
-            PNC.PlayerIdentityMigration.RunForPlayer(player, accountKey, at)
-        if migrationReason == "identity_ambiguous" then
-            return nil, migrationReason
-        end
-        if migrationReason and migrationReason ~= "migrated"
-            and migrationReason ~= "already_migrated"
-            and migrationReason ~= "not_singleplayer"
-            and migrationReason ~= "no_legacy_candidate"
-        then
-            return nil, migrationReason
-        end
-    end
     runtimeUUID = PlayerCharacters.RuntimeByPlayer[player]
     record = runtimeUUID
         and PlayerCharacters.Registry.byUUID[runtimeUUID] or nil
@@ -135,10 +118,6 @@ function PlayerCharacters.EnsureIdentity(player, context)
         local recoveryReason
         record, recoveryReason = recoverAccountCharacter(accountKey, player)
         if recoveryReason == "identity_ambiguous" then
-            PlayerCharacters.Registry.migration.status = "ambiguous"
-            PlayerCharacters.Registry.migration.diagnostic =
-                "multiple_active_account_bindings"
-            PlayerCharacters.Dirty = true
             return nil, "identity_ambiguous"
         end
         if record then
@@ -146,13 +125,6 @@ function PlayerCharacters.EnsureIdentity(player, context)
                 player, record, accountKey, at, callback,
                 "account_recovery", true)
         end
-    end
-    -- An authority migration may detect multiple plausible survivors. Never
-    -- mint another record in that state; surface a diagnostic instead.
-    if PlayerCharacters.Registry.migration
-        and PlayerCharacters.Registry.migration.status == "ambiguous"
-    then
-        return nil, "identity_ambiguous"
     end
     uuid, reason = createIdentity(player, accountKey, at)
     if not uuid then

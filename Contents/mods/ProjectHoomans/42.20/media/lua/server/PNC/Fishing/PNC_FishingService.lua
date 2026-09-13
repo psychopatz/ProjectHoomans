@@ -10,6 +10,8 @@ PNC.FishingService = PNC.FishingService or {}
 local Service = PNC.FishingService
 local Const = PNC.Const or {}
 local Core = PNC.Core or {}
+local Reset = (PNC.Persistence and PNC.Persistence.Reset)
+    or require "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset"
 local Internal = Service.Internal or {}
 local GridRegion
 local Zones
@@ -141,27 +143,34 @@ end
 
 function Service.Load(force)
     if Service.Loaded and force ~= true then return true end
-    local raw
-    if ModData and type(ModData.getOrCreate) == "function" then
-        raw = ModData.getOrCreate(Service.MODDATA_KEY)
-    end
-    if type(raw) == "table" then Service.Data = raw end
+    local raw = Reset.Read(Service.MODDATA_KEY)
+    local reason = Reset.Check(raw, Service.SCHEMA_VERSION, nil,
+        function(value)
+            return type(value.zones) == "table"
+                and type(value.jobs) == "table"
+                and type(value.zoneOrder) == "table"
+        end)
+    Service.Data = reason == nil and raw or nil
     Internal.EnsureData()
     normalizeLoaded()
-    Service.Loaded, Service.Dirty = true, false
+    Service.Loaded = true
+    Service.Dirty = reason ~= nil and reason ~= "empty_state"
+    if Service.Dirty then
+        Reset.Mark(Service, raw, Service.SCHEMA_VERSION, reason, "fishing")
+    end
     return true, "loaded"
 end
 
 function Service.Save()
     if not Service.Loaded then Service.Load(true) end
     local data = Internal.EnsureData()
-    if ModData and type(ModData.getOrCreate) == "function" then
-        local target = ModData.getOrCreate(Service.MODDATA_KEY)
-        if target then
-            target.schemaVersion, target.zones = Service.SCHEMA_VERSION, data.zones
-            target.jobs, target.zoneOrder = data.jobs, data.zoneOrder
-        end
-    end
+    local written = Reset.Write(Service.MODDATA_KEY, {
+        schemaVersion = Service.SCHEMA_VERSION,
+        zones = data.zones,
+        jobs = data.jobs,
+        zoneOrder = data.zoneOrder,
+    })
+    if not written then return false, "moddata_unavailable" end
     Service.LastSaveAt, Service.Dirty = Internal.Now(), false
     return true, "saved"
 end
@@ -176,9 +185,4 @@ if Events and Events.OnInitGlobalModData and not Service.LoadHookRegistered then
     Events.OnInitGlobalModData.Add(function() Service.Load(true) end)
     Service.LoadHookRegistered = true
 end
-if Events and Events.OnSave and not Service.SaveHookRegistered then
-    Events.OnSave.Add(function() Service.Save() end)
-    Service.SaveHookRegistered = true
-end
-
 return Service

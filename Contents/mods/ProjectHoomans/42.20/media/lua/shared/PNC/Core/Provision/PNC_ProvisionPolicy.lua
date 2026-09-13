@@ -93,19 +93,6 @@ function Policy.Normalize(value)
                 == "string" and sourcePolicy.parentPolicyId or nil }
             for _, definition in ipairs(Registry.List()) do
                 local values = sourcePolicy[definition.id]
-                if tonumber(source.schemaVersion) == 1
-                    and (definition.measure == "HUNGER_UTILITY"
-                        or definition.measure == "THIRST_UTILITY")
-                    and type(values) == "table"
-                then
-                    values = copy(values)
-                    if tonumber(values.refillBelow) then
-                        values.refillBelow = values.refillBelow / 100
-                    end
-                    if tonumber(values.target) then
-                        values.target = values.target / 100
-                    end
-                end
                 local normalized = values and Policy.ValidateRule(
                     definition.id, values, false,
                     policyID ~= Policy.DEFAULT_POLICY_ID) or nil

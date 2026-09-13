@@ -112,12 +112,14 @@ PNC.Registry.LiveByID.npc_1 = nil
 tables.PNC_NPC_npc_2.schemaVersion = 4
 PNC.Registry.Loaded = false
 PNC.Registry.Load()
-T.truthy(PNC.Registry.DirtyByID.npc_2,
-    "older per-NPC schema was not scheduled for migration")
-T.equal(PNC.Registry.FlushDirty(), 1,
-    "per-NPC schema migration flush count")
-T.equal(tables.PNC_NPC_npc_2.schemaVersion, 5,
-    "per-NPC schema migration version")
+T.equal(PNC.Registry.Data.npc_2, nil,
+    "older per-NPC schema was not reset")
+T.equal(tables.PNC_NPC_npc_2, nil,
+    "reset per-NPC table was retained")
+T.equal(tables.PNC_Core_Global.records.npc_2, nil,
+    "reset per-NPC pointer was retained")
+T.equal(PNC.Registry.FlushDirty(), 0,
+    "per-NPC reset did not serialize a replacement record")
 
 PNC.Registry.MarkDirty("npc_10", "health")
 PNC.Registry.MarkDirty("npc_20", "inventory")
@@ -140,11 +142,11 @@ tables = {
 }
 PNC.Registry.Loaded = false
 PNC.Registry.Load()
-T.equal(PNC.Core.TableSize(PNC.Registry.Data), 2, "legacy migration record count")
-T.truthy(tables.PNC_Core_Global.NPCs, "legacy bodies removed before per-NPC records were written")
-T.equal(PNC.Registry.FlushDirty(), 2, "legacy migration flush count")
-T.equal(tables.PNC_Core_Global.NPCs, nil, "legacy bodies retained after migration commit")
-T.truthy(tables.PNC_NPC_old_a and tables.PNC_NPC_old_b, "legacy per-NPC tables missing")
+T.equal(PNC.Core.TableSize(PNC.Registry.Data), 0, "unsupported registry reset count")
+T.equal(tables.PNC_Core_Global.NPCs, nil, "unsupported legacy bodies retained")
+T.equal(PNC.Registry.FlushDirty(), 0, "unsupported registry reset flush count")
+T.equal(tables.PNC_NPC_old_a, nil, "unsupported legacy NPC table retained")
+T.equal(tables.PNC_NPC_old_b, nil, "unsupported legacy NPC table retained")
 
 tables = {
     PNC_Core_Global = {
@@ -158,17 +160,16 @@ tables = {
 }
 PNC.Registry.Loaded = false
 PNC.Registry.Load()
-T.equal(PNC.Core.TableSize(PNC.Registry.Data), 1, "partial migration valid record count")
-T.equal(PNC.Registry.FlushDirty(), 1, "partial migration flush count")
-T.truthy(tables.PNC_Core_Global.NPCs, "partial migration removed legacy fallback")
-tables.PNC_Core_Global.NPCs.retry_b.invalid = nil
-PNC.Registry.Loaded = false
-PNC.Registry.Load()
-T.equal(PNC.Core.TableSize(PNC.Registry.Data), 2, "partial migration retry record count")
-T.equal(PNC.Registry.FlushDirty(), 2, "partial migration retry flush count")
-T.equal(tables.PNC_Core_Global.NPCs, nil, "retried migration did not commit")
+T.equal(PNC.Core.TableSize(PNC.Registry.Data), 0, "malformed registry reset count")
+T.equal(PNC.Registry.FlushDirty(), 0, "malformed registry reset flush count")
+T.equal(tables.PNC_Core_Global.NPCs, nil, "malformed legacy bodies retained")
 
-local retryRecord = PNC.Registry.Get("retry_a")
+local retryRecord = {
+    id = "retry_a", recordRevision = 0, persist = true,
+    x = 0, y = 0, z = 0, runtime = {},
+}
+T.truthy(PNC.Registry.AddRecord(retryRecord), "failure fixture record added")
+T.equal(PNC.Registry.FlushDirty(), 1, "failure fixture record flushed")
 local originalSerialize = PNC.Persistence.SerializeRecord
 PNC.Persistence.SerializeRecord = function(record)
     if record.id == "retry_a" then error("intentional serialization failure") end
@@ -183,8 +184,9 @@ T.equal(PNC.Registry.FlushDirty(), 1, "retained dirty record did not retry")
 tables.PNC_NPC_orphan = { id = "orphan", recordRevision = 7 }
 PNC.Registry.Loaded = false
 PNC.Registry.Load()
-T.truthy(PNC.Registry.Get("orphan"), "valid orphan was not recovered")
-T.equal(tables.PNC_Core_Global.records.orphan.storageKey, "PNC_NPC_orphan", "orphan pointer")
+T.equal(PNC.Registry.Get("orphan"), nil, "unreferenced record was recovered")
+T.equal(tables.PNC_Core_Global.records.orphan, nil, "orphan pointer")
+T.equal(tables.PNC_NPC_orphan, nil, "unreferenced NPC table was retained")
 T.finish("pnc_persistence_v5_smoke")
 
 T.finish("pnc_persistence_v5_smoke")

@@ -26,7 +26,6 @@ function Resolution.RollWeaponDamage(weaponItem, fallback)
 end
 
 function Resolution.GetAttackDamage(record, attackType, weaponItem, fallback, skillLevel)
-    local vars
     local base
     local normalized
     local attackMultiplier
@@ -41,8 +40,8 @@ function Resolution.GetAttackDamage(record, attackType, weaponItem, fallback, sk
     else
         attackMultiplier = 8 + (6 * normalized)
     end
-    vars = SandboxVars and SandboxVars.ProjectHoomans or nil
-    dealtMultiplier = math.max(0, tonumber(vars and vars.NPCDamageDealtMultiplier) or 1)
+    dealtMultiplier = PNC.Sandbox and PNC.Sandbox.NPCDamageDealtMultiplier
+        and PNC.Sandbox.NPCDamageDealtMultiplier() or 1
     return base * attackMultiplier * dealtMultiplier
 end
 

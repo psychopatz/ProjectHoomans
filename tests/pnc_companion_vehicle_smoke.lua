@@ -249,6 +249,14 @@ T.equal(PNC.CompanionVehicle.GetSeatReservation(vehicle, 1), false,
     "old vehicle token removed")
 T.equal(PNC.CompanionVehicle.GetSeatReservation(secondVehicle, 1), true,
     "new vehicle token installed")
+local currentMarker = secondVehicleParts[2]:getItemContainer()
+local currentReservation
+local vehicleInternal = PNC.CompanionVehicle.Internal
+vehicleInternal.ForEachContainerItem(currentMarker, function(item)
+    if vehicleInternal.ReservationData(item) then currentReservation = item end
+end)
+T.equal(currentReservation:getModData().PNC_VehicleSeatReservationVersion, 1,
+    "reservation marker carries its current schema")
 
 ownerVehicle = nil
 handled, reason = PNC.CompanionVehicle.Tick(first, nil, owner)

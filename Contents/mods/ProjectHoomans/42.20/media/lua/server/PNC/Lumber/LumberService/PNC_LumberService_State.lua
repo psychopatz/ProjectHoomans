@@ -7,6 +7,8 @@ local Internal = Service.Internal
 local Core = Internal.Core
 local GridRegion = Internal.GridRegion
 local Zones = Internal.Zones
+local Reset = (PNC.Persistence and PNC.Persistence.Reset)
+    or require "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset"
 
 local function now()
     if Core and type(Core.Now) == "function" then return Core.Now() end
@@ -269,32 +271,37 @@ end
 
 function Service.Load(force)
     if Service.Loaded and force ~= true then return true end
-    local raw
-    if ModData and type(ModData.getOrCreate) == "function" then
-        raw = ModData.getOrCreate(Service.MODDATA_KEY)
-    end
-    if type(raw) == "table" then Service.Data = raw end
+    local raw = Reset.Read(Service.MODDATA_KEY)
+    local reason = Reset.Check(raw, Service.SCHEMA_VERSION, nil,
+        function(value)
+            return type(value.zones) == "table"
+                and type(value.trees) == "table"
+                and type(value.jobs) == "table"
+                and type(value.zoneOrder) == "table"
+        end)
+    Service.Data = reason == nil and raw or nil
     ensureData()
     normalizeLoadedState()
     Service.Runtime.nextWorkReconcileAt = 0
     Service.Loaded = true
-    Service.Dirty = false
+    Service.Dirty = reason ~= nil and reason ~= "empty_state"
+    if Service.Dirty then
+        Reset.Mark(Service, raw, Service.SCHEMA_VERSION, reason, "lumber")
+    end
     return true, "loaded"
 end
 
 function Service.Save()
     if not Service.Loaded then Service.Load(true) end
     local data = ensureData()
-    if ModData and type(ModData.getOrCreate) == "function" then
-        local target = ModData.getOrCreate(Service.MODDATA_KEY)
-        if target then
-            target.schemaVersion = Service.SCHEMA_VERSION
-            target.zones = data.zones
-            target.trees = data.trees
-            target.jobs = data.jobs
-            target.zoneOrder = data.zoneOrder
-        end
-    end
+    local written = Reset.Write(Service.MODDATA_KEY, {
+        schemaVersion = Service.SCHEMA_VERSION,
+        zones = data.zones,
+        trees = data.trees,
+        jobs = data.jobs,
+        zoneOrder = data.zoneOrder,
+    })
+    if not written then return false, "moddata_unavailable" end
     Service.LastSaveAt = now()
     Service.Dirty = false
     return true, "saved"

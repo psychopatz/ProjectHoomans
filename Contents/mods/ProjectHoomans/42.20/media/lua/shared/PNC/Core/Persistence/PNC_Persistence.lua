@@ -3,6 +3,7 @@ PNC.Persistence = PNC.Persistence or {}
 PNC.Persistence.Internal = PNC.Persistence.Internal or {}
 
 require "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Primitives"
+require "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset"
 require "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_HealthBody"
 require "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_HealthCodec"
 require "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_RecordState"

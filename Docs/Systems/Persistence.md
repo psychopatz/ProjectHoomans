@@ -5,23 +5,23 @@
 - `PNC_Registry` delegates all long-lived record writes to this subsystem.
 
 ## Owned Data
-- v15 versioned per-NPC persisted schema
+- versioned per-NPC persisted schema, with exact-version reset semantics
 - `PNC_Core_Global.records` directory pointers
 - isolated `PNC_NPC_<id>` record tables
 - canonical persisted fields only
 - nested `identity` payload
 - compact `inventory` payload
 - sparse, directed `social` relationship and memory payload
-- separate `PNC_PlayerCharacters` player-character registry schema v3
+- separate `PNC_PlayerCharacters` player-character registry schema v6
 - separate `PNC_Factions` organizational/diplomacy/emblem/mobile registry schema v6
 - primitive NPC affiliation schema v2, including optional community identity
 - separate `PNC_Communities` community/site registry schema v2
 - body-part wounds and infection timing, stage, progress, fever, and temperature
-- optional NPC `needs` schema V1 for player-owned/recruited individual Needs
-- optional mobile-faction `needs` schema V1 for aggregate group Needs
+- optional NPC `needs` schema V2 for player-owned/recruited individual Needs
+- optional mobile-faction state schema V3, including aggregate group Needs
 - runtime rebuild defaults after load
-- dirty-record tracking and v4 monolithic-store migration
-- save-time position/stamina snapshots and v5-v7 per-record compaction migration
+- dirty-record tracking and explicit reset diagnostics
+- save-time position/stamina snapshots and current-version compaction
 
 ## Public Functions
 - `PNC.Persistence.SerializeRecord(record)`
@@ -34,6 +34,26 @@
 - `PNC.PlayerCharacters.Load()`
 - `PNC.PlayerCharacters.Save()`
 - `PNC.PlayerCharacters.NormalizeRegistry()`
+
+## Version and Reset Contract
+
+- this unreleased persistence surface intentionally has no migration readers or
+  migration writers
+- every canonical named ModData root owns an exact schema/layout version
+- a missing or empty root is a normal first-run state and is not marked dirty
+- an existing root with an older/newer version or malformed shape is discarded
+  in memory, replaced with a fresh current-version state, marked dirty, and
+  rewritten by the next coordinated save
+- reset diagnostics (`LastReset`) are runtime-only and contain the owner,
+  reason, source version, target version, and reset timestamp
+- nested persisted payloads follow the same owner/version boundary; malformed
+  children are dropped and the owning root is dirtied for a clean rewrite
+- object, body, corpse, vehicle, and item ModData are projections or leases,
+  not canonical global stores. They are versioned where durable and reconciled
+  lazily when their owning record/service is accessed; no world-wide scan is
+  performed on load or every tick
+- only player-owned NPC/colonist records participate in the NPC Needs system;
+  unrelated vanilla/player objects are outside this persistence contract
 
 ## Storage Rules
 - the global directory never contains full NPC record bodies
@@ -55,8 +75,6 @@
   without calling `MarkDirty` every tick. `FlushDirty` compares compact saved
   snapshots and dirties only records whose position or stamina actually
   differs at save time
-- records loaded from an older per-NPC schema are accepted, marked
-  `schema_migration`, and rewritten as v15 on the next save
 - missing Need state is intentionally valid for old saves. Individual state is
   initialized only when existing ownership/recruitment makes it eligible;
   group state is initialized only for an active mobile faction. Need debug
@@ -68,35 +86,40 @@
 - each survivor carries only `PNC_CharacterUUID` and
   `PNC_CharacterIdentityVersion` in player ModData. Runtime player-object and
   UUID bindings are module state and never serialized
-- v11 and older records deterministically receive current social schema and an NPC
-  personality generated from their stored identity seed. Partially migrated
-  social data is normalized through the same constructor path, so migration
-  is idempotent and never pre-creates relationships or rewrites memories
-- V13 and older records deterministically receive neutral affiliation schema
-  V1. The separate `PNC_Factions` registry starts empty; migration never
-  converts legacy `colonist`, `neutral`, or `hostile` classifications into
-  organizational membership
-- faction-registry V1 data normalizes through V2 membership indexes. V2
-  symmetric pair diplomacy normalizes to V3 directed relation records while
-  preserving official war/peace state, timestamps, initiator, and revision.
-  V3 normalizes to V4 by assigning each faction a deterministic,
-  archetype-aware layered emblem made only from primitive map-symbol IDs,
-  colors, and numeric transforms. It invents no opinion metrics, incidents,
-  factions, or memberships
-- V4 normalizes to V5 by adding bounded player-specific pacification entries.
-  V5 normalizes to V6 with `mobile = nil`; only the mobile-group director can
-  add a primitive staging site, and it never stores a Community or engine
-  object there
+- current-version social, affiliation, faction, community, mobile, and player
+  registry roots are loaded exactly; unsupported or malformed roots reset to
+  their current empty shape and are rebuilt only by current gameplay writes
 - full NPC records never persist after death. The registry directory instead
   keeps a minimal `deathMarkers` map with identity, name, position, corpse token,
   infection state, and delay metadata
 - a death marker is removed once its recorded square is loaded and the matching
-  vanilla corpse is absent; legacy persisted dead records migrate into this
-  compact form during registry load
+  vanilla corpse is absent
 - persistence ModData is server-only and is never broadcast with `ModData.transmit`
 - Project Zomboid still writes all named ModData tables to its single global save file
-- v4 migration keeps `NPCs` as the fallback until every expected per-NPC table is written and verified
+- the registry directory is the only canonical index; isolated NPC rows are
+  accepted only when their exact current version and directory identity match
+- unreferenced `PNC_NPC_<id>` tables are removed during startup maintenance and
+  are never recovered as live records
 - failed record serialization or writes remain dirty and retry on a later save
+
+## Deterministic Generated-State Healing
+
+- seed-derived NPC vanilla traits, dynamic traits, and social personality carry
+  subsystem generation revisions separate from the root persistence schema
+- when a generated revision is stale, the subsystem regenerates from the
+  persisted `identitySeed` and `archetypeID`, records the current revision, and
+  dirties only that record for lazy rewrite
+- authored trait sets, authored personality values, and explicit empty sets are
+  never regenerated; generation metadata is not treated as permission to erase
+  authored data
+- nutrition, needs, health, inventory, relationships, progression, travel,
+  conduct, and other mutable state remain untouched by generated-state healing
+- adding or changing generated content requires bumping that subsystem's
+  generator revision; it does not require an NPC schema migration or a world
+  scan
+- healing runs during normal record construction/load/access, so existing NPCs
+  converge when encountered while CPU and memory cost stay proportional to the
+  records already being used
 
 ## Scale Contract
 

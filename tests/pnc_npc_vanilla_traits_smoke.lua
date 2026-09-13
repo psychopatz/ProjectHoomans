@@ -65,6 +65,18 @@ T.equal(table.concat(PNC.PlayerNeedsModel.GetActiveTraitIDs(generatedA), "|"),
     table.concat(PNC.PlayerNeedsModel.GetActiveTraitIDs(generatedB), "|"),
     "same permanent identity seed produces the same traits")
 
+local expectedVanillaTraits = PNC.PlayerNeedsModel.GenerateTraits(
+    generatedA.identitySeed, generatedA.archetypeID)
+generatedA.vanillaTraitsGenerationVersion = 99
+local _, vanillaRegenerated = PNC.PlayerNeedsModel.EnsureTraits(generatedA)
+T.truthy(vanillaRegenerated, "stale generated vanilla traits regenerate")
+T.equal(generatedA.vanillaTraitsGenerationVersion,
+    PNC.PlayerNeedsModel.GENERATION_VERSION,
+    "vanilla regeneration records current version")
+T.equal(table.concat(PNC.PlayerNeedsModel.GetActiveTraitIDs(generatedA), "|"),
+    table.concat(PNC.PlayerNeedsModel.GetActiveTraitIDs(expectedVanillaTraits), "|"),
+    "vanilla regeneration remains seed deterministic")
+
 local authored = PNC.Types.NewRecord({
     id = "npc_authored", identitySeed = 321,
     vanillaTraits = { "Base.HighThirst", "Overweight" },
@@ -73,6 +85,11 @@ T.equal(authored.vanillaTraitsAuthored, true, "authored trait source")
 T.equal(authored.vanillaTraitsGenerationVersion, 0, "authored generation version")
 T.equal(authored.vanillaTraits.highthirst, true, "authored high thirst")
 T.equal(authored.vanillaTraits.overweight, true, "authored overweight")
+authored.vanillaTraitsGenerationVersion = 99
+local _, authoredVanillaChanged = PNC.PlayerNeedsModel.EnsureTraits(authored)
+T.falsy(authoredVanillaChanged, "authored vanilla traits never regenerate")
+T.equal(authored.vanillaTraitsGenerationVersion, 0,
+    "authored vanilla traits keep version zero")
 
 local explicitlyTraitless = PNC.Types.NewRecord({
     id = "npc_traitless", identitySeed = 321, vanillaTraits = {},
@@ -81,6 +98,12 @@ T.equal(explicitlyTraitless.vanillaTraitsAuthored, true,
     "explicit empty traits are authoritative")
 T.equal(#PNC.PlayerNeedsModel.GetActiveTraitIDs(explicitlyTraitless), 0,
     "explicit empty traits suppress generation")
+explicitlyTraitless.vanillaTraitsGenerationVersion = 99
+local _, traitlessChanged = PNC.PlayerNeedsModel.EnsureTraits(
+    explicitlyTraitless)
+T.falsy(traitlessChanged, "explicit empty traits never regenerate")
+T.equal(explicitlyTraitless.vanillaTraitsGenerationVersion, 0,
+    "explicit empty traits keep version zero")
 
 local fingerprints = {}
 for seed = 1, 200 do
@@ -109,6 +132,17 @@ T.equal(table.concat(dynamicA, "|"), table.concat(dynamicB, "|"),
 T.equal(generatedA.dynamicTraitsGenerationVersion,
     PNC.ConditionStats.TRAIT_GENERATION_VERSION,
     "custom trait generation version")
+local expectedDynamicTraits = PNC.ConditionStats.GenerateTraits(
+    generatedA.identitySeed, generatedA.archetypeID)
+generatedA.dynamicTraitsGenerationVersion = 99
+local _, dynamicRegenerated = PNC.ConditionStats.EnsureTraits(generatedA)
+T.truthy(dynamicRegenerated, "stale generated custom traits regenerate")
+T.equal(generatedA.dynamicTraitsGenerationVersion,
+    PNC.ConditionStats.TRAIT_GENERATION_VERSION,
+    "custom regeneration records current version")
+T.equal(table.concat(PNC.ConditionStats.GetActiveTraitIDs(generatedA), "|"),
+    table.concat(PNC.ConditionStats.GetActiveTraitIDs(expectedDynamicTraits), "|"),
+    "custom regeneration remains seed deterministic")
 
 local iron = PNC.Types.NewRecord({
     id = "npc_iron", identitySeed = 9, vanillaTraits = {},

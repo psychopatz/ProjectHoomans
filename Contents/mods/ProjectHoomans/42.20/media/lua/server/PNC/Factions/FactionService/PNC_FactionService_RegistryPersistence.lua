@@ -9,6 +9,8 @@ local Constants = PNC.FactionConstants
 local Types = PNC.FactionTypes
 local Archetypes = PNC.FactionArchetypes
 local EntityRef = PNC.EntityRef
+local Reset = (PNC.Persistence and PNC.Persistence.Reset)
+    or require "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset"
 function Factions.Load()
     local raw
     local normalized
@@ -16,13 +18,18 @@ function Factions.Load()
     if PNC.Registry and PNC.Registry.EnsureLoaded then
         PNC.Registry.EnsureLoaded()
     end
-    raw = ModData and ModData.getOrCreate
-        and ModData.getOrCreate(Constants.REGISTRY_MODDATA_KEY)
-        or {}
-    normalized = Types.NormalizeFactionRegistry(raw)
+    raw = Reset.Read(Constants.REGISTRY_MODDATA_KEY)
+    local reason = Reset.Check(raw, Constants.REGISTRY_SCHEMA_VERSION, nil,
+        function(value) return type(value.byID) == "table" end)
+    normalized = Types.NormalizeFactionRegistry(reason == nil and raw or nil)
     Factions.Registry = normalized
     Factions.Loaded = true
-    Factions.Dirty = not Types.AreEqual(raw, normalized)
+    Factions.Dirty = (reason ~= nil and reason ~= "empty_state")
+        or (reason == nil and not Types.AreEqual(raw, normalized))
+    if reason ~= nil and reason ~= "empty_state" then
+        Reset.Mark(Factions, raw, Constants.REGISTRY_SCHEMA_VERSION,
+            reason, "factions")
+    end
     Internal.rebuildIndexes()
     if Factions.ReconcilePlayerMemberships then
         Factions.ReconcilePlayerMemberships(
@@ -54,12 +61,10 @@ function Factions.Save()
     local normalized
     Factions.EnsureLoaded()
     if not Factions.Dirty then return false, "not_dirty" end
-    target = ModData and ModData.getOrCreate
-        and ModData.getOrCreate(Constants.REGISTRY_MODDATA_KEY)
-        or nil
-    if not target then return false, "moddata_unavailable" end
     normalized = Types.NormalizeFactionRegistry(Factions.Registry)
-    Internal.assignTable(target, Internal.copy(normalized))
+    local written = Reset.Write(Constants.REGISTRY_MODDATA_KEY,
+        Internal.copy(normalized))
+    if not written then return false, "moddata_unavailable" end
     Factions.Registry = normalized
     Factions.Dirty = false
     return true, "saved"

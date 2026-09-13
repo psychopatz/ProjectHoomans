@@ -2,12 +2,17 @@ local CompanionVehicle = PNC.CompanionVehicle
 local Internal = CompanionVehicle.Internal
 local Const = PNC.Const
 local Registry = PNC.Registry
+local RESERVATION_SCHEMA_VERSION = 1
 
 function Internal.ReservationItemType()
     return tostring(
         Const.VEHICLE_RESERVATION_ITEM_TYPE
             or "PNC.VehicleSeatReservation"
     )
+end
+
+function Internal.ReservationSchemaVersion()
+    return RESERVATION_SCHEMA_VERSION
 end
 
 function Internal.ItemModData(item)
@@ -47,16 +52,33 @@ end
 
 function Internal.ReservationData(item)
     local modData
+    local npcId
+    local vehicleId
+    local seat
     if not CompanionVehicle.IsReservationItem(item) then return nil end
     modData = Internal.ItemModData(item)
+    if type(modData) ~= "table"
+        or modData.PNC_VehicleSeatReservation ~= true
+        or tonumber(modData.PNC_VehicleSeatReservationVersion)
+            ~= RESERVATION_SCHEMA_VERSION
+    then
+        return nil
+    end
+    npcId = modData.PNC_NPC_ID and tostring(modData.PNC_NPC_ID) or nil
+    vehicleId = modData.PNC_VEHICLE_ID
+        and tostring(modData.PNC_VEHICLE_ID) or nil
+    seat = tonumber(modData.PNC_SEAT)
+    if npcId == nil or npcId == "" or vehicleId == nil
+        or vehicleId == "" or seat == nil
+    then
+        return nil
+    end
     return {
-        npcId = modData and modData.PNC_NPC_ID
-            and tostring(modData.PNC_NPC_ID) or nil,
+        npcId = npcId,
         npcName = modData and modData.PNC_NPC_NAME
             and tostring(modData.PNC_NPC_NAME) or nil,
-        vehicleId = modData and modData.PNC_VEHICLE_ID
-            and tostring(modData.PNC_VEHICLE_ID) or nil,
-        seat = modData and tonumber(modData.PNC_SEAT) or nil,
+        vehicleId = vehicleId,
+        seat = seat,
     }
 end
 

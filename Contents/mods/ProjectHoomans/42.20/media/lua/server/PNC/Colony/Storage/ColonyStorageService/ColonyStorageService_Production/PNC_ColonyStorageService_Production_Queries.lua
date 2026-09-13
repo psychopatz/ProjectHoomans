@@ -13,6 +13,51 @@ local Internal = Service.Internal
 local Definitions = Internal.Definitions
 local Inventory = require "PsychopatzCore/Inventory/PsychopatzInventory"
 local C = require "PsychopatzCore/Inventory/PsychopatzInventoryConstants"
+local PRODUCTION_METADATA_VERSION =
+    tonumber(H.PRODUCTION_METADATA_VERSION) or 1
+
+local function validProductionTag(value)
+    local recipeId = type(value) == "table"
+        and math.floor(tonumber(value.rid) or 0) or 0
+    return type(value) == "table"
+        and tonumber(value.v) == PRODUCTION_METADATA_VERSION
+        and recipeId > 0
+end
+
+function H.ValidProductionTag(value)
+    return validProductionTag(value)
+end
+
+function H.ResetUnsupportedProductionMetadata(item)
+    local data = item and item.getModData and item:getModData() or nil
+    local changed = false
+    if type(data) ~= "table" or type(data.PNC) ~= "table" then
+        return data, false
+    end
+    for _, key in ipairs({ "blueprint", "production" }) do
+        if data.PNC[key] ~= nil and not validProductionTag(data.PNC[key]) then
+            data.PNC[key] = nil
+            changed = true
+        end
+    end
+    return data, changed
+end
+
+local function resetRecordMetadata(storage, recordIndex, item)
+    local data, changed = H.ResetUnsupportedProductionMetadata(item)
+    if not changed then return data end
+    local record = storage and storage.inventory
+        and storage.inventory.records[recordIndex] or nil
+    local replacement = record and Inventory.encodeItem(item,
+        math.max(1, math.floor(tonumber(record[C.QUANTITY]) or 1))) or nil
+    if replacement then
+        storage.inventory.records[recordIndex] = replacement
+        Repository.MarkDirty()
+    end
+    return data
+end
+
+H.ResetProductionRecordMetadata = resetRecordMetadata
 
 function Service.SetTierForSettlement(colonyId, targetTier)
     local storage = Repository.GetForSettlement(colonyId)
@@ -50,7 +95,9 @@ function Service.ReadProductionRecord(storageId, recordIndex)
     if not record then return nil, "record_not_found" end
     local item, reason = Inventory.decodeItem(record)
     local metadata
-    if item and item.getModData then metadata = item:getModData() end
+    if item and item.getModData then
+        metadata = resetRecordMetadata(storage, recordIndex, item)
+    end
     return { record = record,
         fullType = Inventory.getItemFullType(record[C.TYPE_ID]),
         quantity = record[C.QUANTITY], metadata = metadata }, reason

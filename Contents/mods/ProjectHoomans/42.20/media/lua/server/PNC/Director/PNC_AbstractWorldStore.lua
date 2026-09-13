@@ -9,6 +9,8 @@ local Store = PNC.AbstractWorldStore
 local Types = PNC.AbstractWorldTypes
 local Config = PNC.DirectorConfig
 local Core = PNC.Core
+local Reset = (PNC.Persistence and PNC.Persistence.Reset)
+    or require "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset"
 
 Store.Registry = Store.Registry or Types.NewRegistry()
 Store.Loaded = Store.Loaded or false
@@ -32,27 +34,20 @@ end
 
 function Store.Load()
     if not authority() then return false, "not_authority" end
-    local raw = ModData and ModData.getOrCreate
-        and ModData.getOrCreate(Config.MODDATA_KEY) or {}
-    local needsMigration = tonumber(raw.schemaVersion) ~= Config.SCHEMA_VERSION
-        or type(raw.groupsByID) ~= "table"
-        or type(raw.locationsByID) ~= "table"
-        or type(raw.encounters) ~= "table"
-    for _, group in pairs(type(raw.groupsByID) == "table"
-        and raw.groupsByID or {}) do
-        if type(group) ~= "table"
-            or tonumber(group.schemaVersion) ~= Config.SCHEMA_VERSION
-            or type(group.simulation) ~= "table"
-            or type(group.resources) ~= "table"
-            or group.combatProfileDirty == nil
-            or group.morale == nil
-            or type(group.recentAvoidedLocations) ~= "table"
-        then needsMigration = true break end
-    end
-    Store.Registry = Types.NormalizeRegistry(raw)
+    local raw = Reset.Read(Config.MODDATA_KEY)
+    local reason = Reset.Check(raw, Config.SCHEMA_VERSION, nil,
+        function(value)
+            return type(value.groupsByID) == "table"
+                and type(value.locationsByID) == "table"
+                and type(value.encounters) == "table"
+        end)
+    Store.Registry = Types.NormalizeRegistry(reason == nil and raw or nil)
     Store.Loaded = true
-    -- Older or malformed saves are rewritten through the normalizer.
-    Store.Dirty = needsMigration
+    Store.Dirty = reason ~= nil and reason ~= "empty_state"
+    if Store.Dirty then
+        Reset.Mark(Store, raw, Config.SCHEMA_VERSION, reason,
+            "abstract_world")
+    end
     return true, Store.Dirty
 end
 
@@ -70,12 +65,10 @@ end
 function Store.Save()
     Store.EnsureLoaded()
     if not Store.Dirty then return false, "not_dirty" end
-    local target = ModData and ModData.getOrCreate
-        and ModData.getOrCreate(Config.MODDATA_KEY) or nil
     local normalized
-    if not target then return false, "moddata_unavailable" end
     normalized = Types.NormalizeRegistry(Store.Registry)
-    assign(target, Core.DeepCopy(normalized))
+    local written = Reset.Write(Config.MODDATA_KEY, Core.DeepCopy(normalized))
+    if not written then return false, "moddata_unavailable" end
     Store.Registry = normalized
     Store.Dirty = false
     return true, "saved"

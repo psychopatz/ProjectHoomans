@@ -619,9 +619,9 @@ T.truthy(Work.Commands.Cancel(recoveredProject.id),
 T.equal(inventory["Base.Money"], beforeLegacyCancel + 1,
     "recovered cancellation resolves storage and refunds remaining material")
 
--- Pre-checkpoint saves compacted an in-progress construction input down to
--- `consume`, leaving it permanently blocked after reload. Progress now
--- restores the durable funded/committed marker for that legacy shape.
+-- A compacted construction input from an unsupported save shape is no longer
+-- recovered. The current-version reset contract leaves it unfunded so it can
+-- be discarded/recreated by the owning workflow.
 WorkRepository.Import({ schemaVersion = 1, nextId = 3, byId = {
     ["work:2"] = { id = "work:2", operation = "CONSTRUCT",
         status = "BLOCKED", progress = 89, requiredWork = 100,
@@ -631,18 +631,18 @@ WorkRepository.Import({ schemaVersion = 1, nextId = 3, byId = {
             input = { consume = true } } },
 } })
 local recoveredCompacted = WorkRepository.Get("work:2")
-T.equal(recoveredCompacted.funded, true,
-    "compacted in-progress construction recovers as funded")
-T.equal(recoveredCompacted.payload.input.committed, true,
-    "compacted in-progress construction restores committed input state")
+T.equal(recoveredCompacted.funded, false,
+    "compacted in-progress construction is not recovered as funded")
+T.equal(recoveredCompacted.payload.input.committed, false,
+    "compacted in-progress construction does not invent committed input")
 T.equal(recoveredCompacted.previousOrder.kind, "colony_home",
     "construction recovery retains the worker fallback order")
 local compactedPrepared, compactedPrepareReason =
     Construction.Internal.Prepare(recoveredCompacted)
-T.truthy(compactedPrepared,
-    "recovered construction passes the normal preparation pipeline")
-T.equal(compactedPrepareReason, nil,
-    "recovered construction has no unavailable-input blocker")
+T.equal(compactedPrepared, false,
+    "unsupported compacted construction remains blocked")
+T.equal(compactedPrepareReason, "CONSTRUCTION_INPUTS_UNAVAILABLE",
+    "unsupported compacted construction reports unavailable inputs")
 recoveredCompacted.status = "WORKING"
 recoveredCompacted.workerId, recoveredCompacted.stationId = "current",
     "station:current"

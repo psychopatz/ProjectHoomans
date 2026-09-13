@@ -5,6 +5,8 @@ if PsychopatzCore and PsychopatzCore.RuntimeRole and not PsychopatzCore.RuntimeR
 local Discovery = PNC.WorldDiscovery
 local Internal = Discovery.Internal
 local Types = PNC.WorldDiscoveryTypes
+local Reset = (PNC.Persistence and PNC.Persistence.Reset)
+    or require "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset"
 
 local function copy(value, seen)
     if type(value) ~= "table" then return value end
@@ -105,11 +107,16 @@ local function normalizeRegistry(raw)
 end
 
 function Discovery.Load()
-    local raw = ModData and ModData.getOrCreate
-        and ModData.getOrCreate(Types.MODDATA_KEY) or {}
-    Discovery.Registry = normalizeRegistry(raw)
+    local raw = Reset.Read(Types.MODDATA_KEY)
+    local reason = Reset.Check(raw, Types.SCHEMA_VERSION, nil,
+        function(value) return type(value.players) == "table" end)
+    Discovery.Registry = normalizeRegistry(reason == nil and raw or nil)
     Discovery.Loaded = true
-    Discovery.Dirty = tonumber(raw.schemaVersion) ~= Types.SCHEMA_VERSION
+    Discovery.Dirty = reason ~= nil and reason ~= "empty_state"
+    if Discovery.Dirty then
+        Reset.Mark(Discovery, raw, Types.SCHEMA_VERSION, reason,
+            "world_discovery")
+    end
     return true
 end
 
@@ -121,10 +128,8 @@ end
 function Discovery.Save()
     Discovery.EnsureLoaded()
     if not Discovery.Dirty then return false, "not_dirty" end
-    local target = ModData and ModData.getOrCreate
-        and ModData.getOrCreate(Types.MODDATA_KEY) or nil
-    if not target then return false, "moddata_unavailable" end
-    assign(target, Discovery.Registry)
+    local written = Reset.Write(Types.MODDATA_KEY, Discovery.Registry)
+    if not written then return false, "moddata_unavailable" end
     Discovery.Dirty = false
     return true, "saved"
 end

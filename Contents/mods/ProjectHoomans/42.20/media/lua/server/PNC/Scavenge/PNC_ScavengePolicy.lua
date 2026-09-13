@@ -5,10 +5,14 @@ PNC = PNC or {}
 PNC.ScavengePolicy = PNC.ScavengePolicy or {}
 
 local Policy = PNC.ScavengePolicy
+local Reset = (PNC.Persistence and PNC.Persistence.Reset)
+    or require "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset"
 local MODDATA_KEY = "PNC_ScavengePolicy"
 local SCHEMA_VERSION = 1
 local MAX_AUTO_TYPES = 512
 
+Policy.MODDATA_KEY = MODDATA_KEY
+Policy.SCHEMA_VERSION = SCHEMA_VERSION
 Policy.Data = Policy.Data or { schemaVersion = SCHEMA_VERSION, owners = {} }
 Policy.Loaded = Policy.Loaded or false
 Policy.Dirty = Policy.Dirty or false
@@ -56,10 +60,15 @@ local function normalizeData(value)
 end
 
 function Policy.Load()
-    local raw = ModData and ModData.getOrCreate
-        and ModData.getOrCreate(MODDATA_KEY) or {}
-    Policy.Data = normalizeData(raw)
+    local raw = Reset.Read(MODDATA_KEY)
+    local reason = Reset.Check(raw, SCHEMA_VERSION, nil,
+        function(value) return type(value.owners) == "table" end)
+    Policy.Data = normalizeData(reason == nil and raw or nil)
     Policy.Loaded = true
+    Policy.Dirty = reason ~= nil and reason ~= "empty_state"
+    if Policy.Dirty then
+        Reset.Mark(Policy, raw, SCHEMA_VERSION, reason, "scavenge_policy")
+    end
     return true
 end
 
@@ -71,12 +80,9 @@ end
 function Policy.Save(flushGlobal)
     Policy.EnsureLoaded()
     if not Policy.Dirty then return false, "not_dirty" end
-    local target = ModData and ModData.getOrCreate
-        and ModData.getOrCreate(MODDATA_KEY) or nil
-    if not target then return false, "moddata_unavailable" end
-    for key, _ in pairs(target) do target[key] = nil end
     local normalized = normalizeData(Policy.Data)
-    for key, value in pairs(normalized) do target[key] = copy(value) end
+    local written = Reset.Write(MODDATA_KEY, normalized)
+    if not written then return false, "moddata_unavailable" end
     Policy.Data = normalized
     Policy.Dirty = false
     if flushGlobal ~= false and GlobalModData and GlobalModData.save then

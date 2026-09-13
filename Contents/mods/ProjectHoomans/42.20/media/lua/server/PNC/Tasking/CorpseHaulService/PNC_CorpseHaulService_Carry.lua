@@ -101,6 +101,9 @@ local function markCarrying(corpse, order)
     local data = corpse and corpse.getModData and corpse:getModData() or nil
     local owner = tostring(order and order.id or "")
     if not data then return false end
+    if Service.EnsureCorpseHaulMarker then
+        data = Service.EnsureCorpseHaulMarker(corpse, true) or data
+    end
     if tostring(data.PNC_CorpseHaulCarriedBy or "") ~= owner then
         data.PNC_CorpseHaulCarriedBy = owner
         transmit(corpse)

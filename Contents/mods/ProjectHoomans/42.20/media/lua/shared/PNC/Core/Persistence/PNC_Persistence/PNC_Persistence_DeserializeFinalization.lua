@@ -8,10 +8,28 @@ local Core = PNC.Core
 local Const = PNC.Const
 local Identity = PNC.Identity
 
+local function staleGeneratedPersonality(raw)
+    local social = type(raw.social) == "table" and raw.social or nil
+    local personality = social and social.personality or nil
+    local version = personality and tonumber(personality.generationVersion)
+        or nil
+    local currentVersion = PNC.SocialProfileConstants
+        and tonumber(PNC.SocialProfileConstants.NPC_GENERATION_VERSION)
+        or nil
+    local generated = personality
+        and (personality.generatedFromSeed == true
+            or (personality.generatedFromSeed == nil
+                and (version or 0) > 0))
+    return generated and currentVersion ~= nil
+        and math.max(0, math.floor(version or 0)) ~= math.max(
+            1, math.floor(currentVersion))
+end
+
 local function restoreTraits(record, raw)
-    local vanilla = raw.vanillaTraits or raw.physiologicalTraits
+    local vanilla = raw.vanillaTraits
     local vanillaAuthored = raw.vanillaTraitsAuthored == true
         or (raw.vanillaTraitsAuthored == nil
+            and (tonumber(raw.vanillaTraitsGenerationVersion) or 0) == 0
             and Internal.hasTableEntries(vanilla))
     local vanillaVersion = math.max(0, math.floor(
         tonumber(raw.vanillaTraitsGenerationVersion) or 0
@@ -24,10 +42,14 @@ local function restoreTraits(record, raw)
         record.vanillaTraitsGenerationVersion = vanillaAuthored
             and 0 or vanillaVersion
     end
+    if PNC.PlayerNeedsModel and PNC.PlayerNeedsModel.EnsureTraits then
+        PNC.PlayerNeedsModel.EnsureTraits(record)
+    end
 
-    local dynamic = raw.dynamicTraits or raw.pncTraits
+    local dynamic = raw.dynamicTraits
     local dynamicAuthored = raw.dynamicTraitsAuthored == true
         or (raw.dynamicTraitsAuthored == nil
+            and (tonumber(raw.dynamicTraitsGenerationVersion) or 0) == 0
             and Internal.hasTableEntries(dynamic))
     local dynamicVersion = math.max(0, math.floor(
         tonumber(raw.dynamicTraitsGenerationVersion) or 0
@@ -39,6 +61,9 @@ local function restoreTraits(record, raw)
         record.dynamicTraitsAuthored = dynamicAuthored
         record.dynamicTraitsGenerationVersion = dynamicAuthored
             and 0 or dynamicVersion
+    end
+    if PNC.ConditionStats and PNC.ConditionStats.EnsureTraits then
+        PNC.ConditionStats.EnsureTraits(record)
     end
     if PNC.ConditionStats and type(raw.conditionStats) == "table" then
         record.conditionStats = PNC.ConditionStats.NormalizeState(
@@ -80,15 +105,10 @@ local function restoreIdentityAndProgression(
         record.identitySeed,
         record.archetypeID
     )
-    if Internal.hasTableEntries(progression.legacySkillLevels) then
-        for skillID, level in pairs(progression.legacySkillLevels) do
-            local base = PNC.Skills and PNC.Skills.GetBaseLevel
-                and PNC.Skills.GetBaseLevel(record, skillID) or 0
-            record.progression.skillLevelDeltas[skillID] = math.max(
-                -10,
-                math.min(10, level - base)
-            )
-        end
+    if staleGeneratedPersonality(raw)
+        and PNC.Registry and PNC.Registry.MarkDirty
+    then
+        PNC.Registry.MarkDirty(record, "social_profile_regenerated")
     end
 end
 

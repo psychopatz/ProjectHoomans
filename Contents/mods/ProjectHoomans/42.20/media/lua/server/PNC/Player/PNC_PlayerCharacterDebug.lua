@@ -83,8 +83,6 @@ function Debug.FormatRecord(characterUUID)
         "Account key: " .. tostring(record.accountKey),
         "Superseded by: " .. tostring(record.supersededBy),
         "Aliases: " .. tostring(aliases),
-        "Migration: " .. tostring(snapshot.migration
-            and snapshot.migration.status),
         "Status: " .. tostring(record.status),
         "Created: " .. tostring(record.createdAt),
         "First seen: " .. tostring(record.firstSeenAt),

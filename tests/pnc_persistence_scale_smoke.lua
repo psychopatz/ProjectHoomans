@@ -300,6 +300,26 @@ T.equal(table.concat(PNC.ConditionStats.GetActiveTraitIDs(restored), "|"),
     table.concat(PNC.ConditionStats.GetActiveTraitIDs(sample.dynamicTraits), "|"),
     "generated custom traits round trip")
 
+local staleGeneratedPayload = PNC.Core.DeepCopy(sample)
+staleGeneratedPayload.vanillaTraitsGenerationVersion = 99
+staleGeneratedPayload.dynamicTraitsGenerationVersion = 99
+local staleGeneratedRecord = PNC.Persistence.DeserializeRecord(
+    staleGeneratedPayload, "scale_npc_1")
+T.equal(staleGeneratedRecord.vanillaTraitsGenerationVersion,
+    PNC.PlayerNeedsModel.GENERATION_VERSION,
+    "deserialization heals stale vanilla trait generation")
+T.equal(staleGeneratedRecord.dynamicTraitsGenerationVersion,
+    PNC.ConditionStats.TRAIT_GENERATION_VERSION,
+    "deserialization heals stale custom trait generation")
+T.equal(table.concat(
+    PNC.PlayerNeedsModel.GetActiveTraitIDs(staleGeneratedRecord), "|"),
+    table.concat(PNC.PlayerNeedsModel.GetActiveTraitIDs(sample.vanillaTraits), "|"),
+    "healed vanilla traits use the persisted identity")
+T.equal(table.concat(
+    PNC.ConditionStats.GetActiveTraitIDs(staleGeneratedRecord), "|"),
+    table.concat(PNC.ConditionStats.GetActiveTraitIDs(sample.dynamicTraits), "|"),
+    "healed custom traits use the persisted identity")
+
 local legacyPayload = PNC.Core.DeepCopy(sample)
 legacyPayload.schemaVersion = 9
 legacyPayload.inventory.maxWeight = 999
@@ -311,16 +331,7 @@ local legacyRecord = PNC.Persistence.DeserializeRecord(
     legacyPayload,
     "scale_npc_1"
 )
-T.equal(legacyRecord.inventory, nil, "legacy inventory hydrated during load")
-T.equal(legacyRecord.vanillaTraitsGenerationVersion,
-    PNC.PlayerNeedsModel.GENERATION_VERSION,
-    "legacy NPC received deterministic vanilla traits")
-local migratedPayload = PNC.Persistence.SerializeRecord(legacyRecord)
-T.equal(migratedPayload.schemaVersion, 10, "lazy migration schema")
-T.equal(migratedPayload.inventory.maxWeight, nil,
-    "legacy derived max weight survived migration")
-T.equal(migratedPayload.inventory.cachedWeight, nil,
-    "legacy derived used weight survived migration")
+T.equal(legacyRecord, nil, "unsupported NPC schema resets instead of migrating")
 T.finish("pnc_persistence_scale_smoke")
 
 T.finish("pnc_persistence_scale_smoke")

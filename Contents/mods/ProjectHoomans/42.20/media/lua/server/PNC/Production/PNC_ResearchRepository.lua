@@ -5,6 +5,8 @@ PNC = PNC or {}
 PNC.ResearchRepository = PNC.ResearchRepository or {}
 
 local Repository = PNC.ResearchRepository
+local Reset = (PNC.Persistence and PNC.Persistence.Reset)
+    or require "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset"
 Repository.SCHEMA_VERSION = 1
 Repository.MODDATA_KEY = "PNC_Research_V1"
 Repository.ByColony = Repository.ByColony or {}
@@ -58,18 +60,34 @@ end
 
 function Repository.Load(force)
     if Repository.Loaded and force ~= true then return Repository.ByColony end
-    local raw = ModData and ModData.getOrCreate
-        and ModData.getOrCreate(Repository.MODDATA_KEY) or nil
+    local raw = Reset.Read(Repository.MODDATA_KEY)
+    local reason = Reset.Check(raw, Repository.SCHEMA_VERSION, nil,
+        function(value) return type(value.byColony) == "table" end)
     Repository.ByColony, Repository.Runtime = {}, {}
-    if type(raw) == "table"
-        and tonumber(raw.schemaVersion) == Repository.SCHEMA_VERSION
+    local nestedInvalid = false
+    if reason == nil
     then
         for colonyId, state in pairs(raw.byColony or {}) do
             colonyId = tostring(colonyId)
-            Repository.ByColony[colonyId] = normalize(colonyId, state)
+            if type(state) == "table"
+                and tonumber(state.schemaVersion) == Repository.SCHEMA_VERSION
+            then
+                Repository.ByColony[colonyId] = normalize(colonyId, state)
+            else
+                nestedInvalid = true
+            end
         end
     end
-    Repository.Loaded, Repository.Dirty = true, false
+    Repository.Loaded = true
+    Repository.Dirty = (reason ~= nil and reason ~= "empty_state")
+        or nestedInvalid
+    if reason ~= nil and reason ~= "empty_state" then
+        Reset.Mark(Repository, raw, Repository.SCHEMA_VERSION, reason,
+            "research")
+    elseif nestedInvalid then
+        Reset.Mark(Repository, raw, Repository.SCHEMA_VERSION,
+            "invalid_state", "research")
+    end
     return Repository.ByColony
 end
 
@@ -102,9 +120,6 @@ function Repository.MarkDirty() Repository.Dirty = true end
 function Repository.Save()
     Repository.Load()
     if not Repository.Dirty then return false, "not_dirty" end
-    local target = ModData and ModData.getOrCreate
-        and ModData.getOrCreate(Repository.MODDATA_KEY) or nil
-    if not target then return false, "moddata_unavailable" end
     local output = { schemaVersion = Repository.SCHEMA_VERSION, byColony = {} }
     for colonyId, state in pairs(Repository.ByColony) do
         output.byColony[colonyId] = {
@@ -115,8 +130,8 @@ function Repository.Save()
             knowledgeRevision = state.knowledgeRevision,
         }
     end
-    for key, _ in pairs(target) do target[key] = nil end
-    for key, value in pairs(output) do target[key] = value end
+    local written = Reset.Write(Repository.MODDATA_KEY, output)
+    if not written then return false, "moddata_unavailable" end
     Repository.Dirty = false
     return true, "saved"
 end

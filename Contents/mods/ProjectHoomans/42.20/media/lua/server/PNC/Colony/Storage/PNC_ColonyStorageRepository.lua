@@ -7,6 +7,8 @@ local Repository = PNC.ColonyStorageRepository
 local Definitions = require "PNC/Core/Colony/Storage/PNC_ColonyStorageDefinitions"
 local Journal = require "PNC/Core/Colony/Storage/PNC_ColonyStorageJournal"
 local Inventory = require "PsychopatzCore/Inventory/PsychopatzInventory"
+local Reset = (PNC.Persistence and PNC.Persistence.Reset)
+    or require "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset"
 
 Repository.ByID = Repository.ByID or {}
 Repository.PrimaryByFaction = Repository.PrimaryByFaction or {}
@@ -60,33 +62,47 @@ local function hydrate(raw)
         inventory = store,
         productionTransactions = copy(raw.productionTransactions or {}),
     }
-    Journal.Deserialize(raw.activityJournal, storage.id)
-    return storage
+    return storage, Journal.Deserialize(raw.activityJournal, storage.id)
 end
 
 function Repository.Load()
     if Repository.Loaded then return true end
-    local raw = ModData and ModData.getOrCreate
-        and ModData.getOrCreate(Definitions.MODDATA_KEY) or {}
+    local raw = Reset.Read(Definitions.MODDATA_KEY)
+    local reason = Reset.Check(raw, Definitions.SCHEMA_VERSION, nil,
+        function(value) return type(value.byID) == "table" end)
     for storageID, _ in pairs(Repository.ByID) do
         Journal.Remove(storageID)
     end
     Repository.ByID = {}
     Repository.PrimaryByFaction = {}
-    for storageID, payload in pairs(raw.byID or {}) do
-        local storage = hydrate(payload)
-        if storage then
-            Repository.ByID[storage.id] = storage
-            if storage.storageType == Definitions.PRIMARY_TYPE then
-                Repository.PrimaryByFaction[storage.ownerFactionId] = storage.id
+    local rejected = false
+    if reason == nil then
+        for storageID, payload in pairs(raw.byID or {}) do
+            local storage, nestedValid = hydrate(payload)
+            if storage then
+                Repository.ByID[storage.id] = storage
+                if storage.storageType == Definitions.PRIMARY_TYPE then
+                    Repository.PrimaryByFaction[storage.ownerFactionId] = storage.id
+                end
+                if nestedValid == false then rejected = true end
+            else
+                rejected = true
+                if PNC.Core and PNC.Core.LogWarn then
+                    PNC.Core.LogWarn("Rejected colony storage payload id="
+                        .. tostring(storageID))
+                end
             end
-        elseif PNC.Core and PNC.Core.LogWarn then
-            PNC.Core.LogWarn("Rejected colony storage payload id="
-                .. tostring(storageID))
         end
     end
     Repository.Loaded = true
-    Repository.Dirty = false
+    Repository.Dirty = (reason ~= nil and reason ~= "empty_state") or rejected
+    if reason ~= nil and reason ~= "empty_state" then
+        Reset.Mark(Repository, raw, Definitions.SCHEMA_VERSION, reason,
+            "colony_storage")
+    elseif rejected then
+        Reset.Mark(Repository, raw, Definitions.SCHEMA_VERSION,
+            "invalid_state", "colony_storage")
+    end
     return true
 end
 
@@ -102,14 +118,12 @@ end
 function Repository.Save()
     Repository.EnsureLoaded()
     if not Repository.Dirty then return false, "not_dirty" end
-    local target = ModData and ModData.getOrCreate
-        and ModData.getOrCreate(Definitions.MODDATA_KEY) or nil
-    if not target then return false, "moddata_unavailable" end
     local output = { schemaVersion = Definitions.SCHEMA_VERSION, byID = {} }
     for storageID, storage in pairs(Repository.ByID) do
         output.byID[storageID] = serializedStorage(storage)
     end
-    assign(target, output)
+    local written = Reset.Write(Definitions.MODDATA_KEY, output)
+    if not written then return false, "moddata_unavailable" end
     Repository.Dirty = false
     return true, "saved"
 end

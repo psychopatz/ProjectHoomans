@@ -27,13 +27,6 @@ function Director.Initialize(force)
     if Director.Initialized and force ~= true then return true, "initialized" end
     Store.EnsureLoaded()
     releaseLegacyPresenceOverrides()
-    local metadataMigrated = PNC.PopulationIdentity
-        and PNC.PopulationIdentity.MigrateLegacyMetadata
-        and PNC.PopulationIdentity.MigrateLegacyMetadata() or 0
-    if metadataMigrated > 0 then
-        Log.Info("LEGACY_POPULATION_METADATA_MIGRATED", {
-            records = metadataMigrated })
-    end
     Queue.Clear()
     Director.RateHistory = { GROUP = {}, SETTLEMENT = {} }
     local recentGenerations = {}

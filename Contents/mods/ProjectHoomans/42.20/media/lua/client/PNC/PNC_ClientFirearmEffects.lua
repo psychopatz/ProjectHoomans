@@ -15,11 +15,14 @@ Effects.ActiveTracers = Effects.ActiveTracers or {}
 Effects.ActiveMuzzleFlashes = Effects.ActiveMuzzleFlashes or {}
 Effects.SeenShots = Effects.SeenShots or {}
 Effects.DrawAuditState = Effects.DrawAuditState or {}
+Effects.DebugShotSequence = tonumber(Effects.DebugShotSequence) or 0
+Effects.DebugSimulation = Effects.DebugSimulation
 Effects.LightWindowAt = tonumber(Effects.LightWindowAt) or 0
 Effects.LightsInWindow = tonumber(Effects.LightsInWindow) or 0
 Effects.Texture = Effects.Texture or (getTexture and getTexture("media/textures/mask_white.png") or nil)
 local NativeEffects = require "PNC/PNC_ClientNativeFirearmEffects"
 Effects.Native = NativeEffects
+local NameplateAnchor = PNC.NameplateFirearmAnchor
 
 local MAX_FALLBACK_TRACERS = 96
 local MAX_VISIBLE_TRACERS_PER_SHOT = 5
@@ -27,6 +30,8 @@ local MAX_MUZZLE_FLASHES = 48
 local MAX_LIGHTS_PER_WINDOW = 2
 local LIGHT_BUDGET_WINDOW_MS = 100
 local TRACER_TTL = 12
+local TRACER_SCREEN_LENGTH = 300
+local DEBUG_SIMULATION_INTERVAL_MS = 500
 local MUZZLE_FLASH_TTL = 2
 local MUZZLE_FLASH_LENGTH = 42
 local SCREEN_CULL_MARGIN = 96
@@ -125,6 +130,7 @@ local function resolveBody(payload)
     local body
     local key
     if not payload then return nil end
+    if payload.body then return payload.body end
     if payload.shooterOnlineID ~= nil and PNC.Network and PNC.Network.FindZombieByOnlineID then
         body = PNC.Network.FindZombieByOnlineID(payload.shooterOnlineID)
     end
@@ -162,7 +168,10 @@ local function getMuzzlePosition(body, weapon, payload)
     local x = tonumber(body and readMethod(body, "getX")) or tonumber(payload.sx) or 0
     local y = tonumber(body and readMethod(body, "getY")) or tonumber(payload.sy) or 0
     local squareZ = tonumber(body and readMethod(body, "getZ")) or tonumber(payload.sz) or 0
-    local angle = tonumber(body and readMethod(body, "getAnimAngleRadians"))
+    local angle
+    local facing = body and readMethod(body, "getForwardDirection") or nil
+    local forwardX = facing and tonumber(readMethod(facing, "getX")) or nil
+    local forwardY = facing and tonumber(readMethod(facing, "getY")) or nil
     -- HandWeapon does not expose a stable B42 isTwoHandWeapon() Lua method.
     -- Use a weapon-agnostic forward offset, then refine it from the model's
     -- muzzle attachment when a modded weapon supplies one.
@@ -185,22 +194,37 @@ local function getMuzzlePosition(body, weapon, payload)
             up = up + (tonumber(readMethod(offset, "z")) or 0)
         end
     end
-    if not angle then
+    if not forwardX or not forwardY
+        or math.abs(forwardX) + math.abs(forwardY) <= 0.001
+    then
+        angle = tonumber(body and readMethod(body, "getAnimAngleRadians"))
+    end
+    if angle then
+        forwardX = math.cos(angle)
+        forwardY = math.sin(angle)
+    end
+    if not forwardX or not forwardY
+        or math.abs(forwardX) + math.abs(forwardY) <= 0.001
+    then
         local tx = tonumber(payload.tx)
         local ty = tonumber(payload.ty)
         if tx and ty and (math.abs(tx - x) > 0.0001 or math.abs(ty - y) > 0.0001) then
-            -- The animation angle is preferable, but target-derived facing
-            -- keeps remote/modded bodies useful if that method is unavailable.
-            angle = math.atan2 and math.atan2(x - tx, ty - y)
-                or math.atan((x - tx) / ((ty - y) ~= 0 and (ty - y) or 0.0001))
+            -- PZ's character angle is a normal world-space angle: zero points
+            -- along +X. Keep the fallback in that same convention.
+            local dx = tx - x
+            local dy = ty - y
+            local length = math.sqrt((dx * dx) + (dy * dy))
+            if length > 0.0001 then
+                forwardX = dx / length
+                forwardY = dy / length
+            end
         else
-            angle = 0
+            forwardX = 1
+            forwardY = 0
         end
     end
-    local forwardX = math.sin(angle)
-    local forwardY = -math.cos(angle)
-    local rightX = math.cos(angle)
-    local rightY = math.sin(angle)
+    local rightX = -forwardY
+    local rightY = forwardX
     return x + (forwardX * forward) + (rightX * right),
         y + (forwardY * forward) + (rightY * right),
         squareZ + up,
@@ -357,22 +381,44 @@ local function angleRadians(y, x)
     return 0
 end
 
+local function cachedMuzzleScreen(body, payload)
+    if not NameplateAnchor or not NameplateAnchor.GetRenderMuzzle then
+        return nil, nil
+    end
+    return NameplateAnchor.GetRenderMuzzle(
+        body,
+        payload and payload.npcId or nil
+    )
+end
+
 local function resolveDirectionDegrees(body, payload, muzzleX, muzzleY)
     local sx = tonumber(muzzleX) or tonumber(payload and payload.sx)
     local sy = tonumber(muzzleY) or tonumber(payload and payload.sy)
-    local tx = tonumber(payload.tx)
-    local ty = tonumber(payload.ty)
+    local tx = tonumber(payload and payload.tx)
+    local ty = tonumber(payload and payload.ty)
     local angle
+    local forward
+    local forwardX
+    local forwardY
     if sx and sy and tx and ty
         and (math.abs(tx - sx) > 0.0001 or math.abs(ty - sy) > 0.0001)
     then
         return angleRadians(ty - sy, tx - sx) * 180 / math.pi
     end
+    forward = body and readMethod(body, "getForwardDirection") or nil
+    forwardX = forward and tonumber(readMethod(forward, "getX")) or nil
+    forwardY = forward and tonumber(readMethod(forward, "getY")) or nil
+    if forwardX and forwardY
+        and math.abs(forwardX) + math.abs(forwardY) > 0.001
+    then
+        return angleRadians(forwardY, forwardX) * 180 / math.pi
+    end
     angle = tonumber(body and readMethod(body, "getAnimAngleRadians"))
     if angle then
-        -- getAnimAngleRadians points down the character's facing axis, while
-        -- the isometric projectile formula uses +X as zero degrees.
-        return (angle - (math.pi * 0.5)) * 180 / math.pi
+        -- getAnimAngleRadians uses the same +X world-space convention as
+        -- getForwardDirection; do not rotate it through the old down-axis
+        -- approximation.
+        return angle * 180 / math.pi
     end
     return 0
 end
@@ -395,13 +441,19 @@ end
 local function addMuzzleFlash(body, payload, muzzleX, muzzleY, muzzleZ)
     local screenX
     local screenY
+    local anchorCache
+    local anchorSource = "world_projection"
     local direction
     local dx
     local dy
     if #Effects.ActiveMuzzleFlashes >= MAX_MUZZLE_FLASHES then
         return 0
     end
-    screenX, screenY = projectToScreen(muzzleX, muzzleY, muzzleZ)
+    screenX, screenY, anchorCache = cachedMuzzleScreen(body, payload)
+    if anchorCache then anchorSource = "nameplate_cache" end
+    if not screenX or not screenY then
+        screenX, screenY = projectToScreen(muzzleX, muzzleY, muzzleZ)
+    end
     if not screenX or not screenY then return 0 end
     direction = resolveDirectionDegrees(body, payload, muzzleX, muzzleY)
     dx, dy = isometricDirection(direction)
@@ -413,6 +465,7 @@ local function addMuzzleFlash(body, payload, muzzleX, muzzleY, muzzleZ)
         length = MUZZLE_FLASH_LENGTH,
         tick = 0,
         ttl = MUZZLE_FLASH_TTL,
+        anchorSource = anchorSource,
         auditPayload = payload,
     }
     return 1
@@ -427,6 +480,8 @@ local function addTracer(body, payload, muzzleX, muzzleY, muzzleZ)
     local spread = math.max(0, tonumber(payload.projectileSpread) or 0)
     local startX
     local startY
+    local anchorCache
+    local anchorSource = "world_projection"
     local direction
     local projectileDirection
     local dx
@@ -438,7 +493,11 @@ local function addTracer(body, payload, muzzleX, muzzleY, muzzleZ)
     local added = 0
     local i
     if not sx or not sy then return 0 end
-    startX, startY = projectToScreen(sx, sy, sz)
+    startX, startY, anchorCache = cachedMuzzleScreen(body, payload)
+    if anchorCache then anchorSource = "nameplate_cache" end
+    if not startX or not startY then
+        startX, startY = projectToScreen(sx, sy, sz)
+    end
     if not startX or not startY then return 0 end
     direction = resolveDirectionDegrees(body, payload, sx, sy)
     for i = 1, visualCount do
@@ -456,6 +515,7 @@ local function addTracer(body, payload, muzzleX, muzzleY, muzzleZ)
             dy = dy,
             direction = projectileDirection,
             altitudeVariation = ZombRandFloat and ZombRandFloat(-10, 10) or 0,
+            anchorSource = anchorSource,
             auditPayload = payload,
             tick = 1,
             ttl = TRACER_TTL,
@@ -501,6 +561,8 @@ function Effects.Play(payload)
     local audioResult
     local tracerCount
     local muzzleCount
+    local muzzleEffect
+    local tracerEffect
     local impactResult
     local startedAt = nowMs()
     if type(payload) ~= "table" then
@@ -535,12 +597,18 @@ function Effects.Play(payload)
         recordNativeFailure(nativeReason)
         x, y, z = getMuzzlePosition(body, weapon, payload)
         muzzleCount = addMuzzleFlash(body, payload, x, y, z)
+        muzzleEffect = muzzleCount > 0
+            and Effects.ActiveMuzzleFlashes[#Effects.ActiveMuzzleFlashes]
+            or nil
         logFirearmAudit("muzzle_visual_queue_complete", payload,
             "result=" .. tostring(muzzleCount > 0),
             "queued=" .. tostring(muzzleCount),
             "active=" .. tostring(#Effects.ActiveMuzzleFlashes),
             "muzzle=" .. tostring(x or "") .. "," .. tostring(y or "")
-                .. "," .. tostring(z or ""))
+                .. "," .. tostring(z or ""),
+            "anchorSource=" .. tostring(
+                muzzleEffect and muzzleEffect.anchorSource or "none"
+            ))
         lightResult, lightReason, lightX, lightY, lightZ = spawnLight(
             body,
             payload,
@@ -569,12 +637,18 @@ function Effects.Play(payload)
             x, y, z = getMuzzlePosition(body, weapon, payload)
         end
         tracerCount = addTracer(body, payload, x, y, z)
+        tracerEffect = tracerCount > 0
+            and Effects.ActiveTracers[#Effects.ActiveTracers]
+            or nil
         logFirearmAudit("tracer_screen_queue_complete", payload,
             "result=" .. tostring(tracerCount > 0),
             "queued=" .. tostring(tracerCount),
             "active=" .. tostring(#Effects.ActiveTracers),
             "muzzle=" .. tostring(x or "") .. "," .. tostring(y or "")
-                .. "," .. tostring(z or ""))
+                .. "," .. tostring(z or ""),
+            "anchorSource=" .. tostring(
+                tracerEffect and tracerEffect.anchorSource or "none"
+            ))
     end
     impactResult = playImpact(payload)
     logFirearmAudit("impact_audio_complete", payload,
@@ -586,8 +660,88 @@ function Effects.Play(payload)
     return true
 end
 
+function Effects.SimulateShot(body, npcID, playerIndex)
+    local x
+    local y
+    local z
+    local id = tostring(npcID or "debug_npc")
+    local payload
+    if not body then return false, "body_missing" end
+    x = tonumber(readMethod(body, "getX"))
+    y = tonumber(readMethod(body, "getY"))
+    z = tonumber(readMethod(body, "getZ")) or 0
+    if not x or not y then return false, "body_position_missing" end
+    Effects.DebugShotSequence = Effects.DebugShotSequence + 1
+    payload = {
+        body = body,
+        npcId = id,
+        shotId = "debug_firearm:" .. id .. ":"
+            .. tostring(Effects.DebugShotSequence) .. ":" .. tostring(nowMs()),
+        playerIndex = tonumber(playerIndex) or 0,
+        sx = x,
+        sy = y,
+        sz = z,
+        -- Deliberately use a non-matching type so a held weapon cannot route
+        -- this dry-fire probe through the native effect path. The purpose of
+        -- this action is to visualize the cached fallback anchor itself.
+        weaponFullType = "PNC.DebugSimulatedWeapon",
+        projectileCount = 1,
+        projectileSpread = 0,
+        ammoType = "PNC.DebugAmmo",
+    }
+    return Effects.Play(payload), payload
+end
+
+function Effects.IsSimulationActive(body, npcID)
+    local simulation = Effects.DebugSimulation
+    if not simulation then return false end
+    return simulation.body == body
+        and tostring(simulation.npcID or "") == tostring(npcID or "")
+end
+
+function Effects.StopSimulation()
+    Effects.DebugSimulation = nil
+end
+
+function Effects.ToggleSimulation(body, npcID, playerIndex)
+    local now
+    local simulation
+    local ok
+    if Effects.IsSimulationActive(body, npcID) then
+        Effects.StopSimulation()
+        return false
+    end
+    if not body then return false, "body_missing" end
+    Effects.StopSimulation()
+    ok = Effects.SimulateShot(body, npcID, playerIndex)
+    if not ok then return false, "initial_simulation_failed" end
+    now = nowMs()
+    simulation = {
+        body = body,
+        npcID = npcID,
+        playerIndex = tonumber(playerIndex) or 0,
+        nextShotAt = now + DEBUG_SIMULATION_INTERVAL_MS,
+    }
+    Effects.DebugSimulation = simulation
+    return true
+end
+
 function Effects.OnTick()
     local now = PNC.Core and PNC.Core.Now and PNC.Core.Now() or 0
+    local simulation = Effects.DebugSimulation
+    if simulation and now >= (tonumber(simulation.nextShotAt) or 0) then
+        if not simulation.body then
+            Effects.StopSimulation()
+        elseif Effects.SimulateShot(
+            simulation.body,
+            simulation.npcID,
+            simulation.playerIndex
+        ) then
+            simulation.nextShotAt = now + DEBUG_SIMULATION_INTERVAL_MS
+        else
+            Effects.StopSimulation()
+        end
+    end
     for shotId, seenAt in pairs(Effects.SeenShots) do
         if now - (tonumber(seenAt) or 0) > 10000 then
             Effects.SeenShots[shotId] = nil
@@ -618,7 +772,6 @@ function Effects.OnPreUIDraw()
     local tracer
     local alpha
     local zoom
-    local baseAltitude
     local length
     local x
     local y
@@ -668,8 +821,7 @@ function Effects.OnPreUIDraw()
         screenHeight = tonumber(readMethod(core, "getScreenHeight")) or 0
     end
     zoom = math.max(0.1, zoom)
-    baseAltitude = 85 / zoom
-    stepLength = 600 / zoom
+    stepLength = TRACER_SCREEN_LENGTH / zoom
 
     -- The muzzle fallback deliberately uses the same B42-safe renderline
     -- overload as the Bandits projectile. Two short colored lines make a
@@ -688,7 +840,7 @@ function Effects.OnPreUIDraw()
             alpha = math.max(0.25, 1.0 - (flash.tick / flash.ttl))
             length = (tonumber(flash.length) or MUZZLE_FLASH_LENGTH) / zoom
             x = flash.x / zoom
-            y = (flash.y / zoom) - baseAltitude
+            y = flash.y / zoom
             tipX = x + (flash.dx * length)
             tipY = y + (flash.dy * length)
             if lineVisible(x, y, tipX, tipY, screenWidth, screenHeight) then
@@ -765,18 +917,18 @@ function Effects.OnPreUIDraw()
             alpha = math.max(0.2, 1.0 - (tracer.tick / tracer.ttl))
             if lineVisible(
                 x1,
-                y1 - baseAltitude,
+                y1,
                 x2,
-                y2 - (baseAltitude + ((tonumber(tracer.altitudeVariation) or 0) / zoom)),
+                y2 - ((tonumber(tracer.altitudeVariation) or 0) / zoom),
                 screenWidth,
                 screenHeight
             ) then
                 renderer:renderline(
                     texture,
                     math.floor(x1),
-                    math.floor(y1 - baseAltitude),
+                    math.floor(y1),
                     math.floor(x2),
-                    math.floor(y2 - (baseAltitude + ((tonumber(tracer.altitudeVariation) or 0) / zoom))),
+                    math.floor(y2 - ((tonumber(tracer.altitudeVariation) or 0) / zoom)),
                     tracer.color.r,
                     tracer.color.g,
                     tracer.color.b,
@@ -787,10 +939,10 @@ function Effects.OnPreUIDraw()
                         "tracerIndex=" .. tostring(i),
                         "renderer=SpriteRenderer",
                         "x1=" .. tostring(math.floor(x1)),
-                        "y1=" .. tostring(math.floor(y1 - baseAltitude)),
+                        "y1=" .. tostring(math.floor(y1)),
                         "x2=" .. tostring(math.floor(x2)),
                         "y2=" .. tostring(math.floor(y2
-                            - (baseAltitude + ((tonumber(tracer.altitudeVariation) or 0) / zoom)))))
+                            - ((tonumber(tracer.altitudeVariation) or 0) / zoom))))
                     tracer.drawRendered = true
                 end
                 tracer.x = tracer.x + stepX
@@ -820,6 +972,7 @@ function Effects.Reset()
     Effects.ActiveMuzzleFlashes = {}
     Effects.SeenShots = {}
     Effects.DrawAuditState = {}
+    Effects.DebugSimulation = nil
     Effects.LightWindowAt = 0
     Effects.LightsInWindow = 0
 end

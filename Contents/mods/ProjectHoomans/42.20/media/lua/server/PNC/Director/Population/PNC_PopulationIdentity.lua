@@ -44,46 +44,4 @@ function Identity.PresenceSpec()
     return { presenceMode = "auto", allowLive = true }
 end
 
-function Identity.MigrateLegacyMetadata()
-    local migrated = 0
-    for _, faction in ipairs(PNC.Factions.List()) do
-        if faction.tags and faction.tags.populationGenerated == true then
-            local kind = faction.mobile and faction.mobile.active == true
-                and "MOBILE_GROUP" or "SETTLEMENT"
-            if PNC.Factions.MergeTags then
-                PNC.Factions.MergeTags(faction.id,
-                    Identity.FactionTags(faction.archetypeID, kind))
-            end
-            local current = PNC.Factions.Get(faction.id) or faction
-            if string.find(current.name or "", "Population ", 1, true) == 1 then
-                local newName = Identity.FactionName(current.archetypeID,
-                    tostring(current.id) .. ":LEGACY_METADATA")
-                if PNC.Factions.SetName then
-                    local renamed, _, updated = PNC.Factions.SetName(
-                        current.id, newName)
-                    if renamed and updated then
-                        current, migrated = updated, migrated + 1
-                    end
-                end
-            end
-            for _, community in ipairs(PNC.Communities.GetForFaction(
-                current.id) or {}) do
-                if string.find(community.name or "", "Population ", 1, true) == 1
-                then
-                    local generated = PNC.FactionNameGenerator
-                        .GenerateCommunityName(current.archetypeID,
-                            current.name, tostring(current.id) .. ":"
-                                .. tostring(community.siteID or community.id))
-                    if PNC.Communities.SetName
-                        and PNC.Communities.SetName(community.id, generated)
-                    then
-                        migrated = migrated + 1
-                    end
-                end
-            end
-        end
-    end
-    return migrated
-end
-
 return Identity

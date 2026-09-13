@@ -1,4 +1,4 @@
--- One authority-side resolver for all population SandboxVars.
+-- One authority-side resolver for all population sandbox settings.
 
 if PsychopatzCore and PsychopatzCore.RuntimeRole and not PsychopatzCore.RuntimeRole.AllowsServerCode() then return end
 
@@ -8,10 +8,12 @@ PNC.PopulationSandbox = PNC.PopulationSandbox or {}
 local Sandbox = PNC.PopulationSandbox
 local Config = PNC.DirectorConfig.Population
 
-local function option(name, fallback)
-    local vars = SandboxVars and SandboxVars.ProjectHoomans or nil
-    local value = math.floor(tonumber(vars and vars[name]) or fallback or 4)
-    return math.max(1, math.min(6, value))
+local function option(accessor)
+    local settings = PNC.Sandbox
+    if settings and type(settings[accessor]) == "function" then
+        return settings[accessor]()
+    end
+    return 4
 end
 
 local function multiplier(values, value)
@@ -19,13 +21,13 @@ local function multiplier(values, value)
 end
 
 function Sandbox.Resolve()
-    local population = option("NPCPopulation", 4)
-    local settlements = option("SettlementDensity", 4)
-    local groups = option("RoamingGroupDensity", 4)
-    local recovery = option("PopulationRegeneration", 4)
-    local settlementRecovery = option("SettlementRegeneration", 4)
-    local multiplayer = option("MultiplayerPopulationScaling", 4)
-    local distance = option("PopulationGenerationDistance", 4)
+    local population = option("NPCPopulation")
+    local settlements = option("SettlementDensity")
+    local groups = option("RoamingGroupDensity")
+    local recovery = option("PopulationRegeneration")
+    local settlementRecovery = option("SettlementRegeneration")
+    local multiplayer = option("MultiplayerPopulationScaling")
+    local distance = option("PopulationGenerationDistance")
     local distanceScale = ({ 0.65, 0.78, 0.90, 1.0, 1.15, 1.30 })[distance]
     return {
         enabled = population > 1,

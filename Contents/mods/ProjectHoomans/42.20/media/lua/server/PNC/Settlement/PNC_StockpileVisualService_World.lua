@@ -4,6 +4,7 @@ if PsychopatzCore and PsychopatzCore.RuntimeRole
 local World = {}
 local VISUAL_DATA_KEY = "PNC_StockpileVisual"
 local VISUAL_OWNER = "ProjectHoomans"
+local VISUAL_SCHEMA_VERSION = 1
 
 local function call(object, method, ...)
     if not object or type(object[method]) ~= "function" then return nil end
@@ -70,11 +71,16 @@ local function markerFor(object)
 end
 
 local function isOwnedMarker(marker)
-    -- Older Project Hoomans visuals predate the owner field.  Keep those
-    -- manageable while refusing to touch another mod that uses the same
-    -- generic-looking marker key.
+    -- A missing owner is an old Project Hoomans marker. It remains removable
+    -- so the next reconcile can reset it, while another mod's marker is left
+    -- alone even when it reuses the key.
     return marker and (marker.owner == nil
         or tostring(marker.owner) == VISUAL_OWNER)
+end
+
+local function isCurrentMarker(marker)
+    return type(marker) == "table"
+        and tonumber(marker.schemaVersion) == VISUAL_SCHEMA_VERSION
 end
 
 function World.EnforceVisualOnly(object, spec)
@@ -95,7 +101,9 @@ end
 
 function World.OwnedFacilityId(object)
     local marker = markerFor(object)
-    if not isOwnedMarker(marker) or marker.facilityId == nil then return nil end
+    if not isOwnedMarker(marker) or not isCurrentMarker(marker)
+        or marker.facilityId == nil
+    then return nil end
     return tostring(marker.facilityId)
 end
 
@@ -104,6 +112,7 @@ function World.VisualObjects(square, facilityId)
     for _, object in ipairs(listObjects(square)) do
         local marker = markerFor(object)
         if isOwnedMarker(marker)
+            and marker.facilityId ~= nil
             and tostring(marker.facilityId or "")
             == tostring(facilityId or "")
         then
@@ -117,7 +126,7 @@ function World.MatchingVisual(square, facilityId, spec)
     local objects = World.VisualObjects(square, facilityId)
     if #objects ~= 1 then return nil end
     local marker = markerFor(objects[1])
-    if isOwnedMarker(marker)
+    if isOwnedMarker(marker) and isCurrentMarker(marker)
         and tostring(marker.sprite or "") == tostring(spec.sprite)
         and tonumber(marker.tier) == tonumber(spec.tier)
         and tostring(marker.objectType or "isoobject")
@@ -185,6 +194,7 @@ function World.AddObject(square, facility, spec, point)
     local data = call(object, "getModData")
     if not data then return false, "STOCKPILE_VISUAL_MODDATA_UNAVAILABLE" end
     data[VISUAL_DATA_KEY] = {
+        schemaVersion = VISUAL_SCHEMA_VERSION,
         facilityId = tostring(facility.id),
         level = tonumber(facility.level) or 1,
         tier = spec.tier,

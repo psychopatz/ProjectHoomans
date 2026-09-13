@@ -121,18 +121,10 @@ function Types.NewRegistry()
         revision = 0,
         byUUID = {},
         byAccountKey = {},
-        -- Compatibility index for older readers. New code must use
-        -- byAccountKey; both indexes are rebuilt from records on load.
+        -- byAccount is retained as a canonical secondary lookup for current
+        -- callers that address a player by account identity.
         byAccount = {},
         uuidAliases = {},
-        legacyAccountIdentities = {},
-        migration = {
-            revision = 0,
-            status = "pending",
-            completedAt = 0,
-            canonicalUUID = nil,
-            diagnostic = nil,
-        },
     }
 end
 
@@ -154,16 +146,6 @@ function Types.NewCharacterRecord(spec)
     status = Constants.VALID_STATUSES[spec.status]
         and spec.status or Constants.STATUS_ACTIVE
     createdAt = timestamp(spec.createdAt, 0)
-    local legacyAccountIdentities = {}
-    for identity, enabled in pairs(
-        type(spec.legacyAccountIdentities) == "table"
-            and spec.legacyAccountIdentities or {}
-    ) do
-        identity = Types.NormalizeAccountIdentity(identity)
-        if identity and enabled == true then
-            legacyAccountIdentities[identity] = true
-        end
-    end
     return {
         uuid = uuid,
         accountKey = accountKey,
@@ -177,7 +159,6 @@ function Types.NewCharacterRecord(spec)
         retiredAt = status == Constants.STATUS_RETIRED
             and timestamp(spec.retiredAt, 0) or 0,
         supersededBy = Types.NormalizeUUID(spec.supersededBy),
-        legacyAccountIdentities = legacyAccountIdentities,
         forename = optionalString(spec.forename),
         surname = optionalString(spec.surname),
         displayName = optionalString(spec.displayName),
@@ -224,7 +205,6 @@ function Types.NormalizeCharacterRecord(value, registryUUID)
         diedAt = value.diedAt,
         retiredAt = value.retiredAt,
         supersededBy = value.supersededBy,
-        legacyAccountIdentities = value.legacyAccountIdentities,
         forename = value.forename,
         surname = value.surname,
         displayName = value.displayName,
@@ -246,18 +226,6 @@ function Types.NormalizeRegistry(value)
     local uuid
     local record
     output.revision = revision(source.revision)
-    output.migration = {
-        revision = revision(type(source.migration) == "table"
-            and source.migration.revision or 0),
-        status = optionalString(type(source.migration) == "table"
-            and source.migration.status) or "pending",
-        completedAt = timestamp(type(source.migration) == "table"
-            and source.migration.completedAt or 0),
-        canonicalUUID = Types.NormalizeUUID(type(source.migration) == "table"
-            and source.migration.canonicalUUID),
-        diagnostic = optionalString(type(source.migration) == "table"
-            and source.migration.diagnostic),
-    }
     for uuid, record in pairs(
         type(source.byUUID) == "table" and source.byUUID or {}
     ) do
@@ -272,17 +240,6 @@ function Types.NormalizeRegistry(value)
             output.byAccount[record.accountIdentity] =
                 output.byAccount[record.accountIdentity] or {}
             output.byAccount[record.accountIdentity][uuid] = true
-            for legacyIdentity, enabled in pairs(
-                type(record.legacyAccountIdentities) == "table"
-                    and record.legacyAccountIdentities or {}
-            ) do
-                legacyIdentity = Types.NormalizeAccountIdentity(legacyIdentity)
-                if legacyIdentity and enabled == true then
-                    output.legacyAccountIdentities[legacyIdentity] =
-                        output.legacyAccountIdentities[legacyIdentity] or {}
-                    output.legacyAccountIdentities[legacyIdentity][uuid] = true
-                end
-            end
         end
     end
     for oldUUID, canonicalUUID in pairs(

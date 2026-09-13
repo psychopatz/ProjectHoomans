@@ -17,15 +17,24 @@ local Providers = PNC.KnowledgeProviders
 local Resolvers = PNC.KnowledgeResolvers
 local Sources = PNC.KnowledgeEvidenceSources
 local Shared = PNC.KnowledgeRegistry
+local Reset = (PNC.Persistence and PNC.Persistence.Reset)
+    or require "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset"
 local deepCopy = Internal.deepCopy
 local safeString = Internal.safeString
 local normalizeNote = Internal.normalizeNote
 local KEY = Internal.KEY
 
 function Knowledge.Load()
-    local raw = ModData and ModData.getOrCreate and ModData.getOrCreate(KEY) or {}
-    Knowledge.Registry = Knowledge.NormalizeRegistry(raw)
+    local raw = Reset.Read(KEY)
+    local reason = Reset.Check(raw, Internal.SCHEMA, nil,
+        function(value) return type(value.byCharacter) == "table" end)
+    Knowledge.Registry = Knowledge.NormalizeRegistry(reason == nil and raw or nil)
     Knowledge.Loaded = true
+    Knowledge.Dirty = reason ~= nil and reason ~= "empty_state"
+    if Knowledge.Dirty then
+        Reset.Mark(Knowledge, raw, Internal.SCHEMA, reason,
+            "npc_knowledge")
+    end
     return true
 end
 
@@ -37,10 +46,8 @@ end
 function Knowledge.Save(flushGlobal)
     Knowledge.EnsureLoaded()
     if not Knowledge.Dirty then return false, "not_dirty" end
-    local target = ModData and ModData.getOrCreate and ModData.getOrCreate(KEY) or nil
-    if not target then return false, "moddata_unavailable" end
-    for key in pairs(target) do target[key] = nil end
-    for key, value in pairs(Knowledge.Registry) do target[key] = deepCopy(value) end
+    local written = Reset.Write(KEY, deepCopy(Knowledge.Registry))
+    if not written then return false, "moddata_unavailable" end
     if flushGlobal ~= false and GlobalModData and GlobalModData.save then
         GlobalModData.save()
     end

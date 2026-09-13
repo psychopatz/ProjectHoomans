@@ -4,6 +4,7 @@ if PsychopatzCore and PsychopatzCore.RuntimeRole
 local Service = PNC.CorpseHaulService
 local Internal = Service.Internal
 local Core = PNC.Core
+local CORPSE_HAUL_SCHEMA_VERSION = 1
 local Lifecycle = PNC.BodyLifecycle
 local Stockpile = PNC.StockpileAccessService
 local WorkRepository = PNC.WorkRepository
@@ -132,8 +133,32 @@ local function transmit(object)
     if object and object.transmitModData then object:transmitModData() end
 end
 
-function Service.GetCorpseToken(corpse, create)
+function Service.EnsureCorpseHaulMarker(corpse, create)
     local data = corpse and corpse.getModData and corpse:getModData() or nil
+    local hasMarker
+    if not data then return nil, false end
+    hasMarker = data.PNC_CorpseHaulVersion ~= nil
+        or data.PNC_CorpseHaulToken ~= nil
+        or data.PNC_CorpseHaulTaskId ~= nil
+        or data.PNC_CorpseHaulCarriedBy ~= nil
+    if hasMarker and tonumber(data.PNC_CorpseHaulVersion)
+        ~= CORPSE_HAUL_SCHEMA_VERSION
+    then
+        data.PNC_CorpseHaulVersion = nil
+        data.PNC_CorpseHaulToken = nil
+        data.PNC_CorpseHaulTaskId = nil
+        data.PNC_CorpseHaulCarriedBy = nil
+        transmit(corpse)
+        return data, true, "invalid_state"
+    end
+    if create == true then
+        data.PNC_CorpseHaulVersion = CORPSE_HAUL_SCHEMA_VERSION
+    end
+    return data, false
+end
+
+function Service.GetCorpseToken(corpse, create)
+    local data = Service.EnsureCorpseHaulMarker(corpse, create)
     local token
     if not data then return nil end
     token = data.PNC_CorpseHaulToken

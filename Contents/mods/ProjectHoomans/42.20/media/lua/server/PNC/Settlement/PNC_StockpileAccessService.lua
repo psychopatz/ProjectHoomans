@@ -9,6 +9,7 @@ local EventsBus = PsychopatzCore and PsychopatzCore.Events
 local Zones = require "PsychopatzCore/World/PC_ZoneRegistry"
 local GridRegion = require "PsychopatzCore/World/PC_GridRegion"
 local FacilityState = require "PNC/Core/Settlement/PNC_FacilityState"
+local ACCESS_SCHEMA_VERSION = 1
 
 local function numericKeys(source)
     local keys = {}
@@ -207,7 +208,8 @@ function Service.AttachModData(object, nodeId)
     local node = Repository.GetStockpileNode(nodeId)
     if not node or not object or not object.getModData then return false, "INVALID_TARGET" end
     local data = object:getModData()
-    data.PNC = { type = "stockpileAccess", nodeId = node.id, baseId = node.baseId }
+    data.PNC = { schemaVersion = ACCESS_SCHEMA_VERSION,
+        type = "stockpileAccess", nodeId = node.id, baseId = node.baseId }
     if object.transmitModData then object:transmitModData() end
     return true, data.PNC
 end
@@ -215,7 +217,14 @@ end
 function Service.ResolveObject(object)
     local data = object and object.getModData and object:getModData() or nil
     local identity = data and data.PNC or nil
-    if type(identity) ~= "table" or identity.type ~= "stockpileAccess" then return nil end
+    if type(identity) ~= "table" or identity.type ~= "stockpileAccess" then
+        return nil
+    end
+    if tonumber(identity.schemaVersion) ~= ACCESS_SCHEMA_VERSION then
+        data.PNC = nil
+        if object.transmitModData then object:transmitModData() end
+        return nil
+    end
     return Repository.GetStockpileNode(identity.nodeId)
 end
 

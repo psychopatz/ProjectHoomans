@@ -74,12 +74,9 @@ function PlayerCharacters.ResolveEntityKey(entityKey)
         PlayerCharacters.Registry, parsed.characterUUID
     )
     record = PlayerCharacters.Registry.byUUID[canonicalUUID]
-    local legacyMatch = record and record.legacyAccountIdentities
-        and record.legacyAccountIdentities[parsed.accountIdentity] == true
     if not record
         or (record.accountKey ~= parsed.accountIdentity
-            and record.accountIdentity ~= parsed.accountIdentity
-            and not legacyMatch)
+            and record.accountIdentity ~= parsed.accountIdentity)
     then
         return nil, "player_character_not_found"
     end

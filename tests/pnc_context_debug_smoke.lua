@@ -28,6 +28,10 @@ local CLIENT_ROOT = T.path("ProjectHoomans", "client", "")
 local debugAuthorized = false
 local registeredProvider
 local sent = {}
+local anchorTarget
+local simulatedShot
+local simulationActive = false
+local inspectorTarget
 
 PNC = {
     Const = {
@@ -44,6 +48,44 @@ PNC = {
         CanUseDebug = function() return debugAuthorized end,
         SendDebug = function(action, payload)
             sent[#sent + 1] = { action = action, payload = payload }
+        end,
+    },
+    NameplateFirearmAnchor = {
+        SetTarget = function(body, id, playerIndex)
+            anchorTarget = {
+                body = body,
+                id = id,
+                playerIndex = playerIndex,
+            }
+        end,
+        ToggleTarget = function(body, id, playerIndex)
+            anchorTarget = {
+                body = body,
+                id = id,
+                playerIndex = playerIndex,
+            }
+        end,
+    },
+    ClientFirearmEffects = {
+        IsSimulationActive = function()
+            return simulationActive
+        end,
+        ToggleSimulation = function(body, id, playerIndex)
+            simulationActive = not simulationActive
+            simulatedShot = {
+                body = body,
+                id = id,
+                playerIndex = playerIndex,
+            }
+        end,
+    },
+    NPCCoordinateDebugUI = {
+        Open = function(body, id, playerIndex)
+            inspectorTarget = {
+                body = body,
+                id = id,
+                playerIndex = playerIndex,
+            }
         end,
     },
     ContextHub = {
@@ -93,7 +135,13 @@ debugAuthorized = true
 T.equal(registeredProvider.isEnabled(), true, "provider enabled with debug authorization")
 
 local menu = newMenu()
-registeredProvider.addOptions(menu, { id = "npc_one" }, {}, {})
+local selectedBody = {}
+registeredProvider.addOptions(
+    menu,
+    { id = "npc_one", zombie = selectedBody },
+    {},
+    { playerNum = 0 }
+)
 
 T.equal(#menu.options, 1, "debug commands are grouped under one NPC submenu entry")
 T.equal(menu.options[1].name, "Debug", "debug submenu uses a readable fallback label")
@@ -109,6 +157,28 @@ T.equal(
     true,
     "scene lab is available from the NPC debug submenu"
 )
+local anchorOption = findOption(debugMenu, "Debug: Firearm Anchor Probe")
+T.truthy(anchorOption, "firearm anchor probe is in the NPC debug submenu")
+T.falsy(anchorOption.notAvailable, "firearm anchor probe accepts a live NPC")
+anchorOption.callback()
+T.equal(anchorTarget.body, selectedBody, "anchor probe targets selected NPC")
+T.equal(anchorTarget.id, "npc_one", "anchor probe preserves selected NPC id")
+T.equal(anchorTarget.playerIndex, 0, "anchor probe preserves player index")
+local simulationOption = findOption(debugMenu, "Debug: Start Firearm Simulation")
+T.truthy(simulationOption, "firearm simulation is in the NPC debug submenu")
+T.falsy(simulationOption.notAvailable, "firearm simulation accepts a live NPC")
+simulationOption.callback()
+T.equal(simulationActive, true, "firearm simulation toggles on")
+T.equal(simulatedShot.body, selectedBody, "firearm simulation uses selected NPC")
+T.equal(simulatedShot.id, "npc_one", "firearm simulation preserves selected NPC id")
+T.equal(simulatedShot.playerIndex, 0, "firearm simulation preserves player index")
+local inspectorOption = findOption(debugMenu, "Debug: NPC Coordinate Inspector")
+T.truthy(inspectorOption, "NPC coordinate inspector is in the debug submenu")
+T.falsy(inspectorOption.notAvailable, "NPC coordinate inspector accepts a live NPC")
+inspectorOption.callback()
+T.equal(inspectorTarget.body, selectedBody, "coordinate inspector uses selected NPC")
+T.equal(inspectorTarget.id, "npc_one", "coordinate inspector preserves selected NPC id")
+T.equal(inspectorTarget.playerIndex, 0, "coordinate inspector preserves player index")
 local infectionOption = findOption(debugMenu, "Infection")
 T.equal(infectionOption ~= nil, true, "infection debug submenu missing")
 local clearOption = findOption(infectionOption.submenu, "Clear Knox Infection")

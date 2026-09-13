@@ -1,6 +1,26 @@
 local Model = PNC.PlayerNeedsModel
 local Internal = Model.Internal
 
+local function ensureCurrentTraits(record)
+    local currentVersion
+    local generatedVersion
+    if type(record) ~= "table" or record.vanillaTraits == nil
+        or record.vanillaTraitsAuthored == true
+        or not Model.EnsureTraits
+    then
+        return
+    end
+    currentVersion = math.max(1, math.floor(
+        tonumber(Model.GENERATION_VERSION) or 1
+    ))
+    generatedVersion = math.max(0, math.floor(
+        tonumber(record.vanillaTraitsGenerationVersion) or 0
+    ))
+    if generatedVersion ~= currentVersion then
+        Model.EnsureTraits(record)
+    end
+end
+
 function Model.GetTraitDefinitions()
     local output = {}
     local index
@@ -12,6 +32,7 @@ function Model.GetTraitDefinitions()
 end
 
 function Model.GetActiveTraitIDs(source)
+    ensureCurrentTraits(source)
     local traits = source and source.vanillaTraits or source
     traits = Model.NormalizeTraits(traits)
     local output = {}
@@ -34,6 +55,7 @@ function Model.GetTraitLabelKey(id)
 end
 
 function Model.GetTraits(record)
+    ensureCurrentTraits(record)
     return Model.NormalizeTraits(record and (
         record.vanillaTraits or record.physiologicalTraits or record.traits
     ))
@@ -52,10 +74,18 @@ end
 
 function Model.EnsureTraits(record)
     if type(record) ~= "table" then return nil, false end
+    local currentVersion = math.max(1, math.floor(
+        tonumber(Model.GENERATION_VERSION) or 1
+    ))
     local generatedVersion = math.max(0, math.floor(
         tonumber(record.vanillaTraitsGenerationVersion) or 0
     ))
-    if record.vanillaTraitsAuthored == true or generatedVersion > 0 then
+    if record.vanillaTraitsAuthored == true then
+        record.vanillaTraits = Model.NormalizeTraits(record.vanillaTraits)
+        record.vanillaTraitsGenerationVersion = 0
+        return record.vanillaTraits, false
+    end
+    if generatedVersion == currentVersion then
         record.vanillaTraits = Model.NormalizeTraits(record.vanillaTraits)
         return record.vanillaTraits, false
     end
@@ -64,7 +94,7 @@ function Model.EnsureTraits(record)
     for _, enabled in pairs(existing) do
         if enabled == true then hasExisting = true break end
     end
-    if hasExisting then
+    if generatedVersion == 0 and hasExisting then
         record.vanillaTraits = existing
         record.vanillaTraitsAuthored = true
         record.vanillaTraitsGenerationVersion = 0
@@ -74,10 +104,12 @@ function Model.EnsureTraits(record)
             record.archetypeID
         )
         record.vanillaTraitsAuthored = false
-        record.vanillaTraitsGenerationVersion = Model.GENERATION_VERSION
+        record.vanillaTraitsGenerationVersion = currentVersion
     end
     if PNC.Registry and PNC.Registry.MarkDirty then
-        PNC.Registry.MarkDirty(record, "vanilla_traits_initialized")
+        PNC.Registry.MarkDirty(record, generatedVersion == 0 and hasExisting
+            and "vanilla_traits_initialized"
+            or "vanilla_traits_regenerated")
     end
     return record.vanillaTraits, true
 end

@@ -18,6 +18,8 @@ local assignTable = Internal.assignTable
 local rebuildDerivedIndexes = Internal.rebuildDerivedIndexes
 local reconcileLeaders = Internal.reconcileLeaders
 local reconcileNPCReferences = Internal.reconcileNPCReferences
+local Reset = (PNC.Persistence and PNC.Persistence.Reset)
+    or require "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset"
 
 function Communities.Load()
     local raw
@@ -29,14 +31,21 @@ function Communities.Load()
     if PNC.Factions and PNC.Factions.EnsureLoaded then
         PNC.Factions.EnsureLoaded()
     end
-    raw = ModData and ModData.getOrCreate
-        and ModData.getOrCreate(
-            Constants.REGISTRY_MODDATA_KEY
-        ) or {}
-    normalized = Types.NormalizeRegistry(raw)
+    raw = Reset.Read(Constants.REGISTRY_MODDATA_KEY)
+    local reason = Reset.Check(raw, Constants.REGISTRY_SCHEMA_VERSION, nil,
+        function(value)
+            return type(value.byID) == "table"
+                and type(value.sitesByID) == "table"
+        end)
+    normalized = Types.NormalizeRegistry(reason == nil and raw or nil)
     Communities.Registry = normalized
     Communities.Loaded = true
-    Communities.Dirty = not Types.AreEqual(raw, normalized)
+    Communities.Dirty = (reason ~= nil and reason ~= "empty_state")
+        or (reason == nil and not Types.AreEqual(raw, normalized))
+    if reason ~= nil and reason ~= "empty_state" then
+        Reset.Mark(Communities, raw, Constants.REGISTRY_SCHEMA_VERSION,
+            reason, "communities")
+    end
     reconcileNPCReferences()
     rebuildDerivedIndexes()
     reconcileLeaders()
@@ -55,13 +64,10 @@ function Communities.Save()
     local normalized
     Communities.EnsureLoaded()
     if not Communities.Dirty then return false, "not_dirty" end
-    target = ModData and ModData.getOrCreate
-        and ModData.getOrCreate(
-            Constants.REGISTRY_MODDATA_KEY
-        ) or nil
-    if not target then return false, "moddata_unavailable" end
     normalized = Types.NormalizeRegistry(Communities.Registry)
-    assignTable(target, copy(normalized))
+    local written = Reset.Write(Constants.REGISTRY_MODDATA_KEY,
+        copy(normalized))
+    if not written then return false, "moddata_unavailable" end
     Communities.Registry = normalized
     Communities.Dirty = false
     return true, "saved"

@@ -32,6 +32,8 @@ function Internal.StampReservationItem(item, record, vehicleId, seat)
     if not modData then return false end
     name = tostring(record.name or record.id or "NPC")
     modData.PNC_VehicleSeatReservation = true
+    modData.PNC_VehicleSeatReservationVersion =
+        Internal.ReservationSchemaVersion()
     modData.PNC_NPC_ID = tostring(record.id)
     modData.PNC_NPC_NAME = name
     modData.PNC_VEHICLE_ID = tostring(vehicleId)

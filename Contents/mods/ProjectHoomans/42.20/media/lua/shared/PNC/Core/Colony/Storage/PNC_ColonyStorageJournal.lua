@@ -1,6 +1,6 @@
--- Compatibility and presentation adapter for the pre-framework Storage
--- activity format. Runtime storage is owned by PC_Journals; this module keeps
--- the old save key, compact UI rows, and public Record helpers working.
+-- Presentation adapter for the colony-storage activity format. Runtime storage
+-- is owned by PC_Journals; this module keeps compact UI rows and public
+-- Record helpers working while accepting only its current payload version.
 PNC = PNC or {}
 PNC.ColonyStorageJournal = PNC.ColonyStorageJournal or {}
 
@@ -11,7 +11,6 @@ local Inventory = require "PsychopatzCore/Inventory/PsychopatzInventory"
 local EventTypes = require "PNC/Core/Events/PNC_EventDefinitions"
 
 Journal.VERSION = 2
-Journal.LEGACY_VERSION = 1
 Journal.MAX_ENTRIES = 10
 Journal.TYPE = "projecthoomans.colonyActivity"
 Journal.OPERATION = { TAKE = 1, STORE = 2 }
@@ -62,7 +61,7 @@ local function eventForOperation(operation)
             and EventTypes.STORAGE_ITEM_DEPOSITED or nil
 end
 
-local function legacyEntry(raw)
+local function compactEntry(raw)
     if type(raw) ~= "table" then return nil end
     local operation = operationCode(raw[Journal.FIELD.OPERATION])
     local typeID = math.floor(tonumber(raw[Journal.FIELD.TYPE_ID]) or 0)
@@ -132,7 +131,7 @@ function Journal.Snapshot(storageOrID)
             or entry[1] == EventTypes.STORAGE_ITEM_DEPOSITED
                 and Journal.OPERATION.STORE or nil
         if operation then
-            output[#output + 1] = legacyEntry({
+            output[#output + 1] = compactEntry({
                 operation, entry[2], entry[3], entry[4], entry[5], entry[6],
             })
         end
@@ -148,22 +147,13 @@ end
 
 function Journal.Deserialize(payload, storageID)
     Journals.remove(Journal.TYPE, storageID)
-    if type(payload) ~= "table" then return false end
-    if tonumber(payload[1]) == Journal.VERSION then
-        return Journals.import(Journal.TYPE, storageID, payload[2] or {})
+    if payload == nil then return true end
+    if type(payload) ~= "table"
+        or tonumber(payload[1]) ~= Journal.VERSION
+    then
+        return false
     end
-    if tonumber(payload[1]) ~= Journal.LEGACY_VERSION then return false end
-    local entries = {}
-    for _, raw in ipairs(type(payload[2]) == "table" and payload[2] or {}) do
-        local old = legacyEntry(raw)
-        local eventType = old and eventForOperation(old[1]) or nil
-        if eventType then
-            entries[#entries + 1] = {
-                eventType, old[2], old[3], old[4], old[5], old[6],
-            }
-        end
-    end
-    return Journals.import(Journal.TYPE, storageID, { entries = entries })
+    return Journals.import(Journal.TYPE, storageID, payload[2] or {})
 end
 
 function Journal.Remove(storageOrID)

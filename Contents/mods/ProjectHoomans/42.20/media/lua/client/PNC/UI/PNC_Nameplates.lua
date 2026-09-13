@@ -117,6 +117,7 @@ Nameplates.State = Nameplates.State or {
 }
 
 require "PNC/UI/Nameplates/PNC_NameplatePresentation"
+require "PNC/UI/Nameplates/PNC_NameplateFirearmAnchor"
 require "PNC/UI/Nameplates/PNC_NameplateDebug"
 require "PNC/UI/Nameplates/PNC_NameplateBodies"
 require "PNC/UI/Nameplates/PNC_NameplateDisplaySettings"

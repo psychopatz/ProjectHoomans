@@ -26,6 +26,7 @@ local corpse = {
         PNC_DeathMarkerID = "dead:one",
         PNC_CorpseToken = "lifecycle:one",
         PNC_CorpseHaulToken = "corpse:one",
+        PNC_CorpseHaulVersion = 1,
     },
 }
 local untrackedCorpse = { x = 40, y = 40, z = 0, data = {} }

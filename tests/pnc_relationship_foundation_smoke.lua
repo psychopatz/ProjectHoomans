@@ -568,7 +568,7 @@ T.equal(reloadedJournal[1].eventID,
     conversationRelationship.interactionJournal[1].eventID,
     "relationship journal event identity survives reload")
 
--- 24-25. Older records migrate deterministically to V15 and can run again.
+-- 24-25. Older records are rejected by the exact-version reset contract.
 T.equal(PNC.Const.PERSISTENCE_VERSION, 15,
     "persistence schema advanced to V15")
 local oldRaw = {
@@ -590,36 +590,10 @@ local migrated = PNC.Persistence.DeserializeRecord(
     oldRaw,
     oldRaw.id
 )
-T.equal(migrated.social.schemaVersion, 3,
-    "migration adds social data")
-T.equal(next(migrated.social.relationships), nil,
-    "migration keeps relationships sparse")
-T.equal(migrated.social.conduct.scores.reliability, 0,
-    "migration adds neutral NPC conduct")
-T.equal(#migrated.social.conduct.evidence, 0,
-    "migration does not infer conduct evidence")
-T.equal(migrated.affiliation.membershipStatus,
-    "unaffiliated", "migration adds neutral affiliation")
-T.equal(migrated.affiliation.factionID, nil,
-    "migration invents no faction membership")
-local migratedPayload = PNC.Persistence.SerializeRecord(migrated)
-T.equal(migratedPayload.schemaVersion, 15,
-    "migration writes V15")
-local migratedAgain = PNC.Persistence.DeserializeRecord(
-    migratedPayload,
-    migrated.id
-)
-T.equal(PNC.RelationshipTypes.AreEqual(
-    migrated.social,
-    migratedAgain.social
-), true, "migration rerun is safe")
-T.equal(PNC.FactionTypes.AreEqual(
-    migrated.affiliation,
-    migratedAgain.affiliation
-), true, "affiliation migration rerun is safe")
+T.equal(migrated, nil, "unsupported NPC schema is rejected")
 
 -- 26. Serialized payload is primitive/table-only and has no metatables.
-validatePersistedValue(migratedPayload)
+validatePersistedValue(relationshipPayload)
 
 -- Read-only diagnostics and existing faction behavior remain intact.
 local debugText = PNC.RelationshipDebug.Inspect(

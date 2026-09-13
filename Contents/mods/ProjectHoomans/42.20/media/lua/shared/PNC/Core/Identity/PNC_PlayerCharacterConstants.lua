@@ -17,7 +17,6 @@ Constants.LIFECYCLE_VALIDATION_REFRESH_MS = 30000
 Constants.MODDATA_UUID_FIELD = "PNC_CharacterUUID"
 Constants.MODDATA_VERSION_FIELD = "PNC_CharacterIdentityVersion"
 Constants.MODDATA_ACCOUNT_KEY_FIELD = "PNC_CharacterAccountKey"
-Constants.MIGRATION_BACKUP_MODDATA_KEY = "PNC_PlayerCharacters_v3_Backup"
 
 Constants.STATUS_ACTIVE = "active"
 Constants.STATUS_DEAD = "dead"

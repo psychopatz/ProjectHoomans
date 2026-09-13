@@ -6,6 +6,8 @@ PNC.SettlementRepository = PNC.SettlementRepository or {}
 local Repository = PNC.SettlementRepository
 local CoreZones = require "PsychopatzCore/World/PC_ZoneRegistry"
 local GridRegion = require "PsychopatzCore/World/PC_GridRegion"
+local Reset = (PNC.Persistence and PNC.Persistence.Reset)
+    or require "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset"
 
 Repository.SCHEMA_VERSION = 1
 Repository.MODDATA_KEY = "PNC_Settlements_V1"
@@ -15,17 +17,6 @@ Repository.State = Repository.State or {
 }
 Repository.Dirty = Repository.Dirty or false
 Repository.Loaded = Repository.Loaded or false
-Repository.Migrations = Repository.Migrations or {}
-
-Repository.Migrations[0] = Repository.Migrations[0] or function(raw)
-    raw.schemaVersion = 1
-    raw.bases = type(raw.bases) == "table" and raw.bases or {}
-    raw.facilities = type(raw.facilities) == "table" and raw.facilities or {}
-    raw.components = type(raw.components) == "table" and raw.components or {}
-    raw.stockpileNodes = type(raw.stockpileNodes) == "table" and raw.stockpileNodes or {}
-    raw.zones = type(raw.zones) == "table" and raw.zones or {}
-    return raw
-end
 
 local function freshState()
     return { schemaVersion = Repository.SCHEMA_VERSION, bases = {}, facilities = {},
@@ -42,14 +33,6 @@ end
 
 function Repository.Import(raw)
     local source = type(raw) == "table" and copy(raw) or {}
-    local version = math.max(0, math.floor(tonumber(source.schemaVersion) or 0))
-    while version < Repository.SCHEMA_VERSION do
-        local migration = Repository.Migrations[version]
-        if not migration then return nil, "MIGRATION_NOT_FOUND" end
-        source = migration(source)
-        version = math.floor(tonumber(source.schemaVersion) or version + 1)
-    end
-    if version > Repository.SCHEMA_VERSION then return nil, "SCHEMA_TOO_NEW" end
     local state = freshState()
     state.bases = sanitizeMap(source.bases)
     state.facilities = sanitizeMap(source.facilities)
@@ -93,19 +76,38 @@ end
 
 function Repository.Load(force)
     if Repository.Loaded and force ~= true then return Repository.State end
-    local raw = ModData and ModData.getOrCreate
-        and ModData.getOrCreate(Repository.MODDATA_KEY) or nil
-    return Repository.Import(raw)
+    local raw = Reset.Read(Repository.MODDATA_KEY)
+    local reason = Reset.Check(raw, Repository.SCHEMA_VERSION, nil,
+        function(value)
+            return type(value.bases) == "table"
+                and type(value.facilities) == "table"
+                and type(value.components) == "table"
+                and type(value.stockpileNodes) == "table"
+                and type(value.zones) == "table"
+        end)
+    local oldZones = Repository.State and Repository.State.zones or {}
+    if reason ~= nil and reason ~= "empty_state" then
+        for id, _ in pairs(oldZones) do
+            if CoreZones.remove then CoreZones.remove(id) end
+        end
+    end
+    local state = Repository.Import(reason == nil and raw or nil)
+    if reason ~= nil and reason ~= "empty_state" then
+        Reset.Mark(Repository, raw, Repository.SCHEMA_VERSION, reason,
+            "settlements")
+    else
+        Repository.Dirty = false
+    end
+    return state
 end
 
 function Repository.Save()
     Repository.Load()
     if not Repository.Dirty then return true, "unchanged" end
     if ModData and ModData.getOrCreate then
-        local target = ModData.getOrCreate(Repository.MODDATA_KEY)
         local payload = Repository.Export()
-        for key, _ in pairs(target) do target[key] = nil end
-        for key, value in pairs(payload) do target[key] = value end
+        local written = Reset.Write(Repository.MODDATA_KEY, payload)
+        if not written then return false, "moddata_unavailable" end
     else
         return false, "moddata_unavailable"
     end

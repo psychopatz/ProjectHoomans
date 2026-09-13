@@ -15,6 +15,8 @@ local Core = PNC.Core
 local deepEqual = Internal.deepEqual
 local copy = Internal.copy
 local assignTable = Internal.assignTable
+local Reset = (PNC.Persistence and PNC.Persistence.Reset)
+    or require "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset"
 
 function PlayerCharacters.Load()
     local raw
@@ -22,18 +24,21 @@ function PlayerCharacters.Load()
     if Core and Core.IsAuthority and not Core.IsAuthority() then
         return false, "not_authority"
     end
-    raw = ModData and ModData.getOrCreate
-        and ModData.getOrCreate(Constants.REGISTRY_MODDATA_KEY)
-        or {}
-    if (tonumber(raw.schemaVersion) or 0)
-        < Constants.REGISTRY_SCHEMA_VERSION
-    then
-        PlayerCharacters.PendingLegacyBackup = copy(raw)
-    end
-    normalized = Types.NormalizeRegistry(raw)
+    raw = Reset.Read(Constants.REGISTRY_MODDATA_KEY)
+    local reason = Reset.Check(raw, Constants.REGISTRY_SCHEMA_VERSION, nil,
+        function(value)
+            return type(value.byUUID) == "table"
+                and type(value.byAccountKey) == "table"
+        end)
+    normalized = Types.NormalizeRegistry(reason == nil and raw or nil)
     PlayerCharacters.Registry = normalized
     PlayerCharacters.Loaded = true
-    PlayerCharacters.Dirty = not deepEqual(raw, normalized)
+    PlayerCharacters.Dirty = (reason ~= nil and reason ~= "empty_state")
+        or (reason == nil and not deepEqual(raw, normalized))
+    if reason ~= nil and reason ~= "empty_state" then
+        Reset.Mark(PlayerCharacters, raw, Constants.REGISTRY_SCHEMA_VERSION,
+            reason, "player_characters")
+    end
     PlayerCharacters.ResetRuntimeBindings("registry_load")
     return true, PlayerCharacters.Dirty
 end
@@ -51,15 +56,9 @@ function PlayerCharacters.Save(flushGlobal)
     if not PlayerCharacters.Dirty then
         return false, "not_dirty"
     end
-    target = ModData and ModData.getOrCreate
-        and ModData.getOrCreate(Constants.REGISTRY_MODDATA_KEY)
-        or nil
-    if not target then
-        return false, "moddata_unavailable"
-    end
-    assignTable(target, Types.NormalizeRegistry(
-        PlayerCharacters.Registry
-    ))
+    local written = Reset.Write(Constants.REGISTRY_MODDATA_KEY,
+        Types.NormalizeRegistry(PlayerCharacters.Registry))
+    if not written then return false, "moddata_unavailable" end
     PlayerCharacters.Dirty = false
     if flushGlobal ~= false and GlobalModData and GlobalModData.save then
         GlobalModData.save()

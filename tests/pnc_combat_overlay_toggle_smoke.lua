@@ -44,6 +44,7 @@ end
 
 local dependencies = {
     "PNC/UI/Nameplates/PNC_NameplatePresentation",
+    "PNC/UI/Nameplates/PNC_NameplateFirearmAnchor",
     "PNC/UI/Nameplates/PNC_NameplateDebug",
     "PNC/UI/Nameplates/PNC_NameplateBodies",
     "PNC/UI/Nameplates/PNC_NameplateEntries",
