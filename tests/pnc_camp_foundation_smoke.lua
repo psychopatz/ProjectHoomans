@@ -13,7 +13,6 @@ local function distance(x1, y1, x2, y2)
     return math.sqrt(dx * dx + dy * dy)
 end
 
-local threatActive = false
 local movement
 local halted = false
 local cleared = false
@@ -50,13 +49,6 @@ PNC = {
                 stopDistance = stopDistance, reason = reason,
             }
         end,
-    },
-    BehaviorCompanion = {
-        Internal = {
-            TryRespondToThreat = function()
-                return threatActive
-            end,
-        },
     },
     Animation = { Apply = function() end },
     NavigationRouter = { Clear = function() end },
@@ -112,10 +104,9 @@ T.equal(movement.reason, "camp_anchor", "camp return uses the camp movement lane
 T.equal(movement.mode, "walk", "camp return uses walking movement")
 T.equal(halted, false, "camp return does not halt before reaching camp")
 
-threatActive = true
 record.x = 20
 AtCamp.Tick(record)
-T.equal(record.activeBehavior, "AtCamp:combat",
-    "camp behavior hands nearby threats to companion combat")
+T.equal(record.activeBehavior, "AtCamp",
+    "camp behavior remains passive when ThreatGuard is not running")
 
 T.finish("pnc_camp_foundation_smoke")

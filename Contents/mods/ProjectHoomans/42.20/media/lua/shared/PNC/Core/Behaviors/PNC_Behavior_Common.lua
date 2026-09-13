@@ -162,6 +162,9 @@ function Common.MoveRecord(
     local steeringTarget
     local intentNavigation = navigationOptions
     local moveIntent
+    local presentationKind
+    local presentationReason
+    local presentationHoldReason
     local runtime = record and record.runtime or nil
     local scene = runtime and runtime.animationScene or nil
     local state = runtime and runtime.facilityActivity
@@ -171,12 +174,25 @@ function Common.MoveRecord(
     local liveBodyControl = PNC.LiveBodyControl
     local now = Core and Core.Now and Core.Now() or 0
     if liveBodyControl
+        and liveBodyControl.ResolveStationaryPresentation
+    then
+        presentationKind, presentationReason =
+            liveBodyControl.ResolveStationaryPresentation(record, now)
+    elseif liveBodyControl
         and liveBodyControl.IsSeated
         and liveBodyControl.IsSeated(record) == true
-        and liveBodyControl.IsSeatedCombatActive
-        and not liveBodyControl.IsSeatedCombatActive(record, now)
+        and liveBodyControl.IsPresentationCombatActive
+        and not liveBodyControl.IsPresentationCombatActive(record, now)
     then
-        if Diagnostics and Diagnostics.LogSeatingState
+        presentationKind = "seat"
+        presentationReason = "seated_safety"
+    end
+    if presentationKind
+    then
+        presentationHoldReason = presentationKind == "sleep"
+            and "sleep_hold" or "seated_hold"
+        if presentationKind == "seat"
+            and Diagnostics and Diagnostics.LogSeatingState
             and Diagnostics.IsSeatingRuntime
             and Diagnostics.IsSeatingRuntime(runtime, scene)
         then
@@ -188,15 +204,15 @@ function Common.MoveRecord(
                 moveReason
             )
         end
-        if liveBodyControl.ReleaseSeatedMovement then
-            liveBodyControl.ReleaseSeatedMovement(
+        if liveBodyControl.ReleasePresentationMovement then
+            liveBodyControl.ReleasePresentationMovement(
                 record,
                 zombie,
-                "behavior_move_blocked_seated"
+                presentationReason
             )
         end
-        Common.HaltMovement(record, zombie, "seated_hold")
-        return false, "seated_hold"
+        Common.HaltMovement(record, zombie, presentationHoldReason)
+        return false, presentationHoldReason
     end
     if Diagnostics and Diagnostics.LogSeatingState
         and Diagnostics.IsSeatingRuntime

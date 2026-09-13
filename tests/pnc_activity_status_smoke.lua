@@ -185,6 +185,17 @@ local combat = Status.Build({
 T.equal(combat.activityId, "combat",
     "combat overrides a stale generic job")
 
+local reacquiring = Status.Build({
+    alive = true,
+    activeJob = "AtCamp",
+    runtime = { threatGuard = {
+        active = true,
+        phase = "reacquiring",
+    } },
+})
+T.equal(reacquiring.activityId, "combat",
+    "reacquiring threat guard remains visible as a combat activity")
+
 PNC.BehaviorTreatment = {
     BuildSnapshot = function(record)
         return record.runtime and record.runtime.selfTreatment

@@ -12,7 +12,6 @@ local resetPath = Internal.ResetPath
 local completeLease = Internal.CompleteLease
 local workerFor = Internal.WorkerFor
 local clearWorkerAction = Internal.ClearWorkerAction
-local combatBlockReason = Internal.CombatBlockReason
 local tickWorker = Internal.TickWorker
 local Recovery = PNC.Tasking and PNC.Tasking.Internal
 
@@ -192,24 +191,11 @@ if PNC.JobSystem and PNC.JobSystem.RegisterOrder then
     PNC.JobSystem.RegisterOrder(Const.ORDER_SCAVENGE, "Scavenge")
 end
 if PNC.BehaviorRegistry and PNC.BehaviorRegistry.Register then
-    PNC.BehaviorRegistry.Register("Scavenge", function(record, body, _, now)
-        local companion = PNC.BehaviorCompanion
-        local internal = companion and companion.Internal or nil
-        local runtime = record and record.runtime or nil
-        if not internal or not record or not body then return true end
-        if combatBlockReason(record)
-            and internal.TryRespondToImmediateThreat
-            and internal.TryRespondToImmediateThreat(record, body)
-        then return true end
-        now = tonumber(now) or PNC.Core.Now()
-        if internal.ShouldScanFollowThreat
-            and internal.ShouldScanFollowThreat(record, now, true)
-            and internal.TryRespondToThreat
-            and internal.TryRespondToThreat(record, body, {
-                x = record.x, y = record.y,
-                radius = tonumber(Const.FOLLOW_COMBAT_LEASH_DISTANCE) or 5.5,
-            })
-        then return true end
+    -- The shared behavior coordinator owns threat acquisition and its
+    -- resumable CombatGuard lease. The task executor still advances the
+    -- scavenging worker independently; this handler keeps the Scavenge job
+    -- selected without opening a second, non-resumable combat lane.
+    PNC.BehaviorRegistry.Register("Scavenge", function()
         return true
     end)
 end

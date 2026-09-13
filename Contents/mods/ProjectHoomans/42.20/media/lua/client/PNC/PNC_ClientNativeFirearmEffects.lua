@@ -13,23 +13,28 @@ Native.Failures = Native.Failures or {}
 Native.EffectsManager = Native.EffectsManager
 Native.BulletTracerEffects = Native.BulletTracerEffects
 
-local function safeMethod(target, methodName, ...)
+local function readMethod(target, methodName, ...)
     local method
-    local ok
-    local value
     if not target then return nil end
     method = target[methodName]
     if type(method) ~= "function" then return nil end
-    ok, value = pcall(method, target, ...)
-    return ok and value or nil
+    return method(target, ...)
 end
 
-local function callMethod(target, methodName, ...)
+-- Native state/effect calls remain protected because they cross into mutable
+-- Java engine state and must degrade to the existing fallback on failure.
+local function callNative(target, methodName, ...)
     local method
     if not target then return false, nil end
     method = target[methodName]
     if type(method) ~= "function" then return false, nil end
     return pcall(method, target, ...)
+end
+
+-- A tracer burst can contain many projectiles. Protect the whole native
+-- emission batch once instead of wrapping every addEffect call separately.
+local function callNativeBatch(callback)
+    return pcall(callback)
 end
 
 local function recordFailure(reason)
@@ -62,9 +67,11 @@ local function nativeSingleton(classObject)
     if not classObject then return nil end
     getter = classObject.getInstance
     if type(getter) ~= "function" then return nil end
+    -- This is an optional Java singleton, not a normal Lua API. Some builds
+    -- expose the class name but do not expose a callable getInstance bridge;
+    -- contain that one boundary failure so the Bandits-compatible fallback
+    -- can still run.
     ok, instance = pcall(getter)
-    if ok and instance then return instance end
-    ok, instance = pcall(getter, classObject)
     return ok and instance or nil
 end
 
@@ -99,18 +106,7 @@ local function getBulletTracerEffects()
 end
 
 local function isNativeFirearm(weapon)
-    return weapon and safeMethod(weapon, "isAimedFirearm") == true
-end
-
-local function isAnimationReady(body)
-    local animationPlayer
-    if not body or type(body.getAnimationPlayer) ~= "function" then
-        return false
-    end
-    animationPlayer = safeMethod(body, "getAnimationPlayer")
-    return animationPlayer
-        and safeMethod(animationPlayer, "isReady") == true
-        or false
+    return weapon and readMethod(weapon, "isAimedFirearm") == true
 end
 
 local function distanceBetween(x1, y1, z1, x2, y2, z2)
@@ -121,12 +117,12 @@ local function distanceBetween(x1, y1, z1, x2, y2, z2)
 end
 
 local function resolveRange(body, weapon, payload)
-    local range = tonumber(safeMethod(weapon, "getMaxRange", body))
-    local sx = tonumber(body and safeMethod(body, "getX"))
+    local range = tonumber(readMethod(weapon, "getMaxRange", body))
+    local sx = tonumber(body and readMethod(body, "getX"))
         or tonumber(payload and payload.sx)
-    local sy = tonumber(body and safeMethod(body, "getY"))
+    local sy = tonumber(body and readMethod(body, "getY"))
         or tonumber(payload and payload.sy)
-    local sz = tonumber(body and safeMethod(body, "getZ"))
+    local sz = tonumber(body and readMethod(body, "getZ"))
         or tonumber(payload and payload.sz)
     local tx = tonumber(payload and payload.tx)
     local ty = tonumber(payload and payload.ty)
@@ -139,11 +135,11 @@ local function resolveRange(body, weapon, payload)
 end
 
 local function resolveEndpoint(body, payload, projectileIndex, projectileCount, spread)
-    local sx = tonumber(body and safeMethod(body, "getX"))
+    local sx = tonumber(body and readMethod(body, "getX"))
         or tonumber(payload and payload.sx)
-    local sy = tonumber(body and safeMethod(body, "getY"))
+    local sy = tonumber(body and readMethod(body, "getY"))
         or tonumber(payload and payload.sy)
-    local sz = tonumber(body and safeMethod(body, "getZ"))
+    local sz = tonumber(body and readMethod(body, "getZ"))
         or tonumber(payload and payload.sz)
     local tx = tonumber(payload and payload.tx)
     local ty = tonumber(payload and payload.ty)
@@ -174,7 +170,7 @@ local function resolveEndpoint(body, payload, projectileIndex, projectileCount, 
 end
 
 local function projectileCount(body, weapon, payload)
-    local count = tonumber(safeMethod(weapon, "getProjectileCount"))
+    local count = tonumber(readMethod(weapon, "getProjectileCount"))
         or tonumber(payload and payload.projectileCount)
         or 1
     return math.max(1, math.min(32, math.floor(count)))
@@ -193,14 +189,17 @@ local function withNativeWeapon(body, weapon, callback)
     then
         return false, "native_weapon_state_api_missing"
     end
-    current = safeMethod(body, "getUseHandWeapon")
+    current = readMethod(body, "getUseHandWeapon")
     if current ~= weapon then
-        ok = callMethod(body, "setUseHandWeapon", weapon)
+        ok = callNative(body, "setUseHandWeapon", weapon)
         if not ok then return false, "native_weapon_state_set_failed" end
         changed = true
     end
+    -- This is an intentional scoped pcall: it gives the temporary native
+    -- weapon override a finally-like restoration path if a future effect
+    -- call or modded callback raises.
     callbackOk, result, reason = pcall(callback)
-    if changed then callMethod(body, "setUseHandWeapon", current) end
+    if changed then callNative(body, "setUseHandWeapon", current) end
     if not callbackOk then return false, "native_effect_exception" end
     return result, reason
 end
@@ -213,20 +212,17 @@ function Native.PlayMuzzleFlash(body, weapon)
     if not body or not isNativeFirearm(weapon) then
         return false, "not_native_firearm"
     end
-    if not isAnimationReady(body) then
-        return false, "animation_player_not_ready"
-    end
-    primaryWeapon = safeMethod(body, "getPrimaryHandItem")
+    primaryWeapon = readMethod(body, "getPrimaryHandItem")
     if primaryWeapon and primaryWeapon ~= weapon then
         return false, "primary_weapon_mismatch"
     end
-    muzzleModel = safeMethod(weapon, "getMuzzleFlashModelKey")
+    muzzleModel = readMethod(weapon, "getMuzzleFlashModelKey")
     if not muzzleModel or tostring(muzzleModel) == "" then
         return false, "muzzle_flash_model_missing"
     end
     manager = getEffectsManager()
     if not manager then return false, "effects_manager_unavailable" end
-    ok = callMethod(manager, "startMuzzleFlash", body, 1)
+    ok = callNative(manager, "startMuzzleFlash", body, 1)
     if not ok then return false, "native_muzzle_flash_call_failed" end
     return true, "native_muzzle_flash"
 end
@@ -246,19 +242,21 @@ function Native.PlayTracer(body, weapon, payload)
     local z
     local ok
     local effect
+    local addEffect
     if not body or not isNativeFirearm(weapon) then
         return false, "not_native_firearm"
     end
-    if not isAnimationReady(body) then
-        return false, "animation_player_not_ready"
-    end
-    ammoType = safeMethod(weapon, "getAmmoType")
+    ammoType = readMethod(weapon, "getAmmoType")
     if not ammoType then return false, "ammo_type_missing" end
     tracer = getBulletTracerEffects()
     if not tracer then return false, "bullet_tracer_unavailable" end
+    addEffect = tracer.addEffect
+    if type(addEffect) ~= "function" then
+        return false, "native_tracer_method_missing"
+    end
     range = resolveRange(body, weapon, payload)
     count = projectileCount(body, weapon, payload)
-    spread = tonumber(safeMethod(weapon, "getProjectileSpread"))
+    spread = tonumber(readMethod(weapon, "getProjectileSpread"))
         or tonumber(payload and payload.projectileSpread)
         or 0
     hasEndpoint = payload
@@ -267,25 +265,27 @@ function Native.PlayTracer(body, weapon, payload)
         and tonumber(payload.tz) ~= nil
 
     local function emit()
-        controller = safeMethod(body, "getBallisticsController")
+        controller = readMethod(body, "getBallisticsController")
         if not controller and type(body.updateBallistics) == "function" then
-            ok = callMethod(body, "updateBallistics")
+            ok = callNative(body, "updateBallistics")
             if not ok then return false, "ballistics_update_failed" end
-            controller = safeMethod(body, "getBallisticsController")
+            controller = readMethod(body, "getBallisticsController")
         end
         if not controller then return false, "ballistics_controller_missing" end
         if hasEndpoint then
-            for i = 1, count do
-                x, y, z = resolveEndpoint(body, payload, i, count, spread)
-                ok, effect = callMethod(tracer, "addEffect", body, range, x, y, z)
-                if not ok then
-                    if added == 0 then return false, "native_tracer_call_failed" end
-                    break
+            local function emitEndpointEffects()
+                for i = 1, count do
+                    x, y, z = resolveEndpoint(body, payload, i, count, spread)
+                    effect = addEffect(tracer, body, range, x, y, z)
+                    if effect then added = added + 1 end
                 end
-                if effect then added = added + 1 end
+            end
+            ok = callNativeBatch(emitEndpointEffects)
+            if not ok and added == 0 then
+                return false, "native_tracer_call_failed"
             end
         else
-            ok, effect = callMethod(tracer, "addEffect", body, range)
+            ok, effect = callNative(tracer, "addEffect", body, range)
             if ok and effect then added = 1 end
         end
         if added <= 0 then return false, "native_tracer_not_created" end
@@ -296,21 +296,17 @@ function Native.PlayTracer(body, weapon, payload)
 end
 
 function Native.GetCapabilities(body, weapon)
-    local animationPlayer = body and safeMethod(body, "getAnimationPlayer") or nil
-    local muzzleModel = weapon and safeMethod(weapon, "getMuzzleFlashModelKey") or nil
+    local muzzleModel = weapon and readMethod(weapon, "getMuzzleFlashModelKey") or nil
     return {
         effectsManager = getEffectsManager() ~= nil,
         bulletTracerEffects = getBulletTracerEffects() ~= nil,
         aimedFirearm = isNativeFirearm(weapon) == true,
-        ammoType = weapon and safeMethod(weapon, "getAmmoType") ~= nil or false,
+        ammoType = weapon and readMethod(weapon, "getAmmoType") ~= nil or false,
         muzzleFlashModel = muzzleModel ~= nil and tostring(muzzleModel) ~= "" or false,
-        animationReady = animationPlayer
-            and safeMethod(animationPlayer, "isReady") == true
-            or false,
         ballisticsController = body
-            and safeMethod(body, "getBallisticsController") ~= nil
+            and readMethod(body, "getBallisticsController") ~= nil
             or false,
-        weaponFullType = weapon and tostring(safeMethod(weapon, "getFullType") or "")
+        weaponFullType = weapon and tostring(readMethod(weapon, "getFullType") or "")
             or nil,
     }
 end

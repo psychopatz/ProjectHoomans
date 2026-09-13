@@ -54,7 +54,9 @@ local function configureAttack(zombie, npcBody, bumpType)
     local previousNoTeeth = zombie.isNoTeeth
         and zombie:isNoTeeth() or false
     if npcBody.setZombiesDontAttack then
-        npcBody:setZombiesDontAttack(false)
+        -- BumpedChr is the PNC attack lane. Keep the carrier shell outside
+        -- vanilla zombie target acquisition while the scripted bite runs.
+        npcBody:setZombiesDontAttack(true)
     end
     -- BumpedChr owns this scripted attack; setTarget() would create an
     -- unsupported MP character goal for the IsoZombie NPC shell.

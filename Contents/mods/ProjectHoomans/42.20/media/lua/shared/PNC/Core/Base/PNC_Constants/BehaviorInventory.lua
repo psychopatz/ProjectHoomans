@@ -64,11 +64,12 @@ Const.FOLLOW_TICK_INTERVAL_MS = 100
 Const.FOLLOW_IDLE_TICK_INTERVAL_MS = 350
 Const.FOLLOW_THREAT_ACTIVE_SCAN_MS = 150
 Const.FOLLOW_THREAT_IDLE_SCAN_MS = 350
--- Seated NPCs only need a lightweight local safety check. Keep acquisition
+-- Passive behavior uses one lightweight tactical arbiter. Keep acquisition
 -- slower than combat while validating an active threat often enough to stop
 -- promptly when it is no longer hostile.
-Const.SEATED_THREAT_SCAN_MS = 750
-Const.SEATED_THREAT_VALIDATE_MS = 250
+Const.THREAT_GUARD_SCAN_MS = 350
+Const.THREAT_GUARD_VALIDATE_MS = 250
+Const.THREAT_GUARD_RELEASE_GRACE_MS = 900
 Const.FOLLOW_COMBAT_LEASH_DISTANCE = 5.5
 Const.FOLLOW_OWNER_MOVE_EPSILON = 0.08
 Const.FOLLOW_HORDE_AVOID_RADIUS = 6.5

@@ -9,7 +9,7 @@ local ballisticsUpdates = 0
 local weaponStateCalls = 0
 local tracerCalls = {}
 local currentUseWeapon
-local animationReady = true
+local animationReadinessProbes = 0
 
 local nativeManager = {
     startMuzzleFlash = function(_, body, lightMode)
@@ -71,7 +71,12 @@ local body = {
     end,
     getBallisticsController = function() return controller end,
     getAnimationPlayer = function()
-        return { isReady = function() return animationReady end }
+        return {
+            isReady = function()
+                animationReadinessProbes = animationReadinessProbes + 1
+                error("AnimationPlayer:isReady must not be called from Kahlua")
+            end,
+        }
     end,
     getX = function() return 10 end,
     getY = function() return 10 end,
@@ -118,28 +123,13 @@ T.equal(currentUseWeapon, nil, "temporary native weapon state was not restored")
 T.equal(weaponStateCalls, 2, "native weapon state was not scoped")
 T.equal(#Effects.ActiveLights, 0, "fallback light was spawned beside native flash")
 T.equal(#Effects.ActiveTracers, 0, "fallback tracer was spawned beside native tracer")
+T.equal(animationReadinessProbes, 0, "Kahlua probed opaque AnimationPlayer userdata")
 
 local capabilities = Effects.GetNativeCapabilities(body, payload)
 T.truthy(capabilities.effectsManager, "native effects manager was not detected")
 T.truthy(capabilities.bulletTracerEffects, "native tracer service was not detected")
 T.truthy(capabilities.aimedFirearm, "custom firearm was rejected as a firearm")
-T.truthy(capabilities.animationReady, "ready animation player was not detected")
-
-animationReady = false
-capabilities = Effects.GetNativeCapabilities(body, payload)
-T.falsy(capabilities.animationReady, "unready animation player was accepted")
-T.truthy(Effects.Play({
-    shotId = "custom-weapon-shot-unready",
-    shooterOnlineID = 22,
-    weaponFullType = "ExampleMod.CustomCarbine",
-    sx = 10, sy = 10, sz = 0,
-    tx = 20, ty = 10, tz = 1,
-    maxRange = 18,
-    projectileCount = 3,
-    projectileSpread = 2,
-}), "unready weapon effect did not fail safely")
-T.equal(muzzleCalls, 1, "unready body invoked native muzzle flash")
-T.equal(#tracerCalls, 3, "unready body invoked native tracer")
+T.equal(animationReadinessProbes, 0, "capability inspection probed opaque AnimationPlayer userdata")
 
 T.falsy(Effects.Play(payload), "duplicate firearm shot was replayed")
 T.equal(#tracerCalls, 3, "duplicate shot created additional native tracers")

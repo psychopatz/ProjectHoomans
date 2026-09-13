@@ -34,6 +34,7 @@ local useless = false
 local uselessWrites = 0
 local nativeCorpseDragFlag = false
 local noTeeth = false
+local zombiesDontAttack = false
 local vanillaTarget = {}
 local actionState = "idle"
 local modData = { PNC_NPC = true }
@@ -62,6 +63,9 @@ local managedBody = {
     end,
     isUseless = function() return useless end,
     setNoTeeth = function(_, value) noTeeth = value end,
+    setZombiesDontAttack = function(_, value)
+        zombiesDontAttack = value
+    end,
     setVariable = function(_, key, value) variables[key] = value end,
     isNoTeeth = function() return noTeeth end,
     getTarget = function() return vanillaTarget end,
@@ -154,6 +158,8 @@ T.equal(noTeeth, true, "humanized no-teeth fail-safe reasserted")
 T.equal(vanillaTarget, nil, "humanized vanilla target cleared")
 T.equal(variables.NoLungeAttack, true,
     "humanized carrier did not retain the native lunge gate")
+T.equal(zombiesDontAttack, true,
+    "humanized carrier remained available to native zombie targeting")
 T.equal(#stopped, 12, "first maintenance suppresses voices")
 local writesAfterInitialMaintenance = uselessWrites
 PNC.LiveBodyControl.MaintainHumanizedBody(managedBody, 1100)
@@ -253,6 +259,8 @@ T.equal(noTeeth, true, "zombie update repairs persisted teeth flag")
 T.equal(nativeCorpseDragFlag, false,
     "zombie update repairs leaked native corpse-drag flag")
 T.equal(vanillaTarget, nil, "zombie update clears persisted target")
+T.equal(zombiesDontAttack, true,
+    "zombie update keeps native targeting closed for the managed shell")
 
 vanillaTarget = {}
 variables.NoLungeAttack = false
@@ -319,6 +327,12 @@ T.equal(vanillaTarget, nil,
     "seated carrier retained a native target")
 T.equal(modData.PNC_BumpKeepUseless, true,
     "seated chair lease was allowed to restore engine movement ownership")
+local seatPresentationKind, seatPresentationReason =
+    PNC.LiveBodyControl.ResolveStationaryPresentation(managedRecord, 1000)
+T.equal(seatPresentationKind, "seat",
+    "stationary presentation resolver lost the active seat owner")
+T.equal(seatPresentationReason, "seated_safety",
+    "stationary presentation resolver lost the seat safety reason")
 modData.PNC_BumpActionLease = nil
 modData.PNC_BumpActionLeaseUntil = nil
 modData.PNC_BumpRequestedType = nil
@@ -354,6 +368,21 @@ T.equal(vanillaTarget, nil,
     "sleeping carrier retained a native target")
 T.equal(modData.PNC_BumpKeepUseless, true,
     "sleep lease was allowed to restore engine movement ownership")
+managedRecord.runtime.threatGuard = { active = true }
+T.truthy(
+    PNC.LiveBodyControl.IsPresentationCombatActive(managedRecord, 1000),
+    "generic presentation combat includes the threat-guard lease"
+)
+T.truthy(
+    PNC.LiveBodyControl.IsPresentationCombatActive(managedRecord, 1000),
+    "sleep combat includes the threat-guard lease"
+)
+local sleepPresentationKind, sleepPresentationReason =
+    PNC.LiveBodyControl.ResolveStationaryPresentation(managedRecord, 1000)
+T.falsy(sleepPresentationKind,
+    "active threat guard displaces the sleep presentation owner")
+T.falsy(sleepPresentationReason,
+    "active threat guard removes the sleep safety reason")
 modData.PNC_BumpActionLease = nil
 modData.PNC_BumpActionLeaseUntil = nil
 modData.PNC_BumpRequestedType = nil

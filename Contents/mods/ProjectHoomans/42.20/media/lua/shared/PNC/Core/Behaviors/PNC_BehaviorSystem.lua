@@ -19,7 +19,7 @@ require "PNC/Core/Behaviors/PNC_Behavior_Fishing"
 require "PNC/Core/Behaviors/PNC_Behavior_Incapacitated"
 require "PNC/Core/Behaviors/PNC_Behavior_Treatment"
 require "PNC/Core/Behaviors/BehaviorCompanion/PNC_BehaviorCompanion"
-require "PNC/Core/Behaviors/PNC_Behavior_SeatedThreat"
+require "PNC/Core/Behaviors/ThreatGuard/PNC_BehaviorThreatGuard"
 require "PNC/Core/Behaviors/PNC_Behavior_Hostile"
 require "PNC/Core/Behaviors/PNC_Behavior_Roaming"
 
@@ -38,7 +38,7 @@ local Treatment = PNC.BehaviorTreatment
 local Companion = PNC.BehaviorCompanion
 local Hostile = PNC.BehaviorHostile
 local Combat = PNC.BehaviorCombat
-local SeatedThreat = PNC.BehaviorSeatedThreat
+local ThreatGuard = PNC.BehaviorThreatGuard
 local AnimationScenes = PNC.AnimationScenes
 local LiveBodyControl = PNC.LiveBodyControl
 local ScalingDiagnostics = PNC.PerformanceScalingDiagnostics
@@ -223,6 +223,15 @@ function Behavior.Tick(record, zombie, now)
         return
     end
 
+    -- ThreatGuard is the single tactical owner for passive orders and
+    -- presentation leases. It runs before any job or scene can clear its
+    -- target, while the original order remains available for resumption.
+    if ThreatGuard and ThreatGuard.Tick
+        and ThreatGuard.Tick(record, zombie, now)
+    then
+        return
+    end
+
     -- A roaming seat is a transient presentation lease. It owns only the
     -- live route/scene while active; the durable roam order remains intact.
     -- The server service is loaded after this shared coordinator, so resolve
@@ -230,15 +239,6 @@ function Behavior.Tick(record, zombie, now)
     local roamingSeat = PNC.RoamingSeat
     if roamingSeat and roamingSeat.Tick
         and roamingSeat.Tick(record, zombie, now)
-    then
-        return
-    end
-
-    -- Automatic ambient seating is a blocking presentation scene. Give it a
-    -- narrow perception/combat handoff before the scene can consume the tick;
-    -- the arbiter keeps the facility activity alive for later resumption.
-    if SeatedThreat and SeatedThreat.Tick
-        and SeatedThreat.Tick(record, zombie, now)
     then
         return
     end

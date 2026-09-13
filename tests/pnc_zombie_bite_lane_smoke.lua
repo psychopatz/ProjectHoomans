@@ -10,6 +10,7 @@ local laneReason = "wall"
 local visibilityKind = "blocked"
 local damageCount = 0
 local bumpType = ""
+local zombiesDontAttack
 
 local npcBody = {
     x = 1,
@@ -21,7 +22,9 @@ local npcBody = {
     isDead = function() return false end,
     isProne = function() return false end,
     isCrawling = function() return false end,
-    setZombiesDontAttack = function() end,
+    setZombiesDontAttack = function(_, value)
+        zombiesDontAttack = value
+    end,
 }
 
 local zombie = {
@@ -128,6 +131,8 @@ visibilityKind = "clear"
 T.truthy(PNC.ZombieAggro.TryStartBite(zombie, npcBody, record) == true,
     "clear adjacent lane did not start a bite")
 T.truthy(bumpType == "Bite", "clear bite did not enter windup")
+T.equal(zombiesDontAttack, true,
+    "scripted bite reopened native targeting for the shell")
 
 laneClear = false
 laneReason = "wall"

@@ -103,27 +103,12 @@ local function refreshPursuitPath(zombie, npcBody, now)
         modData.PNC_AggroPathX = targetX
         modData.PNC_AggroPathY = targetY
     end
-    -- This is the legacy singleplayer pursuit handoff. Keep the selected NPC
-    -- as the native movement target for WalkTowardState; MP never calls this
-    -- function because its owner receives a separate movement directive.
-    if zombie.setTarget
-        and (not zombie.getTarget or zombie:getTarget() ~= npcBody)
-    then
-        zombie:setTarget(npcBody)
-        if distanceSq > (3.5 * 3.5) and zombie.spotted then
-            zombie:spotted(npcBody, false)
-        end
-    end
-    local canSee = true
-    if zombie.CanSee then
-        canSee = zombie:CanSee(npcBody) == true
-    end
-    if canSee and zombie.pathToCharacter then
-        zombie:pathToCharacter(npcBody)
-        if Diagnostics then
-            Diagnostics.Increment("ZombieAggro.PathRequests")
-        end
-    elseif zombie.pathToLocationF then
+    -- PNC bodies are IsoZombie shells, not IsoPlayer targets. A native
+    -- character goal can enter Build 42's lunge/fence attack path, whose
+    -- animation event dereferences player-only state such as Moodles and
+    -- BodyDamage. Keep SP pursuit coordinate-only; the abstract bite lane
+    -- owns NPC damage separately.
+    if zombie.pathToLocationF then
         zombie:pathToLocationF(targetX, targetY, npcBody:getZ())
         if Diagnostics then
             Diagnostics.Increment("ZombieAggro.PathRequests")
@@ -273,7 +258,10 @@ local function pursueForcedTarget(zombie, npcBody, record, now)
     local zombieSquare
     local npcSquare
     if npcBody.setZombiesDontAttack then
-        npcBody:setZombiesDontAttack(false)
+        -- This flag protects the IsoZombie shell from vanilla zombie attack
+        -- acquisition. PNC's abstract bite lane does not use the native
+        -- target slot, so it remains independently targetable by PNC.
+        npcBody:setZombiesDontAttack(true)
     end
     distSq = Core.DistanceSq(zombie:getX(), zombie:getY(), npcBody:getX(), npcBody:getY())
     dist = math.sqrt(distSq)
@@ -299,10 +287,9 @@ local function pursueForcedTarget(zombie, npcBody, record, now)
             ZombieAggro.Stimulus.Emit(record, npcBody, now)
         end
     else
-        -- Restore the prior SP state machine. The client-side SP controller
-        -- owns the abstract NPC damage gate and this flag is not its target
-        -- selection mechanism.
-        setNoLungeAttack(zombie, false)
+        -- The client-side SP controller owns the abstract NPC damage gate.
+        -- Keep native lunge disabled because the shell is not an IsoPlayer.
+        setNoLungeAttack(zombie, true)
     end
     if isMultiplayerServer() then
         if zombie.setTarget then zombie:setTarget(nil) end

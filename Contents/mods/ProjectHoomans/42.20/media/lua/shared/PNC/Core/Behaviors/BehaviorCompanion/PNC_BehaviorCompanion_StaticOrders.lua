@@ -15,10 +15,10 @@ local function holdSeatedGuard(record, zombie)
         return false
     end
     now = Core and Core.Now and Core.Now() or 0
-    if LiveBodyControl.IsSeatedCombatActive
-        and LiveBodyControl.IsSeatedCombatActive(record, now)
+    if LiveBodyControl.IsPresentationCombatActive
+        and LiveBodyControl.IsPresentationCombatActive(record, now)
     then
-        -- SeatedThreat/Combat owns the live movement lane while a threat is
+        -- ThreatGuard/Combat owns the live movement lane while a threat is
         -- active. Do not clear its target or replace its combat route here.
         record.activeBehavior = "GuardAnchor:combat"
         return true
@@ -48,13 +48,6 @@ function Internal.TickGuardAnchor(record, zombie)
     )
     if anchorDistance > guardRadius then
         Common.ClearCombatTarget(record, "returning_to_guard_anchor", zombie)
-    elseif Internal.TryRespondToThreat(record, zombie, {
-        x = anchorX,
-        y = anchorY,
-        radius = guardRadius,
-    }, { areaDefense = true }) then
-        record.activeBehavior = "GuardAnchor:combat"
-        return true
     end
     if holdSeatedGuard(record, zombie) then return true end
     record.activeBehavior = "GuardAnchor"
@@ -76,9 +69,6 @@ function Internal.TickPatrolRoute(record, zombie)
     local order = record.orderSpec or {}
     local patrolPoints
     local point
-    if Internal.TryRespondToThreat(record, zombie) then
-        return true
-    end
     patrolPoints = order.points or record.patrolPoints or {}
     if #patrolPoints <= 0 then
         Common.ClearCombatTarget(record, "patrol_missing_points")

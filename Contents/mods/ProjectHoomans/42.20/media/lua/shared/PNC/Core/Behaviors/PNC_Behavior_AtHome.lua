@@ -21,7 +21,6 @@ local function normalize(_, spec)
 end
 
 function AtHome.Tick(record, zombie)
-    local Companion = PNC.BehaviorCompanion
     local order = record.orderSpec or {}
     local anchorX = tonumber(order.x) or record.anchorX or record.x
     local anchorY = tonumber(order.y) or record.anchorY or record.y
@@ -29,19 +28,6 @@ function AtHome.Tick(record, zombie)
     local radius = math.max(1, tonumber(order.radius)
         or tonumber(Const and Const.GUARD_ENGAGE_RADIUS)
         or tonumber(Const and Const.GUARD_RADIUS) or 3)
-    local engaged = Companion and Companion.Internal
-        and Companion.Internal.TryRespondToThreat
-        and Companion.Internal.TryRespondToThreat(
-            record,
-            zombie,
-            { x = anchorX, y = anchorY, z = anchorZ, radius = radius },
-            { areaDefense = true }
-        )
-    if engaged then
-        record.activeBehavior = "AtHome:combat"
-        return true
-    end
-
     -- Existing saves may still have a colony_home order anchored to the
     -- former stockpile point. Ask the authority-side home service to repair
     -- that anchor before this behavior freezes the actor in place. A repair

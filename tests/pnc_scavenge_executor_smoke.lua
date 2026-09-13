@@ -81,7 +81,7 @@ local sessions, leases = {}, {}
 local provider
 local lastMove, sceneRequests = {}, {}
 local restored, captured, broadcasts, pathResets = 0, 0, 0, 0
-local behaviorHandler, threatResponses, sceneInterrupts = nil, 0, 0
+local behaviorHandler, sceneInterrupts = nil, 0
 local poolRequests = 0
 local camped = false
 
@@ -167,13 +167,6 @@ PNC = {
         SetOrder = function(record, order) record.orderSpec = order end,
     },
     JobSystem = { RegisterOrder = function() return true end },
-    BehaviorCompanion = { Internal = {
-        ShouldScanFollowThreat = function() return true end,
-        TryRespondToThreat = function()
-            threatResponses = threatResponses + 1
-            return true
-        end,
-    } },
     BehaviorRegistry = { Register = function(job, handler)
         if job == "Scavenge" then behaviorHandler = handler end
         return true
@@ -251,8 +244,7 @@ local Executor = T.load("ProjectHoomans", "server",
 T.equal(provider, Executor, "task coordinator owns scavenge executor")
 T.truthy(behaviorHandler, "scavenge survival behavior registered")
 T.truthy(behaviorHandler(records.bob, bodies.bob, "Scavenge", clock),
-    "scavenge behavior retains combat primitive")
-T.equal(threatResponses, 1, "scavenger scans and responds to nearby threats")
+    "scavenge behavior retains task ownership")
 
 local function leaseFor(session, npcId)
     local lease = { leaseId = "lease:" .. session.id .. ":" .. npcId,

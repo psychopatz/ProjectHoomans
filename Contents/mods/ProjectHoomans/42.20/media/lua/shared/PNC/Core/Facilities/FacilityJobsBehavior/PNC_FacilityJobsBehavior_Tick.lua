@@ -395,12 +395,13 @@ function Internal.Tick(record, zombie)
             and PNC.NeedsUtils.WorldAgeHours() or nil
         if tostring(runtime.capability or "") == "sleep"
             and PNC.LiveBodyControl
-            and PNC.LiveBodyControl.StabilizeSleepingBody
+            and PNC.LiveBodyControl.StabilizePresentationBody
         then
-            PNC.LiveBodyControl.StabilizeSleepingBody(
+            PNC.LiveBodyControl.StabilizePresentationBody(
                 record,
                 zombie,
-                startupNow
+                startupNow,
+                "sleep"
             )
         end
         started, startReason = PNC.AnimationScenes.Request(record, zombie, sceneId, {

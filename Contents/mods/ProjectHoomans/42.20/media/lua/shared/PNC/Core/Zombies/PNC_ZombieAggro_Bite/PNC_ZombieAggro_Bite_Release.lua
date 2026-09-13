@@ -11,9 +11,10 @@ function BiteInternal.FinalizeRelease(zombieId, entry, now, reason)
     local npcBody = entry and entry.npcBody or nil
     local record = entry and Registry.Get(entry.npcId) or nil
     if npcBody and npcBody.setZombiesDontAttack then
-        npcBody:setZombiesDontAttack(
-            BiteInternal.ShouldPreventZombieAttack(record)
-        )
+        -- Releasing the abstract bite must not reopen the native attack
+        -- route. Managed NPCs are IsoZombie shells for their whole live
+        -- lifetime; the next PNC aggro tick may start another abstract bite.
+        npcBody:setZombiesDontAttack(true)
     end
     BiteInternal.SignalBumpFinish(zombie)
     if zombie and zombie.setBumpType then zombie:setBumpType("") end

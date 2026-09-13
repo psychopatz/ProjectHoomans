@@ -30,6 +30,9 @@ PNC = {
         UpdateTargetFromWorld = function(_, current)
             return threatActive and current or nil
         end,
+        ResolveImmediateZombieThreat = function()
+            return threatActive and target or nil
+        end,
     },
     Perception = {
         FindImmediateZombieThreat = function(_, radius)
@@ -59,10 +62,10 @@ PNC = {
     },
 }
 
-local SeatedThreat = T.load(
+local ThreatGuard = T.load(
     "ProjectHoomans",
     "shared",
-    "PNC/Core/Behaviors/PNC_Behavior_SeatedThreat.lua"
+    "PNC/Core/Behaviors/ThreatGuard/PNC_BehaviorThreatGuard.lua"
 )
 
 local record = {
@@ -93,23 +96,23 @@ local record = {
 }
 
 local body = {}
-T.truthy(SeatedThreat.Tick(record, body, now),
+T.truthy(ThreatGuard.Tick(record, body, now),
     "seated camp NPC enters combat when a nearby zombie is visible")
 T.equal(interrupts, 1, "seated scene is interrupted exactly once")
 T.equal(engagements, 1, "seated threat enters the existing combat pipeline")
 T.equal(record.runtime.target, target,
     "seated threat stores the resolved combat target")
-T.truthy(record.runtime.seatedThreat
-        and record.runtime.seatedThreat.active == true,
+T.truthy(record.runtime.threatGuard
+        and record.runtime.threatGuard.active == true,
     "seated combat keeps a transient resume state")
 
 threatActive = false
-now = 1500
-T.falsy(SeatedThreat.Tick(record, body, now),
+now = 2000
+T.falsy(ThreatGuard.Tick(record, body, now),
     "seated combat yields when the zombie is resolved")
 T.equal(clears, 1, "seated combat clears its transient combat lease")
 T.falsy(record.runtime.target, "resolved seated combat has no stale target")
-T.falsy(record.runtime.seatedThreat,
+T.falsy(record.runtime.threatGuard,
     "resolved seated combat clears its resume state")
 T.truthy(record.runtime.facilityActivity,
     "resolved seated combat preserves the facility activity for resumption")
@@ -154,7 +157,7 @@ local homeRecord = {
     },
     orderSpec = { kind = "facility_activity" },
 }
-T.truthy(SeatedThreat.Tick(homeRecord, body, now),
+T.truthy(ThreatGuard.Tick(homeRecord, body, now),
     "seated home NPC enters combat when a nearby zombie is visible")
 T.equal(interrupts, 2,
     "seated home scene is interrupted by a nearby hostile")
@@ -162,8 +165,8 @@ T.equal(engagements, 2,
     "seated home threat uses the existing combat pipeline")
 
 threatActive = false
-now = 2500
-T.falsy(SeatedThreat.Tick(homeRecord, body, now),
+now = 3000
+T.falsy(ThreatGuard.Tick(homeRecord, body, now),
     "seated home combat yields when the zombie is resolved")
 T.truthy(homeRecord.runtime.facilityActivity,
     "resolved home combat preserves the facility activity for resumption")
@@ -208,7 +211,7 @@ local guardRecord = {
     },
     orderSpec = { kind = "facility_activity" },
 }
-T.truthy(SeatedThreat.Tick(guardRecord, body, now),
+T.truthy(ThreatGuard.Tick(guardRecord, body, now),
     "seated guard enters combat when a nearby zombie is visible")
 T.equal(interrupts, 3,
     "seated guard scene is interrupted by a nearby hostile")

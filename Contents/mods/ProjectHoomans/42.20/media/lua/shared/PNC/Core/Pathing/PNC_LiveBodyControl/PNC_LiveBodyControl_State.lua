@@ -141,7 +141,7 @@ function LiveBodyControl.IsSeated(record)
         or false
 end
 
-function LiveBodyControl.ReleaseSeatedMovement(record, zombie, reason)
+function LiveBodyControl.ReleasePresentationMovement(record, zombie, reason)
     local runtime = record and record.runtime or nil
     local intent = runtime and runtime.moveIntent or nil
     local hasMovementOwner = runtime and (
@@ -155,7 +155,11 @@ function LiveBodyControl.ReleaseSeatedMovement(record, zombie, reason)
         return true
     end
     if PNC.EnginePathPlanner and PNC.EnginePathPlanner.Invalidate then
-        PNC.EnginePathPlanner.Invalidate(record, reason or "seated_hold", zombie)
+        PNC.EnginePathPlanner.Invalidate(
+            record,
+            reason or "presentation_hold",
+            zombie
+        )
     end
     if runtime then
         runtime.moveIntent = nil
@@ -170,7 +174,7 @@ function LiveBodyControl.IsPresentationCombatActive(record, now)
     local health = record and record.health or nil
     local attackAction = runtime and runtime.attackAction or nil
     local target = runtime and runtime.target or nil
-    local seatedThreat = runtime and runtime.seatedThreat or nil
+    local threatGuard = runtime and runtime.threatGuard or nil
     if not runtime then return false end
     now = tonumber(now) or (PNC.Core and PNC.Core.Now
         and PNC.Core.Now() or 0)
@@ -181,16 +185,13 @@ function LiveBodyControl.IsPresentationCombatActive(record, now)
     then
         return true
     end
-    if seatedThreat and seatedThreat.active == true then return true end
     if now < (tonumber(runtime.inCombatUntil) or 0) then return true end
     return now < (tonumber(health and health.recentDamageUntil) or 0)
+        or threatGuard and threatGuard.active == true
+        or false
 end
 
-function LiveBodyControl.IsSeatedCombatActive(record, now)
-    return LiveBodyControl.IsPresentationCombatActive(record, now)
-end
-
-function LiveBodyControl.IsSeatedNativeResetState(actionState)
+function LiveBodyControl.IsPresentationNativeResetState(actionState)
     actionState = string.lower(tostring(actionState or ""))
     return PRESENTATION_NATIVE_RESET_STATES[actionState] == true
 end
@@ -216,13 +217,32 @@ function LiveBodyControl.IsSleepWakeActive(record)
         or false
 end
 
-function LiveBodyControl.IsSleepingCombatActive(record, now)
-    return LiveBodyControl.IsPresentationCombatActive(record, now)
+-- Resolve the one stationary presentation that currently owns the native
+-- carrier. Combat is an explicit override; a sleep wake transaction remains
+-- authoritative until it finishes its native release and surface cleanup.
+function LiveBodyControl.ResolveStationaryPresentation(record, now)
+    if LiveBodyControl.IsSleepWakeActive(record) then
+        return "sleep_wake", "sleep_wake"
+    end
+    if LiveBodyControl.IsSeated(record)
+        and not LiveBodyControl.IsPresentationCombatActive(record, now)
+    then
+        return "seat", "seated_safety"
+    end
+    if LiveBodyControl.IsSleeping(record)
+        and not LiveBodyControl.IsPresentationCombatActive(record, now)
+    then
+        return "sleep", "sleep_safety"
+    end
+    return nil, nil
 end
 
-function LiveBodyControl.IsSleepingNativeResetState(actionState)
-    actionState = string.lower(tostring(actionState or ""))
-    return PRESENTATION_NATIVE_RESET_STATES[actionState] == true
+function LiveBodyControl.IsStationaryPresentationBumpType(kind, bumpType)
+    kind = tostring(kind or "")
+    bumpType = tostring(bumpType or "")
+    if kind == "seat" then return bumpType == "PNC_SitChair" end
+    return kind == "sleep"
+        and (bumpType == "PNC_Sleep" or bumpType == "PNC_SleepBed")
 end
 
 -- Read the action-context state through IsoGameCharacter's exposed wrapper.
@@ -501,11 +521,11 @@ function LiveBodyControl.ResetNativeMovementState(zombie)
     return true
 end
 
--- Seating has a second native-state lane that is not covered by the generic
--- movement state classes (notably turnalerted). Keep that reset explicitly
--- scoped to a live seat owner so combat and unrelated NPC movement cannot be
--- cleared by a general recovery call.
-function LiveBodyControl.ResetSeatedNativeMovementState(zombie)
+-- Stationary presentations have a second native-state lane that is not
+-- covered by the generic movement state classes (notably turnalerted). Keep
+-- that reset explicit so combat and unrelated NPC movement cannot be cleared
+-- by a general recovery call.
+function LiveBodyControl.ResetPresentationNativeMovementState(zombie)
     local actionState
     if not zombie
         or not zombie.changeState
@@ -515,78 +535,46 @@ function LiveBodyControl.ResetSeatedNativeMovementState(zombie)
         return false
     end
     actionState = LiveBodyControl.GetActionStateName(zombie)
-    if not LiveBodyControl.IsSeatedNativeResetState(actionState) then
+    if not LiveBodyControl.IsPresentationNativeResetState(actionState) then
         return false
     end
     zombie:changeState(ZombieIdleState.instance())
     return true
 end
 
-function LiveBodyControl.ResetSleepingNativeMovementState(zombie)
-    local actionState
-    if not zombie
-        or not zombie.changeState
-        or not ZombieIdleState
-        or not ZombieIdleState.instance
-    then
-        return false
-    end
-    actionState = LiveBodyControl.GetActionStateName(zombie)
-    if not LiveBodyControl.IsSleepingNativeResetState(actionState) then
-        return false
-    end
-    zombie:changeState(ZombieIdleState.instance())
-    return true
-end
-
--- Seat entry can occur between zombie-update callbacks. Stabilize the native
--- carrier at that ownership boundary so a stale walk/alert action cannot
--- survive into the first furniture scene frame.
-function LiveBodyControl.StabilizeSeatedBody(record, zombie, now)
+-- Presentation entry can occur between zombie-update callbacks. Stabilize the
+-- native carrier at that ownership boundary so a stale walk/alert action
+-- cannot survive into the first presentation frame.
+function LiveBodyControl.StabilizePresentationBody(record, zombie, now, kind)
     local modData
     local actionState
-    if not zombie or not LiveBodyControl.IsSeated(record)
-        or LiveBodyControl.IsSeatedCombatActive(record, now)
+    local active
+    local combatActive
+    local reason
+    if kind == "seat" then
+        active = LiveBodyControl.IsSeated(record)
+        combatActive = LiveBodyControl.IsPresentationCombatActive(record, now)
+        reason = "seated_entry"
+    elseif kind == "sleep" then
+        active = LiveBodyControl.IsSleeping(record)
+        combatActive = LiveBodyControl.IsPresentationCombatActive(record, now)
+        reason = "sleep_entry"
+    end
+    if not zombie or not active or combatActive
     then
         return false
     end
     now = tonumber(now) or (PNC.Core and PNC.Core.Now
         and PNC.Core.Now() or 0)
-    LiveBodyControl.ReleaseSeatedMovement(record, zombie, "seated_entry")
+    LiveBodyControl.ReleasePresentationMovement(record, zombie, reason)
     modData = zombie.getModData and zombie:getModData() or nil
-    if Internal.hasBumpActionLease(zombie, now) then
-        Internal.clearVanillaIntent(zombie)
-        Internal.applyActionLeaseSafeguards(zombie, modData)
-        return true
-    end
-    actionState = LiveBodyControl.GetActionStateName(zombie)
-    if LiveBodyControl.IsSeatedNativeResetState(actionState) then
-        LiveBodyControl.ResetSeatedNativeMovementState(zombie)
-    end
-    LiveBodyControl.ApplyHumanizedBodyFlags(zombie, false)
-    return true
-end
-
--- Sleep entry can occur between zombie-update callbacks. Stabilize the native
--- carrier at that ownership boundary so a stale walk/alert action cannot
--- survive into the first sleep scene frame.
-function LiveBodyControl.StabilizeSleepingBody(record, zombie, now)
-    local modData
-    local actionState
-    if not zombie or not LiveBodyControl.IsSleeping(record)
-        or LiveBodyControl.IsSleepingCombatActive(record, now)
-    then
-        return false
-    end
-    now = tonumber(now) or (PNC.Core and PNC.Core.Now
-        and PNC.Core.Now() or 0)
-    LiveBodyControl.ReleaseSeatedMovement(record, zombie, "sleep_entry")
-    modData = zombie.getModData and zombie:getModData() or nil
-    if modData
+    if kind == "sleep"
+        and modData
         and Internal.hasBumpActionLease(zombie, now)
-        and (tostring(modData.PNC_BumpRequestedType or "") == "PNC_Sleep"
-            or tostring(modData.PNC_BumpRequestedType or "")
-                == "PNC_SleepBed")
+        and LiveBodyControl.IsStationaryPresentationBumpType(
+            kind,
+            modData.PNC_BumpRequestedType
+        )
     then
         modData.PNC_BumpKeepUseless = true
     end
@@ -596,8 +584,8 @@ function LiveBodyControl.StabilizeSleepingBody(record, zombie, now)
         return true
     end
     actionState = LiveBodyControl.GetActionStateName(zombie)
-    if LiveBodyControl.IsSleepingNativeResetState(actionState) then
-        LiveBodyControl.ResetSleepingNativeMovementState(zombie)
+    if LiveBodyControl.IsPresentationNativeResetState(actionState) then
+        LiveBodyControl.ResetPresentationNativeMovementState(zombie)
     end
     LiveBodyControl.ApplyHumanizedBodyFlags(zombie, false)
     return true
@@ -641,10 +629,11 @@ function LiveBodyControl.SyncLocomotionState(zombie, moving)
     return actionState == "idle" or actionState == ""
 end
 
-function LiveBodyControl.SuppressVanillaIntent(
-    zombie,
-    keepEngineMovementActive
-)
+function LiveBodyControl.EnforceManagedNativeIntent(zombie)
+    -- Callers are already on a managed-body boundary. This primitive owns
+    -- only the native intent reset; higher-level body suppression adds its
+    -- own useless/movement state after calling it.
+    if not zombie then return false end
     if not Internal.clearVanillaIntent(zombie) then return false end
     if zombie.setVariable then
         -- A managed body is an IsoZombie carrier. Clearing target references
@@ -653,6 +642,22 @@ function LiveBodyControl.SuppressVanillaIntent(
         zombie:setVariable("NoLungeTarget", true)
         zombie:setVariable("NoLungeAttack", true)
         zombie:setVariable("PNCLive", true)
+    end
+    -- Native combat must never target a managed shell. PNC's abstract bite
+    -- lane uses BumpedChr and Health.ApplyDamage, so this does not disable
+    -- NPC-vs-zombie combat; it only blocks the player-shaped Java path.
+    if zombie.setZombiesDontAttack then
+        zombie:setZombiesDontAttack(true)
+    end
+    return true
+end
+
+function LiveBodyControl.SuppressVanillaIntent(
+    zombie,
+    keepEngineMovementActive
+)
+    if not LiveBodyControl.EnforceManagedNativeIntent(zombie) then
+        return false
     end
     LiveBodyControl.SetManagedBodyUseless(
         zombie,

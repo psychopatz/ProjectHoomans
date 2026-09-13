@@ -190,6 +190,13 @@ function LiveBodyControl.OnZombieUpdate(zombie)
             end
         end
     end
+    -- The single-player planner can touch native state after the shared
+    -- safety pass. Reapply only the target/lunge boundary here; do not reset
+    -- the action state, because PNC may currently own a traversal animation
+    -- or a native movement lease.
+    if LiveBodyControl.EnforceManagedNativeIntent then
+        LiveBodyControl.EnforceManagedNativeIntent(zombie)
+    end
     -- This runs before IsoZombie.updateInternal() reaches its post-event
     -- tryThump() call. If vanilla sees a window on the feeler tile, stop the
     -- zombie movement state here so it cannot enter the player-only climb

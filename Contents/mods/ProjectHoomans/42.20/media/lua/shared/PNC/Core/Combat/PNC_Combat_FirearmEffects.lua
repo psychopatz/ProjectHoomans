@@ -12,15 +12,12 @@ local Effects = PNC.FirearmEffects
 local Core = PNC.Core
 local Firearms = PNC.Firearms
 
-local function safeMethod(target, methodName, ...)
+local function readMethod(target, methodName, ...)
     local method
-    local ok
-    local value
     if not target then return nil end
     method = target[methodName]
     if type(method) ~= "function" then return nil end
-    ok, value = pcall(method, target, ...)
-    return ok and value or nil
+    return method(target, ...)
 end
 
 local function noiseMultiplier()
@@ -28,11 +25,9 @@ local function noiseMultiplier()
     local option
     local value
     if not getSandboxOptions then return 1 end
-    local ok
-    ok, options = pcall(getSandboxOptions)
-    if not ok then options = nil end
-    option = options and safeMethod(options, "getOptionByName", "FirearmNoiseMultiplier") or nil
-    value = option and tonumber(safeMethod(option, "getValue")) or nil
+    options = getSandboxOptions()
+    option = options and readMethod(options, "getOptionByName", "FirearmNoiseMultiplier") or nil
+    value = option and tonumber(readMethod(option, "getValue")) or nil
     return value and math.max(0, value) or 1
 end
 
@@ -46,7 +41,7 @@ local function publishWorldSound(shooter, descriptor)
     end
     radius = math.floor(radius * noiseMultiplier())
     if radius <= 0 then return false end
-    outside = safeMethod(shooter, "isOutside")
+    outside = readMethod(shooter, "isOutside")
     if outside == false then
         radius = math.max(1, math.floor(radius * 0.5))
     end
@@ -58,9 +53,9 @@ local function publishWorldSound(shooter, descriptor)
         ok = pcall(
             addSound,
             shooter,
-            math.floor(tonumber(safeMethod(shooter, "getX")) or 0),
-            math.floor(tonumber(safeMethod(shooter, "getY")) or 0),
-            math.floor(tonumber(safeMethod(shooter, "getZ")) or 0),
+            math.floor(tonumber(readMethod(shooter, "getX")) or 0),
+            math.floor(tonumber(readMethod(shooter, "getY")) or 0),
+            math.floor(tonumber(readMethod(shooter, "getZ")) or 0),
             radius,
             volume
         )
@@ -76,9 +71,9 @@ local function targetCoordinates(target)
     if not object and target.kind == "npc" and PNC.Registry and PNC.Registry.GetLiveZombie then
         object = PNC.Registry.GetLiveZombie(target.id)
     end
-    return tonumber(object and safeMethod(object, "getX") or target.x),
-        tonumber(object and safeMethod(object, "getY") or target.y),
-        tonumber(object and safeMethod(object, "getZ") or target.z)
+    return tonumber(object and readMethod(object, "getX") or target.x),
+        tonumber(object and readMethod(object, "getY") or target.y),
+        tonumber(object and readMethod(object, "getZ") or target.z)
 end
 
 function Effects.BuildShotPayload(record, shooter, target, weaponItem)
@@ -105,9 +100,9 @@ function Effects.BuildShotPayload(record, shooter, target, weaponItem)
         shooterOnlineID = PNC.Network and PNC.Network.GetZombieOnlineID
             and PNC.Network.GetZombieOnlineID(shooter)
             or nil,
-        sx = tonumber(shooter and safeMethod(shooter, "getX")) or tonumber(record.x) or 0,
-        sy = tonumber(shooter and safeMethod(shooter, "getY")) or tonumber(record.y) or 0,
-        sz = tonumber(shooter and safeMethod(shooter, "getZ")) or tonumber(record.z) or 0,
+        sx = tonumber(shooter and readMethod(shooter, "getX")) or tonumber(record.x) or 0,
+        sy = tonumber(shooter and readMethod(shooter, "getY")) or tonumber(record.y) or 0,
+        sz = tonumber(shooter and readMethod(shooter, "getZ")) or tonumber(record.z) or 0,
         tx = tx,
         ty = ty,
         tz = tz,

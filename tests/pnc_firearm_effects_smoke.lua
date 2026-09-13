@@ -102,6 +102,8 @@ local nativeTracerCalls = 0
 local currentUseWeapon
 local controller
 local removedLights = 0
+local lightCreated = 0
+local lastLight
 local impactSound
 local freeEmitterSound
 local liveWeapon = {
@@ -139,10 +141,16 @@ local body = {
     getEmitter = function() return emitter end,
 }
 local cell = {
-    addLamppost = function() end,
+    addLamppost = function(_, light)
+        lightCreated = lightCreated + 1
+        lastLight = light
+    end,
     removeLamppost = function() removedLights = removedLights + 1 end,
     getGridSquare = function()
         return {
+            getX = function() return 10 end,
+            getY = function() return 20 end,
+            getZ = function() return 0 end,
             playSound = function(_, sound) impactSound = sound end,
         }
     end,
@@ -159,6 +167,9 @@ getCore = function()
 end
 getRenderer = function()
     return {
+        render = function()
+            rendered = rendered + 1
+        end,
         renderline = function(_, _, x1, y1, x2, y2)
             rendered = rendered + 1
             renderLines[#renderLines + 1] = {
@@ -218,6 +229,8 @@ zombie = {
     },
 }
 
+isServer = function() return false end
+isIngameState = function() return true end
 T.load(CLIENT_FILE)
 
 T.equal(PNC.ClientFirearmEffects.Play(payload), true, "client shot rendered")
@@ -246,6 +259,11 @@ remotePayload.shotId = "npc_modded_rifle:remote:2:1100"
 remotePayload.shellFallSound = nil
 T.equal(PNC.ClientFirearmEffects.Play(remotePayload), true, "unresolved remote shot rendered")
 T.equal(freeEmitterSound, "ModdedRifleShot", "remote positional emitter uses packet weapon sound")
+T.equal(lightCreated, 1, "Bandits-compatible muzzle light created")
+T.equal(lastLight.args[8], 1, "muzzle light uses one-tick lifetime")
+T.equal(#PNC.ClientFirearmEffects.ActiveTracers, 3, "fallback tracers queued")
+PNC.ClientFirearmEffects.OnPreUIDraw()
+T.equal(rendered > 0, true, "fallback firearm effects rendered")
 T.finish("pnc_firearm_effects_smoke")
 
 T.finish("pnc_firearm_effects_smoke")

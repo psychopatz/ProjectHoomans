@@ -46,21 +46,18 @@ local function lower(value)
     return string.lower(tostring(value or ""))
 end
 
-local function safeMethod(target, methodName, ...)
+local function readMethod(target, methodName, ...)
     local method
-    local ok
-    local value
     if not target then return nil end
     method = target[methodName]
     if type(method) ~= "function" then return nil end
-    ok, value = pcall(method, target, ...)
-    return ok and value or nil
+    return method(target, ...)
 end
 
 local function itemKeyString(value)
     local key
     if value == nil then return nil end
-    key = safeMethod(value, "getItemKey")
+    key = readMethod(value, "getItemKey")
     if key ~= nil and tostring(key) ~= "" then
         return tostring(key)
     end
@@ -69,7 +66,7 @@ local function itemKeyString(value)
 end
 
 local function fullTypeOf(record, weaponItem)
-    local fullType = safeMethod(weaponItem, "getFullType")
+    local fullType = readMethod(weaponItem, "getFullType")
     if fullType and tostring(fullType) ~= "" then
         return tostring(fullType)
     end
@@ -78,18 +75,17 @@ end
 
 local function scriptItemFor(fullType)
     local manager
-    local ok
     local item
     if not fullType or not getScriptManager then return nil end
-    ok, manager = pcall(getScriptManager)
-    if not ok or not manager or not manager.getItem then return nil end
-    ok, item = pcall(manager.getItem, manager, fullType)
-    return ok and item or nil
+    manager = getScriptManager()
+    if not manager or type(manager.getItem) ~= "function" then return nil end
+    item = manager.getItem(manager, fullType)
+    return item
 end
 
 local function resolveFamily(fullType, scriptItem)
     local value = lower(fullType)
-    local category = lower(safeMethod(scriptItem, "getDisplayCategory"))
+    local category = lower(readMethod(scriptItem, "getDisplayCategory"))
     if string.find(value, "revolver", 1, true)
         or string.find(category, "revolver", 1, true)
     then
@@ -127,16 +123,16 @@ local function nonNegativeInteger(value)
 end
 
 local function resolveCapacity(weaponItem, scriptItem, reloadFamily)
-    return positiveInteger(safeMethod(scriptItem, "getClipSize"))
-        or positiveInteger(safeMethod(scriptItem, "getMaxAmmo"))
-        or positiveInteger(safeMethod(weaponItem, "getMaxAmmo"))
-        or positiveInteger(safeMethod(weaponItem, "getClipSize"))
+    return positiveInteger(readMethod(scriptItem, "getClipSize"))
+        or positiveInteger(readMethod(scriptItem, "getMaxAmmo"))
+        or positiveInteger(readMethod(weaponItem, "getMaxAmmo"))
+        or positiveInteger(readMethod(weaponItem, "getClipSize"))
         or CAPACITY_FALLBACKS[reloadFamily]
         or 8
 end
 
 local function resolveReloadDuration(record, scriptItem, reloadFamily)
-    local reloadMs = tonumber(safeMethod(scriptItem, "getReloadTime"))
+    local reloadMs = tonumber(readMethod(scriptItem, "getReloadTime"))
     local reloadLevel = Skills and Skills.GetLevel
         and math.max(0, math.min(10, tonumber(Skills.GetLevel(record, "Reloading")) or 0))
         or 0
@@ -182,7 +178,9 @@ local function primaryInventoryState(record, fullType)
 end
 
 Internal.Lower = lower
-Internal.SafeMethod = safeMethod
+-- Preserve the existing shared helper name while using direct reads for the
+-- standard HandWeapon/script-item API.
+Internal.SafeMethod = readMethod
 Internal.ItemKeyString = itemKeyString
 Internal.FullTypeOf = fullTypeOf
 Internal.ScriptItemFor = scriptItemFor

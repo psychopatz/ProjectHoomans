@@ -114,8 +114,8 @@ function Internal.TickSleepWake(record, zombie)
             then
                 PNC.LiveBodyControl.Internal.clearVanillaIntent(zombie)
             end
-            if PNC.LiveBodyControl.ResetSleepingNativeMovementState then
-                PNC.LiveBodyControl.ResetSleepingNativeMovementState(zombie)
+            if PNC.LiveBodyControl.ResetPresentationNativeMovementState then
+                PNC.LiveBodyControl.ResetPresentationNativeMovementState(zombie)
             end
             if PNC.LiveBodyControl.ApplyHumanizedBodyFlags then
                 PNC.LiveBodyControl.ApplyHumanizedBodyFlags(zombie, false)
@@ -188,8 +188,8 @@ function Internal.TickSleepWake(record, zombie)
         then
             PNC.LiveBodyControl.Internal.clearVanillaIntent(zombie)
         end
-        if PNC.LiveBodyControl.ResetSleepingNativeMovementState then
-            PNC.LiveBodyControl.ResetSleepingNativeMovementState(zombie)
+        if PNC.LiveBodyControl.ResetPresentationNativeMovementState then
+            PNC.LiveBodyControl.ResetPresentationNativeMovementState(zombie)
         end
         if PNC.LiveBodyControl.ApplyHumanizedBodyFlags then
             PNC.LiveBodyControl.ApplyHumanizedBodyFlags(zombie, false)
@@ -342,9 +342,8 @@ function Internal.Finish(record, zombie, reason, restoreOrder)
     end
     record.runtime.facilityActivity = nil
     record.runtime.facilityDebugWork = nil
-    record.runtime.seatedThreat = nil
-    record.runtime.seatedThreatNextScanAt = nil
-    record.runtime.seatedThreatNextValidateAt = nil
+    record.runtime.threatGuard = nil
+    record.runtime.threatGuardNextScanAt = nil
     if restoreOrder ~= false then
         PNC.OrderSystem.SetOrder(record, previous)
     end

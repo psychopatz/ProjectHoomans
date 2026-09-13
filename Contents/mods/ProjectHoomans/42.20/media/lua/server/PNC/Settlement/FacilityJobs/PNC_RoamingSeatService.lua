@@ -13,8 +13,6 @@ local Jobs = PNC.FacilityJobs
 local Resources = PNC.FacilityResources
 local Targets = PNC.FacilityInteractionTargets
 local Reservations = PNC.FacilityReservations
-local Targeting = PNC.BehaviorTargeting
-local Combat = PNC.BehaviorCombat
 local Diagnostics = PNC.PerformanceScalingDiagnostics
 
 Service.NextAttemptAt = Service.NextAttemptAt or {}
@@ -253,29 +251,6 @@ local function stop(record, zombie, reason)
     return finish(record, zombie, reason or "roaming_seat_stopped")
 end
 
-local function handleThreat(record, zombie, state, at)
-    local runtime = record and record.runtime or nil
-    local radius = tonumber(record.orderSpec and record.orderSpec.targetRadius)
-        or tonumber(Const.ROAM_TARGET_RADIUS) or 3
-    local target
-    if runtime and runtime.target and runtime.target.kind then
-        target = runtime.target
-    elseif at >= (tonumber(state.nextThreatScanAt) or 0)
-        and Targeting and Targeting.ResolveRoamingEngageTarget
-    then
-        state.nextThreatScanAt = at + 250
-        target = Targeting.ResolveRoamingEngageTarget(record, radius)
-    end
-    if not target then return false end
-    finish(record, zombie, "roaming_seat_threat", false)
-    record.runtime.target = target
-    record.activeBehavior = "Roam:seat:combat"
-    if Combat and Combat.TickEngage then
-        Combat.TickEngage(record, zombie, target)
-    end
-    return true
-end
-
 function Service.TryStart(record, zombie, order, roaming, at)
     local id = tostring(record and record.id or "")
     local candidate
@@ -394,16 +369,12 @@ function Service.Tick(record, zombie, at)
         stop(record, zombie, "roaming_seat_timeout")
         return true
     end
-    if runtime.seatedThreat and runtime.seatedThreat.active == true then
-        return false
-    end
     scene = runtime.animationScene
     if scene and scene.id == SCENE_ID then return false end
     if scene then
         stop(record, zombie, "roaming_seat_scene_replaced")
         return true
     end
-    if handleThreat(record, zombie, state, at) then return true end
     if not seating then
         stop(record, zombie, "roaming_seat_api_unavailable")
         return true

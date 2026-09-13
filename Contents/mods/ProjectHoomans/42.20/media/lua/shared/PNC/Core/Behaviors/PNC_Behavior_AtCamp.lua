@@ -59,31 +59,12 @@ local function normalize(record, spec)
 end
 
 function AtCamp.Tick(record, zombie)
-    local Companion = PNC.BehaviorCompanion
     local order = record.orderSpec or {}
     local anchorX = tonumber(order.x) or record.anchorX or record.x
     local anchorY = tonumber(order.y) or record.anchorY or record.y
     local anchorZ = tonumber(order.z) or record.anchorZ or record.z or 0
     local radius = math.max(0.5, tonumber(order.radius)
         or tonumber(Const.CAMP_RADIUS) or 3)
-    local engaged = Companion and Companion.Internal
-        and Companion.Internal.TryRespondToThreat
-        and Companion.Internal.TryRespondToThreat(
-            record,
-            zombie,
-            {
-                x = anchorX,
-                y = anchorY,
-                z = anchorZ,
-                radius = tonumber(Const.CAMP_ENGAGE_RADIUS) or radius,
-            },
-            { areaDefense = true }
-        )
-    if engaged then
-        record.activeBehavior = "AtCamp:combat"
-        return true
-    end
-
     if not isWithinCamp(
         record, zombie, anchorX, anchorY, anchorZ, radius
     ) then

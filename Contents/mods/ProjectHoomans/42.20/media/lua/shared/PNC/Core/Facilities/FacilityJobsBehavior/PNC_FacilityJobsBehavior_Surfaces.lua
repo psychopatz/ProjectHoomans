@@ -211,12 +211,13 @@ function Internal.EnterFurnitureSeat(record, zombie, runtime, order)
     runtime.seatState = "SEATED"
     runtime.phase = "SEATED"
     if PNC.LiveBodyControl
-        and PNC.LiveBodyControl.StabilizeSeatedBody
+        and PNC.LiveBodyControl.StabilizePresentationBody
     then
-        PNC.LiveBodyControl.StabilizeSeatedBody(
+        PNC.LiveBodyControl.StabilizePresentationBody(
             record,
             zombie,
-            PNC.Core and PNC.Core.Now and PNC.Core.Now() or 0
+            PNC.Core and PNC.Core.Now and PNC.Core.Now() or 0,
+            "seat"
         )
     end
     auditSeat("seat_entry_complete", record, zombie, runtime)

@@ -106,6 +106,12 @@ function LiveBodyControl.ApplyHumanizedBodyFlags(
     if zombie.setFakeDead then zombie:setFakeDead(false) end
     if zombie.setCanWalk then zombie:setCanWalk(true) end
     Internal.clearVanillaIntent(zombie)
+    if zombie.setZombiesDontAttack then
+        -- Humanized bodies remain IsoZombie carriers. Keep native zombie
+        -- acquisition disabled even when this cadence-bounded maintenance
+        -- pass runs outside the OnZombieUpdate safety boundary.
+        zombie:setZombiesDontAttack(true)
+    end
     if zombie.setAnimatingBackwards then zombie:setAnimatingBackwards(false) end
     LiveBodyControl.SetManagedBodyUseless(
         zombie,

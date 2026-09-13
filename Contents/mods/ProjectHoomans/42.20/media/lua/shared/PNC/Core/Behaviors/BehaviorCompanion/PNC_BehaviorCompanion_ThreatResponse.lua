@@ -22,7 +22,7 @@ local function targetWithinConstraint(target, constraint)
     return (dx * dx) + (dy * dy) <= radius * radius
 end
 
-local function engageResolvedTarget(record, zombie, target, constraint)
+function Internal.EngageResolvedTarget(record, zombie, target, constraint)
     if not target then return false end
     if not targetWithinConstraint(target, constraint) then
         Common.ClearCombatTarget(record, "target_outside_order_leash", zombie)
@@ -38,12 +38,7 @@ local function engageResolvedTarget(record, zombie, target, constraint)
     return true
 end
 
-local function tryEngageTarget(record, zombie, constraint, options)
-    if tostring(record.attackType or Const.ATTACK_TYPE_AUTO or "auto")
-        == tostring(Const.ATTACK_TYPE_NONE or "none")
-    then
-        return false
-    end
+function Internal.ResolveThreatTarget(record, constraint, options)
     local target
     if options and options.areaDefense == true
         and Targeting.ResolveRoamingEngageTarget
@@ -60,7 +55,20 @@ local function tryEngageTarget(record, zombie, constraint, options)
     else
         target = Targeting.ResolveCompanionEngageTarget(record)
     end
-    return engageResolvedTarget(record, zombie, target, constraint)
+    if not target or not targetWithinConstraint(target, constraint) then
+        return nil
+    end
+    return target
+end
+
+local function tryEngageTarget(record, zombie, constraint, options)
+    if tostring(record.attackType or Const.ATTACK_TYPE_AUTO or "auto")
+        == tostring(Const.ATTACK_TYPE_NONE or "none")
+    then
+        return false
+    end
+    local target = Internal.ResolveThreatTarget(record, constraint, options)
+    return Internal.EngageResolvedTarget(record, zombie, target, constraint)
 end
 
 local function tryAvoidThreat(record, zombie, options)
@@ -116,7 +124,7 @@ function Internal.TryRespondToImmediateThreat(record, zombie)
             and CombatTactics.AvoidThreat(record, zombie, target)
         return moved == true
     end
-    return engageResolvedTarget(record, zombie, target, nil)
+    return Internal.EngageResolvedTarget(record, zombie, target, nil)
 end
 
 function Internal.ShouldScanFollowThreat(record, now, active)

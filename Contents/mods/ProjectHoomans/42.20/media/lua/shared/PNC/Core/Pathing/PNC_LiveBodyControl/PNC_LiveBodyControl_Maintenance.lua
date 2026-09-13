@@ -63,25 +63,11 @@ function LiveBodyControl.ShouldKeepEngineMovementActive(record, zombie)
     local treatment = runtime and runtime.selfTreatment or nil
     local modData = zombie and zombie.getModData and zombie:getModData() or nil
     local now = Core and Core.Now and Core.Now() or 0
-    -- A chair is a stronger owner than a stale native movement lease. Combat
-    -- and damage still release the seat through the normal behavior arbiter.
-    if LiveBodyControl.IsSeated
-        and LiveBodyControl.IsSeated(record)
-        and not LiveBodyControl.IsSeatedCombatActive(record, now)
-    then
-        return false
-    end
-    if LiveBodyControl.IsSleepWakeActive
-        and LiveBodyControl.IsSleepWakeActive(record)
-    then
-        return false
-    end
-    -- Sleep owns the carrier in the same way a stationary seat does. A
-    -- stale native movement lease must not make the sleeping zombie useful
-    -- to the vanilla brain while the sleep presentation is active.
-    if LiveBodyControl.IsSleeping
-        and LiveBodyControl.IsSleeping(record)
-        and not LiveBodyControl.IsSleepingCombatActive(record, now)
+    -- A stationary presentation is stronger than a stale native movement
+    -- lease. Combat is an explicit override; otherwise the resolved owner
+    -- keeps the managed carrier useless to the vanilla brain.
+    if LiveBodyControl.ResolveStationaryPresentation
+        and LiveBodyControl.ResolveStationaryPresentation(record, now)
     then
         return false
     end

@@ -102,7 +102,10 @@ local function applyIncapacitatedLiveState(record, zombie)
         LiveBodyControl.SetManagedBodyUseless(zombie, true)
     end
     if zombie.setZombiesDontAttack then
-        zombie:setZombiesDontAttack(shouldPreventZombieAttack(record))
+        -- The live body is an IsoZombie shell. Native zombies must never
+        -- acquire it as a player-shaped combat target; PNC's abstract bite
+        -- validator still applies the gameplay targetability policy.
+        zombie:setZombiesDontAttack(true)
     end
     if zombie.setHealth then
         zombie:setHealth(Const.INCAPACITATED_ENGINE_BUFFER)
@@ -125,7 +128,7 @@ local function applyNormalLiveState(record, zombie)
         LiveBodyControl.SetManagedBodyUseless(zombie, true)
     end
     if zombie.setZombiesDontAttack then
-        zombie:setZombiesDontAttack(shouldPreventZombieAttack(record))
+        zombie:setZombiesDontAttack(true)
     end
     if zombie.setHealth then
         zombie:setHealth(Const.DEFAULT_ENGINE_BUFFER)
@@ -150,7 +153,7 @@ local function refreshNormalLiveBuffer(record, zombie)
         LiveBodyControl.SetManagedBodyUseless(zombie, true)
     end
     if zombie.setZombiesDontAttack then
-        zombie:setZombiesDontAttack(shouldPreventZombieAttack(record))
+        zombie:setZombiesDontAttack(true)
     end
     if zombie.setHealth then
         zombie:setHealth(Const.DEFAULT_ENGINE_BUFFER)

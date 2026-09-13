@@ -30,7 +30,7 @@ local npcBody = {
     getZ = function(self) return self.z end,
     isDead = function() return false end,
     setZombiesDontAttack = function(_, value)
-        T.truthy(value == false)
+        T.truthy(value == true)
     end,
 }
 
@@ -274,6 +274,18 @@ T.truthy(string.find(
     1,
     true
 ), "MP server movement branch is not explicit")
+T.truthy(not string.find(
+    serverSource,
+    "zombie:setTarget(npcBody)",
+    1,
+    true
+), "SP pursuit still installs the IsoZombie shell as native target")
+T.truthy(not string.find(
+    serverSource,
+    "zombie:pathToCharacter(npcBody)",
+    1,
+    true
+), "SP pursuit still submits a native character goal for the shell")
 
 local stateSource = T.read(
     "ProjectHoomans", "shared", "PNC/Core/Zombies/PNC_ZombieAggro_State.lua"

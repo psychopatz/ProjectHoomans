@@ -384,7 +384,7 @@ end
 local function clearNativeCombatTarget(zombie)
     -- NPCs are IsoZombie shells. Never place one in IsoZombie.target or
     -- attackedBy: Build 42 AttackState casts those native combat slots to
-    -- IsoPlayer during animation events. Movement uses pathToCharacter while
+    -- IsoPlayer during animation events. Movement uses coordinate goals while
     -- damage is handled by the abstract server lane.
     if zombie.setTarget then zombie:setTarget(nil) end
     if zombie.setAttackedBy then zombie:setAttackedBy(nil) end
@@ -553,7 +553,9 @@ local function applySingleplayerAggro(zombie, body, distanceSq, now)
     -- both fresh and stale-target cases.
     clearNativeCombatTarget(zombie)
     if body.setZombiesDontAttack then
-        body:setZombiesDontAttack(false)
+        -- Native zombies must not acquire the IsoZombie shell as a combat
+        -- target. PNC's abstract bite lane remains independently targetable.
+        body:setZombiesDontAttack(true)
     end
     if zombie.isUseless and zombie.setUseless
         and zombie:isUseless()
@@ -603,7 +605,6 @@ local function applyMultiplayerAggro(
 )
     local modData = zombie.getModData
         and zombie:getModData() or nil
-    local canSee
     local pathRequested = false
     targetX = body and body:getX() or tonumber(targetX)
     targetY = body and body:getY() or tonumber(targetY)
@@ -620,7 +621,7 @@ local function applyMultiplayerAggro(
     clearHeldItems(zombie)
     clearNativeCombatTarget(zombie)
     if body and body.setZombiesDontAttack then
-        body:setZombiesDontAttack(false)
+        body:setZombiesDontAttack(true)
     end
     if zombie.isUseless and zombie.setUseless
         and zombie:isUseless()
@@ -630,19 +631,10 @@ local function applyMultiplayerAggro(
     -- Match Bandits for movement, but do not copy its native combat-target
     -- handoff. PNC damage is abstract, so path toward the NPC at every range.
     if shouldRefreshPath(zombie, targetX, targetY, now) then
-        -- Bandits only request native character pursuit after the exposed LOS
-        -- check. This avoids repeatedly pushing a zombie into a traversal
-        -- transition that can invoke the player-only drop-items packet.
-        canSee = body and zombie.CanSee and zombie:CanSee(body) or false
-        if body and canSee and zombie.pathToCharacter then
-            zombie:pathToCharacter(body)
-            pathRequested = true
-        elseif not body and targetX and targetY and targetZ
-            and zombie.pathToLocationF
-        then
-            -- The server directive carries a coordinate fallback for the
-            -- brief shell-streaming gap. Once the shell is visible, the LOS
-            -- guarded pathToCharacter branch takes over.
+        -- Coordinate movement keeps the shell out of native character-goal
+        -- combat/traversal states even if this compatibility lane is called
+        -- directly by a future multiplayer controller.
+        if zombie.pathToLocationF then
             zombie:pathToLocationF(targetX, targetY, targetZ)
             pathRequested = true
         elseif PNC.PerformanceScalingDiagnostics
