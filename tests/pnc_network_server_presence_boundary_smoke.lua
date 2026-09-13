@@ -28,6 +28,8 @@ local publicFunctions = {
     "SendCharacterPayload",
     "CanViewCharacter",
     "SendInventoryDelta",
+    "TrackInventoryRecipient",
+    "PushInventoryDelta",
     "SendDebugRoster",
     "SendRelationshipDebug",
     "SendConversationRelationship",
@@ -61,8 +63,30 @@ for i = 1, #providers do
 end
 
 PNC = {
-    Core = { Now = function() return 12 end },
-    Const = {},
+    Core = {
+        Now = function() return 12 end,
+        Distance = function(x1, y1, x2, y2)
+            local dx = (tonumber(x1) or 0) - (tonumber(x2) or 0)
+            local dy = (tonumber(y1) or 0) - (tonumber(y2) or 0)
+            return math.sqrt(dx * dx + dy * dy)
+        end,
+    },
+    Const = {
+        MODULE = "PNC",
+        CMD_CHARACTER_PAYLOAD = "CharacterPayload",
+        CMD_INVENTORY_DELTA = "InventoryDelta",
+        CHARACTER_DETAIL_DISTANCE = 20,
+    },
+    Inventory = {
+        BuildDeltaPayload = function(record, sinceRevision)
+            return {
+                npcId = record.id,
+                fromRevision = sinceRevision,
+                inventoryRevision = record.inventory.revision,
+                ops = { { op = "update", itemID = "water" } },
+            }
+        end,
+    },
     RelationshipPresentation = {
         BuildForConversation = function(_, npcID)
             return {
@@ -121,5 +145,45 @@ T.equal(sent.payload.relationshipDelta.approval, 2,
     "central sender preserves relationship delta")
 T.equal(sent.payload.eventID, "event-central",
     "central sender preserves event id")
+
+local player = {
+    getUsername = function() return "owner" end,
+    getAccessLevel = function() return "admin" end,
+}
+local inventoryRecord = {
+    id = "npc-inventory",
+    inventory = { revision = 1 },
+}
+PNC.Network.BuildCharacterPayload = function(record)
+    return {
+        npcId = record.id,
+        inventory = { revision = record.inventory.revision },
+    }
+end
+T.truthy(PNC.Network.SendCharacterPayload(player, inventoryRecord),
+    "detail payload registers an inventory recipient")
+T.equal(PNC.Network.ServerState.inventoryRecipients.owner.revisions[
+    "npc-inventory"], 1, "recipient remembers the detail revision")
+inventoryRecord.inventory.revision = 2
+T.equal(PNC.Network.PushInventoryDelta(inventoryRecord), 1,
+    "changed inventory pushes one delta to the open detail recipient")
+T.equal(sent.command, "InventoryDelta", "push uses the inventory delta command")
+T.equal(sent.payload.fromRevision, 1, "delta starts at the cached revision")
+T.equal(PNC.Network.ServerState.inventoryRecipients.owner.revisions[
+    "npc-inventory"], 2, "recipient revision advances after the delta")
+
+local localPlayer = {}
+local localSent
+sendServerCommand = nil
+getSpecificPlayer = function() return localPlayer end
+triggerEvent = function(_, _, command, payload)
+    localSent = { command = command, payload = payload }
+end
+T.truthy(PNC.Network.SendInventoryDelta(localPlayer, {
+    id = "npc-local",
+    inventory = { revision = 3 },
+}, 2), "single-player detail delta uses the local command fallback")
+T.equal(localSent.command, "InventoryDelta",
+    "single-player fallback reaches the client command channel")
 
 T.finish("pnc_network_server_presence_boundary_smoke")

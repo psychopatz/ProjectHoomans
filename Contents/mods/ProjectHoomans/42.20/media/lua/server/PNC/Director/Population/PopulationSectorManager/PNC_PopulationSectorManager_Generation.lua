@@ -96,7 +96,7 @@ function Sectors.MarkCommitted(generationID)
     data.committedGenerationIds[generationID] = true
     data.committedOrder[#data.committedOrder + 1] = generationID
     while #data.committedOrder > Config.COMMITTED_GENERATION_HISTORY_LIMIT do
-        local expired = table.H.Remove(data.committedOrder, 1)
+        local expired = table.remove(data.committedOrder, 1)
         data.committedGenerationIds[expired] = nil
     end
     Store.Touch("population_generation_committed")
@@ -116,10 +116,9 @@ function Sectors.AddHistory(eventName, details, now)
     entry.at = tonumber(now) or Store.WorldAgeHours()
     Sectors.History[#Sectors.History + 1] = entry
     while #Sectors.History > Config.GENERATION_HISTORY_LIMIT do
-        table.H.Remove(Sectors.History, 1)
+        table.remove(Sectors.History, 1)
     end
     return entry
 end
 
 return Sectors
-

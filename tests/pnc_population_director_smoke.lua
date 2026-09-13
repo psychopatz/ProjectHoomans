@@ -551,6 +551,45 @@ T.equal(PNC.PopulationSectors.CountSettlements(sectorID), 1,
 local settlementDuplicate = PNC.SettlementGenerator.Commit(settlementPlan, onePlayer)
 T.falsy(settlementDuplicate.ok, "settlement idempotency")
 
+local populationConfig = PNC.DirectorConfig.Population
+local oldHistoryLimit = populationConfig.GENERATION_HISTORY_LIMIT
+local oldHistory = PNC.PopulationSectors.History
+local historyProbe = {}
+PNC.PopulationSectors.History = historyProbe
+populationConfig.GENERATION_HISTORY_LIMIT = 2
+for index = 1, 3 do
+    local historyCallOK = pcall(PNC.PopulationSectors.AddHistory,
+        "RETENTION_TEST_" .. tostring(index), {}, worldHour)
+    T.truthy(historyCallOK, "history retention remains callable")
+end
+T.equal(#historyProbe, 2, "history retention removes oldest entries")
+T.equal(historyProbe[1].event, "RETENTION_TEST_2",
+    "history retention preserves newest entries")
+PNC.PopulationSectors.History = oldHistory
+populationConfig.GENERATION_HISTORY_LIMIT = oldHistoryLimit
+
+local populationData = PNC.AbstractWorldStore.Registry.population
+local oldCommittedLimit = populationConfig.COMMITTED_GENERATION_HISTORY_LIMIT
+local oldCommittedIDs = populationData.committedGenerationIds
+local oldCommittedOrder = populationData.committedOrder
+populationData.committedGenerationIds = {}
+populationData.committedOrder = {}
+populationConfig.COMMITTED_GENERATION_HISTORY_LIMIT = 2
+for index = 1, 3 do
+    local committedCallOK = pcall(PNC.PopulationSectors.MarkCommitted,
+        "POP_RETENTION_TEST_" .. tostring(index))
+    T.truthy(committedCallOK, "committed retention remains callable")
+end
+T.equal(#populationData.committedOrder, 2,
+    "committed retention removes oldest IDs")
+T.falsy(populationData.committedGenerationIds["POP_RETENTION_TEST_1"],
+    "committed retention drops expired ID")
+T.truthy(populationData.committedGenerationIds["POP_RETENTION_TEST_3"],
+    "committed retention keeps newest ID")
+populationData.committedGenerationIds = oldCommittedIDs
+populationData.committedOrder = oldCommittedOrder
+populationConfig.COMMITTED_GENERATION_HISTORY_LIMIT = oldCommittedLimit
+
 local closeLocation = T.truthy(PNC.AbstractLocations.RegisterSite({
     id = "site_population_close", kind = "building",
     home = { x = 780, y = 100, z = 0, radius = 10 },
