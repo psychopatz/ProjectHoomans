@@ -289,6 +289,9 @@ Scenes.Register("facility.living.sitFurniture", {
     priority = 20,
     repeatMode = "loop",
     blocking = true,
+    -- The seat pose is a presentation lease. Keep the managed body useless so
+    -- the vanilla zombie brain cannot reacquire alert/pathing ownership.
+    keepManagedUseless = true,
     steps = {
         { id = "sit_chair", bump = "SitChair", durationMs = 0, loop = true },
     },
@@ -320,6 +323,9 @@ Scenes.Register("ambient.roam.sitFurniture", {
     priority = 20,
     repeatMode = "loop",
     blocking = true,
+    -- The seat pose is a presentation lease. Keep the managed body useless so
+    -- the vanilla zombie brain cannot reacquire alert/pathing ownership.
+    keepManagedUseless = true,
     steps = {
         { id = "sit_chair", bump = "SitChair", durationMs = 0, loop = true },
     },

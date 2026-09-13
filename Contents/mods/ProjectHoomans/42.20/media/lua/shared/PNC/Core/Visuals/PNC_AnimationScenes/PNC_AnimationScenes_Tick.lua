@@ -131,6 +131,8 @@ local function maintainLoop(record, zombie, scene, definition, now)
             sceneId = definition.id,
             sceneRevision = scene.revision,
             playbackRevision = scene.playbackRevision,
+            keepManagedUseless = definition.keepManagedUseless == true
+                and true or nil,
         }
     )
 end

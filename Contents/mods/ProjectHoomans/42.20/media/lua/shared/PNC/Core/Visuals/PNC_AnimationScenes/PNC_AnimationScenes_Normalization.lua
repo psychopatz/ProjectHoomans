@@ -77,6 +77,7 @@ function Internal.NormalizeDefinition(sceneId, definition, steps)
         priority = tonumber(definition.priority) or 10,
         loop = steps[1].loop == true,
         blocking = definition.blocking == true,
+        keepManagedUseless = definition.keepManagedUseless == true,
         pool = definition.pool and tostring(definition.pool) or nil,
         category = tostring(
             definition.category

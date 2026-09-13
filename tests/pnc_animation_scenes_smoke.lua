@@ -51,12 +51,17 @@ PNC = {
         end,
         MaintainBump = function(_, _, bump, leaseUntil, options)
             maintained = maintained + 1
-            T.truthy(bump == "Surrender",
-                "persistent scene maintained wrong bump")
-            T.truthy(leaseUntil > now,
-                "persistent scene lease was not extended")
-            T.truthy(options and options.sceneId == "social.surrender",
-                "scene ownership token was lost")
+            if bump == "Surrender" then
+                T.truthy(leaseUntil > now,
+                    "persistent scene lease was not extended")
+                T.truthy(options and options.sceneId == "social.surrender",
+                    "scene ownership token was lost")
+            elseif bump == "SitChair" then
+                T.equal(options.keepManagedUseless, true,
+                    "seat loop maintenance lost body isolation policy")
+            else
+                error("unexpected persistent scene bump: " .. tostring(bump))
+            end
         end,
         FinishBump = function()
             finished = finished + 1
@@ -125,6 +130,8 @@ T.truthy(furnitureScene and furnitureScene.repeatMode == "loop"
         and furnitureScene.steps[1].loop == true
         and furnitureScene.steps[1].durationMs == 0,
     "furniture seating scene must hold the dedicated chair pose")
+T.equal(furnitureScene.keepManagedUseless, true,
+    "furniture seating scene must retain managed-body isolation")
 local drinkScene = PNC.AnimationScenes.Get("survival.drink.world")
 T.truthy(drinkScene and drinkScene.bump == "Drink"
         and drinkScene.repeatMode == "once",
@@ -194,6 +201,8 @@ T.truthy(played[#played].bump == "ShiftWeight",
     "idle scene did not select its registered bump")
 T.truthy(played[#played].options.sceneId == "idle.shift_weight",
     "scene playback did not carry an ownership token")
+T.equal(played[#played].options.keepManagedUseless, nil,
+    "non-seat scene changed the default body-ownership policy")
 T.truthy(bodyModData.PNC_ClientAnimationSceneKey
         == "idle.shift_weight:1:1",
     "local scene snapshot dedupe key missing")
@@ -392,6 +401,21 @@ T.truthy(played[#played].bump == "HammerLow"
     "construction did not advance to the low hammer animation")
 T.truthy(PNC.AnimationScenes.Interrupt(record, body, "combat"),
     "construction scene did not release for combat")
+
+local seatStarted, seatScene = PNC.AnimationScenes.Request(
+    record,
+    body,
+    "facility.living.sitFurniture",
+    { now = now }
+)
+T.truthy(seatStarted and seatScene ~= nil,
+    "furniture seating scene did not start")
+T.equal(played[#played].options.keepManagedUseless, true,
+    "furniture seating playback did not retain managed-body isolation")
+T.truthy(PNC.AnimationScenes.Tick(record, body, now + 1),
+    "furniture seating scene did not maintain its loop")
+T.truthy(PNC.AnimationScenes.Interrupt(record, body, "movement"),
+    "furniture seating scene did not release for movement")
 
 record.runtime.pathing = { phase = "active" }
 record.runtime.localNavigation = {

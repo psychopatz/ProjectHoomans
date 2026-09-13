@@ -149,6 +149,13 @@ function Internal.StartRetreat(record, zombie, target, distance, mode, stopDista
             + (tonumber(Const.COMBAT_RETREAT_RETRY_MS) or 800)
         return false, "retreat_rejected"
     end
+    if recoveryMode == "retreat"
+        and Tactics.IsStaminaRecoveryReason
+        and Tactics.IsStaminaRecoveryReason(reason)
+        and Tactics.BeginStaminaRecovery
+    then
+        Tactics.BeginStaminaRecovery(record, reason)
+    end
     return true, reason
 end
 

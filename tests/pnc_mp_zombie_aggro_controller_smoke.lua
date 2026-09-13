@@ -185,12 +185,29 @@ T.load(FILE)
 T.truthy(registered,
     "client zombie-aggro controller was not registered")
 registered(zombie)
-T.truthy(pathRequests == 1,
-    "owning client did not submit proactive zombie pursuit")
+T.truthy(pathRequests == 0,
+    "multiplayer controller should defer to vanilla zombie movement")
 T.truthy(target == nil and attackedBy == nil,
-    "distant pursuit mixed PathFindState with target state")
-T.truthy(nativeCharacterPaths == 1 and noLunge == true,
-    "distant pursuit did not use Bandits-style character pathing")
+    "multiplayer controller installed a native NPC combat target")
+
+-- Singleplayer must use the same targetless contract for PNC's IsoZombie
+-- shells. Native target assignment lets Build 42's window-lunge animation
+-- call player-only methods such as getMoodles() on the shell.
+isClient = function() return false end
+isServer = function() return false end
+zombie.actionState = "idle"
+target = nil
+attackedBy = nil
+now = 1000
+registered(zombie)
+T.truthy(pathRequests == 1,
+    "singleplayer NPC pursuit did not submit a coordinate path")
+T.truthy(nativeCharacterPaths == 0,
+    "singleplayer NPC pursuit used a native character goal")
+T.truthy(target == nil and attackedBy == nil,
+    "singleplayer pursuit installed an IsoZombie shell as native target")
+T.truthy(noLunge == true,
+    "singleplayer NPC pursuit did not suppress native lunge attacks")
 
 now = 1100
 registered(zombie)
@@ -198,35 +215,19 @@ T.truthy(pathRequests == 1,
     "unchanged NPC destination ignored pursuit refresh throttle")
 
 npcBody.x = 2
-now = 1600
+now = 1400
 registered(zombie)
 T.truthy(pathRequests == 2,
-    "moving NPC directive did not submit a refreshed path")
+    "moving NPC destination did not refresh coordinate pursuit")
 T.truthy(target == nil and attackedBy == nil,
-    "MP pursuit bound the NPC to native combat state")
-T.truthy(spottedCalls == 0 and aggroCalls == 0,
-    "MP pursuit established native zombie combat aggro")
+    "singleplayer pursuit retained native NPC combat state")
 
 npcBody.x = 0.8
-now = 2000
+now = 1600
 registered(zombie)
-T.truthy(pathRequests == 3 and faced == 1,
-    "bite-range pursuit did not refresh movement and face the NPC")
-T.truthy(target == nil and attackedBy == nil,
-    "bite-range pursuit retained native NPC combat state")
+T.truthy(pathRequests == 2 and faced == 1,
+    "bite-range pursuit did not face the NPC without native targeting")
 
-playerIsTarget = true
-player.x = 0.5
-target = nil
-PNC.Network.ClientState.zombiePursuitDirectives["17"] = nil
-now = 2200
-registered(zombie)
-T.truthy(pathRequests == 3,
-    "closer live player target was incorrectly replaced")
-T.truthy(noLunge == false,
-    "player targeting retained the NPC no-lunge override")
-
-playerIsTarget = false
 managed = true
 PNC.LiveBodyControl = {
     EnforceManagedSafety = function(_, source)
@@ -235,17 +236,18 @@ PNC.LiveBodyControl = {
         managedSafetyCalls = managedSafetyCalls + 1
     end,
 }
-now = 2400
+now = 2000
 registered(zombie)
-T.truthy(pathRequests == 3,
+T.truthy(pathRequests == 2,
     "managed NPC body entered vanilla zombie aggro control")
 T.equal(managedSafetyCalls, 1,
     "managed NPC body bypassed the late client safety guard")
 PNC.LiveBodyControl = nil
 
--- The MP directive lane must yield to an engine-owned action and must not
+-- The multiplayer lane must yield to an engine-owned action and must not
 -- rewrite the native player target while that action is active.
 managed = false
+isClient = function() return true end
 zombie.actionState = "attack"
 target = player
 attackedBy = nil
@@ -292,6 +294,4 @@ T.truthy(not string.find(
     1,
     true
 ), "scripted bite binds the NPC as a network character goal")
-T.finish("pnc_mp_zombie_aggro_controller_smoke")
-
 T.finish("pnc_mp_zombie_aggro_controller_smoke")

@@ -40,6 +40,10 @@ function Animation.MaintainBump(
                 now + Internal.BUMP_ACTION_LEASE_TIMEOUT_MS
             )
         )
+        if options and options.keepManagedUseless ~= nil then
+            modData.PNC_BumpKeepUseless =
+                options.keepManagedUseless == true
+        end
         Internal.applyBumpLeaseBodyMode(zombie)
         return true, "bump_maintained"
     end
@@ -52,6 +56,8 @@ function Animation.MaintainBump(
             sceneId = options and options.sceneId or nil,
             sceneRevision = options
                 and options.sceneRevision or nil,
+            keepManagedUseless = options
+                and options.keepManagedUseless,
         }
     )
 end

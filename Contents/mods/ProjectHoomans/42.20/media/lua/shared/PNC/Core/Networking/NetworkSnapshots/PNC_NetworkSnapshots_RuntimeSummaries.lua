@@ -14,6 +14,14 @@ function Parts.BuildActionInformation(record)
         and PNC.ActivityStatus.Build(record) or nil
 end
 
+function Parts.BuildStaminaRecoverySummary(record)
+    local tactics = PNC.CombatTactics
+    if tactics and tactics.BuildStaminaRecoverySnapshot then
+        return tactics.BuildStaminaRecoverySnapshot(record)
+    end
+    return nil
+end
+
 function Parts.ResolveAIState(record)
     local healthState = record.health and tostring(record.health.state or "normal") or "normal"
     local hasTarget = record.runtime and record.runtime.target ~= nil

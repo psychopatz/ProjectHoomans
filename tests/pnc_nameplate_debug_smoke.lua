@@ -329,6 +329,7 @@ snapshot.actionInformation = {
 getText = function(key)
     if key == "UI_PNC_Action_FoodTarget" then return "food" end
     if key == "UI_PNC_Activity_Eating" then return "Eating" end
+    if key == "UI_PNC_Recovery_Gasping" then return "*Gasping*" end
     return key
 end
 getItemNameFromFullType = function(fullType)
@@ -338,6 +339,21 @@ actionText = PNC.NameplatePresentation.ActionStatus(snapshot)
 T.contains(actionText, "Eating", "eating activity label")
 T.contains(actionText, "Apple", "eating activity item")
 T.contains(actionText, "preparing", "eating activity phase")
+snapshot.staminaRecovery = {
+    active = true,
+    sessionId = 2,
+    emoteKey = "UI_PNC_Recovery_Gasping",
+}
+local recoveryText, recoveryColor, recoveryActive =
+    PNC.NameplatePresentation.RecoveryStatus(snapshot)
+T.equal(recoveryText, "*Gasping*", "recovery emote was localized")
+T.equal(recoveryActive, true, "active recovery emote was hidden")
+T.equal(recoveryColor.r, 1.0, "recovery emote did not use its own color")
+snapshot.staminaRecovery.active = false
+recoveryText, recoveryColor, recoveryActive =
+    PNC.NameplatePresentation.RecoveryStatus(snapshot)
+T.equal(recoveryText, "", "inactive recovery emote remained visible")
+T.equal(recoveryActive, false, "inactive recovery status remained active")
 snapshot.actionInformation = {
     kind = "work_order",
     operation = "PROVISION_PICKUP",
@@ -957,6 +973,15 @@ T.equal(positionedText[1].text, "Working 50%",
     "activity text remains rendered separately")
 T.equal(positionedText[1].y, -166,
     "activity text keeps its reserved slot")
+
+positionedText = {}
+liveRenderManager.entries[1].recoveryVisible = true
+liveRenderManager.entries[1].recoveryText = "*Panting*"
+liveRenderManager.entries[1].recoveryTextWidth = 54
+liveRenderManager.entries[1].recoveryColor = { r = 1, g = 0.78, b = 0.42, a = 1 }
+PNC.NameplateRenderer.Render(liveRenderManager, { enabled = true })
+T.equal(positionedText[1].text, "*Panting*",
+    "recovery emote did not take priority over activity text")
 
 local unknownBody = {
     getX = function() return 2 end,

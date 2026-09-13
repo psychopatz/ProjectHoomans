@@ -1,8 +1,9 @@
 -- Singleplayer zombie pursuit fallback.
 --
 -- The multiplayer lane now uses the vanilla WorldSoundManager/RespondToSound
--- path so the engine owns client-side movement. This controller preserves the
--- prior singleplayer target/path behavior and remains inert in multiplayer.
+-- path so the engine owns client-side movement. Managed NPCs are IsoZombie
+-- shells, so singleplayer pursuit uses coordinates and never installs one as
+-- a native combat target.
 
 PNC = PNC or {}
 PNC.ClientPresenceSync = PNC.ClientPresenceSync or {}
@@ -24,7 +25,6 @@ local PATH_REFRESH_DISTANCE = tonumber(
 ) or 0.6
 local AGGRO_RADIUS = tonumber(Const.ZOMBIE_AGGRO_RADIUS) or 12
 local BITE_DISTANCE = tonumber(Const.ZOMBIE_BITE_DISTANCE) or 1.2
-local NATIVE_TARGET_DISTANCE = 3
 local INDEX_REFRESH_MS = math.max(
     250,
     tonumber(Const.CLIENT_BODY_SCAN_MS) or 750
@@ -546,9 +546,12 @@ local function shouldRefreshPath(zombie, targetX, targetY, now)
 end
 
 local function applySingleplayerAggro(zombie, body, distanceSq, now)
-    local currentTarget
-    local canSee = true
     clearHeldItems(zombie)
+    -- PNC bodies are IsoZombie shells. Build 42's native attack and window
+    -- traversal events assume their target is an IsoPlayer and can dereference
+    -- player-only state such as Moodles. Keep the shell out of those slots in
+    -- both fresh and stale-target cases.
+    clearNativeCombatTarget(zombie)
     if body.setZombiesDontAttack then
         body:setZombiesDontAttack(false)
     end
@@ -557,20 +560,10 @@ local function applySingleplayerAggro(zombie, body, distanceSq, now)
     then
         zombie:setUseless(false)
     end
-    currentTarget = zombie.getTarget and zombie:getTarget() or nil
-    -- Restore the prior SP movement handoff. The path request is transient;
-    -- WalkTowardState continues from zombie.target on the next engine update.
-    if currentTarget ~= body and zombie.setTarget then
-        zombie:setTarget(body)
-        if distanceSq > (3.5 * 3.5) and zombie.spotted then
-            zombie:spotted(body, false)
-        end
-        currentTarget = body
-    end
-    if zombie.CanSee then
-        canSee = zombie:CanSee(body) == true
-    end
-    if distanceSq > NATIVE_TARGET_DISTANCE * NATIVE_TARGET_DISTANCE then
+    -- Coordinate pursuit is safe for the IsoZombie shell representation. Do
+    -- not call pathToCharacter here: Build 42 may promote that character goal
+    -- into the same native combat state we are explicitly avoiding.
+    if distanceSq > BITE_DISTANCE * BITE_DISTANCE then
         if shouldRefreshPath(
             zombie,
             body:getX(),
@@ -578,9 +571,7 @@ local function applySingleplayerAggro(zombie, body, distanceSq, now)
             now
         )
         then
-            if canSee and zombie.pathToCharacter then
-                zombie:pathToCharacter(body)
-            elseif zombie.pathToLocationF then
+            if zombie.pathToLocationF then
                 zombie:pathToLocationF(
                     body:getX(),
                     body:getY(),
@@ -589,36 +580,14 @@ local function applySingleplayerAggro(zombie, body, distanceSq, now)
             end
         end
     else
-        if zombie.spotted then
-            zombie:spotted(body, true)
-        end
-        if zombie.addAggro then
-            zombie:addAggro(body, 1)
-        end
-        if currentTarget ~= body and zombie.setTarget then
-            zombie:setTarget(body)
-        end
-        if zombie.setAttackedBy then
-            zombie:setAttackedBy(body)
-        end
-        if distanceSq <= BITE_DISTANCE * BITE_DISTANCE then
-            if zombie.faceThisObject then
-                zombie:faceThisObject(body)
-            elseif zombie.faceLocation then
-                zombie:faceLocation(body:getX(), body:getY())
-            end
+        if zombie.faceLocation then
+            zombie:faceLocation(body:getX(), body:getY())
+        elseif zombie.faceThisObject then
+            zombie:faceThisObject(body)
         end
     end
     if zombie.setVariable then
         zombie:setVariable("NoLungeAttack", true)
-        if isManagedBody(zombie.getTarget and zombie:getTarget() or nil) then
-            zombie:setVariable("ZombieBiteDone", true)
-        end
-    end
-    if zombie.setNoTeeth
-        and isManagedBody(zombie.getTarget and zombie:getTarget() or nil)
-    then
-        zombie:setNoTeeth(true)
     end
 end
 

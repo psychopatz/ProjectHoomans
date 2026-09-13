@@ -278,6 +278,17 @@ PNC.Registry = {
 
 T.load(FILE)
 
+local recoveryPayload = {
+    active = true,
+    sessionId = 4,
+    emoteKey = "UI_PNC_Recovery_Gasping",
+}
+PNC.CombatTactics = {
+    BuildStaminaRecoverySnapshot = function()
+        return recoveryPayload
+    end,
+}
+
 PNC.Network.ClientState.snapshots = {
     live = {
         id = "live",
@@ -311,6 +322,16 @@ nearbyRecord.activeBehavior = "FollowOwner:idle"
 local followDelta = PNC.Network.BuildPresenceDelta(nearbyRecord)
 T.equal(followDelta.activeBehavior, "FollowOwner:idle",
     "presence delta carries the current behavior for nameplate debug")
+T.equal(followDelta.staminaRecovery.sessionId, 4,
+    "presence delta omitted stamina recovery session")
+T.equal(PNC.Network.BuildSnapshot(nearbyRecord)
+    .staminaRecovery.emoteKey,
+    "UI_PNC_Recovery_Gasping",
+    "detailed snapshot omitted stamina recovery emote")
+T.equal(PNC.Network.BuildRosterSnapshot(nearbyRecord)
+    .staminaRecovery.active,
+    true,
+    "roster snapshot omitted stamina recovery status")
 nearbyRecord.activeBehavior = nil
 T.equal(
     PNC.Network.BuildRosterSnapshot(nearbyRecord).zombieTargetable,

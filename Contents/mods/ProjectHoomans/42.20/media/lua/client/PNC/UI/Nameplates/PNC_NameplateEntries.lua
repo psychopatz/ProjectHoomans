@@ -256,6 +256,8 @@ local function cacheMetrics(entry, snapshot, zombie, settings, speech, scopes)
     local infectionDebugText = showDebug
         and Debug.InfectionText(snapshot, settings) or ""
     local actionText, actionColor = Presentation.ActionStatus(snapshot)
+    local recoveryText, recoveryColor, recoveryActive =
+        Presentation.RecoveryStatus(snapshot)
     speech = speech or (Speech and Speech.Get(snapshot and snapshot.id) or nil)
     local speechText = Speech and Speech.GetDisplayText(speech) or ""
     local factionLine1
@@ -279,11 +281,13 @@ local function cacheMetrics(entry, snapshot, zombie, settings, speech, scopes)
     entry.communityDebugTone =
         communityDebugLines(snapshot, settings)
     entry.actionColor = actionColor
+    entry.recoveryColor = recoveryColor
     entry.scopes = scopes or {}
     entry.identityVisible = entry.scopes[Scopes.IDENTITY] == true
     entry.debugVisible = entry.scopes[Scopes.DEBUG] == true
     entry.conversationVisible = entry.scopes[Scopes.CONVERSATION] == true
     entry.actionVisible = entry.identityVisible and actionText ~= ""
+    entry.recoveryVisible = entry.identityVisible and recoveryActive
     entry.speech = speech
     entry.speechVisible = entry.conversationVisible and speechText ~= ""
     Presentation.CacheTextMetric(entry, "name", name, nameFont)
@@ -316,6 +320,12 @@ local function cacheMetrics(entry, snapshot, zombie, settings, speech, scopes)
         entry,
         "actionText",
         actionText,
+        fonts.debug
+    )
+    Presentation.CacheTextMetric(
+        entry,
+        "recoveryText",
+        recoveryText,
         fonts.debug
     )
     Presentation.CacheTextMetric(

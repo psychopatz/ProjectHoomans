@@ -32,6 +32,7 @@ function LiveBodyControl.EnforceManagedSafety(zombie, source)
     if PNC.Registry and PNC.Registry.FindRecordByZombie then
         record = PNC.Registry.FindRecordByZombie(zombie)
     end
+    modData = zombie.getModData and zombie:getModData() or nil
     now = Core.Now and Core.Now() or 0
     seatedLockActive = LiveBodyControl.IsSeated
         and LiveBodyControl.IsSeated(record)
@@ -39,6 +40,17 @@ function LiveBodyControl.EnforceManagedSafety(zombie, source)
         or false
     keepEngineMovementActive =
         LiveBodyControl.ShouldKeepEngineMovementActive(record, zombie)
+    -- A pre-fix seat lease may still carry the old default (false). Repair
+    -- that state at the guard boundary so the lease cannot make this managed
+    -- body useful while the seat owns the presentation.
+    if seatedLockActive
+        and modData
+        and Internal.hasBumpActionLease(zombie, now)
+        and tostring(modData.PNC_BumpRequestedType or "")
+            == "PNC_SitChair"
+    then
+        modData.PNC_BumpKeepUseless = true
+    end
     hadTarget = zombie.getTarget and zombie:getTarget() ~= nil or false
     wasUseless = zombie.isUseless and zombie:isUseless() or false
     hadTeeth = zombie.isNoTeeth and not zombie:isNoTeeth() or false
@@ -78,7 +90,7 @@ function LiveBodyControl.EnforceManagedSafety(zombie, source)
     then
         LiveBodyControl.SuppressZombieState(zombie, nil, now, true)
     end
-    if seatedLockActive and not actionLeaseActive then
+    if seatedLockActive then
         -- The shared suppressed-state list intentionally does not claim
         -- turnalerted. Seating does: it is a native zombie alert transition
         -- that can otherwise reacquire movement after this callback.
@@ -102,7 +114,6 @@ function LiveBodyControl.EnforceManagedSafety(zombie, source)
         and Core.LogWarn
     then
         SAFETY_REPAIR_LOGGED[zombie] = true
-        modData = zombie.getModData and zombie:getModData() or nil
         npcId = modData and modData.PNC_UUID or "unknown"
         Core.LogWarn("human_safety_repaired npc=" .. tostring(npcId)
             .. " source=" .. tostring(source or "unknown")

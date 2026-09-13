@@ -51,6 +51,7 @@ local TREATMENT_COLORS = {
     clean = { r = 0.35, g = 0.95, b = 0.35, a = 1.0 },
 }
 local ACTION_COLOR = { r = 0.35, g = 0.88, b = 1.0, a = 1.0 }
+local RECOVERY_COLOR = { r = 1.0, g = 0.78, b = 0.42, a = 1.0 }
 
 local function tr(key, fallback)
     local value = getText and getText(key) or nil
@@ -139,6 +140,19 @@ end
 function Presentation.StaminaColor(staminaRatio)
     local value = 0.28 + (0.72 * clamp(tonumber(staminaRatio) or 0, 0, 1))
     return { r = value, g = value, b = value, a = 1.0 }
+end
+
+function Presentation.RecoveryStatus(snapshot)
+    local state = snapshot and snapshot.staminaRecovery or nil
+    local key
+    if not state or state.active ~= true then
+        return "", RECOVERY_COLOR, false
+    end
+    key = state.emoteKey
+    if type(key) ~= "string" or key == "" then
+        return "", RECOVERY_COLOR, false
+    end
+    return tr(key, "*Panting*"), RECOVERY_COLOR, true
 end
 
 function Presentation.GetSpeechColor(record)

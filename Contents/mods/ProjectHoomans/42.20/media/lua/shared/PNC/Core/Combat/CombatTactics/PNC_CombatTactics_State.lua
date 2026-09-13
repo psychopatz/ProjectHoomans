@@ -11,6 +11,89 @@ local Core = PNC.Core
 local Const = PNC.Const
 local Perception = PNC.Perception
 
+local STAMINA_RECOVERY_EMOTE_KEYS = {
+    "UI_PNC_Recovery_Panting",
+    "UI_PNC_Recovery_Gasping",
+    "UI_PNC_Recovery_BreathingHeavily",
+    "UI_PNC_Recovery_CatchingBreath",
+    "UI_PNC_Recovery_Huffing",
+    "UI_PNC_Recovery_Winded",
+}
+
+local function recoverySeed(record)
+    local identity = record and (
+        record.id or record.npcID or record.entityKey or record.name
+    ) or "npc"
+    local numeric = tonumber(identity)
+    local text
+    local hash
+    local index
+    if numeric ~= nil then
+        return math.abs(math.floor(numeric))
+    end
+    text = tostring(identity)
+    hash = 0
+    for index = 1, #text do
+        hash = (hash * 31 + (string.byte(text, index) or 0)) % 2147483647
+    end
+    return hash
+end
+
+local function ensureRecoveryState(record)
+    local runtime
+    if not record then return nil end
+    record.runtime = record.runtime or {}
+    runtime = record.runtime
+    runtime.combatRecovery = runtime.combatRecovery or {}
+    return runtime.combatRecovery
+end
+
+function Tactics.BeginStaminaRecovery(record, reason)
+    local state = ensureRecoveryState(record)
+    local sessionID
+    local emoteIndex
+    if not state then return nil end
+    if state.active == true and state.emoteKey then
+        return state
+    end
+    sessionID = (tonumber(state.sessionId) or 0) + 1
+    emoteIndex = ((recoverySeed(record) + sessionID - 1)
+        % #STAMINA_RECOVERY_EMOTE_KEYS) + 1
+    state.active = true
+    state.sessionId = sessionID
+    state.emoteKey = STAMINA_RECOVERY_EMOTE_KEYS[emoteIndex]
+    state.reason = tostring(reason or "stamina_recovery")
+    state.startedAt = Core.Now()
+    return state
+end
+
+function Tactics.EndStaminaRecovery(record)
+    local runtime = record and record.runtime or nil
+    local state = runtime and runtime.combatRecovery or nil
+    if not state or state.active ~= true then return false end
+    state.active = false
+    state.emoteKey = nil
+    state.reason = nil
+    state.endedAt = Core.Now()
+    return true
+end
+
+function Tactics.BuildStaminaRecoverySnapshot(record)
+    local runtime = record and record.runtime or nil
+    local state = runtime and runtime.combatRecovery or nil
+    return {
+        active = state and state.active == true or false,
+        sessionId = tonumber(state and state.sessionId) or 0,
+        emoteKey = state and state.active == true and state.emoteKey or nil,
+    }
+end
+
+function Tactics.IsStaminaRecoveryReason(reason)
+    reason = tostring(reason or "")
+    return reason == "recovering_stamina"
+        or reason == "exhausted_recovery_retreat"
+end
+
 local function resolveImmediateZombieThreat(record)
     local threat
     if not record or not Perception then return nil end
@@ -149,6 +232,7 @@ function Tactics.ClearRetreatState(record)
         state.lowStaminaPhase = nil
         state.lowStaminaAttackUntil = 0
     end
+    Tactics.EndStaminaRecovery(record)
 end
 
 function Tactics.CanReengage(record)

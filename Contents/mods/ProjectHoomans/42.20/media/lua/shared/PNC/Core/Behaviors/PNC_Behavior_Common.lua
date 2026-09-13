@@ -65,9 +65,13 @@ end
 
 function Common.ClearCombatTarget(record, reason, zombie)
     local equipmentInfo = Equipment.Describe(record)
+    local combatTactics = PNC.CombatTactics
     local committedAttack
     record.runtime = record.runtime or {}
     record.runtime.target = nil
+    if combatTactics and combatTactics.EndStaminaRecovery then
+        combatTactics.EndStaminaRecovery(record)
+    end
     committedAttack = Combat and Combat.HasActiveAttack
         and Combat.HasActiveAttack(record, Core.Now())
         or false

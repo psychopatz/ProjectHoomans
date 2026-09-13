@@ -20,6 +20,7 @@ local buildCommandFeedback = Parts.BuildCommandFeedback
 local buildCorpseHaulDiagnostic = Parts.BuildCorpseHaulDiagnostic
 local buildBandageFeedback = Parts.BuildBandageFeedback
 local buildActionInformation = Parts.BuildActionInformation
+local buildStaminaRecoverySummary = Parts.BuildStaminaRecoverySummary
 local buildVisualState = Parts.BuildVisualState
 local buildPathDebugState = Parts.BuildPathDebugState
 local buildCombatDebugState = Parts.BuildCombatDebugState
@@ -155,6 +156,7 @@ function Network.BuildSnapshot(record)
         corpseHaulManualDiagnostic = buildCorpseHaulDiagnostic(record),
         bandageFeedback = buildBandageFeedback(record),
         actionInformation = buildActionInformation(record),
+        staminaRecovery = buildStaminaRecoverySummary(record),
         lumberRuntime = record.runtime and record.runtime.lumber
             and Core.DeepCopy(record.runtime.lumber) or nil,
         storageCourier = record.runtime and record.runtime.storageCourier

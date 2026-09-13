@@ -142,6 +142,8 @@ function Internal.ActivateStep(record, zombie, scene, definition, now)
             sceneRevision = scene.revision,
             playbackRevision = scene.playbackRevision,
             leaseUntil = Internal.SceneLeaseUntil(scene, now),
+            keepManagedUseless = definition.keepManagedUseless == true
+                and true or nil,
             }
         )
         if played == false then

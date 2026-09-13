@@ -12,6 +12,7 @@ local Identity = PNC.Identity
 local Settings = PNC.Sandbox
 local buildIdentityOwnershipSummary =
     Parts.BuildIdentityOwnershipSummary
+local buildStaminaRecoverySummary = Parts.BuildStaminaRecoverySummary
 
 function Network.BuildRosterSnapshot(record, includeTravelRoute)
     local aiState
@@ -66,6 +67,7 @@ function Network.BuildRosterSnapshot(record, includeTravelRoute)
         staminaMax = staminaInfo.max,
         staminaBaseMax = staminaInfo.baseMax,
         staminaState = staminaInfo.state,
+        staminaRecovery = buildStaminaRecoverySummary(record),
         encumbranceLevel = staminaInfo.encumbranceLevel,
         encumbranceRatio = staminaInfo.encumbranceRatio,
         aiState = aiState,

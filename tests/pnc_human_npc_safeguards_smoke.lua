@@ -306,6 +306,10 @@ managedRecord = {
         },
     },
 }
+modData.PNC_BumpActionLease = true
+modData.PNC_BumpActionLeaseUntil = 10000
+modData.PNC_BumpRequestedType = "PNC_SitChair"
+modData.PNC_BumpKeepUseless = false
 zombieUpdateHandler(managedBody)
 T.equal(actionState, "idle",
     "seated carrier retained the native turn-alerted state")
@@ -313,6 +317,12 @@ T.equal(useless, true,
     "seated carrier did not retain human-shell isolation")
 T.equal(vanillaTarget, nil,
     "seated carrier retained a native target")
+T.equal(modData.PNC_BumpKeepUseless, true,
+    "seated chair lease was allowed to restore engine movement ownership")
+modData.PNC_BumpActionLease = nil
+modData.PNC_BumpActionLeaseUntil = nil
+modData.PNC_BumpRequestedType = nil
+modData.PNC_BumpKeepUseless = nil
 managedRecord = nil
 
 local panic = 2

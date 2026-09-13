@@ -13,6 +13,15 @@ local Animation = PNC.Animation
 local Core = PNC.Core
 local Diagnostics = PNC.PerformanceScalingDiagnostics
 
+local function isFurnitureSeatingScene(sceneId)
+    if sceneId == "facility.living.sitFurniture"
+        or sceneId == "ambient.roam.sitFurniture"
+    then
+        return true
+    end
+    return nil
+end
+
 local function isWaterScene(sceneId)
     return string.find(
         tostring(sceneId or ""),
@@ -163,6 +172,9 @@ local function syncAnimationScene(
                 {
                     sceneId = presentation.id,
                     leaseUntil = presentation.leaseUntil,
+                    keepManagedUseless = isFurnitureSeatingScene(
+                        presentation.id
+                    ),
                 }
             )
             if played == false then
@@ -198,6 +210,9 @@ local function syncAnimationScene(
             presentation.leaseUntil,
             {
                 sceneId = presentation.id,
+                keepManagedUseless = isFurnitureSeatingScene(
+                    presentation.id
+                ),
             }
         )
     end

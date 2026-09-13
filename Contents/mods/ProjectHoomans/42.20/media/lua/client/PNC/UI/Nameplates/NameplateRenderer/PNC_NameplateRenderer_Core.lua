@@ -383,19 +383,28 @@ local function drawLive(manager, entry, metrics, currentTime, settings)
     local actionHeight = getTextManager():getFontHeight(Fonts.debug) + 2
     local actionY = nameY - actionHeight
     local actionVisible = identityVisible and entry.actionVisible
-    local speechBottomY = actionVisible and (actionY - Layout.speechGap)
+    local recoveryVisible = identityVisible
+        and entry.recoveryVisible == true
+    local statusVisible = recoveryVisible or actionVisible
+    local statusText = recoveryVisible and entry.recoveryText
+        or entry.actionText or ""
+    local statusColor = recoveryVisible and entry.recoveryColor
+        or entry.actionColor
+    local statusWidth = recoveryVisible and entry.recoveryTextWidth
+        or entry.actionTextWidth
+    local speechBottomY = statusVisible and (actionY - Layout.speechGap)
         or (nameY - Layout.speechGap)
     if conversationVisible then
         drawConversation(manager, entry, screenX, speechBottomY, 0.95 * alpha)
     end
 
-    if actionVisible and entry.actionText ~= "" then
+    if statusVisible and statusText ~= "" then
         Presentation.DrawOutlinedText(
             manager,
-            entry.actionText,
-            screenX - ((entry.actionTextWidth or 0) / 2),
+            statusText,
+            screenX - ((statusWidth or 0) / 2),
             actionY,
-            entry.actionColor,
+            statusColor,
             0.95 * alpha,
             Fonts.debug
         )

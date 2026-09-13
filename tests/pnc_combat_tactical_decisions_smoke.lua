@@ -295,6 +295,14 @@ moved, reason = PNC.CombatTactics.PreAttackDecision(
 T.equal(moved, true, "exhausted counter never yielded to retreat")
 T.equal(reason, "exhausted_recovery_retreat",
     "exhausted recovery retreat reason")
+local recoverySnapshot = PNC.CombatTactics.BuildStaminaRecoverySnapshot(record)
+T.equal(recoverySnapshot.active, true,
+    "accepted low-stamina retreat did not open recovery presentation")
+T.equal(recoverySnapshot.sessionId, 1,
+    "first recovery presentation session was not numbered")
+T.truthy(recoverySnapshot.emoteKey ~= nil,
+    "recovery presentation did not select an emote")
+local firstRecoveryEmote = recoverySnapshot.emoteKey
 record.x = -1.3
 target.distSq = 5.29
 now = now + 250
@@ -309,6 +317,9 @@ T.equal(moved, true, "safe exhausted fighter did not hold to recover")
 T.equal(reason, "recovering_stamina_safe",
     "safe recovery hold reason")
 T.equal(holds > 0, true, "safe recovery did not stop locomotion")
+recoverySnapshot = PNC.CombatTactics.BuildStaminaRecoverySnapshot(record)
+T.equal(recoverySnapshot.emoteKey, firstRecoveryEmote,
+    "recovery emote changed inside one recovery session")
 record.stamina.current = 35
 record.x = 0
 target.distSq = 1
@@ -321,6 +332,21 @@ moved = PNC.CombatTactics.PreAttackDecision(
     { hasWeapon = true }
 )
 T.equal(moved, false, "recovered fighter did not re-engage")
+recoverySnapshot = PNC.CombatTactics.BuildStaminaRecoverySnapshot(record)
+T.equal(recoverySnapshot.active, false,
+    "recovery presentation remained active after re-engagement")
+T.equal(recoverySnapshot.sessionId, 1,
+    "recovery presentation session changed while ending")
+
+local secondRecovery = PNC.CombatTactics.BeginStaminaRecovery(
+    record,
+    "recovering_stamina"
+)
+T.equal(secondRecovery.sessionId, 2,
+    "new recovery did not receive a new session ID")
+T.truthy(secondRecovery.emoteKey ~= firstRecoveryEmote,
+    "new recovery session did not rotate its emote")
+PNC.CombatTactics.EndStaminaRecovery(record)
 canSpendAttack = true
 
 -- Crowd pressure alone must not make a healthy follower abandon the player.

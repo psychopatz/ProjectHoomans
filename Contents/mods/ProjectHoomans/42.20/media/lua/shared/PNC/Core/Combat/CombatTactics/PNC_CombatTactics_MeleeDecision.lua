@@ -66,6 +66,9 @@ function Tactics.PreAttackDecision(record, zombie, target, effectiveMode, equipm
     end
     if state.lowStaminaPhase == "recover" then
         if Tactics.CanReengage(record) then
+            if Tactics.EndStaminaRecovery then
+                Tactics.EndStaminaRecovery(record)
+            end
             state.lowStaminaPhase = nil
             state.lowStaminaAttackUntil = 0
         elseif dist < safetyRadius then
@@ -80,6 +83,12 @@ function Tactics.PreAttackDecision(record, zombie, target, effectiveMode, equipm
             if continued then state.lowStaminaPhase = "retreat" end
             return continued, continueReason, nil
         else
+            if Tactics.BeginStaminaRecovery then
+                Tactics.BeginStaminaRecovery(
+                    record,
+                    "recovering_stamina_safe"
+                )
+            end
             record.runtime.combatTactical.decision = "recovering_stamina_safe"
             Internal.RequestHold(record, zombie, "recovering_stamina_safe")
             return true, "recovering_stamina_safe", nil
