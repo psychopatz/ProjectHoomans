@@ -192,6 +192,10 @@ for npcIndex = 1, 100 do
     }
     PNC.PlayerNeedsModel.EnsureTraits(record)
     PNC.ConditionStats.EnsureTraits(record)
+    record.generatedVanillaTraitIDs =
+        PNC.PlayerNeedsModel.GetActiveTraitIDs(record)
+    record.generatedDynamicTraitIDs =
+        PNC.ConditionStats.GetActiveTraitIDs(record)
     for partIndex = 1, #partIDs do
         record.health.body.parts[partIDs[partIndex]] = {
             current = partIDs[partIndex] == "Head" and 70 or 92,
@@ -241,16 +245,22 @@ T.equal(PNC.Core.TableSize and PNC.Core.TableSize(payloads) or 100, 100,
     "scale payload count")
 local sample = payloads.scale_npc_1
 T.equal(sample.schemaVersion, 10, "scale schema version")
-T.equal(sample.vanillaTraitsAuthored, false,
-    "generated NPC traits marked as authored")
-T.equal(sample.vanillaTraitsGenerationVersion,
-    PNC.PlayerNeedsModel.GENERATION_VERSION,
-    "generated NPC trait version")
-T.equal(sample.dynamicTraitsAuthored, false,
-    "generated custom traits marked as authored")
-T.equal(sample.dynamicTraitsGenerationVersion,
-    PNC.ConditionStats.TRAIT_GENERATION_VERSION,
-    "generated custom trait version")
+T.equal(sample.vanillaTraits, nil,
+    "generated vanilla traits are derived instead of persisted")
+T.equal(sample.vanillaTraitsAuthored, nil,
+    "generated vanilla trait marker is omitted")
+T.equal(sample.dynamicTraits, nil,
+    "generated custom traits are derived instead of persisted")
+T.equal(sample.dynamicTraitsAuthored, nil,
+    "generated custom trait marker is omitted")
+T.equal(sample.identity.archetypeLabel, nil,
+    "archetype label is derived from archetype id")
+T.equal(sample.persist, nil,
+    "constant persisted flag is omitted")
+T.equal(sample.presenceState, nil,
+    "presence is rebuilt from health and runtime state")
+T.equal(sample.jobPriorities, nil,
+    "empty job priority overrides are omitted")
 T.equal(sample.inventory[1], 2, "NPC inventory schema")
 T.equal(sample.inventory[2], "BASELINE_DELTA", "NPC inventory mode")
 T.equal(sample.inventory[5][1], 1, "core delta schema")
@@ -293,32 +303,16 @@ T.equal(restored.mapPresentation.roleTag, "trader",
     "map role round trip")
 T.equal(restored.mapPresentation.knownBy.scale_player, true,
     "map knowledge round trip")
+T.equal(restored.presenceState, PNC.Const.PRESENCE_ABSTRACT,
+    "abstract presence is rebuilt after load")
+T.equal(restored.persist, true,
+    "persist defaults to true after load")
 T.equal(table.concat(PNC.PlayerNeedsModel.GetActiveTraitIDs(restored), "|"),
-    table.concat(PNC.PlayerNeedsModel.GetActiveTraitIDs(sample.vanillaTraits), "|"),
+    table.concat(records.scale_npc_1.generatedVanillaTraitIDs, "|"),
     "generated vanilla traits round trip")
 T.equal(table.concat(PNC.ConditionStats.GetActiveTraitIDs(restored), "|"),
-    table.concat(PNC.ConditionStats.GetActiveTraitIDs(sample.dynamicTraits), "|"),
+    table.concat(records.scale_npc_1.generatedDynamicTraitIDs, "|"),
     "generated custom traits round trip")
-
-local staleGeneratedPayload = PNC.Core.DeepCopy(sample)
-staleGeneratedPayload.vanillaTraitsGenerationVersion = 99
-staleGeneratedPayload.dynamicTraitsGenerationVersion = 99
-local staleGeneratedRecord = PNC.Persistence.DeserializeRecord(
-    staleGeneratedPayload, "scale_npc_1")
-T.equal(staleGeneratedRecord.vanillaTraitsGenerationVersion,
-    PNC.PlayerNeedsModel.GENERATION_VERSION,
-    "deserialization heals stale vanilla trait generation")
-T.equal(staleGeneratedRecord.dynamicTraitsGenerationVersion,
-    PNC.ConditionStats.TRAIT_GENERATION_VERSION,
-    "deserialization heals stale custom trait generation")
-T.equal(table.concat(
-    PNC.PlayerNeedsModel.GetActiveTraitIDs(staleGeneratedRecord), "|"),
-    table.concat(PNC.PlayerNeedsModel.GetActiveTraitIDs(sample.vanillaTraits), "|"),
-    "healed vanilla traits use the persisted identity")
-T.equal(table.concat(
-    PNC.ConditionStats.GetActiveTraitIDs(staleGeneratedRecord), "|"),
-    table.concat(PNC.ConditionStats.GetActiveTraitIDs(sample.dynamicTraits), "|"),
-    "healed custom traits use the persisted identity")
 
 local legacyPayload = PNC.Core.DeepCopy(sample)
 legacyPayload.schemaVersion = 9

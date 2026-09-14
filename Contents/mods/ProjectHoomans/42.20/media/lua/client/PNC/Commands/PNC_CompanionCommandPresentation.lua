@@ -4,12 +4,14 @@ PNC = PNC or {}
 PNC.CompanionCommandPresentation = PNC.CompanionCommandPresentation or {}
 
 require "PNC/Knowledge/PNC_NPCIdentityPresentation"
+require "PNC/Core/Identity/PNC_FlavorAddress"
 require "PNC/Audio/PNC_PlayerSpeech"
 
 local Presentation = PNC.CompanionCommandPresentation
 local Commands = PNC.CompanionCommands
 local Flavor = PNC.CompanionCommandFlavor
 local Identity = PNC.NPCIdentityPresentation
+local FlavorAddress = PNC.FlavorAddress
 local Registry = PNC.Registry
 local PlayerSpeech = PNC.PlayerSpeech
 local Message = PsychopatzCore and PsychopatzCore.Conversation
@@ -62,12 +64,41 @@ end
 function Presentation.BuildFlavorContext(player, context)
     local targets = normalizeTargets(context)
     local names = formatTargetNames(targets)
+    local state = PNC.Network and PNC.Network.ClientState or {}
+    local playerContext = state.playerContext or {}
+    local npcID = type(context) == "table" and context.npcID
+        or targets[1] and (targets[1].id or targets[1].npcID)
+        or "command-flavor"
+    local playerAddress = FlavorAddress.ResolveForNPC({
+        npcID = npcID,
+        npcIdentitySeed = FlavorAddress.ResolveNPCSeed(
+            targets[1], npcID
+        ),
+        player = player,
+        playerContext = playerContext,
+        playerUUID = playerContext.characterUUID
+            or playerContext.playerUUID,
+        playerNameKnown = type(context) == "table"
+            and context.playerNameKnown or nil,
+        isFemale = type(context) == "table"
+            and context.playerIsFemale or nil,
+        state = state,
+    })
     return {
         name = targets[1] and targetName(targets[1]) or "Companion",
         names = names,
         count = #targets,
-        player = tostring(player and player.getUsername
-            and player:getUsername() or "Survivor"),
+        player = playerAddress.addressName,
+        playerName = playerAddress.addressName,
+        playerAddressName = playerAddress.addressName,
+        playerFullName = playerAddress.fullName,
+        playerFirstName = playerAddress.firstName,
+        playerSurname = playerAddress.surname,
+        playerLastName = playerAddress.lastName,
+        playerNameKnown = playerAddress.known,
+        playerIsFemale = playerAddress.isFemale,
+        playerNicknameID = playerAddress.nicknameID,
+        npcIdentitySeed = FlavorAddress.ResolveNPCSeed(targets[1], npcID),
     }
 end
 
@@ -539,18 +570,16 @@ function Presentation.SyncAcknowledgement(zombie, snapshot, modData)
         return false
     end
     if not isLocalOwner(snapshot, player) then return false end
+    local flavorContext = Presentation.BuildFlavorContext(player, {
+        npcID = snapshot and snapshot.id,
+        target = snapshot,
+    })
     text = Flavor and Flavor.Resolve
         and Flavor.Resolve(
             feedback.id,
             "npc",
             tostring(snapshot.id or "") .. ":" .. tostring(revision),
-            {
-                name = Identity.GetName(snapshot),
-                names = Identity.GetName(snapshot),
-                count = 1,
-                player = tostring(player and player.getUsername
-                    and player:getUsername() or "Survivor"),
-            }
+            flavorContext
         )
         or nil
     return speak(zombie, text)

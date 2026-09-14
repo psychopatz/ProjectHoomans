@@ -7,6 +7,7 @@ if Events and Events.OnTick and PNC.Conversation
     and not PNC.Conversation.Composer.LocalPumpRegistered
 then
     Events.OnTick.Add(PNC.Conversation.Composer.PumpLocalRequests)
+    Events.OnTick.Add(PNC.Conversation.Composer.PumpSettlementVisitExpiry)
     PNC.Conversation.Composer.LocalPumpRegistered = true
 end
 

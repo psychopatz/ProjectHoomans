@@ -9,6 +9,79 @@ PNC.SocialFlavorDefinitions = PNC.SocialFlavorDefinitions or {}
 
 local Flavor = PsychopatzCore.SocialFlavor
 
+Flavor.Register("social.conversation_farewell", {
+    id = "social.conversation_farewell",
+    family = "conversation_farewell",
+    player = {
+        "We are done here. Take care, {npcFirstName}.",
+        "I should let you get back to it. Stay safe, {npcFirstName}.",
+        "That is enough for now. See you around, {npcFirstName}.",
+    },
+    npc = {
+        "Take care, {playerFirstName}.",
+        "Stay safe out there, {playerFirstName}.",
+        "See you around, {playerFirstName}.",
+    },
+    variants = {
+        {
+            id = "hostile",
+            when = { socialRole = "hostile" },
+            player = {
+                "We are finished. Keep your distance.",
+                "That is enough. Do not follow me.",
+                "I am leaving. Stay out of my way.",
+            },
+            npc = {
+                "Keep walking.",
+                "Do not make this a habit.",
+                "Stay out of my way.",
+            },
+        },
+        {
+            id = "lover",
+            when = { socialRole = "lover" },
+            player = {
+                "I will let you get back to it, love. Stay safe.",
+                "See you soon, love. Come back safe.",
+                "That is enough for now, sweetheart. I will see you soon.",
+            },
+            npc = {
+                "Come back safe, love.",
+                "I will see you soon, sweetheart.",
+                "Stay safe for me, love.",
+            },
+        },
+        {
+            id = "family",
+            when = { socialRole = "family" },
+            player = {
+                "Take care of yourself. I will see you soon.",
+                "I should let you go. Stay safe, family.",
+                "See you around. Keep your guard up.",
+            },
+            npc = {
+                "Take care of yourself.",
+                "See you soon. Keep your guard up.",
+                "Stay safe out there, family.",
+            },
+        },
+        {
+            id = "colonist",
+            when = { socialRole = "colonist" },
+            player = {
+                "I will let you get back to camp. Stay safe.",
+                "See you at camp. Keep your eyes open.",
+                "That is enough for now. Watch yourself out there.",
+            },
+            npc = {
+                "Stay safe out there.",
+                "See you at camp.",
+                "Keep your eyes open. I will see you around.",
+            },
+        },
+    },
+})
+
 Flavor.Register("social.witnessed_player_kill", {
     id = "social.witnessed_player_kill",
     family = "combat_commentary",

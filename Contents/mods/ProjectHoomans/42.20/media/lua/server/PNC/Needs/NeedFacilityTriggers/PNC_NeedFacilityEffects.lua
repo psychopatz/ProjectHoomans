@@ -332,7 +332,6 @@ local function applyNeed(record, definition, elapsed)
         local ok, reason, value = PNC.IndividualNeeds.Commands.ApplyRest(
             record, elapsed, "facility_need_route", {
                 ignoreCompletion = manualSleep,
-                recoveryPerGameHour = definition.recoveryPerGameHour,
             })
         local complete = not manualSleep and (reason == "REST_COMPLETE"
             or value ~= nil and value <= definition.completionThreshold)

@@ -94,11 +94,24 @@ local function supplyItemFullType(record, kind)
     local supply = record.runtime and record.runtime.supply or nil
     local state = supply and supply.byKind and supply.byKind[kind] or nil
     local used = state and state.lastUsedItem or nil
-    if used and used.fullType then return tostring(used.fullType) end
     local candidate = state and state.personalCandidates
         and state.personalCandidates[1] or nil
-    return candidate and candidate.fullType
-        and tostring(candidate.fullType) or nil
+    local items = record and record.inventory and record.inventory.items
+    local function available(fullType)
+        fullType = tostring(fullType or "")
+        if fullType == "" then return nil end
+        if type(items) ~= "table" then return fullType end
+        for _, item in pairs(items) do
+            if type(item) == "table"
+                and tostring(item.type or "") == fullType
+            then
+                return fullType
+            end
+        end
+        return nil
+    end
+    return available(used and used.fullType)
+        or available(candidate and candidate.fullType)
 end
 
 local function scavengeActivity(record)
@@ -119,13 +132,41 @@ local function scavengeActivity(record)
 end
 
 local function facilityItem(record, runtime, capability)
+    local function selectedItemFullType(kind)
+        local selected = tostring(runtime.activityItemFullType or "")
+        local itemID = tostring(runtime.activityItemID or "")
+        local items = record and record.inventory and record.inventory.items
+        local item
+        local itemType
+        if type(items) == "table" then
+            if itemID ~= "" then
+                item = items[itemID]
+                if type(item) ~= "table" then
+                    return supplyItemFullType(record, kind)
+                end
+                itemType = tostring(item.type or "")
+                if itemType ~= "" then selected = itemType end
+            elseif selected ~= "" then
+                local found = false
+                for _, candidate in pairs(items) do
+                    if type(candidate) == "table"
+                        and tostring(candidate.type or "") == selected
+                    then
+                        found = true
+                        break
+                    end
+                end
+                if not found then selected = "" end
+            end
+        end
+        if selected ~= "" then return selected end
+        return supplyItemFullType(record, kind)
+    end
     if capability == "food.dine"
         or capability == "survival.eat.inventory"
         or runtime.resourceKind == "personal_food"
     then
-        local selected = tostring(runtime.activityItemFullType
-            or record.orderSpec and record.orderSpec.activityItemFullType
-            or "")
+        local selected = selectedItemFullType("FOOD")
         if selected ~= "" then
             return selected, "UI_PNC_Action_FoodTarget"
         end
@@ -135,9 +176,7 @@ local function facilityItem(record, runtime, capability)
     if capability == "survival.drink.inventory"
         or runtime.resourceKind == "personal_drink"
     then
-        local selected = tostring(runtime.activityItemFullType
-            or record.orderSpec and record.orderSpec.activityItemFullType
-            or "")
+        local selected = selectedItemFullType("HYDRATION")
         if selected ~= "" then
             return selected, "UI_PNC_Action_WaterTarget"
         end
@@ -256,9 +295,11 @@ Status.Register("current_job", 10, function(record)
     local current = tostring(record.activeBehavior
         or record.activeJob or record.orderSpec and record.orderSpec.kind or "")
     if current == "" then return nil end
+    if current == "facility_activity" then return nil end
     if current == "FacilityActivity" then
         local order = record.orderSpec or {}
-        local facilityRuntime = runtime.facilityActivity or order
+        local facilityRuntime = runtime.facilityActivity
+        if not facilityRuntime then return nil end
         local capability = tostring(facilityRuntime.capability or "")
         if capability ~= "" then
             local definition = PNC.FacilityJobDefinitions

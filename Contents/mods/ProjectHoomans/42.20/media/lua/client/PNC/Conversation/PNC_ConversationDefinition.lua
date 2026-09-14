@@ -5,6 +5,7 @@ PNC.Conversation = PNC.Conversation or {}
 if not PNC.NPCIdentityPresentation then
     require "PNC/Knowledge/PNC_NPCIdentityPresentation"
 end
+require "PNC/Core/Identity/PNC_FlavorAddress"
 require "PNC/Conversation/Blocks/PNC_ConversationIdentityChoice"
 if not PNC.Conversation.Audience then
     require "PNC/Conversation/PNC_ConversationAudience"
@@ -19,6 +20,7 @@ local Composer = Conversation.Composer
 local Backgrounds = Conversation.Backgrounds
 local Palette = PNC.NPCTypePalette
 local IdentityPresentation = PNC.NPCIdentityPresentation
+local FlavorAddress = PNC.FlavorAddress
 local Loader = Conversation.TextLoader
 local Registry = Conversation.Registry
 local IdentityChoice = Conversation.IdentityChoice
@@ -62,19 +64,6 @@ local function nameParts(fullName, firstName, lastName)
     return fullName, firstName, lastName
 end
 
-local function playerIdentity(player, clientState)
-    local context = clientState and clientState.playerContext or {}
-    local descriptor = player and player.getDescriptor
-        and player:getDescriptor() or nil
-    local firstName = context.forename
-        or descriptor and descriptor.getForename and descriptor:getForename()
-    local lastName = context.surname
-        or descriptor and descriptor.getSurname and descriptor:getSurname()
-    local fullName = context.displayName
-        or player and player.getDisplayName and player:getDisplayName()
-    return nameParts(fullName, firstName, lastName)
-end
-
 local function npcIdentity(entry, projection, displayedName)
     local snapshot = projection and projection.snapshot
         or entry and entry.snapshot or {}
@@ -96,27 +85,34 @@ local function visibleIdentityArguments(
     clientState,
     npcName,
     npcKnown,
-    playerKnown
+    npcID
 )
     local stranger = systemText("identity.stranger")
-    local playerFull, playerFirst, playerLast = playerIdentity(
-        player, clientState
-    )
+    local playerContext = clientState and clientState.playerContext or {}
+    local playerAddress = FlavorAddress.ResolveForNPC({
+        npcID = npcID,
+        npcIdentitySeed = FlavorAddress.ResolveNPCSeed(entry, npcID),
+        player = player,
+        playerContext = playerContext,
+        playerUUID = playerContext.characterUUID or playerContext.playerUUID,
+        state = clientState,
+    })
     local npcFull, npcFirst, npcLast = npcIdentity(
         entry, projection, npcName
     )
-    if not playerKnown then
-        playerFull, playerFirst, playerLast = stranger, stranger, stranger
-    end
     if not npcKnown then
         npcFull, npcFirst, npcLast = stranger, stranger, stranger
     end
     return {
-        playerName = playerFull or stranger,
-        playerFullName = playerFull or stranger,
-        playerFirstName = playerFirst or playerFull or stranger,
-        playerLastName = playerLast or "",
-        playerSurname = playerLast or "",
+        playerName = playerAddress.addressName,
+        playerAddressName = playerAddress.addressName,
+        playerFullName = playerAddress.fullName or stranger,
+        playerFirstName = playerAddress.firstName or stranger,
+        playerLastName = playerAddress.lastName or "",
+        playerSurname = playerAddress.surname or "",
+        playerNameKnown = playerAddress.known,
+        playerIsFemale = playerAddress.isFemale,
+        playerNicknameID = playerAddress.nicknameID,
         npcName = npcFull or stranger,
         npcFullName = npcFull or stranger,
         npcFirstName = npcFirst or npcFull or stranger,
@@ -279,7 +275,7 @@ function Conversation.BuildDefinition(entry, player, forcedTime)
         clientState,
         name,
         identityState == "known",
-        relationshipID ~= "FirstMeet"
+        npcID
     )
     Composer.SetIdentityArguments(blockContext, identityArguments)
     local presentationContext = {
@@ -309,7 +305,9 @@ function Conversation.BuildDefinition(entry, player, forcedTime)
         playerHostile = blockContext.playerHostile,
         conversationProfile = blockContext.conversationProfile,
         allowHostileParley = blockContext.playerHostile,
+        settlementVisit = blockContext.settlementVisit,
         conversationBlockContext = blockContext,
+        npcIdentitySeed = FlavorAddress.ResolveNPCSeed(entry, npcID),
     }
     for key, value in pairs(identityArguments) do
         presentationContext[key] = value

@@ -95,7 +95,7 @@ T.equal(activity.runtime.facilityActivity, nil,
     "stale facility runtime is cleared")
 T.equal(activity.runtime.facilityDebugWork, nil,
     "stale facility debug runtime is cleared")
-T.equal(activity.persistenceRepairVersions.facility_activity_runtime, 1,
+T.equal(activity.persistenceRepairVersions.facility_activity_runtime, 2,
     "facility repair revision is recorded")
 
 local normal = {

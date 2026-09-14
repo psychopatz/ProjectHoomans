@@ -96,16 +96,28 @@ local function tryCreateSurvivor()
 end
 
 function Identity.GenerateResolvedIdentity(source)
+    local identityOverride = source and source.identity
+    local survivorOverride = type(identityOverride) == "table"
+        and type(identityOverride.survivor) == "table"
+        and identityOverride.survivor or {}
     local seed = Identity.NormalizeSeed(source and source.identitySeed or nil, tostring(source and source.id or "npc"))
     local desc = tryCreateSurvivor()
     local humanVisual = desc and desc.getHumanVisual and desc:getHumanVisual() or nil
-    local explicitName = normalizeString(source and (source.displayName or source.name) or nil)
+    local explicitName = normalizeString(
+        source and (source.displayName or source.name) or nil
+    ) or normalizeString(identityOverride and identityOverride.displayName)
     local explicitFemale = source and source.isFemale
+    if explicitFemale == nil and identityOverride then
+        explicitFemale = identityOverride.isFemale
+    end
     local resolvedFemale = explicitFemale
     local forename
     local surname
     local displayName
     local appearance
+    local voicePrefix
+    local voiceType
+    local voicePitch
     if resolvedFemale == nil and desc and desc.isFemale then
         resolvedFemale = desc:isFemale()
     end
@@ -119,9 +131,33 @@ function Identity.GenerateResolvedIdentity(source)
             desc:setFemale(resolvedFemale)
         end)
     end
-    forename = desc and desc.getForename and normalizeString(desc:getForename()) or nil
-    surname = desc and desc.getSurname and normalizeString(desc:getSurname()) or nil
+    forename = normalizeString(source and source.forename)
+        or normalizeString(survivorOverride.forename)
+        or (desc and desc.getForename and normalizeString(desc:getForename()) or nil)
+    surname = normalizeString(source and source.surname)
+        or normalizeString(survivorOverride.surname)
+        or (desc and desc.getSurname and normalizeString(desc:getSurname()) or nil)
+    if explicitName and not (source and source.forename)
+        and not survivorOverride.forename
+    then
+        forename = string.match(explicitName, "^(%S+)") or forename
+    end
+    if explicitName and not (source and source.surname)
+        and not survivorOverride.surname
+    then
+        surname = string.match(explicitName, "%s+(%S+)%s*$") or surname
+    end
     appearance = Identity.GetCharacterAppearance(desc)
+    voicePrefix = normalizeString(survivorOverride.voicePrefix)
+        or normalizeString(survivorOverride.voice)
+        or (desc and desc.getVoicePrefix
+            and normalizeString(desc:getVoicePrefix()) or nil)
+    voiceType = tonumber(survivorOverride.voiceType)
+        or (desc and desc.getVoiceType
+            and tonumber(desc:getVoiceType()) or nil)
+    voicePitch = tonumber(survivorOverride.voicePitch)
+        or (desc and desc.getVoicePitch
+            and tonumber(desc:getVoicePitch()) or nil)
     displayName = explicitName
     if not displayName then
         if forename or surname then
@@ -145,12 +181,27 @@ function Identity.GenerateResolvedIdentity(source)
         survivor = {
             forename = forename,
             surname = surname,
-            hairModel = humanVisual and humanVisual.getHairModel and normalizeString(humanVisual:getHairModel()) or nil,
-            beardModel = humanVisual and humanVisual.getBeardModel and normalizeString(humanVisual:getBeardModel()) or nil,
-            skinColor = appearance and appearance.skinColor or nil,
-            hairColor = appearance and appearance.hairColor or nil,
-            skinTexture = appearance and appearance.skinTexture or nil,
-            voice = desc and desc.getVoicePrefix and normalizeString(desc:getVoicePrefix()) or nil,
+            hairModel = survivorOverride.hairModel ~= nil
+                and tostring(survivorOverride.hairModel)
+                or (humanVisual and humanVisual.getHairModel
+                    and normalizeString(humanVisual:getHairModel()) or nil),
+            beardModel = survivorOverride.beardModel ~= nil
+                and tostring(survivorOverride.beardModel)
+                or (humanVisual and humanVisual.getBeardModel
+                    and normalizeString(humanVisual:getBeardModel()) or nil),
+            skinColor = survivorOverride.skinColor
+                or (appearance and appearance.skinColor or nil),
+            hairColor = survivorOverride.hairColor
+                or (appearance and appearance.hairColor or nil),
+            skinTexture = normalizeString(survivorOverride.skinTexture)
+                or (appearance and appearance.skinTexture or nil),
+            -- `voice` remains the legacy prefix field. The explicit fields
+            -- mirror SurvivorDesc and allow the creator to preserve the
+            -- complete factory voice profile.
+            voice = voicePrefix,
+            voicePrefix = voicePrefix,
+            voiceType = voiceType,
+            voicePitch = voicePitch,
         },
     }
 end

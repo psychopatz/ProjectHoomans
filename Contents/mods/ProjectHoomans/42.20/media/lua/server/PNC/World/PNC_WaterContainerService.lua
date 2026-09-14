@@ -16,6 +16,7 @@ local EventTypes = require "PNC/Core/Events/PNC_EventDefinitions"
 local Inventory = PNC.Inventory
 local NearbyWater = PNC.NearbyWaterService
 local SupplyInternal = PNC.SupplyInventoryInternal
+local Diagnostics = PNC.PerformanceScalingDiagnostics
 
 local EPSILON = 0.0001
 
@@ -82,24 +83,66 @@ local function activityDetails(record, details)
 end
 
 local function logRefill(event, record, item, source, details)
-    local core = PNC.Core
-    local itemID = type(item) == "table" and item.id or item
-    local itemType = type(item) == "table"
+    local itemID
+    local itemType
+    local sourceKey
+    local fields
+    if not Diagnostics or Diagnostics.InventoryAuditEnabled ~= true
+        or not Diagnostics.LogInventoryAudit
+    then
+        return
+    end
+    itemID = type(item) == "table" and item.id or item
+    itemType = type(item) == "table"
         and (item.type or item.fullType) or nil
-    local sourceKey = type(source) == "table" and source.key or nil
-    local message
-    if not core or not core.LogInfo then return end
-    message = "[PNC][WATER] refill event=" .. tostring(event)
-        .. " npc=" .. tostring(record and record.id or "")
-        .. " item=" .. tostring(itemID or "")
-        .. " type=" .. tostring(itemType or "")
-        .. " source=" .. tostring(sourceKey or "")
+    sourceKey = type(source) == "table" and source.key or nil
+    fields = {
+        "npc=" .. tostring(record and record.id or ""),
+        "item=" .. tostring(itemID or ""),
+        "type=" .. tostring(itemType or ""),
+        "source=" .. tostring(sourceKey or ""),
+    }
     for key, value in pairs(type(details) == "table" and details or {}) do
         if type(value) ~= "table" and type(value) ~= "function" then
-            message = message .. " " .. tostring(key) .. "=" .. tostring(value)
+            fields[#fields + 1] = tostring(key) .. "=" .. tostring(value)
         end
     end
-    core.LogInfo(message)
+    Diagnostics.LogInventoryAudit("refill_" .. tostring(event), fields)
+end
+
+local function logRefillAdmission(record, item, itemID, compactDescription,
+    native, nativeDescription, candidateCount, accepted, reason)
+    local compact
+    if not Diagnostics or Diagnostics.InventoryAuditEnabled ~= true
+        or not Diagnostics.LogInventoryAudit
+    then
+        return
+    end
+    compact = type(compactDescription) == "table"
+        and compactDescription or nil
+    logRefill("admission", record, item or itemID, nil, {
+        result = accepted == true and "accepted" or "rejected",
+        reason = reason,
+        requestedItemID = itemID,
+        resolvedItemID = item and item.id or nil,
+        candidateCount = candidateCount,
+        physicalPresent = native ~= nil,
+        physicalID = native and (call(native, "getID") or native.id) or nil,
+        physicalType = native and (call(native, "getFullType") or native.type)
+            or nil,
+        compactAmount = compact and compact.amount,
+        compactCapacity = compact and compact.capacity,
+        compactFreeCapacity = compact and compact.freeCapacity,
+        compactPrimaryType = compact and compact.primaryType,
+        compactCanFill = compact and compact.canFill,
+        physicalAmount = nativeDescription and nativeDescription.amount,
+        physicalCapacity = nativeDescription and nativeDescription.capacity,
+        physicalFreeCapacity = nativeDescription
+            and nativeDescription.freeCapacity,
+        physicalPrimaryType = nativeDescription
+            and nativeDescription.primaryType,
+        physicalCanFill = nativeDescription and nativeDescription.canFill,
+    })
 end
 
 local function deepCopy(value)
@@ -320,25 +363,41 @@ function Service.CanRefill(record, itemID)
     local selected
     local native
     local description
+    local function result(accepted, reason)
+        logRefillAdmission(
+            record,
+            item,
+            itemID,
+            compactDescription,
+            native,
+            description,
+            selected and #selected or 0,
+            accepted,
+            reason
+        )
+        return accepted, reason
+    end
     item, compactDescription = Service.FindContainer(record, itemID)
-    if not item then return false, compactDescription end
+    if not item then return result(false, compactDescription) end
     body = liveBody(record)
-    if not body then return false, "NPC_BODY_UNAVAILABLE" end
+    if not body then return result(false, "NPC_BODY_UNAVAILABLE") end
     selected = SupplyInternal and SupplyInternal.NativeCandidates
         and SupplyInternal.NativeCandidates(body, item) or {}
     native = selected[1] and selected[1].item or nil
-    if not native then return false, "WATER_CONTAINER_PHYSICAL_MISSING" end
+    if not native then
+        return result(false, "WATER_CONTAINER_PHYSICAL_MISSING")
+    end
     description = Inventory.DescribeLiquidContainer(item, native)
     if not description then
-        return false, "WATER_CONTAINER_NOT_REFILLABLE"
+        return result(false, "WATER_CONTAINER_NOT_REFILLABLE")
     end
     if (tonumber(description.freeCapacity) or 0) <= EPSILON then
-        return false, "WATER_CONTAINER_FULL"
+        return result(false, "WATER_CONTAINER_FULL")
     end
     if description.canFill ~= true then
-        return false, "WATER_CONTAINER_NOT_REFILLABLE"
+        return result(false, "WATER_CONTAINER_NOT_REFILLABLE")
     end
-    return true, "WATER_CONTAINER_REFILLABLE"
+    return result(true, "WATER_CONTAINER_REFILLABLE")
 end
 
 function Service.Refill(record, itemID, source)

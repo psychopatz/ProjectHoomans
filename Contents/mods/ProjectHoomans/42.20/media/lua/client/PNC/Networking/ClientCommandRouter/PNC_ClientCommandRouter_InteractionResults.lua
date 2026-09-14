@@ -4,6 +4,9 @@ local Core = PNC.Core
 local ClientState = PNC.Network.ClientState
 local Registry = PNC.Registry
 
+require "PNC/UI/Nameplates/PNC_NameplateToolFeedback"
+local ToolFeedback = PNC.NameplateToolFeedback
+
 Internal.RegisterServerCommand(Const.CMD_CONVERSATION_RELATIONSHIP,
     function(args)
         args = type(args) == "table" and args or {}
@@ -190,6 +193,11 @@ if Const.CMD_COMPANION_COMMAND_RESULT then
             args = type(args) == "table" and args or {}
             player = getSpecificPlayer and getSpecificPlayer(0) or nil
             commandSource = tostring(args.commandSource or "")
+            if commandSource == "llm_tool"
+                and ToolFeedback and ToolFeedback.PushResult
+            then
+                ToolFeedback.PushResult(args)
+            end
             if commandSource == "colonist_activities"
                 or string.match(tostring(args.commandID or ""), "^manual_")
                     ~= nil
@@ -357,6 +365,26 @@ Internal.RegisterServerCommand(Const.CMD_CONVERSATION_RECRUIT_RESULT,
             PNC.Client.RequestColonyManagement()
         end
     end)
+
+if Const.CMD_CONVERSATION_SETTLEMENT_ADMISSION_RESULT then
+    Internal.RegisterServerCommand(
+        Const.CMD_CONVERSATION_SETTLEMENT_ADMISSION_RESULT,
+        function(args)
+            if PNC.Conversation and PNC.Conversation.Composer
+                and PNC.Conversation.Composer.ReceiveSettlementAdmissionOutcome
+            then
+                PNC.Conversation.Composer.ReceiveSettlementAdmissionOutcome(
+                    args or {}
+                )
+            end
+            if args and args.success == true
+                and PNC.Client and PNC.Client.RequestColonyManagement
+            then
+                PNC.Client.RequestColonyManagement()
+            end
+        end
+    )
+end
 
 if Const.CMD_CONVERSATION_DEPARTURE_RESULT then
     Internal.RegisterServerCommand(Const.CMD_CONVERSATION_DEPARTURE_RESULT,

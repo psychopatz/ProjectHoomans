@@ -25,6 +25,14 @@ function Composer.PumpLocalRequests()
             and Conversation.Authority.HandleRecruit
         then
             Conversation.Authority.HandleRecruit(request.player, request.payload)
+        elseif request.command
+            == PNC.Const.CMD_CONVERSATION_SETTLEMENT_ADMISSION_REQUEST
+            and Conversation.Authority.HandleSettlementAdmission
+        then
+            Conversation.Authority.HandleSettlementAdmission(
+                request.player,
+                request.payload
+            )
         elseif request.command == PNC.Const.CMD_CONVERSATION_DEPARTURE_REQUEST
             and Conversation.Authority.HandleDeparture
         then
@@ -33,6 +41,35 @@ function Composer.PumpLocalRequests()
             )
         end
     end
+end
+
+function Composer.RequestSettlementAdmission(npcID)
+    local view = activeView(npcID)
+    local lifecycle = lifecycleState(view)
+    if not view then return false, "conversation_not_ready" end
+    if not lifecycle then
+        notifyFailure(view, "status.choice_rejected", "conversation_not_ready")
+        return false, "conversation_not_ready"
+    end
+    local id = requestID("settlement_admission")
+    local context = view.spec.context.conversationBlockContext
+    local visit = context and context.settlementVisit or nil
+    view.spec.context.pendingConversationRequest = id
+    local sent, reason = sendRequest(
+        PNC.Const.CMD_CONVERSATION_SETTLEMENT_ADMISSION_REQUEST,
+        {
+            requestID = id,
+            npcID = tostring(npcID),
+            token = lifecycle.token,
+            visitID = visit and visit.visitID or nil,
+            registryFingerprint = Registry.GetFingerprint(),
+        }
+    )
+    if not sent then
+        view.spec.context.pendingConversationRequest = nil
+        notifyFailure(view, "status.choice_rejected", reason)
+    end
+    return sent, reason
 end
 
 function Composer.RequestCategory(npcID, categoryID, autoChoiceID)

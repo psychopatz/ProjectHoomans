@@ -24,6 +24,13 @@ local Options = require "PsychopatzCore/UI/PsychopatzCommandHubOptions"
 local TooltipHost
 local TooltipOptions
 local OPACITY_TARGET_ID = "ProjectHoomans.InventoryWindow"
+local INVENTORY_REFRESH_COOLDOWN_MS = 750
+local INVENTORY_REFRESH_TIMEOUT_MS = 4000
+local INVENTORY_REFRESH_FEEDBACK_MS = 3000
+
+local function inventoryNow()
+    return PNC.Core and PNC.Core.Now and PNC.Core.Now() or 0
+end
 
 local function getTooltipHost()
     TooltipHost = TooltipHost or require
@@ -121,6 +128,14 @@ function ISPNCInventoryWindow:createChildren()
     self.giveAllButton:instantiate()
     self:addChild(self.giveAllButton)
 
+    self.refreshNPCButton = ISButton:new(108, 440, 180, 22,
+        tr("UI_PNC_Inventory_Refresh", "Refresh NPC"),
+        self, ISPNCInventoryWindow.onRefreshNPCInventory)
+    self.refreshNPCButton:initialise()
+    self.refreshNPCButton:instantiate()
+    self.refreshNPCButton:setVisible(false)
+    self:addChild(self.refreshNPCButton)
+
     self.takeAllButton = ISButton:new(316, 440, 92, 22,
         tr("UI_PNC_Inventory_TakeAll", "< Take All"),
         self, ISPNCInventoryWindow.onTakeAll)
@@ -176,6 +191,8 @@ function ISPNCInventoryWindow:onResponsiveLayout()
         listHeight
     )
     Layout.SetBounds(self.giveAllButton, gap, buttonY, 92, 22)
+    Layout.SetBounds(self.refreshNPCButton, gap + 100, buttonY,
+        math.max(80, paneWidth - 100), 22)
     Layout.SetBounds(self.takeAllButton, npcX, buttonY, 92, 22)
     Layout.SetBounds(self.depositStorageButton, npcX + 100, buttonY,
         math.max(80, paneWidth - 100), 22)
@@ -185,6 +202,64 @@ function ISPNCInventoryWindow:onResponsiveLayout()
     self.headingY = titleHeight + 8
     self.containerLabelY = titleHeight + 29
     self.statusY = buttonY + 27
+end
+
+function ISPNCInventoryWindow:updateInventoryRefreshButton(now)
+    local button = self.refreshNPCButton
+    local isNPC = self.transferEndpoint
+        and self.transferEndpoint.kind == "npc"
+        and self.npcId ~= nil
+    if not button then return end
+    now = tonumber(now) or inventoryNow()
+    local pending = self.inventoryRefreshPending == true
+    local last = tonumber(self.lastInventoryRefreshAt)
+    local coolingDown = last ~= nil
+        and now - last < INVENTORY_REFRESH_COOLDOWN_MS
+    button:setVisible(isNPC)
+    button:setTitle(pending
+        and tr("UI_PNC_Inventory_Refreshing", "Refreshing...")
+        or tr("UI_PNC_Inventory_Refresh", "Refresh NPC"))
+    button:setEnable(isNPC and not pending and not coolingDown)
+end
+
+function ISPNCInventoryWindow:finishInventoryRefresh(success, now)
+    now = tonumber(now) or inventoryNow()
+    self.inventoryRefreshPending = false
+    self.inventoryRefreshStartedAt = nil
+    self.inventoryRefreshFeedback = success == true
+        and tr("UI_PNC_Inventory_RefreshComplete", "Inventory refreshed")
+        or tr("UI_PNC_Inventory_RefreshFailed", "Inventory refresh failed")
+    self.inventoryRefreshFeedbackUntil = now + INVENTORY_REFRESH_FEEDBACK_MS
+    self:updateInventoryRefreshButton(now)
+end
+
+function ISPNCInventoryWindow:onRefreshNPCInventory()
+    local endpoint = self.transferEndpoint
+    local now = inventoryNow()
+    local last = tonumber(self.lastInventoryRefreshAt)
+    if not endpoint or endpoint.kind ~= "npc" or not self.npcId then
+        return false
+    end
+    if self.inventoryRefreshPending == true
+        or (last ~= nil and now - last < INVENTORY_REFRESH_COOLDOWN_MS)
+    then
+        return false
+    end
+    self.lastInventoryRefreshAt = now
+    self.inventoryRefreshPending = true
+    self.inventoryRefreshStartedAt = now
+    self.inventoryRefreshFeedback = nil
+    self.inventoryRefreshFeedbackUntil = nil
+    self.contextSignature = nil
+    self:updateInventoryRefreshButton(now)
+    self:refreshInventory(true)
+    local requested = endpoint.requestSnapshot
+        and endpoint:requestSnapshot(true) or false
+    if requested ~= true then
+        self:finishInventoryRefresh(false, inventoryNow())
+        return false
+    end
+    return true
 end
 
 function ISPNCInventoryWindow:onDepositAllStorage()
@@ -221,6 +296,10 @@ function InventoryWindow.CollectBulkTransferIDs(list)
 end
 
 function ISPNCInventoryWindow:onGiveAll()
+    local ok
+    local reason
+    local details
+    local skippedCount
     if self.readOnly then return false end
     local endpoint = self.transferEndpoint
     local selection = TransferEndpoint.BulkSelection(nil, self.playerList)
@@ -230,12 +309,26 @@ function ISPNCInventoryWindow:onGiveAll()
             or self.statusText
         return false
     end
-    return endpoint:send("to_target", selection,
+    ok, reason, details = endpoint:send("to_target", selection,
         endpoint.selectedContainer, {
         bulk = true,
         gift = self.giftMode == true,
         conversationToken = self.giftToken,
     })
+    skippedCount = details and details.skipped and #details.skipped or 0
+    if ok then
+        self.statusText = string.format(
+            tr("UI_PNC_Inventory_CopyComplete", "Copied %d item(s)%s"),
+            tonumber(details and details.added) or selection.quantity or 0,
+            skippedCount > 0 and string.format(
+                tr("UI_PNC_Inventory_CopySkipped", ", skipped %d"),
+                skippedCount) or ""
+        )
+    else
+        self.statusText = tr("UI_PNC_Inventory_CopyFailed", "Copy failed")
+            .. ": " .. tostring(reason or "failed"):gsub("_", " ")
+    end
+    return ok, reason, details
 end
 
 function ISPNCInventoryWindow:onTakeAll()
@@ -268,6 +361,11 @@ function ISPNCInventoryWindow:setTransferEndpoint(endpoint)
     self.giftMode = false
     self.giftToken = nil
     self.contextSignature = nil
+    self.lastInventoryRefreshAt = nil
+    self.inventoryRefreshPending = false
+    self.inventoryRefreshStartedAt = nil
+    self.inventoryRefreshFeedback = nil
+    self.inventoryRefreshFeedbackUntil = nil
     self.readOnly = endpoint and endpoint.readOnly == true or false
     self.courierRevision = nil
     self.statusText = self.readOnly and tr("UI_PNC_Storage_ReadOnlyAway",
@@ -289,7 +387,33 @@ function ISPNCInventoryWindow:setTransferEndpoint(endpoint)
         self.depositStorageButton:setVisible(endpoint
             and endpoint.kind == "npc")
     end
+    self:updateInventoryRefreshButton(inventoryNow())
     self:refreshInventory(true)
+end
+
+-- Network payload application normally becomes visible on the next prerender
+-- because the endpoint revision changes. Explicit invalidation is required
+-- for same-revision full snapshots, which are allowed to replace a stale
+-- client item state after reconnect/load.
+function InventoryWindow.OnInventoryPayloadApplied(npcID, revision, source)
+    local window = InventoryWindow.instance
+    if not window or not window.transferEndpoint
+        or window.transferEndpoint.kind ~= "npc"
+        or tostring(window.transferEndpoint.id or "") ~= tostring(npcID or "")
+    then
+        return false
+    end
+    window.contextSignature = nil
+    window.inventoryPayloadSource = source
+    window.inventoryPayloadRevision = tonumber(revision)
+    if window.inventoryRefreshPending == true
+        and (source == "character_payload" or source == "local_api")
+    then
+        window:finishInventoryRefresh(true, inventoryNow())
+    end
+    window:refreshInventory(true)
+    window:updateInventoryTooltip()
+    return true
 end
 
 function ISPNCInventoryWindow:setConversationMode(mode, token)
@@ -341,6 +465,7 @@ function ISPNCInventoryWindow:refreshInventory(force)
     local player = getSpecificPlayer and getSpecificPlayer(0) or getPlayer and getPlayer() or nil
     local endpoint = self.transferEndpoint
     if not endpoint then return end
+    self:updateInventoryRefreshButton(inventoryNow())
     endpoint.selectedContainer = self.selectedNPCContainer or "root"
     endpoint.expandedGroups = self.expandedNPCGroups or {}
     local inventory = self:inventory()
@@ -431,6 +556,7 @@ function ISPNCInventoryWindow:refreshInventory(force)
                 and #InventoryWindow.CollectBulkTransferIDs(self.npcList) > 0
         )
     end
+    self:updateInventoryRefreshButton(inventoryNow())
     if self.takeAllButton and self.takeAllButton.setVisible then
         self.takeAllButton:setVisible(not self.giftMode)
     end
@@ -475,6 +601,8 @@ function ISPNCInventoryWindow:refreshInventory(force)
     end
     local npcName = endpoint.kind == "storage"
         and tostring(endpoint.displayName or "Colony Storage")
+        or endpoint.kind == "local_draft"
+        and tostring(endpoint.displayName or "Unique NPC Draft")
         or Identity.GetName(
             payload and payload.snapshot or snapshot or { id = self.npcId }
         )
@@ -558,10 +686,15 @@ function ISPNCInventoryWindow:requestTransfer(
 end
 
 function ISPNCInventoryWindow:acceptVanillaItems(items)
+    local player = getSpecificPlayer and getSpecificPlayer(0)
+        or getPlayer and getPlayer() or nil
     if self.readOnly then return false end
     local members = {}
     for _, item in ipairs(items or {}) do
-        if item and item.getID then
+        if item and item.getID
+            and (not Model.GetPlayerItemTransferBlockReason
+                or not Model.GetPlayerItemTransferBlockReason(item, player))
+        then
             members[#members + 1] = {
                 id = tostring(item:getID()),
                 stack = 1,
@@ -689,7 +822,7 @@ function ISPNCInventoryWindow:showItemContext(role, row)
                 target:requestTransfer("player_to_npc", row)
             end
         )
-        if self.transferEndpoint and self.transferEndpoint.kind ~= "storage"
+        if self.transferEndpoint and self.transferEndpoint.kind == "npc"
             and PNC.Client and PNC.Client.CanUseDebug
             and PNC.Client.CanUseDebug()
         then
@@ -716,7 +849,10 @@ function ISPNCInventoryWindow:showItemContext(role, row)
         and row.groupHeader ~= true
     then
         for _, definition in ipairs(Actions.List()) do
-            if Actions.IsAvailable(definition, nil, compact) then
+            if not (self.transferEndpoint.kind == "local_draft"
+                and definition.id == "drop")
+                and Actions.IsAvailable(definition, nil, compact)
+            then
                 local option = context:addOption(
                     tr(definition.labelKey, definition.label),
                     self,
@@ -751,6 +887,15 @@ function ISPNCInventoryWindow:sendItemAction(actionID, itemID)
     local item = inventory.items and inventory.items[tostring(itemID)] or nil
     if item and item.interactionLocked == true then return false end
     self.statusText = tr("UI_PNC_Inventory_Working", "Applying command...")
+    if self.transferEndpoint and self.transferEndpoint.action then
+        local ok, reason = self.transferEndpoint:action(actionID, itemID)
+        self.contextSignature = nil
+        self.statusText = ok
+            and tr("UI_PNC_Inventory_Complete", "Transfer complete")
+            or (tr("UI_PNC_Inventory_Failed", "Inventory action failed")
+                .. ": " .. tostring(reason or "failed"):gsub("_", " "))
+        return ok, reason
+    end
     return PNC.Client.SendInventoryAction({
         id = self.npcId,
         actionID = actionID,
@@ -826,6 +971,13 @@ local function selectedContainerLabel(containers, selected)
 end
 
 function ISPNCInventoryWindow:prerender()
+    local now = inventoryNow()
+    if self.inventoryRefreshPending == true
+        and now - (tonumber(self.inventoryRefreshStartedAt) or now)
+            >= INVENTORY_REFRESH_TIMEOUT_MS
+    then
+        self:finishInventoryRefresh(false, now)
+    end
     self:applyOpacityStyle()
     self:refreshInventory(false)
     self:updateInventoryTooltip()
@@ -916,7 +1068,15 @@ function ISPNCInventoryWindow:prerender()
         self.npcContainerList:getX() + math.floor(self.npcContainerList.width / 2),
         listY - 19, 0.85, 0.85, 0.85, 1, UIFont.Small
     )
-    if self.statusText then
+    local refreshFeedback = self.inventoryRefreshFeedback
+        and self.inventoryRefreshFeedbackUntil
+        and now < self.inventoryRefreshFeedbackUntil
+        and self.inventoryRefreshFeedback or nil
+    if refreshFeedback then
+        self:drawTextCentre(refreshFeedback, self.width / 2,
+            self.statusY or self.height - 42,
+            0.75, 0.82, 0.90, 1, UIFont.Small)
+    elseif self.statusText then
         self:drawTextCentre(self.statusText, self.width / 2, self.statusY or self.height - 42,
             0.75, 0.82, 0.90, 1, UIFont.Small)
     else
@@ -991,6 +1151,19 @@ function InventoryWindow.Open(npcId, options)
     window:setNPC(npcId)
     options = type(options) == "table" and options or {}
     window:setConversationMode(options.mode, options.token)
+    window:bringToTop()
+    return window
+end
+
+function InventoryWindow.OpenLocalDraft(draft, options)
+    options = type(options) == "table" and options or {}
+    local window = getOrCreateWindow()
+    local endpoint = TransferEndpoint.LocalDraft(draft)
+    endpoint.displayName = draft and draft.displayName or "Unique NPC Draft"
+    window:setTransferEndpoint(endpoint)
+    window:setConversationMode(nil, nil)
+    window.statusText = tr("UI_PNC_UniqueNPCEditor_InventoryHint",
+        "Editor copy: player inventory is unchanged")
     window:bringToTop()
     return window
 end

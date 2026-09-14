@@ -23,14 +23,13 @@ local function buildDefinition(
     position,
     anchor
 )
-    local vanillaTraitsVersion = math.max(0, math.floor(
-        tonumber(raw.vanillaTraitsGenerationVersion) or 0
-    ))
-    local dynamicTraitsVersion = math.max(0, math.floor(
-        tonumber(raw.dynamicTraitsGenerationVersion) or 0
-    ))
     return {
         id = raw.id or fallbackID,
+        uniqueDefinitionId = raw.uniqueDefinitionId,
+        uniqueDefinitionVersion = raw.uniqueDefinitionVersion,
+        inventoryTemplateRef = raw.inventoryTemplateRef,
+        startingItems = raw.startingItems,
+        skillBaseLevels = raw.skillBaseLevels,
         displayName = raw.displayName or raw.name
             or (identity and identity.displayName) or nil,
         name = raw.displayName or raw.name
@@ -83,15 +82,10 @@ local function buildDefinition(
         mapPresentation = raw.mapPresentation,
         generation = raw.generation,
         vanillaTraits = raw.vanillaTraits,
-        vanillaTraitsAuthored = raw.vanillaTraitsAuthored == true
-            or (raw.vanillaTraitsAuthored == nil
-                and vanillaTraitsVersion == 0
-                and Internal.hasTableEntries(raw.vanillaTraits)),
+        vanillaTraitsAuthored = raw.vanillaTraitsAuthored == true,
         dynamicTraits = raw.dynamicTraits,
-        dynamicTraitsAuthored = raw.dynamicTraitsAuthored == true
-            or (raw.dynamicTraitsAuthored == nil
-                and dynamicTraitsVersion == 0
-                and Internal.hasTableEntries(raw.dynamicTraits)),
+        dynamicTraitsAuthored = raw.dynamicTraitsAuthored == true,
+        npcTraits = raw.npcTraits,
         recipeKnowledge = raw.recipeKnowledge,
     }
 end
@@ -165,7 +159,6 @@ function Persistence.DeserializeRecord(raw, fallbackID)
     record.health = Internal.sanitizeHealth(raw.health or raw, record.health and record.health.max or Const.DEFAULT_HP_MAX)
     record.alive = tostring(record.health.state or "") ~= "dead"
         and tostring(record.health.state or "") ~= "corpse"
-        and tostring(raw.presenceState or "") ~= Const.PRESENCE_CORPSE
     progression = Internal.sanitizeProgression(raw.progression)
     record.progression = {
         skillLevelDeltas = progression.skillLevelDeltas,

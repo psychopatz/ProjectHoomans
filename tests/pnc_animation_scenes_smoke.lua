@@ -109,6 +109,8 @@ T.truthy(PNC.AnimationScenes.Get("idle.shift_weight").bump
     "default idle scene missing")
 T.truthy(PNC.AnimationScenes.Get("social.surrender").blocking == true,
     "surrender scene is not blocking")
+T.truthy(PNC.AnimationScenes.Get("social.reaction.wavehi").bump == "WaveHi",
+    "conversation wave scene is not registered")
 T.truthy(PNC.AnimationScenes.Get("idle.ambient").repeatMode == "loop",
     "idle scene repeat policy is not explicit")
 T.truthy(PNC.AnimationScenes.Get("facility.sleep.floor").steps[1].loop == true,

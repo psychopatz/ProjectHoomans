@@ -145,6 +145,13 @@ local BUILTINS = {
     ["pnc:base_not_established"] = function(context)
         return context.baseEstablished ~= true
     end,
+    ["pnc:settlement_visit"] = function(context)
+        local visit = context.settlementVisit
+        return type(visit) == "table"
+            and visit.active == true
+            and (tonumber(visit.expiresAt) or 0)
+                > (tonumber(context.worldAgeHours) or 0)
+    end,
 }
 
 local id

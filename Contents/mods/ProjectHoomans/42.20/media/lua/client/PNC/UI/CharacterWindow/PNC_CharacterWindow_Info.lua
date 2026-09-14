@@ -1,5 +1,6 @@
 require "PsychopatzCore/UI/Components/PsychopatzPortraitPanel"
 require "PNC/Knowledge/PNC_NPCIdentityPresentation"
+require "ISUI/ISToolTip"
 
 PNC = PNC or {}
 PNC.CharacterWindowTabs = PNC.CharacterWindowTabs or {}
@@ -12,8 +13,7 @@ local IdentityPresentation = PNC.NPCIdentityPresentation
 -- Temporary shared artwork until the Project Hoomans trait icon set is
 -- generated. Keep this fallback centralized so the generated paths can be
 -- added without changing the trait presentation flow.
-local TRAIT_ICON_PLACEHOLDER = "media/ui/Traits/trait_artisan.png"
-local TRAIT_ICON_PATHS = {}
+local TRAIT_ICON_PLACEHOLDER = "media/ui/Traits/trait_pnc_friendly.png"
 local TRAIT_ICON_SIZE = 18
 
 local function knowledgeSnapshot(npcID)
@@ -24,23 +24,45 @@ end
 local function traitEntries(npcID)
     local knowledge = knowledgeSnapshot(npcID)
     local entries = {}
+    local seen = {}
     local known = false
     for _, category in ipairs(knowledge and knowledge.categories or {}) do
         for _, descriptor in ipairs(category.descriptors or {}) do
             local presentation = descriptor.presentation or {}
-            if presentation.topicID == "traits" and descriptor.value ~= nil then
+            if presentation.topicID == "traits"
+                and (presentation.traitSource == "npc"
+                    or presentation.traitSource == "vanilla")
+                and descriptor.value ~= nil
+            then
                 known = true
                 if descriptor.value == true then
-                    local traitID = tostring(presentation.traitID or "")
-                    entries[#entries + 1] = {
-                        id = traitID,
-                        label = Shared.Text(
-                            presentation.labelKey, presentation.traitID
-                        ),
-                        iconPath = TRAIT_ICON_PATHS[traitID]
-                            or presentation.iconPath
-                            or TRAIT_ICON_PLACEHOLDER,
-                    }
+                    local rawTraitID = tostring(presentation.traitID or "")
+                    local traitID = PNC.NPCTraits
+                        and PNC.NPCTraits.NormalizeID
+                        and PNC.NPCTraits.NormalizeID(rawTraitID)
+                        or rawTraitID
+                    local definition = PNC.NPCTraits
+                        and PNC.NPCTraits.GetDefinition
+                        and PNC.NPCTraits.GetDefinition(traitID) or nil
+                    if not seen[traitID] then
+                        local labelKey = definition and definition.labelKey
+                            or presentation.labelKey
+                        local descriptionKey = definition
+                            and definition.descriptionKey
+                            or presentation.descriptionKey
+                        local label = Shared.TraitLabel(
+                            traitID, definition, labelKey)
+                        entries[#entries + 1] = {
+                            id = traitID,
+                            label = label,
+                            description = Shared.TraitDescription(
+                                traitID, definition, descriptionKey, label),
+                            iconPath = definition and definition.iconPath
+                                or presentation.iconPath
+                                or TRAIT_ICON_PLACEHOLDER,
+                        }
+                        seen[traitID] = true
+                    end
                 end
             end
         end
@@ -49,19 +71,6 @@ local function traitEntries(npcID)
         return tostring(left.label) < tostring(right.label)
     end)
     return entries, known
-end
-
-local function traitText(npcID, entries, known)
-    if not entries or not known then
-        entries, known = traitEntries(npcID)
-    end
-    if not known then return "Unknown" end
-    if #entries == 0 then
-        return Shared.Text("UI_PNC_Character_Traits_None", "None")
-    end
-    local labels = {}
-    for index = 1, #entries do labels[index] = entries[index].label end
-    return table.concat(labels, ", ")
 end
 
 local function loadTraitIcon(path)
@@ -81,8 +90,12 @@ local function drawTraitIcons(view, entries, x, y, availableWidth)
     ))
     local drawn = 0
     local index
+    view.traitIconHitboxes = {}
     for index = 1, #entries do
         local texture = loadTraitIcon(entries[index].iconPath)
+        if not texture then
+            texture = loadTraitIcon(TRAIT_ICON_PLACEHOLDER)
+        end
         if texture then
             local column = drawn % columns
             local row = math.floor(drawn / columns)
@@ -99,11 +112,71 @@ local function drawTraitIcons(view, entries, x, y, availableWidth)
                     TRAIT_ICON_SIZE, TRAIT_ICON_SIZE, 1, 1, 1, 1
                 )
             end
+            view.traitIconHitboxes[#view.traitIconHitboxes + 1] = {
+                x = iconX, y = iconY,
+                width = TRAIT_ICON_SIZE, height = TRAIT_ICON_SIZE,
+                entry = entries[index],
+            }
             drawn = drawn + 1
         end
     end
     if drawn == 0 then return 0 end
     return math.ceil(drawn / columns) * (TRAIT_ICON_SIZE + gap) - gap
+end
+
+local function hideTraitTooltip(view)
+    local tooltip = view and view.traitTooltip or nil
+    if tooltip and tooltip.getIsVisible and tooltip:getIsVisible() then
+        tooltip:setVisible(false)
+        tooltip:removeFromUIManager()
+    end
+end
+
+local function hoveredTrait(view, x, y)
+    local hitboxes = view and view.traitIconHitboxes or {}
+    local index
+    local hitbox
+    for index = #hitboxes, 1, -1 do
+        hitbox = hitboxes[index]
+        if x >= hitbox.x and x <= hitbox.x + hitbox.width
+            and y >= hitbox.y and y <= hitbox.y + hitbox.height
+        then
+            return hitbox.entry
+        end
+    end
+    return nil
+end
+
+local function updateTraitTooltip(view, x, y)
+    -- ISUI passes movement deltas to onMouseMove, not absolute local
+    -- coordinates. Hitboxes are drawn in the tab's local coordinate space.
+    x = view and view.getMouseX and tonumber(view:getMouseX())
+        or tonumber(x) or 0
+    y = view and view.getMouseY and tonumber(view:getMouseY())
+        or tonumber(y) or 0
+    local entry = hoveredTrait(view, x, y)
+    local text = entry and entry.description or nil
+    if not text or not ISToolTip then
+        hideTraitTooltip(view)
+        return
+    end
+    if not view.traitTooltip then
+        view.traitTooltip = ISToolTip:new()
+        view.traitTooltip:setOwner(view)
+        view.traitTooltip:setVisible(false)
+        view.traitTooltip:setAlwaysOnTop(true)
+        view.traitTooltip.maxLineWidth = 1000
+    end
+    if not view.traitTooltip:getIsVisible() then
+        view.traitTooltip:addToUIManager()
+        view.traitTooltip:setVisible(true)
+    end
+    if view.traitTooltip.setName then
+        view.traitTooltip:setName(entry.label)
+    end
+    view.traitTooltip.description = text
+    view.traitTooltip:setX(x + 23)
+    view.traitTooltip:setY(y + 23)
 end
 
 function Tabs.CreateInfoChildren(view)
@@ -123,9 +196,20 @@ function Tabs.CreateInfoChildren(view)
 end
 
 function Tabs.SetInfoContext(view, snapshot, payload)
+    hideTraitTooltip(view)
+    view.traitIconHitboxes = {}
     local character = Shared.GetLiveCharacter(view.npcId)
     local spec = Shared.BuildPortraitSpec(view.npcId, snapshot, payload)
     if view.portraitPanel then view.portraitPanel:setTarget(character, spec) end
+end
+
+function Tabs.OnInfoMouseMove(view, x, y)
+    updateTraitTooltip(view, x, y)
+    return true
+end
+
+function Tabs.OnInfoMouseMoveOutside(view)
+    hideTraitTooltip(view)
 end
 
 function Tabs.LayoutInfo(view)
@@ -169,17 +253,28 @@ function Tabs.RenderInfo(view, snapshot, payload, topY)
     y = y + 14
 
     y = Shared.DrawLabelValue(view, "Faction", knownFaction and knownFaction.name or "Unknown", x, y, labelWidth)
-    y = Shared.DrawLabelValue(
-        view,
-        Shared.Text("UI_PNC_Character_Traits", "Traits"),
-        traitText(view.npcId, traitList, traitsKnown),
-        x, y, labelWidth
-    )
+    local traitLabel = Shared.Text("UI_PNC_Character_Traits", "Traits")
+    local traitTextY = y
+    local traitFontHeight = getTextManager():getFontHeight(UIFont.Small)
+    view:drawTextRight(traitLabel, x + labelWidth, traitTextY,
+        1, 1, 1, 1, UIFont.Small)
+    if not traitsKnown then
+        view:drawText("Unknown", x + labelWidth + 10, traitTextY,
+            1, 1, 1, 0.62, UIFont.Small)
+    elseif #traitList == 0 then
+        view:drawText(
+            Shared.Text("UI_PNC_Character_Traits_None", "None"),
+            x + labelWidth + 10, traitTextY, 1, 1, 1, 0.62, UIFont.Small
+        )
+    end
     local traitIconHeight = drawTraitIcons(
-        view, traitList, x + labelWidth + 10, y + 1,
+        view, traitList, x + labelWidth + 10, traitTextY,
         width - labelWidth - 10
     )
-    if traitIconHeight > 0 then y = y + traitIconHeight + 4 end
+    y = traitTextY + math.max(
+        traitFontHeight + 6,
+        traitIconHeight > 0 and traitIconHeight + 4 or 0
+    )
     local activity = Shared.GetMedicalActivity
         and Shared.GetMedicalActivity(snapshot, payload) or nil
     y = Shared.DrawLabelValue(view, "Status",

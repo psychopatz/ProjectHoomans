@@ -151,6 +151,7 @@ function Parts.BuildCombatDebugState(record, combat, firearmState)
             } or nil,
         zombieStimulus = zombieStimulusDebug,
         aimConfidence = aim.confidence,
+        aimRequiredConfidence = aim.requiredConfidence,
         aimReadyInMs = aim.readyAt
             and math.max(0, (tonumber(aim.readyAt) or now) - now)
             or nil,
@@ -192,6 +193,16 @@ function Parts.BuildCombatDebugState(record, combat, firearmState)
                 0,
                 (tonumber(action.finishAt) or now) - now
             ),
+            effectiveCooldownMs = action.effectiveCooldownMs,
+            rangedHitChance = action.rangedShotProfile
+                and action.rangedShotProfile.hitChance or nil,
+            rangedRoll = action.rangedOutcome
+                and action.rangedOutcome.profile
+                and action.rangedOutcome.profile.roll or nil,
+            rangedOutcome = action.rangedOutcome
+                and action.rangedOutcome.reason or nil,
+            traitFingerprint = action.rangedShotProfile
+                and action.rangedShotProfile.traitFingerprint or nil,
         } or nil,
         magazineCount = firearmState and firearmState.count or nil,
         magazineCapacity = firearmState and firearmState.capacity or nil,

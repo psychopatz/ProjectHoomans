@@ -59,15 +59,28 @@ function Traversal.Arrive(groupOrID, at)
     local settlementTraveling = mobile
         and mobile.activity
             == PNC.FactionConstants.MOBILE_ACTIVITY_TRAVELING_TO_SETTLEMENT
+    local settlementTravel = mobile and mobile.travel
+        and PNC.Core and PNC.Core.DeepCopy
+        and PNC.Core.DeepCopy(mobile.travel) or nil
     local target = Locations.Get(group.targetLocation.id)
     if not target then
         group.targetLocation = nil
         Groups.SetState(group, "IDLE", at, at)
-        if settlementTraveling and PNC.Factions.UpdateMobileGroup then
+        if settlementTraveling and PNC.Factions.SetMobileGroup then
+            local failedMobile = PNC.Core and PNC.Core.DeepCopy
+                and PNC.Core.DeepCopy(faction.mobile) or faction.mobile
+            failedMobile.activity =
+                PNC.FactionConstants.MOBILE_ACTIVITY_STREET_ROAMING
+            failedMobile.travel = nil
+            failedMobile.ambient = nil
+            PNC.Factions.SetMobileGroup(
+                faction.id,
+                failedMobile,
+                "mobile_settlement_target_missing"
+            )
+        elseif settlementTraveling and PNC.Factions.UpdateMobileGroup then
             PNC.Factions.UpdateMobileGroup(faction.id, {
                 activity = PNC.FactionConstants.MOBILE_ACTIVITY_STREET_ROAMING,
-                travel = nil,
-                ambient = nil,
             }, "mobile_settlement_target_missing")
         end
         return false, "target_missing"
@@ -94,11 +107,40 @@ function Traversal.Arrive(groupOrID, at)
             mobilePatch.travel = nil
             mobilePatch.ambient = nil
         end
-        PNC.Factions.UpdateMobileGroup(
-            faction.id, mobilePatch, "abstract_group_arrival")
+        if settlementTraveling and PNC.Factions.SetMobileGroup
+        then
+            local settledMobile = PNC.Core and PNC.Core.DeepCopy
+                and PNC.Core.DeepCopy(faction.mobile) or faction.mobile
+            for key, value in pairs(mobilePatch) do
+                settledMobile[key] = value
+            end
+            settledMobile.travel = nil
+            settledMobile.ambient = nil
+            PNC.Factions.SetMobileGroup(
+                faction.id,
+                settledMobile,
+                "abstract_group_arrival"
+            )
+        else
+            PNC.Factions.UpdateMobileGroup(
+                faction.id, mobilePatch, "abstract_group_arrival")
+        end
     end
     Locations.Arrive(group, at, 0)
     local reports = Encounters.DetectAt(target, group, at)
+    if settlementTravel
+        and PNC.MobileSettlementVisitService
+        and PNC.MobileSettlementVisitService.OnSettlementArrival
+    then
+        PNC.MobileSettlementVisitService.OnSettlementArrival(
+            faction,
+            target,
+            settlementTravel,
+            at,
+            group,
+            reports
+        )
+    end
     Store.Emit("GROUP_ARRIVED", { groupId = group.id,
         locationId = target.id, encounters = #reports })
     if group.mission == "FLEE" then

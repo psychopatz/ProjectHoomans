@@ -13,14 +13,22 @@ local Core = PNC.Core
 function Inventory.BuildSummaryPayload(record)
     local raw = record and record.persistedInventory or nil
     local persistedSummary = raw and (raw.summary or raw.inventorySummary) or nil
+    local persistedBaseline = raw and raw[4] or nil
     local persistedGenerator = raw and raw.template and tonumber(raw.template.generatorVersion) or nil
     local currentGenerator = PNC.Const and tonumber(PNC.Const.GENERATOR_VERSION) or 1
     local inv
+    local summary
+    local templateRef = record and record.inventoryTemplateRef or nil
+    if not templateRef and type(persistedBaseline) == "table" then
+        templateRef = persistedBaseline.templateRef
+    end
     if type(record and record.inventory) ~= "table"
         and type(persistedSummary) == "table"
         and persistedGenerator == currentGenerator
     then
-        return Core.DeepCopy(persistedSummary)
+        summary = Core.DeepCopy(persistedSummary)
+        summary.templateRef = summary.templateRef or templateRef
+        return summary
     end
     inv = Inventory.EnsureRecordInventory(record)
     if not inv then
@@ -38,6 +46,7 @@ function Inventory.BuildSummaryPayload(record)
         containerCount = tonumber(inv.containerCount) or Internal.countMapEntries(inv.containers),
         signature = inv.signature,
         persistenceMode = inv.persistenceMode,
+        templateRef = inv.template and inv.template.templateRef or templateRef,
     }
 end
 

@@ -104,6 +104,9 @@ function H.BuildMobileState(site, mode, at, previous, moved, controlMode)
         activity = previous and previous.activity
             or Constants.MOBILE_ACTIVITY_STREET_ROAMING,
         travel = previous and H.Copy(previous.travel) or nil,
+        pendingSettlementArrival = previous
+            and H.Copy(previous.pendingSettlementArrival) or nil,
+        visit = previous and H.Copy(previous.visit) or nil,
         playerRoam = playerRoam,
         lastDepartureAt = previous and previous.lastDepartureAt or -1,
         site = site,

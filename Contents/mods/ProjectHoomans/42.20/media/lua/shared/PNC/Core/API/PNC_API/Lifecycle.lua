@@ -15,6 +15,26 @@ local Health = PNC.Health
 local Inventory = PNC.Inventory
 local Network = PNC.Network
 
+local function isUniqueSpawnReserved(definition)
+    local uniqueID = tostring(definition and definition.uniqueDefinitionId or "")
+    local uniqueRegistry
+    local state
+    if uniqueID == "" then return true end
+    uniqueRegistry = PNC.UniqueNPCRegistry
+    if not uniqueRegistry or not uniqueRegistry.Get then
+        return true
+    end
+    state = uniqueRegistry.Get(uniqueID)
+    if state and state.status == "reserved" then
+        return true
+    end
+    Core.LogWarn(
+        "PNC rejected unreserved unique NPC spawn uniqueDefinitionId="
+            .. uniqueID
+    )
+    return false
+end
+
 local function hasAnyEntries(map)
     local _
     for _, _ in pairs(map or {}) do
@@ -124,6 +144,9 @@ function API.Spawn(definition)
         return nil
     end
     def = Types.NormalizeDefinition(definition)
+    if not isUniqueSpawnReserved(def) then
+        return nil
+    end
     record = Types.NewRecord(def)
     return finalizeNewRecord(record, def)
 end

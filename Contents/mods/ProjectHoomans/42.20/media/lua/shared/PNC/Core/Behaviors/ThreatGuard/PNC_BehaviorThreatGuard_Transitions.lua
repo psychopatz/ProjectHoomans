@@ -12,6 +12,39 @@ local Diagnostics = PNC.PerformanceScalingDiagnostics
 
 local SCAN_MS = Internal.SCAN_MS
 local VALIDATE_MS = Internal.VALIDATE_MS
+
+local function preserveTravelConversationScene(record, scene)
+    local runtime = record and record.runtime or nil
+    local lease = runtime and runtime.conversationLease or nil
+    return scene
+        and scene.id == "social.conversation"
+        and lease
+        and lease.travelHold == true
+end
+
+-- A scene callback can replace the scene with a native wake transaction (the
+-- bed/sleep path does this).  Treat a blocking scene that survives the normal
+-- interrupt as a failed combat handoff instead of claiming the combat lane
+-- while the presentation still owns the body.
+local function releaseCombatScene(record, zombie, scene)
+    local runtime = record and record.runtime or nil
+    local remaining
+    if not runtime or not scene then return true end
+    if Scenes and Scenes.Interrupt then
+        Scenes.Interrupt(record, zombie, "combat")
+    end
+    remaining = runtime.animationScene
+    if remaining == scene
+        and remaining.blocking == true
+        and Scenes
+        and Scenes.Stop
+    then
+        Scenes.Stop(record, zombie, "threat_guard_combat")
+        remaining = runtime.animationScene
+    end
+    return not remaining or remaining.blocking ~= true
+end
+
 function Internal.LogTransition(eventName, record, zombie, state, target, reason)
     local runtime = record and record.runtime or {}
     local modData = zombie and zombie.getModData and zombie:getModData() or nil
@@ -69,6 +102,12 @@ function Internal.RefreshTarget(record, state, threatContext, now)
     state.target = nil
     if now < (tonumber(state.nextScanAt) or 0) then return nil end
     state.nextScanAt = now + SCAN_MS
+    if Targeting and Targeting.ResolveImmediateNPCThreat then
+        candidate = Targeting.ResolveImmediateNPCThreat(record)
+        if Internal.IsThreat(candidate, threatContext) then
+            return candidate
+        end
+    end
     if Targeting and Targeting.ResolveImmediateZombieThreat then
         candidate = Targeting.ResolveImmediateZombieThreat(record)
         if Internal.IsThreat(candidate, threatContext) then
@@ -149,6 +188,7 @@ end
 
 function Internal.Engage(record, zombie, state, target, threatContext)
     local scene = record.runtime and record.runtime.animationScene or nil
+    local runtime = record.runtime or {}
     if not Internal.AttackEnabled(record) then
         return Internal.EnterAvoidance(
             record,
@@ -158,8 +198,19 @@ function Internal.Engage(record, zombie, state, target, threatContext)
             threatContext
         )
     end
-    if scene and Scenes and Scenes.Interrupt then
-        Scenes.Interrupt(record, zombie, "combat")
+    if scene and not preserveTravelConversationScene(record, scene) then
+        if not releaseCombatScene(record, zombie, scene) then
+            return false
+        end
+    end
+    -- Stopping a sleep scene is intentionally two-phase: the facility owner
+    -- must release the native bed/resting carrier before combat can use it.
+    -- Let the facility wake pump own this tick; the wake callback preserves a
+    -- bounded self-defense threat for the next combat tick.
+    if runtime.facilityActivity
+        and runtime.facilityActivity.sleepWakePending == true
+    then
+        return false
     end
     state.phase = "engaged"
     state.target = target

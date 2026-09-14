@@ -224,7 +224,33 @@ local peacefulTarget = T.truthy(
 )
 T.equal(peacefulTarget.kind, "ai_settlement",
     "peaceful group prefers an AI settlement")
+local peacefulStarted, peacefulReason = Director.StartSettlementTravel(
+    "faction_trader",
+    peacefulTarget,
+    48
+)
+T.truthy(peacefulStarted, peacefulReason)
+T.equal(registry.faction_trader.mobile.travel.purpose,
+    PNC.FactionConstants.MOBILE_TRAVEL_PURPOSE_ADMISSION,
+    "non-hostile settlement travel carries the admission purpose")
+registry.faction_trader.mobile.activity =
+    PNC.FactionConstants.MOBILE_ACTIVITY_STREET_ROAMING
+registry.faction_trader.mobile.travel = nil
+registry.faction_trader.mobile.ambient = {
+    objective = PNC.FactionConstants.MOBILE_AMBIENT_ROAD,
+}
 registry.faction_trader.mobile.lastDepartureAt = 48
+registry.faction_trader.mobile.ambient = nil
+registry.faction_trader.mobile.visit = { expiresAt = 47 }
+T.truthy(H.IsStreetRoaming(registry.faction_trader),
+    "expired settlement visits can re-enter the normal departure pool")
+registry.faction_trader.mobile.visit.expiresAt = 49
+T.falsy(H.IsStreetRoaming(registry.faction_trader),
+    "active settlement visits keep the group out of the departure pool")
+registry.faction_trader.mobile.visit = nil
+registry.faction_trader.mobile.ambient = {
+    objective = PNC.FactionConstants.MOBILE_AMBIENT_ROAD,
+}
 
 local started, reason = Director.StartSettlementTravel(
     "faction_looters",
@@ -238,6 +264,9 @@ T.equal(registry.faction_looters.mobile.activity,
 T.equal(registry.faction_looters.mobile.travel.destination.kind,
     "player_colony",
     "departure persists the selected settlement kind")
+T.equal(registry.faction_looters.mobile.travel.purpose,
+    PNC.FactionConstants.MOBILE_TRAVEL_PURPOSE_HOSTILE_CONTACT,
+    "looter settlement travel remains on the hostile encounter path")
 T.equal(registry.faction_looters.mobile.lastDepartureAt, 48,
     "departure persists the daily attempt timestamp")
 T.equal(groups.faction_looters.state, "ARRIVED",

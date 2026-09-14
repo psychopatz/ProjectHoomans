@@ -1,5 +1,13 @@
 local Scene = PNC.ConversationScene
 local Internal = Scene.Internal
+local Const = PNC.Const or {}
+
+local ACTIVE_JOURNEY_STATES = {
+    planned = true,
+    en_route = true,
+    waiting = true,
+    paused = true,
+}
 
 local function log(event, details)
     if print then
@@ -19,6 +27,20 @@ local function sceneOptions(options)
         math.min(20, tonumber(options.dangerRadius)
             or Scene.DANGER_RADIUS)
     )
+end
+
+local function isTravelJourney(record)
+    local order = record and record.orderSpec or nil
+    local journey = record and record.travel or nil
+    local state = journey and tostring(journey.state or "") or ""
+    return tostring(order and order.kind or "")
+            == tostring(Const.ORDER_TRAVEL or "travel")
+        and ACTIVE_JOURNEY_STATES[state] == true
+end
+
+local function isTravelConversation(record, lease)
+    return (lease and lease.travelHold == true)
+        or isTravelJourney(record)
 end
 
 local function playerOwnsLease(player, lease)
@@ -80,7 +102,7 @@ end
 
 local function createLease(
     record, player, token, currentTime,
-    maximumDistance, dangerRadius, guardThreats, hostileParley
+    maximumDistance, dangerRadius, guardThreats, hostileParley, travelHold
 )
     return {
         token = token,
@@ -96,6 +118,7 @@ local function createLease(
         dangerRadius = dangerRadius,
         guardThreats = guardThreats,
         hostileParley = hostileParley,
+        travelHold = travelHold == true,
     }
 end
 
@@ -136,6 +159,7 @@ function Scene.Begin(record, zombie, player, token, options)
     local pending
     local previousState
     local previousProcessedRequests
+    local activeTravelHeartbeat
     options, maximumDistance, dangerRadius = sceneOptions(options)
     guardThreats = options.guardThreats ~= false
     enforceDistance = options.enforceDistance ~= false
@@ -144,6 +168,15 @@ function Scene.Begin(record, zombie, player, token, options)
     then
         return false, "npc_unavailable"
     end
+    record.runtime = record.runtime or {}
+    currentTime = Internal.Now()
+    token = tostring(token or "")
+    current = record.runtime.conversationLease
+    activeTravelHeartbeat = current
+        and tostring(current.token or "") == token
+        and playerOwnsLease(player, current)
+        and (tonumber(current.expiresAt) or 0) > currentTime
+        and current.travelHold == true
     if enforceDistance
         and Internal.DistanceSq(player, zombie)
             > maximumDistance * maximumDistance
@@ -151,7 +184,7 @@ function Scene.Begin(record, zombie, player, token, options)
         return false, "distance"
     end
     hostileParley = hostileParleyRequested(record, options)
-    if guardThreats and Scene.HasThreat(
+    if guardThreats and not activeTravelHeartbeat and Scene.HasThreat(
         record,
         zombie,
         player,
@@ -162,9 +195,6 @@ function Scene.Begin(record, zombie, player, token, options)
     end
     registered, reason = Scene.EnsureRegistered()
     if not registered then return false, reason end
-    record.runtime = record.runtime or {}
-    currentTime = Internal.Now()
-    token = tostring(token or "")
     renewed = renewLease(record, token, currentTime)
     if renewed then return true, renewed end
     pending = record.runtime.llmRequestLease
@@ -199,7 +229,8 @@ function Scene.Begin(record, zombie, player, token, options)
         maximumDistance,
         dangerRadius,
         guardThreats,
-        hostileParley
+        hostileParley,
+        isTravelJourney(record)
     )
     if hostileParley
         and not establishParley(
@@ -459,6 +490,12 @@ function Scene.Pump(record, zombie, currentTime)
         tonumber(lease.dangerRadius) or Scene.DANGER_RADIUS,
         { ignoreTalkingNPC = lease.hostileParley == true }
     ) then
+        if isTravelConversation(record, lease) then
+            -- ThreatGuard owns the temporary combat overlay. Keep the
+            -- conversation lease alive so the NPC returns to its stationary
+            -- conversation hold after the danger clears.
+            return false
+        end
         return Scene.End(
             record, zombie, lease.token, "conversation_danger"
         )

@@ -10,6 +10,11 @@ local Internal = Tactics.Internal
 local Core = PNC.Core
 local Const = PNC.Const
 local Skills = PNC.Skills
+local TraitEffects = PNC.NPCTraitEffects
+
+local function clamp(value, minimum, maximum)
+    return math.max(minimum, math.min(maximum, tonumber(value) or minimum))
+end
 
 function Tactics.CanTakeRangedShot(record, target)
     local now
@@ -22,6 +27,8 @@ function Tactics.CanTakeRangedShot(record, target)
     local moveTolerance
     local progress
     local confidence
+    local requiredConfidence
+    local firearmModifiers
     local safe
     local reason
     if not record or not target then return false, "no_target" end
@@ -50,6 +57,9 @@ function Tactics.CanTakeRangedShot(record, target)
         state.targetY = target.y
     end
     aiming = Skills and Skills.GetLevel and Skills.GetLevel(record, "Aiming") or 0
+    firearmModifiers = TraitEffects
+        and TraitEffects.ResolveFirearmModifiers
+        and TraitEffects.ResolveFirearmModifiers(record) or {}
     dist = math.sqrt(tonumber(target.distSq)
         or Core.DistanceSq(record.x, record.y, target.x, target.y))
     report = Internal.AssessThreat(record, target)
@@ -63,6 +73,11 @@ function Tactics.CanTakeRangedShot(record, target)
         tonumber(Const.RANGED_AIM_MIN_MS) or 140,
         math.min(900, settleMs)
     )
+    settleMs = settleMs * clamp(
+        tonumber(firearmModifiers.aimTimeMultiplier) or 1,
+        0.50,
+        2.00
+    )
     state.readyAt = (tonumber(state.startedAt) or now) + settleMs
     progress = math.max(0, math.min(
         1,
@@ -75,7 +90,14 @@ function Tactics.CanTakeRangedShot(record, target)
         - math.min(report.visiblePressureCount, 4) * 0.035
     state.confidence = math.max(0, math.min(1, confidence))
     state.settleMs = settleMs
-    if now < state.readyAt or state.confidence < 0.54 then
+    state.visiblePressureCount = report.visiblePressureCount
+    requiredConfidence = clamp(
+        0.54 + (tonumber(firearmModifiers.confidenceThresholdBias) or 0),
+        0.30,
+        0.75
+    )
+    state.requiredConfidence = requiredConfidence
+    if now < state.readyAt or state.confidence < requiredConfidence then
         return false, "aiming"
     end
     return true, "aim_confident"

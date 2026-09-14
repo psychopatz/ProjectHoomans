@@ -141,7 +141,8 @@ function Types.NewNPCPersonality(identitySeed, archetypeID, overrides)
         nil,
         identitySeed,
         archetypeID,
-        overrides
+        overrides,
+        nil
     )
 end
 
@@ -149,7 +150,8 @@ function Types.NormalizeNPCPersonality(
     value,
     identitySeed,
     archetypeID,
-    overrides
+    overrides,
+    traitSource
 )
     local source = type(value) == "table" and value or nil
     local normalizedOverrides =
@@ -159,16 +161,30 @@ function Types.NormalizeNPCPersonality(
         1
     )))
     local sourceVersion = source and revision(source.generationVersion) or 0
+    local hasTraitSource = type(traitSource) == "table"
+    local currentTraitFingerprint = hasTraitSource
+        and PNC.NPCTraitEffects
+        and PNC.NPCTraitEffects.GetFingerprint
+        and PNC.NPCTraitEffects.GetFingerprint(traitSource) or nil
+    local sourceTraitFingerprint = source and tostring(
+        source.traitFingerprint or "") or ""
+    if currentTraitFingerprint == nil then
+        currentTraitFingerprint = sourceTraitFingerprint
+    end
     local sourceIsGenerated = not source
         or source.generatedFromSeed == true
         or (source.generatedFromSeed == nil and sourceVersion > 0)
     local shouldRegenerate = not source
         or (sourceIsGenerated and sourceVersion ~= currentVersion)
+        or (hasTraitSource and sourceIsGenerated and sourceTraitFingerprint
+            ~= currentTraitFingerprint)
     local generated = Generator.Generate(
         identitySeed,
         archetypeID,
-        shouldRegenerate and normalizedOverrides or nil
+        shouldRegenerate and normalizedOverrides or nil,
+        traitSource
     )
+    generated.traitFingerprint = currentTraitFingerprint
     local generationVersion
     local output
     local index
@@ -209,6 +225,7 @@ function Types.NormalizeNPCPersonality(
         ),
         generatedFromSeed = sourceIsGenerated,
         generationVersion = generationVersion,
+        traitFingerprint = sourceTraitFingerprint,
     }
     for index = 1, #Constants.NUMERIC_DIMENSIONS do
         dimension = Constants.NUMERIC_DIMENSIONS[index]

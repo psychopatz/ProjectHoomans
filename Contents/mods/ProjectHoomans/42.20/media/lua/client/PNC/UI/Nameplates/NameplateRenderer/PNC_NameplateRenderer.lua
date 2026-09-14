@@ -1,5 +1,6 @@
 require "PNC/UI/Nameplates/PNC_NameplateSpeech"
 require "PNC/UI/Nameplates/PNC_NameplateRelationshipFeedbackRenderer"
+require "PNC/UI/Nameplates/PNC_NameplateToolFeedbackRenderer"
 require "PNC/UI/Nameplates/PNC_NameplateScopes"
 
 PNC = PNC or {}

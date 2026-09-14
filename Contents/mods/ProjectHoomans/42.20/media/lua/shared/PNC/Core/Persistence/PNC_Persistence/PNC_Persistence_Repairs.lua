@@ -235,11 +235,11 @@ function Repairs.GetDiagnostics()
     }
 end
 
--- Facility activity is runtime-owned. Its order can be persisted as a
--- breadcrumb, but its reservation, animation, path, and task lease cannot be
--- safely resumed after a process restart. Clear that breadcrumb on load so
--- tasking can choose a fresh intent instead of inheriting a dead lease.
-Repairs.Register("npc_record", "facility_activity_runtime", 1,
+-- Facility activity is runtime-owned. Its reservation, animation, path, and
+-- task lease cannot be safely resumed after a process restart. Revision 2 is
+-- deliberately a new load-time pass: revision 1 may already be recorded on
+-- a save which later persisted another facility breadcrumb.
+Repairs.Register("npc_record", "facility_activity_runtime", 2,
     function(record)
         local order = record.orderSpec
         if type(order) ~= "table"

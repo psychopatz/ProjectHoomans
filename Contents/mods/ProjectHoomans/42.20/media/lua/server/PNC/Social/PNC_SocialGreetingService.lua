@@ -22,6 +22,7 @@ local PlayerCharacters = PNC.PlayerCharacters
 local Interactions = PNC.VanillaEmoteInteractions
 local Relationships = PNC.Relationships
 local Presentation = PNC.RelationshipPresentation
+local PresentationAnimations = PNC.PresentationAnimations
 local Network = PNC.Network
 local Meeting = PNC.SocialMeeting
 if not Meeting then
@@ -245,6 +246,7 @@ function Service.TryGreet(player, target, at, actorKey)
     local before
     local after
     local delta
+    local presentationEventID
     local greetingState
     local flavorID
     local meetingOK
@@ -336,6 +338,20 @@ function Service.TryGreet(player, target, at, actorKey)
     end
     after = relationshipSummary(afterRelationship, true, npcID)
     delta = relationshipDelta(before, after)
+    presentationEventID = details and details.eventID or eventID
+    if PresentationAnimations and PresentationAnimations.Request then
+        -- This greeting is authoritative but has no conversation lease, so
+        -- keep it on the server-owned presentation path.
+        PresentationAnimations.Request(
+            record,
+            target.body,
+            "greeting.wavehi",
+            {
+                eventID = presentationEventID,
+                reason = "proximity_greeting",
+            }
+        )
+    end
     if Network and Network.SendConversationRelationshipForNPC then
         Network.SendConversationRelationshipForNPC(
             player,
@@ -343,7 +359,7 @@ function Service.TryGreet(player, target, at, actorKey)
             "proximity_greeting",
             {
                 source = "proximity_greeting",
-                eventID = details and details.eventID or eventID,
+                eventID = presentationEventID,
                 relationshipBefore = before,
                 relationshipAfter = after,
                 relationshipDelta = delta,
@@ -353,7 +369,7 @@ function Service.TryGreet(player, target, at, actorKey)
     end
     if Network and Network.SendSocialGreeting then
         Network.SendSocialGreeting(player, {
-            eventID = details and details.eventID or eventID,
+            eventID = presentationEventID,
             npcID = npcID,
             flavorID = flavorID,
             npcType = npcType,

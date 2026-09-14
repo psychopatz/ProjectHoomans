@@ -61,6 +61,18 @@ PNC = {
             return value
         end,
     },
+    UniqueNPCs = {
+        GetInventoryTemplate = function(id)
+            if id ~= "unique:test:v1" then return nil end
+            return {
+                id = id,
+                version = 1,
+                items = {
+                    { templateKey = "money", type = "Base.Money", stack = 1000 },
+                },
+            }
+        end,
+    },
 }
 
 T.load(ROOT .. "Skills/PNC_Skills.lua")
@@ -115,6 +127,20 @@ malformedProgress.progression.skillLevelDeltas = "invalid"
 PNC.Skills.GetLevel(malformedProgress, "Strength")
 T.equal(type(malformedProgress.progression.skillXP), "table", "invalid skill XP map was not normalized")
 T.equal(type(malformedProgress.progression.skillLevelDeltas), "table", "invalid skill delta map was not normalized")
+
+PNC.AuthoredSkillRecord = {
+    id = "npc_authored_skill",
+    identitySeed = 42,
+    archetypeID = "Test",
+    tacticalClass = "colonist",
+    weaponMode = "melee",
+    skillBaseLevels = { Strength = 10 },
+    progression = { skillLevelDeltas = {}, skillXP = {} },
+}
+T.equal(PNC.Skills.GetBaseLevel(PNC.AuthoredSkillRecord, "Strength"), 10,
+    "authored starting skill level")
+T.equal(PNC.Skills.GetLevel(PNC.AuthoredSkillRecord, "Strength"), 10,
+    "authored starting skill survives level lookup")
 
 skillBias.Strength = { min = 5, max = 5 }
 local newBase = PNC.Skills.GetBaseLevel(record, "Strength")
@@ -212,6 +238,34 @@ T.equal(saved[1], 2, "NPC inventory schema")
 T.equal(saved[2], "BASELINE_DELTA", "NPC persistence mode")
 T.equal(saved[4].generatorVersion, 1, "generator version")
 T.equal(saved[5][1], 1, "core delta schema")
+
+PNC.UniqueTemplateRecord = {
+    id = "npc_unique_template",
+    identitySeed = 77,
+    archetypeID = "Test",
+    tacticalClass = "colonist",
+    weaponMode = "melee",
+    recruited = true,
+    inventoryTemplateRef = "unique:test:v1",
+    progression = { skillLevelDeltas = {}, skillXP = {} },
+    equipment = { worn = {}, attached = {} },
+    runtime = {},
+}
+PNC.UniqueTemplateInventory = PNC.Inventory.CreateFromTemplate(
+    PNC.UniqueTemplateRecord
+)
+PNC.UniqueTemplateMoney = nil
+for _, item in pairs(PNC.UniqueTemplateInventory.items) do
+    if item.type == "Base.Money" then PNC.UniqueTemplateMoney = item end
+end
+T.truthy(PNC.UniqueTemplateMoney, "unique inventory template item missing")
+T.equal(PNC.UniqueTemplateMoney.stack, 1000, "unique inventory template stack")
+T.equal(PNC.UniqueTemplateMoney.templateKey, "tmpl:unique:money",
+    "unique inventory template key")
+PNC.UniqueTemplateSaved = PNC.Inventory.Serialize(PNC.UniqueTemplateRecord)
+T.equal(PNC.UniqueTemplateSaved[2], "SEED_ONLY", "unique unchanged baseline mode")
+T.equal(PNC.UniqueTemplateSaved[4].templateRef, "unique:test:v1",
+    "unique inventory template reference persisted")
 
 loadout.supplies[#loadout.supplies + 1] = {
     key = "new_template_item",
@@ -1671,7 +1725,11 @@ T.equal(rollbackOK, false, "full inventory acquisition succeeded")
 T.equal(rollbackReason, "no_capacity", "full inventory rejection reason")
 T.equal(supplyStorage.inventory:count("Base.Apple"), 1,
     "failed transaction lost storage item")
-T.equal(next(supplyStorage.inventory.reservations), nil,
+PNC.SeedDeltaHasReservations = function(value)
+    for _ in pairs(value or {}) do return true end
+    return false
+end
+T.falsy(PNC.SeedDeltaHasReservations(supplyStorage.inventory.reservations),
     "failed transaction leaked reservation")
 local fullHasApple = false
 for _, compact in pairs(fullNPC.inventory.items) do

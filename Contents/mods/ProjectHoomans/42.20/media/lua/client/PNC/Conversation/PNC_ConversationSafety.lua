@@ -39,6 +39,26 @@ local function isNetworkClient()
     return isClient and isClient() == true
 end
 
+local function isTravelConversation(spec)
+    local context = spec and spec.context or {}
+    local state = context.conversationLifecycleState
+    local entry = context.entry or {}
+    local record = entry.record
+    local order = record and record.orderSpec or nil
+    local journey = record and record.travel or nil
+    local travelState = journey and tostring(journey.state or "") or ""
+    local activeStates = {
+        planned = true,
+        en_route = true,
+        waiting = true,
+        paused = true,
+    }
+    if state and state.travelHold == true then return true end
+    return tostring(order and order.kind or "")
+            == tostring(PNC.Const and PNC.Const.ORDER_TRAVEL or "travel")
+        and activeStates[travelState] == true
+end
+
 local function enforceConversationDistance(spec)
     local context = spec and spec.context or {}
     local state = context.conversationLifecycleState
@@ -362,6 +382,7 @@ function Safety.Check(spec)
     end
     if Safety.GuardsThreats(spec)
         and settingsValue("closeConversationOnDanger", true) == true
+        and not isTravelConversation(spec)
         and Safety.HasDanger(
             player,
             zombie,

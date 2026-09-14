@@ -5,6 +5,7 @@ local Handler = PNC.ServerDebugCommandHandler
 local Router = PNC.ServerCommandRouter
 local Const = PNC.Const
 local H = Handler.Internal
+local Network = PNC.Network
 
 Router.Register(Const.CMD_DEBUG, function(player, normalizedArgs, rawArgs)
     local args = rawArgs
@@ -16,6 +17,14 @@ Router.Register(Const.CMD_DEBUG, function(player, normalizedArgs, rawArgs)
     if not args then return end
     if args.action == "spawn" then
         H.HandleDebugSpawn(player, args)
+        return
+    end
+    if args.action == "spawn_unique_test" then
+        local record, reason = H.HandleUniqueNPCTestSpawn(player, args)
+        if Network and Network.SendUniqueNPCTestSpawn then
+            Network.SendUniqueNPCTestSpawn(
+                player, record, record ~= nil, reason)
+        end
         return
     end
     if args.action == "teleport_to_npc" then

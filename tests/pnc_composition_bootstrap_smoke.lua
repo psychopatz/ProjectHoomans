@@ -120,8 +120,12 @@ T.equal(serverCalls[settlementIndex + 1], "PNC/Journals/PNC_JournalRoutes",
 local directorIndex = indexOf(serverCalls, "PNC/Director/PNC_Director")
 T.equal(serverCalls[directorIndex - 1], "PNC/Needs/PNC_NeedSupplyBridge",
     "server Director initialization predecessor")
-T.equal(serverCalls[directorIndex + 1], "PNC/Needs/PNC_NeedsScheduler",
+T.equal(serverCalls[directorIndex + 1],
+    "PNC/Director/PNC_MobileSettlementVisitService",
     "server Director initialization successor")
+T.equal(serverCalls[directorIndex + 2],
+    "PNC/Needs/PNC_NeedsScheduler",
+    "server settlement visit service initializes before need scheduling")
 T.equal(serverCalls[#serverCalls - 1], "<install-server-profiler>",
     "server profiler installation timing")
 T.equal(serverCalls[#serverCalls], "PNC/Server/PNC_Server",
@@ -149,6 +153,10 @@ T.equal(clientCalls[#clientCalls], "PNC/Integrations/PNC_PsychopatzCoreDebug",
     "client composition final dependency")
 T.equal(PNC.EventMarkers, eventMarkers,
     "client EventMarkers assignment timing")
+local clientMonitorIndex = indexOf(clientCalls, "PNC/UI/PNC_NPCMonitor")
+T.equal(clientCalls[clientMonitorIndex + 1],
+    "PNC/UI/UniqueNPC/PNC_UniqueNPCDebugWindow",
+    "unique NPC debug window loads after NPC monitor tracking")
 
 PNC = { Conversation = {} }
 local conversationSharedCalls = capture(
@@ -179,6 +187,7 @@ PNC = {
     Conversation = {
         Composer = {
             PumpLocalRequests = function() end,
+            PumpSettlementVisitExpiry = function() end,
             LocalPumpRegistered = false,
         },
     },
@@ -186,8 +195,10 @@ PNC = {
 Events = {
     OnTick = {
         Add = function(callback)
-            T.equal(callback, PNC.Conversation.Composer.PumpLocalRequests,
-                "client Conversation pump callback")
+            local expected = pumpRegistrations == 0
+                and PNC.Conversation.Composer.PumpLocalRequests
+                or PNC.Conversation.Composer.PumpSettlementVisitExpiry
+            T.equal(callback, expected, "client Conversation pump callback")
             pumpRegistrations = pumpRegistrations + 1
         end,
     },
@@ -204,7 +215,7 @@ T.equal(conversationClientCalls[2],
     "client Conversation final dependency")
 T.equal(#conversationClientCalls, 2,
     "client Conversation dependency count")
-T.equal(pumpRegistrations, 1,
+T.equal(pumpRegistrations, 2,
     "client Conversation pump registration timing")
 T.equal(PNC.Conversation.Composer.LocalPumpRegistered, true,
     "client Conversation pump registration guard")
@@ -213,7 +224,7 @@ capture(
         .. "client/PNC/Conversation/Composition/"
         .. "PNC_ConversationClientComposition.lua"
 )
-T.equal(pumpRegistrations, 1,
+T.equal(pumpRegistrations, 2,
     "client Conversation pump registers once")
 
 PNC = { Conversation = {} }
@@ -278,6 +289,7 @@ local directorCalls = capture(
 )
 local expectedDirector = {
     "PNC/Director/PNC_AbstractWorldStore",
+    "PNC/Director/PNC_UniqueNPCRegistry",
     "PNC/Director/PNC_AbstractLocationManager",
     "PNC/Director/PNC_AbstractGroupManager",
     "PNC/WorldDiscovery/PNC_WorldDiscovery",

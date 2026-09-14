@@ -3,6 +3,7 @@
 require "PNC/Conversation/Definitions/01_PNC_ConversationDefinitionHelpers"
 require "PNC/Conversation/Definitions/10_PNC_ConversationCategories"
 require "PNC/Conversation/Definitions/20_PNC_ConversationGreetings"
+require "PNC/Conversation/Definitions/21_PNC_ConversationSettlementAdmission"
 require "PNC/Conversation/Definitions/30_PNC_ConversationWhatsUp"
 require "PNC/Conversation/Definitions/40_PNC_ConversationWellbeing"
 require "PNC/Conversation/Definitions/50_PNC_ConversationSmallTalk"

@@ -4,6 +4,7 @@ if PsychopatzCore and PsychopatzCore.RuntimeRole
 then return end
 
 require "PNC/Director/PNC_AbstractWorldStore"
+require "PNC/Director/PNC_UniqueNPCRegistry"
 require "PNC/Director/PNC_AbstractLocationManager"
 require "PNC/Director/PNC_AbstractGroupManager"
 

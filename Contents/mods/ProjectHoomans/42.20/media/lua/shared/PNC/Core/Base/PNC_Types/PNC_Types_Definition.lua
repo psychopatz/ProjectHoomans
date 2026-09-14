@@ -18,7 +18,7 @@ function Types.NormalizeDefinition(definition)
     if vanillaTraitsAuthored == nil then
         vanillaTraitsAuthored = vanillaTraitSource ~= nil
     end
-    local dynamicTraitSource = def.dynamicTraits or def.pncTraits
+    local dynamicTraitSource = def.dynamicTraits
     local dynamicTraitsAuthored = def.dynamicTraitsAuthored
     if dynamicTraitsAuthored == nil then
         dynamicTraitsAuthored = dynamicTraitSource ~= nil
@@ -44,6 +44,20 @@ function Types.NormalizeDefinition(definition)
         ownerOnlineID = def.ownerOnlineID,
         identitySeed = tonumber(def.identitySeed) or nil,
         identity = Internal.NormalizeIdentity(def.identity),
+        uniqueDefinitionId = Internal.NormalizeString(
+            def.uniqueDefinitionId
+        ),
+        uniqueDefinitionVersion = tonumber(def.uniqueDefinitionVersion)
+            and math.max(1, math.floor(tonumber(def.uniqueDefinitionVersion)))
+            or nil,
+        inventoryTemplateRef = Internal.NormalizeString(
+            def.inventoryTemplateRef or def.startingInventoryTemplate
+        ),
+        startingItems = type(def.startingItems) == "table"
+            and PNC.Core.DeepCopy(def.startingItems) or nil,
+        skillBaseLevels = Internal.NormalizeSkillLevels(
+            def.skillBaseLevels or def.skillLevels
+        ),
         orderSpec = def.orderSpec,
         patrolPoints = Internal.NormalizePatrolPoints(
             def.patrolPoints, x, y, z),
@@ -84,6 +98,8 @@ function Types.NormalizeDefinition(definition)
         dynamicTraits = PNC.ConditionStats
             and PNC.ConditionStats.NormalizeTraits(dynamicTraitSource) or {},
         dynamicTraitsAuthored = dynamicTraitsAuthored == true,
+        npcTraits = PNC.NPCTraits
+            and PNC.NPCTraits.NormalizeSet(def.npcTraits) or {},
         recipeKnowledge = PNC.RecipeKnowledge
             and PNC.RecipeKnowledge.Normalize(def.recipeKnowledge) or nil,
     }

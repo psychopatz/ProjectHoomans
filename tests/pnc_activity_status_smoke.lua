@@ -71,10 +71,8 @@ local legacyFacilityActivity = Status.Build({
     },
     runtime = {},
 })
-T.equal(legacyFacilityActivity.fallback, "Sleeping",
-    "legacy FacilityActivity records keep a specific activity label")
-T.equal(legacyFacilityActivity.activityId, "facility:sleep",
-    "legacy FacilityActivity records keep their capability identity")
+T.equal(legacyFacilityActivity, nil,
+    "orphaned FacilityActivity records are not presented as active")
 
 local eating = Status.Build({
     alive = true,
@@ -112,6 +110,39 @@ local eatingCandidate = Status.Build({
 })
 T.equal(eatingCandidate.activityItemFullType, "Base.Bread",
     "food activity keeps the selected item before consumption starts")
+
+local staleEating = Status.Build({
+    alive = true,
+    activeJob = "FacilityActivity",
+    orderSpec = {
+        kind = "facility_activity",
+        capability = "survival.eat.inventory",
+        activityItemFullType = "Base.Chips",
+    },
+    runtime = {
+        facilityActivity = {
+            capability = "survival.eat.inventory",
+            resourceKind = "personal_food",
+            activityItemID = "food-1",
+            activityItemFullType = "Base.Chips",
+        },
+        supply = {
+            byKind = {
+                FOOD = {
+                    lastUsedItem = { fullType = "Base.Chips" },
+                    personalCandidates = {
+                        { fullType = "Base.Apple" },
+                    },
+                },
+            },
+        },
+    },
+    inventory = { items = {
+        ["food-2"] = { type = "Base.Apple" },
+    } },
+})
+T.equal(staleEating.activityItemFullType, "Base.Apple",
+    "missing selected food does not remain displayed as stale chips")
 
 local drinking = Status.Build({
     alive = true,

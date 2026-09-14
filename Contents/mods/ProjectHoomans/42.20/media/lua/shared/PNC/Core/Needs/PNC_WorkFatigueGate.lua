@@ -27,13 +27,25 @@ function Gate.Threshold()
         or Gate.DEFAULT_THRESHOLD
 end
 
+local function effectiveThreshold(record)
+    local threshold = Gate.Threshold()
+    local modifier = PNC.NPCTraitEffects
+        and PNC.NPCTraitEffects.GetBehaviorModifier
+        and PNC.NPCTraitEffects.GetBehaviorModifier(
+            record, "continueWorking") or 0
+    -- Behavior modifiers are authored as direct normalized threshold deltas.
+    -- Keep the gate inside the valid need range even when a mod adds several
+    -- compatible traits.
+    return math.max(0, math.min(1, threshold + (tonumber(modifier) or 0)))
+end
+
 function Gate.Read(record)
     return readFatigue(record)
 end
 
 function Gate.Check(record)
     local fatigue = readFatigue(record)
-    local threshold = Gate.Threshold()
+    local threshold = effectiveThreshold(record)
     local details = {
         known = fatigue ~= nil,
         fatigue = fatigue,

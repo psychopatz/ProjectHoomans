@@ -9,6 +9,7 @@ local EventBus = require "PsychopatzCore/Events/PC_EventBus"
 local EventTypes = PNC.EventTypes
 local H = Needs.Internal
 local MACRO_FIELDS = { "carbohydrates", "proteins", "lipids" }
+local Diagnostics = PNC.PerformanceScalingDiagnostics
 
 Needs.Listeners = Needs.Listeners or {}
 function Needs.RegisterListener(eventName, listener)
@@ -165,6 +166,21 @@ function Needs.Set(record, needType, value, reason)
             Needs.Emit("severity_changed", record, needType, oldLevel, newLevel, reason)
             EventBus.emit(EventTypes.NPC_NEED_SEVERITY_CHANGED, record,
                 needType, oldLevel, newLevel, tostring(reason or "update"))
+        end
+        if Diagnostics and Diagnostics.NeedsAuditEnabled == true
+            and Diagnostics.LogNeedsAudit
+        then
+            Diagnostics.LogNeedsAudit("changed", {
+                "npc=" .. tostring(record and record.id or ""),
+                "need=" .. tostring(needType),
+                "before=" .. tostring(before),
+                "after=" .. tostring(after),
+                "delta=" .. tostring(after - before),
+                "oldLevel=" .. tostring(oldLevel),
+                "newLevel=" .. tostring(newLevel),
+                "reason=" .. tostring(reason or "update"),
+                "activity=" .. tostring(H.Activity(record)),
+            })
         end
         if PNC.NeedsRepository then PNC.NeedsRepository.MarkDirty() end
     end

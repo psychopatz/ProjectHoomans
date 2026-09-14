@@ -16,7 +16,7 @@ local function tacticalClassOf(value)
     return Types.ResolveTacticalClass(value)
 end
 
-function Relationships.AreNPCsEnemies(source, target)
+function Relationships.AreNPCsEnemies(source, target, options)
     local sourceTacticalClass
     local targetTacticalClass
     local factions = PNC.Factions
@@ -24,10 +24,15 @@ function Relationships.AreNPCsEnemies(source, target)
     local targetOrganization
     local sourceDefinition
     local targetDefinition
+    local ignoreAttackNPCPolicy = type(options) == "table"
+        and options.ignoreAttackNPCPolicy == true
     if not source or not target or tostring(source.id or "") == tostring(target.id or "") then
         return false
     end
-    if source.hostility and source.hostility.attackNPCs == false then
+    if not ignoreAttackNPCPolicy
+        and source.hostility
+        and source.hostility.attackNPCs == false
+    then
         return false
     end
     sourceOrganization = factions

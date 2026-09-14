@@ -17,6 +17,66 @@ function Network.SendDebugRoster(targetPlayer, diagnostics, authorized, audit)
     end
 end
 
+function Network.SendUniqueNPCDebug(
+    targetPlayer,
+    snapshot,
+    authorized,
+    reason
+)
+    local payload = {
+        authorized = authorized == true,
+        snapshot = authorized == true and snapshot or nil,
+        reason = reason,
+        serverTime = Core.Now(),
+    }
+    if isServer and isServer() and targetPlayer then
+        sendServerCommand(
+            targetPlayer,
+            Const.MODULE,
+            Const.CMD_UNIQUE_NPC_DEBUG,
+            payload
+        )
+    elseif not isServer or not isServer() then
+        triggerEvent(
+            "OnServerCommand",
+            Const.MODULE,
+            Const.CMD_UNIQUE_NPC_DEBUG,
+            payload
+        )
+    end
+end
+
+function Network.SendUniqueNPCTestSpawn(targetPlayer, record, success, reason)
+    local runtime = record and {
+        id = tostring(record.id or ""),
+        name = record.name,
+        x = tonumber(record.x),
+        y = tonumber(record.y),
+        z = tonumber(record.z),
+    } or nil
+    local payload = {
+        success = success == true,
+        runtime = runtime,
+        reason = reason,
+        serverTime = Core.Now(),
+    }
+    if isServer and isServer() and targetPlayer then
+        sendServerCommand(
+            targetPlayer,
+            Const.MODULE,
+            Const.CMD_UNIQUE_NPC_TEST_SPAWN,
+            payload
+        )
+    elseif not isServer or not isServer() then
+        triggerEvent(
+            "OnServerCommand",
+            Const.MODULE,
+            Const.CMD_UNIQUE_NPC_TEST_SPAWN,
+            payload
+        )
+    end
+end
+
 function Network.SendRelationshipDebug(
     targetPlayer,
     snapshot,

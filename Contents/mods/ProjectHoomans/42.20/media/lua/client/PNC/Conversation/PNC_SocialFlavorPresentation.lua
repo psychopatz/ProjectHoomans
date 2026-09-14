@@ -9,6 +9,7 @@ require "PsychopatzCore/Conversation/PsychopatzSocialFlavorClient"
 require "PsychopatzCore/Conversation/PsychopatzSocialFlavor"
 require "PsychopatzCore/Conversation/PsychopatzNameParts"
 require "PsychopatzCore/Events/PC_EventBus"
+require "PNC/Core/Identity/PNC_FlavorAddress"
 require "PNC/Conversation/PNC_ConversationDiary"
 require "PNC/Conversation/PNC_SocialFlavorDefinitions"
 
@@ -20,6 +21,7 @@ local Client = PsychopatzCore.SocialFlavorClient
 local EventBus = PsychopatzCore.Events
 local Diary = PNC.Conversation.Diary
 local NameParts = PsychopatzCore.Conversation.NameParts
+local FlavorAddress = PNC.FlavorAddress
 local Targets = PNC.CompanionTargetResolver
 local OWNER_TOKEN = Presentation
 local MAX_PLAYER_SPEECH_RECIPIENTS = 8
@@ -29,6 +31,12 @@ local function clean(value, fallback)
     value = string.gsub(value, "^%s+", "")
     value = string.gsub(value, "%s+$", "")
     return value ~= "" and value or fallback
+end
+
+local function firstBoolean(primary, secondary)
+    if type(primary) == "boolean" then return primary end
+    if type(secondary) == "boolean" then return secondary end
+    return nil
 end
 
 local function log(event, details)
@@ -48,15 +56,29 @@ local function currentTime()
         or 0
 end
 
-local function playerIdentity()
-    local state = PNC.Network and PNC.Network.ClientState or {}
-    return NameParts.ForPlayer(currentPlayer(), state.playerContext)
-end
-
 local function playerUUID()
     local state = PNC.Network and PNC.Network.ClientState or {}
     local context = state.playerContext or {}
     return clean(context.characterUUID or context.playerUUID, nil)
+end
+
+local function playerAddress(npcID, player, options)
+    local state = PNC.Network and PNC.Network.ClientState or {}
+    local playerContext = state.playerContext or {}
+    options = type(options) == "table" and options or {}
+    local snapshot = state.snapshots
+        and state.snapshots[tostring(npcID)] or nil
+    return FlavorAddress.ResolveForNPC({
+        npcID = npcID,
+        npcIdentitySeed = FlavorAddress.ResolveNPCSeed(snapshot, npcID),
+        player = player,
+        playerContext = playerContext,
+        playerUUID = playerUUID(),
+        isFemale = options.playerIsFemale,
+        playerNameKnown = options.playerNameKnown,
+        authoritative = options.authoritative,
+        state = state,
+    })
 end
 
 local function npcName(npcID)
@@ -142,7 +164,16 @@ function Presentation.Receive(ambientFlavor, summary, networkArgs)
     local context = type(ambientFlavor.context) == "table"
         and ambientFlavor.context or {}
     local speaker = npcIdentity(npcID)
-    local player = playerIdentity()
+    local player = playerAddress(npcID, currentPlayer(), {
+        playerNameKnown = firstBoolean(
+            networkArgs and networkArgs.playerNameKnown,
+            ambientFlavor.playerNameKnown
+        ),
+        playerIsFemale = firstBoolean(
+            networkArgs and networkArgs.playerIsFemale,
+            ambientFlavor.playerIsFemale
+        ),
+    })
     local victimID = clean(
         ambientFlavor.victimNPCID or context.victimNPCID,
         nil
@@ -175,10 +206,21 @@ function Presentation.Receive(ambientFlavor, summary, networkArgs)
     context.speakerLastName = speaker.lastName
     context.player = player.addressName
     context.playerName = player.addressName
+    context.playerAddressName = player.addressName
     context.playerFullName = player.fullName
     context.playerFirstName = player.firstName
     context.playerSurname = player.surname
     context.playerLastName = player.lastName
+    context.playerNameKnown = player.known
+    context.playerIsFemale = player.isFemale
+    context.playerNicknameID = player.nicknameID
+    context.npcIdentitySeed = context.npcIdentitySeed
+        or FlavorAddress.ResolveNPCSeed(
+            PNC.Network and PNC.Network.ClientState
+                and PNC.Network.ClientState.snapshots
+                and PNC.Network.ClientState.snapshots[npcID],
+            npcID
+        )
     if victim then
         context.victimNPCID = victimID
         context.victim = victim.addressName
@@ -263,13 +305,9 @@ function Presentation.ReceivePlayerSpeech(player, text, sourceContext)
     text = string.sub(text, 1, Client.MAX_TEXT_LENGTH or 420)
     local context = type(sourceContext) == "table" and sourceContext or {}
     local targets = speechTargets(player, context)
-    local playerIdentityValue = playerIdentity()
     local playerIDValue = playerUUID()
     if not playerIDValue then
-        playerIDValue = clean(
-            playerIdentityValue.addressName,
-            "local-player"
-        )
+        playerIDValue = "local-player"
     end
     local accepted = 0
     local nowValue = PNC.Core and PNC.Core.Now and PNC.Core.Now()
@@ -281,6 +319,7 @@ function Presentation.ReceivePlayerSpeech(player, text, sourceContext)
         if npcID then
             local active = activeConversationFor(npcID)
             local speaker = npcIdentity(npcID, target.name)
+            local playerIdentityValue = playerAddress(npcID, player)
             local eventID = "player-speech:" .. tostring(playerIDValue)
                 .. ":" .. tostring(nowValue) .. ":" .. tostring(index)
             local targetContext = {
@@ -297,11 +336,19 @@ function Presentation.ReceivePlayerSpeech(player, text, sourceContext)
                 speakerFullName = speaker.fullName,
                 speakerFirstName = speaker.firstName,
                 speakerSurname = speaker.surname,
+                npcIdentitySeed = FlavorAddress.ResolveNPCSeed(
+                    target.source or target, npcID
+                ),
                 player = playerIdentityValue.addressName,
                 playerName = playerIdentityValue.addressName,
+                playerAddressName = playerIdentityValue.addressName,
                 playerFullName = playerIdentityValue.fullName,
                 playerFirstName = playerIdentityValue.firstName,
                 playerSurname = playerIdentityValue.surname,
+                playerLastName = playerIdentityValue.lastName,
+                playerNameKnown = playerIdentityValue.known,
+                playerIsFemale = playerIdentityValue.isFemale,
+                playerNicknameID = playerIdentityValue.nicknameID,
                 speechScope = "owned_colonists",
                 sourceCommandID = context.commandID,
             }
@@ -358,7 +405,7 @@ function Presentation.EnqueueConversationSafety(spec, state, reason)
         nil
     )
     local player = context.player or currentPlayer()
-    local identity = playerIdentity()
+    local identity = playerAddress(npcID, player)
     local role
     local speaker
     local eventID
@@ -389,9 +436,15 @@ function Presentation.EnqueueConversationSafety(spec, state, reason)
         socialRole = role,
         player = identity.addressName,
         playerName = identity.addressName,
+        playerAddressName = identity.addressName,
         playerFullName = identity.fullName,
         playerFirstName = identity.firstName,
         playerSurname = identity.surname,
+        playerLastName = identity.lastName,
+        playerNameKnown = identity.known,
+        playerIsFemale = identity.isFemale,
+        playerNicknameID = identity.nicknameID,
+        npcIdentitySeed = FlavorAddress.ResolveNPCSeed(entry, npcID),
         speakerFullName = speaker.fullName,
         speakerFirstName = speaker.firstName,
         speakerSurname = speaker.surname,

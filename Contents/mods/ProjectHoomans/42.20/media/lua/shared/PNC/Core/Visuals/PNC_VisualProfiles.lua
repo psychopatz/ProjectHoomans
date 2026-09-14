@@ -60,6 +60,9 @@ function Profiles.ResolveSpawnOutfit(record)
     local appearance
     if Identity and Identity.RollAppearance then
         appearance = Identity.RollAppearance(record)
+        if appearance and appearance.outfitMode == "none" then
+            return nil
+        end
         if appearance and appearance.outfit then
             return appearance.outfit
         end

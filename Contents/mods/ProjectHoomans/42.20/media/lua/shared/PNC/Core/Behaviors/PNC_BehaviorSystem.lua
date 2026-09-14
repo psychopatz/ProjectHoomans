@@ -233,6 +233,16 @@ function Behavior.Tick(record, zombie, now)
         )
     end
 
+    -- Roaming ambience is a transient presentation lease. It is evaluated
+    -- before seating so a night-time bed choice wins over a chair, while the
+    -- service itself remains server-loaded and dynamically resolved here.
+    local roamingAmbient = PNC.RoamAmbient
+    if roamingAmbient and roamingAmbient.Tick
+        and roamingAmbient.Tick(record, zombie, now)
+    then
+        return
+    end
+
     -- A roaming seat is a transient presentation lease. It owns only the
     -- live route/scene while active; the durable roam order remains intact.
     -- The server service is loaded after this shared coordinator, so resolve

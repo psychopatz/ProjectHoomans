@@ -547,11 +547,17 @@ function Types.NormalizeRelationship(value, targetKey)
     }
 end
 
-function Types.NewSocialState(value, identitySeed, archetypeID)
-    return Types.NormalizeSocialState(value, identitySeed, archetypeID)
+function Types.NewSocialState(value, identitySeed, archetypeID, traitSource)
+    return Types.NormalizeSocialState(
+        value, identitySeed, archetypeID, traitSource)
 end
 
-function Types.NormalizeSocialState(value, identitySeed, archetypeID)
+function Types.NormalizeSocialState(
+    value,
+    identitySeed,
+    archetypeID,
+    traitSource
+)
     local source = type(value) == "table" and value or {}
     local relationships = {}
     local personalityOverrides = ProfileTypes
@@ -563,7 +569,8 @@ function Types.NormalizeSocialState(value, identitySeed, archetypeID)
             source.personality,
             identitySeed,
             archetypeID,
-            personalityOverrides
+            personalityOverrides,
+            traitSource
         ) or nil
     local targetKey
     local relationship

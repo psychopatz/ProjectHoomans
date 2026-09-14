@@ -35,6 +35,16 @@ PNC = {
         end,
     },
 }
+PNC.PerformanceScalingDiagnostics = {
+    InventoryAuditEnabled = true,
+    LogInventoryAudit = function(event, fields)
+        local output = { "inventory_audit", "event=" .. tostring(event) }
+        for _, field in ipairs(fields or {}) do
+            output[#output + 1] = tostring(field)
+        end
+        refillLogs[#refillLogs + 1] = table.concat(output, " ")
+    end,
+}
 
 local function makeFluidContainer(initialAmount)
     local amount = tonumber(initialAmount) or 0
@@ -158,6 +168,42 @@ local record = {
 Inventory.EnsureRecordInventory(record)
 local Service = T.load("ProjectHoomans", "server",
     "PNC/World/PNC_WaterContainerService.lua")
+
+local admissionOK, admissionReason = Service.CanRefill(record, "can")
+T.truthy(admissionOK, "an empty live liquid container passes refill admission")
+T.equal(admissionReason, "WATER_CONTAINER_REFILLABLE",
+    "refill admission reports the accepted reason")
+T.truthy(string.find(refillLogs[#refillLogs],
+    "event=refill_admission", 1, true),
+    "refill admission emits a dedicated inventory audit event")
+
+local missingRecord = {
+    id = "npc_missing_refill_container",
+    runtime = { inventory = { nextItemSerial = 0, opLog = {} } },
+    inventory = {
+        revision = 0, cachedWeight = 0, maxWeight = 10, rootMaxWeight = 10,
+        equipped = { primary = nil, secondary = nil, bag = nil },
+        worn = {}, attached = {}, items = {},
+        containers = { root = { maxWeight = 10, items = {} } },
+        template = { generatorVersion = 3 },
+    },
+}
+Inventory.EnsureRecordInventory(missingRecord)
+local missingAdmissionOK, missingAdmissionReason =
+    Service.CanRefill(missingRecord, "missing")
+T.falsy(missingAdmissionOK,
+    "missing liquid containers fail refill admission without crashing")
+T.equal(missingAdmissionReason, "WATER_CONTAINER_NOT_REFILLABLE",
+    "missing liquid containers preserve the precise admission reason")
+
+local logsBeforeDisabledAdmission = #refillLogs
+PNC.PerformanceScalingDiagnostics.InventoryAuditEnabled = false
+local disabledAdmissionOK = Service.CanRefill(record, "can")
+T.truthy(disabledAdmissionOK,
+    "refill admission still works while inventory audit is disabled")
+T.equal(#refillLogs, logsBeforeDisabledAdmission,
+    "disabled inventory audit adds no refill admission log")
+PNC.PerformanceScalingDiagnostics.InventoryAuditEnabled = true
 
 local ok, filled = Service.Refill(record, "can", source)
 T.truthy(ok, "empty generic liquid container refills from a clean source")

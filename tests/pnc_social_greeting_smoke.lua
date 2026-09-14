@@ -76,6 +76,7 @@ local relationships = {
 local applied = {}
 local relationshipBroadcasts = {}
 local speechBroadcasts = {}
+local presentationRequests = {}
 local abandonmentCalls = 0
 
 PNC = {
@@ -103,6 +104,17 @@ PNC = {
                 state = value.state,
                 revision = value.revision,
             }
+        end,
+    },
+    PresentationAnimations = {
+        Request = function(targetRecord, targetBody, animationID, options)
+            presentationRequests[#presentationRequests + 1] = {
+                record = targetRecord,
+                body = targetBody,
+                animationID = animationID,
+                options = options,
+            }
+            return true, "started"
         end,
     },
     Relationships = {
@@ -159,6 +171,17 @@ T.equal(Service.Pump(24), 1, "first proximity entry greets the player")
 T.equal(#applied, 1, "proximity greeting uses one relationship mutation")
 T.equal(#relationshipBroadcasts, 1, "proximity greeting uses central relationship transport")
 T.equal(#speechBroadcasts, 1, "proximity greeting sends NPC speech")
+T.equal(#presentationRequests, 1,
+    "proximity greeting requests one live presentation animation")
+T.equal(presentationRequests[1].animationID, "greeting.wavehi",
+    "proximity greeting requests the safe greeting animation")
+T.equal(presentationRequests[1].body, bodies["npc-good"],
+    "proximity greeting presents the live NPC body")
+T.equal(presentationRequests[1].options.eventID,
+    "conversation:proximity_greeting:player:slot:character-1:npc-good:day:1",
+    "proximity greeting animation uses the authoritative event identity")
+T.equal(presentationRequests[1].options.reason, "proximity_greeting",
+    "proximity greeting animation reports its source")
 T.equal(
     speechBroadcasts[1].flavorID,
     "social_greeting_npc_neutral_warm_first",
@@ -205,6 +228,8 @@ player.x = 0
 T.equal(Service.Pump(48), 1, "next day allows a new proximity greeting")
 T.equal(#applied, 2, "next day grants one new relationship mutation")
 T.equal(#speechBroadcasts, 2, "next day sends another NPC greeting")
+T.equal(#presentationRequests, 2,
+    "next-day proximity greeting requests another live animation")
 T.equal(
     speechBroadcasts[2].greetingDay,
     2,

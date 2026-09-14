@@ -11,6 +11,7 @@ end
 PNC = {
     Network = { ClientState = {
         playerContext = { characterUUID = "char_alex" },
+        playerNameKnowledge = { ["npc_12"] = true },
         snapshots = {
             npc_12 = { needs = { hunger = 0.65, thirst = 0.10, fatigue = 0.85 } },
         },

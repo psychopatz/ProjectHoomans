@@ -100,6 +100,26 @@ T.equal(
     "duplicate logical advance"
 )
 T.falsy(Diagnostics.FirearmAuditEnabled, "firearm audit defaults off")
+T.falsy(Diagnostics.InventoryAuditEnabled, "inventory audit defaults off")
+T.falsy(Diagnostics.NeedsAuditEnabled, "needs audit defaults off")
+T.equal(Diagnostics.LogInventoryAudit("disabled", { "unexpected=field" }),
+    false, "disabled inventory audit emitted a log")
+T.equal(Diagnostics.LogNeedsAudit("disabled", { "unexpected=field" }),
+    false, "disabled needs audit emitted a log")
+Diagnostics.SetInventoryAuditEnabled(true)
+T.truthy(Diagnostics.LogInventoryAudit("mutation", {
+    "npc=npc-test", "revisionBefore=1", "revisionAfter=2",
+}), "inventory audit emitted")
+T.contains(logs[#logs],
+    "inventory_audit event=mutation npc=npc-test revisionBefore=1 revisionAfter=2",
+    "inventory audit uses the dedicated log marker")
+Diagnostics.SetNeedsAuditEnabled(true)
+T.truthy(Diagnostics.LogNeedsAudit("changed", {
+    "npc=npc-test", "need=thirst", "before=0.5", "after=0.0",
+}), "needs audit emitted")
+T.contains(logs[#logs],
+    "needs_audit event=changed npc=npc-test need=thirst before=0.5 after=0.0",
+    "needs audit uses the dedicated log marker")
 Diagnostics.SetFirearmAuditEnabled(true)
 T.truthy(Diagnostics.LogFirearmAudit("test_stage", {
     "side=authority",

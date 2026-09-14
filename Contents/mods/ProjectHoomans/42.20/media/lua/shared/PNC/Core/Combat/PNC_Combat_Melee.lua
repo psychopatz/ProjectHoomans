@@ -17,6 +17,7 @@ local Unarmed = PNC.CombatUnarmed
 local Skills = PNC.Skills
 local Stamina = PNC.Stamina
 local Resolution = PNC.CombatResolution
+local TraitEffects = PNC.NPCTraitEffects
 local Tactics = PNC.CombatTactics
 
 function Combat.TryMelee(record, zombie, target)
@@ -53,10 +54,24 @@ function Combat.TryMelee(record, zombie, target)
     local skillID = Skills and Skills.ResolveWeaponSkill and Skills.ResolveWeaponSkill(record, record.equipment and record.equipment.primaryFullType, "melee") or "Strength"
     local skillLevel = Skills and Skills.GetLevel and Skills.GetLevel(record, skillID) or 0
     local strengthLevel = Skills and Skills.GetLevel and Skills.GetLevel(record, "Strength") or 0
+    local meleeModifiers = TraitEffects
+        and TraitEffects.ResolveMeleeModifiers
+        and TraitEffects.ResolveMeleeModifiers(record) or {}
     local groundSafe
     local liveTarget
     local emergencyMelee
     local attackAudio
+    local actionExtra
+    local hitDelay
+    local duration
+    local strikeProfile
+
+    if Resolution and Resolution.GetMeleeCooldown then
+        cooldownMs = Resolution.GetMeleeCooldown(record, cooldownMs,
+            meleeModifiers, {
+                actionDurationMs = Internal.ATTACK_TIMINGS.melee.duration,
+            })
+    end
 
     if not target then
         return false, "no_target"
@@ -194,6 +209,26 @@ function Combat.TryMelee(record, zombie, target)
             Internal.playAttackSound(zombie, record, weaponItem)
         end
     end
+    actionExtra = attackAudio and { audio = attackAudio } or {}
+    if Resolution and Resolution.GetMeleeTiming then
+        hitDelay, duration = Resolution.GetMeleeTiming(
+            Internal.ATTACK_TIMINGS.melee.hitDelay,
+            Internal.ATTACK_TIMINGS.melee.duration,
+            meleeModifiers
+        )
+        actionExtra.hitDelayMs = hitDelay
+        actionExtra.durationMs = duration
+    end
+    if Resolution and Resolution.BuildMeleeStrikeProfile then
+        strikeProfile = Resolution.BuildMeleeStrikeProfile(record, target, {
+            distance = dist,
+            skillID = skillID,
+            skillLevel = skillLevel,
+            strengthLevel = strengthLevel,
+            modifiers = meleeModifiers,
+        })
+        actionExtra.meleeStrikeProfile = strikeProfile
+    end
     Internal.buildAttackAction(
         record,
         target,
@@ -202,7 +237,7 @@ function Combat.TryMelee(record, zombie, target)
         anim or "PNC_Attack1H1",
         damage,
         skillID,
-        attackAudio and { audio = attackAudio } or nil
+        actionExtra
     )
     return true, isBarehand
         and "unarmed_attack_started"

@@ -205,12 +205,6 @@ function Presentation.TreatmentStatus(snapshot)
             wound = candidate
         end
     end
-    if wound then
-        return "Bandaged: " .. treatmentPartLabel(partId)
-            .. " (" .. tostring(wound.bandageName or wound.bandageType or "Ripped Sheets") .. ")",
-            TREATMENT_COLORS.clean,
-            false
-    end
     return "", TREATMENT_COLORS.clean, false
 end
 

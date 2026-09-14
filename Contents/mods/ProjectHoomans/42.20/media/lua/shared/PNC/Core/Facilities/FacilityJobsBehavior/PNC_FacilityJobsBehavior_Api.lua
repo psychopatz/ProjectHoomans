@@ -25,4 +25,12 @@ Jobs.Seating.ResetPath = Internal.ResetPath
 Jobs.Seating.RestorePosition = Internal.RestorePosition
 Jobs.Seating.RetryApproach = Internal.RetrySeatApproach
 
+-- Roaming ambience reuses the physical bed/surface lifecycle without entering
+-- the durable FacilityJobs or IndividualNeeds ownership paths.
+Jobs.Sleep = Jobs.Sleep or {}
+Jobs.Sleep.ClearSleepSurface = Internal.ClearSleepSurface
+Jobs.Sleep.PrepareSleepSurface = Internal.PrepareSleepSurface
+Jobs.Sleep.ResetPath = Internal.ResetPath
+Jobs.Sleep.RestorePosition = Internal.RestorePosition
+
 return Jobs

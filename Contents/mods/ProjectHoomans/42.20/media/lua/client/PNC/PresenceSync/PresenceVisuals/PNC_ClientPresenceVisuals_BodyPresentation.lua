@@ -19,6 +19,7 @@ local AnimationTrace = PNC.AnimationTrace
 local NPCVoice = PNC.NPCVoice
 local buildVisualKey = Internal.BuildVisualKey
 local buildHandsKey = Internal.BuildHandsKey
+local syncBandageVisuals = Internal.SyncBandageVisuals
 local syncTreatmentSound = Internal.SyncTreatmentSound
 
 local function resolveDrinkSound(snapshot)
@@ -209,13 +210,15 @@ local function applyBodyPresentation(
             Visuals.ApplyReplicaAppearance(
                 zombie,
                 snapshot.appearance or {},
-                snapshot.isFemale == true
+                snapshot.isFemale == true,
+                recordView
             )
         elseif Visuals and Visuals.ApplyResolvedAppearance then
             Visuals.ApplyResolvedAppearance(
                 zombie,
                 snapshot.appearance or {},
-                snapshot.isFemale == true
+                snapshot.isFemale == true,
+                recordView
             )
         end
         if remoteReplica
@@ -247,6 +250,9 @@ local function applyBodyPresentation(
         and Equipment.EnsureCombatHands
     then
         Equipment.EnsureCombatHands(zombie, recordView)
+    end
+    if syncBandageVisuals then
+        syncBandageVisuals(zombie, snapshot)
     end
     if ClientActionProps and ClientActionProps.Attach
         and ActionProps and ActionProps.Resolve

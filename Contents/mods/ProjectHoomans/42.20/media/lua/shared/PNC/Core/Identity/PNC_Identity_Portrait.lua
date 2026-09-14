@@ -132,6 +132,8 @@ function Identity.NormalizePortraitSummary(source, fallback)
         isFemale = source.isFemale == true,
         faceOnly = true,
         appearance = {
+            outfit = normalizeString(appearance.outfit),
+            outfitMode = normalizeString(appearance.outfitMode),
             skinTexture = normalizeString(appearance.skinTexture),
             skinColor = normalizeColor(appearance.skinColor),
             hairModel = normalizeString(appearance.hairModel),
@@ -140,6 +142,8 @@ function Identity.NormalizePortraitSummary(source, fallback)
                 or normalizeString(appearance.beardModel),
             hairColor = normalizeColor(appearance.hairColor),
             outfitItems = normalizeArray(appearance.outfitItems),
+            outfitItemSpecs = type(appearance.outfitItemSpecs) == "table"
+                and PNC.Core.DeepCopy(appearance.outfitItemSpecs) or {},
         },
         equipment = equipment or {
             worn = {},
@@ -184,6 +188,7 @@ function Identity.BuildPortraitSummary(record)
         tostring(skinColor.g or ""),
         tostring(skinColor.b or ""),
         stableSignature(appearance.outfitItems),
+        stableSignature(appearance.outfitItemSpecs),
         stableSignature(equipment),
     }, "|")
     if runtime.portraitSummaryCacheKey == cacheKey

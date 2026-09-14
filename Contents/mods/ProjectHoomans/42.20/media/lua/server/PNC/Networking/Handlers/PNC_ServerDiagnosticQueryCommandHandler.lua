@@ -33,6 +33,24 @@ Router.Register(Const.CMD_DEBUG_ROSTER_REQUEST, function(player, args, rawArgs)
     )
 end)
 
+Router.Register(Const.CMD_UNIQUE_NPC_DEBUG_REQUEST, function(player)
+    local snapshot
+    local reason
+    local registry = PNC.UniqueNPCRegistry
+    if not Router.CanUseDebug(player) then
+        Network.SendUniqueNPCDebug(
+            player, nil, false, "not_authorized")
+        return
+    end
+    if registry and registry.BuildDebugSnapshot then
+        snapshot, reason = registry.BuildDebugSnapshot()
+    else
+        reason = "unique_registry_unavailable"
+    end
+    Network.SendUniqueNPCDebug(
+        player, snapshot, snapshot ~= nil, reason)
+end)
+
 Router.Register(Const.CMD_RELATIONSHIP_DEBUG_REQUEST, function(player, args)
     local snapshot
     local reason

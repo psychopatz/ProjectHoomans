@@ -151,6 +151,12 @@ function Presentation.BuildForConversation(player, npcID)
         relationship
     )
     summary.departurePreview = buildDeparturePreview(record, relationship)
+    summary.settlementVisit = PNC.MobileSettlementVisitService
+        and PNC.MobileSettlementVisitService.GetNPCVisit
+        and PNC.MobileSettlementVisitService.GetNPCVisit(
+            record.id,
+            player
+        ) or nil
     -- These fields are intentionally part of the player's own presentation
     -- response. They make SP/MP identity drift diagnosable without exposing
     -- another player's relationship data.

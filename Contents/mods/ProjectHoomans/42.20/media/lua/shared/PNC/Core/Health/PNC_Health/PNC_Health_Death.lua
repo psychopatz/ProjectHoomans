@@ -108,11 +108,12 @@ end
 local function retireDeadRecord(record)
     local deathMarker
     local colonyOwned
+    local terminalUnique = record.uniqueDefinitionId ~= nil
     local retired = false
     colonyOwned = Registry
         and Registry.IsColonyOwnedNPC
         and Registry.IsColonyOwnedNPC(record)
-    if Registry and Registry.AddDeathMarker then
+    if not terminalUnique and Registry and Registry.AddDeathMarker then
         if colonyOwned ~= false then
             deathMarker = Registry.AddDeathMarker(record)
         end
@@ -124,6 +125,17 @@ local function retireDeadRecord(record)
         end
         Registry.RemoveRecord(record.id)
         retired = true
+    elseif terminalUnique and Registry then
+        record.runtime.deathRetired = true
+        if PNC.Network and PNC.Network.BroadcastRemoval then
+            PNC.Network.BroadcastRemoval(record.id, "unique_death")
+        end
+        if Registry.RemoveRecord then
+            Registry.RemoveRecord(record.id)
+            retired = true
+        elseif Registry.MarkDirty then
+            Registry.MarkDirty(record, "health")
+        end
     elseif colonyOwned == false and Registry then
         -- Unowned world NPCs still need a removal event so clients do not
         -- retain their last roster snapshot, but they do not receive a
@@ -160,6 +172,9 @@ function Health.Kill(record, zombie, reason)
     local retired
     releaseOwnedWork(record)
     markDeadState(record, health, reason)
+    if PNC.UniqueNPCRegistry and PNC.UniqueNPCRegistry.MarkDead then
+        PNC.UniqueNPCRegistry.MarkDead(record, reason, Core.Now())
+    end
     notifyDeathSystems(record)
     createCorpse(record, zombie, reason)
     deathMarker, retired = retireDeadRecord(record)

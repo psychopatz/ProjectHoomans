@@ -15,6 +15,8 @@ PNC = {
         CMD_CONVERSATION_BLOCK = "ConversationBlock",
         CMD_CONVERSATION_OUTCOME = "ConversationOutcome",
         CMD_CONVERSATION_RECRUIT_RESULT = "RecruitResult",
+        CMD_CONVERSATION_SETTLEMENT_ADMISSION_RESULT =
+            "SettlementAdmissionResult",
     },
     Network = { ClientState = {} },
     Client = {

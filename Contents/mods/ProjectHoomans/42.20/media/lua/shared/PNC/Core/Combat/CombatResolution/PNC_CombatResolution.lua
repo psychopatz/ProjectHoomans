@@ -4,6 +4,8 @@ PNC = PNC or {}
 PNC.CombatResolution = PNC.CombatResolution or {}
 
 require "PNC/Core/Combat/CombatResolution/PNC_CombatResolution_Settings"
+require "PNC/Core/Combat/CombatResolution/PNC_CombatResolution_RangedOutcome"
+require "PNC/Core/Combat/CombatResolution/PNC_CombatResolution_MeleeOutcome"
 require "PNC/Core/Combat/CombatResolution/PNC_CombatResolution_Weapon"
 require "PNC/Core/Combat/CombatResolution/PNC_CombatResolution_Resources"
 require "PNC/Core/Combat/CombatResolution/PNC_CombatResolution_HitEvent"

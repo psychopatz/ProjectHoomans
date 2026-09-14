@@ -276,6 +276,10 @@ function Settings.CaravanAccidentDeathChance()
     return Settings.GetNumber("CaravanAccidentDeathChance", 1, 0, 100)
 end
 
+function Settings.MobileSettlementAIJoinChance()
+    return Settings.GetNumber("MobileSettlementAIJoinChance", 35, 0, 100)
+end
+
 function Settings.ZombiesTargetDownedNPC()
     return Settings.GetBoolean("ZombiesTargetDownedNPC", false)
 end

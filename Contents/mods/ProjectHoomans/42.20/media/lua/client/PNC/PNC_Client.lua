@@ -100,6 +100,12 @@ local function onResetLua()
     ClientState.characterPayloads = {}
     ClientState.debugRoster = {}
     ClientState.debugAuthorized = false
+    ClientState.uniqueNPCDebug = nil
+    ClientState.uniqueNPCDebugAuthorized = false
+    ClientState.uniqueNPCDebugReason = nil
+    ClientState.lastUniqueNPCDebugRequestAt = 0
+    ClientState.lastUniqueNPCDebugReceiveAt = 0
+    ClientState.uniqueNPCTestSpawn = nil
     ClientState.relationshipDebug = nil
     ClientState.relationshipDebugAuthorized = false
     ClientState.relationshipDebugReason = nil
@@ -115,6 +121,11 @@ local function onResetLua()
         and PNC.NameplateRelationshipFeedback.Reset
     then
         PNC.NameplateRelationshipFeedback.Reset()
+    end
+    if PNC.NameplateToolFeedback
+        and PNC.NameplateToolFeedback.Reset
+    then
+        PNC.NameplateToolFeedback.Reset()
     end
     if PNC.Conversation
         and PNC.Conversation.Relationship

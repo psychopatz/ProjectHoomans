@@ -21,6 +21,7 @@ PsychopatzCore = {
 }
 PNC = {
     NPCMonitor = { Toggle = function() end },
+    UniqueNPCDebugUI = { Toggle = function() end },
     RelationshipDebugUI = { Toggle = function() end },
     FactionDebugUI = { Toggle = function() end },
     FactionDebugOverlay = { Toggle = function() end },
@@ -34,6 +35,7 @@ package.preload["PsychopatzCore/UI/PsychopatzDebugHubWindow"] =
 T.load(FILE)
 
 T.truthy(tools["pnc.npcMonitor"], "NPC monitor debug tool missing")
+T.truthy(tools["pnc.uniqueNPCs"], "unique NPC debug tool missing")
 T.truthy(tools["pnc.relationships"],
     "relationship inspector debug tool missing")
 T.truthy(tools["pnc.factions"],

@@ -94,6 +94,48 @@ local function isPlayerItemEquipped(player, item)
     return false
 end
 
+local function nativeFlag(item, methodName)
+    return safeCall(item, methodName, false) == true
+end
+
+local function nativeContainerHasItems(item)
+    local nested = safeCall(item, "getItemContainer", nil)
+        or safeCall(item, "getInventory", nil)
+    local items = safeCall(nested, "getItems", nil)
+    return items and items.size and items:size() > 0 or false
+end
+
+local function nativeInteractionLocked(item)
+    local fullType
+    local modData
+    fullType = tostring(safeCall(item, "getFullType", ""))
+    if fullType == "Base.IDcard" then return true end
+    if nativeFlag(item, "isInteractionLocked")
+        or nativeFlag(item, "getInteractionLocked")
+    then
+        return true
+    end
+    modData = safeCall(item, "getModData", nil)
+    return type(modData) == "table"
+        and (modData.interactionLocked == true
+            or modData.PNCInteractionLocked == true
+            or modData.identityNPCId ~= nil
+            or modData.identityNPCName ~= nil)
+end
+
+-- This is the client-side equivalent of the server's native bulk-transfer
+-- protection.  Keep it in the row model so click, drag, and bulk transfer all
+-- render and enforce the same eligibility decision.  The local editor copies
+-- eligible items; it never removes them from the player's inventory.
+function Model.GetPlayerItemTransferBlockReason(item, player)
+    if not item then return "item_missing" end
+    if nativeFlag(item, "isFavorite") then return "favorite" end
+    if isPlayerItemEquipped(player, item) then return "equipped" end
+    if nativeInteractionLocked(item) then return "item_off_limits" end
+    if nativeContainerHasItems(item) then return "container_not_empty" end
+    return nil
+end
+
 local function playerItemRow(item, containerKey, player)
     local fullType = tostring(safeCall(item, "getFullType", ""))
     local metadata = probe(fullType)
@@ -106,6 +148,8 @@ local function playerItemRow(item, containerKey, player)
         and PNC.Gifts.GetItemScore(fullType) or nil
     local giftValid = giftScore and PNC.Gifts.IsValidItemType
         and PNC.Gifts.IsValidItemType(fullType) == true or false
+    local restrictionReason = Model.GetPlayerItemTransferBlockReason(
+        item, player)
     local row = {
         source = "player",
         id = tostring(safeCall(item, "getID", "")),
@@ -121,7 +165,8 @@ local function playerItemRow(item, containerKey, player)
         conditionMax = metadata.conditionMax,
         equipped = isPlayerItemEquipped(player, item),
         favorite = safeCall(item, "isFavorite", false) == true,
-        restricted = false,
+        restricted = restrictionReason ~= nil,
+        restrictionReason = restrictionReason,
         giftScore = giftScore,
         giftValid = giftValid,
     }

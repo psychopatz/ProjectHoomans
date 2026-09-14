@@ -3,6 +3,8 @@ PNC = PNC or {}
 PNC.ConditionStats = PNC.ConditionStats or {}
 
 local Stats = PNC.ConditionStats
+local TraitEffects = PNC.NPCTraitEffects
+local NPCTraits = PNC.NPCTraits
 
 local function ensureCurrentTraits(record)
     local currentVersion
@@ -26,7 +28,7 @@ end
 
 Stats.VERSION = 1
 -- Bump when the seed-derived dynamic trait catalog or rules change.
-Stats.TRAIT_GENERATION_VERSION = 1
+Stats.TRAIT_GENERATION_VERSION = 2
 Stats.TYPES = { "stress", "boredom", "panic" }
 Stats.DEFINITIONS = {
     stress = { minimum = 0, maximum = 1, default = 0,
@@ -37,56 +39,21 @@ Stats.DEFINITIONS = {
         thresholds = { 20, 45, 70, 90 } },
 }
 Stats.LEVELS = { "GOOD", "STABLE", "LOW", "CRITICAL", "EMERGENCY" }
-Stats.TRAITS = {
-    IRON_NERVES = "pnc_ironnerves",
-    FRAYED_NERVES = "pnc_frayednerves",
-    BUSY_HANDS = "pnc_busyhands",
-    RESTLESS_SOUL = "pnc_restlesssoul",
-    HARDY = "pnc_hardy",
-    DELICATE = "pnc_delicate",
-    SECOND_WIND = "pnc_secondwind",
-    HEAVY_SLEEPER = "pnc_heavysleeper",
-}
-Stats.TRAIT_DEFINITIONS = {
-    { id = Stats.TRAITS.IRON_NERVES,
-        labelKey = "UI_PNC_Trait_IronNerves" },
-    { id = Stats.TRAITS.FRAYED_NERVES,
-        labelKey = "UI_PNC_Trait_FrayedNerves" },
-    { id = Stats.TRAITS.BUSY_HANDS,
-        labelKey = "UI_PNC_Trait_BusyHands" },
-    { id = Stats.TRAITS.RESTLESS_SOUL,
-        labelKey = "UI_PNC_Trait_RestlessSoul" },
-    { id = Stats.TRAITS.HARDY, labelKey = "UI_PNC_Trait_Hardy" },
-    { id = Stats.TRAITS.DELICATE, labelKey = "UI_PNC_Trait_Delicate" },
-    { id = Stats.TRAITS.SECOND_WIND,
-        labelKey = "UI_PNC_Trait_SecondWind" },
-    { id = Stats.TRAITS.HEAVY_SLEEPER,
-        labelKey = "UI_PNC_Trait_HeavySleeper" },
-}
-Stats.TRAIT_GROUPS = {
-    { salt = "nerves", choices = {
-        { false, 68 }, { Stats.TRAITS.IRON_NERVES, 18 },
-        { Stats.TRAITS.FRAYED_NERVES, 14 },
-    } },
-    { salt = "tempo", choices = {
-        { false, 65 }, { Stats.TRAITS.BUSY_HANDS, 20 },
-        { Stats.TRAITS.RESTLESS_SOUL, 15 },
-    } },
-    { salt = "constitution", choices = {
-        { false, 68 }, { Stats.TRAITS.HARDY, 18 },
-        { Stats.TRAITS.DELICATE, 14 },
-    } },
-    { salt = "fatigue", choices = {
-        { false, 72 }, { Stats.TRAITS.SECOND_WIND, 16 },
-        { Stats.TRAITS.HEAVY_SLEEPER, 12 },
-    } },
-}
 
 local function traitID(value)
-    value = string.lower(tostring(value or ""))
-    value = string.gsub(value, "^pnc[%.:]", "pnc_")
-    value = string.gsub(value, "[^%w_]", "")
-    return value
+    if NPCTraits and NPCTraits.NormalizeID then
+        return NPCTraits.NormalizeID(value) or ""
+    end
+    return string.lower(tostring(value or ""))
+end
+
+local function updateTraitFingerprint(record)
+    if type(record) == "table"
+        and NPCTraits and NPCTraits.Fingerprint
+    then
+        record.dynamicTraitFingerprint = NPCTraits.Fingerprint(
+            record.dynamicTraits or {})
+    end
 end
 
 function Stats.NormalizeTraits(source)
@@ -100,15 +67,56 @@ function Stats.NormalizeTraits(source)
     return output
 end
 
+local function generationGroups()
+    local output = {}
+    local definitions = NPCTraits and NPCTraits.GetDefinitions
+        and NPCTraits.GetDefinitions() or {}
+    local specifications = NPCTraits and NPCTraits.GetGenerationGroups
+        and NPCTraits.GetGenerationGroups() or {}
+    for index = 1, #specifications do
+        local specification = specifications[index]
+        local candidates = {}
+        local group = {
+            salt = specification.id,
+            choices = { { false, specification.noneWeight } },
+        }
+        for definitionIndex = 1, #definitions do
+            local definition = definitions[definitionIndex]
+            local generation = definition and definition.generation
+            if type(generation) == "table"
+                and generation.group == specification.id
+            then
+                candidates[#candidates + 1] = {
+                    definition.id, tonumber(generation.weight) or 0,
+                }
+            end
+        end
+        table.sort(candidates, function(left, right)
+            return left[1] < right[1]
+        end)
+        for candidateIndex = 1, #candidates do
+            group.choices[#group.choices + 1] = candidates[candidateIndex]
+        end
+        output[#output + 1] = group
+    end
+    return output
+end
+
 local function choice(seed, salt, values)
-    local roll = PNC.Identity and PNC.Identity.Float
-        and PNC.Identity.Float(seed, salt) * 100 or 0
+    local totalWeight = 0
+    local roll
+    for index = 1, #values do
+        totalWeight = totalWeight + (tonumber(values[index][2]) or 0)
+    end
+    if totalWeight <= 0 then return false end
+    roll = PNC.Identity and PNC.Identity.Float
+        and PNC.Identity.Float(seed, salt) * totalWeight or 0
     local cursor = 0
     for index = 1, #values do
         cursor = cursor + (tonumber(values[index][2]) or 0)
         if roll < cursor then return values[index][1] end
     end
-    return values[#values][1]
+    return values[#values][1] or false
 end
 
 function Stats.GenerateTraits(identitySeed, archetypeID)
@@ -116,13 +124,17 @@ function Stats.GenerateTraits(identitySeed, archetypeID)
         and PNC.Identity.NormalizeSeed(identitySeed, archetypeID)
         or math.max(1, math.floor(tonumber(identitySeed) or 1))
     local output = {}
-    for index = 1, #Stats.TRAIT_GROUPS do
-        local group = Stats.TRAIT_GROUPS[index]
+    local groups = generationGroups()
+    for index = 1, #groups do
+        local group = groups[index]
         local selected = choice(seed, "npc_dynamic_traits:v"
             .. tostring(Stats.TRAIT_GENERATION_VERSION) .. ":"
             .. tostring(archetypeID or "General") .. ":" .. group.salt,
             group.choices)
         if selected then output[selected] = true end
+    end
+    if NPCTraits and NPCTraits.ResolveSet then
+        return NPCTraits.ResolveSet(output)
     end
     return output
 end
@@ -142,6 +154,7 @@ end
 function Stats.SetTraits(record, source)
     if type(record) ~= "table" then return false, "npc_missing" end
     record.dynamicTraits = Stats.NormalizeTraits(source)
+    updateTraitFingerprint(record)
     record.dynamicTraitsAuthored = true
     record.dynamicTraitsGenerationVersion = 0
     if PNC.Registry and PNC.Registry.MarkDirty then
@@ -159,11 +172,13 @@ function Stats.EnsureTraits(record)
         tonumber(record.dynamicTraitsGenerationVersion) or 0))
     if record.dynamicTraitsAuthored == true then
         record.dynamicTraits = Stats.NormalizeTraits(record.dynamicTraits)
+        updateTraitFingerprint(record)
         record.dynamicTraitsGenerationVersion = 0
         return record.dynamicTraits, false
     end
     if version == currentVersion then
         record.dynamicTraits = Stats.NormalizeTraits(record.dynamicTraits)
+        updateTraitFingerprint(record)
         return record.dynamicTraits, false
     end
     local existing = Stats.NormalizeTraits(record.dynamicTraits)
@@ -186,6 +201,7 @@ function Stats.EnsureTraits(record)
             and "dynamic_traits_initialized"
             or "dynamic_traits_regenerated")
     end
+    updateTraitFingerprint(record)
     return record.dynamicTraits, true
 end
 
@@ -193,40 +209,30 @@ function Stats.GetActiveTraitIDs(source)
     ensureCurrentTraits(source)
     local traits = Stats.NormalizeTraits(source and source.dynamicTraits or source)
     local output = {}
-    for index = 1, #Stats.TRAIT_DEFINITIONS do
-        local id = Stats.TRAIT_DEFINITIONS[index].id
-        if traits[id] then output[#output + 1] = id end
+    local definitions = NPCTraits and NPCTraits.GetDefinitions
+        and NPCTraits.GetDefinitions() or {}
+    for index = 1, #definitions do
+        local id = definitions[index].id
+        if traits[id] then
+            output[#output + 1] = id
+        end
     end
     return output
 end
 
 function Stats.GetTraitLabelKey(id)
     id = traitID(id)
-    for index = 1, #Stats.TRAIT_DEFINITIONS do
-        if Stats.TRAIT_DEFINITIONS[index].id == id then
-            return Stats.TRAIT_DEFINITIONS[index].labelKey
-        end
-    end
+    local definition = NPCTraits and NPCTraits.GetDefinition
+        and NPCTraits.GetDefinition(id)
+    return definition and definition.labelKey or nil
 end
 
 function Stats.GetNeedRateMultiplier(record, needType, state, activity)
-    local value = 1
-    if Stats.HasTrait(record, Stats.TRAITS.HARDY)
-        and (needType == "hunger" or needType == "thirst")
-    then value = value * 0.90 end
-    if Stats.HasTrait(record, Stats.TRAITS.DELICATE)
-        and (needType == "hunger" or needType == "thirst")
-    then value = value * 1.10 end
-    if needType == "fatigue" then
-        if Stats.HasTrait(record, Stats.TRAITS.SECOND_WIND)
-            and (tonumber(state and state.fatigue) or 0) >= 0.70
-            and activity ~= "sleeping"
-        then value = value * 0.70 end
-        if Stats.HasTrait(record, Stats.TRAITS.HEAVY_SLEEPER) then
-            value = value * (activity == "sleeping" and 1.25 or 1.10)
-        end
+    if TraitEffects and TraitEffects.GetNeedRateMultiplier then
+        return TraitEffects.GetNeedRateMultiplier(
+            record, needType, state, activity)
     end
-    return value
+    return 1
 end
 
 function Stats.NormalizeState(value, at)
@@ -273,17 +279,13 @@ function Stats.GetRates(record, activity)
         or activity == "sleeping" and 0
         or activity == "fighting" and -12 or -6
     local panic = activity == "fighting" and 18 or -12
-    if Stats.HasTrait(record, Stats.TRAITS.IRON_NERVES) then
-        stress = stress > 0 and stress * 0.75 or stress * 1.20
-        panic = panic > 0 and panic * 0.50 or panic * 1.50
-    elseif Stats.HasTrait(record, Stats.TRAITS.FRAYED_NERVES) then
-        stress = stress > 0 and stress * 1.25 or stress * 0.75
-        panic = panic > 0 and panic * 1.50 or panic * 0.70
-    end
-    if Stats.HasTrait(record, Stats.TRAITS.BUSY_HANDS) then
-        boredom = boredom > 0 and boredom * 0.60 or boredom * 1.20
-    elseif Stats.HasTrait(record, Stats.TRAITS.RESTLESS_SOUL) then
-        boredom = boredom > 0 and boredom * 1.50 or boredom * 1.25
+    if TraitEffects and TraitEffects.GetConditionRateMultiplier then
+        stress = stress * TraitEffects.GetConditionRateMultiplier(
+            record, "stress", stress)
+        boredom = boredom * TraitEffects.GetConditionRateMultiplier(
+            record, "boredom", boredom)
+        panic = panic * TraitEffects.GetConditionRateMultiplier(
+            record, "panic", panic)
     end
     return { stress = stress, boredom = boredom, panic = panic }
 end

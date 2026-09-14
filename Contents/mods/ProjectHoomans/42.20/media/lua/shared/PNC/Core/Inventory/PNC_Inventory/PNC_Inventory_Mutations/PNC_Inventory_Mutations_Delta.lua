@@ -2,6 +2,7 @@ local Inventory = PNC.Inventory
 local Internal = Inventory.Internal
 local Events = require "PsychopatzCore/Events/PC_EventBus"
 local EventTypes = require "PNC/Core/Events/PNC_EventDefinitions"
+local Diagnostics = PNC.PerformanceScalingDiagnostics
 
 local function applyAddOperation(record, inv, op)
     local item
@@ -130,7 +131,10 @@ function Inventory.ApplyDelta(record, ops, reason)
     local appliedOps = {}
     local applied
     local i
+    local revisionBefore
+    local revisionAfter
     if type(ops) ~= "table" then return false, {} end
+    revisionBefore = tonumber(inv.revision) or 0
     for i = 1, #ops do
         applied = applyInventoryOperation(record, inv, ops[i])
         if not applied then
@@ -143,7 +147,7 @@ function Inventory.ApplyDelta(record, ops, reason)
         appliedOps[#appliedOps + 1] = applied
     end
     if #appliedOps <= 0 then return false, {} end
-    Internal.bumpRevision(record, appliedOps, reason)
+    revisionAfter = Internal.bumpRevision(record, appliedOps, reason)
     if inv.persistenceMode ~= "FULL" then
         inv.persistenceMode = "BASELINE_DELTA"
     end
@@ -153,6 +157,33 @@ function Inventory.ApplyDelta(record, ops, reason)
         PNC.Registry.MarkDirty(record, "inventory")
     end
     Events.emit(EventTypes.NPC_INVENTORY_CHANGED, record, appliedOps, reason)
+    if Diagnostics and Diagnostics.InventoryAuditEnabled == true
+        and Diagnostics.LogInventoryAudit
+    then
+        local fields = {
+            "npc=" .. tostring(record and record.id or ""),
+            "reason=" .. tostring(reason or "mutation"),
+            "revisionBefore=" .. tostring(revisionBefore),
+            "revisionAfter=" .. tostring(revisionAfter),
+            "opCount=" .. tostring(#appliedOps),
+            "itemCount=" .. tostring(inv.itemCount or ""),
+        }
+        for index = 1, #appliedOps do
+            local operation = appliedOps[index]
+            local itemState = operation and operation.itemState
+            fields[#fields + 1] = "op" .. tostring(index) .. "="
+                .. tostring(operation and operation.op or "unknown")
+                .. ":item=" .. tostring(operation and operation.itemID
+                    or operation and operation.item and operation.item.id or "")
+            if itemState then
+                fields[#fields + 1] = "op" .. tostring(index)
+                    .. "Fluid=" .. tostring(itemState.fluidAmount or "")
+                    .. "/" .. tostring(itemState.fluidCapacity or "")
+                    .. "/" .. tostring(itemState.fluidPrimaryType or "")
+            end
+        end
+        Diagnostics.LogInventoryAudit("mutation", fields)
+    end
     return true, appliedOps
 end
 

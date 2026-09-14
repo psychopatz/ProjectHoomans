@@ -175,11 +175,45 @@ function Shared.Clamp(value, minimum, maximum)
 end
 
 function Shared.Text(key, fallback)
+    -- Translator.getText expects a non-null string. Trait descriptors can be
+    -- supplied by other mods, so an incomplete descriptor must degrade to its
+    -- visible fallback instead of throwing a Java NPE every render frame.
+    if type(key) ~= "string" or key == "" then
+        return fallback or ""
+    end
     if getText then
         local ok, value = pcall(getText, key)
         if ok and value and value ~= "" and value ~= key then return value end
     end
     return fallback or key
+end
+
+local function humanizeTraitID(value)
+    value = tostring(value or "")
+    value = string.gsub(value, "^pnc[_:]", "")
+    value = string.gsub(value, "([a-z0-9])([A-Z])", "%1 %2")
+    value = string.gsub(value, "[_:.-]+", " ")
+    value = string.gsub(value, "^%s+", "")
+    value = string.gsub(value, "%s+$", "")
+    value = string.gsub(value, "%a+", function(word)
+        return string.upper(string.sub(word, 1, 1))
+            .. string.lower(string.sub(word, 2))
+    end)
+    return value ~= "" and value or "Unknown trait"
+end
+
+function Shared.TraitLabel(traitID, definition, labelKey)
+    local key = definition and definition.labelKey or labelKey
+    return Shared.Text(key, humanizeTraitID(traitID))
+end
+
+function Shared.TraitDescription(traitID, definition, descriptionKey, label)
+    local key = definition and definition.descriptionKey or descriptionKey
+    local fallback = Shared.Text(
+        "UI_PNC_Trait_DescriptionUnavailable",
+        "Description unavailable"
+    )
+    return Shared.Text(key, fallback)
 end
 
 function Shared.GetSnapshot(snapshot, payload)

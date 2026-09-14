@@ -28,7 +28,11 @@ PsychopatzCore = {
     },
 }
 
+local testNow = 1000
 PNC = {
+    Core = {
+        Now = function() return testNow end,
+    },
     Network = {
         ClientState = {
             characterPayloads = {},
@@ -472,7 +476,66 @@ T.equal(styledWindow:applyOpacityStyle(), true,
 T.equal(styledWindow.playerList.backgroundColor.a, 0.49,
     "inventory list kept stale detail opacity after settings change")
 
+local refreshRequests = {}
+PNC.Client = {
+    RequestCharacterPayload = function(npcID, forceFull)
+        refreshRequests[#refreshRequests + 1] = {
+            npcID = npcID,
+            forceFull = forceFull,
+        }
+        return true
+    end,
+}
+local npcEndpoint = PNC.InventoryTransferEndpoint.NPC("npc_1")
+T.equal(npcEndpoint:requestSnapshot(true), true,
+    "NPC endpoint accepts an explicit full refresh")
+T.equal(refreshRequests[1].npcID, "npc_1",
+    "NPC refresh targets the selected character")
+T.equal(refreshRequests[1].forceFull, true,
+    "NPC refresh requests the authoritative full payload")
+
+local refreshButton = {
+    setVisible = function(self, value) self.visible = value end,
+    setEnable = function(self, value) self.enabled = value end,
+    setTitle = function(self, value) self.title = value end,
+}
+local refreshWindow = setmetatable({
+    npcId = "npc_1",
+    transferEndpoint = npcEndpoint,
+    refreshNPCButton = refreshButton,
+}, { __index = ISPNCInventoryWindow })
+function refreshWindow:refreshInventory(force)
+    self.refreshForced = force
+end
+function refreshWindow:updateInventoryTooltip() end
+PNC.InventoryWindow.instance = refreshWindow
+T.equal(refreshWindow:onRefreshNPCInventory(), true,
+    "inventory refresh button dispatches")
+T.equal(refreshWindow.inventoryRefreshPending, true,
+    "inventory refresh remains pending until the payload arrives")
+T.equal(refreshWindow.refreshForced, true,
+    "inventory refresh repaints the existing view without clearing it")
+T.equal(refreshWindow:onRefreshNPCInventory(), false,
+    "inventory refresh button blocks duplicate in-flight requests")
+PNC.InventoryWindow.OnInventoryPayloadApplied(
+    "npc_1", 8, "character_payload")
+T.equal(refreshWindow.inventoryRefreshPending, false,
+    "inventory refresh completes on full payload application")
+T.equal(refreshButton.enabled, false,
+    "inventory refresh observes its short cooldown")
+T.equal(#refreshRequests, 2,
+    "duplicate refresh did not send another request")
+testNow = 1800
+refreshWindow:updateInventoryRefreshButton()
+T.equal(refreshButton.enabled, true,
+    "inventory refresh re-enables after its short cooldown")
+PNC.InventoryWindow.instance = nil
+
 local storageEndpoint = PNC.InventoryTransferEndpoint.Storage("storage_a")
+refreshWindow.transferEndpoint = storageEndpoint
+refreshWindow.npcId = nil
+T.equal(refreshWindow:onRefreshNPCInventory(), false,
+    "inventory refresh button ignores storage endpoints")
 PNC.Network.ClientState.colonyManagement = { storage = {
     storageId = "storage_a",
     inventoryRevision = 7,

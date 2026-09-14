@@ -8,6 +8,8 @@ local Model = PNC.InventoryUIModel
     or require "PNC/UI/Inventory/PNC_InventoryUI_Model"
 local StorageModel = PNC.ColonyStorageViewModel
     or require "PNC/UI/Communities/PNC_ColonyStorageViewModel"
+local Inventory = PNC.Inventory
+local EditorModel
 
 local ROOT_TEXTURE = getTexture
     and getTexture("media/ui/Icon_InventoryBasic.png") or nil
@@ -19,6 +21,170 @@ end
 local function title(value, fallback)
     value = tostring(value or "")
     return value ~= "" and value or fallback
+end
+
+local function findNativeItem(container, wantedID, depth)
+    local items
+    local item
+    local nested
+    depth = tonumber(depth) or 0
+    if not container or depth > 6 then return nil end
+    items = container.getItems and container:getItems() or nil
+    if not items or not items.size or not items.get then return nil end
+    for index = 0, items:size() - 1 do
+        item = items:get(index)
+        if item and item.getID and tostring(item:getID()) == tostring(wantedID) then
+            return item
+        end
+        nested = item and item.getItemContainer and item:getItemContainer()
+            or item and item.getInventory and item:getInventory() or nil
+        item = findNativeItem(nested, wantedID, depth + 1)
+        if item then return item end
+    end
+    return nil
+end
+
+local function localPlayer()
+    return getSpecificPlayer and getSpecificPlayer(0)
+        or getPlayer and getPlayer() or nil
+end
+
+function Endpoint.LocalDraft(draft)
+    local endpoint = {
+        kind = "local_draft",
+        role = "counterparty",
+        id = "editor-draft",
+        displayName = draft and draft.displayName or "Unique NPC Draft",
+        draft = draft,
+        selectedContainer = "root",
+        expandedGroups = {},
+    }
+    local function record()
+        if not EditorModel then
+            EditorModel = require "PNC/UI/UniqueNPCEditor/PNC_UniqueNPCEditorModel"
+        end
+        return EditorModel.EnsureRuntimeRecord(draft)
+    end
+    function endpoint:payload()
+        self.displayName = draft and draft.displayName or self.displayName
+        local current = record()
+        return current and {
+            inventory = current.inventory,
+            snapshot = { id = self.id, name = self.displayName },
+        } or nil
+    end
+    function endpoint:inventory()
+        local current = record()
+        return current and current.inventory or nil
+    end
+    function endpoint:revision()
+        local inventory = self:inventory()
+        return inventory and tonumber(inventory.revision) or -1
+    end
+    function endpoint:containers()
+        return Model.BuildNPCContainers(self:inventory())
+    end
+    function endpoint:rows()
+        return Model.BuildNPCRows(
+            self:inventory(), self.selectedContainer, self.expandedGroups
+        )
+    end
+    function endpoint:weight()
+        return Model.GetNPCContainerWeight(
+            self:inventory(), self.selectedContainer
+        )
+    end
+    function endpoint:requestSnapshot() end
+    function endpoint:send(direction, selection, destination)
+        local current = record()
+        local player = localPlayer()
+        local specs = {}
+        local skipped = {}
+        local skippedReasons = {}
+        local item
+        local spec
+        local blockReason
+        local ok
+        local reason
+        local addedIDs
+        if not current or not selection then return false, "draft_unavailable" end
+        if direction == "to_target" then
+            for _, itemID in ipairs(selection.itemIDs or {}) do
+                blockReason = nil
+                item = findNativeItem(
+                    player and player.getInventory and player:getInventory() or nil,
+                    itemID
+                )
+                if not item then
+                    blockReason = "player_item_missing"
+                elseif Model.GetPlayerItemTransferBlockReason then
+                    blockReason = Model.GetPlayerItemTransferBlockReason(
+                        item, player)
+                end
+                if blockReason then
+                    skipped[#skipped + 1] = tostring(itemID)
+                    skippedReasons[blockReason] =
+                        (skippedReasons[blockReason] or 0) + 1
+                    blockReason = nil
+                else
+                    spec, reason = Inventory.CaptureNativeItem(item)
+                    if spec then
+                        spec.templateKey = "editor:" .. tostring(self.id) .. ":"
+                            .. tostring(#specs + 1) .. ":" .. tostring(itemID)
+                        specs[#specs + 1] = spec
+                    else
+                        skipped[#skipped + 1] = tostring(itemID)
+                        skippedReasons[reason or "capture_failed"] =
+                            (skippedReasons[reason or "capture_failed"] or 0) + 1
+                    end
+                end
+            end
+            if #specs < 1 then
+                return false, "no_transferable_items", {
+                    added = 0,
+                    skipped = skipped,
+                    skippedReasons = skippedReasons,
+                }
+            end
+            ok, reason, addedIDs = Inventory.AddItems(
+                current, specs, destination or self.selectedContainer,
+                "editor_player_copy"
+            )
+        else
+            ok, reason = Inventory.RemoveItems(
+                current, selection.itemIDs or {}, "editor_remove"
+            )
+        end
+        if ok and EditorModel then
+            EditorModel.SyncFromRuntime(draft)
+            draft._dirty = true
+        end
+        if direction == "to_target" then
+            return ok, reason, {
+                added = ok and #specs or 0,
+                addedIDs = addedIDs,
+                skipped = skipped,
+                skippedReasons = skippedReasons,
+            }
+        end
+        return ok, reason
+    end
+    function endpoint:action(actionID, itemID)
+        local current = record()
+        local Actions = PNC.InventoryActions
+        local ok
+        local reason
+        if not current or not Actions or not Actions.Execute then
+            return false, "actions_unavailable"
+        end
+        ok, reason = Actions.Execute(actionID, nil, current, itemID, {})
+        if ok and EditorModel then
+            EditorModel.SyncFromRuntime(draft)
+            draft._dirty = true
+        end
+        return ok, reason
+    end
+    return endpoint
 end
 
 function Endpoint.NPC(npcID)
@@ -55,10 +221,16 @@ function Endpoint.NPC(npcID)
             self:inventory(), self.selectedContainer
         )
     end
-    function endpoint:requestSnapshot()
+    function endpoint:requestSnapshot(forceFull)
         if PNC.Client and PNC.Client.RequestCharacterPayload and self.id then
-            PNC.Client.RequestCharacterPayload(self.id)
+            -- Opening the detail window is an explicit cache validation
+            -- boundary. A delta cannot repair a same-revision stale item
+            -- state, while the full payload is cheap and infrequent here.
+            return PNC.Client.RequestCharacterPayload(
+                self.id, forceFull ~= false
+            )
         end
+        return false
     end
     function endpoint:send(direction, selection, destination, options)
         options = options or {}

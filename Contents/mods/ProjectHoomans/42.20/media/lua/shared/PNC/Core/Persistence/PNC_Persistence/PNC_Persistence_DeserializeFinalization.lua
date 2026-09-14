@@ -26,21 +26,19 @@ local function staleGeneratedPersonality(raw)
 end
 
 local function restoreTraits(record, raw)
+    if PNC.NPCTraits and PNC.NPCTraits.NormalizeSet then
+        record.npcTraits = PNC.NPCTraits.NormalizeSet(raw.npcTraits)
+        record.npcTraitFingerprint = PNC.NPCTraits.Fingerprint(
+            record.npcTraits)
+    end
     local vanilla = raw.vanillaTraits
     local vanillaAuthored = raw.vanillaTraitsAuthored == true
-        or (raw.vanillaTraitsAuthored == nil
-            and (tonumber(raw.vanillaTraitsGenerationVersion) or 0) == 0
-            and Internal.hasTableEntries(vanilla))
-    local vanillaVersion = math.max(0, math.floor(
-        tonumber(raw.vanillaTraitsGenerationVersion) or 0
-    ))
     if PNC.PlayerNeedsModel
-        and (vanillaAuthored or vanillaVersion > 0)
+        and vanillaAuthored
     then
         record.vanillaTraits = PNC.PlayerNeedsModel.NormalizeTraits(vanilla)
         record.vanillaTraitsAuthored = vanillaAuthored
-        record.vanillaTraitsGenerationVersion = vanillaAuthored
-            and 0 or vanillaVersion
+        record.vanillaTraitsGenerationVersion = 0
     end
     if PNC.PlayerNeedsModel and PNC.PlayerNeedsModel.EnsureTraits then
         PNC.PlayerNeedsModel.EnsureTraits(record)
@@ -48,22 +46,19 @@ local function restoreTraits(record, raw)
 
     local dynamic = raw.dynamicTraits
     local dynamicAuthored = raw.dynamicTraitsAuthored == true
-        or (raw.dynamicTraitsAuthored == nil
-            and (tonumber(raw.dynamicTraitsGenerationVersion) or 0) == 0
-            and Internal.hasTableEntries(dynamic))
-    local dynamicVersion = math.max(0, math.floor(
-        tonumber(raw.dynamicTraitsGenerationVersion) or 0
-    ))
     if PNC.ConditionStats
-        and (dynamicAuthored or dynamicVersion > 0)
+        and dynamicAuthored
     then
         record.dynamicTraits = PNC.ConditionStats.NormalizeTraits(dynamic)
         record.dynamicTraitsAuthored = dynamicAuthored
-        record.dynamicTraitsGenerationVersion = dynamicAuthored
-            and 0 or dynamicVersion
+        record.dynamicTraitsGenerationVersion = 0
     end
     if PNC.ConditionStats and PNC.ConditionStats.EnsureTraits then
         PNC.ConditionStats.EnsureTraits(record)
+    end
+    if PNC.NPCTraits and PNC.NPCTraits.Fingerprint then
+        record.dynamicTraitFingerprint = PNC.NPCTraits.Fingerprint(
+            record.dynamicTraits or {})
     end
     if PNC.ConditionStats and type(raw.conditionStats) == "table" then
         record.conditionStats = PNC.ConditionStats.NormalizeState(

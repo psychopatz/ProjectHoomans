@@ -16,6 +16,11 @@ function Types.NewRecord(definition)
                 or def.tacticalClass or "PNC NPC") .. ":" .. tostring(generatedID)
         ) or (tonumber(def.identitySeed) or 1),
         identity = Internal.NormalizeIdentity(def.identity),
+        uniqueDefinitionId = def.uniqueDefinitionId,
+        uniqueDefinitionVersion = def.uniqueDefinitionVersion,
+        inventoryTemplateRef = def.inventoryTemplateRef,
+        startingItems = PNC.Core.DeepCopy(def.startingItems or {}),
+        skillBaseLevels = PNC.Core.DeepCopy(def.skillBaseLevels or {}),
         archetypeID = def.archetypeID,
         archetypeLabel = nil,
         tacticalClass = def.tacticalClass,
@@ -92,8 +97,12 @@ function Types.NewRecord(definition)
         vanillaTraitsAuthored = def.vanillaTraitsAuthored == true,
         vanillaTraitsGenerationVersion = 0,
         dynamicTraits = {},
+        dynamicTraitFingerprint = "",
         dynamicTraitsAuthored = def.dynamicTraitsAuthored == true,
         dynamicTraitsGenerationVersion = 0,
+        npcTraits = PNC.NPCTraits and PNC.NPCTraits.NormalizeSet(
+            def.npcTraits) or PNC.Core.DeepCopy(def.npcTraits or {}),
+        npcTraitFingerprint = "",
         conditionStats = nil,
         runtime = {
             target = nil,
@@ -158,12 +167,19 @@ function Types.NewRecord(definition)
     else
         record.dynamicTraits = PNC.Core.DeepCopy(def.dynamicTraits or {})
     end
+    if PNC.NPCTraits and PNC.NPCTraits.Fingerprint then
+        record.npcTraitFingerprint = PNC.NPCTraits.Fingerprint(
+            record.npcTraits)
+        record.dynamicTraitFingerprint = PNC.NPCTraits.Fingerprint(
+            record.dynamicTraits)
+    end
 
     record.social = PNC.RelationshipTypes
         and PNC.RelationshipTypes.NewSocialState(
             def.social,
             record.identitySeed,
-            record.archetypeID
+            record.archetypeID,
+            record
         ) or {
             schemaVersion = 3,
             revision = 0,

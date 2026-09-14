@@ -45,6 +45,7 @@ local optionAccessors = {
     RefugeeAccidentDeathChance = "RefugeeAccidentDeathChance",
     LooterAccidentDeathChance = "LooterAccidentDeathChance",
     CaravanAccidentDeathChance = "CaravanAccidentDeathChance",
+    MobileSettlementAIJoinChance = "MobileSettlementAIJoinChance",
     NPCMeleeWeaponSpawnChance = "NPCMeleeWeaponSpawnChance",
     NPCRangedWeaponSpawnChance = "NPCRangedWeaponSpawnChance",
     ZombiesTargetDownedNPC = "ZombiesTargetDownedNPC",
@@ -147,6 +148,8 @@ T.equal(settings.LooterAccidentDeathChance(), 10,
     "looter accident default")
 T.equal(settings.CaravanAccidentDeathChance(), 1,
     "caravan accident default")
+T.equal(settings.MobileSettlementAIJoinChance(), 35,
+    "AI settlement join chance default")
 T.equal(settings.RadioDiscoveryEnabled(), true,
     "radio discovery default")
 T.equal(settings.RadioDiscoveryCooldownHours(), 0.5,
@@ -177,6 +180,7 @@ SandboxVars = { ProjectHoomans = {
     PlayerOwnedNPCNutritionMode = 2,
     NPCPopulation = 6,
     RefugeeAccidentDeathChance = 0,
+    MobileSettlementAIJoinChance = 72.5,
     RadioDiscoveryCooldownMinutes = 90,
     EnableWeaponDamage = false,
     NPCDamageDealtMultiplier = 3.5,
@@ -189,6 +193,8 @@ T.equal(settings.PlayerOwnedNPCNutritionMode(), "realism",
 T.equal(settings.NPCPopulation(), 6, "population override")
 T.equal(settings.RefugeeAccidentDeathChance(), 0,
     "refugee accident override")
+T.equal(settings.MobileSettlementAIJoinChance(), 72.5,
+    "AI settlement join chance override")
 T.equal(settings.RadioDiscoveryCooldownHours(), 1.5,
     "radio cooldown override")
 T.equal(settings.NPCWeaponDamageEnabled(), false,

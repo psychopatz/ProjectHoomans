@@ -10,12 +10,14 @@ PNC.HoomansLLM = PNC.HoomansLLM or {}
 PNC.HoomansLLM.Context = PNC.HoomansLLM.Context or {}
 
 require "PsychopatzCore/Conversation/PsychopatzNameParts"
+require "PNC/Core/Identity/PNC_FlavorAddress"
 require "PNC/Integrations/PNC_HoomansLLMIdentity"
 
 local Context = PNC.HoomansLLM.Context
 local Message = PsychopatzCore.Conversation.Message
 local ToolPolicy = PNC.ConversationLLMTools
 local NameParts = PsychopatzCore.Conversation.NameParts
+local FlavorAddress = PNC.FlavorAddress
 local MemoryIdentity = PNC.HoomansLLM.Identity
 
 local NEED_TYPES = { "hunger", "thirst", "fatigue" }
@@ -384,20 +386,36 @@ function Context.Build(view, message)
     local source = sourceFor(entry)
     local identity = source.identity or {}
     local npcID = text(definition.npcID or entry.id, "unknown-npc")
+    local clientState = PNC.Network and PNC.Network.ClientState or {}
+    local playerID = playerUUID(view)
+    local playerActor = presentation.player
+    local playerAddress = FlavorAddress.ResolveForNPC({
+        npcID = npcID,
+        npcIdentitySeed = FlavorAddress.ResolveNPCSeed(source, npcID),
+        player = playerActor,
+        playerContext = clientState.playerContext,
+        playerUUID = playerID,
+        isFemale = presentation.playerIsFemale,
+        playerNameKnown = presentation.playerNameKnown,
+        playerFullName = presentation.playerFullName
+            or presentation.playerName,
+        playerFirstName = presentation.playerFirstName,
+        playerSurname = presentation.playerSurname
+            or presentation.playerLastName,
+        state = clientState,
+    })
     local npcParts = NameParts.Split(
         text(presentation.npcFullName or presentation.npcName, npcID),
         presentation.npcFirstName,
         presentation.npcSurname or presentation.npcLastName
     )
     local playerParts = NameParts.Split(
-        text(presentation.playerFullName or presentation.playerName,
-            "the player"),
-        presentation.playerFirstName,
-        presentation.playerSurname or presentation.playerLastName
+        playerAddress.fullName,
+        playerAddress.firstName,
+        playerAddress.surname
     )
     local npcName = npcParts.fullName or npcID
     local playerName = playerParts.addressName or "the player"
-    local playerID = playerUUID(view)
     local worldHours = tonumber(
         Message and Message.GetWorldAgeHours and Message.GetWorldAgeHours()
             or presentation.worldAgeHours
@@ -415,7 +433,6 @@ function Context.Build(view, message)
         and PNC.Conversation.Relationship.GetPresentation
         and PNC.Conversation.Relationship.GetPresentation(npcID)
         or {}
-    local clientState = PNC.Network and PNC.Network.ClientState or {}
     local reactionCapabilities = clientState.llmReactionCapabilities
         and clientState.llmReactionCapabilities[npcID] or nil
     local availableReactions = reactionCapabilities
@@ -460,12 +477,7 @@ function Context.Build(view, message)
     then
         traits = PNC.NPCTraitContext.Collect(source)
     end
-    traits = traits
-        or source.vanillaTraits
-        or source.dynamicTraits
-        or source.traits
-        or source.socialTraits
-        or {}
+    traits = traits or {}
     local preferences = source.preferences or entry.preferences or {}
     local state = copyMap(source, {
         "aiState", "activeBehavior", "activeJob", "orderKind", "attackType",
@@ -512,6 +524,9 @@ function Context.Build(view, message)
             or audioPresentationFor(source),
         npc_name = npcName,
         player_name = playerName,
+        player_address_name = playerAddress.addressName,
+        player_name_known = playerAddress.known,
+        player_is_female = playerAddress.isFemale,
         npc_full_name = npcParts.fullName,
         npc_first_name = npcParts.firstName,
         npc_surname = npcParts.surname,

@@ -1,50 +1,22 @@
 -- Shared, normalized NPC trait context for conversation and rule evaluation.
--- Physiological and dynamic traits remain separate on the record, but gates
--- need one read-only set when evaluating an NPC conversation.
+-- NPC consumers receive only registered NPC traits. Player-only traits remain
+-- in the player physiology/history catalog and are not part of this context.
 
 PNC = PNC or {}
 PNC.NPCTraitContext = PNC.NPCTraitContext or {}
 
 local TraitContext = PNC.NPCTraitContext
-
-local function addSource(output, source)
-    if type(source) ~= "table" then return end
-    for key, enabled in pairs(source) do
-        local id = type(key) == "number" and enabled or key
-        if id ~= nil and (type(key) == "number" or enabled == true) then
-            id = tostring(id)
-            output[id] = true
-            output[string.lower(id)] = true
-        end
-    end
-end
+local Registry = PNC.NPCTraits
 
 function TraitContext.Collect(record)
-    local output = {}
-    local dynamicTraits
-    if type(record) ~= "table" then return output end
-
-    if PNC.PlayerNeedsModel
-        and PNC.PlayerNeedsModel.GetTraits
-    then
-        addSource(output, PNC.PlayerNeedsModel.GetTraits(record))
-    else
-        addSource(output, record.vanillaTraits)
+    if type(record) ~= "table" then return {} end
+    if PNC.ConditionStats and PNC.ConditionStats.EnsureTraits then
+        PNC.ConditionStats.EnsureTraits(record)
     end
-
-    if PNC.ConditionStats
-        and PNC.ConditionStats.EnsureTraits
-    then
-        dynamicTraits = PNC.ConditionStats.EnsureTraits(record)
-        addSource(output, dynamicTraits)
-    else
-        addSource(output, record.dynamicTraits)
+    if Registry and Registry.Collect then
+        return Registry.Collect(record)
     end
-
-    -- Preserve compatibility with older snapshots and external records.
-    addSource(output, record.traits)
-    addSource(output, record.socialTraits)
-    return output
+    return {}
 end
 
 return TraitContext

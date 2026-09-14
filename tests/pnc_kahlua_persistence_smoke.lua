@@ -225,14 +225,31 @@ T.truthy(restored.vanillaTraitsAuthored == true,
     "authored trait source did not round trip")
 T.equal(restored.orderSpec, nil,
     "stale facility order was not repaired during deserialization")
-T.equal(restored.persistenceRepairVersions.facility_activity_runtime, 1,
+T.equal(restored.persistenceRepairVersions.facility_activity_runtime, 2,
     "facility repair revision was not recorded after deserialization")
 T.equal(restored.campState, nil,
     "legacy camp resource cache was restored into the NPC record")
 
 local repairedPayload = PNC.Persistence.SerializeRecord(restored)
-T.equal(repairedPayload.repairVersions.facility_activity_runtime, 1,
+T.equal(repairedPayload.repairVersions.facility_activity_runtime, 2,
     "facility repair revision was not persisted")
+T.equal(repairedPayload.orderSpec, nil,
+    "facility activity order was not excluded from durable persistence")
+
+local legacyPayload = deepCopy(payload)
+legacyPayload.orderSpec = {
+    kind = "facility_activity",
+    capability = "survival.eat.inventory",
+    activityItemFullType = "Base.Chips",
+}
+legacyPayload.repairVersions = { facility_activity_runtime = 1 }
+local legacyRestored = PNC.Persistence.DeserializeRecord(
+    legacyPayload, record.id
+)
+T.equal(legacyRestored.orderSpec, nil,
+    "revision 2 did not clean a revision 1 facility breadcrumb")
+T.equal(legacyRestored.persistenceRepairVersions.facility_activity_runtime, 2,
+    "revision 2 did not supersede the old facility repair")
 
 record.generation = {
     source = "starting_companion_trait",

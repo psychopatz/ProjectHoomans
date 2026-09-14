@@ -254,6 +254,16 @@ local function copyPresentation(summary)
             summary.recruitmentPreview
         ),
         departurePreview = copyDeparturePreview(summary.departurePreview),
+        settlementVisit = summary.settlementVisit and {
+            active = summary.settlementVisit.active == true,
+            kind = summary.settlementVisit.kind,
+            visitID = summary.settlementVisit.visitID,
+            communityID = summary.settlementVisit.communityID,
+            settlementFactionID = summary.settlementVisit.settlementFactionID,
+            startedAt = tonumber(summary.settlementVisit.startedAt) or 0,
+            expiresAt = tonumber(summary.settlementVisit.expiresAt) or 0,
+            revision = tonumber(summary.settlementVisit.revision) or 0,
+        } or nil,
     }
 end
 
@@ -282,6 +292,18 @@ local function sameRecruitmentPreview(left, right)
         and left.fearEligible == right.fearEligible
 end
 
+local function sameSettlementVisit(left, right)
+    left = left and left.settlementVisit or nil
+    right = right and right.settlementVisit or nil
+    if left == nil or right == nil then return left == right end
+    return left.active == right.active
+        and tostring(left.visitID or "") == tostring(right.visitID or "")
+        and (tonumber(left.expiresAt) or 0)
+            == (tonumber(right.expiresAt) or 0)
+        and (tonumber(left.revision) or 0)
+            == (tonumber(right.revision) or 0)
+end
+
 local function samePresentation(left, right)
     if type(left) ~= "table" or type(right) ~= "table" then
         return false
@@ -300,6 +322,7 @@ local function samePresentation(left, right)
             == (tonumber(right.socialRevision) or 0)
         and sameRecruitmentPreview(left, right)
         and sameDeparturePreview(left, right)
+        and sameSettlementVisit(left, right)
 end
 
 function Relationship.ReceivePresentation(summary, delta, metadata)
@@ -316,6 +339,10 @@ function Relationship.ReceivePresentation(summary, delta, metadata)
         )
     end
     local previous = presentationCache[npcID]
+    local settlementVisitChanged = not sameSettlementVisit(
+        previous,
+        summary
+    )
     local incomingRevision = tonumber(summary.revision) or 0
     local previousRevision = previous
         and (tonumber(previous.revision) or 0) or nil
@@ -369,11 +396,19 @@ function Relationship.ReceivePresentation(summary, delta, metadata)
         and PsychopatzCore.Conversation.instance or nil
     if view and view.spec
         and tostring(view.spec.npcID or "") == npcID
-        and view.extensionParts
-        and view.extensionParts.relationship
-        and view.extensionParts.relationship.setRelationship
     then
-        view.extensionParts.relationship:setRelationship(summary)
+        local refreshed = false
+        if settlementVisitChanged
+            and PNC.Conversation.ReceiveIdentityPresentation
+        then
+            refreshed = PNC.Conversation.ReceiveIdentityPresentation(summary)
+        end
+        if not refreshed and view.extensionParts
+            and view.extensionParts.relationship
+            and view.extensionParts.relationship.setRelationship
+        then
+            view.extensionParts.relationship:setRelationship(summary)
+        end
     end
     return true
 end

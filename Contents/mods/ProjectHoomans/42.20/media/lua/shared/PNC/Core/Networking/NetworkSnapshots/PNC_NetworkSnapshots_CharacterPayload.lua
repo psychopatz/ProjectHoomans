@@ -21,6 +21,10 @@ function Network.BuildCharacterPayload(record)
         needs = Core.DeepCopy(snapshot.needs or {}),
         stamina = Stamina and Stamina.BuildSnapshot and Stamina.BuildSnapshot(record) or {},
         inventory = inventoryPayload,
+        -- A full snapshot is authoritative even when its revision equals the
+        -- client's cache. Equal revisions can still carry different item
+        -- state after a reconnect or a stale UI cache.
+        inventoryFull = true,
         equipment = Core.DeepCopy(record.equipment or {}),
         progression = {
             recruited = record.recruited == true,

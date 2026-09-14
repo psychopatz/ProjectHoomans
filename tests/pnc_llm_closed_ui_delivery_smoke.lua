@@ -65,11 +65,14 @@ PNC = {
             end
             return true, "accepted"
         end,
-        ExecuteCompanionCommand = function(commandID, npcID, scope)
+        ExecuteCompanionCommand = function(commandID, npcID, scope, context)
             companionOrders[#companionOrders + 1] = {
                 commandID = commandID,
                 npcID = npcID,
                 scope = scope,
+                requestID = context and context.requestID,
+                callID = context and context.callID,
+                origin = context and context.origin,
             }
             return true
         end,
@@ -272,6 +275,10 @@ T.equal(companionOrders[1].npcID, "npc-two",
     "camp LLM tool targets the active NPC")
 T.equal(companionOrders[1].scope, "conversation",
     "camp LLM tool uses the conversation command scope")
+T.equal(companionOrders[1].callID, "camp-1",
+    "camp LLM tool preserves its tool-call identity")
+T.equal(companionOrders[1].origin, "llm_tool",
+    "camp LLM tool preserves its source")
 T.truthy(string.find(Speech.Get("npc-two").message.text, "Harley", 1, true),
     "headless tool acknowledgement uses the NPC's dedicated name reply")
 T.equal(releases[2].requestID, inlinePacket.request_id,
@@ -345,6 +352,8 @@ T.truthy(Speech.Get("npc-three"),
 socialReactionAccepted = false
 local activeMessages = {}
 local activeView = {
+    headless = true,
+    hoomansLLM = true,
     spec = {
         npcID = "npc-four",
         characterUUID = "player-one",
@@ -390,6 +399,9 @@ T.truthy(activeDelivered.accepted, "active refusal response was not delivered")
 T.equal(activeMessages[1].metadata.portraitAnimation,
     "reaction.thumbsdown",
     "authoritative LLM refusal reaches the close-up portrait")
+T.equal(activeMessages[1].metadata.source.conversationToken,
+    "token-four",
+    "headless LLM response carries its conversation token to live presentation")
 
 -- A provider failure may arrive with legacy generic prose. An authoritative
 -- identity result must still replace that prose in the active conversation.

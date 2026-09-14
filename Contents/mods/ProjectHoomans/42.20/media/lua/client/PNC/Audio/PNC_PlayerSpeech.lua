@@ -170,7 +170,9 @@ function Speech.Speak(player, text, context)
     -- Flavor generation is deliberately client-local.  The server is not
     -- involved in this handoff; the local SocialFlavorClient decides whether
     -- to use PBrainZ or its deterministic fallback.
-    publishLocalSocialReaction(player, text, context)
+    if context.suppressSocialReaction ~= true then
+        publishLocalSocialReaction(player, text, context)
+    end
     local voiced = Speech.Publish(player, text, context) == true
     if type(player.Say) == "function" then
         player:Say(text)

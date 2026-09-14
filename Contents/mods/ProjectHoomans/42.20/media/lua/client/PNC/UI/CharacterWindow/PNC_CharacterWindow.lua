@@ -97,6 +97,17 @@ function ISPNCCharacterTab:onMouseWheel(del)
     return true
 end
 
+function ISPNCCharacterTab:onMouseMove(x, y)
+    local hook = Tabs["On" .. tostring(self.tabId) .. "MouseMove"]
+    if hook then hook(self, x, y) end
+    return true
+end
+
+function ISPNCCharacterTab:onMouseMoveOutside(x, y)
+    local hook = Tabs["On" .. tostring(self.tabId) .. "MouseMoveOutside"]
+    if hook then hook(self, x, y) end
+end
+
 function ISPNCCharacterTab:onRightMouseUp(x, y)
     local hook = Tabs["On" .. tostring(self.tabId) .. "RightMouseUp"]
     if hook then return hook(self, x, y) == true end

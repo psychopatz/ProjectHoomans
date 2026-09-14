@@ -110,6 +110,16 @@ option ProjectHoomans.CaravanAccidentDeathChance
     translation = ProjectHoomans.CaravanAccidentDeathChance,
 }
 
+option ProjectHoomans.MobileSettlementAIJoinChance
+{
+    type = double,
+    default = 35.0,
+    min = 0.0,
+    max = 100.0,
+    page = ProjectHoomans,
+    translation = ProjectHoomans.MobileSettlementAIJoinChance,
+}
+
 option ProjectHoomans.NPCMeleeWeaponSpawnChance
 {
     type = double,

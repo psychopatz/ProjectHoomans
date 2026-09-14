@@ -2,6 +2,37 @@ PNC = PNC or {}
 PNC.Visuals = PNC.Visuals or {}
 
 local Visuals = PNC.Visuals
+
+local function applyIdentityVoice(zombie, record, appearance)
+    local identity = record and record.identity or nil
+    local survivor = identity and identity.survivor or nil
+    local descriptor = zombie and zombie.getDescriptor
+        and zombie:getDescriptor() or nil
+    if not descriptor then return end
+    if not survivor then survivor = {} end
+    if appearance and survivor.voicePrefix == nil then
+        survivor = {
+            voice = appearance.voice,
+            voicePrefix = appearance.voicePrefix or appearance.voice,
+            voiceType = appearance.voiceType,
+            voicePitch = appearance.voicePitch,
+        }
+    end
+    if survivor.voicePrefix and descriptor.setVoicePrefix then
+        pcall(descriptor.setVoicePrefix, descriptor, survivor.voicePrefix)
+    elseif survivor.voice and descriptor.setVoicePrefix then
+        pcall(descriptor.setVoicePrefix, descriptor, survivor.voice)
+    end
+    if survivor.voiceType ~= nil and descriptor.setVoiceType then
+        pcall(descriptor.setVoiceType, descriptor,
+            math.max(0, math.min(3, math.floor(
+                tonumber(survivor.voiceType) or 0))))
+    end
+    if survivor.voicePitch ~= nil and descriptor.setVoicePitch then
+        pcall(descriptor.setVoicePitch, descriptor,
+            math.max(-100, math.min(100, tonumber(survivor.voicePitch) or 0)))
+    end
+end
 local Profiles = PNC.VisualProfiles
 local Core = PNC.Core
 
@@ -200,29 +231,55 @@ end
 local function applyBaseOutfitItems(zombie, appearance)
     local equipment = PNC.Equipment
     local items
+    local specs
+    local count
     local i
+    local spec
+    local fullType
+    local visualState
     local item
     local reason
     if not zombie or not appearance then
         return
     end
-    items = appearance.outfitItems
-    if type(items) ~= "table" or not equipment or not equipment.CreateItem then
+    items = appearance.outfitItems or {}
+    specs = appearance.outfitItemSpecs or {}
+    if type(items) ~= "table" or type(specs) ~= "table"
+        or not equipment or not equipment.CreateItem
+    then
         return
     end
-    for i = 1, #items do
-        if not Visuals.AddClothingVisual(zombie, items[i]) then
-            item, reason = equipment.CreateItem(items[i])
+    count = math.max(#items, #specs)
+    for i = 1, count do
+        spec = type(specs[i]) == "table" and specs[i] or nil
+        fullType = spec and spec.type or items[i]
+        if fullType then
+            visualState = equipment.VisualStateFromItemState
+                and equipment.VisualStateFromItemState(
+                    spec and spec.itemState or nil,
+                    fullType
+                ) or nil
+        end
+        if fullType and not Visuals.AddClothingVisual(
+            zombie, fullType, visualState)
+        then
+            item, reason = equipment.CreateItem(fullType)
             if item then
+                if visualState and equipment.Internal
+                    and equipment.Internal.applyItemVisualState
+                then
+                    equipment.Internal.applyItemVisualState(item, visualState)
+                end
                 safeSetWornItem(zombie, item)
             elseif reason and reason ~= "invalid_full_type" then
-                PNC.Core.LogWarn("PNC visuals could not create outfit item " .. tostring(items[i]) .. ": " .. tostring(reason))
+                PNC.Core.LogWarn("PNC visuals could not create outfit item "
+                    .. tostring(fullType) .. ": " .. tostring(reason))
             end
         end
     end
 end
 
-function Visuals.ApplyResolvedAppearance(zombie, appearance, isFemale)
+function Visuals.ApplyResolvedAppearance(zombie, appearance, isFemale, record)
     local humanVisual
     local itemVisuals
     local wornItems
@@ -234,6 +291,7 @@ function Visuals.ApplyResolvedAppearance(zombie, appearance, isFemale)
     if zombie.setFemaleEtc then
         zombie:setFemaleEtc(isFemale == true)
     end
+    applyIdentityVoice(zombie, record, appearance)
 
     humanVisual = zombie.getHumanVisual and zombie:getHumanVisual() or nil
     itemVisuals = zombie.getItemVisuals and zombie:getItemVisuals() or nil
@@ -249,7 +307,7 @@ function Visuals.ApplyResolvedAppearance(zombie, appearance, isFemale)
     Visuals.ClearAttachedItems(zombie)
     clearBodySoiledState(humanVisual)
 
-    if zombie.dressInNamedOutfit then
+    if appearance.outfit and zombie.dressInNamedOutfit then
         zombie:dressInNamedOutfit(appearance.outfit)
     end
     applyBaseOutfitItems(zombie, appearance)
@@ -260,12 +318,13 @@ end
 -- Multiplayer bodies keep their worn inventory and ItemVisuals under server
 -- ownership.  The client may repair human-only fields, but must never clear or
 -- rebuild clothing: native zombie/equipment packets apply those collections.
-function Visuals.ApplyReplicaAppearance(zombie, appearance, isFemale)
+function Visuals.ApplyReplicaAppearance(zombie, appearance, isFemale, record)
     local humanVisual
     if not zombie or not appearance then
         return false, "missing_body_or_appearance"
     end
     humanVisual = zombie.getHumanVisual and zombie:getHumanVisual() or nil
+    applyIdentityVoice(zombie, record, appearance)
     clearBodySoiledState(humanVisual)
     Visuals.MaintainHumanAppearance(
         zombie,
@@ -298,13 +357,15 @@ function Visuals.ApplyHumanVisuals(zombie, record)
         Visuals.ApplyReplicaAppearance(
             zombie,
             appearance,
-            record.isFemale == true
+            record.isFemale == true,
+            record
         )
     else
         Visuals.ApplyResolvedAppearance(
             zombie,
             appearance,
-            record.isFemale == true
+            record.isFemale == true,
+            record
         )
     end
 end

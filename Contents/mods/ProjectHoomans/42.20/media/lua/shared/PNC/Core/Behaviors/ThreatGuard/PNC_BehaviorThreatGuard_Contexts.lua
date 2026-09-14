@@ -173,6 +173,38 @@ local function workContext(record, order, kind)
     )
 end
 
+local function travelConversationContext(record)
+    local runtime = record and record.runtime or nil
+    local lease = runtime and runtime.conversationLease or nil
+    local journey = record and record.travel or nil
+    local order = record and record.orderSpec or nil
+    local journeyId
+    local token
+    if not lease or lease.travelHold ~= true or not journey
+        or tostring(order and order.kind or "") ~= tostring(
+            Const.ORDER_TRAVEL or "travel")
+    then
+        return nil
+    end
+    journeyId = tostring(journey.journeyId or order.journeyId or "")
+    token = "conversation|travel|"
+        .. tostring(lease.token or "") .. "|" .. journeyId
+    return context(
+        "conversation",
+        "travel",
+        record.x,
+        record.y,
+        record.z,
+        firstNumber(
+            lease.dangerRadius,
+            Const.TARGET_IMMEDIATE_THREAT_RADIUS,
+            6
+        ),
+        "conversation",
+        token
+    )
+end
+
 function Internal.ResolveContext(record)
     local runtime = record and record.runtime or nil
     local order = record and record.orderSpec or {}
@@ -191,6 +223,8 @@ function Internal.ResolveContext(record)
         end
         return facilityContext(record, activity, order)
     end
+    point = travelConversationContext(record)
+    if point then return point end
     if roamingSeat and kind == tostring(Const.ORDER_ROAM or "roam") then
         return context(
             "roaming_seat",

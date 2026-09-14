@@ -10,6 +10,7 @@ PNC.ClientPresenceSync.Internal =
 
 require "PNC/PresenceSync/PresenceVisuals/PNC_ClientPresenceVisuals_RecordView"
 require "PNC/PresenceSync/PresenceVisuals/PNC_ClientPresenceVisuals_Keys"
+require "PNC/PresenceSync/PresenceVisuals/PNC_ClientPresenceVisuals_Bandages"
 require "PNC/PresenceSync/PresenceVisuals/PNC_ClientPresenceVisuals_Attack"
 require "PNC/PresenceSync/PresenceVisuals/PNC_ClientPresenceVisuals_Treatment"
 require "PNC/PresenceSync/PresenceVisuals/PNC_ClientPresenceVisuals_Scene"

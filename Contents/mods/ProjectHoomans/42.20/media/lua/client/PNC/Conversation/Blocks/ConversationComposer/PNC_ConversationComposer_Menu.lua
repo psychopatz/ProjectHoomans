@@ -219,8 +219,21 @@ function Composer.BuildRootNode(context, options)
         local recruited = ownership
             and (ownership.recruited or ownership.colonyOwned)
             or record.recruited == true
-        if not recruited
+        if not recruited and context.settlementVisit
+            and context.settlementVisit.active == true
         then
+            choices[#choices + 1] = {
+                id = "settlement_admission",
+                text = dialoguePayload(
+                    SYSTEM_SOURCE,
+                    "choice.settlement_admission",
+                    context
+                ),
+                action = function()
+                    Composer.RequestSettlementAdmission(context.npcID)
+                end,
+            }
+        elseif not recruited then
             local function setRecruitPreview(highlighted)
                 local relationship = Conversation.Relationship
                     or PNC.Conversation.Relationship
@@ -317,7 +330,7 @@ function Composer.BuildRootNode(context, options)
     end
     local requiredSystemKeys = {
         "status.block_unavailable", "status.choice_rejected",
-        "choice.show_debug_text",
+        "choice.show_debug_text", "choice.settlement_admission",
     }
     for _, key in ipairs(RECRUIT_SYSTEM_KEYS) do
         requiredSystemKeys[#requiredSystemKeys + 1] = key

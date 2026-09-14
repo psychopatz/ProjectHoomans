@@ -58,8 +58,7 @@ function Composer.BuildContext(entry, player, timeID, relationshipID)
         npcTraits = PNC.NPCTraitContext
             and PNC.NPCTraitContext.Collect
             and PNC.NPCTraitContext.Collect(record)
-            or record.vanillaTraits or record.dynamicTraits
-            or record.traits or record.socialTraits,
+            or {},
         audience = profile.audience,
         conversationAudience = profile.audience,
         conversationProfile = profile,
@@ -71,6 +70,9 @@ function Composer.BuildContext(entry, player, timeID, relationshipID)
         hour = TIME_HOURS[timeID] or at % 24,
         worldID = "world",
         baseEstablished = profile.baseEstablished,
+        settlementVisit = relationship and relationship.settlementVisit
+            and (tonumber(relationship.settlementVisit.expiresAt) or 0) > at
+            and relationship.settlementVisit or nil,
     }
     context.blockValidator = function(block)
         return Loader.EnsureSource(

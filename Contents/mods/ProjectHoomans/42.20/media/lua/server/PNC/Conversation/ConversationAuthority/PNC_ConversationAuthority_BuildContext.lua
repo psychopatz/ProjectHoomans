@@ -79,8 +79,7 @@ function Authority.BuildContext(player, record, token)
         npcTraits = PNC.NPCTraitContext
             and PNC.NPCTraitContext.Collect
             and PNC.NPCTraitContext.Collect(record)
-            or record.vanillaTraits or record.dynamicTraits
-            or record.traits or record.socialTraits,
+            or {},
         audiences = audienceMap(record, category),
         allowHostileParley = audienceMap(record, category).hostile,
         worldAgeHours = worldAgeHours(),
@@ -89,6 +88,13 @@ function Authority.BuildContext(player, record, token)
         factionID = faction and faction.id or nil,
         colonyID = colony and colony.id or nil,
         baseEstablished = base ~= nil,
+        settlementVisit = PNC.MobileSettlementVisitService
+            and PNC.MobileSettlementVisitService.GetNPCVisit
+            and PNC.MobileSettlementVisitService.GetNPCVisit(
+                record.id,
+                player,
+                worldAgeHours()
+            ) or nil,
     }
     context.historyLookup = function(subjectID, scope)
         return History.Get(subjectID, { scope = scope }, context)

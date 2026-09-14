@@ -556,10 +556,14 @@ T.equal(
 local relationshipPayload = PNC.Persistence.SerializeRecord(
     PNC.Registry.Get(alice.id)
 )
+T.equal(relationshipPayload.social.conduct.scores, nil,
+    "conduct scores are omitted from persisted social state")
 local relationshipReloaded = PNC.Persistence.DeserializeRecord(
     relationshipPayload,
     alice.id
 )
+T.truthy(relationshipReloaded.social.conduct.scores,
+    "conduct scores are rebuilt from persisted evidence")
 local reloadedJournal = relationshipReloaded.social.relationships[playerKey]
     .interactionJournal
 T.equal(#reloadedJournal, 1,
@@ -569,8 +573,8 @@ T.equal(reloadedJournal[1].eventID,
     "relationship journal event identity survives reload")
 
 -- 24-25. Older records are rejected by the exact-version reset contract.
-T.equal(PNC.Const.PERSISTENCE_VERSION, 15,
-    "persistence schema advanced to V15")
+T.equal(PNC.Const.PERSISTENCE_VERSION, 16,
+    "persistence schema advanced to V16")
 local oldRaw = {
     schemaVersion = 10,
     recordRevision = 7,

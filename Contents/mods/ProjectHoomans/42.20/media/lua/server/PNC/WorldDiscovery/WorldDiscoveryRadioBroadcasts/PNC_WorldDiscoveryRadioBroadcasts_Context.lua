@@ -3,6 +3,8 @@ if PsychopatzCore and PsychopatzCore.RuntimeRole and not PsychopatzCore.RuntimeR
 local Discovery = PNC.WorldDiscovery
 local Internal = Discovery.RadioBroadcastsInternal
 local Types = PNC.WorldDiscoveryTypes
+require "PNC/Core/Identity/PNC_FlavorAddress"
+local FlavorAddress = PNC.FlavorAddress
 
 Discovery.RADIO_IDENTITY_REVEAL_CHANCE = 35
 Discovery.RADIO_AMBIENT_VARIANTS = {
@@ -53,41 +55,14 @@ local function npcNames(npcID)
         fullName = full or "Unknown survivor",
         firstName = first or full or "Unknown",
         lastName = last or "",
+        identitySeed = summary.identitySeed or record.identitySeed,
+        isFemale = summary.isFemale == true or record.isFemale == true,
     }
 end
 
-local function playerNames(player)
-    local context = PNC.PlayerContext and PNC.PlayerContext.Resolve
+local function playerContextFor(player)
+    return PNC.PlayerContext and PNC.PlayerContext.Resolve
         and PNC.PlayerContext.Resolve(player, "radio_discovery") or {}
-    local descriptor = player and player.getDescriptor
-        and player:getDescriptor() or nil
-    local full, first, last = nameParts(
-        context and context.displayName,
-        context and context.forename
-            or descriptor and descriptor.getForename
-                and descriptor:getForename(),
-        context and context.surname
-            or descriptor and descriptor.getSurname
-                and descriptor:getSurname()
-    )
-    if not full and player and player.getUsername then
-        full, first, last = nameParts(player:getUsername())
-    end
-    return full or "unknown listener", first or "listener", last or "",
-        context
-end
-
-local function playerKnowsSpeakerName(playerContext, speakerID)
-    if not playerContext or not playerContext.characterUUID
-        or not speakerID
-        or not PNC.NPCKnowledge
-        or type(PNC.NPCKnowledge.GetDescriptor) ~= "function"
-    then return false end
-    local ok, descriptor = pcall(
-        PNC.NPCKnowledge.GetDescriptor,
-        playerContext.characterUUID, speakerID, "identity.name"
-    )
-    return ok and descriptor ~= nil
 end
 
 local function memberIDs(entity)
@@ -165,11 +140,16 @@ function Discovery.BuildRadioTemplateContext(player, entity, phase)
             .. tostring(math.floor(entity.y))
         or "grid " .. tostring(math.floor(entity.x / 100)) .. ", "
             .. tostring(math.floor(entity.y / 100))
-    local playerFull, playerFirst, playerLast, playerContext = playerNames(player)
+    local playerContext = playerContextFor(player)
     local speaker, second = pickSpeakers(entity)
-    local playerNameKnown = playerKnowsSpeakerName(
-        playerContext, speaker and speaker.npcID or nil
-    )
+    local playerAddress = FlavorAddress.ResolveForNPC({
+        npcID = speaker and speaker.npcID or "radio:unknown",
+        npcIdentitySeed = speaker and speaker.identitySeed,
+        player = player,
+        playerContext = playerContext,
+        playerUUID = playerContext and playerContext.characterUUID,
+        state = playerContext,
+    })
     local introduced = speaker ~= nil and revealRoll()
     return {
         entityID = entity.entityID,
@@ -179,12 +159,15 @@ function Discovery.BuildRadioTemplateContext(player, entity, phase)
         phase = phase,
         location = location,
         settlementName = tostring(entity.name or "unknown enclave"),
-        -- Do not put the player's real name in the template context unless
-        -- this exact selected speaker is already known to this character.
-        playerFirstName = playerNameKnown and playerFirst or "listener",
-        playerLastName = playerNameKnown and playerLast or "",
-        playerFullName = playerNameKnown and playerFull or "unknown listener",
-        playerNameKnown = playerNameKnown,
+        playerFirstName = playerAddress.firstName,
+        playerLastName = playerAddress.lastName,
+        playerSurname = playerAddress.surname,
+        playerFullName = playerAddress.fullName,
+        playerAddressName = playerAddress.addressName,
+        playerNameKnown = playerAddress.known,
+        playerIsFemale = playerAddress.isFemale,
+        playerNicknameID = playerAddress.nicknameID,
+        npcIdentitySeed = speaker and speaker.identitySeed,
         npcFirstName = introduced and speaker.firstName or "unknown caller",
         npcLastName = introduced and speaker.lastName or "",
         npcFullName = introduced and speaker.fullName or "unknown caller",

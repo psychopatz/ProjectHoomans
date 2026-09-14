@@ -15,6 +15,36 @@ local Tactics = PNC.CombatTactics
 local Common = PNC.BehaviorCommon
 local Engagement = PNC.CombatEngagement
 
+local function canFightThroughTravelConversation(record, scene)
+    local runtime = record and record.runtime or nil
+    local lease = runtime and runtime.conversationLease or nil
+    return scene
+        and scene.id == "social.conversation"
+        and scene.blocking == true
+        and lease
+        and lease.travelHold == true
+        and runtime.threatGuard ~= nil
+end
+
+local function releaseBlockingCombatScene(record, zombie, scene)
+    local runtime = record and record.runtime or nil
+    local remaining
+    if not runtime or not scene then return true end
+    if PNC.AnimationScenes and PNC.AnimationScenes.Interrupt then
+        PNC.AnimationScenes.Interrupt(record, zombie, "combat")
+    end
+    remaining = runtime.animationScene
+    if remaining == scene
+        and remaining.blocking == true
+        and PNC.AnimationScenes
+        and PNC.AnimationScenes.Stop
+    then
+        PNC.AnimationScenes.Stop(record, zombie, "combat_force_stop")
+        remaining = runtime.animationScene
+    end
+    return not remaining or remaining.blocking ~= true
+end
+
 function BehaviorCombat.TickCommittedAction(record, zombie)
     local equipmentInfo
     local actionActive
@@ -114,10 +144,37 @@ function BehaviorCombat.TickEngage(record, zombie, target)
     end
     local scene = record and record.runtime
         and record.runtime.animationScene or nil
-    if scene and scene.blocking == true then
-        return true
+    local travelConversationCombat = canFightThroughTravelConversation(
+        record,
+        scene
+    )
+    if scene and scene.blocking == true and not travelConversationCombat then
+        if not releaseBlockingCombatScene(record, zombie, scene) then
+            if Common and Common.SetCombatDebug then
+                Common.SetCombatDebug(
+                    record,
+                    target,
+                    "combat_scene_blocked"
+                )
+            end
+            return false
+        end
+        if record.runtime
+            and record.runtime.facilityActivity
+            and record.runtime.facilityActivity.sleepWakePending == true
+        then
+            if Common and Common.SetCombatDebug then
+                Common.SetCombatDebug(
+                    record,
+                    target,
+                    "combat_waiting_sleep_wake"
+                )
+            end
+            return false
+        end
     end
-    if PNC.AnimationScenes
+    if not travelConversationCombat
+        and PNC.AnimationScenes
         and PNC.AnimationScenes.Interrupt
     then
         PNC.AnimationScenes.Interrupt(

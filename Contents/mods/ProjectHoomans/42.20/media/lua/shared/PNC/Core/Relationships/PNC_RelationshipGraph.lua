@@ -114,7 +114,8 @@ function Graph.ResolveNPCPersonality(record)
             raw,
             record and (record.identitySeed or identity.seed),
             record and (record.archetypeID or identity.archetypeID),
-            social.personalityOverrides
+            social.personalityOverrides,
+            record
         )
     end
     return raw

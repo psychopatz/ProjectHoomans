@@ -41,6 +41,8 @@ Diagnostics.TimingLastSampleAt = Diagnostics.TimingLastSampleAt or {}
 Diagnostics.SeatingAuditEnabled = false
 Diagnostics.FollowerPresenceAuditEnabled = false
 Diagnostics.FollowerAbandonmentAuditEnabled = false
+Diagnostics.InventoryAuditEnabled = false
+Diagnostics.NeedsAuditEnabled = false
 -- Firearm tracing is opt-in. It is intentionally disabled on a normal load
 -- because it assembles per-shot fields and can produce substantial console
 -- traffic during firefights.
@@ -55,6 +57,8 @@ local FOLLOWER_PRESENCE_AUDIT_SETTING_ID =
     "ProjectHoomans.FollowerPresenceAudit"
 local FOLLOWER_ABANDONMENT_AUDIT_SETTING_ID =
     "ProjectHoomans.FollowerAbandonmentAudit"
+local INVENTORY_AUDIT_SETTING_ID = "ProjectHoomans.InventoryAudit"
+local NEEDS_AUDIT_SETTING_ID = "ProjectHoomans.NeedsAudit"
 local function initializeCentralDebugSettings()
     local settings = PsychopatzCore and PsychopatzCore.DebugSettings
     if not settings or type(settings.Register) ~= "function" then
@@ -127,6 +131,30 @@ local function initializeCentralDebugSettings()
             Diagnostics.FollowerAbandonmentAuditEnabled = enabled == true
         end,
     })
+    settings.Register({
+        id = INVENTORY_AUDIT_SETTING_ID,
+        source = "Project Hoomans",
+        order = 130,
+        title = "Inventory state audit",
+        description = "Logs authoritative inventory mutations and client synchronization.",
+        defaultEnabled = false,
+        runtimeMutable = true,
+        apply = function(enabled)
+            Diagnostics.InventoryAuditEnabled = enabled == true
+        end,
+    })
+    settings.Register({
+        id = NEEDS_AUDIT_SETTING_ID,
+        source = "Project Hoomans",
+        order = 135,
+        title = "Needs state audit",
+        description = "Logs hunger, thirst, fatigue, and other individual need changes.",
+        defaultEnabled = false,
+        runtimeMutable = true,
+        apply = function(enabled)
+            Diagnostics.NeedsAuditEnabled = enabled == true
+        end,
+    })
     Diagnostics.Enabled = settings.IsEnabled(PERFORMANCE_SETTING_ID) == true
     Diagnostics.TimingEnabled = Diagnostics.Enabled
         and Diagnostics.TimingEnabled ~= false
@@ -143,6 +171,10 @@ local function initializeCentralDebugSettings()
         FOLLOWER_PRESENCE_AUDIT_SETTING_ID) == true
     Diagnostics.FollowerAbandonmentAuditEnabled = settings.IsEnabled(
         FOLLOWER_ABANDONMENT_AUDIT_SETTING_ID) == true
+    Diagnostics.InventoryAuditEnabled = settings.IsEnabled(
+        INVENTORY_AUDIT_SETTING_ID) == true
+    Diagnostics.NeedsAuditEnabled = settings.IsEnabled(
+        NEEDS_AUDIT_SETTING_ID) == true
 end
 
 initializeCentralDebugSettings()
@@ -335,6 +367,38 @@ function Diagnostics.IsSeatingAuditEnabled()
     return Diagnostics.SeatingAuditEnabled == true
 end
 
+function Diagnostics.SetInventoryAuditEnabled(enabled)
+    Diagnostics.InventoryAuditEnabled = enabled == true
+    if Diagnostics.InventoryAuditEnabled == true then
+        if PNC.Core and PNC.Core.LogInfo then
+            PNC.Core.LogInfo("inventory_audit event=enabled")
+        else
+            print("[PNC][INFO] inventory_audit event=enabled")
+        end
+    end
+    return Diagnostics.InventoryAuditEnabled
+end
+
+function Diagnostics.IsInventoryAuditEnabled()
+    return Diagnostics.InventoryAuditEnabled == true
+end
+
+function Diagnostics.SetNeedsAuditEnabled(enabled)
+    Diagnostics.NeedsAuditEnabled = enabled == true
+    if Diagnostics.NeedsAuditEnabled == true then
+        if PNC.Core and PNC.Core.LogInfo then
+            PNC.Core.LogInfo("needs_audit event=enabled")
+        else
+            print("[PNC][INFO] needs_audit event=enabled")
+        end
+    end
+    return Diagnostics.NeedsAuditEnabled
+end
+
+function Diagnostics.IsNeedsAuditEnabled()
+    return Diagnostics.NeedsAuditEnabled == true
+end
+
 function Diagnostics.SetFirearmAuditEnabled(enabled)
     Diagnostics.FirearmAuditEnabled = enabled == true
     if Diagnostics.FirearmAuditEnabled == true then
@@ -407,6 +471,50 @@ function Diagnostics.LogFirearmAudit(eventName, fields)
     local message
     if Diagnostics.FirearmAuditEnabled ~= true then return false end
     output = { "firearm_audit", "event=" .. tostring(eventName or "unknown") }
+    for _, field in ipairs(fields or {}) do
+        output[#output + 1] = tostring(field)
+    end
+    message = table.concat(output, " ")
+    if PNC.Core and PNC.Core.LogInfo then
+        PNC.Core.LogInfo(message)
+    else
+        print("[PNC][INFO] " .. message)
+    end
+    return true
+end
+
+-- Inventory and needs traces are event-boundary diagnostics. Callers must
+-- guard expensive field assembly before entering these functions so the
+-- disabled path is only a boolean branch and does not allocate tables,
+-- inspect state, read clocks, or concatenate strings.
+function Diagnostics.LogInventoryAudit(eventName, fields)
+    local output
+    local message
+    if Diagnostics.InventoryAuditEnabled ~= true then return false end
+    output = {
+        "inventory_audit",
+        "event=" .. tostring(eventName or "unknown"),
+    }
+    for _, field in ipairs(fields or {}) do
+        output[#output + 1] = tostring(field)
+    end
+    message = table.concat(output, " ")
+    if PNC.Core and PNC.Core.LogInfo then
+        PNC.Core.LogInfo(message)
+    else
+        print("[PNC][INFO] " .. message)
+    end
+    return true
+end
+
+function Diagnostics.LogNeedsAudit(eventName, fields)
+    local output
+    local message
+    if Diagnostics.NeedsAuditEnabled ~= true then return false end
+    output = {
+        "needs_audit",
+        "event=" .. tostring(eventName or "unknown"),
+    }
     for _, field in ipairs(fields or {}) do
         output[#output + 1] = tostring(field)
     end

@@ -26,8 +26,8 @@ T.load("ProjectHoomans", "shared", "PNC/Core/Base/PNC_Constants.lua")
 
 local count = 0
 for _ in pairs(PNC.Const) do count = count + 1 end
-T.equal(count, 545, "constant key count")
-T.equal(PNC.Const.PERSISTENCE_VERSION, 15, "persistence contract")
+T.equal(count, 551, "constant key count")
+T.equal(PNC.Const.PERSISTENCE_VERSION, 16, "persistence contract")
 T.equal(PNC.Const.CMD_FULL_SYNC_REQUEST, "RequestFullSync", "network contract")
 T.equal(PNC.Const.CMD_LLM_REQUEST_RESERVE, "LLMRequestReserve",
     "llm request reservation contract")

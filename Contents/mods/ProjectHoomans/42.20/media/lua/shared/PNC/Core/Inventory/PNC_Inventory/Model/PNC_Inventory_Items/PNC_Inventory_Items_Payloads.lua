@@ -33,6 +33,26 @@ function Internal.itemToPayload(item)
     return buildItemPayload(item, Internal.sanitizeItemState(item and item.itemState))
 end
 
+-- Convert the canonical runtime item into the sparse, authored form used by
+-- unique-NPC definitions.  Keep this beside the normal payload builder so
+-- editors and runtime inventory code cannot slowly grow different item
+-- serialization rules.  Runtime identity/container fields are deliberately
+-- removed; visual state, modData, condition, and equipment slots remain in
+-- itemState/the authored spec.
+function Internal.itemToDefinitionSpec(item, key, preferredContainer)
+    local payload = Internal.itemToPayload(item)
+    if not payload then return nil end
+    payload.id = nil
+    payload.container = nil
+    payload.bagContainer = nil
+    payload.templateKey = nil
+    payload.identityNPCId = nil
+    payload.identityNPCName = nil
+    payload.preferredContainer = preferredContainer
+    payload.key = key
+    return payload
+end
+
 local function networkItemState(item)
     if not item then return {} end
     return Internal.sanitizeNetworkItemState(item.itemState, item)

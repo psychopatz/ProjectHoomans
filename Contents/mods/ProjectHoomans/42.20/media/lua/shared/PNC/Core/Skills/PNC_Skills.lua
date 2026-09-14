@@ -59,8 +59,15 @@ local function resolveBaseLevel(record, skillID)
     local specialty
     local level
     local lowered
+    local authoredLevels
     if type(record) ~= "table" or not skillID then
         return 0
+    end
+
+    authoredLevels = type(record.skillBaseLevels) == "table"
+        and record.skillBaseLevels or nil
+    if authoredLevels and authoredLevels[skillID] ~= nil then
+        return clampLevel(authoredLevels[skillID])
     end
 
     specialty = getSpecialtyMap(record)

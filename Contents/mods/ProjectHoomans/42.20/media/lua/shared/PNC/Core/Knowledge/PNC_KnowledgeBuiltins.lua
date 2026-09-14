@@ -149,10 +149,10 @@ Providers.Register("pnc_trait", {
         local sourceKind = presentation.traitSource
         local traits
         if type(record) ~= "table" then return nil, "npc_not_found" end
-        if sourceKind == "dynamic" then
-            traits = PNC.ConditionStats and PNC.ConditionStats.NormalizeTraits
-                and PNC.ConditionStats.NormalizeTraits(record and record.dynamicTraits)
-                or {}
+        if sourceKind == "npc" and PNC.NPCTraits
+            and PNC.NPCTraits.Collect
+        then
+            traits = PNC.NPCTraits.Collect(record)
         else
             traits = PNC.PlayerNeedsModel and PNC.PlayerNeedsModel.GetTraits
                 and PNC.PlayerNeedsModel.GetTraits(record) or {}
@@ -248,8 +248,10 @@ local function registerTraitDescriptors(definitions, sourceKind)
                 presentation = {
                     topicID = "traits", traitID = traitID,
                     traitSource = sourceKind, labelKey = trait.labelKey,
+                    descriptionKey = trait.descriptionKey,
+                    iconPath = trait.iconPath,
                 },
-            })
+            }, sourceKind == "npc")
         end
     end
 end
@@ -257,8 +259,9 @@ end
 registerTraitDescriptors(PNC.PlayerNeedsModel
     and PNC.PlayerNeedsModel.GetTraitDefinitions
     and PNC.PlayerNeedsModel.GetTraitDefinitions() or {}, "vanilla")
-registerTraitDescriptors(PNC.ConditionStats
-    and PNC.ConditionStats.TRAIT_DEFINITIONS or {}, "dynamic")
+registerTraitDescriptors(PNC.NPCTraits
+    and PNC.NPCTraits.GetDefinitions
+    and PNC.NPCTraits.GetDefinitions() or {}, "npc")
 
 for _, group in ipairs(PNC.SkillCatalog and PNC.SkillCatalog.GetGroups and PNC.SkillCatalog.GetGroups() or {}) do
     for _, skill in ipairs(group.skills or {}) do

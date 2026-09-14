@@ -116,6 +116,9 @@ function Network.BuildSnapshot(record)
         dynamicTraits = PNC.ConditionStats
             and PNC.ConditionStats.NormalizeTraits(record.dynamicTraits) or {},
         dynamicTraitsAuthored = record.dynamicTraitsAuthored == true,
+        npcTraits = PNC.NPCTraits
+            and PNC.NPCTraits.NormalizeSet(record.npcTraits) or {},
+        npcTraitFingerprint = tostring(record.npcTraitFingerprint or ""),
         conditionStats = PNC.ConditionStats
             and PNC.ConditionStats.NormalizeState(record.conditionStats, 0)
             or {},

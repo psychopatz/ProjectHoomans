@@ -124,6 +124,23 @@ Scenes.Register("social.surrender", {
     },
 })
 
+Scenes.Register("social.reaction.wavehi", {
+    label = "Wave Hi",
+    description = "A short conversational wave that never owns movement.",
+    category = "social",
+    bump = "WaveHi",
+    durationMs = 2200,
+    priority = 15,
+    repeatMode = "once",
+    blocking = false,
+    interrupts = {
+        movement = true,
+        combat = true,
+        externalBump = true,
+        abstract = true,
+    },
+})
+
 Scenes.Register("facility.sleep.floor", {
     label = "Sleep on Floor",
     description = "A persistent ground sleep loop used when no bed is present.",
@@ -361,6 +378,85 @@ Scenes.Register("ambient.roam.sitFurniture", {
         end
     end,
 })
+
+local function ambientRoamTick(record, zombie, scene, now)
+    local service = PNC and PNC.RoamAmbient
+    if service and service.OnSceneTick then
+        return service.OnSceneTick(record, zombie, scene, now)
+    end
+    return true
+end
+
+local function ambientRoamStopped(record, zombie, scene, reason)
+    local service = PNC and PNC.RoamAmbient
+    if service and service.OnSceneStopped then
+        service.OnSceneStopped(record, zombie, scene, reason)
+    end
+end
+
+Scenes.Register("ambient.roam.eat", {
+    label = "Ambient Roam Eat",
+    description = "A visual eating sequence for an idle roaming NPC.",
+    category = "ambient",
+    priority = 25,
+    repeatMode = "once",
+    blocking = true,
+    stepGapMs = 180,
+    steps = EAT_STEPS,
+    interrupts = {
+        movement = true,
+        combat = true,
+        externalBump = true,
+        abstract = true,
+    },
+    onTick = ambientRoamTick,
+    onStop = ambientRoamStopped,
+})
+
+Scenes.Register("ambient.roam.drink", {
+    label = "Ambient Roam Drink",
+    description = "A visual drinking sequence for an idle roaming NPC.",
+    category = "ambient",
+    priority = 25,
+    repeatMode = "once",
+    blocking = true,
+    stepGapMs = 180,
+    steps = DRINK_STEPS,
+    interrupts = {
+        movement = true,
+        combat = true,
+        externalBump = true,
+        abstract = true,
+    },
+    onTick = ambientRoamTick,
+    onStop = ambientRoamStopped,
+})
+
+local function registerAmbientSleep(sceneId, label)
+    Scenes.Register(sceneId, {
+        label = label,
+        description = "A persistent sleep pose for an idle roaming NPC.",
+        category = "ambient",
+        priority = 30,
+        repeatMode = "loop",
+        blocking = true,
+        keepManagedUseless = true,
+        steps = {
+            { id = "sleep", bump = "SleepBed", durationMs = 0, loop = true },
+        },
+        interrupts = {
+            movement = true,
+            combat = true,
+            externalBump = true,
+            abstract = true,
+        },
+        onTick = ambientRoamTick,
+        onStop = ambientRoamStopped,
+    })
+end
+
+registerAmbientSleep("ambient.roam.sleep.bed", "Ambient Roam Sleep in Bed")
+registerAmbientSleep("ambient.roam.sleep.sofa", "Ambient Roam Sleep on Sofa")
 
 Scenes.Register("survival.drink.inventory", {
     label = "Drink from Personal Inventory",

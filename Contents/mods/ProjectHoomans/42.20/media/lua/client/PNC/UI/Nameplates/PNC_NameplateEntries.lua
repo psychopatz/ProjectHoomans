@@ -4,6 +4,7 @@ PNC.NameplateEntries = PNC.NameplateEntries or {}
 require "PNC/Knowledge/PNC_NPCIdentityPresentation"
 require "PNC/UI/Nameplates/PNC_NameplateSpeech"
 require "PNC/UI/Nameplates/PNC_NameplateScopes"
+require "PNC/UI/Nameplates/PNC_NameplateToolFeedback"
 
 local Entries = PNC.NameplateEntries
 local Bodies = PNC.NameplateBodies
@@ -14,6 +15,7 @@ local ClientState = PNC.Network.ClientState
 local Identity = PNC.NPCIdentityPresentation
 local Speech = PNC.NameplateSpeech
 local Scopes = PNC.NameplateScopes
+local ToolFeedback = PNC.NameplateToolFeedback
 local Diagnostics = PNC.PerformanceScalingDiagnostics
 local DisplaySettings = PNC.NameplateDisplaySettings
 
@@ -260,6 +262,10 @@ local function cacheMetrics(entry, snapshot, zombie, settings, speech, scopes)
         Presentation.RecoveryStatus(snapshot)
     speech = speech or (Speech and Speech.Get(snapshot and snapshot.id) or nil)
     local speechText = Speech and Speech.GetDisplayText(speech) or ""
+    local toolFeedback = ToolFeedback and ToolFeedback.Get
+        and ToolFeedback.Get(snapshot and snapshot.id) or nil
+    local toolFeedbackText = ToolFeedback and ToolFeedback.GetDisplayText
+        and ToolFeedback.GetDisplayText(toolFeedback) or ""
     local factionLine1
     local factionLine2
     local factionLine3
@@ -286,6 +292,9 @@ local function cacheMetrics(entry, snapshot, zombie, settings, speech, scopes)
     entry.identityVisible = entry.scopes[Scopes.IDENTITY] == true
     entry.debugVisible = entry.scopes[Scopes.DEBUG] == true
     entry.conversationVisible = entry.scopes[Scopes.CONVERSATION] == true
+    entry.toolFeedback = toolFeedback
+    entry.toolFeedbackVisible = entry.scopes[Scopes.TOOL_FEEDBACK] == true
+        and toolFeedbackText ~= ""
     entry.actionVisible = entry.identityVisible and actionText ~= ""
     entry.recoveryVisible = entry.identityVisible and recoveryActive
     entry.speech = speech
@@ -333,6 +342,12 @@ local function cacheMetrics(entry, snapshot, zombie, settings, speech, scopes)
         "speechText",
         speechText,
         fonts.speech or fonts.debug
+    )
+    Presentation.CacheTextMetric(
+        entry,
+        "toolFeedbackText",
+        toolFeedbackText,
+        fonts.debug
     )
     Presentation.CacheTextMetric(
         entry,

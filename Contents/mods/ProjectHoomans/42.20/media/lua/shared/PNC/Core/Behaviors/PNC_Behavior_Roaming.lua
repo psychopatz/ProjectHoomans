@@ -281,6 +281,12 @@ local function areaMode(record, zombie, order)
         if now < state.waitUntil then
             state.phase = "idle"
             record.activeBehavior = "Roam:area:idle"
+            if PNC.RoamAmbient and PNC.RoamAmbient.TryStart
+                and PNC.RoamAmbient.TryStart(
+                    record, zombie, order, state, now)
+            then
+                return true
+            end
             if PNC.RoamingSeat and PNC.RoamingSeat.TryStart
                 and PNC.RoamingSeat.TryStart(
                     record, zombie, order, state, now)

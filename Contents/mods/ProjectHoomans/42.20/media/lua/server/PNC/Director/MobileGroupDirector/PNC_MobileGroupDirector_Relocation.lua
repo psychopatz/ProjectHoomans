@@ -22,6 +22,14 @@ function Director.RelocateFaction(factionID, at, force)
         return false, "not_mobile_group"
     end
     local mobile = faction.mobile
+    if mobile.pendingSettlementArrival then
+        return false, "mobile_settlement_encounter_pending"
+    end
+    if mobile.visit
+        and (tonumber(mobile.visit.expiresAt) or 0) > H.WorldAge(at)
+    then
+        return false, "mobile_settlement_visit_active"
+    end
     if mobile.activity
         == Constants.MOBILE_ACTIVITY_TRAVELING_TO_SETTLEMENT
     then

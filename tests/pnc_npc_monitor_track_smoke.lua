@@ -128,6 +128,37 @@ T.equal(PNC.NPCMonitor.trackedId, nil,
     "tracking clears when authoritative metadata disappears")
 T.equal(removals[2], "pnc_npc_track:npc_anton",
     "stale direction marker removed with metadata")
+
+PNC.Network.ClientState.uniqueNPCDebug = {
+    entries = {
+        {
+            displayName = "Gorgon Ramsee",
+            status = "alive",
+            runtime = {
+                runtimeNpcId = "npcGorgonRamsee_ABC",
+                name = "Gorgon Ramsee",
+                tacticalClass = "neutral",
+                presenceState = "abstract",
+                x = 300,
+                y = 400,
+                z = 0,
+            },
+        },
+    },
+}
+PNC.NPCMonitor.TrackTarget({
+    id = "npcGorgonRamsee_ABC",
+    name = "Gorgon Ramsee",
+    x = 300,
+    y = 400,
+    z = 0,
+})
+T.equal(PNC.NPCMonitor.trackedId, "npcGorgonRamsee_ABC",
+    "unique NPC can reuse tracking")
+T.equal(markerCalls[4].id, "pnc_npc_track:npcGorgonRamsee_ABC",
+    "unique marker namespace")
+T.equal(markerCalls[4].description, "Gorgon Ramsee",
+    "unique marker description")
 T.finish("pnc_npc_monitor_track_smoke")
 
 T.finish("pnc_npc_monitor_track_smoke")

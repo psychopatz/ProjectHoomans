@@ -42,6 +42,9 @@ function H.OnServerStarted()
     if PNC.AbstractWorldStore and PNC.AbstractWorldStore.Load then
         PNC.AbstractWorldStore.Load()
     end
+    if PNC.UniqueNPCRegistry and PNC.UniqueNPCRegistry.Reconcile then
+        PNC.UniqueNPCRegistry.Reconcile()
+    end
     if PNC.WorldDirector and PNC.WorldDirector.Initialize then
         PNC.WorldDirector.Initialize(true)
     end

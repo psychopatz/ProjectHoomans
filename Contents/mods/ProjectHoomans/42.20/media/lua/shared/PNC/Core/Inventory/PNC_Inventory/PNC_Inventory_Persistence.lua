@@ -18,6 +18,7 @@ local function baseline(record, inv)
         equipmentPoolID = inv and inv.template
             and inv.template.equipmentPoolID or nil,
         weaponMode = inv and inv.template and inv.template.weaponMode or nil,
+        templateRef = inv and inv.template and inv.template.templateRef or nil,
         createdAtHours = inv and inv.template
             and tonumber(inv.template.createdAtHours) or nil,
     }
@@ -89,6 +90,11 @@ function Inventory.Deserialize(record, rawInventory, options)
         else
             baselinePayload = type(rawInventory[4]) == "table"
                 and rawInventory[4] or {}
+            if not record.inventoryTemplateRef
+                and type(baselinePayload.templateRef) == "string"
+            then
+                record.inventoryTemplateRef = baselinePayload.templateRef
+            end
             inv = Inventory.CreateFromTemplate(record, {
                 createdAtHours = baselinePayload.createdAtHours,
                 reconcileWaterContainer = options

@@ -1,5 +1,6 @@
 -- Build 42.20 conversation lifecycle implementation.
 require "PNC/Conversation/PNC_ConversationSafety"
+require "PNC/Conversation/PNC_ConversationFarewell"
 
 PNC = PNC or {}
 PNC.Conversation = PNC.Conversation or {}
@@ -7,6 +8,7 @@ PNC.Conversation = PNC.Conversation or {}
 local Lifecycle = PNC.Conversation.Lifecycle or {}
 PNC.Conversation.Lifecycle = Lifecycle
 local Safety = PNC.Conversation.Safety
+local Farewell = PNC.Conversation.Farewell
 local Scene = PNC.ConversationScene
 local NAMEPLATE_UNAVAILABLE_GRACE_MS = 3000
 
@@ -261,6 +263,9 @@ function Lifecycle.Create()
         end,
         finish = function(_, spec, state, reason)
             presentSafetyFeedback(spec, state, reason)
+            if Farewell and type(Farewell.Schedule) == "function" then
+                Farewell.Schedule(spec, state, reason)
+            end
             if PNC.Core and PNC.Core.LogInfo then
                 PNC.Core.LogInfo(table.concat({
                     "Conversation closed",

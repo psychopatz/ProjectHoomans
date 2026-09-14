@@ -52,8 +52,15 @@ function Definitions.Evaluate(definition, record, continuing)
     if not definition or not record then return false end
     if definition.signal == "sleep" then
         local value = needValue(record, "fatigue")
+        local policy = PNC.NPCTraitEffects
+            and PNC.NPCTraitEffects.ResolveSleepPolicy
+            and PNC.NPCTraitEffects.ResolveSleepPolicy(
+                record, PNC.NeedsDefinitions
+                    and PNC.NeedsDefinitions.SLEEP_TASK or nil)
+            or nil
         if continuing then
-            return value > (tonumber(definition.completion) or 0.12),
+            return value > (tonumber(policy and policy.completion)
+                or tonumber(definition.completion) or 0.12),
                 { value = value, urgency = value,
                     precedence = value >= 0.82 and "CRITICAL_NEED"
                         or "NORMAL_NEED" }

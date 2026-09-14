@@ -105,11 +105,9 @@ end
 function Internal.sanitizeIdentity(rawIdentity, record)
     local identity = type(rawIdentity) == "table" and Core.DeepCopy(rawIdentity) or {}
     local archetypeID = Internal.normalizeString(identity.archetypeID or record.archetypeID)
-    local archetypeLabel = Internal.normalizeString(identity.archetypeLabel or record.archetypeLabel)
     return {
         seed = Identity.NormalizeSeed(identity.seed or record.identitySeed, record.id),
         archetypeID = archetypeID,
-        archetypeLabel = archetypeLabel,
         displayName = Internal.normalizeString(identity.displayName or record.name),
         isFemale = identity.isFemale == true or record.isFemale == true,
         survivor = {

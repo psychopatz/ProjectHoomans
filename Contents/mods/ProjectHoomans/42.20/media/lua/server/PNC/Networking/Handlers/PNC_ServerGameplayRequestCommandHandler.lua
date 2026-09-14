@@ -23,6 +23,7 @@ Router.Register(Const.CMD_COMPANION_COMMAND, function(player, args)
         if sendServerCommand
             and (tostring(args.commandID) == "camp"
                 or tostring(args.commandSource or "") == "companion_emote"
+                or tostring(args.commandSource or "") == "llm_tool"
                 or isColonistActivityCommand(args))
         then
             sendServerCommand(
@@ -39,6 +40,7 @@ Router.Register(Const.CMD_COMPANION_COMMAND, function(player, args)
                     reason = tostring(reason),
                     targets = affectedTargets,
                     requestID = args.requestID,
+                    callID = args.callID,
                     commandSource = args.commandSource,
                 }
             )

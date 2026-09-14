@@ -43,10 +43,75 @@ local function commitMeleeImpactAudio(record, action, target)
     end
 end
 
+local function resolveRangedOutcome(record, target, action)
+    local rangedHit
+    local rangedReason
+    local rangedProfile
+    if not Resolution or not Resolution.ResolveRangedShot then
+        return true, nil, nil
+    end
+    if type(action.rangedOutcome) ~= "table" then
+        rangedHit, rangedReason, rangedProfile =
+            Resolution.ResolveRangedShot(record, target, {
+                profile = action.rangedShotProfile,
+            })
+        action.rangedOutcome = {
+            hit = rangedHit == true,
+            reason = rangedReason or "ranged_miss",
+            profile = rangedProfile,
+        }
+        logFirearmAudit("ranged_attack_resolved", record, action,
+            "result=" .. tostring(action.rangedOutcome.reason),
+            "chance=" .. tostring(rangedProfile and rangedProfile.hitChance or ""),
+            "roll=" .. tostring(rangedProfile and rangedProfile.roll or ""))
+    end
+    return action.rangedOutcome.hit == true,
+        action.rangedOutcome.reason or "ranged_miss",
+        action.rangedOutcome.profile
+end
+
+local function resolveMeleeOutcome(record, target, action)
+    local meleeHit
+    local meleeReason
+    local meleeProfile
+    if not Resolution or not Resolution.ResolveMeleeStrike then
+        return true, nil, nil
+    end
+    if type(action.meleeOutcome) ~= "table" then
+        meleeHit, meleeReason, meleeProfile =
+            Resolution.ResolveMeleeStrike(record, target, {
+                profile = action.meleeStrikeProfile,
+            })
+        action.meleeOutcome = {
+            hit = meleeHit == true,
+            reason = meleeReason or "melee_miss",
+            profile = meleeProfile,
+        }
+    end
+    return action.meleeOutcome.hit == true,
+        action.meleeOutcome.reason or "melee_miss",
+        action.meleeOutcome.profile
+end
+
+local function commitMeleeSwingResources(record, action)
+    if action.meleeResourcesCommitted == true then return end
+    action.meleeResourcesCommitted = true
+    AttackExecution.applyWeaponWear(record)
+    if Stamina and Stamina.SpendAttack then
+        Stamina.SpendAttack(record, "melee", action.skillID)
+    end
+end
+
 function Internal.applyAttackActionHit(record, zombie, action, target)
     local zombieTarget
     local attackApplied
     local attackReason
+    local rangedReady
+    local rangedReason
+    local rangedProfile
+    local meleeReady
+    local meleeReason
+    local meleeProfile
     if not action or not target then
         return false, "target_lost"
     end
@@ -81,6 +146,14 @@ function Internal.applyAttackActionHit(record, zombie, action, target)
         end
     end
 
+    if action.attackType == "ranged" then
+        rangedReady, rangedReason, rangedProfile =
+            resolveRangedOutcome(record, target, action)
+        if not rangedReady then
+            return false, rangedReason, rangedProfile
+        end
+    end
+
     if action.attackKind == "shove" then
         zombieTarget = target.kind == "zombie" and Perception.FindZombieByID and Perception.FindZombieByID(target.zombieId) or nil
         if not zombieTarget then
@@ -96,6 +169,17 @@ function Internal.applyAttackActionHit(record, zombie, action, target)
             return true, "shoved_zombie"
         end
         return false, "zombie_shove_failed"
+    end
+
+    if action.attackType == "melee" and action.attackKind ~= "ground" then
+        meleeReady, meleeReason, meleeProfile =
+            resolveMeleeOutcome(record, target, action)
+        if not meleeReady then
+            if meleeReason ~= "not_authority" then
+                commitMeleeSwingResources(record, action)
+            end
+            return false, meleeReason or "melee_miss", meleeProfile
+        end
     end
 
     if action.attackKind == "ground" or action.attackType == "melee" then

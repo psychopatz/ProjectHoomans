@@ -6,6 +6,47 @@ local Jobs = PNC.FacilityJobs
 local Internal = PNC.FacilityJobsBehaviorInternal
 local SLEEP_WAKE_ANIMATION_TIMEOUT_MS = 2000
 
+local function preserveCombatThreatForWake(record, runtime, reason, now)
+    local ownerRuntime = record and record.runtime or nil
+    local state
+    local target
+    local kind
+    local id
+    local expiresAt
+    local existing
+    if string.find(tostring(reason or ""), "combat", 1, true) == nil then
+        return
+    end
+    state = ownerRuntime and ownerRuntime.threatGuard or nil
+    target = state and state.target or ownerRuntime
+        and ownerRuntime.target or runtime and runtime.target or nil
+    if type(target) ~= "table" then return end
+    kind = tostring(target.kind or "")
+    if kind == "npc" then
+        id = target.id
+    elseif kind == "zombie" then
+        id = target.zombieId
+    elseif kind == "player" then
+        id = target.onlineID or target.username
+    end
+    if id == nil or id == "" then return end
+    expiresAt = now + (
+        tonumber(PNC.Const and PNC.Const.TARGET_RECENT_ATTACKER_MS) or 5000
+    )
+    existing = ownerRuntime and ownerRuntime.recentThreat or nil
+    if existing and (tonumber(existing.expiresAt) or 0) > expiresAt then
+        return
+    end
+    if not ownerRuntime then return end
+    ownerRuntime.recentThreat = {
+        kind = kind,
+        id = kind == "player" and nil or id,
+        onlineID = kind == "player" and target.onlineID or nil,
+        username = kind == "player" and target.username or nil,
+        expiresAt = expiresAt,
+    }
+end
+
 local function logSleepWake(eventName, record, zombie, runtime, reason)
     local modData
     if not PNC.Core or not PNC.Core.LogInfo then return end
@@ -54,6 +95,7 @@ function Internal.BeginSleepWake(record, zombie, reason)
     local now
     if not runtime then return false end
     now = PNC.Core and PNC.Core.Now and tonumber(PNC.Core.Now()) or 0
+    preserveCombatThreatForWake(record, runtime, reason, now)
     if runtime.sleepWakePending == true then
         runtime.sleepWakeReason = tostring(
             reason or runtime.sleepWakeReason or "sleep_stopped")

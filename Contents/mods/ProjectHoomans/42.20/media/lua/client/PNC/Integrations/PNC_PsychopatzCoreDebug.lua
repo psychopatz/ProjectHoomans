@@ -70,12 +70,52 @@ PsychopatzCore.DebugHub.RegisterTool({
 })
 
 PsychopatzCore.DebugHub.RegisterTool({
+    id = "pnc.uniqueNPCs",
+    source = "Project Hoomans",
+    order = 201,
+    title = resolveText(
+        getText and getText("UI_PNC_UniqueNPCDebug_Title"),
+        "UI_PNC_UniqueNPCDebug_Title", "UNIQUE NPC REGISTRY"),
+    description = resolveText(
+        getText and getText("UI_PNC_UniqueNPCDebug_Description"),
+        "UI_PNC_UniqueNPCDebug_Description",
+        "Inspect one-time unique NPC definitions, lifecycle state, and location."),
+    available = function()
+        return PNC
+            and PNC.UniqueNPCDebugUI
+            and PNC.UniqueNPCDebugUI.Toggle
+            and PNC.Client
+            and PNC.Client.CanUseDebug
+            and PNC.Client.CanUseDebug()
+    end,
+    action = function() PNC.UniqueNPCDebugUI.Toggle() end,
+})
+
+PsychopatzCore.DebugHub.RegisterTool({
+    id = "pnc.uniqueNPCEditor",
+    source = "Project Hoomans",
+    order = 202,
+    title = resolveText(
+        getText and getText("UI_PNC_UniqueNPCEditor_Title"),
+        "UI_PNC_UniqueNPCEditor_Title", "UNIQUE NPC CREATOR"),
+    description = "Create, preview, equip, and produce client-local unique NPC definitions.",
+    available = function()
+        return PNC
+            and PNC.UniqueNPCEditorUI
+            and PNC.UniqueNPCEditorUI.Toggle
+            and PNC.Client
+            and PNC.Client.CanUseDebug
+            and PNC.Client.CanUseDebug()
+    end,
+    action = function() PNC.UniqueNPCEditorUI.Toggle() end,
+})
+
+PsychopatzCore.DebugHub.RegisterTool({
     id = "pnc.communities",
     source = "Project Hoomans",
     order = 230,
-    title = getText
-        and getText("UI_PNC_CommunityInspectorTitle")
-        or "UI_PNC_CommunityInspectorTitle",
+    title = resolveText(getText and getText("UI_PNC_CommunityInspectorTitle"),
+        "UI_PNC_CommunityInspectorTitle", "COMMUNITY INSPECTOR"),
     description =
         "Inspect persistent communities, membership, anchors, capacity, and supplies.",
     available = function()
@@ -138,9 +178,9 @@ PsychopatzCore.DebugHub.RegisterTool({
     id = "pnc.communityOverlay",
     source = "Project Hoomans",
     order = 231,
-    title = getText
-        and getText("UI_PNC_CommunityWorldOverlayTitle")
-        or "UI_PNC_CommunityWorldOverlayTitle",
+    title = resolveText(getText
+        and getText("UI_PNC_CommunityWorldOverlayTitle"),
+        "UI_PNC_CommunityWorldOverlayTitle", "COMMUNITY WORLD OVERLAY"),
     description =
         "Toggle server-resolved community diagnostics above visible NPCs.",
     available = function()
@@ -200,11 +240,30 @@ PsychopatzCore.DebugHub.RegisterTool({
 })
 
 PsychopatzCore.DebugHub.RegisterTool({
+    id = "pnc.npcTraits",
+    source = "Project Hoomans",
+    order = 212,
+    title = resolveText(getText and getText("UI_PNC_NPCTraitDebug_Title"),
+        "UI_PNC_NPCTraitDebug_Title", "NPC TRAIT REGISTRY"),
+    description = resolveText(
+        getText and getText("UI_PNC_NPCTraitDebug_Description"),
+        "UI_PNC_NPCTraitDebug_Description",
+        "Inspect every registered NPC trait and its composed effects."),
+    available = function()
+        return PNC and PNC.NPCTraitDebugUI
+            and PNC.NPCTraitDebugUI.Toggle
+            and PNC.Client and PNC.Client.CanUseDebug
+            and PNC.Client.CanUseDebug()
+    end,
+    action = function() PNC.NPCTraitDebugUI.Toggle() end,
+})
+
+PsychopatzCore.DebugHub.RegisterTool({
     id = "pnc.factions",
     source = "Project Hoomans",
     order = 220,
-    title = getText and getText("UI_PNC_FactionInspectorTitle")
-        or "UI_PNC_FactionInspectorTitle",
+    title = resolveText(getText and getText("UI_PNC_FactionInspectorTitle"),
+        "UI_PNC_FactionInspectorTitle", "FACTION INSPECTOR"),
     description = "Inspect persistent organizations, affiliations, roles, ranks, and leadership.",
     available = function()
         return PNC
@@ -223,9 +282,9 @@ PsychopatzCore.DebugHub.RegisterTool({
     id = "pnc.factionOverlay",
     source = "Project Hoomans",
     order = 221,
-    title = getText
-        and getText("UI_PNC_FactionWorldOverlayTitle")
-        or "UI_PNC_FactionWorldOverlayTitle",
+    title = resolveText(getText
+        and getText("UI_PNC_FactionWorldOverlayTitle"),
+        "UI_PNC_FactionWorldOverlayTitle", "FACTION WORLD OVERLAY"),
     description =
         "Toggle server-resolved faction diagnostics above visible NPCs.",
     available = function()

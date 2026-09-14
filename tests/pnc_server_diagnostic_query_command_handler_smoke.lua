@@ -8,6 +8,7 @@ local player = {
     getAccessLevel = function(self) return self.access end,
 }
 local rosterCall
+local uniqueCall
 local relationshipCall
 local conversationCall
 local knowledgeCalls = {}
@@ -20,6 +21,7 @@ local discovered
 PNC = {
     Const = {
         CMD_DEBUG_ROSTER_REQUEST = "DebugRosterRequest",
+        CMD_UNIQUE_NPC_DEBUG_REQUEST = "UniqueNPCDebugRequest",
         CMD_RELATIONSHIP_DEBUG_REQUEST = "RelationshipDebugRequest",
         CMD_CONVERSATION_RELATIONSHIP_REQUEST = "ConversationRelationshipRequest",
         CMD_NPC_KNOWLEDGE_REQUEST = "NPCKnowledgeRequest",
@@ -39,6 +41,9 @@ PNC = {
         SendDebugRoster = function(...)
             rosterCall = { ... }
         end,
+        SendUniqueNPCDebug = function(...)
+            uniqueCall = { ... }
+        end,
         SendRelationshipDebug = function(...)
             relationshipCall = { ... }
         end,
@@ -56,6 +61,11 @@ PNC = {
         BuildSnapshotForRequest = function(receivedPlayer, args)
             relationshipArgs = args
             return { kind = "relationship" }, "relationship_reason"
+        end,
+    },
+    UniqueNPCRegistry = {
+        BuildDebugSnapshot = function()
+            return { entries = { { definitionId = "gorgon_ramsee" } } }, "ok"
         end,
     },
     RelationshipPresentation = {
@@ -113,6 +123,18 @@ T.equal(audited.now, 123, "roster audit time")
 T.equal(audited.forced, true, "roster audit force")
 T.equal(rosterCall[2][1].id, "npc-1", "authorized roster payload")
 T.equal(rosterCall[3], true, "authorized roster flag")
+
+player.access = ""
+Router.Handle("UniqueNPCDebugRequest", player, {})
+T.equal(uniqueCall[2], nil, "unauthorized unique snapshot")
+T.equal(uniqueCall[3], false, "unauthorized unique flag")
+T.equal(uniqueCall[4], "not_authorized", "unauthorized unique reason")
+player.access = "admin"
+Router.Handle("UniqueNPCDebugRequest", player, {})
+T.equal(uniqueCall[2].entries[1].definitionId, "gorgon_ramsee",
+    "authorized unique snapshot")
+T.equal(uniqueCall[3], true, "authorized unique flag")
+T.equal(uniqueCall[4], "ok", "authorized unique reason")
 
 player.access = ""
 Router.Handle("RelationshipDebugRequest", player, nil)

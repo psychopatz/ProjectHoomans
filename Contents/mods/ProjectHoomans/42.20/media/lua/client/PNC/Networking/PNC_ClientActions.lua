@@ -15,6 +15,34 @@ local Registry = PNC.Registry
 local ClientState = PNC.Network.ClientState
 local CompanionInitialization = require "PNC/Core/Companions/PNC_DebugCompanionInitialization"
 
+local function publishLLMCommandResult(commandID, npcID, context,
+        accepted, reason, targets)
+    local feedback
+    if type(context) ~= "table"
+        or tostring(context.origin or context.commandSource or "")
+            ~= "llm_tool"
+    then
+        return
+    end
+    feedback = PNC.NameplateToolFeedback
+    if not feedback or not feedback.PushResult then
+        pcall(require, "PNC/UI/Nameplates/PNC_NameplateToolFeedback")
+        feedback = PNC.NameplateToolFeedback
+    end
+    if feedback and feedback.PushResult then
+        feedback.PushResult({
+            npcID = npcID,
+            commandID = commandID,
+            accepted = accepted == true,
+            reason = reason,
+            requestID = context.requestID,
+            callID = context.callID,
+            commandSource = "llm_tool",
+            targets = targets,
+        })
+    end
+end
+
 -- Keep manual-activity feedback in the same client state that drives the
 -- Colonists window. This lets local and multiplayer command paths present the
 -- same rejection reason without adding a second activity-specific transport.
@@ -259,6 +287,35 @@ function Client.SendDebug(action, payload)
         ClientState.directorDebugReason = nil
         ClientState.lastDirectorDebugReceiveAt = Core.Now()
         return snapshot ~= nil
+    end
+    if action == "spawn_unique_test" then
+        local uniqueAPI = PNC.API and PNC.API.UniqueNPCs
+        local record
+        local reason
+        if not args.definitionId and not args.id then return false end
+        if Core.IsClientOnly and Core.IsClientOnly() then
+            if not sendClientCommand then return false, "network_unavailable" end
+            sendClientCommand(player, Const.MODULE, Const.CMD_DEBUG, args)
+            return true, "request_sent"
+        end
+        if not uniqueAPI or not uniqueAPI.SpawnTest then
+            return false, "unique_test_spawn_unavailable"
+        end
+        record, reason = uniqueAPI.SpawnTest(
+            args.definitionId or args.id, player)
+        ClientState.uniqueNPCTestSpawn = {
+            success = record ~= nil,
+            runtime = record and {
+                id = tostring(record.id or ""),
+                name = record.name,
+                x = record.x,
+                y = record.y,
+                z = record.z,
+            } or nil,
+            reason = reason,
+            at = Core.Now(),
+        }
+        return record ~= nil, reason, record
     end
     if action == "spawn" and PNC.API and PNC.API.Spawn then
         local variant = tostring(args.variant or "companion")
@@ -619,6 +676,13 @@ function Client.SendCompanionCommand(commandID, npcId, scope, context)
     if tostring(commandID or "") == "camp"
         and rejectUnsafeCampLocally(player, npcId, scope, context)
     then
+        publishLLMCommandResult(
+            commandID,
+            npcId,
+            context,
+            false,
+            "camp_requires_building"
+        )
         traceCompanionCommand(commandID, npcId, scope, context, {
             status = "rejected",
             reason = "camp_requires_building",
@@ -631,6 +695,7 @@ function Client.SendCompanionCommand(commandID, npcId, scope, context)
         scope = scope and tostring(scope) or nil,
         radius = tonumber(Const.COMPANION_COMMAND_RADIUS) or 20,
         requestID = type(context) == "table" and context.requestID or nil,
+        callID = type(context) == "table" and context.callID or nil,
         commandSource = type(context) == "table"
             and (context.commandSource or context.source or context.origin)
             or nil,
@@ -658,6 +723,14 @@ function Client.SendCompanionCommand(commandID, npcId, scope, context)
     local affected, reason, affectedTargets =
         PNC.CompanionCommands.Execute(player, args)
     local succeeded = (tonumber(affected) or 0) > 0
+    publishLLMCommandResult(
+        commandID,
+        npcId,
+        context,
+        succeeded,
+        reason,
+        affectedTargets
+    )
     if not succeeded and reason == "camp_requires_building"
         and not isCampEmoteContext(context)
     then

@@ -4,10 +4,12 @@
 
 PNC = PNC or {}
 PNC.Conversation = PNC.Conversation or {}
+require "PNC/Core/Identity/PNC_FlavorAddress"
 
 local Diary = PNC.Conversation.Diary or {}
 PNC.Conversation.Diary = Diary
 Diary.MAX_ENTRIES = 80
+local FlavorAddress = PNC.FlavorAddress
 
 local function state()
     PNC.Network = PNC.Network or {}
@@ -38,12 +40,32 @@ end
 local function flavorContext(npcID, entry)
     local name = npcName(npcID, entry)
     local player = getSpecificPlayer and getSpecificPlayer(0) or nil
+    local clientState = state()
+    local playerContext = clientState.playerContext or {}
+    local address = FlavorAddress.ResolveForNPC({
+        npcID = npcID,
+        npcIdentitySeed = FlavorAddress.ResolveNPCSeed(entry, npcID),
+        player = player,
+        playerContext = playerContext,
+        playerUUID = playerContext.characterUUID
+            or playerContext.playerUUID
+            or player and player.getUsername and player:getUsername(),
+        state = clientState,
+    })
     return {
         name = name,
         names = name,
         count = 1,
-        player = tostring(player and player.getUsername
-            and player:getUsername() or "Survivor"),
+        player = address.addressName,
+        playerName = address.addressName,
+        playerAddressName = address.addressName,
+        playerFullName = address.fullName,
+        playerFirstName = address.firstName,
+        playerSurname = address.surname,
+        playerLastName = address.lastName,
+        playerNameKnown = address.known,
+        playerIsFemale = address.isFemale,
+        playerNicknameID = address.nicknameID,
     }
 end
 

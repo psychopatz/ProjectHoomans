@@ -12,7 +12,8 @@ local function generationFailure(
     community,
     createdCommunity,
     at,
-    reason
+    reason,
+    uniqueClaim
 )
     for _, prior in ipairs(created) do
         H.RollbackNPC(prior, factionID, at)
@@ -23,6 +24,11 @@ local function generationFailure(
             "group_generation_failed",
             at
         )
+    end
+    if uniqueClaim and PNC.UniqueNPCRegistry
+        and PNC.UniqueNPCRegistry.RollbackSpawn
+    then
+        PNC.UniqueNPCRegistry.RollbackSpawn(uniqueClaim, reason)
     end
     return nil, nil, nil, nil, reason
 end
@@ -46,14 +52,29 @@ function H.SpawnCommunityMembers(
     local created = {}
     local liveCount = 0
     local abstractCount = 0
+    local UniqueRegistry = PNC.UniqueNPCRegistry
+    local uniqueClaim
+    local uniqueDefinition
+    local defaultArchetypeID = H.NPCArchetype(faction.archetypeID)
+    if spec.uniqueNPC ~= false and UniqueRegistry
+        and UniqueRegistry.PrepareForGeneration
+    then
+        uniqueClaim, uniqueDefinition = UniqueRegistry.PrepareForGeneration({
+            generationId = spec.generation and spec.generation.generationId,
+            seed = spec.generation and spec.generation.seed or at,
+            worldAgeHours = at,
+            archetypeID = defaultArchetypeID,
+            generation = spec.generation,
+            poolChance = spec.uniquePoolChance,
+            force = spec.forceUniqueNPC == true,
+        })
+    end
     local index
     for index = 1, count do
         local point = points[index]
-        local record = PNC.API.Spawn({
+        local spawnDefinition = {
             tacticalClass = "neutral",
-            archetypeID = H.NPCArchetype(
-                faction.archetypeID
-            ),
+            archetypeID = defaultArchetypeID,
             x = point.x,
             y = point.y,
             z = point.z,
@@ -81,7 +102,28 @@ function H.SpawnCommunityMembers(
             factionJoinedAt = at,
             debug = spec.debug == true,
             generation = spec.generation,
-        })
+        }
+        if index == 1 and uniqueDefinition then
+            local resolved = PNC.Core.DeepCopy(uniqueDefinition)
+            resolved.tacticalClass = spawnDefinition.tacticalClass
+            resolved.x = spawnDefinition.x
+            resolved.y = spawnDefinition.y
+            resolved.z = spawnDefinition.z
+            resolved.anchorX = spawnDefinition.anchorX
+            resolved.anchorY = spawnDefinition.anchorY
+            resolved.anchorZ = spawnDefinition.anchorZ
+            resolved.orderSpec = spawnDefinition.orderSpec
+            resolved.forceLive = spawnDefinition.forceLive
+            resolved.equipmentSpawnMode = spawnDefinition.equipmentSpawnMode
+            resolved.factionID = spawnDefinition.factionID
+            resolved.membershipStatus = spawnDefinition.membershipStatus
+            resolved.factionRole = spawnDefinition.factionRole
+            resolved.factionJoinedAt = spawnDefinition.factionJoinedAt
+            resolved.debug = spawnDefinition.debug
+            resolved.generation = spawnDefinition.generation
+            spawnDefinition = resolved
+        end
+        local record = PNC.API.Spawn(spawnDefinition)
         if not record then
             return generationFailure(
                 created,
@@ -89,8 +131,30 @@ function H.SpawnCommunityMembers(
                 community,
                 createdCommunity,
                 at,
-                "npc_spawn_failed"
+                "npc_spawn_failed",
+                uniqueClaim
             )
+        end
+        if uniqueClaim and index == 1 and UniqueRegistry
+            and UniqueRegistry.CommitSpawn
+        then
+            local committed, commitReason = UniqueRegistry.CommitSpawn(
+                uniqueClaim,
+                record,
+                at
+            )
+            if not committed then
+                H.RollbackNPC(record, faction.id, at)
+                return generationFailure(
+                    created,
+                    faction.id,
+                    community,
+                    createdCommunity,
+                    at,
+                    commitReason or "unique_commit_failed",
+                    uniqueClaim
+                )
+            end
         end
         local added
         local reason
@@ -111,7 +175,8 @@ function H.SpawnCommunityMembers(
                 community,
                 createdCommunity,
                 at,
-                reason
+                reason,
+                uniqueClaim
             )
         end
         if presenceMode == "abstract" then

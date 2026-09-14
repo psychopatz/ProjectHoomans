@@ -415,7 +415,7 @@ T.equal(healedSocialNPC.social.personality.orientation, "gay",
     "personality healing reapplies authored enum override")
 T.equal(healedSocialNPC.social.personality.compassion, 0.88,
     "personality healing reapplies authored numeric override")
-T.equal(serialized.schemaVersion, 15, "NPC schema V15")
+T.equal(serialized.schemaVersion, 16, "NPC schema V16")
 validatePersistedValue(serialized.social)
 
 local oldNPC = PNC.Persistence.DeserializeRecord({

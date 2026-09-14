@@ -10,6 +10,22 @@ Internal.RegisterServerCommand(Const.CMD_DEBUG_ROSTER, function(args)
     ClientState.lastDebugRosterReceiveAt = Core.Now()
 end)
 
+Internal.RegisterServerCommand(Const.CMD_UNIQUE_NPC_DEBUG, function(args)
+    ClientState.uniqueNPCDebugAuthorized = args.authorized == true
+    ClientState.uniqueNPCDebug = args.snapshot
+    ClientState.uniqueNPCDebugReason = args.reason
+    ClientState.lastUniqueNPCDebugReceiveAt = Core.Now()
+end)
+
+Internal.RegisterServerCommand(Const.CMD_UNIQUE_NPC_TEST_SPAWN, function(args)
+    ClientState.uniqueNPCTestSpawn = {
+        success = args.success == true,
+        runtime = args.runtime,
+        reason = args.reason,
+        at = Core.Now(),
+    }
+end)
+
 Internal.RegisterServerCommand(Const.CMD_RELATIONSHIP_DEBUG, function(args)
     ClientState.relationshipDebugAuthorized = args.authorized == true
     ClientState.relationshipDebug = args.snapshot

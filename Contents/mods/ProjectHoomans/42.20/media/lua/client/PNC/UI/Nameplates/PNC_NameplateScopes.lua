@@ -1,6 +1,7 @@
 require "PNC/Knowledge/PNC_NPCIdentityPresentation"
 require "PNC/UI/Nameplates/PNC_NameplatePresentation"
 require "PNC/UI/Nameplates/PNC_NameplateRelationshipFeedback"
+require "PNC/UI/Nameplates/PNC_NameplateToolFeedback"
 
 PNC = PNC or {}
 PNC.NameplateScopes = PNC.NameplateScopes or {}
@@ -9,11 +10,13 @@ local Scopes = PNC.NameplateScopes
 local Identity = PNC.NPCIdentityPresentation
 local Presentation = PNC.NameplatePresentation
 local RelationshipFeedback = PNC.NameplateRelationshipFeedback
+local ToolFeedback = PNC.NameplateToolFeedback
 
 Scopes.IDENTITY = "identity"
 Scopes.DEBUG = "debug"
 Scopes.CONVERSATION = "conversation"
 Scopes.RELATIONSHIP_FEEDBACK = "relationship_feedback"
+Scopes.TOOL_FEEDBACK = "tool_feedback"
 
 local function nameplateDebugEnabled(settings)
     return settings and (
@@ -75,6 +78,10 @@ function Scopes.Build(player, snapshot, zombie, settings, speech)
         and RelationshipFeedback.IsActive
         and RelationshipFeedback.IsActive(snapshot and snapshot.id)
         or false
+    local toolFeedbackVisible = ToolFeedback
+        and ToolFeedback.IsActive
+        and ToolFeedback.IsActive(snapshot and snapshot.id)
+        or false
 
     return {
         [Scopes.IDENTITY] = liveVisible
@@ -83,6 +90,7 @@ function Scopes.Build(player, snapshot, zombie, settings, speech)
             and snapshotVisible or false,
         [Scopes.CONVERSATION] = speech ~= nil and snapshotVisible or false,
         [Scopes.RELATIONSHIP_FEEDBACK] = feedbackVisible,
+        [Scopes.TOOL_FEEDBACK] = toolFeedbackVisible,
     }
 end
 
@@ -93,6 +101,7 @@ function Scopes.HasRenderableScope(scopes)
                 or scopes[Scopes.DEBUG] == true
                 or scopes[Scopes.CONVERSATION] == true
                 or scopes[Scopes.RELATIONSHIP_FEEDBACK] == true
+                or scopes[Scopes.TOOL_FEEDBACK] == true
         )
 end
 

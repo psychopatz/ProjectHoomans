@@ -354,6 +354,63 @@ T.equal(missingStateReason, "conversation_state_missing",
 T.equal(sent[#sent].payload.success, false,
     "missing conversation state did not return a client outcome")
 
+local admissionCalls = 0
+record.affiliation = { factionID = "mobile-faction" }
+PNC.Factions = {
+    GetPlayerFaction = function() return { id = "player-faction" } end,
+}
+PNC.MobileSettlementVisitService = {
+    GetNPCVisit = function() return {
+        active = true,
+        kind = "settlement_admission",
+        visitID = "visit-authority",
+        expiresAt = worldHours + 12,
+    } end,
+    AdmitPlayer = function(_, npcID, visitID)
+        admissionCalls = admissionCalls + 1
+        T.equal(npcID, record.id, "admission carries the selected NPC")
+        T.equal(visitID, "visit-authority",
+            "admission carries the authoritative visit id")
+        return true, "settlement_member_admitted", {
+            npcID = record.id,
+            communityID = "player-community",
+            factionID = "player-faction",
+        }
+    end,
+}
+local admissionAccepted, admissionReason =
+    Authority.HandleSettlementAdmission(player, {
+        requestID = "settlement-admission-1",
+        npcID = record.id,
+        token = "lease-token",
+        visitID = "visit-authority",
+        registryFingerprint = fingerprint,
+    })
+T.truthy(admissionAccepted, admissionReason)
+T.equal(admissionCalls, 1,
+    "settlement admission reaches the server service exactly once")
+T.equal(sent[#sent].command,
+    PNC.Const.CMD_CONVERSATION_SETTLEMENT_ADMISSION_RESULT,
+    "settlement admission response uses its dedicated command")
+T.equal(sent[#sent].payload.success, true,
+    "settlement admission response succeeds")
+T.equal(sent[#sent].payload.responseKey,
+    "response.settlement_admission.accepted.1",
+    "settlement admission response carries its dedicated dialogue key")
+local admissionReplay, admissionReplayReason =
+    Authority.HandleSettlementAdmission(player, {
+        requestID = "settlement-admission-1",
+        npcID = record.id,
+        token = "lease-token",
+        visitID = "visit-authority",
+        registryFingerprint = fingerprint,
+    })
+T.falsy(admissionReplay, "settlement admission replay is rejected")
+T.equal(admissionReplayReason, "replayed_request",
+    "settlement admission replay reports the correct reason")
+T.equal(admissionCalls, 1,
+    "settlement admission replay does not duplicate the transfer")
+
 T.finish("pnc_conversation_authority_smoke")
 
 T.finish("pnc_conversation_authority_smoke")

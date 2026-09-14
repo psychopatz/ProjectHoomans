@@ -64,7 +64,11 @@ function Combat.PumpAttackAction(record, zombie)
         else
             action.lastResult, action.lastReason = Internal.applyAttackActionHit(record, zombie, action, target)
         end
-        if action.lastResult ~= true and Core and Core.Log then
+        if action.lastResult ~= true
+            and action.lastReason ~= "ranged_miss"
+            and action.lastReason ~= "melee_miss"
+            and Core and Core.Log
+        then
             Core.Log("WARN", "attack_hit_failed npc=" .. tostring(record and record.id or "nil") .. " reason=" .. tostring(action.lastReason or "unknown") .. " target=" .. tostring(target and target.kind or "nil"))
         end
     end

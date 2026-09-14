@@ -84,10 +84,10 @@ local Selector = PNC.Conversation.Selector
 local Loader = PNC.Conversation.TextLoader
 
 T.equal(#Registry.ListCategories(), 12, "built-in category count")
-T.equal(#Registry.ListBlocks(), 49, "expanded built-in block count")
+T.equal(#Registry.ListBlocks(), 50, "expanded built-in block count")
 T.equal(Registry.GetFingerprint(), Registry.GetFingerprint(),
     "registry fingerprint stable")
-T.equal(#Registry.ListBlocks({ includeInvalid = true }), 49,
+T.equal(#Registry.ListBlocks({ includeInvalid = true }), 50,
     "built-ins all validate")
 
 local whatsUpBlocks = Registry.ListBlocks({
@@ -285,6 +285,25 @@ local player = {
         }
     end,
 }
+PNC.Network = { ClientState = {
+    playerContext = { characterUUID = "character-one" },
+    playerNameKnowledge = { ["npc-12"] = true },
+    npcKnowledge = {
+        ["npc-12"] = {
+            knownFaction = {
+                id = "crossroads", name = "Crossroads Exchange",
+                role = "lead_scavenger",
+            },
+            categories = { { descriptors = {
+                {
+                    descriptorID = "identity.name", value = "Morgan Hale",
+                    status = "confirmed",
+                },
+                { descriptorID = "faction.identity", status = "confirmed" },
+            } } },
+        },
+    },
+} }
 local definition = PNC.Conversation.BuildDefinition(entry, player, "dawn")
 T.equal(definition.namespace, "ProjectHoomans", "history namespace")
 T.equal(definition.npcID, "npc-12", "NPC id")
@@ -318,6 +337,69 @@ end
 T.truthy(recruitChoice, "recruit choice is available for an un-recruited NPC")
 T.equal(type(recruitChoice.onHighlightChanged), "function",
     "recruit choice exposes a reusable highlight callback")
+
+PNC.Network = {
+    ClientState = {
+        playerContext = { characterUUID = "character-visit" },
+        conversationRelationships = {
+            ["npc-visit"] = {
+                npcID = "npc-visit",
+                settlementVisit = {
+                    active = true,
+                    kind = "settlement_admission",
+                    visitID = "visit-1",
+                    expiresAt = 300,
+                    revision = 1,
+                },
+            },
+        },
+    },
+}
+local visitingEntry = {
+    id = "npc-visit",
+    name = "Desperate Visitor",
+    record = { hostility = { attackPlayers = false } },
+    snapshot = {
+        displayName = "Desperate Visitor",
+        survivor = { forename = "Desperate", surname = "Visitor" },
+        tacticalClass = "neutral",
+        relationshipCategory = "Acquaintance",
+    },
+}
+local visitingDefinition = PNC.Conversation.BuildDefinition(
+    visitingEntry, player, "dawn"
+)
+local visitGreeting = Selector.SelectBlock(
+    "projecthoomans:greetings",
+    visitingDefinition.context.conversationBlockContext
+)
+T.equal(visitGreeting.id,
+    "projecthoomans:settlement_admission",
+    "active settlement visit selects the dedicated desperate greeting")
+local admissionChoice
+for _, choice in ipairs(visitingDefinition.nodes.menu.choices or {}) do
+    if choice.id == "settlement_admission" then admissionChoice = choice end
+end
+T.truthy(admissionChoice,
+    "active settlement visit exposes the one-member admission choice")
+
+PNC.Network.ClientState.conversationRelationships["npc-visit"]
+    .settlementVisit.expiresAt = 180
+local expiredDefinition = PNC.Conversation.BuildDefinition(
+    visitingEntry, player, "dawn"
+)
+local expiredGreeting = Selector.SelectBlock(
+    "projecthoomans:greetings",
+    expiredDefinition.context.conversationBlockContext
+)
+T.truthy(expiredGreeting.id ~= "projecthoomans:settlement_admission",
+    "expired visit falls back to the default greeting variant")
+local defaultRecruitChoice
+for _, choice in ipairs(expiredDefinition.nodes.menu.choices or {}) do
+    if choice.id == "recruit" then defaultRecruitChoice = choice end
+end
+T.truthy(defaultRecruitChoice,
+    "expired visit restores the default recruitment menu")
 
 local memberEntry = {
     id = "npc-member",
@@ -715,8 +797,13 @@ T.equal(unknownDefinition.context.npcFirstName, "Stranger",
     "unknown NPC first name is hidden")
 T.equal(unknownDefinition.context.npcLastName, "Stranger",
     "unknown NPC last name is hidden")
-T.equal(unknownDefinition.context.playerFullName, "Stranger",
-    "player name is hidden from an unintroduced NPC")
+T.equal(unknownDefinition.context.playerNameKnown, false,
+    "unknown player name remains undisclosed")
+T.equal(unknownDefinition.context.playerFullName,
+    unknownDefinition.context.playerFirstName,
+    "unknown player full name uses the safe address")
+T.falsy(string.find(unknownDefinition.context.playerFullName, "Alex", 1, true),
+    "unknown player full name does not leak the real name")
 
 PNC.Network.ClientState.npcPresentations["npc-daily"] = {
     state = "known",

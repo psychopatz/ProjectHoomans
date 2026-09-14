@@ -170,6 +170,7 @@ end
 
 local function resolveWeaponRolls(record, seed)
     local override = tostring(record and record.equipmentSpawnMode or "")
+    if override == "none" then return false, false end
     if override == "melee" then return true, false end
     if override == "ranged" then return false, true end
     if override == "both" then return true, true end

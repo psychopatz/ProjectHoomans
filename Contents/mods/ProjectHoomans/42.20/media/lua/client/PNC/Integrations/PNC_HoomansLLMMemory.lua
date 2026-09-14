@@ -5,6 +5,7 @@
 -- event IDs. It deliberately does not accept free-form LLM memory text.
 
 require "PsychopatzCore/Conversation/PsychopatzConversationMessage"
+require "PNC/Core/Identity/PNC_FlavorAddress"
 require "PNC/Integrations/PNC_HoomansLLMIdentity"
 
 PNC = PNC or {}
@@ -13,6 +14,7 @@ PNC.HoomansLLM.Memory = PNC.HoomansLLM.Memory or {}
 
 local Memory = PNC.HoomansLLM.Memory
 local Message = PsychopatzCore.Conversation.Message
+local FlavorAddress = PNC.FlavorAddress
 local Identity = PNC.HoomansLLM.Identity
 local Reset = (PNC.Persistence and PNC.Persistence.Reset)
     or require "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset"
@@ -73,17 +75,20 @@ local function logPrimitive(primitiveType, npcID, result, reason, pending)
         .. " pending=" .. tostring(pending or 0))
 end
 
-local function playerName()
-    local current = player()
-    if not current then return "" end
-    local fullName = text(call(current, "getFullName", ""), 256)
-    if fullName ~= "" then return fullName end
-    local forename = text(call(current, "getForename", ""), 128)
-    local surname = text(call(current, "getSurname", ""), 128)
-    if forename ~= "" or surname ~= "" then
-        return text(forename .. " " .. surname, 256)
+local function playerAddressName(npcID)
+    if not npcID or text(npcID, 256) == "" then
+        return "the player"
     end
-    return text(call(current, "getUsername", ""), 256)
+    local state = clientState()
+    local context = state.playerContext or {}
+    local address = FlavorAddress.ResolveForNPC({
+        npcID = npcID,
+        player = player(),
+        playerContext = context,
+        playerUUID = context.characterUUID or context.playerUUID,
+        state = state,
+    })
+    return address.addressName
 end
 
 local function calendarSnapshot(worldAgeHours)
@@ -151,7 +156,7 @@ local function preOutbreakTime()
     }
 end
 
-function Memory.CurrentContext(worldAgeHours)
+function Memory.CurrentContext(worldAgeHours, npcID)
     local identity = Identity.Current()
     local currentAge = tonumber(worldAgeHours)
     if not currentAge then
@@ -167,7 +172,7 @@ function Memory.CurrentContext(worldAgeHours)
         server_instance_id = identity.server_instance_id,
         server_world_generation = identity.server_world_generation,
         player_uuid = playerUUID(),
-        player_name = playerName(),
+        player_name = playerAddressName(npcID),
         event_time = calendarSnapshot(currentAge),
     }
 end
@@ -298,7 +303,7 @@ function Memory.IsNameQuestion(value)
 end
 
 function Memory.EnqueueFirstMeeting(npcID, npcName, sourceEventID, explicitPlayerID)
-    local context = Memory.CurrentContext()
+    local context = Memory.CurrentContext(nil, npcID)
     local playerID = playerUUID(explicitPlayerID)
     local targetID = text(npcID, 256)
     if playerID == "" or targetID == "" then

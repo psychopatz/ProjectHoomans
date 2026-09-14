@@ -68,6 +68,8 @@
     "Sandbox_ProjectHoomans.LooterAccidentDeathChance_tooltip": "Chance per abstract looter member every two in-game hours. Set to 0 to disable accidental deaths for looters.",
     "Sandbox_ProjectHoomans.CaravanAccidentDeathChance": "Caravan Accident Death Chance (%%)",
     "Sandbox_ProjectHoomans.CaravanAccidentDeathChance_tooltip": "Chance per abstract trader/caravan member every two in-game hours. Set to 0 to disable accidental deaths for caravans.",
+    "Sandbox_ProjectHoomans.MobileSettlementAIJoinChance": "AI Settlement Mobile Join Chance (%%)",
+    "Sandbox_ProjectHoomans.MobileSettlementAIJoinChance_tooltip": "Chance per eligible mobile-group member to join an AI-owned settlement on arrival. Colony population capacity still applies.",
     "Sandbox_ProjectHoomans.NPCMeleeWeaponSpawnChance": "NPC Melee Weapon Spawn Chance (%%)",
     "Sandbox_ProjectHoomans.NPCMeleeWeaponSpawnChance_tooltip": "Independent identity-seeded chance that a generated NPC receives a melee weapon. Melee and ranged rolls can both succeed.",
     "Sandbox_ProjectHoomans.NPCRangedWeaponSpawnChance": "NPC Ranged Weapon Spawn Chance (%%)",

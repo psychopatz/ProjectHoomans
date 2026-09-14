@@ -7,10 +7,14 @@ local ProfileTypes = PNC.SocialProfileTypes
 local Generator = PNC.SocialProfileGenerator
 local RelationshipTypes = PNC.RelationshipTypes
 
-function SocialProfiles.GenerateNPCProfile(identitySeed, archetypeID, overrides)
+function SocialProfiles.GenerateNPCProfile(
+    identitySeed, archetypeID, overrides, traitSource
+)
     local profile = ProfileTypes.NormalizeNPCPersonality(
-        Generator.Generate(identitySeed, archetypeID, overrides),
-        identitySeed, archetypeID)
+        Generator.Generate(
+            identitySeed, archetypeID, overrides, traitSource
+        ),
+        identitySeed, archetypeID, overrides, traitSource)
     if H.HasEntries(ProfileTypes.NormalizeNPCPersonalityOverrides(overrides)) then
         H.LogProfile("authored_override", {
             identitySeed = identitySeed,
@@ -27,7 +31,9 @@ function SocialProfiles.GetNPCProfile(npcID)
     return ProfileTypes.NormalizeNPCPersonality(
         record.social and record.social.personality,
         record.identitySeed,
-        record.archetypeID), "resolved"
+        record.archetypeID,
+        record.social and record.social.personalityOverrides,
+        record), "resolved"
 end
 
 function SocialProfiles.EnsureNPCProfile(record)
@@ -38,7 +44,7 @@ function SocialProfiles.EnsureNPCProfile(record)
         return nil, "invalid_npc_record"
     end
     normalizedSocial = RelationshipTypes.NormalizeSocialState(
-        record.social, record.identitySeed, record.archetypeID)
+        record.social, record.identitySeed, record.archetypeID, record)
     changed = not RelationshipTypes.AreEqual(record.social, normalizedSocial)
     if changed then
         normalizedSocial.revision = math.max(

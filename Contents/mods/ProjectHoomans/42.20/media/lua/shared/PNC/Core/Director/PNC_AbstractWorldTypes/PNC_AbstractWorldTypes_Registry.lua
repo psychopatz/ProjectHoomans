@@ -11,6 +11,7 @@ function Types.NewRegistry()
         encounters = {},
         encounterCooldowns = {},
         nextEncounterSerial = 1,
+        uniqueNPCsByID = {},
         population = Types.NormalizePopulation(nil),
     }
 end
@@ -105,6 +106,44 @@ local function normalizeCooldowns(source, output)
     end
 end
 
+local function normalizeUniqueNPCs(source, output)
+    local id
+    local raw
+    local definitionID
+    local status
+    local entry
+    for id, raw in pairs(
+        type(source.uniqueNPCsByID) == "table"
+            and source.uniqueNPCsByID or {}
+    ) do
+        definitionID = Internal.SafeID(id)
+        if definitionID and type(raw) == "table" then
+            status = tostring(raw.status or "unseen")
+            if status ~= "unseen" and status ~= "reserved"
+                and status ~= "alive" and status ~= "dead"
+                and status ~= "disabled"
+            then
+                status = "unseen"
+            end
+            entry = {
+                definitionId = definitionID,
+                status = status,
+                runtimeNpcId = Internal.SafeID(raw.runtimeNpcId),
+                identitySeed = tonumber(raw.identitySeed) or nil,
+                definitionVersion = math.max(1, math.floor(
+                    Internal.Finite(raw.definitionVersion, 1)
+                )),
+                reservedAt = math.max(0, Internal.Finite(raw.reservedAt, 0)),
+                spawnedAt = math.max(0, Internal.Finite(raw.spawnedAt, 0)),
+                diedAt = math.max(0, Internal.Finite(raw.diedAt, 0)),
+                deathReason = type(raw.deathReason) == "string"
+                    and raw.deathReason or nil,
+            }
+            output[definitionID] = entry
+        end
+    end
+end
+
 function Types.NormalizeRegistry(value)
     local source = type(value) == "table" and value or {}
     local output = Types.NewRegistry()
@@ -112,6 +151,7 @@ function Types.NormalizeRegistry(value)
         source.revision, 0, 2147483647, 0
     )
     output.population = Types.NormalizePopulation(source.population)
+    normalizeUniqueNPCs(source, output.uniqueNPCsByID)
     normalizeLocations(source, output.locationsByID)
     normalizeGroups(source, output.locationsByID, output.groupsByID)
     normalizeEncounters(source, output.encounters)

@@ -2,6 +2,7 @@
 require "PsychopatzCore/UI/Conversation/PsychopatzConversationLayout"
 require "PsychopatzCore/Conversation/PsychopatzConversationMessage"
 require "PsychopatzCore/Conversation/PsychopatzNameParts"
+require "PNC/Core/Identity/PNC_FlavorAddress"
 require "PNC/Conversation/PNC_ConversationLLMTools"
 require "PNC/Conversation/PNC_ConversationToolReplies"
 require "PNC/Integrations/PNC_HoomansLLMContext"
@@ -15,6 +16,7 @@ PNC.HoomansLLM = PNC.HoomansLLM or {}
 
 local Integration = PNC.HoomansLLM
 local NameParts = PsychopatzCore.Conversation.NameParts
+local FlavorAddress = PNC.FlavorAddress
 local Layout = PsychopatzCore.Conversation.Layout
 local Context = PNC.HoomansLLM.Context
 local MemoryIdentity = PNC.HoomansLLM.Identity
@@ -117,6 +119,13 @@ local function declinedPortraitAnimation(results)
         end
     end
     return nil
+end
+
+local function conversationTokenOf(packet)
+    local context = packet and packet.conversation_context or nil
+    local token = context and context.conversation_token or nil
+    if token == nil or trim(token) == "" then return nil end
+    return tostring(token)
 end
 
 local function replaceAmbientIdentity(text, fullName, firstName, surname)
@@ -287,18 +296,23 @@ local function buildAmbientPacket(item, requestID)
         source.speakerFirstName or source.firstName,
         source.speakerSurname or source.surname
     )
-    local player = NameParts.Split(
-        source.playerFullName or source.playerName
-            or source.player or "the player",
-        source.playerFirstName,
-        source.playerSurname
-    )
+    local playerAddress = FlavorAddress.ResolveForNPC({
+        npcID = npcID,
+        npcIdentitySeed = FlavorAddress.ResolveNPCSeed(source, npcID),
+        playerUUID = playerID,
+        isFemale = source.playerIsFemale,
+        playerNameKnown = source.playerNameKnown,
+        playerFullName = source.playerFullName,
+        playerFirstName = source.playerFirstName,
+        playerSurname = source.playerSurname or source.playerLastName,
+        state = PNC.Network and PNC.Network.ClientState or nil,
+    })
     local npcFullName = npc.fullName or "the survivor"
     local npcFirstName = npc.firstName or npcFullName
     local npcSurname = npc.surname or ""
-    local playerFullName = player.fullName or "the player"
-    local playerFirstName = player.firstName or playerFullName
-    local playerSurname = player.surname or ""
+    local playerFullName = playerAddress.fullName or "the player"
+    local playerFirstName = playerAddress.firstName or playerFullName
+    local playerSurname = playerAddress.surname or ""
     local victimID = tostring(source.victimNPCID or "")
     local victim = NameParts.Split(
         source.victimFullName or source.victimName
@@ -353,6 +367,9 @@ local function buildAmbientPacket(item, requestID)
         session_id = sessionID,
         npc_name = npcFullName,
         player_name = playerFirstName,
+        player_address_name = playerAddress.addressName,
+        player_name_known = playerAddress.known,
+        player_is_female = playerAddress.isFemale,
         npc_full_name = npcFullName,
         npc_first_name = npcFirstName,
         npc_surname = npcSurname,
@@ -393,6 +410,7 @@ local function buildAmbientPacket(item, requestID)
             event_type = eventType,
             victim_npc_id = victimID ~= "" and victimID or nil,
             victim_first_name = victimFirstName,
+            player_name_known = playerAddress.known,
             player_message = playerMessage ~= "" and playerMessage or nil,
             social_role = source.socialRole or source.npcType,
             relationship_state = source.relationshipState,
@@ -896,12 +914,24 @@ local function applySemanticTools(packet, arguments, npcID, session)
                 and PNC.CompanionCommands.Get(commandID) or nil
             local execute = PNC.Client and PNC.Client.ExecuteCompanionCommand
             if definition and execute then
-                result.accepted = execute(commandID, npcID, "conversation", {
-                    origin = "llm_tool",
-                    requestID = packet and packet.request_id,
-                }) == true
-                result.reason = result.accepted and "submitted" or "rejected_by_game"
+                local accepted
+                local reason
+                local targets
+                accepted, reason, targets = execute(
+                    commandID,
+                    npcID,
+                    "conversation",
+                    {
+                        origin = "llm_tool",
+                        requestID = packet and packet.request_id,
+                        callID = callID,
+                    }
+                )
+                result.accepted = accepted == true
+                result.reason = reason or (result.accepted
+                    and "submitted" or "rejected_by_game")
                 result.commandID = commandID
+                result.targets = targets
             else
                 result.reason = "unknown_command"
             end
@@ -1259,6 +1289,7 @@ function Integration.Deliver(arguments)
         Pending.responseText = response
         Pending.responseIsFailure = providerFailure == true
         Pending.portraitAnimation = portraitAnimation
+        Pending.conversationToken = conversationTokenOf(Pending.packet)
         session.llmPending = true
         session.busy = true
         view.historyPart:setTyping("npc")
@@ -1291,6 +1322,7 @@ function Integration.Deliver(arguments)
         providerFailure = providerFailure == true,
         contextEligible = providerFailure ~= true,
         portraitAnimation = portraitAnimation,
+        conversationToken = conversationTokenOf(Pending.packet),
     })
     if traceEnabled() then
         Trace.Record({
@@ -1380,6 +1412,7 @@ function Integration.SpeechStarted(arguments)
             messageID = "llm-response:" .. Pending.requestID,
             providerFailure = Pending.responseIsFailure == true,
             contextEligible = Pending.responseIsFailure ~= true,
+            conversationToken = Pending.conversationToken,
         },
         portraitAnimation = Pending.portraitAnimation,
     })
@@ -1448,6 +1481,7 @@ function Integration.SpeechFallback(arguments)
                 providerFailure = Pending.responseIsFailure == true,
                 contextEligible = Pending.responseIsFailure ~= true,
                 portraitAnimation = Pending.portraitAnimation,
+                conversationToken = Pending.conversationToken,
             })
             log(
                 "speech_fallback",

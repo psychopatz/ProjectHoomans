@@ -12,6 +12,7 @@ local Internal = Client.Internal
 local Const = PNC.Const
 local Core = PNC.Core
 local ClientState = PNC.Network.ClientState
+local Diagnostics = PNC.PerformanceScalingDiagnostics
 
 local function requestInventoryResync(npcID, reason)
     local pending
@@ -228,6 +229,36 @@ local function applyInventoryDelta(args)
         ClientState.inventoryResyncPending[npcID] = nil
     end
     rebuildCachedEquipment(cached, args.equipment)
+    if Diagnostics and Diagnostics.InventoryAuditEnabled == true
+        and Diagnostics.LogInventoryAudit
+    then
+        local fields = {
+            "npc=" .. tostring(npcID or ""),
+            "fromRevision=" .. tostring(fromRevision or ""),
+            "inventoryRevision=" .. tostring(incomingRevision or ""),
+            "opCount=" .. tostring(#args.ops),
+        }
+        for index = 1, #args.ops do
+            op = args.ops[index]
+            fields[#fields + 1] = "op" .. tostring(index) .. "="
+                .. tostring(op and op.op or "unknown")
+                .. ":item=" .. tostring(op and op.itemID
+                    or op and op.item and op.item.id or "")
+            if op and op.itemState then
+                fields[#fields + 1] = "op" .. tostring(index)
+                    .. "Fluid=" .. tostring(op.itemState.fluidAmount or "")
+                    .. "/" .. tostring(op.itemState.fluidCapacity or "")
+                    .. "/" .. tostring(op.itemState.fluidPrimaryType or "")
+            end
+        end
+        Diagnostics.LogInventoryAudit("client_delta_applied", fields)
+    end
+    if PNC.InventoryWindow
+        and PNC.InventoryWindow.OnInventoryPayloadApplied
+    then
+        PNC.InventoryWindow.OnInventoryPayloadApplied(
+            npcID, incomingRevision, "inventory_delta")
+    end
     return true
 end
 
@@ -240,6 +271,7 @@ Internal.RegisterServerCommand(Const.CMD_CHARACTER_PAYLOAD, function(args)
     local currentInventoryRevision
     local currentSnapshot
     local snapshotIsStale
+    local inventoryAction = "replace"
     if not args.npcId then
         return
     end
@@ -276,8 +308,10 @@ Internal.RegisterServerCommand(Const.CMD_CHARACTER_PAYLOAD, function(args)
     if currentPayload and incomingInventoryRevision
         and currentInventoryRevision
         and incomingInventoryRevision <= currentInventoryRevision
+        and args.inventoryFull ~= true
     then
         args.inventory = currentPayload.inventory
+        inventoryAction = "reuse_cached_equal_or_newer"
     end
     ClientState.characterPayloads[id] = args
     if ClientState.inventoryResyncPending then
@@ -292,6 +326,23 @@ Internal.RegisterServerCommand(Const.CMD_CHARACTER_PAYLOAD, function(args)
                 PNC.Network.RefreshClientBodyIdentityIndex()
             end
         end
+    end
+    if Diagnostics and Diagnostics.InventoryAuditEnabled == true
+        and Diagnostics.LogInventoryAudit
+    then
+        Diagnostics.LogInventoryAudit("client_payload_applied", {
+            "npc=" .. tostring(id),
+            "payloadRevision=" .. tostring(incomingRevision or ""),
+            "inventoryRevision=" .. tostring(incomingInventoryRevision or ""),
+            "inventoryFull=" .. tostring(args.inventoryFull == true),
+            "inventoryAction=" .. tostring(inventoryAction),
+        })
+    end
+    if PNC.InventoryWindow
+        and PNC.InventoryWindow.OnInventoryPayloadApplied
+    then
+        PNC.InventoryWindow.OnInventoryPayloadApplied(
+            id, incomingInventoryRevision, "character_payload")
     end
 end)
 

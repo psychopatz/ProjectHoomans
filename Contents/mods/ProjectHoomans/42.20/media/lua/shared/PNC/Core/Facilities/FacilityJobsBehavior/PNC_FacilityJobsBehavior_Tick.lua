@@ -447,7 +447,23 @@ function Internal.Tick(record, zombie)
         if not refillReady then
             local leaseId = runtime.taskLeaseId
             runtime.failedReason = refillReason
+            runtime.lastProgressReason = "water_refill_scene_admission_failed"
             deferActivityRetry(record, runtime)
+            if runtime.resourceKind == "water_refill"
+                and PNC.NeedFacilityEffects
+                and PNC.NeedFacilityEffects.ReportWaterRefillResult
+            then
+                PNC.NeedFacilityEffects.ReportWaterRefillResult(
+                    record,
+                    runtime,
+                    false,
+                    refillReason,
+                    {
+                        stage = "scene_admission",
+                        itemID = runtime.activityItemID,
+                    }
+                )
+            end
             Internal.Finish(record, zombie, refillReason)
             if leaseId ~= "" and PNC.TaskLeaseService
                 and PNC.TaskLeaseService.Get

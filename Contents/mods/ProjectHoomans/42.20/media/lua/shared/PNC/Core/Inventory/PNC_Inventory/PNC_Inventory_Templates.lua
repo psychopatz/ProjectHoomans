@@ -11,6 +11,7 @@ local Internal = Inventory.Internal
 local Core = PNC.Core
 local Archetypes = PNC.Archetypes
 local Identity = PNC.Identity
+local Unique = PNC.UniqueNPCs
 
 local function choose(list, seed, salt)
     if type(list) ~= "table" or #list <= 0 then
@@ -24,6 +25,11 @@ local function buildIdentityTemplate(record)
     local archetype = Archetypes.Get(record and record.archetypeID or nil)
     local loadout = archetype.loadout or {}
     local seed = Identity.NormalizeSeed(record and record.identitySeed or nil, record and record.id or "npc")
+    local uniqueItems = record and record.startingItems or nil
+    local uniqueTemplate = record and record.inventoryTemplateRef
+        and Unique and Unique.GetInventoryTemplate
+        and Unique.GetInventoryTemplate(record.inventoryTemplateRef) or nil
+    if uniqueTemplate then uniqueItems = uniqueTemplate.items end
     local startingEquipment = Inventory.ResolveStartingEquipment
         and Inventory.ResolveStartingEquipment(record)
         or {}
@@ -34,6 +40,8 @@ local function buildIdentityTemplate(record)
         startingEquipment = startingEquipment,
         attached = Core.DeepCopy(loadout.attached or {}),
         supplies = Internal.shallowArrayCopy(loadout.supplies),
+        uniqueItems = Internal.shallowArrayCopy(uniqueItems),
+        templateRef = record and record.inventoryTemplateRef or nil,
     }
 end
 
@@ -44,7 +52,7 @@ local function createSupplyItems(record, base, supplies, prefix, bagContainerID,
     local i
     for i = 1, #(supplies or {}) do
         supply = supplies[i]
-        templateKey = Internal.normalizeString(supply.key)
+        templateKey = Internal.normalizeString(supply.key or supply.templateKey)
         if not templateKey then
             counts[tostring(supply.type)] = (counts[tostring(supply.type)] or 0) + 1
             templateKey = tostring(supply.type) .. ":" .. tostring(counts[tostring(supply.type)])
@@ -53,11 +61,21 @@ local function createSupplyItems(record, base, supplies, prefix, bagContainerID,
                     .. tostring(archetypeID) .. " type=" .. tostring(supply.type))
             end
         end
-        Internal.createItem(record, base, {
+        local created = Internal.createItem(record, base, {
             type = supply.type,
             stack = supply.stack,
             uses = supply.uses,
             cond = supply.cond,
+            ammoCount = supply.ammoCount,
+            fav = supply.fav,
+            customName = supply.customName,
+            itemState = supply.itemState,
+            maxWeight = supply.maxWeight,
+            weightReduction = supply.weightReduction,
+            wearableSlot = supply.wearableSlot,
+            wornSlot = supply.wornSlot,
+            attachedSlot = supply.attachedSlot,
+            equipSlot = supply.equipSlot,
             container = (supply.preferredContainer == "bag" and bagContainerID)
                 and bagContainerID
                 or "root",
@@ -67,6 +85,12 @@ local function createSupplyItems(record, base, supplies, prefix, bagContainerID,
                 and "tmpl:supply:" .. tostring(i)
                 or nil,
         })
+        -- A custom editor bag is part of the same authored item list. Make it
+        -- the active destination for following `preferredContainer = "bag"`
+        -- entries, just like the archetype bag above.
+        if created and created.bagContainer then
+            bagContainerID = created.bagContainer
+        end
     end
 end
 
@@ -74,6 +98,8 @@ function Internal.buildTemplateSnapshot(record, options)
     local base = Internal.createBaseInventory(record, options)
     local template = buildIdentityTemplate(record)
     local appearanceItems = template.appearance and template.appearance.outfitItems or {}
+    local appearanceSpecs = template.appearance
+        and template.appearance.outfitItemSpecs or nil
     local lookCounts = {}
     local bagContainerID
     local bagItem
@@ -83,18 +109,28 @@ function Internal.buildTemplateSnapshot(record, options)
 
     Internal.ensureIdentityCard(record, base)
 
-    for i = 1, #appearanceItems do
-        lookCounts[tostring(appearanceItems[i])] = (lookCounts[tostring(appearanceItems[i])] or 0) + 1
-        templateKey = "tmpl:look:" .. tostring(appearanceItems[i]) .. ":"
-            .. tostring(lookCounts[tostring(appearanceItems[i])])
+    for i = 1, math.max(#appearanceItems, #(appearanceSpecs or {})) do
+        local appearanceSpec = appearanceSpecs and appearanceSpecs[i] or nil
+        local appearanceType = type(appearanceSpec) == "table"
+            and appearanceSpec.type or appearanceItems[i]
+        if not appearanceType then
+            break
+        end
+        lookCounts[tostring(appearanceType)] = (lookCounts[tostring(appearanceType)] or 0) + 1
+        templateKey = "tmpl:look:" .. tostring(appearanceType) .. ":"
+            .. tostring(lookCounts[tostring(appearanceType)])
         item = Internal.createItem(record, base, {
-            type = appearanceItems[i],
+            type = appearanceType,
             container = "root",
             templateKey = templateKey,
             legacyTemplateKey = "tmpl:look:" .. tostring(i),
+            itemState = type(appearanceSpec) == "table"
+                and appearanceSpec.itemState or nil,
+            wornSlot = type(appearanceSpec) == "table"
+                and appearanceSpec.wornSlot or nil,
         })
         if item and PNC.Equipment and PNC.Equipment.CreateItem then
-            local created = PNC.Equipment.CreateItem(appearanceItems[i])
+            local created = PNC.Equipment.CreateItem(appearanceType)
             created = type(created) == "table" and created[1] or created
             if created and created.getBodyLocation then
                 item.wornSlot = Internal.normalizeString(created:getBodyLocation())
@@ -157,6 +193,14 @@ function Internal.buildTemplateSnapshot(record, options)
     createSupplyItems(
         record,
         base,
+        template.uniqueItems,
+        "tmpl:unique:",
+        bagContainerID,
+        template.archetypeID
+    )
+    createSupplyItems(
+        record,
+        base,
         template.startingEquipment.reserveWeapon
             and template.startingEquipment.reserveWeapon.grants
             or {},
@@ -175,6 +219,7 @@ function Internal.buildTemplateSnapshot(record, options)
 
     base.template.equipmentPoolID = template.startingEquipment.poolID
     base.template.weaponMode = template.startingEquipment.weaponMode
+    base.template.templateRef = template.templateRef
     Internal.calculateWeights(base)
     return base
 end
@@ -195,6 +240,7 @@ function Inventory.CreateFromTemplate(record, options)
         createdAtHours = generatedTemplate.createdAtHours,
         equipmentPoolID = generatedTemplate.equipmentPoolID,
         weaponMode = generatedTemplate.weaponMode,
+        templateRef = generatedTemplate.templateRef,
     }
     record.inventory = inv
     runtime = Internal.getRuntimeState(record)

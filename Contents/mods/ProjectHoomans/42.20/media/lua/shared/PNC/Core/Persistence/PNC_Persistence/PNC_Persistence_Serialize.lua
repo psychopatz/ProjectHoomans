@@ -13,6 +13,50 @@ local RelationshipTypes = PNC.RelationshipTypes
 local RelationshipMath = PNC.RelationshipMath
 local FactionTypes = PNC.FactionTypes
 
+local function serializeAuthoredTraits(record, field, authoredField, normalize)
+    local traits
+    if type(record) ~= "table" or record[authoredField] ~= true then
+        return nil
+    end
+    traits = normalize(record[field])
+    return Internal.hasTableEntries(traits) and traits or nil
+end
+
+local function serializeMapPresentation(record)
+    local presentation
+    if type(record) ~= "table"
+        or type(record.mapPresentation) ~= "table"
+        or not PNC.MapPresentation
+        or not PNC.MapPresentation.BuildSummary
+    then
+        return nil
+    end
+    presentation = PNC.MapPresentation.BuildSummary(record.mapPresentation)
+    if presentation.visibility == PNC.MapPresentation.VISIBILITY_ALL
+        and not Internal.hasTableEntries(presentation.knownBy)
+        and presentation.roleTag == nil
+        and presentation.iconID == nil
+        and presentation.revision == 0
+    then
+        return nil
+    end
+    return presentation
+end
+
+local function serializeSocial(record)
+    local social = Internal.sanitizeSocial(
+        record and record.social,
+        record and record.identitySeed,
+        record and record.archetypeID
+    )
+    -- Conduct scores are a projection of baseline + evidence. Keep the
+    -- evidence authoritative in the save and rebuild this view on load.
+    if social and social.conduct then
+        social.conduct.scores = nil
+    end
+    return social
+end
+
 local function prepareProgression(record)
     local progression = Internal.sanitizeProgression(record.progression)
     progression.recruited = record.recruited == true
@@ -51,6 +95,17 @@ local function serializeInventory(record)
     return Core.DeepCopy(record.persistedInventory)
 end
 
+local function serializeSkillBaseLevels(record)
+    local levels
+    if not Types or not Types.Internal
+        or not Types.Internal.NormalizeSkillLevels
+    then
+        return nil
+    end
+    levels = Types.Internal.NormalizeSkillLevels(record.skillBaseLevels)
+    return Internal.hasTableEntries(levels) and levels or nil
+end
+
 local function addBodyHint(payload, record)
     local startupBodyHint = record.runtime
         and record.runtime.startupBodyHint or nil
@@ -68,6 +123,16 @@ local function addBodyHint(payload, record)
         y = Internal.normalizeNumber(record.y, 0),
         z = Internal.normalizeNumber(record.z, 0),
     }
+end
+
+local function serializeOrderSpec(record)
+    local order = record and record.orderSpec or nil
+    if type(order) ~= "table"
+        or tostring(order.kind or "") == "facility_activity"
+    then
+        return nil
+    end
+    return Internal.sanitizeOrderSpec(order, record)
 end
 
 function Persistence.SerializeRecord(record)
@@ -92,7 +157,19 @@ function Persistence.SerializeRecord(record)
                 record.persistenceRepairVersions
             ) or nil,
         id = record.id,
-        persist = record.persist ~= false,
+        uniqueDefinitionId = Internal.normalizeString(
+            record.uniqueDefinitionId
+        ),
+        uniqueDefinitionVersion = tonumber(record.uniqueDefinitionVersion)
+            and math.max(1, math.floor(tonumber(record.uniqueDefinitionVersion)))
+            or nil,
+        inventoryTemplateRef = Internal.normalizeString(
+            record.inventoryTemplateRef
+        ),
+        startingItems = not record.inventoryTemplateRef
+            and Internal.hasTableEntries(record.startingItems)
+            and Core.DeepCopy(record.startingItems) or nil,
+        skillBaseLevels = serializeSkillBaseLevels(record),
         tacticalClass = record.tacticalClass,
         ownerUsername = Internal.normalizeString(record.ownerUsername),
         identity = identity,
@@ -111,8 +188,7 @@ function Persistence.SerializeRecord(record)
             y = Internal.normalizeNumber(record.anchorY, record.y),
             z = Internal.normalizeNumber(record.anchorZ, record.z),
         },
-        presenceState = record.alive == false and Const.PRESENCE_CORPSE or Const.PRESENCE_ABSTRACT,
-        orderSpec = Internal.sanitizeOrderSpec(record.orderSpec, record),
+        orderSpec = serializeOrderSpec(record),
         patrolPoints = Internal.serializePatrolPoints(record),
         patrolIndex = record.orderSpec
                 and tostring(record.orderSpec.kind or "")
@@ -141,13 +217,10 @@ function Persistence.SerializeRecord(record)
         allowedJobs = type(record.allowedJobs) == "table"
             and Core.DeepCopy(record.allowedJobs) or {},
         jobPriorities = type(record.jobPriorities) == "table"
-            and Core.DeepCopy(record.jobPriorities) or {},
+                and Internal.hasTableEntries(record.jobPriorities)
+            and Core.DeepCopy(record.jobPriorities) or nil,
         inventory = inventoryPayload,
-        social = Internal.sanitizeSocial(
-            record.social,
-            record.identitySeed,
-            record.archetypeID
-        ),
+        social = serializeSocial(record),
         followerAbandonment = Internal.sanitizeFollowerAbandonment(
             record.followerAbandonment
         ),
@@ -166,22 +239,27 @@ function Persistence.SerializeRecord(record)
             and PNC.Travel.Model.BuildSummary
             and PNC.Travel.Model.BuildSummary(record.travel, true)
             or nil,
-        mapPresentation = PNC.MapPresentation
-            and PNC.MapPresentation.BuildSummary(record.mapPresentation)
-            or nil,
+        mapPresentation = serializeMapPresentation(record),
         vanillaTraits = PNC.PlayerNeedsModel
-            and PNC.PlayerNeedsModel.NormalizeTraits(record.vanillaTraits)
-            or {},
-        vanillaTraitsAuthored = record.vanillaTraitsAuthored == true,
-        vanillaTraitsGenerationVersion = math.max(0, math.floor(
-            tonumber(record.vanillaTraitsGenerationVersion) or 0
-        )),
+            and serializeAuthoredTraits(
+                record,
+                "vanillaTraits",
+                "vanillaTraitsAuthored",
+                PNC.PlayerNeedsModel.NormalizeTraits
+            ) or nil,
+        vanillaTraitsAuthored = record.vanillaTraitsAuthored == true
+            and true or nil,
         dynamicTraits = PNC.ConditionStats
-            and PNC.ConditionStats.NormalizeTraits(record.dynamicTraits) or {},
-        dynamicTraitsAuthored = record.dynamicTraitsAuthored == true,
-        dynamicTraitsGenerationVersion = math.max(0, math.floor(
-            tonumber(record.dynamicTraitsGenerationVersion) or 0
-        )),
+            and serializeAuthoredTraits(
+                record,
+                "dynamicTraits",
+                "dynamicTraitsAuthored",
+                PNC.ConditionStats.NormalizeTraits
+            ) or nil,
+        dynamicTraitsAuthored = record.dynamicTraitsAuthored == true
+            and true or nil,
+        npcTraits = PNC.NPCTraits
+            and PNC.NPCTraits.NormalizeSet(record.npcTraits) or nil,
         conditionStats = PNC.ConditionStats
             and type(record.conditionStats) == "table"
             and PNC.ConditionStats.NormalizeState(record.conditionStats, 0)

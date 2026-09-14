@@ -43,6 +43,19 @@ function Internal.NormalizeInventory(inventory)
     return PNC.Core.DeepCopy(inventory)
 end
 
+function Internal.NormalizeSkillLevels(source)
+    local output = {}
+    local key
+    local value
+    if type(source) ~= "table" then return output end
+    for key, value in pairs(source) do
+        if type(key) == "string" and tonumber(value) ~= nil then
+            output[key] = math.max(0, math.min(10, math.floor(tonumber(value))))
+        end
+    end
+    return output
+end
+
 function Internal.NormalizeEquipmentSpawnMode(value)
     value = Internal.NormalizeString(value)
     if value == "melee" or value == "ranged" or value == "both" then

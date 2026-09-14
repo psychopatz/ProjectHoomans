@@ -59,6 +59,9 @@ local function applySnapshotToBody(snapshot, zombie, remoteReplica)
             modData.PNC_UUID = tostring(snapshot.id)
             modData.PNC_NPC = true
         end
+        if Internal.SyncBandageVisuals then
+            Internal.SyncBandageVisuals(zombie, snapshot)
+        end
         PNC.AnimationDebugPlayer.Maintain(zombie, now)
         return
     end

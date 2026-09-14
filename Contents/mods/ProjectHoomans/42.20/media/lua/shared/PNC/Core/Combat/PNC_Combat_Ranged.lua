@@ -17,6 +17,7 @@ local Stamina = PNC.Stamina
 local Resolution = PNC.CombatResolution
 local Firearms = PNC.Firearms
 local Tactics = PNC.CombatTactics
+local TraitEffects = PNC.NPCTraitEffects
 local Diagnostics = PNC.PerformanceScalingDiagnostics
 
 local function readMethod(target, methodName, ...)
@@ -53,10 +54,40 @@ local function logFirearmAudit(eventName, record, target, ...)
     return Diagnostics.LogFirearmAudit(eventName, fields)
 end
 
+local function resolveFirearmTiming(record, profile)
+    local modifiers = TraitEffects
+        and TraitEffects.ResolveFirearmModifiers
+        and TraitEffects.ResolveFirearmModifiers(record) or {}
+    local cooldown = Resolution and Resolution.GetRangedCooldown
+        and Resolution.GetRangedCooldown(
+            record,
+            profile.rangedCooldownMs,
+            modifiers,
+            { actionDurationMs = Internal.ATTACK_TIMINGS.ranged.duration }
+        )
+        or tonumber(profile.rangedCooldownMs) or 1800
+    return modifiers, cooldown
+end
+
+local function buildShotProfile(record, target, modifiers, distance)
+    if not Resolution or not Resolution.BuildRangedShotProfile then
+        return nil
+    end
+    return Resolution.BuildRangedShotProfile(record, target, {
+        modifiers = modifiers,
+        distance = distance,
+        aimConfidence = record.runtime.combatAim
+            and record.runtime.combatAim.confidence or 0,
+        pressureCount = record.runtime.combatAim
+            and record.runtime.combatAim.visiblePressureCount or 0,
+    })
+end
+
 function Combat.TryRanged(record, zombie, target)
     local now = Core.Now()
     local profile = record.combatProfile or {}
-    local cooldownMs = tonumber(profile.rangedCooldownMs) or 1800
+    local firearmModifiers
+    local cooldownMs
     local damage = tonumber(profile.rangedDamage) or 7
     local dist
     local equipmentInfo = Equipment.Describe(record)
@@ -71,6 +102,9 @@ function Combat.TryRanged(record, zombie, target)
     local reloadReason
     local shotReady
     local shotReason
+    local shotProfile
+
+    firearmModifiers, cooldownMs = resolveFirearmTiming(record, profile)
 
     if not target then
         return false, "no_target"
@@ -132,6 +166,8 @@ function Combat.TryRanged(record, zombie, target)
         end
     end
 
+    shotProfile = buildShotProfile(record, target, firearmModifiers, dist)
+
     if Firearms and Firearms.PrepareShot then
         ammoReady, ammoReason, magazine = Firearms.PrepareShot(record, weaponItem)
         if not ammoReady then
@@ -175,6 +211,9 @@ function Combat.TryRanged(record, zombie, target)
         {
             ammoConsumed = ammoReady == true,
             weaponFullType = magazine and magazine.descriptor and magazine.descriptor.fullType or nil,
+            effectiveCooldownMs = cooldownMs,
+            firearmModifiers = firearmModifiers,
+            rangedShotProfile = shotProfile,
         }
     )
     if Tactics and Tactics.MarkRangedShot then
@@ -183,6 +222,8 @@ function Combat.TryRanged(record, zombie, target)
     logFirearmAudit("ranged_attack_started", record, target,
         "animation=" .. tostring(anim or "PNC_AttackPistol"),
         "weapon=" .. tostring(weaponItem and readMethod(weaponItem, "getFullType") or ""),
-        "distance=" .. tostring(dist))
+        "distance=" .. tostring(dist),
+        "cooldownMs=" .. tostring(cooldownMs),
+        "hitChance=" .. tostring(shotProfile and shotProfile.hitChance or ""))
     return true, "ranged_attack_started"
 end

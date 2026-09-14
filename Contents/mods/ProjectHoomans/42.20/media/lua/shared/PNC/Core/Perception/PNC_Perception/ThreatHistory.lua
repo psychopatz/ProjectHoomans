@@ -136,7 +136,11 @@ function Perception.ResolveRecentAttacker(record, now)
         end
         if Relationships
             and Relationships.AreNPCsEnemies
-            and not Relationships.AreNPCsEnemies(record, targetRecord)
+            and not Relationships.AreNPCsEnemies(
+                record,
+                targetRecord,
+                { ignoreAttackNPCPolicy = true }
+            )
         then
             return nil
         end

@@ -229,6 +229,9 @@ local function normalizeMobileTravel(value)
     local startedAt = Internal.Timestamp(value.startedAt, 0)
     return {
         kind = Constants.MOBILE_TRAVEL_SETTLEMENT,
+        purpose = Constants.VALID_MOBILE_TRAVEL_PURPOSES[value.purpose]
+            and value.purpose
+            or Constants.MOBILE_TRAVEL_PURPOSE_ADMISSION,
         destination = destination,
         startedAt = startedAt,
         departureDay = math.max(
@@ -239,6 +242,77 @@ local function normalizeMobileTravel(value)
             ))
         ),
         revision = Internal.Revision(value.revision),
+    }
+end
+
+local function normalizeSettlementVisit(value)
+    if type(value) ~= "table" then return nil end
+    local startedAt = Internal.Timestamp(value.startedAt, 0)
+    local expiresAt = Internal.Timestamp(value.expiresAt, 0)
+    local visitID = Internal.SafeString(
+        value.id,
+        Constants.ID_MAX_LENGTH * 2
+    )
+    local settlementFactionID = Internal.SafeString(
+        value.settlementFactionID,
+        Constants.ID_MAX_LENGTH
+    )
+    local communityID = Internal.SafeString(
+        value.communityID,
+        Constants.ID_MAX_LENGTH
+    )
+    if not visitID or not settlementFactionID or not communityID
+        or expiresAt <= startedAt
+    then
+        return nil
+    end
+    local pendingMemberIDs = Internal.NormalizeIDSet(
+        value.pendingMemberIDs,
+        Types.IsValidNPCID
+    )
+    local completedMemberIDs = Internal.NormalizeIDSet(
+        value.completedMemberIDs,
+        Types.IsValidNPCID
+    )
+    for npcID, _ in pairs(completedMemberIDs) do
+        pendingMemberIDs[npcID] = nil
+    end
+    return {
+        schemaVersion = Constants.MOBILE_SETTLEMENT_VISIT_SCHEMA_VERSION,
+        id = visitID,
+        kind = "settlement_admission",
+        settlementFactionID = settlementFactionID,
+        communityID = communityID,
+        siteID = Internal.SafeString(value.siteID, Constants.ID_MAX_LENGTH),
+        locationID = Internal.SafeString(
+            value.locationID,
+            Constants.ID_MAX_LENGTH
+        ),
+        startedAt = startedAt,
+        expiresAt = expiresAt,
+        pendingMemberIDs = pendingMemberIDs,
+        completedMemberIDs = completedMemberIDs,
+        revision = Internal.Revision(value.revision),
+    }
+end
+
+local function normalizeSettlementArrival(value)
+    if type(value) ~= "table" then return nil end
+    local travel = normalizeMobileTravel(value.travel)
+    local locationID = Internal.SafeString(
+        value.locationID,
+        Constants.ID_MAX_LENGTH
+    )
+    if not travel or not locationID then return nil end
+    return {
+        schemaVersion = Constants.MOBILE_SETTLEMENT_ARRIVAL_SCHEMA_VERSION,
+        travel = travel,
+        locationID = locationID,
+        reportIDs = Internal.NormalizeIDSet(
+            value.reportIDs,
+            Types.IsValidNPCID
+        ),
+        startedAt = Internal.Timestamp(value.startedAt, travel.startedAt),
     }
 end
 
@@ -258,6 +332,8 @@ function Types.NormalizeMobileGroup(value)
     local strategicTarget
     local activity
     local travel
+    local pendingSettlementArrival
+    local visit
     local playerRoam
     if source.active ~= true then return nil end
     if not CommunityTypes or not CommunityTypes.NormalizeSite then
@@ -301,6 +377,10 @@ function Types.NormalizeMobileGroup(value)
         source.strategicTarget
     )
     travel = normalizeMobileTravel(source.travel)
+    pendingSettlementArrival = normalizeSettlementArrival(
+        source.pendingSettlementArrival
+    )
+    visit = normalizeSettlementVisit(source.visit)
     activity = Constants.VALID_MOBILE_ACTIVITY_STATES[
         source.activity
     ] and source.activity or Constants.MOBILE_ACTIVITY_STREET_ROAMING
@@ -330,6 +410,8 @@ function Types.NormalizeMobileGroup(value)
         ambient = ambient,
         activity = activity,
         travel = travel,
+        pendingSettlementArrival = pendingSettlementArrival,
+        visit = visit,
         playerRoam = playerRoam,
         lastDepartureAt = source.lastDepartureAt == nil
             and -1 or math.max(-1, math.floor(Internal.Finite(

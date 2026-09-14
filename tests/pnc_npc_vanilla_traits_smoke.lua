@@ -37,19 +37,24 @@ PNC = {
 
 T.load(ROOT .. "shared/PNC/Core/Identity/PNC_Identity.lua")
 T.load(ROOT .. "shared/PNC/Core/Needs/PNC_NeedsDefinitions.lua")
+T.load(ROOT .. "shared/PNC/Core/Traits/PNC_NPCTraitRegistry.lua")
+T.load(ROOT .. "shared/PNC/Core/Traits/PNC_NPCTraitEffects.lua")
+T.load(ROOT .. "shared/PNC/Core/Traits/PNC_NPCTraitDefinitions.lua")
 T.load(ROOT .. "shared/PNC/Core/Needs/PNC_ConditionStats.lua")
 T.load(ROOT .. "shared/PNC/Core/Needs/PNC_PlayerNeedsModel.lua")
 T.load(ROOT .. "shared/PNC/Core/Traits/PNC_NPCTraitContext.lua")
 T.load(ROOT .. "shared/PNC/Core/Base/PNC_Types.lua")
 
 local combinedTraits = PNC.NPCTraitContext.Collect({
-    vanillaTraits = { overweight = true },
+    npcTraits = { pnc_friendly = true },
     dynamicTraits = { pnc_ironnerves = true },
 })
-T.equal(combinedTraits.overweight, true,
-    "trait context includes stable NPC traits")
+T.equal(combinedTraits.pnc_friendly, true,
+    "trait context includes canonical NPC traits")
 T.equal(combinedTraits.pnc_ironnerves, true,
     "trait context includes dynamic NPC traits")
+T.falsy(combinedTraits.overweight,
+    "player physiology traits are not part of NPC trait context")
 
 local generatedA = PNC.Types.NewRecord({
     id = "npc_generated_a", identitySeed = 321, archetypeID = "General",
@@ -146,7 +151,7 @@ T.equal(table.concat(PNC.ConditionStats.GetActiveTraitIDs(generatedA), "|"),
 
 local iron = PNC.Types.NewRecord({
     id = "npc_iron", identitySeed = 9, vanillaTraits = {},
-    dynamicTraits = { "PNC.IronNerves", "PNC.BusyHands" },
+    dynamicTraits = { "pnc_ironnerves", "pnc_busyhands" },
 })
 iron.needs = { hunger = 0.8, hydration = 0.2, fatigue = 0.2 }
 local normalCondition = PNC.Types.NewRecord({
@@ -167,7 +172,7 @@ T.truthy(iron.conditionStats.boredom > 0, "idle time raises boredom")
 
 local hardy = PNC.Types.NewRecord({
     id = "npc_hardy", identitySeed = 4, vanillaTraits = {},
-    dynamicTraits = { "PNC.Hardy" },
+    dynamicTraits = { "pnc_hardy" },
 })
 local plain = PNC.Types.NewRecord({
     id = "npc_plain", identitySeed = 4, vanillaTraits = {},

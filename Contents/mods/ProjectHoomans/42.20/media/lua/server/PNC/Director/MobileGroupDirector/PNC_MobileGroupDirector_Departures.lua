@@ -23,12 +23,23 @@ end
 
 function H.IsStreetRoaming(faction)
     local mobile = faction and faction.mobile or nil
-    return mobile and mobile.active == true
-        and (mobile.activity == nil
-            or mobile.activity == Constants.MOBILE_ACTIVITY_STREET_ROAMING)
-        and not mobile.travel
-        and mobile.controlMode == Constants.MOBILE_CONTROL_AMBIENT
-        and mobile.ambient
+    local visit = mobile and mobile.visit or nil
+    local at = H.WorldAge()
+    if mobile and mobile.pendingSettlementArrival then return false end
+    if not mobile or mobile.active ~= true
+        or (mobile.activity ~= nil
+            and mobile.activity ~= Constants.MOBILE_ACTIVITY_STREET_ROAMING)
+        or mobile.travel
+        or mobile.controlMode ~= Constants.MOBILE_CONTROL_AMBIENT
+    then
+        return false
+    end
+    if visit then
+        -- Settlement arrival clears the old road objective. Once the visit
+        -- expires, the ordinary departure pump may choose a new objective.
+        return (tonumber(visit.expiresAt) or 0) <= at
+    end
+    return mobile.ambient
         and mobile.ambient.objective == Constants.MOBILE_AMBIENT_ROAD
 end
 
@@ -106,6 +117,9 @@ function Director.StartSettlementTravel(factionID, target, at)
     at = H.WorldAge(at)
     local travel = {
         kind = Constants.MOBILE_TRAVEL_SETTLEMENT,
+        purpose = faction.archetypeID == "looter"
+            and Constants.MOBILE_TRAVEL_PURPOSE_HOSTILE_CONTACT
+            or Constants.MOBILE_TRAVEL_PURPOSE_ADMISSION,
         destination = target,
         startedAt = at,
         departureDay = H.DepartureDay(at),

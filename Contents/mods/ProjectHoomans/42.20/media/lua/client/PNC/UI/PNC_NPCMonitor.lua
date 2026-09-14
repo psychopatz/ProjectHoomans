@@ -1,6 +1,7 @@
 require "PsychopatzCore/UI/PsychopatzUI"
 require "PsychopatzCore/EventMarkers/PsychopatzEventMarkerHandler"
 require "PNC/UI/NPCMonitor/PNC_NPCMonitorSupport"
+require "PNC/UI/NPCMonitor/PNC_NPCTracking"
 require "PNC/UI/SettlementManagement/PNC_SettlementManagement_ProvisionDiagnosticsModal"
 require "ISUI/ISContextMenu"
 
@@ -10,45 +11,26 @@ local Monitor = PNC.NPCMonitor
 local ClientState = PNC.Network.ClientState
 local UI = PsychopatzCore.UI
 local Support = PNC.NPCMonitorSupport
-local TRACK_MARKER_PREFIX = "pnc_npc_track:"
-local TRACK_MARKER_DURATION = 86400
-
-local function markerHandler()
-    return PNC.EventMarkers or (PsychopatzCore and PsychopatzCore.EventMarkers) or nil
-end
-
-local function markerID(npcID)
-    return TRACK_MARKER_PREFIX .. tostring(npcID or "")
-end
-
-local function findDiagnostic(npcID)
-    npcID = tostring(npcID or "")
-    for _, item in ipairs(ClientState.debugRoster or {}) do
-        if tostring(item.id or "") == npcID then return item end
-    end
-    return nil
-end
-
-local function markerStyle(item)
-    local tacticalClass = tostring(item and item.tacticalClass or "")
-    if tacticalClass == "hostile" then return "thief.png", { r = 1, g = 0.25, b = 0.2 } end
-    if tacticalClass == "neutral" then return "crew.png", { r = 0.95, g = 0.75, b = 0.2 } end
-    return "friend.png", { r = 0.15, g = 0.85, b = 1 }
-end
+local Tracking = PNC.NPCTracking
 
 function Monitor.ClearTrack()
-    local trackedID = Monitor.trackedId
-    local markers = markerHandler()
-    local remove = markers and (markers.Remove or markers.remove) or nil
-    if trackedID and remove then remove(markerID(trackedID)) end
-    Monitor.trackedId = nil
-    Monitor.trackSignature = nil
-    Monitor.trackUpdatedAt = nil
+    Tracking.Clear()
+    Monitor.trackedId = Tracking.trackedId
+    Monitor.trackSignature = Tracking.trackSignature
+    Monitor.trackUpdatedAt = Tracking.trackUpdatedAt
     Monitor.lastTrackRosterRequestAt = nil
     if Monitor.instance then
         Monitor.instance.trackSignature = nil
         Monitor.instance.trackUpdatedAt = nil
     end
+end
+
+function Monitor.TrackTarget(item)
+    local tracked = Tracking.Track(item)
+    Monitor.trackedId = Tracking.trackedId
+    Monitor.trackSignature = Tracking.trackSignature
+    Monitor.trackUpdatedAt = Tracking.trackUpdatedAt
+    return tracked
 end
 
 ISPNCNPCMonitor = PsychopatzWindow:derive("ISPNCNPCMonitor")
@@ -463,41 +445,11 @@ function ISPNCNPCMonitor:onFocus()
 end
 
 function Monitor.UpdateTrackedMarker(force)
-    local trackedID = Monitor.trackedId
-    local markers = markerHandler()
-    local setMarker = markers and (markers.Set or markers.set) or nil
-    if not trackedID or not setMarker then return false end
-
-    local existing = markers.markers and markers.markers[markerID(trackedID)] or nil
-    if existing and existing.getDuration and existing:getDuration() <= 0 then
-        Monitor.trackedId = nil
-        Monitor.trackSignature = nil
-        return false
-    end
-
-    local item = findDiagnostic(trackedID)
-    if not item then
-        Monitor.ClearTrack()
-        return false
-    end
-    local body = Support.FindBody(item)
-    local x = body and body.getX and body:getX() or tonumber(item.x)
-    local y = body and body.getY and body:getY() or tonumber(item.y)
-    if x == nil or y == nil then return false end
-
-    local now = PNC.Core.Now()
-    local signature = string.format("%s:%.2f:%.2f", trackedID, x, y)
-    if force ~= true then
-        if signature == Monitor.trackSignature then return true end
-        if now - (tonumber(Monitor.trackUpdatedAt) or 0) < 250 then return true end
-    end
-
-    local icon, color = markerStyle(item)
-    setMarker(markerID(trackedID), icon, TRACK_MARKER_DURATION, x, y, color,
-        tostring(item.name or trackedID))
-    Monitor.trackSignature = signature
-    Monitor.trackUpdatedAt = now
-    return true
+    local result = Tracking.Update(force)
+    Monitor.trackedId = Tracking.trackedId
+    Monitor.trackSignature = Tracking.trackSignature
+    Monitor.trackUpdatedAt = Tracking.trackUpdatedAt
+    return result
 end
 
 function ISPNCNPCMonitor:updateTrackedMarker(force)
@@ -511,9 +463,7 @@ function ISPNCNPCMonitor:onTrack()
     if Monitor.trackedId == selectedID then
         Monitor.ClearTrack()
     else
-        Monitor.ClearTrack()
-        Monitor.trackedId = selectedID
-        self:updateTrackedMarker(true)
+        Monitor.TrackTarget(item)
     end
     self:updateControlState()
 end

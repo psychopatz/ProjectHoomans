@@ -141,9 +141,13 @@ T.equal(PNC.RadioDiscoveryChannel.FREQUENCY, 69000,
 
 local disclosures = {}
 local knownNames = {}
+local playerNameKnowledge = {}
 PNC.PlayerContext = {
     Resolve = function()
-        return { characterUUID = characterUUID }
+        return {
+            characterUUID = characterUUID,
+            playerNameKnowledge = playerNameKnowledge,
+        }
     end,
 }
 PNC.NPCKnowledge = {
@@ -258,10 +262,15 @@ T.equal(secondaryRadioLine and secondaryRadioLine.speakerNPCID,
     "radio result keeps the selected secondary speaker for voice continuity")
 T.equal(airedBroadcasts[1].context.groupType, "REFUGEE",
     "broadcast context identifies the discovered group kind")
-T.equal(airedBroadcasts[1].context.playerFirstName, "listener",
-    "unknown radio speakers do not receive the player's name")
 T.equal(airedBroadcasts[1].context.playerNameKnown, false,
-    "radio name addressing is scoped to the selected speaker's knowledge")
+    "unknown radio speakers do not receive the player's name")
+T.equal(airedBroadcasts[1].context.playerFullName,
+    airedBroadcasts[1].context.playerFirstName,
+    "unknown radio speakers receive one stable safe address")
+T.falsy(string.find(airedBroadcasts[1].context.playerFullName,
+    "Casey", 1, true), "unknown radio address does not leak the player name")
+T.equal(airedBroadcasts[1].context.playerNameKnown, false,
+    "radio name addressing remains scoped to player-name knowledge")
 T.equal(airedBroadcasts[1].context.npcFullName, "Mara Cole",
     "radio speaker identity comes from a real group member")
 T.equal(airedBroadcasts[1].context.factionName, "Road Refugees",
@@ -308,6 +317,7 @@ T.equal(anonymousContext.npcFullName, "unknown caller",
 T.equal(anonymousContext.speakerNPCID, "npc_one",
     "anonymous broadcasts still retain an internal voice-continuity identity")
 knownNames.npc_one = true
+playerNameKnowledge.npc_one = true
 local knownContext = Discovery.BuildRadioTemplateContext(
     player,
     Discovery.ResolveEntity(Types.KIND_MOBILE_GROUP, "group_one"),

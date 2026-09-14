@@ -212,6 +212,29 @@ function Targeting.ResolveImmediateZombieThreat(record)
     return nil
 end
 
+-- NPC self-defense must be resolved before ordinary area targeting. A direct
+-- attacker is actionable even when this survivor's attackNPCs policy is off.
+function Targeting.ResolveImmediateNPCThreat(record)
+    local threat
+    if not record then return nil end
+    if Perception.ResolveRecentAttacker then
+        threat = Perception.ResolveRecentAttacker(
+            record,
+            Core.Now and Core.Now() or 0
+        )
+        if threat and threat.kind == "npc" then
+            return threat
+        end
+    end
+    if Perception.FindImmediateNPCThreat then
+        threat = Perception.FindImmediateNPCThreat(record)
+        if threat and threat.kind == "npc" then
+            return threat
+        end
+    end
+    return nil
+end
+
 function Targeting.ResolveEngageTarget(record, resolver)
     local runtime
     local now

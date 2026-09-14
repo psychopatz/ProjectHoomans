@@ -12,6 +12,7 @@ local Internal = Client.Internal
 local Const = PNC.Const
 local Core = PNC.Core
 local ClientState = PNC.Network.ClientState
+local Diagnostics = PNC.PerformanceScalingDiagnostics
 local KnowledgeInterest = PNC.KnowledgeInterest
     or require "PNC/Knowledge/PNC_KnowledgeInterest"
 local isWorldReady = Internal.IsWorldReady
@@ -194,6 +195,43 @@ function Client.RequestDebugRoster(forceAudit)
     ClientState.debugAuthorized = true
     ClientState.debugAudit = PNC.BodyLifecycle and PNC.BodyLifecycle.LastAudit or {}
     return true
+end
+
+function Client.RequestUniqueNPCDebug()
+    local player = getSpecificPlayer and getSpecificPlayer(0) or nil
+    if not Client.CanUseDebug() then
+        ClientState.uniqueNPCDebugAuthorized = false
+        ClientState.uniqueNPCDebug = nil
+        ClientState.uniqueNPCDebugReason = "not_authorized"
+        return false
+    end
+    ClientState.lastUniqueNPCDebugRequestAt = Core.Now()
+    if Core.IsClientOnly and Core.IsClientOnly() then
+        if player and sendClientCommand then
+            sendClientCommand(
+                player,
+                Const.MODULE,
+                Const.CMD_UNIQUE_NPC_DEBUG_REQUEST,
+                {}
+            )
+            return true
+        end
+        return false
+    end
+    if PNC.UniqueNPCRegistry
+        and PNC.UniqueNPCRegistry.BuildDebugSnapshot
+    then
+        local snapshot, reason = PNC.UniqueNPCRegistry.BuildDebugSnapshot()
+        ClientState.uniqueNPCDebugAuthorized = snapshot ~= nil
+        ClientState.uniqueNPCDebug = snapshot
+        ClientState.uniqueNPCDebugReason = reason
+        ClientState.lastUniqueNPCDebugReceiveAt = Core.Now()
+        return snapshot ~= nil
+    end
+    ClientState.uniqueNPCDebugAuthorized = false
+    ClientState.uniqueNPCDebug = nil
+    ClientState.uniqueNPCDebugReason = "unique_registry_unavailable"
+    return false
 end
 
 function Client.RequestRelationshipDebug(
@@ -917,6 +955,26 @@ function Client.RequestCharacterPayload(npcId, forceFull)
                 if PNC.Network.RefreshClientBodyIdentityIndex then
                     PNC.Network.RefreshClientBodyIdentityIndex()
                 end
+            end
+            if Diagnostics and Diagnostics.InventoryAuditEnabled == true
+                and Diagnostics.LogInventoryAudit
+            then
+                Diagnostics.LogInventoryAudit("client_local_payload_applied", {
+                    "npc=" .. tostring(npcId),
+                    "inventoryRevision=" .. tostring(payload.inventory
+                        and payload.inventory.revision or ""),
+                    "inventoryFull=" .. tostring(payload.inventoryFull == true),
+                    "source=local_api",
+                })
+            end
+            if PNC.InventoryWindow
+                and PNC.InventoryWindow.OnInventoryPayloadApplied
+            then
+                PNC.InventoryWindow.OnInventoryPayloadApplied(
+                    npcId,
+                    payload.inventory and payload.inventory.revision,
+                    "local_api"
+                )
             end
             return true
         end

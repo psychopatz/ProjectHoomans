@@ -98,6 +98,47 @@ T.equal(recoveryRequest.npcID, "npc-1",
 T.equal(recoveryRequest.forceFull, true,
     "rejected delta did not request an authoritative snapshot")
 
+local payloadApplied = {}
+PNC.InventoryWindow = {
+    OnInventoryPayloadApplied = function(npcID, revision, source)
+        payloadApplied[#payloadApplied + 1] = {
+            npcID = npcID, revision = revision, source = source,
+        }
+    end,
+}
+PNC.Network.ClientState.characterPayloads["npc-full"] = {
+    revision = 7,
+    inventory = {
+        revision = 4, summary = { revision = 4 },
+        items = {
+            water = {
+                id = "water", type = "Base.WaterBottle",
+                itemState = { fluidAmount = 0 },
+            },
+        },
+        containers = { root = { items = { "water" } } },
+    },
+}
+registered[PNC.Const.CMD_CHARACTER_PAYLOAD]({
+    npcId = "npc-full", revision = 7, inventoryFull = true,
+    inventory = {
+        revision = 4, summary = { revision = 4 },
+        items = {
+            water = {
+                id = "water", type = "Base.WaterBottle",
+                itemState = { fluidAmount = 1, fluidCapacity = 1,
+                    fluidPrimaryType = "Water" },
+            },
+        },
+        containers = { root = { items = { "water" } } },
+    },
+})
+T.equal(PNC.Network.ClientState.characterPayloads["npc-full"].inventory.items.water
+    .itemState.fluidAmount, 1,
+    "equal-revision full payload did not replace stale item state")
+T.equal(payloadApplied[1].source, "character_payload",
+    "full payload did not invalidate the open inventory window")
+
 PNC.ServerCommandRouter = {
     Register = function(command, handler)
         registered["server:" .. command] = handler

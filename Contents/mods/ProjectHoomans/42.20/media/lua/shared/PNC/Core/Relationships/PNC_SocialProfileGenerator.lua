@@ -83,7 +83,7 @@ local function validOverride(overrides, key, allowed)
     return allowed[value] and value or nil
 end
 
-function Generator.Generate(identitySeed, archetypeID, overrides)
+function Generator.Generate(identitySeed, archetypeID, overrides, traitSource)
     local seed = Identity.NormalizeSeed(identitySeed, archetypeID)
     local archetype = tostring(archetypeID or "General")
     local version = Constants.NPC_GENERATION_VERSION
@@ -151,6 +151,16 @@ function Generator.Generate(identitySeed, archetypeID, overrides)
         generatedFromSeed = true,
         generationVersion = version,
     }
+
+    if PNC.NPCTraitEffects
+        and PNC.NPCTraitEffects.ApplyPersonality
+    then
+        profile = PNC.NPCTraitEffects.ApplyPersonality(profile, traitSource)
+        if PNC.NPCTraitEffects.GetFingerprint then
+            profile.traitFingerprint =
+                PNC.NPCTraitEffects.GetFingerprint(traitSource)
+        end
+    end
 
     profile.orientation = validOverride(
         overrides,

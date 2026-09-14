@@ -5,6 +5,7 @@ local Presentation = PNC.NameplatePresentation
 local Speech = PNC.NameplateSpeech
 local RelationshipFeedbackRenderer =
     PNC.NameplateRelationshipFeedbackRenderer
+local ToolFeedbackRenderer = PNC.NameplateToolFeedbackRenderer
 local DisplaySettings = PNC.NameplateDisplaySettings
 local Scopes = PNC.NameplateScopes
 local Layout = Presentation.Layout
@@ -251,6 +252,31 @@ local function drawDebugOnly(manager, entry, metrics)
     local screenX = isoToScreenX(manager.playerIndex, entry.worldX, entry.worldY, entry.worldZ) - manager.x
     local screenY = isoToScreenY(manager.playerIndex, entry.worldX, entry.worldY, entry.worldZ) - manager.y
     local nameY = screenY - metrics.nameYOffset
+    local toolFeedbackVisible = scopeVisible(
+        entry,
+        Scopes.TOOL_FEEDBACK,
+        false
+    ) and entry.toolFeedbackVisible == true
+    local toolFeedbackHeight = getTextManager():getFontHeight(Fonts.debug) + 2
+    local toolFeedbackY = nameY - toolFeedbackHeight
+    if toolFeedbackVisible and ToolFeedbackRenderer
+        and ToolFeedbackRenderer.Draw
+    then
+        ToolFeedbackRenderer.Draw(
+            manager,
+            entry.snapshot and entry.snapshot.id or entry.uuid,
+            screenX,
+            nameY,
+            {
+                currentTime = getTimeInMillis
+                    and getTimeInMillis() or nil,
+                textWidth = entry.toolFeedbackTextWidth,
+                y = toolFeedbackY,
+                zoom = metrics.zoom,
+                alpha = 0.9,
+            }
+        )
+    end
     if RelationshipFeedbackRenderer
         and RelationshipFeedbackRenderer.Draw
         and scopeVisible(
@@ -274,7 +300,15 @@ local function drawDebugOnly(manager, entry, metrics)
         )
     end
     if scopeVisible(entry, Scopes.CONVERSATION, false) then
-        drawConversation(manager, entry, screenX, nameY - Layout.speechGap, 0.9)
+        drawConversation(
+            manager,
+            entry,
+            screenX,
+            toolFeedbackVisible
+                and (toolFeedbackY - Layout.speechGap)
+                or (nameY - Layout.speechGap),
+            0.9
+        )
     end
     if scopeVisible(entry, Scopes.IDENTITY, true) then
         Presentation.DrawOutlinedText(
@@ -413,7 +447,16 @@ local function drawLive(manager, entry, metrics, currentTime, settings)
     end
 
     local actionHeight = getTextManager():getFontHeight(Fonts.debug) + 2
-    local actionY = nameY - actionHeight
+    local toolFeedbackVisible = scopeVisible(
+        entry,
+        Scopes.TOOL_FEEDBACK,
+        false
+    ) and entry.toolFeedbackVisible == true
+    local toolFeedbackHeight = getTextManager():getFontHeight(Fonts.debug) + 2
+    local toolFeedbackY = nameY - toolFeedbackHeight
+    local actionY = toolFeedbackVisible
+        and (toolFeedbackY - Layout.speechGap - actionHeight)
+        or (nameY - actionHeight)
     local actionVisible = identityVisible and entry.actionVisible
     local recoveryVisible = identityVisible
         and entry.recoveryVisible == true
@@ -425,6 +468,7 @@ local function drawLive(manager, entry, metrics, currentTime, settings)
     local statusWidth = recoveryVisible and entry.recoveryTextWidth
         or entry.actionTextWidth
     local speechBottomY = statusVisible and (actionY - Layout.speechGap)
+        or toolFeedbackVisible and (toolFeedbackY - Layout.speechGap)
         or (nameY - Layout.speechGap)
     if conversationVisible then
         drawConversation(manager, entry, screenX, speechBottomY, 0.95 * alpha)
@@ -439,6 +483,24 @@ local function drawLive(manager, entry, metrics, currentTime, settings)
             statusColor,
             0.95 * alpha,
             Fonts.debug
+        )
+    end
+
+    if toolFeedbackVisible and ToolFeedbackRenderer
+        and ToolFeedbackRenderer.Draw
+    then
+        ToolFeedbackRenderer.Draw(
+            manager,
+            entry.snapshot and entry.snapshot.id or entry.uuid,
+            screenX,
+            nameY,
+            {
+                currentTime = currentTime,
+                textWidth = entry.toolFeedbackTextWidth,
+                y = toolFeedbackY,
+                zoom = metrics.zoom,
+                alpha = alpha,
+            }
         )
     end
 

@@ -34,7 +34,8 @@ PNC = {
             if args and args.commandID == "camp" then
                 return 0, "camp_requires_building"
             end
-            return 1, "commanded"
+            return 1, "commanded",
+                args and args.id and { tostring(args.id) } or {}
         end,
     },
     MapCommandService = {
@@ -115,6 +116,27 @@ T.equal(sent.args.requestID, "manual:refill",
     "manual refill response preserves request identity")
 T.equal(sent.args.accepted, false,
     "manual refill response reports the rejected state")
+
+sent = nil
+Router.Handle("CompanionCommand", player, {
+    commandID = "stay", id = "npc:one", scope = "conversation",
+    requestID = "llm:stay", callID = "tool:stay",
+    commandSource = "llm_tool",
+})
+T.equal(sent.command, "CompanionCommandResult",
+    "LLM order response command")
+T.equal(sent.args.commandID, "stay",
+    "LLM order response preserves command identity")
+T.equal(sent.args.requestID, "llm:stay",
+    "LLM order response preserves request identity")
+T.equal(sent.args.callID, "tool:stay",
+    "LLM order response preserves tool-call identity")
+T.equal(sent.args.commandSource, "llm_tool",
+    "LLM order response preserves source")
+T.equal(sent.args.targets[1], "npc:one",
+    "LLM order response preserves affected target")
+T.equal(sent.args.accepted, true,
+    "LLM order response reports accepted state")
 
 companion = nil
 T.equal(Router.Handle("CompanionCommand", player, nil), true,

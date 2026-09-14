@@ -32,6 +32,28 @@ function H.ResolveDebugArchetype(args, tacticalClass, fallbackID)
     return fallbackID
 end
 
+function H.HandleUniqueNPCTestSpawn(player, args)
+    local definitionID = args and (args.definitionId or args.id) or nil
+    local API = PNC.API and PNC.API.UniqueNPCs
+    local record
+    local reason
+    if not API or not API.SpawnTest then
+        return nil, "unique_test_spawn_unavailable"
+    end
+    if not definitionID or tostring(definitionID) == "" then
+        return nil, "unique_definition_id_required"
+    end
+    record, reason = API.SpawnTest(tostring(definitionID), player)
+    if not record then
+        PNC.Core.LogWarn("PNC unique test spawn failed definition="
+            .. tostring(definitionID) .. " reason=" .. tostring(reason))
+        return nil, reason or "unique_test_spawn_failed"
+    end
+    PNC.Core.LogInfo("PNC unique test spawn definition="
+        .. tostring(definitionID) .. " runtime=" .. tostring(record.id))
+    return record, "spawned"
+end
+
 function H.HandleDebugSpawn(player, args)
     local x = tonumber(args and args.x) or (player and player:getX()) or 0
     local y = tonumber(args and args.y) or (player and player:getY()) or 0

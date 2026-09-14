@@ -32,6 +32,8 @@ PNC = {
     Conversation = {},
     Network = {
         ClientState = {
+            playerContext = { characterUUID = "character-one" },
+            playerNameKnowledge = { ["npc-one"] = true },
             snapshots = {
                 ["npc-one"] = { id = "npc-one", name = "Mara" },
                 ["npc-two"] = {

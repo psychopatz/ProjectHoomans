@@ -59,6 +59,9 @@ local function onResetLua()
     if Sync.Internal.ResetClientZombieStimulus then
         Sync.Internal.ResetClientZombieStimulus()
     end
+    if Sync.Internal.ResetClientBandageVisuals then
+        Sync.Internal.ResetClientBandageVisuals()
+    end
     if Sync.Internal.ClearNativePathControllers then
         Sync.Internal.ClearNativePathControllers()
     end
@@ -96,6 +99,9 @@ function Sync.OnReplicaVisualUpdate(zombie)
             snapshot,
             zombie
         )
+    end
+    if Sync.Internal.SyncBandageVisuals then
+        Sync.Internal.SyncBandageVisuals(zombie, snapshot)
     end
 end
 
