@@ -21,6 +21,10 @@ local FOOD_OPTIONAL = {
     cookingTime = 4096,
     foodLastAgedHours = 8192,
     foodCreatedAtHours = 16384,
+    calories = 32768,
+    carbohydrates = 65536,
+    proteins = 131072,
+    lipids = 262144,
 }
 
 local FOOD_OPTIONAL_ORDER = {
@@ -28,7 +32,7 @@ local FOOD_OPTIONAL_ORDER = {
     "poisonLevelForRecipe", "poisonPower", "rottenTime",
     "cookedInMicrowave", "tainted", "fertilized", "fertilizedTime",
     "heat", "lastCookMinute", "cookingTime", "foodLastAgedHours",
-    "foodCreatedAtHours",
+    "foodCreatedAtHours", "calories", "carbohydrates", "proteins", "lipids",
 }
 
 local function choose(preferred, fallback)
@@ -48,6 +52,8 @@ function StateCodec.pseudoItem(item)
         age = state.age, cooked = state.cooked, burnt = state.burnt,
         frozen = state.frozen, freezingTime = state.freezingTime,
         hungChange = state.hungChange, thirstChange = state.thirstChange,
+        calories = state.calories, carbohydrates = state.carbohydrates,
+        proteins = state.proteins, lipids = state.lipids,
         dangerousUncooked = state.dangerousUncooked,
         poison = state.poison,
         poisonDetectionLevel = state.poisonDetectionLevel,
@@ -74,6 +80,7 @@ function StateCodec.pseudoItem(item)
         "fluidPrimaryType", "fluidCapacity", "fluidInputLocked",
         "fluidCanPlayerEmpty", "fluidRainCatcher", "fluids",
         "hungChange", "thirstChange", "roundChambered", "jammed",
+        "calories", "carbohydrates", "proteins", "lipids",
         "dangerousUncooked", "poison", "poisonDetectionLevel",
         "poisonLevelForRecipe", "poisonPower", "rottenTime",
         "cookedInMicrowave", "tainted", "fertilized", "fertilizedTime",
@@ -107,6 +114,10 @@ function StateCodec.pseudoItem(item)
     function pseudo:getFreezingTime() return self.freezingTime end
     function pseudo:getHungChange() return self.hungChange end
     function pseudo:getThirstChange() return self.thirstChange end
+    function pseudo:getCalories() return self.calories end
+    function pseudo:getCarbohydrates() return self.carbohydrates end
+    function pseudo:getProteins() return self.proteins end
+    function pseudo:getLipids() return self.lipids end
     function pseudo:isbDangerousUncooked() return self.dangerousUncooked end
     function pseudo:isPoison() return self.poison end
     function pseudo:getPoisonDetectionLevel() return self.poisonDetectionLevel end

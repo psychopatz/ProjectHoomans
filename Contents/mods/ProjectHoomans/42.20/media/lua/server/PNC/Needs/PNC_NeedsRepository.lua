@@ -55,8 +55,12 @@ end
 
 local function normalize(state)
     state = type(state) == "table" and state or {}
+    local overflowMaximum = tonumber(Definitions.HUNGER_OVERFLOW
+        and Definitions.HUNGER_OVERFLOW.maximum) or 4.0
     return {
         needs = PNC.NeedsUtils.NormalizeState(state.needs or state, 0),
+        hungerOverflow = math.max(0, math.min(overflowMaximum,
+            tonumber(state.hungerOverflow) or 0)),
         nutrition = normalizeNutrition(state.nutrition),
         morale = {
             conditions = type(state.morale) == "table"

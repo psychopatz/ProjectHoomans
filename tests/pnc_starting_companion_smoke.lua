@@ -14,6 +14,11 @@ local assignCount = 0
 local relationshipCount = 0
 local knowledgeCount = 0
 local commitCount = 0
+local randomSequence = 1000
+ZombRand = function(maximum)
+    randomSequence = randomSequence + 1
+    return randomSequence % maximum
+end
 local specs = {
     { id = "PNC_HasBrother", relationshipKind = "brother", sex = "male",
         sharesSurname = true, sharesAppearance = true },
@@ -70,6 +75,9 @@ PNC = {
         end,
     },
     Registry = {
+        Data = npcs,
+        Loaded = false,
+        Internal = {},
         Get = function(id) return npcs[id] end,
         MarkDirty = function() end,
     },
@@ -163,7 +171,11 @@ PNC = {
             return "player:" .. account .. ":" .. uuid
         end,
     },
-    Const = { TACTICAL_CLASS_NEUTRAL = "neutral" },
+    Const = {
+        TACTICAL_CLASS_NEUTRAL = "neutral",
+        MODDATA_NPC_PREFIX = "PNC_npc",
+    },
+    Persistence = { Reset = {} },
     Core = { Now = function() return 1000 end, LogInfo = function() end },
 }
 
@@ -181,6 +193,12 @@ local player = {
     end,
 }
 
+T.load("ProjectHoomans", "shared", "PNC/Core/Identity/PNC_Identity_ID.lua")
+T.load(
+    "ProjectHoomans",
+    "shared",
+    "PNC/Core/Registry/PNC_Registry/PNC_Registry_StorageCore.lua"
+)
 T.load(SERVER_ROOT .. "Companions/PNC_StartingCompanionService.lua")
 
 local granted, reason, result = PNC.StartingCompanions.Ensure(
@@ -193,7 +211,16 @@ T.equal(spawnCount, 6, "one NPC per selected trait")
 T.equal(assignCount, 6, "all companions assigned")
 T.equal(relationshipCount, 6, "all relationships initialized")
 T.equal(knowledgeCount, 6, "all dossiers initialized")
-T.equal(commitCount, 7, "selection plus each grant committed")
+T.equal(commitCount, 13, "selection, ID assignment, and each grant committed")
+for _, npcID in ipairs(result.npcIDs) do
+    T.truthy(string.match(npcID,
+        "^npc[%a%d]+_[0-9A-Z][0-9A-Z][0-9A-Z][0-9A-Z]$"),
+        "trait companion uses readable collision-safe ID")
+    T.truthy(string.match(npcID, "^npcCasey"),
+        "trait companion ID uses generated identity name")
+    T.equal(PNC.Registry.StorageKeyForID(npcID), "PNC_" .. npcID,
+        "trait companion uses canonical ModData key")
+end
 
 local brother = npcs[record.startingCompanions.grants.PNC_HasBrother.npcID]
 local sister = npcs[record.startingCompanions.grants.PNC_HasSister.npcID]
@@ -201,6 +228,12 @@ local mom = npcs[record.startingCompanions.grants.PNC_HasMom.npcID]
 local dad = npcs[record.startingCompanions.grants.PNC_HasDad.npcID]
 local lover = npcs[record.startingCompanions.grants.PNC_IsMarried.npcID]
 local friend = npcs[record.startingCompanions.grants.PNC_HasFriend.npcID]
+T.equal(brother.generation.source, "starting_companion_trait",
+    "trait generation source persisted on the record")
+T.equal(brother.generation.traitID, "PNC_HasBrother",
+    "trait generation ID persisted on the record")
+T.equal(brother.generation.playerCharacterUUID, record.uuid,
+    "trait generation owner persisted on the record")
 for _, familyMember in ipairs({ brother, sister, mom, dad }) do
     T.equal(familyMember.identity.survivor.surname, "SurvivorFamily",
         "blood relative shares player surname")
@@ -267,6 +300,4 @@ T.equal(assignCount, 7,
     "steady lifecycle checks never repeat companion assignment")
 T.equal(commitCount, stableCommitCount,
     "steady lifecycle checks never save companion state per frame")
-T.finish("pnc_starting_companion_smoke")
-
 T.finish("pnc_starting_companion_smoke")

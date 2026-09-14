@@ -17,7 +17,9 @@ function Needs.Update(record, elapsedHours, reason)
         tonumber(elapsedHours) or 0))
     local rates = Needs.GetRates(record)
     local beforeState = Utils.CopyState(state)
-    for _, needType in ipairs(Definitions.TYPES) do
+    Needs.IncreaseHunger(record, rates.hunger * elapsedHours,
+        reason or "passive_increase")
+    for _, needType in ipairs({ "thirst", "fatigue" }) do
         Needs.Modify(record, needType, rates[needType] * elapsedHours,
             reason or "passive_increase")
     end

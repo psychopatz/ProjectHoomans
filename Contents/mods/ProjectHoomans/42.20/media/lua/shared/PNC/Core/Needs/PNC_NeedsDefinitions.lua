@@ -113,6 +113,9 @@ Definitions.NUTRITION = {
     calorieBurnPerHour = 2000 / 24, caloriesPerKilogram = 7700,
 }
 Definitions.NUTRITION_MODES = { SIMPLE = "simple", REALISM = "realism" }
+-- CharacterStat clamps visible hunger to [0, 1]. Keep excess relief in a
+-- separate, bounded reserve so a dense food is not discarded at zero hunger.
+Definitions.HUNGER_OVERFLOW = { maximum = 4.0 }
 Definitions.CONSEQUENCES = {
     criticalThreshold = 0.84, nonlethalHealthFloor = 10,
 }

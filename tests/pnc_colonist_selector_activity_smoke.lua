@@ -23,6 +23,13 @@ local treatment = Presentation.Current({
     name = "Doctor", activity = "working",
     actionInformation = { kind = "treatment", phase = "bandaging" },
 })
+local dual = Presentation.Current({
+    name = "Thirsty Alex", activity = "working",
+    actionInformation = {
+        kind = "activity", activityId = "facility:survival.drink.inventory",
+        fallback = "Drinking", activityConsumptionMode = "dual",
+    },
+})
 
 T.contains(work, "CORPSE HAUL",
     "roster exposes the actual work operation")
@@ -32,5 +39,7 @@ T.contains(idle, "Idle (Guard Anchor)",
     "roster does not call a generic guard job working")
 T.contains(treatment, "MEDICAL CARE (bandaging)",
     "roster does not expose canonical treatment activity")
+T.equal(dual, "CONSUMING",
+    "roster uses a neutral label for dual-purpose consumption")
 
 T.finish("pnc_colonist_selector_activity_smoke")

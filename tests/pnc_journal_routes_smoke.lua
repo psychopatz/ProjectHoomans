@@ -44,18 +44,24 @@ Events.emit(EventTypes.NPC_DRINK_CONSUMED, abstractNPC, "Base.WaterBottle", 0.3)
 T.equal(Adapter.HasNPC(worldNPC.id), false, "world NPC journal stays lazy")
 T.equal(Adapter.HasNPC(abstractNPC.id), false, "abstract NPC journal stays lazy")
 
-Events.emit(EventTypes.NPC_FOOD_CONSUMED, owned, "Base.Apple", 0.2)
-Events.emit(EventTypes.NPC_DRINK_CONSUMED, owned, "Base.WaterBottle", 0.3)
+Events.emit(EventTypes.NPC_FOOD_CONSUMED, owned, "Base.Apple", 0.2, 0.1)
+Events.emit(EventTypes.NPC_DRINK_CONSUMED, owned, "Base.WaterBottle", 0.3, 0.2)
 Events.emit(EventTypes.NPC_WATER_REFILLED, owned, "Base.WaterBottle", 0.75,
     "sink:10:10:0")
+Events.emit(EventTypes.NPC_WATER_REFILL_DRANK, owned, "Base.WaterBottle", 0.30,
+    0.75, "sink:10:10:0")
 Events.emit(EventTypes.NPC_SKILL_LEVEL_UP, owned, "Axe", 4)
 Events.emit(EventTypes.NPC_WOUNDED, owned, "Hand_L", "laceration", 7)
 local ownedEntries = Adapter.GetNPC(owned.id)
-T.equal(#ownedEntries, 5, "owned NPC events accepted")
+T.equal(#ownedEntries, 6, "owned NPC events accepted")
 T.equal(ownedEntries[1][1], EventTypes.NPC_FOOD_CONSUMED,
     "semantic event ID stored")
 T.equal(ownedEntries[1][3], "Base.Apple",
     "stable item identifier stored")
+T.equal(ownedEntries[1][5], 0.1,
+    "food journal preserves the secondary hydration effect")
+T.equal(ownedEntries[2][5], 0.2,
+    "drink journal preserves the secondary nourishment effect")
 local refillEntry
 for _, entry in ipairs(ownedEntries) do
     if entry[1] == EventTypes.NPC_WATER_REFILLED then
@@ -70,6 +76,22 @@ T.equal(refillEntry[4], 0.75,
     "water refill journal stores the amount filled")
 T.equal(refillEntry[5], "sink:10:10:0",
     "water refill journal stores the source identity")
+local drankEntry
+for _, entry in ipairs(ownedEntries) do
+    if entry[1] == EventTypes.NPC_WATER_REFILL_DRANK then
+        drankEntry = entry
+        break
+    end
+end
+T.truthy(drankEntry, "combined refill-drink event was routed to the NPC journal")
+T.equal(drankEntry[3], "Base.WaterBottle",
+    "combined refill-drink journal stores the container type")
+T.equal(drankEntry[4], 0.30,
+    "combined refill-drink journal stores thirst before clearing")
+T.equal(drankEntry[5], 0.75,
+    "combined refill-drink journal stores the committed amount")
+T.equal(drankEntry[6], "sink:10:10:0",
+    "combined refill-drink journal stores the source identity")
 T.equal(dirtied[#dirtied][2], "npc_journal", "NPC persistence marked dirty")
 
 for index = 1, 40 do

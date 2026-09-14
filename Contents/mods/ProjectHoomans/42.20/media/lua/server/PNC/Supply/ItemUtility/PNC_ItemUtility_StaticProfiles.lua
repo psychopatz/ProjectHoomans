@@ -26,6 +26,8 @@ function H.BuildStatic(fullType, typeID)
         { "isWaterSource", "isWaterOnlySource" })
     local useDelta = math.max(0, H.ReadNumber(item, scriptItem,
         { "getUseDelta" }, 0) or 0)
+    local maxUsedDelta = math.max(0.000001, H.ReadNumber(item, scriptItem,
+        { "getUsedDelta" }, 1) or 1)
     hungerChange = H.NormalizeNeedChange(hungerChange)
     thirstChange = H.NormalizeNeedChange(thirstChange)
     local calories = H.ReadNumber(item, scriptItem, { "getCalories" }, 0)
@@ -76,10 +78,17 @@ function H.BuildStatic(fullType, typeID)
         lipids = lipids,
         negativeThirst = math.max(0, thirstChange or 0),
         useDelta = useDelta,
+        maxUsedDelta = maxUsedDelta,
         offAge = H.ReadNumber(item, scriptItem, { "getOffAge" }),
         offAgeMax = H.ReadNumber(item, scriptItem, { "getOffAgeMax" }),
         replaceOnRotten = H.ReadString(
             item, scriptItem, { "getReplaceOnRotten" }
+        ),
+        replaceOnUse = H.ReadString(
+            item, scriptItem, { "getReplaceOnUse" }
+        ),
+        replaceOnDeplete = H.ReadString(
+            item, scriptItem, { "getReplaceOnDeplete" }
         ),
         food = typeString == "food" or hungerChange < 0
             or H.HasAny(tags, { "food", "edible" }),

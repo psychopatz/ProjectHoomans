@@ -125,13 +125,22 @@ function Inventory.ApplyDelta(record, ops, reason)
     local inv = Inventory.EnsureRecordInventory(record, {
         reconcileWaterContainer = false,
     })
+    local snapshot = PNC.Core and PNC.Core.DeepCopy
+        and PNC.Core.DeepCopy(inv) or nil
     local appliedOps = {}
     local applied
     local i
     if type(ops) ~= "table" then return false, {} end
     for i = 1, #ops do
         applied = applyInventoryOperation(record, inv, ops[i])
-        if applied then appliedOps[#appliedOps + 1] = applied end
+        if not applied then
+            if snapshot then
+                record.inventory = snapshot
+                Inventory.RebuildCaches(record)
+            end
+            return false, appliedOps
+        end
+        appliedOps[#appliedOps + 1] = applied
     end
     if #appliedOps <= 0 then return false, {} end
     Internal.bumpRevision(record, appliedOps, reason)

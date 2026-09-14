@@ -8,6 +8,8 @@ local Effects = PNC.NeedFacilityEffects
 local afterDelay
 local WORLD_WATER_RETRY_COOLDOWN_MS = 5000
 local WATER_REFILL_RETRY_COOLDOWN_MS = 5000
+local Events = require "PsychopatzCore/Events/PC_EventBus"
+local EventTypes = require "PNC/Core/Events/PNC_EventDefinitions"
 
 local function resolveActivityOwner(record)
     local core = PNC.Core
@@ -231,6 +233,23 @@ local function applyWaterRefill(record, state, definition, now)
         return false, true, reason
     end
     state.effectAttempted = true
+    -- The physical refill is the commit point for the combined action. Clear
+    -- thirst only after the bottle and source have both been committed, then
+    -- publish a distinct journal event so this automatic drinking is not
+    -- confused with consuming the bottle itself.
+    local needs = PNC.IndividualNeeds
+    local thirstBefore = needs and needs.Get
+        and tonumber(needs.Get(record, "thirst")) or nil
+    if needs and needs.Set then
+        local cleared = needs.Set(record, "thirst", 0,
+            "water_refill_drink")
+        if cleared ~= nil then
+            Events.emit(EventTypes.NPC_WATER_REFILL_DRANK, record,
+                tostring(state.activityItemFullType
+                    or state.activityItemID or ""), thirstBefore or 0,
+                tonumber(filled) or 0, tostring(state.resourceKey or ""))
+        end
+    end
     return true, true, "WATER_REFILL_COMPLETE", filled
 end
 

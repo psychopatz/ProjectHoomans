@@ -175,6 +175,56 @@ function Needs.Modify(record, needType, amount, reason)
     return Needs.Set(record, needType, (Needs.Get(record, needType) or 0) + (tonumber(amount) or 0), reason)
 end
 
+function Needs.GetHungerOverflow(record)
+    local repositoryState = Needs.GetState(record)
+    return repositoryState and math.max(0,
+        tonumber(repositoryState.hungerOverflow) or 0) or 0
+end
+
+function Needs.ApplyHungerRelief(record, amount, reason)
+    local repositoryState = Needs.GetState(record)
+    local before
+    local visibleRelief
+    local overflow
+    local maximum
+    if not repositoryState then return nil, "repository_unavailable" end
+    amount = math.max(0, tonumber(amount) or 0)
+    before = math.max(0, tonumber(Needs.Get(record, "hunger")) or 0)
+    visibleRelief = math.min(before, amount)
+    if visibleRelief > 0 then
+        Needs.Set(record, "hunger", before - visibleRelief, reason)
+    end
+    overflow = amount - visibleRelief
+    if overflow > 0 then
+        maximum = tonumber(Definitions.HUNGER_OVERFLOW
+            and Definitions.HUNGER_OVERFLOW.maximum) or 4.0
+        repositoryState.hungerOverflow = math.max(0, math.min(maximum,
+            (tonumber(repositoryState.hungerOverflow) or 0) + overflow))
+        if PNC.NeedsRepository then PNC.NeedsRepository.MarkDirty() end
+    end
+    return Needs.Get(record, "hunger"), overflow
+end
+
+function Needs.IncreaseHunger(record, amount, reason)
+    local repositoryState = Needs.GetState(record)
+    local reserve
+    local consumed
+    local remaining
+    if not repositoryState then return nil, "repository_unavailable" end
+    amount = math.max(0, tonumber(amount) or 0)
+    reserve = math.max(0, tonumber(repositoryState.hungerOverflow) or 0)
+    consumed = math.min(reserve, amount)
+    if consumed > 0 then
+        repositoryState.hungerOverflow = reserve - consumed
+        if PNC.NeedsRepository then PNC.NeedsRepository.MarkDirty() end
+    end
+    remaining = amount - consumed
+    if remaining > 0 then
+        return Needs.Modify(record, "hunger", remaining, reason)
+    end
+    return Needs.Get(record, "hunger")
+end
+
 function Needs.GetLevel(record, needType)
     return Definitions.GetLevel(needType, Needs.Get(record, needType) or 0)
 end

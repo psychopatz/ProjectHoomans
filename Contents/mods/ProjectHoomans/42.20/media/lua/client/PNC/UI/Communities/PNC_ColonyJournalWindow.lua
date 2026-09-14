@@ -19,9 +19,11 @@ local RadioImageAnimation = PsychopatzCore.RadioImageAnimation
 local Options = require "PsychopatzCore/UI/PsychopatzCommandHubOptions"
 local WidgetWindow = UI.WidgetWindow
 
-local function tr(key, fallback)
-    local value = getText and getText(key) or nil
-    return value and value ~= "" and value ~= key and value or fallback
+local function tr(key, fallback, ...)
+    local value = getText and getText(key, ...) or nil
+    if value and value ~= "" and value ~= key then return value end
+    if select("#", ...) > 0 then return string.format(fallback, ...) end
+    return fallback
 end
 
 local function state()
@@ -79,9 +81,23 @@ end
 local function npcMessage(code, args)
     code = tonumber(code) or 0
     if code == 3 then
+        if tonumber(args[3]) and tonumber(args[3]) > 0.000001 then
+            return tr("UI_PNC_Journal_ConsumableDual",
+                "Consumed %s (+%s%% hunger, +%s%% thirst relief)",
+                itemName(args[1]),
+                tostring(math.floor((tonumber(args[2]) or 0) * 100 + 0.5)),
+                tostring(math.floor((tonumber(args[3]) or 0) * 100 + 0.5)))
+        end
         return string.format("Ate %s (+%s%%)", itemName(args[1]),
             tostring(math.floor((tonumber(args[2]) or 0) * 100 + 0.5)))
     elseif code == 4 then
+        if tonumber(args[3]) and tonumber(args[3]) > 0.000001 then
+            return tr("UI_PNC_Journal_ConsumableDual",
+                "Consumed %s (+%s%% hunger, +%s%% thirst relief)",
+                itemName(args[1]),
+                tostring(math.floor((tonumber(args[3]) or 0) * 100 + 0.5)),
+                tostring(math.floor((tonumber(args[2]) or 0) * 100 + 0.5)))
+        end
         return string.format("Drank %s (+%s%%)", itemName(args[1]),
             tostring(math.floor((tonumber(args[2]) or 0) * 100 + 0.5)))
     elseif code == 5 then
@@ -100,6 +116,12 @@ local function npcMessage(code, args)
     elseif code == 9 then
         return string.format("Wounded: %s on %s (%s damage)",
             humanize(args[2]), humanize(args[1]), tostring(args[3] or "?"))
+    elseif code == 10 then
+        return string.format("Filled %s (+%s L)", itemName(args[1]),
+            string.format("%.2f", tonumber(args[2]) or 0))
+    elseif code == 11 then
+        return string.format("Drank from filled %s (thirst cleared)",
+            itemName(args[1]))
     end
     return "Recorded event: " .. humanize(Protocol.EventType(code) or "unknown")
 end

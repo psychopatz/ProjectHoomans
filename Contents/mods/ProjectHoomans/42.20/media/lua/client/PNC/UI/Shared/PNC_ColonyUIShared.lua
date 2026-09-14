@@ -18,6 +18,30 @@ Shared.NEED_LABEL_KEYS = {
     thirst = "UI_PNC_Need_Thirst",
     fatigue = "UI_PNC_Need_Fatigue",
 }
+Shared.ROSTER_ICON_PATHS = {
+    hunger = "media/ui/Moodles/32/Status_Hunger.png",
+    thirst = "media/ui/Moodles/32/Status_Thirst.png",
+    fatigue = "media/ui/Moodles/32/Mood_Exhausted.png",
+    bleeding = "media/ui/Moodles/32/Status_Bleeding.png",
+    pained = "media/ui/Moodles/32/Mood_Pained.png",
+    critical = "media/ui/Moodles/32/Mood_Angry.png",
+}
+Shared.ROSTER_ICON_TOOLTIP_KEYS = {
+    hunger = "UI_PNC_Roster_Tooltip_Hunger",
+    thirst = "UI_PNC_Roster_Tooltip_Thirst",
+    fatigue = "UI_PNC_Roster_Tooltip_Fatigue",
+    bleeding = "UI_PNC_Roster_Tooltip_Bleeding",
+    pained = "UI_PNC_Roster_Tooltip_Pained",
+    critical = "UI_PNC_Roster_Tooltip_Critical",
+}
+Shared.ROSTER_ICON_TOOLTIP_FALLBACKS = {
+    hunger = "This colonist is hungry and needs food.",
+    thirst = "This colonist is thirsty and needs water.",
+    fatigue = "This colonist is tired and needs rest.",
+    bleeding = "This colonist has an untreated wound and is bleeding.",
+    pained = "This colonist has a bandaged wound and is still recovering.",
+    critical = "This colonist has a critical need that requires immediate attention.",
+}
 Shared.CONDITION_LABEL_KEYS = {
     stress = "UI_PNC_Stat_Stress",
     boredom = "UI_PNC_Stat_Boredom",
@@ -156,6 +180,40 @@ function Shared.WorstNeed(person)
         end
     end
     return Shared.LEVELS[worstIndex], worstType
+end
+
+function Shared.RosterIndicators(person)
+    local indicators = {}
+    local critical = false
+    local function add(id)
+        indicators[#indicators + 1] = {
+            id = id,
+            texturePath = Shared.ROSTER_ICON_PATHS[id],
+            tooltip = Shared.Tr(Shared.ROSTER_ICON_TOOLTIP_KEYS[id],
+                Shared.ROSTER_ICON_TOOLTIP_FALLBACKS[id]),
+        }
+    end
+
+    person = person or {}
+    local needs = person.needs or {}
+    for _, needType in ipairs(Shared.NEED_TYPES) do
+        local level = Shared.NeedLevel(needType, needs[needType])
+        if level ~= "NORMAL" then add(needType) end
+        if level == "CRITICAL" then critical = true end
+    end
+
+    local medical = person.medicalStatus or {}
+    local openWoundCount = tonumber(medical.openWoundCount) or 0
+    local bandagedWoundCount = tonumber(medical.bandagedWoundCount) or 0
+    local bleeding = medical.bleeding == true
+        or (tonumber(medical.bleedingRate) or 0) > 0
+    if openWoundCount > 0 or bleeding then
+        add("bleeding")
+    elseif bandagedWoundCount > 0 then
+        add("pained")
+    end
+    if critical then add("critical") end
+    return indicators
 end
 
 return Shared

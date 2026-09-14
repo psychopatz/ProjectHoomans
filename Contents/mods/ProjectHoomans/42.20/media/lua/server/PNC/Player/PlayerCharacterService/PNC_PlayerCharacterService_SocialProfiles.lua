@@ -72,23 +72,6 @@ function PlayerCharacters.ApplyStartingCompanionState(characterUUID, value)
     return true, "updated", copy(normalized)
 end
 
-
--- Version 5 compatibility for external integrations that still submit one
--- grant. New code should commit the complete state atomically.
-function PlayerCharacters.ApplyStartingCompanionGrant(characterUUID, value)
-    local record = PlayerCharacters.GetRegistryRecord(characterUUID)
-    local state = Types.NormalizeStartingCompanionState(
-        record and record.startingCompanions
-    )
-    local grant = Types.NormalizeStartingCompanionGrant(value)
-    if not grant then return false, "invalid_grant" end
-    state.resolved = true
-    if grant.status ~= "none" and grant.traitID then
-        state.grants[grant.traitID] = grant
-    end
-    return PlayerCharacters.ApplyStartingCompanionState(characterUUID, state)
-end
-
 -- Internal conduct commit boundary. The conduct service performs evidence
 -- validation and revision calculation; this method owns character/registry
 -- revision updates.

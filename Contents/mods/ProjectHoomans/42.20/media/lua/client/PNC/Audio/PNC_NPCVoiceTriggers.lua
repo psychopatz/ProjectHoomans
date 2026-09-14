@@ -270,12 +270,8 @@ local function resolveTriggerRule(snapshot)
 end
 
 local function identityVoiceSeed(snapshot, body)
-    local identity = snapshot and snapshot.identity or nil
     local seed = snapshot and snapshot.identitySeed or nil
     local fallback
-    if seed == nil and identity then
-        seed = identity.seed
-    end
     fallback = snapshot and snapshot.id or nil
     if fallback == nil and body and body.getModData then
         local ok, modData = pcall(body.getModData, body)

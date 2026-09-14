@@ -11,7 +11,7 @@ function H.IntroductionText(npcID)
     if not record then return nil end
     local identity = PNC.Identity and PNC.Identity.GetCharacterSummary
         and PNC.Identity.GetCharacterSummary(record) or {}
-    local name = identity.displayName or record.name
+    local name = identity.displayName
     if not name then return nil end
     return "I'm " .. tostring(name) .. "."
 end

@@ -90,9 +90,14 @@ local function currentActivity(person)
         local phase = tostring(info.phase or "")
         return phase ~= "" and label .. " (" .. phase .. ")" or label
     end
-    local label = info.labelKey
-        and Shared.Tr(info.labelKey, info.fallback)
-        or Shared.Text(info.fallback or info.activityId, "IDLE")
+    local label
+    if tostring(info.activityConsumptionMode or "") == "dual" then
+        label = Shared.Tr("UI_PNC_Activity_Consuming", "CONSUMING")
+    else
+        label = info.labelKey
+            and Shared.Tr(info.labelKey, info.fallback)
+            or Shared.Text(info.fallback or info.activityId, "IDLE")
+    end
     local item = itemName(info)
     if not item and info.activityItemLabelKey then
         local fallback = (info.resourceKind == "world_water"

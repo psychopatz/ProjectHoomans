@@ -1,7 +1,6 @@
 -- The only client-side presentation gateway for NPC identity. Gameplay UI
--- must never read snapshot.name/displayName directly: those fields exist for
--- transport and diagnostics, while this module enforces what the player has
--- actually learned.
+-- owns the client-side presentation of the canonical displayName transport
+-- field while enforcing what the player has actually learned.
 
 PNC = PNC or {}
 PNC.NPCIdentityPresentation = PNC.NPCIdentityPresentation or {}
@@ -145,13 +144,12 @@ end
 function Identity.GetDebugName(npc, fallback)
     local source = sourceFor(npc)
     if type(source) == "table" then
-        return tostring(source.displayName or source.name
-            or fallback or Identity.UnknownName)
+        return tostring(source.displayName or fallback or Identity.UnknownName)
     end
     local id = normalizeID(npc)
     local state = clientState()
     local snapshot = id and state and state.snapshots and state.snapshots[id] or nil
-    return tostring(snapshot and (snapshot.displayName or snapshot.name) or fallback or Identity.UnknownName)
+    return tostring(snapshot and snapshot.displayName or fallback or Identity.UnknownName)
 end
 
 return Identity

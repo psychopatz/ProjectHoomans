@@ -124,7 +124,7 @@ local function normalizedSelection(raw)
             seen[id] = true
             output[#output + 1] = {
                 id = id,
-                name = Identity.GetName(source),
+                displayName = Identity.GetName(source),
                 x = tonumber(source.x),
                 y = tonumber(source.y),
                 z = tonumber(source.z) or 0,
@@ -136,7 +136,7 @@ end
 
 local function selectionLabel()
     if #Commands.Selection == 1 then
-        return Commands.Selection[1].name
+        return Commands.Selection[1].displayName
     end
     return tostring(#Commands.Selection) .. " NPCs"
 end

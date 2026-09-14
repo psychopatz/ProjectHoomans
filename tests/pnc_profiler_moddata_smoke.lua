@@ -6,14 +6,14 @@ local now = 1000
 getTimeInMillis = function() return now end
 local stores = {
     PNC_Core_Global = { records = { secret_dynamic_identifier_abcdefghijklmnopqrstuvwxyz = { revision = 2 } } },
-    PNC_NPC_secret_dynamic_identifier_abcdefghijklmnopqrstuvwxyz = {
+    PNC_npc_secret_dynamic_identifier_abcdefghijklmnopqrstuvwxyz = {
         identity = { name = "redacted value" },
         inventory = { items = { item_123 = { fullType = "Base.Axe", modData = { custom = "large" } } } },
     },
     OtherMod_Data = { shouldNotAppear = true },
 }
 ModData = {
-    getTableNames = function() return { "PNC_Core_Global", "PNC_NPC_secret_dynamic_identifier_abcdefghijklmnopqrstuvwxyz", "OtherMod_Data" } end,
+    getTableNames = function() return { "PNC_Core_Global", "PNC_npc_secret_dynamic_identifier_abcdefghijklmnopqrstuvwxyz", "OtherMod_Data" } end,
     get = function(name) return stores[name] end,
 }
 
@@ -30,7 +30,7 @@ Profiler.Start("DETAILED", {
 
 PNC = {
     Registry = {
-        StorageKeyForID = function() return "PNC_NPC_secret_dynamic_identifier_abcdefghijklmnopqrstuvwxyz" end,
+        StorageKeyForID = function() return "PNC_npc_secret_dynamic_identifier_abcdefghijklmnopqrstuvwxyz" end,
         Data = {
             npc_one = {
                 name = "Alex Morgan",

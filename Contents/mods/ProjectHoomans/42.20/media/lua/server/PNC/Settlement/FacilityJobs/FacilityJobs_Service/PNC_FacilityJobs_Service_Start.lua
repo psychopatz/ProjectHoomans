@@ -51,6 +51,7 @@ function Jobs.Start(record, facilityOrId, capability, options)
     capability = tostring(capability or H.DefinitionCapability(facility) or "")
     local definition = PNC.FacilityJobDefinitions.Get(capability)
     local activityItemFullType
+    local activityConsumptionMode
     if not record or record.alive == false then return false, "NPC_UNAVAILABLE" end
     if not base and options.nearby == true then
         base = { id = tostring(facility.baseId or "nearby") }
@@ -59,6 +60,9 @@ function Jobs.Start(record, facilityOrId, capability, options)
     if not definition then return false, "FACILITY_HAS_NO_ACTIVITY" end
     activityItemFullType = H.ResolveFoodItemFullType(
         record, capability, options)
+    activityConsumptionMode = H.ResolveActivityConsumptionMode
+        and H.ResolveActivityConsumptionMode(record, capability, options)
+        or nil
     if record.runtime and record.runtime.facilityActivity then
         local stopped, stopReason = H.StopExistingActivity(
             record, "activity_replaced")
@@ -193,6 +197,7 @@ function Jobs.Start(record, facilityOrId, capability, options)
             options.resourceRadius or acquired.resourceRadius),
         activityItemID = tostring(options.activityItemID or ""),
         activityItemFullType = activityItemFullType,
+        activityConsumptionMode = activityConsumptionMode,
         resource = resource,
         approachCandidates = approachCandidates,
         approachIndex = 1,
@@ -287,6 +292,7 @@ function Jobs.Start(record, facilityOrId, capability, options)
         resourceRadius = tonumber(
             options.resourceRadius or acquired.resourceRadius),
         activityItemFullType = activityItemFullType,
+        activityConsumptionMode = activityConsumptionMode,
     })
     -- Keep the normalized executor order beside the activity lease. Passive
     -- mobile-group repair may rewrite record.orderSpec, but it must not make

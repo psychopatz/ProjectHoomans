@@ -24,9 +24,16 @@ function H.SafeID(value)
     return string.gsub(value, "[^%w_%-]", "_")
 end
 
-function H.MakeNPCID(characterUUID, traitID)
-    return "pnc_starting_" .. tostring(characterUUID)
-        .. "_" .. H.SafeID(traitID)
+function H.MakeNPCSeedID(characterUUID, traitID)
+    return "starting:" .. tostring(characterUUID)
+        .. ":" .. H.SafeID(traitID)
+end
+
+function H.MakeNPCID(characterUUID, traitID, identity)
+    if not Identity.GenerateNPCID or not identity then return nil end
+    return Identity.GenerateNPCID(
+        identity, H.MakeNPCSeedID(characterUUID, traitID)
+    )
 end
 
 function H.SharesSurname(spec)

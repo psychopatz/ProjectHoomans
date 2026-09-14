@@ -38,7 +38,7 @@ local function normalizeTargets(context)
     if type(context) ~= "table" then return {} end
     if type(context.targets) == "table" then return context.targets end
     if context.target then return { context.target } end
-    if context.id or context.name or context.displayName
+    if context.id or context.displayName
         or context.source
     then
         return { context }

@@ -260,6 +260,87 @@ record.runtime.facilityActivity = {
     activityItemID = "can",
     manual = false,
 }
+
+-- A successful facility refill is also the NPC's drink action. The logical
+-- need update and its journal event must happen once, after the physical
+-- transaction commits.
+destinationContainer:adjustAmount(0)
+record.inventory.items.can.itemState = {
+    fluidAmount = 0, fluidCapacity = 1, fluidPrimaryType = nil,
+    fluids = {},
+}
+sourceAmount = 2
+local thirst = 0.60
+local thirstSetCount = 0
+local autoDrinkEvent
+local autoDrinkEventCount = 0
+PNC.IndividualNeeds = {
+    Get = function(_, needType)
+        return needType == "thirst" and thirst or nil
+    end,
+    Set = function(_, needType, value)
+        if needType ~= "thirst" then return nil, "invalid_need" end
+        thirst = tonumber(value) or 0
+        thirstSetCount = thirstSetCount + 1
+        return thirst
+    end,
+}
+Events.subscribe(EventTypes.NPC_WATER_REFILL_DRANK, function(receivedRecord,
+        fullType, thirstBefore, amount, sourceKey)
+    autoDrinkEventCount = autoDrinkEventCount + 1
+    autoDrinkEvent = {
+        record = receivedRecord, fullType = fullType,
+        thirstBefore = thirstBefore, amount = amount, sourceKey = sourceKey,
+    }
+end, "tests.water_refill_drink")
+local successfulEffectState = {
+    effectReadyAt = 0,
+    effectAttempted = false,
+    activityItemID = "can",
+    activityItemFullType = "Base.EmptyCan",
+    resource = source,
+    resourceKey = source.key,
+}
+local successfulEffectOK, successfulEffectComplete, successfulEffectReason,
+    successfulEffectAmount =
+    NeedFacilityEffects.Tick(record, successfulEffectState, {
+        needEffect = "water_refill",
+        effectDelayMs = 0,
+    }, 0, 1)
+T.truthy(successfulEffectOK, "successful refill effect reports success")
+T.truthy(successfulEffectComplete, "successful refill effect completes once")
+T.equal(successfulEffectReason, "WATER_REFILL_COMPLETE",
+    "successful refill effect preserves the completion reason")
+T.equal(successfulEffectAmount, 1,
+    "successful refill effect reports committed liters")
+T.equal(thirst, 0, "successful refill clears the NPC thirst need")
+T.equal(thirstSetCount, 1, "successful refill clears thirst exactly once")
+T.equal(autoDrinkEventCount, 1,
+    "successful refill emits one combined refill-drink event")
+T.equal(autoDrinkEvent.record, record,
+    "combined refill-drink event targets the refilled NPC")
+T.equal(autoDrinkEvent.fullType, "Base.EmptyCan",
+    "combined refill-drink event stores the container type")
+T.equal(autoDrinkEvent.thirstBefore, 0.60,
+    "combined refill-drink event stores thirst before clearing")
+T.equal(autoDrinkEvent.amount, 1,
+    "combined refill-drink event stores the committed fill amount")
+T.equal(autoDrinkEvent.sourceKey, source.key,
+    "combined refill-drink event stores the source identity")
+T.equal(sourceAmount, 1,
+    "successful refill effect debits the source once")
+local repeatOK, repeatComplete = NeedFacilityEffects.Tick(record,
+    successfulEffectState, { needEffect = "water_refill", effectDelayMs = 0 },
+    0, 2)
+T.truthy(repeatOK, "completed refill effect remains safely acknowledged")
+T.falsy(repeatComplete, "completed refill effect is not applied twice")
+T.equal(thirstSetCount, 1,
+    "completed refill effect does not clear thirst a second time")
+T.equal(autoDrinkEventCount, 1,
+    "completed refill effect does not journal a second drink")
+
+-- The later full-container rejection remains a physical failure and must not
+-- clear thirst or emit the combined drink event.
 local effectOK, effectComplete, effectReason = NeedFacilityEffects.Tick(record, {
     effectReadyAt = 0,
     effectAttempted = false,
@@ -271,6 +352,10 @@ T.falsy(effectOK, "effect boundary reports failed refill")
 T.truthy(effectComplete, "failed refill requests scene completion")
 T.equal(effectReason, "WATER_CONTAINER_FULL",
     "effect boundary preserves transaction failure reason")
+T.equal(thirstSetCount, 1,
+    "failed refill does not clear the NPC thirst need")
+T.equal(autoDrinkEventCount, 1,
+    "failed refill does not emit the combined drink event")
 
 -- If source consumption fails after destination mutation, both sides roll
 -- back and no journal event is emitted.
@@ -290,6 +375,7 @@ PNC.NearbyWaterService.Consume = function(_, _, liters)
 end
 local compactBeforeRollback = Inventory.ResolveItemState(
     record.inventory.items.can).fluidAmount
+local eventsBeforeRollback = refillEventCount
 ok, reason = Service.Refill(record, "can", source)
 PNC.NearbyWaterService.Consume = originalConsume
 T.falsy(ok, "a failed source transaction is rejected")
@@ -301,7 +387,7 @@ T.near(destinationContainer:getAmount(), 0.25, 0.000001,
 T.equal(Inventory.ResolveItemState(record.inventory.items.can).fluidAmount,
     compactBeforeRollback,
     "failed source consumption rolls compact inventory back")
-T.equal(refillEventCount, eventsBeforeFull,
+T.equal(refillEventCount, eventsBeforeRollback,
     "failed source consumption emits no success journal event")
 T.truthy(string.find(refillLogs[#refillLogs],
     "destinationPhysicalRollback=true", 1, true),

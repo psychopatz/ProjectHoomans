@@ -90,6 +90,13 @@ PNC = {
             return true, "Base.Apple", "drink:1"
         end,
     },
+    ItemUtility = {
+        DescribeNPCItem = function(item)
+            if item and item.type == "Base.Apple" then
+                return { hunger = 0.20, thirst = 0.10, fluidSafe = true }
+            end
+        end,
+    },
     OrderSystem = {
         SetOrder = function(record, order) record.orderSpec = order end,
     },
@@ -115,6 +122,10 @@ local record = {
     orderSpec = { kind = "follow", ownerUsername = "alice" },
     runtime = {},
     needs = { hunger = 0.8 },
+    inventory = { items = {
+        ["food:1"] = { id = "food:1", type = "Base.Apple" },
+        ["drink:1"] = { id = "drink:1", type = "Base.Apple" },
+    } },
 }
 
 local originalStop = function(target, reason)
@@ -166,6 +177,8 @@ T.equal(record.runtime.facilityActivity.activityItemFullType,
     "Base.Apple", "manual eating preserves the selected item type")
 T.equal(record.runtime.facilityActivity.activityItemID, "food:1",
     "manual eating preserves the exact selected item ID")
+T.equal(record.runtime.facilityActivity.activityConsumptionMode, "dual",
+    "facility activity records the selected item's dual-purpose mode")
 T.equal(acquiredCount, 2, "only sleep starts reserve a home activity")
 T.truthy(#stopped >= 1, "manual stop path was exercised")
 

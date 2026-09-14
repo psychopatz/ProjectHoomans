@@ -200,21 +200,25 @@ T.equal(defaultRecord.conduct.scores.reliability, 0,
     "new character conduct neutral")
 T.equal(#defaultRecord.conduct.evidence, 0,
     "new character has no conduct evidence")
-local promotedGrant = IdentityTypes.NewCharacterRecord({
-    uuid = "char_old_starting_grant",
+local startingCompanionRecord = IdentityTypes.NewCharacterRecord({
+    uuid = "char_starting_grant",
     accountIdentity = "Account",
-    startingCompanion = {
-        status = "granted",
-        traitID = "PNC_HasBrother",
-        relationshipKind = "brother",
-        npcID = "pnc_starting_char_old_starting_grant",
+    startingCompanions = {
+        resolved = true,
+        grants = {
+            PNC_HasBrother = {
+                status = "granted",
+                traitID = "PNC_HasBrother",
+                relationshipKind = "brother",
+                npcID = "npcCaseyRandom_0001",
+            },
+        },
     },
 })
-T.truthy(promotedGrant.startingCompanions.resolved,
-    "version five starting grant promoted to resolved collection")
-T.equal(promotedGrant.startingCompanions.grants.PNC_HasBrother.npcID,
-    "pnc_starting_char_old_starting_grant",
-    "version five companion identity preserved")
+T.truthy(startingCompanionRecord.startingCompanions.resolved,
+    "starting companion collection remains resolved")
+T.equal(startingCompanionRecord.startingCompanions.grants.PNC_HasBrother.npcID,
+    "npcCaseyRandom_0001", "starting companion identity preserved")
 
 Service.Load()
 local originalGenerator = Service.UUIDGenerator

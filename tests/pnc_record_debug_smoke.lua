@@ -147,8 +147,8 @@ PNC.ContextHub.RegisterProvider({
 })
 
 entries = {
-    { id = "npc_one", name = "Nigel Hidalgo", archetypeLabel = "Foreman", tacticalClass = "neutral", activeBehavior = "FollowOwner", distSq = 1 },
-    { id = "npc_two", name = "Dario Hanna", archetypeLabel = "Foreman", tacticalClass = "hostile", distSq = 4 },
+    { id = "npc_one", displayName = "Nigel Hidalgo", archetypeLabel = "Foreman", tacticalClass = "neutral", activeBehavior = "FollowOwner", distSq = 1 },
+    { id = "npc_two", displayName = "Dario Hanna", archetypeLabel = "Foreman", tacticalClass = "hostile", distSq = 4 },
 }
 local menu = newMenu()
 PNC.ContextHub.BuildWorldContext(0, menu, {}, false)

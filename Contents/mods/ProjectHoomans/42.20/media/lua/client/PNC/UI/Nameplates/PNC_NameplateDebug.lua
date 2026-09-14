@@ -508,7 +508,7 @@ function Debug.DescribeSnapshot(snapshot)
     local firearm = snapshot.firearmState or nil
     return table.concat({
         "id=" .. tostring(snapshot.id),
-        "name=" .. tostring(snapshot.name),
+        "name=" .. tostring(snapshot.displayName),
         "archetype=" .. tostring(snapshot.archetypeLabel or "-"),
         "ai=" .. tostring(snapshot.aiState),
         "job=" .. tostring(snapshot.debugState and snapshot.debugState.activeJob or "-"),

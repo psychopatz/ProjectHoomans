@@ -4,7 +4,6 @@ PNC.ContextHub = PNC.ContextHub or {}
 local ContextHub = PNC.ContextHub
 local Const = PNC.Const
 local ClientState = PNC.Network.ClientState
-local FirearmAnchor = PNC.NameplateFirearmAnchor
 
 local Provider = {
     id = "debug",
@@ -76,95 +75,18 @@ function Provider.addOptions(menu, entry, player, contextData)
             or tostring(snapshot and snapshot.aiState or "No snapshot")
         print("[PNC] " .. snapshotText)
     end)
-    local firearmAnchorOption = menu:addOption(
-        "Debug: Firearm Anchor Probe",
-        nil,
-        function()
-            local selectedPlayerIndex = contextData and contextData.playerNum or nil
-            if player and type(player.getPlayerNum) == "function" then
-                selectedPlayerIndex = player:getPlayerNum()
-            end
-            if FirearmAnchor and FirearmAnchor.ToggleTarget then
-                FirearmAnchor.ToggleTarget(
-                    entry.zombie,
-                    entry.id,
-                    selectedPlayerIndex
-                )
-            end
-        end
-    )
-    firearmAnchorOption.notAvailable = not (
-        FirearmAnchor
-        and FirearmAnchor.ToggleTarget
-        and entry.zombie
-    )
-    local inspectorOption = menu:addOption(
-        "Debug: NPC Coordinate Inspector",
-        nil,
-        function()
-            local selectedPlayerIndex = contextData and contextData.playerNum or nil
-            local Inspector = PNC.NPCCoordinateDebugUI
-            if player and type(player.getPlayerNum) == "function" then
-                selectedPlayerIndex = player:getPlayerNum()
-            end
-            if not Inspector and require then
-                require "PNC/UI/Nameplates/PNC_NPCCoordinateDebugWindow"
-                Inspector = PNC.NPCCoordinateDebugUI
-            end
-            if Inspector and Inspector.Open then
-                Inspector.Open(entry.zombie, entry.id, selectedPlayerIndex)
-            end
-        end
-    )
-    inspectorOption.notAvailable = not entry.zombie
-    local firearmEffects = PNC.ClientFirearmEffects
-    local simulationActive = firearmEffects
-        and firearmEffects.IsSimulationActive
-        and firearmEffects.IsSimulationActive(entry.zombie, entry.id)
-        or false
-    local firearmSimulationOption = menu:addOption(
-        simulationActive
-            and "Debug: Stop Firearm Simulation"
-            or "Debug: Start Firearm Simulation",
-        nil,
-        function()
-            local selectedPlayerIndex = contextData and contextData.playerNum or nil
-            local Effects = PNC.ClientFirearmEffects
-            if player and type(player.getPlayerNum) == "function" then
-                selectedPlayerIndex = player:getPlayerNum()
-            end
-            if not Provider.isEnabled() or not entry.zombie then return end
-            if FirearmAnchor and FirearmAnchor.SetTarget then
-                FirearmAnchor.SetTarget(
-                    entry.zombie,
-                    entry.id,
-                    selectedPlayerIndex
-                )
-            end
-            if Effects and Effects.ToggleSimulation then
-                Effects.ToggleSimulation(
-                    entry.zombie,
-                    entry.id,
-                    selectedPlayerIndex
-                )
-            end
-        end
-    )
-    firearmSimulationOption.notAvailable = not (
-        entry.zombie
-        and PNC.ClientFirearmEffects
-        and PNC.ClientFirearmEffects.ToggleSimulation
-    )
-    menu:addOption("Animation Debug Player", nil, function()
+    menu:addOption("NPC Presentation Lab", nil, function()
         -- Keep the 511-node generated catalog and its UI out of the normal
         -- client startup path. Debuggers pay this load cost only on first use.
-        if not PNC.AnimationDebugWindow then
-            require "PNC/UI/PNC_AnimationDebugWindow"
-        end
-        if PNC.AnimationDebugWindow
-            and PNC.AnimationDebugWindow.Open
+        if not PNC.NPCPresentationDebug
+            or not PNC.NPCPresentationDebug.Open
         then
-            PNC.AnimationDebugWindow.Open(entry)
+            require "PNC/UI/NPCPresentationDebug/PNC_NPCPresentationDebug"
+        end
+        if PNC.NPCPresentationDebug
+            and PNC.NPCPresentationDebug.Open
+        then
+            PNC.NPCPresentationDebug.Open(entry)
         end
     end)
     menu:addOption("Animation Scene Lab", nil, function()

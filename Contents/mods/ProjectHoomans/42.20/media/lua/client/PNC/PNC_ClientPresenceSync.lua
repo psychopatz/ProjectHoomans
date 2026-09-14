@@ -29,6 +29,7 @@ Sync.lastRemoteSnapshotStatePruneAt =
 
 require "PNC/PresenceSync/PNC_ClientPresenceRuntime"
 require "PNC/PresenceSync/PNC_ClientPresenceFacing"
+require "PNC/ActionProps/PNC_ClientActionProps"
 require "PNC/PresenceSync/PresenceVisuals/PNC_ClientPresenceVisuals"
 require "PNC/PresenceSync/PNC_ClientPresenceBodies"
 require "PNC/PresenceSync/ClientNativePathController/PNC_ClientNativePathController"

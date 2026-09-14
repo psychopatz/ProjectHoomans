@@ -83,6 +83,7 @@ local eating = Status.Build({
             capability = "survival.eat.inventory",
             phase = "STARTING",
             activityItemID = "food-1",
+            activityConsumptionMode = "dual",
         },
         supply = {
             byKind = {
@@ -97,6 +98,8 @@ T.equal(eating.activityItemID, "food-1",
     "food activity preserves the exact selected item")
 T.equal(eating.activityItemLabelKey, "UI_PNC_Action_FoodTarget",
     "food activity exposes its item fallback")
+T.equal(eating.activityConsumptionMode, "dual",
+    "activity preserves dual-purpose consumable metadata")
 
 local eatingCandidate = Status.Build({
     alive = true,

@@ -311,7 +311,7 @@ end
 
 function Shared.GetIdentity(snapshot, payload)
     local resolved = Shared.GetSnapshot(snapshot, payload)
-    return payload and payload.identity or resolved.identity or {}
+    return resolved.identity or {}
 end
 
 function Shared.GetEquipment(snapshot, payload)

@@ -57,7 +57,14 @@ local snapshot = {
 local roster = Presentation.BuildRoster(snapshot)
 T.equal(#roster, 1, "roster row count")
 T.equal(roster[1].id, "npc_1", "roster preserves selection identity")
-T.equal(roster[1].worstLevel, "CRITICAL", "worst need badge")
+T.equal(roster[1].detail, "working", "roster keeps only the activity detail")
+T.falsy(roster[1].detail:find("resident", 1, true),
+    "roster does not repeat the colonist role")
+T.equal(roster[1].indicators[1].id, "thirst",
+    "critical need keeps its need icon")
+T.equal(roster[1].indicators[2].id, "critical",
+    "critical need adds the angry icon")
+T.falsy(roster[1].worstLevel, "roster no longer exposes a severity badge")
 
 local selectedRoster = {
     getItem = function() return { item = roster[1] } end,

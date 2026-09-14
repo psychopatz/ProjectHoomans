@@ -210,6 +210,97 @@ T.truthy(
     "runtime must not index strict AdvancedAnimator userdata"
 )
 player.Stop("done")
-T.finish("pnc_animation_debug_player_smoke")
+
+-- Build 42 model playback uses AnimationPlayer tracks. Verify the debugger
+-- owns a native track and freezes its final frame instead of relying on the
+-- legacy PlayAnim* stubs.
+local nativeTrack = {
+    time = 0,
+    duration = 1.25,
+    isPlaying = true,
+}
+function nativeTrack:getDuration() return self.duration end
+function nativeTrack:getCurrentTimeValue() return self.time end
+function nativeTrack:setCurrentTimeValue(value) self.time = value end
+function nativeTrack:setPreviousTimeValue(value) self.previous = value end
+function nativeTrack:isFinished() return self.time >= self.duration end
+function nativeTrack:setBlendWeight(value) self.blendWeight = value end
+function nativeTrack:setSpeedDelta(value) self.speed = value end
+function nativeTrack:reset() self.currentClip = nil end
+local nativeMultiTrack = {}
+function nativeMultiTrack:removeTrack(track)
+    self.removed = track
+end
+local nativePlayer = {}
+function nativePlayer:play(clip, looped)
+    self.clip = clip
+    self.looped = looped
+    return nativeTrack
+end
+function nativePlayer:getMultiTrack() return nativeMultiTrack end
+local nativeBody = {}
+for key, value in pairs(body) do nativeBody[key] = value end
+nativeBody.getModData = function() return { PNC_UUID = "npc-1" } end
+nativeBody.getAnimationPlayer = function() return nativePlayer end
+
+player.SetHoldPose(true)
+ok, reason = player.PlayRaw(entry, "npc-1", nativeBody)
+T.truthy(ok and reason == "raw_clip_started", "native raw preview failed")
+T.equal(nativePlayer.clip, entry.anim, "native track received selected clip")
+T.equal(nativeTrack.blendWeight, 1.0, "native track was given visible blend weight")
+T.equal(nativeTrack.speed, entry.speed, "native track received clip speed")
+nativeTrack.time = nativeTrack.duration
+player.Maintain(nativeBody, now)
+T.equal(nativeTrack.time, nativeTrack.duration, "held track moved to final frame")
+T.equal(nativeTrack.isPlaying, false, "held track stopped advancing")
+T.truthy(player.active.poseHeld, "native pose hold state was not recorded")
+runtime = player.Runtime()
+T.equal(runtime.trackSource, "AnimationPlayer.play", "native track source missing")
+T.equal(runtime.trackDuration, nativeTrack.duration, "native track duration missing")
+player.Stop("native_done")
+T.equal(nativeMultiTrack.removed, nativeTrack, "owned native track was removed")
+
+local originalPrimary = { id = "original_primary" }
+local originalSecondary = { id = "original_secondary" }
+local heldPrimary = originalPrimary
+local heldSecondary = originalSecondary
+local rangedItem = { fullType = "Base.Pistol" }
+function rangedItem:getFullType() return self.fullType end
+function rangedItem:isRanged() return true end
+function nativeBody:getPrimaryHandItem() return heldPrimary end
+function nativeBody:getSecondaryHandItem() return heldSecondary end
+function nativeBody:setPrimaryHandItem(item) heldPrimary = item end
+function nativeBody:setSecondaryHandItem(item) heldSecondary = item end
+function nativeBody:getInventory()
+    return {
+        getItems = function()
+            return {
+                size = function() return 1 end,
+                get = function(_, index) return index == 0 and rangedItem or nil end,
+            }
+        end,
+    }
+end
+state.variables.PNCPrimary = "original.primary"
+state.variables.PNCSecondary = "original.secondary"
+state.variables.PNCPrimaryType = "onehanded"
+ok, reason = player.PlayRaw(entry, "npc-1", nativeBody)
+T.truthy(ok, "native preview did not restart for equipment test")
+ok, reason = player.ToggleRangedWeapon()
+T.truthy(ok and reason == "temporary_inventory_item", "temporary ranged equip failed")
+T.equal(heldPrimary, rangedItem, "temporary ranged weapon was equipped")
+T.equal(state.variables.PNCPrimaryType, "handgun", "ranged selector type was applied")
+T.truthy(player.IsRangedOverrideActive(), "ranged override was not recorded")
+ok, reason = player.PlayRaw(entry, "npc-1", nativeBody)
+T.truthy(ok, "native preview did not replay with ranged override")
+T.equal(heldPrimary, rangedItem,
+    "ranged override was not preserved while replacing the clip")
+T.truthy(player.IsRangedOverrideActive(),
+    "ranged override was lost while replacing the clip")
+player.Stop("equipment_done")
+T.equal(heldPrimary, originalPrimary, "temporary primary hand was restored")
+T.equal(heldSecondary, originalSecondary, "temporary secondary hand was restored")
+T.equal(state.variables.PNCPrimary, "original.primary", "primary selector was restored")
+T.equal(state.variables.PNCPrimaryType, "onehanded", "primary type selector was restored")
 
 T.finish("pnc_animation_debug_player_smoke")

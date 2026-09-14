@@ -1,11 +1,15 @@
--- One-shot persistence maintenance for the per-NPC ModData namespace.
--- This is intentionally not a recovery path: it is used only after the
--- canonical directory version has been rejected and the old namespace must
--- not be rediscovered as if it were current data.
+-- One-shot persistence maintenance for the canonical per-NPC ModData
+-- namespace. This is used only when the current directory is reset.
 
 local Registry = PNC.Registry
 local Internal = Registry.Internal
 local Const = PNC.Const
+
+local function isNPCStorageKey(key)
+    local value = tostring(key or "")
+    local prefix = tostring(Const.MODDATA_NPC_PREFIX or "PNC_npc")
+    return string.sub(value, 1, #prefix) == prefix
+end
 
 local function forEachTableName(callback)
     local names = ModData and ModData.getTableNames
@@ -25,10 +29,9 @@ function Internal.ForEachTableName(callback)
 end
 
 function Internal.ClearPersistedNPCNamespace()
-    local prefix = tostring(Const.MODDATA_NPC_PREFIX or "PNC_NPC_")
     local removed = 0
     forEachTableName(function(key)
-        if string.sub(key, 1, #prefix) == prefix
+        if isNPCStorageKey(key)
             and ModData and ModData.remove
         then
             ModData.remove(key)
@@ -39,7 +42,6 @@ function Internal.ClearPersistedNPCNamespace()
 end
 
 function Internal.ClearUnreferencedPersistedNPCRecords(directory)
-    local prefix = tostring(Const.MODDATA_NPC_PREFIX or "PNC_NPC_")
     local referenced = {}
     local removed = 0
     for _, entry in pairs(directory and directory.records or {}) do
@@ -48,7 +50,7 @@ function Internal.ClearUnreferencedPersistedNPCRecords(directory)
         end
     end
     forEachTableName(function(key)
-        if string.sub(key, 1, #prefix) == prefix
+        if isNPCStorageKey(key)
             and not referenced[key]
             and ModData and ModData.remove
         then

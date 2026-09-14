@@ -542,13 +542,15 @@ function ISPNCAnimationSceneDebugWindow:onRefresh()
 end
 
 function ISPNCAnimationSceneDebugWindow:onOpenXML()
-    if not PNC.AnimationDebugWindow then
-        require "PNC/UI/PNC_AnimationDebugWindow"
-    end
-    if PNC.AnimationDebugWindow
-        and PNC.AnimationDebugWindow.Open
+    if not PNC.NPCPresentationDebug
+        or not PNC.NPCPresentationDebug.Open
     then
-        PNC.AnimationDebugWindow.Open(
+        require "PNC/UI/NPCPresentationDebug/PNC_NPCPresentationDebug"
+    end
+    if PNC.NPCPresentationDebug
+        and PNC.NPCPresentationDebug.Open
+    then
+        PNC.NPCPresentationDebug.Open(
             self.contextEntry
         )
     end

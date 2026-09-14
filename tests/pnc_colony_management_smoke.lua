@@ -30,6 +30,9 @@ local companion = {
     affiliation = { factionID = "faction_player", communityRole = "resident" },
     health = { state = "normal" },
     needs = { hunger = 0.82, thirst = 0.10, fatigue = 0.10 },
+    medicalStatus = {
+        bleeding = false, openWoundCount = 0, bandagedWoundCount = 1,
+    },
     runtime = { activityInformation = {
         kind = "activity", capability = "sleep", phase = "QUEUED",
     } },
@@ -62,6 +65,14 @@ PNC = {
             if value >= 0.45 then return "MODERATE" end
             if value >= 0.15 then return "MINOR" end
             return "NORMAL"
+        end,
+    },
+    NPCWounds = {
+        BuildStatusSummary = function(record)
+            return record.medicalStatus or {
+                bleeding = false, openWoundCount = 0,
+                bandagedWoundCount = 0,
+            }
         end,
     },
     IndividualNeeds = {
@@ -230,6 +241,10 @@ T.equal(snapshot.people[1].followingCurrentPlayer, true,
     "snapshot marks the current player's follower")
 T.equal(snapshot.people[1].actionInformation.capability, "sleep",
     "colony snapshot exposes canonical activity information")
+T.equal(snapshot.people[1].medicalStatus.bandagedWoundCount, 1,
+    "colony snapshot exposes bandaged wound state")
+T.falsy(snapshot.people[1].medicalStatus.bleeding,
+    "bandaged wound is not reported as active bleeding")
 T.equal(#snapshot.people[1].journal, 1, "companion journal included")
 T.equal(#snapshot.attention, 1, "critical need appears in attention")
 T.equal(snapshot.attention[1].needType, "hunger", "critical need type")

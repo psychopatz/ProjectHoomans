@@ -56,5 +56,3 @@ PNC.Network.ClientState.snapshots["npc-starting-family"] = {
 T.equal(Identity.GetName("npc-starting-family"), "Casey Survivor",
     "companion lookup by ID uses its replicated identity immediately")
 T.finish("pnc_identity_presentation_smoke")
-
-T.finish("pnc_identity_presentation_smoke")

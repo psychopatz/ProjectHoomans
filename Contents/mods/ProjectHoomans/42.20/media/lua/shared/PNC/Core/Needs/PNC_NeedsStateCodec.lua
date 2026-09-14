@@ -4,7 +4,8 @@ PNC.NeedsStateCodec = PNC.NeedsStateCodec or {}
 local Codec = PNC.NeedsStateCodec
 local Definitions = PNC.NeedsDefinitions
 
--- V2 keeps the tuple compact while adding the three player Nutrition values.
+-- V2 keeps the tuple compact while adding player Nutrition values and the
+-- persistent hunger-relief reserve.
 -- Nutrition presence is explicit so SIMPLE-mode records do not allocate or
 -- rehydrate a detailed nutrition state when they are loaded.
 Codec.VERSION = 2
@@ -16,6 +17,8 @@ local MIN_MACRO = tonumber(tuning.minimumMacro) or -500
 local MAX_MACRO = tonumber(tuning.maximumMacro) or 1000
 local MIN_WEIGHT = tonumber(tuning.minimumWeight) or 35
 local MAX_WEIGHT = tonumber(tuning.maximumWeight) or 200
+local MAX_HUNGER_OVERFLOW = tonumber(Definitions.HUNGER_OVERFLOW
+    and Definitions.HUNGER_OVERFLOW.maximum) or 4.0
 
 local function clamp(value, minimum, maximum)
     return math.max(minimum, math.min(maximum, tonumber(value) or minimum))
@@ -84,6 +87,8 @@ function Codec.Encode(records, at)
             math.floor(clamp(nutrition and nutrition.lipids or 0,
                 MIN_MACRO, MAX_MACRO)),
             nutrition and 1 or 0,
+            math.floor(clamp(state.hungerOverflow, 0, MAX_HUNGER_OVERFLOW)
+                * 1000 + 0.5),
         }
         local morale = state.morale or {}
         local modifiers = {}
@@ -136,6 +141,8 @@ function Codec.Decode(raw)
                 nutrition = hasNutrition
                     and decodeNutrition(packed) or nil,
                 morale = decodeMorale(packed),
+                hungerOverflow = clamp(packed[12], 0,
+                    MAX_HUNGER_OVERFLOW * 1000) / 1000,
             }
         end
     end

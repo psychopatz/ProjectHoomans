@@ -61,7 +61,7 @@ end
 function Parts.BuildIdentitySummary(record)
     local summary = PNC.Identity and PNC.Identity.GetCharacterSummary and PNC.Identity.GetCharacterSummary(record) or {}
     return {
-        displayName = summary.displayName or record.name,
+        displayName = summary.displayName,
         archetypeID = summary.archetypeID or record.archetypeID,
         archetypeLabel = summary.archetypeLabel or record.archetypeLabel,
         identitySeed = summary.identitySeed or record.identitySeed,

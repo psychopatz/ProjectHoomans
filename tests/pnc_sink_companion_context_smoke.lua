@@ -41,7 +41,7 @@ square.getObjects = function() return list({ sink }) end
 
 PNC = {
     Network = { ClientState = { snapshots = {
-        parker = { id = "parker", name = "Parker", presenceState = "LIVE" },
+        parker = { id = "parker", displayName = "Parker", presenceState = "LIVE" },
     } } },
     CompanionCommands = {
         CanPlayerCommand = function(snapshot)
@@ -49,7 +49,7 @@ PNC = {
         end,
     },
     NPCIdentityPresentation = {
-        GetName = function(snapshot) return snapshot.name end,
+        GetName = function(snapshot) return snapshot.displayName end,
     },
     Client = {
         RequestColonyAction = function(action, options)

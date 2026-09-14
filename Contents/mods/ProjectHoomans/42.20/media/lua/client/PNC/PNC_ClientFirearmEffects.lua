@@ -30,7 +30,7 @@ local MAX_MUZZLE_FLASHES = 48
 local MAX_LIGHTS_PER_WINDOW = 2
 local LIGHT_BUDGET_WINDOW_MS = 100
 local TRACER_TTL = 12
-local TRACER_SCREEN_LENGTH = 300
+local TRACER_SCREEN_LENGTH = 180
 local DEBUG_SIMULATION_INTERVAL_MS = 500
 local MUZZLE_FLASH_TTL = 2
 local MUZZLE_FLASH_LENGTH = 42
@@ -381,6 +381,12 @@ local function angleRadians(y, x)
     return 0
 end
 
+local function normalizeScreen(x, y, fallbackX, fallbackY)
+    local length = math.sqrt((x * x) + (y * y))
+    if length <= 0.001 then return fallbackX, fallbackY end
+    return x / length, y / length
+end
+
 local function cachedMuzzleScreen(body, payload)
     if not NameplateAnchor or not NameplateAnchor.GetRenderMuzzle then
         return nil, nil
@@ -391,16 +397,28 @@ local function cachedMuzzleScreen(body, payload)
     )
 end
 
+local function hasLiveAnchor(body, payload)
+    if not body then return false end
+    local _, _, cache = cachedMuzzleScreen(body, payload)
+    return cache ~= nil
+end
+
 local function resolveDirectionDegrees(body, payload, muzzleX, muzzleY)
     local sx = tonumber(muzzleX) or tonumber(payload and payload.sx)
     local sy = tonumber(muzzleY) or tonumber(payload and payload.sy)
     local tx = tonumber(payload and payload.tx)
     local ty = tonumber(payload and payload.ty)
+    local bodyX = tonumber(body and readMethod(body, "getX"))
+    local bodyY = tonumber(body and readMethod(body, "getY"))
+    local targetIsShooter = bodyX and bodyY and tx and ty
+        and math.abs(tx - bodyX) <= 0.25
+        and math.abs(ty - bodyY) <= 0.25
     local angle
     local forward
     local forwardX
     local forwardY
     if sx and sy and tx and ty
+        and not targetIsShooter
         and (math.abs(tx - sx) > 0.0001 or math.abs(ty - sy) > 0.0001)
     then
         return angleRadians(ty - sy, tx - sx) * 180 / math.pi
@@ -427,7 +445,87 @@ local function isometricDirection(directionDegrees)
     local theta = (tonumber(directionDegrees) or 0) * math.pi / 180
     local cosine = math.cos(theta)
     local sine = math.sin(theta)
-    return cosine - sine, (cosine + sine) * 0.5
+    return normalizeScreen(
+        cosine - sine,
+        (cosine + sine) * 0.5,
+        1,
+        0
+    )
+end
+
+local function bodyWorldPosition(body, payload)
+    return tonumber(body and readMethod(body, "getX"))
+        or tonumber(payload and payload.sx),
+        tonumber(body and readMethod(body, "getY"))
+        or tonumber(payload and payload.sy),
+        tonumber(body and readMethod(body, "getZ"))
+        or tonumber(payload and payload.sz)
+        or 0
+end
+
+local function targetIsShooter(body, payload)
+    local bodyX
+    local bodyY
+    local targetX = tonumber(payload and payload.tx)
+    local targetY = tonumber(payload and payload.ty)
+    if not body or not targetX or not targetY then return false end
+    bodyX, bodyY = bodyWorldPosition(body, payload)
+    return bodyX and bodyY
+        and math.abs(targetX - bodyX) <= 0.25
+        and math.abs(targetY - bodyY) <= 0.25
+end
+
+local function resolveScreenDirection(body, payload, muzzleX, muzzleY, muzzleZ)
+    local targetX = tonumber(payload and payload.tx)
+    local targetY = tonumber(payload and payload.ty)
+    local targetZ = tonumber(payload and payload.tz) or 0
+    local bodyX
+    local bodyY
+    local bodyZ
+    local originX
+    local originY
+    local originZ
+    local originScreenX
+    local originScreenY
+    local targetScreenX
+    local targetScreenY
+    local dx
+    local dy
+    local forwardX
+    local forwardY
+    local direction
+    if targetX and targetY and not targetIsShooter(body, payload) then
+        bodyX, bodyY, bodyZ = bodyWorldPosition(body, payload)
+        originX = tonumber(muzzleX) or bodyX
+        originY = tonumber(muzzleY) or bodyY
+        originZ = tonumber(muzzleZ) or bodyZ
+        originScreenX, originScreenY = projectToScreen(originX, originY, originZ)
+        targetScreenX, targetScreenY = projectToScreen(
+            targetX,
+            targetY,
+            targetZ
+        )
+        if originScreenX and originScreenY and targetScreenX and targetScreenY then
+            dx = targetScreenX - originScreenX
+            dy = targetScreenY - originScreenY
+            if math.abs(dx) + math.abs(dy) > 0.001 then
+                return normalizeScreen(dx, dy, 1, 0)
+            end
+        end
+    end
+    if NameplateAnchor and NameplateAnchor.GetScreenDirection then
+        forwardX, forwardY = NameplateAnchor.GetScreenDirection(
+            body,
+            payload and payload.npcId or nil,
+            payload and payload.playerIndex or 0
+        )
+        if forwardX and forwardY then
+            return normalizeScreen(forwardX, forwardY, 1, 0)
+        end
+    end
+    direction = resolveDirectionDegrees(body, payload, muzzleX, muzzleY)
+    forwardX, forwardY = isometricDirection(direction)
+    return normalizeScreen(forwardX, forwardY, 1, 0)
 end
 
 local function getTracerColor(payload)
@@ -443,20 +541,27 @@ local function addMuzzleFlash(body, payload, muzzleX, muzzleY, muzzleZ)
     local screenY
     local anchorCache
     local anchorSource = "world_projection"
-    local direction
+    local directionX
+    local directionY
     local dx
     local dy
     if #Effects.ActiveMuzzleFlashes >= MAX_MUZZLE_FLASHES then
         return 0
     end
     screenX, screenY, anchorCache = cachedMuzzleScreen(body, payload)
-    if anchorCache then anchorSource = "nameplate_cache" end
+    if anchorCache then anchorSource = "nameplate_relative" end
     if not screenX or not screenY then
         screenX, screenY = projectToScreen(muzzleX, muzzleY, muzzleZ)
     end
     if not screenX or not screenY then return 0 end
-    direction = resolveDirectionDegrees(body, payload, muzzleX, muzzleY)
-    dx, dy = isometricDirection(direction)
+    directionX, directionY = resolveScreenDirection(
+        body,
+        payload,
+        muzzleX,
+        muzzleY,
+        muzzleZ
+    )
+    dx, dy = directionX, directionY
     Effects.ActiveMuzzleFlashes[#Effects.ActiveMuzzleFlashes + 1] = {
         x = screenX,
         y = screenY,
@@ -482,7 +587,9 @@ local function addTracer(body, payload, muzzleX, muzzleY, muzzleZ)
     local startY
     local anchorCache
     local anchorSource = "world_projection"
-    local direction
+    local directionX
+    local directionY
+    local directionRadians
     local projectileDirection
     local dx
     local dy
@@ -494,19 +601,32 @@ local function addTracer(body, payload, muzzleX, muzzleY, muzzleZ)
     local i
     if not sx or not sy then return 0 end
     startX, startY, anchorCache = cachedMuzzleScreen(body, payload)
-    if anchorCache then anchorSource = "nameplate_cache" end
+    if anchorCache then anchorSource = "nameplate_relative" end
     if not startX or not startY then
         startX, startY = projectToScreen(sx, sy, sz)
     end
     if not startX or not startY then return 0 end
-    direction = resolveDirectionDegrees(body, payload, sx, sy)
+    directionX, directionY = resolveScreenDirection(
+        body,
+        payload,
+        sx,
+        sy,
+        sz
+    )
+    directionRadians = angleRadians(directionY, directionX)
     for i = 1, visualCount do
         if #Effects.ActiveTracers >= MAX_FALLBACK_TRACERS then break end
         centered = i - ((visualCount + 1) * 0.5)
         normalized = centered / math.max(1, (visualCount - 1) * 0.5)
         jitter = ZombRandFloat and ZombRandFloat(-0.3, 0.3) or 0
-        projectileDirection = direction + (normalized * spread) + jitter
-        dx, dy = isometricDirection(projectileDirection)
+        projectileDirection = directionRadians * 180 / math.pi
+            + (normalized * spread) + jitter
+        dx, dy = normalizeScreen(
+            math.cos(projectileDirection * math.pi / 180),
+            math.sin(projectileDirection * math.pi / 180),
+            1,
+            0
+        )
         color = getTracerColor(payload)
         Effects.ActiveTracers[#Effects.ActiveTracers + 1] = {
             x = startX,
@@ -565,6 +685,7 @@ function Effects.Play(payload)
     local tracerEffect
     local impactResult
     local startedAt = nowMs()
+    local anchoredFallback
     if type(payload) ~= "table" then
         logFirearmAudit("play_rejected", nil,
             "reason=payload_not_table",
@@ -585,16 +706,28 @@ function Effects.Play(payload)
     end
     body = resolveBody(payload)
     weapon = resolveWeapon(body, payload)
+    -- A visible nameplate gives us the same cached starter point used by the
+    -- debug probe. Prefer that visual path for tracked shots; the native B42
+    -- tracer API accepts a body/endpoint but does not accept our hand anchor.
+    -- Untracked/off-screen shooters retain the native engine path.
+    anchoredFallback = hasLiveAnchor(body, payload)
+    logFirearmAudit("anchor_route", payload,
+        "live=" .. tostring(anchoredFallback),
+        "route=" .. (anchoredFallback and "nameplate_relative" or "native"))
     logFirearmAudit("body_weapon_resolved", payload,
         "body=" .. tostring(body ~= nil),
         "weapon=" .. tostring(weapon ~= nil),
         "weaponType=" .. tostring(weapon and readMethod(weapon, "getFullType") or ""))
-    nativeResult, nativeReason = NativeEffects.PlayMuzzleFlash(body, weapon)
+    if anchoredFallback then
+        nativeResult, nativeReason = false, "nameplate_anchor_preferred"
+    else
+        nativeResult, nativeReason = NativeEffects.PlayMuzzleFlash(body, weapon)
+    end
     logFirearmAudit("muzzle_native_complete", payload,
         "result=" .. tostring(nativeResult),
         "reason=" .. tostring(nativeReason or ""))
     if not nativeResult then
-        recordNativeFailure(nativeReason)
+        if not anchoredFallback then recordNativeFailure(nativeReason) end
         x, y, z = getMuzzlePosition(body, weapon, payload)
         muzzleCount = addMuzzleFlash(body, payload, x, y, z)
         muzzleEffect = muzzleCount > 0
@@ -627,12 +760,16 @@ function Effects.Play(payload)
         "result=" .. tostring(audioResult),
         "sound=" .. tostring(payload.shotSound or ""),
         "shellSound=" .. tostring(payload.shellFallSound or ""))
-    nativeResult, nativeReason = NativeEffects.PlayTracer(body, weapon, payload)
+    if anchoredFallback then
+        nativeResult, nativeReason = false, "nameplate_anchor_preferred"
+    else
+        nativeResult, nativeReason = NativeEffects.PlayTracer(body, weapon, payload)
+    end
     logFirearmAudit("tracer_native_complete", payload,
         "result=" .. tostring(nativeResult),
         "reason=" .. tostring(nativeReason or ""))
     if not nativeResult then
-        recordNativeFailure(nativeReason)
+        if not anchoredFallback then recordNativeFailure(nativeReason) end
         if not x then
             x, y, z = getMuzzlePosition(body, weapon, payload)
         end

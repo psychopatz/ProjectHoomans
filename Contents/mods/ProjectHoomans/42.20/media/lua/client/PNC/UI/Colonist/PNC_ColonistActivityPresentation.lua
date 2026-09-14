@@ -47,8 +47,13 @@ function Presentation.Current(person)
         local phase = tostring(info.phase or "")
         return phase ~= "" and label .. " (" .. phase .. ")" or label
     end
-    local label = Shared.Text(info.fallback or info.activityId,
-        Shared.Text(person.activity, "IDLE"))
+    local label
+    if tostring(info.activityConsumptionMode or "") == "dual" then
+        label = Shared.Tr("UI_PNC_Activity_Consuming", "CONSUMING")
+    else
+        label = Shared.Text(info.fallback or info.activityId,
+            Shared.Text(person.activity, "IDLE"))
+    end
     if tostring(info.activityId or "") == "job:GuardAnchor" then
         return Shared.Tr("UI_PNC_Action_Idle", "Idle")
             .. " (" .. label .. ")"

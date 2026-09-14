@@ -49,13 +49,15 @@ local foreign = {
 }
 
 T.equal(Protocol.MAX_BATCH, 32, "journal batch is bounded")
+T.equal(Protocol.EventCode(EventTypes.NPC_WATER_REFILL_DRANK), 11,
+    "combined refill-drink event has a stable compact code")
 T.equal(#Protocol.ToWire({
     sequence = 1, at = 2, source = 1, eventCode = 3,
     subjectID = "npc_a", label = "Guard", args = {},
 }), 10, "known wire rows use fixed primitive layout")
 
 Feed.AppendNPC(EventTypes.NPC_FOOD_CONSUMED, owned, 601,
-    "Base.Apple", 0.25)
+    "Base.Apple", 0.25, 0.10)
 Feed.AppendNPC(EventTypes.NPC_FOOD_CONSUMED, foreign, 602,
     "Base.Berry", 0.25)
 Feed.AppendStorage(EventTypes.STORAGE_ITEM_DEPOSITED, "storage_a",
@@ -65,6 +67,8 @@ local first = Feed.GetDelta(player, { after = 0, limit = 32 })
 T.equal(#first.rows, 2, "delta filters entries to the player's faction")
 T.equal(first.rows[1][4], Protocol.EventCode(EventTypes.NPC_FOOD_CONSUMED),
     "NPC event code is compact")
+T.equal(first.rows[1][9], 0.10,
+    "NPC dual-consumption effect survives the colony journal wire format")
 T.equal(first.rows[2][3], Protocol.SOURCE_STORAGE,
     "storage source is represented in the wire row")
 T.equal(first.more, false, "small delta does not page")

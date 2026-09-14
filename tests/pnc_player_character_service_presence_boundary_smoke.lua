@@ -66,7 +66,7 @@ for name, _ in pairs(contextFunctions) do
     T.equal(type(PNC.PlayerContext[name]), "function",
         "entry point should preserve PlayerContext." .. name)
 end
-T.equal(publicCount, 22, "player-character function declaration count")
+T.equal(publicCount, 21, "player-character function declaration count")
 T.equal(contextCount, 2, "player-context function declaration count")
 
 for i = 1, #providers do

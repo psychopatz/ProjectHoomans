@@ -2,6 +2,16 @@ PNC = PNC or {}
 local Wounds = PNC.NPCWounds
 local Core = PNC.Core
 
+function Wounds.BuildStatusSummary(record)
+    local body = Wounds.Recalculate(record)
+    local bleedingRate = tonumber(body.bleedingRate) or 0
+    return {
+        bleeding = bleedingRate > 0,
+        openWoundCount = tonumber(body.openWoundCount) or 0,
+        bandagedWoundCount = tonumber(body.bandagedWoundCount) or 0,
+    }
+end
+
 function Wounds.BuildSnapshot(record)
     local body = Wounds.Recalculate(record)
     local output = {

@@ -20,7 +20,12 @@ Registry.DirectoryDirty = Registry.DirectoryDirty or false
 Registry.LastFlushCount = Registry.LastFlushCount or 0
 
 local function storageKeyForID(id)
-    return tostring(Const.MODDATA_NPC_PREFIX or "PNC_NPC_") .. tostring(id)
+    local prefix = tostring(Const.MODDATA_NPC_PREFIX or "PNC_npc")
+    local value = tostring(id)
+    if string.sub(value, 1, 3) == "npc" then
+        return "PNC_" .. value
+    end
+    return prefix .. "_" .. value
 end
 
 local function captureSnapshot(record)

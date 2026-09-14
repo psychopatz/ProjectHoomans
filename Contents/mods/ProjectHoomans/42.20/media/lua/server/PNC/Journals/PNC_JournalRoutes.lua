@@ -80,20 +80,29 @@ local function appendStorage(eventType, storageID, actor, typeID, quantity,
     return ok
 end
 
-local function onFoodConsumed(record, fullType, restored)
+local function onFoodConsumed(record, fullType, restored, hydration)
     appendNPC(EventTypes.NPC_FOOD_CONSUMED, record,
-        tostring(fullType or ""), tonumber(restored) or 0)
+        tostring(fullType or ""), tonumber(restored) or 0,
+        tonumber(hydration) or 0)
 end
 
-local function onDrinkConsumed(record, fullType, restored)
+local function onDrinkConsumed(record, fullType, restored, nourishment)
     appendNPC(EventTypes.NPC_DRINK_CONSUMED, record,
-        tostring(fullType or ""), tonumber(restored) or 0)
+        tostring(fullType or ""), tonumber(restored) or 0,
+        tonumber(nourishment) or 0)
 end
 
 local function onWaterRefilled(record, fullType, amount, sourceKey)
     appendNPC(EventTypes.NPC_WATER_REFILLED, record,
         tostring(fullType or ""), tonumber(amount) or 0,
         tostring(sourceKey or ""))
+end
+
+local function onWaterRefillDrank(record, fullType, thirstBefore,
+        amount, sourceKey)
+    appendNPC(EventTypes.NPC_WATER_REFILL_DRANK, record,
+        tostring(fullType or ""), tonumber(thirstBefore) or 0,
+        tonumber(amount) or 0, tostring(sourceKey or ""))
 end
 
 local function onNeedSeverityChanged(record, needType, oldLevel, newLevel,
@@ -141,6 +150,8 @@ Events.subscribe(EventTypes.NPC_FOOD_CONSUMED, onFoodConsumed,
 Events.subscribe(EventTypes.NPC_DRINK_CONSUMED, onDrinkConsumed,
     "projecthoomans.journals")
 Events.subscribe(EventTypes.NPC_WATER_REFILLED, onWaterRefilled,
+    "projecthoomans.journals")
+Events.subscribe(EventTypes.NPC_WATER_REFILL_DRANK, onWaterRefillDrank,
     "projecthoomans.journals")
 Events.subscribe(EventTypes.NPC_NEED_SEVERITY_CHANGED, onNeedSeverityChanged,
     "projecthoomans.journals")

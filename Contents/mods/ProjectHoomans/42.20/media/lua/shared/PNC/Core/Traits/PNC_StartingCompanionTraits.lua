@@ -75,13 +75,6 @@ function StartingTraits.ResolveSelections(player)
     return output, #output > 0 and "selected" or "none"
 end
 
--- Compatibility helper for integrations that only need the first selection.
-function StartingTraits.ResolveSelected(player)
-    local selections, reason = StartingTraits.ResolveSelections(player)
-    if not selections then return nil, reason end
-    return selections[1] or false, reason
-end
-
 function StartingTraits.ResolveCompanionFemale(
     spec, playerFemale, orientation, randomFemale
 )

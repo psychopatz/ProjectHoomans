@@ -526,7 +526,7 @@ for i = 1, 8 do
     PNC.CompanionCommandPresentation.ShowPlayerFlavor(
         player,
         "follow",
-        { target = { name = "Walker Sage" } }
+        { target = { displayName = "Walker Sage" } }
     )
 end
 local spokenVariants = {}

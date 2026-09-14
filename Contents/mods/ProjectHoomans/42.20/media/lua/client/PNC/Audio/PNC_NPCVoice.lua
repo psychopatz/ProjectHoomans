@@ -63,12 +63,8 @@ local function getGender(snapshot, body)
 end
 
 local function getSeed(snapshot, body)
-    local identity = snapshot and snapshot.identity or nil
     local seed = snapshot and snapshot.identitySeed or nil
     local fallback
-    if seed == nil and identity then
-        seed = identity.seed
-    end
     fallback = snapshot and snapshot.id or nil
     if fallback == nil and body and body.getModData then
         local ok, modData = pcall(body.getModData, body)
@@ -421,11 +417,7 @@ function Voice.GetProfile(snapshot, body)
     local seed = getSeed(snapshot, body)
     local isFemale = getGender(snapshot, body)
     local snapshotHasSeed = snapshot
-        and (
-            snapshot.identitySeed ~= nil
-            or snapshot.identity
-                and snapshot.identity.seed ~= nil
-        )
+        and snapshot.identitySeed ~= nil
     local snapshotHasGender = snapshot and snapshot.isFemale ~= nil
     if profile
         and not snapshotHasSeed

@@ -157,28 +157,23 @@ T.equal(
     true,
     "scene lab is available from the NPC debug submenu"
 )
-local anchorOption = findOption(debugMenu, "Debug: Firearm Anchor Probe")
-T.truthy(anchorOption, "firearm anchor probe is in the NPC debug submenu")
-T.falsy(anchorOption.notAvailable, "firearm anchor probe accepts a live NPC")
-anchorOption.callback()
-T.equal(anchorTarget.body, selectedBody, "anchor probe targets selected NPC")
-T.equal(anchorTarget.id, "npc_one", "anchor probe preserves selected NPC id")
-T.equal(anchorTarget.playerIndex, 0, "anchor probe preserves player index")
-local simulationOption = findOption(debugMenu, "Debug: Start Firearm Simulation")
-T.truthy(simulationOption, "firearm simulation is in the NPC debug submenu")
-T.falsy(simulationOption.notAvailable, "firearm simulation accepts a live NPC")
-simulationOption.callback()
-T.equal(simulationActive, true, "firearm simulation toggles on")
-T.equal(simulatedShot.body, selectedBody, "firearm simulation uses selected NPC")
-T.equal(simulatedShot.id, "npc_one", "firearm simulation preserves selected NPC id")
-T.equal(simulatedShot.playerIndex, 0, "firearm simulation preserves player index")
-local inspectorOption = findOption(debugMenu, "Debug: NPC Coordinate Inspector")
-T.truthy(inspectorOption, "NPC coordinate inspector is in the debug submenu")
-T.falsy(inspectorOption.notAvailable, "NPC coordinate inspector accepts a live NPC")
-inspectorOption.callback()
-T.equal(inspectorTarget.body, selectedBody, "coordinate inspector uses selected NPC")
-T.equal(inspectorTarget.id, "npc_one", "coordinate inspector preserves selected NPC id")
-T.equal(inspectorTarget.playerIndex, 0, "coordinate inspector preserves player index")
+T.equal(
+    findOption(debugMenu, "NPC Presentation Lab") ~= nil,
+    true,
+    "NPC presentation lab is the unified animation/firearm entry point"
+)
+T.falsy(
+    findOption(debugMenu, "Debug: Firearm Anchor Probe"),
+    "old standalone firearm anchor probe was removed"
+)
+T.falsy(
+    findOption(debugMenu, "Debug: Start Firearm Simulation"),
+    "old standalone firearm simulation was removed"
+)
+T.falsy(
+    findOption(debugMenu, "Debug: NPC Coordinate Inspector"),
+    "old standalone coordinate inspector was removed"
+)
 local infectionOption = findOption(debugMenu, "Infection")
 T.equal(infectionOption ~= nil, true, "infection debug submenu missing")
 local clearOption = findOption(infectionOption.submenu, "Clear Knox Infection")

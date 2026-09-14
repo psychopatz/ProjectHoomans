@@ -91,16 +91,13 @@ end
 function Presentation.BuildRoster(snapshot)
     local rows = {}
     for _, person in ipairs(snapshot and snapshot.people or {}) do
-        local level, needType = Shared.WorstNeed(person)
         rows[#rows + 1] = {
             id = person.id,
             key = person.id,
             label = Shared.Text(person.name, person.id),
-            detail = string.upper(Shared.Text(person.role, "Companion"))
-                .. "  -  " .. Shared.Text(person.activity, "Idle")
-                .. "  -  " .. string.upper(needType),
+            detail = Shared.Text(person.activity, "Idle"),
+            indicators = Shared.RosterIndicators(person),
             value = person,
-            worstLevel = level,
         }
     end
     return rows

@@ -66,7 +66,7 @@ local function npcName(npcID)
     if identity and identity.GetName then
         return identity.GetName(snapshot or { id = npcID })
     end
-    return clean(snapshot and (snapshot.name or snapshot.displayName), npcID)
+    return clean(snapshot and snapshot.displayName, npcID)
 end
 
 local function npcIdentity(npcID, fallbackName)

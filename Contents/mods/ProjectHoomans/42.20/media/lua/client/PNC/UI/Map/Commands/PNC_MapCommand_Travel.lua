@@ -8,7 +8,7 @@ Commands.RegisterProvider("travel", {
     order = 10,
     label = function(selection)
         if #selection == 1 then
-            return "Move " .. tostring(selection[1].name) .. " here"
+            return "Move " .. tostring(selection[1].displayName) .. " here"
         end
         return "Move " .. tostring(#selection) .. " NPCs here"
     end,

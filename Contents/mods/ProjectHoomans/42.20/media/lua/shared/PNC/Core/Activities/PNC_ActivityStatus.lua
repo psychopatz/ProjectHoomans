@@ -238,6 +238,7 @@ Status.Register("facility_activity", 80, function(record)
             activityItemID = runtime.activityItemID,
             activityItemFullType = itemFullType,
             activityItemLabelKey = itemLabelKey,
+            activityConsumptionMode = runtime.activityConsumptionMode,
         })
 end)
 
@@ -285,6 +286,8 @@ Status.Register("current_job", 10, function(record)
                     activityItemID = facilityRuntime.activityItemID,
                     activityItemFullType = itemFullType,
                     activityItemLabelKey = itemLabelKey,
+                    activityConsumptionMode = facilityRuntime.activityConsumptionMode
+                        or order.activityConsumptionMode,
                 })
         end
     end

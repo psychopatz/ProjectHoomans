@@ -11,8 +11,13 @@ local H = Needs.Internal
 
 local function applyConsumable(record, effect, source)
     effect = type(effect) == "table" and effect or {}
-    Needs.Modify(record, "hunger", -(tonumber(effect.hunger) or 0),
-        source or "food_consumed")
+    if Needs.ApplyHungerRelief then
+        Needs.ApplyHungerRelief(record, tonumber(effect.hunger) or 0,
+            source or "food_consumed")
+    else
+        Needs.Modify(record, "hunger", -(tonumber(effect.hunger) or 0),
+            source or "food_consumed")
+    end
     Needs.Modify(record, "thirst", -(tonumber(effect.thirst) or 0),
         source or "food_consumed")
     Needs.ModifyNutrition(record, tonumber(effect.calories) or 0,

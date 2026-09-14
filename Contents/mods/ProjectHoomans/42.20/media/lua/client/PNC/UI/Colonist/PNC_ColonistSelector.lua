@@ -43,16 +43,13 @@ end
 function Selector.BuildRows(snapshot)
     local rows = {}
     for _, person in ipairs(snapshot and snapshot.people or {}) do
-        local level, needType = Shared.WorstNeed(person)
         rows[#rows + 1] = {
             id = person.id,
             key = person.id,
             label = Shared.Text(person.name, person.id),
-            detail = string.upper(Shared.Text(person.role, "Companion"))
-                .. "  -  " .. ActivityPresentation.Current(person)
-                .. "  -  " .. string.upper(needType),
+            detail = ActivityPresentation.Current(person),
+            indicators = Shared.RosterIndicators(person),
             value = person,
-            worstLevel = level,
         }
     end
     return rows

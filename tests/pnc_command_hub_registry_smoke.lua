@@ -704,10 +704,22 @@ T.contains(settingsLayoutSource, "onResponsiveLayout",
 T.contains(settingsLayoutSource, "Layout.SetBounds(self.statusLabel",
     "settings feedback is not positioned in the footer")
 local animationSource = T.read("ProjectHoomans", "client",
-    "PNC/UI/PNC_AnimationDebugWindow.lua")
-T.contains(animationSource, "Layout.SetBounds(self.search",
+    "PNC/UI/NPCPresentationDebug/PNC_NPCPresentationDebug.lua")
+local animationTabSource = T.read("ProjectHoomans", "client",
+    "PNC/UI/NPCPresentationDebug/PNC_NPCPresentationDebug_AnimationTab.lua")
+T.contains(animationSource, "NPCPresentationDebug",
+    "NPC presentation debugger does not expose its canonical root")
+T.contains(animationSource, "ISPNCNPCPresentationDebugWindow",
+    "NPC presentation debugger does not expose its canonical window class")
+T.contains(animationSource, "ISTabPanel",
+    "NPC presentation debugger hub is missing its tab container")
+T.contains(animationSource, 'addView("Animation"',
+    "NPC presentation debugger hub does not expose its animation tab")
+T.contains(animationTabSource, "ISPNCNPCPresentationDebugAnimationTab",
+    "NPC presentation debugger does not expose its canonical animation tab")
+T.contains(animationTabSource, "Layout.SetBounds(self.search",
     "animation search field bypasses shared bounds")
-T.falsy(string.find(animationSource, "self.search:setX", 1, true),
+T.falsy(string.find(animationTabSource, "self.search:setX", 1, true),
     "animation search field still uses manual geometry")
 local animationSceneSource = T.read("ProjectHoomans", "client",
     "PNC/UI/PNC_AnimationSceneDebugWindow.lua")

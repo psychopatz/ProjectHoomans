@@ -110,6 +110,7 @@ local rendered = 0
 local renderLines = {}
 local muzzleFlash = 0
 local nativeTracerCalls = 0
+local anchorAvailable = false
 local currentUseWeapon
 local controller
 local removedLights = 0
@@ -242,7 +243,11 @@ zombie = {
 
 PNC.NameplateFirearmAnchor = {
     GetRenderMuzzle = function()
+        if not anchorAvailable then return nil, nil, nil end
         return 1234, 5678, {}
+    end,
+    GetScreenDirection = function()
+        return 0.6, 0.8
     end,
 }
 isServer = function() return false end
@@ -267,6 +272,39 @@ PNC.ClientFirearmEffects.OnTick()
 PNC.ClientFirearmEffects.OnTick()
 T.equal(#PNC.ClientFirearmEffects.ActiveLights, 0, "muzzle light cleaned")
 T.equal(removedLights, 0, "native muzzle light is engine-owned")
+
+-- A tracked shooter must prefer the same relative nameplate anchor used by
+-- the coordinate probe, instead of emitting another body-centred native line.
+anchorAvailable = true
+PNC.Network.FindZombieByOnlineID = function() return body end
+local anchoredPayload = {}
+for key, value in pairs(payload) do anchoredPayload[key] = value end
+anchoredPayload.shotId = "npc_modded_rifle:anchored:1:1100"
+T.equal(PNC.ClientFirearmEffects.Play(anchoredPayload), true,
+    "tracked anchored shot rendered")
+T.equal(muzzleFlash, 1, "tracked anchored shot bypasses native muzzle flash")
+T.equal(nativeTracerCalls, 3, "tracked anchored shot bypasses native tracer")
+T.equal(PNC.ClientFirearmEffects.ActiveMuzzleFlashes[1].x, 1234,
+    "tracked muzzle flash uses the relative anchor")
+T.equal(PNC.ClientFirearmEffects.ActiveTracers[1].anchorSource,
+    "nameplate_relative", "tracked tracer records the relative anchor source")
+PNC.ClientFirearmEffects.Reset()
+local selfPayload = {}
+for key, value in pairs(anchoredPayload) do selfPayload[key] = value end
+selfPayload.shotId = "npc_modded_rifle:self:1:1100"
+selfPayload.tx = 10
+selfPayload.ty = 20
+selfPayload.tz = 0
+selfPayload.projectileCount = 1
+selfPayload.projectileSpread = 0
+T.equal(PNC.ClientFirearmEffects.Play(selfPayload), true,
+    "self-targeted anchored shot rendered")
+T.truthy(math.abs(PNC.ClientFirearmEffects.ActiveTracers[1].dx - 0.6) < 0.001,
+    "self-targeted tracer follows the NPC forward screen X")
+T.truthy(math.abs(PNC.ClientFirearmEffects.ActiveTracers[1].dy - 0.8) < 0.001,
+    "self-targeted tracer follows the NPC forward screen Y")
+PNC.ClientFirearmEffects.Reset()
+lightCreated = 0
 
 PNC.Network.FindZombieByOnlineID = function() return nil end
 local remotePayload = {}
@@ -323,7 +361,7 @@ T.equal(
 T.equal(PNC.ClientFirearmEffects.ActiveMuzzleFlashes[1].x, 1234,
     "debug simulation uses cached muzzle anchor")
 T.equal(PNC.ClientFirearmEffects.ActiveMuzzleFlashes[1].anchorSource,
-    "nameplate_cache",
+    "nameplate_relative",
     "debug simulation records the nameplate anchor source")
 T.equal(PNC.ClientFirearmEffects.ActiveTracers[1].x, 1234,
     "debug simulation starts tracer at cached muzzle anchor")
@@ -351,6 +389,4 @@ T.falsy(
     PNC.ClientFirearmEffects.IsSimulationActive(body, "debug_npc"),
     "debug firearm simulation stops emitting"
 )
-T.finish("pnc_firearm_effects_smoke")
-
 T.finish("pnc_firearm_effects_smoke")

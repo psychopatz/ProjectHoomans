@@ -57,6 +57,47 @@ function H.ResolveFoodItemFullType(record, capability, options)
     return nil
 end
 
+function H.ResolveActivityConsumptionMode(record, capability, options)
+    local isFood = capability == "food.dine"
+        or capability == "survival.eat.inventory"
+    local isHydration = capability == "survival.drink.inventory"
+    local explicit = options and (options.activityConsumptionMode
+        or options.acquired and options.acquired.activityConsumptionMode)
+    local itemID = options and (options.activityItemID
+        or options.acquired and options.acquired.activityItemID)
+    local item = record and record.inventory and record.inventory.items
+        and itemID and record.inventory.items[tostring(itemID)] or nil
+    local descriptor
+    local hunger
+    local thirst
+
+    if not isFood and not isHydration then return nil end
+    explicit = tostring(explicit or "")
+    if explicit == "food" or explicit == "hydration" or explicit == "dual" then
+        return explicit
+    end
+    if PNC.ItemUtility and PNC.ItemUtility.DescribeNPCItem and item then
+        local ok, value = pcall(PNC.ItemUtility.DescribeNPCItem, item)
+        if ok then descriptor = value end
+    end
+    if descriptor then
+        hunger = tonumber(descriptor.hunger) or 0
+        thirst = tonumber(descriptor.thirst) or 0
+        if hunger > 0.000001 and thirst > 0.000001
+            and descriptor.fluidSafe ~= false
+        then
+            return "dual"
+        end
+        if thirst > 0.000001 and descriptor.fluidSafe ~= false then
+            return "hydration"
+        end
+        if hunger > 0.000001 then return "food" end
+    end
+    -- Preserve the old label when item metadata is unavailable. The exact
+    -- descriptor is authoritative whenever the selected personal item exists.
+    return isHydration and "hydration" or "food"
+end
+
 H.BaseForRecord = function(record)
     local affiliation = record and record.affiliation or {}
     local factionId = tostring(affiliation.factionID or "")

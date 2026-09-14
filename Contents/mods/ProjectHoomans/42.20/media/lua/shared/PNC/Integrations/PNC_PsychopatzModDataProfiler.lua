@@ -33,6 +33,7 @@ local function pathSegment(key)
     local lower = string.lower(value)
     if string.match(lower, "^item_%d+$")
         or string.match(lower, "^pnc_[%w_]+_%d+_")
+        or string.match(lower, "^pnc_npc[%w_%-]*$")
         or #value > 32
     then
         return "[id]"
@@ -44,7 +45,7 @@ end
 
 local function rootName(name)
     name = tostring(name or "")
-    if string.sub(name, 1, 8) == "PNC_NPC_" then return "PNC_NPC_*" end
+    if string.sub(name, 1, 7) == "PNC_npc" then return "PNC_npc*" end
     return pathSegment(name)
 end
 

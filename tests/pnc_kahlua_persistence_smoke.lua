@@ -234,7 +234,29 @@ local repairedPayload = PNC.Persistence.SerializeRecord(restored)
 T.equal(repairedPayload.repairVersions.facility_activity_runtime, 1,
     "facility repair revision was not persisted")
 
-next = originalNext
-T.finish("pnc_kahlua_persistence_smoke")
+record.generation = {
+    source = "starting_companion_trait",
+    traitID = "PNC_HasBrother",
+    relationshipKind = "brother",
+    relationshipSince = "before_outbreak",
+    playerCharacterUUID = "char_starting_player",
+}
+local startingPayload = PNC.Persistence.SerializeRecord(record)
+T.equal(startingPayload.generation.source, "starting_companion_trait",
+    "starting companion source was serialized")
+T.equal(startingPayload.generation.traitID, "PNC_HasBrother",
+    "starting companion trait was serialized")
+T.equal(startingPayload.generation.playerCharacterUUID,
+    "char_starting_player", "starting companion owner was serialized")
+local startingRestored = PNC.Persistence.DeserializeRecord(
+    startingPayload, record.id
+)
+T.equal(startingRestored.generation.relationshipKind, "brother",
+    "starting companion relationship was restored")
+T.equal(startingRestored.generation.relationshipSince, "before_outbreak",
+    "starting companion relationship age was restored")
+T.equal(startingRestored.generation.playerCharacterUUID,
+    "char_starting_player", "starting companion owner was restored")
 
+next = originalNext
 T.finish("pnc_kahlua_persistence_smoke")

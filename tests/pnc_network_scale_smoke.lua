@@ -233,6 +233,13 @@ local nearbyRecord = {
     },
     equipment = { worn = {}, attached = {} },
     runtime = {},
+    generation = {
+        source = "starting_companion_trait",
+        traitID = "PNC_HasBrother",
+        relationshipKind = "brother",
+        relationshipSince = "before_outbreak",
+        playerCharacterUUID = "char_network_player",
+    },
     presenceRevision = 1,
     affiliation = {
         factionID = "faction_crossroads",
@@ -319,6 +326,20 @@ T.equal(bodyIdentityIndex["75"], nil,
 
 nearbyRecord.ownerUsername = "player_1"
 nearbyRecord.activeBehavior = "FollowOwner:idle"
+local relationshipSnapshot = PNC.Network.BuildSnapshot(nearbyRecord)
+local relationshipRoster = PNC.Network.BuildRosterSnapshot(nearbyRecord)
+T.equal(relationshipSnapshot.startingRelationship.kind, "brother",
+    "detailed snapshot carries starting relationship kind")
+T.equal(relationshipRoster.startingRelationship.since, "before_outbreak",
+    "roster snapshot carries starting relationship age")
+T.equal(relationshipSnapshot.startingRelationship.traitID, nil,
+    "detailed snapshot does not leak trait ID")
+T.equal(relationshipSnapshot.startingRelationship.playerCharacterUUID, nil,
+    "detailed snapshot does not leak player UUID")
+T.equal(relationshipSnapshot.displayName, "Nearby",
+    "detailed snapshot uses canonical display name")
+T.equal(relationshipSnapshot.name, nil,
+    "detailed snapshot has no duplicate name field")
 local followDelta = PNC.Network.BuildPresenceDelta(nearbyRecord)
 T.equal(followDelta.activeBehavior, "FollowOwner:idle",
     "presence delta carries the current behavior for nameplate debug")
@@ -417,6 +438,11 @@ nearbyRecord.campState = {
     },
 }
 local campSnapshot = PNC.Network.BuildSnapshot(nearbyRecord)
+T.equal(campSnapshot.name, nil, "detailed snapshot retained name alias")
+T.equal(campSnapshot.identity.displayName, nil,
+    "detailed snapshot duplicated display name")
+T.equal(campSnapshot.identity.identitySeed, nil,
+    "detailed snapshot duplicated identity seed")
 T.equal(campSnapshot.debugState.campResourceDebug.bedCount, 1,
     "detailed camp debug bed count")
 T.equal(campSnapshot.debugState.campResourceDebug.waterCount, 1,
@@ -428,8 +454,10 @@ T.equal(PNC.Network.BuildPresenceDelta(nearbyRecord)
     "presence camp debug resource count")
 nearbyRecord.orderSpec = nil
 nearbyRecord.campState = nil
+local compactRoster = PNC.Network.BuildRosterSnapshot(nearbyRecord)
+T.equal(compactRoster.name, nil, "roster snapshot retained name alias")
 T.equal(
-    #PNC.Network.BuildRosterSnapshot(nearbyRecord).travel.route.points,
+    #compactRoster.travel.route.points,
     2,
     "initial roster omitted travel route"
 )
@@ -439,13 +467,12 @@ T.equal(
     "high-frequency presence delta repeated travel route"
 )
 T.equal(
-    PNC.Network.BuildRosterSnapshot(nearbyRecord).mapPresentation.roleTag,
+    compactRoster.mapPresentation.roleTag,
     "trader",
     "roster omitted map presentation"
 )
 T.equal(
-    PNC.Network.BuildRosterSnapshot(nearbyRecord)
-        .portrait.equipment.worn.Hat,
+    compactRoster.portrait.equipment.worn.Hat,
     "Base.Hat_HardHat",
     "roster omitted compact portrait metadata"
 )
@@ -473,6 +500,7 @@ local deathSnapshot = PNC.Network.BuildDeathMarkerSnapshot({
         equipment = { worn = {} },
     },
 })
+T.equal(deathSnapshot.name, nil, "death marker retained name alias")
 T.equal(deathSnapshot.deathMarker, true, "death marker roster flag")
 T.equal(deathSnapshot.colonist, true, "death marker colonist flag")
 T.equal(deathSnapshot.presenceState, "corpse",
@@ -879,6 +907,4 @@ T.equal(PNC.Network.BroadcastFirearmShot({
 T.equal(#sent, 8, "firearm shot distance recipient count")
 T.equal(sent[1].command, "FirearmShot", "firearm shot command")
 T.equal(sent[1].payload.shotId, "npc_near:1", "firearm shot id")
-T.finish("pnc_network_scale_smoke")
-
 T.finish("pnc_network_scale_smoke")

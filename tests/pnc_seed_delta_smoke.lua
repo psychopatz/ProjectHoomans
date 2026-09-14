@@ -323,8 +323,10 @@ end
 local function nativeItem(fullType)
     local item = { fullType = fullType, modData = {}, weight = 0.1 }
     local dualFood = fullType == "Mod.FoodApple"
+    local replacementFood = fullType == "Base.PanFood"
     local food = dualFood or fullType == "Base.Apple"
         or fullType == "Base.FractionalApple"
+        or replacementFood
         or string.find(fullType, "Mod.Food", 1, true) == 1
     local water = fullType == "Base.WaterBottle"
         or string.find(fullType, "Mod.Water", 1, true) == 1
@@ -375,12 +377,28 @@ local function nativeItem(fullType)
     function item:setCurrentAmmoCount(value) self.ammoCount = value end
     function item:getHungerChange()
         if fullType == "Base.FractionalApple" then return -0.15 end
+        if replacementFood then return -0.80 end
         return food and -0.20 or 0
     end
     function item:getThirstChange()
         return dualFood and -0.10 or water and -0.15 or 0
     end
     function item:getUseDelta() return water and 0.25 or 0 end
+    function item:getReplaceOnUse()
+        return replacementFood and "Base.Pan" or nil
+    end
+    function item:getCalories()
+        return replacementFood and 720 or nil
+    end
+    function item:getCarbohydrates()
+        return replacementFood and 72 or nil
+    end
+    function item:getProteins()
+        return replacementFood and 18 or nil
+    end
+    function item:getLipids()
+        return replacementFood and 36 or nil
+    end
     function item:isWaterSource() return water end
     function item:isBandage() return fullType == "Base.Bandage" end
     function item:getAge() return self.age or 0 end
@@ -656,16 +674,53 @@ PNC._testFoodOps, PNC._testFoodRemaining, PNC._testFoodUnused,
     PNC.SupplyInventoryInternal.CanonicalConsumptionOps({
         id = "fractional_food", type = "Base.FractionalApple", stack = 1,
         uses = 1,
-    }, { food = true, hydration = false, useDelta = 0.25 })
-T.near(PNC._testFoodRemaining, 0.75, 0.000001,
-    "food use-delta keeps a partial serving remainder")
-T.near(PNC._testFoodFraction, 0.25, 0.000001,
-    "food consumption reports the consumed fraction")
+    }, { food = true, hydration = false, useDelta = 0.25,
+        resourceKind = "FOOD" })
+T.equal(PNC._testFoodRemaining, 0,
+    "food consumption depletes the complete remaining item")
+T.equal(PNC._testFoodOps[1].op, "remove",
+    "food consumption did not remove the complete food item")
+T.near(PNC._testFoodFraction, 1, 0.000001,
+    "food consumption reports the complete remaining portion")
+local partialDescriptor = PNC.ItemUtility.Internal.Describe({
+    food = true, hydration = false, hunger = 0.40, thirst = 0,
+    negativeThirst = 0, calories = 720, carbohydrates = 72,
+    proteins = 18, lipids = 36, useDelta = 0.25, maxUsedDelta = 1,
+}, { usedDelta = 0.50 })
+T.near(partialDescriptor.remainingFraction, 0.50, 0.000001,
+    "partially eaten food did not expose its remaining fraction")
+T.near(partialDescriptor.hunger, 0.20, 0.000001,
+    "partially eaten food still awarded full hunger relief")
+T.near(partialDescriptor.calories, 360, 0.000001,
+    "partially eaten food still awarded full calories")
+local staleNutritionDescriptor = PNC.ItemUtility.Internal.Describe({
+    food = true, hydration = false, hunger = 0.40, thirst = 0,
+    negativeThirst = 0, calories = 720, carbohydrates = 72,
+    proteins = 18, lipids = 36, useDelta = 0.25, maxUsedDelta = 1,
+}, { usedDelta = 0.50, calories = 720, carbohydrates = 72,
+    proteins = 18, lipids = 36 })
+T.near(staleNutritionDescriptor.calories, 360, 0.000001,
+    "stale full nutrition metadata bypassed the remaining fraction")
+do
+local cookedDescriptor = PNC.ItemUtility.Internal.Describe({
+    food = true, hydration = false, hunger = 0.40, thirst = 0,
+    negativeThirst = 0, calories = 720, useDelta = 0,
+}, { cooked = true, hungChange = -0.40 })
+T.near(cookedDescriptor.hunger, 0.52, 0.000001,
+    "cooked food metadata did not increase hunger relief")
+local rottenDescriptor = PNC.ItemUtility.Internal.Describe({
+    food = true, hydration = false, hunger = 0.40, thirst = 0,
+    negativeThirst = 0, calories = 720, offAge = 1, offAgeMax = 2,
+    useDelta = 0,
+}, { age = 2, hungChange = -0.40 })
+T.near(rottenDescriptor.hunger, 0.40 / 2.2, 0.000001,
+    "rotten food metadata did not reduce hunger relief")
+end
 PNC._testBurntEffect = PNC.SupplyInventoryInternal.BuildConsumptionEffect({
     hunger = 0.40, thirst = 0, calories = 100,
     carbohydrates = 20, proteins = 10, lipids = 5,
     burnt = true, fullType = "Base.FractionalApple",
-}, PNC._testFoodFraction)
+}, 0.25)
 T.near(PNC._testBurntEffect.hunger, 0.02, 0.000001,
     "burnt food hunger is reduced to one fifth after partial use")
 T.near(PNC._testBurntEffect.calories, 5, 0.000001,
@@ -802,6 +857,53 @@ T.falsy(exactFoodNPC.inventory.items[exactFoodID],
     "exact personal food item remained in the physical inventory")
 T.truthy(PNC.IndividualNeeds.Get(exactFoodNPC, "hunger") < exactFoodBefore,
     "exact personal food transaction did not apply hunger relief")
+end
+
+-- Food relief beyond visible hunger is retained as a persistent satiation
+-- reserve, then consumed by passive hunger increase before the visible stat.
+do
+local overflowNPC = supplyNPC("supply_hunger_overflow", {
+    emptyBaseline = true, hunger = 0.20,
+})
+local overflowEffect = {
+    hunger = 0.75, thirst = 0, calories = 0,
+}
+PNC.IndividualNeeds.Commands.ApplyFood(
+    overflowNPC, overflowEffect, "test_overflow_food")
+T.near(PNC.IndividualNeeds.Get(overflowNPC, "hunger"), 0,
+    0.000001, "food relief did not clear visible hunger")
+T.near(PNC.IndividualNeeds.GetHungerOverflow(overflowNPC), 0.55,
+    0.000001, "food relief overflow was discarded")
+PNC.IndividualNeeds.IncreaseHunger(overflowNPC, 0.25,
+    "test_overflow_drain")
+T.near(PNC.IndividualNeeds.Get(overflowNPC, "hunger"), 0,
+    0.000001, "passive hunger bypassed satiation reserve")
+T.near(PNC.IndividualNeeds.GetHungerOverflow(overflowNPC), 0.30,
+    0.000001, "passive hunger did not consume reserve first")
+PNC.IndividualNeeds.IncreaseHunger(overflowNPC, 0.40,
+    "test_overflow_release")
+T.near(PNC.IndividualNeeds.Get(overflowNPC, "hunger"), 0.10,
+    0.000001, "visible hunger did not resume after reserve depletion")
+T.near(PNC.IndividualNeeds.GetHungerOverflow(overflowNPC), 0,
+    0.000001, "hunger reserve remained after depletion")
+end
+
+do
+local encodedNeeds = PNC.NeedsStateCodec.Encode({
+    overflow = {
+        needs = { hunger = 0, thirst = 0, fatigue = 0 },
+        hungerOverflow = 0.55,
+    },
+}, 100)
+local decodedNeeds = PNC.NeedsStateCodec.Decode(encodedNeeds)
+T.near(decodedNeeds.overflow.hungerOverflow, 0.55, 0.001,
+    "hunger overflow was not persisted")
+local oldShape = PNC.NeedsStateCodec.Decode({
+    v = PNC.NeedsStateCodec.VERSION, at = 0,
+    n = { legacy = { 0, 0, 0, 0, 0, nil, nil, 0, 0, 0, 0 } },
+})
+T.equal(oldShape.legacy.hungerOverflow, 0,
+    "old needs records did not default hunger overflow to zero")
 end
 
 -- Build 42 uses Base.WaterBottle; the old Full/Empty names are model names.
@@ -944,6 +1046,34 @@ T.truthy(PNC.IndividualNeeds.Get(dualFoodNPC, "hunger") < 0.30,
     "dual-purpose food did not reduce hunger")
 T.truthy(PNC.IndividualNeeds.Get(dualFoodNPC, "thirst") < 0.30,
     "dual-purpose food did not reduce thirst")
+do
+T.truthy(PNC.Inventory.AddItems(dualFoodNPC, {
+    { type = "Mod.FoodApple", stack = 1 },
+}, "root", "test_personal_dual_hydration"))
+local dualHydrationID
+for itemID, item in pairs(dualFoodNPC.inventory.items) do
+    if item.type == "Mod.FoodApple" then dualHydrationID = itemID end
+end
+local dualHydrationBeforeHunger =
+    PNC.IndividualNeeds.Get(dualFoodNPC, "hunger")
+local dualHydrationBeforeThirst =
+    PNC.IndividualNeeds.Get(dualFoodNPC, "thirst")
+local dualHydrationOK, dualHydrationReason, dualHydrationEffect =
+    SupplyService.ConsumePersonalItem(
+        dualFoodNPC, dualHydrationID, 0.10, "HYDRATION")
+T.equal(dualHydrationOK, true,
+    "dual-purpose hydration request failed: " .. tostring(dualHydrationReason))
+T.near(dualHydrationEffect.hunger, 0.20, 0.000001,
+    "hydration lane discarded the food component")
+T.near(dualHydrationEffect.thirst, 0.10, 0.000001,
+    "hydration lane discarded the thirst component")
+T.truthy(PNC.IndividualNeeds.Get(dualFoodNPC, "hunger")
+    < dualHydrationBeforeHunger,
+    "dual-purpose hydration request did not reduce hunger")
+T.truthy(PNC.IndividualNeeds.Get(dualFoodNPC, "thirst")
+    < dualHydrationBeforeThirst,
+    "dual-purpose hydration request did not reduce thirst")
+end
 
 -- State-aware storage selection may take more than the normal refill batch,
 -- while still stopping at the requested deficit.
@@ -1112,6 +1242,13 @@ function liveSupplyContainer:AddItem(value)
     value.getContainer = function(self) return self.owner end
     return value
 end
+function liveSupplyContainer:AddItems(fullType, count)
+    local values = {}
+    for _ = 1, count do
+        values[#values + 1] = self:AddItem(nativeItem(fullType))
+    end
+    return javaList(values)
+end
 function liveSupplyContainer:DoRemoveItem(value)
     for index = #liveSupplyItems, 1, -1 do
         if liveSupplyItems[index] == value then
@@ -1146,9 +1283,99 @@ T.equal(#liveSupplyItems, 0,
     "live food use did not mutate physical inventory")
 supplyBodies[liveSupplyNPC.id] = nil
 
+-- Native food replacements must survive as the same physical transaction.
+-- This models canned food, jars, pans, and similar Base-game vessels.
+do
+local replacementOps = PNC.SupplyInventoryInternal.CanonicalConsumptionOps({
+    id = "replacement_food", type = "Base.PanFood", stack = 1,
+}, { food = true, replaceOnUse = "Base.Pan", useDelta = 0 }, {
+    resourceKind = "FOOD",
+})
+T.equal(replacementOps[1].op, "remove",
+    "food with a replacement did not remove the consumed food")
+T.equal(replacementOps[2].op, "add",
+    "food with a replacement did not add a fresh empty vessel")
+T.equal(replacementOps[2].item.type, "Base.Pan",
+    "food replacement operation used the wrong empty vessel")
+
+T.truthy(CoreInventory.deposit(supplyStorage.inventory,
+    nativeItem("Base.PanFood"), 1))
+PNC.SupplyIndex.Invalidate(supplyStorage)
+local replacementNPC = supplyNPC("supply_live_replacement", {
+    emptyBaseline = true, hunger = 0.30,
+})
+liveSupplyItems = {}
+supplyBodies[replacementNPC.id] = liveSupplyBody
+local replacementAcquire = SupplyService.Process({
+    requesterId = replacementNPC.id, resourceKind = "FOOD",
+    required = { hunger = 0.20 }, priority = 80,
+}, { acquireOnly = true })
+T.equal(replacementAcquire, true, "replacement food acquisition")
+local replacementUse, replacementReason = SupplyService.Process({
+    requesterId = replacementNPC.id, resourceKind = "FOOD",
+    required = { hunger = 0.20 }, priority = 80,
+})
+T.equal(replacementUse, true,
+    "replacement food use failed: " .. tostring(replacementReason))
+T.equal(#liveSupplyItems, 1,
+    "food replacement did not return an item to the native inventory")
+T.equal(liveSupplyItems[1].fullType, "Base.Pan",
+    "food replacement returned the wrong native vessel")
+local replacementCompact
+for _, compact in pairs(replacementNPC.inventory.items) do
+    if compact.type == "Base.Pan" then replacementCompact = compact end
+end
+T.truthy(replacementCompact,
+    "food replacement was not committed to compact inventory")
+T.equal(replacementCompact.itemState and replacementCompact.itemState.age,
+    nil, "food replacement retained stale food metadata")
+supplyBodies[replacementNPC.id] = nil
+end
+
+-- The same complete-food transaction must feed detailed nutrition in realism
+-- mode, while the primitive hunger value uses the overflow reserve.
+do
+PNC.Sandbox.PlayerOwnedNPCNutritionRealismEnabled = function() return true end
+local realismFoodNPC = supplyNPC("supply_realism_food", {
+    emptyBaseline = true, hunger = 0.20,
+})
+T.truthy(PNC.Inventory.AddItems(realismFoodNPC, {
+    { type = "Base.PanFood", stack = 1 },
+}, "root", "test_realism_food"))
+local realismFoodID
+for itemID, compact in pairs(realismFoodNPC.inventory.items) do
+    if compact.type == "Base.PanFood" then realismFoodID = itemID end
+end
+T.truthy(realismFoodID, "realism food item was not indexed")
+local realismFoodOK, realismFoodReason =
+    SupplyService.ConsumePersonalItem(realismFoodNPC, realismFoodID,
+        0.20, "FOOD")
+T.equal(realismFoodOK, true,
+    "realism food use failed: " .. tostring(realismFoodReason))
+local realismReplacement
+for _, compact in pairs(realismFoodNPC.inventory.items) do
+    if compact.type == "Base.Pan" then realismReplacement = compact end
+end
+T.truthy(realismReplacement,
+    "realism food was not fully consumed into its empty vessel")
+T.near(PNC.IndividualNeeds.GetHungerOverflow(realismFoodNPC), 0.60,
+    0.000001, "realism food did not preserve hunger overflow")
+local realismNutrition = PNC.IndividualNeeds.GetNutrition(realismFoodNPC)
+T.equal(realismNutrition.calories, 1520,
+    "realism food calories were not applied")
+T.equal(realismNutrition.carbohydrates, 72,
+    "realism food carbohydrates were not applied")
+T.equal(realismNutrition.proteins, 18,
+    "realism food proteins were not applied")
+T.equal(realismNutrition.lipids, 36,
+    "realism food lipids were not applied")
+PNC.Sandbox.PlayerOwnedNPCNutritionRealismEnabled = function() return false end
+end
+
 -- A live NPC must drain the native B42 FluidContainer as well as the compact
 -- record. The empty bottle remains available after the final sip.
 do
+PNC.Sandbox.PlayerOwnedNPCNutritionRealismEnabled = function() return true end
 T.truthy(CoreInventory.deposit(supplyStorage.inventory,
     nativeItem("Base.WaterBottle"), 1))
 PNC.SupplyIndex.Invalidate(supplyStorage)
@@ -1220,6 +1447,7 @@ T.near(PNC.Inventory.ResolveItemState(liveWaterCompact).fluidAmount,
     expectedLiveWaterAmount,
     0.000001, "live hydration compact state matches native fluid amount")
 supplyBodies[liveWaterNPC.id] = nil
+PNC.Sandbox.PlayerOwnedNPCNutritionRealismEnabled = function() return false end
 end
 
 -- Native Build 42 groups identical items into one InventoryItem count. A

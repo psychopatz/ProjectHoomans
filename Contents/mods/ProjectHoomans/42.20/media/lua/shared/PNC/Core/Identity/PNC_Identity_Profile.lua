@@ -169,7 +169,7 @@ function Identity.GetCharacterSummary(record)
     local archetype = Archetypes.Get(record and record.archetypeID or nil)
     local identity = record and record.identity or {}
     return {
-        displayName = identity.displayName or record and record.name or "Unknown",
+        displayName = identity.displayName or "Unknown",
         archetypeID = archetype.id,
         archetypeLabel = archetype.label,
         identitySeed = identity.seed or record and record.identitySeed or 1,

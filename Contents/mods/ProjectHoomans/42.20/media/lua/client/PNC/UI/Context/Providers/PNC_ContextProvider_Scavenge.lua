@@ -66,7 +66,7 @@ function Provider.addOptions(menu, entry)
     scavengingMenu:addOption(tr(
         "UI_PNC_Scavenge_Open", "Open Scavenging UI"), nil, function()
             Controller.Open(entry.id, {
-                name = entry.name or entry.displayName or entry.id,
+                name = entry.displayName or entry.id,
             })
         end)
 end

@@ -6,16 +6,133 @@ local Components = {}
 local UI = PsychopatzCore.UI
 local Theme = UI.Theme
 local Layout = UI.Layout
+local rosterTextures = {}
+local ROSTER_ICON_SIZE = 22
+local ROSTER_ICON_Y = 4
+
+local function rosterTexture(path)
+    if not path or not getTexture then return nil end
+    if rosterTextures[path] == nil then
+        rosterTextures[path] = getTexture(path) or false
+    end
+    return rosterTextures[path] or nil
+end
+
+local function rosterScale(list)
+    return tonumber(list and list.uiScale)
+        or tonumber(list and list.parent and list.parent.uiScale) or 1
+end
+
+local function rosterPixels(value, scale)
+    return Layout.Pixels and Layout.Pixels(value, scale) or value
+end
+
+local function rosterIconMetrics(list, person)
+    local indicators = person.indicators or {}
+    local scale = rosterScale(list)
+    local size = rosterPixels(ROSTER_ICON_SIZE, scale)
+    local gap = rosterPixels(3, scale)
+    local count = 0
+    for _, indicator in ipairs(indicators) do
+        if rosterTexture(indicator.texturePath) then count = count + 1 end
+    end
+    return size, gap, count
+end
+
+local function drawRosterIcons(list, y, person)
+    local indicators = person.indicators or {}
+    local size, gap, count = rosterIconMetrics(list, person)
+    if count == 0 or not list.drawTextureScaledAspect then return 0 end
+    local right = list:getWidth() - rosterPixels(8, rosterScale(list))
+    local x = right - size
+    for index = #indicators, 1, -1 do
+        local texture = rosterTexture(indicators[index].texturePath)
+        if texture then
+            list:drawTextureScaledAspect(texture, x, y + ROSTER_ICON_Y,
+                size, size,
+                1, 1, 1, 1)
+            x = x - size - gap
+        end
+    end
+    return count * size + math.max(0, count - 1) * gap
+end
+
+local function rosterIndicatorAt(list)
+    if not list or not list.getMouseX or not list.getMouseY
+        or not list.rowAt then
+        return nil
+    end
+    if list.isMouseOverScrollBar and list:isMouseOverScrollBar() then
+        return nil
+    end
+    local mouseX = list:getMouseX()
+    local mouseY = list:getMouseY()
+    local rowIndex = list:rowAt(mouseX, mouseY)
+    local entry = list.items and list.items[rowIndex]
+    local person = entry and entry.item or nil
+    if not person then return nil end
+
+    local rowTop = list.topOfItem and list:topOfItem(rowIndex)
+        or (rowIndex - 1) * list.itemheight
+    local size, gap, count = rosterIconMetrics(list, person)
+    if count == 0 or mouseY < rowTop + ROSTER_ICON_Y
+        or mouseY > rowTop + ROSTER_ICON_Y + size
+    then
+        return nil
+    end
+
+    local x = list:getWidth() - rosterPixels(8, rosterScale(list)) - size
+    local indicators = person.indicators or {}
+    for index = #indicators, 1, -1 do
+        local texture = rosterTexture(indicators[index].texturePath)
+        if texture then
+            if mouseX >= x and mouseX <= x + size then
+                return indicators[index]
+            end
+            x = x - size - gap
+        end
+    end
+    return nil
+end
+
+local function hideRosterTooltip(list)
+    local tooltip = list and list.tooltipUI or nil
+    if tooltip and tooltip.getIsVisible and tooltip:getIsVisible() then
+        tooltip:setVisible(false)
+        tooltip:removeFromUIManager()
+    end
+end
+
+local function updateRosterTooltip(list)
+    local indicator = rosterIndicatorAt(list)
+    local text = indicator and indicator.tooltip or nil
+    if not text or not ISToolTip then
+        hideRosterTooltip(list)
+        return
+    end
+    if not list.tooltipUI then
+        list.tooltipUI = ISToolTip:new()
+        list.tooltipUI:setOwner(list)
+        list.tooltipUI:setVisible(false)
+        list.tooltipUI:setAlwaysOnTop(true)
+        list.tooltipUI.maxLineWidth = 1000
+    end
+    if not list.tooltipUI:getIsVisible() then
+        list.tooltipUI:addToUIManager()
+        list.tooltipUI:setVisible(true)
+    end
+    list.tooltipUI.description = text
+    list.tooltipUI:setX(list:getMouseX() + 23)
+    list.tooltipUI:setY(list:getMouseY() + 23)
+end
 
 local function drawRosterRow(list, y, entry, alternate)
     local person = entry.item or {}
     UI.DrawListSelection(
         list, y, list.itemheight, list.selected == entry.index, alternate
     )
-    local level = person.worstLevel or "NORMAL"
-    local badgeWidth = UI.DrawBadge(list, level, list:getWidth() - 7,
-        y + 7, Shared.LEVEL_COLORS[level])
-    local available = math.max(40, list:getWidth() - badgeWidth - 24)
+    local iconWidth = drawRosterIcons(list, y, person)
+    local available = math.max(40, list:getWidth() - iconWidth - 24)
     list:drawText(
         Layout.Ellipsize(person.label, UIFont.Small, available), 10, y + 7,
         Theme.colors.text.r, Theme.colors.text.g, Theme.colors.text.b,
@@ -141,7 +258,16 @@ function Components.CreatePane(window, itemHeight, drawItem)
 end
 
 function Components.CreateRosterPane(window)
-    return createPane(window, 52, drawRosterRow)
+    local pane, list = createPane(window, 52, drawRosterRow)
+    list.updateTooltip = updateRosterTooltip
+    local nativeMouseMoveOutside = list.onMouseMoveOutside
+    list.onMouseMoveOutside = function(self, x, y)
+        if type(nativeMouseMoveOutside) == "function" then
+            nativeMouseMoveOutside(self, x, y)
+        end
+        hideRosterTooltip(self)
+    end
+    return pane, list
 end
 
 function Components.CreateDetailPane(window)

@@ -49,16 +49,31 @@ function Presentation.Row(entry)
     local eventType = tostring(entry[1] or "")
     local message
     if eventType == EventTypes.NPC_FOOD_CONSUMED then
-        message = text("UI_PNC_Journal_FoodConsumed", "Ate %s (+%s%% hunger)",
-            itemName(entry[3]), percent(entry[4]))
+        if tonumber(entry[5]) and tonumber(entry[5]) > 0.000001 then
+            message = text("UI_PNC_Journal_ConsumableDual",
+                "Consumed %s (+%s%% hunger, +%s%% thirst relief)",
+                itemName(entry[3]), percent(entry[4]), percent(entry[5]))
+        else
+            message = text("UI_PNC_Journal_FoodConsumed",
+                "Ate %s (+%s%% hunger)", itemName(entry[3]), percent(entry[4]))
+        end
     elseif eventType == EventTypes.NPC_DRINK_CONSUMED then
-        message = text("UI_PNC_Journal_DrinkConsumed",
-            "Drank %s (+%s%% thirst relief)", itemName(entry[3]),
-            percent(entry[4]))
+        if tonumber(entry[5]) and tonumber(entry[5]) > 0.000001 then
+            message = text("UI_PNC_Journal_ConsumableDual",
+                "Consumed %s (+%s%% hunger, +%s%% thirst relief)",
+                itemName(entry[3]), percent(entry[5]), percent(entry[4]))
+        else
+            message = text("UI_PNC_Journal_DrinkConsumed",
+                "Drank %s (+%s%% thirst relief)", itemName(entry[3]),
+                percent(entry[4]))
+        end
     elseif eventType == EventTypes.NPC_WATER_REFILLED then
         message = text("UI_PNC_Journal_WaterRefilled",
             "Filled %s (+%s L)", itemName(entry[3]),
             string.format("%.2f", tonumber(entry[4]) or 0))
+    elseif eventType == EventTypes.NPC_WATER_REFILL_DRANK then
+        message = text("UI_PNC_Journal_WaterRefillDrank",
+            "Drank from filled %s (thirst cleared)", itemName(entry[3]))
     elseif eventType == EventTypes.NPC_NEED_SEVERITY_CHANGED then
         message = string.format("%s changed from %s to %s",
             humanize(entry[3]), humanize(entry[4]), humanize(entry[5]))

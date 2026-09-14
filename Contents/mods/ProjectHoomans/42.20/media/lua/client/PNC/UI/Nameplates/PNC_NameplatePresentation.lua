@@ -251,6 +251,15 @@ local function activityItemName(info)
     return itemName(fullType, fallback)
 end
 
+local function activityLabel(info, fallback)
+    if tostring(info and info.activityConsumptionMode or "") == "dual" then
+        return tr("UI_PNC_Activity_Consuming", "Consuming")
+    end
+    return type(info and info.labelKey) == "string"
+        and info.labelKey ~= ""
+        and tr(info.labelKey, fallback) or fallback
+end
+
 local function recipeTarget(info)
     local resolved = info.recipeId and PNC.RecipeKnowledgeRegistry
         and PNC.RecipeKnowledgeRegistry.Queries
@@ -342,8 +351,7 @@ function Presentation.ActivityActionStatus(snapshot)
         return "", ACTION_COLOR, false
     end
     local fallback = tostring(info.fallback or info.activityId or "")
-    local text = type(info.labelKey) == "string" and info.labelKey ~= ""
-        and tr(info.labelKey, fallback) or fallback
+    local text = activityLabel(info, fallback)
     if info.facilityDefinitionId then
         text = text .. " - " .. facilityName(info)
     end

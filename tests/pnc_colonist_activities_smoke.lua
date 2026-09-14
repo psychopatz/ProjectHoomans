@@ -156,14 +156,40 @@ T.equal(rows[5].label, "Reached Axe level 3",
     "activities tab does not render journal history")
 T.equal(rows[6].label, "Ate Apple (+20% hunger)",
     "activities tab does not preserve canonical journal formatting")
+person.actionInformation.activityConsumptionMode = "dual"
+local dualRows = Activities.BuildRows({ selectedPerson = person, window = window })
+T.equal(dualRows[1].detail, "CONSUMING - Apple (PLAYING)",
+    "activities tab uses a neutral label for dual-purpose consumption")
+person.actionInformation.activityConsumptionMode = nil
 local JournalPresentation = require
     "PNC/UI/Communities/PNC_ColonistJournalPresentation"
+local dualFoodRow = JournalPresentation.Row({
+    "projecthoomans.npc.needs.foodConsumed", 120,
+    "Base.Apple", 0.16, 0.10,
+})
+T.equal(dualFoodRow.message,
+    "Consumed Apple (+16% hunger, +10% thirst relief)",
+    "colonist journal exposes both effects of a dual-purpose food")
+local dualDrinkRow = JournalPresentation.Row({
+    "projecthoomans.npc.needs.drinkConsumed", 120,
+    "Base.Apple", 0.10, 0.16,
+})
+T.equal(dualDrinkRow.message,
+    "Consumed Apple (+16% hunger, +10% thirst relief)",
+    "colonist journal exposes both effects through the hydration lane")
 local refillRow = JournalPresentation.Row({
     "projecthoomans.npc.needs.waterRefilled", 120,
     "Base.WaterBottle", 0.75, "sink:10:10:0",
 })
 T.equal(refillRow.message, "Filled WaterBottle (+0.75 L)",
     "activities journal does not render water refill entries")
+local refillDrinkRow = JournalPresentation.Row({
+    "projecthoomans.npc.needs.waterRefillDrank", 120,
+    "Base.WaterBottle", 0.30, 0.75, "sink:10:10:0",
+})
+T.equal(refillDrinkRow.message,
+    "Drank from filled WaterBottle (thirst cleared)",
+    "activities journal does not render combined refill-drink entries")
 
 T.truthy(Activities.OnControl(window, {
     internal = "manual_eat",

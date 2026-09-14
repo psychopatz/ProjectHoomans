@@ -6,6 +6,7 @@ PNC.EventTypes = PNC.EventTypes or {
     NPC_FOOD_CONSUMED = "projecthoomans.npc.needs.foodConsumed",
     NPC_DRINK_CONSUMED = "projecthoomans.npc.needs.drinkConsumed",
     NPC_WATER_REFILLED = "projecthoomans.npc.needs.waterRefilled",
+    NPC_WATER_REFILL_DRANK = "projecthoomans.npc.needs.waterRefillDrank",
     NPC_NEED_SEVERITY_CHANGED = "projecthoomans.npc.needs.severityChanged",
     NPC_NEED_CRITICAL_DAMAGE = "projecthoomans.npc.needs.criticalDamage",
     NPC_WEIGHT_CATEGORY_CHANGED = "projecthoomans.npc.nutrition.weightCategoryChanged",

@@ -329,6 +329,8 @@ snapshot.actionInformation = {
 getText = function(key)
     if key == "UI_PNC_Action_FoodTarget" then return "food" end
     if key == "UI_PNC_Activity_Eating" then return "Eating" end
+    if key == "UI_PNC_Activity_Drinking" then return "Drinking" end
+    if key == "UI_PNC_Activity_Consuming" then return "Consuming" end
     if key == "UI_PNC_Recovery_Gasping" then return "*Gasping*" end
     return key
 end
@@ -339,6 +341,13 @@ actionText = PNC.NameplatePresentation.ActionStatus(snapshot)
 T.contains(actionText, "Eating", "eating activity label")
 T.contains(actionText, "Apple", "eating activity item")
 T.contains(actionText, "preparing", "eating activity phase")
+snapshot.actionInformation.labelKey = "UI_PNC_Activity_Drinking"
+snapshot.actionInformation.fallback = "Drinking"
+snapshot.actionInformation.activityConsumptionMode = "dual"
+actionText = PNC.NameplatePresentation.ActionStatus(snapshot)
+T.contains(actionText, "Consuming", "dual-purpose activity uses a neutral verb")
+T.falsy(string.find(actionText, "Drinking", 1, true),
+    "dual-purpose activity does not mislabel food as drinking")
 snapshot.staminaRecovery = {
     active = true,
     sessionId = 2,

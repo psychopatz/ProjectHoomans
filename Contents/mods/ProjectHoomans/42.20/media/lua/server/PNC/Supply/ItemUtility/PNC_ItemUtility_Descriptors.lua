@@ -8,6 +8,10 @@ local C = H.Constants
 local StateCodec = H.StateCodec
 local Portable = require "PsychopatzCore/Inventory/PsychopatzPortableItemState"
 
+local function clampFraction(value)
+    return math.max(0, math.min(1, tonumber(value) or 0))
+end
+
 local function effectiveState(profile, state)
     local raw = type(state) == "table" and state or {}
     local resolver = PNC.Inventory and PNC.Inventory.ResolveItemState
@@ -21,39 +25,58 @@ local function effectiveState(profile, state)
     return raw
 end
 
-local function currentFoodValues(profile, state, status)
-    local hungerChange = H.Number(state.hungChange)
-    local thirstChange = H.Number(state.thirstChange)
-    local hunger = profile.hunger
-    local thirst = profile.thirst
-    local negativeThirst = profile.negativeThirst
+local function currentFoodValues(profile, state, explicitState, status,
+    remainingFraction)
+    local hungerChange = H.Number(explicitState.hungChange,
+        H.Number(state.hungChange))
+    local thirstChange = H.Number(explicitState.thirstChange,
+        H.Number(state.thirstChange))
+    local hunger = profile.hunger * remainingFraction
+    local thirst = profile.thirst * remainingFraction
+    local negativeThirst = profile.negativeThirst * remainingFraction
+    local baseHunger = profile.hunger
+    local baseThirst = profile.thirst
+    local baseNegativeThirst = profile.negativeThirst
+    local hungerCap = baseHunger * remainingFraction
     if hungerChange ~= nil then
         if state.cooked == true then
             hungerChange = hungerChange * 1.3
+            hungerCap = hungerCap * 1.3
         elseif status.rotten then
             hungerChange = hungerChange / 2.2
+            hungerCap = hungerCap / 2.2
         elseif status.stale then
             hungerChange = hungerChange / 1.3
+            hungerCap = hungerCap / 1.3
         end
-        hunger = math.max(0, -hungerChange)
+        hunger = math.min(math.max(0, -hungerChange),
+            math.max(0, hungerCap))
     end
     if thirstChange ~= nil then
         if state.cooked == true then
             thirstChange = thirstChange / 2
         end
-        thirst = math.max(0, -thirstChange)
-        negativeThirst = math.max(0, thirstChange)
+        thirst = math.min(math.max(0, -thirstChange),
+            math.max(0, baseThirst * remainingFraction))
+        negativeThirst = math.min(math.max(0, thirstChange),
+            math.max(0, baseNegativeThirst * remainingFraction))
     end
     return hunger, thirst, negativeThirst
 end
 
 function H.Describe(profile, state, quantity)
     if not profile then return nil end
+    local explicitState = type(state) == "table" and state or {}
     state = effectiveState(profile, state)
     local usedDelta = H.Number(state.usedDelta, H.Number(state.uses))
     local useDelta = H.Number(profile.useDelta, 0) or 0
-    local remainingUses = useDelta > 0 and math.max(0,
-        math.floor((usedDelta or 1) / useDelta + 0.0001)) or 1
+    local remainingFraction = profile.food == true and usedDelta ~= nil
+        and clampFraction((usedDelta or 0) / math.max(0.000001,
+            H.Number(profile.maxUsedDelta, 1) or 1)) or 1
+    local remainingUses = profile.food == true
+        and (remainingFraction > 0.000001 and 1 or 0)
+        or useDelta > 0 and math.max(0,
+            math.floor((usedDelta or 1) / useDelta + 0.0001)) or 1
     local age = H.Number(state.age, 0) or 0
     local foodStatus = Portable.GetFoodStatus(state, profile)
     local hunger
@@ -64,7 +87,7 @@ function H.Describe(profile, state, quantity)
     local fluidHydration
     local fluidSafe
     hunger, thirst, negativeThirst = currentFoodValues(
-        profile, state, foodStatus
+        profile, state, explicitState, foodStatus, remainingFraction
     )
     fluidAmount = H.Number(state.fluidAmount)
     fluidType = tostring(state.fluidPrimaryType or state.fluidType or "")
@@ -90,6 +113,18 @@ function H.Describe(profile, state, quantity)
         expiry = math.max(0, math.min(1, age / profile.offAgeMax))
     end
     local burntMultiplier = state.burnt == true and 0.20 or 1
+    local function currentNutrient(field)
+        local current = H.Number(explicitState[field])
+        local baseline = H.Number(profile[field], 0) or 0
+        if current == nil then return baseline * remainingFraction end
+        -- A stale compact record may carry the original nutrient value while
+        -- usedDelta says only part of the food remains. Never award more than
+        -- the remaining share of the pristine item.
+        if baseline >= 0 then
+            return math.min(current, baseline * remainingFraction)
+        end
+        return current
+    end
     return {
         typeId = profile.typeId,
         fullType = profile.fullType,
@@ -99,14 +134,13 @@ function H.Describe(profile, state, quantity)
         -- so burnt items are not accidentally reduced twice.
         hunger = hunger * burntMultiplier,
         thirst = thirst * burntMultiplier,
-        calories = (H.Number(profile.calories, 0) or 0) * burntMultiplier,
+        calories = currentNutrient("calories") * burntMultiplier,
         carbohydrates = profile.carbohydrates ~= nil
-            and (H.Number(profile.carbohydrates, 0) or 0) * burntMultiplier
-            or nil,
+            and currentNutrient("carbohydrates") * burntMultiplier or nil,
         proteins = profile.proteins ~= nil
-            and (H.Number(profile.proteins, 0) or 0) * burntMultiplier or nil,
+            and currentNutrient("proteins") * burntMultiplier or nil,
         lipids = profile.lipids ~= nil
-            and (H.Number(profile.lipids, 0) or 0) * burntMultiplier or nil,
+            and currentNutrient("lipids") * burntMultiplier or nil,
         negativeThirst = negativeThirst * burntMultiplier,
         fluidAmount = fluidAmount,
         fluidType = fluidType ~= "" and fluidType or nil,
@@ -126,6 +160,9 @@ function H.Describe(profile, state, quantity)
         burnt = state.burnt == true,
         burntMultiplier = burntMultiplier,
         effectiveValues = true,
+        remainingFraction = remainingFraction,
+        replaceOnUse = profile.replaceOnUse,
+        replaceOnDeplete = profile.replaceOnDeplete,
         frozen = state.frozen == true,
         expiry = expiry,
         state = state,

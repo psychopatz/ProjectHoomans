@@ -98,7 +98,6 @@ function Network.BuildSnapshot(record)
     return {
         interestDetailed = true,
         id = record.id,
-        name = identity.displayName,
         displayName = identity.displayName,
         identitySeed = identity.identitySeed,
         portrait = PNC.Identity
@@ -144,7 +143,10 @@ function Network.BuildSnapshot(record)
         worldDiscovery = Parts.BuildWorldDiscoverySummary(record),
         visualProfile = record.visualProfile,
         isFemale = identity.isFemale,
-        identity = identity,
+        identity = {
+            isFemale = identity.isFemale,
+            survivor = identity.survivor,
+        },
         x = record.x,
         y = record.y,
         z = record.z,
@@ -236,14 +238,8 @@ function Network.BuildSnapshot(record)
         },
         inventorySummary = inventorySummary,
         characterWindow = {
-            displayName = identity.displayName,
-            archetypeID = identity.archetypeID,
-            archetypeLabel = identity.archetypeLabel,
-            identitySeed = identity.identitySeed,
             ownerUsername = ownership.ownerUsername,
-            recruited = ownership.recruited,
-            canRevive = canRevive,
-            carry = inventorySummary,
+            ownerOnlineID = ownership.ownerOnlineID,
         },
         debugState = buildDetailedDebugState(
             record,

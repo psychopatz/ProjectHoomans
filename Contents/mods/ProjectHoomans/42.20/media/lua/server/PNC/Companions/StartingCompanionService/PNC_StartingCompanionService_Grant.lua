@@ -20,19 +20,20 @@ end
 
 function H.EnsureOne(player, character, state, spec, index, at)
     local grant = state.grants[spec.id]
+    if not grant then return false, "starting_companion_grant_missing" end
     if grant and grant.status == "granted"
         and (tonumber(grant.enrichmentVersion) or 0)
             >= Starting.ENRICHMENT_VERSION
     then
         return true, "granted"
     end
-    local npcID = grant and grant.npcID
-        or H.MakeNPCID(character.uuid, spec.id)
+    local npcID = grant.npcID
     local record = Registry.Get(npcID)
     if not record then
         local x, y, z = H.PlayerPosition(player)
         local offsetX, offsetY = H.SpawnOffset(index)
-        local seed = Identity.NormalizeSeed(nil, npcID)
+        local seedID = H.MakeNPCSeedID(character.uuid, spec.id)
+        local seed = Identity.NormalizeSeed(nil, seedID)
         local isFemale = Traits.ResolveCompanionFemale(
             spec,
             H.PlayerFemale(player),
@@ -40,8 +41,20 @@ function H.EnsureOne(player, character, state, spec, index, at)
             Identity.Index(seed, "companion_sex", 2) == 1
         )
         local resolvedIdentity = H.BuildIdentity(
-            player, npcID, spec, isFemale, seed
+            player, seedID, spec, isFemale, seed
         )
+        if not npcID then
+            npcID = H.MakeNPCID(character.uuid, spec.id, resolvedIdentity)
+            if not npcID then return false, "npc_id_generation_failed" end
+            grant.npcID = npcID
+            local recorded, recordReason = H.UpdateState(
+                character.uuid, state, "starting_companion_id_assigned"
+            )
+            if not recorded then
+                grant.npcID = nil
+                return false, recordReason
+            end
+        end
         record = PNC.API.Spawn({
             id = npcID,
             archetypeID = "General",

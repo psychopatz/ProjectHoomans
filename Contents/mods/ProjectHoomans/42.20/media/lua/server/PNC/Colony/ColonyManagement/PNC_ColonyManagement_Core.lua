@@ -48,6 +48,18 @@ local function effectiveJobPriorities(record)
         PNC.WorkDefinitions and PNC.WorkDefinitions.COLONY_JOBS)
 end
 
+local function medicalStatus(record)
+    local wounds = PNC.NPCWounds
+    if wounds and wounds.BuildStatusSummary then
+        return wounds.BuildStatusSummary(record)
+    end
+    return {
+        bleeding = false,
+        openWoundCount = 0,
+        bandagedWoundCount = 0,
+    }
+end
+
 local function specialOrderState(record)
     local output = {}
     local npcId = record and record.id or nil
@@ -106,6 +118,7 @@ local function summary(record, player, options)
         role=record.affiliation and record.affiliation.communityRole or record.affiliation and record.affiliation.role or "companion",
         activity=PNC.IndividualNeeds.GetActivity(record), job=record.activeJob,
         health=record.health and record.health.state or "unknown", needs=needs,
+        medicalStatus=medicalStatus(record),
         nutrition=nutrition,
         conditionStats=PNC.ConditionStats
             and PNC.ConditionStats.Ensure(record,

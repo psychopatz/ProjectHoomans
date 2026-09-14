@@ -23,6 +23,12 @@ local Util = require
     "PsychopatzCore/Inventory/PsychopatzInventoryUtil"
 local Portable = require
     "PsychopatzCore/Inventory/PsychopatzPortableItemState"
+local ItemTransfer
+do
+    local loaded, value = pcall(require,
+        "PsychopatzCore/Inventory/PsychopatzItemTransfer")
+    if loaded then ItemTransfer = value end
+end
 local Events = require "PsychopatzCore/Events/PC_EventBus"
 local EventTypes =
     require "PNC/Core/Events/PNC_EventDefinitions"
@@ -50,14 +56,20 @@ local function removePhysicalUnit(adapter, nativeItem)
         end
         local updated = pcall(nativeItem.setCount, nativeItem, count - 1)
         if not updated then return false, "physical_stack_update_failed" end
-        return true, function()
+        return true, nil, function()
             pcall(nativeItem.setCount, nativeItem, count)
+            syncPhysicalItem(nativeItem)
+            return true
         end
     end
     if not adapter:_nativeRemove(nativeItem) then
         return false, "physical_remove_failed"
     end
-    return true, function() adapter:_nativeAdd(nativeItem) end
+    return true, nil, function()
+        local restored = adapter:_nativeAdd(nativeItem)
+        syncPhysicalItem(nativeItem)
+        return restored
+    end
 end
 
 local function fluidStateAfterUse(item, current, remaining)
@@ -151,6 +163,21 @@ local function splitItem(item, state)
     return split
 end
 
+local function replacementFullType(itemType, replacement)
+    local module
+    replacement = tostring(replacement or "")
+    if replacement == "" then return nil end
+    if string.find(replacement, ".", 1, true) then return replacement end
+    module = string.match(tostring(itemType or ""), "^([^%.]+)%.")
+    return module and module .. "." .. replacement or nil
+end
+
+local function foodReplacement(item, descriptor)
+    if not descriptor or descriptor.food ~= true then return nil end
+    return replacementFullType(item and item.type,
+        descriptor.replaceOnUse or descriptor.replaceOnDeplete)
+end
+
 function H.CanonicalConsumptionOps(item, descriptor, request)
     local stack = math.max(1, math.floor(tonumber(item.stack) or 1))
     -- Build 42 fluid containers do not expose a dependable thirstChange or
@@ -186,7 +213,34 @@ function H.CanonicalConsumptionOps(item, descriptor, request)
             itemState = fluidState }}, remainingUses, drained,
             consumedFraction
     end
-    if (descriptor.hydration or descriptor.food) and descriptor.useDelta > 0 then
+    if descriptor.food == true and request
+        and request.resourceKind == "FOOD"
+    then
+        local replacement = foodReplacement(item, descriptor)
+        if stack > 1 then
+            local ops = {
+                { op = "update", itemID = item.id, stack = stack - 1 },
+            }
+            if replacement then
+                ops[#ops + 1] = { op = "add", item = {
+                    type = replacement, stack = 1,
+                    container = item.container or "root", itemState = {},
+                } }
+            end
+            return ops, 0, nil, 1
+        end
+        if replacement then
+            return {
+                { op = "remove", itemID = item.id },
+                { op = "add", item = {
+                    type = replacement, stack = 1,
+                    container = item.container or "root", itemState = {},
+                } },
+            }, 0, nil, 1
+        end
+        return {{ op = "remove", itemID = item.id }}, 0, nil, 1
+    end
+    if descriptor.hydration and descriptor.useDelta > 0 then
         local current = currentUseDelta(item)
         local remaining = math.max(0, current - descriptor.useDelta)
         if remaining > 0.0001 then
@@ -296,6 +350,45 @@ local function drainPhysicalFluid(nativeItem, amount)
     end
 end
 
+local function consumePhysicalFood(adapter, nativeItem, replacement)
+    local removed, reason, undo = removePhysicalUnit(adapter, nativeItem)
+    local added = {}
+    local replacementResult
+    local addedOK
+    if not removed then return false, reason end
+    if replacement then
+        if ItemTransfer and ItemTransfer.AddToContainer then
+            addedOK, replacementResult = pcall(
+                ItemTransfer.AddToContainer, adapter.container, replacement, 1)
+            if not addedOK then replacementResult = nil end
+        elseif adapter.container and adapter.container.AddItems then
+            addedOK, replacementResult = pcall(
+                adapter.container.AddItems, adapter.container, replacement, 1)
+            if not addedOK then replacementResult = nil end
+        end
+        added = Util.javaList(replacementResult)
+        if #added <= 0 then
+            if undo then undo() end
+            return false, "physical_replacement_add_failed"
+        end
+        if not ItemTransfer and sendAddItemToContainer then
+            for index = 1, #added do
+                pcall(sendAddItemToContainer, adapter.container, added[index])
+            end
+        end
+    end
+    syncPhysicalItem(nativeItem)
+    return true, nil, function()
+        local restored = true
+        for index = #added, 1, -1 do
+            if not adapter:_nativeRemove(added[index]) then restored = false end
+        end
+        if undo and not undo() then restored = false end
+        syncPhysicalItem(nativeItem)
+        return restored
+    end
+end
+
 function SupplyInventory.Consume(record, itemID, request)
     if InventoryCommands.AdvanceFoodLifecycle then
         InventoryCommands.AdvanceFoodLifecycle(record)
@@ -358,7 +451,13 @@ function SupplyInventory.Consume(record, itemID, request)
                     return restored
                 end
                 syncPhysicalItem(selected.item)
-            elseif (descriptor.hydration or descriptor.food)
+            elseif descriptor.food and request.resourceKind == "FOOD"
+            then
+                local consumed, consumeReason, undo = consumePhysicalFood(
+                    adapter, selected.item, foodReplacement(item, descriptor))
+                if not consumed then return false, consumeReason end
+                physicalUndo = undo
+            elseif descriptor.hydration
                 and descriptor.useDelta > 0
                 and remainingUses > 0.0001
             then
@@ -413,7 +512,8 @@ function SupplyInventory.Consume(record, itemID, request)
             and EventTypes.NPC_DRINK_CONSUMED or nil
     if eventType then
         Events.emit(eventType, record, effect.fullType,
-            request.resourceKind == "FOOD" and effect.hunger or effect.thirst)
+            request.resourceKind == "FOOD" and effect.hunger or effect.thirst,
+            request.resourceKind == "FOOD" and effect.thirst or effect.hunger)
     end
     return true, "consumed", effect
 end

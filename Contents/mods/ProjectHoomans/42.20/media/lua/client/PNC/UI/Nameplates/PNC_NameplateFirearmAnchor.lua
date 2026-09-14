@@ -14,11 +14,36 @@ local Anchor = PNC.NameplateFirearmAnchor
 
 Anchor.CacheByID = Anchor.CacheByID or {}
 Anchor.CacheByBody = Anchor.CacheByBody or {}
+Anchor.ProjectionByPlayer = Anchor.ProjectionByPlayer or {}
 Anchor.Config = Anchor.Config or {}
-Anchor.Config.screenOffsetX = tonumber(Anchor.Config.screenOffsetX) or 0
-Anchor.Config.screenOffsetY = tonumber(Anchor.Config.screenOffsetY) or 72
-Anchor.Config.sideOffset = tonumber(Anchor.Config.sideOffset) or 18
-Anchor.Config.sideSign = tonumber(Anchor.Config.sideSign) or 1
+local DEFAULT_FORWARD_OFFSET = 84
+local DEFAULT_SIDE_OFFSET = 18
+local DEFAULT_HEIGHT_OFFSET = 72
+local LEGACY_OFFSET_VERSION = 2
+local previousOffsetVersion = tonumber(Anchor.Config.relativeOffsetVersion) or 0
+local previousScreenX = tonumber(Anchor.Config.screenOffsetX)
+local previousScreenY = tonumber(Anchor.Config.screenOffsetY)
+local previousSide = tonumber(Anchor.Config.sideOffset)
+local previousSideSign = tonumber(Anchor.Config.sideSign) or 1
+Anchor.Config.relativeOffsetVersion = LEGACY_OFFSET_VERSION
+Anchor.Config.forwardOffset = tonumber(Anchor.Config.forwardOffset)
+    or DEFAULT_FORWARD_OFFSET
+Anchor.Config.heightOffset = tonumber(Anchor.Config.heightOffset)
+    or previousScreenY or DEFAULT_HEIGHT_OFFSET
+if previousOffsetVersion < LEGACY_OFFSET_VERSION then
+    -- The old X correction was screen-relative and cannot be converted until
+    -- a live facing basis is available. Keep it for one lazy migration pass.
+    Anchor.Config.legacyScreenOffsetX = previousScreenX or 0
+    Anchor.Config.sideOffset = (previousSide or DEFAULT_SIDE_OFFSET)
+        * previousSideSign
+else
+    Anchor.Config.sideOffset = tonumber(Anchor.Config.sideOffset)
+        or DEFAULT_SIDE_OFFSET
+end
+Anchor.Config.sideSign = Anchor.Config.sideOffset < 0 and -1 or 1
+if Anchor.Config.showDebugText == nil then
+    Anchor.Config.showDebugText = true
+end
 Anchor.Target = Anchor.Target
 
 local NAMEPLATE_ANCHOR_MAX_AGE_MS = 1000
@@ -74,6 +99,147 @@ local function facing(body)
     return 1, 0
 end
 
+local function normalize(x, y, fallbackX, fallbackY)
+    local length = math.sqrt((x * x) + (y * y))
+    if length <= 0.001 then return fallbackX, fallbackY end
+    return x / length, y / length
+end
+
+local function projectionDelta(playerIndex, deltaX, deltaY, deltaZ)
+    local key
+    local projection
+    local baseX
+    local baseY
+    if type(isoToScreenX) ~= "function"
+        or type(isoToScreenY) ~= "function"
+    then
+        return deltaX - deltaY, (deltaX + deltaY) * 0.5 - deltaZ
+    end
+    key = tostring(tonumber(playerIndex) or 0)
+    projection = Anchor.ProjectionByPlayer[key]
+    if not projection then
+        baseX = isoToScreenX(playerIndex or 0, 0, 0, 0)
+        baseY = isoToScreenY(playerIndex or 0, 0, 0, 0)
+        projection = {
+            xX = isoToScreenX(playerIndex or 0, 1, 0, 0) - baseX,
+            xY = isoToScreenX(playerIndex or 0, 0, 1, 0) - baseX,
+            xZ = isoToScreenX(playerIndex or 0, 0, 0, 1) - baseX,
+            yX = isoToScreenY(playerIndex or 0, 1, 0, 0) - baseY,
+            yY = isoToScreenY(playerIndex or 0, 0, 1, 0) - baseY,
+            yZ = isoToScreenY(playerIndex or 0, 0, 0, 1) - baseY,
+        }
+        Anchor.ProjectionByPlayer[key] = projection
+    end
+    return projection.xX * deltaX
+        + projection.xY * deltaY
+        + projection.xZ * deltaZ,
+        projection.yX * deltaX
+        + projection.yY * deltaY
+        + projection.yZ * deltaZ
+end
+
+local function facingBasis(body, playerIndex)
+    local facingX, facingY = facing(body)
+    local forwardDeltaX, forwardDeltaY = projectionDelta(
+        playerIndex,
+        facingX,
+        facingY,
+        0
+    )
+    local forwardScreenX, forwardScreenY = normalize(
+        forwardDeltaX,
+        forwardDeltaY,
+        1,
+        0
+    )
+    local sideWorldX = -facingY
+    local sideWorldY = facingX
+    local sideDeltaX, sideDeltaY = projectionDelta(
+        playerIndex,
+        sideWorldX,
+        sideWorldY,
+        0
+    )
+    local sideScreenX, sideScreenY = normalize(
+        sideDeltaX,
+        sideDeltaY,
+        0,
+        1
+    )
+    local heightDeltaX, heightDeltaY = projectionDelta(
+        playerIndex,
+        0,
+        0,
+        1
+    )
+    -- Positive H is deliberately toward the body (down the screen), because
+    -- the nameplate is above the body and the inspector has always used a
+    -- positive value to move the launch point down toward the hands.
+    local heightScreenX, heightScreenY = normalize(
+        -heightDeltaX,
+        -heightDeltaY,
+        0,
+        1
+    )
+    return facingX, facingY,
+        forwardScreenX, forwardScreenY,
+        sideScreenX, sideScreenY,
+        heightScreenX, heightScreenY
+end
+
+local function refreshFacingBasis(cache)
+    local facingX
+    local facingY
+    local forwardScreenX
+    local forwardScreenY
+    local sideScreenX
+    local sideScreenY
+    local heightScreenX
+    local heightScreenY
+    if not cache or not cache.body then return cache end
+    facingX, facingY, forwardScreenX, forwardScreenY, sideScreenX, sideScreenY,
+        heightScreenX, heightScreenY = facingBasis(cache.body, cache.playerIndex)
+    cache.facingX = facingX
+    cache.facingY = facingY
+    cache.forwardScreenX = forwardScreenX
+    cache.forwardScreenY = forwardScreenY
+    cache.sideScreenX = sideScreenX
+    cache.sideScreenY = sideScreenY
+    cache.heightScreenX = heightScreenX
+    cache.heightScreenY = heightScreenY
+    return cache
+end
+
+local function migrateLegacyScreenX(cache)
+    local targetX
+    local determinant
+    local forwardCorrection
+    local sideCorrection
+    if not cache or cache.legacyMigrated then return end
+    targetX = tonumber(Anchor.Config.legacyScreenOffsetX)
+    if not targetX or math.abs(targetX) <= 0.001 then
+        cache.legacyMigrated = true
+        Anchor.Config.legacyScreenOffsetX = nil
+        return
+    end
+    -- Solve F*forwardBasis + S*sideBasis = (legacyX, 0). This preserves the
+    -- old visible point once, then stores the correction in NPC-local axes.
+    determinant = cache.forwardScreenX * cache.sideScreenY
+        - cache.forwardScreenY * cache.sideScreenX
+    if math.abs(determinant) <= 0.001 then return end
+    forwardCorrection = (targetX * cache.sideScreenY) / determinant
+    sideCorrection = (-targetX * cache.forwardScreenY) / determinant
+    Anchor.Config.forwardOffset = (tonumber(Anchor.Config.forwardOffset)
+        or DEFAULT_FORWARD_OFFSET)
+        + forwardCorrection
+    Anchor.Config.sideOffset = (tonumber(Anchor.Config.sideOffset)
+        or DEFAULT_SIDE_OFFSET)
+        + sideCorrection
+    Anchor.Config.sideSign = Anchor.Config.sideOffset < 0 and -1 or 1
+    Anchor.Config.legacyScreenOffsetX = nil
+    cache.legacyMigrated = true
+end
+
 local function offsetFor(cache)
     local offsetX
     local offsetY
@@ -82,16 +248,44 @@ local function offsetFor(cache)
 end
 
 function Anchor.GetOffsetParts(cache)
-    local zoom = math.max(0.1, tonumber(cache and cache.zoom) or 1)
-    local sideOffset = (tonumber(Anchor.Config.sideOffset) or 18) / zoom
-    local sideSign = tonumber(Anchor.Config.sideSign) or 1
-    local baseX = (tonumber(Anchor.Config.screenOffsetX) or 0) / zoom
-    local baseY = (tonumber(Anchor.Config.screenOffsetY) or 72) / zoom
-    local sideX = (tonumber(cache and cache.sideScreenX) or 0)
-        * sideOffset * sideSign
-    local sideY = (tonumber(cache and cache.sideScreenY) or 0)
-        * sideOffset * sideSign
-    return baseX + sideX, baseY + sideY, baseX, baseY, sideX, sideY
+    local zoom
+    local forwardOffset
+    local sideOffset
+    local heightOffset
+    local forwardX
+    local forwardY
+    local sideX
+    local sideY
+    local baseX
+    local baseY
+    local heightX
+    local heightY
+    if not cache then return 0, 0, 0, 0, 0, 0, 0, 0 end
+    refreshFacingBasis(cache)
+    migrateLegacyScreenX(cache)
+    zoom = math.max(0.1, tonumber(cache.zoom) or 1)
+    forwardOffset = (tonumber(Anchor.Config.forwardOffset)
+        or DEFAULT_FORWARD_OFFSET) / zoom
+    sideOffset = (tonumber(Anchor.Config.sideOffset)
+        or DEFAULT_SIDE_OFFSET) / zoom
+    heightOffset = (tonumber(Anchor.Config.heightOffset)
+        or DEFAULT_HEIGHT_OFFSET) / zoom
+    forwardX = (tonumber(cache.forwardScreenX) or 0) * forwardOffset
+    forwardY = (tonumber(cache.forwardScreenY) or 0) * forwardOffset
+    sideX = (tonumber(cache.sideScreenX) or 0) * sideOffset
+    sideY = (tonumber(cache.sideScreenY) or 0) * sideOffset
+    heightX = (tonumber(cache.heightScreenX) or 0) * heightOffset
+    heightY = (tonumber(cache.heightScreenY) or 1) * heightOffset
+    baseX = heightX
+    baseY = heightY
+    return baseX + forwardX + sideX,
+        baseY + forwardY + sideY,
+        baseX,
+        baseY,
+        forwardX,
+        forwardY,
+        sideX,
+        sideY
 end
 
 function Anchor.Update(body, id, playerIndex, managerX, managerY, zoom,
@@ -101,28 +295,17 @@ function Anchor.Update(body, id, playerIndex, managerX, managerY, zoom,
     local cache
     local facingX
     local facingY
-    local sideWorldX
-    local sideWorldY
+    local forwardScreenX
+    local forwardScreenY
     local sideScreenX
     local sideScreenY
-    local sideScreenLength
+    local heightScreenX
+    local heightScreenY
     if not body or not nameX or not nameY then return nil end
 
-    facingX, facingY = facing(body)
-    sideWorldX = -facingY
-    sideWorldY = facingX
-    sideScreenX = sideWorldX - sideWorldY
-    sideScreenY = (sideWorldX + sideWorldY) * 0.5
-    sideScreenLength = math.sqrt(
-        (sideScreenX * sideScreenX) + (sideScreenY * sideScreenY)
-    )
-    if sideScreenLength > 0.001 then
-        sideScreenX = sideScreenX / sideScreenLength
-        sideScreenY = sideScreenY / sideScreenLength
-    else
-        sideScreenX = 0
-        sideScreenY = 0
-    end
+    facingX, facingY, forwardScreenX, forwardScreenY, sideScreenX, sideScreenY,
+        heightScreenX, heightScreenY =
+        facingBasis(body, playerIndex)
 
     cache = {
         body = body,
@@ -138,8 +321,14 @@ function Anchor.Update(body, id, playerIndex, managerX, managerY, zoom,
         worldX = tonumber(worldX),
         worldY = tonumber(worldY),
         worldZ = tonumber(worldZ),
+        facingX = facingX,
+        facingY = facingY,
+        forwardScreenX = forwardScreenX,
+        forwardScreenY = forwardScreenY,
         sideScreenX = sideScreenX,
         sideScreenY = sideScreenY,
+        heightScreenX = heightScreenX,
+        heightScreenY = heightScreenY,
         updatedAt = currentTime(),
     }
     if key then Anchor.CacheByID[key] = cache end
@@ -168,26 +357,73 @@ function Anchor.GetLocalMuzzle(cache)
     return cache.nameX + offsetX, cache.nameY + offsetY
 end
 
-function Anchor.GetRenderMuzzle(body, id)
+function Anchor.GetScreenMuzzle(body, id)
     local cache = Anchor.Get(body, id)
     local localX
     local localY
     if not cache then return nil, nil, nil end
     localX, localY = Anchor.GetLocalMuzzle(cache)
+    return localX + cache.managerX,
+        localY + cache.managerY,
+        cache
+end
+
+function Anchor.GetRenderMuzzle(body, id)
+    local cache
+    local screenX
+    local screenY
+    screenX, screenY, cache = Anchor.GetScreenMuzzle(body, id)
+    if not cache then return nil, nil, nil end
     -- FirearmEffects stores unscaled coordinates and divides by the active
     -- zoom at draw time, matching ISCoordConversion.ToScreen.
-    return (localX + cache.managerX) * cache.zoom,
-        (localY + cache.managerY) * cache.zoom,
+    return screenX * cache.zoom,
+        screenY * cache.zoom,
         cache
+end
+
+function Anchor.GetScreenDirection(body, id, playerIndex)
+    local cache = Anchor.Get(body, id)
+    local target = Anchor.Target
+    playerIndex = tonumber(playerIndex)
+        or (target and target.playerIndex)
+        or 0
+    local facingX
+    local facingY
+    local forwardX
+    local forwardY
+    if cache then
+        refreshFacingBasis(cache)
+        return cache.forwardScreenX, cache.forwardScreenY, cache
+    end
+    facingX, facingY, forwardX, forwardY = facingBasis(body, playerIndex)
+    return forwardX, forwardY, nil
 end
 
 function Anchor.GetConfig()
     return {
-        screenOffsetX = tonumber(Anchor.Config.screenOffsetX) or 0,
-        screenOffsetY = tonumber(Anchor.Config.screenOffsetY) or 72,
-        sideOffset = tonumber(Anchor.Config.sideOffset) or 18,
+        relativeOffsetVersion = LEGACY_OFFSET_VERSION,
+        forwardOffset = tonumber(Anchor.Config.forwardOffset)
+            or DEFAULT_FORWARD_OFFSET,
+        heightOffset = tonumber(Anchor.Config.heightOffset)
+            or DEFAULT_HEIGHT_OFFSET,
+        sideOffset = tonumber(Anchor.Config.sideOffset) or DEFAULT_SIDE_OFFSET,
         sideSign = tonumber(Anchor.Config.sideSign) or 1,
+        showDebugText = Anchor.Config.showDebugText == true,
     }
+end
+
+function Anchor.IsDebugTextVisible()
+    return Anchor.Config.showDebugText == true
+end
+
+function Anchor.ToggleDebugText()
+    Anchor.Config.showDebugText = not Anchor.IsDebugTextVisible()
+    return Anchor.Config.showDebugText
+end
+
+function Anchor.SetDebugTextVisible(visible)
+    Anchor.Config.showDebugText = visible == true
+    return Anchor.Config.showDebugText
 end
 
 function Anchor.AdjustOffset(axis, delta)
@@ -196,31 +432,38 @@ function Anchor.AdjustOffset(axis, delta)
     local value
     axis = tostring(axis or "")
     if axis == "x" then
-        key = "screenOffsetX"
+        key = "forwardOffset"
     elseif axis == "y" then
-        key = "screenOffsetY"
+        key = "heightOffset"
         minimum = -math.huge
     elseif axis == "side" then
         key = "sideOffset"
-        minimum = 0
+        minimum = -math.huge
     else
         return nil
     end
     value = (tonumber(Anchor.Config[key]) or 0) + (tonumber(delta) or 0)
     Anchor.Config[key] = math.max(minimum, value)
+    if key == "sideOffset" then
+        Anchor.Config.sideSign = Anchor.Config[key] < 0 and -1 or 1
+    end
     return Anchor.Config[key]
 end
 
 function Anchor.FlipSide()
-    Anchor.Config.sideSign = -((tonumber(Anchor.Config.sideSign) or 1))
+    Anchor.Config.sideOffset = -((tonumber(Anchor.Config.sideOffset)
+        or DEFAULT_SIDE_OFFSET))
+    Anchor.Config.sideSign = Anchor.Config.sideOffset < 0 and -1 or 1
     return Anchor.Config.sideSign
 end
 
 function Anchor.ResetOffsets()
-    Anchor.Config.screenOffsetX = 0
-    Anchor.Config.screenOffsetY = 72
-    Anchor.Config.sideOffset = 18
+    Anchor.Config.relativeOffsetVersion = LEGACY_OFFSET_VERSION
+    Anchor.Config.forwardOffset = DEFAULT_FORWARD_OFFSET
+    Anchor.Config.heightOffset = DEFAULT_HEIGHT_OFFSET
+    Anchor.Config.sideOffset = DEFAULT_SIDE_OFFSET
     Anchor.Config.sideSign = 1
+    Anchor.Config.legacyScreenOffsetX = nil
 end
 
 function Anchor.GetDebugState(body, id)
@@ -234,6 +477,8 @@ function Anchor.GetDebugState(body, id)
     local offsetY
     local baseX
     local baseY
+    local forwardX
+    local forwardY
     local sideX
     local sideY
     local state = {
@@ -246,7 +491,8 @@ function Anchor.GetDebugState(body, id)
     if not cache and key then cache = Anchor.CacheByID[key] end
     if not cache then return state end
     localX, localY = Anchor.GetLocalMuzzle(cache)
-    offsetX, offsetY, baseX, baseY, sideX, sideY = Anchor.GetOffsetParts(cache)
+    offsetX, offsetY, baseX, baseY, forwardX, forwardY, sideX, sideY =
+        Anchor.GetOffsetParts(cache)
     state.status = liveCache and "LIVE" or "STALE"
     state.fresh = liveCache ~= nil
     state.cache = cache
@@ -257,8 +503,11 @@ function Anchor.GetDebugState(body, id)
     state.groundY = cache.groundY
     state.launchX = localX
     state.launchY = localY
-    state.renderX = (localX + cache.managerX) * cache.zoom
-    state.renderY = (localY + cache.managerY) * cache.zoom
+    -- This is the actual screen coordinate used by the nameplate manager.
+    -- GetRenderMuzzle intentionally returns a zoom-buffer coordinate for the
+    -- firearm renderer, so it must not be used in the inspector display.
+    state.renderX = localX + cache.managerX
+    state.renderY = localY + cache.managerY
     -- The inspector reports offsets in final screen pixels, while the
     -- cached nameplate/local points remain in the renderer's zoom-relative
     -- coordinate space.
@@ -268,8 +517,22 @@ function Anchor.GetDebugState(body, id)
     state.baseOffsetY = baseY * cache.zoom
     state.sideOffsetX = sideX * cache.zoom
     state.sideOffsetY = sideY * cache.zoom
+    state.forwardOffsetX = forwardX * cache.zoom
+    state.forwardOffsetY = forwardY * cache.zoom
+    state.localForward = tonumber(Anchor.Config.forwardOffset)
+        or DEFAULT_FORWARD_OFFSET
+    state.localSide = tonumber(Anchor.Config.sideOffset) or DEFAULT_SIDE_OFFSET
+    state.localHeight = tonumber(Anchor.Config.heightOffset)
+        or DEFAULT_HEIGHT_OFFSET
+    state.facingX = cache.facingX
+    state.facingY = cache.facingY
+    state.forwardScreenX = cache.forwardScreenX
+    state.forwardScreenY = cache.forwardScreenY
     state.sideScreenX = cache.sideScreenX
     state.sideScreenY = cache.sideScreenY
+    state.heightScreenX = cache.heightScreenX
+    state.heightScreenY = cache.heightScreenY
+    state.source = "nameplate_relative"
     state.worldX = cache.worldX
     state.worldY = cache.worldY
     state.worldZ = cache.worldZ
@@ -323,11 +586,14 @@ local function drawCross(manager, x, y, size, color)
     )
 end
 
-local function directionScreen(body)
-    local x
-    local y
-    x, y = facing(body)
-    return x - y, (x + y) * 0.5, x, y
+local function directionScreen(body, id, playerIndex)
+    local directionX
+    local directionY
+    local facingX
+    local facingY
+    directionX, directionY = Anchor.GetScreenDirection(body, id, playerIndex)
+    facingX, facingY = facing(body)
+    return directionX, directionY, facingX, facingY
 end
 
 local function rounded(value)
@@ -387,6 +653,11 @@ function Anchor.Render(manager, body, id, nameX, nameY, groundX, groundY,
     end
     muzzleX, muzzleY = Anchor.GetLocalMuzzle(cache)
     if not muzzleX or not muzzleY then return false end
+    -- Use the exact cached starter point that the effects bridge resolves.
+    -- This prevents a stale caller argument from making the probe line and
+    -- the tracer appear to disagree by a frame while an NPC is moving.
+    nameX = cache.nameX or nameX
+    nameY = cache.nameY or nameY
 
     drawCross(manager, nameX, nameY, 7, ANCHOR_COLOR)
     drawCross(manager, groundX or nameX, groundY or nameY, 7, GROUND_COLOR)
@@ -402,7 +673,11 @@ function Anchor.Render(manager, body, id, nameX, nameY, groundX, groundY,
         SHOULDER_COLOR.b
     )
 
-    directionX, directionY, facingX, facingY = directionScreen(body)
+    directionX, directionY, facingX, facingY = directionScreen(
+        body,
+        id,
+        manager.playerIndex
+    )
     manager:drawLine2(
         muzzleX,
         muzzleY,
@@ -414,33 +689,37 @@ function Anchor.Render(manager, body, id, nameX, nameY, groundX, groundY,
         DIRECTION_COLOR.b
     )
 
-    textX = muzzleX + 14
-    textY = muzzleY - 48
-    font = PNC.NameplatePresentation
-        and PNC.NameplatePresentation.Fonts
-        and PNC.NameplatePresentation.Fonts.debug or UIFont.Small
-    debugText(manager, "FIREARM ANCHOR  " .. tostring(cache.id or "?"),
-        textX, textY, SHOULDER_COLOR, font)
-    debugText(manager,
-        "nameplate=" .. rounded(nameX) .. "," .. rounded(nameY)
-            .. "  shoulder=" .. rounded(muzzleX) .. "," .. rounded(muzzleY),
-        textX, textY + 14, ANCHOR_COLOR, font)
-    debugText(manager,
-        "offset=" .. rounded(muzzleX - nameX) .. ","
-            .. rounded(muzzleY - nameY)
-            .. "  world=" .. rounded(worldX) .. "," .. rounded(worldY)
-            .. "," .. rounded(worldZ),
-        textX, textY + 28, GROUND_COLOR, font)
-    debugText(manager,
-        "facing=" .. rounded(facingX) .. "," .. rounded(facingY)
-            .. "  line=orange",
-        textX, textY + 42, DIRECTION_COLOR, font)
+    if Anchor.IsDebugTextVisible() then
+        textX = muzzleX + 14
+        textY = muzzleY - 48
+        font = PNC.NameplatePresentation
+            and PNC.NameplatePresentation.Fonts
+            and PNC.NameplatePresentation.Fonts.debug or UIFont.Small
+        debugText(manager, "FIREARM ANCHOR  " .. tostring(cache.id or "?"),
+            textX, textY, SHOULDER_COLOR, font)
+        debugText(manager,
+            "nameplate=" .. rounded(nameX) .. "," .. rounded(nameY)
+                .. "  shoulder=" .. rounded(muzzleX) .. "," .. rounded(muzzleY),
+            textX, textY + 14, ANCHOR_COLOR, font)
+        debugText(manager,
+            "local F/S/H=" .. rounded(Anchor.Config.forwardOffset) .. "/"
+                .. rounded(Anchor.Config.sideOffset) .. "/"
+                .. rounded(Anchor.Config.heightOffset)
+                .. "  world=" .. rounded(worldX) .. "," .. rounded(worldY)
+                .. "," .. rounded(worldZ),
+            textX, textY + 28, GROUND_COLOR, font)
+        debugText(manager,
+            "facing=" .. rounded(facingX) .. "," .. rounded(facingY)
+                .. "  line=orange",
+            textX, textY + 42, DIRECTION_COLOR, font)
+    end
     return true
 end
 
 function Anchor.Reset()
     Anchor.CacheByID = {}
     Anchor.CacheByBody = {}
+    Anchor.ProjectionByPlayer = {}
     Anchor.Target = nil
 end
 

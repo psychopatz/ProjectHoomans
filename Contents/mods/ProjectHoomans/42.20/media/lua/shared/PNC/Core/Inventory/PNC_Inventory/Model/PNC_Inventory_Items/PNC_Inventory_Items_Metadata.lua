@@ -283,6 +283,7 @@ function Internal.getItemDefinitionState(fullType)
         copyKnown(food, state, {
             "age", "cooked", "burnt", "frozen", "freezingTime",
             "hungChange", "thirstChange", "dangerousUncooked", "poison",
+            "calories", "carbohydrates", "proteins", "lipids",
             "poisonDetectionLevel", "poisonLevelForRecipe", "poisonPower",
             "rottenTime", "cookedInMicrowave", "tainted", "fertilized",
             "fertilizedTime", "heat", "lastCookMinute", "cookingTime",

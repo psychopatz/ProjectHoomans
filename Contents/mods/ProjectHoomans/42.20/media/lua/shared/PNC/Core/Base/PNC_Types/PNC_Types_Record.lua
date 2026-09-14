@@ -128,6 +128,10 @@ function Types.NewRecord(definition)
             or "Colonist NPC")
     end
 
+    if not def.id and Identity and Identity.GenerateNPCID then
+        record.id = Identity.GenerateNPCID(record.identity, generatedID)
+    end
+
     if PNC.PlayerNeedsModel and PNC.PlayerNeedsModel.ResolveInitialTraits then
         record.vanillaTraits,
             record.vanillaTraitsAuthored,

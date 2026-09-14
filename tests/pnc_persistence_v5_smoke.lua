@@ -35,7 +35,7 @@ Events = {
 PNC = {
     Const = {
         MODDATA_KEY = "PNC_Core_Global",
-        MODDATA_NPC_PREFIX = "PNC_NPC_",
+        MODDATA_NPC_PREFIX = "PNC_npc",
         PERSISTENCE_VERSION = 5,
         STORAGE_LAYOUT_VERSION = 2,
     },
@@ -92,7 +92,7 @@ end
 T.equal(PNC.Registry.FlushDirty(), 500, "initial dirty flush")
 T.equal(PNC.Core.TableSize(tables.PNC_Core_Global.records), 500, "directory pointer count")
 T.equal(tables.PNC_Core_Global.NPCs, nil, "directory contains no record bodies")
-T.truthy(tables.PNC_NPC_npc_1 and tables.PNC_NPC_npc_500, "per-NPC tables missing")
+T.truthy(tables.PNC_npc_1 and tables.PNC_npc_500, "per-NPC tables missing")
 
 PNC.Registry.LiveByID.npc_1 = {
     isDead = function() return false end,
@@ -109,12 +109,12 @@ T.equal(PNC.Registry.DirtyByID.npc_1, nil,
     "position snapshot remained dirty after save")
 PNC.Registry.LiveByID.npc_1 = nil
 
-tables.PNC_NPC_npc_2.schemaVersion = 4
+tables.PNC_npc_2.schemaVersion = 4
 PNC.Registry.Loaded = false
 PNC.Registry.Load()
 T.equal(PNC.Registry.Data.npc_2, nil,
     "older per-NPC schema was not reset")
-T.equal(tables.PNC_NPC_npc_2, nil,
+T.equal(tables.PNC_npc_2, nil,
     "reset per-NPC table was retained")
 T.equal(tables.PNC_Core_Global.records.npc_2, nil,
     "reset per-NPC pointer was retained")
@@ -129,7 +129,7 @@ T.equal(PNC.Registry.Get("npc_10").inventory, nil, "inventory hydrated unexpecte
 
 PNC.Registry.RemoveRecord("npc_20")
 T.equal(tables.PNC_Core_Global.records.npc_20, nil, "pointer not removed")
-T.equal(tables.PNC_NPC_npc_20, nil, "per-NPC table not removed")
+T.equal(tables.PNC_npc_20, nil, "per-NPC table not removed")
 
 tables = {
     PNC_Core_Global = {
@@ -145,8 +145,8 @@ PNC.Registry.Load()
 T.equal(PNC.Core.TableSize(PNC.Registry.Data), 0, "unsupported registry reset count")
 T.equal(tables.PNC_Core_Global.NPCs, nil, "unsupported legacy bodies retained")
 T.equal(PNC.Registry.FlushDirty(), 0, "unsupported registry reset flush count")
-T.equal(tables.PNC_NPC_old_a, nil, "unsupported legacy NPC table retained")
-T.equal(tables.PNC_NPC_old_b, nil, "unsupported legacy NPC table retained")
+T.equal(tables.PNC_npc_old_a, nil, "unsupported NPC table retained")
+T.equal(tables.PNC_npc_old_b, nil, "unsupported NPC table retained")
 
 tables = {
     PNC_Core_Global = {
@@ -181,12 +181,12 @@ T.truthy(PNC.Registry.DirtyByID.retry_a, "failed serialization was removed from 
 PNC.Persistence.SerializeRecord = originalSerialize
 T.equal(PNC.Registry.FlushDirty(), 1, "retained dirty record did not retry")
 
-tables.PNC_NPC_orphan = { id = "orphan", recordRevision = 7 }
+tables.PNC_npc_orphan = { id = "orphan", recordRevision = 7 }
 PNC.Registry.Loaded = false
 PNC.Registry.Load()
 T.equal(PNC.Registry.Get("orphan"), nil, "unreferenced record was recovered")
 T.equal(tables.PNC_Core_Global.records.orphan, nil, "orphan pointer")
-T.equal(tables.PNC_NPC_orphan, nil, "unreferenced NPC table was retained")
+T.equal(tables.PNC_npc_orphan, nil, "unreferenced NPC table was retained")
 T.finish("pnc_persistence_v5_smoke")
 
 T.finish("pnc_persistence_v5_smoke")

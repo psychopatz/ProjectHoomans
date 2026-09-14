@@ -35,6 +35,10 @@ local activitiesSource = T.read("ProjectHoomans", "client",
     "PNC/UI/Colonist/PNC_ColonistActivities.lua")
 local selectorSource = T.read("ProjectHoomans", "client",
     "PNC/UI/Colonist/PNC_ColonistSelector.lua")
+local componentsSource = T.read("ProjectHoomans", "client",
+    "PNC/UI/Shared/PNC_ColonyUIComponents.lua")
+local sharedSource = T.read("ProjectHoomans", "client",
+    "PNC/UI/Shared/PNC_ColonyUIShared.lua")
 local windowSource = T.read("ProjectHoomans", "client",
     "PNC/UI/Colonist/PNC_ColonistWindow.lua")
 local hubSource = T.read("ProjectHoomans", "client",
@@ -49,6 +53,20 @@ T.contains(selectorSource, "ActivityPresentation.Current",
     "colonist selector does not use canonical activity information")
 T.contains(selectorSource, "PNC_ColonistActivityPresentation",
     "colonist selector does not import the activity formatter")
+T.contains(selectorSource, "Shared.RosterIndicators",
+    "colonist selector does not project roster problem indicators")
+T.falsy(selectorSource:find("Shared.WorstNeed", 1, true),
+    "colonist selector still projects a single textual need")
+T.contains(componentsSource, "drawTextureScaledAspect",
+    "colonist roster does not render problem icons")
+T.contains(componentsSource, "updateRosterTooltip",
+    "colonist roster does not provide icon hover tooltips")
+T.contains(componentsSource, "ROSTER_ICON_SIZE = 22",
+    "colonist roster icons were not enlarged")
+T.contains(sharedSource, "Moodles/32/",
+    "colonist roster does not use vanilla Moodle assets")
+T.falsy(componentsSource:find("UI.DrawBadge", 1, true),
+    "colonist roster still renders the redundant severity badge")
 T.contains(controllerSource, "SyncTabComponents",
     "colonist shell cannot initialize injected tab components")
 T.contains(controllerSource, "activeTabControlsPane",

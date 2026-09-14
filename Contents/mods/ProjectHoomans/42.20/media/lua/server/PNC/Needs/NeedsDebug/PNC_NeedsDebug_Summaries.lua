@@ -42,6 +42,8 @@ function H.IndividualSummary(record)
         id = record.id, name = tostring(record.name or record.id), owner = record.ownerUsername or "Player",
         activity = record.activeBehavior or record.activeJob or record.orderSpec and record.orderSpec.kind or "idle",
         needs = state,
+        hungerOverflow = repositoryState
+            and tonumber(repositoryState.hungerOverflow) or 0,
         nutrition = (not PNC.Sandbox
             or not PNC.Sandbox.PlayerOwnedNPCNutritionRealismEnabled
             or PNC.Sandbox.PlayerOwnedNPCNutritionRealismEnabled() == true)

@@ -132,7 +132,7 @@ T.load(FILE .. "Commands/PNC_MapCommand_Lumber.lua")
 
 T.truthy(PNC.MapCommands.OpenForNPC({
     id = "npc:1",
-    name = "Map Tester",
+    displayName = "Map Tester",
     x = 50,
     y = 60,
     z = 0,

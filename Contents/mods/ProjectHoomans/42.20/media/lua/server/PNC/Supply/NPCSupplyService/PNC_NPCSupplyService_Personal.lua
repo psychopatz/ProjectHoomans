@@ -74,15 +74,6 @@ local function usePersonal(record, request, state, options)
             -- requested volume is computed below for each transaction.
             availableUses = math.max(1,
                 tonumber(candidates[index].descriptor.remainingUses) or 1)
-        elseif request.resourceKind == "FOOD"
-            and candidates[index].descriptor.useDelta > 0
-            and (tonumber(candidates[index].stack) or 1) <= 1
-        then
-            -- A single partial food item can be consumed repeatedly without
-            -- creating another compact item ID. Stacks split on the first
-            -- partial use and are revisited on the next selection pass.
-            availableUses = math.max(1,
-                tonumber(candidates[index].descriptor.remainingUses) or 1)
         else
             availableUses = math.max(1, math.floor(
                 tonumber(candidates[index].stack) or 1

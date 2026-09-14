@@ -31,7 +31,7 @@ local function npcName(npcID, entry)
         return identity.GetName(snapshot or { id = npcID })
     end
     return tostring(entry and entry.npcName
-        or snapshot and (snapshot.name or snapshot.displayName)
+        or snapshot and snapshot.displayName
         or "Companion")
 end
 
