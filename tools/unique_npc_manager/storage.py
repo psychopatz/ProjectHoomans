@@ -4,20 +4,15 @@ from __future__ import annotations
 
 import json
 import os
-import re
-import shutil
 import tempfile
-from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable, Optional
 
 from .runtime_export import (
     GENERATED_MARKER,
+    LOADER_NAME,
     DefinitionExportError,
-    export_definition_module,
-    generated_definition_id,
-    module_stem,
-    rebuild_loader,
+    export_catalog,
 )
 from .schema import (
     ConversionError,
@@ -67,7 +62,6 @@ class DraftStore:
     def __init__(self, root: Path):
         self.root = root.expanduser().resolve()
         self.root.mkdir(parents=True, exist_ok=True)
-        self.trash = self.root / ".trash"
 
     def _path(self, filename: str) -> Path:
         if not filename or Path(filename).name != filename or not filename.endswith(".txt"):
@@ -139,12 +133,9 @@ class DraftStore:
         source = self._path(filename)
         if not source.exists():
             raise StorageError(f"Hoomans file does not exist: {filename}")
-        self.trash.mkdir(parents=True, exist_ok=True)
-        stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-        destination = self.trash / f"{stamp}_{source.name}"
-        shutil.move(str(source), str(destination))
+        source.unlink()
         self._write_index(set(self.list_files()) - {filename})
-        return destination
+        return source
 
     def rebuild_index(self) -> Path:
         valid: list[str] = []
@@ -159,25 +150,14 @@ class DraftStore:
 
 
 class RuntimeDefinitionStore:
-    """CRUD/export facade for generated Lua runtime definitions."""
+    """Export facade for the self-contained runtime definition catalog."""
 
     def __init__(self, root: Path):
         self.root = root.expanduser().resolve()
         self.root.mkdir(parents=True, exist_ok=True)
-        self.trash = self.root / ".trash"
 
-    def _generated_modules(self) -> list[Path]:
-        output: list[Path] = []
-        for path in sorted(self.root.glob("*.lua")):
-            if path.name == "PNC_UniqueNPCDefinitions.lua" or ".bak." in path.name:
-                continue
-            try:
-                content = path.read_text(encoding="utf-8", errors="replace")
-            except OSError:
-                continue
-            if GENERATED_MARKER in content:
-                output.append(path)
-        return output
+    def catalog_path(self) -> Path:
+        return within(self.root, self.root / LOADER_NAME)
 
     @staticmethod
     def _definition_id(definition: dict[str, Any]) -> str:
@@ -186,84 +166,57 @@ class RuntimeDefinitionStore:
             raise StorageError("unique definition ID is required")
         return str(identifier)
 
-    def _find_existing(self, definition: dict[str, Any]) -> Optional[Path]:
-        identifier = self._definition_id(definition)
-        for path in self._generated_modules():
-            if generated_definition_id(path) == identifier:
-                return path
-        return None
+    def _remove_legacy_modules(self) -> None:
+        """Permanently remove child modules from the pre-catalog format."""
 
-    def _available_path(self, definition: dict[str, Any]) -> Path:
-        identifier = self._definition_id(definition)
-        preferred = module_stem(definition)
-        candidate = self.root / f"{preferred}.lua"
-        if not candidate.exists():
-            return candidate
-        if generated_definition_id(candidate) == identifier:
-            return candidate
+        candidates = list(self.root.glob("*.lua"))
+        legacy_root = self.root / ".trash"
+        if legacy_root.is_dir():
+            candidates.extend(path for path in legacy_root.iterdir() if path.is_file())
+        for path in candidates:
+            if path.name == LOADER_NAME:
+                continue
+            try:
+                content = path.read_text(encoding="utf-8", errors="replace")
+            except OSError:
+                continue
+            if GENERATED_MARKER in content:
+                path.unlink()
+        if legacy_root.is_dir():
+            try:
+                legacy_root.rmdir()
+            except OSError:
+                pass
 
-        token = re.sub(r"[^A-Za-z0-9]+", "", identifier).lower() or "id"
-        candidate = self.root / f"{preferred}__{token[:24]}.lua"
-        suffix = 2
-        while candidate.exists():
-            if generated_definition_id(candidate) == identifier:
-                return candidate
-            candidate = self.root / f"{preferred}__{token[:24]}_{suffix}.lua"
-            suffix += 1
-        return candidate
-
-    def _backup(self, path: Path) -> Path:
-        self.trash.mkdir(parents=True, exist_ok=True)
-        stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-        destination = self.trash / f"{stamp}_{path.name}"
-        counter = 2
-        while destination.exists():
-            destination = self.trash / f"{stamp}_{counter}_{path.name}"
-            counter += 1
-        shutil.move(str(path), str(destination))
-        return destination
-
-    def module_path(self, definition: dict[str, Any]) -> Path:
-        # Always prefer the canonical human-readable name.  An existing
-        # legacy module is discovered separately by export() and moved to
-        # the managed trash directory before the canonical file is written.
-        return within(self.root, self._available_path(definition))
-
-    def export(self, definition: dict[str, Any]) -> Path:
+    def export_all(self, definitions: Iterable[dict[str, Any]]) -> Path:
         try:
-            normalized = build_payload(definition)["definition"]
-            path = self.module_path(normalized)
-            identifier = self._definition_id(normalized)
-            for old_path in self._generated_modules():
-                if old_path != path and generated_definition_id(old_path) == identifier:
-                    self._backup(old_path)
-            atomic_write(path, export_definition_module(normalized))
-            rebuild_loader(self.root)
-            return path
+            content = export_catalog(definitions)
         except DefinitionExportError as exc:
             raise StorageError(str(exc)) from exc
+        path = self.catalog_path()
+        atomic_write(path, content)
+        self._remove_legacy_modules()
+        return path
 
-    def delete(self, definition: dict[str, Any]) -> Path:
-        path = self._find_existing(definition) or self.module_path(definition)
-        return self.delete_module(path.name)
+    def export(self, definition: dict[str, Any]) -> Path:
+        """Compatibility entry point for a one-definition catalog export."""
 
-    def delete_module(self, filename: str) -> Path:
-        if (not filename or Path(filename).name != filename
-                or filename == "PNC_UniqueNPCDefinitions.lua"
-                or not filename.endswith(".lua")):
-            raise StorageError(f"invalid generated module filename: {filename!r}")
-        path = within(self.root, self.root / filename)
-        if not path.exists():
-            raise StorageError(f"generated definition does not exist: {path.name}")
-        content = path.read_text(encoding="utf-8", errors="replace")
-        if GENERATED_MARKER not in content:
-            raise StorageError(f"refusing to delete non-generated Lua: {path.name}")
-        backup = self._backup(path)
-        rebuild_loader(self.root)
-        return backup
+        return self.export_all([build_payload(definition)["definition"]])
+
+    def rebuild(self, definitions: Iterable[dict[str, Any]] = ()) -> Path:
+        return self.export_all(definitions)
 
     def has_generated(self, definition: dict[str, Any]) -> bool:
-        return self._find_existing(definition) is not None
+        path = self.catalog_path()
+        if not path.exists():
+            return False
+        try:
+            identifier = self._definition_id(definition)
+            content = path.read_text(encoding="utf-8", errors="replace")
+        except (OSError, StorageError):
+            return False
+        marker = f'["uniqueDefinitionId"] = "{identifier}"'
+        return marker in content
 
-    def rebuild(self) -> Path:
-        return rebuild_loader(self.root)
+    def catalog_contains_all(self, definitions: Iterable[dict[str, Any]]) -> bool:
+        return all(self.has_generated(definition) for definition in definitions)

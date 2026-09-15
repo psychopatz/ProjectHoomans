@@ -178,8 +178,7 @@ require "PNC/Core/Health/PNC_Treatment"
 require "PNC/Core/Health/PNC_Revive"
 require "PNC/Core/API/PNC_API"
 -- Stable generated catalog entry point. The desktop manager updates this
--- loader and its child modules; the composition root never imports NPC files
--- individually.
+-- self-contained catalog; the composition root has one fixed import path.
 require "PNC/Generated/UniqueNPC/PNC_UniqueNPCDefinitions"
 require "PNC/Core/Health/PNC_PlayerDamage"
 require "PNC/Integrations/PNC_PsychopatzProfiler"

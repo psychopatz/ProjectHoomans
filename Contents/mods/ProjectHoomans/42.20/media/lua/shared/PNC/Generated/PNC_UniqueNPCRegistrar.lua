@@ -1,6 +1,6 @@
--- Stable registrar used by generated unique NPC definition modules.
--- Generated modules import this function instead of reaching into the
--- registry implementation directly.
+-- Stable registrar used by the generated unique NPC catalog.
+-- The catalog imports this function instead of reaching into the registry
+-- implementation directly.
 
 local API = require "PNC/Core/API/PNC_API/UniqueNPCs"
 

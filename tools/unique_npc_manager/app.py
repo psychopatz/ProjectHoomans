@@ -14,7 +14,6 @@ if __package__ in (None, ""):
 import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
 
-from unique_npc_manager.runtime_export import generated_definition_id
 from unique_npc_manager.schema import ConversionError, build_payload, encode, output_name
 from unique_npc_manager.storage import (
     DraftStore,
@@ -210,10 +209,7 @@ class UniqueNPCManager(tk.Tk):
     def _build_runtime_tab(self) -> None:
         toolbar = ttk.Frame(self.runtime_tab, padding=4)
         toolbar.pack(fill="x")
-        ttk.Button(toolbar, text="Rebuild Loader", command=self.rebuild_loader).pack(side="left")
-        ttk.Button(toolbar, text="Delete Selected Lua", command=self.delete_runtime).pack(
-            side="left", padx=5
-        )
+        ttk.Button(toolbar, text="Rebuild Catalog", command=self.rebuild_catalog).pack(side="left")
         ttk.Button(toolbar, text="Open Runtime Folder", command=self.open_runtime_folder).pack(
             side="left", padx=5
         )
@@ -230,8 +226,8 @@ class UniqueNPCManager(tk.Tk):
             left, columns=("module", "source", "status"), show="headings"
         )
         for column, heading, width in (
-            ("module", "Lua module", 240),
-            ("source", "Hoomans source", 180),
+            ("module", "Runtime catalog", 240),
+            ("source", "Hoomans definitions", 180),
             ("status", "Status", 120),
         ):
             self.runtime_tree.heading(column, text=heading)
@@ -241,7 +237,7 @@ class UniqueNPCManager(tk.Tk):
         self.runtime_tree.pack(side="left", fill="both", expand=True)
         runtime_scroll.pack(side="right", fill="y")
         self.runtime_tree.bind("<<TreeviewSelect>>", self._on_runtime_selected)
-        ttk.Label(right, text="Generated Lua", style="Title.TLabel").pack(anchor="w")
+        ttk.Label(right, text="Self-contained runtime catalog", style="Title.TLabel").pack(anchor="w")
         self.runtime_text = tk.Text(right, wrap="none", state="disabled", font=("TkFixedFont", 10))
         runtime_text_scroll = ttk.Scrollbar(right, orient="vertical", command=self.runtime_text.yview)
         self.runtime_text.configure(yscrollcommand=runtime_text_scroll.set)
@@ -359,26 +355,53 @@ class UniqueNPCManager(tk.Tk):
             self.draft_tree.selection_set(selected)
             self.draft_tree.focus(selected)
 
-    def refresh_runtime(self) -> None:
-        for item in self.runtime_tree.get_children():
-            self.runtime_tree.delete(item)
-        source_by_id: dict[str, str] = {}
+    def _catalog_definitions(
+        self,
+        override: Optional[dict[str, Any]] = None,
+    ) -> tuple[list[dict[str, Any]], list[str]]:
+        """Load all valid drafts, optionally replacing one with editor state."""
+
+        definitions: list[dict[str, Any]] = []
+        errors: list[str] = []
+        override_id = None
+        override_filename = self.current_filename if override is not None else None
+        if override is not None:
+            override_id = str(override.get("uniqueDefinitionId") or override.get("id") or "")
+        replaced = False
         for filename in self.draft_store.list_files():
             try:
                 definition = build_payload(self.draft_store.load(filename))["definition"]
-                source_by_id[str(definition.get("uniqueDefinitionId"))] = filename
-            except (StorageError, ConversionError):
-                continue
-        for path in sorted(self.runtime_store.root.glob("*.lua")):
-            if path.name == "PNC_UniqueNPCDefinitions.lua" or ".bak." in path.name:
-                continue
-            content = path.read_text(encoding="utf-8", errors="replace")
-            if "PNC_GENERATED_UNIQUE_NPC" not in content:
-                continue
-            identifier = generated_definition_id(path)
-            source = source_by_id.get(identifier, "<missing source>")
-            status = "Synced" if source != "<missing source>" else "Orphaned"
-            self.runtime_tree.insert("", "end", iid=path.name, values=(path.name, source, status))
+                if (override_filename and filename == override_filename) or (
+                    override_id and str(definition.get("uniqueDefinitionId")) == override_id
+                ):
+                    definition = override
+                    replaced = True
+                definitions.append(definition)
+            except (StorageError, ConversionError) as exc:
+                errors.append(f"{filename}: {exc}")
+        if override is not None and not replaced:
+            definitions.append(override)
+        return definitions, errors
+
+    def refresh_runtime(self) -> None:
+        for item in self.runtime_tree.get_children():
+            self.runtime_tree.delete(item)
+        definitions, errors = self._catalog_definitions()
+        path = self.runtime_store.catalog_path()
+        if not path.exists():
+            status = "Missing"
+        elif errors:
+            status = f"Partial ({len(errors)} invalid)"
+        elif self.runtime_store.catalog_contains_all(definitions):
+            status = "Synced"
+        else:
+            status = "Out of date"
+        self.runtime_tree.insert(
+            "",
+            "end",
+            iid=path.name,
+            values=(path.name, f"{len(definitions)} definition(s)", status),
+        )
 
     def _on_draft_selected(self, _event: tk.Event) -> None:
         selection = self.draft_tree.selection()
@@ -552,26 +575,23 @@ class UniqueNPCManager(tk.Tk):
         if not self.current_filename:
             return
         if not messagebox.askyesno(
-            "Delete draft", f"Move {self.current_filename} to the Hoomans trash folder?"
+            "Permanently delete draft",
+            f"Permanently delete {self.current_filename}? This cannot be undone.",
         ):
             return
         filename = self.current_filename
-        definition = self.current_definition
         try:
             self.draft_store.delete(filename)
-            if definition:
-                normalized = build_payload(definition)["definition"]
-                if self.runtime_store.has_generated(normalized) and messagebox.askyesno(
-                    "Delete runtime definition", "Also remove its generated Lua definition?"
-                ):
-                    self.runtime_store.delete(normalized)
+            definitions, errors = self._catalog_definitions()
+            self.runtime_store.rebuild(definitions)
         except (StorageError, ConversionError) as exc:
             messagebox.showerror("Delete draft", str(exc))
             return
         self.current_filename = None
         self.current_definition = None
         self._refresh_all()
-        self.status_var.set(f"Deleted {filename}")
+        suffix = f"; {len(errors)} invalid source(s) omitted" if errors else ""
+        self.status_var.set(f"Permanently deleted {filename}; catalog rebuilt{suffix}")
 
     def export_current(self) -> None:
         if not self.current_definition:
@@ -579,54 +599,39 @@ class UniqueNPCManager(tk.Tk):
             return
         try:
             definition = build_payload(self._definition_from_editor())["definition"]
-            path = self.runtime_store.export(definition)
+            definitions, errors = self._catalog_definitions(override=definition)
+            path = self.runtime_store.export_all(definitions)
         except (StorageError, ConversionError) as exc:
             messagebox.showerror("Export Lua", str(exc))
             return
         self.current_definition = definition
         self.refresh_drafts()
         self.refresh_runtime()
-        self.status_var.set(f"Generated {path.name} and rebuilt the loader")
+        suffix = f"; {len(errors)} invalid source(s) omitted" if errors else ""
+        self.status_var.set(f"Rebuilt {path.name}{suffix}")
 
     def export_all(self) -> None:
-        exported = 0
-        errors: list[str] = []
-        for filename in self.draft_store.list_files():
-            try:
-                definition = build_payload(self.draft_store.load(filename))["definition"]
-                self.runtime_store.export(definition)
-                exported += 1
-            except (StorageError, ConversionError) as exc:
-                errors.append(f"{filename}: {exc}")
-        self.refresh_drafts()
-        self.refresh_runtime()
-        self._write_validation([f"Exported {exported} definition(s)"] + errors)
-        self.status_var.set(f"Exported {exported} definition(s)")
-
-    def rebuild_loader(self) -> None:
-        path = self.runtime_store.rebuild()
-        self.refresh_runtime()
-        self.status_var.set(f"Rebuilt {path.name}")
-
-    def delete_runtime(self) -> None:
-        selection = self.runtime_tree.selection()
-        if not selection:
-            messagebox.showinfo("Delete runtime definition", "Select a generated Lua module first.")
-            return
-        filename = selection[0]
-        if not messagebox.askyesno(
-            "Delete runtime definition",
-            f"Move generated {filename} to a backup and rebuild the loader?",
-        ):
-            return
+        definitions, errors = self._catalog_definitions()
         try:
-            backup = self.runtime_store.delete_module(filename)
+            path = self.runtime_store.export_all(definitions)
         except StorageError as exc:
-            messagebox.showerror("Delete runtime definition", str(exc))
+            messagebox.showerror("Export All", str(exc))
             return
         self.refresh_drafts()
         self.refresh_runtime()
-        self.status_var.set(f"Removed {filename}; backup: {backup.name}")
+        self._write_validation([f"Rebuilt {path.name} with {len(definitions)} definition(s)"] + errors)
+        self.status_var.set(f"Rebuilt {path.name} with {len(definitions)} definition(s)")
+
+    def rebuild_catalog(self) -> None:
+        definitions, errors = self._catalog_definitions()
+        try:
+            path = self.runtime_store.rebuild(definitions)
+        except StorageError as exc:
+            messagebox.showerror("Rebuild Catalog", str(exc))
+            return
+        self.refresh_runtime()
+        suffix = f"; {len(errors)} invalid source(s) omitted" if errors else ""
+        self.status_var.set(f"Rebuilt {path.name}{suffix}")
 
     def _on_runtime_selected(self, _event: tk.Event) -> None:
         selection = self.runtime_tree.selection()

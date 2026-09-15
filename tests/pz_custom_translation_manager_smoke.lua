@@ -5,7 +5,7 @@ T.addPackagePaths({
     { "PsychopatzCore", "common" },
 })
 
-local activeLanguage = "ES"
+local activeLanguage = "TL"
 local readersClosed = 0
 local virtualFiles = {}
 
@@ -47,9 +47,9 @@ local function packagedSource(modID, path)
             ["media/translation/EN/Traits.json"] =
                 T.read("ProjectHoomans", "common_mod",
                     "media/translation/EN/Traits.json"),
-            ["media/translation/ES/Traits.json"] =
+            ["media/translation/TL/Traits.json"] =
                 T.read("ProjectHoomans", "common_mod",
-                    "media/translation/ES/Traits.json"),
+                    "media/translation/TL/Traits.json"),
         }
         return known[path]
     end
@@ -85,8 +85,8 @@ T.equal(Traits.systemName, "Traits", "trait catalog keeps its system namespace")
 
 for _, callback in ipairs(Events.OnGameBoot.listeners) do callback() end
 
-T.equal(Manager.getLanguage(), "ES", "active language is read from Translator")
-T.equal(Traits:get("UI_PNC_Trait_Friendly"), "Amistoso",
+T.equal(Manager.getLanguage(), "TL", "active language is read from Translator")
+T.equal(Traits:get("UI_PNC_Trait_Friendly"), "Palakaibigan",
     "localized catalog overrides the English value")
 T.equal(Traits:get("UI_PNC_Trait_Brawler"), "Brawler",
     "missing localized key falls back to English")

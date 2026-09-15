@@ -130,6 +130,9 @@ local function hideTraitTooltip(view)
         tooltip:setVisible(false)
         tooltip:removeFromUIManager()
     end
+    if view then
+        view.traitTooltipEntryID = nil
+    end
 end
 
 local function hoveredTrait(view, x, y)
@@ -175,6 +178,7 @@ local function updateTraitTooltip(view, x, y)
         view.traitTooltip:setName(entry.label)
     end
     view.traitTooltip.description = text
+    view.traitTooltipEntryID = tostring(entry.id or "")
     view.traitTooltip:setX(x + 23)
     view.traitTooltip:setY(y + 23)
 end
@@ -196,7 +200,17 @@ function Tabs.CreateInfoChildren(view)
 end
 
 function Tabs.SetInfoContext(view, snapshot, payload)
-    hideTraitTooltip(view)
+    -- Live NPC data can refresh while the cursor remains over an icon. Do
+    -- not close the tooltip for ordinary snapshot updates; RenderInfo will
+    -- resolve the current hitbox and text again. A changed NPC is a real
+    -- context switch and must discard the old tooltip.
+    local contextID = tostring(view.npcId or "")
+    if view.traitTooltipContextID
+        and view.traitTooltipContextID ~= contextID
+    then
+        hideTraitTooltip(view)
+    end
+    view.traitTooltipContextID = contextID
     view.traitIconHitboxes = {}
     local character = Shared.GetLiveCharacter(view.npcId)
     local spec = Shared.BuildPortraitSpec(view.npcId, snapshot, payload)
@@ -209,7 +223,13 @@ function Tabs.OnInfoMouseMove(view, x, y)
 end
 
 function Tabs.OnInfoMouseMoveOutside(view)
-    hideTraitTooltip(view)
+    -- ISToolTip is top-level UI. Depending on event ordering, the tab can
+    -- receive this callback while the cursor is still over the icon.
+    local x = view and view.getMouseX and tonumber(view:getMouseX()) or nil
+    local y = view and view.getMouseY and tonumber(view:getMouseY()) or nil
+    if not hoveredTrait(view, x or 0, y or 0) then
+        hideTraitTooltip(view)
+    end
 end
 
 function Tabs.LayoutInfo(view)
@@ -271,6 +291,9 @@ function Tabs.RenderInfo(view, snapshot, payload, topY)
         view, traitList, x + labelWidth + 10, traitTextY,
         width - labelWidth - 10
     )
+    -- Re-resolve every draw so a live data refresh cannot permanently hide a
+    -- tooltip while the cursor stays over the same trait icon.
+    updateTraitTooltip(view)
     y = traitTextY + math.max(
         traitFontHeight + 6,
         traitIconHeight > 0 and traitIconHeight + 4 or 0

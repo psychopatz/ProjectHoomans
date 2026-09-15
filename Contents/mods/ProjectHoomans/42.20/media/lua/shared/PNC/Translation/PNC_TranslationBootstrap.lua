@@ -1,17 +1,14 @@
 -- Project Hoomans custom catalogs.
 -- The manager itself belongs to PsychopatzCore so future mods can reuse it;
 -- this file only declares which Hoomans catalogs exist.
-require "PsychopatzCore/Translation/PsychopatzCustomTranslationManager"
+require "CustomTranslationManager"
 
 PNC = PNC or {}
 PNC.Translation = PNC.Translation or {}
 
-local Manager = CustomTranslationManager
+local Translations = CustomTranslationManager.forMod("ProjectHoomans")
 
-PNC.Translation.Traits = Manager.registerSystem({
-    modID = "ProjectHoomans",
-    systemName = "Traits",
-    basePath = "media/translation",
-})
+PNC.Translation.Traits = Translations
+    and Translations.registerSystem("Traits", "media/translation")
 
 return PNC.Translation.Traits

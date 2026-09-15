@@ -26,7 +26,11 @@ function Model.GetTraitDefinitions()
     local index
     for index = 1, #Model.TRAIT_DEFINITIONS do
         local definition = Model.TRAIT_DEFINITIONS[index]
-        output[index] = { id = definition.id, labelKey = definition.labelKey }
+        output[index] = {
+            id = definition.id,
+            labelKey = definition.labelKey,
+            descriptionKey = definition.descriptionKey,
+        }
     end
     return output
 end
