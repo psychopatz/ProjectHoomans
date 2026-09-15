@@ -45,7 +45,7 @@ local function getTooltipOptions()
 end
 
 local function tr(key, fallback)
-    local value = getText and getText(key) or nil
+    local value = getText and PNC.Translation.GetKey(key) or nil
     return value and value ~= "" and value ~= key and value or fallback
 end
 
@@ -1039,23 +1039,23 @@ function ISPNCInventoryWindow:prerender()
         0.90, 0.90, 0.90, 1, UIFont.Small
     )
     local listY = self.playerList and self.playerList:getY() or containerY + 38
-    self:drawText("Item", self.playerList:getX() + 40, listY - 19,
+    self:drawText(tr("UI_PNC_Inventory_Item", "Item"), self.playerList:getX() + 40, listY - 19,
         0.85, 0.85, 0.85, 1, UIFont.Small)
     if self.giftMode then
         self:drawText(
-            "Gift score (A / R / F)",
+            tr("UI_PNC_Inventory_GiftScore", "Gift score (A / R / F)"),
             self.playerList:getX() + math.floor(self.playerList.width * 0.64),
             listY - 19,
             0.55, 0.88, 0.68, 1, UIFont.Small
         )
     else
-        self:drawText("Category",
+        self:drawText(tr("UI_PNC_Inventory_Category", "Category"),
             self.playerList:getX() + math.floor(self.playerList.width * 0.64),
             listY - 19, 0.85, 0.85, 0.85, 1, UIFont.Small)
     end
-    self:drawText("Item", self.npcList:getX() + 40, listY - 19,
+    self:drawText(tr("UI_PNC_Inventory_Item", "Item"), self.npcList:getX() + 40, listY - 19,
         0.85, 0.85, 0.85, 1, UIFont.Small)
-    self:drawText("Category",
+    self:drawText(tr("UI_PNC_Inventory_Category", "Category"),
         self.npcList:getX() + math.floor(self.npcList.width * 0.64),
         listY - 19, 0.85, 0.85, 0.85, 1, UIFont.Small)
     self:drawTextCentre(

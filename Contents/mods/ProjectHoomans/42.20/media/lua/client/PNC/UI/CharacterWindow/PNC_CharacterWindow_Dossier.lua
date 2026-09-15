@@ -26,7 +26,7 @@ end
 
 function Tabs.CreateDossierChildren(view)
     view.refreshDossierButton = UI.CreateButton(view, {
-        id = "refresh_dossier", title = "Refresh", target = view,
+        id = "refresh_dossier", title = PNC.Translation.GetKey("UI_PNC_Character_Dossier_Refresh", "Refresh"), target = view,
         onclick = function(target)
             if PNC.Client and PNC.Client.RequestNPCKnowledge then
                 PNC.Client.RequestNPCKnowledge(target.npcId)
@@ -57,16 +57,16 @@ function Tabs.RenderDossier(view, _, _, topY)
     local muted = Theme.colors.textMuted
     local sections = model.sections or {}
     if #sections == 0 then
-        view:drawText("NO OBSERVATIONS YET", pad, y, muted.r, muted.g, muted.b, muted.a, UIFont.Small)
+        view:drawText(PNC.Translation.GetKey("UI_PNC_Character_Dossier_NoObservations", "NO OBSERVATIONS YET"), pad, y, muted.r, muted.g, muted.b, muted.a, UIFont.Small)
         y = y + Layout.Pixels(24, view.uiScale)
-        view:drawText("Talk to, watch, or spend time with this NPC to build their dossier.", pad, y, color.r, color.g, color.b, color.a, UIFont.Small)
+        view:drawText(PNC.Translation.GetKey("UI_PNC_Character_Dossier_Hint", "Talk to, watch, or spend time with this NPC to build their dossier."), pad, y, color.r, color.g, color.b, color.a, UIFont.Small)
         if canDebug() then
             y = y + Layout.Pixels(22, view.uiScale)
-            view:drawText("Debug: use Talk > Relationship tools > Discovery topics.", pad, y, muted.r, muted.g, muted.b, muted.a, UIFont.Small)
+            view:drawText(PNC.Translation.GetKey("UI_PNC_Character_Dossier_DebugHint", "Debug: use Talk > Relationship tools > Discovery topics."), pad, y, muted.r, muted.g, muted.b, muted.a, UIFont.Small)
         end
         return y + Layout.Pixels(30, view.uiScale)
     end
-    view:drawText("KNOWN INFORMATION", pad, y, muted.r, muted.g, muted.b, muted.a, UIFont.Small)
+    view:drawText(PNC.Translation.GetKey("UI_PNC_Character_Dossier_KnownInformation", "KNOWN INFORMATION"), pad, y, muted.r, muted.g, muted.b, muted.a, UIFont.Small)
     y = y + Layout.Pixels(24, view.uiScale)
     for _, section in ipairs(sections) do
         view:drawText(string.upper(tostring(section.title)), pad, y, color.r, color.g, color.b, color.a, UIFont.Small)

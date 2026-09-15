@@ -124,7 +124,8 @@ end
 
 function Identity.GetContextLabel(npc)
     return Identity.IsNameKnown(npc) and Identity.GetName(npc)
-        or "Talk to stranger"
+        or PNC.Translation.GetKey("UI_PNC_Character_TalkToStranger",
+            "Talk to stranger")
 end
 
 -- Dialogue may explicitly reveal identity before the following knowledge

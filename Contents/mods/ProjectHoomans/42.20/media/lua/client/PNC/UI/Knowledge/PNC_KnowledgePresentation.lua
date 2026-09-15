@@ -138,8 +138,8 @@ function Presentation.GetFactLabel(descriptor)
         descriptor and descriptor.descriptorID or "information"
     )
     local presentation = descriptor and descriptor.presentation or nil
-    if presentation and presentation.labelKey and getText then
-        local localized = getText(presentation.labelKey)
+    if presentation and presentation.labelKey then
+        local localized = PNC.Translation.GetKey(presentation.labelKey)
         if localized and localized ~= presentation.labelKey then
             return localized
         end
@@ -159,11 +159,8 @@ function Presentation.ShowLearnedFacts(previous, current)
     local facts = Presentation.GetNewFacts(previous, current)
     for _, descriptor in ipairs(facts) do
         local label = Presentation.GetFactLabel(descriptor)
-        local message = getText
-            and getText("UI_PNC_KnowledgeLearned", label) or nil
-        if not message or message == ""
-            or message == "UI_PNC_KnowledgeLearned"
-        then message = "Learned: " .. label end
+        local message = PNC.Translation.TrFormat("UI_PNC_KnowledgeLearned",
+            "Learned: %s", label)
         HaloTextHelper.addTextWithArrow(
             player,
             message,

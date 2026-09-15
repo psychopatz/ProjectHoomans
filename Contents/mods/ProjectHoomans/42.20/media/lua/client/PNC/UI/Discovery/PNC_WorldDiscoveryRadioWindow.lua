@@ -1,6 +1,7 @@
 -- Contact directory for discovered settlements and mobile groups.
 
 require "PsychopatzCore/UI/PsychopatzUI"
+require "PNC/WorldDiscovery/PNC_WorldDiscoveryPresentation"
 
 PNC = PNC or {}
 PNC.ContactsUI = PNC.ContactsUI or PNC.WorldDiscoveryUI or {}
@@ -11,11 +12,16 @@ local UI = PsychopatzCore.UI
 local Theme = UI.Theme
 local Layout = UI.Layout
 local State = PNC.Network.ClientState
+local Presentation = PNC.WorldDiscoveryPresentation
 
 local function tr(key, fallback)
-    local value = getText and getText(key) or nil
+    local value = getText and PNC.Translation.GetKey(key) or nil
     return value and value ~= "" and value ~= key
         and value or fallback
+end
+
+local function trf(key, fallback, ...)
+    return PNC.Translation.TrFormat(key, fallback, ...)
 end
 
 local function drawSignal(list, y, entry, alternate)
@@ -29,22 +35,19 @@ local function drawSignal(list, y, entry, alternate)
         or phase == "LOCATED" and Theme.colors.accent
         or Theme.colors.warning
     list:drawText(
-        tostring(entity.name or "Unknown signal"),
+        Presentation.SignalName(entity),
         10, y + 7,
         Theme.colors.text.r, Theme.colors.text.g,
         Theme.colors.text.b, Theme.colors.text.a,
         UIFont.Small
     )
     list:drawText(
-        phase .. " · " .. tostring(entity.kind or "contact"),
+        Presentation.Phase(phase) .. " · " .. Presentation.Kind(entity.kind),
         10, y + 28,
         color.r, color.g, color.b, color.a,
         UIFont.Small
     )
-    local factionText = entity.factionKnown == true
-        and entity.factionName
-        and ("Faction: " .. tostring(entity.factionName))
-        or "Faction not disclosed"
+    local factionText = Presentation.Faction(entity)
     list:drawText(
         factionText,
         10, y + 47,
@@ -89,7 +92,7 @@ function ISPNCContactsWindow:createChildren()
     })
     self.refreshButton = UI.CreateButton(self, {
         id = "refresh",
-        title = getText("UI_PNC_DiscoveryRefresh"),
+        title = PNC.Translation.GetKey("UI_PNC_DiscoveryRefresh"),
         target = self,
         onclick = ISPNCContactsWindow.onRefresh,
         variant = "quiet",
@@ -115,7 +118,8 @@ end
 function ISPNCContactsWindow:onRefresh()
     if PNC.Client and PNC.Client.RequestWorldDiscovery then
         PNC.Client.RequestWorldDiscovery("snapshot")
-        self.statusText = "Refreshing receiver memory..."
+        self.statusText = tr("UI_PNC_Discovery_Refreshing",
+            "Refreshing receiver memory...")
     end
 end
 
@@ -133,11 +137,13 @@ end
 function ISPNCContactsWindow:onCallContact()
     local entity = self.selectedEntity
     if not entity then
-        self.statusText = "Select a known channel first."
+        self.statusText = tr("UI_PNC_Discovery_SelectChannel",
+            "Select a known channel first.")
         return
     end
     if not PNC.Client or not PNC.Client.RequestWorldDiscovery then
-        self.statusText = "Discovery service unavailable."
+        self.statusText = tr("UI_PNC_Discovery_ServiceUnavailable",
+            "Discovery service unavailable.")
         return
     end
     local sent, payload = PNC.Client.RequestWorldDiscovery(
@@ -146,9 +152,11 @@ function ISPNCContactsWindow:onCallContact()
             entityID = entity.entityID,
         })
     if not sent then
-        self.statusText = "Call failed: " .. tostring(payload or "unknown")
+        self.statusText = trf("UI_PNC_Discovery_CallFailed",
+            "Call failed: %1", tostring(payload or "unknown"))
     elseif not payload then
-        self.statusText = "Calling channel..."
+        self.statusText = tr("UI_PNC_Discovery_Calling",
+            "Calling channel...")
     end
 end
 
@@ -179,28 +187,36 @@ function ISPNCContactsWindow:refresh()
     if result then
         if result.ok == true then
             self.statusText = result.reason == "signal_detected"
-                and "Weak signal detected. Its position is approximate."
+                and tr("UI_PNC_Discovery_WeakSignal",
+                    "Weak signal detected. Its position is approximate.")
                 or result.reason == "signal_located"
-                    and "Signal triangulated and added to the map."
-                    or result.reason == "contact_located"
-                        and "Channel triangulated; map updated."
-                        or result.reason == "contact_already_located"
-                            and "Channel already has an exact map position."
-                    or "Discovery data updated."
+                    and tr("UI_PNC_Discovery_SignalTriangulated",
+                        "Signal triangulated and added to the map.")
+                or result.reason == "contact_located"
+                    and tr("UI_PNC_Discovery_ChannelTriangulated",
+                        "Channel triangulated; map updated.")
+                or result.reason == "contact_already_located"
+                    and tr("UI_PNC_Discovery_ChannelAlreadyLocated",
+                        "Channel already has an exact map position.")
+                    or tr("UI_PNC_Discovery_DataUpdated",
+                        "Discovery data updated.")
         elseif result.reason == "radio_cooldown" then
-            self.statusText = "Receiver cooling down: "
-                .. tostring(result.cooldownSeconds or 0) .. " seconds."
+            self.statusText = trf("UI_PNC_Discovery_ReceiverCoolingDown",
+                "Receiver cooling down: %1 seconds.",
+                tostring(result.cooldownSeconds or 0))
         elseif result.reason == "no_signal" then
-            self.statusText = "No undiscovered signals are in radio range."
+            self.statusText = tr("UI_PNC_Discovery_NoSignalsInRange",
+                "No undiscovered signals are in radio range.")
         else
-            self.statusText = "Scan failed: "
-                .. tostring(result.reason or "unknown")
+            self.statusText = trf("UI_PNC_Discovery_ScanFailed",
+                "Scan failed: %1", tostring(result.reason or "unknown"))
         end
     elseif #(snapshot.entities or {}) == 0 then
-        self.statusText = "No contacts recorded. Listen to the scan channel."
+        self.statusText = tr("UI_PNC_Discovery_NoContacts",
+            "No contacts recorded. Listen to the scan channel.")
     else
-        self.statusText = tostring(#(snapshot.entities or {}))
-            .. " contacts recorded."
+        self.statusText = trf("UI_PNC_Discovery_ContactsRecorded",
+            "%1 contacts recorded.", #(snapshot.entities or {}))
     end
 end
 
@@ -218,7 +234,8 @@ function ISPNCContactsWindow:prerender()
         UIFont.Small
     )
     self:drawText(
-        tostring(self.statusText or "Receiver ready."),
+        self.statusText or tr("UI_PNC_Discovery_ReceiverReady",
+            "Receiver ready."),
         Layout.Pixels(14, self.uiScale),
         Layout.Pixels(49, self.uiScale),
         Theme.colors.textMuted.r, Theme.colors.textMuted.g,

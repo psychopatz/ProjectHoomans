@@ -10,12 +10,12 @@ Toolbar.Register("hoomans", {
     field = "pncHoomansButton",
     width = 112,
     title = function()
-        local value = getText and getText("UI_PNC_MapHoomans_Button")
+        local value = getText and PNC.Translation.GetKey("UI_PNC_MapHoomans_Button")
         return value and value ~= ""
             and value ~= "UI_PNC_MapHoomans_Button" and value or "Hoomans"
     end,
     tooltip = function()
-        local value = getText and getText("UI_PNC_MapHoomans_ButtonHelp")
+        local value = getText and PNC.Translation.GetKey("UI_PNC_MapHoomans_ButtonHelp")
         return value and value ~= ""
             and value ~= "UI_PNC_MapHoomans_ButtonHelp"
             and value or "Open Hoomans map settings"

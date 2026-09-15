@@ -129,14 +129,14 @@ end
 local function woundLabel(wound)
     local woundType = tostring(wound and wound.type or "wound")
     local keys = {
-        scratch = { "IGUI_health_Scratched", "Scratch" },
-        laceration = { "IGUI_health_Cut", "Laceration" },
-        bite = { "IGUI_health_Bitten", "Bite" },
-        bullet = { "IGUI_health_LodgedBullet", "Lodged Bullet" },
-        deep_wound = { "IGUI_health_DeepWound", "Deep Wound" },
-        fracture = { "IGUI_health_Fracture", "Fracture" },
-        burn = { "IGUI_health_Burned", "Burn" },
-        glass = { "IGUI_health_LodgedGlassShards", "Lodged Glass Shards" },
+        scratch = { "UI_PNC_Wound_scratch", "Scratch" },
+        laceration = { "UI_PNC_Wound_laceration", "Laceration" },
+        bite = { "UI_PNC_Wound_bite", "Bite" },
+        bullet = { "UI_PNC_Wound_bullet", "Lodged Bullet" },
+        deep_wound = { "UI_PNC_Wound_deep_wound", "Deep Wound" },
+        fracture = { "UI_PNC_Wound_fracture", "Fracture" },
+        burn = { "UI_PNC_Wound_burn", "Burn" },
+        glass = { "UI_PNC_Wound_glass", "Lodged Glass Shards" },
     }
     local definition = keys[woundType]
     return definition and Shared.Text(definition[1], definition[2])
@@ -144,14 +144,14 @@ local function woundLabel(wound)
 end
 
 local BODY_PART_TEXT = {
-    Hand_L = "IGUI_health_Left_Hand", Hand_R = "IGUI_health_Right_Hand",
-    ForeArm_L = "IGUI_health_Left_Forearm", ForeArm_R = "IGUI_health_Right_Forearm",
-    UpperArm_L = "IGUI_health_Left_Upper_Arm", UpperArm_R = "IGUI_health_Right_Upper_Arm",
-    Torso_Upper = "IGUI_health_Upper_Torso", Torso_Lower = "IGUI_health_Lower_Torso",
-    Head = "IGUI_health_Head", Neck = "IGUI_health_Neck", Groin = "IGUI_health_Groin",
-    UpperLeg_L = "IGUI_health_Left_Thigh", UpperLeg_R = "IGUI_health_Right_Thigh",
-    LowerLeg_L = "IGUI_health_Left_Shin", LowerLeg_R = "IGUI_health_Right_Shin",
-    Foot_L = "IGUI_health_Left_Foot", Foot_R = "IGUI_health_Right_Foot",
+    Hand_L = "UI_PNC_Character_BodyPart_LeftHand", Hand_R = "UI_PNC_Character_BodyPart_RightHand",
+    ForeArm_L = "UI_PNC_Character_BodyPart_LeftForearm", ForeArm_R = "UI_PNC_Character_BodyPart_RightForearm",
+    UpperArm_L = "UI_PNC_Character_BodyPart_LeftUpperArm", UpperArm_R = "UI_PNC_Character_BodyPart_RightUpperArm",
+    Torso_Upper = "UI_PNC_Character_BodyPart_UpperTorso", Torso_Lower = "UI_PNC_Character_BodyPart_LowerTorso",
+    Head = "UI_PNC_Character_BodyPart_Head", Neck = "UI_PNC_Character_BodyPart_Neck", Groin = "UI_PNC_Character_BodyPart_Groin",
+    UpperLeg_L = "UI_PNC_Character_BodyPart_LeftThigh", UpperLeg_R = "UI_PNC_Character_BodyPart_RightThigh",
+    LowerLeg_L = "UI_PNC_Character_BodyPart_LeftShin", LowerLeg_R = "UI_PNC_Character_BodyPart_RightShin",
+    Foot_L = "UI_PNC_Character_BodyPart_LeftFoot", Foot_R = "UI_PNC_Character_BodyPart_RightFoot",
 }
 
 local function overallStatus(current, maximum, incapacitated)
@@ -478,9 +478,18 @@ function Tabs.RenderHealth(view, snapshot, payload, topY)
 
     if state == "incapacitated" then
         y = y + 6
-        view:drawText("Incapacitated - " .. tostring(health.incapacitatedReason or "critical injury"), x, y, 0.95, 0.36, 0.31, 1, UIFont.Small)
+        local reason = tostring(health.incapacitatedReason or "")
+        if reason == "" or reason == "critical injury" then
+            reason = Shared.Text("UI_PNC_Health_CriticalInjury", "critical injury")
+        end
+        view:drawText(PNC.Translation.TrFormat(
+            "UI_PNC_Health_Incapacitated", "Incapacitated - %1", reason
+        ), x, y, 0.95, 0.36, 0.31, 1, UIFont.Small)
         y = y + fontHeight + 6
-        view:drawText("Bandage the wounds; they will stand once sufficiently recovered.",
+        view:drawText(Shared.Text(
+            "UI_PNC_Health_IncapacitatedHelp",
+            "Bandage the wounds; they will stand once sufficiently recovered."
+        ),
             x, y, 0.72, 0.72, 0.72, 1, UIFont.Small)
         y = y + fontHeight + 6
     end

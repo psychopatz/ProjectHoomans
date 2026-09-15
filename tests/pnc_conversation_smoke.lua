@@ -52,6 +52,7 @@ getGameTime = function()
     }
 end
 
+T.load(SHARED .. "PNC/Translation/PNC_TranslationBootstrap.lua")
 T.load(CORE_TEXT)
 T.load(SHARED .. "PNC/Conversation/Blocks/PNC_ConversationRegistry.lua")
 T.load(SHARED .. "PNC/Conversation/Blocks/PNC_ConversationRules.lua")
@@ -1091,11 +1092,14 @@ T.truthy(option, "Talk option created")
 option.callback()
 T.equal(opened.npcID, "npc-12", "Talk opens selected NPC")
 
-local ui = T.read("ProjectHoomans", "common_lua", "Translate/EN/UI.json")
-T.equal(string.find(ui, "UI_PNC_Conversation_", 1, true), nil,
-    "conversation strings removed from UI.json")
-T.equal(string.find(ui, "UI_PNC_Greeting_", 1, true), nil,
-    "greeting strings removed from UI.json")
+local conversationCatalog = T.read(
+    "ProjectHoomans", "common_mod",
+    "media/translation/EN/Conversation/Conversation.json")
+T.truthy(string.find(conversationCatalog, "UI_PNC_Flavor_AttackAuto_NPC_1",
+    1, true), "conversation flavor strings live in the Conversation catalog")
+T.truthy(string.find(conversationCatalog,
+    "UI_PNC_Flavor_SocialGreeting_Colonist_Familiar_First_1", 1, true),
+    "greeting strings live in the Conversation catalog")
 T.finish("pnc_conversation_smoke")
 
 T.finish("pnc_conversation_smoke")

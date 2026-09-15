@@ -25,55 +25,55 @@ function Tabs.RenderTemperature(view, snapshot, payload, topY)
 
     Shared.DrawBodyMap(view, resolved.isFemale == true, padding, padding, bodyWidth, bodyHeight, insulation, Shared.TemperatureColor)
 
-    y = Shared.DrawSection(view, "Body Temperature", contentX, y, contentWidth)
+    y = Shared.DrawSection(view, Shared.Text("UI_PNC_Character_Temperature_Section", "Body Temperature"), contentX, y, contentWidth)
     if infectionTemperature or thermal and thermal.coreTemperature then
         local coreTemperature = infectionTemperature or thermal.coreTemperature
-        y = Shared.DrawBar(view, "Core Temperature", coreTemperature, 42, contentX, y, contentWidth, { r = 0.82, g = 0.34, b = 0.18 })
-        y = Shared.DrawLabelValue(view, "Reading", tostring(Shared.Round(coreTemperature, 1)) .. " C", contentX, y + 2, 92)
-        y = Shared.DrawLabelValue(view, "Heat Output",
+        y = Shared.DrawBar(view, Shared.Text("UI_PNC_Character_Temperature_Core", "Core Temperature"), coreTemperature, 42, contentX, y, contentWidth, { r = 0.82, g = 0.34, b = 0.18 })
+        y = Shared.DrawLabelValue(view, Shared.Text("UI_PNC_Character_Temperature_Reading", "Reading"), tostring(Shared.Round(coreTemperature, 1)) .. " C", contentX, y + 2, 92)
+        y = Shared.DrawLabelValue(view, Shared.Text("UI_PNC_Character_Temperature_HeatOutput", "Heat Output"),
             infectionTemperature and tostring(Shared.Round(tonumber(infection.fever) or 0, 0)) .. "% fever"
                 or tostring(Shared.Round((thermal.heatGenerationUI or 0) * 100, 0)) .. "%",
             contentX, y, 92)
         if infectionTemperature then
-            y = Shared.DrawLabelValue(view, "Infection",
+            y = Shared.DrawLabelValue(view, Shared.Text("UI_PNC_Character_Temperature_Infection", "Infection"),
                 tostring(infection.stage or "incubating"), contentX, y, 92)
         end
     else
-        view:drawText("Live temperature telemetry is available while this NPC is loaded.", contentX, y, 0.7, 0.7, 0.7, 1, UIFont.Small)
+        view:drawText(Shared.Text("UI_PNC_Character_Temperature_TelemetryHint", "Live temperature telemetry is available while this NPC is loaded."), contentX, y, 0.7, 0.7, 0.7, 1, UIFont.Small)
         y = y + fontHeight + 10
     end
 
-    y = Shared.DrawSection(view, "Clothing Insulation", contentX, y, contentWidth)
-    y = Shared.DrawBar(view, "Average Insulation", insulation.insulationAverage * 100, 100, contentX, y, contentWidth, { r = 0.76, g = 0.42, b = 0.18 })
-    y = Shared.DrawBar(view, "Average Wind Resistance", insulation.windAverage * 100, 100, contentX, y, contentWidth, { r = 0.32, g = 0.57, b = 0.75 })
+    y = Shared.DrawSection(view, Shared.Text("UI_PNC_Character_Temperature_InsulationSection", "Clothing Insulation"), contentX, y, contentWidth)
+    y = Shared.DrawBar(view, Shared.Text("UI_PNC_Character_Temperature_AverageInsulation", "Average Insulation"), insulation.insulationAverage * 100, 100, contentX, y, contentWidth, { r = 0.76, g = 0.42, b = 0.18 })
+    y = Shared.DrawBar(view, Shared.Text("UI_PNC_Character_Temperature_AverageWind", "Average Wind Resistance"), insulation.windAverage * 100, 100, contentX, y, contentWidth, { r = 0.32, g = 0.57, b = 0.75 })
 
     local warmthWidth = math.min(64, math.floor(contentWidth * 0.22))
     local windWidth = math.min(56, math.floor(contentWidth * 0.2))
     local partWidth = math.max(72, contentWidth - warmthWidth - windWidth)
-    view:drawText("Part", contentX, y, 0.78, 0.78, 0.78, 1, UIFont.Small)
-    view:drawTextRight("Warmth", contentX + partWidth + warmthWidth, y, 0.78, 0.78, 0.78, 1, UIFont.Small)
-    view:drawTextRight("Wind", contentX + contentWidth, y, 0.78, 0.78, 0.78, 1, UIFont.Small)
+    view:drawText(Shared.Text("UI_PNC_Character_Temperature_Part", "Part"), contentX, y, 0.78, 0.78, 0.78, 1, UIFont.Small)
+    view:drawTextRight(Shared.Text("UI_PNC_Character_Temperature_Warmth", "Warmth"), contentX + partWidth + warmthWidth, y, 0.78, 0.78, 0.78, 1, UIFont.Small)
+    view:drawTextRight(Shared.Text("UI_PNC_Character_Temperature_Wind", "Wind"), contentX + contentWidth, y, 0.78, 0.78, 0.78, 1, UIFont.Small)
     y = y + fontHeight + 3
     for _, definition in ipairs(Shared.BodyParts) do
         local entry = insulation[definition.id]
         local r, g, b = Shared.TemperatureColor(entry.insulation)
-        view:drawText(definition.label, contentX, y, 0.9, 0.9, 0.9, 1, UIFont.Small)
+        view:drawText(Shared.Text(definition.labelKey, definition.label), contentX, y, 0.9, 0.9, 0.9, 1, UIFont.Small)
         view:drawTextRight(tostring(Shared.Round(entry.insulation * 100, 0)) .. "%", contentX + partWidth + warmthWidth, y, r, g, b, 1, UIFont.Small)
         view:drawTextRight(tostring(Shared.Round(entry.wind * 100, 0)) .. "%", contentX + contentWidth, y, 0.42, 0.7, 0.92, 1, UIFont.Small)
         y = y + fontHeight + 2
     end
 
     y = y + 7
-    y = Shared.DrawSection(view, "Worn Items", contentX, y, contentWidth)
+    y = Shared.DrawSection(view, Shared.Text("UI_PNC_Character_Temperature_WornItems", "Worn Items"), contentX, y, contentWidth)
     if #rows == 0 then
-        view:drawText("No insulating clothing equipped.", contentX, y, 0.7, 0.7, 0.7, 1, UIFont.Small)
+        view:drawText(Shared.Text("UI_PNC_Character_Temperature_NoClothing", "No insulating clothing equipped."), contentX, y, 0.7, 0.7, 0.7, 1, UIFont.Small)
         y = y + fontHeight + 8
     else
         local valueWidth = math.min(62, math.floor(contentWidth * 0.2))
         local itemWidth = math.max(70, contentWidth - valueWidth * 2 - 12)
-        view:drawText("Garment", contentX, y, 0.72, 0.72, 0.72, 1, UIFont.Small)
-        view:drawTextRight("Condition", contentX + itemWidth + valueWidth, y, 0.72, 0.72, 0.72, 1, UIFont.Small)
-        view:drawTextRight("Wet", contentX + contentWidth, y, 0.72, 0.72, 0.72, 1, UIFont.Small)
+        view:drawText(Shared.Text("UI_PNC_Character_Temperature_Garment", "Garment"), contentX, y, 0.72, 0.72, 0.72, 1, UIFont.Small)
+        view:drawTextRight(Shared.Text("UI_PNC_Character_Temperature_Condition", "Condition"), contentX + itemWidth + valueWidth, y, 0.72, 0.72, 0.72, 1, UIFont.Small)
+        view:drawTextRight(Shared.Text("UI_PNC_Character_Temperature_Wet", "Wet"), contentX + contentWidth, y, 0.72, 0.72, 0.72, 1, UIFont.Small)
         y = y + fontHeight + 3
         view:drawRect(contentX, y, contentWidth, 1, 0.55, 0.4, 0.4, 0.4)
         y = y + 5

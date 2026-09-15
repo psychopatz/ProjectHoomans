@@ -85,11 +85,7 @@ function ISPNCUniqueNPCAppearanceScrollPanel:render()
 end
 
 local function tr(key, fallback)
-    if getText then
-        local ok, value = pcall(getText, key)
-        if ok and value and value ~= "" and value ~= key then return value end
-    end
-    return fallback or key
+    return PNC.Translation.GetKey(key, fallback or key)
 end
 
 local function copy(value)

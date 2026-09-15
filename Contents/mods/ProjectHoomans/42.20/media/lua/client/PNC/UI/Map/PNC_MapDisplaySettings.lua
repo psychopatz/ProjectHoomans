@@ -12,7 +12,7 @@ Display.NamesVisible = Display.NamesVisible == true
 if Display.BasesVisible == nil then Display.BasesVisible = true end
 
 local function text(key, fallback)
-    local value = getText and getText(key) or nil
+    local value = getText and PNC.Translation.GetKey(key) or nil
     if value and value ~= "" and value ~= key then return value end
     return fallback or key
 end

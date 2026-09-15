@@ -2,11 +2,7 @@ local Presentation = {}
 local EventTypes = require "PNC/Core/Events/PNC_EventDefinitions"
 
 local function text(key, fallback, ...)
-    local translated = getText and getText(key, ...) or nil
-    if translated and translated ~= "" and translated ~= key then
-        return translated
-    end
-    return string.format(fallback, ...)
+    return PNC.Translation.TrFormat(key, fallback, ...)
 end
 
 local function humanize(value)

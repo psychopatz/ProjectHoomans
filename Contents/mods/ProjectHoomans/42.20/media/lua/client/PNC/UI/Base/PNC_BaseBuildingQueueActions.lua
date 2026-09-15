@@ -1,7 +1,7 @@
 local Actions = {}
 
 local function tr(key, fallback)
-    local value = getText and getText(key) or nil
+    local value = getText and PNC.Translation.GetKey(key) or nil
     if not value or value == key or value == "" then return fallback end
     return value
 end

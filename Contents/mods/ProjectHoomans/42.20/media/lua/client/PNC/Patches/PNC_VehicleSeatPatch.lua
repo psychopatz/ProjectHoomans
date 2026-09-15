@@ -26,8 +26,8 @@ if not PNC._VehicleSeatPatchApplied then
     end
 
     local function showOccupied(playerObj, name)
-        local text = getText and getText("UI_PNC_VehicleSeatOccupied", tostring(name or "NPC"))
-            or ("Seat occupied by " .. tostring(name or "NPC"))
+        local text = PNC.Translation.TrFormat("UI_PNC_VehicleSeatOccupied",
+            "Seat occupied by %s", tostring(name or "NPC"))
         if HaloTextHelper and HaloTextHelper.addBadText then
             HaloTextHelper.addBadText(playerObj, text)
         end

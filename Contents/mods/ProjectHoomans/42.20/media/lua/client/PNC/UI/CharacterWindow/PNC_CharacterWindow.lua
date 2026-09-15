@@ -15,13 +15,13 @@ local Layout = UI.Layout
 local IdentityPresentation = PNC.NPCIdentityPresentation
 
 local TAB_ORDER = {
-    { id = "Info", label = "Info" },
-    { id = "Dossier", label = "Profile" },
-    { id = "Interactions", label = "Interactions" },
-    { id = "Skills", label = "Skills" },
-    { id = "Health", label = "Health" },
-    { id = "Protection", label = "Protection" },
-    { id = "Temperature", label = "Temperature" },
+    { id = "Info", labelKey = "UI_PNC_Character_Tab_Info", label = "Info" },
+    { id = "Dossier", labelKey = "UI_PNC_Character_Tab_Profile", label = "Profile" },
+    { id = "Interactions", labelKey = "UI_PNC_Character_Tab_Interactions", label = "Interactions" },
+    { id = "Skills", labelKey = "UI_PNC_Character_Tab_Skills", label = "Skills" },
+    { id = "Health", labelKey = "UI_PNC_Character_Tab_Health", label = "Health" },
+    { id = "Protection", labelKey = "UI_PNC_Character_Tab_Protection", label = "Protection" },
+    { id = "Temperature", labelKey = "UI_PNC_Character_Tab_Temperature", label = "Temperature" },
 }
 
 ISPNCCharacterTab = ISPanel:derive("ISPNCCharacterTab")
@@ -150,7 +150,7 @@ function ISPNCCharacterWindow:createChildren()
         view = ISPNCCharacterTab:new(0, self.tabPanel.tabHeight, self.tabPanel.width, self.tabPanel.height - self.tabPanel.tabHeight, tab.id)
         view:initialise()
         view:instantiate()
-        self.tabPanel:addView(tab.label, view)
+        self.tabPanel:addView(Shared.Text(tab.labelKey, tab.label), view)
         self.tabViews[tab.id] = view
     end
     self:onResponsiveLayout()

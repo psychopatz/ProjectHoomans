@@ -1,4 +1,5 @@
 require "PsychopatzCore/UI/PsychopatzUI"
+require "PsychopatzCore/UI/Components/PsychopatzCheckbox"
 require "ISUI/ISLabel"
 
 PNC = PNC or {}
@@ -15,6 +16,7 @@ local Theme = UI.Theme
 local WidgetWindow = UI.WidgetWindow
 local DisplaySettings = require
     "PNC/UI/Nameplates/PNC_NameplateDisplaySettings"
+local CoreTranslation = PsychopatzCore.Translation
 
 local function trace(event, message)
     local hub = UI.CommandHub
@@ -23,8 +25,19 @@ end
 
 local function tr(key, fallback)
     if not key or key == "" then return fallback end
-    local value = getText and getText(key) or nil
+    local value = getText and PNC.Translation.GetKey(key) or nil
     return value and value ~= "" and value ~= key and value or fallback
+end
+
+local function audioText(key, fallback)
+    if CoreTranslation and CoreTranslation.GetKey then
+        return CoreTranslation.GetKey(key, fallback)
+    end
+    return fallback
+end
+
+local function getAudio()
+    return PsychopatzCore and PsychopatzCore.Audio or nil
 end
 
 local function label(parent, text, color, colorName)
@@ -267,9 +280,21 @@ function ISPNCCommandHubSettingsWindow:createChildren()
         slider = relationshipFeedbackScaleRow.control,
         valueLabel = relationshipFeedbackScaleRow.valueLabel,
     }
+    self.audioSectionLabel = label(self,
+        audioText("UI_PsychopatzCore_AudioSettingsTitle", "Sounds"),
+        Theme.colors.textMuted)
+    local audio = getAudio()
+    self.audioCheckbox = UI.CreateCheckbox(self, {
+        id = "pnc-command-hub-setting:player-speech-tts",
+        label = audioText("UI_PsychopatzCore_SettingPlayerSpeechTTS",
+            "Speak player dialogue with TTS"),
+        target = self,
+        value = audio and audio.IsPlayerSpeechEnabled
+            and audio.IsPlayerSpeechEnabled() or false,
+    })
     self.helpLabel = label(self,
         tr("UI_PNC_CommandHub_Settings_Help",
-            "Adjust opacity, nameplate text and bar sizes, relationship feedback, child surface lifts, title-bar controls, theme, and panel side here."),
+            "Adjust opacity, nameplate text and bar sizes, relationship feedback, child surface lifts, title-bar controls, theme, panel side, and sound here."),
         Theme.colors.textMuted)
     self.themeButton = UI.CreateButton(self, {
         id = "theme", title = themeTitle(), target = self,
@@ -378,6 +403,10 @@ function ISPNCCommandHubSettingsWindow:populate()
         relationshipFeedbackScale, true)
     UI.SetLabelText(self.fields.relationshipFeedbackScale.valueLabel,
         formatRelationshipFeedbackScale(relationshipFeedbackScale))
+    local audio = getAudio()
+    if self.audioCheckbox and audio and audio.IsPlayerSpeechEnabled then
+        self.audioCheckbox:setChecked(audio.IsPlayerSpeechEnabled())
+    end
     self.branchButton:setTitle(branchTitle())
     self.themeButton:setTitle(themeTitle())
 end
@@ -392,6 +421,11 @@ function ISPNCCommandHubSettingsWindow:onReset()
         DisplaySettings.ResetNameplateTextScale(true)
         DisplaySettings.ResetNameplateBarScale(true)
         DisplaySettings.ResetRelationshipFeedbackScale(true)
+        local audio = getAudio()
+        if audio and audio.Set then
+            local defaults = audio.defaults or {}
+            audio.Set("playerSpeechTTS", defaults.playerSpeechTTS == true, true)
+        end
         applyOpacityToWindows(hub, Options.GetOpacity())
         Options.ApplyRegisteredToolbarScale()
     end
@@ -470,6 +504,10 @@ function ISPNCCommandHubSettingsWindow:onApply()
         math.floor(self.fields.relationshipFeedbackScale.slider:getValue()
             + 0.5) / 100,
         true)
+    local audio = getAudio()
+    if self.audioCheckbox and audio and audio.Set then
+        audio.Set("playerSpeechTTS", self.audioCheckbox:getChecked(), true)
+    end
     applyOpacityToWindows(hub, opacity / 100)
     Options.ApplyRegisteredToolbarScale()
     self:populate()
@@ -518,9 +556,9 @@ function SettingsUI.Open(owner)
             resizable = true,
             persistenceKey = "PNC.CommandHub.Settings",
             responsiveSpec = {
-                width = 420, height = 530,
-                minWidth = 340, minHeight = 510,
-                maxWidth = 700, maxHeight = 720,
+                width = 420, height = 590,
+                minWidth = 340, minHeight = 590,
+                maxWidth = 700, maxHeight = 760,
             },
         })
         window:initialise()

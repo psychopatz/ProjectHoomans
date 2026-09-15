@@ -20,7 +20,7 @@ local function makeList(window, role, columns, callback)
 end
 
 local function button(window, UIBuilder, id, key, variant)
-    return UIBuilder.CreateButton(window, { id = id, title = getText(key),
+    return UIBuilder.CreateButton(window, { id = id, title = PNC.Translation.GetKey(key),
         target = window, onclick = window.onWorkshopControl,
         variant = variant })
 end

@@ -8,7 +8,7 @@ local UI, Theme, Layout = PsychopatzCore.UI, PsychopatzCore.UI.Theme, Psychopatz
 local ClientState = PNC.Network.ClientState
 local Definitions = PNC.NeedsDefinitions
 
-local function text(value) return getText and getText(value) or value end
+local function text(value) return getText and PNC.Translation.GetKey(value) or value end
 local function selected(list) local entry = list and list:getItem(); return entry and entry.item or nil end
 local function calorieBalance(nutrition)
     nutrition = nutrition or {}

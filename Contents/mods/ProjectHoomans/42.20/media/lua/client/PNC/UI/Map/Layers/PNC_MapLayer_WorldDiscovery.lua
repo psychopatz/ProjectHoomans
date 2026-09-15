@@ -1,6 +1,7 @@
 -- Player-authorized settlement and mobile-group markers.
 
 require "ISUI/Maps/ISWorldMap"
+require "PNC/WorldDiscovery/PNC_WorldDiscoveryPresentation"
 
 PNC = PNC or {}
 PNC.WorldDiscoveryMapLayer = PNC.WorldDiscoveryMapLayer or {}
@@ -8,6 +9,7 @@ PNC.WorldDiscoveryMapLayer = PNC.WorldDiscoveryMapLayer or {}
 local Layer = PNC.WorldDiscoveryMapLayer
 local State = PNC.Network.ClientState
 local Types = PNC.WorldDiscoveryTypes
+local Presentation = PNC.WorldDiscoveryPresentation
 
 Layer.RefreshMs = 10000
 Layer.LastRefreshAt = Layer.LastRefreshAt or 0
@@ -100,7 +102,7 @@ local function colorFor(entity)
 end
 
 local function labelFor(entity)
-    local label = tostring(entity.name or getText("UI_PNC_UnknownSignal"))
+    local label = Presentation.SignalName(entity)
     if entity.factionKnown == true and entity.factionName
         and (tonumber(entity.phase) or 0) < Types.PHASE_CONTACTED
     then
@@ -131,18 +133,17 @@ end
 local function drawHover(map, entity, x, y, color)
     local lines = {
         labelFor(entity),
-        tostring(entity.phaseName or "DISCOVERED"),
-        entity.kind == Types.KIND_SETTLEMENT
-            and "Settlement signal" or "Mobile group signal",
+        Presentation.Phase(entity.phaseName),
+        Presentation.SignalKind(entity),
     }
     if entity.factionKnown == true and entity.factionName then
-        lines[#lines + 1] = "Faction: " .. tostring(entity.factionName)
+        lines[#lines + 1] = Presentation.Faction(entity)
     end
     if entity.population then
-        lines[#lines + 1] = "Population: " .. tostring(entity.population)
+        lines[#lines + 1] = Presentation.Population(entity.population)
     end
     if entity.approximate == true then
-        lines[#lines + 1] = "Position is approximate; scan again to locate."
+        lines[#lines + 1] = Presentation.ApproximatePosition()
     end
     local width = 290
     local height = 14 + #lines * 17

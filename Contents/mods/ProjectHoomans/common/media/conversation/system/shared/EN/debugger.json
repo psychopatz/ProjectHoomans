@@ -1,7 +1,5 @@
 {
   "title": "CONVERSATION BLOCK DEBUGGER",
-  "hub.title": "PNC Conversation Blocks",
-  "hub.description": "Browse registered conversation graphs, gates, translations, deterministic rolls, and sandbox effects.",
   "button.refresh": "Refresh",
   "button.audience": "Audience: {audience}",
   "button.hour": "Hour: {hour}",

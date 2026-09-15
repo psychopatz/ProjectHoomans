@@ -11,7 +11,7 @@ local Theme = UI.Theme
 
 function Presentation.Translate(key, fallback)
     if not key or key == "" then return fallback end
-    local value = getText and getText(key) or nil
+    local value = getText and PNC.Translation.GetKey(key) or nil
     return value and value ~= "" and value ~= key and value or fallback
 end
 

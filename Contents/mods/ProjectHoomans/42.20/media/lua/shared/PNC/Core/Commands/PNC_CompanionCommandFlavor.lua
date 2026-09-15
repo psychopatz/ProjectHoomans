@@ -85,8 +85,8 @@ end
 local function translate(line)
     local value
     if not line then return nil end
-    if line.key and getText then
-        value = getText(line.key)
+    if line.key then
+        value = PNC.Translation.GetKey(line.key)
         if value and value ~= "" and value ~= line.key then
             return value
         end

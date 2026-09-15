@@ -7,7 +7,7 @@ PNC.FactionMemberModal = PNC.FactionMemberModal or {}
 local MemberModal = PNC.FactionMemberModal
 
 local function tr(key, fallback)
-    local value = getText and getText(key) or nil
+    local value = getText and PNC.Translation.GetKey(key) or nil
     return value and value ~= "" and value ~= key
         and value or fallback
 end

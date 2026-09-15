@@ -54,7 +54,7 @@ local ACTION_COLOR = { r = 0.35, g = 0.88, b = 1.0, a = 1.0 }
 local RECOVERY_COLOR = { r = 1.0, g = 0.78, b = 0.42, a = 1.0 }
 
 local function tr(key, fallback)
-    local value = getText and getText(key) or nil
+    local value = getText and PNC.Translation.GetKey(key) or nil
     return value and value ~= "" and value ~= key and value or fallback
 end
 

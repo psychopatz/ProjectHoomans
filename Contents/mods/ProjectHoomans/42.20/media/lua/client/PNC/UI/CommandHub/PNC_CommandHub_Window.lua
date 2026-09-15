@@ -21,7 +21,7 @@ local function trace(event, message)
 end
 
 local function titleText()
-    local value = getText and getText("UI_PNC_CommandHub_Title") or nil
+    local value = getText and PNC.Translation.GetKey("UI_PNC_CommandHub_Title") or nil
     return value and value ~= "" and value ~= "UI_PNC_CommandHub_Title"
         and value or "COMMAND HUB"
 end

@@ -76,14 +76,14 @@ function Tabs.RenderSkills(view, snapshot, payload, topY)
             view:drawText(label, labelX, y, unlocked and 0.9 or 0.5, unlocked and 0.9 or 0.5, unlocked and 0.9 or 0.5, 1, UIFont.Small)
             local unit = drawSkillUnits(view, level, barX, y + math.floor((fontHeight - 10) / 2), barWidth)
             if not unlocked then
-                view:drawText("LOCKED", barX, y, 0.7, 0.55, 0.18, 1, UIFont.Small)
+                view:drawText(Shared.Text("UI_PNC_Character_Skills_Locked", "LOCKED"), barX, y, 0.7, 0.55, 0.18, 1, UIFont.Small)
             end
             y = y + math.max(fontHeight + 5, unit + 5)
         end
         y = y + 9
     end
     if #groups == 0 then
-        view:drawTextCentre("No skill data available", view.width / 2, y + 30, 0.7, 0.7, 0.7, 1, UIFont.Small)
+        view:drawTextCentre(Shared.Text("UI_PNC_Character_Skills_NoData", "No skill data available"), view.width / 2, y + 30, 0.7, 0.7, 0.7, 1, UIFont.Small)
         y = y + 60
     end
     return y

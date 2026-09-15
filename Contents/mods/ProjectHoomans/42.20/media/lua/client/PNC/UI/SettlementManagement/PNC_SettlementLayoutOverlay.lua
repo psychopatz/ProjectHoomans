@@ -148,7 +148,7 @@ end
 
 local function localizedName(key, fallback)
     local value = type(key) == "string" and key ~= ""
-        and getText and getText(key) or nil
+        and getText and PNC.Translation.GetKey(key) or nil
     if value and value ~= key and value ~= "" then return value end
     return fallback
 end

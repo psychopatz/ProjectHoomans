@@ -108,14 +108,11 @@ Shared.NEED_METER_THRESHOLDS = {
 }
 
 function Shared.Tr(key, fallback)
-    local value = getText and getText(key) or nil
-    return value and value ~= "" and value ~= key and value or fallback
+    return PNC.Translation.GetKey(key, fallback)
 end
 
 function Shared.TrFormat(key, fallback, ...)
-    local value = getText and getText(key, ...) or nil
-    if value and value ~= "" and value ~= key then return value end
-    return string.format(fallback, ...)
+    return PNC.Translation.TrFormat(key, fallback, ...)
 end
 
 function Shared.Text(value, fallback)

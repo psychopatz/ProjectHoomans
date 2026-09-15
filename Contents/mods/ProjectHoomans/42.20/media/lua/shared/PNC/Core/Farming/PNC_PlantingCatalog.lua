@@ -5,8 +5,7 @@ local Catalog = PNC.FarmingCatalog
 local cache
 
 local function safeText(key, fallback)
-    if type(getText) ~= "function" then return fallback end
-    local value = getText(key)
+    local value = PNC.Translation.GetKey(key, fallback)
     if value and value ~= key then return tostring(value) end
     return fallback
 end

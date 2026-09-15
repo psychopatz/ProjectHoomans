@@ -65,7 +65,7 @@ local function nameplateDebugEnabled(settings)
 end
 
 local function translatedText(key, fallback)
-    local value = getText and getText(key) or nil
+    local value = getText and PNC.Translation.GetKey(key) or nil
     if value and tostring(value) ~= tostring(key) then
         return tostring(value)
     end

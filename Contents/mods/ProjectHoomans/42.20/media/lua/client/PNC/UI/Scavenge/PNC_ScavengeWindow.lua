@@ -19,10 +19,7 @@ local Model = PNC.InventoryUIModel
 local ScavengeModel = PNC.ScavengeUIModel
 
 local function tr(key, fallback, ...)
-    local value = getText and getText(key, ...) or nil
-    if value and value ~= "" and value ~= key then return value end
-    if select("#", ...) > 0 then return string.format(fallback, ...) end
-    return fallback
+    return PNC.Translation.TrFormat(key, fallback, ...)
 end
 
 local function readable(value)

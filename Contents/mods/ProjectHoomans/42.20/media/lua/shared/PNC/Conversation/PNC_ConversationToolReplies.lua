@@ -14,7 +14,7 @@ require "PNC/Conversation/PNC_ConversationToolReplyCatalog"
 local Replies = PNC.Conversation.ToolReplies
 local CATALOG = PNC.Conversation.ToolReplyCatalog or {}
 
-Replies.VERSION = 1
+Replies.VERSION = 2
 
 local lastVariant = Replies.lastVariant or {}
 Replies.lastVariant = lastVariant
@@ -45,12 +45,29 @@ local function choose(key, values, salt)
         index = index % count + 1
     end
     lastVariant[key] = index
-    return values[index]
+    return values[index], index
 end
 
 local function formatName(line, name)
     local ok, formatted = pcall(string.format, line, name)
     return ok and formatted or line
+end
+
+local function localized(key, fallback, ...)
+    local translation = PNC.Translation
+    if translation and type(translation.TrFormat) == "function" then
+        return translation.TrFormat(key, fallback, ...)
+    end
+    local first = ...
+    return first ~= nil and formatName(fallback, first) or fallback
+end
+
+local function localizedCatalogLine(line)
+    if not line then return nil end
+    return localized(
+        "UI_PNC_Conversation_ToolReply_Line_" .. tostring(hash(line)),
+        line
+    )
 end
 
 local function contextName(context)
@@ -113,24 +130,29 @@ local function socialReply(result, context)
         pool,
         resultSalt(result, context)
     )
-    return line
+    return localizedCatalogLine(line)
 end
 
 local function nameReply(result, context)
     local line
+    local index
     if not result or result.accepted ~= true then
-        line = choose("ask_name:rejected", CATALOG.ask_name.rejected,
+        line, index = choose("ask_name:rejected", CATALOG.ask_name.rejected,
             resultSalt(result, context))
-        return line
+        return localized("UI_PNC_Conversation_ToolReply_AskNameRejected_"
+            .. tostring(index or 1), line)
     end
     local name = contextName(context)
     if name then
-        line = choose("ask_name:named", CATALOG.ask_name.named,
+        line, index = choose("ask_name:named", CATALOG.ask_name.named,
             resultSalt(result, context))
-        return formatName(line, name)
+        return localized("UI_PNC_Conversation_ToolReply_AskNameNamed_"
+            .. tostring(index or 1), line, name)
     end
-    return choose("ask_name:unnamed", CATALOG.ask_name.unnamed,
+    line, index = choose("ask_name:unnamed", CATALOG.ask_name.unnamed,
         resultSalt(result, context))
+    return localized("UI_PNC_Conversation_ToolReply_AskNameUnnamed_"
+        .. tostring(index or 1), line)
 end
 
 local function orderReply(result, context)
@@ -144,11 +166,12 @@ local function orderReply(result, context)
     else
         pool = CATALOG.orders.rejected
     end
-    return choose(
+    line = choose(
         "order:" .. command .. ":" .. group,
         pool,
         resultSalt(result, context)
     )
+    return localizedCatalogLine(line)
 end
 
 local function priority(results, name)

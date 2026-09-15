@@ -170,7 +170,8 @@ T.equal(#StartingTraits.DEFINITIONS, 6, "six starting companion traits")
 T.equal(#StartingTraits.EXCLUSIONS, 0,
     "starting companion traits are not mutually exclusive")
 local englishCatalog = T.read(
-    "ProjectHoomans", "common_lua", "Translate/EN/UI.json"
+    "ProjectHoomans", "common_mod",
+    "media/translation/EN/Character/Character.json"
 )
 for _, spec in ipairs(StartingTraits.DEFINITIONS) do
     local trait = PsychopatzCore.Traits.EngineTraits[spec.id]

@@ -27,7 +27,7 @@ local originalInit = ISEmoteRadialMenu.init
 local originalEmote = ISEmoteRadialMenu.emote
 
 local function tr(key, fallback)
-    local value = getText and getText(key) or nil
+    local value = getText and PNC.Translation.GetKey(key) or nil
     return value and value ~= "" and value ~= key and value or fallback
 end
 
@@ -176,7 +176,7 @@ function Emotes.OpenNestedGroup(radial, groupKey)
         )
     end
     radialMenu:addSlice(
-        getText and getText("IGUI_Emote_Back") or "Back",
+        getText and PNC.Translation.GetKey("IGUI_Emote_Back") or "Back",
         ISEmoteRadialMenu.icons.back,
         radial.fillMenu,
         radial,

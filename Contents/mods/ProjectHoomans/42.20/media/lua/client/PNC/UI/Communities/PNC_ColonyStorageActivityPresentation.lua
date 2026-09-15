@@ -4,9 +4,7 @@ local Inventory = require "PsychopatzCore/Inventory/PsychopatzInventory"
 local F = Journal.FIELD
 
 local function text(key, fallback, ...)
-    local translated = getText and getText(key, ...) or nil
-    if translated and translated ~= key then return translated end
-    return string.format(fallback, ...)
+    return PNC.Translation.TrFormat(key, fallback, ...)
 end
 
 local function itemName(typeID)
@@ -23,7 +21,7 @@ local function reasonName(reason)
     reason = tostring(reason or "")
     if reason == "" then return nil end
     local key = "UI_PNC_Storage_Reason_" .. reason
-    local translated = getText and getText(key) or nil
+    local translated = getText and PNC.Translation.GetKey(key) or nil
     if translated and translated ~= key then return translated end
     return reason
 end

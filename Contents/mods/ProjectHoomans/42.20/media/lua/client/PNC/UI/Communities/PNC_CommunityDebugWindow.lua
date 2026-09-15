@@ -12,7 +12,7 @@ local Theme = UI.Theme
 local Layout = UI.Layout
 
 local function text(key)
-    return getText and getText(key) or key
+    return getText and PNC.Translation.GetKey(key) or key
 end
 
 local CONTROLS = {

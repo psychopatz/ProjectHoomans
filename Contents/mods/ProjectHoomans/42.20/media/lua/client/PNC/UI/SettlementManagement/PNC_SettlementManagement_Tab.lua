@@ -23,7 +23,7 @@ local CONTEXT = {
 }
 
 local function tr(key, fallback)
-    local value = getText and getText(key) or nil
+    local value = getText and PNC.Translation.GetKey(key) or nil
     if not value or value == key then return fallback end
     return value
 end

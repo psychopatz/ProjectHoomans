@@ -7,23 +7,23 @@ local itemStatsCache = {}
 local bodyTextureCache = {}
 
 Shared.BodyParts = {
-    { id = "Hand_L", index = 0, label = "Left Hand", texture = "left-hand" },
-    { id = "Hand_R", index = 1, label = "Right Hand", texture = "right-hand" },
-    { id = "ForeArm_L", index = 2, label = "Left Forearm", texture = "lower-left-arm" },
-    { id = "ForeArm_R", index = 3, label = "Right Forearm", texture = "lower-right-arm" },
-    { id = "UpperArm_L", index = 4, label = "Left Upper Arm", texture = "upper-left-arm", maleNodeX = 10, femaleNodeX = 4 },
-    { id = "UpperArm_R", index = 5, label = "Right Upper Arm", texture = "upper-right-arm", maleNodeX = -10, femaleNodeX = -4 },
-    { id = "Torso_Upper", index = 6, label = "Upper Torso", texture = "chest" },
-    { id = "Torso_Lower", index = 7, label = "Lower Torso", texture = "abdomen" },
-    { id = "Head", index = 8, label = "Head", texture = "head" },
-    { id = "Neck", index = 9, label = "Neck", texture = "neck" },
-    { id = "Groin", index = 10, label = "Groin", texture = "groin" },
-    { id = "UpperLeg_L", index = 11, label = "Left Thigh", texture = "left-thigh", nodeX = -2, nodeY = 10 },
-    { id = "UpperLeg_R", index = 12, label = "Right Thigh", texture = "right-thigh", nodeX = 2, nodeY = 10 },
-    { id = "LowerLeg_L", index = 13, label = "Left Shin", texture = "left-calf" },
-    { id = "LowerLeg_R", index = 14, label = "Right Shin", texture = "right-calf" },
-    { id = "Foot_L", index = 15, label = "Left Foot", texture = "left-foot", nodeX = -2 },
-    { id = "Foot_R", index = 16, label = "Right Foot", texture = "right-foot", nodeX = 2 },
+    { id = "Hand_L", index = 0, label = "Left Hand", labelKey = "UI_PNC_Character_BodyPart_LeftHand", texture = "left-hand" },
+    { id = "Hand_R", index = 1, label = "Right Hand", labelKey = "UI_PNC_Character_BodyPart_RightHand", texture = "right-hand" },
+    { id = "ForeArm_L", index = 2, label = "Left Forearm", labelKey = "UI_PNC_Character_BodyPart_LeftForearm", texture = "lower-left-arm" },
+    { id = "ForeArm_R", index = 3, label = "Right Forearm", labelKey = "UI_PNC_Character_BodyPart_RightForearm", texture = "lower-right-arm" },
+    { id = "UpperArm_L", index = 4, label = "Left Upper Arm", labelKey = "UI_PNC_Character_BodyPart_LeftUpperArm", texture = "upper-left-arm", maleNodeX = 10, femaleNodeX = 4 },
+    { id = "UpperArm_R", index = 5, label = "Right Upper Arm", labelKey = "UI_PNC_Character_BodyPart_RightUpperArm", texture = "upper-right-arm", maleNodeX = -10, femaleNodeX = -4 },
+    { id = "Torso_Upper", index = 6, label = "Upper Torso", labelKey = "UI_PNC_Character_BodyPart_UpperTorso", texture = "chest" },
+    { id = "Torso_Lower", index = 7, label = "Lower Torso", labelKey = "UI_PNC_Character_BodyPart_LowerTorso", texture = "abdomen" },
+    { id = "Head", index = 8, label = "Head", labelKey = "UI_PNC_Character_BodyPart_Head", texture = "head" },
+    { id = "Neck", index = 9, label = "Neck", labelKey = "UI_PNC_Character_BodyPart_Neck", texture = "neck" },
+    { id = "Groin", index = 10, label = "Groin", labelKey = "UI_PNC_Character_BodyPart_Groin", texture = "groin" },
+    { id = "UpperLeg_L", index = 11, label = "Left Thigh", labelKey = "UI_PNC_Character_BodyPart_LeftThigh", texture = "left-thigh", nodeX = -2, nodeY = 10 },
+    { id = "UpperLeg_R", index = 12, label = "Right Thigh", labelKey = "UI_PNC_Character_BodyPart_RightThigh", texture = "right-thigh", nodeX = 2, nodeY = 10 },
+    { id = "LowerLeg_L", index = 13, label = "Left Shin", labelKey = "UI_PNC_Character_BodyPart_LeftShin", texture = "left-calf" },
+    { id = "LowerLeg_R", index = 14, label = "Right Shin", labelKey = "UI_PNC_Character_BodyPart_RightShin", texture = "right-calf" },
+    { id = "Foot_L", index = 15, label = "Left Foot", labelKey = "UI_PNC_Character_BodyPart_LeftFoot", texture = "left-foot", nodeX = -2 },
+    { id = "Foot_R", index = 16, label = "Right Foot", labelKey = "UI_PNC_Character_BodyPart_RightFoot", texture = "right-foot", nodeX = 2 },
 }
 
 local BODY_PART_BY_ID = {}
@@ -181,11 +181,11 @@ function Shared.Text(key, fallback)
     if type(key) ~= "string" or key == "" then
         return fallback or ""
     end
-    if getText then
-        local ok, value = pcall(getText, key)
-        if ok and value and value ~= "" and value ~= key then return value end
+    local value = PNC.Translation.GetKey(key, fallback or key)
+    if type(value) ~= "string" or value == "" or value == key then
+        return fallback or key
     end
-    return fallback or key
+    return value
 end
 
 local function humanizeTraitID(value)

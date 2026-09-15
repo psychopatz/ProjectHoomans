@@ -8,7 +8,7 @@ PNC.SinkCompanionContext = PNC.SinkCompanionContext or {}
 local Context = PNC.SinkCompanionContext
 
 local function tr(key, fallback)
-    local value = getText and getText(key) or nil
+    local value = getText and PNC.Translation.GetKey(key) or nil
     return value and value ~= "" and value ~= key and value or fallback
 end
 

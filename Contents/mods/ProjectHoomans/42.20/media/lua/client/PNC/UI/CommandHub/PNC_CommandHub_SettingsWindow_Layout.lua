@@ -74,6 +74,12 @@ function ISPNCCommandHubSettingsWindow:onResponsiveLayout()
             controlHeight = controlHeight,
         })
     y = y + rowHeight + px(8)
+    if self.audioSectionLabel and self.audioCheckbox then
+        Layout.SetBounds(self.audioSectionLabel, rect.x, y, rect.width, px(18))
+        y = y + px(23)
+        Layout.SetBounds(self.audioCheckbox, rect.x, y, rect.width, px(24))
+        y = y + px(32)
+    end
     Layout.SetBounds(self.themeButton, rect.x, y, rect.width, controlHeight)
     y = y + controlHeight + px(8)
     Layout.SetBounds(self.branchButton, rect.x, y,

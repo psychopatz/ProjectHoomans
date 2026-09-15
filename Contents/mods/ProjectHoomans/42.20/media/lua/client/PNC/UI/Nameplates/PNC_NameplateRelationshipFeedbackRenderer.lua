@@ -45,7 +45,7 @@ local function signed(value)
 end
 
 local function translated(key, fallback)
-    local value = getText and getText(key) or nil
+    local value = getText and PNC.Translation.GetKey(key) or nil
     if value and value ~= "" and value ~= key then
         return value
     end

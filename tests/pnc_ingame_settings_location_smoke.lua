@@ -60,7 +60,7 @@ T.load(FILE)
 
 T.equal(createdID, "ProjectHoomans",
     "native mod-options registration id")
-T.equal(createdName, "UI_PNC_Settings_Title",
+T.equal(createdName, "Project Hoomans",
     "native mod-options translated title")
 T.truthy(options:getOption("showNameplateDebug"),
     "nameplate debug overlay missing from native options")

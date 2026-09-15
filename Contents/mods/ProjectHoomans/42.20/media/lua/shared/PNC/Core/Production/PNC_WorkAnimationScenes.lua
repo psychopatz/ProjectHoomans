@@ -2,7 +2,7 @@ PNC = PNC or {}
 
 local Scenes = PNC.AnimationScenes
 if not Scenes or not Scenes.Register then return false end
-local function tr(key) return getText and getText(key) or key end
+local function tr(key) return PNC.Translation.GetKey(key) end
 local RESEARCH_LABEL = tr("UI_PNC_WorkScene_Research")
 local CRAFT_LABEL = tr("UI_PNC_WorkScene_Craft")
 local DISASSEMBLY_LABEL = tr("UI_PNC_WorkScene_Disassemble")

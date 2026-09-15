@@ -20,6 +20,110 @@ local roots = {
 }
 local defaultPackagePathsAdded = false
 
+-- Isolated smoke tests load individual Hoomans modules instead of the normal
+-- shared composition root. Preserve the old getText-shaped test behavior for
+-- those modules without changing the production runtime or monkey-patching
+-- the game translation API.
+local function installTranslationFallback()
+    local existing = getmetatable(_G)
+    if existing and existing.__pncTranslationFallback then return end
+
+    local previousNewIndex = existing and existing.__newindex
+    local previousIndex = existing and existing.__index
+    local fallbackPNC = {}
+    local metatable = {}
+    if existing then
+        for key, value in pairs(existing) do metatable[key] = value end
+    end
+    metatable.__pncTranslationFallback = true
+    metatable.__index = function(table, key)
+        if key == "PNC" and rawget(table, key) == nil then
+            return fallbackPNC
+        end
+        if type(previousIndex) == "function" then
+            return previousIndex(table, key)
+        end
+        if type(previousIndex) == "table" then return previousIndex[key] end
+        return nil
+    end
+    metatable.__newindex = function(table, key, value)
+        if key == "PNC" and type(value) == "table" then
+            if value ~= fallbackPNC then
+                for field in pairs(fallbackPNC) do
+                    if field ~= "Translation" then fallbackPNC[field] = nil end
+                end
+                if not value.Translation then
+                    value.Translation = fallbackPNC.Translation
+                end
+                for field, fieldValue in pairs(value) do
+                    fallbackPNC[field] = fieldValue
+                end
+            end
+            return
+        end
+        if type(previousNewIndex) == "function" then
+            return previousNewIndex(table, key, value)
+        end
+        if type(previousNewIndex) == "table" then
+            previousNewIndex[key] = value
+        else
+            rawset(table, key, value)
+        end
+    end
+    setmetatable(_G, metatable)
+    fallbackPNC.Translation = {
+        GetKey = function(translationKey, fallback)
+            if type(getText) == "function" then
+                local ok, translated = pcall(getText, translationKey)
+                if ok and type(translated) == "string"
+                    and translated ~= ""
+                    and translated ~= translationKey
+                then
+                    return translated
+                end
+            end
+            return fallback or translationKey or ""
+        end,
+    }
+    fallbackPNC.Translation.TrFormat = function(translationKey, fallback, ...)
+        local direct
+        if type(getText) == "function" then
+            local args = { ... }
+            local ok, translated = pcall(getText, translationKey,
+                args[1], args[2], args[3], args[4])
+            if ok and type(translated) == "string"
+                and translated ~= "" and translated ~= translationKey
+            then
+                direct = translated
+            end
+        end
+        local translated = fallbackPNC.Translation.GetKey(
+            translationKey, fallback)
+        if direct then translated = direct end
+        local args = { ... }
+        translated = string.gsub(translated, "%%(%d+)", function(index)
+            local replacement = args[tonumber(index)]
+            return replacement ~= nil and tostring(replacement)
+                or "%%" .. index
+        end)
+        local ok, formatted = pcall(string.format, translated,
+            args[1], args[2], args[3], args[4])
+        return ok and formatted or translated
+    end
+    local currentPNC = rawget(_G, "PNC")
+    if type(currentPNC) == "table" then
+        if currentPNC.Translation then
+            fallbackPNC.Translation = currentPNC.Translation
+        else
+            currentPNC.Translation = fallbackPNC.Translation
+        end
+        for field, fieldValue in pairs(currentPNC) do
+            fallbackPNC[field] = fieldValue
+        end
+        rawset(_G, "PNC", nil)
+    end
+end
+
 local function cleanRelative(path)
     path = tostring(path or "")
     assert(string.sub(path, 1, 1) ~= "/", "test path must be relative")
@@ -73,6 +177,7 @@ function Test.path(mod, layer, relative)
 end
 
 function Test.addPackagePaths(specifications)
+    installTranslationFallback()
     local usingDefaults = specifications == nil
     specifications = specifications or {
         { "ProjectHoomans", "shared" },

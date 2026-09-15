@@ -14,26 +14,38 @@ local function pack(id, priority, matches, messages, eventType)
     })
 end
 
-local function voiced(_, text)
-    return { text = text, speakerRole = "primary" }
+local function voiced(_, key, fallback)
+    return {
+        textKey = key,
+        textFallback = fallback,
+        textSource = "ProjectHoomans",
+        speakerRole = "primary",
+    }
 end
 
-local function reply(context, text)
+local function reply(context, key, fallback)
     if context.hasSecondSpeaker ~= true then return nil end
-    return { text = text, speakerRole = "secondary" }
+    return {
+        textKey = key,
+        textFallback = fallback,
+        textSource = "ProjectHoomans",
+        speakerRole = "secondary",
+    }
 end
 
 local function introduction(context)
     if not context.identityIntroduced then return nil end
-    return voiced(context, "My name is {npcFullName}. I speak for {factionName}.")
+    return voiced(context, "UI_PNC_Discovery_Radio_Introduction",
+        "My name is {npcFullName}. I speak for {factionName}.")
 end
 
 local function addressPlayer(context)
     if context.playerNameKnown == true then
-        return voiced(context,
+        return voiced(context, "UI_PNC_Discovery_Radio_AddressNamed",
             "{playerFirstName}, if that is you listening, please answer.")
     end
-    return voiced(context, "If that is you listening, please answer.")
+    return voiced(context, "UI_PNC_Discovery_Radio_AddressUnknown",
+        "If that is you listening, please answer.")
 end
 
 local function lines(...)
@@ -51,18 +63,24 @@ pack("refugee", 100, function(context)
 end, {
     function(context) return lines(
         "<wzzt>",
-        voiced(context, "Mayday, mayday. Is anyone still listening?"),
-        reply(context, "Tell them about the wounded. The fever is getting worse."),
-        voiced(context, "We're moving near {location}. We need medicine and food."),
+        voiced(context, "UI_PNC_Discovery_Radio_RefugeeMayday",
+            "Mayday, mayday. Is anyone still listening?"),
+        reply(context, "UI_PNC_Discovery_Radio_RefugeeWounded",
+            "Tell them about the wounded. The fever is getting worse."),
+        voiced(context, "UI_PNC_Discovery_Radio_RefugeeMovingNear",
+            "We're moving near {location}. We need medicine and food."),
         introduction(context),
         addressPlayer(context),
         "<fzzt>"
     ) end,
     function(context) return lines(
         "<bzzt>",
-        voiced(context, "This is a civilian group. Families, not soldiers."),
-        reply(context, "Battery is nearly gone. Keep the call short."),
-        voiced(context, "We are close to {location}. We need somewhere safe."),
+        voiced(context, "UI_PNC_Discovery_Radio_RefugeeCivilian",
+            "This is a civilian group. Families, not soldiers."),
+        reply(context, "UI_PNC_Discovery_Radio_RefugeeBattery",
+            "Battery is nearly gone. Keep the call short."),
+        voiced(context, "UI_PNC_Discovery_Radio_RefugeeClose",
+            "We are close to {location}. We need somewhere safe."),
         introduction(context),
         "<fzzt>"
     ) end,
@@ -74,15 +92,20 @@ pack("looter", 100, function(context)
 end, {
     function(context) return lines(
         "<bzzt>",
-        voiced(context, "Any survivors out there, we have food and a safe roof."),
-        reply(context, "Tell them to come alone. Crowds draw the dead."),
-        voiced(context, "Come to {location}. We will be waiting."),
+        voiced(context, "UI_PNC_Discovery_Radio_LooterSurvivors",
+            "Any survivors out there, we have food and a safe roof."),
+        reply(context, "UI_PNC_Discovery_Radio_LooterComeAlone",
+            "Tell them to come alone. Crowds draw the dead."),
+        voiced(context, "UI_PNC_Discovery_Radio_LooterComeTo",
+            "Come to {location}. We will be waiting."),
         introduction(context),
         "<wzzt>"
     ) end,
     function(context) return lines(
-        voiced(context, "Attention travelers. Free supplies near {location}."),
-        reply(context, "Yeah, free. Just signal twice when you're close."),
+        voiced(context, "UI_PNC_Discovery_Radio_LooterAttention",
+            "Attention travelers. Free supplies near {location}."),
+        reply(context, "UI_PNC_Discovery_Radio_LooterSignalTwice",
+            "Yeah, free. Just signal twice when you're close."),
         introduction(context),
         "<fzzt>"
     ) end,
@@ -94,15 +117,21 @@ pack("trader", 100, function(context)
 end, {
     function(context) return lines(
         "<bzzt>",
-        voiced(context, "Caravan calling on the open band."),
-        reply(context, "We still have batteries, tools, and two crates of cans."),
-        voiced(context, "We are passing {location}. Keep weapons lowered and we can trade."),
+        voiced(context, "UI_PNC_Discovery_Radio_TraderCaravan",
+            "Caravan calling on the open band."),
+        reply(context, "UI_PNC_Discovery_Radio_TraderSupplies",
+            "We still have batteries, tools, and two crates of cans."),
+        voiced(context, "UI_PNC_Discovery_Radio_TraderPassing",
+            "We are passing {location}. Keep weapons lowered and we can trade."),
         introduction(context)
     ) end,
     function(context) return lines(
-        voiced(context, "Traveling merchants near {location}."),
-        reply(context, "Ask for medicine, fuel, and clean water."),
-        voiced(context, "No trouble wanted. Fair trades only."),
+        voiced(context, "UI_PNC_Discovery_Radio_TraderMerchants",
+            "Traveling merchants near {location}."),
+        reply(context, "UI_PNC_Discovery_Radio_TraderAskSupplies",
+            "Ask for medicine, fuel, and clean water."),
+        voiced(context, "UI_PNC_Discovery_Radio_TraderNoTrouble",
+            "No trouble wanted. Fair trades only."),
         introduction(context),
         "<fzzt>"
     ) end,
@@ -113,16 +142,23 @@ pack("settlement", 50, function(context)
 end, {
     function(context) return lines(
         "<wzzt>",
-        voiced(context, "This is an enclave broadcasting on an open band."),
-        reply(context, "North watch is clear. Keep the gate shut anyway."),
-        voiced(context, "Our perimeter is near {location}. Approach slowly, weapons down."),
+        voiced(context, "UI_PNC_Discovery_Radio_SettlementEnclave",
+            "This is an enclave broadcasting on an open band."),
+        reply(context, "UI_PNC_Discovery_Radio_SettlementNorthWatch",
+            "North watch is clear. Keep the gate shut anyway."),
+        voiced(context, "UI_PNC_Discovery_Radio_SettlementPerimeter",
+            "Our perimeter is near {location}. Approach slowly, weapons down."),
         introduction(context),
-        voiced(context, "Identify yourself before coming close.")
+        voiced(context, "UI_PNC_Discovery_Radio_SettlementIdentify",
+            "Identify yourself before coming close.")
     ) end,
     function(context) return lines(
-        voiced(context, "Mayday relay to anyone passing through {location}."),
-        reply(context, "The generator is holding. We can keep transmitting."),
-        voiced(context, "People are alive here. Announce yourself on approach."),
+        voiced(context, "UI_PNC_Discovery_Radio_SettlementMaydayRelay",
+            "Mayday relay to anyone passing through {location}."),
+        reply(context, "UI_PNC_Discovery_Radio_SettlementGenerator",
+            "The generator is holding. We can keep transmitting."),
+        voiced(context, "UI_PNC_Discovery_Radio_SettlementPeopleAlive",
+            "People are alive here. Announce yourself on approach."),
         introduction(context),
         "<bzzt>"
     ) end,
@@ -133,9 +169,12 @@ pack("mobile", 0, function(context)
 end, {
     function(context) return lines(
         "<fzzt>",
-        voiced(context, "Unknown group calling from around {location}."),
-        reply(context, "We need to move before dark."),
-        voiced(context, "We will not stay long. Respond if you hear this."),
+        voiced(context, "UI_PNC_Discovery_Radio_MobileUnknownGroup",
+            "Unknown group calling from around {location}."),
+        reply(context, "UI_PNC_Discovery_Radio_MobileMove",
+            "We need to move before dark."),
+        voiced(context, "UI_PNC_Discovery_Radio_MobileNotStay",
+            "We will not stay long. Respond if you hear this."),
         introduction(context)
     ) end,
 })
@@ -146,25 +185,33 @@ pack("ambient_open_band", 20, function(context)
 end, {
     function(context) return lines(
         "<fzzt>",
-        voiced(context, "...copy that... no, start again."),
-        voiced(context, "If anyone is awake, keep the channel clear."),
+        voiced(context, "UI_PNC_Discovery_Radio_AmbientCopy",
+            "...copy that... no, start again."),
+        voiced(context, "UI_PNC_Discovery_Radio_AmbientClearChannel",
+            "If anyone is awake, keep the channel clear."),
         "<wzzt>"
     ) end,
     function(context) return lines(
         "<bzzt>",
-        voiced(context, "Static on the line. Thought I heard somebody."),
-        voiced(context, "Never mind. Just the wind and a bad connection."),
+        voiced(context, "UI_PNC_Discovery_Radio_AmbientStatic",
+            "Static on the line. Thought I heard somebody."),
+        voiced(context, "UI_PNC_Discovery_Radio_AmbientWind",
+            "Never mind. Just the wind and a bad connection."),
         "<fzzt>"
     ) end,
     function(context) return lines(
-        voiced(context, "Check, check... still transmitting."),
-        voiced(context, "No response. Leave it open for another minute."),
+        voiced(context, "UI_PNC_Discovery_Radio_AmbientCheck",
+            "Check, check... still transmitting."),
+        voiced(context, "UI_PNC_Discovery_Radio_AmbientNoResponse",
+            "No response. Leave it open for another minute."),
         "<wzzt>"
     ) end,
     function(context) return lines(
         "<wzzt>",
-        voiced(context, "The last one was garbled. Send it slow."),
-        voiced(context, "I said slow. Forget it, just listen for the tone."),
+        voiced(context, "UI_PNC_Discovery_Radio_AmbientGarbled",
+            "The last one was garbled. Send it slow."),
+        voiced(context, "UI_PNC_Discovery_Radio_AmbientSendSlow",
+            "I said slow. Forget it, just listen for the tone."),
         "<bzzt>"
     ) end,
 }, "ambient")
@@ -175,28 +222,40 @@ pack("ambient_cross_talk", 20, function(context)
 end, {
     function(context) return lines(
         "<fzzt>",
-        voiced(context, "Did you mark the channel?"),
-        reply(context, "Which channel? No, say that again."),
-        voiced(context, "Never mind. I can barely hear you."),
+        voiced(context, "UI_PNC_Discovery_Radio_AmbientMarkChannel",
+            "Did you mark the channel?"),
+        reply(context, "UI_PNC_Discovery_Radio_AmbientWhichChannel",
+            "Which channel? No, say that again."),
+        voiced(context, "UI_PNC_Discovery_Radio_AmbientBarelyHear",
+            "Never mind. I can barely hear you."),
         "<wzzt>"
     ) end,
     function(context) return lines(
-        voiced(context, "Tell the west side to hold."),
-        reply(context, "The west side of what?"),
-        voiced(context, "Exactly. That is why I said hold."),
+        voiced(context, "UI_PNC_Discovery_Radio_AmbientWestHold",
+            "Tell the west side to hold."),
+        reply(context, "UI_PNC_Discovery_Radio_AmbientWestWhat",
+            "The west side of what?"),
+        voiced(context, "UI_PNC_Discovery_Radio_AmbientExactly",
+            "Exactly. That is why I said hold."),
         "<bzzt>"
     ) end,
     function(context) return lines(
         "<wzzt>",
-        voiced(context, "You are breaking up around the—"),
-        reply(context, "Around the what?"),
-        voiced(context, "The thing. The big thing. Just stay put."),
+        voiced(context, "UI_PNC_Discovery_Radio_AmbientBreaking",
+            "You are breaking up around the—"),
+        reply(context, "UI_PNC_Discovery_Radio_AmbientAroundWhat",
+            "Around the what?"),
+        voiced(context, "UI_PNC_Discovery_Radio_AmbientThing",
+            "The thing. The big thing. Just stay put."),
         "<fzzt>"
     ) end,
     function(context) return lines(
-        voiced(context, "Read that back to me."),
-        reply(context, "I did. You were not listening."),
-        voiced(context, "I am listening. The radio is not."),
+        voiced(context, "UI_PNC_Discovery_Radio_AmbientReadBack",
+            "Read that back to me."),
+        reply(context, "UI_PNC_Discovery_Radio_AmbientNotListening",
+            "I did. You were not listening."),
+        voiced(context, "UI_PNC_Discovery_Radio_AmbientRadioNot",
+            "I am listening. The radio is not."),
         "<bzzt>"
     ) end,
 }, "ambient")

@@ -5,6 +5,10 @@ PNC.Settings = PNC.Settings or {}
 local Settings = PNC.Settings
 local ModOptions = PZAPI and PZAPI.ModOptions or nil
 
+local function tr(key, fallback)
+    return PNC.Translation.GetKey(key, fallback or key)
+end
+
 local function setNameplateDebug(value)
     value = value == true
     PNC.Nameplates.Settings.showNameplateDebug = value
@@ -164,23 +168,24 @@ if ModOptions and not Settings.nativeRegistered then
     local options = ModOptions:getOptions("ProjectHoomans")
         or ModOptions:create(
             "ProjectHoomans",
-            "UI_PNC_Settings_Title"
+            tr("UI_PNC_Settings_Title", "Project Hoomans")
         )
-    options:addTitle("UI_PNC_Settings_OverlaySection")
+    options:addTitle(tr("UI_PNC_Settings_OverlaySection", "NPC overlays"))
     local index
     for index = 1, #definitions do
         if index == 10 then
             options:addSeparator()
-            options:addTitle("UI_PNC_Settings_OverlayPartsSection")
+            options:addTitle(tr("UI_PNC_Settings_OverlayPartsSection",
+                "Overlay details"))
         end
         if index == 21 then
             options:addSeparator()
-            options:addTitle("UI_PNC_Settings_LoggingSection")
+            options:addTitle(tr("UI_PNC_Settings_LoggingSection", "Logging"))
         end
         local definition = definitions[index]
         local option = options:addTickBox(
             definition.id,
-            definition.label,
+            tr(definition.label, definition.label),
             definition.get()
         )
         option.onChangeApply = optionApplyHandler(definition)

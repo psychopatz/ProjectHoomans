@@ -7,7 +7,7 @@ local Scenes = PNC.AnimationScenes
 if not Scenes or not Scenes.Register then return false end
 
 local function tr(key)
-    return getText and getText(key) or key
+    return PNC.Translation.GetKey(key)
 end
 
 Scenes.Register("fishing.cast", {

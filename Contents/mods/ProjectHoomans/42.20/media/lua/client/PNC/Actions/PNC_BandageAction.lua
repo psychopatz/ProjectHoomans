@@ -127,7 +127,7 @@ function PNCBandageAction:start()
     self.character:reportEvent("EventLootItem")
     self:setOverrideHandModels(nil, nil)
     if self.item then
-        self.item:setJobType(getText("ContextMenu_Apply_Bandage"))
+        self.item:setJobType(PNC.Translation.GetKey("ContextMenu_Apply_Bandage"))
         self.item:setJobDelta(0)
     end
     if self.character.playSound then

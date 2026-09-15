@@ -272,14 +272,17 @@ function Tabs.RenderInfo(view, snapshot, payload, topY)
     view:drawRect(x, y, width, 1, 0.8, 0.5, 0.5, 0.5)
     y = y + 14
 
-    y = Shared.DrawLabelValue(view, "Faction", knownFaction and knownFaction.name or "Unknown", x, y, labelWidth)
+    y = Shared.DrawLabelValue(view,
+        Shared.Text("UI_PNC_Character_Info_Faction", "Faction"),
+        knownFaction and knownFaction.name or Shared.Text("UI_PNC_Character_Info_Unknown", "Unknown"),
+        x, y, labelWidth)
     local traitLabel = Shared.Text("UI_PNC_Character_Traits", "Traits")
     local traitTextY = y
     local traitFontHeight = getTextManager():getFontHeight(UIFont.Small)
     view:drawTextRight(traitLabel, x + labelWidth, traitTextY,
         1, 1, 1, 1, UIFont.Small)
     if not traitsKnown then
-        view:drawText("Unknown", x + labelWidth + 10, traitTextY,
+        view:drawText(Shared.Text("UI_PNC_Character_Info_Unknown", "Unknown"), x + labelWidth + 10, traitTextY,
             1, 1, 1, 0.62, UIFont.Small)
     elseif #traitList == 0 then
         view:drawText(
@@ -300,24 +303,27 @@ function Tabs.RenderInfo(view, snapshot, payload, topY)
     )
     local activity = Shared.GetMedicalActivity
         and Shared.GetMedicalActivity(snapshot, payload) or nil
-    y = Shared.DrawLabelValue(view, "Status",
+    y = Shared.DrawLabelValue(view, Shared.Text("UI_PNC_Character_Info_Status", "Status"),
         activity and activity.label or resolved.aiState or resolved.activeBehavior or "Idle",
         x, y, labelWidth)
-    y = Shared.DrawLabelValue(view, "Health", hp, x, y, labelWidth)
-    y = Shared.DrawLabelValue(view, "Stamina", stamina, x, y, labelWidth)
-    y = Shared.DrawLabelValue(view, "Carry Weight", carryText, x, y, labelWidth)
-    y = Shared.DrawLabelValue(view, "Hair", appearance.hairModel or survivor.hairModel or "None", x, y, labelWidth)
+    y = Shared.DrawLabelValue(view, Shared.Text("UI_PNC_Character_Info_Health", "Health"), hp, x, y, labelWidth)
+    y = Shared.DrawLabelValue(view, Shared.Text("UI_PNC_Character_Info_Stamina", "Stamina"), stamina, x, y, labelWidth)
+    y = Shared.DrawLabelValue(view, Shared.Text("UI_PNC_Character_Info_CarryWeight", "Carry Weight"), carryText, x, y, labelWidth)
+    y = Shared.DrawLabelValue(view, Shared.Text("UI_PNC_Character_Info_Hair", "Hair"), appearance.hairModel or survivor.hairModel or Shared.Text("UI_PNC_Character_Info_None", "None"), x, y, labelWidth)
     if resolved.isFemale ~= true then
-        y = Shared.DrawLabelValue(view, "Beard", appearance.beardModel or survivor.beardModel or "None", x, y, labelWidth)
+        y = Shared.DrawLabelValue(view, Shared.Text("UI_PNC_Character_Info_Beard", "Beard"), appearance.beardModel or survivor.beardModel or Shared.Text("UI_PNC_Character_Info_None", "None"), x, y, labelWidth)
     end
-    y = Shared.DrawLabelValue(view, "Weapon", equipment.primaryFullType or "Bare hands", x, y, labelWidth)
-    y = Shared.DrawLabelValue(view, "Combat", resolved.combatModeResolved or resolved.weaponMode or "melee", x, y, labelWidth)
-    y = Shared.DrawLabelValue(view, "Recruited", resolved.recruited == true and "Yes" or "No", x, y, labelWidth)
-    y = Shared.DrawLabelValue(view, "Owner", data.ownerUsername or "-", x, y, labelWidth)
+    y = Shared.DrawLabelValue(view, Shared.Text("UI_PNC_Character_Info_Weapon", "Weapon"), equipment.primaryFullType or Shared.Text("UI_PNC_Character_Info_BareHands", "Bare hands"), x, y, labelWidth)
+    y = Shared.DrawLabelValue(view, Shared.Text("UI_PNC_Character_Info_Combat", "Combat"), resolved.combatModeResolved or resolved.weaponMode or "melee", x, y, labelWidth)
+    y = Shared.DrawLabelValue(view, Shared.Text("UI_PNC_Character_Info_Recruited", "Recruited"), resolved.recruited == true and Shared.Text("UI_PNC_Character_Info_Yes", "Yes") or Shared.Text("UI_PNC_Character_Info_No", "No"), x, y, labelWidth)
+    y = Shared.DrawLabelValue(view, Shared.Text("UI_PNC_Character_Info_Owner", "Owner"), data.ownerUsername or "-", x, y, labelWidth)
 
     local portraitBottom = view.portraitPanel and view.portraitPanel:getBottom() or y
     local footerY = math.max(y + 8, portraitBottom + 10)
-    view:drawTextCentre("Inventory Items  " .. tostring(carry.itemCount or 0), view.width / 2, footerY, 0.82, 0.82, 0.82, 1, UIFont.Small)
+    view:drawTextCentre(PNC.Translation.TrFormat(
+        "UI_PNC_Character_Info_InventoryItems", "Inventory Items  %1",
+        tostring(carry.itemCount or 0)
+    ), view.width / 2, footerY, 0.82, 0.82, 0.82, 1, UIFont.Small)
     return footerY + getTextManager():getFontHeight(UIFont.Small) + 10
 end
 

@@ -16,7 +16,7 @@ local TravelLayer = PNC.MapTravelLayer
 local EmblemRenderer = PNC.FactionEmblemRenderer
 
 local function text(key, fallback)
-    return getText and getText(key) or fallback or key
+    return getText and PNC.Translation.GetKey(key) or fallback or key
 end
 
 local function isVisible()

@@ -19,38 +19,38 @@ function Tabs.RenderProtection(view, snapshot, payload, topY)
 
     Shared.DrawBodyMap(view, resolved.isFemale == true, padding, padding, bodyWidth, bodyHeight, protection, Shared.ProtectionColor)
 
-    y = Shared.DrawSection(view, "Clothing Protection", contentX, y, contentWidth)
-    y = Shared.DrawBar(view, "Average Bite Defense", protection.biteAverage, 100, contentX, y, contentWidth, { r = 0.68, g = 0.3, b = 0.2 })
-    y = Shared.DrawBar(view, "Average Scratch Defense", protection.scratchAverage, 100, contentX, y, contentWidth, { r = 0.72, g = 0.58, b = 0.22 })
+    y = Shared.DrawSection(view, Shared.Text("UI_PNC_Character_Protection_Section", "Clothing Protection"), contentX, y, contentWidth)
+    y = Shared.DrawBar(view, Shared.Text("UI_PNC_Character_Protection_AverageBite", "Average Bite Defense"), protection.biteAverage, 100, contentX, y, contentWidth, { r = 0.68, g = 0.3, b = 0.2 })
+    y = Shared.DrawBar(view, Shared.Text("UI_PNC_Character_Protection_AverageScratch", "Average Scratch Defense"), protection.scratchAverage, 100, contentX, y, contentWidth, { r = 0.72, g = 0.58, b = 0.22 })
 
     local biteWidth = math.min(56, math.floor(contentWidth * 0.2))
     local scratchWidth = math.min(64, math.floor(contentWidth * 0.22))
     local partWidth = math.max(72, contentWidth - biteWidth - scratchWidth)
-    view:drawText("Part", contentX, y, 0.78, 0.78, 0.78, 1, UIFont.Small)
-    view:drawTextRight("Bite", contentX + partWidth + biteWidth, y, 0.78, 0.78, 0.78, 1, UIFont.Small)
-    view:drawTextRight("Scratch", contentX + contentWidth, y, 0.78, 0.78, 0.78, 1, UIFont.Small)
+    view:drawText(Shared.Text("UI_PNC_Character_Protection_Part", "Part"), contentX, y, 0.78, 0.78, 0.78, 1, UIFont.Small)
+    view:drawTextRight(Shared.Text("UI_PNC_Character_Protection_Bite", "Bite"), contentX + partWidth + biteWidth, y, 0.78, 0.78, 0.78, 1, UIFont.Small)
+    view:drawTextRight(Shared.Text("UI_PNC_Character_Protection_Scratch", "Scratch"), contentX + contentWidth, y, 0.78, 0.78, 0.78, 1, UIFont.Small)
     y = y + fontHeight + 3
     for _, definition in ipairs(Shared.BodyParts) do
         local entry = protection[definition.id]
         local br, bg, bb = Shared.ProtectionColor(entry.bite)
         local sr, sg, sb = Shared.ProtectionColor(entry.scratch)
-        view:drawText(definition.label, contentX, y, 0.9, 0.9, 0.9, 1, UIFont.Small)
+        view:drawText(Shared.Text(definition.labelKey, definition.label), contentX, y, 0.9, 0.9, 0.9, 1, UIFont.Small)
         view:drawTextRight(tostring(Shared.Round(entry.bite, 0)) .. "%", contentX + partWidth + biteWidth, y, br, bg, bb, 1, UIFont.Small)
         view:drawTextRight(tostring(Shared.Round(entry.scratch, 0)) .. "%", contentX + contentWidth, y, sr, sg, sb, 1, UIFont.Small)
         y = y + fontHeight + 2
     end
 
     y = y + 7
-    y = Shared.DrawSection(view, "Worn Items", contentX, y, contentWidth)
+    y = Shared.DrawSection(view, Shared.Text("UI_PNC_Character_Protection_WornItems", "Worn Items"), contentX, y, contentWidth)
     if #rows == 0 then
-        view:drawText("No protective clothing equipped.", contentX, y, 0.7, 0.7, 0.7, 1, UIFont.Small)
+        view:drawText(Shared.Text("UI_PNC_Character_Protection_NoClothing", "No protective clothing equipped."), contentX, y, 0.7, 0.7, 0.7, 1, UIFont.Small)
         y = y + fontHeight + 8
     else
         local valueWidth = math.min(66, math.floor(contentWidth * 0.22))
         local itemWidth = math.max(70, contentWidth - valueWidth * 2 - 12)
-        view:drawText("Item", contentX, y, 0.72, 0.72, 0.72, 1, UIFont.Small)
-        view:drawTextRight("Condition", contentX + itemWidth + valueWidth, y, 0.72, 0.72, 0.72, 1, UIFont.Small)
-        view:drawTextRight("Holes", contentX + contentWidth, y, 0.72, 0.72, 0.72, 1, UIFont.Small)
+        view:drawText(Shared.Text("UI_PNC_Character_Protection_Item", "Item"), contentX, y, 0.72, 0.72, 0.72, 1, UIFont.Small)
+        view:drawTextRight(Shared.Text("UI_PNC_Character_Protection_Condition", "Condition"), contentX + itemWidth + valueWidth, y, 0.72, 0.72, 0.72, 1, UIFont.Small)
+        view:drawTextRight(Shared.Text("UI_PNC_Character_Protection_Holes", "Holes"), contentX + contentWidth, y, 0.72, 0.72, 0.72, 1, UIFont.Small)
         y = y + fontHeight + 3
         view:drawRect(contentX, y, contentWidth, 1, 0.55, 0.4, 0.4, 0.4)
         y = y + 5

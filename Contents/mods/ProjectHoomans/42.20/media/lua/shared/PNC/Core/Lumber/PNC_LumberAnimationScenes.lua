@@ -4,7 +4,7 @@ PNC = PNC or {}
 
 local Scenes = PNC.AnimationScenes
 if not Scenes or not Scenes.Register then return false end
-local function tr(key) return getText and getText(key) or key end
+local function tr(key) return PNC.Translation.GetKey(key) end
 
 Scenes.Register("lumber.chop", {
     label = tr("UI_PNC_LumberScene_Chop"),

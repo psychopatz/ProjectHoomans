@@ -10,7 +10,7 @@ local Toolbar = PNC.MapToolbar
     or require "PNC/UI/Map/PNC_MapToolbar"
 
 local function text(key, fallback)
-    local value = getText and getText(key) or nil
+    local value = getText and PNC.Translation.GetKey(key) or nil
     if value and value ~= "" and value ~= key then return value end
     return fallback or key
 end
@@ -158,12 +158,12 @@ if Toolbar and Toolbar.Register then
         field = "pncTrackButton",
         width = 92,
         title = function()
-            local value = getText and getText("UI_PNC_MapTrack_Button")
+            local value = getText and PNC.Translation.GetKey("UI_PNC_MapTrack_Button")
             return value and value ~= ""
                 and value ~= "UI_PNC_MapTrack_Button" and value or "Track"
         end,
         tooltip = function()
-            local value = getText and getText("UI_PNC_MapTrack_ButtonHelp")
+            local value = getText and PNC.Translation.GetKey("UI_PNC_MapTrack_ButtonHelp")
             return value and value ~= ""
                 and value ~= "UI_PNC_MapTrack_ButtonHelp"
                 and value or "Open Hoomans tracking options."

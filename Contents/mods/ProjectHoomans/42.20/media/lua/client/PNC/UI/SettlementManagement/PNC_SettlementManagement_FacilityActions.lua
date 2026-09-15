@@ -277,13 +277,13 @@ end
 
 function Facility.AnchorLabel(role)
     local key = ANCHOR_LABELS[role]
-    return key and getText(key)
+    return key and PNC.Translation.GetKey(key)
         or string.upper(string.gsub(role or "", "[%.]", " "))
 end
 
 function Facility.AnchorAssignLabel(role)
     local key = ANCHOR_ASSIGN_TITLES[role]
-    return key and getText(key) or Facility.AnchorLabel(role)
+    return key and PNC.Translation.GetKey(key) or Facility.AnchorLabel(role)
 end
 
 function Facility.BeginPoint(window, _, facility, requestedRole, componentId)
@@ -296,12 +296,12 @@ function Facility.BeginPoint(window, _, facility, requestedRole, componentId)
     local selectTitleKey = ANCHOR_SELECT_TITLES[role]
     local boundary = Support.FacilityRegion(facility)
     Support.OpenSelector(window, {
-        title = selectTitleKey and getText(selectTitleKey)
+        title = selectTitleKey and PNC.Translation.GetKey(selectTitleKey)
             or Support.Tr("UI_PNC_Facility_SelectStation",
                 "SELECT FACILITY COMPONENT"),
         instruction = role == "sleep.bed" and Support.Tr("UI_PNC_Facility_SelectBedHelp",
             "Choose a sleeping spot. A bed is used automatically when present; otherwise the colonist sleeps on the floor.")
-            or getText("UI_PNC_Facility_SelectStationHelp"),
+            or PNC.Translation.GetKey("UI_PNC_Facility_SelectStationHelp"),
         selectionKind = "point",
         guideRegion = boundary,
         guideLayers = Support.UsedGuideLayers(window,

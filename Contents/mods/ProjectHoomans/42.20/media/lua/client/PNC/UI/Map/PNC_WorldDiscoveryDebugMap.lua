@@ -12,7 +12,7 @@ local DebugMap = PNC.WorldDiscoveryDebugMap
 DebugMap.ShowRawEntities = DebugMap.ShowRawEntities == true
 
 local function text(key, fallback)
-    local value = getText and getText(key) or nil
+    local value = getText and PNC.Translation.GetKey(key) or nil
     if value and value ~= "" and value ~= key then return value end
     return fallback or key
 end

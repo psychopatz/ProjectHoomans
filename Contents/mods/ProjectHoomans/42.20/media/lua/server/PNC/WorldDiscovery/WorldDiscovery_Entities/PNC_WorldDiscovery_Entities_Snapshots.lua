@@ -54,6 +54,16 @@ function Discovery.BuildSnapshot(player, result)
                 x = Internal.ApproximateCoordinate(x, entityID, "x")
                 y = Internal.ApproximateCoordinate(y, entityID, "y")
             end
+            local entityName = phase >= Types.PHASE_CONTACTED
+                and current and current.name or nil
+            local nameKey
+            if entityName == nil or tostring(entityName) == "" then
+                nameKey = kind == Types.KIND_SETTLEMENT
+                    and "UI_PNC_Discovery_UnknownSettlement"
+                    or "UI_PNC_UnknownSignal"
+                entityName = kind == Types.KIND_SETTLEMENT
+                    and "Unknown settlement" or "Unknown mobile signal"
+            end
             entities[#entities + 1] = {
                 entityID = entityID,
                 kind = kind,
@@ -67,10 +77,8 @@ function Discovery.BuildSnapshot(player, result)
                 contactedAt = tonumber(entry.contactedAt) or 0,
                 presenceStatus = Types.PresenceStatus(
                     entry.presenceStatus),
-                name = phase >= Types.PHASE_CONTACTED
-                    and current and current.name
-                    or kind == Types.KIND_SETTLEMENT
-                        and "Unknown settlement" or "Unknown mobile signal",
+                name = entityName,
+                nameKey = nameKey,
                 factionID = phase >= Types.PHASE_CONTACTED
                     and current and current.factionID or factionID,
                 factionKnown = factionKnown,

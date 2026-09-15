@@ -16,7 +16,7 @@ local Options = require "PsychopatzCore/UI/PsychopatzCommandHubOptions"
 local WidgetWindow = UI.WidgetWindow
 
 local function tr(key)
-    local value = getText and getText(key) or nil
+    local value = getText and PNC.Translation.GetKey(key) or nil
     return value and value ~= "" and value ~= key and value or key
 end
 

@@ -213,15 +213,23 @@ function Loader.EnsureSource(source, requiredKeys)
     local usedFallback = false
     local missingLocalizedKeys = {}
     if language ~= "EN" then
-        localized, localizedReason = Loader.Load(source, language)
-        if not localized then
-            localized = english
+        local candidate
+        candidate, localizedReason = Loader.Load(source, language)
+        localized = {}
+        for key, value in pairs(english) do localized[key] = value end
+        if candidate then
+            for key, value in pairs(candidate) do
+                if type(value) == "string" and value ~= "" then
+                    localized[key] = value
+                end
+            end
+        else
             usedFallback = true
         end
-    end
-    if language ~= "EN" and localized ~= english then
         for _, key in ipairs(requiredKeys or {}) do
-            if type(localized[key]) ~= "string" or localized[key] == "" then
+            if not candidate or type(candidate[key]) ~= "string"
+                or candidate[key] == ""
+            then
                 missingLocalizedKeys[#missingLocalizedKeys + 1] =
                     "missing " .. language .. " key " .. tostring(key)
             end

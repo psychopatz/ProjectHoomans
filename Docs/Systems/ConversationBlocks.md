@@ -12,7 +12,8 @@ Zomboid Build 42.20 implementation:
 
 `EN` is mandatory. Other languages fall back to the matching English bundle.
 Paths are explicit: the runtime does not recursively scan folders or generate a
-Project Zomboid `Translate/EN/UI.json` file.
+Project Hoomans modular conversation catalogs under
+`common/media/translation/EN/Conversation/Conversation.json`.
 
 ## Runtime composition and authority
 
@@ -76,7 +77,7 @@ commit only one `What's up?` conversation per world day.
 3. Require the Project Hoomans shared initialization, register the category if
    it is yours, and then register each block.
 4. Put English strings in an explicit modular JSON bundle. Never place these
-   strings in `Translate/EN/UI.json`.
+strings in the retired native UI translation monolith.
 5. Add other languages at the identical path with a different language folder.
 6. Open **PsychopatzCore DebugHub → PNC Conversation Blocks**, inspect the
    block, then run it in the sandbox GUI before testing against a live NPC.

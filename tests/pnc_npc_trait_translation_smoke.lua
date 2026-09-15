@@ -1,14 +1,53 @@
 local T = require "tests/support/test"
 
+T.addPackagePaths({
+    { "ProjectHoomans", "shared" },
+    { "ProjectHoomans", "client" },
+    { "PsychopatzCore", "common" },
+})
+
 PNC = {}
 local translationSource = T.read(
-    "ProjectHoomans", "shared", "Translate/EN/UI_EN.txt")
+    "ProjectHoomans", "common_mod",
+    "media/translation/EN/Character/Character.json")
+
+local function splitLines(text)
+    local lines = {}
+    for line in string.gmatch(text, "([^\n]*)\n?") do
+        lines[#lines + 1] = line
+        if string.sub(text, -1) ~= "\n" and lines[#lines] == ""
+            and #lines > 1
+        then
+            lines[#lines] = nil
+            break
+        end
+    end
+    return lines
+end
+
+getModFileReader = function(modID, path)
+    if modID ~= "ProjectHoomans" then return nil end
+    local ok, content = pcall(T.read, "ProjectHoomans", "common_mod", path)
+    if not ok then return nil end
+    local lines = splitLines(content)
+    local index = 0
+    return {
+        readLine = function()
+            index = index + 1
+            return lines[index]
+        end,
+        close = function() end,
+    }
+end
+
+T.load("ProjectHoomans", "shared",
+    "PNC/Translation/PNC_TranslationBootstrap.lua")
 
 local function translationValue(key)
     if type(key) ~= "string" or key == "" then return nil end
     return string.match(
         translationSource,
-        "%f[%w_]" .. key .. "%s*=%s*\"([^\"]+)\"")
+        "\"" .. key .. "\"%s*:%s*\"([^\"]+)\"")
 end
 
 getText = function(key)
@@ -50,12 +89,14 @@ end
 
 -- Simulate a language/runtime where an unresolved key is returned verbatim.
 -- The UI must remain readable and must never expose the canonical ID.
-getText = function(key) return key end
+local originalGetKey = PNC.Translation.GetKey
+PNC.Translation.GetKey = function(key) return key end
 local scrapper = Registry.GetDefinition("pnc_scrapper")
 T.equal(Shared.TraitLabel("pnc_scrapper", scrapper), "Scrapper",
     "unresolved label falls back to a readable trait name")
 T.equal(Shared.TraitDescription("pnc_scrapper", scrapper),
     "Description unavailable",
     "unresolved description avoids exposing the trait ID")
+PNC.Translation.GetKey = originalGetKey
 
 T.finish("pnc_npc_trait_translation_smoke")

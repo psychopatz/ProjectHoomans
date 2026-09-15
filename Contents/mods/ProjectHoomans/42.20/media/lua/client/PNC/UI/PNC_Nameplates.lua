@@ -201,8 +201,8 @@ end
 
 function Nameplates.GetOverlayLabel(id)
     local definition = overlayDefinitionByID[tostring(id or "")]
-    if definition and definition.labelKey and getText then
-        return getText(definition.labelKey)
+    if definition and definition.labelKey then
+        return PNC.Translation.GetKey(definition.labelKey)
     end
     return definition and definition.label or tostring(id or "Overlay")
 end
@@ -280,7 +280,7 @@ function Nameplates.ToggleCampDebug()
             or "UI_PNC_CampOverlayDisabled"
         HaloTextHelper.addText(
             player,
-            getText(messageKey)
+            PNC.Translation.GetKey(messageKey)
         )
     end
     return Settings.showCampDebug
@@ -301,7 +301,7 @@ function Nameplates.ToggleNameplateDebug()
         local messageKey = Settings.showNameplateDebug
             and "UI_PNC_NameplateDebugEnabled"
             or "UI_PNC_NameplateDebugDisabled"
-        HaloTextHelper.addText(player, getText(messageKey))
+        HaloTextHelper.addText(player, PNC.Translation.GetKey(messageKey))
     end
     return Settings.showNameplateDebug
 end
@@ -318,7 +318,7 @@ function Nameplates.TogglePathDebug()
     PNC.SettingsStore:Set("showPathDebug", Settings.showPathDebug, true)
     if player and HaloTextHelper and HaloTextHelper.addText then
         local messageKey = Settings.showPathDebug and "UI_PNC_PathOverlayEnabled" or "UI_PNC_PathOverlayDisabled"
-        HaloTextHelper.addText(player, getText(messageKey))
+        HaloTextHelper.addText(player, PNC.Translation.GetKey(messageKey))
     end
     return Settings.showPathDebug
 end
@@ -346,7 +346,7 @@ function Nameplates.SetFactionDebugEnabled(enabled, announce)
     then
         HaloTextHelper.addText(
             player,
-            getText(
+            PNC.Translation.GetKey(
                 Settings.showFactionDebug
                     and "UI_PNC_FactionOverlayEnabled"
                     or "UI_PNC_FactionOverlayDisabled"
@@ -382,7 +382,7 @@ function Nameplates.SetCommunityDebugEnabled(enabled, announce)
     then
         HaloTextHelper.addText(
             player,
-            getText(
+            PNC.Translation.GetKey(
                 Settings.showCommunityDebug
                     and "UI_PNC_CommunityOverlayEnabled"
                     or "UI_PNC_CommunityOverlayDisabled"
@@ -411,7 +411,7 @@ function Nameplates.ToggleCombatDebug()
         local messageKey = Settings.showCombatDebug
             and "UI_PNC_CombatOverlayEnabled"
             or "UI_PNC_CombatOverlayDisabled"
-        HaloTextHelper.addText(player, getText(messageKey))
+        HaloTextHelper.addText(player, PNC.Translation.GetKey(messageKey))
     end
     return Settings.showCombatDebug
 end

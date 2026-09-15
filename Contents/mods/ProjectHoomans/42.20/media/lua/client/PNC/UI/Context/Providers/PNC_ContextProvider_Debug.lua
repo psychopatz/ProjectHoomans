@@ -10,7 +10,7 @@ local Provider = {
 }
 
 local function tr(key, fallback)
-    local value = getText and getText(key) or nil
+    local value = getText and PNC.Translation.GetKey(key) or nil
     if not value or value == "" or value == key then
         return fallback
     end
@@ -52,22 +52,24 @@ function Provider.addOptions(menu, entry, player, contextData)
     menu:addSubMenu(menu:addOption(tr("UI_PNC_Debug", "Debug")), debugMenu)
     menu = debugMenu
 
-    menu:addOption("Force Live", nil, function()
+    menu:addOption(tr("UI_PNC_Debug_ForceLive", "Force Live"), nil, function()
         sendDebug("force_live", { id = entry.id })
     end)
-    menu:addOption("Force Abstract", nil, function()
+    menu:addOption(tr("UI_PNC_Debug_ForceAbstract", "Force Abstract"), nil, function()
         sendDebug("force_abstract", { id = entry.id })
     end)
-    menu:addOption("Heal", nil, function()
+    menu:addOption(tr("UI_PNC_Debug_Heal", "Heal"), nil, function()
         sendDebug("heal", { id = entry.id })
     end)
-    menu:addOption("Damage 25", nil, function()
+    menu:addOption(tr("UI_PNC_Debug_Damage25", "Damage 25"), nil, function()
         sendDebug("damage", { id = entry.id, amount = 25 })
     end)
-    menu:addOption(isRecording(entry) and "Stop Recording Debug" or "Record Debug", nil, function()
+    menu:addOption(tr(isRecording(entry) and "UI_PNC_Debug_StopRecording"
+        or "UI_PNC_Debug_RecordDebug",
+        isRecording(entry) and "Stop Recording Debug" or "Record Debug"), nil, function()
         sendDebug("toggle_debug", { id = entry.id })
     end)
-    menu:addOption("Dump Snapshot", nil, function()
+    menu:addOption(tr("UI_PNC_Debug_DumpSnapshot", "Dump Snapshot"), nil, function()
         local snapshotText
         snapshot = ClientState.snapshots and ClientState.snapshots[entry.id] or nil
         snapshotText = PNC.Nameplates and PNC.Nameplates.DebugDescribeSnapshot
@@ -75,7 +77,7 @@ function Provider.addOptions(menu, entry, player, contextData)
             or tostring(snapshot and snapshot.aiState or "No snapshot")
         print("[PNC] " .. snapshotText)
     end)
-    menu:addOption("NPC Presentation Lab", nil, function()
+    menu:addOption(tr("UI_PNC_Debug_NPCPresentationLab", "NPC Presentation Lab"), nil, function()
         -- Keep the 511-node generated catalog and its UI out of the normal
         -- client startup path. Debuggers pay this load cost only on first use.
         if not PNC.NPCPresentationDebug
@@ -89,7 +91,7 @@ function Provider.addOptions(menu, entry, player, contextData)
             PNC.NPCPresentationDebug.Open(entry)
         end
     end)
-    menu:addOption("Animation Scene Lab", nil, function()
+    menu:addOption(tr("UI_PNC_Debug_AnimationSceneLab", "Animation Scene Lab"), nil, function()
         if not PNC.AnimationSceneDebugWindow then
             require "PNC/UI/PNC_AnimationSceneDebugWindow"
         end
@@ -165,13 +167,14 @@ function Provider.addOptions(menu, entry, player, contextData)
         end
     end
     if not hasBandage then
-        local status = treatmentMenu:addOption("No bandaged wounds", nil)
+        local status = treatmentMenu:addOption(
+            tr("UI_PNC_Debug_NoBandagedWounds", "No bandaged wounds"), nil)
         status.notAvailable = true
     end
 
     orderMenu = ISContextMenu:getNew(menu)
-    menu:addSubMenu(menu:addOption("Orders"), orderMenu)
-    orderMenu:addOption("Follow Me", nil, function()
+    menu:addSubMenu(menu:addOption(tr("UI_PNC_Debug_Orders", "Orders")), orderMenu)
+    orderMenu:addOption(tr("UI_PNC_Debug_FollowMe", "Follow Me"), nil, function()
         sendDebug("set_order", {
             id = entry.id,
             orderSpec = {
@@ -181,7 +184,7 @@ function Provider.addOptions(menu, entry, player, contextData)
             },
         })
     end)
-    orderMenu:addOption("Guard Here", nil, function()
+    orderMenu:addOption(tr("UI_PNC_Debug_GuardHere", "Guard Here"), nil, function()
         if not actionSquare then
             return
         end
@@ -190,7 +193,7 @@ function Provider.addOptions(menu, entry, player, contextData)
             orderSpec = { kind = Const.ORDER_GUARD, x = actionSquare:getX(), y = actionSquare:getY(), z = actionSquare:getZ() },
         })
     end)
-    orderMenu:addOption("Patrol Nearby", nil, function()
+    orderMenu:addOption(tr("UI_PNC_Debug_PatrolNearby", "Patrol Nearby"), nil, function()
         if not actionSquare then
             return
         end
@@ -222,7 +225,7 @@ function Provider.addOptions(menu, entry, player, contextData)
             },
         })
     end)
-    orderMenu:addOption("Hostile Hunt", nil, function()
+    orderMenu:addOption(tr("UI_PNC_Debug_HostileHunt", "Hostile Hunt"), nil, function()
         if not actionSquare then
             return
         end
@@ -237,22 +240,22 @@ function Provider.addOptions(menu, entry, player, contextData)
     end)
 
     weaponMenu = ISContextMenu:getNew(menu)
-    menu:addSubMenu(menu:addOption("Combat"), weaponMenu)
-    weaponMenu:addOption("Set Melee", nil, function()
+    menu:addSubMenu(menu:addOption(tr("UI_PNC_Debug_Combat", "Combat")), weaponMenu)
+    weaponMenu:addOption(tr("UI_PNC_Debug_SetMelee", "Set Melee"), nil, function()
         sendDebug("set_weapon_mode", { id = entry.id, weaponMode = "melee" })
     end)
-    weaponMenu:addOption("Set Ranged", nil, function()
+    weaponMenu:addOption(tr("UI_PNC_Debug_SetRanged", "Set Ranged"), nil, function()
         sendDebug("set_weapon_mode", { id = entry.id, weaponMode = "ranged" })
     end)
-    weaponMenu:addOption("Set Mixed", nil, function()
+    weaponMenu:addOption(tr("UI_PNC_Debug_SetMixed", "Set Mixed"), nil, function()
         sendDebug("set_weapon_mode", { id = entry.id, weaponMode = "mixed" })
     end)
     if heldItem and heldItem.getFullType then
-        weaponMenu:addOption("Use My Held Weapon", nil, function()
+        weaponMenu:addOption(tr("UI_PNC_Debug_UseHeldWeapon", "Use My Held Weapon"), nil, function()
             sendDebug("copy_held_weapon", { id = entry.id, weaponFullType = heldItem:getFullType() })
         end)
     end
-    weaponMenu:addOption("Use My Full Loadout", nil, function()
+    weaponMenu:addOption(tr("UI_PNC_Debug_UseFullLoadout", "Use My Full Loadout"), nil, function()
         sendDebug("copy_player_loadout", { id = entry.id })
     end)
 end

@@ -22,7 +22,7 @@ Address.VERSION = Address.VERSION or 1
 
 local function translate(key, fallback)
     if translatedNicknames[key] then return translatedNicknames[key] end
-    local value = type(getText) == "function" and getText(key) or nil
+    local value = PNC.Translation.GetKey(key)
     value = Names.Clean(value, nil)
     value = value and value ~= key and value or fallback
     translatedNicknames[key] = value

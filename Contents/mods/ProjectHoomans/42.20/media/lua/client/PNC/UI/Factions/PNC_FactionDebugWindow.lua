@@ -14,7 +14,7 @@ local Theme = UI.Theme
 local Layout = UI.Layout
 
 local function text(key)
-    return getText and getText(key) or key
+    return getText and PNC.Translation.GetKey(key) or key
 end
 
 local function views(first, second)
@@ -1145,7 +1145,7 @@ function FactionUI.Open()
         local screenHeight = getCore and getCore()
             and getCore():getScreenHeight() or 800
         window = UI.NewWindow(ISPNCFactionDebugWindow, {
-            title = getText("UI_PNC_FactionInspectorTitle"),
+            title = PNC.Translation.GetKey("UI_PNC_FactionInspectorTitle"),
             resizable = true,
             responsiveSpec = {
                 width = math.min(1280, screenWidth - 24),
