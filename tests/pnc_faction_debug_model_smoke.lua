@@ -2,7 +2,7 @@ local T = require "tests/support/test"
 
 local FILE =
     T.path("ProjectHoomans", "client", "PNC/")
-    .. "UI/Factions/PNC_FactionDebugModel.lua"
+    .. "UI/Factions/FactionDebugModel/PNC_FactionDebugModel.lua"
 
 local function expectRowContaining(rows, label, fragment)
     for _, item in ipairs(rows) do

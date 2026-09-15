@@ -315,10 +315,10 @@ function Presentation.ShowResult(payload)
         player, tr(key, "Radio signal discovered"), true,
         HaloTextHelper.getColorGreen()
     )
-    if result.identityRevealed == true then
+    if result.factionRevealed == true then
         HaloTextHelper.addTextWithArrow(
             player,
-            tr("UI_PNC_DiscoveryIdentityLearned", "Radio contact identified"),
+            tr("UI_PNC_DiscoveryFactionLearned", "Radio faction identified"),
             true, HaloTextHelper.getColorGreen()
         )
     end

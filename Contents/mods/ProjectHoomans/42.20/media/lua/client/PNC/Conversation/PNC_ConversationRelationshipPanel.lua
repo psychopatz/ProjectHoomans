@@ -207,6 +207,9 @@ function ISPNCConversationRelationshipPanel:prerender()
     -- conversation windows. Graph-only applies to the graph's inspector
     -- footer, not to this conversation-window presentation.
     PsychopatzConversationPart.prerender(self)
+    if self.graph and self.graph.setOpacity then
+        self.graph:setOpacity(self:getContentOpacity())
+    end
     local evaluation = self.graph and self.graph.getEvaluation
         and self.graph:getEvaluation() or nil
     local text = previewText(evaluation)

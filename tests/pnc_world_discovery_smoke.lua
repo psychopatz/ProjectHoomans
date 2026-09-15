@@ -70,7 +70,8 @@ local communities = {
 local groups = {
     group_one = {
         id = "group_one", factionId = "faction_roam",
-        groupType = "REFUGEE", memberIds = { "npc_one", "npc_two" },
+        groupType = "REFUGEE",
+        memberIds = { "npc_one", "npc_two", "npc_dead" },
         location = { x = 120, y = 220, z = 0 },
     },
 }
@@ -112,7 +113,7 @@ PNC.Registry = {
         return {
             id = id,
             name = id == "npc_one" and "Mara Cole" or "Jonas Reed",
-            alive = true,
+            alive = id ~= "npc_dead",
             identity = { displayName = id == "npc_one"
                 and "Mara Cole" or "Jonas Reed", survivor = {
                 forename = id == "npc_one" and "Mara" or "Jonas",
@@ -170,6 +171,8 @@ PNC.NPCKnowledge = {
 }
 PNC.Network = { SendNPCKnowledge = function() end }
 Discovery.RadioIdentityRevealRoll = function() return 0 end
+Discovery.RadioArgumentRoll = function() return 99 end
+Discovery.RadioConflictRoll = function() return 99 end
 Discovery.RadioRandomIndex = function() return 1 end
 
 local refugeeFlavor = PsychopatzCore.CustomRadio.SelectMessage(
@@ -237,8 +240,8 @@ T.equal(entityOf(radio, Types.KIND_MOBILE_GROUP).factionKnown, true,
 T.equal(entityOf(radio, Types.KIND_MOBILE_GROUP).factionName,
     "Road Refugees",
     "the disclosed faction name is visible in the contact snapshot")
-T.equal(radio.result.identityRevealed, true,
-    "radio scan result preserves the broadcast identity reveal")
+T.equal(radio.result.factionRevealed, true,
+    "radio scan result preserves the faction disclosure")
 T.equal(radio.result.radioBroadcast.speech.effect_profile, "radio",
     "radio scan result selects the radio DSP profile")
 T.truthy(#radio.result.radioBroadcast.lines > 0,
@@ -275,12 +278,16 @@ T.equal(airedBroadcasts[1].context.npcFullName, "Mara Cole",
     "radio speaker identity comes from a real group member")
 T.equal(airedBroadcasts[1].context.factionName, "Road Refugees",
     "introduced speaker exposes the real faction name token")
+T.equal(#disclosures, 1,
+    "radio introduction persists only the faction knowledge topic")
 T.equal(disclosures[1].npcID, "npc_one",
-    "radio introduction persists knowledge for the speaking NPC")
-T.equal(disclosures[1].topicID, "identity_name",
-    "radio introduction uses the same identity topic as asking a name")
-T.equal(disclosures[2].topicID, "faction",
+    "radio introduction persists faction knowledge for the speaking NPC")
+T.equal(disclosures[1].topicID, "faction",
     "radio introduction persists the explicitly claimed faction")
+T.equal(disclosures[1].sourceType, "radio_disclosure",
+    "radio faction knowledge keeps the radio evidence source")
+T.falsy(knownNames.npc_one,
+    "radio introduction does not mark the NPC name as known")
 local throttled = Discovery.RadioScan(player,
     PNC.RadioDiscoveryChannel.ID, PNC.RadioDiscoveryChannel.FREQUENCY)
 T.equal(throttled.result.reason, "radio_cooldown",
@@ -302,6 +309,70 @@ T.equal(dynamicFlavor.lines[3].text,
     "background reply does not add a speaker label")
 T.equal(dynamicFlavor.lines[3].speakerRole, "secondary",
     "background reply marks the secondary speaker separately from its text")
+T.equal(Discovery.RADIO_ARGUMENT_CHANCE, 25,
+    "radio arguments remain an occasional flavor variant")
+Discovery.RadioArgumentRoll = function() return 0 end
+local argumentContext = Discovery.BuildRadioTemplateContext(
+    player,
+    Discovery.ResolveEntity(Types.KIND_MOBILE_GROUP, "group_one"),
+    Types.PHASE_RUMORED
+)
+T.equal(argumentContext.argumentVariant, true,
+    "argument flavor is enabled by its deterministic roll")
+T.equal(argumentContext.hasSecondSpeaker, true,
+    "argument flavor requires a second living speaker")
+T.equal(argumentContext.speakerNPCID, "npc_one",
+    "argument flavor keeps the selected living primary speaker")
+T.equal(argumentContext.secondarySpeakerNPCID, "npc_two",
+    "argument flavor selects a second living speaker")
+T.equal(argumentContext.argumentPrimaryName, "Mara",
+    "argument flavor names the primary member internally")
+T.equal(argumentContext.argumentSecondaryName, "Jonas",
+    "argument flavor names the secondary member internally")
+local argumentFlavor = PsychopatzCore.CustomRadio.SelectMessage(
+    PNC.RadioDiscoveryChannel.ID, "discovery", argumentContext
+)
+T.equal(argumentFlavor.packID, "projecthoomans.argument",
+    "argument flavor uses the dedicated message pack")
+T.equal(argumentFlavor.lines[2].speakerRole, "primary",
+    "argument flavor starts with the primary speaker")
+T.equal(argumentFlavor.lines[3].speakerRole, "secondary",
+    "argument flavor replies with the secondary speaker")
+T.equal(argumentFlavor.lines[4].speakerRole, "primary",
+    "argument flavor returns to the primary speaker")
+T.equal(argumentFlavor.lines[5].speakerRole, "secondary",
+    "argument flavor keeps the exchange conversational")
+T.equal(argumentFlavor.lines[2].text,
+    "Jonas, stop talking over me. I'm trying to get a message through.",
+    "the primary speaker names the secondary target")
+T.equal(argumentFlavor.lines[3].text,
+    "No, Mara, you're the one filling the channel with the same warning.",
+    "the secondary speaker names the primary target")
+T.equal(argumentFlavor.lines[6].text,
+    "My name is Mara Cole. I speak for Road Refugees.",
+    "argument flavor retains the existing optional introduction text")
+Discovery.RadioIdentityRevealRoll = function() return 99 end
+local unnamedArgumentContext = Discovery.BuildRadioTemplateContext(
+    player,
+    Discovery.ResolveEntity(Types.KIND_MOBILE_GROUP, "group_one"),
+    Types.PHASE_RUMORED
+)
+unnamedArgumentContext.random = function() return 1 end
+T.equal(unnamedArgumentContext.identityIntroduced, false,
+    "argument names do not depend on the identity introduction roll")
+T.equal(unnamedArgumentContext.argumentPrimaryName, "Mara",
+    "argument flavor still names its primary member as a target")
+T.equal(unnamedArgumentContext.argumentSecondaryName, "Jonas",
+    "argument flavor still names its secondary member as a target")
+local unnamedArgumentFlavor = PsychopatzCore.CustomRadio.SelectMessage(
+    PNC.RadioDiscoveryChannel.ID, "discovery", unnamedArgumentContext
+)
+T.equal(unnamedArgumentFlavor.lines[2].text,
+    "Jonas, stop talking over me. I'm trying to get a message through.",
+    "argument target names remain presentation-only flavor")
+T.equal(#unnamedArgumentFlavor.lines, 6,
+    "argument flavor omits the separate introduction when not rolled")
+Discovery.RadioArgumentRoll = function() return 99 end
 T.equal(Discovery.RADIO_IDENTITY_REVEAL_CHANCE, 35,
     "radio identity introductions remain chance based")
 Discovery.RadioIdentityRevealRoll = function() return 99 end
@@ -328,7 +399,10 @@ T.equal(knownContext.playerFirstName, "Casey",
 T.equal(knownContext.playerNameKnown, true,
     "known-name state is attached to the selected radio speaker")
 local knownFlavor = PsychopatzCore.CustomRadio.SelectMessage(
-    PNC.RadioDiscoveryChannel.ID, "discovery", knownContext
+    PNC.RadioDiscoveryChannel.ID, "discovery",
+    setmetatable({ random = function() return 1 end }, {
+        __index = knownContext,
+    })
 )
 local addressedByName = false
 for _, line in ipairs(knownFlavor.lines or {}) do

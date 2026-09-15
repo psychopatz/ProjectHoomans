@@ -49,7 +49,7 @@ PNC = {
 getText = function(key)
     local values = {
         UI_PNC_DiscoveryFoundSettlement = "Found an enclave",
-        UI_PNC_DiscoveryIdentityLearned = "Radio contact identified",
+        UI_PNC_DiscoveryFactionLearned = "Radio faction identified",
     }
     return values[key] or key
 end
@@ -79,12 +79,12 @@ T.equal(requests[5], "radio_ambient",
     "ambient chatter is requested only after its independent interval")
 T.equal(PNC.RadioDiscoveryPresentation.ShowResult({ result = {
     ok = true, notificationID = "settlement:1:1",
-    kind = "settlement", phase = 1, identityRevealed = true,
+    kind = "settlement", phase = 1, factionRevealed = true,
 } }), true, "successful discovery displays feedback")
 T.equal(halos[1].value, "Found an enclave",
     "discovery uses a native-style positive arrow notification")
-T.equal(halos[2].value, "Radio contact identified",
-    "identity introduction displays separate feedback")
+T.equal(halos[2].value, "Radio faction identified",
+    "faction disclosure displays separate feedback")
 T.equal(#published, 0, "radio speech waits for a successful broadcast payload")
 T.equal(PNC.RadioDiscoveryPresentation.ShowResult({ result = {
     ok = true, notificationID = "settlement:2:1",

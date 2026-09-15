@@ -46,7 +46,8 @@ PNC = {
 getCurrentSaveName = function() return "Save One" end
 getTimeInMillis = function() return 1000 end
 
-T.load("ProjectHoomans", "client", "PNC/Integrations/PNC_HoomansLLMContext.lua")
+T.load("ProjectHoomans", "client",
+    "PNC/Integrations/HoomansLLM/PNC_HoomansLLM_Context.lua")
 
 local Context = PNC.HoomansLLM.Context
 local view = {

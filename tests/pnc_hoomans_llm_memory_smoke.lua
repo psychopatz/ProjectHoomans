@@ -45,7 +45,7 @@ ModData = {
 T.load("PsychopatzCore", "common",
     "PsychopatzCore/Conversation/PsychopatzConversationMessage.lua")
 T.load("ProjectHoomans", "client",
-    "PNC/Integrations/PNC_HoomansLLMMemory.lua")
+    "PNC/Integrations/HoomansLLM/PNC_HoomansLLM_Memory.lua")
 
 local Memory = PNC.HoomansLLM.Memory
 T.truthy(Memory.IsNameQuestion("What's your name?"),
@@ -90,7 +90,7 @@ T.equal(batch.memory_primitives[2].event_time.kind, "pre_outbreak",
     "relationship uses pre-outbreak event time")
 
 local sync = T.load("ProjectHoomans", "client",
-    "PNC/Integrations/PNC_ConversationMemorySync.lua")
+    "PNC/Integrations/HoomansLLM/PNC_HoomansLLM_ConversationMemorySync.lua")
 local syncBatch = sync.Poll()
 T.equal(#syncBatch.memory_primitives, 2,
     "conversation sync exposes primitive outbox")

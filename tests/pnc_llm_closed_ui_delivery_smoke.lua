@@ -101,7 +101,7 @@ getGameTime = function()
     return { getWorldAgeHours = function() return 49 end }
 end
 
-T.load("ProjectHoomans", "client", "PNC/Integrations/PNC_HoomansLLM.lua")
+T.load("ProjectHoomans", "client", "PNC/Integrations/HoomansLLM/PNC_HoomansLLM.lua")
 
 local Message = PsychopatzCore.Conversation.Message
 local Sync = PNC.ConversationMemorySync

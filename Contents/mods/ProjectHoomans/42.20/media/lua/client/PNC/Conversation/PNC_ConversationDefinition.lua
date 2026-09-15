@@ -353,6 +353,10 @@ function Conversation.BuildDefinition(entry, player, forcedTime)
         characterUUID = clientState.playerContext
             and clientState.playerContext.characterUUID or "unbound",
         character = entry and entry.zombie or nil,
+        -- Standard face-to-face talk uses the readable subtle treatment.
+        -- Radio and walkie-talkie callers can opt into CRT with their own
+        -- explicit conversation screenVariant.
+        screenVariant = "subtle",
         portrait = portraitSpec(entry),
         backgroundID = Backgrounds.Get(timeID),
         theme = Palette.BuildConversationTheme(entry),

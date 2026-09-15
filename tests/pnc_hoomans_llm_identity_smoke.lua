@@ -18,7 +18,7 @@ getServerPort = function() return "16261" end
 local identity = T.load(
     "ProjectHoomans",
     "client",
-    "PNC/Integrations/PNC_HoomansLLMIdentity.lua"
+    "PNC/Integrations/HoomansLLM/PNC_HoomansLLM_Identity.lua"
 )
 local multiplayer = identity.Current()
 T.equal(multiplayer.world_mode, "multiplayer", "multiplayer mode")

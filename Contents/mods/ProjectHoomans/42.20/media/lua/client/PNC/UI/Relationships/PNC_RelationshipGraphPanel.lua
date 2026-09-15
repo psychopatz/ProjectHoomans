@@ -35,6 +35,18 @@ local function capitalize(value)
         .. string.sub(value, 2)
 end
 
+function ISPNCRelationshipGraphPanel:setOpacity(value)
+    self.opacity = math.max(0, math.min(1, tonumber(value) or 1))
+end
+
+function ISPNCRelationshipGraphPanel:getOpacity()
+    return self.opacity == nil and 1 or self.opacity
+end
+
+function ISPNCRelationshipGraphPanel:alpha(value)
+    return (tonumber(value) or 1) * self:getOpacity()
+end
+
 function ISPNCRelationshipGraphPanel:initialise()
     ISPanel.initialise(self)
     self.background = false
@@ -84,7 +96,7 @@ function ISPNCRelationshipGraphPanel:drawColorRect(
         y,
         math.max(0, width),
         math.max(0, height),
-        color[1],
+        self:alpha(color[1]),
         color[2],
         color[3],
         color[4]
@@ -158,6 +170,7 @@ function ISPNCRelationshipGraphPanel:drawDiamond(x, y)
             y - 3 + index,
             row[2],
             1,
+            self:alpha(1),
             1,
             1,
             1,
@@ -250,8 +263,8 @@ function ISPNCRelationshipGraphPanel:drawHover(
         self.height - height - 6,
         math.max(6, mouseY + 14)
     )
-    self:drawRect(x, y, width, height, 0.96, 0.03, 0.03, 0.03)
-    self:drawRectBorder(x, y, width, height, 0.9, 0.4, 0.8, 0.55)
+    self:drawRect(x, y, width, height, self:alpha(0.96), 0.03, 0.03, 0.03)
+    self:drawRectBorder(x, y, width, height, self:alpha(0.9), 0.4, 0.8, 0.55)
     for index, line in ipairs(lines) do
         self:drawText(
             line,
@@ -260,7 +273,7 @@ function ISPNCRelationshipGraphPanel:drawHover(
             0.94,
             0.96,
             0.97,
-            1,
+            self:alpha(1),
             UIFont.Small
         )
     end
@@ -289,18 +302,19 @@ function ISPNCRelationshipGraphPanel:drawDepartureThreshold(
     )
     self:drawRect(
         graphX, approvalY, graphSize, 2,
-        COLORS.departure[1], COLORS.departure[2],
+        self:alpha(COLORS.departure[1]), COLORS.departure[2],
         COLORS.departure[3], COLORS.departure[4]
     )
     self:drawRect(
         respectX, graphY, 2, graphSize,
-        COLORS.departure[1], COLORS.departure[2],
+        self:alpha(COLORS.departure[1]), COLORS.departure[2],
         COLORS.departure[3], COLORS.departure[4]
     )
 end
 
 function ISPNCRelationshipGraphPanel:render()
     ISPanel.render(self)
+    local opacity = self:getOpacity()
     local evaluation = self.evaluation or Graph.Evaluate(
         0,
         0,
@@ -325,7 +339,7 @@ function ISPNCRelationshipGraphPanel:render()
             0.90,
             0.93,
             0.95,
-            1,
+            opacity,
             UIFont.Small
         )
     end
@@ -357,7 +371,7 @@ function ISPNCRelationshipGraphPanel:render()
         graphY + half,
         graphSize,
         1,
-        COLORS.grid[1],
+        self:alpha(COLORS.grid[1]),
         COLORS.grid[2],
         COLORS.grid[3],
         COLORS.grid[4]
@@ -367,7 +381,7 @@ function ISPNCRelationshipGraphPanel:render()
         graphY,
         1,
         graphSize,
-        COLORS.grid[1],
+        self:alpha(COLORS.grid[1]),
         COLORS.grid[2],
         COLORS.grid[3],
         COLORS.grid[4]
@@ -377,7 +391,7 @@ function ISPNCRelationshipGraphPanel:render()
         graphY,
         graphSize,
         graphSize,
-        COLORS.border[1],
+        self:alpha(COLORS.border[1]),
         COLORS.border[2],
         COLORS.border[3],
         COLORS.border[4]
@@ -396,7 +410,7 @@ function ISPNCRelationshipGraphPanel:render()
             0.88,
             0.91,
             0.93,
-            0.92,
+            opacity * 0.92,
             UIFont.Small
         )
     end
@@ -417,7 +431,7 @@ function ISPNCRelationshipGraphPanel:render()
             0.62,
             0.68,
             0.73,
-            1,
+            opacity,
             UIFont.Small
         )
         local summaryY = graphY + graphSize + 29
@@ -430,7 +444,7 @@ function ISPNCRelationshipGraphPanel:render()
             0.90,
             0.93,
             0.95,
-            1,
+            opacity,
             UIFont.Small
         )
         local resultText = evaluation.requirement.enabled
@@ -448,7 +462,7 @@ function ISPNCRelationshipGraphPanel:render()
             evaluation.insideSuccessRegion and 0.35 or 0.72,
             evaluation.insideSuccessRegion and 0.90 or 0.74,
             evaluation.insideSuccessRegion and 0.45 or 0.76,
-            1,
+            opacity,
             UIFont.Small
         )
         self:drawText(
@@ -459,7 +473,7 @@ function ISPNCRelationshipGraphPanel:render()
             0.62,
             0.68,
             0.73,
-            1,
+            opacity,
             UIFont.Small
         )
         local modifierY = summaryY + 60
@@ -472,7 +486,7 @@ function ISPNCRelationshipGraphPanel:render()
                 modifier.value >= 0 and 0.42 or 0.93,
                 modifier.value >= 0 and 0.82 or 0.52,
                 modifier.value >= 0 and 0.48 or 0.45,
-                1,
+                opacity,
                 UIFont.Small
             )
         end
@@ -496,6 +510,7 @@ function ISPNCRelationshipGraphPanel:new(x, y, width, height)
     self.__index = self
     object.evaluation = Graph.Evaluate(0, 0, "inspect")
     object.graphOnly = false
+    object.opacity = 1
     return object
 end
 

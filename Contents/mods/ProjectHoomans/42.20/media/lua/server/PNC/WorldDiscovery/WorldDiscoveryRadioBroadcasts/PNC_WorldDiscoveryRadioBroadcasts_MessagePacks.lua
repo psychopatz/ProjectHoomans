@@ -179,6 +179,76 @@ end, {
     ) end,
 })
 
+pack("argument", 110, function(context)
+    return context.argumentVariant == true
+        and context.hasSecondSpeaker == true
+end, {
+    function(context) return lines(
+        "<wzzt>",
+        voiced(context, "UI_PNC_Discovery_Radio_ArgumentPrimaryChannel",
+            "{argumentSecondaryName}, stop talking over me. I'm trying to get a message through."),
+        reply(context, "UI_PNC_Discovery_Radio_ArgumentSecondaryChannel",
+            "No, {argumentPrimaryName}, you're the one filling the channel with the same warning."),
+        voiced(context, "UI_PNC_Discovery_Radio_ArgumentPrimaryRoad",
+            "{argumentSecondaryName}, you were supposed to check the east road."),
+        reply(context, "UI_PNC_Discovery_Radio_ArgumentSecondaryRoad",
+            "I checked it, {argumentPrimaryName}. You were supposed to listen."),
+        introduction(context),
+        "<fzzt>"
+    ) end,
+    function(context) return lines(
+        "<bzzt>",
+        voiced(context, "UI_PNC_Discovery_Radio_ArgumentPrimarySupplies",
+            "{argumentSecondaryName}, we are not leaving the supplies behind."),
+        reply(context, "UI_PNC_Discovery_Radio_ArgumentSecondarySupplies",
+            "No, {argumentPrimaryName}, we are not risking everyone for three boxes."),
+        voiced(context, "UI_PNC_Discovery_Radio_ArgumentPrimaryDecision",
+            "{argumentSecondaryName}, you made that call without the group."),
+        reply(context, "UI_PNC_Discovery_Radio_ArgumentSecondaryDecision",
+            "Because you kept the group waiting, {argumentPrimaryName}."),
+        introduction(context),
+        "<fzzt>"
+    ) end,
+})
+
+pack("conflict", 120, function(context)
+    return context.conflictVariant == true
+        and context.hasSecondSpeaker == true
+        and context.conflictPrimaryName ~= ""
+        and context.conflictSecondaryName ~= ""
+        and context.conflictPrimaryFactionID ~= nil
+        and context.conflictSecondaryFactionID ~= nil
+        and context.conflictPrimaryFactionID
+            ~= context.conflictSecondaryFactionID
+end, {
+    function(context) return lines(
+        "<wzzt>",
+        voiced(context, "UI_PNC_Discovery_Radio_ConflictPrimaryInsult",
+            "{conflictSecondaryName}, you're an idiot."),
+        reply(context, "UI_PNC_Discovery_Radio_ConflictSecondaryInsult",
+            "No, {conflictPrimaryName}, you're the one who's an idiot here."),
+        voiced(context, "UI_PNC_Discovery_Radio_ConflictPrimarySupplies",
+            "You took the supplies without asking, {conflictSecondaryName}."),
+        reply(context, "UI_PNC_Discovery_Radio_ConflictSecondarySupplies",
+            "Because you would have stood there arguing all night, {conflictPrimaryName}."),
+        introduction(context),
+        "<fzzt>"
+    ) end,
+    function(context) return lines(
+        "<bzzt>",
+        voiced(context, "UI_PNC_Discovery_Radio_ConflictPrimaryWarning",
+            "{conflictSecondaryName}, keep your people away from that house."),
+        reply(context, "UI_PNC_Discovery_Radio_ConflictSecondaryWarning",
+            "Your people were already inside, {conflictPrimaryName}."),
+        voiced(context, "UI_PNC_Discovery_Radio_ConflictPrimaryClaim",
+            "We marked that place first, {conflictSecondaryName}."),
+        reply(context, "UI_PNC_Discovery_Radio_ConflictSecondaryClaim",
+            "Then come say it to my face, {conflictPrimaryName}."),
+        introduction(context),
+        "<wzzt>"
+    ) end,
+})
+
 pack("ambient_open_band", 20, function(context)
     return context.eventType == "ambient"
         and context.ambientVariant == "open_band"

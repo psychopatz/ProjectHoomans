@@ -6,7 +6,9 @@
 
 require "PsychopatzCore/Conversation/PsychopatzConversationMessage"
 require "PNC/Core/Identity/PNC_FlavorAddress"
-require "PNC/Integrations/PNC_HoomansLLMIdentity"
+require "PNC/Integrations/HoomansLLM/PNC_HoomansLLM_Runtime"
+require "PNC/Integrations/HoomansLLM/PNC_HoomansLLM_Identity"
+require "PNC/Integrations/HoomansLLM/PNC_HoomansLLM_Outbox"
 
 PNC = PNC or {}
 PNC.HoomansLLM = PNC.HoomansLLM or {}
@@ -16,8 +18,8 @@ local Memory = PNC.HoomansLLM.Memory
 local Message = PsychopatzCore.Conversation.Message
 local FlavorAddress = PNC.FlavorAddress
 local Identity = PNC.HoomansLLM.Identity
-local Reset = (PNC.Persistence and PNC.Persistence.Reset)
-    or require "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset"
+local Runtime = PNC.HoomansLLM.Internal.Runtime
+local Outbox = PNC.HoomansLLM.Internal.Outbox
 
 Memory.VERSION = 1
 Memory.STORAGE_KEY = "PNC_HoomansLLMMemory"
@@ -25,23 +27,20 @@ Memory.MAX_PENDING = 256
 Memory.MAX_BATCH = 8
 Memory.MAX_EVENT_ID = 256
 
-local OWNER_TOKEN = Memory
-local memoryRoot = Memory.memoryRoot or {}
-Memory.memoryRoot = memoryRoot
-local storageValidated = false
+local outbox = Outbox.New({
+    owner = Memory,
+    storageKey = Memory.STORAGE_KEY,
+    version = Memory.VERSION,
+    idField = "event_id",
+    resetOwner = "llm_memory",
+})
 local monthNames = {
     "January", "February", "March", "April", "May", "June",
     "July", "August", "September", "October", "November", "December",
 }
 
 local function text(value, limit)
-    value = tostring(value or "")
-    value = string.gsub(value, "^%s+", "")
-    value = string.gsub(value, "%s+$", "")
-    if limit and #value > limit then
-        value = string.sub(value, 1, limit)
-    end
-    return value
+    return Runtime.Trim(value, limit)
 end
 
 local function call(object, method, fallback)
@@ -178,47 +177,7 @@ function Memory.CurrentContext(worldAgeHours, npcID)
 end
 
 local function storage()
-    local root
-    if not storageValidated then
-        local raw = Reset.Read(Memory.STORAGE_KEY)
-        local reason = Reset.Check(raw, Memory.VERSION, "version",
-            function(value) return type(value.records) == "table" end)
-        if reason ~= nil and reason ~= "empty_state" then
-            Memory.LastReset = Reset.Info(raw, Memory.VERSION, reason,
-                "llm_memory", "version")
-            if ModData and ModData.getOrCreate then
-                Reset.Write(Memory.STORAGE_KEY, {
-                    version = Memory.VERSION, records = {}, index = {},
-                    indexReady = true,
-                })
-            else
-                for key, _ in pairs(memoryRoot) do memoryRoot[key] = nil end
-            end
-            if PNC.Core and PNC.Core.LogWarn then
-                PNC.Core.LogWarn("PNC persistence reset owner=llm_memory reason="
-                    .. tostring(reason))
-            end
-        end
-        storageValidated = true
-    end
-    if ModData and ModData.getOrCreate then
-        root = ModData.getOrCreate(Memory.STORAGE_KEY)
-    else
-        root = memoryRoot
-    end
-    root.version = Memory.VERSION
-    root.records = root.records or {}
-    root.index = root.index or {}
-    if root.indexReady ~= true then
-        root.index = {}
-        for _, record in ipairs(root.records) do
-            if record and record.event_id then
-                root.index[tostring(record.event_id)] = true
-            end
-        end
-        root.indexReady = true
-    end
-    return root
+    return outbox.Storage()
 end
 
 local function stableEventID(primitiveType, playerID, npcID, relationshipKind)
@@ -277,16 +236,18 @@ function Memory.Enqueue(event)
         end
         return true, "duplicate"
     end
-    if #root.records >= Memory.MAX_PENDING then
+    local queued, reason = outbox.Append(
+        event, event.event_id, Memory.MAX_PENDING
+    )
+    if not queued then
         if primitiveType == "first_meeting" then
-            logPrimitive(primitiveType, npcID, false, "memory_outbox_full", #root.records)
+            logPrimitive(primitiveType, npcID, false,
+                "memory_outbox_full", #root.records)
         end
         return false, "memory_outbox_full"
     end
-    root.records[#root.records + 1] = event
-    root.index[event.event_id] = true
     if primitiveType == "first_meeting" then
-        logPrimitive(primitiveType, npcID, true, "queued", #root.records)
+        logPrimitive(primitiveType, npcID, true, reason, #root.records)
     end
     return true, "queued"
 end
@@ -342,16 +303,12 @@ function Memory.EnqueueSnapshotPrimitives(primitives)
 end
 
 function Memory.Poll()
-    local root = storage()
-    local events = {}
-    for index = 1, math.min(#root.records, Memory.MAX_BATCH) do
-        events[#events + 1] = root.records[index]
-    end
+    local events, pendingCount = outbox.Peek(Memory.MAX_BATCH)
     return {
         status = #events > 0 and "pending" or "idle",
         version = Memory.VERSION,
         memory_primitives = events,
-        pendingCount = #root.records,
+        pendingCount = pendingCount,
     }
 end
 
@@ -359,28 +316,15 @@ function Memory.Ack(arguments)
     arguments = type(arguments) == "table" and arguments or {}
     local eventIDs = arguments.event_ids or arguments.eventIDs or {}
     if type(eventIDs) ~= "table" then return 0 end
-    local acknowledged = {}
-    for index = 1, math.min(#eventIDs, Memory.MAX_BATCH * 8) do
-        local eventID = text(eventIDs[index], Memory.MAX_EVENT_ID)
-        if eventID ~= "" then acknowledged[eventID] = true end
-    end
-    local root = storage()
-    local kept = {}
-    local removed = 0
-    for _, record in ipairs(root.records) do
-        local eventID = text(record and record.event_id, Memory.MAX_EVENT_ID)
-        if eventID ~= "" and acknowledged[eventID] then
-            root.index[eventID] = nil
-            removed = removed + 1
-        elseif record then
-            kept[#kept + 1] = record
-        end
-    end
-    root.records = kept
+    local removed = outbox.Acknowledge(
+        eventIDs,
+        Memory.MAX_BATCH * 8,
+        function(value) return text(value, Memory.MAX_EVENT_ID) end
+    )
     if removed > 0 and print then
         print("[PNC][LLM] memory_primitive_acknowledged count="
             .. tostring(removed)
-            .. " pending=" .. tostring(#root.records))
+            .. " pending=" .. tostring(outbox.PendingCount()))
     end
     return removed
 end

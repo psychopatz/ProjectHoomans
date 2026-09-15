@@ -49,7 +49,8 @@ local function compactRadioBroadcast(message, context)
         packID = tostring(message.packID or ""),
         eventType = context and context.eventType or "discovery",
         -- This is an internal voice-continuity identity, not a player-facing
-        -- disclosure. IdentityIntroduced remains the only name-reveal gate.
+        -- disclosure. identityIntroduced only gates the flavor introduction;
+        -- it does not mean that identity.name knowledge was granted.
         speakerNPCID = context and context.speakerNPCID or nil,
         secondarySpeakerNPCID = context and context.secondarySpeakerNPCID or nil,
         speech = {
@@ -236,7 +237,7 @@ function Discovery.RadioScan(player, channelID, frequency)
         kind = best.kind,
         phase = nextPhase,
         groupType = best.groupType,
-        identityRevealed = broadcastContext
+        factionRevealed = broadcastContext
             and broadcastContext.identityIntroduced == true or false,
         notificationID = tostring(best.entityID) .. ":"
             .. tostring(nextPhase) .. ":"

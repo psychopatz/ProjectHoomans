@@ -5,8 +5,9 @@
 -- safe because the receiver enforces the same IDs at its SQLite boundary.
 require "PsychopatzCore/Conversation/PsychopatzConversationMessage"
 require "PsychopatzCore/Events/PC_EventBus"
-require "PNC/Integrations/PNC_HoomansLLMIdentity"
-require "PNC/Integrations/PNC_HoomansLLMMemory"
+require "PNC/Integrations/HoomansLLM/PNC_HoomansLLM_Identity"
+require "PNC/Integrations/HoomansLLM/PNC_HoomansLLM_Memory"
+require "PNC/Integrations/HoomansLLM/PNC_HoomansLLM_Outbox"
 
 PNC = PNC or {}
 PNC.HoomansLLM = PNC.HoomansLLM or {}
@@ -17,8 +18,7 @@ local Message = PsychopatzCore.Conversation.Message
 local Events = PsychopatzCore.Events
 local MemoryIdentity = PNC.HoomansLLM.Identity
 local MemoryPrimitives = PNC.HoomansLLM.Memory
-local Reset = (PNC.Persistence and PNC.Persistence.Reset)
-    or require "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset"
+local Outbox = PNC.HoomansLLM.Internal.Outbox
 
 Sync.VERSION = 1
 Sync.STORAGE_KEY = "PNC_ConversationMemorySync"
@@ -27,53 +27,16 @@ Sync.MAX_BATCH = 4
 Sync.MAX_CONTENT_LENGTH = 12000
 
 local OWNER_TOKEN = Sync
-local memoryRoot = Sync.memoryRoot or {}
-Sync.memoryRoot = memoryRoot
-local storageValidated = false
+local outbox = Outbox.New({
+    owner = Sync,
+    storageKey = Sync.STORAGE_KEY,
+    version = Sync.VERSION,
+    idField = "messageID",
+    resetOwner = "conversation_memory_sync",
+})
 
 local function storage()
-    local root
-    if not storageValidated then
-        local raw = Reset.Read(Sync.STORAGE_KEY)
-        local reason = Reset.Check(raw, Sync.VERSION, "version",
-            function(value) return type(value.records) == "table" end)
-        if reason ~= nil and reason ~= "empty_state" then
-            Sync.LastReset = Reset.Info(raw, Sync.VERSION, reason,
-                "conversation_memory_sync", "version")
-            if ModData and ModData.getOrCreate then
-                Reset.Write(Sync.STORAGE_KEY, {
-                    version = Sync.VERSION, records = {}, index = {},
-                    indexReady = true,
-                })
-            else
-                for key, _ in pairs(memoryRoot) do memoryRoot[key] = nil end
-            end
-            if PNC.Core and PNC.Core.LogWarn then
-                PNC.Core.LogWarn("PNC persistence reset owner=conversation_memory_sync reason="
-                    .. tostring(reason))
-            end
-        end
-        storageValidated = true
-    end
-    if ModData and ModData.getOrCreate then
-        root = ModData.getOrCreate(Sync.STORAGE_KEY)
-    else
-        root = memoryRoot
-    end
-    root.version = Sync.VERSION
-    root.records = root.records or {}
-    root.index = root.index or {}
-    -- Rebuild the index once for data written by an older outbox shape.
-    if root.indexReady ~= true then
-        root.index = {}
-        for _, record in ipairs(root.records) do
-            if record and record.messageID then
-                root.index[tostring(record.messageID)] = true
-            end
-        end
-        root.indexReady = true
-    end
-    return root
+    return outbox.Storage()
 end
 
 local function compactSource(source)
@@ -189,7 +152,10 @@ function Sync.Enqueue(message)
     end
     local root = storage()
     if root.index[messageID] then return true, "duplicate" end
-    if #root.records >= Sync.MAX_PENDING then
+    local queued, reason = outbox.Append(
+        wireMessage(message), messageID, Sync.MAX_PENDING
+    )
+    if not queued then
         root.overflow = (tonumber(root.overflow) or 0) + 1
         if print then
             print("[PNC][LLM] conversation_sync_outbox_full pending="
@@ -197,23 +163,17 @@ function Sync.Enqueue(message)
         end
         return false, "outbox_full"
     end
-    root.records[#root.records + 1] = wireMessage(message)
-    root.index[messageID] = true
     if print then
         print("[PNC][LLM] conversation_sync_queued message="
             .. messageID .. " speaker="
             .. tostring(message.speakerKind or message.speaker or "unknown")
             .. " pending=" .. tostring(#root.records))
     end
-    return true, "queued"
+    return true, reason
 end
 
 function Sync.Poll()
-    local root = storage()
-    local records = {}
-    for index = 1, math.min(#root.records, Sync.MAX_BATCH) do
-        records[#records + 1] = root.records[index]
-    end
+    local records, pendingCount, overflow = outbox.Peek(Sync.MAX_BATCH)
     local primitiveBatch = MemoryPrimitives and MemoryPrimitives.Poll
         and MemoryPrimitives.Poll() or { memory_primitives = {}, pendingCount = 0 }
     if print and #(primitiveBatch.memory_primitives or {}) > 0 then
@@ -230,9 +190,9 @@ function Sync.Poll()
         messages = records,
         memory_primitives = primitiveBatch.memory_primitives or {},
         memory_context = memoryContext,
-        pendingCount = #root.records,
+        pendingCount = pendingCount,
         primitivePendingCount = primitiveBatch.pendingCount or 0,
-        overflow = tonumber(root.overflow) or 0,
+        overflow = overflow,
     }
 end
 
@@ -240,33 +200,21 @@ function Sync.Ack(arguments)
     arguments = type(arguments) == "table" and arguments or {}
     local messageIDs = arguments.message_ids or arguments.messageIDs or {}
     if type(messageIDs) ~= "table" then return nil, "INVALID_ARGUMENTS", "message_ids must be a list." end
-    local acknowledged = {}
-    for index = 1, math.min(#messageIDs, Sync.MAX_BATCH * 8) do
-        local messageID = tostring(messageIDs[index] or "")
-        if messageID ~= "" then acknowledged[messageID] = true end
-    end
-    local root = storage()
-    local kept = {}
-    local removed = 0
-    for _, record in ipairs(root.records) do
-        if record and acknowledged[tostring(record.messageID or "")] then
-            root.index[tostring(record.messageID)] = nil
-            removed = removed + 1
-        elseif record then
-            kept[#kept + 1] = record
-        end
-    end
-    root.records = kept
+    local removed = outbox.Acknowledge(
+        messageIDs,
+        Sync.MAX_BATCH * 8
+    )
     local primitiveAcknowledged = MemoryPrimitives and MemoryPrimitives.Ack
         and MemoryPrimitives.Ack(arguments) or 0
     if removed > 0 and print then
         print("[PNC][LLM] conversation_sync_acknowledged count="
-            .. tostring(removed) .. " pending=" .. tostring(#root.records))
+            .. tostring(removed)
+            .. " pending=" .. tostring(outbox.PendingCount()))
     end
     return {
         acknowledged = removed,
         primitivesAcknowledged = primitiveAcknowledged,
-        pendingCount = #root.records,
+        pendingCount = outbox.PendingCount(),
     }
 end
 

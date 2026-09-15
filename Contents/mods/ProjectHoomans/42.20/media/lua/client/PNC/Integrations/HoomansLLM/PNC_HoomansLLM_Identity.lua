@@ -9,13 +9,13 @@ PNC = PNC or {}
 PNC.HoomansLLM = PNC.HoomansLLM or {}
 PNC.HoomansLLM.Identity = PNC.HoomansLLM.Identity or {}
 
+require "PNC/Integrations/HoomansLLM/PNC_HoomansLLM_Runtime"
+
 local Identity = PNC.HoomansLLM.Identity
+local Runtime = PNC.HoomansLLM.Internal.Runtime
 
 local function text(value)
-    value = tostring(value or "")
-    value = string.gsub(value, "^%s+", "")
-    value = string.gsub(value, "%s+$", "")
-    return value
+    return Runtime.Trim(value)
 end
 
 local function normalizedSavePath()

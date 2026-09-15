@@ -19,7 +19,8 @@ local function memoryPipeline()
     if PNC.HoomansLLM and PNC.HoomansLLM.Memory then
         return PNC.HoomansLLM.Memory
     end
-    local ok = pcall(require, "PNC/Integrations/PNC_HoomansLLMMemory")
+    local ok = pcall(require,
+        "PNC/Integrations/HoomansLLM/PNC_HoomansLLM_Memory")
     return ok and PNC.HoomansLLM and PNC.HoomansLLM.Memory or nil
 end
 

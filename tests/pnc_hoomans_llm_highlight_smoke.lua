@@ -55,7 +55,7 @@ package.preload["PNC/Commands/PNC_CompanionTargetResolver"] =
 T.load(
     "ProjectHoomans",
     "client",
-    "PNC/Integrations/PNC_HoomansLLMInput.lua"
+    "PNC/Integrations/HoomansLLM/PNC_HoomansLLM_InlineChat.lua"
 )
 
 local Integration = PNC.HoomansLLM
@@ -187,7 +187,7 @@ T.equal(readyState.statusText, "",
 local inlineSource = T.read(
     "ProjectHoomans",
     "client",
-    "PNC/Integrations/PNC_HoomansLLMInput.lua"
+    "PNC/Integrations/HoomansLLM/PNC_HoomansLLM_InlineChatConfig.lua"
 )
 T.contains(inlineSource, 'image = "media/ui/MP/mp_ui_emptyServer.png"',
     "inline single-target control keeps its person icon")

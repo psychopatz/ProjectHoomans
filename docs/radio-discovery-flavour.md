@@ -9,14 +9,37 @@ The discovery context supports these replacement tokens:
 - `{playerFirstName}`, `{playerLastName}`, `{playerFullName}`
 - `{npcFirstName}`, `{npcLastName}`, `{npcFullName}`
 - `{npc2FirstName}`, `{npc2LastName}`, `{npc2FullName}`
+- `{argumentPrimaryName}`, `{argumentSecondaryName}`
+- `{conflictPrimaryName}`, `{conflictSecondaryName}`
 - `{factionName}`, `{settlementName}`, `{location}`
 - `{entityID}`, `{kind}`, `{groupType}`, `{archetypeID}`, `{phase}`
 
-NPC and faction identity tokens reveal real values only when the server rolls
-a radio introduction. Otherwise they resolve to anonymous caller/group text.
+The radio text may use real NPC and faction values when the server rolls a
+radio introduction. Argument variants are the intentional flavor exception:
+they use the first names of both selected members so they can address each
+other, without creating player knowledge. Other messages resolve to anonymous
+caller/group text when there is no introduction.
 The selected NPC is always a living member of the broadcasting entity. A
-successful introduction records the same `identity_name` knowledge topic used
-by an in-person introduction, so the learned name persists in SP and MP.
+successful introduction may speak the NPC's real name as immersive flavor, but
+it does not create `identity.name` knowledge. The disclosed faction is still
+persisted as a strategic contact and as `faction.identity` knowledge. The
+in-person “What's your name?” interaction remains the authoritative route for
+learning the NPC's name.
+
+About 25% of discovery broadcasts with at least two living members use an
+argument variant. These exchanges alternate between the selected living
+primary and secondary speakers, preserve their internal voice bindings, and
+remain flavor-only. The existing introduction line is retained when its
+separate roll succeeds, so faction disclosure behavior stays unchanged.
+
+About 15% of broadcasts with an eligible second faction use a conflict
+variant. The scanned entity remains the primary speaker, while the secondary
+speaker is a living member from another radio-eligible faction. Looter versus
+neutral exchanges are preferred, followed by looter versus a player-faction
+colonist. Both speakers may address each other by first name for flavor, but
+neither name becomes `identity.name` knowledge. The conflict does not add a
+second faction discovery claim; only the scanned faction follows the existing
+radio introduction persistence rule.
 
 Add variety by appending message definitions to
 `WorldDiscoveryRadioBroadcasts/PNC_WorldDiscoveryRadioBroadcasts_MessagePacks.lua`,

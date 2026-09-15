@@ -24,7 +24,7 @@ PNC = { Network = { ClientState = {} } }
 getTimeInMillis = function() return 1000 end
 getCurrentSaveName = function() return "ambient-llm-test" end
 
-T.load("ProjectHoomans", "client", "PNC/Integrations/PNC_HoomansLLM.lua")
+T.load("ProjectHoomans", "client", "PNC/Integrations/HoomansLLM/PNC_HoomansLLM.lua")
 local Integration = PNC.HoomansLLM
 local callbackText
 local item = {

@@ -33,6 +33,10 @@ function Part:setHeight(value)
     self.height = value
 end
 
+function Part:getContentOpacity()
+    return 1
+end
+
 function Part:setVisible(value)
     self.visible = value
 end
@@ -137,8 +141,11 @@ PsychopatzCore = {
         Text = {
             Resolve = function(value, fallback)
                 return type(value) == "table" and (value.fallback or fallback)
-                    or tostring(value or fallback or "")
+                or tostring(value or fallback or "")
             end,
+        },
+        Opacity = {
+            GetSignature = function() return "test-opacity" end,
         },
     },
     UI = UI,

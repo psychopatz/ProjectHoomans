@@ -62,13 +62,14 @@ PNC = {
 -- Keep this bootstrap smoke focused on the Hoomans integration. The current
 -- 42.20 package path can otherwise load Core's real shared initializer while
 -- loading the integration, which replaces the deliberately injected mock.
-package.loaded["PNC/Integrations/PNC_HoomansLLM"] = PNC.HoomansLLM
+package.loaded["PNC/Integrations/HoomansLLM/PNC_HoomansLLM"] = PNC.HoomansLLM
 Events = { OnTick = {
     Add = function(callback) onTick = callback end,
 } }
 getTimeInMillis = function() return 0 end
 
-T.load("ProjectHoomans", "client", "PNC/Integrations/PNC_HoomansLLMBridge.lua")
+T.load("ProjectHoomans", "client",
+    "PNC/Integrations/HoomansLLM/PNC_HoomansLLM_Bridge.lua")
 T.truthy(onTick, "bridge tick hook registered")
 T.equal(bridge.registerCount, 0, "disabled bridge does not register commands")
 

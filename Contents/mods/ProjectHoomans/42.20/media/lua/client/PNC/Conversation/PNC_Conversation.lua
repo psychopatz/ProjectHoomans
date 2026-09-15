@@ -14,10 +14,9 @@ require "PNC/UI/PNC_NPCTypePalette"
 -- Register authored and LLM-resolved NPC messages with Core's optional voice
 -- gateway before any conversation can append a line.
 require "PNC/Integrations/PNC_VoiceGateway"
-require "PNC/Integrations/PNC_HoomansLLM"
-require "PNC/Integrations/PNC_ConversationMemorySync"
-require "PNC/Integrations/PNC_HoomansLLMBridge"
-require "PNC/Integrations/PNC_HoomansLLMInput"
+require "PNC/Integrations/HoomansLLM/PNC_HoomansLLM"
+require "PNC/Integrations/HoomansLLM/PNC_HoomansLLM_Bridge"
+require "PNC/Integrations/HoomansLLM/PNC_HoomansLLM_InlineChat"
 require "PNC/Conversation/PNC_SocialFlavorPresentation"
 require "PNC/Conversation/PNC_ConversationLiveAnimation"
 

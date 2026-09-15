@@ -2,8 +2,8 @@ local T = require "tests/support/test"
 
 local ROOT =
     T.path("ProjectHoomans", "client", "PNC/")
-local MODEL = ROOT .. "UI/Factions/PNC_FactionDebugModel.lua"
-local OVERLAY = ROOT .. "UI/Factions/PNC_FactionDebugOverlay.lua"
+local MODEL = ROOT .. "UI/Factions/FactionDebugModel/PNC_FactionDebugModel.lua"
+local OVERLAY = ROOT .. "UI/Factions/FactionDebugOverlay/PNC_FactionDebugOverlay.lua"
 
 ISUIElement = {}
 function ISUIElement:derive()
@@ -31,8 +31,14 @@ function ISUIElement:getIsVisible() return self.visible end
 function ISUIElement:bringToTop() end
 function ISUIElement:setX(value) self.x = value end
 function ISUIElement:setY(value) self.y = value end
-function ISUIElement:drawRect() end
-function ISUIElement:drawRectBorder() end
+function ISUIElement:drawRect(_, _, width, height)
+    assert(width ~= nil and height ~= nil,
+        "drawRect received missing dimensions")
+end
+function ISUIElement:drawRectBorder(_, _, width, height)
+    assert(width ~= nil and height ~= nil,
+        "drawRectBorder received missing dimensions")
+end
 function ISUIElement:drawText() end
 function ISUIElement:drawTextRight() end
 function ISUIElement:drawTextCentre() end
@@ -230,7 +236,7 @@ end
 getText = function(key) return key end
 
 T.load(MODEL)
-package.preload["PNC/UI/Factions/PNC_FactionDebugModel"] =
+package.preload["PNC/UI/Factions/FactionDebugModel/PNC_FactionDebugModel"] =
     function() return PNC.FactionDebugModel end
 T.load(OVERLAY)
 

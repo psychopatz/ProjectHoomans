@@ -47,7 +47,7 @@ getWorld = function()
     }
 end
 
-T.load(CLIENT .. "PNC/Integrations/PNC_HoomansLLMContext.lua")
+T.load(CLIENT .. "PNC/Integrations/HoomansLLM/PNC_HoomansLLM_Context.lua")
 
 local view = {
     spec = {
