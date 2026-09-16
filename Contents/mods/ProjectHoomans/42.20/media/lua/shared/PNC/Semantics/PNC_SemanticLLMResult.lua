@@ -23,6 +23,7 @@ function Result.DescribeContract()
             recipient = "entity",
             target = "entity",
             object = "entity",
+            inventory_query = "inventory_query",
             source = "entity",
             destination = "entity",
             modifiers = "map",

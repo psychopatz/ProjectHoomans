@@ -32,6 +32,8 @@ local engineTraits = {}
 local engineDefinitions = {}
 local gameBootCallbacks = {}
 
+getText = function(key) return "Localized " .. tostring(key) end
+
 Events = {
     OnGameBoot = {
         Add = function(callback)
@@ -83,9 +85,9 @@ CharacterTraitDefinition = {
     )
         local definition = {
             trait = trait,
-            uiName = uiName,
+            uiName = getText and getText(uiName) or uiName,
             cost = cost,
-            uiDescription = uiDescription,
+            uiDescription = getText and getText(uiDescription) or uiDescription,
             isProfession = isProfession,
             disabledInMP = disabledInMP,
             exclusions = {},
@@ -124,6 +126,10 @@ local Constants = PNC.SocialProfileConstants
 local Traits = PNC.SocialTraits
 local Math = PNC.SocialProfileMath
 local TraitIds = Constants.TRAIT_IDS
+local nativeEnglishCatalog = T.read(
+    "ProjectHoomans", "common_mod",
+    "media/lua/shared/Translate/EN/UI.json"
+)
 
 -- Registration, point values, and engine-level exclusions.
 T.truthy(Traits.Registered, "traits registered")
@@ -134,6 +140,16 @@ for _, spec in ipairs(Constants.TRAIT_DEFINITIONS) do
     local definition = engineDefinitions[trait]
     T.truthy(trait ~= nil, spec.id .. " engine trait")
     T.truthy(definition ~= nil, spec.id .. " engine definition")
+    T.equal(definition.uiName, "Localized " .. spec.uiName,
+        spec.id .. " label resolved once by engine")
+    T.equal(definition.uiDescription, "Localized " .. spec.uiDescription,
+        spec.id .. " description resolved once by engine")
+    T.truthy(string.find(
+        nativeEnglishCatalog, '"' .. spec.uiName .. '"', 1, true
+    ) ~= nil, spec.id .. " has native translated name")
+    T.truthy(string.find(
+        nativeEnglishCatalog, '"' .. spec.uiDescription .. '"', 1, true
+    ) ~= nil, spec.id .. " has native translated description")
     T.equal(definition.cost, spec.cost, spec.id .. " cost")
     T.equal(definition.isProfession, false,
         spec.id .. " normal trait")
@@ -175,6 +191,17 @@ local englishCatalog = T.read(
 )
 for _, spec in ipairs(StartingTraits.DEFINITIONS) do
     local trait = PsychopatzCore.Traits.EngineTraits[spec.id]
+    local definition = engineDefinitions[trait]
+    T.equal(definition.uiName, "Localized " .. spec.uiName,
+        spec.id .. " label resolved once by engine")
+    T.equal(definition.uiDescription, "Localized " .. spec.uiDescription,
+        spec.id .. " description resolved once by engine")
+    T.truthy(string.find(
+        nativeEnglishCatalog, '"' .. spec.uiName .. '"', 1, true
+    ) ~= nil, spec.id .. " has native translated name")
+    T.truthy(string.find(
+        nativeEnglishCatalog, '"' .. spec.uiDescription .. '"', 1, true
+    ) ~= nil, spec.id .. " has native translated description")
     T.equal(engineDefinitions[trait].cost, 2,
         spec.id .. " costs two points")
     T.equal(engineDefinitions[trait].disabledInMP, false,

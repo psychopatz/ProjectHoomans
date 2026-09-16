@@ -57,6 +57,54 @@ function Service.GetHandler(action)
     return Service.Handlers[normalized(action)]
 end
 
+local function requestNPCID(request, context)
+    context = type(context) == "table" and context or {}
+    local recipient = request and request.recipient
+    return tostring(context.npcID or context.targetID
+        or recipient and (recipient.id or recipient.entityID) or "")
+end
+
+-- Client-originated semantic tasks use the same conversation/companion
+-- authority as existing gameplay commands. Server-owned NPC-to-NPC work can
+-- omit `player` because it is already inside the authoritative simulation.
+function Service.Authorize(request, context)
+    context = type(context) == "table" and context or {}
+    if context.internal == true or not context.player then
+        return true, "server_owned"
+    end
+
+    local npcID = requestNPCID(request, context)
+    local record = PNC.Registry and PNC.Registry.Get
+        and PNC.Registry.Get(npcID) or nil
+    if not record then return false, "npc_not_found" end
+
+    local token = tostring(context.conversationToken or "")
+    if token ~= "" then
+        local authority = PNC.Conversation
+            and PNC.Conversation.Authority
+        local internal = authority and authority.Internal
+        if not internal or type(internal.ValidateLease) ~= "function" then
+            return false, "conversation_authority_unavailable"
+        end
+        local ok, reason = internal.ValidateLease(
+            context.player, record, token)
+        return ok == true, reason or (ok and "conversation_authorized"
+            or "invalid_lease")
+    end
+
+    local commands = PNC.CompanionCommands
+    if commands and type(commands.CanPlayerCommand) == "function" then
+        local ok, reason = commands.CanPlayerCommand(
+            record,
+            context.player,
+            tonumber(PNC.Const and PNC.Const.INVENTORY_INTERACTION_RADIUS)
+                or 3
+        )
+        if ok == true then return true, reason or "companion_authorized" end
+    end
+    return false, "conversation_token_required"
+end
+
 function Service.Submit(request, context)
     context = type(context) == "table" and context or {}
     if not authority() then
@@ -73,6 +121,18 @@ function Service.Submit(request, context)
             accepted = false,
             status = "rejected",
             reason = normalizeReason,
+        }
+    end
+
+    local authorized, authorizationReason = Service.Authorize(
+        normalizedRequest, context)
+    if authorized ~= true then
+        return {
+            accepted = false,
+            status = "rejected",
+            reason = authorizationReason or "task_unauthorized",
+            action = normalizedRequest.action,
+            request = normalizedRequest,
         }
     end
 

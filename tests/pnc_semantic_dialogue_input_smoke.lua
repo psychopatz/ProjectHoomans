@@ -249,6 +249,12 @@ local viewStartupState = Input.GetState({})
 T.truthy(viewStartupState.visible,
     "full-screen input remains mounted while its session is being created")
 
+session.busy = true
+local queuedTurnState = Input.GetState(view)
+T.truthy(queuedTurnState.enabled,
+    "local semantic input remains enabled while an NPC line is queued")
+session.busy = nil
+
 PNC = originalPNC
 PsychopatzCore = originalCore
 PsychopatzConversationLLMInput = originalInputClass

@@ -85,6 +85,11 @@ T.load(T.path(
     "shared",
     "PNC/Semantics/PNC_SemanticCognitionProjection.lua"
 ))
+T.load(T.path(
+    "ProjectHoomans",
+    "shared",
+    "PNC/Semantics/PNC_SemanticActionPlan.lua"
+))
 
 local originalNext = next
 next = nil
@@ -193,6 +198,21 @@ local record = {
             },
         },
     },
+    semanticActionPlan = {
+        planID = "plan:npc_kahlua",
+        npcID = "npc_kahlua",
+        source = "semantic_dialogue",
+        state = "RUNNING",
+        currentStep = 1,
+        steps = {
+            {
+                id = "step:guard",
+                action = "GUARD",
+                state = "TRAVEL",
+                assignment = { x = 4, y = 5, z = 0 },
+            },
+        },
+    },
 }
 
 local payload = PNC.Persistence.SerializeRecord(record)
@@ -219,6 +239,10 @@ T.truthy(payload.vanillaTraitsAuthored == true,
     "authored trait source was not serialized")
 T.truthy(payload.semanticCognition.facts["SEEN|npc_sarah"],
     "semantic cognition was not serialized")
+T.equal(payload.semanticActionPlan.planID, "plan:npc_kahlua",
+    "semantic action plan was not serialized")
+T.equal(payload.semanticActionPlan.steps[1].assignment.x, 4,
+    "semantic action assignment was not serialized")
 T.equal(payload.campState, nil,
     "camp resource cache was serialized into the NPC record")
 
@@ -248,6 +272,10 @@ T.truthy(restored.vanillaTraitsAuthored == true,
     "authored trait source did not round trip")
 T.truthy(restored.semanticCognition.facts["SEEN|npc_sarah"],
     "semantic cognition did not round trip")
+T.equal(restored.semanticActionPlan.planID, "plan:npc_kahlua",
+    "semantic action plan did not round trip")
+T.equal(restored.semanticActionPlan.npcID, restored.id,
+    "semantic action plan NPC identity changed during restore")
 T.equal(restored.orderSpec, nil,
     "stale facility order was not repaired during deserialization")
 T.equal(restored.persistenceRepairVersions.facility_activity_runtime, 2,

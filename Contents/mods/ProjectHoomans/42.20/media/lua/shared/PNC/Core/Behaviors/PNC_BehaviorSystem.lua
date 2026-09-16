@@ -6,6 +6,7 @@
 ]]
 
 require "PNC/Core/Behaviors/PNC_Behavior_MoveIntent"
+require "PNC/Core/Behaviors/PNC_Behavior_ActionPlanOwnership"
 require "PNC/Core/Behaviors/PNC_Behavior_Common"
 require "PNC/Core/Behaviors/PNC_Behavior_Targeting"
 require "PNC/Core/Combat/PNC_Combat_Engagement"
@@ -42,6 +43,7 @@ local ThreatGuard = PNC.BehaviorThreatGuard
 local AnimationScenes = PNC.AnimationScenes
 local LiveBodyControl = PNC.LiveBodyControl
 local ScalingDiagnostics = PNC.PerformanceScalingDiagnostics
+local ActionPlanOwnership = PNC.BehaviorActionPlanOwnership
 
 local function clearStaleFacilityState(record, zombie)
     local runtime = record and record.runtime or nil
@@ -268,6 +270,21 @@ function Behavior.Tick(record, zombie, now)
     end
 
     if Treatment and Treatment.Tick and Treatment.Tick(record, zombie, now) then
+        return
+    end
+
+    -- Semantic action plans are an exclusive, resumable execution lease for
+    -- ordinary behavior. Safety/combat gates above retain priority; once they
+    -- yield, the plan provider owns the actor until its current step changes.
+    -- This prevents the normal job selector from overwriting a provider's
+    -- movement intent between the Tasking pump and PathService.Pump.
+    local planOwner = ActionPlanOwnership
+        and ActionPlanOwnership.Get
+        and ActionPlanOwnership.Get(record) or nil
+    if planOwner then
+        record.activeJob = "SemanticActionPlan"
+        record.activeBehavior = "SemanticActionPlan:"
+            .. tostring(planOwner.action or "unknown")
         return
     end
 

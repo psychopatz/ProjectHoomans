@@ -80,6 +80,103 @@ local function dispatchSemanticCognition(player, args)
     return accepted == true, reason or "dispatched"
 end
 
+-- Semantic task requests are contracts only.  In multiplayer they cross the
+-- normal client-command boundary; in singleplayer the same server service is
+-- called directly so local-first dialogue does not depend on an LLM bridge.
+function Client.RequestSemanticTask(request, context)
+    context = type(context) == "table" and context or {}
+    if type(request) ~= "table" then
+        return false, "semantic_task_request_missing"
+    end
+    local player = getSpecificPlayer and getSpecificPlayer(0) or nil
+    local payload = {}
+    for key, value in pairs(request) do payload[key] = value end
+    payload.npcID = payload.npcID or context.npcID or context.targetID
+    payload.scope = payload.scope or context.scope or "single"
+    payload.conversationID = payload.conversationID
+        or context.conversationID
+    payload.conversationToken = payload.conversationToken
+        or context.conversationToken or context.token
+    if Core.IsClientOnly and Core.IsClientOnly() then
+        if not player or not sendClientCommand then
+            return false, "player_unavailable"
+        end
+        sendClientCommand(
+            player,
+            Const.MODULE,
+            Const.CMD_SEMANTIC_TASK_REQUEST,
+            payload
+        )
+        return true, "sent"
+    end
+    local service = PNC.Semantics and PNC.Semantics.TaskRequestService
+    if not service or type(service.Submit) ~= "function" then
+        return false, "semantic_task_service_unavailable"
+    end
+    local result = service.Submit(payload, {
+        player = player,
+        npcID = payload.npcID,
+        scope = payload.scope,
+        conversationToken = payload.conversationToken,
+    })
+    if type(result) ~= "table" then
+        return result == true, result == true and "accepted" or "rejected"
+    end
+    return result.accepted == true, result.reason or result.status, result
+end
+
+-- Read-only semantic inventory queries use their own transport and response
+-- contract.  They must never enter the semantic task/action-plan path.
+function Client.RequestSemanticInventoryQuery(request, context)
+    context = type(context) == "table" and context or {}
+    if type(request) ~= "table" then
+        return false, "semantic_inventory_query_missing"
+    end
+    local player = getSpecificPlayer and getSpecificPlayer(0) or nil
+    local payload = {}
+    for key, value in pairs(request) do payload[key] = value end
+    payload.requestID = payload.requestID
+        or requestID("semantic_inventory_query")
+    payload.npcID = payload.npcID or context.npcID or context.targetID
+    payload.conversationID = payload.conversationID
+        or context.conversationID
+    payload.conversationToken = payload.conversationToken
+        or context.conversationToken or context.token
+    if Core.IsClientOnly and Core.IsClientOnly() then
+        if not player or not sendClientCommand then
+            return false, "player_unavailable"
+        end
+        sendClientCommand(
+            player,
+            Const.MODULE,
+            Const.CMD_SEMANTIC_INVENTORY_QUERY_REQUEST,
+            payload
+        )
+        return true, "pending", {
+            accepted = true,
+            status = "pending",
+            requestID = payload.requestID,
+            npcID = payload.npcID,
+        }
+    end
+
+    local service = PNC.Semantics
+        and PNC.Semantics.InventoryQueryService
+    if not service or type(service.HandleRequest) ~= "function" then
+        return false, "semantic_inventory_query_service_unavailable"
+    end
+    local result = service.HandleRequest(payload, {
+        player = player,
+        npcID = payload.npcID,
+        conversationID = payload.conversationID,
+        conversationToken = payload.conversationToken,
+    })
+    if type(result) ~= "table" then
+        return false, "semantic_inventory_query_failed"
+    end
+    return result.accepted == true, result.reason or result.status, result
+end
+
 function Client.RequestPlayerBootstrap()
     local player = getSpecificPlayer and getSpecificPlayer(0) or nil
     local args = {

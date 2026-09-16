@@ -18,15 +18,19 @@ local function registerConcept(id, aliases, priority)
     })
 end
 
-local function registerPattern(id, match, emit, confidence, priority)
-    return Registry.RegisterPattern({
+local function registerPattern(id, match, emit, confidence, priority, options)
+    local definition = {
         id = id,
         match = match,
         emit = emit,
         confidence = confidence,
         priority = priority or 0,
         owner = Catalog.OWNER,
-    })
+    }
+    for key, value in pairs(type(options) == "table" and options or {}) do
+        definition[key] = value
+    end
+    return Registry.RegisterPattern(definition)
 end
 
 local function registerSpeechAct(id)
@@ -64,11 +68,16 @@ function Catalog.Register()
     )
     registerConcept("STOP", { "stop", "halt" })
     registerConcept("WAIT", {
-        "wait", "wait here", "stay here", "stay right here",
+        "wait", "stay", "wait here", "stay here", "stay right here",
+    })
+    registerConcept("CAMPFIRE", {
+        "campfire", "fire pit", "firepit",
     })
     registerConcept("GO", { "go", "head", "travel" })
     registerConcept("HOME", { "home" })
     registerConcept("FETCH", { "bring", "get", "fetch", "grab" })
+    registerConcept("GIVE", { "give", "hand", "pass" })
+    registerConcept("HAVE", { "have", "got", "carry", "carrying" })
     registerConcept("HEAR", { "hear", "heard" })
     registerConcept("BITTEN", { "bitten", "got bitten", "was bitten" })
     registerConcept("WATER", {
@@ -77,6 +86,9 @@ function Catalog.Register()
     registerConcept("FOOD", {
         "food", "something to eat", "meal", "rations",
     })
+    registerConcept("SEAFOOD", {
+        "seafood", "sea foods", "seafoods", "fish", "shellfish",
+    }, 4)
     registerConcept("MEDICINE", {
         "medicine", "meds", "medical supplies",
     })
@@ -132,6 +144,104 @@ function Catalog.Register()
         100
     )
     registerPattern(
+        "pnc.command.wait_at",
+        {
+            { kind = "concept", id = "WAIT" },
+            { kind = "literal", value = "at" },
+            { kind = "literal", value = "the", optional = true },
+            {
+                kind = "any_phrase",
+                capture = "target",
+                minTokens = 1,
+                maxTokens = 4,
+                stopWords = { "please", "now" },
+            },
+        },
+        {
+            intent = "REQUEST",
+            speechAct = "REQUEST",
+            action = "WAIT_AT",
+            target = "$capture.target",
+        },
+        0.94,
+        130
+    )
+    registerPattern(
+        "pnc.question.inventory_have",
+        {
+            { kind = "literal", value = "do" },
+            { kind = "literal", value = "you" },
+            { kind = "literal", value = "still", optional = true },
+            { kind = "concept", id = "HAVE" },
+            { kind = "literal", value = "any", optional = true },
+            { kind = "literal", value = "kind", optional = true },
+            { kind = "literal", value = "of", optional = true },
+            { kind = "literal", value = "a", optional = true },
+            { kind = "literal", value = "an", optional = true },
+            { kind = "literal", value = "some", optional = true },
+            {
+                kind = "any_phrase",
+                capture = "itemQuery",
+                minTokens = 1,
+                maxTokens = 4,
+                stopWords = { "yet", "please", "now" },
+            },
+            { kind = "literal", value = "yet", optional = true },
+            { kind = "literal", value = "please", optional = true },
+        },
+        {
+            intent = "QUESTION",
+            speechAct = "QUESTION",
+            subject = "INVENTORY",
+            inventoryQuery = {
+                mode = "LIST",
+                item = "$capture.itemQuery",
+                text = "$capture.itemQuery.text",
+                concept = "$capture.itemQuery.concept",
+                category = "$capture.itemQuery.category",
+            },
+        },
+        0.92,
+        115,
+        { allowFuzzyCapture = true }
+    )
+    registerPattern(
+        "pnc.question.inventory_what_have",
+        {
+            { kind = "literal", value = "what" },
+            { kind = "literal", value = "kind", optional = true },
+            { kind = "literal", value = "of", optional = true },
+            {
+                kind = "any_phrase",
+                capture = "itemQuery",
+                minTokens = 1,
+                maxTokens = 4,
+                stopWords = {
+                    "do", "you", "still", "have", "please", "now",
+                },
+            },
+            { kind = "literal", value = "do" },
+            { kind = "literal", value = "you" },
+            { kind = "literal", value = "still", optional = true },
+            { kind = "concept", id = "HAVE" },
+        },
+        {
+            intent = "QUESTION",
+            speechAct = "QUESTION",
+            subject = "INVENTORY",
+            inventoryQuery = {
+                mode = "LIST",
+                item = "$capture.itemQuery",
+                text = "$capture.itemQuery.text",
+                concept = "$capture.itemQuery.concept",
+                category = "$capture.itemQuery.category",
+            },
+        },
+        0.92,
+        116,
+        { allowFuzzyCapture = true }
+    )
+    registerPattern(
         "pnc.command.go_home",
         {
             { kind = "concept", id = "GO" },
@@ -157,11 +267,17 @@ function Catalog.Register()
         "pnc.request.fetch",
         {
             { kind = "literal", value = "can", optional = true },
+            { kind = "literal", value = "could", optional = true },
+            { kind = "literal", value = "would", optional = true },
             { kind = "literal", value = "you", optional = true },
+            { kind = "literal", value = "please", optional = true },
             { kind = "concept", id = "FETCH" },
             { kind = "literal", value = "me", optional = true },
+            { kind = "literal", value = "a", optional = true },
+            { kind = "literal", value = "an", optional = true },
             { kind = "literal", value = "some", optional = true },
-            { kind = "any_concept", capture = "object" },
+            { kind = "literal", value = "the", optional = true },
+            { kind = "any", capture = "object" },
         },
         {
             intent = "REQUEST",
@@ -178,7 +294,43 @@ function Catalog.Register()
             },
         },
         0.94,
-        100
+        100,
+        { allowFuzzyCapture = true }
+    )
+    registerPattern(
+        "pnc.request.give",
+        {
+            { kind = "literal", value = "please", optional = true },
+            { kind = "literal", value = "can", optional = true },
+            { kind = "literal", value = "could", optional = true },
+            { kind = "literal", value = "would", optional = true },
+            { kind = "literal", value = "you", optional = true },
+            { kind = "literal", value = "please", optional = true },
+            { kind = "concept", id = "GIVE" },
+            { kind = "literal", value = "me", optional = true },
+            { kind = "literal", value = "a", optional = true },
+            { kind = "literal", value = "an", optional = true },
+            { kind = "literal", value = "some", optional = true },
+            { kind = "literal", value = "the", optional = true },
+            { kind = "any", capture = "object" },
+        },
+        {
+            intent = "REQUEST",
+            speechAct = "REQUEST",
+            action = "GIVE",
+            object = {
+                category = "$capture.object.category",
+                concept = "$capture.object.concept",
+                text = "$capture.object.text",
+                value = "$capture.object.value",
+                unresolved = "$capture.object.unresolved",
+                reference = "$capture.object.reference",
+                quantity = "SOME",
+            },
+        },
+        0.94,
+        110,
+        { allowFuzzyCapture = true }
     )
     registerPattern(
         "pnc.request.fetch_to",

@@ -161,6 +161,8 @@ local function onResetLua()
     ClientState.factionDebugReason = nil
     ClientState.inventoryResult = nil
     ClientState.inventoryRequestSerial = 0
+    ClientState.semanticInventoryQueryResults = {}
+    ClientState.semanticInventoryQueryResultOrder = {}
     ClientState.needsDebug = nil
     ClientState.needsDebugAuthorized = false
     ClientState.needsDebugReason = nil

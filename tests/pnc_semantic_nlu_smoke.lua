@@ -61,6 +61,20 @@ local medicine = Parser.Parse("Bring me meds")
 T.equal(medicine.object.category, "MEDICINE",
     "new concepts are vocabulary registrations")
 
+local inventoryWhat = Parser.Parse("What kind of seafood do you have?")
+T.equal(inventoryWhat.subject, "INVENTORY",
+    "what-kind inventory questions are semantic questions")
+T.equal(inventoryWhat.inventoryQuery.concept, "SEAFOOD",
+    "what-kind inventory questions preserve the concept")
+
+local unknownItem = Parser.Parse("Bring me an apple")
+T.equal(unknownItem.action, "FETCH",
+    "fetch accepts an item name outside the core vocabulary")
+T.equal(unknownItem.object.text, "apple",
+    "unknown item text remains available to the item selector")
+T.equal(unknownItem.object.unresolved, true,
+    "unknown fetch objects remain explicitly unresolved")
+
 local negated = Parser.Parse("Don't go")
 T.equal(negated.action, "GO", "negated command action")
 T.equal(negated.modifiers.negated, true, "negation is semantic metadata")

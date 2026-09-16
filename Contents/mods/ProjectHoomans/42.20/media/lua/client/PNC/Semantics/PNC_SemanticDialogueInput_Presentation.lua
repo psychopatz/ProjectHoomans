@@ -57,6 +57,15 @@ function Internal.QueueDeterministicResponse(view, value, result, actionResult)
     local decision = result.decision or {}
     local response = responsePayload(decision)
     local ir = result.ir or {}
+    if decision.branch == "INVENTORY_QUERY_RECEIVED"
+        and actionResult and actionResult.result
+        and actionResult.result.status ~= "pending"
+    then
+        -- Singleplayer delivers the authoritative projection synchronously;
+        -- the result spoke already queued the concrete answer. Multiplayer
+        -- does the same when its server command arrives.
+        return true
+    end
     local topic = ir.extensions and ir.extensions.topic or nil
     topic = type(topic) == "table" and (topic.id or topic.key) or topic
     session.pendingChoices = pendingChoices

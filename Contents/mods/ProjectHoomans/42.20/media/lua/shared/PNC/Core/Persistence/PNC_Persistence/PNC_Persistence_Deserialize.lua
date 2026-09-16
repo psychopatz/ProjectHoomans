@@ -101,6 +101,7 @@ function Persistence.DeserializeRecord(raw, fallbackID)
     local progression
     local inventoryData
     local bodyHint
+    local actionPlan
     local reason = Reset.Check(raw, Const.PERSISTENCE_VERSION, nil,
         function(value)
             return type(value.id) == "string" and value.id ~= ""
@@ -128,6 +129,18 @@ function Persistence.DeserializeRecord(raw, fallbackID)
         return nil
     end
     record.id = tostring(raw.id or record.id)
+    record.semanticActionPlan = nil
+    local actionPlanContract = PNC.Semantics
+        and PNC.Semantics.ActionPlan or nil
+    if actionPlanContract
+        and type(actionPlanContract.Normalize) == "function"
+        and type(raw.semanticActionPlan) == "table"
+    then
+        actionPlan = actionPlanContract.Normalize(raw.semanticActionPlan)
+        if actionPlan and tostring(actionPlan.npcID) == record.id then
+            record.semanticActionPlan = actionPlan
+        end
+    end
     record.recordRevision = math.max(0, math.floor(Internal.normalizeNumber(raw.recordRevision, 0)))
     record.persistenceRepairVersions = Persistence.Repairs
         and Persistence.Repairs.NormalizeVersions(raw.repairVersions)

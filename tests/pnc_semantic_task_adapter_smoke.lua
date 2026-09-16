@@ -44,6 +44,34 @@ T.equal(submitted.request.actor.id, "player:one",
 T.equal(submitted.request.recipient.id, "npc:alice",
     "task contract preserves the addressed recipient")
 
+local giveSubmitted
+PNC.Client = {
+    RequestSemanticTask = function(request, context)
+        giveSubmitted = { request = request, context = context }
+        return true, "sent"
+    end,
+}
+local giveAccepted = Adapter.Dispatch({
+    intent = "REQUEST",
+    speechAct = "REQUEST",
+    action = "GIVE",
+    object = { text = "apple", unresolved = true, quantity = "SOME" },
+    confidence = 0.89,
+}, {
+    requestID = "dialogue:give:1",
+    npcID = "npc:alice",
+    conversationToken = "lease:1",
+    rawText = "Can you give me an apple?",
+})
+T.equal(giveAccepted.status, "accepted",
+    "give item uses the shared task transport")
+T.equal(giveSubmitted.request.action, "GIVE",
+    "give item preserves its semantic action")
+T.equal(giveSubmitted.request.object.text, "apple",
+    "give item preserves unresolved MarketSense text")
+T.equal(giveSubmitted.context.conversationToken, "lease:1",
+    "give item carries the conversation authority token")
+
 local negated = Adapter.Dispatch({
     action = "FETCH",
     modifiers = { negated = true },

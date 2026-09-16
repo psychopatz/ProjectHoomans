@@ -302,8 +302,26 @@ function Internal.RequestCognitionForIR(view, ir)
 end
 
 function Internal.Interactive(view)
-    return view and view.session
-        and type(view.isConversationInteractive) == "function"
+    local session = view and view.session
+    if not view or not session then return false end
+    if view.closed == true or view.closing == true
+        or view.editMode == true
+    then
+        return false
+    end
+
+    -- The semantic input is a live conversation channel, not a choice
+    -- button.  A queued NPC line makes Session.busy true while it is being
+    -- typed/released, but it must not prevent the player from sending the
+    -- next turn.  Keep the legacy host callback as a fallback for custom
+    -- conversation hosts that do not expose the view animation state.
+    if view.headless == true then
+        return view.lifecycleFinished ~= true
+    end
+    if view.animationInteractive ~= nil then
+        return view.animationInteractive == true
+    end
+    return type(view.isConversationInteractive) == "function"
         and view:isConversationInteractive() == true
 end
 

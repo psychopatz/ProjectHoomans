@@ -49,6 +49,62 @@ T.equal(handled.request.action, "FETCH", "server normalizes action identity")
 T.equal(handled.context.npcID, "npc:alice",
     "server keeps domain context separate from the contract")
 
+local authorityRecord = { id = "npc:alice", alive = true }
+local authorityPlayer = {}
+PNC.Registry = {
+    Get = function(id)
+        return tostring(id or "") == authorityRecord.id
+            and authorityRecord or nil
+    end,
+}
+PNC.Conversation = {
+    Authority = {
+        Internal = {
+            ValidateLease = function(player, record, token)
+                return player == authorityPlayer
+                    and record == authorityRecord
+                    and token == "lease:ok",
+                    token == "lease:ok" and nil or "invalid_lease"
+            end,
+        },
+    },
+}
+Service.RegisterHandler("AUTH", {
+    Submit = function() return true, "authorized" end,
+})
+local unauthorized = Service.Submit({
+    kind = "semantic_task_request",
+    schemaVersion = 1,
+    intent = "REQUEST",
+    action = "AUTH",
+    rawText = "Wait",
+    normalizedText = "wait",
+    confidence = 0.90,
+}, {
+    player = authorityPlayer,
+    npcID = authorityRecord.id,
+    conversationToken = "lease:bad",
+})
+T.equal(unauthorized.status, "rejected",
+    "client-originated tasks require authority")
+T.equal(unauthorized.reason, "invalid_lease",
+    "invalid conversation leases fail closed")
+local authorized = Service.Submit({
+    kind = "semantic_task_request",
+    schemaVersion = 1,
+    intent = "REQUEST",
+    action = "AUTH",
+    rawText = "Wait",
+    normalizedText = "wait",
+    confidence = 0.90,
+}, {
+    player = authorityPlayer,
+    npcID = authorityRecord.id,
+    conversationToken = "lease:ok",
+})
+T.equal(authorized.status, "accepted",
+    "a valid conversation lease reaches the domain handler")
+
 local missing = Service.Submit({
     kind = "semantic_task_request",
     schemaVersion = 1,

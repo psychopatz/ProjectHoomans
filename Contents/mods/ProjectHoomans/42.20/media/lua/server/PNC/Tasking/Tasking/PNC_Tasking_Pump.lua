@@ -240,6 +240,13 @@ function Tasking.Commands.Pump(at, budget)
     if executorTimerName then
         ScalingDiagnostics.EndTiming(executorTimerName, executorTimerStart)
     end
+    local actionPlans = PNC.Semantics
+        and PNC.Semantics.ActionPlanService or nil
+    if actionPlans and type(actionPlans.Pump) == "function" then
+        H.SafeCall("semantic_action_plan_pump", actionPlans.Pump, {
+            domain = "semantic_action_plan",
+        }, at)
+    end
     if ScalingDiagnostics then
         ScalingDiagnostics.Increment("Tasking.ReevaluationsProcessed", processed)
         ScalingDiagnostics.Increment("Tasking.ExecutorSteps", executorSteps)

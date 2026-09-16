@@ -66,7 +66,7 @@ for _, system in ipairs(systems) do
     T.equal(reverse, count, "catalog entry count parity " .. system)
 end
 
-for _, domain in ipairs({ "Sandbox", "ItemName" }) do
+for _, domain in ipairs({ "Sandbox", "ItemName", "UI" }) do
     local english = Loader.Decode(T.read(
         "ProjectHoomans", "common_mod",
         "media/lua/shared/Translate/EN/" .. domain .. ".json"))

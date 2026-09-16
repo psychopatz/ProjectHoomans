@@ -135,6 +135,21 @@ local function serializeOrderSpec(record)
     return Internal.sanitizeOrderSpec(order, record)
 end
 
+local function serializeSemanticActionPlan(record)
+    local contract = PNC.Semantics and PNC.Semantics.ActionPlan
+    local plan
+    if not contract or type(contract.Normalize) ~= "function"
+        or type(record and record.semanticActionPlan) ~= "table"
+    then
+        return nil
+    end
+    plan = contract.Normalize(record.semanticActionPlan)
+    if not plan or tostring(plan.npcID) ~= tostring(record.id) then
+        return nil
+    end
+    return plan
+end
+
 function Persistence.SerializeRecord(record)
     local identity
     local progression
@@ -227,6 +242,7 @@ function Persistence.SerializeRecord(record)
                 record.semanticCognition,
                 record.id
             ) or nil,
+        semanticActionPlan = serializeSemanticActionPlan(record),
         followerAbandonment = Internal.sanitizeFollowerAbandonment(
             record.followerAbandonment
         ),

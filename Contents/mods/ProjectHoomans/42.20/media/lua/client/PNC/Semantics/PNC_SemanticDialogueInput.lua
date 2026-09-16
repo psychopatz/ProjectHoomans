@@ -10,6 +10,7 @@ require "PNC/Semantics/PNC_SemanticDialoguePolicy"
 require "PNC/Semantics/PNC_SemanticDialogueResponseCatalog"
 require "PNC/Semantics/PNC_SemanticCommandAdapter"
 require "PNC/Semantics/PNC_SemanticTaskAdapter"
+require "PNC/Semantics/PNC_SemanticInventoryQueryAdapter"
 
 PNC = PNC or {}
 PNC.Conversation = PNC.Conversation or {}
@@ -36,7 +37,7 @@ if ResponseCatalog and type(ResponseCatalog.RegisterTextFallbacks) == "function"
     ResponseCatalog.RegisterTextFallbacks()
 end
 
-Input.VERSION = 1
+Input.VERSION = 2
 Input.MAX_INPUT_LENGTH = 4000
 Input.Internal = Input.Internal or {}
 
@@ -64,6 +65,8 @@ local function traceTurn(view, value, result, event, extra)
         speechAct = ir.speechAct,
         action = ir.action,
         subject = ir.subject,
+        target = ir.target,
+        inventoryQuery = ir.inventoryQuery,
         provider = provenance.provider,
         parser = provenance.parser,
         pattern = provenance.pattern,
@@ -82,6 +85,7 @@ end
 require "PNC/Semantics/PNC_SemanticDialogueInput_Context"
 require "PNC/Semantics/PNC_SemanticDialogueInput_Presentation"
 require "PNC/Semantics/PNC_SemanticDialogueInput_Actions"
+require "PNC/Semantics/PNC_SemanticDialogueInput_Inventory"
 
 local Internal = Input.Internal
 
@@ -89,6 +93,12 @@ function Input.Submit(view, value, part)
     if not view or not view.session then
         return false, "conversation_unavailable"
     end
+    -- Keep the submitting host available to asynchronous local projections.
+    -- Full-screen conversations are discoverable through Core's singleton,
+    -- while compact/headless conversations are deliberately not global.  The
+    -- reference is runtime-only and is never serialized or sent over the
+    -- network.
+    Input.ActiveView = view
     if not Internal.Interactive(view) then return false, "conversation_busy" end
     value = tostring(value or "")
     value = string.gsub(value, "^%s+", "")

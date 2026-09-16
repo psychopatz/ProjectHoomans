@@ -45,6 +45,12 @@ Const.CMD_NPC_KNOWLEDGE_REQUEST = "RequestNPCKnowledge"
 Const.CMD_NPC_KNOWLEDGE = "NPCKnowledge"
 Const.CMD_SEMANTIC_COGNITION_REQUEST = "RequestSemanticCognition"
 Const.CMD_SEMANTIC_COGNITION = "SemanticCognition"
+Const.CMD_SEMANTIC_TASK_REQUEST = "SemanticTaskRequest"
+Const.CMD_SEMANTIC_TASK_RESULT = "SemanticTaskResult"
+Const.CMD_SEMANTIC_INVENTORY_QUERY_REQUEST =
+    "SemanticInventoryQueryRequest"
+Const.CMD_SEMANTIC_INVENTORY_QUERY_RESULT =
+    "SemanticInventoryQueryResult"
 Const.CMD_PLAYER_BOOTSTRAP_REQUEST = "PlayerBootstrapRequest"
 Const.CMD_PLAYER_BOOTSTRAP = "PlayerBootstrap"
 Const.CMD_NPC_PRESENTATION_REQUEST = "NPCPresentationRequest"

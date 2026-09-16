@@ -22,7 +22,9 @@ local COMMAND_ACTIONS = {
     GO = true,
     HELP = true,
     FETCH = true,
+    GIVE = true,
     TAKE = true,
+    WAIT_AT = true,
 }
 
 -- Fuzzy recognition is useful for low-risk conversational movement commands,
@@ -31,6 +33,14 @@ local FUZZY_SAFE_ACTIONS = {
     FOLLOW = true,
     STOP = true,
     STAY = true,
+}
+
+-- A literal item name is intentionally allowed to remain unresolved here.
+-- The authoritative item selector must still classify it and find an actual
+-- inventory entry before any gameplay effect can occur.
+local ITEM_REQUEST_ACTIONS = {
+    FETCH = true,
+    GIVE = true,
 }
 
 local RESPONSE_TEMPLATES = {
@@ -45,6 +55,10 @@ local RESPONSE_TEMPLATES = {
     QUESTION_RECEIVED = {
         templateID = "semantic.question.received",
         fallback = "Let me think about that.",
+    },
+    INVENTORY_QUERY_RECEIVED = {
+        templateID = "semantic.inventory.query.pending",
+        fallback = "Let me check what I have.",
     },
     SOCIAL_ACKNOWLEDGED = {
         templateID = "semantic.social.acknowledged",
@@ -157,6 +171,36 @@ local function fuzzyActionNeedsConfirmation(ir, options)
     return not FUZZY_SAFE_ACTIONS[ir.action]
 end
 
+local function unresolvedItemRequest(ir)
+    local object = ir and ir.object
+    if ir and ir.intent ~= "REQUEST"
+        or not ITEM_REQUEST_ACTIONS[ir and ir.action]
+        or type(object) ~= "table"
+        or object.reference ~= nil
+    then
+        return false
+    end
+    if object.unresolved ~= true then return false end
+    return tostring(object.text or object.value or "") ~= ""
+end
+
+local function isInventoryQuery(ir)
+    return type(ir) == "table"
+        and ir.intent == "QUESTION"
+        and ir.subject == "INVENTORY"
+        and type(ir.inventoryQuery) == "table"
+end
+
+local function unresolvedWorldTargetRequest(ir)
+    local target = ir and ir.target
+    return type(ir) == "table"
+        and ir.intent == "REQUEST"
+        and ir.action == "WAIT_AT"
+        and type(target) == "table"
+        and target.unresolved == true
+        and tostring(target.text or target.value or "") ~= ""
+end
+
 local function responseFor(branch, ir)
     local definition = Policy.ResponseTemplates[branch]
         or Policy.ResponseTemplates.UNKNOWN
@@ -218,6 +262,7 @@ local function decision(ir, route, branch, reason, options)
         speechAct = ir and ir.speechAct,
         action = ir and ir.action,
         actionIntent = actionIntent(ir),
+        inventoryQuery = copyValue(ir and ir.inventoryQuery),
         response = responseFor(branch, ir),
         diagnostics = {
             reason = reason,
@@ -272,7 +317,12 @@ function Policy.Decide(ir, state, context, options)
     -- A resolvable reference is required before a semantic action can be
     -- handed to a downstream command adapter. The policy itself never
     -- resolves world entities; it chooses clarification or fallback.
-    if diagnostics.unresolvedEntity == true or confidence < limits.high then
+    if (diagnostics.unresolvedEntity == true
+            and not unresolvedItemRequest(ir)
+            and not isInventoryQuery(ir)
+            and not unresolvedWorldTargetRequest(ir))
+        or confidence < limits.high
+    then
         local result = decision(
             ir,
             "deterministic",
@@ -313,8 +363,13 @@ function Policy.Decide(ir, state, context, options)
             reason = "request_without_action"
         end
     elseif ir.intent == "QUESTION" then
-        branch = "QUESTION_RECEIVED"
-        reason = "recognized_question"
+        if isInventoryQuery(ir) then
+            branch = "INVENTORY_QUERY_RECEIVED"
+            reason = "recognized_inventory_query"
+        else
+            branch = "QUESTION_RECEIVED"
+            reason = "recognized_question"
+        end
     elseif ir.intent == "GOSSIP" then
         branch = "GOSSIP_RECEIVED"
         reason = "recognized_gossip"

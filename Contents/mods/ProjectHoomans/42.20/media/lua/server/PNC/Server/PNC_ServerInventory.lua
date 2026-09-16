@@ -17,6 +17,7 @@ require "PNC/Server/ServerInventory/PNC_ServerInventory_PlayerToNPC"
 require "PNC/Server/ServerInventory/PNC_ServerInventory_NPCToPlayer"
 require "PNC/Server/ServerInventory/PNC_ServerInventory_GiftEffects"
 require "PNC/Server/ServerInventory/PNC_ServerInventory_Transfer"
+require "PNC/Server/ServerInventory/PNC_ServerInventory_Semantic"
 require "PNC/Server/ServerInventory/PNC_ServerInventory_Actions"
 require "PNC/Server/ServerInventory/PNC_ServerInventory_Replication"
 

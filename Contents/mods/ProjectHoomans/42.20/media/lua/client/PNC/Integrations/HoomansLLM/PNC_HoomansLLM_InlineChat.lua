@@ -42,6 +42,17 @@ local function label(key, fallback)
 end
 
 local function stateFor(view)
+    -- The compact/headless widget and the full-screen widget must share the
+    -- same interaction gate.  The legacy inline gate treats Session.busy as
+    -- a complete input lock, which is appropriate for a single outstanding
+    -- LLM request but not for the local semantic channel: deterministic
+    -- turns are already queued and the player should be able to continue
+    -- talking while those NPC lines are being delivered.
+    local input = semanticInput()
+    if input and type(input.GetState) == "function" then
+        return input.GetState(view)
+    end
+
     local status = ""
     local enabled = false
     local visible = true

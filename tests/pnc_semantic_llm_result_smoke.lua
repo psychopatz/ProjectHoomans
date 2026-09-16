@@ -34,6 +34,26 @@ T.equal(ir.provenance.parser, "llm_semantic",
 T.equal(ir.target.unresolved, true,
     "LLM entity uncertainty remains in the IR")
 
+local inventoryIR, inventoryReason = Result.Normalize({
+    semantic_ir = {
+        intent = "QUESTION",
+        speech_act = "QUESTION",
+        subject = "INVENTORY",
+        inventory_query = {
+            mode = "LIST",
+            concept = "SEAFOOD",
+            text = "seafood",
+        },
+        confidence = 0.91,
+    },
+}, {
+    rawText = "Do you have seafood?",
+})
+T.truthy(inventoryIR, "LLM inventory IR uses the common contract")
+T.equal(inventoryReason, nil, "valid LLM inventory IR has no reason")
+T.equal(inventoryIR.inventoryQuery.concept, "SEAFOOD",
+    "provider normalization preserves inventory query semantics")
+
 local malformed, malformedReason = Result.Normalize({
     semantic_ir = { intent = 7, confidence = 0.72 },
 })
