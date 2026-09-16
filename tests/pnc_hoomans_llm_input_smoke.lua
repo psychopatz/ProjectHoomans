@@ -15,6 +15,12 @@ local Part = {
 }
 Part.__index = Part
 
+ISPanel = {
+    update = function(self)
+        self.baseUpdateCount = (self.baseUpdateCount or 0) + 1
+    end,
+}
+
 function Part:new(x, y, width, height, options)
     local object = {
         x = x,
@@ -34,6 +40,9 @@ function Part:setHeight(value)
 end
 
 function Part:getContentOpacity()
+    return 1
+end
+function Part:getBackgroundOpacity()
     return 1
 end
 
@@ -203,6 +212,22 @@ T.truthy(input.inputHeight > 26, "newline expands the input height")
 input:focusInput()
 T.truthy(input:blurInput(), "input exposes a reusable blur operation")
 T.truthy(entry.unfocused, "blur operation releases the native text entry")
+
+local interactive = false
+local dynamicInput = PsychopatzConversationLLMInput:new(0, 0, 280, 82, {
+    getState = function()
+        return { visible = true, enabled = interactive }
+    end,
+})
+dynamicInput:createChildren()
+T.falsy(dynamicInput.sendButton.enabled,
+    "input starts disabled before the conversation session is ready")
+interactive = true
+dynamicInput:update()
+T.truthy(dynamicInput.sendButton.enabled,
+    "full-screen input enables itself when the session becomes interactive")
+T.equal(dynamicInput.baseUpdateCount, 1,
+    "input update keeps the native child update lifecycle")
 
 local modeInput = PsychopatzConversationLLMInput:new(0, 0, 320, 108, {
     modeButtons = {

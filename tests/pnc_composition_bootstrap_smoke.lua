@@ -219,6 +219,24 @@ T.equal(pumpRegistrations, 2,
     "client Conversation pump registration timing")
 T.equal(PNC.Conversation.Composer.LocalPumpRegistered, true,
     "client Conversation pump registration guard")
+
+PNC = {}
+local conversationRuntimeCalls = capture(
+    ROOT .. "client/PNC/Conversation/PNC_Conversation.lua"
+)
+local semanticInputIndex = indexOf(
+    conversationRuntimeCalls,
+    "PNC/Semantics/PNC_SemanticDialogueInput"
+)
+T.truthy(semanticInputIndex,
+    "conversation runtime loads the semantic input boundary")
+local inlineChatIndex = indexOf(
+    conversationRuntimeCalls,
+    "PNC/Integrations/HoomansLLM/PNC_HoomansLLM_InlineChat"
+)
+T.truthy(inlineChatIndex and inlineChatIndex < semanticInputIndex,
+    "semantic input loads after inline dependencies")
+
 capture(
     ROOT
         .. "client/PNC/Conversation/Composition/"

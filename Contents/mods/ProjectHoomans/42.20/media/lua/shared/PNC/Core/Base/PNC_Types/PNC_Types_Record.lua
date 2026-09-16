@@ -60,6 +60,12 @@ function Types.NewRecord(definition)
         affiliation = PNC.FactionTypes
             and PNC.FactionTypes.NewAffiliation() or nil,
         social = nil,
+        semanticCognition = PNC.Semantics
+            and PNC.Semantics.CognitionProjection
+            and PNC.Semantics.CognitionProjection.Normalize(
+                def.semanticCognition,
+                generatedID
+            ) or nil,
         followerAbandonment = nil,
         health = {
             current = def.hpMax,

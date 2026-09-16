@@ -81,6 +81,11 @@ function Integration.Submit(view, value, part)
     if not Runtime.IsBridgeEnabled() then
         return false, "bridge_disabled"
     end
+    if type(Runtime.IsProviderAvailable) == "function"
+        and Runtime.IsProviderAvailable() ~= true
+    then
+        return false, "provider_unavailable"
+    end
     if State.Pending or #State.PendingQueue > 0 then
         return false, "llm_request_pending"
     end

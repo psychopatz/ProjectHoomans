@@ -221,6 +221,12 @@ function Persistence.SerializeRecord(record)
             and Core.DeepCopy(record.jobPriorities) or nil,
         inventory = inventoryPayload,
         social = serializeSocial(record),
+        semanticCognition = PNC.Semantics
+            and PNC.Semantics.CognitionProjection
+            and PNC.Semantics.CognitionProjection.Serialize(
+                record.semanticCognition,
+                record.id
+            ) or nil,
         followerAbandonment = Internal.sanitizeFollowerAbandonment(
             record.followerAbandonment
         ),

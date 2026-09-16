@@ -10,6 +10,14 @@ local Spatial = PNC.SpatialIndex
 local Registry = PNC.Registry
 local Relationships = PNC.Relationships
 
+local function recordVisibleNPC(observer, target, candidate)
+    local semantics = PNC.Semantics
+    local evidence = semantics and semantics.CognitionEvidence or nil
+    if evidence and type(evidence.RecordVisibleNPC) == "function" then
+        evidence.RecordVisibleNPC(observer, target, candidate)
+    end
+end
+
 function Perception.FindNearestEnemyPlayer(record, radius)
     radius = tonumber(radius) or Const.ZOMBIE_TARGET_RADIUS
     local players = Spatial.QueryPlayers(record.x, record.y, radius)
@@ -82,24 +90,32 @@ function Perception.FindNearestEnemyNPC(record, radius)
         if targetZombie then
             visible, visibilityKind = Perception.CanSeeWorldObject(record, targetZombie)
         end
-        if target and target.alive ~= false and targetZombie and Internal.IsRecordEnemy(record, target) and math.abs(target.z - record.z) < 1
-            and visible
+        if target and target.alive ~= false and targetZombie
+            and math.abs(target.z - record.z) < 1 and visible
         then
             distSq = Core.DistanceSq(record.x, record.y, target.x, target.y)
             if distSq <= (radius * radius) then
-                candidate = {
-                    kind = "npc",
-                    id = target.id,
-                    x = target.x,
-                    y = target.y,
-                    z = target.z,
-                    distSq = distSq,
-                    visible = true,
+                recordVisibleNPC(record, target, {
+                    distanceSq = distSq,
                     visibilityKind = visibilityKind,
-                    lastSeenAt = Core.Now(),
-                }
-                candidate.threatening = Perception.IsTargetThreatening(record, candidate)
-                best = Internal.PickNearest(best, candidate)
+                    source = "perception",
+                })
+                if Internal.IsRecordEnemy(record, target) then
+                    candidate = {
+                        kind = "npc",
+                        id = target.id,
+                        x = target.x,
+                        y = target.y,
+                        z = target.z,
+                        distSq = distSq,
+                        visible = true,
+                        visibilityKind = visibilityKind,
+                        lastSeenAt = Core.Now(),
+                    }
+                    candidate.threatening = Perception.IsTargetThreatening(
+                        record, candidate)
+                    best = Internal.PickNearest(best, candidate)
+                end
             end
         end
     end
@@ -159,32 +175,39 @@ function Perception.FindImmediateNPCThreat(record, radius)
             if distSq <= limitSq
                 and math.abs(z - record.z) < 1
                 and visible
-                and Relationships
-                and Relationships.AreNPCsEnemies
-                and Relationships.AreNPCsEnemies(
-                    record,
-                    target,
-                    { ignoreAttackNPCPolicy = true }
-                )
             then
-                candidate = {
-                    kind = "npc",
-                    id = target.id,
-                    x = x,
-                    y = y,
-                    z = z,
-                    distSq = distSq,
-                    visible = true,
-                    visibilityKind = visibilityKind
-                        or "immediate_npc_threat",
-                    lastSeenAt = Core.Now(),
-                }
-                candidate.threatening = Perception.IsTargetThreatening
-                    and Perception.IsTargetThreatening(record, candidate)
-                    or false
-                if candidate.threatening == true then
-                    candidate.immediateSelfDefense = true
-                    best = Internal.PickNearest(best, candidate)
+                recordVisibleNPC(record, target, {
+                    distanceSq = distSq,
+                    visibilityKind = visibilityKind,
+                    source = "immediate_threat_perception",
+                })
+                if Relationships
+                    and Relationships.AreNPCsEnemies
+                    and Relationships.AreNPCsEnemies(
+                        record,
+                        target,
+                        { ignoreAttackNPCPolicy = true }
+                    )
+                then
+                    candidate = {
+                        kind = "npc",
+                        id = target.id,
+                        x = x,
+                        y = y,
+                        z = z,
+                        distSq = distSq,
+                        visible = true,
+                        visibilityKind = visibilityKind
+                            or "immediate_npc_threat",
+                        lastSeenAt = Core.Now(),
+                    }
+                    candidate.threatening = Perception.IsTargetThreatening
+                        and Perception.IsTargetThreatening(record, candidate)
+                        or false
+                    if candidate.threatening == true then
+                        candidate.immediateSelfDefense = true
+                        best = Internal.PickNearest(best, candidate)
+                    end
                 end
             end
         end

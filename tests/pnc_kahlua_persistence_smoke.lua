@@ -66,6 +66,7 @@ PNC = {
                 equipmentPoolID = definition.equipmentPoolID,
                 patrolPoints = {},
                 equipment = definition.equipment or { worn = {}, attached = {} },
+                semanticCognition = definition.semanticCognition,
                 health = { current = 100, max = 100, state = "normal" },
                 recruited = definition.recruited == true,
                 persist = definition.persist ~= false,
@@ -77,6 +78,13 @@ PNC = {
 
 PNC.NeedsDefinitions = {}
 T.load(ROOT .. "Needs/PNC_PlayerNeedsModel.lua")
+
+PNC.Semantics = {}
+T.load(T.path(
+    "ProjectHoomans",
+    "shared",
+    "PNC/Semantics/PNC_SemanticCognitionProjection.lua"
+))
 
 local originalNext = next
 next = nil
@@ -172,6 +180,19 @@ local record = {
         createdAt = 34, seed = 42 },
     vanillaTraits = { "Base.HighThirst", "Overweight" },
     vanillaTraitsAuthored = true,
+    semanticCognition = {
+        npcID = "npc_kahlua",
+        revision = 2,
+        facts = {
+            {
+                subject = "SEEN",
+                targetID = "npc_sarah",
+                status = "known",
+                value = true,
+                observedAt = 30,
+            },
+        },
+    },
 }
 
 local payload = PNC.Persistence.SerializeRecord(record)
@@ -196,6 +217,8 @@ T.truthy(payload.vanillaTraits.overweight == true,
     "vanilla weight trait was not serialized")
 T.truthy(payload.vanillaTraitsAuthored == true,
     "authored trait source was not serialized")
+T.truthy(payload.semanticCognition.facts["SEEN|npc_sarah"],
+    "semantic cognition was not serialized")
 T.equal(payload.campState, nil,
     "camp resource cache was serialized into the NPC record")
 
@@ -223,6 +246,8 @@ T.truthy(restored.vanillaTraits.overweight == true,
     "vanilla weight trait did not round trip")
 T.truthy(restored.vanillaTraitsAuthored == true,
     "authored trait source did not round trip")
+T.truthy(restored.semanticCognition.facts["SEEN|npc_sarah"],
+    "semantic cognition did not round trip")
 T.equal(restored.orderSpec, nil,
     "stale facility order was not repaired during deserialization")
 T.equal(restored.persistenceRepairVersions.facility_activity_runtime, 2,

@@ -1,5 +1,6 @@
 -- Runtime and presentation-boundary primitives shared by HoomansLLM flows.
 require "PNC/Integrations/HoomansLLM/PNC_HoomansLLM_State"
+require "PNC/Integrations/HoomansLLM/PNC_HoomansLLM_ProviderAvailability"
 
 PNC = PNC or {}
 PNC.HoomansLLM = PNC.HoomansLLM or {}
@@ -9,6 +10,7 @@ local Internal = PNC.HoomansLLM.Internal
 local Runtime = Internal.Runtime or {}
 Internal.Runtime = Runtime
 local State = Internal.State
+local Availability = Internal.ProviderAvailability
 
 local Trace = PsychopatzCore and PsychopatzCore.DebugTrace
 
@@ -34,6 +36,40 @@ end
 
 PNC.HoomansLLM.IsBridgeEnabled = PNC.HoomansLLM.IsBridgeEnabled
     or Runtime.IsBridgeEnabled
+
+function Runtime.GetProviderStatus()
+    if not Runtime.IsBridgeEnabled() then
+        return {
+            source = "bridge",
+            available = false,
+            ready = false,
+            status = "disabled",
+            reason = "bridge_disabled",
+        }
+    end
+    -- The test harness and tools that load Lua outside Project Zomboid do not
+    -- expose getFileReader.  Preserve their bridge-only behavior; the game
+    -- itself always has getFileReader, so production remains fail-closed when
+    -- the pbrainz heartbeat is missing or stale.
+    if type(getFileReader) ~= "function" then
+        return {
+            source = "bridge_legacy",
+            available = true,
+            ready = true,
+            status = "legacy_bridge",
+        }
+    end
+    return Availability.Read()
+end
+
+function Runtime.IsProviderAvailable()
+    return Runtime.GetProviderStatus().ready == true
+end
+
+PNC.HoomansLLM.GetProviderStatus = PNC.HoomansLLM.GetProviderStatus
+    or Runtime.GetProviderStatus
+PNC.HoomansLLM.IsProviderAvailable = PNC.HoomansLLM.IsProviderAvailable
+    or Runtime.IsProviderAvailable
 
 function Runtime.Now()
     return getTimeInMillis and getTimeInMillis()

@@ -17,6 +17,7 @@ require "PNC/Integrations/PNC_VoiceGateway"
 require "PNC/Integrations/HoomansLLM/PNC_HoomansLLM"
 require "PNC/Integrations/HoomansLLM/PNC_HoomansLLM_Bridge"
 require "PNC/Integrations/HoomansLLM/PNC_HoomansLLM_InlineChat"
+require "PNC/Semantics/PNC_SemanticDialogueInput"
 require "PNC/Conversation/PNC_SocialFlavorPresentation"
 require "PNC/Conversation/PNC_ConversationLiveAnimation"
 

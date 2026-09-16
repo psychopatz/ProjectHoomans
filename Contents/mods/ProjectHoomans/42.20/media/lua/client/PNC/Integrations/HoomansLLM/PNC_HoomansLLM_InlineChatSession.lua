@@ -113,9 +113,7 @@ function Session.OpenQueuedFallback(binding)
 end
 
 function Integration.OpenInlineForTarget(entry, binding)
-    if not Integration.IsBridgeEnabled
-        or not Integration.IsBridgeEnabled()
-        or Integration.GetPending and Integration.GetPending()
+    if Integration.GetPending and Integration.GetPending()
     then
         return false
     end
@@ -129,11 +127,6 @@ function Integration.OpenInlineForTarget(entry, binding)
 end
 
 function Integration.RequestInlineFallback(entry, reason, view)
-    if not Integration.IsBridgeEnabled
-        or not Integration.IsBridgeEnabled()
-    then
-        return false
-    end
     if not queueFallback(entry, reason) then return false end
     local current = Targets.CurrentView()
     if current and (not view or current == view) and current.close then

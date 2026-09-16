@@ -208,7 +208,10 @@ function ISPNCConversationRelationshipPanel:prerender()
     -- footer, not to this conversation-window presentation.
     PsychopatzConversationPart.prerender(self)
     if self.graph and self.graph.setOpacity then
-        self.graph:setOpacity(self:getContentOpacity())
+        self.graph:setOpacity(
+            self:getBackgroundOpacity(),
+            self:getContentOpacity()
+        )
     end
     local evaluation = self.graph and self.graph.getEvaluation
         and self.graph:getEvaluation() or nil
@@ -312,6 +315,7 @@ function ISPNCConversationRelationshipPanel:onPartResize()
         ))
     end
     self:syncResizeGrip()
+    PsychopatzConversationPart.onPartResize(self)
 end
 
 function ISPNCConversationRelationshipPanel:new(x, y, width, height, options)

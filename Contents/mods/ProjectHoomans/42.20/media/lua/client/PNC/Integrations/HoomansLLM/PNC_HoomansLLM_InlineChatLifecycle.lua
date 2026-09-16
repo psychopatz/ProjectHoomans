@@ -37,6 +37,15 @@ local function updateHostLifecycles()
         if host and host.updateLifecycle then
             interruption = host:updateLifecycle()
         end
+        if not interruption and host and host.session
+            and type(host.session.update) == "function"
+        then
+            -- Compact conversations use a headless Core host. Visible views
+            -- drive Session:update from their panel loop, so the inline
+            -- heartbeat must drive the same queue here or a local semantic
+            -- response remains stuck in the "NPC IS SPEAKING" state.
+            host.session:update()
+        end
         if interruption or host and host.closed then
             failureReason = failureReason
                 or interruption or "conversation_interrupted"
@@ -106,12 +115,6 @@ function Integration.UpdateInline()
         Session.OpenQueuedFallback("conversation_handoff")
     end
     if not Inline.part then return end
-    if not Integration.IsBridgeEnabled
-        or not Integration.IsBridgeEnabled()
-    then
-        Integration.CloseInline("bridge_disabled")
-        return
-    end
     local now = Runtime.Now()
     local player = getSpecificPlayer and getSpecificPlayer(0)
         or getPlayer and getPlayer() or nil
@@ -188,9 +191,7 @@ function Lifecycle.Register()
             defaultKey = getKeyCode and (tonumber(getKeyCode("V")) or 47)
                 or 47,
             isEnabled = function()
-                return Integration.IsBridgeEnabled
-                    and Integration.IsBridgeEnabled()
-                    and not (Integration.GetPending
+                return not (Integration.GetPending
                         and Integration.GetPending())
                     and not Targets.CurrentView()
             end,

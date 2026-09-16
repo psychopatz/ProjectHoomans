@@ -14,6 +14,9 @@ require "PNC/Integrations/HoomansLLM/PNC_HoomansLLM_ContextHistory"
 require "PNC/Integrations/HoomansLLM/PNC_HoomansLLM_ContextNeeds"
 require "PNC/Integrations/HoomansLLM/PNC_HoomansLLM_ContextTools"
 require "PNC/Integrations/HoomansLLM/PNC_HoomansLLM_Identity"
+require "PNC/Semantics/PNC_SemanticLLMResult"
+require "PNC/Semantics/PNC_SemanticWorldContext"
+require "PNC/Semantics/PNC_SemanticDialogueSituation"
 
 local Internal = PNC.HoomansLLM.Internal
 local Payload = Internal.ContextPayload or {}
@@ -26,10 +29,81 @@ local Tools = Internal.ContextTools
 local Message = PsychopatzCore.Conversation.Message
 local ToolPolicy = PNC.ConversationLLMTools
 local MemoryIdentity = PNC.HoomansLLM.Identity
+local SemanticResult = PNC.Semantics and PNC.Semantics.LLMResult
+local WorldContext = PNC.Semantics and PNC.Semantics.WorldContext
+local DialogueSituation = PNC.Semantics
+    and PNC.Semantics.DialogueSituation
 
 local function text(value, fallback)
     value = Runtime.Trim(value)
     return value ~= "" and value or fallback
+end
+
+local function compactValue(value, depth)
+    if type(value) ~= "table" then return value end
+    depth = tonumber(depth) or 0
+    if depth >= 3 then return nil end
+    local output = {}
+    local count = 0
+    local key
+    local item
+    for key, item in pairs(value) do
+        if count >= 24 then break end
+        if type(key) == "string" or type(key) == "number" then
+            output[key] = compactValue(item, depth + 1)
+            count = count + 1
+        end
+    end
+    return output
+end
+
+local function topicOf(ir)
+    local topic = ir and ir.extensions and ir.extensions.topic or nil
+    if type(topic) == "table" then topic = topic.id or topic.key end
+    topic = tostring(topic or "")
+    return topic ~= "" and topic or nil
+end
+
+local function semanticFallbackFor(session, currentMessage)
+    local pending = session and session.semanticDialoguePending or nil
+    local preview = pending and pending.preview or nil
+    local ir = preview and preview.ir or nil
+    if type(ir) ~= "table" then return nil end
+    local diagnostics = ir.diagnostics or {}
+    local interpretation = {
+        raw_text = text(pending.rawText or ir.rawText, currentMessage),
+        normalized_text = text(ir.normalizedText, nil),
+        intent = ir.intent,
+        speech_act = ir.speechAct,
+        action = ir.action,
+        subject = ir.subject,
+        actor = compactValue(ir.actor),
+        recipient = compactValue(ir.recipient),
+        target = compactValue(ir.target),
+        object = compactValue(ir.object),
+        source = compactValue(ir.source),
+        destination = compactValue(ir.destination),
+        slots = compactValue(ir.slots),
+        modifiers = compactValue(ir.modifiers),
+        facts = compactValue(ir.extensions and ir.extensions.facts),
+        confidence = tonumber(ir.confidence) or 0,
+        confidence_band = ir.confidenceBand,
+        topic = topicOf(ir),
+        diagnostics = {
+            no_match = diagnostics.noMatch == true,
+            ambiguous_intent = diagnostics.ambiguousIntent == true,
+            ambiguous_concept = diagnostics.ambiguousConcept == true,
+            unresolved_entity = diagnostics.unresolvedEntity == true,
+            recommended_route = diagnostics.recommendedRoute,
+            reason = preview.decision and preview.decision.diagnostics
+                and preview.decision.diagnostics.reason or nil,
+        },
+    }
+    return {
+        schema_version = 1,
+        route = "llm_fallback",
+        lua_interpretation = interpretation,
+    }
 end
 
 function Payload.Build(view, message)
@@ -49,12 +123,18 @@ function Payload.Build(view, message)
     local playerParts = actor.playerParts
     local npcName = actor.npcName
     local playerName = actor.playerName
+    local worldContext = WorldContext and WorldContext.Get and WorldContext.Get({
+        player = presentation.player,
+    }) or {}
     local worldHours = tonumber(
-        Message and Message.GetWorldAgeHours and Message.GetWorldAgeHours()
+        worldContext.worldAgeHours
+            or Message and Message.GetWorldAgeHours
+            and Message.GetWorldAgeHours()
             or presentation.worldAgeHours
     ) or 0
     local lifecycle = presentation.conversationLifecycleState or {}
-    local gameDay = Message and Message.GetGameDay
+    local gameDay = tonumber(worldContext.gameDay)
+        or Message and Message.GetGameDay
         and Message.GetGameDay(worldHours)
         or math.floor(worldHours / 24)
     local participants = History.CompactParticipants(
@@ -145,6 +225,51 @@ function Payload.Build(view, message)
     local memoryIdentity = MemoryIdentity.Current()
     local currentMessage = text(message, "")
     local session = view and view.session or {}
+    local semanticState = session.semanticDialogueState
+    local semanticContext = semanticState
+        and type(semanticState.ToContext) == "function"
+        and semanticState:ToContext() or nil
+    local semanticFallback = semanticFallbackFor(session, currentMessage)
+    local semanticFallbackTopic = semanticFallback
+        and semanticFallback.lua_interpretation
+        and semanticFallback.lua_interpretation.topic
+    local semanticInputContext = session.semanticDialoguePending
+        and session.semanticDialoguePending.context or {}
+    local authoredTopic = text(
+        presentation.conversationTopic or block.topic,
+        nil
+    )
+    local currentTopic = authoredTopic
+        or semanticFallbackTopic
+        or semanticContext and semanticContext.currentTopic
+    local dialogueSituation = semanticInputContext.dialogueSituation
+        or presentation.dialogueSituation
+    if type(dialogueSituation) ~= "table"
+        and DialogueSituation
+        and type(DialogueSituation.Build) == "function"
+    then
+        -- Legacy/debug callers may enter the provider path without the
+        -- semantic input's pending context. Reconstruct only the bounded
+        -- situation projection from authorized presentation sources; never
+        -- expose the full NPC record to the payload.
+        local ok, projected = pcall(DialogueSituation.Build, {
+            npcID = npcID,
+            npcRecord = entry.record,
+            npcSnapshot = entry.snapshot,
+            entry = entry,
+            npcPersonality = personality,
+            npcTraits = traits,
+            relationship = relationship,
+            relationshipState = presentation.relationshipState
+                or presentation.conversationRelationshipID,
+            currentTopic = currentTopic,
+            semanticDialogueState = semanticContext,
+            worldContext = worldContext,
+        })
+        if ok and type(projected) == "table" then
+            dialogueSituation = projected
+        end
+    end
     local context = {
         world_uuid = Actors.WorldUUID(),
         world_mode = memoryIdentity.world_mode,
@@ -176,21 +301,25 @@ function Payload.Build(view, message)
         player_surname = playerParts.surname,
         game_day = gameDay,
         world_age_hours = worldHours,
+        world_context = worldContext,
+        dialogue_situation = compactValue(dialogueSituation),
+        semantic_fallback = semanticFallback,
+        semantic_entity_index = compactValue(
+            semanticInputContext.semanticEntityIndex
+        ),
+        semantic_fact_values = compactValue(
+            semanticInputContext.semanticFactValues
+        ),
+        semantic_dialogue_state = semanticContext,
         participants = participants,
         scene = {
             participants = participants,
             active_participants = participants,
             current_speaker_id = npcID,
             addressed_targets = { playerID },
-            current_topic = text(
-                presentation.conversationTopic or block.topic,
-                nil
-            ),
+            current_topic = currentTopic,
         },
-        current_topic = text(
-            presentation.conversationTopic or block.topic,
-            nil
-        ),
+        current_topic = currentTopic,
         message = currentMessage,
         character_card = characterCard,
         relationship_snapshot = relationship,
@@ -225,9 +354,13 @@ function Payload.Build(view, message)
             ),
             world_age_hours = worldHours,
             game_day = gameDay,
+            time_band = worldContext.timeBand,
             needs_revision = needs and needs.revision or nil,
         },
     }
+    if SemanticResult and SemanticResult.DescribeContract then
+        context.semantic_ir_contract = SemanticResult.DescribeContract()
+    end
     if catalogID then
         context.tool_catalog_id = catalogID
         context.available_tool_ids = availableToolIDs

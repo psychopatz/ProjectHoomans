@@ -65,6 +65,18 @@ local function onResetLua()
     ClientState.managedBodyOnlineIDsReady = false
     ClientState.npcKnowledge = {}
     ClientState.npcPresentations = {}
+    if PNC.Semantics
+        and PNC.Semantics.CognitionClient
+        and PNC.Semantics.CognitionClient.Reset
+    then
+        PNC.Semantics.CognitionClient.Reset()
+    else
+        ClientState.semanticCognition = {}
+        ClientState.pendingSemanticCognition = {}
+        ClientState.lastSemanticCognitionRequestAt = {}
+        ClientState.lastSemanticCognitionReceiveAt = 0
+        ClientState.lastSemanticCognitionFailure = nil
+    end
     ClientState.playerContext = nil
     ClientState.bootstrapState = "idle"
     ClientState.rosterRevision = 0

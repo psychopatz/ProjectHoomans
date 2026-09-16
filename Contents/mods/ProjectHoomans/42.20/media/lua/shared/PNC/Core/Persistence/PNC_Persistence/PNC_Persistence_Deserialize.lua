@@ -78,6 +78,7 @@ local function buildDefinition(
             raw.identitySeed or (identity and identity.seed),
             raw.archetypeID or (identity and identity.archetypeID)
         ),
+        semanticCognition = raw.semanticCognition,
         affiliation = raw.affiliation,
         mapPresentation = raw.mapPresentation,
         generation = raw.generation,

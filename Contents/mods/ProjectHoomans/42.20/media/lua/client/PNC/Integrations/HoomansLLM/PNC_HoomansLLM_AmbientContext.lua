@@ -2,6 +2,7 @@
 PNC = PNC or {}
 PNC.HoomansLLM = PNC.HoomansLLM or {}
 PNC.HoomansLLM.Internal = PNC.HoomansLLM.Internal or {}
+require "PNC/Semantics/PNC_SemanticWorldContext"
 
 local Integration = PNC.HoomansLLM
 local Context = Integration.Context
@@ -9,6 +10,7 @@ local MemoryIdentity = Integration.Identity
 local Message = PsychopatzCore.Conversation.Message
 local AmbientContext = Integration.Internal.AmbientContext or {}
 Integration.Internal.AmbientContext = AmbientContext
+local WorldContext = PNC.Semantics and PNC.Semantics.WorldContext
 
 local function promptFor(eventType, playerMessage, playerFirstName, victimFirstName)
     if eventType == "player_spoke" and playerMessage ~= "" then
@@ -45,6 +47,11 @@ function AmbientContext.Build(item, source, npcID, playerID, identity, requestID
         or "ambient_social")
     local playerMessage = tostring(source.playerMessage or "")
     local memoryIdentity = MemoryIdentity.Current()
+    local player = source.player
+        or getSpecificPlayer and getSpecificPlayer(0)
+    local worldContext = WorldContext and WorldContext.Get and WorldContext.Get({
+        player = player,
+    }) or {}
     return {
         world_uuid = Message.GetSaveID(),
         world_mode = memoryIdentity.world_mode,
@@ -71,6 +78,9 @@ function AmbientContext.Build(item, source, npcID, playerID, identity, requestID
         victim_first_name = identity.victimFirstName,
         victim_surname = identity.victim.surname or "",
         player_message = playerMessage ~= "" and playerMessage or nil,
+        world_age_hours = worldContext.worldAgeHours,
+        game_day = worldContext.gameDay,
+        world_context = worldContext,
         message = promptFor(
             eventType,
             playerMessage,
@@ -92,6 +102,7 @@ function AmbientContext.Build(item, source, npcID, playerID, identity, requestID
         scene = {
             current_speaker_id = npcID,
             addressed_targets = { playerID },
+            current_topic = source.currentTopic or source.conversationTopic,
         },
         recent_conversation = {},
         available_tools = {},

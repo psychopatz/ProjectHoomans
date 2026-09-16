@@ -129,5 +129,64 @@ T.truthy(string.find(
     true
 ), "camp intent guidance is exposed to the LLM")
 T.equal(#context.available_tools, 4, "client-only tools are not exposed")
+T.equal(context.semantic_ir_contract.outputField, "semantic_ir",
+    "LLM context advertises the shared semantic output contract")
+T.equal(context.dialogue_situation.npc.activity.id, "traveling",
+    "legacy provider callers still receive a bounded activity situation")
+T.equal(context.dialogue_situation.social.relationshipState, "Acquaintance",
+    "legacy provider callers retain the relationship situation")
+
+view.session.semanticDialoguePending = {
+    rawText = "Can you do something about this?",
+    preview = {
+        ir = {
+            rawText = "Can you do something about this?",
+            normalizedText = "can you do something about this",
+            intent = nil,
+            confidence = 0.20,
+            confidenceBand = "low",
+            modifiers = { unresolved = true },
+            diagnostics = {
+                noMatch = true,
+                recommendedRoute = "llm_fallback",
+            },
+            extensions = {
+                topic = { id = "help" },
+                facts = {
+                    LOCATION = { status = "unknown" },
+                },
+            },
+        },
+        decision = {
+            diagnostics = { reason = "no_match" },
+        },
+    },
+    context = {
+        semanticEntityIndex = {
+            candidates = { { id = "npc_12", name = "Harley" } },
+        },
+        semanticFactValues = {
+            LOCATION = { status = "unknown" },
+        },
+    },
+}
+local fallbackContext = PNC.HoomansLLM.Context.Build(
+    view,
+    "Can you do something about this?"
+)
+T.equal(fallbackContext.current_topic, "help",
+    "LLM fallback context uses the current semantic topic")
+T.equal(fallbackContext.semantic_fallback.route, "llm_fallback",
+    "LLM fallback is explicitly marked in the provider payload")
+T.equal(
+    fallbackContext.semantic_fallback.lua_interpretation.diagnostics.no_match,
+    true,
+    "LLM fallback receives bounded Lua diagnostics")
+T.equal(
+    fallbackContext.semantic_fallback.lua_interpretation.facts.LOCATION.status,
+    "unknown",
+    "LLM fallback receives bounded semantic fact evidence")
+T.equal(fallbackContext.semantic_entity_index.candidates[1].id, "npc_12",
+    "LLM fallback receives authorized semantic entity projections")
 
 T.finish("pnc_hoomans_llm_context_smoke")

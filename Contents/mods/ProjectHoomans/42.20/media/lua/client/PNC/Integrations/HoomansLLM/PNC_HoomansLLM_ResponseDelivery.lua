@@ -8,6 +8,7 @@ local Internal = Integration.Internal
 local Runtime = Internal.Runtime
 local RequestFlow = Internal.RequestFlow
 local ToolFlow = Internal.ToolFlow
+local SemanticResult = Internal.SemanticResult
 local Presentation = Internal.ResponsePresentation
 local Fallback = Internal.ResponseFallback
 local Delivery = Internal.ResponseDelivery or {}
@@ -33,6 +34,9 @@ end
 local function detached(pending, arguments)
     local calls = arguments and arguments.semantic_tool_calls
     local actionAttempted = type(calls) == "table" and #calls > 0
+    if SemanticResult and SemanticResult.Apply then
+        SemanticResult.Apply(pending, arguments)
+    end
     local semanticResults = {}
     local view = pending.view
     if view and view.session then
@@ -83,6 +87,9 @@ local function detached(pending, arguments)
 end
 
 local function liveResponse(pending, arguments)
+    if SemanticResult and SemanticResult.Apply then
+        SemanticResult.Apply(pending, arguments)
+    end
     local semanticResults = ToolFlow.Apply(
         pending.packet,
         arguments,

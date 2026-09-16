@@ -23,6 +23,16 @@ local Conversation = PNC.Conversation
 local Text = PsychopatzCore.Conversation.Text
 local LLMInput = PsychopatzConversationLLMInput
 
+local function semanticInput()
+    local semantics = PNC.Semantics
+    local input = semantics and semantics.DialogueInput or nil
+    if input and type(input.Submit) == "function" then return input end
+    pcall(require, "PNC/Semantics/PNC_SemanticDialogueInput")
+    semantics = PNC.Semantics
+    input = semantics and semantics.DialogueInput or nil
+    return input and type(input.Submit) == "function" and input or nil
+end
+
 local function label(key, fallback)
     return Text.Resolve({
         key = key,
@@ -32,23 +42,22 @@ local function label(key, fallback)
 end
 
 local function stateFor(view)
-    local status = label("llm.status.off", "LLM BRIDGE OFF")
+    local status = ""
     local enabled = false
-    local visible = false
-    if Integration.IsBridgeEnabled and Integration.IsBridgeEnabled() then
-        visible = true
-        if not view or not view.session then
-            status = label("llm.status.open", "OPEN A CONVERSATION")
-        elseif view.session.llmPending
-            or Integration.GetPending and Integration.GetPending()
-        then
-            status = label("llm.status.waiting", "WAITING FOR NPC RESPONSE...")
-        elseif not view:isConversationInteractive() then
-            status = label("llm.status.speaking", "NPC IS SPEAKING...")
-        else
-            enabled = true
-            status = ""
-        end
+    local visible = true
+    if not view or not view.session then
+        status = label("llm.status.open", "OPEN A CONVERSATION")
+    elseif view.session.llmPending
+        or view.session.semanticDialoguePending
+        or Integration.GetPending and Integration.GetPending()
+    then
+        status = label("llm.status.waiting", "WAITING FOR NPC RESPONSE...")
+    elseif type(view.isConversationInteractive) ~= "function"
+        or not view:isConversationInteractive()
+    then
+        status = label("llm.status.speaking", "NPC IS SPEAKING...")
+    else
+        enabled = true
     end
     return {
         visible = visible,
@@ -56,6 +65,18 @@ local function stateFor(view)
         statusText = status,
         sendKey = "llm.send",
     }
+end
+
+local function submitHybrid(view, value, part)
+    local input = semanticInput()
+    if input and type(input.Submit) == "function" then
+        return input.Submit(view, value, part)
+    end
+    -- The legacy submit path always assumes an LLM request. Falling through
+    -- to it would let a partial load-order failure turn a local utterance
+    -- into the old waiting placeholder. Keep the hybrid entry point fail
+    -- closed; the semantic module owns the only valid remote fallback route.
+    return false, "semantic_input_unavailable"
 end
 
 function Integration.CreateInputPart(bounds, options)
@@ -68,7 +89,7 @@ function Integration.CreateInputPart(bounds, options)
         domain = "pnc.system.shared.categories",
         fallback = "TYPE TO TALK",
     }
-    options.submit = options.submit or Integration.Submit
+    options.submit = options.submit or submitHybrid
     options.getState = options.getState or stateFor
     options.resolveText = options.resolveText or label
     options.maxInputLength = options.maxInputLength

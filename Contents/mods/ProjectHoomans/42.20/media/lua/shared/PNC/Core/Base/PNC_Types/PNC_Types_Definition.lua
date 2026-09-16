@@ -83,6 +83,8 @@ function Types.NormalizeDefinition(definition)
         recruited = def.recruited == true,
         social = type(def.social) == "table"
             and PNC.Core.DeepCopy(def.social) or nil,
+        semanticCognition = type(def.semanticCognition) == "table"
+            and PNC.Core.DeepCopy(def.semanticCognition) or nil,
         factionID = Internal.NormalizeString(def.factionID),
         membershipStatus = Internal.NormalizeString(def.membershipStatus),
         factionRole = Internal.NormalizeString(def.factionRole),

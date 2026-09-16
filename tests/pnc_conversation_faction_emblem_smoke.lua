@@ -5,6 +5,7 @@ local ROOT =
 
 local emblemDraw
 local originalRenderCount = 0
+local drawnRects = {}
 
 PNC = {
     FactionEmblemRenderer = {
@@ -85,7 +86,15 @@ local portrait = {
     getAccentColor = function()
         return { r = 1, g = 0.25, b = 0.18 }
     end,
-    drawRect = function() end,
+    drawRect = function(_, x, y, width, height, alpha)
+        table.insert(drawnRects, {
+            x = x,
+            y = y,
+            width = width,
+            height = height,
+            alpha = alpha,
+        })
+    end,
     drawText = function(_, text, x, y)
         table.insert(drawnTexts, {
             text = text,
@@ -103,6 +112,7 @@ setmetatable(
 
 portrait:render()
 T.equal(originalRenderCount, 1, "core portrait render preserved")
+T.equal(drawnRects[1].alpha, 1, "faction plate uses content alpha")
 T.equal(emblemDraw.target, portrait, "emblem target")
 T.equal(emblemDraw.size, 36, "conversation emblem size is larger (36)")
 T.equal(emblemDraw.x, 10, "emblem x position on far left")
@@ -126,16 +136,30 @@ T.equal(
 
 emblemDraw = nil
 drawnTexts = {}
+drawnRects = {}
 portrait.owner.spec.context.identityState = "unknown"
 portrait:render()
 T.equal(emblemDraw, nil, "unknown name suppresses emblem rendering")
 
 emblemDraw = nil
 drawnTexts = {}
+drawnRects = {}
 portrait.owner.spec.context.identityState = "known"
 portrait.owner.spec.context.factionEmblem = nil
 portrait:render()
 T.equal(emblemDraw, nil, "missing emblem suppresses faction rendering")
+
+emblemDraw = nil
+drawnTexts = {}
+drawnRects = {}
+portrait.owner.spec.context.factionEmblem = {
+    backgroundColorID = "black",
+    layers = {},
+}
+portrait.getContentOpacity = function() return 0 end
+portrait:render()
+T.equal(emblemDraw, nil, "zero content suppresses faction emblem rendering")
+T.equal(#drawnRects, 0, "zero content suppresses faction plate overdraw")
 T.finish("pnc_conversation_faction_emblem_smoke")
 
 T.finish("pnc_conversation_faction_emblem_smoke")

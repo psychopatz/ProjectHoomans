@@ -184,6 +184,34 @@ local readyState = inputOptions.getState({
 }, inputOptions)
 T.equal(readyState.statusText, "",
     "ready inline input does not render a generic status footer")
+
+-- A partial composition must not silently bypass the semantic router. If the
+-- semantic module is unavailable, the hybrid adapter fails closed instead of
+-- starting the legacy LLM request that used to produce "Give me a moment.".
+local semanticRequire = require
+local legacySubmit = Integration.Submit
+local legacyCalled = false
+require = function(name)
+    if name == "PNC/Semantics/PNC_SemanticDialogueInput" then
+        return true
+    end
+    return semanticRequire(name)
+end
+Integration.Submit = function()
+    legacyCalled = true
+    return true
+end
+local unavailableAccepted, unavailableReason = inputOptions.submit(
+    {}, "hello there", inputOptions
+)
+T.equal(unavailableAccepted, false,
+    "missing semantic input rejects the hybrid submission")
+T.equal(unavailableReason, "semantic_input_unavailable",
+    "missing semantic input returns a stable reason")
+T.falsy(legacyCalled,
+    "missing semantic input never invokes the legacy LLM request")
+Integration.Submit = legacySubmit
+require = semanticRequire
 local inlineSource = T.read(
     "ProjectHoomans",
     "client",
@@ -490,7 +518,13 @@ local lifecyclePart = {
     refreshControls = function() end,
     updateModeButtonStyles = function() end,
 }
-local lifecyclePrimary = { closed = false }
+local lifecyclePrimary = {
+    closed = false,
+    session = { updates = 0 },
+}
+function lifecyclePrimary.session:update()
+    self.updates = self.updates + 1
+end
 function lifecyclePrimary:updateLifecycle() return nil end
 local lifecycleSecondary = { closed = false }
 function lifecycleSecondary:updateLifecycle()
@@ -514,6 +548,8 @@ T.equal(#Integration.Inline.hosts, 1,
     "unavailable secondary recipient was not pruned")
 T.equal(Integration.Inline.hosts[1], lifecyclePrimary,
     "primary nearby recipient was not preserved")
+T.equal(lifecyclePrimary.session.updates, 1,
+    "headless inline host advances its conversation queue")
 Integration.CloseInline("test_cleanup_lifecycle")
 
 -- If the selected nearby recipient disappears, promote the first healthy

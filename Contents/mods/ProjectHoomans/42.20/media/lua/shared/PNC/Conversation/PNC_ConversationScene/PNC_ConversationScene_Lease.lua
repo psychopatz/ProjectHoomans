@@ -316,6 +316,30 @@ function Scene.ReserveLLMRequest(record, zombie, player, token, requestID)
     return true, pending
 end
 
+-- Shared authority check for read-only conversation projections.  Keeping the
+-- lease ownership rule here prevents semantic cognition requests from
+-- reimplementing player/token validation in a second subsystem.
+function Scene.ValidateConversationLease(record, player, token)
+    local runtime = record and record.runtime or nil
+    local lease = runtime and runtime.conversationLease or nil
+    local currentTime
+    token = tostring(token or "")
+    if token == "" or not lease then
+        return false, "invalid_lease"
+    end
+    if tostring(lease.token or "") ~= token then
+        return false, "invalid_lease"
+    end
+    if not playerOwnsLease(player, lease) then
+        return false, "conversation_player_mismatch"
+    end
+    currentTime = Internal.Now()
+    if currentTime >= (tonumber(lease.expiresAt) or 0) then
+        return false, "conversation_expired"
+    end
+    return true, lease
+end
+
 function Scene.ClearLLMRequest(record, reason)
     local runtime = record and record.runtime or nil
     local pending = runtime and runtime.llmRequestLease or nil

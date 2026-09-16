@@ -17,20 +17,54 @@ local Open = Internal.InlineChatOpen or {}
 Internal.InlineChatOpen = Open
 local LLMInput = PsychopatzConversationLLMInput
 
-function Integration.SubmitInline(view, value, part)
-    local accepted, reason = Integration.Submit(view, value, part)
-    if accepted == true then
-        Integration.CloseInline("message_submitted")
-    else
-        Diagnostics.LogSubmitRejection(view, reason)
+local function semanticInput()
+    local semantics = PNC.Semantics
+    local input = semantics and semantics.DialogueInput or nil
+    local ok
+    if input and type(input.Submit) == "function" then return input end
+    ok = pcall(
+        require,
+        "PNC/Semantics/PNC_SemanticDialogueInput"
+    )
+    semantics = PNC.Semantics
+    input = semantics and semantics.DialogueInput or nil
+    if ok and input and type(input.Submit) == "function" then
+        return input
     end
-    return accepted, reason
+    return nil
+end
+
+function Integration.SubmitInline(view, value, part)
+    local input = semanticInput()
+    local accepted, reason
+    if input and type(input.Submit) == "function" then
+        accepted, reason = input.Submit(view, value, part)
+        if accepted == true then
+            local result = view and view.lastSemanticDialogueResult
+            local route = result and result.decision
+                and result.decision.route or "deterministic"
+            -- A local semantic response is already queued in the headless
+            -- session. Keep the inline conversation open for the next turn;
+            -- only the remote fallback path needs to detach the widget.
+            if route == "llm_fallback" then
+                Integration.CloseInline("message_submitted")
+            end
+        end
+    else
+        -- Do not bypass the semantic router when a partial composition has
+        -- not loaded it yet. The old integration path unconditionally starts
+        -- an LLM request and can present a misleading wait for local input.
+        accepted, reason = false, "semantic_input_unavailable"
+    end
+    if accepted == true then
+        return true, reason
+    end
+    Diagnostics.LogSubmitRejection(view, reason)
+    return false, reason
 end
 
 function Integration.OpenInline(binding)
-    if not Integration.IsBridgeEnabled
-        or not Integration.IsBridgeEnabled()
-        or Integration.GetPending and Integration.GetPending()
+    if Integration.GetPending and Integration.GetPending()
     then
         return false
     end

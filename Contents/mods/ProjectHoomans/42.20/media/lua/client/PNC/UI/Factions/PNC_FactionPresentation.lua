@@ -137,6 +137,7 @@ function FactionPresentation.RenderPortraitPlate(portraitUI, rawContext)
     end
 
     local alpha = portraitUI:getContentOpacity()
+    if alpha <= 0.001 then return end
     local accent = portraitUI:getAccentColor()
     local bright = PsychopatzCore
         and PsychopatzCore.Conversation
@@ -152,13 +153,14 @@ function FactionPresentation.RenderPortraitPlate(portraitUI, rawContext)
     local iconY = plateY + math.floor((plateHeight - iconSize) / 2)
     local textX = iconX + iconSize + 10
 
-    -- OPAQUE (1.0 alpha) background overdraw to completely erase core's default text/box underneath
+    -- Overdraw the core plate with the same CONTENT alpha so the extension
+    -- cannot leave a solid rectangle when the portrait content is hidden.
     portraitUI:drawRect(
         3,
         plateY + 2,
         portraitUI.width - 7,
         plateHeight - 2,
-        1.0,
+        alpha,
         0.012,
         0.030,
         0.025

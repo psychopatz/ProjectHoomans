@@ -7,6 +7,29 @@ local dialoguePayload = Internal.DialoguePayload
 local ensureBlockText = Internal.EnsureBlockText
 local selectedTextKey = Internal.SelectedTextKey
 
+local TopicCatalog = PNC.Semantics and PNC.Semantics.TopicCatalog
+if type(TopicCatalog) ~= "table" then
+    pcall(require, "PNC/Semantics/PNC_SemanticTopicCatalog")
+    TopicCatalog = PNC.Semantics and PNC.Semantics.TopicCatalog
+end
+
+local function syncSemanticTopic(spec, topic)
+    if not topic or type(spec) ~= "table" then return false end
+    local conversation = PsychopatzCore and PsychopatzCore.Conversation
+    local view = conversation and conversation.instance or nil
+    local viewSpec = view and view.spec or nil
+    if not view or not viewSpec
+        or tostring(viewSpec.npcID or "") ~= tostring(spec.npcID or "")
+    then
+        return false, "conversation_unavailable"
+    end
+    local state = view.session and view.session.semanticDialogueState or nil
+    if not state or type(state.SetTopic) ~= "function" then
+        return false, "semantic_state_unavailable"
+    end
+    return state:SetTopic(topic)
+end
+
 local function lockedText(block, choice, reason, context)
     local key = choice.lockedReasonKey or reason
     if not key then
@@ -68,6 +91,19 @@ function Composer.AttachBlock(spec, block, context)
     local valid, errors = ensureBlockText(block)
     if not valid then return false, errors end
     spec.context.activeConversationBlockID = block.id
+    local topic = TopicCatalog
+        and type(TopicCatalog.AuthoredTopic) == "function"
+        and TopicCatalog.AuthoredTopic(block) or nil
+    if topic then
+        -- Keep the authored topic in both projections. The presentation
+        -- context feeds the provider payload; the block context feeds local
+        -- semantic input after a menu-selected block is attached.
+        spec.context.conversationTopic = topic
+        if type(context) == "table" then
+            context.conversationTopic = topic
+        end
+        syncSemanticTopic(spec, topic)
+    end
     for nodeID in pairs(block.nodes) do
         spec.nodes["block:" .. nodeID] = Composer.BuildBlockNode(
             block, nodeID, context

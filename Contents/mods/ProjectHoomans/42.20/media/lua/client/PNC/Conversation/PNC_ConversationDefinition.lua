@@ -145,6 +145,20 @@ Conversation.FormatRoleLabel = roleLabel
 
 local isAggressive = Audience.IsPlayerHostile
 
+local function semanticInputFactory()
+    if type(Conversation.CreateSemanticDialogueInput) == "function" then
+        return Conversation.CreateSemanticDialogueInput
+    end
+
+    -- BuildDefinition is also used by debug and preview entry points. Those
+    -- callers can run before the full client composition root has completed.
+    -- Load the semantic input lazily so a partial load cannot silently select
+    -- the legacy LLM wait/reply path for ordinary local conversation.
+    pcall(require, "PNC/Semantics/PNC_SemanticDialogueInput")
+    return type(Conversation.CreateSemanticDialogueInput) == "function"
+        and Conversation.CreateSemanticDialogueInput or nil
+end
+
 function Conversation.RequestCeasefire(context)
     return Lifecycle and Lifecycle.RequestCeasefire
         and Lifecycle.RequestCeasefire(context) or false
@@ -261,6 +275,7 @@ end
 
 function Conversation.BuildDefinition(entry, player, forcedTime)
     local timeID = forcedTime or Time.Resolve()
+    local semanticFactory = semanticInputFactory()
     local relationshipID = Relationship.Resolve(entry, player)
     local npcID = tostring(entry and entry.id or "debug-npc")
     local identityState, name, projection, clientState = identityProjection(entry)
@@ -278,6 +293,7 @@ function Conversation.BuildDefinition(entry, player, forcedTime)
         npcID
     )
     Composer.SetIdentityArguments(blockContext, identityArguments)
+    blockContext.conversationTopic = "greeting"
     local presentationContext = {
         entry = entry,
         player = player,
@@ -294,6 +310,7 @@ function Conversation.BuildDefinition(entry, player, forcedTime)
         relationshipID = faction and faction.name or relationshipID,
         conversationTimeID = timeID,
         conversationRelationshipID = relationshipID,
+        conversationTopic = "greeting",
         factionID = faction and faction.id or nil,
         factionName = faction and faction.name or nil,
         factionRole = faction and faction.role or nil,
@@ -378,8 +395,12 @@ function Conversation.BuildDefinition(entry, player, forcedTime)
             },
             {
                 partID = "llmInput",
-                factory = Conversation.CreateHoomansLLMInput,
-                visible = true,
+                factory = semanticFactory,
+                -- If a dependency is genuinely unavailable, hide the part
+                -- rather than constructing an extension with a nil factory.
+                -- The caller can retry after composition finishes, and no
+                -- fake "waiting for LLM" state is presented to the player.
+                visible = semanticFactory ~= nil,
                 title = {
                     key = "panel.llm_input",
                     domain = "pnc.system.shared.categories",

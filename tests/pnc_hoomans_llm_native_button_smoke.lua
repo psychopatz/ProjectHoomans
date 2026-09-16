@@ -26,6 +26,8 @@ local colors = {
     textMuted = { r = 0.58, g = 0.65, b = 0.7, a = 1 },
 }
 local themeRevision = 1
+local panelOpacity = 1
+local contentOpacity = 1
 
 local UI = {
     Theme = {
@@ -57,7 +59,9 @@ PsychopatzCore = {
             end,
         },
         Opacity = {
-            GetSignature = function() return "test-opacity" end,
+            GetSignature = function()
+                return tostring(panelOpacity) .. ":" .. tostring(contentOpacity)
+            end,
         },
     },
 }
@@ -173,7 +177,8 @@ end
 function Part:addChild(child) self.children[#self.children + 1] = child end
 function Part:setHeight(value) self.height = value end
 function Part:setVisible(value) self.visible = value end
-function Part:getContentOpacity() return 1 end
+function Part:getContentOpacity() return contentOpacity end
+function Part:getBackgroundOpacity() return panelOpacity end
 
 package.preload["PsychopatzCore/UI/Conversation/Parts/PsychopatzConversationPart"] =
     function()
@@ -311,5 +316,15 @@ themeRevision = themeRevision + 1
 input:refreshControls()
 assertVariant(input.modeButtons[1], "selected")
 assertVariant(input.modeButtons[2], "quiet")
+
+panelOpacity = 0.25
+contentOpacity = 0.75
+input:refreshOpacity()
+T.equal(input.modeButtons[1].button.backgroundColor.a, 0.75,
+    "native button surfaces use content opacity")
+T.equal(input.modeButtons[1].button.textColor.a, 0.75,
+    "native button labels use content opacity")
+T.equal(input.modeButtons[1].button.textureColor.a, 0.75,
+    "native button icons use content opacity")
 
 T.finish("pnc_hoomans_llm_native_button_smoke")
