@@ -18,7 +18,10 @@ Jobs.Tick = Internal.Tick
 -- accidentally enter the persistence path.
 Jobs.Seating = Jobs.Seating or {}
 Jobs.Seating.ClearFurnitureSeat = Internal.ClearFurnitureSeat
+Jobs.Seating.ClearFloorSeat = Internal.ClearFloorSeat
 Jobs.Seating.EnterFurnitureSeat = Internal.EnterFurnitureSeat
+Jobs.Seating.EnterFloorSeat = Internal.EnterFloorSeat
+Jobs.Seating.MaintainFloorSeat = Internal.MaintainFloorSeat
 Jobs.Seating.RefreshLiveSeatTarget = Internal.RefreshLiveSeatTarget
 Jobs.Seating.PositionAtSeatAnchor = Internal.PositionAtSeatAnchor
 Jobs.Seating.ResetPath = Internal.ResetPath

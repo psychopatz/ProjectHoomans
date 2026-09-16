@@ -93,6 +93,11 @@ function Jobs.Start(record, facilityOrId, capability, options)
     local resource = options.resource or acquired.resource
     local seating = options.seating == true or target.seating == true
         or resourceKind == "seating_surface"
+    local floorSeating = options.floorSeating == true
+        or acquired.floorSeating == true
+        or target.floorSeating == true
+        or resource and resource.floorSeating == true
+        or resourceKind == "floor_seating"
     local liveObject = resource and resource.object
         or target.object or target.furnitureObject
     local approachCandidates = copyApproachCandidates(
@@ -130,6 +135,12 @@ function Jobs.Start(record, facilityOrId, capability, options)
         return false, "INVALID_SLEEP_TARGET"
     end
     local previousOrder = PNC.Core.DeepCopy(record.orderSpec)
+    local campOrderSpec = record.orderSpec
+    local campScope = options.scope or options.siteScope
+        or acquired.scope or acquired.siteScope
+        or campOrderSpec and (campOrderSpec.scope or campOrderSpec.siteScope)
+    local campRoomBounds = options.roomBounds or acquired.roomBounds
+        or campOrderSpec and campOrderSpec.roomBounds
     local activityStartedAt = PNC.Core.Now()
     record.runtime = record.runtime or {}
     record.runtime.facilityActivity = {
@@ -178,6 +189,7 @@ function Jobs.Start(record, facilityOrId, capability, options)
         resourceKind = tostring(resourceKind),
         resourceKey = tostring(resourceKey),
         seating = seating,
+        floorSeating = floorSeating,
         seatDirection = tostring(target.seatDirection or ""),
         seatSide = tostring(target.seatSide or ""),
         approachKey = tostring(target.approachKey or ""),
@@ -189,6 +201,22 @@ function Jobs.Start(record, facilityOrId, capability, options)
         seatArrivalDistance = tonumber(target.arrivalDistance) or 0.14,
         campActivity = options.campActivity == true,
         campId = tostring(options.campId or ""),
+        scope = campScope,
+        siteScope = campScope,
+        siteID = options.siteID or acquired.siteID
+            or campOrderSpec and campOrderSpec.siteID,
+        roomID = options.roomID or acquired.roomID
+            or campOrderSpec and campOrderSpec.roomID,
+        buildingID = options.buildingID or acquired.buildingID
+            or campOrderSpec and campOrderSpec.buildingID,
+        roomType = options.roomType or acquired.roomType
+            or campOrderSpec and campOrderSpec.roomType,
+        roomName = options.roomName or acquired.roomName
+            or campOrderSpec and campOrderSpec.roomName,
+        roomBounds = campRoomBounds and PNC.Core.DeepCopy(campRoomBounds)
+            or nil,
+        campfireID = options.campfireID or acquired.campfireID
+            or campOrderSpec and campOrderSpec.campfireID,
         campX = tonumber(options.campX or acquired.campX),
         campY = tonumber(options.campY or acquired.campY),
         campZ = tonumber(options.campZ or acquired.campZ),
@@ -270,6 +298,7 @@ function Jobs.Start(record, facilityOrId, capability, options)
         stopDistance = target.stopDistance,
         arrivalDistance = target.arrivalDistance,
         seating = seating,
+        floorSeating = floorSeating,
         sceneId = sceneId,
         sleepSurface = target.sleepSurface,
         sleepVariant = tostring(options.sleepVariant

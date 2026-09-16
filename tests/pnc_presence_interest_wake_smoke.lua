@@ -4,6 +4,8 @@ local FILE = T.path("ProjectHoomans", "shared", "PNC/Core/Presence/PNC_Presence.
 local now = 1000
 local scheduled = 0
 local woken = 0
+local rebuildCalls = 0
+local rebuildForce
 
 local player = {
     getX = function() return 0 end,
@@ -42,6 +44,11 @@ PNC = {
     Registry = {},
     SpatialIndex = {
         QueryNPCs = function() return { record } end,
+        Rebuild = function(_, force)
+            rebuildCalls = rebuildCalls + 1
+            rebuildForce = force
+            return true
+        end,
     },
     SimulationClock = {
         Wake = function(candidate, key, wakeAt)
@@ -68,11 +75,15 @@ T.truthy(woken == 1 and scheduled == 1,
     "multiplayer player queries did not deduplicate the NPC wake")
 T.truthy(record.runtime.forcePresenceCheck == true,
     "presence force flag was not set")
+T.truthy(rebuildCalls == 1 and rebuildForce == false,
+    "interest wake forced a duplicate spatial rebuild")
 
 now = 1100
 T.truthy(PNC.Presence.RefreshMaterializationCandidates(now, false) == 0,
     "interest wake throttle failed")
 T.truthy(scheduled == 1, "throttled wake scheduled duplicate work")
+T.truthy(rebuildCalls == 1,
+    "throttled interest wake rebuilt the spatial index")
 T.finish("pnc_presence_interest_wake_smoke")
 
 T.finish("pnc_presence_interest_wake_smoke")

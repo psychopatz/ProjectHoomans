@@ -22,6 +22,21 @@ function Internal.OnSceneTick(record, zombie, scene, now)
         runtime.phase = runtime.seating == true
             and "SEATED" or definition.activityLabel or "WORKING"
     end
+    if runtime.seating == true
+        and Internal.IsFloorSeating(runtime, record.orderSpec)
+        and runtime.seatEntered ~= true
+    then
+        -- The ground pose is retained only while the owning seat lifecycle is
+        -- still seated. If the seat was released by another path, let the
+        -- scene cleanup finish the bump instead of reviving the pose.
+        return false
+    end
+    if runtime.seating == true
+        and runtime.seatEntered == true
+        and Internal.MaintainFloorSeat
+    then
+        Internal.MaintainFloorSeat(record, zombie, runtime, record.orderSpec)
+    end
     if PNC.FacilityReservations and runtime.reservationId ~= ""
         and now >= (tonumber(runtime.nextReservationRenewAt) or 0)
     then

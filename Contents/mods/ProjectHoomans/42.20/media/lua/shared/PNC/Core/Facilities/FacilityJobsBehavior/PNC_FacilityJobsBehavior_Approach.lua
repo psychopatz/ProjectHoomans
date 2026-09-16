@@ -67,7 +67,10 @@ end
 
 function Internal.RetrySeatApproach(record, zombie, order, runtime)
     return retryApproach(record, zombie, order, runtime, {
-        guard = function(activity) return activity and activity.seating == true end,
+        guard = function(activity)
+            return activity and activity.seating == true
+                and not Internal.IsFloorSeating(activity, order)
+        end,
         usable = function(candidate, failedApproaches, index)
             return Internal.SeatSpotUsable(candidate, failedApproaches, index)
         end,

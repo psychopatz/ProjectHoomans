@@ -353,6 +353,26 @@ Catalog.Register("semantic.greeting", {
     },
 })
 
+Catalog.Register("semantic.offer", {
+    variants = {
+        {
+            id = "semantic.offer.hungry",
+            templateID = "semantic.offer.interested",
+            fallback = "I could use one.",
+            when = {
+                needType = "hunger",
+                needUrgency = { "moderate", "severe", "emergency", "critical" },
+            },
+            priority = 2,
+        },
+        {
+            id = "semantic.offer.default",
+            templateID = "semantic.offer.declined",
+            fallback = "No thanks, I'm not hungry.",
+        },
+    },
+})
+
 Catalog.Register("semantic.question.activity", {
     variants = {
         {

@@ -59,6 +59,11 @@ local function notifyTaskResult(plan, status, accepted, reason)
         accepted = accepted == true,
         status = bounded(status, 32),
         reason = bounded(reason, 128),
+        siteLabel = bounded(metadata.siteLabel, 64),
+        siteScope = bounded(metadata.siteScope, 16),
+        siteID = bounded(metadata.siteID, 128),
+        siteRoomType = bounded(metadata.siteRoomType, 48),
+        siteRisk = bounded(metadata.siteRisk, 32),
     })
     auditResultDelivery(plan, status, accepted, reason, true)
     return true

@@ -25,6 +25,7 @@ local COMMAND_ACTIONS = {
     GIVE = true,
     TAKE = true,
     WAIT_AT = true,
+    CAMP = true,
     EAT = true,
     DRINK = true,
     REFILL = true,
@@ -76,6 +77,10 @@ local RESPONSE_TEMPLATES = {
         templateID = "semantic.greet.acknowledged",
         fallback = "Hey there.",
     },
+    OFFER_RECEIVED = {
+        templateID = "semantic.offer.received",
+        fallback = "I could use one.",
+    },
     GOSSIP_RECEIVED = {
         templateID = "semantic.gossip.unknown",
         fallback = "I haven't heard anything about that yet.",
@@ -95,6 +100,10 @@ local RESPONSE_TEMPLATES = {
     ACTION_UNAVAILABLE = {
         templateID = "semantic.action.unavailable",
         fallback = "I can't do that yet.",
+    },
+    CAMP_REQUESTED = {
+        templateID = "semantic.camp.requested",
+        fallback = "I'll find us a safe place to camp.",
     },
     UNKNOWN = {
         templateID = "semantic.unknown",
@@ -196,6 +205,14 @@ local function unresolvedItemRequest(ir)
     return tostring(object.text or object.value or "") ~= ""
 end
 
+local function unresolvedOffer(ir)
+    local object = ir and ir.object
+    return ir and ir.intent == "OFFER"
+        and type(object) == "table"
+        and object.unresolved == true
+        and tostring(object.text or object.value or "") ~= ""
+end
+
 local function isInventoryQuery(ir)
     return type(ir) == "table"
         and ir.intent == "QUESTION"
@@ -207,7 +224,7 @@ local function unresolvedWorldTargetRequest(ir)
     local target = ir and ir.target
     return type(ir) == "table"
         and ir.intent == "REQUEST"
-        and ir.action == "WAIT_AT"
+        and (ir.action == "WAIT_AT" or ir.action == "CAMP")
         and type(target) == "table"
         and target.unresolved == true
         and tostring(target.text or target.value or "") ~= ""
@@ -331,6 +348,7 @@ function Policy.Decide(ir, state, context, options)
     -- resolves world entities; it chooses clarification or fallback.
     if (diagnostics.unresolvedEntity == true
             and not unresolvedItemRequest(ir)
+            and not unresolvedOffer(ir)
             and not isInventoryQuery(ir)
             and not unresolvedWorldTargetRequest(ir))
         or confidence < limits.high
@@ -365,10 +383,14 @@ function Policy.Decide(ir, state, context, options)
     if ir.intent == "GREET" or ir.speechAct == "GREET" then
         branch = "GREET_ACKNOWLEDGED"
         reason = "recognized_greeting"
+    elseif ir.intent == "OFFER" or ir.speechAct == "OFFER" then
+        branch = "OFFER_RECEIVED"
+        reason = "recognized_offer"
     elseif ir.intent == "REQUEST" then
         if COMMAND_ACTIONS[ir.action] then
             branch = ir.action == "FETCH"
                 and "REQUEST_ACKNOWLEDGED" or "COMMAND_ACCEPTED"
+            if ir.action == "CAMP" then branch = "CAMP_REQUESTED" end
             reason = "recognized_request"
         else
             branch = "ASK_CLARIFICATION"

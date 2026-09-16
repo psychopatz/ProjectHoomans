@@ -203,6 +203,28 @@ local abstractTarget = Camp.ResolveActivityTarget(campRecord)
 T.truthy(abstractTarget and abstractTarget.seatDirection == "E",
     "abstract camp seating rehydrates its saved seat spot")
 
+local previousCampSnapshot = Camp.GetSnapshot
+Camp.GetSnapshot = function() return { resources = {} } end
+local emptyCampRecord = {
+    id = "npc:camp-floor-seat", alive = true, x = 10, y = 20, z = 0,
+    runtime = {},
+    orderSpec = {
+        kind = "camp", campId = "camp:floor-seat", x = 10, y = 20, z = 0,
+        radius = 3, resourceRadius = 1,
+    },
+}
+local floorCampSeat = Camp.AcquireSeat(emptyCampRecord, { abstract = true })
+T.truthy(floorCampSeat and floorCampSeat.ok,
+    "camp seating falls back to a virtual floor slot without furniture")
+T.equal(floorCampSeat.resourceKind, "floor_seating",
+    "camp floor fallback carries its distinct resource kind")
+T.equal(floorCampSeat.target.sceneId, "facility.living.sit",
+    "camp floor fallback selects the ground sitting scene")
+T.truthy(floorCampSeat.target.seating
+        and floorCampSeat.target.floorSeating,
+    "camp floor fallback remains a seated presentation")
+Camp.GetSnapshot = previousCampSnapshot
+
 local ambientStartOptions
 local ambientRecord = {
     id = "npc:ambient-seat", alive = true, x = 10, y = 20, z = 0,
@@ -293,5 +315,62 @@ T.equal(blockedSpots[1].rejectionReason, "solid",
     "blocked seating records the concrete approach rejection reason")
 T.near(blockedSpots[1].seatAnchorX, 30.5, 0.0001,
     "blocked seating retains the animation anchor separately")
+
+local BehaviorInternal = T.load("ProjectHoomans", "shared",
+    "PNC/Core/Facilities/FacilityJobsBehavior/PNC_FacilityJobsBehavior_State.lua")
+T.load("ProjectHoomans", "shared",
+    "PNC/Core/Facilities/FacilityJobsBehavior/PNC_FacilityJobsBehavior_Surfaces.lua")
+local stabilized = 0
+PNC.LiveBodyControl = {
+    StabilizePresentationBody = function()
+        stabilized = stabilized + 1
+    end,
+}
+local floorBody = {
+    setIsResting = function(self, value) self.resting = value end,
+    setOnFloor = function(self, value) self.onFloor = value end,
+    setSitAgainstWall = function(self, value) self.againstWall = value end,
+    setSitOnGround = function(self, value) self.sitOnGround = value end,
+    setSittingOnFurniture = function(self, value)
+        self.sittingOnFurniture = value
+    end,
+    setVariable = function(self, key, value) self.variables[key] = value end,
+    clearVariable = function(self, key) self.variables[key] = nil end,
+    variables = {},
+}
+local floorRecord = {
+    id = "npc:floor-presentation", orderSpec = {
+        resourceKind = "floor_seating", floorSeating = true,
+    }, runtime = {},
+}
+local floorRuntime = {
+    seating = true, floorSeating = true, resourceKind = "floor_seating",
+    seatEntered = false, seatState = "TRAVELLING",
+}
+T.truthy(BehaviorInternal.EnterFloorSeat(floorRecord, floorBody,
+    floorRuntime, floorRecord.orderSpec),
+    "floor seating enters through its dedicated presentation lifecycle")
+T.truthy(floorBody.sitOnGround and floorBody.resting
+        and not floorBody.sittingOnFurniture,
+    "floor seating sets the native ground and resting flags")
+T.equal(stabilized, 1,
+    "floor seating stabilizes the managed body at presentation entry")
+floorBody.sitOnGround = false
+floorBody.resting = false
+floorBody.variables.PNCSeated = nil
+T.truthy(BehaviorInternal.MaintainFloorSeat(
+    floorRecord,
+    floorBody,
+    floorRuntime,
+    floorRecord.orderSpec
+), "floor seating does not restore its presentation flags")
+T.truthy(floorBody.sitOnGround and floorBody.resting
+        and floorBody.variables.PNCSeated,
+    "floor seating maintenance restores the active ground pose")
+BehaviorInternal.ClearFurnitureSeat(floorRecord, floorBody, floorRuntime)
+T.falsy(floorBody.sitOnGround or floorBody.resting,
+    "floor seating cleanup clears native ground and resting flags")
+T.equal(floorRuntime.seatState, "STANDING",
+    "floor seating cleanup returns the lifecycle to standing")
 
 T.finish("pnc_seating_smoke")

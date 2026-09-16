@@ -28,7 +28,9 @@ local function responsePayload(decision)
 end
 
 function Internal.AppendPlayerInput(view, value, result)
-    local session = view.session
+    local group = view and view.groupConversation
+    local session = group and type(group.PrimarySession) == "function"
+        and group:PrimarySession() or view.session
     local ir = result.ir or {}
     local provenance = ir.provenance or {}
     local topic = ir.extensions and ir.extensions.topic or nil
@@ -47,15 +49,26 @@ function Internal.AppendPlayerInput(view, value, result)
             confidence = ir.confidence,
             topic = topic,
         },
+        participants = group and group.participantIDs or nil,
+        groupID = group and group.id or nil,
+        groupTurnID = group and group.activeTurn
+            and group.activeTurn.id or nil,
     })
 end
 
-function Internal.QueueDeterministicResponse(view, value, result, actionResult)
-    local session = view.session
+function Internal.QueueDeterministicResponse(
+    view, value, result, actionResult, options
+)
+    options = type(options) == "table" and options or {}
+    local group = options.groupConversation or view and view.groupConversation
+    local session = options.session
+        or group and type(group.PrimarySession) == "function"
+        and group:PrimarySession()
+        or view.session
     local pendingChoices = session.currentNode
         and session.currentNode.choices or session.pendingChoices
     local decision = result.decision or {}
-    local response = responsePayload(decision)
+    local response = options.response or responsePayload(decision)
     local ir = result.ir or {}
     if actionResult and actionResult.accepted == false
         and actionResult.status ~= "unmapped"
@@ -80,7 +93,17 @@ function Internal.QueueDeterministicResponse(view, value, result, actionResult)
     session.pendingNext = nil
     session.pendingClose = nil
     session.pendingCloseReason = nil
+    local speakerID = options.speakerID
+    local speakerName = options.speakerName
+    if not speakerID and group and type(group.SpeakerFor) == "function" then
+        speakerID, speakerName = group:SpeakerFor(view)
+    end
     session:queueMessage("npc", response, {
+        speakerID = speakerID,
+        speakerName = speakerName,
+        npcID = speakerID or view.spec and view.spec.npcID,
+        participants = options.participants
+            or group and group.participantIDs or nil,
         source = {
             kind = "semantic",
             channel = "response",
@@ -89,11 +112,17 @@ function Internal.QueueDeterministicResponse(view, value, result, actionResult)
             topic = topic,
             actionResult = actionResult,
             input = tostring(value or ""),
+            groupID = options.groupID or group and group.id,
+            groupTurnID = options.groupTurnID or group
+                and group.activeTurn and group.activeTurn.id,
         },
         provenance = {
             provider = "lua",
             parser = "semantic_dialogue_policy",
             branch = decision.branch,
+            groupID = options.groupID or group and group.id,
+            groupTurnID = options.groupTurnID or group
+                and group.activeTurn and group.activeTurn.id,
         },
     })
     return true

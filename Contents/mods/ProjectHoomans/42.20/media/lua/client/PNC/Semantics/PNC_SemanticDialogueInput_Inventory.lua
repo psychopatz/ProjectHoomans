@@ -185,6 +185,18 @@ end
 local function activeView(payload)
     local candidates = {}
     local active = Input.ActiveView
+    local activeGroup = active and active.groupConversation or nil
+    if activeGroup and payload and payload.npcID
+        and type(activeGroup.ViewFor) == "function"
+    then
+        local memberView = activeGroup:ViewFor(payload.npcID)
+        if memberView and memberView.session
+            and memberView.closed ~= true
+            and memberView.lifecycleFinished ~= true
+        then
+            return memberView
+        end
+    end
     if active then candidates[#candidates + 1] = active end
     local conversation = PsychopatzCore and PsychopatzCore.Conversation
     local visible = conversation and conversation.instance or nil
@@ -255,18 +267,42 @@ function Input.ReceiveInventoryQueryResult(payload)
     session.semanticInventoryQueries[requestID] = nil
     local response = responseFor(payload, pending)
     recordInventoryContext(view, payload, response)
-    session:queueMessage("npc", response, {
+    local group = view and view.groupConversation
+    local outputSession = group
+        and type(group.PrimarySession) == "function"
+        and group:PrimarySession() or session
+    if not outputSession
+        or type(outputSession.queueMessage) ~= "function"
+    then
+        return false, "conversation_queue_unavailable"
+    end
+    local speakerID
+    local speakerName
+    if group and type(group.SpeakerFor) == "function" then
+        speakerID, speakerName = group:SpeakerFor(view)
+    end
+    outputSession:queueMessage("npc", response, {
+        speakerID = speakerID,
+        speakerName = speakerName,
+        npcID = speakerID or view.spec and view.spec.npcID,
+        participants = group and group.participantIDs or nil,
         source = {
             kind = "semantic",
             channel = "inventory_query_response",
             requestID = requestID,
             status = payload.status,
             reason = payload.reason,
+            groupID = group and group.id,
+            groupTurnID = group and group.activeTurn
+                and group.activeTurn.id or nil,
         },
         provenance = {
             provider = "server_inventory_projection",
             parser = "marketsense_item_selector",
             requestID = requestID,
+            groupID = group and group.id,
+            groupTurnID = group and group.activeTurn
+                and group.activeTurn.id or nil,
         },
     })
     return true

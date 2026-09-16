@@ -18,6 +18,8 @@ PNC = PNC or {}
 PNC.Conversation = PNC.Conversation or {}
 PNC.Semantics = PNC.Semantics or {}
 
+require "PNC/Conversation/PNC_ConversationGroup"
+
 local Conversation = PNC.Conversation
 local Policy = PNC.Semantics.DialoguePolicy
 local Text = PsychopatzCore.Conversation.Text
@@ -70,10 +72,16 @@ local function traceTurn(view, value, result, event, extra)
     local ir = result and result.ir or {}
     local decision = result and result.decision or {}
     local provenance = ir.provenance or {}
+    local group = view and view.groupConversation
     local data = {
         npcID = view and view.spec and view.spec.npcID,
         conversationID = view and view.session
             and view.session.conversationID,
+        groupID = group and group.id,
+        groupTurnID = group and group.activeTurn
+            and group.activeTurn.id or nil,
+        groupParticipantCount = group and group.members
+            and #group.members or nil,
         rawText = string.sub(tostring(value or ""), 1, 256),
         normalizedText = string.sub(
             tostring(ir.normalizedText or ""), 1, 256
@@ -115,12 +123,37 @@ require "PNC/Semantics/PNC_SemanticDialogueInput_Tasks"
 
 local Internal = Input.Internal
 
+local function groupMemberShouldHandle(view, result, value)
+    local group = view and view.groupConversation
+    if not group or type(group.MemberForHost) ~= "function"
+        or type(group.ShouldRespond) ~= "function"
+    then
+        return true
+    end
+    local member = group:MemberForHost(view)
+    return not member or group:ShouldRespond(member, result, value)
+end
+
 local function finishLocalSubmit(view, value, result)
     local inputMessage = Internal.AppendPlayerInput(view, value, result)
     if not inputMessage then return false, "input_presentation_failed" end
-    local actionResult = Internal.DispatchAction(view, result, value)
-    local queued = Internal.QueueDeterministicResponse(
-        view, value, result, actionResult)
+    local actionResult
+    local queued = false
+    if groupMemberShouldHandle(view, result, value) then
+        actionResult = Internal.DispatchAction(view, result, value)
+        queued = Internal.QueueDeterministicResponse(
+            view, value, result, actionResult)
+    else
+        audit("semantic.group.member_skipped", {
+            groupID = view.groupConversation
+                and view.groupConversation.id,
+            turnID = view.groupConversation
+                and view.groupConversation.activeTurn
+                and view.groupConversation.activeTurn.id,
+            npcID = view.spec and view.spec.npcID,
+            reason = "not_addressed",
+        })
+    end
     audit("semantic.response.queued", {
         npcID = view.spec and view.spec.npcID,
         conversationID = view.session.conversationID,
@@ -154,7 +187,7 @@ local function recordAcceptedContextTurn(view, result, options)
     return recorded, event
 end
 
-function Input.Submit(view, value, part)
+local function submitSingle(view, value, part)
     if not view or not view.session then
         return false, "conversation_unavailable"
     end
@@ -265,6 +298,19 @@ function Input.Submit(view, value, part)
     })
 
     return finishLocalSubmit(view, value, result)
+end
+
+-- Nearby mode wraps the same single-recipient semantic pipeline.  Keeping
+-- this seam explicit prevents group coordination from duplicating parsing,
+-- policy, or authoritative transport behavior.
+Internal.SubmitSingle = submitSingle
+
+function Input.Submit(view, value, part)
+    local group = view and view.groupConversation
+    if group and type(group.Submit) == "function" then
+        return group:Submit(value, part)
+    end
+    return submitSingle(view, value, part)
 end
 
 function Input.GetState(view)

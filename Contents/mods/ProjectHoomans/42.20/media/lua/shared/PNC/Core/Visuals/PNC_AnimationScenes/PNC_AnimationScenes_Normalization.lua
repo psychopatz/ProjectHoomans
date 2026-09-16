@@ -78,6 +78,10 @@ function Internal.NormalizeDefinition(sceneId, definition, steps)
         loop = steps[1].loop == true,
         blocking = definition.blocking == true,
         keepManagedUseless = definition.keepManagedUseless == true,
+        -- Some multi-step scenes are one continuous pose lease. Their
+        -- selector may change between compatible looped clips, but the
+        -- managed body must not leave the action state between steps.
+        retainBump = definition.retainBump == true,
         pool = definition.pool and tostring(definition.pool) or nil,
         category = tostring(
             definition.category

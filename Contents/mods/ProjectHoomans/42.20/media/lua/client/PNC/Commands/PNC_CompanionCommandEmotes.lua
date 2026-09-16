@@ -96,6 +96,7 @@ function Emotes.BuildMenuDefinition(scope, target, nestedMenus)
     for i = 1, #definitions do
         definition = definitions[i]
         if definition.contextOnly ~= true
+            and definition.semanticOnly ~= true
             and not (scope == "group" and (definition.attackType ~= nil
                 or definition.personalized == true))
         then

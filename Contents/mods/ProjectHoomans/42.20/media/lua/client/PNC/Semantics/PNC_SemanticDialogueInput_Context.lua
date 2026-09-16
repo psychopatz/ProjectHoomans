@@ -367,7 +367,12 @@ function Internal.RouterFor(view)
         local initialTopic = source.conversationTopic
             or source.conversationBlockContext
             and source.conversationBlockContext.conversationTopic
-        if view.spec and view.spec.npcID then
+        local groupParticipants = source.semanticGroupParticipants
+        if type(groupParticipants) == "table" then
+            for index = 1, #groupParticipants do
+                participants[#participants + 1] = groupParticipants[index]
+            end
+        elseif view.spec and view.spec.npcID then
             participants[#participants + 1] = view.spec.npcID
         end
         if session.characterUUID then
@@ -377,6 +382,7 @@ function Internal.RouterFor(view)
             participants = participants,
             currentTopic = initialTopic,
             maxEvents = 12,
+            maxParticipants = math.max(8, #participants),
         })
     end
     if not session.semanticDialogueContext

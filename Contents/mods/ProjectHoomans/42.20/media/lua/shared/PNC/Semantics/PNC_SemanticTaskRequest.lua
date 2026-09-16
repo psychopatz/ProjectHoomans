@@ -12,6 +12,8 @@ PNC.Semantics.TaskRequest = Contract
 Contract.VERSION = 1
 Contract.MAX_REQUEST_ID = 128
 Contract.MAX_TEXT = 4096
+Contract.MAX_TARGET_HINT_TEXT = 64
+Contract.MAX_TARGET_HINT_DISTANCE = 32
 
 local function copyValue(value, depth)
     if type(value) ~= "table" then return value end
@@ -50,6 +52,69 @@ end
 
 local function tableOrNil(value)
     return type(value) == "table" and copyValue(value) or nil
+end
+
+local function finiteCoordinate(value)
+    value = tonumber(value)
+    if value == nil or value ~= value or math.abs(value) > 1000000 then
+        return nil
+    end
+    return value
+end
+
+-- Client world observations are hints, not assignments.  Normalize them into
+-- a tiny primitive shape before the request can cross a multiplayer boundary.
+-- Invalid hints are ignored so the authoritative resolver can use its normal
+-- server-side lookup path instead of turning a stale client observation into
+-- a hard failure.
+local function targetHint(value)
+    if type(value) ~= "table" then return nil end
+    local x = finiteCoordinate(value.x)
+    local y = finiteCoordinate(value.y)
+    if x == nil or y == nil then return nil end
+    local z = finiteCoordinate(value.z) or 0
+    local radius = tonumber(value.radius) or 16
+    local score = confidence(value.score)
+    return {
+        version = tonumber(value.version) or 1,
+        source = boundedText(value.source or "client_loaded_world", 32),
+        kind = boundedText(value.kind, 64),
+        scope = boundedText(value.scope or value.siteScope, 16),
+        siteScope = boundedText(value.siteScope or value.scope, 16),
+        siteID = boundedText(value.siteID, 128),
+        roomID = boundedText(value.roomID, 128),
+        buildingID = boundedText(value.buildingID, 128),
+        roomType = boundedText(value.roomType, 48),
+        campfireID = boundedText(value.campfireID, 128),
+        label = boundedText(value.label, Contract.MAX_TARGET_HINT_TEXT),
+        labelKey = boundedText(value.labelKey, 96),
+        risk = boundedText(value.risk, 32),
+        query = boundedText(value.query, Contract.MAX_TARGET_HINT_TEXT),
+        x = x,
+        y = y,
+        z = z,
+        minX = finiteCoordinate(value.minX),
+        minY = finiteCoordinate(value.minY),
+        maxX = finiteCoordinate(value.maxX),
+        maxY = finiteCoordinate(value.maxY),
+        minZ = finiteCoordinate(value.minZ),
+        maxZ = finiteCoordinate(value.maxZ),
+        radius = math.max(1, math.min(Contract.MAX_TARGET_HINT_DISTANCE,
+            math.floor(radius))),
+        score = score,
+        observedAt = tonumber(value.observedAt),
+    }
+end
+
+local function targetTable(value)
+    local output = tableOrNil(value)
+    if not output then return nil end
+    if type(value.clientHint) == "table" then
+        output.clientHint = targetHint(value.clientHint)
+    else
+        output.clientHint = nil
+    end
+    return output
 end
 
 function Contract.Validate(request)
@@ -98,7 +163,7 @@ function Contract.Normalize(raw)
         action = actionID(raw.action),
         actor = tableOrNil(raw.actor),
         recipient = tableOrNil(raw.recipient),
-        target = tableOrNil(raw.target),
+        target = targetTable(raw.target),
         object = tableOrNil(raw.object),
         sourceEntity = tableOrNil(raw.sourceEntity or raw.sourceRef),
         destination = tableOrNil(raw.destination),

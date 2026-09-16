@@ -56,7 +56,12 @@ PNC = {
                     "persistent scene lease was not extended")
                 T.truthy(options and options.sceneId == "social.surrender",
                     "scene ownership token was lost")
-            elseif bump == "SitChair" then
+            elseif bump == "SitChair"
+                or bump == "Sit"
+                or bump == "SitAction"
+                or bump == "SitMaking"
+                or bump == "SitRubHands"
+            then
                 T.equal(options.keepManagedUseless, true,
                     "seat loop maintenance lost body isolation policy")
             elseif bump == "Sleep" or bump == "SleepBed" then
@@ -137,6 +142,36 @@ T.truthy(livingScene and livingScene.repeatMode == "loop"
 T.truthy(livingScene.steps[1].bump == "Sit"
         and livingScene.steps[4].bump == "SitRubHands",
     "living-room scene uses the supplied sitting bumps")
+T.equal(livingScene.keepManagedUseless, true,
+    "ground sitting scene must retain managed-body isolation")
+T.equal(livingScene.retainBump, true,
+    "ground sitting scene must retain its active bump between variants")
+T.truthy(livingScene.steps[1].loop == true
+        and livingScene.steps[2].loop == true
+        and livingScene.steps[3].loop == true
+        and livingScene.steps[4].loop == true,
+    "ground sitting variants must remain looped while selected")
+local roamingSceneTicked = false
+local roamingSceneStopped = false
+PNC.RoamingSeat = {
+    OnSceneTick = function()
+        roamingSceneTicked = true
+        return true
+    end,
+    OnSceneStopped = function()
+        roamingSceneStopped = true
+    end,
+}
+local roamingSceneRecord = { runtime = { roamingSeat = { seating = true } } }
+T.truthy(livingScene.onTick(
+    roamingSceneRecord, body, { id = "facility.living.sit" }, now
+), "ground scene did not route roaming ticks to its owner")
+livingScene.onStop(
+    roamingSceneRecord, body, { id = "facility.living.sit" }, "combat"
+)
+T.truthy(roamingSceneTicked and roamingSceneStopped,
+    "ground scene did not route roaming stop cleanup to its owner")
+PNC.RoamingSeat = nil
 local furnitureScene = PNC.AnimationScenes.Get("facility.living.sitFurniture")
 T.truthy(furnitureScene and furnitureScene.repeatMode == "loop"
         and #furnitureScene.steps == 1
@@ -488,4 +523,52 @@ T.truthy(holdAnimationCalls == 0,
     "path hold overwrote the active construction scene with Idle")
 T.truthy(holdMotionClears == 1,
     "path hold did not clear stale movement presentation for work")
+
+-- A multi-step ground scene must switch its selector in-place. The scene
+-- remains active, there is no nil-bump gap, and FinishBump is reserved for
+-- the actual release/interruption boundary.
+local groundBodyModData = {}
+local groundBody = {
+    getModData = function()
+        return groundBodyModData
+    end,
+}
+local groundRecord = {
+    id = "ground_scene_npc",
+    alive = true,
+    presenceState = "live",
+    health = { state = "normal" },
+    runtime = {},
+}
+local groundStarted, groundActive = PNC.AnimationScenes.Request(
+    groundRecord,
+    groundBody,
+    "facility.living.sit",
+    { now = now }
+)
+T.truthy(groundStarted and groundActive ~= nil,
+    "ground sitting scene did not start for retained playback")
+local groundFinishedBeforeStep = finished
+local groundRevisionBeforeStep = groundActive.playbackRevision
+now = groundActive.finishAt
+T.truthy(PNC.AnimationScenes.Tick(
+    groundRecord,
+    groundBody,
+    now
+), "ground sitting scene stopped during a retained variant switch")
+T.truthy(groundRecord.runtime.animationScene == groundActive
+        and groundActive.bump ~= nil
+        and groundActive.nextStepAt == nil
+        and groundActive.playbackRevision == groundRevisionBeforeStep + 1,
+    "ground sitting scene released its pose between variants")
+T.equal(finished, groundFinishedBeforeStep,
+    "ground sitting variant switch must not finish the active bump")
+T.truthy(PNC.AnimationScenes.Interrupt(
+    groundRecord,
+    groundBody,
+    "combat"
+), "ground sitting scene did not release for combat")
+T.equal(finished, groundFinishedBeforeStep + 1,
+    "ground sitting release must finish the bump once")
+
 T.finish("pnc_animation_scenes_smoke")

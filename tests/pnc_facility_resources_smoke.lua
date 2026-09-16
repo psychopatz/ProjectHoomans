@@ -213,4 +213,91 @@ T.equal(selectedSofa.resourceKey, sofaScan.resources[1].resourceKey,
     "sleep selection can acquire a sofa resource")
 T.equal(selectedSofa.target.sceneId, "facility.sleep.sofa",
     "sleep selection does not route sofas through chair seating")
+
+local floorBinding = {
+    detectorId = "seat", role = "living.chair",
+    resourceKind = "seating_surface",
+    virtual = {
+        key = "floor", role = "living.floor",
+        resourceKind = "floor_seating", exclusive = false,
+        perNpc = true, seating = true, floorSeating = true,
+        allowActivityOverflow = true,
+        sceneId = "facility.living.sit",
+        stopDistance = 0.45, arrivalDistance = 0.55,
+    },
+}
+PNC.FacilityDefinitions.GetLevel = function()
+    return {
+        resourceBindings = { living = floorBinding },
+        activityLimits = { living = { maxConcurrent = 8 } },
+    }
+end
+makeSquare(40, 40, {})
+makeSquare(41, 40, {})
+local emptyLiving = {
+    id = "living:floor", definitionId = "living_room", level = 1,
+    constructionState = "BUILT",
+    constructionRegion = {
+        levels = { [0] = { rows = { [40] = { 40, 41 } } } },
+    },
+}
+local firstFloor = Resources.Select(emptyLiving, "living", {
+    npcId = "npc:floor:1",
+})
+local secondFloor = Resources.Select(emptyLiving, "living", {
+    npcId = "npc:floor:2",
+})
+T.equal(firstFloor.resourceKind, "floor_seating",
+    "living selection falls back to a virtual floor seat")
+T.equal(firstFloor.target.sceneId, "facility.living.sit",
+    "facility floor fallback selects the ground sitting scene")
+T.truthy(firstFloor.target.seating and firstFloor.target.floorSeating,
+    "facility floor fallback remains a seated presentation")
+T.truthy(firstFloor.resourceKey ~= secondFloor.resourceKey,
+    "facility floor seating allocates a stable per-NPC resource key")
+T.truthy(firstFloor.target.x >= 40.5 and firstFloor.target.x <= 41.5
+        and firstFloor.target.y == 40.5,
+    "facility floor target remains inside its construction region")
+PNC.SettlementRepository = {
+    GetFacility = function(id)
+        return tostring(id) == emptyLiving.id and emptyLiving or nil
+    end,
+}
+local rehydratedFloor = Resources.ResolveActivityTarget({
+    id = "npc:floor:1",
+    runtime = { facilityActivity = {
+        capability = "living", facilityId = emptyLiving.id,
+        resourceKey = firstFloor.resourceKey,
+        resourceKind = "floor_seating", floorSeating = true,
+    } },
+})
+T.equal(rehydratedFloor.resourceKey, firstFloor.resourceKey,
+    "facility floor seating rehydrates by its per-NPC resource key")
+T.equal(rehydratedFloor.sceneId, "facility.living.sit",
+    "rehydrated facility floor seating retains its ground scene")
+
+PNC.FacilityService = {
+    ListByCapability = function() return { emptyLiving } end,
+}
+PNC.Registry = { GetLiveZombie = function() return nil end }
+PNC.FacilityReservations = {
+    Internal = {}, ByResource = {},
+    ReserveResource = function(_, resource, npcId, capability)
+        return true, {
+            id = "floor-seat-reservation", resourceKey = resource.resourceKey,
+            npcId = npcId, purpose = capability,
+        }
+    end,
+}
+T.load("ProjectHoomans", "server",
+    "PNC/Settlement/FacilityReservations/PNC_FacilityReservations_Acquisition.lua")
+local acquiredFloor = PNC.FacilityService.AcquireActivity(
+    emptyLiving.id, "npc:acquired-floor", "living", { abstract = true })
+T.truthy(acquiredFloor.ok,
+    "generic facility acquisition accepts the floor seating resource")
+T.equal(acquiredFloor.facility, emptyLiving,
+    "generic facility acquisition returns the selected facility")
+T.truthy(acquiredFloor.floorSeating
+        and acquiredFloor.target.floorSeating,
+    "generic facility acquisition preserves floor seating metadata")
 T.finish("pnc_facility_resources_smoke")

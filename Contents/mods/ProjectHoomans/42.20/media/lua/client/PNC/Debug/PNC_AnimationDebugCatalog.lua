@@ -4051,16 +4051,15 @@ PNC.AnimationDebugCatalog = {
             extends = nil,
             node = "PNC_Anim_Sit",
             anim = "Bob_SitGround_Idle",
-            looped = false,
+            looped = true,
             speed = 0.8,
             playable = true,
-            transitionCount = 0,
+            transitionCount = 3,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
                 { name = "BumpType", kind = "STRING", value = "PNC_Sit" },
             },
             events = {
-                { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
             },
         },
         {
@@ -4071,16 +4070,15 @@ PNC.AnimationDebugCatalog = {
             extends = nil,
             node = "PNC_Anim_SitAction",
             anim = "Bob_SitGround_ActionIdle",
-            looped = false,
+            looped = true,
             speed = 0.8,
             playable = true,
-            transitionCount = 0,
+            transitionCount = 3,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
                 { name = "BumpType", kind = "STRING", value = "PNC_SitAction" },
             },
             events = {
-                { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
             },
         },
         {
@@ -4110,16 +4108,15 @@ PNC.AnimationDebugCatalog = {
             extends = nil,
             node = "PNC_Anim_SitMaking",
             anim = "Bob_SitGround_Making",
-            looped = false,
+            looped = true,
             speed = 0.8,
             playable = true,
-            transitionCount = 0,
+            transitionCount = 3,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
                 { name = "BumpType", kind = "STRING", value = "PNC_SitMaking" },
             },
             events = {
-                { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
             },
         },
         {
@@ -4130,16 +4127,15 @@ PNC.AnimationDebugCatalog = {
             extends = nil,
             node = "PNC_Anim_SitRubHands",
             anim = "Bob_SitGround_RubHands",
-            looped = false,
+            looped = true,
             speed = 0.8,
             playable = true,
-            transitionCount = 0,
+            transitionCount = 3,
             conditions = {
                 { name = "PNCActor", kind = "BOOL", value = "true" },
                 { name = "BumpType", kind = "STRING", value = "PNC_SitRubHands" },
             },
             events = {
-                { name = "SetVariable", time = "End", parameter = "BumpAnimFinished=true" },
             },
         },
         {

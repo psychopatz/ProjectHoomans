@@ -29,6 +29,34 @@ local function clearFurnitureOccupancy(zombie)
     end
 end
 
+local function maintainFloorSeatPresentation(zombie)
+    if not zombie then return end
+    -- Ground sit clips are looped, but these native flags are still shared
+    -- with the vanilla action state. Reassert only the sitting presentation;
+    -- the owner callbacks call this while the seat lease is authoritative.
+    if zombie.setOnFloor then zombie:setOnFloor(false) end
+    if zombie.setSitAgainstWall then zombie:setSitAgainstWall(false) end
+    if zombie.setSitOnGround then zombie:setSitOnGround(true) end
+    if zombie.setSitOnFurnitureObject then
+        zombie:setSitOnFurnitureObject(nil)
+    end
+    if zombie.setSitOnFurnitureDirection then
+        zombie:setSitOnFurnitureDirection(nil)
+    end
+    if zombie.setSittingOnFurniture then
+        zombie:setSittingOnFurniture(false)
+    end
+    if zombie.setVariable then
+        zombie:setVariable("PNCSeated", true)
+        if zombie.clearVariable then
+            zombie:clearVariable("SitOnFurnitureDirection")
+            zombie:clearVariable("SitOnFurnitureStarted")
+            zombie:clearVariable("SitOnFurnitureAnim")
+        end
+    end
+    if zombie.setIsResting then zombie:setIsResting(true) end
+end
+
 function Internal.SleepDirection(order)
     local directionName = tostring(order and order.sleepFacing or "")
     local axis = tostring(order and (order.sleepAxis or order.interactionAxis)
@@ -72,6 +100,76 @@ function Internal.ClearSleepSurface(record, zombie, runtime, objectOverride,
     runtime.sleepSurfaceEntered = false
 end
 
+function Internal.ClearFloorSeat(record, zombie, runtime)
+    if not runtime or runtime.seating ~= true
+        or not Internal.IsFloorSeating(runtime, record and record.orderSpec)
+    then return end
+    auditSeat("floor_seat_clear_begin", record, zombie, runtime)
+    if zombie then
+        clearFurnitureOccupancy(zombie)
+        if zombie.setOnFloor then zombie:setOnFloor(false) end
+        if zombie.setSitAgainstWall then zombie:setSitAgainstWall(false) end
+        if zombie.setSitOnGround then zombie:setSitOnGround(false) end
+        if zombie.setSittingOnFurniture then
+            zombie:setSittingOnFurniture(false)
+        end
+        if zombie.clearVariable then
+            zombie:clearVariable("PNCSeated")
+            zombie:clearVariable("SitOnFurnitureDirection")
+            zombie:clearVariable("SitOnFurnitureStarted")
+            zombie:clearVariable("SitOnFurnitureAnim")
+        end
+    end
+    runtime.seatEntered = false
+    runtime.seatState = "STANDING"
+    auditSeat("floor_seat_clear_complete", record, zombie, runtime)
+end
+
+function Internal.EnterFloorSeat(record, zombie, runtime, order)
+    if not runtime or runtime.seating ~= true
+        or not Internal.IsFloorSeating(runtime, order)
+    then return true end
+    auditSeat("floor_seat_entry_attempt", record, zombie, runtime)
+    if not zombie then
+        runtime.seatEntered = true
+        runtime.seatState = "SEATED"
+        runtime.phase = "SEATED"
+        auditSeat("floor_seat_entry_complete", record, zombie, runtime,
+            "abstract")
+        return true
+    end
+    if runtime.seatEntered == true then return true end
+    clearFurnitureOccupancy(zombie)
+    maintainFloorSeatPresentation(zombie)
+    runtime.seatEntered = true
+    runtime.seatState = "SEATED"
+    runtime.phase = "SEATED"
+    if PNC.LiveBodyControl
+        and PNC.LiveBodyControl.StabilizePresentationBody
+    then
+        PNC.LiveBodyControl.StabilizePresentationBody(
+            record,
+            zombie,
+            PNC.Core and PNC.Core.Now and PNC.Core.Now() or 0,
+            "seat"
+        )
+    end
+    auditSeat("floor_seat_entry_complete", record, zombie, runtime)
+    return true
+end
+
+function Internal.MaintainFloorSeat(record, zombie, runtime, order)
+    if not runtime or runtime.seating ~= true
+        or runtime.seatEntered ~= true
+        or not Internal.IsFloorSeating(runtime, order)
+        or not zombie
+    then
+        return false
+    end
+    maintainFloorSeatPresentation(zombie)
+    return true
+end
+
 function Internal.PrepareSleepSurface(record, zombie, runtime, order)
     local surface = tostring(runtime and runtime.sleepSurface
         or order and order.sleepSurface or "")
@@ -113,6 +211,9 @@ end
 
 function Internal.ClearFurnitureSeat(record, zombie, runtime)
     if not runtime or runtime.seating ~= true then return end
+    if Internal.IsFloorSeating(runtime, record and record.orderSpec) then
+        return Internal.ClearFloorSeat(record, zombie, runtime)
+    end
     auditSeat("seat_clear_begin", record, zombie, runtime)
     local object = Internal.LiveSeatObject(record, runtime)
     if object and object.setSatChair then

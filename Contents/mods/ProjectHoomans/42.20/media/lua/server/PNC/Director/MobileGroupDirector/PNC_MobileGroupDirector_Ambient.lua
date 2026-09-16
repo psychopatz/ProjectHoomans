@@ -12,8 +12,38 @@ local Factions = PNC.Factions
 local Resolver = PNC.CommunitySiteResolver
 local Core = PNC.Core
 local Const = PNC.Const
+local Config = PNC.DirectorConfig or {}
+local Diagnostics = PNC.PerformanceScalingDiagnostics
 local Zones = require "PsychopatzCore/World/PC_ZoneRegistry"
 local GridRegion = require "PsychopatzCore/World/PC_GridRegion"
+
+-- These helpers are intentionally sampled by the shared diagnostics service.
+-- They avoid clock reads and table work when diagnostics are unavailable or
+-- disabled, and they do not alter any director decisions.
+local function beginDiagnosticTiming(name)
+    if Diagnostics and Diagnostics.BeginTiming then
+        return Diagnostics.BeginTiming(name)
+    end
+    return nil, nil
+end
+
+local function endDiagnosticTiming(name, startedAt, context)
+    if name and Diagnostics and Diagnostics.EndTiming then
+        Diagnostics.EndTiming(name, startedAt, context)
+    end
+end
+
+local function incrementDiagnostic(name, amount)
+    if Diagnostics and Diagnostics.Increment then
+        Diagnostics.Increment(name, amount)
+    end
+end
+
+local function setDiagnosticGauge(name, value)
+    if Diagnostics and Diagnostics.SetGauge then
+        Diagnostics.SetGauge(name, value)
+    end
+end
 
 local function finite(value, fallback)
     value = tonumber(value)
@@ -159,6 +189,15 @@ function H.ShelterFilter(snapshot)
     end
 end
 
+local function ambientOwnershipSnapshot(context)
+    if context and context.ownershipSnapshot then
+        return context.ownershipSnapshot
+    end
+    local snapshot = H.PlayerOwnershipSnapshot()
+    if context then context.ownershipSnapshot = snapshot end
+    return snapshot
+end
+
 function H.AmbientPhase(at)
     local hour = finite(at, 0) % 24
     if hour >= Constants.MOBILE_AMBIENT_DAY_START_HOUR
@@ -194,18 +233,32 @@ local function targetFromSite(site)
     }
 end
 
-function H.FindShelterTarget(faction, at)
+function H.FindShelterTarget(faction, at, ownershipSnapshot)
+    local timingName, timingStart = beginDiagnosticTiming(
+        "MobileAmbient.FindShelterTarget"
+    )
     local mobile = faction and faction.mobile or {}
     local site = mobile.site or {}
-    local snapshot = H.PlayerOwnershipSnapshot()
+    local snapshot = ownershipSnapshot or H.PlayerOwnershipSnapshot()
     local filter = H.ShelterFilter(snapshot)
+    local houseTimingName, houseTimingStart = beginDiagnosticTiming(
+        "MobileAmbient.FindRandomHouse"
+    )
     local selected, reason = Resolver.FindRandomHouse({
         z = site.home and site.home.z or 0,
         createdAt = at,
         randomIndex = (tonumber(mobile.relocationCount) or 0) + 1,
         siteFilter = filter,
     })
+    endDiagnosticTiming(
+        houseTimingName,
+        houseTimingStart,
+        selected and "selected" or reason
+    )
     if not selected then
+        local nearTimingName, nearTimingStart = beginDiagnosticTiming(
+            "MobileAmbient.FindAvailableNear"
+        )
         selected, reason = Resolver.FindAvailableNear(
             site.home and site.home.x or 0,
             site.home and site.home.y or 0,
@@ -216,10 +269,21 @@ function H.FindShelterTarget(faction, at)
                 siteFilter = filter,
             }
         )
+        endDiagnosticTiming(
+            nearTimingName,
+            nearTimingStart,
+            selected and "selected" or reason
+        )
     end
     if not selected or not H.IsValidShelterSite(selected, snapshot) then
+        endDiagnosticTiming(
+            timingName,
+            timingStart,
+            reason or "no_valid_shelter"
+        )
         return nil, reason or "no_valid_shelter"
     end
+    endDiagnosticTiming(timingName, timingStart, "selected")
     return targetFromSite(selected), "shelter_selected"
 end
 
@@ -238,6 +302,9 @@ function H.FindRoadTarget(faction)
     if not metaGrid or not list or not metaGrid.getZonesIntersecting then
         return nil, "nav_api_unavailable"
     end
+    local timingName, timingStart = beginDiagnosticTiming(
+        "MobileAmbient.FindRoadTarget"
+    )
     local radius = Constants.MOBILE_AMBIENT_ROAD_SEARCH_RADIUS
     local x = math.floor(finite(origin.x, 0) - radius)
     local y = math.floor(finite(origin.y, 0) - radius)
@@ -248,7 +315,10 @@ function H.FindRoadTarget(faction)
         metaGrid,
         x, y, z, width, width, list
     )
-    if not ok then return nil, "nav_query_failed" end
+    if not ok then
+        endDiagnosticTiming(timingName, timingStart, "nav_query_failed")
+        return nil, "nav_query_failed"
+    end
     local candidates = {}
     local count = list.size and list:size() or #list
     local index
@@ -272,9 +342,12 @@ function H.FindRoadTarget(faction)
             }
         end
     end
-    if #candidates == 0 then return nil, "no_nav_zone" end
+    if #candidates == 0 then
+        endDiagnosticTiming(timingName, timingStart, "no_nav_zone")
+        return nil, "no_nav_zone"
+    end
     local bounds = candidates[chooseIndex(#candidates)]
-    return {
+    local result = {
         kind = "nav",
         x = (bounds.minX + bounds.maxX) / 2,
         y = (bounds.minY + bounds.maxY) / 2,
@@ -287,7 +360,9 @@ function H.FindRoadTarget(faction)
             )
         )),
         bounds = bounds,
-    }, "nav_selected"
+    }
+    endDiagnosticTiming(timingName, timingStart, "nav_selected")
+    return result, "nav_selected"
 end
 
 local function sameTarget(left, right)
@@ -396,12 +471,18 @@ local function memberRecords(faction)
 end
 
 function H.RepairMobileOrders(faction)
+    local timingName, timingStart = beginDiagnosticTiming(
+        "MobileAmbient.RepairMobileOrders"
+    )
     local expected = H.MobileOrder(
         faction,
         faction.mobile,
         faction.mobile and faction.mobile.site
     )
-    if not expected then return 0 end
+    if not expected then
+        endDiagnosticTiming(timingName, timingStart, "no_expected_order")
+        return 0
+    end
     local repaired = 0
     for _, record in ipairs(memberRecords(faction)) do
         local jobSystem = PNC.JobSystem
@@ -417,6 +498,11 @@ function H.RepairMobileOrders(faction)
             repaired = repaired + 1
         end
     end
+    endDiagnosticTiming(
+        timingName,
+        timingStart,
+        repaired > 0 and "repaired" or "already_current"
+    )
     return repaired
 end
 
@@ -622,6 +708,9 @@ function H.RefreshStrategic(faction, at)
     then
         return faction, false
     end
+    local timingName, timingStart = beginDiagnosticTiming(
+        "MobileAmbient.RefreshStrategic"
+    )
     local target = H.FindPlayerBaseTarget(faction)
     local current = mobile.strategicTarget
     if target and not sameTarget(current, target) then
@@ -634,10 +723,15 @@ function H.RefreshStrategic(faction, at)
         }, "mobile_player_base_lost")
     end
     H.RepairMobileOrders(faction)
+    endDiagnosticTiming(
+        timingName,
+        timingStart,
+        target and "target" or "no_target"
+    )
     return faction, target ~= nil
 end
 
-function H.RefreshAmbient(faction, at)
+function H.RefreshAmbient(faction, at, context)
     local mobile = faction and faction.mobile or nil
     if not mobile
         or mobile.controlMode ~= Constants.MOBILE_CONTROL_AMBIENT
@@ -652,6 +746,9 @@ function H.RefreshAmbient(faction, at)
     then
         return faction, false
     end
+    local timingName, timingStart = beginDiagnosticTiming(
+        "MobileAmbient.RefreshAmbient"
+    )
     local phase = H.AmbientPhase(at)
     local ambient = mobile.ambient or {}
     local objective = phase == Constants.MOBILE_AMBIENT_DAY
@@ -662,12 +759,44 @@ function H.RefreshAmbient(faction, at)
         or ambient.objective ~= objective
         or not target
         or at >= (tonumber(ambient.nextObjectiveAt) or 0)
-    if needsTarget and at >= (tonumber(ambient.retryAt) or 0) then
+    local targetSelectionDue = needsTarget
+        and at >= (tonumber(ambient.retryAt) or 0)
+    local targetSelectionAllowed = not context
+        or context.ambientTargetSelectionBudget == nil
+        or context.ambientTargetSelectionBudget > 0
+    local checkDue = target and at >= (tonumber(ambient.nextCheckAt) or 0)
+    local ownershipSnapshot
+    if objective == Constants.MOBILE_AMBIENT_SHELTER
+        and ((targetSelectionDue and targetSelectionAllowed) or checkDue)
+    then
+        ownershipSnapshot = ambientOwnershipSnapshot(context)
+    end
+    if targetSelectionDue and not targetSelectionAllowed then
+        -- Leave the objective due for the next pump. This keeps target
+        -- discovery resumable without changing its eventual result.
+        incrementDiagnostic("MobileAmbient.TargetSelectionDeferred")
+        endDiagnosticTiming(timingName, timingStart, "selection_deferred")
+        return faction, target ~= nil
+    end
+    if targetSelectionDue then
+        incrementDiagnostic("MobileAmbient.TargetSelections")
+        if context and context.ambientTargetSelectionBudget ~= nil then
+            context.ambientTargetSelectionBudget =
+                context.ambientTargetSelectionBudget - 1
+            context.ambientTargetSelections =
+                (tonumber(context.ambientTargetSelections) or 0) + 1
+        end
         local selected
         if objective == Constants.MOBILE_AMBIENT_ROAD then
+            incrementDiagnostic("MobileAmbient.RoadSelections")
             selected = H.FindRoadTarget(faction)
         else
-            selected = H.FindShelterTarget(faction, at)
+            incrementDiagnostic("MobileAmbient.ShelterSelections")
+            selected = H.FindShelterTarget(
+                faction,
+                at,
+                ownershipSnapshot
+            )
         end
         if type(selected) == "table" then
             target = selected
@@ -698,13 +827,13 @@ function H.RefreshAmbient(faction, at)
                 ambient = ambient,
             }, "mobile_ambient_target_retry")
         end
-    elseif target and at >= (tonumber(ambient.nextCheckAt) or 0) then
+    elseif target and checkDue then
         if objective == Constants.MOBILE_AMBIENT_SHELTER
             and not H.IsValidShelterSite({
                 kind = "building",
                 home = { x = target.x, y = target.y, z = target.z },
                 bounds = target.bounds,
-            })
+            }, ownershipSnapshot)
         then
             ambient.nextObjectiveAt = at
             faction = updateMobile(faction, {
@@ -718,6 +847,11 @@ function H.RefreshAmbient(faction, at)
         end
     end
     H.RepairMobileOrders(faction)
+    endDiagnosticTiming(
+        timingName,
+        timingStart,
+        target and "target" or "no_target"
+    )
     return faction, target ~= nil
 end
 
@@ -750,6 +884,20 @@ end
 function Director.PumpAmbient(at, budget)
     at = finite(at, H.WorldAge and H.WorldAge() or 0)
     budget = math.max(1, math.floor(tonumber(budget) or 12))
+    local pumpTimingName, pumpTimingStart = beginDiagnosticTiming(
+        "MobileAmbient.PumpAmbient"
+    )
+    incrementDiagnostic("MobileAmbient.PumpCalls")
+    local selectionBudget = math.max(1, math.floor(
+        tonumber(Config.MOBILE_AMBIENT_TARGET_SELECTIONS_PER_PUMP) or 1
+    ))
+    local context = {
+        ambientTargetSelectionBudget = selectionBudget,
+        ambientTargetSelections = 0,
+    }
+    local discoveryTimingName, discoveryTimingStart = beginDiagnosticTiming(
+        "MobileAmbient.FactionDiscovery"
+    )
     local factionIDs = {}
     for factionID, faction in pairs(
         Factions.Registry and Factions.Registry.byID or {}
@@ -759,17 +907,35 @@ function Director.PumpAmbient(at, budget)
         end
     end
     table.sort(factionIDs)
+    endDiagnosticTiming(
+        discoveryTimingName,
+        discoveryTimingStart,
+        tostring(#factionIDs)
+    )
     local cursor = math.max(1, tonumber(Director.AmbientCursor) or 1)
     local processed = 0
     while processed < budget and #factionIDs > 0 do
         if cursor > #factionIDs then cursor = 1 end
         local faction = Factions.Get(factionIDs[cursor])
+        local selectionsBefore = context.ambientTargetSelections
         if faction then
             if H.ExpirePlayerRoamArea then
+                local roamTimingName, roamTimingStart = beginDiagnosticTiming(
+                    "MobileAmbient.ExpirePlayerRoamArea"
+                )
+                incrementDiagnostic("MobileAmbient.PlayerRoamChecks")
                 local expired, _, updated = H.ExpirePlayerRoamArea(
                     faction,
                     at
                 )
+                endDiagnosticTiming(
+                    roamTimingName,
+                    roamTimingStart,
+                    expired and "expired" or "not_expired"
+                )
+                if expired then
+                    incrementDiagnostic("MobileAmbient.PlayerRoamExpired")
+                end
                 if expired then faction = updated or Factions.Get(
                     faction.id
                 ) or faction end
@@ -779,14 +945,39 @@ function Director.PumpAmbient(at, budget)
             then
                 H.RefreshStrategic(faction, at)
             else
-                H.RefreshAmbient(faction, at)
+                H.RefreshAmbient(faction, at, context)
             end
         end
+        local targetSelectionStarted = context.ambientTargetSelections
+            > selectionsBefore
+        incrementDiagnostic("MobileAmbient.FactionsProcessed")
         cursor = cursor + 1
         processed = processed + 1
+        if targetSelectionStarted then
+            -- A target lookup may enumerate the meta-grid. Do not run a
+            -- second one in the same scheduler callback.
+            break
+        end
         if processed >= #factionIDs then break end
     end
     Director.AmbientCursor = cursor
+    if context.ambientTargetSelections > 0 then
+        incrementDiagnostic(
+            "MobileAmbient.TargetSelectionsStarted",
+            context.ambientTargetSelections
+        )
+    end
+    setDiagnosticGauge("MobileAmbient.LastFactionCount", #factionIDs)
+    setDiagnosticGauge("MobileAmbient.LastProcessed", processed)
+    setDiagnosticGauge(
+        "MobileAmbient.LastTargetSelections",
+        context.ambientTargetSelections
+    )
+    endDiagnosticTiming(
+        pumpTimingName,
+        pumpTimingStart,
+        tostring(processed)
+    )
     return processed
 end
 

@@ -49,4 +49,14 @@ T.equal(target.y, 14.5, "object approach y is retained")
 T.falsy(target.object, "Java object does not cross the plan boundary")
 T.equal(calls, 1, "object lookup is bounded")
 
+local shortTarget, shortReason = Resolver.Resolve({
+    kind = "phrase",
+    text = "bin",
+    unresolved = true,
+}, { record = { x = 10, y = 10, z = 0 } })
+T.truthy(shortTarget, "the short bin alias resolves without a client hint")
+T.equal(shortReason, nil, "the short bin alias has a deterministic resolution")
+T.equal(shortTarget.kind, "recycle_bin",
+    "the short bin alias keeps the canonical target kind")
+
 T.finish("pnc_semantic_recycle_bin_target_smoke")

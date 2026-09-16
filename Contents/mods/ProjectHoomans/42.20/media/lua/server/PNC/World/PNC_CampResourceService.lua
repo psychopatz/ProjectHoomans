@@ -13,13 +13,18 @@ local Resources = PNC.FacilityResources
 local Targets = PNC.FacilityInteractionTargets
 local Water = PNC.NearbyWaterService
 local Locator = PNC.NearbyResourceLocator
+local CampSite = PNC.Semantics and PNC.Semantics.CampSite
+    or require "PNC/Semantics/PNC_SemanticCampSite"
+local Geometry = PNC.Semantics and PNC.Semantics.CampSiteGeometry
+    or require "PNC/Semantics/PNC_SemanticCampSiteGeometry"
 
 -- Bump this whenever resource classification or target metadata changes. Old
 -- camp snapshots are world-state caches, not authoritative sleep decisions.
-Service.SCHEMA_VERSION = 3
+Service.SCHEMA_VERSION = 4
 Service.Providers = Service.Providers or {}
 Service.Runtime = Service.Runtime or {}
 Service.Runtime.camps = Service.Runtime.camps or {}
+Service.MAX_ROOM_SCAN_SQUARES = 4096
 
 local function number(value, fallback)
     local result = tonumber(value)
@@ -38,6 +43,15 @@ local function campOrder(record)
         return nil
     end
     return order
+end
+
+local function campScope(order)
+    return CampSite.NormalizeScope(order and (order.scope
+        or order.siteScope)) or CampSite.SCOPES.CAMPFIRE
+end
+
+local function roomBounds(order)
+    return CampSite.NormalizeBounds(order and order.roomBounds)
 end
 
 -- Facility activities temporarily replace the camp order. Keep the camp
@@ -64,6 +78,17 @@ local function campContext(record)
         resourceRadius = number(activity.resourceRadius
             or state and state.resourceRadius,
             Const.CAMP_RESOURCE_RADIUS or 12),
+        scope = activity.scope or activity.siteScope
+            or state and (state.scope or state.siteScope),
+        siteScope = activity.siteScope or activity.scope
+            or state and (state.siteScope or state.scope),
+        siteID = activity.siteID or state and state.siteID,
+        roomID = activity.roomID or state and state.roomID,
+        buildingID = activity.buildingID or state and state.buildingID,
+        roomType = activity.roomType or state and state.roomType,
+        roomName = activity.roomName or state and state.roomName,
+        roomBounds = activity.roomBounds or state and state.roomBounds,
+        campfireID = activity.campfireID or state and state.campfireID,
     }
 end
 
@@ -87,6 +112,26 @@ local function targetWithinCamp(record, target)
     local anchorTargetZ
     if not order or not targetX or not targetY or not targetZ then
         return false
+    end
+    if campScope(order) == CampSite.SCOPES.ROOM then
+        local bounds = roomBounds(order)
+        if not bounds or not CampSite.BoundsContain(bounds,
+            math.floor(targetX), math.floor(targetY), targetZ)
+        then
+            return false
+        end
+        -- Bounds are the durable primitive fallback. When the live square is
+        -- available, verify the actual room identity as well so overlapping
+        -- RoomDef rectangles cannot leak resources across rooms.
+        if Geometry and Geometry.GetSquare
+            and Geometry.MatchesRoom
+        then
+            local square = Geometry.GetSquare(nil, targetX, targetY, targetZ)
+            if square and not Geometry.MatchesRoom(square, order) then
+                return false
+            end
+        end
+        return true
     end
     anchorX, anchorY, anchorZ = tonumber(order.x), tonumber(order.y),
         tonumber(order.z)
@@ -326,6 +371,10 @@ Service.RegisterProvider("seat", {
 })
 
 local function snapshotMatches(state, order, radius, campRadius)
+    local stateBounds = type(state) == "table"
+        and CampSite.NormalizeBounds(state.roomBounds)
+    local orderBounds = roomBounds(order)
+    local scope = campScope(order)
     return type(state) == "table"
         and tonumber(state.schemaVersion) == tonumber(Service.SCHEMA_VERSION)
         and tostring(state.campId or "") == tostring(order.campId or "")
@@ -334,6 +383,22 @@ local function snapshotMatches(state, order, radius, campRadius)
         and tonumber(state.anchorZ) == tonumber(order.z)
         and tonumber(state.campRadius) == tonumber(campRadius)
         and tonumber(state.resourceRadius) == tonumber(radius)
+        and tostring(state.scope or state.siteScope or "") == tostring(scope)
+        and (scope ~= CampSite.SCOPES.ROOM
+            or (tostring(state.siteID or "") == tostring(order.siteID or "")
+                and tostring(state.roomID or "") == tostring(order.roomID or "")
+                and tostring(state.buildingID or "")
+                    == tostring(order.buildingID or "")
+                and stateBounds and orderBounds
+                and stateBounds.minX == orderBounds.minX
+                and stateBounds.minY == orderBounds.minY
+                and stateBounds.maxX == orderBounds.maxX
+                and stateBounds.maxY == orderBounds.maxY
+                and (stateBounds.z == nil or orderBounds.z == nil
+                    or stateBounds.z == orderBounds.z)))
+        and (scope ~= CampSite.SCOPES.CAMPFIRE
+            or tostring(state.campfireID or "")
+                == tostring(order.campfireID or order.siteID or ""))
         and type(state.resources) == "table"
 end
 
@@ -424,6 +489,8 @@ function Service.GetCachedSnapshot(record)
 end
 
 local function newCapture(entry, record, order, radius, campRadius)
+    local scope = campScope(order)
+    local bounds = roomBounds(order)
     local state = {
         schemaVersion = Service.SCHEMA_VERSION,
         campId = tostring(order.campId or "camp:" .. tostring(record.id)),
@@ -432,9 +499,42 @@ local function newCapture(entry, record, order, radius, campRadius)
         anchorZ = number(order.z, record.z or 0),
         campRadius = campRadius,
         resourceRadius = radius,
+        scope = scope,
+        siteScope = scope,
+        siteID = order.siteID,
+        roomID = order.roomID,
+        buildingID = order.buildingID,
+        roomType = order.roomType,
+        roomName = order.roomName,
+        roomBounds = bounds,
+        campfireID = order.campfireID or order.siteID,
         capturedAtWorldHour = worldHour(),
         resources = {},
     }
+    local originX = math.floor(state.anchorX)
+    local originY = math.floor(state.anchorY)
+    local minX = originX - math.floor(radius)
+    local minY = originY - math.floor(radius)
+    local maxX = originX + math.floor(radius)
+    local maxY = originY + math.floor(radius)
+    local truncated = false
+    if scope == CampSite.SCOPES.ROOM and bounds then
+        minX = math.floor(bounds.minX)
+        minY = math.floor(bounds.minY)
+        maxX = math.floor(bounds.maxX)
+        maxY = math.floor(bounds.maxY)
+        if (maxX - minX + 1) * (maxY - minY + 1)
+            > Service.MAX_ROOM_SCAN_SQUARES
+        then
+            local side = math.floor(math.sqrt(Service.MAX_ROOM_SCAN_SQUARES))
+            minX = math.max(minX, originX - math.floor(side / 2))
+            minY = math.max(minY, originY - math.floor(side / 2))
+            maxX = math.min(maxX, minX + side - 1)
+            maxY = math.min(maxY, minY + side - 1)
+            truncated = true
+        end
+    end
+    state.scanTruncated = truncated
     return {
         entry = entry,
         record = record,
@@ -443,13 +543,21 @@ local function newCapture(entry, record, order, radius, campRadius)
         cell = type(getCell) == "function" and getCell() or nil,
         live = PNC.Registry and PNC.Registry.GetLiveZombie
             and PNC.Registry.GetLiveZombie(record.id) or nil,
+        order = order,
+        scope = scope,
         radius = radius,
-        originX = math.floor(state.anchorX),
-        originY = math.floor(state.anchorY),
+        originX = originX,
+        originY = originY,
         originZ = math.floor(state.anchorZ),
         span = math.floor(radius),
         dx = -math.floor(radius),
         dy = -math.floor(radius),
+        minX = minX,
+        minY = minY,
+        maxX = maxX,
+        maxY = maxY,
+        scanX = minX,
+        scanY = minY,
     }
 end
 
@@ -483,47 +591,68 @@ local function pumpCapture(capture, budget)
     local square
     local dx
     local dy
+    local x
+    local y
     if not capture then return nil, 0 end
     if not capture.cell
         or type(capture.cell.getGridSquare) ~= "function"
     then
         return finishCapture(capture), 0
     end
-    while capture.dx <= capture.span and processed < limit do
-        dx, dy = capture.dx, capture.dy
-        capture.dy = dy + 1
-        if capture.dy > capture.span then
-            capture.dx = dx + 1
-            capture.dy = -capture.span
+    while processed < limit do
+        if capture.scope == CampSite.SCOPES.ROOM then
+            if capture.scanX > capture.maxX then break end
+            x, y = capture.scanX, capture.scanY
+            capture.scanY = capture.scanY + 1
+            if capture.scanY > capture.maxY then
+                capture.scanX = capture.scanX + 1
+                capture.scanY = capture.minY
+            end
+            square = capture.cell:getGridSquare(x, y, capture.originZ)
+            if square and Geometry.MatchesRoom
+                and not Geometry.MatchesRoom(square, capture.order)
+            then
+                square = nil
+            end
+        else
+            if capture.dx > capture.span then break end
+            dx, dy = capture.dx, capture.dy
+            capture.dy = dy + 1
+            if capture.dy > capture.span then
+                capture.dx = dx + 1
+                capture.dy = -capture.span
+            end
+            x, y = capture.originX + dx, capture.originY + dy
+            square = nil
+            if dx * dx + dy * dy <= capture.radius * capture.radius then
+                square = capture.cell:getGridSquare(x, y, capture.originZ)
+            end
         end
         processed = processed + 1
-        if dx * dx + dy * dy <= capture.radius * capture.radius then
-            square = capture.cell:getGridSquare(
-                capture.originX + dx,
-                capture.originY + dy,
-                capture.originZ
-            )
-            if square then
-                for _, provider in pairs(Service.Providers) do
-                    provider.CaptureSquare(
-                        square,
-                        function(resource)
-                            addResource(
-                                capture.state.resources,
-                                capture.seen,
-                                resource
-                            )
-                        end,
-                        {
-                            record = capture.record,
-                            character = capture.live,
-                        }
-                    )
-                end
+        if square then
+            for _, provider in pairs(Service.Providers) do
+                provider.CaptureSquare(
+                    square,
+                    function(resource)
+                        addResource(
+                            capture.state.resources,
+                            capture.seen,
+                            resource
+                        )
+                    end,
+                    {
+                        record = capture.record,
+                        character = capture.live,
+                    }
+                )
             end
         end
     end
-    if capture.dx > capture.span then
+    if (capture.scope == CampSite.SCOPES.ROOM
+        and capture.scanX > capture.maxX)
+        or (capture.scope ~= CampSite.SCOPES.ROOM
+            and capture.dx > capture.span)
+    then
         return finishCapture(capture), processed
     end
     return nil, processed
@@ -635,7 +764,8 @@ local function floorSlot(record, order)
         { 0, 0 }, { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 },
         { 1, 1 }, { -1, 1 }, { 1, -1 },
     }
-    local slot = offsets[hash + 1]
+    local slot = campScope(order) == CampSite.SCOPES.ROOM
+        and offsets[1] or offsets[hash + 1]
     local x = math.floor(number(order.x, record.x or 0)) + slot[1] + 0.5
     local y = math.floor(number(order.y, record.y or 0)) + slot[2] + 0.5
     local campId = tostring(order.campId or "camp:" .. id)
@@ -648,6 +778,44 @@ local function floorSlot(record, order)
         originZ = math.floor(number(order.z, record.z or 0)),
         exclusive = false, available = true,
         sceneId = "facility.sleep.floor", sleepSurface = "floor",
+    }
+end
+
+local function floorSeatSlot(record, order)
+    local hash = 0
+    local id = tostring(record and record.id or "npc")
+    for index = 1, #id do
+        hash = (hash + (string.byte(id, index) or 0) * index) % 8
+    end
+    local offsets = {
+        { 0, 0 }, { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 },
+        { 1, 1 }, { -1, 1 }, { 1, -1 },
+    }
+    local slot = campScope(order) == CampSite.SCOPES.ROOM
+        and offsets[1] or offsets[hash + 1]
+    local x = math.floor(number(order.x, record.x or 0)) + slot[1] + 0.5
+    local y = math.floor(number(order.y, record.y or 0)) + slot[2] + 0.5
+    local campId = tostring(order.campId or "camp:" .. id)
+    local z = number(order.z, record.z or 0)
+    return {
+        kind = "virtual", targetResolver = "floor",
+        resourceKind = "floor_seating", role = "living.floor",
+        resourceKey = campId .. ":floor_sit:" .. id,
+        x = x, y = y, z = z,
+        originX = math.floor(x), originY = math.floor(y), originZ = math.floor(z),
+        exclusive = false, available = true, virtual = true,
+        sceneId = "facility.living.sit", seating = true,
+        floorSeating = true, stopDistance = 0.45, arrivalDistance = 0.55,
+    }
+end
+
+local function floorSeatTarget(resource)
+    return {
+        x = resource.x, y = resource.y, z = resource.z,
+        sceneId = resource.sceneId, resourceKey = resource.resourceKey,
+        resourceKind = resource.resourceKind, seating = true,
+        floorSeating = true, stopDistance = resource.stopDistance,
+        arrivalDistance = resource.arrivalDistance,
     }
 end
 
@@ -797,6 +965,13 @@ function Service.FindSeat(record, options)
             end
         end
     end
+    if options.allowFloor ~= false then
+        local resource = floorSeatSlot(record, campContext(record) or {})
+        local target = floorSeatTarget(resource)
+        if targetWithinCamp(record, target) then
+            return resource, target, nil
+        end
+    end
     return nil, nil, nil, "CAMP_SEAT_UNAVAILABLE"
 end
 
@@ -899,6 +1074,8 @@ function Service.AcquireSeat(record, options)
         resourceRadius = number(order.resourceRadius,
             Const.CAMP_RESOURCE_RADIUS or 12),
         seating = true,
+        floorSeating = resource.floorSeating == true
+            or target and target.floorSeating == true,
         executionMode = options.abstract == true and "ABSTRACT" or "LIVE",
     }
 end
@@ -962,6 +1139,12 @@ local function applyTarget(record, target)
     end
     order.sceneId, order.sleepSurface = target.sceneId or "",
         target.sleepSurface or ""
+    if target.resourceKind ~= nil then
+        order.resourceKind = tostring(target.resourceKind)
+    end
+    if target.seating ~= nil then order.seating = target.seating == true end
+    order.floorSeating = target.floorSeating == true
+        or tostring(target.resourceKind or "") == "floor_seating"
     activity.target = { x = target.x, y = target.y, z = target.z }
     activity.seatAnchor = target.seatAnchorX and {
         x = tonumber(target.seatAnchorX),
@@ -969,6 +1152,12 @@ local function applyTarget(record, target)
         z = tonumber(target.seatAnchorZ or target.z),
     } or nil
     activity.sceneId, activity.sleepSurface = order.sceneId, order.sleepSurface
+    if target.resourceKind ~= nil then
+        activity.resourceKind = tostring(target.resourceKind)
+    end
+    if target.seating ~= nil then activity.seating = target.seating == true end
+    activity.floorSeating = target.floorSeating == true
+        or tostring(target.resourceKind or "") == "floor_seating"
     if tostring(activity.capability or "") == "sleep" then
         PNC.SleepRuntime = PNC.SleepRuntime or {}
         PNC.SleepRuntime.LiveObjects = PNC.SleepRuntime.LiveObjects or {}
@@ -1007,8 +1196,16 @@ function Service.ResolveActivityTarget(record)
             local target
             local resolvedResource
             if tostring(activity.capability or "") == "living" then
-                target = resolveSeat(
-                    resource, abstract, live, activity.approachKey)
+                if activity.floorSeating == true
+                    or tostring(activity.resourceKind or "")
+                        == "floor_seating"
+                then
+                    target = floorSeatTarget(floorSeatSlot(
+                        record, campContext(record) or {}))
+                else
+                    target = resolveSeat(
+                        resource, abstract, live, activity.approachKey)
+                end
             elseif tostring(activity.capability or "")
                     == "survival.drink.world"
                 or tostring(activity.resourceKind or "") == "world_water"
@@ -1025,6 +1222,20 @@ function Service.ResolveActivityTarget(record)
         end
     end
     if tostring(activity.capability or "") == "living" then
+        if activity.floorSeating == true
+            or tostring(activity.resourceKind or "") == "floor_seating"
+        then
+            local floor = floorSeatSlot(record, campContext(record) or {})
+            local target = floorSeatTarget(floor)
+            target.resourceKey = key
+            target.resourceKind = activity.resourceKind or floor.resourceKind
+            target.sceneId = activity.sceneId ~= ""
+                and activity.sceneId or target.sceneId
+            if targetWithinCamp(record, target) then
+                target.campResource = true
+                return target, floor
+            end
+        end
         local _, target = Service.FindSeat(record, {
             abstract = abstract, force = true, excludeKey = key,
         })
@@ -1156,6 +1367,11 @@ function Service.RefreshActivity(record, zombie)
     runtime.resourceKey = tostring(resource.resourceKey or "")
     runtime.resourceKind = isWater and "world_water"
         or tostring(resource.resourceKind or "")
+    if isLiving then
+        runtime.floorSeating = resource.floorSeating == true
+            or replacement.floorSeating == true
+            or tostring(resource.resourceKind or "") == "floor_seating"
+    end
     runtime.approachCandidates = targets
     runtime.approachIndex = 1
     order.reservationId = reservation.id

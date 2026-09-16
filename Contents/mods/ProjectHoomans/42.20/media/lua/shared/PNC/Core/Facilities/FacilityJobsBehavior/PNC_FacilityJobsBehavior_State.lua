@@ -11,6 +11,8 @@ PNC.SleepRuntime = PNC.SleepRuntime or {}
 PNC.SleepRuntime.LiveObjects = PNC.SleepRuntime.LiveObjects or {}
 
 function Internal.Normalize(_, spec)
+    local floorSeating = spec.floorSeating == true
+        or tostring(spec.resourceKind or "") == "floor_seating"
     return {
         kind = KIND,
         capability = tostring(spec.capability or ""),
@@ -50,7 +52,8 @@ function Internal.Normalize(_, spec)
         routeStatus = tostring(spec.routeStatus or "UNTESTED"),
         stopDistance = tonumber(spec.stopDistance),
         arrivalDistance = tonumber(spec.arrivalDistance),
-        seating = spec.seating == true,
+        seating = spec.seating == true or floorSeating,
+        floorSeating = floorSeating,
         sceneId = tostring(spec.sceneId or ""),
         sleepSurface = tostring(spec.sleepSurface or ""),
         taskLeaseId = tostring(spec.taskLeaseId or ""),
@@ -67,6 +70,20 @@ function Internal.Normalize(_, spec)
         activityItemFullType = tostring(spec.activityItemFullType or ""),
         debugHold = spec.debugHold == true,
     }
+end
+
+function Internal.IsFloorSeating(activity, order)
+    return activity and (
+        activity.floorSeating == true
+        or tostring(activity.resourceKind or "") == "floor_seating"
+        or order and order.floorSeating == true
+        or order and tostring(order.resourceKind or "") == "floor_seating"
+    ) or false
+end
+
+function Internal.IsFurnitureSeating(activity, order)
+    return activity and activity.seating == true
+        and not Internal.IsFloorSeating(activity, order) or false
 end
 
 function Internal.State(record)

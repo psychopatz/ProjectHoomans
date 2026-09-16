@@ -289,6 +289,35 @@ local function firstRegionPoint(region)
         z = bounds.minZ }
 end
 
+local function floorRegionPoint(region, npcId)
+    local normalized = GridRegion.normalize(region)
+    local candidates = {}
+    local id = tostring(npcId or "floor")
+    local hash = 0
+    for index = 1, #id do
+        hash = (hash + (string.byte(id, index) or 0) * index) % 2147483647
+    end
+    for z, level in pairs(normalized.levels or {}) do
+        for y, spans in pairs(level.rows or {}) do
+            for index = 1, #spans, 2 do
+                for x = spans[index], spans[index + 1] do
+                    candidates[#candidates + 1] = { x = x, y = y, z = z }
+                end
+            end
+        end
+    end
+    if #candidates == 0 then return nil end
+    table.sort(candidates, function(left, right)
+        if left.z ~= right.z then return left.z < right.z end
+        if left.y ~= right.y then return left.y < right.y end
+        return left.x < right.x
+    end)
+    local candidate = candidates[(hash % #candidates) + 1]
+    return {
+        x = candidate.x + 0.5, y = candidate.y + 0.5, z = candidate.z,
+    }
+end
+
 local function binding(facility, capability)
     local level = facility and PNC.FacilityDefinitions
         and PNC.FacilityDefinitions.GetLevel(facility.definitionId,
@@ -363,7 +392,11 @@ function Resources.GetCapacity(facility, capability, suppliedScan)
         -- A confirmed physical resource count is the automatic room
         -- occupancy limit. A missing/unloaded scan falls back to the
         -- definition's activity limit until the room can be inspected.
-        if count > 0 then return count, "detected", scan.status end
+        if count > 0 and not (resourceBinding.virtual
+            and resourceBinding.virtual.allowActivityOverflow == true)
+        then
+            return count, "detected", scan.status
+        end
     end
 
     local fallback = activityLimit(facility, capability)
@@ -377,20 +410,30 @@ local function resourceReserved(resource)
         and reservations.ByResource[tostring(resource.resourceKey or "")] ~= nil
 end
 
-local function virtualResource(facility, bindingData)
+local function virtualResource(facility, bindingData, npcId)
     local virtual = bindingData and bindingData.virtual
-    local point = firstRegionPoint(facility and facility.constructionRegion)
+    local point = virtual and virtual.floorSeating == true
+        and floorRegionPoint(facility and facility.constructionRegion, npcId)
+        or firstRegionPoint(facility and facility.constructionRegion)
+    local resourceKey
+    local npcKey = tostring(npcId or "")
     if not virtual or not point then return nil end
+    resourceKey = tostring(facility.id) .. ":"
+        .. tostring(virtual.key or "default")
+    if virtual.perNpc == true and npcKey ~= "" then
+        resourceKey = resourceKey .. ":" .. npcKey
+    end
     return {
         detectorId = "virtual",
         resourceKind = tostring(virtual.resourceKind or "virtual"),
-        role = tostring(bindingData.role or ""),
-        resourceKey = tostring(facility.id) .. ":"
-            .. tostring(virtual.key or "default"),
+        role = tostring(virtual.role or bindingData.role or ""),
+        resourceKey = resourceKey,
         x = point.x, y = point.y, z = point.z,
         originX = math.floor(point.x), originY = math.floor(point.y),
         originZ = math.floor(point.z), exclusive = virtual.exclusive == true,
         virtual = true, available = true,
+        seating = virtual.seating == true,
+        floorSeating = virtual.floorSeating == true,
     }
 end
 
@@ -401,6 +444,10 @@ local function virtualTarget(resource, bindingData)
         sceneId = virtual.sceneId, sleepSurface = virtual.sleepSurface,
         resourceKey = resource.resourceKey,
         resourceKind = resource.resourceKind,
+        seating = virtual.seating == true,
+        floorSeating = virtual.floorSeating == true,
+        stopDistance = tonumber(virtual.stopDistance),
+        arrivalDistance = tonumber(virtual.arrivalDistance),
     } }
 end
 
@@ -472,7 +519,7 @@ function Resources.Select(facility, capability, options)
             end
         end
     end
-    local virtual = virtualResource(facility, bindingData)
+    local virtual = virtualResource(facility, bindingData, options.npcId)
     if virtual and not resourceReserved(virtual) then
         local targets = virtualTarget(virtual, bindingData)
         local target = targets[1]
@@ -481,7 +528,9 @@ function Resources.Select(facility, capability, options)
         then
             return { resource = virtual, target = target, targets = targets,
                 role = virtual.role, resourceKind = virtual.resourceKind,
-                resourceKey = virtual.resourceKey, scanStatus = scanStatus }
+                resourceKey = virtual.resourceKey,
+                floorSeating = virtual.floorSeating == true,
+                scanStatus = scanStatus }
         end
     end
     return nil
@@ -578,7 +627,8 @@ function Resources.ResolveActivityTarget(record)
             and tostring(capabilityBinding.virtual.resourceKind or "")
                 == tostring(activity.resourceKind or "")
         then
-            local virtual = virtualResource(facility, capabilityBinding)
+            local virtual = virtualResource(facility, capabilityBinding,
+                record.id)
             if virtual and virtual.resourceKey == resourceKey then
                 local target = virtualTarget(virtual, capabilityBinding)[1]
                 if tostring(activity.capability or "") ~= "sleep"

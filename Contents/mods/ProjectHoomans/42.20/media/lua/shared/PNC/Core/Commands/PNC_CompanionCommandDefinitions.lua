@@ -153,6 +153,7 @@ Commands.Register({
 Commands.Register({
     id = "camp",
     group = "movement",
+    semanticOnly = true,
     labelKey = "UI_PNC_CommandCamp",
     label = "Camp Here",
     llmDescription = "Order this companion to stop following and make a temporary camp at their current location. Player-issued camps require the companion to be inside a building. NPC faction AI may override that restriction for its own camps. Use for requests such as 'let's just stay here for now', 'make camp', or 'rest here'. Unlike Wait Here, camp allows the companion to satisfy needs such as sleep, food, and water without requiring a home.",

@@ -72,6 +72,10 @@ local function clearStaleFacilityState(record, zombie)
     if scene and AnimationScenes and AnimationScenes.Get then
         definition = AnimationScenes.Get(scene.id)
         if definition and definition.category == "facility"
+            -- The shared ground-sit scene is also used by the transient
+            -- roaming-seat service. Its lease is owned by that service, so
+            -- do not let facility stale-state repair stop an active sitter.
+            and not (runtime and runtime.roamingSeat)
             and AnimationScenes.Stop
         then
             AnimationScenes.Stop(record, zombie, "stale_facility_scene")

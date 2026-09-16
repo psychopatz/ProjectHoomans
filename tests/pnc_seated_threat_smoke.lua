@@ -82,6 +82,7 @@ local record = {
         facilityActivity = {
             automatic = true,
             seating = true,
+            floorSeating = true,
             taskLeaseId = "",
             previousOrder = {
                 kind = "camp",
@@ -92,7 +93,7 @@ local record = {
             },
         },
         animationScene = {
-            id = "facility.living.sitFurniture",
+            id = "facility.living.sit",
             blocking = true,
         },
     },
@@ -200,6 +201,7 @@ local guardRecord = {
         facilityActivity = {
             automatic = true,
             seating = true,
+            floorSeating = true,
             taskLeaseId = "",
             previousOrder = {
                 kind = "guard",
@@ -209,12 +211,14 @@ local guardRecord = {
             },
         },
         animationScene = {
-            id = "facility.living.sitFurniture",
+            id = "facility.living.sit",
             blocking = true,
         },
     },
     orderSpec = { kind = "facility_activity" },
 }
+T.truthy(guardRecord.runtime.facilityActivity.floorSeating,
+    "seated guard threat case uses the ground sitting presentation")
 T.truthy(ThreatGuard.Tick(guardRecord, body, now),
     "seated guard enters combat when a nearby zombie is visible")
 T.equal(interrupts, 3,

@@ -3,11 +3,14 @@ PNC = PNC or {}
 PNC.HoomansLLM = PNC.HoomansLLM or {}
 PNC.HoomansLLM.Internal = PNC.HoomansLLM.Internal or {}
 
+require "PNC/Conversation/PNC_ConversationGroup"
+
 local Integration = PNC.HoomansLLM
 local Internal = Integration.Internal
 local Config = Internal.InlineChatConfig
 local Resolver = PNC.CompanionTargetResolver
 local Inline = Integration.Inline
+local Group = PNC.Conversation.Group
 local Hosts = Internal.InlineChatHosts or {}
 Internal.InlineChatHosts = Hosts
 
@@ -114,6 +117,29 @@ function Hosts.Rebuild(player, resolved, requestedMode)
     Inline.target = entries[primaryIndex]
     Inline.targetID = tostring(Inline.target.id)
     Inline.host = newHosts[primaryIndex]
+    Inline.groupConversation = nil
+    if mode == Config.MODE_NEARBY and #newHosts > 1
+        and Group and type(Group.Create) == "function"
+    then
+        local group
+        local reason
+        group, reason = Group.Create(
+            Inline.host, newHosts, entries, player, { mode = mode }
+        )
+        if group then
+            Inline.groupConversation = group
+        elseif print then
+            print("[PNC][LLM] inline_group_failed reason="
+                .. tostring(reason or "group_create_failed"))
+        end
+    end
+    for _, host in ipairs(newHosts) do
+        if not Inline.groupConversation then
+            host.groupConversation = nil
+            host.groupMemberID = nil
+            host.groupPrimary = nil
+        end
+    end
     return true
 end
 
@@ -137,6 +163,27 @@ function Hosts.RefreshLocked(player)
             then
                 Inline.target = refreshed
             end
+        end
+    end
+    if Inline.groupConversation
+        and type(Inline.groupConversation.Rebind) == "function"
+    then
+        local rebound = Inline.groupConversation:Rebind(
+            hosts, entries, Inline.host
+        )
+        if not rebound then
+            Inline.groupConversation = nil
+            for _, host in ipairs(hosts) do
+                host.groupConversation = nil
+                host.groupMemberID = nil
+                host.groupPrimary = nil
+            end
+        else
+            Inline.host = Inline.groupConversation:PrimaryView()
+            local primary = Inline.groupConversation:MemberForHost(Inline.host)
+            Inline.target = primary and primary.entry or Inline.target
+            Inline.targetID = Inline.target
+                and tostring(Inline.target.id or "") or Inline.targetID
         end
     end
 end

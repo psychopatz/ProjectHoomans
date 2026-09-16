@@ -39,6 +39,18 @@ end
 local function activeView(payload)
     local candidates = {}
     local active = Input.ActiveView
+    local activeGroup = active and active.groupConversation or nil
+    if activeGroup and payload and payload.npcID
+        and type(activeGroup.ViewFor) == "function"
+    then
+        local memberView = activeGroup:ViewFor(payload.npcID)
+        if memberView and memberView.session
+            and memberView.closed ~= true
+            and memberView.lifecycleFinished ~= true
+        then
+            return memberView
+        end
+    end
     if active then candidates[#candidates + 1] = active end
     local conversation = PsychopatzCore and PsychopatzCore.Conversation
     local visible = conversation and conversation.instance or nil
@@ -96,6 +108,11 @@ local function responseFor(payload, pending)
         if action == "WAIT_AT" then
             return "I'm here."
         end
+        if action == "CAMP" then
+            local label = payload.siteLabel or pending and pending.siteLabel
+                or "the safe place"
+            return "We're set up at " .. tostring(label) .. "."
+        end
         if action == "EAT" then
             return "That hit the spot."
         end
@@ -132,6 +149,19 @@ local function responseFor(payload, pending)
     then
         return "I can't refill that here."
     end
+    if action == "CAMP" then
+        if string.find(reason, "no_safe_room", 1, true)
+            or string.find(reason, "no_room_or_campfire", 1, true)
+        then
+            return "I don't see a safe place to camp nearby."
+        end
+        if string.find(reason, "room_not_found", 1, true) then
+            return "I can't find a safe room like that nearby."
+        end
+        if string.find(reason, "campfire", 1, true) then
+            return "There isn't a usable campfire nearby."
+        end
+    end
     if action == "WAIT_AT"
         and (string.find(reason, "not_found", 1, true)
             or string.find(reason, "world_", 1, true)
@@ -158,14 +188,30 @@ local function queueResult(view, payload, pending)
     if not session or type(session.queueMessage) ~= "function" then
         return false, "conversation_queue_unavailable"
     end
+    local group = view and view.groupConversation
+    local outputSession = group
+        and type(group.PrimarySession) == "function"
+        and group:PrimarySession() or session
+    if not outputSession or type(outputSession.queueMessage) ~= "function" then
+        return false, "conversation_queue_unavailable"
+    end
     local requestID = tostring(payload.requestID or "")
     local text = responseFor(payload, pending)
-    session:queueMessage("npc", {
+    local speakerID
+    local speakerName
+    if group and type(group.SpeakerFor) == "function" then
+        speakerID, speakerName = group:SpeakerFor(view)
+    end
+    outputSession:queueMessage("npc", {
         key = "semantic.task.result",
         domain = "pnc.system.shared.categories",
         fallback = text,
         text = text,
     }, {
+        speakerID = speakerID,
+        speakerName = speakerName,
+        npcID = speakerID or view.spec and view.spec.npcID,
+        participants = group and group.participantIDs or nil,
         source = {
             kind = "semantic",
             channel = "task_result",
@@ -179,10 +225,21 @@ local function queueResult(view, payload, pending)
             admissionActive = payload.admissionActive,
             admissionPlanID = payload.admissionPlanID,
             admissionCleanupReason = payload.admissionCleanupReason,
+            siteLabel = payload.siteLabel,
+            siteScope = payload.siteScope,
+            siteID = payload.siteID,
+            siteRoomType = payload.siteRoomType,
+            siteRisk = payload.siteRisk,
+            groupID = group and group.id,
+            groupTurnID = group and group.activeTurn
+                and group.activeTurn.id or nil,
         },
         provenance = {
             provider = "server_semantic_task",
             requestID = requestID,
+            groupID = group and group.id,
+            groupTurnID = group and group.activeTurn
+                and group.activeTurn.id or nil,
         },
     })
     return true
@@ -206,6 +263,11 @@ function Input.ReceiveSemanticTaskResult(payload)
         admissionActive = payload.admissionActive,
         admissionPlanID = payload.admissionPlanID,
         admissionCleanupReason = payload.admissionCleanupReason,
+        siteLabel = payload.siteLabel,
+        siteScope = payload.siteScope,
+        siteID = payload.siteID,
+        siteRoomType = payload.siteRoomType,
+        siteRisk = payload.siteRisk,
     }, { requestID = requestID })
     local view = activeView(payload)
     local session = view and view.session or nil
@@ -232,6 +294,7 @@ function Input.ReceiveSemanticTaskResult(payload)
         action = actionName(payload, pending),
         status = payload.status,
         reason = payload.reason,
+        siteLabel = payload.siteLabel,
         response = responseFor(payload, pending),
     }, { requestID = requestID })
     return queueResult(view, payload, pending)

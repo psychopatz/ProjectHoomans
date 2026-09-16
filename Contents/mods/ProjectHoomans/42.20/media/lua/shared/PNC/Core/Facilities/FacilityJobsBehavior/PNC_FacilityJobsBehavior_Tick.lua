@@ -255,7 +255,7 @@ function Internal.Tick(record, zombie)
         end
         return true
     end
-    if runtime.seating == true and zombie then
+    if Internal.IsFurnitureSeating(runtime, order) and zombie then
         previousSeatKey = runtime.approachKey
         previousSeatAnchorX = runtime.seatAnchor
             and runtime.seatAnchor.x or nil
@@ -316,12 +316,14 @@ function Internal.Tick(record, zombie)
     arrivalDistance = runtime.seating == true
         and (tonumber(runtime.seatArrivalDistance)
             or tonumber(order.arrivalDistance)
-            or SEAT_ARRIVAL_TOLERANCE)
+            or Internal.IsFloorSeating(runtime, order)
+                and 0.55 or SEAT_ARRIVAL_TOLERANCE)
         or (tonumber(definition.arrivalDistance) or 0.85)
     moveStopDistance = runtime.seating == true
         and (tonumber(runtime.seatStopDistance)
             or tonumber(order.stopDistance)
-            or SEAT_STOP_DISTANCE)
+            or Internal.IsFloorSeating(runtime, order)
+                and 0.45 or SEAT_STOP_DISTANCE)
         or 0.7
     if distance > arrivalDistance
         or math.abs((tonumber(record.z) or 0) - order.z) >= 0.5
@@ -355,7 +357,9 @@ function Internal.Tick(record, zombie)
         runtime.arrivalSettled = true
     end
     PNC.BehaviorCommon.HaltMovement(record, zombie, "facility_working")
-    if runtime.seating == true and runtime.positioned ~= true then
+    if Internal.IsFurnitureSeating(runtime, order)
+        and runtime.positioned ~= true
+    then
         positioned, positionReason = Internal.PositionAtSeatAnchor(
             record, zombie, runtime, order)
         if not positioned then
@@ -365,8 +369,15 @@ function Internal.Tick(record, zombie)
         end
     end
     if runtime.seating == true and runtime.seatEntered ~= true then
-        local seated, seatReason = Internal.EnterFurnitureSeat(
-            record, zombie, runtime, order)
+        local seated
+        local seatReason
+        if Internal.IsFloorSeating(runtime, order) then
+            seated, seatReason = Internal.EnterFloorSeat(
+                record, zombie, runtime, order)
+        else
+            seated, seatReason = Internal.EnterFurnitureSeat(
+                record, zombie, runtime, order)
+        end
         if not seated then
             runtime.failedReason = seatReason or "SEAT_UNAVAILABLE"
             Internal.Finish(record, zombie, runtime.failedReason)

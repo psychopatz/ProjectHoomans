@@ -9,23 +9,58 @@ local EventBus = require "PsychopatzCore/Events/PC_EventBus"
 local EventTypes = PNC.EventTypes
 local H = Needs.Internal
 local NutritionModel = PNC.NPCNutrition
+local PASSIVE_NEED_TYPES = { "thirst", "fatigue" }
 
-function Needs.Update(record, elapsedHours, reason)
-    local state = Needs.Ensure(record)
+local function setPassiveValue(record, state, needType, value, reason)
+    if H and H.SetStateValue then
+        return H.SetStateValue(record, state, needType, value, reason, false)
+    end
+    return Needs.Set(record, needType, value, reason)
+end
+
+function Needs.Update(record, elapsedHours, reason, stateOverride,
+    repositoryStateOverride)
+    local state = stateOverride
+    local repositoryState = repositoryStateOverride
+    local ignoredReason
+    if not state then
+        state, ignoredReason, repositoryState = Needs.Ensure(record)
+    end
     if not state then return false end
+    if not repositoryState and PNC.NeedsRepository
+        and PNC.NeedsRepository.Get
+    then
+        repositoryState = PNC.NeedsRepository.Get(record, true)
+    end
     elapsedHours = math.max(0, math.min(Definitions.MAX_CATCHUP_HOURS,
         tonumber(elapsedHours) or 0))
-    local rates = Needs.GetRates(record)
-    local beforeState = Utils.CopyState(state)
-    Needs.IncreaseHunger(record, rates.hunger * elapsedHours,
-        reason or "passive_increase")
-    for _, needType in ipairs({ "thirst", "fatigue" }) do
-        Needs.Modify(record, needType, rates[needType] * elapsedHours,
-            reason or "passive_increase")
+    local rates = Needs.GetRates(record, state)
+    local updateReason = reason or "passive_increase"
+    local consequences = PNC.NeedHealthConsequences
+    local beforeState = consequences and consequences.Apply
+        and Utils.CopyState(state) or nil
+
+    local hungerAmount = math.max(0, tonumber(rates.hunger) or 0)
+        * elapsedHours
+    local reserve = repositoryState
+        and math.max(0, tonumber(repositoryState.hungerOverflow) or 0) or 0
+    local consumed = math.min(reserve, hungerAmount)
+    if consumed > 0 and repositoryState then
+        repositoryState.hungerOverflow = reserve - consumed
     end
-    if PNC.NeedHealthConsequences and PNC.NeedHealthConsequences.Apply then
-        PNC.NeedHealthConsequences.Apply(record, beforeState, state, rates,
-            elapsedHours)
+    local remainingHunger = hungerAmount - consumed
+    if remainingHunger > 0 then
+        setPassiveValue(record, state, "hunger",
+            (tonumber(state.hunger) or 0) + remainingHunger, updateReason)
+    end
+
+    for _, needType in ipairs(PASSIVE_NEED_TYPES) do
+        local amount = (tonumber(rates[needType]) or 0) * elapsedHours
+        setPassiveValue(record, state, needType,
+            (tonumber(state[needType]) or 0) + amount, updateReason)
+    end
+    if consequences and consequences.Apply then
+        consequences.Apply(record, beforeState, state, rates, elapsedHours)
     end
     local nutrition = Needs.IsNutritionRealismEnabled()
         and Needs.EnsureNutrition(record) or nil
@@ -48,10 +83,12 @@ function Needs.Update(record, elapsedHours, reason)
 end
 
 function Needs.AdvanceTo(record, now, reason)
-    if not Needs.Ensure(record) then return false end
+    local state, ignoredReason, repositoryState = Needs.Ensure(record)
+    if not state then return false end
     now = math.max(0, tonumber(now) or Utils.WorldAgeHours())
     local previous = PNC.NeedsRepository.GetEvaluatedAt(record)
-    local updated = Needs.Update(record, math.max(0, now - previous), reason)
+    local updated = Needs.Update(record, math.max(0, now - previous), reason,
+        state, repositoryState)
     PNC.NeedsRepository.SetEvaluatedAt(record, now)
     return updated
 end

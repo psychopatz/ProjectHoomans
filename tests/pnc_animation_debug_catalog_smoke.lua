@@ -18,6 +18,10 @@ local inheritedStagger
 local fenceStart
 local fenceEnd
 local sitChair
+local sitGround
+local sitGroundAction
+local sitGroundMaking
+local sitGroundRubHands
 local keys = {}
 for _, entry in ipairs(catalog.entries) do
     local key = entry.folder .. "/" .. entry.file
@@ -43,6 +47,22 @@ for _, entry in ipairs(catalog.entries) do
         and entry.file == "PNC_Anim_SitChair.xml"
     then
         sitChair = entry
+    elseif entry.state == "bumped"
+        and entry.file == "PNC_Anim_Sit.xml"
+    then
+        sitGround = entry
+    elseif entry.state == "bumped"
+        and entry.file == "PNC_Anim_SitAction.xml"
+    then
+        sitGroundAction = entry
+    elseif entry.state == "bumped"
+        and entry.file == "PNC_Anim_SitMaking.xml"
+    then
+        sitGroundMaking = entry
+    elseif entry.state == "bumped"
+        and entry.file == "PNC_Anim_SitRubHands.xml"
+    then
+        sitGroundRubHands = entry
     end
 end
 
@@ -87,6 +107,20 @@ T.truthy(sitChair.anim == "Bob_SatChair",
     "chair seating must use the vanilla chair pose")
 T.truthy(sitChair.looped == true,
     "chair seating pose must remain looped")
+
+for _, entry in ipairs({
+    sitGround,
+    sitGroundAction,
+    sitGroundMaking,
+    sitGroundRubHands,
+}) do
+    T.truthy(entry, "ground seating animation node missing")
+    T.equal(entry.transitionCount, 3,
+        "ground seating variants need seated handoff transitions")
+    T.equal(#entry.events, 0,
+        "ground seating loops must not finish the bump at clip end")
+end
+
 T.finish("pnc_animation_debug_catalog_smoke")
 
 T.finish("pnc_animation_debug_catalog_smoke")

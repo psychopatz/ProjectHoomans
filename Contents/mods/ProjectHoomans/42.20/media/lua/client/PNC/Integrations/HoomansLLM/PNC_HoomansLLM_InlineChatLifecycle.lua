@@ -65,6 +65,7 @@ local function updateHostLifecycles()
         Inline.entries = {}
         Inline.host = nil
         Inline.target = nil
+        Inline.groupConversation = nil
         Targets.ClearHighlights(0)
         return false, failureReason or "conversation_interrupted"
     end
@@ -84,6 +85,27 @@ local function updateHostLifecycles()
     end
     Inline.hosts = activeHosts
     Inline.entries = activeEntries
+    if Inline.groupConversation
+        and type(Inline.groupConversation.Rebind) == "function"
+    then
+        local rebound = Inline.groupConversation:Rebind(
+            activeHosts, activeEntries, Inline.host
+        )
+        if not rebound then
+            Inline.groupConversation = nil
+            for _, host in ipairs(activeHosts) do
+                host.groupConversation = nil
+                host.groupMemberID = nil
+                host.groupPrimary = nil
+            end
+        else
+            Inline.host = Inline.groupConversation:PrimaryView()
+            local primary = Inline.groupConversation:MemberForHost(Inline.host)
+            Inline.target = primary and primary.entry or Inline.target
+            Inline.targetID = Inline.target
+                and tostring(Inline.target.id or "") or Inline.targetID
+        end
+    end
     return true
 end
 

@@ -16,6 +16,9 @@ Config.ACTION_INTERVAL_HOURS = 2 / 60
 Config.ENCOUNTER_INTERVAL_HOURS = 1 / 60
 Config.MOBILE_ACCIDENT_INTERVAL_HOURS = 2
 Config.MOBILE_AMBIENT_INTERVAL_HOURS = 2 / 60
+-- Target discovery can scan the meta-grid. Keep one ambient target search
+-- per scheduled pump so several due groups do not share one frame hitch.
+Config.MOBILE_AMBIENT_TARGET_SELECTIONS_PER_PUMP = 1
 Config.MOBILE_DEPARTURE_INTERVAL_HOURS = 24
 Config.MOBILE_DAILY_DEPARTURE_BASE_CHANCE = 0.10
 -- Player-path groups use the same deterministic daily-roll mechanism as

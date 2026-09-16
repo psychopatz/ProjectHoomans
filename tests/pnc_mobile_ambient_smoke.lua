@@ -33,6 +33,24 @@ Events = {
 }
 
 PNC = {}
+local diagnosticCounters = {}
+local diagnosticGauges = {}
+local diagnosticTimings = {}
+PNC.PerformanceScalingDiagnostics = {
+    BeginTiming = function(name)
+        return name, 0
+    end,
+    EndTiming = function(name)
+        diagnosticTimings[name] = (diagnosticTimings[name] or 0) + 1
+    end,
+    Increment = function(name, amount)
+        diagnosticCounters[name] = (diagnosticCounters[name] or 0)
+            + (tonumber(amount) or 1)
+    end,
+    SetGauge = function(name, value)
+        diagnosticGauges[name] = value
+    end,
+}
 T.load(SHARED .. "Base/PNC_Core.lua")
 T.load(SHARED .. "Base/PNC_Constants.lua")
 T.load(SHARED .. "Relationships/PNC_EntityRef.lua")
@@ -290,5 +308,63 @@ local abstractSynced = H.SyncAbstractObjective(
 T.truthy(abstractSynced, "abstract ambient objective synchronizes")
 T.equal(abstractBeginCalls, 1,
     "abstract ambient objective still starts traversal")
+
+-- A scheduled ambient pump should amortize expensive target discovery instead
+-- of refreshing every due faction in one callback.
+PNC.AbstractGroups = nil
+PNC.AbstractTraversal = nil
+local pumpFactions = {}
+for index = 1, 3 do
+    local faction = {
+        id = "faction_pump_" .. tostring(index),
+        status = "active",
+        archetypeID = "trader",
+        memberIDs = {},
+        mobile = {
+            active = true,
+            controlMode = PNC.FactionConstants.MOBILE_CONTROL_AMBIENT,
+            pathMode = PNC.FactionConstants.MOBILE_PATH_RANDOM,
+            site = safe,
+            ambient = {
+                phase = PNC.FactionConstants.MOBILE_AMBIENT_DAY,
+                objective = PNC.FactionConstants.MOBILE_AMBIENT_ROAD,
+            },
+        },
+    }
+    pumpFactions[faction.id] = faction
+end
+PNC.Factions.Registry.byID = pumpFactions
+local originalShelterTarget = H.FindShelterTarget
+local shelterSelections = 0
+H.FindShelterTarget = function()
+    shelterSelections = shelterSelections + 1
+    return {
+        kind = "building",
+        siteID = safe.id,
+        x = safe.home.x, y = safe.home.y, z = safe.home.z,
+        radius = safe.home.radius,
+        bounds = safe.bounds,
+    }, "test_shelter"
+end
+PNC.MobileGroupDirector.AmbientCursor = 1
+local pumpProcessed = PNC.MobileGroupDirector.PumpAmbient(22, 12)
+T.equal(pumpProcessed, 1,
+    "ambient pump stops after one expensive target selection")
+T.equal(shelterSelections, 1,
+    "ambient pump performs one target selection per callback")
+local nextPumpProcessed = PNC.MobileGroupDirector.PumpAmbient(22, 12)
+T.equal(nextPumpProcessed, 1,
+    "ambient pump resumes on the next due faction")
+T.equal(shelterSelections, 2,
+    "ambient target selection remains amortized across callbacks")
+T.truthy(diagnosticCounters["MobileAmbient.PumpCalls"] >= 2,
+    "ambient pump diagnostics count scheduled callbacks")
+T.truthy(diagnosticTimings["MobileAmbient.PumpAmbient"] >= 2,
+    "ambient pump diagnostics sample the full callback")
+T.truthy(diagnosticTimings["MobileAmbient.ExpirePlayerRoamArea"] >= 2,
+    "ambient pump diagnostics sample player-roam checks")
+T.equal(diagnosticGauges["MobileAmbient.LastTargetSelections"], 1,
+    "ambient pump diagnostics report the bounded selection count")
+H.FindShelterTarget = originalShelterTarget
 
 T.finish("pnc_mobile_ambient_smoke")

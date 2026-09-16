@@ -17,6 +17,8 @@ local Resolver = PNC.Semantics.WorldTargetResolver
 local Locator = PNC.NearbyResourceLocator
 local FacilityTargets = PNC.FacilityInteractionTargets
 local Diagnostics = PNC.Semantics.SemanticDiagnostics
+local Catalog = PNC.Semantics.WorldTargetCatalog
+    or require "PNC/Semantics/PNC_SemanticWorldTargetCatalog"
 
 Resolver.Providers = Resolver.Providers or {}
 Resolver.Aliases = Resolver.Aliases or {}
@@ -48,6 +50,99 @@ local function boundedRadius(value, fallback)
     return math.max(0, math.min(Resolver.MAX_RADIUS,
         math.floor(number(value) or fallback or 12)))
 end
+
+local function validClientHint(target, kind, origin, radius)
+    local raw = target and target.clientHint
+    local hintKind
+    local x
+    local y
+    local z
+    local originX
+    local originY
+    local originZ
+    local maximum
+    local dx
+    local dy
+    if type(raw) ~= "table" then return nil end
+    hintKind = lower(raw.kind)
+    hintKind = string.gsub(hintKind, "[%s%-]+", "_")
+    if hintKind ~= "" and hintKind ~= lower(kind) then
+        return nil, "client_hint_kind_mismatch"
+    end
+    if hintKind ~= ""
+        and Catalog and type(Catalog.Get) == "function"
+        and not Catalog.Get(hintKind)
+    then
+        return nil, "client_hint_kind_unknown"
+    end
+    if Catalog and type(Catalog.Normalize) == "function"
+        and raw.query ~= nil
+    then
+        local requested = target and (target.text or target.value
+            or target.category or target.concept or target.id) or ""
+        local requestedKey = Catalog.Normalize(requested)
+        local queryKey = Catalog.Normalize(raw.query)
+        if requestedKey ~= "" and queryKey ~= ""
+            and requestedKey ~= queryKey
+        then
+            return nil, "client_hint_query_mismatch"
+        end
+    end
+    x = number(raw.x)
+    y = number(raw.y)
+    z = number(raw.z) or 0
+    if x == nil or y == nil
+        or math.abs(x) > 1000000 or math.abs(y) > 1000000
+    then
+        return nil, "client_hint_coordinates_invalid"
+    end
+    originX = number(call(origin, "getX"))
+    originY = number(call(origin, "getY"))
+    originZ = number(call(origin, "getZ")) or 0
+    if originX == nil or originY == nil then
+        return nil, "world_origin_unavailable"
+    end
+    maximum = math.max(4, math.min(Resolver.MAX_RADIUS,
+        (number(radius) or 12) + 4))
+    dx = x - number(originX)
+    dy = y - number(originY)
+    if dx * dx + dy * dy > maximum * maximum
+        or math.abs(z - number(originZ)) > 1
+    then
+        return nil, "client_hint_out_of_range"
+    end
+    return {
+        kind = hintKind,
+        x = x,
+        y = y,
+        z = z,
+        score = number(raw.score),
+    }
+end
+
+local function nearClientHint(entry, hint, maximum)
+    if not entry or not hint then return false end
+    local x = number(entry.x)
+    local y = number(entry.y)
+    local z = number(entry.z) or 0
+    if x == nil or y == nil then return false end
+    local dx = x - hint.x
+    local dy = y - hint.y
+    maximum = number(maximum) or 2.5
+    return dx * dx + dy * dy <= maximum * maximum
+        and math.abs(z - hint.z) <= 1
+end
+
+local function hintKey(hint)
+    if not hint then return "" end
+    return tostring(math.floor(hint.x * 10)) .. ":"
+        .. tostring(math.floor(hint.y * 10)) .. ":"
+        .. tostring(math.floor(hint.z * 10))
+end
+
+Resolver.ValidateClientHint = validClientHint
+Resolver.NearClientHint = nearClientHint
+Resolver.ClientHintKey = hintKey
 
 local function primitiveTarget(raw, fallbackKind)
     if type(raw) ~= "table" then return nil end
@@ -211,20 +306,34 @@ local function resolveCampfire(target, context)
     local radius = boundedRadius(target and target.radius, 16)
     local wantedID = target and (target.targetID or target.id
         or target.objectID)
+    local hint, hintReason = validClientHint(target, "campfire", origin, radius)
+    local hintPresent = target and type(target.clientHint) == "table"
+    local function find(useHint)
+        local key = "semantic_campfire:" .. tostring(wantedID or "nearest")
+        if useHint then key = key .. ":hint:" .. hintKey(hint) end
+        return Locator.FindObject(origin, {
+            radius = radius,
+            cacheMs = tonumber(target and target.cacheMs)
+                or Resolver.OBJECT_CACHE_MS,
+            cacheKey = key,
+            accept = function(candidate)
+                if not isCampfire(candidate, wantedID) then return false end
+                return not useHint or nearClientHint(candidate, hint, 2.5)
+            end,
+            specialObject = globalCampfireForSquare,
+        })
+    end
+    local entry
+    local hintAccepted = false
     if not origin then return nil, "world_origin_unavailable" end
     if not Locator or type(Locator.FindObject) ~= "function" then
         return nil, "world_locator_unavailable"
     end
-    local entry = Locator.FindObject(origin, {
-        radius = radius,
-        cacheMs = tonumber(target and target.cacheMs)
-            or Resolver.OBJECT_CACHE_MS,
-        cacheKey = "semantic_campfire:" .. tostring(wantedID or "nearest"),
-        accept = function(candidate)
-            return isCampfire(candidate, wantedID)
-        end,
-        specialObject = globalCampfireForSquare,
-    })
+    if hint then
+        entry = find(true)
+        hintAccepted = entry ~= nil
+    end
+    if not entry then entry = find(false) end
     if not entry then return nil, "campfire_not_found" end
     local result = primitiveTarget({
         kind = "campfire",
@@ -240,6 +349,9 @@ local function resolveCampfire(target, context)
     if not result then return nil, "campfire_position_unavailable" end
     result.objectKind = "campfire"
     result.resourceKey = entry.key
+    result.clientHintAccepted = hintAccepted
+    result.clientHintRejected = hintPresent and not hintAccepted
+    result.clientHintReason = hintReason
     return result
 end
 
@@ -293,6 +405,21 @@ function Resolver.ResolveKind(target)
         local key = aliasKey(values[index])
         local mapped = Resolver.Aliases[key]
         if mapped then return mapped end
+    end
+    if Catalog and type(Catalog.ResolveKind) == "function" then
+        local mapped = Catalog.ResolveKind(target)
+        if mapped then return mapped end
+    end
+    -- A client may correct a misspelled surface phrase, but the hinted kind is
+    -- usable only if this server already has a registered provider for it.
+    local hint = target.clientHint
+    local hintedKind = hint and lower(hint.kind) or ""
+    hintedKind = string.gsub(hintedKind, "[%s%-]+", "_")
+    if hintedKind ~= "" and Resolver.Providers[hintedKind]
+        and (not Catalog or type(Catalog.Get) ~= "function"
+            or Catalog.Get(hintedKind) ~= nil)
+    then
+        return hintedKind
     end
     return nil
 end
@@ -359,6 +486,9 @@ function Resolver.Resolve(target, context)
     end
     bounded.objectKind = text(result.objectKind)
     bounded.resourceKey = text(result.resourceKey)
+    bounded.clientHintAccepted = result.clientHintAccepted == true
+    bounded.clientHintRejected = result.clientHintRejected == true
+    bounded.clientHintReason = text(result.clientHintReason)
     return traceResolution(target, context, kind, bounded, nil)
 end
 

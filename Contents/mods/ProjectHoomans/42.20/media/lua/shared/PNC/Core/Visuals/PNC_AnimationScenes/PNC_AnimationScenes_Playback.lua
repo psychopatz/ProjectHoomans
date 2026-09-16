@@ -178,6 +178,42 @@ function Internal.ScheduleNextStep(
     now
 )
     local completedStepIndex = scene.stepIndex
+    if definition.retainBump == true then
+        if not advanceSequence(scene, definition, completedStepIndex) then
+            if scene.bump
+                and PNC.Animation
+                and PNC.Animation.FinishBump
+            then
+                PNC.Animation.FinishBump(zombie, true)
+            end
+            scene.bump = nil
+            scene.loop = false
+            scene.finishAt = 0
+            Internal.ClearLocalSceneKey(zombie)
+            Internal.ClearScene(record, zombie, "completed", false)
+            return false
+        end
+        -- Keep the existing BumpedState lease while selecting the next
+        -- compatible sitting clip. This removes the nil-bump/inter-step gap
+        -- that made ground sitting visibly stand up between variants.
+        local started, reason = Internal.ActivateStep(
+            record,
+            zombie,
+            scene,
+            definition,
+            now
+        )
+        if not started then
+            Internal.ClearScene(
+                record,
+                zombie,
+                reason or "step_start_failed",
+                true
+            )
+            return false
+        end
+        return true
+    end
     if scene.bump and PNC.Animation and PNC.Animation.FinishBump then
         PNC.Animation.FinishBump(zombie, true)
     end

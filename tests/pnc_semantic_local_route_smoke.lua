@@ -275,6 +275,23 @@ T.equal(entityPreview.ir.diagnostics.unresolvedEntity, false,
     "known conversation entity is resolved before policy")
 T.truthy(Semantic, "Core semantic parser remains the active parser")
 
+view.spec.context.entry.snapshot.needs.hunger = 0.82
+view.spec.context.entry.snapshot.needs.thirst = 0.10
+view.spec.context.entry.snapshot.needs.fatigue = 0.10
+local offerAccepted = Input.Submit(view, "who wants an apple")
+T.equal(offerAccepted, true, "item offers stay on the local route")
+T.equal(view.lastSemanticDialogueResult.decision.branch,
+    "OFFER_RECEIVED", "offers select a dedicated semantic branch")
+T.equal(queued[#queued].payload.fallback, "I could use one.",
+    "a hungry NPC reacts to an offer from its local need state")
+
+view.spec.context.entry.snapshot.needs.hunger = 0.10
+local declinedOffer = Input.Submit(view, "who wants an apple")
+T.equal(declinedOffer, true, "a non-hungry NPC can decline locally")
+T.equal(queued[#queued].payload.fallback,
+    "No thanks, I'm not hungry.",
+    "offer response changes with the NPC's current need state")
+
 PNC = originalPNC
 PsychopatzCore = originalPsychopatzCore
 PsychopatzConversationLLMInput = originalInputClass

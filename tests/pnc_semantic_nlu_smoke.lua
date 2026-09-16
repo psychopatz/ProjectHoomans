@@ -39,6 +39,15 @@ T.equal(greeting.diagnostics.matchedPattern, "pnc.social.greet",
 T.equal(greeting.diagnostics.recommendedRoute, "deterministic",
     "greetings never require the optional LLM")
 
+local offer = Parser.Parse("Who wants an apple?")
+T.equal(offer.intent, "OFFER", "offer intent")
+T.equal(offer.speechAct, "OFFER", "offer speech act")
+T.equal(offer.object.text, "apple", "offer preserves the item phrase")
+T.equal(offer.object.unresolved, true,
+    "unknown offered items remain data for the later item resolver")
+T.equal(offer.diagnostics.recommendedRoute, "deterministic",
+    "an item offer has no gameplay side effect and remains local")
+
 local waitHere = Parser.Parse("Wait here.")
 T.equal(waitHere.action, "STAY", "wait maps to existing stay semantics")
 

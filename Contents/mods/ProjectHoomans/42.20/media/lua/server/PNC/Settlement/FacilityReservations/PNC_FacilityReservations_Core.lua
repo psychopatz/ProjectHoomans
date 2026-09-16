@@ -28,6 +28,7 @@ end
 local function isSeatingReservation(reservation, purpose)
     return reservation and (
         tostring(reservation.resourceKind or "") == "seating_surface"
+        or tostring(reservation.resourceKind or "") == "floor_seating"
         or tostring(purpose or reservation.purpose or "")
             == "ambient_roam_seat"
     )

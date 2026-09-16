@@ -155,6 +155,23 @@ T.equal(interacted, true, "collision opens current-square door")
 T.equal(interaction, "door_open", "collision interaction")
 T.equal(opened, true, "collision door state")
 
+-- The live-body safety guard cancels vanilla movement with no lane object.
+-- The interaction resolver must recover the exact door from the same feeler,
+-- otherwise a corner-aligned door can be missed by directional probing.
+PNC.LiveBodyControl = {
+    GetVanillaPassageAhead = function() return door, "door" end,
+}
+opened = false
+zombie.isCollidedWithDoor = function() return false end
+lane = {}
+interacted, interaction = PNC.PathService.Internal.tryDoorOrWindowInteraction(
+    zombie, { id = "feeler_door_test" }, lane, 2.5, 0.5, 0
+)
+T.equal(interacted, true, "feeler passage opens without blocked-lane metadata")
+T.equal(interaction, "door_open", "feeler passage interaction")
+T.equal(opened, true, "feeler-resolved door state")
+PNC.LiveBodyControl = nil
+
 opened = false
 door.isLockedByKey = function() return true end
 T.equal(PNC.PathService.Internal.openDoorForNPC(zombie, door), false, "key-locked door stays closed")

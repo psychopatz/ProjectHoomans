@@ -11,6 +11,8 @@ PNC.Semantics = PNC.Semantics or {}
 
 local Resolver = PNC.Semantics.WorldTargetResolver
 local Locator = PNC.NearbyResourceLocator
+local Catalog = PNC.Semantics.WorldTargetCatalog
+    or require "PNC/Semantics/PNC_SemanticWorldTargetCatalog"
 local SquareRules
 local loadedRules, rules = pcall(
     require, "PsychopatzCore/World/PsychopatzSquareRules")
@@ -37,19 +39,44 @@ local function addValue(values, value)
     if value then values[#values + 1] = lower(value) end
 end
 
-local function objectText(object)
-    local values = {}
-    addValue(values, call(object, "getObjectName"))
-    addValue(values, call(object, "getName"))
-    addValue(values, call(object, "getSpriteName"))
+local function objectMetadata(object)
+    local labels = {}
+    local sprites = {}
     local sprite = call(object, "getSprite")
-    addValue(values, call(sprite, "getName"))
-    addValue(values, call(sprite, "getSpriteName"))
+    local spriteName = call(object, "getSpriteName")
+    local container = call(object, "getContainer")
+    local function addLabel(value) addValue(labels, value) end
+    local function addSprite(value)
+        value = text(value)
+        if value then sprites[#sprites + 1] = lower(value) end
+    end
+
+    addLabel(call(object, "getObjectName"))
+    addLabel(call(object, "getName"))
+    addLabel(spriteName)
+    addSprite(spriteName)
+    addLabel(call(sprite, "getName"))
+    addLabel(call(sprite, "getSpriteName"))
+    addSprite(call(sprite, "getName"))
+    addSprite(call(sprite, "getSpriteName"))
+    addLabel(call(container, "getType"))
     if SquareRules and type(SquareRules.GetObjectProperty) == "function" then
-        addValue(values, SquareRules.GetObjectProperty(object, "CustomName"))
-        addValue(values, SquareRules.GetObjectProperty(object, "GroupName"))
-        addValue(values, SquareRules.GetObjectProperty(object, "Type"))
-        addValue(values, SquareRules.GetObjectProperty(object, "FurnitureType"))
+        addLabel(SquareRules.GetObjectProperty(object, "CustomName"))
+        addLabel(SquareRules.GetObjectProperty(object, "GroupName"))
+        addLabel(SquareRules.GetObjectProperty(object, "Type"))
+        addLabel(SquareRules.GetObjectProperty(object, "FurnitureType"))
+    end
+    return { labels = labels, spriteNames = sprites }
+end
+
+local function objectText(object)
+    local metadata = objectMetadata(object)
+    local values = {}
+    for index = 1, #(metadata.labels or {}) do
+        addValue(values, metadata.labels[index])
+    end
+    for index = 1, #(metadata.spriteNames or {}) do
+        addValue(values, metadata.spriteNames[index])
     end
     return table.concat(values, " ")
 end
@@ -64,6 +91,11 @@ local function isRecycleBin(entry)
     local sprite = lower(call(object, "getSpriteName"))
     if sprite == "" then
         sprite = lower(call(call(object, "getSprite"), "getName"))
+    end
+    if Catalog and type(Catalog.Matches) == "function"
+        and Catalog.Matches("recycle_bin", objectMetadata(object))
+    then
+        return true
     end
     return contains(fullText, "recycle bin")
         or contains(fullText, "recycling bin")
@@ -90,17 +122,43 @@ end
 
 local function resolveObject(target, context, kind, predicate, missingReason)
     local origin = originFor(context)
+    local radius = math.max(1, math.min(32,
+        math.floor(tonumber(target and target.radius) or 16)))
+    local hint
+    local hintReason
+    local hintPresent = target and type(target.clientHint) == "table"
+    local hintAccepted = false
+    local function find(useHint)
+        local cacheKey = "semantic_object:" .. kind
+        if useHint and Resolver.ClientHintKey then
+            cacheKey = cacheKey .. ":hint:"
+                .. Resolver.ClientHintKey(hint)
+        end
+        return Locator.FindObject(origin, {
+            radius = radius,
+            cacheMs = math.max(0, tonumber(target and target.cacheMs) or 1000),
+            cacheKey = cacheKey,
+            accept = function(candidate)
+                if not predicate(candidate) then return false end
+                return not useHint
+                    or Resolver.NearClientHint(candidate, hint, 2.5)
+            end,
+        })
+    end
     if not origin then return nil, "world_origin_unavailable" end
     if not Locator or type(Locator.FindObject) ~= "function" then
         return nil, "world_locator_unavailable"
     end
-    local entry = Locator.FindObject(origin, {
-        radius = math.max(1, math.min(32,
-            math.floor(tonumber(target and target.radius) or 16))),
-        cacheMs = math.max(0, tonumber(target and target.cacheMs) or 1000),
-        cacheKey = "semantic_object:" .. kind,
-        accept = predicate,
-    })
+    if Resolver.ValidateClientHint then
+        hint, hintReason = Resolver.ValidateClientHint(
+            target, kind, origin, radius)
+    end
+    local entry
+    if hint then
+        entry = find(true)
+        hintAccepted = entry ~= nil
+    end
+    if not entry then entry = find(false) end
     if not entry then return nil, missingReason end
     local x = tonumber(entry.x)
     local y = tonumber(entry.y)
@@ -118,6 +176,9 @@ local function resolveObject(target, context, kind, predicate, missingReason)
             tonumber(target and target.stopDistance) or 1.25),
         objectKind = kind,
         resourceKey = text(entry.key),
+        clientHintAccepted = hintAccepted,
+        clientHintRejected = hintPresent and not hintAccepted,
+        clientHintReason = hintReason,
     }
 end
 
@@ -132,11 +193,41 @@ local function resolveRecycleBin(target, context)
 end
 
 Resolver.Register("recycle_bin", resolveRecycleBin)
-Resolver.RegisterAlias("recycle bin", "recycle_bin")
-Resolver.RegisterAlias("recycling bin", "recycle_bin")
-Resolver.RegisterAlias("trash bin", "recycle_bin")
-Resolver.RegisterAlias("garbage bin", "recycle_bin")
-Resolver.RegisterAlias("campfire", "campfire")
-Resolver.RegisterAlias("fire pit", "campfire")
+local function resolveCatalogObject(target, context, profile)
+    return resolveObject(
+        target,
+        context,
+        profile.kind,
+        function(entry)
+            return Catalog.Matches(profile.kind,
+                objectMetadata(entry and entry.object))
+        end,
+        profile.kind .. "_not_found"
+    )
+end
+
+local function registerCatalogProfile(profile)
+    if not profile then return false, "world_target_profile_missing" end
+    for index = 1, #(profile.aliases or {}) do
+        Resolver.RegisterAlias(profile.aliases[index], profile.kind)
+    end
+    -- Special profiles have a dedicated provider because their engine object
+    -- may not be present in square:getObjects().
+    if not profile.special and not Resolver.Providers[profile.kind] then
+        Resolver.Register(profile.kind, function(target, context)
+            return resolveCatalogObject(target, context, profile)
+        end)
+    end
+    return true, profile.kind
+end
+
+function Resolver.RegisterCatalogProfile(kind)
+    local profile = Catalog and Catalog.Get and Catalog.Get(kind) or nil
+    return registerCatalogProfile(profile)
+end
+
+for _, profile in ipairs(Catalog and Catalog.List and Catalog.List() or {}) do
+    registerCatalogProfile(profile)
+end
 
 return Resolver

@@ -240,7 +240,13 @@ end
 function LiveBodyControl.IsStationaryPresentationBumpType(kind, bumpType)
     kind = tostring(kind or "")
     bumpType = tostring(bumpType or "")
-    if kind == "seat" then return bumpType == "PNC_SitChair" end
+    if kind == "seat" then
+        return bumpType == "PNC_SitChair"
+            or bumpType == "PNC_Sit"
+            or bumpType == "PNC_SitAction"
+            or bumpType == "PNC_SitMaking"
+            or bumpType == "PNC_SitRubHands"
+    end
     return kind == "sleep"
         and (bumpType == "PNC_Sleep" or bumpType == "PNC_SleepBed")
 end

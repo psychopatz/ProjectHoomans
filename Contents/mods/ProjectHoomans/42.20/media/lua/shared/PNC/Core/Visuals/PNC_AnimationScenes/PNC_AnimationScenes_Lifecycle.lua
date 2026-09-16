@@ -92,6 +92,7 @@ local function isSeatingScene(runtime, scene)
         Diagnostics and Diagnostics.IsSeatingSceneId
             and Diagnostics.IsSeatingSceneId(scene.id)
         or scene.id == "facility.living.sitFurniture"
+        or scene.id == "facility.living.sit"
         or scene.id == "ambient.roam.sitFurniture"
         or activity and activity.seating == true
         or roaming and roaming.seating == true
@@ -355,6 +356,7 @@ function Scenes.Request(record, zombie, sceneId, options)
         and ((Diagnostics.IsSeatingSceneId
             and Diagnostics.IsSeatingSceneId(sceneId))
             or sceneId == "facility.living.sitFurniture"
+            or sceneId == "facility.living.sit"
             or runtime.facilityActivity
                 and runtime.facilityActivity.seating == true
             or runtime.roamingSeat

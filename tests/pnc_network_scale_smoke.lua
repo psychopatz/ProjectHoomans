@@ -802,6 +802,37 @@ T.truthy(
     "replica sequence did not advance between server broadcasts"
 )
 
+-- Periodic roster entries are coalesced by id. Snapshot construction waits
+-- until flush so movement before delivery is represented by the latest state.
+sent = {}
+nearbyRecord.runtime.rosterSignature = nil
+nearbyRecord.runtime.lastRosterQueuedAt = nil
+nearbyRecord.x = 101
+T.equal(PNC.Network.QueuePeriodicRoster(nearbyRecord, 20000), true,
+    "periodic roster entry was not queued")
+local deferredRosterEntry = PNC.Network.ServerState.rosterDeltas[nearbyRecord.id]
+T.equal(deferredRosterEntry.snapshot, nil,
+    "periodic roster snapshot was built before flush")
+T.equal(deferredRosterEntry.record, nearbyRecord,
+    "periodic roster did not retain the authoritative record")
+nearbyRecord.x = 103
+T.equal(PNC.Network.FlushRosterDeltas(21000, true), 1,
+    "periodic roster delta count")
+T.equal(sent[1].payload.entries[1].snapshot.x, nearbyRecord.x,
+    "periodic roster did not materialize the latest position")
+T.equal(sent[1].payload.entries[1].record, nil,
+    "periodic roster leaked its server-only record reference")
+
+sent = {}
+T.equal(PNC.Network.Internal.QueueBroadcastRoster(nearbyRecord, "explicit_test"), true,
+    "explicit broadcast roster entry was not queued")
+local deferredBroadcastRosterEntry =
+    PNC.Network.ServerState.rosterDeltas[nearbyRecord.id]
+T.equal(deferredBroadcastRosterEntry.snapshot, nil,
+    "explicit broadcast built a duplicate roster snapshot")
+T.equal(PNC.Network.FlushRosterDeltas(22000, true), 1,
+    "explicit broadcast roster delta count")
+
 local loopbackEvents = 0
 triggerEvent = function()
     loopbackEvents = loopbackEvents + 1

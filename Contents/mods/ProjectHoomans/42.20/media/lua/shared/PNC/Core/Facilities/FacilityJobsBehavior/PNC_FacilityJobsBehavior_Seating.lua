@@ -61,6 +61,9 @@ function Internal.RefreshLiveSeatTarget(record, zombie, runtime, order)
     if not runtime or runtime.seating ~= true or not zombie then
         return true, nil, false
     end
+    if Internal.IsFloorSeating(runtime, order) then
+        return true, nil, false
+    end
     if not resources or not resources.BuildSeatSpots then
         return true, nil, false
     end
@@ -176,6 +179,7 @@ function Internal.ApplySeatFacing(zombie, direction, side)
 end
 
 function Internal.PositionAtSeatAnchor(record, zombie, runtime, order)
+    if Internal.IsFloorSeating(runtime, order) then return true end
     local x = tonumber(runtime and runtime.seatAnchor
         and runtime.seatAnchor.x)
         or tonumber(order.seatAnchorX)

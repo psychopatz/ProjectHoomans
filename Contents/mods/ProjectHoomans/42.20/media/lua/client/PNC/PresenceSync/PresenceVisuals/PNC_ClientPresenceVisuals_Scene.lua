@@ -15,6 +15,7 @@ local Diagnostics = PNC.PerformanceScalingDiagnostics
 
 local function isFurnitureSeatingScene(sceneId)
     if sceneId == "facility.living.sitFurniture"
+        or sceneId == "facility.living.sit"
         or sceneId == "ambient.roam.sitFurniture"
     then
         return true

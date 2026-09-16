@@ -425,6 +425,7 @@ end
 function Diagnostics.IsSeatingSceneId(sceneId)
     sceneId = tostring(sceneId or "")
     return sceneId == "facility.living.sitFurniture"
+        or sceneId == "facility.living.sit"
         or sceneId == "ambient.roam.sitFurniture"
 end
 

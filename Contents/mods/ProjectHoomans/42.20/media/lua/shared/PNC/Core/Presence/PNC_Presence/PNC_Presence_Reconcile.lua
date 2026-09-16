@@ -111,9 +111,10 @@ function Presence.RefreshMaterializationCandidates(now, force)
     count = #ordered
     wakeCandidates(ordered, now)
     if count > 0 and Spatial.Rebuild then
-        -- One fresh index keeps batch shell cleanup and first-frame
-        -- perception safe without returning to one global scan per NPC.
-        Spatial.Rebuild(now, true)
+        -- PrepareTick already rebuilds the shared index before this interest
+        -- pass. Respect the spatial/census throttle here so a nearby abstract
+        -- NPC cannot force a second full engine scan in the same tick.
+        Spatial.Rebuild(now, false)
     end
     return count
 end

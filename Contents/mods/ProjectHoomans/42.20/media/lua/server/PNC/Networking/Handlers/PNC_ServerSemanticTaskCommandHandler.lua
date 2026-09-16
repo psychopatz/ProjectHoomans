@@ -21,6 +21,8 @@ local function sendResult(player, args, result)
     details = type(result.details) == "table" and result.details or nil
     local request = type(result.request) == "table"
         and result.request or {}
+    local site = details and type(details.site) == "table"
+        and details.site or nil
     sendServerCommand(player, Const.MODULE, Const.CMD_SEMANTIC_TASK_RESULT, {
         requestID = bounded(result.requestID or request.requestID
             or args.requestID, 128),
@@ -38,6 +40,11 @@ local function sendResult(player, args, result)
         admissionPlanID = bounded(details and details.planID, 160),
         admissionCleanupReason = bounded(
             details and details.cleanupReason, 128),
+        siteLabel = bounded(result.siteLabel or site and site.label, 64),
+        siteScope = bounded(result.siteScope or site and site.scope, 16),
+        siteID = bounded(result.siteID or site and site.siteID, 128),
+        siteRoomType = bounded(result.roomType or site and site.roomType, 48),
+        siteRisk = bounded(result.risk or site and site.risk, 32),
     })
 end
 

@@ -33,6 +33,32 @@ local function holdSeatedGuard(record, zombie)
     return true
 end
 
+local function tryGuardSeat(record, zombie, order)
+    local service = PNC.RoamingSeat
+    local anchorX = tonumber(order and order.x) or record.anchorX or record.x
+    local anchorY = tonumber(order and order.y) or record.anchorY or record.y
+    local bodyX = zombie and zombie.getX and zombie:getX() or record.x
+    local bodyY = zombie and zombie.getY and zombie:getY() or record.y
+    local stopDistance = tonumber(Const.GUARD_STOP_DISTANCE)
+        or tonumber(Const.GUARD_REACHED_DISTANCE) or 0.55
+    if not zombie or not service or not service.TryStartGuard
+        or not Core or not Core.Distance
+    then
+        return false
+    end
+    if Core.Distance(bodyX, bodyY, anchorX, anchorY)
+        > math.max(0.45, stopDistance)
+    then
+        return false
+    end
+    return service.TryStartGuard(
+        record,
+        zombie,
+        order,
+        Core.Now and Core.Now() or 0
+    ) == true
+end
+
 function Internal.TickGuardAnchor(record, zombie)
     local order = record.orderSpec or {}
     local anchorX = tonumber(order.x) or record.anchorX
@@ -50,6 +76,7 @@ function Internal.TickGuardAnchor(record, zombie)
         Common.ClearCombatTarget(record, "returning_to_guard_anchor", zombie)
     end
     if holdSeatedGuard(record, zombie) then return true end
+    if tryGuardSeat(record, zombie, order) then return true end
     record.activeBehavior = "GuardAnchor"
     Common.ClearCombatTarget(record, "guarding_anchor")
     Common.MoveRecord(

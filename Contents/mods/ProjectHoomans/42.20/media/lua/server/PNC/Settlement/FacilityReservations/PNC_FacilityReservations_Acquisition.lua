@@ -78,6 +78,7 @@ function PNC.FacilityService.AcquireActivity(baseId, npcId, capability,
     local selectionOptions = {}
     for key, value in pairs(options) do selectionOptions[key] = value end
     selectionOptions.character = liveCharacter
+    selectionOptions.npcId = tostring(npcId or "")
     local facilities = PNC.FacilityService.ListByCapability(baseId, capability,
         options.stationId)
     local requested = options.componentId and PNC.SettlementRepository
@@ -106,8 +107,14 @@ function PNC.FacilityService.AcquireActivity(baseId, npcId, capability,
                         resource = selected.resource,
                         resourceKind = selected.resourceKind,
                         resourceKey = selected.resourceKey,
+                        floorSeating = selected.floorSeating == true
+                            or selected.resource
+                                and selected.resource.floorSeating == true
+                            or selected.target and selected.target.floorSeating
+                                == true,
                         scanStatus = selected.scanStatus,
                         abstract = options.abstract == true,
+                        facility = facility,
                     }
                 end
             end
@@ -159,6 +166,7 @@ function PNC.FacilityService.AcquireActivity(baseId, npcId, capability,
                             target = target,
                             targets = targets,
                             abstract = options.abstract == true,
+                            facility = facility,
                         }
                     end
                 end

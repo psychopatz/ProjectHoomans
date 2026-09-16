@@ -105,7 +105,9 @@ function Needs.Ensure(record, initial)
         -- free beyond the primitive need state.
         Needs.EnsureNutrition(record)
     end
-    return entry.needs
+    -- The repository entry is returned as an extra value for internal batch
+    -- updates. Existing callers use the first value and keep the same API.
+    return entry.needs, nil, entry
 end
 
 function Needs.GetState(record)
@@ -150,8 +152,7 @@ function Needs.Get(record, needType)
     return state and state[tostring(needType or "")]
 end
 
-function Needs.Set(record, needType, value, reason)
-    local state = Needs.Ensure(record)
+local function setStateValue(record, state, needType, value, reason, markDirty)
     needType = tostring(needType or "")
     if not state or not Definitions.Get(needType) then return nil, "invalid_need" end
     local before = state[needType]
@@ -182,9 +183,18 @@ function Needs.Set(record, needType, value, reason)
                 "activity=" .. tostring(H.Activity(record)),
             })
         end
-        if PNC.NeedsRepository then PNC.NeedsRepository.MarkDirty() end
+        if markDirty ~= false and PNC.NeedsRepository then
+            PNC.NeedsRepository.MarkDirty()
+        end
     end
     return after
+end
+
+H.SetStateValue = setStateValue
+
+function Needs.Set(record, needType, value, reason)
+    local state = Needs.Ensure(record)
+    return setStateValue(record, state, needType, value, reason, true)
 end
 
 function Needs.Modify(record, needType, amount, reason)
@@ -252,9 +262,10 @@ function Needs.SetActivityOverride(record, value)
     H.Runtime(record).activityOverride = value ~= "" and value or nil
     return true
 end
-function Needs.GetRates(record)
+function Needs.GetRates(record, state)
     local activity = H.Activity(record)
-    local rates = PlayerModel.GetRates(record, Needs.Ensure(record), activity)
+    local rates = PlayerModel.GetRates(record,
+        state or Needs.Ensure(record), activity)
     local facilityActivity = record.runtime
         and record.runtime.facilityActivity or nil
     -- FacilityJobs owns the sleep effect clock. Keep the normal sleeping

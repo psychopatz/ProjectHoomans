@@ -258,6 +258,12 @@ function Response.Resolve(ir, state, context, branch)
             topic = state and state.currentTopic,
         })
     end
+    if branch == "OFFER_RECEIVED" then
+        return catalogResponse("semantic.offer", ir, state, context, {
+            object = ir.object,
+            topic = state and state.currentTopic,
+        })
+    end
     if branch == "QUESTION_RECEIVED" and ir.subject == "TIME" then
         local text = clockText(world)
         if text then

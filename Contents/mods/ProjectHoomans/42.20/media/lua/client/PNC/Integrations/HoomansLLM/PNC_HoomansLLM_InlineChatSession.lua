@@ -17,6 +17,9 @@ function Integration.CloseInline(reason)
     local part = Inline.part
     local hosts = Inline.hosts or {}
     local closed = {}
+    if Inline.groupConversation then
+        Inline.groupConversation.closed = true
+    end
     Targets.ClearHighlights(0)
     if part then
         if part.blurInput then
@@ -44,6 +47,7 @@ function Integration.CloseInline(reason)
     Inline.target = nil
     Inline.targetID = nil
     Inline.directTarget = nil
+    Inline.groupConversation = nil
     Inline.nextLifecycleAt = nil
     Inline.nextContextRefreshAt = nil
     Inline.nextControlsRefreshAt = nil

@@ -245,13 +245,23 @@ Scenes.Register("facility.living.sit", {
     priority = 20,
     repeatMode = "loop",
     blocking = true,
-    stepGapMs = 250,
+    -- Ground sitting is a presentation lease. Keep the managed body useless
+    -- so the vanilla zombie brain cannot reacquire alert/pathing ownership.
+    keepManagedUseless = true,
+    -- The ground clips are compatible sitting poses. Switch their selector
+    -- without releasing the active bump, so the body never stands between
+    -- two sitting variants.
+    retainBump = true,
+    stepGapMs = 0,
     sequenceMode = "shuffle",
     steps = {
-        { id = "sit", bump = "Sit", durationMs = 4200 },
-        { id = "sit_action", bump = "SitAction", durationMs = 3600 },
-        { id = "sit_making", bump = "SitMaking", durationMs = 3600 },
-        { id = "sit_rub_hands", bump = "SitRubHands", durationMs = 3600 },
+        { id = "sit", bump = "Sit", durationMs = 4200, loop = true },
+        { id = "sit_action", bump = "SitAction", durationMs = 3600,
+            loop = true },
+        { id = "sit_making", bump = "SitMaking", durationMs = 3600,
+            loop = true },
+        { id = "sit_rub_hands", bump = "SitRubHands", durationMs = 3600,
+            loop = true },
     },
     interrupts = {
         movement = true,
@@ -260,6 +270,13 @@ Scenes.Register("facility.living.sit", {
         abstract = true,
     },
     onTick = function(record, zombie, scene, now)
+        local roaming = PNC and PNC.RoamingSeat
+        if record and record.runtime and record.runtime.roamingSeat then
+            if roaming and roaming.OnSceneTick then
+                return roaming.OnSceneTick(record, zombie, scene, now)
+            end
+            return true
+        end
         local jobs = PNC and PNC.FacilityJobs
         if jobs and jobs.OnSceneTick then
             return jobs.OnSceneTick(record, zombie, scene, now)
@@ -267,6 +284,13 @@ Scenes.Register("facility.living.sit", {
         return true
     end,
     onStop = function(record, zombie, scene, reason)
+        local roaming = PNC and PNC.RoamingSeat
+        if record and record.runtime and record.runtime.roamingSeat then
+            if roaming and roaming.OnSceneStopped then
+                roaming.OnSceneStopped(record, zombie, scene, reason)
+            end
+            return
+        end
         local jobs = PNC and PNC.FacilityJobs
         if jobs and jobs.OnSceneStopped then
             jobs.OnSceneStopped(record, zombie, scene, reason)

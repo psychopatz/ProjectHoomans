@@ -263,6 +263,30 @@ local function localSnapshotInterval(record, previous, now)
     return tonumber(Const.CLIENT_LOCAL_SNAPSHOT_IDLE_MS) or 500
 end
 
+local function mergeLocalPresenceSnapshot(current, incoming)
+    local key
+    if type(current) ~= "table" then
+        return incoming
+    end
+    if type(incoming) ~= "table" then
+        return nil
+    end
+    if type(incoming.travel) == "table"
+        and incoming.travel.route == nil
+        and type(current.travel) == "table"
+        and current.travel.route ~= nil
+    then
+        -- Presence deltas intentionally omit the detailed travel route.
+        -- Preserve it for local consumers that still use the last detailed
+        -- route while movement fields are refreshed.
+        incoming.travel.route = current.travel.route
+    end
+    for key, value in pairs(incoming) do
+        current[key] = value
+    end
+    return current
+end
+
 local function refreshLocalAuthoritySnapshots(now)
     local snapshots
     local builtAtByID
@@ -273,6 +297,7 @@ local function refreshLocalAuthoritySnapshots(now)
     local previous
     local dueAt
     local snapshot
+    local presenceDelta
     local hasIncapacitated = false
     if canRequestRemoteSync() then
         return false
@@ -307,10 +332,36 @@ local function refreshLocalAuthoritySnapshots(now)
         dueAt = (tonumber(builtAtByID[id]) or 0)
             + localSnapshotInterval(record, previous, now)
         if not previous
-            or tonumber(previous.presenceRevision) ~= tonumber(record.presenceRevision)
-            or now >= dueAt
+            or previous.deathMarker == true
+            or previous.interestDetailed == false
         then
             snapshot = Network.BuildSnapshot(record)
+        elseif tonumber(previous.presenceRevision) ~= tonumber(record.presenceRevision)
+            or now >= dueAt
+        then
+            if type(Network.BuildPresenceDelta) == "function" then
+                presenceDelta = Network.BuildPresenceDelta(record)
+                if type(presenceDelta) == "table"
+                    and presenceDelta.id ~= nil
+                    and tostring(presenceDelta.id) == id
+                then
+                    -- Keep the first detailed snapshot's static fields and
+                    -- refresh only the compact presence fields while the
+                    -- local-authority body is moving or otherwise due.
+                    snapshot = mergeLocalPresenceSnapshot(
+                        previous,
+                        presenceDelta
+                    )
+                else
+                    -- A malformed/missing delta must never erase detail or
+                    -- leave presentation with a stale dynamic state.
+                    snapshot = Network.BuildSnapshot(record)
+                end
+            else
+                -- Keep compatibility with older load orders and test doubles
+                -- that expose only the established full-snapshot API.
+                snapshot = Network.BuildSnapshot(record)
+            end
         else
             snapshot = nil
         end

@@ -171,6 +171,23 @@ function Internal.sanitizeCampState(raw, record)
     if type(raw) ~= "table" then return nil end
     local rawResources = type(raw.resources) == "table"
         and raw.resources or {}
+    local function optionalNumber(value)
+        return tonumber(value)
+    end
+    local rawBounds = type(raw.roomBounds) == "table"
+        and raw.roomBounds or nil
+    local roomBounds = rawBounds and {
+        minX = optionalNumber(rawBounds.minX),
+        minY = optionalNumber(rawBounds.minY),
+        maxX = optionalNumber(rawBounds.maxX),
+        maxY = optionalNumber(rawBounds.maxY),
+        z = optionalNumber(rawBounds.z),
+    } or nil
+    if roomBounds and (roomBounds.minX == nil or roomBounds.minY == nil
+        or roomBounds.maxX == nil or roomBounds.maxY == nil)
+    then
+        roomBounds = nil
+    end
     local output = {
         schemaVersion = math.max(1, math.floor(
             Internal.normalizeNumber(raw.schemaVersion, 1))),
@@ -185,6 +202,16 @@ function Internal.sanitizeCampState(raw, record)
             raw.campRadius, Const.CAMP_RADIUS or 3))),
         resourceRadius = math.max(1, math.min(24, Internal.normalizeNumber(
             raw.resourceRadius, Const.CAMP_RESOURCE_RADIUS or 12))),
+        scope = Internal.normalizeString(raw.scope or raw.siteScope),
+        siteScope = Internal.normalizeString(raw.siteScope or raw.scope),
+        siteID = Internal.normalizeString(raw.siteID),
+        roomID = Internal.normalizeString(raw.roomID),
+        buildingID = Internal.normalizeString(raw.buildingID),
+        roomType = Internal.normalizeString(raw.roomType),
+        roomName = Internal.normalizeString(raw.roomName),
+        roomBounds = roomBounds,
+        campfireID = Internal.normalizeString(raw.campfireID),
+        scanTruncated = raw.scanTruncated == true,
         capturedAtWorldHour = Internal.normalizeNumber(
             raw.capturedAtWorldHour, 0),
         resources = {},

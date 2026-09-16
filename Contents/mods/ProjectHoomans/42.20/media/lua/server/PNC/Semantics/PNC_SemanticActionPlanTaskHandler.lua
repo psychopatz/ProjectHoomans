@@ -59,6 +59,8 @@ local function targetFor(request)
             -- explicit world id at this boundary.
             targetID = text(target.targetID or target.objectID
                 or target.worldID),
+            clientHint = type(target.clientHint) == "table"
+                and target.clientHint or nil,
             radius = math.max(1, math.min(32,
                 tonumber(target.radius) or 16)),
             stopDistance = math.max(0.25,

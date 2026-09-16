@@ -14,6 +14,7 @@ local function isSeatingNavigation(navigation)
         or runtime.animationScene
             and (runtime.animationScene.id
                 == "facility.living.sitFurniture"
+                or runtime.animationScene.id == "facility.living.sit"
                 or runtime.animationScene.id == "ambient.roam.sitFurniture")
     )
 end

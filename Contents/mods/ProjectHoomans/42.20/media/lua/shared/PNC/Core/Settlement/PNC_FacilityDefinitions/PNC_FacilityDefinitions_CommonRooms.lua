@@ -21,11 +21,37 @@ Definitions.Register({
         [1] = {
             requiredHQLevel = 1,
             capabilities = { "living", "recreation" },
+            resourceBindings = {
+                living = {
+                    detectorId = "seat", role = "living.chair",
+                    resourceKind = "seating_surface",
+                    virtual = {
+                        key = "floor", role = "living.floor",
+                        resourceKind = "floor_seating", exclusive = false,
+                        perNpc = true, seating = true, floorSeating = true,
+                        allowActivityOverflow = true,
+                        sceneId = "facility.living.sit",
+                        stopDistance = 0.45, arrivalDistance = 0.55,
+                    },
+                },
+                recreation = {
+                    detectorId = "seat", role = "living.chair",
+                    resourceKind = "seating_surface",
+                    virtual = {
+                        key = "floor", role = "living.floor",
+                        resourceKind = "floor_seating", exclusive = false,
+                        perNpc = true, seating = true, floorSeating = true,
+                        allowActivityOverflow = true,
+                        sceneId = "facility.living.sit",
+                        stopDistance = 0.45, arrivalDistance = 0.55,
+                    },
+                },
+            },
             componentLimits = {
                 ["living.room"] = { kind = "region", minCount = 1,
                     maxCount = 1, minTotalTiles = 1, maxTotalTiles = 1000,
                     roomGroup = "living" },
-                ["living.chair"] = { kind = "anchor", minCount = 1,
+                ["living.chair"] = { kind = "anchor", minCount = 0,
                     maxCount = 8, roomGroup = "living" },
             },
             activityLimits = { living = { maxConcurrent = 8 },

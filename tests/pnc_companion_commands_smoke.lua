@@ -716,20 +716,20 @@ registeredProvider.addOptions(
 )
 T.equal(context.options[1].name, "Companion Commands",
     "context command root")
-T.equal(#context.options[1].submenu.options, 6,
-    "movement commands and nested attack root")
-T.equal(context.options[1].submenu.options[4].name, "Go Home",
+T.equal(#context.options[1].submenu.options, 5,
+    "movement commands and nested attack root (semantic camp is chat-only)")
+T.equal(context.options[1].submenu.options[3].name, "Go Home",
     "context go-home command")
-T.equal(context.options[1].submenu.options[5].name, "Scavenge Nearby",
+T.equal(context.options[1].submenu.options[4].name, "Scavenge Nearby",
     "context scavenge command")
-T.equal(context.options[1].submenu.options[6].name, "Attack Type",
+T.equal(context.options[1].submenu.options[5].name, "Attack Type",
     "nested attack type root")
-local attackOptions = context.options[1].submenu.options[6].submenu.options
+local attackOptions = context.options[1].submenu.options[5].submenu.options
 T.equal(#attackOptions, 4, "attack type definitions")
 T.equal(attackOptions[4].notAvailable, true,
     "current attack type is disabled and red")
 T.equal(
-    context.options[1].submenu.options[6].iconTexture,
+    context.options[1].submenu.options[5].iconTexture,
     "media/ui/emotes/no.png",
     "context attack type icon did not reflect current setting"
 )
@@ -881,8 +881,8 @@ T.equal(
 T.equal(
     ISEmoteRadialMenu.menu.PNC_GroupCompanionCommands
         .subMenu.PNC_GroupCommand_camp,
-    "Camp Here",
-    "all-nearby radial camp slice"
+    nil,
+    "semantic camp is not exposed on the all-nearby radial"
 )
 T.equal(
     ISEmoteRadialMenu.menu.PNC_ClosestCompanionCommands

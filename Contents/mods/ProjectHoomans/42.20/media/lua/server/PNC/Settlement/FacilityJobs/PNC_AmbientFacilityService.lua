@@ -89,75 +89,20 @@ local function eligible(record, currentTime)
     return true, camp, base
 end
 
-local function reserved(resource)
-    local key = tostring(resource and resource.resourceKey or "")
-    return key ~= "" and PNC.FacilityReservations
-        and PNC.FacilityReservations.ByResource
-        and PNC.FacilityReservations.ByResource[key] ~= nil
-end
-
 local function liveBody(record)
     return PNC.Registry and PNC.Registry.GetLiveZombie
         and PNC.Registry.GetLiveZombie(record.id) or nil
 end
 
 local function homeSeat(record, base, live)
-    if not base or not base.id then return nil end
-    local facilities = PNC.FacilityService and PNC.FacilityService
-        .ListByCapability and PNC.FacilityService.ListByCapability(
-            base.id, "living") or {}
-    for facilityIndex = 1, #facilities do
-        local facility = facilities[facilityIndex]
-        local resources = PNC.FacilityResources
-            and PNC.FacilityResources.GetResources
-            and PNC.FacilityResources.GetResources(facility, "seat") or {}
-        for resourceIndex = 1, #resources do
-            local resource = resources[resourceIndex]
-            if not reserved(resource) then
-                local targets = PNC.FacilityInteractionTargets
-                    and PNC.FacilityInteractionTargets.ResolveResource
-                    and PNC.FacilityInteractionTargets.ResolveResource(resource, {
-                        abstract = live == nil, character = live,
-                    }) or {}
-                local target = targets[1]
-                if target then
-                    local ok = false
-                    local reservation
-                    if PNC.FacilityReservations
-                        and PNC.FacilityReservations.ReserveResource
-                    then
-                        ok, reservation =
-                            PNC.FacilityReservations.ReserveResource(
-                                facility.id,
-                                resource,
-                                record.id,
-                                "living",
-                                30000,
-                                { automatic = true }
-                            )
-                    end
-                    if ok then
-                        return {
-                            ok = true,
-                            facilityId = facility.id,
-                            componentId = "",
-                            reservationId = reservation.id,
-                            role = resource.role or "living.chair",
-                            resource = resource,
-                            resourceKey = resource.resourceKey,
-                            resourceKind = resource.resourceKind,
-                            target = target,
-                            targets = targets,
-                            approachCandidates = targets,
-                            facility = facility,
-                            seating = true,
-                        }
-                    end
-                end
-            end
-        end
-    end
-    return nil
+    if not base or not base.id or not PNC.FacilityService
+        or not PNC.FacilityService.AcquireActivity
+    then return nil end
+    return PNC.FacilityService.AcquireActivity(base.id, record.id, "living", {
+        ttlMs = 30000,
+        abstract = live == nil,
+        automatic = true,
+    })
 end
 
 local function campSeat(record, live)
@@ -196,6 +141,9 @@ local function start(record, acquired, camp, live)
         campRadius = acquired.campRadius,
         resourceRadius = acquired.resourceRadius,
         seating = true,
+        floorSeating = acquired.floorSeating == true
+            or acquired.resourceKind == "floor_seating"
+            or acquired.target and acquired.target.floorSeating == true,
         approachCandidates = acquired.approachCandidates
             or acquired.targets,
         resourceKind = acquired.resourceKind,

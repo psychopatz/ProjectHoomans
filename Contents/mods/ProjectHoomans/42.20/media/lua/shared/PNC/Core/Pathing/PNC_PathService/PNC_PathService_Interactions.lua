@@ -74,7 +74,30 @@ local function buildContext(
         blockedPassage = knownPassage.object
         blockedFromSquare = knownPassage.fromSquare
         blockedSquare = knownPassage.toSquare
-    elseif not blockedPassage and TraversalQuery
+    end
+
+    -- LiveBodyControl cancels vanilla's walktoward/tryThump path when the
+    -- engine's feeler sees a passage.  That guard is called without a lane,
+    -- so the exact object is otherwise lost before this resolver runs.  Ask
+    -- the same feeler for the object again and give the interaction provider
+    -- the exact door/window rather than relying only on two axis probes.
+    if not blockedPassage then
+        local bodyControl = PNC.LiveBodyControl
+        local passageObject
+        if bodyControl
+            and type(bodyControl.GetVanillaPassageAhead) == "function"
+        then
+            passageObject = bodyControl.GetVanillaPassageAhead(zombie)
+        end
+        if passageObject then
+            blockedPassage = passageObject
+            blockedFromSquare = actorSquare
+            blockedSquare = passageObject.getSquare
+                and passageObject:getSquare() or blockedSquare
+        end
+    end
+
+    if not blockedPassage and TraversalQuery
         and TraversalQuery.FindPassageToward
     then
         local passage = TraversalQuery.FindPassageToward(

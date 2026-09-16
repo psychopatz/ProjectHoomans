@@ -42,6 +42,28 @@ function Network.QueueRosterSnapshot(id, snapshot, removed, reason)
     return true
 end
 
+local function queueDeferredRoster(record, reason, includeTravelRoute)
+    local id = record and record.id or nil
+    if id == nil then
+        return false
+    end
+    id = tostring(id)
+    ServerState.rosterRevision = (tonumber(ServerState.rosterRevision) or 0) + 1
+    -- Periodic roster state is coalesced by NPC id until the next flush. Keep
+    -- the authoritative record here and materialize only the latest state at
+    -- flush time; never let this server-only reference enter the payload.
+    ServerState.rosterDeltas[id] = {
+        id = id,
+        removed = false,
+        reason = reason,
+        revision = ServerState.rosterRevision,
+        record = record,
+        deferred = true,
+        includeTravelRoute = includeTravelRoute ~= false,
+    }
+    return true
+end
+
 function Network.QueuePeriodicRoster(record, now)
     local runtime
     local signature
@@ -69,8 +91,7 @@ function Network.QueuePeriodicRoster(record, now)
     end
     runtime.rosterSignature = signature
     runtime.lastRosterQueuedAt = now
-    Network.QueueRosterDelta(record, false, "periodic", false)
-    return true
+    return queueDeferredRoster(record, "periodic", false)
 end
 
 local function collectVisibleIDs(player, state)
@@ -178,14 +199,38 @@ end
 function Network.FlushRosterDeltas(now, force)
     local entries = {}
     local id
+    local queued
+    local entry
+    local snapshot
     now = tonumber(now) or Core.Now()
     if not force and now - (tonumber(ServerState.lastRosterFlushAt) or 0) < Const.ROSTER_DELTA_INTERVAL_MS then
         return 0
     end
     for id, _ in pairs(ServerState.rosterDeltas) do
-        entries[#entries + 1] = ServerState.rosterDeltas[id]
+        queued = ServerState.rosterDeltas[id]
+        if queued and queued.deferred == true then
+            snapshot = Network.BuildRosterSnapshot(
+                queued.record,
+                queued.includeTravelRoute ~= false
+            )
+            -- A record can be retired between queue and flush. Drop only this
+            -- stale periodic entry rather than sending an invalid snapshot.
+            if type(snapshot) == "table" then
+                entry = {
+                    id = queued.id,
+                    removed = false,
+                    reason = queued.reason,
+                    revision = queued.revision,
+                    snapshot = snapshot,
+                }
+                entries[#entries + 1] = entry
+            end
+        else
+            entries[#entries + 1] = queued
+        end
     end
     if #entries <= 0 then
+        ServerState.rosterDeltas = {}
         ServerState.lastRosterFlushAt = now
         return 0
     end
@@ -202,7 +247,10 @@ end
 
 function Internal.QueueBroadcastRoster(record, eventName)
     if eventName ~= "tick" and eventName ~= "materialize" and eventName ~= "interest_enter" then
-        return Network.QueueRosterDelta(record, false, eventName)
+        -- BroadcastRecord immediately builds the detailed payload. Defer the
+        -- separate compact roster snapshot until the coalesced roster flush
+        -- instead of constructing both snapshots back-to-back.
+        return queueDeferredRoster(record, eventName, false)
     end
     return false
 end

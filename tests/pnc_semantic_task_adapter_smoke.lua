@@ -72,6 +72,31 @@ T.equal(giveSubmitted.request.object.text, "apple",
 T.equal(giveSubmitted.context.conversationToken, "lease:1",
     "give item carries the conversation authority token")
 
+local campSubmitted
+PNC.Client.RequestSemanticTask = function(request, context)
+    campSubmitted = { request = request, context = context }
+    return true, "sent"
+end
+local campAccepted = Adapter.Dispatch({
+    intent = "REQUEST",
+    speechAct = "REQUEST",
+    action = "CAMP",
+    target = { kind = "camp_site", scope = "room",
+        roomType = "BEDROOM", roomQuery = "bedroom" },
+    confidence = 0.95,
+}, {
+    requestID = "dialogue:camp:1",
+    npcID = "npc:alice",
+    conversationToken = "lease:1",
+    rawText = "Let's camp in the bedroom",
+})
+T.equal(campAccepted.status, "accepted",
+    "camp uses the shared semantic task transport")
+T.equal(campSubmitted.request.action, "CAMP",
+    "camp preserves its semantic action")
+T.equal(campSubmitted.request.target.scope, "room",
+    "camp preserves the room-scoped target")
+
 local negated = Adapter.Dispatch({
     action = "FETCH",
     modifiers = { negated = true },

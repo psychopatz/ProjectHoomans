@@ -3,6 +3,8 @@ PNC.Semantics = PNC.Semantics or {}
 
 local Semantic = require "PsychopatzCore/Semantics/PsychopatzSemantic"
 local Registry = Semantic.Registry
+local CampSite = PNC.Semantics.CampSite
+    or require "PNC/Semantics/PNC_SemanticCampSite"
 local Catalog = PNC.Semantics.Catalog or {}
 PNC.Semantics.Catalog = Catalog
 
@@ -70,14 +72,21 @@ function Catalog.Register()
     registerConcept("WAIT", {
         "wait", "stay", "wait here", "stay here", "stay right here",
     })
+    registerConcept("CAMP", { "camp", "camping" })
+    registerConcept("CAMP_PREP", { "at", "in", "inside", "by", "near" })
     registerConcept("CAMPFIRE", {
-        "campfire", "fire pit", "firepit",
+        "campfire", "fire pit", "firepit", "fire",
     })
+    for _, roomDefinition in ipairs(CampSite.RoomTypesList()) do
+        registerConcept("ROOM_" .. tostring(roomDefinition.id),
+            roomDefinition.aliases, 2)
+    end
     registerConcept("GO", { "go", "head", "travel" })
     registerConcept("HOME", { "home" })
     registerConcept("FETCH", { "bring", "get", "fetch", "grab" })
     registerConcept("GIVE", { "give", "hand", "pass" })
     registerConcept("HAVE", { "have", "got", "carry", "carrying" })
+    registerConcept("WANT", { "want", "wants", "need", "needs" })
     registerConcept("HEAR", { "hear", "heard" })
     registerConcept("BITTEN", { "bitten", "got bitten", "was bitten" })
     registerConcept("WATER", {
@@ -167,6 +176,102 @@ function Catalog.Register()
         130
     )
     registerPattern(
+        "pnc.command.camp_campfire",
+        {
+            { kind = "literal", value = "let's", optional = true },
+            { kind = "literal", value = "lets", optional = true },
+            { kind = "literal", value = "we", optional = true },
+            { kind = "literal", value = "should", optional = true },
+            { kind = "literal", value = "can", optional = true },
+            { kind = "literal", value = "make", optional = true },
+            { kind = "literal", value = "set", optional = true },
+            { kind = "literal", value = "up", optional = true },
+            { kind = "concept", id = "CAMP" },
+            { kind = "concept", id = "CAMP_PREP" },
+            { kind = "literal", value = "the", optional = true },
+            { kind = "concept", id = "CAMPFIRE" },
+        },
+        {
+            intent = "REQUEST",
+            speechAct = "REQUEST",
+            action = "CAMP",
+            target = {
+                kind = "camp_site",
+                scope = "campfire",
+                concept = "CAMPFIRE",
+                text = "campfire",
+            },
+        },
+        0.97,
+        150
+    )
+    registerPattern(
+        "pnc.command.camp_room",
+        {
+            { kind = "literal", value = "let's", optional = true },
+            { kind = "literal", value = "lets", optional = true },
+            { kind = "literal", value = "we", optional = true },
+            { kind = "literal", value = "should", optional = true },
+            { kind = "literal", value = "can", optional = true },
+            { kind = "literal", value = "make", optional = true },
+            { kind = "literal", value = "set", optional = true },
+            { kind = "literal", value = "up", optional = true },
+            { kind = "concept", id = "CAMP" },
+            { kind = "concept", id = "CAMP_PREP" },
+            { kind = "literal", value = "the", optional = true },
+            {
+                kind = "any_phrase",
+                capture = "room",
+                minTokens = 1,
+                maxTokens = 4,
+                stopWords = { "please", "now" },
+            },
+        },
+        {
+            intent = "REQUEST",
+            speechAct = "REQUEST",
+            action = "CAMP",
+            target = {
+                kind = "camp_site",
+                scope = "room",
+                roomQuery = "$capture.room",
+                roomType = "$capture.room.concept",
+                text = "$capture.room.text",
+                unresolved = "$capture.room.unresolved",
+            },
+        },
+        0.95,
+        140,
+        { allowFuzzyCapture = true }
+    )
+    registerPattern(
+        "pnc.command.camp_here",
+        {
+            { kind = "literal", value = "let's", optional = true },
+            { kind = "literal", value = "lets", optional = true },
+            { kind = "literal", value = "we", optional = true },
+            { kind = "literal", value = "should", optional = true },
+            { kind = "literal", value = "can", optional = true },
+            { kind = "literal", value = "make", optional = true },
+            { kind = "literal", value = "set", optional = true },
+            { kind = "literal", value = "up", optional = true },
+            { kind = "concept", id = "CAMP" },
+            { kind = "literal", value = "here", optional = true },
+            { kind = "literal", value = "now", optional = true },
+        },
+        {
+            intent = "REQUEST",
+            speechAct = "REQUEST",
+            action = "CAMP",
+            target = {
+                kind = "camp_site",
+                scope = "here",
+            },
+        },
+        0.96,
+        125
+    )
+    registerPattern(
         "pnc.question.inventory_have",
         {
             { kind = "literal", value = "do" },
@@ -239,6 +344,44 @@ function Catalog.Register()
         },
         0.92,
         116,
+        { allowFuzzyCapture = true }
+    )
+    registerPattern(
+        "pnc.social.offer",
+        {
+            { kind = "literal", value = "who", optional = true },
+            { kind = "literal", value = "does", optional = true },
+            { kind = "literal", value = "anyone", optional = true },
+            { kind = "concept", id = "WANT" },
+            { kind = "literal", value = "a", optional = true },
+            { kind = "literal", value = "an", optional = true },
+            { kind = "literal", value = "some", optional = true },
+            { kind = "literal", value = "the", optional = true },
+            {
+                kind = "any_phrase",
+                capture = "object",
+                minTokens = 1,
+                maxTokens = 4,
+                stopWords = { "please", "now" },
+            },
+            { kind = "literal", value = "please", optional = true },
+        },
+        {
+            intent = "OFFER",
+            speechAct = "OFFER",
+            subject = "ITEM",
+            object = {
+                category = "$capture.object.category",
+                concept = "$capture.object.concept",
+                text = "$capture.object.text",
+                value = "$capture.object.value",
+                unresolved = "$capture.object.unresolved",
+                reference = "$capture.object.reference",
+                quantity = "SOME",
+            },
+        },
+        0.94,
+        120,
         { allowFuzzyCapture = true }
     )
     registerPattern(
