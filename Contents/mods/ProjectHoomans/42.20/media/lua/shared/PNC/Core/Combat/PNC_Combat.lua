@@ -15,6 +15,8 @@ local Core = PNC.Core
 local Registry = PNC.Registry
 local Equipment = PNC.Equipment
 local Perception = PNC.Perception
+local CompatibilityAPI = PNC.Compatibility
+    and PNC.Compatibility.API
 
 Internal.MELEE_BUMP_TYPES = {
     -- Keep attack selectors out of vanilla IsoZombie's BumpType namespace.
@@ -104,6 +106,13 @@ function Internal.resolveTargetObject(target)
             )
             or nil
     end
+    if target.kind == "foreign_npc" then
+        if target.worldObject then return target.worldObject end
+        if CompatibilityAPI and CompatibilityAPI.ResolveTarget then
+            local resolved = CompatibilityAPI.ResolveTarget(target)
+            return resolved and resolved.worldObject or nil
+        end
+    end
     return nil
 end
 
@@ -160,6 +169,7 @@ function Internal.faceTarget(zombie, target, record, leaseMs, reason)
     if target.kind ~= "player"
         and target.kind ~= "npc"
         and target.kind ~= "zombie"
+        and target.kind ~= "foreign_npc"
     then
         return false
     end

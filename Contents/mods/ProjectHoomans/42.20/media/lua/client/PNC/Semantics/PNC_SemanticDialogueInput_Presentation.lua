@@ -57,6 +57,14 @@ function Internal.QueueDeterministicResponse(view, value, result, actionResult)
     local decision = result.decision or {}
     local response = responsePayload(decision)
     local ir = result.ir or {}
+    if actionResult and actionResult.accepted == false
+        and actionResult.status ~= "unmapped"
+        and actionResult.status ~= "skipped"
+    then
+        -- DispatchAction has already converted the authoritative rejection
+        -- into a task-result message. Do not append a misleading "Okay."
+        return true
+    end
     if decision.branch == "INVENTORY_QUERY_RECEIVED"
         and actionResult and actionResult.result
         and actionResult.result.status ~= "pending"

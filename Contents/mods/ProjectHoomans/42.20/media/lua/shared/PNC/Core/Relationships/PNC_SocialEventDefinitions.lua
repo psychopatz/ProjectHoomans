@@ -295,6 +295,44 @@ Definitions.npc_proximity_greeting = {
     contributionCaps = { approval = 20, respect = 10 },
 }
 
+Definitions.necroa_mask_removed = {
+    id = "necroa_mask_removed",
+    allowedSourceSystems = { necroa = true },
+    targetMemory = {
+        type = "necroa_mask_removed",
+        approvalEffect = -3,
+        respectEffect = -3,
+        moraleEffect = -2,
+        familiarityGain = 0,
+        strength = 1,
+        decayPerDay = 0.04,
+        permanent = false,
+        shareable = false,
+        knowledgeSource = "experienced",
+        tags = { health = true, safety = true, hostility = true },
+    },
+    contributionCaps = { approval = -30, respect = -30 },
+}
+
+Definitions.necroa_player_mask_removed = {
+    id = "necroa_player_mask_removed",
+    allowedSourceSystems = { necroa = true },
+    targetMemory = {
+        type = "necroa_player_mask_removed",
+        approvalEffect = -6,
+        respectEffect = -5,
+        moraleEffect = -2,
+        familiarityGain = 1,
+        strength = 1,
+        decayPerDay = 0.035,
+        permanent = false,
+        shareable = false,
+        knowledgeSource = "experienced",
+        tags = { health = true, safety = true, hostility = true },
+    },
+    contributionCaps = { approval = -60, respect = -50 },
+}
+
 Definitions.player_emote_wavebye = positiveEmoteDefinition(
     "player_emote_wavebye", "player_farewelled", 1, 0, 0, 1, 0.10, 2,
     { approval = 10, respect = 5 }, { farewell = true, emote = true }

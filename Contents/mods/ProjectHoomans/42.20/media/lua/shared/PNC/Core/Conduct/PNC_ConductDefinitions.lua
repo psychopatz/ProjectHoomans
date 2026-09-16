@@ -168,6 +168,26 @@ PNC.ConductDefinitions = {
         shareable = false,
         tags = { respect = true, emote = true },
     },
+    necroa_mask_removed = {
+        required = false,
+        role = "unsafe_survivor",
+        participants = "actor_and_target",
+        effects = {},
+        decayPerDay = 0.04,
+        visibility = "direct",
+        shareable = false,
+        tags = { health = true, safety = true },
+    },
+    necroa_player_mask_removed = {
+        required = false,
+        role = "unsafe_survivor",
+        participants = "actor",
+        effects = {},
+        decayPerDay = 0.035,
+        visibility = "direct",
+        shareable = false,
+        tags = { health = true, safety = true },
+    },
 }
 
 return PNC.ConductDefinitions

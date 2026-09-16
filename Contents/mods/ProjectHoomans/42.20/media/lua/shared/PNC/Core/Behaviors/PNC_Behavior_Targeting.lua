@@ -12,6 +12,8 @@ local Core = PNC.Core
 local Const = PNC.Const
 local Registry = PNC.Registry
 local Perception = PNC.Perception
+local CompatibilityAPI = PNC.Compatibility
+    and PNC.Compatibility.API
 
 function Targeting.BindLiveTarget(zombie, target)
     local targetZombie
@@ -30,6 +32,14 @@ function Targeting.BindLiveTarget(zombie, target)
         targetZombie = Registry.GetLiveZombie(target.id)
     elseif target.kind == "zombie" and Perception.FindZombieByID then
         targetZombie = Perception.FindZombieByID(target.zombieId)
+    elseif target.kind == "foreign_npc" then
+        targetZombie = target.worldObject
+        if not targetZombie and CompatibilityAPI
+            and CompatibilityAPI.ResolveTarget
+        then
+            local resolved = CompatibilityAPI.ResolveTarget(target)
+            targetZombie = resolved and resolved.worldObject or nil
+        end
     end
     if targetZombie then
         if zombie.faceThisObject then
@@ -139,6 +149,51 @@ function Targeting.UpdateTargetFromWorld(record, target)
         end
         return Perception.FindNearestEnemyZombie(record, Const.ZOMBIE_TARGET_RADIUS)
     end
+    if target.kind == "foreign_npc" then
+        local resolved = target.worldObject and target
+            or CompatibilityAPI
+            and CompatibilityAPI.ResolveTarget
+            and CompatibilityAPI.ResolveTarget(target)
+            or nil
+        local foreignBody = resolved and resolved.worldObject or nil
+        visible = false
+        visibilityKind = nil
+        if foreignBody and foreignBody.isAlive
+            and foreignBody:isAlive()
+            and Perception.CanSeeWorldObject
+        then
+            visible, visibilityKind = Perception.CanSeeWorldObject(
+                record,
+                foreignBody
+            )
+        end
+        if foreignBody and foreignBody.isAlive
+            and foreignBody:isAlive() and visible
+        then
+            target.worldObject = foreignBody
+            target.x = foreignBody:getX()
+            target.y = foreignBody:getY()
+            target.z = foreignBody:getZ()
+            target.distSq = Core.DistanceSq(
+                record.x, record.y, target.x, target.y
+            )
+            target.visible = true
+            target.visibilityKind = visibilityKind
+            target.lastSeenAt = now
+            target.threatening = true
+            return target
+        end
+        if foreignBody and foreignBody.isAlive
+            and foreignBody:isAlive() and now < memoryUntil
+        then
+            target.visible = false
+            target.distSq = Core.DistanceSq(
+                record.x, record.y, target.x, target.y
+            )
+            return target
+        end
+        return nil
+    end
     return nil
 end
 
@@ -151,6 +206,11 @@ local function sameTarget(left, right)
             return tonumber(left.onlineID) == tonumber(right.onlineID)
         end
         return tostring(left.username or "") == tostring(right.username or "")
+    end
+    if left.kind == "foreign_npc" then
+        return tostring(left.provider or "") == tostring(right.provider or "")
+            and tostring(left.actorId or left.id or "")
+                == tostring(right.actorId or right.id or "")
     end
     return false
 end
@@ -222,7 +282,9 @@ function Targeting.ResolveImmediateNPCThreat(record)
             record,
             Core.Now and Core.Now() or 0
         )
-        if threat and threat.kind == "npc" then
+        if threat and (threat.kind == "npc"
+            or threat.kind == "foreign_npc")
+        then
             return threat
         end
     end

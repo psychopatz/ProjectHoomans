@@ -19,6 +19,8 @@ function Lifecycle.StampLiveBody(record, zombie)
         record.runtime.bodyLease = Core.GenerateID("body")
     end
     modData = zombie:getModData()
+    modData.PNC_Owner = "ProjectHoomans"
+    modData.PNC_OwnerVersion = 1
     modData.PNC_NPC = true
     modData.PNC_UUID = tostring(record.id)
     modData.PNC_BodyKind = "live"

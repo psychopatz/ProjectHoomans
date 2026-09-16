@@ -8,18 +8,78 @@ local Service = PNC.Semantics.ActionPlanService
 local Plan = PNC.Semantics.ActionPlan
 local Internal = Service.Internal
 local PlanInternal = Plan.Internal
+require "PNC/Semantics/PNC_SemanticDiagnostics"
 local Trace = PsychopatzCore and PsychopatzCore.DebugTrace
+local Diagnostics = PNC.Semantics.SemanticDiagnostics
+
+local function bounded(value, maximum)
+    if value == nil then return nil end
+    value = tostring(value)
+    maximum = tonumber(maximum) or 128
+    return string.sub(value, 1, maximum)
+end
+
+local function auditResultDelivery(plan, status, accepted, reason, sent)
+    if not Diagnostics
+        or type(Diagnostics.IsEnabled) ~= "function"
+        or Diagnostics.IsEnabled() ~= true
+    then
+        return false
+    end
+    local metadata = plan and plan.metadata or {}
+    return Diagnostics.Record("semantic.task.result_dispatch", {
+        npcID = plan and plan.npcID,
+        requestID = plan and plan.requestID,
+        planID = plan and plan.planID,
+        action = metadata.taskAction,
+        status = status,
+        accepted = accepted == true,
+        reason = reason,
+        sent = sent == true,
+    }, { requestID = plan and plan.requestID })
+end
+
+local function notifyTaskResult(plan, status, accepted, reason)
+    local runtime = Service.GetRuntimeContext(plan and plan.planID)
+    local player = runtime and runtime.player
+    local command = PNC.Const
+        and PNC.Const.CMD_SEMANTIC_TASK_RESULT or nil
+    if not player or type(sendServerCommand) ~= "function"
+        or not command
+    then
+        auditResultDelivery(plan, status, accepted, reason, false)
+        return false
+    end
+    local metadata = plan and plan.metadata or {}
+    sendServerCommand(player, PNC.Const.MODULE, command, {
+        requestID = bounded(plan and plan.requestID, 128),
+        npcID = bounded(plan and plan.npcID, 128),
+        action = bounded(metadata.taskAction, 32),
+        planID = bounded(plan and plan.planID, 160),
+        accepted = accepted == true,
+        status = bounded(status, 32),
+        reason = bounded(reason, 128),
+    })
+    auditResultDelivery(plan, status, accepted, reason, true)
+    return true
+end
 
 local function traceProgress(plan, event, cause)
-    if not Trace or type(Trace.IsEnabled) ~= "function"
-        or Trace.IsEnabled() ~= true
-        or type(Trace.Record) ~= "function"
+    local semanticAudit = Diagnostics
+        and type(Diagnostics.IsEnabled) == "function"
+        and Diagnostics.IsEnabled() == true
+    local legacyTrace = Trace
+        and type(Trace.IsEnabled) == "function"
+        and Trace.IsEnabled() == true
+        and type(Trace.Record) == "function"
+    if not semanticAudit and not legacyTrace
     then
         return false
     end
     local step = Plan.Current(plan)
     local diagnostics = step and step.diagnostics or nil
-    Trace.Record({
+    local assignment = step and step.assignment or nil
+    local definition = {
         source = "ProjectHoomans.Semantics",
         event = event or "semantic.action_plan.progress",
         requestID = plan and plan.requestID,
@@ -33,8 +93,28 @@ local function traceProgress(plan, event, cause)
             stepState = step and step.state,
             cause = cause,
             reason = diagnostics and diagnostics.reason,
+            assignmentX = assignment and assignment.x,
+            assignmentY = assignment and assignment.y,
+            assignmentZ = assignment and assignment.z,
+            targetID = assignment and assignment.targetID,
         },
-    })
+    }
+    if semanticAudit then
+        Diagnostics.Record(
+            definition.event,
+            definition.data,
+            {
+                requestID = definition.requestID,
+                dedupeKey = tostring(definition.data.planID or "") .. "|"
+                    .. tostring(definition.data.stepID or "") .. "|"
+                    .. tostring(definition.data.stepState or "") .. "|"
+                    .. tostring(definition.data.reason or ""),
+                consoleIntervalMs = 250,
+            }
+        )
+    else
+        Trace.Record(definition)
+    end
     return true
 end
 
@@ -180,6 +260,21 @@ function Service.Report(planID, stepID, outcome, at)
     Internal.MarkDirty(plan)
     Internal.Emit("SEMANTIC_ACTION_PLAN_STEP_CHANGED", plan, "reported")
     if Internal.Terminal(plan) then
+        notifyTaskResult(
+            plan,
+            plan.state == "COMPLETED" and "completed" or "failed",
+            plan.state == "COMPLETED",
+            step.diagnostics and step.diagnostics.reason
+                or plan.failureReason
+        )
+    elseif Plan.Current(plan)
+        and Plan.Current(plan).state == "BLOCKED"
+    then
+        local current = Plan.Current(plan)
+        notifyTaskResult(plan, "blocked", false,
+            current.diagnostics and current.diagnostics.reason)
+    end
+    if Internal.Terminal(plan) then
         Service.ClearRuntimeContext(plan.planID)
         Internal.RemoveActive(plan.planID)
     end
@@ -218,6 +313,7 @@ function Service.Pump(at, budget)
                 Internal.MarkDirty(plan)
                 traceProgress(plan, "semantic.action_plan.progress",
                     "npc_unavailable")
+                notifyTaskResult(plan, "failed", false, "npc_unavailable")
             end
             Service.ClearRuntimeContext(plan.planID)
             Internal.RemoveActive(plan.planID)
@@ -228,6 +324,20 @@ function Service.Pump(at, budget)
                 Internal.Emit("SEMANTIC_ACTION_PLAN_STEP_CHANGED",
                     plan, "pump")
                 traceProgress(plan, "semantic.action_plan.progress", "pump")
+                local current = Plan.Current(plan)
+                local diagnostics = current and current.diagnostics or nil
+                local blocked = current and current.state == "BLOCKED"
+                if Internal.Terminal(plan) or blocked then
+                    notifyTaskResult(
+                        plan,
+                        Internal.Terminal(plan) and plan.state == "COMPLETED"
+                            and "completed"
+                            or Internal.Terminal(plan) and "failed"
+                            or "blocked",
+                        plan.state == "COMPLETED",
+                        diagnostics and diagnostics.reason
+                    )
+                end
             end
             if Internal.Terminal(plan)
                 or (Plan.Current(plan)
@@ -247,5 +357,6 @@ end
 
 Service.Internal.ApplyOutcome = applyOutcome
 Service.Internal.ProcessPlan = processPlan
+Service.Internal.NotifyTaskResult = notifyTaskResult
 
 return Service

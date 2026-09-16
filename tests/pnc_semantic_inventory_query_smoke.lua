@@ -40,4 +40,10 @@ T.equal(typo.inventoryQuery.concept, "SEAFOOD",
     "fuzzy item vocabulary maps to the same concept")
 T.truthy(typo.diagnostics.fuzzyMatch, "typo is observable as fuzzy")
 
+local optionalKind = Parser.Parse("do you have any kind of seafood?")
+T.equal(optionalKind.subject, "INVENTORY",
+    "optional inventory wording remains semantic")
+T.equal(optionalKind.inventoryQuery.concept, "SEAFOOD",
+    "optional inventory wording preserves seafood category")
+
 T.finish("pnc_semantic_inventory_query_smoke")

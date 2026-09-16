@@ -15,6 +15,15 @@ ZombieAggro.Internal = ZombieAggro.Internal or {}
 
 local Internal = ZombieAggro.Internal
 
+local function isForeignOwnedBody(body)
+    local ownership = PNC.Compatibility
+        and PNC.Compatibility.ActorOwnership or nil
+    return ownership
+        and ownership.IsForeignOwned
+        and ownership.IsForeignOwned(body) == true
+        or false
+end
+
 function Internal.ensureZombieID(zombie)
     local modData
     if not zombie or not zombie.getModData then
@@ -358,7 +367,7 @@ function Internal.forceAggro(zombie, npcBody)
     local modData
     local record
     local npcId
-    if not zombie or not npcBody then
+    if not zombie or not npcBody or isForeignOwnedBody(zombie) then
         return
     end
     modData = Internal.getZombieModData(zombie)

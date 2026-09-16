@@ -70,6 +70,13 @@ T.equal(namedReason, "matched", "item text matching accepts plurals")
 T.equal(named.itemID, "appleB",
     "item text matching uses the authoritative full type")
 
+local typo, typoReason = Selector.Find(record, {
+    text = "aple",
+})
+T.equal(typoReason, "matched", "bounded item typo matching is local")
+T.equal(typo.itemID, "appleB",
+    "item typo matching resolves against the full type")
+
 MarketSense.GetItemCapabilities = nil
 Selector.ClearCache()
 local tagsWithoutCapabilities, tagsWithoutCapabilitiesReason = Selector.Find(

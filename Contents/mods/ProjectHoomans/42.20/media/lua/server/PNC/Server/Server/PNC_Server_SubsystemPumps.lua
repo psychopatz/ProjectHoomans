@@ -11,6 +11,9 @@ local PlayerCharacterLifecycle = PNC.PlayerCharacterLifecycle
 local ScalingDiagnostics = PNC.PerformanceScalingDiagnostics
 local Network = PNC.Network
 local ZombieAggro = PNC.ZombieAggro
+local NecroaExposure = PNC.Compatibility
+    and PNC.Compatibility.Necroa
+    and PNC.Compatibility.Necroa.Exposure
 
 H.LastLivePositionSafetyRefreshAt =
     tonumber(H.LastLivePositionSafetyRefreshAt) or 0
@@ -117,6 +120,11 @@ function H.PrepareTick(now)
     end
     safeOptional("server_prepare.spatial_rebuild", Spatial, "Rebuild", nil,
         now, false)
+    -- Compatibility adapters share the same scheduler as core systems. This
+    -- keeps their work visible to the profiler and prevents a second OnTick
+    -- callback from competing with the server tick's phase ordering.
+    safeOptional("server_prepare.necroa_exposure", NecroaExposure, "Pump",
+        nil, now)
     -- Player buckets must be current before the Director evaluates abstract
     -- arrivals or encounter observation safety.
     if PNC.WorldDirector and type(PNC.WorldDirector.Pump) == "function" then

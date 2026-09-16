@@ -3,6 +3,11 @@ if PsychopatzCore and PsychopatzCore.RuntimeRole
 
 local Selector = PNC.Semantics.ItemSelector
 local Internal = Selector.Internal
+local MarketSenseAdapter = PNC.Semantics.MarketSenseAdapter
+if type(MarketSenseAdapter) ~= "table" then
+    local loaded = require "PNC/Semantics/PNC_SemanticMarketSenseAdapter"
+    MarketSenseAdapter = type(loaded) == "table" and loaded or nil
+end
 
 function Internal.Normalized(value)
     local text = string.lower(tostring(value or ""))
@@ -49,13 +54,27 @@ function Internal.Classification(fullType, options)
     if fullType == "" then return nil, "item_type_missing" end
     options = type(options) == "table" and options or {}
     local includeCapabilities = options.includeCapabilities == true
+    local api = marketSense()
     local cached = Selector.Cache[fullType]
     if cached and (not includeCapabilities
         or cached.capabilitiesReady == true)
     then
+        -- A hot-loaded optional MarketSense module may become available after
+        -- the first exact classification. Re-enrich the cached row once so
+        -- semantic capabilities do not remain permanently unknown.
+        if MarketSenseAdapter
+            and type(MarketSenseAdapter.EnrichClassification) == "function"
+            and cached.semanticCapabilitiesReady ~= true
+        then
+            local enriched = MarketSenseAdapter.EnrichClassification(
+                fullType, cached, { api = api })
+            if type(enriched) == "table" then
+                Selector.Cache[fullType] = enriched
+                return enriched
+            end
+        end
         return cached
     end
-    local api = marketSense()
     if type(api) ~= "table" or type(api.GetTags) ~= "function" then
         return nil, "classification_unavailable"
     end
@@ -80,20 +99,16 @@ function Internal.Classification(fullType, options)
     addValue(tagSet, tags.themes, tagState)
     local capabilitiesReady = cached and cached.capabilitiesReady == true
         or false
-    if includeCapabilities then
-        if type(api.GetItemCapabilities) ~= "function" then
-            return nil, "classification_capabilities_unavailable"
-        end
+    if includeCapabilities and type(api.GetItemCapabilities) == "function" then
         local capabilitiesOK, capabilities = pcall(
             api.GetItemCapabilities, fullType)
-        if not capabilitiesOK or type(capabilities) ~= "table" then
-            return nil, "classification_capabilities_failed"
+        if capabilitiesOK and type(capabilities) == "table" then
+            for key, value in pairs(capabilities.capabilities or {}) do
+                addCapability(capabilitySet, tostring(key), value,
+                    capabilityState)
+            end
+            capabilitiesReady = true
         end
-        for key, value in pairs(capabilities.capabilities or {}) do
-            addCapability(capabilitySet, tostring(key), value,
-                capabilityState)
-        end
-        capabilitiesReady = true
     elseif cached then
         capabilitySet = cached.capabilities or capabilitySet
     end
@@ -107,6 +122,13 @@ function Internal.Classification(fullType, options)
         rawTags = tags,
         available = true,
     }
+    if MarketSenseAdapter
+        and type(MarketSenseAdapter.EnrichClassification) == "function"
+    then
+        local enriched = MarketSenseAdapter.EnrichClassification(
+            fullType, result, { api = api })
+        if type(enriched) == "table" then result = enriched end
+    end
     Selector.Cache[fullType] = result
     return result
 end

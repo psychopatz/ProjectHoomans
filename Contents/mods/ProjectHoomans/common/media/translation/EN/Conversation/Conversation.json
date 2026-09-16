@@ -351,5 +351,19 @@
     "UI_PNC_Conversation_ToolReply_Line_695128450": "Understood.",
     "UI_PNC_Conversation_ToolReply_Line_1489014961": "I will handle it.",
     "UI_PNC_Conversation_ToolReply_Line_1462709608": "I cannot do that right now.",
-    "UI_PNC_Conversation_ToolReply_Line_1147574178": "That order is not going to work."
+    "UI_PNC_Conversation_ToolReply_Line_1147574178": "That order is not going to work.",
+    "UI_PNC_Flavor_Necroa_MaskWarning_NPC_1": "Put your mask back on, {victimFirstName}! Knox is airborne!",
+    "UI_PNC_Flavor_Necroa_MaskWarning_NPC_2": "No mask? That is not safe, {victimFirstName}. Cover your face!",
+    "UI_PNC_Flavor_Necroa_MaskWarning_NPC_3": "We need masks on. I am not watching another person turn.",
+    "UI_PNC_Flavor_Necroa_MaskWarning_Family_1": "Put your mask on, family. I am not losing you to the air.",
+    "UI_PNC_Flavor_Necroa_MaskWarning_Family_2": "Mask up! I will not watch you gamble with Knox like that.",
+    "UI_PNC_Flavor_Necroa_MaskWarning_Colonist_1": "Mask up, {victimFirstName}. We keep the camp safe together.",
+    "UI_PNC_Flavor_Necroa_MaskWarning_Colonist_2": "Get a mask on before you come back inside, {victimFirstName}.",
+    "UI_PNC_Flavor_Necroa_PlayerMaskRemoved_NPC_1": "What are you doing, {playerFirstName}? Put that mask back on!",
+    "UI_PNC_Flavor_Necroa_PlayerMaskRemoved_NPC_2": "That is idiot behavior, {playerFirstName}. The air is not safe!",
+    "UI_PNC_Flavor_Necroa_PlayerMaskRemoved_NPC_3": "Do you want to die? Mask up before you get us all sick!",
+    "UI_PNC_Flavor_Necroa_PlayerMaskRemoved_Hostile_1": "Idiot. Put your mask back on before you become a problem.",
+    "UI_PNC_Flavor_Necroa_PlayerMaskRemoved_Hostile_2": "Take that mask off again and you are on your own, {playerFirstName}.",
+    "UI_PNC_Flavor_Necroa_PlayerMaskRemoved_Lover_1": "Please put your mask back on, love. This air is not safe.",
+    "UI_PNC_Flavor_Necroa_PlayerMaskRemoved_Lover_2": "Do not be an idiot, sweetheart. Mask up for me."
 }

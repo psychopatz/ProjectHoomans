@@ -12,6 +12,8 @@ require "PsychopatzCore/Events/PC_EventBus"
 require "PNC/Core/Identity/PNC_FlavorAddress"
 require "PNC/Conversation/PNC_ConversationDiary"
 require "PNC/Conversation/PNC_SocialFlavorDefinitions"
+require "PNC/Compatibility/Mods/Bandits/PNC_Bandits_HoomansFlavorDefinitions"
+require "PNC/Compatibility/Mods/Necroa/PNC_Necroa_HoomansFlavorDefinitions"
 
 PNC = PNC or {}
 PNC.SocialFlavorPresentation = PNC.SocialFlavorPresentation or {}

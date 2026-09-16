@@ -75,6 +75,12 @@ T.equal(unknownItem.object.text, "apple",
 T.equal(unknownItem.object.unresolved, true,
     "unknown fetch objects remain explicitly unresolved")
 
+local compoundItem = Parser.Parse("Bring me some medical supplies")
+T.equal(compoundItem.action, "FETCH",
+    "fetch accepts bounded compound item names")
+T.equal(compoundItem.object.text, "medical supplies",
+    "compound item text remains intact for MarketSense selection")
+
 local negated = Parser.Parse("Don't go")
 T.equal(negated.action, "GO", "negated command action")
 T.equal(negated.modifiers.negated, true, "negation is semantic metadata")

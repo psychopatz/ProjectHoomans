@@ -12,6 +12,7 @@ local Core = PNC.Core
 local Const = PNC.Const
 
 local CONTROL_MODDATA_KEYS = {
+    "PNC_Owner", "PNC_OwnerVersion",
     "PNC_NPC", "PNC_UUID", "PNC_BodyKind", "PNC_BodyLease",
     "PNC_CorpseToken", "PNC_TagVersion", "PNC_PersistedShell",
     "PNC_ShellVersion", "PNC_BaseOutfit", "PNC_LiveBodyInstanceID",

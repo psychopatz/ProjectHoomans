@@ -48,7 +48,8 @@ function Core.IsManagedNPCBody(zombie)
         return false
     end
     modData = zombie:getModData()
-    if modData and (modData.PNC_NPC == true
+    if modData and (modData.PNC_Owner == "ProjectHoomans"
+        or modData.PNC_NPC == true
         or modData.PNC_PersistedShell == true
         or (modData.PNC_UUID ~= nil and modData.PNC_BodyKind == "live"))
     then

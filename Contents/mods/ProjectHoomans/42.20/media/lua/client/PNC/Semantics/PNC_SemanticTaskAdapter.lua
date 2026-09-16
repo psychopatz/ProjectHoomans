@@ -98,27 +98,21 @@ function Adapter.Dispatch(actionIntent, context)
     }
 end
 
--- First semantic-task transport.  More actions can register their own
--- definitions without changing this adapter; the server remains the only
--- place that can create or mutate an action plan.
-Adapter.RegisterAction("WAIT_AT", {
-    Dispatch = function(request, context)
-        local client = PNC.Client
-        if not client or type(client.RequestSemanticTask) ~= "function" then
-            return false, "task_transport_unavailable"
-        end
-        return client.RequestSemanticTask(request, context)
-    end,
-})
+-- Semantic-task transport. More actions can register their own definitions
+-- without changing this adapter; the server remains the only place that can
+-- create or mutate an action plan.
+local function dispatchSemanticTask(request, context)
+    local client = PNC.Client
+    if not client or type(client.RequestSemanticTask) ~= "function" then
+        return false, "task_transport_unavailable"
+    end
+    return client.RequestSemanticTask(request, context)
+end
 
-Adapter.RegisterAction("GIVE", {
-    Dispatch = function(request, context)
-        local client = PNC.Client
-        if not client or type(client.RequestSemanticTask) ~= "function" then
-            return false, "task_transport_unavailable"
-        end
-        return client.RequestSemanticTask(request, context)
-    end,
-})
+for _, action in ipairs({
+    "WAIT_AT", "GIVE", "EAT", "DRINK", "REFILL", "CONSUME",
+}) do
+    Adapter.RegisterAction(action, { Dispatch = dispatchSemanticTask })
+end
 
 return Adapter

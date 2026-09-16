@@ -138,7 +138,7 @@ T.equal(serverCalls[conversationServerIndex - 1],
     "PNC/Social/PNC_SocialEventHooks",
     "server Conversation initialization predecessor")
 T.equal(serverCalls[conversationServerIndex + 1],
-    "PNC/Server/PNC_ServerInventory",
+    "PNC/Compatibility/Mods/Necroa/PNC_Necroa_ExposureServer",
     "server Conversation initialization successor")
 
 local eventMarkers = {}

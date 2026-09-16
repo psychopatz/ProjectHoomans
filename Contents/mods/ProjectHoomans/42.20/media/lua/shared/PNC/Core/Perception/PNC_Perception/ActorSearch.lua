@@ -9,6 +9,8 @@ local Const = PNC.Const
 local Spatial = PNC.SpatialIndex
 local Registry = PNC.Registry
 local Relationships = PNC.Relationships
+local CompatibilityTargeting = PNC.Compatibility
+    and PNC.Compatibility.Targeting
 
 local function recordVisibleNPC(observer, target, candidate)
     local semantics = PNC.Semantics
@@ -67,6 +69,14 @@ function Perception.FindNearestEnemyPlayer(record, radius)
             end
         end
     end
+    if CompatibilityTargeting
+        and CompatibilityTargeting.FindNearestEnemy
+    then
+        best = Internal.PickNearest(
+            best,
+            CompatibilityTargeting.FindNearestEnemy(record, radius)
+        )
+    end
     return best
 end
 
@@ -118,6 +128,14 @@ function Perception.FindNearestEnemyNPC(record, radius)
                 end
             end
         end
+    end
+    if CompatibilityTargeting
+        and CompatibilityTargeting.FindNearestEnemy
+    then
+        best = Internal.PickNearest(
+            best,
+            CompatibilityTargeting.FindNearestEnemy(record, radius)
+        )
     end
     return best
 end

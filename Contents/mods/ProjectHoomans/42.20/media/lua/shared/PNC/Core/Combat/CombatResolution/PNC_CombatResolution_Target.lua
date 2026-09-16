@@ -1,5 +1,7 @@
 local Resolution = PNC.CombatResolution
 local Core = PNC.Core
+local CompatibilityAPI = PNC.Compatibility
+    and PNC.Compatibility.API
 
 function Resolution.ApplyTargetDamage(attackerRecord, attackerBody, target, options)
     local registry = PNC.Registry
@@ -54,6 +56,44 @@ function Resolution.ApplyTargetDamage(attackerRecord, attackerBody, target, opti
     end
     hit = Resolution.BuildHitEvent(attackerRecord, target, options)
     if hit.amount <= 0 then return false, "invalid_damage", hit end
+    if target.kind == "foreign_npc" then
+        local allowed
+        local reason
+        local applied
+        if not CompatibilityAPI then
+            return false, "compatibility_api_unavailable", hit
+        end
+        allowed, reason = CompatibilityAPI.CanAttack(
+            attackerRecord,
+            target,
+            {
+                attackerBody = attackerBody,
+                hit = hit,
+                phase = "damage",
+            }
+        )
+        if not allowed then
+            return false, reason or "foreign_target_not_allowed", hit
+        end
+        applied, reason = CompatibilityAPI.ApplyDamage(target, {
+            attackerRecord = attackerRecord,
+            attackerBody = attackerBody,
+            hit = hit,
+            options = options,
+        })
+        if applied == true and CompatibilityAPI.EmitEvent then
+            CompatibilityAPI.EmitEvent("foreign_damage_applied", {
+                attackerRecord = attackerRecord,
+                attackerBody = attackerBody,
+                target = target,
+                hit = hit,
+                options = options,
+            })
+        end
+        return applied == true,
+            reason or (applied and "hit_foreign_npc" or "foreign_damage_rejected"),
+            hit
+    end
     if target.kind == "player" then
         local applied = Resolution.ApplyPlayerDamage(target.player, hit.amount, hit.attackType, hit.weaponItem, hit)
         if applied == true

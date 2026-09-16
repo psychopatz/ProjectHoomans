@@ -29,7 +29,10 @@ function climate:getPrecipitationIntensity()
 end
 function climate:isRaining() return precipitation > 0 end
 function climate:getFogIntensity() return 0.25 end
-function climate:getAirTemperatureForCharacter() return 18.5 end
+function climate:getAirTemperatureForCharacter(value)
+    if value ~= player then error("non-character weather argument") end
+    return 18.5
+end
 
 getTimeInMillis = function() return now end
 getGameTime = function() return gameTime end
@@ -59,6 +62,14 @@ T.near(first.weather.temperatureC, 18.5, 0.001,
 T.equal(first.environment.indoors, false, "local indoor state is captured")
 T.near(first.environment.position.x, 101.5, 0.001,
     "local position is captured")
+
+local identityOnly = World.Get({
+    player = "Friend",
+    cacheKey = "identity_only",
+    force = true,
+})
+T.near(identityOnly.weather.temperatureC, 18.5, 0.001,
+    "display identity is not passed to character weather APIs")
 
 now = 1500
 precipitation = 0

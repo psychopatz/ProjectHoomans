@@ -12,6 +12,15 @@ local Spatial = PNC.SpatialIndex
 local Internal = ZombieAggro.Internal
 local Diagnostics = PNC.PerformanceScalingDiagnostics
 
+local function isForeignOwnedBody(body)
+    local ownership = PNC.Compatibility
+        and PNC.Compatibility.ActorOwnership or nil
+    return ownership
+        and ownership.IsForeignOwned
+        and ownership.IsForeignOwned(body) == true
+        or false
+end
+
 ZombieAggro.ActiveSet = ZombieAggro.ActiveSet or {
     byID = {},
     order = {},
@@ -51,9 +60,13 @@ end
 
 function ZombieAggro.Activate(zombie, now, reason, ttl)
     local state = ZombieAggro.ActiveSet
-    local id = Internal.ensureZombieID(zombie)
+    local id
     local entry
-    if not id or not zombie then return false end
+    if not zombie or isForeignOwnedBody(zombie) then
+        return false
+    end
+    id = Internal.ensureZombieID(zombie)
+    if not id then return false end
     id = tostring(id)
     now = tonumber(now) or Core.Now()
     entry = state.byID[id]
@@ -119,6 +132,7 @@ function ZombieAggro.RefreshActiveSet(now, force)
                 for i = 1, #candidates do
                     zombie = candidates[i]
                     if zombie
+                        and not isForeignOwnedBody(zombie)
                         and math.abs(zombie:getZ() - body:getZ()) < 1
                         and Core.DistanceSq(
                             body:getX(),
@@ -161,6 +175,7 @@ function ZombieAggro.PumpActiveSet(now, callback)
         entry = id and state.byID[id] or nil
         zombie = entry and entry.zombie or nil
         if entry and zombie
+            and not isForeignOwnedBody(zombie)
             and not (zombie.isDead and zombie:isDead())
             and (not zombie.getSquare or zombie:getSquare() ~= nil)
             and (now < (tonumber(entry.expiresAt) or 0)
@@ -204,7 +219,7 @@ function ZombieAggro.ForEachActive(callback)
     for i = 1, #state.order do
         id = state.order[i]
         entry = id and state.byID[id] or nil
-        if entry and entry.zombie then
+        if entry and entry.zombie and not isForeignOwnedBody(entry.zombie) then
             callback(entry.zombie, entry)
         end
     end

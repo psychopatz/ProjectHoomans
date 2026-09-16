@@ -31,6 +31,52 @@ local function singular(value)
     return value
 end
 
+local function fuzzyLimit(value)
+    local length = #tostring(value or "")
+    if length < 4 then return 0 end
+    return length >= 8 and 2 or 1
+end
+
+local function editDistanceAtMost(left, right, limit)
+    left = tostring(left or "")
+    right = tostring(right or "")
+    limit = tonumber(limit) or 0
+    if left == right then return true end
+    if limit < 1 then return false end
+    if math.abs(#left - #right) > limit then return false end
+
+    local previous = {}
+    local current
+    local row
+    local column
+    for column = 0, #right do previous[column] = column end
+    for row = 1, #left do
+        current = { [0] = row }
+        for column = 1, #right do
+            local cost = string.sub(left, row, row)
+                == string.sub(right, column, column) and 0 or 1
+            current[column] = math.min(
+                current[column - 1] + 1,
+                previous[column] + 1,
+                previous[column - 1] + cost
+            )
+        end
+        previous = current
+    end
+    return previous[#right] <= limit
+end
+
+local function fuzzySingleWord(query, candidate)
+    local limit = fuzzyLimit(query)
+    if limit < 1 then return false end
+    for token in string.gmatch(candidate, "%S+") do
+        if editDistanceAtMost(query, singular(token), limit) then
+            return true
+        end
+    end
+    return false
+end
+
 function Internal.ItemText(item, fullType)
     local values = {}
     local function add(value)
@@ -51,8 +97,16 @@ function Internal.TextMatches(item, queryText, fullType)
     local candidate = Internal.ItemText(item, fullType)
     if string.find(candidate, query, 1, true) then return true end
     local reduced = singular(query)
-    return reduced ~= query and string.find(candidate, reduced, 1, true)
+    if reduced ~= query and string.find(candidate, reduced, 1, true)
         ~= nil
+    then
+        return true
+    end
+    -- Keep typo recovery deliberately narrow: one short English word and a
+    -- maximum edit distance of one (two only for long words). This avoids
+    -- turning an item request into an expensive or overly permissive parser.
+    return not string.find(query, " ", 1, true)
+        and fuzzySingleWord(reduced, candidate)
 end
 
 local function requestedValues(value)
@@ -64,6 +118,16 @@ local function requestedValues(value)
         for index = 1, #value do
             local entry = Internal.Normalized(value[index])
             if entry ~= "" then values[#values + 1] = entry end
+        end
+        -- Semantic mentions and MarketSense projections commonly expose
+        -- capabilities as a boolean map (`edible = true`) rather than an
+        -- array. Accept both shapes at the selector boundary so contextual
+        -- references and task requests use the same contract.
+        for key, enabled in pairs(value) do
+            if type(key) ~= "number" and enabled == true then
+                local entry = Internal.Normalized(key)
+                if entry ~= "" then values[#values + 1] = entry end
+            end
         end
     end
     return values

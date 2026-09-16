@@ -122,8 +122,26 @@ local function globalObject(getter)
     return ok and value or nil
 end
 
+local function isCharacterArgument(value)
+    local ok
+    local result
+    local getX
+    local getY
+    if value == nil then return false end
+    if type(instanceof) == "function" then
+        ok, result = pcall(instanceof, value, "IsoGameCharacter")
+        if ok then return result == true end
+    end
+    ok, getX = pcall(function() return value.getX end)
+    if not ok or type(getX) ~= "function" then return false end
+    ok, getY = pcall(function() return value.getY end)
+    return ok and type(getY) == "function"
+end
+
 local function localPlayer(options)
-    if type(options) == "table" and options.player ~= nil then
+    if type(options) == "table"
+        and isCharacterArgument(options.player)
+    then
         return options.player
     end
     if type(getSpecificPlayer) == "function" then
@@ -186,7 +204,7 @@ local function weatherSnapshot(climate, player)
     local fogIntensity = firstNumber(climate, {
         "getFogIntensity",
     })
-    if fogIntensity == nil and player ~= nil then
+    if fogIntensity == nil and isCharacterArgument(player) then
         local ok, value = call1(climate, "getFogIntensityForCharacter", player)
         if ok then fogIntensity = tonumber(value) end
     end
@@ -208,7 +226,7 @@ local function weatherSnapshot(climate, player)
     end
 
     local temperature = nil
-    if player ~= nil then
+    if isCharacterArgument(player) then
         local ok, value = call2(
             climate, "getAirTemperatureForCharacter", player, false
         )

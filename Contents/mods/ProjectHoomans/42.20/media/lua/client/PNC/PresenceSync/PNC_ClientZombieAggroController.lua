@@ -17,6 +17,15 @@ local Const = PNC.Const or {}
 local Network = PNC.Network
 local ClientState = PNC.Network and PNC.Network.ClientState or nil
 
+local function isForeignOwnedBody(body)
+    local ownership = PNC.Compatibility
+        and PNC.Compatibility.ActorOwnership or nil
+    return ownership
+        and ownership.IsForeignOwned
+        and ownership.IsForeignOwned(body) == true
+        or false
+end
+
 local PATH_REFRESH_MS = tonumber(
     Const.ZOMBIE_NPC_PATH_REFRESH_MS
 ) or 350
@@ -749,6 +758,11 @@ function Internal.UpdateClientZombieAggro(zombie, now)
         or (zombie.isDead and zombie:isDead())
         or not isLocalZombieUpdate(zombie)
     then
+        return false
+    end
+    -- Bandits owns its own client-side zombie mind. Do not clear targets,
+    -- hands, teeth, or lunge variables before its update lane runs.
+    if isForeignOwnedBody(zombie) then
         return false
     end
     if enforceManagedSafetyGuard(zombie) then return false end

@@ -10,12 +10,15 @@ then return end
 PNC = PNC or {}
 PNC.Semantics = PNC.Semantics or {}
 
+require "PNC/Semantics/PNC_SemanticDiagnostics"
+
 local Contract = PNC.Semantics.InventoryQuery
     or require "PNC/Semantics/PNC_SemanticInventoryQuery"
 local Selector = PNC.Semantics.ItemSelector
     or require "PNC/Semantics/Inventory/PNC_SemanticItemSelector"
 local Service = PNC.Semantics.InventoryQueryService or {}
 PNC.Semantics.InventoryQueryService = Service
+local Diagnostics = PNC.Semantics.SemanticDiagnostics
 
 Service.VERSION = 1
 Service.MAX_ITEMS = 256
@@ -112,14 +115,19 @@ end
 
 local function traceQuery(record, query, status, reason, result, options)
     local trace = PsychopatzCore and PsychopatzCore.DebugTrace
-    if not trace or type(trace.IsEnabled) ~= "function"
-        or trace.IsEnabled() ~= true
-        or type(trace.Record) ~= "function"
+    local semanticAudit = Diagnostics
+        and type(Diagnostics.IsEnabled) == "function"
+        and Diagnostics.IsEnabled() == true
+    local legacyTrace = trace
+        and type(trace.IsEnabled) == "function"
+        and trace.IsEnabled() == true
+        and type(trace.Record) == "function"
+    if not semanticAudit and not legacyTrace
     then
         return result, reason
     end
     query = type(query) == "table" and query or {}
-    trace.Record({
+    local definition = {
         source = "ProjectHoomans.Semantics",
         event = "semantic.inventory.query",
         requestID = options and options.requestID or query.requestID,
@@ -134,8 +142,18 @@ local function traceQuery(record, query, status, reason, result, options)
             totalCount = result and result.totalCount or 0,
             distinctItems = result and result.distinctItems or 0,
             inventoryRevision = result and result.inventoryRevision,
+            items = result and result.items,
         },
-    })
+    }
+    if semanticAudit then
+        Diagnostics.Record(
+            "semantic.inventory.query",
+            definition.data,
+            { requestID = options and options.requestID or query.requestID }
+        )
+    else
+        trace.Record(definition)
+    end
     return result, reason
 end
 
@@ -148,18 +166,48 @@ local function textMatches(item, queryText, fullType)
         or string.find(typeText, queryText, 1, true) ~= nil
 end
 
+local function compactMap(value, maximum)
+    local output = {}
+    if type(value) ~= "table" then return output end
+    maximum = tonumber(maximum) or 24
+    local count = 0
+    local key
+    local item
+    for key, item in pairs(value) do
+        if type(key) == "string"
+            and (item == true or item == false
+                or type(item) == "string" or type(item) == "number")
+        then
+            output[text(key, 64)] = item
+            count = count + 1
+            if count >= maximum then break end
+        end
+    end
+    return output
+end
+
 local function compactClassification(details)
     if type(details) ~= "table" then return nil end
     local output = {
         primary = text(details.primary, 64),
         category = text(details.category, 64),
         tags = {},
+        capabilities = compactMap(details.capabilities),
+        semanticCapabilities = compactMap(details.semanticCapabilities),
+        capabilityEvidence = copyValue(details.capabilityEvidence),
+        marketRole = text(details.marketRole, 64),
+        marketSenseTags = {},
     }
     for tag in pairs(details.tags or {}) do
         if #output.tags >= 16 then break end
         output.tags[#output.tags + 1] = text(tag, 64)
     end
     table.sort(output.tags)
+    for index = 1, math.min(#(details.marketSenseTags or {}), 32) do
+        output.marketSenseTags[index] = text(
+            details.marketSenseTags[index], 64)
+    end
+    table.sort(output.marketSenseTags)
     return output
 end
 
@@ -211,6 +259,11 @@ function Service.Query(record, query, options)
                 reason = matched and "text_matched" or "item_text_mismatch"
             end
             if matched then
+                if not details and Selector.Internal
+                    and type(Selector.Internal.Classification) == "function"
+                then
+                    details = Selector.Internal.Classification(fullType, {})
+                end
                 candidates[#candidates + 1] = {
                     itemID = tostring(item.id or ids[index]),
                     fullType = fullType,
@@ -297,7 +350,7 @@ end
 local function resultPayload(request, status, reason, result)
     result = type(result) == "table" and result or {}
     request = type(request) == "table" and request or {}
-    return {
+    local payload = {
         accepted = status == "found" or status == "empty",
         status = status,
         reason = reason,
@@ -310,6 +363,25 @@ local function resultPayload(request, status, reason, result)
         distinctItems = tonumber(result.distinctItems) or 0,
         inventoryRevision = result.inventoryRevision,
     }
+    if Diagnostics
+        and type(Diagnostics.IsEnabled) == "function"
+        and Diagnostics.IsEnabled() == true
+    then
+        Diagnostics.Record("semantic.inventory.response", {
+            npcID = payload.npcID,
+            conversationID = payload.conversationID,
+            requestID = payload.requestID,
+            status = payload.status,
+            accepted = payload.accepted == true,
+            reason = payload.reason,
+            query = payload.query,
+            totalCount = payload.totalCount,
+            distinctItems = payload.distinctItems,
+            inventoryRevision = payload.inventoryRevision,
+            items = payload.items,
+        }, { requestID = payload.requestID })
+    end
+    return payload
 end
 
 function Service.HandleRequest(raw, context)

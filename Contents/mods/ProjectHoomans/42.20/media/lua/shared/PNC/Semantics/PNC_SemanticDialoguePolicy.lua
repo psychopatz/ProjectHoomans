@@ -25,6 +25,10 @@ local COMMAND_ACTIONS = {
     GIVE = true,
     TAKE = true,
     WAIT_AT = true,
+    EAT = true,
+    DRINK = true,
+    REFILL = true,
+    CONSUME = true,
 }
 
 -- Fuzzy recognition is useful for low-risk conversational movement commands,
@@ -41,6 +45,10 @@ local FUZZY_SAFE_ACTIONS = {
 local ITEM_REQUEST_ACTIONS = {
     FETCH = true,
     GIVE = true,
+    EAT = true,
+    DRINK = true,
+    REFILL = true,
+    CONSUME = true,
 }
 
 local RESPONSE_TEMPLATES = {
@@ -83,6 +91,10 @@ local RESPONSE_TEMPLATES = {
     ASK_CLARIFICATION = {
         templateID = "semantic.ask_clarification",
         fallback = "I'm not sure what you mean.",
+    },
+    ACTION_UNAVAILABLE = {
+        templateID = "semantic.action.unavailable",
+        fallback = "I can't do that yet.",
     },
     UNKNOWN = {
         templateID = "semantic.unknown",

@@ -114,6 +114,26 @@ T.truthy(snapshot, "query returns a plan snapshot")
 snapshot.state = "FAILED"
 T.equal(plan.state, "COMPLETED", "queries cannot mutate live plan state")
 
+local activeAccepted, activePlan = Service.Submit({
+    planID = "plan:active",
+    npcID = record.id,
+    steps = { { action = "ACTIVE" } },
+})
+T.equal(activeAccepted, true, "a new active plan can start after completion")
+local rejected, activeReason, activeDetails = Service.Submit({
+    planID = "plan:while-active",
+    npcID = record.id,
+    steps = { { action = "OTHER" } },
+})
+T.equal(rejected, false, "a genuinely active plan remains exclusive")
+T.equal(activeReason, "npc_action_plan_active",
+    "active-plan rejection keeps its stable reason")
+T.equal(activeDetails.reason, "active",
+    "active-plan rejection exposes admission diagnostics")
+T.equal(activeDetails.stepState, "RESOLVING",
+    "admission diagnostics identify the current step state")
+Service.Cancel(record.id, "test_active_cleanup")
+
 Service.UnregisterProvider("GUARD")
 local blocked, blockedPlan = Service.Submit({
     planID = "plan:missing",
@@ -127,8 +147,32 @@ now = 106
 Service.Pump(now)
 T.equal(blockedPlan.steps[1].state, "BLOCKED",
     "missing providers fail closed as a retryable block")
+local blockedAdmission = Service.GetAdmissionState(record.id)
+T.equal(blockedAdmission.reason, "blocked",
+    "blocked plans are visible as recoverable admission state")
+T.equal(blockedAdmission.active, false,
+    "blocked plans are removed from the active execution index")
 T.equal(Service.Retry(record.id), true, "blocked plans can be retried")
 T.equal(blockedPlan.steps[1].state, "RESOLVING",
     "retry returns the step to resolution")
+
+now = 107
+Service.Pump(now)
+T.equal(blockedPlan.steps[1].state, "BLOCKED",
+    "a failed retry remains explicitly blocked")
+local replacementAccepted, replacementPlan = Service.Submit({
+    planID = "plan:replacement",
+    npcID = record.id,
+    steps = { { action = "RECOVER" } },
+})
+T.equal(replacementAccepted, true,
+    "a new command can replace a blocked persisted plan")
+T.equal(blockedPlan.state, "CANCELLED",
+    "superseded blocked plans are retired")
+T.equal(replacementPlan.state, "RUNNING",
+    "the replacement plan owns the execution lease")
+T.equal(Service.GetAdmissionState(record.id).reason, "active",
+    "replacement admission state is active")
+Service.Cancel(record.id, "test_replacement_cleanup")
 
 T.finish("pnc_semantic_action_plan_service_smoke")

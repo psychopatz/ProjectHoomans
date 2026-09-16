@@ -7,6 +7,8 @@ local Core = PNC.Core
 local Const = PNC.Const or {}
 local Registry = PNC.Registry
 local Perception = PNC.Perception
+local Compatibility = PNC.Compatibility
+local CompatibilityAPI = Compatibility and Compatibility.API
 
 function AttackExecution.captureTargetRef(target)
     local worldObject
@@ -17,12 +19,17 @@ function AttackExecution.captureTargetRef(target)
         worldObject = Perception.FindZombieByID(target.zombieId)
     elseif target.kind == "player" then
         worldObject = target.player
+    elseif target.kind == "foreign_npc" then
+        worldObject = target.worldObject
     end
     return {
         kind = target.kind,
         id = target.id,
         onlineID = target.onlineID,
         username = target.username,
+        provider = target.provider,
+        actorId = target.actorId or target.id,
+        generation = target.generation,
         zombieId = target.zombieId,
         x = target.x,
         y = target.y,
@@ -90,6 +97,28 @@ function AttackExecution.resolveActionTarget(targetRef)
             distSq = 0,
         }
     end
+    if targetRef.kind == "foreign_npc" and CompatibilityAPI
+        and CompatibilityAPI.ResolveTarget
+    then
+        local foreignTarget = CompatibilityAPI.ResolveTarget(targetRef)
+        if not foreignTarget or not foreignTarget.worldObject
+            or not foreignTarget.worldObject.isAlive
+            or not foreignTarget.worldObject:isAlive()
+        then
+            return nil
+        end
+        return {
+            kind = "foreign_npc",
+            provider = foreignTarget.provider or targetRef.provider,
+            actorId = foreignTarget.actorId or targetRef.actorId,
+            generation = foreignTarget.generation or targetRef.generation,
+            worldObject = foreignTarget.worldObject,
+            x = foreignTarget.worldObject:getX(),
+            y = foreignTarget.worldObject:getY(),
+            z = foreignTarget.worldObject:getZ(),
+            distSq = 0,
+        }
+    end
     return nil
 end
 
@@ -106,6 +135,8 @@ function AttackExecution.isActionTargetVisible(record, target)
         worldObject = Registry.GetLiveZombie(target.id)
     elseif target.kind == "zombie" then
         worldObject = target.worldObject or Perception.FindZombieByID and Perception.FindZombieByID(target.zombieId) or nil
+    elseif target.kind == "foreign_npc" then
+        worldObject = target.worldObject
     end
     if not worldObject then
         return false

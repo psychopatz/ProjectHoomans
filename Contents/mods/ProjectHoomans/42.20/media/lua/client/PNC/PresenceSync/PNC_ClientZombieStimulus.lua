@@ -19,6 +19,15 @@ local Diagnostics = PNC.PerformanceScalingDiagnostics
 local NEXT_PROBE_AT = setmetatable({}, { __mode = "k" })
 local OBSERVATION_BY_ZOMBIE = setmetatable({}, { __mode = "k" })
 
+local function isForeignOwnedBody(body)
+    local ownership = PNC.Compatibility
+        and PNC.Compatibility.ActorOwnership or nil
+    return ownership
+        and ownership.IsForeignOwned
+        and ownership.IsForeignOwned(body) == true
+        or false
+end
+
 local function isLocalZombie(zombie)
     return zombie
         and not (zombie.isRemoteZombie and zombie:isRemoteZombie())
@@ -104,6 +113,9 @@ function Internal.OnClientZombieStimulusUpdate(zombie)
     if not isClient or isClient() ~= true or not isLocalZombie(zombie)
         or not zombie.isUseless or not zombie:isUseless()
     then
+        return false
+    end
+    if isForeignOwnedBody(zombie) then
         return false
     end
     now = Core and Core.Now and Core.Now() or 0

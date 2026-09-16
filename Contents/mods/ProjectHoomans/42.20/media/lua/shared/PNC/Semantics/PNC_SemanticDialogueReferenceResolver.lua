@@ -14,6 +14,11 @@ if type(EntityResolver) ~= "table" then
     local loaded = require "PNC/Semantics/PNC_SemanticEntityResolver"
     EntityResolver = type(loaded) == "table" and loaded or nil
 end
+local ContextResolver = PNC.Semantics.ContextResolver
+if type(ContextResolver) ~= "table" then
+    local loaded = require "PNC/Semantics/PNC_SemanticContextResolver"
+    ContextResolver = type(loaded) == "table" and loaded or nil
+end
 local Resolver = PNC.Semantics.DialogueReferenceResolver or {}
 PNC.Semantics.DialogueReferenceResolver = Resolver
 
@@ -65,11 +70,71 @@ local function unresolvedEntity(output)
     return false
 end
 
-local function resolveField(output, field, state, diagnostics)
+local function resolveField(output, field, state, context, diagnostics)
     local value = output[field]
     if not isReference(value) then return false end
 
     diagnostics.contextResolutionAttempted = true
+    local contextState = type(context) == "table"
+        and (context.semanticContextState or context.semanticDialogueContext)
+        or nil
+    if contextState and ContextResolver
+        and type(ContextResolver.ResolveReference) == "function"
+    then
+        local contextualResolved
+        local contextualReason
+        local contextualDetails
+        local contextualOptions = {
+            field = field,
+            action = output.action,
+            context = context,
+        }
+        local contextualOK
+        contextualOK, contextualResolved, contextualReason,
+            contextualDetails = pcall(
+                ContextResolver.ResolveReference,
+                value,
+                contextState,
+                output,
+                contextualOptions
+            )
+        if contextualOK and type(contextualResolved) == "table" then
+            output[field] = contextualResolved
+            diagnostics.contextResolved = true
+            diagnostics.contextualResolver = true
+            diagnostics.contextualReferenceDetails =
+                diagnostics.contextualReferenceDetails or {}
+            diagnostics.contextualReferenceDetails[field] = contextualDetails
+            appendBounded(diagnostics.contextResolvedReferences, {
+                field = field,
+                reference = value.reference,
+                reason = contextualReason,
+                method = "context_salience_and_capability",
+                confidence = contextualDetails
+                    and contextualDetails.confidence or nil,
+                margin = contextualDetails
+                    and contextualDetails.margin or nil,
+            })
+            return true
+        end
+        if contextualOK and (
+            contextualReason == "ambiguous_reference"
+                or contextualReason == "low_reference_confidence"
+                or contextualReason == "capability_unknown"
+        ) then
+            diagnostics.contextualResolver = true
+            diagnostics.contextualReferenceDetails =
+                diagnostics.contextualReferenceDetails or {}
+            diagnostics.contextualReferenceDetails[field] = contextualDetails
+            appendBounded(diagnostics.contextUnresolvedReferences, {
+                field = field,
+                reference = value.reference,
+                reason = contextualReason,
+            })
+            return false
+        end
+    end
+
     local resolved
     local reason
     local ok = false
@@ -205,6 +270,7 @@ function Resolver.Resolve(ir, state, context, options)
             output,
             ENTITY_FIELDS[index],
             state,
+            context,
             diagnostics
         ) then
             resolvedCount = resolvedCount + 1

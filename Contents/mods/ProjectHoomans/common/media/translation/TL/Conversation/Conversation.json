@@ -351,5 +351,19 @@
     "UI_PNC_Conversation_ToolReply_Line_695128450": "Nauunawaan ko.",
     "UI_PNC_Conversation_ToolReply_Line_1489014961": "Ako na ang bahala.",
     "UI_PNC_Conversation_ToolReply_Line_1462709608": "Hindi ko iyan magagawa ngayon.",
-    "UI_PNC_Conversation_ToolReply_Line_1147574178": "Hindi uubra ang utos na iyan."
+    "UI_PNC_Conversation_ToolReply_Line_1147574178": "Hindi uubra ang utos na iyan.",
+    "UI_PNC_Flavor_Necroa_MaskWarning_NPC_1": "Isuot mo ulit ang maskara mo, {victimFirstName}! Nasa hangin ang Knox!",
+    "UI_PNC_Flavor_Necroa_MaskWarning_NPC_2": "Walang maskara? Hindi ligtas iyan, {victimFirstName}. Takpan mo ang mukha mo!",
+    "UI_PNC_Flavor_Necroa_MaskWarning_NPC_3": "Kailangan nating magsuot ng maskara. Ayokong may makita pang magbago.",
+    "UI_PNC_Flavor_Necroa_MaskWarning_Family_1": "Isuot mo ang maskara mo, pamilya. Ayokong mawala ka sa hangin.",
+    "UI_PNC_Flavor_Necroa_MaskWarning_Family_2": "Mag-maskara ka! Hindi ko hahayaang isugal mo ang buhay mo sa Knox.",
+    "UI_PNC_Flavor_Necroa_MaskWarning_Colonist_1": "Mag-maskara ka, {victimFirstName}. Sama-sama nating pinananatiling ligtas ang kampo.",
+    "UI_PNC_Flavor_Necroa_MaskWarning_Colonist_2": "Magsuot ka ng maskara bago ka pumasok ulit, {victimFirstName}.",
+    "UI_PNC_Flavor_Necroa_PlayerMaskRemoved_NPC_1": "Ano ba ang ginagawa mo, {playerFirstName}? Isuot mo ulit ang maskara mo!",
+    "UI_PNC_Flavor_Necroa_PlayerMaskRemoved_NPC_2": "Kahangalan iyan, {playerFirstName}. Hindi ligtas ang hangin!",
+    "UI_PNC_Flavor_Necroa_PlayerMaskRemoved_NPC_3": "Gusto mo bang mamatay? Mag-maskara ka bago tayo mahawa!",
+    "UI_PNC_Flavor_Necroa_PlayerMaskRemoved_Hostile_1": "Tanga. Isuot mo ulit ang maskara mo bago ka maging problema.",
+    "UI_PNC_Flavor_Necroa_PlayerMaskRemoved_Hostile_2": "Alisin mo ulit ang maskara at bahala ka na sa sarili mo, {playerFirstName}.",
+    "UI_PNC_Flavor_Necroa_PlayerMaskRemoved_Lover_1": "Pakiusap, isuot mo ulit ang maskara mo, mahal. Hindi ligtas ang hangin.",
+    "UI_PNC_Flavor_Necroa_PlayerMaskRemoved_Lover_2": "Huwag kang tanga, sinta. Mag-maskara ka para sa akin."
 }

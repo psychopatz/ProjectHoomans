@@ -45,7 +45,7 @@ function Internal.PickNearest(firstTarget, secondTarget)
     return secondTarget
 end
 
-local function sameTarget(target, kind, id, onlineID, username)
+local function sameTarget(target, kind, id, onlineID, username, provider)
     if not target or tostring(target.kind or "") ~= tostring(kind or "") then
         return false
     end
@@ -61,6 +61,11 @@ local function sameTarget(target, kind, id, onlineID, username)
         end
         return username ~= nil and tostring(target.username or "") == tostring(username)
     end
+    if kind == "foreign_npc" then
+        return tostring(target.provider or "") == tostring(provider or "")
+            and tostring(target.actorId or target.id or "")
+                == tostring(id or "")
+    end
     return false
 end
 
@@ -75,15 +80,26 @@ function Perception.RememberAttacker(record, damageEvent, now)
     local id
     if not record or type(damageEvent) ~= "table" then return false end
     kind = tostring(damageEvent.attackerKind or "")
-    if kind ~= "npc" and kind ~= "player" and kind ~= "zombie" then
+    if kind == "bandit" then
+        kind = "foreign_npc"
+        damageEvent.attackerProvider =
+            damageEvent.attackerProvider or "Bandits"
+    end
+    if kind ~= "npc" and kind ~= "player" and kind ~= "zombie"
+        and kind ~= "foreign_npc"
+    then
         return false
     end
     if kind == "npc" then
         id = damageEvent.attackerID
     elseif kind == "zombie" then
         id = damageEvent.attackerZombieId or damageEvent.zombieId
+    elseif kind == "foreign_npc" then
+        id = damageEvent.attackerID or damageEvent.actorId
     end
-    if (kind == "npc" or kind == "zombie") and (id == nil or id == "") then
+    if (kind == "npc" or kind == "zombie" or kind == "foreign_npc")
+        and (id == nil or id == "")
+    then
         return false
     end
     if kind == "player"
@@ -96,6 +112,7 @@ function Perception.RememberAttacker(record, damageEvent, now)
     record.runtime.recentThreat = {
         kind = kind,
         id = id,
+        provider = damageEvent.attackerProvider or damageEvent.provider,
         onlineID = damageEvent.attackerOnlineID,
         username = damageEvent.attackerUsername,
         expiresAt = (tonumber(now) or Core.Now())
@@ -191,6 +208,34 @@ function Perception.ResolveRecentAttacker(record, now)
             zombieId = recent.id,
             worldObject = worldObject,
         }
+    elseif kind == "foreign_npc" then
+        local api = PNC.Compatibility
+            and PNC.Compatibility.API
+        local reference = {
+            provider = recent.provider,
+            actorId = recent.id,
+            id = recent.id,
+            kind = "foreign_npc",
+            generation = recent.generation,
+        }
+        local resolved = api and api.ResolveTarget
+            and api.ResolveTarget(reference) or nil
+        worldObject = resolved and resolved.worldObject or nil
+        if not worldObject
+            or not worldObject.isAlive
+            or not worldObject:isAlive()
+        then
+            return nil
+        end
+        x = worldObject:getX()
+        y = worldObject:getY()
+        z = worldObject:getZ()
+        target = {
+            kind = "foreign_npc",
+            provider = resolved.provider or recent.provider,
+            actorId = resolved.actorId or recent.id,
+            worldObject = worldObject,
+        }
     else
         return nil
     end
@@ -220,7 +265,8 @@ function Perception.IsTargetThreatening(record, target)
             recent.kind,
             recent.id,
             recent.onlineID,
-            recent.username
+            recent.username,
+            recent.provider
         )
     then
         return true

@@ -277,7 +277,18 @@ function Catalog.Register()
             { kind = "literal", value = "an", optional = true },
             { kind = "literal", value = "some", optional = true },
             { kind = "literal", value = "the", optional = true },
-            { kind = "any", capture = "object" },
+            {
+                kind = "any_phrase",
+                capture = "object",
+                minTokens = 1,
+                maxTokens = 4,
+                -- Keep prepositions available to compositional patterns such
+                -- as FETCH ... TO ... instead of letting the generic object
+                -- slot greedily consume the destination.
+                stopWords = { "to", "from", "please", "now" },
+            },
+            { kind = "literal", value = "please", optional = true },
+            { kind = "literal", value = "now", optional = true },
         },
         {
             intent = "REQUEST",
@@ -312,7 +323,15 @@ function Catalog.Register()
             { kind = "literal", value = "an", optional = true },
             { kind = "literal", value = "some", optional = true },
             { kind = "literal", value = "the", optional = true },
-            { kind = "any", capture = "object" },
+            {
+                kind = "any_phrase",
+                capture = "object",
+                minTokens = 1,
+                maxTokens = 4,
+                stopWords = { "to", "from", "please", "now" },
+            },
+            { kind = "literal", value = "please", optional = true },
+            { kind = "literal", value = "now", optional = true },
         },
         {
             intent = "REQUEST",
@@ -338,9 +357,20 @@ function Catalog.Register()
             { kind = "concept", id = "FETCH" },
             { kind = "literal", value = "me", optional = true },
             { kind = "literal", value = "some", optional = true },
-            { kind = "any", capture = "object" },
+            {
+                kind = "any_phrase",
+                capture = "object",
+                minTokens = 1,
+                maxTokens = 4,
+                stopWords = { "to" },
+            },
             { kind = "literal", value = "to" },
-            { kind = "any", capture = "target" },
+            {
+                kind = "any_phrase",
+                capture = "target",
+                minTokens = 1,
+                maxTokens = 4,
+            },
         },
         {
             intent = "REQUEST",
@@ -359,7 +389,13 @@ function Catalog.Register()
             { kind = "literal", value = "you", optional = true },
             { kind = "concept", id = "HELP" },
             { kind = "literal", value = "me", optional = true },
-            { kind = "any", capture = "target", optional = true },
+            {
+                kind = "any_phrase",
+                capture = "target",
+                optional = true,
+                minTokens = 1,
+                maxTokens = 4,
+            },
         },
         {
             intent = "REQUEST",
@@ -390,7 +426,13 @@ function Catalog.Register()
         {
             { kind = "literal", value = "don't" },
             { kind = "concept", id = "TAKE" },
-            { kind = "any", capture = "object", optional = true },
+            {
+                kind = "any_phrase",
+                capture = "object",
+                optional = true,
+                minTokens = 1,
+                maxTokens = 4,
+            },
         },
         {
             intent = "REQUEST",
@@ -406,7 +448,12 @@ function Catalog.Register()
         "pnc.command.take",
         {
             { kind = "concept", id = "TAKE" },
-            { kind = "any", capture = "object" },
+            {
+                kind = "any_phrase",
+                capture = "object",
+                minTokens = 1,
+                maxTokens = 4,
+            },
         },
         {
             intent = "REQUEST",
@@ -422,7 +469,12 @@ function Catalog.Register()
         {
             { kind = "literal", value = "where" },
             { kind = "literal", value = "is" },
-            { kind = "any", capture = "target" },
+            {
+                kind = "any_phrase",
+                capture = "target",
+                minTokens = 1,
+                maxTokens = 4,
+            },
         },
         {
             intent = "QUESTION",
@@ -439,7 +491,12 @@ function Catalog.Register()
             { kind = "literal", value = "did" },
             { kind = "literal", value = "you" },
             { kind = "literal", value = "see" },
-            { kind = "any", capture = "target" },
+            {
+                kind = "any_phrase",
+                capture = "target",
+                minTokens = 1,
+                maxTokens = 4,
+            },
         },
         {
             intent = "QUESTION",

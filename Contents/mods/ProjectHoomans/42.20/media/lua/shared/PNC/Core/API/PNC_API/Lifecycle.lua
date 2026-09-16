@@ -93,6 +93,14 @@ local function finalizeNewRecord(record, definition)
             Inventory.EnsureRecordInventory(record)
         end
     end
+    if PNC.Compatibility and PNC.Compatibility.API
+        and PNC.Compatibility.API.EmitEvent
+    then
+        PNC.Compatibility.API.EmitEvent("npc_spawn", {
+            record = record,
+            definition = definition,
+        })
+    end
     OrderSystem.SetOrder(record, definition.orderSpec)
     OrderSystem.SetHostility(record, definition.hostility or Types.DefaultHostility(definition.tacticalClass))
     Registry.AddRecord(record)

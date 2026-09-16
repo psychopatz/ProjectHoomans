@@ -13,6 +13,12 @@ Input.Internal = Internal
 local Semantic = PsychopatzCore.Semantics
 local DialogueRouter = Semantic.DialogueRouter
 local State = Semantic.DialogueState
+local DialogueContextState = PNC.Semantics.DialogueContextState
+if type(DialogueContextState) ~= "table" then
+    local loaded = require
+        "PNC/Semantics/PNC_SemanticDialogueContextState"
+    DialogueContextState = type(loaded) == "table" and loaded or nil
+end
 local Policy = PNC.Semantics.DialoguePolicy
 local Topics = PNC.Semantics.TopicCatalog
 if type(Topics) ~= "table" then
@@ -231,6 +237,17 @@ function Internal.ShallowContext(view)
     else
         output.currentTopic = output.authoredTopic
     end
+    if session and session.semanticDialogueContext
+        and type(session.semanticDialogueContext.ToContext) == "function"
+    then
+        -- Keep the live object private to the local resolver. The serialized
+        -- projection is safe for diagnostics and future LLM context payloads.
+        output.semanticContextState = session.semanticDialogueContext
+        output.semanticDialogueContext =
+            session.semanticDialogueContext:ToContext()
+        output.currentTopic = session.semanticDialogueContext.currentTopic
+            or output.currentTopic
+    end
     if WorldContext and type(WorldContext.Get) == "function" then
         output.worldContext = WorldContext.Get({
             player = localPlayer(view, source),
@@ -325,6 +342,22 @@ function Internal.Interactive(view)
         and view:isConversationInteractive() == true
 end
 
+function Internal.RecordContextTurn(view, ir, options)
+    local session = view and view.session
+    local context = session and session.semanticDialogueContext or nil
+    if not context or type(context.RecordTurn) ~= "function" then
+        return false, "context_state_unavailable"
+    end
+    options = type(options) == "table" and options or {}
+    local recordOptions = {
+        timestamp = options.timestamp,
+        speaker = options.speaker or "player",
+        source = options.source or "player_input",
+        mentions = options.mentions,
+    }
+    return context:RecordTurn(ir, recordOptions)
+end
+
 function Internal.RouterFor(view)
     local session = view and view.session
     if not session then return nil, "conversation_unavailable" end
@@ -344,6 +377,17 @@ function Internal.RouterFor(view)
             participants = participants,
             currentTopic = initialTopic,
             maxEvents = 12,
+        })
+    end
+    if not session.semanticDialogueContext
+        and DialogueContextState
+        and type(DialogueContextState.New) == "function"
+    then
+        session.semanticDialogueContext = DialogueContextState.New({
+            currentTopic = initialTopic,
+            maxTurns = 12,
+            maxMentions = 32,
+            maxFocus = 8,
         })
     end
     if not session.semanticDialogueRouter then

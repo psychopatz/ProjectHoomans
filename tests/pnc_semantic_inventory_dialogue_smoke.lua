@@ -154,6 +154,11 @@ T.equal(queued[1].payload.fallback,
 T.equal(queued[1].metadata.source.channel,
     "inventory_query_response",
     "inventory response remains distinguishable from task acknowledgements")
+T.truthy(session.semanticDialogueContext,
+    "inventory response initializes the dialogue context store")
+local inventoryFocus = session.semanticDialogueContext:GetFocus(1)
+T.equal(inventoryFocus[1].text, "Sardines",
+    "inventory response records the returned item in discourse focus")
 T.falsy(session.semanticInventoryQueries["1"],
     "completed inventory query is removed from pending state")
 T.equal(view.lastSemanticDialogueResult.decision.route, "deterministic",

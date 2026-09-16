@@ -227,6 +227,28 @@ function Internal.applyAttackActionHit(record, zombie, action, target)
             end
             return false, attackReason or "npc_damage_rejected"
         end
+        if target.kind == "foreign_npc" then
+            attackApplied, attackReason = Resolution and Resolution.ApplyTargetDamage
+                and Resolution.ApplyTargetDamage(record, zombie, target, {
+                    damage = action.damage,
+                    attackType = "melee",
+                    attackKind = action.attackKind,
+                    weaponItem = Internal.resolveWeaponItem(record),
+                })
+            if attackApplied then
+                commitMeleeImpactAudio(record, action, target)
+                AttackExecution.applyWeaponWear(record)
+                if Stamina and Stamina.SpendAttack then
+                    Stamina.SpendAttack(record, "melee", action.skillID)
+                end
+                if Skills and Skills.AddXP then
+                    Skills.AddXP(record, action.skillID or "Strength", 5)
+                    Skills.AddXP(record, "Maintenance", 1)
+                end
+                return true, attackReason or "hit_foreign_npc"
+            end
+            return false, attackReason or "foreign_damage_rejected"
+        end
         if target.kind == "zombie" then
             attackApplied, attackReason = Internal.applyDamageToZombie(record, zombie, target, action.damage, "melee")
             if attackApplied then
@@ -286,6 +308,27 @@ function Internal.applyAttackActionHit(record, zombie, action, target)
                 return true, attackReason or "hit_npc"
             end
             return false, attackReason or "npc_damage_rejected"
+        end
+        if target.kind == "foreign_npc" then
+            attackApplied, attackReason = Resolution and Resolution.ApplyTargetDamage
+                and Resolution.ApplyTargetDamage(record, zombie, target, {
+                    damage = action.damage,
+                    attackType = "ranged",
+                    attackKind = action.attackKind,
+                    weaponItem = Internal.resolveWeaponItem(record),
+                })
+            if attackApplied then
+                AttackExecution.applyWeaponWear(record)
+                if Stamina and Stamina.SpendAttack then
+                    Stamina.SpendAttack(record, "ranged", action.skillID or "Aiming")
+                end
+                if Skills and Skills.AddXP then
+                    Skills.AddXP(record, "Aiming", 5)
+                    Skills.AddXP(record, "Reloading", 2)
+                end
+                return true, attackReason or "hit_foreign_npc"
+            end
+            return false, attackReason or "foreign_damage_rejected"
         end
         if target.kind == "zombie" then
             attackApplied, attackReason = Internal.applyDamageToZombie(record, zombie, target, action.damage, "ranged")

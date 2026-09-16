@@ -10,6 +10,8 @@ local Equipment = PNC.Equipment
 local LiveBodyControl = PNC.LiveBodyControl
 local MaterializationSafety = PNC.MaterializationSafety
 local Diagnostics = PNC.PerformanceScalingDiagnostics
+local ActorOwnership = PNC.Compatibility
+    and PNC.Compatibility.ActorOwnership or nil
 
 local function isFollower(record)
     return record
@@ -179,7 +181,13 @@ local function spawnBody(record, position, reason)
         )
         return nil
     end
-    return zombieList:get(0)
+    local zombie = zombieList:get(0)
+    -- Claim the IsoZombie before visual/equipment setup and before the next
+    -- engine/mod update can observe a partially configured body.
+    if ActorOwnership and ActorOwnership.MarkHoomansOwned then
+        ActorOwnership.MarkHoomansOwned(zombie)
+    end
+    return zombie
 end
 
 local function configureBody(record, zombie)

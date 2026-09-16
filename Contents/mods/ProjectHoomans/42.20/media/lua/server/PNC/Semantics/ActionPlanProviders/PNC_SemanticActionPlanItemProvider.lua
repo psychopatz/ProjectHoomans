@@ -16,13 +16,18 @@ Provider.Inventory = PNC.Inventory
 Provider.ServerInventory = PNC.ServerInventory
 Provider.Selection = Provider.Selection or {}
 Provider.Give = Provider.Give or {}
+Provider.Consume = Provider.Consume or {}
+Provider.Refill = Provider.Refill or {}
 
 require "PNC/Semantics/ActionPlanProviders/PNC_SemanticActionPlanItemProvider_Selection"
 require "PNC/Semantics/ActionPlanProviders/PNC_SemanticActionPlanItemProvider_Give"
+require "PNC/Semantics/ActionPlanProviders/PNC_SemanticActionPlanItemProvider_Consumption"
 
 if Provider.Service and type(Provider.Service.RegisterProvider) == "function" then
     Provider.Service.RegisterProvider("SELECT_ITEM", Provider.Selection)
     Provider.Service.RegisterProvider("GIVE_ITEM", Provider.Give)
+    Provider.Service.RegisterProvider("CONSUME_ITEM", Provider.Consume)
+    Provider.Service.RegisterProvider("REFILL_ITEM", Provider.Refill)
 end
 
 return Provider

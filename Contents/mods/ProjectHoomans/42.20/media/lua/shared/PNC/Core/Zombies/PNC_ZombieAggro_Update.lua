@@ -13,6 +13,15 @@ local Network = PNC.Network
 
 local Internal = ZombieAggro.Internal
 
+local function isForeignOwnedBody(body)
+    local ownership = PNC.Compatibility
+        and PNC.Compatibility.ActorOwnership or nil
+    return ownership
+        and ownership.IsForeignOwned
+        and ownership.IsForeignOwned(body) == true
+        or false
+end
+
 local function isMultiplayerServer()
     return isServer and isServer() == true or false
 end
@@ -27,7 +36,10 @@ function ZombieAggro.ClearForNPCBody(npcBody)
     ZombieAggro.ClearBiteEntriesForNPCBody(npcBody)
     if ZombieAggro.ForEachActive then
         ZombieAggro.ForEachActive(function(zombie)
-        if zombie and (not zombie:isDead()) and (not Internal.isManagedNPCBody(zombie)) then
+        if zombie and (not zombie:isDead())
+            and (not Internal.isManagedNPCBody(zombie))
+            and not isForeignOwnedBody(zombie)
+        then
             target = zombie.getTarget and zombie:getTarget() or nil
             forcedRecord, forcedBody = Internal.getForcedNPCBodyTarget(zombie)
             if target == npcBody or forcedBody == npcBody then
@@ -40,7 +52,10 @@ function ZombieAggro.ClearForNPCBody(npcBody)
 end
 
 function ZombieAggro.OnZombieProvoked(zombie, npcBody)
-    if not zombie or not npcBody or zombie:isDead() or Internal.isManagedNPCBody(zombie) then
+    if not zombie or not npcBody or zombie:isDead()
+        or Internal.isManagedNPCBody(zombie)
+        or isForeignOwnedBody(zombie)
+    then
         return
     end
     if ZombieAggro.Activate then
@@ -443,6 +458,9 @@ local function processZombie(zombie, now)
     local nearestPlayer
     local nearestPlayerDistSq
     local forcedNPCDistSq
+    if isForeignOwnedBody(zombie) then
+        return
+    end
     if ZombieReaction and ZombieReaction.Pump then
         ZombieReaction.Pump(zombie, now)
     end

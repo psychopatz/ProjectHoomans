@@ -75,6 +75,8 @@ function Internal.stampCorpse(record, corpse, token)
         or record.corpse and record.corpse.token
         or Core.GenerateID("corpse"))
     modData = corpse:getModData()
+    modData.PNC_Owner = nil
+    modData.PNC_OwnerVersion = nil
     modData.PNC_NPC = nil
     modData.PNC_UUID = nil
     modData.PNC_BodyKind = nil

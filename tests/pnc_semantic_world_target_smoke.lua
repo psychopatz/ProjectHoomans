@@ -6,11 +6,39 @@ local campfire = {
     getID = function() return 77 end,
     isCampfire = function() return true end,
 }
+local globalCampfire = {
+    getX = function() return 30 end,
+    getY = function() return 31 end,
+    getZ = function() return 0 end,
+}
+local globalCampfireSquare = {
+    getX = function() return 30 end,
+    getY = function() return 31 end,
+    getZ = function() return 0 end,
+    getCampfire = function() return globalCampfire end,
+}
 
 PNC = {
     NearbyResourceLocator = {
         FindObject = function(_, options)
             acceptedCalls = acceptedCalls + 1
+            if tostring(options.cacheKey or "")
+                == "semantic_campfire:campfire@30:31:0"
+            then
+                T.truthy(options.specialObject,
+                    "campfire lookup provides the special-object hook")
+                local special = options.specialObject
+                    and options.specialObject(globalCampfireSquare)
+                T.truthy(special, "special-object hook finds the global campfire")
+                local candidate = special and {
+                    object = special.object,
+                    key = special.key,
+                    source = special.source,
+                    x = 30.5, y = 31.5, z = 0,
+                } or nil
+                return candidate and options.accept(candidate) and candidate
+                    or nil
+            end
             local candidate = {
                 object = campfire,
                 key = "campfire@12:14:0#77",
@@ -59,6 +87,22 @@ T.equal(campTarget.objectKind, "campfire", "campfire kind is explicit")
 T.equal(campTarget.x, 12.5, "campfire coordinate is copied")
 T.falsy(campTarget.object, "Java object does not cross the boundary")
 T.equal(acceptedCalls, 1, "campfire lookup is bounded to one locator call")
+
+local globalCampTarget, globalCampReason = Resolver.Resolve({
+    kind = "campfire",
+    targetID = "campfire@30:31:0",
+}, {
+    record = { x = 28, y = 29, z = 0 },
+})
+T.truthy(globalCampTarget,
+    "global campfire resolves through the square hook: "
+        .. tostring(globalCampReason))
+T.equal(globalCampReason, nil, "global campfire has no resolution error")
+T.equal(globalCampTarget.targetID, "campfire@30:31:0",
+    "global campfire receives a stable coordinate identity")
+T.equal(globalCampTarget.x, 30.5,
+    "global campfire uses the square center as its approach point")
+T.equal(acceptedCalls, 2, "global campfire lookup is bounded")
 
 local resourceTarget = Resolver.Resolve({
     kind = "facility_resource",

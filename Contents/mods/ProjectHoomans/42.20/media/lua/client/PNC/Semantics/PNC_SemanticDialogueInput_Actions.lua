@@ -4,6 +4,8 @@
 PNC = PNC or {}
 PNC.Semantics = PNC.Semantics or {}
 
+require "PNC/Semantics/PNC_SemanticDiagnostics"
+
 local Input = PNC.Semantics.DialogueInput or {}
 PNC.Semantics.DialogueInput = Input
 
@@ -12,6 +14,17 @@ Input.Internal = Internal
 local CommandAdapter = PNC.Semantics.CommandAdapter
 local TaskAdapter = PNC.Semantics.TaskAdapter
 local InventoryQueryAdapter = PNC.Semantics.InventoryQueryAdapter
+local Diagnostics = PNC.Semantics.SemanticDiagnostics
+
+local function audit(eventName, data, options)
+    if not Diagnostics
+        or type(Diagnostics.IsEnabled) ~= "function"
+        or Diagnostics.IsEnabled() ~= true
+    then
+        return false
+    end
+    return Diagnostics.Record(eventName, data, options)
+end
 
 local function actionContext(view, result, value)
     local spec = view and view.spec or {}
@@ -62,6 +75,16 @@ function Internal.DispatchInventoryQuery(view, result, value)
     dispatched.requestID = dispatched.request
         and dispatched.request.requestID or requestID
     dispatched.query = decision.inventoryQuery
+    audit("semantic.inventory.dispatch", {
+        npcID = context.npcID,
+        conversationID = context.conversationID,
+        requestID = dispatched.requestID,
+        status = dispatched.status,
+        accepted = dispatched.accepted == true,
+        pending = dispatched.pending == true,
+        reason = dispatched.reason,
+        query = decision.inventoryQuery,
+    }, { requestID = dispatched.requestID })
     if dispatched.result and dispatched.result.status
         and dispatched.result.status ~= "pending"
         and Input.ReceiveInventoryQueryResult
@@ -80,8 +103,83 @@ function Internal.DispatchAction(view, result, value)
     local context = actionContext(view, result, value)
     local commandResult = CommandAdapter.Dispatch(
         decision.actionIntent, context)
-    if commandResult.status ~= "unmapped" then return commandResult end
-    return TaskAdapter.Dispatch(decision.actionIntent, context)
+    if commandResult.status ~= "unmapped" then
+        audit("semantic.command.dispatch", {
+            npcID = context.npcID,
+            conversationID = context.conversationID,
+            requestID = context.requestID,
+            action = decision.actionIntent.action,
+            status = commandResult.status,
+            accepted = commandResult.accepted == true,
+            reason = commandResult.reason,
+        }, { requestID = context.requestID })
+        return commandResult
+    end
+    local session = view and view.session
+    local provisionalID = context.requestID
+    if session and provisionalID then
+        session.semanticTaskRequests = session.semanticTaskRequests or {}
+        -- Register before transport so a same-tick server response cannot
+        -- race the request into the inactive-result cache.
+        session.semanticTaskRequests[tostring(provisionalID)] = {
+            action = decision.actionIntent.action,
+            rawText = value,
+        }
+    end
+    local taskResult = TaskAdapter.Dispatch(decision.actionIntent, context)
+    local status = tostring(taskResult and taskResult.status or "")
+    local request = taskResult and taskResult.request or nil
+    local requestID = request and request.requestID or context.requestID
+    audit("semantic.task.dispatch", {
+        npcID = context.npcID,
+        conversationID = context.conversationID,
+        requestID = requestID,
+        action = decision.actionIntent.action,
+        status = status,
+        accepted = taskResult and taskResult.accepted == true,
+        reason = taskResult and taskResult.reason,
+        planID = taskResult and taskResult.planID,
+    }, { requestID = requestID })
+    if session and requestID and status ~= "unmapped"
+        and status ~= "skipped"
+    then
+        session.semanticTaskRequests = session.semanticTaskRequests or {}
+        if provisionalID and tostring(provisionalID) ~= tostring(requestID) then
+            session.semanticTaskRequests[tostring(provisionalID)] = nil
+        end
+        session.semanticTaskRequests[tostring(requestID)] = {
+            action = decision.actionIntent.action,
+            rawText = value,
+            request = request,
+        }
+    elseif session and provisionalID then
+        session.semanticTaskRequests[tostring(provisionalID)] = nil
+    end
+    if taskResult and taskResult.accepted ~= true
+        and Input.ReceiveSemanticTaskResult
+    then
+        Input.ReceiveSemanticTaskResult({
+            requestID = requestID,
+            npcID = context.npcID,
+            action = decision.actionIntent.action,
+            accepted = false,
+            status = status ~= "" and status or "failed",
+            reason = taskResult.reason,
+            admissionReason = taskResult.details
+                and taskResult.details.reason,
+            admissionPlanState = taskResult.details
+                and taskResult.details.planState,
+            admissionStepState = taskResult.details
+                and taskResult.details.stepState,
+            admissionActive = taskResult.details
+                and taskResult.details.active,
+            admissionPlanID = taskResult.details
+                and taskResult.details.planID,
+            admissionCleanupReason = taskResult.details
+                and taskResult.details.cleanupReason,
+        })
+    end
+    return taskResult
 end
 
 return Input

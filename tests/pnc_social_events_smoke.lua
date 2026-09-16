@@ -234,7 +234,11 @@ local definitionCount = 0
 for _, _ in pairs(PNC.SocialEventDefinitions) do
     definitionCount = definitionCount + 1
 end
-T.equal(definitionCount, 18, "eighteen definitions")
+T.equal(definitionCount, 20, "twenty definitions")
+T.truthy(PNC.SocialEventDefinitions.necroa_mask_removed,
+    "Necroa mask removal definition")
+T.truthy(PNC.SocialEventDefinitions.necroa_player_mask_removed,
+    "Necroa player mask removal definition")
 T.truthy(PNC.SocialEventDefinitions.faction_member_attacked,
     "faction attack definition")
 T.truthy(PNC.ConductDefinitions.faction_member_attacked,

@@ -353,7 +353,8 @@ local function deliverTeammateDamageFlavor(
     targetBody,
     attacker,
     hit,
-    attackerKind
+    attackerKind,
+    presentation
 )
     local victimFactionID
     local amount
@@ -362,7 +363,15 @@ local function deliverTeammateDamageFlavor(
     local candidates = 0
     local emitted = 0
     local attempted = 0
-    local eventType = "witnessed_teammate_hurt"
+    local banditAttack = attackerKind == "bandit"
+        or attackerKind == "foreign_npc"
+            and hit and hit.attackerProvider == "Bandits"
+    local eventType = banditAttack
+        and "bandit_attack" or "witnessed_teammate_hurt"
+    local flavorID = presentation and presentation.flavorID
+        or banditAttack
+        and "compat.bandits.hooman_hurt"
+        or "social.witnessed_teammate_hurt"
     local playerCallback
     local throttleKey
     local currentTime
@@ -486,7 +495,7 @@ local function deliverTeammateDamageFlavor(
                         eventID = eventID,
                         npcID = observer.id,
                         ambientFlavor = {
-                            flavorID = "social.witnessed_teammate_hurt",
+                            flavorID = flavorID,
                             eventType = eventType,
                             family = "combat_commentary",
                             priority = 55,
@@ -555,13 +564,20 @@ local function deliverTeammateDamageFlavor(
         and "teammates_notified" or "no_teammate_event_emitted"
 end
 
-function H.RecordNPCDamagedByZombie(record, body, attacker, hit)
+function H.RecordNPCDamagedByZombie(
+    record,
+    body,
+    attacker,
+    hit,
+    presentation
+)
     return deliverTeammateDamageFlavor(
         record,
         body,
         attacker,
         hit,
-        "zombie"
+        hit and hit.attackerKind or "zombie",
+        presentation
     )
 end
 

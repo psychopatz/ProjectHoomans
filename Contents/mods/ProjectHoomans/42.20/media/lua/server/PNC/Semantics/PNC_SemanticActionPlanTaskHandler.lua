@@ -149,11 +149,12 @@ function Handler.Submit(request, context)
     local plan, reason = buildPlan(request, context)
     local accepted
     local submitted
+    local submitDetails
     if not plan then
         return false, reason
     end
-    accepted, submitted = Plans.Submit(plan, context)
-    if accepted ~= true then return false, submitted end
+    accepted, submitted, submitDetails = Plans.Submit(plan, context)
+    if accepted ~= true then return false, submitted, submitDetails end
     return {
         accepted = true,
         status = "accepted",

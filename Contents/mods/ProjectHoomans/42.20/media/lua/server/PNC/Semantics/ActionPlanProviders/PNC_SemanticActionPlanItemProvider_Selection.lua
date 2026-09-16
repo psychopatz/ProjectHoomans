@@ -22,12 +22,14 @@ local function selectorRequest(step)
         fullType = object.fullType,
         category = object.category,
         primary = object.primary,
-        capabilities = object.capabilities,
+        capabilities = object.capabilities
+            or object.semanticCapabilities,
         concept = object.concept,
         text = object.text or object.value,
         quantity = object.quantity or args.quantity,
     }
-    request.tags = object.tags
+    request.tags = object.tags or object.marketSenseTags
+        or object.itemTags
     return request
 end
 

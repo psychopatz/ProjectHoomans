@@ -16,6 +16,78 @@ local emit = Internal.Emit
 local safeCall = Internal.SafeCall
 local replaceIndexes = Internal.ReplaceIndexes
 
+-- A plan can survive a reload in a non-terminal state without remaining in
+-- the bounded Active index.  Treat that state as recoverable instead of
+-- making every later command wait forever on a plan the pump can no longer
+-- execute.
+local function admissionState(plan)
+    local step = plan and Plan.Current(plan) or nil
+    local stepState = step and step.state or nil
+    local active = plan
+        and Service.ActiveIndex[plan.planID] ~= nil
+        or false
+    local reason
+    if not plan then
+        reason = "available"
+    elseif terminal(plan) then
+        reason = "terminal"
+    elseif stepState == "BLOCKED" then
+        reason = "blocked"
+    elseif plan.state == "PAUSED" or stepState == "PAUSED" then
+        reason = "paused"
+    elseif active then
+        reason = "active"
+    else
+        reason = "stale"
+    end
+    return {
+        npcID = plan and plan.npcID or nil,
+        planID = plan and plan.planID or nil,
+        requestID = plan and plan.requestID or nil,
+        planState = plan and plan.state or nil,
+        currentStep = plan and plan.currentStep or nil,
+        stepID = step and step.id or nil,
+        action = step and step.action or nil,
+        stepState = stepState,
+        active = active,
+        reason = reason,
+        updatedAt = plan and plan.updatedAt or nil,
+    }
+end
+
+local function retireStalePlan(plan, reason)
+    local record
+    local step
+    local provider
+    local callbackOK
+    local callbackResult
+    local callbackReason
+    local changed
+    local failureReason
+    if not plan then return false, "plan_required" end
+
+    record = PNC.Registry and PNC.Registry.Get
+        and PNC.Registry.Get(plan.npcID) or nil
+    step = Plan.Current(plan)
+    provider = step and Service.GetProvider(step.action) or nil
+    if provider and type(provider.Cancel) == "function" then
+        callbackOK, callbackResult, callbackReason = safeCall(
+            provider.Cancel, plan, step, record, reason)
+        if not callbackOK or callbackResult == false then
+            return false, callbackReason or "provider_cancel_rejected"
+        end
+    end
+
+    changed, failureReason = Plan.Cancel(plan, reason, now())
+    if not changed then return false, failureReason end
+    Service.ClearRuntimeContext(plan.planID)
+    removeActive(plan.planID)
+    markDirty(plan)
+    emit("SEMANTIC_ACTION_PLAN_RETIRED", plan,
+        reason or "stale_plan_replaced")
+    return true, plan
+end
+
 function Service.Attach(record)
     local raw = record and record.semanticActionPlan
     local plan
@@ -38,6 +110,9 @@ function Service.Submit(raw, context)
     local record
     local previous
     local started
+    local admission
+    local retired
+    local retireReason
     if not (PNC.Core and (not PNC.Core.IsAuthority
         or PNC.Core.IsAuthority() == true))
     then
@@ -52,7 +127,19 @@ function Service.Submit(raw, context)
     end
     previous = Service.ByNPC[plan.npcID]
     if previous and not terminal(previous) then
-        return false, "npc_action_plan_active"
+        admission = admissionState(previous)
+        if admission.reason == "active" then
+            return false, "npc_action_plan_active", admission
+        end
+        retired, retireReason = retireStalePlan(
+            previous,
+            "superseded_by_new_task"
+        )
+        if not retired then
+            admission.cleanupReason = retireReason
+            admission.reason = "stale_cleanup_failed"
+            return false, "npc_action_plan_stale_cleanup_failed", admission
+        end
     end
     started, reason = Plan.Start(plan, now())
     if not started then return false, reason end
@@ -64,6 +151,18 @@ function Service.Submit(raw, context)
     markDirty(plan)
     emit("SEMANTIC_ACTION_PLAN_SUBMITTED", plan, "submitted")
     return true, plan
+end
+
+function Service.GetAdmissionState(npcID)
+    local id = key(npcID)
+    local plan = Service.ByNPC[id]
+    local details
+    if not plan and PNC.Registry and PNC.Registry.Get then
+        plan = Service.Attach(PNC.Registry.Get(id))
+    end
+    details = admissionState(plan)
+    details.npcID = id
+    return details
 end
 
 function Service.Get(npcID)
@@ -102,6 +201,10 @@ function Service.Cancel(npcID, reason)
     end
     ok, result = Plan.Cancel(plan, reason, now())
     if not ok then return false, result end
+    local notify = Internal.NotifyTaskResult
+    if type(notify) == "function" then
+        notify(plan, "cancelled", false, reason or "cancelled")
+    end
     Service.ClearRuntimeContext(plan.planID)
     removeActive(plan.planID)
     markDirty(plan)

@@ -47,7 +47,11 @@ function AmbientContext.Build(item, source, npcID, playerID, identity, requestID
         or "ambient_social")
     local playerMessage = tostring(source.playerMessage or "")
     local memoryIdentity = MemoryIdentity.Current()
-    local player = source.player
+    -- source.player is normally the resolved display/address name (for
+    -- example, "Friend"), not an engine character. Never pass that identity
+    -- value into Java-backed world observers.
+    local player = source.runtimePlayer
+        or source.playerObject
         or getSpecificPlayer and getSpecificPlayer(0)
     local worldContext = WorldContext and WorldContext.Get and WorldContext.Get({
         player = player,

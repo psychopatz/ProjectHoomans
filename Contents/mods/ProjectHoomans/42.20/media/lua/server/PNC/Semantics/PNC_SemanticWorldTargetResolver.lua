@@ -11,9 +11,12 @@ PNC.Semantics = PNC.Semantics or {}
 PNC.Semantics.WorldTargetResolver =
     PNC.Semantics.WorldTargetResolver or {}
 
+require "PNC/Semantics/PNC_SemanticDiagnostics"
+
 local Resolver = PNC.Semantics.WorldTargetResolver
 local Locator = PNC.NearbyResourceLocator
 local FacilityTargets = PNC.FacilityInteractionTargets
+local Diagnostics = PNC.Semantics.SemanticDiagnostics
 
 Resolver.Providers = Resolver.Providers or {}
 Resolver.Aliases = Resolver.Aliases or {}
@@ -89,16 +92,25 @@ end
 
 local function traceResolution(target, context, kind, result, reason)
     local trace = PsychopatzCore and PsychopatzCore.DebugTrace
-    if not trace or type(trace.IsEnabled) ~= "function"
-        or trace.IsEnabled() ~= true
-        or type(trace.Record) ~= "function"
+    local semanticAudit = Diagnostics
+        and type(Diagnostics.IsEnabled) == "function"
+        and Diagnostics.IsEnabled() == true
+    local legacyTrace = trace
+        and type(trace.IsEnabled) == "function"
+        and trace.IsEnabled() == true
+        and type(trace.Record) == "function"
+    if not semanticAudit and not legacyTrace
     then
         return result, reason
     end
     context = type(context) == "table" and context or {}
     local record = context.record
     local origin = originFor(context)
-    local data = {
+    local definition = {
+        source = "ProjectHoomans.Semantics",
+        event = "semantic.world_target.resolve",
+        requestID = context.requestID or context.planID,
+        data = {
         npcID = record and (record.id or record.npcID),
         planID = context.planID,
         targetText = text(target and (target.text or target.value
@@ -115,19 +127,41 @@ local function traceResolution(target, context, kind, result, reason)
         targetX = result and result.x,
         targetY = result and result.y,
         targetZ = result and result.z,
+        },
     }
-    trace.Record({
-        source = "ProjectHoomans.Semantics",
-        event = "semantic.world_target.resolve",
-        requestID = context.requestID or context.planID,
-        data = data,
-    })
+    if semanticAudit then
+        Diagnostics.Record(
+            "semantic.world_target.resolve",
+            definition.data,
+            { requestID = definition.requestID }
+        )
+    else
+        trace.Record(definition)
+    end
     return result, reason
 end
 
 local function objectName(object)
     return lower(call(object, "getObjectName")
         or call(object, "getName"))
+end
+
+local function globalCampfireForSquare(square)
+    local campfire = call(square, "getCampfire")
+    local x
+    local y
+    local z
+    if not campfire then return nil end
+    x = call(campfire, "getX") or call(square, "getX")
+    y = call(campfire, "getY") or call(square, "getY")
+    z = call(campfire, "getZ") or call(square, "getZ")
+    if x == nil or y == nil then return nil end
+    return {
+        object = campfire,
+        source = "global_campfire",
+        key = "campfire@" .. tostring(x) .. ":" .. tostring(y)
+            .. ":" .. tostring(z or 0),
+    }
 end
 
 local function isCampfire(entry, requestedID)
@@ -138,8 +172,11 @@ local function isCampfire(entry, requestedID)
     if wanted and wanted ~= key and wanted ~= tostring(objectID or "") then
         return false
     end
+    if entry and entry.source == "global_campfire" then return true end
     local campfire = call(object, "isCampfire")
     if campfire == true then return true end
+    local container = call(object, "getContainer")
+    if lower(call(container, "getType")) == "campfire" then return true end
     local name = objectName(object)
     return string.find(name, "campfire", 1, true) ~= nil
 end
@@ -186,6 +223,7 @@ local function resolveCampfire(target, context)
         accept = function(candidate)
             return isCampfire(candidate, wantedID)
         end,
+        specialObject = globalCampfireForSquare,
     })
     if not entry then return nil, "campfire_not_found" end
     local result = primitiveTarget({

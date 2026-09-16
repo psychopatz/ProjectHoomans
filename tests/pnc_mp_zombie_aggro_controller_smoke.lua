@@ -20,6 +20,7 @@ local stateChanges = 0
 local managed = false
 local playerIsTarget = false
 local managedSafetyCalls = 0
+local banditOwned = false
 
 local npcBody = {
     x = 5,
@@ -130,6 +131,13 @@ PNC = {
             return candidate == npcBody
                 or (managed and candidate == zombie)
         end,
+    },
+    Compatibility = {
+        ActorOwnership = {
+            IsForeignOwned = function(candidate)
+                return banditOwned and candidate == zombie
+            end,
+        },
     },
     Network = {
         ClientState = {
@@ -243,6 +251,22 @@ T.truthy(pathRequests == 2,
 T.equal(managedSafetyCalls, 1,
     "managed NPC body bypassed the late client safety guard")
 PNC.LiveBodyControl = nil
+
+-- A Bandits-owned zombie must be a hard no-op for the Hoomans ordinary-zombie
+-- lane. In particular, Hoomans must not release or rewrite Bandits' target.
+banditOwned = true
+target = player
+attackedBy = nil
+noLunge = false
+now = 2200
+registered(zombie)
+T.equal(pathRequests, 2,
+    "foreign-owned zombie entered Hoomans pursuit")
+T.equal(target, player,
+    "foreign-owned zombie lost its Bandits target")
+T.equal(noLunge, false,
+    "foreign-owned zombie had its lunge contract rewritten")
+banditOwned = false
 
 -- The multiplayer lane must yield to an engine-owned action and must not
 -- rewrite the native player target while that action is active.
