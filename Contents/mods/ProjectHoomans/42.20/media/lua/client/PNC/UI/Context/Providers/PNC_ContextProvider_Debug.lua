@@ -91,6 +91,20 @@ function Provider.addOptions(menu, entry, player, contextData)
             PNC.NPCPresentationDebug.Open(entry)
         end
     end)
+    menu:addOption(tr("UI_PNC_Debug_PlayerAnimationLab", "Player Animation Lab"), nil, function()
+        -- The player debugger owns a separate timed-action preview and must not
+        -- share the NPC presentation singleton or its selector state.
+        if not PNC.PlayerAnimationDebugUI
+            or not PNC.PlayerAnimationDebugUI.Open
+        then
+            require "PNC/UI/PNC_PlayerAnimationDebugWindow"
+        end
+        if PNC.PlayerAnimationDebugUI
+            and PNC.PlayerAnimationDebugUI.Open
+        then
+            PNC.PlayerAnimationDebugUI.Open()
+        end
+    end)
     menu:addOption(tr("UI_PNC_Debug_AnimationSceneLab", "Animation Scene Lab"), nil, function()
         if not PNC.AnimationSceneDebugWindow then
             require "PNC/UI/PNC_AnimationSceneDebugWindow"

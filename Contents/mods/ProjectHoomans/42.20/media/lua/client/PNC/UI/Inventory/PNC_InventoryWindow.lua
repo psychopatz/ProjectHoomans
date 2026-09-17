@@ -360,6 +360,7 @@ function ISPNCInventoryWindow:setTransferEndpoint(endpoint)
     self.expandedNPCGroups = {}
     self.giftMode = false
     self.giftToken = nil
+    self.giftIntent = nil
     self.contextSignature = nil
     self.lastInventoryRefreshAt = nil
     self.inventoryRefreshPending = false
@@ -416,9 +417,11 @@ function InventoryWindow.OnInventoryPayloadApplied(npcID, revision, source)
     return true
 end
 
-function ISPNCInventoryWindow:setConversationMode(mode, token)
+function ISPNCInventoryWindow:setConversationMode(mode, token, options)
+    options = type(options) == "table" and options or {}
     self.giftMode = mode == "gift"
     self.giftToken = token and tostring(token) or nil
+    self.giftIntent = options.giftIntent
     self.statusText = self.giftMode
         and "Gift mode: valid gifts only | A Approval (like) / R Respect / F Familiarity"
         or self.statusText
@@ -1150,7 +1153,7 @@ function InventoryWindow.Open(npcId, options)
     local window = getOrCreateWindow()
     window:setNPC(npcId)
     options = type(options) == "table" and options or {}
-    window:setConversationMode(options.mode, options.token)
+    window:setConversationMode(options.mode, options.token, options)
     window:bringToTop()
     return window
 end
@@ -1182,6 +1185,17 @@ end
 
 function InventoryWindow.OnResult(result)
     local window = InventoryWindow.instance
+    local composer = PNC.Conversation
+        and PNC.Conversation.Composer or nil
+    if result and (result.gift == true or result.giftEffect ~= nil)
+        and composer and type(composer.ReceiveGiftResult) == "function"
+        and (not window or not window.giftMode
+            or not window.transferEndpoint
+            or window.transferEndpoint.kind ~= "npc"
+            or tostring(result.npcId or "") ~= tostring(window.npcId or ""))
+    then
+        return composer.ReceiveGiftResult(result)
+    end
     if window and window.transferEndpoint
         and window.transferEndpoint.kind ~= "npc"
     then return end
@@ -1194,12 +1208,10 @@ function InventoryWindow.OnResult(result)
         and tr("UI_PNC_Inventory_Complete", "Transfer complete")
         or (tr("UI_PNC_Inventory_Failed", "Inventory action failed") .. ": " .. readable)
     window.contextSignature = nil
-    if window.giftMode
-        and PNC.Conversation
-        and PNC.Conversation.Composer
-        and PNC.Conversation.Composer.ReceiveGiftResult
+    if window.giftMode and composer
+        and composer.ReceiveGiftResult
     then
-        PNC.Conversation.Composer.ReceiveGiftResult(result)
+        composer.ReceiveGiftResult(result)
     end
 end
 

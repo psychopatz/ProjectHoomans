@@ -80,6 +80,9 @@ local function actionContext(view, result, value)
     }
 end
 
+Internal.Audit = audit
+Internal.ActionContext = actionContext
+
 local function targetNeedsHint(target)
     if type(target) ~= "table" then return false end
     if number(target.x or target.targetX) ~= nil
@@ -242,6 +245,16 @@ end
 
 function Internal.DispatchAction(view, result, value)
     local decision = result and result.decision or {}
+    if decision.giftOffer then
+        if type(Internal.DispatchGiftOffer) == "function" then
+            return Internal.DispatchGiftOffer(view, result, value)
+        end
+        return {
+            status = "gift_dispatch_unavailable",
+            accepted = false,
+            reason = "gift_dispatch_unavailable",
+        }
+    end
     if decision.inventoryQuery then
         return Internal.DispatchInventoryQuery(view, result, value)
     end

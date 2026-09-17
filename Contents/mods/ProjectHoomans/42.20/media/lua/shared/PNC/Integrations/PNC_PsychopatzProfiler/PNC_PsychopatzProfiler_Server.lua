@@ -49,6 +49,8 @@ function Integration.InstallServer()
     wrap(PNC.Presence, "RefreshMaterializationCandidates",
         "Server.Update.MaterializationCandidates")
     wrap(PNC.Presence, "Materialize", "Server.Update.NPC.Materialize")
+    wrap(PNC.Server and PNC.Server.Internal, "ProcessRecord",
+        "Server.Update.NPC.ProcessRecord")
     wrap(PNC.Network, "RefreshInterestSets",
         "Server.Update.Network.RefreshInterestSets")
     wrap(PNC.ZombieAggro, "Pump", "Server.Update.ZombieAggro")

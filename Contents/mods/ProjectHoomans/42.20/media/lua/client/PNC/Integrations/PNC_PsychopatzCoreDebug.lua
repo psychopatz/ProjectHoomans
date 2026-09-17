@@ -59,6 +59,31 @@ PsychopatzCore.DebugHub.RegisterTool({
 })
 
 PsychopatzCore.DebugHub.RegisterTool({
+    id = "pnc.playerAnimation",
+    source = "Project Hoomans",
+    order = 207,
+    title = translateHubText("UI_PNC_DebugHub_PlayerAnimation_Title",
+        "Player Animation Lab"),
+    description = translateHubText(
+        "UI_PNC_DebugHub_PlayerAnimation_Description",
+        "Preview zombie animation clips on the local ISOPlayer without changing NPC state."),
+    available = function()
+        return PNC
+            and PNC.Client
+            and PNC.Client.CanUseDebug
+            and PNC.Client.CanUseDebug()
+    end,
+    action = function()
+        local ok = pcall(require, "PNC/UI/PNC_PlayerAnimationDebugWindow")
+        if ok and PNC.PlayerAnimationDebugUI
+            and PNC.PlayerAnimationDebugUI.Open
+        then
+            PNC.PlayerAnimationDebugUI.Open()
+        end
+    end,
+})
+
+PsychopatzCore.DebugHub.RegisterTool({
     id = "pnc.npcMonitor",
     source = "Project Hoomans",
     order = 200,

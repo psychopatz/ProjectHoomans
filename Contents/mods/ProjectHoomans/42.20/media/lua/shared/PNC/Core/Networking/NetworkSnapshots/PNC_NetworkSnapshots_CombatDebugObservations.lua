@@ -9,8 +9,16 @@ local Core = PNC.Core
 local Const = PNC.Const
 local Perception = PNC.Perception
 local Registry = PNC.Registry
+local Diagnostics = PNC.PerformanceScalingDiagnostics
 
 function Parts.BuildCombatDebugObservations(record, target)
+    local timingName
+    local timingStart
+    if Diagnostics and Diagnostics.BeginTiming then
+        timingName, timingStart = Diagnostics.BeginTiming(
+            "Network.Snapshot.Part.CombatDebugObservations"
+        )
+    end
     local radius = tonumber(Const.COMBAT_DEBUG_CONE_RADIUS) or 8.5
     local limit = math.max(
         1,
@@ -151,6 +159,9 @@ function Parts.BuildCombatDebugObservations(record, target)
                 targetSource = targetSource,
             }
         end
+    end
+    if Diagnostics and Diagnostics.EndTiming then
+        Diagnostics.EndTiming(timingName, timingStart)
     end
     return output, #entries, frame and nearbyCount or #entries
 end

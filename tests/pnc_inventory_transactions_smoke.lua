@@ -162,7 +162,9 @@ end
 local Service = require "PNC/Server/PNC_ServerInventory"
 local player = {}
 
-local ok, reason = Service.Transfer(player, {
+local transferResult
+local ok, reason
+ok, reason, transferResult = Service.Transfer(player, {
     id = record.id,
     direction = "player_to_npc",
     itemIDs = { "55" },
@@ -172,6 +174,8 @@ local ok, reason = Service.Transfer(player, {
 })
 T.equal(ok, true, "player-to-NPC success")
 T.equal(reason, "transferred_to_npc", "player-to-NPC reason")
+T.equal(transferResult.itemIDs[1], "npc-new",
+    "player-to-NPC returns authoritative NPC item ID")
 T.equal(addedSpecs[1].type, "Base.Bandage", "compact item type")
 T.equal(addedSpecs[1].cond, 4, "compact condition")
 T.equal(addedSpecs[1].fav, true, "compact favorite state")

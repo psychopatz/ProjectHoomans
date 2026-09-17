@@ -30,6 +30,7 @@ local SEGMENT_SYSTEMS = {
     Activities = "Needs",
     Activity = "Needs",
     AudioDebug = "Debug",
+    PlayerAnimation = "Debug",
     Bandage = "Health",
     Bandages = "Health",
     Base = "Settlement",

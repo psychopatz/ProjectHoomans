@@ -88,6 +88,7 @@ local function mentionFrom(value, options, sequence, timestamp)
         entityID = value.entityID,
         itemID = value.itemID,
         uuid = value.uuid,
+        fullType = value.fullType,
         entityType = entityType and string.lower(tostring(entityType)) or nil,
         concept = symbolValue(value.concept or value.category),
         category = symbolValue(value.category),
@@ -198,6 +199,7 @@ function Context:RecordMention(value, options)
         existing.source = mention.source or existing.source
         existing.ownerID = mention.ownerID or existing.ownerID
         existing.quantity = mention.quantity or existing.quantity
+        existing.fullType = mention.fullType or existing.fullType
         existing.marketRole = mention.marketRole or existing.marketRole
         existing.marketSenseTags = mention.marketSenseTags
             or existing.marketSenseTags

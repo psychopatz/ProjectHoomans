@@ -7,12 +7,63 @@ PNC.Gifts = PNC.Gifts or {}
 
 local Gifts = PNC.Gifts
 
+local function marketSenseFacts(itemType, inventoryItem)
+    local foundation = Gifts.Foundation
+    local adapter = foundation and foundation.MarketSenseAdapter
+    if not adapter or type(adapter.BuildFacts) ~= "function" then
+        return nil
+    end
+    local ok
+    local facts
+    ok, facts = pcall(adapter.BuildFacts, itemType, inventoryItem)
+    if not ok or type(facts) ~= "table" then return nil end
+    if facts.marketSenseSource == "api_unavailable"
+        or facts.marketSenseSource == "price_details_unavailable"
+    then
+        return nil
+    end
+    if facts.price <= 0 and #(facts.marketSenseTags or {}) == 0
+        and tostring(facts.primary or "") == ""
+    then
+        return nil
+    end
+    return facts
+end
+
 local function contains(value, needle)
     return string.find(string.lower(tostring(value or "")), needle, 1, true)
         ~= nil
 end
 
-function Gifts.GetItemScore(itemType)
+function Gifts.GetItemScore(itemType, inventoryItem)
+    local facts = marketSenseFacts(itemType, inventoryItem)
+    if facts then
+        local capabilities = facts.capabilities or {}
+        local price = tonumber(facts.price) or 0
+        local approval = 1
+        local respect = math.min(2, math.max(0, price / 50))
+        local kind = "general"
+        if capabilities.edible or capabilities.drinkable then
+            approval = approval + 2
+            kind = "food"
+        elseif capabilities.refillable then
+            approval = approval + 1
+            kind = "general"
+        elseif facts.marketRole then
+            respect = respect + 1
+            kind = (facts.marketRole == "weapon"
+                or facts.marketRole == "tool")
+                and "equipment" or "general"
+        end
+        return {
+            approval = approval,
+            respect = respect,
+            familiarity = 0.5,
+            score = approval + respect + 0.5,
+            kind = string.lower(tostring(kind)),
+            marketSense = true,
+        }
+    end
     local approval = 1
     local respect = 0
     local familiarity = 0.5
@@ -79,7 +130,8 @@ function Gifts.GetItemScore(itemType)
     }
 end
 
-function Gifts.IsValidItemType(itemType)
+function Gifts.IsValidItemType(itemType, inventoryItem)
+    if marketSenseFacts(itemType, inventoryItem) then return true end
     return Gifts.GetItemScore(itemType).kind ~= "general"
 end
 

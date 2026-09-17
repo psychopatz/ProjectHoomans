@@ -110,6 +110,11 @@ local function transferPlayerToNPC(player, record, args, sinceRevision)
     syncResult(player, record, sinceRevision)
     return true, "transferred_to_npc", {
         itemTypes = itemTypes,
+        -- Compact IDs are authoritative NPC-inventory identities. Returning
+        -- them lets the client keep a discourse reference such as "it"
+        -- tied to the actual gifted item without trusting a client ID for
+        -- mutation. Any later task still revalidates this ID on the server.
+        itemIDs = compactIDs,
         itemCount = #itemTypes,
     }
 end

@@ -13,9 +13,44 @@ local relationshipSnapshot = Internal.relationshipSnapshot
 
 PNC.Gifts = PNC.Gifts or {}
 local giftEffect = PNC.Gifts.EvaluateEffect
+local Foundation = PNC.Gifts.Foundation
+local RuntimeEvaluator = Foundation and Foundation.RuntimeEvaluator
+
+local function evaluateGift(record, itemTypes)
+    local legacy = giftEffect(itemTypes or {})
+    if not RuntimeEvaluator or type(RuntimeEvaluator.Evaluate) ~= "function" then
+        return legacy
+    end
+    local ok
+    local evaluation
+    ok, evaluation = pcall(RuntimeEvaluator.Evaluate,
+        record, itemTypes or {})
+    if not ok or type(evaluation) ~= "table" then return legacy end
+    local relationship = evaluation.relationshipEffect or {}
+    return {
+        approval = tonumber(relationship.approval) or legacy.approval or 0,
+        respect = tonumber(relationship.respect) or legacy.respect or 0,
+        familiarity = tonumber(relationship.familiarity)
+            or legacy.familiarity or 0,
+        memoryID = evaluation.bestKey or legacy.memoryID or "gift",
+        kind = legacy.kind or "general",
+        interactionType = "gift",
+        disposition = evaluation.disposition or "neutral",
+        foundation = {
+            schemaVersion = evaluation.schemaVersion,
+            disposition = evaluation.disposition,
+            score = evaluation.score,
+            totalQuantity = evaluation.totalQuantity,
+            totalPrice = evaluation.totalPrice,
+            confidence = evaluation.confidence,
+            bestKey = evaluation.bestKey,
+            bestType = evaluation.bestType,
+        },
+    }
+end
 
 local function applyGiftEffect(player, record, args, details)
-    local gift = giftEffect(details and details.itemTypes or {})
+    local gift = evaluateGift(record, details and details.itemTypes or {})
     details = details or {}
     -- The acknowledgement is part of the conversation contract even if
     -- the relationship service is temporarily unavailable. The transfer

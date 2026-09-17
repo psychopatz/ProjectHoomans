@@ -7,8 +7,16 @@ local Network = PNC.Network
 local Parts = Network.Internal.SnapshotParts
 local Core = PNC.Core
 local Const = PNC.Const
+local Diagnostics = PNC.PerformanceScalingDiagnostics
 
 function Parts.BuildCombatDebugState(record, combat, firearmState)
+    local timingName
+    local timingStart
+    if Diagnostics and Diagnostics.BeginTiming then
+        timingName, timingStart = Diagnostics.BeginTiming(
+            "Network.Snapshot.Part.CombatDebugState"
+        )
+    end
     local runtime = record.runtime or {}
     local npcIdentity = Parts.BuildIdentitySummary(record)
     local target = runtime.target
@@ -68,7 +76,7 @@ function Parts.BuildCombatDebugState(record, combat, firearmState)
             z = record.z,
         }
     end
-    return {
+    local snapshot = {
         target = target and {
             kind = target.kind,
             id = target.id or target.zombieId
@@ -221,6 +229,10 @@ function Parts.BuildCombatDebugState(record, combat, firearmState)
         coneHalfAngleDegrees =
             Const.COMBAT_DEBUG_CONE_HALF_ANGLE_DEGREES,
     }
+    if Diagnostics and Diagnostics.EndTiming then
+        Diagnostics.EndTiming(timingName, timingStart)
+    end
+    return snapshot
 end
 
 return Parts

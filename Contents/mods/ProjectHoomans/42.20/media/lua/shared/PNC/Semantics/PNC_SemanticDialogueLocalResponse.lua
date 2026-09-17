@@ -264,6 +264,20 @@ function Response.Resolve(ir, state, context, branch)
             topic = state and state.currentTopic,
         })
     end
+    if branch == "GIFT_SELECTION_REQUIRED" then
+        return {
+            templateID = "semantic.gift.selection_required",
+            fallback = "Oh? What did you bring me?",
+            args = copyArgs({ object = ir.object }),
+        }
+    end
+    if branch == "GIFT_OFFER_DISPATCHED" then
+        return {
+            templateID = "semantic.gift.pending",
+            fallback = "",
+            args = copyArgs({ object = ir.object }),
+        }
+    end
     if branch == "QUESTION_RECEIVED" and ir.subject == "TIME" then
         local text = clockText(world)
         if text then

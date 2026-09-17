@@ -145,9 +145,9 @@ local function playerItemRow(item, containerKey, player)
     end
     local displayName = tostring(customName or metadata.name or fullType)
     local giftScore = PNC.Gifts and PNC.Gifts.GetItemScore
-        and PNC.Gifts.GetItemScore(fullType) or nil
+        and PNC.Gifts.GetItemScore(fullType, item) or nil
     local giftValid = giftScore and PNC.Gifts.IsValidItemType
-        and PNC.Gifts.IsValidItemType(fullType) == true or false
+        and PNC.Gifts.IsValidItemType(fullType, item) == true or false
     local restrictionReason = Model.GetPlayerItemTransferBlockReason(
         item, player)
     local row = {

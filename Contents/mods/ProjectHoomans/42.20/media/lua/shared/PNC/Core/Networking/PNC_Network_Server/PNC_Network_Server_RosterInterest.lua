@@ -3,6 +3,27 @@ local Internal = Network.Internal
 local Core = PNC.Core
 local Const = PNC.Const
 local ServerState = Network.ServerState
+local ScalingDiagnostics = PNC.PerformanceScalingDiagnostics
+
+local function recordPayloadDiagnostics(eventName)
+    local eventKey
+    if not ScalingDiagnostics
+        or type(ScalingDiagnostics.Increment) ~= "function"
+        or ScalingDiagnostics.Enabled == false
+    then
+        return
+    end
+    eventKey = tostring(eventName or "unknown")
+    if eventKey == "" then eventKey = "unknown" end
+    if eventKey == "tick" then
+        ScalingDiagnostics.Increment("Network.PayloadBuild.PresenceDelta")
+    else
+        ScalingDiagnostics.Increment("Network.PayloadBuild.FullSnapshot")
+    end
+    ScalingDiagnostics.Increment(
+        "Network.PayloadBuild.Event." .. eventKey
+    )
+end
 
 function Network.QueueRosterDelta(record, removed, reason, includeTravelRoute)
     local id = type(record) == "table" and record.id or record
@@ -269,6 +290,7 @@ function Internal.CollectRecordRecipients(record)
 end
 
 function Internal.BuildRecordPayload(record, eventName)
+    recordPayloadDiagnostics(eventName)
     return {
         event = eventName or "update",
         directoryRevision = ServerState.rosterRevision,

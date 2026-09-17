@@ -1119,6 +1119,7 @@ function Client.SendInventoryTransfer(args)
             result.reason = reason
             result.npcId = args.id
             result.requestId = args.requestId
+            result.gift = args.gift == true
             PNC.InventoryWindow.OnResult(result)
         end
         return success == true

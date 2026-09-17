@@ -359,6 +359,17 @@ function Group:Fanout(value, primaryResult)
     end
 
     local decision = primaryResult.decision or {}
+    if decision.giftOffer then
+        -- A spoken gift has one explicit recipient in the current slice. Do
+        -- not duplicate the same item transfer for every nearby participant;
+        -- multi-recipient gifting gets its own negotiation round later.
+        audit("semantic.group.gift_primary_only", {
+            groupID = self.id,
+            turnID = self.activeTurn and self.activeTurn.id,
+            reason = "gift_recipient_selection_not_implemented",
+        })
+        return 0, "gift_primary_only"
+    end
     if decision.route == "llm_fallback" then
         audit("semantic.group.fallback", {
             groupID = self.id,
@@ -486,6 +497,7 @@ function Group:Submit(value, part)
     if accepted == true and primaryResult
         and primaryResult.decision
         and primaryResult.decision.route ~= "llm_fallback"
+        and not primaryResult.decision.giftOffer
     then
         self:Fanout(value, primaryResult)
     end

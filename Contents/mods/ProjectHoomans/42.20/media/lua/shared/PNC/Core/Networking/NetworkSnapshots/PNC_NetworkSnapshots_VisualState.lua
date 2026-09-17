@@ -7,6 +7,7 @@ local Network = PNC.Network
 local Parts = Network.Internal.SnapshotParts
 local Core = PNC.Core
 local MotionHints = PNC.MotionHints
+local Diagnostics = PNC.PerformanceScalingDiagnostics
 
 local function buildAttackAudio(attack)
     local audio = attack and attack.audio or nil
@@ -21,6 +22,13 @@ local function buildAttackAudio(attack)
 end
 
 function Parts.BuildVisualState(record)
+    local timingName
+    local timingStart
+    if Diagnostics and Diagnostics.BeginTiming then
+        timingName, timingStart = Diagnostics.BeginTiming(
+            "Network.Snapshot.Part.VisualState"
+        )
+    end
     local runtime = record and record.runtime or nil
     local path = runtime and runtime.pathing or nil
     local navigation = runtime
@@ -116,7 +124,7 @@ function Parts.BuildVisualState(record)
         anim = tostring(attack.anim)
     end
 
-    return {
+    local snapshot = {
         moving = moving,
         mode = mode,
         walkType = walkType,
@@ -201,6 +209,10 @@ function Parts.BuildVisualState(record)
         nativeMoveRevision = nativeMoveActive
             and navigation.requestRevision or 0,
     }
+    if Diagnostics and Diagnostics.EndTiming then
+        Diagnostics.EndTiming(timingName, timingStart)
+    end
+    return snapshot
 end
 
 return Parts

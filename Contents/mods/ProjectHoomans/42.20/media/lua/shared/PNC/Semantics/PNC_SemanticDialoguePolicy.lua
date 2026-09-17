@@ -3,6 +3,13 @@ PNC.Semantics = PNC.Semantics or {}
 
 local Semantic = require "PsychopatzCore/Semantics/PsychopatzSemantic"
 local IR = Semantic.IR
+local SemanticOffer = PNC.Gifts
+    and PNC.Gifts.Foundation
+    and PNC.Gifts.Foundation.SemanticOffer or nil
+if type(SemanticOffer) ~= "table" then
+    local loaded = require "PNC/Gifts/PNC_GiftSemanticOffer"
+    SemanticOffer = type(loaded) == "table" and loaded or nil
+end
 local Policy = PNC.Semantics.DialoguePolicy or {}
 PNC.Semantics.DialoguePolicy = Policy
 local LocalResponse = PNC.Semantics.LocalResponse
@@ -80,6 +87,14 @@ local RESPONSE_TEMPLATES = {
     OFFER_RECEIVED = {
         templateID = "semantic.offer.received",
         fallback = "I could use one.",
+    },
+    GIFT_SELECTION_REQUIRED = {
+        templateID = "semantic.gift.selection_required",
+        fallback = "Oh? What did you bring me?",
+    },
+    GIFT_OFFER_DISPATCHED = {
+        templateID = "semantic.gift.pending",
+        fallback = "",
     },
     GOSSIP_RECEIVED = {
         templateID = "semantic.gossip.unknown",
@@ -213,6 +228,16 @@ local function unresolvedOffer(ir)
         and tostring(object.text or object.value or "") ~= ""
 end
 
+local function classifyGiftOffer(ir)
+    if not SemanticOffer
+        or type(SemanticOffer.Classify) ~= "function"
+    then
+        return nil
+    end
+    local ok, offer = pcall(SemanticOffer.Classify, ir)
+    return ok and type(offer) == "table" and offer or nil
+end
+
 local function isInventoryQuery(ir)
     return type(ir) == "table"
         and ir.intent == "QUESTION"
@@ -292,6 +317,7 @@ local function decision(ir, route, branch, reason, options)
         action = ir and ir.action,
         actionIntent = actionIntent(ir),
         inventoryQuery = copyValue(ir and ir.inventoryQuery),
+        giftOffer = copyValue(classifyGiftOffer(ir)),
         response = responseFor(branch, ir),
         diagnostics = {
             reason = reason,
@@ -331,6 +357,7 @@ function Policy.Decide(ir, state, context, options)
 
     local diagnostics = ir.diagnostics or {}
     local confidence = tonumber(ir.confidence) or 0
+    local giftOffer = classifyGiftOffer(ir)
     if diagnostics.noMatch == true or confidence < limits.medium then
         local result = decision(
             ir,
@@ -351,7 +378,7 @@ function Policy.Decide(ir, state, context, options)
             and not unresolvedOffer(ir)
             and not isInventoryQuery(ir)
             and not unresolvedWorldTargetRequest(ir))
-        or confidence < limits.high
+        or (confidence < limits.high and not giftOffer)
     then
         local result = decision(
             ir,
@@ -383,6 +410,14 @@ function Policy.Decide(ir, state, context, options)
     if ir.intent == "GREET" or ir.speechAct == "GREET" then
         branch = "GREET_ACKNOWLEDGED"
         reason = "recognized_greeting"
+    elseif giftOffer then
+        if giftOffer.mode == "selection" then
+            branch = "GIFT_SELECTION_REQUIRED"
+            reason = "gift_item_selection_required"
+        else
+            branch = "GIFT_OFFER_DISPATCHED"
+            reason = "gift_item_query_ready"
+        end
     elseif ir.intent == "OFFER" or ir.speechAct == "OFFER" then
         branch = "OFFER_RECEIVED"
         reason = "recognized_offer"

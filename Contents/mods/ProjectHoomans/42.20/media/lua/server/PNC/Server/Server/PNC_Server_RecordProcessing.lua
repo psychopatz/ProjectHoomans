@@ -147,6 +147,14 @@ function H.ProcessRecord(record, now)
 
     forceSyncEvent = record.runtime and record.runtime.forceSyncEvent or nil
     if forceSyncEvent then
+        if ScalingDiagnostics and ScalingDiagnostics.Increment then
+            local eventKey = tostring(forceSyncEvent)
+            if eventKey == "" then eventKey = "unknown" end
+            ScalingDiagnostics.Increment("Combat.ForcedSyncEvents.Total")
+            ScalingDiagnostics.Increment(
+                "Combat.ForcedSyncEvents." .. eventKey
+            )
+        end
         record.runtime.forceSyncEvent = nil
         Network.BroadcastRecord(record, forceSyncEvent)
         record.lastSyncAt = now

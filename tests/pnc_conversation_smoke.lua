@@ -722,6 +722,8 @@ T.truthy(PNC.Conversation.Composer.ReceiveGiftResult({
     success = true,
     npcId = "npc-12",
     itemTypes = { "Base.Katana" },
+    itemIDs = { "npc-item-katana" },
+    requestId = "gift-result-test",
     giftReplyKey = "gift.received.equipment",
     relationshipDelta = { approval = 0, respect = 2, familiarity = 0.5 },
 }), "gift result accepted")
@@ -735,6 +737,33 @@ T.equal(giftMessages[2].speaker, "npc", "gift response is an NPC line")
 T.equal(relationshipRefreshes, 1, "gift refreshes the live relationship panel")
 T.truthy(PNC.Conversation.Diary.Get("npc-12")[1],
     "gift is recorded in the interaction diary")
+T.equal(fakeSession.semanticDialogueContext:GetFocus(1)[1].itemID,
+    "npc-item-katana",
+    "gift result records the authoritative item for later references")
+local giftMessageCount = #giftMessages
+T.equal(PNC.Conversation.Composer.ReceiveGiftResult({
+    success = true,
+    npcId = "npc-12",
+    itemTypes = { "Base.Katana" },
+    itemIDs = { "npc-item-katana" },
+    requestId = "gift-result-test",
+}), true, "duplicate gift result is safely acknowledged")
+T.equal(#giftMessages, giftMessageCount,
+    "duplicate gift result does not append another conversation turn")
+giftMessages = {}
+T.equal(PNC.Conversation.Composer.ReceiveGiftResult({
+    success = false,
+    npcId = "npc-12",
+    requestId = "gift-failure-test",
+    gift = true,
+    reason = "revision_conflict",
+}), false, "failed gift result remains rejected")
+T.equal(#giftMessages, 1, "failed gift result is visible in the log")
+T.equal(
+    PsychopatzCore.Conversation.Text.Resolve(giftMessages[1].value),
+    "That gift is out of date. Try again.",
+    "failed gift result has a human-readable response"
+)
 giftMessages = {}
 T.truthy(PNC.Conversation.Composer.ReceiveGiftResult({
     success = true,
@@ -750,6 +779,18 @@ T.truthy(string.find(formattedGift, "Water Bottle Full", 1, true),
     "gift offer includes the current water item")
 T.truthy(string.find(formattedGift, "Bandage", 1, true),
     "gift offer includes the current bandage item")
+giftMessages = {}
+T.truthy(PNC.Conversation.Composer.ReceiveGiftResult({
+    success = true,
+    npcId = "npc-12",
+    itemTypes = { "Base.Crisps" },
+    giftEffect = { kind = "food", disposition = "hated" },
+}), "preference disposition gift result is accepted")
+T.equal(
+    PsychopatzCore.Conversation.Text.Resolve(giftMessages[2].value),
+    "Is this a joke? Why would you give me this?",
+    "hated gift disposition produces a preference-aware reaction"
+)
 PsychopatzCore.Conversation.instance = nil
 
 local previewRequirement

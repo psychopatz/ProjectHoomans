@@ -70,9 +70,21 @@ function Internal.QueueDeterministicResponse(
     local decision = result.decision or {}
     local response = options.response or responsePayload(decision)
     local ir = result.ir or {}
+    if actionResult and type(actionResult.response) == "table" then
+        response = actionResult.response
+    end
+    if actionResult and (actionResult.status == "gift_transfer_pending"
+            or actionResult.status == "gift_transferred")
+    then
+        -- The authoritative gift result will append the natural response when
+        -- the server confirms the transfer. Do not put an empty/pending line
+        -- in front of it.
+        return true
+    end
     if actionResult and actionResult.accepted == false
         and actionResult.status ~= "unmapped"
         and actionResult.status ~= "skipped"
+        and type(actionResult.response) ~= "table"
     then
         -- DispatchAction has already converted the authoritative rejection
         -- into a task-result message. Do not append a misleading "Okay."

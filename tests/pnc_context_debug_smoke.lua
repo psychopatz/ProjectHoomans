@@ -162,6 +162,11 @@ T.equal(
     true,
     "NPC presentation lab is the unified animation/firearm entry point"
 )
+T.equal(
+    findOption(debugMenu, "Player Animation Lab") ~= nil,
+    true,
+    "player animation lab is available from the NPC debug submenu"
+)
 T.falsy(
     findOption(debugMenu, "Debug: Firearm Anchor Probe"),
     "old standalone firearm anchor probe was removed"

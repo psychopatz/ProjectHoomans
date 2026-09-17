@@ -118,6 +118,7 @@ end
 require "PNC/Semantics/PNC_SemanticDialogueInput_Context"
 require "PNC/Semantics/PNC_SemanticDialogueInput_Presentation"
 require "PNC/Semantics/PNC_SemanticDialogueInput_Actions"
+require "PNC/Semantics/PNC_SemanticDialogueInput_Gifts"
 require "PNC/Semantics/PNC_SemanticDialogueInput_Inventory"
 require "PNC/Semantics/PNC_SemanticDialogueInput_Tasks"
 

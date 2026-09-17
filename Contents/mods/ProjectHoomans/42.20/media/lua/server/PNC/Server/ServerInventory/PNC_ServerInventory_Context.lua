@@ -31,6 +31,7 @@ local function notify(player, success, reason, args, details)
         reason = tostring(reason or (success and "ok" or "failed")),
         npcId = args and args.id and tostring(args.id) or nil,
         requestId = args and args.requestId and tostring(args.requestId) or nil,
+        gift = args and args.gift == true or false,
     }
     for key, value in pairs(type(details) == "table" and details or {}) do
         payload[key] = value
@@ -71,7 +72,7 @@ local function canGift(player, record, args)
         )
         if ok ~= true then return false, reason or "conversation_unavailable" end
     end
-    return true, "gift_authorized"
+    return true, "gift_authorized", lease
 end
 
 local function relationshipSnapshot(value)

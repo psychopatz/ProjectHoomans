@@ -22,6 +22,18 @@ local SYSTEM_SOURCE = {
     domain = "pnc.system.shared.categories",
 }
 local function activeView(npcID)
+    local semantic = PNC.Semantics and PNC.Semantics.DialogueInput
+        and PNC.Semantics.DialogueInput.ActiveView or nil
+    if semantic and tostring(semantic.spec and semantic.spec.npcID or "")
+        == tostring(npcID or "")
+    then
+        return semantic
+    end
+    local group = semantic and semantic.groupConversation or nil
+    if group and type(group.ViewFor) == "function" then
+        local memberView = group:ViewFor(npcID)
+        if memberView then return memberView end
+    end
     local view = PsychopatzCore and PsychopatzCore.Conversation
         and PsychopatzCore.Conversation.instance or nil
     if view and tostring(view.spec and view.spec.npcID or "")
