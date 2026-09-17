@@ -102,7 +102,7 @@ local function cacheKey(scope, query, origin, cell)
         .. "|" .. tostring(cell)
 end
 
-local function audit(scope, query, hint, reason)
+local function audit(scope, query, hint, reason, details)
     if not Diagnostics
         or type(Diagnostics.IsEnabled) ~= "function"
         or Diagnostics.IsEnabled() ~= true
@@ -121,6 +121,8 @@ local function audit(scope, query, hint, reason)
         x = hint and hint.x,
         y = hint and hint.y,
         score = hint and hint.score,
+        roomReason = details and details.roomReason,
+        fallbackReason = details and details.fallbackReason,
     }, {
         dedupeKey = "camp_site|" .. tostring(scope or "") .. "|"
             .. tostring(query or "") .. "|"
@@ -215,6 +217,8 @@ function Hints.Resolve(target, context)
     local site
     local hint
     local reason
+    local roomReason
+    local fallbackReason
 
     if cached and timestamp - cached.at <= Hints.CACHE_MS then
         return cached.hint, cached.reason
@@ -223,7 +227,7 @@ function Hints.Resolve(target, context)
     elseif scope == CampSite.SCOPES.CAMPFIRE then
         hint, reason = campfireHint(target, context, origin, timestamp, cell)
     else
-        site, reason = Geometry.FindNearestRoom(cell, origin, {
+        site, roomReason = Geometry.FindNearestRoom(cell, origin, {
             text = query,
             roomType = target.roomType,
         }, {
@@ -233,13 +237,18 @@ function Hints.Resolve(target, context)
         })
         hint = roomHint(site, query, timestamp)
         if not hint and scope == CampSite.SCOPES.HERE then
-            hint, reason = campfireHint(target, context, origin, timestamp, cell)
+            hint, fallbackReason = campfireHint(target, context, origin,
+                timestamp, cell)
+            reason = hint and nil or fallbackReason or roomReason
         elseif not hint then
-            reason = reason or "room_not_found"
+            reason = roomReason or "room_not_found"
         end
     end
     Hints.Cache[key] = { at = timestamp, hint = hint, reason = reason }
-    audit(scope, query, hint, reason)
+    audit(scope, query, hint, reason, {
+        roomReason = roomReason,
+        fallbackReason = fallbackReason,
+    })
     return hint, reason
 end
 

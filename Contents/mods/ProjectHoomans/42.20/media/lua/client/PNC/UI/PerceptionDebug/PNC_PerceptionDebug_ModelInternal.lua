@@ -40,6 +40,16 @@ local LABEL_KEYS = {
     scope = "UI_PNC_PerceptionDebug_Label_Scope",
     label = "UI_PNC_PerceptionDebug_Label_Label",
     ["site / campfire id"] = "UI_PNC_PerceptionDebug_Label_SiteCampfireID",
+    ["last camp attempt"] = "UI_PNC_PerceptionDebug_Label_LastCampAttempt",
+    ["client result"] = "UI_PNC_PerceptionDebug_Label_ClientResult",
+    ["server result"] = "UI_PNC_PerceptionDebug_Label_ServerResult",
+    ["result reason"] = "UI_PNC_PerceptionDebug_Label_ResultReason",
+    ["request ID"] = "UI_PNC_PerceptionDebug_Label_RequestID",
+    ["hint source"] = "UI_PNC_PerceptionDebug_Label_HintSource",
+    ["hint scope"] = "UI_PNC_PerceptionDebug_Label_HintScope",
+    ["hint label"] = "UI_PNC_PerceptionDebug_Label_HintLabel",
+    ["hint site / campfire ID"] =
+        "UI_PNC_PerceptionDebug_Label_HintSiteCampfireID",
 }
 
 local VALUE_KEYS = {
@@ -63,6 +73,9 @@ local VALUE_KEYS = {
     UNKNOWN = "UI_PNC_PerceptionDebug_Value_Unknown",
     UNAVAILABLE = "UI_PNC_PerceptionDebug_Value_Unavailable",
     READY = "UI_PNC_PerceptionDebug_Value_Ready",
+    PENDING = "UI_PNC_PerceptionDebug_Value_Pending",
+    ACCEPTED = "UI_PNC_PerceptionDebug_Value_Accepted",
+    REJECTED = "UI_PNC_PerceptionDebug_Value_Rejected",
     ["room then campfire"] = "UI_PNC_PerceptionDebug_Value_RoomThenCampfire",
     Sitting = "UI_PNC_PerceptionDebug_Usage_Sitting",
     Drinking = "UI_PNC_PerceptionDebug_Usage_Drinking",

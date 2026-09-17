@@ -18,14 +18,15 @@ local function ownerFor(sessionID)
     return OWNER_PREFIX .. tostring(sessionID or "")
 end
 
-function Adapter.Start(sessionID, beat)
-    if type(beat) ~= "table" or type(beat.player) ~= "table" then
+function Adapter.Start(sessionID, beat, track)
+    track = track or beat and beat.player
+    if type(beat) ~= "table" or type(track) ~= "table" then
         return false, "player_beat_missing"
     end
     if Adapter.Active then
         return false, "player_animation_owned_by_puppet_session"
     end
-    local entry = beat.player
+    local entry = track
     local body = Player.ResolveLocalPlayer()
     local options = {
         owner = ownerFor(sessionID),

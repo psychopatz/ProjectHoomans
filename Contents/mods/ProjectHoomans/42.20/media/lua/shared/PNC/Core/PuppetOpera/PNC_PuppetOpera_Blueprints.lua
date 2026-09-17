@@ -159,20 +159,26 @@ local function normalizeActors(rawActors, rawAnchors)
             kind = kind,
             required = raw.required ~= false,
             anchor = anchor,
+            labelKey = validID(raw.labelKey, 128),
             label = cleanText(raw.label, 96),
         }
         actors[actorID] = normalized
         actorCount = actorCount + 1
     end
     if actorCount < 2 then return nil, "at_least_two_actors_required" end
-    if not actors.player then return nil, "player_actor_required" end
-    if not actors.npc then return nil, "npc_actor_required" end
-    if actors.player.kind ~= "local_player" then
-        return nil, "player_actor_kind_invalid"
+
+    -- Actor ids are scene-local slot names.  The old builder required the
+    -- literal `player` and `npc` keys, which made a two-NPC scene impossible
+    -- even though the rest of the anchor/session model is already generic.
+    -- Keep the useful invariant that a blueprint contains at most one local
+    -- player slot; any number of nearby live-NPC slots is valid.
+    local localPlayerCount = 0
+    for _, definition in pairs(actors) do
+        if definition.kind == "local_player" then
+            localPlayerCount = localPlayerCount + 1
+        end
     end
-    if actors.npc.kind ~= "nearby_live_npc" then
-        return nil, "npc_actor_kind_invalid"
-    end
+    if localPlayerCount > 1 then return nil, "too_many_local_player_actors" end
     return actors
 end
 
@@ -180,19 +186,36 @@ local function normalizePlayerBeat(raw, beatID, durationMs)
     if type(raw) ~= "table" then
         return nil, "player_beat_missing:" .. tostring(beatID)
     end
-    local route = cleanText(raw.route or "player_action", 32)
+    local mode = cleanText(
+        raw.mode or (raw.emote and "emote" or "action"),
+        16
+    )
+    local route = cleanText(
+        raw.route or (mode == "emote" and "player_emote" or "player_action"),
+        32
+    )
     local action = validID(raw.action, 96)
+    local emote = validID(raw.emote, 96)
     local animation = validID(raw.animation or raw.anim, 128)
     local catalog = validID(raw.catalog or "player", 32)
     local entryID = validID(raw.entryId or raw.entryID, 192)
-    if route ~= "player_action" then
+    if mode == "action" and route ~= "player_action" then
+        return nil, "player_route_unsupported:" .. tostring(beatID)
+    end
+    if mode == "emote" and route ~= "player_emote" then
         return nil, "player_route_unsupported:" .. tostring(beatID)
     end
     if catalog ~= "player" then
         return nil, "player_catalog_unsupported:" .. tostring(beatID)
     end
-    if not action or not animation then
+    if mode ~= "action" and mode ~= "emote" then
+        return nil, "player_mode_unsupported:" .. tostring(beatID)
+    end
+    if mode == "action" and (not action or not animation) then
         return nil, "player_action_missing:" .. tostring(beatID)
+    end
+    if mode == "emote" and not emote then
+        return nil, "player_emote_missing:" .. tostring(beatID)
     end
     -- PsychopatzCore's native timed-action controller consumes maxTime in
     -- simulation ticks (60 ticks per second at normal speed), while Puppet
@@ -203,14 +226,15 @@ local function normalizePlayerBeat(raw, beatID, durationMs)
     )
     return {
         route = route,
-        mode = "action",
+        mode = mode,
         catalog = catalog,
         entryId = entryID,
-        state = cleanText(raw.state or action, 96),
+        state = cleanText(raw.state or action or emote, 96),
         action = action,
+        emote = emote,
         anim = animation,
         playable = true,
-        debugDuration = actionDuration,
+        debugDuration = mode == "action" and actionDuration or nil,
         variables = normalizeVariables(raw.variables),
         event = validID(raw.event, 96),
     }
@@ -244,7 +268,26 @@ local function normalizeNPCBeat(raw, beatID, durationMs)
     }
 end
 
-local function normalizeBeats(rawBeats)
+local function normalizeFutureBeat(raw, beatID, durationMs)
+    if type(raw) ~= "table" then
+        return nil, "actor_track_missing:" .. tostring(beatID)
+    end
+    return {
+        route = cleanText(raw.route or "future", 32),
+        mode = cleanText(raw.mode or "future", 16),
+        catalog = validID(raw.catalog or "future", 32),
+        entryId = validID(raw.entryId or raw.entryID, 192),
+        state = cleanText(raw.state, 96),
+        action = validID(raw.action, 96),
+        emote = validID(raw.emote, 96),
+        bump = validID(raw.bump, 96),
+        anim = validID(raw.animation or raw.anim, 128),
+        durationMs = durationMs,
+        nonCombat = raw.nonCombat ~= false,
+    }
+end
+
+local function normalizeBeats(rawBeats, actors)
     if type(rawBeats) ~= "table" or #rawBeats == 0 then
         return nil, "beats_required"
     end
@@ -253,10 +296,13 @@ local function normalizeBeats(rawBeats)
     local raw
     local beatID
     local durationMs
-    local playerBeat
-    local npcBeat
-    local playerError
-    local npcError
+    local track
+    local trackError
+    local rawTracks
+    local rawTrack
+    local actorDefinition
+    local actorID
+    local normalizedBeat
     for index, raw in ipairs(rawBeats) do
         if type(raw) ~= "table" then
             return nil, "beat_not_a_table:" .. tostring(index)
@@ -266,28 +312,59 @@ local function normalizeBeats(rawBeats)
         if not beatID or not durationMs then
             return nil, "beat_metadata_invalid:" .. tostring(index)
         end
-        playerBeat, playerError = normalizePlayerBeat(
-            raw.player,
-            beatID,
-            durationMs
-        )
-        if not playerBeat then
-            return nil, playerError
+        rawTracks = type(raw.tracks) == "table" and raw.tracks or {}
+        -- Accept the original schema as an input format while normalizing to
+        -- the actor-id keyed track map used by the scene builder.
+        if rawTracks.player == nil and raw.player ~= nil then
+            rawTracks.player = raw.player
         end
-        npcBeat, npcError = normalizeNPCBeat(raw.npc, beatID, durationMs)
-        if not npcBeat then
-            return nil, npcError
+        if rawTracks.npc == nil and raw.npc ~= nil then
+            rawTracks.npc = raw.npc
         end
-        beats[index] = {
+        normalizedBeat = {
             id = beatID,
             durationMs = durationMs,
             synchronization = cleanText(
                 raw.synchronization or "arrival_and_start_barrier",
                 64
             ),
-            player = playerBeat,
-            npc = npcBeat,
+            tracks = {},
         }
+        for actorID, actorDefinition in pairs(actors or {}) do
+            rawTrack = rawTracks[actorID]
+            if not rawTrack then
+                if actorDefinition.required ~= false then
+                    return nil, "actor_track_missing:" .. tostring(actorID)
+                end
+            else
+                if actorDefinition.kind == "local_player" then
+                    track, trackError = normalizePlayerBeat(
+                        rawTrack,
+                        beatID,
+                        durationMs
+                    )
+                elseif actorDefinition.kind == "nearby_live_npc" then
+                    track, trackError = normalizeNPCBeat(
+                        rawTrack,
+                        beatID,
+                        durationMs
+                    )
+                else
+                    track, trackError = normalizeFutureBeat(
+                        rawTrack,
+                        beatID,
+                        durationMs
+                    )
+                end
+                if not track then return nil, trackError end
+                normalizedBeat.tracks[actorID] = track
+            end
+        end
+        -- Compatibility aliases let existing low-level consumers continue to
+        -- read the first blueprint without knowing about `tracks` yet.
+        normalizedBeat.player = normalizedBeat.tracks.player
+        normalizedBeat.npc = normalizedBeat.tracks.npc
+        beats[index] = normalizedBeat
     end
     return beats
 end
@@ -327,7 +404,7 @@ function Registry.Normalize(id, definition)
             return nil, "anchor_face_target_unknown:" .. tostring(anchorID)
         end
     end
-    local beats, beatError = normalizeBeats(definition.beats)
+    local beats, beatError = normalizeBeats(definition.beats, actors)
     if not beats then return nil, beatError end
 
     local playback = type(definition.playback) == "table"
@@ -345,6 +422,7 @@ function Registry.Normalize(id, definition)
     return {
         id = normalizedID,
         version = version,
+        labelKey = validID(definition.labelKey, 128),
         label = cleanText(definition.label or normalizedID, 128),
         description = cleanText(definition.description, 256),
         actors = actors,
@@ -382,16 +460,37 @@ function Registry.IsRuntimeNPCBump(bump)
     return RUNTIME_NPC_BUMPS[tostring(bump or "")] == true
 end
 
+function Registry.GetTrack(beat, actorID)
+    if type(beat) ~= "table" then return nil end
+    if type(beat.tracks) == "table" then
+        return beat.tracks[tostring(actorID or "")]
+    end
+    return beat[tostring(actorID or "")]
+end
+
 function Registry.ValidateRuntime(blueprint)
     if type(blueprint) ~= "table" then
         return false, "blueprint_missing"
     end
     for index, beat in ipairs(blueprint.beats or {}) do
-        if not Registry.IsRuntimePlayerAction(beat.player and beat.player.action) then
-            return false, "player_action_not_server_approved:" .. tostring(index)
-        end
-        if not Registry.IsRuntimeNPCBump(beat.npc and beat.npc.bump) then
-            return false, "npc_bump_not_server_approved:" .. tostring(index)
+        for actorID, actor in pairs(blueprint.actors or {}) do
+            local track = Registry.GetTrack(beat, actorID)
+            if actor.kind == "local_player" then
+                if not Registry.IsRuntimePlayerAction(
+                    track and track.action
+                ) then
+                    return false, "player_action_not_server_approved:"
+                        .. tostring(index) .. ":" .. tostring(actorID)
+                end
+            elseif actor.kind == "nearby_live_npc" then
+                if not Registry.IsRuntimeNPCBump(track and track.bump) then
+                    return false, "npc_bump_not_server_approved:"
+                        .. tostring(index) .. ":" .. tostring(actorID)
+                end
+            else
+                return false, "actor_kind_not_runtime_supported:"
+                    .. tostring(actorID)
+            end
         end
     end
     return true
@@ -417,20 +516,20 @@ end
 local defaultBlueprint = {
     id = "social.kiss_test",
     version = 1,
-    label = "Player and NPC Kiss Test",
+    labelKey = "UI_PNC_PuppetOpera_KissTest",
     description = "Two actors walk to opposing anchors and play a synchronized Shove beat.",
     actors = {
         player = {
             kind = "local_player",
             required = true,
             anchor = "left",
-            label = "Player",
+            labelKey = "UI_PNC_PuppetOpera_PlayerActor",
         },
         npc = {
             kind = "nearby_live_npc",
             required = true,
             anchor = "right",
-            label = "Nearby live NPC",
+            labelKey = "UI_PNC_PuppetOpera_NPCActor",
         },
     },
     anchorFrame = {

@@ -54,15 +54,16 @@ function Adapter.IsOwned(body, sessionID)
     return owns(body, sessionID)
 end
 
-function Adapter.Start(session, actor, beat)
+function Adapter.Start(session, actor, beat, track)
+    track = track or beat and beat.npc
     if type(session) ~= "table" or type(actor) ~= "table"
-        or type(beat) ~= "table" or type(beat.npc) ~= "table"
+        or type(beat) ~= "table" or type(track) ~= "table"
     then
         return false, "npc_beat_arguments_invalid"
     end
     local body = actor.body
     local record = actor.record
-    local bump = tostring(beat.npc.bump or "")
+    local bump = tostring(track.bump or "")
     if not body or not record or bump == "" then
         return false, "npc_animation_actor_unavailable"
     end
@@ -132,9 +133,13 @@ function Adapter.Observe(session, actor, beat)
     return false, "npc_animation_interrupted"
 end
 
-function Adapter.Maintain(session, actor, beat, leaseUntil)
+function Adapter.Maintain(session, actor, beat, leaseUntil, track)
+    track = track or beat and beat.npc
     if not owns(actor.body, session.sessionId) then
         return false, "npc_animation_ownership_lost"
+    end
+    if type(track) ~= "table" or not track.bump then
+        return false, "npc_animation_track_missing"
     end
     if not Animation or not Animation.MaintainBump then
         return false, "npc_animation_service_unavailable"
@@ -144,7 +149,7 @@ function Adapter.Maintain(session, actor, beat, leaseUntil)
     accepted, reason = Animation.MaintainBump(
         actor.body,
         actor.record,
-        beat.npc.bump,
+        track and track.bump,
         leaseUntil,
         {
             sceneId = "PuppetOpera:" .. tostring(session.sessionId),

@@ -11,6 +11,33 @@ local text = Internal.Text
 local listText = Internal.ListText
 local addLine = Internal.AddLine
 
+local function resultTone(status)
+    status = string.upper(tostring(status or ""))
+    if status == "ACCEPTED" then return "success" end
+    if status == "REJECTED" then return "danger" end
+    if status == "PENDING" then return "warning" end
+    return "muted"
+end
+
+local function addCampResult(rows, label, result)
+    local hint
+    if type(result) ~= "table" then return end
+    addLine(rows, label, result.status or "UNKNOWN",
+        resultTone(result.status))
+    addLine(rows, "result reason", result.reason or "none",
+        result.status == "REJECTED" and "danger" or "muted")
+    if result.requestID then
+        addLine(rows, "request ID", result.requestID)
+    end
+    hint = result.hint
+    if type(hint) ~= "table" then return end
+    addLine(rows, "hint source", hint.source or "none")
+    addLine(rows, "hint scope", hint.scope or result.scope or "none")
+    addLine(rows, "hint label", hint.label or hint.roomType or "none")
+    addLine(rows, "hint site / campfire ID",
+        hint.siteID or hint.campfireID or "none")
+end
+
 function Model.Summary(snapshot)
     snapshot = snapshot or {}
     local sitting = 0
@@ -57,9 +84,18 @@ end
 function Model.CampPreviewRows(snapshot)
     local rows = {}
     local preview = snapshot and snapshot.campPreview or nil
+    local diagnostics = snapshot and snapshot.diagnostics
+        and snapshot.diagnostics.campCommand or nil
     if not preview then
         addLine(rows, "camp policy", "room then campfire", "muted")
         addLine(rows, "preview", "unavailable", "warning")
+        if type(diagnostics) == "table" then
+            addLine(rows, "last camp attempt",
+                diagnostics.last and diagnostics.last.status or "none",
+                resultTone(diagnostics.last and diagnostics.last.status))
+            addCampResult(rows, "client result", diagnostics.client)
+            addCampResult(rows, "server result", diagnostics.server)
+        end
         return rows
     end
     addLine(rows, "camp policy", preview.policy or "room then campfire")
@@ -74,6 +110,13 @@ function Model.CampPreviewRows(snapshot)
         preview.reason and "warning" or "muted")
     addLine(rows, "site / campfire id", preview.siteID or preview.campfireID
         or "none")
+    if type(diagnostics) == "table" then
+        addLine(rows, "last camp attempt",
+            diagnostics.last and diagnostics.last.status or "none",
+            resultTone(diagnostics.last and diagnostics.last.status))
+        addCampResult(rows, "client result", diagnostics.client)
+        addCampResult(rows, "server result", diagnostics.server)
+    end
     return rows
 end
 

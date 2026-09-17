@@ -11,24 +11,40 @@ PNC.PerceptionDebug = PNC.PerceptionDebug or {}
 
 require "PNC/UI/PerceptionDebug/PNC_PerceptionDebug_Settings"
 require "PNC/Perception/WorldObjectPerception/PNC_ClientWorldObjectPerception"
+require "PNC/UI/PerceptionDebug/PNC_PerceptionDebug_CoreProvider"
 require "PNC/UI/PerceptionDebug/PNC_PerceptionDebug_Model"
 require "PNC/UI/PerceptionDebug/PNC_PerceptionDebug_Overlay"
-require "PNC/UI/PerceptionDebug/PNC_PerceptionDebug_Window"
 
 local Namespace = PNC.PerceptionDebug
-local DebugUI = Namespace.UI
+local Provider = Namespace.CoreProvider
+
+local function previewHub()
+    local loaded, hub = pcall(require, "PsychopatzCore/Preview/PC_PreviewHub")
+    if loaded and hub then return hub end
+    return nil
+end
 
 function Namespace.Open()
-    return DebugUI and DebugUI.Open and DebugUI.Open() or nil
+    local hub = previewHub()
+    if hub and hub.Open and Provider then
+        return hub.Open(Provider.ID)
+    end
+    return nil
 end
 
 function Namespace.Toggle()
-    return DebugUI and DebugUI.Toggle and DebugUI.Toggle() or false
+    local hub = previewHub()
+    if hub and hub.Toggle and Provider then
+        return hub.Toggle(Provider.ID)
+    end
+    return false
 end
 
 function Namespace.IsOpen()
-    return DebugUI and DebugUI.instance
-        and DebugUI.instance:getIsVisible() == true or false
+    local window = rawget(_G, "ISPsychopatzPreviewHubWindow")
+        and ISPsychopatzPreviewHubWindow.instance or nil
+    return window and window.getIsVisible
+        and window:getIsVisible() == true or false
 end
 
 return Namespace

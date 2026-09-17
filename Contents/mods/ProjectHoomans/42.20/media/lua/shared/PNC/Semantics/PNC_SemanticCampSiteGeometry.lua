@@ -14,6 +14,7 @@ local CampSite = PNC.Semantics.CampSite
 
 Geometry.VERSION = 1
 Geometry.MAX_ROOMS = 128
+Geometry.MAX_LOCAL_ROOM_CANDIDATES = 64
 Geometry.MAX_ROOM_SQUARES = 512
 Geometry.MAX_FALLBACK_SCAN = 4096
 
@@ -344,9 +345,24 @@ end
 
 function Geometry.EnumerateRooms(cell, callback, options)
     options = type(options) == "table" and options or {}
+    local roomList = cell and call(cell, "getRoomList") or nil
+    local roomValues = values(roomList, options.maxRooms or Geometry.MAX_ROOMS)
+    local count = 0
+    for _, room in ipairs(roomValues) do
+        local definition = roomDefFor(room)
+        local building = buildingFor(room, definition)
+        if not building or call(building, "isToxic") ~= true then
+            count = count + 1
+            if type(callback) == "function" then
+                callback(room, building, count)
+            end
+            if count >= Geometry.MAX_ROOMS then return count end
+        end
+    end
+    if count > 0 then return count end
+
     local buildings = cell and call(cell, "getBuildingList") or nil
     local buildingValues = values(buildings, options.maxBuildings or 128)
-    local count = 0
     for _, building in ipairs(buildingValues) do
         if call(building, "isToxic") ~= true then
             local definition = buildingDefinition(building)
@@ -425,40 +441,100 @@ function Geometry.FindNearestRoom(cell, origin, query, options)
         end
     end
 
-    Geometry.EnumerateRooms(cell, function(room, building)
-        local site = Geometry.DescribeRoom(room, building, cell, origin, {
+    -- When the player is outside, the cell building list is not a spatial
+    -- index and may be capped or ordered independently of the player's
+    -- position. Discover rooms from nearby loaded squares first. This keeps
+    -- the client-first camp decision local while making a visible house
+    -- authoritative for the same action that requested it.
+    local seenRooms = {}
+    local localRoomCandidates = 0
+    local localRoomLimit = math.max(1, math.min(
+        Geometry.MAX_LOCAL_ROOM_CANDIDATES,
+        math.floor(number(options.maxLocalRooms)
+            or Geometry.MAX_LOCAL_ROOM_CANDIDATES)))
+
+    local function considerRoom(room, building)
+        local site
+        local dx
+        local dy
+        local distance
+        local sameRoom
+        local preferred
+        local score
+        if not room or seenRooms[room] then return end
+        seenRooms[room] = true
+        site = Geometry.DescribeRoom(room, building, cell, origin, {
             roomType = wantedType,
             query = wantedText,
         })
-        if site then
-            local dx = site.x - originX
-            local dy = site.y - originY
-            local distance = math.sqrt(dx * dx + dy * dy)
-            local sameRoom = originRoomID ~= nil
-                and tostring(site.roomID or "") == tostring(originRoomID)
-            local preferred = options.preferredSiteID
-                and tostring(site.siteID or "")
-                    == tostring(options.preferredSiteID)
-                or options.preferredRoomID
-                and tostring(site.roomID or "")
-                    == tostring(options.preferredRoomID)
-            if math.abs(site.z - originZ) <= 1 and distance <= maximum then
-                local score = distance
-                if sameRoom then score = score - 1000 end
-                if preferred then score = score - 100 end
-                if call(building, "isResidential") == true then
-                    score = score - 2
-                end
-                if not best or score < bestScore
-                    or score == bestScore
-                        and tostring(site.siteID) < tostring(best.siteID)
-                then
-                    best = site
-                    bestScore = score
-                    bestDistance = distance
-                end
+        if not site then return end
+        dx = site.x - originX
+        dy = site.y - originY
+        distance = math.sqrt(dx * dx + dy * dy)
+        sameRoom = originRoomID ~= nil
+            and tostring(site.roomID or "") == tostring(originRoomID)
+        preferred = options.preferredSiteID
+            and tostring(site.siteID or "")
+                == tostring(options.preferredSiteID)
+            or options.preferredRoomID
+            and tostring(site.roomID or "")
+                == tostring(options.preferredRoomID)
+        if math.abs(site.z - originZ) > 1 or distance > maximum then
+            return
+        end
+        score = distance
+        if sameRoom then score = score - 1000 end
+        if preferred then score = score - 100 end
+        if call(building, "isResidential") == true then score = score - 2 end
+        if not best or score < bestScore
+            or score == bestScore
+                and tostring(site.siteID) < tostring(best.siteID)
+        then
+            best = site
+            bestScore = score
+            bestDistance = distance
+        end
+    end
+
+    local function inspectNearbySquare(x, y)
+        local square = Geometry.GetSquare(cell, x, y, originZ)
+        local room = roomFor(square)
+        if room and not seenRooms[room]
+            and localRoomCandidates < localRoomLimit
+        then
+            localRoomCandidates = localRoomCandidates + 1
+            considerRoom(room, buildingFor(room, roomDefFor(room)))
+        end
+    end
+
+    local baseX = math.floor(originX)
+    local baseY = math.floor(originY)
+    for ring = 0, math.floor(maximum) do
+        if ring == 0 then
+            inspectNearbySquare(baseX, baseY)
+        else
+            for dx = -ring, ring do
+                inspectNearbySquare(baseX + dx, baseY - ring)
+                inspectNearbySquare(baseX + dx, baseY + ring)
+            end
+            for dy = -ring + 1, ring - 1 do
+                inspectNearbySquare(baseX - ring, baseY + dy)
+                inspectNearbySquare(baseX + ring, baseY + dy)
             end
         end
+    end
+
+    -- A local scan is enough for the normal visible-house case. Retain the
+    -- bounded room-list/building fallback for rooms whose loaded squares do
+    -- not expose room identity on this engine/version.
+    if best then
+        best.distance = bestDistance
+        best.selectionScore = bestScore
+        return best
+    end
+
+    Geometry.EnumerateRooms(cell, function(room, building)
+        considerRoom(room, building)
     end, options)
     if not best then return nil, "room_not_found" end
     best.distance = bestDistance

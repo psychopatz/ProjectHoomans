@@ -33,8 +33,11 @@ local function drawBeatItem(list, y, row, alternate)
         0.92, 0.94, 1.00, 1, UIFont.Small
     )
     list:drawText(
-        "PLAYER  " .. tostring(beat.player and beat.player.anim or "-")
-            .. "    NPC  " .. tostring(beat.npc and beat.npc.anim or "-"),
+        Layout.Ellipsize(
+            tostring(row.summary or "No tracks assigned"),
+            UIFont.Small,
+            math.max(32, list:getWidth() - 16)
+        ),
         8, y + 24,
         0.62, 0.82, 0.95, 1, UIFont.Small
     )
@@ -72,7 +75,8 @@ function ISPNCPuppetOperaBeatsTab:createChildren()
     self.details = UI.CreateKeyValueList(self, {
         itemHeight = 25,
         valueXRatio = 0.34,
-        ellipsize = false,
+        valueXMax = 112,
+        ellipsize = true,
         labelX = 8,
         labelY = 6,
         valueY = 6,
@@ -145,16 +149,17 @@ function ISPNCPuppetOperaBeatsTab:refresh()
     addDetail(self.details, "Duration", tostring(beat.durationMs) .. " ms")
     addDetail(self.details, "Synchronization",
         beat.synchronization or "arrival_and_start_barrier")
-    addDetail(self.details, "Player action", beat.player and beat.player.action)
-    addDetail(self.details, "Player clip", beat.player and beat.player.anim)
-    addDetail(self.details, "Player catalog ID", beat.player and beat.player.entryId)
-    addDetail(self.details, "NPC BumpType", beat.npc and beat.npc.bump)
-    addDetail(self.details, "NPC clip", beat.npc and beat.npc.anim)
-    addDetail(self.details, "NPC catalog ID", beat.npc and beat.npc.entryId)
+    for _, actor in ipairs(self.model.GetActorRows(nil)) do
+        addDetail(self.details, "Track " .. tostring(actor.id),
+            self.model.GetSelectionSummary(actor.id),
+            actor.supported ~= true)
+    end
+    local schemaOK, runtimeReason = self.model.GetValidation()
     addDetail(self.details, "MP policy",
-        self.model.GetValidation() and "schema checked; start is server validated"
-            or "invalid draft",
-        not self.model.GetValidation())
+        not schemaOK and "invalid draft"
+            or (runtimeReason and "local preview; server will reject"
+                or "server-approved"),
+        not schemaOK or runtimeReason ~= nil)
 end
 
 function ISPNCPuppetOperaBeatsTab:onAction(button)
@@ -190,8 +195,12 @@ function ISPNCPuppetOperaBeatsTab:onResponsiveLayout()
     local scale = self.ownerWindow and self.ownerWindow.uiScale
     local pad = Layout.Pixels(8, scale)
     local top = Layout.Pixels(4, scale)
-    local leftWidth = math.max(Layout.Pixels(280, scale),
-        math.floor(self:getWidth() * 0.38))
+    local leftWidth = math.max(Layout.Pixels(200, scale),
+        math.floor(self:getWidth() * 0.36))
+    leftWidth = math.min(leftWidth,
+        math.max(Layout.Pixels(1, scale), self:getWidth() - pad * 3
+            - Layout.Pixels(190, scale)))
+    local bottom = Layout.Pixels(132, scale)
     Layout.SetBounds(self.beatList, pad, top, leftWidth,
         self:getHeight() - top - Layout.Pixels(44, scale))
     Layout.SetBounds(self.durationEntry, pad,
@@ -203,14 +212,19 @@ function ISPNCPuppetOperaBeatsTab:onResponsiveLayout()
         Layout.Pixels(140, scale), Layout.Pixels(26, scale))
     local rightX = leftWidth + pad * 2
     Layout.SetBounds(self.details, rightX, top,
-        self:getWidth() - rightX - pad,
-        self:getHeight() - top - Layout.Pixels(132, scale))
-    local buttonWidth = math.max(Layout.Pixels(96, scale),
-        math.floor((self:getWidth() - rightX - pad) / #self.buttons) - pad)
+        math.max(1, self:getWidth() - rightX - pad),
+        math.max(1, self:getHeight() - top - bottom))
+    local buttonAreaWidth = math.max(1, self:getWidth() - rightX - pad)
+    local columns = buttonAreaWidth >= Layout.Pixels(500, scale) and 5 or 3
+    local buttonWidth = math.max(Layout.Pixels(64, scale),
+        math.floor((buttonAreaWidth - pad * (columns - 1)) / columns))
+    local buttonTop = self:getHeight() - Layout.Pixels(98, scale)
     for index, button in ipairs(self.buttons) do
+        local row = math.floor((index - 1) / columns)
+        local column = (index - 1) % columns
         Layout.SetBounds(button,
-            rightX + (index - 1) * (buttonWidth + pad),
-            self:getHeight() - Layout.Pixels(98, scale),
+            rightX + column * (buttonWidth + pad),
+            buttonTop + row * Layout.Pixels(31, scale),
             buttonWidth, Layout.Pixels(26, scale))
     end
 end

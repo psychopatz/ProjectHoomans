@@ -1,5 +1,9 @@
 local T = require "tests/support/test"
 T.addPackagePaths()
+-- The shared preview façade lives in Core's client tree. Keep the normal
+-- Hoomans paths, then append Core's client-root lookup without depending on a
+-- machine-specific runtime path.
+T.addPackagePaths({ { "PsychopatzCore", "client" } })
 
 local SquareRules = {
     GetObjectProperty = function() return nil end,

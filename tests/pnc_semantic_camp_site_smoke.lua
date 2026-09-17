@@ -129,6 +129,25 @@ T.truthy(Geometry.MatchesRoom(bedroomSquare, roomSite),
 T.falsy(Geometry.MatchesRoom(bathroomSquare, roomSite),
     "the selected room rejects another room in the building")
 
+local outsideCell = {
+    getBuildingList = function() return {} end,
+    getGridSquare = cell.getGridSquare,
+}
+local outsidePlayer = {
+    getX = function() return 12.5 end,
+    getY = function() return 10.5 end,
+    getZ = function() return 0 end,
+    getCurrentSquare = function() return outsideSquare end,
+}
+local outsideRoom, outsideReason = Geometry.FindNearestRoom(
+    outsideCell, outsidePlayer, {}, { radius = 8 })
+T.truthy(outsideRoom,
+    "a nearby loaded room resolves even when the building index is empty")
+T.equal(outsideReason, nil,
+    "nearby loaded-square room discovery has no failure reason")
+T.equal(outsideRoom.roomID, "bedroom-1",
+    "outside discovery returns the nearby room identity")
+
 PNC = {
     Const = {
         ORDER_CAMP = "camp",

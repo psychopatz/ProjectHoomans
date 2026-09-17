@@ -198,7 +198,63 @@ local blueprint = Opera.GetBlueprint("social.kiss_test")
 local plan = Opera.Anchors.BuildPlan(blueprint, player)
 T.truthy(plan, "transport test could not build anchor plan")
 
-local accepted = Client.Start("social.kiss_test", "npc-client", false)
+local previewAccepted = Client.StartPlacementPreview(
+    "social.kiss_test",
+    nil,
+    { npc = "npc-client" },
+    "social.kiss_test:preview_pending"
+)
+T.truthy(previewAccepted, "client did not send the placement preview request")
+T.equal(sent[#sent].payload.action, "preview_start",
+    "placement preview did not use the preview_start request action")
+T.equal(sent[#sent].payload.actors.npc, "npc-client",
+    "placement preview did not carry the actor-slot binding map")
+T.falsy(sent[#sent].payload.x,
+    "placement preview must not send an arbitrary world coordinate")
+local pendingStopAccepted = Client.StopPlacementPreview()
+T.truthy(pendingStopAccepted,
+    "pending placement preview could not be cancelled")
+T.equal(sent[#sent].payload.action, "preview_stop",
+    "pending placement preview cancellation did not use preview_stop")
+
+previewAccepted = Client.StartPlacementPreview(
+    "social.kiss_test",
+    nil,
+    { npc = "npc-client" },
+    "social.kiss_test:preview"
+)
+T.truthy(previewAccepted, "client could not restart the placement preview")
+
+local previewSnapshot = {
+    sessionId = "puppet:preview:1",
+    blueprintId = "social.kiss_test",
+    revision = 1,
+    phase = Opera.Phases.MOVING,
+    preview = true,
+    actors = {
+        player = { target = plan.actors.player },
+        npc = { target = plan.actors.npc },
+    },
+}
+Client.ReceiveState(previewSnapshot)
+T.equal(queue.current and queue.current.puppetOperaSessionId,
+    previewSnapshot.sessionId,
+    "placement preview did not create the owned native walk action")
+local previewStopAccepted = Client.StopPlacementPreview()
+T.truthy(previewStopAccepted,
+    "client did not send the placement preview stop request")
+T.equal(sent[#sent].payload.action, "preview_stop",
+    "placement preview stop used the wrong request action")
+previewSnapshot.revision = 2
+previewSnapshot.phase = Opera.Phases.RESTORED
+previewSnapshot.restored = true
+Client.ReceiveState(previewSnapshot)
+T.falsy(queue.current,
+    "placement preview stop left the native walk action owned")
+
+local accepted = Client.Start("social.kiss_test", "npc-client", false, nil, {
+    npc = "npc-client",
+})
 T.truthy(accepted, "client did not send the start request")
 T.equal(sent[#sent].command, PNC.Const.CMD_PUPPET_OPERA_REQUEST,
     "start did not use the Puppet Opera request command")
@@ -206,6 +262,8 @@ T.equal(sent[#sent].payload.action, "start",
     "start request action changed")
 T.equal(sent[#sent].payload.npcID, "npc-client",
     "start request NPC identity changed")
+T.equal(sent[#sent].payload.actors.npc, "npc-client",
+    "start request did not carry the actor-slot binding map")
 T.falsy(sent[#sent].payload.x,
     "client request must not send an arbitrary world coordinate")
 

@@ -171,28 +171,41 @@ end
 function ISPNCPuppetOperaDebugWindow:onResponsiveLayout()
     local scale = self.uiScale
     local pad = Layout.Pixels(10, scale)
+    local gap = Layout.Pixels(8, scale)
     local toolbarHeight = Layout.Pixels(30, scale)
-    local tabTop = Layout.Pixels(72, scale)
-    local bottom = Layout.Pixels(48, scale)
-    local blueprintWidth = Layout.Pixels(290, scale)
-    local npcWidth = Layout.Pixels(310, scale)
-    local topButtonWidth = Layout.Pixels(112, scale)
+    local width = self:getWidth()
+    local height = self:getHeight()
+    -- Keep editor controls below the native collapsable-window title bar.
+    -- Placing the combos at y=6 made them overlap the close/pin controls on
+    -- narrow windows, which looked like a clipped toolbar rather than a
+    -- resizable scene builder.
+    local rowY = self:titleBarHeight() + Layout.Pixels(6, scale)
+    local innerWidth = math.max(1, width - pad * 2)
+    local comboWidth = math.floor((innerWidth - gap) / 2)
+    Layout.SetBounds(self.blueprintCombo, pad, rowY,
+        comboWidth, toolbarHeight)
+    Layout.SetBounds(self.npcCombo, pad + comboWidth + gap, rowY,
+        math.max(1, innerWidth - comboWidth - gap), toolbarHeight)
 
-    Layout.SetBounds(self.blueprintCombo, pad, Layout.Pixels(7, scale),
-        blueprintWidth, toolbarHeight)
-    Layout.SetBounds(self.npcCombo,
-        pad + blueprintWidth + pad,
-        Layout.Pixels(7, scale), npcWidth, toolbarHeight)
-    local topX = pad + blueprintWidth + pad + npcWidth + pad
+    local topRowY = rowY + toolbarHeight + gap
+    local topButtonWidth = math.floor((innerWidth - gap * 2) / 3)
     for index, button in ipairs(self.topButtons) do
         Layout.SetBounds(button,
-            topX + (index - 1) * (topButtonWidth + pad),
-            Layout.Pixels(7, scale), topButtonWidth, toolbarHeight)
+            pad + (index - 1) * (topButtonWidth + gap),
+            topRowY,
+            topButtonWidth,
+            toolbarHeight)
     end
 
+    local descriptionY = topRowY + toolbarHeight + Layout.Pixels(4, scale)
+    local tabTop = descriptionY + Layout.Pixels(22, scale)
+    local bottomColumns = width >= Layout.Pixels(900, scale) and 6 or 3
+    local bottomRows = math.ceil(#self.controls / bottomColumns)
+    local bottom = bottomRows * toolbarHeight
+        + (bottomRows - 1) * gap + pad
     Layout.SetBounds(self.tabPanel, pad, tabTop,
-        self:getWidth() - pad * 2,
-        self:getHeight() - tabTop - bottom)
+        innerWidth,
+        math.max(1, height - tabTop - bottom))
     local viewHeight = math.max(1,
         self.tabPanel:getHeight() - self.tabPanel.tabHeight)
     for _, view in ipairs({
@@ -207,14 +220,18 @@ function ISPNCPuppetOperaDebugWindow:onResponsiveLayout()
         if view.onResponsiveLayout then view:onResponsiveLayout() end
     end
 
-    local buttonWidth = math.max(Layout.Pixels(110, scale),
-        math.floor((self:getWidth() - pad * 2) / #self.controls) - pad)
+    local buttonWidth = math.max(1,
+        math.floor((innerWidth - gap * (bottomColumns - 1))
+            / bottomColumns))
     for index, button in ipairs(self.controls) do
+        local row = math.floor((index - 1) / bottomColumns)
+        local column = (index - 1) % bottomColumns
         Layout.SetBounds(button,
-            pad + (index - 1) * (buttonWidth + pad),
-            self:getHeight() - bottom,
+            pad + column * (buttonWidth + gap),
+            height - bottom + row * (toolbarHeight + gap),
             buttonWidth, toolbarHeight)
     end
+    self.descriptionY = descriptionY
 end
 
 function ISPNCPuppetOperaDebugWindow:refreshBlueprints()
@@ -240,7 +257,7 @@ end
 
 function ISPNCPuppetOperaDebugWindow:refreshNPCs()
     local selectedID = Model.GetSelectedNPCID()
-    self.npcs = Model.GetNearbyNPCs(8)
+    self.npcs = Model.GetNearbyNPCs(Model.GetActorDiscoveryRadius())
     self.npcCombo:clear()
     local selectedIndex = nil
     for index, npc in ipairs(self.npcs) do
@@ -269,6 +286,7 @@ end
 function ISPNCPuppetOperaDebugWindow:refreshViews()
     self:refreshBlueprints()
     self:refreshNPCs()
+    if Model.RefreshPreflight then Model.RefreshPreflight(false) end
     self.layoutTab:refresh()
     self.playerAnimationTab:refreshCatalog()
     self.npcAnimationTab:refreshCatalog()
@@ -278,10 +296,16 @@ end
 
 function ISPNCPuppetOperaDebugWindow:setEditorStatus(message, isError)
     self.editorStatus = message and tostring(message) or nil
-    if isError then Model.State.editorError = self.editorStatus end
+    Model.State.editorError = isError and self.editorStatus or nil
+end
+
+function ISPNCPuppetOperaDebugWindow:clearEditorStatus()
+    self.editorStatus = nil
+    Model.State.editorError = nil
 end
 
 function ISPNCPuppetOperaDebugWindow:onBlueprintChanged()
+    self:clearEditorStatus()
     local index = tonumber(self.blueprintCombo.selected) or 1
     local blueprint = self.blueprints and self.blueprints[index]
     if blueprint then
@@ -292,9 +316,15 @@ function ISPNCPuppetOperaDebugWindow:onBlueprintChanged()
 end
 
 function ISPNCPuppetOperaDebugWindow:onNPCChanged()
+    self:clearEditorStatus()
     local index = tonumber(self.npcCombo.selected) or 1
     self.selectedNPC = self.npcs and self.npcs[index] or nil
-    Model.SetSelectedNPC(self.selectedNPC and self.selectedNPC.id or nil)
+    if self.selectedNPC then
+        local accepted, reason = Model.SelectLiveActor(self.selectedNPC.id)
+        if not accepted then self:setEditorStatus(reason, true) end
+    else
+        Model.SetSelectedNPC(nil)
+    end
     self:refreshViews()
 end
 
@@ -315,6 +345,10 @@ function ISPNCPuppetOperaDebugWindow:onTopAction(button)
         self:setEditorStatus(id .. "_complete")
     end
     self:refreshViews()
+    local snapshot = Client.GetSnapshot and Client.GetSnapshot() or nil
+    if accepted and snapshot and snapshot.preview == true then
+        self:requestPlacementPreview()
+    end
 end
 
 function ISPNCPuppetOperaDebugWindow:prepareRuntime()
@@ -338,22 +372,61 @@ function ISPNCPuppetOperaDebugWindow:prepareRuntime()
     return normalized
 end
 
+function ISPNCPuppetOperaDebugWindow:requestPlacementPreview(force)
+    if not Client.StartPlacementPreview then
+        self:setEditorStatus("placement_preview_unavailable", true)
+        return false
+    end
+    local schemaOK, runtimeReason, normalized = Model.GetValidation()
+    if not schemaOK then
+        self:setEditorStatus(runtimeReason, true)
+        return false
+    end
+    if runtimeReason then
+        self:setEditorStatus(
+            "not_server_approved:" .. tostring(runtimeReason),
+            true
+        )
+        return false
+    end
+    local bindings, bindingReason = Model.GetRuntimeActorBindings()
+    if not bindings then
+        self:setEditorStatus(
+            "placement_preview_blocked:" .. tostring(bindingReason),
+            true
+        )
+        return false
+    end
+    local key = Model.GetBlueprintID() .. ":"
+        .. tostring(Model.GetChangeSerial())
+    local accepted, reason = Client.StartPlacementPreview(
+        Model.GetBlueprintID(),
+        normalized,
+        bindings,
+        key,
+        force == true
+    )
+    if not accepted then self:setEditorStatus(reason, true) end
+    return accepted == true
+end
+
 function ISPNCPuppetOperaDebugWindow:onControl(button)
     local id = button and button.internal or ""
-    local npc = self.selectedNPC or Model.GetSelectedNPC()
     local blueprintID = Model.GetBlueprintID()
     local definition
     if id == "play" or id == "replay" then
-        if not npc then
-            self:setEditorStatus(TEXT_NO_NPC, true)
-        else
-            definition = self:prepareRuntime()
-            if definition then
-                if id == "play" then
-                    Client.Start(blueprintID, npc.id, self.loopEnabled, definition)
-                else
-                    Client.Replay(blueprintID, npc.id, self.loopEnabled, definition)
-                end
+        self:clearEditorStatus()
+        definition = self:prepareRuntime()
+        if definition then
+            local bindings, bindingReason = Model.GetRuntimeActorBindings()
+            if not bindings then
+                self:setEditorStatus(bindingReason, true)
+            elseif id == "play" then
+                Client.Start(blueprintID, nil, self.loopEnabled,
+                    definition, bindings)
+            else
+                Client.Replay(blueprintID, nil, self.loopEnabled,
+                    definition, bindings)
             end
         end
     elseif id == "loop" then
@@ -368,8 +441,7 @@ function ISPNCPuppetOperaDebugWindow:onControl(button)
         Client.DumpTrace()
     elseif id == "clear" then
         Client.ClearStatus()
-        self.editorStatus = nil
-        Model.State.editorError = nil
+        self:clearEditorStatus()
     end
     self:refreshViews()
 end
@@ -377,33 +449,56 @@ end
 function ISPNCPuppetOperaDebugWindow:prerender()
     PsychopatzWindow.prerender(self)
     self.refreshCounter = self.refreshCounter + 1
-    if self.refreshCounter % 10 == 0 then self:refreshViews() end
+    if self.refreshCounter % 10 == 0
+        and not (self.layoutTab and self.layoutTab.liveDragPending)
+    then
+        self:refreshViews()
+        if Client.RefreshPlacementPreview then
+            Client.RefreshPlacementPreview(false)
+        end
+    end
 end
 
 function ISPNCPuppetOperaDebugWindow:render()
     PsychopatzWindow.render(self)
-    local status, errorText = Model.GetStatus()
-    local message = self.editorStatus and ("  " .. self.editorStatus) or ""
+    local status, runtimeError = Client.GetStatus()
+    local editorMessage = self.editorStatus
+        or (Model.GetEditorStatus and Model.GetEditorStatus())
+        or nil
+    local runtimeLabel = tr("UI_PNC_PuppetOpera_RuntimeStatus", "runtime")
+    local editorLabel = tr("UI_PNC_PuppetOpera_EditorStatus", "editor")
+    local message = runtimeLabel .. "=" .. tostring(status)
+        .. (runtimeError and " " .. tostring(runtimeError) or "")
+    if editorMessage then
+        message = message .. " | " .. editorLabel .. "="
+            .. tostring(editorMessage)
+    end
+    local description = Layout.Ellipsize(TEXT_DESCRIPTION, UIFont.Small,
+        math.floor(self:getWidth() * 0.54))
     self:drawText(
-        TEXT_DESCRIPTION,
-        12, 34,
+        description,
+        12, self.descriptionY or 34,
         0.62, 0.76, 0.84, 1,
         UIFont.Small
     )
     self:drawTextRight(
-        tostring(status) .. message
-            .. (errorText and "  " .. tostring(errorText) or ""),
+        Layout.Ellipsize(message, UIFont.Small,
+            math.floor(self:getWidth() * 0.42)),
         self:getWidth() - 12,
-        34,
-        errorText and 1.00 or 0.72,
-        errorText and 0.55 or 0.78,
-        errorText and 0.55 or 0.84,
+        self.descriptionY or 34,
+        runtimeError and 1.00 or editorMessage and 1.00 or 0.72,
+        runtimeError and 0.55 or editorMessage and 0.55 or 0.78,
+        runtimeError and 0.55 or editorMessage and 0.55 or 0.84,
         1,
         UIFont.Small
     )
 end
 
 function ISPNCPuppetOperaDebugWindow:close()
+    if Client and Client.StopPlacementPreview then
+        Client.StopPlacementPreview()
+    end
+    if Client and Client.StopPreview then Client.StopPreview() end
     self:setVisible(false)
     self:removeFromUIManager()
     WindowAPI.instance = nil

@@ -20,6 +20,8 @@ local SquareRules
 local loadedRules, loadedSquareRules = pcall(
     require, "PsychopatzCore/World/PsychopatzSquareRules")
 if loadedRules then SquareRules = loadedSquareRules end
+local CampSite = PNC.Semantics.CampSite
+    or require "PNC/Semantics/PNC_SemanticCampSite"
 
 Observer.VERSION = 2
 Observer.DEFAULT_CACHE_MS = 500
@@ -172,11 +174,14 @@ local function observationFor(output, seen, object, square, originZ,
     metadata.special = specialKind
         or (call(object, "isCampfire") == true and "campfire" or nil)
     seen[object] = true
-    local keyPrefix = metadata.special == "campfire"
-        and "campfire" or "world_object"
-    local observationKey = keyPrefix .. ":" .. tostring(x) .. ":"
-        .. tostring(y) .. ":" .. tostring(z) .. ":"
-        .. tostring(objectIndex or 0)
+    local observationKey
+    if metadata.special == "campfire" then
+        observationKey = CampSite.CampfireKey(x, y, z)
+    else
+        observationKey = "world_object:" .. tostring(x) .. ":"
+            .. tostring(y) .. ":" .. tostring(z) .. ":"
+            .. tostring(objectIndex or 0)
+    end
     local observation = {
         x = x,
         y = y,

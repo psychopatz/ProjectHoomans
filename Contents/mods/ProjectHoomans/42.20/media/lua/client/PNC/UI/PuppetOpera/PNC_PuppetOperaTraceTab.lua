@@ -48,7 +48,8 @@ function ISPNCPuppetOperaTraceTab:createChildren()
     self.snapshot = UI.CreateKeyValueList(self, {
         itemHeight = 25,
         valueXRatio = 0.34,
-        ellipsize = false,
+        valueXMax = 112,
+        ellipsize = true,
         labelX = 8,
         labelY = 6,
         valueY = 6,
@@ -94,11 +95,14 @@ end
 function ISPNCPuppetOperaTraceTab:onResponsiveLayout()
     local scale = self.ownerWindow and self.ownerWindow.uiScale
     local pad = Layout.Pixels(8, scale)
-    local split = math.floor(self:getWidth() * 0.64)
+    local split = math.floor(self:getWidth() * 0.60)
+    split = math.max(Layout.Pixels(220, scale),
+        math.min(split, self:getWidth() - Layout.Pixels(190, scale)))
     Layout.SetBounds(self.trace, pad, pad,
-        split - pad * 2, self:getHeight() - pad * 2)
+        math.max(1, split - pad * 2), self:getHeight() - pad * 2)
     Layout.SetBounds(self.snapshot, split + pad, pad,
-        self:getWidth() - split - pad * 2, self:getHeight() - pad * 2)
+        math.max(1, self:getWidth() - split - pad * 2),
+        self:getHeight() - pad * 2)
 end
 
 return ISPNCPuppetOperaTraceTab

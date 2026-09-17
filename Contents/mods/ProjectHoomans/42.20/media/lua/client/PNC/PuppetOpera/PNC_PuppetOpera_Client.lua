@@ -4,6 +4,7 @@ PNC = PNC or {}
 PNC.PuppetOpera = PNC.PuppetOpera or {}
 
 local Opera = PNC.PuppetOpera
+require "PNC/Debug/PNC_AnimationDebugPlayer"
 local Anchors = Opera.Anchors
     or require "PNC/Core/PuppetOpera/PNC_PuppetOpera_Anchors"
 local Movement = Opera.PlayerMovement
@@ -20,6 +21,11 @@ Client.State = Client.State or {
     trace = {},
     status = "idle",
     error = nil,
+    preflight = nil,
+    preflightKey = nil,
+    preflightRequestedAt = 0,
+    placementPreviewKey = nil,
+    placementPreviewRefreshAt = 0,
     movementSessionId = nil,
     movementRevision = nil,
     movementAckRevision = nil,
@@ -32,11 +38,15 @@ Client.State = Client.State or {
     beatFinishedAck = false,
     pendingMovementRelease = nil,
     pendingAnimationRelease = nil,
+    previewPlayerOwner = nil,
+    previewNPCID = nil,
+    previewNPCBody = nil,
 }
 
 local State = Client.State
 local Core = PNC.Core
 local Const = PNC.Const or {}
+local stopOwnedLocals
 
 local function timestamp()
     return Core and Core.Now and Core.Now() or 0
@@ -83,7 +93,9 @@ local function request(action, payload)
     local authority = Opera.Authority
     if authority and authority.HandleRequest then
         local accepted, result = authority.HandleRequest(player, payload)
-        if type(result) == "table" and result.sessionId then
+        if type(result) == "table" and result.preflight then
+            Client.ReceivePreflight(result.preflight)
+        elseif type(result) == "table" and result.sessionId then
             Client.ReceiveState(Opera.BuildSnapshot(result, false))
         end
         if accepted ~= true then setError(result) end
@@ -97,34 +109,163 @@ function Client.Request(action, payload)
     return request(action, payload)
 end
 
-function Client.Start(blueprintID, npcID, loopEnabled, definition)
+function Client.Start(blueprintID, npcID, loopEnabled, definition,
+    actorBindings)
     State.error = nil
     State.status = "requesting"
+    if State.snapshot and State.snapshot.preview
+        and State.snapshot.sessionId
+    then
+        stopOwnedLocals(State.snapshot.sessionId)
+    end
+    -- A preview is owned by this builder, so it is safe to release before a
+    -- server session claims the same actor.  This also prevents the Core
+    -- player controller's preview lease from blocking the first beat.
+    Client.StopPreview()
     return request("start", {
         blueprintId = tostring(blueprintID or "social.kiss_test"),
-        npcID = tostring(npcID or ""),
+        npcID = npcID and tostring(npcID) or nil,
+        actors = type(actorBindings) == "table" and actorBindings or nil,
         loop = loopEnabled == true,
         definition = type(definition) == "table" and definition or nil,
     })
 end
 
-function Client.Replay(blueprintID, npcID, loopEnabled, definition)
+function Client.Replay(blueprintID, npcID, loopEnabled, definition,
+    actorBindings)
     State.error = nil
     State.status = "requesting"
+    if State.snapshot and State.snapshot.preview
+        and State.snapshot.sessionId
+    then
+        stopOwnedLocals(State.snapshot.sessionId)
+    end
+    Client.StopPreview()
     return request("replay", {
         blueprintId = tostring(blueprintID or "social.kiss_test"),
-        npcID = tostring(npcID or ""),
+        npcID = npcID and tostring(npcID) or nil,
+        actors = type(actorBindings) == "table" and actorBindings or nil,
         loop = loopEnabled == true,
         definition = type(definition) == "table" and definition or nil,
     })
+end
+
+function Client.Preflight(blueprintID, definition, actorBindings, requestKey,
+    force)
+    local current = timestamp()
+    local key = tostring(requestKey or blueprintID or "")
+    local refreshMs = Opera.Config and tonumber(
+        Opera.Config.preflightRefreshMs
+    ) or 1000
+    if not force
+        and State.preflightKey == key
+        and current - (tonumber(State.preflightRequestedAt) or 0)
+            < refreshMs
+    then
+        return true, "preflight_cached"
+    end
+    State.preflightKey = key
+    State.preflightRequestedAt = current
+    if not State.snapshot or not State.snapshot.sessionId then
+        State.status = "preflight"
+        State.error = nil
+    end
+    return request("preflight", {
+        blueprintId = tostring(blueprintID or "social.kiss_test"),
+        actors = type(actorBindings) == "table" and actorBindings or {},
+        definition = type(definition) == "table" and definition or nil,
+    })
+end
+
+function Client.StartPlacementPreview(blueprintID, definition, actorBindings,
+    requestKey, force)
+    local key = tostring(requestKey or blueprintID or "")
+    local snapshot = State.snapshot
+    if not force
+        and State.placementPreviewKey == key
+        and snapshot and snapshot.preview == true
+        and snapshot.sessionId
+    then
+        return true, "placement_preview_cached"
+    end
+    if snapshot and snapshot.preview == true and snapshot.sessionId then
+        stopOwnedLocals(snapshot.sessionId)
+    end
+    State.placementPreviewKey = key
+    State.placementPreviewRefreshAt = timestamp()
+    State.error = nil
+    State.status = "preview_requesting"
+    return request("preview_start", {
+        blueprintId = tostring(blueprintID or "social.kiss_test"),
+        actors = type(actorBindings) == "table" and actorBindings or {},
+        definition = type(definition) == "table" and definition or nil,
+    })
+end
+
+function Client.StopPlacementPreview()
+    local snapshot = State.snapshot
+    if not snapshot or snapshot.preview ~= true or not snapshot.sessionId then
+        if State.placementPreviewKey then
+            local accepted, result = request("preview_stop", {})
+            State.placementPreviewKey = nil
+            State.placementPreviewRefreshAt = 0
+            if accepted then
+                State.status = "idle"
+                State.error = nil
+            end
+            return accepted, result
+        end
+        State.placementPreviewKey = nil
+        return false, "placement_preview_missing"
+    end
+    stopOwnedLocals(snapshot.sessionId)
+    local accepted, result = request("preview_stop", {
+        sessionId = snapshot.sessionId,
+    })
+    if accepted and result == "preview_stopped" then
+        State.snapshot = nil
+        State.status = "idle"
+        State.error = nil
+        State.placementPreviewKey = nil
+    end
+    return accepted, result
+end
+
+function Client.RefreshPlacementPreview(force)
+    local snapshot = State.snapshot
+    if not snapshot or snapshot.preview ~= true or not snapshot.sessionId then
+        return false, "placement_preview_missing"
+    end
+    local current = timestamp()
+    if not force and current - (tonumber(State.placementPreviewRefreshAt)
+        or 0) < 5000
+    then
+        return true, "placement_preview_cached"
+    end
+    State.placementPreviewRefreshAt = current
+    return request("preview_refresh", { sessionId = snapshot.sessionId })
 end
 
 function Client.Stop()
     local snapshot = State.snapshot
     if not snapshot or not snapshot.sessionId then
-        return false, "puppet_opera_session_missing"
+        local pendingPreviewAccepted, pendingPreviewResult =
+            Client.StopPlacementPreview()
+        if pendingPreviewAccepted
+            or pendingPreviewResult ~= "placement_preview_missing"
+        then
+            return pendingPreviewAccepted, pendingPreviewResult
+        end
+        local previewStopped = Client.StopPreview()
+        return previewStopped, previewStopped
+            and "preview_stopped" or "puppet_opera_session_missing"
     end
-    return request("stop", { sessionId = snapshot.sessionId })
+    if snapshot.preview == true then
+        return Client.StopPlacementPreview()
+    end
+    local accepted, result = request("stop", { sessionId = snapshot.sessionId })
+    Client.StopPreview()
+    return accepted, result
 end
 
 function Client.DumpTrace()
@@ -142,12 +283,125 @@ function Client.ClearStatus()
     State.error = nil
     if State.snapshot and State.snapshot.phase then
         State.status = State.snapshot.phase
+    elseif State.preflight then
+        State.status = State.preflight.ready == true and "ready" or "blocked"
     else
         State.status = "idle"
     end
 end
 
-local function stopOwnedLocals(sessionID)
+local PREVIEW_PLAYER_OWNER = "ProjectHoomans.PuppetOperaPreview"
+local PREVIEW_NPC_OWNER_KEY = "PNC_PuppetOperaPreviewOwner"
+local PREVIEW_NPC_OWNER = "ProjectHoomans.PuppetOperaPreview"
+
+local function previewNPCMarker(body)
+    local modData = body and body.getModData and body:getModData() or nil
+    return modData and tostring(modData[PREVIEW_NPC_OWNER_KEY] or "")
+        or ""
+end
+
+local function markPreviewNPC(body)
+    local modData = body and body.getModData and body:getModData() or nil
+    if modData then modData[PREVIEW_NPC_OWNER_KEY] = PREVIEW_NPC_OWNER end
+end
+
+local function clearPreviewNPCMarker(body)
+    local modData = body and body.getModData and body:getModData() or nil
+    if modData and previewNPCMarker(body) == PREVIEW_NPC_OWNER then
+        modData[PREVIEW_NPC_OWNER_KEY] = nil
+    end
+end
+
+function Client.PreviewPlayer(entry)
+    if type(entry) ~= "table" then return false, "player_preview_entry_missing" end
+    local controller = PsychopatzCore
+        and PsychopatzCore.Animation
+        and PsychopatzCore.Animation.Player
+        or nil
+    if not controller or not controller.Play then
+        return false, "player_animation_controller_unavailable"
+    end
+    local runtime = controller.Runtime and controller.Runtime() or nil
+    if runtime and runtime.active == true then
+        if tostring(runtime.owner or "") ~= PREVIEW_PLAYER_OWNER then
+            return false, "player_animation_owned_by_other"
+        end
+        local handle = controller.GetActiveHandle
+            and controller.GetActiveHandle() or nil
+        if controller.Stop then controller.Stop(handle, "preview_replaced") end
+    end
+    local player = controller.ResolveLocalPlayer
+        and controller.ResolveLocalPlayer() or localPlayer()
+    local accepted, reason = controller.Play(player, entry, {
+        owner = PREVIEW_PLAYER_OWNER,
+        loop = false,
+        actionEvents = {},
+    })
+    if accepted == true then State.previewPlayerOwner = PREVIEW_PLAYER_OWNER end
+    return accepted == true, reason
+end
+
+function Client.PreviewNPC(entry, npcID, body, record)
+    if type(entry) ~= "table" then return false, "npc_preview_entry_missing" end
+    local debugPlayer = PNC.AnimationDebugPlayer
+    if not debugPlayer or not debugPlayer.PlayXML then
+        return false, "npc_animation_debug_player_unavailable"
+    end
+    local id = tostring(npcID or "")
+    local active = debugPlayer.active
+    if active then
+        if tostring(active.npcId or "") ~= id
+            or State.previewNPCID ~= id
+            or previewNPCMarker(active.body) ~= PREVIEW_NPC_OWNER
+        then
+            return false, "npc_preview_owned_by_other"
+        end
+    end
+    if active and debugPlayer.Stop then
+        clearPreviewNPCMarker(active.body)
+        debugPlayer.Stop("preview_replaced")
+    end
+    local accepted, reason = debugPlayer.PlayXML(entry, id, body, record)
+    if accepted == true then
+        State.previewNPCID = id
+        State.previewNPCBody = debugPlayer.active
+            and debugPlayer.active.body or body
+        markPreviewNPC(State.previewNPCBody)
+    end
+    return accepted == true, reason
+end
+
+function Client.StopPreview()
+    local stopped = false
+    local controller = PsychopatzCore
+        and PsychopatzCore.Animation
+        and PsychopatzCore.Animation.Player
+        or nil
+    local runtime = controller and controller.Runtime and controller.Runtime()
+        or nil
+    if controller and runtime and runtime.active
+        and tostring(runtime.owner or "") == PREVIEW_PLAYER_OWNER
+    then
+        local handle = controller.GetActiveHandle
+            and controller.GetActiveHandle() or nil
+        stopped = controller.Stop(handle, "preview_stopped") == true or stopped
+    end
+    local debugPlayer = PNC.AnimationDebugPlayer
+    if debugPlayer and debugPlayer.active
+        and tostring(debugPlayer.active.npcId or "")
+            == tostring(State.previewNPCID or "")
+        and previewNPCMarker(debugPlayer.active.body) == PREVIEW_NPC_OWNER
+    then
+        clearPreviewNPCMarker(debugPlayer.active.body)
+        stopped = debugPlayer.Stop("preview_stopped") == true or stopped
+    end
+    State.previewPlayerOwner = nil
+    State.previewNPCID = nil
+    State.previewNPCBody = nil
+    return stopped
+end
+
+stopOwnedLocals = function(sessionID)
     if not sessionID then return end
     local movementStopped = Movement.Stop(sessionID)
     local animationStopped = Animation.Stop(sessionID)
@@ -199,6 +453,46 @@ local function blueprintBeat(snapshot)
     return blueprint and index and blueprint.beats[index] or nil
 end
 
+local function localActor(snapshot)
+    for actorID, actor in pairs(snapshot and snapshot.actors or {}) do
+        if actor and actor.kind == "local_player" then
+            return tostring(actorID), actor
+        end
+    end
+    -- Older snapshots predate generic actor metadata.
+    if snapshot and snapshot.actors and snapshot.actors.player then
+        return "player", snapshot.actors.player
+    end
+    return nil, nil
+end
+
+local function actorTarget(snapshot, actor)
+    local targetID = actor and actor.target and actor.target.faceTarget
+        or nil
+    if not targetID and snapshot and snapshot.actors
+        and snapshot.actors.npc
+    then
+        return snapshot.actors.npc.target
+    end
+    local targetActor = targetID and snapshot and snapshot.actors
+        and snapshot.actors[tostring(targetID)] or nil
+    return targetActor and targetActor.target or nil
+end
+
+function Client.ReceivePreflight(preflight)
+    if type(preflight) ~= "table" then return false end
+    State.preflight = preflight
+    State.preflightKey = tostring(
+        preflight.requestKey or State.preflightKey or ""
+    )
+    State.preflightRequestedAt = timestamp()
+    if not State.snapshot or not State.snapshot.sessionId then
+        State.status = preflight.ready == true and "ready" or "blocked"
+        State.error = nil
+    end
+    return true
+end
+
 function Client.ReceiveState(snapshot)
     if type(snapshot) ~= "table" then return false end
     local previous = State.snapshot
@@ -210,35 +504,45 @@ function Client.ReceiveState(snapshot)
     end
     State.snapshot = snapshot
     if snapshot.trace then State.trace = snapshot.trace end
-    State.status = tostring(snapshot.phase or "idle")
+    if snapshot.preflight then Client.ReceivePreflight(snapshot.preflight) end
+    if snapshot.preflight and not snapshot.sessionId then
+        State.status = snapshot.preflight.ready == true
+            and "ready" or "blocked"
+    else
+        State.status = tostring(snapshot.phase or "idle")
+    end
     State.error = snapshot.lastError
     if finalPhase(snapshot.phase) then
         stopOwnedLocals(snapshot.sessionId)
         if snapshot.trace then State.trace = snapshot.trace end
+        State.placementPreviewKey = nil
+        State.placementPreviewRefreshAt = 0
         return true
     end
     if previous and previous.sessionId ~= snapshot.sessionId then
         resetTransient()
     end
+    local localActorID, localActorState = localActor(snapshot)
     if snapshot.phase == Opera.Phases.MOVING then
-        if State.movementSessionId ~= snapshot.sessionId
-            or State.movementRevision ~= snapshot.revision
+        if localActorState
+            and (State.movementSessionId ~= snapshot.sessionId
+                or State.movementRevision ~= snapshot.revision)
         then
-            local playerTarget = snapshot.actors
-                and snapshot.actors.player
-                and snapshot.actors.player.target
-            local accepted, reason = Movement.Start(
-                snapshot.sessionId,
-                playerTarget,
-                {}
-            )
-            if not accepted then
-                setError(reason)
-                request("player_cancelled", {
-                    sessionId = snapshot.sessionId,
-                    reason = reason,
-                })
-                return false
+            local playerTarget = localActorState.target
+            if playerTarget then
+                local accepted, reason = Movement.Start(
+                    snapshot.sessionId,
+                    playerTarget,
+                    {}
+                )
+                if not accepted then
+                    setError(reason)
+                    request("player_cancelled", {
+                        sessionId = snapshot.sessionId,
+                        reason = reason,
+                    })
+                    return false
+                end
             end
             State.movementSessionId = snapshot.sessionId
             State.movementRevision = snapshot.revision
@@ -249,7 +553,9 @@ function Client.ReceiveState(snapshot)
             })
         end
     elseif snapshot.phase == Opera.Phases.FACING then
-        if State.movementSessionId == snapshot.sessionId then
+        if localActorState
+            and State.movementSessionId == snapshot.sessionId
+        then
             local stopped, stopReason = Movement.Stop(snapshot.sessionId)
             if stopped ~= true and Movement.IsOwned(snapshot.sessionId) then
                 local observed, movementStatus = Movement.Observe(
@@ -268,12 +574,11 @@ function Client.ReceiveState(snapshot)
             State.movementSessionId = nil
             State.movementRevision = nil
         end
-        if State.facingSessionId ~= snapshot.sessionId
-            or State.facingRevision ~= snapshot.revision
+        if localActorState
+            and (State.facingSessionId ~= snapshot.sessionId
+                or State.facingRevision ~= snapshot.revision)
         then
-            local npcTarget = snapshot.actors
-                and snapshot.actors.npc
-                and snapshot.actors.npc.target
+            local npcTarget = actorTarget(snapshot, localActorState)
             local accepted, reason = Movement.Face(npcTarget)
             if not accepted then
                 setError(reason)
@@ -378,6 +683,14 @@ function Client.GetStatus()
     return State.status, State.error
 end
 
+function Client.GetPreflight()
+    return State.preflight
+end
+
+function Client.GetLocalPlayer()
+    return localPlayer()
+end
+
 function Client.GetSnapshot()
     return State.snapshot
 end
@@ -421,9 +734,8 @@ function Client.Pump()
         and State.facingSessionId == sessionID
     then
         local body = Movement.GetPlayer()
-        local target = snapshot.actors
-            and snapshot.actors.npc
-            and snapshot.actors.npc.target
+        local _, actor = localActor(snapshot)
+        local target = actorTarget(snapshot, actor)
         if Anchors.IsFacing(body, target, 0.70) then
             if State.facingRevision ~= -snapshot.revision then
                 State.facingRevision = -snapshot.revision
@@ -434,6 +746,8 @@ function Client.Pump()
             end
         end
     elseif snapshot.phase == Opera.Phases.PLAYING then
+        local localActorID, localActorState = localActor(snapshot)
+        if not localActorID or not localActorState then return end
         local beat = blueprintBeat(snapshot)
         if not beat then
             setError("player_beat_missing")
@@ -443,10 +757,22 @@ function Client.Pump()
             })
             return
         end
+        local track = Blueprints.GetTrack
+            and Blueprints.GetTrack(beat, localActorID)
+            or beat.tracks and beat.tracks[localActorID]
+            or beat.player
+        if not track then
+            setError("player_track_missing")
+            request("player_cancelled", {
+                sessionId = sessionID,
+                reason = State.error,
+            })
+            return
+        end
         if not State.beatStartedAck
             and timestamp() >= tonumber(snapshot.beatStartAt or 0)
         then
-            local accepted, reason = Animation.Start(sessionID, beat)
+            local accepted, reason = Animation.Start(sessionID, beat, track)
             if not accepted then
                 setError(reason)
                 request("player_cancelled", {
@@ -494,6 +820,11 @@ function Client.Reset()
     State.trace = {}
     State.status = "idle"
     State.error = nil
+    State.preflight = nil
+    State.preflightKey = nil
+    State.preflightRequestedAt = 0
+    State.placementPreviewKey = nil
+    State.placementPreviewRefreshAt = 0
 end
 
 if PNC.Client and PNC.Client.Internal

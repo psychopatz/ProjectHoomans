@@ -283,6 +283,30 @@ function CampSite.NormalizeScope(value)
     return nil
 end
 
+-- Campfires are represented as GlobalObjects on the client, but the server
+-- validates them from their loaded square.  Keep one coordinate identity at
+-- the shared semantic boundary so a client hint cannot become stale merely
+-- because the two runtimes chose different object-index suffixes.
+function CampSite.CampfireKey(x, y, z)
+    x = tonumber(x)
+    y = tonumber(y)
+    z = tonumber(z) or 0
+    if x == nil or y == nil then return nil end
+    return "campfire@" .. tostring(math.floor(x)) .. ":"
+        .. tostring(math.floor(y)) .. ":" .. tostring(math.floor(z))
+end
+
+function CampSite.CampfireCoordinateKey(value)
+    local x
+    local y
+    local z
+    value = tostring(value or "")
+    x, y, z = string.match(value,
+        "^campfire[@:]([%-]?%d+):([%-]?%d+):([%-]?%d+)")
+    if not x then return nil end
+    return CampSite.CampfireKey(x, y, z)
+end
+
 function CampSite.NormalizeBounds(value)
     if type(value) ~= "table" then return nil end
     local minX = tonumber(value.minX or value.x)

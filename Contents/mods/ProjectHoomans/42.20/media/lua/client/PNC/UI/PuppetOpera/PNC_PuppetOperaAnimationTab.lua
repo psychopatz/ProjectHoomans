@@ -10,6 +10,18 @@ local UI = PsychopatzCore.UI
 local Layout = UI.Layout
 local addDetail = UI.AddKeyValue
 
+local function resizeRows(list, itemHeight)
+    if not list then return end
+    itemHeight = math.max(1, math.floor(itemHeight))
+    list.itemheight = itemHeight
+    for _, item in ipairs(list.items or {}) do
+        item.height = itemHeight
+    end
+    if list.setScrollHeight then
+        list:setScrollHeight(#(list.items or {}) * itemHeight)
+    end
+end
+
 local function tr(key, fallback)
     local translation = PNC.Translation
     local value = translation and translation.GetKey
@@ -48,8 +60,17 @@ local function drawCatalogItem(list, y, row, alternate)
         list:drawRect(0, y, list:getWidth(), list.itemheight,
             0.12, 0.16, 0.18, 0.20)
     end
-    local title = tostring(entry.node or entry.file or "?")
-    local clip = tostring(entry.anim or "(no direct clip)")
+    local width = math.max(32, list:getWidth() - 16)
+    local title = Layout.Ellipsize(
+        tostring(entry.node or entry.file or "?"),
+        UIFont.Small,
+        width
+    )
+    local clip = Layout.Ellipsize(
+        tostring(entry.anim or "(no direct clip)"),
+        UIFont.Small,
+        width
+    )
     local selector = selectorText(entry)
     list:drawText(title, 8, y + 4,
         entry.playable and 0.92 or 0.62,
@@ -58,7 +79,11 @@ local function drawCatalogItem(list, y, row, alternate)
     list:drawText(clip, 8, y + 21,
         0.62, 0.82, 0.95, 1, UIFont.Small)
     list:drawText(
-        selector ~= "" and selector or tostring(entry.path or "-"),
+        Layout.Ellipsize(
+            selector ~= "" and selector or tostring(entry.path or "-"),
+            UIFont.Small,
+            math.max(32, list:getWidth() - 16)
+        ),
         8, y + 38,
         0.66, 0.70, 0.74, 1, UIFont.Small
     )
@@ -108,7 +133,8 @@ function ISPNCPuppetOperaAnimationTab:createChildren()
     self.details = UI.CreateKeyValueList(self, {
         itemHeight = 25,
         valueXRatio = 0.34,
-        ellipsize = false,
+        valueXMax = 108,
+        ellipsize = true,
         labelX = 8,
         labelY = 6,
         valueY = 6,
@@ -123,6 +149,24 @@ function ISPNCPuppetOperaAnimationTab:createChildren()
             return ISPNCPuppetOperaAnimationTab.onAction(self, button)
         end),
         variant = "selected",
+    })
+    self.previewButton = UI.CreateButton(self, {
+        id = "preview",
+        title = tr("UI_PNC_PuppetOpera_Preview", "Preview selected"),
+        target = self,
+        onclick = UI.ButtonCallback(function(button)
+            return ISPNCPuppetOperaAnimationTab.onAction(self, button)
+        end),
+        variant = "quiet",
+    })
+    self.stopPreviewButton = UI.CreateButton(self, {
+        id = "stop_preview",
+        title = tr("UI_PNC_PuppetOpera_StopPreview", "Stop preview"),
+        target = self,
+        onclick = UI.ButtonCallback(function(button)
+            return ISPNCPuppetOperaAnimationTab.onAction(self, button)
+        end),
+        variant = "danger",
     })
     self.catalogName = "player"
     self.ownerWindow = nil
@@ -235,6 +279,15 @@ function ISPNCPuppetOperaAnimationTab:refreshDetails()
         return
     end
     local model = self.ownerWindow.model
+    local approved = self.catalogName == "player"
+        and model.IsPlayerEntryServerApproved(entry)
+        or model.IsNPCEntryServerApproved(entry)
+    local actorID = model.GetActorForCatalog(self.catalogName)
+    addDetail(self.details, "Scene actor", actorID or "No matching actor slot",
+        actorID == nil)
+    if actorID then
+        addDetail(self.details, "Assignment", model.GetSelectionSummary(actorID))
+    end
     addDetail(self.details, "Catalog", self.catalogName)
     addDetail(self.details, "State", entry.state)
     addDetail(self.details, "Source", entry.source or entry.folder)
@@ -247,9 +300,9 @@ function ISPNCPuppetOperaAnimationTab:refreshDetails()
         addDetail(self.details, "Mode", entry.mode)
         addDetail(self.details, "Entry ID", model.PlayerEntryID(entry))
         addDetail(self.details, "MP policy",
-            model.IsPlayerEntryServerApproved(entry)
+            approved
                 and "server-approved" or "local preview only",
-            not model.IsPlayerEntryServerApproved(entry))
+            not approved)
     else
         local bump = model.EntryBumpType(entry)
         addDetail(self.details, "BumpType", bump or "-", not bump)
@@ -260,9 +313,9 @@ function ISPNCPuppetOperaAnimationTab:refreshDetails()
             not entry.puppetOperaDirect)
         addDetail(self.details, "Entry ID", model.NPCEntryID(entry))
         addDetail(self.details, "MP policy",
-            model.IsNPCEntryServerApproved(entry)
+            approved
                 and "server-approved" or "local preview only",
-            not model.IsNPCEntryServerApproved(entry))
+            not approved)
     end
     addDetail(self.details, "Playback",
         (entry.looped and "looped" or "one-shot") .. " @ "
@@ -274,8 +327,49 @@ function ISPNCPuppetOperaAnimationTab:onAction(button)
     if not self.ownerWindow then return false end
     local entry = self:getSelectedEntry()
     if not entry then return false end
-    local actorID = self.catalogName == "player" and "player" or "npc"
-    local accepted, reason = self.ownerWindow.model.AssignAnimation(actorID, entry)
+    local model = self.ownerWindow.model
+    if button and button.internal == "preview" then
+        local actorID = model.GetActorForCatalog(self.catalogName)
+        if not actorID then
+            self.ownerWindow:setEditorStatus("no_matching_scene_actor", true)
+            return false
+        end
+        local accepted
+        local reason
+        if self.catalogName == "player" then
+            accepted, reason = PNC.PuppetOpera.Client.PreviewPlayer(entry)
+        else
+            local npc = model.GetNPCForActor(actorID)
+            if not npc or not npc.zombie then
+                self.ownerWindow:setEditorStatus("scene_actor_npc_not_local", true)
+                return false
+            end
+            accepted, reason = PNC.PuppetOpera.Client.PreviewNPC(
+                entry,
+                npc.id,
+                npc.zombie,
+                npc.record
+            )
+        end
+        self.ownerWindow:setEditorStatus(
+            accepted and "preview_started" or reason,
+            not accepted
+        )
+        self.ownerWindow:refreshViews()
+        return accepted == true
+    end
+    if button and button.internal == "stop_preview" then
+        PNC.PuppetOpera.Client.StopPreview()
+        self.ownerWindow:setEditorStatus("preview_stopped")
+        self.ownerWindow:refreshViews()
+        return true
+    end
+    local actorID = model.GetActorForCatalog(self.catalogName)
+    if not actorID then
+        self.ownerWindow:setEditorStatus("no_matching_scene_actor", true)
+        return false
+    end
+    local accepted, reason = model.AssignAnimation(actorID, entry)
     if not accepted then
         self.ownerWindow:setEditorStatus(reason)
         return false
@@ -287,29 +381,54 @@ end
 
 function ISPNCPuppetOperaAnimationTab:onResponsiveLayout()
     local pad = Layout.Pixels(8, self.ownerWindow and self.ownerWindow.uiScale)
-    local filterWidth = Layout.Pixels(190, self.ownerWindow
-        and self.ownerWindow.uiScale)
-    local searchWidth = math.max(
-        Layout.Pixels(180, self.ownerWindow and self.ownerWindow.uiScale),
-        math.floor(self:getWidth() * 0.26)
-    )
-    local top = Layout.Pixels(38, self.ownerWindow and self.ownerWindow.uiScale)
-    local split = math.floor(self:getWidth() * 0.54)
+    local scale = self.ownerWindow and self.ownerWindow.uiScale
+    local controlHeight = Layout.Pixels(26, scale)
+    resizeRows(self.list, Layout.Pixels(56, scale))
+    resizeRows(self.details, Layout.Pixels(25, scale))
+    if self.list then self.list.uiScale = scale end
+    if self.details then self.details.uiScale = scale end
+    local available = math.max(1, self:getWidth() - pad * 2)
+    local filterWidth = math.min(Layout.Pixels(190, scale),
+        math.max(Layout.Pixels(120, scale), math.floor(available * 0.38)))
+    local searchWidth = math.max(Layout.Pixels(110, scale),
+        available - filterWidth - pad)
+    local top = Layout.Pixels(38, scale)
+    local minimumRight = Layout.Pixels(190, scale)
+    local split = math.floor(self:getWidth() * 0.52)
+    split = math.max(Layout.Pixels(220, scale), split)
+    split = math.min(split,
+        math.max(Layout.Pixels(1, scale), self:getWidth() - minimumRight))
     Layout.SetBounds(self.search, pad, pad, searchWidth,
-        Layout.Pixels(26, self.ownerWindow and self.ownerWindow.uiScale))
+        controlHeight)
     Layout.SetBounds(self.filter, pad + searchWidth + pad, pad,
-        filterWidth, Layout.Pixels(26, self.ownerWindow and self.ownerWindow.uiScale))
+        math.max(1, math.min(filterWidth,
+            self:getWidth() - pad * 2 - searchWidth - pad)), controlHeight)
+    local footer = Layout.Pixels(72, scale)
+    local contentHeight = math.max(1, self:getHeight() - top - footer)
     Layout.SetBounds(self.list, pad, top,
-        split - pad * 2, self:getHeight() - top - pad)
+        math.max(1, split - pad * 2),
+        contentHeight)
     Layout.SetBounds(self.details, split + pad, top,
-        self:getWidth() - split - pad * 2,
-        self:getHeight() - top - Layout.Pixels(42,
-            self.ownerWindow and self.ownerWindow.uiScale))
-    Layout.SetBounds(self.assignButton, split + pad,
-        self:getHeight() - Layout.Pixels(34,
-            self.ownerWindow and self.ownerWindow.uiScale),
-        self:getWidth() - split - pad * 2,
-        Layout.Pixels(26, self.ownerWindow and self.ownerWindow.uiScale))
+        math.max(1, self:getWidth() - split - pad * 2),
+        contentHeight)
+    local buttonGap = pad
+    local buttonWidth = math.max(1, math.floor((
+        self:getWidth() - split - pad * 2 - buttonGap * 2
+    ) / 3))
+    local buttonY = self:getHeight() - Layout.Pixels(34,
+        self.ownerWindow and self.ownerWindow.uiScale)
+    Layout.SetBounds(self.assignButton, split + pad, buttonY,
+        buttonWidth,
+        controlHeight)
+    Layout.SetBounds(self.previewButton, split + pad + buttonWidth + buttonGap,
+        buttonY, buttonWidth,
+        controlHeight)
+    Layout.SetBounds(self.stopPreviewButton,
+        split + pad + (buttonWidth + buttonGap) * 2,
+        buttonY,
+        math.max(1, self:getWidth() - split - pad * 2
+            - (buttonWidth + buttonGap) * 2),
+        controlHeight)
 end
 
 return ISPNCPuppetOperaAnimationTab

@@ -33,6 +33,18 @@ Opera.Config = Opera.Config or {
     traceEvents = 128,
     maxRequestText = 96,
 }
+Opera.Config.actorDiscoveryRadius = tonumber(
+    Opera.Config.actorDiscoveryRadius
+) or 12
+Opera.Config.runtimeActorRange = tonumber(
+    Opera.Config.runtimeActorRange
+) or 12
+Opera.Config.preflightRefreshMs = tonumber(
+    Opera.Config.preflightRefreshMs
+) or 1000
+Opera.Config.placementPreviewLeaseMs = tonumber(
+    Opera.Config.placementPreviewLeaseMs
+) or 30000
 
 local function serializable(value)
     local kind = type(value)
@@ -112,6 +124,7 @@ function Opera.BuildSnapshot(session, includeTrace)
         lastError = session.lastError,
         stopReason = session.stopReason,
         restored = session.restored == true,
+        preview = session.previewOnly == true,
         plan = copyTable(session.plan),
         actors = {},
     }

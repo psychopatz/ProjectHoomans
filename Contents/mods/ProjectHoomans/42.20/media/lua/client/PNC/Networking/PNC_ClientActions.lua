@@ -607,6 +607,60 @@ local function clientCampSiteHints()
     return hints
 end
 
+local function campDiagnostics()
+    local debug = PNC.PerceptionDebug
+    local diagnostics = debug and debug.CampDiagnostics or nil
+    if diagnostics and type(diagnostics.RecordClient) == "function" then
+        return diagnostics
+    end
+    pcall(require,
+        "PNC/UI/PerceptionDebug/PNC_PerceptionDebug_CampDiagnostics")
+    debug = PNC.PerceptionDebug
+    diagnostics = debug and debug.CampDiagnostics or nil
+    return diagnostics
+end
+
+local function recordCampClient(status, reason, commandID, npcId, scope,
+    context, hint)
+    local diagnostics
+    if tostring(commandID or "") ~= "camp" then return end
+    diagnostics = campDiagnostics()
+    if diagnostics and type(diagnostics.RecordClient) == "function" then
+        diagnostics.RecordClient(status, reason, {
+            commandID = commandID,
+            npcID = npcId,
+            scope = scope,
+            requestID = type(context) == "table"
+                and context.requestID or nil,
+            commandSource = type(context) == "table" and (
+                context.commandSource or context.source or context.origin)
+                or nil,
+        }, hint)
+    end
+end
+
+local function recordCampServer(commandID, npcId, scope, context, accepted,
+    reason, hint)
+    local diagnostics
+    if tostring(commandID or "") ~= "camp" then return end
+    diagnostics = campDiagnostics()
+    if diagnostics and type(diagnostics.RecordServer) == "function" then
+        diagnostics.RecordServer({
+            commandID = commandID,
+            npcID = npcId,
+            scope = scope,
+            requestID = type(context) == "table"
+                and context.requestID or nil,
+            commandSource = type(context) == "table" and (
+                context.commandSource or context.source or context.origin)
+                or nil,
+            accepted = accepted == true,
+            reason = reason,
+            campSiteHint = hint,
+        })
+    end
+end
+
 local function findLocalCampSiteHint(player, npcId, context)
     local hints = clientCampSiteHints()
     local record = commandRecord(npcId, context)
@@ -706,6 +760,8 @@ function Client.SendCompanionCommand(commandID, npcId, scope, context)
         rejected, localReason, campSiteHint = rejectUnsafeCampLocally(
             player, npcId, scope, context)
         if rejected then
+            recordCampClient("REJECTED", localReason
+                or "camp_no_visible_site", commandID, npcId, scope, context)
             publishLLMCommandResult(
                 commandID,
                 npcId,
@@ -735,6 +791,8 @@ function Client.SendCompanionCommand(commandID, npcId, scope, context)
     }
     if Core.IsClientOnly and Core.IsClientOnly() then
         if not sendClientCommand then
+            recordCampClient("REJECTED", "network_api_unavailable",
+                commandID, npcId, scope, context)
             traceCompanionCommand(commandID, npcId, scope, context, {
                 status = "rejected",
                 reason = "network_api_unavailable",
@@ -747,6 +805,8 @@ function Client.SendCompanionCommand(commandID, npcId, scope, context)
             Const.CMD_COMPANION_COMMAND,
             args
         )
+        recordCampClient("PENDING", "network_queued", commandID, npcId,
+            scope, context, campSiteHint)
         traceCompanionCommand(commandID, npcId, scope, context, {
             status = "network_queued",
         })
@@ -755,6 +815,8 @@ function Client.SendCompanionCommand(commandID, npcId, scope, context)
     local affected, reason, affectedTargets =
         PNC.CompanionCommands.Execute(player, args)
     local succeeded = (tonumber(affected) or 0) > 0
+    recordCampServer(commandID, npcId, scope, context, succeeded, reason,
+        campSiteHint)
     publishLLMCommandResult(
         commandID,
         npcId,

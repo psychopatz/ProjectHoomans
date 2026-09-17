@@ -158,6 +158,35 @@ T.equal(campfireSite.campfireID, "campfire@14:10:0",
 T.equal(locatorCalls, 0,
     "campfire hint validation does not invoke the broad world locator")
 
+local legacyCampfireSite, legacyCampfireReason = Resolver.ValidateClientSite({
+    kind = CampSite.KIND,
+    scope = CampSite.SCOPES.HERE,
+    clientHint = {
+        version = 1,
+        kind = "campfire",
+        scope = "campfire",
+        siteScope = "campfire",
+        campfireID = "campfire:14:10:0:-1",
+        x = 14.5,
+        y = 10.5,
+        z = 0,
+        radius = 32,
+        score = 1,
+    },
+}, {
+    selectionOrigin = player,
+    player = player,
+    cell = cell,
+})
+T.truthy(legacyCampfireSite,
+    "server validation accepts the legacy client GlobalObject identity")
+T.equal(legacyCampfireReason, nil,
+    "legacy GlobalObject identity has no stale-hint failure reason")
+T.equal(legacyCampfireSite.campfireID, "campfire@14:10:0",
+    "legacy client identity resolves to the canonical server identity")
+T.equal(locatorCalls, 0,
+    "legacy campfire validation remains bounded and locator-free")
+
 local staleRoomHint = {}
 for key, value in pairs(roomHint) do staleRoomHint[key] = value end
 staleRoomHint.siteID = "room:other-building:other-room"

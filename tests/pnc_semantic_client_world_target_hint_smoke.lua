@@ -22,11 +22,17 @@ local clutterObjectB = {
     getName = function() return "unrelated furniture" end,
     getSpriteName = function() return "furniture_misc_01_1" end,
 }
+local campfire = {
+    getX = function() return 4 end,
+    getY = function() return 0 end,
+    getZ = function() return 0 end,
+}
 local squareLookups = 0
 local square = {
     getX = function() return 4 end,
     getY = function() return 0 end,
     getZ = function() return 0 end,
+    getCampfire = function() return campfire end,
     getObjects = function()
         return {
             size = function() return 1 end,
@@ -89,6 +95,20 @@ T.falsy(hint.object, "a Java object is not included in the client hint")
 T.falsy(hint.square, "a Java square is not included in the client hint")
 local firstSquareLookups = squareLookups
 
+local campfireHint, campfireReason = Hints.Resolve({
+    kind = "phrase",
+    text = "campfire",
+    unresolved = true,
+}, { origin = origin })
+T.truthy(campfireHint, "a loaded GlobalObject campfire is found locally")
+T.equal(campfireReason, nil, "a confident campfire target has no failure reason")
+T.equal(campfireHint.kind, "campfire",
+    "the client returns the canonical campfire target kind")
+T.equal(campfireHint.targetID, "campfire@4:0:0",
+    "GlobalObject campfires use the shared server-compatible identity")
+T.equal(squareLookups, firstSquareLookups,
+    "campfire lookup reuses the loaded-cell observation cache")
+
 local typoHint, typoReason = Hints.Resolve({
     kind = "phrase",
     text = "recycel bin",
@@ -107,7 +127,8 @@ local cached = Hints.Resolve({
     unresolved = true,
 }, { origin = origin })
 T.equal(cached.x, 4, "repeated target lookup returns the cached primitive")
-T.equal(scans, 2, "each distinct phrase is scanned once and exact repeats are cached")
+T.equal(scans, 3,
+    "each distinct phrase is scanned once and exact repeats are cached")
 
 local boundedHint, boundedReason = Hints.Resolve({
     kind = "phrase",

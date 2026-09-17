@@ -115,6 +115,7 @@ function player:getUsername() return "PuppetTester" end
 function player:getOnlineID() return 42 end
 
 npc = actor(100.5, 200.5, 0, -1)
+function npc:getActionStateName() return self.actionState or "" end
 record = { id = "npc1", runtime = {} }
 PNC.Registry.Get = function(id)
     return tostring(id) == "npc1" and record or nil
@@ -187,6 +188,88 @@ T.load(
 )
 
 local Authority = Opera.Authority
+local preflightAccepted, preflightResult = Authority.HandleRequest(player, {
+    action = "preflight",
+    blueprintId = "social.kiss_test",
+    actors = { npc = "npc1" },
+})
+T.truthy(preflightAccepted, "authority rejected a valid preflight request")
+T.truthy(preflightResult and preflightResult.preflight
+    and preflightResult.preflight.ready,
+    "valid preflight did not report the scene as ready")
+T.equal(preflightResult.preflight.actors.npc.reasonDetail, "ready",
+    "valid preflight did not report the NPC as ready")
+
+npc.actionState = "climbwindow"
+preflightAccepted, preflightResult = Authority.HandleRequest(player, {
+    action = "preflight",
+    blueprintId = "social.kiss_test",
+    actors = { npc = "npc1" },
+})
+T.truthy(preflightAccepted, "busy-state preflight request was rejected")
+T.falsy(preflightResult.preflight.ready,
+    "busy NPC was incorrectly reported as ready")
+T.equal(preflightResult.preflight.actors.npc.reason,
+    "npc_action_state_busy",
+    "busy NPC readiness reason changed")
+T.truthy(string.find(
+    preflightResult.preflight.actors.npc.reasonDetail,
+    "state=climbwindow",
+    1,
+    true
+), "busy preflight did not expose the engine action state")
+local busyAccepted, busyReason = Authority.HandleRequest(player, {
+    action = "start",
+    blueprintId = "social.kiss_test",
+    npcID = "npc1",
+    loop = false,
+})
+T.falsy(busyAccepted, "busy NPC was incorrectly forced into a scene")
+T.truthy(string.find(tostring(busyReason), "state=climbwindow", 1, true),
+    "busy start rejection did not preserve the action-state detail")
+npc.actionState = nil
+
+local previewAccepted, previewSession = Authority.HandleRequest(player, {
+    action = "preview_start",
+    blueprintId = "social.kiss_test",
+    actors = { npc = "npc1" },
+})
+T.truthy(previewAccepted, "placement preview was not accepted")
+T.truthy(previewSession and previewSession.previewOnly,
+    "placement preview was not marked as preview-only")
+player.x = previewSession.actors.player.target.worldX
+player.y = previewSession.actors.player.target.worldY
+npc.x = previewSession.actors.npc.target.worldX
+npc.y = previewSession.actors.npc.target.worldY
+T.truthy(Authority.HandleRequest(player, {
+    action = "player_arrived",
+    sessionId = previewSession.sessionId,
+    revision = previewSession.revision,
+}), "preview player arrival was not verified")
+Authority.PumpSession(previewSession, clock)
+T.equal(previewSession.phase, Opera.Phases.FACING,
+    "placement preview did not enter the facing barrier")
+player:faceLocation(
+    previewSession.actors.npc.target.x,
+    previewSession.actors.npc.target.y
+)
+T.truthy(Authority.HandleRequest(player, {
+    action = "player_facing",
+    sessionId = previewSession.sessionId,
+    revision = previewSession.revision,
+}), "preview player facing was not verified")
+Authority.PumpSession(previewSession, clock)
+T.equal(previewSession.phase, Opera.Phases.READY,
+    "placement preview did not remain ready after facing")
+T.equal(previewSession.actors.player.state, "preview_ready",
+    "placement preview did not expose its ready state")
+T.truthy(Authority.HandleRequest(player, {
+    action = "preview_stop",
+    sessionId = previewSession.sessionId,
+}), "placement preview could not be stopped")
+T.falsy(record.runtime.puppetOperaLease,
+    "placement preview did not release the NPC session lease")
+
 local accepted, session = Authority.HandleRequest(player, {
     action = "start",
     blueprintId = "social.kiss_test",

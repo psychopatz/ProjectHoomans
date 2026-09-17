@@ -115,8 +115,37 @@ local function npcActionState(body)
     return ""
 end
 
+local function npcActionContextState(body)
+    if PNC.LiveBodyControl
+        and PNC.LiveBodyControl.GetActionContextStateName
+    then
+        return string.lower(tostring(
+            PNC.LiveBodyControl.GetActionContextStateName(body) or ""
+        ))
+    end
+    if body and body.getCurrentActionContextStateName then
+        return string.lower(tostring(
+            body:getCurrentActionContextStateName() or ""
+        ))
+    end
+    return npcActionState(body)
+end
+
 local function unsafeNPCActionState(body)
     return UNSAFE_NPC_ACTION_STATES[npcActionState(body)] == true
+end
+
+local function actorFailureReason(reason, actorID, body)
+    if not reason then return nil end
+    local value = tostring(reason)
+    if actorID then value = value .. ":" .. tostring(actorID) end
+    if reason == "npc_action_state_busy"
+        or reason == "npc_action_state_interrupted"
+    then
+        value = value .. ":state=" .. tostring(npcActionState(body) or "")
+            .. ":context=" .. tostring(npcActionContextState(body) or "")
+    end
+    return value
 end
 
 local function invalidPlayer(player)
@@ -238,9 +267,8 @@ local function sameNumber(left, right)
     return tonumber(left) == tonumber(right)
 end
 
-local function puppetMovementIsSafe(session)
-    local actor = session and session.actors
-        and session.actors.npc or nil
+local function puppetMovementIsSafe(session, actor)
+    if not actor or actor.kind ~= "nearby_live_npc" then return true end
     local record = actor and actor.record or nil
     local runtime = record and record.runtime or nil
     local intent = runtime and runtime.moveIntent or nil
@@ -344,7 +372,13 @@ local function indexSession(session)
     Authority.Sessions[session.sessionId] = session
     Authority.ByOwner[session.ownerId] = session
     Authority.ByActor["player:" .. session.ownerId] = session
-    Authority.ByActor[session.npcID] = session
+    for actorID, actor in pairs(session.actors or {}) do
+        if actor.kind == "nearby_live_npc" and actor.npcID then
+            Authority.ByActor[tostring(actor.npcID)] = session
+        elseif actor.kind == "local_player" then
+            Authority.ByActor["player:" .. session.ownerId] = session
+        end
+    end
 end
 
 local function unindexSession(session)
@@ -357,13 +391,17 @@ local function unindexSession(session)
     if Authority.ByActor["player:" .. session.ownerId] == session then
         Authority.ByActor["player:" .. session.ownerId] = nil
     end
-    if Authority.ByActor[session.npcID] == session then
-        Authority.ByActor[session.npcID] = nil
+    for _, actor in pairs(session.actors or {}) do
+        if actor.kind == "nearby_live_npc" and actor.npcID
+            and Authority.ByActor[tostring(actor.npcID)] == session
+        then
+            Authority.ByActor[tostring(actor.npcID)] = nil
+        end
     end
 end
 
-local function clearNPCLease(session)
-    local actor = session.actors.npc
+local function clearNPCLease(session, actor)
+    actor = actor or session and session.actors and session.actors.npc
     local record = actor and actor.record or nil
     local runtime = record and record.runtime or nil
     local lease = runtime and runtime.puppetOperaLease or nil
@@ -375,19 +413,20 @@ local function clearNPCLease(session)
 end
 
 local function releaseActors(session)
-    local actor = session.actors.npc
-    if actor then
-        if actor.animationOwned
-            or NPCAnimation.IsOwned(actor.body, session.sessionId)
-        then
-            NPCAnimation.Release(session, actor)
+    for _, actor in pairs(session.actors or {}) do
+        if actor.kind == "nearby_live_npc" then
+            if actor.animationOwned
+                or NPCAnimation.IsOwned(actor.body, session.sessionId)
+            then
+                NPCAnimation.Release(session, actor)
+            end
+            if actor.movementOwned
+                or NPCMovement.IsOwned(actor.record, session.sessionId)
+            then
+                NPCMovement.Release(session, actor)
+            end
+            clearNPCLease(session, actor)
         end
-        if actor.movementOwned
-            or NPCMovement.IsOwned(actor.record, session.sessionId)
-        then
-            NPCMovement.Release(session, actor)
-        end
-        clearNPCLease(session)
     end
 end
 
@@ -430,6 +469,65 @@ local function resolveNPC(npcID)
     return record, body, nil
 end
 
+local function resolveBlueprint(args)
+    args = type(args) == "table" and args or {}
+    local blueprintID = tostring(args.blueprintId or "social.kiss_test")
+    local blueprint = Blueprints.Get(blueprintID)
+    if not blueprint then return nil, "blueprint_not_found" end
+    if type(args.definition) ~= "table" then
+        return blueprint
+    end
+    local normalized, reason = Blueprints.Normalize(
+        blueprintID,
+        args.definition
+    )
+    if not normalized then
+        return nil, "blueprint_definition_invalid:" .. tostring(reason)
+    end
+    return normalized
+end
+
+local function ownerDescription(record, body)
+    local runtime = record and record.runtime or {}
+    local lease = runtime.puppetOperaLease
+    if lease and lease.sessionId then
+        return "puppet_opera:" .. tostring(lease.sessionId)
+    end
+    local movement = runtime.puppetOperaMovement
+    if movement and movement.sessionId then
+        return "puppet_movement:" .. tostring(movement.sessionId)
+    end
+    local ownerFields = {
+        { "animationScene", "animation_scene" },
+        { "conversationLease", "conversation" },
+        { "taskLeaseId", "task" },
+        { "orderLeaseId", "order" },
+        { "facilityActivity", "facility" },
+        { "workOrderId", "work_order" },
+        { "medicalCare", "medical" },
+        { "treatment", "treatment" },
+        { "roamAmbient", "ambient" },
+    }
+    for _, field in ipairs(ownerFields) do
+        if hasValue(runtime[field[1]]) then return field[2] end
+    end
+    if PNC.Compatibility and PNC.Compatibility.ActorOwnership
+        and PNC.Compatibility.ActorOwnership.GetForeignOwner
+    then
+        local foreign = PNC.Compatibility.ActorOwnership.GetForeignOwner(body)
+        if foreign then return "foreign:" .. tostring(foreign) end
+    end
+    if runtime.target ~= nil or runtime.combatTarget ~= nil
+        or runtime.attackAction ~= nil
+    then
+        return "combat"
+    end
+    if runtime.moveIntent and runtime.moveIntent.kind == "move" then
+        return "movement"
+    end
+    return nil
+end
+
 local function validatePlan(plan)
     if type(plan) ~= "table" or type(plan.actors) ~= "table" then
         return false, "anchor_plan_missing"
@@ -460,7 +558,169 @@ local function supportedActors(blueprint)
     return true
 end
 
-local function makeSession(player, blueprint, record, body, plan, loopEnabled)
+local function buildNPCReadiness(player, actorID, npcID, allowedSession)
+    local result = {
+        actorID = tostring(actorID),
+        kind = "nearby_live_npc",
+        bindingID = npcID and tostring(npcID) or nil,
+        ready = false,
+        actionState = "",
+        actionContextState = "",
+        owner = nil,
+        distance = nil,
+        reason = nil,
+        reasonDetail = nil,
+    }
+    if not npcID or tostring(npcID) == "" then
+        result.reason = "npc_binding_missing"
+        result.reasonDetail = "npc_binding_missing:" .. tostring(actorID)
+        return result
+    end
+
+    local record, body, resolveReason = resolveNPC(npcID)
+    if not record or not body then
+        result.reason = resolveReason or "npc_unavailable"
+        result.reasonDetail = actorFailureReason(
+            result.reason,
+            actorID,
+            body
+        )
+        return result
+    end
+
+    result.bindingID = tostring(record.id or npcID)
+    result.actionState = npcActionState(body)
+    result.actionContextState = npcActionContextState(body)
+    result.owner = ownerDescription(record, body)
+    local distance = distanceSquared(player, body)
+    result.distance = distance and math.sqrt(distance) or nil
+
+    local reason = invalidNPC(record, body, allowedSession)
+    if not reason and not inRange(
+        player,
+        body,
+        tonumber(Opera.Config.runtimeActorRange) or 12
+    ) then
+        reason = "npc_out_of_range"
+    end
+    if not reason and Authority.ByActor[result.bindingID]
+        and Authority.ByActor[result.bindingID] ~= allowedSession
+    then
+        reason = "npc_session_already_active"
+    end
+    if reason then
+        result.reason = reason
+        result.reasonDetail = actorFailureReason(reason, actorID, body)
+        return result
+    end
+
+    result.ready = true
+    result.reason = nil
+    result.reasonDetail = "ready"
+    return result
+end
+
+local function buildPreflight(player, args)
+    local blueprint, reason = resolveBlueprint(args)
+    if not blueprint then return nil, reason end
+    local runtimeOK
+    runtimeOK, reason = Blueprints.ValidateRuntime(blueprint)
+    if not runtimeOK then return nil, reason end
+    local actorOK
+    actorOK, reason = supportedActors(blueprint)
+    if not actorOK then return nil, reason end
+
+    local result = {
+        blueprintId = blueprint.id,
+        checkedAt = now(),
+        ready = true,
+        actors = {},
+        runtimeRange = tonumber(Opera.Config.runtimeActorRange) or 12,
+    }
+    local playerReason = invalidPlayer(player)
+    local ownerSession = Authority.ByOwner[ownerID(player)]
+    local allowedSession = ownerSession and ownerSession.previewOnly
+        and ownerSession or nil
+    local bindings = type(args) == "table"
+        and type(args.actors) == "table" and args.actors or {}
+    local npcCount = 0
+    for actorID, definition in pairs(blueprint.actors or {}) do
+        if definition.kind == "local_player" then
+            result.actors[actorID] = {
+                actorID = tostring(actorID),
+                bindingID = "__local_player__",
+                kind = definition.kind,
+                ready = playerReason == nil,
+                reason = playerReason,
+                reasonDetail = playerReason or "ready",
+            }
+            if playerReason then result.ready = false end
+        elseif definition.kind == "nearby_live_npc" then
+            local npcID = bindings[actorID]
+            if not npcID and tostring(actorID) == "npc"
+                and type(args) == "table"
+            then
+                npcID = args.npcID
+            end
+            local readiness = buildNPCReadiness(
+                player,
+                actorID,
+                npcID,
+                allowedSession
+            )
+            readiness.required = definition.required ~= false
+            result.actors[actorID] = readiness
+            npcCount = npcCount + 1
+            if readiness.required and readiness.ready ~= true then
+                result.ready = false
+                result.reason = result.reason or readiness.reasonDetail
+            end
+        end
+    end
+    if npcCount == 0 then
+        result.ready = false
+        result.reason = "runtime_actor_missing"
+    end
+
+    if playerReason == nil then
+        local plan, planReason = Anchors.BuildPlan(blueprint, player)
+        if not plan then
+            result.ready = false
+            result.reason = planReason
+        else
+            local planOK, planValidationReason = validatePlan(plan)
+            if not planOK then
+                result.ready = false
+                result.reason = planValidationReason
+            end
+        end
+    end
+    return result
+end
+
+local function orderedActorIDs(blueprint)
+    local ids = {}
+    for actorID in pairs(blueprint and blueprint.actors or {}) do
+        ids[#ids + 1] = tostring(actorID)
+    end
+    table.sort(ids, function(left, right)
+        if left == "player" then return right ~= "player" end
+        if right == "player" then return false end
+        return left < right
+    end)
+    return ids
+end
+
+local function localActor(session)
+    for actorID, actor in pairs(session and session.actors or {}) do
+        if actor.kind == "local_player" then
+            return tostring(actorID), actor
+        end
+    end
+    return nil, nil
+end
+
+local function makeSession(player, blueprint, resolvedNPCs, plan, loopEnabled)
     Authority.Serial = Authority.Serial + 1
     local timestamp = now()
     local sessionID = "puppet:" .. tostring(timestamp) .. ":"
@@ -474,42 +734,40 @@ local function makeSession(player, blueprint, record, body, plan, loopEnabled)
         loopEnabled == true and blueprint.playback.allowLoop == true
     )
     session.ownerPlayer = player
-    session.npcID = tostring(record.id)
     session.playerBody = player
     session.plan = plan
-    session.actors.player = {
-        id = "player",
-        kind = "local_player",
-        label = blueprint.actors.player.label,
-        anchor = blueprint.actors.player.anchor,
-        target = plan.actors.player,
-        body = player,
-        state = "pending",
-        arrived = false,
-        facing = false,
-        movementOwned = false,
-        animationOwned = false,
-    }
-    session.actors.npc = {
-        id = "npc",
-        kind = "nearby_live_npc",
-        label = blueprint.actors.npc.label,
-        anchor = blueprint.actors.npc.anchor,
-        target = plan.actors.npc,
-        record = record,
-        body = body,
-        state = "pending",
-        arrived = false,
-        facing = false,
-        movementOwned = false,
-        animationOwned = false,
-    }
-    record.runtime = record.runtime or {}
-    record.runtime.puppetOperaLease = {
-        sessionId = session.sessionId,
-        ownerId = session.ownerId,
-        expiresAt = timestamp + Opera.Config.leaseDurationMs,
-    }
+    for _, actorID in ipairs(orderedActorIDs(blueprint)) do
+        local definition = blueprint.actors[actorID]
+        local actor = {
+            id = actorID,
+            kind = definition.kind,
+            label = definition.label,
+            anchor = definition.anchor,
+            target = plan.actors[actorID],
+            body = definition.kind == "local_player"
+                and player or resolvedNPCs[actorID].body,
+            record = definition.kind == "nearby_live_npc"
+                and resolvedNPCs[actorID].record or nil,
+            npcID = definition.kind == "nearby_live_npc"
+                and resolvedNPCs[actorID].id or nil,
+            state = "pending",
+            arrived = false,
+            facing = false,
+            movementOwned = false,
+            animationOwned = false,
+        }
+        session.actors[actorID] = actor
+        if actor.kind == "nearby_live_npc" then
+            session.npcID = session.npcID or tostring(actor.npcID)
+            local record = actor.record
+            record.runtime = record.runtime or {}
+            record.runtime.puppetOperaLease = {
+                sessionId = session.sessionId,
+                ownerId = session.ownerId,
+                expiresAt = timestamp + Opera.Config.leaseDurationMs,
+            }
+        end
+    end
     trace(session, "session_created", {
         blueprint = blueprint.id,
         npc = session.npcID,
@@ -518,32 +776,29 @@ local function makeSession(player, blueprint, record, body, plan, loopEnabled)
     return session
 end
 
-local function startSession(player, args)
+local function startSession(player, args, previewOnly)
+    args = type(args) == "table" and args or {}
+    previewOnly = previewOnly == true
     local blueprintID = tostring(args.blueprintId or "social.kiss_test")
-    local blueprint = Blueprints.Get(blueprintID)
-    local candidate
-    local candidateReason
+    local blueprint, blueprintReason = resolveBlueprint(args)
     local current = Authority.ByOwner[ownerID(player)]
-    local record
-    local body
     local reason
     local plan
     local planOK
     local actorOK
-    if current then return false, "owner_session_already_active" end
-    if not blueprint then return false, "blueprint_not_found" end
-    -- A builder draft contains only declarative data.  Normalize it again on
-    -- the server and never trust client coordinates or executable values.
-    if type(args.definition) == "table" then
-        candidate, candidateReason = Blueprints.Normalize(
-            blueprintID,
-            args.definition
-        )
-        if not candidate then
-            return false, "blueprint_definition_invalid:" .. tostring(candidateReason)
+    local resolvedNPCs = {}
+    local bindings = type(args.actors) == "table" and args.actors or {}
+    local seenNPCs = {}
+    local npcCount = 0
+    if current then
+        if current.previewOnly then
+            closeSession(current, Opera.Phases.RESTORED, "preview_replaced")
+            current = nil
+        else
+            return false, "owner_session_already_active"
         end
-        blueprint = candidate
     end
+    if not blueprint then return false, blueprintReason end
     local runtimeOK
     runtimeOK, reason = Blueprints.ValidateRuntime(blueprint)
     if not runtimeOK then return false, reason end
@@ -551,13 +806,48 @@ local function startSession(player, args)
     if not actorOK then return false, reason end
     reason = invalidPlayer(player)
     if reason then return false, reason end
-    record, body, reason = resolveNPC(args.npcID)
-    if not body then return false, reason end
-    reason = invalidNPC(record, body, nil)
-    if reason then return false, reason end
-    if not inRange(player, body, 12) then return false, "npc_out_of_range" end
-    if Authority.ByActor[tostring(record.id)] then
-        return false, "npc_session_already_active"
+
+    -- Every live-NPC slot is bound by an id, then resolved and range-checked
+    -- on the server.  The legacy npcID field remains accepted for the
+    -- original two-slot blueprint only.
+    for actorID, definition in pairs(blueprint.actors or {}) do
+        if definition.kind == "nearby_live_npc" then
+            local npcID = bindings[actorID]
+            if not npcID and tostring(actorID) == "npc" then
+                npcID = args.npcID
+            end
+            local record, body
+            record, body, reason = resolveNPC(npcID)
+            if not body then return false, reason end
+            reason = invalidNPC(record, body, nil)
+            if reason then
+                return false, actorFailureReason(reason, actorID, body)
+            end
+            if not inRange(
+                player,
+                body,
+                tonumber(Opera.Config.runtimeActorRange) or 12
+            ) then
+                return false, "npc_out_of_range:" .. tostring(actorID)
+            end
+            local resolvedID = tostring(record.id)
+            if seenNPCs[resolvedID] then
+                return false, "npc_bound_to_multiple_actor_slots"
+            end
+            if Authority.ByActor[resolvedID] then
+                return false, "npc_session_already_active:" .. tostring(actorID)
+            end
+            seenNPCs[resolvedID] = true
+            resolvedNPCs[tostring(actorID)] = {
+                id = resolvedID,
+                record = record,
+                body = body,
+            }
+            npcCount = npcCount + 1
+        end
+    end
+    if npcCount == 0 then
+        return false, "runtime_actor_missing"
     end
     plan, reason = Anchors.BuildPlan(blueprint, player)
     if not plan then return false, reason end
@@ -567,22 +857,29 @@ local function startSession(player, args)
     local session = makeSession(
         player,
         blueprint,
-        record,
-        body,
+        resolvedNPCs,
         plan,
         args.loop == true
     )
+    session.previewOnly = previewOnly
     indexSession(session)
     setPhase(session, Opera.Phases.ACQUIRING, now() + 1500, "acquiring", false)
     local accepted
-    accepted, reason = NPCMovement.Start(session, session.actors.npc)
-    if not accepted then
-        clearNPCLease(session)
-        unindexSession(session)
-        return false, reason or "npc_movement_start_failed"
+    for _, actorID in ipairs(orderedActorIDs(blueprint)) do
+        local actor = session.actors[actorID]
+        if actor.kind == "nearby_live_npc" then
+            accepted, reason = NPCMovement.Start(session, actor)
+            if not accepted then
+                releaseActors(session)
+                unindexSession(session)
+                return false, reason or "npc_movement_start_failed"
+            end
+            actor.state = "moving"
+            actor.movementOwned = true
+        elseif actor.kind == "local_player" then
+            actor.state = "moving"
+        end
     end
-    session.actors.npc.state = "moving"
-    session.actors.npc.movementOwned = true
     setPhase(
         session,
         Opera.Phases.MOVING,
@@ -594,85 +891,102 @@ local function startSession(player, args)
 end
 
 local function refreshLease(session, timestamp)
-    local record = session.actors.npc.record
-    local runtime = record and record.runtime or nil
-    local lease = runtime and runtime.puppetOperaLease or nil
-    if not lease or tostring(lease.sessionId or "")
-        ~= tostring(session.sessionId or "")
-    then
-        return false
+    for _, actor in pairs(session.actors or {}) do
+        if actor.kind == "nearby_live_npc" then
+            local record = actor.record
+            local runtime = record and record.runtime or nil
+            local lease = runtime and runtime.puppetOperaLease or nil
+            if not lease or tostring(lease.sessionId or "")
+                ~= tostring(session.sessionId or "")
+            then
+                return false
+            end
+            lease.expiresAt = timestamp + Opera.Config.leaseDurationMs
+        end
     end
-    lease.expiresAt = timestamp + Opera.Config.leaseDurationMs
     return true
 end
 
 local function activeSafety(session, timestamp)
     local playerReason = invalidPlayer(session.playerBody)
     if playerReason then return false, playerReason end
-    local actor = session.actors.npc
-    local live = Registry and Registry.GetLiveZombie
-        and Registry.GetLiveZombie(session.npcID) or nil
-    if live ~= actor.body then return false, "npc_body_changed" end
-    local reason = invalidNPC(actor.record, actor.body, session)
-    if reason then return false, reason end
-    if PNC.LiveBodyControl
-        and PNC.LiveBodyControl.IsSeated
-        and PNC.LiveBodyControl.IsSeated(actor.record)
-    then
-        return false, "npc_became_seated"
-    end
-    local movementSafe
-    movementSafe, reason = puppetMovementIsSafe(session)
-    if not movementSafe then return false, reason end
-    if unsafeNPCActionState(actor.body)
-        and not NPCAnimation.IsOwned(actor.body, session.sessionId)
-    then
-        return false, "npc_action_state_interrupted"
-    end
-    if PNC.PathService and PNC.PathService.IsTraversalActive
-        and PNC.PathService.IsTraversalActive(actor.record, actor.body)
-    then
-        return false, "npc_traversal_started"
-    end
-    if PNC.LiveBodyControl
-        and PNC.LiveBodyControl.IsPresentationCombatActive
-        and PNC.LiveBodyControl.IsPresentationCombatActive(
-            actor.record,
-            timestamp
-        )
-    then
-        return false, "npc_entered_combat"
-    end
-    local runtime = actor.record and actor.record.runtime or nil
-    if runtime and (
-        runtime.target ~= nil
-            or runtime.combatTarget ~= nil
-            or runtime.attackAction ~= nil
-            or hasValue(runtime.animationScene)
-            or hasValue(runtime.conversationLease)
-            or hasValue(runtime.taskLeaseId)
-            or hasValue(runtime.orderLeaseId)
-            or hasValue(runtime.facilityActivity)
-            or hasValue(runtime.workOrderId)
-            or hasValue(runtime.medicalCare)
-            or hasValue(runtime.treatment)
-            or hasValue(runtime.roamAmbient)
-    ) then
-        if runtime.target ~= nil
-            or runtime.combatTarget ~= nil
-            or runtime.attackAction ~= nil
-        then
-            return false, "npc_entered_combat"
+    for actorID, actor in pairs(session.actors or {}) do
+        if actor.kind == "nearby_live_npc" then
+            local live = Registry and Registry.GetLiveZombie
+                and Registry.GetLiveZombie(actor.npcID) or nil
+            if live ~= actor.body then
+                return false, "npc_body_changed:" .. tostring(actorID)
+            end
+            local reason = invalidNPC(actor.record, actor.body, session)
+            if reason then
+                return false, actorFailureReason(reason, actorID, actor.body)
+            end
+            if PNC.LiveBodyControl
+                and PNC.LiveBodyControl.IsSeated
+                and PNC.LiveBodyControl.IsSeated(actor.record)
+            then
+                return false, "npc_became_seated:" .. tostring(actorID)
+            end
+            local movementSafe
+            movementSafe, reason = puppetMovementIsSafe(session, actor)
+            if not movementSafe then return false, reason end
+            if unsafeNPCActionState(actor.body)
+                and not NPCAnimation.IsOwned(actor.body, session.sessionId)
+            then
+                return false, actorFailureReason(
+                    "npc_action_state_interrupted",
+                    actorID,
+                    actor.body
+                )
+            end
+            if PNC.PathService and PNC.PathService.IsTraversalActive
+                and PNC.PathService.IsTraversalActive(actor.record, actor.body)
+            then
+                return false, "npc_traversal_started:" .. tostring(actorID)
+            end
+            if PNC.LiveBodyControl
+                and PNC.LiveBodyControl.IsPresentationCombatActive
+                and PNC.LiveBodyControl.IsPresentationCombatActive(
+                    actor.record,
+                    timestamp
+                )
+            then
+                return false, "npc_entered_combat:" .. tostring(actorID)
+            end
+            local runtime = actor.record and actor.record.runtime or nil
+            if runtime and (
+                runtime.target ~= nil
+                    or runtime.combatTarget ~= nil
+                    or runtime.attackAction ~= nil
+                    or hasValue(runtime.animationScene)
+                    or hasValue(runtime.conversationLease)
+                    or hasValue(runtime.taskLeaseId)
+                    or hasValue(runtime.orderLeaseId)
+                    or hasValue(runtime.facilityActivity)
+                    or hasValue(runtime.workOrderId)
+                    or hasValue(runtime.medicalCare)
+                    or hasValue(runtime.treatment)
+                    or hasValue(runtime.roamAmbient)
+            ) then
+                if runtime.target ~= nil
+                    or runtime.combatTarget ~= nil
+                    or runtime.attackAction ~= nil
+                then
+                    return false, "npc_entered_combat:" .. tostring(actorID)
+                end
+                return false, "npc_behavior_ownership_lost:"
+                    .. tostring(actorID)
+            end
+            if runtime and runtime.followState
+                and runtime.followState.ownerMoving == true
+            then
+                return false, "npc_movement_ownership_lost:"
+                    .. tostring(actorID)
+            end
+            if not inRange(session.playerBody, actor.body, 20) then
+                return false, "actors_out_of_range:" .. tostring(actorID)
+            end
         end
-        return false, "npc_behavior_ownership_lost"
-    end
-    if runtime and runtime.followState
-        and runtime.followState.ownerMoving == true
-    then
-        return false, "npc_movement_ownership_lost"
-    end
-    if not inRange(session.playerBody, actor.body, 20) then
-        return false, "actors_out_of_range"
     end
     if not refreshLease(session, timestamp) then
         return false, "npc_session_lease_lost"
@@ -681,10 +995,13 @@ local function activeSafety(session, timestamp)
 end
 
 local function moveToFacing(session, timestamp)
-    local actor = session.actors.npc
-    if actor.movementOwned then NPCMovement.Release(session, actor) end
-    actor.state = "facing"
-    actor.lastReason = "movement_barrier_complete"
+    for _, actor in pairs(session.actors or {}) do
+        if actor.kind == "nearby_live_npc" then
+            if actor.movementOwned then NPCMovement.Release(session, actor) end
+        end
+        actor.state = "facing"
+        actor.lastReason = "movement_barrier_complete"
+    end
     setPhase(
         session,
         Opera.Phases.FACING,
@@ -698,9 +1015,8 @@ local function scheduleBeat(session, timestamp)
     local playback = session.blueprint.playback or {}
     session.beatStartAt = timestamp + (tonumber(playback.gapMs) or 250)
     session.beatStartedAt = nil
-    session.playerBeatStarted = false
-    session.playerBeatFinished = false
-    session.npcBeatFinished = false
+    session.beatStartedBy = {}
+    session.beatFinishedBy = {}
     session.beatRevision = nil
     setPhase(
         session,
@@ -719,9 +1035,12 @@ local function prepareBeat(session, timestamp)
     if not beat then return false, "beat_missing" end
     session.beatStartAt = timestamp + (tonumber(playback.gapMs) or 250)
     session.beatStartedAt = nil
-    session.playerBeatStarted = false
-    session.playerBeatFinished = false
-    session.npcBeatFinished = false
+    session.beatStartedBy = {}
+    session.beatFinishedBy = {}
+    for _, actor in pairs(session.actors or {}) do
+        actor.animationStartedAt = nil
+        actor.animationOwned = false
+    end
     setPhase(
         session,
         Opera.Phases.PLAYING,
@@ -736,10 +1055,12 @@ local function prepareBeat(session, timestamp)
 end
 
 local function beatFinished(session, timestamp)
-    local actor = session.actors.npc
-    if actor.animationOwned then NPCAnimation.Release(session, actor) end
-    actor.animationOwned = false
-    session.npcBeatFinished = true
+    for _, actor in pairs(session.actors or {}) do
+        if actor.kind == "nearby_live_npc" then
+            if actor.animationOwned then NPCAnimation.Release(session, actor) end
+            actor.animationOwned = false
+        end
+    end
     trace(session, "beat_finished", {
         beat = session.blueprint.beats[session.beatIndex].id,
         iteration = session.iteration,
@@ -752,37 +1073,76 @@ local function beatFinished(session, timestamp)
         session.beatIndex = 1
         session.iteration = session.iteration + 1
     end
-    session.actors.player.facing = false
-    session.actors.npc.facing = false
+    for _, actor in pairs(session.actors or {}) do
+        actor.facing = false
+    end
     scheduleBeat(session, timestamp)
     return true
 end
 
 local function pumpMoving(session, timestamp)
-    local actor = session.actors.npc
-    local ok
-    local reason
-    ok, reason = NPCMovement.Observe(session, actor)
-    if not ok then return false, reason end
-    if actor.arrived and session.actors.player.arrived then
+    for actorID, actor in pairs(session.actors or {}) do
+        if actor.kind == "nearby_live_npc" then
+            local ok, reason = NPCMovement.Observe(session, actor)
+            if not ok then
+                return false, tostring(reason or "npc_movement_failed")
+                    .. ":" .. tostring(actorID)
+            end
+        end
+    end
+    local allArrived = true
+    for _, actor in pairs(session.actors or {}) do
+        if not actor.arrived then allArrived = false break end
+    end
+    if allArrived then
         moveToFacing(session, timestamp)
     end
     return true
 end
 
 local function pumpFacing(session, timestamp)
-    local playerActor = session.actors.player
-    local npcActor = session.actors.npc
-    local target
-    if not npcActor.body.faceLocation then
-        return false, "npc_facing_api_unavailable"
+    for actorID, actor in pairs(session.actors or {}) do
+        if actor.kind == "nearby_live_npc" then
+            if not actor.body.faceLocation then
+                return false, "npc_facing_api_unavailable:" .. tostring(actorID)
+            end
+            local targetActor = actor.target and session.actors
+                and session.actors[actor.target.faceTarget] or nil
+            local target = targetActor and targetActor.target or nil
+            if not target then
+                return false, "npc_facing_target_unavailable:"
+                    .. tostring(actorID)
+            end
+            local point = Anchors.WorldPoint(target)
+            if not point then
+                return false, "npc_facing_target_unavailable:"
+                    .. tostring(actorID)
+            end
+            actor.body:faceLocation(point.x, point.y)
+            actor.facing = Anchors.IsFacing(actor.body, target, 0.70)
+        end
     end
-    target = Anchors.WorldPoint(playerActor.target)
-    if not target then return false, "npc_facing_target_unavailable" end
-    npcActor.body:faceLocation(target.x, target.y)
-    npcActor.facing = Anchors.IsFacing(npcActor.body, playerActor.target, 0.70)
-    if npcActor.facing and playerActor.facing then
-        scheduleBeat(session, timestamp)
+    local allFacing = true
+    for _, actor in pairs(session.actors or {}) do
+        if not actor.facing then allFacing = false break end
+    end
+    if allFacing then
+        if session.previewOnly then
+            for _, actor in pairs(session.actors or {}) do
+                actor.state = "preview_ready"
+                actor.lastReason = "placement_preview_facing_complete"
+            end
+            setPhase(
+                session,
+                Opera.Phases.READY,
+                timestamp + (tonumber(Opera.Config.placementPreviewLeaseMs)
+                    or 30000),
+                "placement_preview_ready",
+                true
+            )
+        else
+            scheduleBeat(session, timestamp)
+        end
     end
     return true
 end
@@ -796,50 +1156,81 @@ end
 
 local function pumpPlaying(session, timestamp)
     local beat = session.blueprint.beats[session.beatIndex]
-    local actor = session.actors.npc
     local accepted
     local status
-    local ok
     local reason
     if not session.beatStartedAt then
         if timestamp < tonumber(session.beatStartAt or 0) then
             return true
         end
         session.beatStartedAt = timestamp
-        accepted, reason = NPCAnimation.Start(session, actor, beat)
-        if not accepted then
-            return false, reason or "npc_animation_start_failed"
+        for actorID, actor in pairs(session.actors or {}) do
+            if actor.kind == "nearby_live_npc" then
+                local track = Blueprints.GetTrack
+                    and Blueprints.GetTrack(beat, actorID)
+                    or beat.tracks and beat.tracks[actorID]
+                    or beat.npc
+                accepted, reason = NPCAnimation.Start(
+                    session, actor, beat, track
+                )
+                if not accepted then
+                    return false, reason or "npc_animation_start_failed"
+                end
+                actor.animationOwned = true
+                session.beatStartedBy[actorID] = true
+            elseif actor.kind == "local_player" then
+                session.beatStartedBy[actorID] = false
+            end
         end
-        actor.animationOwned = true
         trace(session, "beat_started", {
             beat = beat.id,
             revision = session.revision,
         }, timestamp)
         sendState(session, false)
     end
-    if not session.playerBeatStarted
-        and timestamp > session.beatStartedAt + Opera.Config.acknowledgementTimeoutMs
-    then
-        return false, "player_animation_ack_timeout"
+    for actorID, actor in pairs(session.actors or {}) do
+        if actor.kind == "local_player"
+            and not session.beatStartedBy[actorID]
+            and timestamp > session.beatStartedAt
+                + Opera.Config.acknowledgementTimeoutMs
+        then
+            return false, "player_animation_ack_timeout"
+        end
     end
-    if actor.animationOwned then
-        ok, status = NPCAnimation.Observe(session, actor, beat)
-        if not ok then return false, status end
-        if status == "finished" then
-            session.npcBeatFinished = true
-        elseif timestamp < session.phaseDeadline then
-            local maintained, maintainReason = NPCAnimation.Maintain(
-                session,
-                actor,
-                beat,
-                session.phaseDeadline
-            )
-            if maintained ~= true then
-                return false, maintainReason or "npc_animation_maintain_failed"
+    for actorID, actor in pairs(session.actors or {}) do
+        if actor.kind == "nearby_live_npc" and actor.animationOwned then
+            local track = Blueprints.GetTrack
+                and Blueprints.GetTrack(beat, actorID)
+                or beat.tracks and beat.tracks[actorID]
+                or beat.npc
+            local ok
+            ok, status = NPCAnimation.Observe(session, actor, beat, track)
+            if not ok then return false, status end
+            if status == "finished" then
+                session.beatFinishedBy[actorID] = true
+            elseif timestamp < session.phaseDeadline then
+                local maintained, maintainReason = NPCAnimation.Maintain(
+                    session,
+                    actor,
+                    beat,
+                    session.phaseDeadline,
+                    track
+                )
+                if maintained ~= true then
+                    return false, maintainReason
+                        or "npc_animation_maintain_failed"
+                end
             end
         end
     end
-    if session.playerBeatFinished and session.npcBeatFinished then
+    local allFinished = true
+    for actorID in pairs(session.actors or {}) do
+        if not session.beatFinishedBy[actorID] then
+            allFinished = false
+            break
+        end
+    end
+    if allFinished then
         return beatFinished(session, timestamp)
     end
     if timestamp >= session.phaseDeadline then
@@ -862,7 +1253,14 @@ function Authority.PumpSession(session, timestamp)
     elseif session.phase == Opera.Phases.FACING then
         safe, reason = pumpFacing(session, timestamp)
     elseif session.phase == Opera.Phases.READY then
-        safe, reason = pumpReady(session, timestamp)
+        if session.previewOnly then
+            session.phaseDeadline = timestamp + (
+                tonumber(Opera.Config.placementPreviewLeaseMs) or 30000
+            )
+            safe = true
+        else
+            safe, reason = pumpReady(session, timestamp)
+        end
     elseif session.phase == Opera.Phases.PLAYING then
         safe, reason = pumpPlaying(session, timestamp)
     else
@@ -916,22 +1314,93 @@ function Authority.HandleRequest(player, args)
     local accepted
     local reason
     if action == "start" then
-        accepted, reason = startSession(player, args)
+        accepted, reason = startSession(player, args, false)
         if not accepted then
             sendError(player, reason, session)
             return false, reason
         end
         return true, reason
     end
+    if action == "preview_start" then
+        if session and not session.previewOnly then
+            sendError(player, "playback_session_active", session)
+            return false, "playback_session_active"
+        end
+        accepted, reason = startSession(player, args, true)
+        if not accepted then
+            sendError(player, reason, session)
+            return false, reason
+        end
+        return true, reason
+    end
+    if action == "preview_stop" then
+        if not session then return true, "preview_missing" end
+        if not session.previewOnly then
+            sendError(player, "playback_session_active", session)
+            return false, "playback_session_active"
+        end
+        accepted, reason = ownsRequest(session, player, args)
+        if not accepted then
+            sendError(player, reason, session)
+            return false, reason
+        end
+        closeSession(session, Opera.Phases.RESTORED, "preview_stop")
+        return true, "preview_stopped"
+    end
+    if action == "preview_refresh" then
+        if not session then return false, "preview_missing" end
+        if not session.previewOnly then
+            sendError(player, "playback_session_active", session)
+            return false, "playback_session_active"
+        end
+        accepted, reason = ownsRequest(session, player, args)
+        if not accepted then
+            sendError(player, reason, session)
+            return false, reason
+        end
+        local refreshAt = now()
+        local safe
+        safe, reason = activeSafety(session, refreshAt)
+        if not safe then
+            abortSession(session, reason)
+            return false, reason
+        end
+        session.phaseDeadline = refreshAt + (
+            tonumber(Opera.Config.placementPreviewLeaseMs) or 30000
+        )
+        sendState(session, false)
+        return true, "preview_refreshed"
+    end
+    if action == "preflight" then
+        local preflight
+        preflight, reason = buildPreflight(player, args)
+        if not preflight then
+            sendError(player, reason, session)
+            return false, reason
+        end
+        sendToClient(player, Const.CMD_PUPPET_OPERA_STATE, {
+            phase = session and session.phase
+                or (preflight.ready and "ready" or "blocked"),
+            blueprintId = preflight.blueprintId,
+            preflight = preflight,
+        })
+        return true, { preflight = preflight }
+    end
     if action == "replay" then
         if session then
-            local npcID = session.npcID
+            local actorBindings = {}
+            for actorID, actor in pairs(session.actors or {}) do
+                if actor.kind == "nearby_live_npc" then
+                    actorBindings[actorID] = actor.npcID
+                end
+            end
             local loop = session.loopEnabled
             closeSession(session, Opera.Phases.RESTORED, "replay")
-            args.npcID = args.npcID or npcID
+            args.actors = args.actors or actorBindings
+            args.npcID = args.npcID or session.npcID
             args.loop = args.loop == true or loop
         end
-        accepted, reason = startSession(player, args)
+        accepted, reason = startSession(player, args, false)
         if not accepted then
             sendError(player, reason, session)
             return false, reason
@@ -1003,7 +1472,8 @@ function Authority.HandleRequest(player, args)
         then
             return false, "player_arrival_out_of_phase"
         end
-        local actor = session.actors.player
+        local actorID, actor = localActor(session)
+        if not actor then return false, "player_actor_missing" end
         if not Anchors.IsAt(
             session.playerBody,
             actor.target,
@@ -1014,7 +1484,7 @@ function Authority.HandleRequest(player, args)
         actor.arrived = true
         actor.state = "arrived"
         actor.lastReason = "player_arrived_verified"
-        trace(session, "player_arrived", { actor = "player" })
+        trace(session, "player_arrived", { actor = actorID })
         return true, "player_arrival_verified"
     end
     if action == "player_facing" then
@@ -1023,17 +1493,22 @@ function Authority.HandleRequest(player, args)
         then
             return false, "player_facing_out_of_phase"
         end
-        local actor = session.actors.player
+        local actorID, actor = localActor(session)
+        if not actor then return false, "player_actor_missing" end
+        local targetActor = actor.target and session.actors
+            and session.actors[actor.target.faceTarget] or nil
+        local target = targetActor and targetActor.target or nil
+        if not target then return false, "player_facing_target_missing" end
         if not Anchors.IsFacing(
             session.playerBody,
-            session.actors.npc.target,
+            target,
             0.70
         ) then
             return false, "player_facing_not_verified"
         end
         actor.facing = true
         actor.lastReason = "player_facing_verified"
-        trace(session, "player_facing", { actor = "player" })
+        trace(session, "player_facing", { actor = actorID })
         return true, "player_facing_verified"
     end
     if action == "player_beat_started" then
@@ -1043,10 +1518,12 @@ function Authority.HandleRequest(player, args)
         then
             return false, "player_beat_start_out_of_phase"
         end
-        session.playerBeatStarted = true
-        session.actors.player.animationOwned = true
+        local actorID, actor = localActor(session)
+        if not actor then return false, "player_actor_missing" end
+        session.beatStartedBy[actorID] = true
+        actor.animationOwned = true
         trace(session, "player_beat_started", {
-            actor = "player",
+            actor = actorID,
             beat = session.beatIndex,
         })
         return true, "player_beat_start_verified"
@@ -1058,10 +1535,12 @@ function Authority.HandleRequest(player, args)
         then
             return false, "player_beat_finish_out_of_phase"
         end
-        session.playerBeatFinished = true
-        session.actors.player.animationOwned = false
+        local actorID, actor = localActor(session)
+        if not actor then return false, "player_actor_missing" end
+        session.beatFinishedBy[actorID] = true
+        actor.animationOwned = false
         trace(session, "player_beat_finished", {
-            actor = "player",
+            actor = actorID,
             beat = session.beatIndex,
         })
         return true, "player_beat_finish_verified"

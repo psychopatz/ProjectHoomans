@@ -19,6 +19,8 @@ local FacilityTargets = PNC.FacilityInteractionTargets
 local Diagnostics = PNC.Semantics.SemanticDiagnostics
 local Catalog = PNC.Semantics.WorldTargetCatalog
     or require "PNC/Semantics/PNC_SemanticWorldTargetCatalog"
+local CampSite = PNC.Semantics.CampSite
+    or require "PNC/Semantics/PNC_SemanticCampSite"
 
 Resolver.Providers = Resolver.Providers or {}
 Resolver.Aliases = Resolver.Aliases or {}
@@ -254,8 +256,7 @@ local function globalCampfireForSquare(square)
     return {
         object = campfire,
         source = "global_campfire",
-        key = "campfire@" .. tostring(x) .. ":" .. tostring(y)
-            .. ":" .. tostring(z or 0),
+        key = CampSite.CampfireKey(x, y, z),
     }
 end
 
@@ -279,10 +280,13 @@ local function campfireIDMatches(wanted, key, objectID)
     local objectText = tostring(objectID or "")
     local coordinateKey = wantedText
         and string.match(wantedText, "^([^#]+)#") or nil
+    local wantedCoordinate = CampSite.CampfireCoordinateKey(wantedText)
+    local keyCoordinate = CampSite.CampfireCoordinateKey(keyText)
     if not wantedText then return true end
     return wantedText == keyText
         or wantedText == objectText
         or coordinateKey ~= nil and coordinateKey == keyText
+        or wantedCoordinate ~= nil and wantedCoordinate == keyCoordinate
 end
 
 local function isCampfire(entry, requestedID)
