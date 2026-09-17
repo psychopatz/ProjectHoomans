@@ -237,6 +237,26 @@ T.equal(records.canonical.affiliation.communityID, "community_player",
     "canonical community is mirrored onto the NPC record")
 T.equal(records.canonical.communityId, nil,
     "legacy scheduler community field is not reintroduced")
+
+records.faction_candidate = {
+    id = "faction_candidate", tacticalClass = "colonist",
+    recruited = true, alive = true, ownerUsername = "another-player",
+}
+affiliations.faction_candidate = { factionID = "player-faction" }
+communityByNPC.faction_candidate = playerCommunities[1]
+T.equal(PNC.Factions.GetNPCFaction("faction_candidate").id,
+    "player-faction", "candidate faction is available to reconciliation")
+T.equal(PNC.Communities.GetNPCCommunity("faction_candidate").factionID,
+    "player-faction", "candidate community is available to reconciliation")
+ok, reason = Recruit.ReconcileOwned(player, records.faction_candidate, {
+    playerFaction = { id = "player-faction" },
+    ownershipContext = { playerKey = "player:canonical:character" },
+})
+T.equal(reason, "unchanged", "candidate repair reason")
+T.equal(ok, true,
+    "canonical faction membership can repair a stale ownership projection")
+T.equal(reason, "unchanged",
+    "faction candidate repair does not require username ownership")
 T.finish("pnc_debug_companion_recruit_smoke")
 
 T.finish("pnc_debug_companion_recruit_smoke")

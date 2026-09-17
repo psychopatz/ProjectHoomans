@@ -76,6 +76,8 @@ function Catalog.Register(kind, definition)
     local profile = {
         kind = kind,
         label = text(definition.label) or kind,
+        commandName = text(definition.commandName)
+            or text(definition.label) or kind,
         aliases = copyList(definition.aliases, Catalog.Normalize),
         spriteNames = copyList(definition.spriteNames, assetKey),
         objectNames = copyList(definition.objectNames, Catalog.Normalize),
@@ -99,6 +101,11 @@ function Catalog.List()
         if profile then output[#output + 1] = profile end
     end
     return output
+end
+
+function Catalog.CommandName(kind)
+    local profile = Catalog.Get(kind)
+    return profile and profile.commandName or nil
 end
 
 local function valuesFor(target)
@@ -178,6 +185,7 @@ end
 -- registration, not a new parser branch or a new client/server scan loop.
 Catalog.Register("recycle_bin", {
     label = "recycle bin",
+    commandName = "bin",
     aliases = {
         "recycle bin", "recycling bin", "trash bin", "garbage bin",
         "bin",
@@ -190,6 +198,7 @@ Catalog.Register("recycle_bin", {
 
 Catalog.Register("campfire", {
     label = "campfire",
+    commandName = "campfire",
     aliases = { "campfire", "fire pit", "firepit", "fire" },
     objectNames = { "campfire", "fire pit", "firepit" },
     special = "campfire",
@@ -201,24 +210,28 @@ Catalog.Register("campfire", {
 -- guessing from an arbitrary nearby object.
 Catalog.Register("bed", {
     label = "bed",
+    commandName = "bed",
     aliases = { "bed", "cot", "bunk", "sleeping spot" },
     objectNames = { "bed", "cot", "bunk" },
 })
 
 Catalog.Register("chair", {
     label = "chair",
+    commandName = "chair",
     aliases = { "chair", "seat", "bench" },
     objectNames = { "chair", "seat", "bench" },
 })
 
 Catalog.Register("door", {
     label = "door",
+    commandName = "door",
     aliases = { "door", "doorway", "entrance" },
     objectNames = { "door", "doorway", "entrance" },
 })
 
 Catalog.Register("table", {
     label = "table",
+    commandName = "table",
     aliases = { "table", "desk", "counter" },
     objectNames = { "table", "desk", "counter" },
 })

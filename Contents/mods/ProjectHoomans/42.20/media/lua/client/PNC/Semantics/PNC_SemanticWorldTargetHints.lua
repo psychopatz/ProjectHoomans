@@ -20,7 +20,7 @@ local Hints = PNC.Semantics.ClientWorldTargetHints or {}
 PNC.Semantics.ClientWorldTargetHints = Hints
 
 local Diagnostics = PNC.Semantics.SemanticDiagnostics
-Hints.VERSION = 1
+Hints.VERSION = 2
 Hints.DEFAULT_RADIUS = 16
 Hints.MAX_RADIUS = 24
 Hints.DEFAULT_CACHE_MS = 750
@@ -314,6 +314,11 @@ local function addCandidate(candidates, profile, observation,
     candidates[#candidates + 1] = {
         kind = profile.kind,
         label = text(profile.label, 64),
+        commandName = text(profile.commandName, 64),
+        targetID = text(observation.targetID or observation.objectKey,
+            128),
+        resourceKey = text(observation.resourceKey or observation.objectKey,
+            128),
         x = x,
         y = y,
         z = z,
@@ -476,6 +481,9 @@ function Hints.Resolve(target, context, options)
             source = "client_loaded_world",
             kind = top.kind,
             label = top.label,
+            semanticName = top.commandName,
+            targetID = top.targetID,
+            resourceKey = top.resourceKey,
             query = text(query, 64),
             x = top.x,
             y = top.y,

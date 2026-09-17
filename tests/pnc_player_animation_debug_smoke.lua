@@ -162,8 +162,11 @@ PNC = {
     },
 }
 
+PsychopatzCore = {}
 Events = nil
 function require() return true end
+T.load("PsychopatzCore", "root",
+    "client/PsychopatzCore/Animation/PsychopatzPlayerAnimationController.lua")
 T.load(PLAYER_FILE)
 
 local source = T.read(PLAYER_FILE)

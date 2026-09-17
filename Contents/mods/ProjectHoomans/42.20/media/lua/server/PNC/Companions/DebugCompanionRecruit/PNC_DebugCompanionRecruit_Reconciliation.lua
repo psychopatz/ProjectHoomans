@@ -15,18 +15,33 @@ local Factions = PNC.Factions
 local Registry = PNC.Registry
 local Graph = PNC.RelationshipGraph
 
-function Recruit.ReconcileOwned(player, record)
+function Recruit.ReconcileOwned(player, record, options)
+    options = type(options) == "table" and options or {}
+    local ownershipContext = options.ownershipContext
+    local playerFaction = options.playerFaction
+    local npcFaction
+    local ownershipConfirmed
     if not player or not record or record.alive == false then
         return false, "npc_not_found"
     end
-    if not PNC.CompanionCommands
-        or not PNC.CompanionCommands.IsOwnedByPlayer
-        or not PNC.CompanionCommands.IsOwnedByPlayer(record, player)
+    ownershipConfirmed = PNC.CompanionCommands
+        and PNC.CompanionCommands.IsOwnedByPlayer
+        and PNC.CompanionCommands.IsOwnedByPlayer(
+            record, player, ownershipContext)
+    if not ownershipConfirmed and ownershipContext
+        and ownershipContext.playerKey and playerFaction and Factions
+        and Factions.GetNPCFaction
     then
+        npcFaction = Factions.GetNPCFaction(record.id)
+        ownershipConfirmed = npcFaction
+            and tostring(npcFaction.id or "")
+                == tostring(playerFaction.id or "")
+    end
+    if not ownershipConfirmed then
         return false, "npc_not_owned"
     end
-    local playerFaction = Factions.GetPlayerFaction(player)
-    local npcFaction = Factions.GetNPCFaction(record.id)
+    playerFaction = playerFaction or Factions.GetPlayerFaction(player)
+    npcFaction = npcFaction or Factions.GetNPCFaction(record.id)
     local community = PNC.Communities
         and PNC.Communities.GetNPCCommunity
         and PNC.Communities.GetNPCCommunity(record.id) or nil
@@ -44,4 +59,3 @@ function Recruit.ReconcileOwned(player, record)
 end
 
 return Recruit
-

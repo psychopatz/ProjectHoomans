@@ -1,8 +1,10 @@
 require "PZAPI/ModOptions"
+require "PNC/UI/PerceptionDebug/PNC_PerceptionDebug_Settings"
 
 PNC.Settings = PNC.Settings or {}
 
 local Settings = PNC.Settings
+local PerceptionSettings = PNC.PerceptionDebug.Settings
 local ModOptions = PZAPI and PZAPI.ModOptions or nil
 
 local function tr(key, fallback)
@@ -150,6 +152,14 @@ local definitions = {
     },
 }
 
+-- Perception settings are registered through the same native options page,
+-- but their storage and runtime consumers live in the dedicated perception
+-- namespace. This keeps the existing nameplate settings contract intact.
+local perceptionDefinitions = PerceptionSettings.GetOptionDefinitions()
+for index = 1, #perceptionDefinitions do
+    definitions[#definitions + 1] = perceptionDefinitions[index]
+end
+
 local function applyDefinition(definition, value)
     if definition.set then
         definition.set(value)
@@ -171,6 +181,7 @@ if ModOptions and not Settings.nativeRegistered then
             tr("UI_PNC_Settings_Title", "Project Hoomans")
         )
     options:addTitle(tr("UI_PNC_Settings_OverlaySection", "NPC overlays"))
+    local perceptionStart = #definitions - #perceptionDefinitions + 1
     local index
     for index = 1, #definitions do
         if index == 10 then
@@ -181,6 +192,11 @@ if ModOptions and not Settings.nativeRegistered then
         if index == 21 then
             options:addSeparator()
             options:addTitle(tr("UI_PNC_Settings_LoggingSection", "Logging"))
+        end
+        if index == perceptionStart then
+            options:addSeparator()
+            options:addTitle(tr("UI_PNC_Settings_PerceptionSection",
+                "NPC perception"))
         end
         local definition = definitions[index]
         local option = options:addTickBox(

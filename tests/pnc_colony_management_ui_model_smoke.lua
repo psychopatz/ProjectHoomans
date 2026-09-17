@@ -101,6 +101,12 @@ T.equal(#needs, 10, "needs, nutrition, and condition meter rows")
 T.equal(needs[2].needType, "hunger", "hunger meter binding")
 T.equal(needs[10].key, "morale", "morale meter binding")
 
+local pendingNeeds = Presentation.BuildNeeds(nil, {
+    identityStatus = { state = "pending" },
+})
+T.equal(pendingNeeds[1].label, "COLONIST IDENTITY IS STILL SYNCING",
+    "pending multiplayer identity is not reported as an empty colony")
+
 ISPanel = {
     derive = function(self)
         local child = {}

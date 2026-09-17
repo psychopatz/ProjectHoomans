@@ -152,6 +152,7 @@
     "UI_PNC_Settings_LoggingSection": "Pag-log",
     "UI_PNC_Settings_OverlayPartsSection": "Mga detalye ng overlay",
     "UI_PNC_Settings_OverlaySection": "Mga overlay ng NPC",
+    "UI_PNC_Settings_PerceptionSection": "Perception ng NPC",
     "UI_PNC_Settings_ShowAIDebug": "Ipakita ang NPC AI debug overlay",
     "UI_PNC_Settings_ShowAnimationDebug": "Ipakita ang mga live na track ng animation ng NPC",
     "UI_PNC_Settings_ShowAnimationSceneDebug": "Ipakita ang overlay ng eksena ng animation ng NPC",

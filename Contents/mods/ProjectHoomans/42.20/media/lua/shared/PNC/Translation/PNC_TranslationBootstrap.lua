@@ -381,6 +381,7 @@ local SEGMENT_SYSTEMS = {
     Overlay = "Settlement",
     PathOverlayDisabled = "Debug",
     PathOverlayEnabled = "Debug",
+    PerceptionDebug = "Debug",
     PlayerNPCInteractions = "Character",
     Point = "Debug",
     Provision = "Provision",

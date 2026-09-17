@@ -28,9 +28,10 @@ local function rememberSettlementResult(requestId, value)
     end
 end
 
-local function owned(record, player)
+local function owned(record, player, ownershipContext)
     return PNC.CompanionCommands and PNC.CompanionCommands.IsOwnedByPlayer
-        and PNC.CompanionCommands.IsOwnedByPlayer(record, player)
+        and PNC.CompanionCommands.IsOwnedByPlayer(
+            record, player, ownershipContext)
 end
 local canUseDebug
 local function effectiveAllowedJobs(record)

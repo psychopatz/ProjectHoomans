@@ -1,7 +1,7 @@
--- PsychopatzCore is an external dependency and therefore the only failure
--- boundary here; Project Hoomans debug registration remains direct afterward.
-local ok = pcall(require, "PsychopatzCore/UI/PsychopatzDebugHubWindow")
-if not ok or not (PsychopatzCore and PsychopatzCore.DebugHub) then
+-- PsychopatzCore is a required mod dependency. Let load failures surface
+-- directly so an animation API or UI regression is diagnosable.
+require "PsychopatzCore/UI/PsychopatzDebugHubWindow"
+if not (PsychopatzCore and PsychopatzCore.DebugHub) then
     return
 end
 
@@ -74,12 +74,34 @@ PsychopatzCore.DebugHub.RegisterTool({
             and PNC.Client.CanUseDebug()
     end,
     action = function()
-        local ok = pcall(require, "PNC/UI/PNC_PlayerAnimationDebugWindow")
-        if ok and PNC.PlayerAnimationDebugUI
+        require "PNC/UI/PNC_PlayerAnimationDebugWindow"
+        if PNC.PlayerAnimationDebugUI
             and PNC.PlayerAnimationDebugUI.Open
         then
             PNC.PlayerAnimationDebugUI.Open()
         end
+    end,
+})
+
+PsychopatzCore.DebugHub.RegisterTool({
+    id = "pnc.perception",
+    source = "Project Hoomans",
+    order = 208,
+    title = translateHubText("UI_PNC_DebugHub_Perception_Title",
+        "Hoomans Perception Debug"),
+    description = translateHubText(
+        "UI_PNC_DebugHub_Perception_Description",
+        "Inspect client-visible objects, semantic names, usable surfaces, rooms, campfire zones, and camp-site resolution without sending search requests."),
+    available = function()
+        return PNC
+            and PNC.PerceptionDebug
+            and PNC.PerceptionDebug.Toggle
+            and PNC.Client
+            and PNC.Client.CanUseDebug
+            and PNC.Client.CanUseDebug()
+    end,
+    action = function()
+        PNC.PerceptionDebug.Toggle()
     end,
 })
 

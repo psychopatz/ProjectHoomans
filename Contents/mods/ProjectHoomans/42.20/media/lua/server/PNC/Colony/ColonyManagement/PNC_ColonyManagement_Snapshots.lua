@@ -22,6 +22,64 @@ local function playerKey(player)
     return "local"
 end
 
+-- Resolve the authority identity once per snapshot. Ownership checks can run
+-- over a large NPC registry, so they must reuse this result instead of
+-- repeatedly probing RuntimeContexts/GetCharacterUUID for every record.
+local function resolveSnapshotOwner(player)
+    local characters = PNC.PlayerCharacters
+    local options = {
+        callback = "colony_management_snapshot",
+        worldAgeHours = PNC.NeedsUtils
+            and PNC.NeedsUtils.WorldAgeHours
+            and PNC.NeedsUtils.WorldAgeHours() or nil,
+    }
+    if not characters or type(characters.GetEntityKey) ~= "function" then
+        return nil, nil, false
+    end
+    local ok, key, reason = pcall(
+        characters.GetEntityKey,
+        player,
+        options
+    )
+    if ok and key ~= nil and tostring(key) ~= "" then
+        return { playerKey = tostring(key) }, "resolved", true
+    end
+    if not ok then reason = "identity_resolution_failed" end
+    return {
+        unavailable = true,
+        reason = tostring(reason or "player_identity_unavailable"),
+    }, tostring(reason or "player_identity_unavailable"), true
+end
+
+local function playerFactionForSnapshot(player, ownershipContext,
+    resolverAvailable)
+    if not PNC.Factions then return nil end
+    if ownershipContext and ownershipContext.playerKey
+        and type(PNC.Factions.GetFactionForPlayerKey) == "function"
+    then
+        return PNC.Factions.GetFactionForPlayerKey(
+            ownershipContext.playerKey)
+    end
+    if not resolverAvailable
+        and type(PNC.Factions.GetPlayerFaction) == "function"
+    then
+        return PNC.Factions.GetPlayerFaction(player)
+    end
+    return nil
+end
+
+local function snapshotIdentityStatus(ownershipContext, reason,
+    resolverAvailable)
+    if not resolverAvailable then return { state = "legacy" } end
+    if ownershipContext and ownershipContext.playerKey then
+        return { state = "ready" }
+    end
+    return {
+        state = "pending",
+        reason = tostring(reason or "player_identity_unavailable"),
+    }
+end
+
 local function ownedZoneSnapshot(service, player)
     local data = service and service.Data or nil
     local zones = data and data.zones or nil
@@ -127,8 +185,10 @@ end
 -- Keep this projection separate from the much heavier colony-management
 -- payload so it remains safe to send through the MP command buffer.
 function Management.BuildBaseSnapshot(player)
-    local playerFaction = PNC.Factions and PNC.Factions.GetPlayerFaction
-        and PNC.Factions.GetPlayerFaction(player) or nil
+    local ownershipContext, identityReason, resolverAvailable =
+        resolveSnapshotOwner(player)
+    local playerFaction = playerFactionForSnapshot(
+        player, ownershipContext, resolverAvailable)
     local colony = activeColonyForFaction(playerFaction)
     local base = colony and PNC.BaseService
         and PNC.BaseService.GetForColony(colony.id) or nil
@@ -145,6 +205,8 @@ function Management.BuildBaseSnapshot(player)
         colony = colonySnapshot,
         faction = faction,
         settlement = base and Internal.BuildSettlementSnapshot(base, {}) or nil,
+        identityStatus = snapshotIdentityStatus(
+            ownershipContext, identityReason, resolverAvailable),
         generatedAt = PNC.NeedsUtils.WorldAgeHours(),
     }
 end
@@ -153,39 +215,76 @@ function Management.BuildSnapshot(player, options)
     options = type(options) == "table" and options or {}
     local people, attention, counts = {}, {}, { hunger={}, thirst={}, fatigue={} }
     local supplyShortages = { food = {}, hydration = {}, medical = {} }
+    local ownedRecords = {}
+    local candidateRecords = {}
     local playerFaction, colony
-    if PNC.Recruitment and PNC.Recruitment.ReconcileOwned then
-        for _, record in pairs(PNC.Registry.Data or {}) do
-            if record.alive ~= false and owned(record, player) then
-                PNC.Recruitment.ReconcileOwned(player, record)
+    local ownershipContext, identityReason, resolverAvailable =
+        resolveSnapshotOwner(player)
+    local identityReady = not resolverAvailable
+        or ownershipContext and ownershipContext.playerKey ~= nil
+    local function recordOwned(record)
+        if resolverAvailable then
+            return identityReady and owned(
+                record, player, ownershipContext) or false
+        end
+        return owned(record, player)
+    end
+    playerFaction = playerFactionForSnapshot(
+        player, ownershipContext, resolverAvailable)
+    for _, record in pairs(PNC.Registry.Data or {}) do
+        if record.alive ~= false then
+            if recordOwned(record) then
+                ownedRecords[#ownedRecords + 1] = record
+            elseif playerFaction and record.affiliation
+                and tostring(record.affiliation.factionID or "")
+                    == tostring(playerFaction.id or "")
+            then
+                -- The record is already in the resolved player's faction.
+                -- Let the canonical recruitment repair reconcile secondary
+                -- membership state without accepting username ownership.
+                candidateRecords[#candidateRecords + 1] = record
             end
         end
     end
-    if PNC.Factions and PNC.Factions.GetPlayerFaction then playerFaction = PNC.Factions.GetPlayerFaction(player) end
-    colony = activeColonyForFaction(playerFaction)
-    for _, record in pairs(PNC.Registry.Data or {}) do
-        if record.alive ~= false and owned(record, player) then
-            local value = summary(record, player, options); people[#people+1]=value
-            for _, needType in ipairs(Definitions.TYPES) do
-                local level=Definitions.GetLevel(needType, value.needs[needType]); counts[needType][level]=(counts[needType][level] or 0)+1
-                if level == "CRITICAL" or level == "SEVERE" or level == "MODERATE" then attention[#attention+1]={ severity=level, npcID=value.id, name=value.name, needType=needType, value=value.needs[needType] } end
+    if PNC.Recruitment and PNC.Recruitment.ReconcileOwned then
+        for _, record in ipairs(ownedRecords) do
+            PNC.Recruitment.ReconcileOwned(player, record, {
+                ownershipContext = ownershipContext,
+                playerFaction = playerFaction,
+            })
+        end
+        for _, record in ipairs(candidateRecords) do
+            local repaired = PNC.Recruitment.ReconcileOwned(player, record, {
+                ownershipContext = ownershipContext,
+                playerFaction = playerFaction,
+            })
+            if repaired and recordOwned(record) then
+                ownedRecords[#ownedRecords + 1] = record
             end
-            local supply = record.runtime and record.runtime.supply
-                and record.runtime.supply.byKind or {}
-            for kind, bucket in pairs({
-                FOOD = supplyShortages.food,
-                HYDRATION = supplyShortages.hydration,
-                MEDICAL = supplyShortages.medical,
-            }) do
-                local lane = supply[kind]
-                if lane and lane.phase == "FAILED" then
-                    bucket[#bucket + 1] = {
-                        npcID = record.id,
-                        name = tostring(record.name or record.id),
-                        reason = lane.lastFailureReason,
-                        nextRetry = lane.nextRetry,
-                    }
-                end
+        end
+    end
+    colony = activeColonyForFaction(playerFaction)
+    for _, record in ipairs(ownedRecords) do
+        local value = summary(record, player, options); people[#people+1]=value
+        for _, needType in ipairs(Definitions.TYPES) do
+            local level=Definitions.GetLevel(needType, value.needs[needType]); counts[needType][level]=(counts[needType][level] or 0)+1
+            if level == "CRITICAL" or level == "SEVERE" or level == "MODERATE" then attention[#attention+1]={ severity=level, npcID=value.id, name=value.name, needType=needType, value=value.needs[needType] } end
+        end
+        local supply = record.runtime and record.runtime.supply
+            and record.runtime.supply.byKind or {}
+        for kind, bucket in pairs({
+            FOOD = supplyShortages.food,
+            HYDRATION = supplyShortages.hydration,
+            MEDICAL = supplyShortages.medical,
+        }) do
+            local lane = supply[kind]
+            if lane and lane.phase == "FAILED" then
+                bucket[#bucket + 1] = {
+                    npcID = record.id,
+                    name = tostring(record.name or record.id),
+                    reason = lane.lastFailureReason,
+                    nextRetry = lane.nextRetry,
+                }
             end
         end
     end
@@ -236,6 +335,8 @@ function Management.BuildSnapshot(player, options)
         provisionStorage=provisionStorage,
         provisionSettings=provisionSettings,
         settlement=settlement, utilities={ facilities = {} },
+        identityStatus=snapshotIdentityStatus(
+            ownershipContext, identityReason, resolverAvailable),
         zoneState={
             lumber=ownedZoneSnapshot(PNC.LumberService, player),
             fishing=ownedZoneSnapshot(PNC.FishingService, player),

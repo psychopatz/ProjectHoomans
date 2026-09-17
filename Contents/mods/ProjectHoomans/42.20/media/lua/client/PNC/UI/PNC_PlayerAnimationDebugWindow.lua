@@ -569,7 +569,6 @@ function ISPNCPlayerAnimationDebugWindow:onResponsiveLayout()
 end
 
 function ISPNCPlayerAnimationDebugWindow:prerender()
-    Debug.Maintain()
     self:refreshDetails(false)
     self:refreshControls()
     PsychopatzWindow.prerender(self)
@@ -645,7 +644,6 @@ end
 
 local function onResetLua()
     if WindowAPI.instance then WindowAPI.instance:close() end
-    Debug.Stop("lua_reset")
 end
 
 if Events and Events.OnResetLua and Events.OnResetLua.Add

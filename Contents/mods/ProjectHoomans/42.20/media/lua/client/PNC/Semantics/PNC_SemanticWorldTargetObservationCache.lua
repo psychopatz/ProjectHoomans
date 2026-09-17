@@ -21,7 +21,7 @@ local loadedRules, loadedSquareRules = pcall(
     require, "PsychopatzCore/World/PsychopatzSquareRules")
 if loadedRules then SquareRules = loadedSquareRules end
 
-Observer.VERSION = 1
+Observer.VERSION = 2
 Observer.DEFAULT_CACHE_MS = 500
 Observer.MAX_RADIUS = 24
 -- The observer is intentionally bounded, but a square-distance scan that
@@ -59,6 +59,31 @@ local function addUnique(values, seen, value, normalizer)
     values[#values + 1] = value
 end
 
+-- Decoration is an optional client-local extension point. Keep the cache
+-- boundary primitive even when a perception provider briefly inspects a Java
+-- object: only booleans, numbers, strings, and plain nested tables survive.
+local function copyPrimitive(value, depth)
+    local valueType = type(value)
+    depth = tonumber(depth) or 0
+    if valueType == "number" or valueType == "string"
+        or valueType == "boolean"
+    then
+        return value
+    end
+    if valueType ~= "table" or depth >= 5 then return nil end
+    local output = {}
+    for key, child in pairs(value) do
+        local keyType = type(key)
+        if keyType == "string" or keyType == "number"
+            or keyType == "boolean"
+        then
+            local copied = copyPrimitive(child, depth + 1)
+            if copied ~= nil then output[key] = copied end
+        end
+    end
+    return output
+end
+
 local function metadataFor(object)
     local labels = {}
     local sprites = {}
@@ -89,7 +114,13 @@ local function metadataFor(object)
         addUnique(labels, seenLabels,
             SquareRules.GetObjectProperty(object, "FurnitureType"))
     end
-    return { labels = labels, spriteNames = sprites }
+    return {
+        labels = labels,
+        spriteNames = sprites,
+        objectName = text(call(object, "getObjectName")),
+        displayName = text(call(object, "getName")),
+        spriteName = text(spriteName),
+    }
 end
 
 local function listSize(list)
@@ -110,15 +141,15 @@ local function objectBudget(value)
         math.floor(number(value) or Observer.MAX_OBJECTS)))
 end
 
-local function cacheKey(originX, originY, originZ, radius, maxObjects)
+local function cacheKey(originX, originY, originZ, radius, maxObjects, cacheTag)
     return tostring(math.floor(originX)) .. ":"
         .. tostring(math.floor(originY)) .. ":"
         .. tostring(originZ) .. ":" .. tostring(radius) .. ":"
-        .. tostring(maxObjects)
+        .. tostring(maxObjects) .. ":" .. tostring(cacheTag or "plain")
 end
 
 local function observationFor(output, seen, object, square, originZ,
-    specialKind)
+    specialKind, objectIndex, decorate)
     if not object or seen[object] then return end
     local squareX = number(call(square, "getX"))
     local squareY = number(call(square, "getY"))
@@ -132,16 +163,33 @@ local function observationFor(output, seen, object, square, originZ,
     metadata.special = specialKind
         or (call(object, "isCampfire") == true and "campfire" or nil)
     seen[object] = true
-    output[#output + 1] = {
+    local keyPrefix = metadata.special == "campfire"
+        and "campfire" or "world_object"
+    local observationKey = keyPrefix .. ":" .. tostring(x) .. ":"
+        .. tostring(y) .. ":" .. tostring(z) .. ":"
+        .. tostring(objectIndex or 0)
+    local observation = {
         x = x,
         y = y,
         z = z,
+        objectIndex = objectIndex,
+        objectKey = observationKey,
+        targetID = observationKey,
+        resourceKey = observationKey,
         metadata = metadata,
         source = "client_loaded_world",
     }
+    if type(decorate) == "function" then
+        local ok, facts = pcall(decorate, object, square, observation)
+        if ok and type(facts) == "table" then
+            observation.facts = copyPrimitive(facts)
+        end
+    end
+    output[#output + 1] = observation
 end
 
-local function scan(cell, originX, originY, originZ, radius, maxObjects)
+local function scan(cell, originX, originY, originZ, radius, maxObjects,
+    decorate)
     local observations = {}
     local seen = {}
     local objectCount = 0
@@ -174,7 +222,8 @@ local function scan(cell, originX, originY, originZ, radius, maxObjects)
             end
             objectCount = objectCount + 1
             observationFor(observations, seen,
-                listItem(objects, index), square, originZ)
+                listItem(objects, index), square, originZ, nil, index,
+                decorate)
         end
 
         -- Campfires are GlobalObjects in some engine versions and are not
@@ -187,7 +236,7 @@ local function scan(cell, originX, originY, originZ, radius, maxObjects)
                 else
                     objectCount = objectCount + 1
                     observationFor(observations, seen, campfire, square,
-                        originZ, "campfire")
+                        originZ, "campfire", -1, decorate)
                 end
             end
         end
@@ -249,7 +298,8 @@ function Observer.Observe(cell, originX, originY, originZ, options)
         bucket = {}
         Observer.Cache[cell] = bucket
     end
-    local key = cacheKey(originX, originY, originZ, radius, maxObjects)
+    local key = cacheKey(originX, originY, originZ, radius, maxObjects,
+        options.cacheTag)
     local cached = bucket[key]
     if cached and timestamp - cached.at <= cacheMs then
         return cached.observations, {
@@ -261,7 +311,8 @@ function Observer.Observe(cell, originX, originY, originZ, options)
     end
 
     local observations, objectCount, truncated = scan(
-        cell, originX, originY, originZ, radius, maxObjects)
+        cell, originX, originY, originZ, radius, maxObjects,
+        options.decorate)
     bucket[key] = {
         at = timestamp,
         observations = observations,
@@ -275,6 +326,18 @@ function Observer.Observe(cell, originX, originY, originZ, options)
         maxObjects = maxObjects,
         cached = false,
     }
+end
+
+-- Detailed observations use the same bounded scan and cache as semantic target
+-- hints, but store provider facts alongside each primitive record. A distinct
+-- cache tag prevents a plain hint lookup from satisfying a detailed debug
+-- lookup with an undecorated snapshot.
+function Observer.ObserveDetailed(cell, originX, originY, originZ, options)
+    options = type(options) == "table" and options or {}
+    local detailed = {}
+    for key, value in pairs(options) do detailed[key] = value end
+    detailed.cacheTag = detailed.cacheTag or "detailed"
+    return Observer.Observe(cell, originX, originY, originZ, detailed)
 end
 
 return Observer

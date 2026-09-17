@@ -156,7 +156,7 @@ function Commands.IsCompanion(record)
     return record.recruited == true
 end
 
-function Commands.IsOwnedByPlayer(record, player)
+function Commands.IsOwnedByPlayer(record, player, ownershipContext)
     local organizationID
     local organization
     local uuid
@@ -165,7 +165,8 @@ function Commands.IsOwnedByPlayer(record, player)
     if PNC.Identity and PNC.Identity.Verifier
         and PNC.Identity.Verifier.IsOwnedByPlayer
     then
-        return PNC.Identity.Verifier.IsOwnedByPlayer(record, player)
+        return PNC.Identity.Verifier.IsOwnedByPlayer(
+            record, player, ownershipContext)
     end
     organizationID = record.affiliation
         and record.affiliation.factionID or nil
@@ -175,21 +176,33 @@ function Commands.IsOwnedByPlayer(record, player)
         and PNC.Factions.Get(organizationID)
         or nil
     if organization then
+        if type(ownershipContext) == "table"
+            and ownershipContext.unavailable == true
+        then
+            return false
+        end
+        if type(ownershipContext) == "table" then
+            playerKey = ownershipContext.playerKey
+                or ownershipContext.entityKey
+        end
         uuid = PNC.PlayerCharacters
             and PNC.PlayerCharacters.GetCharacterUUID
+            and not playerKey
             and PNC.PlayerCharacters.GetCharacterUUID(player)
             or nil
-        local context = PNC.PlayerContext and PNC.PlayerContext.Peek
-            and PNC.PlayerContext.Peek(player) or nil
-        local character = uuid and PNC.PlayerCharacters.Registry
-            and PNC.PlayerCharacters.Registry.byUUID
-            and PNC.PlayerCharacters.Registry.byUUID[uuid] or nil
-        playerKey = context and context.entityKey
-            or uuid and character and PNC.EntityRef
-                and PNC.EntityRef.ForPlayerIdentity(
-                    character.accountKey or character.accountIdentity,
-                    uuid
-                ) or nil
+        if not playerKey then
+            local context = PNC.PlayerContext and PNC.PlayerContext.Peek
+                and PNC.PlayerContext.Peek(player) or nil
+            local character = uuid and PNC.PlayerCharacters.Registry
+                and PNC.PlayerCharacters.Registry.byUUID
+                and PNC.PlayerCharacters.Registry.byUUID[uuid] or nil
+            playerKey = context and context.entityKey
+                or uuid and character and PNC.EntityRef
+                    and PNC.EntityRef.ForPlayerIdentity(
+                        character.accountKey or character.accountIdentity,
+                        uuid
+                    ) or nil
+        end
         if playerKey then
             return organization.ownerPlayerKey == playerKey
                 or organization.playerMemberKeys

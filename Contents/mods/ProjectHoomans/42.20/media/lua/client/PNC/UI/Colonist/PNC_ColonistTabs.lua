@@ -16,7 +16,8 @@ Registry.Register({
     detailTitleKey = "UI_PNC_Colonist_Needs_Title",
     detailTitleFallback = "NEEDS OVERVIEW",
     buildRows = function(context)
-        return Presentation.BuildNeeds(context.selectedPerson)
+        return Presentation.BuildNeeds(
+            context.selectedPerson, context.snapshot)
     end,
 })
 

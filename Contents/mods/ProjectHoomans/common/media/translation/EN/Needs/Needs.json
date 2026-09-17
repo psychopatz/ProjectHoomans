@@ -43,6 +43,7 @@
     "UI_PNC_Need_Hunger": "Hunger",
     "UI_PNC_Need_Hydration": "Hydration",
     "UI_PNC_Need_Thirst": "Thirst",
+    "UI_PNC_Needs_IdentityPending": "Colonist identity is still syncing. Please wait.",
     "UI_PNC_Needs_NoCompanions": "No companions are assigned to this colony.",
     "UI_PNC_Nutrition_Calories": "Calorie Balance",
     "UI_PNC_Nutrition_Weight": "Weight",

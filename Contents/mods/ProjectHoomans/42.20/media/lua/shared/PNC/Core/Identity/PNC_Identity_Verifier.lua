@@ -107,11 +107,20 @@ function Verifier.IsCompanion(value)
     return read(value, "alive") ~= false and Verifier.IsRecruited(value)
 end
 
-local function playerKey(player)
+local function playerKey(player, ownershipContext)
     local context
     local uuid
     local character
+    local resolvedKey
     if not player then return nil end
+    if type(ownershipContext) == "table" then
+        resolvedKey = ownershipContext.playerKey
+            or ownershipContext.entityKey
+        if resolvedKey ~= nil and tostring(resolvedKey) ~= "" then
+            return tostring(resolvedKey)
+        end
+        if ownershipContext.unavailable == true then return nil end
+    end
     context = PNC.PlayerContext and PNC.PlayerContext.Peek
         and PNC.PlayerContext.Peek(player) or nil
     if context and context.entityKey then return context.entityKey end
@@ -147,8 +156,8 @@ local function factionHasPlayer(faction)
     return false
 end
 
-function Verifier.GetPlayerFactionID(player)
-    local key = playerKey(player)
+function Verifier.GetPlayerFactionID(player, ownershipContext)
+    local key = playerKey(player, ownershipContext)
     local faction
     if not key then return nil, "player_identity_unavailable" end
     if not PNC.Factions or not PNC.Factions.GetFactionForPlayerKey then
@@ -187,7 +196,7 @@ function Verifier.BuildOwnershipSummary(value)
     }
 end
 
-function Verifier.ResolveOwnership(value, player)
+function Verifier.ResolveOwnership(value, player, ownershipContext)
     local factionID = Verifier.GetFactionID(value)
     local faction = factionFor(factionID)
     local key
@@ -197,7 +206,7 @@ function Verifier.ResolveOwnership(value, player)
         return false, "factions_unavailable"
     end
     if not faction then return false, "faction_not_found" end
-    key = playerKey(player)
+    key = playerKey(player, ownershipContext)
     if not key then return false, "player_identity_unavailable" end
     if faction.ownerPlayerKey == key
         or faction.playerMemberKeys
@@ -208,8 +217,9 @@ function Verifier.ResolveOwnership(value, player)
     return false, "not_faction_player_member"
 end
 
-function Verifier.IsOwnedByPlayer(value, player)
-    local owned = Verifier.ResolveOwnership(value, player)
+function Verifier.IsOwnedByPlayer(value, player, ownershipContext)
+    local owned = Verifier.ResolveOwnership(
+        value, player, ownershipContext)
     return owned == true
 end
 

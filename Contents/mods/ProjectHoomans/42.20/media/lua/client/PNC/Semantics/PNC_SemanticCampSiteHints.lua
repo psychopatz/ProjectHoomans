@@ -85,7 +85,10 @@ local function position(value)
     return nil
 end
 
-local function cellFor()
+local function cellFor(context)
+    if type(context) == "table" and context.cell then
+        return context.cell
+    end
     if type(getCell) ~= "function" then return nil end
     local ok, cell = pcall(getCell)
     return ok and cell or nil
@@ -136,6 +139,7 @@ local function roomHint(site, query, timestamp)
         roomID = text(site.roomID, 128),
         buildingID = text(site.buildingID, 128),
         roomType = text(site.roomType, 48),
+        roomName = text(site.roomName, 64),
         label = text(site.label, CampSite.MAX_LABEL),
         labelKey = text(site.labelKey, 96),
         risk = text(site.risk, 32),
@@ -153,7 +157,7 @@ local function roomHint(site, query, timestamp)
     }
 end
 
-local function campfireHint(target, context, origin, timestamp)
+local function campfireHint(target, context, origin, timestamp, cell)
     if type(WorldHints) ~= "table"
         or type(WorldHints.Resolve) ~= "function"
     then
@@ -165,7 +169,7 @@ local function campfireHint(target, context, origin, timestamp)
         concept = "CAMPFIRE",
         text = "campfire",
         radius = target and target.radius or 16,
-    }, context, { origin = origin })
+    }, context, { origin = origin, cell = cell })
     if not hint then return nil, reason end
     return {
         version = Hints.VERSION,
@@ -198,7 +202,7 @@ function Hints.Resolve(target, context)
     local scope = scopeFor(target)
     local query = queryFor(target)
     local origin = originFor(context)
-    local cell = cellFor()
+    local cell = cellFor(context)
     local timestamp = nowMs()
     local key = cacheKey(scope, query, origin, cell)
     local cached = Hints.Cache[key]
@@ -211,7 +215,7 @@ function Hints.Resolve(target, context)
     end
     if not origin then reason = "world_origin_unavailable"
     elseif scope == CampSite.SCOPES.CAMPFIRE then
-        hint, reason = campfireHint(target, context, origin, timestamp)
+        hint, reason = campfireHint(target, context, origin, timestamp, cell)
     else
         site, reason = Geometry.FindNearestRoom(cell, origin, {
             text = query,
@@ -223,7 +227,7 @@ function Hints.Resolve(target, context)
         })
         hint = roomHint(site, query, timestamp)
         if not hint and scope == CampSite.SCOPES.HERE then
-            hint, reason = campfireHint(target, context, origin, timestamp)
+            hint, reason = campfireHint(target, context, origin, timestamp, cell)
         elseif not hint then
             reason = reason or "room_not_found"
         end

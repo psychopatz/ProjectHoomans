@@ -249,8 +249,14 @@ function Presentation.BuildPeople(person)
     return rows
 end
 
-function Presentation.BuildNeeds(person)
+function Presentation.BuildNeeds(person, snapshot)
     if not person then
+        local identityStatus = snapshot and snapshot.identityStatus
+        if identityStatus and identityStatus.state == "pending" then
+            return { Presentation.Detail(Shared.Tr(
+                "UI_PNC_Needs_IdentityPending",
+                "COLONIST IDENTITY IS STILL SYNCING"), "") }
+        end
         return { Presentation.Detail(Shared.Tr(
             "UI_PNC_Needs_NoCompanions", "NO COMPANIONS"), "") }
     end

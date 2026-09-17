@@ -152,6 +152,7 @@
     "UI_PNC_Settings_LoggingSection": "Logging",
     "UI_PNC_Settings_OverlayPartsSection": "Overlay details",
     "UI_PNC_Settings_OverlaySection": "NPC overlays",
+    "UI_PNC_Settings_PerceptionSection": "NPC perception",
     "UI_PNC_Settings_ShowAIDebug": "Show NPC AI debug overlay",
     "UI_PNC_Settings_ShowAnimationDebug": "Show live NPC animation tracks",
     "UI_PNC_Settings_ShowAnimationSceneDebug": "Show NPC animation scene overlay",
