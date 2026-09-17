@@ -51,15 +51,15 @@ register("camp_no_npc", {
 })
 
 register("camp_rejected", {
-    { key = "UI_PNC_Flavor_CampRejected_Player_1", fallback = "No camp here. This place isn't safe without a building." },
-    { key = "UI_PNC_Flavor_CampRejected_Player_2", fallback = "We need shelter before we make camp." },
-    { key = "UI_PNC_Flavor_CampRejected_Player_3", fallback = "This isn't safe for camping. Find a building first." },
+    { key = "UI_PNC_Flavor_CampRejected_Player_1", fallback = "I can't find a safe room or campfire nearby." },
+    { key = "UI_PNC_Flavor_CampRejected_Player_2", fallback = "We need a nearby room or campfire before we make camp." },
+    { key = "UI_PNC_Flavor_CampRejected_Player_3", fallback = "No usable camp site is visible from here." },
 }, {
-    { key = "UI_PNC_Flavor_CampRejected_NPC_1", fallback = "I can't camp here. This place isn't safe without a building." },
-    { key = "UI_PNC_Flavor_CampRejected_NPC_2", fallback = "Not here. We need shelter before we make camp." },
-    { key = "UI_PNC_Flavor_CampRejected_NPC_3", fallback = "This isn't safe for a camp. Let's find a building." },
-    { key = "UI_PNC_Flavor_CampRejected_NPC_4", fallback = "We're too exposed out here. We need a roof." },
-    { key = "UI_PNC_Flavor_CampRejected_NPC_5", fallback = "No. Camp somewhere safe, with walls around us." },
+    { key = "UI_PNC_Flavor_CampRejected_NPC_1", fallback = "I can't find a safe room or campfire nearby." },
+    { key = "UI_PNC_Flavor_CampRejected_NPC_2", fallback = "Not here. We need a nearby room or campfire." },
+    { key = "UI_PNC_Flavor_CampRejected_NPC_3", fallback = "I can't see a usable camp site from here." },
+    { key = "UI_PNC_Flavor_CampRejected_NPC_4", fallback = "We're too exposed out here. Let's find a room or campfire." },
+    { key = "UI_PNC_Flavor_CampRejected_NPC_5", fallback = "No usable camp site is visible from here." },
 })
 
 register("return_home", {

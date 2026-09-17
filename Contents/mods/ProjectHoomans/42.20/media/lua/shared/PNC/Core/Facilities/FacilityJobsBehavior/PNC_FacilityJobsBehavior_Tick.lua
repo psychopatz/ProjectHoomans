@@ -47,6 +47,7 @@ end
 local function waterRefillSceneReady(record, runtime)
     local waterService = PNC.WaterContainerService
     local inventory = PNC.Inventory
+    local policy = PNC.WaterHydrationPolicy
     local inv
     local item
     local description
@@ -55,6 +56,11 @@ local function waterRefillSceneReady(record, runtime)
     then
         return true
     end
+    if not policy or not policy.AllowsActivity then
+        return false, "WATER_POLICY_UNAVAILABLE"
+    end
+    local allowed, policyReason = policy.AllowsActivity(record, runtime)
+    if not allowed then return false, policyReason end
     if not inventory or not inventory.EnsureRecordInventory
         or not inventory.DescribeLiquidContainer
     then

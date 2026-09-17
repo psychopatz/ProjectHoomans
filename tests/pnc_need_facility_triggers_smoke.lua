@@ -67,6 +67,26 @@ PNC = {
         GetBase = function() return { id = "base" } end,
         IsAtHome = function() return atHome end,
     },
+    WaterHydrationPolicy = {
+        GetContext = function(_, _, options)
+            if options and options.manualOverride == true then
+                return { kind = "MANUAL_OVERRIDE", manualOverride = true }
+            end
+            if atHome then return { kind = "HOME", baseId = "base" } end
+            return nil, "WATER_LOCATION_REQUIRED"
+        end,
+        AllowsActivity = function(_, target, activity)
+            if activity and activity.manualOverride == true then
+                return true, "MANUAL_OVERRIDE"
+            end
+            local context = PNC.WaterHydrationPolicy.GetContext(target)
+            return context ~= nil, context and context.kind
+                or "WATER_LOCATION_REQUIRED"
+        end,
+        RestrictTargets = function(_, _, source, target, approaches)
+            return target, approaches
+        end,
+    },
     CampResourceService = {
         FindWater = function()
             return { resourceKey = "camp:faucet" }, { x = 10.5, y = 12.5,

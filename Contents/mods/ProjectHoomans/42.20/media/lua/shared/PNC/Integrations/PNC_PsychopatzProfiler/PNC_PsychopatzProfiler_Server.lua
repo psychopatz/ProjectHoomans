@@ -64,6 +64,34 @@ function Integration.InstallServer()
     wrap(PNC.Network, "QueuePeriodicRoster",
         "Server.Update.NPC.QueueRoster")
     wrap(PNC.Scheduler, "Schedule", "Server.Update.NPC.Schedule")
+    -- Hydration is split into planning, source movement, the delayed scene
+    -- effect, and the inventory transaction. Keep each boundary separate so
+    -- a refill spike can be attributed without guessing from the broad NPC
+    -- decision/path markers.
+    wrap(PNC.NeedFacilityTriggers, "GetCandidates",
+        "Server.Update.NPC.Needs.Candidates")
+    wrap(PNC.NeedFacilityTriggers, "Assign",
+        "Server.Update.NPC.Needs.Assignment")
+    wrap(PNC.NeedFacilityTriggers, "Start",
+        "Server.Update.NPC.Needs.Start")
+    wrap(PNC.NeedFacilityEffects, "Tick",
+        "Server.Update.NPC.Needs.EffectTick")
+    wrap(PNC.NearbyWaterService, "ResolveHydrationPlan",
+        "Server.Update.NPC.Water.Plan")
+    wrap(PNC.NearbyWaterService, "FindSource",
+        "Server.Update.NPC.Water.SourceSearch")
+    wrap(PNC.NearbyWaterService, "BuildApproach",
+        "Server.Update.NPC.Water.Approach")
+    wrap(PNC.NearbyWaterService, "Consume",
+        "Server.Update.NPC.Water.DrinkCommit")
+    wrap(PNC.WaterContainerService, "CanRefill",
+        "Server.Update.NPC.Water.RefillAdmission")
+    wrap(PNC.WaterContainerService, "Refill",
+        "Server.Update.NPC.Water.RefillTransaction")
+    wrap(PNC.FacilityJobsBehaviorInternal, "Tick",
+        "Server.Update.NPC.FacilityActivity.Tick")
+    wrap(PNC.FacilityJobsBehaviorInternal, "OnSceneTick",
+        "Server.Update.NPC.FacilityActivity.SceneTick")
     local networkInternal = PNC.Network and PNC.Network.Internal or nil
     wrap(networkInternal, "QueueBroadcastRoster",
         "Network.BroadcastRecord.QueueRoster")

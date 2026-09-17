@@ -111,6 +111,18 @@ local Handler = T.load("ProjectHoomans", "server",
     "PNC/Semantics/PNC_SemanticCampTaskHandler.lua")
 T.truthy(registeredHandler == Handler,
     "CAMP handler registers with the shared task service")
+local clientValidationCalls = 0
+local broadResolutionCalls = 0
+local originalValidateClientSite = Resolver.ValidateClientSite
+local originalResolve = Resolver.Resolve
+Resolver.ValidateClientSite = function(target, context)
+    clientValidationCalls = clientValidationCalls + 1
+    return roomSite
+end
+Resolver.Resolve = function(target, context)
+    broadResolutionCalls = broadResolutionCalls + 1
+    return originalResolve(target, context)
+end
 local result = Handler.Submit({
     intent = "REQUEST",
     action = "CAMP",
@@ -121,6 +133,16 @@ local result = Handler.Submit({
         kind = CampSite.KIND,
         scope = CampSite.SCOPES.ROOM,
         roomQuery = "bedroom",
+        clientHint = {
+            kind = CampSite.KIND,
+            scope = CampSite.SCOPES.ROOM,
+            siteID = roomSite.siteID,
+            roomID = roomSite.roomID,
+            buildingID = roomSite.buildingID,
+            x = roomSite.x,
+            y = roomSite.y,
+            z = roomSite.z,
+        },
     },
 }, { npcID = "npc:camp", player = player })
 T.truthy(result.accepted, "CAMP admission accepts a resolved room")
@@ -132,5 +154,24 @@ T.equal(submittedPlan.steps[3].action, "COMMIT_CAMP_ORDER",
     "camp plan commits the durable order last")
 T.equal(submittedPlan.steps[1].parameters.target.x, roomSite.x,
     "camp movement uses the resolved room anchor")
+T.equal(clientValidationCalls, 1,
+    "client-originated CAMP uses exact hint validation")
+T.equal(broadResolutionCalls, 0,
+    "client-originated CAMP does not fall back to broad discovery")
+Resolver.ValidateClientSite = originalValidateClientSite
+Resolver.Resolve = originalResolve
+
+local noHint = Handler.Submit({
+    intent = "REQUEST",
+    action = "CAMP",
+    rawText = "Let's camp here",
+    confidence = 0.96,
+    recipient = { id = "npc:camp" },
+    target = { kind = CampSite.KIND, scope = CampSite.SCOPES.HERE },
+}, { npcID = "npc:camp", player = player })
+T.falsy(noHint.accepted,
+    "client-originated CAMP without an observation is rejected")
+T.equal(noHint.reason, "camp_site_hint_required",
+    "missing client observation has a stable rejection reason")
 
 T.finish("pnc_semantic_camp_task_smoke")

@@ -18,39 +18,17 @@ local function currentPosition(record)
         tonumber(record and record.z) or 0
 end
 
-local function campDestinationEligibility(x, y, z)
-    local query = PNC.TraversalQuery
-    local square
-    local indoor
-    if not query or type(query.GetSquare) ~= "function"
-        or type(query.GetInteriorState) ~= "function"
-    then
-        return false, "camp_requires_building"
-    end
-    square = query.GetSquare(x, y, z)
-    indoor = query.GetInteriorState(square)
-    if indoor ~= true then
-        return false, "camp_requires_building"
-    end
-    return true, "camp_inside_building"
-end
-
-local function playerCampEligibility(record)
-    return campDestinationEligibility(currentPosition(record))
-end
-
--- Group camp uses the player's destination as the single authoritative
--- anchor. Expose the same check to the client preview and the server command
--- path so distant/abstract followers are not rejected for their old position.
+-- Group camp uses the player's destination as the selection origin. The
+-- client supplies a primitive site hint and the server validates that one
+-- candidate before creating the shared anchor.
 function Commands.CanCampAtPlayer(player)
     if not player or (player.isDead and player:isDead()) then
         return false, "invalid_player"
     end
     if not player.getX or not player.getY or not player.getZ then
-        return false, "camp_requires_building"
+        return false, "position_missing"
     end
-    return campDestinationEligibility(
-        player:getX(), player:getY(), player:getZ())
+    return true, "commandable"
 end
 
 Commands.RegisterGroup({
@@ -156,17 +134,20 @@ Commands.Register({
     semanticOnly = true,
     labelKey = "UI_PNC_CommandCamp",
     label = "Camp Here",
-    llmDescription = "Order this companion to stop following and make a temporary camp at their current location. Player-issued camps require the companion to be inside a building. NPC faction AI may override that restriction for its own camps. Use for requests such as 'let's just stay here for now', 'make camp', or 'rest here'. Unlike Wait Here, camp allows the companion to satisfy needs such as sleep, food, and water without requiring a home.",
+    llmDescription = "Order this companion to stop following and make a temporary camp at the nearest safe room or campfire visible from the requested location. Player-issued camps use a client-discovered site hint that the server validates before accepting it. NPC faction AI may resolve its own camps on the server. Use for requests such as 'let's just stay here for now', 'make camp', or 'rest here'. Unlike Wait Here, camp allows the companion to satisfy needs such as sleep, food, and water without requiring a home.",
     emote = "freeze",
     icon = "media/ui/Emotes/PNC_EmoteStay.png",
-    canApply = playerCampEligibility,
     buildOrder = function(record, _, options)
         local x
         local y
         local z
+        local site
         options = type(options) == "table" and options or {}
+        site = type(options.campSite) == "table" and options.campSite or nil
         if options.x ~= nil and options.y ~= nil then
             x, y, z = options.x, options.y, options.z
+        elseif site and site.x ~= nil and site.y ~= nil then
+            x, y, z = site.x, site.y, site.z
         else
             x, y, z = currentPosition(record)
         end
@@ -175,10 +156,24 @@ Commands.Register({
             x = x,
             y = y,
             z = z,
-            radius = tonumber(Const.CAMP_RADIUS) or 3,
+            radius = tonumber(site and site.radius)
+                or tonumber(Const.CAMP_RADIUS) or 3,
             campId = tostring(options.campId
                 or ("camp:" .. tostring(record.id))),
-            resourceRadius = tonumber(Const.CAMP_RESOURCE_RADIUS) or 12,
+            resourceRadius = tonumber(site and site.resourceRadius)
+                or tonumber(Const.CAMP_RESOURCE_RADIUS) or 12,
+            scope = site and (site.scope or site.siteScope) or nil,
+            siteScope = site and (site.siteScope or site.scope) or nil,
+            siteID = site and site.siteID or nil,
+            roomID = site and site.roomID or nil,
+            buildingID = site and site.buildingID or nil,
+            roomType = site and site.roomType or nil,
+            roomName = site and site.roomName or nil,
+            roomBounds = site and site.roomBounds or nil,
+            campfireID = site and site.campfireID or nil,
+            label = site and site.label or nil,
+            risk = site and site.risk or nil,
+            stopDistance = site and site.stopDistance or nil,
         }
     end,
 })

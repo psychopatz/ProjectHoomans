@@ -460,7 +460,7 @@ function Debug.Runtime()
         loopCount = active and tonumber(active.loopCount) or 0,
         actionTime = actionTime,
         actionDuration = actionDuration,
-        actionSource = entry and entry.path or nil,
+        actionSource = entry and (entry.bridgePath or entry.path) or nil,
         result = Debug.lastResult,
     }
 end

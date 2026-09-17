@@ -376,7 +376,10 @@ function ISEmoteRadialMenu:emote(emote)
             interactionOutcome = "pending"
         elseif sent then
             interactionOutcome = "valid"
-        elseif commandReason == "camp_requires_building" then
+        elseif string.sub(tostring(commandReason or ""), 1, 5) == "camp_"
+            or string.sub(tostring(commandReason or ""), 1, 9)
+                == "campfire_"
+        then
             interactionOutcome = "invalid"
         end
     elseif sent and commandReason == "network_queued" then

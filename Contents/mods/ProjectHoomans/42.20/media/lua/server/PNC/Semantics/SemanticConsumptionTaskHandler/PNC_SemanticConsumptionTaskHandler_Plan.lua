@@ -38,6 +38,10 @@ local function buildPlan(request, context)
         confidence = request.confidence,
         rawText = request.rawText,
         provenance = request.provenance,
+        -- A semantic REFILL is an explicit player/dialogue command, not an
+        -- autonomous need decision. Carry that authority through the queued
+        -- plan so it remains a manual override at delayed commit time.
+        manualOverride = action == "REFILL",
         metadata = {
             taskAction = action,
             resourceKind = resourceKind,

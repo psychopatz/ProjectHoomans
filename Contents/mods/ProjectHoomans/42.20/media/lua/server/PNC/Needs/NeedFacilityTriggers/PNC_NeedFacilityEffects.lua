@@ -83,6 +83,24 @@ function Effects.ReportWaterRefillResult(record, state, accepted, reason, detail
     return true
 end
 
+-- A successful bottle fill is also a hydration completion. Keep this effect
+-- shared by facility, manual, and semantic refill callers so none of those
+-- paths can silently refill a bottle while leaving thirst active.
+function Effects.ApplyWaterRefillSuccess(record, state, filled)
+    state = type(state) == "table" and state or {}
+    local needs = PNC.IndividualNeeds
+    local thirstBefore = needs and needs.Get
+        and tonumber(needs.Get(record, "thirst")) or nil
+    if not needs or not needs.Set then return false end
+    local cleared = needs.Set(record, "thirst", 0, "water_refill_drink")
+    if cleared == nil then return false end
+    Events.emit(EventTypes.NPC_WATER_REFILL_DRANK, record,
+        tostring(state.activityItemFullType or state.activityItemID or ""),
+        thirstBefore or 0, tonumber(filled) or 0,
+        tostring(state.resourceKey or ""))
+    return true
+end
+
 local function hasLiveWaterSource(source)
     return source and (source.object ~= nil or source.item ~= nil)
 end
@@ -98,6 +116,53 @@ local function worldWaterFailure(record, now, reason)
             + WORLD_WATER_RETRY_COOLDOWN_MS
     end
     return false, true, reason
+end
+
+local function optionalBottleRefill(record, state, source)
+    local activity = record and record.runtime
+        and record.runtime.facilityActivity or nil
+    local policy = PNC.WaterHydrationPolicy
+    local inventory = PNC.Inventory
+    local water = PNC.WaterContainerService
+    local item
+    local context
+    local reason
+    if not activity or not policy or not policy.GetContext then
+        return nil, nil, "WATER_REFILL_NOT_AUTHORIZED"
+    end
+    context, reason = policy.GetContext(record, {
+        manualOverride = activity.manualOverride == true,
+        manual = activity.manual == true,
+        capability = activity.capability,
+        resourceKind = activity.resourceKind,
+    })
+    if not context then return nil, nil, reason end
+    if not inventory then return nil, nil, "WATER_CONTAINER_UNAVAILABLE" end
+    item = inventory.GetWaterContainer
+        and inventory.GetWaterContainer(record)
+        or inventory.FindWaterContainer
+        and inventory.FindWaterContainer(record)
+        or nil
+    if not item or not inventory.IsRefillableWaterContainer
+        or not inventory.IsRefillableWaterContainer(item)
+    then
+        return nil, nil, "WATER_CONTAINER_NOT_REFILLABLE"
+    end
+    if not source or not source.object or not water
+        or not water.Refill
+    then
+        return nil, nil, "WATER_SOURCE_NOT_REFILLABLE"
+    end
+    if water.IsFillableFaucet
+        and water.IsFillableFaucet(source.object) ~= true
+    then
+        return nil, nil, "WATER_SOURCE_NOT_REFILLABLE"
+    end
+    local ok, filled, refillReason = water.Refill(record, item.id, source)
+    if ok ~= true then
+        return nil, nil, refillReason or "WATER_REFILL_FAILED"
+    end
+    return filled, item.id, nil
 end
 
 local function applyWorldWater(record, state, definition, now)
@@ -180,12 +245,21 @@ local function applyWorldWater(record, state, definition, now)
     if (tonumber(consumed) or 0) <= 0 then
         return worldWaterFailure(record, now, "INSUFFICIENT_WATER")
     end
-    if PNC.IndividualNeeds and PNC.IndividualNeeds.Commands
+    local filledBottle, filledItemID, refillReason = optionalBottleRefill(
+        record, state, source)
+    if filledBottle ~= nil then
+        state.optionalBottleFill = true
+        state.optionalBottleFillItemID = filledItemID
+        state.optionalBottleFillAmount = filledBottle
+        Effects.ApplyWaterRefillSuccess(record, state, filledBottle)
+    elseif PNC.IndividualNeeds and PNC.IndividualNeeds.Commands
         and PNC.IndividualNeeds.Commands.ApplyDrink
     then
         PNC.IndividualNeeds.Commands.ApplyDrink(record, {
             thirst = (tonumber(consumed) or 0) / 2,
         }, "world_water_drink")
+        state.optionalBottleFill = false
+        state.optionalBottleFillReason = refillReason
     end
     state.effectAttempted = true
     return true, true, "NEED_COMPLETE", consumed
@@ -237,19 +311,7 @@ local function applyWaterRefill(record, state, definition, now)
     -- thirst only after the bottle and source have both been committed, then
     -- publish a distinct journal event so this automatic drinking is not
     -- confused with consuming the bottle itself.
-    local needs = PNC.IndividualNeeds
-    local thirstBefore = needs and needs.Get
-        and tonumber(needs.Get(record, "thirst")) or nil
-    if needs and needs.Set then
-        local cleared = needs.Set(record, "thirst", 0,
-            "water_refill_drink")
-        if cleared ~= nil then
-            Events.emit(EventTypes.NPC_WATER_REFILL_DRANK, record,
-                tostring(state.activityItemFullType
-                    or state.activityItemID or ""), thirstBefore or 0,
-                tonumber(filled) or 0, tostring(state.resourceKey or ""))
-        end
-    end
+    Effects.ApplyWaterRefillSuccess(record, state, filled)
     return true, true, "WATER_REFILL_COMPLETE", filled
 end
 

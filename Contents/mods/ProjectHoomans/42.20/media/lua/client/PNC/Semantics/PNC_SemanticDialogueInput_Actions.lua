@@ -7,6 +7,7 @@ PNC.Semantics = PNC.Semantics or {}
 require "PNC/Semantics/PNC_SemanticDiagnostics"
 require "PNC/Semantics/PNC_SemanticWorldTargetHints"
 require "PNC/Semantics/PNC_SemanticCampSiteHints"
+require "PNC/Semantics/PNC_SemanticCampSite"
 
 local Input = PNC.Semantics.DialogueInput or {}
 PNC.Semantics.DialogueInput = Input
@@ -19,6 +20,7 @@ local InventoryQueryAdapter = PNC.Semantics.InventoryQueryAdapter
 local Diagnostics = PNC.Semantics.SemanticDiagnostics
 local WorldTargetHints = PNC.Semantics.ClientWorldTargetHints
 local CampSiteHints = PNC.Semantics.ClientCampSiteHints
+local CampSite = PNC.Semantics.CampSite
 
 local function number(value)
     return tonumber(value)
@@ -151,8 +153,17 @@ end
 
 local function attachCampSiteHint(actionIntent, context)
     local target = actionIntent and actionIntent.target
+    local normalizedTarget = CampSite and CampSite.NormalizeTarget
+        and CampSite.NormalizeTarget(target) or target
+    local normalizedAction = actionIntent
     local x = target and number(target.x or target.targetX)
     local y = target and number(target.y or target.targetY)
+    if normalizedTarget ~= target then
+        normalizedAction = copyActionWithTarget(actionIntent, normalizedTarget)
+        target = normalizedTarget
+        x = target and number(target.x or target.targetX)
+        y = target and number(target.y or target.targetY)
+    end
     if not actionIntent or actionIntent.action ~= "CAMP"
         or type(target) ~= "table"
         or target.kind ~= "camp_site"
@@ -161,7 +172,7 @@ local function attachCampSiteHint(actionIntent, context)
         or type(CampSiteHints) ~= "table"
         or type(CampSiteHints.Resolve) ~= "function"
     then
-        return actionIntent
+        return normalizedAction
     end
 
     local hint, reason = CampSiteHints.Resolve(target, context)
@@ -175,7 +186,7 @@ local function attachCampSiteHint(actionIntent, context)
             reason = reason,
             attached = false,
         }, { requestID = context.requestID })
-        return actionIntent
+        return normalizedAction
     end
 
     local targetCopy = {}
@@ -196,7 +207,7 @@ local function attachCampSiteHint(actionIntent, context)
         score = hint.score,
         attached = true,
     }, { requestID = context.requestID })
-    return copyActionWithTarget(actionIntent, targetCopy)
+    return copyActionWithTarget(normalizedAction, targetCopy)
 end
 
 function Internal.DispatchInventoryQuery(view, result, value)
@@ -262,6 +273,14 @@ function Internal.DispatchAction(view, result, value)
     local context = actionContext(view, result, value)
     local actionIntent = attachCampSiteHint(
         decision.actionIntent, context)
+    if actionIntent and actionIntent.action == "CAMP"
+        and actionIntent.target
+        and type(actionIntent.target.clientHint) == "table"
+    then
+        -- Reuse the already-bounded observation for the command adapter. This
+        -- avoids a second client scan in the same dialogue dispatch tick.
+        context.campSiteHint = actionIntent.target.clientHint
+    end
     actionIntent = attachWorldTargetHint(actionIntent, context)
     local commandResult = CommandAdapter.Dispatch(
         actionIntent, context)

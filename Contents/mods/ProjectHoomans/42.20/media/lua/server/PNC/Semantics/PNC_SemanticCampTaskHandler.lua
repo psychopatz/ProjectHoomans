@@ -134,6 +134,8 @@ function Handler.Submit(request, context)
     context = type(context) == "table" and context or {}
     local npcID = npcIDFor(request, context)
     local selectionContext = {}
+    local clientOriginated
+    local clientHint
     local site
     local reason
     local plan
@@ -143,7 +145,27 @@ function Handler.Submit(request, context)
     selectionContext.npcID = npcID
     selectionContext.selectionOrigin = context.player
         or context.selectionOrigin
-    if Resolver and type(Resolver.Resolve) == "function" then
+    clientOriginated = context.player ~= nil and context.internal ~= true
+    clientHint = request.target and request.target.clientHint
+    if clientOriginated then
+        if type(clientHint) ~= "table" then
+            return {
+                accepted = false,
+                status = "rejected",
+                action = "CAMP",
+                npcID = npcID,
+                request = request,
+                reason = "camp_site_hint_required",
+                details = { siteReason = "camp_site_hint_required" },
+            }
+        end
+        if Resolver and type(Resolver.ValidateClientSite) == "function" then
+            site, reason = Resolver.ValidateClientSite(
+                request.target, selectionContext)
+        else
+            reason = "camp_site_hint_validator_unavailable"
+        end
+    elseif Resolver and type(Resolver.Resolve) == "function" then
         site, reason = Resolver.Resolve(request.target, selectionContext)
     else
         reason = "camp_site_resolver_unavailable"

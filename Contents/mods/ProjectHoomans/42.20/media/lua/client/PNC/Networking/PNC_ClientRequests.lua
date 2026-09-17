@@ -89,6 +89,17 @@ function Client.RequestSemanticTask(request, context)
         return false, "semantic_task_request_missing"
     end
     local player = getSpecificPlayer and getSpecificPlayer(0) or nil
+    if string.upper(tostring(request.action or "")) == "CAMP"
+        and player
+        and type(request.target) == "table"
+        and request.target.kind == "camp_site"
+        and type(request.target.clientHint) ~= "table"
+    then
+        -- Dialogue CAMP is client-observed just like the command path. The
+        -- hint search already happened at the action boundary; do not turn a
+        -- missing local observation into a server-wide fallback scan.
+        return false, "camp_no_visible_site"
+    end
     local payload = {}
     for key, value in pairs(request) do payload[key] = value end
     payload.npcID = payload.npcID or context.npcID or context.targetID

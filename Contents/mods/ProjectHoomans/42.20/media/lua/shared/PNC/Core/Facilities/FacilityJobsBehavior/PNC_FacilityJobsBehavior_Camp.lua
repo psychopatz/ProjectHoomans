@@ -2,6 +2,10 @@ PNC = PNC or {}
 PNC.FacilityJobsBehaviorInternal = PNC.FacilityJobsBehaviorInternal or {}
 
 local Internal = PNC.FacilityJobsBehaviorInternal
+local CampSite = PNC.Semantics and PNC.Semantics.CampSite
+    or require "PNC/Semantics/PNC_SemanticCampSite"
+local Geometry = PNC.Semantics and PNC.Semantics.CampSiteGeometry
+    or require "PNC/Semantics/PNC_SemanticCampSiteGeometry"
 
 function Internal.RefreshCampActivity(record, zombie)
     local runtime = Internal.State(record)
@@ -87,8 +91,106 @@ function Internal.CampActivityBounds(record, runtime)
         math.max(1, math.min(24, resourceRadius))
 end
 
+function Internal.CampActivitySite(record, runtime, order)
+    local state = record and record.campState or nil
+    local service = PNC.CampResourceService
+    local scope
+    local bounds
+    local anchorX
+    local anchorY
+    local anchorZ
+    local campRadius
+    if service and service.GetCachedSnapshot then
+        state = service.GetCachedSnapshot(record) or state
+    end
+    anchorX, anchorY, anchorZ, campRadius =
+        Internal.CampActivityBounds(record, runtime)
+    scope = CampSite.NormalizeScope(runtime and runtime.scope)
+        or CampSite.NormalizeScope(runtime and runtime.siteScope)
+        or CampSite.NormalizeScope(state and state.scope)
+        or CampSite.NormalizeScope(state and state.siteScope)
+        or CampSite.NormalizeScope(order and order.scope)
+        or CampSite.NormalizeScope(order and order.siteScope)
+    bounds = CampSite.NormalizeBounds(runtime and runtime.roomBounds
+        or state and state.roomBounds or order and order.roomBounds)
+    if not scope then
+        scope = bounds and CampSite.SCOPES.ROOM
+            or CampSite.SCOPES.CAMPFIRE
+    end
+    return {
+        kind = CampSite.KIND,
+        scope = scope,
+        siteScope = scope,
+        siteID = runtime and runtime.siteID
+            or state and state.siteID or order and order.siteID,
+        roomID = runtime and runtime.roomID
+            or state and state.roomID or order and order.roomID,
+        buildingID = runtime and runtime.buildingID
+            or state and state.buildingID or order and order.buildingID,
+        roomType = runtime and runtime.roomType
+            or state and state.roomType or order and order.roomType,
+        roomName = runtime and runtime.roomName
+            or state and state.roomName or order and order.roomName,
+        roomBounds = bounds,
+        campfireID = runtime and runtime.campfireID
+            or state and state.campfireID or order and order.campfireID,
+        x = anchorX,
+        y = anchorY,
+        z = anchorZ,
+        radius = campRadius,
+    }
+end
+
+local function pointInsideSite(site, x, y, z)
+    if Geometry and Geometry.ContainsPoint then
+        return Geometry.ContainsPoint(site, x, y, z, {
+            radius = site and site.radius,
+        })
+    end
+    if site and site.scope == CampSite.SCOPES.ROOM then
+        return CampSite.BoundsContain(site.roomBounds,
+            math.floor(tonumber(x) or -999999),
+            math.floor(tonumber(y) or -999999), z)
+    end
+    local anchorX = tonumber(site and site.x)
+    local anchorY = tonumber(site and site.y)
+    local anchorZ = tonumber(site and site.z)
+    local radius = tonumber(site and site.radius) or 3
+    local targetX = tonumber(x)
+    local targetY = tonumber(y)
+    local targetZ = tonumber(z) or 0
+    if not anchorX or not anchorY or not targetX or not targetY
+        or math.abs(targetZ - (anchorZ or 0)) > 0.5
+    then
+        return false
+    end
+    local dx, dy = targetX - anchorX, targetY - anchorY
+    return dx * dx + dy * dy <= (radius + 0.5) * (radius + 0.5)
+end
+
+local function bodyInsideRoom(site, record, zombie)
+    local square
+    local bodyX
+    local bodyY
+    local bodyZ
+    if zombie and zombie.getCurrentSquare then
+        square = zombie:getCurrentSquare()
+    end
+    if square and Geometry and Geometry.MatchesRoom then
+        return Geometry.MatchesRoom(square, site) == true
+    end
+    bodyX = zombie and zombie.getX and zombie:getX()
+        or record and record.x
+    bodyY = zombie and zombie.getY and zombie:getY()
+        or record and record.y
+    bodyZ = zombie and zombie.getZ and zombie:getZ()
+        or record and record.z
+    return pointInsideSite(site, bodyX, bodyY, bodyZ)
+end
+
 function Internal.CampActivityIsSafe(record, zombie, runtime, order)
     if not runtime or runtime.campActivity ~= true then return true end
+    local site = Internal.CampActivitySite(record, runtime, order)
     local anchorX, anchorY, anchorZ, campRadius =
         Internal.CampActivityBounds(record, runtime)
     local targetX = tonumber(order and order.x)
@@ -111,6 +213,32 @@ function Internal.CampActivityIsSafe(record, zombie, runtime, order)
     then
         return false, "CAMP_ACTIVITY_TARGET_INVALID"
     end
+    if site.scope == CampSite.SCOPES.ROOM then
+        if not site.roomBounds then
+            return false, "CAMP_ACTIVITY_ROOM_METADATA_MISSING"
+        end
+        if not pointInsideSite(site, targetX, targetY, targetZ) then
+            return false, "CAMP_ACTIVITY_TARGET_OUTSIDE_ROOM"
+        end
+        if anchorTargetX and anchorTargetY and anchorTargetZ
+            and not pointInsideSite(site, anchorTargetX,
+                anchorTargetY, anchorTargetZ)
+        then
+            return false, "CAMP_ACTIVITY_TARGET_OUTSIDE_ROOM"
+        end
+        -- Do not require the body to be inside the room while it is still
+        -- travelling to the selected target. Once arrival is settled, the
+        -- room identity becomes the activity's temporary safety boundary.
+        if zombie and (runtime.arrivalSettled == true
+            or runtime.positioned == true
+            or runtime.seatEntered == true
+            or runtime.sleepSurfaceEntered == true)
+            and not bodyInsideRoom(site, record, zombie)
+        then
+            return false, "CAMP_ACTIVITY_LEFT_ROOM"
+        end
+        return true
+    end
     targetDistance = PNC.Core.Distance(
         targetX, targetY, anchorX, anchorY)
     if targetDistance > campRadius + 0.5 then
@@ -126,7 +254,17 @@ function Internal.CampActivityIsSafe(record, zombie, runtime, order)
             return false, "CAMP_ACTIVITY_TARGET_OUT_OF_RANGE"
         end
     end
-    if zombie and zombie.getX and zombie.getY then
+    -- This safety check runs before the movement branch below. Rejecting a
+    -- body that is still travelling makes every campfire activity fail as
+    -- soon as it starts, because the body is necessarily outside the small
+    -- campfire radius at that moment. Once arrival is settled, the radius is
+    -- the correct temporary outdoor boundary.
+    if zombie and zombie.getX and zombie.getY
+        and (runtime.arrivalSettled == true
+            or runtime.positioned == true
+            or runtime.seatEntered == true
+            or runtime.sleepSurfaceEntered == true)
+    then
         bodyDistanceFromCamp = PNC.Core.Distance(
             zombie:getX(), zombie:getY(), anchorX, anchorY)
         if bodyDistanceFromCamp > campRadius + 1.0 then

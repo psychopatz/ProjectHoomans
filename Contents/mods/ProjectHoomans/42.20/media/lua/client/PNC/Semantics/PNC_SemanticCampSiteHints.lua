@@ -191,6 +191,7 @@ end
 
 function Hints.Resolve(target, context)
     context = type(context) == "table" and context or {}
+    target = CampSite.NormalizeTarget(target)
     if type(target) ~= "table" or target.kind ~= CampSite.KIND then
         return nil, "camp_site_target_required"
     end

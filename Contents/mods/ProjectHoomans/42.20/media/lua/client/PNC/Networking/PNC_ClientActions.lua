@@ -562,11 +562,17 @@ local function isCampEmoteContext(context)
         and tostring(context.origin or "") == "companion_emote"
 end
 
+local function isCampRejectionReason(reason)
+    reason = tostring(reason or "")
+    return string.sub(reason, 1, 5) == "camp_"
+        or string.sub(reason, 1, 9) == "campfire_"
+end
+
 local function showCampRejection(player, npcId, reason, context, record)
     local presentation = PNC.CompanionCommandPresentation
     local actor
     local presentationContext
-    if tostring(reason or "") ~= "camp_requires_building" then
+    if not isCampRejectionReason(reason) then
         return false
     end
     if not presentation then
@@ -591,15 +597,67 @@ local function showCampRejection(player, npcId, reason, context, record)
     return true
 end
 
+local function clientCampSiteHints()
+    local semantics = PNC.Semantics
+    local hints = semantics and semantics.ClientCampSiteHints or nil
+    if hints and type(hints.Resolve) == "function" then return hints end
+    pcall(require, "PNC/Semantics/PNC_SemanticCampSiteHints")
+    semantics = PNC.Semantics
+    hints = semantics and semantics.ClientCampSiteHints or nil
+    return hints
+end
+
+local function findLocalCampSiteHint(player, npcId, context)
+    local hints = clientCampSiteHints()
+    local record = commandRecord(npcId, context)
+    -- "Here" is the player's requested location. The companion may still be
+    -- several tiles away and is expected to travel to the selected room or
+    -- campfire after the order is accepted.
+    local origin = player
+    local body
+    local searchContext = {}
+    local hint
+    local reason
+    if type(context) == "table"
+        and type(context.campSiteHint) == "table"
+    then
+        return context.campSiteHint
+    end
+    if npcId ~= nil and record and Registry
+        and type(Registry.GetLiveZombie) == "function"
+    then
+        body = Registry.GetLiveZombie(record.id or npcId)
+    end
+    if not hints or type(hints.Resolve) ~= "function" then
+        return nil, "camp_site_discovery_unavailable"
+    end
+    if type(context) == "table" then
+        for key, value in pairs(context) do searchContext[key] = value end
+    end
+    searchContext.player = player
+    searchContext.selectionOrigin = origin
+    searchContext.worldOrigin = origin
+    searchContext.record = record
+    searchContext.body = body
+    searchContext.npcID = npcId
+    hint, reason = hints.Resolve({
+        kind = "camp_site",
+        scope = "here",
+        radius = tonumber(hints.MAX_RADIUS) or 32,
+    }, searchContext)
+    if hint then return hint end
+    -- Detailed observer failures are useful for diagnostics, but the command
+    -- contract exposes one stable local-rejection reason to the UI and LLM.
+    return nil, "camp_no_visible_site"
+end
+
 local function rejectUnsafeCampLocally(player, npcId, scope, context)
     local commands = PNC.CompanionCommands
     local record = commandRecord(npcId, context)
     local radius = tonumber(Const.COMPANION_COMMAND_RADIUS) or 20
-    local allowed
     local reason
-    local hasTarget = false
-    local hasSafeTarget = false
-    if not commands or not commands.CanApply then return false end
+    local hint
+    if not commands then return false end
     if npcId ~= nil then
         if not record then return false end
         if commands.CanPlayerCommand
@@ -607,63 +665,33 @@ local function rejectUnsafeCampLocally(player, npcId, scope, context)
         then
             return false
         end
-        allowed, reason = commands.CanApply(record, player, "camp")
-        if allowed == true then return false end
+        hint, reason = findLocalCampSiteHint(player, npcId, context)
+        if hint then return false, nil, hint end
         if not isCampEmoteContext(context) then
-            showCampRejection(player, npcId, reason, context, record)
+            showCampRejection(
+                player, npcId, reason or "camp_no_visible_site",
+                context, record)
         end
-        return reason == "camp_requires_building"
+        return true, reason or "camp_no_visible_site"
     end
     if string.lower(tostring(scope or "")) ~= "group"
-        or not Registry or not Registry.ForEach
     then
         return false
     end
-    if commands.CanCampAtPlayer then
-        allowed, reason = commands.CanCampAtPlayer(player)
-        if allowed ~= true then
-            if not isCampEmoteContext(context) then
-                showCampRejection(
-                    player, nil, reason or "camp_requires_building",
-                    context, nil)
-            end
-            return reason == "camp_requires_building"
-        end
-        -- The authoritative group command considers all owned followers,
-        -- including abstract and distant records. Do not apply the local
-        -- live-radius filter to the preview.
-        return false
-    end
-    Registry.ForEach(function(candidate)
-        local playerCommandable = true
-        local candidateAllowed
-        local candidateReason
-        if commands.CanPlayerCommand then
-            playerCommandable = commands.CanPlayerCommand(
-                candidate, player, radius
-            ) == true
-        end
-        if not playerCommandable then return end
-        hasTarget = true
-        candidateAllowed, candidateReason = commands.CanApply(
-            candidate, player, "camp"
-        )
-        if candidateAllowed == true then
-            hasSafeTarget = true
-        elseif candidateReason ~= "camp_requires_building" then
-            hasSafeTarget = true
-        end
-    end)
-    if not hasTarget or hasSafeTarget then return false end
+    hint, reason = findLocalCampSiteHint(player, nil, context)
+    if hint then return false, nil, hint end
     if not isCampEmoteContext(context) then
-        showCampRejection(player, nil, "camp_requires_building", context, nil)
+        showCampRejection(
+            player, nil, reason or "camp_no_visible_site", context, nil)
     end
-    return true
+    return true, reason or "camp_no_visible_site"
 end
 
 function Client.SendCompanionCommand(commandID, npcId, scope, context)
     local player = getSpecificPlayer and getSpecificPlayer(0) or nil
     local args
+    local localReason
+    local campSiteHint
     if not player or not PNC.CompanionCommands
         or not PNC.CompanionCommands.Get(commandID)
     then
@@ -673,21 +701,24 @@ function Client.SendCompanionCommand(commandID, npcId, scope, context)
         })
         return false, "invalid_player_or_command"
     end
-    if tostring(commandID or "") == "camp"
-        and rejectUnsafeCampLocally(player, npcId, scope, context)
-    then
-        publishLLMCommandResult(
-            commandID,
-            npcId,
-            context,
-            false,
-            "camp_requires_building"
-        )
-        traceCompanionCommand(commandID, npcId, scope, context, {
-            status = "rejected",
-            reason = "camp_requires_building",
-        })
-        return false, "camp_requires_building"
+    if tostring(commandID or "") == "camp" then
+        local rejected
+        rejected, localReason, campSiteHint = rejectUnsafeCampLocally(
+            player, npcId, scope, context)
+        if rejected then
+            publishLLMCommandResult(
+                commandID,
+                npcId,
+                context,
+                false,
+                localReason or "camp_no_visible_site"
+            )
+            traceCompanionCommand(commandID, npcId, scope, context, {
+                status = "rejected",
+                reason = localReason or "camp_no_visible_site",
+            })
+            return false, localReason or "camp_no_visible_site"
+        end
     end
     args = {
         commandID = tostring(commandID),
@@ -700,6 +731,7 @@ function Client.SendCompanionCommand(commandID, npcId, scope, context)
             and (context.commandSource or context.source or context.origin)
             or nil,
         dialogueID = type(context) == "table" and context.dialogueID or nil,
+        campSiteHint = campSiteHint,
     }
     if Core.IsClientOnly and Core.IsClientOnly() then
         if not sendClientCommand then
@@ -731,7 +763,7 @@ function Client.SendCompanionCommand(commandID, npcId, scope, context)
         reason,
         affectedTargets
     )
-    if not succeeded and reason == "camp_requires_building"
+    if not succeeded and isCampRejectionReason(reason)
         and not isCampEmoteContext(context)
     then
         showCampRejection(

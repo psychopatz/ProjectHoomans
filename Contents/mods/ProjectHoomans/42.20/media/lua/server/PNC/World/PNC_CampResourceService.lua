@@ -101,61 +101,50 @@ local function targetWithinCamp(record, target)
     local targetX = tonumber(target and target.x)
     local targetY = tonumber(target and target.y)
     local targetZ = tonumber(target and target.z)
-    local anchorX
-    local anchorY
-    local anchorZ
-    local radius
-    local dx
-    local dy
     local anchorTargetX
     local anchorTargetY
     local anchorTargetZ
+    local radius
     if not order or not targetX or not targetY or not targetZ then
         return false
     end
-    if campScope(order) == CampSite.SCOPES.ROOM then
-        local bounds = roomBounds(order)
-        if not bounds or not CampSite.BoundsContain(bounds,
-            math.floor(targetX), math.floor(targetY), targetZ)
-        then
+    radius = number(order.radius, Const.CAMP_RADIUS or 3)
+    if Geometry and Geometry.ContainsPoint then
+        if not Geometry.ContainsPoint(order, targetX, targetY, targetZ, {
+            radius = radius,
+        }) then
             return false
         end
-        -- Bounds are the durable primitive fallback. When the live square is
-        -- available, verify the actual room identity as well so overlapping
-        -- RoomDef rectangles cannot leak resources across rooms.
-        if Geometry and Geometry.GetSquare
-            and Geometry.MatchesRoom
-        then
-            local square = Geometry.GetSquare(nil, targetX, targetY, targetZ)
-            if square and not Geometry.MatchesRoom(square, order) then
-                return false
-            end
+        anchorTargetX = tonumber(target.seatAnchorX)
+        anchorTargetY = tonumber(target.seatAnchorY)
+        anchorTargetZ = tonumber(target.seatAnchorZ or target.z)
+        if anchorTargetX and anchorTargetY and anchorTargetZ then
+            return Geometry.ContainsPoint(order, anchorTargetX,
+                anchorTargetY, anchorTargetZ, { radius = radius })
         end
         return true
     end
-    anchorX, anchorY, anchorZ = tonumber(order.x), tonumber(order.y),
-        tonumber(order.z)
-    radius = number(order.radius, Const.CAMP_RADIUS or 3)
+    -- Compatibility fallback for a partially loaded older geometry adapter.
+    local scope = campScope(order)
+    if scope == CampSite.SCOPES.ROOM then
+        return CampSite.BoundsContain(roomBounds(order),
+            math.floor(targetX), math.floor(targetY), targetZ)
+    end
+    local anchorX = tonumber(order.x)
+    local anchorY = tonumber(order.y)
+    local anchorZ = tonumber(order.z)
     if not anchorX or not anchorY or not anchorZ
         or math.abs(targetZ - anchorZ) > 0.5
     then
         return false
     end
-    dx, dy = targetX - anchorX, targetY - anchorY
-    if (dx * dx) + (dy * dy) > (radius + 0.5) * (radius + 0.5) then
-        return false
-    end
-    anchorTargetX = tonumber(target.seatAnchorX)
-    anchorTargetY = tonumber(target.seatAnchorY)
-    anchorTargetZ = tonumber(target.seatAnchorZ or target.z)
-    if anchorTargetX and anchorTargetY and anchorTargetZ then
-        if math.abs(anchorTargetZ - anchorZ) > 0.5 then return false end
-        dx, dy = anchorTargetX - anchorX, anchorTargetY - anchorY
-        if (dx * dx) + (dy * dy) > (radius + 0.5) * (radius + 0.5) then
-            return false
-        end
-    end
-    return true
+    local dx, dy = targetX - anchorX, targetY - anchorY
+    return (dx * dx) + (dy * dy)
+        <= (radius + 0.5) * (radius + 0.5)
+end
+
+function Service.IsWithinCamp(record, target)
+    return targetWithinCamp(record, target)
 end
 
 local function worldHour()

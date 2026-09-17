@@ -168,6 +168,9 @@ function Jobs.Start(record, facilityOrId, capability, options)
         debugForceWater = options.debugForceWater == true,
         automatic = options.automatic == true,
         manual = options.manual == true,
+        manualOverride = options.manualOverride == true,
+        waterContextKind = tostring(options.waterContextKind or ""),
+        waterBaseId = options.waterBaseId,
         manualToggleable = options.manualToggleable == true,
         manualCommandID = tostring(options.manualCommandID or ""),
         manualRequestID = options.manualRequestID,
@@ -314,6 +317,22 @@ function Jobs.Start(record, facilityOrId, capability, options)
         resourceKey = tostring(resourceKey),
         campActivity = options.campActivity == true,
         campId = tostring(options.campId or ""),
+        scope = campScope,
+        siteScope = campScope,
+        siteID = options.siteID or acquired.siteID
+            or campOrderSpec and campOrderSpec.siteID,
+        roomID = options.roomID or acquired.roomID
+            or campOrderSpec and campOrderSpec.roomID,
+        buildingID = options.buildingID or acquired.buildingID
+            or campOrderSpec and campOrderSpec.buildingID,
+        roomType = options.roomType or acquired.roomType
+            or campOrderSpec and campOrderSpec.roomType,
+        roomName = options.roomName or acquired.roomName
+            or campOrderSpec and campOrderSpec.roomName,
+        roomBounds = campRoomBounds
+            and PNC.Core.DeepCopy(campRoomBounds) or nil,
+        campfireID = options.campfireID or acquired.campfireID
+            or campOrderSpec and campOrderSpec.campfireID,
         campX = tonumber(options.campX or acquired.campX),
         campY = tonumber(options.campY or acquired.campY),
         campZ = tonumber(options.campZ or acquired.campZ),

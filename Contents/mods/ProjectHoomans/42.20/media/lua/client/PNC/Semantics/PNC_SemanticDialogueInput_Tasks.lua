@@ -150,6 +150,11 @@ local function responseFor(payload, pending)
         return "I can't refill that here."
     end
     if action == "CAMP" then
+        if reason == "camp_no_visible_site"
+            or string.find(reason, "camp_site_hint", 1, true)
+        then
+            return "I don't see a safe place to camp nearby."
+        end
         if string.find(reason, "no_safe_room", 1, true)
             or string.find(reason, "no_room_or_campfire", 1, true)
         then

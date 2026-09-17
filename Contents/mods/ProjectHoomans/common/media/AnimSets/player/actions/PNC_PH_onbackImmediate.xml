@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animNode>
+	<m_Name>PNC_PH_onbackImmediate</m_Name>
+	<m_AnimName>Bob_GetUp_Back</m_AnimName>
+	<m_deferredBoneAxis>Y</m_deferredBoneAxis>
+	<m_SyncTrackingEnabled>false</m_SyncTrackingEnabled>
+	<m_Looped>false</m_Looped>
+	<m_EarlyTransitionOut>true</m_EarlyTransitionOut>
+	<m_SpeedScale>31.12</m_SpeedScale>
+	<m_BlendTime>0.20</m_BlendTime>
+	<m_BlendOutTime>0.20</m_BlendOutTime>
+	<m_Conditions>
+		<m_Name>PerformingAction</m_Name>
+		<m_Type>STRING</m_Type>
+		<m_Value>PNC_PH_onbackImmediate</m_Value>
+	</m_Conditions>
+</animNode>

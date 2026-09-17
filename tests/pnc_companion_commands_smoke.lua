@@ -13,7 +13,39 @@ local sentHome = {}
 local releasedWorkers = {}
 local manualProvisionRequests = 0
 local manualCorpseHaulRequests = 0
-local campIndoor = true
+local validatedCampOrigin
+local validatedCampRadius
+
+local roomHint = {
+    version = 1,
+    source = "client_loaded_rooms",
+    kind = "camp_site",
+    scope = "room",
+    siteScope = "room",
+    siteID = "room:test-building:test-room",
+    roomID = "test-room",
+    buildingID = "test-building",
+    roomType = "BEDROOM",
+    roomBounds = { minX = 0, minY = 0, maxX = 10, maxY = 10, z = 0 },
+    x = 4.5,
+    y = 2.5,
+    z = 0,
+    radius = 32,
+    score = 1,
+}
+local campfireHint = {
+    version = 1,
+    source = "client_loaded_campfire",
+    kind = "campfire",
+    scope = "campfire",
+    siteScope = "campfire",
+    campfireID = "campfire@test",
+    x = 4.5,
+    y = 2.5,
+    z = 0,
+    radius = 32,
+    score = 1,
+}
 
 local function companion(id, owner, x)
     return {
@@ -68,18 +100,39 @@ PNC = {
             return dx * dx + dy * dy
         end,
     },
-    TraversalQuery = {
-        GetSquare = function()
-            return {
-                isInARoom = function()
-                    return campIndoor
-                end,
-            }
-        end,
-        GetInteriorState = function(square)
-            return square and square.isInARoom
-                and square:isInARoom() or nil
-        end,
+    Semantics = {
+        CampSiteResolver = {
+            ValidateClientSite = function(target, context)
+                validatedCampOrigin = context and context.selectionOrigin
+                validatedCampRadius = target and target.radius
+                local hint = target and target.clientHint
+                if type(hint) ~= "table" then
+                    return nil, "camp_site_hint_required"
+                end
+                return {
+                    kind = "camp_site",
+                    scope = hint.scope or hint.siteScope or "room",
+                    siteScope = hint.siteScope or hint.scope or "room",
+                    siteID = hint.siteID,
+                    roomID = hint.roomID,
+                    buildingID = hint.buildingID,
+                    roomType = hint.roomType,
+                    roomBounds = hint.roomBounds,
+                    campfireID = hint.campfireID,
+                    x = hint.x,
+                    y = hint.y,
+                    z = hint.z,
+                    label = hint.scope == "campfire"
+                        and "campfire" or "bedroom",
+                    risk = hint.scope == "campfire"
+                        and "exposed" or "sheltered",
+                    radius = 3,
+                    resourceRadius = 12,
+                    stopDistance = hint.scope == "campfire"
+                        and 1.25 or 0.7,
+                }
+            end,
+        },
     },
     Registry = {
         Get = function(id) return records[tostring(id)] end,
@@ -174,10 +227,10 @@ T.truthy(string.find(
 ), "camp command intent metadata is registered")
 T.truthy(string.find(
     PNC.CompanionCommands.Get("camp").llmDescription,
-    "inside a building",
+    "room or campfire",
     1,
     true
-), "camp command indoor requirement metadata is registered")
+), "camp command site metadata is registered")
 T.equal(PNC.CompanionCommands.Get("manual_sleep").contextOnly, true,
     "manual sleep stays out of the radial command list")
 T.load(SHARED_ROOT .. "PNC_CompanionCommandFlavorDefinitions.lua")
@@ -364,24 +417,43 @@ T.equal(records.owned.orderSpec.y, 1.5, "stay live-body anchor y")
 affected, reason = PNC.CompanionCommands.Execute(player, {
     id = "owned",
     commandID = "camp",
+    campSiteHint = roomHint,
 })
-T.equal(affected, 1, "indoor camp command target count")
-T.equal(reason, "commanded", "indoor camp command result")
-T.equal(records.owned.orderSpec.kind, "camp", "indoor camp order")
-T.equal(records.owned.orderSpec.x, 3.5, "indoor camp live-body anchor x")
-T.equal(records.owned.orderSpec.y, 1.5, "indoor camp live-body anchor y")
+T.equal(affected, 1, "room camp command target count")
+T.equal(reason, "commanded", "room camp command result")
+T.equal(records.owned.orderSpec.kind, "camp", "room camp order")
+T.equal(records.owned.orderSpec.x, roomHint.x, "room camp hint anchor x")
+T.equal(records.owned.orderSpec.y, roomHint.y, "room camp hint anchor y")
 T.equal(records.owned.orderSpec.radius, 3, "indoor camp order radius")
+T.equal(records.owned.orderSpec.scope, "room", "room camp scope")
+T.equal(records.owned.orderSpec.siteID, roomHint.siteID,
+    "room camp keeps authoritative site identity")
+T.equal(validatedCampOrigin, player,
+    "server camp validation incorrectly used the companion as origin")
+T.equal(validatedCampRadius, 32,
+    "camp validation confused command range with site discovery range")
 
-campIndoor = false
+affected, reason = PNC.CompanionCommands.Execute(player, {
+    id = "owned",
+    commandID = "camp",
+    campSiteHint = campfireHint,
+})
+T.equal(affected, 1, "campfire player camp command target count")
+T.equal(reason, "commanded", "campfire player camp command result")
+T.equal(records.owned.orderSpec.scope, "campfire", "campfire camp scope")
+T.equal(records.owned.orderSpec.campfireID, campfireHint.campfireID,
+    "campfire camp keeps the authoritative fire identity")
+
+local priorCampOrder = records.owned.orderSpec
 affected, reason = PNC.CompanionCommands.Execute(player, {
     id = "owned",
     commandID = "camp",
 })
-T.equal(affected, 0, "outdoor player camp command rejected")
-T.equal(reason, "camp_requires_building",
-    "outdoor player camp rejection reason")
-T.equal(records.owned.orderSpec.kind, "camp",
-    "rejected outdoor camp does not replace the existing order")
+T.equal(affected, 0, "camp without a client site hint is rejected")
+T.equal(reason, "camp_site_hint_required",
+    "camp without a hint reports the bounded admission reason")
+T.equal(records.owned.orderSpec, priorCampOrder,
+    "missing camp hint does not replace the existing order")
 
 -- Faction behavior is a server-owned order producer, not a player command.
 -- It remains able to create an outdoor camp order when its policy requires it.
@@ -391,16 +463,16 @@ PNC.OrderSystem.SetOrder(records.neutral, {
 T.equal(records.neutral.orderSpec.kind, "camp",
     "faction-owned order path can override the player camp restriction")
 
-campIndoor = true
 affected, reason = PNC.CompanionCommands.Execute(player, {
     id = "owned",
     commandID = "camp",
+    campSiteHint = roomHint,
 })
 T.equal(affected, 1, "camp command target count")
 T.equal(reason, "commanded", "camp command result")
 T.equal(records.owned.orderSpec.kind, "camp", "camp order")
-T.equal(records.owned.orderSpec.x, 3.5, "camp live-body anchor x")
-T.equal(records.owned.orderSpec.y, 1.5, "camp live-body anchor y")
+T.equal(records.owned.orderSpec.x, roomHint.x, "camp room anchor x")
+T.equal(records.owned.orderSpec.y, roomHint.y, "camp room anchor y")
 T.equal(records.owned.orderSpec.radius, 3, "camp order radius")
 
 affected, reason = PNC.CompanionCommands.Execute(player, {
@@ -466,7 +538,7 @@ records.abstract.orderSpec = {
     kind = "follow", ownerUsername = "alice", ownerOnlineID = 7,
 }
 affected, reason = PNC.CompanionCommands.Execute(player, {
-    commandID = "camp", scope = "group",
+    commandID = "camp", scope = "group", campSiteHint = roomHint,
 })
 T.equal(affected, 4, "group camp includes distant and abstract followers")
 T.equal(reason, "commanded", "group camp result")
@@ -478,8 +550,10 @@ T.equal(records.abstract.orderSpec.kind, "camp",
     "group camp stopped the abstract follower")
 T.equal(records.far.orderSpec.campId, records.owned.orderSpec.campId,
     "group camp uses one shared camp cache identity")
-T.equal(records.abstract.orderSpec.x, player:getX(),
-    "group camp uses the player anchor for abstract followers")
+T.equal(records.abstract.orderSpec.x, roomHint.x,
+    "group camp uses the validated room anchor for abstract followers")
+T.equal(records.abstract.orderSpec.scope, "room",
+    "group camp preserves the validated site scope")
 records.owned.runtime.workOrderId = "work-1"
 affected, reason = PNC.CompanionCommands.Execute(player, {
     id = "owned",
@@ -558,12 +632,14 @@ T.truthy(#spoken > spokenBeforeRejection,
     "camp rejection did not make the player speak")
 T.truthy(string.find(spoken[#spoken], "safe", 1, true)
     or string.find(spoken[#spoken], "shelter", 1, true)
-    or string.find(spoken[#spoken], "building", 1, true),
-    "camp rejection player speech did not explain the safety restriction")
+    or string.find(spoken[#spoken], "campfire", 1, true)
+    or string.find(spoken[#spoken], "site", 1, true),
+    "camp rejection player speech did not explain the missing site")
 T.truthy(string.find(npcSpeech[#npcSpeech], "safe", 1, true)
     or string.find(npcSpeech[#npcSpeech], "shelter", 1, true)
-    or string.find(npcSpeech[#npcSpeech], "building", 1, true),
-    "camp rejection speech did not explain why outdoor camping is unsafe")
+    or string.find(npcSpeech[#npcSpeech], "campfire", 1, true)
+    or string.find(npcSpeech[#npcSpeech], "site", 1, true),
+    "camp rejection speech did not explain the missing site")
 
 local campExchangePlayerSpeech = #spoken
 local campExchangeNPCSpeech = #npcSpeech

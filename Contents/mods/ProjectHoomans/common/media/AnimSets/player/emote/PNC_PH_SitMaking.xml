@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animNode>
+	<m_Name>PNC_PH_SitMaking</m_Name>
+	<m_AnimName>Bob_SitGround_Making</m_AnimName>
+	<m_SyncTrackingEnabled>false</m_SyncTrackingEnabled>
+	<m_Looped>true</m_Looped>
+	<m_SpeedScale>0.8</m_SpeedScale>
+	<m_BlendTime>0.30</m_BlendTime>
+	<m_BlendOutTime>0.10</m_BlendOutTime>
+	<m_Conditions>
+		<m_Name>emote</m_Name>
+		<m_Type>STRING</m_Type>
+		<m_Value>PNC_PH_SitMaking</m_Value>
+	</m_Conditions>
+	<m_SubStateBoneWeights>
+		<boneName>Bip01</boneName>
+		<includeDescendants>true</includeDescendants>
+	</m_SubStateBoneWeights>
+</animNode>

@@ -244,6 +244,33 @@ local function campWater(record, options)
     return service.AcquireWater(record, options)
 end
 
+local function refillContext(record, options)
+    local policy = PNC.WaterHydrationPolicy
+    if not policy or not policy.GetContext then
+        return nil, "WATER_POLICY_UNAVAILABLE"
+    end
+    return policy.GetContext(record, options)
+end
+
+local function restrictRefillTarget(record, context, source, target,
+        approaches)
+    local policy = PNC.WaterHydrationPolicy
+    if not policy or not policy.RestrictTargets then
+        return nil, nil, "WATER_POLICY_UNAVAILABLE"
+    end
+    return policy.RestrictTargets(record, context, source, target,
+        approaches)
+end
+
+local function worldWaterMovementAllowed(record, options)
+    if type(options) == "table" and options.manualOverride == true then
+        return true
+    end
+    if not Routes.IsFollowing(record) then return true end
+    local home = PNC.NeedFacilityHomeRoute
+    return home and home.IsAtHome and home.IsAtHome(record) == true
+end
+
 local function liveBody(record)
     return PNC.Registry and PNC.Registry.GetLiveZombie
         and PNC.Registry.GetLiveZombie(record.id) or nil
@@ -369,6 +396,8 @@ Routes.Register({
     needId = "hydration",
     capability = "survival.fill.water",
     IsAvailable = function(record)
+        local context = refillContext(record)
+        if not context then return false end
         local planned, plan = planAction(record, "fill_container", "refill")
         if plan then
             return planned and liveBody(record) ~= nil
@@ -386,6 +415,8 @@ Routes.Register({
             and fillableWaterSource(record) ~= nil
     end,
     Validate = function(record)
+        local context, contextReason = refillContext(record)
+        if not context then return false, contextReason end
         local planned, plan = planAction(record, "fill_container", "refill")
         if plan then
             if not liveBody(record) then return false, "NPC_BODY_UNAVAILABLE" end
@@ -424,7 +455,9 @@ Routes.Register({
             .. tostring(source and source.key or "source") .. ":"
             .. tostring(record.id)
     end,
-    Assign = function(record)
+    Assign = function(record, options)
+        local context, contextReason = refillContext(record, options)
+        if not context then return nil, contextReason end
         local planned, plan = planAction(record, "fill_container", "refill")
         if waterRefillRetryBlocked(record) then
             return nil, "WATER_REFILL_RETRY_COOLDOWN"
@@ -441,6 +474,9 @@ Routes.Register({
             target, approaches = PNC.NearbyWaterService.BuildApproach(
                 record, plan.source)
             if not target then return nil, approaches end
+            target, approaches, contextReason = restrictRefillTarget(
+                record, context, plan.source, target, approaches)
+            if not target then return nil, contextReason end
             return {
                 ok = true,
                 facilityId = "water_refill:" .. tostring(plan.sourceKey),
@@ -450,6 +486,9 @@ Routes.Register({
                 activityItemID = plan.activityItemID,
                 activityItemFullType = plan.activityItemFullType,
                 target = target, approachCandidates = approaches,
+                waterContextKind = context.kind,
+                waterBaseId = context.baseId,
+                manualOverride = context.manualOverride == true,
                 executionMode = "LIVE",
             }
         end
@@ -464,6 +503,9 @@ Routes.Register({
         local target, approaches = PNC.NearbyWaterService.BuildApproach(
             record, source)
         if not target then return nil, approaches end
+        target, approaches, contextReason = restrictRefillTarget(
+            record, context, source, target, approaches)
+        if not target then return nil, contextReason end
         return {
             ok = true,
             facilityId = "water_refill:" .. tostring(source.key),
@@ -472,10 +514,19 @@ Routes.Register({
             resource = source, resourceKey = source.key,
             activityItemID = item.id, activityItemFullType = item.type,
             target = target, approachCandidates = approaches,
+            waterContextKind = context.kind,
+            waterBaseId = context.baseId,
+            manualOverride = context.manualOverride == true,
             executionMode = "LIVE",
         }
     end,
     Start = function(record, lease, assignment)
+        local policy = PNC.WaterHydrationPolicy
+        if not policy or not policy.AllowsActivity then
+            return false, "WATER_POLICY_UNAVAILABLE"
+        end
+        local allowed, reason = policy.AllowsActivity(record, assignment)
+        if not allowed then return false, reason end
         return PNC.FacilityJobs.Start(record, {
             id = assignment.facilityId, baseId = "nearby",
             definitionId = "water_refill",
@@ -489,6 +540,9 @@ Routes.Register({
             approachCandidates = assignment.approachCandidates,
             taskLeaseId = lease.leaseId, nearby = true,
             abstract = false,
+            manualOverride = assignment.manualOverride == true,
+            waterContextKind = assignment.waterContextKind,
+            waterBaseId = assignment.waterBaseId,
         })
     end,
     CanContinue = function(record, lease)
@@ -508,6 +562,10 @@ Routes.Register({
             if activity.completionRequested == true then
                 return true
             end
+            local policy = PNC.WaterHydrationPolicy
+            if not policy or not policy.AllowsActivity then return false end
+            local allowed = policy.AllowsActivity(record, activity)
+            if not allowed then return false end
             if waterRefillRetryBlocked(record) then return false end
             return not Routes.IsCombatActive(record)
                 and not Routes.HasPersonalHydration(record)
@@ -516,6 +574,8 @@ Routes.Register({
                     waterContainer(record))
                 and fillableWaterSource(record) ~= nil
         end
+        local context = refillContext(record)
+        if not context then return false end
         if waterRefillRetryBlocked(record) then return false end
         if plan then
             return not Routes.IsCombatActive(record)
@@ -746,11 +806,13 @@ Routes.Register({
         local planned, plan = planAction(record, "drink_source")
         if plan then
             return planned and not Routes.IsCampContext(record)
+                and worldWaterMovementAllowed(record)
                 and Routes.IsNearbyWaterAllowed(record)
                 and not Routes.IsCombatActive(record)
                 and not worldWaterRetryBlocked(record)
         end
         return not Routes.IsCampContext(record)
+            and worldWaterMovementAllowed(record)
             and Routes.IsNearbyWaterAllowed(record)
             and not Routes.IsCombatActive(record)
             and not Routes.HasPersonalHydration(record)
@@ -776,6 +838,9 @@ Routes.Register({
             if not Routes.IsNearbyWaterAllowed(record) then
                 return false, "NEARBY_WATER_NOT_ALLOWED"
             end
+            if not worldWaterMovementAllowed(record) then
+                return false, "FOLLOWING_SOURCE_WATER_NOT_ALLOWED"
+            end
             if Routes.IsCombatActive(record) then return false, "NPC_BUSY" end
             if worldWaterRetryBlocked(record) then
                 return false, "WORLD_WATER_RETRY_COOLDOWN"
@@ -787,6 +852,9 @@ Routes.Register({
         end
         if not Routes.IsNearbyWaterAllowed(record) then
             return false, "NEARBY_WATER_NOT_ALLOWED"
+        end
+        if not worldWaterMovementAllowed(record) then
+            return false, "FOLLOWING_SOURCE_WATER_NOT_ALLOWED"
         end
         if Routes.IsCombatActive(record) then return false, "NPC_BUSY" end
         if Routes.HasPersonalHydration(record) then
@@ -800,6 +868,9 @@ Routes.Register({
         return true
     end,
     Assign = function(record, options)
+        if not worldWaterMovementAllowed(record, options) then
+            return nil, "FOLLOWING_SOURCE_WATER_NOT_ALLOWED"
+        end
         local planned
         local plan
         if not (type(options) == "table" and options.forceWorld == true) then
@@ -822,6 +893,8 @@ Routes.Register({
                 resourceKind = "world_water",
                 target = target, approachCandidates = approaches,
                 resource = plan.source, resourceKey = plan.sourceKey,
+                manualOverride = type(options) == "table"
+                    and options.manualOverride == true,
                 executionMode = live and "LIVE" or "ABSTRACT",
             }
         end
@@ -844,6 +917,8 @@ Routes.Register({
             resourceKind = "world_water",
             target = target, approachCandidates = approaches,
             resource = source, resourceKey = source.key,
+            manualOverride = type(options) == "table"
+                and options.manualOverride == true,
             executionMode = live and "LIVE" or "ABSTRACT",
         }
     end,
@@ -855,6 +930,9 @@ Routes.Register({
         end
         if not Routes.IsNearbyWaterAllowed(record) then
             return false, "NEARBY_WATER_NOT_ALLOWED"
+        end
+        if not worldWaterMovementAllowed(record, assignment) then
+            return false, "FOLLOWING_SOURCE_WATER_NOT_ALLOWED"
         end
         if not source then
             source, sourceReason = waterSource(record, assignment.resourceKey)
@@ -869,6 +947,7 @@ Routes.Register({
             approachCandidates = assignment.approachCandidates,
             taskLeaseId = lease.leaseId, nearby = true,
             abstract = lease.executionMode == "ABSTRACT",
+            manualOverride = assignment.manualOverride == true,
         })
     end,
     CanContinue = function(record, lease)
@@ -880,11 +959,13 @@ Routes.Register({
                 and tostring(activity.taskLeaseId or "")
                     == tostring(lease and lease.leaseId or "")
             return not Routes.IsCampContext(record)
+                and worldWaterMovementAllowed(record, activity)
                 and Routes.IsNearbyWaterAllowed(record)
                 and not Routes.IsCombatActive(record)
                 and (active or planned)
         end
         return not Routes.IsCampContext(record)
+            and worldWaterMovementAllowed(record)
             and Routes.IsNearbyWaterAllowed(record)
             and not Routes.IsCombatActive(record)
             and not Routes.HasPersonalHydration(record)

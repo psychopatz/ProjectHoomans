@@ -12,6 +12,12 @@ local function list(values)
     return values
 end
 
+local function distance(x1, y1, x2, y2)
+    local dx = (tonumber(x2) or 0) - (tonumber(x1) or 0)
+    local dy = (tonumber(y2) or 0) - (tonumber(y1) or 0)
+    return math.sqrt(dx * dx + dy * dy)
+end
+
 local function square(x, y, z, room, objects)
     local value = {
         getX = function() return x end,
@@ -93,6 +99,16 @@ local Geometry = T.load("ProjectHoomans", "shared",
 local CampSite = T.load("ProjectHoomans", "shared",
     "PNC/Semantics/PNC_SemanticCampSite.lua")
 
+T.equal(CampSite.RoomLabel("UNKNOWN_ROOM", "custom_room"),
+    "room", "unclassified rooms use the generic camp label")
+local normalizedHere = CampSite.NormalizeTarget({
+    kind = CampSite.KIND, scope = "room", query = "here",
+})
+T.equal(normalizedHere.scope, CampSite.SCOPES.HERE,
+    "deictic room-shaped camp targets normalize to here")
+T.falsy(normalizedHere.query,
+    "deictic normalization clears the stale room query")
+
 local player = {
     getX = function() return 10.5 end,
     getY = function() return 10.5 end,
@@ -120,7 +136,7 @@ PNC = {
         CAMP_RESOURCE_MAX = 16,
         CAMP_RESOURCE_SCAN_SQUARES_PER_TICK = 64,
     },
-    Core = { Now = function() return 1000 end },
+    Core = { Now = function() return 1000 end, Distance = distance },
     Registry = { MarkDirty = function() end },
     FacilityResources = {},
     FacilityInteractionTargets = {
@@ -179,5 +195,68 @@ local resource, target = Service.FindSleep(record, { abstract = true })
 T.truthy(resource and target, "room camp can use an in-room sleep resource")
 T.equal(resource.resourceKey, "bed:10.5",
     "room camp resource selection remains room-scoped")
+
+local CampBehavior = T.load("ProjectHoomans", "shared",
+    "PNC/Core/Facilities/FacilityJobsBehavior/PNC_FacilityJobsBehavior_Camp.lua")
+local activity = {
+    campActivity = true, scope = CampSite.SCOPES.ROOM,
+    siteScope = CampSite.SCOPES.ROOM,
+    roomBounds = { minX = 10, minY = 10, maxX = 20, maxY = 20, z = 0 },
+    campX = 10.5, campY = 10.5, campZ = 0, campRadius = 3,
+}
+local activityRecord = {
+    id = "npc:room-activity", alive = true, x = 10.5, y = 10.5, z = 0,
+    runtime = { facilityActivity = activity },
+}
+local safe, safetyReason = CampBehavior.CampActivityIsSafe(
+    activityRecord, nil, activity, {
+        kind = "facility_activity", x = 16.5, y = 10.5, z = 0,
+    })
+T.truthy(safe,
+    "room activities accept targets beyond the camp anchor radius")
+T.equal(safetyReason, nil,
+    "room activity safety has no failure for an in-room target")
+local outsideSafe, outsideReason = CampBehavior.CampActivityIsSafe(
+    activityRecord, nil, activity, {
+        kind = "facility_activity", x = 22.5, y = 10.5, z = 0,
+    })
+T.falsy(outsideSafe,
+    "room activities reject targets outside the selected room")
+T.equal(outsideReason, "CAMP_ACTIVITY_TARGET_OUTSIDE_ROOM",
+    "room boundary rejection reports a room-specific reason")
+
+local campfireActivity = {
+    campActivity = true, scope = CampSite.SCOPES.CAMPFIRE,
+    siteScope = CampSite.SCOPES.CAMPFIRE,
+    campX = 10.5, campY = 10.5, campZ = 0, campRadius = 3,
+}
+local travellingZombie = {
+    getX = function() return 20.5 end,
+    getY = function() return 10.5 end,
+    getZ = function() return 0 end,
+}
+local campfireSafe, campfireReason = CampBehavior.CampActivityIsSafe(
+    { id = "npc:campfire-activity", alive = true,
+        x = 20.5, y = 10.5, z = 0,
+        runtime = { facilityActivity = campfireActivity } },
+    travellingZombie, campfireActivity,
+    { kind = "facility_activity", x = 10.5, y = 10.5, z = 0 })
+T.truthy(campfireSafe,
+    "campfire activity allows travel toward the camp anchor")
+T.equal(campfireReason, nil,
+    "campfire travel does not report a premature outside-area failure")
+campfireActivity.arrivalSettled = true
+local arrivedSafe, arrivedReason = CampBehavior.CampActivityIsSafe(
+    { id = "npc:campfire-activity", alive = true,
+        x = 10.5, y = 10.5, z = 0,
+        runtime = { facilityActivity = campfireActivity } },
+    { getX = function() return 10.5 end,
+        getY = function() return 10.5 end,
+        getZ = function() return 0 end },
+    campfireActivity,
+    { kind = "facility_activity", x = 10.5, y = 10.5, z = 0 })
+T.truthy(arrivedSafe, "arrived campfire activity remains inside its zone")
+T.equal(arrivedReason, nil,
+    "arrived campfire activity has no safety failure")
 
 T.finish("pnc_semantic_camp_site_smoke")

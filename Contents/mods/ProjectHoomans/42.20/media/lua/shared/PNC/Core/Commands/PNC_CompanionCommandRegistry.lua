@@ -213,6 +213,57 @@ local function livePosition(record)
         tonumber(record and record.z)
 end
 
+local function copyTable(value)
+    local output = {}
+    if type(value) ~= "table" then return output end
+    for key, child in pairs(value) do output[key] = child end
+    return output
+end
+
+local function campValidationOrigin(record, player)
+    local zombie = record and record.id and Registry.GetLiveZombie(record.id)
+        or nil
+    -- Player-issued "here" commands use the same origin as the client hint
+    -- search. The companion's live body is still passed separately for world
+    -- validation, but must not move the requested camp location.
+    return player or record, zombie
+end
+
+local function validateCampSite(record, player, commandContext)
+    local resolver = PNC.Semantics
+        and PNC.Semantics.CampSiteResolver or nil
+    local hint = commandContext and commandContext.campSiteHint
+    local origin
+    local body
+    local validationContext
+    local target
+    if not resolver or type(resolver.ValidateClientSite) ~= "function" then
+        return nil, "camp_site_validation_unavailable"
+    end
+    if type(hint) ~= "table" then return nil, "camp_site_hint_required" end
+    origin, body = campValidationOrigin(record, player)
+    validationContext = {
+        selectionOrigin = origin,
+        origin = origin,
+        body = body,
+        record = record,
+        player = player,
+        npcID = record and record.id or nil,
+        requestID = commandContext and commandContext.requestID or nil,
+    }
+    target = {
+        kind = "camp_site",
+        scope = "here",
+        clientHint = hint,
+        -- commandContext.radius is the companion-command eligibility radius
+        -- (normally 20), not the camp-site discovery radius. Keep site
+        -- validation aligned with the client loaded-cell search limit.
+        radius = tonumber(commandContext and commandContext.campSiteRadius)
+            or tonumber(resolver.DEFAULT_RADIUS) or 32,
+    }
+    return resolver.ValidateClientSite(target, validationContext)
+end
+
 local function isFollowingPlayer(record, player)
     local order = record and record.orderSpec or nil
     local ownerOnlineID
@@ -348,6 +399,8 @@ function Commands.Apply(record, player, commandID, radius, commandContext)
     local allowed
     local reason
     local orderSpec
+    local orderOptions = commandContext
+    local campSite
     if not Core.IsAuthority() then return false, "not_authority" end
     if not definition then return false, "unknown_command" end
     if definition.clientOnly == true then
@@ -357,8 +410,14 @@ function Commands.Apply(record, player, commandID, radius, commandContext)
     if not allowed then return false, reason end
     allowed, reason = Commands.CanApply(record, player, commandID)
     if not allowed then return false, reason end
+    if tostring(commandID or "") == "camp" then
+        campSite, reason = validateCampSite(record, player, commandContext)
+        if not campSite then return false, reason end
+        orderOptions = copyTable(commandContext)
+        orderOptions.campSite = campSite
+    end
     if type(definition.buildOrder) == "function" then
-        orderSpec = definition.buildOrder(record, player)
+        orderSpec = definition.buildOrder(record, player, orderOptions)
         if type(orderSpec) ~= "table" then return false, "invalid_order" end
         OrderSystem.SetOrder(record, orderSpec)
     end
@@ -385,7 +444,7 @@ function Commands.Apply(record, player, commandID, radius, commandContext)
     return true, "commanded"
 end
 
-function Commands.ApplyGroupCamp(player)
+function Commands.ApplyGroupCamp(player, commandContext)
     local definition = Commands.Get("camp")
     local allowed
     local reason
@@ -393,6 +452,7 @@ function Commands.ApplyGroupCamp(player)
     local anchorY
     local anchorZ
     local campID
+    local campSite
     local affected = 0
     local affectedTargets = {}
     if not Core.IsAuthority() then return 0, "not_authority", affectedTargets end
@@ -401,13 +461,15 @@ function Commands.ApplyGroupCamp(player)
         return 0, "invalid_player", affectedTargets
     end
     if not player.getX or not player.getY or not player.getZ then
-        return 0, "camp_requires_building", affectedTargets
+        return 0, "position_missing", affectedTargets
     end
     if Commands.CanCampAtPlayer then
         allowed, reason = Commands.CanCampAtPlayer(player)
         if not allowed then return 0, reason, affectedTargets end
     end
-    anchorX, anchorY, anchorZ = player:getX(), player:getY(), player:getZ()
+    campSite, reason = validateCampSite(nil, player, commandContext)
+    if not campSite then return 0, reason, affectedTargets end
+    anchorX, anchorY, anchorZ = campSite.x, campSite.y, campSite.z
     campID = nextGroupCampID(player)
     Registry.ForEach(function(record)
         local orderSpec
@@ -415,6 +477,7 @@ function Commands.ApplyGroupCamp(player)
         if type(definition.buildOrder) ~= "function" then return end
         orderSpec = definition.buildOrder(record, player, {
             x = anchorX, y = anchorY, z = anchorZ, campId = campID,
+            campSite = campSite,
         })
         if type(orderSpec) ~= "table" then return end
         OrderSystem.SetOrder(record, orderSpec)
@@ -462,7 +525,7 @@ function Commands.Execute(player, args)
         return 0, "personalized_command"
     end
     if scope == "group" and commandID == "camp" then
-        return Commands.ApplyGroupCamp(player)
+        return Commands.ApplyGroupCamp(player, args)
     end
     if scope == "closest" then
         Registry.ForEach(function(record)

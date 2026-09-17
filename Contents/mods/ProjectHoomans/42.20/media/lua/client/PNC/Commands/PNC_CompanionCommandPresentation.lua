@@ -158,8 +158,10 @@ end
 
 function Presentation.ShowCommandRejection(player, actor, commandID, reason,
     context)
+    local reasonText = tostring(reason or "")
     if tostring(commandID or "") ~= "camp"
-        or tostring(reason or "") ~= "camp_requires_building"
+        or (string.sub(reasonText, 1, 5) ~= "camp_"
+            and string.sub(reasonText, 1, 9) ~= "campfire_")
     then
         return false
     end

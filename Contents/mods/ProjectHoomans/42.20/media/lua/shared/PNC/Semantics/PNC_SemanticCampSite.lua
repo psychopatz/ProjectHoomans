@@ -61,6 +61,60 @@ function CampSite.NormalizeText(value)
     return normalizeText(value)
 end
 
+function CampSite.IsHereQuery(value)
+    value = normalizeText(value)
+    return value == "here"
+        or value == "right here"
+        or value == "this place"
+        or value == "this spot"
+        or value == "here now"
+        or value == "right here now"
+        or value == "this place now"
+        or value == "this spot now"
+end
+
+-- Parser grammar is intentionally permissive around prepositions, so a
+-- deictic phrase can occasionally arrive with the room-capture fields filled
+-- in (for example, "camp in here"). Normalize that boundary once so client
+-- hints and server resolution agree that it means a generic nearby site.
+function CampSite.NormalizeTarget(target)
+    local value
+    local query
+    local scope
+    local hasRoomSelector
+    local output
+    if type(target) ~= "table" then return target end
+    value = target.roomQuery or target.query
+        or target.roomType or target.roomName
+    if type(value) == "table" then
+        value = value.text or value.value or value.concept
+    end
+    query = normalizeText(value)
+    scope = CampSite.NormalizeScope(target.scope or target.siteScope)
+    hasRoomSelector = target.query ~= nil
+        or target.roomQuery ~= nil
+        or target.roomType ~= nil
+        or target.roomID ~= nil
+        or target.roomName ~= nil
+    if not CampSite.IsHereQuery(query)
+        or target.roomID ~= nil
+        or target.siteID ~= nil
+        or (scope ~= nil and scope ~= "room")
+    then
+        return target
+    end
+    if not hasRoomSelector and scope ~= "room" then return target end
+    output = {}
+    for key, child in pairs(target) do output[key] = child end
+    output.scope = CampSite.SCOPES.HERE
+    output.siteScope = CampSite.SCOPES.HERE
+    output.query = nil
+    output.roomQuery = nil
+    output.roomType = nil
+    output.roomName = nil
+    return output
+end
+
 function CampSite.RegisterRoomType(id, definition)
     local roomID = roomTypeID(id)
     local existing
@@ -213,7 +267,10 @@ function CampSite.RoomLabel(roomType, roomName)
     local definition = CampSite.RoomTypes[roomTypeID(roomType)]
     local label = definition and definition.label or nil
     if label and label ~= "" then return label end
-    return text(roomName, CampSite.MAX_LABEL) or "room"
+    -- RoomDef names are engine data, not player-facing taxonomy. An
+    -- unclassified room must remain the generic semantic fallback instead of
+    -- leaking names such as "other" or an arbitrary modded identifier.
+    return "room"
 end
 
 function CampSite.NormalizeScope(value)

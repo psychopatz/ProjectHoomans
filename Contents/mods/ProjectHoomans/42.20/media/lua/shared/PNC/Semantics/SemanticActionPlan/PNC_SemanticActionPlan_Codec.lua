@@ -108,6 +108,7 @@ function Plan.Normalize(raw)
         steps = steps,
         interruptPolicy = string.upper(
             tostring(raw.interruptPolicy or "PAUSE")),
+        manualOverride = raw.manualOverride == true,
         confidence = confidence,
         rawText = boundedText(raw.rawText or raw.text,
             Plan.MAX_TEXT_LENGTH, ""),

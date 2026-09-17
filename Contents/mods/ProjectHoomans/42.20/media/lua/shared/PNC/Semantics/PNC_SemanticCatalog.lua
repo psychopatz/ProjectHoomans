@@ -257,6 +257,8 @@ function Catalog.Register()
             { kind = "literal", value = "set", optional = true },
             { kind = "literal", value = "up", optional = true },
             { kind = "concept", id = "CAMP" },
+            { kind = "concept", id = "CAMP_PREP", optional = true },
+            { kind = "literal", value = "the", optional = true },
             { kind = "literal", value = "here", optional = true },
             { kind = "literal", value = "now", optional = true },
         },
@@ -270,7 +272,37 @@ function Catalog.Register()
             },
         },
         0.96,
-        125
+        160
+    )
+    registerPattern(
+        "pnc.command.camp_here_place",
+        {
+            { kind = "literal", value = "let's", optional = true },
+            { kind = "literal", value = "lets", optional = true },
+            { kind = "literal", value = "we", optional = true },
+            { kind = "literal", value = "should", optional = true },
+            { kind = "literal", value = "can", optional = true },
+            { kind = "literal", value = "make", optional = true },
+            { kind = "literal", value = "set", optional = true },
+            { kind = "literal", value = "up", optional = true },
+            { kind = "concept", id = "CAMP" },
+            { kind = "concept", id = "CAMP_PREP", optional = true },
+            { kind = "literal", value = "the", optional = true },
+            { kind = "literal", value = "this" },
+            { kind = "literal", value = "place" },
+            { kind = "literal", value = "now", optional = true },
+        },
+        {
+            intent = "REQUEST",
+            speechAct = "REQUEST",
+            action = "CAMP",
+            target = {
+                kind = "camp_site",
+                scope = "here",
+            },
+        },
+        0.96,
+        160
     )
     registerPattern(
         "pnc.question.inventory_have",

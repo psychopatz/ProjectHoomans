@@ -51,6 +51,18 @@ T.equal(offer.diagnostics.recommendedRoute, "deterministic",
 local waitHere = Parser.Parse("Wait here.")
 T.equal(waitHere.action, "STAY", "wait maps to existing stay semantics")
 
+local campHere = Parser.Parse("lets camp in here")
+T.equal(campHere.action, "CAMP", "camp-here action")
+T.equal(campHere.target.scope, "here",
+    "camp-here preposition keeps a generic site scope")
+T.falsy(campHere.target.roomQuery,
+    "camp-here does not capture the deictic word as a room")
+
+local campPlace = Parser.Parse("camp at this place")
+T.equal(campPlace.action, "CAMP", "camp-this-place action")
+T.equal(campPlace.target.scope, "here",
+    "camp-this-place keeps a generic site scope")
+
 local goHome = Parser.Parse("Go home.")
 T.equal(goHome.action, "GO", "go home action")
 T.equal(goHome.destination.category, "HOME", "go home destination")

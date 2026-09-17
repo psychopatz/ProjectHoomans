@@ -23,13 +23,18 @@ local function dutyOrder(record)
 end
 
 function Service.IsAtHome(record, baseId)
+    return Service.IsWithinHome(record,
+        record and record.x, record and record.y, record and record.z, baseId)
+end
+
+function Service.IsWithinHome(record, x, y, z, baseId)
     local base = H.BaseFor(record, baseId)
     local zone = base and Zones.get(base.baseZoneId) or nil
     if not zone or not zone.geometry or not record then return false end
     return GridRegion.containsXY(
         zone.geometry,
-        math.floor(tonumber(record.x) or 0),
-        math.floor(tonumber(record.y) or 0)
+        math.floor(tonumber(x) or 0),
+        math.floor(tonumber(y) or 0)
     )
 end
 

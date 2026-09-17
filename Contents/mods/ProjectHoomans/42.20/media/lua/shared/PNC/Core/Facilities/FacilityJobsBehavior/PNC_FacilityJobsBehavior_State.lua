@@ -4,6 +4,8 @@ PNC.FacilityJobsBehaviorInternal = PNC.FacilityJobsBehaviorInternal or {}
 
 local Internal = PNC.FacilityJobsBehaviorInternal
 local KIND = Internal.KIND
+local CampSite = PNC.Semantics and PNC.Semantics.CampSite
+    or require "PNC/Semantics/PNC_SemanticCampSite"
 
 PNC.SeatingRuntime = PNC.SeatingRuntime or {}
 PNC.SeatingRuntime.LiveObjects = PNC.SeatingRuntime.LiveObjects or {}
@@ -13,6 +15,8 @@ PNC.SleepRuntime.LiveObjects = PNC.SleepRuntime.LiveObjects or {}
 function Internal.Normalize(_, spec)
     local floorSeating = spec.floorSeating == true
         or tostring(spec.resourceKind or "") == "floor_seating"
+    local scope = CampSite.NormalizeScope(spec.scope
+        or spec.siteScope)
     return {
         kind = KIND,
         capability = tostring(spec.capability or ""),
@@ -59,8 +63,22 @@ function Internal.Normalize(_, spec)
         taskLeaseId = tostring(spec.taskLeaseId or ""),
         resourceKind = tostring(spec.resourceKind or ""),
         resourceKey = tostring(spec.resourceKey or ""),
+        manual = spec.manual == true,
+        manualOverride = spec.manualOverride == true,
+        waterContextKind = tostring(spec.waterContextKind or ""),
+        waterBaseId = spec.waterBaseId,
         campActivity = spec.campActivity == true,
         campId = tostring(spec.campId or ""),
+        scope = scope,
+        siteScope = scope,
+        siteID = spec.siteID and tostring(spec.siteID) or nil,
+        roomID = spec.roomID and tostring(spec.roomID) or nil,
+        buildingID = spec.buildingID and tostring(spec.buildingID) or nil,
+        roomType = spec.roomType and tostring(spec.roomType) or nil,
+        roomName = spec.roomName and tostring(spec.roomName) or nil,
+        roomBounds = CampSite.NormalizeBounds(spec.roomBounds),
+        campfireID = spec.campfireID
+            and tostring(spec.campfireID) or nil,
         campX = tonumber(spec.campX),
         campY = tonumber(spec.campY),
         campZ = tonumber(spec.campZ),

@@ -259,12 +259,37 @@ local function globalCampfireForSquare(square)
     }
 end
 
+local function listSize(list)
+    local size = call(list, "size")
+    if size ~= nil then return math.max(0, math.floor(number(size) or 0)) end
+    if type(list) == "table" then return #list end
+    return 0
+end
+
+local function listItem(list, index)
+    local item = call(list, "get", index)
+    if item ~= nil then return item end
+    if type(list) == "table" then return list[index + 1] end
+    return nil
+end
+
+local function campfireIDMatches(wanted, key, objectID)
+    local wantedText = text(wanted)
+    local keyText = text(key)
+    local objectText = tostring(objectID or "")
+    local coordinateKey = wantedText
+        and string.match(wantedText, "^([^#]+)#") or nil
+    if not wantedText then return true end
+    return wantedText == keyText
+        or wantedText == objectText
+        or coordinateKey ~= nil and coordinateKey == keyText
+end
+
 local function isCampfire(entry, requestedID)
     local object = entry and entry.object
     local key = text(entry and entry.key)
     local objectID = call(object, "getID")
-    local wanted = text(requestedID)
-    if wanted and wanted ~= key and wanted ~= tostring(objectID or "") then
+    if not campfireIDMatches(requestedID, key, objectID) then
         return false
     end
     if entry and entry.source == "global_campfire" then return true end
@@ -274,6 +299,97 @@ local function isCampfire(entry, requestedID)
     if lower(call(container, "getType")) == "campfire" then return true end
     local name = objectName(object)
     return string.find(name, "campfire", 1, true) ~= nil
+end
+
+local function cellFor(context)
+    if type(context) == "table" and context.cell then
+        return context.cell
+    end
+    if type(getCell) == "function" then
+        local ok, cell = pcall(getCell)
+        if ok then return cell end
+    end
+    return nil
+end
+
+local function campfireEntryOnSquare(square, requestedID)
+    local x = number(call(square, "getX"))
+    local y = number(call(square, "getY"))
+    local z = number(call(square, "getZ")) or 0
+    local global = globalCampfireForSquare(square)
+    local objects
+    local index
+    if x == nil or y == nil then return nil end
+    if global and isCampfire(global, requestedID) then
+        global.x = x + 0.5
+        global.y = y + 0.5
+        global.z = z
+        return global
+    end
+    objects = call(square, "getObjects")
+    for index = 0, listSize(objects) - 1 do
+        local object = listItem(objects, index)
+        local objectID = call(object, "getID")
+        local key = objectID and "campfire@" .. tostring(x) .. ":"
+            .. tostring(y) .. ":" .. tostring(z) .. "#"
+            .. tostring(objectID)
+            or "campfire@" .. tostring(x) .. ":" .. tostring(y) .. ":"
+                .. tostring(z)
+        local entry = {
+            object = object,
+            source = "square_object",
+            key = key,
+            x = x + 0.5,
+            y = y + 0.5,
+            z = z,
+        }
+        if isCampfire(entry, requestedID) then return entry end
+    end
+    return nil
+end
+
+-- Validate one client-observed campfire square without falling back to the
+-- broad server locator. Direct player commands must remain cheap even when a
+-- multiplayer server has many simultaneous command requests.
+function Resolver.ValidateCampfireHint(target, context)
+    local raw = target and target.clientHint
+    local origin = originFor(context)
+    local radius = boundedRadius(target and target.radius, 16)
+    local hint
+    local reason
+    local cell
+    local square
+    local requestedID
+    local entry
+    local result
+    if type(raw) ~= "table" then return nil, "campfire_hint_required" end
+    hint, reason = validClientHint(target, "campfire", origin, radius)
+    if not hint then return nil, reason or "campfire_hint_invalid" end
+    cell = cellFor(context)
+    if not cell or type(cell.getGridSquare) ~= "function" then
+        return nil, "campfire_validation_unavailable"
+    end
+    local ok
+    ok, square = pcall(cell.getGridSquare, cell,
+        math.floor(hint.x), math.floor(hint.y), math.floor(hint.z))
+    if not ok or not square then return nil, "campfire_hint_not_loaded" end
+    requestedID = raw.campfireID or target.campfireID or target.fireID
+    entry = campfireEntryOnSquare(square, requestedID)
+    if not entry then return nil, "campfire_hint_stale" end
+    result = primitiveTarget({
+        kind = "campfire",
+        targetID = entry.key,
+        x = entry.x,
+        y = entry.y,
+        z = entry.z,
+        mode = target.mode,
+        stopDistance = target.stopDistance or 1.25,
+    }, "campfire")
+    if not result then return nil, "campfire_position_unavailable" end
+    result.objectKind = "campfire"
+    result.resourceKey = entry.key
+    result.clientHintAccepted = true
+    return result
 end
 
 local function resolvePlayer(target, context)

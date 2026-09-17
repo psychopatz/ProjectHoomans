@@ -10,7 +10,19 @@ local Support = Provider.ConsumptionSupport
 local Water = PNC.WaterContainerService
 local NearbyWater = PNC.NearbyWaterService
 
+local function refillContext(record, plan)
+    local policy = PNC.WaterHydrationPolicy
+    if not policy or not policy.GetContext then
+        return nil, "WATER_POLICY_UNAVAILABLE"
+    end
+    local manualOverride = type(plan) == "table"
+        and plan.manualOverride == true
+    return policy.GetContext(record, { manualOverride = manualOverride })
+end
+
 local function refillSelection(plan, step, record)
+    local context, contextReason = refillContext(record, plan)
+    if not context then return nil, contextReason end
     local selection, reason = Support.Select(record, step)
     local item
     if selection and Water and type(Water.FindContainer) == "function" then
@@ -56,6 +68,10 @@ local function resolve(plan, step, record)
 end
 
 local function execute(plan, step, record)
+    local context, contextReason = refillContext(record, plan)
+    if not context then
+        return { blocked = true, reason = contextReason }
+    end
     local assignment = step and step.assignment
     local selection, reason = refillSelection(plan, step, record)
     local item
@@ -105,6 +121,15 @@ local function execute(plan, step, record)
     })
     if ok ~= true then
         return { blocked = true, reason = amount or "WATER_REFILL_FAILED" }
+    end
+    if PNC.NeedFacilityEffects
+        and PNC.NeedFacilityEffects.ApplyWaterRefillSuccess
+    then
+        PNC.NeedFacilityEffects.ApplyWaterRefillSuccess(record, {
+            activityItemID = resultItemID or item.id,
+            activityItemFullType = item.type or item.fullType,
+            resourceKey = source.key,
+        }, amount)
     end
     return {
         complete = true,

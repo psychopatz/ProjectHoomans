@@ -9,6 +9,115 @@ PNC.NearbyWaterServiceInternal =
 local Service = PNC.NearbyWaterService
 local H = PNC.NearbyWaterServiceInternal
 local Locator = PNC.NearbyResourceLocator
+
+PNC.WaterHydrationPolicy = PNC.WaterHydrationPolicy or {}
+local Policy = PNC.WaterHydrationPolicy
+
+function Policy.IsManualOverride(options)
+    if type(options) ~= "table" then return false end
+    if options.manualOverride == true then return true end
+    -- Preserve already-running manual water activities from older saves that
+    -- predate the explicit manualOverride field. Do not broaden this to every
+    -- manual facility action: only the refill capability bypasses the water
+    -- location policy.
+    return options.manual == true
+        and (options.resourceKind == "water_refill"
+            or options.capability == "survival.fill.water")
+end
+
+function Policy.GetContext(record, options)
+    if not record or record.alive == false then
+        return nil, "NPC_UNAVAILABLE"
+    end
+    if Policy.IsManualOverride(options) then
+        return {
+            kind = "MANUAL_OVERRIDE",
+            manualOverride = true,
+        }
+    end
+    local routes = PNC.NeedFacilityAwayRoutes
+    if routes and routes.IsCampContext
+        and routes.IsCampContext(record) == true
+    then
+        return { kind = "CAMP" }
+    end
+    local home = PNC.HomeDutyService
+    local base = home and home.GetBase and home.GetBase(record) or nil
+    if base and home.IsAtHome
+        and home.IsAtHome(record, base.id) == true
+    then
+        return { kind = "HOME", baseId = base.id }
+    end
+    return nil, "WATER_LOCATION_REQUIRED"
+end
+
+function Policy.IsTargetAllowed(record, context, target)
+    if not context or type(target) ~= "table" then return false end
+    if context.manualOverride == true then return true end
+    if context.kind == "HOME" then
+        local home = PNC.HomeDutyService
+        return home and home.IsWithinHome
+            and home.IsWithinHome(record, target.x, target.y, target.z,
+                context.baseId) == true
+            or false
+    end
+    if context.kind == "CAMP" then
+        local camp = PNC.CampResourceService
+        return camp and camp.IsWithinCamp
+            and camp.IsWithinCamp(record, target) == true
+            or false
+    end
+    return false
+end
+
+function Policy.RestrictTargets(record, context, source, target, approaches)
+    if context and context.manualOverride == true then
+        return target, approaches
+    end
+    if not Policy.IsTargetAllowed(record, context, source) then
+        return nil, nil, "WATER_SOURCE_OUTSIDE_ALLOWED_CONTEXT"
+    end
+    local candidates = {}
+    local selected
+    local function append(candidate)
+        if type(candidate) ~= "table"
+            or not Policy.IsTargetAllowed(record, context, candidate)
+        then
+            return
+        end
+        candidates[#candidates + 1] = candidate
+        if not selected then selected = candidate end
+    end
+    append(target)
+    if type(approaches) == "table" then
+        for index = 1, #approaches do
+            append(approaches[index])
+        end
+    end
+    if not selected then
+        return nil, nil, "WATER_APPROACH_OUTSIDE_ALLOWED_CONTEXT"
+    end
+    return selected, candidates
+end
+
+function Policy.AllowsActivity(record, activity)
+    if Policy.IsManualOverride(activity) then
+        return true, "MANUAL_OVERRIDE"
+    end
+    local context, reason = Policy.GetContext(record)
+    if not context then return false, reason end
+    local expected = tostring(activity and activity.waterContextKind or "")
+    if expected ~= "" and expected ~= context.kind then
+        return false, "WATER_CONTEXT_CHANGED"
+    end
+    local expectedBase = tostring(activity and activity.waterBaseId or "")
+    if expected == "HOME" and expectedBase ~= ""
+        and tostring(context.baseId or "") ~= expectedBase
+    then
+        return false, "WATER_CONTEXT_CHANGED"
+    end
+    return true, context.kind
+end
 -- Discovery is intentionally wider than interaction. NPCs can acquire a
 -- nearby source from a useful search window, then path to an adjacent tile;
 -- consumption still validates a short server-side interaction range.

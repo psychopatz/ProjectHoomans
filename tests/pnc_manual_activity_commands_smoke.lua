@@ -241,7 +241,9 @@ PNC.NeedFacilityAwayRoutes = {
         T.equal(sourceRef, "water_refill",
             "manual refill selected the wrong shared route")
         return {
-            Assign = function()
+            Assign = function(_, options)
+                T.truthy(options and options.manualOverride == true,
+                    "manual refill passes explicit override authority")
                 return refillAssignment
             end,
         }
@@ -269,6 +271,8 @@ T.equal(refillOptions.resourceKey, "sink:manual",
     "manual refill does not preserve the source key")
 T.equal(refillOptions.activityItemID, "water-container:1",
     "manual refill does not preserve the selected container")
+T.truthy(refillOptions.manualOverride,
+    "manual refill preserves override authority in the facility start")
 PNC.FacilityJobs.Start = actualStart
 
 -- A manual refill rejection must stop at the planner and preserve its exact

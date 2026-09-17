@@ -231,7 +231,7 @@ end
 virtualFiles["OtherMod|media/translation/EN/Partial/Partial.json"] =
     '{"present":"English present","missing":"English fallback"}'
 virtualFiles["OtherMod|media/translation/TL/Partial/Partial.json"] =
-    '{"present":"Tagalog present"}'
+    '{"present":"Tagalog present","extra":"Only in active language"}'
 local partial = Manager.registerSystem({
     modID = "OtherMod",
     systemName = "Partial",
@@ -272,6 +272,51 @@ T.equal(equalAudit.counts.english_value_fallback, 1,
     "translation audit identifies an untranslated localized sentence")
 T.equal(equalAudit.warningCount, 1,
     "translation audit warns once for an untranslated localized sentence")
+
+virtualFiles["OtherMod|media/translation/EN/NoLocale/NoLocale.json"] =
+    '{"line":"English-only line"}'
+local noLocale = Manager.registerSystem({
+    modID = "OtherMod",
+    systemName = "NoLocale",
+    basePath = "media/translation",
+})
+T.truthy(noLocale, "missing localized catalog fixture registers")
+
+local coverage = Manager.GetTranslationCoverageSnapshot()
+T.equal(coverage.language, "TL", "coverage follows the active language")
+local partialCoverage
+local equalCoverage
+local noLocaleCoverage
+for _, entry in ipairs(coverage.entries or {}) do
+    if entry.modID == "OtherMod" and entry.systemName == "Partial" then
+        partialCoverage = partialCoverage or {}
+        partialCoverage[entry.key] = entry.status
+    elseif entry.modID == "OtherMod" and entry.systemName == "Equal" then
+        equalCoverage = entry.status
+    elseif entry.modID == "OtherMod" and entry.systemName == "NoLocale" then
+        noLocaleCoverage = entry.status
+    end
+end
+T.equal(partialCoverage.present, "translated",
+    "coverage marks a localized key as translated")
+T.equal(partialCoverage.missing, "missing_key",
+    "coverage marks a missing localized key")
+T.equal(partialCoverage.extra, "extra_key",
+    "coverage marks an extra localized key")
+T.equal(equalCoverage, "same_as_english",
+    "coverage marks identical English prose for review")
+T.equal(noLocaleCoverage, "missing_catalog",
+    "coverage marks a missing localized catalog")
+local noLocaleSummary
+for _, summary in ipairs(coverage.systems or {}) do
+    if summary.id == "OtherMod:NoLocale" then
+        noLocaleSummary = summary
+    end
+end
+T.equal(noLocaleSummary.state, "missing_catalog",
+    "coverage system summary identifies the missing localized catalog")
+T.falsy(Manager.Data.OtherMod and Manager.Data.OtherMod.NoLocale,
+    "coverage scanning does not populate the normal lazy translation cache")
 
 local ConversationText = T.load("PsychopatzCore", "common_client",
     "PsychopatzCore/UI/Conversation/PsychopatzConversationText.lua")

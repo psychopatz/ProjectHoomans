@@ -8,10 +8,27 @@ local CLIENT_ROOT = T.path(
 
 T.addPackagePaths()
 
-local indoor = false
 local executeCount = 0
 local rejectionCount = 0
 local exchange
+local lastArgs
+local queuedArgs
+local observedHintOrigin
+local visibleHint = {
+    version = 1,
+    source = "client_loaded_rooms",
+    kind = "camp_site",
+    scope = "room",
+    siteScope = "room",
+    siteID = "room:test-building:test-room",
+    roomID = "test-room",
+    buildingID = "test-building",
+    x = 2.5,
+    y = 0.5,
+    z = 0,
+    radius = 32,
+    score = 1,
+}
 local player = {
     getUsername = function() return "alice" end,
     isDead = function() return false end,
@@ -32,6 +49,9 @@ local record = {
 }
 local body = {
     isDead = function() return false end,
+    getX = function() return 100 end,
+    getY = function() return 100 end,
+    getZ = function() return 0 end,
 }
 
 PNC = {
@@ -46,6 +66,16 @@ PNC = {
     Network = {
         ClientState = {},
     },
+    Semantics = {
+        ClientCampSiteHints = {
+            MAX_RADIUS = 32,
+            Resolve = function(_, context)
+                observedHintOrigin = context and context.selectionOrigin
+                if visibleHint then return visibleHint end
+                return nil, "no_matching_loaded_object"
+            end,
+        },
+    },
     Registry = {
         Get = function() return record end,
         GetLiveZombie = function() return body end,
@@ -58,13 +88,10 @@ PNC = {
                 or { id = commandID }
         end,
         CanPlayerCommand = function() return true, "commandable" end,
-        CanApply = function()
-            return indoor and true or false,
-                indoor and "camp_inside_building"
-                    or "camp_requires_building"
-        end,
-        Execute = function()
+        CanApply = function() return true, "commandable" end,
+        Execute = function(_, args)
             executeCount = executeCount + 1
+            lastArgs = args
             return 1, "commanded"
         end,
     },
@@ -93,32 +120,77 @@ end
 
 T.load(CLIENT_ROOT .. "PNC_ClientActions.lua")
 
-T.falsy(PNC.Client.SendCompanionCommand(
-    "camp", "owned", nil, { record = record }
-), "outdoor targeted camp should be rejected before execution")
-T.equal(executeCount, 0,
-    "outdoor targeted camp reached the order executor")
-T.equal(rejectionCount, 1,
-    "outdoor targeted camp did not present its safety warning")
-
-T.falsy(PNC.Client.SendCompanionCommand(
-    "camp", nil, "group"
-), "outdoor group camp should be rejected before execution")
-T.equal(executeCount, 0,
-    "outdoor group camp reached the order executor")
-T.equal(rejectionCount, 2,
-    "outdoor group camp did not present its safety warning")
-
-indoor = true
 T.truthy(PNC.Client.SendCompanionCommand(
     "camp", "owned", nil, { record = record }
-), "indoor targeted camp was incorrectly rejected")
+), "room targeted camp was rejected despite a visible site")
 T.equal(executeCount, 1,
-    "indoor targeted camp did not reach the order executor")
+    "room targeted camp did not reach the order executor")
+T.equal(lastArgs.campSiteHint.scope, "room",
+    "room targeted camp did not attach the client site hint")
+T.equal(observedHintOrigin, player,
+    "direct camp discovery incorrectly used the companion as its origin")
+T.equal(rejectionCount, 0,
+    "room targeted camp presented a safety warning")
+
+visibleHint = {
+    version = 1,
+    source = "client_loaded_campfire",
+    kind = "campfire",
+    scope = "campfire",
+    siteScope = "campfire",
+    campfireID = "campfire@test",
+    x = 3.5,
+    y = 0.5,
+    z = 0,
+    radius = 32,
+    score = 1,
+}
+T.truthy(PNC.Client.SendCompanionCommand(
+    "camp", nil, "group"
+), "campfire group camp was rejected despite a visible site")
+T.equal(executeCount, 2,
+    "campfire group camp did not reach the order executor")
+T.equal(lastArgs.campSiteHint.scope, "campfire",
+    "campfire group camp did not attach the client site hint")
+T.equal(rejectionCount, 0,
+    "campfire group camp presented a safety warning")
+
+visibleHint = nil
+T.falsy(PNC.Client.SendCompanionCommand(
+    "camp", "owned", nil, { record = record }
+), "camp without a visible site reached execution")
+T.equal(executeCount, 2,
+    "camp without a visible site reached the order executor")
+T.equal(rejectionCount, 1,
+    "camp without a visible site did not present its rejection")
+
+visibleHint = {
+    version = 1,
+    source = "client_loaded_rooms",
+    kind = "camp_site",
+    scope = "room",
+    siteScope = "room",
+    x = 2.5,
+    y = 0.5,
+    z = 0,
+    radius = 32,
+    score = 1,
+}
+PNC.Core.IsClientOnly = function() return true end
+sendClientCommand = function(_, _, _, args) queuedArgs = args end
+local queued, queuedReason = PNC.Client.SendCompanionCommand(
+    "camp", "owned", nil, { record = record })
+T.equal(queued, true, "multiplayer camp with a visible site was not queued")
+T.equal(queuedReason, "network_queued",
+    "multiplayer camp returned the wrong queue result")
+T.equal(executeCount, 2,
+    "multiplayer camp incorrectly executed through the local authority")
+T.equal(queuedArgs.campSiteHint.scope, "room",
+    "multiplayer camp omitted its primitive site hint")
 
 local target = { id = "owned", name = "Mel patz" }
 local emoteResult = false
-local emoteReason = "camp_requires_building"
+local emoteReason = "camp_no_visible_site"
 local originalEmote
 
 ISEmoteRadialMenu = {
@@ -158,7 +230,7 @@ T.load(T.path(
 
 ISEmoteRadialMenu.PNCClosestCompanion = target
 emoteResult = false
-emoteReason = "camp_requires_building"
+emoteReason = "camp_no_visible_site"
 ISEmoteRadialMenu:emote("PNC_ClosestCommand_camp")
 T.equal(exchange.outcome, "invalid",
     "camp emote did not route the unsafe result to the exchange")

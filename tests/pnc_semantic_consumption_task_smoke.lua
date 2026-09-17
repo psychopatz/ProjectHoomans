@@ -81,6 +81,14 @@ PNC = {
             approachKey = "5:0:0",
         } end,
     },
+    WaterHydrationPolicy = {
+        GetContext = function(_, options)
+            if options and options.manualOverride == true then
+                return { kind = "MANUAL_OVERRIDE", manualOverride = true }
+            end
+            return nil, "WATER_LOCATION_REQUIRED"
+        end,
+    },
     WaterContainerService = {
         FindContainer = function(record, itemID)
             local item = record.inventory.items[tostring(itemID or "")]
@@ -290,6 +298,8 @@ local refillResult = Requests.Submit(refill, {
 })
 T.equal(refillResult.accepted, true, "refill request is admitted locally")
 local refillRuntime = Plans.GetMutable("npc:bob")
+T.equal(refillRuntime.manualOverride, true,
+    "semantic refill plan preserves manual override authority")
 now = now + 1
 Plans.Pump(now)
 now = now + 1

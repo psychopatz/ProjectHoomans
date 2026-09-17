@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animNode>
+	<m_Name>PNC_PH_Attack2HStamp_BUMP</m_Name>
+	<m_AnimName>Bob_AttackFloorStamp_2Hheavy</m_AnimName>
+	<m_Priority>4</m_Priority>
+	<m_deferredBoneAxis>Y</m_deferredBoneAxis>
+	<m_Looped>false</m_Looped>
+	<m_EarlyTransitionOut>true</m_EarlyTransitionOut>
+	<m_SpeedScale>0.9</m_SpeedScale>
+	<m_BlendTime>0.15</m_BlendTime>
+	<m_BlendOutTime>0.25</m_BlendOutTime>
+	<m_Conditions>
+		<m_Name>PerformingAction</m_Name>
+		<m_Type>STRING</m_Type>
+		<m_Value>PNC_PH_Attack2HStamp_BUMP</m_Value>
+	</m_Conditions>
+</animNode>

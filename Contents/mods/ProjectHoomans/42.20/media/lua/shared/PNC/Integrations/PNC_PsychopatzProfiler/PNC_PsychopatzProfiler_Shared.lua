@@ -191,16 +191,34 @@ function Internal.InstallSharedPerformance()
         local followOwners = {}
         local ambientLeases = 0
         local roamingSeatLeases = 0
+        local waterActivities = 0
+        local refillActivities = 0
+        local worldWaterActivities = 0
+        local manualWaterOverrides = 0
         for _, record in pairs(Registry and Registry.Data or {}) do
             local order = record and record.orderSpec or nil
             local runtime = record and record.runtime or nil
             local followState = runtime and runtime.followState or nil
             local path = runtime and runtime.pathing or nil
+            local activity = runtime and runtime.facilityActivity or nil
             if runtime and runtime.roamAmbient then
                 ambientLeases = ambientLeases + 1
             end
             if runtime and runtime.roamingSeat then
                 roamingSeatLeases = roamingSeatLeases + 1
+            end
+            if activity and (activity.resourceKind == "water_refill"
+                or activity.resourceKind == "world_water")
+            then
+                waterActivities = waterActivities + 1
+                if activity.resourceKind == "water_refill" then
+                    refillActivities = refillActivities + 1
+                else
+                    worldWaterActivities = worldWaterActivities + 1
+                end
+                if activity.manualOverride == true then
+                    manualWaterOverrides = manualWaterOverrides + 1
+                end
             end
             if order and tostring(order.kind or "")
                 == tostring(Const.ORDER_FOLLOW or "follow")
@@ -252,6 +270,12 @@ function Internal.InstallSharedPerformance()
             Internal.CountMap(followOwners))
         api.SetGauge("ProjectHoomans.Roaming.AmbientLeases", ambientLeases)
         api.SetGauge("ProjectHoomans.Roaming.SeatLeases", roamingSeatLeases)
+        api.SetGauge("ProjectHoomans.NPC.Water.Active", waterActivities)
+        api.SetGauge("ProjectHoomans.NPC.Water.RefillActive", refillActivities)
+        api.SetGauge("ProjectHoomans.NPC.Water.WorldActive",
+            worldWaterActivities)
+        api.SetGauge("ProjectHoomans.NPC.Water.ManualOverrides",
+            manualWaterOverrides)
         api.SetGauge("ProjectHoomans.World.LoadedZombies",
             #(Census and Census.OrdinaryZombies or {}))
         api.SetGauge("ProjectHoomans.World.ManagedBodies",

@@ -119,7 +119,7 @@ function H.ManualSleepActivity(record, options)
     return H.ManualHomeActivity(record, "sleep", options)
 end
 
-function H.ManualWorldWaterActivity(record)
+function H.ManualWorldWaterActivity(record, options)
     local routes = PNC.NeedFacilityAwayRoutes
     local routeId = routes and routes.IsCampContext
         and routes.IsCampContext(record) and "camp_water"
@@ -129,14 +129,18 @@ function H.ManualWorldWaterActivity(record)
     if not route or type(route.Assign) ~= "function" then
         return nil, "WORLD_WATER_NOT_FOUND"
     end
-    assignment = route.Assign(record, { forceWorld = true })
+    assignment = route.Assign(record, {
+        forceWorld = true,
+        manualOverride = type(options) == "table"
+            and options.manualOverride == true,
+    })
     if not assignment then
         return nil, "WORLD_WATER_NOT_FOUND"
     end
     return assignment
 end
 
-function H.ManualWaterRefillActivity(record)
+function H.ManualWaterRefillActivity(record, options)
     local water = PNC.NearbyWaterService
     local routes = PNC.NeedFacilityAwayRoutes
     local route = routes and routes.Get and routes.Get("water_refill") or nil
@@ -154,7 +158,10 @@ function H.ManualWaterRefillActivity(record)
     if not route or type(route.Assign) ~= "function" then
         return nil, "WATER_REFILL_UNAVAILABLE"
     end
-    assignment, reason = route.Assign(record)
+    assignment, reason = route.Assign(record, {
+        manualOverride = type(options) == "table"
+            and options.manualOverride == true,
+    })
     if not assignment or assignment.ok ~= true then
         return nil, reason or "WATER_FILL_SOURCE_UNAVAILABLE"
     end
@@ -258,7 +265,9 @@ function H.ManualStart(record, capability, commandContext)
                 definitionId = "manual_drink",
             }
         else
-            assignment = H.ManualWorldWaterActivity(record)
+            assignment = H.ManualWorldWaterActivity(record, {
+                manualOverride = true,
+            })
             if not assignment then
                 return false, "NO_DRINK_OR_WORLD_WATER"
             end
@@ -284,10 +293,13 @@ function H.ManualStart(record, capability, commandContext)
             }
             capability = "survival.drink.world"
             options.manualToggleable = false
+            options.manualOverride = true
         end
     elseif capability == "survival.fill.water" then
         local assignmentReason
-        assignment, assignmentReason = H.ManualWaterRefillActivity(record)
+        assignment, assignmentReason = H.ManualWaterRefillActivity(record, {
+            manualOverride = true,
+        })
         if not assignment then
             return false, assignmentReason or "NO_WATER_REFILL"
         end
@@ -297,6 +309,9 @@ function H.ManualStart(record, capability, commandContext)
         options.resource = assignment.resource
         options.resourceKey = assignment.resourceKey
         options.resourceKind = "water_refill"
+        options.manualOverride = true
+        options.waterContextKind = assignment.waterContextKind
+        options.waterBaseId = assignment.waterBaseId
         options.activityItemID = assignment.activityItemID
         options.activityItemFullType = assignment.activityItemFullType
         options.approachCandidates = assignment.approachCandidates

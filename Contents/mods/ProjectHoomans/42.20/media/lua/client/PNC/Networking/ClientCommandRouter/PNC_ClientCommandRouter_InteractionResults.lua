@@ -249,9 +249,11 @@ if Const.CMD_COMPANION_COMMAND_RESULT then
                 end
                 target = targets[1]
                 if not target then return end
+                local resultReason = tostring(args.reason or "")
                 outcome = args.accepted == true and "valid"
-                    or tostring(args.reason or "")
-                        == "camp_requires_building" and "invalid"
+                    or ((string.sub(resultReason, 1, 5) == "camp_"
+                        or string.sub(resultReason, 1, 9) == "campfire_")
+                        and "invalid")
                     or nil
                 if not outcome
                     or not PNC.CompanionCommandPresentation
@@ -289,7 +291,9 @@ if Const.CMD_COMPANION_COMMAND_RESULT then
             target = target or ClientState.snapshots
                 and targetID
                 and ClientState.snapshots[tostring(targetID)] or nil
-            if tostring(args.reason or "") ~= "camp_requires_building"
+            local resultReason = tostring(args.reason or "")
+            if (string.sub(resultReason, 1, 5) ~= "camp_"
+                and string.sub(resultReason, 1, 9) ~= "campfire_")
                 or not PNC.CompanionCommandPresentation
                 or not PNC.CompanionCommandPresentation.ShowCommandRejection
             then
