@@ -97,6 +97,35 @@ local function collectZones(cell, origin, originX, originY, originZ, radius,
         end
     end
 
+    -- Candidate filtering intentionally removes ordinary room floors from
+    -- the object list. Preserve room-zone recovery when the building index is
+    -- incomplete by asking the player's current loaded square directly.
+    local currentSquare = origin and Internal.Call(origin, "getCurrentSquare")
+    if currentSquare and Geometry
+        and type(Geometry.RoomIdentity) == "function"
+    then
+        local identityOk, identity = pcall(Geometry.RoomIdentity,
+            currentSquare)
+        local distance = zoneDistance(identity, originX, originY, originZ)
+        if identityOk and type(identity) == "table" and distance
+            and distance <= radius
+            and type(identity.roomBounds) == "table"
+        then
+            addRoom({
+                siteID = "room:" .. tostring(identity.buildingID or "unknown")
+                    .. ":" .. tostring(identity.roomID or "current"),
+                roomID = identity.roomID,
+                buildingID = identity.buildingID,
+                roomType = identity.roomType,
+                roomName = identity.roomName,
+                label = CampSite.RoomLabel(identity.roomType,
+                    identity.roomName),
+                roomBounds = identity.roomBounds,
+                x = identity.x, y = identity.y, z = identity.z,
+            }, distance, "observed_current_room")
+        end
+    end
+
     -- A few runtime versions expose room identity on loaded squares while
     -- their building list is incomplete. Keep that observation visible, but
     -- label it as weaker evidence than full room enumeration.

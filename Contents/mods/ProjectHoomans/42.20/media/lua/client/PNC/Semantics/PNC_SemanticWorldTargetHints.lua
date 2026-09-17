@@ -378,6 +378,12 @@ local function audit(query, profile, originX, originY, originZ, radius,
         secondScore = second and second.score or nil,
         status = hint and "attached" or "not_attached",
         reason = reason,
+    }, {
+        dedupeKey = "world_target|" .. Catalog.Normalize(query or "") .. "|"
+            .. tostring(profile and profile.kind or "") .. "|"
+            .. tostring(hint and "attached" or "not_attached") .. "|"
+            .. tostring(reason or ""),
+        consoleIntervalMs = 1000,
     })
 end
 

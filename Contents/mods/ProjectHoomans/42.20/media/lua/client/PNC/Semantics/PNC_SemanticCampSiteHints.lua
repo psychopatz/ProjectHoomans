@@ -121,6 +121,12 @@ local function audit(scope, query, hint, reason)
         x = hint and hint.x,
         y = hint and hint.y,
         score = hint and hint.score,
+    }, {
+        dedupeKey = "camp_site|" .. tostring(scope or "") .. "|"
+            .. tostring(query or "") .. "|"
+            .. tostring(hint and "attached" or "not_attached") .. "|"
+            .. tostring(reason or ""),
+        consoleIntervalMs = 1000,
     })
 end
 

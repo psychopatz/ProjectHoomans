@@ -114,6 +114,36 @@ local function approximateSitting(object, record)
     }
 end
 
+local function surfaceCandidate(object, square, metadata)
+    metadata = type(metadata) == "table" and metadata or {}
+    if SquareRules
+        and type(SquareRules.ClassifySleepSurface) == "function"
+    then
+        local ok, surface = pcall(SquareRules.ClassifySleepSurface, object)
+        if ok and (surface == "bed" or surface == "sofa") then
+            return true
+        end
+    end
+    if Catalog and type(Catalog.Matches) == "function" then
+        local bedOk, bed = pcall(Catalog.Matches, "bed", metadata)
+        local chairOk, chair = pcall(Catalog.Matches, "chair", metadata)
+        if (bedOk and bed == true) or (chairOk and chair == true) then
+            return true
+        end
+    end
+    local labels = metadata.labels or {}
+    return containsToken(labels, "bed")
+        or containsToken(labels, "cot")
+        or containsToken(labels, "bunk")
+        or containsToken(labels, "chair")
+        or containsToken(labels, "seat")
+        or containsToken(labels, "bench")
+        or containsToken(labels, "stool")
+        or containsToken(labels, "furniture_seating")
+        or containsToken(labels, "sofa")
+        or containsToken(labels, "couch")
+end
+
 local function sittingProvider(object, square, record)
     if SeatingManager and type(SeatingManager.getInstance) == "function" then
         local ok, manager = pcall(SeatingManager.getInstance)
@@ -143,11 +173,13 @@ end
 Perception.RegisterProvider("sleep", {
     order = 30,
     labelKey = "UI_PNC_PerceptionDebug_ProviderSleeping",
+    candidate = surfaceCandidate,
     describe = sleepProvider,
 })
 Perception.RegisterProvider("sitting", {
     order = 40,
     labelKey = "UI_PNC_PerceptionDebug_ProviderSitting",
+    candidate = surfaceCandidate,
     describe = sittingProvider,
 })
 

@@ -53,4 +53,23 @@ function Perception.ListProviders()
     return output
 end
 
+-- Candidate hooks are the cheap pre-scan side of a provider. They decide
+-- whether an ordinary loaded-cell object is worth decorating; the provider's
+-- `describe` hook still owns the authoritative facts. This keeps generic
+-- floor/wall entries out of the bounded perception budget while allowing a
+-- future domain (plants, appliances, etc.) to opt in without changing the
+-- shared scanner.
+function Perception.IsCandidate(object, square, metadata)
+    for index = 1, #Perception.ProviderOrder do
+        local id = Perception.ProviderOrder[index]
+        local provider = Perception.Providers[id]
+        if provider and type(provider.candidate) == "function" then
+            local ok, accepted = pcall(provider.candidate, object, square,
+                metadata)
+            if ok and accepted == true then return true end
+        end
+    end
+    return false
+end
+
 return Perception

@@ -4,6 +4,7 @@ if PsychopatzCore and PsychopatzCore.RuntimeRole
 then return end
 
 require "PNC/Networking/PNC_ServerCommandRouter"
+require "PNC/PuppetOpera/PNC_PuppetOpera_Authority"
 require "PNC/Networking/Handlers/PNC_ServerInventoryCommandHandler"
 require "PNC/Networking/Handlers/PNC_ServerKnowledgeCommandHandler"
 require "PNC/Networking/Handlers/PNC_ServerSemanticCognitionCommandHandler"

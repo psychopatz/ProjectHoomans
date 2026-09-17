@@ -30,6 +30,15 @@ Observer.MAX_RADIUS = 24
 -- Keep this high enough for a dense loaded cell while retaining a hard cap.
 Observer.MAX_OBJECTS = 512
 Observer.MAX_OBJECTS_HARD = 1024
+-- Candidate filtering may skip hundreds of floor/wall entries before it
+-- reaches a meaningful object. Keep that pre-filter pass bounded as well;
+-- otherwise a debug refresh could trade the old false-positive flood for a
+-- different unbounded metadata scan.
+Observer.MAX_INSPECTED_OBJECTS = 4096
+-- Campfires are GlobalObjects and must remain discoverable even when a dense
+-- square exhausts the ordinary-object budget.  This separate cap keeps the
+-- priority path bounded without allowing it to inflate into an unbounded scan.
+Observer.MAX_SPECIAL_OBJECTS = 32
 Observer.Cache = Observer.Cache or {}
 
 local function call(object, method, ...)
@@ -149,7 +158,7 @@ local function cacheKey(originX, originY, originZ, radius, maxObjects, cacheTag)
 end
 
 local function observationFor(output, seen, object, square, originZ,
-    specialKind, objectIndex, decorate)
+    specialKind, objectIndex, decorate, suppliedMetadata)
     if not object or seen[object] then return end
     local squareX = number(call(square, "getX"))
     local squareY = number(call(square, "getY"))
@@ -159,7 +168,7 @@ local function observationFor(output, seen, object, square, originZ,
     local z = number(call(object, "getZ")) or squareZ
     if x == nil or y == nil or z ~= originZ then return end
 
-    local metadata = metadataFor(object)
+    local metadata = suppliedMetadata or metadataFor(object)
     metadata.special = specialKind
         or (call(object, "isCampfire") == true and "campfire" or nil)
     seen[object] = true
@@ -189,11 +198,18 @@ local function observationFor(output, seen, object, square, originZ,
 end
 
 local function scan(cell, originX, originY, originZ, radius, maxObjects,
-    decorate)
+    decorate, filter, includeUnknown)
     local observations = {}
     local seen = {}
     local objectCount = 0
+    local inspectedObjectCount = 0
+    local rejectedObjectCount = 0
+    local filterErrorCount = 0
+    local campfireCount = 0
     local truncated = false
+    local inspectionTruncated = false
+    local inspectionLimit = math.min(Observer.MAX_INSPECTED_OBJECTS,
+        math.max(maxObjects, maxObjects * 8))
     local baseX = math.floor(originX)
     local baseY = math.floor(originY)
     local radiusSq = (radius + 0.5) * (radius + 0.5)
@@ -204,7 +220,6 @@ local function scan(cell, originX, originY, originZ, radius, maxObjects,
         local square
         local objects
         local campfire
-        if truncated then return end
         squareDX = baseX + dx + 0.5 - originX
         squareDY = baseY + dy + 0.5 - originY
         if squareDX * squareDX + squareDY * squareDY > radiusSq then
@@ -214,52 +229,75 @@ local function scan(cell, originX, originY, originZ, radius, maxObjects,
             originZ)
         if not square then return end
 
+        -- Campfires are GlobalObjects in some engine versions and are not
+        -- guaranteed to appear in getObjects().  Check them before ordinary
+        -- objects and continue this cheap special check after the ordinary
+        -- budget is exhausted.
+        campfire = call(square, "getCampfire")
+        if campfire and not seen[campfire]
+            and campfireCount < Observer.MAX_SPECIAL_OBJECTS
+        then
+            campfireCount = campfireCount + 1
+            observationFor(observations, seen, campfire, square,
+                originZ, "campfire", -1, decorate)
+        end
+
+        if truncated or inspectionTruncated then return end
         objects = call(square, "getObjects")
         for index = 0, listSize(objects) - 1 do
             if objectCount >= maxObjects then
                 truncated = true
                 break
             end
-            objectCount = objectCount + 1
-            observationFor(observations, seen,
-                listItem(objects, index), square, originZ, nil, index,
-                decorate)
-        end
-
-        -- Campfires are GlobalObjects in some engine versions and are not
-        -- guaranteed to appear in getObjects().
-        if not truncated then
-            campfire = call(square, "getCampfire")
-            if campfire then
-                if objectCount >= maxObjects then
-                    truncated = true
-                else
+            if inspectedObjectCount >= inspectionLimit then
+                inspectionTruncated = true
+                break
+            end
+            inspectedObjectCount = inspectedObjectCount + 1
+            local object = listItem(objects, index)
+            if object then
+                local metadata = metadataFor(object)
+                local accepted = includeUnknown == true
+                    or type(filter) ~= "function"
+                if not accepted then
+                    local filterOk, filterResult = pcall(filter, object,
+                        square, metadata)
+                    if filterOk then
+                        accepted = filterResult == true
+                    else
+                        filterErrorCount = filterErrorCount + 1
+                    end
+                end
+                if accepted then
                     objectCount = objectCount + 1
-                    observationFor(observations, seen, campfire, square,
-                        originZ, "campfire", -1, decorate)
+                    observationFor(observations, seen, object, square,
+                        originZ, nil, index, decorate, metadata)
+                else
+                    rejectedObjectCount = rejectedObjectCount + 1
                 end
             end
         end
     end
 
-    -- Visit the nearest squares first.  The previous row-major order could
-    -- consume all 256 entries on distant clutter and miss a nearby bin.
+    -- Visit the nearest squares first. The previous row-major order could
+    -- consume the ordinary budget on distant clutter and miss a nearby bin.
     for ring = 0, radius do
         if ring == 0 then
             visit(0, 0)
         else
             for dx = -ring, ring do
-                if not truncated then visit(dx, -ring) end
-                if not truncated and ring > 0 then visit(dx, ring) end
+                visit(dx, -ring)
+                if ring > 0 then visit(dx, ring) end
             end
             for dy = -ring + 1, ring - 1 do
-                if not truncated then visit(-ring, dy) end
-                if not truncated then visit(ring, dy) end
+                visit(-ring, dy)
+                visit(ring, dy)
             end
         end
-        if truncated then break end
     end
-    return observations, objectCount, truncated
+    return observations, objectCount, truncated, campfireCount,
+        inspectedObjectCount, rejectedObjectCount, filterErrorCount,
+        inspectionTruncated
 end
 
 function Observer.ClearCache()
@@ -304,25 +342,43 @@ function Observer.Observe(cell, originX, originY, originZ, options)
     if cached and timestamp - cached.at <= cacheMs then
         return cached.observations, {
             objectCount = cached.objectCount,
+            campfireCount = cached.campfireCount,
             truncated = cached.truncated,
+            inspectedObjectCount = cached.inspectedObjectCount,
+            rejectedObjectCount = cached.rejectedObjectCount,
+            filterErrorCount = cached.filterErrorCount,
+            inspectionTruncated = cached.inspectionTruncated,
             maxObjects = cached.maxObjects,
             cached = true,
         }
     end
 
-    local observations, objectCount, truncated = scan(
+    local observations, objectCount, truncated, campfireCount,
+        inspectedObjectCount, rejectedObjectCount, filterErrorCount,
+        inspectionTruncated = scan(
         cell, originX, originY, originZ, radius, maxObjects,
-        options.decorate)
+        options.decorate, options.filter or options.candidate,
+        options.includeUnknown == true)
     bucket[key] = {
         at = timestamp,
         observations = observations,
         objectCount = objectCount,
+        campfireCount = campfireCount,
         truncated = truncated,
+        inspectedObjectCount = inspectedObjectCount,
+        rejectedObjectCount = rejectedObjectCount,
+        filterErrorCount = filterErrorCount,
+        inspectionTruncated = inspectionTruncated,
         maxObjects = maxObjects,
     }
     return observations, {
         objectCount = objectCount,
+        campfireCount = campfireCount,
         truncated = truncated,
+        inspectedObjectCount = inspectedObjectCount,
+        rejectedObjectCount = rejectedObjectCount,
+        filterErrorCount = filterErrorCount,
+        inspectionTruncated = inspectionTruncated,
         maxObjects = maxObjects,
         cached = false,
     }

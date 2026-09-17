@@ -5,6 +5,6 @@ author=Psychopatz
 category=framework
 version=0.1.0
 versionMin=42.20
-require=PsychopatzCore
+require=PsychopatzCore,MarketSense
 poster=poster.png
 icon=icon.png

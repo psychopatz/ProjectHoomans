@@ -115,6 +115,18 @@ function Provider.addOptions(menu, entry, player, contextData)
             PNC.AnimationSceneDebugWindow.Open(entry)
         end
     end)
+    menu:addOption(tr("UI_PNC_Debug_PuppetOpera", "Puppet Opera"), nil, function()
+        if not PNC.PuppetOperaDebugWindow
+            or not PNC.PuppetOperaDebugWindow.Open
+        then
+            require "PNC/UI/PuppetOpera/PNC_PuppetOperaDebugWindow"
+        end
+        if PNC.PuppetOperaDebugWindow
+            and PNC.PuppetOperaDebugWindow.Open
+        then
+            PNC.PuppetOperaDebugWindow.Open(entry)
+        end
+    end)
 
     snapshot = ClientState.snapshots and ClientState.snapshots[entry.id] or nil
     if snapshot and snapshot.healthState == "incapacitated" and snapshot.canRevive == true then

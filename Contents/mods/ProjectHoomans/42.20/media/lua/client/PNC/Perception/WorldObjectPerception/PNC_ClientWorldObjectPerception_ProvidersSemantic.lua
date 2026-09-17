@@ -35,9 +35,19 @@ local function semanticProvider(object, square, record)
     }
 end
 
+local function semanticCandidate(object, square, metadata)
+    metadata = type(metadata) == "table" and metadata or {}
+    for _, profile in ipairs(Catalog.List()) do
+        local ok, matched = pcall(Catalog.Matches, profile.kind, metadata)
+        if ok and matched == true then return true end
+    end
+    return false
+end
+
 Perception.RegisterProvider("semantic", {
     order = 10,
     labelKey = "UI_PNC_PerceptionDebug_ProviderSemantic",
+    candidate = semanticCandidate,
     describe = semanticProvider,
 })
 

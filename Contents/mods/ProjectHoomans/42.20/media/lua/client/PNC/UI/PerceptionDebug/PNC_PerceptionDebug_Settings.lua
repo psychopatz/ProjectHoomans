@@ -12,9 +12,9 @@ PNC.PerceptionDebug = PNC.PerceptionDebug or {}
 
 local Settings = PNC.PerceptionDebug.Settings or {}
 PNC.PerceptionDebug.Settings = Settings
+Settings.revision = tonumber(Settings.revision) or 0
 
 local DEFAULTS = {
-    enabled = false,
     showObjectNames = true,
     showSemanticNames = true,
     showUsage = true,
@@ -29,7 +29,6 @@ local DEFAULTS = {
 }
 
 local LABELS = {
-    enabled = "UI_PNC_PerceptionDebug_EnableOverlay",
     showObjectNames = "UI_PNC_PerceptionDebug_ShowObjectNames",
     showSemanticNames = "UI_PNC_PerceptionDebug_ShowSemanticNames",
     showUsage = "UI_PNC_PerceptionDebug_ShowUsage",
@@ -44,7 +43,6 @@ local LABELS = {
 }
 
 local ORDER = {
-    "enabled",
     "showObjectNames",
     "showSemanticNames",
     "showUsage",
@@ -86,6 +84,11 @@ end
 
 function Settings.Get(key, fallback)
     key = tostring(key or "")
+    -- This module shares the native options page with nameplates, but it does
+    -- not share their setting namespace. Reject unknown keys before touching
+    -- the legacy ProjectHoomans store; otherwise a nameplate `enabled` value
+    -- can accidentally activate this debug surface again.
+    if DEFAULTS[key] == nil then return fallback == true end
     local current = store()
     if current and current.Get then
         local value = current:Get(key, nil)
@@ -101,12 +104,30 @@ function Settings.Set(key, value, save)
     value = normalize(key, value)
     if value == nil then return nil end
     localValues[key] = value
+    Settings.revision = Settings.revision + 1
     local current = store()
     if current and current.Set then
         ensureStoreDefaults()
         current:Set(key, value, save ~= false)
     end
+    -- Keep the frame hook dormant when the enabled session has no world
+    -- layer selected. Resolve the overlay lazily so this settings module does
+    -- not create a load-order dependency on the renderer.
+    local overlay = PNC.PerceptionDebug
+        and PNC.PerceptionDebug.Overlay or nil
+    if overlay and type(overlay.SyncRenderHook) == "function" then
+        overlay.SyncRenderHook()
+    end
     return value
+end
+
+function Settings.GetRevision()
+    local current = store()
+    -- Loading the shared store can happen after this module is required. The
+    -- loaded bit is part of the revision so the overlay does not retain the
+    -- pre-load defaults forever.
+    return tostring(Settings.revision) .. ":"
+        .. tostring(current and current.loaded == true)
 end
 
 function Settings.Toggle(key)

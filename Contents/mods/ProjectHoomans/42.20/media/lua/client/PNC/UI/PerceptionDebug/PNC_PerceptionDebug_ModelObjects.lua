@@ -12,6 +12,36 @@ local listText = Internal.ListText
 local yesNo = Internal.YesNo
 local addLine = Internal.AddLine
 
+local function hasValues(values)
+    return type(values) == "table" and #values > 0
+end
+
+-- Room facts describe the zone containing an object; they do not make every
+-- floor, wall, curtain, or light a semantic object.  This predicate is the
+-- shared contract for the dashboard list and the world hover renderer.
+function Model.ObjectVisible(object, settings)
+    settings = type(settings) == "table" and settings or {}
+    local facts = object and object.facts or {}
+    if settings.showUnknownObjects == true then return true end
+    if facts.semanticName or facts.commandName then
+        if settings.showSemanticNames ~= false then return true end
+    end
+    if facts.validSitting == true and settings.showSitting ~= false then
+        return true
+    end
+    if facts.validSleeping == true and settings.showSleeping ~= false then
+        return true
+    end
+    if facts.waterDetected == true and settings.showWater ~= false then
+        return true
+    end
+    if facts.isCampfire == true and settings.showCampZones ~= false then
+        return true
+    end
+    return (hasValues(facts.jobs) or hasValues(facts.capabilities))
+        and settings.showJobs ~= false
+end
+
 function Model.ObjectLabel(object, settings)
     settings = type(settings) == "table" and settings or {}
     local facts = object and object.facts or {}
@@ -46,14 +76,7 @@ function Model.ObjectRows(snapshot, settings)
     for index = 1, #(snapshot and snapshot.objects or {}) do
         local object = snapshot.objects[index]
         local facts = object.facts or {}
-        if settings.showUnknownObjects == true
-            or facts.semanticName
-            or facts.validSitting == true
-            or facts.validSleeping == true
-            or facts.waterDetected == true
-            or facts.isCampfire == true
-            or facts.indoor == true
-        then
+        if Model.ObjectVisible(object, settings) then
             rows[#rows + 1] = {
                 id = object.objectKey or object.targetID or index,
                 label = Model.ObjectLabel(object, settings)

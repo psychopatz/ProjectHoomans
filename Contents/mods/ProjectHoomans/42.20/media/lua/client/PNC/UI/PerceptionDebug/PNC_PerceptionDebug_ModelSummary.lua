@@ -44,7 +44,10 @@ function Model.Summary(snapshot)
         activeWater = activeWater,
         camps = camps,
         rooms = rooms,
-        inspected = tonumber(scan.objectCount) or 0,
+        inspected = tonumber(scan.inspectedObjectCount)
+            or tonumber(scan.objectCount) or 0,
+        candidates = tonumber(scan.objectCount) or 0,
+        rejected = tonumber(scan.rejectedObjectCount) or 0,
         truncated = scan.truncated == true,
         serverRequests = snapshot.diagnostics
             and snapshot.diagnostics.serverRequests or 0,

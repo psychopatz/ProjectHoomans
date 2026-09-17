@@ -31,6 +31,7 @@ local SEGMENT_SYSTEMS = {
     Activity = "Needs",
     AudioDebug = "Debug",
     PlayerAnimation = "Debug",
+    PuppetOpera = "Debug",
     Bandage = "Health",
     Bandages = "Health",
     Base = "Settlement",

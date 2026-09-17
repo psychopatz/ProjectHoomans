@@ -22,7 +22,6 @@ local Layout = UI.Layout
 local SLEEP_COLOR = { r = 0.78, g = 0.42, b = 1.0, a = 1 }
 
 local OPTION_LABELS = {
-    enabled = "UI_PNC_PerceptionDebug_EnableOverlay",
     showObjectNames = "UI_PNC_PerceptionDebug_ShowObjectNames",
     showSemanticNames = "UI_PNC_PerceptionDebug_ShowSemanticNames",
     showUsage = "UI_PNC_PerceptionDebug_ShowUsage",
@@ -58,16 +57,6 @@ local function trf(key, fallback, ...)
     end)
     local ok, formatted = pcall(string.format, value, ...)
     return ok and formatted or value
-end
-
-local function now()
-    if PNC.Core and type(PNC.Core.Now) == "function" then
-        return tonumber(PNC.Core.Now()) or 0
-    end
-    if type(getTimeInMillis) == "function" then
-        return tonumber(getTimeInMillis()) or 0
-    end
-    return 0
 end
 
 local function selected(list)
@@ -141,9 +130,13 @@ function ISPNCPerceptionDebugWindow:createChildren()
             onChange = function(owner, value, control)
                 Settings.Set(control and control.internal or definition.id,
                     value, true)
-                if owner and owner.syncControls then owner:syncControls() end
-                if owner and owner.refreshSnapshot then
-                    owner:refreshSnapshot(false)
+                if owner and owner.refreshPresentation then
+                    -- Settings change the presentation of the frozen
+                    -- snapshot. They must not trigger another world scan;
+                    -- use REFRESH LOCAL SCAN when world state should reload.
+                    owner:refreshPresentation()
+                elseif owner and owner.syncControls then
+                    owner:syncControls()
                 end
             end,
         })
@@ -175,7 +168,15 @@ function ISPNCPerceptionDebugWindow:createChildren()
     })
     self:requestResponsiveLayout(true)
     self:syncControls()
-    self:refreshSnapshot(true)
+    -- Reuse an active session's frozen snapshot when the dashboard is
+    -- reopened. A fresh scan is only needed for the first open; after that,
+    -- the Refresh button is the explicit world-reload boundary.
+    if Overlay.snapshot and Overlay.snapshot.status == "READY" then
+        self.snapshot = Overlay.snapshot
+        self:refreshPresentation()
+    else
+        self:refreshSnapshot(true)
+    end
 end
 
 function ISPNCPerceptionDebugWindow:onResponsiveLayout()
@@ -268,15 +269,10 @@ function ISPNCPerceptionDebugWindow:refreshCampPreview()
     end
 end
 
-function ISPNCPerceptionDebugWindow:refreshSnapshot(force)
-    if force then Perception.ClearSnapshotCache() end
+function ISPNCPerceptionDebugWindow:refreshPresentation()
     local previous = self:getSelected()
     local previousID = previous and (previous.id or previous.object
         and previous.object.objectKey) or self.selectedID
-    self.snapshot = Perception.GetSnapshot({
-        radius = Perception.DEFAULT_RADIUS,
-        maxObjects = Perception.MAX_OBJECTS,
-    })
     local rows = Model.ObjectRows(self.snapshot, Settings.All())
     self.objects:clear()
     for index = 1, #rows do
@@ -298,8 +294,24 @@ function ISPNCPerceptionDebugWindow:refreshSnapshot(force)
     self.selectedID = current and current.id or previousID
     self:refreshDetails()
     self:refreshCampPreview()
-    self.lastSnapshotAt = now()
     self:syncControls()
+end
+
+function ISPNCPerceptionDebugWindow:refreshSnapshot(force)
+    -- World state is deliberately reloaded only from this explicit path.
+    -- Settings changes re-filter the frozen snapshot through
+    -- refreshPresentation instead of triggering another scan.
+    if force then Perception.ClearSnapshotCache() end
+    self.snapshot = Perception.GetSnapshot({
+        radius = Perception.DEFAULT_RADIUS,
+        maxObjects = Perception.MAX_OBJECTS,
+        cacheMs = 0,
+        includeUnknown = Settings.Get("showUnknownObjects", false),
+    })
+    -- The draw callback consumes this frozen, bounded snapshot.  It must never
+    -- start a perception scan from OnPreUIDraw.
+    Overlay.SetSnapshot(self.snapshot)
+    self:refreshPresentation()
 end
 
 function ISPNCPerceptionDebugWindow:onAction(button)
@@ -315,10 +327,6 @@ function ISPNCPerceptionDebugWindow:onAction(button)
 end
 
 function ISPNCPerceptionDebugWindow:prerender()
-    local timestamp = now()
-    if timestamp - (tonumber(self.lastSnapshotAt) or 0) >= 500 then
-        self:refreshSnapshot(false)
-    end
     if self.objects.selected ~= self.lastSelection then
         self.lastSelection = self.objects.selected
         self:refreshDetails()
@@ -355,6 +363,11 @@ function ISPNCPerceptionDebugWindow:render()
 end
 
 function ISPNCPerceptionDebugWindow:close()
+    -- Overlay activation is a session/runtime concern. Closing the debug hub
+    -- releases the dashboard only; an explicitly active overlay remains
+    -- visible and uses its last frozen snapshot. This also stops all future
+    -- scans because the window's refresh loop is no longer running.
+    if not Overlay.IsEnabled() then Overlay.Clear(true) end
     self:setVisible(false)
     self:removeFromUIManager()
     if DebugUI.instance == self then DebugUI.instance = nil end
@@ -377,6 +390,7 @@ function DebugUI.Open()
             title = tr("UI_PNC_PerceptionDebug_Title",
                 "HOOMANS PERCEPTION DEBUG"),
             resizable = true,
+            collapsible = false,
             responsiveSpec = {
                 width = 1120,
                 height = 720,
@@ -392,8 +406,16 @@ function DebugUI.Open()
     end
     window:addToUIManager()
     window:setVisible(true)
+    -- Older sessions could have persisted this hub in its collapsed title-bar
+    -- state. The perception controls must always be reachable when the hub is
+    -- opened, even after the window switches to the fixed presentation.
+    window.isCollapsed = false
+    if window.clearMaxDrawHeight then window:clearMaxDrawHeight() end
+    if window.syncWindowControls then window:syncWindowControls() end
+    if window.requestResponsiveLayout then
+        window:requestResponsiveLayout(true)
+    end
     window:bringToTop()
-    window:refreshSnapshot(true)
     return window
 end
 

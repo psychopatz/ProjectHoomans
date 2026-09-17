@@ -84,6 +84,33 @@ PsychopatzCore.DebugHub.RegisterTool({
 })
 
 PsychopatzCore.DebugHub.RegisterTool({
+    id = "pnc.puppetOpera",
+    source = "Project Hoomans",
+    order = 208,
+    title = translateHubText("UI_PNC_DebugHub_PuppetOpera_Title",
+        "Puppet Opera Scene Builder"),
+    description = translateHubText(
+        "UI_PNC_DebugHub_PuppetOpera_Description",
+        "Build multi-actor scenes from the existing player and NPC animation catalogs."),
+    available = function()
+        return PNC
+            and PNC.PuppetOperaDebugWindow
+            and PNC.PuppetOperaDebugWindow.Open
+            and PNC.Client
+            and PNC.Client.CanUseDebug
+            and PNC.Client.CanUseDebug()
+    end,
+    action = function()
+        require "PNC/UI/PuppetOpera/PNC_PuppetOperaDebugWindow"
+        if PNC.PuppetOperaDebugWindow
+            and PNC.PuppetOperaDebugWindow.Open
+        then
+            PNC.PuppetOperaDebugWindow.Open()
+        end
+    end,
+})
+
+PsychopatzCore.DebugHub.RegisterTool({
     id = "pnc.perception",
     source = "Project Hoomans",
     order = 208,

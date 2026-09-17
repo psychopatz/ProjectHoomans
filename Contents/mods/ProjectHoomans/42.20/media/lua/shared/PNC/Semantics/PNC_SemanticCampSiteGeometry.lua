@@ -393,6 +393,38 @@ function Geometry.FindNearestRoom(cell, origin, query, options)
         return nil, "room_origin_unavailable"
     end
 
+    -- Loaded-square room identity is more reliable than the cell building
+    -- index on some runtime versions.  Resolve the player's current room
+    -- directly before enumerating buildings so a valid nearby living room is
+    -- not rejected merely because getBuildingList()/getRooms() is incomplete.
+    if originRoom then
+        local directSite, directReason = Geometry.DescribeRoom(originRoom,
+            buildingFor(originRoom, originRoomDef), cell, origin, {
+                roomType = wantedType,
+                query = wantedText,
+            })
+        if directSite then
+            local dx = directSite.x - originX
+            local dy = directSite.y - originY
+            local distance = math.sqrt(dx * dx + dy * dy)
+            local preferred = not options.preferredSiteID
+                and not options.preferredRoomID
+                or options.preferredSiteID
+                and tostring(directSite.siteID or "")
+                    == tostring(options.preferredSiteID)
+                or options.preferredRoomID
+                and tostring(directSite.roomID or "")
+                    == tostring(options.preferredRoomID)
+            if preferred and math.abs(directSite.z - originZ) <= 1
+                and distance <= maximum
+            then
+                directSite.distance = distance
+                directSite.selectionScore = distance - 1000
+                return directSite
+            end
+        end
+    end
+
     Geometry.EnumerateRooms(cell, function(room, building)
         local site = Geometry.DescribeRoom(room, building, cell, origin, {
             roomType = wantedType,

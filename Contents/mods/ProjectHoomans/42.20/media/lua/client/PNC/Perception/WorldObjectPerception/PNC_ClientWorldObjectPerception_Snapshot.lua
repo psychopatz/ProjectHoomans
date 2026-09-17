@@ -17,11 +17,12 @@ local function copyPrimitive(value)
 end
 
 local function snapshotKey(cell, originX, originY, originZ, radius, maxObjects,
-    includeCampPreview)
+    includeCampPreview, includeUnknown)
     return tostring(cell) .. "|" .. tostring(math.floor(originX)) .. ":"
         .. tostring(math.floor(originY)) .. ":" .. tostring(originZ) .. "|"
         .. tostring(radius) .. ":" .. tostring(maxObjects) .. ":"
-        .. tostring(includeCampPreview == true) .. "|v"
+        .. tostring(includeCampPreview == true) .. ":"
+        .. tostring(includeUnknown == true) .. "|v"
         .. tostring(Perception.ProviderVersion)
 end
 
@@ -75,8 +76,9 @@ function Perception.BuildSnapshot(options)
     end
 
     local includeCampPreview = options.skipCampPreview ~= true
+    local includeUnknown = options.includeUnknown == true
     local key = snapshotKey(cell, originX, originY, originZ, radius,
-        maxObjects, includeCampPreview)
+        maxObjects, includeCampPreview, includeUnknown)
     local cached = Perception.SnapshotCache[key]
     if cached and timestamp - cached.at <= cacheMs then
         cached.snapshot.diagnostics.snapshotCacheHit = true
@@ -94,7 +96,13 @@ function Perception.BuildSnapshot(options)
             maxObjects = maxObjects,
             cacheMs = cacheMs,
             nowMs = timestamp,
-            cacheTag = "perception:" .. tostring(Perception.ProviderVersion),
+            cacheTag = "perception:" .. tostring(Perception.ProviderVersion)
+                .. ":unknown=" .. tostring(includeUnknown),
+            includeUnknown = includeUnknown,
+            candidate = function(object, square, metadata)
+                if includeUnknown then return true end
+                return Perception.IsCandidate(object, square, metadata)
+            end,
             decorate = function(object, square, record)
                 return Internal.DescribeObject(object, square, record, context)
             end,

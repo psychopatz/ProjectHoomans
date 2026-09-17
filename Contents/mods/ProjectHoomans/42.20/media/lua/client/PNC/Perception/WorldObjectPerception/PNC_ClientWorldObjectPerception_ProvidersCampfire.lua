@@ -25,9 +25,21 @@ local function campfireProvider(object, square, record)
     }
 end
 
+local function campfireCandidate(object, square, metadata)
+    if Internal.Call(object, "isCampfire") == true then return true end
+    metadata = type(metadata) == "table" and metadata or {}
+    local catalog = Internal.Catalog
+    if not catalog or type(catalog.Matches) ~= "function" then
+        return false
+    end
+    local ok, matched = pcall(catalog.Matches, "campfire", metadata)
+    return ok and matched == true
+end
+
 Perception.RegisterProvider("campfire", {
     order = 60,
     labelKey = "UI_PNC_PerceptionDebug_ProviderCampfire",
+    candidate = campfireCandidate,
     describe = campfireProvider,
 })
 

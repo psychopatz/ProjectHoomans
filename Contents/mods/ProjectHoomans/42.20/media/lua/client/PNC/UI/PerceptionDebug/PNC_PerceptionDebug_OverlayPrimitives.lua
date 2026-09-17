@@ -66,6 +66,26 @@ function Primitives.Point(drawer, index, x, y, z)
         screenY - (number(drawer.y) or 0)
 end
 
+-- Native area highlights are retained for the current UI frame even when
+-- their tile is outside the camera. Avoid submitting those quads when the
+-- projection can be resolved; if projection is unavailable, preserve the
+-- marker rather than making the debug view incomplete.
+function Primitives.WorldPointVisible(drawer, index, x, y, z, margin)
+    if not drawer then return true end
+    if type(isoToScreenX) ~= "function"
+        or type(isoToScreenY) ~= "function"
+    then return true end
+    local sx, sy = Primitives.Point(drawer, index,
+        (number(x) or 0) + 0.5, (number(y) or 0) + 0.5,
+        number(z) or 0)
+    if not sx or not sy then return true end
+    margin = number(margin) or 64
+    local width = number(drawer and drawer.width) or 1920
+    local height = number(drawer and drawer.height) or 1080
+    return sx >= -margin and sx <= width + margin
+        and sy >= -margin and sy <= height + margin
+end
+
 function Primitives.WorldLine(drawer, index, x1, y1, z1, x2, y2, z2, color)
     if not drawer or type(drawer.drawLine2) ~= "function" then return end
     local sx1, sy1 = Primitives.Point(drawer, index, x1, y1, z1)
@@ -86,18 +106,21 @@ function Primitives.WorldMarker(drawer, index, x, y, z, color, size)
 end
 
 function Primitives.WorldTile(drawer, index, x, y, z, color)
+    if type(addAreaHighlightForPlayer) ~= "function" then return false end
     x, y, z = math.floor(number(x) or 0), math.floor(number(y) or 0),
         number(z) or 0
-    Primitives.WorldLine(drawer, index, x, y, z, x + 1, y, z, color)
-    Primitives.WorldLine(drawer, index, x + 1, y, z, x + 1, y + 1, z, color)
-    Primitives.WorldLine(drawer, index, x + 1, y + 1, z, x, y + 1, z, color)
-    Primitives.WorldLine(drawer, index, x, y + 1, z, x, y, z, color)
+    if not Primitives.WorldPointVisible(drawer, index, x, y, z) then
+        return false
+    end
+    addAreaHighlightForPlayer(index, x, y, x + 1, y + 1, z,
+        color.r, color.g, color.b, color.a)
+    return true
 end
 
 function Primitives.WorldCircle(drawer, index, x, y, z, radius, color)
     radius = number(radius)
     if not radius or radius <= 0 then return end
-    local segments = math.max(12, math.floor(math.min(48, radius * 2)))
+    local segments = math.max(12, math.floor(math.min(28, radius * 2)))
     local previousX, previousY
     for segment = 0, segments do
         local angle = segment / segments * math.pi * 2
@@ -148,24 +171,92 @@ function Primitives.DrawText(drawer, value, x, y, color, font)
         color.b, color.a or 1, font or UIFont.Small)
 end
 
-function Primitives.DrawLabel(drawer, index, x, y, z, value, color, offsetY)
-    if value == nil or value == "" then return end
-    local sx, sy = Primitives.Point(drawer, index, x, y, z)
-    if not sx or not sy then return end
-    local width = math.max(80, #tostring(value) * 7 + 14)
-    local left = math.max(4, math.min((drawer.width or 1920) - width - 4,
-        sx - width / 2))
-    local top = math.max(4, sy - (number(offsetY) or 22))
+local function readableRoomType(value)
+    value = tostring(value or "")
+    if value == "" then return nil end
+    value = string.lower(string.gsub(value, "_", " "))
+    if value == "" or value == "unknown" or value == "unclassified" then
+        return nil
+    end
+    return value
+end
+
+-- Zone labels are deliberately derived from the already-frozen snapshot. They
+-- are not object nameplates and never perform another world lookup.
+function Primitives.ZoneLabel(zone)
+    if type(zone) ~= "table" then return nil end
+    if zone.kind == "campfire" then
+        return tostring(zone.label or "campfire")
+    end
+    if zone.kind ~= "room" then return nil end
+    local label = tostring(zone.label or "")
+    if label ~= "" then return label end
+    label = readableRoomType(zone.roomType)
+    if label then return label end
+    label = tostring(zone.roomName or "")
+    return label ~= "" and label or "room"
+end
+
+local function zoneAnchor(zone)
+    if type(zone) ~= "table" then return nil end
+    if zone.kind == "room" and type(zone.roomBounds) == "table" then
+        local bounds = zone.roomBounds
+        local minX, minY = number(bounds.minX), number(bounds.minY)
+        local maxX, maxY = number(bounds.maxX), number(bounds.maxY)
+        if minX and minY and maxX and maxY then
+            return (minX + maxX + 1) / 2,
+                (minY + maxY + 1) / 2,
+                number(zone.z) or number(bounds.z) or 0
+        end
+    end
+    local x, y = number(zone.x), number(zone.y)
+    if x == nil or y == nil then return nil end
+    return x + 0.5, y + 0.5, number(zone.z) or 0
+end
+
+Primitives.ZoneAnchor = zoneAnchor
+
+function Primitives.DrawZoneLabel(drawer, index, zone, color)
+    if not drawer or type(drawer.drawText) ~= "function" then return false end
+    local label = Primitives.ZoneLabel(zone)
+    local worldX, worldY, worldZ = zoneAnchor(zone)
+    if not label or not worldX or not worldY then return false end
+    local screenX, screenY = Primitives.Point(drawer, index,
+        worldX, worldY, worldZ)
+    if not screenX or not screenY then return false end
+
+    local drawerWidth = number(drawer.width) or 1920
+    local drawerHeight = number(drawer.height) or 1080
+    local width = math.min(240, math.max(64, #label * 7 + 18))
+    local height = 20
+    if screenX < -width or screenX > drawerWidth + width
+        or screenY < -height or screenY > drawerHeight + height
+    then
+        return false
+    end
+
+    local x = math.max(4, math.min(drawerWidth - width - 4,
+        screenX - width / 2))
+    local y = math.max(4, math.min(drawerHeight - height - 4,
+        screenY - height / 2))
     if drawer.drawRect then
-        drawer:drawRect(left, top, width, 20, 0.84, 0.02, 0.04, 0.07)
+        drawer:drawRect(x, y, width, height, 0.84, 0.01, 0.02, 0.04)
     end
     if drawer.drawRectBorder then
-        drawer:drawRectBorder(left, top, width, 20, 0.92,
+        color = color or { r = 1, g = 1, b = 1, a = 1 }
+        drawer:drawRectBorder(x, y, width, height, 0.90,
             color.r, color.g, color.b)
     end
-    Primitives.DrawText(drawer, value, left + 7, top + 3, {
-        r = 1, g = 1, b = 1, a = 1,
-    })
+    Primitives.DrawText(drawer, label, x + 8, y + 3,
+        { r = 1, g = 1, b = 1, a = 1 })
+    return true
+end
+
+function Primitives.TruncateText(value, maximum)
+    value = tostring(value or "")
+    maximum = math.max(8, math.floor(number(maximum) or 72))
+    if #value <= maximum then return value end
+    return string.sub(value, 1, maximum - 3) .. "..."
 end
 
 function Primitives.DrawRoomZone(drawer, index, zone, color)
@@ -181,11 +272,11 @@ end
 
 function Primitives.DrawCampZone(drawer, index, zone, color)
     if not zone then return end
+    Primitives.WorldTile(drawer, index, number(zone.x) or 0,
+        number(zone.y) or 0, number(zone.z) or 0, color)
     Primitives.WorldCircle(drawer, index, number(zone.x) or 0,
         number(zone.y) or 0, number(zone.z) or 0,
         number(zone.radius) or 16, color)
-    Primitives.WorldMarker(drawer, index, number(zone.x) or 0,
-        number(zone.y) or 0, number(zone.z) or 0, color, 9)
 end
 
 return Primitives

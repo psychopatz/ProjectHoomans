@@ -214,4 +214,8 @@ require "PNC/Core/API/PNC_API"
 -- self-contained catalog; the composition root has one fixed import path.
 require "PNC/Generated/UniqueNPC/PNC_UniqueNPCDefinitions"
 require "PNC/Core/Health/PNC_PlayerDamage"
+require "PNC/Core/PuppetOpera/PNC_PuppetOpera_Blueprints"
+require "PNC/Core/PuppetOpera/PNC_PuppetOpera_Anchors"
+require "PNC/Core/PuppetOpera/PNC_PuppetOpera_Trace"
+require "PNC/Core/PuppetOpera/PNC_PuppetOpera"
 require "PNC/Integrations/PNC_PsychopatzProfiler"
