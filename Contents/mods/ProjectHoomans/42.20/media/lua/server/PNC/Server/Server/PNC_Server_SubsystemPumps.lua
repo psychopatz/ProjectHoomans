@@ -11,6 +11,7 @@ local PlayerCharacterLifecycle = PNC.PlayerCharacterLifecycle
 local ScalingDiagnostics = PNC.PerformanceScalingDiagnostics
 local Network = PNC.Network
 local ZombieAggro = PNC.ZombieAggro
+local CampMovement = PNC.CampMovementCoordinator
 local NecroaExposure = PNC.Compatibility
     and PNC.Compatibility.Necroa
     and PNC.Compatibility.Necroa.Exposure
@@ -93,6 +94,10 @@ function H.PrepareTick(now)
         nil, now)
     safeOptional("server_prepare.camp_resources",
         PNC.CampResourceService, "Pump", nil, now)
+    if CampMovement and (tonumber(CampMovement.PendingCount) or 0) > 0 then
+        safeOptional("server_prepare.camp_movement",
+            CampMovement, "Pump", nil, now)
+    end
     safeOptional("server_prepare.lumber", PNC.LumberService, "Pump", nil,
         now)
     -- Native engine-path routes are pumped by PathService.Pump from

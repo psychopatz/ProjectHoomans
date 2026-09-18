@@ -163,6 +163,10 @@ function Internal.Tick(record, zombie)
             sleepGridY = order.sleepGridY,
             sleepGridWidth = order.sleepGridWidth,
             sleepGridHeight = order.sleepGridHeight,
+            sleepSlotId = order.sleepSlotId,
+            sleepSlotIndex = order.sleepSlotIndex,
+            sleepCapacity = order.sleepCapacity,
+            bedCapacity = order.bedCapacity,
             object = Internal.LiveSleepObject(record, runtime),
         }
     end
@@ -359,6 +363,18 @@ function Internal.Tick(record, zombie)
                 "facility_arrival"
             )
         end
+        if tostring(runtime.capability or "") == "sleep"
+            and Diagnostics and Diagnostics.SleepAuditEnabled == true
+            and Diagnostics.LogSleepState
+        then
+            Diagnostics.LogSleepState(
+                "sleep_arrival",
+                record,
+                zombie,
+                runtime.animationScene,
+                "facility_arrival"
+            )
+        end
         Internal.ResetPath(record, zombie, "facility_arrival")
         runtime.arrivalSettled = true
     end
@@ -390,19 +406,51 @@ function Internal.Tick(record, zombie)
             return true
         end
     end
-    if runtime.seating ~= true and runtime.positioned ~= true and zombie
-        and order.interactionX and order.interactionY
-        and PNC.LiveBodyControl and PNC.LiveBodyControl.SetAuthoritativePosition
-    then
-        runtime.approachPosition = {
-            x = zombie:getX(), y = zombie:getY(), z = zombie:getZ(),
-        }
-        PNC.LiveBodyControl.SetAuthoritativePosition(zombie,
-            order.interactionX, order.interactionY,
-            order.interactionZ or order.z)
-        record.x, record.y, record.z = order.interactionX,
-            order.interactionY, order.interactionZ or order.z
-        runtime.positioned = true
+    if runtime.seating ~= true and runtime.positioned ~= true and zombie then
+        if tostring(runtime.capability or "") == "sleep"
+            and Internal.TrySnapToSleep
+        then
+            positioned, positionReason = Internal.TrySnapToSleep(
+                record, zombie, runtime, order)
+            if not positioned then
+                runtime.failedReason = positionReason
+                    or "SLEEP_ENTRY_POSITION_FAILED"
+                Internal.Finish(record, zombie, runtime.failedReason)
+                return true
+            end
+        elseif order.interactionX and order.interactionY
+            and PNC.LiveBodyControl
+            and PNC.LiveBodyControl.SetAuthoritativePosition
+        then
+            runtime.approachPosition = {
+                x = zombie:getX(), y = zombie:getY(), z = zombie:getZ(),
+            }
+            PNC.LiveBodyControl.SetAuthoritativePosition(zombie,
+                order.interactionX, order.interactionY,
+                order.interactionZ or order.z)
+            record.x, record.y, record.z = order.interactionX,
+                order.interactionY, order.interactionZ or order.z
+            runtime.positioned = true
+        end
+        if runtime.positioned == true
+            and tostring(runtime.capability or "") == "sleep"
+            and Diagnostics and Diagnostics.SleepAuditEnabled == true
+            and Diagnostics.LogSleepState
+        then
+            Diagnostics.LogSleepState(
+                "sleep_positioned",
+                record,
+                zombie,
+                runtime.animationScene,
+                "interaction_positioned",
+                {
+                    "interactionX=" .. tostring(order.interactionX),
+                    "interactionY=" .. tostring(order.interactionY),
+                    "interactionZ=" .. tostring(
+                        order.interactionZ or order.z),
+                }
+            )
+        end
     end
     if runtime.facingApplied ~= true and zombie then
         local directionName = tostring(order.interactionFacing or "")
@@ -503,6 +551,25 @@ function Internal.Tick(record, zombie)
             repeatMode = definition.completeWithScene == true
                 and "once" or "loop",
         })
+        if tostring(runtime.capability or "") == "sleep"
+            and Diagnostics and Diagnostics.SleepAuditEnabled == true
+            and Diagnostics.LogSleepState
+        then
+            Diagnostics.LogSleepState(
+                "sleep_scene_request",
+                record,
+                zombie,
+                record.runtime.animationScene,
+                started == true and "accepted"
+                    or startReason or "scene_request_failed",
+                {
+                    "requestedScene=" .. tostring(sceneId or ""),
+                    "accepted=" .. tostring(started == true),
+                    "attempt=" .. tostring(runtime.startupAttempts or 0),
+                    "requestReason=" .. tostring(startReason or ""),
+                }
+            )
+        end
         if started ~= true then
             if startReason == "traversal_active" then
                 -- Native window/fence passage owns the body until its

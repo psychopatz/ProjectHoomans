@@ -11,6 +11,7 @@ require "PNC/Core/Facilities/FacilityJobsBehavior/PNC_FacilityJobsBehavior_State
 require "PNC/Core/Facilities/FacilityJobsBehavior/PNC_FacilityJobsBehavior_Surfaces"
 require "PNC/Core/Facilities/FacilityJobsBehavior/PNC_FacilityJobsBehavior_Seating"
 require "PNC/Core/Facilities/FacilityJobsBehavior/PNC_FacilityJobsBehavior_Approach"
+require "PNC/Core/Facilities/FacilityJobsBehavior/PNC_FacilityJobsBehavior_SleepPlacement"
 require "PNC/Core/Facilities/FacilityJobsBehavior/PNC_FacilityJobsBehavior_Camp"
 require "PNC/Core/Facilities/FacilityJobsBehavior/PNC_FacilityJobsBehavior_Lifecycle"
 require "PNC/Core/Facilities/FacilityJobsBehavior/PNC_FacilityJobsBehavior_Scenes"

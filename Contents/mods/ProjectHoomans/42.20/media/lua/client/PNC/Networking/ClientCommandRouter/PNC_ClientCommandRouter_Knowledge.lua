@@ -16,12 +16,12 @@ local function logDisclosure(args, result, reason)
 end
 
 local function memoryPipeline()
-    if PNC.HoomansLLM and PNC.HoomansLLM.Memory then
-        return PNC.HoomansLLM.Memory
+    if PNC.PBrainZ and PNC.PBrainZ.Memory then
+        return PNC.PBrainZ.Memory
     end
     local ok = pcall(require,
-        "PNC/Integrations/HoomansLLM/PNC_HoomansLLM_Memory")
-    return ok and PNC.HoomansLLM and PNC.HoomansLLM.Memory or nil
+        "PNC/Integrations/PBrainZ/PNC_PBrainZ_Memory")
+    return ok and PNC.PBrainZ and PNC.PBrainZ.Memory or nil
 end
 
 local function queueSnapshotMemoryPrimitives(snapshot)

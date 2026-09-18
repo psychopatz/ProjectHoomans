@@ -6,6 +6,7 @@ local FakeLocomotion = PNC.FakeLocomotion
 local Internal = FakeLocomotion.Internal
 local Core = PNC.Core
 local LiveBodyControl = PNC.LiveBodyControl
+local ActorControl = PNC.ActorControl
 
 local function buildStepContext(zombie, record, lane, goal, now)
     local stepDistance, deltaMs = Internal.ComputeStepDistance(
@@ -73,6 +74,21 @@ end
 function FakeLocomotion.StepTowardGoal(zombie, record, lane, goal, now)
     if not zombie or not record or not lane or not goal then
         return false, "invalid", 0
+    end
+    -- Puppet Opera movement must remain on the native timed/path route. The
+    -- fake fallback writes authoritative coordinates and is therefore never a
+    -- valid movement owner for a leased scene actor.
+    if ActorControl and ActorControl.IsPuppetOwned
+        and ActorControl.IsPuppetOwned(record)
+    then
+        if ActorControl.NoteBlocked then
+            ActorControl.NoteBlocked(
+                record,
+                "fake_locomotion",
+                "puppet_opera_writer_blocked:fake_locomotion"
+            )
+        end
+        return false, "puppet_opera_native_required", 0
     end
     -- Multiplayer movement is client-controlled; incremental position writes
     -- must never become a second transport owner.

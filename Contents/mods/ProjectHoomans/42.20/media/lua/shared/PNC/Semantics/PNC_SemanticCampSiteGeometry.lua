@@ -192,8 +192,32 @@ local function isIndoor(square)
     return call(square, "getRoom") ~= nil
 end
 
-local function isUsable(square)
+local function isUsable(square, cell)
+    local traversal
+    local x
+    local y
+    local z
+    local ok
+    local reason
     if not square or not isIndoor(square) then return false end
+    -- Geometry is loaded before the traversal package, so consult it lazily
+    -- when available. This keeps the semantic module load-order safe while
+    -- preventing a merely `isFree(true)` tile (for example a furniture or
+    -- dynamic-occupancy edge case) from becoming a movement anchor.
+    traversal = PNC.TraversalQuery
+    if traversal and type(traversal.GetOccupancyReason) == "function" then
+        x, y, z = position(square)
+        if x ~= nil and y ~= nil then
+            ok, reason = pcall(
+                traversal.GetOccupancyReason,
+                x + 0.5,
+                y + 0.5,
+                z or 0,
+                cell
+            )
+            if ok and reason ~= nil then return false end
+        end
+    end
     local free = call(square, "isFree", true)
     return free ~= false
 end
@@ -250,7 +274,7 @@ local function anchorFor(room, bounds, cell, origin)
         local dx
         local dy
         local distance
-        if not isUsable(square) then return end
+        if not isUsable(square, cell) then return end
         x, y, z = position(square)
         if not x or not y then return end
         dx = originX and x - originX or 0
@@ -333,6 +357,12 @@ function Geometry.DescribeRoom(roomLike, building, cell, origin, options)
         x = anchor.x,
         y = anchor.y,
         z = anchor.z,
+        -- Keep the movement point explicit. The room identity/label is the
+        -- semantic contract; this is only the bounded server/client walking
+        -- anchor chosen from the room's usable tiles.
+        movementX = anchor.x,
+        movementY = anchor.y,
+        movementZ = anchor.z,
         label = CampSite.RoomLabel(roomType, name),
         labelKey = "semantic.camp.room",
         risk = "sheltered",

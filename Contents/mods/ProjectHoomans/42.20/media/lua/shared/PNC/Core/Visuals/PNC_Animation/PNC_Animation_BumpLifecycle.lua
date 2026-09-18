@@ -44,6 +44,9 @@ function Animation.MaintainBump(
             modData.PNC_BumpKeepUseless =
                 options.keepManagedUseless == true
         end
+        if options and options.nonCombat ~= nil then
+            modData.PNC_BumpNonCombat = options.nonCombat == true
+        end
         Internal.applyBumpLeaseBodyMode(zombie)
         return true, "bump_maintained"
     end
@@ -58,14 +61,35 @@ function Animation.MaintainBump(
                 and options.sceneRevision or nil,
             keepManagedUseless = options
                 and options.keepManagedUseless,
+            nonCombat = options and options.nonCombat,
         }
     )
 end
 
-function Animation.FinishBump(zombie, forceIdle)
+function Animation.FinishBump(zombie, forceIdle, owner)
     local modData
+    local record
+    local sessionID
+    local ownerSessionID
     if not zombie then
         return
+    end
+    modData = zombie.getModData and zombie:getModData() or nil
+    record = PNC.Registry and PNC.Registry.FindRecordByZombie
+        and PNC.Registry.FindRecordByZombie(zombie) or nil
+    sessionID = modData and tostring(
+        modData.PNC_PuppetOperaAnimationSession or "") or ""
+    ownerSessionID = type(owner) == "table" and tostring(
+        owner.sessionId or owner.ownerSessionId or "") or ""
+    if sessionID ~= "" and ownerSessionID ~= sessionID then
+        if PNC.ActorControl and PNC.ActorControl.NoteBlocked then
+            PNC.ActorControl.NoteBlocked(
+                record,
+                "animation_finish",
+                "puppet_opera_writer_blocked:animation_finish"
+            )
+        end
+        return false
     end
     if AnimationTrace and AnimationTrace.MarkFinishing then
         AnimationTrace.MarkFinishing(
@@ -73,7 +97,6 @@ function Animation.FinishBump(zombie, forceIdle)
             "finish_before"
         )
     end
-    modData = zombie.getModData and zombie:getModData() or nil
     if Diagnostics and Diagnostics.SeatingAuditEnabled == true
         and Diagnostics.LogSeatingAudit
     then
@@ -234,6 +257,7 @@ function Animation.PumpBumpRelease(zombie, now)
     modData.PNC_BumpActionLeaseStartedAt = nil
     modData.PNC_BumpRequestedType = nil
     modData.PNC_BumpKeepUseless = nil
+    modData.PNC_BumpNonCombat = nil
     if Diagnostics and Diagnostics.SeatingAuditEnabled == true
         and Diagnostics.LogSeatingAudit
     then

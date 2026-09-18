@@ -1,5 +1,5 @@
 -- Hybrid conversation input. Lua handles deterministic utterances first;
--- only the policy's explicit fallback route may call HoomansLLM.
+-- only the policy's explicit fallback route may call PBrainZ.
 require "PsychopatzCore/UI/Conversation/Parts/PsychopatzConversationLLMInput"
 require "PsychopatzCore/Semantics/PsychopatzSemanticDialogueRouter"
 require "PNC/Semantics/PNC_SemanticDiagnostics"
@@ -140,8 +140,10 @@ local function finishLocalSubmit(view, value, result)
     if not inputMessage then return false, "input_presentation_failed" end
     local actionResult
     local queued = false
+    view.lastSemanticActionResult = nil
     if groupMemberShouldHandle(view, result, value) then
         actionResult = Internal.DispatchAction(view, result, value)
+        view.lastSemanticActionResult = actionResult
         queued = Internal.QueueDeterministicResponse(
             view, value, result, actionResult)
     else
@@ -198,6 +200,7 @@ local function submitSingle(view, value, part)
     -- reference is runtime-only and is never serialized or sent over the
     -- network.
     Input.ActiveView = view
+    view.lastSemanticActionResult = nil
     if not Internal.Interactive(view) then return false, "conversation_busy" end
     value = tostring(value or "")
     value = string.gsub(value, "^%s+", "")
@@ -244,13 +247,15 @@ local function submitSingle(view, value, part)
     if Internal.RequestCognitionForIR then
         Internal.RequestCognitionForIR(view, preview.ir)
     end
+    local identityRequest = Internal.PrepareIdentityRequest
+        and Internal.PrepareIdentityRequest(view, preview.ir, context)
 
     local decision = preview.decision or {}
     if decision.route == "llm_fallback" then
         traceTurn(view, value, preview, "semantic_input_llm_fallback", {
             providerAvailable = context.llmAvailable == true,
         })
-        local integration = PNC.HoomansLLM
+        local integration = PNC.PBrainZ
         local llmAvailable = context.llmAvailable == true
         if llmAvailable
             and integration and type(integration.Submit) == "function"
@@ -298,7 +303,11 @@ local function submitSingle(view, value, part)
         providerUsed = false,
     })
 
-    return finishLocalSubmit(view, value, result)
+    local submitted, submitReason = finishLocalSubmit(view, value, result)
+    if identityRequest and Internal.DispatchIdentityRequest then
+        Internal.DispatchIdentityRequest(identityRequest)
+    end
+    return submitted, submitReason
 end
 
 -- Nearby mode wraps the same single-recipient semantic pipeline.  Keeping

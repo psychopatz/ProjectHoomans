@@ -36,9 +36,18 @@ local roomSquare = {
     isFree = function() return true end,
     getObjects = function() return {} end,
 }
+local roomSquareFar = {
+    getX = function() return 11 end,
+    getY = function() return 10 end,
+    getZ = function() return 0 end,
+    getRoom = function() return room end,
+    isInARoom = function() return true end,
+    isFree = function() return true end,
+    getObjects = function() return {} end,
+}
 room.getRoomDef = function() return roomDefinition end
 room.getBuilding = function() return building end
-room.getSquares = function() return { roomSquare } end
+room.getSquares = function() return { roomSquare, roomSquareFar } end
 room.getFreeTile = function() return roomSquare end
 
 local campfire = {
@@ -56,6 +65,7 @@ local campfireSquare = {
 }
 local squares = {
     ["10:10:0"] = roomSquare,
+    ["11:10:0"] = roomSquareFar,
     ["14:10:0"] = campfireSquare,
 }
 local cell = {
@@ -102,7 +112,9 @@ local roomHint = {
     siteID = "room:test-building:test-room",
     roomID = "test-room",
     buildingID = "test-building",
-    x = 10.5,
+    -- The client points at the far side of the room. The server must keep
+    -- the room identity but choose the nearer server-owned movement anchor.
+    x = 11.5,
     y = 10.5,
     z = 0,
     radius = 32,
@@ -125,6 +137,10 @@ T.equal(roomSite.siteID, roomHint.siteID,
     "room hint validation derives the stable room identity")
 T.truthy(roomSite.roomBounds,
     "room hint validation uses server-owned room bounds")
+T.equal(roomSite.x, 10.5,
+    "room validation replaces the raw client square with a bounded anchor")
+T.equal(roomSite.movementX, 10.5,
+    "room validation exposes the authoritative movement anchor")
 T.equal(locatorCalls, 0,
     "room hint validation does not invoke the broad world locator")
 

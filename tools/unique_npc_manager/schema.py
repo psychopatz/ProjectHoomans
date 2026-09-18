@@ -158,22 +158,62 @@ def encode(value: Any) -> str:
 
 
 def update_index(directory: Path, file_names: Iterable[str]) -> Path:
-    index_path = directory / "UniqueNPCIndex.txt"
-    existing: list[str] = []
+    directory = directory.expanduser().resolve()
+    if directory.name == "NPC Definitions":
+        root = directory.parent
+        definition_directory = directory
+    else:
+        root = directory
+        definition_directory = root / "NPC Definitions"
+    index_path = root / "UniqueNPCIndex.txt"
+    existing_entries: list[dict[str, Any]] = []
+    existing_files: list[str] = []
     if index_path.exists():
         try:
             payload = json.loads(index_path.read_text(encoding="utf-8"))
-            existing = payload.get("files", []) if isinstance(payload, dict) else []
+            if isinstance(payload, dict):
+                existing_entries = [
+                    dict(entry)
+                    for entry in payload.get("entries", [])
+                    if isinstance(entry, dict)
+                ]
+                existing_files = [
+                    value
+                    for value in payload.get("files", [])
+                    if isinstance(value, str)
+                ]
         except (OSError, json.JSONDecodeError):
-            existing = []
-    names = sorted(
-        {str(name) for name in existing if isinstance(name, str)}
-        | {str(name) for name in file_names}
+            existing_entries = []
+            existing_files = []
+    names = sorted({str(name) for name in existing_files} | {
+        str(name) for name in file_names
+    })
+    retained = [
+        entry
+        for entry in existing_entries
+        if str(entry.get("definitionType") or entry.get("kind") or "") != "npc"
+    ]
+    retained.extend(
+        {
+            "definitionType": "npc",
+            "fileName": name,
+            "path": f"Hoomans/NPC Definitions/{name}",
+            "schemaVersion": 2,
+        }
+        for name in names
+    )
+    retained.sort(
+        key=lambda entry: (
+            str(entry.get("definitionType") or ""),
+            str(entry.get("fileName") or ""),
+        )
     )
     payload = {
-        "schemaVersion": 1,
-        "kind": "ProjectHoomans.UniqueNPCIndex",
+        "schemaVersion": 2,
+        "kind": "ProjectHoomans.DefinitionIndex",
+        "entries": retained,
         "files": names,
     }
+    definition_directory.mkdir(parents=True, exist_ok=True)
     index_path.write_text(encode(payload), encoding="utf-8")
     return index_path

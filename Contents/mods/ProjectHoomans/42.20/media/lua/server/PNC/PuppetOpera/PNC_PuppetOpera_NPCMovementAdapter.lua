@@ -13,6 +13,7 @@ local Anchors = PNC.PuppetOpera.Anchors
 local MoveIntent = PNC.BehaviorMoveIntent
 local PathService = PNC.PathService
 local NavigationRouter = PNC.NavigationRouter
+local ActorControl = PNC.ActorControl
 
 local function runtimeOf(record)
     if not record then return nil end
@@ -79,6 +80,12 @@ function Adapter.Start(session, actor)
     local steeringTarget
     local navigation
     local ownershipReason = "puppet_opera:" .. tostring(session.sessionId)
+    local owner = ActorControl and ActorControl.MakeOwner
+        and ActorControl.MakeOwner(session.sessionId)
+        or {
+            kind = "puppet_opera",
+            sessionId = tostring(session.sessionId),
+        }
     if NavigationRouter and NavigationRouter.Resolve then
         policyName, providerName, policy = NavigationRouter.Resolve(
             record,
@@ -101,7 +108,8 @@ function Adapter.Start(session, actor)
                 },
                 policyName,
                 providerName,
-                policy
+                policy,
+                owner
             )
         end
         if steeringTarget then
@@ -137,7 +145,8 @@ function Adapter.Start(session, actor)
             "walk",
             0.65,
             ownershipReason,
-            navigation
+            navigation,
+            owner
         )
     elseif PathService and PathService.MoveToward then
         accepted, movementState = PathService.MoveToward(
@@ -149,7 +158,8 @@ function Adapter.Start(session, actor)
             "walk",
             0.65,
             ownershipReason,
-            navigation
+            navigation,
+            owner
         )
     else
         return false, "npc_movement_service_unavailable"
@@ -227,7 +237,16 @@ function Adapter.Release(session, actor)
     if intentMatchesClaim(intent, claim, session.sessionId)
         and MoveIntent and MoveIntent.Hold
     then
-        MoveIntent.Hold(record, "puppet_opera_release")
+        MoveIntent.Hold(
+            record,
+            "puppet_opera_release",
+            ActorControl and ActorControl.MakeOwner
+                and ActorControl.MakeOwner(session.sessionId)
+                or {
+                    kind = "puppet_opera",
+                    sessionId = tostring(session.sessionId),
+                }
+        )
     end
     runtime.puppetOperaMovement = nil
     actor.movementOwned = false

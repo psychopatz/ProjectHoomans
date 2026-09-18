@@ -6,6 +6,7 @@ PNC.LiveBodyControl.Internal = PNC.LiveBodyControl.Internal or {}
 
 local LiveBodyControl = PNC.LiveBodyControl
 local Internal = LiveBodyControl.Internal
+local ActorControl = PNC.ActorControl
 local VANILLA_PASSAGE_GUARD_LOGGED = setmetatable({}, { __mode = "k" })
 
 local NATIVE_PASSAGE_STATES = {
@@ -99,7 +100,25 @@ function Internal.isDamageReactionState(actionState)
 end
 
 function LiveBodyControl.SetAuthoritativePosition(zombie, x, y, z)
+    local record
     if not zombie then return false end
+    record = PNC.Registry and PNC.Registry.FindRecordByZombie
+        and PNC.Registry.FindRecordByZombie(zombie) or nil
+    -- This is the legacy authoritative-position escape hatch used by seat,
+    -- abstract-recovery, and traversal helpers. Puppet Opera placement is
+    -- movement-owned and must never be replaced by a raw coordinate write.
+    if ActorControl and ActorControl.IsPuppetOwned
+        and ActorControl.IsPuppetOwned(record)
+    then
+        if ActorControl.NoteBlocked then
+            ActorControl.NoteBlocked(
+                record,
+                "authoritative_position",
+                "puppet_opera_writer_blocked:authoritative_position"
+            )
+        end
+        return false
+    end
     zombie:setX(x)
     zombie:setY(y)
     zombie:setZ(z)
@@ -141,7 +160,12 @@ function LiveBodyControl.IsSeated(record)
         or false
 end
 
-function LiveBodyControl.ReleasePresentationMovement(record, zombie, reason)
+function LiveBodyControl.ReleasePresentationMovement(
+    record,
+    zombie,
+    reason,
+    owner
+)
     local runtime = record and record.runtime or nil
     local intent = runtime and runtime.moveIntent or nil
     local hasMovementOwner = runtime and (
@@ -150,8 +174,23 @@ function LiveBodyControl.ReleasePresentationMovement(record, zombie, reason)
             or intent and intent.kind == "move"
     )
     if not hasMovementOwner then return false end
+    if ActorControl and ActorControl.CanWrite then
+        local controlOwner = owner
+        if ActorControl.ResolveOwner then
+            controlOwner = ActorControl.ResolveOwner(owner, reason)
+        end
+        local accepted = ActorControl.CanWrite(
+            record,
+            controlOwner,
+            "presentation_movement_release",
+            { reason = reason }
+        )
+        if accepted ~= true then
+            return false, "puppet_opera_writer_blocked:presentation_release"
+        end
+    end
     if PNC.PathService and PNC.PathService.Reset then
-        PNC.PathService.Reset(zombie, record)
+        PNC.PathService.Reset(zombie, record, reason, owner)
         return true
     end
     if PNC.EnginePathPlanner and PNC.EnginePathPlanner.Invalidate then
@@ -392,6 +431,9 @@ end
 function LiveBodyControl.ResetNativePassageActionContext(zombie)
     local actionState
     local recovered = false
+    local context
+    local group
+    local initialState
     if not zombie then
         return false
     end
@@ -406,6 +448,25 @@ function LiveBodyControl.ResetNativePassageActionContext(zombie)
         recovered = LiveBodyControl.SuppressZombieState(
             zombie, nil, nil
         ) == true
+    end
+
+    -- Build 42 exposes the ActionContext getter on IsoGameCharacter and the
+    -- context's public setCurrentState(ActionState) bridge. Use the action
+    -- group's actual initial ActionState rather than inventing a string or
+    -- touching AnimationPlayer internals. The guards also keep older/fake
+    -- bodies on the ordinary state-reset path.
+    if zombie.getActionContext then
+        context = zombie:getActionContext()
+    end
+    if context and context.getGroup then
+        group = context:getGroup()
+    end
+    if group and group.getInitialState then
+        initialState = group:getInitialState()
+    end
+    if context and context.setCurrentState and initialState then
+        context:setCurrentState(initialState)
+        recovered = true
     end
 
     if LiveBodyControl.ResetNativeMovementState

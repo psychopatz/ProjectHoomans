@@ -96,6 +96,9 @@ function Catalog.Register()
     registerConcept("FOOD", {
         "food", "something to eat", "meal", "rations",
     })
+    registerConcept("HUNGER", {
+        "hungry", "starving", "famished",
+    }, 5)
     registerConcept("SEAFOOD", {
         "seafood", "sea foods", "seafoods", "fish", "shellfish",
     }, 4)
@@ -131,6 +134,127 @@ function Catalog.Register()
     registerConcept("IDENTITY", {
         "name", "who are you", "what is your name", "what's your name",
     })
+
+    -- Keep first-person state claims ahead of the open-ended name capture.
+    -- This prevents "I'm starving" from being treated as a name claim while
+    -- still allowing an unknown player name such as "Patrick" through the
+    -- deterministic route.
+    registerPattern(
+        "pnc.state.self_hunger_im",
+        {
+            { kind = "literal", value = "i'm" },
+            { kind = "concept", id = "HUNGER", capture = "state" },
+        },
+        {
+            intent = "INFORM",
+            speechAct = "INFORM",
+            subject = "HUNGER",
+            slots = {
+                state = {
+                    type = "HUNGER",
+                    value = "$capture.state.text",
+                },
+            },
+            socialContext = {
+                directed = false,
+                selfDirected = true,
+                target = "SELF",
+            },
+        },
+        0.99,
+        180
+    )
+    registerPattern(
+        "pnc.state.self_hunger_i_am",
+        {
+            { kind = "literal", value = "i" },
+            { kind = "literal", value = "am" },
+            { kind = "concept", id = "HUNGER", capture = "state" },
+        },
+        {
+            intent = "INFORM",
+            speechAct = "INFORM",
+            subject = "HUNGER",
+            slots = {
+                state = {
+                    type = "HUNGER",
+                    value = "$capture.state.text",
+                },
+            },
+            socialContext = {
+                directed = false,
+                selfDirected = true,
+                target = "SELF",
+            },
+        },
+        0.99,
+        180
+    )
+    registerPattern(
+        "pnc.identity.self_name_im",
+        {
+            { kind = "literal", value = "i'm" },
+            {
+                kind = "any_phrase",
+                capture = "name",
+                minTokens = 1,
+                maxTokens = 2,
+                stopWords = { "please", "now" },
+            },
+        },
+        {
+            intent = "INFORM",
+            speechAct = "INFORM",
+            subject = "IDENTITY",
+            slots = {
+                identityClaim = {
+                    claimType = "SELF_NAME",
+                    name = "$capture.name.text",
+                },
+            },
+            socialContext = {
+                directed = false,
+                selfDirected = true,
+                target = "SELF",
+                identityClaim = true,
+            },
+        },
+        0.98,
+        155
+    )
+    registerPattern(
+        "pnc.identity.self_name_i_am",
+        {
+            { kind = "literal", value = "i" },
+            { kind = "literal", value = "am" },
+            {
+                kind = "any_phrase",
+                capture = "name",
+                minTokens = 1,
+                maxTokens = 2,
+                stopWords = { "please", "now" },
+            },
+        },
+        {
+            intent = "INFORM",
+            speechAct = "INFORM",
+            subject = "IDENTITY",
+            slots = {
+                identityClaim = {
+                    claimType = "SELF_NAME",
+                    name = "$capture.name.text",
+                },
+            },
+            socialContext = {
+                directed = false,
+                selfDirected = true,
+                target = "SELF",
+                identityClaim = true,
+            },
+        },
+        0.98,
+        155
+    )
 
     registerPattern(
         "pnc.command.follow",

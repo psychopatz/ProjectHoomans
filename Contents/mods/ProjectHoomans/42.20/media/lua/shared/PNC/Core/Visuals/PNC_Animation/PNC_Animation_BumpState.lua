@@ -112,6 +112,7 @@ function Animation.IsBumpActionActive(zombie, now)
         modData.PNC_BumpActionLeaseStartedAt = nil
         modData.PNC_BumpRequestedType = nil
         modData.PNC_BumpKeepUseless = nil
+        modData.PNC_BumpNonCombat = nil
         return false
     end
     if now <= (
@@ -125,6 +126,7 @@ function Animation.IsBumpActionActive(zombie, now)
     modData.PNC_BumpActionLeaseStartedAt = nil
     modData.PNC_BumpRequestedType = nil
     modData.PNC_BumpKeepUseless = nil
+    modData.PNC_BumpNonCombat = nil
     return false
 end
 
@@ -143,6 +145,7 @@ function Animation.IsCombatBumpActionActive(zombie, now)
     then
         return false
     end
+    if modData.PNC_BumpNonCombat == true then return false end
     requested = tostring(modData.PNC_BumpRequestedType or "")
     if zombie.getBumpType then
         bumpType = tostring(zombie:getBumpType() or "")

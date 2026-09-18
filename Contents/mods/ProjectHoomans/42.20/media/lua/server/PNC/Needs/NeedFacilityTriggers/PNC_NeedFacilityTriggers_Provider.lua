@@ -57,7 +57,23 @@ local function manuallyDisabled(record, definition)
             == tostring(definition and definition.capability or "")
 end
 
+local function campPlacementLocked(record)
+    local coordinator = PNC.CampMovementCoordinator
+    local runtime = record and record.runtime or nil
+    local placement = runtime and runtime.campPlacement or nil
+    local order = record and record.orderSpec or nil
+    local state
+    if coordinator and type(coordinator.IsPlacementLocked) == "function" then
+        return coordinator.IsPlacementLocked(record) == true
+    end
+    state = placement and placement.state
+        or order and order.placementState or ""
+    state = string.lower(tostring(state))
+    return state == "queued" or state == "moving" or state == "failed"
+end
+
 function Triggers.PreferFacility(record, triggerId)
+    if campPlacementLocked(record) then return false end
     local definition = Definitions.Get(triggerId)
     local actionable = definition and Definitions.Evaluate(
         definition, record, false)
@@ -83,6 +99,7 @@ end
 -- deduplicates repeated scheduler ticks while preserving the best cause.
 function Triggers.WakeActionable(record)
     if not record then return false end
+    if campPlacementLocked(record) then return false end
     for _, definition in ipairs(Definitions.List()) do
         local actionable = Definitions.Evaluate(definition, record, false)
         if not manuallyDisabled(record, definition)
@@ -105,6 +122,7 @@ function Triggers.GetCandidates(npcId)
     local record = recordFor(npcId)
     local candidates = {}
     if not record then return candidates end
+    if campPlacementLocked(record) then return candidates end
     for _, definition in ipairs(Definitions.List()) do
         local actionable, metadata = Definitions.Evaluate(
             definition, record, false)
@@ -135,6 +153,9 @@ function Triggers.Validate(intent)
     local route = AwayRoutes.Get(intent.sourceRef)
     local definition = Definitions.Get(route and route.needId or intent.sourceRef)
     if not record or record.alive == false then return false, "NPC_UNAVAILABLE" end
+    if campPlacementLocked(record) then
+        return false, "CAMP_PLACEMENT_ACTIVE"
+    end
     if not definition then return false, "TRIGGER_NOT_FOUND" end
     if manuallyDisabled(record, definition) then
         return false, "MANUAL_ACTIVITY_DISABLED"
@@ -193,6 +214,7 @@ function Triggers.CanContinue(lease)
     local activity = record and record.runtime
         and record.runtime.facilityActivity or nil
     if not record or record.alive == false or not definition then return false end
+    if campPlacementLocked(record) then return false end
     if record.health and record.health.state == "incapacitated"
         or AwayRoutes.IsCombatActive(record)
         or record.runtime and record.runtime.workOrderId

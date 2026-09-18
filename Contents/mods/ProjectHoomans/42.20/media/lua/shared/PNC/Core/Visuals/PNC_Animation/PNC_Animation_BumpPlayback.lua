@@ -7,6 +7,50 @@ local Internal = Animation.Internal
 local Core = PNC.Core
 local LiveBodyControl = PNC.LiveBodyControl
 local AnimationTrace = PNC.AnimationTrace
+local ActorControl = PNC.ActorControl
+
+local function puppetBumpWriteAllowed(zombie, record, requestedBumpType,
+    resolvedBumpType, options)
+    local modData
+    local sessionID
+    local sceneID
+    local currentBump
+    local combatBump
+    local traversalBump
+    if not ActorControl or not ActorControl.IsPuppetOwned
+        or not ActorControl.IsPuppetOwned(record)
+    then
+        return true
+    end
+    modData = zombie and zombie.getModData and zombie:getModData() or nil
+    sessionID = ActorControl.GetSessionID(record)
+    sceneID = tostring(options and options.sceneId or "")
+    currentBump = modData and tostring(
+        modData.PNC_PuppetOperaAnimationBump or "") or ""
+    if sceneID == "PuppetOpera:" .. sessionID
+        or currentBump == tostring(resolvedBumpType or "")
+    then
+        return true
+    end
+    combatBump = Internal.isCombatBumpType(
+        requestedBumpType,
+        resolvedBumpType
+    ) and not (options and options.nonCombat == true)
+    traversalBump = LiveBodyControl
+        and LiveBodyControl.IsTraversalBumpType
+        and LiveBodyControl.IsTraversalBumpType(resolvedBumpType)
+    if combatBump or traversalBump then
+        return true
+    end
+    if ActorControl.NoteBlocked then
+        ActorControl.NoteBlocked(
+            record,
+            "animation_bump",
+            "puppet_opera_writer_blocked:animation_bump"
+        )
+    end
+    return false
+end
 
 local function notifyExternalScene(record, zombie, bumpType, options)
     if (not options or options.sceneId == nil)
@@ -81,6 +125,9 @@ local function installLease(
     modData.PNC_BumpActionLeaseStartedAt = now
     modData.PNC_BumpRequestedType = resolvedBumpType
     modData.PNC_BumpKeepUseless = keepManagedUseless
+    modData.PNC_BumpNonCombat = options
+        and options.nonCombat == true
+        or nil
     return leaseUntil
 end
 
@@ -164,6 +211,15 @@ function Animation.PlayBump(zombie, record, bumpType, options)
     end
     local now = Core and Core.Now and Core.Now() or 0
     local resolvedBumpType = Animation.ResolveBumpType(bumpType)
+    if not puppetBumpWriteAllowed(
+        zombie,
+        record,
+        bumpType,
+        resolvedBumpType,
+        options
+    ) then
+        return false, "puppet_opera_writer_blocked:animation_bump"
+    end
     if LiveBodyControl and LiveBodyControl.CheckBumpOwnership then
         local allowed
         local ownershipReason
@@ -212,7 +268,7 @@ function Animation.PlayBump(zombie, record, bumpType, options)
     local combatBump = Internal.isCombatBumpType(
         bumpType,
         resolvedBumpType
-    )
+    ) and not (options and options.nonCombat == true)
     local keepManagedUseless = resolveKeepManagedUseless(
         options,
         combatBump

@@ -9,6 +9,7 @@ local providers = {
     "PNC_ConversationAuthority_Validation",
     "PNC_ConversationAuthority_Category",
     "PNC_ConversationAuthority_Recruit",
+    "PNC_ConversationAuthority_AmbientVisit",
     "PNC_ConversationAuthority_Choice",
 }
 
@@ -50,7 +51,7 @@ for name in pairs(publicFunctions) do
     T.equal(type(PNC.Conversation.Authority[name]), "function",
         "entry point preserves Conversation.Authority." .. name)
 end
-T.equal(publicCount, 4, "conversation-authority function declaration count")
+T.equal(publicCount, 5, "conversation-authority function declaration count")
 
 for i = 1, #providers do
     package.loaded[prefix .. providers[i]] = nil

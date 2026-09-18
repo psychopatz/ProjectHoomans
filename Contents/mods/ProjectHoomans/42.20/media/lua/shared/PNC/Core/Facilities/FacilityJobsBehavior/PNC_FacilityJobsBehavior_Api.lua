@@ -35,5 +35,9 @@ Jobs.Sleep.ClearSleepSurface = Internal.ClearSleepSurface
 Jobs.Sleep.PrepareSleepSurface = Internal.PrepareSleepSurface
 Jobs.Sleep.ResetPath = Internal.ResetPath
 Jobs.Sleep.RestorePosition = Internal.RestorePosition
+Jobs.Sleep.TrySnapToSleep = Internal.TrySnapToSleep
+Jobs.Sleep.FindSleepExit = Internal.FindSleepExit
+Jobs.Sleep.CommitSleepExit = Internal.CommitSleepExit
+Jobs.Sleep.RestoreSleepPosition = Internal.RestoreSleepPosition
 
 return Jobs

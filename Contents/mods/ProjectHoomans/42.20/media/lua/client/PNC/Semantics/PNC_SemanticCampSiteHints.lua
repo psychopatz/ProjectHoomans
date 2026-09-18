@@ -219,6 +219,8 @@ function Hints.Resolve(target, context)
     local reason
     local roomReason
     local fallbackReason
+    local hasExplicitRoom = target.roomID ~= nil
+        or target.siteID ~= nil
 
     if cached and timestamp - cached.at <= Hints.CACHE_MS then
         return cached.hint, cached.reason
@@ -236,12 +238,34 @@ function Hints.Resolve(target, context)
             preferredRoomID = target.roomID,
         })
         hint = roomHint(site, query, timestamp)
+        if not hint and not hasExplicitRoom then
+            -- A requested room label is a preference, not a safety
+            -- requirement. If this building has no bedroom/living-room/etc,
+            -- use the nearest loaded indoor room and let the hint carry its
+            -- actual label (including the generic "room" fallback).
+            site, fallbackReason = Geometry.FindNearestRoom(cell, origin,
+                nil, {
+                    radius = Hints.MAX_RADIUS,
+                    preferredSiteID = target.siteID,
+                    preferredRoomID = target.roomID,
+                })
+            hint = roomHint(site, query, timestamp)
+            if hint then
+                reason = "room_type_fallback"
+            end
+        end
         if not hint and scope == CampSite.SCOPES.HERE then
             hint, fallbackReason = campfireHint(target, context, origin,
                 timestamp, cell)
             reason = hint and nil or fallbackReason or roomReason
         elseif not hint then
-            reason = roomReason or "room_not_found"
+            -- An explicit room request still degrades to a nearby campfire
+            -- when no indoor room is loaded; the server validates the exact
+            -- primitive hint before accepting the command.
+            hint, fallbackReason = campfireHint(target, context, origin,
+                timestamp, cell)
+            reason = hint and "campfire_fallback"
+                or fallbackReason or roomReason or "room_not_found"
         end
     end
     Hints.Cache[key] = { at = timestamp, hint = hint, reason = reason }

@@ -150,7 +150,13 @@ function ISPNCPuppetOperaBeatsTab:refresh()
     addDetail(self.details, "Synchronization",
         beat.synchronization or "arrival_and_start_barrier")
     for _, actor in ipairs(self.model.GetActorRows(nil)) do
-        addDetail(self.details, "Track " .. tostring(actor.id),
+        local trackLabel = tostring(actor.label)
+            .. " [slot=" .. tostring(actor.id) .. "]"
+        if actor.liveName and actor.liveID then
+            trackLabel = trackLabel .. " -> " .. tostring(actor.liveName)
+                .. " [" .. tostring(actor.liveID) .. "]"
+        end
+        addDetail(self.details, "Track " .. trackLabel,
             self.model.GetSelectionSummary(actor.id),
             actor.supported ~= true)
     end

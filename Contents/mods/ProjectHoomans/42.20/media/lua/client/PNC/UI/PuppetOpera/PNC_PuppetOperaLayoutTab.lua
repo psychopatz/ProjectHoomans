@@ -41,11 +41,22 @@ local function drawActorRow(list, y, row, alternate)
         list:drawRect(0, y, list:getWidth(), list.itemheight,
             0.12, 0.16, 0.18, 0.20)
     end
-    list:drawText(Layout.Ellipsize(tostring(actor.label), UIFont.Small, width), 8, y + 5,
+    local liveID = actor.liveShortID
+        and (" [" .. tostring(actor.liveShortID) .. "]") or ""
+    local identity = actor.liveName
+        and ("  -> " .. tostring(actor.liveName) .. liveID)
+        or "  -> unbound"
+    list:drawText(Layout.Ellipsize(
+        tostring(actor.label) .. identity,
+        UIFont.Small,
+        width
+    ), 8, y + 5,
         0.92, 0.94, 1.00, 1, UIFont.Small)
     list:drawText(
         Layout.Ellipsize(
-            tostring(actor.kind) .. "  anchor=" .. tostring(actor.anchor),
+            "slot=" .. tostring(actor.id)
+                .. "  " .. tostring(actor.kind or "unbound")
+                .. "  anchor=" .. tostring(actor.anchor),
             UIFont.Small,
             width
         ),
@@ -70,6 +81,14 @@ local function drawLiveRow(list, y, row, alternate)
     local actor = row.item
     local selected = list.selected == row.index
     local width = math.max(32, list:getWidth() - 16)
+    local assignment = actor.assignedActorID
+        and ("BOUND slot=" .. tostring(actor.assignedActorID))
+        or tr("UI_PNC_PuppetOpera_FreeActor", "FREE - drag to graph")
+    local readiness = actor.ready == true
+        and tr("UI_PNC_PuppetOpera_Ready", "READY")
+        or actor.ready == false
+        and tr("UI_PNC_PuppetOpera_Blocked", "BLOCKED")
+        or tr("UI_PNC_PuppetOpera_Checking", "CHECKING")
     if selected then
         list:drawRect(0, y, list:getWidth(), list.itemheight,
             0.35, 0.20, 0.48, 0.82)
@@ -77,23 +96,17 @@ local function drawLiveRow(list, y, row, alternate)
         list:drawRect(0, y, list:getWidth(), list.itemheight,
             0.12, 0.16, 0.18, 0.20)
     end
-    list:drawText(Layout.Ellipsize(tostring(actor.name), UIFont.Small, width), 8, y + 5,
+    local shortID = actor.shortID and (" [" .. tostring(actor.shortID)
+        .. "]") or ""
+    local identity = tostring(actor.name) .. shortID
+    list:drawText(Layout.Ellipsize(identity, UIFont.Small,
+        math.max(32, width - 72)), 8, y + 3,
         0.92, 0.94, 1.00, 1, UIFont.Small)
-    local assignment = actor.assignedActorID
-        and tr("UI_PNC_PuppetOpera_AssignedTo", "assigned to")
-            .. " " .. tostring(actor.assignedActorID)
-        or tr("UI_PNC_PuppetOpera_UnassignedDrop",
-            "unassigned - drag to the graph")
-    local state = actor.reason
-        or actor.actionContextState
-        or actor.actionState
-        or ""
-    local detail = assignment
-    if state ~= "" then detail = detail .. "  state=" .. tostring(state) end
     list:drawText(
-        Layout.Ellipsize(detail, UIFont.Small, width),
+        Layout.Ellipsize(assignment .. "  id=" .. tostring(actor.id), UIFont.Small,
+            math.max(32, width - 72)),
         8,
-        y + 24,
+        y + 19,
         actor.ready == false and 1.00
             or actor.assignedActorID and 0.72 or 0.98,
         actor.ready == false and 0.45
@@ -106,22 +119,17 @@ local function drawLiveRow(list, y, row, alternate)
     list:drawTextRight(
         string.format("%.1f tiles", math.sqrt(tonumber(actor.distSq) or 0)),
         list:getWidth() - 8,
-        y + 5,
+        y + 3,
         0.62,
         0.76,
         0.84,
         1,
         UIFont.Small
     )
-    local readiness = actor.ready == true
-        and tr("UI_PNC_PuppetOpera_Ready", "READY")
-        or actor.ready == false
-        and tr("UI_PNC_PuppetOpera_Blocked", "BLOCKED")
-        or tr("UI_PNC_PuppetOpera_Checking", "CHECKING")
     list:drawTextRight(
         readiness,
         list:getWidth() - 8,
-        y + 24,
+        y + 19,
         actor.ready == true and 0.40 or actor.ready == false and 1.00 or 0.80,
         actor.ready == true and 0.95 or actor.ready == false and 0.42 or 0.80,
         actor.ready == true and 0.58 or actor.ready == false and 0.38 or 0.42,
@@ -139,11 +147,45 @@ function ISPNCPuppetOperaLayoutTab:initialise()
 end
 
 function ISPNCPuppetOperaLayoutTab:setLivePointerFromEvent(list, x, y)
-    if not list or type(x) ~= "number" or type(y) ~= "number" then
+    if not list then
         return false
     end
-    self.livePointerX = list:getAbsoluteX() + x
-    self.livePointerY = list:getAbsoluteY() + y
+    local candidates = {}
+    local function addCandidate(candidateX, candidateY)
+        if type(candidateX) == "number" and type(candidateY) == "number" then
+            candidates[#candidates + 1] = {
+                x = candidateX,
+                y = candidateY,
+            }
+        end
+    end
+    -- Mouse-up-outside coordinates are list-local in some ISUI paths and
+    -- stale capture coordinates in others. Prefer the global screen point,
+    -- but accept the event-local projection when it is the one that lands on
+    -- the graph. This keeps a captured list from turning a valid drop into
+    -- `outside_grid` after the pointer crosses a sibling panel.
+    if type(getMouseX) == "function" and type(getMouseY) == "function" then
+        addCandidate(getMouseX(), getMouseY())
+    end
+    if type(x) == "number" and type(y) == "number" then
+        addCandidate(list:getAbsoluteX() + x, list:getAbsoluteY() + y)
+        addCandidate(x, y)
+    end
+    for _, candidate in ipairs(candidates) do
+        if self.grid and self.grid.containsGraphPoint then
+            local graphX = candidate.x - self.grid:getAbsoluteX()
+            local graphY = candidate.y - self.grid:getAbsoluteY()
+            if self.grid:containsGraphPoint(graphX, graphY) then
+                self.livePointerX = candidate.x
+                self.livePointerY = candidate.y
+                return true
+            end
+        end
+    end
+    local fallback = candidates[1]
+    if not fallback then return false end
+    self.livePointerX = fallback.x
+    self.livePointerY = fallback.y
     return true
 end
 
@@ -183,43 +225,25 @@ end
 
 function ISPNCPuppetOperaLayoutTab:finishLiveDrag(list, x, y)
     if not self.liveDragPending then return false end
-    self:setLivePointerFromEvent(list, x, y)
     local actorID = self.liveDragActorID
     local dragged = self.liveDragging == true
     local accepted = false
     local reason
     if dragged then
+        self:setLivePointerFromEvent(list, x, y)
         local gridX = self.livePointerX - self.grid:getAbsoluteX()
         local gridY = self.livePointerY - self.grid:getAbsoluteY()
         if self.grid:containsGraphPoint(gridX, gridY) then
             local right, forward = self.grid:cellAt(gridX, gridY)
             local occupant = self.model.GetActorAtOffset(right, forward)
             if occupant then
-                local liveRows = self.model.GetLiveActorRows(
-                    self.model.GetActorDiscoveryRadius()
+                accepted, reason = self.model.AddLiveActorToScene(
+                    actorID, right, forward, 0, occupant.id
                 )
-                local draggedRow
-                for _, liveRow in ipairs(liveRows) do
-                    if tostring(liveRow.id) == tostring(actorID) then
-                        draggedRow = liveRow
-                        break
-                    end
-                end
-                if draggedRow
-                    and draggedRow.assignedActorID
-                    and occupant
-                    and tostring(occupant.id)
-                        == tostring(draggedRow.assignedActorID)
-                then
-                    accepted, reason = self.model.AddLiveActorToScene(
-                        actorID, right, forward, 0
-                    )
-                else
-                    reason = "anchor_tile_occupied"
-                end
             else
                 accepted, reason = self.model.AddLiveActorToScene(
-                    actorID, right, forward, 0
+                    actorID, right, forward, 0,
+                    self.model.GetSelectedActorID()
                 )
             end
         else
@@ -280,8 +304,7 @@ function ISPNCPuppetOperaLayoutTab:createChildren()
             self.liveDragX = 0
             self.liveDragY = 0
             self.liveDragging = false
-            self.livePointerX = list:getAbsoluteX() + (tonumber(x) or 0)
-            self.livePointerY = list:getAbsoluteY() + (tonumber(y) or 0)
+            self:setLivePointerFromEvent(list, x, y)
             list:setCapture(true)
             -- Do not clear/rebuild the captured list during mouse-down.  The
             -- native list can drop capture when its items are cleared; status
@@ -337,6 +360,15 @@ function ISPNCPuppetOperaLayoutTab:createChildren()
         end),
         variant = "danger",
     })
+    self.addButton = UI.CreateButton(self, {
+        id = "add_actor",
+        title = tr("UI_PNC_PuppetOpera_AddActor", "Add actor slot"),
+        target = self,
+        onclick = UI.ButtonCallback(function(button)
+            return self:onAction(button)
+        end),
+        variant = "quiet",
+    })
 end
 
 function ISPNCPuppetOperaLayoutTab:setContext(window)
@@ -351,7 +383,7 @@ function ISPNCPuppetOperaLayoutTab:refresh()
     if not self.model or not self.actorList then return end
     local selectedID = self.model.GetSelectedActorID()
     self.actorList:clear()
-    local selectedIndex = 1
+    local selectedIndex = nil
     for index, row in ipairs(self.model.GetActorRows(
         self.model.GetSnapshot()
     )) do
@@ -360,11 +392,11 @@ function ISPNCPuppetOperaLayoutTab:refresh()
             selectedIndex = index
         end
     end
-    if #self.actorList.items > 0 then self.actorList.selected = selectedIndex end
+    self.actorList.selected = selectedIndex or 0
 
     if not self.liveDragPending then
         self.liveList:clear()
-        local selectedLiveIndex = 1
+        local selectedLiveIndex = nil
         for index, row in ipairs(self.model.GetLiveActorRows(
             self.model.GetActorDiscoveryRadius()
         )) do
@@ -377,9 +409,7 @@ function ISPNCPuppetOperaLayoutTab:refresh()
                 selectedLiveIndex = index
             end
         end
-        if #self.liveList.items > 0 then
-            self.liveList.selected = selectedLiveIndex
-        end
+        self.liveList.selected = selectedLiveIndex or 0
     end
 
     self.details:clear()
@@ -389,16 +419,23 @@ function ISPNCPuppetOperaLayoutTab:refresh()
     )) do
         if tostring(row.id) == tostring(selectedID) then selected = row break end
     end
-    if not selected then
+        if not selected then
         addDetail(self.details, "Selection", tr(
             "UI_PNC_PuppetOpera_NoActorSelected", "No actor slot selected"), true)
     else
         addDetail(self.details, "Actor", selected.label)
-        addDetail(self.details, "Kind", selected.kind)
+        addDetail(self.details, "Scene slot", selected.id)
+        addDetail(self.details, "Kind", selected.kind or "unbound")
+        addDetail(self.details, "Allowed kinds",
+            table.concat(selected.allowedKinds or {}, ", "))
         addDetail(self.details, "Anchor", selected.anchor)
         addDetail(self.details, "Binding", selected.bindingID or tr(
             "UI_PNC_PuppetOpera_Unassigned", "unassigned"),
-            selected.kind == "nearby_live_npc" and not selected.bindingID)
+            not selected.bindingID)
+        if selected.liveID then
+            addDetail(self.details, "Live actor", selected.liveName or "-")
+            addDetail(self.details, "Live ID", selected.liveID)
+        end
         for _, gridRow in ipairs(self.model.GetGridActors()) do
             if gridRow.id == selected.id then
                 addDetail(self.details, "Relative tile",
@@ -413,6 +450,32 @@ function ISPNCPuppetOperaLayoutTab:refresh()
             tostring(self.model.GetSelectedBeatIndex()))
         addDetail(self.details, "Assigned track",
             self.model.GetSelectionSummary(selected.id))
+        if selected.kind == "nearby_live_npc" and selected.bindingID
+            and self.model.GetLiveActorReadiness
+        then
+            local readiness = self.model.GetLiveActorReadiness(
+                selected.bindingID
+            )
+            if readiness then
+                addDetail(self.details, "Live readiness",
+                    readiness.ready and "ready" or "blocked",
+                    readiness.ready ~= true)
+                addDetail(self.details, "Action state",
+                    readiness.actionState or "-")
+                addDetail(self.details, "Action context",
+                    readiness.actionContextState or "-")
+                addDetail(self.details, "Current owner",
+                    readiness.owner or "-")
+                addDetail(self.details, "Override",
+                    readiness.suspendable
+                        and ("suspendable:"
+                            .. tostring(readiness.overrideOwnerKind or "idle"))
+                        or "none")
+                addDetail(self.details, "Readiness reason",
+                    readiness.reasonDetail or readiness.reason or "ready",
+                    readiness.ready ~= true)
+            end
+        end
     end
     addDetail(self.details, "Placement", tr(
         "UI_PNC_PuppetOpera_PlacementHint",
@@ -424,10 +487,18 @@ end
 
 function ISPNCPuppetOperaLayoutTab:onAction(button)
     local id = button and button.internal or ""
-    if id ~= "remove_actor" or not self.model then return false end
-    local accepted, reason = self.model.RemoveActor(
-        self.model.GetSelectedActorID()
-    )
+    if not self.model then return false end
+    local accepted
+    local reason
+    if id == "add_actor" then
+        accepted, reason = self.model.AddActorContainer()
+    elseif id == "remove_actor" then
+        accepted, reason = self.model.RemoveActor(
+            self.model.GetSelectedActorID()
+        )
+    else
+        return false
+    end
     if self.ownerWindow then
         self.ownerWindow:setEditorStatus(reason or "actor_removed", not accepted)
         self.ownerWindow:refreshViews()
@@ -467,12 +538,52 @@ function ISPNCPuppetOperaLayoutTab:onResponsiveLayout()
     local gap = Layout.Pixels(8, scale)
     local width = self:getWidth()
     local height = self:getHeight()
-    resizeRows(self.actorList, Layout.Pixels(50, scale))
-    resizeRows(self.liveList, Layout.Pixels(50, scale))
+    local compact = height < Layout.Pixels(430, scale)
+    local actorRowHeight = Layout.Pixels(compact and 36 or 48, scale)
+    local liveRowHeight = Layout.Pixels(compact and 36 or 44, scale)
+    resizeRows(self.actorList, actorRowHeight)
+    resizeRows(self.liveList, liveRowHeight)
     resizeRows(self.details, Layout.Pixels(25, scale))
     if self.actorList then self.actorList.uiScale = scale end
     if self.liveList then self.liveList.uiScale = scale end
     local columnsWidth = math.max(1, width - pad * 2 - gap * 2)
+    local stacked = width < Layout.Pixels(720, scale)
+        or columnsWidth < Layout.Pixels(430, scale)
+    if stacked then
+        local heading = Layout.Pixels(20, scale)
+        local rowBlock = math.max(Layout.Pixels(70, scale),
+            math.floor(height * 0.22))
+        local listWidth = math.max(1, width - pad * 2)
+        local sceneHeight = math.max(Layout.Pixels(36, scale),
+            math.floor(rowBlock * 0.48))
+        local liveTop = pad + heading + sceneHeight + gap + heading
+        local liveHeight = math.max(Layout.Pixels(36, scale),
+            math.floor(rowBlock * 0.48))
+        local gridTop = liveTop + liveHeight + gap
+        local detailsHeight = math.max(Layout.Pixels(1, scale),
+            height - gridTop - Layout.Pixels(96, scale))
+        local gridHeight = math.max(Layout.Pixels(100, scale),
+            math.floor(detailsHeight * 0.62))
+        local detailsTop = gridTop + gridHeight + gap
+        local removeHeight = Layout.Pixels(26, scale)
+        Layout.SetBounds(self.actorList, pad, pad + heading,
+            listWidth, sceneHeight)
+        Layout.SetBounds(self.liveList, pad, liveTop,
+            listWidth, liveHeight)
+        Layout.SetBounds(self.grid, pad, gridTop, listWidth, gridHeight)
+        Layout.SetBounds(self.details, pad, detailsTop,
+            listWidth, math.max(1, height - detailsTop - removeHeight
+                - pad - gap))
+        Layout.SetBounds(self.addButton, pad, height - pad - removeHeight,
+            math.max(1, math.floor((listWidth - gap) / 2)), removeHeight)
+        Layout.SetBounds(self.removeButton,
+            pad + math.floor((listWidth - gap) / 2) + gap,
+            height - pad - removeHeight,
+            math.max(1, math.ceil((listWidth - gap) / 2)), removeHeight)
+        self.stackedLayout = true
+        return
+    end
+    self.stackedLayout = false
     local leftWidth = math.floor(columnsWidth * 0.24)
     local rightWidth = math.floor(columnsWidth * 0.28)
     local centerWidth = columnsWidth - leftWidth - rightWidth
@@ -481,8 +592,8 @@ function ISPNCPuppetOperaLayoutTab:onResponsiveLayout()
         rightWidth = math.floor(columnsWidth * 0.25)
         centerWidth = columnsWidth - leftWidth - rightWidth
     end
-    leftWidth = math.max(Layout.Pixels(132, scale), leftWidth)
-    rightWidth = math.max(Layout.Pixels(156, scale), rightWidth)
+    leftWidth = math.max(Layout.Pixels(112, scale), leftWidth)
+    rightWidth = math.max(Layout.Pixels(132, scale), rightWidth)
     if leftWidth + rightWidth >= columnsWidth then
         leftWidth = math.max(1, math.floor(columnsWidth * 0.25))
         rightWidth = math.max(1, math.floor(columnsWidth * 0.28))
@@ -493,9 +604,20 @@ function ISPNCPuppetOperaLayoutTab:onResponsiveLayout()
     local leftX = pad
     local leftTop = Layout.Pixels(22, scale)
     local leftBottom = height - pad
-    local sceneHeight = math.max(Layout.Pixels(56, scale),
-        math.floor((leftBottom - leftTop - gap - Layout.Pixels(20, scale))
-            * 0.46))
+    local liveHeadingHeight = Layout.Pixels(20, scale)
+    local availableLeft = math.max(1,
+        leftBottom - leftTop - gap - liveHeadingHeight)
+    local sceneHeight = math.floor(availableLeft * (compact and 0.42 or 0.46))
+    local minSceneHeight = math.min(availableLeft,
+        math.max(Layout.Pixels(36, scale), actorRowHeight))
+    local minLiveHeight = math.min(availableLeft,
+        math.max(Layout.Pixels(32, scale), liveRowHeight))
+    if availableLeft >= minSceneHeight + minLiveHeight then
+        sceneHeight = math.max(minSceneHeight,
+            math.min(availableLeft - minLiveHeight, sceneHeight))
+    else
+        sceneHeight = math.max(1, availableLeft - minLiveHeight)
+    end
     local liveTop = leftTop + sceneHeight + gap + Layout.Pixels(20, scale)
     local liveHeight = math.max(1, leftBottom - liveTop)
     Layout.SetBounds(self.actorList, leftX, leftTop, leftWidth, sceneHeight)
@@ -506,12 +628,17 @@ function ISPNCPuppetOperaLayoutTab:onResponsiveLayout()
         centerWidth, height - pad * 2)
 
     local detailsX = gridX + centerWidth + gap
+    local removeHeight = Layout.Pixels(26, scale)
+    local removeY = math.max(pad, height - pad - removeHeight)
     local detailsHeight = math.max(Layout.Pixels(1, scale),
-        height - pad * 2 - Layout.Pixels(38, scale))
+        removeY - pad - gap)
     Layout.SetBounds(self.details, detailsX, pad,
         math.max(1, width - detailsX - pad), detailsHeight)
+    Layout.SetBounds(self.addButton, detailsX,
+        removeY - Layout.Pixels(30, scale),
+        math.max(1, width - detailsX - pad), Layout.Pixels(26, scale))
     Layout.SetBounds(self.removeButton, detailsX,
-        height - pad - Layout.Pixels(28, scale),
+        removeY,
         math.max(1, width - detailsX - pad), Layout.Pixels(26, scale))
 end
 

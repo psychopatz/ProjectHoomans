@@ -36,6 +36,8 @@ PNC = {
                 keepManagedUseless = options
                     and options.keepManagedUseless
                     or nil,
+                nonCombat = options and options.nonCombat or nil,
+                sceneId = options and options.sceneId or nil,
             }
             return true, "bump_type_setter"
         end,
@@ -190,10 +192,20 @@ T.truthy(
     pipelineCalls[1].keepManagedUseless == nil,
     "debug pipeline must preserve the SP/MP body-mode contract"
 )
+ok, reason = player.PlayPipeline(entry, "npc-1", body, nil, {
+    sceneId = "PuppetOperaPreview:npc-1",
+    nonCombat = true,
+})
+T.truthy(ok and reason == "bump_type_setter",
+    "debug pipeline did not accept Puppet Opera preview options")
+T.equal(pipelineCalls[2].sceneId, "PuppetOperaPreview:npc-1",
+    "Puppet Opera preview scene identity was not forwarded")
+T.truthy(pipelineCalls[2].nonCombat == true,
+    "Puppet Opera preview did not mark the bump non-combat")
 player.Finish()
-T.truthy(finishCalls == 1, "pipeline finish was not signalled")
+T.truthy(finishCalls == 2, "pipeline finish was not signalled")
 player.Stop("test_pipeline_stop")
-T.truthy(finishCalls == 2, "stop did not finish active pipeline")
+T.truthy(finishCalls == 3, "stop did not finish active pipeline")
 
 ok, reason = player.PlayRaw(entry, "npc-1", body)
 T.truthy(ok and reason == "raw_clip_started", "raw preview failed")

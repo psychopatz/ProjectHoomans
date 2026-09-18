@@ -5,6 +5,7 @@ local Tasking = PNC.Tasking
 local Priority = PNC.TaskPriority
 local Leases = PNC.TaskLeaseService
 local ScalingDiagnostics = PNC.PerformanceScalingDiagnostics
+local ActorControl = PNC.ActorControl
 local H = Tasking.Internal
 local Events = Tasking.Events
 local Inbox = Tasking.Inbox
@@ -19,6 +20,19 @@ end
 local function budgetExhausted(startedAt)
     local budget = math.max(1, tonumber(Tasking.TIME_BUDGET_MS) or 2)
     return clockNow(startedAt) - startedAt >= budget
+end
+
+local function puppetOperaSuspends(lease)
+    local record
+    if not lease or not ActorControl
+        or not ActorControl.IsPuppetOwned
+        or not PNC.Registry
+        or not PNC.Registry.Get
+    then
+        return false
+    end
+    record = PNC.Registry.Get(lease.npcId)
+    return record ~= nil and ActorControl.IsPuppetOwned(record)
 end
 
 local function promoteMaterializedLease(lease)
@@ -47,6 +61,14 @@ local function reconcileOrphanedActivities(at)
     then return 0 end
     local recovered = 0
     PNC.Registry.ForEach(function(record)
+        if ActorControl and ActorControl.IsPuppetOwned
+            and ActorControl.IsPuppetOwned(record)
+        then
+            -- A Puppet lease is a temporary presentation override. Do not
+            -- let orphan cleanup erase the facility runtime that the scene
+            -- will hand back to after release.
+            return
+        end
         local activity = record and record.runtime
             and record.runtime.facilityActivity or nil
         local leaseId = activity and tostring(activity.taskLeaseId or "") or ""
@@ -173,6 +195,7 @@ function Tasking.Commands.Pump(at, budget)
         executorSteps = executorSteps + 1
         Tasking.ExecutorCursor = (Tasking.ExecutorCursor % #Leases.Active) + 1
         local lease = Leases.Get(Leases.Active[Tasking.ExecutorCursor])
+        local suspended = puppetOperaSuspends(lease)
         local domainTimerName
         local domainTimerStart
         if ScalingDiagnostics and lease then
@@ -180,12 +203,17 @@ function Tasking.Commands.Pump(at, budget)
                 "Tasking.Domain." .. tostring(lease.sourceDomain or "unknown"),
                 at)
         end
-        promoteMaterializedLease(lease)
+        if not suspended then promoteMaterializedLease(lease) end
         local provider = lease and Tasking.Providers[lease.sourceDomain]
         local executor = provider and type(provider.Tick) == "function"
             and provider or lease and Tasking.Executors[lease.executionMode]
         local recoveryState
-        if lease and lease.cancellationRequested ~= true then
+        if suspended then
+            -- Puppet Opera owns the live presentation. Keep the durable task
+            -- lease and its provider state intact until the scene releases it;
+            -- executor recovery/cancellation must not tear down the state that
+            -- will be resumed afterwards.
+        elseif lease and lease.cancellationRequested ~= true then
             _, recoveryState = H.RecoverStalledLease(lease, at)
             recoveryState = recoveryState or H.GetRecoveryState(lease, at)
         end

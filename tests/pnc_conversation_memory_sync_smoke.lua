@@ -29,7 +29,7 @@ T.load("PsychopatzCore", "common", "PsychopatzCore/Events/PC_EventBus.lua")
 T.load("PsychopatzCore", "common",
     "PsychopatzCore/Conversation/PsychopatzConversationMessage.lua")
 T.load("ProjectHoomans", "client",
-    "PNC/Integrations/HoomansLLM/PNC_HoomansLLM_ConversationMemorySync.lua")
+    "PNC/Integrations/PBrainZ/PNC_PBrainZ_ConversationMemorySync.lua")
 
 local Message = PsychopatzCore.Conversation.Message
 local Sync = PNC.ConversationMemorySync

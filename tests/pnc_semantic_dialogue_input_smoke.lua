@@ -162,7 +162,7 @@ PNC = {
             end,
         },
     },
-    HoomansLLM = {
+    PBrainZ = {
         IsBridgeEnabled = function() return false end,
         Submit = function()
             llmAttempts = llmAttempts + 1

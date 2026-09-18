@@ -58,12 +58,22 @@ class DraftStore:
     """CRUD for the JSON wrapper files written by the in-game creator."""
 
     INDEX_NAME = "UniqueNPCIndex.txt"
+    DEFINITION_DIR = "NPC Definitions"
 
     def __init__(self, root: Path):
         self.root = root.expanduser().resolve()
         self.root.mkdir(parents=True, exist_ok=True)
+        self.definition_root = self.root / self.DEFINITION_DIR
+        self.definition_root.mkdir(parents=True, exist_ok=True)
 
     def _path(self, filename: str) -> Path:
+        if not filename or Path(filename).name != filename or not filename.endswith(".txt"):
+            raise StorageError(f"invalid Hoomans filename: {filename!r}")
+        if filename == self.INDEX_NAME:
+            raise StorageError("the index is not an NPC definition")
+        return within(self.definition_root, self.definition_root / filename)
+
+    def _legacy_path(self, filename: str) -> Path:
         if not filename or Path(filename).name != filename or not filename.endswith(".txt"):
             raise StorageError(f"invalid Hoomans filename: {filename!r}")
         if filename == self.INDEX_NAME:
@@ -73,28 +83,89 @@ class DraftStore:
     def _index_path(self) -> Path:
         return self.root / self.INDEX_NAME
 
-    def _read_index(self) -> list[str]:
+    def _read_index_payload(self) -> dict[str, Any]:
         try:
             payload = json.loads(self._index_path().read_text(encoding="utf-8"))
         except (OSError, json.JSONDecodeError):
-            return []
-        values = payload.get("files", []) if isinstance(payload, dict) else []
-        return sorted(
-            {
-                str(value)
-                for value in values
-                if isinstance(value, str)
-                and value.endswith(".txt")
-                and Path(value).name == value
-                and value != self.INDEX_NAME
-            }
-        )
+            return {}
+        return payload if isinstance(payload, dict) else {}
+
+    @staticmethod
+    def _safe_filename(value: Any, index_name: str) -> Optional[str]:
+        if not isinstance(value, str):
+            return None
+        if not value.endswith(".txt") or Path(value).name != value:
+            return None
+        if value == index_name:
+            return None
+        return value
+
+    def _read_index(self) -> list[str]:
+        payload = self._read_index_payload()
+        values: set[str] = set()
+        for value in payload.get("files", []):
+            filename = self._safe_filename(value, self.INDEX_NAME)
+            if filename:
+                values.add(filename)
+        for entry in payload.get("entries", []):
+            if not isinstance(entry, dict):
+                continue
+            if str(entry.get("definitionType") or entry.get("kind") or "") != "npc":
+                continue
+            filename = self._safe_filename(
+                entry.get("fileName") or entry.get("file"), self.INDEX_NAME
+            )
+            if filename:
+                values.add(filename)
+        return sorted(values)
 
     def _write_index(self, filenames: Iterable[str]) -> None:
-        values = sorted(set(filenames))
+        values = sorted(
+            {
+                filename
+                for filename in filenames
+                if self._safe_filename(filename, self.INDEX_NAME)
+            }
+        )
+        existing = self._read_index_payload()
+        other_entries: list[dict[str, Any]] = []
+        metadata_by_name: dict[str, dict[str, Any]] = {}
+        for entry in existing.get("entries", []):
+            if not isinstance(entry, dict):
+                continue
+            definition_type = str(
+                entry.get("definitionType") or entry.get("kind") or ""
+            )
+            filename = self._safe_filename(
+                entry.get("fileName") or entry.get("file"), self.INDEX_NAME
+            )
+            if definition_type != "npc" and filename:
+                other_entries.append(dict(entry))
+            elif definition_type == "npc" and filename:
+                metadata_by_name[filename] = dict(entry)
+        entries = other_entries
+        for filename in values:
+            metadata = metadata_by_name.get(filename, {})
+            entries.append(
+                {
+                    **metadata,
+                    "definitionType": "npc",
+                    "fileName": filename,
+                    "path": f"Hoomans/{self.DEFINITION_DIR}/{filename}",
+                    "schemaVersion": int(metadata.get("schemaVersion") or 2),
+                }
+            )
+        entries.sort(
+            key=lambda entry: (
+                str(entry.get("definitionType") or ""),
+                str(entry.get("fileName") or ""),
+            )
+        )
         payload = {
-            "schemaVersion": 1,
-            "kind": "ProjectHoomans.UniqueNPCIndex",
+            "schemaVersion": 2,
+            "kind": "ProjectHoomans.DefinitionIndex",
+            "entries": entries,
+            # Compatibility view consumed by older Unique NPC tooling.
             "files": values,
         }
         atomic_write(self._index_path(), encode(payload))
@@ -103,13 +174,22 @@ class DraftStore:
         indexed = set(self._read_index())
         discovered = {
             path.name
-            for path in self.root.glob("*.txt")
+            for path in self.definition_root.glob("*.txt")
             if path.name != self.INDEX_NAME
         }
+        # Read legacy flat files during migration. New saves always go to the
+        # namespaced directory, so an Opera file can never collide with one.
+        discovered.update(
+            path.name
+            for path in self.root.glob("*.txt")
+            if path.name != self.INDEX_NAME
+        )
         return sorted(indexed | discovered)
 
     def load(self, filename: str) -> dict[str, Any]:
         path = self._path(filename)
+        if not path.exists():
+            path = self._legacy_path(filename)
         if not path.exists():
             raise StorageError(f"Hoomans file does not exist: {filename}")
         try:
@@ -131,6 +211,8 @@ class DraftStore:
 
     def delete(self, filename: str) -> Path:
         source = self._path(filename)
+        if not source.exists():
+            source = self._legacy_path(filename)
         if not source.exists():
             raise StorageError(f"Hoomans file does not exist: {filename}")
         source.unlink()

@@ -158,8 +158,15 @@ local function campfireTarget(target, hint, origin)
 end
 
 local function normalizeRoomSite(site)
+    local movementX
+    local movementY
+    local movementZ
     if type(site) ~= "table" then return nil end
-    if number(site.x) == nil or number(site.y) == nil then return nil end
+    movementX = number(site.movementX) or number(site.x)
+    movementY = number(site.movementY) or number(site.y)
+    movementZ = number(site.movementZ)
+        or number(site.z) or 0
+    if movementX == nil or movementY == nil then return nil end
     return {
         kind = CampSite.KIND,
         scope = CampSite.SCOPES.ROOM,
@@ -170,9 +177,12 @@ local function normalizeRoomSite(site)
         roomType = text(site.roomType, 48),
         roomName = text(site.roomName, 64),
         roomBounds = CampSite.NormalizeBounds(site.roomBounds),
-        x = number(site.x),
-        y = number(site.y),
-        z = number(site.z) or 0,
+        x = movementX,
+        y = movementY,
+        z = movementZ,
+        movementX = movementX,
+        movementY = movementY,
+        movementZ = movementZ,
         label = text(site.label, CampSite.MAX_LABEL) or "room",
         labelKey = text(site.labelKey, 96) or "semantic.camp.room",
         risk = text(site.risk, 32) or "sheltered",
@@ -185,17 +195,27 @@ local function normalizeRoomSite(site)
 end
 
 local function normalizeCampfireSite(site)
+    local movementX
+    local movementY
+    local movementZ
     if type(site) ~= "table" then return nil end
-    if number(site.x) == nil or number(site.y) == nil then return nil end
+    movementX = number(site.movementX) or number(site.x)
+    movementY = number(site.movementY) or number(site.y)
+    movementZ = number(site.movementZ)
+        or number(site.z) or 0
+    if movementX == nil or movementY == nil then return nil end
     return {
         kind = CampSite.KIND,
         scope = CampSite.SCOPES.CAMPFIRE,
         siteScope = CampSite.SCOPES.CAMPFIRE,
         siteID = text(site.targetID or site.resourceKey, 128),
         campfireID = text(site.targetID or site.resourceKey, 128),
-        x = number(site.x),
-        y = number(site.y),
-        z = number(site.z) or 0,
+        x = movementX,
+        y = movementY,
+        z = movementZ,
+        movementX = movementX,
+        movementY = movementY,
+        movementZ = movementZ,
         label = "campfire",
         labelKey = "semantic.camp.campfire",
         risk = "exposed",
@@ -230,6 +250,8 @@ local function validateRoomHint(hint, context)
     local cell = cellFor(context)
     local square
     local identity
+    local anchor
+    local anchorReason
     local site
     local free
     local hintKind = string.lower(tostring(hint.kind or ""))
@@ -257,6 +279,24 @@ local function validateRoomHint(hint, context)
     if not identity.roomBounds then
         return nil, "camp_room_bounds_unavailable"
     end
+    -- The client hint identifies the room, but its exact square is not a
+    -- trustworthy movement target. A free square may be deep inside the
+    -- room, behind a blocked passage, or otherwise unsuitable for the native
+    -- path planner. Re-resolve a bounded anchor from the server's room view
+    -- while retaining the validated room identity and semantic label.
+    if type(Geometry.DescribeRoom) ~= "function" then
+        return nil, "camp_room_anchor_unavailable"
+    end
+    anchor, anchorReason = Geometry.DescribeRoom(
+        square,
+        nil,
+        cell,
+        originFor(context),
+        {}
+    )
+    if not anchor then
+        return nil, anchorReason or "camp_room_no_free_anchor"
+    end
     site = {
         siteID = roomSiteID(identity),
         roomID = identity.roomID,
@@ -264,9 +304,14 @@ local function validateRoomHint(hint, context)
         roomType = identity.roomType,
         roomName = identity.roomName,
         roomBounds = identity.roomBounds,
-        x = math.floor(number(hint.x)) + 0.5,
-        y = math.floor(number(hint.y)) + 0.5,
-        z = number(identity.z) or number(hint.z) or 0,
+        x = number(anchor.movementX) or number(anchor.x),
+        y = number(anchor.movementY) or number(anchor.y),
+        z = number(anchor.movementZ) or number(anchor.z)
+            or number(identity.z) or number(hint.z) or 0,
+        movementX = number(anchor.movementX) or number(anchor.x),
+        movementY = number(anchor.movementY) or number(anchor.y),
+        movementZ = number(anchor.movementZ) or number(anchor.z)
+            or number(identity.z) or number(hint.z) or 0,
         label = CampSite.RoomLabel(identity.roomType, identity.roomName),
         labelKey = "semantic.camp.room",
         risk = "sheltered",
@@ -285,6 +330,7 @@ local function validateCampfireHint(target, context)
     local worldContext = {}
     local result
     local reason
+    local requested
     if not WorldTargets
         or type(WorldTargets.ValidateCampfireHint) ~= "function"
     then
@@ -378,6 +424,9 @@ audit = function(context, scope, query, result, reason)
         siteX = result and result.x,
         siteY = result and result.y,
         siteZ = result and result.z,
+        movementX = result and result.movementX,
+        movementY = result and result.movementY,
+        movementZ = result and result.movementZ,
         roomID = result and result.roomID,
         roomType = result and result.roomType,
         campfireID = result and result.campfireID,
@@ -414,11 +463,39 @@ function Resolver.Resolve(target, context)
             preferredRoomID = hint and hint.roomID,
         })
         result = normalizeRoomSite(result)
+        if not result and target.roomID == nil and target.siteID == nil then
+            -- Room names are preferred semantic labels. Safety only requires
+            -- a loaded indoor room, so an unclassified hallway/room is a
+            -- valid fallback when the requested type is absent.
+            result, reason = Geometry.FindNearestRoom(cell, origin, nil, {
+                radius = math.max(4, math.min(64,
+                    number(target.radius) or Resolver.DEFAULT_RADIUS)),
+                preferredSiteID = hint and hint.siteID,
+                preferredRoomID = hint and hint.roomID,
+            })
+            result = normalizeRoomSite(result)
+            if result then reason = "camp_room_type_fallback" end
+        end
         if not result then
-            reason = query and "camp_room_not_found" or "camp_no_safe_room"
+            requested = campfireTarget(target, hint, origin)
+            result, reason = WorldTargets.Resolve(requested, {
+                origin = origin,
+                record = context.record,
+                body = context.body,
+                runtime = context.runtime,
+                npcID = context.npcID,
+                planID = context.planID,
+                requestID = context.requestID,
+            })
+            result = normalizeCampfireSite(result)
+            if result then
+                reason = "campfire_fallback"
+            else
+                reason = query and "camp_room_not_found" or "camp_no_safe_room"
+            end
         end
     elseif scope == CampSite.SCOPES.CAMPFIRE then
-        local requested = campfireTarget(target, hint, origin)
+        requested = campfireTarget(target, hint, origin)
         result, reason = WorldTargets.Resolve(requested, {
             origin = origin,
             record = context.record,

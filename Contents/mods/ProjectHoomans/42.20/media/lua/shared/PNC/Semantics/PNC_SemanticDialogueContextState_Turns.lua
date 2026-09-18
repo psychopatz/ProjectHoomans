@@ -48,6 +48,18 @@ function Context:RecordTurn(ir, options)
     self.lastAction = ir.action
     self.lastSpeaker = options.speaker or ir.speaker
 
+    -- Identity questions create a bounded, conversation-local obligation.
+    -- The next turn can answer it with a self-name claim; any other turn is
+    -- observable as an evasion before the state is advanced again.
+    if ir.intent == "QUESTION" and ir.subject == "IDENTITY" then
+        self.pendingIdentityExchange = {
+            kind = "PLAYER_NAME",
+            requestedAt = sequence,
+        }
+    elseif self.pendingIdentityExchange then
+        self.pendingIdentityExchange = nil
+    end
+
     local event = {
         sequence = sequence,
         timestamp = timestamp,

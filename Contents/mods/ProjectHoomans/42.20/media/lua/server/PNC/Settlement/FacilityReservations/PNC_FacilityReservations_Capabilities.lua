@@ -58,7 +58,10 @@ function Reservations.HasCapacity(facility, capability)
                 resourceBinding.detectorId) or {}
         for index = 1, #resources do
             local resource = resources[index]
-            if not Reservations.ByResource[resource.resourceKey] then
+            local available = Reservations.IsResourceAvailable
+                and Reservations.IsResourceAvailable(resource)
+                or not Reservations.ByResource[resource.resourceKey]
+            if available then
                 return H.HasActivityCapacity(facility.id, capability)
             end
         end

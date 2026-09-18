@@ -163,6 +163,18 @@ T["load"]("ProjectHoomans", "server", "PNC/Needs/PNC_NeedSupplyBridge.lua")
 T.equal(provider, Triggers, "single provider owns all facility need routes")
 local candidates = Triggers.GetCandidates(record.id)
 T.equal(#candidates, 4, "all configured need routes produce candidates")
+
+-- CAMP placement is a movement transaction. NeedFacility must not reacquire a
+-- bed/table/water lease until the coordinator reports that the NPC arrived.
+PNC.CampMovementCoordinator = {
+    IsPlacementLocked = function() return true end,
+}
+T.equal(#Triggers.GetCandidates(record.id), 0,
+    "camp placement fences need candidates")
+T.falsy(Triggers.PreferFacility(record, "hunger"),
+    "camp placement fences need wakeups")
+PNC.CampMovementCoordinator.IsPlacementLocked = function() return false end
+
 local homeFoodCandidate
 for _, candidate in ipairs(candidates) do
     if candidate.sourceRef == "hunger" then homeFoodCandidate = candidate end
@@ -480,7 +492,10 @@ T.falsy(noFoodCandidate,
     "the task provider omits follower eating when no food is available")
 hasPersonalFood = true
 
-record.orderSpec = { kind = "camp" }
+record.orderSpec = {
+    kind = "camp", x = 42, y = 44, z = 0,
+    zoneID = "room:kitchen", zoneLabel = "kitchen",
+}
 record.needs.hunger = 0.65
 record.needs.thirst = 0.60
 local campCandidates = Triggers.GetCandidates(record.id)
@@ -492,6 +507,11 @@ for _, candidate in ipairs(campCandidates) do
 end
 T.truthy(campFood, "camp uses the reusable personal-food route")
 T.truthy(campWater, "camp uses the captured Camp water route")
+local campFoodAssignment = Triggers.Assign(campFood)
+T.equal(campFoodAssignment.target.x, 42,
+    "camped hunger routes to the assigned zone instead of the stale NPC position")
+T.equal(campFoodAssignment.target.y, 44,
+    "camped hunger preserves the assigned zone destination")
 local beforeSchedulerWake = dirty
 T.truthy(Triggers.WakeActionable(record),
     "the generic needs wake finds an actionable Camp need")

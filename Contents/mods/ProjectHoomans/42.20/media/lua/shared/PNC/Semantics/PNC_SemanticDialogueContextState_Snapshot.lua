@@ -70,6 +70,7 @@ function Context:ToContext()
         lastIntent = self.lastIntent,
         lastAction = self.lastAction,
         lastSpeaker = self.lastSpeaker,
+        pendingIdentityExchange = self.pendingIdentityExchange,
         sequence = self.sequence,
         recentTurns = self:RecentTurns(6, true),
         focus = self:GetFocus(self.maxFocus),

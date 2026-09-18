@@ -27,6 +27,34 @@ local function responsePayload(decision)
     }
 end
 
+local function campAcknowledgement(result, actionResult)
+    local decision = result and result.decision or {}
+    local action = string.upper(tostring(decision.action
+        or actionResult and actionResult.action or ""))
+    local phase
+    if action ~= "CAMP" or not actionResult
+        or actionResult.accepted ~= true
+        or type(Internal.CampResponseFor) ~= "function"
+    then
+        return nil
+    end
+    phase = (actionResult.status == "pending"
+        or actionResult.reason == "network_queued")
+        and "pending" or "admitted"
+    local text = Internal.CampResponseFor(
+        actionResult,
+        decision,
+        phase
+    )
+    if not text then return nil end
+    return {
+        key = "semantic.camp.requested",
+        domain = "pnc.system.shared.categories",
+        text = text,
+        fallback = text,
+    }
+end
+
 function Internal.AppendPlayerInput(view, value, result)
     local group = view and view.groupConversation
     local session = group and type(group.PrimarySession) == "function"
@@ -73,6 +101,8 @@ function Internal.QueueDeterministicResponse(
     if actionResult and type(actionResult.response) == "table" then
         response = actionResult.response
     end
+    local campResponse = campAcknowledgement(result, actionResult)
+    if campResponse then response = campResponse end
     if actionResult and (actionResult.status == "gift_transfer_pending"
             or actionResult.status == "gift_transferred")
     then

@@ -91,6 +91,7 @@ function LiveBodyControl.ShouldKeepEngineMovementActive(record, zombie)
         modData.PNC_BumpActionLeaseStartedAt = nil
         modData.PNC_BumpRequestedType = nil
         modData.PNC_BumpKeepUseless = nil
+        modData.PNC_BumpNonCombat = nil
     end
     if Core and Core.IsAuthority and not Core.IsAuthority() then return false end
     if attackAction and now < (tonumber(attackAction.finishAt) or 0) then

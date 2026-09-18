@@ -41,6 +41,22 @@ Diagnostics.RecordServer({
     siteScope = "room",
     siteID = "room:1",
     siteLabel = "bedroom",
+    details = {
+        version = 1,
+        route = "group_command",
+        campID = "camp:1",
+        placementMode = "root_only",
+        placementState = "moving",
+        activeNPCID = "npc:1",
+        acceptedCount = 1,
+        targetCount = 2,
+        site = { scope = "room", label = "bedroom" },
+        targets = {
+            { npcID = "npc:1", state = "moving",
+                reason = "camp_started", runtimeObject = function() end },
+        },
+        runtimeObject = function() end,
+    },
 })
 
 local snapshot = Diagnostics.Get()
@@ -60,6 +76,12 @@ T.equal(snapshot.server.hint.source, "server_authoritative_site",
     "server camp metadata becomes an inspectable primitive hint")
 T.equal(snapshot.server.hint.label, "bedroom",
     "server camp metadata preserves the authoritative zone label")
+T.equal(snapshot.server.details.route, "group_command",
+    "authoritative camp route is retained")
+T.equal(snapshot.server.details.placementState, "moving",
+    "authoritative placement state is retained")
+T.equal(snapshot.server.details.targets[1].runtimeObject, nil,
+    "camp target diagnostics copy only bounded primitive data")
 
 local Model = T.load("ProjectHoomans", "client",
     "PNC/UI/PerceptionDebug/PNC_PerceptionDebug_Model.lua")

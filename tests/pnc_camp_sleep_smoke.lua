@@ -194,6 +194,19 @@ T.equal(gridSquareCalls, firstCaptureCalls,
 T.equal(peerSnapshot, snapshot,
     "members of one camp share the runtime resource snapshot")
 
+local zonePeerRecord = {
+    id = "npc:camp-zone-peer", alive = true, x = 20, y = 20, z = 0,
+    runtime = {}, orderSpec = {
+        kind = "camp", campId = "camp:test", x = 10, y = 10, z = 0,
+        resourceRadius = 2, zoneID = "room:bedroom",
+    },
+}
+local zonePeerSnapshot = Service.Capture(zonePeerRecord, false)
+T.truthy(zonePeerSnapshot and zonePeerSnapshot ~= snapshot,
+    "different assigned zones do not share one camp resource snapshot")
+T.truthy(gridSquareCalls > firstCaptureCalls,
+    "a different assigned zone performs its own bounded resource capture")
+
 local asyncRecord = {
     id = "npc:camp-async", alive = true, x = 10, y = 10, z = 0,
     runtime = {}, orderSpec = {

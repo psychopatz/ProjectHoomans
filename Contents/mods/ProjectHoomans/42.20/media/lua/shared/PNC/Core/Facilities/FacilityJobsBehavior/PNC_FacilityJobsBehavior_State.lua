@@ -11,6 +11,7 @@ PNC.SeatingRuntime = PNC.SeatingRuntime or {}
 PNC.SeatingRuntime.LiveObjects = PNC.SeatingRuntime.LiveObjects or {}
 PNC.SleepRuntime = PNC.SleepRuntime or {}
 PNC.SleepRuntime.LiveObjects = PNC.SleepRuntime.LiveObjects or {}
+PNC.SleepRuntime.SurfaceOccupants = PNC.SleepRuntime.SurfaceOccupants or {}
 
 function Internal.Normalize(_, spec)
     local floorSeating = spec.floorSeating == true
@@ -44,6 +45,12 @@ function Internal.Normalize(_, spec)
         sleepGridY = tonumber(spec.sleepGridY),
         sleepGridWidth = tonumber(spec.sleepGridWidth),
         sleepGridHeight = tonumber(spec.sleepGridHeight),
+        sleepSlotId = tostring(spec.sleepSlotId or ""),
+        sleepSlotIndex = tonumber(spec.sleepSlotIndex),
+        sleepCapacity = tonumber(spec.sleepCapacity
+            or spec.bedCapacity),
+        bedCapacity = tonumber(spec.bedCapacity
+            or spec.sleepCapacity),
         seatDirection = tostring(spec.seatDirection or ""),
         seatSide = tostring(spec.seatSide or ""),
         approachKey = tostring(spec.approachKey or ""),
@@ -79,6 +86,32 @@ function Internal.Normalize(_, spec)
         roomBounds = CampSite.NormalizeBounds(spec.roomBounds),
         campfireID = spec.campfireID
             and tostring(spec.campfireID) or nil,
+        zoneID = spec.zoneID and tostring(spec.zoneID) or nil,
+        zoneLabel = spec.zoneLabel and tostring(spec.zoneLabel) or nil,
+        zoneScope = CampSite.NormalizeScope(spec.zoneScope) or scope,
+        zoneNeedKind = spec.zoneNeedKind
+            and tostring(spec.zoneNeedKind) or nil,
+        zoneReason = spec.zoneReason and tostring(spec.zoneReason) or nil,
+        zoneScore = tonumber(spec.zoneScore),
+        zoneRevision = tonumber(spec.zoneRevision),
+        campRootX = tonumber(spec.campRootX),
+        campRootY = tonumber(spec.campRootY),
+        campRootZ = tonumber(spec.campRootZ),
+        campRootScope = CampSite.NormalizeScope(spec.campRootScope),
+        campRootSiteID = spec.campRootSiteID
+            and tostring(spec.campRootSiteID) or nil,
+        campRootRoomID = spec.campRootRoomID
+            and tostring(spec.campRootRoomID) or nil,
+        campRootBuildingID = spec.campRootBuildingID
+            and tostring(spec.campRootBuildingID) or nil,
+        campRootRoomType = spec.campRootRoomType
+            and tostring(spec.campRootRoomType) or nil,
+        campRootRoomName = spec.campRootRoomName
+            and tostring(spec.campRootRoomName) or nil,
+        campRootRoomBounds = CampSite.NormalizeBounds(
+            spec.campRootRoomBounds),
+        campRootCampfireID = spec.campRootCampfireID
+            and tostring(spec.campRootCampfireID) or nil,
         campX = tonumber(spec.campX),
         campY = tonumber(spec.campY),
         campZ = tonumber(spec.campZ),

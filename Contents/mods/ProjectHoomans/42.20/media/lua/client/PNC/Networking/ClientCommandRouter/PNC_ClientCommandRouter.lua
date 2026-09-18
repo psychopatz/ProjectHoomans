@@ -6,6 +6,7 @@ PNC.Client.Internal = PNC.Client.Internal or {}
 require "PNC/Networking/ClientCommandRouter/PNC_ClientCommandRouter_Registry"
 require "PNC/Networking/ClientCommandRouter/PNC_ClientCommandRouter_Diagnostics"
 require "PNC/Networking/ClientCommandRouter/PNC_ClientCommandRouter_Knowledge"
+require "PNC/Networking/ClientCommandRouter/PNC_ClientCommandRouter_SemanticIdentity"
 require "PNC/Networking/ClientCommandRouter/PNC_ClientCommandRouter_Semantics"
 require "PNC/Networking/ClientCommandRouter/PNC_ClientCommandRouter_Exploration"
 require "PNC/Networking/ClientCommandRouter/PNC_ClientCommandRouter_Colony"

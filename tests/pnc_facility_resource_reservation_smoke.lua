@@ -121,4 +121,29 @@ T.equal(overCapacity.reason, "NO_ACTIVITY_CAPACITY",
     "room capacity returns the normal activity capacity reason")
 Reservations.Release(bedSleeper.reservationId, "complete")
 Reservations.Release(floorSleeper.reservationId, "complete")
+
+local doubleBed = {
+    resourceKey = "bed:double", resourceKind = "sleep_surface",
+    sleepSurface = "bed", sleepCapacity = 2, exclusive = true,
+}
+facility.capacity = 10
+local slotOneOk, slotOne = Reservations.ReserveResource(
+    facility.id, doubleBed, "npc:slot1", "sleep", 5000,
+    { sleepSlotId = "slot:1", sleepCapacity = 2 })
+local slotTwoOk, slotTwo = Reservations.ReserveResource(
+    facility.id, doubleBed, "npc:slot2", "sleep", 5000,
+    { sleepSlotId = "slot:2", sleepCapacity = 2 })
+T.truthy(slotOneOk and slotTwoOk,
+    "two sleepers can reserve separate slots on a double bed: "
+        .. tostring(slotOneOk) .. "/" .. tostring(slotTwoOk))
+T.equal(Reservations.ByResource[doubleBed.resourceKey], nil,
+    "slot reservations do not collapse a double bed into one resource lock")
+local duplicateSlotOk, duplicateSlotReason = Reservations.ReserveResource(
+    facility.id, doubleBed, "npc:slot3", "sleep", 5000,
+    { sleepSlotId = "slot:1", sleepCapacity = 2 })
+T.falsy(duplicateSlotOk, "a claimed sleep slot cannot be double-booked")
+T.equal(duplicateSlotReason, "RESOURCE_SLOT_RESERVED",
+    "duplicate sleep slot reports the slot-level reservation reason")
+Reservations.Release(slotOne.id, "complete")
+Reservations.Release(slotTwo.id, "complete")
 T.finish("pnc_facility_resource_reservation_smoke")

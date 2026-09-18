@@ -7,6 +7,8 @@ PNC.RoamAmbient = PNC.RoamAmbient or {}
 
 local Service = PNC.RoamAmbient
 local Common = PNC.BehaviorCommon
+local ActorControl = PNC.ActorControl
+    or require "PNC/Core/ActorControl/PNC_ActorControl"
 
 local function canContinue(record, zombie, state, at)
     local runtime = record and record.runtime or nil
@@ -34,6 +36,22 @@ function Service.Tick(record, zombie, at)
     local sleep = PNC.FacilityJobs and PNC.FacilityJobs.Sleep
     at = Service.CurrentTime(at)
     if not state then return false end
+    if state.action == "sleep" and state.wakeExitPending == true then
+        local restored = sleep and sleep.RestoreSleepPosition
+            and sleep.RestoreSleepPosition(record, zombie, state, state)
+        if not restored then return true end
+        state.wakeExitPending = nil
+        return Service.Finish(record, zombie,
+            state.wakeExitReason or "roam_ambient_sleep_wake", "movement")
+    end
+    if ActorControl and ActorControl.IsPuppetOwned
+        and ActorControl.IsPuppetOwned(record)
+    then
+        -- The owner lease pauses the provider rather than treating its
+        -- suspension as a combat preemption. Its runtime is restored when the
+        -- Puppet Opera session releases the actor.
+        return false
+    end
     if not canContinue(record, zombie, state, at) then
         Service.Stop(record, zombie, "roam_ambient_preempted", "combat")
         return true
@@ -87,22 +105,35 @@ function Service.Tick(record, zombie, at)
         state.arrivalSettled = true
     end
     if state.positioned ~= true then
-        local x = tonumber(state.interactionX) or state.target.x
-        local y = tonumber(state.interactionY) or state.target.y
-        local z = tonumber(state.interactionZ) or state.target.z
-        if not PNC.LiveBodyControl
-            or not PNC.LiveBodyControl.SetAuthoritativePosition
+        local positioned
+        local positionReason
+        if sleep and sleep.TrySnapToSleep then
+            positioned, positionReason = sleep.TrySnapToSleep(
+                record, zombie, state, state)
+        elseif PNC.LiveBodyControl
+            and PNC.LiveBodyControl.SetAuthoritativePosition
         then
+            state.approachPosition = {
+                x = zombie:getX(), y = zombie:getY(), z = zombie:getZ(),
+            }
+            PNC.LiveBodyControl.SetAuthoritativePosition(
+                zombie,
+                tonumber(state.interactionX) or state.target.x,
+                tonumber(state.interactionY) or state.target.y,
+                tonumber(state.interactionZ) or state.target.z)
+            record.x, record.y, record.z = zombie:getX(), zombie:getY(),
+                zombie:getZ()
+            state.positioned = true
+            positioned = true
+        else
+            positionReason = "roam_ambient_sleep_position_unavailable"
+        end
+        if not positioned then
             Service.Stop(record, zombie,
-                "roam_ambient_sleep_position_unavailable", "movement")
+                positionReason or "roam_ambient_sleep_position_unavailable",
+                "movement")
             return true
         end
-        state.approachPosition = {
-            x = zombie:getX(), y = zombie:getY(), z = zombie:getZ(),
-        }
-        PNC.LiveBodyControl.SetAuthoritativePosition(zombie, x, y, z)
-        record.x, record.y, record.z = x, y, z
-        state.positioned = true
     end
     if state.sleepSurfaceEntered ~= true then
         local prepared, reason = sleep.PrepareSleepSurface(
@@ -125,6 +156,11 @@ end
 function Service.OnSceneTick(record, zombie, scene, at)
     local state = record and record.runtime and record.runtime.roamAmbient
     if not state or not scene or scene.id ~= state.sceneId then return false end
+    if ActorControl and ActorControl.IsPuppetOwned
+        and ActorControl.IsPuppetOwned(record)
+    then
+        return false
+    end
     if not canContinue(record, zombie, state, Service.CurrentTime(at)) then
         return false
     end

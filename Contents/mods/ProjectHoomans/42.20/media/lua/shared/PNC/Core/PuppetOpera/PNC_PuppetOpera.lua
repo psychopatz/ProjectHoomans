@@ -134,6 +134,7 @@ function Opera.BuildSnapshot(session, includeTrace)
         snapshot.actors[actorID] = {
             id = actor.id,
             kind = actor.kind,
+            bindingID = actor.bindingID,
             label = actor.label,
             anchor = actor.anchor,
             state = actor.state,
@@ -142,6 +143,8 @@ function Opera.BuildSnapshot(session, includeTrace)
             facing = actor.facing == true,
             movementOwned = actor.movementOwned == true,
             animationOwned = actor.animationOwned == true,
+            overrideOwned = actor.overrideOwned == true,
+            overrideOwnerKind = actor.overrideOwnerKind,
             lastReason = actor.lastReason,
             lastUpdateAt = actor.lastUpdateAt,
         }

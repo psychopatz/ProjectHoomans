@@ -752,6 +752,8 @@ Routes.Register({
     Assign = function(record)
         local live = PNC.Registry and PNC.Registry.GetLiveZombie
             and PNC.Registry.GetLiveZombie(record.id) or nil
+        local order = routeOrder(record)
+        local camped = Routes.IsCamped(record)
         local available, fullType, itemID = Routes.HasPersonalFood(record)
         if not available then return nil, "PERSONAL_FOOD_MISSING" end
         return {
@@ -762,9 +764,15 @@ Routes.Register({
             activityItemID = itemID,
             activityItemFullType = fullType,
             target = {
-                x = tonumber(record.x) or 0,
-                y = tonumber(record.y) or 0,
-                z = tonumber(record.z) or 0,
+                -- A camped NPC eats at its assigned room anchor. A follower
+                -- that has no camp keeps the existing current-position
+                -- behavior, so this route remains useful outside camps.
+                x = camped and (tonumber(order.x) or tonumber(record.x) or 0)
+                    or tonumber(record.x) or 0,
+                y = camped and (tonumber(order.y) or tonumber(record.y) or 0)
+                    or tonumber(record.y) or 0,
+                z = camped and (tonumber(order.z) or tonumber(record.z) or 0)
+                    or tonumber(record.z) or 0,
             },
             executionMode = live and "LIVE" or "ABSTRACT",
         }

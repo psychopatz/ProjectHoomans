@@ -4,6 +4,7 @@ local Planner = PNC.EnginePathPlanner
 local Internal = Planner.Internal
 local Core = PNC.Core
 local Diagnostics = PNC.PerformanceScalingDiagnostics
+local ActorControl = PNC.ActorControl
 
 local function suppressConflictingNativeState(body, navigation, now)
     local liveBodyControl = PNC.LiveBodyControl
@@ -47,6 +48,17 @@ function Planner.Pump(record, body, source)
         or not navigation.nativeActive
     then
         return false, "native_inactive"
+    end
+    -- PathService owns the Puppet movement claim.  If the scene is in a
+    -- beat/facing/arrival phase, do not let a scheduled Behavior2/native pump
+    -- recreate walking or clear the scene's pending route.  Active scene
+    -- movement carries the matching claim and is allowed through this same
+    -- boundary.
+    if ActorControl and ActorControl.IsPuppetOwned
+        and ActorControl.IsPuppetOwned(record)
+        and not ActorControl.CanPump(record)
+    then
+        return false, "puppet_opera_owned"
     end
     local now = Core and Core.Now and Core.Now() or 0
     source = tostring(source or "scheduled")

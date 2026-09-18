@@ -46,6 +46,15 @@ T.falsy(handled, "fresh work progress should not recover")
 T.equal(state, "HEALTHY", "fresh work progress state")
 T.equal(#stopped, 0, "fresh work progress should not stop the lease")
 
+local resumed = {
+    leaseId = "resumed", npcId = "resumed-npc", sourceDomain = "work",
+    phase = "WORKING", startedAt = 0, lastProgressAt = 0,
+    puppetOperaResumeAt = 1000,
+}
+handled, state = H.RecoverStalledLease(resumed, 60000)
+T.falsy(handled, "a restored task should receive a fresh watchdog window")
+T.equal(state, "HEALTHY", "restored task watchdog baseline")
+
 Tasking.Providers.work = {
     GetRecoveryState = function()
         return { lastProgressAt = 59000, phase = "WORKING" }
@@ -79,6 +88,12 @@ T.equal(stopped[1].reason, "task_progress_timeout",
     "stall recovery reason")
 T.equal(Tasking.Diagnostics.counters.stallRecoveries, 1,
     "stall recovery diagnostic")
+
+handled, state = H.RecoverStalledLease(resumed, 61001)
+T.truthy(handled, "a task stalled after restore should still recover")
+T.equal(state, "RECOVERED", "restored task eventual recovery state")
+T.equal(resumed.puppetOperaResumeAt, 1000,
+    "resume baseline should remain until provider reports progress")
 
 local cleanupFailure = {
     leaseId = "cleanup", npcId = "three", sourceDomain = "work",
@@ -173,6 +188,10 @@ T.contains(core, "TASK_PROVIDER_RECOVERY_UNSUPPORTED",
     "watchdog providers require recovery snapshots")
 T.contains(pump, "RecoverStalledLease", "pump stall watchdog")
 T.contains(pump, "RecoverExecutorFailure", "pump executor recovery")
+T.contains(pump, "if not suspended then promoteMaterializedLease(lease) end",
+    "Puppet ownership pauses abstract-task promotion")
+T.contains(T.read(ROOT .. "PNC/Tasking/Tasking/PNC_Tasking_Recovery.lua"),
+    "puppetOperaResumeAt", "Puppet resume watchdog baseline")
 T.contains(provider, "RecordRecovery", "durable work recovery counter")
 T.contains(provider, "recoveryQuarantined", "quarantined work exclusion")
 T.contains(commands, "function Service.Commands.Quarantine",

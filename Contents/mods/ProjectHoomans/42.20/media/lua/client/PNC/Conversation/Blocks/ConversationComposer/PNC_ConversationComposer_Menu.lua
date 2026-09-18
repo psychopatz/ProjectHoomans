@@ -234,6 +234,21 @@ function Composer.BuildRootNode(context, options)
                 end,
             }
         elseif not recruited then
+            if context.ambientVisitPreview
+                and context.ambientVisitPreview.eligible == true
+            then
+                choices[#choices + 1] = {
+                    id = "ambient_visit",
+                    text = dialoguePayload(
+                        SYSTEM_SOURCE,
+                        "choice.ambient_visit",
+                        context
+                    ),
+                    action = function()
+                        Composer.RequestAmbientVisit(context.npcID)
+                    end,
+                }
+            end
             local function setRecruitPreview(highlighted)
                 local relationship = Conversation.Relationship
                     or PNC.Conversation.Relationship
@@ -331,6 +346,7 @@ function Composer.BuildRootNode(context, options)
     local requiredSystemKeys = {
         "status.block_unavailable", "status.choice_rejected",
         "choice.show_debug_text", "choice.settlement_admission",
+        "choice.ambient_visit",
     }
     for _, key in ipairs(RECRUIT_SYSTEM_KEYS) do
         requiredSystemKeys[#requiredSystemKeys + 1] = key

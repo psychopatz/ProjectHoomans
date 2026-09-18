@@ -3,6 +3,7 @@
 local Planner = PNC.EnginePathPlanner
 local Internal = Planner.Internal
 local Core = PNC.Core
+local ActorControl = PNC.ActorControl
 
 local function recordSinglePlayerNativeFrame(
     record,
@@ -49,6 +50,12 @@ end
 function Planner.PumpFrame(record, body)
     if Core and Core.IsAuthority and not Core.IsAuthority() then
         return false, "client_replica"
+    end
+    if ActorControl and ActorControl.IsPuppetOwned
+        and ActorControl.IsPuppetOwned(record)
+        and not ActorControl.CanPump(record)
+    then
+        return false, "puppet_opera_owned"
     end
     local lane = record and record.runtime and record.runtime.pathing or nil
     if not lane or lane.phase ~= "active" then
@@ -161,7 +168,10 @@ function Planner.PumpServerFrame()
         then
             Planner.Pump(record, body, "server_tick")
             pumped = pumped + 1
-        else
+        elseif not (ActorControl and ActorControl.IsPuppetOwned
+            and ActorControl.IsPuppetOwned(record)
+            and not ActorControl.CanPump(record))
+        then
             Internal.ClearEngineRequest(body, navigation)
         end
     end

@@ -14,6 +14,8 @@ local Resources = PNC.FacilityResources
 local Targets = PNC.FacilityInteractionTargets
 local Reservations = PNC.FacilityReservations
 local Diagnostics = PNC.PerformanceScalingDiagnostics
+local ActorControl = PNC.ActorControl
+    or require "PNC/Core/ActorControl/PNC_ActorControl"
 
 local function facilityJobs()
     return PNC.FacilityJobs or Jobs
@@ -127,6 +129,11 @@ local function canAttempt(record, zombie, roaming, at)
     then
         return false
     end
+    if ActorControl and ActorControl.IsPuppetOwned
+        and ActorControl.IsPuppetOwned(record)
+    then
+        return false
+    end
     if at < (tonumber(roaming.idleSince) or at) + Service.MIN_IDLE_MS then
         return false
     end
@@ -136,6 +143,11 @@ local function canAttempt(record, zombie, roaming, at)
     if runtime and (runtime.facilityActivity or runtime.workOrderId
         or runtime.attackAction or runtime.combatTarget
         or at < (tonumber(runtime.inCombatUntil) or 0))
+    then
+        return false
+    end
+    if ActorControl and ActorControl.IsPuppetOwned
+        and ActorControl.IsPuppetOwned(record)
     then
         return false
     end
@@ -470,6 +482,11 @@ local function startSeat(record, zombie, at, ownerKind)
     local sceneId
     local reservationPurpose = ownerKind == "guard"
         and GUARD_RESERVATION_PURPOSE or RESERVATION_PURPOSE
+    if ActorControl and ActorControl.IsPuppetOwned
+        and ActorControl.IsPuppetOwned(record)
+    then
+        return false
+    end
     if not beginAttempt(id, at) then return false end
     candidate = findSeat(record, zombie)
     if not candidate or not reservationsService
@@ -581,6 +598,11 @@ function Service.Tick(record, zombie, at)
     local started
     at = currentTime(at)
     if not state then return false end
+    if ActorControl and ActorControl.IsPuppetOwned
+        and ActorControl.IsPuppetOwned(record)
+    then
+        return false
+    end
     if not isSeatOrder(record, state) or not zombie
         or record.alive == false
     then
@@ -687,6 +709,11 @@ function Service.OnSceneTick(record, zombie, scene, at)
     local state = runtime and runtime.roamingSeat or nil
     at = currentTime(at)
     if not state or not scene or scene.id ~= state.sceneId then return false end
+    if ActorControl and ActorControl.IsPuppetOwned
+        and ActorControl.IsPuppetOwned(record)
+    then
+        return false
+    end
     if not zombie or not isSeatOrder(record, state)
         or record.alive == false
     then

@@ -54,6 +54,16 @@ Router.Register(Const.CMD_CONVERSATION_SETTLEMENT_ADMISSION_REQUEST,
         end
     end)
 
+Router.Register(Const.CMD_CONVERSATION_AMBIENT_VISIT_REQUEST,
+    function(player, args)
+        local conversation = PNC.Conversation
+        if conversation and conversation.Authority
+            and conversation.Authority.HandleAmbientVisit
+        then
+            conversation.Authority.HandleAmbientVisit(player, args)
+        end
+    end)
+
 Router.Register(Const.CMD_CONVERSATION_DEPARTURE_REQUEST,
     function(player, args)
         local conversation = PNC.Conversation

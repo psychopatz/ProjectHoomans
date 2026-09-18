@@ -146,12 +146,18 @@ visibleHint = {
     score = 1,
 }
 T.truthy(PNC.Client.SendCompanionCommand(
-    "camp", nil, "group"
+    "camp", nil, "group", {
+        targets = { { id = "owned" }, { id = "owned_second" } },
+    }
 ), "campfire group camp was rejected despite a visible site")
 T.equal(executeCount, 2,
     "campfire group camp did not reach the order executor")
 T.equal(lastArgs.campSiteHint.scope, "campfire",
     "campfire group camp did not attach the client site hint")
+T.equal(lastArgs.targetIDs[1], "owned",
+    "group camp omitted the first compact nearby target id")
+T.equal(lastArgs.targetIDs[2], "owned_second",
+    "group camp omitted the second compact nearby target id")
 T.equal(rejectionCount, 0,
     "campfire group camp presented a safety warning")
 

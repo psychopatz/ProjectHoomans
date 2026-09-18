@@ -89,6 +89,24 @@ local function stateFor(lease, at, reportedProgressAt)
     return state, progressAt
 end
 
+-- Puppet Opera pauses the task executor without completing or cancelling the
+-- durable task. Keep the watchdog clock paused as well. The provider's
+-- progress field intentionally remains untouched so a real task update still
+-- wins as soon as the provider resumes.
+local function progressBaseline(lease, snapshot)
+    local progressAt = tonumber(snapshot and snapshot.lastProgressAt)
+        or tonumber(lease and lease.lastProgressAt)
+    local resumedAt = tonumber(lease and lease.puppetOperaResumeAt)
+    if resumedAt then
+        if progressAt and progressAt >= resumedAt then
+            lease.puppetOperaResumeAt = nil
+        else
+            progressAt = resumedAt
+        end
+    end
+    return progressAt
+end
+
 local function refreshProviderState(lease)
     local provider = lease and Tasking.Providers
         and Tasking.Providers[lease.sourceDomain]
@@ -251,7 +269,7 @@ function H.RecoverStalledLease(lease, at)
         return nil, "NOT_APPLICABLE"
     end
     local state, progressAt = stateFor(lease, at,
-        snapshot and snapshot.lastProgressAt)
+        progressBaseline(lease, snapshot))
     local timeoutMs = snapshot and tonumber(snapshot.timeoutMs)
         or Tasking.PROGRESS_TIMEOUT_MS
     if snapshot and snapshot.forceRecovery == true then

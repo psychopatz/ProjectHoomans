@@ -152,7 +152,7 @@ local function onResetLua()
     ClientState.playerEmoteInteractionResultOrder = {}
     ClientState.socialGreetingResults = {}
     ClientState.socialGreetingResultOrder = {}
-    local context = PNC.HoomansLLM and PNC.HoomansLLM.Context
+    local context = PNC.PBrainZ and PNC.PBrainZ.Context
     if context and context.ResetTransientState then
         context.ResetTransientState()
     end

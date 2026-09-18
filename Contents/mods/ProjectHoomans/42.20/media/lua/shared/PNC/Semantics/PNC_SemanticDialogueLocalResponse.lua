@@ -23,6 +23,11 @@ local LEGACY_TEXT_FALLBACKS = {
     ["semantic.question.weather"] =
         "I can't tell what the weather's doing right now.",
     ["semantic.question.identity"] = "I'm a survivor.",
+    ["semantic.identity.exchange"] = "Nice to meet you. I'm a survivor.",
+    ["semantic.identity.evasion"] =
+        "I asked you your name. Don't just change the subject.",
+    ["semantic.social.self_reflection"] =
+        "Don't talk about yourself like that.",
     ["semantic.question.location"] =
         "I know where they are, but not exactly.",
     ["semantic.question.location_unknown"] = "I don't know where they are.",
@@ -122,7 +127,7 @@ local function selectorContext(ir, state, context)
         emotionUrgency = emotion.urgency,
         healthState = npc.healthState,
         relationshipAttitude = social.attitude,
-        socialStyle = social.style,
+        socialStyle = context.socialStyle or social.style,
         hostilityCount = hostilityCount,
         insultCount = insultCount,
         lastSpeechAct = lastSpeechAct,
@@ -317,10 +322,33 @@ function Response.Resolve(ir, state, context, branch)
         }
     end
     if branch == "QUESTION_RECEIVED" and ir.subject == "IDENTITY" then
+        local text
+        if context and context.identityTrust == "untrustworthy" then
+            text = "I don't share my name with liars. What's yours, truthfully?"
+        elseif context and context.identityState == "known" then
+            text = identityText(context) .. " What's your name?"
+        else
+            text = "I'll tell you my name once we've established some trust."
+                .. " What's your name?"
+        end
         return {
             templateID = "semantic.question.identity",
-            fallback = identityText(context),
+            fallback = text,
             args = copyArgs({
+                npcName = context and (context.npcFullName or context.npcName),
+            }),
+        }
+    end
+    if branch == "IDENTITY_CLAIM_RECEIVED" then
+        local claim = ir.slots and ir.slots.identityClaim or {}
+        return {
+            templateID = "semantic.identity.exchange",
+            -- The authoritative identity-claim result decides whether the
+            -- NPC may disclose their own name. Do not leak it before the
+            -- server validates the player's claim.
+            fallback = "Nice to meet you. What's your name?",
+            args = copyArgs({
+                playerName = claim.name,
                 npcName = context and (context.npcFullName or context.npcName),
             }),
         }
@@ -420,6 +448,24 @@ function Response.Resolve(ir, state, context, branch)
                 intensity = ir.emotionalState
                     and ir.emotionalState.intensity,
                 hostilityCount = hostilityCount,
+            }
+        )
+    end
+    if branch == "SELF_REFLECTION_RECEIVED" then
+        return catalogResponse(
+            "semantic.self_reflection", ir, state, context, {
+                reflectionType = ir.socialContext
+                    and ir.socialContext.reflectionType,
+                relationshipState = context and context.relationshipState,
+                socialStyle = context and context.socialStyle,
+            }
+        )
+    end
+    if branch == "IDENTITY_NAME_EVASION" then
+        return catalogResponse(
+            "semantic.identity.evasion", ir, state, context, {
+                relationshipState = context and context.relationshipState,
+                socialStyle = context and context.socialStyle,
             }
         )
     end

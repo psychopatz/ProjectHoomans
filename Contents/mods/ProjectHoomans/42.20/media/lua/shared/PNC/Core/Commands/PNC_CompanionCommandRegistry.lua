@@ -233,6 +233,132 @@ local function copyTable(value)
     return output
 end
 
+-- CAMP diagnostics cross the network boundary, so keep them primitive and
+-- bounded. In particular, never serialize live Java objects or an entire zone
+-- directory just to explain why a member has not started walking yet.
+local function detailText(value, maximum)
+    local valueType = type(value)
+    local result
+    if value == nil then return nil end
+    if valueType ~= "string" and valueType ~= "number"
+        and valueType ~= "boolean"
+    then
+        return nil
+    end
+    result = tostring(value)
+    if maximum then result = string.sub(result, 1, maximum) end
+    return result ~= "" and result or nil
+end
+
+local function detailNumber(value)
+    value = tonumber(value)
+    if value ~= nil and value == value then return value end
+    return nil
+end
+
+local function compactCampSite(site)
+    local output
+    local bounds
+    if type(site) ~= "table" then return nil end
+    output = {
+        kind = detailText(site.kind, 32),
+        scope = detailText(site.scope or site.siteScope, 32),
+        siteID = detailText(site.siteID, 128),
+        roomID = detailText(site.roomID, 128),
+        buildingID = detailText(site.buildingID, 128),
+        roomType = detailText(site.roomType, 48),
+        roomName = detailText(site.roomName, 64),
+        campfireID = detailText(site.campfireID, 128),
+        label = detailText(site.label, 64),
+        risk = detailText(site.risk, 32),
+        x = detailNumber(site.x),
+        y = detailNumber(site.y),
+        z = detailNumber(site.z),
+        radius = detailNumber(site.radius),
+        resourceRadius = detailNumber(site.resourceRadius),
+        stopDistance = detailNumber(site.stopDistance),
+    }
+    bounds = site.roomBounds
+    if type(bounds) == "table" then
+        output.roomBounds = {
+            minX = detailNumber(bounds.minX or bounds.x),
+            minY = detailNumber(bounds.minY or bounds.y),
+            maxX = detailNumber(bounds.maxX or bounds.x2),
+            maxY = detailNumber(bounds.maxY or bounds.y2),
+            z = detailNumber(bounds.z),
+        }
+    end
+    return output
+end
+
+local function campLeaseFor(record)
+    local leases = PNC.TaskLeaseService
+    local ok
+    local lease
+    if not leases or type(leases.ForNPC) ~= "function" then return nil end
+    ok, lease = pcall(leases.ForNPC, record and record.id)
+    return ok and type(lease) == "table" and lease or nil
+end
+
+local function campCommandDetails(campID, site, records, route,
+    acceptedCount)
+    local output = {
+        version = 1,
+        route = detailText(route, 32) or "command",
+        campID = detailText(campID, 128),
+        placementMode = "root_only",
+        site = compactCampSite(site),
+        targetCount = 0,
+        acceptedCount = tonumber(acceptedCount) or 0,
+        targets = {},
+    }
+    local maximum = math.min(type(records) == "table" and #records or 0, 32)
+    for index = 1, maximum do
+        local record = records[index]
+        if record and record.id ~= nil then
+            local runtime = record.runtime or {}
+            local placement = runtime.campPlacement or {}
+            local order = record.orderSpec or {}
+            local lease = campLeaseFor(record)
+            local activity = runtime.facilityActivity or {}
+            local assignment = runtime.campZoneAssignment or {}
+            local state = detailText(placement.state, 24)
+                or detailText(order.placementState, 24)
+                or "arrived"
+            local target = {
+                npcID = detailText(record.id, 128),
+                state = state,
+                reason = detailText(placement.reason, 64)
+                    or detailText(order.zoneReason, 64),
+                orderKind = detailText(order.kind, 32),
+                activeJob = detailText(record.activeJob, 64),
+                activeBehavior = detailText(record.activeBehavior, 96),
+                taskLeaseID = detailText(lease and lease.leaseId, 128)
+                    or detailText(activity.taskLeaseId, 128),
+                leaseDomain = detailText(lease and lease.sourceDomain, 48),
+                leasePhase = detailText(lease and lease.phase, 32),
+                facilityCapability = detailText(activity.capability, 48),
+                facilityPhase = detailText(activity.phase, 32),
+                sleepWakePending = activity.sleepWakePending == true,
+                zoneID = detailText(assignment.zoneID or order.zoneID, 128),
+                zoneLabel = detailText(
+                    assignment.zoneLabel or order.zoneLabel, 64),
+                zoneNeedKind = detailText(
+                    assignment.needKind or order.zoneNeedKind, 32),
+            }
+            output.targets[#output.targets + 1] = target
+            output.targetCount = output.targetCount + 1
+            if output.placementState == nil then
+                output.placementState = state
+            end
+            if state == "moving" and output.activeNPCID == nil then
+                output.activeNPCID = target.npcID
+            end
+        end
+    end
+    return output
+end
+
 local function campValidationOrigin(record, player)
     local zombie = record and record.id and Registry.GetLiveZombie(record.id)
         or nil
@@ -277,16 +403,13 @@ local function validateCampSite(record, player, commandContext)
     return resolver.ValidateClientSite(target, validationContext)
 end
 
-local function isFollowingPlayer(record, player)
-    local order = record and record.orderSpec or nil
-    local ownerOnlineID
-    local playerOnlineID
-    local ownerUsername
-    local playerUsername
-    if not record or not player
-        or tostring(order and order.kind or "")
-            ~= tostring(Const.ORDER_FOLLOW or "follow")
-    then
+local function isOwnedCompanion(record, player)
+    -- Group CAMP is a command to nearby owned companions, not a command
+    -- restricted to records whose previous order happened to be FOLLOW.
+    -- CAMP replaces that previous order, so checking it here made the
+    -- server reject valid nearby companions that were guarding, roaming, or
+    -- already finishing another compatible order.
+    if not record or not player then
         return false
     end
     if not Commands.IsCompanion(record)
@@ -294,16 +417,102 @@ local function isFollowingPlayer(record, player)
     then
         return false
     end
-    ownerOnlineID = tonumber(order.ownerOnlineID or record.ownerOnlineID)
-    playerOnlineID = player.getOnlineID
-        and tonumber(player:getOnlineID()) or nil
-    if ownerOnlineID ~= nil and playerOnlineID ~= nil then
-        return ownerOnlineID == playerOnlineID
+    -- Do not duplicate the ownership identity fields here. The authoritative
+    -- verifier supports the current organization/character ownership model;
+    -- requiring legacy order owner fields would reject valid companions even
+    -- after the verifier has accepted them.
+    return true
+end
+
+-- A logical LIVE record is not enough for this command. Group camp is a
+-- nearby, materialized-world action: an abstract record has no body that can
+-- walk to its assigned room and must remain outside this assignment pass.
+local function materializedLive(record)
+    local body
+    if not record or record.alive == false
+        or tostring(record.presenceState or Const.PRESENCE_LIVE)
+            ~= tostring(Const.PRESENCE_LIVE)
+    then
+        return false
     end
-    ownerUsername = tostring(order.ownerUsername or record.ownerUsername or "")
-    playerUsername = player.getUsername
-        and tostring(player:getUsername() or "") or ""
-    return ownerUsername ~= "" and ownerUsername == playerUsername
+    body = record.id and Registry
+        and type(Registry.GetLiveZombie) == "function"
+        and Registry.GetLiveZombie(record.id) or nil
+    if not body
+        or type(body.getX) ~= "function"
+        or type(body.getY) ~= "function"
+        or type(body.getZ) ~= "function"
+    then
+        return false
+    end
+    if body.isDead and body:isDead() then return false end
+    return true, body
+end
+
+local function requestedTargetIDs(commandContext)
+    local values = commandContext and commandContext.targetIDs
+    local output
+    local seen
+    local value
+    local id
+    local maximum
+    if type(values) ~= "table" then return nil, false end
+    output = {}
+    seen = {}
+    maximum = math.min(#values, 32)
+    for index = 1, maximum do
+        value = values[index]
+        id = type(value) == "table" and value.id or value
+        if id ~= nil and tostring(id) ~= "" then
+            id = tostring(id)
+            if not seen[id] then
+                seen[id] = true
+                output[#output + 1] = id
+            end
+        end
+    end
+    return output, true
+end
+
+local function collectGroupCampRecipients(player, radius, commandContext)
+    local requested
+    local explicit
+    local output = {}
+    local seen = {}
+
+    requested, explicit = requestedTargetIDs(commandContext)
+
+    local function consider(record)
+        local live
+        local allowed
+        local id = record and record.id and tostring(record.id) or ""
+        if id == "" or seen[id] or not isOwnedCompanion(record, player)
+        then
+            return
+        end
+        allowed, live = materializedLive(record)
+        if not allowed or not live then return end
+        allowed = Commands.CanPlayerCommand(record, player, radius)
+        if allowed ~= true then return end
+        seen[id] = true
+        output[#output + 1] = record
+    end
+
+    if explicit then
+        for index = 1, #requested do
+            consider(Registry.Get(requested[index]))
+        end
+    elseif Registry.ForEach then
+        -- Compatibility for server-owned callers and older clients that do
+        -- not yet send the nearby candidate list. The same live/radius gate
+        -- still applies, so this fallback cannot revive the old distant or
+        -- abstract group-camp behavior.
+        Registry.ForEach(consider)
+    end
+    table.sort(output, function(left, right)
+        return tostring(left.id or "") < tostring(right.id or "")
+    end)
+    return output, explicit
 end
 
 local function nextGroupCampID(player)
@@ -414,6 +623,7 @@ function Commands.Apply(record, player, commandID, radius, commandContext)
     local orderSpec
     local orderOptions = commandContext
     local campSite
+    local details
     if not Core.IsAuthority() then return false, "not_authority" end
     if not definition then return false, "unknown_command" end
     if definition.clientOnly == true then
@@ -454,18 +664,34 @@ function Commands.Apply(record, player, commandID, radius, commandContext)
         record,
         "companion_command_" .. tostring(definition.id)
     )
-    return true, "commanded"
+    if tostring(commandID or "") == "camp" then
+        details = campCommandDetails(
+            orderSpec and orderSpec.campId,
+            campSite,
+            { record },
+            "single_command",
+            1
+        )
+    end
+    return true, "commanded", details
 end
 
 function Commands.ApplyGroupCamp(player, commandContext)
     local definition = Commands.Get("camp")
     local allowed
     local reason
-    local anchorX
-    local anchorY
-    local anchorZ
     local campID
     local campSite
+    local recipients
+    local directory
+    local assignments
+    local zoneService
+    local coordinator
+    local ownerKey
+    local coordinated
+    local coordinatedReason
+    local coordinatedTargets
+    local details
     local affected = 0
     local affectedTargets = {}
     if not Core.IsAuthority() then return 0, "not_authority", affectedTargets end
@@ -482,31 +708,138 @@ function Commands.ApplyGroupCamp(player, commandContext)
     end
     campSite, reason = validateCampSite(nil, player, commandContext)
     if not campSite then return 0, reason, affectedTargets end
-    anchorX, anchorY, anchorZ = campSite.x, campSite.y, campSite.z
     campID = nextGroupCampID(player)
-    Registry.ForEach(function(record)
-        local orderSpec
-        if not isFollowingPlayer(record, player) then return end
-        if type(definition.buildOrder) ~= "function" then return end
-        orderSpec = definition.buildOrder(record, player, {
-            x = anchorX, y = anchorY, z = anchorZ, campId = campID,
-            campSite = campSite,
+    recipients = collectGroupCampRecipients(player,
+        tonumber(commandContext and commandContext.radius)
+            or tonumber(Const.COMPANION_COMMAND_RADIUS) or 20,
+        commandContext)
+    if #recipients == 0 then
+        return 0, "no_targets", affectedTargets
+    end
+
+    -- A group camp is one authoritative placement session. The coordinator
+    -- installs the durable camp order for every accepted live recipient, but
+    -- starts only one movement owner; the rest remain queued until the
+    -- previous member arrives or fails. The first phase deliberately does
+    -- not build the full room/need directory: root arrival must succeed
+    -- before any adjacent-zone distribution work is admitted.
+    coordinator = PNC.CampMovementCoordinator
+    if coordinator and type(coordinator.StartGroupCamp) == "function" then
+        ownerKey = "player"
+        if player.getOnlineID then
+            local ok, onlineID = pcall(player.getOnlineID, player)
+            if ok and onlineID ~= nil then ownerKey = tostring(onlineID) end
+        end
+        if ownerKey == "player" and player.getUsername then
+            local ok, username = pcall(player.getUsername, player)
+            if ok and username ~= nil and tostring(username) ~= "" then
+                ownerKey = tostring(username)
+            end
+        end
+        local ok
+        ok, coordinated, coordinatedReason, coordinatedTargets = pcall(
+            coordinator.StartGroupCamp,
+            campSite,
+            recipients,
+            directory,
+            {
+                campId = campID,
+                ownerKey = ownerKey,
+                player = player,
+                now = Core.Now(),
+            }
+        )
+        if ok then
+            details = campCommandDetails(
+                campID,
+                campSite,
+                recipients,
+                "group_command",
+                coordinated or 0
+            )
+            return coordinated or 0,
+                coordinatedReason or "camp_coordinator_rejected",
+                coordinatedTargets or affectedTargets,
+                details
+        end
+        if Core.LogWarn then
+            Core.LogWarn("group camp coordinator failed reason="
+                .. tostring(coordinated))
+        end
+        return 0, "camp_coordinator_failed", affectedTargets
+    end
+
+    -- Compatibility fallback for builds without the coordinator. Keep the
+    -- old bounded root-only directory here; normal coordinator builds never
+    -- pay this scan during camp admission.
+    zoneService = PNC.CampZoneService
+    if zoneService and type(zoneService.BuildGroup) == "function" then
+        local ok
+        ok, directory = pcall(zoneService.BuildGroup, campSite, recipients, {
+            campId = campID,
+            player = player,
+            commandContext = commandContext,
+            rootOnly = true,
         })
-        if type(orderSpec) ~= "table" then return end
-        OrderSystem.SetOrder(record, orderSpec)
-        record.runtime = record.runtime or {}
-        record.runtime.lastCompanionCommand = "camp"
-        record.runtime.lastCompanionCommandAt = Core.Now()
-        record.runtime.lastCompanionCommandRevision =
-            (tonumber(record.runtime.lastCompanionCommandRevision) or 0) + 1
-        record.runtime.lastCompanionCommandOwner = player.getUsername
-            and tostring(player:getUsername() or "") or nil
-        Network.BroadcastRecord(record, "companion_command_camp")
-        affected = affected + 1
-        affectedTargets[#affectedTargets + 1] = tostring(record.id)
-    end)
+        if not ok or type(directory) ~= "table" then directory = nil end
+    end
+    assignments = directory and directory.assignments or nil
+
+    for index = 1, #recipients do
+        local record = recipients[index]
+        local orderSpec
+        local assignment = assignments
+            and assignments[tostring(record.id or "")] or nil
+        local assignedSite = assignment and assignment.zone or campSite
+        local options = copyTable(commandContext)
+        if type(definition.buildOrder) == "function" then
+            options.x = assignedSite and assignedSite.x or campSite.x
+            options.y = assignedSite and assignedSite.y or campSite.y
+            options.z = assignedSite and assignedSite.z or campSite.z
+            options.campId = campID
+            options.campSite = assignedSite
+            options.campRoot = campSite
+            options.zone = assignedSite
+            options.zoneAssignment = assignment
+            options.campDirectoryRevision = directory
+                and directory.revision or nil
+            orderSpec = definition.buildOrder(record, player, options)
+        end
+        if type(orderSpec) == "table" then
+            OrderSystem.SetOrder(record, orderSpec)
+            record.runtime = record.runtime or {}
+            record.runtime.lastCompanionCommand = "camp"
+            record.runtime.lastCompanionCommandAt = Core.Now()
+            record.runtime.lastCompanionCommandRevision =
+                (tonumber(record.runtime.lastCompanionCommandRevision) or 0) + 1
+            record.runtime.lastCompanionCommandOwner = player.getUsername
+                and tostring(player:getUsername() or "") or nil
+            if assignment then
+                record.runtime.campZoneAssignment = {
+                    zoneID = assignment.zoneID,
+                    zoneLabel = assignment.zoneLabel,
+                    needKind = assignment.needKind,
+                    reason = assignment.reason,
+                    score = assignment.score,
+                    revision = assignment.assignmentRevision,
+                }
+            else
+                record.runtime.campZoneAssignment = nil
+            end
+            Network.BroadcastRecord(record, "companion_command_camp")
+            affected = affected + 1
+            affectedTargets[#affectedTargets + 1] = tostring(record.id)
+        end
+    end
+    details = campCommandDetails(
+        campID,
+        campSite,
+        recipients,
+        "group_legacy",
+        affected
+    )
     return affected, affected > 0 and "commanded" or "no_targets",
-        affectedTargets
+        affectedTargets, details
 end
 
 function Commands.Execute(player, args)
@@ -528,6 +861,7 @@ function Commands.Execute(player, args)
     local z
     local distSq
     local affectedTargets = {}
+    local details
     if commandID == "" or not definition then
         return 0, "unknown_command"
     end
@@ -557,7 +891,7 @@ function Commands.Execute(player, args)
             end
         end)
         if not closestRecord then return 0, "no_targets" end
-        applied, reason = Commands.Apply(
+        applied, reason, details = Commands.Apply(
             closestRecord,
             player,
             commandID,
@@ -567,10 +901,10 @@ function Commands.Execute(player, args)
         if applied then
             affectedTargets[1] = tostring(closestRecord.id)
         end
-        return applied and 1 or 0, reason, affectedTargets
+        return applied and 1 or 0, reason, affectedTargets, details
     end
     if targetID ~= nil then
-        applied, reason = Commands.Apply(
+        applied, reason, details = Commands.Apply(
             Registry.Get(targetID),
             player,
             commandID,
@@ -578,13 +912,14 @@ function Commands.Execute(player, args)
             args
         )
         if applied then affectedTargets[1] = tostring(targetID) end
-        return applied and 1 or 0, reason, affectedTargets
+        return applied and 1 or 0, reason, affectedTargets, details
     end
     if definition.attackType ~= nil then
         return 0, "personalized_command"
     end
     Registry.ForEach(function(record)
-        applied, reason = Commands.Apply(record, player, commandID, radius, args)
+        applied, reason, details = Commands.Apply(
+            record, player, commandID, radius, args)
         if applied then
             affected = affected + 1
             affectedTargets[#affectedTargets + 1] = tostring(record.id)
@@ -593,7 +928,7 @@ function Commands.Execute(player, args)
         end
     end)
     return affected, affected > 0 and "commanded" or lastReason,
-        affectedTargets
+        affectedTargets, details
 end
 
 return Commands

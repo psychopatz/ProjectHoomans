@@ -5,6 +5,7 @@ local Internal = Planner.Internal
 local Core = PNC.Core
 local Const = PNC.Const or {}
 local Diagnostics = PNC.PerformanceScalingDiagnostics
+local ActorControl = PNC.ActorControl
 
 local function targetDriftSquared(navigation, finalTarget)
     local requestX = tonumber(navigation and navigation.requestX)
@@ -21,9 +22,24 @@ local function targetDriftSquared(navigation, finalTarget)
     return (dx * dx) + (dy * dy)
 end
 
-function Planner.GetSteeringTarget(record, body, finalTarget)
+function Planner.GetSteeringTarget(record, body, finalTarget, owner)
+    local allowed
     if not record or not body or type(finalTarget) ~= "table" then
         return finalTarget
+    end
+    if ActorControl and ActorControl.CanWrite then
+        allowed = ActorControl.CanWrite(
+            record,
+            owner,
+            "engine_path_steering",
+            {
+                reason = "engine_path_steering",
+                allowPuppetMovement = owner == nil,
+            }
+        )
+        if allowed == false then
+            return finalTarget
+        end
     end
     local navigation = Internal.EnsureNavigation(record)
     navigation.body = body

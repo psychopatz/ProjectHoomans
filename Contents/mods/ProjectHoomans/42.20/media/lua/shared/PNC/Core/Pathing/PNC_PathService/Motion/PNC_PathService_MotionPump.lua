@@ -3,6 +3,16 @@
 local PathService = PNC.PathService
 local Internal = PathService.Internal
 local Diagnostics = PNC.PerformanceScalingDiagnostics
+local ActorControl = PNC.ActorControl
+
+local function puppetMovementBlocked(record)
+    if not ActorControl or not ActorControl.IsPuppetOwned
+        or not ActorControl.IsPuppetOwned(record)
+    then
+        return false
+    end
+    return not ActorControl.CanPump(record)
+end
 
 local function recordPumpDiagnostics(record, zombie, caller)
     if not Diagnostics then
@@ -178,6 +188,10 @@ function PathService.Pump(record, zombie, caller)
         recordPumpDiagnostics(record, zombie, caller)
         return false, "no_live_body"
     end
+    if puppetMovementBlocked(record) then
+        recordPumpDiagnostics(record, zombie, caller)
+        return true, "puppet_opera_owned"
+    end
     local lane = Internal.ensureMoveLane(record)
     local now = Internal.Core.Now()
     local handled
@@ -247,6 +261,9 @@ function PathService.AdvanceScriptedPassage(record, zombie, caller)
     local runtime = record and record.runtime or nil
     if not zombie or not runtime then
         return false, "no_live_body"
+    end
+    if puppetMovementBlocked(record) then
+        return true, "puppet_opera_owned"
     end
     local lane = Internal.ensureMoveLane(record)
     local now = Internal.Core.Now()

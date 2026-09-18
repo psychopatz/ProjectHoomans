@@ -1,4 +1,4 @@
--- Compact, request-scoped results for Project Hoomans LLM gameplay tools.
+-- Compact, request-scoped results for PBrainZ gameplay tools.
 
 local Network = PNC.Network
 local Core = PNC.Core

@@ -11,6 +11,8 @@ PNC = {
         CMD_CONVERSATION_CATEGORY_REQUEST = "ConversationCategoryRequest",
         CMD_CONVERSATION_CHOICE_REQUEST = "ConversationChoiceRequest",
         CMD_CONVERSATION_RECRUIT_REQUEST = "ConversationRecruitRequest",
+        CMD_CONVERSATION_AMBIENT_VISIT_REQUEST =
+            "ConversationAmbientVisitRequest",
     },
     ConversationScene = {
         CMD_BEGIN = "conversationBegin",
@@ -34,6 +36,12 @@ PNC = {
             end,
             HandleRecruit = function(receivedPlayer, args)
                 received.recruit = { player = receivedPlayer, args = args }
+            end,
+            HandleAmbientVisit = function(receivedPlayer, args)
+                received.ambientVisit = {
+                    player = receivedPlayer,
+                    args = args,
+                }
             end,
         },
     },
@@ -75,6 +83,15 @@ T.equal(Router.Handle(
     recruitArgs
 ), true, "recruit handled")
 T.equal(received.recruit.args, recruitArgs, "recruit payload")
+
+local ambientVisitArgs = { npcID = "npc-1", requestID = "visit-1" }
+T.equal(Router.Handle(
+    "ConversationAmbientVisitRequest",
+    player,
+    ambientVisitArgs
+), true, "ambient visit handled")
+T.equal(received.ambientVisit.args, ambientVisitArgs,
+    "ambient visit payload")
 
 PNC.Conversation = nil
 T.equal(Router.Handle(

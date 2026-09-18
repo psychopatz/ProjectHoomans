@@ -33,6 +33,14 @@ function Composer.PumpLocalRequests()
                 request.player,
                 request.payload
             )
+        elseif request.command
+            == PNC.Const.CMD_CONVERSATION_AMBIENT_VISIT_REQUEST
+            and Conversation.Authority.HandleAmbientVisit
+        then
+            Conversation.Authority.HandleAmbientVisit(
+                request.player,
+                request.payload
+            )
         elseif request.command == PNC.Const.CMD_CONVERSATION_DEPARTURE_REQUEST
             and Conversation.Authority.HandleDeparture
         then
@@ -62,6 +70,32 @@ function Composer.RequestSettlementAdmission(npcID)
             npcID = tostring(npcID),
             token = lifecycle.token,
             visitID = visit and visit.visitID or nil,
+            registryFingerprint = Registry.GetFingerprint(),
+        }
+    )
+    if not sent then
+        view.spec.context.pendingConversationRequest = nil
+        notifyFailure(view, "status.choice_rejected", reason)
+    end
+    return sent, reason
+end
+
+function Composer.RequestAmbientVisit(npcID)
+    local view = activeView(npcID)
+    local lifecycle = lifecycleState(view)
+    if not view then return false, "conversation_not_ready" end
+    if not lifecycle then
+        notifyFailure(view, "status.choice_rejected", "conversation_not_ready")
+        return false, "conversation_not_ready"
+    end
+    local id = requestID("ambient_visit")
+    view.spec.context.pendingConversationRequest = id
+    local sent, reason = sendRequest(
+        PNC.Const.CMD_CONVERSATION_AMBIENT_VISIT_REQUEST,
+        {
+            requestID = id,
+            npcID = tostring(npcID),
+            token = lifecycle.token,
             registryFingerprint = Registry.GetFingerprint(),
         }
     )

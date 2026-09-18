@@ -232,7 +232,7 @@ T.truthy(semanticInputIndex,
     "conversation runtime loads the semantic input boundary")
 local inlineChatIndex = indexOf(
     conversationRuntimeCalls,
-    "PNC/Integrations/HoomansLLM/PNC_HoomansLLM_InlineChat"
+    "PNC/Integrations/PBrainZ/PNC_PBrainZ_InlineChat"
 )
 T.truthy(inlineChatIndex and inlineChatIndex < semanticInputIndex,
     "semantic input loads after inline dependencies")

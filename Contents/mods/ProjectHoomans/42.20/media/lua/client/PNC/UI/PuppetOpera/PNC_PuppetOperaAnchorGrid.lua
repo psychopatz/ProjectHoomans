@@ -179,9 +179,12 @@ function ISPNCPuppetOperaAnchorGrid:render()
     for _, row in ipairs(rows) do
         local x, y = self:cellPoint(row.right, row.forward)
         local selected = row.selected == true
-        local color = row.kind == "nearby_live_npc"
-            and { r = 0.92, g = 0.58, b = 0.28 }
-            or { r = 0.32, g = 0.82, b = 0.96 }
+        local assigned = row.bindingID ~= nil
+        local color = selected
+            and { r = 0.96, g = 0.78, b = 0.20 }
+            or assigned
+            and { r = 0.30, g = 0.84, b = 0.52 }
+            or { r = 0.52, g = 0.56, b = 0.60 }
         local radius = selected and 11 or 9
         self:drawRect(
             x - radius,
@@ -215,7 +218,8 @@ function ISPNCPuppetOperaAnchorGrid:render()
             UIFont.Small
         )
         self:drawTextCentre(
-            tostring(row.right) .. "," .. tostring(row.forward),
+            tostring(row.kind == "unbound" and "?"
+                or row.right) .. "," .. tostring(row.forward),
             x,
             y - 5,
             0.08,
@@ -271,7 +275,7 @@ function ISPNCPuppetOperaAnchorGrid:render()
     end
     self:drawText(
         tr("UI_PNC_PuppetOpera_GridHint",
-            "Drag live actors or markers onto an empty tile."),
+            "Gray = empty slot, green = assigned actor, yellow = selected."),
         10,
         self:getHeight() - 22,
         0.62,
@@ -312,6 +316,9 @@ function ISPNCPuppetOperaAnchorGrid:onMouseDown(x, y)
         return false
     end
     self.model.SelectActor(actor.id)
+    if self.ownerWindow then
+        self.ownerWindow:refreshViews()
+    end
     self.dragActorID = actor.id
     self.dragX = x
     self.dragY = y

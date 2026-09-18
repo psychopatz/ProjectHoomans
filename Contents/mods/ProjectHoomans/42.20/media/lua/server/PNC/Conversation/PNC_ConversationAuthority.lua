@@ -16,6 +16,7 @@ require "PNC/Conversation/ConversationAuthority/PNC_ConversationAuthority_Valida
 require "PNC/Conversation/ConversationAuthority/PNC_ConversationAuthority_Category"
 require "PNC/Conversation/ConversationAuthority/PNC_ConversationAuthority_Recruit"
 require "PNC/Conversation/ConversationAuthority/PNC_ConversationAuthority_SettlementAdmission"
+require "PNC/Conversation/ConversationAuthority/PNC_ConversationAuthority_AmbientVisit"
 require "PNC/Conversation/ConversationAuthority/PNC_ConversationAuthority_Departure"
 require "PNC/Conversation/ConversationAuthority/PNC_ConversationAuthority_Choice"
 

@@ -101,7 +101,7 @@ getGameTime = function()
     return { getWorldAgeHours = function() return 49 end }
 end
 
-T.load("ProjectHoomans", "client", "PNC/Integrations/HoomansLLM/PNC_HoomansLLM.lua")
+T.load("ProjectHoomans", "client", "PNC/Integrations/PBrainZ/PNC_PBrainZ.lua")
 
 local Message = PsychopatzCore.Conversation.Message
 local Sync = PNC.ConversationMemorySync
@@ -144,7 +144,7 @@ local view = {
 function view:isConversationInteractive() return true end
 PsychopatzCore.Conversation.instance = view
 
-local Integration = PNC.HoomansLLM
+local Integration = PNC.PBrainZ
 local longReply = string.rep("A", 5000)
 local submitted = Integration.Submit(view, "Hello")
 T.truthy(submitted, "LLM request submitted")
@@ -192,7 +192,7 @@ T.equal(batch.messages[2].messageID, "llm-response:" .. packet.request_id,
 -- submission, polling, persistence, and detached-delivery pipeline.
 local headlessView = {
     headless = true,
-    hoomansLLM = true,
+    pbrainz = true,
     spec = {
         npcID = "npc-two",
         characterUUID = "player-one",
@@ -288,7 +288,7 @@ T.equal(releases[2].requestID, inlinePacket.request_id,
 -- same serial poll/deliver pipeline, one request per recipient.
 local secondView = {
     headless = true,
-    hoomansLLM = true,
+    pbrainz = true,
     spec = {
         npcID = "npc-three",
         characterUUID = "player-one",
@@ -353,7 +353,7 @@ socialReactionAccepted = false
 local activeMessages = {}
 local activeView = {
     headless = true,
-    hoomansLLM = true,
+    pbrainz = true,
     spec = {
         npcID = "npc-four",
         characterUUID = "player-one",

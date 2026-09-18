@@ -12,6 +12,7 @@ require "PNC/Conversation/Blocks/ConversationComposer/PNC_ConversationComposer_B
 require "PNC/Conversation/Blocks/ConversationComposer/PNC_ConversationComposer_Outcomes"
 require "PNC/Conversation/Blocks/ConversationComposer/PNC_ConversationComposer_Recruitment"
 require "PNC/Conversation/Blocks/ConversationComposer/PNC_ConversationComposer_SettlementAdmission"
+require "PNC/Conversation/Blocks/ConversationComposer/PNC_ConversationComposer_AmbientVisit"
 require "PNC/Conversation/Blocks/ConversationComposer/PNC_ConversationComposer_Departure"
 require "PNC/Conversation/Blocks/ConversationComposer/PNC_ConversationComposer_GiftPresentation"
 require "PNC/Conversation/Blocks/ConversationComposer/PNC_ConversationComposer_Gifts"

@@ -8,16 +8,27 @@ local Core = PNC.Core
 local LiveBodyControl = PNC.LiveBodyControl
 local LocomotionProfiles = PNC.LocomotionProfiles
 local AnimationTrace = PNC.AnimationTrace
+local ActorControl = PNC.ActorControl
 
 function Animation.ApplyLiveSetup(zombie, record)
     local descriptor
     local releasedDamageReaction = false
+    local accepted
     if not zombie or not record then
         return
     end
     if Animation.IsBumpActionActive(zombie) then
         Internal.applyBumpLeaseBodyMode(zombie)
         return false
+    end
+    if ActorControl and ActorControl.CanWrite then
+        accepted = ActorControl.CanWrite(
+            record,
+            nil,
+            "animation_live_setup",
+            { reason = "animation_live_setup" }
+        )
+        if accepted ~= true then return false end
     end
     if zombie.setNoTeeth then
         zombie:setNoTeeth(true)
@@ -97,6 +108,7 @@ function Animation.Apply(zombie, record, animState, profileOverride, movingOverr
     local profile
     local moving
     local animSpeed
+    local accepted
     if not zombie or not record then
         return
     end
@@ -107,13 +119,28 @@ function Animation.Apply(zombie, record, animState, profileOverride, movingOverr
         Internal.applyBumpLeaseBodyMode(zombie)
         return false
     end
-    profile = Internal.resolveProfile(record, profileOverride, animState)
-    Internal.setPNCStateVars(zombie, record, animState)
     if movingOverride ~= nil then
         moving = movingOverride == true
     else
-        moving = animState == "Run" or animState == "Walk" or animState == "SneakWalk" or animState == "Crawl"
+        moving = animState == "Run"
+            or animState == "Walk"
+            or animState == "SneakWalk"
+            or animState == "Crawl"
     end
+    if ActorControl and ActorControl.CanWrite then
+        accepted = ActorControl.CanWrite(
+            record,
+            nil,
+            "animation_apply",
+            {
+                allowPuppetMovement = moving == true,
+                reason = "animation_apply:" .. tostring(animState or ""),
+            }
+        )
+        if accepted ~= true then return false end
+    end
+    profile = Internal.resolveProfile(record, profileOverride, animState)
+    Internal.setPNCStateVars(zombie, record, animState)
     animSpeed = tonumber(profile and profile.animSpeed) or 1.0
     Internal.setLocomotionVars(zombie, profile, moving, animSpeed)
     Internal.applyWalkType(zombie, profile and profile.engineWalkType or "", animSpeed)

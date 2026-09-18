@@ -72,7 +72,8 @@ local identity = router:Preview(
 )
 T.equal(identity.ir.subject, "IDENTITY",
     "identity question is represented semantically")
-T.equal(identity.decision.response.fallback, "I'm Mara Hale.",
+T.equal(identity.decision.response.fallback,
+    "I'm Mara Hale. What's your name?",
     "identity response uses authorized conversation context")
 
 T.finish("pnc_semantic_state_response_smoke")

@@ -15,6 +15,16 @@ local function isFollowOwnerLane(lane)
         == tostring(Const.ORDER_FOLLOW or "follow")
 end
 
+local function isCampAnchorLane(lane)
+    if not lane then return false end
+    if tostring(lane.intentReason or "") == "camp_anchor" then
+        return true
+    end
+    return tostring(lane.requestedOrder or "") == tostring(
+        Const.ORDER_CAMP or "camp"
+    )
+end
+
 local function activateNativeFallback(record, lane, now, reason)
     local router = PNC.NavigationRouter
     local durationMs = math.max(
@@ -53,11 +63,12 @@ local function handleNativeFailure(
     lane.lastStepAt = now
     lane.lastStepDistance = 0
     lane.lastStepLabel = nativeState
-    if isFollowOwnerLane(lane) then
-        -- Follow is a durable player command.  Native failure is a provider
-        -- failure, not an order failure: keep the lane alive and give the
-        -- scripted mover the same destination so it can approach/interact
-        -- with a doorway or recover from a stale engine ownership state.
+    if isFollowOwnerLane(lane) or isCampAnchorLane(lane) then
+        -- Follow and camp are durable local movement commands. Native
+        -- failure is a provider failure, not an order failure: keep the lane
+        -- alive and give the scripted mover the same destination so it can
+        -- approach/interact with a doorway or recover from stale engine
+        -- ownership state.
         activateNativeFallback(
             record,
             lane,

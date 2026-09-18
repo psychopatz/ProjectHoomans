@@ -491,7 +491,7 @@ T.equal(record.runtime.conversationParley, nil,
 -- it can create a combat-gated scene lease. The fallback keeps the exact
 -- selected entry instead of resolving a different nearest NPC.
 local fallbackCalls = {}
-PNC.HoomansLLM = {
+PNC.PBrainZ = {
     RequestInlineFallback = function(entry, reason, view)
         fallbackCalls[#fallbackCalls + 1] = {
             entry = entry,
@@ -521,7 +521,7 @@ T.equal(fallbackCalls[1].entry, spec.context.entry,
     "handoff keeps the selected conversation entry")
 T.equal(fallbackCalls[1].reason, "hostile_nameplate_fallback",
     "handoff records a diagnostic reason")
-PNC.HoomansLLM = nil
+PNC.PBrainZ = nil
 
 -- The visual conversation can close while the provider is still working. A
 -- request lease keeps only that exact asynchronous request authorized.

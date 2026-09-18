@@ -8,11 +8,25 @@ local Internal = PNC.PathService.Internal
 local Core = Internal.Core
 local Animation = Internal.Animation
 local MotionHints = Internal.MotionHints
+local ActorControl = PNC.ActorControl
 
 function Internal.setWalkAnim(zombie, record, mode, force)
     local lane = record and record.runtime and record.runtime.pathing or nil
     local profile = lane and lane.motionProfile or nil
     local moveAnim = profile and profile.moveAnim or "Walk"
+    local accepted
+    if ActorControl and ActorControl.CanWrite then
+        accepted = ActorControl.CanWrite(
+            record,
+            nil,
+            "path_walk_animation",
+            {
+                allowPuppetMovement = true,
+                reason = "path_walk_animation",
+            }
+        )
+        if accepted ~= true then return false end
+    end
     -- Engine paths must never pass through the fake-locomotion animator.
     -- Animation.Apply writes bMoving/setMoving and creates WalkTowardState;
     -- PathFindBehavior2 then owns path2 at the same time, which the engine
@@ -43,11 +57,28 @@ function Internal.applyHoldAnimation(zombie, record, lane)
     local animationScene = record and record.runtime
         and record.runtime.animationScene or nil
     local profile = lane and lane.motionProfile or nil
+    local accepted
+    local allowPuppetMovement
     if not zombie or not record then
         return
     end
     if attackAction and Core.Now() < (tonumber(attackAction.finishAt) or 0) then
         return
+    end
+    allowPuppetMovement = lane and Core.Now() < (
+        tonumber(lane.visualMovingUntil) or 0
+    ) or false
+    if ActorControl and ActorControl.CanWrite then
+        accepted = ActorControl.CanWrite(
+            record,
+            nil,
+            "path_hold_animation",
+            {
+                allowPuppetMovement = allowPuppetMovement,
+                reason = "path_hold_animation",
+            }
+        )
+        if accepted ~= true then return false end
     end
     if animationScene and animationScene.bump then
         -- AnimationScenes owns stationary presentation while a work/social

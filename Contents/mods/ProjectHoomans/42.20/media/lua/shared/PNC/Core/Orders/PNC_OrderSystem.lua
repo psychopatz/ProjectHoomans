@@ -54,6 +54,10 @@ local CAMP_BLOCKED_TASK_DOMAINS = {
     farming = true,
     fishing = true,
     scavenge = true,
+    -- NeedFacility leases are also behavior owners. If they survive the
+    -- camp transition they can immediately select a bed/chair/water scene
+    -- and consume the tick before AtCamp gets a chance to move the NPC.
+    NeedFacility = true,
 }
 
 local function releaseCampBlockedTask(record)
@@ -86,6 +90,32 @@ local function releaseCampBlockedTask(record)
         return false, reason or "WORK_ASSIGNMENT_RELEASE_FAILED"
     end
     return true
+end
+
+local function cancelSemanticActionPlan(record, reason)
+    local semantics = PNC.Semantics
+    local service = semantics and semantics.ActionPlanService or nil
+    local mutable
+    local result
+    local ok
+    if not record then return end
+    if service and type(service.GetMutable) == "function" then
+        ok, mutable = pcall(service.GetMutable, record.id)
+        if not ok then mutable = nil end
+    end
+    if record.semanticActionPlan == nil and not mutable then return end
+    if service and type(service.Cancel) == "function" then
+        ok, result = pcall(service.Cancel, record.id,
+            reason or "camp_entered")
+        if ok and result == true then return end
+        if Core.LogWarn then
+            Core.LogWarn("semantic plan cleanup failed npc="
+                .. tostring(record.id or "") .. " reason="
+                .. tostring(reason or "camp_entered"))
+        end
+        if service.ByNPC then service.ByNPC[tostring(record.id)] = nil end
+    end
+    record.semanticActionPlan = nil
 end
 
 function OrderSystem.RegisterNormalizer(kind, normalizer)
@@ -165,9 +195,40 @@ function OrderSystem.SetOrder(record, orderSpec)
         and (orderSpec.kind or orderSpec.mode) or "")
     local activeFacility = record.runtime
         and record.runtime.facilityActivity or nil
+    local pendingCampPlacement
     record.runtime = record.runtime or {}
 
+    -- CampMovementCoordinator writes the placement lock before calling this
+    -- function. Capture it across cleanup because facility/lease teardown can
+    -- synchronously re-enter SetOrder and a nested order transition may clear
+    -- runtime camp state before the requested camp order is normalized.
     if requestedKind == tostring(Const.ORDER_CAMP or "camp") then
+        pendingCampPlacement = record.runtime.campPlacement
+    end
+
+    -- A facility activity owns the behavior tick regardless of which durable
+    -- order was last persisted. This catches stale runtime activity left
+    -- behind after a previous order transition, and it must happen before
+    -- lease cleanup so the facility abort path cannot restore the old order
+    -- over the camp request.
+    if requestedKind ~= "facility_activity"
+        and activeFacility
+        and PNC.FacilityJobs
+        and PNC.FacilityJobs.AbortForOrderChange
+    then
+        PNC.FacilityJobs.AbortForOrderChange(
+            record,
+            nil,
+            requestedKind == tostring(Const.ORDER_CAMP or "camp")
+                and "camp_entered" or "order_changed"
+        )
+        previousOrder = record.orderSpec
+        previousKind = tostring(previousOrder and previousOrder.kind or "")
+        activeFacility = record.runtime.facilityActivity
+    end
+
+    if requestedKind == tostring(Const.ORDER_CAMP or "camp") then
+        cancelSemanticActionPlan(record, "camp_entered")
         local released, releaseReason = releaseCampBlockedTask(record)
         if released == false and Core.LogWarn then
             Core.LogWarn("camp_task_release_failed npc="
@@ -180,6 +241,11 @@ function OrderSystem.SetOrder(record, orderSpec)
         previousOrder = record.orderSpec
         previousKind = tostring(previousOrder and previousOrder.kind or "")
         activeFacility = record.runtime.facilityActivity
+        if pendingCampPlacement
+            and not record.runtime.campPlacement
+        then
+            record.runtime.campPlacement = pendingCampPlacement
+        end
     end
 
     -- A blocking facility scene owns the behavior tick until it is stopped.
@@ -192,10 +258,39 @@ function OrderSystem.SetOrder(record, orderSpec)
         and PNC.FacilityJobs
         and PNC.FacilityJobs.AbortForOrderChange
     then
-        PNC.FacilityJobs.AbortForOrderChange(record, nil, "order_changed")
+        PNC.FacilityJobs.AbortForOrderChange(
+            record,
+            nil,
+            requestedKind == tostring(Const.ORDER_CAMP or "camp")
+                and "camp_entered" or "order_changed"
+        )
+    end
+
+    if requestedKind == tostring(Const.ORDER_CAMP or "camp")
+        and pendingCampPlacement
+        and not record.runtime.campPlacement
+    then
+        record.runtime.campPlacement = pendingCampPlacement
     end
 
     record.orderSpec = OrderSystem.Normalize(record, orderSpec)
+    if tostring(record.orderSpec.kind or "")
+        ~= tostring(Const.ORDER_CAMP or "camp")
+    then
+        -- A queued camp placement is runtime coordination state, not a
+        -- general NPC lock. Clear it when another durable order supersedes
+        -- camp so stale placement data cannot block the next need/job.
+        record.runtime.campPlacement = nil
+        record.runtime.campZoneAssignment = nil
+    elseif record.runtime.campPlacement
+        and tostring(record.runtime.campPlacement.campID or "")
+            ~= tostring(record.orderSpec.campId or "")
+    then
+        -- A new camp session must not inherit the previous session's queue
+        -- state, even when the new order is also a camp order.
+        record.runtime.campPlacement = nil
+        record.runtime.campZoneAssignment = nil
+    end
     -- A return complaint belongs only to the follow order that created it.
     -- Clear it at the durable order boundary so an NPC that is reassigned
     -- while abstract cannot later deliver stale follow-phase commentary.
@@ -253,6 +348,7 @@ function OrderSystem.SetOrder(record, orderSpec)
     if tostring(record.orderSpec.kind or "")
         == tostring(Const.ORDER_CAMP or "camp")
         and previousKind ~= tostring(Const.ORDER_CAMP or "camp")
+        and record.orderSpec.ambientNoNeeds ~= true
         and PNC.Tasking and PNC.Tasking.Events
         and PNC.Tasking.Events.Emit
     then

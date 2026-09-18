@@ -22,6 +22,8 @@ local NPCMovement = Opera.NPCMovement
     or require "PNC/PuppetOpera/PNC_PuppetOpera_NPCMovementAdapter"
 local NPCAnimation = Opera.NPCAnimation
     or require "PNC/PuppetOpera/PNC_PuppetOpera_NPCAnimationAdapter"
+local NPCOverride = Opera.Override
+    or require "PNC/PuppetOpera/PNC_PuppetOpera_OverrideAdapter"
 
 local Authority = Opera.Authority or {}
 Opera.Authority = Authority
@@ -133,6 +135,14 @@ end
 
 local function unsafeNPCActionState(body)
     return UNSAFE_NPC_ACTION_STATES[npcActionState(body)] == true
+end
+
+local function nonCombatBumpCanBeReleased(body)
+    local modData = body and body.getModData and body:getModData() or nil
+    return npcActionState(body) == "bumped"
+        and modData
+        and modData.PNC_BumpActionLease == true
+        and modData.PNC_BumpNonCombat == true
 end
 
 local function actorFailureReason(reason, actorID, body)
@@ -425,6 +435,11 @@ local function releaseActors(session)
             then
                 NPCMovement.Release(session, actor)
             end
+            if actor.overrideOwned
+                or NPCOverride.IsOwned(actor.record, session.sessionId)
+            then
+                NPCOverride.Release(session, actor)
+            end
             clearNPCLease(session, actor)
         end
     end
@@ -471,10 +486,10 @@ end
 
 local function resolveBlueprint(args)
     args = type(args) == "table" and args or {}
-    local blueprintID = tostring(args.blueprintId or "social.kiss_test")
+    local blueprintID = tostring(args.blueprintId or "social.kiss_player_npc")
     local blueprint = Blueprints.Get(blueprintID)
-    if not blueprint then return nil, "blueprint_not_found" end
     if type(args.definition) ~= "table" then
+        if not blueprint then return nil, "blueprint_not_found" end
         return blueprint
     end
     local normalized, reason = Blueprints.Normalize(
@@ -549,13 +564,58 @@ local function supportedActors(blueprint)
     local actorID
     local definition
     for actorID, definition in pairs(blueprint.actors or {}) do
-        if definition.kind ~= "local_player"
-            and definition.kind ~= "nearby_live_npc"
-        then
+        local allowed = definition.kind and { definition.kind }
+            or definition.allowedKinds or {}
+        local hasRuntimeKind = false
+        for _, actorKind in ipairs(allowed) do
+            if actorKind == "local_player"
+                or actorKind == "nearby_live_npc"
+            then
+                hasRuntimeKind = true
+                break
+            end
+        end
+        if not hasRuntimeKind then
             return false, "actor_kind_not_supported:" .. tostring(actorID)
         end
     end
     return true
+end
+
+local function actorAllowsKind(definition, actorKind)
+    if not definition then return false end
+    if definition.kind then return definition.kind == actorKind end
+    for _, allowedKind in ipairs(definition.allowedKinds or {}) do
+        if allowedKind == actorKind then return true end
+    end
+    return false
+end
+
+local function requestedBinding(args, actorID, definition)
+    local bindings = type(args) == "table"
+        and type(args.actors) == "table" and args.actors or {}
+    local binding = bindings[actorID]
+    if not binding and tostring(actorID) == "npc"
+        and type(args) == "table"
+    then
+        binding = args.npcID
+    end
+    if not binding and definition and definition.kind == "local_player" then
+        binding = "__local_player__"
+    end
+    if binding == nil or tostring(binding) == "" then return nil end
+    return tostring(binding)
+end
+
+local function playerReadiness(player, actorID, playerReason)
+    return {
+        actorID = tostring(actorID),
+        bindingID = "__local_player__",
+        kind = "local_player",
+        ready = playerReason == nil,
+        reason = playerReason,
+        reasonDetail = playerReason or "ready",
+    }
 end
 
 local function buildNPCReadiness(player, actorID, npcID, allowedSession)
@@ -570,6 +630,8 @@ local function buildNPCReadiness(player, actorID, npcID, allowedSession)
         distance = nil,
         reason = nil,
         reasonDetail = nil,
+        suspendable = false,
+        overrideOwnerKind = nil,
     }
     if not npcID or tostring(npcID) == "" then
         result.reason = "npc_binding_missing"
@@ -595,7 +657,21 @@ local function buildNPCReadiness(player, actorID, npcID, allowedSession)
     local distance = distanceSquared(player, body)
     result.distance = distance and math.sqrt(distance) or nil
 
-    local reason = invalidNPC(record, body, allowedSession)
+    local overrideReady
+    local overrideInfo
+    overrideReady, overrideInfo = NPCOverride.GetReadiness(record, body, {
+        sessionId = allowedSession and allowedSession.sessionId or nil,
+    })
+    if overrideReady then
+        result.suspendable = overrideInfo.suspendable == true
+        result.overrideOwnerKind = overrideInfo.ownerKind
+        result.reasonDetail = overrideInfo.suspendable
+            and "suspendable:" .. tostring(overrideInfo.ownerKind or "idle")
+            or "ready"
+    end
+
+    local reason
+    if not overrideReady then reason = overrideInfo end
     if not reason and not inRange(
         player,
         body,
@@ -616,7 +692,7 @@ local function buildNPCReadiness(player, actorID, npcID, allowedSession)
 
     result.ready = true
     result.reason = nil
-    result.reasonDetail = "ready"
+    if not result.reasonDetail then result.reasonDetail = "ready" end
     return result
 end
 
@@ -641,27 +717,31 @@ local function buildPreflight(player, args)
     local ownerSession = Authority.ByOwner[ownerID(player)]
     local allowedSession = ownerSession and ownerSession.previewOnly
         and ownerSession or nil
-    local bindings = type(args) == "table"
-        and type(args.actors) == "table" and args.actors or {}
     local npcCount = 0
     for actorID, definition in pairs(blueprint.actors or {}) do
-        if definition.kind == "local_player" then
-            result.actors[actorID] = {
-                actorID = tostring(actorID),
-                bindingID = "__local_player__",
-                kind = definition.kind,
-                ready = playerReason == nil,
-                reason = playerReason,
-                reasonDetail = playerReason or "ready",
-            }
-            if playerReason then result.ready = false end
-        elseif definition.kind == "nearby_live_npc" then
-            local npcID = bindings[actorID]
-            if not npcID and tostring(actorID) == "npc"
-                and type(args) == "table"
-            then
-                npcID = args.npcID
+        local binding = requestedBinding(args, actorID, definition)
+        if binding == "__local_player__" then
+            if not actorAllowsKind(definition, "local_player") then
+                result.ready = false
+                result.reason = result.reason
+                    or "actor_kind_not_allowed:local_player:"
+                        .. tostring(actorID)
+            else
+                result.actors[actorID] = playerReadiness(
+                    player,
+                    actorID,
+                    playerReason
+                )
+                if playerReason then result.ready = false end
             end
+        elseif binding then
+            if not actorAllowsKind(definition, "nearby_live_npc") then
+                result.ready = false
+                result.reason = result.reason
+                    or "actor_kind_not_allowed:nearby_live_npc:"
+                        .. tostring(actorID)
+            else
+                local npcID = binding
             local readiness = buildNPCReadiness(
                 player,
                 actorID,
@@ -675,11 +755,16 @@ local function buildPreflight(player, args)
                 result.ready = false
                 result.reason = result.reason or readiness.reasonDetail
             end
+            end
+        elseif definition.required ~= false then
+            result.ready = false
+            result.reason = result.reason
+                or "actor_binding_missing:" .. tostring(actorID)
         end
     end
     if npcCount == 0 then
         result.ready = false
-        result.reason = "runtime_actor_missing"
+        result.reason = result.reason or "runtime_actor_missing"
     end
 
     if playerReason == nil then
@@ -720,7 +805,7 @@ local function localActor(session)
     return nil, nil
 end
 
-local function makeSession(player, blueprint, resolvedNPCs, plan, loopEnabled)
+local function makeSession(player, blueprint, resolvedActors, plan, loopEnabled)
     Authority.Serial = Authority.Serial + 1
     local timestamp = now()
     local sessionID = "puppet:" .. tostring(timestamp) .. ":"
@@ -738,34 +823,28 @@ local function makeSession(player, blueprint, resolvedNPCs, plan, loopEnabled)
     session.plan = plan
     for _, actorID in ipairs(orderedActorIDs(blueprint)) do
         local definition = blueprint.actors[actorID]
+        local resolved = resolvedActors[actorID]
         local actor = {
             id = actorID,
-            kind = definition.kind,
+            kind = resolved.kind,
+            bindingID = resolved.bindingID,
             label = definition.label,
             anchor = definition.anchor,
             target = plan.actors[actorID],
-            body = definition.kind == "local_player"
-                and player or resolvedNPCs[actorID].body,
-            record = definition.kind == "nearby_live_npc"
-                and resolvedNPCs[actorID].record or nil,
-            npcID = definition.kind == "nearby_live_npc"
-                and resolvedNPCs[actorID].id or nil,
+            body = resolved.body,
+            record = resolved.record,
+            npcID = resolved.kind == "nearby_live_npc"
+                and resolved.bindingID or nil,
             state = "pending",
             arrived = false,
             facing = false,
             movementOwned = false,
             animationOwned = false,
+            overrideOwned = false,
         }
         session.actors[actorID] = actor
         if actor.kind == "nearby_live_npc" then
             session.npcID = session.npcID or tostring(actor.npcID)
-            local record = actor.record
-            record.runtime = record.runtime or {}
-            record.runtime.puppetOperaLease = {
-                sessionId = session.sessionId,
-                ownerId = session.ownerId,
-                expiresAt = timestamp + Opera.Config.leaseDurationMs,
-            }
         end
     end
     trace(session, "session_created", {
@@ -776,18 +855,36 @@ local function makeSession(player, blueprint, resolvedNPCs, plan, loopEnabled)
     return session
 end
 
+local function claimNPCLease(session, actor)
+    local record = actor and actor.record or nil
+    local runtime = record and record.runtime or nil
+    if not runtime then return false end
+    local existing = runtime.puppetOperaLease
+    if existing
+        and tostring(existing.sessionId or "")
+            ~= tostring(session.sessionId or "")
+    then
+        return false
+    end
+    runtime.puppetOperaLease = {
+        sessionId = tostring(session.sessionId),
+        ownerId = tostring(session.ownerId or ""),
+        expiresAt = now() + Opera.Config.leaseDurationMs,
+    }
+    return true
+end
+
 local function startSession(player, args, previewOnly)
     args = type(args) == "table" and args or {}
     previewOnly = previewOnly == true
-    local blueprintID = tostring(args.blueprintId or "social.kiss_test")
+    local blueprintID = tostring(args.blueprintId or "social.kiss_player_npc")
     local blueprint, blueprintReason = resolveBlueprint(args)
     local current = Authority.ByOwner[ownerID(player)]
     local reason
     local plan
     local planOK
     local actorOK
-    local resolvedNPCs = {}
-    local bindings = type(args.actors) == "table" and args.actors or {}
+    local resolvedActors = {}
     local seenNPCs = {}
     local npcCount = 0
     if current then
@@ -807,21 +904,48 @@ local function startSession(player, args, previewOnly)
     reason = invalidPlayer(player)
     if reason then return false, reason end
 
-    -- Every live-NPC slot is bound by an id, then resolved and range-checked
-    -- on the server.  The legacy npcID field remains accepted for the
-    -- original two-slot blueprint only.
+    -- Every neutral slot is resolved from a server-validated live binding.
+    -- The legacy npcID field remains accepted for the original fixed `npc`
+    -- slot only. World bodies and positions are never accepted from the
+    -- client; only registry ids cross the transport boundary.
     for actorID, definition in pairs(blueprint.actors or {}) do
-        if definition.kind == "nearby_live_npc" then
-            local npcID = bindings[actorID]
-            if not npcID and tostring(actorID) == "npc" then
-                npcID = args.npcID
+        local binding = requestedBinding(args, actorID, definition)
+        if not binding then
+            if definition.required ~= false then
+                return false, "actor_binding_missing:" .. tostring(actorID)
             end
+        elseif binding == "__local_player__" then
+            if not actorAllowsKind(definition, "local_player") then
+                return false, "actor_kind_not_allowed:local_player:"
+                    .. tostring(actorID)
+            end
+            resolvedActors[tostring(actorID)] = {
+                kind = "local_player",
+                bindingID = "__local_player__",
+                body = player,
+                record = nil,
+            }
+        else
+            if not actorAllowsKind(definition, "nearby_live_npc") then
+                return false, "actor_kind_not_allowed:nearby_live_npc:"
+                    .. tostring(actorID)
+            end
+            local npcID = binding
             local record, body
+            local overrideReady
+            local overrideReason
             record, body, reason = resolveNPC(npcID)
             if not body then return false, reason end
-            reason = invalidNPC(record, body, nil)
-            if reason then
-                return false, actorFailureReason(reason, actorID, body)
+            overrideReady, overrideReason = NPCOverride.CanAcquire(
+                record,
+                body
+            )
+            if overrideReady ~= true then
+                return false, actorFailureReason(
+                    overrideReason,
+                    actorID,
+                    body
+                )
             end
             if not inRange(
                 player,
@@ -838,8 +962,9 @@ local function startSession(player, args, previewOnly)
                 return false, "npc_session_already_active:" .. tostring(actorID)
             end
             seenNPCs[resolvedID] = true
-            resolvedNPCs[tostring(actorID)] = {
-                id = resolvedID,
+            resolvedActors[tostring(actorID)] = {
+                kind = "nearby_live_npc",
+                bindingID = resolvedID,
                 record = record,
                 body = body,
             }
@@ -857,7 +982,7 @@ local function startSession(player, args, previewOnly)
     local session = makeSession(
         player,
         blueprint,
-        resolvedNPCs,
+        resolvedActors,
         plan,
         args.loop == true
     )
@@ -868,6 +993,23 @@ local function startSession(player, args, previewOnly)
     for _, actorID in ipairs(orderedActorIDs(blueprint)) do
         local actor = session.actors[actorID]
         if actor.kind == "nearby_live_npc" then
+            accepted, reason = NPCOverride.Acquire(session, actor)
+            if not accepted then
+                releaseActors(session)
+                unindexSession(session)
+                return false, reason or "npc_override_acquire_failed"
+            end
+            accepted = claimNPCLease(session, actor)
+            if not accepted then
+                releaseActors(session)
+                unindexSession(session)
+                return false, "npc_lease_claim_failed"
+            end
+            trace(session, "npc_override_acquired", {
+                actor = actorID,
+                ownerKind = actor.overrideOwnerKind,
+                reason = actor.lastReason,
+            })
             accepted, reason = NPCMovement.Start(session, actor)
             if not accepted then
                 releaseActors(session)
@@ -932,6 +1074,7 @@ local function activeSafety(session, timestamp)
             if not movementSafe then return false, reason end
             if unsafeNPCActionState(actor.body)
                 and not NPCAnimation.IsOwned(actor.body, session.sessionId)
+                and not nonCombatBumpCanBeReleased(actor.body)
             then
                 return false, actorFailureReason(
                     "npc_action_state_interrupted",
@@ -954,6 +1097,10 @@ local function activeSafety(session, timestamp)
                 return false, "npc_entered_combat:" .. tostring(actorID)
             end
             local runtime = actor.record and actor.record.runtime or nil
+            local overrideOwned = NPCOverride.IsOwned(
+                actor.record,
+                session.sessionId
+            )
             if runtime and (
                 runtime.target ~= nil
                     or runtime.combatTarget ~= nil
@@ -974,14 +1121,18 @@ local function activeSafety(session, timestamp)
                 then
                     return false, "npc_entered_combat:" .. tostring(actorID)
                 end
-                return false, "npc_behavior_ownership_lost:"
-                    .. tostring(actorID)
+                if not overrideOwned then
+                    return false, "npc_behavior_ownership_lost:"
+                        .. tostring(actorID)
+                end
             end
             if runtime and runtime.followState
                 and runtime.followState.ownerMoving == true
             then
-                return false, "npc_movement_ownership_lost:"
-                    .. tostring(actorID)
+                if not overrideOwned then
+                    return false, "npc_movement_ownership_lost:"
+                        .. tostring(actorID)
+                end
             end
             if not inRange(session.playerBody, actor.body, 20) then
                 return false, "actors_out_of_range:" .. tostring(actorID)
@@ -990,6 +1141,24 @@ local function activeSafety(session, timestamp)
     end
     if not refreshLease(session, timestamp) then
         return false, "npc_session_lease_lost"
+    end
+    return true
+end
+
+local function maintainOverrides(session, timestamp)
+    local actorID
+    local actor
+    local maintained
+    local reason
+    if not NPCOverride or not NPCOverride.Maintain then return true end
+    for actorID, actor in pairs(session.actors or {}) do
+        if actor.record then
+            maintained, reason = NPCOverride.Maintain(
+                session, actor, timestamp)
+            if maintained ~= true then
+                return false, actorFailureReason(reason, actorID, actor.body)
+            end
+        end
     end
     return true
 end
@@ -1167,7 +1336,7 @@ local function pumpPlaying(session, timestamp)
         for actorID, actor in pairs(session.actors or {}) do
             if actor.kind == "nearby_live_npc" then
                 local track = Blueprints.GetTrack
-                    and Blueprints.GetTrack(beat, actorID)
+                    and Blueprints.GetTrack(beat, actorID, actor.kind)
                     or beat.tracks and beat.tracks[actorID]
                     or beat.npc
                 accepted, reason = NPCAnimation.Start(
@@ -1200,7 +1369,7 @@ local function pumpPlaying(session, timestamp)
     for actorID, actor in pairs(session.actors or {}) do
         if actor.kind == "nearby_live_npc" and actor.animationOwned then
             local track = Blueprints.GetTrack
-                and Blueprints.GetTrack(beat, actorID)
+                and Blueprints.GetTrack(beat, actorID, actor.kind)
                 or beat.tracks and beat.tracks[actorID]
                 or beat.npc
             local ok
@@ -1244,6 +1413,11 @@ function Authority.PumpSession(session, timestamp)
     local safe
     local reason
     safe, reason = activeSafety(session, timestamp)
+    if not safe then
+        abortSession(session, reason)
+        return false
+    end
+    safe, reason = maintainOverrides(session, timestamp)
     if not safe then
         abortSession(session, reason)
         return false
@@ -1365,6 +1539,11 @@ function Authority.HandleRequest(player, args)
             abortSession(session, reason)
             return false, reason
         end
+        safe, reason = maintainOverrides(session, refreshAt)
+        if not safe then
+            abortSession(session, reason)
+            return false, reason
+        end
         session.phaseDeadline = refreshAt + (
             tonumber(Opera.Config.placementPreviewLeaseMs) or 30000
         )
@@ -1390,8 +1569,8 @@ function Authority.HandleRequest(player, args)
         if session then
             local actorBindings = {}
             for actorID, actor in pairs(session.actors or {}) do
-                if actor.kind == "nearby_live_npc" then
-                    actorBindings[actorID] = actor.npcID
+                if actor.bindingID then
+                    actorBindings[actorID] = actor.bindingID
                 end
             end
             local loop = session.loopEnabled

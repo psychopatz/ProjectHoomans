@@ -35,6 +35,8 @@ local function normalizeOrder(record, spec)
     local pauseMaxMs = math.max(pauseMinMs, tonumber(spec.pauseMaxMs) or Const.ROAM_PAUSE_MAX_MS)
     local roadBounds = type(spec.roadBounds) == "table"
         and spec.roadBounds or nil
+    local shelterBounds = type(spec.shelterBounds) == "table"
+        and spec.shelterBounds or nil
     return {
         kind = spec.kind == Const.ORDER_HOSTILE_ROAM
             and Const.ORDER_HOSTILE_ROAM or Const.ORDER_ROAM,
@@ -50,6 +52,19 @@ local function normalizeOrder(record, spec)
         pauseMaxMs = pauseMaxMs,
         shelterSiteID = type(spec.shelterSiteID) == "string"
             and spec.shelterSiteID or nil,
+        shelterBounds = shelterBounds and {
+            minX = tonumber(shelterBounds.minX),
+            minY = tonumber(shelterBounds.minY),
+            maxX = tonumber(shelterBounds.maxX),
+            maxY = tonumber(shelterBounds.maxY),
+            minZ = tonumber(shelterBounds.minZ),
+            maxZ = tonumber(shelterBounds.maxZ),
+        } or nil,
+        ambientMobile = spec.ambientMobile == true,
+        ambientObjective = type(spec.ambientObjective) == "string"
+            and spec.ambientObjective or nil,
+        ambientSourceID = type(spec.ambientSourceID) == "string"
+            and spec.ambientSourceID or nil,
         roadBounds = roadBounds and {
             minX = tonumber(roadBounds.minX),
             minY = tonumber(roadBounds.minY),
@@ -623,6 +638,18 @@ local function shelterMode(record, zombie, order)
         Common.ClearCombatTarget(record, "sheltered", zombie)
         Common.HaltMovement(record, zombie, "mobile_shelter")
         record.activeBehavior = "Roam:shelter:sheltered"
+        if order.ambientMobile == true
+            and order.ambientObjective == "shelter"
+            and PNC.AmbientVisitService
+            and PNC.AmbientVisitService.TryStartMobileShelter
+        then
+            PNC.AmbientVisitService.TryStartMobileShelter(
+                record,
+                zombie,
+                order,
+                now
+            )
+        end
         return true
     end
     Common.ClearCombatTarget(record, "moving_to_shelter", zombie)

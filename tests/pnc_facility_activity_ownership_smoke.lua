@@ -4,6 +4,8 @@ PNC = {
     Const = {
         ORDER_FOLLOW = "follow",
         ORDER_PATROL = "patrol",
+        ORDER_CAMP = "camp",
+        JOB_AT_CAMP = "AtCamp",
     },
 }
 
@@ -17,6 +19,7 @@ PNC.FacilityJobsBehaviorInternal = {
 T.load("ProjectHoomans", "shared", "PNC/Core/Jobs/PNC_JobSystem.lua")
 local JobSystem = PNC.JobSystem
 JobSystem.RegisterOrder("follow", "FollowOwner")
+JobSystem.RegisterOrder("camp", "AtCamp")
 
 local record = {
     orderSpec = { kind = "follow" },
@@ -86,5 +89,25 @@ T.truthy(JobSystem.IsFacilityActivityActive(record),
     "pending sleep wake retains behavior ownership")
 T.equal(JobSystem.Select(record), "FacilityActivity",
     "facility wake transaction wins over follow")
+
+-- Camp transit is the movement owner. A stale/manual facility activity must
+-- not take the actor back between coordinator ticks, while the native sleep
+-- wake transaction is still allowed to finish cleanly.
+record.orderSpec = { kind = "camp", placementState = "moving" }
+record.runtime.facilityActivity = {
+    capability = "survival.eat.inventory",
+    taskLeaseId = "lease:active",
+}
+liveLeases["lease:active"] = true
+T.equal(JobSystem.Select(record), "AtCamp",
+    "camp transit keeps movement ownership over stale facility work")
+
+record.runtime.facilityActivity = {
+    capability = "sleep",
+    stopRequested = true,
+    sleepWakePending = true,
+}
+T.equal(JobSystem.Select(record), "FacilityActivity",
+    "camp transit waits for native sleep wake cleanup")
 
 T.finish("pnc_facility_activity_ownership_smoke")

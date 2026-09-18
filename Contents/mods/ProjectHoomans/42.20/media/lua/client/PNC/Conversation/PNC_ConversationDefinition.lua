@@ -323,6 +323,7 @@ function Conversation.BuildDefinition(entry, player, forcedTime)
         conversationProfile = blockContext.conversationProfile,
         allowHostileParley = blockContext.playerHostile,
         settlementVisit = blockContext.settlementVisit,
+        ambientVisitPreview = blockContext.ambientVisitPreview,
         conversationBlockContext = blockContext,
         npcIdentitySeed = FlavorAddress.ResolveNPCSeed(entry, npcID),
     }
@@ -427,9 +428,9 @@ function Conversation.Open(entry, player, forcedTime)
     -- Keep this handoff targeted to the selected entry so it cannot silently
     -- switch the player to the nearest unrelated NPC.
     if isAggressive(entry)
-        and PNC.HoomansLLM
-        and PNC.HoomansLLM.OpenInlineForTarget
-        and PNC.HoomansLLM.OpenInlineForTarget(entry)
+        and PNC.PBrainZ
+        and PNC.PBrainZ.OpenInlineForTarget
+        and PNC.PBrainZ.OpenInlineForTarget(entry)
     then
         Relationship.RequestPresentation(npcID)
         if PNC.Client and PNC.Client.RequestNPCKnowledge then

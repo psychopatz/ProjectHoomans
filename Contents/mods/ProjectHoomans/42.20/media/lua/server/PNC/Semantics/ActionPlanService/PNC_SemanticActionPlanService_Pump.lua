@@ -11,6 +11,7 @@ local PlanInternal = Plan.Internal
 require "PNC/Semantics/PNC_SemanticDiagnostics"
 local Trace = PsychopatzCore and PsychopatzCore.DebugTrace
 local Diagnostics = PNC.Semantics.SemanticDiagnostics
+local ActorControl = PNC.ActorControl
 
 local function bounded(value, maximum)
     if value == nil then return nil end
@@ -322,6 +323,12 @@ function Service.Pump(at, budget)
             end
             Service.ClearRuntimeContext(plan.planID)
             Internal.RemoveActive(plan.planID)
+        elseif ActorControl and ActorControl.IsPuppetOwned
+            and ActorControl.IsPuppetOwned(record)
+        then
+            -- Keep the durable plan and its provider context intact while
+            -- Puppet Opera temporarily owns the live actor. Its normal
+            -- executor will resume after the presentation lease is released.
         else
             local changed = processPlan(plan, record, at)
             if changed then

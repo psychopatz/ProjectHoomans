@@ -63,6 +63,53 @@ local function hintCopy(hint)
     }
 end
 
+local function detailsCopy(details)
+    local output
+    local site
+    local targets
+    if type(details) ~= "table" then return nil end
+    output = {
+        version = number(details.version),
+        route = text(details.route, 32),
+        campID = text(details.campID, 128),
+        placementMode = text(details.placementMode, 32),
+        placementState = text(details.placementState, 24),
+        activeNPCID = text(details.activeNPCID, 128),
+        targetCount = number(details.targetCount),
+        acceptedCount = number(details.acceptedCount),
+    }
+    site = hintCopy(details.site)
+    if site then output.site = site end
+    targets = {}
+    if type(details.targets) == "table" then
+        for index = 1, math.min(#details.targets, 32) do
+            local target = details.targets[index]
+            if type(target) == "table" then
+                targets[#targets + 1] = {
+                    npcID = text(target.npcID, 128),
+                    state = text(target.state, 24),
+                    reason = text(target.reason, 64),
+                    orderKind = text(target.orderKind, 32),
+                    activeJob = text(target.activeJob, 64),
+                    activeBehavior = text(target.activeBehavior, 96),
+                    taskLeaseID = text(target.taskLeaseID, 128),
+                    leaseDomain = text(target.leaseDomain, 48),
+                    leasePhase = text(target.leasePhase, 32),
+                    facilityCapability = text(
+                        target.facilityCapability, 48),
+                    facilityPhase = text(target.facilityPhase, 32),
+                    sleepWakePending = target.sleepWakePending == true,
+                    zoneID = text(target.zoneID, 128),
+                    zoneLabel = text(target.zoneLabel, 64),
+                    zoneNeedKind = text(target.zoneNeedKind, 32),
+                }
+            end
+        end
+    end
+    output.targets = targets
+    return output
+end
+
 local function copyRecord(record)
     if type(record) ~= "table" then return nil end
     return {
@@ -76,10 +123,11 @@ local function copyRecord(record)
         commandSource = text(record.commandSource, 32),
         at = number(record.at),
         hint = hintCopy(record.hint),
+        details = detailsCopy(record.details),
     }
 end
 
-local function record(stage, status, reason, context, hint)
+local function record(stage, status, reason, context, hint, details)
     context = type(context) == "table" and context or {}
     local value = {
         stage = text(stage, 16),
@@ -92,6 +140,7 @@ local function record(stage, status, reason, context, hint)
         commandSource = text(context.commandSource or context.origin, 32),
         at = now(),
         hint = hintCopy(hint),
+        details = detailsCopy(details),
     }
     Diagnostics.revision = Diagnostics.revision + 1
     Diagnostics[stage] = value
@@ -126,7 +175,7 @@ function Diagnostics.RecordServer(args)
             scope = args.scope,
             requestID = args.requestID,
             commandSource = args.commandSource,
-        }, hint)
+        }, hint, args.details)
 end
 
 function Diagnostics.Get()

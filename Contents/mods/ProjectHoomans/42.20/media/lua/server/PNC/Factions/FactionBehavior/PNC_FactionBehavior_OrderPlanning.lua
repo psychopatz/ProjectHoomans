@@ -29,6 +29,15 @@ end
 local function desiredOrder(record, mode, owner, faction, preservePlayerOrder)
     local mobile = faction and faction.mobile
     local home = mobile and mobile.site and mobile.site.home
+    -- A visitor lease is a temporary server-authorized movement owner. Keep
+    -- faction reconciliation from replacing its room/camp order until the
+    -- lease expires or is explicitly released.
+    if PNC.AmbientVisitService
+        and PNC.AmbientVisitService.IsOrderProtected
+        and PNC.AmbientVisitService.IsOrderProtected(record)
+    then
+        return Core.DeepCopy(record.orderSpec or {})
+    end
     -- A player-owned order is an explicit command and must be resolved before
     -- mobile-faction ambient planning.  Otherwise an active mobile site can
     -- replace follow with roam/camp behavior on the next faction reconcile.

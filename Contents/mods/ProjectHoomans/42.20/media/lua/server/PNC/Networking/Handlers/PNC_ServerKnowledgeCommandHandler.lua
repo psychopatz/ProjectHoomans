@@ -18,6 +18,10 @@ Router.Register(Const.CMD_KNOWLEDGE_DISCLOSURE_REQUEST, function(player, args)
     PNC.PlayerKnowledgeCommands.HandleDisclosure(player, args)
 end)
 
+Router.Register(Const.CMD_SEMANTIC_IDENTITY_REQUEST, function(player, args)
+    PNC.PlayerKnowledgeCommands.HandleSemanticIdentity(player, args)
+end)
+
 local function handleWorldDiscovery(player, args)
     PNC.Network.SendWorldDiscovery(
         player,

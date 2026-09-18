@@ -530,6 +530,68 @@ Catalog.Register("semantic.gossip", {
     },
 })
 
+Catalog.Register("semantic.self_reflection", {
+    variants = {
+        {
+            id = "semantic.self_reflection.friendly",
+            templateID = "semantic.social.self_reflection.friendly",
+            fallback = "Hey. Don't talk about yourself like that. You matter.",
+            when = { socialStyle = { "friendly", "protective" } },
+            priority = 4,
+        },
+        {
+            id = "semantic.self_reflection.trusted",
+            templateID = "semantic.social.self_reflection.trusted",
+            fallback = "You're harder on yourself than you need to be.",
+            when = { relationshipState = { "Friend", "Trusted", "Ally" } },
+            priority = 3,
+        },
+        {
+            id = "semantic.self_reflection.withdrawn",
+            templateID = "semantic.social.self_reflection.withdrawn",
+            fallback = "Don't make a habit of saying things like that.",
+            when = { socialStyle = "withdrawn" },
+            priority = 2,
+        },
+        {
+            id = "semantic.self_reflection.stressed",
+            templateID = "semantic.social.self_reflection.stressed",
+            fallback = "We've all made mistakes. Focus on what comes next.",
+            when = { emotionType = { "stress", "panic" } },
+            priority = 1,
+        },
+        {
+            id = "semantic.self_reflection.default",
+            templateID = "semantic.social.self_reflection.default",
+            fallback = "Don't talk about yourself like that.",
+        },
+    },
+})
+
+Catalog.Register("semantic.identity.evasion", {
+    variants = {
+        {
+            id = "semantic.identity.evasion.friendly",
+            templateID = "semantic.identity.evasion.friendly",
+            fallback = "I asked you your name. I thought you trusted me.",
+            when = { socialStyle = { "friendly", "protective" } },
+            priority = 3,
+        },
+        {
+            id = "semantic.identity.evasion.withdrawn",
+            templateID = "semantic.identity.evasion.withdrawn",
+            fallback = "Forget it. Keep your name to yourself.",
+            when = { socialStyle = "withdrawn" },
+            priority = 2,
+        },
+        {
+            id = "semantic.identity.evasion.default",
+            templateID = "semantic.identity.evasion.default",
+            fallback = "You avoided my question. That makes me wary.",
+        },
+    },
+})
+
 Catalog.Register("semantic.hostile_remark", {
     variants = {
         {

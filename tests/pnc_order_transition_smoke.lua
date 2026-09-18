@@ -11,6 +11,7 @@ PNC = {
     Const = {
         ORDER_FOLLOW = "follow",
         ORDER_GUARD = "guard",
+        ORDER_CAMP = "camp",
         ORDER_PATROL = "patrol",
         ORDER_HOSTILE_HUNT = "hostile_hunt",
     },
@@ -26,9 +27,13 @@ PNC = {
     },
     FacilityJobs = {
         AbortForOrderChange = function(record, _, reason)
-            T.equal(record.orderSpec.kind, "facility_activity",
+            T.truthy(record.orderSpec.kind == "facility_activity"
+                    or record.orderSpec.kind == "camp",
                 "facility activity is still current during abort")
-            T.equal(reason, "order_changed", "order abort reason")
+            T.equal(reason,
+                record.orderSpec.kind == "camp"
+                    and "camp_entered" or "order_changed",
+                "order abort reason")
             facilityAbortCount = facilityAbortCount + 1
             record.runtime.facilityActivity = nil
             record.runtime.animationScene = nil
@@ -46,6 +51,10 @@ PNC = {
 }
 
 T.load(LUA_ROOT .. "Orders/PNC_OrderSystem.lua")
+PNC.OrderSystem.RegisterNormalizer("camp", function(_, spec)
+    return { kind = "camp", campId = spec.campId,
+        placementState = spec.placementState }
+end)
 
 local record = {
     id = "companion",
@@ -102,6 +111,25 @@ T.falsy(record.runtime.facilityActivity,
     "facility activity is gone before follow resumes")
 T.falsy(record.runtime.animationScene,
     "blocking facility scene is gone before follow resumes")
+
+-- A stale activity can survive with CAMP already persisted (for example after
+-- a previous wake/lease teardown). CAMP must still revoke that behavior owner
+-- and preserve the coordinator's movement lock while re-normalizing the order.
+record.orderSpec = { kind = "camp", campId = "camp:stale" }
+record.runtime.facilityActivity = { capability = "sleep" }
+record.runtime.campPlacement = { campID = "camp:stale", state = "moving" }
+PNC.OrderSystem.SetOrder(record, {
+    kind = "camp", campId = "camp:stale", placementState = "moving",
+})
+
+T.equal(facilityAbortCount, 2,
+    "camp transition aborts stale facility activity even when camp is current")
+T.equal(record.orderSpec.kind, "camp",
+    "stale facility cleanup does not replace the camp order")
+T.equal(record.runtime.campPlacement.state, "moving",
+    "camp placement lock survives stale facility cleanup")
+T.falsy(record.runtime.facilityActivity,
+    "stale facility activity is gone before camp movement resumes")
 T.finish("pnc_order_transition_smoke")
 
 T.finish("pnc_order_transition_smoke")

@@ -9,6 +9,18 @@ local Jobs = PNC.FacilityJobs
 local H = PNC.FacilityJobsServiceInternal
 local Repository = PNC.SettlementRepository
 local Diagnostics = PNC.PerformanceScalingDiagnostics
+local ActorControl = PNC.ActorControl
+    or require "PNC/Core/ActorControl/PNC_ActorControl"
+
+local function campPlacementLocked(record)
+    local runtime = record and record.runtime or nil
+    local placement = runtime and runtime.campPlacement or nil
+    local order = record and record.orderSpec or nil
+    local state = placement and placement.state
+        or order and order.placementState or nil
+    state = string.lower(tostring(state or ""))
+    return state == "queued" or state == "moving" or state == "failed"
+end
 
 local function copyApproachCandidates(candidates)
     if type(candidates) ~= "table" then return nil end
@@ -27,6 +39,22 @@ local function copyApproachCandidates(candidates)
                 interactionZ = tonumber(candidate.interactionZ),
                 interactionAxis = candidate.interactionAxis,
                 interactionFacing = candidate.interactionFacing,
+                sleepSlotId = candidate.sleepSlotId,
+                sleepSlotIndex = tonumber(candidate.sleepSlotIndex),
+                sleepCapacity = tonumber(candidate.sleepCapacity),
+                bedCapacity = tonumber(candidate.bedCapacity),
+                sleepAnchorX = tonumber(candidate.sleepAnchorX),
+                sleepAnchorY = tonumber(candidate.sleepAnchorY),
+                sleepAnchorZ = tonumber(candidate.sleepAnchorZ),
+                sleepAxis = candidate.sleepAxis,
+                sleepFacing = candidate.sleepFacing,
+                sleepSprite = candidate.sleepSprite,
+                sleepGridX = tonumber(candidate.sleepGridX),
+                sleepGridY = tonumber(candidate.sleepGridY),
+                sleepGridWidth = tonumber(candidate.sleepGridWidth),
+                sleepGridHeight = tonumber(candidate.sleepGridHeight),
+                sleepSurface = candidate.sleepSurface,
+                sceneId = candidate.sceneId,
                 approachKey = candidate.approachKey,
                 seatDirection = candidate.seatDirection
                     or candidate.direction,
@@ -45,6 +73,20 @@ end
 
 function Jobs.Start(record, facilityOrId, capability, options)
     options = type(options) == "table" and options or {}
+    if ActorControl and ActorControl.CanWrite then
+        local allowed, ownerReason = ActorControl.CanWrite(
+            record,
+            options.owner,
+            "facility_start",
+            { reason = options.reason or "facility_start" }
+        )
+        if allowed == false then
+            return false, ownerReason or "puppet_opera_owned"
+        end
+    end
+    if campPlacementLocked(record) then
+        return false, "camp_placement_active"
+    end
     local facility = type(facilityOrId) == "table" and facilityOrId
         or Repository.GetFacility(facilityOrId)
     local base = facility and PNC.BaseService.Get(facility.baseId) or nil
@@ -177,6 +219,13 @@ function Jobs.Start(record, facilityOrId, capability, options)
         manualCommandSource = tostring(options.manualCommandSource or ""),
         sleepVariant = tostring(options.sleepVariant
             or acquired.sleepVariant or ""),
+        sleepSlotId = tostring(target.sleepSlotId
+            or acquired.sleepSlotId or ""),
+        sleepSlotIndex = tonumber(target.sleepSlotIndex),
+        sleepCapacity = tonumber(target.sleepCapacity
+            or acquired.sleepCapacity),
+        bedCapacity = tonumber(target.bedCapacity
+            or target.sleepCapacity or acquired.sleepCapacity),
         sleepTargetPolicy = tostring(options.sleepTargetPolicy
             or acquired.sleepTargetPolicy or ""),
         sleepCompletionPolicy = capability == "sleep"
@@ -220,6 +269,45 @@ function Jobs.Start(record, facilityOrId, capability, options)
             or nil,
         campfireID = options.campfireID or acquired.campfireID
             or campOrderSpec and campOrderSpec.campfireID,
+        zoneID = options.zoneID or acquired.zoneID
+            or campOrderSpec and campOrderSpec.zoneID,
+        zoneLabel = options.zoneLabel or acquired.zoneLabel
+            or campOrderSpec and campOrderSpec.zoneLabel,
+        zoneScope = options.zoneScope or acquired.zoneScope
+            or campOrderSpec and campOrderSpec.zoneScope,
+        zoneNeedKind = options.zoneNeedKind or acquired.zoneNeedKind
+            or campOrderSpec and campOrderSpec.zoneNeedKind,
+        zoneReason = options.zoneReason or acquired.zoneReason
+            or campOrderSpec and campOrderSpec.zoneReason,
+        zoneScore = tonumber(options.zoneScore or acquired.zoneScore
+            or campOrderSpec and campOrderSpec.zoneScore),
+        zoneRevision = tonumber(options.zoneRevision or acquired.zoneRevision
+            or campOrderSpec and campOrderSpec.zoneRevision),
+        campRootX = tonumber(options.campRootX or acquired.campRootX
+            or campOrderSpec and campOrderSpec.campRootX),
+        campRootY = tonumber(options.campRootY or acquired.campRootY
+            or campOrderSpec and campOrderSpec.campRootY),
+        campRootZ = tonumber(options.campRootZ or acquired.campRootZ
+            or campOrderSpec and campOrderSpec.campRootZ),
+        campRootScope = options.campRootScope or acquired.campRootScope
+            or campOrderSpec and campOrderSpec.campRootScope,
+        campRootSiteID = options.campRootSiteID or acquired.campRootSiteID
+            or campOrderSpec and campOrderSpec.campRootSiteID,
+        campRootRoomID = options.campRootRoomID or acquired.campRootRoomID
+            or campOrderSpec and campOrderSpec.campRootRoomID,
+        campRootBuildingID = options.campRootBuildingID
+            or acquired.campRootBuildingID
+            or campOrderSpec and campOrderSpec.campRootBuildingID,
+        campRootRoomType = options.campRootRoomType or acquired.campRootRoomType
+            or campOrderSpec and campOrderSpec.campRootRoomType,
+        campRootRoomName = options.campRootRoomName or acquired.campRootRoomName
+            or campOrderSpec and campOrderSpec.campRootRoomName,
+        campRootRoomBounds = options.campRootRoomBounds
+            or acquired.campRootRoomBounds
+            or campOrderSpec and campOrderSpec.campRootRoomBounds,
+        campRootCampfireID = options.campRootCampfireID
+            or acquired.campRootCampfireID
+            or campOrderSpec and campOrderSpec.campRootCampfireID,
         campX = tonumber(options.campX or acquired.campX),
         campY = tonumber(options.campY or acquired.campY),
         campZ = tonumber(options.campZ or acquired.campZ),
@@ -291,6 +379,11 @@ function Jobs.Start(record, facilityOrId, capability, options)
         sleepGridY = target.sleepGridY,
         sleepGridWidth = target.sleepGridWidth,
         sleepGridHeight = target.sleepGridHeight,
+        sleepSlotId = target.sleepSlotId or acquired.sleepSlotId,
+        sleepSlotIndex = target.sleepSlotIndex,
+        sleepCapacity = target.sleepCapacity or acquired.sleepCapacity,
+        bedCapacity = target.bedCapacity or target.sleepCapacity
+            or acquired.sleepCapacity,
         approachKey = target.approachKey,
         seatDirection = target.seatDirection,
         seatSide = target.seatSide,
@@ -333,6 +426,45 @@ function Jobs.Start(record, facilityOrId, capability, options)
             and PNC.Core.DeepCopy(campRoomBounds) or nil,
         campfireID = options.campfireID or acquired.campfireID
             or campOrderSpec and campOrderSpec.campfireID,
+        zoneID = options.zoneID or acquired.zoneID
+            or campOrderSpec and campOrderSpec.zoneID,
+        zoneLabel = options.zoneLabel or acquired.zoneLabel
+            or campOrderSpec and campOrderSpec.zoneLabel,
+        zoneScope = options.zoneScope or acquired.zoneScope
+            or campOrderSpec and campOrderSpec.zoneScope,
+        zoneNeedKind = options.zoneNeedKind or acquired.zoneNeedKind
+            or campOrderSpec and campOrderSpec.zoneNeedKind,
+        zoneReason = options.zoneReason or acquired.zoneReason
+            or campOrderSpec and campOrderSpec.zoneReason,
+        zoneScore = tonumber(options.zoneScore or acquired.zoneScore
+            or campOrderSpec and campOrderSpec.zoneScore),
+        zoneRevision = tonumber(options.zoneRevision or acquired.zoneRevision
+            or campOrderSpec and campOrderSpec.zoneRevision),
+        campRootX = tonumber(options.campRootX or acquired.campRootX
+            or campOrderSpec and campOrderSpec.campRootX),
+        campRootY = tonumber(options.campRootY or acquired.campRootY
+            or campOrderSpec and campOrderSpec.campRootY),
+        campRootZ = tonumber(options.campRootZ or acquired.campRootZ
+            or campOrderSpec and campOrderSpec.campRootZ),
+        campRootScope = options.campRootScope or acquired.campRootScope
+            or campOrderSpec and campOrderSpec.campRootScope,
+        campRootSiteID = options.campRootSiteID or acquired.campRootSiteID
+            or campOrderSpec and campOrderSpec.campRootSiteID,
+        campRootRoomID = options.campRootRoomID or acquired.campRootRoomID
+            or campOrderSpec and campOrderSpec.campRootRoomID,
+        campRootBuildingID = options.campRootBuildingID
+            or acquired.campRootBuildingID
+            or campOrderSpec and campOrderSpec.campRootBuildingID,
+        campRootRoomType = options.campRootRoomType or acquired.campRootRoomType
+            or campOrderSpec and campOrderSpec.campRootRoomType,
+        campRootRoomName = options.campRootRoomName or acquired.campRootRoomName
+            or campOrderSpec and campOrderSpec.campRootRoomName,
+        campRootRoomBounds = options.campRootRoomBounds
+            or acquired.campRootRoomBounds
+            or campOrderSpec and campOrderSpec.campRootRoomBounds,
+        campRootCampfireID = options.campRootCampfireID
+            or acquired.campRootCampfireID
+            or campOrderSpec and campOrderSpec.campRootCampfireID,
         campX = tonumber(options.campX or acquired.campX),
         campY = tonumber(options.campY or acquired.campY),
         campZ = tonumber(options.campZ or acquired.campZ),

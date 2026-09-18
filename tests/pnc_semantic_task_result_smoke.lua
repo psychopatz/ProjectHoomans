@@ -3,6 +3,11 @@ T.addPackagePaths()
 
 PsychopatzCore = { Conversation = {} }
 PNC = { Semantics = {} }
+T.load(
+    "ProjectHoomans",
+    "client",
+    "PNC/Semantics/PNC_SemanticDialogueInput_Presentation.lua"
+)
 local Input = T.load(
     "ProjectHoomans",
     "client",
@@ -55,6 +60,79 @@ T.falsy(session.semanticTaskRequests["task:wait"],
 T.equal(queued[1].payload.fallback, "I'm here.",
     "completed wait task has a human-readable response")
 
+session.semanticTaskRequests["task:camp"] = {
+    action = "CAMP",
+    request = {
+        target = {
+            kind = "camp_site",
+            clientHint = {
+                label = "living room",
+                scope = "room",
+            },
+        },
+    },
+}
+local campAdmitted = Input.ReceiveSemanticTaskResult({
+    requestID = "task:camp",
+    npcID = "npc:alice",
+    action = "CAMP",
+    accepted = true,
+    status = "accepted",
+    siteLabel = "living room",
+    siteScope = "room",
+})
+T.equal(campAdmitted, true, "camp admission is accepted")
+T.equal(session.semanticTaskRequests["task:camp"].siteLabel,
+    "living room", "authoritative camp label is retained while pending")
+
+local campCompleted = Input.ReceiveSemanticTaskResult({
+    requestID = "task:camp",
+    npcID = "npc:alice",
+    action = "CAMP",
+    accepted = true,
+    status = "completed",
+})
+T.equal(campCompleted, true, "completed camp reaches the conversation queue")
+T.equal(queued[2].payload.fallback,
+    "We're set up in the living room.",
+    "completed camp response names the selected room")
+
+local immediateCamp = Input.Internal.QueueDeterministicResponse(
+    view,
+    "let's camp here",
+    {
+        ir = {},
+        decision = {
+            branch = "CAMP_REQUESTED",
+            action = "CAMP",
+            actionIntent = { action = "CAMP" },
+            response = {
+                templateID = "semantic.camp.requested",
+                fallback = "I'll find us a safe place to camp.",
+            },
+        },
+    },
+    {
+        accepted = true,
+        status = "accepted",
+        action = "CAMP",
+        request = {
+            target = {
+                kind = "camp_site",
+                clientHint = {
+                    label = "campfire",
+                    scope = "campfire",
+                },
+            },
+        },
+    }
+)
+T.equal(immediateCamp, true,
+    "camp admission acknowledgement is queued")
+T.equal(queued[3].payload.fallback,
+    "I'll set up camp by the campfire.",
+    "immediate camp acknowledgement names the observed campfire")
+
 session.semanticTaskRequests["task:give"] = { action = "GIVE" }
 local failed = Input.ReceiveSemanticTaskResult({
     requestID = "task:give",
@@ -68,11 +146,11 @@ local failed = Input.ReceiveSemanticTaskResult({
     admissionStepState = "BLOCKED",
 })
 T.equal(failed, true, "failed task reaches the conversation queue")
-T.equal(queued[2].payload.fallback, "I don't have that.",
+T.equal(queued[4].payload.fallback, "I don't have that.",
     "item failure has a semantic response")
-T.equal(queued[2].metadata.source.reason, "item_not_found",
+T.equal(queued[4].metadata.source.reason, "item_not_found",
     "internal failure reason remains available in metadata")
-T.equal(queued[2].metadata.source.admissionReason, "blocked",
+T.equal(queued[4].metadata.source.admissionReason, "blocked",
     "admission diagnostics remain available in metadata")
 
 T.finish("pnc_semantic_task_result_smoke")

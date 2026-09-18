@@ -44,6 +44,72 @@ local AnimationScenes = PNC.AnimationScenes
 local LiveBodyControl = PNC.LiveBodyControl
 local ScalingDiagnostics = PNC.PerformanceScalingDiagnostics
 local ActionPlanOwnership = PNC.BehaviorActionPlanOwnership
+local ActorControl = PNC.ActorControl
+
+local function tickPendingSleepWake(record, zombie)
+    local runtime = record and record.runtime or nil
+    local activity = runtime and runtime.facilityActivity or nil
+    local internal = PNC.FacilityJobsBehaviorInternal
+    if not activity
+        or tostring(activity.capability or "") ~= "sleep"
+        or activity.sleepWakePending ~= true
+        or not internal
+        or type(internal.TickSleepWake) ~= "function"
+    then
+        return false
+    end
+    -- A replacement animation scene is allowed to exist while an order
+    -- callback is unwinding, but it must not consume the tick that releases
+    -- the old sleep carrier. The wake transaction itself enforces authority
+    -- and ActorControl checks before any position or reservation write.
+    internal.TickSleepWake(record, zombie)
+    return true
+end
+
+local function puppetOperaOwnsBehavior(record)
+    local runtime = record and record.runtime or nil
+    local override = runtime and runtime.puppetOperaOverride or nil
+    if not override or tostring(override.sessionId or "") == "" then
+        return false
+    end
+    record.activeJob = "PuppetOpera"
+    record.activeBehavior = "PuppetOpera:"
+        .. tostring(override.sessionId)
+    return true
+end
+
+local function puppetOperaSafetyBoundary(record, zombie, now)
+    if not ActorControl or not ActorControl.IsPuppetOwned
+        or not ActorControl.IsPuppetOwned(record)
+    then
+        return false
+    end
+    if zombie and zombie.getVehicle and zombie:getVehicle() then
+        return true
+    end
+    if zombie and zombie.isSeatedInVehicle
+        and zombie:isSeatedInVehicle()
+    then
+        return true
+    end
+    if LiveBodyControl
+        and LiveBodyControl.IsPresentationCombatActive
+        and LiveBodyControl.IsPresentationCombatActive(record, now)
+    then
+        return true
+    end
+    if PNC.PathService and PNC.PathService.IsTraversalActive
+        and PNC.PathService.IsTraversalActive(record, zombie)
+    then
+        return true
+    end
+    if LiveBodyControl and LiveBodyControl.IsGrounded
+        and LiveBodyControl.IsGrounded(zombie)
+    then
+        return true
+    end
+    return false
+end
 
 local function clearStaleFacilityState(record, zombie)
     local runtime = record and record.runtime or nil
@@ -159,6 +225,25 @@ function Behavior.Tick(record, zombie, now)
         return
     end
 
+    -- Sleep teardown owns the actor until native bump release, valid exit
+    -- placement, surface cleanup, and reservation release have completed.
+    -- This must run before Puppet/scene/job ownership, otherwise a newly
+    -- requested presentation scene can leave the NPC visibly stuck in the
+    -- old sleep state.
+    if tickPendingSleepWake(record, zombie) then
+        return
+    end
+
+    -- The Puppet lease suspends every ordinary behavior before recovery,
+    -- stale-provider repair, or job selection can issue a competing write.
+    -- Safety boundaries deliberately fall through so combat, vehicles,
+    -- traversal, and grounded recovery can abort the scene and take control.
+    if puppetOperaOwnsBehavior(record)
+        and not puppetOperaSafetyBoundary(record, zombie, now)
+    then
+        return
+    end
+
     -- Direct follow/guard/patrol/roam/travel orders do not own a Tasking
     -- lease, so give them the same bounded liveness boundary. The recovery
     -- probe observes PathService and re-issues the order only after a real
@@ -237,6 +322,14 @@ function Behavior.Tick(record, zombie, now)
             zombie,
             now
         )
+    end
+
+    -- Puppet Opera is a temporary presentation lease. ThreatGuard and the
+    -- committed-combat fence above still win; once they yield, do not let a
+    -- normal job/ambient/scene tick overwrite the session's movement lane.
+    -- The server-side lease owns the corresponding restore handoff.
+    if puppetOperaOwnsBehavior(record) then
+        return
     end
 
     -- Roaming ambience is a transient presentation lease. It is evaluated

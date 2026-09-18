@@ -11,6 +11,21 @@ PNC.BehaviorMoveIntent = PNC.BehaviorMoveIntent or {}
 local MoveIntent = PNC.BehaviorMoveIntent
 local Core = PNC.Core
 local Diagnostics = PNC.PerformanceScalingDiagnostics
+local ActorControl = PNC.ActorControl
+
+local function writeOwner(owner, reason)
+    if ActorControl and ActorControl.ResolveOwner then
+        return ActorControl.ResolveOwner(owner, reason)
+    end
+    return owner
+end
+
+local function ownerParts(owner)
+    if type(owner) ~= "table" then return nil, nil end
+    return owner.kind or owner.ownerKind,
+        owner.sessionId or owner.ownerSessionId
+            or owner.puppetOperaSessionId
+end
 
 local function auditSeatedMove(
     eventName,
@@ -73,9 +88,11 @@ local function sameMoveIntent(
     mode,
     stopDistance,
     reason,
-    navigation
+    navigation,
+    owner
 )
     local runtime = record and record.runtime or nil
+    local ownerKind, ownerSessionID = ownerParts(owner)
     local requestedByJob = tostring(record.activeJob or "none")
     local requestedByBehavior = tostring(
         record.activeBehavior or record.activeJob or "none"
@@ -111,6 +128,8 @@ local function sameMoveIntent(
             and tonumber(navigation.steeringIndex) or nil)
         and intent.steeringKind == (navigation
             and tostring(navigation.steeringKind or "") or nil)
+        and intent.ownerKind == ownerKind
+        and intent.ownerSessionId == ownerSessionID
 end
 
 local function ensureRuntime(record)
@@ -126,14 +145,32 @@ function MoveIntent.RequestMove(
     mode,
     stopDistance,
     reason,
-    navigation
+    navigation,
+    owner
 )
     local runtime
     local intent
+    local accepted
+    local controlOwner
+    local ownerKind
+    local ownerSessionID
     if not record then
         return false
     end
     runtime = ensureRuntime(record)
+    controlOwner = writeOwner(owner, reason)
+    if ActorControl and ActorControl.CanWrite then
+        accepted = ActorControl.CanWrite(
+            record,
+            controlOwner,
+            "movement_intent",
+            { reason = reason }
+        )
+        if accepted ~= true then
+            return false, "puppet_opera_writer_blocked:movement_intent"
+        end
+    end
+    ownerKind, ownerSessionID = ownerParts(controlOwner)
     auditSeatedMove(
         "movement_intent_request",
         record,
@@ -158,7 +195,8 @@ function MoveIntent.RequestMove(
         mode,
         stopDistance,
         reason,
-        navigation
+        navigation,
+        controlOwner
     )
     intent.kind = "move"
     intent.x = tonumber(x) or record.x
@@ -188,6 +226,10 @@ function MoveIntent.RequestMove(
         and tonumber(navigation.steeringIndex) or nil
     intent.steeringKind = navigation
         and tostring(navigation.steeringKind or "") or nil
+    intent.ownerKind = ownerKind
+    intent.ownerSessionId = ownerSessionID
+    intent.puppetOperaSessionId = ownerKind == "puppet_opera"
+        and ownerSessionID or nil
     intent.updatedAt = Core.Now()
     if not unchanged then
         intent.revision = (tonumber(intent.revision) or 0) + 1
@@ -195,13 +237,30 @@ function MoveIntent.RequestMove(
     return true
 end
 
-function MoveIntent.Hold(record, reason)
+function MoveIntent.Hold(record, reason, owner)
     local runtime
     local intent
+    local accepted
+    local controlOwner
+    local ownerKind
+    local ownerSessionID
     if not record then
         return false
     end
     runtime = ensureRuntime(record)
+    controlOwner = writeOwner(owner, reason)
+    if ActorControl and ActorControl.CanWrite then
+        accepted = ActorControl.CanWrite(
+            record,
+            controlOwner,
+            "movement_hold",
+            { reason = reason }
+        )
+        if accepted ~= true then
+            return false, "puppet_opera_writer_blocked:movement_hold"
+        end
+    end
+    ownerKind, ownerSessionID = ownerParts(controlOwner)
     if Diagnostics and Diagnostics.LogSeatingState
         and Diagnostics.IsSeatingRuntime
         and Diagnostics.IsSeatingRuntime(runtime, runtime.animationScene)
@@ -228,6 +287,10 @@ function MoveIntent.Hold(record, reason)
     intent.requestedOrder = tostring(
         record.orderSpec and record.orderSpec.kind or "none"
     )
+    intent.ownerKind = ownerKind
+    intent.ownerSessionId = ownerSessionID
+    intent.puppetOperaSessionId = ownerKind == "puppet_opera"
+        and ownerSessionID or nil
     intent.updatedAt = Core.Now()
     intent.revision = (tonumber(intent.revision) or 0) + 1
     return true

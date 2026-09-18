@@ -97,6 +97,148 @@ local function actionName(payload, pending)
         or pending and pending.action or ""))
 end
 
+local function textValue(value)
+    local valueType = type(value)
+    if value == nil or valueType == "table" or valueType == "function"
+        or valueType == "thread"
+    then
+        return nil
+    end
+    value = tostring(value)
+    return value ~= "" and value or nil
+end
+
+local function firstValue(...)
+    local count = select("#", ...)
+    for index = 1, count do
+        local value = textValue(select(index, ...))
+        if value then return value end
+    end
+    return nil
+end
+
+-- Camp responses can be produced from three bounded projections:
+--
+--   1. the authoritative server result;
+--   2. the pending request retained by the conversation;
+--   3. the client observation carried by that request while multiplayer
+--      admission is travelling to the server.
+--
+-- The first projection wins for every field, so a client hint can make the
+-- acknowledgement immediate without becoming authoritative state.
+local function campSiteDetails(primary, secondary)
+    local output = {}
+
+    local function read(value)
+        if type(value) ~= "table" then return end
+        local details = type(value.details) == "table"
+            and value.details or nil
+        local site = details and type(details.site) == "table"
+            and details.site or nil
+        local request = type(value.request) == "table"
+            and value.request or nil
+        local target = request and type(request.target) == "table"
+            and request.target or nil
+        target = target or type(value.target) == "table"
+            and value.target or nil
+        local intent = type(value.actionIntent) == "table"
+            and value.actionIntent or nil
+        target = target or intent and type(intent.target) == "table"
+            and intent.target or nil
+        local hint = target and type(target.clientHint) == "table"
+            and target.clientHint or nil
+
+        output.label = output.label or firstValue(
+            value.siteLabel,
+            details and details.siteLabel,
+            site and site.label,
+            value.label,
+            hint and hint.label
+        )
+        output.scope = output.scope or firstValue(
+            value.siteScope,
+            details and details.siteScope,
+            site and (site.siteScope or site.scope),
+            value.scope,
+            hint and (hint.siteScope or hint.scope)
+        )
+        output.siteID = output.siteID or firstValue(
+            value.siteID,
+            details and details.siteID,
+            site and site.siteID,
+            value.campfireID,
+            hint and (hint.siteID or hint.campfireID)
+        )
+        output.roomType = output.roomType or firstValue(
+            value.siteRoomType,
+            value.roomType,
+            details and (details.siteRoomType or details.roomType),
+            site and site.roomType,
+            hint and hint.roomType
+        )
+        output.risk = output.risk or firstValue(
+            value.siteRisk,
+            value.risk,
+            details and (details.siteRisk or details.risk),
+            site and site.risk,
+            hint and hint.risk
+        )
+    end
+
+    read(primary)
+    read(secondary)
+    if not output.label and not output.scope and not output.siteID
+        and not output.roomType and not output.risk
+    then
+        return nil
+    end
+    return output
+end
+
+local function withArticle(label)
+    local lowered = string.lower(label)
+    if string.sub(lowered, 1, 4) == "the " then return label end
+    return "the " .. label
+end
+
+local function campLocationPhrase(details)
+    local label = details and textValue(details.label)
+    if not label then return nil end
+    local lowered = string.lower(label)
+    local scope = string.lower(tostring(details.scope or ""))
+    if scope == "campfire" or lowered == "campfire" then
+        return "by " .. withArticle(label)
+    end
+    if scope == "room" then
+        return "in " .. withArticle(label)
+    end
+    return "at " .. withArticle(label)
+end
+
+local function campResponseFor(primary, secondary, phase)
+    local location = campLocationPhrase(campSiteDetails(primary, secondary))
+    if not location then
+        if phase == "completed" then
+            return "We're set up at the safe place."
+        end
+        return nil
+    end
+    if phase == "completed" then
+        return "We're set up " .. location .. "."
+    end
+    if phase == "pending" then
+        return "I'll head to " .. location .. " and set up camp."
+    end
+    return "I'll set up camp " .. location .. "."
+end
+
+-- Presentation.lua is loaded before Tasks.lua, but calls this only after the
+-- complete dialogue input composition has loaded. Keeping the bounded camp
+-- formatting seam here makes immediate and completion text agree.
+Internal.CampSiteDetails = campSiteDetails
+Internal.CampLocationPhrase = campLocationPhrase
+Internal.CampResponseFor = campResponseFor
+
 local function responseFor(payload, pending)
     local action = actionName(payload, pending)
     local status = string.lower(tostring(payload and payload.status or ""))
@@ -109,9 +251,7 @@ local function responseFor(payload, pending)
             return "I'm here."
         end
         if action == "CAMP" then
-            local label = payload.siteLabel or pending and pending.siteLabel
-                or "the safe place"
-            return "We're set up at " .. tostring(label) .. "."
+            return campResponseFor(payload, pending, "completed")
         end
         if action == "EAT" then
             return "That hit the spot."
@@ -202,6 +342,7 @@ local function queueResult(view, payload, pending)
     end
     local requestID = tostring(payload.requestID or "")
     local text = responseFor(payload, pending)
+    local site = campSiteDetails(payload, pending)
     local speakerID
     local speakerName
     if group and type(group.SpeakerFor) == "function" then
@@ -230,11 +371,11 @@ local function queueResult(view, payload, pending)
             admissionActive = payload.admissionActive,
             admissionPlanID = payload.admissionPlanID,
             admissionCleanupReason = payload.admissionCleanupReason,
-            siteLabel = payload.siteLabel,
-            siteScope = payload.siteScope,
-            siteID = payload.siteID,
-            siteRoomType = payload.siteRoomType,
-            siteRisk = payload.siteRisk,
+            siteLabel = site and site.label or payload.siteLabel,
+            siteScope = site and site.scope or payload.siteScope,
+            siteID = site and site.siteID or payload.siteID,
+            siteRoomType = site and site.roomType or payload.siteRoomType,
+            siteRisk = site and site.risk or payload.siteRisk,
             groupID = group and group.id,
             groupTurnID = group and group.activeTurn
                 and group.activeTurn.id or nil,
@@ -248,6 +389,17 @@ local function queueResult(view, payload, pending)
         },
     })
     return true
+end
+
+local function mergeCampSiteDetails(pending, payload)
+    if type(pending) ~= "table" then return end
+    local site = campSiteDetails(payload, pending)
+    if not site then return end
+    pending.siteLabel = site.label or pending.siteLabel
+    pending.siteScope = site.scope or pending.siteScope
+    pending.siteID = site.siteID or pending.siteID
+    pending.siteRoomType = site.roomType or pending.siteRoomType
+    pending.siteRisk = site.risk or pending.siteRisk
 end
 
 function Input.ReceiveSemanticTaskResult(payload)
@@ -287,8 +439,11 @@ function Input.ReceiveSemanticTaskResult(payload)
     if payload.accepted == true and (status == "accepted"
         or status == "sent" or status == "pending")
     then
-        -- Admission is acknowledged by the existing deterministic response.
-        -- Keep the request until the plan completes or fails.
+        -- Keep the request until the plan completes or fails, while retaining
+        -- the authoritative site metadata for the eventual completion line.
+        if actionName(payload, pending) == "CAMP" then
+            mergeCampSiteDetails(pending, payload)
+        end
         return true, "task_admitted"
     end
 

@@ -409,6 +409,10 @@ function H.AmbientOrder(faction, mobile, site)
             radius = target.radius,
             targetRadius = Const.ROAM_TARGET_RADIUS,
             roadBounds = target.bounds,
+            ambientMobile = true,
+            ambientObjective = Constants.MOBILE_AMBIENT_ROAD,
+            ambientSourceID = tostring(faction.id or "") .. ":"
+                .. tostring(ambient.revision or 0),
         }
         return order
     end
@@ -424,8 +428,13 @@ function H.AmbientOrder(faction, mobile, site)
             z = target.z,
             radius = target.radius,
             shelterSiteID = target.siteID,
+            shelterBounds = target.bounds,
             targetRadius = Const.ROAM_TARGET_RADIUS,
             reachedDistance = 3,
+            ambientMobile = true,
+            ambientObjective = Constants.MOBILE_AMBIENT_SHELTER,
+            ambientSourceID = tostring(faction.id or "") .. ":"
+                .. tostring(ambient.revision or 0),
         }
     end
     if faction.archetypeID == "looter" then
@@ -489,7 +498,12 @@ function H.RepairMobileOrders(faction)
         local facilityActive = jobSystem
             and jobSystem.IsFacilityActivityActive
             and jobSystem.IsFacilityActivityActive(record)
-        if not facilityActive and not sameOrder(record.orderSpec, expected) then
+        local ambientVisit = PNC.AmbientVisitService
+            and PNC.AmbientVisitService.IsOrderProtected
+            and PNC.AmbientVisitService.IsOrderProtected(record)
+        if not facilityActive and not ambientVisit
+            and not sameOrder(record.orderSpec, expected)
+        then
             if PNC.OrderSystem and PNC.OrderSystem.SetOrder then
                 PNC.OrderSystem.SetOrder(record, H.Copy(expected))
             else
@@ -844,6 +858,18 @@ function H.RefreshAmbient(faction, at, context)
             faction = updateMobile(faction, {
                 ambient = ambient,
             }, "mobile_ambient_objective_checked")
+        end
+    end
+    if objective ~= Constants.MOBILE_AMBIENT_SHELTER
+        and PNC.AmbientVisitService
+        and PNC.AmbientVisitService.ReleaseMobileShelter
+    then
+        for _, record in ipairs(memberRecords(faction)) do
+            PNC.AmbientVisitService.ReleaseMobileShelter(
+                record,
+                "mobile_shelter_day_started",
+                at
+            )
         end
     end
     H.RepairMobileOrders(faction)

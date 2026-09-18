@@ -3,8 +3,29 @@
 local PathService = PNC.PathService
 local Internal = PathService.Internal
 local Diagnostics = PNC.PerformanceScalingDiagnostics
+local ActorControl = PNC.ActorControl
 
-function PathService.Reset(zombie, record)
+local function writeOwner(owner, reason)
+    if ActorControl and ActorControl.ResolveOwner then
+        return ActorControl.ResolveOwner(owner, reason)
+    end
+    return owner
+end
+
+function PathService.Reset(zombie, record, reason, owner)
+    local accepted
+    local controlOwner = writeOwner(owner, reason)
+    if ActorControl and ActorControl.CanWrite then
+        accepted = ActorControl.CanWrite(
+            record,
+            controlOwner,
+            "path_reset",
+            { reason = reason }
+        )
+        if accepted ~= true then
+            return false, "puppet_opera_writer_blocked:path_reset"
+        end
+    end
     local lane = record and record.runtime and record.runtime.pathing or nil
     if lane and lane.traversalAction and Internal.clearTraversalAction then
         Internal.clearTraversalAction(zombie, lane, "reset")
@@ -17,6 +38,7 @@ function PathService.Reset(zombie, record)
         record.runtime.moveIntent = nil
     end
     Internal.hardResetMoveOwner(zombie)
+    return true, "reset"
 end
 
 function PathService.MoveToward(
@@ -28,9 +50,23 @@ function PathService.MoveToward(
     mode,
     stopDistance,
     reason,
-    navigation
+    navigation,
+    owner
 )
     local runtime = record and record.runtime or nil
+    local controlOwner = writeOwner(owner, reason)
+    local accepted
+    if ActorControl and ActorControl.CanWrite then
+        accepted = ActorControl.CanWrite(
+            record,
+            controlOwner,
+            "path_move",
+            { reason = reason }
+        )
+        if accepted ~= true then
+            return false, "puppet_opera_writer_blocked:path_move"
+        end
+    end
     local state = runtime and runtime.facilityActivity
         and runtime.facilityActivity.seating == true
         and runtime.facilityActivity
@@ -96,6 +132,12 @@ function PathService.MoveToward(
         and tonumber(navigation.steeringIndex) or nil
     intent.steeringKind = navigation
         and tostring(navigation.steeringKind or "") or nil
+    intent.ownerKind = controlOwner and controlOwner.kind or nil
+    intent.ownerSessionId = controlOwner
+        and (controlOwner.sessionId or controlOwner.ownerSessionId) or nil
+    intent.puppetOperaSessionId = controlOwner
+        and controlOwner.kind == "puppet_opera"
+        and (controlOwner.sessionId or controlOwner.ownerSessionId) or nil
     intent.updatedAt = Internal.Core.Now()
     intent.revision = (tonumber(intent.revision) or 0) + 1
     if zombie and Internal.isAtGoal(

@@ -628,6 +628,38 @@ function Client.RequestNPCKnowledgeTopic(npcID, topicID, options)
     return accepted, reason, args.requestID
 end
 
+function Client.SubmitSemanticIdentity(npcID, options)
+    npcID = tostring(npcID or "")
+    options = type(options) == "table" and options or {}
+    if npcID == "" then return false, "invalid_npc_id" end
+    local kind = tostring(options.kind or "")
+    if kind ~= "identity_claim" and kind ~= "identity_evasion" then
+        return false, "invalid_identity_event"
+    end
+    local args = {
+        requestID = requestID("identity_exchange"),
+        npcID = npcID,
+        kind = kind,
+        claimedName = options.claimedName,
+        conversationToken = options.conversationToken or options.token,
+        origin = options.origin or "semantic_dialogue",
+    }
+    ClientState.pendingSemanticIdentity =
+        ClientState.pendingSemanticIdentity or {}
+    ClientState.pendingSemanticIdentity[npcID] = args.requestID
+    local player = getSpecificPlayer and getSpecificPlayer(0) or nil
+    local accepted, reason = dispatchIdentity(
+        player,
+        Const.CMD_SEMANTIC_IDENTITY_REQUEST,
+        args,
+        "HandleSemanticIdentity"
+    )
+    if accepted ~= true then
+        ClientState.pendingSemanticIdentity[npcID] = nil
+    end
+    return accepted, reason, args.requestID
+end
+
 function Client.RequestKnowledgeDebug(npcID, showTruth, descriptorID)
     if not Client.CanUseDebug() then return false, "not_authorized" end
     npcID = tostring(npcID or "")

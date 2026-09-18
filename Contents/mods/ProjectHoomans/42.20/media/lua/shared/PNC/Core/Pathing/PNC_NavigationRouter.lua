@@ -14,6 +14,7 @@ PNC = PNC or {}
 PNC.NavigationRouter = PNC.NavigationRouter or {}
 
 local Router = PNC.NavigationRouter
+local ActorControl = PNC.ActorControl
 
 Router.Providers = Router.Providers or {}
 Router.Policies = Router.Policies or {}
@@ -208,17 +209,33 @@ function Router.GetSteeringTarget(
     finalTarget,
     policyName,
     providerName,
-    policy
+    policy,
+    owner
 )
     local provider
     local state
     local steeringTarget
+    local allowed
     if providerName == Router.DIRECT_PROVIDER then
         return finalTarget
     end
     provider = Router.Providers[providerName]
     if not provider then
         return finalTarget
+    end
+    if ActorControl and ActorControl.CanWrite then
+        allowed = ActorControl.CanWrite(
+            record,
+            owner,
+            "navigation_steering",
+            {
+                reason = "navigation:" .. tostring(policyName or "unknown"),
+                allowPuppetMovement = owner == nil,
+            }
+        )
+        if allowed == false then
+            return finalTarget
+        end
     end
     state = ensureState(record)
     if state then
@@ -228,7 +245,8 @@ function Router.GetSteeringTarget(
         record,
         body,
         finalTarget,
-        policy or Router.Policies[policyName]
+        policy or Router.Policies[policyName],
+        owner
     )
     return steeringTarget or finalTarget
 end
@@ -264,7 +282,13 @@ function Router.Invalidate(record, reason)
 end
 
 Router.RegisterProvider("engine_path", {
-    GetSteeringTarget = function(record, body, finalTarget, policy)
+    GetSteeringTarget = function(
+        record,
+        body,
+        finalTarget,
+        policy,
+        owner
+    )
         local planner = PNC.EnginePathPlanner
         if not planner or not planner.GetSteeringTarget then
             return finalTarget
@@ -273,7 +297,8 @@ Router.RegisterProvider("engine_path", {
             record,
             body,
             finalTarget,
-            policy
+            policy,
+            owner
         )
     end,
     Clear = function(record)

@@ -8,6 +8,7 @@ local Core = PNC.Core
 local LiveBodyControl = PNC.LiveBodyControl
 local LocomotionProfiles = PNC.LocomotionProfiles
 local AnimationTrace = PNC.AnimationTrace
+local ActorControl = PNC.ActorControl
 
 function Animation.SyncLocomotion(zombie, record)
     local profile
@@ -23,6 +24,8 @@ function Animation.SyncLocomotion(zombie, record)
     local downedMoving
     local treatment
     local navigation
+    local accepted
+    local allowPuppetMovement
     if not zombie then
         return
     end
@@ -72,6 +75,23 @@ function Animation.SyncLocomotion(zombie, record)
     if path and now < (tonumber(path.specialMoveUntil) or 0) and path.specialAnim then
         Internal.applyBumpLeaseBodyMode(zombie)
         return
+    end
+    allowPuppetMovement = path and (
+        path.phase == "requested"
+            or path.phase == "active"
+            or now < (tonumber(path.visualMovingUntil) or 0)
+    ) or navigation and navigation.nativeActive == true or false
+    if ActorControl and ActorControl.CanWrite then
+        accepted = ActorControl.CanWrite(
+            record,
+            nil,
+            "animation_locomotion_sync",
+            {
+                allowPuppetMovement = allowPuppetMovement,
+                reason = "animation_locomotion_sync",
+            }
+        )
+        if accepted ~= true then return false end
     end
     if navigation
         and navigation.provider == "engine_path"

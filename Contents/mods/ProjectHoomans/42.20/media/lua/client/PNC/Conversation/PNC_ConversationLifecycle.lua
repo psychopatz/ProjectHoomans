@@ -43,7 +43,7 @@ local function requestNameplateFallback(view, spec, reason)
     if isNameplateConversation(spec) or not isHostileConversation(spec) then
         return false
     end
-    local integration = PNC.HoomansLLM
+    local integration = PNC.PBrainZ
     if not integration or not integration.RequestInlineFallback then
         return false
     end

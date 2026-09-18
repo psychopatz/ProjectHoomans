@@ -38,6 +38,21 @@ end
 
 function Presentation.Summarize(relationship, exists)
     relationship = type(relationship) == "table" and relationship or {}
+    local interactionJournal = PNC.RelationshipTypes
+        and PNC.RelationshipTypes.NormalizeInteractionJournal
+        and PNC.RelationshipTypes.NormalizeInteractionJournal(
+            relationship.interactionJournal
+        ) or {}
+    local identityTrust
+    for index = 1, #interactionJournal do
+        local interaction = interactionJournal[index]
+        if interaction.interactionType == "identity_deception"
+            or interaction.interactionType == "identity_evasion"
+        then
+            identityTrust = "untrustworthy"
+            break
+        end
+    end
     local summary = {
         exists = exists == true,
         approval = number(relationship.approval),
@@ -46,6 +61,7 @@ function Presentation.Summarize(relationship, exists)
         state = tostring(relationship.state or "unknown"),
         previousState = tostring(relationship.previousState or "unknown"),
         revision = math.max(0, math.floor(number(relationship.revision))),
+        identityTrust = identityTrust,
     }
     if PNC.RelationshipTypes
         and PNC.RelationshipTypes.NormalizeInteractionJournal
@@ -54,8 +70,7 @@ function Presentation.Summarize(relationship, exists)
             0,
             math.floor(number(relationship.interactionRevision))
         )
-        summary.interactionJournal = PNC.RelationshipTypes
-            .NormalizeInteractionJournal(relationship.interactionJournal)
+        summary.interactionJournal = interactionJournal
     end
     return summary
 end
@@ -156,6 +171,13 @@ function Presentation.BuildForConversation(player, npcID)
         and PNC.MobileSettlementVisitService.GetNPCVisit(
             record.id,
             player
+        ) or nil
+    summary.ambientVisitPreview = PNC.AmbientVisitService
+        and PNC.AmbientVisitService.GetInvitationPreview
+        and PNC.AmbientVisitService.GetInvitationPreview(
+            record,
+            player,
+            relationship
         ) or nil
     -- These fields are intentionally part of the player's own presentation
     -- response. They make SP/MP identity drift diagnosable without exposing

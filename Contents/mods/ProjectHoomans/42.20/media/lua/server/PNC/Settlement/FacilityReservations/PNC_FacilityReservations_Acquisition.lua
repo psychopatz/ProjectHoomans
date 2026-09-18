@@ -92,9 +92,21 @@ function PNC.FacilityService.AcquireActivity(baseId, npcId, capability,
             local selected = PNC.FacilityResources.Select(
                 facility, capability, selectionOptions)
             if selected then
+                local reservationMetadata = {}
+                for key, value in pairs(options) do
+                    reservationMetadata[key] = value
+                end
+                if tostring(capability or "") == "sleep" then
+                    reservationMetadata.sleepSlotId = selected.sleepSlotId
+                        or selected.target and selected.target.sleepSlotId
+                    reservationMetadata.sleepCapacity = selected.sleepCapacity
+                        or selected.target and selected.target.sleepCapacity
+                        or selected.resource
+                            and selected.resource.sleepCapacity
+                end
                 local ok, reservation = Reservations.ReserveResource(
                     facility.id, selected.resource, npcId, capability,
-                    options.ttlMs, options)
+                    options.ttlMs, reservationMetadata)
                 if ok then
                     return {
                         ok = true,
@@ -107,6 +119,12 @@ function PNC.FacilityService.AcquireActivity(baseId, npcId, capability,
                         resource = selected.resource,
                         resourceKind = selected.resourceKind,
                         resourceKey = selected.resourceKey,
+                        sleepSlotId = selected.sleepSlotId
+                            or selected.target and selected.target.sleepSlotId,
+                        sleepSlotIndex = selected.target
+                            and selected.target.sleepSlotIndex,
+                        sleepCapacity = selected.sleepCapacity
+                            or selected.target and selected.target.sleepCapacity,
                         floorSeating = selected.floorSeating == true
                             or selected.resource
                                 and selected.resource.floorSeating == true

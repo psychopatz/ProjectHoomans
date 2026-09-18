@@ -34,6 +34,49 @@ local function isSeatingReservation(reservation, purpose)
     )
 end
 
+local function isSleepResource(resource)
+    local surface = tostring(resource and resource.sleepSurface or "")
+    return resource and (
+        tostring(resource.resourceKind or "") == "sleep_surface"
+        or surface == "bed" or surface == "sofa"
+    ) and (surface == "bed" or surface == "sofa")
+end
+
+local function sleepCapacity(resource, metadata)
+    local explicit = tonumber(metadata and metadata.sleepCapacity)
+        or tonumber(resource and (resource.sleepCapacity
+            or resource.bedCapacity))
+    if explicit and explicit >= 1 then
+        return math.min(2, math.floor(explicit))
+    end
+    if tostring(resource and resource.sleepSurface or "") == "sofa" then
+        return 1
+    end
+    local width = tonumber(resource and (resource.gridWidth
+        or resource.sleepGridWidth)) or 1
+    local height = tonumber(resource and (resource.gridHeight
+        or resource.sleepGridHeight)) or 1
+    return math.max(width, height) >= 2 and 2 or 1
+end
+
+local function sleepSlotKey(resourceKey, slotId)
+    if tostring(slotId or "") == "" then return nil end
+    return tostring(resourceKey or "") .. ":" .. tostring(slotId)
+end
+
+local function sleepReservationCount(resourceKey, excludeId)
+    local count = 0
+    local prefix = tostring(resourceKey or "") .. ":"
+    for slotKey, id in pairs(Reservations.ByResourceSlot or {}) do
+        if string.sub(tostring(slotKey), 1, #prefix) == prefix
+            and tostring(id) ~= tostring(excludeId or "")
+        then
+            count = count + 1
+        end
+    end
+    return count
+end
+
 local function auditReservation(eventName, reservation, reason)
     if not Diagnostics or Diagnostics.SeatingAuditEnabled ~= true
         or not Diagnostics.LogSeatingAudit
@@ -88,6 +131,12 @@ function Reservations.Release(id, reason)
         and Reservations.ByResource[reservation.resourceKey] == reservation.id
     then
         Reservations.ByResource[reservation.resourceKey] = nil
+    end
+    if reservation.resourceSlotKey
+        and Reservations.ByResourceSlot[reservation.resourceSlotKey]
+            == reservation.id
+    then
+        Reservations.ByResourceSlot[reservation.resourceSlotKey] = nil
     end
     local activityKey = tostring(reservation.facilityId) .. ":"
         .. reservation.purpose
@@ -181,8 +230,28 @@ function Reservations.ReserveResource(facilityId, resource, npcId, purpose,
         return false, "RESOURCE_NOT_FOUND"
     end
     local resourceKey = tostring(resource.resourceKey or "")
+    local reservationPurpose = tostring(purpose or "activity")
+    local sleep = isSleepResource(resource)
+        and (reservationPurpose == "sleep"
+            or reservationPurpose == "ambient_roam_sleep")
+    local slotId = sleep and type(metadata) == "table"
+        and (metadata.sleepSlotId or metadata.slotId) or nil
+    local slotKey = sleep and sleepSlotKey(resourceKey, slotId) or nil
+    local capacity = sleep and sleepCapacity(resource, metadata) or nil
     if resourceKey == "" then return false, "RESOURCE_KEY_REQUIRED" end
-    if Reservations.ByResource[resourceKey]
+    if sleep and slotKey then
+        if Reservations.ByResource[resourceKey]
+            and H.IsExclusiveResource(resource)
+        then
+            return false, "RESOURCE_RESERVED"
+        end
+        if Reservations.ByResourceSlot[slotKey] then
+            return false, "RESOURCE_SLOT_RESERVED"
+        end
+        if sleepReservationCount(resourceKey) >= capacity then
+            return false, "RESOURCE_CAPACITY_REACHED"
+        end
+    elseif Reservations.ByResource[resourceKey]
         and H.IsExclusiveResource(resource)
     then
         return false, "RESOURCE_RESERVED"
@@ -197,6 +266,9 @@ function Reservations.ReserveResource(facilityId, resource, npcId, purpose,
         componentId = "",
         resourceKey = resourceKey,
         resourceKind = tostring(resource.resourceKind or ""),
+        resourceSlotId = slotId and tostring(slotId) or nil,
+        resourceSlotKey = slotKey,
+        resourceCapacity = capacity,
         resource = PNC.FacilityResources
             and PNC.FacilityResources.CopyDescriptor
             and PNC.FacilityResources.CopyDescriptor(resource) or resource,
@@ -210,7 +282,9 @@ function Reservations.ReserveResource(facilityId, resource, npcId, purpose,
             math.floor(tonumber(ttlMs) or Reservations.DEFAULT_TTL_MS)),
     }
     Reservations.ByID[id] = reservation
-    if H.IsExclusiveResource(resource) then
+    if slotKey then
+        Reservations.ByResourceSlot[slotKey] = id
+    elseif H.IsExclusiveResource(resource) then
         Reservations.ByResource[resourceKey] = id
     end
     local activityKey = tostring(facilityId) .. ":" .. reservation.purpose
@@ -224,9 +298,41 @@ function Reservations.ReserveResource(facilityId, resource, npcId, purpose,
 end
 
 function Reservations.ReleaseResource(resourceKey)
-    local id = Reservations.ByResource[tostring(resourceKey or "")]
-    return id and Reservations.Release(id, "resource_removed")
-        or false, id and "RESOURCE_NOT_RESERVED" or "RESOURCE_NOT_FOUND"
+    local key = tostring(resourceKey or "")
+    local ids = {}
+    local legacy = Reservations.ByResource[key]
+    if legacy then ids[#ids + 1] = legacy end
+    local prefix = key .. ":"
+    for slotKey, id in pairs(Reservations.ByResourceSlot or {}) do
+        if string.sub(tostring(slotKey), 1, #prefix) == prefix then
+            ids[#ids + 1] = id
+        end
+    end
+    if #ids == 0 then return false, "RESOURCE_NOT_FOUND" end
+    for index = 1, #ids do
+        Reservations.Release(ids[index], "resource_removed")
+    end
+    return true, "RESOURCE_RELEASED"
+end
+
+function Reservations.IsResourceAvailable(resource, slotId, excludeId)
+    local key = tostring(resource and resource.resourceKey or "")
+    if key == "" then return false end
+    Reservations.Expire()
+    local legacy = Reservations.ByResource[key]
+    if legacy and tostring(legacy) ~= tostring(excludeId or "") then
+        return false
+    end
+    if isSleepResource(resource) then
+        local slotKey = sleepSlotKey(key, slotId)
+        if slotKey then
+            local owner = Reservations.ByResourceSlot[slotKey]
+            return not owner or tostring(owner) == tostring(excludeId or "")
+        end
+        return sleepReservationCount(key, excludeId)
+            < sleepCapacity(resource)
+    end
+    return legacy == nil or tostring(legacy) == tostring(excludeId or "")
 end
 
 function Reservations.Start(id, ttlMs)

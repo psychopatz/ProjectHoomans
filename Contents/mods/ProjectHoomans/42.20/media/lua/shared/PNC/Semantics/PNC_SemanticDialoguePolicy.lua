@@ -104,6 +104,18 @@ local RESPONSE_TEMPLATES = {
         templateID = "semantic.social.hostile_remark",
         fallback = "Don't talk to me like that.",
     },
+    SELF_REFLECTION_RECEIVED = {
+        templateID = "semantic.social.self_reflection",
+        fallback = "Don't talk about yourself like that.",
+    },
+    IDENTITY_CLAIM_RECEIVED = {
+        templateID = "semantic.identity.exchange",
+        fallback = "Nice to meet you.",
+    },
+    IDENTITY_NAME_EVASION = {
+        templateID = "semantic.identity.evasion",
+        fallback = "I asked you your name. Don't just change the subject.",
+    },
     THREAT_RECEIVED = {
         templateID = "semantic.social.threat",
         fallback = "Back off.",
@@ -255,6 +267,35 @@ local function unresolvedWorldTargetRequest(ir)
         and tostring(target.text or target.value or "") ~= ""
 end
 
+local function isIdentityClaim(ir)
+    return type(ir) == "table"
+        and type(ir.socialContext) == "table"
+        and ir.socialContext.identityClaim == true
+end
+
+local function pendingIdentityExchange(state, context)
+    local semanticState = context and context.semanticContextState
+    local pending = context and context.pendingIdentityExchange
+        or semanticState and semanticState.pendingIdentityExchange
+        or context and context.semanticDialogueContext
+        and context.semanticDialogueContext.pendingIdentityExchange
+    if type(pending) == "table" then return pending end
+    local question = state and state.pendingQuestion
+    if type(question) == "table" and question.subject == "IDENTITY" then
+        return question
+    end
+    return nil
+end
+
+local function isIdentityEvasion(ir, state, context)
+    if not pendingIdentityExchange(state, context)
+        or isIdentityClaim(ir)
+    then
+        return false
+    end
+    return not (ir and ir.intent == "QUESTION" and ir.subject == "IDENTITY")
+end
+
 local function responseFor(branch, ir)
     local definition = Policy.ResponseTemplates[branch]
         or Policy.ResponseTemplates.UNKNOWN
@@ -377,7 +418,8 @@ function Policy.Decide(ir, state, context, options)
             and not unresolvedItemRequest(ir)
             and not unresolvedOffer(ir)
             and not isInventoryQuery(ir)
-            and not unresolvedWorldTargetRequest(ir))
+            and not unresolvedWorldTargetRequest(ir)
+            and not isIdentityClaim(ir))
         or (confidence < limits.high and not giftOffer)
     then
         local result = decision(
@@ -442,6 +484,17 @@ function Policy.Decide(ir, state, context, options)
     elseif ir.intent == "GOSSIP" then
         branch = "GOSSIP_RECEIVED"
         reason = "recognized_gossip"
+    elseif isIdentityClaim(ir) then
+        branch = "IDENTITY_CLAIM_RECEIVED"
+        reason = "recognized_self_name_claim"
+    elseif isIdentityEvasion(ir, state, context) then
+        branch = "IDENTITY_NAME_EVASION"
+        reason = "identity_question_evaded"
+    elseif ir.intent == "SELF_REFLECTION"
+        or ir.speechAct == "SELF_REFLECTION"
+    then
+        branch = "SELF_REFLECTION_RECEIVED"
+        reason = "recognized_self_reflection"
     elseif ir.intent == "INSULT"
         or ir.intent == "HOSTILE_REMARK"
         or ir.speechAct == "INSULT"

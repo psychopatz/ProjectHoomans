@@ -14,6 +14,7 @@
   "choice.view_dossier": "View dossier",
   "choice.recruit": "Would you like to join us?",
   "choice.settlement_admission": "You can have a place with us if you want it.",
+  "choice.ambient_visit": "You can stay with us for a while if you need a safe place.",
   "choice.disband": "Tell them to leave the group",
   "choice.disband_confirm": "Yes. I understand they will leave us.",
   "choice.disband_cancel": "No. Keep talking.",

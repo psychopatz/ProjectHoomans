@@ -6,6 +6,7 @@ PNC.LiveBodyControl = PNC.LiveBodyControl or {}
 local LiveBodyControl = PNC.LiveBodyControl
 local Core = PNC.Core
 local Diagnostics = PNC.PerformanceScalingDiagnostics
+local ActorControl = PNC.ActorControl
 local plantProtectionState = setmetatable({}, { __mode = "k" })
 
 local function hasFarmingPlant(square)
@@ -75,8 +76,19 @@ function LiveBodyControl.ProtectManagedPlant(zombie)
     local square
     local state
     local safeSquare
+    local record
     if not zombie or not Core or not Core.IsManagedNPCBody
         or not Core.IsManagedNPCBody(zombie)
+    then
+        return false
+    end
+    record = PNC.Registry and PNC.Registry.FindRecordByZombie
+        and PNC.Registry.FindRecordByZombie(zombie) or nil
+    -- This legacy plant-recovery helper uses authoritative setX/setY/setZ.
+    -- Puppet Opera must never be repositioned by it; its movement lease owns
+    -- all scene placement and can abort/release if the target square is bad.
+    if ActorControl and ActorControl.IsPuppetOwned
+        and ActorControl.IsPuppetOwned(record)
     then
         return false
     end
@@ -136,6 +148,7 @@ function LiveBodyControl.OnZombieUpdate(zombie)
     local navigation
     local now
     local animation = PNC.Animation
+    local canPump = true
     if not LiveBodyControl.EnforceManagedSafety(
         zombie,
         "zombie_update"
@@ -167,26 +180,32 @@ function LiveBodyControl.OnZombieUpdate(zombie)
             then
                 Diagnostics.Increment("LiveAbstract.AbstractBodyUpdates")
             end
-            PNC.EnginePathPlanner.PumpFrame(record, zombie)
-            navigation = record.runtime and record.runtime.localNavigation
-                or nil
-            now = Core.Now and Core.Now() or 0
-            if navigation
-                and navigation.controllerMode == "behavior2_move"
-                and navigation.nativeActive == true
-                and animation
-                and animation.SyncLocomotion
-                and (
-                    navigation.lastNativeLocomotionSyncAt == nil
-                    or now - navigation.lastNativeLocomotionSyncAt >= 100
-                )
-            then
-                -- Native Behavior2 is advanced here in single-player, so its
-                -- locomotion presentation must be synchronized here as well.
-                -- The scheduler is deliberately not allowed to write Walk/Idle
-                -- between these frames.
-                navigation.lastNativeLocomotionSyncAt = now
-                animation.SyncLocomotion(zombie, record)
+            canPump = not ActorControl
+                or not ActorControl.IsPuppetOwned
+                or not ActorControl.IsPuppetOwned(record)
+                or ActorControl.CanPump(record)
+            if canPump then
+                PNC.EnginePathPlanner.PumpFrame(record, zombie)
+                navigation = record.runtime
+                    and record.runtime.localNavigation or nil
+                now = Core.Now and Core.Now() or 0
+                if navigation
+                    and navigation.controllerMode == "behavior2_move"
+                    and navigation.nativeActive == true
+                    and animation
+                    and animation.SyncLocomotion
+                    and (
+                        navigation.lastNativeLocomotionSyncAt == nil
+                        or now - navigation.lastNativeLocomotionSyncAt >= 100
+                    )
+                then
+                    -- Native Behavior2 is advanced here in single-player, so
+                    -- its locomotion presentation must be synchronized here
+                    -- as well. The scheduler is deliberately not allowed to
+                    -- write Walk/Idle between these frames.
+                    navigation.lastNativeLocomotionSyncAt = now
+                    animation.SyncLocomotion(zombie, record)
+                end
             end
         end
     end

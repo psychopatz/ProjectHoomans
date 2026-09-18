@@ -48,6 +48,7 @@ function LiveBodyControl.ReleaseDamageReaction(zombie, actionState)
         modData.PNC_BumpActionLeaseStartedAt = nil
         modData.PNC_BumpRequestedType = nil
         modData.PNC_BumpKeepUseless = nil
+        modData.PNC_BumpNonCombat = nil
     end
     if PNC.AnimationTrace and PNC.AnimationTrace.Sample then
         PNC.AnimationTrace.Sample(zombie, "damage_release_after")

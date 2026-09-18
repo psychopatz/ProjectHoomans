@@ -91,6 +91,7 @@ function Adapter.Start(session, actor, beat, track)
                 + tonumber(beat.durationMs or 900)
                 + 1500,
             keepManagedUseless = false,
+            nonCombat = track.nonCombat == true,
         }
     )
     if accepted ~= true then return false, reason or "npc_animation_rejected" end
@@ -155,6 +156,7 @@ function Adapter.Maintain(session, actor, beat, leaseUntil, track)
             sceneId = "PuppetOpera:" .. tostring(session.sessionId),
             sceneRevision = tonumber(session.revision) or 0,
             keepManagedUseless = false,
+            nonCombat = track.nonCombat == true,
         }
     )
     return accepted == true, reason or "npc_animation_maintained"
@@ -177,7 +179,14 @@ function Adapter.Release(session, actor)
         return false, "npc_animation_ownership_lost"
     end
     if Animation and Animation.FinishBump then
-        Animation.FinishBump(body, true)
+        Animation.FinishBump(
+            body,
+            true,
+            {
+                kind = "puppet_opera",
+                sessionId = tostring(session.sessionId),
+            }
+        )
     end
     modData[SESSION_KEY] = nil
     modData[BUMP_KEY] = nil

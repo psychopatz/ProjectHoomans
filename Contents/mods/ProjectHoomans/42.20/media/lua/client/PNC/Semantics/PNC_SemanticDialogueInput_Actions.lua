@@ -36,6 +36,25 @@ local function audit(eventName, data, options)
     return Diagnostics.Record(eventName, data, options)
 end
 
+local function isBroadcastCamp(group, result, value)
+    local decision = result and result.decision or nil
+    local intent = decision and decision.actionIntent or nil
+    local action = decision and decision.action
+        or result and result.ir and result.ir.action
+        or type(intent) == "table" and intent.action
+        or ""
+    local addressed
+    if not group or string.upper(tostring(action)) ~= "CAMP" then
+        return false
+    end
+    if type(group.AddressedIDs) ~= "function" then return true end
+    local ok
+    ok, addressed = pcall(group.AddressedIDs, group, result, value)
+    if not ok or type(addressed) ~= "table" then return true end
+    for _ in pairs(addressed) do return false end
+    return true
+end
+
 local function actionContext(view, result, value)
     local spec = view and view.spec or {}
     local session = view and view.session
@@ -45,6 +64,8 @@ local function actionContext(view, result, value)
     local lifecycle = spec.context
         and spec.context.conversationLifecycleState or nil
     local origin
+    local groupCamp = isBroadcastCamp(group, result, value)
+    local targets
     local selectionOrigin = spec.context and spec.context.player
         or getSpecificPlayer and getSpecificPlayer(0) or nil
     local registry = PNC.Registry
@@ -56,6 +77,12 @@ local function actionContext(view, result, value)
     end
     origin = origin or spec.context and spec.context.player
         or getSpecificPlayer and getSpecificPlayer(0) or nil
+    if groupCamp and type(group.participantIDs) == "table" then
+        targets = {}
+        for index = 1, #group.participantIDs do
+            targets[index] = group.participantIDs[index]
+        end
+    end
     return {
         npcID = spec.npcID,
         targetID = spec.npcID,
@@ -63,11 +90,9 @@ local function actionContext(view, result, value)
         recipient = recipientID and { id = recipientID } or nil,
         dialogueID = session and session.conversationID,
         conversationID = session and session.conversationID,
-        -- A nearby turn is fanned out as one request per NPC.  Keep the
-        -- transport scope single so a companion command is not expanded a
-        -- second time by the group command resolver.
         requestID = view and view.semanticRequestID or result.sequence,
-        scope = "single",
+        scope = groupCamp and "group" or "single",
+        targets = targets,
         groupID = group and group.id,
         groupTurnID = group and group.activeTurn
             and group.activeTurn.id or nil,

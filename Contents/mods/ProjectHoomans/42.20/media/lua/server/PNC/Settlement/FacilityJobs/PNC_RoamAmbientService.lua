@@ -39,4 +39,36 @@ function Service.TryStart(record, zombie, order, roaming, at)
     return Service.StartInstantAction(record, zombie, plan, at)
 end
 
+-- Camp visitors do not use the area-roam pause loop, but they can still use
+-- the same deterministic, item-free ambient scenes after AtCamp has reached
+-- the leased room or campfire zone. The synthetic idle state is local to the
+-- attempt and never becomes a needs state.
+function Service.TryStartAmbient(record, zombie, at)
+    local visit = PNC.AmbientVisitService
+    local runtime
+    local roaming
+    at = Service.CurrentTime(at)
+    if not visit or not visit.CanUseAmbient
+        or not visit.CanUseAmbient(record)
+    then
+        return false
+    end
+    runtime = record.runtime or {}
+    record.runtime = runtime
+    roaming = runtime.roaming
+    if not roaming then
+        roaming = {
+            phase = "idle",
+            idleSince = at - (tonumber(Service.MIN_IDLE_MS) or 1200),
+        }
+        runtime.roaming = roaming
+    else
+        roaming.phase = "idle"
+        if roaming.idleSince == nil then
+            roaming.idleSince = at - (tonumber(Service.MIN_IDLE_MS) or 1200)
+        end
+    end
+    return Service.TryStart(record, zombie, record.orderSpec, roaming, at)
+end
+
 return Service

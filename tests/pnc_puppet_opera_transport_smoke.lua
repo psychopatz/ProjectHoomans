@@ -10,6 +10,26 @@ local sent = {}
 local handlers = {}
 local queue = { queue = {}, current = nil }
 local player
+local previewCalls = {}
+local previewBody = {
+    modData = {},
+}
+function previewBody:getModData() return self.modData end
+local previewDebugger = {
+    active = nil,
+}
+function previewDebugger.PlayXML(_, _, body, _, options)
+    previewCalls[#previewCalls + 1] = options
+    previewDebugger.active = {
+        npcId = "npc-preview",
+        body = body,
+    }
+    return true, "xml_pipeline_started"
+end
+function previewDebugger.Stop()
+    previewDebugger.active = nil
+    return true
+end
 local currentRuntime = {
     active = false,
     owner = nil,
@@ -72,7 +92,12 @@ PNC = {
             end,
         },
     },
+    AnimationDebugPlayer = previewDebugger,
 }
+
+package.preload["PNC/Debug/PNC_AnimationDebugPlayer"] = function()
+    return previewDebugger
+end
 
 PsychopatzCore = {
     Animation = {
@@ -198,16 +223,41 @@ local blueprint = Opera.GetBlueprint("social.kiss_test")
 local plan = Opera.Anchors.BuildPlan(blueprint, player)
 T.truthy(plan, "transport test could not build anchor plan")
 
-local previewAccepted = Client.StartPlacementPreview(
+local previewAccepted, previewReason = Client.PreviewNPC(
+    {
+        state = "bumped",
+        node = "PNC_Shove",
+        anim = "Bob_Shove",
+        conditions = {
+            { name = "BumpType", kind = "STRING", value = "PNC_Shove" },
+        },
+        playable = true,
+    },
+    "npc-preview",
+    previewBody,
+    { id = "npc-preview" }
+)
+T.truthy(previewAccepted, "Puppet NPC preview did not start")
+T.truthy(previewCalls[1] and previewCalls[1].nonCombat == true,
+    "Puppet NPC preview did not use the non-combat bump lease")
+T.equal(previewCalls[1].sceneId, "ProjectHoomans.PuppetOperaPreview:npc-preview",
+    "Puppet NPC preview did not identify its owner")
+T.truthy(Client.StopPreview(),
+    "Puppet NPC preview could not be stopped")
+
+previewAccepted = Client.StartPlacementPreview(
     "social.kiss_test",
     nil,
-    { npc = "npc-client" },
+    {
+        actor_1 = "__local_player__",
+        actor_2 = "npc-client",
+    },
     "social.kiss_test:preview_pending"
 )
 T.truthy(previewAccepted, "client did not send the placement preview request")
 T.equal(sent[#sent].payload.action, "preview_start",
     "placement preview did not use the preview_start request action")
-T.equal(sent[#sent].payload.actors.npc, "npc-client",
+T.equal(sent[#sent].payload.actors.actor_2, "npc-client",
     "placement preview did not carry the actor-slot binding map")
 T.falsy(sent[#sent].payload.x,
     "placement preview must not send an arbitrary world coordinate")
@@ -220,7 +270,10 @@ T.equal(sent[#sent].payload.action, "preview_stop",
 previewAccepted = Client.StartPlacementPreview(
     "social.kiss_test",
     nil,
-    { npc = "npc-client" },
+    {
+        actor_1 = "__local_player__",
+        actor_2 = "npc-client",
+    },
     "social.kiss_test:preview"
 )
 T.truthy(previewAccepted, "client could not restart the placement preview")
@@ -232,8 +285,14 @@ local previewSnapshot = {
     phase = Opera.Phases.MOVING,
     preview = true,
     actors = {
-        player = { target = plan.actors.player },
-        npc = { target = plan.actors.npc },
+        actor_1 = {
+            kind = "local_player",
+            target = plan.actors.actor_1,
+        },
+        actor_2 = {
+            kind = "nearby_live_npc",
+            target = plan.actors.actor_2,
+        },
     },
 }
 Client.ReceiveState(previewSnapshot)
@@ -253,7 +312,8 @@ T.falsy(queue.current,
     "placement preview stop left the native walk action owned")
 
 local accepted = Client.Start("social.kiss_test", "npc-client", false, nil, {
-    npc = "npc-client",
+    actor_1 = "__local_player__",
+    actor_2 = "npc-client",
 })
 T.truthy(accepted, "client did not send the start request")
 T.equal(sent[#sent].command, PNC.Const.CMD_PUPPET_OPERA_REQUEST,
@@ -262,7 +322,7 @@ T.equal(sent[#sent].payload.action, "start",
     "start request action changed")
 T.equal(sent[#sent].payload.npcID, "npc-client",
     "start request NPC identity changed")
-T.equal(sent[#sent].payload.actors.npc, "npc-client",
+T.equal(sent[#sent].payload.actors.actor_2, "npc-client",
     "start request did not carry the actor-slot binding map")
 T.falsy(sent[#sent].payload.x,
     "client request must not send an arbitrary world coordinate")
@@ -274,8 +334,14 @@ local snapshot = {
     revision = 1,
     phase = Opera.Phases.MOVING,
     actors = {
-        player = { target = plan.actors.player },
-        npc = { target = plan.actors.npc },
+        actor_1 = {
+            kind = "local_player",
+            target = plan.actors.actor_1,
+        },
+        actor_2 = {
+            kind = "nearby_live_npc",
+            target = plan.actors.actor_2,
+        },
     },
 }
 T.truthy(handlers[PNC.Const.CMD_PUPPET_OPERA_STATE],
@@ -286,8 +352,8 @@ T.equal(queue.current and queue.current.puppetOperaSessionId, sessionID,
 T.equal(sent[#sent].payload.action, "player_moving",
     "moving state did not acknowledge the server revision")
 
-player.x = plan.actors.player.worldX
-player.y = plan.actors.player.worldY
+player.x = plan.actors.actor_1.worldX
+player.y = plan.actors.actor_1.worldY
 Client.Pump()
 T.equal(sent[#sent].payload.action, "player_arrived",
     "client did not acknowledge verified local arrival")

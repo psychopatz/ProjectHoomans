@@ -8,6 +8,8 @@ PNC.FacilityJobsServiceInternal = PNC.FacilityJobsServiceInternal or {}
 local Jobs = PNC.FacilityJobs
 local H = PNC.FacilityJobsServiceInternal
 local Repository = PNC.SettlementRepository
+local ActorControl = PNC.ActorControl
+    or require "PNC/Core/ActorControl/PNC_ActorControl"
 
 function H.LivePosition(record)
     local zombie = record and record.id and PNC.Registry
@@ -25,6 +27,17 @@ function H.StopExistingActivity(record, reason)
     local runtime = record and record.runtime or nil
     local activity = runtime and runtime.facilityActivity or nil
     local taskLeaseId = tostring(activity and activity.taskLeaseId or "")
+    if ActorControl and ActorControl.CanWrite then
+        local allowed, ownerReason = ActorControl.CanWrite(
+            record,
+            nil,
+            "facility_stop",
+            { reason = reason or "facility_stop" }
+        )
+        if allowed == false then
+            return false, ownerReason or "puppet_opera_owned"
+        end
+    end
     if taskLeaseId ~= "" and PNC.Tasking and PNC.Tasking.Commands
         and PNC.Tasking.Commands.CancelForNPC
     then
@@ -46,4 +59,3 @@ function Jobs.StopControlled(record, reason)
     end
     return H.StopExistingActivity(record, reason or "player_stop")
 end
-

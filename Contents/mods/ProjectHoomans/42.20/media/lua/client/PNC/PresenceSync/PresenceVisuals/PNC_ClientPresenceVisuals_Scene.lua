@@ -74,6 +74,24 @@ end
 
 local function logSceneReplica(eventName, recordView, presentation,
     zombie, reason)
+    if Diagnostics and Diagnostics.SleepAuditEnabled == true
+        and Diagnostics.LogSleepState
+        and presentation
+        and isSleepScene(presentation.id)
+    then
+        Diagnostics.LogSleepState(
+            "client_" .. tostring(eventName or "scene"),
+            recordView,
+            zombie,
+            presentation,
+            reason,
+            {
+                "clientReplica=true",
+                "presentationKey=" .. tostring(presentation.key or ""),
+                "presentationBump=" .. tostring(presentation.bump or ""),
+            }
+        )
+    end
     if Diagnostics and Diagnostics.LogSeatingState
         and Diagnostics.IsSeatingSceneId
         and presentation

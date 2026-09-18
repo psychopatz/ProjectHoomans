@@ -13,11 +13,18 @@ PNC.PuppetOpera.Blueprints = PNC.PuppetOpera.Blueprints or {}
 
 local Opera = PNC.PuppetOpera
 local Registry = Opera.Blueprints
+local Capabilities = Opera.AnimationCapabilities
+    or require "PNC/Core/PuppetOpera/PNC_PuppetOpera_AnimationCapabilities"
 
 local SUPPORTED_ACTOR_KINDS = {
     local_player = true,
     nearby_live_npc = true,
     future_actor = true,
+}
+
+local DEFAULT_ACTOR_KINDS = {
+    "local_player",
+    "nearby_live_npc",
 }
 
 -- The first vertical slice deliberately exposes only routes that have a
@@ -29,7 +36,7 @@ local RUNTIME_PLAYER_ACTIONS = {
 }
 
 local RUNTIME_NPC_BUMPS = {
-    PNC_Shove = true,
+    PNC_WaveHi = true,
 }
 
 local function cleanText(value, maximum)
@@ -147,16 +154,49 @@ local function normalizeActors(rawActors, rawAnchors)
             return nil, "actor_not_a_table:" .. tostring(actorID)
         end
         kind = cleanText(raw.kind, 32)
-        if not SUPPORTED_ACTOR_KINDS[kind] then
+        if kind == "" then kind = nil end
+        if kind and not SUPPORTED_ACTOR_KINDS[kind] then
             return nil, "actor_kind_unsupported:" .. tostring(actorID)
         end
         anchor = validID(raw.anchor, 64)
         if not anchor or type(rawAnchors[anchor]) ~= "table" then
             return nil, "actor_anchor_missing:" .. tostring(actorID)
         end
+        local allowedKinds = {}
+        local allowedCount = 0
+        local allowedSource = type(raw.allowedKinds) == "table"
+            and raw.allowedKinds or nil
+        if allowedSource then
+            for _, allowedKind in ipairs(allowedSource) do
+                allowedKind = cleanText(allowedKind, 32)
+                if allowedKind ~= "" and SUPPORTED_ACTOR_KINDS[allowedKind]
+                    and not allowedKinds[allowedKind]
+                then
+                    allowedKinds[allowedKind] = true
+                    allowedCount = allowedCount + 1
+                end
+            end
+        elseif kind then
+            allowedKinds[kind] = true
+            allowedCount = 1
+        else
+            for _, allowedKind in ipairs(DEFAULT_ACTOR_KINDS) do
+                allowedKinds[allowedKind] = true
+                allowedCount = allowedCount + 1
+            end
+        end
+        if allowedCount == 0 then
+            return nil, "actor_allowed_kinds_missing:" .. tostring(actorID)
+        end
+        local allowedList = {}
+        for allowedKind in pairs(allowedKinds) do
+            allowedList[#allowedList + 1] = allowedKind
+        end
+        table.sort(allowedList)
         normalized = {
             id = actorID,
             kind = kind,
+            allowedKinds = allowedList,
             required = raw.required ~= false,
             anchor = anchor,
             labelKey = validID(raw.labelKey, 128),
@@ -224,7 +264,7 @@ local function normalizePlayerBeat(raw, beatID, durationMs)
         1,
         math.floor((durationMs * 60 / 1000) + 0.5)
     )
-    return {
+    local normalized = {
         route = route,
         mode = mode,
         catalog = catalog,
@@ -238,6 +278,7 @@ local function normalizePlayerBeat(raw, beatID, durationMs)
         variables = normalizeVariables(raw.variables),
         event = validID(raw.event, 96),
     }
+    return Capabilities.NormalizeTrack("local_player", normalized)
 end
 
 local function normalizeNPCBeat(raw, beatID, durationMs)
@@ -256,7 +297,7 @@ local function normalizeNPCBeat(raw, beatID, durationMs)
         return nil, "npc_catalog_unsupported:" .. tostring(beatID)
     end
     if not bump then return nil, "npc_bump_missing:" .. tostring(beatID) end
-    return {
+    local normalized = {
         route = route,
         mode = "bump",
         catalog = catalog,
@@ -266,13 +307,14 @@ local function normalizeNPCBeat(raw, beatID, durationMs)
         durationMs = durationMs,
         nonCombat = raw.nonCombat ~= false,
     }
+    return Capabilities.NormalizeTrack("nearby_live_npc", normalized)
 end
 
 local function normalizeFutureBeat(raw, beatID, durationMs)
     if type(raw) ~= "table" then
         return nil, "actor_track_missing:" .. tostring(beatID)
     end
-    return {
+    local normalized = {
         route = cleanText(raw.route or "future", 32),
         mode = cleanText(raw.mode or "future", 16),
         catalog = validID(raw.catalog or "future", 32),
@@ -285,6 +327,57 @@ local function normalizeFutureBeat(raw, beatID, durationMs)
         durationMs = durationMs,
         nonCombat = raw.nonCombat ~= false,
     }
+    return normalized
+end
+
+local function normalizeTrackForKind(rawTrack, actorKind, beatID, durationMs)
+    if actorKind == "local_player" then
+        return normalizePlayerBeat(rawTrack, beatID, durationMs)
+    elseif actorKind == "nearby_live_npc" then
+        return normalizeNPCBeat(rawTrack, beatID, durationMs)
+    end
+    return normalizeFutureBeat(rawTrack, beatID, durationMs)
+end
+
+local function normalizeActorTrack(rawTrack, actorDefinition, beatID, durationMs)
+    if type(rawTrack) ~= "table" then
+        return nil, "actor_track_missing:" .. tostring(beatID)
+    end
+
+    -- Fixed-kind legacy blueprints retain their original direct track shape.
+    -- Neutral slots use a variant map so one scene can be assigned to a
+    -- player, an NPC, or two NPCs without rewriting the blueprint.
+    if actorDefinition.kind then
+        return normalizeTrackForKind(
+            rawTrack,
+            actorDefinition.kind,
+            beatID,
+            durationMs
+        )
+    end
+
+    local rawVariants = rawTrack.byKind or rawTrack.variants
+    if type(rawVariants) ~= "table" then
+        return nil, "actor_track_variants_required:" .. tostring(beatID)
+    end
+    local variants = {}
+    for _, actorKind in ipairs(actorDefinition.allowedKinds or {}) do
+        local variant = rawVariants[actorKind]
+        if not variant then
+            return nil, "actor_track_variant_missing:" .. tostring(beatID)
+                .. ":" .. tostring(actorDefinition.id)
+                .. ":" .. tostring(actorKind)
+        end
+        local normalized, reason = normalizeTrackForKind(
+            variant,
+            actorKind,
+            beatID,
+            durationMs
+        )
+        if not normalized then return nil, reason end
+        variants[actorKind] = normalized
+    end
+    return { byKind = variants }
 end
 
 local function normalizeBeats(rawBeats, actors)
@@ -337,25 +430,12 @@ local function normalizeBeats(rawBeats, actors)
                     return nil, "actor_track_missing:" .. tostring(actorID)
                 end
             else
-                if actorDefinition.kind == "local_player" then
-                    track, trackError = normalizePlayerBeat(
-                        rawTrack,
-                        beatID,
-                        durationMs
-                    )
-                elseif actorDefinition.kind == "nearby_live_npc" then
-                    track, trackError = normalizeNPCBeat(
-                        rawTrack,
-                        beatID,
-                        durationMs
-                    )
-                else
-                    track, trackError = normalizeFutureBeat(
-                        rawTrack,
-                        beatID,
-                        durationMs
-                    )
-                end
+                track, trackError = normalizeActorTrack(
+                    rawTrack,
+                    actorDefinition,
+                    beatID,
+                    durationMs
+                )
                 if not track then return nil, trackError end
                 normalizedBeat.tracks[actorID] = track
             end
@@ -422,6 +502,12 @@ function Registry.Normalize(id, definition)
     return {
         id = normalizedID,
         version = version,
+        definitionType = cleanText(
+            definition.definitionType or "opera",
+            32
+        ),
+        sceneType = validID(definition.sceneType, 64),
+        legacy = definition.legacy == true,
         labelKey = validID(definition.labelKey, 128),
         label = cleanText(definition.label or normalizedID, 128),
         description = cleanText(definition.description, 256),
@@ -454,18 +540,30 @@ end
 
 function Registry.IsRuntimePlayerAction(action)
     return RUNTIME_PLAYER_ACTIONS[tostring(action or "")] == true
+        and Capabilities.IsRuntimePlayerAction(action) == true
 end
 
 function Registry.IsRuntimeNPCBump(bump)
     return RUNTIME_NPC_BUMPS[tostring(bump or "")] == true
+        and Capabilities.IsRuntimeNPCBump(bump) == true
 end
 
-function Registry.GetTrack(beat, actorID)
+function Registry.GetAnimationCapability(actorKind, track)
+    return Capabilities.ForTrack(actorKind, track)
+end
+
+function Registry.GetTrack(beat, actorID, actorKind)
     if type(beat) ~= "table" then return nil end
+    local track
     if type(beat.tracks) == "table" then
-        return beat.tracks[tostring(actorID or "")]
+        track = beat.tracks[tostring(actorID or "")]
+    else
+        track = beat[tostring(actorID or "")]
     end
-    return beat[tostring(actorID or "")]
+    if type(track) == "table" and type(track.byKind) == "table" then
+        return actorKind and track.byKind[tostring(actorKind)] or nil
+    end
+    return track
 end
 
 function Registry.ValidateRuntime(blueprint)
@@ -474,22 +572,24 @@ function Registry.ValidateRuntime(blueprint)
     end
     for index, beat in ipairs(blueprint.beats or {}) do
         for actorID, actor in pairs(blueprint.actors or {}) do
-            local track = Registry.GetTrack(beat, actorID)
-            if actor.kind == "local_player" then
-                if not Registry.IsRuntimePlayerAction(
-                    track and track.action
-                ) then
-                    return false, "player_action_not_server_approved:"
-                        .. tostring(index) .. ":" .. tostring(actorID)
+            local kinds = actor.kind and { actor.kind }
+                or actor.allowedKinds or {}
+            for _, actorKind in ipairs(kinds) do
+                local track = Registry.GetTrack(beat, actorID, actorKind)
+                if actorKind == "local_player"
+                    or actorKind == "nearby_live_npc"
+                then
+                    local approved, capabilityReason =
+                        Capabilities.IsSceneApproved(actorKind, track)
+                    if not approved then
+                        return false, tostring(capabilityReason)
+                            .. ":beat=" .. tostring(index)
+                            .. ":actor=" .. tostring(actorID)
+                    end
+                else
+                    return false, "actor_kind_not_runtime_supported:"
+                        .. tostring(actorID)
                 end
-            elseif actor.kind == "nearby_live_npc" then
-                if not Registry.IsRuntimeNPCBump(track and track.bump) then
-                    return false, "npc_bump_not_server_approved:"
-                        .. tostring(index) .. ":" .. tostring(actorID)
-                end
-            else
-                return false, "actor_kind_not_runtime_supported:"
-                    .. tostring(actorID)
             end
         end
     end
@@ -515,21 +615,22 @@ end
 
 local defaultBlueprint = {
     id = "social.kiss_test",
-    version = 1,
+    version = 2,
+    legacy = true,
     labelKey = "UI_PNC_PuppetOpera_KissTest",
-    description = "Two actors walk to opposing anchors and play a synchronized Shove beat.",
+    description = "Two actors walk to opposing anchors and play a synchronized social beat.",
     actors = {
-        player = {
-            kind = "local_player",
+        actor_1 = {
+            allowedKinds = { "local_player", "nearby_live_npc" },
             required = true,
             anchor = "left",
-            labelKey = "UI_PNC_PuppetOpera_PlayerActor",
+            label = "Actor 1",
         },
-        npc = {
-            kind = "nearby_live_npc",
+        actor_2 = {
+            allowedKinds = { "local_player", "nearby_live_npc" },
             required = true,
             anchor = "right",
-            labelKey = "UI_PNC_PuppetOpera_NPCActor",
+            label = "Actor 2",
         },
     },
     anchorFrame = {
@@ -541,13 +642,13 @@ local defaultBlueprint = {
                 right = -1,
                 forward = 0,
                 z = 0,
-                faceTarget = "npc",
+                faceTarget = "actor_2",
             },
             right = {
                 right = 1,
                 forward = 0,
                 z = 0,
-                faceTarget = "player",
+                faceTarget = "actor_1",
             },
         },
     },
@@ -556,20 +657,45 @@ local defaultBlueprint = {
             id = "kiss",
             durationMs = 900,
             synchronization = "arrival_and_start_barrier",
-            player = {
-                route = "player_action",
-                catalog = "player",
-                entryId = "player.player_native.RemoveBush.RemoveBush",
-                action = "RemoveBush",
-                animation = "Bob_Shove",
-            },
-            npc = {
-                route = "zombie_bump",
-                catalog = "npc",
-                entryId = "npc.bumped.PNC_Shove.PNC_Shove",
-                bump = "PNC_Shove",
-                animation = "Bob_Shove",
-                nonCombat = true,
+            tracks = {
+                actor_1 = {
+                    byKind = {
+                        local_player = {
+                            route = "player_action",
+                            catalog = "player",
+                            entryId = "player.player_native.RemoveBush.RemoveBush",
+                            action = "RemoveBush",
+                            animation = "Bob_Shove",
+                        },
+                        nearby_live_npc = {
+                            route = "zombie_bump",
+                            catalog = "npc",
+                            entryId = "npc.bumped.PNC_Anim_WaveHi.PNC_Anim_WaveHi",
+                            bump = "PNC_WaveHi",
+                            animation = "Bob_EmoteWaveHi",
+                            nonCombat = true,
+                        },
+                    },
+                },
+                actor_2 = {
+                    byKind = {
+                        local_player = {
+                            route = "player_action",
+                            catalog = "player",
+                            entryId = "player.player_native.RemoveBush.RemoveBush",
+                            action = "RemoveBush",
+                            animation = "Bob_Shove",
+                        },
+                        nearby_live_npc = {
+                            route = "zombie_bump",
+                            catalog = "npc",
+                            entryId = "npc.bumped.PNC_Anim_WaveHi.PNC_Anim_WaveHi",
+                            bump = "PNC_WaveHi",
+                            animation = "Bob_EmoteWaveHi",
+                            nonCombat = true,
+                        },
+                    },
+                },
             },
         },
     },
@@ -582,5 +708,97 @@ local defaultBlueprint = {
 
 Registry.Definitions = Registry.Definitions or {}
 Registry.Register(defaultBlueprint.id, defaultBlueprint)
+
+local function dedicatedKissBlueprint(id, label, sceneType, actorKinds)
+    local tracks = {}
+    local actorDefinitions = {}
+    local anchors = {
+        left = {
+            right = -1,
+            forward = 0,
+            z = 0,
+            faceTarget = "actor_2",
+        },
+        right = {
+            right = 1,
+            forward = 0,
+            z = 0,
+            faceTarget = "actor_1",
+        },
+    }
+    for index, actorKind in ipairs(actorKinds) do
+        local actorID = "actor_" .. tostring(index)
+        local anchor = index == 1 and "left" or "right"
+        actorDefinitions[actorID] = {
+            kind = actorKind,
+            allowedKinds = { actorKind },
+            required = true,
+            anchor = anchor,
+            label = "Actor " .. tostring(index),
+        }
+        if actorKind == "local_player" then
+            tracks[actorID] = {
+                route = "player_emote",
+                mode = "emote",
+                catalog = "player",
+                entryId = "player.player_native.wavehi.wavehi",
+                emote = "wavehi",
+                animation = "Bob_EmoteWaveHi",
+            }
+        else
+            tracks[actorID] = {
+                route = "zombie_bump",
+                catalog = "npc",
+                entryId = "npc.bumped.PNC_Anim_WaveHi.PNC_Anim_WaveHi",
+                bump = "PNC_WaveHi",
+                animation = "Bob_EmoteWaveHi",
+                nonCombat = true,
+            }
+        end
+    end
+    return {
+        id = id,
+        version = 1,
+        definitionType = "opera",
+        sceneType = sceneType,
+        label = label,
+        description = "Dedicated two-actor kiss scene with explicit actor routes.",
+        actors = actorDefinitions,
+        anchorFrame = {
+            origin = "server_player_relative",
+            orientation = "player_facing",
+            tolerance = 0.75,
+            anchors = anchors,
+        },
+        beats = {
+            {
+                id = "kiss",
+                durationMs = 900,
+                synchronization = "arrival_and_start_barrier",
+                tracks = tracks,
+            },
+        },
+        playback = {
+            defaultMode = "once",
+            allowLoop = true,
+            gapMs = 250,
+        },
+    }
+end
+
+local playerNPCKiss = dedicatedKissBlueprint(
+    "social.kiss_player_npc",
+    "Player and NPC Kiss",
+    "player_npc_kiss",
+    { "local_player", "nearby_live_npc" }
+)
+local npcNPCKiss = dedicatedKissBlueprint(
+    "social.kiss_npc_npc",
+    "NPC and NPC Kiss",
+    "npc_npc_kiss",
+    { "nearby_live_npc", "nearby_live_npc" }
+)
+Registry.Register(playerNPCKiss.id, playerNPCKiss)
+Registry.Register(npcNPCKiss.id, npcNPCKiss)
 
 return Registry

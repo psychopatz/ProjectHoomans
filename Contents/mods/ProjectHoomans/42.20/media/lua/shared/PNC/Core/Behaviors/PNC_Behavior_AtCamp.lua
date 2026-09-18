@@ -99,14 +99,29 @@ local function normalize(record, spec)
     spec = type(spec) == "table" and spec or {}
     local scope = normalizeScope(spec.scope or spec.siteScope)
         or CAMPFIRE_SCOPE
+    local placementState = string.lower(
+        tostring(spec.placementState or "arrived"))
+    if placementState ~= "queued" and placementState ~= "moving"
+        and placementState ~= "arrived" and placementState ~= "failed"
+        and placementState ~= "skipped" and placementState ~= "cancelled"
+    then
+        placementState = "arrived"
+    end
+    local movementX = tonumber(spec.movementX) or tonumber(spec.x)
+        or tonumber(record and record.x) or tonumber(record and record.anchorX)
+    local movementY = tonumber(spec.movementY) or tonumber(spec.y)
+        or tonumber(record and record.y) or tonumber(record and record.anchorY)
+    local movementZ = tonumber(spec.movementZ) or tonumber(spec.z)
+        or tonumber(record and record.z) or tonumber(record and record.anchorZ)
+        or 0
     return {
         kind = Const.ORDER_CAMP or "camp",
-        x = tonumber(spec.x) or tonumber(record and record.x)
-            or tonumber(record and record.anchorX),
-        y = tonumber(spec.y) or tonumber(record and record.y)
-            or tonumber(record and record.anchorY),
-        z = tonumber(spec.z) or tonumber(record and record.z)
-            or tonumber(record and record.anchorZ) or 0,
+        x = movementX,
+        y = movementY,
+        z = movementZ,
+        movementX = movementX,
+        movementY = movementY,
+        movementZ = movementZ,
         radius = math.max(0.5, tonumber(spec.radius)
             or tonumber(Const.CAMP_RADIUS) or 3),
         campId = tostring(spec.campId or "camp:" .. tostring(record and record.id or "")),
@@ -128,16 +143,85 @@ local function normalize(record, spec)
         stopDistance = math.max(0.25, tonumber(spec.stopDistance)
             or (scope == ROOM_SCOPE and 0.7
                 or tonumber(Const.CAMP_STOP_DISTANCE) or 0.45)),
+        -- Group camp keeps the assigned zone as the durable movement boundary
+        -- and the validated player-selected site as a separate primitive root
+        -- for diagnostics/reallocation. Do not retain Java objects here.
+        zoneID = spec.zoneID and tostring(spec.zoneID) or nil,
+        zoneLabel = spec.zoneLabel and tostring(spec.zoneLabel) or nil,
+        zoneScope = normalizeScope(spec.zoneScope) or scope,
+        zoneNeedKind = spec.zoneNeedKind
+            and tostring(spec.zoneNeedKind) or nil,
+        zoneReason = spec.zoneReason and tostring(spec.zoneReason) or nil,
+        zoneScore = tonumber(spec.zoneScore),
+        zoneRevision = tonumber(spec.zoneRevision),
+        placementState = placementState,
+        placementCampID = spec.placementCampID
+            and tostring(spec.placementCampID) or nil,
+        placementIndex = tonumber(spec.placementIndex),
+        campRootX = tonumber(spec.campRootX),
+        campRootY = tonumber(spec.campRootY),
+        campRootZ = tonumber(spec.campRootZ),
+        campRootScope = normalizeScope(spec.campRootScope),
+        campRootSiteID = spec.campRootSiteID
+            and tostring(spec.campRootSiteID) or nil,
+        campRootRoomID = spec.campRootRoomID
+            and tostring(spec.campRootRoomID) or nil,
+        campRootBuildingID = spec.campRootBuildingID
+            and tostring(spec.campRootBuildingID) or nil,
+        campRootRoomType = spec.campRootRoomType
+            and tostring(spec.campRootRoomType) or nil,
+        campRootRoomName = spec.campRootRoomName
+            and tostring(spec.campRootRoomName) or nil,
+        campRootRoomBounds = CampSite
+            and type(CampSite.NormalizeBounds) == "function"
+            and CampSite.NormalizeBounds(spec.campRootRoomBounds)
+            or spec.campRootRoomBounds,
+        campRootCampfireID = spec.campRootCampfireID
+            and tostring(spec.campRootCampfireID) or nil,
+        -- Ambient visits reuse the mature camp movement boundary while
+        -- remaining explicitly presentation-only. Preserve the marker
+        -- through normalization so faction repair and the ambient scene
+        -- provider can distinguish a visitor from a needs-bearing camp.
+        ambientVisit = spec.ambientVisit == true,
+        ambientVisitID = spec.ambientVisitID
+            and tostring(spec.ambientVisitID) or nil,
+        ambientAccessClass = spec.ambientAccessClass
+            and tostring(spec.ambientAccessClass) or nil,
+        ambientPurpose = spec.ambientPurpose
+            and tostring(spec.ambientPurpose) or nil,
+        ambientNoNeeds = spec.ambientNoNeeds == true,
+        ambientNoItemEffects = spec.ambientNoItemEffects == true,
+        ambientSourceID = spec.ambientSourceID
+            and tostring(spec.ambientSourceID) or nil,
+        ambientRevision = tonumber(spec.ambientRevision),
+        visitorNPCID = spec.visitorNPCID
+            and tostring(spec.visitorNPCID) or nil,
     }
 end
 
 function AtCamp.Tick(record, zombie)
     local order = record.orderSpec or {}
-    local anchorX = tonumber(order.x) or record.anchorX or record.x
-    local anchorY = tonumber(order.y) or record.anchorY or record.y
-    local anchorZ = tonumber(order.z) or record.anchorZ or record.z or 0
+    local placementState = string.lower(
+        tostring(order.placementState or "arrived"))
+    local anchorX = tonumber(order.movementX) or tonumber(order.x)
+        or record.anchorX or record.x
+    local anchorY = tonumber(order.movementY) or tonumber(order.y)
+        or record.anchorY or record.y
+    local anchorZ = tonumber(order.movementZ) or tonumber(order.z)
+        or record.anchorZ or record.z or 0
     local radius = math.max(0.5, tonumber(order.radius)
         or tonumber(Const.CAMP_RADIUS) or 3)
+    if placementState == "queued" or placementState == "failed"
+        or placementState == "skipped" or placementState == "cancelled"
+    then
+        record.activeBehavior = "AtCamp:" .. placementState
+        Common.ClearCombatTarget(record, "camp_placement_hold", zombie)
+        Common.HaltMovement(record, zombie, "camp_placement_hold")
+        if zombie and Animation and Animation.Apply then
+            Animation.Apply(zombie, record, "Idle")
+        end
+        return true
+    end
     if not isWithinCamp(
         record, zombie, anchorX, anchorY, anchorZ, radius, order
     ) then
@@ -166,6 +250,17 @@ function AtCamp.Tick(record, zombie)
     Common.HaltMovement(record, zombie, "at_camp")
     if zombie and Animation and Animation.Apply then
         Animation.Apply(zombie, record, "Idle")
+    end
+    if order.ambientVisit == true
+        and PNC.RoamAmbient
+        and PNC.RoamAmbient.TryStartAmbient
+        and PNC.RoamAmbient.TryStartAmbient(
+            record,
+            zombie,
+            Core and Core.Now and Core.Now() or 0
+        )
+    then
+        return true
     end
     return true
 end

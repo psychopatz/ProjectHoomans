@@ -1,4 +1,4 @@
--- Shared policy for Project Hoomans LLM semantic tools.
+-- Shared policy for PBrainZ semantic tools.
 --
 -- Tool schemas are static and belong to the Core catalog.  This module only
 -- owns the Hoomans-specific reaction vocabulary and the safe mapping from an

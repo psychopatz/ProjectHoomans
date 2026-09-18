@@ -10,8 +10,14 @@ self-registering Lua catalog for the game runtime.
 
 The default folders are:
 
-- drafts: `~/Zomboid/Lua/Hoomans`
+- definition root: `~/Zomboid/Lua/Hoomans`
+- Unique NPC definitions: `~/Zomboid/Lua/Hoomans/NPC Definitions`
+- shared definition index: `~/Zomboid/Lua/Hoomans/UniqueNPCIndex.txt`
 - runtime Lua: `Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Generated/UniqueNPC`
+
+Project Hoomans keeps other authoring kinds beside the NPC files. Puppet Opera
+definitions use `Hoomans/Opera Definitions`; both folders are indexed by the
+same root index without sharing filenames.
 
 The game imports one stable catalog:
 

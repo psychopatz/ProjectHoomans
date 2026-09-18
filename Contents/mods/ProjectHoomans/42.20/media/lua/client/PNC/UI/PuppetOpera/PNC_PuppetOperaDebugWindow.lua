@@ -36,9 +36,9 @@ local TEXT_DESCRIPTION = tr(
     "UI_PNC_PuppetOpera_Description",
     "Build a multi-actor scene from existing player and NPC animation routes"
 )
-local TEXT_NO_NPC = tr(
-    "UI_PNC_PuppetOpera_NoNPC",
-    "Select a nearby live NPC"
+local TEXT_NO_ACTOR = tr(
+    "UI_PNC_PuppetOpera_SelectActorSlot",
+    "Select actor slot"
 )
 
 local function setComboSelection(combo, selected)
@@ -56,7 +56,6 @@ function ISPNCPuppetOperaDebugWindow:createChildren()
     PsychopatzWindow.createChildren(self)
     self.model = Model
     self.loopEnabled = false
-    self.selectedNPC = nil
     self.editorStatus = nil
     self.refreshCounter = 0
 
@@ -66,14 +65,15 @@ function ISPNCPuppetOperaDebugWindow:createChildren()
     self.blueprintCombo:instantiate()
     self:addChild(self.blueprintCombo)
 
-    self.npcCombo = ISComboBox:new(0, 0, 1, 1, self,
-        ISPNCPuppetOperaDebugWindow.onNPCChanged)
-    self.npcCombo:initialise()
-    self.npcCombo:instantiate()
-    self:addChild(self.npcCombo)
+    self.actorCombo = ISComboBox:new(0, 0, 1, 1, self,
+        ISPNCPuppetOperaDebugWindow.onActorChanged)
+    self.actorCombo:initialise()
+    self.actorCombo:instantiate()
+    self:addChild(self.actorCombo)
 
     self.topButtons = {}
     for _, definition in ipairs({
+        { "create", "UI_PNC_PuppetOpera_CreateNew", "CREATE NEW", "quiet" },
         { "duplicate", "UI_PNC_PuppetOpera_Duplicate", "DUPLICATE", "quiet" },
         { "save", "UI_PNC_PuppetOpera_SaveDraft", "SAVE DRAFT", "selected" },
         { "reset", "UI_PNC_PuppetOpera_ResetDraft", "RESET DRAFT", "quiet" },
@@ -138,6 +138,40 @@ function ISPNCPuppetOperaDebugWindow:createChildren()
         tr("UI_PNC_PuppetOpera_Trace", "Trace"),
         self.traceTab
     )
+    self.tabDefinitions = {
+        {
+            key = "layout",
+            name = tr("UI_PNC_PuppetOpera_AnchorGrid", "Layout / anchors"),
+            view = self.layoutTab,
+        },
+        {
+            key = "player",
+            name = tr("UI_PNC_PuppetOpera_PlayerAnimations", "Player animations"),
+            view = self.playerAnimationTab,
+        },
+        {
+            key = "npc",
+            name = tr("UI_PNC_PuppetOpera_NPCAnimations", "NPC animations"),
+            view = self.npcAnimationTab,
+        },
+        {
+            key = "beats",
+            name = tr("UI_PNC_PuppetOpera_Beats", "Beats"),
+            view = self.beatsTab,
+        },
+        {
+            key = "trace",
+            name = tr("UI_PNC_PuppetOpera_Trace", "Trace"),
+            view = self.traceTab,
+        },
+    }
+    self.visibleTabKeys = {
+        layout = true,
+        player = true,
+        npc = true,
+        beats = true,
+        trace = true,
+    }
 
     self.layoutTab:setContext(self)
     self.playerAnimationTab:setContext(self, "player")
@@ -170,26 +204,32 @@ end
 
 function ISPNCPuppetOperaDebugWindow:onResponsiveLayout()
     local scale = self.uiScale
-    local pad = Layout.Pixels(10, scale)
-    local gap = Layout.Pixels(8, scale)
-    local toolbarHeight = Layout.Pixels(30, scale)
     local width = self:getWidth()
     local height = self:getHeight()
+    local compact = height < Layout.Pixels(430, scale)
+    local pad = Layout.Pixels(compact and 6 or 10, scale)
+    local gap = Layout.Pixels(compact and 5 or 8, scale)
+    local toolbarHeight = Layout.Pixels(compact and 26 or 30, scale)
+    local hideSecondaryToolbar = compact
     -- Keep editor controls below the native collapsable-window title bar.
     -- Placing the combos at y=6 made them overlap the close/pin controls on
     -- narrow windows, which looked like a clipped toolbar rather than a
     -- resizable scene builder.
     local rowY = self:titleBarHeight() + Layout.Pixels(6, scale)
     local innerWidth = math.max(1, width - pad * 2)
-    local comboWidth = math.floor((innerWidth - gap) / 2)
+    local comboWidth = math.max(1, math.floor((innerWidth - gap) / 2))
     Layout.SetBounds(self.blueprintCombo, pad, rowY,
         comboWidth, toolbarHeight)
-    Layout.SetBounds(self.npcCombo, pad + comboWidth + gap, rowY,
+    Layout.SetBounds(self.actorCombo, pad + comboWidth + gap, rowY,
         math.max(1, innerWidth - comboWidth - gap), toolbarHeight)
 
     local topRowY = rowY + toolbarHeight + gap
-    local topButtonWidth = math.floor((innerWidth - gap * 2) / 3)
+    local topButtonCount = math.max(1, #self.topButtons)
+    local topButtonWidth = math.max(1,
+        math.floor((innerWidth - gap * (topButtonCount - 1))
+            / topButtonCount))
     for index, button in ipairs(self.topButtons) do
+        button:setVisible(not hideSecondaryToolbar)
         Layout.SetBounds(button,
             pad + (index - 1) * (topButtonWidth + gap),
             topRowY,
@@ -197,15 +237,29 @@ function ISPNCPuppetOperaDebugWindow:onResponsiveLayout()
             toolbarHeight)
     end
 
-    local descriptionY = topRowY + toolbarHeight + Layout.Pixels(4, scale)
-    local tabTop = descriptionY + Layout.Pixels(22, scale)
+    local descriptionY = hideSecondaryToolbar
+        and (rowY + toolbarHeight + gap)
+        or (topRowY + toolbarHeight + Layout.Pixels(4, scale))
     local bottomColumns = width >= Layout.Pixels(900, scale) and 6 or 3
     local bottomRows = math.ceil(#self.controls / bottomColumns)
     local bottom = bottomRows * toolbarHeight
         + (bottomRows - 1) * gap + pad
+    -- The action bar is the last thing to give up when the window is made
+    -- short. The editor body may collapse to a one-pixel viewport, but the
+    -- controls remain reachable and never sit below the window edge.
+    local actionY = math.max(1, height - bottom)
+    self.showDescription = not compact
+        and actionY - descriptionY >= Layout.Pixels(20, scale)
+    local contentTop = descriptionY
+        + (self.showDescription and Layout.Pixels(22, scale) or gap)
+    local bodyHeight = actionY - contentTop
+    local showEditor = bodyHeight > 0
+    local tabTop = math.max(1, contentTop)
+    self.actionY = actionY
+    if self.tabPanel.setVisible then self.tabPanel:setVisible(showEditor) end
     Layout.SetBounds(self.tabPanel, pad, tabTop,
         innerWidth,
-        math.max(1, height - tabTop - bottom))
+        math.max(1, showEditor and actionY - tabTop or 1))
     local viewHeight = math.max(1,
         self.tabPanel:getHeight() - self.tabPanel.tabHeight)
     for _, view in ipairs({
@@ -228,7 +282,7 @@ function ISPNCPuppetOperaDebugWindow:onResponsiveLayout()
         local column = (index - 1) % bottomColumns
         Layout.SetBounds(button,
             pad + column * (buttonWidth + gap),
-            height - bottom + row * (toolbarHeight + gap),
+            actionY + row * (toolbarHeight + gap),
             buttonWidth, toolbarHeight)
     end
     self.descriptionY = descriptionY
@@ -255,37 +309,79 @@ function ISPNCPuppetOperaDebugWindow:refreshBlueprints()
     if #self.blueprints > 0 then setComboSelection(self.blueprintCombo, selectedIndex) end
 end
 
-function ISPNCPuppetOperaDebugWindow:refreshNPCs()
-    local selectedID = Model.GetSelectedNPCID()
-    self.npcs = Model.GetNearbyNPCs(Model.GetActorDiscoveryRadius())
-    self.npcCombo:clear()
-    local selectedIndex = nil
-    for index, npc in ipairs(self.npcs) do
-        self.npcCombo:addOptionWithData(
-            tostring(npc.name or npc.id)
-                .. "  [" .. tostring(npc.id) .. "]",
-            npc.id
-        )
-        if selectedID and tostring(npc.id) == tostring(selectedID) then
-            selectedIndex = index
+function ISPNCPuppetOperaDebugWindow:refreshAnimationTabs()
+    local selectedActorID = Model.GetSelectedActorID()
+    local actorKind = Model.GetActorKind(selectedActorID)
+    local visible = {
+        layout = true,
+        beats = true,
+        trace = true,
+        player = actorKind == "local_player",
+        npc = actorKind == "nearby_live_npc",
+    }
+    local changed = false
+    for _, definition in ipairs(self.tabDefinitions or {}) do
+        if self.visibleTabKeys[definition.key] ~= visible[definition.key] then
+            changed = true
+            break
         end
     end
-    if #self.npcs == 0 then
-        self.npcCombo:addOption(TEXT_NO_NPC)
-        setComboSelection(self.npcCombo, 1)
-        self.selectedNPC = nil
-        Model.SetSelectedNPC(nil)
-        return
+    if not changed then return end
+
+    local activeKey = self.tabPanel.activeView
+        and self.tabPanel.activeView.view
+        and self.tabPanel.activeView.view.puppetOperaTabKey or "layout"
+    for _, definition in ipairs(self.tabDefinitions or {}) do
+        definition.view.puppetOperaTabKey = definition.key
+        self.tabPanel:removeView(definition.view)
     end
-    selectedIndex = selectedIndex or 1
-    setComboSelection(self.npcCombo, selectedIndex)
-    self.selectedNPC = self.npcs[selectedIndex]
-    if self.selectedNPC then Model.SetSelectedNPC(self.selectedNPC.id) end
+    self.tabPanel.viewList = {}
+    self.tabPanel.maxLength = 0
+    self.tabPanel.scrollX = 0
+    for _, definition in ipairs(self.tabDefinitions or {}) do
+        if visible[definition.key] then
+            self.tabPanel:addView(definition.name, definition.view)
+        end
+    end
+    self.visibleTabKeys = visible
+    local targetKey = visible[activeKey] and activeKey or "layout"
+    for _, definition in ipairs(self.tabDefinitions or {}) do
+        if definition.key == targetKey and visible[definition.key] then
+            self.tabPanel:activateView(definition.name)
+            break
+        end
+    end
+end
+
+function ISPNCPuppetOperaDebugWindow:refreshActorSlots()
+    local selectedID = Model.GetSelectedActorID()
+    self.actorSlots = Model.GetActorRows(Model.GetSnapshot())
+    self.actorCombo:clear()
+    self.actorCombo:addOption(TEXT_NO_ACTOR)
+    local selectedIndex = 1
+    for index, actor in ipairs(self.actorSlots) do
+        local resolved = actor.kind ~= "unbound"
+            and (" (" .. tostring(actor.kind) .. ")") or " (unbound)"
+        local liveID = actor.liveShortID
+            and (" [" .. tostring(actor.liveShortID) .. "]") or ""
+        local bound = actor.liveName
+            and (" - " .. tostring(actor.liveName) .. liveID)
+            or " - empty slot"
+        self.actorCombo:addOptionWithData(
+            tostring(actor.label or actor.id) .. bound .. resolved,
+            actor.id
+        )
+        if selectedID and tostring(actor.id) == tostring(selectedID) then
+            selectedIndex = index + 1
+        end
+    end
+    setComboSelection(self.actorCombo, selectedIndex)
 end
 
 function ISPNCPuppetOperaDebugWindow:refreshViews()
     self:refreshBlueprints()
-    self:refreshNPCs()
+    self:refreshActorSlots()
+    self:refreshAnimationTabs()
     if Model.RefreshPreflight then Model.RefreshPreflight(false) end
     self.layoutTab:refresh()
     self.playerAnimationTab:refreshCatalog()
@@ -315,15 +411,15 @@ function ISPNCPuppetOperaDebugWindow:onBlueprintChanged()
     self:refreshViews()
 end
 
-function ISPNCPuppetOperaDebugWindow:onNPCChanged()
+function ISPNCPuppetOperaDebugWindow:onActorChanged()
     self:clearEditorStatus()
-    local index = tonumber(self.npcCombo.selected) or 1
-    self.selectedNPC = self.npcs and self.npcs[index] or nil
-    if self.selectedNPC then
-        local accepted, reason = Model.SelectLiveActor(self.selectedNPC.id)
-        if not accepted then self:setEditorStatus(reason, true) end
+    local index = tonumber(self.actorCombo.selected) or 1
+    local actor = index > 1 and self.actorSlots and self.actorSlots[index - 1]
+        or nil
+    if actor then
+        Model.SelectActor(actor.id)
     else
-        Model.SetSelectedNPC(nil)
+        Model.SelectActor(nil)
     end
     self:refreshViews()
 end
@@ -332,7 +428,9 @@ function ISPNCPuppetOperaDebugWindow:onTopAction(button)
     local id = button and button.internal or ""
     local accepted
     local reason
-    if id == "duplicate" then
+    if id == "create" then
+        accepted, reason = Model.CreateNew()
+    elseif id == "duplicate" then
         accepted, reason = Model.DuplicateBlueprint()
     elseif id == "save" then
         accepted, reason = Model.SaveDraft()
@@ -422,11 +520,13 @@ function ISPNCPuppetOperaDebugWindow:onControl(button)
             if not bindings then
                 self:setEditorStatus(bindingReason, true)
             elseif id == "play" then
-                Client.Start(blueprintID, nil, self.loopEnabled,
-                    definition, bindings)
+                local accepted, reason = Client.Start(blueprintID, nil,
+                    self.loopEnabled, definition, bindings)
+                if not accepted then self:setEditorStatus(reason, true) end
             else
-                Client.Replay(blueprintID, nil, self.loopEnabled,
-                    definition, bindings)
+                local accepted, reason = Client.Replay(blueprintID, nil,
+                    self.loopEnabled, definition, bindings)
+                if not accepted then self:setEditorStatus(reason, true) end
             end
         end
     elseif id == "loop" then
@@ -473,19 +573,23 @@ function ISPNCPuppetOperaDebugWindow:render()
         message = message .. " | " .. editorLabel .. "="
             .. tostring(editorMessage)
     end
-    local description = Layout.Ellipsize(TEXT_DESCRIPTION, UIFont.Small,
-        math.floor(self:getWidth() * 0.54))
-    self:drawText(
-        description,
-        12, self.descriptionY or 34,
-        0.62, 0.76, 0.84, 1,
-        UIFont.Small
-    )
+    local statusY = self.showDescription and (self.descriptionY or 34)
+        or math.max(1, (self.actionY or self:getHeight()) - 16)
+    if self.showDescription then
+        local description = Layout.Ellipsize(TEXT_DESCRIPTION, UIFont.Small,
+            math.floor(self:getWidth() * 0.54))
+        self:drawText(
+            description,
+            12, self.descriptionY or 34,
+            0.62, 0.76, 0.84, 1,
+            UIFont.Small
+        )
+    end
     self:drawTextRight(
         Layout.Ellipsize(message, UIFont.Small,
             math.floor(self:getWidth() * 0.42)),
         self:getWidth() - 12,
-        self.descriptionY or 34,
+        statusY,
         runtimeError and 1.00 or editorMessage and 1.00 or 0.72,
         runtimeError and 0.55 or editorMessage and 0.55 or 0.78,
         runtimeError and 0.55 or editorMessage and 0.55 or 0.84,
@@ -518,8 +622,8 @@ function WindowAPI.Open(contextEntry)
             responsiveSpec = {
                 width = 1160,
                 height = 760,
-                minWidth = 980,
-                minHeight = 620,
+                minWidth = 1,
+                minHeight = 1,
                 maxWidth = 1600,
                 maxHeight = 1080,
             },
@@ -528,9 +632,15 @@ function WindowAPI.Open(contextEntry)
         window:instantiate()
         WindowAPI.instance = window
     end
-    if contextEntry and contextEntry.id then
-        Model.SetSelectedNPC(contextEntry.id)
+    if Model.ResetEditorSelection then
+        Model.ResetEditorSelection()
     end
+    if Model.ClearActorBindings then
+        Model.ClearActorBindings()
+    end
+    -- A context-menu actor is only an opening context. Do not silently bind
+    -- it to a scene slot; the builder must begin neutral and require an
+    -- explicit drag/target selection so multi-actor drafts remain auditable.
     window:addToUIManager()
     window:setVisible(true)
     window:bringToTop()

@@ -4,6 +4,8 @@ PNC.FacilityJobsBehaviorInternal = PNC.FacilityJobsBehaviorInternal or {}
 
 local Jobs = PNC.FacilityJobs
 local Internal = PNC.FacilityJobsBehaviorInternal
+local ActorControl = PNC.ActorControl
+    or require "PNC/Core/ActorControl/PNC_ActorControl"
 local SLEEP_WAKE_ANIMATION_TIMEOUT_MS = 2000
 
 local function preserveCombatThreatForWake(record, runtime, reason, now)
@@ -131,10 +133,23 @@ function Internal.TickSleepWake(record, zombie)
     local animationDeadline
     local releaseDeadline
     local played
+    local wakeExit
+    local wakeExitReason
+    local wakeExitPlaced
     if not runtime or runtime.sleepWakePending ~= true then
         return false
     end
+    if PNC.Core and PNC.Core.IsAuthority
+        and PNC.Core.IsAuthority() == false
+    then
+        return true
+    end
     now = PNC.Core and PNC.Core.Now and tonumber(PNC.Core.Now()) or 0
+    if runtime.sleepWakeExitPending == true
+        and now < (tonumber(runtime.sleepWakeExitRetryAt) or 0)
+    then
+        return true
+    end
     deadline = tonumber(runtime.sleepWakeDeadlineAt) or (now + 1000)
     surface = tostring(runtime.sleepSurface or "")
     if runtime.sleepWakeAnimationStarted ~= true then
@@ -237,8 +252,37 @@ function Internal.TickSleepWake(record, zombie)
             PNC.LiveBodyControl.ApplyHumanizedBodyFlags(zombie, false)
         end
     end
+    if tostring(runtime.capability or "") == "sleep"
+        and Internal.FindSleepExit
+    then
+        wakeExit, wakeExitReason = Internal.FindSleepExit(
+            record, zombie, runtime, record.orderSpec)
+        if not wakeExit then
+            runtime.sleepWakeExitPending = true
+            runtime.sleepWakeExitRetryAt = now + 250
+            runtime.phase = "WAKING_EXIT_WAIT"
+            logSleepWake("exit_wait", record, zombie, runtime,
+                wakeExitReason or "SLEEP_EXIT_UNAVAILABLE")
+            return true
+        end
+    end
     Internal.ClearSleepSurface(record, zombie, runtime)
-    Internal.RestorePosition(record, zombie, runtime)
+    if wakeExit and Internal.CommitSleepExit then
+        wakeExitPlaced, wakeExitReason = Internal.CommitSleepExit(
+            record, zombie, runtime, wakeExit)
+        if not wakeExitPlaced then
+            runtime.sleepWakeExitPending = true
+            runtime.sleepWakeExitRetryAt = now + 250
+            runtime.phase = "WAKING_EXIT_WAIT"
+            logSleepWake("exit_wait", record, zombie, runtime,
+                wakeExitReason or "SLEEP_EXIT_WRITE_FAILED")
+            return true
+        end
+    else
+        Internal.RestorePosition(record, zombie, runtime)
+    end
+    runtime.sleepWakeExitPending = nil
+    runtime.sleepWakeExitRetryAt = nil
     runtime.arrivalSettled = false
     runtime.facingApplied = false
     runtime.sleepSurfaceEntered = false
@@ -363,7 +407,21 @@ function Internal.Finish(record, zombie, reason, restoreOrder)
     end
     runtime.finishing = true
     runtime.sleepSceneActive = false
-    Internal.RestorePosition(record, zombie, runtime)
+    if tostring(runtime.capability or "") == "sleep"
+        and runtime.positioned == true
+        and Internal.RestoreSleepPosition
+    then
+        local restored, restoreReason = Internal.RestoreSleepPosition(
+            record, zombie, runtime, record.orderSpec)
+        if not restored then
+            runtime.finishing = false
+            runtime.failedReason = restoreReason
+                or "SLEEP_EXIT_UNAVAILABLE"
+            return false
+        end
+    else
+        Internal.RestorePosition(record, zombie, runtime)
+    end
     if PNC.FacilityReservations and runtime.reservationId ~= ""
         and not Internal.HasLiveTaskLease(runtime.taskLeaseId)
     then
@@ -424,7 +482,20 @@ end
 function Internal.Stop(record, reason)
     local runtime = Internal.State(record)
     local zombie
+    local allowed
+    local ownerReason
     if not runtime then return false, "facility_activity_not_active" end
+    if ActorControl and ActorControl.CanWrite then
+        allowed, ownerReason = ActorControl.CanWrite(
+            record,
+            nil,
+            "facility_stop",
+            { reason = reason or "facility_stop" }
+        )
+        if allowed == false then
+            return false, ownerReason or "puppet_opera_owned"
+        end
+    end
     zombie = PNC.Registry and PNC.Registry.GetLiveZombie
         and PNC.Registry.GetLiveZombie(record.id) or nil
     runtime.stopRequested = true

@@ -67,7 +67,7 @@ T.load(
     "PNC/Semantics/PNC_SemanticDialoguePolicy.lua"
 )
 local providerReady = true
-PNC.HoomansLLM = {
+PNC.PBrainZ = {
     IsProviderAvailable = function() return providerReady end,
     Submit = function()
         llmCalls = llmCalls + 1

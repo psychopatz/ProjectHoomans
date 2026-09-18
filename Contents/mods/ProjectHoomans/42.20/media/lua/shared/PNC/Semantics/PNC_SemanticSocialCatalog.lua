@@ -64,9 +64,32 @@ local function directedSocialEmit(speechAct, intensity)
     }
 end
 
+local function selfReflectionEmit(reflectionType)
+    return {
+        intent = "SELF_REFLECTION",
+        speechAct = "SELF_REFLECTION",
+        subject = "SELF",
+        modifiers = {
+            directed = false,
+            selfDirected = true,
+        },
+        emotionalState = {
+            valence = "negative",
+            intensity = "moderate",
+        },
+        socialContext = {
+            directed = false,
+            selfDirected = true,
+            target = "SELF",
+            reflectionType = reflectionType,
+        },
+    }
+end
+
 function Social.Register()
     registerSpeechAct("INSULT")
     registerSpeechAct("HOSTILE_REMARK")
+    registerSpeechAct("SELF_REFLECTION")
 
     -- These are deliberately short, game-domain phrases.  This is not a
     -- general profanity detector; adding or removing vocabulary is a data
@@ -88,6 +111,64 @@ function Social.Register()
         "i will kill you", "i'll kill you", "i am going to kill you",
         "i'm going to kill you", "you are going to die", "you're going to die",
     }, 4)
+    registerConcept("SELF_BLAME", {
+        "my fault", "it was my fault", "i messed up", "i screwed up",
+        "i made a mistake", "i'm to blame", "i am to blame",
+    }, 4)
+
+    registerPattern(
+        "pnc.social.self_mockery_im",
+        {
+            { kind = "literal", value = "i'm" },
+            { kind = "literal", value = "an", optional = true },
+            { kind = "concept", id = "INSULT" },
+        },
+        selfReflectionEmit("SELF_MOCKERY"),
+        0.98,
+        145
+    )
+    registerPattern(
+        "pnc.social.self_mockery_i_am",
+        {
+            { kind = "literal", value = "i" },
+            { kind = "literal", value = "am" },
+            { kind = "literal", value = "an", optional = true },
+            { kind = "concept", id = "INSULT" },
+        },
+        selfReflectionEmit("SELF_MOCKERY"),
+        0.98,
+        145
+    )
+    registerPattern(
+        "pnc.social.self_blame",
+        { "@SELF_BLAME" },
+        selfReflectionEmit("SELF_BLAME"),
+        0.97,
+        145
+    )
+    registerPattern(
+        "pnc.social.insult_you_are",
+        {
+            { kind = "literal", value = "you" },
+            { kind = "literal", value = "are" },
+            { kind = "literal", value = "an", optional = true },
+            { kind = "concept", id = "INSULT" },
+        },
+        directedSocialEmit("INSULT", "high"),
+        0.98,
+        140
+    )
+    registerPattern(
+        "pnc.social.insult_youre",
+        {
+            { kind = "literal", value = "you're" },
+            { kind = "literal", value = "an", optional = true },
+            { kind = "concept", id = "INSULT" },
+        },
+        directedSocialEmit("INSULT", "high"),
+        0.98,
+        140
+    )
 
     registerPattern(
         "pnc.social.insult",
@@ -99,7 +180,7 @@ function Social.Register()
     registerPattern(
         "pnc.social.insult_prefixed",
         {
-            { kind = "any", optional = true },
+            { kind = "literal", value = "hey", optional = true },
             { kind = "concept", id = "INSULT" },
         },
         directedSocialEmit("INSULT", "high"),
@@ -116,7 +197,7 @@ function Social.Register()
     registerPattern(
         "pnc.social.hostile_remark_prefixed",
         {
-            { kind = "any", optional = true },
+            { kind = "literal", value = "hey", optional = true },
             { kind = "concept", id = "HOSTILE_REMARK" },
         },
         directedSocialEmit("HOSTILE_REMARK", "high"),
@@ -133,7 +214,7 @@ function Social.Register()
     registerPattern(
         "pnc.social.profanity_prefixed",
         {
-            { kind = "any", optional = true },
+            { kind = "literal", value = "hey", optional = true },
             { kind = "concept", id = "PROFANITY" },
         },
         directedSocialEmit("HOSTILE_REMARK", "moderate"),

@@ -298,6 +298,12 @@ liveBodies.owned = {
     getY = function() return 1.5 end,
     getZ = function() return 0 end,
 }
+liveBodies.owned_second = {
+    isDead = function() return false end,
+    getX = function() return 6 end,
+    getY = function() return 0 end,
+    getZ = function() return 0 end,
+}
 
 -- Single-player factions use the slot account key, not the display username.
 PNC.PlayerCharacters = {
@@ -528,32 +534,78 @@ T.equal(records.owned.orderSpec.kind, "follow",
     "group follow did not update closest companion")
 T.equal(records.owned_second.orderSpec.kind, "follow",
     "group follow did not update second companion")
--- Camp is intentionally a different group boundary from the live command
--- radius: followers that are abstract or far away still receive the same
--- player-anchored order and stop following the player.
+-- Group camp consumes the client-discovered candidate ids, then applies the
+-- server's live/materialized/radius gate. Abstract and far followers remain
+-- on their existing follow order instead of receiving a camp they cannot
+-- physically execute.
 records.far.orderSpec = {
     kind = "follow", ownerUsername = "alice", ownerOnlineID = 7,
 }
 records.abstract.orderSpec = {
     kind = "follow", ownerUsername = "alice", ownerOnlineID = 7,
 }
+PNC.CampZoneService = {
+    BuildGroup = function(_, recipients, options)
+        T.equal(#recipients, 2,
+            "group camp passed a non-materialized recipient to allocation")
+        T.equal(options.rootOnly, true,
+            "group camp allocation is bounded to the validated root zone")
+        return {
+            revision = 9,
+            assignments = {
+                owned = {
+                    zoneID = roomHint.siteID,
+                    zoneLabel = "bedroom",
+                    needKind = "social",
+                    reason = "social_rotation",
+                    score = 10,
+                    assignmentRevision = 9,
+                    zone = roomHint,
+                },
+                owned_second = {
+                    zoneID = "room:test-building:kitchen",
+                    zoneLabel = "kitchen",
+                    needKind = "food",
+                    reason = "need_food",
+                    score = 20,
+                    assignmentRevision = 9,
+                    zone = {
+                        kind = "camp_site", scope = "room", siteScope = "room",
+                        siteID = "room:test-building:kitchen",
+                        roomID = "kitchen", buildingID = "test-building",
+                        roomType = "KITCHEN", roomName = "kitchen",
+                        roomBounds = { minX = 5, minY = 0, maxX = 10, maxY = 10, z = 0 },
+                        x = 7.5, y = 2.5, z = 0, label = "kitchen",
+                        radius = 3, resourceRadius = 12,
+                    },
+                },
+            },
+        }
+    end,
+}
 affected, reason = PNC.CompanionCommands.Execute(player, {
     commandID = "camp", scope = "group", campSiteHint = roomHint,
+    targetIDs = { "owned", "owned_second", "far", "abstract" },
 })
-T.equal(affected, 4, "group camp includes distant and abstract followers")
+T.equal(affected, 2, "group camp affects nearby materialized followers")
 T.equal(reason, "commanded", "group camp result")
 T.equal(records.owned.orderSpec.kind, "camp",
     "group camp stopped the nearby follower")
-T.equal(records.far.orderSpec.kind, "camp",
-    "group camp stopped the distant follower")
-T.equal(records.abstract.orderSpec.kind, "camp",
-    "group camp stopped the abstract follower")
-T.equal(records.far.orderSpec.campId, records.owned.orderSpec.campId,
-    "group camp uses one shared camp cache identity")
-T.equal(records.abstract.orderSpec.x, roomHint.x,
-    "group camp uses the validated room anchor for abstract followers")
-T.equal(records.abstract.orderSpec.scope, "room",
-    "group camp preserves the validated site scope")
+T.equal(records.owned_second.orderSpec.kind, "camp",
+    "group camp stopped the second nearby follower")
+T.equal(records.owned_second.orderSpec.campId, records.owned.orderSpec.campId,
+    "group camp uses one shared group identity")
+T.equal(records.owned_second.orderSpec.siteID,
+    "room:test-building:kitchen",
+    "group camp did not apply the per-NPC zone")
+T.equal(records.owned_second.orderSpec.zoneLabel, "kitchen",
+    "group camp did not preserve the assigned zone label")
+T.equal(records.owned_second.orderSpec.campRootSiteID, roomHint.siteID,
+    "group camp lost the validated root site")
+T.equal(records.far.orderSpec.kind, "follow",
+    "group camp rejected the distant follower")
+T.equal(records.abstract.orderSpec.kind, "follow",
+    "group camp rejected the abstract follower")
 records.owned.runtime.workOrderId = "work-1"
 affected, reason = PNC.CompanionCommands.Execute(player, {
     id = "owned",

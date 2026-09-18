@@ -9,6 +9,7 @@ local Runtime = Internal.TraversalRuntime
 local Animation = PNC.Animation
 local LiveBodyControl = PNC.LiveBodyControl
 local TraversalAction = PNC.TraversalAction
+local ActorControl = PNC.ActorControl
 
 local function clamp01(value)
     return math.max(0, math.min(1, tonumber(value) or 0))
@@ -57,6 +58,18 @@ local function advanceTraversalPhase(zombie, record, action, now)
 end
 
 local function setTraversalPosition(zombie, record, lane, now, x, y, z)
+    if ActorControl and ActorControl.IsPuppetOwned
+        and ActorControl.IsPuppetOwned(record)
+    then
+        if ActorControl.NoteBlocked then
+            ActorControl.NoteBlocked(
+                record,
+                "traversal_position",
+                "puppet_opera_writer_blocked:traversal_position"
+            )
+        end
+        return false
+    end
     if LiveBodyControl and LiveBodyControl.SetAuthoritativePosition then
         LiveBodyControl.SetAuthoritativePosition(zombie, x, y, z)
     else
@@ -66,6 +79,7 @@ local function setTraversalPosition(zombie, record, lane, now, x, y, z)
     end
     Internal.syncRecordPosition(record, zombie)
     lane.lastPhysicalMoveAt = now
+    return true
 end
 
 function Internal.updateTraversalAction(zombie, record, lane, now)
@@ -163,7 +177,17 @@ function Internal.updateTraversalAction(zombie, record, lane, now)
     nextZ = (tonumber(action.startZ) or zombie:getZ())
         + (((tonumber(action.endZ) or zombie:getZ())
         - (tonumber(action.startZ) or zombie:getZ())) * eased)
-    setTraversalPosition(zombie, record, lane, now, nextX, nextY, nextZ)
+    if not setTraversalPosition(
+        zombie,
+        record,
+        lane,
+        now,
+        nextX,
+        nextY,
+        nextZ
+    ) then
+        return false, "puppet_opera_traversal_blocked"
+    end
     lane.lastProgressAt = now
     lane.lastIssueAt = now
     actionState = Runtime.getActionStateName(zombie)
@@ -189,7 +213,17 @@ function Internal.updateTraversalAction(zombie, record, lane, now)
     nextX = tonumber(action.endX) or zombie:getX()
     nextY = tonumber(action.endY) or zombie:getY()
     nextZ = tonumber(action.endZ) or zombie:getZ()
-    setTraversalPosition(zombie, record, lane, now, nextX, nextY, nextZ)
+    if not setTraversalPosition(
+        zombie,
+        record,
+        lane,
+        now,
+        nextX,
+        nextY,
+        nextZ
+    ) then
+        return false, "puppet_opera_traversal_blocked"
+    end
     crossed = Runtime.isFenceCrossed(zombie, action)
     if not crossed and not timedOut then
         return true, action.kind .. "_same_side"

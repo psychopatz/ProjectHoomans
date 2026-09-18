@@ -191,7 +191,7 @@ function Internal.Now()
 end
 
 function Internal.LLMEnabled()
-    local integration = PNC.HoomansLLM
+    local integration = PNC.PBrainZ
     if integration
         and type(integration.IsProviderAvailable) == "function"
     then
@@ -203,7 +203,7 @@ function Internal.LLMEnabled()
 end
 
 function Internal.ProviderStatus()
-    local integration = PNC.HoomansLLM
+    local integration = PNC.PBrainZ
     if integration and type(integration.GetProviderStatus) == "function" then
         local ok, status = pcall(integration.GetProviderStatus)
         if ok and type(status) == "table" then return status end
@@ -226,6 +226,15 @@ function Internal.ShallowContext(view)
     output.llmProviderStatus = providerStatus.status
     output.llmProviderReason = providerStatus.reason
     output.npcID = view and view.spec and view.spec.npcID or output.npcID
+    local relationship = PNC.Network and PNC.Network.ClientState
+        and PNC.Network.ClientState.conversationRelationships
+        and PNC.Network.ClientState.conversationRelationships[
+            tostring(output.npcID or "")
+        ] or nil
+    if relationship and output.identityTrust == nil then
+        output.identityTrust = relationship.identityTrust
+            or relationship.trustLabel
+    end
     output.authoredTopic = source.conversationTopic
         or source.conversationBlockContext
         and source.conversationBlockContext.conversationTopic
@@ -315,6 +324,103 @@ function Internal.RequestCognitionForIR(view, ir)
             targetID = targetID,
             conversationToken = lifecycle and lifecycle.token,
         }
+    )
+end
+
+local function identityClaimName(ir)
+    local claim = ir and ir.slots and ir.slots.identityClaim or nil
+    return type(claim) == "table" and claim.name or nil
+end
+
+local function pendingIdentity(context)
+    local state = context and context.semanticContextState
+    return context and context.pendingIdentityExchange
+        or state and state.pendingIdentityExchange
+        or context and context.semanticDialogueContext
+        and context.semanticDialogueContext.pendingIdentityExchange
+end
+
+-- Identity is a small semantic side effect with two different authorities:
+-- the existing knowledge service discloses an NPC name, while the semantic
+-- identity command validates the player's claim and applies social fallout.
+function Internal.PrepareIdentityRequest(view, ir, context)
+    local npcID = view and view.spec and view.spec.npcID
+    local lifecycle = context and context.conversationLifecycleState or nil
+    if type(ir) ~= "table" or not npcID then
+        return nil
+    end
+
+    if ir.intent == "QUESTION" and ir.subject == "IDENTITY" then
+        if context.identityTrust == "untrustworthy" then
+            return nil
+        end
+        if context.identityState == "known"
+        then
+            return nil
+        end
+        return {
+            kind = "identity_disclosure",
+            npcID = npcID,
+            conversationToken = lifecycle and lifecycle.token,
+        }
+    end
+
+    if ir.socialContext and ir.socialContext.identityClaim == true then
+        return {
+            kind = "identity_claim",
+            npcID = npcID,
+            claimedName = identityClaimName(ir),
+            conversationToken = lifecycle and lifecycle.token,
+        }
+    end
+
+    if pendingIdentity(context)
+        and not (ir.intent == "QUESTION" and ir.subject == "IDENTITY")
+    then
+        return {
+            kind = "identity_evasion",
+            npcID = npcID,
+            conversationToken = lifecycle and lifecycle.token,
+        }
+    end
+    return nil
+end
+
+function Internal.DispatchIdentityRequest(request)
+    request = type(request) == "table" and request or nil
+    local client = PNC.Client
+    if not request or not client then return false, "identity_request_unavailable" end
+    if request.kind == "identity_disclosure" then
+        if type(client.RequestNPCKnowledgeTopic) ~= "function" then
+            return false, "identity_disclosure_unavailable"
+        end
+        local pending = PNC.Network and PNC.Network.ClientState
+            and PNC.Network.ClientState.pendingDisclosure
+            and PNC.Network.ClientState.pendingDisclosure[
+                tostring(request.npcID)
+            ]
+        if pending then return false, "identity_request_pending" end
+        return client.RequestNPCKnowledgeTopic(
+            request.npcID, "identity_name", {
+                conversationToken = request.conversationToken,
+                origin = "semantic_dialogue",
+            }
+        )
+    end
+    if type(client.SubmitSemanticIdentity) ~= "function" then
+        return false, "identity_claim_transport_unavailable"
+    end
+    return client.SubmitSemanticIdentity(request.npcID, {
+        kind = request.kind,
+        claimedName = request.claimedName,
+        conversationToken = request.conversationToken,
+        origin = "semantic_dialogue",
+    })
+end
+
+function Internal.RequestIdentityForIR(view, ir, context)
+    return Internal.DispatchIdentityRequest(
+        Internal.PrepareIdentityRequest(view, ir, context)
     )
 end
 

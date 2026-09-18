@@ -2,48 +2,23 @@
 -- JSON keeps these files data-only and safe to share with other clients/mods.
 
 require "PNC/UI/UniqueNPCEditor/PNC_UniqueNPCEditorModel"
+require "PNC/Core/Definitions/PNC_DefinitionDatabase"
 
 PNC = PNC or {}
 PNC.UniqueNPCEditorStorage = PNC.UniqueNPCEditorStorage or {}
 
 local Storage = PNC.UniqueNPCEditorStorage
 local Model = PNC.UniqueNPCEditorModel
+local Database = PNC.DefinitionDatabase
 local Json = require "PsychopatzCore/Bridge/PsychopatzBridgeJson"
 
-local ROOT = "Hoomans"
-local INDEX = ROOT .. "/UniqueNPCIndex.txt"
+local ROOT = Database.ROOT
+local INDEX = Database.INDEX_PATH
+local DIRECTORY = Database.GetDirectory("npc")
 local LIMITS = { maxString = 65536, maxDepth = 12, maxCollection = 512 }
-local MAX_FILE_LINES = 8192
 
 local function safeFileName(value)
-    value = tostring(value or "")
-    if string.match(value, "^[%w%-_]+%.txt$") then return value end
-    return nil
-end
-
-local function path(fileName)
-    return ROOT .. "/" .. tostring(fileName)
-end
-
-local function read(fileName)
-    local reader = getFileReader and getFileReader(path(fileName), false) or nil
-    local lines = {}
-    if not reader then return nil, "file_missing" end
-    while #lines < MAX_FILE_LINES do
-        local line = reader:readLine()
-        if line == nil then break end
-        lines[#lines + 1] = line
-    end
-    reader:close()
-    return table.concat(lines, "\n")
-end
-
-local function write(fileName, content)
-    local writer = getFileWriter and getFileWriter(path(fileName), true, false) or nil
-    if not writer then return false, "file_unavailable" end
-    writer:write(tostring(content or ""))
-    writer:close()
-    return true
+    return Database.SafeFileName(value)
 end
 
 local function decode(textValue)
@@ -55,19 +30,10 @@ local function encode(value)
     return Json.Encode(value, LIMITS)
 end
 
-local function indexPayload(files)
-    return { schemaVersion = 1, kind = "ProjectHoomans.UniqueNPCIndex", files = files }
-end
-
 function Storage.LoadIndex()
-    local content = read("UniqueNPCIndex.txt")
-    local payload
-    if not content then return {} end
-    payload = decode(content)
-    if type(payload) ~= "table" or type(payload.files) ~= "table" then return {} end
     local output = {}
-    for _, fileName in ipairs(payload.files) do
-        fileName = safeFileName(fileName)
+    for _, entry in ipairs(Database.List("npc")) do
+        local fileName = safeFileName(entry.fileName)
         if fileName then output[#output + 1] = fileName end
     end
     table.sort(output)
@@ -76,17 +42,7 @@ end
 
 function Storage.RebuildIndex(files)
     files = type(files) == "table" and files or Storage.LoadIndex()
-    local seen = {}
-    local output = {}
-    for _, fileName in ipairs(files) do
-        fileName = safeFileName(fileName)
-        if fileName and not seen[fileName] then
-            seen[fileName] = true
-            output[#output + 1] = fileName
-        end
-    end
-    table.sort(output)
-    return write("UniqueNPCIndex.txt", encode(indexPayload(output)))
+    return Database.ReplaceKind("npc", files)
 end
 
 function Storage.FileName(draft)
@@ -102,7 +58,6 @@ end
 function Storage.Save(draft, produced)
     local valid, normalized = Model.Validate(draft)
     local fileName
-    local files
     local payload
     if not valid then return false, normalized end
     Model.SyncFromRuntime(draft)
@@ -114,14 +69,19 @@ function Storage.Save(draft, produced)
         produced = produced == true,
         definition = normalized,
     }
-    local ok, reason = write(fileName, encode(payload))
+    local ok, reason = Database.WriteFile("npc", fileName, encode(payload))
     if not ok then return false, reason end
+    local indexed, indexReason = Database.Upsert("npc", fileName, {
+        definitionType = "npc",
+        fileName = fileName,
+        definitionId = normalized.id,
+        displayName = normalized.displayName,
+        schemaVersion = payload.schemaVersion,
+    })
+    if not indexed then return false, indexReason end
     draft.fileName = fileName
     draft.id = normalized.id
     draft.identityIDLocked = true
-    files = Storage.LoadIndex()
-    files[#files + 1] = fileName
-    Storage.RebuildIndex(files)
     draft._dirty = false
     return true, fileName, normalized
 end
@@ -129,7 +89,7 @@ end
 function Storage.LoadFile(fileName)
     fileName = safeFileName(fileName)
     if not fileName then return nil, "invalid_file_name" end
-    local content, reason = read(fileName)
+    local content, reason = Database.ReadFile("npc", fileName)
     local payload
     if not content then return nil, reason end
     payload, reason = decode(content)
@@ -161,5 +121,6 @@ end
 
 Storage.ROOT = ROOT
 Storage.INDEX = INDEX
+Storage.DIRECTORY = DIRECTORY
 
 return Storage

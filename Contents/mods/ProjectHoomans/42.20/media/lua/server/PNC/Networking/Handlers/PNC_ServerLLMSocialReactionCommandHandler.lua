@@ -1,4 +1,4 @@
--- Authoritative adapter for the Project Hoomans LLM social reaction tool.
+-- Authoritative adapter for the PBrainZ social reaction tool.
 -- The provider never supplies relationship deltas or a trusted target.
 
 if PsychopatzCore and PsychopatzCore.RuntimeRole

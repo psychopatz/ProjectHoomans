@@ -1,0 +1,82 @@
+local T = require "tests/support/test"
+T.addPackagePaths({
+    { "ProjectHoomans", "client" },
+    { "PsychopatzCore", "common_client" },
+    { "PsychopatzCore", "client" },
+    { "PsychopatzCore", "common" },
+})
+
+PsychopatzCore = {
+    Bridge = {
+        GetToolCatalog = function()
+            return {
+                catalog_id = "catalog-1",
+                tools = {
+                    { id = "pbrainz.llm:social_react" },
+                    { id = "pbrainz.llm:ask_name" },
+                    { id = "pbrainz.llm:order_follow" },
+                    { id = "pbrainz.llm:order_camp" },
+                },
+            }
+        end,
+    },
+    Conversation = {
+        Message = {
+            GetSaveID = function() return "save-1" end,
+            GetGameDay = function() return 3 end,
+        },
+        Text = { Resolve = function() return "" end },
+    },
+}
+PNC = {
+    Network = { ClientState = { playerContext = { characterUUID = "player-1" } } },
+    CompanionCommands = {
+        List = function()
+            return {
+                { id = "follow", clientOnly = false },
+                {
+                    id = "camp",
+                    clientOnly = false,
+                    llmDescription = "Use when the player says stay here for now.",
+                },
+            }
+        end,
+    },
+}
+getCurrentSaveName = function() return "Save One" end
+getTimeInMillis = function() return 1000 end
+
+T.load("ProjectHoomans", "client",
+    "PNC/Integrations/PBrainZ/PNC_PBrainZ_Context.lua")
+
+local Context = PNC.PBrainZ.Context
+local view = {
+    spec = {
+        npcID = "npc-1",
+        context = {
+            npcName = "Harley", playerName = "Alex", entry = { id = "npc-1" },
+        },
+    },
+    session = { participants = {}, llmSessionID = "conversation-1" },
+    historyPart = { messages = {} },
+}
+
+local context = Context.Build(view, "hello")
+T.load("ProjectHoomans", "shared", "PNC/Conversation/PNC_ConversationLLMTools.lua")
+local definition = PNC.ConversationLLMTools.BuildDefinition()
+local properties = definition["function"].parameters.properties
+T.equal(properties.subtype.enum[3], "sexual_advance",
+    "sexual subtype is exposed in the social tool schema")
+T.equal(properties.explicit.type, "boolean",
+    "explicit social metadata is exposed in the social tool schema")
+T.equal(context.available_tools, nil, "catalog mode avoids repeated full schemas")
+T.equal(context.tool_catalog_id, "catalog-1", "catalog ID missing")
+T.equal(#context.available_tool_ids, 4, "allowed tool IDs missing")
+T.equal(context.available_tool_ids[2], "pbrainz.llm:ask_name",
+    "identity tool ID missing")
+T.equal(context.available_tool_ids[3], "pbrainz.llm:order_follow",
+    "command tool ID missing")
+T.equal(context.available_tool_ids[4], "pbrainz.llm:order_camp",
+    "camp command tool ID missing")
+
+T.finish("pnc_pbrainz_tool_catalog_smoke")

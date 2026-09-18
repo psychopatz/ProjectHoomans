@@ -73,6 +73,29 @@ class ManagerTests(unittest.TestCase):
 
             saved = drafts.save(SAMPLE)
             self.assertTrue(saved.exists())
+            self.assertEqual(saved.parent.name, "NPC Definitions")
+            index = json.loads(
+                (root / "UniqueNPCIndex.txt").read_text(encoding="utf-8")
+            )
+            self.assertEqual(index["schemaVersion"], 2)
+            self.assertEqual(index["entries"][0]["definitionType"], "npc")
+            index["entries"].append(
+                {
+                    "definitionType": "opera",
+                    "fileName": "social.kiss_player_npc.txt",
+                    "path": "Hoomans/Opera Definitions/social.kiss_player_npc.txt",
+                }
+            )
+            index_path = root / "UniqueNPCIndex.txt"
+            index_path.write_text(json.dumps(index), encoding="utf-8")
+            drafts.save(SAMPLE, "SecondNpc.txt")
+            preserved_index = json.loads(index_path.read_text(encoding="utf-8"))
+            self.assertTrue(
+                any(
+                    entry.get("definitionType") == "opera"
+                    for entry in preserved_index["entries"]
+                )
+            )
             loaded = drafts.load(saved.name)
             normalized = build_payload(loaded)["definition"]
             generated = definitions.export_all([normalized])

@@ -3,6 +3,7 @@ PNC.FacilityJobsBehaviorInternal = PNC.FacilityJobsBehaviorInternal or {}
 
 local Internal = PNC.FacilityJobsBehaviorInternal
 local Definitions = PNC.FacilityJobDefinitions
+local Diagnostics = PNC.PerformanceScalingDiagnostics
 local PERSONAL_FOOD_RETRY_COOLDOWN_MS = 5000
 
 function Internal.OnSceneTick(record, zombie, scene, now)
@@ -10,6 +11,7 @@ function Internal.OnSceneTick(record, zombie, scene, now)
     local definition = runtime and Definitions.Get(runtime.capability) or nil
     local sceneId = runtime and runtime.sceneId ~= "" and runtime.sceneId
         or definition and definition.sceneId
+    local sleepWasActive = runtime and runtime.sleepSceneActive == true
     if not runtime or not definition or scene.id ~= sceneId then
         return false
     end
@@ -18,6 +20,22 @@ function Internal.OnSceneTick(record, zombie, scene, now)
         -- animation scene has been accepted. Reaching the bed is not sleep.
         runtime.sleepSceneActive = true
         runtime.phase = "SLEEPING"
+        if not sleepWasActive
+            and Diagnostics and Diagnostics.SleepAuditEnabled == true
+            and Diagnostics.LogSleepState
+        then
+            Diagnostics.LogSleepState(
+                "sleep_scene_active",
+                record,
+                zombie,
+                scene,
+                "scene_tick",
+                {
+                    "sceneAccepted=true",
+                    "sceneStep=" .. tostring(scene and scene.stepId or ""),
+                }
+            )
+        end
     else
         runtime.phase = runtime.seating == true
             and "SEATED" or definition.activityLabel or "WORKING"
@@ -131,6 +149,21 @@ function Internal.OnSceneStopped(record, zombie, scene, reason)
                 .. " completionRequested="
                 .. tostring(runtime.completionRequested == true))
     end
+    if capability == "sleep"
+        and Diagnostics and Diagnostics.SleepAuditEnabled == true
+        and Diagnostics.LogSleepState
+    then
+        Diagnostics.LogSleepState(
+            "sleep_scene_stopped",
+            record,
+            zombie,
+            scene,
+            reason or "scene_stopped",
+            {
+                "sceneAccepted=" .. tostring(runtime.sleepSceneActive == true),
+            }
+        )
+    end
     if capability == "sleep" then
         if reason == "interrupted:externalBump" then
             -- An external bump is about to replace the sleep selector. There
@@ -138,8 +171,16 @@ function Internal.OnSceneStopped(record, zombie, scene, reason)
             -- finish the facility activity without touching the incoming
             -- bump lease.
             runtime.sleepSceneActive = false
+            if Internal.RestoreSleepPosition then
+                local restored = Internal.RestoreSleepPosition(
+                    record, zombie, runtime, record.orderSpec)
+                if not restored then
+                    Internal.BeginSleepWake(
+                        record, zombie, "sleep_external_bump")
+                    return
+                end
+            end
             Internal.ClearSleepSurface(record, zombie, runtime)
-            Internal.RestorePosition(record, zombie, runtime)
             runtime.arrivalSettled = false
             Internal.Finish(record, zombie, "sleep_external_bump")
             return

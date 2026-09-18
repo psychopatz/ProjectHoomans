@@ -10,6 +10,8 @@ PNC.AmbientFacilityService = PNC.AmbientFacilityService or {}
 local Service = PNC.AmbientFacilityService
 Service.NextAttemptAt = Service.NextAttemptAt or {}
 Service.CADENCE_MS = 5000
+local ActorControl = PNC.ActorControl
+    or require "PNC/Core/ActorControl/PNC_ActorControl"
 
 local function now()
     return PNC.Core and PNC.Core.Now and PNC.Core.Now() or 0
@@ -51,6 +53,14 @@ local function eligible(record, currentTime)
         or not PNC.CompanionCommands
         or not PNC.CompanionCommands.IsCompanion(record)
     then return false end
+    if ActorControl and ActorControl.IsPuppetOwned
+        and ActorControl.IsPuppetOwned(record)
+    then
+        -- Ambient seating is an independent server pump. It must yield before
+        -- acquiring a reservation or starting a facility activity for an
+        -- actor temporarily owned by Puppet Opera.
+        return false
+    end
     if PNC.TaskLeaseService and PNC.TaskLeaseService.ForNPC(record.id) then
         return false
     end

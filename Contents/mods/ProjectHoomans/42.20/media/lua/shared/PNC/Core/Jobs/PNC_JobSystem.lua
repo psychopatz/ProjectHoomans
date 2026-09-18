@@ -45,12 +45,35 @@ function JobSystem.RegisterOrder(kind, job)
     return true
 end
 
+local function isCampPlacementTransit(record, kind)
+    local placement
+    local state
+    if not Const or kind ~= Const.ORDER_CAMP then return false end
+    placement = record and record.runtime
+        and record.runtime.campPlacement or nil
+    state = placement and placement.state
+        or record and record.orderSpec and record.orderSpec.placementState
+    state = string.lower(tostring(state or ""))
+    return state == "queued" or state == "moving" or state == "failed"
+end
+
 function JobSystem.Select(record)
     local order = record.orderSpec or {}
     local kind = tostring(order.kind or "")
     local registeredJob = JobSystem.OrderJobs[kind]
+    local campTransit = isCampPlacementTransit(record, kind)
+    local activity = record.runtime and record.runtime.facilityActivity or nil
 
-    if JobSystem.IsFacilityActivityActive(record) then
+    -- A camp placement owns the movement boundary. Existing facility work is
+    -- allowed to finish only when it is in the explicit native sleep-wake
+    -- transaction; otherwise it must not reclaim the actor between the camp
+    -- coordinator's movement ticks.
+    if not campTransit and JobSystem.IsFacilityActivityActive(record) then
+        return "FacilityActivity"
+    end
+    if campTransit and activity and activity.sleepWakePending == true
+        and JobSystem.IsFacilityActivityActive(record)
+    then
         return "FacilityActivity"
     end
 

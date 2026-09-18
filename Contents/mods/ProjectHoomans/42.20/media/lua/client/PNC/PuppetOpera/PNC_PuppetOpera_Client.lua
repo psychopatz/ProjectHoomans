@@ -41,6 +41,10 @@ Client.State = Client.State or {
     previewPlayerOwner = nil,
     previewNPCID = nil,
     previewNPCBody = nil,
+    previewLoop = false,
+    previewNPCEntry = nil,
+    previewNPCRecord = nil,
+    previewNPCNextAt = 0,
 }
 
 local State = Client.State
@@ -123,7 +127,7 @@ function Client.Start(blueprintID, npcID, loopEnabled, definition,
     -- player controller's preview lease from blocking the first beat.
     Client.StopPreview()
     return request("start", {
-        blueprintId = tostring(blueprintID or "social.kiss_test"),
+        blueprintId = tostring(blueprintID or "social.kiss_player_npc"),
         npcID = npcID and tostring(npcID) or nil,
         actors = type(actorBindings) == "table" and actorBindings or nil,
         loop = loopEnabled == true,
@@ -142,7 +146,7 @@ function Client.Replay(blueprintID, npcID, loopEnabled, definition,
     end
     Client.StopPreview()
     return request("replay", {
-        blueprintId = tostring(blueprintID or "social.kiss_test"),
+        blueprintId = tostring(blueprintID or "social.kiss_player_npc"),
         npcID = npcID and tostring(npcID) or nil,
         actors = type(actorBindings) == "table" and actorBindings or nil,
         loop = loopEnabled == true,
@@ -171,7 +175,7 @@ function Client.Preflight(blueprintID, definition, actorBindings, requestKey,
         State.error = nil
     end
     return request("preflight", {
-        blueprintId = tostring(blueprintID or "social.kiss_test"),
+        blueprintId = tostring(blueprintID or "social.kiss_player_npc"),
         actors = type(actorBindings) == "table" and actorBindings or {},
         definition = type(definition) == "table" and definition or nil,
     })
@@ -191,12 +195,18 @@ function Client.StartPlacementPreview(blueprintID, definition, actorBindings,
     if snapshot and snapshot.preview == true and snapshot.sessionId then
         stopOwnedLocals(snapshot.sessionId)
     end
+    -- The builder's individual player/NPC previews use the same native
+    -- animation lanes as the placement preview. Release only those previews
+    -- owned by this builder before the server evaluates the live actor; an
+    -- old local Shove preview must not present itself as an NPC action-state
+    -- conflict during placement.
+    Client.StopPreview()
     State.placementPreviewKey = key
     State.placementPreviewRefreshAt = timestamp()
     State.error = nil
     State.status = "preview_requesting"
     return request("preview_start", {
-        blueprintId = tostring(blueprintID or "social.kiss_test"),
+        blueprintId = tostring(blueprintID or "social.kiss_player_npc"),
         actors = type(actorBindings) == "table" and actorBindings or {},
         definition = type(definition) == "table" and definition or nil,
     })
@@ -334,7 +344,7 @@ function Client.PreviewPlayer(entry)
         and controller.ResolveLocalPlayer() or localPlayer()
     local accepted, reason = controller.Play(player, entry, {
         owner = PREVIEW_PLAYER_OWNER,
-        loop = false,
+        loop = State.previewLoop == true,
         actionEvents = {},
     })
     if accepted == true then State.previewPlayerOwner = PREVIEW_PLAYER_OWNER end
@@ -361,11 +371,34 @@ function Client.PreviewNPC(entry, npcID, body, record)
         clearPreviewNPCMarker(active.body)
         debugPlayer.Stop("preview_replaced")
     end
-    local accepted, reason = debugPlayer.PlayXML(entry, id, body, record)
+    -- The Presentation Lab's default preview is intentionally a generic
+    -- debugger lease. Puppet Opera previews are a non-combat presentation
+    -- lease, otherwise PlayBump leaves the body in `bumped` and the server
+    -- readiness gate correctly rejects the same actor as action-state busy.
+    -- Keep this option at the shared Animation.PlayBump boundary so the
+    -- builder uses the same XML/BumpType pipeline as the NPC lab without
+    -- weakening the normal NPC action route.
+    local accepted, reason = debugPlayer.PlayXML(
+        entry,
+        id,
+        body,
+        record,
+        {
+            sceneId = PREVIEW_NPC_OWNER .. ":" .. id,
+            sceneRevision = 0,
+            leaseUntil = timestamp() + 10000,
+            keepManagedUseless = false,
+            nonCombat = true,
+            loop = State.previewLoop == true,
+        }
+    )
     if accepted == true then
         State.previewNPCID = id
         State.previewNPCBody = debugPlayer.active
             and debugPlayer.active.body or body
+        State.previewNPCEntry = entry
+        State.previewNPCRecord = record
+        State.previewNPCNextAt = timestamp() + 900
         markPreviewNPC(State.previewNPCBody)
     end
     return accepted == true, reason
@@ -398,7 +431,51 @@ function Client.StopPreview()
     State.previewPlayerOwner = nil
     State.previewNPCID = nil
     State.previewNPCBody = nil
+    State.previewNPCEntry = nil
+    State.previewNPCRecord = nil
+    State.previewNPCNextAt = 0
     return stopped
+end
+
+function Client.SetPreviewLoopEnabled(enabled)
+    State.previewLoop = enabled == true
+    if not State.previewLoop then State.previewNPCNextAt = 0 end
+    return State.previewLoop
+end
+
+function Client.GetPreviewLoopEnabled()
+    return State.previewLoop == true
+end
+
+local function pumpPreviewLoop()
+    if State.previewLoop ~= true then return end
+    local debugPlayer = PNC.AnimationDebugPlayer
+    local active = debugPlayer and debugPlayer.active or nil
+    if not active
+        or tostring(active.npcId or "") ~= tostring(State.previewNPCID or "")
+        or previewNPCMarker(active.body) ~= PREVIEW_NPC_OWNER
+    then
+        return
+    end
+    local current = timestamp()
+    if debugPlayer.Maintain then
+        debugPlayer.Maintain(active.body, current)
+    end
+    if current < (tonumber(State.previewNPCNextAt) or 0) then return end
+    if debugPlayer.Replay and State.previewNPCEntry then
+        local accepted = debugPlayer.Replay()
+        if accepted == true then
+            local entry = State.previewNPCEntry
+            local duration = tonumber(entry.durationMs) or 900
+            local speed = tonumber(entry.speed) or 1
+            duration = math.floor(duration / math.max(0.1, speed))
+            duration = math.max(250, math.min(5000, duration))
+            State.previewNPCNextAt = current + duration
+            if debugPlayer.active and debugPlayer.active.body then
+                markPreviewNPC(debugPlayer.active.body)
+            end
+        end
+    end
 end
 
 stopOwnedLocals = function(sessionID)
@@ -702,12 +779,13 @@ end
 function Client.GetGridPreview()
     local snapshot = State.snapshot
     local blueprint = snapshot
-        and Blueprints.Get(snapshot.blueprintId) or Blueprints.Get("social.kiss_test")
+        and Blueprints.Get(snapshot.blueprintId) or Blueprints.Get("social.kiss_player_npc")
     return Anchors.GetGridPreview(blueprint)
 end
 
 function Client.Pump()
     pumpPendingReleases()
+    pumpPreviewLoop()
     local snapshot = State.snapshot
     if not snapshot or finalPhase(snapshot.phase) then return end
     local sessionID = snapshot.sessionId
@@ -758,7 +836,11 @@ function Client.Pump()
             return
         end
         local track = Blueprints.GetTrack
-            and Blueprints.GetTrack(beat, localActorID)
+            and Blueprints.GetTrack(
+                beat,
+                localActorID,
+                localActorState.kind
+            )
             or beat.tracks and beat.tracks[localActorID]
             or beat.player
         if not track then
@@ -825,6 +907,7 @@ function Client.Reset()
     State.preflightRequestedAt = 0
     State.placementPreviewKey = nil
     State.placementPreviewRefreshAt = 0
+    State.previewLoop = false
 end
 
 if PNC.Client and PNC.Client.Internal

@@ -386,7 +386,8 @@ function Resources.GetCapacity(facility, capability, suppliedScan)
             local resource = scan.resources[index]
             if bindingDetectorMatches(resourceBinding, resource)
             then
-                count = count + 1
+                count = count + (tostring(capability or "") == "sleep"
+                    and Resources.GetSleepCapacity(resource) or 1)
             end
         end
         -- A confirmed physical resource count is the automatic room
@@ -404,10 +405,55 @@ function Resources.GetCapacity(facility, capability, suppliedScan)
         or nil, "default", scan and scan.status or nil
 end
 
-local function resourceReserved(resource)
+function Resources.GetSleepCapacity(resource)
+    if type(resource) ~= "table" then return 1 end
+    local explicit = tonumber(resource.sleepCapacity
+        or resource.bedCapacity)
+    if explicit and explicit >= 1 then
+        return math.min(2, math.floor(explicit))
+    end
+    if tostring(resource.sleepSurface or resource.detectorId or "") == "sofa"
+    then
+        return 1
+    end
+    local width = tonumber(resource.gridWidth
+        or resource.sleepGridWidth) or 1
+    local height = tonumber(resource.gridHeight
+        or resource.sleepGridHeight) or 1
+    return math.max(width, height) >= 2 and 2 or 1
+end
+
+local function isSleepResource(resource)
+    local surface = tostring(resource and resource.sleepSurface or "")
+    return tostring(resource and resource.resourceKind or "")
+        == "sleep_surface"
+        and (surface == "bed" or surface == "sofa")
+end
+
+local function resourceSlotAvailable(resource, target)
     local reservations = PNC.FacilityReservations
-    return reservations and reservations.ByResource
-        and reservations.ByResource[tostring(resource.resourceKey or "")] ~= nil
+    local key = tostring(resource and resource.resourceKey or "")
+    if key == "" then return false end
+    if isSleepResource(resource) and reservations
+        and reservations.IsResourceAvailable
+    then
+        return reservations.IsResourceAvailable(resource,
+            target and target.sleepSlotId)
+    end
+    if target and target.sleepSlotId and reservations
+        and reservations.ByResourceSlot
+    then
+        return reservations.ByResourceSlot[key .. ":"
+            .. tostring(target.sleepSlotId)] == nil
+            and not (reservations.ByResource
+                and reservations.ByResource[key])
+    end
+    return not (reservations and reservations.ByResource
+        and reservations.ByResource[key] ~= nil)
+end
+
+local function resourceReserved(resource)
+    return not resourceSlotAvailable(resource)
 end
 
 local function virtualResource(facility, bindingData, npcId)
@@ -500,21 +546,38 @@ function Resources.Select(facility, capability, options)
         local resource = resources[index]
         local keyMatches = requestedKey == ""
             or requestedKey == tostring(resource.resourceKey)
-        if keyMatches and not resourceReserved(resource) then
+        if keyMatches then
             local targets = PNC.FacilityInteractionTargets
                 and PNC.FacilityInteractionTargets.ResolveResource
                 and PNC.FacilityInteractionTargets.ResolveResource(resource, {
                     abstract = options.abstract == true,
                     character = options.character,
                 }) or {}
-            local target = targets[1]
-            if target and (tostring(capability or "") ~= "sleep"
-                or Resources.IsValidSleepTarget(resource, target))
+            local target
+            if tostring(capability or "") == "sleep" then
+                for targetIndex = 1, #targets do
+                    local candidate = targets[targetIndex]
+                    if Resources.IsValidSleepTarget(resource, candidate)
+                        and resourceSlotAvailable(resource, candidate)
+                    then
+                        target = candidate
+                        break
+                    end
+                end
+            elseif resourceSlotAvailable(resource, targets[1]) then
+                target = targets[1]
+            end
+            if target
             then
                 return { resource = resource, target = target, targets = targets,
                     role = resource.role or bindingData.role,
                     resourceKind = resource.resourceKind or bindingData.resourceKind,
                     resourceKey = resource.resourceKey,
+                    sleepSlotId = target.sleepSlotId,
+                    sleepCapacity = target.sleepCapacity
+                        or Resources.GetSleepCapacity(resource),
+                    bedCapacity = target.bedCapacity
+                        or Resources.GetSleepCapacity(resource),
                     scanStatus = scanStatus }
             end
         end
@@ -529,6 +592,9 @@ function Resources.Select(facility, capability, options)
             return { resource = virtual, target = target, targets = targets,
                 role = virtual.role, resourceKind = virtual.resourceKind,
                 resourceKey = virtual.resourceKey,
+                sleepSlotId = target and target.sleepSlotId,
+                sleepCapacity = target and target.sleepCapacity
+                    or Resources.GetSleepCapacity(virtual),
                 floorSeating = virtual.floorSeating == true,
                 scanStatus = scanStatus }
         end
@@ -992,6 +1058,8 @@ Resources.Register("bed", {
         bed.resourceKind = "sleep_surface"
         bed.role = "sleep.bed"
         bed.sleepSurface = "bed"
+        bed.sleepCapacity = Resources.GetSleepCapacity(bed)
+        bed.bedCapacity = bed.sleepCapacity
         return bed
     end,
     key = function(resource)
@@ -1016,6 +1084,7 @@ Resources.Register("sofa", {
         sofa.resourceKind = "sleep_surface"
         sofa.role = "sleep.sofa"
         sofa.sleepSurface = "sofa"
+        sofa.sleepCapacity = 1
         return sofa
     end,
     key = function(resource)

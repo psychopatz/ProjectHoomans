@@ -18,7 +18,7 @@ end
 Router.Register(Const.CMD_COMPANION_COMMAND, function(player, args)
     if not args.commandID then return end
     if CompanionCommands and CompanionCommands.Execute then
-        local affected, reason, affectedTargets =
+        local affected, reason, affectedTargets, details =
             CompanionCommands.Execute(player, args)
         if sendServerCommand
             and (tostring(args.commandID) == "camp"
@@ -39,6 +39,7 @@ Router.Register(Const.CMD_COMPANION_COMMAND, function(player, args)
                     accepted = (tonumber(affected) or 0) > 0,
                     reason = tostring(reason),
                     targets = affectedTargets,
+                    details = details,
                     requestID = args.requestID,
                     callID = args.callID,
                     commandSource = args.commandSource,

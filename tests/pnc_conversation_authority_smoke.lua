@@ -411,6 +411,61 @@ T.equal(admissionReplayReason, "replayed_request",
 T.equal(admissionCalls, 1,
     "settlement admission replay does not duplicate the transfer")
 
+local ambientVisitCalls = 0
+record.runtime.conversationLease = {
+    token = "lease-token",
+    maximumDistance = 6,
+    dangerRadius = 8,
+}
+PNC.AmbientVisitService = {
+    Invite = function(invitedRecord, invitedPlayer, relationship, options)
+        ambientVisitCalls = ambientVisitCalls + 1
+        T.equal(invitedRecord, record,
+            "ambient visit carries the selected NPC")
+        T.equal(invitedPlayer, player,
+            "ambient visit carries the requesting player")
+        T.equal(relationship.state, "admire",
+            "ambient visit carries the server relationship")
+        T.equal(options.authorized, true,
+            "ambient visit authority marker is server-set")
+        return true, "ambient_visit_started", {
+            siteLabel = "living room",
+        }
+    end,
+}
+local ambientAccepted, ambientReason =
+    Authority.HandleAmbientVisit(player, {
+        requestID = "ambient-visit-1",
+        npcID = record.id,
+        token = "lease-token",
+        registryFingerprint = fingerprint,
+    })
+T.truthy(ambientAccepted, ambientReason)
+T.equal(ambientVisitCalls, 1,
+    "ambient visit reaches the temporary lease exactly once")
+T.equal(sent[#sent].command,
+    PNC.Const.CMD_CONVERSATION_AMBIENT_VISIT_RESULT,
+    "ambient visit response uses its dedicated command")
+T.equal(sent[#sent].payload.success, true,
+    "ambient visit response succeeds")
+T.equal(sent[#sent].payload.responseKey,
+    "response.ambient_visit.accepted.1",
+    "ambient visit response carries its dedicated dialogue key")
+T.equal(sent[#sent].payload.visit.siteLabel, "living room",
+    "ambient visit response carries the resolved site label")
+local ambientReplay, ambientReplayReason =
+    Authority.HandleAmbientVisit(player, {
+        requestID = "ambient-visit-1",
+        npcID = record.id,
+        token = "lease-token",
+        registryFingerprint = fingerprint,
+    })
+T.falsy(ambientReplay, "ambient visit replay is rejected")
+T.equal(ambientReplayReason, "replayed_request",
+    "ambient visit replay reports the correct reason")
+T.equal(ambientVisitCalls, 1,
+    "ambient visit replay does not duplicate the lease")
+
 T.finish("pnc_conversation_authority_smoke")
 
 T.finish("pnc_conversation_authority_smoke")

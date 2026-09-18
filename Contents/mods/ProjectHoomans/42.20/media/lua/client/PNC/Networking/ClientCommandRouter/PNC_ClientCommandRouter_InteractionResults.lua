@@ -409,6 +409,21 @@ if Const.CMD_CONVERSATION_SETTLEMENT_ADMISSION_RESULT then
     )
 end
 
+if Const.CMD_CONVERSATION_AMBIENT_VISIT_RESULT then
+    Internal.RegisterServerCommand(
+        Const.CMD_CONVERSATION_AMBIENT_VISIT_RESULT,
+        function(args)
+            if PNC.Conversation and PNC.Conversation.Composer
+                and PNC.Conversation.Composer.ReceiveAmbientVisitOutcome
+            then
+                PNC.Conversation.Composer.ReceiveAmbientVisitOutcome(
+                    args or {}
+                )
+            end
+        end
+    )
+end
+
 if Const.CMD_CONVERSATION_DEPARTURE_RESULT then
     Internal.RegisterServerCommand(Const.CMD_CONVERSATION_DEPARTURE_RESULT,
         function(args)

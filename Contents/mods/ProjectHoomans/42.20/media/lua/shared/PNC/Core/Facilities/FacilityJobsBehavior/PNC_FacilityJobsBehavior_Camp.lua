@@ -38,6 +38,7 @@ function Internal.SleepTargetChanged(order, runtime, previous)
         "sleepAnchorX", "sleepAnchorY", "sleepAnchorZ", "sleepAxis",
         "sleepFacing", "sleepSprite", "sleepGridX", "sleepGridY",
         "sleepGridWidth", "sleepGridHeight",
+        "sleepSlotId", "sleepSlotIndex", "sleepCapacity", "bedCapacity",
     }
     for index = 1, #fields do
         local field = fields[index]

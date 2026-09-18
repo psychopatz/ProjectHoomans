@@ -17,6 +17,7 @@ local MobileAccidents = PNC.AbstractMobileAccidents
 local MobileGroupDirector = PNC.MobileGroupDirector
 local MobileGroupDirectorInternal = PNC.MobileGroupDirectorInternal
 local MobileSettlementVisitService = PNC.MobileSettlementVisitService
+local AmbientVisitService = PNC.AmbientVisitService
 local Scheduler = PNC.Scheduler
 local Config = PNC.DirectorConfig
 
@@ -102,6 +103,21 @@ function Director.Initialize(force)
         end,
         { budget = Config.DIRECTOR_JOB_BUDGET,
             startAt = now + Config.MOBILE_AMBIENT_INTERVAL_HOURS })
+    Scheduler.RegisterJob("AmbientVisits",
+        AmbientVisitService and AmbientVisitService.PUMP_INTERVAL_HOURS
+            or (2 / 60),
+        function(at, budget)
+            if Director.Paused or not AmbientVisitService
+                or not AmbientVisitService.Pump
+            then
+                return 0
+            end
+            return AmbientVisitService.Pump(at, budget)
+        end,
+        { budget = AmbientVisitService
+                and AmbientVisitService.PUMP_BUDGET or 4,
+            startAt = now + (AmbientVisitService
+                and AmbientVisitService.PUMP_INTERVAL_HOURS or (2 / 60)) })
     Scheduler.RegisterJob("MobileDepartures",
         Config.MOBILE_DEPARTURE_INTERVAL_HOURS,
         function(at, budget)

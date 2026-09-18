@@ -17,6 +17,7 @@ function Internal.clearBumpActionLease(zombie)
         modData.PNC_BumpActionLeaseStartedAt = nil
         modData.PNC_BumpRequestedType = nil
         modData.PNC_BumpKeepUseless = nil
+        modData.PNC_BumpNonCombat = nil
     end
 end
 

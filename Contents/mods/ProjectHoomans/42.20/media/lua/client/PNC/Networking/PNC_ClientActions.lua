@@ -640,7 +640,7 @@ local function recordCampClient(status, reason, commandID, npcId, scope,
 end
 
 local function recordCampServer(commandID, npcId, scope, context, accepted,
-    reason, hint)
+    reason, hint, details)
     local diagnostics
     if tostring(commandID or "") ~= "camp" then return end
     diagnostics = campDiagnostics()
@@ -657,6 +657,7 @@ local function recordCampServer(commandID, npcId, scope, context, accepted,
             accepted = accepted == true,
             reason = reason,
             campSiteHint = hint,
+            details = details,
         })
     end
 end
@@ -741,6 +742,43 @@ local function rejectUnsafeCampLocally(player, npcId, scope, context)
     return true, reason or "camp_no_visible_site"
 end
 
+-- Nearby discovery is intentionally client-owned: the client can only see
+-- loaded candidates, while the server remains the final authority.  Send
+-- only stable NPC ids across that boundary; never forward the client-side
+-- snapshots, positions, or semantic observations as authoritative data.
+local MAX_GROUP_TARGET_IDS = 32
+
+local function groupTargetIDs(scope, context)
+    local values
+    local output
+    local seen
+    local candidate
+    local id
+    local maximum
+    if string.lower(tostring(scope or "")) ~= "group"
+        or type(context) ~= "table"
+        or type(context.targets) ~= "table"
+    then
+        return nil
+    end
+    values = context.targets
+    output = {}
+    seen = {}
+    maximum = math.min(#values, MAX_GROUP_TARGET_IDS)
+    for index = 1, maximum do
+        candidate = values[index]
+        id = type(candidate) == "table" and candidate.id or candidate
+        if id ~= nil and tostring(id) ~= "" then
+            id = tostring(id)
+            if not seen[id] then
+                seen[id] = true
+                output[#output + 1] = id
+            end
+        end
+    end
+    return output
+end
+
 function Client.SendCompanionCommand(commandID, npcId, scope, context)
     local player = getSpecificPlayer and getSpecificPlayer(0) or nil
     local args
@@ -788,6 +826,7 @@ function Client.SendCompanionCommand(commandID, npcId, scope, context)
             or nil,
         dialogueID = type(context) == "table" and context.dialogueID or nil,
         campSiteHint = campSiteHint,
+        targetIDs = groupTargetIDs(scope, context),
     }
     if Core.IsClientOnly and Core.IsClientOnly() then
         if not sendClientCommand then
@@ -812,11 +851,11 @@ function Client.SendCompanionCommand(commandID, npcId, scope, context)
         })
         return true, "network_queued"
     end
-    local affected, reason, affectedTargets =
+    local affected, reason, affectedTargets, details =
         PNC.CompanionCommands.Execute(player, args)
     local succeeded = (tonumber(affected) or 0) > 0
     recordCampServer(commandID, npcId, scope, context, succeeded, reason,
-        campSiteHint)
+        campSiteHint, details)
     publishLLMCommandResult(
         commandID,
         npcId,
@@ -841,7 +880,7 @@ function Client.SendCompanionCommand(commandID, npcId, scope, context)
         affected = tonumber(affected) or 0,
         reason = reason,
     })
-    return succeeded, reason, affectedTargets
+    return succeeded, reason, affectedTargets, details
 end
 
 function Client.ExecuteLLMSocialReaction(npcID, kind, intensity, context)

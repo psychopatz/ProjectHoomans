@@ -35,8 +35,8 @@ Commands.RequestCombatFacing = PathService.RequestCombatFacing
 Commands.RequestIdleFacing = PathService.RequestIdleFacing
 Commands.RequestAmbientFacing = PathService.RequestAmbientFacing
 Commands.ApplyTravelFacing = PathService.ApplyTravelFacing
-Commands.Reset = function(record, zombie, reason)
-    return PathService.Reset(zombie, record, reason)
+Commands.Reset = function(record, zombie, reason, owner)
+    return PathService.Reset(zombie, record, reason, owner)
 end
 
 local Queries = PathService.Queries

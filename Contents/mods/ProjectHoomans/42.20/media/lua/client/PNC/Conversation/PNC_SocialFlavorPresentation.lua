@@ -557,16 +557,16 @@ function Presentation.SetDebug(enabled)
     return Client.SetDebug(enabled)
 end
 
-if PNC.HoomansLLM
-    and PNC.HoomansLLM.SubmitAmbientFlavor
+if PNC.PBrainZ
+    and PNC.PBrainZ.SubmitAmbientFlavor
 then
     Client.SetLLMProvider(
         function(item, complete)
-            return PNC.HoomansLLM.SubmitAmbientFlavor(item, complete)
+            return PNC.PBrainZ.SubmitAmbientFlavor(item, complete)
         end,
         function(eventID)
-            if PNC.HoomansLLM.CancelAmbientFlavor then
-                return PNC.HoomansLLM.CancelAmbientFlavor(eventID)
+            if PNC.PBrainZ.CancelAmbientFlavor then
+                return PNC.PBrainZ.CancelAmbientFlavor(eventID)
             end
             return false
         end

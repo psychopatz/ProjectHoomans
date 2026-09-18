@@ -89,6 +89,16 @@ local function campContext(record)
         roomName = activity.roomName or state and state.roomName,
         roomBounds = activity.roomBounds or state and state.roomBounds,
         campfireID = activity.campfireID or state and state.campfireID,
+        zoneID = activity.zoneID or state and state.zoneID,
+        zoneLabel = activity.zoneLabel or state and state.zoneLabel,
+        zoneScope = activity.zoneScope or state and state.zoneScope,
+        campRootX = activity.campRootX or state and state.campRootX,
+        campRootY = activity.campRootY or state and state.campRootY,
+        campRootZ = activity.campRootZ or state and state.campRootZ,
+        campRootScope = activity.campRootScope
+            or state and state.campRootScope,
+        campRootSiteID = activity.campRootSiteID
+            or state and state.campRootSiteID,
     }
 end
 
@@ -373,6 +383,7 @@ local function snapshotMatches(state, order, radius, campRadius)
         and tonumber(state.campRadius) == tonumber(campRadius)
         and tonumber(state.resourceRadius) == tonumber(radius)
         and tostring(state.scope or state.siteScope or "") == tostring(scope)
+        and tostring(state.zoneID or "") == tostring(order.zoneID or "")
         and (scope ~= CampSite.SCOPES.ROOM
             or (tostring(state.siteID or "") == tostring(order.siteID or "")
                 and tostring(state.roomID or "") == tostring(order.roomID or "")
@@ -402,8 +413,11 @@ local function campDimensions(order)
 end
 
 local function campCacheKey(record, order)
-    return tostring(order and order.campId
+    local campID = tostring(order and order.campId
         or "camp:" .. tostring(record and record.id or "unknown"))
+    local zoneID = tostring(order and order.zoneID or "")
+    if zoneID ~= "" then return campID .. "|zone:" .. zoneID end
+    return campID
 end
 
 local function cacheEntry(record, order, create)
@@ -497,6 +511,8 @@ local function newCapture(entry, record, order, radius, campRadius)
         roomName = order.roomName,
         roomBounds = bounds,
         campfireID = order.campfireID or order.siteID,
+        zoneID = order.zoneID,
+        zoneLabel = order.zoneLabel,
         capturedAtWorldHour = worldHour(),
         resources = {},
     }
@@ -808,18 +824,34 @@ local function floorSeatTarget(resource)
     }
 end
 
-local function reserved(resource, excludeKey)
+local function reserved(resource, excludeKey, target, excludeReservationId)
     local key = tostring(resource and resource.resourceKey or "")
     if key == "" then return false end
     if tostring(excludeKey or "") ~= "" and key == tostring(excludeKey) then
         return true
+    end
+    if target and target.sleepSlotId
+        and PNC.FacilityReservations
+        and PNC.FacilityReservations.IsResourceAvailable
+    then
+        return not PNC.FacilityReservations.IsResourceAvailable(
+            resource, target.sleepSlotId, excludeReservationId)
+    end
+    if resource and (resource.sleepSurface == "bed"
+        or resource.sleepSurface == "sofa")
+        and PNC.FacilityReservations
+        and PNC.FacilityReservations.IsResourceAvailable
+    then
+        return not PNC.FacilityReservations.IsResourceAvailable(
+            resource, nil, excludeReservationId)
     end
     return PNC.FacilityReservations
         and PNC.FacilityReservations.ByResource
         and PNC.FacilityReservations.ByResource[key] ~= nil
 end
 
-local function resolveSleep(resource, abstract)
+local function resolveSleep(resource, abstract, character, excludeKey,
+    excludeReservationId)
     local sleepSurface = tostring(resource and resource.sleepSurface or "")
     local detectorId = tostring(resource and resource.detectorId or "")
     if type(resource) ~= "table"
@@ -829,14 +861,25 @@ local function resolveSleep(resource, abstract)
     then
         return nil, {}
     end
-    local targets = Targets and Targets.ResolveResource
-        and Targets.ResolveResource(resource, { abstract = abstract == true }) or {}
-    if targets[1] and Resources and Resources.IsValidSleepTarget
-        and not Resources.IsValidSleepTarget(resource, targets[1])
+    if tostring(excludeKey or "") ~= ""
+        and tostring(resource.resourceKey or "") == tostring(excludeKey)
     then
-        return nil, targets
+        return nil, {}
     end
-    return targets[1], targets
+    local targets = Targets and Targets.ResolveResource
+        and Targets.ResolveResource(resource, {
+            abstract = abstract == true, character = character,
+        }) or {}
+    for index = 1, #targets do
+        local target = targets[index]
+        if (not Resources or not Resources.IsValidSleepTarget
+            or Resources.IsValidSleepTarget(resource, target))
+            and not reserved(resource, nil, target, excludeReservationId)
+        then
+            return target, targets
+        end
+    end
+    return nil, targets
 end
 
 local function resolveSeat(resource, abstract, character, approachKey)
@@ -895,15 +938,18 @@ function Service.FindSleep(record, options)
     local state = Service.GetSnapshot(record, options.force == true)
     local resources = state and state.resources or {}
     local selected
+    local live = options.character
+        or PNC.Registry and PNC.Registry.GetLiveZombie
+            and PNC.Registry.GetLiveZombie(record.id) or nil
     for index = 1, #resources do
         local resource = resources[index]
         local sleepSurface = tostring(resource.sleepSurface or "")
         if tostring(resource.resourceKind or "") == "sleep_surface"
             and tostring(resource.detectorId or "") == sleepSurface
             and (sleepSurface == "bed" or sleepSurface == "sofa")
-            and not reserved(resource, options.excludeKey)
         then
-            local target, targets = resolveSleep(resource, options.abstract)
+            local target, targets = resolveSleep(resource, options.abstract,
+                live, options.excludeKey, options.excludeReservationId)
             if target and targetWithinCamp(record, target) then
                 local priority = tonumber(resource.sleepPriority) or 0
                 if not selected
@@ -985,14 +1031,19 @@ function Service.FindWater(record, options)
     return nil, nil, nil, nil, "CAMP_WATER_UNAVAILABLE"
 end
 
-local function reserve(record, resource, campId)
+local function reserve(record, resource, campId, target)
     local reservations = PNC.FacilityReservations
     if not reservations or not reservations.ReserveResource then
         return false, "CAMP_RESERVATIONS_UNAVAILABLE"
     end
     return reservations.ReserveResource(
         campFacilityId(campId), resource, record.id, "sleep", 30000,
-        { campId = campId, campResource = true })
+        {
+            campId = campId, campResource = true,
+            sleepSlotId = target and target.sleepSlotId,
+            sleepCapacity = target and target.sleepCapacity
+                or resource and resource.sleepCapacity,
+        })
 end
 
 local function reserveSeat(record, resource, campId)
@@ -1022,13 +1073,17 @@ function Service.AcquireSleep(record, options)
     local resource, target, targets, reason = Service.FindSleep(record, options)
     if not resource then return nil, reason or "CAMP_SLEEP_UNAVAILABLE" end
     local campId = tostring(order.campId or "camp:" .. tostring(record.id))
-    local ok, reservation = reserve(record, resource, campId)
+    local ok, reservation = reserve(record, resource, campId, target)
     if not ok then return nil, reservation or "CAMP_SLEEP_RESERVATION_FAILED" end
     return {
         ok = true, facilityId = campFacilityId(campId), componentId = "",
         reservationId = reservation.id, role = resource.role,
         resource = resource, resourceKey = resource.resourceKey,
         resourceKind = resource.resourceKind, target = target,
+        sleepSlotId = target and target.sleepSlotId,
+        sleepSlotIndex = target and target.sleepSlotIndex,
+        sleepCapacity = target and target.sleepCapacity
+            or resource.sleepCapacity,
         approachCandidates = targets, campId = campId, campActivity = true,
         sleepVariant = "CAMP_NEARBY",
         sleepTargetPolicy = resource.sleepSurface == "sofa"
@@ -1115,6 +1170,10 @@ local function applyTarget(record, target)
     order.sleepGridX, order.sleepGridY = target.sleepGridX, target.sleepGridY
     order.sleepGridWidth, order.sleepGridHeight = target.sleepGridWidth,
         target.sleepGridHeight
+    order.sleepSlotId = target.sleepSlotId
+    order.sleepSlotIndex = target.sleepSlotIndex
+    order.sleepCapacity = target.sleepCapacity or target.bedCapacity
+    order.bedCapacity = target.bedCapacity or target.sleepCapacity
     order.seatDirection, order.seatSide = target.seatDirection,
         target.seatSide
     if target.approachKey ~= nil then order.approachKey = target.approachKey end
@@ -1141,6 +1200,10 @@ local function applyTarget(record, target)
         z = tonumber(target.seatAnchorZ or target.z),
     } or nil
     activity.sceneId, activity.sleepSurface = order.sceneId, order.sleepSurface
+    activity.sleepSlotId = order.sleepSlotId
+    activity.sleepSlotIndex = order.sleepSlotIndex
+    activity.sleepCapacity = order.sleepCapacity
+    activity.bedCapacity = order.bedCapacity
     if target.resourceKind ~= nil then
         activity.resourceKind = tostring(target.resourceKind)
     end
@@ -1202,7 +1265,8 @@ function Service.ResolveActivityTarget(record)
                 target, _, resolvedResource = resolveWaterTarget(
                     record, resource, abstract)
             else
-                target = resolveSleep(resource, abstract)
+                target = resolveSleep(resource, abstract, live, nil,
+                    activity.reservationId)
             end
             if target and targetWithinCamp(record, target) then
                 target.campResource = true

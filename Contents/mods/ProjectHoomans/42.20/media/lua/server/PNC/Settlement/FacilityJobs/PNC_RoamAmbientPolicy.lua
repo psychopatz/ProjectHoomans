@@ -8,6 +8,8 @@ PNC.RoamAmbient = PNC.RoamAmbient or {}
 local Service = PNC.RoamAmbient
 local Core = PNC.Core
 local Const = PNC.Const or {}
+local ActorControl = PNC.ActorControl
+    or require "PNC/Core/ActorControl/PNC_ActorControl"
 
 Service.NextAttemptAt = Service.NextAttemptAt or {}
 Service.CADENCE_MS = 5000
@@ -53,13 +55,35 @@ function Service.IsRoamOrder(record)
     local order = record and record.orderSpec or nil
     local kind = tostring(order and order.kind or "")
     local mode = tostring(order and order.roamMode or "area")
+    if kind == tostring(Const.ORDER_CAMP or "camp")
+        and order and order.ambientVisit == true
+        and PNC.AmbientVisitService
+        and PNC.AmbientVisitService.IsActive
+        and PNC.AmbientVisitService.IsActive(record)
+    then
+        return true
+    end
     return kind == tostring(Const.ORDER_ROAM or "roam") and mode == "area"
 end
 
 function Service.IsUnowned(record)
+    -- A temporary ambient visit is explicitly authorized by the server
+    -- lease. It may belong to an AI faction, so the normal player-ownership
+    -- test is intentionally not used for this narrow presentation path.
+    if PNC.AmbientVisitService
+        and PNC.AmbientVisitService.IsActive
+        and PNC.AmbientVisitService.IsActive(record)
+    then
+        return true
+    end
     if not record or record.recruited == true
         or record.ownerUsername ~= nil or record.ownerOnlineID ~= nil
         or record.colonyOwned == true
+    then
+        return false
+    end
+    if ActorControl and ActorControl.IsPuppetOwned
+        and ActorControl.IsPuppetOwned(record)
     then
         return false
     end

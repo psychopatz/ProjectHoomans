@@ -61,6 +61,7 @@ function Context.New(spec)
         lastIntent = spec.lastIntent,
         lastAction = spec.lastAction,
         lastSpeaker = spec.lastSpeaker,
+        pendingIdentityExchange = spec.pendingIdentityExchange,
         sequence = tonumber(spec.sequence) or 0,
         turns = {},
         mentionOrder = {},
@@ -77,6 +78,7 @@ function Context:Reset()
     self.lastIntent = nil
     self.lastAction = nil
     self.lastSpeaker = nil
+    self.pendingIdentityExchange = nil
     self.sequence = 0
     self.turns = {}
     self.mentionOrder = {}

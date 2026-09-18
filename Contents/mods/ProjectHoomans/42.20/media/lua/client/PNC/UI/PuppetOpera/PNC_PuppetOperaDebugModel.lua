@@ -15,26 +15,54 @@ local Opera = PNC.PuppetOpera
 local Client = Opera and Opera.Client
 local Blueprints = Opera and Opera.Blueprints
 local Anchors = Opera and Opera.Anchors
+local Capabilities = Opera and Opera.AnimationCapabilities
+    or require "PNC/Core/PuppetOpera/PNC_PuppetOpera_AnimationCapabilities"
 local PlayerCatalog = PNC.PlayerAnimationDebugCatalog or {}
 local NPCCatalog = PNC.AnimationDebugCatalog or {}
 
 local State = Model.State or {}
 Model.State = State
-State.blueprintID = State.blueprintID or "social.kiss_test"
+State.blueprintID = State.blueprintID or "social.kiss_player_npc"
 State.drafts = State.drafts or {}
 State.bases = State.bases or {}
 State.dirtyByID = State.dirtyByID or {}
-State.selectedActorID = State.selectedActorID or "player"
+-- Selection is editor state, not an implicit runtime binding. Starting with
+-- no selected slot keeps the canvas neutral and makes live-actor binding an
+-- explicit builder operation.
+State.selectedActorID = State.selectedActorID
 State.selectedBeatIndex = tonumber(State.selectedBeatIndex) or 1
 State.selectedNPCID = State.selectedNPCID
-State.playerSource = State.playerSource or "player"
+-- `zombie` was the old UI label for player-compatible bridge entries. Keep
+-- old in-memory drafts readable, but expose the actual route explicitly.
+State.playerSource = State.playerSource == "zombie"
+    and "bridge" or State.playerSource or "player"
+if State.playerSource ~= "player" and State.playerSource ~= "bridge" then
+    State.playerSource = "player"
+end
 State.playerQuery = State.playerQuery or ""
 State.npcQuery = State.npcQuery or ""
 State.npcState = State.npcState or "bumped"
 State.actorBindings = State.actorBindings or {}
+State.animationTargets = State.animationTargets or {}
 State.pendingLiveActorID = State.pendingLiveActorID
 State.editorError = nil
 State.changeSerial = tonumber(State.changeSerial) or 0
+State.persistentBlueprintsLoaded = State.persistentBlueprintsLoaded == true
+
+local function loadPersistentBlueprints()
+    if State.persistentBlueprintsLoaded then return end
+    State.persistentBlueprintsLoaded = true
+    -- The test harness does not provide the game file API. Avoid loading the
+    -- client storage module there, while the live game still discovers saved
+    -- Opera Definitions through the same root database as Unique NPCs.
+    if type(getFileReader) ~= "function" then return end
+    local storage = require "PNC/UI/PuppetOpera/PNC_PuppetOperaStorage"
+    for _, item in ipairs(storage.List()) do
+        if item.draft and item.draft.id then
+            Blueprints.Register(item.draft.id, item.draft)
+        end
+    end
+end
 
 local function copy(value, depth)
     if type(value) ~= "table" then return value end
@@ -134,7 +162,8 @@ local function markChanged()
 end
 
 local function currentDraft()
-    local id = tostring(State.blueprintID or "social.kiss_test")
+    loadPersistentBlueprints()
+    local id = tostring(State.blueprintID or "social.kiss_player_npc")
     if not State.drafts[id] then
         local blueprint = Blueprints and Blueprints.Get(id) or nil
         if blueprint then
@@ -173,7 +202,12 @@ local function actorLabel(definition, fallback)
 end
 
 local function actorOrder(left, right)
-    local order = { player = 1, npc = 2 }
+    local order = {
+        actor_1 = 1,
+        actor_2 = 2,
+        player = 1,
+        npc = 2,
+    }
     local leftOrder = order[left.id] or 10
     local rightOrder = order[right.id] or 10
     if leftOrder ~= rightOrder then return leftOrder < rightOrder end
@@ -181,7 +215,6 @@ local function actorOrder(left, right)
 end
 
 local function firstActorID(draft)
-    if draft and draft.actors and draft.actors.player then return "player" end
     local first
     for id in pairs(draft and draft.actors or {}) do
         if not first or tostring(id) < tostring(first) then first = id end
@@ -204,22 +237,75 @@ local function actorBinding(actorID, definition)
     local bindings = bindingMap()
     local bound = bindings[tostring(actorID)]
     if bound and tostring(bound) ~= "" then return tostring(bound) end
-    if tostring(actorID) == "npc"
-        and definition and definition.kind == "nearby_live_npc"
-        and State.selectedNPCID
-    then
-        return tostring(State.selectedNPCID)
+    return nil
+end
+
+local function allowedActorKinds(definition)
+    if not definition then return {} end
+    if definition.kind then return { definition.kind } end
+    local result = {}
+    for _, kind in ipairs(definition.allowedKinds or {}) do
+        result[#result + 1] = tostring(kind)
+    end
+    if #result == 0 then
+        result = { "local_player", "nearby_live_npc" }
+    end
+    return result
+end
+
+local function kindAllowed(definition, actorKind)
+    actorKind = tostring(actorKind or "")
+    for _, kind in ipairs(allowedActorKinds(definition)) do
+        if kind == actorKind then return true end
+    end
+    return false
+end
+
+-- This is a live-list identity, not a blueprint actor id. Keeping it
+-- separate prevents a drag from the live list from being confused with the
+-- scene's ordinary `player` slot.
+local LIVE_PLAYER_ID = "__local_player__"
+
+local function compactLiveID(value)
+    local id = tostring(value or "")
+    if id == "" or id == LIVE_PLAYER_ID then return nil end
+    if #id <= 8 then return id end
+    return string.sub(id, -8)
+end
+
+local function findLiveActorRow(id, rows)
+    id = id and tostring(id) or nil
+    if not id then return nil end
+    for _, row in ipairs(rows or {}) do
+        if tostring(row.id) == id then return row end
     end
     return nil
 end
 
-local function trackForBeat(beat, actorID)
+local function liveActorName(row, fallback)
+    local name = row and row.name or fallback
+    name = tostring(name or "")
+    return name ~= "" and name or tostring(fallback or "Unknown actor")
+end
+
+local function actorDiscoveryRadius()
+    return Opera and Opera.Config
+        and tonumber(Opera.Config.actorDiscoveryRadius) or 12
+end
+
+local function trackForBeat(beat, actorID, actorKind)
     if not beat then return nil end
     actorID = tostring(actorID or "")
+    local track
     if type(beat.tracks) == "table" and beat.tracks[actorID] then
-        return beat.tracks[actorID]
+        track = beat.tracks[actorID]
+    else
+        track = beat[actorID]
     end
-    return beat[actorID]
+    if type(track) == "table" and type(track.byKind) == "table" then
+        return actorKind and track.byKind[tostring(actorKind)] or track
+    end
+    return track
 end
 
 local function beatTrackSummary(beat)
@@ -234,7 +320,27 @@ local function beatTrackSummary(beat)
     table.sort(ids)
     local parts = {}
     for _, actorID in ipairs(ids) do
-        local track = trackForBeat(beat, actorID)
+        local definition = actorDefinition(actorID)
+        local track = trackForBeat(
+            beat,
+            actorID,
+            definition and definition.kind or nil
+        )
+        local identity = actorID
+        if definition then
+            identity = actorLabel(definition, actorID)
+                .. " [slot=" .. tostring(actorID) .. "]"
+            local binding = actorBinding(actorID, definition)
+            if binding then
+                local live = findLiveActorRow(
+                    binding,
+                    Model.GetLiveActorRows(actorDiscoveryRadius())
+                )
+                identity = identity .. " -> "
+                    .. liveActorName(live, binding)
+                    .. " [" .. tostring(binding) .. "]"
+            end
+        end
         local value
         if track and track.mode == "emote" then
             value = track.emote
@@ -243,7 +349,7 @@ local function beatTrackSummary(beat)
         else
             value = track and (track.bump or track.anim) or "-"
         end
-        parts[#parts + 1] = actorID .. "=" .. tostring(value or "-")
+        parts[#parts + 1] = identity .. "=" .. tostring(value or "-")
     end
     return table.concat(parts, " | ")
 end
@@ -271,23 +377,13 @@ local function uniqueID(prefix, values)
     return candidate
 end
 
--- This is a live-list identity, not a blueprint actor id.  Keeping it
--- separate prevents a drag from the live list from being confused with the
--- scene's ordinary `player` slot.
-local LIVE_PLAYER_ID = "__local_player__"
-
-local function actorDiscoveryRadius()
-    return Opera and Opera.Config
-        and tonumber(Opera.Config.actorDiscoveryRadius) or 12
-end
-
 local function beatAt(index)
     local draft = currentDraft()
     return draft and draft.beats and draft.beats[tonumber(index) or 1] or nil
 end
 
 local function setPlayerFromEntry(beat, actorID, entry)
-    local track = {
+    local track = Capabilities.NormalizeTrack("local_player", {
         route = entry.mode == "emote" and "player_emote" or "player_action",
         mode = entry.mode or "action",
         catalog = "player",
@@ -300,9 +396,30 @@ local function setPlayerFromEntry(beat, actorID, entry)
         event = entry.event,
         variables = copy(entry.variables),
         playable = true,
-    }
+        -- Preserve catalog provenance for the authoring draft. The runtime
+        -- normalizer intentionally consumes only the safe player route, but
+        -- the builder should still show whether a track came from a native
+        -- player node or a PNC-prefixed player-compatible bridge.
+        source = entry.source,
+        sourceState = entry.sourceState,
+        sourceRoute = entry.route,
+        compatibility = entry.compatibility,
+        bridgeFile = entry.bridgeFile,
+        bridgePath = entry.bridgePath,
+        fullBody = entry.fullBody == true,
+        looped = entry.looped == true,
+        speed = entry.speed,
+    })
     local tracks = ensureTracks(beat)
-    tracks[tostring(actorID)] = track
+    local definition = actorDefinition(actorID)
+    if definition and not definition.kind then
+        tracks[tostring(actorID)] = tracks[tostring(actorID)] or {}
+        tracks[tostring(actorID)].byKind = tracks[tostring(actorID)].byKind
+            or {}
+        tracks[tostring(actorID)].byKind.local_player = track
+    else
+        tracks[tostring(actorID)] = track
+    end
     if tostring(actorID) == "player" then beat.player = track end
 end
 
@@ -312,7 +429,7 @@ local function setNPCFromEntry(beat, actorID, entry)
     if not directNPCEntry(entry) then
         return false, "npc_catalog_entry_requires_selector_context"
     end
-    local track = {
+    local track = Capabilities.NormalizeTrack("nearby_live_npc", {
         route = "zombie_bump",
         mode = "bump",
         catalog = "npc",
@@ -321,32 +438,45 @@ local function setNPCFromEntry(beat, actorID, entry)
         anim = entry.anim,
         animation = entry.anim,
         nonCombat = true,
-    }
+    })
     local tracks = ensureTracks(beat)
-    tracks[tostring(actorID)] = track
+    local definition = actorDefinition(actorID)
+    if definition and not definition.kind then
+        tracks[tostring(actorID)] = tracks[tostring(actorID)] or {}
+        tracks[tostring(actorID)].byKind = tracks[tostring(actorID)].byKind
+            or {}
+        tracks[tostring(actorID)].byKind.nearby_live_npc = track
+    else
+        tracks[tostring(actorID)] = track
+    end
     if tostring(actorID) == "npc" then beat.npc = track end
     return true
 end
 
 function Model.GetBlueprints()
+    loadPersistentBlueprints()
     local result = {}
     local seen = {}
     for _, blueprint in ipairs(Blueprints and Blueprints.List() or {}) do
         local id = tostring(blueprint.id)
-        seen[id] = true
-        result[#result + 1] = {
-            id = id,
-            label = blueprintLabel(blueprint),
-            description = blueprint.description or "",
-            dirty = State.dirtyByID[id] == true,
-        }
+        if blueprint.legacy ~= true then
+            seen[id] = true
+            result[#result + 1] = {
+                id = id,
+                label = blueprintLabel(blueprint),
+                description = blueprint.description or "",
+                sceneType = blueprint.sceneType,
+                dirty = State.dirtyByID[id] == true,
+            }
+        end
     end
     for id, draft in pairs(State.drafts) do
-        if not seen[tostring(id)] and draft then
+        if not seen[tostring(id)] and draft and draft.legacy ~= true then
             result[#result + 1] = {
                 id = tostring(id),
                 label = blueprintLabel(draft),
                 description = draft.description or "",
+                sceneType = draft.sceneType,
                 dirty = true,
             }
         end
@@ -366,6 +496,7 @@ function Model.IsDirty(id)
 end
 
 function Model.SetBlueprintID(id)
+    loadPersistentBlueprints()
     id = tostring(id or "")
     if id == "" or (
         not (Blueprints and Blueprints.Get(id))
@@ -376,9 +507,11 @@ function Model.SetBlueprintID(id)
     end
     State.blueprintID = id
     currentDraft()
-    State.selectedActorID = firstActorID(State.drafts[id])
+    State.selectedActorID = nil
     State.selectedBeatIndex = 1
     State.pendingLiveActorID = nil
+    State.animationTargets = {}
+    State.actorBindings[id] = {}
     State.editorError = nil
     touch()
     return true
@@ -401,13 +534,66 @@ function Model.DuplicateBlueprint()
     local draft = copy(source)
     draft.id = id
     draft.label = tostring(source.label or id) .. " (copy)"
+    draft.legacy = nil
     State.drafts[id] = draft
     State.bases[id] = copy(draft)
     State.dirtyByID[id] = true
     State.blueprintID = id
-    State.selectedActorID = firstActorID(draft)
+    State.selectedActorID = nil
     State.selectedBeatIndex = 1
     State.pendingLiveActorID = nil
+    State.animationTargets = {}
+    State.actorBindings[id] = {}
+    markChanged()
+    return true, draft
+end
+
+function Model.CreateNew()
+    loadPersistentBlueprints()
+    local base = "opera.new_scene"
+    local id = base
+    local serial = 2
+    while (Blueprints and Blueprints.Get(id)) or State.drafts[id] do
+        id = base .. "_" .. tostring(serial)
+        serial = serial + 1
+    end
+    local draft = {
+        id = id,
+        version = 1,
+        definitionType = "opera",
+        sceneType = "custom",
+        label = "New Opera Scene",
+        description = "Author a multi-actor scene from explicit actor slots.",
+        actors = {},
+        anchorFrame = {
+            origin = "server_player_relative",
+            orientation = "player_facing",
+            tolerance = 0.75,
+            anchors = {},
+        },
+        beats = {
+            {
+                id = "beat_1",
+                durationMs = 900,
+                synchronization = "arrival_and_start_barrier",
+                tracks = {},
+            },
+        },
+        playback = {
+            defaultMode = "once",
+            allowLoop = true,
+            gapMs = 250,
+        },
+    }
+    State.drafts[id] = draft
+    State.bases[id] = copy(draft)
+    State.dirtyByID[id] = true
+    State.blueprintID = id
+    State.selectedActorID = nil
+    State.selectedBeatIndex = 1
+    State.pendingLiveActorID = nil
+    State.actorBindings[id] = {}
+    State.animationTargets = {}
     markChanged()
     return true, draft
 end
@@ -419,6 +605,15 @@ function Model.SaveDraft()
     if not normalized then
         State.editorError = reason
         return false, reason
+    end
+    if type(getFileWriter) == "function" then
+        local storage = require "PNC/UI/PuppetOpera/PNC_PuppetOperaStorage"
+        local stored, storeReason, storedDefinition = storage.Save(normalized)
+        if not stored then
+            State.editorError = storeReason
+            return false, storeReason
+        end
+        normalized = storedDefinition or normalized
     end
     local registered, registeredValue = Blueprints.Register(
         normalized.id,
@@ -443,12 +638,23 @@ function Model.ResetDraft()
     if not base then return false, "blueprint_not_found" end
     State.drafts[id] = copy(base)
     State.editorError = nil
-    State.selectedActorID = firstActorID(State.drafts[id])
+    State.selectedActorID = nil
     State.selectedBeatIndex = 1
     State.pendingLiveActorID = nil
+    State.animationTargets = {}
+    State.actorBindings[id] = {}
     State.dirtyByID[id] = false
     touch()
     return true
+end
+
+function Model.ClearActorBindings()
+    State.actorBindings[tostring(State.blueprintID or "")] = {}
+    State.selectedActorID = nil
+    State.selectedNPCID = nil
+    State.pendingLiveActorID = nil
+    State.animationTargets = {}
+    touch()
 end
 
 function Model.GetValidation()
@@ -490,24 +696,32 @@ end
 function Model.SetSelectedNPC(id)
     local previousID = State.selectedNPCID
     local previousPending = State.pendingLiveActorID
-    local bindings = bindingMap()
-    local previousBinding = bindings.npc
     State.selectedNPCID = id and tostring(id) or nil
     if not id then State.pendingLiveActorID = nil end
-    local draft = currentDraft()
-    if draft and draft.actors and draft.actors.npc
-        and draft.actors.npc.kind == "nearby_live_npc"
-        and not State.pendingLiveActorID
-        and not bindings.npc
-    then
-        bindings.npc = State.selectedNPCID
-    end
     if previousID ~= State.selectedNPCID
         or previousPending ~= State.pendingLiveActorID
-        or previousBinding ~= bindings.npc
     then
         touch()
     end
+end
+
+function Model.ClearLiveSelection()
+    local changed = State.selectedNPCID ~= nil
+        or State.pendingLiveActorID ~= nil
+    State.selectedNPCID = nil
+    State.pendingLiveActorID = nil
+    if changed then touch() end
+end
+
+function Model.ResetEditorSelection()
+    local changed = State.selectedActorID ~= nil
+        or State.selectedNPCID ~= nil
+        or State.pendingLiveActorID ~= nil
+    State.selectedActorID = nil
+    State.selectedNPCID = nil
+    State.pendingLiveActorID = nil
+    State.animationTargets = {}
+    if changed then touch() end
 end
 
 function Model.GetSelectedNPC()
@@ -527,6 +741,60 @@ function Model.GetActorBinding(actorID)
     return actorBinding(actorID, actorDefinition(actorID))
 end
 
+function Model.BindLiveActor(actorID, liveID)
+    actorID = tostring(actorID or "")
+    liveID = liveID and tostring(liveID) or ""
+    local definition = actorDefinition(actorID)
+    if not definition then return false, "actor_not_found" end
+    if liveID == "" then return false, "live_actor_id_missing" end
+    local found
+    for _, row in ipairs(Model.GetLiveActorRows(actorDiscoveryRadius())) do
+        if tostring(row.id) == liveID
+        then
+            found = row
+            break
+        end
+    end
+    if not found then return false, "nearby_live_actor_not_found" end
+    if not kindAllowed(definition, found.kind) then
+        return false, "actor_kind_not_allowed:" .. tostring(found.kind)
+    end
+    for otherID, otherBinding in pairs(bindingMap()) do
+        if tostring(otherID) ~= actorID
+            and tostring(otherBinding or "") == liveID
+        then
+            return false, "live_actor_already_bound:" .. tostring(otherID)
+        end
+    end
+    if definition.dynamic == true and not definition.kind then
+        definition.kind = found.kind
+        definition.allowedKinds = { found.kind }
+    end
+    bindingMap()[actorID] = liveID
+    State.selectedActorID = actorID
+    State.selectedNPCID = found.kind == "nearby_live_npc" and liveID or nil
+    State.pendingLiveActorID = nil
+    markChanged()
+    return true, actorID
+end
+
+function Model.UnbindLiveActor(actorID)
+    actorID = tostring(actorID or "")
+    if not actorDefinition(actorID) then return false, "actor_not_found" end
+    if not bindingMap()[actorID] then return false, "actor_unbound" end
+    bindingMap()[actorID] = nil
+    local definition = actorDefinition(actorID)
+    if definition and definition.dynamic == true then
+        definition.kind = nil
+        definition.allowedKinds = { "local_player", "nearby_live_npc" }
+    end
+    if State.selectedActorID == actorID then State.selectedActorID = nil end
+    State.pendingLiveActorID = nil
+    State.selectedNPCID = nil
+    markChanged()
+    return true
+end
+
 function Model.GetRuntimeActorBindings()
     local draft = currentDraft()
     if not draft or type(draft.actors) ~= "table" then
@@ -534,13 +802,11 @@ function Model.GetRuntimeActorBindings()
     end
     local bindings = {}
     for actorID, definition in pairs(draft.actors) do
-        if definition.kind == "nearby_live_npc" then
-            local bound = actorBinding(actorID, definition)
-            if not bound then
-                return nil, "live_actor_unassigned:" .. tostring(actorID)
-            end
-            bindings[tostring(actorID)] = bound
+        local bound = actorBinding(actorID, definition)
+        if not bound and definition.required ~= false then
+            return nil, "actor_unassigned:" .. tostring(actorID)
         end
+        if bound then bindings[tostring(actorID)] = bound end
     end
     return bindings
 end
@@ -567,12 +833,8 @@ end
 
 function Model.GetUnassignedNearbyNPCs(radius)
     local assigned = {}
-    local draft = currentDraft()
-    for actorID, definition in pairs(draft and draft.actors or {}) do
-        if definition.kind == "nearby_live_npc" then
-            local bound = actorBinding(actorID, definition)
-            if bound then assigned[bound] = true end
-        end
+    for _, bound in pairs(bindingMap()) do
+        assigned[tostring(bound)] = true
     end
     local result = {}
     for _, npc in ipairs(Model.GetNearbyNPCs(radius or actorDiscoveryRadius())) do
@@ -586,11 +848,12 @@ function Model.GetLiveActorRows(radius)
     local playerAssignment
     local draft = currentDraft()
     for actorID, definition in pairs(draft and draft.actors or {}) do
-        if definition.kind == "local_player" then
-            playerAssignment = actorID
-        elseif definition.kind == "nearby_live_npc" then
-            local bound = actorBinding(actorID, definition)
-            if bound then assignments[bound] = actorID end
+        local bound = actorBinding(actorID, definition)
+        if bound then
+            assignments[tostring(bound)] = actorID
+            if tostring(bound) == LIVE_PLAYER_ID then
+                playerAssignment = actorID
+            end
         end
     end
     local result = {}
@@ -598,14 +861,17 @@ function Model.GetLiveActorRows(radius)
         and Client.GetLocalPlayer() or nil
     if playerBody and playerBody.getX and playerBody.getY then
         local playerName = playerBody.getUsername
-            and playerBody:getUsername() or "Local player"
+            and playerBody:getUsername() or translatedLabel(
+                "UI_PNC_PuppetOpera_LocalPlayer", "Local player")
         if not playerName or tostring(playerName) == "" then
-            playerName = "Local player"
+            playerName = translatedLabel(
+                "UI_PNC_PuppetOpera_LocalPlayer", "Local player")
         end
         local playerRow = {
             id = LIVE_PLAYER_ID,
             name = playerName,
             kind = "local_player",
+            shortID = nil,
             distSq = 0,
             assignedActorID = playerAssignment,
             body = playerBody,
@@ -629,6 +895,7 @@ function Model.GetLiveActorRows(radius)
             id = id,
             name = npc.name or id,
             kind = "nearby_live_npc",
+            shortID = compactLiveID(id),
             distSq = npc.distSq,
             assignedActorID = assignments[id],
             body = npc.zombie,
@@ -661,9 +928,24 @@ function Model.SelectLiveActor(id)
     end
     if not found then return false, "nearby_live_actor_not_found" end
     State.pendingLiveActorID = id
-    if found.kind == "nearby_live_npc" then State.selectedNPCID = id end
+    if found.kind == "nearby_live_npc" then
+        State.selectedNPCID = id
+    else
+        State.selectedNPCID = nil
+    end
     if found.assignedActorID then
         State.selectedActorID = found.assignedActorID
+        State.pendingLiveActorID = nil
+        State.animationTargets[found.kind == "local_player"
+            and "player" or "npc"] = "scene:"
+            .. tostring(found.assignedActorID)
+    else
+        -- A free live body is a preview/drag source, never an implicit
+        -- assignment target.  The user must drop it onto an explicit scene
+        -- slot or add a container first.
+        State.selectedActorID = nil
+        State.animationTargets[found.kind == "local_player"
+            and "player" or "npc"] = "live:" .. id
     end
     touch()
     return true
@@ -682,8 +964,35 @@ function Model.GetNPCForActor(actorID)
     return nil
 end
 
+function Model.GetNPCForLiveID(liveID)
+    liveID = liveID and tostring(liveID) or nil
+    if not liveID then return nil end
+    for _, npc in ipairs(Model.GetNearbyNPCs(actorDiscoveryRadius())) do
+        if tostring(npc.id) == liveID then return npc end
+    end
+    return nil
+end
+
 function Model.SelectActor(id)
-    State.selectedActorID = tostring(id or "player")
+    State.selectedActorID = id and tostring(id) or nil
+    State.pendingLiveActorID = nil
+    State.selectedNPCID = nil
+    local definition = actorDefinition(State.selectedActorID)
+    local kind = definition and Model.GetActorKind(State.selectedActorID) or nil
+    if kind == "local_player" then
+        State.animationTargets.player = "scene:" .. State.selectedActorID
+        State.animationTargets.npc = nil
+    elseif kind == "nearby_live_npc" then
+        State.animationTargets.npc = "scene:" .. State.selectedActorID
+        State.animationTargets.player = nil
+        State.selectedNPCID = actorBinding(
+            State.selectedActorID,
+            definition
+        )
+    else
+        State.animationTargets.player = nil
+        State.animationTargets.npc = nil
+    end
     touch()
 end
 
@@ -693,7 +1002,15 @@ end
 
 function Model.GetActorKind(actorID)
     local definition = actorDefinition(actorID)
-    return definition and definition.kind or nil
+    if not definition then return nil end
+    if definition.kind then return definition.kind end
+    local bound = actorBinding(actorID, definition)
+    if not bound then return nil end
+    local row = findLiveActorRow(
+        bound,
+        Model.GetLiveActorRows(actorDiscoveryRadius())
+    )
+    return row and row.kind or nil
 end
 
 function Model.GetActorForCatalog(catalogName)
@@ -701,20 +1018,167 @@ function Model.GetActorForCatalog(catalogName)
         and "local_player" or "nearby_live_npc"
     local selected = State.selectedActorID
     if actorDefinition(selected)
-        and actorDefinition(selected).kind == wanted
+        and Model.GetActorKind(selected) == wanted
     then
         return selected
     end
-    local draft = currentDraft()
-    local first
-    for id, definition in pairs(draft and draft.actors or {}) do
-        if definition.kind == wanted
-            and (not first or tostring(id) < tostring(first))
-        then
-            first = id
+    local target = Model.GetAnimationTarget(catalogName)
+    if target and target.previewOnly ~= true then
+        local targetDefinition = actorDefinition(target.actorID)
+        if targetDefinition and Model.GetActorKind(target.actorID) == wanted then
+            return target.actorID
         end
     end
-    return first
+    return nil
+end
+
+-- Animation browsing has two kinds of target. A scene target can receive an
+-- assignment; a live preview target only supplies a concrete local body. They
+-- deliberately use different keys so a live NPC ID can never be mistaken for
+-- a blueprint actor slot ID.
+function Model.GetAnimationTargetRows(catalogName)
+    local wanted = catalogName == "player"
+        and "local_player" or "nearby_live_npc"
+    local liveRows = Model.GetLiveActorRows(actorDiscoveryRadius())
+    local sceneRows = Model.GetActorRows(Model.GetSnapshot())
+    local result = {}
+    local bound = {}
+    for _, scene in ipairs(sceneRows) do
+        if scene.kind == wanted then
+            local liveID = scene.liveID
+            if not liveID
+                and tostring(scene.id) == tostring(State.selectedActorID or "")
+                and State.pendingLiveActorID
+            then
+                local pending = findLiveActorRow(
+                    State.pendingLiveActorID,
+                    liveRows
+                )
+                if pending and pending.kind == wanted then
+                    liveID = pending.id
+                end
+            end
+            local live = findLiveActorRow(liveID, liveRows)
+            local fallbackName = scene.liveName or (
+                liveID and ("Unavailable [" .. tostring(liveID) .. "]")
+                or "unbound")
+            local name = liveActorName(live, fallbackName)
+            result[#result + 1] = {
+                key = "scene:" .. tostring(scene.id),
+                actorID = tostring(scene.id),
+                liveID = liveID,
+                name = name,
+                label = tostring(scene.label) .. " -> " .. name,
+                previewOnly = false,
+                body = live and live.body or nil,
+                record = live and live.record or nil,
+            }
+            if liveID then bound[tostring(liveID)] = true end
+        end
+    end
+
+    -- Keep the local player available for isolated player-animation preview,
+    -- even when the draft has no player slot. If a slot exists, the explicit
+    -- scene row above remains the assignable target.
+    if catalogName == "player" then
+        local player = findLiveActorRow(LIVE_PLAYER_ID, liveRows)
+        if player then
+            result[#result + 1] = {
+                key = "live:" .. LIVE_PLAYER_ID,
+                liveID = LIVE_PLAYER_ID,
+                name = liveActorName(player, translatedLabel(
+                    "UI_PNC_PuppetOpera_LocalPlayer", "Local player")),
+                label = liveActorName(player, translatedLabel(
+                    "UI_PNC_PuppetOpera_LocalPlayer", "Local player"))
+                    .. " (preview only)",
+                previewOnly = true,
+                body = player.body,
+                record = player.record,
+            }
+        end
+    else
+        -- Unbound live NPCs are preview targets. Bound NPCs are represented by
+        -- their named scene rows, avoiding an ambiguous duplicate entry.
+        for _, live in ipairs(liveRows) do
+            if live.kind == wanted and not bound[tostring(live.id)] then
+                result[#result + 1] = {
+                    key = "live:" .. tostring(live.id),
+                    liveID = tostring(live.id),
+                    name = liveActorName(live, live.id),
+                    label = liveActorName(live, live.id)
+                        .. " [" .. tostring(live.id) .. "] (preview only)",
+                    previewOnly = true,
+                    body = live.body,
+                    record = live.record,
+                }
+            end
+        end
+    end
+    return result
+end
+
+function Model.GetAnimationTarget(catalogName)
+    catalogName = catalogName == "player" and "player" or "npc"
+    local requested = State.animationTargets[catalogName]
+    local rows = Model.GetAnimationTargetRows(catalogName)
+    if requested then
+        for _, row in ipairs(rows) do
+            if row.key == requested then return row end
+        end
+        -- A disappeared live body must not silently fall back to a different
+        -- NPC or scene slot with a similar label.
+        return nil
+    end
+    local selected = State.selectedActorID
+    local definition = actorDefinition(selected)
+    local wanted = catalogName == "player"
+        and "local_player" or "nearby_live_npc"
+    if definition and Model.GetActorKind(selected) == wanted then
+        for _, row in ipairs(rows) do
+            if row.actorID == tostring(selected) then return row end
+        end
+    end
+    return nil
+end
+
+function Model.SetAnimationTarget(catalogName, key)
+    catalogName = catalogName == "player" and "player" or "npc"
+    key = key and tostring(key) or nil
+    if not key or key == "" then
+        State.animationTargets[catalogName] = nil
+        touch()
+        return true
+    end
+    local target
+    for _, row in ipairs(Model.GetAnimationTargetRows(catalogName)) do
+        if row.key == key then target = row break end
+    end
+    if not target then return false, "animation_target_not_found" end
+    State.animationTargets[catalogName] = key
+    if target.previewOnly == true then
+        State.selectedActorID = nil
+        State.pendingLiveActorID = target.liveID
+        if catalogName == "npc" then
+            State.selectedNPCID = target.liveID
+        else
+            State.selectedNPCID = nil
+        end
+    else
+        State.selectedActorID = target.actorID
+        State.pendingLiveActorID = nil
+        if catalogName == "npc" then State.selectedNPCID = target.liveID end
+    end
+    touch()
+    return true, key
+end
+
+function Model.GetPreviewTarget(catalogName)
+    local target = Model.GetAnimationTarget(catalogName)
+    if not target then return nil, "animation_target_required" end
+    if catalogName == "npc" and (not target.body or not target.record) then
+        return nil, "animation_target_npc_not_local"
+    end
+    return target
 end
 
 function Model.SelectBeat(index)
@@ -758,27 +1222,33 @@ end
 function Model.GetActorRows(snapshot)
     local draft = currentDraft()
     local rows = {}
+    local liveRows = Model.GetLiveActorRows(actorDiscoveryRadius())
     for id, definition in pairs(draft and draft.actors or {}) do
         local runtime = snapshot and snapshot.actors
             and snapshot.actors[id] or nil
-        local binding = definition.kind == "nearby_live_npc"
-            and actorBinding(id, definition) or nil
+        local binding = actorBinding(id, definition)
+        local liveID = binding
+        local live = findLiveActorRow(liveID, liveRows)
+        local resolvedKind = Model.GetActorKind(id)
         rows[#rows + 1] = {
             id = id,
             label = actorLabel(definition, id),
-            kind = definition.kind or "future_actor",
+            kind = resolvedKind or "unbound",
+            allowedKinds = allowedActorKinds(definition),
             anchor = definition.anchor or "-",
             state = runtime and runtime.state
-                or (binding and "bound " .. tostring(binding)
-                    or "draft slot ready"),
+                or (binding and "bound" or "unbound"),
             bindingID = binding,
+            liveID = liveID,
+            liveName = live and live.name or nil,
+            liveShortID = live and live.shortID or nil,
             target = runtime and runtime.target or nil,
             owned = runtime and (
                 runtime.movementOwned == true
                 or runtime.animationOwned == true
             ) or false,
-            supported = definition.kind == "local_player"
-                or definition.kind == "nearby_live_npc",
+            supported = resolvedKind == "local_player"
+                or resolvedKind == "nearby_live_npc",
         }
     end
     table.sort(rows, actorOrder)
@@ -796,7 +1266,9 @@ function Model.GetGridActors()
             rows[#rows + 1] = {
                 id = id,
                 label = actorLabel(definition, id),
-                kind = definition.kind,
+                kind = Model.GetActorKind(id) or "unbound",
+                allowedKinds = allowedActorKinds(definition),
+                bindingID = actorBinding(id, definition),
                 anchor = definition.anchor,
                 right = tonumber(anchor.right) or 0,
                 forward = tonumber(anchor.forward) or 0,
@@ -864,9 +1336,85 @@ function Model.SetActorAnchorOffset(actorID, right, forward, z)
     return true
 end
 
-function Model.AddLiveActorToScene(npcID, right, forward, z)
+function Model.AddActorContainer()
     local draft = currentDraft()
-    local id = tostring(npcID or "")
+    if not draft or type(draft.actors) ~= "table" then
+        return false, "actors_required"
+    end
+    draft.anchorFrame = draft.anchorFrame or {}
+    draft.anchorFrame.anchors = draft.anchorFrame.anchors or {}
+    local actorID = uniqueID("actor", draft.actors)
+    local anchorID = uniqueID("anchor_" .. actorID,
+        draft.anchorFrame.anchors)
+    local occupied = {}
+    for _, row in ipairs(Model.GetGridActors()) do
+        occupied[tostring(row.right) .. ":" .. tostring(row.forward)
+            .. ":" .. tostring(row.z)] = true
+    end
+    local right
+    local forward
+    for candidateRight = -8, 8 do
+        local key = tostring(candidateRight) .. ":0:0"
+        if not occupied[key] then
+            right, forward = candidateRight, 0
+            break
+        end
+    end
+    if right == nil then
+        return false, "no_free_anchor_tile"
+    end
+    local targetID
+    for existingID in pairs(draft.actors) do
+        if not targetID or tostring(existingID) < tostring(targetID) then
+            targetID = tostring(existingID)
+        end
+    end
+    draft.anchorFrame.anchors[anchorID] = {
+        right = right,
+        forward = forward,
+        z = 0,
+        faceTarget = targetID or actorID,
+    }
+    draft.actors[actorID] = {
+        allowedKinds = { "local_player", "nearby_live_npc" },
+        dynamic = true,
+        required = true,
+        anchor = anchorID,
+        label = "Actor " .. tostring(actorID),
+    }
+    -- Adding a slot must not silently author an animation. The scene builder
+    -- is intentionally explicit: the user binds a live actor, selects that
+    -- actor's route, and assigns a beat track from the matching catalog tab.
+    for _, beat in ipairs(draft.beats or {}) do
+        local tracks = ensureTracks(beat)
+        tracks[actorID] = { byKind = {} }
+    end
+    -- A first slot has no meaningful facing target yet. Once a second slot is
+    -- added, point the first slot at it so the draft becomes a normal
+    -- two-person arrangement without requiring hidden defaults.
+    if targetID then
+        for existingID, existingDefinition in pairs(draft.actors) do
+            local existingAnchor = draft.anchorFrame.anchors[
+                existingDefinition.anchor
+            ]
+            if existingID ~= actorID
+                and existingAnchor
+                and tostring(existingAnchor.faceTarget or "")
+                    == tostring(existingID)
+            then
+                existingAnchor.faceTarget = actorID
+            end
+        end
+    end
+    State.selectedActorID = actorID
+    State.pendingLiveActorID = nil
+    markChanged()
+    return true, actorID
+end
+
+function Model.AddLiveActorToScene(liveID, right, forward, z, targetActorID)
+    local draft = currentDraft()
+    local id = tostring(liveID or "")
     if not draft or not draft.actors or id == "" then
         return false, "live_actor_id_missing"
     end
@@ -879,8 +1427,12 @@ function Model.AddLiveActorToScene(npcID, right, forward, z)
     end
     if not liveActor then return false, "nearby_live_actor_not_found" end
 
-    if liveActor.assignedActorID then
-        State.selectedActorID = liveActor.assignedActorID
+    local assignedID = liveActor.assignedActorID
+    if assignedID then
+        if targetActorID and tostring(targetActorID) ~= tostring(assignedID) then
+            return false, "live_actor_already_bound:" .. tostring(assignedID)
+        end
+        State.selectedActorID = assignedID
         if liveActor.kind == "nearby_live_npc" then
             State.selectedNPCID = id
         end
@@ -897,103 +1449,30 @@ function Model.AddLiveActorToScene(npcID, right, forward, z)
         touch()
         return true, liveActor.assignedActorID
     end
-
-    local actorKind = liveActor.kind == "local_player"
-        and "local_player" or "nearby_live_npc"
-    local actorID = uniqueID(
-        actorKind == "local_player" and "player" or "npc",
-        draft.actors
-    )
-    local anchorID = uniqueID("anchor_" .. actorID,
-        draft.anchorFrame and draft.anchorFrame.anchors or {})
-    local targetID = State.selectedActorID
-    if targetID == actorID or not draft.actors[targetID] then
-        targetID = firstActorID(draft)
+    local actorID = targetActorID and tostring(targetActorID)
+        or State.selectedActorID and tostring(State.selectedActorID) or nil
+    local definition = actorID and draft.actors[actorID] or nil
+    if not definition then return false, "actor_slot_required" end
+    if not kindAllowed(definition, liveActor.kind) then
+        return false, "actor_kind_not_allowed:" .. tostring(liveActor.kind)
     end
-    if not targetID then return false, "scene_target_actor_missing" end
-
-    local occupied = {}
-    for _, row in ipairs(Model.GetGridActors()) do
-        occupied[tostring(row.right) .. ":" .. tostring(row.forward)
-            .. ":" .. tostring(row.z)] = true
+    local existingBinding = actorBinding(actorID, definition)
+    if existingBinding and existingBinding ~= id then
+        return false, "actor_slot_already_bound:" .. tostring(actorID)
     end
     local hasExplicitOffset = right ~= nil or forward ~= nil or z ~= nil
-    right = tonumber(right)
-    forward = tonumber(forward)
-    z = tonumber(z)
-    if z == nil and right ~= nil and forward ~= nil then z = 0 end
-    if not hasExplicitOffset then
-        for candidateRight = -8, 8 do
-            local key = tostring(candidateRight) .. ":0:0"
-            if not occupied[key] then
-                right, forward, z = candidateRight, 0, 0
-                break
-            end
-        end
-    end
-    if not right or not forward or not z
-        or right ~= math.floor(right)
-        or forward ~= math.floor(forward)
-        or z ~= math.floor(z)
-        or right < -8 or right > 8
-        or forward < -8 or forward > 8
-        or z < -1 or z > 1
-    then
-        return false, hasExplicitOffset
-            and "anchor_offset_out_of_range" or "no_free_anchor_tile"
-    end
-    if occupied[tostring(right) .. ":" .. tostring(forward)
-        .. ":" .. tostring(z)]
-    then
-        return false, "anchor_tile_occupied"
-    end
-
-    draft.anchorFrame = draft.anchorFrame or {}
-    draft.anchorFrame.anchors = draft.anchorFrame.anchors or {}
-    draft.anchorFrame.anchors[anchorID] = {
-        right = math.floor(right),
-        forward = math.floor(forward),
-        z = math.floor(z),
-        faceTarget = tostring(targetID),
-    }
-    draft.actors[actorID] = {
-        kind = actorKind,
-        required = true,
-        anchor = anchorID,
-        label = liveActor.name or actorID,
-    }
-    if actorKind == "nearby_live_npc" then bindingMap()[actorID] = id end
-
-    -- New slots inherit the route for their own actor kind, so dropping a
-    -- live actor creates a usable track instead of a half-defined blueprint.
-    for _, beat in ipairs(draft.beats or {}) do
-        local tracks = ensureTracks(beat)
-        local source = trackForBeat(
-            beat,
-            actorKind == "local_player" and "player" or "npc"
+    if hasExplicitOffset then
+        local moved, moveReason = Model.SetActorAnchorOffset(
+            actorID,
+            right,
+            forward,
+            z == nil and 0 or z
         )
-        if not source then
-            for existingID, existingDefinition in pairs(draft.actors) do
-                if existingID ~= actorID
-                    and existingDefinition.kind == actorKind
-                then
-                    source = trackForBeat(beat, existingID)
-                    if source then break end
-                end
-            end
-        end
-        if source then tracks[actorID] = copy(source) end
+        if not moved then return false, moveReason end
     end
-
-    local targetActor = draft.actors[targetID]
-    local targetAnchor = targetActor
-        and draft.anchorFrame.anchors[targetActor.anchor]
-        or nil
-    if targetAnchor then targetAnchor.faceTarget = actorID end
-    State.selectedActorID = actorID
-    if actorKind == "nearby_live_npc" then State.selectedNPCID = id end
+    local bound, bindReason = Model.BindLiveActor(actorID, id)
+    if not bound then return false, bindReason end
     State.pendingLiveActorID = nil
-    markChanged()
     return true, actorID
 end
 
@@ -1009,10 +1488,8 @@ function Model.RemoveActor(actorID)
     end
     if #remaining < 2 then return false, "at_least_two_actors_required" end
     table.sort(remaining)
-    local replacement = remaining[1]
     local removed = draft.actors[actorID]
-    local removedBinding = removed.kind == "nearby_live_npc"
-        and actorBinding(actorID, removed) or nil
+    local removedBinding = actorBinding(actorID, removed)
     draft.actors[actorID] = nil
     bindingMap()[actorID] = nil
     if draft.anchorFrame and draft.anchorFrame.anchors then
@@ -1020,7 +1497,7 @@ function Model.RemoveActor(actorID)
         draft.anchorFrame.anchors[anchorID] = nil
         for _, anchor in pairs(draft.anchorFrame.anchors) do
             if tostring(anchor.faceTarget or "") == actorID then
-                anchor.faceTarget = replacement
+                anchor.faceTarget = remaining[1]
             end
         end
         -- Removing the player is the normal way to turn a three-actor draft
@@ -1050,16 +1527,17 @@ function Model.RemoveActor(actorID)
     then
         State.selectedNPCID = nil
         for survivorID, survivor in pairs(draft.actors) do
-            if survivor.kind == "nearby_live_npc" then
-                local survivorBinding = actorBinding(survivorID, survivor)
-                if survivorBinding then
+            local survivorBinding = actorBinding(survivorID, survivor)
+            if survivorBinding then
+                local survivorKind = Model.GetActorKind(survivorID)
+                if survivorKind == "nearby_live_npc" then
                     State.selectedNPCID = survivorBinding
                     break
                 end
             end
         end
     end
-    State.selectedActorID = replacement
+    State.selectedActorID = nil
     State.pendingLiveActorID = nil
     markChanged()
     return true
@@ -1148,7 +1626,8 @@ function Model.GetPlayerSource()
 end
 
 function Model.SetPlayerSource(source)
-    if source ~= "player" and source ~= "zombie" then return false end
+    if source == "zombie" then source = "bridge" end
+    if source ~= "player" and source ~= "bridge" then return false end
     State.playerSource = source
     touch()
     return true
@@ -1184,8 +1663,10 @@ function Model.GetPlayerCatalogEntries()
     local source = State.playerSource
     local result = {}
     for _, entry in ipairs(PlayerCatalog.entries or {}) do
-        local inSource = source == "zombie"
+        local inSource = source == "bridge"
             and entry.source == "zombie"
+            and (entry.route == "player_bridge"
+                or entry.route == "player_emote_bridge")
             or source == "player" and entry.source ~= "zombie"
         if inSource
             and entry.playable == true
@@ -1198,6 +1679,10 @@ function Model.GetPlayerCatalogEntries()
             )
             and (query == "" or string.find(searchText(entry), query, 1, true))
         then
+            entry.puppetOperaCapability = Capabilities.DescribeEntry(
+                "player",
+                entry
+            )
             result[#result + 1] = entry
         end
     end
@@ -1222,13 +1707,17 @@ function Model.GetNPCCatalogEntries()
     local result = {}
     for _, entry in ipairs(NPCCatalog.entries or {}) do
         local bump = bumpType(entry)
-        if bump
-            and entry.playable == true
+        if entry.playable == true
             and (not state or state == "all" or entry.state == state)
             and (query == "" or string.find(searchText(entry), query, 1, true))
         then
             entry.puppetOperaBump = bump
             entry.puppetOperaDirect = directNPCEntry(entry)
+            entry.puppetOperaCapability = Capabilities.DescribeEntry(
+                "npc",
+                entry,
+                bump
+            )
             result[#result + 1] = entry
         end
     end
@@ -1248,15 +1737,23 @@ function Model.EntryBumpType(entry)
 end
 
 function Model.IsPlayerEntryServerApproved(entry)
-    return Blueprints and Blueprints.IsRuntimePlayerAction
-        and Blueprints.IsRuntimePlayerAction(entry and entry.action)
-        or false
+    if not entry then return false end
+    local approved = Capabilities.IsSceneApproved("local_player", {
+        mode = entry.mode,
+        action = entry.action,
+        emote = entry.emote,
+    })
+    return approved == true
 end
 
 function Model.IsNPCEntryServerApproved(entry)
-    return Blueprints and Blueprints.IsRuntimeNPCBump
-        and Blueprints.IsRuntimeNPCBump(bumpType(entry))
-        or false
+    local bump = bumpType(entry)
+    if not entry or not bump or not directNPCEntry(entry) then return false end
+    local approved = Capabilities.IsSceneApproved("nearby_live_npc", {
+        bump = bump,
+        nonCombat = true,
+    })
+    return approved == true
 end
 
 function Model.AssignAnimation(actorID, entry)
@@ -1267,9 +1764,22 @@ function Model.AssignAnimation(actorID, entry)
     actorID = tostring(actorID or State.selectedActorID or "")
     local definition = actorDefinition(actorID)
     if not definition then return false, "actor_not_found" end
+    local actorKind = Model.GetActorKind(actorID)
+    if not actorKind then return false, "actor_kind_required" end
     local accepted
     local reason
-    if definition.kind == "local_player" then
+    if actorKind == "local_player" then
+        local approved, capabilityReason = Capabilities.IsSceneApproved(
+            "local_player",
+            {
+                mode = entry.mode,
+                action = entry.action,
+                emote = entry.emote,
+            }
+        )
+        if not approved then
+            return false, capabilityReason or "player_animation_not_scene_approved"
+        end
         if entry.mode == "emote" then
             if not entry.emote or entry.emote == "" then
                 return false, "player_catalog_entry_has_no_emote"
@@ -1279,7 +1789,15 @@ function Model.AssignAnimation(actorID, entry)
         end
         setPlayerFromEntry(beat, actorID, entry)
         accepted = true
-    elseif definition.kind == "nearby_live_npc" then
+    elseif actorKind == "nearby_live_npc" then
+        local bump = bumpType(entry)
+        local approved, capabilityReason = Capabilities.IsSceneApproved(
+            "nearby_live_npc",
+            { bump = bump, nonCombat = true }
+        )
+        if not approved then
+            return false, capabilityReason or "npc_animation_not_scene_approved"
+        end
         accepted, reason = setNPCFromEntry(beat, actorID, entry)
         if not accepted then return false, reason end
     else
@@ -1292,14 +1810,24 @@ end
 function Model.GetSelectionSummary(actorID)
     local beat = Model.GetSelectedBeat()
     actorID = tostring(actorID or State.selectedActorID or "")
-    local track = trackForBeat(beat, actorID)
+    local actorKind = Model.GetActorKind(actorID)
+    local track = trackForBeat(beat, actorID, actorKind)
     if not track then return "No track assigned" end
     local definition = actorDefinition(actorID)
-    if definition and definition.kind == "local_player" then
+    if definition and actorKind == "local_player" then
         if track.mode == "emote" then
             return tostring(track.emote or "-") .. " / emote"
         end
         return tostring(track.action or "-") .. " / " .. tostring(track.anim or "-")
+    end
+    if track.byKind then
+        local variants = {}
+        for kind, variant in pairs(track.byKind) do
+            variants[#variants + 1] = tostring(kind) .. ":"
+                .. tostring(variant.bump or variant.action or "-")
+        end
+        table.sort(variants)
+        return table.concat(variants, " | ")
     end
     return tostring(track.bump or "-") .. " / " .. tostring(track.anim or "-")
 end

@@ -102,9 +102,12 @@ local missingRoom, missingReason = Resolver.Resolve({
     scope = CampSite.SCOPES.ROOM,
     roomQuery = "bedroom",
 }, { player = player, cell = {} })
-T.falsy(missingRoom, "explicit missing room is not silently downgraded")
-T.equal(missingReason, "camp_room_not_found",
-    "explicit missing room reports a precise reason")
+T.truthy(missingRoom,
+    "missing room type falls back to the nearest available camp site")
+T.equal(missingRoom.scope, CampSite.SCOPES.CAMPFIRE,
+    "missing room type falls back to a campfire")
+T.equal(missingReason, nil,
+    "campfire fallback does not report an unresolved room")
 
 roomAvailable = true
 local Handler = T.load("ProjectHoomans", "server",

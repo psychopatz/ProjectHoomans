@@ -41,8 +41,13 @@ Adapter.RegisterAction("GO", {
         HOME = "return_home",
     },
 })
+-- All CAMP scopes use the same authoritative command. Group admission still
+-- batches nearby targets in the command registry, while a single recipient
+-- receives the same durable camp order instead of entering a second semantic
+-- action-plan path that can acknowledge without taking movement ownership.
+Adapter.RegisterAction("CAMP", "camp")
 
-function Adapter.Resolve(actionIntent)
+function Adapter.Resolve(actionIntent, context)
     if type(actionIntent) ~= "table" then
         return nil, "invalid_action_intent"
     end
@@ -63,7 +68,7 @@ end
 
 function Adapter.Dispatch(actionIntent, context)
     context = type(context) == "table" and context or {}
-    local commandID, resolveReason = Adapter.Resolve(actionIntent)
+    local commandID, resolveReason = Adapter.Resolve(actionIntent, context)
     if not commandID then
         return {
             status = resolveReason == "negated_action"
@@ -91,20 +96,36 @@ function Adapter.Dispatch(actionIntent, context)
         dialogueID = context.dialogueID,
         requestID = context.requestID,
         semanticAction = actionIntent.action,
+        targets = context.targets,
+        campSiteHint = context.campSiteHint,
+        groupID = context.groupID,
+        groupTurnID = context.groupTurnID,
     }
-    local accepted, reason, targets = client.SendCompanionCommand(
+    local accepted, reason, targets, details = client.SendCompanionCommand(
         commandID,
         npcID,
         context.scope or "single",
         commandContext
     )
-    return {
-        status = accepted == true and "accepted" or "rejected",
+    local result = {
+        status = accepted ~= true and "rejected"
+            or (commandID == "camp" and reason == "network_queued"
+                and "pending" or "accepted"),
         accepted = accepted == true,
         reason = reason,
         commandID = commandID,
         targets = targets,
+        details = details,
     }
+    if commandID == "camp" and type(context.campSiteHint) == "table" then
+        local hint = context.campSiteHint
+        result.siteLabel = hint.label
+        result.siteScope = hint.siteScope or hint.scope
+        result.siteID = hint.siteID or hint.campfireID
+        result.siteRoomType = hint.roomType
+        result.siteRisk = hint.risk
+    end
+    return result
 end
 
 return Adapter

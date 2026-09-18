@@ -168,7 +168,17 @@ function ISPNCPuppetOperaAnimationTab:createChildren()
         end),
         variant = "danger",
     })
+    self.loopPreviewButton = UI.CreateButton(self, {
+        id = "loop_preview",
+        title = tr("UI_PNC_PuppetOpera_LoopPreview", "Loop preview: OFF"),
+        target = self,
+        onclick = UI.ButtonCallback(function(button)
+            return ISPNCPuppetOperaAnimationTab.onAction(self, button)
+        end),
+        variant = "quiet",
+    })
     self.catalogName = "player"
+    self.targets = {}
     self.ownerWindow = nil
     self:rebuildFilter()
 end
@@ -197,8 +207,8 @@ function ISPNCPuppetOperaAnimationTab:rebuildFilter()
         self.filter:addOption(tr("UI_PNC_PuppetOpera_PlayerCatalog",
             "Player catalog"))
         self.filter:addOption(tr("UI_PNC_PuppetOpera_ZombieSourceBridges",
-            "Zombie-source bridges"))
-        self.filter.selected = self.ownerWindow.model.GetPlayerSource() == "zombie"
+            "Player-compatible bridges"))
+        self.filter.selected = self.ownerWindow.model.GetPlayerSource() == "bridge"
             and 2 or 1
     else
         self.filter:addOption(tr("UI_PNC_PuppetOpera_AllStates",
@@ -219,7 +229,7 @@ function ISPNCPuppetOperaAnimationTab:onFilterChanged()
     if not self.ownerWindow then return end
     if self.catalogName == "player" then
         self.ownerWindow.model.SetPlayerSource(
-            tonumber(self.filter.selected) == 2 and "zombie" or "player"
+            tonumber(self.filter.selected) == 2 and "bridge" or "player"
         )
     else
         local selected = tonumber(self.filter.selected) or 1
@@ -228,6 +238,17 @@ function ISPNCPuppetOperaAnimationTab:onFilterChanged()
         )
     end
     self:refreshCatalog()
+end
+
+function ISPNCPuppetOperaAnimationTab:refreshTargets()
+    -- Actor identity is selected once by the parent window. Keeping a second
+    -- target selector here made it possible to preview one live body and
+    -- assign another scene slot, which was the source of the old ambiguity.
+    self.targets = {}
+end
+
+function ISPNCPuppetOperaAnimationTab:onTargetChanged()
+    return false
 end
 
 function ISPNCPuppetOperaAnimationTab:getSelectedEntry()
@@ -267,6 +288,7 @@ function ISPNCPuppetOperaAnimationTab:refreshCatalog()
         self.list.selected = 1
     end
     self.visibleCount = #self.list.items
+    self:refreshTargets()
     self:refreshDetails()
 end
 
@@ -283,15 +305,52 @@ function ISPNCPuppetOperaAnimationTab:refreshDetails()
         and model.IsPlayerEntryServerApproved(entry)
         or model.IsNPCEntryServerApproved(entry)
     local actorID = model.GetActorForCatalog(self.catalogName)
-    addDetail(self.details, "Scene actor", actorID or "No matching actor slot",
-        actorID == nil)
+    local selectedActor
+    for _, row in ipairs(model.GetActorRows(model.GetSnapshot())) do
+        if actorID and tostring(row.id) == tostring(actorID) then
+            selectedActor = row
+            break
+        end
+    end
+    addDetail(self.details, "Actor slot",
+        selectedActor and selectedActor.label or "No actor slot selected",
+        selectedActor == nil)
+    addDetail(self.details, "Scene slot", actorID or "-", actorID == nil)
+    addDetail(self.details, "Kind",
+        selectedActor and selectedActor.kind or "unbound",
+        selectedActor == nil or selectedActor.kind == "unbound")
+    addDetail(self.details, "Binding",
+        selectedActor and (selectedActor.liveName or selectedActor.bindingID)
+            or "-",
+        selectedActor == nil or not selectedActor.bindingID)
+    addDetail(self.details, "Live ID",
+        selectedActor and selectedActor.liveID or "-",
+        selectedActor == nil or not selectedActor.liveID)
     if actorID then
         addDetail(self.details, "Assignment", model.GetSelectionSummary(actorID))
     end
     addDetail(self.details, "Catalog", self.catalogName)
+    local capability = entry.puppetOperaCapability
+    addDetail(self.details, "Capability",
+        capability and capability.id or "unregistered",
+        not capability or capability.scenePolicy ~= "scene_approved")
+    addDetail(self.details, "Scene policy",
+        capability and capability.scenePolicy or "preview_only",
+        not capability or capability.scenePolicy ~= "scene_approved")
+    if capability and capability.warning then
+        addDetail(self.details, "Safety note", capability.warning, true)
+    end
     addDetail(self.details, "State", entry.state)
     addDetail(self.details, "Source", entry.source or entry.folder)
-    addDetail(self.details, "Route", entry.route or "zombie_bump")
+    local route = entry.route
+    if self.catalogName == "npc" then
+        route = model.EntryBumpType(entry)
+            and "zombie_bump -> XML" or "native clip preview only"
+    end
+    addDetail(self.details, "Route", route or "player_action")
+    if self.catalogName == "player" and entry.bridgePath then
+        addDetail(self.details, "Bridge", entry.bridgePath)
+    end
     addDetail(self.details, "Node", entry.node)
     addDetail(self.details, "Clip", entry.anim or "(none)", not entry.anim)
     addDetail(self.details, "File", entry.path or entry.file)
@@ -305,12 +364,15 @@ function ISPNCPuppetOperaAnimationTab:refreshDetails()
             not approved)
     else
         local bump = model.EntryBumpType(entry)
+        local selectors = selectorText(entry)
         addDetail(self.details, "BumpType", bump or "-", not bump)
-        addDetail(self.details, "Selectors", selectorText(entry) or "none",
-            selectorText(entry) ~= "")
+        addDetail(self.details, "Selectors",
+            selectors ~= "" and selectors or "none",
+            selectors ~= "")
         addDetail(self.details, "Direct route",
-            entry.puppetOperaDirect and "yes" or "requires selectors",
-            not entry.puppetOperaDirect)
+            bump and (entry.puppetOperaDirect and "yes"
+                or "requires selectors") or "preview only",
+            not (bump and entry.puppetOperaDirect))
         addDetail(self.details, "Entry ID", model.NPCEntryID(entry))
         addDetail(self.details, "MP policy",
             approved
@@ -325,13 +387,23 @@ end
 
 function ISPNCPuppetOperaAnimationTab:onAction(button)
     if not self.ownerWindow then return false end
+    if button and button.internal == "loop_preview" then
+        local client = PNC.PuppetOpera.Client
+        local enabled = not client.GetPreviewLoopEnabled()
+        client.SetPreviewLoopEnabled(enabled)
+        button:setTitle(tr("UI_PNC_PuppetOpera_LoopPreview", "Loop preview")
+            .. ": " .. (enabled and "ON" or "OFF"))
+        self.ownerWindow:setEditorStatus(
+            enabled and "preview_loop_enabled" or "preview_loop_disabled")
+        return true
+    end
     local entry = self:getSelectedEntry()
     if not entry then return false end
     local model = self.ownerWindow.model
     if button and button.internal == "preview" then
-        local actorID = model.GetActorForCatalog(self.catalogName)
-        if not actorID then
-            self.ownerWindow:setEditorStatus("no_matching_scene_actor", true)
+        local target, targetReason = model.GetPreviewTarget(self.catalogName)
+        if not target then
+            self.ownerWindow:setEditorStatus(targetReason, true)
             return false
         end
         local accepted
@@ -339,16 +411,16 @@ function ISPNCPuppetOperaAnimationTab:onAction(button)
         if self.catalogName == "player" then
             accepted, reason = PNC.PuppetOpera.Client.PreviewPlayer(entry)
         else
-            local npc = model.GetNPCForActor(actorID)
-            if not npc or not npc.zombie then
-                self.ownerWindow:setEditorStatus("scene_actor_npc_not_local", true)
+            if not target.body or not target.record then
+                self.ownerWindow:setEditorStatus(
+                    "animation_target_npc_not_local", true)
                 return false
             end
             accepted, reason = PNC.PuppetOpera.Client.PreviewNPC(
                 entry,
-                npc.id,
-                npc.zombie,
-                npc.record
+                target.liveID,
+                target.body,
+                target.record
             )
         end
         self.ownerWindow:setEditorStatus(
@@ -389,45 +461,47 @@ function ISPNCPuppetOperaAnimationTab:onResponsiveLayout()
     if self.details then self.details.uiScale = scale end
     local available = math.max(1, self:getWidth() - pad * 2)
     local filterWidth = math.min(Layout.Pixels(190, scale),
-        math.max(Layout.Pixels(120, scale), math.floor(available * 0.38)))
-    local searchWidth = math.max(Layout.Pixels(110, scale),
-        available - filterWidth - pad)
-    local top = Layout.Pixels(38, scale)
-    local minimumRight = Layout.Pixels(190, scale)
-    local split = math.floor(self:getWidth() * 0.52)
-    split = math.max(Layout.Pixels(220, scale), split)
-    split = math.min(split,
-        math.max(Layout.Pixels(1, scale), self:getWidth() - minimumRight))
+        math.max(Layout.Pixels(96, scale), math.floor(available * 0.36)))
+    local searchWidth = math.max(1, available - filterWidth - pad)
+    local top = pad + controlHeight + pad
+    local split = math.floor(self:getWidth() * 0.50)
+    split = math.max(1, math.min(split, self:getWidth() - 1))
     Layout.SetBounds(self.search, pad, pad, searchWidth,
         controlHeight)
     Layout.SetBounds(self.filter, pad + searchWidth + pad, pad,
         math.max(1, math.min(filterWidth,
             self:getWidth() - pad * 2 - searchWidth - pad)), controlHeight)
-    local footer = Layout.Pixels(72, scale)
+    local footer = Layout.Pixels(38, scale)
     local contentHeight = math.max(1, self:getHeight() - top - footer)
-    Layout.SetBounds(self.list, pad, top,
-        math.max(1, split - pad * 2),
-        contentHeight)
-    Layout.SetBounds(self.details, split + pad, top,
-        math.max(1, self:getWidth() - split - pad * 2),
-        contentHeight)
+    local narrow = self:getWidth() < Layout.Pixels(600, scale)
+    if narrow then
+        local listHeight = math.max(1, math.floor(contentHeight * 0.48))
+        Layout.SetBounds(self.list, pad, top,
+            available, listHeight)
+        Layout.SetBounds(self.details, pad, top + listHeight + pad,
+            available, math.max(1, contentHeight - listHeight - pad))
+    else
+        Layout.SetBounds(self.list, pad, top,
+            math.max(1, split - pad * 2), contentHeight)
+        Layout.SetBounds(self.details, split + pad, top,
+            math.max(1, self:getWidth() - split - pad * 2), contentHeight)
+    end
     local buttonGap = pad
-    local buttonWidth = math.max(1, math.floor((
-        self:getWidth() - split - pad * 2 - buttonGap * 2
-    ) / 3))
+    local buttonWidth = math.max(1, math.floor((available - buttonGap * 3) / 4))
     local buttonY = self:getHeight() - Layout.Pixels(34,
         self.ownerWindow and self.ownerWindow.uiScale)
-    Layout.SetBounds(self.assignButton, split + pad, buttonY,
+    Layout.SetBounds(self.assignButton, pad, buttonY,
         buttonWidth,
         controlHeight)
-    Layout.SetBounds(self.previewButton, split + pad + buttonWidth + buttonGap,
+    Layout.SetBounds(self.previewButton, pad + buttonWidth + buttonGap,
         buttonY, buttonWidth,
         controlHeight)
+    Layout.SetBounds(self.loopPreviewButton,
+        pad + (buttonWidth + buttonGap) * 2, buttonY,
+        buttonWidth, controlHeight)
     Layout.SetBounds(self.stopPreviewButton,
-        split + pad + (buttonWidth + buttonGap) * 2,
-        buttonY,
-        math.max(1, self:getWidth() - split - pad * 2
-            - (buttonWidth + buttonGap) * 2),
+        pad + (buttonWidth + buttonGap) * 3, buttonY,
+        math.max(1, available - (buttonWidth + buttonGap) * 3),
         controlHeight)
 end
 

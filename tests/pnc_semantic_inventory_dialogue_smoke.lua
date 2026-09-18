@@ -27,7 +27,7 @@ PNC = {
     Conversation = {},
     Network = { ClientState = {} },
     Semantics = {},
-    HoomansLLM = {
+    PBrainZ = {
         IsProviderAvailable = function() return false end,
     },
 }

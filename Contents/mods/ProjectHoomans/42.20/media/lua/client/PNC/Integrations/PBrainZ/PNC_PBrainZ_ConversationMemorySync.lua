@@ -1,0 +1,230 @@
+-- Durable, bounded handoff of canonical conversation messages to pbrainz.
+--
+-- This is an outbox, not a transcript database. Messages remain here only
+-- until pbrainz acknowledges their canonical message IDs. Retrying a poll is
+-- safe because the receiver enforces the same IDs at its SQLite boundary.
+require "PsychopatzCore/Conversation/PsychopatzConversationMessage"
+require "PsychopatzCore/Events/PC_EventBus"
+require "PNC/Integrations/PBrainZ/PNC_PBrainZ_Identity"
+require "PNC/Integrations/PBrainZ/PNC_PBrainZ_Memory"
+require "PNC/Integrations/PBrainZ/PNC_PBrainZ_Outbox"
+
+PNC = PNC or {}
+PNC.PBrainZ = PNC.PBrainZ or {}
+PNC.ConversationMemorySync = PNC.ConversationMemorySync or {}
+
+local Sync = PNC.ConversationMemorySync
+local Message = PsychopatzCore.Conversation.Message
+local Events = PsychopatzCore.Events
+local MemoryIdentity = PNC.PBrainZ.Identity
+local MemoryPrimitives = PNC.PBrainZ.Memory
+local Outbox = PNC.PBrainZ.Internal.Outbox
+
+Sync.VERSION = 1
+Sync.STORAGE_KEY = "PNC_ConversationMemorySync"
+Sync.MAX_PENDING = 256
+Sync.MAX_BATCH = 4
+Sync.MAX_CONTENT_LENGTH = 12000
+
+local OWNER_TOKEN = Sync
+local outbox = Outbox.New({
+    owner = Sync,
+    storageKey = Sync.STORAGE_KEY,
+    version = Sync.VERSION,
+    idField = "messageID",
+    resetOwner = "conversation_memory_sync",
+})
+
+local function storage()
+    return outbox.Storage()
+end
+
+local function compactSource(source)
+    local output = {}
+    if type(source) ~= "table" then return output end
+    local keys = {
+        "kind", "channel", "requestID", "sessionID", "utteranceID",
+        "providerFailure", "contextEligible", "excludeFromLLM",
+    }
+    for _, key in ipairs(keys) do
+        if source[key] ~= nil then
+            if key == "providerFailure"
+                or key == "contextEligible"
+                or key == "excludeFromLLM"
+            then
+                local value = source[key]
+                local normalized = string.lower(tostring(value or ""))
+                if value == true or normalized == "true"
+                    or normalized == "1" or normalized == "yes"
+                    or normalized == "on"
+                then
+                    output[key] = true
+                elseif value == false or normalized == "false"
+                    or normalized == "0" or normalized == "no"
+                    or normalized == "off"
+                then
+                    output[key] = false
+                else
+                    output[key] = value
+                end
+            else
+                output[key] = tostring(source[key])
+            end
+        end
+    end
+    return output
+end
+
+local function compactParticipants(participants)
+    local output = {}
+    if type(participants) ~= "table" then return output end
+    for index = 1, math.min(#participants, 16) do
+        local participant = participants[index]
+        if type(participant) == "table" then
+            output[#output + 1] = {
+                id = participant.id or participant.speakerID,
+                name = participant.name or participant.speakerName,
+                kind = participant.kind or participant.speakerKind,
+            }
+        end
+    end
+    return output
+end
+
+local function wireMessage(message)
+    local text = tostring(message.text or "")
+    if #text > Sync.MAX_CONTENT_LENGTH then
+        text = string.sub(text, 1, Sync.MAX_CONTENT_LENGTH)
+    end
+    local memoryIdentity = MemoryIdentity.Current()
+    return {
+        version = Sync.VERSION,
+        messageID = tostring(message.messageID or ""),
+        saveUUID = tostring(message.saveUUID or Message.GetSaveID()),
+        worldMode = memoryIdentity.world_mode,
+        saveRelativePath = memoryIdentity.save_relative_path,
+        serverInstanceId = memoryIdentity.server_instance_id,
+        serverWorldGeneration = memoryIdentity.server_world_generation,
+        conversationID = tostring(message.conversationID or ""),
+        namespace = tostring(message.namespace or ""),
+        sequence = tonumber(message.sequence) or 0,
+        playerUUID = tostring(message.playerUUID or ""),
+        npcUUID = tostring(message.npcUUID or ""),
+        speakerID = tostring(message.speakerID or ""),
+        speakerName = message.speakerName,
+        speakerKind = tostring(message.speakerKind or message.speaker or "npc"),
+        role = message.speakerKind == "player" and "user" or "assistant",
+        text = text,
+        gameDay = tonumber(message.gameDay) or 0,
+        worldAgeHours = tonumber(message.worldAgeHours) or 0,
+        participants = compactParticipants(message.participants),
+        visibility = tostring(message.visibility or "PUBLIC"),
+        provenance = compactSource(message.provenance),
+        source = compactSource(message.source),
+    }
+end
+
+function Sync.Enqueue(message)
+    if type(message) ~= "table" then return false, "invalid_message" end
+    local messageID = tostring(message.messageID or "")
+    if messageID == "" then return false, "missing_message_id" end
+    local saveUUID = tostring(message.saveUUID or "")
+    if saveUUID == "" or saveUUID == "ephemeral"
+        or tostring(message.playerUUID or "") == ""
+        or tostring(message.npcUUID or "") == ""
+    then
+        return false, "not_persistent"
+    end
+    local text = tostring(message.text or "")
+    if text == "" then return false, "empty_message" end
+    if Message.IsLLMContextEligible
+        and not Message.IsLLMContextEligible(message, text)
+    then
+        if print and message.source
+            and (message.source.providerFailure == true
+                or message.source.excludeFromLLM == true
+                or message.source.contextEligible == false)
+        then
+            print("[PNC][LLM] conversation_sync_skipped message="
+                .. messageID .. " reason=llm_context_excluded")
+        end
+        return false, "llm_context_excluded"
+    end
+    local root = storage()
+    if root.index[messageID] then return true, "duplicate" end
+    local queued, reason = outbox.Append(
+        wireMessage(message), messageID, Sync.MAX_PENDING
+    )
+    if not queued then
+        root.overflow = (tonumber(root.overflow) or 0) + 1
+        if print then
+            print("[PNC][LLM] conversation_sync_outbox_full pending="
+                .. tostring(#root.records))
+        end
+        return false, "outbox_full"
+    end
+    if print then
+        print("[PNC][LLM] conversation_sync_queued message="
+            .. messageID .. " speaker="
+            .. tostring(message.speakerKind or message.speaker or "unknown")
+            .. " pending=" .. tostring(#root.records))
+    end
+    return true, reason
+end
+
+function Sync.Poll()
+    local records, pendingCount, overflow = outbox.Peek(Sync.MAX_BATCH)
+    local primitiveBatch = MemoryPrimitives and MemoryPrimitives.Poll
+        and MemoryPrimitives.Poll() or { memory_primitives = {}, pendingCount = 0 }
+    if print and #(primitiveBatch.memory_primitives or {}) > 0 then
+        print("[PNC][LLM] memory_primitive_polled count="
+            .. tostring(#primitiveBatch.memory_primitives)
+            .. " pending=" .. tostring(primitiveBatch.pendingCount or 0))
+    end
+    local memoryContext = MemoryPrimitives and MemoryPrimitives.CurrentContext
+        and MemoryPrimitives.CurrentContext() or MemoryIdentity.Current()
+    return {
+        status = (#records > 0 or #(primitiveBatch.memory_primitives or {}) > 0)
+            and "pending" or "idle",
+        version = Sync.VERSION,
+        messages = records,
+        memory_primitives = primitiveBatch.memory_primitives or {},
+        memory_context = memoryContext,
+        pendingCount = pendingCount,
+        primitivePendingCount = primitiveBatch.pendingCount or 0,
+        overflow = overflow,
+    }
+end
+
+function Sync.Ack(arguments)
+    arguments = type(arguments) == "table" and arguments or {}
+    local messageIDs = arguments.message_ids or arguments.messageIDs or {}
+    if type(messageIDs) ~= "table" then return nil, "INVALID_ARGUMENTS", "message_ids must be a list." end
+    local removed = outbox.Acknowledge(
+        messageIDs,
+        Sync.MAX_BATCH * 8
+    )
+    local primitiveAcknowledged = MemoryPrimitives and MemoryPrimitives.Ack
+        and MemoryPrimitives.Ack(arguments) or 0
+    if removed > 0 and print then
+        print("[PNC][LLM] conversation_sync_acknowledged count="
+            .. tostring(removed)
+            .. " pending=" .. tostring(outbox.PendingCount()))
+    end
+    return {
+        acknowledged = removed,
+        primitivesAcknowledged = primitiveAcknowledged,
+        pendingCount = outbox.PendingCount(),
+    }
+end
+
+function Sync.GetPendingCount()
+    return #(storage().records or {})
+end
+
+Events.clearOwner(OWNER_TOKEN)
+Events.subscribe(Message.EVENT_TYPE, function(message)
+    Sync.Enqueue(message)
+end, OWNER_TOKEN)
+
+return Sync

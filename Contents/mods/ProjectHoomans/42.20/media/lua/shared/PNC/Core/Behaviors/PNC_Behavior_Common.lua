@@ -16,6 +16,7 @@ local Equipment = PNC.Equipment
 local Combat = PNC.Combat
 local NavigationRouter = PNC.NavigationRouter
 local Diagnostics = PNC.PerformanceScalingDiagnostics
+local ActorControl = PNC.ActorControl
 
 local function resolveMoveIntent()
     return PNC.BehaviorMoveIntent
@@ -183,6 +184,7 @@ function Common.MoveRecord(
     local presentationKind
     local presentationReason
     local presentationHoldReason
+    local controlOwner
     local runtime = record and record.runtime or nil
     local scene = runtime and runtime.animationScene or nil
     local state = runtime and runtime.facilityActivity
@@ -191,6 +193,9 @@ function Common.MoveRecord(
         or runtime and runtime.roamingSeat
     local liveBodyControl = PNC.LiveBodyControl
     local now = Core and Core.Now and Core.Now() or 0
+    if ActorControl and ActorControl.ResolveOwner then
+        controlOwner = ActorControl.ResolveOwner(nil, moveReason)
+    end
     if liveBodyControl
         and liveBodyControl.ResolveStationaryPresentation
     then
@@ -288,7 +293,8 @@ function Common.MoveRecord(
                     },
                     policyName,
                     providerName,
-                    policy
+                    policy,
+                    controlOwner
                 )
                 if steeringTarget then
                     tx = steeringTarget.x
@@ -317,7 +323,7 @@ function Common.MoveRecord(
         end
         moveIntent = resolveMoveIntent()
         if moveIntent and moveIntent.RequestMove then
-            moveIntent.RequestMove(
+            local accepted, requestReason = moveIntent.RequestMove(
                 record,
                 tx,
                 ty,
@@ -325,9 +331,13 @@ function Common.MoveRecord(
                 mode,
                 stopDistance,
                 moveReason,
-                intentNavigation
+                intentNavigation,
+                controlOwner
             )
-            return true, "move_intent"
+            if accepted == false then
+                return false, requestReason or "movement_request_rejected"
+            end
+            return true, requestReason or "move_intent"
         end
         return PathService.MoveToward(
             record,
@@ -338,7 +348,8 @@ function Common.MoveRecord(
             mode,
             stopDistance,
             moveReason,
-            intentNavigation
+            intentNavigation,
+            controlOwner
         )
     end
     PathService.AdvanceAbstract(record, tx, ty, tz, stopDistance)
@@ -352,12 +363,25 @@ function Common.ResolveCombatApproachMode(dist, preferredMode)
     return preferredMode
 end
 
-function Common.HaltMovement(record, zombie, reason)
+function Common.HaltMovement(record, zombie, reason, owner)
     local moveIntent = resolveMoveIntent()
+    local controlOwner = owner
+    local accepted
+    local holdReason
+    if ActorControl and ActorControl.ResolveOwner then
+        controlOwner = ActorControl.ResolveOwner(owner, reason)
+    end
     if record and record.presenceState == Const.PRESENCE_LIVE
         and moveIntent and moveIntent.Hold
     then
-        moveIntent.Hold(record, reason or "hold")
+        accepted, holdReason = moveIntent.Hold(
+            record,
+            reason or "hold",
+            controlOwner
+        )
+        if accepted == false then
+            return false, holdReason or "movement_hold_rejected"
+        end
         -- A live engine route must be relinquished before callers apply an
         -- idle presentation.  Deferring this to the next PathService pump
         -- leaves Behavior2/path2 alive while Animation.Apply writes the
@@ -373,13 +397,19 @@ function Common.HaltMovement(record, zombie, reason)
         then
             planner.Invalidate(record, reason or "hold", zombie)
         end
-        return
+        return true, "hold"
     end
     if zombie and PathService and PathService.Reset then
         if PathService.Commands and PathService.Commands.Reset then
-            PathService.Commands.Reset(record, zombie, reason)
+            return PathService.Commands.Reset(
+                record,
+                zombie,
+                reason,
+                controlOwner
+            )
         else
-            PathService.Reset(zombie, record, reason)
+            return PathService.Reset(zombie, record, reason, controlOwner)
         end
     end
+    return false, "movement_service_unavailable"
 end

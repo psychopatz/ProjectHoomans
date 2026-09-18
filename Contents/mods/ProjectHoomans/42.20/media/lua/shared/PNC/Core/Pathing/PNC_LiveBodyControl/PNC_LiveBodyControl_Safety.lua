@@ -4,6 +4,7 @@ local LiveBodyControl = PNC.LiveBodyControl
 local Internal = LiveBodyControl.Internal
 local Core = PNC.Core
 local Diagnostics = PNC.PerformanceScalingDiagnostics
+local ActorControl = PNC.ActorControl
 local SAFETY_REPAIR_LOGGED = setmetatable({}, { __mode = "k" })
 
 function LiveBodyControl.EnforceManagedSafety(zombie, source)
@@ -24,6 +25,8 @@ function LiveBodyControl.EnforceManagedSafety(zombie, source)
     local presentationReason
     local presentationLockActive
     local bumpType
+    local puppetOwned
+    local puppetSafetyBoundary
     if not zombie or not Core or not Core.IsManagedNPCBody
         or not Core.IsManagedNPCBody(zombie)
     then
@@ -51,6 +54,21 @@ function LiveBodyControl.EnforceManagedSafety(zombie, source)
     end
     modData = zombie.getModData and zombie:getModData() or nil
     now = Core.Now and Core.Now() or 0
+    puppetOwned = ActorControl and ActorControl.IsPuppetOwned
+        and ActorControl.IsPuppetOwned(record) or false
+    if puppetOwned then
+        puppetSafetyBoundary = zombie.getVehicle
+            and zombie:getVehicle() ~= nil
+            or zombie.isSeatedInVehicle
+            and zombie:isSeatedInVehicle()
+            or LiveBodyControl.IsPresentationCombatActive
+            and LiveBodyControl.IsPresentationCombatActive(record, now)
+            or PNC.PathService and PNC.PathService.IsTraversalActive
+            and PNC.PathService.IsTraversalActive(record, zombie)
+            or LiveBodyControl.IsGrounded
+            and LiveBodyControl.IsGrounded(zombie)
+            or false
+    end
     presentationKind, presentationReason =
         LiveBodyControl.ResolveStationaryPresentation(record, now)
     presentationLockActive = presentationKind ~= nil
@@ -95,6 +113,7 @@ function LiveBodyControl.EnforceManagedSafety(zombie, source)
         or (
             (not keepEngineMovementActive or unsafeNativeTraversalState)
             and not actionLeaseActive
+            and (not puppetOwned or puppetSafetyBoundary == true)
             and LiveBodyControl.IsSuppressedActionState(actionState)
         )
     LiveBodyControl.MaintainHumanizedBody(
@@ -112,11 +131,14 @@ function LiveBodyControl.EnforceManagedSafety(zombie, source)
     end
     if (not keepEngineMovementActive or unsafeNativeTraversalState)
         and not actionLeaseActive
+        and (not puppetOwned or puppetSafetyBoundary == true)
         and LiveBodyControl.IsSuppressedActionState(actionState)
     then
         LiveBodyControl.SuppressZombieState(zombie, nil, now, true)
     end
-    if presentationLockActive then
+    if presentationLockActive
+        and (not puppetOwned or puppetSafetyBoundary == true)
+    then
         -- The shared suppressed-state list intentionally does not claim
         -- turnalerted. Stationary presentation ownership does: it is a
         -- native zombie alert transition that can otherwise reacquire

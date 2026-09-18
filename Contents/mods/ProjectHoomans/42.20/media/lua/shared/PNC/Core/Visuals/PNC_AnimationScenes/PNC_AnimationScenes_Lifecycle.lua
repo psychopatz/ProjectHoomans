@@ -4,6 +4,7 @@ local Core = PNC.Core
 local Const = PNC.Const
 local Diagnostics = PNC.PerformanceScalingDiagnostics
 local LiveBodyControl = PNC.LiveBodyControl
+local ActorControl = PNC.ActorControl
 
 local function isWaterScene(sceneId)
     local id = tostring(sceneId or "")
@@ -165,10 +166,12 @@ local function notifyStop(definition, record, zombie, scene, reason)
     end
 end
 
-function Internal.ClearScene(record, zombie, reason, release)
+function Internal.ClearScene(record, zombie, reason, release, options)
     local runtime
     local scene
     local definition
+    local preserveOwner = type(options) == "table"
+        and options.preserveOwner == true
     if not record then return false end
     runtime = record.runtime or {}
     record.runtime = runtime
@@ -203,6 +206,7 @@ function Internal.ClearScene(record, zombie, reason, release)
         stepPosition = scene.stepPosition,
         stoppedAt = Core.Now(),
         reason = reason or "stopped",
+        preservedOwner = preserveOwner,
     }
     runtime.animationScene = nil
     Internal.ClearLocalSceneKey(zombie)
@@ -214,7 +218,9 @@ function Internal.ClearScene(record, zombie, reason, release)
         PNC.Animation.FinishBump(zombie, true)
     end
     Internal.MarkSceneSync(record, "animation_scene_stop")
-    notifyStop(definition, record, zombie, scene, reason or "stopped")
+    if not preserveOwner then
+        notifyStop(definition, record, zombie, scene, reason or "stopped")
+    end
     return true
 end
 
@@ -311,9 +317,22 @@ function Scenes.Request(record, zombie, sceneId, options)
     local result
     local traversalActive
     local traversalKind
+    local allowed
+    local ownerReason
     options = type(options) == "table" and options or {}
     if not record or not definition then
         return false, definition and "record_missing" or "scene_missing"
+    end
+    if ActorControl and ActorControl.CanWrite then
+        allowed, ownerReason = ActorControl.CanWrite(
+            record,
+            options.owner,
+            "animation_scene_request",
+            { reason = options.reason or "animation_scene_request" }
+        )
+        if allowed == false then
+            return false, ownerReason or "puppet_opera_owned"
+        end
     end
     if record.presenceState ~= Const.PRESENCE_LIVE or not zombie then
         return false, "live_body_required"
@@ -441,12 +460,39 @@ function Scenes.Request(record, zombie, sceneId, options)
     return true, scene
 end
 
-function Scenes.Stop(record, zombie, reason)
+function Scenes.Stop(record, zombie, reason, owner)
+    local allowed
+    local ownerReason
+    if ActorControl and ActorControl.CanWrite then
+        allowed, ownerReason = ActorControl.CanWrite(
+            record,
+            owner,
+            "animation_scene_stop",
+            { reason = reason or "scene_stopped" }
+        )
+        if allowed == false then
+            return false, ownerReason or "puppet_opera_owned"
+        end
+    end
     return Internal.ClearScene(
         record,
         zombie,
         reason or "scene_stopped",
         true
+    )
+end
+
+-- Clear a presentation scene while preserving the provider runtime that owns
+-- it. Puppet Opera uses this handoff when it temporarily takes an actor from
+-- a facility, ambient, or conversation presentation. The provider can then
+-- rebuild its visual scene after the Puppet lease is released.
+function Scenes.Suspend(record, zombie, reason)
+    return Internal.ClearScene(
+        record,
+        zombie,
+        reason or "scene_suspended",
+        true,
+        { preserveOwner = true }
     )
 end
 
@@ -468,12 +514,25 @@ function Scenes.RequestFromPool(record, zombie, poolName, options)
     return Scenes.Request(record, zombie, sceneId, options)
 end
 
-function Scenes.Interrupt(record, zombie, reason)
+function Scenes.Interrupt(record, zombie, reason, owner)
     local scene = record and record.runtime
         and record.runtime.animationScene or nil
     local definition = scene and Scenes.Get(scene.id) or nil
     local interruptKey = tostring(reason or "externalBump")
+    local allowed
+    local ownerReason
     if not scene or not definition then return false end
+    if ActorControl and ActorControl.CanWrite then
+        allowed, ownerReason = ActorControl.CanWrite(
+            record,
+            owner,
+            "animation_scene_interrupt",
+            { reason = reason or "externalBump" }
+        )
+        if allowed == false then
+            return false, ownerReason or "puppet_opera_owned"
+        end
+    end
     if definition.interrupts[interruptKey] == false then
         return false
     end

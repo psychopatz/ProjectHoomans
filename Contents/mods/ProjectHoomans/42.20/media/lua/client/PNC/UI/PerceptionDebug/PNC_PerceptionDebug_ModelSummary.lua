@@ -21,6 +21,7 @@ end
 
 local function addCampResult(rows, label, result)
     local hint
+    local details
     if type(result) ~= "table" then return end
     addLine(rows, label, result.status or "UNKNOWN",
         resultTone(result.status))
@@ -30,12 +31,41 @@ local function addCampResult(rows, label, result)
         addLine(rows, "request ID", result.requestID)
     end
     hint = result.hint
-    if type(hint) ~= "table" then return end
-    addLine(rows, "hint source", hint.source or "none")
-    addLine(rows, "hint scope", hint.scope or result.scope or "none")
-    addLine(rows, "hint label", hint.label or hint.roomType or "none")
-    addLine(rows, "hint site / campfire ID",
-        hint.siteID or hint.campfireID or "none")
+    if type(hint) == "table" then
+        addLine(rows, "hint source", hint.source or "none")
+        addLine(rows, "hint scope", hint.scope or result.scope or "none")
+        addLine(rows, "hint label", hint.label or hint.roomType or "none")
+        addLine(rows, "hint site / campfire ID",
+            hint.siteID or hint.campfireID or "none")
+    end
+    details = result.details
+    if type(details) == "table" then
+        addLine(rows, "authority route", details.route or "none")
+        addLine(rows, "placement mode", details.placementMode or "none")
+        addLine(rows, "placement state",
+            details.placementState or "none")
+        addLine(rows, "accepted / inspected",
+            tostring(details.acceptedCount or 0) .. " / "
+                .. tostring(details.targetCount or 0))
+        if details.activeNPCID then
+            addLine(rows, "active mover", details.activeNPCID)
+        end
+        if type(details.site) == "table" then
+            addLine(rows, "authority site",
+                details.site.label or details.site.roomType
+                    or details.site.scope or "none")
+        end
+        if type(details.targets) == "table" then
+            for index = 1, math.min(#details.targets, 32) do
+                local target = details.targets[index]
+                if type(target) == "table" and target.npcID then
+                    addLine(rows, "target " .. tostring(target.npcID),
+                        tostring(target.state or "unknown") .. " / "
+                            .. tostring(target.reason or "none"))
+                end
+            end
+        end
+    end
 end
 
 function Model.Summary(snapshot)

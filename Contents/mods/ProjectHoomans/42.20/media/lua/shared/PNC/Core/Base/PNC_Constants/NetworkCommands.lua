@@ -101,6 +101,10 @@ Const.CMD_CONVERSATION_SETTLEMENT_ADMISSION_REQUEST =
     "ConversationSettlementAdmissionRequest"
 Const.CMD_CONVERSATION_SETTLEMENT_ADMISSION_RESULT =
     "ConversationSettlementAdmissionResult"
+Const.CMD_CONVERSATION_AMBIENT_VISIT_REQUEST =
+    "ConversationAmbientVisitRequest"
+Const.CMD_CONVERSATION_AMBIENT_VISIT_RESULT =
+    "ConversationAmbientVisitResult"
 Const.CMD_CONVERSATION_DEPARTURE_REQUEST = "ConversationDepartureRequest"
 Const.CMD_CONVERSATION_DEPARTURE_RESULT = "ConversationDepartureResult"
 Const.CMD_LLM_SOCIAL_REACTION = "LLMSocialReaction"

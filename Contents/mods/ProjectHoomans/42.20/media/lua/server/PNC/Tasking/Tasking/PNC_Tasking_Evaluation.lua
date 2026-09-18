@@ -5,6 +5,7 @@ local Tasking = PNC.Tasking
 local Priority = PNC.TaskPriority
 local Leases = PNC.TaskLeaseService
 local ScalingDiagnostics = PNC.PerformanceScalingDiagnostics
+local ActorControl = PNC.ActorControl
 local H = Tasking.Internal
 
 function H.Collect(record)
@@ -140,6 +141,12 @@ function Tasking.Commands.Reevaluate(npcId, cause, event)
         if existing then H.StopLease(existing, "npc_unavailable") end
         diagnostics.lastReason = "NPC_UNAVAILABLE"
         return false, diagnostics.lastReason
+    end
+    if ActorControl and ActorControl.IsPuppetOwned
+        and ActorControl.IsPuppetOwned(record)
+    then
+        diagnostics.lastReason = "DEFERRED_PUPPET_OPERA"
+        return true, Leases.ForNPC(npcId)
     end
     local current, currentOK, currentReason = H.ReconcileCurrentLease(npcId)
     if not currentOK then

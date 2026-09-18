@@ -98,13 +98,21 @@ target = Targets.Resolve(component)[1]
 T.equal(target.sceneId, "facility.sleep.bed", "new bed changes XML without reassignment")
 T.equal(target.x, 10.5, "bed approach x")
 T.equal(target.y, 21.5, "bed approach y")
-T.equal(target.interactionX, 11, "multi-tile bed center x")
+T.equal(target.interactionX, 10.5, "first multi-tile bed slot x")
 T.equal(target.interactionY, 20.5, "multi-tile bed center y")
 T.equal(target.interactionAxis, "x", "bed long axis")
 T.equal(target.sleepSurface, "bed", "bed surface metadata")
 T.equal(target.sleepAnchorX, 11, "bed target carries the sprite-grid center")
 T.equal(target.sleepGridWidth, 2,
     "bed target carries sprite-grid dimensions")
+local bedTargets = Targets.Resolve(component)
+T.equal(#bedTargets, 2, "multi-tile bed exposes two legacy sleep slots")
+T.equal(bedTargets[1].sleepSlotId, "slot:1",
+    "legacy bed first slot is stable")
+T.equal(bedTargets[2].sleepSlotId, "slot:2",
+    "legacy bed second slot is stable")
+T.equal(bedTargets[2].interactionX, 11.5,
+    "legacy bed second slot uses its own interaction pose")
 
 bedObjects[1] = nil
 component.targetResolver = nil

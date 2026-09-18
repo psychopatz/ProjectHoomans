@@ -142,38 +142,87 @@ Commands.Register({
         local y
         local z
         local site
+        local root
+        local zone
+        local assignment
+        local movementX
+        local movementY
+        local movementZ
         options = type(options) == "table" and options or {}
         site = type(options.campSite) == "table" and options.campSite or nil
+        root = type(options.campRoot) == "table" and options.campRoot
+            or site
+        zone = type(options.zone) == "table" and options.zone or site
+        assignment = type(options.zoneAssignment) == "table"
+            and options.zoneAssignment or nil
         if options.x ~= nil and options.y ~= nil then
             x, y, z = options.x, options.y, options.z
-        elseif site and site.x ~= nil and site.y ~= nil then
-            x, y, z = site.x, site.y, site.z
+        elseif zone and zone.x ~= nil and zone.y ~= nil then
+            x = zone.movementX or zone.x
+            y = zone.movementY or zone.y
+            z = zone.movementZ or zone.z
         else
             x, y, z = currentPosition(record)
         end
+        movementX = tonumber(options.movementX) or tonumber(x)
+        movementY = tonumber(options.movementY) or tonumber(y)
+        movementZ = tonumber(options.movementZ) or tonumber(z) or 0
         return {
             kind = Const.ORDER_CAMP or "camp",
             x = x,
             y = y,
             z = z,
+            movementX = movementX,
+            movementY = movementY,
+            movementZ = movementZ,
             radius = tonumber(site and site.radius)
                 or tonumber(Const.CAMP_RADIUS) or 3,
             campId = tostring(options.campId
                 or ("camp:" .. tostring(record.id))),
-            resourceRadius = tonumber(site and site.resourceRadius)
+            resourceRadius = tonumber(zone and zone.resourceRadius)
                 or tonumber(Const.CAMP_RESOURCE_RADIUS) or 12,
-            scope = site and (site.scope or site.siteScope) or nil,
-            siteScope = site and (site.siteScope or site.scope) or nil,
-            siteID = site and site.siteID or nil,
-            roomID = site and site.roomID or nil,
-            buildingID = site and site.buildingID or nil,
-            roomType = site and site.roomType or nil,
-            roomName = site and site.roomName or nil,
-            roomBounds = site and site.roomBounds or nil,
-            campfireID = site and site.campfireID or nil,
-            label = site and site.label or nil,
-            risk = site and site.risk or nil,
-            stopDistance = site and site.stopDistance or nil,
+            scope = zone and (zone.scope or zone.siteScope) or nil,
+            siteScope = zone and (zone.siteScope or zone.scope) or nil,
+            siteID = zone and zone.siteID or nil,
+            roomID = zone and zone.roomID or nil,
+            buildingID = zone and zone.buildingID or nil,
+            roomType = zone and zone.roomType or nil,
+            roomName = zone and zone.roomName or nil,
+            roomBounds = zone and zone.roomBounds or nil,
+            campfireID = zone and zone.campfireID or nil,
+            label = zone and zone.label or nil,
+            risk = zone and zone.risk or nil,
+            stopDistance = zone and zone.stopDistance or nil,
+            -- The assigned zone is the movement/safety boundary. Keep the
+            -- validated player-selected site separately for diagnostics and
+            -- future group reallocation without serializing the full zone
+            -- directory into each order.
+            zoneID = assignment and assignment.zoneID
+                or zone and zone.siteID or nil,
+            zoneLabel = assignment and assignment.zoneLabel
+                or zone and zone.label or nil,
+            zoneScope = zone and (zone.scope or zone.siteScope) or nil,
+            zoneNeedKind = assignment and assignment.needKind or nil,
+            zoneReason = assignment and assignment.reason or nil,
+            zoneScore = assignment and assignment.score or nil,
+            zoneRevision = assignment and assignment.assignmentRevision
+                or options.campDirectoryRevision or nil,
+            placementState = options.placementState
+                and tostring(options.placementState) or nil,
+            placementCampID = options.placementCampID
+                and tostring(options.placementCampID) or nil,
+            placementIndex = tonumber(options.placementIndex),
+            campRootX = root and (root.movementX or root.x) or nil,
+            campRootY = root and (root.movementY or root.y) or nil,
+            campRootZ = root and (root.movementZ or root.z) or nil,
+            campRootScope = root and (root.scope or root.siteScope) or nil,
+            campRootSiteID = root and root.siteID or nil,
+            campRootRoomID = root and root.roomID or nil,
+            campRootBuildingID = root and root.buildingID or nil,
+            campRootRoomType = root and root.roomType or nil,
+            campRootRoomName = root and root.roomName or nil,
+            campRootRoomBounds = root and root.roomBounds or nil,
+            campRootCampfireID = root and root.campfireID or nil,
         }
     end,
 })

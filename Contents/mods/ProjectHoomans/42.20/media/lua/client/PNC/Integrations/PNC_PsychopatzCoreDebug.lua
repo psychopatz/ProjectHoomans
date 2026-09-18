@@ -94,8 +94,6 @@ PsychopatzCore.DebugHub.RegisterTool({
         "Build multi-actor scenes from the existing player and NPC animation catalogs."),
     available = function()
         return PNC
-            and PNC.PuppetOperaDebugWindow
-            and PNC.PuppetOperaDebugWindow.Open
             and PNC.Client
             and PNC.Client.CanUseDebug
             and PNC.Client.CanUseDebug()

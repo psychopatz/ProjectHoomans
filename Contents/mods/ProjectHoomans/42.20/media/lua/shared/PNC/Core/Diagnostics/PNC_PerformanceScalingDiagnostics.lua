@@ -39,6 +39,7 @@ Diagnostics.TimingLastSampleAt = Diagnostics.TimingLastSampleAt or {}
 -- summaries. It is off by default and only runs when its startup setting is
 -- active, or when an explicit emergency runtime override is used.
 Diagnostics.SeatingAuditEnabled = false
+Diagnostics.SleepAuditEnabled = false
 Diagnostics.FollowerPresenceAuditEnabled = false
 Diagnostics.FollowerAbandonmentAuditEnabled = false
 Diagnostics.InventoryAuditEnabled = false
@@ -52,6 +53,7 @@ Diagnostics.SeatingSessionSequence =
 
 local PERFORMANCE_SETTING_ID = "ProjectHoomans.PerformanceDiagnostics"
 local SEATING_AUDIT_SETTING_ID = "ProjectHoomans.SeatingAudit"
+local SLEEP_AUDIT_SETTING_ID = "ProjectHoomans.SleepAudit"
 local FIREARM_AUDIT_SETTING_ID = "ProjectHoomans.FirearmEffectsAudit"
 local FOLLOWER_PRESENCE_AUDIT_SETTING_ID =
     "ProjectHoomans.FollowerPresenceAudit"
@@ -93,6 +95,18 @@ local function initializeCentralDebugSettings()
         runtimeMutable = true,
         apply = function(enabled)
             Diagnostics.SeatingAuditEnabled = enabled == true
+        end,
+    })
+    settings.Register({
+        id = SLEEP_AUDIT_SETTING_ID,
+        source = "Project Hoomans",
+        order = 102,
+        title = "Sleep state audit",
+        description = "Captures sleep targeting, bed entry, scene handoff, cleanup, and client replication.",
+        defaultEnabled = false,
+        runtimeMutable = true,
+        apply = function(enabled)
+            Diagnostics.SleepAuditEnabled = enabled == true
         end,
     })
     settings.Register({
@@ -165,6 +179,8 @@ local function initializeCentralDebugSettings()
     -- use SetSeatingAuditEnabled as a temporary emergency runtime override.
     Diagnostics.SeatingAuditEnabled = settings.IsEnabled(
         SEATING_AUDIT_SETTING_ID) == true
+    Diagnostics.SleepAuditEnabled = settings.IsEnabled(
+        SLEEP_AUDIT_SETTING_ID) == true
     Diagnostics.FirearmAuditEnabled = settings.IsEnabled(
         FIREARM_AUDIT_SETTING_ID) == true
     Diagnostics.FollowerPresenceAuditEnabled = settings.IsEnabled(
@@ -367,6 +383,22 @@ function Diagnostics.IsSeatingAuditEnabled()
     return Diagnostics.SeatingAuditEnabled == true
 end
 
+function Diagnostics.SetSleepAuditEnabled(enabled)
+    Diagnostics.SleepAuditEnabled = enabled == true
+    if Diagnostics.SleepAuditEnabled == true then
+        if PNC.Core and PNC.Core.LogInfo then
+            PNC.Core.LogInfo("sleep_audit event=enabled")
+        else
+            print("[PNC][INFO] sleep_audit event=enabled")
+        end
+    end
+    return Diagnostics.SleepAuditEnabled
+end
+
+function Diagnostics.IsSleepAuditEnabled()
+    return Diagnostics.SleepAuditEnabled == true
+end
+
 function Diagnostics.SetInventoryAuditEnabled(enabled)
     Diagnostics.InventoryAuditEnabled = enabled == true
     if Diagnostics.InventoryAuditEnabled == true then
@@ -455,6 +487,23 @@ function Diagnostics.LogSeatingAudit(eventName, fields)
         output[#output + 1] = tostring(field)
     end
     local message = table.concat(output, " ")
+    if PNC.Core and PNC.Core.LogInfo then
+        PNC.Core.LogInfo(message)
+    else
+        print("[PNC][INFO] " .. message)
+    end
+    return true
+end
+
+function Diagnostics.LogSleepAudit(eventName, fields)
+    local output
+    local message
+    if Diagnostics.SleepAuditEnabled ~= true then return false end
+    output = { "sleep_audit", "event=" .. tostring(eventName or "unknown") }
+    for _, field in ipairs(fields or {}) do
+        output[#output + 1] = tostring(field)
+    end
+    message = table.concat(output, " ")
     if PNC.Core and PNC.Core.LogInfo then
         PNC.Core.LogInfo(message)
     else
@@ -607,6 +656,84 @@ function Diagnostics.LogSeatingState(
     }
     for _, field in ipairs(extra or {}) do fields[#fields + 1] = tostring(field) end
     return Diagnostics.LogSeatingAudit(eventName, fields)
+end
+
+-- Sleep state snapshot for the bed/sofa handoff trace. Callers guard this
+-- function before assembling event-specific fields so the disabled path stays
+-- allocation-free on the normal facility tick.
+function Diagnostics.LogSleepState(
+    eventName,
+    record,
+    zombie,
+    scene,
+    reason,
+    extra
+)
+    local runtime
+    local animationScene
+    local modData
+    local actionState
+    local contextState
+    local bump
+    local bodyX
+    local bodyY
+    local bodyZ
+    local fields
+    if Diagnostics.SleepAuditEnabled ~= true then return false end
+    runtime = record and record.runtime or {}
+    animationScene = scene or runtime.animationScene
+    modData = zombie and zombie.getModData and zombie:getModData() or nil
+    actionState = zombie and zombie.getActionStateName
+        and zombie:getActionStateName() or ""
+    contextState = PNC.LiveBodyControl
+        and PNC.LiveBodyControl.GetActionContextStateName
+        and PNC.LiveBodyControl.GetActionContextStateName(zombie) or ""
+    bump = zombie and zombie.getBumpType and zombie:getBumpType()
+        or modData and modData.PNC_BumpRequestedType or ""
+    bodyX = zombie and zombie.getX and zombie:getX() or ""
+    bodyY = zombie and zombie.getY and zombie:getY() or ""
+    bodyZ = zombie and zombie.getZ and zombie:getZ() or ""
+    fields = {
+        "npc=" .. tostring(record and record.id or ""),
+        "surface=" .. tostring(runtime.sleepSurface or ""),
+        "resourceKey=" .. tostring(runtime.resourceKey or ""),
+        "scene=" .. tostring(animationScene and animationScene.id or ""),
+        "sceneBump=" .. tostring(animationScene and animationScene.bump or ""),
+        "sceneActive=" .. tostring(runtime.sleepSceneActive == true
+            or animationScene ~= nil),
+        "phase=" .. tostring(runtime.phase or ""),
+        "arrivalSettled=" .. tostring(runtime.arrivalSettled == true),
+        "positioned=" .. tostring(runtime.positioned == true),
+        "surfaceEntered=" .. tostring(runtime.sleepSurfaceEntered == true),
+        "sleepWakePending=" .. tostring(runtime.sleepWakePending == true),
+        "startupAttempts=" .. tostring(runtime.startupAttempts or 0),
+        "interruptReason=" .. tostring(runtime.interruptReason or ""),
+        "failedReason=" .. tostring(runtime.failedReason or ""),
+        "action=" .. tostring(actionState),
+        "context=" .. tostring(contextState),
+        "bump=" .. tostring(bump or ""),
+        "requestedBump=" .. tostring(modData
+            and modData.PNC_BumpRequestedType or ""),
+        "bumpLease=" .. tostring(modData
+            and modData.PNC_BumpActionLease == true or false),
+        "bedAssigned=" .. tostring(zombie and zombie.getBed
+            and zombie:getBed() ~= nil or false),
+        "onBed=" .. tostring(zombie and zombie.getVariableBoolean
+            and zombie:getVariableBoolean("OnBed") == true or false),
+        "sittingOnFurniture=" .. tostring(zombie
+            and zombie.getVariableBoolean
+            and zombie:getVariableBoolean("SittingOnFurniture") == true
+            or false),
+        "bodyX=" .. tostring(bodyX),
+        "bodyY=" .. tostring(bodyY),
+        "bodyZ=" .. tostring(bodyZ),
+        "recordX=" .. tostring(record and record.x or ""),
+        "recordY=" .. tostring(record and record.y or ""),
+        "recordZ=" .. tostring(record and record.z or ""),
+        "reason=" .. tostring(reason or ""),
+    }
+    for _, field in ipairs(extra or {}) do fields[#fields + 1] = tostring(field) end
+    return Diagnostics.LogSleepAudit(eventName, fields)
 end
 
 -- Follower presence auditing is intentionally separate from the general

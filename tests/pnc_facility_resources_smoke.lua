@@ -85,6 +85,22 @@ T.equal(target.interactionSurfaceOffset, 0.15,
     "bed target carries surface offset")
 T.equal(target.interactionZ, (0.15 + 1) / 96,
     "bed target converts surface height to world Z")
+local targets = Targets.ResolveResource(scan.resources[1], { abstract = true })
+T.equal(#targets, 2, "two-tile bed exposes two sleep slots")
+T.equal(targets[1].sleepSlotId, "slot:1", "first bed slot is stable")
+T.equal(targets[2].sleepSlotId, "slot:2", "second bed slot is stable")
+T.truthy(targets[1].interactionX ~= targets[2].interactionX
+    or targets[1].interactionY ~= targets[2].interactionY,
+    "double-bed slots have distinct interaction poses")
+local isolated = {
+    resourceKey = "bed:isolated", resourceKind = "sleep_surface",
+    detectorId = "bed", sleepSurface = "bed", originX = 50, originY = 50,
+    originZ = 0, x = 51, y = 50.5, z = 0, gridX = 0, gridY = 0,
+    gridWidth = 2, gridHeight = 1,
+}
+T.equal(#Targets.ResolveResource(isolated, {
+    abstract = false, character = {},
+}), 0, "live sleep resolution rejects a bed without an approach square")
 T.truthy(Resources.IsValidSleepTarget(scan.resources[1], target),
     "bed target passes the physical sleep-target gate")
 T.falsy(Resources.IsValidSleepTarget(
@@ -112,8 +128,8 @@ PNC.FacilityDefinitions = {
 }
 local snapshot = Resources.BuildSnapshot(facility)
 T.equal(snapshot.profile.bedCount, 2, "room profile counts discovered beds")
-T.equal(snapshot.profile.capacity, 2,
-    "automatic room capacity follows detected bed count")
+T.equal(snapshot.profile.capacity, 4,
+    "automatic room capacity follows detected bed slots")
 T.equal(snapshot.profile.classification, "barracks",
     "multiple beds classify the room as barracks")
 T.equal(#snapshot.components, 2, "discovered beds become read-only components")

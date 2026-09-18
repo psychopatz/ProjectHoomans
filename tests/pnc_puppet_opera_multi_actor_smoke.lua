@@ -187,8 +187,16 @@ local registered, blueprint = Opera.Blueprints.Register("rumors.dual_npc", {
             id = "exchange",
             durationMs = 900,
             tracks = {
-                npc_a = { bump = "PNC_Shove", animation = "Bob_Shove" },
-                npc_b = { bump = "PNC_Shove", animation = "Bob_Shove" },
+                npc_a = {
+                    bump = "PNC_WaveHi",
+                    animation = "Bob_EmoteWaveHi",
+                    nonCombat = true,
+                },
+                npc_b = {
+                    bump = "PNC_WaveHi",
+                    animation = "Bob_EmoteWaveHi",
+                    nonCombat = true,
+                },
             },
         },
     },
@@ -196,9 +204,9 @@ local registered, blueprint = Opera.Blueprints.Register("rumors.dual_npc", {
 })
 T.truthy(registered, "two-NPC blueprint could not be registered")
 T.truthy(blueprint, "two-NPC blueprint normalization returned no value")
-T.equal(blueprint.beats[1].tracks.npc_a.bump, "PNC_Shove",
+T.equal(blueprint.beats[1].tracks.npc_a.bump, "PNC_WaveHi",
     "first NPC track was not normalized")
-T.equal(blueprint.beats[1].tracks.npc_b.bump, "PNC_Shove",
+T.equal(blueprint.beats[1].tracks.npc_b.bump, "PNC_WaveHi",
     "second NPC track was not normalized")
 T.truthy(Opera.Blueprints.ValidateRuntime(blueprint),
     "two-NPC blueprint failed the runtime policy")
@@ -272,5 +280,42 @@ T.falsy(Authority.ByActor["npc-a"],
 T.falsy(Authority.ByActor["npc-b"],
     "second NPC session index was not released")
 T.truthy(#sent > 0, "two-NPC transport emitted no state")
+
+-- The scene-builder blueprint is deliberately kind-neutral. Exercise the
+-- same normalized definition with two NPC bindings so the server cannot
+-- accidentally rely on a fixed player slot while the editor supports the
+-- rumors/NPC-to-NPC use case.
+local neutralAccepted, neutralSession = Authority.HandleRequest(player, {
+    action = "start",
+    blueprintId = "social.kiss_test",
+    actors = {
+        actor_1 = "npc-a",
+        actor_2 = "npc-b",
+    },
+    loop = false,
+})
+T.truthy(neutralAccepted, "authority rejected a neutral two-NPC scene")
+T.equal(neutralSession.actors.actor_1.kind, "nearby_live_npc",
+    "neutral actor 1 did not resolve to the NPC route")
+T.equal(neutralSession.actors.actor_2.kind, "nearby_live_npc",
+    "neutral actor 2 did not resolve to the NPC route")
+npcA.x = neutralSession.actors.actor_1.target.worldX
+npcA.y = neutralSession.actors.actor_1.target.worldY
+npcB.x = neutralSession.actors.actor_2.target.worldX
+npcB.y = neutralSession.actors.actor_2.target.worldY
+Authority.PumpSession(neutralSession, clock)
+T.equal(neutralSession.phase, Opera.Phases.FACING,
+    "neutral two-NPC scene did not pass the arrival barrier")
+Authority.PumpSession(neutralSession, clock)
+T.equal(neutralSession.phase, Opera.Phases.READY,
+    "neutral two-NPC scene did not pass the facing barrier")
+clock = neutralSession.beatStartAt + 1
+Authority.PumpSession(neutralSession, clock)
+T.equal(neutralSession.phase, Opera.Phases.PLAYING,
+    "neutral two-NPC scene did not enter its beat")
+clock = neutralSession.beatStartAt + 1
+Authority.PumpSession(neutralSession, clock)
+T.truthy(neutralSession.closed,
+    "neutral two-NPC one-shot scene did not close")
 
 return T.finish("pnc_puppet_opera_multi_actor_smoke")

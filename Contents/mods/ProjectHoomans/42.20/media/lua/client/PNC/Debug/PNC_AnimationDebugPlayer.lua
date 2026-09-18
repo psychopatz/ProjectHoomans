@@ -671,7 +671,8 @@ local function begin(
     body,
     mode,
     record,
-    applySelectors
+    applySelectors,
+    options
 )
     -- Keep the temporary ranged preference while replacing/replaying a clip.
     -- Player.Stop still clears it for an explicit stop or a failed start.
@@ -707,6 +708,7 @@ local function begin(
         startedAt = nowMillis(),
         previousVariables = {},
         skippedSelectors = {},
+        bumpOptions = options,
         holdPose = Player.holdPose == true,
         poseHeld = false,
         previousEquipmentVariables = {},
@@ -759,14 +761,15 @@ local function completeStart(active, ok, reason)
     return ok == true, reason
 end
 
-function Player.PlayXML(entry, npcId, body, record)
+function Player.PlayXML(entry, npcId, body, record, options)
     local active, reason = begin(
         entry,
         npcId,
         body,
         "xml",
         record,
-        true
+        true,
+        options
     )
     if not active then return false, reason end
     local bumpType = findBumpType(entry)
@@ -776,7 +779,8 @@ function Player.PlayXML(entry, npcId, body, record)
         local ok, playReason = Animation.PlayBump(
             body,
             active.record,
-            bumpType
+            bumpType,
+            options
         )
         return completeStart(
             active,
@@ -807,7 +811,7 @@ function Player.PlayXML(entry, npcId, body, record)
     return completeStart(active, true, "xml_selectors_clip_started")
 end
 
-function Player.PlayPipeline(entry, npcId, body, record)
+function Player.PlayPipeline(entry, npcId, body, record, options)
     local bumpType = findBumpType(entry)
     if not bumpType then return false, "node_has_no_bump_type" end
     local active, reason = begin(
@@ -816,7 +820,8 @@ function Player.PlayPipeline(entry, npcId, body, record)
         body,
         "pipeline",
         record,
-        true
+        true,
+        options
     )
     if not active then return false, reason end
     if not Animation or not Animation.PlayBump then
@@ -825,7 +830,8 @@ function Player.PlayPipeline(entry, npcId, body, record)
     local ok, playReason = Animation.PlayBump(
         body,
         active.record,
-        bumpType
+        bumpType,
+        options
     )
     return completeStart(active, ok, playReason)
 end
@@ -870,12 +876,24 @@ function Player.Replay()
     local body = active.body
     local record = active.record
     if isPipelineMode(active.mode) then
-        return Player.PlayPipeline(entry, npcId, body, record)
+        return Player.PlayPipeline(
+            entry,
+            npcId,
+            body,
+            record,
+            active.bumpOptions
+        )
     end
     if active.mode == "raw" then
         return Player.PlayRaw(entry, npcId, body, record)
     end
-    return Player.PlayXML(entry, npcId, body, record)
+    return Player.PlayXML(
+        entry,
+        npcId,
+        body,
+        record,
+        active.bumpOptions
+    )
 end
 
 function Player.Finish()

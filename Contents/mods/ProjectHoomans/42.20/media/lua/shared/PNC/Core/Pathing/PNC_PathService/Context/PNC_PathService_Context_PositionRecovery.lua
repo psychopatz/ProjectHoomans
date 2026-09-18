@@ -6,6 +6,7 @@ PNC.PathService.Internal = PNC.PathService.Internal or {}
 
 local Internal = PNC.PathService.Internal
 local Core = Internal.Core
+local ActorControl = PNC.ActorControl
 
 local function applyRecoveredBody(
     record,
@@ -17,8 +18,27 @@ local function applyRecoveredBody(
     safeY,
     safeZ
 )
+    if ActorControl and ActorControl.IsPuppetOwned
+        and ActorControl.IsPuppetOwned(record)
+    then
+        if ActorControl.NoteBlocked then
+            ActorControl.NoteBlocked(
+                record,
+                "position_recovery",
+                "puppet_opera_writer_blocked:position_recovery"
+            )
+        end
+        return false
+    end
     if Internal.LiveBodyControl and Internal.LiveBodyControl.SetAuthoritativePosition then
-        Internal.LiveBodyControl.SetAuthoritativePosition(zombie, safeX, safeY, safeZ)
+        if Internal.LiveBodyControl.SetAuthoritativePosition(
+            zombie,
+            safeX,
+            safeY,
+            safeZ
+        ) == false then
+            return false
+        end
     else
         zombie:setX(safeX)
         zombie:setY(safeY)
@@ -38,6 +58,7 @@ local function applyRecoveredBody(
     Internal.clearBlockedStep(lane)
     lane.steeringSide = nil
     lane.directStepCount = 0
+    return true
 end
 
 local function recordRecovery(
@@ -143,7 +164,7 @@ function Internal.repairInvalidBodyPosition(record, zombie, lane, now)
     if safeX == nil or safeY == nil or safeZ == nil then
         return false, "no_safe_square:" .. tostring(reason)
     end
-    applyRecoveredBody(
+    if not applyRecoveredBody(
         record,
         zombie,
         lane,
@@ -152,7 +173,9 @@ function Internal.repairInvalidBodyPosition(record, zombie, lane, now)
         safeX,
         safeY,
         safeZ
-    )
+    ) then
+        return false, "position_recovery_blocked"
+    end
     recordRecovery(
         record,
         now,

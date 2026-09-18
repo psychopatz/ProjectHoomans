@@ -9,6 +9,8 @@ local Service = PNC.RoamAmbient
 local Common = PNC.BehaviorCommon
 local Scenes = PNC.AnimationScenes
 local Reservations = PNC.FacilityReservations
+local ActorControl = PNC.ActorControl
+    or require "PNC/Core/ActorControl/PNC_ActorControl"
 
 local SCENE_BY_ACTION = {
     eat = "ambient.roam.eat", drink = "ambient.roam.drink",
@@ -19,7 +21,8 @@ local TARGET_FIELDS = {
     "interactionFacing", "interactionSurfaceOffset", "sleepAnchorX",
     "sleepAnchorY", "sleepAnchorZ", "sleepAxis", "sleepFacing",
     "sleepSprite", "sleepGridX", "sleepGridY", "sleepGridWidth",
-    "sleepGridHeight",
+    "sleepGridHeight", "sleepSlotId", "sleepSlotIndex", "sleepCapacity",
+    "bedCapacity",
 }
 
 local function copyTarget(state, target)
@@ -34,6 +37,18 @@ local function copyTarget(state, target)
         state[key] = target[key]
     end
     state.sleepSurface = tostring(target.sleepSurface or state.sleepSurface or "")
+end
+
+local function canWrite(record, reason)
+    if ActorControl and ActorControl.CanWrite then
+        return ActorControl.CanWrite(
+            record,
+            nil,
+            "roam_ambient_provider",
+            { reason = reason }
+        ) == true
+    end
+    return true
 end
 
 function Service.ResetPath(record, zombie, reason)
@@ -53,19 +68,33 @@ local function releaseReservation(state, reason)
     if state then state.reservationId = nil end
 end
 
-function Service.Finish(record, zombie, reason)
+function Service.Finish(record, zombie, reason, ownerReason)
     local runtime = record and record.runtime or nil
     local state = runtime and runtime.roamAmbient or nil
     local sleep = PNC.FacilityJobs and PNC.FacilityJobs.Sleep
     local id = tostring(record and record.id or "")
     if not state or state.finishing == true then return false end
+    if not canWrite(record, ownerReason or reason or "roam_ambient_finish") then
+        return false
+    end
     state.finishing = true
     if state.action == "sleep" then
+        if sleep and sleep.RestoreSleepPosition
+            and state.positioned == true
+        then
+            local restored = sleep.RestoreSleepPosition(
+                record, zombie, state, state)
+            if not restored then
+                state.finishing = false
+                state.wakeExitPending = true
+                state.wakeExitReason = tostring(reason or "")
+                return false
+            end
+        elseif sleep and sleep.RestorePosition then
+            sleep.RestorePosition(record, zombie, state)
+        end
         if sleep and sleep.ClearSleepSurface then
             sleep.ClearSleepSurface(record, zombie, state)
-        end
-        if sleep and sleep.RestorePosition then
-            sleep.RestorePosition(record, zombie, state)
         end
         Service.ResetPath(record, zombie, reason or "roam_ambient_sleep_stopped")
         if PNC.SleepRuntime and PNC.SleepRuntime.LiveObjects then
@@ -84,6 +113,11 @@ function Service.Stop(record, zombie, reason, interruptReason)
     local state = runtime and runtime.roamAmbient or nil
     local scene = runtime and runtime.animationScene or nil
     if not state then return false end
+    if not canWrite(record, interruptReason or reason
+        or "roam_ambient_stop")
+    then
+        return false
+    end
     if scene and scene.id == state.sceneId
         and Scenes and Scenes.Interrupt
     then
@@ -95,13 +129,21 @@ function Service.Stop(record, zombie, reason, interruptReason)
                 "roam_ambient_stop", true)
         end
     end
-    Service.Finish(record, zombie, reason or "roam_ambient_stopped")
+    Service.Finish(
+        record,
+        zombie,
+        reason or "roam_ambient_stopped",
+        interruptReason or reason
+    )
     return true
 end
 
 function Service.StartScene(record, zombie, state, at)
     local started
     local reason
+    if not canWrite(record, "roam_ambient_scene_start") then
+        return false, "puppet_opera_writer_blocked:roam_ambient_provider"
+    end
     if not Scenes or not Scenes.Request then
         started, reason = false, "animation_api_unavailable"
     else
@@ -125,6 +167,9 @@ end
 
 function Service.StartInstantAction(record, zombie, plan, at)
     local runtime = record.runtime or {}
+    if not canWrite(record, "roam_ambient_start") then
+        return false, "puppet_opera_writer_blocked:roam_ambient_provider"
+    end
     local state = {
         action = plan.action, sceneId = SCENE_BY_ACTION[plan.action],
         scheduleKey = plan.key, startedAt = at, phase = "STARTING",
@@ -147,6 +192,9 @@ function Service.StartSleep(record, zombie, plan, candidate, at)
     local ok
     local reservation
     local state
+    if not canWrite(record, "roam_ambient_sleep_start") then
+        return false, "puppet_opera_writer_blocked:roam_ambient_provider"
+    end
     if not sleep or not sleep.PrepareSleepSurface
         or not sleep.ClearSleepSurface
         or not Reservations or not Reservations.ReserveResource
@@ -155,7 +203,12 @@ function Service.StartSleep(record, zombie, plan, candidate, at)
     end
     ok, reservation = Reservations.ReserveResource(
         "ambient:roam", candidate.resource, record.id,
-        "ambient_roam_sleep", 30000, { automatic = true, ambient = true })
+        "ambient_roam_sleep", 30000, {
+            automatic = true, ambient = true,
+            sleepSlotId = candidate.target.sleepSlotId,
+            sleepCapacity = candidate.target.sleepCapacity
+                or candidate.resource.sleepCapacity,
+        })
     if not ok or type(reservation) ~= "table" then return false end
     state = {
         action = "sleep",
@@ -170,6 +223,13 @@ function Service.StartSleep(record, zombie, plan, candidate, at)
             or candidate.resource,
         positioned = false, arrivalSettled = false,
         sleepSurfaceEntered = false,
+        sleepSlotId = candidate.target.sleepSlotId,
+        sleepSlotIndex = candidate.target.sleepSlotIndex,
+        sleepCapacity = candidate.target.sleepCapacity
+            or candidate.resource.sleepCapacity,
+        bedCapacity = candidate.target.bedCapacity
+            or candidate.target.sleepCapacity,
+        approachCandidates = candidate.targets,
     }
     copyTarget(state, candidate.target)
     runtime.roamAmbient = state

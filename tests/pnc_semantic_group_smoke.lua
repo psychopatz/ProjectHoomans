@@ -88,10 +88,11 @@ end
 
 local function makeResult(value, sequence)
     local target
+    local result
     if string.find(string.lower(value), "bob", 1, true) then
         target = { id = "npc-bob", entityType = "npc" }
     end
-    return {
+    result = {
         accepted = true,
         sequence = sequence,
         ir = {
@@ -114,6 +115,12 @@ local function makeResult(value, sequence)
             },
         },
     }
+    if string.find(string.lower(value), "camp", 1, true) then
+        result.ir.action = "CAMP"
+        result.decision.action = "CAMP"
+        result.decision.actionIntent = { action = "CAMP" }
+    end
+    return result
 end
 
 local internal = PNC.Semantics.DialogueInput.Internal
@@ -174,10 +181,14 @@ end
 internal.SubmitSingle = function(view, value)
     submitCalls = submitCalls + 1
     local result = makeResult(value, submitCalls)
+    local actionResult
     view.lastSemanticDialogueResult = result
+    view.lastSemanticActionResult = nil
     if shouldHandle(view, result, value) then
-        internal.DispatchAction(view, result, value)
-        internal.QueueDeterministicResponse(view, value, result, nil)
+        actionResult = internal.DispatchAction(view, result, value)
+        view.lastSemanticActionResult = actionResult
+        internal.QueueDeterministicResponse(
+            view, value, result, actionResult)
     end
     return true
 end
@@ -225,6 +236,26 @@ T.equal(#queued, 1, "named turn queues only the named response")
 T.equal(queued[1].id, "npc-bob", "named response is spoken by Bob")
 T.equal(group.activeTurn.responseCount, 1,
     "named turn records one responding participant")
+
+dispatches = {}
+queued = {}
+routerCalls = {}
+recorded = {}
+local groupCampAccepted = group:Submit("let's camp here", {})
+T.equal(groupCampAccepted, true, "group camp turn is accepted")
+T.equal(submitCalls, 3, "group camp still submits one canonical turn")
+T.equal(#dispatches, 1,
+    "group camp dispatches one authoritative action")
+T.equal(#routerCalls, 0,
+    "group camp does not re-interpret the action for every member")
+T.equal(#recorded, 0,
+    "group camp does not record duplicate semantic turns")
+T.equal(#queued, 3,
+    "group camp preserves one acknowledgement speaker per participant")
+T.equal(group.activeTurn.responseCount, 3,
+    "group camp records all acknowledgement speakers")
+T.equal(queued[2].actionResult.status, "accepted",
+    "group camp acknowledgements reuse the canonical action result")
 
 PNC = originalPNC
 PsychopatzCore = originalCore

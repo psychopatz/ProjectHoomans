@@ -1089,7 +1089,7 @@ T.equal(incompleteReplica.context.allowHostileParley, false,
     "missing MP hostility data fails closed")
 
 local hostileRouteCalls = {}
-PNC.HoomansLLM = {
+PNC.PBrainZ = {
     OpenInlineForTarget = function(entry)
         hostileRouteCalls[#hostileRouteCalls + 1] = entry
         return true
@@ -1107,7 +1107,7 @@ T.equal(hostileView, nil,
     "hostile conversation does not open the full-screen view")
 T.equal(#hostileRouteCalls, 1,
     "hostile conversation routes through the nameplate input")
-PNC.HoomansLLM = nil
+PNC.PBrainZ = nil
 
 local sandbox = T.truthy(PNC.ConversationDebugModel.ExecuteSandbox(
     "projecthoomans:whats_up_local_activity_neutral",

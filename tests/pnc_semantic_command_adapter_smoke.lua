@@ -51,4 +51,43 @@ T.equal(fetch.status, "unmapped",
     "task requests wait for a dedicated downstream task adapter")
 T.equal(#commandCalls, 1, "unmapped actions do not call gameplay transport")
 
+local campHint = {
+    scope = "room",
+    siteScope = "room",
+    siteID = "room:test",
+    roomType = "LIVING_ROOM",
+    label = "living room",
+    risk = "sheltered",
+}
+local camp = Adapter.Dispatch({ action = "CAMP" }, {
+    npcID = "npc-alice",
+    scope = "group",
+    targets = { "npc-alice", "npc-bob" },
+    groupID = "group:test",
+    groupTurnID = "turn:1",
+    campSiteHint = campHint,
+})
+T.equal(camp.status, "pending",
+    "group camp reports transport pending until the server confirms it")
+T.equal(commandCalls[2].commandID, "camp", "camp command mapping")
+T.equal(commandCalls[2].scope, "group", "camp keeps group scope")
+T.equal(commandCalls[2].context.targets[2], "npc-bob",
+    "group camp preserves the compact recipient projection")
+T.equal(camp.siteLabel, "living room",
+    "camp result preserves the client site label for acknowledgement")
+
+local singleCamp = Adapter.Dispatch({ action = "CAMP" }, {
+    npcID = "npc-alice",
+    scope = "single",
+    campSiteHint = campHint,
+})
+T.equal(singleCamp.status, "pending",
+    "single camp uses the same authoritative command path")
+T.equal(commandCalls[3].commandID, "camp",
+    "single camp command mapping")
+T.equal(commandCalls[3].scope, "single",
+    "single camp preserves the single-recipient scope")
+T.equal(#commandCalls, 3,
+    "single camp creates one bounded transport call")
+
 T.finish("pnc_semantic_command_adapter_smoke")

@@ -9,6 +9,7 @@ local Const = PNC.Const or {}
 local LiveBodyControl = PNC.LiveBodyControl
 local LocomotionProfiles = PNC.LocomotionProfiles
 local AnimationTrace = PNC.AnimationTrace
+local ActorControl = PNC.ActorControl
 
 function Animation.SyncNativeLocomotionStyle(zombie, record)
     local runtime
@@ -24,6 +25,8 @@ function Animation.SyncNativeLocomotionStyle(zombie, record)
     local now
     local progressAt
     local progressFresh
+    local accepted
+    local allowPuppetMovement
     if not zombie then
         return
     end
@@ -35,6 +38,24 @@ function Animation.SyncNativeLocomotionStyle(zombie, record)
     navigation = runtime and runtime.localNavigation or nil
     path = runtime and runtime.pathing or nil
     now = Core and Core.Now and Core.Now() or 0
+    allowPuppetMovement = navigation and navigation.nativeActive == true
+        or path and (
+            path.phase == "requested"
+                or path.phase == "active"
+                or now < (tonumber(path.visualMovingUntil) or 0)
+        ) or false
+    if ActorControl and ActorControl.CanWrite then
+        accepted = ActorControl.CanWrite(
+            record,
+            nil,
+            "animation_native_locomotion",
+            {
+                allowPuppetMovement = allowPuppetMovement,
+                reason = "animation_native_locomotion",
+            }
+        )
+        if accepted ~= true then return false end
+    end
     profile = path and path.motionProfile or nil
     moveAnim = profile and profile.moveAnim
         or path and path.moveAnim

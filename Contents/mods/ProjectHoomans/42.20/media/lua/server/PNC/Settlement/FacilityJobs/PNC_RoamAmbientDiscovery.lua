@@ -35,8 +35,14 @@ local function distanceTo(zombie, x, y)
     return math.sqrt(dx * dx + dy * dy)
 end
 
-local function reserved(resource)
+local function reserved(resource, target)
     local key = tostring(resource and resource.resourceKey or "")
+    if target and target.sleepSlotId and Reservations
+        and Reservations.IsResourceAvailable
+    then
+        return not Reservations.IsResourceAvailable(
+            resource, target.sleepSlotId)
+    end
     return key ~= "" and Reservations and Reservations.ByResource
         and Reservations.ByResource[key] ~= nil
 end
@@ -77,13 +83,21 @@ function Service.FindSleepSurface(zombie)
                             local resource = detector.describe(square, object, {
                                 objectIndex = objectIndex, character = zombie,
                             })
-                            if type(resource) ~= "table" or reserved(resource) then
+                            if type(resource) ~= "table" then
                                 return
                             end
                             local targets = Targets.ResolveResource(resource, {
                                 abstract = false, character = zombie,
                             })
-                            local target = targets and targets[1] or nil
+                            local target
+                            local targetIndex
+                            for targetIndex = 1, #(targets or {}) do
+                                if not reserved(resource, targets[targetIndex])
+                                then
+                                    target = targets[targetIndex]
+                                    break
+                                end
+                            end
                             if not target or target.validSpot == false then return end
                             local priority = tonumber(resource.sleepPriority) or
                                 (detectorIDs[detectorIndex] == "bed" and 100 or 50)
@@ -94,7 +108,8 @@ function Service.FindSleepSurface(zombie)
                             then
                                 best = {
                                     object = object, resource = resource,
-                                    target = target, priority = priority,
+                                    target = target, targets = targets,
+                                    priority = priority,
                                     distance = distance,
                                 }
                             end

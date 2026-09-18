@@ -29,7 +29,11 @@ def _iter_inputs(path: Path) -> Iterable[Path]:
         yield path
         return
     if path.is_dir():
-        for candidate in sorted(path.glob("*.txt")):
+        candidates = list(path.glob("*.txt"))
+        npc_directory = path / "NPC Definitions"
+        if npc_directory.is_dir():
+            candidates.extend(npc_directory.glob("*.txt"))
+        for candidate in sorted(candidates):
             if candidate.name != "UniqueNPCIndex.txt":
                 yield candidate
         return

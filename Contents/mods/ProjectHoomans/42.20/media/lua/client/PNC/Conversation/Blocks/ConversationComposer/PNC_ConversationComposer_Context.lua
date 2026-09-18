@@ -73,6 +73,8 @@ function Composer.BuildContext(entry, player, timeID, relationshipID)
         settlementVisit = relationship and relationship.settlementVisit
             and (tonumber(relationship.settlementVisit.expiresAt) or 0) > at
             and relationship.settlementVisit or nil,
+        ambientVisitPreview = relationship
+            and relationship.ambientVisitPreview or nil,
     }
     context.blockValidator = function(block)
         return Loader.EnsureSource(
