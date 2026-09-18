@@ -1,0 +1,38 @@
+{
+  "player": {
+    "characterUUID": "char_patrick",
+    "forename": "Patrick",
+    "surname": "Patz",
+    "displayName": "SteamDisplayName"
+  },
+  "npc": {
+    "npcID": "npc_mara",
+    "forename": "Mara",
+    "surname": "Vale",
+    "identityState": "unknown",
+    "traits": ["reserved", "observant"],
+    "relationship": {
+      "approval": 0,
+      "respect": 0,
+      "familiarity": 0,
+      "revision": 1,
+      "identityTrust": "unknown"
+    }
+  },
+  "runtime": {
+    "mode": "singleplayer",
+    "language": "EN",
+    "llmEnabled": false,
+    "providerAvailable": false,
+    "commandResponses": {
+      "camp": {
+        "accepted": true,
+        "reason": "network_queued",
+        "details": {
+          "siteLabel": "safehouse",
+          "siteScope": "room"
+        }
+      }
+    }
+  }
+}

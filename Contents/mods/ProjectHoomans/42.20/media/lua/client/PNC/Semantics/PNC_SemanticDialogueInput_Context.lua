@@ -231,9 +231,15 @@ function Internal.ShallowContext(view)
         and PNC.Network.ClientState.conversationRelationships[
             tostring(output.npcID or "")
         ] or nil
-    if relationship and output.identityTrust == nil then
+    if relationship then
+        -- Relationship updates arrive after the conversation view is built.
+        -- Prefer the authoritative client projection on every turn so a
+        -- deception/evasion result affects the very next response.
+        output.relationship = relationship
         output.identityTrust = relationship.identityTrust
-            or relationship.trustLabel
+            or relationship.trustLabel or output.identityTrust
+        output.relationshipState = relationship.relationshipState
+            or output.relationshipState
     end
     output.authoredTopic = source.conversationTopic
         or source.conversationBlockContext

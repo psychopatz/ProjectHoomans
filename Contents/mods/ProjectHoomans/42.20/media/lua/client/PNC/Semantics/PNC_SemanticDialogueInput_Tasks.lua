@@ -227,7 +227,7 @@ local function campResponseFor(primary, secondary, phase)
         return "We're set up " .. location .. "."
     end
     if phase == "pending" then
-        return "I'll head to " .. location .. " and set up camp."
+        return "I'll head " .. location .. " and set up camp."
     end
     return "I'll set up camp " .. location .. "."
 end

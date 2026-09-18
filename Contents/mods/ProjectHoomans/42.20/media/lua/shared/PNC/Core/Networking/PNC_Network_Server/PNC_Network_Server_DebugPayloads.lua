@@ -3,6 +3,11 @@ local Internal = Network.Internal
 local Core = PNC.Core
 local Const = PNC.Const
 
+local function isLocalPlayer(player)
+    local localPlayer = getSpecificPlayer and getSpecificPlayer(0) or nil
+    return localPlayer ~= nil and player == localPlayer
+end
+
 function Network.SendDebugRoster(targetPlayer, diagnostics, authorized, audit)
     local payload = {
         authorized = authorized == true,
@@ -176,10 +181,21 @@ function Internal.SendIdentityPayload(targetPlayer, command, payload)
     payload = payload or {}
     payload.serverTime = Core.Now()
     if isServer and isServer() and targetPlayer then
+        -- In singleplayer the authority and client share the process.  The
+        -- native server-command bridge is not guaranteed to loop the payload
+        -- back to the local client, so deliver the same command through the
+        -- client event router explicitly for player zero.
+        if isLocalPlayer(targetPlayer) and triggerEvent then
+            triggerEvent("OnServerCommand", Const.MODULE, command, payload)
+            return true
+        end
         sendServerCommand(targetPlayer, Const.MODULE, command, payload)
+        return true
     elseif not isServer or not isServer() then
         triggerEvent("OnServerCommand", Const.MODULE, command, payload)
+        return true
     end
+    return false
 end
 
 function Network.SendPlayerBootstrap(targetPlayer, payload)

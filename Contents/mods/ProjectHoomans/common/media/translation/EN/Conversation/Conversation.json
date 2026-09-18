@@ -365,5 +365,19 @@
     "UI_PNC_Flavor_Necroa_PlayerMaskRemoved_Hostile_1": "Idiot. Put your mask back on before you become a problem.",
     "UI_PNC_Flavor_Necroa_PlayerMaskRemoved_Hostile_2": "Take that mask off again and you are on your own, {playerFirstName}.",
     "UI_PNC_Flavor_Necroa_PlayerMaskRemoved_Lover_1": "Please put your mask back on, love. This air is not safe.",
-    "UI_PNC_Flavor_Necroa_PlayerMaskRemoved_Lover_2": "Do not be an idiot, sweetheart. Mask up for me."
+    "UI_PNC_Flavor_Necroa_PlayerMaskRemoved_Lover_2": "Do not be an idiot, sweetheart. Mask up for me.",
+    "UI_PNC_Conversation_Identity_FalseName": "That isn't your exact name. Don't lie to me.",
+    "UI_PNC_Conversation_Semantic_QuestionIdentity": "I'll tell you my name once we've established some trust. What's your name?",
+    "UI_PNC_Conversation_Semantic_QuestionIdentityKnown": "I'm %s. What's your name?",
+    "UI_PNC_Conversation_Semantic_QuestionIdentityWary": "I don't share my name with liars. What's yours, truthfully?",
+    "UI_PNC_Conversation_Semantic_IdentityExchange": "Nice to meet you. What's your name?",
+    "UI_PNC_Conversation_Semantic_SelfReflectionFriendly": "Hey. Don't talk about yourself like that. You matter.",
+    "UI_PNC_Conversation_Semantic_SelfReflectionTrusted": "You're harder on yourself than you need to be.",
+    "UI_PNC_Conversation_Semantic_SelfReflectionWithdrawn": "Don't make a habit of saying things like that.",
+    "UI_PNC_Conversation_Semantic_SelfReflectionStressed": "We've all made mistakes. Focus on what comes next.",
+    "UI_PNC_Conversation_Semantic_SelfReflectionDefault": "Don't talk about yourself like that.",
+    "UI_PNC_Conversation_Semantic_IdentityEvasionUntrustworthy": "You avoided my question. I can't trust you with my name.",
+    "UI_PNC_Conversation_Semantic_IdentityEvasionFriendly": "I asked you your name. Changing the subject makes me question your honesty.",
+    "UI_PNC_Conversation_Semantic_IdentityEvasionWithdrawn": "Forget it. Keep your name to yourself; I don't trust evasive people.",
+    "UI_PNC_Conversation_Semantic_IdentityEvasionDefault": "You avoided my question. That makes you seem untrustworthy."
 }

@@ -7,6 +7,7 @@ local CampSite = PNC.Semantics.CampSite
     or require "PNC/Semantics/PNC_SemanticCampSite"
 local Catalog = PNC.Semantics.Catalog or {}
 PNC.Semantics.Catalog = Catalog
+Catalog.Internal = Catalog.Internal or {}
 
 Catalog.VERSION = 1
 Catalog.OWNER = "ProjectHoomans"
@@ -34,6 +35,9 @@ local function registerPattern(id, match, emit, confidence, priority, options)
     end
     return Registry.RegisterPattern(definition)
 end
+
+Catalog.Internal.RegisterPattern = registerPattern
+require "PNC/Semantics/SemanticCatalog/PNC_SemanticCatalog_Identity"
 
 local function registerSpeechAct(id)
     return Registry.RegisterSpeechAct({
@@ -191,70 +195,31 @@ function Catalog.Register()
         180
     )
     registerPattern(
-        "pnc.identity.self_name_im",
+        "pnc.state.self_hunger_im_plain",
         {
-            { kind = "literal", value = "i'm" },
-            {
-                kind = "any_phrase",
-                capture = "name",
-                minTokens = 1,
-                maxTokens = 2,
-                stopWords = { "please", "now" },
-            },
+            { kind = "literal", value = "im" },
+            { kind = "concept", id = "HUNGER", capture = "state" },
         },
         {
             intent = "INFORM",
             speechAct = "INFORM",
-            subject = "IDENTITY",
+            subject = "HUNGER",
             slots = {
-                identityClaim = {
-                    claimType = "SELF_NAME",
-                    name = "$capture.name.text",
+                state = {
+                    type = "HUNGER",
+                    value = "$capture.state.text",
                 },
             },
             socialContext = {
                 directed = false,
                 selfDirected = true,
                 target = "SELF",
-                identityClaim = true,
             },
         },
-        0.98,
-        155
+        0.99,
+        180
     )
-    registerPattern(
-        "pnc.identity.self_name_i_am",
-        {
-            { kind = "literal", value = "i" },
-            { kind = "literal", value = "am" },
-            {
-                kind = "any_phrase",
-                capture = "name",
-                minTokens = 1,
-                maxTokens = 2,
-                stopWords = { "please", "now" },
-            },
-        },
-        {
-            intent = "INFORM",
-            speechAct = "INFORM",
-            subject = "IDENTITY",
-            slots = {
-                identityClaim = {
-                    claimType = "SELF_NAME",
-                    name = "$capture.name.text",
-                },
-            },
-            socialContext = {
-                directed = false,
-                selfDirected = true,
-                target = "SELF",
-                identityClaim = true,
-            },
-        },
-        0.98,
-        155
-    )
+    Catalog.Internal.RegisterIdentityPatterns()
 
     registerPattern(
         "pnc.command.follow",

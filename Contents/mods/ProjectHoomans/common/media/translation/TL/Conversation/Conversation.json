@@ -365,5 +365,19 @@
     "UI_PNC_Flavor_Necroa_PlayerMaskRemoved_Hostile_1": "Tanga. Isuot mo ulit ang maskara mo bago ka maging problema.",
     "UI_PNC_Flavor_Necroa_PlayerMaskRemoved_Hostile_2": "Alisin mo ulit ang maskara at bahala ka na sa sarili mo, {playerFirstName}.",
     "UI_PNC_Flavor_Necroa_PlayerMaskRemoved_Lover_1": "Pakiusap, isuot mo ulit ang maskara mo, mahal. Hindi ligtas ang hangin.",
-    "UI_PNC_Flavor_Necroa_PlayerMaskRemoved_Lover_2": "Huwag kang tanga, sinta. Mag-maskara ka para sa akin."
+    "UI_PNC_Flavor_Necroa_PlayerMaskRemoved_Lover_2": "Huwag kang tanga, sinta. Mag-maskara ka para sa akin.",
+    "UI_PNC_Conversation_Identity_FalseName": "Hindi iyan ang tunay mong pangalan. Huwag mo akong pagsinungalingan.",
+    "UI_PNC_Conversation_Semantic_QuestionIdentity": "Sasabihin ko ang pangalan ko kapag may tiwala na tayo. Ano ang pangalan mo?",
+    "UI_PNC_Conversation_Semantic_QuestionIdentityKnown": "Ako si %s. Ano ang pangalan mo?",
+    "UI_PNC_Conversation_Semantic_QuestionIdentityWary": "Hindi ko ibinabahagi ang pangalan ko sa mga sinungaling. Ano ang tunay mong pangalan?",
+    "UI_PNC_Conversation_Semantic_IdentityExchange": "Ikinagagalak kitang makilala. Ano ang pangalan mo?",
+    "UI_PNC_Conversation_Semantic_SelfReflectionFriendly": "Huwag mong pagsalitaan nang ganyan ang sarili mo. Mahalaga ka.",
+    "UI_PNC_Conversation_Semantic_SelfReflectionTrusted": "Mas mahigpit ka sa sarili mo kaysa kailangan.",
+    "UI_PNC_Conversation_Semantic_SelfReflectionWithdrawn": "Huwag mong gawing ugali ang pagsasabi ng ganyan.",
+    "UI_PNC_Conversation_Semantic_SelfReflectionStressed": "Lahat tayo ay nagkakamali. Ituon mo ang pansin sa susunod na hakbang.",
+    "UI_PNC_Conversation_Semantic_SelfReflectionDefault": "Huwag mong pagsalitaan nang masama ang sarili mo.",
+    "UI_PNC_Conversation_Semantic_IdentityEvasionUntrustworthy": "Iniwasan mo ang tanong ko. Hindi kita mapagkakatiwalaan sa pangalan ko.",
+    "UI_PNC_Conversation_Semantic_IdentityEvasionFriendly": "Tinanong ko ang pangalan mo. Dahil binago mo ang paksa, nagdududa ako sa katapatan mo.",
+    "UI_PNC_Conversation_Semantic_IdentityEvasionWithdrawn": "Sige na. Itago mo ang pangalan mo; hindi ako nagtitiwala sa mga umiiwas.",
+    "UI_PNC_Conversation_Semantic_IdentityEvasionDefault": "Iniwasan mo ang tanong ko. Nagmumukha kang hindi mapagkakatiwalaan."
 }

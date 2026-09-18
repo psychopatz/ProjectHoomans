@@ -37,12 +37,20 @@ PNC = {
     },
     Registry = {
         Get = function(id)
-            return id == "npc_mara" and { id = id } or nil
+            return id == "npc_mara" and {
+                id = id,
+                name = "Mara Vale",
+                identity = { displayName = "Mara Vale" },
+            } or nil
         end,
     },
     PlayerCharacters = {
         GetRegistryRecord = function()
-            return { displayName = "Patrick" }
+            return {
+                displayName = "SteamAccount",
+                forename = "Patrick",
+                surname = "Patz",
+            }
         end,
     },
     Conversation = {
@@ -105,14 +113,19 @@ local truthful, truthfulPayload = Commands.HandleSemanticIdentity({}, {
     requestID = "identity:truth",
     npcID = "npc_mara",
     kind = "identity_claim",
-    claimedName = "patrick",
+    claimedName = "Patrick Patz",
     conversationToken = "lease",
 })
 T.truthy(truthful, "exact player name claim is accepted")
 T.truthy(truthfulPayload.truthful, "truthful claim is marked truthful")
 T.equal(truthfulPayload.responseText,
-    "Nice to meet you. I'm Mara.",
-    "truthful claim receives the NPC introduction")
+    "Nice to meet you. I'm Mara Vale.",
+    "truthful claim receives the canonical NPC name")
+T.equal(truthfulPayload.responseKey,
+    "UI_PNC_Conversation_ToolReply_AskNameNamed_1",
+    "truthful claim carries the localized NPC-name response key")
+T.equal(truthfulPayload.responseArgs[1], "Mara Vale",
+    "truthful claim carries the canonical NPC name as a format argument")
 T.equal(disclosures, 1,
     "truthful claim commits the existing NPC identity disclosure fact")
 T.truthy(effects[1].respect > 0,
@@ -129,6 +142,9 @@ T.truthy(falseClaim, "false name claim is processed authoritatively")
 T.falsy(falsePayload.truthful, "false name claim is rejected as untruthful")
 T.equal(falsePayload.trustLabel, "untrustworthy",
     "false name claim creates the untrustworthy label")
+T.equal(falsePayload.responseKey,
+    "UI_PNC_Conversation_Identity_FalseName",
+    "false name claim carries a dedicated localized response key")
 T.falsy(string.find(falsePayload.responseText or "", "Mara", 1, true),
     "false name claim never discloses the NPC name")
 T.truthy(effects[2].respect < 0 and effects[2].approval < 0,

@@ -5,9 +5,17 @@ PNC.Const = PNC.Const or {}
 
 local Network = PNC.Network
 local Identity = PNC.Semantics and PNC.Semantics.IdentityExchange
+local Internal = Network.Internal or {}
 
 function Network.SendSemanticIdentityResult(targetPlayer, payload)
     payload = type(payload) == "table" and payload or {}
+    if type(Internal.SendIdentityPayload) == "function" then
+        return Internal.SendIdentityPayload(
+            targetPlayer,
+            PNC.Const.CMD_SEMANTIC_IDENTITY_RESULT,
+            payload
+        )
+    end
     payload.serverTime = PNC.Core and PNC.Core.Now and PNC.Core.Now() or 0
     local command = PNC.Const.CMD_SEMANTIC_IDENTITY_RESULT
     if isServer and isServer() and targetPlayer then

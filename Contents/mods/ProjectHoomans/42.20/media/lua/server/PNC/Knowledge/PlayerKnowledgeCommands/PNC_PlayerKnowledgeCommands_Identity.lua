@@ -42,6 +42,26 @@ local function playerName(player, context)
         or nil
     local name = record and (record.displayName
         or record.identity and record.identity.displayName)
+    if record and (record.forename or record.surname) then
+        local forename = clean(record.forename)
+        local surname = clean(record.surname)
+        local composed = forename
+        if surname ~= "" then
+            composed = composed .. (composed ~= "" and " " or "") .. surname
+        end
+        if composed ~= "" then name = composed end
+    end
+    if not name and player and player.getDescriptor then
+        local descriptor = player:getDescriptor()
+        local forename = descriptor and descriptor.getForename
+            and clean(descriptor:getForename()) or ""
+        local surname = descriptor and descriptor.getSurname
+            and clean(descriptor:getSurname()) or ""
+        name = forename
+        if surname ~= "" then
+            name = name .. (name ~= "" and " " or "") .. surname
+        end
+    end
     if not name and player and player.getDisplayName then
         name = player:getDisplayName()
     end
@@ -57,6 +77,46 @@ local function relationshipDelta(before, after)
         familiarity = (tonumber(after and after.familiarity) or 0)
             - (tonumber(before and before.familiarity) or 0),
     }
+end
+
+local function npcName(record)
+    local identity = record and record.identity
+    return clean(identity and identity.displayName
+        or record and (record.displayName or record.name))
+end
+
+local function localized(key, fallback, ...)
+    local translation = PNC.Translation
+    if translation and type(translation.TrFormat) == "function" then
+        return translation.TrFormat(key, fallback, ...)
+    end
+    return fallback
+end
+
+local function identityResponse(record, truthful, introduction)
+    if truthful then
+        local name = npcName(record)
+        if name == "" and introduction then
+            local introduced = clean(introduction)
+            local extracted = string.match(introduced, "^[Ii]'m%s+(.+)%.$")
+            name = clean(extracted or "")
+        end
+        if name ~= "" then
+            local fallback = "Nice to meet you. I'm " .. name .. "."
+            return localized(
+                "UI_PNC_Conversation_ToolReply_AskNameNamed_1",
+                fallback,
+                name
+            ), "UI_PNC_Conversation_ToolReply_AskNameNamed_1", { name }
+        end
+        return localized(
+            "UI_PNC_Conversation_ToolReply_AskNameUnnamed_1",
+            "Nice to meet you."
+        ), "UI_PNC_Conversation_ToolReply_AskNameUnnamed_1", nil
+    end
+    local key = "UI_PNC_Conversation_Identity_FalseName"
+    return localized(key, "That isn't your exact name. Don't lie to me."),
+        key, nil
 end
 
 local function sendRejected(player, args, reason)
@@ -125,7 +185,9 @@ function Commands.HandleSemanticIdentity(player, args)
         if actualName == "" then
             return sendRejected(player, args, "player_name_unavailable")
         end
-        truthful = Identity.NamesEqual(claimedName, actualName)
+        truthful = Identity.ClaimMatchesName
+            and Identity.ClaimMatchesName(claimedName, actualName)
+            or Identity.NamesEqual(claimedName, actualName)
         if truthful then
             effect = {
                 memoryType = "identity_introduction",
@@ -207,6 +269,8 @@ function Commands.HandleSemanticIdentity(player, args)
     summary.identityTrust = trustLabel
     local delta = relationshipDelta(before, after)
     local responseText
+    local responseKey
+    local responseArgs
     if kind == Identity.EVENT_CLAIM and truthful then
         if PNC.NPCKnowledgeAPI
             and PNC.NPCKnowledgeAPI.DiscloseForPlayer
@@ -221,11 +285,13 @@ function Commands.HandleSemanticIdentity(player, args)
         end
         local introduction = Commands.Internal.IntroductionText
             and Commands.Internal.IntroductionText(npcID)
-        responseText = introduction
-            and "Nice to meet you. " .. introduction
-            or "Nice to meet you."
+        responseText, responseKey, responseArgs = identityResponse(
+            record, true, introduction
+        )
     elseif kind == Identity.EVENT_CLAIM then
-        responseText = "That isn't your exact name. Don't lie to me."
+        responseText, responseKey, responseArgs = identityResponse(
+            record, false
+        )
     end
 
     local payload = {
@@ -236,6 +302,8 @@ function Commands.HandleSemanticIdentity(player, args)
         truthful = truthful,
         trustLabel = trustLabel,
         responseText = responseText,
+        responseKey = responseKey,
+        responseArgs = responseArgs,
         relationship = summary,
         relationshipBefore = before,
         relationshipAfter = summary,

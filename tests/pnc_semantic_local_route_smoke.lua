@@ -100,6 +100,11 @@ local Input = T.load(
     "client",
     "PNC/Semantics/PNC_SemanticDialogueInput.lua"
 )
+T.load(
+    "ProjectHoomans",
+    "client",
+    "PNC/Semantics/PNC_SemanticDialogueInput_Lifecycle.lua"
+)
 require = originalRequire
 
 local queued = {}
@@ -160,6 +165,7 @@ T.equal(view.lastSemanticDialogueResult.decision.route, "deterministic",
     "greeting never enters the LLM route")
 T.equal(llmCalls, 0,
     "recognized greeting stays local even when the provider is ready")
+
 T.equal(registeredFallbacks["semantic.command.accepted"], "Okay.",
     "semantic policy registers a readable history fallback")
 T.equal(registeredFallbacks["semantic.ask_clarification"],
@@ -291,6 +297,79 @@ T.equal(declinedOffer, true, "a non-hungry NPC can decline locally")
 T.equal(queued[#queued].payload.fallback,
     "No thanks, I'm not hungry.",
     "offer response changes with the NPC's current need state")
+
+local identityAccepted = Input.Submit(view, "im psycho btw")
+T.equal(identityAccepted, true,
+    "natural identity introductions are accepted by the local route")
+T.equal(view.lastSemanticDialogueResult.decision.route, "deterministic",
+    "natural identity introductions never enter the LLM route")
+T.equal(view.lastSemanticDialogueResult.ir.provenance.pattern,
+    "pnc.identity.self_name_im_plain",
+    "natural identity introductions use the identity grammar")
+T.equal(llmCalls, 0,
+    "natural identity introductions do not call the LLM")
+
+-- An identity claim has an authoritative response.  The local semantic
+-- branch must not also queue its provisional exchange line, or one utterance
+-- appears as two contradictory NPC replies in the live conversation.
+local identityEvents = {}
+local identityQueue = {}
+PNC.Client = {
+    RequestNPCKnowledgeTopic = function(npcID, topicID, options)
+        identityEvents[#identityEvents + 1] = {
+            kind = "identity_disclosure",
+            npcID = npcID,
+            topicID = topicID,
+            options = options,
+        }
+        return true
+    end,
+    SubmitSemanticIdentity = function(npcID, options)
+        identityEvents[#identityEvents + 1] = {
+            kind = options and options.kind,
+            npcID = npcID,
+            options = options,
+        }
+        return true
+    end,
+}
+local identitySession = {
+    characterUUID = "player-one",
+    conversationID = "identity-conversation",
+    append = function(self, speaker, value, metadata)
+        self.lastAppend = { speaker = speaker, value = value, metadata = metadata }
+        return { messageID = "identity-message" }
+    end,
+    queueMessage = function(self, speaker, payload, metadata)
+        identityQueue[#identityQueue + 1] = {
+            speaker = speaker, payload = payload, metadata = metadata,
+        }
+    end,
+}
+local identityView = {
+    spec = {
+        npcID = "npc-identity",
+        context = {
+            identityState = "unknown",
+            npcName = "Mara",
+            npcFullName = "Mara Vale",
+            relationshipState = "FirstMeet",
+            conversationTopic = "greeting",
+        },
+    },
+    session = identitySession,
+    isConversationInteractive = function() return true end,
+}
+T.equal(Input.Submit(identityView, "what is your name"), true,
+    "identity question starts the authoritative exchange")
+T.equal(#identityQueue, 1,
+    "identity question has one local request response")
+T.equal(Input.Submit(identityView, "im psycho"), true,
+    "identity claim is submitted to the authority")
+T.equal(#identityQueue, 1,
+    "identity claim does not queue a contradictory provisional response")
+T.equal(identityEvents[2].kind, "identity_claim",
+    "identity claim uses the authoritative identity transport")
 
 PNC = originalPNC
 PsychopatzCore = originalPsychopatzCore

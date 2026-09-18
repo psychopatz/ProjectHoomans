@@ -1,0 +1,16 @@
+{
+  "id": "identity_exchange",
+  "tags": ["identity", "relationship", "singleplayer"],
+  "scenario": {
+    "player": {
+      "characterUUID": "char_patrick",
+      "forename": "Patrick",
+      "surname": "Patz",
+      "displayName": "SteamAlias"
+    }
+  },
+  "inputs": [
+    "what is your name",
+    "I'm Patrick"
+  ]
+}

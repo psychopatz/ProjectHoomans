@@ -459,12 +459,27 @@ local function socialStyle(context)
         local key
         local enabled
         for key, enabled in pairs(traits) do
-            if enabled == true then
-                local id = text(key)
+            local rawID = enabled == true and key
+                or type(enabled) == "string" and enabled or nil
+            if rawID then
+                local id = text(rawID)
                 if string.find(id, "withdrawn", 1, true) then
                     return "withdrawn"
                 end
+                if string.find(id, "reserved", 1, true)
+                    or string.find(id, "guarded", 1, true)
+                    or string.find(id, "suspicious", 1, true)
+                    or string.find(id, "stoic", 1, true)
+                then
+                    return "withdrawn"
+                end
                 if string.find(id, "friendly", 1, true) then
+                    return "friendly"
+                end
+                if string.find(id, "kind", 1, true)
+                    or string.find(id, "protective", 1, true)
+                    or string.find(id, "warm", 1, true)
+                then
                     return "friendly"
                 end
             end

@@ -17,6 +17,13 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 TESTS = ROOT / "tests"
 VERSION = re.compile(r"^\d+\.\d+$")
+sys.path.insert(0, str(ROOT))
+
+from tools.semantic_harness.suite import (
+    BoundedLuaTestRunner,
+    install_suite_shutdown_handler,
+    write_report,
+)
 
 
 @dataclass(frozen=True)
@@ -73,11 +80,21 @@ def discover(filters: list[str]) -> list[Path]:
     return tests
 
 
-def run_one(path: Path, environment: dict[str, str], timeout: float) -> Result:
+def run_one(
+    path: Path,
+    environment: dict[str, str],
+    timeout: float,
+    *,
+    runner: BoundedLuaTestRunner | None = None,
+    executable: str = "lua",
+) -> Result:
+    if runner is not None:
+        bounded = runner.run_one(path, environment, timeout)
+        return Result(path, bounded.returncode, bounded.output, bounded.elapsed)
     started = time.monotonic()
     try:
         completed = subprocess.run(
-            ["lua", str(path)],
+            [executable, str(path)],
             cwd=ROOT, env=environment,
             stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
             text=True, timeout=timeout, check=False,
@@ -106,10 +123,27 @@ def parse_args(arguments: list[str]) -> argparse.Namespace:
     parser.add_argument("--fail-fast", action="store_true")
     parser.add_argument("--list", action="store_true")
     parser.add_argument("--verbose", action="store_true")
+    parser.add_argument("--lua", default="lua", help="Lua executable for smoke tests")
+    parser.add_argument(
+        "--max-output-bytes",
+        type=int,
+        default=256 * 1024,
+        help="maximum captured output per test when using the bounded harness runner",
+    )
+    parser.add_argument(
+        "--legacy-runner",
+        action="store_true",
+        help="use the previous subprocess runner instead of the bounded harness runner",
+    )
+    parser.add_argument(
+        "--harness-report",
+        help="write bounded lifecycle JSON report from the harness runner",
+    )
     return parser.parse_args(arguments)
 
 
 def main(arguments: list[str] | None = None) -> int:
+    install_suite_shutdown_handler()
     options = parse_args(arguments or sys.argv[1:])
     tests = discover(options.filters)
     if options.list:
@@ -128,9 +162,27 @@ def main(arguments: list[str] | None = None) -> int:
     started = time.monotonic()
     results: list[Result] = []
     workers = max(1, min(options.jobs, len(tests)))
+    harness_runner = None
+    if not options.legacy_runner:
+        try:
+            harness_runner = BoundedLuaTestRunner(
+                ROOT,
+                executable=options.lua,
+                max_output_bytes=options.max_output_bytes,
+            )
+        except ValueError as error:
+            print(f"Harness runner configuration error: {error}", file=sys.stderr)
+            return 2
     with ThreadPoolExecutor(max_workers=workers) as executor:
         futures = {
-            executor.submit(run_one, path, environment, options.timeout): path
+            executor.submit(
+                run_one,
+                path,
+                environment,
+                options.timeout,
+                runner=harness_runner,
+                executable=options.lua,
+            ): path
             for path in tests
         }
         for future in as_completed(futures):
@@ -149,6 +201,11 @@ def main(arguments: list[str] | None = None) -> int:
     results.sort(key=lambda item: item.path.name)
     failures = [result for result in results if result.returncode != 0]
     elapsed = time.monotonic() - started
+    if options.harness_report:
+        if harness_runner is None:
+            print("--harness-report requires the bounded harness runner", file=sys.stderr)
+            return 2
+        write_report(harness_runner.report(), Path(options.harness_report).expanduser())
     if failures:
         print(f"FAIL {len(failures)}/{len(results)} executed in {elapsed:.2f}s")
         for result in failures:

@@ -424,12 +424,30 @@ T.falsy(record.runtime.puppetOperaLease,
     "session lease was not released")
 T.truthy(#sent > 0, "singleplayer transport emitted no state")
 
+T.truthy(Authority.Internal,
+    "authority did not expose its bounded spoke handoff")
+T.equal(Authority.RequestActions.START, "start",
+    "authority request contract lost its start action")
+local malformedAccepted, malformedReason = Authority.HandleRequest(player)
+T.falsy(malformedAccepted,
+    "malformed request was incorrectly accepted")
+T.equal(malformedReason, "session_missing",
+    "malformed request did not fail through the authority boundary")
+
 local sourceFiles = {
     { "shared", "PNC/Core/PuppetOpera/PNC_PuppetOpera_Blueprints.lua" },
     { "shared", "PNC/Core/PuppetOpera/PNC_PuppetOpera_Anchors.lua" },
     { "shared", "PNC/Core/PuppetOpera/PNC_PuppetOpera.lua" },
     { "shared", "PNC/Core/PuppetOpera/PNC_PuppetOpera_Trace.lua" },
+    { "client", "PNC/PuppetOpera/PNC_PuppetOpera_Client_Discovery.lua" },
+    { "client", "PNC/PuppetOpera/PNC_PuppetOpera_Client_Preview.lua" },
+    { "client", "PNC/PuppetOpera/PNC_PuppetOpera_Client_Runtime.lua" },
+    { "client", "PNC/PuppetOpera/PNC_PuppetOpera_Client_Transport.lua" },
     { "server", "PNC/PuppetOpera/PNC_PuppetOpera_Authority.lua" },
+    { "server", "PNC/PuppetOpera/PNC_PuppetOpera_Authority_Admission.lua" },
+    { "server", "PNC/PuppetOpera/PNC_PuppetOpera_Authority_Runtime.lua" },
+    { "server", "PNC/PuppetOpera/PNC_PuppetOpera_Authority_Requests.lua" },
+    { "server", "PNC/PuppetOpera/PNC_PuppetOpera_Authority_Acknowledgements.lua" },
     { "server", "PNC/PuppetOpera/PNC_PuppetOpera_OverrideAdapter.lua" },
 }
 local forbiddenProtectedCall = "p" .. "call"

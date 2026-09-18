@@ -83,6 +83,7 @@ PNC = {
         CMD_PUPPET_OPERA_REQUEST = "PuppetOperaRequest",
         CMD_PUPPET_OPERA_STATE = "PuppetOperaState",
         CMD_PUPPET_OPERA_TRACE = "PuppetOperaTrace",
+        PRESENCE_LIVE = "live",
     },
     Client = {
         Internal = {
@@ -223,6 +224,179 @@ local blueprint = Opera.GetBlueprint("social.kiss_test")
 local plan = Opera.Anchors.BuildPlan(blueprint, player)
 T.truthy(plan, "transport test could not build anchor plan")
 
+local nearbyRegistryBody = {
+    x = 101.5,
+    y = 200.5,
+    modData = {},
+}
+function nearbyRegistryBody:getX() return self.x end
+function nearbyRegistryBody:getY() return self.y end
+function nearbyRegistryBody:getModData() return self.modData end
+
+PNC.Registry = {
+    ForEachLive = function(callback)
+        callback({ id = "npc-reg", displayName = "Registry NPC" },
+            nearbyRegistryBody)
+        callback({ displayName = "missing-body" }, nil)
+    end,
+}
+PNC.Network = {
+    ClientState = {
+        snapshots = {
+            duplicate = {
+                id = "npc-reg",
+                displayName = "Duplicate NPC",
+                x = 101.5,
+                y = 200.5,
+                presenceState = "live",
+                alive = true,
+            },
+            network = {
+                id = "npc-net",
+                displayName = "Network NPC",
+                x = 102.5,
+                y = 200.5,
+                presenceState = "live",
+                alive = true,
+            },
+            alpha = {
+                id = "npc-alpha",
+                displayName = "Alpha NPC",
+                x = 103.5,
+                y = 200.5,
+                presenceState = "live",
+                alive = true,
+            },
+            zeta = {
+                id = "npc-zeta",
+                displayName = "Zeta NPC",
+                x = 103.5,
+                y = 200.5,
+                presenceState = "live",
+                alive = true,
+            },
+            dead = {
+                id = "npc-dead",
+                displayName = "Dead NPC",
+                x = 101.5,
+                y = 200.5,
+                presenceState = "live",
+                alive = false,
+            },
+            stale = {
+                id = "npc-stale",
+                displayName = "Stale NPC",
+                x = 101.5,
+                y = 200.5,
+                presenceState = "stale",
+                alive = true,
+            },
+            far = {
+                id = "npc-far",
+                displayName = "Far NPC",
+                x = 104.5,
+                y = 200.5,
+                presenceState = "live",
+                alive = true,
+            },
+            malformed = {
+                id = "npc-malformed",
+                displayName = "Malformed NPC",
+                presenceState = "live",
+                alive = true,
+            },
+        },
+    },
+}
+PNC.ClientPresenceSync = {
+    BodyByID = {
+        ["npc-net"] = false,
+    },
+}
+
+local nearby = Client.GetNearbyNPCs(3)
+T.equal(#nearby, 4,
+    "nearby discovery did not filter live targets by radius and validity")
+T.equal(nearby[1].id, "npc-reg",
+    "nearby discovery did not prefer the live registry body")
+T.equal(nearby[1].name, "Registry NPC",
+    "network duplicate replaced the registry target")
+T.equal(nearby[2].id, "npc-net",
+    "nearby discovery did not include a valid network snapshot")
+T.equal(nearby[3].name, "Alpha NPC",
+    "nearby discovery did not use deterministic name ordering for ties")
+T.equal(nearby[4].name, "Zeta NPC",
+    "nearby discovery tie ordering changed")
+local nearbyIDs = {}
+for _, entry in ipairs(nearby) do nearbyIDs[entry.id] = true end
+T.falsy(nearbyIDs["npc-dead"],
+    "nearby discovery included a dead snapshot")
+T.falsy(nearbyIDs["npc-stale"],
+    "nearby discovery included a non-live snapshot")
+T.falsy(nearbyIDs["npc-far"],
+    "nearby discovery included an out-of-radius snapshot")
+T.falsy(nearbyIDs["npc-malformed"],
+    "nearby discovery included a malformed snapshot")
+
+local invalidPlayerPreview, invalidPlayerReason = Client.PreviewPlayer(nil)
+T.falsy(invalidPlayerPreview,
+    "Puppet player preview accepted a missing entry")
+T.equal(invalidPlayerReason, "player_preview_entry_missing",
+    "Puppet player preview returned the wrong missing-entry reason")
+
+local playerPreviewAccepted, playerPreviewReason = Client.PreviewPlayer({
+    state = "Idle",
+    anim = "Bob_Idle",
+    playable = true,
+})
+T.truthy(playerPreviewAccepted,
+    "Puppet player preview did not start")
+T.equal(playerPreviewReason, "player_action_started",
+    "Puppet player preview returned the wrong start reason")
+T.equal(currentRuntime.owner, "ProjectHoomans.PuppetOperaPreview",
+    "Puppet player preview did not claim its animation lease")
+T.truthy(Client.StopPreview(),
+    "Puppet player preview could not be stopped")
+T.falsy(currentRuntime.active,
+    "Puppet player preview remained active after stop")
+currentRuntime.active = true
+currentRuntime.owner = "other.preview"
+local blockedPlayerPreview, blockedPlayerReason = Client.PreviewPlayer({
+    state = "Idle",
+    anim = "Bob_Idle",
+    playable = true,
+})
+T.falsy(blockedPlayerPreview,
+    "Puppet player preview replaced an animation owned by another system")
+T.equal(blockedPlayerReason, "player_animation_owned_by_other",
+    "Puppet player preview returned the wrong ownership reason")
+currentRuntime.active = false
+currentRuntime.owner = nil
+currentRuntime.entry = nil
+
+local invalidNPCPreview, invalidNPCReason = Client.PreviewNPC(nil,
+    "npc-preview", previewBody, { id = "npc-preview" })
+T.falsy(invalidNPCPreview,
+    "Puppet NPC preview accepted a missing entry")
+T.equal(invalidNPCReason, "npc_preview_entry_missing",
+    "Puppet NPC preview returned the wrong missing-entry reason")
+
+previewDebugger.active = {
+    npcId = "other-preview",
+    body = previewBody,
+}
+local blockedNPCPreview, blockedNPCReason = Client.PreviewNPC({
+    state = "bumped",
+    node = "PNC_Shove",
+    anim = "Bob_Shove",
+    playable = true,
+}, "npc-preview", previewBody, { id = "npc-preview" })
+T.falsy(blockedNPCPreview,
+    "Puppet NPC preview replaced an NPC preview owned by another system")
+T.equal(blockedNPCReason, "npc_preview_owned_by_other",
+    "Puppet NPC preview returned the wrong ownership reason")
+previewDebugger.active = nil
+
 local previewAccepted, previewReason = Client.PreviewNPC(
     {
         state = "bumped",
@@ -244,6 +418,60 @@ T.equal(previewCalls[1].sceneId, "ProjectHoomans.PuppetOperaPreview:npc-preview"
     "Puppet NPC preview did not identify its owner")
 T.truthy(Client.StopPreview(),
     "Puppet NPC preview could not be stopped")
+T.falsy(previewBody.modData.PNC_PuppetOperaPreviewOwner,
+    "Puppet NPC preview left its ownership marker behind")
+
+local maintainCalls = 0
+local replayCalls = 0
+function previewDebugger.Maintain()
+    maintainCalls = maintainCalls + 1
+end
+function previewDebugger.Replay()
+    replayCalls = replayCalls + 1
+    return true, "preview_replayed"
+end
+clock = 2000
+T.truthy(Client.SetPreviewLoopEnabled(true),
+    "Puppet preview loop did not enable")
+previewAccepted = Client.PreviewNPC({
+    state = "bumped",
+    node = "PNC_Shove",
+    anim = "Bob_Shove",
+    playable = true,
+}, "npc-preview", previewBody, { id = "npc-preview" })
+T.truthy(previewAccepted, "Puppet NPC preview could not restart for looping")
+clock = 3000
+Client.Pump()
+T.equal(maintainCalls, 1,
+    "Puppet preview loop did not maintain its owned NPC")
+T.equal(replayCalls, 1,
+    "Puppet preview loop did not replay after its bounded delay")
+T.truthy(previewCalls[2] and previewCalls[2].loop == true,
+    "Puppet NPC preview did not pass loop ownership to the adapter")
+T.falsy(Client.SetPreviewLoopEnabled(false),
+    "Puppet preview loop did not disable")
+T.falsy(Client.GetPreviewLoopEnabled(),
+    "Puppet preview loop getter reported stale state")
+T.truthy(Client.StopPreview(),
+    "Puppet loop preview could not be stopped")
+
+clock = 4000
+previewAccepted = Client.PreviewNPC({
+    state = "bumped",
+    node = "PNC_Shove",
+    anim = "Bob_Shove",
+    playable = true,
+}, "npc-preview", previewBody, { id = "npc-preview" })
+T.truthy(previewAccepted, "Puppet preview could not start before Lua reset")
+T.truthy(Client.SetPreviewLoopEnabled(true),
+    "Puppet preview loop could not enable before Lua reset")
+Events.reset()
+T.falsy(previewDebugger.active,
+    "Lua reset left the Puppet NPC preview active")
+T.falsy(previewBody.modData.PNC_PuppetOperaPreviewOwner,
+    "Lua reset left the Puppet NPC ownership marker behind")
+T.falsy(Client.GetPreviewLoopEnabled(),
+    "Lua reset left the Puppet preview loop enabled")
 
 previewAccepted = Client.StartPlacementPreview(
     "social.kiss_test",
@@ -346,11 +574,23 @@ local snapshot = {
 }
 T.truthy(handlers[PNC.Const.CMD_PUPPET_OPERA_STATE],
     "client state command was not registered")
+T.truthy(handlers[PNC.Const.CMD_PUPPET_OPERA_TRACE],
+    "client trace command was not registered")
+T.equal(Events.tick, Client.Pump,
+    "client runtime pump was not registered as the tick entry point")
 Client.ReceiveState(snapshot)
 T.equal(queue.current and queue.current.puppetOperaSessionId, sessionID,
     "moving state did not create the owned native walk action")
 T.equal(sent[#sent].payload.action, "player_moving",
     "moving state did not acknowledge the server revision")
+
+T.falsy(Client.ReceiveState({
+    sessionId = sessionID,
+    revision = 0,
+    phase = Opera.Phases.MOVING,
+}), "stale server snapshot was accepted")
+T.equal(Client.GetSnapshot().revision, 1,
+    "stale server snapshot replaced the current revision")
 
 player.x = plan.actors.actor_1.worldX
 player.y = plan.actors.actor_1.worldY

@@ -19,7 +19,7 @@ Catalog.LAST_VARIANTS = Catalog.LAST_VARIANTS or {}
 
 local CONDITION_FIELDS = {
     "topic", "previousTopic", "intent", "action", "subject",
-    "relationshipState", "timeBand", "raining", "foggy", "snowing",
+    "relationshipState", "identityTrust", "timeBand", "raining", "foggy", "snowing",
     "indoors", "hasPendingRequest", "npcID", "activity", "busy",
     "needType", "needUrgency", "relationshipAttitude", "healthState",
     "socialStyle", "emotionType", "emotionUrgency", "hostilityCount",
@@ -106,6 +106,7 @@ local function conditionContext(context)
         action = context.action,
         subject = context.subject,
         relationshipState = context.relationshipState,
+        identityTrust = context.identityTrust,
         timeBand = world.timeBand or time.band or context.timeBand,
         raining = weather.raining,
         foggy = weather.foggy,
@@ -543,7 +544,14 @@ Catalog.Register("semantic.self_reflection", {
             id = "semantic.self_reflection.trusted",
             templateID = "semantic.social.self_reflection.trusted",
             fallback = "You're harder on yourself than you need to be.",
-            when = { relationshipState = { "Friend", "Trusted", "Ally" } },
+            -- Conversation authority currently projects Member/Lover as the
+            -- established relationship categories. Keep the older labels as
+            -- compatibility aliases for other context providers.
+            when = {
+                relationshipState = {
+                    "Friend", "Trusted", "Ally", "Member", "Lover",
+                },
+            },
             priority = 3,
         },
         {
@@ -571,23 +579,30 @@ Catalog.Register("semantic.self_reflection", {
 Catalog.Register("semantic.identity.evasion", {
     variants = {
         {
+            id = "semantic.identity.evasion.untrustworthy",
+            templateID = "semantic.identity.evasion.untrustworthy",
+            fallback = "You avoided my question. I can't trust you with my name.",
+            when = { identityTrust = "untrustworthy" },
+            priority = 5,
+        },
+        {
             id = "semantic.identity.evasion.friendly",
             templateID = "semantic.identity.evasion.friendly",
-            fallback = "I asked you your name. I thought you trusted me.",
+            fallback = "I asked you your name. Changing the subject makes me question your honesty.",
             when = { socialStyle = { "friendly", "protective" } },
             priority = 3,
         },
         {
             id = "semantic.identity.evasion.withdrawn",
             templateID = "semantic.identity.evasion.withdrawn",
-            fallback = "Forget it. Keep your name to yourself.",
+            fallback = "Forget it. Keep your name to yourself; I don't trust evasive people.",
             when = { socialStyle = "withdrawn" },
             priority = 2,
         },
         {
             id = "semantic.identity.evasion.default",
             templateID = "semantic.identity.evasion.default",
-            fallback = "You avoided my question. That makes me wary.",
+            fallback = "You avoided my question. That makes you seem untrustworthy.",
         },
     },
 })

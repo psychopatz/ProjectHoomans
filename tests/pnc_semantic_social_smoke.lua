@@ -87,6 +87,10 @@ T.equal(selfHunger.subject, "HUNGER",
 T.falsy(selfHunger.socialContext and selfHunger.socialContext.identityClaim,
     "hunger state does not create an identity claim")
 
+local plainSelfHunger = Parser.Parse("im starving")
+T.equal(plainSelfHunger.subject, "HUNGER",
+    "plain im hunger state is not mistaken for a name")
+
 local recipientInsult = Parser.Parse("you are an idiot")
 T.equal(recipientInsult.intent, "INSULT",
     "second-person insult targets the recipient")
@@ -117,6 +121,33 @@ T.truthy(identityClaim.socialContext
     "name introduction carries an identity-claim marker")
 T.equal(identityClaim.slots.identityClaim.name, "patrick",
     "name introduction preserves the normalized claimed name")
+
+local conversationalIdentity = Parser.Parse("im psycho btw")
+T.truthy(conversationalIdentity.socialContext
+    and conversationalIdentity.socialContext.identityClaim == true,
+    "plain im introductions remain identity claims")
+T.equal(conversationalIdentity.slots.identityClaim.name, "psycho",
+    "plain im introductions capture the name before conversational filler")
+
+local turnTakingIdentity = Parser.Parse("I'm Psycho, now your turn")
+T.equal(turnTakingIdentity.slots.identityClaim.name, "psycho",
+    "turn-taking filler does not become part of the claimed name")
+
+local namedIdentity = Parser.Parse(
+    "psycho is my name, nice to meet you"
+)
+T.equal(namedIdentity.slots.identityClaim.name, "psycho",
+    "is-my-name introductions capture the leading name")
+
+local possessiveIdentity = Parser.Parse(
+    "my name is psycho, nice to meet you"
+)
+T.equal(possessiveIdentity.slots.identityClaim.name, "psycho",
+    "my-name-is introductions capture the claimed name")
+
+local plainSelfMockery = Parser.Parse("im an idiot")
+T.equal(plainSelfMockery.intent, "SELF_REFLECTION",
+    "plain im self-mockery remains self-directed")
 
 local profanity = Parser.Parse("shit")
 T.equal(profanity.intent, "HOSTILE_REMARK",

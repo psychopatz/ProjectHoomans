@@ -140,6 +140,17 @@ function Social.Register()
         145
     )
     registerPattern(
+        "pnc.social.self_mockery_im_plain",
+        {
+            { kind = "literal", value = "im" },
+            { kind = "literal", value = "an", optional = true },
+            { kind = "concept", id = "INSULT" },
+        },
+        selfReflectionEmit("SELF_MOCKERY"),
+        0.98,
+        145
+    )
+    registerPattern(
         "pnc.social.self_blame",
         { "@SELF_BLAME" },
         selfReflectionEmit("SELF_BLAME"),

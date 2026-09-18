@@ -8,6 +8,15 @@ local Const = PNC.Const
 local ClientState = PNC.Network.ClientState
 
 local function activeViewFor(npcID)
+    local semanticInput = PNC.Semantics
+        and PNC.Semantics.DialogueInput or nil
+    local active = semanticInput and semanticInput.ActiveView or nil
+    if active and active.session
+        and tostring(active.spec and active.spec.npcID or "")
+            == tostring(npcID or "")
+    then
+        return active
+    end
     local conversation = PsychopatzCore and PsychopatzCore.Conversation
     local view = conversation and conversation.instance or nil
     if not view or tostring(view.spec and view.spec.npcID or "")
@@ -58,10 +67,50 @@ Internal.RegisterServerCommand(Const.CMD_SEMANTIC_IDENTITY_RESULT,
         end
 
         local view = activeViewFor(npcID)
-        if view and view.session and args.responseText then
-            view.session:append("npc", {
-                fallback = tostring(args.responseText),
-            })
+        if view and view.session and (args.responseText or args.responseKey) then
+            local fallback = tostring(args.responseText or "")
+            local text = fallback
+            local translation = PNC.Translation
+            if args.responseKey and translation
+                and type(translation.TrFormat) == "function"
+            then
+                local responseArgs = type(args.responseArgs) == "table"
+                    and args.responseArgs or {}
+                local ok, localized = pcall(
+                    translation.TrFormat,
+                    args.responseKey,
+                    fallback,
+                    responseArgs[1],
+                    responseArgs[2],
+                    responseArgs[3]
+                )
+                if ok and localized then text = tostring(localized) end
+            end
+            local response = {
+                key = args.responseKey,
+                text = text ~= "" and text or nil,
+                fallback = fallback,
+                args = args.responseArgs,
+            }
+            local metadata = {
+                source = {
+                    kind = "semantic_identity",
+                    channel = "authoritative_response",
+                    requestID = args.requestID,
+                    truthful = args.truthful,
+                    trustLabel = args.trustLabel,
+                },
+                provenance = {
+                    provider = "server",
+                    parser = "semantic_identity_authority",
+                    requestID = args.requestID,
+                },
+            }
+            if view.session.queueMessage then
+                view.session:queueMessage("npc", response, metadata)
+            else
+                view.session:append("npc", response, metadata)
+            end
         end
 
     end)
