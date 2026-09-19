@@ -32,8 +32,8 @@ local territorySource = T.read("ProjectHoomans", "client",
     "PNC/UI/CommandHub/PNC_CommandHub_BaseTerritoryActions.lua")
 local outcomesSource = T.read("ProjectHoomans", "client",
     "PNC/Conversation/Blocks/ConversationComposer/PNC_ConversationComposer_Outcomes.lua")
-local clientRequestsSource = T.read("ProjectHoomans", "client",
-    "PNC/Networking/PNC_ClientRequests.lua")
+local colonyRequestsSource = T.read("ProjectHoomans", "client",
+    "PNC/Networking/ClientRequests/PNC_ClientRequests_ColonyActions.lua")
 
 T.contains(windowSource, 'id = "pnc-command-hub-base-widget"',
     "Base window is not installed as a detachable widget")
@@ -105,7 +105,7 @@ T.contains(territorySource, "local latest = snapshotFor(window)",
     "Base territory requests still capture stale multiplayer state")
 T.contains(outcomesSource, "PNC.CommandHub.OpenTerritorySetup",
     "Conversation territory outcome does not target the Base Zone selector")
-T.contains(clientRequestsSource, 'return true, "sent", args.requestId',
+T.contains(colonyRequestsSource, 'return true, "sent", args.requestId',
     "Colony actions do not expose their async request id to Base")
 T.falsy(baseTabSource:find('"claim"', 1, true),
     "Base tab still exposes a duplicate territory claim control")

@@ -24,7 +24,18 @@ ISPanel = {
 }
 PsychopatzCore = {
     UI = {
-        Layout = {},
+        Layout = {
+            Pixels = function(value) return value end,
+            SetBounds = function(widget, x, y, width, height)
+                if not widget then return end
+                widget.bounds = {
+                    x = x,
+                    y = y,
+                    width = width,
+                    height = height,
+                }
+            end,
+        },
         AddKeyValue = function() end,
     },
 }
@@ -52,6 +63,11 @@ T.truthy(type(PNC.PuppetOperaLayoutTabInternal.setLivePointerFromEvent)
     and type(PNC.PuppetOperaLayoutTabInternal.finishLiveDrag)
     == "function",
     "live drag spokes did not install their private contracts")
+T.truthy(type(PNC.PuppetOperaLayoutTabInternal.applyStackedLayout)
+    == "function"
+    and type(PNC.PuppetOperaLayoutTabInternal.applyWideLayout)
+    == "function",
+    "responsive geometry spokes did not install their private contracts")
 
 local methods = {
     "initialise",
@@ -70,6 +86,39 @@ for _, method in ipairs(methods) do
     T.truthy(type(LayoutTab[method]) == "function",
         "layout tab public method was not installed: " .. method)
 end
+
+local dimensions = { width = 640, height = 600 }
+local function responsiveWidget()
+    return { items = {} }
+end
+local responsive = setmetatable({
+    ownerWindow = { uiScale = 1 },
+    actorList = responsiveWidget(),
+    liveList = responsiveWidget(),
+    details = responsiveWidget(),
+    grid = responsiveWidget(),
+    addButton = responsiveWidget(),
+    removeButton = responsiveWidget(),
+    getWidth = function() return dimensions.width end,
+    getHeight = function() return dimensions.height end,
+}, { __index = LayoutTab })
+
+responsive:onResponsiveLayout()
+T.truthy(responsive.stackedLayout,
+    "narrow responsive layout did not select stacked geometry")
+T.equal(responsive.actorList.bounds.x, 8,
+    "stacked layout did not preserve the scaled left padding")
+T.truthy(responsive.grid.bounds.height >= 100,
+    "stacked layout did not enforce the minimum grid height")
+
+dimensions.width = 1000
+responsive:onResponsiveLayout()
+T.falsy(responsive.stackedLayout,
+    "wide responsive layout incorrectly selected stacked geometry")
+T.truthy(responsive.grid.bounds.x > responsive.actorList.bounds.x,
+    "wide layout did not place the grid after the actor column")
+T.truthy(responsive.details.bounds.x > responsive.grid.bounds.x,
+    "wide layout did not place details after the grid")
 
 local status
 local captureState

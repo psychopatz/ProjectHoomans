@@ -69,35 +69,6 @@ local function recordSemanticCampServer(result, request, context)
     end
 end
 
-local function requestID(prefix)
-    ClientState.identityRequestSerial =
-        (tonumber(ClientState.identityRequestSerial) or 0) + 1
-    return tostring(prefix) .. ":" .. tostring(Core.Now()) .. ":"
-        .. tostring(ClientState.identityRequestSerial)
-end
-
-local function dispatchSemanticCognition(player, args)
-    local service
-    if Core.IsClientOnly and Core.IsClientOnly() then
-        if not player or not sendClientCommand then
-            return false, "player_unavailable"
-        end
-        sendClientCommand(
-            player,
-            Const.MODULE,
-            Const.CMD_SEMANTIC_COGNITION_REQUEST,
-            args
-        )
-        return true, "sent"
-    end
-    service = PNC.Semantics and PNC.Semantics.CognitionService
-    if not service or type(service.HandleRequest) ~= "function" then
-        return false, "cognition_service_unavailable"
-    end
-    local accepted, reason = service.HandleRequest(player, args)
-    return accepted == true, reason or "dispatched"
-end
-
 -- Semantic task requests are contracts only. In multiplayer they cross the
 -- normal client-command boundary; in singleplayer the same server service is
 -- called directly so local-first dialogue does not depend on an LLM bridge.
@@ -180,7 +151,7 @@ function Client.RequestSemanticInventoryQuery(request, context)
     local payload = {}
     for key, value in pairs(request) do payload[key] = value end
     payload.requestID = payload.requestID
-        or requestID("semantic_inventory_query")
+        or Internal.RequestID("semantic_inventory_query")
     payload.npcID = payload.npcID or context.npcID or context.targetID
     payload.conversationID = payload.conversationID
         or context.conversationID
