@@ -126,6 +126,82 @@ local function checkRevision(record, args)
     return true, expected
 end
 
+local function auditScalar(value, maxBytes)
+    local valueType = type(value)
+    if valueType == "string" then
+        return string.sub(value, 1, maxBytes)
+    end
+    if valueType == "number" or valueType == "boolean" then
+        return string.sub(tostring(value), 1, maxBytes)
+    end
+    if value == nil then return "" end
+    return "<" .. valueType .. ">"
+end
+
+local function auditInventoryRequest(
+    eventName,
+    stage,
+    record,
+    args,
+    authority,
+    authorityReason,
+    adapterResult,
+    result,
+    reason,
+    revisionBefore
+)
+    local diagnostics = PNC.PerformanceScalingDiagnostics
+    if not diagnostics or diagnostics.InventoryAuditEnabled ~= true
+        or type(diagnostics.LogInventoryAudit) ~= "function"
+    then
+        return false
+    end
+    args = type(args) == "table" and args or {}
+
+    local direction = args.direction
+    if direction ~= "player_to_npc" and direction ~= "npc_to_player" then
+        direction = "invalid"
+    elseif args.gift == true then
+        direction = "gift_" .. direction
+    end
+    local actionID = auditScalar(args.actionID, 32)
+    local route = actionID ~= "" and "action:" .. actionID or direction
+    local targetContainer
+    if args.direction == "npc_to_player" then
+        targetContainer = args.playerContainer
+    elseif args.direction == "player_to_npc" then
+        targetContainer = args.npcContainer
+    end
+    local itemIDs = type(args.itemIDs) == "table" and args.itemIDs or nil
+    local itemCount = itemIDs and #itemIDs
+        or args.itemID ~= nil and 1 or 0
+    local selection = "quantity=" .. auditScalar(args.quantity, 16)
+        .. ",bulk=" .. (args.bulk == true and "true" or "false")
+    if args.gift == true then selection = selection .. ",gift=true" end
+    local currentRevision = record and record.inventory
+        and record.inventory.revision or nil
+    local fields = {
+        "stage=" .. auditScalar(stage, 24),
+        "npc=" .. auditScalar(record and record.id or args.id, 64),
+        "request=" .. auditScalar(args.requestId, 48),
+        "route=" .. auditScalar(route, 48),
+        "target=" .. auditScalar(targetContainer, 48),
+        "item_count=" .. auditScalar(itemCount, 12),
+        "item=" .. auditScalar(args.itemID, 48),
+        "selection=" .. selection,
+        "authority=" .. auditScalar(authority, 24),
+        "authority_reason=" .. auditScalar(authorityReason, 48),
+        "adapter_result=" .. auditScalar(adapterResult, 24),
+        "result=" .. auditScalar(result, 8),
+        "reason=" .. auditScalar(reason, 48),
+        "revision_expected=" .. auditScalar(args.inventoryRevision, 16),
+        "revision_before=" .. auditScalar(revisionBefore, 16),
+        "revision_after=" .. auditScalar(currentRevision, 16),
+    }
+    diagnostics.LogInventoryAudit(auditScalar(eventName, 64), fields)
+    return true
+end
+
 local function syncResult(player, record, sinceRevision)
     if Network and Network.SendInventoryDelta then
         Network.SendInventoryDelta(player, record, sinceRevision)
@@ -148,5 +224,6 @@ Internal.canGift = canGift
 Internal.relationshipSnapshot = relationshipSnapshot
 Internal.canManage = canManage
 Internal.checkRevision = checkRevision
+Internal.auditInventoryRequest = auditInventoryRequest
 Internal.syncResult = syncResult
 Internal.refreshLiveEquipment = refreshLiveEquipment

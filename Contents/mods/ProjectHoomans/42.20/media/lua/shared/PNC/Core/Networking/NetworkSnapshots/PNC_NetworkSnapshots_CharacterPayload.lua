@@ -11,8 +11,9 @@ local Stamina = PNC.Stamina
 local Parts = Network.Internal.SnapshotParts
 
 function Network.BuildCharacterPayload(record)
-    local snapshot = Network.BuildSnapshot(record)
     local inventoryPayload = Inventory and Inventory.BuildFullPayload and Inventory.BuildFullPayload(record) or nil
+    local snapshot = Network.BuildSnapshot(record,
+        inventoryPayload and inventoryPayload.summary or nil)
     return {
         npcId = record.id,
         revision = record.presenceRevision,

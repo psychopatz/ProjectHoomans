@@ -61,9 +61,11 @@ T.load("ProjectHoomans", "shared",
     "PNC/Core/Inventory/PNC_Inventory/PNC_Inventory_Mutations.lua")
 T.load("ProjectHoomans", "shared",
     "PNC/Core/Inventory/PNC_Inventory/PNC_Inventory_WaterContainers.lua")
-T.load("ProjectHoomans", "shared", "PNC/Core/Inventory/PNC_Inventory_Actions.lua")
+T.load("ProjectHoomans", "shared", "PNC/Core/Inventory/InventoryActions/PNC_InventoryActions.lua")
 
 local Inventory = PNC.Inventory
+T.equal(type(Inventory.Internal.WaterContainerRuntime), "table",
+    "native water adapter loads before water-container rules")
 Inventory.SyncEquipmentFromInventory = function() end
 Inventory.RebuildCaches = function() end
 PNC.Registry = { MarkDirty = function() end }

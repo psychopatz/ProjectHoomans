@@ -77,6 +77,14 @@ PNC = {
 
 T.load(ROOT .. "Skills/PNC_Skills.lua")
 T.load(ROOT .. "Inventory/PNC_Inventory.lua")
+T.equal(type(PNC.Inventory.Internal.CorePhysicalAdapter), "table",
+    "physical inventory adapter loads with the bridge")
+T.equal(type(PNC.Inventory.CoreBridge.captureLoose), "function",
+    "bridge keeps its loose capture contract")
+T.equal(type(PNC.Inventory.CoreBridge.materializeItem), "function",
+    "bridge keeps its item materialization contract")
+T.equal(type(PNC.Inventory.CaptureLooseInventory), "function",
+    "inventory keeps its public physical capture API")
 
 local oversizedState = {
     customName = string.rep("x", 1100),
@@ -312,6 +320,138 @@ local reloadedCard = PNC.Inventory.Internal.findItemByTemplateKey(
 T.equal(reloadedCard.cond, 0, "zero condition lost on rebase")
 T.equal(reloadedCard.ammoCount, 0, "zero ammo state lost on rebase")
 
+do
+local malformedSource = {
+    id = "npc_invalid_core_source",
+    identitySeed = 501,
+    archetypeID = "Test",
+    tacticalClass = "colonist",
+    progression = { skillLevelDeltas = {}, skillXP = {} },
+    equipment = { worn = {}, attached = {} },
+    runtime = {},
+    inventoryPersistenceMode = "FULL",
+}
+local malformedSave = PNC.Inventory.Serialize(malformedSource)
+T.equal(malformedSave[2], "FULL", "malformed Core save fixture mode")
+T.truthy(type(malformedSave[3]) == "table"
+    and type(malformedSave[3][2]) == "table",
+    "malformed Core save fixture has expected envelope")
+malformedSave[3][2][5] = 1
+local malformedTarget = {
+    id = "npc_invalid_core_save",
+    identitySeed = 501,
+    archetypeID = "Test",
+    tacticalClass = "colonist",
+    progression = { skillLevelDeltas = {}, skillXP = {} },
+    equipment = { worn = {}, attached = {} },
+    runtime = {},
+    inventory = { marker = true },
+}
+local previousMalformedInventory = malformedTarget.inventory
+local bridgeOk, bridgeInventory, bridgeReason = pcall(
+    PNC.Inventory.CoreBridge.deserialize,
+    malformedTarget,
+    malformedSave[3]
+)
+T.truthy(bridgeOk, "malformed Core save raised through the bridge")
+T.equal(bridgeInventory, nil, "malformed Core save was accepted")
+T.equal(bridgeReason, "npc_inventory_core_deserialize_failed",
+    "malformed Core save failure reason")
+T.equal(malformedTarget.inventory, previousMalformedInventory,
+    "malformed Core save changed the existing inventory")
+local malformedMetadataSave = PNC.Inventory.Serialize(malformedSource)
+malformedMetadataSave[3][3][1] = nil
+local metadataOk, metadataInventory, metadataReason = pcall(
+    PNC.Inventory.CoreBridge.deserialize,
+    malformedTarget,
+    malformedMetadataSave[3]
+)
+T.truthy(metadataOk, "missing Core metadata raised through the bridge")
+T.equal(metadataInventory, nil, "missing Core metadata was accepted")
+T.equal(metadataReason, "npc_inventory_metadata_missing",
+    "missing Core metadata failure reason")
+T.equal(malformedTarget.inventory, previousMalformedInventory,
+    "missing Core metadata changed the existing inventory")
+local deserializeOk, fallbackInventory = pcall(
+    PNC.Inventory.Deserialize,
+    malformedTarget,
+    malformedSave
+)
+T.truthy(deserializeOk, "malformed Core save raised through inventory restore")
+T.truthy(fallbackInventory and type(fallbackInventory.items) == "table"
+    and malformedTarget.inventory == fallbackInventory,
+    "malformed Core save did not fall back to a valid template inventory")
+end
+
+do
+    local malformedDeltaSave = PNC.Core.DeepCopy(saved)
+    local C = require "PsychopatzCore/Inventory/PsychopatzInventoryConstants"
+    local upserts = malformedDeltaSave[5][3]
+    local upsert = type(upserts) == "table" and upserts[1] or nil
+    local coreRecord = type(upsert) == "table" and upsert[2] or nil
+    T.truthy(type(coreRecord) == "table",
+        "baseline delta fixture has a core item upsert")
+    if type(coreRecord) == "table" then
+        coreRecord[C.FLAGS] = C.FLAG_MOD_DATA
+        coreRecord[C.STATE] = { 1 }
+        local malformedDeltaTarget = {
+            id = "npc_invalid_delta_save",
+            identitySeed = record.identitySeed,
+            archetypeID = "Test",
+            tacticalClass = "colonist",
+            progression = { skillLevelDeltas = {}, skillXP = {} },
+            equipment = { worn = {}, attached = {} },
+            runtime = {},
+        }
+        local deltaRestoreOk, fallback = pcall(
+            PNC.Inventory.Deserialize,
+            malformedDeltaTarget,
+            malformedDeltaSave
+        )
+        T.truthy(deltaRestoreOk,
+            "malformed baseline delta raised through inventory restore")
+        T.truthy(fallback and type(fallback.items) == "table"
+            and malformedDeltaTarget.inventory == fallback,
+            "malformed baseline delta did not fall back to a template")
+        local fallbackHasCustomLoot = false
+        for _, item in pairs(fallback and fallback.items or {}) do
+            if item.type == "Base.CustomLoot" then fallbackHasCustomLoot = true end
+        end
+        T.falsy(fallbackHasCustomLoot,
+            "partial baseline delta leaked into the fallback inventory")
+    end
+
+    local malformedShapes = {
+        { field = 2, value = true, name = "removed list is scalar" },
+        { field = 3, value = true, name = "upsert list is scalar" },
+        { field = 3, value = { true }, name = "upsert row is scalar" },
+    }
+    for i = 1, #malformedShapes do
+        local shape = malformedShapes[i]
+        local malformedShapeSave = PNC.Core.DeepCopy(saved)
+        malformedShapeSave[5][shape.field] = shape.value
+        local malformedShapeTarget = {
+            id = "npc_invalid_delta_shape_" .. tostring(i),
+            identitySeed = record.identitySeed,
+            archetypeID = "Test",
+            tacticalClass = "colonist",
+            progression = { skillLevelDeltas = {}, skillXP = {} },
+            equipment = { worn = {}, attached = {} },
+            runtime = {},
+        }
+        local restoreOk, fallbackInventory = pcall(
+            PNC.Inventory.Deserialize,
+            malformedShapeTarget,
+            malformedShapeSave
+        )
+        T.truthy(restoreOk, "malformed delta " .. shape.name .. " raised")
+        T.truthy(fallbackInventory
+            and type(fallbackInventory.items) == "table"
+            and malformedShapeTarget.inventory == fallbackInventory,
+            "malformed delta " .. shape.name .. " did not use template fallback")
+    end
+end
+
 isServer = function() return false end
 isClient = function() return false end
 isDebugEnabled = function() return true end
@@ -478,6 +618,24 @@ T.truthy(PNC.Inventory.MaterializeLooseInventory(reloaded, body),
 local physicalLoot = false
 for i = 1, #liveItems do physicalLoot = physicalLoot or liveItems[i].fullType == "Base.CustomLoot" end
 T.equal(physicalLoot, true, "loose item missing from live physical inventory")
+local physicalFailureProbe = {
+    originalEnsure = PNC.Inventory.EnsureRecordInventory,
+    originalRefresh = PNC.Inventory.CoreBridge.refreshCanonical,
+}
+PNC.Inventory.EnsureRecordInventory = function(value) return value.inventory end
+PNC.Inventory.CoreBridge.refreshCanonical = function()
+    return nil, "snapshot_encode_failed"
+end
+physicalFailureProbe.ok, physicalFailureProbe.reason =
+    PNC.Inventory.MaterializeLooseInventory(
+    reloaded,
+    body
+)
+PNC.Inventory.CoreBridge.refreshCanonical = physicalFailureProbe.originalRefresh
+PNC.Inventory.EnsureRecordInventory = physicalFailureProbe.originalEnsure
+T.equal(physicalFailureProbe.ok, false, "canonical snapshot failure is reported")
+T.equal(physicalFailureProbe.reason, "snapshot_encode_failed",
+    "canonical snapshot failure reason is preserved")
 local revisionBeforeCapture = reloaded.inventory.revision
 T.truthy(PNC.Inventory.CaptureLooseInventory(reloaded, body),
     "live inventory did not abstract")

@@ -138,6 +138,26 @@ T.equal(PNC.Network.ClientState.characterPayloads["npc-full"].inventory.items.wa
     "equal-revision full payload did not replace stale item state")
 T.equal(payloadApplied[1].source, "character_payload",
     "full payload did not invalidate the open inventory window")
+registered[PNC.Const.CMD_CHARACTER_PAYLOAD]({
+    npcId = "npc-full", revision = 6, inventoryFull = true,
+    inventory = {
+        revision = 5, summary = { revision = 5 },
+        items = {
+            water = {
+                id = "water", type = "Base.WaterBottle",
+                itemState = { fluidAmount = 0 },
+            },
+        },
+        containers = { root = { items = { "water" } } },
+    },
+})
+T.equal(PNC.Network.ClientState.characterPayloads["npc-full"].revision, 7,
+    "late older character payload replaced the newer cached snapshot")
+T.equal(PNC.Network.ClientState.characterPayloads["npc-full"].inventory.items.water
+    .itemState.fluidAmount, 1,
+    "late older inventory payload replaced newer item state")
+T.equal(payloadApplied[2], nil,
+    "late stale payload triggered a window refresh callback")
 
 PNC.ServerCommandRouter = {
     Register = function(command, handler)

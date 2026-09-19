@@ -55,6 +55,20 @@ local function buildBaseline(record)
     return baseline
 end
 
+local function arrayLength(value)
+    if value == nil then return 0 end
+    if type(value) ~= "table" then return nil end
+    local count = 0
+    for key, _ in pairs(value) do
+        if type(key) ~= "number" or key < 1 or key ~= math.floor(key) then
+            return nil
+        end
+        count = count + 1
+    end
+    if count ~= #value then return nil end
+    return count
+end
+
 function Delta.build(record, inv)
     local baseline = buildBaseline(record)
     local removed = {}
@@ -84,41 +98,79 @@ function Delta.build(record, inv)
 end
 
 function Delta.isEmpty(delta)
-    return type(delta) == "table"
-        and #(delta[2] or {}) == 0 and #(delta[3] or {}) == 0
+    if type(delta) ~= "table" then return false end
+    local removedCount = arrayLength(delta[2])
+    local upsertCount = arrayLength(delta[3])
+    return removedCount == 0 and upsertCount == 0
 end
 
-local function applyUpsert(record, inv, upsert)
-    local templateKey = upsert[1] ~= false and upsert[1] or nil
+local function prepareUpsert(upsert)
+    if type(upsert) ~= "table" then
+        return nil, "delta_upsert_invalid"
+    end
+    local templateKey = upsert[1]
+    if templateKey ~= nil and templateKey ~= false
+        and (type(templateKey) ~= "string" or #templateKey == 0)
+    then
+        return nil, "delta_upsert_invalid"
+    end
     local coreRecord = upsert[2]
     local meta = upsert[3]
     if type(coreRecord) ~= "table" or type(meta) ~= "table" then
         return false, "delta_upsert_invalid"
     end
-    if templateKey then
-        local existing = Internal.findItemByTemplateKey(inv, templateKey)
-        if existing then Internal.removeItemByID(inv, existing.id) end
-    end
     local fullType = CoreInventory.getItemFullType(coreRecord[C.TYPE_ID])
     if not fullType then return false, "unknown_type_id" end
-    local spec = StateCodec.readState(coreRecord)
+    local spec, reason = StateCodec.readValidatedState(coreRecord)
+    if not spec then return nil, reason or "delta_upsert_invalid" end
     StateCodec.applyMetadata(spec, meta, fullType)
     spec.stack = coreRecord[C.QUANTITY]
-    return Internal.createItem(record, inv, spec) ~= nil,
-        "delta_item_create_failed"
+    return {
+        templateKey = templateKey ~= false and templateKey or nil,
+        spec = spec,
+    }
 end
 
 function Delta.apply(record, inv, delta)
     if type(delta) ~= "table" or tonumber(delta[1]) ~= DELTA_SCHEMA then
         return false, "npc_delta_schema_mismatch"
     end
-    for i = 1, #(delta[2] or {}) do
+    if type(record) ~= "table" or type(inv) ~= "table" then
+        return false, "npc_delta_target_invalid"
+    end
+    local removedCount = arrayLength(delta[2])
+    local upsertCount = arrayLength(delta[3])
+    if removedCount == nil then
+        return false, "npc_delta_removed_invalid"
+    end
+    if upsertCount == nil then
+        return false, "npc_delta_upserts_invalid"
+    end
+    for i = 1, removedCount do
+        local templateKey = delta[2][i]
+        if type(templateKey) ~= "string" or #templateKey == 0 then
+            return false, "npc_delta_removed_invalid"
+        end
+    end
+    local prepared = {}
+    for i = 1, upsertCount do
+        local entry, reason = prepareUpsert(delta[3][i])
+        if not entry then return false, reason end
+        prepared[i] = entry
+    end
+    for i = 1, removedCount do
         local item = Internal.findItemByTemplateKey(inv, delta[2][i])
         if item then Internal.removeItemByID(inv, item.id) end
     end
-    for i = 1, #(delta[3] or {}) do
-        local ok, reason = applyUpsert(record, inv, delta[3][i])
-        if not ok then return false, reason end
+    for i = 1, upsertCount do
+        local entry = prepared[i]
+        if entry.templateKey then
+            local existing = Internal.findItemByTemplateKey(inv, entry.templateKey)
+            if existing then Internal.removeItemByID(inv, existing.id) end
+        end
+        if not Internal.createItem(record, inv, entry.spec) then
+            return false, "delta_item_create_failed"
+        end
     end
     Inventory.SyncEquipmentFromInventory(record)
     Inventory.RebuildCaches(record)

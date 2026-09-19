@@ -6,6 +6,8 @@ PNC.Inventory.Internal = PNC.Inventory.Internal or {}
 
 require "PNC/Core/Inventory/PNC_Inventory/Model/PNC_Inventory_Items/PNC_Inventory_Items_State"
 require "PNC/Core/Inventory/PNC_Inventory/Model/PNC_Inventory_Items/PNC_Inventory_Items_Metadata"
+require "PNC/Core/Inventory/PNC_Inventory/Model/PNC_Inventory_Items/PNC_Inventory_Items_FoodProfiles"
+require "PNC/Core/Inventory/PNC_Inventory/Model/PNC_Inventory_Items/PNC_Inventory_Items_DefinitionState"
 require "PNC/Core/Inventory/PNC_Inventory/Model/PNC_Inventory_Items/PNC_Inventory_Items_Payloads"
 require "PNC/Core/Inventory/PNC_Inventory/Model/PNC_Inventory_Items/PNC_Inventory_Items_Construction"
 require "PNC/Core/Inventory/PNC_Inventory/Model/PNC_Inventory_Items/PNC_Inventory_Items_Weights"

@@ -45,7 +45,7 @@ local function buildNeedsSummary(record)
     }
 end
 
-function Network.BuildSnapshot(record)
+function Network.BuildSnapshot(record, inventorySummaryOverride)
     local aiState
     local canRevive
     local inCombat
@@ -70,7 +70,13 @@ function Network.BuildSnapshot(record)
     equipmentInfo = Equipment and Equipment.Describe and Equipment.Describe(record) or {}
     identity = buildIdentitySummary(record)
     ownership = buildIdentityOwnershipSummary(record)
-    inventorySummary = Inventory and Inventory.BuildSummaryPayload and Inventory.BuildSummaryPayload(record) or nil
+    if inventorySummaryOverride ~= nil then
+        -- Keep the snapshot copy independent from the full inventory payload.
+        inventorySummary = Core.DeepCopy(inventorySummaryOverride)
+    else
+        inventorySummary = Inventory and Inventory.BuildSummaryPayload
+            and Inventory.BuildSummaryPayload(record) or nil
+    end
     combat = buildCombatSummary(record, equipmentInfo)
     visualState = buildVisualState(record)
     appearance = Profiles and Profiles.RollAppearance and Profiles.RollAppearance(record) or nil

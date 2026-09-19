@@ -17,7 +17,7 @@ local Diagnostics = PNC.PerformanceScalingDiagnostics
 local function requestInventoryResync(npcID, reason)
     local pending
     local sent
-    if not npcID or not Client.RequestCharacterPayload then
+    if not npcID or not Client.RequestCharacterInventoryPayload then
         return false
     end
     ClientState.inventoryResyncPending = ClientState.inventoryResyncPending or {}
@@ -30,7 +30,7 @@ local function requestInventoryResync(npcID, reason)
                 .. " reason=" .. tostring(reason or "delta_rejected")
         )
     end
-    sent = Client.RequestCharacterPayload(npcID, true)
+    sent = Client.RequestCharacterInventoryPayload(npcID)
     if sent ~= true then
         ClientState.inventoryResyncPending[npcID] = nil
     end
@@ -262,6 +262,91 @@ local function applyInventoryDelta(args)
     return true
 end
 
+local function applyCharacterInventoryPayload(args, source)
+    local npcID = args and args.npcId and tostring(args.npcId) or nil
+    local pending = ClientState.pendingCharacterInventoryRequest
+    local inventory = args and args.inventory or nil
+    local requestID = args and args.requestID and tostring(args.requestID) or nil
+    local incomingRevision
+    local cached
+    local currentRevision
+    local snapshot
+    if not npcID or not requestID or not pending
+        or tostring(pending.npcId or "") ~= npcID
+        or tostring(pending.requestID or "") ~= requestID
+    then
+        return false
+    end
+    if type(inventory) ~= "table" or args.inventoryFull ~= true then
+        ClientState.pendingCharacterInventoryRequest = nil
+        if ClientState.inventoryResyncPending then
+            ClientState.inventoryResyncPending[npcID] = nil
+        end
+        return false
+    end
+
+    ClientState.characterPayloads = ClientState.characterPayloads or {}
+    cached = ClientState.characterPayloads[npcID]
+    if type(cached) ~= "table" then
+        cached = { npcId = npcID }
+    end
+    incomingRevision = tonumber(inventory.revision
+        or inventory.summary and inventory.summary.revision)
+    currentRevision = cached.inventory
+        and tonumber(cached.inventory.revision
+            or cached.inventory.summary
+            and cached.inventory.summary.revision) or nil
+    if incomingRevision and currentRevision
+        and incomingRevision < currentRevision
+    then
+        ClientState.pendingCharacterInventoryRequest = nil
+        if ClientState.inventoryResyncPending then
+            ClientState.inventoryResyncPending[npcID] = nil
+        end
+        if PNC.InventoryWindow
+            and PNC.InventoryWindow.OnInventoryPayloadApplied
+        then
+            PNC.InventoryWindow.OnInventoryPayloadApplied(
+                npcID, currentRevision, source or "inventory_payload")
+        end
+        return true
+    end
+
+    cached.npcId = cached.npcId or npcID
+    cached.inventory = inventory
+    cached.inventoryFull = true
+    snapshot = ClientState.snapshots
+        and ClientState.snapshots[npcID] or cached.snapshot
+    if snapshot and inventory.summary then
+        snapshot.inventorySummary = Core.DeepCopy(inventory.summary)
+        cached.snapshot = snapshot
+    end
+    ClientState.characterPayloads[npcID] = cached
+    ClientState.pendingCharacterInventoryRequest = nil
+    if ClientState.inventoryResyncPending then
+        ClientState.inventoryResyncPending[npcID] = nil
+    end
+
+    if Diagnostics and Diagnostics.InventoryAuditEnabled == true
+        and Diagnostics.LogInventoryAudit
+    then
+        Diagnostics.LogInventoryAudit("client_inventory_payload_applied", {
+            "npc=" .. tostring(npcID),
+            "inventoryRevision=" .. tostring(incomingRevision or ""),
+            "source=" .. tostring(source or "inventory_payload"),
+        })
+    end
+    if PNC.InventoryWindow
+        and PNC.InventoryWindow.OnInventoryPayloadApplied
+    then
+        PNC.InventoryWindow.OnInventoryPayloadApplied(
+            npcID, incomingRevision, source or "inventory_payload")
+    end
+    return true
+end
+
+Internal.ApplyCharacterInventoryPayload = applyCharacterInventoryPayload
+
 Internal.RegisterServerCommand(Const.CMD_CHARACTER_PAYLOAD, function(args)
     local id
     local currentPayload
@@ -345,6 +430,11 @@ Internal.RegisterServerCommand(Const.CMD_CHARACTER_PAYLOAD, function(args)
             id, incomingInventoryRevision, "character_payload")
     end
 end)
+
+Internal.RegisterServerCommand(Const.CMD_CHARACTER_INVENTORY_PAYLOAD,
+    function(args)
+        applyCharacterInventoryPayload(args, "inventory_payload")
+    end)
 
 Internal.RegisterServerCommand(Const.CMD_INVENTORY_DELTA, function(args)
     if args.npcId then

@@ -1,7 +1,8 @@
 local Internal = PNC.Inventory.Internal
+local CoreInventory = require "PsychopatzCore/Inventory/PsychopatzInventory"
 local C = require "PsychopatzCore/Inventory/PsychopatzInventoryConstants"
 local Util = require "PsychopatzCore/Inventory/PsychopatzInventoryUtil"
-local Profiles = require "PsychopatzCore/Inventory/PsychopatzItemTypeProfile"
+local ItemAdapter = require "PNC/Core/Inventory/PNC_Inventory/Persistence/PNC_Inventory_CoreItemAdapter"
 
 local StateCodec = {}
 
@@ -35,138 +36,8 @@ local FOOD_OPTIONAL_ORDER = {
     "foodCreatedAtHours", "calories", "carbohydrates", "proteins", "lipids",
 }
 
-local function choose(preferred, fallback)
-    return preferred ~= nil and preferred or fallback
-end
-
 function StateCodec.pseudoItem(item)
-    local state = type(item.itemState) == "table" and item.itemState or {}
-    local profile = Profiles.Get(item.type)
-    local capabilities = profile and profile.capabilities or {}
-    local pseudo = {
-        type = item.type, condition = choose(item.cond, state.condition),
-        usedDelta = choose(item.uses, state.usedDelta),
-        favorite = item.fav == true or state.favorite == true,
-        customName = item.customName or state.customName,
-        ammoCount = choose(item.ammoCount, state.ammoCount),
-        age = state.age, cooked = state.cooked, burnt = state.burnt,
-        frozen = state.frozen, freezingTime = state.freezingTime,
-        hungChange = state.hungChange, thirstChange = state.thirstChange,
-        calories = state.calories, carbohydrates = state.carbohydrates,
-        proteins = state.proteins, lipids = state.lipids,
-        dangerousUncooked = state.dangerousUncooked,
-        poison = state.poison,
-        poisonDetectionLevel = state.poisonDetectionLevel,
-        poisonLevelForRecipe = state.poisonLevelForRecipe,
-        poisonPower = state.poisonPower,
-        rottenTime = state.rottenTime,
-        cookedInMicrowave = state.cookedInMicrowave,
-        tainted = state.tainted,
-        fertilized = state.fertilized,
-        fertilizedTime = state.fertilizedTime,
-        heat = state.heat,
-        lastCookMinute = state.lastCookMinute,
-        cookingTime = state.cookingTime,
-        foodLastAgedHours = state.foodLastAgedHours,
-        foodCreatedAtHours = state.foodCreatedAtHours,
-        wetness = state.wetness, bloodLevel = state.bloodLevel,
-        dirtyness = state.dirtyness,
-        actualWeight = Internal.getItemWeight(item.type),
-        extraState = Util.copy(state),
-    }
-    local known = { "condition", "usedDelta", "favorite", "customName",
-        "ammoCount", "age", "cooked", "burnt", "frozen", "freezingTime",
-        "wetness", "bloodLevel", "dirtyness", "fluidAmount", "fluidType",
-        "fluidPrimaryType", "fluidCapacity", "fluidInputLocked",
-        "fluidCanPlayerEmpty", "fluidRainCatcher", "fluids",
-        "hungChange", "thirstChange", "roundChambered", "jammed",
-        "calories", "carbohydrates", "proteins", "lipids",
-        "dangerousUncooked", "poison", "poisonDetectionLevel",
-        "poisonLevelForRecipe", "poisonPower", "rottenTime",
-        "cookedInMicrowave", "tainted", "fertilized", "fertilizedTime",
-        "heat", "lastCookMinute", "cookingTime", "foodLastAgedHours",
-        "foodCreatedAtHours",
-        "foodRottenAtHours",
-    }
-    for i = 1, #known do pseudo.extraState[known[i]] = nil end
-    if Internal.countMapEntries(pseudo.extraState) <= 0 then pseudo.extraState = nil end
-    if state.fluidAmount ~= nil or state.fluidType ~= nil
-        or state.fluidCapacity ~= nil or state.fluids ~= nil
-    then
-        pseudo.fluidState = state
-    end
-    function pseudo:getFluidContainer() return self.fluidState end
-    function pseudo:getFullType() return self.type end
-    function pseudo:getCondition() return self.condition end
-    function pseudo:getConditionMax() return self.condition and self.condition + 1 or nil end
-    function pseudo:getUsedDelta() return self.usedDelta end
-    function pseudo:isFavorite() return self.favorite end
-    function pseudo:isCustomName() return self.customName ~= nil end
-    function pseudo:getName() return self.customName end
-    function pseudo:getModData() return self.extraState end
-    function pseudo:getActualWeight() return self.actualWeight end
-    function pseudo:getWeight() return self.actualWeight end
-    function pseudo:getCurrentAmmoCount() return self.ammoCount end
-    function pseudo:getAge() return self.age end
-    function pseudo:isCooked() return self.cooked end
-    function pseudo:isBurnt() return self.burnt end
-    function pseudo:isFrozen() return self.frozen end
-    function pseudo:getFreezingTime() return self.freezingTime end
-    function pseudo:getHungChange() return self.hungChange end
-    function pseudo:getThirstChange() return self.thirstChange end
-    function pseudo:getCalories() return self.calories end
-    function pseudo:getCarbohydrates() return self.carbohydrates end
-    function pseudo:getProteins() return self.proteins end
-    function pseudo:getLipids() return self.lipids end
-    function pseudo:isbDangerousUncooked() return self.dangerousUncooked end
-    function pseudo:isPoison() return self.poison end
-    function pseudo:getPoisonDetectionLevel() return self.poisonDetectionLevel end
-    function pseudo:getPoisonLevelForRecipe() return self.poisonLevelForRecipe end
-    function pseudo:getPoisonPower() return self.poisonPower end
-    function pseudo:getRottenTime() return self.rottenTime end
-    function pseudo:isCookedInMicrowave() return self.cookedInMicrowave end
-    function pseudo:isTainted() return self.tainted end
-    function pseudo:isFertilized() return self.fertilized end
-    function pseudo:getFertilizedTime() return self.fertilizedTime end
-    function pseudo:getHeat() return self.heat end
-    function pseudo:getLastCookMinute() return self.lastCookMinute end
-    function pseudo:getCookingTime() return self.cookingTime end
-    function pseudo:getWetness() return self.wetness end
-    function pseudo:getBloodLevel() return self.bloodLevel end
-    function pseudo:getDirtiness() return self.dirtyness end
-    pseudo.isWeapon = capabilities.weapon == true
-    pseudo.isFood = capabilities.food == true
-    pseudo.isClothing = capabilities.clothing == true
-    pseudo.isDrainable = capabilities.drainable == true
-    if not profile then
-        -- Abstract records can contain an explicit state family without a
-        -- native definition probe (for example a dynamically authored
-        -- magazine).  Preserve that explicit ledger data until its owner
-        -- registers a static profile; neutral native getters never reach
-        -- this path.
-        if pseudo.ammoCount ~= nil then pseudo.isWeapon = true end
-        if pseudo.age ~= nil or pseudo.cooked ~= nil or pseudo.burnt ~= nil
-            or pseudo.dangerousUncooked ~= nil or pseudo.poison ~= nil
-            or pseudo.poisonPower ~= nil or pseudo.tainted ~= nil
-            or pseudo.fertilized ~= nil or pseudo.foodLastAgedHours ~= nil
-            or pseudo.foodCreatedAtHours ~= nil
-            or pseudo.poisonDetectionLevel ~= nil
-            or pseudo.poisonLevelForRecipe ~= nil
-            or pseudo.rottenTime ~= nil
-            or pseudo.cookedInMicrowave ~= nil
-            or pseudo.fertilizedTime ~= nil
-            or pseudo.heat ~= nil
-            or pseudo.lastCookMinute ~= nil
-            or pseudo.cookingTime ~= nil
-        then
-            pseudo.isFood = true
-        end
-        if pseudo.wetness ~= nil or pseudo.bloodLevel ~= nil then
-            pseudo.isClothing = true
-        end
-        if pseudo.usedDelta ~= nil then pseudo.isDrainable = true end
-    end
-    return pseudo
+    return ItemAdapter.pseudoItem(item)
 end
 
 function StateCodec.metadata(item)
@@ -176,6 +47,70 @@ function StateCodec.metadata(item)
         item.preferredContainer, item.wornSlot, item.attachedSlot, item.equipSlot,
         item.interactionLocked == true or nil, item.interactionLockReason,
         item.identityNPCId, item.identityNPCName }
+end
+
+function StateCodec.validateCoreRecord(coreRecord)
+    if type(coreRecord) ~= "table" then
+        return false, "record_not_table"
+    end
+    local itemRecord = CoreInventory.ItemRecord
+    if type(itemRecord) ~= "table"
+        or type(itemRecord.validate) ~= "function"
+    then
+        return false, "core_record_validator_unavailable"
+    end
+    local valid, reason = itemRecord.validate(coreRecord)
+    if not valid then return false, reason or "invalid_core_record" end
+
+    local flags = tonumber(coreRecord[C.FLAGS]) or 0
+    local data = coreRecord[C.STATE]
+    local cursor = 1
+    local chunk
+    if Util.hasFlag(flags, C.FLAG_CONDITION) then cursor = cursor + 1 end
+    if Util.hasFlag(flags, C.FLAG_USED_DELTA) then cursor = cursor + 1 end
+    if Util.hasFlag(flags, C.FLAG_CUSTOM_NAME) then cursor = cursor + 1 end
+    if Util.hasFlag(flags, C.FLAG_MOD_DATA) then
+        chunk = data[cursor]
+        if chunk ~= nil and type(chunk) ~= "table" then
+            return false, "invalid_mod_data_state"
+        end
+        cursor = cursor + 1
+    end
+    if Util.hasFlag(flags, C.FLAG_CUSTOM_WEIGHT) then cursor = cursor + 1 end
+    if Util.hasFlag(flags, C.FLAG_FLUID) then
+        chunk = data[cursor]
+        if chunk ~= nil and type(chunk) ~= "table" then
+            return false, "invalid_fluid_state"
+        end
+        cursor = cursor + 1
+    end
+    if Util.hasFlag(flags, C.FLAG_FOOD) then
+        chunk = data[cursor]
+        if chunk ~= nil and type(chunk) ~= "table" then
+            return false, "invalid_food_state"
+        end
+        cursor = cursor + 1
+    end
+    if Util.hasFlag(flags, C.FLAG_AMMO) then
+        chunk = data[cursor]
+        if chunk ~= nil and type(chunk) ~= "table" then
+            return false, "invalid_ammo_state"
+        end
+        cursor = cursor + 1
+    end
+    if Util.hasFlag(flags, C.FLAG_CLOTHING) then
+        chunk = data[cursor]
+        if chunk ~= nil and type(chunk) ~= "table" then
+            return false, "invalid_clothing_state"
+        end
+    end
+    return true
+end
+
+function StateCodec.readValidatedState(coreRecord)
+    local valid, reason = StateCodec.validateCoreRecord(coreRecord)
+    if not valid then return nil, reason end
+    return StateCodec.readState(coreRecord)
 end
 
 function StateCodec.readState(coreRecord)

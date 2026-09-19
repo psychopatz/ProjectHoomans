@@ -63,19 +63,44 @@ compatibility surface and have identical behavior.
   queries.
 - `PNC_Inventory_Model.lua` loads focused model modules for runtime/revision state,
   container membership, and item/carry-cache mechanics.
-- `Equipment/PNC_Inventory_EquipmentGeneration.lua` owns generic categorized
-  pools, weighted identity-seed selection, validation, and starting-equipment policy.
+- `Equipment/PNC_Inventory_EquipmentPools.lua` owns pool normalization,
+  registration, and weighted identity-seed selection.
+- `Equipment/PNC_Inventory_EquipmentGeneration.lua` owns starting-equipment
+  policy, grant routing, and pool integration.
 - `common/.../PNC/EquipmentDefinitions/PNC_EquipmentPools.lua` is the editable
   built-in equipment catalog shared by supported game versions.
-- `PNC_Inventory_Templates.lua` owns deterministic template generation.
-- `PNC_Inventory_Equipment.lua` loads record hydration and legacy equipment-sync modules.
+- `PNC_Inventory_Templates.lua` owns deterministic template generation;
+  `PNC_Inventory_TemplateSupplies.lua` builds archetype supply grants.
+- `PNC_Inventory_Equipment.lua` loads equipment synchronization and hydration.
+  Import normalization and bounded audit formatting are separate equipment
+  modules; water item normalization and native water runtime calls have their
+  own adapters.
 - `PNC_Inventory_Mutations.lua` validates and records inventory operations.
-- `PNC_Inventory_Actions.lua` is the data-driven item command registry. Built-in
-  actions are equip, unequip, wear, remove worn clothing, and drop; additional
-  mods can register actions without changing the inventory window.
+- `InventoryActions/PNC_InventoryActions.lua` is the action load-order entry.
+  Its registry/executor and built-in action definitions are separate modules;
+  the public `PNC.InventoryActions` registration API remains stable.
 - `PNC_Inventory_Payloads.lua` builds summary, full, and incremental network payloads.
 - `PNC_Inventory_Persistence.lua` owns the public serializer/hydrator and delegates
-  template-delta encoding and replay to its delta codec.
+  template-delta encoding, replay, Core item records, and physical item adaptation
+  to persistence codecs and adapters.
+  Untrusted delta lists and Core state groups are validated before replay; an
+  invalid delta falls back to the generated template inventory.
+- Item construction keeps script definition state and food profiles in focused
+  child modules under `Model/PNC_Inventory_Items`.
+- `client/PNC/UI/Inventory/PNC_InventoryWindow.lua` stays the stable window
+  loader. Its `InventoryWindow/` modules separate layout, refresh, endpoint
+  state, bulk transfers, drag/drop, item actions, presentation, and lifecycle
+  while preserving `ISPNCInventoryWindow` and `PNC.InventoryWindow` APIs.
+- `client/PNC/UI/Inventory/PNC_InventoryUI_Model.lua`,
+  `PNC_InventoryTransferEndpoint.lua`, and `PNC_InventoryUI_List.lua` are stable
+  facades over focused provider/row, endpoint, appearance/input/lifecycle
+  modules. Keep their public model, endpoint, and list contracts intact.
+- `server/PNC/Semantics/Inventory/PNC_SemanticInventoryQueryService.lua`
+  remains the server query facade. Candidate scanning and MarketSense
+  classification, bounded response shaping, and request authorization/network
+  handling load in that order. The selector loads classification and text
+  matching before criteria matching and query helpers; MarketSense remains the
+  item meaning authority.
 
 Implementation modules communicate through `PNC.Inventory.Internal`; consumers should
 continue to call only the public `PNC.Inventory` functions.
@@ -204,3 +229,232 @@ the generation service should remain free of item lists.
 - death conversion re-validates the identity card against the final
   `IsoDeadBody` container, so legacy records and engine fallback conversions
   still receive exactly one card
+
+## Maintenance Plan
+
+### Current architecture and responsibilities
+
+- `PNC.Inventory` is the shared compatibility facade and load-order entry point.
+  Focused model, equipment, generation, template, action, payload, persistence,
+  and water modules implement the domain behind it. Cross-module calls use
+  `PNC.Inventory.Internal`; external consumers keep using the public facade.
+- Compact NPC inventory records are the domain representation. Templates provide
+  deterministic identity-seeded starting state; semantic deltas describe changes
+  to that state; portable acquired-item records store only bounded overrides and
+  supported primitive item state. Persistence schema version 8 keeps derived
+  script data and runtime-only caches out of saved records.
+- `PNC.InventoryActions` is the stable action registry and executor contract.
+  Action definitions are loaded separately from registry mechanics.
+- The existing `PNC.PerformanceScalingDiagnostics` API loads Inventory audit
+  formatting from `PNC_PerformanceScalingDiagnostics_InventoryAudit.lua`, keeping
+  bounded event text at a focused diagnostic boundary.
+- `PNC_ServerInventory` owns multiplayer authorization, current-revision checks,
+  authoritative item-ID resolution, capacity checks, and rollback around native
+  item transfer and compact inventory mutation.
+- Client Inventory UI facades preserve the window, model, endpoint, and list
+  contracts. The endpoint owns snapshots, rows, containers, weight, revision, and
+  transfer operations. UI requests carry identifiers and revisions; the server
+  remains authoritative for NPC state. PsychopatzCore's item-transfer adapter
+  owns native player/world item materialization and removal.
+- Server semantic inventory requests pass through request authorization, bounded
+  response shaping, candidate scanning, and item selection. MarketSense remains
+  the classification authority; the semantic selector only applies request
+  criteria and text matching to classified items.
+- A successful compact mutation updates revision, equipment and lookup caches,
+  marks persistence state dirty, then publishes one inventory-changed event.
+  Provision and other consumers subscribe to that event instead of becoming
+  direct Inventory dependencies.
+
+### Stable contracts and state ownership
+
+- Preserve public `PNC.Inventory` and `PNC.InventoryActions` tables, their
+  documented methods, inventory window/model/endpoint/list facades, and template,
+  full-save, delta-save, and network payload shapes unless a separately reviewed
+  schema migration explicitly changes them.
+- Keep item IDs, template keys, container IDs, equipped-item references, and
+  inventory revisions as the stable identifiers crossing persistence, UI, and
+  network boundaries. Do not pass native engine objects through those contracts.
+- The server registry owns canonical NPC inventory and revisions. A client may
+  hold a presentation snapshot, but every mutation is revalidated against the
+  authoritative record. The local player inventory remains an engine-owned
+  container and crosses into NPC inventory through the Core adapter and server
+  transaction boundary.
+- The item-state codec accepts only the documented portable fields and bounded
+  primitive modData. Diagnostics and mutation history stay bounded and are never
+  serialized. MarketSense owns item meaning; Inventory owns item identity,
+  membership, equipment, and mutation rules.
+
+### Module boundaries and migration order
+
+The implementation has been split along these boundaries while retaining the
+existing entry points:
+
+1. Preserve public facades, save schemas, and load-order behavior.
+2. Separate compact model state, deterministic templates and equipment
+   generation, mutation/action rules, and payload construction.
+3. Split persistence codecs and runtime adapters; validate imported Core state
+   and deltas before replay, then fall back safely to template state on invalid
+   persisted input.
+4. Keep server authorization and transaction rollback at the request boundary;
+   keep native inventory operations behind PsychopatzCore adapters.
+5. Split the Inventory window, UI model, transfer endpoint, and list behind their
+   stable loaders. Split semantic query candidate scanning, response shaping,
+   request handling, and selector matching behind server facades.
+6. Verify save compatibility, shared/client/server loading, and the end-to-end
+   multiplayer mutation path before considering a schema or API change.
+
+The model, equipment, template, action, persistence, water, UI, and semantic
+query slices above are implemented in focused child modules. Future changes
+should remain within these ownership boundaries and keep compatibility wrappers
+small and explicitly named.
+
+### Compatibility and load order
+
+- Keep each public facade as the single supported load entry and require children
+  in dependency order. Do not capture collaborators at module load when shared
+  bootstrap loads them later; resolve those collaborators when the operation runs.
+- Preserve generator rebasing and replay of valid semantic deltas. Version 2
+  equipment migration, version 3 identity-card migration, and schema version 8
+  persistence remain covered by the current format contract.
+- Keep old sandbox option names and save records readable. Invalid external
+  state must fail closed to the generated template rather than partially applying
+  a malformed delta.
+- Keep Kahlua compatibility and use protected calls only at documented external
+  callback or serializer boundaries where recovery is required.
+
+### Test and verification strategy
+
+- Compare focused smoke tests and the full `tests/run_tests.py` suite with the
+  established repository baseline. Relevant contracts include template/delta
+  round trips, malformed state fallback, equipment synchronization and
+  hydration, water-container normalization, physical item capture/materialization,
+  UI request behavior, semantic inventory filtering, duplicate requests,
+  multiplayer stale-revision rejection, and native/compact rollback after
+  partial transfer failure.
+- Run `pz_verify` on the complete shared Inventory tree and the changed UI/server
+  scopes. Confirm no new Kahlua findings and no Inventory file above the token
+  threshold. Treat findings outside those scopes as baseline unless separately
+  investigated.
+- The default `pz_verify` i18n scan flags the existing action labels and
+  selector whitespace patterns, plus UI translation keys passed through
+  `Helpers.tr`; the helper resolves keys through `PNC.Translation.GetKey`, and
+  the clean baseline contains the same labels and patterns. No localization
+  changes were made. Its single-file scan of the host-side transaction smoke
+  also reports test-only `package.preload` use and an over-threshold estimate;
+  the baseline test already exceeded that threshold.
+- Use `git diff --check` after edits and inspect the final facade-to-adapter call
+  path, not only isolated smoke tests.
+- A clean archive of baseline `HEAD` (`a0bde193`) passes `tests/run_tests.py`
+  712/712; the current worktree passes 717/717. Scoped `pz_verify` reports zero
+  Kahlua issues and zero over-threshold Inventory files.
+- The shared performance-diagnostics facade remains above the general token
+  threshold: its clean-HEAD estimate is 10,570 tokens and the current estimate is
+  10,382. Extracting Inventory audit formatting reduced that facade and put the
+  bounded logger in a child module below the threshold; a broader diagnostics
+  split remains cross-system maintenance work.
+- The architecture scan still flags the shared diagnostics facade as a large
+  module at 1,007 code lines, down from 1,025 at baseline. The Inventory-specific
+  formatter is isolated; the remaining cross-system responsibilities are outside
+  this Inventory migration slice.
+  The latest available `console.txt` was modified at 2026-09-19 00:23 +08:00,
+  before this verification pass. Searches found no `PNC_Inventory` or
+  `inventory_audit` entries; its recent general errors and warnings are engine,
+  map, translation, or unrelated initialization messages. A live multiplayer
+  session was not available for this verification pass.
+
+### Performance and memory constraints
+
+- Preserve identity-seeded compact templates, indexed item/container lookups,
+  bounded portable-state fields, and capped runtime operation logs. Do not retain
+  Java/Lua engine objects in serialized data or long-lived audit records.
+- Inventory audit is disabled by default and retains no event history. When
+  enabled, the logger caps event names at 64 bytes, accepts at most 16
+  fields of 256 bytes each, strips control characters, and renders
+  non-primitive values as type labels without calling arbitrary stringifiers.
+- Authoritative transfer, action, and semantic-transfer results include the
+  normalized route and selection, NPC/request/item identifiers, authority
+  decision, adapter result, failure reason, and inventory revisions before and
+  after the request. These fields are constructed only while the audit is on.
+- Keep deterministic local classification and item selection ahead of optional
+  external services. The semantic inventory path must remain server-bounded and
+  must not require an LLM or network lookup for ordinary filtering.
+- Source inspection found that `refreshInventory(false)` runs from every
+  `prerender` and rebuilds player rows to compute its change signature before its
+  early return. A changed signature now reuses those rows when the selected native
+  container is still the same; it rebuilds after the fresh container list only
+  when that native container changed. The per-frame row scan remains because it
+  detects stack, favorite, equipped, and item-state changes even when item counts
+  and NPC revisions stay the same. Profile an open window with representative
+  container sizes before changing that invalidation contract further.
+
+### Risks, rollback, and acceptance
+
+Primary risks are require order, template/save compatibility, stale client state,
+and partial failure while transferring native items. Keep each structural change
+small enough to roll back by restoring the prior `require` target while leaving
+the public facade and persisted payload contract intact. Do not roll back or
+overwrite unrelated worktree changes.
+
+Automated acceptance requires the baseline and current smoke suites to pass, no
+new Inventory Kahlua findings or over-threshold files, and clean diff checks.
+Release acceptance also requires loading an existing save, checking generated
+and reloaded equipment, exercising a live server with two clients, and observing
+the stale-revision rejection and resync behavior described below.
+
+#### Manual server and two-client gate
+
+On the server, enable the bounded audit and inject a missing item ID into a
+record's compact inventory, then hydrate it again to exercise normalization:
+
+```lua
+PNC.PerformanceScalingDiagnostics.SetInventoryAuditEnabled(true)
+local record = PNC.Registry.Get("<npcId>")
+local inv = PNC.Inventory.EnsureRecordInventory(record)
+table.insert(inv.containers.root.items, "inventory_audit_probe_missing")
+PNC.Inventory.EnsureRecordInventory(record)
+PNC.API.DebugCommand("<npcId>", "set_equipment_slot", {
+    slotKind = "worn", slotName = "Torso1",
+    fullType = "Base.Tshirt_DefaultTEXTURE_TINT",
+})
+```
+
+With two clients, have client A retain revision N, let client B commit a valid
+inventory action at N+1, then submit an action from A using N. To preserve the
+old revision even after A receives B's update, run this on client A before B's
+commit:
+
+```lua
+local npcId = "<npcId>"
+local itemID = "<existing item ID>"
+local cached = PNC.Network.ClientState.characterPayloads[npcId]
+PNC.__inventoryAuditProbe = {
+    id = npcId,
+    itemID = itemID,
+    revision = cached.inventory.summary.revision,
+}
+```
+
+After client B commits, run this on client A:
+
+```lua
+local probe = PNC.__inventoryAuditProbe
+PNC.Client.SendInventoryAction({
+    id = probe.id,
+    actionID = "equip_primary",
+    itemID = probe.itemID,
+    inventoryRevision = probe.revision,
+})
+PNC.__inventoryAuditProbe = nil
+```
+
+Confirm that the server rejects the stale action and sends the current
+inventory state to A. Disable the audit after collecting the output. Expected
+signatures are:
+
+```text
+inventory_audit event=enabled
+inventory_audit event=record_hydrated ... membership_changed=true ... dirty_reason=inventory_structure_normalized
+inventory_audit event=equipment_sync ... reason=debug_equipment_slot result=complete ... revision_before=... revision_after=...
+[PNC][INVENTORY] revision conflict ... expected=N current=N+1 ...
+inventory_audit event=server_action stage=stale_revision ... route=action:equip_primary ... authority=allowed ... adapter_result=not_run result=false reason=revision_conflict ... revision_expected=N revision_before=N+1 revision_after=N+1
+```

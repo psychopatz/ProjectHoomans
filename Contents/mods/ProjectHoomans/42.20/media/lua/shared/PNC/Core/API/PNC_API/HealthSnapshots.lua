@@ -133,3 +133,51 @@ function API.GetCharacterPayload(npcId)
     return nil
 end
 
+function API.GetCharacterInventoryPayload(npcId)
+    local record = Registry.Get(npcId)
+    local networkState = PNC.Network and PNC.Network.ClientState or nil
+    local cached = networkState and networkState.characterPayloads
+        and networkState.characterPayloads[tostring(npcId)] or nil
+    local cachedInventory = cached and cached.inventory or nil
+    local inventoryPayload
+    if cached and cached.inventoryFull == true
+        and type(cachedInventory) == "table"
+    then
+        local liveInventory = record and record.inventory or nil
+        local cachedRevision = tonumber(cachedInventory.revision
+            or cachedInventory.summary
+            and cachedInventory.summary.revision)
+        local liveRevision = type(liveInventory) == "table"
+            and tonumber(liveInventory.revision) or nil
+        if not record or liveRevision ~= nil
+            and cachedRevision == liveRevision
+        then
+            return {
+                npcId = tostring(record and record.id or npcId),
+                revision = record and record.presenceRevision
+                    or cached.revision,
+                inventory = cachedInventory,
+                inventoryFull = true,
+            }
+        end
+    end
+    if record and Inventory and Inventory.BuildFullPayload then
+        inventoryPayload = Inventory.BuildFullPayload(record)
+        if not inventoryPayload then return nil end
+        return {
+            npcId = tostring(record.id or npcId),
+            revision = record.presenceRevision,
+            inventory = inventoryPayload,
+            inventoryFull = true,
+        }
+    end
+    if cached and cached.inventory and cached.inventoryFull == true then
+        return {
+            npcId = tostring(npcId),
+            revision = cached.revision,
+            inventory = cached.inventory,
+            inventoryFull = true,
+        }
+    end
+    return nil
+end

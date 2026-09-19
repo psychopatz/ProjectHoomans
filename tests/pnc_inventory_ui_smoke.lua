@@ -616,32 +616,127 @@ T.equal(window.selectedPlayerContainer, "root", "container wheel cycles forward"
 window:cycleContainer("player", -1)
 T.equal(window.selectedPlayerContainer, "bag_1", "container wheel cycles backward")
 
-local listSource = T.read(
-    "ProjectHoomans", "client", "PNC/UI/Inventory/PNC_InventoryUI_List.lua"
+local listAppearanceSource = T.read(
+    "ProjectHoomans", "client",
+    "PNC/UI/Inventory/PNC_InventoryUI_List/_Appearance.lua"
 )
-T.truthy(string.find(listSource, "media/ui/icon.png", 1, true),
+local listLifecycleSource = T.read(
+    "ProjectHoomans", "client",
+    "PNC/UI/Inventory/PNC_InventoryUI_List/_Lifecycle.lua"
+)
+T.truthy(string.find(listLifecycleSource, "media/ui/icon.png", 1, true),
     "vanilla equipped circle texture missing")
 T.truthy(string.find(
-    listSource, "media/ui/inventoryPanes/FavouriteYes.png", 1, true
+    listLifecycleSource, "media/ui/inventoryPanes/FavouriteYes.png", 1, true
 ),
     "vanilla favorite star texture missing")
 T.truthy(string.find(
-    listSource,
+    listLifecycleSource,
     "media/ui/inventoryPanes/Button_TreeCollapsed.png",
     1,
     true
 ), "vanilla collapsed-group texture missing")
-T.truthy(string.find(listSource, "row.restricted", 1, true),
+T.truthy(string.find(listAppearanceSource, "row.restricted", 1, true),
     "off-limits row dimming missing")
-T.truthy(string.find(listSource, "setContentOpacity", 1, true),
+T.truthy(string.find(listLifecycleSource, "setContentOpacity", 1, true),
     "inventory item list has no shared content-opacity hook")
-local windowSource = T.read(
-    "ProjectHoomans", "client", "PNC/UI/Inventory/PNC_InventoryWindow.lua"
+local windowLayoutSource = T.read(
+    "ProjectHoomans", "client",
+    "PNC/UI/Inventory/InventoryWindow/_Layout.lua"
 )
-T.truthy(string.find(windowSource, "RegisterTarget", 1, true),
+local windowLifecycleSource = T.read(
+    "ProjectHoomans", "client",
+    "PNC/UI/Inventory/InventoryWindow/_Lifecycle.lua"
+)
+T.truthy(string.find(windowLifecycleSource, "RegisterTarget", 1, true),
     "inventory window is not registered for live opacity updates")
-T.truthy(string.find(windowSource, "GetContentOpacitySignature", 1, true),
+T.truthy(string.find(windowLayoutSource, "GetContentOpacitySignature", 1, true),
     "inventory window does not track shared opacity changes")
+
+local originalBuildPlayerRows = PNC.InventoryUIModel.BuildPlayerRows
+local buildPlayerRowsCalls = 0
+PNC.InventoryUIModel.BuildPlayerRows = function(...)
+    buildPlayerRowsCalls = buildPlayerRowsCalls + 1
+    return originalBuildPlayerRows(...)
+end
+local originalPlayerBagFavorite = playerBag.isFavorite
+local playerBagFavorite = true
+playerBag.isFavorite = function() return playerBagFavorite end
+local function refreshList()
+    return {
+        items = {},
+        clear = function(self) self.items = {} end,
+        addItem = function(self, label, item)
+            local row = { text = label, item = item }
+            self.items[#self.items + 1] = row
+            return row
+        end,
+    }
+end
+local refreshRevision = 1
+local originalGetSpecificPlayer = getSpecificPlayer
+getSpecificPlayer = function(index)
+    T.equal(index, 0, "inventory refresh selects the local player")
+    return player
+end
+local refreshEndpoint = {
+    kind = "local_draft",
+    id = "draft_1",
+    displayName = "Draft NPC",
+    revision = function() return refreshRevision end,
+    containers = function() return { { id = "root", label = "Inventory" } } end,
+    rows = function() return {} end,
+}
+local originalPlayerGetInventory = player.getInventory
+local refreshWindow = setmetatable({
+    npcId = "npc_1",
+    transferEndpoint = refreshEndpoint,
+    selectedNPCContainer = "root",
+    selectedPlayerContainer = "root",
+    playerContainers = playerContainers,
+    expandedPlayerGroups = {},
+    playerList = refreshList(),
+    npcList = refreshList(),
+    playerContainerList = refreshList(),
+    npcContainerList = refreshList(),
+    contextSignature = nil,
+    inventory = function() return {} end,
+    updateInventoryRefreshButton = function() end,
+    payload = function() return { snapshot = { id = "npc_1" } } end,
+    setTitle = function(self, value) self.title = value end,
+}, { __index = ISPNCInventoryWindow })
+ISPNCInventoryWindow.refreshInventory(refreshWindow, false)
+T.equal(buildPlayerRowsCalls, 1,
+    "stable player container rows were rebuilt after the refresh signature")
+playerBagFavorite = false
+ISPNCInventoryWindow.refreshInventory(refreshWindow, false)
+T.equal(buildPlayerRowsCalls, 2,
+    "favorite state changes remain visible without a revision change")
+local refreshedBagRow
+for _, entry in ipairs(refreshWindow.playerList.items) do
+    if entry.item.id == "42" then refreshedBagRow = entry.item end
+end
+T.equal(refreshedBagRow.favorite, false,
+    "favorite state change was not rendered from the current row snapshot")
+refreshRevision = 2
+ISPNCInventoryWindow.refreshInventory(refreshWindow, false)
+T.equal(buildPlayerRowsCalls, 3,
+    "revision refresh reused the rows already built for its signature")
+local replacementRootItems = { wornShirt }
+local replacementRoot = {
+    getItems = function() return javaList(replacementRootItems) end,
+    getCapacityWeight = function() return 2 end,
+}
+player.getInventory = function() return replacementRoot end
+ISPNCInventoryWindow.refreshInventory(refreshWindow, true)
+T.equal(buildPlayerRowsCalls, 5,
+    "refresh rebuilt rows when the selected native container changed")
+T.equal(refreshWindow.playerList.items[1].item.id, "43",
+    "refresh rendered rows from the replacement native container")
+player.getInventory = originalPlayerGetInventory
+playerBag.isFavorite = originalPlayerBagFavorite
+getSpecificPlayer = originalGetSpecificPlayer
+PNC.InventoryUIModel.BuildPlayerRows = originalBuildPlayerRows
 
 local modalSource = T.read(
     "ProjectHoomans", "client", "PNC/UI/Inventory/PNC_InventoryQuantityModal.lua"

@@ -16,6 +16,7 @@ local Registry = PNC.Registry
 local Network = PNC.Network
 local Inventory = PNC.Inventory
 local checkRevision = Internal.checkRevision
+local auditInventoryRequest = Internal.auditInventoryRequest
 local transferNPCToPlayer = Internal.transferNPCToPlayer
 
 local function authorize(player, record, token)
@@ -41,6 +42,13 @@ function Service.SemanticTransferNPCToPlayer(player, record, args)
     local revisionDetails
     local success
     if args.direction ~= "npc_to_player" then
+        if auditInventoryRequest then
+            auditInventoryRequest(
+                "server_semantic_transfer", "rejected", record, args,
+                "not_checked", "semantic_direction_invalid", "not_run",
+                false, "semantic_direction_invalid"
+            )
+        end
         return false, "semantic_direction_invalid"
     end
 
@@ -49,12 +57,28 @@ function Service.SemanticTransferNPCToPlayer(player, record, args)
         record,
         args.conversationToken or args.token
     )
-    if authorized ~= true then return false, reason end
+    local authorityReason = reason
+    if authorized ~= true then
+        if auditInventoryRequest then
+            auditInventoryRequest(
+                "server_semantic_transfer", "rejected", record, args,
+                "denied", authorityReason, "not_run", false, reason
+            )
+        end
+        return false, reason
+    end
 
     revisionOK, sinceRevision, revisionDetails = checkRevision(record, args)
     if not revisionOK then
         if Network and Network.SendCharacterPayload then
             Network.SendCharacterPayload(player, record)
+        end
+        if auditInventoryRequest then
+            auditInventoryRequest(
+                "server_semantic_transfer", "stale_revision", record, args,
+                "allowed", authorityReason, "not_run", false, sinceRevision,
+                revisionDetails and revisionDetails.currentInventoryRevision
+            )
         end
         return false, sinceRevision, revisionDetails
     end
@@ -62,6 +86,20 @@ function Service.SemanticTransferNPCToPlayer(player, record, args)
     args.playerContainer = args.playerContainer or "root"
     success, reason = transferNPCToPlayer(
         player, record, args, sinceRevision)
+    if auditInventoryRequest then
+        auditInventoryRequest(
+            "server_semantic_transfer",
+            success == true and "completed" or "rejected",
+            record,
+            args,
+            "allowed",
+            authorityReason,
+            success == true and "committed" or "failed",
+            success == true,
+            reason,
+            sinceRevision
+        )
+    end
     return success == true, reason
 end
 

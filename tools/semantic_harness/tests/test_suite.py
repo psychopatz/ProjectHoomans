@@ -5,6 +5,7 @@ from __future__ import annotations
 import sys
 import tempfile
 import textwrap
+import time
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 import unittest
@@ -92,7 +93,52 @@ class BoundedLuaSuiteTests(unittest.TestCase):
         self.assertEqual(len(report["results"]), 2)
         self.assertGreaterEqual(len(report["events"]), 4)
 
+    def test_fail_fast_terminates_other_active_processes(self) -> None:
+        with tempfile.TemporaryDirectory() as directory_name:
+            directory = Path(directory_name)
+            started = directory / "slow-started"
+            slow = self.make_script(
+                directory,
+                "slow.lua",
+                f"""
+                from pathlib import Path
+                import time
+                Path({str(started)!r}).write_text("started")
+                time.sleep(4.0)
+                """,
+            )
+            failure = self.make_script(
+                directory,
+                "failure.lua",
+                f"""
+                from pathlib import Path
+                import time
+                started = Path({str(started)!r})
+                deadline = time.monotonic() + 2.0
+                while not started.exists() and time.monotonic() < deadline:
+                    time.sleep(0.01)
+                raise SystemExit(1)
+                """,
+            )
+
+            before = time.monotonic()
+            results, report = run_lua_suite(
+                [failure, slow],
+                root=directory,
+                environment={},
+                executable=sys.executable,
+                timeout=5.0,
+                jobs=2,
+                fail_fast=True,
+            )
+            elapsed = time.monotonic() - before
+            slow_process_started = started.exists()
+
+        self.assertTrue(slow_process_started)
+        self.assertLess(elapsed, 2.0)
+        self.assertTrue(any(result.returncode != 0 for result in results))
+        self.assertFalse(report["ok"])
+
 
 if __name__ == "__main__":
     unittest.main()
-

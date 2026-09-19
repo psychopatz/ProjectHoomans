@@ -15,6 +15,7 @@ local ItemTransfer = Internal.ItemTransfer
 local canManage = Internal.canManage
 local notify = Internal.notify
 local checkRevision = Internal.checkRevision
+local auditInventoryRequest = Internal.auditInventoryRequest
 local compactContainerHasItems = Internal.compactContainerHasItems
 local portableCompactItemState = Internal.portableCompactItemState
 local refreshLiveEquipment = Internal.refreshLiveEquipment
@@ -60,26 +61,73 @@ function Service.Action(player, args)
     args = args or {}
     local record = args.id and Registry.Get(tostring(args.id)) or nil
     local allowed, reason = canManage(player, record)
-    if not allowed then return notify(player, false, reason, args) end
+    local authorityReason = reason
+    if not allowed then
+        local failed, failedReason, payload = notify(
+            player, false, reason, args
+        )
+        if auditInventoryRequest then
+            auditInventoryRequest(
+                "server_action", "rejected", record, args,
+                "denied", authorityReason, "not_run", failed, failedReason
+            )
+        end
+        return failed, failedReason, payload
+    end
     local revisionOK, sinceRevision, revisionDetails = checkRevision(record, args)
     if not revisionOK then
         if Network and Network.SendCharacterPayload then
             Network.SendCharacterPayload(player, record)
         end
-        return notify(player, false, sinceRevision, args, revisionDetails)
+        local failed, failedReason, payload = notify(
+            player, false, sinceRevision, args, revisionDetails
+        )
+        if auditInventoryRequest then
+            auditInventoryRequest(
+                "server_action", "stale_revision", record, args,
+                "allowed", authorityReason, "not_run", failed,
+                failedReason,
+                revisionDetails and revisionDetails.currentInventoryRevision
+            )
+        end
+        return failed, failedReason, payload
     end
     local inv = Inventory.EnsureRecordInventory(record, {
         reconcileWaterContainer = false,
     })
     local item = inv.items[tostring(args.itemID or "")]
-    if not item then return notify(player, false, "item_not_found", args) end
+    if not item then
+        local failed, failedReason, payload = notify(
+            player, false, "item_not_found", args
+        )
+        if auditInventoryRequest then
+            auditInventoryRequest(
+                "server_action", "rejected", record, args,
+                "allowed", authorityReason, "not_run", failed, failedReason,
+                sinceRevision
+            )
+        end
+        return failed, failedReason, payload
+    end
     if item.interactionLocked == true then
-        return notify(player, false, "item_off_limits", args)
+        local failed, failedReason, payload = notify(
+            player, false, "item_off_limits", args
+        )
+        if auditInventoryRequest then
+            auditInventoryRequest(
+                "server_action", "rejected", record, args,
+                "allowed", authorityReason, "not_run", failed, failedReason,
+                sinceRevision
+            )
+        end
+        return failed, failedReason, payload
     end
 
     local success
+    local adapterResult
     if tostring(args.actionID or "") == "drop" then
         success, reason = dropItem(player, record, item, sinceRevision)
+        adapterResult = success == true and "committed" or "failed"
     else
         local definition = Actions.Get and Actions.Get(args.actionID) or nil
         success, reason = Actions.Execute(
@@ -89,6 +137,7 @@ function Service.Action(player, args)
             item.id,
             args
         )
+        adapterResult = success == true and "committed" or "failed"
         if success then
             if not definition or definition.refreshEquipment ~= false then
                 refreshLiveEquipment(record)
@@ -96,5 +145,22 @@ function Service.Action(player, args)
             syncResult(player, record, sinceRevision)
         end
     end
-    return notify(player, success, reason, args)
+    local resultSuccess, resultReason, payload = notify(
+        player, success, reason, args
+    )
+    if auditInventoryRequest then
+        auditInventoryRequest(
+            "server_action",
+            resultSuccess and "completed" or "rejected",
+            record,
+            args,
+            "allowed",
+            authorityReason,
+            adapterResult,
+            resultSuccess,
+            resultReason,
+            sinceRevision
+        )
+    end
+    return resultSuccess, resultReason, payload
 end

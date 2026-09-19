@@ -10,6 +10,34 @@ session backend. Worker requests use a bounded, versioned JSON-lines protocol
 with request IDs, a startup handshake, a single serialized request queue,
 timeouts, crash detection, and bounded stderr diagnostics.
 
+## Module boundaries
+
+- `app.py` is the stable module and direct-script entry point. It routes doctor,
+  CLI, and GUI startup without importing Tk for headless use.
+- `cli.py` owns argument parsing, replay, interactive input, and JSONL output.
+- `gui.py` owns the asynchronous Tk conversation and future polling.
+- `worker_session.py` serializes worker startup, requests, status reads, and
+  cleanup outside the Tk view.
+- `settings_dialog.py` owns the runtime settings form and converts its draft
+  into a validated scenario before the live worker is configured.
+- `scenario.py` owns the editable scenario document; `worker.py` owns the
+  session adapter; `process.py` and `protocol.py` own child-process lifecycle
+  and the versioned JSON-lines contract.
+- `runner.py` owns case replay and its streaming conflict ledger; `suite.py`
+  owns isolated Lua smoke-test subprocesses. `rendering.py` and `transcript.py`
+  provide shared JSON presentation and bounded visible conversation history.
+
+Python owns the editable scenario and child-process lifecycle. The isolated Lua
+worker owns only its current in-memory production-module state. Native action
+and network boundaries remain mocked by the harness.
+
+The GUI keeps at most 200 transcript entries, 200,000 characters total, and
+8,192 characters per entry. Interactive `--audit` retains at most 4,096 event
+IDs (256 characters each) and 256 conflict records; an `audit_truncated`
+record marks an incomplete audit so a cap cannot look like a clean result.
+`--fail-fast` cancels queued smoke tests and terminates other active test
+processes.
+
 The repository Lua smoke runner also uses the bounded suite adapter by default.
 It keeps one Lua process per test, caps captured output, records process
 lifecycles and PIDs, reports timeouts, and detects concurrent duplicate test
@@ -124,13 +152,16 @@ tools/semantic_harness/run_harness.sh --test pnc_semantic
 ## Testing
 
 ```bash
-python3 -m unittest tools.semantic_harness.tests.test_harness -v
+python3 -m unittest discover -s tools/semantic_harness/tests -v
+tools/semantic_harness/run_harness.sh --test pnc_semantic
 ```
 
-The tests cover real production semantic modules, authoritative character
-identity, false names, pronoun/self-directed language, trait-aware responses,
-editable inventory queries, gift transfer effects, JSON request correlation,
-concurrent caller serialization, and worker timeout termination.
+The tests cover entry-point routing, headless CLI imports, settings validation,
+bounded transcript and conflict history, fail-fast process termination, real
+production semantic modules, authoritative character identity, false names,
+pronoun/self-directed language, trait-aware responses, editable inventory
+queries, gift transfer effects, JSON request correlation, concurrent caller
+serialization, and worker timeout termination.
 
 The worker intentionally loads a narrow semantic dependency closure rather
 than the complete Project Zomboid composition root. This keeps failures

@@ -10,19 +10,18 @@ local Inventory = PNC.Inventory
 local Internal = Inventory.Internal
 local Core = PNC.Core
 
-function Inventory.BuildSummaryPayload(record)
+local function buildSummaryPayload(record, inv)
     local raw = record and record.persistedInventory or nil
     local persistedSummary = raw and (raw.summary or raw.inventorySummary) or nil
     local persistedBaseline = raw and raw[4] or nil
     local persistedGenerator = raw and raw.template and tonumber(raw.template.generatorVersion) or nil
     local currentGenerator = PNC.Const and tonumber(PNC.Const.GENERATOR_VERSION) or 1
-    local inv
     local summary
     local templateRef = record and record.inventoryTemplateRef or nil
     if not templateRef and type(persistedBaseline) == "table" then
         templateRef = persistedBaseline.templateRef
     end
-    if type(record and record.inventory) ~= "table"
+    if not inv and type(record and record.inventory) ~= "table"
         and type(persistedSummary) == "table"
         and persistedGenerator == currentGenerator
     then
@@ -30,11 +29,11 @@ function Inventory.BuildSummaryPayload(record)
         summary.templateRef = summary.templateRef or templateRef
         return summary
     end
-    inv = Inventory.EnsureRecordInventory(record)
+    inv = inv or Inventory.EnsureRecordInventory(record)
     if not inv then
         return nil
     end
-    local encumbrance = Inventory.GetEncumbranceState(record)
+    local encumbrance = Inventory.GetEncumbranceState(record, inv)
     return {
         revision = inv.revision,
         usedWeight = tonumber(inv.cachedWeight) or 0,
@@ -48,6 +47,10 @@ function Inventory.BuildSummaryPayload(record)
         persistenceMode = inv.persistenceMode,
         templateRef = inv.template and inv.template.templateRef or templateRef,
     }
+end
+
+function Inventory.BuildSummaryPayload(record)
+    return buildSummaryPayload(record)
 end
 
 function Inventory.BuildFullPayload(record)
@@ -76,7 +79,7 @@ function Inventory.BuildFullPayload(record)
         revision = inv.revision,
         persistenceMode = inv.persistenceMode,
         template = Core.DeepCopy(inv.template or {}),
-        summary = Inventory.BuildSummaryPayload(record),
+        summary = buildSummaryPayload(record, inv),
         equipped = Core.DeepCopy(inv.equipped or {}),
         worn = Core.DeepCopy(inv.worn or {}),
         attached = Core.DeepCopy(inv.attached or {}),

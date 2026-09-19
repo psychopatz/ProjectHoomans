@@ -3,11 +3,13 @@ PNC = PNC or {}
 PNC.Inventory = PNC.Inventory or {}
 
 local Inventory = PNC.Inventory
-local Internal = Inventory.Internal
+local Internal = Inventory.Internal or {}
+Inventory.Internal = Internal
 local CoreInventory = require "PsychopatzCore/Inventory/PsychopatzInventory"
 local C = require "PsychopatzCore/Inventory/PsychopatzInventoryConstants"
 local Util = require "PsychopatzCore/Inventory/PsychopatzInventoryUtil"
 local StateCodec = require "PNC/Core/Inventory/PNC_Inventory/Persistence/PNC_Inventory_CoreStateCodec"
+local PhysicalAdapter = require "PNC/Core/Inventory/PNC_Inventory/Persistence/PNC_Inventory_CorePhysicalAdapter"
 
 local Bridge = {}
 local NPC_SCHEMA = 1
@@ -62,7 +64,14 @@ function Bridge.deserialize(record, payload)
     if type(payload) ~= "table" or tonumber(payload[1]) ~= NPC_SCHEMA then
         return nil, "npc_inventory_schema_mismatch"
     end
-    local store, reason = CoreInventory.Serializer.deserialize(payload[2])
+    -- Core's serializer validates records, but malformed nested save payloads
+    -- can still raise while it walks the record list. Catch that before this
+    -- bridge assigns a new inventory to the NPC record.
+    local ok, store, reason = pcall(
+        CoreInventory.Serializer.deserialize,
+        payload[2]
+    )
+    if not ok then return nil, "npc_inventory_core_deserialize_failed" end
     if not store then return nil, reason end
     local inv = Internal.createBaseInventory(record)
     inv.revision = store.revision
@@ -71,7 +80,6 @@ function Bridge.deserialize(record, payload)
     inv.rootMaxWeight = type(payload[4]) == "table" and tonumber(payload[4][2]) or inv.rootMaxWeight
     inv.coreStore = store
     inv.coreMetadata = Util.copy(payload[3])
-    record.inventory = inv
     for i = 1, #store.records do
         local coreRecord = store.records[i]
         local fullType = CoreInventory.getItemFullType(coreRecord[C.TYPE_ID])
@@ -81,111 +89,27 @@ function Bridge.deserialize(record, payload)
         local assigned = 0
         for j = 1, #bucket do
             local meta = bucket[j]
-            local spec = StateCodec.readState(coreRecord)
+            local spec, stateReason = StateCodec.readValidatedState(coreRecord)
+            if not spec then return nil, stateReason end
             StateCodec.applyMetadata(spec, meta, fullType)
             assigned = assigned + math.max(1, math.floor(tonumber(spec.stack) or 1))
             if not Internal.createItem(record, inv, spec) then return nil, "npc_item_create_failed" end
         end
         if assigned ~= coreRecord[C.QUANTITY] then return nil, "npc_inventory_quantity_mismatch" end
     end
+    record.inventory = inv
     Inventory.SyncEquipmentFromInventory(record)
     Inventory.RebuildCaches(record)
     Internal.refreshNextItemSerial(record, inv)
     return inv
 end
 
-local function isLooseMeta(meta)
-    return meta[10] == nil and meta[11] == nil and meta[12] == nil
-end
-
 function Bridge.materializeLoose(record, body)
-    local inv = Inventory.EnsureRecordInventory(record)
-    local container = body and body.getInventory and body:getInventory() or nil
-    if not inv or not container then return false, "physical_inventory_unavailable" end
-    local store, meta = Bridge.refreshCanonical(record, inv)
-    local physical = CoreInventory.wrapPhysicalInventory(container)
-    for i = 1, #store.records do
-        local bucket = meta[i] or {}
-        for j = 1, #bucket do
-            if isLooseMeta(bucket[j]) then
-                local materialized = CoreInventory.ItemRecord.clone(store.records[i], bucket[j][2])
-                local ok, reason = physical:add(materialized)
-                if not ok then return false, reason end
-            end
-        end
-    end
-    return true
-end
-
-local function collectPresentationItems(body)
-    local excluded = {}
-    local item
-    if not body then return excluded end
-    item = body.getPrimaryHandItem and body:getPrimaryHandItem() or nil
-    if item then excluded[item] = true end
-    item = body.getSecondaryHandItem and body:getSecondaryHandItem() or nil
-    if item then excluded[item] = true end
-    local worn = body.getWornItems and body:getWornItems() or nil
-    if worn and worn.size and worn.get then
-        for i = 0, worn:size() - 1 do
-            local entry = worn:get(i)
-            item = entry and entry.getItem and entry:getItem() or nil
-            if item then excluded[item] = true end
-        end
-    end
-    return excluded
+    return PhysicalAdapter.materializeLoose(record, body, Bridge)
 end
 
 function Bridge.captureLoose(record, body)
-    local inv = Inventory.EnsureRecordInventory(record)
-    local container = body and body.getInventory and body:getInventory() or nil
-    if not inv or not container then return false, "physical_inventory_unavailable" end
-    -- Encode the complete physical snapshot before mutating the persistent
-    -- model.  A codec failure must leave the previous NPC inventory intact.
-    local capturedSpecs = {}
-    local excluded = collectPresentationItems(body)
-    local physical = CoreInventory.wrapPhysicalInventory(container)
-    local iterator = physical:iterate()
-    while true do
-        local nativeItem = iterator()
-        if not nativeItem then break end
-        if not excluded[nativeItem] then
-            local encoded, reason = CoreInventory.encodeItem(nativeItem, 1)
-            if not encoded then return false, reason end
-            local fullType = CoreInventory.getItemFullType(encoded[C.TYPE_ID])
-            if not fullType then return false, "npc_item_type_unavailable" end
-            local spec = StateCodec.readState(encoded)
-            spec.type, spec.container = fullType, "root"
-            spec.origin = "world"
-            capturedSpecs[#capturedSpecs + 1] = spec
-        end
-    end
-
-    local removeIds = {}
-    for itemId, item in pairs(inv.items or {}) do
-        if not item.wornSlot and not item.attachedSlot and not item.equipSlot then
-            removeIds[#removeIds + 1] = itemId
-        end
-    end
-    table.sort(removeIds)
-    local ops = {}
-    for i = 1, #removeIds do
-        ops[#ops + 1] = { op = "remove", itemID = removeIds[i] }
-    end
-    for i = 1, #capturedSpecs do
-        ops[#ops + 1] = { op = "add", item = capturedSpecs[i] }
-    end
-    if #ops > 0 then
-        local applied, appliedOps = Inventory.ApplyDelta(
-            record, ops, "physical_inventory_capture")
-        if not applied or #appliedOps ~= #ops then
-            return false, "npc_item_capture_failed"
-        end
-    else
-        Inventory.SyncEquipmentFromInventory(record)
-        Inventory.RebuildCaches(record)
-    end
-    return true
+    return PhysicalAdapter.captureLoose(record, body)
 end
 
 function Inventory.MaterializeLooseInventory(record, body)
@@ -196,28 +120,7 @@ end
 -- regular materializeLoose path is intentionally a snapshot operation and
 -- would duplicate other loose items if it were used for a single transfer.
 function Bridge.materializeItem(record, body, itemID)
-    local inv = Inventory.EnsureRecordInventory(record)
-    local item = inv and inv.items and inv.items[tostring(itemID or "")] or nil
-    local container = body and body.getInventory and body:getInventory() or nil
-    local encoded
-    local physical
-    local addOK
-    local addedItems
-    local reason
-    if not item or not container then
-        return false, "physical_inventory_unavailable"
-    end
-    encoded, reason = CoreInventory.encodeItem(
-        StateCodec.pseudoItem(item), 1)
-    if not encoded then return false, reason or "item_encode_failed" end
-    physical, reason = CoreInventory.wrapPhysicalInventory(container)
-    if not physical then return false, reason end
-    addOK, addedItems = physical:add(encoded)
-    if not addOK then return false, addedItems or "physical_add_failed" end
-    local addedItem = addedItems and addedItems[1]
-    return true, "materialized", function()
-        if addedItem then physical:_nativeRemove(addedItem) end
-    end
+    return PhysicalAdapter.materializeItem(record, body, itemID)
 end
 
 function Inventory.MaterializeItem(record, body, itemID)

@@ -6,28 +6,103 @@ PNC.Inventory = PNC.Inventory or {}
 local Internal = PNC.Inventory.Internal
 
 function Internal.ensureContainer(inv, containerID, maxWeight)
-    inv.containers = inv.containers or {}
-    inv.containers[containerID] = inv.containers[containerID] or {
-        maxWeight = tonumber(maxWeight) or 0,
-        items = {},
-    }
-    inv.containers[containerID].maxWeight = tonumber(inv.containers[containerID].maxWeight)
+    if type(inv.containers) ~= "table" then inv.containers = {} end
+    local container = inv.containers[containerID]
+    if type(container) ~= "table" then
+        container = {
+            maxWeight = tonumber(maxWeight) or 0,
+            items = {},
+        }
+        inv.containers[containerID] = container
+    end
+    container.maxWeight = tonumber(container.maxWeight)
         or tonumber(maxWeight)
         or 0
-    inv.containers[containerID].items = type(inv.containers[containerID].items) == "table"
-        and inv.containers[containerID].items
+    container.items = type(container.items) == "table"
+        and container.items
         or {}
-    return inv.containers[containerID]
+    return container
+end
+
+function Internal.rebuildContainerMembership(inv)
+    local changed = false
+    local previousMembership = {}
+    local item
+    local itemID
+    local retainedItems
+    local visited
+    if type(inv) ~= "table" then return false end
+    if type(inv.containers) ~= "table" then
+        inv.containers = {}
+        changed = true
+    end
+    for containerID, container in pairs(inv.containers) do
+        if type(container) ~= "table" then
+            inv.containers[containerID] = {
+                maxWeight = 0,
+                items = {},
+            }
+            changed = true
+        else
+            if type(container.items) ~= "table" then
+                changed = true
+                container.items = {}
+            else
+                retainedItems = {}
+                visited = 0
+                for _, itemID in ipairs(container.items) do
+                    visited = visited + 1
+                    item = type(inv.items) == "table"
+                        and inv.items[itemID] or nil
+                    if not item
+                        or item.container ~= containerID
+                        or previousMembership[itemID]
+                    then
+                        changed = true
+                    else
+                        previousMembership[itemID] = true
+                        retainedItems[#retainedItems + 1] = itemID
+                    end
+                end
+                if visited ~= Internal.countMapEntries(container.items) then
+                    changed = true
+                end
+                container.items = retainedItems
+            end
+        end
+    end
+    Internal.ensureContainer(inv, "root", inv.rootMaxWeight)
+    for itemID, item in pairs(type(inv.items) == "table" and inv.items or {}) do
+        if type(item) == "table" then
+            local targetID = Internal.normalizeString(item.container) or "root"
+            if item.container ~= targetID then
+                item.container = targetID
+                changed = true
+            end
+            if not previousMembership[itemID] then
+                changed = true
+                local target = Internal.ensureContainer(inv, targetID,
+                    targetID == "root" and inv.rootMaxWeight or 0)
+                target.items[#target.items + 1] = itemID
+                previousMembership[itemID] = true
+            end
+            if item.bagContainer then
+                Internal.ensureContainer(inv, item.bagContainer,
+                    tonumber(item.maxWeight) or 0)
+            end
+        end
+    end
+    return changed
 end
 
 function Internal.removeItemFromAllContainers(inv, itemID)
     local container
     local i
-    if not inv or not inv.containers then
+    if type(inv) ~= "table" or type(inv.containers) ~= "table" then
         return
     end
     for _, container in pairs(inv.containers) do
-        if type(container.items) == "table" then
+        if type(container) == "table" and type(container.items) == "table" then
             for i = #container.items, 1, -1 do
                 if container.items[i] == itemID then
                     table.remove(container.items, i)

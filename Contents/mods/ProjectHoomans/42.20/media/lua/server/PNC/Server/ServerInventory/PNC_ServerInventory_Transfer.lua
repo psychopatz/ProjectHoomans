@@ -16,6 +16,7 @@ local checkRevision = Internal.checkRevision
 local transferPlayerToNPC = Internal.transferPlayerToNPC
 local transferNPCToPlayer = Internal.transferNPCToPlayer
 local applyGiftEffect = Internal.applyGiftEffect
+local auditInventoryRequest = Internal.auditInventoryRequest
 
 local MAX_PROCESSED_GIFTS = 32
 
@@ -60,8 +61,17 @@ function Service.Transfer(player, args)
         and processed[requestID]
     then
         local cached = processed[requestID]
-        return notify(player, cached.success, cached.reason, args,
-            cached.details)
+        local success, reason, payload = notify(
+            player, cached.success, cached.reason, args, cached.details
+        )
+        if auditInventoryRequest then
+            auditInventoryRequest(
+                "server_transfer", "replay", record, args,
+                "previously_allowed", "duplicate_request", "cached",
+                success, reason
+            )
+        end
+        return success, reason, payload
     end
     local allowed, reason
     if giftMode then
@@ -69,12 +79,32 @@ function Service.Transfer(player, args)
     else
         allowed, reason = canManage(player, record)
     end
-    if not allowed then return notify(player, false, reason, args) end
+    local authorityReason = reason
+    if not allowed then
+        local failed, failedReason, payload = notify(
+            player, false, reason, args
+        )
+        if auditInventoryRequest then
+            auditInventoryRequest(
+                "server_transfer", "rejected", record, args,
+                "denied", reason, "not_run", failed, failedReason
+            )
+        end
+        return failed, failedReason, payload
+    end
     processed = giftMode and processedGiftCache(lease) or nil
     if processed and requestID ~= "" and processed[requestID] then
         local cached = processed[requestID]
-        return notify(player, cached.success, cached.reason, args,
-            cached.details)
+        local success, cachedReason, payload = notify(
+            player, cached.success, cached.reason, args, cached.details
+        )
+        if auditInventoryRequest then
+            auditInventoryRequest(
+                "server_transfer", "replay", record, args,
+                "allowed", authorityReason, "cached", success, cachedReason
+            )
+        end
+        return success, cachedReason, payload
     end
     local revisionOK, sinceRevision, revisionDetails = checkRevision(record, args)
     if not revisionOK then
@@ -89,6 +119,13 @@ function Service.Transfer(player, args)
                 reason = failedReason,
                 details = revisionDetails,
             })
+        end
+        if auditInventoryRequest then
+            auditInventoryRequest(
+                "server_transfer", "stale_revision", record, args,
+                "allowed", authorityReason, "not_run", failed, failedReason,
+                revisionDetails and revisionDetails.currentInventoryRevision
+            )
         end
         return failed, failedReason, failedPayload
     end
@@ -114,6 +151,24 @@ function Service.Transfer(player, args)
             reason = resultReason,
             details = details,
         })
+    end
+    if auditInventoryRequest then
+        local adapterResult = success == true and "committed"
+            or (args.direction == "player_to_npc"
+                or args.direction == "npc_to_player") and "failed"
+            or "not_run"
+        auditInventoryRequest(
+            "server_transfer",
+            resultSuccess and "completed" or "rejected",
+            record,
+            args,
+            "allowed",
+            authorityReason,
+            adapterResult,
+            resultSuccess,
+            resultReason,
+            sinceRevision
+        )
     end
     return resultSuccess, resultReason, resultPayload
 end

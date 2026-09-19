@@ -1,4 +1,5 @@
 local T = require "tests/support/test"
+T.addPackagePaths()
 
 local definitions = {}
 local logCount = 0

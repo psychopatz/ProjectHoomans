@@ -29,20 +29,17 @@ local function sandboxOptionValue(name)
     local sandboxClass = rawget(_G, "SandboxOptions")
     local options
     local option
-    local ok
     if type(getSandboxOptions) == "function" then
-        ok, options = pcall(getSandboxOptions)
+        options = getSandboxOptions()
     elseif sandboxClass and type(sandboxClass.getInstance) == "function" then
-        ok, options = pcall(sandboxClass.getInstance)
+        options = sandboxClass.getInstance()
     elseif sandboxClass then
         options = sandboxClass.instance
-        ok = options ~= nil
     end
-    if not ok or not options then return nil end
+    if not options then return nil end
     option = options[name]
     if option and type(option.getValue) == "function" then
-        ok, option = pcall(option.getValue, option)
-        return ok and finite(option) or nil
+        return finite(option:getValue())
     end
     return finite(option)
 end
@@ -121,6 +118,8 @@ local function lifecyclePolicy(record, item, profile, options)
     if type(provider) == "function" then
         local ok
         local extension
+        -- This hook may be supplied by another add-on; isolate failures at
+        -- that extension callback boundary so lifecycle updates still run.
         ok, extension = pcall(provider, record, item, profile, options)
         if ok then policy = copyPolicy(policy, extension) end
     end

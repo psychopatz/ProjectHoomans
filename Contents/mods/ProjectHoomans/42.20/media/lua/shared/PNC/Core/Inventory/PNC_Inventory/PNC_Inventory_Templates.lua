@@ -12,6 +12,7 @@ local Core = PNC.Core
 local Archetypes = PNC.Archetypes
 local Identity = PNC.Identity
 local Unique = PNC.UniqueNPCs
+local SupplyBuilder = require "PNC/Core/Inventory/PNC_Inventory/PNC_Inventory_TemplateSupplies"
 
 local function choose(list, seed, salt)
     if type(list) ~= "table" or #list <= 0 then
@@ -45,69 +46,14 @@ local function buildIdentityTemplate(record)
     }
 end
 
-local function createSupplyItems(record, base, supplies, prefix, bagContainerID, archetypeID)
-    local counts = {}
-    local supply
-    local templateKey
-    local i
-    for i = 1, #(supplies or {}) do
-        supply = supplies[i]
-        templateKey = Internal.normalizeString(supply.key or supply.templateKey)
-        if not templateKey then
-            counts[tostring(supply.type)] = (counts[tostring(supply.type)] or 0) + 1
-            templateKey = tostring(supply.type) .. ":" .. tostring(counts[tostring(supply.type)])
-            if Core.LogWarn then
-                Core.LogWarn("PNC spawn supply missing stable key archetype="
-                    .. tostring(archetypeID) .. " type=" .. tostring(supply.type))
-            end
-        end
-        local created = Internal.createItem(record, base, {
-            type = supply.type,
-            stack = supply.stack,
-            uses = supply.uses,
-            cond = supply.cond,
-            ammoCount = supply.ammoCount,
-            fav = supply.fav,
-            customName = supply.customName,
-            itemState = supply.itemState,
-            maxWeight = supply.maxWeight,
-            weightReduction = supply.weightReduction,
-            wearableSlot = supply.wearableSlot,
-            wornSlot = supply.wornSlot,
-            attachedSlot = supply.attachedSlot,
-            equipSlot = supply.equipSlot,
-            container = (supply.preferredContainer == "bag" and bagContainerID)
-                and bagContainerID
-                or "root",
-            preferredContainer = supply.preferredContainer,
-            templateKey = tostring(prefix) .. tostring(templateKey),
-            legacyTemplateKey = prefix == "tmpl:supply:"
-                and "tmpl:supply:" .. tostring(i)
-                or nil,
-        })
-        -- A custom editor bag is part of the same authored item list. Make it
-        -- the active destination for following `preferredContainer = "bag"`
-        -- entries, just like the archetype bag above.
-        if created and created.bagContainer then
-            bagContainerID = created.bagContainer
-        end
-    end
-end
-
-function Internal.buildTemplateSnapshot(record, options)
-    local base = Internal.createBaseInventory(record, options)
-    local template = buildIdentityTemplate(record)
+local function addAppearanceItems(record, base, template)
     local appearanceItems = template.appearance and template.appearance.outfitItems or {}
     local appearanceSpecs = template.appearance
         and template.appearance.outfitItemSpecs or nil
     local lookCounts = {}
-    local bagContainerID
-    local bagItem
     local templateKey
-    local item
     local i
-
-    Internal.ensureIdentityCard(record, base)
+    local item
 
     for i = 1, math.max(#appearanceItems, #(appearanceSpecs or {})) do
         local appearanceSpec = appearanceSpecs and appearanceSpecs[i] or nil
@@ -140,7 +86,11 @@ function Internal.buildTemplateSnapshot(record, options)
             end
         end
     end
+end
 
+local function addTemplateBag(record, base, template)
+    local bagContainerID
+    local bagItem
     if template.bagType then
         local bagProfile = Internal.getContainerProfile(template.bagType)
         bagItem = Internal.createItem(record, base, {
@@ -156,7 +106,10 @@ function Internal.buildTemplateSnapshot(record, options)
             bagContainerID = bagItem.bagContainer
         end
     end
+    return bagContainerID
+end
 
+local function addStartingWeapons(record, base, template)
     if template.startingEquipment.primaryWeapon
         and template.startingEquipment.primaryWeapon.type
     then
@@ -179,43 +132,18 @@ function Internal.buildTemplateSnapshot(record, options)
             templateKey = "tmpl:weapon:reserve",
         })
     end
+end
 
-    createSupplyItems(
-        record,
-        base,
-        template.startingEquipment.primaryWeapon
-            and template.startingEquipment.primaryWeapon.grants
-            or {},
-        "tmpl:equipment_grant:primary:",
-        bagContainerID,
-        template.archetypeID
-    )
-    createSupplyItems(
-        record,
-        base,
-        template.uniqueItems,
-        "tmpl:unique:",
-        bagContainerID,
-        template.archetypeID
-    )
-    createSupplyItems(
-        record,
-        base,
-        template.startingEquipment.reserveWeapon
-            and template.startingEquipment.reserveWeapon.grants
-            or {},
-        "tmpl:equipment_grant:reserve:",
-        bagContainerID,
-        template.archetypeID
-    )
-    createSupplyItems(
-        record,
-        base,
-        template.supplies,
-        "tmpl:supply:",
-        bagContainerID,
-        template.archetypeID
-    )
+function Internal.buildTemplateSnapshot(record, options)
+    local base = Internal.createBaseInventory(record, options)
+    local template = buildIdentityTemplate(record)
+    local bagContainerID
+
+    Internal.ensureIdentityCard(record, base)
+    addAppearanceItems(record, base, template)
+    bagContainerID = addTemplateBag(record, base, template)
+    addStartingWeapons(record, base, template)
+    SupplyBuilder.Add(record, base, template, bagContainerID)
 
     base.template.equipmentPoolID = template.startingEquipment.poolID
     base.template.weaponMode = template.startingEquipment.weaponMode

@@ -110,6 +110,7 @@ local function onResetLua()
     end
     ClientState.pendingDisclosure = {}
     ClientState.characterPayloads = {}
+    ClientState.pendingCharacterInventoryRequest = nil
     ClientState.debugRoster = {}
     ClientState.debugAuthorized = false
     ClientState.uniqueNPCDebug = nil

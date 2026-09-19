@@ -11,8 +11,9 @@ local Portable = require "PsychopatzCore/Inventory/PsychopatzPortableItemState"
 
 local function call(item, method, fallback, ...)
     if not item or type(item[method]) ~= "function" then return fallback end
-    local ok, value = pcall(item[method], item, ...)
-    return ok and value ~= nil and value or fallback
+    local value = item[method](item, ...)
+    if value == nil then return fallback end
+    return value
 end
 
 local function stringValue(value)

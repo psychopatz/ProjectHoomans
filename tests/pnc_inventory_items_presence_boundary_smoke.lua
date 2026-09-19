@@ -10,6 +10,8 @@ local prefix =
 local providers = {
     "PNC_Inventory_Items_State",
     "PNC_Inventory_Items_Metadata",
+    "PNC_Inventory_Items_FoodProfiles",
+    "PNC_Inventory_Items_DefinitionState",
     "PNC_Inventory_Items_Payloads",
     "PNC_Inventory_Items_Construction",
     "PNC_Inventory_Items_Weights",
@@ -17,12 +19,18 @@ local providers = {
 local publicFunctions = {
     "SanitizeItemState",
     "GetContainerProfile",
+    "GetFoodProfile",
+    "RegisterFoodProfileProvider",
+    "GetItemDefinitionState",
+    "NormalizeItemState",
+    "ResolveItemState",
     "GetEncumbranceState",
     "RebuildCaches",
 }
 local internalFunctions = {
     "sanitizeItemState",
     "getContainerProfile",
+    "getFoodProfile",
     "getItemWeight",
     "getItemCapacity",
     "itemToPayload",
@@ -67,6 +75,23 @@ for i = 1, #internalFunctions do
         "entry point should preserve Internal." .. functionName
     )
 end
+PNC.Inventory.RegisterFoodProfileProvider(function()
+    return { offAge = 2 }
+end)
+T.equal(PNC.Inventory.GetFoodProfile("Base.ProfileProviderFood"), nil,
+    "food profile lookup tolerates an unavailable string normalizer")
+PNC.Inventory.Internal.normalizeString = function(value)
+    value = tostring(value or "")
+    return value ~= "" and value or nil
+end
+T.equal(PNC.Inventory.GetFoodProfile("Base.ProfileProviderFood").offAge, 2,
+    "food profile provider supplies deterministic lifecycle metadata")
+PNC.Inventory.RegisterFoodProfileProvider(function()
+    return { offAge = 4 }
+end)
+T.equal(PNC.Inventory.GetFoodProfile("Base.ProfileProviderFood").offAge, 4,
+    "provider replacement clears the cached food profile")
+PNC.Inventory.RegisterFoodProfileProvider(nil)
 for i = 1, #providers do
     package.loaded[prefix .. providers[i]] = nil
 end

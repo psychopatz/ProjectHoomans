@@ -97,8 +97,8 @@ local function encumbranceLevel(ratio)
     return "normal", 1.0, 1.0, 1.0
 end
 
-function Inventory.GetEncumbranceState(record)
-    local inv = Inventory.EnsureRecordInventory(record)
+function Inventory.GetEncumbranceState(record, inventory)
+    local inv = inventory or Inventory.EnsureRecordInventory(record)
     local usedWeight
     local maxWeight
     local ratio

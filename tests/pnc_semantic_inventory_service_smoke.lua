@@ -81,6 +81,19 @@ PNC.Registry = {
             and authoritativeRecord or nil
     end,
 }
+local rejected = Service.HandleRequest({
+    requestID = "inventory:unauthorized",
+    npcID = authoritativeRecord.id,
+    rawText = "Do you have seafood?",
+    normalizedText = "do you have seafood",
+    confidence = 0.93,
+    query = { concept = "SEAFOOD", text = "seafood" },
+}, { player = {}, npcID = authoritativeRecord.id })
+T.equal(rejected.status, "failed",
+    "network players cannot query without a conversation lease")
+T.equal(rejected.reason, "conversation_token_required",
+    "missing authorization stays explicit")
+
 local payload = Service.HandleRequest({
     requestID = "inventory:1",
     npcID = authoritativeRecord.id,

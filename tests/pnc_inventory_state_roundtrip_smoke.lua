@@ -56,10 +56,17 @@ T.equal(state.fluids[2].type, "Coffee", "mixture type preserved")
 local pseudo = StateCodec.pseudoItem({
     type = "Base.WaterBottle", cond = 0, uses = 0, itemState = state,
 })
+local secondPseudo = StateCodec.pseudoItem({ type = "Base.WaterBottle" })
 T.truthy(pseudo.fluidState, "pseudo item exposes fluid state")
 T.equal(pseudo.condition, 0, "pseudo item keeps zero condition")
 T.equal(pseudo.usedDelta, 0, "pseudo item keeps zero uses")
+T.equal(pseudo:getFullType(), "Base.WaterBottle",
+    "pseudo item exposes its full type")
+T.equal(pseudo:getCondition(), 0, "pseudo item getter keeps zero condition")
+T.equal(pseudo:getUsedDelta(), 0, "pseudo item getter keeps zero uses")
 T.equal(pseudo:getHungChange(), -0.15, "pseudo item keeps food state")
+T.equal(pseudo.getAge, secondPseudo.getAge,
+    "pseudo items reuse their read-only getter functions")
 
 local networkPayload = PNC.Inventory.Internal.itemToNetworkPayload({
     id = "water", type = "Base.WaterBottle", uses = 0, cond = 0,

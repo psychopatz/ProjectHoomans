@@ -83,6 +83,40 @@ function Network.SendCharacterPayload(targetPlayer, record)
     return sent
 end
 
+function Network.SendCharacterInventoryPayload(
+    targetPlayer, record, requestID)
+    local inventoryPayload
+    local payload
+    local sent
+    if not targetPlayer or not record or not Inventory
+        or not Inventory.BuildFullPayload
+    then
+        return false
+    end
+    inventoryPayload = Inventory.BuildFullPayload(record)
+    if not inventoryPayload then
+        return false
+    end
+    payload = {
+        npcId = record.id,
+        requestID = requestID,
+        inventory = inventoryPayload,
+        inventoryFull = true,
+    }
+    sent = Internal.SendToPlayer(targetPlayer,
+        Const.CMD_CHARACTER_INVENTORY_PAYLOAD, payload)
+    if not sent and isLocalPlayer(targetPlayer) and triggerEvent then
+        triggerEvent("OnServerCommand", Const.MODULE,
+            Const.CMD_CHARACTER_INVENTORY_PAYLOAD, payload)
+        sent = true
+    end
+    if sent then
+        Network.TrackInventoryRecipient(targetPlayer, payload.npcId,
+            inventoryRevision(payload))
+    end
+    return sent == true
+end
+
 function Network.CanViewCharacter(player, record)
     local access
     local distance

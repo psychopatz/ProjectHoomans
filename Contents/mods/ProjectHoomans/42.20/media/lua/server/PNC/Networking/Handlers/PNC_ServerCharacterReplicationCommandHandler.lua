@@ -57,3 +57,27 @@ Router.Register(Const.CMD_REQUEST_CHARACTER, function(player, args)
         )
     end
 end)
+
+
+Router.Register(Const.CMD_REQUEST_CHARACTER_INVENTORY, function(player, args)
+    local registry
+    local network
+    local record
+    if not args or not args.id then return end
+    registry = PNC.Registry
+    network = PNC.Network
+    record = registry.Get(args.id)
+    if record and network.CanViewCharacter(player, record)
+        and network.SendCharacterInventoryPayload
+    then
+        network.SendCharacterInventoryPayload(player, record,
+            args.requestID)
+    else
+        PNC.Core.LogWarn(
+            "Rejected unauthorized NPC inventory request player="
+                .. tostring(player and player.getUsername
+                    and player:getUsername() or "unknown")
+                .. " npc=" .. tostring(args.id)
+        )
+    end
+end)

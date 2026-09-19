@@ -533,30 +533,6 @@ function Diagnostics.LogFirearmAudit(eventName, fields)
     return true
 end
 
--- Inventory and needs traces are event-boundary diagnostics. Callers must
--- guard expensive field assembly before entering these functions so the
--- disabled path is only a boolean branch and does not allocate tables,
--- inspect state, read clocks, or concatenate strings.
-function Diagnostics.LogInventoryAudit(eventName, fields)
-    local output
-    local message
-    if Diagnostics.InventoryAuditEnabled ~= true then return false end
-    output = {
-        "inventory_audit",
-        "event=" .. tostring(eventName or "unknown"),
-    }
-    for _, field in ipairs(fields or {}) do
-        output[#output + 1] = tostring(field)
-    end
-    message = table.concat(output, " ")
-    if PNC.Core and PNC.Core.LogInfo then
-        PNC.Core.LogInfo(message)
-    else
-        print("[PNC][INFO] " .. message)
-    end
-    return true
-end
-
 function Diagnostics.LogNeedsAudit(eventName, fields)
     local output
     local message
@@ -1130,5 +1106,7 @@ function Diagnostics.Snapshot()
         timings = timings,
     }
 end
+
+require "PNC/Core/Diagnostics/PNC_PerformanceScalingDiagnostics_InventoryAudit"
 
 return Diagnostics

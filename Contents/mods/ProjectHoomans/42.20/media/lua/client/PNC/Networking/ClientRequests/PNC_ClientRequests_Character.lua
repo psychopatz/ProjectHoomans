@@ -6,6 +6,7 @@ PNC.Client.Internal = PNC.Client.Internal or {}
 local Client = PNC.Client
 local Internal = Client.Internal
 local Const = PNC.Const
+local Core = PNC.Core
 local ClientState = PNC.Network.ClientState
 local Diagnostics = PNC.PerformanceScalingDiagnostics
 
@@ -18,7 +19,11 @@ function Client.RequestCharacterPayload(npcId, forceFull)
         return false
     end
     npcId = tostring(npcId)
-    if not sendClientCommand and PNC.API and PNC.API.GetCharacterPayload then
+    -- Standalone and host runtimes own the registry locally; only remote
+    -- multiplayer clients need the server command round-trip.
+    local multiplayerClient = Core and Core.IsClientOnly
+        and Core.IsClientOnly() == true
+    if not multiplayerClient and PNC.API and PNC.API.GetCharacterPayload then
         payload = PNC.API.GetCharacterPayload(npcId)
         if payload then
             ClientState.characterPayloads = ClientState.characterPayloads or {}
@@ -51,7 +56,6 @@ function Client.RequestCharacterPayload(npcId, forceFull)
             end
             return true
         end
-        return false
     end
     if not player or not sendClientCommand then
         return false
@@ -66,6 +70,53 @@ function Client.RequestCharacterPayload(npcId, forceFull)
         inventoryRevision = forceFull == true and nil or inventoryRevision,
         forceFull = forceFull == true,
     })
+    return true
+end
+
+function Client.RequestCharacterInventoryPayload(npcId)
+    local player = Internal.GetPlayer()
+    local payload
+    local requestID
+    if not npcId then
+        return false
+    end
+    npcId = tostring(npcId)
+    ClientState.inventoryPayloadRequestSequence =
+        (tonumber(ClientState.inventoryPayloadRequestSequence) or 0) + 1
+    requestID = tostring(ClientState.inventoryPayloadRequestSequence)
+    ClientState.pendingCharacterInventoryRequest = {
+        npcId = npcId,
+        requestID = requestID,
+    }
+
+    -- Standalone and host runtimes can build only the inventory section from
+    -- their local registry. Remote clients request that same section from the
+    -- server without constructing a detailed character snapshot.
+    local multiplayerClient = Core and Core.IsClientOnly
+        and Core.IsClientOnly() == true
+    if not multiplayerClient and PNC.API
+        and PNC.API.GetCharacterInventoryPayload
+    then
+        payload = PNC.API.GetCharacterInventoryPayload(npcId)
+        if payload then
+            payload.requestID = requestID
+            if Internal.ApplyCharacterInventoryPayload then
+                return Internal.ApplyCharacterInventoryPayload(
+                    payload, "local_api") == true
+            end
+            ClientState.pendingCharacterInventoryRequest = nil
+            return false
+        end
+    end
+    if not player or not sendClientCommand then
+        ClientState.pendingCharacterInventoryRequest = nil
+        return false
+    end
+    sendClientCommand(player, Const.MODULE,
+        Const.CMD_REQUEST_CHARACTER_INVENTORY, {
+            id = npcId,
+            requestID = requestID,
+        })
     return true
 end
 

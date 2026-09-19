@@ -9,6 +9,10 @@ from typing import Any, Iterable
 from .scenario import DEFAULT_SCENARIO, load_scenario, merge
 from .worker import LuaSemanticWorker
 
+MAX_TRACKED_EVENT_IDS = 4096
+MAX_REPORTED_CONFLICTS = 256
+MAX_EVENT_ID_LENGTH = 256
+
 
 @dataclass(frozen=True)
 class HarnessCase:
@@ -46,32 +50,50 @@ def load_case(path: Path) -> HarnessCase:
     return HarnessCase.from_mapping(value, default_id=path.stem)
 
 
-def detect_conflicts(turns: Iterable[dict[str, Any]]) -> list[dict[str, Any]]:
-    """Find deterministic ordering/duplication problems in bounded turn records."""
+class ConflictLedger:
+    """Incrementally detect conflicts while bounding retained audit state."""
 
-    conflicts: list[dict[str, Any]] = []
-    previous_sequence = 0
-    event_ids: dict[str, int] = {}
-    for index, turn in enumerate(turns, start=1):
-        sequence = turn.get("result", {}).get("sequence")
+    def __init__(self) -> None:
+        self._previous_sequence = 0
+        self._event_ids: dict[str, int] = {}
+        self._conflicts: list[dict[str, Any]] = []
+        self._truncation_reasons: set[str] = set()
+        self._turn_index = 0
+
+    def _record(self, conflict: dict[str, Any]) -> None:
+        if len(self._conflicts) < MAX_REPORTED_CONFLICTS:
+            self._conflicts.append(conflict)
+        else:
+            self._truncation_reasons.add("conflict_limit")
+
+    def add(self, turn: dict[str, Any]) -> None:
+        self._turn_index += 1
+        index = self._turn_index
+        if not isinstance(turn, dict):
+            self._record({"kind": "invalid_turn_record", "turnIndex": index})
+            return
+
+        result = turn.get("result")
+        sequence = result.get("sequence") if isinstance(result, dict) else None
         if isinstance(sequence, int):
-            if sequence <= previous_sequence:
-                conflicts.append(
+            if sequence <= self._previous_sequence:
+                self._record(
                     {
                         "kind": "turn_sequence_regression",
                         "turnIndex": index,
-                        "previous": previous_sequence,
+                        "previous": self._previous_sequence,
                         "current": sequence,
                     }
                 )
-            previous_sequence = max(previous_sequence, sequence)
+            self._previous_sequence = max(self._previous_sequence, sequence)
+
         relationship_before = turn.get("relationshipBefore", {})
         relationship_after = turn.get("relationshipAfter", {})
-        before_revision = relationship_before.get("revision")
-        after_revision = relationship_after.get("revision")
+        before_revision = relationship_before.get("revision") if isinstance(relationship_before, dict) else None
+        after_revision = relationship_after.get("revision") if isinstance(relationship_after, dict) else None
         if isinstance(before_revision, int) and isinstance(after_revision, int):
             if after_revision < before_revision:
-                conflicts.append(
+                self._record(
                     {
                         "kind": "relationship_revision_regression",
                         "turnIndex": index,
@@ -79,25 +101,58 @@ def detect_conflicts(turns: Iterable[dict[str, Any]]) -> list[dict[str, Any]]:
                         "after": after_revision,
                     }
                 )
-        for transport in turn.get("transport", []):
+
+        transports = turn.get("transport", [])
+        if not isinstance(transports, (list, tuple)):
+            self._record({"kind": "invalid_transport_collection", "turnIndex": index})
+            return
+        for transport in transports:
             if not isinstance(transport, dict) or transport.get("direction") != "server_to_client":
                 continue
-            payload = transport.get("payload", {}) if isinstance(transport, dict) else {}
+            payload = transport.get("payload", {})
             event_id = payload.get("eventID") if isinstance(payload, dict) else None
             if not isinstance(event_id, str) or not event_id:
                 continue
-            if event_id in event_ids:
-                conflicts.append(
+            if len(event_id) > MAX_EVENT_ID_LENGTH:
+                self._truncation_reasons.add("event_id_length_limit")
+                continue
+            first_turn = self._event_ids.get(event_id)
+            if first_turn is not None:
+                self._record(
                     {
                         "kind": "duplicate_authoritative_event",
                         "turnIndex": index,
                         "eventID": event_id,
-                        "firstTurnIndex": event_ids[event_id],
+                        "firstTurnIndex": first_turn,
                     }
                 )
+            elif len(self._event_ids) >= MAX_TRACKED_EVENT_IDS:
+                self._truncation_reasons.add("event_id_limit")
             else:
-                event_ids[event_id] = index
-    return conflicts
+                self._event_ids[event_id] = index
+
+    def report(self) -> list[dict[str, Any]]:
+        conflicts = list(self._conflicts)
+        if self._truncation_reasons:
+            if len(conflicts) >= MAX_REPORTED_CONFLICTS:
+                conflicts = conflicts[: MAX_REPORTED_CONFLICTS - 1]
+            conflicts.append(
+                {
+                    "kind": "audit_truncated",
+                    "reasons": sorted(self._truncation_reasons),
+                    "trackedEventIDs": len(self._event_ids),
+                }
+            )
+        return conflicts
+
+
+def detect_conflicts(turns: Iterable[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Find ordering/duplication problems using a bounded incremental ledger."""
+
+    ledger = ConflictLedger()
+    for turn in turns:
+        ledger.add(turn)
+    return ledger.report()
 
 
 @dataclass

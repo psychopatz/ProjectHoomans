@@ -304,6 +304,7 @@ def run_lua_suite(
             if fail_fast and result.returncode != 0:
                 for pending in futures:
                     pending.cancel()
+                runner.terminate_all()
                 break
     return results, runner.report(results)
 

@@ -18,6 +18,8 @@ local lifecycleSource = T.read("ProjectHoomans", "client",
     "PNC/UI/Base/PNC_BaseWindowLifecycle.lua")
 local inventoryListSource = T.read("ProjectHoomans", "client",
     "PNC/UI/Inventory/PNC_InventoryUI_List.lua")
+local inventoryListInputSource = T.read("ProjectHoomans", "client",
+    "PNC/UI/Inventory/PNC_InventoryUI_List/_Input.lua")
 local facilityModalSource = T.read("ProjectHoomans", "client",
     "PNC/UI/SettlementManagement/PNC_SettlementManagement_FacilityBuildModal.lua")
 local hubSource = T.read("ProjectHoomans", "client",
@@ -61,7 +63,7 @@ T.contains(buildingCatalogSource, "FilterFacilityRecipes",
     "Buildings catalog does not remove facility-backed recipes")
 T.contains(buildingCatalogSource, "SetRowsStable",
     "Buildings catalog still clears live lists during refresh")
-T.contains(inventoryListSource, "function ISPNCInventoryList:resolveMouse",
+T.contains(inventoryListInputSource, "function ISPNCInventoryList:resolveMouse",
     "Building catalog list does not normalize resized/scrolling input coordinates")
 T.contains(buildingCatalogSource, "buildRecipePreview",
     "Buildings catalog is missing the selected-recipe preview pane")

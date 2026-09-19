@@ -170,6 +170,31 @@ local function itemByTemplateKey(inventory, templateKey)
     return nil
 end
 
+local originalRollAppearance = PNC.Identity.RollAppearance
+PNC.Identity.RollAppearance = function()
+    return { outfitItems = {
+        "Base.Tshirt_DefaultTEXTURE_TINT",
+        "Base.PNCInventoryTest_Hat",
+    } }
+end
+local outfitRecord = makeRecord("outfit_projection", 9321)
+local outfitInventory = PNC.Inventory.CreateFromTemplate(outfitRecord)
+PNC.Identity.RollAppearance = originalRollAppearance
+local outfitShirt = itemByTemplateKey(
+    outfitInventory,
+    "tmpl:look:Base.Tshirt_DefaultTEXTURE_TINT:1"
+)
+local outfitHat = itemByTemplateKey(
+    outfitInventory,
+    "tmpl:look:Base.PNCInventoryTest_Hat:1"
+)
+T.truthy(outfitShirt, "appearance shirt missing from generated inventory")
+T.truthy(outfitHat, "appearance hat missing from generated inventory")
+T.equal(outfitShirt.wornSlot, "Torso1",
+    "appearance item native body slot projection")
+T.equal(outfitInventory.worn.Torso1, outfitShirt.id,
+    "appearance item body slot index")
+
 SandboxVars.ProjectHoomans.NPCMeleeWeaponSpawnChance = 100
 SandboxVars.ProjectHoomans.NPCRangedWeaponSpawnChance = 100
 local bothRecord = makeRecord("natural_both_1", 8142, "Scavenger")
@@ -247,6 +272,27 @@ T.truthy(PNC.Inventory.AddEquipmentSpawnEntry("MedicalTest", "medical", {
     type = "Base.AlcoholBandage",
     weight = 2,
 }), "generic equipment pool extension")
+T.equal(false, PNC.Inventory.RegisterEquipmentSpawnPool("InvalidCategories", {
+    categories = "medical",
+}), "non-table pool categories are rejected")
+T.truthy(PNC.Inventory.RegisterEquipmentSpawnPool("MalformedGrantTest", {
+    categories = {
+        medical = {
+            { type = "Base.Bandage", grants = 1 },
+        },
+    },
+}), "malformed grant field does not reject a valid entry")
+local malformedGrant = PNC.Inventory.ChooseEquipmentSpawnEntry(
+    "MalformedGrantTest",
+    "medical",
+    99,
+    "test:malformed-grants"
+)
+T.truthy(
+    malformedGrant and type(malformedGrant.grants) == "table"
+        and #malformedGrant.grants == 0,
+    "malformed grant entry remains selectable without invalid grants"
+)
 local medical = PNC.Inventory.ChooseEquipmentSpawnEntry(
     "MedicalTest",
     "medical",
@@ -258,7 +304,7 @@ T.truthy(medical and (
     or medical.type == "Base.AlcoholBandage"
 ), "generic equipment category selection")
 
-T.load(ROOT .. "Inventory/PNC_Inventory_Actions.lua")
+T.load(ROOT .. "Inventory/InventoryActions/PNC_InventoryActions.lua")
 local interactionRecord = makeRecord("inventory_interaction", 5150)
 interactionRecord.tacticalClass = "colonist"
 local interactionInventory = PNC.Inventory.CreateFromTemplate(interactionRecord)

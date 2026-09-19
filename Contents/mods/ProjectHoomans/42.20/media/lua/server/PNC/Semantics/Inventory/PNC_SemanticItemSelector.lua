@@ -45,6 +45,7 @@ Selector.RegisterConceptTags("WATER", { "liquidwater" })
 Selector.RegisterConceptTags("MEDICINE", { "firstaid" })
 
 require "PNC/Semantics/Inventory/PNC_SemanticItemSelector_Classification"
+require "PNC/Semantics/Inventory/PNC_SemanticItemSelector_TextMatching"
 require "PNC/Semantics/Inventory/PNC_SemanticItemSelector_Matching"
 require "PNC/Semantics/Inventory/PNC_SemanticItemSelector_Queries"
 

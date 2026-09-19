@@ -5,78 +5,17 @@
 PNC = PNC or {}
 PNC.Inventory = PNC.Inventory or {}
 
+require "PNC/Core/Inventory/PNC_Inventory/PNC_Inventory_WaterContainerRuntime"
+
 local Inventory = PNC.Inventory
 local Internal = Inventory.Internal
-local Portable = require "PsychopatzCore/Inventory/PsychopatzPortableItemState"
-local Profiles = require "PsychopatzCore/Inventory/PsychopatzItemTypeProfile"
 
-local EPSILON = 0.0001
+local Runtime = Internal.WaterContainerRuntime
+local EPSILON = Runtime.EPSILON
 local SAFE_FLUIDS = {
     Water = true,
     CarbonatedWater = true,
 }
-
-Internal.WaterContainerCapabilityCache =
-    Internal.WaterContainerCapabilityCache or {}
-
-local function call(object, method, ...)
-    local fn = object and object[method]
-    local value
-    local ok
-    if type(fn) ~= "function" then return nil end
-    ok, value = pcall(fn, object, ...)
-    return ok and value or nil
-end
-
-local function probe(fullType)
-    local cached = Internal.WaterContainerCapabilityCache[fullType]
-    local item
-    local profile
-    if cached ~= nil then return cached.item, cached.fluid == true end
-    if PNC.Equipment and PNC.Equipment.CreateItem then
-        item = PNC.Equipment.CreateItem(fullType)
-    end
-    if type(item) == "table" and not item.getFluidContainer and item[1] then
-        item = item[1]
-    end
-    profile = item and Profiles.ClassifyNative(item) or Profiles.Get(fullType)
-    cached = {
-        item = item,
-        fluid = profile and profile.capabilities
-            and profile.capabilities.fluid == true
-            or item and (call(item, "getFluidContainer") ~= nil
-                or call(item, "isFluidContainer") == true
-                or call(item, "IsFluidContainer") == true),
-    }
-    Internal.WaterContainerCapabilityCache[fullType] = cached
-    return cached.item, cached.fluid == true
-end
-
-local function nativeFluidCapable(item)
-    return item and (call(item, "getFluidContainer") ~= nil
-        or call(item, "isFluidContainer") == true
-        or call(item, "IsFluidContainer") == true)
-end
-
-local function hasFluidState(state)
-    return type(state) == "table"
-        and (state.fluidAmount ~= nil or state.fluidCapacity ~= nil
-            or state.fluidPrimaryType ~= nil or type(state.fluids) == "table")
-end
-
-local function stateFor(item, nativeItem, nativeAuthoritative)
-    local state
-    if nativeAuthoritative and nativeItem then
-        state = Portable.CaptureFluid(nativeItem)
-    end
-    if state then return state end
-    if Inventory.ResolveItemState then
-        state = Inventory.ResolveItemState(item) or {}
-        if hasFluidState(state) then return state end
-    end
-    if nativeItem then return Portable.CaptureFluid(nativeItem) or {} end
-    return type(item and item.itemState) == "table" and item.itemState or {}
-end
 
 local function fluidName(value)
     value = tostring(value or "")
@@ -111,47 +50,17 @@ local function stateFluidSafe(state, amount)
     return true
 end
 
-local function waterFluid()
-    local fluidClass = rawget(_G, "Fluid")
-    local fluidTypeClass = rawget(_G, "FluidType")
-    local value
-    local ok
-    if fluidClass and type(fluidClass.Get) == "function" then
-        ok, value = pcall(fluidClass.Get, "Water")
-        if ok and value then return value end
-    end
-    if fluidTypeClass and fluidTypeClass.Water
-        and fluidClass and type(fluidClass.Get) == "function"
-    then
-        ok, value = pcall(fluidClass.Get, fluidTypeClass.Water)
-        if ok and value then return value end
-    end
-    return nil
-end
-
-local function canAcceptWater(nativeItem, state, freeCapacity)
-    local container = nativeItem and call(nativeItem, "getFluidContainer")
-    local water = waterFluid()
-    local result
-    if container and water and type(container.canAddFluid) == "function" then
-        result = call(container, "canAddFluid", water)
-        if result == false then return false end
-    end
-    return (tonumber(freeCapacity) or 0) > EPSILON
-        and state.fluidInputLocked ~= true
-end
-
 function Inventory.IsLiquidContainer(item, nativeItem)
     local state
     local _, capable
     local nativeProvided = nativeItem ~= nil
     if type(item) ~= "table" then return false end
     if nativeProvided then
-        capable = nativeFluidCapable(nativeItem)
+        capable = Runtime.NativeFluidCapable(nativeItem)
     else
-        nativeItem, capable = probe(item.type)
+        nativeItem, capable = Runtime.Probe(item.type)
     end
-    state = stateFor(item, nativeItem, nativeProvided)
+    state = Runtime.StateFor(item, nativeItem, nativeProvided)
     if capable then return true end
     return state.fluidCapacity ~= nil or state.fluidAmount ~= nil
         or type(state.fluids) == "table"
@@ -165,8 +74,8 @@ function Inventory.DescribeLiquidContainer(item, nativeItem)
     local free
     local nativeProvided = nativeItem ~= nil
     if not Inventory.IsLiquidContainer(item, nativeItem) then return nil end
-    nativeItem = nativeItem or probe(item.type)
-    state = stateFor(item, nativeItem, nativeProvided)
+    nativeItem = nativeItem or Runtime.Probe(item.type)
+    state = Runtime.StateFor(item, nativeItem, nativeProvided)
     amount = math.max(0, tonumber(state.fluidAmount) or 0)
     capacity = tonumber(state.fluidCapacity)
     free = capacity and math.max(0, capacity - amount) or 0
@@ -180,7 +89,7 @@ function Inventory.DescribeLiquidContainer(item, nativeItem)
         inputLocked = state.fluidInputLocked == true,
         safeWater = safe == true,
         empty = amount <= EPSILON,
-        canFill = safe and canAcceptWater(nativeItem, state, free) or false,
+        canFill = safe and Runtime.CanAcceptWater(nativeItem, state, free) or false,
         canDrink = safe and amount > EPSILON,
         state = state,
     }

@@ -1,4 +1,5 @@
 local T = require "tests/support/test"
+T.addPackagePaths()
 
 PNC = {
     Core = {},
@@ -113,6 +114,27 @@ T.truthy(Diagnostics.LogInventoryAudit("mutation", {
 T.contains(logs[#logs],
     "inventory_audit event=mutation npc=npc-test revisionBefore=1 revisionAfter=2",
     "inventory audit uses the dedicated log marker")
+local hostileAuditValue = setmetatable({}, {
+    __tostring = function() error("unsafe audit value was converted") end,
+})
+local oversizedAuditFields = { hostileAuditValue, "line\nbreak" }
+for index = 3, 24 do
+    oversizedAuditFields[index] = string.rep("x", 600)
+end
+T.truthy(Diagnostics.LogInventoryAudit(hostileAuditValue, oversizedAuditFields),
+    "inventory audit safely formats bounded fields")
+local boundedAuditLog = logs[#logs]
+T.contains(boundedAuditLog, "event=<table>",
+    "inventory audit does not invoke arbitrary event stringifiers")
+T.contains(boundedAuditLog, "line break",
+    "inventory audit removes control characters from fields")
+T.contains(boundedAuditLog, "fields_truncated=true",
+    "inventory audit marks excess fields")
+T.equal(string.find(boundedAuditLog, "\n", 1, true), nil,
+    "inventory audit output cannot add extra log lines")
+T.truthy(#boundedAuditLog < 5000,
+    "inventory audit output remains bounded")
+Diagnostics.SetInventoryAuditEnabled(false)
 Diagnostics.SetNeedsAuditEnabled(true)
 T.truthy(Diagnostics.LogNeedsAudit("changed", {
     "npc=npc-test", "need=thirst", "before=0.5", "after=0.0",
