@@ -18,19 +18,10 @@ Internal.InlineChatOpen = Open
 local LLMInput = PsychopatzConversationLLMInput
 
 local function semanticInput()
+    pcall(require, "PNC/PNC_ConversationSemantics")
     local semantics = PNC.Semantics
     local input = semantics and semantics.DialogueInput or nil
-    local ok
     if input and type(input.Submit) == "function" then return input end
-    ok = pcall(
-        require,
-        "PNC/Semantics/PNC_SemanticDialogueInput"
-    )
-    semantics = PNC.Semantics
-    input = semantics and semantics.DialogueInput or nil
-    if ok and input and type(input.Submit) == "function" then
-        return input
-    end
     return nil
 end
 

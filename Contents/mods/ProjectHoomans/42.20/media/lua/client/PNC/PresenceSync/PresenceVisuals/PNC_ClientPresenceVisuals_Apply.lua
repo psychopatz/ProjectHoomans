@@ -22,10 +22,26 @@ local applyBodyPresentation = Internal.ApplyBodyPresentation
 local applyActionMotion = Internal.ApplyActionMotion
 local applyLocomotion = Internal.ApplyLocomotion
 
+local function normalizeVisualStateSnapshot(snapshot)
+    local key
+    local value
+    local normalized
+    if snapshot.visualState == nil
+        or type(snapshot.visualState) == "table"
+    then
+        return snapshot
+    end
+    normalized = {}
+    for key, value in pairs(snapshot) do
+        normalized[key] = value
+    end
+    normalized.visualState = {}
+    return normalized
+end
+
 local function applySnapshotToBody(snapshot, zombie, remoteReplica)
-    local visualState = snapshot and snapshot.visualState or {}
-    local modData = zombie and zombie.getModData
-        and zombie:getModData() or nil
+    local visualState
+    local modData
     local attackKey
     local recordView
     local motionKey
@@ -36,11 +52,17 @@ local function applySnapshotToBody(snapshot, zombie, remoteReplica)
     local scenePresentation
     local sceneActive
     local now
-    if not snapshot or not zombie
-        or (zombie.isDead and zombie:isDead())
+    if type(snapshot) ~= "table" or not zombie
     then
         return
     end
+    snapshot = normalizeVisualStateSnapshot(snapshot)
+    if zombie.isDead and zombie:isDead() then
+        return
+    end
+    visualState = type(snapshot.visualState) == "table"
+        and snapshot.visualState or {}
+    modData = zombie.getModData and zombie:getModData() or nil
     if remoteReplica == nil then
         remoteReplica = true
     end
@@ -82,6 +104,11 @@ local function applySnapshotToBody(snapshot, zombie, remoteReplica)
         and modData.PNC_ClientAttackKey ~= attackKey
         and AnimationTrace
         and AnimationTrace.Begin
+        and (
+            AnimationTrace.forceEnabled == true
+            or snapshot.debugState
+                and snapshot.debugState.debugEnabled == true
+        )
     then
         AnimationTrace.Begin(zombie, {
             npcId = snapshot.id,
@@ -95,7 +122,6 @@ local function applySnapshotToBody(snapshot, zombie, remoteReplica)
                 or visualState.attackAnim,
             debugEnabled = snapshot.debugState
                 and snapshot.debugState.debugEnabled == true
-                or snapshot.combatDebugState ~= nil
                 or false,
         }, now)
     end

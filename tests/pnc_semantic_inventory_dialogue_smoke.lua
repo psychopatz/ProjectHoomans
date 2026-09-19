@@ -88,8 +88,10 @@ T.load(
     "PNC/Semantics/PNC_SemanticDialogueInput_Inventory.lua"
 )
 
+local inventoryRequestCount = 0
 PNC.Client = {
     RequestSemanticInventoryQuery = function(request)
+        inventoryRequestCount = inventoryRequestCount + 1
         return true, "found", {
             accepted = true,
             status = "found",
@@ -115,6 +117,16 @@ local Input = T.load(
     "ProjectHoomans",
     "client",
     "PNC/Semantics/PNC_SemanticDialogueInput.lua"
+)
+T.load(
+    "ProjectHoomans",
+    "client",
+    "PNC/Semantics/PNC_SemanticDialogueInput_Trace.lua"
+)
+T.load(
+    "ProjectHoomans",
+    "client",
+    "PNC/Semantics/PNC_SemanticDialogueInput_ProviderFallback.lua"
 )
 T.load(
     "ProjectHoomans",
@@ -169,6 +181,75 @@ T.falsy(session.semanticInventoryQueries["1"],
 T.equal(view.lastSemanticDialogueResult.decision.route, "deterministic",
     "inventory query does not use the LLM fallback route")
 
+local inventoryPending = Input.Internal.InventoryPending
+local pendingRequestIDs = {}
+for index = 1, inventoryPending.MAX_PENDING do
+    local requestID = "bounded:" .. tostring(index)
+    local registered, registerReason = inventoryPending.Register(
+        view, requestID, { query = { concept = "FOOD" } })
+    T.equal(registered, true, "pending inventory query is registered")
+    T.equal(registerReason, nil, "pending inventory registration succeeds")
+    pendingRequestIDs[#pendingRequestIDs + 1] = requestID
+end
+local duplicateRegistered, duplicateReason = inventoryPending.Register(
+    view, pendingRequestIDs[1], { query = { concept = "FOOD" } })
+T.falsy(duplicateRegistered,
+    "duplicate inventory request IDs are not resubmitted")
+T.equal(duplicateReason, "inventory_query_already_pending",
+    "duplicate inventory requests return an explicit reason")
+local missingSession, missingSessionReason = inventoryPending.Register(
+    {}, "missing-session", { query = { concept = "FOOD" } })
+T.falsy(missingSession,
+    "inventory queries require a conversation session")
+T.equal(missingSessionReason, "inventory_query_session_unavailable",
+    "missing inventory sessions fail explicitly")
+local missingID, missingIDReason = inventoryPending.Register(
+    view, nil, { query = { concept = "FOOD" } })
+T.falsy(missingID, "inventory queries require a request ID")
+T.equal(missingIDReason, "inventory_query_request_id_missing",
+    "missing inventory request IDs fail explicitly")
+local overLimitRegistered, overLimitReason = inventoryPending.Register(
+    view, "bounded:overflow", { query = { concept = "FOOD" } })
+T.falsy(overLimitRegistered,
+    "inventory queries beyond the pending cap are rejected")
+T.equal(overLimitReason, "inventory_query_pending_limit",
+    "the pending-query limit has an explicit failure reason")
+local requestsBeforeLimit = inventoryRequestCount
+local limitedSubmission = Input.Submit(view, "do you have seefoods?")
+T.equal(limitedSubmission, true,
+    "a full pending-query map does not reject local dialogue input")
+T.equal(inventoryRequestCount, requestsBeforeLimit,
+    "the pending-query cap prevents another transport request")
+local pendingCount = 0
+for _ in pairs(session.semanticInventoryQueries) do
+    pendingCount = pendingCount + 1
+end
+T.equal(pendingCount, inventoryPending.MAX_PENDING,
+    "pending inventory query state stays bounded")
+for _, requestID in ipairs(pendingRequestIDs) do
+    T.truthy(inventoryPending.Take(view, requestID),
+        "completed request correlation can be removed")
+end
+
+for index = 1, 17 do
+    local received, inactiveReason = Input.ReceiveInventoryQueryResult({
+        requestID = "orphan:" .. tostring(index),
+        npcID = "npc-alice",
+        status = "found",
+        query = { concept = "FOOD" },
+        items = {},
+    })
+    T.equal(received, false, "unmatched inventory results are not presented")
+    T.equal(inactiveReason, "inventory_query_not_active",
+        "unmatched inventory result keeps its routing reason")
+end
+T.equal(#PNC.Network.ClientState.semanticInventoryQueryResultOrder, 16,
+    "unmatched inventory result cache stays bounded")
+T.equal(PNC.Network.ClientState.semanticInventoryQueryResults["orphan:1"], nil,
+    "old unmatched inventory results are evicted")
+T.truthy(PNC.Network.ClientState.semanticInventoryQueryResults["orphan:17"],
+    "new unmatched inventory results remain available")
+
 -- A queued NPC line must not lock the live semantic channel.  The full view
 -- reports animationInteractive separately from Session.busy; this is the
 -- state reached while a reply is being typed or released.
@@ -179,5 +260,22 @@ T.equal(queuedWhileSpeaking, true,
 T.equal(#queued, 2,
     "the second local turn queues its own authoritative inventory answer")
 session.busy = nil
+
+PNC.Client.RequestSemanticInventoryQuery = function()
+    inventoryRequestCount = inventoryRequestCount + 1
+    return false, "semantic_inventory_query_service_unavailable"
+end
+local requestsBeforeFailure = inventoryRequestCount
+local unavailableSubmission = Input.Submit(view, "do you have seefoods?")
+T.equal(unavailableSubmission, true,
+    "an unavailable inventory transport does not reject the local turn")
+T.equal(inventoryRequestCount, requestsBeforeFailure + 1,
+    "the transport rejection reaches the inventory adapter")
+local strandedPending = 0
+for _ in pairs(session.semanticInventoryQueries or {}) do
+    strandedPending = strandedPending + 1
+end
+T.equal(strandedPending, 0,
+    "a rejected inventory transport releases its pending correlation")
 
 T.finish("pnc_semantic_inventory_dialogue_smoke")

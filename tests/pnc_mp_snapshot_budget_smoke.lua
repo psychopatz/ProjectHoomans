@@ -10,6 +10,7 @@ local bindCount = 0
 local facingCount = 0
 local pruneCount = 0
 local controllerPruneCount = 0
+local retainedPruneState = { key = "active" }
 local body = {}
 local snapshot = {
     id = "remote_budget",
@@ -53,7 +54,13 @@ PNC = {
         BodyByInstanceID = {},
         BodyByLease = {},
         NativePathStateByBody = {},
-        RemoteSnapshotStateByID = {},
+        RemoteSnapshotStateByID = {
+            removed_npc = {},
+        },
+        PrunedRevisionByID = {
+            [snapshot.id] = retainedPruneState,
+            removed_npc = { key = "stale" },
+        },
         Internal = {
             ApplySnapshotFacing = function()
                 facingCount = facingCount + 1
@@ -162,5 +169,17 @@ T.equal(bindCount, 5,
     "active native movement binding was replayed every client tick")
 T.equal(controllerPruneCount, 7,
     "native controller pruning stopped running every client tick")
+
+now = 6000
+PNC.ClientPresenceSync.OnTick()
+T.equal(
+    PNC.ClientPresenceSync.PrunedRevisionByID[snapshot.id],
+    retainedPruneState,
+    "remote state sweep removed cache for an active snapshot"
+)
+T.equal(PNC.ClientPresenceSync.PrunedRevisionByID.removed_npc, nil,
+    "remote state sweep retained cache for a removed snapshot")
+T.equal(PNC.ClientPresenceSync.RemoteSnapshotStateByID.removed_npc, nil,
+    "remote state sweep retained its removed snapshot state")
 
 T.finish("pnc_mp_snapshot_budget_smoke")

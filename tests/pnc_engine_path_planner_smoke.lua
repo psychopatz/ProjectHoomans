@@ -827,6 +827,113 @@ T.truthy(PNC.EnginePathPlanner.PumpServerFrame() == 0,
     "cleared delegated route remained in the active server set")
 serverMode = false
 
+local routeRepairWarning
+local passageInternal = {
+    updateTraversalAction = function(_, _, lane)
+        lane.traversalAction = nil
+        lane.lastTraversalFinishReason = "hard_timeout"
+        return false, "completed"
+    end,
+    logMoveWarning = function(_, _, _, event, reason, detail)
+        routeRepairWarning = {
+            event = event,
+            reason = reason,
+            detail = detail,
+        }
+    end,
+    logMoveDebug = function() end,
+    describeGoal = function() return "test_goal" end,
+}
+PNC.PathService = { Internal = passageInternal }
+T.load(
+    "ProjectHoomans",
+    "shared",
+    "PNC/Core/Pathing/PNC_PathService/Motion/PNC_PathService_MotionPassage.lua"
+)
+
+-- A timed-out scripted traversal invalidates the old native route. If the
+-- request budget is exhausted, steering must defer safely and reissue once the
+-- bounded budget window expires.
+body.x = 0.5
+body.y = 0.5
+body.z = 0
+body.square = outsideSquare
+body.path2 = selectedPath
+body.actionState = "idle"
+local repairedNavigation = {
+    provider = "engine_path",
+    body = body,
+    nativeActive = true,
+    requestPending = true,
+    requestRevision = 8,
+    plannedAt = now - 1000,
+    requestStartedAt = now - 1000,
+    requestX = body:getX(),
+    requestY = body:getY(),
+    requestZ = body:getZ(),
+}
+local repairedRecord = {
+    runtime = {
+        pathing = {
+            phase = "active",
+            navigationProvider = "engine_path",
+            ownerMode = "engine_path_waiting",
+            traversalAction = { kind = "window_climb" },
+        },
+        localNavigation = repairedNavigation,
+    },
+}
+local requestsBeforeTimeoutRepair = requestCount
+PNC.EnginePathPlanner.RequestBudget.windowStartedAt = now
+PNC.EnginePathPlanner.RequestBudget.used =
+    PNC.Const.ENGINE_PATH_REQUEST_BUDGET_PER_WINDOW
+local repairHandled, repairState = passageInternal.updateScriptedSpecialMove(
+    body,
+    repairedRecord,
+    repairedRecord.runtime.pathing,
+    now
+)
+T.truthy(repairHandled,
+    "timed-out traversal did not hand off to route repair")
+T.equal(repairState, "traversal_repaired",
+    "timed-out traversal did not report the route repair state")
+T.falsy(repairedNavigation.nativeActive,
+    "route invalidation retained native movement ownership")
+T.falsy(repairedNavigation.requestPending,
+    "route invalidation retained a pending native request")
+T.equal(repairedNavigation.plannedAt, 0,
+    "route invalidation retained the previous request cooldown")
+T.equal(body.path2, nil, "route invalidation retained the previous path")
+T.equal(repairedRecord.runtime.pathing.traversalAction, nil,
+    "route repair retained the scripted traversal")
+T.equal(routeRepairWarning.event, "route_failed",
+    "timeout route repair did not emit its route diagnostic")
+T.equal(routeRepairWarning.reason, "traversal_hard_timeout",
+    "timeout route repair diagnostic reason changed")
+
+PNC.EnginePathPlanner.GetSteeringTarget(repairedRecord, body, target)
+T.equal(requestCount, requestsBeforeTimeoutRepair,
+    "exhausted request budget did not defer the repaired route")
+T.equal(repairedNavigation.nativeActive, false,
+    "budget-deferred repair reclaimed native ownership early")
+T.equal(repairedNavigation.lastPlanReason, "native_budget_deferred",
+    "deferred route repair lost its bounded retry reason")
+
+now = now + PNC.Const.ENGINE_PATH_REQUEST_BUDGET_WINDOW_MS
+PNC.EnginePathPlanner.GetSteeringTarget(repairedRecord, body, target)
+T.equal(requestCount, requestsBeforeTimeoutRepair + 1,
+    "repaired route was not requested after the budget window")
+T.truthy(repairedNavigation.nativeActive,
+    "replanned route did not restore native movement ownership")
+T.truthy(repairedNavigation.requestPending,
+    "replanned route was not marked pending")
+T.equal(repairedNavigation.requestRevision, 9,
+    "replanned route did not advance the request revision")
+T.equal(repairedNavigation.requestX, target.x,
+    "replanned route lost the final target")
+T.equal(behavior.target.x, target.x,
+    "replanned route did not call the Behavior2 adapter")
+
 local serverSource = T.read(SERVER_FILE)
     .. T.read(
         T.path("ProjectHoomans", "server", "PNC/")

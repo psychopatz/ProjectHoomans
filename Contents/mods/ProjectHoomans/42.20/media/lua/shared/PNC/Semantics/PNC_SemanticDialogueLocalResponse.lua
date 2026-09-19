@@ -255,9 +255,26 @@ local function locationText(ir, fact)
     return "I know where " .. name .. " is, but not exactly."
 end
 
+-- The question resolver is a pure domain spoke. These helpers are read-only
+-- response utilities shared with it; the public Response.Resolve contract is
+-- unchanged.
+Response.Internal = Response.Internal or {}
+local Internal = Response.Internal
+Internal.CopyArgs = copyArgs
+Internal.CatalogResponse = catalogResponse
+Internal.ClockText = clockText
+Internal.DayText = dayText
+Internal.WeatherText = weatherText
+Internal.IdentityText = identityText
+Internal.TargetText = targetText
+Internal.FactFor = factFor
+Internal.LocationText = locationText
+
+local resolveQuestion = require
+    "PNC/Semantics/PNC_SemanticDialogueLocalResponse_Questions"
+
 function Response.Resolve(ir, state, context, branch)
     if type(ir) ~= "table" then return nil end
-    local world = type(context) == "table" and context.worldContext or nil
     if branch == "GREET_ACKNOWLEDGED" then
         return catalogResponse("semantic.greeting", ir, state, context, {
             topic = state and state.currentTopic,
@@ -283,61 +300,9 @@ function Response.Resolve(ir, state, context, branch)
             args = copyArgs({ object = ir.object }),
         }
     end
-    if branch == "QUESTION_RECEIVED" and ir.subject == "TIME" then
-        local text = clockText(world)
-        if text then
-            return {
-                templateID = "semantic.question.time",
-                fallback = text,
-                args = copyArgs({
-                    hour = world.time and world.time.hour,
-                    minute = world.time and world.time.minute,
-                    gameDay = world.gameDay,
-                }),
-            }
-        end
-    end
-    if branch == "QUESTION_RECEIVED" and ir.subject == "DATE" then
-        local text = dayText(world)
-        if text then
-            local calendar = world.calendar or {}
-            return {
-                templateID = "semantic.question.date",
-                fallback = text,
-                args = copyArgs({
-                    gameDay = world.gameDay,
-                    year = calendar.year,
-                    month = calendar.month,
-                    day = calendar.day,
-                }),
-            }
-        end
-    end
-    if branch == "QUESTION_RECEIVED" and ir.subject == "WEATHER" then
-        local text = weatherText(world)
-        return {
-            templateID = "semantic.question.weather",
-            fallback = text or "I can't tell what the weather's doing right now.",
-            args = copyArgs({ weather = world and world.weather }),
-        }
-    end
-    if branch == "QUESTION_RECEIVED" and ir.subject == "IDENTITY" then
-        local text
-        if context and context.identityTrust == "untrustworthy" then
-            text = "I don't share my name with liars. What's yours, truthfully?"
-        elseif context and context.identityState == "known" then
-            text = identityText(context) .. " What's your name?"
-        else
-            text = "I'll tell you my name once we've established some trust."
-                .. " What's your name?"
-        end
-        return {
-            templateID = "semantic.question.identity",
-            fallback = text,
-            args = copyArgs({
-                npcName = context and (context.npcFullName or context.npcName),
-            }),
-        }
+    if branch == "QUESTION_RECEIVED" and type(resolveQuestion) == "function" then
+        local response = resolveQuestion(ir, state, context)
+        if response then return response end
     end
     if branch == "IDENTITY_CLAIM_RECEIVED" then
         local claim = ir.slots and ir.slots.identityClaim or {}
@@ -352,78 +317,6 @@ function Response.Resolve(ir, state, context, branch)
                 npcName = context and (context.npcFullName or context.npcName),
             }),
         }
-    end
-    if branch == "QUESTION_RECEIVED" and ir.subject == "ACTIVITY" then
-        return catalogResponse(
-            "semantic.question.activity", ir, state, context, {
-                activity = context and context.dialogueSituation
-                    and context.dialogueSituation.npc
-                    and context.dialogueSituation.npc.activity
-                    and context.dialogueSituation.npc.activity.id,
-            }
-        )
-    end
-    if branch == "QUESTION_RECEIVED" and ir.subject == "WELLBEING" then
-        return catalogResponse(
-            "semantic.question.wellbeing", ir, state, context, {
-                needType = context and context.dialogueSituation
-                    and context.dialogueSituation.npc
-                    and context.dialogueSituation.npc.needs
-                    and context.dialogueSituation.npc.needs.highest,
-            }
-        )
-    end
-    if branch == "QUESTION_RECEIVED"
-        and (ir.subject == "LOCATION" or ir.subject == "SEEN")
-    then
-        local fact = factFor(ir)
-        if fact and fact.status == "known" then
-            if ir.subject == "LOCATION" then
-                return {
-                    templateID = "semantic.question.location",
-                    fallback = locationText(ir, fact),
-                    args = copyArgs({
-                        target = targetText(ir.target, fact),
-                        location = fact.location,
-                        freshness = fact.freshness,
-                    }),
-                }
-            end
-            if fact.value == true then
-                return {
-                    templateID = "semantic.question.seen_yes",
-                    fallback = "Yes, I saw " .. targetText(ir.target, fact) .. ".",
-                    args = copyArgs({ target = targetText(ir.target, fact) }),
-                }
-            end
-            if fact.value == false then
-                return {
-                    templateID = "semantic.question.seen_no",
-                    fallback = "No, I haven't seen " .. targetText(ir.target, fact) .. ".",
-                    args = copyArgs({ target = targetText(ir.target, fact) }),
-                }
-            end
-        elseif fact and fact.status == "ambiguous" then
-            return {
-                templateID = "semantic.question.fact_clarification",
-                fallback = "I'm not sure which person you mean.",
-                args = copyArgs({ target = targetText(ir.target, fact) }),
-            }
-        elseif ir.subject == "LOCATION" then
-            return {
-                templateID = "semantic.question.location_unknown",
-                fallback = "I don't know where " .. targetText(ir.target, fact)
-                    .. " is.",
-                args = copyArgs({ target = targetText(ir.target, fact) }),
-            }
-        else
-            return {
-                templateID = "semantic.question.seen_unknown",
-                fallback = "I don't know if I've seen "
-                    .. targetText(ir.target, fact) .. ".",
-                args = copyArgs({ target = targetText(ir.target, fact) }),
-            }
-        end
     end
     if branch == "GOSSIP_RECEIVED" then
         local response = catalogResponse(

@@ -25,6 +25,8 @@ Hints.VERSION = 1
 Hints.MAX_RADIUS = 32
 Hints.CACHE_MS = 750
 Hints.Cache = Hints.Cache or {}
+local Projection = require
+    "PNC/Semantics/PNC_SemanticCampSiteHints_Projection"
 
 local function number(value)
     value = tonumber(value)
@@ -132,71 +134,6 @@ local function audit(scope, query, hint, reason, details)
     })
 end
 
-local function roomHint(site, query, timestamp)
-    if not site then return nil end
-    local distance = number(site.distance) or 0
-    local score = math.max(0.62, math.min(1,
-        1 - distance / math.max(8, Hints.MAX_RADIUS)))
-    return {
-        version = Hints.VERSION,
-        source = "client_loaded_rooms",
-        kind = CampSite.KIND,
-        scope = CampSite.SCOPES.ROOM,
-        siteScope = CampSite.SCOPES.ROOM,
-        siteID = text(site.siteID, 128),
-        roomID = text(site.roomID, 128),
-        buildingID = text(site.buildingID, 128),
-        roomType = text(site.roomType, 48),
-        roomName = text(site.roomName, 64),
-        label = text(site.label, CampSite.MAX_LABEL),
-        labelKey = text(site.labelKey, 96),
-        risk = text(site.risk, 32),
-        query = text(query, CampSite.MAX_QUERY),
-        x = number(site.x),
-        y = number(site.y),
-        z = number(site.z) or 0,
-        minX = site.roomBounds and site.roomBounds.minX,
-        minY = site.roomBounds and site.roomBounds.minY,
-        maxX = site.roomBounds and site.roomBounds.maxX,
-        maxY = site.roomBounds and site.roomBounds.maxY,
-        radius = Hints.MAX_RADIUS,
-        score = score,
-        observedAt = timestamp,
-    }
-end
-
-local function campfireHint(target, context, origin, timestamp, cell)
-    if type(WorldHints) ~= "table"
-        or type(WorldHints.Resolve) ~= "function"
-    then
-        return nil, "world_hint_unavailable"
-    end
-    local hint, reason = WorldHints.Resolve({
-        kind = "campfire",
-        category = "CAMPFIRE",
-        concept = "CAMPFIRE",
-        text = "campfire",
-        radius = target and target.radius or 16,
-    }, context, { origin = origin, cell = cell })
-    if not hint then return nil, reason end
-    return {
-        version = Hints.VERSION,
-        source = "client_loaded_campfire",
-        kind = "campfire",
-        scope = CampSite.SCOPES.CAMPFIRE,
-        siteScope = CampSite.SCOPES.CAMPFIRE,
-        campfireID = hint.targetID or hint.resourceKey,
-        label = "campfire",
-        query = "campfire",
-        x = hint.x,
-        y = hint.y,
-        z = hint.z,
-        radius = hint.radius,
-        score = hint.score,
-        observedAt = timestamp,
-    }
-end
-
 function Hints.ClearCache()
     Hints.Cache = {}
 end
@@ -227,7 +164,9 @@ function Hints.Resolve(target, context)
     end
     if not origin then reason = "world_origin_unavailable"
     elseif scope == CampSite.SCOPES.CAMPFIRE then
-        hint, reason = campfireHint(target, context, origin, timestamp, cell)
+        hint, reason = Projection.Campfire(
+            target, context, origin, timestamp, cell, Hints, CampSite,
+            WorldHints)
     else
         site, roomReason = Geometry.FindNearestRoom(cell, origin, {
             text = query,
@@ -237,7 +176,7 @@ function Hints.Resolve(target, context)
             preferredSiteID = target.siteID,
             preferredRoomID = target.roomID,
         })
-        hint = roomHint(site, query, timestamp)
+        hint = Projection.Room(site, query, timestamp, Hints, CampSite)
         if not hint and not hasExplicitRoom then
             -- A requested room label is a preference, not a safety
             -- requirement. If this building has no bedroom/living-room/etc,
@@ -249,21 +188,23 @@ function Hints.Resolve(target, context)
                     preferredSiteID = target.siteID,
                     preferredRoomID = target.roomID,
                 })
-            hint = roomHint(site, query, timestamp)
+            hint = Projection.Room(site, query, timestamp, Hints, CampSite)
             if hint then
                 reason = "room_type_fallback"
             end
         end
         if not hint and scope == CampSite.SCOPES.HERE then
-            hint, fallbackReason = campfireHint(target, context, origin,
-                timestamp, cell)
+            hint, fallbackReason = Projection.Campfire(
+                target, context, origin, timestamp, cell, Hints, CampSite,
+                WorldHints)
             reason = hint and nil or fallbackReason or roomReason
         elseif not hint then
             -- An explicit room request still degrades to a nearby campfire
             -- when no indoor room is loaded; the server validates the exact
             -- primitive hint before accepting the command.
-            hint, fallbackReason = campfireHint(target, context, origin,
-                timestamp, cell)
+            hint, fallbackReason = Projection.Campfire(
+                target, context, origin, timestamp, cell, Hints, CampSite,
+                WorldHints)
             reason = hint and "campfire_fallback"
                 or fallbackReason or roomReason or "room_not_found"
         end

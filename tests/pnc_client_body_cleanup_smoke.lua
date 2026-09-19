@@ -151,6 +151,17 @@ T.equal(onlineIDCollision.wasRemoved(), false,
     "online-ID collision body preserved")
 T.equal(onlineIDCollision:getModData().PNC_UUID, "different_npc",
     "online-ID collision was not rebound to the wrong NPC")
+T.equal(PNC.ClientPresenceSync.BodyByID.npc_client, false,
+    "duplicate NPC UUIDs were not left ambiguous in the body registry")
+T.equal(
+    PNC.ClientPresenceSync.BodyByLease["npc_client:lease-new"],
+    canonical,
+    "body registry lost the canonical lease identity"
+)
+T.equal(PNC.ClientPresenceSync.BodyByOnlineID["11"], false,
+    "duplicate online IDs were not left ambiguous in the body registry")
+T.equal(PNC.ClientPresenceSync.BodyByInstanceID["1001"], canonical,
+    "body registry lost the canonical instance identity")
 
 local exact = makeBody({
     instanceID = 2001,
@@ -175,6 +186,11 @@ T.equal(PNC.ClientPresenceSync.RemoveBodyInstance({
 T.equal(exact.wasRemoved(), true, "exact server-directed body removed")
 T.equal(removalCollision.wasRemoved(), false,
     "online-ID collision was not removed with another NPC")
+
+getCell = function() return nil end
+PNC.ClientPresenceSync.Internal.RefreshBodyMap(1000)
+T.equal(PNC.ClientPresenceSync.BodyByID.npc_client, nil,
+    "body registry retained entries while the local cell was unavailable")
 T.finish("pnc_client_body_cleanup_smoke")
 
 T.finish("pnc_client_body_cleanup_smoke")

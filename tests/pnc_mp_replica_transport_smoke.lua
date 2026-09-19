@@ -564,8 +564,13 @@ local controllerModules = {
     "PNC_ClientNativePathController_State.lua",
     "PNC_ClientNativePathController_Goal.lua",
     "PNC_ClientNativePathController_Passage.lua",
+    "PNC_ClientNativePathController_Passage_Common.lua",
+    "PNC_ClientNativePathController_Passage_Fence.lua",
+    "PNC_ClientNativePathController_Passage_Window.lua",
+    "PNC_ClientNativePathController_Passage_Routing.lua",
     "PNC_ClientNativePathController_Binding.lua",
     "PNC_ClientNativePathController_Request.lua",
+    "PNC_ClientNativePathController_Recovery.lua",
     "PNC_ClientNativePathController_Update.lua",
     "PNC_ClientNativePathController_Lifecycle.lua",
 }

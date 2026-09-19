@@ -1,6 +1,5 @@
 -- Deterministic client Conversation composition root.
 require "PNC/Conversation/PNC_Conversation"
-require "PNC/UI/Context/Providers/PNC_ContextProvider_Conversation"
 
 if Events and Events.OnTick and PNC.Conversation
     and PNC.Conversation.Composer

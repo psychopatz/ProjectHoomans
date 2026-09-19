@@ -80,6 +80,9 @@ function Trace.Reset()
     Internal.byBody = setmetatable({}, { __mode = "k" })
     Internal.byNPC = {}
     Internal.autoDumped = {}
+    Internal.autoDumpOrder = {}
+    Internal.autoDumpOrderNext = 1
+    Internal.autoDumpOrderCount = 0
 end
 
 function Trace.SetEnabled(enabled)

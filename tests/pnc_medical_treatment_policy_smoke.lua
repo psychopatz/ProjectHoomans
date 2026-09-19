@@ -10,6 +10,7 @@ local now = 1000
 local consumed = 0
 local xpActor
 local applied = {}
+local treatmentDebugMessages = {}
 
 local function deepCopy(value, seen)
     if type(value) ~= "table" then return value end
@@ -34,6 +35,13 @@ PNC = {
         Now = function() return now end,
         IsAuthority = function() return true end,
         DeepCopy = deepCopy,
+        IsRecordDebugEnabled = function(record)
+            return record and record.runtime
+                and record.runtime.debug == true
+        end,
+        LogRecordDebug = function(_, message)
+            treatmentDebugMessages[#treatmentDebugMessages + 1] = message
+        end,
     },
     Types = {
         IsColonist = function(record)
@@ -90,7 +98,7 @@ local colonist = {
     inventory = { items = {
         bandage = { id = "bandage", type = "Base.Bandage", stack = 1 },
     } },
-    runtime = {},
+    runtime = { debug = true },
 }
 local abstract = {
     id = "abstract-doctor",
@@ -123,6 +131,12 @@ T.equal(colonist.inventory.items.bandage.stack, 0,
     "colonist bandage stack decremented")
 T.equal(applied[1].bandageType, "Base.Bandage",
     "colonist wound retains actual bandage type")
+T.contains(treatmentDebugMessages[1],
+    "health.treatment event=apply_bandage route=npc_self")
+T.contains(treatmentDebugMessages[2],
+    "health.treatment event=complete route=npc_self")
+T.contains(treatmentDebugMessages[2],
+    "status=applied reason=bandaged")
 
 before = consumed
 T.equal(PNC.Treatment.TryNPCBandage(abstract, "Hand_L"), true,
@@ -134,6 +148,7 @@ T.equal(applied[2].bandageType, "PNC.AbstractMedical",
 
 colonist.inventory.items.bandage.stack = 1
 before = consumed
+patient.runtime.debug = true
 T.equal(PNC.Treatment.TryNPCMedicalTreatment(
     colonist, patient, "UpperArm_L"), true,
     "colonist doctor treats another NPC")
@@ -143,6 +158,10 @@ T.equal(xpActor, colonist,
     "First Aid XP belongs to the doctor")
 T.equal(applied[3].actorTarget, "patient",
     "doctor treatment applied to the patient")
+T.contains(treatmentDebugMessages[#treatmentDebugMessages],
+    "health.treatment event=complete route=npc_assist")
+T.contains(treatmentDebugMessages[#treatmentDebugMessages],
+    "actor=colonist-doctor target=patient")
 
 before = consumed
 T.equal(PNC.Treatment.TryNPCMedicalTreatment(
@@ -166,5 +185,41 @@ T.equal(travelingSnapshot.phase, "traveling",
     "medical-care snapshot exposes the traveling phase")
 T.equal(travelingSnapshot.patientId, "patient",
     "medical-care snapshot keeps its patient target")
+
+local appliedCount = #applied
+PNC.Core.IsAuthority = function() return false end
+local rejectedBandage, rejectedBandageReason = PNC.Treatment.ApplyBandage(
+    patient, "ForeArm_R", {})
+T.equal(rejectedBandage, false,
+    "direct bandage application rejects a non-authoritative caller")
+T.equal(rejectedBandageReason, "not_authority",
+    "direct bandage rejection has an explicit reason")
+T.equal(#applied, appliedCount,
+    "non-authoritative bandage does not mutate wound state")
+T.contains(treatmentDebugMessages[#treatmentDebugMessages],
+    "route=direct")
+T.contains(treatmentDebugMessages[#treatmentDebugMessages],
+    "status=rejected reason=not_authority")
+
+PNC.Treatment.Internal.LogDebug(
+    patient,
+    "complete\n" .. string.rep("e", 100),
+    "player",
+    "rejected",
+    "bad\nreason",
+    { unsafe = true },
+    "patient",
+    "UpperArm_L",
+    "Base.Bandage",
+    "policy",
+    4
+)
+local boundedMessage = treatmentDebugMessages[#treatmentDebugMessages]
+T.contains(boundedMessage, "actor=unsupported")
+T.contains(boundedMessage, "reason=bad reason")
+T.truthy(not string.find(boundedMessage, "\n", 1, true),
+    "treatment diagnostics strip control characters")
+T.truthy(#boundedMessage < 700,
+    "treatment diagnostic fields are length bounded")
 
 T.finish("pnc_medical_treatment_policy_smoke")

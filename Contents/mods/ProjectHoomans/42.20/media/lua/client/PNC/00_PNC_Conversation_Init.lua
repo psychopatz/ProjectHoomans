@@ -1,2 +1,2 @@
--- Build 42.20 conversation runtime bootstrap.
-require "PNC/Conversation/Composition/PNC_ConversationClientComposition"
+-- Build 42.20 client Conversation and adapter bootstrap.
+require "PNC/Composition/PNC_ConversationRuntimeComposition"

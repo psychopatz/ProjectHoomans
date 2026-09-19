@@ -15,62 +15,8 @@ local GiftSelection = PNC.Semantics.GiftSelection
 local GiftLifecycle = PNC.Semantics.GiftLifecycle
 local audit = Internal.Audit or function() return false end
 local actionContext = Internal.ActionContext
-
-local function giftResponse(templateID, fallback, args)
-    return {
-        key = templateID,
-        domain = "pnc.system.shared.categories",
-        text = fallback,
-        fallback = fallback,
-        args = args,
-    }
-end
-
-local function giftConversationContext(view)
-    local root = view and view.spec and view.spec.context or nil
-    if type(root) ~= "table" then return nil end
-    root.giftConversationActive = true
-    if type(root.conversationBlockContext) == "table" then
-        root.conversationBlockContext.giftConversationActive = true
-    end
-    return root
-end
-
-local function openGiftSelector(view, offer, context, reason)
-    giftConversationContext(view)
-    local window = PNC.InventoryWindow
-    if not window or type(window.Open) ~= "function" then
-        return {
-            status = "gift_selector_unavailable",
-            accepted = false,
-            reason = "inventory_ui_unavailable",
-            response = giftResponse(
-                "semantic.gift.selection_required",
-                "I need to see what you brought me first."
-            ),
-        }
-    end
-    window.Open(context.npcID, {
-        mode = "gift",
-        token = context.conversationToken,
-        giftIntent = offer,
-        semantic = true,
-    })
-    audit("semantic.gift.selector_opened", {
-        npcID = context.npcID,
-        conversationID = context.conversationID,
-        requestID = context.requestID,
-        query = offer and offer.query,
-        mode = offer and offer.mode,
-        reason = reason,
-    }, { requestID = context.requestID })
-    return {
-        status = "gift_selector_open",
-        accepted = true,
-        pending = true,
-        reason = reason,
-    }
-end
+local giftResponse = Internal.GiftResponse
+local openGiftSelector = Internal.OpenGiftSelector
 
 local function targetInventoryRevision(npcID)
     local state = PNC.Network and PNC.Network.ClientState or nil
@@ -81,19 +27,9 @@ local function targetInventoryRevision(npcID)
         or inventory.summary and inventory.summary.revision)) or 0
 end
 
-function Internal.DispatchGiftOffer(view, result, value)
-    local decision = result and result.decision or {}
-    local offer = decision.giftOffer
-    if type(offer) ~= "table" or type(actionContext) ~= "function" then
-        return nil
-    end
-    local context = actionContext(view, result, value)
-    if offer.mode == "selection" then
-        return openGiftSelector(view, offer, context,
-            "gift_item_selection_required")
-    end
+local function findGiftSelection(view, offer, context)
     if not GiftSelection or type(GiftSelection.Find) ~= "function" then
-        return {
+        return nil, {
             status = "gift_selector_unavailable",
             accepted = false,
             reason = "gift_matcher_unavailable",
@@ -105,87 +41,88 @@ function Internal.DispatchGiftOffer(view, result, value)
     local player = getSpecificPlayer and getSpecificPlayer(0)
         or getPlayer and getPlayer() or nil
     local selection, reason, details = GiftSelection.Find(player, offer)
-    if not selection then
-        if reason == "gift_item_ambiguous" then
-            return openGiftSelector(view, offer, context, reason)
-        end
-        audit("semantic.gift.match_failed", {
+    if selection then return selection end
+    if reason == "gift_item_ambiguous" then
+        return nil, openGiftSelector(view, offer, context, reason)
+    end
+    audit("semantic.gift.match_failed", {
+        npcID = context.npcID,
+        conversationID = context.conversationID,
+        requestID = context.requestID,
+        query = offer.query,
+        reason = reason,
+        details = details,
+    }, { requestID = context.requestID })
+    return nil, {
+        status = reason or "gift_item_not_found",
+        accepted = false,
+        reason = reason,
+        response = giftResponse(
+            "semantic.gift.not_found",
+            "I couldn't find that in your hands.",
+            { query = offer.query }
+        ),
+    }
+end
+
+local function beginGiftRequest(session, value, context, selection, requestID)
+    if not session then return true end
+    local active = GiftLifecycle and GiftLifecycle.Active
+        and GiftLifecycle.Active(session, context.npcID) or nil
+    if active then
+        audit("semantic.gift.request_rejected", {
             npcID = context.npcID,
             conversationID = context.conversationID,
-            requestID = context.requestID,
-            query = offer.query,
-            reason = reason,
-            details = details,
-        }, { requestID = context.requestID })
-        return {
-            status = reason or "gift_item_not_found",
+            requestID = requestID,
+            reason = "gift_request_active",
+            activeRequestID = active.requestID,
+        }, { requestID = requestID })
+        return false, {
+            status = "gift_request_busy",
             accepted = false,
-            reason = reason,
+            reason = "gift_request_active",
             response = giftResponse(
-                "semantic.gift.not_found",
-                "I couldn't find that in your hands.",
-                { query = offer.query }
+                "semantic.gift.busy",
+                "I'm still processing the last gift."
             ),
         }
     end
-
-    local session = view and view.session
-    local requestID = "semantic-gift:" .. tostring(context.npcID or "npc")
-        .. ":" .. tostring(context.requestID or "request")
-    if session then
-        local active = GiftLifecycle and GiftLifecycle.Active
-            and GiftLifecycle.Active(session, context.npcID) or nil
-        if active then
-            audit("semantic.gift.request_rejected", {
-                npcID = context.npcID,
-                conversationID = context.conversationID,
-                requestID = requestID,
-                reason = "gift_request_active",
-                activeRequestID = active.requestID,
-            }, { requestID = requestID })
-            return {
-                status = "gift_request_busy",
-                accepted = false,
-                reason = "gift_request_active",
-                response = giftResponse(
-                    "semantic.gift.busy",
-                    "I'm still processing the last gift."
-                ),
-            }
-        end
-        local begun
-        local beginReason
-        if GiftLifecycle and type(GiftLifecycle.Begin) == "function" then
-            begun, beginReason = GiftLifecycle.Begin(session, requestID, {
-                mode = "auto",
-                rawText = value,
-                query = selection.query,
-                itemIDs = selection.itemIDs,
-                selection = selection,
-                npcID = context.npcID,
-                conversationID = context.conversationID,
-            })
-        else
-            begun, beginReason = false, "gift_lifecycle_unavailable"
-        end
-        if not begun then
-            audit("semantic.gift.request_rejected", {
-                npcID = context.npcID,
-                conversationID = context.conversationID,
-                requestID = requestID,
-                reason = beginReason,
-            }, { requestID = requestID })
-            return {
-                status = "gift_request_busy",
-                accepted = false,
-                reason = beginReason,
-                response = giftResponse(
-                    "semantic.gift.busy",
-                    "I'm still processing the last gift."
-                ),
-            }
-        end
+    local begun
+    local beginReason
+    if GiftLifecycle and type(GiftLifecycle.Begin) == "function" then
+        begun, beginReason = GiftLifecycle.Begin(session, requestID, {
+            mode = "auto",
+            rawText = value,
+            query = selection.query,
+            itemIDs = selection.itemIDs,
+            selection = selection,
+            npcID = context.npcID,
+            conversationID = context.conversationID,
+        })
+    else
+        begun, beginReason = false, "gift_lifecycle_unavailable"
     end
+    if not begun then
+        audit("semantic.gift.request_rejected", {
+            npcID = context.npcID,
+            conversationID = context.conversationID,
+            requestID = requestID,
+            reason = beginReason,
+        }, { requestID = requestID })
+        return false, {
+            status = "gift_request_busy",
+            accepted = false,
+            reason = beginReason,
+            response = giftResponse(
+                "semantic.gift.busy",
+                "I'm still processing the last gift."
+            ),
+        }
+    end
+    return true
+end
+
+local function sendGiftTransfer(session, context, selection, requestID)
     local client = PNC.Client
     local sent = client and type(client.SendInventoryTransfer) == "function"
         and client.SendInventoryTransfer({
@@ -230,6 +167,29 @@ function Internal.DispatchGiftOffer(view, result, value)
         requestID = requestID,
         selection = selection,
     }
+end
+
+function Internal.DispatchGiftOffer(view, result, value)
+    local decision = result and result.decision or {}
+    local offer = decision.giftOffer
+    if type(offer) ~= "table" or type(actionContext) ~= "function" then
+        return nil
+    end
+    local context = actionContext(view, result, value)
+    if offer.mode == "selection" then
+        return openGiftSelector(view, offer, context,
+            "gift_item_selection_required")
+    end
+    local selection, selectionResult = findGiftSelection(view, offer, context)
+    if not selection then return selectionResult end
+
+    local session = view and view.session
+    local requestID = "semantic-gift:" .. tostring(context.npcID or "npc")
+        .. ":" .. tostring(context.requestID or "request")
+    local begun, beginResult = beginGiftRequest(
+        session, value, context, selection, requestID)
+    if not begun then return beginResult end
+    return sendGiftTransfer(session, context, selection, requestID)
 end
 
 return Input

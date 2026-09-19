@@ -45,13 +45,20 @@ local World = T.load(
     "PNC/Semantics/PNC_SemanticWorldContext.lua"
 )
 World.Clear()
+local resolvedTimeOfDay
+World.SetTimeBandResolver(function(timeOfDay)
+    resolvedTimeOfDay = timeOfDay
+    return "sunset"
+end)
 
 local first = World.Get({ player = player, force = true })
 T.equal(first.kind, "world_context", "world context kind")
 T.equal(first.gameDay, 2, "world age produces compact game day")
 T.equal(first.time.hour, 13, "calendar hour is captured")
 T.equal(first.time.minute, 30, "calendar minute is captured")
-T.equal(first.time.band, "sunset", "time band uses conversation time adapter")
+T.equal(first.time.band, "sunset", "time band uses its injected resolver")
+T.equal(resolvedTimeOfDay, 13.5,
+    "time band resolver receives the world time snapshot")
 T.equal(first.calendar.year, 1993, "calendar year is captured")
 T.equal(first.calendar.month, 7, "calendar month is normalized to one-based")
 T.equal(first.calendar.day, 14, "calendar day is normalized to one-based")

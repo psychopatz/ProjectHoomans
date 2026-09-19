@@ -21,8 +21,7 @@ local function boundedText(value, maximum)
     return value
 end
 
-local function normalizedName(value)
-    local resolver = PNC.Semantics and PNC.Semantics.EntityResolver
+local function normalizedName(value, resolver)
     if resolver and type(resolver.NormalizeName) == "function" then
         return resolver.NormalizeName(value)
     end
@@ -53,9 +52,8 @@ local function runtimeNow()
     return 0
 end
 
-local function audit(eventName, data, options)
-    local diagnostics = PNC.Semantics
-        and PNC.Semantics.SemanticDiagnostics or nil
+local function audit(group, eventName, data, options)
+    local diagnostics = group and group.semanticDiagnostics or nil
     if not diagnostics
         or type(diagnostics.IsEnabled) ~= "function"
         or diagnostics.IsEnabled() ~= true
@@ -272,7 +270,7 @@ function Group:BeginTurn(value)
         table.remove(self.events, 1)
     end
     self:Refresh()
-    audit("semantic.group.turn", {
+    audit(self, "semantic.group.turn", {
         groupID = self.id,
         turnID = turn.id,
         participantCount = turn.participantCount,
@@ -310,14 +308,14 @@ function Group:AddressedIDs(result, rawText)
     for _ in pairs(addressed) do count = count + 1 end
     if count > 0 then return addressed end
 
-    local normalized = normalizedName(rawText)
+    local normalized = normalizedName(rawText, self.entityResolver)
     if normalized == "" then return addressed end
     local padded = " " .. normalized .. " "
     for index = 1, #self.members do
         local member = self.members[index]
         local aliases = { member.firstName, member.name }
         for aliasIndex = 1, #aliases do
-            local alias = normalizedName(aliases[aliasIndex])
+            local alias = normalizedName(aliases[aliasIndex], self.entityResolver)
             if alias ~= ""
                 and string.find(padded, " " .. alias .. " ", 1, true)
             then
@@ -375,8 +373,7 @@ end
 -- transport result; only enqueue the other speakers. This keeps one server
 -- command and one semantic interpretation while preserving group dialogue.
 function Group:QueueGroupCampResponses(value, primaryResult, actionResult)
-    local semantics = PNC.Semantics
-    local input = semantics and semantics.DialogueInput or nil
+    local input = self.dialogueInput
     local internal = input and input.Internal or nil
     local primary = self.primaryHost
     local queued = 0
@@ -413,7 +410,7 @@ function Group:QueueGroupCampResponses(value, primaryResult, actionResult)
         end
     end
     if self.activeTurn then self.activeTurn.responseCount = queued end
-    audit("semantic.group.camp_responses_queued", {
+    audit(self, "semantic.group.camp_responses_queued", {
         groupID = self.id,
         turnID = self.activeTurn and self.activeTurn.id,
         responseCount = queued,
@@ -423,8 +420,7 @@ function Group:QueueGroupCampResponses(value, primaryResult, actionResult)
 end
 
 function Group:Fanout(value, primaryResult)
-    local semantics = PNC.Semantics
-    local input = semantics and semantics.DialogueInput or nil
+    local input = self.dialogueInput
     local internal = input and input.Internal or nil
     local primary = self.primaryHost
     if not internal or not primary or not primaryResult
@@ -438,7 +434,7 @@ function Group:Fanout(value, primaryResult)
         -- A spoken gift has one explicit recipient in the current slice. Do
         -- not duplicate the same item transfer for every nearby participant;
         -- multi-recipient gifting gets its own negotiation round later.
-        audit("semantic.group.gift_primary_only", {
+        audit(self, "semantic.group.gift_primary_only", {
             groupID = self.id,
             turnID = self.activeTurn and self.activeTurn.id,
             reason = "gift_recipient_selection_not_implemented",
@@ -446,7 +442,7 @@ function Group:Fanout(value, primaryResult)
         return 0, "gift_primary_only"
     end
     if decision.route == "llm_fallback" then
-        audit("semantic.group.fallback", {
+        audit(self, "semantic.group.fallback", {
             groupID = self.id,
             turnID = self.activeTurn and self.activeTurn.id,
             reason = "llm_fallback",
@@ -511,7 +507,7 @@ function Group:Fanout(value, primaryResult)
                         end
                     end
                 end
-                audit("semantic.group.member", {
+                audit(self, "semantic.group.member", {
                     groupID = self.id,
                     turnID = self.activeTurn and self.activeTurn.id,
                     npcID = member.id,
@@ -524,7 +520,7 @@ function Group:Fanout(value, primaryResult)
             end)
             host.semanticRequestID = nil
             if not ok then
-                audit("semantic.group.member_failed", {
+                audit(self, "semantic.group.member_failed", {
                     groupID = self.id,
                     turnID = self.activeTurn and self.activeTurn.id,
                     npcID = member.id,
@@ -541,7 +537,7 @@ end
 function Group:Submit(value, part)
     if self.closed == true then return false, "group_closed" end
     if self.submitting == true then return false, "group_submit_busy" end
-    local input = PNC.Semantics and PNC.Semantics.DialogueInput or nil
+    local input = self.dialogueInput
     local internal = input and input.Internal or nil
     local primary = self.primaryHost
     if not internal or type(internal.SubmitSingle) ~= "function"
@@ -560,7 +556,7 @@ function Group:Submit(value, part)
     primary.semanticRequestID = nil
     if not ok then
         self.submitting = false
-        audit("semantic.group.submit_failed", {
+        audit(self, "semantic.group.submit_failed", {
             groupID = self.id,
             turnID = self.activeTurn and self.activeTurn.id,
             reason = tostring(accepted),
@@ -599,6 +595,9 @@ function Group.Create(primaryHost, hosts, entries, player, options)
         id = "group:" .. safeID(base),
         player = player,
         mode = options.mode,
+        dialogueInput = options.dialogueInput,
+        semanticDiagnostics = options.semanticDiagnostics,
+        entityResolver = options.entityResolver,
         turnSequence = 0,
         events = {},
         activeTurn = nil,
@@ -608,7 +607,7 @@ function Group.Create(primaryHost, hosts, entries, player, options)
     setmetatable(self, { __index = Group })
     local rebound, reason = self:Rebind(hosts, entries, primaryHost)
     if not rebound then return nil, reason end
-    audit("semantic.group.created", {
+    audit(self, "semantic.group.created", {
         groupID = self.id,
         participantCount = #self.members,
         participantIDs = copyIDs(self.participantIDs),

@@ -11,6 +11,8 @@ local maintained = 0
 local locomotionWrites = 0
 local humanizedWrites = 0
 local femaleWrites = 0
+local previewEnabled = true
+local traceBegins = {}
 local modData = {}
 local variables = {}
 local body = {
@@ -43,6 +45,12 @@ PNC = {
     Animation = {
         Apply = function() locomotionWrites = locomotionWrites + 1 end,
     },
+    AnimationTrace = {
+        Begin = function(_, info)
+            traceBegins[#traceBegins + 1] = info
+        end,
+        Sample = function() end,
+    },
     LiveBodyControl = {
         MaintainHumanizedBody = function()
             humanizedWrites = humanizedWrites + 1
@@ -50,7 +58,7 @@ PNC = {
     },
     AnimationDebugPlayer = {
         IsPreviewing = function(candidate)
-            return candidate == body
+            return previewEnabled and candidate == body
         end,
         Maintain = function(candidate, now)
             T.truthy(candidate == body, "wrong preview body")
@@ -92,6 +100,37 @@ T.truthy(variables.PNCActor == true, "NPC identity variable was not maintained")
 T.truthy(variables.PNCLive == true, "live identity variable was not maintained")
 T.truthy(modData.PNC_UUID == "debug-npc", "body identity tag was not maintained")
 T.truthy(modData.PNC_NPC == true, "NPC body tag was not maintained")
+
+previewEnabled = false
+modData.PNC_ClientAttackKey = nil
+PNC.ClientPresenceSync.Internal.ApplySnapshotToBody({
+    id = "debug-npc",
+    presenceState = "live",
+    combatDebugState = {},
+    visualState = {
+        attackActive = true,
+        attackAnim = "Attack1H1",
+        attackFinishAt = 6000,
+    },
+}, body, true)
+T.equal(#traceBegins, 0,
+    "combat snapshot payload alone does not enable animation tracing")
+
+modData.PNC_ClientAttackKey = nil
+PNC.ClientPresenceSync.Internal.ApplySnapshotToBody({
+    id = "debug-npc",
+    presenceState = "live",
+    debugState = { debugEnabled = true },
+    visualState = {
+        attackActive = true,
+        attackAnim = "Attack1H1",
+        attackFinishAt = 6000,
+    },
+}, body, true)
+T.equal(#traceBegins, 1,
+    "explicit debug snapshot enables animation tracing")
+T.equal(traceBegins[1].debugEnabled, true,
+    "animation trace receives explicit diagnostic gate")
 T.finish("pnc_animation_debug_snapshot_gate_smoke")
 
 T.finish("pnc_animation_debug_snapshot_gate_smoke")

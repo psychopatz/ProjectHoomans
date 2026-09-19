@@ -3,7 +3,6 @@
 -- draggable conversation-panel framing and current-player data.
 
 require "PsychopatzCore/UI/Conversation/Parts/PsychopatzConversationPart"
-require "PNC/UI/Relationships/PNC_RelationshipGraphPanel"
 
 PNC = PNC or {}
 PNC.Conversation = PNC.Conversation or {}

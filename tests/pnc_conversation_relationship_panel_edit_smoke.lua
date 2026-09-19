@@ -103,6 +103,8 @@ package.preload["PNC/UI/Relationships/PNC_RelationshipGraphPanel"] =
         return Graph
     end
 
+require "PNC/UI/Relationships/PNC_RelationshipGraphPanel"
+
 getMouseX = function() return 100 end
 getMouseY = function() return 100 end
 

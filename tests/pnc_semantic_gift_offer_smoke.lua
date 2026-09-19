@@ -164,12 +164,19 @@ local Input = T.load(
 )
 T.load(
     "ProjectHoomans", "client",
+    "PNC/Semantics/PNC_SemanticDialogueInput_GiftPresentation.lua"
+)
+T.load(
+    "ProjectHoomans", "client",
     "PNC/Semantics/PNC_SemanticDialogueInput_Gifts.lua"
 )
 local actionView = {
     spec = {
         npcID = "npc-alice",
-        context = { conversationLifecycleState = { token = "lease-one" } },
+        context = {
+            conversationLifecycleState = { token = "lease-one" },
+            conversationBlockContext = {},
+        },
     },
     session = {},
 }
@@ -187,8 +194,36 @@ T.equal(sentTransfer.itemIDs[1], "apple-a",
     "direct gift sends the locally matched item ID")
 T.equal(sentTransfer.conversationToken, "lease-one",
     "direct gift preserves the conversation lease token")
+local busyResult = Input.Internal.DispatchAction(actionView, {
+    sequence = 11,
+    ir = { normalizedText = "i have an apple for you", confidence = 0.95 },
+    decision = {
+        giftOffer = { mode = "explicit", query = "apple" },
+    },
+}, "I have an apple for you")
+T.equal(busyResult.status, "gift_request_busy",
+    "a pending gift blocks a second request for the same conversation")
+T.equal(PNC.Semantics.GiftLifecycle.Active(
+    actionView.session, "npc-alice").requestID, sentTransfer.requestId,
+    "a rejected gift leaves the active request intact")
 PNC.Semantics.GiftLifecycle.Clear(actionView.session,
     sentTransfer.requestId)
+
+local sendInventoryTransfer = PNC.Client.SendInventoryTransfer
+PNC.Client.SendInventoryTransfer = function() return false end
+local failedTransferResult = Input.Internal.DispatchAction(actionView, {
+    sequence = 13,
+    ir = { normalizedText = "i have an apple for you", confidence = 0.95 },
+    decision = {
+        giftOffer = { mode = "explicit", query = "apple" },
+    },
+}, "I have an apple for you")
+T.equal(failedTransferResult.status, "gift_transfer_unavailable",
+    "a rejected transport returns the existing transfer failure")
+T.equal(PNC.Semantics.GiftLifecycle.Active(
+    actionView.session, "npc-alice"), nil,
+    "a failed transfer clears its pending gift request")
+PNC.Client.SendInventoryTransfer = sendInventoryTransfer
 
 local selectorResult = Input.Internal.DispatchAction(actionView, {
     sequence = 12,
@@ -203,6 +238,26 @@ T.equal(openedSelector.npcID, "npc-alice",
     "gift selector targets the conversation NPC")
 T.equal(openedSelector.options.mode, "gift",
     "gift selector uses the existing gift UI mode")
+T.truthy(actionView.spec.context.giftConversationActive,
+    "opening the selector marks the semantic gift conversation active")
+T.truthy(actionView.spec.context.conversationBlockContext.giftConversationActive,
+    "opening the selector marks the conversation block context active")
+
+local inventoryWindow = PNC.InventoryWindow
+PNC.InventoryWindow = nil
+local unavailableSelectorResult = Input.Internal.DispatchAction(actionView, {
+    sequence = 14,
+    ir = { normalizedText = "i have a gift for you", confidence = 0.95 },
+    decision = {
+        giftOffer = { mode = "selection", query = "gift" },
+    },
+}, "I have a gift for you")
+T.equal(unavailableSelectorResult.status, "gift_selector_unavailable",
+    "missing inventory UI returns the established selector failure")
+T.equal(unavailableSelectorResult.response.key,
+    "semantic.gift.selection_required",
+    "missing inventory UI preserves the selection response contract")
+PNC.InventoryWindow = inventoryWindow
 
 PNC = originalPNC
 PsychopatzCore = originalPsychopatzCore

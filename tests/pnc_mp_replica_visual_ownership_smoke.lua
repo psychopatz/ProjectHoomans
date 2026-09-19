@@ -308,6 +308,25 @@ if PNC.ClientPresenceSync.Internal.BuildVisualKey(
 ) == firstNestedVisualKey then
     error("real nested tint change did not invalidate presentation")
 end
+PNC.ClientPresenceSync.Internal.ApplySnapshotToBody(
+    42,
+    remoteBody,
+    true
+)
+local malformedVisualStateSnapshot = {}
+local snapshotKey
+local snapshotValue
+for snapshotKey, snapshotValue in pairs(snapshot) do
+    malformedVisualStateSnapshot[snapshotKey] = snapshotValue
+end
+malformedVisualStateSnapshot.visualState = "moving"
+PNC.ClientPresenceSync.Internal.ApplySnapshotToBody(
+    malformedVisualStateSnapshot,
+    remoteBody,
+    true
+)
+T.equal(malformedVisualStateSnapshot.visualState, "moving",
+    "rendering mutated the stored snapshot while normalizing visual state")
 T.finish("pnc_mp_replica_visual_ownership_smoke")
 
 T.finish("pnc_mp_replica_visual_ownership_smoke")

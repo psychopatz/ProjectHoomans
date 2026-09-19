@@ -74,7 +74,7 @@ for _, value in ipairs({ "Dawn", "Sunrise", "Sunset", "Dusk", "Twilight" }) do
 end
 T.load(CLIENT .. "PNC/Conversation/PNC_ConversationDiary.lua")
 T.load(CLIENT .. "PNC/Conversation/Blocks/ConversationComposer/PNC_ConversationComposer.lua")
-T.load(CLIENT .. "PNC/Conversation/PNC_ConversationRelationship.lua")
+T.load(CLIENT .. "PNC/Conversation/ConversationRelationship/PNC_ConversationRelationship.lua")
 T.load(CLIENT .. "PNC/Conversation/PNC_ConversationDefinition.lua")
 T.load(CLIENT .. "PNC/Conversation/Debug/PNC_ConversationDebugModel.lua")
 T.load(CLIENT .. "PNC/UI/Context/Providers/PNC_ContextProvider_Conversation.lua")
@@ -1013,18 +1013,32 @@ T.equal(sandboxView.start,
     "sandbox execution opens the actual GUI registry browser")
 
 local refreshedSpec
+local conversationRefreshCount = 0
+local relationshipPanelUpdates = 0
+local relationshipPanelSummary
 definition.context.conversationLifecycleState = { token = "lease-persist" }
 definition.context.pendingConversationRequest = "category:pending"
 definition.context.activeConversationBlockID =
     "projecthoomans:ask_about_basic_neutral"
-PsychopatzCore.Conversation.instance = {
+local activeConversationView = {
     spec = definition,
+    extensionParts = {
+        relationship = {
+            setRelationship = function(_, value)
+                relationshipPanelUpdates = relationshipPanelUpdates + 1
+                relationshipPanelSummary = value
+            end,
+        },
+    },
     refreshConversationSpec = function(self, value)
+        conversationRefreshCount = conversationRefreshCount + 1
+        if self.rejectConversationRefresh then return false end
         refreshedSpec = value
         self.spec = value
         return true
     end,
 }
+PsychopatzCore.Conversation.instance = activeConversationView
 PNC.Network = { ClientState = {
     playerContext = {
         characterUUID = "character-alex",
@@ -1048,6 +1062,8 @@ PNC.Network = { ClientState = {
 } }
 T.truthy(PNC.Conversation.ReceiveKnowledgeSnapshot({ npcID = "npc-12" }),
     "identity refresh updates the active conversation")
+T.equal(conversationRefreshCount, 1,
+    "identity snapshot refreshes the active conversation once")
 T.equal(refreshedSpec.context.conversationLifecycleState.token, "lease-persist",
     "identity refresh preserves the conversation lease")
 T.equal(refreshedSpec.context.pendingConversationRequest, "category:pending",
@@ -1060,6 +1076,59 @@ for _, choice in ipairs(refreshedSpec.nodes.greeting.choices or {}) do
     T.truthy(choice.id ~= "ask_name",
         "persisted identity does not offer Ask Name again")
 end
+local relationship = PNC.Conversation.Relationship
+local clientState = PNC.Network.ClientState
+local previousCachedRelationship = relationship.presentationCache["npc-12"]
+local previousRelationshipMap = clientState.conversationRelationships
+local previousDiagnosticsMap = clientState.conversationRelationshipDiagnostics
+local previousReceiveAt = clientState.lastConversationRelationshipReceiveAt
+local acceptedHandler, handlerReason =
+    relationship.SetConversationRefreshHandler({})
+T.falsy(acceptedHandler, "invalid refresh handler is rejected")
+T.equal(handlerReason, "invalid_refresh_handler",
+    "invalid refresh handler returns a stable reason")
+local panelUpdatesBeforeRelationshipReceipt = relationshipPanelUpdates
+local visitPresentation = {
+    npcID = "npc-12",
+    revision = 200,
+    settlementVisit = {
+        active = true,
+        visitID = "visit-refresh-1",
+        expiresAt = 2000,
+        revision = 1,
+    },
+}
+T.truthy(relationship.ReceivePresentation(visitPresentation),
+    "relationship visit presentation is accepted")
+T.equal(conversationRefreshCount, 2,
+    "relationship receipt refreshes through the registered callback")
+T.equal(relationshipPanelUpdates,
+    panelUpdatesBeforeRelationshipReceipt + 1,
+    "successful conversation refresh updates its relationship panel once")
+T.equal(relationshipPanelSummary.revision, 200,
+    "conversation refresh uses the received relationship presentation")
+activeConversationView.rejectConversationRefresh = true
+T.truthy(relationship.ReceivePresentation({
+    npcID = "npc-12",
+    revision = 201,
+    settlementVisit = {
+        active = true,
+        visitID = "visit-refresh-2",
+        expiresAt = 2100,
+        revision = 2,
+    },
+}), "relationship presentation survives a rejected view refresh")
+T.equal(conversationRefreshCount, 3,
+    "registered refresh callback reports the rejected view refresh")
+T.equal(relationshipPanelUpdates,
+    panelUpdatesBeforeRelationshipReceipt + 2,
+    "rejected full refresh falls back to the relationship panel")
+T.equal(relationshipPanelSummary.revision, 201,
+    "panel fallback uses the newest relationship presentation")
+relationship.presentationCache["npc-12"] = previousCachedRelationship
+clientState.conversationRelationships = previousRelationshipMap
+clientState.conversationRelationshipDiagnostics = previousDiagnosticsMap
+clientState.lastConversationRelationshipReceiveAt = previousReceiveAt
 PNC.Network = nil
 PsychopatzCore.Conversation.instance = nil
 

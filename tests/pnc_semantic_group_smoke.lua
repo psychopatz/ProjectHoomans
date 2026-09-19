@@ -124,6 +124,7 @@ local function makeResult(value, sequence)
 end
 
 local internal = PNC.Semantics.DialogueInput.Internal
+local dialogueInput = PNC.Semantics.DialogueInput
 internal.Now = function() return 1234 end
 internal.ShallowContext = function(view) return view.spec.context end
 internal.RecordContextTurn = function(view, result, options)
@@ -193,8 +194,10 @@ internal.SubmitSingle = function(view, value)
     return true
 end
 
+PNC.Semantics = nil
 group = Group.Create(alice, hosts, entries, { id = "player-one" }, {
     mode = "nearby",
+    dialogueInput = dialogueInput,
 })
 T.truthy(group, "nearby group is created")
 T.equal(#group.members, 3, "all selected hosts become participants")

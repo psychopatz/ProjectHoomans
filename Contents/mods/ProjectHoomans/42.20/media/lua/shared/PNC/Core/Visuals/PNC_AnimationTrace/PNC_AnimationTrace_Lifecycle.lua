@@ -1,6 +1,56 @@
 local Trace = PNC.AnimationTrace
 local Internal = Trace.Internal
 
+local function clearBodyReference(trace)
+    for body, candidate in pairs(Internal.byBody) do
+        if candidate == trace then
+            Internal.byBody[body] = nil
+        end
+    end
+end
+
+local function retainedTraceCount()
+    local count = 0
+    for _, trace in pairs(Internal.byNPC) do
+        if trace then count = count + 1 end
+    end
+    return count
+end
+
+local function evictOldestTrace()
+    local oldestId
+    local oldestTrace
+    for npcId, trace in pairs(Internal.byNPC) do
+        if trace and (not oldestTrace
+            or trace.sequence < oldestTrace.sequence)
+        then
+            oldestId = npcId
+            oldestTrace = trace
+        end
+    end
+    if not oldestTrace then return false end
+    Internal.byNPC[oldestId] = nil
+    clearBodyReference(oldestTrace)
+    return true
+end
+
+local function retainByNPC(npcId, trace)
+    local traceId = tostring(npcId or "unknown")
+    local existing = Internal.byNPC[traceId]
+    local count
+    if existing == trace then return end
+    if existing then
+        clearBodyReference(existing)
+    else
+        count = retainedTraceCount()
+        while count >= Internal.MAX_RETAINED_TRACES do
+            if not evictOldestTrace() then break end
+            count = count - 1
+        end
+    end
+    Internal.byNPC[traceId] = trace
+end
+
 function Trace.Begin(body, info, now)
     local current
     local trace
@@ -21,9 +71,15 @@ function Trace.Begin(body, info, now)
                 and (now - current.startedAt) <= 50)
     then
         if info.npcId ~= nil then
+            local previousNpcId = current.npcId
             current.npcId = tostring(info.npcId)
-            Internal.byNPC[current.npcId] = current
+            if previousNpcId ~= current.npcId
+                and Internal.byNPC[previousNpcId] == current
+            then
+                Internal.byNPC[previousNpcId] = nil
+            end
         end
+        retainByNPC(current.npcId, current)
         if info.debugEnabled ~= nil then
             current.debugEnabled = info.debugEnabled == true
         end
@@ -42,10 +98,10 @@ function Trace.Begin(body, info, now)
         samples = {},
     }
     Internal.byBody[body] = trace
-    Internal.byNPC[trace.npcId] = trace
     sample = Internal.Capture(body, "trace_begin", now)
     trace.samples[1] = sample
     trace.lastSignature = Internal.StateSignature(sample)
+    retainByNPC(trace.npcId, trace)
     return trace
 end
 
@@ -55,6 +111,13 @@ function Trace.Ensure(body, info, now)
     return Trace.Begin(body, info, now)
 end
 
+function Trace.ExpectRearmSelectorClear(body)
+    local trace = body and Internal.byBody[body] or nil
+    if not trace or trace.finishing == true then return false end
+    trace.expectedRearmSelectorClear = true
+    return true
+end
+
 function Trace.Sample(body, event, now, force)
     local trace = body and Internal.byBody[body] or nil
     local sample
@@ -62,6 +125,12 @@ function Trace.Sample(body, event, now, force)
     if not trace then return nil end
     now = Internal.NowMillis(now)
     sample = Internal.Capture(body, event, now)
+    if trace.expectedRearmSelectorClear then
+        trace.expectedRearmSelectorClear = nil
+        if event == "setter_before" then
+            sample.expectedRearmSelectorClear = true
+        end
+    end
     signature = Internal.StateSignature(sample)
     if force ~= true and signature == trace.lastSignature then
         -- Keep the first unchanged sample crossing the handoff grace period.

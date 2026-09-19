@@ -3,14 +3,22 @@ PNC = PNC or {}
 PNC.PBrainZ = PNC.PBrainZ or {}
 PNC.PBrainZ.Internal = PNC.PBrainZ.Internal or {}
 
+require "PNC/Conversation/PNC_ConversationTime"
 require "PNC/Conversation/PNC_ConversationGroup"
+pcall(require, "PNC/PNC_ConversationSemantics")
 
 local Integration = PNC.PBrainZ
 local Internal = Integration.Internal
 local Config = Internal.InlineChatConfig
 local Resolver = PNC.CompanionTargetResolver
 local Inline = Integration.Inline
-local Group = PNC.Conversation.Group
+local ConversationSemantics = PNC.ConversationSemantics
+if ConversationSemantics
+    and type(ConversationSemantics.RegisterConversation) == "function"
+then
+    ConversationSemantics.RegisterConversation(
+        PNC.Conversation, PNC.Conversation.Group, PNC.Conversation.Time)
+end
 local Hosts = Internal.InlineChatHosts or {}
 Internal.InlineChatHosts = Hosts
 
@@ -119,11 +127,12 @@ function Hosts.Rebuild(player, resolved, requestedMode)
     Inline.host = newHosts[primaryIndex]
     Inline.groupConversation = nil
     if mode == Config.MODE_NEARBY and #newHosts > 1
-        and Group and type(Group.Create) == "function"
+        and ConversationSemantics
+        and type(ConversationSemantics.CreateGroup) == "function"
     then
         local group
         local reason
-        group, reason = Group.Create(
+        group, reason = ConversationSemantics.CreateGroup(
             Inline.host, newHosts, entries, player, { mode = mode }
         )
         if group then

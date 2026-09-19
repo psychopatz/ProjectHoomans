@@ -15,12 +15,8 @@ require "PNC/Semantics/PNC_SemanticTaskAdapter"
 require "PNC/Semantics/PNC_SemanticInventoryQueryAdapter"
 
 PNC = PNC or {}
-PNC.Conversation = PNC.Conversation or {}
 PNC.Semantics = PNC.Semantics or {}
 
-require "PNC/Conversation/PNC_ConversationGroup"
-
-local Conversation = PNC.Conversation
 local Policy = PNC.Semantics.DialoguePolicy
 local Text = PsychopatzCore.Conversation.Text
 local ResponseCatalog = PNC.Semantics.ResponseCatalog
@@ -48,9 +44,12 @@ Input.Internal = Input.Internal or {}
 require "PNC/Semantics/PNC_SemanticDialogueInput_Context"
 require "PNC/Semantics/PNC_SemanticDialogueInput_Presentation"
 require "PNC/Semantics/PNC_SemanticDialogueInput_Actions"
+require "PNC/Semantics/PNC_SemanticDialogueInput_GiftPresentation"
 require "PNC/Semantics/PNC_SemanticDialogueInput_Gifts"
 require "PNC/Semantics/PNC_SemanticDialogueInput_Inventory"
 require "PNC/Semantics/PNC_SemanticDialogueInput_Tasks"
+require "PNC/Semantics/PNC_SemanticDialogueInput_Trace"
+require "PNC/Semantics/PNC_SemanticDialogueInput_ProviderFallback"
 require "PNC/Semantics/PNC_SemanticDialogueInput_Lifecycle"
 
 local Internal = Input.Internal
@@ -111,7 +110,5 @@ function Input.CreatePart(bounds, options)
         bounds.x, bounds.y, bounds.width, bounds.height, options
     )
 end
-
-Conversation.CreateSemanticDialogueInput = Input.CreatePart
 
 return Input

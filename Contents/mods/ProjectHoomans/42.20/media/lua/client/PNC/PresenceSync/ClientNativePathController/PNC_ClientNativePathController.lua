@@ -15,6 +15,7 @@ require "PNC/PresenceSync/ClientNativePathController/PNC_ClientNativePathControl
 require "PNC/PresenceSync/ClientNativePathController/PNC_ClientNativePathController_Passage"
 require "PNC/PresenceSync/ClientNativePathController/PNC_ClientNativePathController_Binding"
 require "PNC/PresenceSync/ClientNativePathController/PNC_ClientNativePathController_Request"
+require "PNC/PresenceSync/ClientNativePathController/PNC_ClientNativePathController_Recovery"
 require "PNC/PresenceSync/ClientNativePathController/PNC_ClientNativePathController_Update"
 require "PNC/PresenceSync/ClientNativePathController/PNC_ClientNativePathController_Lifecycle"
 

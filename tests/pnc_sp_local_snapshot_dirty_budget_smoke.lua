@@ -2,6 +2,7 @@ local T = require "tests/support/test"
 
 local now = 1000
 local builds = 0
+local bootstrapPumps = 0
 local renderCountByID = {}
 
 local attacker = {
@@ -63,7 +64,24 @@ PNC = {
     Core = {
         Now = function() return now end,
     },
-    Client = {},
+    Client = {
+        Internal = {
+            IsWorldReady = function() return true end,
+        },
+        EnsurePlayerBootstrap = function(tickNow, forceKnowledge)
+            T.equal(tickNow, now, "player bootstrap did not share the presence tick time")
+            T.falsy(forceKnowledge, "unexpected knowledge flush was forced")
+            bootstrapPumps = bootstrapPumps + 1
+        end,
+        EnsureWorldDiscovery = function(tickNow, force)
+            T.equal(tickNow, now, "world discovery did not share the presence tick time")
+            T.falsy(force, "world discovery unexpectedly bypassed its retry gate")
+            bootstrapPumps = bootstrapPumps + 1
+        end,
+    },
+    KnowledgeInterest = {
+        ConsumeFlush = function() return false end,
+    },
     ClientPresenceSync = {
         BodyByID = bodyByID,
         BodyByInstanceID = {},
@@ -104,16 +122,23 @@ PNC = {
     },
 }
 
+T.load(
+    "ProjectHoomans",
+    "client",
+    "PNC/Networking/ClientRequests/PNC_ClientRequests_InitialStateTick.lua"
+)
 T.load("ProjectHoomans", "client", "PNC/PresenceSync/PNC_ClientPresenceTick.lua")
 local sync = PNC.ClientPresenceSync
 
 sync.OnTick()
+T.equal(bootstrapPumps, 2, "initial-state request pump did not run before local snapshots")
 T.equal(builds, 2, "initial local snapshots were not built")
 T.equal(renderCountByID[attacker.id], 1, "initial attacker was not rendered")
 T.equal(renderCountByID[idle.id], 1, "initial idle NPC was not rendered")
 
 now = 1100
 sync.OnTick()
+T.equal(bootstrapPumps, 4, "initial-state request pump did not run on the next tick")
 T.equal(builds, 3, "only the due local combat snapshot should rebuild")
 T.equal(renderCountByID[attacker.id], 2, "due attacker was not rendered")
 T.equal(

@@ -17,11 +17,18 @@ local Network = PNC.Network
 function API.ApplyDamage(npcId, damageEvent)
     local record = Registry.Get(npcId)
     local zombie
+    local applied
+    if not Core or not Core.IsAuthority or not Core.IsAuthority() then
+        return false, "not_authority"
+    end
     if not record then
         return false
     end
     zombie = Registry.GetLiveZombie(npcId)
-    Health.ApplyDamage(record, zombie, damageEvent or {})
+    applied = Health.ApplyDamage(record, zombie, damageEvent or {})
+    if not applied then
+        return false, "damage_rejected"
+    end
     Network.BroadcastRecord(record, "damage")
     if record.alive == false then
         Network.BroadcastRemoval(record.id, "death")
@@ -34,6 +41,11 @@ function API.ApplyDebugWound(npcId, args)
     local zombie
     local applied
     local result
+    if not Core or type(Core.IsAuthority) ~= "function"
+        or Core.IsAuthority() ~= true
+    then
+        return false, "not_authority"
+    end
     if not record or not PNC.NPCWounds or not PNC.NPCWounds.ApplyDebugWound then
         return false
     end
@@ -60,6 +72,11 @@ function API.ApplyDebugInfection(npcId, args)
     local zombie
     local applied
     local result
+    if not Core or type(Core.IsAuthority) ~= "function"
+        or Core.IsAuthority() ~= true
+    then
+        return false, "not_authority"
+    end
     if not record or not PNC.NPCWounds or not PNC.NPCWounds.ApplyDebugInfection then
         return false
     end

@@ -9,109 +9,8 @@ PNC.Semantics.DialogueInput = Input
 
 local Internal = Input.Internal or {}
 Input.Internal = Internal
-local Policy = PNC.Semantics.DialoguePolicy
-
-local function semanticTranslationKey(response)
-    local templateID = tostring(response and response.templateID or "")
-    if templateID == "semantic.question.identity" then
-        local fallback = tostring(response and response.fallback or "")
-        if string.find(string.lower(fallback), "liars", 1, true) then
-            return "UI_PNC_Conversation_Semantic_QuestionIdentityWary"
-        end
-        if string.sub(fallback, 1, 4) == "I'm " then
-            return "UI_PNC_Conversation_Semantic_QuestionIdentityKnown"
-        end
-        return "UI_PNC_Conversation_Semantic_QuestionIdentity"
-    end
-    local keys = {
-        ["semantic.identity.exchange"] =
-            "UI_PNC_Conversation_Semantic_IdentityExchange",
-        ["semantic.social.self_reflection.friendly"] =
-            "UI_PNC_Conversation_Semantic_SelfReflectionFriendly",
-        ["semantic.social.self_reflection.trusted"] =
-            "UI_PNC_Conversation_Semantic_SelfReflectionTrusted",
-        ["semantic.social.self_reflection.withdrawn"] =
-            "UI_PNC_Conversation_Semantic_SelfReflectionWithdrawn",
-        ["semantic.social.self_reflection.stressed"] =
-            "UI_PNC_Conversation_Semantic_SelfReflectionStressed",
-        ["semantic.social.self_reflection.default"] =
-            "UI_PNC_Conversation_Semantic_SelfReflectionDefault",
-        ["semantic.identity.evasion.untrustworthy"] =
-            "UI_PNC_Conversation_Semantic_IdentityEvasionUntrustworthy",
-        ["semantic.identity.evasion.friendly"] =
-            "UI_PNC_Conversation_Semantic_IdentityEvasionFriendly",
-        ["semantic.identity.evasion.withdrawn"] =
-            "UI_PNC_Conversation_Semantic_IdentityEvasionWithdrawn",
-        ["semantic.identity.evasion.default"] =
-            "UI_PNC_Conversation_Semantic_IdentityEvasionDefault",
-    }
-    return keys[templateID]
-end
-
-local function localizedResponse(response)
-    local fallback = tostring(response and response.fallback or "")
-    local key = semanticTranslationKey(response)
-    local translation = PNC.Translation
-    if not key or not translation
-        or type(translation.TrFormat) ~= "function"
-    then
-        return fallback, key
-    end
-    local args = type(response.args) == "table" and response.args or {}
-    local firstArg = args.npcName or args.target or args.object
-    if type(firstArg) == "table" then firstArg = nil end
-    local ok, value = pcall(translation.TrFormat, key, fallback, firstArg)
-    if ok and value ~= nil and tostring(value) ~= "" then
-        return tostring(value), key
-    end
-    return fallback, key
-end
-
-local function responsePayload(decision)
-    local response = decision and decision.response or {}
-    local fallback = tostring(response.fallback or "")
-    local text, translationKey = localizedResponse(response)
-    return {
-        key = response.templateID,
-        domain = "pnc.system.shared.categories",
-        -- Keep the authored English fallback on the live payload as well as
-        -- in the keyed field.  Text.Resolve still gives a registered
-        -- translation precedence, but a missing/late domain registration
-        -- cannot leak an internal semantic template ID into the UI.
-        text = text ~= "" and text or nil,
-        fallback = fallback,
-        args = response.args,
-        translationKey = translationKey,
-    }
-end
-
-local function campAcknowledgement(result, actionResult)
-    local decision = result and result.decision or {}
-    local action = string.upper(tostring(decision.action
-        or actionResult and actionResult.action or ""))
-    local phase
-    if action ~= "CAMP" or not actionResult
-        or actionResult.accepted ~= true
-        or type(Internal.CampResponseFor) ~= "function"
-    then
-        return nil
-    end
-    phase = (actionResult.status == "pending"
-        or actionResult.reason == "network_queued")
-        and "pending" or "admitted"
-    local text = Internal.CampResponseFor(
-        actionResult,
-        decision,
-        phase
-    )
-    if not text then return nil end
-    return {
-        key = "semantic.camp.requested",
-        domain = "pnc.system.shared.categories",
-        text = text,
-        fallback = text,
-    }
-end
+local ResponseAdapter = require
+    "PNC/Semantics/PNC_SemanticDialogueInput_Presentation_Responses"
 
 function Internal.AppendPlayerInput(view, value, result)
     local group = view and view.groupConversation
@@ -154,12 +53,13 @@ function Internal.QueueDeterministicResponse(
     local pendingChoices = session.currentNode
         and session.currentNode.choices or session.pendingChoices
     local decision = result.decision or {}
-    local response = options.response or responsePayload(decision)
+    local response = options.response or ResponseAdapter.Payload(decision)
     local ir = result.ir or {}
     if actionResult and type(actionResult.response) == "table" then
         response = actionResult.response
     end
-    local campResponse = campAcknowledgement(result, actionResult)
+    local campResponse = ResponseAdapter.CampAcknowledgement(
+        result, actionResult)
     if campResponse then response = campResponse end
     if actionResult and (actionResult.status == "gift_transfer_pending"
             or actionResult.status == "gift_transferred")

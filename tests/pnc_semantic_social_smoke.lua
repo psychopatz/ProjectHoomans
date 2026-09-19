@@ -175,6 +175,15 @@ T.equal(decision.branch, "HOSTILE_REMARK_RECEIVED",
 T.truthy(decision.response.fallback ~= "I'm not sure what you mean.",
     "recognized insult does not use generic clarification")
 
+local threatDecision = Policy.Decide(threat, state, {
+    llmEnabled = false,
+    npcID = "mara",
+})
+T.equal(threatDecision.branch, "THREAT_RECEIVED",
+    "explicit threats select their dedicated social response branch")
+T.equal(threatDecision.diagnostics.reason, "recognized_threat",
+    "threat routing keeps its deterministic decision reason")
+
 local withdrawn = Policy.Decide(insult, state, {
     llmEnabled = false,
     npcID = "mara-withdrawn",

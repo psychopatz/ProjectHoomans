@@ -175,6 +175,84 @@ local rejected, rejectedReason = PNC.PlayerDamage.HandleClientReport(player, {
 })
 T.equal(rejected, false, "spoofed attacker rejected")
 T.equal(rejectedReason, "attacker_mismatch", "spoofed attacker reason")
+
+now = 1300
+local staleOnlineBody, staleOnlineBodyReason =
+    PNC.PlayerDamage.HandleClientReport(player, {
+        id = "neutral_1",
+        attackerOnlineID = 12,
+        bodyOnlineID = 78,
+        bodyInstanceID = 991,
+        bodyLease = "lease_1",
+        weaponFullType = "Base.Axe",
+        damage = 1,
+    })
+T.equal(staleOnlineBody, false, "stale online body ID rejected")
+T.equal(staleOnlineBodyReason, "online_id_mismatch",
+    "stale online body reason")
+local staleBody, staleBodyReason = PNC.PlayerDamage.HandleClientReport(player, {
+    id = "neutral_1",
+    attackerOnlineID = 12,
+    bodyOnlineID = 77,
+    bodyInstanceID = 991,
+    bodyLease = "stale_lease",
+    weaponFullType = "Base.Axe",
+    damage = 1,
+})
+T.equal(staleBody, false, "stale managed-body lease rejected")
+T.equal(staleBodyReason, "body_lease_mismatch", "stale lease reason")
+
+local validReport = {
+    id = "neutral_1",
+    attackerOnlineID = 12,
+    bodyOnlineID = 77,
+    bodyInstanceID = 991,
+    bodyLease = "lease_1",
+    weaponFullType = "Base.Axe",
+    damage = 1,
+}
+local afterLease, afterLeaseReason =
+    PNC.PlayerDamage.HandleClientReport(player, validReport)
+T.equal(afterLease, true, "valid report after stale lease accepted")
+T.equal(afterLeaseReason, "damaged", "accepted report reason")
+T.equal(records.neutral_1.health.current, 75,
+    "valid report applies server-scaled damage")
+local duplicate, duplicateReason =
+    PNC.PlayerDamage.HandleClientReport(player, validReport)
+T.equal(duplicate, false, "duplicate report is rejected")
+T.equal(duplicateReason, "rate_limited", "duplicate report reason")
+
+local previousAuthority = PNC.Core.IsAuthority
+local healthBeforeClientRequest = records.neutral_1.health.current
+PNC.Core.IsAuthority = function() return false end
+local clientReport, clientReportReason =
+    PNC.PlayerDamage.HandleClientReport(player, validReport)
+T.equal(clientReport, false, "client cannot admit a server hit report")
+T.equal(clientReportReason, "not_authority", "client report authority reason")
+local clientApply, clientApplyReason = PNC.PlayerDamage.Apply(
+    records.neutral_1, body, player, weapon, 1, "client_call")
+T.equal(clientApply, false, "client cannot apply managed-body damage")
+T.equal(clientApplyReason, "not_authority", "client apply authority reason")
+T.equal(records.neutral_1.health.current, healthBeforeClientRequest,
+    "client authority rejection leaves HP unchanged")
+PNC.Core.IsAuthority = nil
+local unavailableAuthority, unavailableAuthorityReason =
+    PNC.PlayerDamage.HandleClientReport(player, validReport)
+T.equal(unavailableAuthority, false,
+    "report admission fails closed without an authority service")
+T.equal(unavailableAuthorityReason, "not_authority",
+    "missing report authority has an explicit reason")
+local applyWithoutAuthority, applyWithoutAuthorityReason =
+    PNC.PlayerDamage.Apply(records.neutral_1, body, player, weapon,
+        1, "missing_authority")
+T.equal(applyWithoutAuthority, false,
+    "damage application fails closed without an authority service")
+T.equal(applyWithoutAuthorityReason, "not_authority",
+    "missing application authority has an explicit reason")
+T.equal(records.neutral_1.health.current, healthBeforeClientRequest,
+    "missing authority leaves HP unchanged")
+PNC.Core.IsAuthority = previousAuthority
+
 T.finish("pnc_player_damage_smoke")
 
 T.finish("pnc_player_damage_smoke")

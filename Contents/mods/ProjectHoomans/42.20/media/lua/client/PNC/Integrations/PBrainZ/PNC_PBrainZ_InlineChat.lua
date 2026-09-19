@@ -27,10 +27,7 @@ local function semanticInput()
     local semantics = PNC.Semantics
     local input = semantics and semantics.DialogueInput or nil
     if input and type(input.Submit) == "function" then return input end
-    pcall(require, "PNC/Semantics/PNC_SemanticDialogueInput")
-    semantics = PNC.Semantics
-    input = semantics and semantics.DialogueInput or nil
-    return input and type(input.Submit) == "function" and input or nil
+    return nil
 end
 
 local function label(key, fallback)

@@ -28,6 +28,7 @@ PNC = {
         CMD_FACTION_TOLL = "FactionToll",
         CMD_ZOMBIE_REACTION = "ZombieReaction",
         CMD_ZOMBIE_BITE = "ZombieBite",
+        CMD_ZOMBIE_PURSUIT = "ZombiePursuit",
         CMD_FIREARM_SHOT = "FirearmShot",
         CMD_FULL_SYNC = "FullSync",
         CMD_ROSTER_SYNC_BEGIN = "RosterSyncBegin",
@@ -66,6 +67,9 @@ PNC = {
         ClientState = {
             snapshots = {},
             characterPayloads = {},
+            zombiePursuitDirectives = {
+                ["17"] = { npcId = "stale_from_previous_receiver" },
+            },
         },
         FindZombieByOnlineID = function() return nil end,
     },
@@ -101,6 +105,27 @@ T.load(FILE)
 
 local Client = PNC.Client
 local State = PNC.Network.ClientState
+
+T.equal(State.zombiePursuitDirectives["17"], nil,
+    "legacy pursuit directives survived receiver initialization")
+Client.HandleServerCommand("ZombiePursuit", {
+    active = true,
+    zombieOnlineID = 18,
+    npcId = "npc_legacy",
+    x = 10,
+    y = 11,
+    z = 0,
+    expiresAt = 6000,
+    revision = 1,
+})
+T.equal(State.zombiePursuitDirectives["18"], nil,
+    "retired pursuit receiver retained a new directive")
+State.zombiePursuitDirectives["19"] = {
+    npcId = "npc_stale",
+}
+Client.Internal.ResetZombiePursuitDirectives()
+T.equal(State.zombiePursuitDirectives["19"], nil,
+    "Lua reset retained a legacy pursuit directive")
 
 State.colonyManagement = { people = { { id = "npc_refill" } } }
 Client.HandleServerCommand("CompanionCommandResult", {
@@ -674,6 +699,59 @@ T.equal(State.snapshots.npc_invalid_one, nil,
 T.equal(State.pendingRoster, nil,
     "invalid roster stream was cleared")
 PNC.Core.IsClientOnly = function() return false end
+
+-- Malformed external command data must not throw or partially commit a batch.
+Client.HandleServerCommand("FullSync", "not-a-table")
+Client.HandleServerCommand("FullSync", {
+    snapshots = {
+        { id = "npc_partial_full_sync", presenceState = "live" },
+        42,
+    },
+})
+T.equal(State.snapshots.npc_partial_full_sync, nil,
+    "malformed full-sync row partially committed earlier snapshots")
+Client.HandleServerCommand("FullSync", {
+    snapshots = {
+        { id = "npc_partial_visual_state", presenceState = "live" },
+        { id = "npc_malformed_visual_state", visualState = "moving" },
+    },
+})
+T.equal(State.snapshots.npc_partial_visual_state, nil,
+    "malformed visual state partially committed an earlier full-sync row")
+T.equal(State.snapshots.npc_malformed_visual_state, nil,
+    "non-table visual state was stored from a full-sync row")
+
+Client.HandleServerCommand("RosterSyncBegin", {
+    syncID = "roster:malformed-row",
+    directoryRevision = 5,
+    total = 2,
+    chunkCount = 1,
+})
+Client.HandleServerCommand("RosterSyncChunk", {
+    syncID = "roster:malformed-row",
+    directoryRevision = 5,
+    total = 2,
+    chunkCount = 1,
+    chunkIndex = 1,
+    snapshots = {
+        { id = "npc_partial_chunk" },
+        42,
+    },
+})
+T.equal(State.pendingRoster, nil,
+    "malformed roster row left a partially staged stream")
+
+Client.HandleServerCommand("RosterDelta", {
+    entries = {
+        { id = "npc_roster", removed = true },
+        42,
+    },
+})
+T.truthy(State.snapshots.npc_roster,
+    "malformed roster delta partially removed a record")
+Client.HandleServerCommand("SyncRecord", { snapshot = 42 })
+T.equal(State.snapshots["42"], nil,
+    "malformed record snapshot was stored under a coerced identifier")
 
 State.snapshots.npc_roster.inventory = { heavyweight = true }
 Client.HandleServerCommand("SyncRecord", {

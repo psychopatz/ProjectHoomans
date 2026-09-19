@@ -14,6 +14,30 @@ local ClientState = PNC.Network.ClientState
 local Network = PNC.Network
 local Diagnostics = PNC.PerformanceScalingDiagnostics
 
+local function normalizeSnapshotID(value)
+    local valueType = type(value)
+    local normalized
+    if valueType ~= "string" and valueType ~= "number" then
+        return nil
+    end
+    normalized = tostring(value)
+    if normalized == "" then return nil end
+    return normalized
+end
+
+local function isSnapshotRecord(snapshot)
+    local visualState
+    if type(snapshot) ~= "table"
+        or normalizeSnapshotID(snapshot.id) == nil
+    then
+        return false
+    end
+    visualState = snapshot.visualState
+    return visualState == nil
+        or visualState == false
+        or type(visualState) == "table"
+end
+
 local function refreshClientBodyIdentityIndex()
     if Network and Network.RefreshClientBodyIdentityIndex then
         Network.RefreshClientBodyIdentityIndex()
@@ -159,10 +183,10 @@ local function storeSnapshot(
 )
     local id
     local current
-    if type(incoming) ~= "table" or incoming.id == nil then
+    if not isSnapshotRecord(incoming) then
         return nil
     end
-    id = tostring(incoming.id)
+    id = normalizeSnapshotID(incoming.id)
     current = ClientState.snapshots[id]
     if incoming.deathMarker ~= true
         and isStaleSnapshot(current, incoming)
@@ -200,13 +224,25 @@ Internal.StoreSnapshot = storeSnapshot
 Internal.IsStaleSnapshot = isStaleSnapshot
 
 Internal.RegisterServerCommand(Const.CMD_FULL_SYNC, function(args)
+    local snapshots = args.snapshots
     local snapshot
     local i
-    for i = 1, #(args.snapshots or {}) do
-        snapshot = args.snapshots[i]
-        if snapshot and snapshot.id then
-            storeSnapshot(snapshot, true, true, "full_sync")
+    if snapshots == nil then snapshots = {} end
+    if type(snapshots) ~= "table" then
+        requestRosterRetry()
+        return
+    end
+    -- Validate the complete batch before mutating client state. A malformed
+    -- later row must not leave a partially applied full-sync response.
+    for i = 1, #snapshots do
+        if not isSnapshotRecord(snapshots[i]) then
+            requestRosterRetry()
+            return
         end
+    end
+    for i = 1, #snapshots do
+        snapshot = snapshots[i]
+        storeSnapshot(snapshot, true, true, "full_sync")
     end
     refreshClientBodyIdentityIndex()
 end)
@@ -258,8 +294,12 @@ Internal.RegisterServerCommand(Const.CMD_ROSTER_SYNC_CHUNK, function(args)
     end
     for i = 1, #(args.snapshots or {}) do
         snapshot = args.snapshots[i]
-        local snapshotID = snapshot and snapshot.id
-            and tostring(snapshot.id) or nil
+        local snapshotID
+        if not isSnapshotRecord(snapshot) then
+            requestRosterRetry()
+            return
+        end
+        snapshotID = normalizeSnapshotID(snapshot.id)
         if not snapshotID or snapshotIDs[snapshotID]
             or ClientState.pendingRoster[snapshotID] ~= nil
         then
@@ -328,14 +368,36 @@ Internal.RegisterServerCommand(Const.CMD_ROSTER_SYNC_END, function(args)
 end)
 
 Internal.RegisterServerCommand(Const.CMD_ROSTER_DELTA, function(args)
+    local entries = args.entries
     local entry
     local entryID
     local i
-    for i = 1, #(args.entries or {}) do
-        entry = args.entries[i]
+    if entries == nil then entries = {} end
+    if type(entries) ~= "table" then
+        requestRosterRetry()
+        return
+    end
+    -- Roster deltas can remove or replace several records. Check every row
+    -- before applying any of them so a malformed tail cannot leave a partial
+    -- batch committed.
+    for i = 1, #entries do
+        entry = entries[i]
+        if type(entry) ~= "table"
+            or (entry.id ~= nil and not normalizeSnapshotID(entry.id))
+            or (entry.removed == true
+                and not normalizeSnapshotID(entry.id))
+            or (entry.snapshot ~= nil
+                and not isSnapshotRecord(entry.snapshot))
+        then
+            requestRosterRetry()
+            return
+        end
+    end
+    for i = 1, #entries do
+        entry = entries[i]
         entryID = nil
         if entry and entry.id then
-            entryID = tostring(entry.id)
+            entryID = normalizeSnapshotID(entry.id)
             local entryRevision = tonumber(entry.revision)
             local lastRevision = ClientState.rosterEntryRevisions
                 and tonumber(ClientState.rosterEntryRevisions[entryID]) or nil
@@ -379,10 +441,10 @@ Internal.RegisterServerCommand(Const.CMD_SYNC_RECORD, function(args)
     local id
     local directoryRevision
     local lastRevision
-    if not snapshot or not snapshot.id then
+    if not isSnapshotRecord(snapshot) then
         return
     end
-    id = tostring(snapshot.id)
+    id = normalizeSnapshotID(snapshot.id)
     directoryRevision = tonumber(args.directoryRevision)
     if directoryRevision then
         lastRevision = ClientState.rosterEntryRevisions
@@ -416,10 +478,11 @@ Internal.RegisterServerCommand(Const.CMD_REMOVE_RECORD, function(args)
     local entryRevision
     local lastRevision
     local current
-    if not args.id then
+    if args.id == nil then
         return
     end
-    id = tostring(args.id)
+    id = normalizeSnapshotID(args.id)
+    if not id then return end
     entryRevision = tonumber(args.revision)
     lastRevision = ClientState.rosterEntryRevisions
         and tonumber(ClientState.rosterEntryRevisions[id]) or nil

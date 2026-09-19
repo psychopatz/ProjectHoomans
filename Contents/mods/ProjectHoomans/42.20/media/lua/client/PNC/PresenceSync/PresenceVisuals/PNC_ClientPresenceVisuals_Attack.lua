@@ -102,6 +102,9 @@ local function rearmDroppedClientAttackBump(
     -- leaving the requested selector installed but the ActionContext idle.
     -- Toggle the selector once to create a fresh edge after path ownership has
     -- been released. Never do this after BumpedState has actually started.
+    if AnimationTrace and AnimationTrace.ExpectRearmSelectorClear then
+        AnimationTrace.ExpectRearmSelectorClear(zombie)
+    end
     if zombie.setBumpType then zombie:setBumpType("") end
     if Animation and Animation.PlayBump then
         Animation.PlayBump(zombie, recordView, anim, {
@@ -131,4 +134,3 @@ end
 Internal.BeginClientAttackBump = beginClientAttackBump
 Internal.ObserveClientAttackBump = observeClientAttackBump
 Internal.RearmDroppedClientAttackBump = rearmDroppedClientAttackBump
-

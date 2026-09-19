@@ -4,8 +4,6 @@
 -- specification. Vanilla map-symbol textures are resolved by the client
 -- renderer at draw time.
 
-require "PNC/UI/Factions/PNC_FactionPresentation"
-
 PNC = PNC or {}
 PNC.ConversationFactionEmblem =
     PNC.ConversationFactionEmblem or {}

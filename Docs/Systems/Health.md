@@ -85,3 +85,201 @@
 ## Next Expansion
 
 - floating damage numbers and richer faction/relation coloring
+
+## Runtime Boundaries
+
+- `PNC.Health` owns managed-NPC HP, incapacitation, death, revive recovery,
+  and the disposable vanilla-health buffer. The NPC record remains the source
+  of truth.
+- `PNC.NPCWounds` owns body-part health, wound lifecycle, bleeding, gradual
+  healing, and Knox infection. Its infection progression and lifecycle actions
+  are separate modules, loaded through the original infection require path. It
+  updates through `Health.Update` and writes changes to the authoritative
+  record.
+- Zombie wound application keeps the legacy randomized route and the
+  defense-resolved route separate. Both use one authority check, target check,
+  damage application, rollback, record-dirty, and social-event boundary.
+- `PNC.PlayerDamage` is the player-hit boundary. Its stable entry point is
+  `PNC/Core/Health/PNC_PlayerDamage.lua`; runtime access, policy, application,
+  client event capture, report validation, the report contract, bounded
+  session rate limiting, and diagnostics live in the adjacent `PlayerDamage/`
+  spokes.
+- `PNC.Treatment` owns wound treatment and accepted medical-item consumption.
+  `PNC.MedicalCareService` owns the separate queued medical-care lifecycle.
+- Health UI, nameplates, and network snapshots project health state. The
+  character API also exposes explicit mutation operations; those delegate to
+  authoritative health services and broadcast only accepted changes.
+
+### Player Hit Report Contract
+
+`PNC.PlayerDamage.Report` creates and normalizes a scalar-only v1 report:
+
+```lua
+{
+    schemaVersion = 1,
+    id = "managed-npc-id",
+    attackerOnlineID = 12,
+    bodyOnlineID = 77,
+    bodyInstanceID = "991",
+    bodyLease = "lease-token",
+    weaponFullType = "Base.Axe",
+    damage = 1.5,
+}
+```
+
+The client values identify the request and describe the observed hit. The
+server binds the attacker to the actual command sender, resolves the live NPC
+body, checks its identity and lease, resolves the currently held weapon,
+rechecks range and floor, and scales damage before calling
+`PNC.PlayerDamage.Apply`. Reports without `schemaVersion` remain accepted for
+older clients; unsupported versions and malformed scalar fields fail with an
+explicit reason. The public `PNC.PlayerDamage` table and original `require`
+path stay stable.
+
+`PNC.Core.IsAuthority()` gates both report admission and damage application.
+Remote clients only observe a hit and send the compact report. Singleplayer
+applies locally; the server owns multiplayer mutation. The report cooldown
+state is session-only: its FIFO holds at most 2,048 attacker/target entries,
+with at most 64 active entries per player. Normal admission prunes a fixed
+budget; pressure cleanup is bounded by the queue capacity. The tracker stores
+only scalar IDs and timestamps, never engine objects.
+
+Per-record debug output is disabled unless `record.runtime.debug == true`.
+Messages have bounded scalar fields and use signatures such as:
+
+```text
+health.player_hit event=client_request npc=<id> player=<id> status=sent reason=report_sent weapon=<type> damage=<n>
+health.player_hit event=server_admission npc=<id> player=<id> status=applied reason=damaged weapon=<type> damage=<n>
+```
+
+The event, status, and reason identify the request route, authority outcome,
+and final application result without retaining or logging Java objects.
+
+### Wound and Infection Diagnostics
+
+The NPC Monitor's per-record **Record Debug** toggle also enables opt-in wound,
+zombie attack, infection, and treatment diagnostics. Example signatures are:
+
+```text
+health.zombie_attack route=resolved npc=<id> attacker=<id> status=applied reason=wounded part=<part> wound=<type> damage=<n>
+health.infection event=stage_transition npc=<id> status=updated reason=stage_changed stage=<stage> progress=<n> fever=<n>
+health.treatment event=complete route=npc_assist npc=<id> actor=<id> target=<id> status=applied reason=bandaged part=<part> item=<type>
+```
+
+Messages are disabled unless that NPC's record debug flag is enabled. Fields
+are limited to scalar values, control characters are stripped, and each field
+is capped at 64 characters. Treatment diagnostics distinguish the accepted
+bandage mutation from the end of item consumption and transaction completion.
+Rejected authority requests include `status=rejected reason=not_authority`.
+
+## Health Architecture and Migration Plan
+
+### Current architecture and module ownership
+
+The shared `PNC_Health` entry point composes live state, incapacitation, death,
+damage, and update modules. `PNC_NPCWounds` composes body-part definitions,
+clothing, mutation, infection, zombie attack, healing updates, and snapshots.
+`PNC_PlayerDamage` separates engine access, policy, authoritative application,
+the versioned report contract, bounded rate limiting, client event capture,
+server admission, and diagnostics. `PNC_Treatment` keeps its stable namespace
+and now composes medical policy, item access and rollback, authoritative wound
+actions, and snapshot projection. The server medical-care service,
+persistence/network snapshots, and client UI remain separate owners because
+they have different authority or lifecycle boundaries.
+
+`PNC_NPCWounds` keeps the stable namespace and composition file. Infection stage
+and fever progression live separately from infect/clear/fatal lifecycle
+actions. Zombie attack application has a common authority/rollback adapter;
+the legacy randomized route and defense-resolved route retain their individual
+decision and result contracts.
+
+### Module boundaries and follow-up
+
+Keep the stable health and wound entry points. Continue splitting by ownership
+only when a module combines independent work:
+
+1. Completed the infection progression/lifecycle split and the legacy/resolved
+   zombie attack split while keeping `PNC.NPCWounds` and both original require
+   paths unchanged.
+2. Keep snapshot builders and UI projection read-only. Keep explicit API
+   mutation operations as authority-gated delegates to the existing health
+   and wound services.
+3. Keep bounded diagnostics at the player-hit, zombie-attack, infection, and
+   treatment boundaries behind the existing per-record debug seam, with no
+   always-on trace history.
+
+Do not move `PNC_MedicalCareService`, the Health UI, or persistence into the
+shared domain modules. They are runtime adapters and consumers with independent
+lifecycles.
+
+### State, authority, and compatibility
+
+- `record.health` and its body/wound/infection data are authoritative NPC state.
+  Snapshot payloads and the native `IsoZombie` health value are projections or
+  runtime adapters.
+- Client hit reports contain stable scalar identifiers. The server revalidates
+  each identifier and gameplay precondition before applying effects.
+- Treatment item consumption, wound mutation, revive, infection death, and
+  ordinary NPC death remain authority-owned.
+- Infection lifecycle/progression and both zombie attack entry points require
+  `PNC.Core.IsAuthority()` to return true. Missing authority support fails
+  closed before infection or damage state changes.
+- Keep `PNC.Health`, `PNC.NPCWounds`, `PNC.PlayerDamage`, public function names,
+  return reasons, and the existing composition `require` paths stable during
+  module moves. Load providers before consumers and event adapters last.
+- Do not change translations, persistence schema, damage tuning, or gameplay
+  wording as part of a structural split unless a separately tested behavior
+  change requires it.
+
+### Migration and verification order
+
+1. Completed the player-hit split: preserve the entry point, formalize the
+   scalar report contract, bound cooldown state, and test validation and
+   authority outcomes.
+2. Completed the treatment split: preserve public functions and successful
+   returns, separate policy, inventory, actions, and snapshot projection, and
+   make direct wound application reject non-authority explicitly.
+3. Completed the infection progression/lifecycle and zombie attack route split,
+   with tests for server/client authority, both successful attack routes, and
+   rollback after rejected health damage.
+4. Run the focused Health tests, full test suite, `pz_verify --kahlua`, and
+   stale-require/diff checks after the split.
+5. Compare all failures with the captured baseline; keep unrelated staged
+   inventory/constants failures separate.
+6. Still required: manually exercise singleplayer and multiplayer
+   hit/treatment/death flows and inspect the bounded per-record diagnostic
+   events. This in-game verification was not run during the refactor.
+
+### Performance, risks, and rollback
+
+- Keep update work bounded by the current record/body data; do not add world
+  scans or whole-map cleanup to a per-hit or per-tick path.
+- Keep request tracking fixed-capacity and diagnostics disabled by default.
+- The main structural risk is an incorrect `require` order or a missed consumer
+  of a public namespace. Focused composition tests and the full suite are the
+  rollback gate.
+- For the player-hit slice, restore the prior `PNC_PlayerDamage.lua` entry and
+  remove its new `PlayerDamage/` spokes as one unit. No composition file or
+  network command name changes are needed.
+- For the treatment slice, restore the prior `PNC_Treatment.lua` entry and
+  remove its `PNC_Treatment/` spokes as one unit. The authority guard on
+  `Treatment.ApplyBandage` is covered by the treatment policy smoke test.
+- For the infection and zombie attack slices, restore the original two wound
+  modules and remove their progression/lifecycle and common/route spokes as a
+  unit. Their stable require paths remain unchanged, and focused tests cover
+  authority rejection and rollback.
+
+### Acceptance Criteria
+
+- Public health, wound, treatment, and player-damage entry points retain their
+  contracts unless a separately identified behavior change is accepted by a
+  focused test.
+- Client-originated gameplay changes are admitted and committed only by the
+  authority; stale, malformed, duplicate, and out-of-range hit reports fail
+  safely with explicit reasons.
+- History, report payloads, and diagnostic strings remain bounded and contain
+  no live Java objects.
+- Focused Health tests pass, Kahlua validation passes, and the full suite has no
+  failures beyond the recorded baseline.
+- Manual multiplayer checks confirm server-owned damage, body-buffer restore,
+  wound replication, and readable opt-in diagnostic events.

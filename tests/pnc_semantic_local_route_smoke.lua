@@ -103,6 +103,16 @@ local Input = T.load(
 T.load(
     "ProjectHoomans",
     "client",
+    "PNC/Semantics/PNC_SemanticDialogueInput_Trace.lua"
+)
+T.load(
+    "ProjectHoomans",
+    "client",
+    "PNC/Semantics/PNC_SemanticDialogueInput_ProviderFallback.lua"
+)
+T.load(
+    "ProjectHoomans",
+    "client",
     "PNC/Semantics/PNC_SemanticDialogueInput_Lifecycle.lua"
 )
 require = originalRequire
@@ -152,6 +162,35 @@ local view = {
 local initialContext = Input.Internal.ShallowContext(view)
 T.equal(initialContext.currentTopic, "whats_up",
     "authored conversation topic enters semantic context before input")
+T.truthy(type(initialContext.semanticEntityIndex) == "table",
+    "context projection builds the semantic entity index")
+T.truthy(type(initialContext.semanticEntityIndex.candidates) == "table"
+    and #initialContext.semanticEntityIndex.candidates > 0,
+    "known conversation identities remain available as entity candidates")
+
+local missingRouter, missingReason = Input.Internal.RouterFor({})
+T.equal(missingRouter, nil,
+    "router lifecycle declines a view without a conversation session")
+T.equal(missingReason, "conversation_unavailable",
+    "missing sessions keep their explicit router reason")
+
+local initialRouter, routerReason = Input.Internal.RouterFor(view)
+T.truthy(initialRouter, "router lifecycle initializes a conversation router")
+T.equal(routerReason, nil, "router initialization has no rejection reason")
+T.equal(view.session.semanticDialogueContext.currentTopic, "whats_up",
+    "authored topic initializes semantic context state")
+
+local existingSemanticState = view.session.semanticDialogueState
+local partialSession = {
+    characterUUID = "player-two",
+    semanticDialogueState = existingSemanticState,
+}
+local partialView = { spec = view.spec, session = partialSession }
+Input.Internal.RouterFor(partialView)
+T.equal(partialSession.semanticDialogueState, existingSemanticState,
+    "router lifecycle preserves an existing semantic state")
+T.equal(partialSession.semanticDialogueContext.currentTopic, "whats_up",
+    "authored topic initializes context when semantic state already exists")
 
 local accepted, reason = Input.Submit(view, "hello there")
 T.equal(accepted, true, "greeting is accepted locally")
@@ -370,6 +409,55 @@ T.equal(#identityQueue, 1,
     "identity claim does not queue a contradictory provisional response")
 T.equal(identityEvents[2].kind, "identity_claim",
     "identity claim uses the authoritative identity transport")
+
+local cognitionDispatch
+PNC.Client.RequestSemanticCognition = function(npcID, request)
+    cognitionDispatch = { npcID = npcID, request = request }
+    return true, "queued"
+end
+identityView.spec.context.conversationLifecycleState = {
+    token = "identity-conversation-token",
+}
+local cognitionAccepted, cognitionStatus =
+    Input.Internal.RequestCognitionForIR(identityView, {
+        intent = "QUESTION",
+        subject = "brother",
+        extensions = { facts = { brother = { status = "unknown" } } },
+        target = { id = "npc-relative" },
+    })
+T.equal(cognitionAccepted, true,
+    "unknown NPC facts use the narrow cognition request")
+T.equal(cognitionStatus, "queued",
+    "cognition transport status is preserved")
+T.equal(cognitionDispatch.npcID, "npc-identity",
+    "cognition request is bound to the current conversation NPC")
+T.equal(cognitionDispatch.request.targetID, "npc-relative",
+    "cognition request carries only the resolved target identifier")
+T.equal(cognitionDispatch.request.conversationToken,
+    "identity-conversation-token",
+    "cognition request retains the conversation lease token")
+
+local localFactAccepted, localFactReason =
+    Input.Internal.RequestCognitionForIR(identityView, {
+        intent = "QUESTION",
+        subject = "TIME",
+        target = { id = "npc-relative" },
+    })
+T.falsy(localFactAccepted,
+    "local world facts do not use the cognition network adapter")
+T.equal(localFactReason, "local_world_fact",
+    "local fact requests keep their explicit skip reason")
+local knownFactAccepted, knownFactReason =
+    Input.Internal.RequestCognitionForIR(identityView, {
+        intent = "QUESTION",
+        subject = "brother",
+        extensions = { facts = { brother = { status = "known" } } },
+        target = { id = "npc-relative" },
+    })
+T.falsy(knownFactAccepted,
+    "known NPC facts do not issue duplicate cognition requests")
+T.equal(knownFactReason, "fact_already_known",
+    "known fact requests keep their explicit skip reason")
 
 PNC = originalPNC
 PsychopatzCore = originalPsychopatzCore

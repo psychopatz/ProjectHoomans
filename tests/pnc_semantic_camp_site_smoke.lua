@@ -124,6 +124,12 @@ T.equal(roomSite.scope, CampSite.SCOPES.ROOM, "room site has room scope")
 T.equal(roomSite.roomID, "bedroom-1", "room identity uses RoomDef id")
 T.equal(roomSite.buildingID, "building-1", "room identity keeps building id")
 T.equal(roomSite.roomType, "BEDROOM", "room identity keeps normalized type")
+local fallbackCellSite, fallbackCellReason = Geometry.FindNearestRoom(
+    nil, player, { roomType = "BEDROOM", text = "bedroom" },
+    { cell = cell, radius = 32 })
+T.truthy(fallbackCellSite,
+    "room discovery uses the cell supplied through options")
+T.equal(fallbackCellReason, nil, "option cell fallback resolves cleanly")
 T.truthy(Geometry.MatchesRoom(bedroomSquare, roomSite),
     "the selected room accepts its own squares")
 T.falsy(Geometry.MatchesRoom(bathroomSquare, roomSite),
@@ -147,6 +153,22 @@ T.equal(outsideReason, nil,
     "nearby loaded-square room discovery has no failure reason")
 T.equal(outsideRoom.roomID, "bedroom-1",
     "outside discovery returns the nearby room identity")
+
+local localSquareLookups = 0
+local cappedCell = {
+    getGridSquare = function(_, x, y, z)
+        localSquareLookups = localSquareLookups + 1
+        return squares[tostring(x) .. ":" .. tostring(y) .. ":" .. tostring(z)]
+    end,
+}
+local cappedRoom, cappedReason = Geometry.FindNearestRoom(
+    cappedCell, outsidePlayer, {}, { radius = 8, maxLocalRooms = 1 })
+T.truthy(cappedRoom, "the local candidate cap still resolves a nearby room")
+T.equal(cappedRoom.roomID, "bedroom-1",
+    "the local candidate cap keeps the nearby room selection")
+T.equal(cappedReason, nil, "capped local discovery succeeds")
+T.equal(localSquareLookups, 8,
+    "nearby scanning stops after it reaches the unique-room candidate cap")
 
 PNC = {
     Const = {

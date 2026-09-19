@@ -55,10 +55,12 @@ PNC.Gifts = {
 }
 
 local recordedTurns = 0
+local lastRecordedIR
 PNC.Semantics.DialogueInput = {
     Internal = {
         RecordContextTurn = function(view, ir, options)
             recordedTurns = recordedTurns + 1
+            lastRecordedIR = ir
             return view.session.semanticDialogueContext:RecordTurn(ir, {
                 speaker = options and options.speaker,
                 source = options and options.source,
@@ -121,6 +123,57 @@ T.equal(resolved.object.fullType, "Base.Apple",
     "resolved gift reference retains the stable item type")
 T.equal(resolved.object.unresolved, false,
     "gifted item reference is resolved")
+
+local manyTypes = {}
+local manyIDs = {}
+for index = 1, 14 do
+    manyTypes[index] = "Base.Item" .. tostring(index)
+    manyIDs[index] = "npc-item-" .. tostring(index)
+end
+T.equal(GiftContext.RecordTransfer(view, {
+    npcId = "npc-alice",
+    itemTypes = manyTypes,
+    itemIDs = manyIDs,
+}, nil), true, "multi-item authoritative gift is recorded")
+T.equal(#lastRecordedIR.extensions.semanticMentions, GiftContext.MAX_ITEMS,
+    "gift context projection keeps the existing item cap")
+T.equal(lastRecordedIR.extensions.semanticMentions[12].itemID,
+    "npc-item-12", "gift context keeps the final permitted item identity")
+T.equal(lastRecordedIR.extensions.semanticMentions[13], nil,
+    "gift context excludes items above the cap")
+
+local rejected, rejectedReason = GiftContext.RecordTransfer(view, {
+    npcId = "npc-alice",
+    itemTypes = {},
+}, nil)
+T.equal(rejected, false, "an item-less transfer is rejected")
+T.equal(rejectedReason, "gift_items_unavailable",
+    "an item-less transfer keeps its explicit failure reason")
+
+T.equal(GiftContext.RecordTransfer(view, {
+    npcId = "npc-alice",
+    itemTypes = {},
+}, {
+    selection = {
+        fullType = "Base.Apple",
+        displayName = "Apple",
+        facts = PNC.Gifts.Foundation.MarketSenseAdapter.BuildFacts(
+            "Base.Apple"
+        ),
+    },
+}), true, "pending selection supplies a missing transfer type")
+T.equal(lastRecordedIR.extensions.semanticMentions[1].fullType,
+    "Base.Apple", "pending selection keeps the stable item type")
+
+local originalInput = PNC.Semantics.DialogueInput
+PNC.Semantics.DialogueInput = nil
+local fallbackRecorded = GiftContext.RecordTransfer(view, {
+    npcId = "npc-alice",
+    itemTypes = { "Base.Apple" },
+}, nil)
+T.equal(fallbackRecorded, true,
+    "gift context records directly when the dialogue input adapter is absent")
+PNC.Semantics.DialogueInput = originalInput
 
 local Lifecycle = T.load(
     "ProjectHoomans",

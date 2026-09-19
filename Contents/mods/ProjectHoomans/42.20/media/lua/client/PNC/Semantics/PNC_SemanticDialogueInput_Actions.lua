@@ -8,23 +8,25 @@ require "PNC/Semantics/PNC_SemanticDiagnostics"
 require "PNC/Semantics/PNC_SemanticWorldTargetHints"
 require "PNC/Semantics/PNC_SemanticCampSiteHints"
 require "PNC/Semantics/PNC_SemanticCampSite"
+require "PNC/Semantics/PNC_SemanticDialogueInput_ActionContext"
+require "PNC/Semantics/PNC_SemanticDialogueInput_ActionTargetHints"
+require "PNC/Semantics/PNC_SemanticDialogueInput_TaskDispatch"
 
 local Input = PNC.Semantics.DialogueInput or {}
 PNC.Semantics.DialogueInput = Input
 
 local Internal = Input.Internal or {}
 Input.Internal = Internal
+local InventoryPending = require
+    "PNC/Semantics/PNC_SemanticDialogueInput_InventoryPending"
 local CommandAdapter = PNC.Semantics.CommandAdapter
-local TaskAdapter = PNC.Semantics.TaskAdapter
 local InventoryQueryAdapter = PNC.Semantics.InventoryQueryAdapter
 local Diagnostics = PNC.Semantics.SemanticDiagnostics
 local WorldTargetHints = PNC.Semantics.ClientWorldTargetHints
 local CampSiteHints = PNC.Semantics.ClientCampSiteHints
 local CampSite = PNC.Semantics.CampSite
-
-local function number(value)
-    return tonumber(value)
-end
+local ActionContext = PNC.Semantics.DialogueInputActionContext
+local ActionTargetHints = PNC.Semantics.DialogueInputActionTargetHints
 
 local function audit(eventName, data, options)
     if not Diagnostics
@@ -36,204 +38,9 @@ local function audit(eventName, data, options)
     return Diagnostics.Record(eventName, data, options)
 end
 
-local function isBroadcastCamp(group, result, value)
-    local decision = result and result.decision or nil
-    local intent = decision and decision.actionIntent or nil
-    local action = decision and decision.action
-        or result and result.ir and result.ir.action
-        or type(intent) == "table" and intent.action
-        or ""
-    local addressed
-    if not group or string.upper(tostring(action)) ~= "CAMP" then
-        return false
-    end
-    if type(group.AddressedIDs) ~= "function" then return true end
-    local ok
-    ok, addressed = pcall(group.AddressedIDs, group, result, value)
-    if not ok or type(addressed) ~= "table" then return true end
-    for _ in pairs(addressed) do return false end
-    return true
-end
-
-local function actionContext(view, result, value)
-    local spec = view and view.spec or {}
-    local session = view and view.session
-    local group = view and view.groupConversation
-    local actorID = session and session.characterUUID
-    local recipientID = spec.npcID
-    local lifecycle = spec.context
-        and spec.context.conversationLifecycleState or nil
-    local origin
-    local groupCamp = isBroadcastCamp(group, result, value)
-    local targets
-    local selectionOrigin = spec.context and spec.context.player
-        or getSpecificPlayer and getSpecificPlayer(0) or nil
-    local registry = PNC.Registry
-    if registry and type(registry.GetLiveZombie) == "function"
-        and recipientID
-    then
-        local ok, body = pcall(registry.GetLiveZombie, recipientID)
-        if ok then origin = body end
-    end
-    origin = origin or spec.context and spec.context.player
-        or getSpecificPlayer and getSpecificPlayer(0) or nil
-    if groupCamp and type(group.participantIDs) == "table" then
-        targets = {}
-        for index = 1, #group.participantIDs do
-            targets[index] = group.participantIDs[index]
-        end
-    end
-    return {
-        npcID = spec.npcID,
-        targetID = spec.npcID,
-        actor = actorID and { id = actorID } or nil,
-        recipient = recipientID and { id = recipientID } or nil,
-        dialogueID = session and session.conversationID,
-        conversationID = session and session.conversationID,
-        requestID = view and view.semanticRequestID or result.sequence,
-        scope = groupCamp and "group" or "single",
-        targets = targets,
-        groupID = group and group.id,
-        groupTurnID = group and group.activeTurn
-            and group.activeTurn.id or nil,
-        groupScope = group and "nearby" or "single",
-        rawText = value,
-        normalizedText = result.ir and result.ir.normalizedText,
-        confidence = result.ir and result.ir.confidence,
-        provenance = result.ir and result.ir.provenance,
-        conversationToken = lifecycle and lifecycle.token or nil,
-        worldOrigin = origin,
-        selectionOrigin = selectionOrigin,
-    }
-end
-
+local actionContext = ActionContext.Build
 Internal.Audit = audit
 Internal.ActionContext = actionContext
-
-local function targetNeedsHint(target)
-    if type(target) ~= "table" then return false end
-    if number(target.x or target.targetX) ~= nil
-        or number(target.y or target.targetY) ~= nil
-        or target.targetID ~= nil or target.worldID ~= nil
-    then
-        return false
-    end
-    return target.unresolved == true
-        or tostring(target.kind or "") == "phrase"
-        or target.category ~= nil or target.concept ~= nil
-end
-
-local function copyActionWithTarget(actionIntent, target)
-    local output = {}
-    for key, value in pairs(actionIntent or {}) do output[key] = value end
-    output.target = target
-    return output
-end
-
-local function attachWorldTargetHint(actionIntent, context)
-    if actionIntent and actionIntent.target
-        and actionIntent.target.kind == "camp_site"
-    then
-        return actionIntent
-    end
-    if type(WorldTargetHints) ~= "table"
-        or type(WorldTargetHints.Resolve) ~= "function"
-        or not targetNeedsHint(actionIntent and actionIntent.target)
-    then
-        return actionIntent
-    end
-
-    local target = actionIntent.target
-    local hint, reason = WorldTargetHints.Resolve(target, context)
-    if not hint then
-        audit("semantic.world_target.client_hint", {
-            npcID = context.npcID,
-            conversationID = context.conversationID,
-            requestID = context.requestID,
-            query = target.text or target.value or target.category
-                or target.concept,
-            reason = reason,
-            attached = false,
-        }, { requestID = context.requestID })
-        return actionIntent
-    end
-
-    local targetCopy = {}
-    for key, value in pairs(target) do targetCopy[key] = value end
-    targetCopy.clientHint = hint
-    audit("semantic.world_target.client_hint", {
-        npcID = context.npcID,
-        conversationID = context.conversationID,
-        requestID = context.requestID,
-        query = hint.query,
-        kind = hint.kind,
-        x = hint.x,
-        y = hint.y,
-        z = hint.z,
-        score = hint.score,
-        attached = true,
-    }, { requestID = context.requestID })
-    return copyActionWithTarget(actionIntent, targetCopy)
-end
-
-local function attachCampSiteHint(actionIntent, context)
-    local target = actionIntent and actionIntent.target
-    local normalizedTarget = CampSite and CampSite.NormalizeTarget
-        and CampSite.NormalizeTarget(target) or target
-    local normalizedAction = actionIntent
-    local x = target and number(target.x or target.targetX)
-    local y = target and number(target.y or target.targetY)
-    if normalizedTarget ~= target then
-        normalizedAction = copyActionWithTarget(actionIntent, normalizedTarget)
-        target = normalizedTarget
-        x = target and number(target.x or target.targetX)
-        y = target and number(target.y or target.targetY)
-    end
-    if not actionIntent or actionIntent.action ~= "CAMP"
-        or type(target) ~= "table"
-        or target.kind ~= "camp_site"
-        or x ~= nil or y ~= nil
-        or target.siteID ~= nil or target.campfireID ~= nil
-        or type(CampSiteHints) ~= "table"
-        or type(CampSiteHints.Resolve) ~= "function"
-    then
-        return normalizedAction
-    end
-
-    local hint, reason = CampSiteHints.Resolve(target, context)
-    if not hint then
-        audit("semantic.camp_site.client_hint", {
-            npcID = context.npcID,
-            conversationID = context.conversationID,
-            requestID = context.requestID,
-            scope = target.scope or target.siteScope,
-            query = target.roomQuery or target.roomType or target.text,
-            reason = reason,
-            attached = false,
-        }, { requestID = context.requestID })
-        return normalizedAction
-    end
-
-    local targetCopy = {}
-    for key, value in pairs(target) do targetCopy[key] = value end
-    targetCopy.clientHint = hint
-    audit("semantic.camp_site.client_hint", {
-        npcID = context.npcID,
-        conversationID = context.conversationID,
-        requestID = context.requestID,
-        scope = hint.scope or hint.siteScope,
-        query = hint.query,
-        siteID = hint.siteID,
-        roomID = hint.roomID,
-        roomType = hint.roomType,
-        campfireID = hint.campfireID,
-        x = hint.x,
-        y = hint.y,
-        score = hint.score,
-        attached = true,
-    }, { requestID = context.requestID })
-    return copyActionWithTarget(normalizedAction, targetCopy)
-end
 
 function Internal.DispatchInventoryQuery(view, result, value)
     local decision = result and result.decision or {}
@@ -244,16 +51,26 @@ function Internal.DispatchInventoryQuery(view, result, value)
         return nil
     end
     local context = actionContext(view, result, value)
-    local session = view and view.session
-    session.semanticInventoryQueries = session.semanticInventoryQueries or {}
     local requestID = context.requestID
-    session.semanticInventoryQueries[tostring(requestID)] = {
-        rawText = value,
-        query = decision.inventoryQuery,
-        at = PNC.Core and PNC.Core.Now and PNC.Core.Now() or 0,
-    }
-    local dispatched = InventoryQueryAdapter.Dispatch(
-        decision.inventoryQuery, context)
+    local registered, registrationReason = InventoryPending.Register(
+        view, requestID, {
+            rawText = value,
+            query = decision.inventoryQuery,
+            at = PNC.Core and PNC.Core.Now and PNC.Core.Now() or 0,
+        })
+    local dispatched
+    if registered then
+        -- Register before transport because local-server responses can arrive
+        -- synchronously from inside Dispatch.
+        dispatched = InventoryQueryAdapter.Dispatch(
+            decision.inventoryQuery, context)
+    else
+        dispatched = {
+            status = "rejected",
+            accepted = false,
+            reason = registrationReason,
+        }
+    end
     dispatched = type(dispatched) == "table" and dispatched or {
         status = "rejected", accepted = false,
     }
@@ -270,11 +87,18 @@ function Internal.DispatchInventoryQuery(view, result, value)
         reason = dispatched.reason,
         query = decision.inventoryQuery,
     }, { requestID = dispatched.requestID })
+    local resultStatus = type(dispatched.result) == "table"
+        and dispatched.result.status or nil
     if dispatched.result and dispatched.result.status
         and dispatched.result.status ~= "pending"
         and Input.ReceiveInventoryQueryResult
     then
         Input.ReceiveInventoryQueryResult(dispatched.result)
+    end
+    if registered and dispatched.pending ~= true
+        and resultStatus ~= "pending"
+    then
+        InventoryPending.Remove(view, requestID)
     end
     return dispatched
 end
@@ -296,8 +120,8 @@ function Internal.DispatchAction(view, result, value)
     end
     if not decision.actionIntent then return nil end
     local context = actionContext(view, result, value)
-    local actionIntent = attachCampSiteHint(
-        decision.actionIntent, context)
+    local actionIntent = ActionTargetHints.AttachCampSiteHint(
+        decision.actionIntent, context, CampSite, CampSiteHints, audit)
     if actionIntent and actionIntent.action == "CAMP"
         and actionIntent.target
         and type(actionIntent.target.clientHint) == "table"
@@ -306,7 +130,8 @@ function Internal.DispatchAction(view, result, value)
         -- avoids a second client scan in the same dialogue dispatch tick.
         context.campSiteHint = actionIntent.target.clientHint
     end
-    actionIntent = attachWorldTargetHint(actionIntent, context)
+    actionIntent = ActionTargetHints.AttachWorldTargetHint(
+        actionIntent, context, WorldTargetHints, audit)
     local commandResult = CommandAdapter.Dispatch(
         actionIntent, context)
     if commandResult.status ~= "unmapped" then
@@ -321,77 +146,15 @@ function Internal.DispatchAction(view, result, value)
         }, { requestID = context.requestID })
         return commandResult
     end
-    local session = view and view.session
-    local provisionalID = context.requestID
-    if session and provisionalID then
-        session.semanticTaskRequests = session.semanticTaskRequests or {}
-        -- Register before transport so a same-tick server response cannot
-        -- race the request into the inactive-result cache.
-        session.semanticTaskRequests[tostring(provisionalID)] = {
-            action = actionIntent.action,
-            rawText = value,
-        }
-    end
-    local taskResult = TaskAdapter.Dispatch(actionIntent, context)
-    local status = tostring(taskResult and taskResult.status or "")
-    local request = taskResult and taskResult.request or nil
-    local requestID = request and request.requestID or context.requestID
-    audit("semantic.task.dispatch", {
-        npcID = context.npcID,
-        conversationID = context.conversationID,
-        requestID = requestID,
-        action = actionIntent.action,
-        status = status,
-        accepted = taskResult and taskResult.accepted == true,
-        reason = taskResult and taskResult.reason,
-        planID = taskResult and taskResult.planID,
-    }, { requestID = requestID })
-    if session and requestID and status ~= "unmapped"
-        and status ~= "skipped"
-    then
-        session.semanticTaskRequests = session.semanticTaskRequests or {}
-        if provisionalID and tostring(provisionalID) ~= tostring(requestID) then
-            session.semanticTaskRequests[tostring(provisionalID)] = nil
-        end
-        session.semanticTaskRequests[tostring(requestID)] = {
-            action = actionIntent.action,
-            rawText = value,
-            request = request,
-            siteLabel = taskResult and taskResult.details
-                and taskResult.details.siteLabel,
-            siteScope = taskResult and taskResult.details
-                and taskResult.details.siteScope,
-            siteID = taskResult and taskResult.details
-                and taskResult.details.siteID,
-        }
-    elseif session and provisionalID then
-        session.semanticTaskRequests[tostring(provisionalID)] = nil
-    end
-    if taskResult and taskResult.accepted ~= true
-        and Input.ReceiveSemanticTaskResult
-    then
-        Input.ReceiveSemanticTaskResult({
-            requestID = requestID,
-            npcID = context.npcID,
-            action = actionIntent.action,
+    local taskDispatch = Internal.DispatchTaskAction
+    if type(taskDispatch) ~= "function" then
+        return {
+            status = "task_dispatch_unavailable",
             accepted = false,
-            status = status ~= "" and status or "failed",
-            reason = taskResult.reason,
-            admissionReason = taskResult.details
-                and taskResult.details.reason,
-            admissionPlanState = taskResult.details
-                and taskResult.details.planState,
-            admissionStepState = taskResult.details
-                and taskResult.details.stepState,
-            admissionActive = taskResult.details
-                and taskResult.details.active,
-            admissionPlanID = taskResult.details
-                and taskResult.details.planID,
-            admissionCleanupReason = taskResult.details
-                and taskResult.details.cleanupReason,
-        })
+            reason = "task_dispatch_unavailable",
+        }
     end
-    return taskResult
+    return taskDispatch(view, actionIntent, context, value)
 end
 
 return Input

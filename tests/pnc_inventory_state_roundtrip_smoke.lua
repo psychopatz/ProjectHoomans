@@ -131,6 +131,7 @@ T.equal(mutationRecord.inventory.items.water.itemState.fluidAmount, 0.5,
     "state-bearing update stored fluid state")
 
 PNC.Const.CMD_CHARACTER_PAYLOAD = "CharacterPayload"
+PNC.Const.CMD_CHARACTER_INVENTORY_PAYLOAD = "CharacterInventoryPayload"
 PNC.Const.CMD_INVENTORY_DELTA = "InventoryDelta"
 PNC.Const.CMD_INVENTORY_RESULT = "InventoryResult"
 PNC.Network = { ClientState = { characterPayloads = {} } }

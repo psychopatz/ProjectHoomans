@@ -42,6 +42,8 @@ local function formatSample(trace, sample)
         .. " local=" .. tostring(sample.localBody)
         .. " lease=" .. tostring(sample.lease)
         .. " release=" .. tostring(sample.releasePending)
+        .. (sample.expectedRearmSelectorClear
+            and " expectedRearmSelectorClear=true" or "")
 end
 
 function Internal.DumpLines(trace)
@@ -75,6 +77,26 @@ function Internal.EmitLines(lines)
     end
 end
 
+local function rememberAutoDump(key)
+    local limit = Internal.MAX_AUTO_DUMP_KEYS
+    local order = Internal.autoDumpOrder
+    local nextIndex = Internal.autoDumpOrderNext
+    local count = Internal.autoDumpOrderCount
+    local evicted
+    if Internal.autoDumped[key] then return false end
+    if count >= limit then
+        evicted = order[nextIndex]
+        if evicted then Internal.autoDumped[evicted] = nil end
+    else
+        count = count + 1
+    end
+    order[nextIndex] = key
+    Internal.autoDumped[key] = true
+    Internal.autoDumpOrderCount = count
+    Internal.autoDumpOrderNext = nextIndex % limit + 1
+    return true
+end
+
 local function setFailure(trace, kind, sample)
     local key
     if trace.failure then return end
@@ -83,8 +105,7 @@ local function setFailure(trace, kind, sample)
     trace.failureEvent = sample.event
     if trace.debugEnabled ~= true then return end
     key = tostring(trace.npcId or "unknown") .. "|" .. trace.failure
-    if Internal.autoDumped[key] then return end
-    Internal.autoDumped[key] = true
+    if not rememberAutoDump(key) then return end
     Internal.EmitLines(Internal.DumpLines(trace))
 end
 
@@ -92,6 +113,7 @@ function Internal.Classify(trace, sample)
     local age
     local acceptedNow
     if trace.finishing == true then return end
+    if sample.expectedRearmSelectorClear == true then return end
     acceptedNow = hasRequestedBump(trace, sample)
     if acceptedNow and trace.acceptedAt == nil then
         trace.acceptedAt = sample.at

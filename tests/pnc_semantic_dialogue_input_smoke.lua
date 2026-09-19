@@ -191,6 +191,16 @@ local Input = T.load(
 T.load(
     "ProjectHoomans",
     "client",
+    "PNC/Semantics/PNC_SemanticDialogueInput_Trace.lua"
+)
+T.load(
+    "ProjectHoomans",
+    "client",
+    "PNC/Semantics/PNC_SemanticDialogueInput_ProviderFallback.lua"
+)
+T.load(
+    "ProjectHoomans",
+    "client",
     "PNC/Semantics/PNC_SemanticDialogueInput_Lifecycle.lua"
 )
 require = originalRequire
@@ -242,6 +252,40 @@ T.equal(routed, 2, "low-confidence input still passes through the router")
 T.equal(llmAttempts, 1, "low-confidence input attempts the optional provider")
 T.equal(queued[2].payload.fallback, "I'm not sure what you mean.",
     "provider rejection uses the deterministic clarification")
+T.falsy(view.session.semanticDialoguePending,
+    "provider rejection retires the pending request")
+
+local queuedBeforeProviderAcceptance = #queued
+PNC.PBrainZ.Submit = function()
+    llmAttempts = llmAttempts + 1
+    return true
+end
+local providerAccepted = Input.Submit(
+    view, "Can you do something about this?"
+)
+T.equal(providerAccepted, true, "optional provider can accept a fallback turn")
+T.equal(llmAttempts, 2, "accepted fallback is submitted once")
+T.equal(view.lastSemanticDialogueResult.decision.route, "llm_fallback",
+    "accepted fallback keeps its pending semantic preview")
+T.equal(view.session.semanticDialoguePending.rawText,
+    "Can you do something about this?",
+    "accepted fallback retains the bounded request text for delivery")
+T.equal(#queued, queuedBeforeProviderAcceptance,
+    "accepted provider turn does not also queue a local reply")
+T.falsy(Input.GetState(view).enabled,
+    "pending provider turn prevents duplicate UI submissions")
+local duplicateAccepted, duplicateReason = Input.Submit(
+    view, "Can you do something about this?"
+)
+T.falsy(duplicateAccepted,
+    "direct duplicate submissions are rejected while a provider turn is pending")
+T.equal(duplicateReason, "conversation_busy",
+    "duplicate submissions keep the existing busy response contract")
+T.equal(llmAttempts, 2, "a pending provider turn is never resubmitted")
+T.equal(view.session.semanticDialoguePending.rawText,
+    "Can you do something about this?",
+    "duplicate rejection preserves the original pending request")
+view.session.semanticDialoguePending = nil
 
 local part = Input.CreatePart({ x = 1, y = 2, width = 3, height = 4 }, {})
 T.equal(part.options.partID, "semanticInput", "input factory owns its part id")

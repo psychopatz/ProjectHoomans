@@ -38,8 +38,10 @@ local npcBody = {
 local player = {
     x = 20,
     y = 0,
+    z = 0,
     getX = function(self) return self.x end,
     getY = function(self) return self.y end,
+    getZ = function(self) return self.z end,
 }
 
 local modData = {}
@@ -174,7 +176,12 @@ PNC = {
 instanceof = function(value, className)
     return className == "IsoPlayer" and value == player
 end
-isClient = function() return true end
+getNumActivePlayers = function() return 1 end
+getSpecificPlayer = function(index)
+    return index == 0 and player or nil
+end
+isClient = function() return false end
+isServer = function() return false end
 Events = {
     OnZombieUpdate = {
         Add = function(handler) registered = handler end,
@@ -191,18 +198,11 @@ ZombieIdleState = {
 T.load(FILE)
 
 T.truthy(registered,
-    "client zombie-aggro controller was not registered")
-registered(zombie)
-T.truthy(pathRequests == 0,
-    "multiplayer controller should defer to vanilla zombie movement")
-T.truthy(target == nil and attackedBy == nil,
-    "multiplayer controller installed a native NPC combat target")
+    "singleplayer zombie-aggro controller was not registered")
 
 -- Singleplayer must use the same targetless contract for PNC's IsoZombie
 -- shells. Native target assignment lets Build 42's window-lunge animation
 -- call player-only methods such as getMoodles() on the shell.
-isClient = function() return false end
-isServer = function() return false end
 zombie.actionState = "idle"
 target = nil
 attackedBy = nil
@@ -235,6 +235,21 @@ now = 1600
 registered(zombie)
 T.truthy(pathRequests == 2 and faced == 1,
     "bite-range pursuit did not face the NPC without native targeting")
+
+-- A body removed or marked ambiguous by the local replica index must not
+-- remain targetable through the short-lived spatial cache.
+PNC.ClientPresenceSync.BodyByID.npc = false
+target = npcBody
+attackedBy = npcBody
+now = 1601
+registered(zombie)
+T.equal(pathRequests, 2,
+    "spatial cache pursued a body no longer owned by the body index")
+T.equal(target, player,
+    "ordinary zombie did not replace a stale managed target with the player")
+T.equal(attackedBy, nil,
+    "ordinary zombie retained a stale managed attacker reference")
+PNC.ClientPresenceSync.BodyByID.npc = npcBody
 
 managed = true
 PNC.LiveBodyControl = {
@@ -272,6 +287,16 @@ banditOwned = false
 -- rewrite the native player target while that action is active.
 managed = false
 isClient = function() return true end
+zombie.actionState = "idle"
+target = nil
+attackedBy = nil
+now = 2600
+registered(zombie)
+T.equal(pathRequests, 2,
+    "multiplayer client ran the singleplayer pursuit fallback")
+T.truthy(target == nil and attackedBy == nil,
+    "multiplayer client applied a stale server directive locally")
+
 zombie.actionState = "attack"
 target = player
 attackedBy = nil

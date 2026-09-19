@@ -21,5 +21,6 @@ require "PNC/Networking/ClientRequests/PNC_ClientRequests_Colony"
 require "PNC/Networking/ClientRequests/PNC_ClientRequests_ColonyActions"
 require "PNC/Networking/ClientRequests/PNC_ClientRequests_ColonyStorage"
 require "PNC/Networking/ClientRequests/PNC_ClientRequests_Character"
+require "PNC/Networking/ClientRequests/PNC_ClientRequests_InitialStateTick"
 
 return PNC.Client

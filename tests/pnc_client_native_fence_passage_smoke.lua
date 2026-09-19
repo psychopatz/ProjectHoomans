@@ -33,6 +33,12 @@ local bumpOptions
 local climbDirection
 local leases = 0
 local holdRequests = 0
+local pathClears = 0
+local movementResetCalls = 0
+local zombieStateSuppressions = 0
+local localController = true
+local approachReady = true
+local landingReady = true
 
 PNC = {
     TraversalQuery = {
@@ -58,8 +64,8 @@ PNC = {
         IsWindow = function(object)
             return object == window
         end,
-        IsFenceApproachReady = function() return true end,
-        CanTraverseAt = function() return true end,
+        IsFenceApproachReady = function() return approachReady end,
+        CanTraverseAt = function() return landingReady end,
     },
     PathService = { Internal = {} },
     Animation = {
@@ -71,6 +77,12 @@ PNC = {
         FinishBump = function() return true end,
     },
     LiveBodyControl = {
+        ResetNativeMovementState = function()
+            movementResetCalls = movementResetCalls + 1
+        end,
+        SuppressZombieState = function()
+            zombieStateSuppressions = zombieStateSuppressions + 1
+        end,
         SetManagedBodyUseless = function(_, requestedUseless)
             if requestedUseless == true then
                 holdRequests = holdRequests + 1
@@ -83,9 +95,12 @@ PNC = {
         end,
     },
     ClientPresenceSync = { Internal = {
-        IsLocalZombieController = function() return true end,
+        IsLocalZombieController = function() return localController end,
         NativePathController = {
-            ClearOwnedPath = function() return true end,
+            ClearOwnedPath = function()
+                pathClears = pathClears + 1
+                return true
+            end,
             BeginMovementLease = function()
                 leases = leases + 1
                 return true
@@ -136,7 +151,19 @@ T.load("ProjectHoomans", "client",
     "PNC/PresenceSync/ClientNativePathController/"
         .. "PNC_ClientNativePathController_Passage.lua")
 
+PNC.TraversalQuery.IsFenceApproachReady = function()
+    return approachReady
+end
+PNC.TraversalQuery.CanTraverseAt = function()
+    return landingReady
+end
+
 local Controller = PNC.ClientPresenceSync.Internal.NativePathController
+T.equal(
+    Controller.UpdatePassageAction,
+    Controller.UpdateWindowSmash,
+    "legacy passage update entry lost its compatibility alias"
+)
 local verticalFrom = {
     getX = function() return 4 end,
     getY = function() return 7 end,
@@ -153,6 +180,50 @@ local verticalX, verticalY = PNC.TraversalQuery.GetFenceTransferPoint(
 T.equal(verticalX, 4.27, "vertical fence transfer changed its lane")
 T.equal(verticalY, 8.41, "vertical fence transfer did not cross one tile")
 
+-- Preflight failures through the passage router must not take path or
+-- movement ownership or start an animation.
+local rejectedState = { marker = "untouched" }
+approachReady = false
+local rejected, rejectReason = Controller.TryNativePassage(
+    { id = "fence-approach-not-ready" }, body, rejectedState,
+    { x = 3.5, y = 0.5, z = 0 }, 900)
+T.falsy(rejected, "fence approach failure was reported as handled")
+T.equal(rejectReason, "native_fence_not_ready",
+    "fence approach failure reason changed")
+T.equal(rejectedState.passageAction, nil,
+    "fence approach failure created a passage action")
+T.equal(rejectedState.marker, "untouched",
+    "fence approach failure changed unrelated state")
+T.equal(pathClears, 0, "fence approach failure cleared the path")
+T.equal(movementResetCalls, 0,
+    "fence approach failure reset native movement")
+T.equal(zombieStateSuppressions, 0,
+    "fence approach failure suppressed zombie state")
+T.equal(bumpType, nil, "fence approach failure started an animation")
+T.equal(holdRequests, 0, "fence approach failure held the body")
+
+approachReady = true
+landingReady = false
+rejectedState = { marker = "untouched" }
+rejected, rejectReason = Controller.TryNativePassage(
+    { id = "fence-landing-blocked" }, body, rejectedState,
+    { x = 3.5, y = 0.5, z = 0 }, 950)
+T.falsy(rejected, "blocked fence landing was reported as handled")
+T.equal(rejectReason, "native_fence_landing_blocked",
+    "blocked fence landing reason changed")
+T.equal(rejectedState.passageAction, nil,
+    "blocked fence landing created a passage action")
+T.equal(rejectedState.marker, "untouched",
+    "blocked fence landing changed unrelated state")
+T.equal(pathClears, 0, "blocked fence landing cleared the path")
+T.equal(movementResetCalls, 0,
+    "blocked fence landing reset native movement")
+T.equal(zombieStateSuppressions, 0,
+    "blocked fence landing suppressed zombie state")
+T.equal(bumpType, nil, "blocked fence landing started an animation")
+T.equal(holdRequests, 0, "blocked fence landing held the body")
+landingReady = true
+
 -- Both fence types use the same transfer-point traversal. Low fences retain
 -- their existing two-phase raise/cross animation sequence.
 local state = {}
@@ -161,6 +232,11 @@ local handled, reason = Controller.TryNativePassage(
     { x = 3.5, y = 0.5, z = 0 }, 1000)
 T.truthy(handled, "small fence was not intercepted")
 T.equal(reason, "native_fence_climb", "small fence traversal reason")
+T.equal(pathClears, 1, "small fence did not clear its owned path")
+T.equal(movementResetCalls, 1,
+    "small fence did not reset native movement")
+T.equal(zombieStateSuppressions, 1,
+    "small fence did not suppress a stale zombie state")
 T.equal(bumpType, "PNC_LegacyClimbFenceStart",
     "small fence did not select the raise clip")
 T.equal(state.passageAction.kind, "fence_climb",
@@ -268,6 +344,24 @@ handled, reason = Controller.TryNativePassage(
 T.truthy(handled, "window repeat was not suppressed")
 T.equal(reason, "native_window_cooldown",
     "window repeat cooldown reason")
+
+-- A nearest-client ownership change must release the active passage before
+-- the local replica applies another native movement step.
+position.x, position.y, position.z = 0.5, 0.23, 0
+actionState = "pathfind"
+state = {}
+handled, reason = Controller.TryNativePassage(
+    { id = "owner-change-window" }, body, state,
+    { x = 3.5, y = 0.5, z = 0 }, 6300)
+T.truthy(handled, "owner-change window was not started")
+localController = false
+handled, reason = Controller.UpdatePassageAction(body, state, 6400)
+T.falsy(handled, "non-owner client continued the passage action")
+T.equal(reason, "native_passage_owner_changed",
+    "ownership transfer reason changed")
+T.equal(state.passageAction, nil,
+    "ownership transfer did not clear the active passage")
+localController = true
 
 -- A landing may be known to be occupied before the climb, but it can also
 -- become blocked during the animation. Keep the latter completion-path

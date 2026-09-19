@@ -16,6 +16,7 @@ T.load(entry)
 
 local expected = {
     "PNC/Core/Health/PNC_NPCWounds/PNC_NPCWounds_Definitions",
+    "PNC/Core/Health/PNC_NPCWounds/PNC_NPCWounds_Diagnostics",
     "PNC/Core/Health/PNC_NPCWounds/PNC_NPCWounds_ClothingCoverage",
     "PNC/Core/Health/PNC_NPCWounds/PNC_NPCWounds_Clothing",
     "PNC/Core/Health/PNC_NPCWounds/PNC_NPCWounds_BodyState",

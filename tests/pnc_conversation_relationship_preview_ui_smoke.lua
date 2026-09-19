@@ -113,7 +113,7 @@ local RelationshipPanel = T.load(
 T.load(
     "ProjectHoomans",
     "client",
-    "PNC/Conversation/PNC_ConversationRelationship.lua"
+    "PNC/Conversation/ConversationRelationship/PNC_ConversationRelationship.lua"
 )
 require = originalRequire
 

@@ -39,6 +39,22 @@ T.equal(greeting.diagnostics.matchedPattern, "pnc.social.greet",
 T.equal(greeting.diagnostics.recommendedRoute, "deterministic",
     "greetings never require the optional LLM")
 
+local hunger = Parser.Parse("I'm hungry")
+T.equal(hunger.intent, "INFORM", "self-state intent")
+T.equal(hunger.subject, "HUNGER", "self-state subject")
+T.equal(hunger.provenance.pattern, "pnc.state.self_hunger_im",
+    "self-state claims use the dedicated state pattern")
+
+local date = Parser.Parse("What day is it?")
+T.equal(date.subject, "DATE", "higher-priority date concept wins")
+T.equal(date.provenance.pattern, "pnc.question.day",
+    "date questions use the local date pattern")
+
+local weather = Parser.Parse("What is the weather?")
+T.equal(weather.subject, "WEATHER", "weather question subject")
+T.equal(weather.provenance.pattern, "pnc.question.weather",
+    "weather questions use the local context pattern")
+
 local offer = Parser.Parse("Who wants an apple?")
 T.equal(offer.intent, "OFFER", "offer intent")
 T.equal(offer.speechAct, "OFFER", "offer speech act")

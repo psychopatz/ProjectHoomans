@@ -56,7 +56,7 @@ PNC.NameplateDisplaySettings.SetNameplateBarScale(1.0, false)
 T.load("ProjectHoomans", "client",
     "PNC/UI/Nameplates/PNC_NameplateRelationshipFeedbackRenderer.lua")
 T.load("ProjectHoomans", "client",
-    "PNC/Conversation/PNC_ConversationRelationship.lua")
+    "PNC/Conversation/ConversationRelationship/PNC_ConversationRelationship.lua")
 
 local Feedback = PNC.NameplateRelationshipFeedback
 Feedback.Reset()
@@ -113,6 +113,32 @@ relationship.ReceivePresentation({
 local observed = Feedback.Get("npc-observe", clock + 100)
 T.equal(observed.direction, "up",
     "relationship presentation changes enter the feedback pipe")
+
+local missingHandlerPanelUpdates = 0
+local missingHandlerPanelSummary
+PsychopatzCore = { Conversation = { instance = {
+    spec = { npcID = "npc-no-conversation-handler" },
+    extensionParts = { relationship = {
+        setRelationship = function(_, summary)
+            missingHandlerPanelUpdates = missingHandlerPanelUpdates + 1
+            missingHandlerPanelSummary = summary
+        end,
+    } },
+} } }
+T.truthy(relationship.ReceivePresentation({
+    npcID = "npc-no-conversation-handler",
+    revision = 9,
+    settlementVisit = {
+        active = true,
+        visitID = "visit-without-handler",
+        revision = 1,
+    },
+}), "relationship presentation is accepted without a refresh handler")
+T.equal(missingHandlerPanelUpdates, 1,
+    "missing refresh handler falls back to the relationship panel")
+T.equal(missingHandlerPanelSummary.revision, 9,
+    "missing-handler fallback keeps the newest presentation")
+PsychopatzCore.Conversation.instance = nil
 
 local calls = { lines = {}, rects = {}, texts = {}, fonts = {} }
 local manager = {

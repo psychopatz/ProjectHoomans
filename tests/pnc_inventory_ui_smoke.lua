@@ -709,9 +709,11 @@ ISPNCInventoryWindow.refreshInventory(refreshWindow, false)
 T.equal(buildPlayerRowsCalls, 1,
     "stable player container rows were rebuilt after the refresh signature")
 playerBagFavorite = false
+PNC.InventoryWindow.instance = refreshWindow
+PNC.InventoryWindow.InvalidatePlayerRows()
 ISPNCInventoryWindow.refreshInventory(refreshWindow, false)
 T.equal(buildPlayerRowsCalls, 2,
-    "favorite state changes remain visible without a revision change")
+    "favorite state changes rebuild rows after inventory invalidation")
 local refreshedBagRow
 for _, entry in ipairs(refreshWindow.playerList.items) do
     if entry.item.id == "42" then refreshedBagRow = entry.item end
@@ -720,8 +722,8 @@ T.equal(refreshedBagRow.favorite, false,
     "favorite state change was not rendered from the current row snapshot")
 refreshRevision = 2
 ISPNCInventoryWindow.refreshInventory(refreshWindow, false)
-T.equal(buildPlayerRowsCalls, 3,
-    "revision refresh reused the rows already built for its signature")
+T.equal(buildPlayerRowsCalls, 2,
+    "NPC inventory revision rebuilt the unrelated player inventory rows")
 local replacementRootItems = { wornShirt }
 local replacementRoot = {
     getItems = function() return javaList(replacementRootItems) end,
@@ -729,7 +731,7 @@ local replacementRoot = {
 }
 player.getInventory = function() return replacementRoot end
 ISPNCInventoryWindow.refreshInventory(refreshWindow, true)
-T.equal(buildPlayerRowsCalls, 5,
+T.equal(buildPlayerRowsCalls, 4,
     "refresh rebuilt rows when the selected native container changed")
 T.equal(refreshWindow.playerList.items[1].item.id, "43",
     "refresh rendered rows from the replacement native container")

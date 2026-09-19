@@ -6,16 +6,17 @@
 -- local routing and optional LLM context assembly.
 PNC = PNC or {}
 PNC.Semantics = PNC.Semantics or {}
+require "PNC/Semantics/PNC_SemanticWorldContext_Environment"
 
 local World = PNC.Semantics.WorldContext or {}
 PNC.Semantics.WorldContext = World
-
-require "PNC/Conversation/PNC_ConversationTime"
+local Environment = PNC.Semantics.WorldContextEnvironment
 
 World.VERSION = 1
 World.DEFAULT_TTL_MS = 1000
 World.Internal = World.Internal or {}
 local cache = {}
+local timeBandResolver = nil
 local DEFAULT_CACHE_KEY = "__default_player__"
 
 local function call0(object, methodName)
@@ -86,21 +87,6 @@ local function firstBoolean(object, methods)
     return nil
 end
 
--- GameTime stores month/day as zero-based values. Prefer the engine's
--- explicit day-plus-one helper when available and keep the arithmetic
--- fallback for older/partial test doubles.
-local function calendarDay(gameTime)
-    local day = readNumber(gameTime, "getDayPlusOne")
-    if day ~= nil then return day end
-    day = readNumber(gameTime, "getDay")
-    return day ~= nil and day + 1 or nil
-end
-
-local function calendarMonth(gameTime)
-    local month = readNumber(gameTime, "getMonth")
-    return month ~= nil and month + 1 or nil
-end
-
 local function nowMillis(options)
     if type(options) == "table" and options.now ~= nil then
         return tonumber(options.now) or 0
@@ -151,110 +137,17 @@ local function localPlayer(options)
     return nil
 end
 
-local function timeSnapshot(gameTime, worldAgeHours)
-    local timeOfDay = readNumber(gameTime, "getTimeOfDay")
-    local hour = readNumber(gameTime, "getHour")
-    local minutes = readNumber(gameTime, "getMinutes")
-    local available = gameTime ~= nil
-        and (timeOfDay ~= nil or hour ~= nil or minutes ~= nil)
-    if hour == nil and timeOfDay ~= nil then hour = math.floor(timeOfDay) end
-    if hour == nil then hour = 12 end
-    if minutes == nil and timeOfDay ~= nil then
-        minutes = math.floor((timeOfDay - math.floor(timeOfDay)) * 60 + 0.5)
-    end
-    minutes = minutes or 0
-    if timeOfDay == nil then timeOfDay = hour + minutes / 60 end
-    local calendar = {
-        year = readNumber(gameTime, "getYear"),
-        month = calendarMonth(gameTime),
-        day = calendarDay(gameTime),
-    }
-    local gameDay = math.floor((tonumber(worldAgeHours) or 0) / 24)
-    local timeBand = nil
-    local time = PNC.Conversation and PNC.Conversation.Time
-    if time and type(time.Resolve) == "function" then
-        local ok, value = pcall(time.Resolve, timeOfDay)
-        if ok then timeBand = value end
-    end
-    return {
-        available = available,
-        worldAgeHours = tonumber(worldAgeHours) or 0,
-        gameDay = gameDay,
-        timeOfDay = timeOfDay,
-        hour = math.floor(hour),
-        minute = math.max(0, math.min(59, math.floor(minutes))),
-        band = timeBand,
-        calendar = calendar,
-    }
-end
-
-local function weatherSnapshot(climate, player)
-    local precipitation = firstNumber(climate, {
-        "getPrecipitationIntensity",
-    })
-    local raining = firstBoolean(climate, { "isRaining" })
-    if raining == nil then
-        local value = readMember(climate, "isRaining")
-        if value == true or value == false then raining = value end
-    end
-    if raining == nil and precipitation ~= nil then
-        raining = precipitation > 0
-    end
-
-    local fogIntensity = firstNumber(climate, {
-        "getFogIntensity",
-    })
-    if fogIntensity == nil and isCharacterArgument(player) then
-        local ok, value = call1(climate, "getFogIntensityForCharacter", player)
-        if ok then fogIntensity = tonumber(value) end
-    end
-    local foggy = firstBoolean(climate, { "isFoggy" })
-    if foggy == nil then
-        local value = readMember(climate, "isFoggy")
-        if value == true or value == false then foggy = value end
-    end
-    if foggy == nil and fogIntensity ~= nil then foggy = fogIntensity > 0.10 end
-
-    local rainIntensity = firstNumber(climate, { "getRainIntensity" })
-    local snowIntensity = firstNumber(climate, { "getSnowIntensity" })
-    local snowing = firstBoolean(climate, { "isSnowing" })
-    if snowing == nil then
-        snowing = firstBoolean(climate, { "getPrecipitationIsSnow" })
-    end
-    if snowing == nil and snowIntensity ~= nil then
-        snowing = snowIntensity > 0
-    end
-
-    local temperature = nil
-    if isCharacterArgument(player) then
-        local ok, value = call2(
-            climate, "getAirTemperatureForCharacter", player, false
-        )
-        if ok then temperature = tonumber(value) end
-    end
-    temperature = temperature or firstNumber(climate, {
-        "getTemperature",
-        "getAirTemperature",
-    })
-
-    return {
-        source = climate and "climate_manager" or "unavailable",
-        precipitationIntensity = precipitation,
-        raining = raining,
-        rainIntensity = rainIntensity,
-        snowing = snowing,
-        snowIntensity = snowIntensity,
-        fogIntensity = fogIntensity,
-        foggy = foggy,
-        temperatureC = temperature,
-        windIntensity = firstNumber(climate, {
-            "getWindIntensity", "getWindPower",
-        }),
-        cloudIntensity = readNumber(climate, "getCloudIntensity"),
-        humidity = readNumber(climate, "getHumidity"),
-        season = readString(climate, "getSeasonName"),
-    }
-end
+local environmentReaders = {
+    call1 = call1,
+    call2 = call2,
+    firstBoolean = firstBoolean,
+    firstNumber = firstNumber,
+    isCharacterArgument = isCharacterArgument,
+    readBoolean = readBoolean,
+    readMember = readMember,
+    readNumber = readNumber,
+    readString = readString,
+}
 
 local function positionSnapshot(player)
     if player == nil then return nil end
@@ -271,7 +164,8 @@ local function build(options, sampledAt)
     local worldAgeHours = readNumber(gameTime, "getWorldAgeHours") or 0
     local climate = globalObject(getClimateManager)
     local indoors = firstBoolean(player, { "isInARoom", "isInside" })
-    local snapshotTime = timeSnapshot(gameTime, worldAgeHours)
+    local snapshotTime = Environment.TimeSnapshot(
+        gameTime, worldAgeHours, timeBandResolver, environmentReaders)
     local snapshot = {
         schemaVersion = World.VERSION,
         kind = "world_context",
@@ -282,7 +176,8 @@ local function build(options, sampledAt)
         timeOfDay = snapshotTime.timeOfDay,
         timeBand = snapshotTime.band,
         calendar = snapshotTime.calendar,
-        weather = weatherSnapshot(climate, player),
+        weather = Environment.WeatherSnapshot(
+            climate, player, environmentReaders),
         environment = {
             indoors = indoors,
             position = positionSnapshot(player),
@@ -322,6 +217,12 @@ end
 function World.Clear()
     cache = {}
     return true
+end
+
+function World.SetTimeBandResolver(resolver)
+    timeBandResolver = type(resolver) == "function" and resolver or nil
+    World.Clear()
+    return timeBandResolver ~= nil
 end
 
 World.Internal.Call0 = call0

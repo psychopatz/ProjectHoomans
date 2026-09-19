@@ -2,6 +2,7 @@ local T = require "tests/support/test"
 
 PNC = {
     Core = {
+        IsAuthority = function() return true end,
         Clamp = function(value, minimum, maximum)
             return math.max(minimum, math.min(maximum, value))
         end,
@@ -47,6 +48,16 @@ T.load(root .. "shared/PNC/Core/Needs/PNC_NeedsDefinitions.lua")
 T.load(root .. "shared/PNC/Core/Health/PNC_NPCWounds/PNC_NPCWounds_BodyState.lua")
 T.load(root .. "shared/PNC/Core/Health/PNC_NPCWounds/PNC_NPCWounds_WholeBody.lua")
 T.load(root .. "shared/PNC/Core/Health/PNC_NPCWounds/PNC_NPCWounds_Infection.lua")
+T.load(root .. "shared/PNC/Core/Health/PNC_NPCWounds/PNC_NPCWounds_Diagnostics.lua")
+T.load(root .. "shared/PNC/Core/Health/PNC_NPCWounds/PNC_NPCWounds_Debug.lua")
+
+local infectionDebugMessages = {}
+PNC.Core.IsRecordDebugEnabled = function(record)
+    return record and record.runtime and record.runtime.debug == true
+end
+PNC.Core.LogRecordDebug = function(_, message)
+    infectionDebugMessages[#infectionDebugMessages + 1] = message
+end
 
 local function makeRecord()
     return {
@@ -68,7 +79,60 @@ local function makeRecord()
     }
 end
 
+local unauthorized = makeRecord()
+unauthorized.runtime.debug = true
+PNC.Core.IsAuthority = nil
+local accepted, reason = PNC.NPCWounds.ForceInfection(
+    unauthorized, "Head"
+)
+T.equal(accepted, false, "infection mutation fails closed without authority")
+T.equal(reason, "not_authority", "missing authority reason")
+T.contains(infectionDebugMessages[#infectionDebugMessages],
+    "health.infection event=force")
+T.contains(infectionDebugMessages[#infectionDebugMessages],
+    "status=rejected reason=not_authority")
+T.equal(unauthorized.health.body.infection, nil,
+    "missing authority leaves infection state unchanged")
+accepted, reason = PNC.NPCWounds.ApplyDebugWound(
+    unauthorized, nil, "Head", "bite"
+)
+T.equal(accepted, false, "debug wound fails closed without authority")
+T.equal(reason.outcome, "not_authority", "debug wound authority result")
+accepted, reason = PNC.NPCWounds.ApplyDebugInfection(
+    unauthorized, nil, "Head", "fever"
+)
+T.equal(accepted, false, "debug infection fails closed without authority")
+T.equal(reason, "not_authority", "debug infection authority result")
+
+PNC.Core.IsAuthority = function() return false end
+unauthorized.health.body.infection = { active = true, progress = 0 }
+accepted, reason = PNC.NPCWounds.Internal.RefreshInfectionState(
+    unauthorized, 24, true
+)
+T.equal(accepted, false, "client cannot advance infection state")
+T.equal(reason, "not_authority", "progression authority reason")
+T.equal(unauthorized.health.body.infection.progress, 0,
+    "client progression leaves stored state unchanged")
+accepted, reason = PNC.NPCWounds.ClearInfection(unauthorized)
+T.equal(accepted, false, "client cannot clear infection")
+T.equal(reason, "not_authority", "clear authority reason")
+T.truthy(unauthorized.health.body.infection.active,
+    "client clear leaves infection active")
+accepted, reason = PNC.NPCWounds.PrepareInfectionDeath(unauthorized)
+T.equal(accepted, false, "client cannot prepare infection death")
+T.equal(reason, "not_authority", "death preparation authority reason")
+T.truthy(unauthorized.health.body.infection.active,
+    "client death preparation leaves infection active")
+accepted, reason = PNC.NPCWounds.TriggerInfectionDeath(unauthorized, nil)
+T.equal(accepted, false, "client cannot trigger infection death")
+T.equal(reason, "not_authority", "death trigger authority reason")
+T.truthy(unauthorized.health.body.infection.active,
+    "client death trigger leaves infection active")
+
+PNC.Core.IsAuthority = function() return true end
+
 local record = makeRecord()
+record.runtime.debug = true
 PNC.NPCWounds.SyncOverallHealth(record)
 T.equal(record.health.body.totalPartHealth, 200,
     "whole-body hitpoints are the sum of limb hitpoints")
@@ -76,6 +140,10 @@ T.equal(record.health.body.totalPartMax, 200,
     "whole-body maximum is the sum of limb maxima")
 T.truthy(PNC.NPCWounds.ForceInfection(record, "Head"),
     "Knox infection can be applied")
+T.contains(infectionDebugMessages[#infectionDebugMessages],
+    "health.infection event=apply")
+T.contains(infectionDebugMessages[#infectionDebugMessages],
+    "status=applied reason=infected")
 T.equal(PNC.NPCWounds.WholeBody.IsCurable("knox_fever"), false,
     "Knox fever is the incurable fever class")
 
@@ -85,6 +153,9 @@ T.near(record.health.current, 100, 0.000001,
     "fever buildup does not overwrite or damage whole-body HP early")
 T.near(record.health.body.wholeBodyAilments.knox_fever.severity,
     1, 0.000001, "Knox fever reaches full severity before damage")
+T.contains(infectionDebugMessages[#infectionDebugMessages],
+    "health.infection event=stage_transition")
+T.contains(infectionDebugMessages[#infectionDebugMessages], "stage=terminal")
 
 worldHour = 44.2
 PNC.NPCWounds.Internal.RefreshInfectionState(record, worldHour, true)

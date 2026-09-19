@@ -7,6 +7,9 @@ T.addPackagePaths({
 local now = 1000
 local bumpTypes = {}
 local finished = false
+local moveWarnings = {}
+local pathInvalidations = {}
+local traversalEvents = {}
 
 local fromSquare = {
     getX = function() return 0 end,
@@ -86,9 +89,41 @@ T.load(
     "shared",
     "PNC/Core/Pathing/PNC_PathService/PNC_PathService_TraversalRuntime.lua"
 )
+T.load(
+    "ProjectHoomans",
+    "shared",
+    "PNC/Core/Pathing/PNC_PathService/Motion/PNC_PathService_MotionPassage.lua"
+)
 
 local lane = {}
 local record = { id = "split-fence" }
+local internal = PNC.PathService.Internal
+internal.logMoveWarning = function(_, _, _, event, reason, detail)
+    moveWarnings[#moveWarnings + 1] = {
+        event = event,
+        reason = reason,
+        detail = detail,
+    }
+end
+internal.logMoveDebug = function() end
+internal.logTraversalEvent = function(_, _, _, event, reason, detail)
+    traversalEvents[#traversalEvents + 1] = {
+        event = event,
+        reason = reason,
+        detail = detail,
+    }
+end
+internal.describeGoal = function() return "test_goal" end
+local function installPathPlanner()
+    PNC.EnginePathPlanner = {
+        Invalidate = function(_, reason, body)
+            pathInvalidations[#pathInvalidations + 1] = {
+                reason = reason,
+                body = body,
+            }
+        end,
+    }
+end
 T.truthy(PNC.PathService.Internal.beginTraversalAction(
     zombie,
     record,
@@ -151,12 +186,21 @@ T.truthy(zombie.x > 0.5 and zombie.x < 1.5,
 zombie.variables.PNCTraversalPhase = "finished"
 zombie.variables.BumpAnimFinished = true
 now = 2050
-T.falsy(PNC.PathService.Internal.updateTraversalAction(
+lane.navigationProvider = "engine_path"
+lane.goal = { x = 2.5, y = 0.5, z = 0 }
+installPathPlanner()
+local handled, state = internal.updateScriptedSpecialMove(
     zombie, record, lane, now
-), "split fence did not finish after crossing")
+)
+T.truthy(handled, "split fence completion was not handled")
+T.equal(state, "traversal_completed",
+    "normal split fence completion changed state")
 T.equal(zombie.x, 1.5, "split fence did not land on the other side")
 T.falsy(lane.traversalAction, "split fence action was not cleared")
 T.truthy(finished, "split fence did not release its bump")
+T.equal(#pathInvalidations, 0,
+    "normal split fence completion invalidated its route")
+PNC.EnginePathPlanner = nil
 
 -- Missing XML phase/finish events must still complete on the bounded
 -- profile deadline. This characterizes the fallback before phase policy is
@@ -200,12 +244,47 @@ T.truthy(PNC.PathService.Internal.updateTraversalAction(
     zombie, record, lane, now
 ), "timeout traversal did not enter crossing")
 now = 4300
-T.falsy(PNC.PathService.Internal.updateTraversalAction(
+installPathPlanner()
+handled, state = internal.updateScriptedSpecialMove(
     zombie, record, lane, now
-), "missing finish event pinned scripted traversal")
+)
+T.truthy(handled, "timeout traversal handoff was not handled")
+T.equal(state, "traversal_repaired",
+    "timeout traversal did not enter the route repair handoff")
 T.equal(lane.lastTraversalFinishReason, "hard_timeout",
     "scripted timeout completion reason")
 T.equal(zombie.x, 1.5, "timeout traversal did not reach its landing")
 T.truthy(finished, "timeout traversal did not release its bump")
+T.equal(#pathInvalidations, 1,
+    "timed-out traversal did not invalidate its native route")
+T.equal(pathInvalidations[1].reason, "traversal_repaired",
+    "timed-out traversal used the wrong route invalidation reason")
+T.equal(pathInvalidations[1].body, zombie,
+    "timed-out traversal invalidated the wrong body route")
+T.equal(lane.ownerMode, "engine_path_waiting",
+    "timed-out traversal did not return ownership to the route planner")
+T.equal(lane.lastNavigationInvalidatedAt, now,
+    "timed-out traversal lost the route invalidation timestamp")
+local timeoutEvent = traversalEvents[#traversalEvents]
+T.equal(timeoutEvent.event, "complete",
+    "crossed timeout was not logged as traversal completion")
+T.equal(timeoutEvent.reason, "hard_timeout",
+    "crossed timeout completion reason changed")
+T.contains(timeoutEvent.detail, "crossed=true",
+    "timeout traversal log lost the crossing result")
+T.contains(timeoutEvent.detail, "finished=false",
+    "timeout traversal log lost the animation result")
+T.contains(timeoutEvent.detail, "timedOut=true",
+    "timeout traversal log lost the deadline result")
+local routeFailed
+for i = 1, #moveWarnings do
+    if moveWarnings[i].event == "route_failed" then
+        routeFailed = moveWarnings[i]
+    end
+end
+T.truthy(routeFailed,
+    "timeout route repair did not emit its route failure diagnostic")
+T.equal(routeFailed.reason, "traversal_hard_timeout",
+    "timeout route repair diagnostic reason changed")
 
 T.finish("pnc_split_fence_traversal_smoke")

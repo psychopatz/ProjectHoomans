@@ -4,6 +4,11 @@ local Internal = Wounds.Internal
 local Core = PNC.Core
 local Settings = PNC.Sandbox
 
+local function hasAuthority()
+    return Core and type(Core.IsAuthority) == "function"
+        and Core.IsAuthority() == true
+end
+
 function Wounds.ApplyDebugWound(
     record,
     npcBody,
@@ -11,6 +16,9 @@ function Wounds.ApplyDebugWound(
     woundType,
     amount
 )
+    if not hasAuthority() then
+        return false, { outcome = "not_authority" }
+    end
     local part = partId
         and Wounds.Parts[tostring(partId)]
         or Internal.ChoosePart()
@@ -62,6 +70,14 @@ function Wounds.ApplyDebugInfection(
     partId,
     stage
 )
+    if not hasAuthority() then
+        if Internal.LogInfectionDebug then
+            Internal.LogInfectionDebug(
+                record, "debug_apply", "rejected", "not_authority"
+            )
+        end
+        return false, "not_authority"
+    end
     local selectedPartId = partId
         and tostring(partId)
         or Wounds.ChoosePartId()
@@ -79,6 +95,11 @@ function Wounds.ApplyDebugInfection(
         or record.alive == false
         or not Wounds.Parts[selectedPartId]
     then
+        if Internal.LogInfectionDebug then
+            Internal.LogInfectionDebug(
+                record, "debug_apply", "rejected", "invalid_target"
+            )
+        end
         return false, "invalid_target"
     end
     local body = Wounds.Ensure(record)
@@ -105,6 +126,11 @@ function Wounds.ApplyDebugInfection(
     end
     local infection = body.infection
     if not infection or infection.active ~= true then
+        if Internal.LogInfectionDebug then
+            Internal.LogInfectionDebug(
+                record, "debug_apply", "rejected", "infection_unavailable"
+            )
+        end
         return false, "infection_unavailable"
     end
     local currentHour = Internal.WorldHour()
@@ -134,6 +160,17 @@ function Wounds.ApplyDebugInfection(
         "debug_infection_" .. tostring(infection.stage)
     if PNC.Registry and PNC.Registry.MarkDirty then
         PNC.Registry.MarkDirty(record, "infection")
+    end
+    if Internal.LogInfectionDebug then
+        Internal.LogInfectionDebug(
+            record,
+            "debug_apply",
+            "applied",
+            "debug_stage_set",
+            infection.stage,
+            infection.progress,
+            infection.fever
+        )
     end
     return true, infection.stage
 end

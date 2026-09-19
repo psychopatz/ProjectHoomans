@@ -6,18 +6,19 @@ require "PNC/Conversation/PNC_ConversationBackgrounds"
 require "PNC/Conversation/PNC_ConversationDiary"
 require "PNC/Conversation/Blocks/PNC_ConversationTextLoader"
 require "PNC/Conversation/PNC_ConversationAudience"
-require "PNC/Conversation/PNC_ConversationRelationship"
+require "PNC/Conversation/ConversationRelationship/PNC_ConversationRelationship"
 require "PNC/Conversation/Blocks/ConversationComposer/PNC_ConversationComposer"
 require "PNC/Conversation/PNC_ConversationRelationshipPanel"
 require "PNC/Conversation/PNC_ConversationLifecycle"
-require "PNC/UI/PNC_NPCTypePalette"
--- Register authored and LLM-resolved NPC messages with Core's optional voice
--- gateway before any conversation can append a line.
-require "PNC/Integrations/PNC_VoiceGateway"
-require "PNC/Integrations/PBrainZ/PNC_PBrainZ"
-require "PNC/Integrations/PBrainZ/PNC_PBrainZ_Bridge"
-require "PNC/Integrations/PBrainZ/PNC_PBrainZ_InlineChat"
-require "PNC/Semantics/PNC_SemanticDialogueInput"
+require "PNC/Conversation/PNC_ConversationGroup"
+require "PNC/PNC_ConversationSemantics"
+local ConversationSemantics = PNC.ConversationSemantics
+if ConversationSemantics
+    and type(ConversationSemantics.RegisterConversation) == "function"
+then
+    ConversationSemantics.RegisterConversation(
+        PNC.Conversation, PNC.Conversation.Group, PNC.Conversation.Time)
+end
 require "PNC/Conversation/PNC_SocialFlavorPresentation"
 require "PNC/Conversation/PNC_ConversationLiveAnimation"
 

@@ -5,6 +5,7 @@ PNC.NPCWounds = PNC.NPCWounds or {}
 PNC.NPCWounds.Internal = PNC.NPCWounds.Internal or {}
 
 require "PNC/Core/Health/PNC_NPCWounds/PNC_NPCWounds_Definitions"
+require "PNC/Core/Health/PNC_NPCWounds/PNC_NPCWounds_Diagnostics"
 require "PNC/Core/Health/PNC_NPCWounds/PNC_NPCWounds_ClothingCoverage"
 require "PNC/Core/Health/PNC_NPCWounds/PNC_NPCWounds_Clothing"
 require "PNC/Core/Health/PNC_NPCWounds/PNC_NPCWounds_BodyState"

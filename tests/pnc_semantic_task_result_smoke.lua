@@ -66,7 +66,7 @@ session.semanticTaskRequests["task:camp"] = {
         target = {
             kind = "camp_site",
             clientHint = {
-                label = "living room",
+                label = "client guessed room",
                 scope = "room",
             },
         },
@@ -83,7 +83,7 @@ local campAdmitted = Input.ReceiveSemanticTaskResult({
 })
 T.equal(campAdmitted, true, "camp admission is accepted")
 T.equal(session.semanticTaskRequests["task:camp"].siteLabel,
-    "living room", "authoritative camp label is retained while pending")
+    "living room", "authoritative camp label overrides the client hint")
 
 local campCompleted = Input.ReceiveSemanticTaskResult({
     requestID = "task:camp",
@@ -152,5 +152,71 @@ T.equal(queued[4].metadata.source.reason, "item_not_found",
     "internal failure reason remains available in metadata")
 T.equal(queued[4].metadata.source.admissionReason, "blocked",
     "admission diagnostics remain available in metadata")
+
+local function campFailureResponse(requestID, reason)
+    session.semanticTaskRequests[requestID] = { action = "CAMP" }
+    local received = Input.ReceiveSemanticTaskResult({
+        requestID = requestID,
+        npcID = "npc:alice",
+        action = "CAMP",
+        accepted = false,
+        status = "blocked",
+        reason = reason,
+    })
+    T.equal(received, true, "camp failure reaches the conversation queue")
+    return queued[#queued].payload.fallback
+end
+
+T.equal(campFailureResponse("task:camp-no-site", "camp_no_visible_site"),
+    "I don't see a safe place to camp nearby.",
+    "missing visible camp sites retain their response")
+T.equal(campFailureResponse("task:camp-room", "room_not_found"),
+    "I can't find a safe room like that nearby.",
+    "missing requested rooms retain their response")
+T.equal(campFailureResponse("task:campfire", "campfire_not_found"),
+    "There isn't a usable campfire nearby.",
+    "missing campfires retain their response")
+
+local groupQueued = {}
+local groupSession = {
+    queueMessage = function(self, speaker, payload, metadata)
+        groupQueued[#groupQueued + 1] = {
+            speaker = speaker,
+            payload = payload,
+            metadata = metadata,
+        }
+    end,
+}
+view.groupConversation = {
+    id = "group:1",
+    participantIDs = { "npc:alice", "npc:bob" },
+    activeTurn = { id = "turn:2" },
+    PrimarySession = function() return groupSession end,
+    SpeakerFor = function(_, memberView)
+        T.equal(memberView, view, "group presentation uses the matching view")
+        return "npc:bob", "Bob"
+    end,
+}
+session.semanticTaskRequests["task:group"] = { action = "WAIT_AT" }
+local groupResult = Input.ReceiveSemanticTaskResult({
+    requestID = "task:group",
+    npcID = "npc:alice",
+    action = "WAIT_AT",
+    accepted = true,
+    status = "completed",
+})
+T.equal(groupResult, true, "group task result is presented")
+T.equal(#queued, 7, "group result uses the primary session")
+T.equal(groupQueued[1].speaker, "npc", "group result keeps its speaker role")
+T.equal(groupQueued[1].metadata.speakerID, "npc:bob",
+    "group result uses the selected speaker identity")
+T.equal(groupQueued[1].metadata.speakerName, "Bob",
+    "group result uses the selected speaker name")
+T.equal(groupQueued[1].metadata.participants[2], "npc:bob",
+    "group result retains its participant list")
+T.equal(groupQueued[1].metadata.source.groupID, "group:1",
+    "group result records its group")
+T.equal(groupQueued[1].metadata.source.groupTurnID, "turn:2",
+    "group result records its active turn")
 
 T.finish("pnc_semantic_task_result_smoke")

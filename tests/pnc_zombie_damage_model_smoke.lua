@@ -220,4 +220,188 @@ T.equal(condition, 8, "penetrating clothing loses two condition")
 randomValues = { 0 }
 T.equal(Wounds.RollZombieAttackType(), "bite", "bite type roll remains independent")
 
+local attackRecord = {
+    id = "zombie_authority",
+    x = 0,
+    y = 0,
+    z = 0,
+    alive = true,
+    presenceState = "live",
+    runtime = {},
+    health = {
+        current = 100,
+        max = 100,
+        state = "normal",
+        body = { parts = {}, wounds = {} },
+    },
+}
+local attackBody = {}
+local allowed, attackResult = Wounds.ResolveZombieAttack(
+    attackRecord, attackBody, nil, "zombie_1"
+)
+T.equal(allowed, false, "legacy attack fails closed without authority service")
+T.equal(attackResult.outcome, "not_authority",
+    "legacy attack reports missing authority")
+allowed, attackResult = Wounds.ApplyResolvedZombieAttack(
+    attackRecord,
+    attackBody,
+    nil,
+    "zombie_1",
+    { part = Wounds.Parts.Torso_Upper, damageType = "scratch" }
+)
+T.equal(allowed, false, "resolved attack fails closed without authority service")
+T.equal(attackResult.outcome, "not_authority",
+    "resolved attack reports missing authority")
+
+PNC.Core.IsAuthority = function() return false end
+allowed, attackResult = Wounds.ResolveZombieAttack(
+    attackRecord, attackBody, nil, "zombie_1"
+)
+T.equal(allowed, false, "client cannot apply legacy zombie damage")
+T.equal(attackResult.outcome, "not_authority",
+    "legacy client rejection outcome")
+allowed, attackResult = Wounds.ApplyResolvedZombieAttack(
+    attackRecord,
+    attackBody,
+    nil,
+    "zombie_1",
+    { part = Wounds.Parts.Torso_Upper, damageType = "scratch" }
+)
+T.equal(allowed, false, "client cannot apply resolved zombie damage")
+T.equal(attackResult.outcome, "not_authority",
+    "resolved client rejection outcome")
+T.equal(attackRecord.health.current, 100,
+    "authority rejections leave health unchanged")
+T.equal(next(attackRecord.health.body.wounds), nil,
+    "authority rejections leave wound state unchanged")
+
+PNC.Core.IsAuthority = function() return true end
+PNC.Sandbox.NPCZombieWoundChance = function() return 100 end
+PNC.Sandbox.NPCZombieBiteChance = function() return 0 end
+PNC.Sandbox.NPCZombieLacerationChance = function() return 0 end
+PNC.Health = {
+    Ensure = function(record) return record.health end,
+    ApplyDamage = function(record, _, event)
+        record.health.current = record.health.current - event.amount
+        return true
+    end,
+}
+local zombieDebugMessages = {}
+PNC.Core.IsRecordDebugEnabled = function(record)
+    return record and record.runtime and record.runtime.debug == true
+end
+PNC.Core.LogRecordDebug = function(_, message)
+    zombieDebugMessages[#zombieDebugMessages + 1] = message
+end
+
+local function makeAttackVictim(id)
+    return {
+        id = id,
+        x = 0,
+        y = 0,
+        z = 0,
+        alive = true,
+        presenceState = "live",
+        runtime = {},
+        health = {
+            current = 100,
+            max = 100,
+            state = "normal",
+            body = { parts = {}, wounds = {} },
+        },
+    }
+end
+
+local legacyVictim = makeAttackVictim("legacy_attack")
+legacyVictim.runtime.debug = true
+randomValues = { 0, 9999, 0 }
+allowed, attackResult = Wounds.ResolveZombieAttack(
+    legacyVictim, attackBody, nil, "zombie_2"
+)
+T.equal(allowed, true, "authoritative legacy attack applies damage")
+T.equal(attackResult.outcome, "wounded", "legacy attack outcome")
+T.truthy(legacyVictim.health.body.wounds[attackResult.partId],
+    "legacy attack records its body-part wound")
+T.contains(zombieDebugMessages[#zombieDebugMessages],
+    "health.zombie_attack route=legacy")
+T.contains(zombieDebugMessages[#zombieDebugMessages],
+    "status=applied reason=wounded")
+T.contains(zombieDebugMessages[#zombieDebugMessages],
+    "attacker=zombie_2")
+PNC.NPCWounds.Internal.LogZombieAttackDebug(
+    legacyVictim,
+    "legacy\n" .. string.rep("r", 100),
+    "rejected",
+    "bad\nreason",
+    { unsafe = true },
+    "Torso_Upper",
+    "scratch",
+    { unsafe = true }
+)
+local boundedMessage = zombieDebugMessages[#zombieDebugMessages]
+T.contains(boundedMessage, "attacker=unsupported")
+T.contains(boundedMessage, "damage=unsupported")
+T.truthy(not string.find(boundedMessage, "\n", 1, true),
+    "diagnostics strip control characters")
+T.truthy(#boundedMessage < 500, "diagnostic fields are length bounded")
+
+local resolvedVictim = makeAttackVictim("resolved_attack")
+allowed, attackResult = Wounds.ApplyResolvedZombieAttack(
+    resolvedVictim,
+    attackBody,
+    nil,
+    "zombie_3",
+    {
+        part = Wounds.Parts.Torso_Upper,
+        damageType = "scratch",
+        damageModel = false,
+        damageChance = 100,
+        damageRoll = 0,
+    }
+)
+T.equal(allowed, true, "authoritative resolved attack applies damage")
+T.equal(attackResult.outcome, "wounded", "resolved attack outcome")
+T.equal(attackResult.partId, "Torso_Upper",
+    "resolved attack preserves its selected body part")
+T.truthy(resolvedVictim.health.body.wounds.Torso_Upper,
+    "resolved attack records its body-part wound")
+
+local rejectedVictim = makeAttackVictim("rejected_attack")
+PNC.Health.ApplyDamage = function() return false end
+allowed, attackResult = Wounds.ApplyResolvedZombieAttack(
+    rejectedVictim,
+    attackBody,
+    nil,
+    "zombie_4",
+    {
+        part = Wounds.Parts.Torso_Upper,
+        damageType = "scratch",
+        damageModel = false,
+    }
+)
+T.equal(allowed, false, "rejected health damage rejects the wound")
+T.equal(attackResult.outcome, "damage_rejected",
+    "resolved damage rejection is reported")
+T.equal(rejectedVictim.health.body.wounds.Torso_Upper, nil,
+    "rejected health damage rolls back the wound")
+
+local unavailableVictim = makeAttackVictim("unavailable_attack")
+PNC.Health = nil
+allowed, attackResult = Wounds.ApplyResolvedZombieAttack(
+    unavailableVictim,
+    attackBody,
+    nil,
+    "zombie_5",
+    {
+        part = Wounds.Parts.Torso_Upper,
+        damageType = "scratch",
+        damageModel = false,
+    }
+)
+T.equal(allowed, false, "missing Health API safely rejects the attack")
+T.equal(attackResult.outcome, "damage_unavailable",
+    "missing Health API has an explicit result")
+T.equal(unavailableVictim.health.body.wounds.Torso_Upper, nil,
+    "missing Health API leaves wound state unchanged")
+
 T.finish("pnc_zombie_damage_model_smoke")

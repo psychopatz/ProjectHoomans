@@ -18,8 +18,11 @@ end
 
 function Client.HandleServerCommand(command, args)
     ClientState.lastSyncReceiveAt = Core.Now()
+    if type(args) ~= "table" then
+        args = {}
+    end
     local handler = Handlers[command]
-    if handler then handler(args or {}) end
+    if handler then handler(args) end
 end
 
 return Client

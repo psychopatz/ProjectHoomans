@@ -22,7 +22,9 @@ PNC = {
         MODULE = "PNC",
         CMD_FULL_SYNC_REQUEST = "FullSyncRequest",
         CMD_REQUEST_CHARACTER = "RequestCharacter",
+        CMD_REQUEST_CHARACTER_INVENTORY = "RequestCharacterInventoryPayload",
         CMD_CHARACTER_PAYLOAD = "CharacterPayload",
+        CMD_CHARACTER_INVENTORY_PAYLOAD = "CharacterInventoryPayload",
         CMD_INVENTORY_DELTA = "InventoryDelta",
         CMD_INVENTORY_RESULT = "InventoryResult",
     },
@@ -93,10 +95,12 @@ registered[PNC.Const.CMD_INVENTORY_DELTA]({
     ops = {{ op = "update", itemID = "missing", itemState = {} }},
 })
 local recoveryRequest = sentRequests[#sentRequests]
-T.equal(recoveryRequest.npcID, "npc-1",
-    "rejected delta did not request the correct NPC")
-T.equal(recoveryRequest.forceFull, true,
-    "rejected delta did not request an authoritative snapshot")
+T.equal(recoveryRequest.command, PNC.Const.CMD_REQUEST_CHARACTER_INVENTORY,
+    "rejected delta did not request an inventory snapshot")
+T.equal(recoveryRequest.args.id, "npc-1",
+    "inventory recovery request did not target the correct NPC")
+T.truthy(recoveryRequest.args.requestID,
+    "inventory recovery request did not register a request ID")
 
 local payloadApplied = {}
 PNC.InventoryWindow = {

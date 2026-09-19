@@ -42,8 +42,7 @@ local anchorCases = {
     },
     {
         path = ROOT .. "client/PNC/00_PNC_Conversation_Init.lua",
-        composition =
-            "PNC/Conversation/Composition/PNC_ConversationClientComposition",
+        composition = "PNC/Composition/PNC_ConversationRuntimeComposition",
     },
 }
 
@@ -210,10 +209,7 @@ local conversationClientCalls = capture(
 )
 T.equal(conversationClientCalls[1], "PNC/Conversation/PNC_Conversation",
     "client Conversation first dependency")
-T.equal(conversationClientCalls[2],
-    "PNC/UI/Context/Providers/PNC_ContextProvider_Conversation",
-    "client Conversation final dependency")
-T.equal(#conversationClientCalls, 2,
+T.equal(#conversationClientCalls, 1,
     "client Conversation dependency count")
 T.equal(pumpRegistrations, 2,
     "client Conversation pump registration timing")
@@ -226,16 +222,44 @@ local conversationRuntimeCalls = capture(
 )
 local semanticInputIndex = indexOf(
     conversationRuntimeCalls,
-    "PNC/Semantics/PNC_SemanticDialogueInput"
+    "PNC/PNC_ConversationSemantics"
 )
 T.truthy(semanticInputIndex,
-    "conversation runtime loads the semantic input boundary")
+    "conversation runtime loads the semantic conversation adapter")
+for _, dependency in ipairs(conversationRuntimeCalls) do
+    T.falsy(string.sub(dependency, 1, 7) == "PNC/UI/",
+        "Conversation runtime does not load PNC UI modules")
+end
 local inlineChatIndex = indexOf(
     conversationRuntimeCalls,
     "PNC/Integrations/PBrainZ/PNC_PBrainZ_InlineChat"
 )
-T.truthy(inlineChatIndex and inlineChatIndex < semanticInputIndex,
-    "semantic input loads after inline dependencies")
+T.falsy(inlineChatIndex,
+    "Conversation runtime does not load the PBrainZ integration")
+
+local conversationCompositionCalls = capture(
+    ROOT
+        .. "client/PNC/Composition/PNC_ConversationRuntimeComposition.lua"
+)
+local expectedConversationComposition = {
+    "PNC/Integrations/PNC_VoiceGateway",
+    "PNC/UI/PNC_NPCTypePalette",
+    "PNC/UI/Factions/PNC_FactionPresentation",
+    "PNC/UI/Relationships/PNC_RelationshipGraphPanel",
+    "PNC/UI/Context/PNC_ContextHub",
+    "PNC/Conversation/Composition/PNC_ConversationClientComposition",
+    "PNC/UI/Context/Providers/PNC_ContextProvider_Conversation",
+    "PNC/Integrations/PBrainZ/PNC_PBrainZ",
+    "PNC/Integrations/PBrainZ/PNC_PBrainZ_Bridge",
+    "PNC/Integrations/PBrainZ/PNC_PBrainZ_InlineChat",
+}
+for index = 1, #expectedConversationComposition do
+    T.equal(conversationCompositionCalls[index],
+        expectedConversationComposition[index],
+        "client Conversation runtime dependency " .. tostring(index))
+end
+T.equal(#conversationCompositionCalls, #expectedConversationComposition,
+    "client Conversation runtime dependency count")
 
 capture(
     ROOT
