@@ -4,6 +4,7 @@ if PsychopatzCore and PsychopatzCore.RuntimeRole
 PNC = PNC or {}
 PNC.Relationships = PNC.Relationships or {}
 PNC.Relationships.Internal = PNC.Relationships.Internal or {}
+require "PNC/Conversation/Memory/PNC_ConversationMemory"
 
 local Relationships = PNC.Relationships
 local Internal = Relationships.Internal
@@ -170,6 +171,21 @@ function Relationships.ApplyEventMutation(
             },
         }
     )
+    local memoryEvents = PNC.Conversation
+        and PNC.Conversation.Memory
+        and PNC.Conversation.Memory.Events or nil
+    if memoryEvents
+        and type(memoryEvents.RecordRelationshipMemory) == "function"
+    then
+        -- The compact journal is an additional projection. A failure here must
+        -- never roll back or interrupt the authoritative relationship commit.
+        pcall(
+            memoryEvents.RecordRelationshipMemory,
+            record,
+            memory,
+            targetKey
+        )
+    end
     return true, "applied", {
         relationship = Types.NormalizeRelationship(
             record.social.relationships[targetKey],

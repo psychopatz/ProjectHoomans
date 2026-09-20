@@ -14,6 +14,8 @@ local Fallback = Internal.ResponseFallback
 local Delivery = Internal.ResponseDelivery or {}
 Internal.ResponseDelivery = Delivery
 local Trace = PsychopatzCore and PsychopatzCore.DebugTrace
+local SemanticTelemetryPrompt = require
+    "PNC/Semantics/PNC_SemanticTelemetryPrompt"
 
 local function anyAccepted(results)
     for _, result in ipairs(results) do
@@ -87,8 +89,20 @@ local function detached(pending, arguments)
 end
 
 local function liveResponse(pending, arguments)
+    local view = pending and pending.view
+    local session = view and view.session
+    local semanticPending = session and session.semanticDialoguePending
+    local rawText = semanticPending and semanticPending.rawText
+    local semanticResult
     if SemanticResult and SemanticResult.Apply then
-        SemanticResult.Apply(pending, arguments)
+        semanticResult = SemanticResult.Apply(pending, arguments)
+    end
+    local decision = semanticResult and semanticResult.decision or {}
+    if decision.branch == "ASK_CLARIFICATION"
+        and SemanticTelemetryPrompt
+        and type(SemanticTelemetryPrompt.Offer) == "function"
+    then
+        SemanticTelemetryPrompt.Offer(view, rawText, semanticResult, "llm")
     end
     local semanticResults = ToolFlow.Apply(
         pending.packet,

@@ -404,10 +404,35 @@ function Scene.ValidateLLMRequest(record, zombie, player, token, requestID)
     return true, nil, pending
 end
 
+local function recordConversationTopics(record, player, topicMask)
+    local playerCharacters = PNC and PNC.PlayerCharacters or nil
+    local uuid
+    local memory
+    local events
+    local ok
+    if not player or not playerCharacters
+        or type(playerCharacters.GetCharacterUUID) ~= "function"
+    then
+        return false, "player_identity_unavailable"
+    end
+    ok, uuid = pcall(playerCharacters.GetCharacterUUID, player)
+    if not ok or not uuid then return false, "player_identity_unavailable" end
+    pcall(require, "PNC/Conversation/Memory/PNC_ConversationMemory")
+    pcall(require,
+        "PNC/Conversation/Definitions/Memory/ConversationTopics/00_PNC_ConversationMemoryTopics")
+    memory = PNC.Conversation and PNC.Conversation.Memory or nil
+    events = memory and memory.Events or nil
+    if not events or type(events.RecordConversationTopics) ~= "function" then
+        return false, "conversation_memory_unavailable"
+    end
+    return events.RecordConversationTopics(record, topicMask, uuid)
+end
+
 function Scene.End(record, zombie, token, reason, options)
     local runtime = record and record.runtime or nil
     local lease = runtime and runtime.conversationLease or nil
     local parley
+    local player = type(options) == "table" and options.player or nil
     local requestID = type(options) == "table"
         and tostring(options.llmRequestID or "") or ""
     if not lease then return false end
@@ -416,11 +441,21 @@ function Scene.End(record, zombie, token, reason, options)
     then
         return false
     end
+    if player and (tostring(token or "") == ""
+        or not playerOwnsLease(player, lease))
+    then
+        return false, "conversation_player_mismatch"
+    end
+    if player and type(options) == "table"
+        and options.memoryTopicMask ~= nil
+    then
+        recordConversationTopics(record, player, options.memoryTopicMask)
+    end
     if requestID ~= "" then
         local reserved, reserveReason = Scene.ReserveLLMRequest(
             record,
             zombie,
-            type(options) == "table" and options.player or nil,
+            player,
             token,
             requestID
         )

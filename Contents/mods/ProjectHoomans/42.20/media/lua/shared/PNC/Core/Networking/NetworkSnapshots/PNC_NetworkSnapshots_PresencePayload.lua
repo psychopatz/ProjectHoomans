@@ -128,6 +128,7 @@ function Network.BuildPresenceDelta(record)
             and PNC.BehaviorTreatment.BuildSnapshot(record) or nil,
         medicalCareState = medicalCareState,
         recentDamageUntil = record.health and record.health.recentDamageUntil or 0,
+        recentDamageType = record.health and record.health.recentDamageType or nil,
         staminaCurrent = staminaInfo.current,
         staminaMax = staminaInfo.max,
         staminaBaseMax = staminaInfo.baseMax,

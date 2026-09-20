@@ -17,6 +17,25 @@ local function scaledOpacity(self, value)
     return math.max(0, math.min(1, (tonumber(value) or 0) * multiplier))
 end
 
+local function giftPreferenceText(value)
+    local key
+    local fallback
+    if value == "like" then
+        key = "UI_PNC_Inventory_GiftPreference_Like"
+        fallback = "Like"
+    elseif value == "dislike" then
+        key = "UI_PNC_Inventory_GiftPreference_Dislike"
+        fallback = "Dislike"
+    else
+        return nil
+    end
+    local text = getText and getText(key) or nil
+    if type(text) == "string" and text ~= "" and text ~= key then
+        return text
+    end
+    return fallback
+end
+
 local function drawCatalogColumns(self, y, row, dimmed)
     local columns = self.catalogColumns
     if type(columns) ~= "table" or type(row.catalogCells) ~= "table" then
@@ -115,18 +134,21 @@ function ISPNCInventoryList:doDrawItem(y, listItem, alt)
         39 + indent, y + 7,
         textColor, textColor, textColor, 1, UIFont.Small
     )
-    if not custom and self.ownerWindow and self.ownerWindow.giftMode
-        and self.role == "player"
-        and row.giftScore
-        and PNC.Gifts and PNC.Gifts.FormatShortScore
-    then
-        local scoreText = PNC.Gifts.FormatShortScore(row.giftScore)
-        self:drawText(
-            scoreText,
-            categoryX,
-            y + 7,
-            0.50, 0.92, 0.70, 1, UIFont.Small
-        )
+    local preferenceColumn = not custom and self.ownerWindow
+        and self.ownerWindow.giftMode and self.role == "player"
+    if preferenceColumn then
+        local preference = tostring(row.giftPreference or "")
+        local preferenceLabel = giftPreferenceText(preference)
+        if preferenceLabel then
+            local red, green, blue = 0.50, 0.92, 0.70
+            if preference == "dislike" then
+                red, green, blue = 0.94, 0.48, 0.48
+            end
+            self:drawText(
+                preferenceLabel, categoryX, y + 7,
+                red, green, blue, 1, UIFont.Small
+            )
+        end
     elseif not custom then
         local category = tostring(row.category or "Item")
         if Layout and Layout.Ellipsize then

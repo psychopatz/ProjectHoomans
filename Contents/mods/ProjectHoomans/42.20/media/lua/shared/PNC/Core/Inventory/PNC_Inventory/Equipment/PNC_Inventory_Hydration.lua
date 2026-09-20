@@ -90,13 +90,34 @@ local function finalizeRecordInventory(
     local dirtyReason
     local dirtyMarked = false
     local waterReconciled = false
+    local identityCard
+    local identityCardChanged
+    local factionDogTag
+    local factionDogTagChanged
     Internal.normalizeLegacyBagSlot(inv)
     Internal.getRuntimeState(record)
     Internal.refreshNextItemSerial(record, inv)
+    identityCard, identityCardChanged = Internal.ensureIdentityCard(
+        record,
+        inv
+    )
+    if identityCardChanged then
+        structureChanged = true
+    end
     if generatorVersion < 3 then
-        Internal.ensureIdentityCard(record, inv)
         inv.template = inv.template or {}
         inv.template.generatorVersion = currentGenerator
+        structureChanged = true
+    end
+    if generatorVersion < 4 then
+        factionDogTag, factionDogTagChanged =
+            Internal.ensureFactionDogTag(record, inv)
+        if factionDogTagChanged then
+            structureChanged = true
+        end
+        inv.template = inv.template or {}
+        inv.template.generatorVersion = currentGenerator
+        structureChanged = true
     end
     if stateChanged then
         dirtyReason = "inventory_state_normalized"

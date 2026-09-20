@@ -450,21 +450,23 @@ function LiveBodyControl.ResetNativePassageActionContext(zombie)
         ) == true
     end
 
-    -- Build 42 exposes the ActionContext getter on IsoGameCharacter and the
-    -- context's public setCurrentState(ActionState) bridge. Use the action
-    -- group's actual initial ActionState rather than inventing a string or
-    -- touching AnimationPlayer internals. The guards also keep older/fake
-    -- bodies on the ordinary state-reset path.
+    -- ActionContext is Java-backed userdata in Build 42. Kahlua throws when
+    -- Lua indexes an unexposed Java method instead of returning nil, so only
+    -- inspect plain Lua table adapters here. The completion variables above
+    -- let the engine-owned context return to idle on its next update.
     if zombie.getActionContext then
         context = zombie:getActionContext()
     end
-    if context and context.getGroup then
+    if type(context) == "table" and context.getGroup then
         group = context:getGroup()
     end
-    if group and group.getInitialState then
+    if type(group) == "table" and group.getInitialState then
         initialState = group:getInitialState()
     end
-    if context and context.setCurrentState and initialState then
+    if type(context) == "table"
+        and context.setCurrentState
+        and initialState
+    then
         context:setCurrentState(initialState)
         recovered = true
     end

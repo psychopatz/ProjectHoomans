@@ -185,6 +185,8 @@ local dispatched = Input.Internal.DispatchAction({
     sequence = "turn:1",
     ir = { normalizedText = "wait at the bin", confidence = 0.96 },
     decision = {
+        branch = "COMMAND_ACCEPTED",
+        route = "deterministic",
         actionIntent = {
             intent = "REQUEST",
             action = "WAIT_AT",

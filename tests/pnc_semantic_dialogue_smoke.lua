@@ -79,8 +79,13 @@ local questionDecision = Policy.Decide(question, state, {
 })
 T.equal(questionDecision.route, "deterministic",
     "unresolved references can clarify without forcing an LLM call")
-T.equal(questionDecision.branch, "ASK_CLARIFICATION",
-    "entity resolution remains outside the parser")
+T.equal(questionDecision.branch, "QUESTION_RECEIVED",
+    "read-only location questions reach the local fact responder")
+T.equal(questionDecision.response.templateID,
+    "semantic.question.location_unknown",
+    "unknown locations receive an explicit uncertainty response")
+T.equal(questionDecision.actionIntent, nil,
+    "a local fact question never creates a gameplay action")
 
 local referenceIR = Semantic.IR.New({
     rawText = "Take this",

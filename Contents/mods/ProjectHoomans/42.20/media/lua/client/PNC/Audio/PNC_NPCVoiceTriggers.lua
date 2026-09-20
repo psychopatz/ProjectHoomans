@@ -445,14 +445,18 @@ local function observeInitialized(state, snapshot, body, now)
     local previousStaminaState = tostring(state.lastStaminaState or "")
     local damageUntil = tonumber(snapshot.recentDamageUntil) or 0
     local previousDamageUntil = tonumber(state.lastRecentDamageUntil) or 0
+    local damageType = string.lower(tostring(snapshot.recentDamageType or ""))
     local bodySignature = healthSignature(snapshot)
     local damageChanged = damageUntil > 0
         and damageUntil ~= previousDamageUntil
     local nowMoving = isMoving(snapshot)
     local policy
 
+    -- Bleeding damage repeats on a timer; it is not a new impact that needs
+    -- another pain vocalization.
     if damageChanged
         and healthState ~= "incapacitated"
+        and damageType ~= "blood_loss"
     then
         policy = Catalog.Get(resolveDamageEvent(snapshot))
         if policy and readyFor(

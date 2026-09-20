@@ -270,6 +270,47 @@ Internal.TargetText = targetText
 Internal.FactFor = factFor
 Internal.LocationText = locationText
 
+local function recentTurnsFrom(context, limit)
+    context = type(context) == "table" and context or {}
+    local dialogue = type(context.semanticDialogueContext) == "table"
+        and context.semanticDialogueContext
+        or type(context.semanticContextState) == "table"
+        and context.semanticContextState or nil
+    if not dialogue then return {} end
+
+    local recentTurns = dialogue.recentTurns
+    if type(recentTurns) ~= "table"
+        and type(dialogue.RecentTurns) == "function"
+    then
+        recentTurns = dialogue:RecentTurns(limit or 6, true)
+    end
+    return type(recentTurns) == "table" and recentTurns or {}
+end
+
+Internal.RecentTurns = recentTurnsFrom
+
+local function followsRelationshipStatusAnswer(context)
+    local recentTurns = recentTurnsFrom(context, 2)
+    if #recentTurns == 0 then return false end
+
+    local responseTurn = recentTurns[1]
+    -- Some callers snapshot context before recording the player's input;
+    -- others record it before resolving the response. Support both orders.
+    if type(responseTurn) == "table"
+        and responseTurn.speaker == "player"
+        and responseTurn.intent == "ACKNOWLEDGE"
+    then
+        responseTurn = recentTurns[2]
+    end
+
+    return type(responseTurn) == "table"
+        and responseTurn.speaker == "npc"
+        and responseTurn.speechAct == "ANSWER"
+        and responseTurn.branch == "QUESTION_RECEIVED"
+        and (responseTurn.subject == "RELATIONSHIP_STATUS"
+            or responseTurn.topic == "RELATIONSHIP_STATUS")
+end
+
 local resolveQuestion = require
     "PNC/Semantics/PNC_SemanticDialogueLocalResponse_Questions"
 
@@ -279,6 +320,9 @@ function Response.Resolve(ir, state, context, branch)
         return catalogResponse("semantic.greeting", ir, state, context, {
             topic = state and state.currentTopic,
         })
+    end
+    if branch == "COMPLIMENT_RECEIVED" then
+        return catalogResponse("semantic.compliment", ir, state, context)
     end
     if branch == "OFFER_RECEIVED" then
         return catalogResponse("semantic.offer", ir, state, context, {
@@ -298,6 +342,18 @@ function Response.Resolve(ir, state, context, branch)
             templateID = "semantic.gift.pending",
             fallback = "",
             args = copyArgs({ object = ir.object }),
+        }
+    end
+    if branch == "GIFT_CONSENT_DECLINED" then
+        return {
+            templateID = "semantic.gift.consent.declined",
+            fallback = "No problem. I'll leave it with you.",
+        }
+    end
+    if branch == "GIFT_CONSENT_AMBIGUOUS" then
+        return {
+            templateID = "semantic.gift.consent.ambiguous",
+            fallback = "More than one of us wants it. Please offer it to one person directly.",
         }
     end
     if branch == "QUESTION_RECEIVED" and type(resolveQuestion) == "function" then
@@ -354,6 +410,13 @@ function Response.Resolve(ir, state, context, branch)
             }
         )
     end
+    if branch == "SELF_STATE_RECEIVED" then
+        return catalogResponse(
+            "semantic.self_state", ir, state, context, {
+                state = ir.slots and ir.slots.state,
+            }
+        )
+    end
     if branch == "IDENTITY_NAME_EVASION" then
         return catalogResponse(
             "semantic.identity.evasion", ir, state, context, {
@@ -368,19 +431,29 @@ function Response.Resolve(ir, state, context, branch)
         })
     end
     if branch == "SOCIAL_ACKNOWLEDGED" then
+        if ir.intent == "ACKNOWLEDGE"
+            and followsRelationshipStatusAnswer(context)
+        then
+            return catalogResponse(
+                "semantic.question.relationship_status.acknowledged",
+                ir,
+                state,
+                context
+            )
+        end
         if ir.intent == "THANK" then
             return catalogResponse("semantic.thanks", ir, state, context, {
                 topic = state and state.currentTopic,
             })
         end
-        if ir.intent == "ACCEPT" then
+        if ir.intent == "ACCEPT" or ir.intent == "AGREE" then
             return catalogResponse("semantic.accept", ir, state, context, {
                 action = state and state.pendingRequest
                     and state.pendingRequest.action,
                 topic = state and state.currentTopic,
             })
         end
-        if ir.intent == "REFUSE" then
+        if ir.intent == "REFUSE" or ir.intent == "DISAGREE" then
             return catalogResponse("semantic.refuse", ir, state, context, {
                 action = state and state.pendingRequest
                     and state.pendingRequest.action,

@@ -243,10 +243,10 @@ local function publishNPCMessage(actor, text, context)
     return true
 end
 
--- Ambient NPC greetings use the same flavor resolver as emote replies, but
--- publish a canonical NPC message so nameplates and other speech consumers see
--- the exact line. Native Say() is only the fallback when the message bus is
--- unavailable.
+-- Ambient NPC speech publishes a canonical NPC message so nameplates and
+-- other speech consumers share one presentation path. A server-selected
+-- localized gossip packet may supply resolvedText; ordinary greetings use
+-- the standard flavor resolver below.
 function Presentation.ShowAmbientNPCFlavor(actor, flavorID, context)
     local player = type(context) == "table" and context.playerActor
         or getSpecificPlayer and getSpecificPlayer(0) or nil
@@ -254,17 +254,22 @@ function Presentation.ShowAmbientNPCFlavor(actor, flavorID, context)
     local seed
     local text
     local published
+    local resolvedText = type(context) == "table"
+        and context.resolvedText or nil
     if not flavorID then return false end
     Presentation.FlavorRevision = Presentation.FlavorRevision + 1
-    flavorContext = Presentation.BuildFlavorContext(player, context)
-    seed = type(context) == "table" and context.seed or nil
-    -- The server event id is the stable flavor seed.  Do not include the
-    -- local presentation counter or two clients/replays can choose different
-    -- lines for the same authoritative greeting.
-    seed = tostring(seed or "")
-    text = Flavor and Flavor.Resolve
-        and Flavor.Resolve(flavorID, "npc", seed, flavorContext)
-        or nil
+    if type(resolvedText) == "string" and resolvedText ~= "" then
+        text = resolvedText
+    else
+        flavorContext = Presentation.BuildFlavorContext(player, context)
+        seed = type(context) == "table" and context.seed or nil
+        -- The server event id is the stable flavor seed. Do not include the
+        -- local presentation counter or replays could choose another line.
+        seed = tostring(seed or "")
+        text = Flavor and Flavor.Resolve
+            and Flavor.Resolve(flavorID, "npc", seed, flavorContext)
+            or nil
+    end
     if not text or text == "" then return false end
     if type(context) ~= "table" then context = {} end
     context.playerActor = player
@@ -283,6 +288,13 @@ function Presentation.HandleSocialGreeting(greeting)
     local snapshot
     local text
     local diary
+    local memory
+    local resolvedText
+    local context
+    local socialFlavor
+    local queueAccepted
+    local queueReason
+    local queuedReaction = false
     if not state or eventID == "" or npcID == "" then return false end
     state.socialGreetingResults = state.socialGreetingResults or {}
     state.socialGreetingResultOrder = state.socialGreetingResultOrder or {}
@@ -299,18 +311,110 @@ function Presentation.HandleSocialGreeting(greeting)
     snapshot = state.snapshots and state.snapshots[npcID]
         or Registry and Registry.Get and Registry.Get(npcID)
         or { id = npcID }
-    _, text = Presentation.ShowAmbientNPCFlavor(
-        body,
-        greeting.flavorID,
-        {
-            target = snapshot,
-            npcID = npcID,
-            playerActor = player,
-            speakerName = targetName(snapshot),
-            seed = eventID,
-            eventID = eventID,
-        }
-    )
+    context = {
+        target = snapshot,
+        npcID = npcID,
+        playerActor = player,
+        speakerName = targetName(snapshot),
+        seed = eventID,
+        eventID = eventID,
+    }
+    if greeting.eventType == "corpse_reaction"
+        and type(greeting.gossipPacket) == "table"
+    then
+        memory = PNC.Conversation and PNC.Conversation.Memory or nil
+        if not memory or type(memory.RenderGossipPacket) ~= "function" then
+            memory = require "PNC/Conversation/Memory/PNC_ConversationMemory"
+        end
+        if memory and memory.GetGossipTemplateByCode
+            and not memory.GetGossipTemplateByCode(greeting.gossipPacket.c)
+        then
+            require "PNC/Conversation/Definitions/Memory/00_PNC_ConversationMemoryDefinitions"
+            memory = PNC.Conversation and PNC.Conversation.Memory or memory
+        end
+        if not memory or type(memory.RenderGossipPacket) ~= "function" then
+            return false
+        end
+        resolvedText = memory.RenderGossipPacket(greeting.gossipPacket)
+        if type(resolvedText) ~= "string" or resolvedText == "" then
+            return false
+        end
+        context.resolvedText = resolvedText
+        context.corpseNPCID = greeting.corpseNPCID
+        context.corpseName = greeting.corpseName
+        context.factionName = greeting.factionName
+        context.relationshipKind = greeting.relationshipKind
+        context.memoryID = greeting.memoryID
+        context.memoryType = greeting.memoryType
+        context.eventType = "corpse_reaction"
+        socialFlavor = PNC.SocialFlavorPresentation
+        if not socialFlavor or type(socialFlavor.Receive) ~= "function" then
+            local ok = pcall(
+                require,
+                "PNC/Conversation/PNC_SocialFlavorPresentation"
+            )
+            socialFlavor = ok and PNC.SocialFlavorPresentation or nil
+        end
+        if socialFlavor and type(socialFlavor.Receive) == "function" then
+            queueAccepted, queueReason = socialFlavor.Receive({
+                eventID = eventID,
+                npcID = npcID,
+                flavorID = greeting.flavorID,
+                family = "corpse_reaction",
+                eventType = "corpse_reaction",
+                socialRole = snapshot.socialRole or snapshot.npcType
+                    or greeting.npcType,
+                priority = 100,
+                weight = 10000,
+                text = resolvedText,
+                llmEligible = false,
+                memoryEligible = false,
+                mergeKey = "",
+                cooldowns = {
+                    familyMs = 0,
+                    speakerMs = 0,
+                    ambientMs = 0,
+                    mergeWindowMs = 0,
+                },
+                presentationState = {
+                    interrupt = true,
+                },
+                context = {
+                    npcID = npcID,
+                    eventID = eventID,
+                    eventType = "corpse_reaction",
+                    corpseNPCID = greeting.corpseNPCID,
+                    corpseName = greeting.corpseName,
+                    factionName = greeting.factionName,
+                    relationshipKind = greeting.relationshipKind,
+                    memoryID = greeting.memoryID,
+                    memoryType = greeting.memoryType,
+                    interactionType = greeting.interactionType,
+                },
+                ttlMs = 4000,
+                holdMs = 1500,
+                pumpImmediately = true,
+            }, nil, {
+                npcID = npcID,
+                eventID = eventID,
+            })
+            if queueAccepted == true then
+                queuedReaction = true
+                text = resolvedText
+            elseif queueReason == "duplicate_delivered"
+                or queueReason == "duplicate_queued"
+            then
+                return false
+            end
+        end
+    end
+    if not queuedReaction then
+        _, text = Presentation.ShowAmbientNPCFlavor(
+            body,
+            greeting.flavorID,
+            context
+        )
+    end
     diary = PNC.Conversation and PNC.Conversation.Diary or nil
     if not diary then
         local ok, loaded = pcall(
@@ -319,9 +423,11 @@ function Presentation.HandleSocialGreeting(greeting)
         )
         diary = ok and loaded or nil
     end
-    if diary and diary.Append then
+    if diary and diary.Append and not queuedReaction then
         diary.Append(npcID, {
-            kind = "npc_proximity_greeting",
+            kind = greeting.eventType == "corpse_reaction"
+                and "npc_corpse_reaction" or "npc_proximity_greeting",
+            eventType = greeting.eventType,
             npcText = text,
             delta = greeting.relationshipDelta,
             before = greeting.relationshipBefore,
@@ -335,6 +441,10 @@ function Presentation.HandleSocialGreeting(greeting)
             relationshipTier = greeting.relationshipTier,
             greetingState = greeting.greetingState,
             greetingDay = greeting.greetingDay,
+            corpseNPCID = greeting.corpseNPCID,
+            corpseName = greeting.corpseName,
+            factionName = greeting.factionName,
+            relationshipKind = greeting.relationshipKind,
         })
     end
     return text ~= nil and text ~= ""

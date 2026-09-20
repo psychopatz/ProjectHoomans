@@ -39,6 +39,15 @@ local COMMAND_ACTIONS = {
     CONSUME = true,
 }
 
+function Policy.GetCommandActions()
+    local actions = {}
+    for action in pairs(COMMAND_ACTIONS) do
+        actions[#actions + 1] = action
+    end
+    table.sort(actions)
+    return actions
+end
+
 -- Fuzzy recognition is useful for low-risk conversational movement commands,
 -- but a typo must not silently turn into an inventory or task side effect.
 local FUZZY_SAFE_ACTIONS = {
@@ -86,7 +95,7 @@ local RESPONSE_TEMPLATES = {
     },
     OFFER_RECEIVED = {
         templateID = "semantic.offer.received",
-        fallback = "I could use one.",
+        fallback = "I'd really like one. Could I have it?",
     },
     GIFT_SELECTION_REQUIRED = {
         templateID = "semantic.gift.selection_required",
@@ -95,6 +104,14 @@ local RESPONSE_TEMPLATES = {
     GIFT_OFFER_DISPATCHED = {
         templateID = "semantic.gift.pending",
         fallback = "",
+    },
+    GIFT_CONSENT_DECLINED = {
+        templateID = "semantic.gift.consent.declined",
+        fallback = "No problem. I'll leave it with you.",
+    },
+    GIFT_CONSENT_AMBIGUOUS = {
+        templateID = "semantic.gift.consent.ambiguous",
+        fallback = "More than one of us wants it. Please offer it to one person directly.",
     },
     GOSSIP_RECEIVED = {
         templateID = "semantic.gossip.unknown",
@@ -257,6 +274,14 @@ local function isInventoryQuery(ir)
         and type(ir.inventoryQuery) == "table"
 end
 
+local function isLocalFactQuestion(ir)
+    -- Location/seen queries are read-only and have explicit unknown and
+    -- ambiguous responses, so entity resolution is not required to answer.
+    return type(ir) == "table"
+        and ir.intent == "QUESTION"
+        and (ir.subject == "LOCATION" or ir.subject == "SEEN")
+end
+
 local function unresolvedWorldTargetRequest(ir)
     local target = ir and ir.target
     return type(ir) == "table"
@@ -294,6 +319,51 @@ local function isIdentityEvasion(ir, state, context)
         return false
     end
     return not (ir and ir.intent == "QUESTION" and ir.subject == "IDENTITY")
+end
+
+local function giftConsentFor(ir, context)
+    local pending = context and context.pendingGiftConsent or nil
+    if type(pending) ~= "table" then return nil end
+
+    local accepts = ir and (ir.intent == "ACCEPT" or ir.intent == "AGREE")
+    local refuses = ir and (ir.intent == "REFUSE" or ir.intent == "DISAGREE")
+    if not accepts and not refuses then return nil end
+
+    local candidates = type(pending.candidates) == "table"
+        and pending.candidates or {}
+    if #candidates == 0 then return nil end
+
+    local output = {
+        groupID = pending.groupID,
+        query = pending.query,
+        quantity = pending.quantity,
+        candidateCount = #candidates,
+    }
+    if refuses then
+        output.status = "declined"
+        if #candidates == 1 then
+            output.recipientID = candidates[1].npcID
+            output.recipientName = candidates[1].name
+        end
+        return output
+    end
+
+    if pending.overflow == true or #candidates ~= 1 then
+        output.status = "ambiguous"
+        return output
+    end
+
+    local recipientID = tostring(candidates[1].npcID or "")
+    if recipientID == "" then return nil end
+    output.status = "granted"
+    output.recipientID = recipientID
+    output.recipientName = candidates[1].name
+    output.offer = {
+        mode = "explicit",
+        query = pending.query,
+        quantity = pending.quantity,
+    }
+    return output
 end
 
 local function responseFor(branch, ir)
@@ -427,6 +497,7 @@ function Policy.Decide(ir, state, context, options)
             and not unresolvedItemRequest(ir)
             and not unresolvedOffer(ir)
             and not isInventoryQuery(ir)
+            and not isLocalFactQuestion(ir)
             and not unresolvedWorldTargetRequest(ir)
             and not isIdentityClaim(ir))
         or (confidence < limits.high and not giftOffer)
@@ -457,8 +528,22 @@ function Policy.Decide(ir, state, context, options)
     end
 
     local branch, reason = resolveIntentBranch(ir, state, context, giftOffer)
+    local giftConsent = giftConsentFor(ir, context)
+    if giftConsent then
+        if giftConsent.status == "granted" then
+            branch = "GIFT_CONSENT_GRANTED"
+            reason = "gift_offer_confirmed"
+        elseif giftConsent.status == "declined" then
+            branch = "GIFT_CONSENT_DECLINED"
+            reason = "gift_offer_declined"
+        else
+            branch = "GIFT_CONSENT_AMBIGUOUS"
+            reason = "gift_offer_recipient_ambiguous"
+        end
+    end
 
     local result = decision(ir, "deterministic", branch, reason, options)
+    result.giftConsent = giftConsent
     result.diagnostics.llmEligible = hasLLM
     if state then
         result.diagnostics.stateSequence = state.sequence

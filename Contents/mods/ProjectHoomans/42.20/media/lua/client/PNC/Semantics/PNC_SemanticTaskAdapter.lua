@@ -110,7 +110,8 @@ local function dispatchSemanticTask(request, context)
 end
 
 for _, action in ipairs({
-    "WAIT_AT", "CAMP", "GIVE", "EAT", "DRINK", "REFILL", "CONSUME",
+    "WAIT_AT", "CAMP", "GIVE", "FETCH", "EAT", "DRINK", "REFILL",
+    "CONSUME",
 }) do
     Adapter.RegisterAction(action, { Dispatch = dispatchSemanticTask })
 end

@@ -9,6 +9,49 @@ local Constants = PNC.FactionConstants
 local Types = PNC.FactionTypes
 local Archetypes = PNC.FactionArchetypes
 local EntityRef = PNC.EntityRef
+
+local function refreshFactionDogTags(faction)
+    local inventory = PNC.Inventory
+    local factionID = faction and faction.id or nil
+    local members
+    local index
+    local member
+    local record
+    local _, changed
+    if not Factions.GetMembers or not inventory
+        or type(inventory.RefreshFactionDogTag) ~= "function"
+    then
+        return
+    end
+    members = Factions.GetMembers(factionID)
+    if type(members) ~= "table" then return end
+    for index = 1, #members do
+        member = members[index]
+        if member and member.alive ~= false then
+            record = PNC.Registry and PNC.Registry.Get
+                and PNC.Registry.Get(member.npcID) or nil
+            if record and record.alive ~= false
+                and record.affiliation
+                and tostring(record.affiliation.factionID or "")
+                    == tostring(factionID or "")
+            then
+                _, changed = inventory.RefreshFactionDogTag(
+                    record,
+                    faction
+                )
+                if changed == true and PNC.Network
+                    and type(PNC.Network.BroadcastRecord) == "function"
+                then
+                    PNC.Network.BroadcastRecord(
+                        record,
+                        "faction_dogtag_renamed"
+                    )
+                end
+            end
+        end
+    end
+end
+
 function Factions.SetEmblem(factionID, value)
     local faction
     local normalized
@@ -133,6 +176,7 @@ function Factions.SetPlayerFactionName(player, value)
             Internal.touchRegistry()
         end
     end
+    refreshFactionDogTags(faction)
     return true, changed and "renamed" or "name_confirmed", Internal.copy(record)
 end
 

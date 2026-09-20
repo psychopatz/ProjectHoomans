@@ -73,7 +73,30 @@ Internal.ProviderStatus = function()
     return ContextProjection.ProviderStatus(Internal.LLMEnabled)
 end
 Internal.ShallowContext = function(view)
-    return ContextProjection.Build(view, Internal.ProviderStatus)
+    local output = ContextProjection.Build(view, Internal.ProviderStatus)
+    local group = view and view.groupConversation or nil
+    local session = group and type(group.PrimarySession) == "function"
+        and group:PrimarySession() or view and view.session
+    local lifecycle = PNC.Semantics and PNC.Semantics.GiftLifecycle or nil
+    if lifecycle and type(lifecycle.PendingOfferConsent) == "function" then
+        output.pendingGiftConsent = lifecycle.PendingOfferConsent(
+            session,
+            Internal.Now and Internal.Now() or nil,
+            nil,
+            group and group.id or nil
+        )
+    end
+    return output
+end
+Internal.ClearPendingGiftConsent = function(view)
+    local group = view and view.groupConversation or nil
+    local session = group and type(group.PrimarySession) == "function"
+        and group:PrimarySession() or view and view.session
+    local lifecycle = PNC.Semantics and PNC.Semantics.GiftLifecycle or nil
+    if lifecycle and type(lifecycle.ClearOfferConsent) == "function" then
+        return lifecycle.ClearOfferConsent(session)
+    end
+    return false
 end
 Internal.RequestCognitionForIR = Requests.RequestCognitionForIR
 Internal.PrepareIdentityRequest = Requests.PrepareIdentityRequest
@@ -113,6 +136,9 @@ end
 function Internal.Interactive(view)
     local session = view and view.session
     if not view or not session then return false end
+    if session.closed == true or session.conversationMemoryClosed == true then
+        return false
+    end
     if view.closed == true or view.closing == true
         or view.editMode == true
     then

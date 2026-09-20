@@ -70,19 +70,21 @@ local function notifyDeathSystems(record)
     end
 end
 
-local function createCorpse(record, zombie, reason)
+local function createCorpse(record, zombie, reason, deathContext)
     local create
     local converted
     local result
     if not zombie then
         if not record.corpse then
             record.corpse = {
-                token = nil,
+                token = record.corpseToken,
                 x = record.x,
                 y = record.y,
                 z = record.z,
                 createdWorldHour = 0,
             }
+        elseif not record.corpse.token then
+            record.corpse.token = record.corpseToken
         end
         return
     end
@@ -90,8 +92,12 @@ local function createCorpse(record, zombie, reason)
     create = PNC.BodyLifecycle
         and PNC.BodyLifecycle.CreateVanillaCorpse or nil
     if create then
-        converted, result =
-            create(record, zombie, reason or "death")
+        converted, result = create(
+            record,
+            zombie,
+            reason or "death",
+            deathContext
+        )
     else
         converted, result = false, "corpse_service_unavailable"
     end
@@ -103,6 +109,21 @@ local function createCorpse(record, zombie, reason)
                 .. " reason=" .. tostring(result or "unknown")
         )
     end
+end
+
+local function ensureCorpseToken(record)
+    local corpse = type(record.corpse) == "table"
+        and record.corpse or nil
+    local token = corpse and corpse.token or record.corpseToken
+    if token == nil or tostring(token) == "" then
+        token = Core and Core.GenerateID
+            and Core.GenerateID("corpse") or nil
+    end
+    if token == nil or tostring(token) == "" then return nil end
+    token = tostring(token)
+    record.corpseToken = token
+    if corpse then corpse.token = token end
+    return token
 end
 
 local function retireDeadRecord(record)
@@ -156,7 +177,7 @@ local function retireDeadRecord(record)
     return deathMarker, retired
 end
 
-function Health.Kill(record, zombie, reason)
+function Health.Kill(record, zombie, reason, damageEvent)
     if not record then
         return false, nil
     end
@@ -170,13 +191,25 @@ function Health.Kill(record, zombie, reason)
     local health = Health.Ensure(record)
     local deathMarker
     local retired
+    local deathToken = ensureCorpseToken(record)
+    local deathContext
     releaseOwnedWork(record)
     markDeadState(record, health, reason)
+    if deathToken and PNC.CorpseAwareness
+        and type(PNC.CorpseAwareness.ObserveDeath) == "function"
+    then
+        deathContext = PNC.CorpseAwareness.ObserveDeath(
+            record,
+            zombie,
+            damageEvent,
+            deathToken
+        )
+    end
     if PNC.UniqueNPCRegistry and PNC.UniqueNPCRegistry.MarkDead then
         PNC.UniqueNPCRegistry.MarkDead(record, reason, Core.Now())
     end
     notifyDeathSystems(record)
-    createCorpse(record, zombie, reason)
+    createCorpse(record, zombie, reason, deathContext)
     deathMarker, retired = retireDeadRecord(record)
     return retired == true or deathMarker ~= nil, deathMarker
 end

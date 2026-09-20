@@ -1,6 +1,7 @@
 PNC = PNC or {}
 PNC.Persistence = PNC.Persistence or {}
 PNC.Persistence.Internal = PNC.Persistence.Internal or {}
+require "PNC/Conversation/Memory/PNC_ConversationMemory"
 
 local Persistence = PNC.Persistence
 local Internal = Persistence.Internal
@@ -12,6 +13,9 @@ local Inventory = PNC.Inventory
 local RelationshipTypes = PNC.RelationshipTypes
 local RelationshipMath = PNC.RelationshipMath
 local FactionTypes = PNC.FactionTypes
+local MemoryEvents = PNC.Conversation
+    and PNC.Conversation.Memory
+    and PNC.Conversation.Memory.Events or nil
 
 local function serializeAuthoredTraits(record, field, authoredField, normalize)
     local traits
@@ -188,6 +192,8 @@ function Persistence.SerializeRecord(record)
         tacticalClass = record.tacticalClass,
         ownerUsername = Internal.normalizeString(record.ownerUsername),
         identity = identity,
+        m = MemoryEvents
+            and MemoryEvents.Serialize(record.memory) or nil,
         position = {
             x = Internal.normalizeNumber(record.x, 0),
             y = Internal.normalizeNumber(record.y, 0),

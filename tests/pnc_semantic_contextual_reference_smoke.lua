@@ -103,6 +103,72 @@ T.equal(resolved.diagnostics.contextualResolver, true,
 T.truthy(resolved.diagnostics.contextualReferenceDetails.object.confidence
     >= 0.58, "compatible reference has usable confidence")
 
+local giveStore = ContextState.New({ currentTopic = "INVENTORY" })
+giveStore:RecordMention({
+    id = "item:apple", entityType = "item", concept = "APPLE",
+    text = "apple", capabilities = { edible = true, consumable = true },
+}, { turn = 1, role = "object", topic = "INVENTORY" })
+local give = Semantic.IR.New({
+    rawText = "give it to me",
+    normalizedText = "give it to me",
+    intent = "REQUEST",
+    speechAct = "REQUEST",
+    action = "GIVE",
+    object = { reference = "IT", unresolved = true },
+    confidence = 0.96,
+})
+local resolvedGive = ReferenceResolver.Resolve(
+    give,
+    nil,
+    { semanticContextState = giveStore },
+    {}
+)
+T.equal(resolvedGive.object.id, "item:apple",
+    "give-it-to-me binds to the exact item from inventory dialogue")
+T.equal(resolvedGive.object.unresolved, false,
+    "the existing reference resolver completes the GIVE object")
+
+local useStore = ContextState.New({ currentTopic = "INVENTORY" })
+useStore:RecordMention({
+    id = "item:apple", entityType = "item", concept = "APPLE",
+    text = "apple", capabilities = { edible = true, consumable = true },
+}, { turn = 1, role = "object", topic = "INVENTORY" })
+useStore:RecordMention({
+    id = "item:rifle", entityType = "item", concept = "RIFLE",
+    text = "rifle", capabilities = { weapon = true },
+}, { turn = 1, role = "object", topic = "INVENTORY" })
+local use = Semantic.IR.New({
+    rawText = "use it",
+    normalizedText = "use it",
+    intent = "REQUEST",
+    speechAct = "REQUEST",
+    action = "CONSUME",
+    object = { reference = "IT", unresolved = true },
+    confidence = 0.94,
+})
+local resolvedUse = ReferenceResolver.Resolve(
+    use,
+    nil,
+    { semanticContextState = useStore },
+    {}
+)
+T.equal(resolvedUse.object.id, "item:apple",
+    "use-it resolves only to the MarketSense-backed consumable")
+
+local nonConsumableStore = ContextState.New({ currentTopic = "INVENTORY" })
+nonConsumableStore:RecordMention({
+    id = "item:rifle", entityType = "item", concept = "RIFLE",
+    text = "rifle", capabilities = { weapon = true },
+}, { turn = 1, role = "object", topic = "INVENTORY" })
+local unresolvedUse = ReferenceResolver.Resolve(
+    use,
+    nil,
+    { semanticContextState = nonConsumableStore },
+    {}
+)
+T.equal(unresolvedUse.object.reference, "IT",
+    "generic use stays unresolved for an item without a supported capability")
+
 local ambiguousStore = ContextState.New({ currentTopic = "INVENTORY" })
 ambiguousStore:RecordMention({
     id = "item:apple", entityType = "item", concept = "APPLE",

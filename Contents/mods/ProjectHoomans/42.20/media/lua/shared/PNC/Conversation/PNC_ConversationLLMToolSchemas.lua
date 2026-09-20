@@ -94,6 +94,10 @@ local function knowledgeTopics()
             output[#output + 1] = topicID
         end
     end
+    if not seen.gift_preferences then
+        seen.gift_preferences = true
+        output[#output + 1] = "gift_preferences"
+    end
     table.sort(output)
     return output
 end
@@ -116,7 +120,11 @@ function Tools.BuildKnowledgeDefinition()
                     topic_id = {
                         type = "string",
                         enum = topics,
-                        description = "The exact registered knowledge topic.",
+                        description = "The exact knowledge topic listed here.",
+                    },
+                    preference_item_type = {
+                        type = "string",
+                        description = "For gift_preferences, the exact item full type being discussed.",
                     },
                 },
                 required = { "topic_id" },

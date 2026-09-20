@@ -10,6 +10,18 @@ function Network.SendSemanticCognition(
     requestID,
     npcID
 )
+    local cognition = PNC and PNC.Semantics
+        and PNC.Semantics.CognitionProjection or nil
+    local memoryGossip = type(projection) == "table"
+        and projection._memoryGossip or nil
+    if type(projection) == "table" then
+        projection._memoryGossip = nil
+    end
+    if type(projection) == "table" and cognition
+        and type(cognition.Compact) == "function"
+    then
+        projection = cognition.Compact(projection, npcID)
+    end
     local payload = {
         projection = projection,
         reason = reason,
@@ -17,6 +29,12 @@ function Network.SendSemanticCognition(
         npcID = npcID,
         serverTime = Core.Now(),
     }
+    if type(memoryGossip) == "table"
+        and type(memoryGossip.codes) == "table"
+    then
+        payload.g = memoryGossip.codes
+        payload.gs = memoryGossip.subject
+    end
     if isServer and isServer() and targetPlayer and sendServerCommand then
         sendServerCommand(
             targetPlayer,

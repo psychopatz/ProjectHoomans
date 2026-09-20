@@ -21,7 +21,10 @@ local Reset = (PNC.Persistence and PNC.Persistence.Reset)
     or require "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset"
 local deepCopy = Internal.deepCopy
 local safeString = Internal.safeString
+local now = Internal.now
 local normalizeNote = Internal.normalizeNote
+local normalizeGiftPreference = Internal.normalizeGiftPreference
+local MAX_GIFT_PREFERENCES = Internal.MAX_GIFT_PREFERENCES or 256
 local KEY = Internal.KEY
 
 function Knowledge.Load()
@@ -82,6 +85,74 @@ end
 function Knowledge.Get(characterUUID, npcID)
     local note = mutableNote(characterUUID, npcID, false)
     return note and deepCopy(note) or nil
+end
+
+function Knowledge.GetGiftPreference(characterUUID, npcID, itemType)
+    local fullType = safeString(itemType, 160)
+    if not fullType then return nil end
+    local note = mutableNote(characterUUID, npcID, false)
+    local preference = note and note.giftPreferences
+        and note.giftPreferences[fullType] or nil
+    return preference and deepCopy(preference) or nil
+end
+
+function Knowledge.RecordGiftPreferences(
+    characterUUID, npcID, preferences, sourceType, sourceEventID, at
+)
+    if sourceType ~= "gift_reaction"
+        and sourceType ~= "direct_disclosure"
+    then
+        return false, "invalid_gift_preference_source"
+    end
+    if type(preferences) ~= "table" then
+        return false, "invalid_gift_preferences"
+    end
+    local note, reason = mutableNote(
+        characterUUID, npcID, true, now(at)
+    )
+    if not note then return false, reason end
+    note.giftPreferences = note.giftPreferences or {}
+    local changed = false
+    for itemType, value in pairs(preferences) do
+        local disposition = type(value) == "table"
+            and value.disposition or value
+        local normalized = normalizeGiftPreference(itemType, {
+            disposition = disposition,
+            sourceType = sourceType,
+            sourceEventID = sourceEventID,
+            createdAt = at,
+        })
+        local existing = normalized
+            and note.giftPreferences[normalized.fullType] or nil
+        if normalized and (not existing
+            or existing.disposition ~= normalized.disposition)
+        then
+            note.giftPreferences[normalized.fullType] = normalized
+            changed = true
+        end
+    end
+    if not changed then return false end
+    local entries = {}
+    for itemType, preference in pairs(note.giftPreferences) do
+        entries[#entries + 1] = {
+            fullType = itemType,
+            createdAt = tonumber(preference.createdAt) or 0,
+        }
+    end
+    if #entries > MAX_GIFT_PREFERENCES then
+        table.sort(entries, function(left, right)
+            if left.createdAt ~= right.createdAt then
+                return left.createdAt < right.createdAt
+            end
+            return left.fullType < right.fullType
+        end)
+        for index = 1, #entries - MAX_GIFT_PREFERENCES do
+            note.giftPreferences[entries[index].fullType] = nil
+        end
+    end
+    note.lastInteractionAt = now(at)
+    markDirty(note)
+    return true
 end
 
 function Knowledge.GetDescriptor(characterUUID, npcID, descriptorID)

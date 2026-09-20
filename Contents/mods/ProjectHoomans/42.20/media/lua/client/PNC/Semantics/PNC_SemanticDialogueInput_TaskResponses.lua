@@ -32,7 +32,7 @@ function TaskResponses.ForResult(payload, pending, action)
     local status = string.lower(tostring(payload and payload.status or ""))
     local reason = string.lower(tostring(payload and payload.reason or ""))
     if status == "completed" then
-        if action == "GIVE" then
+        if action == "GIVE" or action == "FETCH" then
             return "Here you go."
         end
         if action == "WAIT_AT" then
@@ -56,12 +56,18 @@ function TaskResponses.ForResult(payload, pending, action)
         end
         return "It's done."
     end
-    if action == "GIVE"
+    if (action == "GIVE" or action == "FETCH")
         and (string.find(reason, "item", 1, true)
             or string.find(reason, "inventory", 1, true)
             or string.find(reason, "classification", 1, true))
     then
         return "I don't have that."
+    end
+    if action == "FETCH" and reason == "fetch_source_unsupported" then
+        return "I can only fetch something I'm already carrying."
+    end
+    if action == "FETCH" and reason == "fetch_destination_unsupported" then
+        return "I can bring that to you, but not to someone else right now."
     end
     if (action == "EAT" or action == "DRINK" or action == "CONSUME")
         and (string.find(reason, "item", 1, true)

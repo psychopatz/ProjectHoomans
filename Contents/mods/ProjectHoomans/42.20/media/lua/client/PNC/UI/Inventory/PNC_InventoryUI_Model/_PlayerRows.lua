@@ -3,14 +3,20 @@ local playerItemRow = Helpers.playerItemRow
 
 local Model = PNC.InventoryUIModel
 
-function Model.BuildPlayerRows(containerEntry, player, expandedGroups, giftOnly)
+function Model.BuildPlayerRows(
+    containerEntry, player, expandedGroups, giftOnly, giftPreferences
+)
     local rows = {}
     local container = containerEntry and containerEntry.container or nil
     local items = container and container.getItems and container:getItems() or nil
     if items and items.size and items.get then
         for index = 0, items:size() - 1 do
             local row = playerItemRow(
-                items:get(index), containerEntry.id, player, giftOnly == true
+                items:get(index),
+                containerEntry.id,
+                player,
+                giftOnly == true,
+                giftPreferences
             )
             if not giftOnly or row.giftValid == true then
                 rows[#rows + 1] = row

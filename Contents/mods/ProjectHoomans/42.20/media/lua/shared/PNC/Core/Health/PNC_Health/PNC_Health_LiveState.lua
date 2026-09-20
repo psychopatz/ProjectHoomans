@@ -75,11 +75,13 @@ function Health.Ensure(record)
     return record.health
 end
 
-function Health.MarkRecentDamage(record, now)
+function Health.MarkRecentDamage(record, now, damageEvent)
     local health = Health.Ensure(record)
     local damageAt = tonumber(now) or Core.Now()
     health.lastDamageAt = damageAt
     health.recentDamageUntil = damageAt + Const.RECENT_DAMAGE_SHOW_MS
+    health.recentDamageType = type(damageEvent) == "table"
+        and tostring(damageEvent.type or "") or nil
     record.runtime = record.runtime or {}
     record.runtime.inCombatUntil = math.max(
         tonumber(record.runtime.inCombatUntil or 0) or 0,

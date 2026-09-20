@@ -9,6 +9,13 @@ PNC.SocialFlavorDefinitions = PNC.SocialFlavorDefinitions or {}
 
 local Flavor = PsychopatzCore.SocialFlavor
 
+local function translatedLine(key, fallback)
+    local translation = PNC.Translation
+    local value = translation and type(translation.GetKey) == "function"
+        and translation.GetKey(key, fallback) or fallback
+    return { key = key, fallback = value }
+end
+
 Flavor.Register("social.conversation_farewell", {
     id = "social.conversation_farewell",
     family = "conversation_farewell",
@@ -147,6 +154,50 @@ Flavor.Register("social.witnessed_teammate_hurt", {
         "You are hit, {victimFirstName}. Fall back and let me cover you.",
     },
     variants = {
+        {
+            id = "bandage_request_resolved",
+            when = { medicalSupplyRequestStatus = "resolved" },
+            npc = {
+                translatedLine(
+                    "UI_PNC_Conversation_MedicalBandage_Resolved_1",
+                    "Never mind, {victimFirstName}. We don't need you to find a bandage for that request now."
+                ),
+            },
+        },
+        {
+            id = "bandage_request_fulfilled",
+            when = {
+                medicalBandageRequired = true,
+                medicalBandageStatus = "found",
+            },
+            npc = {
+                translatedLine(
+                    "UI_PNC_Conversation_MedicalBandage_Found_1",
+                    "We found a bandage for you, {victimFirstName}. Hold still while I patch you up."
+                ),
+                translatedLine(
+                    "UI_PNC_Conversation_MedicalBandage_Found_2",
+                    "I've got a bandage now, {victimFirstName}. Let me take care of that wound."
+                ),
+            },
+        },
+        {
+            id = "out_of_bandages",
+            when = {
+                medicalBandageRequired = true,
+                medicalBandageStatus = "missing",
+            },
+            npc = {
+                translatedLine(
+                    "UI_PNC_Conversation_MedicalBandage_Missing_1",
+                    "I'm out of bandages. Can you or someone in the group spare one for {victimFirstName}?"
+                ),
+                translatedLine(
+                    "UI_PNC_Conversation_MedicalBandage_Missing_2",
+                    "I need a bandage for {victimFirstName}. Does anyone in the group have one to share?"
+                ),
+            },
+        },
         {
             id = "hostile",
             when = { socialRole = "hostile" },

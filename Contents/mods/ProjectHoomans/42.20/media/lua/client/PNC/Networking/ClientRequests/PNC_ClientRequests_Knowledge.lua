@@ -58,6 +58,7 @@ function Client.RequestNPCKnowledgeTopic(npcID, topicID, options)
         topicID = topicID,
         conversationToken = options.conversationToken or options.token,
         origin = options.origin,
+        preferenceItemType = options.preferenceItemType,
     }
     ClientState.pendingDisclosure = ClientState.pendingDisclosure or {}
     ClientState.pendingDisclosure[npcID] = args.requestID

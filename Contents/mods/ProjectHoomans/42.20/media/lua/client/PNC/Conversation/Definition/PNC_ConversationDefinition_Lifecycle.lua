@@ -11,6 +11,25 @@ local Registry = Conversation.Registry
 local IdentityPresentation = PNC.NPCIdentityPresentation
 local isAggressive = Audience.IsPlayerHostile
 
+local GIFT_PREFERENCE_RESPONSES = {
+    like = {
+        key = "semantic.gift.preference.like",
+        text = "I like that.",
+    },
+    dislike = {
+        key = "semantic.gift.preference.dislike",
+        text = "I don't like that.",
+    },
+    neutral = {
+        key = "semantic.gift.preference.neutral",
+        text = "I don't have a strong preference.",
+    },
+    unknown = {
+        key = "semantic.gift.preference.unknown",
+        text = "I'm not sure which item you mean.",
+    },
+}
+
 function Conversation.RequestCeasefire(context)
     return Lifecycle and Lifecycle.RequestCeasefire
         and Lifecycle.RequestCeasefire(context) or false
@@ -160,6 +179,10 @@ end
 function Conversation.ReceiveDisclosureResult(result)
     local view = PsychopatzCore and PsychopatzCore.Conversation
         and PsychopatzCore.Conversation.instance or nil
+    local preference = result and result.giftPreference or nil
+    local reaction = preference and GIFT_PREFERENCE_RESPONSES[
+        tostring(preference.disposition or "")
+    ] or nil
     if not view or not result
         or tostring(result.npcID) ~= tostring(view.spec and view.spec.npcID)
     then return false end
@@ -167,6 +190,30 @@ function Conversation.ReceiveDisclosureResult(result)
         and view.session and view.session.append
     then
         view.session:append("npc", { fallback = tostring(result.responseText) })
+    elseif result.success == true and reaction
+        and view.session and view.session.append
+    then
+        view.session:append("npc", {
+            key = reaction.key,
+            domain = "pnc.system.shared.categories",
+            text = reaction.text,
+            fallback = reaction.text,
+        })
+    elseif result.success ~= true
+        and tostring(result.topicID or "") == "gift_preferences"
+        and (result.reason == "preference_item_required"
+            or result.reason == "invalid_gift_item_type"
+            or result.reason == "gift_preference_unavailable"
+            or result.reason == "marketsense_unavailable")
+        and view.session and view.session.append
+    then
+        local unknown = GIFT_PREFERENCE_RESPONSES.unknown
+        view.session:append("npc", {
+            key = unknown.key,
+            domain = "pnc.system.shared.categories",
+            text = unknown.text,
+            fallback = unknown.text,
+        })
     end
     return refreshForNPC(result.npcID)
 end

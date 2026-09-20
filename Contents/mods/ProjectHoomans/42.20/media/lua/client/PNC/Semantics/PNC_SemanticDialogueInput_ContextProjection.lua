@@ -61,6 +61,13 @@ function Projection.Build(view, getProviderStatus)
     output.llmProviderStatus = providerStatus.status
     output.llmProviderReason = providerStatus.reason
     output.npcID = view and view.spec and view.spec.npcID or output.npcID
+    local socialFlavor = PNC.SocialFlavorPresentation
+    if socialFlavor
+        and type(socialFlavor.GetActiveMedicalSupplyRequest) == "function"
+    then
+        output.activeMedicalSupplyRequest =
+            socialFlavor.GetActiveMedicalSupplyRequest(output.npcID)
+    end
     local relationship = PNC.Network and PNC.Network.ClientState
         and PNC.Network.ClientState.conversationRelationships
         and PNC.Network.ClientState.conversationRelationships[
@@ -80,6 +87,16 @@ function Projection.Build(view, getProviderStatus)
         or source.conversationBlockContext
         and source.conversationBlockContext.conversationTopic
     local session = view and view.session or nil
+    local memoryTargetID = session and session.semanticMemoryTargetID
+        or source.semanticMemoryTargetID
+    local cognitionClient = PNC.Semantics
+        and PNC.Semantics.CognitionClient or nil
+    if cognitionClient and type(cognitionClient.GetGossipContext) == "function" then
+        output.npcGossip = cognitionClient.GetGossipContext(
+            output.npcID,
+            memoryTargetID
+        )
+    end
     local state = session and session.semanticDialogueState or nil
     if state and type(state.ToContext) == "function" then
         output.semanticDialogueState = state:ToContext()

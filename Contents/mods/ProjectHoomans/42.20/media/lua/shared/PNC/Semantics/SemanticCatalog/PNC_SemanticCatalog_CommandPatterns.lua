@@ -31,6 +31,23 @@ function Internal.RegisterBasicCommands()
     )
 
     registerPattern(
+        "pnc.command.stop_following",
+        {
+            { kind = "literal", value = "please", optional = true },
+            { kind = "concept", id = "STOP" },
+            {
+                kind = "concept",
+                id = "FOLLOW",
+                verbForms = { "PROGRESSIVE" },
+            },
+            { kind = "literal", value = "me", optional = true },
+        },
+        { intent = "REQUEST", speechAct = "REQUEST", action = "STOP" },
+        0.97,
+        125
+    )
+
+    registerPattern(
         "pnc.command.wait",
         { "@WAIT" },
         { intent = "REQUEST", speechAct = "REQUEST", action = "STAY" },
@@ -260,6 +277,32 @@ function Internal.RegisterOtherCommands()
         },
         0.90,
         120
+    )
+
+    -- A prohibition on following has a direct, existing game action: stop.
+    registerPattern(
+        "pnc.command.stop_negated_follow",
+        {
+            { kind = "literal", value = "please", optional = true },
+            { kind = "literal", value = "don't" },
+            { kind = "concept", id = "FOLLOW" },
+        },
+        { intent = "REQUEST", speechAct = "REQUEST", action = "STOP" },
+        0.97,
+        126
+    )
+
+    registerPattern(
+        "pnc.command.stop_do_not_follow",
+        {
+            { kind = "literal", value = "please", optional = true },
+            { kind = "literal", value = "do" },
+            { kind = "literal", value = "not" },
+            { kind = "concept", id = "FOLLOW" },
+        },
+        { intent = "REQUEST", speechAct = "REQUEST", action = "STOP" },
+        0.97,
+        126
     )
 
     registerPattern(

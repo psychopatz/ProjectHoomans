@@ -142,6 +142,14 @@ T.equal(implicit.object.reference, "IT",
 T.equal(implicit.object.implicit, true,
     "implicit object provenance is visible")
 
+local use = Parser.Parse("use it")
+T.equal(use.action, "CONSUME",
+    "generic use routes through the existing consumable task")
+T.equal(use.object.reference, "IT",
+    "use-it references remain discourse-resolved")
+T.equal(use.object.unresolved, true,
+    "generic use does not choose an item before capability resolution")
+
 local Selector = T.load(
     "ProjectHoomans",
     "server",

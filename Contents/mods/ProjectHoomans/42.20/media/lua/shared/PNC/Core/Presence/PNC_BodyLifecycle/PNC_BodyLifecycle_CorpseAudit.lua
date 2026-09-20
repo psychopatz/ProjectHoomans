@@ -43,9 +43,17 @@ function Internal.pumpPendingCorpses()
             if Internal.ensureCorpseIdentityCard then
                 Internal.ensureCorpseIdentityCard(record, found)
             end
+            if Internal.ensureCorpseFactionDogTag then
+                Internal.ensureCorpseFactionDogTag(record, found)
+            end
             Internal.applyCorpseWornItems(found, pending.wornEntries)
             Internal.stampCorpse(record, found, pending.token)
             Internal.announceCorpse(found)
+            if PNC.CorpseAwareness
+                and PNC.CorpseAwareness.ObserveCorpse
+            then
+                PNC.CorpseAwareness.ObserveCorpse(record, found)
+            end
             table.remove(Lifecycle.PendingCorpses, i)
         elseif pending.attempts >= 8 then
             if record then
@@ -74,6 +82,7 @@ function Internal.auditCorpseRecord(record)
     local duplicates = {}
     local previousCorpseState
     local identityCardCreated = false
+    local factionDogTagChanged = false
     if not cell or not record then
         return
     end
@@ -134,8 +143,14 @@ function Internal.auditCorpseRecord(record)
         Internal.removeCorpse(duplicate)
     end
     if accepted and Internal.ensureCorpseIdentityCard then
-        local _, created = Internal.ensureCorpseIdentityCard(record, accepted)
-        identityCardCreated = created == true
+        local _, _, _, changed =
+            Internal.ensureCorpseIdentityCard(record, accepted)
+        identityCardCreated = changed == true
+    end
+    if accepted and Internal.ensureCorpseFactionDogTag then
+        local _, _, _, changed =
+            Internal.ensureCorpseFactionDogTag(record, accepted)
+        factionDogTagChanged = changed == true
     end
     if accepted and Lifecycle.IsReanimationDue
         and Lifecycle.IsReanimationDue(record)
@@ -143,15 +158,21 @@ function Internal.auditCorpseRecord(record)
     then
         local spawned = Lifecycle.SpawnReanimatedZombie(record, accepted)
         if spawned then return end
-        if identityCardCreated then
+        if identityCardCreated or factionDogTagChanged then
             Internal.transmitCorpseState(accepted)
             identityCardCreated = false
+            factionDogTagChanged = false
         end
         if state.corpseState == "reanimation_retry" then return end
     end
     if accepted then
-        if identityCardCreated then
+        if identityCardCreated or factionDogTagChanged then
             Internal.transmitCorpseState(accepted)
+        end
+        if PNC.CorpseAwareness
+            and PNC.CorpseAwareness.ObserveCorpse
+        then
+            PNC.CorpseAwareness.ObserveCorpse(record, accepted)
         end
         state.corpseState = "inert_loaded"
         state.missingSinceAt = 0

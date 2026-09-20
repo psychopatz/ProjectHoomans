@@ -6,6 +6,9 @@
 PNC = PNC or {}
 PNC.Semantics = PNC.Semantics or {}
 
+require "PNC/Conversation/Memory/PNC_ConversationMemory"
+require "PNC/Conversation/Definitions/Memory/ConversationTopics/00_PNC_ConversationMemoryTopics"
+
 local Input = PNC.Semantics.DialogueInput or {}
 PNC.Semantics.DialogueInput = Input
 
@@ -26,6 +29,18 @@ local function groupMemberShouldHandle(view, result, value)
     return not member or group:ShouldRespond(member, result, value)
 end
 
+local function giftConsentResponseView(view, result)
+    local consent = result and result.decision
+        and result.decision.giftConsent or nil
+    local group = view and view.groupConversation or nil
+    if type(consent) ~= "table" or not consent.recipientID
+        or not group or type(group.ViewFor) ~= "function"
+    then
+        return view
+    end
+    return group:ViewFor(consent.recipientID) or view
+end
+
 local function finishLocalSubmit(view, value, result, options)
     options = type(options) == "table" and options or {}
     local inputMessage = Internal.AppendPlayerInput(view, value, result)
@@ -36,9 +51,16 @@ local function finishLocalSubmit(view, value, result, options)
     if groupMemberShouldHandle(view, result, value) then
         actionResult = Internal.DispatchAction(view, result, value)
         view.lastSemanticActionResult = actionResult
+        if Internal.ClearPendingGiftConsent then
+            Internal.ClearPendingGiftConsent(view)
+        end
         if options.deferResponse ~= true then
             queued = Internal.QueueDeterministicResponse(
-                view, value, result, actionResult)
+                giftConsentResponseView(view, result),
+                value,
+                result,
+                actionResult
+            )
         end
     else
         audit("semantic.group.member_skipped", {
@@ -66,6 +88,9 @@ local function finishLocalSubmit(view, value, result, options)
     return true
 end
 
+local SemanticTelemetryPrompt = require
+    "PNC/Semantics/PNC_SemanticTelemetryPrompt"
+
 local function recordAcceptedContextTurn(view, result, options)
     if not Internal.RecordContextTurn or not result
         or result.accepted ~= true or not result.ir
@@ -83,6 +108,25 @@ local function recordAcceptedContextTurn(view, result, options)
             and view.session.semanticDialogueContext.sequence or nil,
     }, { requestID = result.sequence })
     return recorded, event
+end
+
+local function recordConversationTopics(view, result, rawText)
+    local session = view and view.session
+    local events = PNC.Conversation and PNC.Conversation.Memory
+        and PNC.Conversation.Memory.Events or nil
+    if not session or not result or result.accepted ~= true
+        or type(result.ir) ~= "table"
+        or not events or type(events.AccumulateConversationTopics) ~= "function"
+    then
+        return false
+    end
+    local ok, recorded = pcall(
+        events.AccumulateConversationTopics,
+        session,
+        result.ir,
+        rawText
+    )
+    return ok and recorded == true
 end
 
 function Internal.SubmitSingle(view, value, part)
@@ -152,11 +196,17 @@ function Internal.SubmitSingle(view, value, part)
 
     local decision = preview.decision or {}
     if decision.route == "llm_fallback" then
-        if Internal.SubmitProviderFallback
-            and Internal.SubmitProviderFallback(
-                view, value, part, preview, decision, context, options)
-        then
-            return true
+        if Internal.ClearPendingGiftConsent then
+            Internal.ClearPendingGiftConsent(view)
+        end
+        if Internal.SubmitProviderFallback then
+            local submitted = Internal.SubmitProviderFallback(
+                view, value, part, preview, decision, context, options
+            )
+            if submitted then
+                recordConversationTopics(view, preview, value)
+                return true
+            end
         end
     end
 
@@ -166,20 +216,27 @@ function Internal.SubmitSingle(view, value, part)
     end
     view.lastSemanticDialogueResult = result
 
+    local finalDecision = result and result.decision or {}
+    if finalDecision.branch == "ASK_CLARIFICATION"
+        and SemanticTelemetryPrompt
+        and type(SemanticTelemetryPrompt.Offer) == "function"
+    then
+        SemanticTelemetryPrompt.Offer(view, value, result, "local")
+    end
+
     recordAcceptedContextTurn(view, result, options)
+    recordConversationTopics(view, result, value)
 
     traceTurn(view, value, result, "semantic_input_local", {
         providerAvailable = context.llmAvailable == true,
         providerUsed = false,
     })
 
-    -- A claimed identity is authoritative and asynchronous in multiplayer.
-    -- Do not queue the provisional "Nice to meet you. What's your name?"
-    -- response here; the server result is the only response for this turn.
-    -- Otherwise singleplayer and multiplayer both show two contradictory
-    -- replies for one utterance.
+    -- Claimed identity and targeted preference disclosures are authoritative
+    -- server responses. Do not also queue a local reply for those turns.
     local deferIdentityResponse = identityRequest
-        and identityRequest.kind == "identity_claim"
+        and (identityRequest.kind == "identity_claim"
+            or identityRequest.kind == "gift_preference_disclosure")
     local submitted, submitReason = finishLocalSubmit(
         view,
         value,

@@ -77,10 +77,15 @@ local function isProviderFailure(message, content)
         or string.find(lowered, "personal identity", 1, true) ~= nil
 end
 
-function History.Recent(view, currentMessage)
+function History.Recent(view, currentMessage, messageLimit, textLimit)
     local history = view and view.historyPart and view.historyPart.messages or {}
     local output = {}
-    local first = math.max(1, #history - 7)
+    local maximumMessages = tonumber(messageLimit) or 8
+    local maximumText = tonumber(textLimit) or 500
+    maximumMessages = math.max(0, math.min(8, math.floor(maximumMessages)))
+    maximumText = math.max(1, math.min(500, math.floor(maximumText)))
+    if maximumMessages <= 0 then return output end
+    local first = math.max(1, #history - maximumMessages + 1)
     local textResolver = PsychopatzCore and PsychopatzCore.Conversation
         and PsychopatzCore.Conversation.Text
     for index = first, #history do
@@ -96,7 +101,7 @@ function History.Recent(view, currentMessage)
             output[#output + 1] = {
                 role = message and message.speaker == "player"
                     and "user" or "assistant",
-                content = string.sub(content, 1, 500),
+                content = string.sub(content, 1, maximumText),
             }
         end
     end

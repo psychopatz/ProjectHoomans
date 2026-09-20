@@ -107,6 +107,8 @@ function Internal.sanitizeIdentity(rawIdentity, record)
     local archetypeID = Internal.normalizeString(identity.archetypeID or record.archetypeID)
     return {
         seed = Identity.NormalizeSeed(identity.seed or record.identitySeed, record.id),
+        birth = Identity and type(Identity.NormalizeBirthDate) == "function"
+            and Identity.NormalizeBirthDate(identity.birth) or nil,
         archetypeID = archetypeID,
         displayName = Internal.normalizeString(identity.displayName or record.name),
         isFemale = identity.isFemale == true or record.isFemale == true,

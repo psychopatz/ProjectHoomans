@@ -14,6 +14,7 @@ Lifecycle.Internal = Lifecycle.Internal or {}
 require "PNC/Core/Presence/PNC_BodyLifecycle/PNC_BodyLifecycle_State"
 require "PNC/Core/Presence/PNC_BodyLifecycle/PNC_BodyLifecycle_World"
 require "PNC/Core/Presence/PNC_BodyLifecycle/PNC_BodyLifecycle_CorpseItems"
+require "PNC/Core/Presence/PNC_BodyLifecycle/PNC_BodyLifecycle_CorpseAwareness"
 require "PNC/Core/Presence/PNC_BodyLifecycle/PNC_BodyLifecycle_CorpseWornItems"
 require "PNC/Core/Presence/PNC_BodyLifecycle/PNC_BodyLifecycle_LiveBodies"
 require "PNC/Core/Presence/PNC_BodyLifecycle/PNC_BodyLifecycle_Startup"

@@ -16,6 +16,16 @@ local Catalog = T.load(
     "shared",
     "PNC/Semantics/PNC_SemanticCatalog.lua"
 )
+local Policy = T.load(
+    "ProjectHoomans",
+    "shared",
+    "PNC/Semantics/PNC_SemanticDialoguePolicy.lua"
+)
+local CommandAdapter = T.load(
+    "ProjectHoomans",
+    "client",
+    "PNC/Semantics/PNC_SemanticCommandAdapter.lua"
+)
 local Parser = Semantic.Parser
 local IR = Semantic.IR
 
@@ -31,6 +41,25 @@ T.equal(synonym.action, "FOLLOW", "follow synonym")
 T.equal(synonym.diagnostics.matchedPattern, "pnc.command.follow",
     "synonyms use the same semantic pattern")
 
+local stopFollowing = Parser.Parse("Stop following me")
+T.equal(stopFollowing.action, "STOP",
+    "progressive follow language resolves to the existing stop action")
+T.equal(Policy.Decide(stopFollowing, nil, { llmEnabled = false }).branch,
+    "COMMAND_ACCEPTED", "stop-following uses the existing command branch")
+T.equal(CommandAdapter.Resolve(stopFollowing), "stay",
+    "stop-following reuses the existing authoritative stay command")
+local dontFollow = Parser.Parse("Please don't follow me")
+T.equal(dontFollow.action, "STOP",
+    "a direct prohibition maps to the existing safe inverse command")
+local doNotFollow = Parser.Parse("Do not follow me")
+T.equal(doNotFollow.action, "STOP",
+    "uncontracted prohibitions share the same Hoomans action")
+local dontStopFollowing = Parser.Parse("Don't stop following me")
+T.falsy(dontStopFollowing.action,
+    "negating stop does not trigger a stop command")
+T.equal(dontStopFollowing.diagnostics.noMatch, true,
+    "unsupported double negation remains unresolved")
+
 local greeting = Parser.Parse("hello there")
 T.equal(greeting.intent, "GREET", "greeting intent")
 T.equal(greeting.speechAct, "GREET", "greeting speech act")
@@ -44,6 +73,61 @@ T.equal(hunger.intent, "INFORM", "self-state intent")
 T.equal(hunger.subject, "HUNGER", "self-state subject")
 T.equal(hunger.provenance.pattern, "pnc.state.self_hunger_im",
     "self-state claims use the dedicated state pattern")
+
+local selfWellbeing = Parser.Parse("im fine thank you")
+T.equal(selfWellbeing.intent, "INFORM",
+    "a first-person fine reply is a self-state report")
+T.equal(selfWellbeing.subject, "WELLBEING",
+    "fine replies use the explicit wellbeing subject")
+T.equal(selfWellbeing.slots.state.type, "WELLBEING",
+    "fine replies preserve their state type")
+T.equal(selfWellbeing.slots.state.value, "fine",
+    "fine replies preserve the reported status")
+T.equal(selfWellbeing.socialContext.selfDirected, true,
+    "fine replies are explicitly self-directed")
+T.equal(selfWellbeing.socialContext.target, "SELF",
+    "fine replies cannot be mistaken for an NPC state claim")
+local punctuatedWellbeing = Parser.Parse("I'm fine, thank you.")
+T.equal(punctuatedWellbeing.subject, "WELLBEING",
+    "punctuation and the standard contraction keep the same self-state meaning")
+local selfWellbeingDecision = Policy.Decide(
+    selfWellbeing, nil, { llmEnabled = false })
+T.equal(selfWellbeingDecision.branch, "SELF_STATE_RECEIVED",
+    "first-person wellbeing replies reach the local self-state response")
+T.equal(selfWellbeingDecision.route, "deterministic",
+    "the wellbeing acknowledgment does not require the optional LLM")
+T.truthy(string.find(
+    selfWellbeingDecision.response.templateID,
+    "semantic.self_state.wellbeing", 1, true
+), "fine replies receive an empathetic deterministic response")
+
+local thirstyReport = Parser.Parse("I am thirsty")
+T.equal(thirstyReport.subject, "THIRST",
+    "first-person thirst uses the existing state-report path")
+T.equal(thirstyReport.slots.state.value, "thirsty",
+    "the thirst report preserves the recognized state phrase")
+T.equal(Policy.Decide(thirstyReport, nil, { llmEnabled = false }).branch,
+    "SELF_STATE_RECEIVED", "thirst reports reach the local response")
+local tiredReport = Parser.Parse("I'm exhausted")
+T.equal(tiredReport.subject, "FATIGUE",
+    "first-person fatigue uses the existing state-report path")
+T.equal(Policy.Decide(tiredReport, nil, { llmEnabled = false }).branch,
+    "SELF_STATE_RECEIVED", "fatigue reports reach the local response")
+
+local standaloneOkay = Parser.Parse("okay")
+T.equal(standaloneOkay.intent, "ACCEPT",
+    "standalone okay retains its existing acceptance meaning")
+local fineByMe = Parser.Parse("fine by me")
+T.equal(fineByMe.intent, "AGREE",
+    "fine by me retains its existing agreement meaning")
+local longerFine = Parser.Parse("I am fine with that")
+T.falsy(longerFine.intent == "INFORM"
+    and longerFine.subject == "WELLBEING",
+    "a longer agreement clause is not truncated into a wellbeing report")
+local negatedFine = Parser.Parse("I am not fine")
+T.falsy(negatedFine.intent == "INFORM"
+    and negatedFine.subject == "WELLBEING",
+    "negated wellbeing is not treated as a positive fine report")
 
 local date = Parser.Parse("What day is it?")
 T.equal(date.subject, "DATE", "higher-priority date concept wins")
@@ -91,6 +175,24 @@ T.equal(water.object.quantity, "SOME", "water request quantity")
 T.equal(water.diagnostics.recommendedRoute, "deterministic",
     "common fetch request stays in Lua")
 
+local wantFetch = Parser.Parse("I want you to retrieve some food")
+T.equal(wantFetch.action, "FETCH",
+    "a constrained want-you-to frame reuses the existing FETCH concept")
+T.equal(wantFetch.object.category, "FOOD",
+    "the new request frame keeps the existing item role")
+T.equal(wantFetch.diagnostics.matchedPattern, "pnc.request.want_you_fetch",
+    "the explicit conversational request frame is diagnosable")
+local wantFetchDecision = Policy.Decide(wantFetch, nil, { llmEnabled = false })
+T.equal(wantFetchDecision.branch, "REQUEST_ACKNOWLEDGED",
+    "the new wording reaches the existing item-request branch")
+T.equal(wantFetchDecision.actionIntent.action, "FETCH",
+    "the existing FETCH task path receives the semantic action")
+local negatedWantFetch = Parser.Parse("I don't want you to retrieve food")
+T.falsy(negatedWantFetch.action,
+    "negative desire language is not promoted into a FETCH command")
+T.equal(negatedWantFetch.diagnostics.noMatch, true,
+    "negative desire language remains unresolved until a refusal rule exists")
+
 local food = Parser.Parse("Get some food")
 T.equal(food.object.category, "FOOD", "food synonym object")
 
@@ -127,6 +229,90 @@ T.equal(question.intent, "QUESTION", "question intent")
 T.equal(question.subject, "LOCATION", "question subject")
 T.equal(question.target.text, "john", "unresolved target is preserved")
 T.equal(question.target.unresolved, true, "world resolution stays downstream")
+
+local whereFind = Parser.Parse("Where can I find Sarah?")
+T.equal(whereFind.subject, "LOCATION",
+    "find phrasing reuses the local location question")
+T.equal(whereFind.target.text, "sarah",
+    "find phrasing preserves the requested person")
+T.equal(whereFind.diagnostics.matchedPattern, "pnc.question.where_can_find",
+    "find phrasing uses its explicit rule")
+
+local whereKnow = Parser.Parse("Do you know where Sarah is?")
+T.equal(whereKnow.subject, "LOCATION",
+    "embedded where questions become location queries")
+T.equal(whereKnow.target.text, "sarah",
+    "embedded where questions stop the target at the copula")
+
+local seenHave = Parser.Parse("Have you seen Sarah?")
+T.equal(seenHave.subject, "SEEN",
+    "present perfect phrasing reuses the seen question")
+T.equal(seenHave.target.text, "sarah",
+    "present perfect seen queries preserve the target")
+
+local seenHappen = Parser.Parse("Did you happen to see Sarah?")
+T.equal(seenHappen.subject, "SEEN",
+    "polite seen phrasing reuses the seen question")
+T.equal(seenHappen.target.text, "sarah",
+    "polite seen queries preserve the target")
+
+local locationDecision = Policy.Decide(whereKnow, nil, { llmEnabled = false })
+T.equal(locationDecision.branch, "QUESTION_RECEIVED",
+    "read-only location questions can answer without a resolved target")
+T.equal(locationDecision.response.templateID,
+    "semantic.question.location_unknown",
+    "unresolved location questions keep the explicit uncertainty response")
+local seenDecision = Policy.Decide(seenHave, nil, { llmEnabled = false })
+T.equal(seenDecision.branch, "QUESTION_RECEIVED",
+    "read-only seen questions can answer without a resolved target")
+T.equal(seenDecision.response.templateID, "semantic.question.seen_unknown",
+    "unknown seen facts remain uncertain instead of fabricated")
+
+local howFeeling = Parser.Parse("How are you feeling?")
+T.equal(howFeeling.subject, "WELLBEING",
+    "feeling questions use the existing local wellbeing answer")
+T.equal(howFeeling.diagnostics.matchedPattern,
+    "pnc.question.wellbeing_feeling",
+    "the explicit feeling frame wins over the shorter how-are-you frame")
+local howBeen = Parser.Parse("How have you been?")
+T.equal(howBeen.subject, "WELLBEING",
+    "recent wellbeing questions use the existing local answer")
+local feelingOkay = Parser.Parse("Are you feeling okay?")
+T.equal(feelingOkay.subject, "WELLBEING",
+    "feeling-check wording uses the existing wellbeing answer")
+
+local recentActivity = Parser.Parse("What have you been doing?")
+T.equal(recentActivity.subject, "ACTIVITY",
+    "recent activity phrasing uses the existing local answer")
+local recentActivityUpTo = Parser.Parse("What have you been up to?")
+T.equal(recentActivityUpTo.subject, "ACTIVITY",
+    "recent up-to phrasing uses the existing local answer")
+local activityNow = Parser.Parse("What are you doing right now?")
+T.equal(activityNow.subject, "ACTIVITY",
+    "time-qualified activity questions use the existing local answer")
+local everythingOkay = Parser.Parse("Is everything okay?")
+T.equal(everythingOkay.subject, "WELLBEING",
+    "broad but direct wellbeing checks use the existing local answer")
+
+local wellbeingDecision = Policy.Decide(howBeen, nil, { llmEnabled = false })
+T.equal(wellbeingDecision.branch, "QUESTION_RECEIVED",
+    "expanded wellbeing phrasing stays on the pure Lua question branch")
+T.equal(wellbeingDecision.response.templateID,
+    "semantic.question.wellbeing.default",
+    "expanded phrasing reuses the existing wellbeing response variant")
+
+local statementWithLocation = Parser.Parse("I know where Sarah is")
+T.falsy(statementWithLocation.intent,
+    "embedded statements do not become location questions")
+local statementWithWellbeing = Parser.Parse("I wonder how you have been")
+T.falsy(statementWithWellbeing.intent,
+    "embedded statements do not become wellbeing questions")
+local activityHow = Parser.Parse("How are you carrying the boxes?")
+T.falsy(activityHow.intent,
+    "how-are-you activity questions do not become wellbeing questions")
+local activityOkay = Parser.Parse("Are you okay fixing the fence?")
+T.falsy(activityOkay.intent,
+    "okay followed by an activity does not become a wellbeing question")
 
 local unknown = Parser.Parse("Can you do something about this?")
 T.falsy(unknown.intent, "unknown language has no invented intent")

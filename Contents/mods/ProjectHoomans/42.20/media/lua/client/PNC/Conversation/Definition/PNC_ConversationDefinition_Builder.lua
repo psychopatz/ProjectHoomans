@@ -10,7 +10,6 @@ local Composer = Conversation.Composer
 local Backgrounds = Conversation.Backgrounds
 local Palette = PNC.NPCTypePalette
 local FlavorAddress = PNC.FlavorAddress
-local IdentityChoice = Conversation.IdentityChoice
 local Context = require "PNC/Conversation/Definition/PNC_ConversationDefinition_Context"
 local ExtensionParts = require "PNC/Conversation/Definition/PNC_ConversationDefinition_ExtensionParts"
 
@@ -103,21 +102,9 @@ local function buildConversationContext(entry, player, timeID, relationshipID, n
 end
 
 local function buildConversationMenu(contextData, npcID)
-    local identityState = contextData.identityState
-    local projection = contextData.projection
     local identityArguments = contextData.identityArguments
     local blockContext = contextData.blockContext
     local presentationContext = contextData.presentationContext
-    local askNameChoice
-    if identityState == "unknown" and projection
-        and (projection.canAskName == true or projection.state == "loading")
-    then
-        askNameChoice = IdentityChoice.Build(
-            npcID,
-            projection,
-            identityArguments
-        )
-    end
     local dossierChoice = {
         id = "view_dossier",
         log = false,
@@ -130,7 +117,6 @@ local function buildConversationMenu(contextData, npcID)
         next = "greeting",
     }
     local menuOptions = {
-        askNameChoice = askNameChoice,
         dossierChoice = dossierChoice,
         presentationContext = presentationContext,
     }
@@ -160,6 +146,10 @@ function Conversation.BuildDefinition(entry, player, forcedTime)
         npcID = npcID,
         characterUUID = contextData.clientState.playerContext
             and contextData.clientState.playerContext.characterUUID or "unbound",
+        -- Hoomans conversation text is session-local. The Lua NPC memory
+        -- projection stores only bounded current-day topic codes on close.
+        persistHistory = false,
+        activeMessageLimit = 64,
         character = entry and entry.zombie or nil,
         -- Standard face-to-face talk uses the readable subtle treatment.
         -- Radio and walkie-talkie callers can opt into CRT with their own

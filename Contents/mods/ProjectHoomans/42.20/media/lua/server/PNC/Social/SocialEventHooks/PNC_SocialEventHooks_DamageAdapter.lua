@@ -428,6 +428,7 @@ local function deliverTeammateDamageFlavor(
     attackerID = damageAttackerID(attacker, hit)
     Registry.ForEachLive(function(record, body, npcID)
         local factionID
+        local medicalBandageAvailable
         if not record or not body or not npcID
             or record.alive == false
             or (body.isDead and body:isDead())
@@ -440,11 +441,19 @@ local function deliverTeammateDamageFlavor(
         if not witnessCanSeeDamage(record, body, targetBody, attacker) then
             return
         end
+        if flavorID == "social.witnessed_teammate_hurt" then
+            local treatment = PNC.Treatment
+            if treatment and type(treatment.GetNPCBandagePlan) == "function" then
+                medicalBandageAvailable =
+                    treatment.GetNPCBandagePlan(record) ~= nil
+            end
+        end
         candidates = candidates + 1
         observers[#observers + 1] = {
             id = tostring(npcID),
             record = record,
             body = body,
+            medicalBandageAvailable = medicalBandageAvailable,
         }
     end)
     if not Core or type(Core.ForEachPlayer) ~= "function" then
@@ -480,6 +489,10 @@ local function deliverTeammateDamageFlavor(
                 socialRole = role,
                 npcType = role,
             }
+            if observer.medicalBandageAvailable == false then
+                context.medicalBandageRequired = true
+                context.medicalBandageStatus = "missing"
+            end
             attempted = attempted + 1
             local sent, reason = false, nil
             if Network
@@ -499,7 +512,10 @@ local function deliverTeammateDamageFlavor(
                             eventType = eventType,
                             family = "combat_commentary",
                             priority = 55,
-                            llmEligible = true,
+                            -- Keep the supply-shortage line grounded in the
+                            -- authoritative inventory check above.
+                            llmEligible = observer.medicalBandageAvailable
+                                ~= false,
                             llmPriority = 90,
                             weight = 2,
                             npcID = observer.id,

@@ -14,6 +14,7 @@ require "PNC/Integrations/PBrainZ/PNC_PBrainZ_ContextHistory"
 require "PNC/Integrations/PBrainZ/PNC_PBrainZ_ContextNeeds"
 require "PNC/Integrations/PBrainZ/PNC_PBrainZ_ContextTools"
 require "PNC/Integrations/PBrainZ/PNC_PBrainZ_Identity"
+require "PNC/Integrations/PBrainZ/PNC_PBrainZ_ContextPayload_DialogueFacts"
 require "PNC/Semantics/PNC_SemanticLLMResult"
 require "PNC/Semantics/PNC_SemanticWorldContext"
 require "PNC/Semantics/PNC_SemanticDialogueSituation"
@@ -29,6 +30,7 @@ local Tools = Internal.ContextTools
 local Message = PsychopatzCore.Conversation.Message
 local ToolPolicy = PNC.ConversationLLMTools
 local MemoryIdentity = PNC.PBrainZ.Identity
+local DialogueFacts = PNC.PBrainZ.ContextPayloadDialogueFacts
 local SemanticResult = PNC.Semantics and PNC.Semantics.LLMResult
 local WorldContext = PNC.Semantics and PNC.Semantics.WorldContext
 local DialogueSituation = PNC.Semantics
@@ -116,6 +118,21 @@ function Payload.Build(view, message)
         view, entry, source, definition, presentation
     )
     local npcID = actor.npcID
+    local dialogueMemoryRecord = entry.record
+    if type(dialogueMemoryRecord) ~= "table"
+        or type(dialogueMemoryRecord.memory) ~= "table"
+    then
+        local registry = PNC.Registry
+        if registry and type(registry.Get) == "function" then
+            local ok, resolved = pcall(registry.Get, npcID)
+            if ok and type(resolved) == "table" then
+                dialogueMemoryRecord = resolved
+            end
+        end
+    end
+    if type(dialogueMemoryRecord) ~= "table" then
+        dialogueMemoryRecord = source
+    end
     local clientState = actor.clientState
     local playerID = actor.playerID
     local playerAddress = actor.playerAddress
@@ -307,6 +324,14 @@ function Payload.Build(view, message)
         semantic_entity_index = compactValue(
             semanticInputContext.semanticEntityIndex
         ),
+        -- Request-local Lua facts are rendered by PBrainZ as prompt context;
+        -- they are not written to its memory store.
+        dialogue_facts = compactValue(DialogueFacts.Build(
+            dialogueMemoryRecord,
+            semanticInputContext,
+            playerID,
+            session
+        )),
         semantic_fact_values = compactValue(
             semanticInputContext.semanticFactValues
         ),

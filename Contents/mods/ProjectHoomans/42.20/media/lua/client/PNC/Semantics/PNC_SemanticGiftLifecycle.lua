@@ -15,6 +15,8 @@ Lifecycle.MAX_PENDING = 8
 Lifecycle.MAX_EXPIRED = 8
 Lifecycle.MAX_HANDLED = 24
 Lifecycle.DEFAULT_TIMEOUT = 15000
+Lifecycle.MAX_OFFER_CANDIDATES = 8
+Lifecycle.DEFAULT_OFFER_CONSENT_TIMEOUT = 45000
 
 local function requestValue(value)
     value = tostring(value or "")
@@ -66,6 +68,113 @@ local function trimExpired(session)
         local old = table.remove(session.semanticGiftExpiredOrder, 1)
         session.semanticGiftExpired[old] = nil
     end
+end
+
+local function normalizedText(value)
+    value = string.lower(tostring(value or ""))
+    value = string.gsub(value, "[^%w]+", " ")
+    value = string.gsub(value, "^%s+", "")
+    value = string.gsub(value, "%s+$", "")
+    return value
+end
+
+function Lifecycle.StageOfferConsent(session, offer, candidate, at, timeout)
+    session = stateFor(session)
+    if not session then return false, "gift_consent_session_missing" end
+    offer = type(offer) == "table" and offer or {}
+    candidate = type(candidate) == "table" and candidate or {}
+
+    local query = normalizedText(offer.query)
+    local recipientID = requestValue(candidate.npcID or candidate.id)
+    if query == "" then return false, "gift_consent_item_missing" end
+    if not recipientID then return false, "gift_consent_recipient_missing" end
+
+    local groupID = requestValue(offer.groupID)
+    local turnID = requestValue(offer.groupTurnID
+        or offer.sourceSequence or offer.conversationID)
+    local key = table.concat({ groupID or "single", turnID or "turn", query }, ":")
+    local current = nowValue(at)
+    local maximumAge = tonumber(timeout)
+        or Lifecycle.DEFAULT_OFFER_CONSENT_TIMEOUT
+    local record = session.semanticGiftConsentOffer
+    if type(record) ~= "table"
+        or current - (tonumber(record.at) or current) >= maximumAge
+        or record.key ~= key
+    then
+        record = {
+            key = key,
+            query = query,
+            quantity = tonumber(offer.quantity),
+            groupID = groupID,
+            groupTurnID = turnID,
+            conversationID = offer.conversationID,
+            at = current,
+            overflow = false,
+            candidates = {},
+        }
+        session.semanticGiftConsentOffer = record
+    end
+
+    local index
+    for index = 1, #record.candidates do
+        if tostring(record.candidates[index].npcID or "") == recipientID then
+            return true, record
+        end
+    end
+    if #record.candidates >= Lifecycle.MAX_OFFER_CANDIDATES then
+        record.overflow = true
+        return true, record
+    end
+
+    record.candidates[#record.candidates + 1] = {
+        npcID = recipientID,
+        name = tostring(candidate.name or candidate.npcName or ""),
+    }
+    return true, record
+end
+
+function Lifecycle.PendingOfferConsent(session, at, timeout, groupID)
+    if type(session) ~= "table" then return nil end
+    local record = session.semanticGiftConsentOffer
+    if type(record) ~= "table" then return nil end
+
+    local current = nowValue(at)
+    local maximumAge = tonumber(timeout)
+        or Lifecycle.DEFAULT_OFFER_CONSENT_TIMEOUT
+    if current - (tonumber(record.at) or current) >= maximumAge
+        or tostring(record.groupID or "") ~= tostring(groupID or "")
+    then
+        session.semanticGiftConsentOffer = nil
+        return nil
+    end
+
+    local output = {
+        query = record.query,
+        quantity = record.quantity,
+        groupID = record.groupID,
+        groupTurnID = record.groupTurnID,
+        conversationID = record.conversationID,
+        at = record.at,
+        overflow = record.overflow == true,
+        candidates = {},
+    }
+    local index
+    local candidate
+    for index = 1, #record.candidates do
+        candidate = record.candidates[index]
+        output.candidates[index] = {
+            npcID = candidate.npcID,
+            name = candidate.name,
+        }
+    end
+    return output
+end
+
+function Lifecycle.ClearOfferConsent(session)
+    if type(session) ~= "table" then return false end
+    local existed = type(session.semanticGiftConsentOffer) == "table"
+    session.semanticGiftConsentOffer = nil
+    return existed
 end
 
 function Lifecycle.Expire(session, at, timeout)

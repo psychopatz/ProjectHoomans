@@ -27,6 +27,8 @@ local FlavorAddress = PNC.FlavorAddress
 local Targets = PNC.CompanionTargetResolver
 local OWNER_TOKEN = Presentation
 local MAX_PLAYER_SPEECH_RECIPIENTS = 8
+local MEDICAL_SUPPLY_REQUEST_TTL = 30 * 60 * 1000
+Presentation.MedicalSupplyRequests = Presentation.MedicalSupplyRequests or {}
 
 local function clean(value, fallback)
     value = tostring(value or "")
@@ -56,6 +58,49 @@ local function currentTime()
     return PNC.Core and PNC.Core.Now and PNC.Core.Now()
         or getTimeInMillis and getTimeInMillis()
         or 0
+end
+
+local function updateMedicalSupplyRequest(npcID, context)
+    local status = string.lower(tostring(
+        context and context.medicalSupplyRequestStatus or ""))
+    local npcKey = tostring(npcID or "")
+    local requestID = clean(context and context.medicalSupplyRequestID, nil)
+    local taskID = clean(context and context.medicalSupplyTaskID, nil)
+    local requests = Presentation.MedicalSupplyRequests
+    if npcKey == "" or type(requests) ~= "table" then return end
+    if status == "needed" and requestID and taskID then
+        requests[npcKey] = {
+            requestID = requestID,
+            taskID = taskID,
+            itemQuery = "bandage",
+            expiresAt = currentTime() + MEDICAL_SUPPLY_REQUEST_TTL,
+        }
+        return
+    end
+    if status == "fulfilled" or status == "resolved" or status == "closed" then
+        local active = requests[npcKey]
+        if active and (not requestID
+            or tostring(active.requestID) == requestID)
+        then
+            requests[npcKey] = nil
+        end
+    end
+end
+
+function Presentation.GetActiveMedicalSupplyRequest(npcID)
+    local requests = Presentation.MedicalSupplyRequests
+    local key = tostring(npcID or "")
+    local active = type(requests) == "table" and requests[key] or nil
+    if not active then return nil end
+    if (tonumber(active.expiresAt) or 0) <= currentTime() then
+        requests[key] = nil
+        return nil
+    end
+    return {
+        requestID = tostring(active.requestID or ""),
+        taskID = tostring(active.taskID or ""),
+        itemQuery = tostring(active.itemQuery or "bandage"),
+    }
 end
 
 local function playerUUID()
@@ -133,6 +178,10 @@ end
 
 function Presentation.Receive(ambientFlavor, summary, networkArgs)
     if type(ambientFlavor) ~= "table" then return false, "invalid_flavor" end
+    local presentationOverrides = type(ambientFlavor.presentationState)
+        == "table" and ambientFlavor.presentationState or {}
+    local sourceOverrides = type(ambientFlavor.source) == "table"
+        and ambientFlavor.source or {}
     local npcID = clean(
         ambientFlavor.npcID
             or networkArgs and networkArgs.npcID
@@ -162,9 +211,12 @@ function Presentation.Receive(ambientFlavor, summary, networkArgs)
         ambientFlavor.relationshipTier,
         "reserved"
     )
+    local eventType = ambientFlavor.eventType or "social_flavor"
+    local family = ambientFlavor.family or "combat_commentary"
     local active, view = activeConversationFor(npcID)
     local context = type(ambientFlavor.context) == "table"
         and ambientFlavor.context or {}
+    updateMedicalSupplyRequest(npcID, context)
     local speaker = npcIdentity(npcID)
     local player = playerAddress(npcID, currentPlayer(), {
         playerNameKnown = firstBoolean(
@@ -237,10 +289,12 @@ function Presentation.Receive(ambientFlavor, summary, networkArgs)
         eventID = eventID,
         flavorID = ambientFlavor.flavorID
             or "social.witnessed_player_kill",
-        family = ambientFlavor.family or "combat_commentary",
+        family = family,
         priority = tonumber(ambientFlavor.priority) or 35,
         llmPriority = tonumber(ambientFlavor.llmPriority) or 90,
         weight = tonumber(ambientFlavor.weight) or 1,
+        text = type(ambientFlavor.text) == "string"
+            and ambientFlavor.text or nil,
         speakerID = npcID,
         -- Nameplates and history retain the NPC's full display identity.
         speakerName = speaker.fullName,
@@ -259,18 +313,39 @@ function Presentation.Receive(ambientFlavor, summary, networkArgs)
         llmGraceMs = tonumber(ambientFlavor.llmGraceMs) or 2500,
         cooldowns = ambientFlavor.cooldowns,
         presentationState = {
-            nameplate = not active,
-            conversationUI = active,
-            interrupt = false,
-            tts = true,
+            nameplate = firstBoolean(
+                presentationOverrides.nameplate,
+                not active
+            ),
+            conversationUI = firstBoolean(
+                presentationOverrides.conversationUI,
+                active
+            ),
+            interrupt = firstBoolean(
+                presentationOverrides.interrupt,
+                false
+            ),
+            tts = firstBoolean(presentationOverrides.tts, true),
         },
         source = {
-            kind = "social_flavor",
-            eventType = ambientFlavor.eventType or "social_flavor",
+            kind = clean(sourceOverrides.kind, "social_flavor"),
+            channel = clean(sourceOverrides.channel, nil),
+            eventType = clean(sourceOverrides.eventType, eventType),
             relationshipState = relationshipState,
             socialRole = role,
+            contextEligible = sourceOverrides.contextEligible,
         },
+        ttlMs = ambientFlavor.ttlMs,
+        holdMs = ambientFlavor.holdMs,
     })
+    if accepted == true and ambientFlavor.pumpImmediately == true
+        and type(Client.Pump) == "function"
+    then
+        local delivered, deliveryReason = Client.Pump(currentTime())
+        if delivered == true then
+            reason = deliveryReason or reason
+        end
+    end
     log("received", "event=" .. eventID .. " npc=" .. npcID
         .. " role=" .. role .. " accepted=" .. tostring(accepted == true)
         .. " reason=" .. tostring(reason or ""))
@@ -509,6 +584,7 @@ local function onDelivered(payload)
     local item = payload.item or {}
     local message = payload.message
     local source = item.source or {}
+    local context = type(item.context) == "table" and item.context or {}
     local npcID = tostring(item.speakerID or "")
     -- Interaction speech has its own exchange/diary owner.  The ambient
     -- listener must not reinterpret player lines or command replies as new
@@ -520,17 +596,23 @@ local function onDelivered(payload)
     end
     if npcID == "" or type(message) ~= "table" then return end
     Diary.Append(npcID, {
-        kind = "social_flavor",
+        kind = source.eventType == "corpse_reaction"
+            and "npc_corpse_reaction" or "social_flavor",
         source = "social_flavor",
-        eventType = item.context and item.context.eventType
-            or item.family,
+        eventType = context.eventType or source.eventType or item.family,
         eventID = item.eventID,
         npcFlavorID = item.flavorID,
         npcText = payload.text or message.text,
-        npcType = item.context and (item.context.socialRole
-            or item.context.npcType),
-        relationshipState = item.context and item.context.relationshipState,
-        relationshipTier = item.context and item.context.relationshipTier,
+        npcType = context.socialRole or context.npcType,
+        relationshipState = context.relationshipState,
+        relationshipTier = context.relationshipTier,
+        memoryID = context.memoryID,
+        memoryType = context.memoryType,
+        interactionType = context.interactionType,
+        corpseNPCID = context.corpseNPCID,
+        corpseName = context.corpseName,
+        factionName = context.factionName,
+        relationshipKind = context.relationshipKind,
         priority = item.priority,
         mergedCount = item.mergedCount,
         llm = payload.llm == true,

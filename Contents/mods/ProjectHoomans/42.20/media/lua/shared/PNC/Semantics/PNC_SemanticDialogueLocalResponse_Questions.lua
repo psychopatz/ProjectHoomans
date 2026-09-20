@@ -95,6 +95,104 @@ local function resolveWellbeing(ir, state, context)
     )
 end
 
+local function isCommittedRelation(value)
+    if type(value) ~= "string" then return false end
+    value = string.lower(value)
+    value = string.gsub(value, "[%s%-]", "_")
+    value = string.gsub(value, "[^%w_]", "")
+    return value == "lover" or value == "partner" or value == "spouse"
+end
+
+local function hasKnownCurrentPartner(context)
+    context = type(context) == "table" and context or {}
+    local relationship = type(context.relationship) == "table"
+        and context.relationship or {}
+    local npcRecord = type(context.npcRecord) == "table"
+        and context.npcRecord or {}
+    local npcGeneration = type(npcRecord.generation) == "table"
+        and npcRecord.generation or {}
+    local entry = type(context.entry) == "table" and context.entry or {}
+    local entryRecord = type(entry.record) == "table" and entry.record or {}
+    local entryGeneration = type(entryRecord.generation) == "table"
+        and entryRecord.generation or {}
+
+    return isCommittedRelation(context.relationshipState)
+        or isCommittedRelation(context.conversationRelationshipID)
+        or isCommittedRelation(context.relationshipKind)
+        or isCommittedRelation(context.conversationRelationship)
+        or isCommittedRelation(relationship.category)
+        or isCommittedRelation(relationship.status)
+        or isCommittedRelation(relationship.relationshipKind)
+        or isCommittedRelation(relationship.relationshipState)
+        or isCommittedRelation(npcGeneration.relationshipKind)
+        or isCommittedRelation(entryGeneration.relationshipKind)
+end
+
+local function followsRecentCompliment(context)
+    local recentTurns = type(Internal.RecentTurns) == "function"
+        and Internal.RecentTurns(context, 2) or {}
+    if type(recentTurns) ~= "table" or #recentTurns < 2 then
+        return false
+    end
+
+    local npcReply = recentTurns[1]
+    local playerCompliment = recentTurns[2]
+    return type(npcReply) == "table"
+        and npcReply.speaker == "npc"
+        and npcReply.speechAct == "COMPLIMENT_RESPONSE"
+        and type(playerCompliment) == "table"
+        and playerCompliment.speaker == "player"
+        and (playerCompliment.intent == "COMPLIMENT"
+            or playerCompliment.speechAct == "COMPLIMENT")
+end
+
+local function resolveRelationshipStatus(ir, state, context)
+    local followsCompliment = followsRecentCompliment(context)
+    if hasKnownCurrentPartner(context) then
+        if followsCompliment then
+            local response = catalogResponse(
+                "semantic.question.relationship_status.committed_after_compliment",
+                ir,
+                state,
+                context
+            )
+            if response then return response end
+        end
+        return catalogResponse(
+            "semantic.question.relationship_status.committed",
+            ir,
+            state,
+            context
+        ) or {
+            templateID = "semantic.question.relationship_status.committed",
+            fallback = "I thought we were already together.",
+        }
+    end
+
+    if followsCompliment then
+        local response = catalogResponse(
+            "semantic.question.relationship_status.unknown_after_compliment",
+            ir,
+            state,
+            context
+        )
+        if response then return response end
+    end
+
+    -- A missing partner fact is not evidence that the NPC is single. Keep the
+    -- deterministic answer open-ended until the character has an authored or
+    -- authoritative relationship status.
+    return catalogResponse(
+        "semantic.question.relationship_status.unknown",
+        ir,
+        state,
+        context
+    ) or {
+        templateID = "semantic.question.relationship_status.uncertain",
+        fallback = "I haven't really thought about dating. Right now, I'm focused on surviving.",
+    }
+end
+
 local function resolveLocationOrSeen(ir)
     local fact = factFor(ir)
     if fact and fact.status == "known" then
@@ -153,6 +251,9 @@ return function(ir, state, context)
     if ir.subject == "DATE" then return resolveDate(world) end
     if ir.subject == "WEATHER" then return resolveWeather(world) end
     if ir.subject == "IDENTITY" then return resolveIdentityQuestion(context) end
+    if ir.subject == "RELATIONSHIP_STATUS" then
+        return resolveRelationshipStatus(ir, state, context)
+    end
     if ir.subject == "ACTIVITY" then
         return resolveActivity(ir, state, context)
     end

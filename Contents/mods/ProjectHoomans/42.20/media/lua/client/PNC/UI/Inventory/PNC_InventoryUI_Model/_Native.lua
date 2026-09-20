@@ -131,7 +131,9 @@ function Model.GetPlayerItemTransferBlockReason(item, player)
     return nil
 end
 
-local function playerItemRow(item, containerKey, player, includeGiftScore)
+local function playerItemRow(
+    item, containerKey, player, includeGiftOnly, giftPreferences
+)
     local fullType = tostring(safeCall(item, "getFullType", ""))
     local metadata = probe(fullType)
     local customName = safeCall(item, "getName", nil, player)
@@ -139,12 +141,9 @@ local function playerItemRow(item, containerKey, player, includeGiftScore)
         customName = safeCall(item, "getName", nil)
     end
     local displayName = tostring(customName or metadata.name or fullType)
-    local giftScore
     local giftValid
-    if includeGiftScore == true then
-        giftScore = PNC.Gifts and PNC.Gifts.GetItemScore
-            and PNC.Gifts.GetItemScore(fullType, item) or nil
-        giftValid = giftScore and PNC.Gifts.IsValidItemType
+    if includeGiftOnly == true then
+        giftValid = PNC.Gifts and PNC.Gifts.IsValidItemType
             and PNC.Gifts.IsValidItemType(fullType, item) == true or false
     end
     local restrictionReason = Model.GetPlayerItemTransferBlockReason(
@@ -164,9 +163,9 @@ local function playerItemRow(item, containerKey, player, includeGiftScore)
         conditionMax = metadata.conditionMax,
         equipped = isPlayerItemEquipped(player, item),
         favorite = safeCall(item, "isFavorite", false) == true,
+        giftPreference = giftPreferences and giftPreferences[fullType] or nil,
         restricted = restrictionReason ~= nil,
         restrictionReason = restrictionReason,
-        giftScore = giftScore,
         giftValid = giftValid,
     }
     -- Grouping must ignore quantity/weight, while the tooltip cache still

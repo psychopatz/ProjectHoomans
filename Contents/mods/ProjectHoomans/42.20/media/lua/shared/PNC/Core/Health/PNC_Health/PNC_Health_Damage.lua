@@ -34,7 +34,7 @@ end
 
 local function rememberDamageSource(record, damageEvent, now)
     local tactics
-    Health.MarkRecentDamage(record, now)
+    Health.MarkRecentDamage(record, now, damageEvent)
     if PNC.Perception and PNC.Perception.RememberAttacker then
         PNC.Perception.RememberAttacker(record, damageEvent, now)
     end
@@ -84,7 +84,8 @@ local function finishIncapacitated(
     Health.Kill(
         record,
         zombie,
-        damageEvent and damageEvent.type or "incapacitated_finish"
+        damageEvent and damageEvent.type or "incapacitated_finish",
+        damageEvent
     )
     return true
 end

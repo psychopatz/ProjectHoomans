@@ -22,6 +22,8 @@ local deepCopy = Internal.deepCopy
 local safeString = Internal.safeString
 local SCHEMA = Internal.SCHEMA
 local MAX_MANUAL_LENGTH = Internal.MAX_MANUAL_LENGTH
+local MAX_GIFT_PREFERENCES = 256
+Internal.MAX_GIFT_PREFERENCES = MAX_GIFT_PREFERENCES
 
 local function normalizeDiscovered(raw, descriptorID)
     local value = type(raw) == "table" and raw or {}
@@ -63,11 +65,60 @@ local function normalizeEvidence(raw)
     }
 end
 
+local function normalizeGiftPreference(itemType, raw)
+    local source = type(raw) == "table" and raw or {}
+    local fullType = safeString(itemType, 160)
+    local disposition = tostring(source.disposition or "")
+    local sourceType = safeString(source.sourceType, 64)
+    if not fullType or #fullType > 160
+        or not string.match(fullType, "^[A-Za-z0-9_.:%-]+$")
+    then
+        return nil
+    end
+    if disposition ~= "like" and disposition ~= "dislike"
+        and disposition ~= "neutral"
+    then
+        return nil
+    end
+    if sourceType ~= "gift_reaction"
+        and sourceType ~= "direct_disclosure"
+    then
+        return nil
+    end
+    return {
+        fullType = fullType,
+        disposition = disposition,
+        sourceType = sourceType,
+        createdAt = now(source.createdAt),
+        sourceEventID = safeString(source.sourceEventID, 128),
+    }
+end
+
+local function normalizeGiftPreferences(raw)
+    local entries = {}
+    local output = {}
+    for itemType, preference in pairs(type(raw) == "table" and raw or {}) do
+        local normalized = normalizeGiftPreference(itemType, preference)
+        if normalized then entries[#entries + 1] = normalized end
+    end
+    table.sort(entries, function(left, right)
+        if left.createdAt ~= right.createdAt then
+            return left.createdAt > right.createdAt
+        end
+        return left.fullType < right.fullType
+    end)
+    for index = 1, math.min(#entries, MAX_GIFT_PREFERENCES) do
+        output[entries[index].fullType] = entries[index]
+    end
+    return output
+end
+
 local function normalizeNote(raw, npcID)
     local source = type(raw) == "table" and raw or {}
     local note = {
         npcID = npcID, firstMetAt = now(source.firstMetAt), lastInteractionAt = now(source.lastInteractionAt),
         discovered = {}, evidence = {}, journalEntries = {}, manualNotes = {},
+        giftPreferences = normalizeGiftPreferences(source.giftPreferences),
         revision = math.max(0, math.floor(tonumber(source.revision) or 0)),
     }
     for descriptorID, fact in pairs(type(source.discovered) == "table" and source.discovered or {}) do
@@ -129,6 +180,7 @@ end
 
 Internal.normalizeDiscovered = normalizeDiscovered
 Internal.normalizeEvidence = normalizeEvidence
+Internal.normalizeGiftPreference = normalizeGiftPreference
 Internal.normalizeNote = normalizeNote
 
 return Knowledge

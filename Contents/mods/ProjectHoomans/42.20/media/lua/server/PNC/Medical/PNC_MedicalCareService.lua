@@ -274,9 +274,33 @@ function Service.ResolveForPatient(patientKind, patientId, reason)
     return Service.Complete(task.id, reason or "patient_resolved")
 end
 
+local function pendingSupplyRequest(task)
+    if not task or task.status ~= Status.WAITING_FOR_SUPPLY
+        or not task.supplyRequestId
+    then
+        return nil
+    end
+    return copy(task)
+end
+
+local function notifySupplyRequest(task, state)
+    local executor = PNC.MedicalCareExecutor
+    if not task or not executor
+        or type(executor.NotifyBandageSupportState) ~= "function"
+    then
+        return false
+    end
+    local ok, result = pcall(
+        executor.NotifyBandageSupportState, task, state)
+    return ok and result == true
+end
+
 function Service.SetPhase(id, phase, options)
     local task = Repository.Get(id)
     local at = now()
+    local enteringSupplyWait
+    local previousSupplyRequest
+    local supplyResolution
     options = type(options) == "table" and options or {}
     phase = tostring(phase or "")
     if not task then return false, "MEDICAL_TASK_NOT_FOUND" end
@@ -286,10 +310,27 @@ function Service.SetPhase(id, phase, options)
     if Service.TERMINAL[task.status] then
         return false, "MEDICAL_TASK_TERMINAL"
     end
+    previousSupplyRequest = pendingSupplyRequest(task)
+    enteringSupplyWait = phase == Status.WAITING_FOR_SUPPLY
+        and task.status ~= Status.WAITING_FOR_SUPPLY
     task.status = phase
     task.phase = phase
     if options.actorId ~= nil then task.actorId = tostring(options.actorId) end
     if options.clearActor == true then task.actorId = nil end
+    if phase == Status.WAITING_FOR_SUPPLY then
+        if options.supplyRequesterId ~= nil then
+            task.supplyRequesterId = tostring(options.supplyRequesterId)
+        end
+        if options.supplyRequestId ~= nil then
+            task.supplyRequestId = tostring(options.supplyRequestId)
+        elseif enteringSupplyWait or task.supplyRequestId == nil then
+            task.supplyRequestId = "medical-bandage:" .. tostring(task.id)
+                .. ":" .. tostring((tonumber(task.revision) or 0) + 1)
+        end
+    else
+        task.supplyRequesterId = nil
+        task.supplyRequestId = nil
+    end
     if options.reservationId ~= nil then
         task.reservationId = tostring(options.reservationId)
     end
@@ -302,6 +343,17 @@ function Service.SetPhase(id, phase, options)
     task.revision = task.revision + 1
     Repository.Put(task)
     emit("MEDICAL_CARE_PHASE_CHANGED", task, "phase_changed")
+    if previousSupplyRequest and phase ~= Status.WAITING_FOR_SUPPLY then
+        supplyResolution = options.supplyResolution
+        if supplyResolution ~= "fulfilled" and supplyResolution ~= "resolved" then
+            local fulfilledPhase = phase == Status.CLAIMED
+                or phase == Status.TRAVELING
+                or phase == Status.AT_PATIENT
+                or phase == Status.TREATING
+            supplyResolution = fulfilledPhase and "fulfilled" or "resolved"
+        end
+        notifySupplyRequest(previousSupplyRequest, supplyResolution)
+    end
     return true, copy(task)
 end
 
@@ -322,11 +374,15 @@ end
 
 function Service.Complete(id, reason)
     local task = Repository.Get(id)
+    local supplyRequest
     if not task then return false, "MEDICAL_TASK_NOT_FOUND" end
     if Service.TERMINAL[task.status] then return false, "MEDICAL_TASK_TERMINAL" end
+    supplyRequest = pendingSupplyRequest(task)
     task.status = Status.COMPLETED
     task.phase = Status.COMPLETED
     task.actorId = nil
+    task.supplyRequesterId = nil
+    task.supplyRequestId = nil
     task.reservationId = nil
     task.updatedAt = now()
     task.lastProgressAt = task.updatedAt
@@ -334,16 +390,21 @@ function Service.Complete(id, reason)
     task.revision = task.revision + 1
     Repository.Put(task)
     emit("MEDICAL_CARE_COMPLETED", task, reason or "completed")
+    notifySupplyRequest(supplyRequest, "resolved")
     return true, copy(task)
 end
 
 function Service.Cancel(id, reason)
     local task = Repository.Get(id)
+    local supplyRequest
     if not task then return false, "MEDICAL_TASK_NOT_FOUND" end
     if Service.TERMINAL[task.status] then return false, "MEDICAL_TASK_TERMINAL" end
+    supplyRequest = pendingSupplyRequest(task)
     task.status = Status.CANCELLED
     task.phase = Status.CANCELLED
     task.actorId = nil
+    task.supplyRequesterId = nil
+    task.supplyRequestId = nil
     task.reservationId = nil
     task.cancellationReason = tostring(reason or "cancelled")
     task.updatedAt = now()
@@ -351,17 +412,22 @@ function Service.Cancel(id, reason)
     task.revision = task.revision + 1
     Repository.Put(task)
     emit("MEDICAL_CARE_CANCELLED", task, task.cancellationReason)
+    notifySupplyRequest(supplyRequest, "resolved")
     return true, copy(task)
 end
 
 function Service.Requeue(id, reason)
     local task = Repository.Get(id)
+    local supplyRequest
     if not task or Service.TERMINAL[task.status] then
         return false, "MEDICAL_TASK_NOT_REQUEUEABLE"
     end
+    supplyRequest = pendingSupplyRequest(task)
     task.status = Status.WAITING_FOR_DOCTOR
     task.phase = Status.WAITING_FOR_DOCTOR
     task.actorId = nil
+    task.supplyRequesterId = nil
+    task.supplyRequestId = nil
     task.reservationId = nil
     task.blockedReason = reason and tostring(reason) or nil
     task.retryCount = task.retryCount + 1
@@ -371,6 +437,7 @@ function Service.Requeue(id, reason)
     task.revision = task.revision + 1
     Repository.Put(task)
     emit("MEDICAL_CARE_REQUEST_CHANGED", task, "requeued")
+    notifySupplyRequest(supplyRequest, "resolved")
     return true, copy(task)
 end
 

@@ -106,6 +106,10 @@ function Composer.ReceiveGiftResult(args)
         -- client before the lifecycle spoke was installed.
         pending = session.semanticGiftRequests[requestID]
     end
+    local group = view.groupConversation
+    local responseSession = group and group.closed ~= true
+        and type(group.PrimarySession) == "function"
+        and group:PrimarySession() or session
     local semanticAuto = pending and pending.mode == "auto"
     if session and requestID ~= "" and GiftLifecycle
         and type(GiftLifecycle.MarkHandled) == "function"
@@ -115,6 +119,14 @@ function Composer.ReceiveGiftResult(args)
         session.semanticGiftRequests[requestID] = nil
     end
     local state = PNC.Network and PNC.Network.ClientState
+    local clientInternal = PNC.Client and PNC.Client.Internal
+    if args.knowledgeSnapshot and clientInternal
+        and clientInternal.ApplyNPCKnowledgeSnapshot
+    then
+        clientInternal.ApplyNPCKnowledgeSnapshot(
+            args.knowledgeSnapshot, "gift_reaction"
+        )
+    end
     if args.relationshipDelta and state then
         state.lastConversationDelta = {
             npcID = args.npcId,
@@ -133,8 +145,8 @@ function Composer.ReceiveGiftResult(args)
             if rootContext then rootContext.giftConversationActive = nil end
         end
         local failure = giftFailurePayload(args.reason)
-        if session and type(session.append) == "function" then
-            session:append("npc", failure, {
+        if responseSession and type(responseSession.append) == "function" then
+            responseSession:append("npc", failure, {
                 source = {
                     kind = "semantic",
                     channel = "gift_result",
@@ -211,7 +223,7 @@ function Composer.ReceiveGiftResult(args)
     if PNC.InventoryWindow and PNC.InventoryWindow.Close then
         PNC.InventoryWindow.Close()
     end
-    if view.session and view.session.append then
+    if responseSession and responseSession.append then
         local requiredKeys = {}
         for _, key in ipairs(GIFT_OFFER_KEYS) do
             requiredKeys[#requiredKeys + 1] = key
@@ -222,14 +234,14 @@ function Composer.ReceiveGiftResult(args)
         -- explicit semantic gift already has its original line in the log;
         -- appending the synthetic selector line would duplicate it.
         if not semanticAuto then
-            view.session:append("player", dialoguePayload(
+            responseSession:append("player", dialoguePayload(
                 giftSource,
                 offerKey,
                 context,
                 offerArgs
             ))
         end
-        view.session:append("npc", giftReplyPayload(
+        responseSession:append("npc", giftReplyPayload(
             args.giftEffect,
             giftSource,
             giftReplyKey,
@@ -271,12 +283,12 @@ function Composer.ReceiveGiftResult(args)
     end
     -- The authored gift node is already the next node of the conversation.
     -- Closing the modal reveals it; do not reroll or append a second response.
-    if view.session and view.session.currentNodeID ~= "block:gift"
-        and #view.session.queue == 0
-        and view.session.finishPending
+    if responseSession and responseSession.currentNodeID ~= "block:gift"
+        and #responseSession.queue == 0
+        and responseSession.finishPending
     then
-        view.session.pendingNext = "block:gift"
-        view.session:finishPending()
+        responseSession.pendingNext = "block:gift"
+        responseSession:finishPending()
     end
     return true
 end

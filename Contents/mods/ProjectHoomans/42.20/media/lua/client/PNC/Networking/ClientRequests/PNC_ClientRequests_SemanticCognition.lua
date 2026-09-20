@@ -76,6 +76,9 @@ function Client.RequestSemanticCognition(npcID, options)
         conversationToken = token,
     }
     ClientState.pendingSemanticCognition[npcID] = args
+    ClientState.semanticMemoryGossip =
+        ClientState.semanticMemoryGossip or {}
+    ClientState.semanticMemoryGossip[npcID] = nil
     player = Internal.GetPlayer()
     accepted, reason = dispatchSemanticCognition(player, args)
     if accepted ~= true then

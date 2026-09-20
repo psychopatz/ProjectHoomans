@@ -4,6 +4,31 @@ PNC = PNC or {}
 PNC.Semantics = PNC.Semantics or {}
 
 local InventoryResponses = {}
+local QUERY_LABELS = {
+    ANY_ITEM = "items",
+    SEAFOOD = "seafood",
+    FOOD = "food",
+    WATER = "water",
+    BEVERAGE = "beverage",
+    MEDICINE = "medical supply",
+    BANDAGE = "bandage",
+    WEAPON = "weapon",
+    FIREARM = "firearm",
+    RIFLE = "rifle",
+    HANDGUN = "handgun",
+    SHOTGUN = "shotgun",
+    AMMUNITION = "ammunition",
+    TOOL = "tool",
+    CONTAINER = "container",
+    CLOTHING = "clothing",
+    RESOURCE = "resource",
+    LITERATURE = "book",
+    ELECTRONICS = "electronic",
+    BUILDING = "building",
+    FRUIT = "fruit",
+    VEGETABLE = "vegetable",
+    MEAT = "meat",
+}
 
 local function copyValue(value, depth)
     if type(value) ~= "table" then return value end
@@ -24,12 +49,11 @@ local function queryLabel(query)
     query = type(query) == "table" and query or {}
     local concept = string.upper(tostring(query.concept
         or query.category or ""))
-    if concept == "SEAFOOD" then return "seafood" end
-    if concept == "FOOD" then return "food" end
-    if concept == "WATER" then return "water" end
-    if concept == "MEDICINE" then return "medicine" end
+    if QUERY_LABELS[concept] then return QUERY_LABELS[concept] end
     local value = tostring(query.text or query.category
         or query.concept or "that")
+    value = string.lower(value)
+    value = string.gsub(value, "_", " ")
     return value ~= "" and value or "that"
 end
 
@@ -47,6 +71,7 @@ function InventoryResponses.ForResult(payload, pending)
     payload = type(payload) == "table" and payload or {}
     local query = payload.query
         or pending and pending.query or {}
+    query = type(query) == "table" and query or {}
     local label = queryLabel(query)
     local status = tostring(payload.status or "failed")
     if status == "pending" then
@@ -75,8 +100,17 @@ function InventoryResponses.ForResult(payload, pending)
                 .. tostring(more) .. " more"
         end
         local count = tonumber(payload.totalCount) or 0
-        local text = "I have " .. tostring(count) .. " " .. label
-            .. (count == 1 and " item" or " items")
+        local isAllItems = query.listAll == true
+            or string.upper(tostring(query.concept or query.category or ""))
+                == "ANY_ITEM"
+        local text
+        if isAllItems then
+            text = "I have " .. tostring(count)
+                .. (count == 1 and " item" or " items")
+        else
+            text = "I have " .. tostring(count) .. " " .. label
+                .. (count == 1 and " item" or " items")
+        end
         if suffix ~= "" then text = text .. ": " .. suffix end
         return {
             key = "semantic.inventory.found",

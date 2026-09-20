@@ -151,7 +151,7 @@ local function createEngineCorpse(zombie)
     return corpse
 end
 
-function Lifecycle.CreateVanillaCorpse(record, zombie, reason)
+function Lifecycle.CreateVanillaCorpse(record, zombie, reason, deathContext)
     local x
     local y
     local z
@@ -177,7 +177,17 @@ function Lifecycle.CreateVanillaCorpse(record, zombie, reason)
         -- the transient zombie shell instead of converting a second corpse.
         token = record.corpse and record.corpse.token
             or record.corpseToken or Core.GenerateID("corpse")
-        Internal.ensureCorpseIdentityCard(record, existing)
+        local _, _, _, identityChanged =
+            Internal.ensureCorpseIdentityCard(record, existing)
+        local dogTagChanged = false
+        if Internal.ensureCorpseFactionDogTag then
+            local _, _, _, changed =
+                Internal.ensureCorpseFactionDogTag(record, existing)
+            dogTagChanged = changed == true
+        end
+        if identityChanged or dogTagChanged then
+            Internal.transmitCorpseState(existing)
+        end
         Internal.stampCorpse(record, existing, token)
         Internal.clearBodyCombat(zombie)
         Internal.removeZombie(zombie)
@@ -185,6 +195,15 @@ function Lifecycle.CreateVanillaCorpse(record, zombie, reason)
         Internal.detachLiveBody(record, reason or "death")
         Internal.mark(record, "corpse", "inert_loaded", reason or "death")
         runtime.corpseState = "inert_loaded"
+        if PNC.CorpseAwareness
+            and PNC.CorpseAwareness.ObserveCorpse
+        then
+            PNC.CorpseAwareness.ObserveCorpse(
+                record,
+                existing,
+                deathContext
+            )
+        end
         return true, existing
     end
     if runtime.corpseState == "finalizing"
@@ -195,7 +214,8 @@ function Lifecycle.CreateVanillaCorpse(record, zombie, reason)
     x = zombie.getX and zombie:getX() or record.x
     y = zombie.getY and zombie:getY() or record.y
     z = zombie.getZ and zombie:getZ() or record.z
-    token = record.corpse and record.corpse.token or Core.GenerateID("corpse")
+    token = record.corpse and record.corpse.token
+        or record.corpseToken or Core.GenerateID("corpse")
     createdWorldHour = record.corpse and tonumber(record.corpse.createdWorldHour) or Internal.worldHour()
     record.x = x
     record.y = y
@@ -239,10 +259,22 @@ function Lifecycle.CreateVanillaCorpse(record, zombie, reason)
         -- Guarantee the stable quest identity on the final vanilla-owned
         -- container before the one complete-corpse MP sync.
         Internal.ensureCorpseIdentityCard(record, corpse)
+        if Internal.ensureCorpseFactionDogTag then
+            Internal.ensureCorpseFactionDogTag(record, corpse)
+        end
         Internal.applyCorpseWornItems(corpse, wornEntries)
         Internal.stampCorpse(record, corpse, token)
         Internal.mark(record, "corpse", "inert_loaded", reason or "death")
         Internal.announceCorpse(corpse)
+        if PNC.CorpseAwareness
+            and PNC.CorpseAwareness.ObserveCorpse
+        then
+            PNC.CorpseAwareness.ObserveCorpse(
+                record,
+                corpse,
+                deathContext
+            )
+        end
         runtime.corpseState = "inert_loaded"
     else
         Internal.mark(record, "corpse", "missing", reason or "death")

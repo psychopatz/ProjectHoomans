@@ -9,6 +9,27 @@ local Constants = PNC.FactionConstants
 local Types = PNC.FactionTypes
 local Archetypes = PNC.FactionArchetypes
 local EntityRef = PNC.EntityRef
+
+local function refreshFactionDogTag(record, faction)
+    local inventory = PNC.Inventory
+    local _, changed
+    if not record or not inventory
+        or type(inventory.RefreshFactionDogTag) ~= "function"
+    then
+        return false
+    end
+    _, changed = inventory.RefreshFactionDogTag(record, faction)
+    return changed == true
+end
+
+local function broadcastFactionDogTag(record, reason)
+    if record and PNC.Network
+        and type(PNC.Network.BroadcastRecord) == "function"
+    then
+        PNC.Network.BroadcastRecord(record, reason)
+    end
+end
+
 function Factions.AddNPC(factionID, npcID, options)
     local faction
     local record
@@ -17,6 +38,8 @@ function Factions.AddNPC(factionID, npcID, options)
     local rank
     local membershipStatus
     local at
+    local dogTagChanged
+    local behaviorChanged
     if not Internal.authority() then return false, "not_authority" end
     Factions.EnsureLoaded()
     options = type(options) == "table" and options or {}
@@ -64,16 +87,26 @@ function Factions.AddNPC(factionID, npcID, options)
     if Types.AreEqual(affiliation, nextAffiliation)
         and faction.memberIDs[npcID] == true
     then
+        if refreshFactionDogTag(record, faction) then
+            broadcastFactionDogTag(record, "faction_dogtag_added")
+        end
         return false, "unchanged"
     end
     faction.memberIDs[npcID] = true
     Internal.commitAffiliation(record, nextAffiliation)
+    dogTagChanged = refreshFactionDogTag(record, faction)
     Internal.touchFaction(faction)
     Internal.touchRegistry()
     if PNC.FactionBehavior
         and PNC.FactionBehavior.ApplyNPC
     then
-        PNC.FactionBehavior.ApplyNPC(record, "faction_joined")
+        behaviorChanged = PNC.FactionBehavior.ApplyNPC(
+            record,
+            "faction_joined"
+        )
+    end
+    if dogTagChanged and behaviorChanged ~= true then
+        broadcastFactionDogTag(record, "faction_dogtag_added")
     end
     if PNC.ProvisionScheduler then
         PNC.ProvisionScheduler.MarkAllDirty(record)
@@ -164,6 +197,8 @@ function Factions.TransferNPC(npcID, destinationFactionID, options)
     local membershipStatus
     local at
     local leaveReason
+    local dogTagChanged
+    local behaviorChanged
     if not Internal.authority() then return false, "not_authority" end
     Factions.EnsureLoaded()
     options = type(options) == "table" and options or {}
@@ -224,15 +259,19 @@ function Factions.TransferNPC(npcID, destinationFactionID, options)
     }, destination)
     destination.memberIDs[npcID] = true
     Internal.commitAffiliation(record, nextAffiliation)
+    dogTagChanged = refreshFactionDogTag(record, destination)
     Internal.touchFaction(destination)
     Internal.touchRegistry()
     if PNC.FactionBehavior
         and PNC.FactionBehavior.ApplyNPC
     then
-        PNC.FactionBehavior.ApplyNPC(
+        behaviorChanged = PNC.FactionBehavior.ApplyNPC(
             record,
             "faction_transferred"
         )
+    end
+    if dogTagChanged and behaviorChanged ~= true then
+        broadcastFactionDogTag(record, "faction_dogtag_transferred")
     end
     if source and PNC.FactionLeadership
         and PNC.FactionLeadership.OnMemberDeparture

@@ -43,27 +43,38 @@ function Context:RecordTurn(ir, options)
     local sequence = self.sequence
     local timestamp = options.timestamp or Internal.TimestampValue(options)
     local topic = topicFor(ir, options)
-    if topic then self:SetTopic(topic) end
-    self.lastIntent = ir.intent or ir.speechAct
-    self.lastAction = ir.action
-    self.lastSpeaker = options.speaker or ir.speaker
+    local responseOnly = options.responseOnly == true
+    local speaker = options.speaker or ir.speaker
+    if not responseOnly then
+        if topic then self:SetTopic(topic) end
+        self.lastIntent = ir.intent or ir.speechAct
+        self.lastAction = ir.action
+        self.lastSpeaker = speaker
+    elseif speaker ~= nil then
+        self.lastSpeaker = speaker
+    end
 
     -- Identity questions create a bounded, conversation-local obligation.
     -- The next turn can answer it with a self-name claim; any other turn is
     -- observable as an evasion before the state is advanced again.
-    if ir.intent == "QUESTION" and ir.subject == "IDENTITY" then
-        self.pendingIdentityExchange = {
-            kind = "PLAYER_NAME",
-            requestedAt = sequence,
-        }
-    elseif self.pendingIdentityExchange then
-        self.pendingIdentityExchange = nil
+    if not responseOnly then
+        if ir.intent == "QUESTION" and ir.subject == "IDENTITY" then
+            self.pendingIdentityExchange = {
+                kind = "PLAYER_NAME",
+                requestedAt = sequence,
+            }
+        elseif self.pendingIdentityExchange then
+            self.pendingIdentityExchange = nil
+        end
     end
 
     local event = {
         sequence = sequence,
         timestamp = timestamp,
-        speaker = self.lastSpeaker,
+        speaker = speaker or self.lastSpeaker,
+        speakerID = Internal.TextValue(options.speakerID),
+        source = Internal.TextValue(options.source),
+        branch = Internal.TextValue(options.branch),
         intent = ir.intent,
         speechAct = ir.speechAct,
         action = ir.action,
@@ -120,6 +131,20 @@ function Context:RecordTurn(ir, options)
     self.turns[#self.turns + 1] = event
     while #self.turns > self.maxTurns do table.remove(self.turns, 1) end
     return true, Internal.CopyValue(event)
+end
+
+function Context:RecordNPCResponse(ir, options)
+    options = type(options) == "table" and options or {}
+    local recordOptions = {}
+    local key
+    local value
+    for key, value in pairs(options) do
+        recordOptions[key] = value
+    end
+    recordOptions.responseOnly = true
+    recordOptions.speaker = recordOptions.speaker or "npc"
+    recordOptions.source = recordOptions.source or "npc_response"
+    return self:RecordTurn(ir, recordOptions)
 end
 
 Context.Record = Context.RecordTurn

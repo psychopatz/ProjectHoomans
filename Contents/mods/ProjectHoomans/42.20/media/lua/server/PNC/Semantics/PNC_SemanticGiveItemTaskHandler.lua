@@ -1,4 +1,4 @@
--- Compose an inventory-aware give request into the shared ordered plan.
+-- Compose inventory-aware give/fetch requests into the shared ordered plan.
 -- This module chooses steps only; providers own selection, movement, and the
 -- authoritative inventory mutation boundary.
 if PsychopatzCore and PsychopatzCore.RuntimeRole
@@ -19,6 +19,97 @@ end
 
 local function normalized(value)
     return string.upper(tostring(value or ""))
+end
+
+local function containsToken(value, expected)
+    value = string.lower(tostring(value or ""))
+    for token in string.gmatch(value, "[%a%d_]+") do
+        if token == expected then return true end
+    end
+    return false
+end
+
+local function hasExplicitFetchSource(request)
+    -- This handler cannot resolve world or container inventories. Preserve
+    -- the explicit relation when parsed, and fail closed from the utterance
+    -- text if a future pattern omits its source capture.
+    if request.sourceEntity ~= nil then return true end
+    return containsToken(request.rawText, "from")
+        or containsToken(request.normalizedText, "from")
+end
+
+local function normalizedTargetPhrase(value)
+    value = string.lower(tostring(value or ""))
+    value = string.gsub(value, "[%p%s]+", " ")
+    return string.gsub(value, "^%s*(.-)%s*$", "%1")
+end
+
+local function targetText(target)
+    if type(target) ~= "table" then return target end
+    return target.text or target.value or target.name or target.label
+        or target.primary or target.concept
+end
+
+local function actorIDFor(request)
+    local actor = request and request.actor
+    if type(actor) ~= "table" then return nil end
+    return text(actor.id or actor.entityID or actor.playerID)
+end
+
+local function matchesSpeakerID(targetID, request)
+    targetID = normalizedTargetPhrase(targetID)
+    if targetID == "player" then return true end
+    local actorID = normalizedTargetPhrase(actorIDFor(request))
+    return actorID ~= "" and targetID == actorID
+end
+
+local function isSpeakerTarget(target, request)
+    if target == nil then return true end
+
+    local phrase = normalizedTargetPhrase(targetText(target))
+    local speakerPhrases = {
+        me = true,
+        myself = true,
+        player = true,
+        ["the player"] = true,
+    }
+    local kind = ""
+    local targetID
+    if type(target) == "table" then
+        kind = normalized(target.kind or target.type
+            or target.entityType or target.entity_type or target.targetKind)
+        targetID = target.id or target.entityID or target.entityId
+            or target.targetID or target.playerID
+    elseif type(target) ~= "string" and type(target) ~= "number" then
+        return false
+    end
+
+    if kind ~= "" and kind ~= "PLAYER" and kind ~= "PHRASE" then
+        return false
+    end
+    if targetID ~= nil and not matchesSpeakerID(targetID, request) then
+        return false
+    end
+    if phrase ~= "" then return speakerPhrases[phrase] == true end
+    if targetID ~= nil then return true end
+    return kind == "PLAYER"
+end
+
+local function hasUnsupportedFetchDestination(request)
+    local target = request.target
+    local destination = request.destination
+    if target ~= nil and not isSpeakerTarget(target, request) then return true end
+    if destination ~= nil
+        and not isSpeakerTarget(destination, request)
+    then
+        return true
+    end
+    if target == nil and destination == nil then
+        -- Do not default an uncaptured explicit destination to the speaker.
+        return containsToken(request.rawText, "to")
+            or containsToken(request.normalizedText, "to")
+    end
+    return false
 end
 
 local function safePart(value, fallback)
@@ -66,11 +157,13 @@ local function buildPlan(request, context)
     local npcID = npcIDFor(request, context)
     local object, objectReason = objectFor(request)
     local requestID
+    local taskAction = normalized(request.action)
+    local planAction = taskAction == "FETCH" and "fetch" or "give"
     if not npcID then return nil, "npc_required" end
     if not object then return nil, objectReason end
     requestID = requestIDFor(request, npcID)
     return {
-        planID = "semantic:give:" .. safePart(npcID)
+        planID = "semantic:" .. planAction .. ":" .. safePart(npcID)
             .. ":" .. safePart(requestID),
         npcID = npcID,
         requestID = requestID,
@@ -79,7 +172,7 @@ local function buildPlan(request, context)
         rawText = request.rawText,
         provenance = request.provenance,
         metadata = {
-            taskAction = "GIVE",
+            taskAction = taskAction,
             objectText = text(object.text or object.value),
         },
         steps = {
@@ -117,10 +210,20 @@ local function buildPlan(request, context)
 end
 
 function Handler.Validate(request, context)
+    local action = normalized(request and request.action)
     if not request or request.intent ~= "REQUEST"
-        or normalized(request.action) ~= "GIVE"
+        or (action ~= "GIVE" and action ~= "FETCH")
     then
-        return false, "give_request_invalid"
+        return false, action == "FETCH"
+            and "fetch_request_invalid" or "give_request_invalid"
+    end
+    if action == "FETCH" then
+        if hasExplicitFetchSource(request) then
+            return false, "fetch_source_unsupported"
+        end
+        if hasUnsupportedFetchDestination(request) then
+            return false, "fetch_destination_unsupported"
+        end
     end
     local _, reason = objectFor(request)
     if reason then return false, reason end
@@ -147,7 +250,9 @@ function Handler.Submit(request, context)
 end
 
 if Requests and type(Requests.RegisterHandler) == "function" then
-    Requests.RegisterHandler("GIVE", Handler)
+    for _, action in ipairs({ "GIVE", "FETCH" }) do
+        Requests.RegisterHandler(action, Handler)
+    end
 end
 
 return Handler

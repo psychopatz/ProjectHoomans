@@ -114,6 +114,8 @@ local function normalize(raw, id)
         status = status,
         phase = stringOrNil(raw.phase) or status,
         actorId = stringOrNil(raw.actorId),
+        supplyRequesterId = stringOrNil(raw.supplyRequesterId),
+        supplyRequestId = stringOrNil(raw.supplyRequestId),
         reservationId = stringOrNil(raw.reservationId),
         blockedReason = stringOrNil(raw.blockedReason),
         failureReason = stringOrNil(raw.failureReason),
@@ -130,6 +132,8 @@ local function normalize(raw, id)
     if task.id == "" then return nil end
     if Repository.TERMINAL[task.status] then
         task.actorId = nil
+        task.supplyRequesterId = nil
+        task.supplyRequestId = nil
         task.reservationId = nil
     end
     return task

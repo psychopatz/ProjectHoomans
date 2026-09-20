@@ -1,0 +1,23 @@
+-- Current-day recall topics use stable bit positions; append new topics only.
+require "PNC/Conversation/Definitions/Memory/ConversationTopics/Food/01_PNC_ConversationMemoryTopic"
+require "PNC/Conversation/Definitions/Memory/ConversationTopics/Drink/01_PNC_ConversationMemoryTopic"
+require "PNC/Conversation/Definitions/Memory/ConversationTopics/Health/01_PNC_ConversationMemoryTopic"
+require "PNC/Conversation/Definitions/Memory/ConversationTopics/Rest/01_PNC_ConversationMemoryTopic"
+require "PNC/Conversation/Definitions/Memory/ConversationTopics/Safety/01_PNC_ConversationMemoryTopic"
+require "PNC/Conversation/Definitions/Memory/ConversationTopics/Zombies/01_PNC_ConversationMemoryTopic"
+require "PNC/Conversation/Definitions/Memory/ConversationTopics/Combat/01_PNC_ConversationMemoryTopic"
+require "PNC/Conversation/Definitions/Memory/ConversationTopics/Location/01_PNC_ConversationMemoryTopic"
+require "PNC/Conversation/Definitions/Memory/ConversationTopics/Travel/01_PNC_ConversationMemoryTopic"
+require "PNC/Conversation/Definitions/Memory/ConversationTopics/Work/01_PNC_ConversationMemoryTopic"
+require "PNC/Conversation/Definitions/Memory/ConversationTopics/Supplies/01_PNC_ConversationMemoryTopic"
+require "PNC/Conversation/Definitions/Memory/ConversationTopics/Crafting/01_PNC_ConversationMemoryTopic"
+require "PNC/Conversation/Definitions/Memory/ConversationTopics/Relationships/01_PNC_ConversationMemoryTopic"
+require "PNC/Conversation/Definitions/Memory/ConversationTopics/Identity/01_PNC_ConversationMemoryTopic"
+require "PNC/Conversation/Definitions/Memory/ConversationTopics/Family/01_PNC_ConversationMemoryTopic"
+require "PNC/Conversation/Definitions/Memory/ConversationTopics/Plans/01_PNC_ConversationMemoryTopic"
+require "PNC/Conversation/Definitions/Memory/ConversationTopics/Settlement/01_PNC_ConversationMemoryTopic"
+require "PNC/Conversation/Definitions/Memory/ConversationTopics/Weather/01_PNC_ConversationMemoryTopic"
+require "PNC/Conversation/Definitions/Memory/ConversationTopics/Animals/01_PNC_ConversationMemoryTopic"
+require "PNC/Conversation/Definitions/Memory/ConversationTopics/Help/01_PNC_ConversationMemoryTopic"
+
+return true

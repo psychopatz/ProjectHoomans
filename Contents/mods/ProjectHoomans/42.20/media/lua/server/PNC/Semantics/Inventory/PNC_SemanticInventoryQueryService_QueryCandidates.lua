@@ -86,6 +86,42 @@ local function queryTags(query)
     return {}
 end
 
+local function queryCapabilities(query)
+    query = type(query) == "table" and query or {}
+    local concept = query.concept or query.category
+    if concept and Selector
+        and type(Selector.CapabilitiesForConcept) == "function"
+    then
+        local mapped = Selector.CapabilitiesForConcept(concept)
+        if mapped then return mapped end
+    end
+    local values = type(query.capabilities) == "table"
+        and query.capabilities or {}
+    local output = {}
+    for index = 1, math.min(#values, 8) do
+        output[#output + 1] = normalized(values[index])
+    end
+    return output
+end
+
+local function queryTagAlternatives(query)
+    query = type(query) == "table" and query or {}
+    local concept = query.concept or query.category
+    if concept and Selector
+        and type(Selector.TagAlternativesForConcept) == "function"
+    then
+        return Selector.TagAlternativesForConcept(concept) or {}
+    end
+    return {}
+end
+
+local function isAllItemsQuery(query)
+    query = type(query) == "table" and query or {}
+    return query.listAll == true
+        or string.upper(tostring(query.concept or query.category or ""))
+            == "ANY_ITEM"
+end
+
 local function itemLabel(item, fullType)
     local label = item and (item.customName or item.displayName)
     if not label and item and type(item.itemState) == "table" then
@@ -164,6 +200,9 @@ function Internal.FindCandidates(record, query, options)
     end
 
     local tags = queryTags(query)
+    local capabilities = queryCapabilities(query)
+    local tagAlternatives = queryTagAlternatives(query)
+    local listAll = isAllItemsQuery(query)
     local queryText = query.text
     local ids = sortedItemIDs(items)
     local limit = math.max(1, math.min(Service.MAX_ITEMS, math.floor(
@@ -179,14 +218,25 @@ function Internal.FindCandidates(record, query, options)
             local details
             local reason
             local score = 0
-            if #tags > 0 then
-                matched, reason, details = Selector.Matches(item, {
+            if listAll then
+                matched, reason = true, "all_items"
+            elseif #tags > 0 or #capabilities > 0
+                or #tagAlternatives > 0
+            then
+                local requirements = {
                     tags = tags,
-                })
+                    capabilities = capabilities,
+                    tagAlternatives = tagAlternatives,
+                }
+                matched, reason, details = Selector.Matches(item,
+                    requirements)
                 if matched then
                     score = (Selector.Internal.Score
-                        and Selector.Internal.Score(item, { tags = tags }, details)
-                        or (#tags * 20))
+                        and Selector.Internal.Score(item, requirements,
+                            details)
+                        or ((#tags + #capabilities
+                            + (tagAlternatives[1]
+                                and #tagAlternatives[1] or 0)) * 20))
                 elseif reason == "classification_unavailable"
                     or reason == "classification_failed"
                 then

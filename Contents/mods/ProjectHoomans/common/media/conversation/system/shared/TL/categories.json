@@ -58,5 +58,9 @@
     "llm.status.off": "LLM BRIDGE PATAY",
     "llm.status.open": "MAGBUKAS NG USAPAN",
     "llm.status.waiting": "NAGHIHINTAY NG SAGOT NG NPC...",
-    "llm.status.speaking": "NPC ANG Nagsasalita..."
+    "llm.status.speaking": "NPC ANG Nagsasalita...",
+    "semantic.gift.preference.like": "Gusto ko iyan.",
+    "semantic.gift.preference.dislike": "Ayaw ko niyan.",
+    "semantic.gift.preference.neutral": "Wala akong matinding kagustuhan tungkol diyan.",
+    "semantic.gift.preference.unknown": "Hindi ko alam kung anong gamit ang tinutukoy mo."
 }

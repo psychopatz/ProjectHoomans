@@ -441,6 +441,15 @@ function Group:Fanout(value, primaryResult)
         })
         return 0, "gift_primary_only"
     end
+    if decision.giftConsent then
+        audit(self, "semantic.group.gift_consent_primary_only", {
+            groupID = self.id,
+            turnID = self.activeTurn and self.activeTurn.id,
+            recipientID = decision.giftConsent.recipientID,
+            status = decision.giftConsent.status,
+        })
+        return 0, "gift_consent_primary_only"
+    end
     if decision.route == "llm_fallback" then
         audit(self, "semantic.group.fallback", {
             groupID = self.id,
@@ -570,6 +579,7 @@ function Group:Submit(value, part)
         and primaryResult.decision
         and primaryResult.decision.route ~= "llm_fallback"
         and not primaryResult.decision.giftOffer
+        and not primaryResult.decision.giftConsent
     then
         if isBroadcastCamp(self, primaryResult, value) then
             self:QueueGroupCampResponses(

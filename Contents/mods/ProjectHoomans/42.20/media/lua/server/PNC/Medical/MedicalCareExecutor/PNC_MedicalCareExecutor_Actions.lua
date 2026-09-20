@@ -76,13 +76,17 @@ local function treatmentOptions(task, state)
 end
 
 local function failForSupply(lease, task, record, body)
-    Service.SetPhase(task.id, Status.WAITING_FOR_SUPPLY, {
+    local changed = Service.SetPhase(task.id, Status.WAITING_FOR_SUPPLY, {
         clearActor = true,
         clearReservation = true,
         blockedReason = "missing_bandage",
+        supplyRequesterId = tostring(lease.npcId),
     })
     clearRuntime(record, body, "missing_bandage")
     PNC.Tasking.Commands.CancelForNPC(lease.npcId, "MEDICAL_SUPPLY_REQUIRED")
+    if changed and Executor.RequestBandageSupport then
+        Executor.RequestBandageSupport(task.id)
+    end
     return false, "waiting_for_supply"
 end
 

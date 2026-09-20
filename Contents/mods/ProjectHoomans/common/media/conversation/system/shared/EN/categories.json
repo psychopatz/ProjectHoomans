@@ -58,5 +58,9 @@
   "llm.status.off": "LLM BRIDGE OFF",
   "llm.status.open": "OPEN A CONVERSATION",
   "llm.status.waiting": "WAITING FOR NPC RESPONSE...",
-  "llm.status.speaking": "NPC IS SPEAKING..."
+  "llm.status.speaking": "NPC IS SPEAKING...",
+  "semantic.gift.preference.like": "I like that.",
+  "semantic.gift.preference.dislike": "I don't like that.",
+  "semantic.gift.preference.neutral": "I don't have a strong preference.",
+  "semantic.gift.preference.unknown": "I'm not sure which item you mean."
 }

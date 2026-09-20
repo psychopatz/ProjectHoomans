@@ -6,6 +6,27 @@ return function(dependencies)
     local isInventoryQuery = dependencies.isInventoryQuery
     local isIdentityClaim = dependencies.isIdentityClaim
     local isIdentityEvasion = dependencies.isIdentityEvasion
+    local SELF_STATE_SUBJECTS = {
+        HUNGER = true,
+        THIRST = true,
+        FATIGUE = true,
+        WELLBEING = true,
+    }
+
+    local function isSelfStateReport(ir)
+        local socialContext = ir and ir.socialContext
+        local state = ir and ir.slots and ir.slots.state
+        local subject = ir and ir.subject
+        return ir and ir.intent == "INFORM"
+            and type(socialContext) == "table"
+            and socialContext.selfDirected == true
+            and socialContext.target == "SELF"
+            and SELF_STATE_SUBJECTS[subject] == true
+            and type(state) == "table"
+            and state.type == subject
+            and type(state.value) == "string"
+            and state.value ~= ""
+    end
 
     return function(ir, state, context, giftOffer)
         local branch = "SOCIAL_ACKNOWLEDGED"
@@ -13,6 +34,11 @@ return function(dependencies)
         if ir.intent == "GREET" or ir.speechAct == "GREET" then
             branch = "GREET_ACKNOWLEDGED"
             reason = "recognized_greeting"
+        elseif ir.intent == "COMPLIMENT"
+            or ir.speechAct == "COMPLIMENT"
+        then
+            branch = "COMPLIMENT_RECEIVED"
+            reason = "recognized_compliment"
         elseif giftOffer then
             if giftOffer.mode == "selection" then
                 branch = "GIFT_SELECTION_REQUIRED"
@@ -42,6 +68,9 @@ return function(dependencies)
                 branch = "QUESTION_RECEIVED"
                 reason = "recognized_question"
             end
+        elseif isSelfStateReport(ir) then
+            branch = "SELF_STATE_RECEIVED"
+            reason = "recognized_player_self_state"
         elseif ir.intent == "GOSSIP" then
             branch = "GOSSIP_RECEIVED"
             reason = "recognized_gossip"
@@ -69,6 +98,9 @@ return function(dependencies)
         elseif ir.intent == "THANK"
             or ir.intent == "ACCEPT"
             or ir.intent == "REFUSE"
+            or ir.intent == "AGREE"
+            or ir.intent == "DISAGREE"
+            or ir.intent == "ACKNOWLEDGE"
             or ir.intent == "APOLOGIZE"
         then
             branch = "SOCIAL_ACKNOWLEDGED"

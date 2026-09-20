@@ -116,6 +116,11 @@ T.load(
     "PNC/Semantics/PNC_SemanticDialogueInput_Lifecycle.lua"
 )
 require = originalRequire
+T.load(
+    "ProjectHoomans",
+    "client",
+    "PNC/Semantics/PNC_SemanticGiftLifecycle.lua"
+)
 
 local queued = {}
 local session = {
@@ -327,8 +332,15 @@ local offerAccepted = Input.Submit(view, "who wants an apple")
 T.equal(offerAccepted, true, "item offers stay on the local route")
 T.equal(view.lastSemanticDialogueResult.decision.branch,
     "OFFER_RECEIVED", "offers select a dedicated semantic branch")
-T.equal(queued[#queued].payload.fallback, "I could use one.",
-    "a hungry NPC reacts to an offer from its local need state")
+T.equal(queued[#queued].payload.fallback,
+    "I'd really like one. Could I have it?",
+    "a hungry NPC asks the player for permission to take an offered item")
+local pendingConsent = PNC.Semantics.GiftLifecycle.PendingOfferConsent(
+    session, nil, nil, nil)
+T.equal(pendingConsent.query, "apple",
+    "a concrete spoken offer stages its item for the consent turn")
+T.equal(pendingConsent.candidates[1].npcID, "npc-alice",
+    "the pending offer is bound to the NPC who asked for it")
 
 view.spec.context.entry.snapshot.needs.hunger = 0.10
 local declinedOffer = Input.Submit(view, "who wants an apple")
@@ -336,6 +348,8 @@ T.equal(declinedOffer, true, "a non-hungry NPC can decline locally")
 T.equal(queued[#queued].payload.fallback,
     "No thanks, I'm not hungry.",
     "offer response changes with the NPC's current need state")
+T.equal(PNC.Semantics.GiftLifecycle.PendingOfferConsent(session), nil,
+    "a declined offer clears the previous pending consent")
 
 local identityAccepted = Input.Submit(view, "im psycho btw")
 T.equal(identityAccepted, true,

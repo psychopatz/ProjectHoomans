@@ -141,6 +141,7 @@ function Internal.buildTemplateSnapshot(record, options)
 
     Internal.ensureIdentityCard(record, base)
     addAppearanceItems(record, base, template)
+    Internal.ensureFactionDogTag(record, base)
     bagContainerID = addTemplateBag(record, base, template)
     addStartingWeapons(record, base, template)
     SupplyBuilder.Add(record, base, template, bagContainerID)

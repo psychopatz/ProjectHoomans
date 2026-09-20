@@ -25,7 +25,8 @@ local SCHEMA = Internal.SCHEMA
 function Knowledge.BuildPlayerSnapshot(characterUUID, npcID)
     local note = mutableNote(characterUUID, npcID, false)
     local output = { schemaVersion = SCHEMA, npcID = tostring(npcID or ""), categories = {}, revision = note and note.revision or 0,
-        firstMetAt = note and note.firstMetAt or nil, lastInteractionAt = note and note.lastInteractionAt or nil }
+        firstMetAt = note and note.firstMetAt or nil, lastInteractionAt = note and note.lastInteractionAt or nil,
+        giftPreferences = {} }
     if not note then return output end
     for descriptorID, fact in pairs(note.discovered) do
         local descriptor = Definitions.Get(descriptorID)
@@ -46,6 +47,14 @@ function Knowledge.BuildPlayerSnapshot(characterUUID, npcID)
     output.categories = ordered
     output.journalEntries = deepCopy(note.journalEntries)
     output.manualNotes = deepCopy(note.manualNotes)
+    for fullType, preference in pairs(note.giftPreferences or {}) do
+        if preference and (preference.disposition == "like"
+            or preference.disposition == "dislike"
+            or preference.disposition == "neutral")
+        then
+            output.giftPreferences[fullType] = preference.disposition
+        end
+    end
     return output
 end
 

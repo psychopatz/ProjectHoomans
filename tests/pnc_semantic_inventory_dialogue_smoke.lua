@@ -181,6 +181,28 @@ T.falsy(session.semanticInventoryQueries["1"],
 T.equal(view.lastSemanticDialogueResult.decision.route, "deterministic",
     "inventory query does not use the LLM fallback route")
 
+local InventoryResponses = require
+    "PNC/Semantics/PNC_SemanticDialogueInput_InventoryResponses"
+local allItemsReply = InventoryResponses.ForResult({
+    status = "found",
+    query = { concept = "ANY_ITEM", text = "items" },
+    totalCount = 3,
+    distinctItems = 2,
+    items = {
+        { displayName = "Sardines", quantity = 2 },
+        { displayName = "Pistol", quantity = 1 },
+    },
+})
+T.equal(allItemsReply.fallback,
+    "I have 3 items: Sardines (2), Pistol (1).",
+    "open inventory responses list concrete carried items")
+local noItemsReply = InventoryResponses.ForResult({
+    status = "empty",
+    query = { concept = "ANY_ITEM", text = "items" },
+})
+T.equal(noItemsReply.fallback, "I don't have any items.",
+    "empty open inventory questions receive a direct answer")
+
 local inventoryPending = Input.Internal.InventoryPending
 local pendingRequestIDs = {}
 for index = 1, inventoryPending.MAX_PENDING do

@@ -147,6 +147,10 @@ function Types.NewRecord(definition)
         record.id = Identity.GenerateNPCID(record.identity, generatedID)
     end
 
+    if Identity and type(Identity.EnsureBirthDate) == "function" then
+        Identity.EnsureBirthDate(record, false)
+    end
+
     if PNC.PlayerNeedsModel and PNC.PlayerNeedsModel.ResolveInitialTraits then
         record.vanillaTraits,
             record.vanillaTraitsAuthored,

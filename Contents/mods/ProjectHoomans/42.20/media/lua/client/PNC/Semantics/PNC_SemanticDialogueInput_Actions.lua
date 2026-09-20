@@ -17,6 +17,44 @@ PNC.Semantics.DialogueInput = Input
 
 local Internal = Input.Internal or {}
 Input.Internal = Internal
+
+local EXECUTABLE_ACTION_BRANCHES = {
+    COMMAND_ACCEPTED = true,
+    REQUEST_ACKNOWLEDGED = true,
+    CAMP_REQUESTED = true,
+}
+local GIFT_DISPATCH_BRANCHES = {
+    GIFT_OFFER_DISPATCHED = true,
+    GIFT_SELECTION_REQUIRED = true,
+    GIFT_CONSENT_GRANTED = true,
+}
+local INVENTORY_DISPATCH_BRANCHES = {
+    INVENTORY_QUERY_RECEIVED = true,
+}
+
+local function dispatchBranchEligibility(decision, executableBranches)
+    if decision.route == "llm_fallback" then
+        return false, "llm_fallback_pending"
+    end
+    if executableBranches[decision.branch] == true then
+        return true
+    end
+    if decision.branch == "ASK_CLARIFICATION"
+        or decision.branch == "AMBIGUOUS_INPUT"
+    then
+        return false, "clarification_required"
+    end
+    return false, "dispatch_branch_not_approved"
+end
+
+local function blockedDispatch(reason)
+    return {
+        status = "semantic_dispatch_blocked",
+        accepted = false,
+        reason = reason,
+    }
+end
+
 local InventoryPending = require
     "PNC/Semantics/PNC_SemanticDialogueInput_InventoryPending"
 local CommandAdapter = PNC.Semantics.CommandAdapter
@@ -105,7 +143,24 @@ end
 
 function Internal.DispatchAction(view, result, value)
     local decision = result and result.decision or {}
+    if decision.giftConsent then
+        if decision.giftConsent.status ~= "granted" then return nil end
+        local allowed, blockReason = dispatchBranchEligibility(
+            decision, GIFT_DISPATCH_BRANCHES)
+        if not allowed then return blockedDispatch(blockReason) end
+        if type(Internal.DispatchGiftConsent) == "function" then
+            return Internal.DispatchGiftConsent(view, result, value)
+        end
+        return {
+            status = "gift_dispatch_unavailable",
+            accepted = false,
+            reason = "gift_dispatch_unavailable",
+        }
+    end
     if decision.giftOffer then
+        local allowed, blockReason = dispatchBranchEligibility(
+            decision, GIFT_DISPATCH_BRANCHES)
+        if not allowed then return blockedDispatch(blockReason) end
         if type(Internal.DispatchGiftOffer) == "function" then
             return Internal.DispatchGiftOffer(view, result, value)
         end
@@ -116,9 +171,17 @@ function Internal.DispatchAction(view, result, value)
         }
     end
     if decision.inventoryQuery then
+        local allowed, blockReason = dispatchBranchEligibility(
+            decision, INVENTORY_DISPATCH_BRANCHES)
+        if not allowed then return blockedDispatch(blockReason) end
         return Internal.DispatchInventoryQuery(view, result, value)
     end
     if not decision.actionIntent then return nil end
+    local actionAllowed, actionBlockReason = dispatchBranchEligibility(
+        decision, EXECUTABLE_ACTION_BRANCHES)
+    if not actionAllowed then
+        return blockedDispatch(actionBlockReason)
+    end
     local context = actionContext(view, result, value)
     local actionIntent = ActionTargetHints.AttachCampSiteHint(
         decision.actionIntent, context, CampSite, CampSiteHints, audit)

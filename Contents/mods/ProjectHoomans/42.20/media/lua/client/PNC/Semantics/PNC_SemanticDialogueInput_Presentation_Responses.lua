@@ -43,6 +43,38 @@ local function semanticTranslationKey(response)
             "UI_PNC_Conversation_Semantic_IdentityEvasionWithdrawn",
         ["semantic.identity.evasion.default"] =
             "UI_PNC_Conversation_Semantic_IdentityEvasionDefault",
+        ["semantic.social.compliment.default"] =
+            "UI_PNC_Conversation_Semantic_ComplimentDefault",
+        ["semantic.social.compliment.alternate"] =
+            "UI_PNC_Conversation_Semantic_ComplimentAlternate",
+        ["semantic.social.compliment.friendly"] =
+            "UI_PNC_Conversation_Semantic_ComplimentFriendly",
+        ["semantic.social.compliment.trusted"] =
+            "UI_PNC_Conversation_Semantic_ComplimentTrusted",
+        ["semantic.social.compliment.withdrawn"] =
+            "UI_PNC_Conversation_Semantic_ComplimentWithdrawn",
+        ["semantic.question.relationship_status.committed"] =
+            "UI_PNC_Conversation_Semantic_QuestionRelationshipStatusCommitted",
+        ["semantic.question.relationship_status.uncertain"] =
+            "UI_PNC_Conversation_Semantic_QuestionRelationshipStatusUncertain",
+        ["semantic.question.relationship_status.uncertain_alt"] =
+            "UI_PNC_Conversation_Semantic_QuestionRelationshipStatusUncertainAlt",
+        ["semantic.question.relationship_status.withdrawn"] =
+            "UI_PNC_Conversation_Semantic_QuestionRelationshipStatusWithdrawn",
+        ["semantic.question.relationship_status.after_compliment.committed"] =
+            "UI_PNC_Conversation_Semantic_QuestionRelationshipStatusAfterComplimentCommitted",
+        ["semantic.question.relationship_status.after_compliment.unknown"] =
+            "UI_PNC_Conversation_Semantic_QuestionRelationshipStatusAfterCompliment",
+        ["semantic.question.relationship_status.after_compliment.unknown_alt"] =
+            "UI_PNC_Conversation_Semantic_QuestionRelationshipStatusAfterComplimentAlt",
+        ["semantic.question.relationship_status.after_compliment.withdrawn"] =
+            "UI_PNC_Conversation_Semantic_QuestionRelationshipStatusAfterComplimentWithdrawn",
+        ["semantic.question.relationship_status.acknowledged.default"] =
+            "UI_PNC_Conversation_Semantic_RelationshipStatusAcknowledged",
+        ["semantic.question.relationship_status.acknowledged.alternate"] =
+            "UI_PNC_Conversation_Semantic_RelationshipStatusAcknowledgedAlt",
+        ["semantic.question.relationship_status.acknowledged.withdrawn"] =
+            "UI_PNC_Conversation_Semantic_RelationshipStatusAcknowledgedWithdrawn",
     }
     return keys[templateID]
 end

@@ -10,6 +10,9 @@ local Projection = PNC.Semantics.CognitionProjection or {}
 PNC.Semantics.CognitionProjection = Projection
 
 Projection.VERSION = 1
+-- Storage/wire codec version. VERSION describes the expanded fact contract;
+-- COMPACT_VERSION lets readers distinguish packed data from legacy projections.
+Projection.COMPACT_VERSION = 1
 Projection.MAX_FACTS = 64
 Projection.MAX_VALUE_DEPTH = 3
 Projection.MAX_VALUE_FIELDS = 24
@@ -22,6 +25,56 @@ local VALID_STATUS = {
     ambiguous = true,
 }
 
+local STATUS_TO_CODE = {
+    unknown = 1,
+    known = 2,
+    ambiguous = 3,
+}
+
+local CODE_TO_STATUS = {
+    [1] = "unknown",
+    [2] = "known",
+    [3] = "ambiguous",
+}
+
+local COMPACT_FACT_FIELD = {
+    TARGET_ID = 1,
+    TARGET_NAME = 2,
+    VALUE = 3,
+    LOCATION = 4,
+    EVENT = 5,
+    SOURCE = 6,
+    SOURCE_ID = 7,
+    EVIDENCE = 8,
+    CONFIDENCE = 9,
+    OBSERVED_AT = 10,
+    RECORDED_AT = 11,
+    EXPIRES_AT = 12,
+    CLIENT_VISIBLE = 13,
+}
+
+local COMPACT_FACT_FIELD_NAME = {
+    [1] = "targetID",
+    [2] = "targetName",
+    [3] = "value",
+    [4] = "location",
+    [5] = "event",
+    [6] = "source",
+    [7] = "sourceID",
+    [8] = "evidence",
+    [9] = "confidence",
+    [10] = "observedAt",
+    [11] = "recordedAt",
+    [12] = "expiresAt",
+    [13] = "clientVisible",
+}
+
+local COMPACT_SCOPE_FIELD = {
+    TARGET_ID = 1,
+    SUBJECT = 2,
+    SUBJECTS = 3,
+}
+
 local function finite(value)
     value = tonumber(value)
     if value == nil or value ~= value
@@ -30,6 +83,16 @@ local function finite(value)
         return nil
     end
     return value
+end
+
+local function normalizeIdentitySeed(value)
+    local seed = finite(value)
+    if seed == nil or seed <= 0 then return nil end
+    local identity = PNC.Identity
+    if identity and type(identity.NormalizeSeed) == "function" then
+        return identity.NormalizeSeed(seed)
+    end
+    return math.floor(seed)
 end
 
 local function boundedString(value, maximum)
@@ -273,17 +336,194 @@ local function pruneFacts(facts)
     return false
 end
 
+local function appendCompactPair(target, code, value)
+    target[#target + 1] = code
+    target[#target + 1] = value
+end
+
+local function encodeFact(fact)
+    local defaultConfidence = fact.status == "known" and 0.75 or 0
+    -- Each row starts with subject and status, then stores compact field-code /
+    -- value pairs. This stays a dense array while omitting nil/default fields.
+    local row = { fact.subject, STATUS_TO_CODE[fact.status] or 1 }
+    if fact.targetID ~= nil then
+        appendCompactPair(row, COMPACT_FACT_FIELD.TARGET_ID, fact.targetID)
+    end
+    if fact.targetName ~= nil then
+        appendCompactPair(row, COMPACT_FACT_FIELD.TARGET_NAME, fact.targetName)
+    end
+    if fact.value ~= nil then
+        appendCompactPair(row, COMPACT_FACT_FIELD.VALUE, fact.value)
+    end
+    if fact.location ~= nil then
+        appendCompactPair(row, COMPACT_FACT_FIELD.LOCATION, fact.location)
+    end
+    if fact.event ~= nil then
+        appendCompactPair(row, COMPACT_FACT_FIELD.EVENT, fact.event)
+    end
+    if fact.source ~= "unknown" then
+        appendCompactPair(row, COMPACT_FACT_FIELD.SOURCE, fact.source)
+    end
+    if fact.sourceID ~= nil then
+        appendCompactPair(row, COMPACT_FACT_FIELD.SOURCE_ID, fact.sourceID)
+    end
+    if fact.evidence ~= nil then
+        appendCompactPair(row, COMPACT_FACT_FIELD.EVIDENCE, fact.evidence)
+    end
+    if fact.confidence ~= defaultConfidence then
+        appendCompactPair(row, COMPACT_FACT_FIELD.CONFIDENCE, fact.confidence)
+    end
+    if fact.observedAt ~= nil then
+        appendCompactPair(row, COMPACT_FACT_FIELD.OBSERVED_AT, fact.observedAt)
+    end
+    if fact.recordedAt ~= fact.observedAt
+        and fact.recordedAt ~= nil
+    then
+        appendCompactPair(row, COMPACT_FACT_FIELD.RECORDED_AT, fact.recordedAt)
+    end
+    if fact.expiresAt ~= nil then
+        appendCompactPair(row, COMPACT_FACT_FIELD.EXPIRES_AT, fact.expiresAt)
+    end
+    if fact.clientVisible == false then
+        appendCompactPair(row, COMPACT_FACT_FIELD.CLIENT_VISIBLE, false)
+    end
+    return row
+end
+
+local function decodeFact(row)
+    local status
+    local fact
+    local fieldID
+    local fieldName
+    local value
+    if type(row) ~= "table" then return nil end
+    status = CODE_TO_STATUS[row[2]]
+    if not status or type(row[1]) ~= "string" then return nil end
+    fact = {
+        subject = row[1],
+        status = status,
+        clientVisible = true,
+    }
+    for index = 3, #row, 2 do
+        fieldID = row[index]
+        fieldName = COMPACT_FACT_FIELD_NAME[fieldID]
+        value = row[index + 1]
+        if fieldName ~= nil and value ~= nil then
+            fact[fieldName] = value
+        end
+    end
+    return fact
+end
+
+local function encodeScope(scope)
+    if type(scope) ~= "table" then return nil end
+    local output = {}
+    local targetID = identifier(scope.targetID)
+    local normalizedSubject = subject(scope.subject)
+    if targetID ~= nil then
+        appendCompactPair(output, COMPACT_SCOPE_FIELD.TARGET_ID, targetID)
+    end
+    if normalizedSubject ~= nil then
+        appendCompactPair(output, COMPACT_SCOPE_FIELD.SUBJECT, normalizedSubject)
+    end
+    if type(scope.subjects) == "table" then
+        local subjects, valid = safeCopy(scope.subjects)
+        if valid then
+            appendCompactPair(output, COMPACT_SCOPE_FIELD.SUBJECTS, subjects)
+        end
+    end
+    return output
+end
+
+local function decodeScope(scope)
+    local output
+    local fieldID
+    local value
+    if type(scope) ~= "table" then return nil end
+    output = {}
+    for index = 1, #scope, 2 do
+        fieldID = scope[index]
+        value = scope[index + 1]
+        if fieldID == COMPACT_SCOPE_FIELD.TARGET_ID then
+            output.targetID = value
+        elseif fieldID == COMPACT_SCOPE_FIELD.SUBJECT then
+            output.subject = value
+        elseif fieldID == COMPACT_SCOPE_FIELD.SUBJECTS
+            and type(value) == "table"
+        then
+            output.subjects = value
+        end
+    end
+    return output
+end
+
+local function compactNormalized(
+    projection,
+    replace,
+    scope,
+    includeIdentitySeed
+)
+    -- Envelope: c codec, v fact schema, n NPC, r revision, t updated, f facts,
+    -- x replace flag, q replacement scope, i ephemeral identity seed.
+    local output = {
+        c = Projection.COMPACT_VERSION,
+        v = Projection.VERSION,
+        n = projection.npcID,
+        r = projection.revision,
+        f = {},
+    }
+    local keys = {}
+    local key
+    for key, _ in pairs(projection.facts) do
+        keys[#keys + 1] = key
+    end
+    table.sort(keys)
+    for index = 1, #keys do
+        output.f[index] = encodeFact(projection.facts[keys[index]])
+    end
+    if projection.updatedAt ~= nil then
+        output.t = projection.updatedAt
+    end
+    if replace == true then
+        output.x = true
+    end
+    if type(scope) == "table" then
+        output.q = encodeScope(scope)
+    end
+    if includeIdentitySeed and projection.identitySeed ~= nil then
+        output.i = projection.identitySeed
+    end
+    return output
+end
+
+function Projection.Compact(raw, npcID)
+    if type(raw) ~= "table" then return nil end
+    local compact = raw.c == Projection.COMPACT_VERSION
+    local replace = raw.replace == true or compact and raw.x == true
+    local scope = type(raw.scope) == "table" and raw.scope
+        or compact and decodeScope(raw.q)
+    local normalized = Projection.Normalize(raw, npcID)
+    -- Conversation packets carry the existing seed as a compact reference
+    -- for client-side derived identity context. Persistence omits this copy.
+    return compactNormalized(normalized, replace, scope, true)
+end
+
 function Projection.Normalize(raw, npcID)
     local source = type(raw) == "table" and raw or {}
+    local compact = source.c == Projection.COMPACT_VERSION
+    local revision = compact and source.r or source.revision
+    local updatedAt = compact and source.t or source.updatedAt
+    local rawIdentitySeed = compact and source.i or source.identitySeed
     local output = {
         schemaVersion = Projection.VERSION,
-        npcID = identifier(npcID or source.npcID),
-        revision = math.max(0, math.floor(finite(source.revision) or 0)),
-        updatedAt = normalizeTime(source.updatedAt),
+        npcID = identifier(npcID or (compact and source.n or source.npcID)),
+        revision = math.max(0, math.floor(finite(revision) or 0)),
+        updatedAt = normalizeTime(updatedAt),
         facts = {},
     }
-    local candidates = type(source.facts) == "table"
-        and source.facts or {}
+    output.identitySeed = normalizeIdentitySeed(rawIdentitySeed)
+    local candidates = compact and type(source.f) == "table" and source.f
+        or type(source.facts) == "table" and source.facts or {}
     local keys = {}
     local key
     local item
@@ -291,14 +531,26 @@ function Projection.Normalize(raw, npcID)
     local fallbackTargetID
     local normalized
     local existing
-    for key, item in pairs(candidates) do
-        fallbackSubject, fallbackTargetID = keyParts(key)
-        normalized = Projection.NormalizeFact(
-            item, fallbackSubject, fallbackTargetID)
-        if normalized then
-            existing = output.facts[normalized.key]
-            output.facts[normalized.key] = existing
-                and prefer(existing, normalized) or normalized
+    if compact then
+        for index = 1, math.min(#candidates, Projection.MAX_FACTS * 2) do
+            item = decodeFact(candidates[index])
+            normalized = item and Projection.NormalizeFact(item) or nil
+            if normalized then
+                existing = output.facts[normalized.key]
+                output.facts[normalized.key] = existing
+                    and prefer(existing, normalized) or normalized
+            end
+        end
+    else
+        for key, item in pairs(candidates) do
+            fallbackSubject, fallbackTargetID = keyParts(key)
+            normalized = Projection.NormalizeFact(
+                item, fallbackSubject, fallbackTargetID)
+            if normalized then
+                existing = output.facts[normalized.key]
+                output.facts[normalized.key] = existing
+                    and prefer(existing, normalized) or normalized
+            end
         end
     end
     for key, _ in pairs(output.facts) do keys[#keys + 1] = key end
@@ -320,7 +572,9 @@ function Projection.Serialize(raw, npcID)
         break
     end
     if not hasFacts then return nil end
-    return normalized
+    -- Static identity/background context is rebuilt from identity.seed; only
+    -- observed or learned facts belong in this persisted projection.
+    return compactNormalized(normalized)
 end
 
 function Projection.Get(raw, rawSubject, rawTargetID, worldAgeHours)
@@ -330,6 +584,9 @@ function Projection.Get(raw, rawSubject, rawTargetID, worldAgeHours)
     local fact
     local expiresAt
     local now
+    if projection and projection.c == Projection.COMPACT_VERSION then
+        projection = Projection.Normalize(projection)
+    end
     if not projection or type(projection.facts) ~= "table" or not key then
         return nil, "fact_unavailable"
     end
@@ -508,8 +765,14 @@ function Projection.BuildClientProjection(raw, npcID, options)
 end
 
 function Projection.Merge(existing, incoming, npcID)
-    local replace = type(incoming) == "table" and incoming.replace == true
+    local compact = type(incoming) == "table"
+        and incoming.c == Projection.COMPACT_VERSION
+    local replace = type(incoming) == "table"
+        and (incoming.replace == true or compact and incoming.x == true)
     local scope = type(incoming) == "table" and incoming.scope or nil
+    if scope == nil and compact then
+        scope = decodeScope(incoming.q)
+    end
     local current = Projection.Normalize(existing, npcID)
     local received = Projection.Normalize(incoming, npcID)
     local key
@@ -524,11 +787,21 @@ function Projection.Merge(existing, incoming, npcID)
         return nil, false, "npc_id_mismatch"
     end
     if (tonumber(received.revision) or 0) < (tonumber(current.revision) or 0) then
+        if current.identitySeed == nil and received.identitySeed ~= nil then
+            current.identitySeed = received.identitySeed
+            return current, true, "identity_seed_added"
+        end
         return current, false, "stale_projection"
     end
     current.npcID = received.npcID
     current.revision = math.max(current.revision, received.revision)
     current.updatedAt = received.updatedAt or current.updatedAt
+    if received.identitySeed ~= nil
+        and received.identitySeed ~= current.identitySeed
+    then
+        current.identitySeed = received.identitySeed
+        changed = true
+    end
     if replace then
         for key, previous in pairs(current.facts) do
             if scopeIncludes(previous, scope)

@@ -9,6 +9,7 @@ then return end
 
 PNC = PNC or {}
 PNC.Semantics = PNC.Semantics or {}
+require "PNC/Conversation/Memory/PNC_ConversationMemory"
 
 local Projection = PNC.Semantics.CognitionProjection
     or require "PNC/Semantics/PNC_SemanticCognitionProjection"
@@ -17,6 +18,9 @@ PNC.Semantics.CognitionService = Service
 
 local Core = PNC.Core
 local Registry = PNC.Registry
+local MemoryEvents = PNC.Conversation
+    and PNC.Conversation.Memory
+    and PNC.Conversation.Memory.Events or nil
 
 Service.VERSION = 1
 
@@ -40,6 +44,16 @@ end
 
 local function storeFor(record)
     if not record then return nil end
+    -- Service writes and record loading both normalize this table; keep read
+    -- paths from deep-copying and sorting it again on every lookup.
+    if type(record.semanticCognition) == "table"
+        and record.semanticCognition.schemaVersion == Projection.VERSION
+        and tostring(record.semanticCognition.npcID or "")
+            == tostring(record.id or "")
+        and type(record.semanticCognition.facts) == "table"
+    then
+        return record.semanticCognition
+    end
     record.semanticCognition = Projection.Normalize(
         record.semanticCognition,
         record.id
@@ -55,6 +69,37 @@ local function requestOptions(args)
         subjects = args.subjects,
     }
     return output
+end
+
+local function attachMemoryGossip(projection, speakerRecord, options)
+    local targetValue = options.targetID or options.target
+    local target
+    local subjectName
+    local codes
+    if not projection or not MemoryEvents
+        or type(MemoryEvents.ResolveTarget) ~= "function"
+        or type(MemoryEvents.BuildGossipCodes) ~= "function"
+    then
+        return
+    end
+    target = MemoryEvents.ResolveTarget(targetValue)
+    subjectName = target and target.record and target.record.name or nil
+    if not target or type(subjectName) ~= "string" or subjectName == "" then
+        return
+    end
+    codes = MemoryEvents.BuildGossipCodes(
+        speakerRecord,
+        target,
+        subjectName,
+        speakerRecord.tacticalClass,
+        MemoryEvents.MAX_GOSSIP
+    )
+    if type(codes) == "table" and #codes > 0 then
+        projection._memoryGossip = {
+            codes = codes,
+            subject = subjectName,
+        }
+    end
 end
 
 function Service.Get(npcID)
@@ -137,6 +182,7 @@ function Service.BuildForConversation(player, npcID, options)
     local record
     local reason
     local valid
+    local projection
     options = type(options) == "table" and options or {}
     if not authority() then return nil, "not_authority" end
     record, reason = resolveRecord(npcID)
@@ -152,11 +198,19 @@ function Service.BuildForConversation(player, npcID, options)
         options.conversationToken or options.token
     )
     if valid ~= true then return nil, reason or "invalid_conversation" end
-    return Projection.BuildClientProjection(
+    projection = Projection.BuildClientProjection(
         storeFor(record),
         record.id,
         requestOptions(options)
     )
+    if projection then
+        local identity = type(record.identity) == "table"
+            and record.identity or nil
+        projection.identitySeed = record.identitySeed
+            or identity and (identity.identitySeed or identity.seed)
+        attachMemoryGossip(projection, record, options)
+    end
+    return projection
 end
 
 function Service.HandleRequest(player, args)

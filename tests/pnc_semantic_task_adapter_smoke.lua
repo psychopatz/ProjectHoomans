@@ -8,6 +8,31 @@ local Adapter = T.load(
     "PNC/Semantics/PNC_SemanticTaskAdapter.lua"
 )
 
+T.truthy(type(Adapter.Actions.FETCH) == "table",
+    "fetch is registered by the production task adapter")
+local builtInSubmitted
+PNC.Client = {
+    RequestSemanticTask = function(request, context)
+        builtInSubmitted = { request = request, context = context }
+        return true, "sent"
+    end,
+}
+local builtInFetch = Adapter.Dispatch({
+    intent = "REQUEST",
+    speechAct = "REQUEST",
+    action = "FETCH",
+    object = { text = "apple", unresolved = true, quantity = "SOME" },
+    confidence = 0.94,
+}, {
+    requestID = "dialogue:fetch:builtin",
+    npcID = "npc:alice",
+    rawText = "Fetch me an apple",
+})
+T.equal(builtInFetch.status, "accepted",
+    "built-in fetch action uses the shared task transport")
+T.equal(builtInSubmitted.request.action, "FETCH",
+    "built-in fetch dispatch preserves its action")
+
 local submitted
 Adapter.RegisterAction("FETCH", {
     CanSubmit = function(request)

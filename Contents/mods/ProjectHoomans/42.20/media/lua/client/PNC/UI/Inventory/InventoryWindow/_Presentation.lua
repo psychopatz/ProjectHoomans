@@ -84,7 +84,7 @@ function ISPNCInventoryWindow:prerender()
         0.85, 0.85, 0.85, 1, UIFont.Small)
     if self.giftMode then
         self:drawText(
-            tr("UI_PNC_Inventory_GiftScore", "Gift score (A / R / F)"),
+            tr("UI_PNC_Inventory_GiftPreference", "Like / Dislike"),
             self.playerList:getX() + math.floor(self.playerList.width * 0.64),
             listY - 19,
             0.55, 0.88, 0.68, 1, UIFont.Small

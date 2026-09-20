@@ -120,6 +120,13 @@ local function makeResult(value, sequence)
         result.decision.action = "CAMP"
         result.decision.actionIntent = { action = "CAMP" }
     end
+    if string.find(string.lower(value), "gift consent", 1, true) then
+        result.decision.branch = "GIFT_CONSENT_GRANTED"
+        result.decision.giftConsent = {
+            status = "granted",
+            recipientID = "npc-bob",
+        }
+    end
     return result
 end
 
@@ -259,6 +266,19 @@ T.equal(group.activeTurn.responseCount, 3,
     "group camp records all acknowledgement speakers")
 T.equal(queued[2].actionResult.status, "accepted",
     "group camp acknowledgements reuse the canonical action result")
+
+dispatches = {}
+queued = {}
+routerCalls = {}
+recorded = {}
+local consentAccepted = group:Submit("gift consent", {})
+T.equal(consentAccepted, true, "gift consent turn is accepted")
+T.equal(#dispatches, 1,
+    "a confirmed gift dispatches once through the primary input")
+T.equal(#queued, 1,
+    "a consent confirmation queues one response without group fanout")
+T.equal(#routerCalls, 0,
+    "gift consent is not reinterpreted by secondary group members")
 
 PNC = originalPNC
 PsychopatzCore = originalCore

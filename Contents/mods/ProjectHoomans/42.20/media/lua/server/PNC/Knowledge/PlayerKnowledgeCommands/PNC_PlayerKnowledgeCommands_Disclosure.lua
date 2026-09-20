@@ -21,6 +21,7 @@ function Commands.HandleDisclosure(player, args)
     local requestID = H.SafeID(args.requestID)
     local npcID = H.SafeID(args.npcID)
     local topicID = H.SafeID(args.topicID)
+    local preferenceItemType = H.SafeID(args.preferenceItemType)
     local context, reason = H.ContextFor(player, "knowledge_disclosure")
     local payload
     if not requestID or not npcID or not topicID or not context then
@@ -53,6 +54,7 @@ function Commands.HandleDisclosure(player, args)
                             conversationToken = args.conversationToken
                                 or args.token,
                             origin = args.origin or "conversation",
+                            preferenceItemType = preferenceItemType,
                         }
                     )
                     if result then disclosure = result end
@@ -73,6 +75,7 @@ function Commands.HandleDisclosure(player, args)
                             conversationToken = args.conversationToken
                                 or args.token,
                             origin = args.origin or "conversation",
+                            preferenceItemType = preferenceItemType,
                         }
                     )
                     if result then
@@ -93,6 +96,7 @@ function Commands.HandleDisclosure(player, args)
                     success = true, reason = "committed",
                     responseText = topicID == "identity_name"
                         and H.IntroductionText(npcID) or nil,
+                    giftPreference = disclosure.giftPreference,
                     revealedFacts = disclosure.revealed or {},
                     presentation = presentation,
                     bindingRevision = context.bindingRevision,

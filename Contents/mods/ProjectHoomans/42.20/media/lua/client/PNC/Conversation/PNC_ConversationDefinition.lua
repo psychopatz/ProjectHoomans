@@ -6,7 +6,6 @@ if not PNC.NPCIdentityPresentation then
     require "PNC/Knowledge/PNC_NPCIdentityPresentation"
 end
 require "PNC/Core/Identity/PNC_FlavorAddress"
-require "PNC/Conversation/Blocks/PNC_ConversationIdentityChoice"
 if not PNC.Conversation.Audience then
     require "PNC/Conversation/PNC_ConversationAudience"
 end

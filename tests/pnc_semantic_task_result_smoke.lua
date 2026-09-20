@@ -153,6 +153,27 @@ T.equal(queued[4].metadata.source.reason, "item_not_found",
 T.equal(queued[4].metadata.source.admissionReason, "blocked",
     "admission diagnostics remain available in metadata")
 
+local taskResponses = Input.Internal.TaskResponses
+T.equal(taskResponses.ForResult({ status = "completed" }, nil, "FETCH"),
+    "Here you go.", "completed fetch has an item handoff response")
+T.equal(taskResponses.ForResult({
+    status = "blocked",
+    reason = "item_not_found",
+}, nil, "FETCH"), "I don't have that.",
+    "missing fetch item has a useful response")
+T.equal(taskResponses.ForResult({
+    status = "rejected",
+    reason = "fetch_source_unsupported",
+}, nil, "FETCH"),
+    "I can only fetch something I'm already carrying.",
+    "unsupported fetch source is explained")
+T.equal(taskResponses.ForResult({
+    status = "rejected",
+    reason = "fetch_destination_unsupported",
+}, nil, "FETCH"),
+    "I can bring that to you, but not to someone else right now.",
+    "unsupported fetch destination is explained")
+
 local function campFailureResponse(requestID, reason)
     session.semanticTaskRequests[requestID] = { action = "CAMP" }
     local received = Input.ReceiveSemanticTaskResult({

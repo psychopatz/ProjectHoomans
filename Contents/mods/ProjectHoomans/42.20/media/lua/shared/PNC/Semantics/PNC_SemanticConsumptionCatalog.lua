@@ -151,7 +151,10 @@ function Catalog.Register()
         "refill", "fill up", "top up", "top off",
     }, 4)
     registerAction("CONSUME", {
-        "consume",
+        -- Generic use is intentionally routed through the existing
+        -- consumable capability gate. Other item-use actions need their own
+        -- authoritative task handler before they can be exposed here.
+        "consume", "use",
     }, 3)
 
     Catalog.registered = true

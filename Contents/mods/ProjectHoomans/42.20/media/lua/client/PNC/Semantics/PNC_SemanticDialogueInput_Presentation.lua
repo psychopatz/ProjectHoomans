@@ -12,6 +12,112 @@ Input.Internal = Internal
 local ResponseAdapter = require
     "PNC/Semantics/PNC_SemanticDialogueInput_Presentation_Responses"
 
+local GENERIC_OFFER_ITEMS = {
+    anything = true,
+    item = true,
+    one = true,
+    something = true,
+    thing = true,
+}
+
+local function normalizedOfferQuery(value)
+    value = string.lower(tostring(value or ""))
+    value = string.gsub(value, "[^%w]+", " ")
+    value = string.gsub(value, "^%s+", "")
+    value = string.gsub(value, "%s+$", "")
+    return value
+end
+
+local function stageGiftConsent(view, result, decision, group, session, options)
+    if decision.branch ~= "OFFER_RECEIVED"
+        or type(decision.response) ~= "table"
+        or decision.response.templateID ~= "semantic.offer.interested"
+    then
+        return false
+    end
+    local ir = result and result.ir or nil
+    if type(ir) ~= "table"
+        or (ir.intent ~= "OFFER" and ir.speechAct ~= "OFFER")
+    then
+        return false
+    end
+    local object = type(ir.object) == "table" and ir.object or nil
+    if not object or object.reference ~= nil then return false end
+    local query = normalizedOfferQuery(
+        object.text or object.value or object.name or object.category
+    )
+    if query == "" or GENERIC_OFFER_ITEMS[query] then return false end
+
+    local lifecycle = PNC.Semantics and PNC.Semantics.GiftLifecycle or nil
+    if not lifecycle or type(lifecycle.StageOfferConsent) ~= "function" then
+        return false
+    end
+
+    local speakerID = options.speakerID
+    local speakerName = options.speakerName
+    if not speakerID and group and type(group.SpeakerFor) == "function" then
+        speakerID, speakerName = group:SpeakerFor(view)
+    end
+    speakerID = speakerID or view.spec and view.spec.npcID
+    local context = view.spec and view.spec.context or {}
+    speakerName = speakerName or context.npcFullName or context.npcName
+    local turnID = options.groupTurnID or group and group.activeTurn
+        and group.activeTurn.id
+    lifecycle.StageOfferConsent(session, {
+        query = query,
+        quantity = object.quantity,
+        groupID = options.groupID or group and group.id,
+        groupTurnID = turnID,
+        sourceSequence = result.sequence,
+        conversationID = session and session.conversationID,
+    }, {
+        npcID = speakerID,
+        name = speakerName,
+    }, Internal.Now and Internal.Now() or nil)
+    return true
+end
+
+local function recordNPCResponseTurn(
+    session, inputIR, response, decision, speakerID
+)
+    local context = session and session.semanticDialogueContext or nil
+    if not context or type(context.RecordNPCResponse) ~= "function" then
+        return false
+    end
+    local responseText = response and (response.text or response.fallback)
+    if type(responseText) ~= "string" or responseText == "" then
+        return false
+    end
+
+    local branch = decision and decision.branch or nil
+    local responseSpeechAct = branch == "COMPLIMENT_RECEIVED"
+        and "COMPLIMENT_RESPONSE" or "ANSWER"
+    local topic = inputIR and inputIR.extensions
+        and inputIR.extensions.topic or nil
+    if type(topic) == "table" then topic = topic.id or topic.key end
+    topic = topic or inputIR and (inputIR.subject or inputIR.action)
+    if topic == nil then
+        -- An acknowledgment gets its own topic in the turn state. Preserve
+        -- the question topic that its response is continuing.
+        topic = context.previousTopic or context.currentTopic
+    end
+    return context:RecordNPCResponse({
+        intent = "RESPONSE",
+        speechAct = responseSpeechAct,
+        subject = inputIR and inputIR.subject,
+        rawText = responseText,
+        extensions = {
+            topic = topic,
+        },
+    }, {
+        speaker = "npc",
+        speakerID = speakerID,
+        source = "semantic_response",
+        branch = branch,
+        topic = topic,
+    })
+end
+
 function Internal.AppendPlayerInput(view, value, result)
     local group = view and view.groupConversation
     local session = group and type(group.PrimarySession) == "function"
@@ -98,6 +204,7 @@ function Internal.QueueDeterministicResponse(
     if not speakerID and group and type(group.SpeakerFor) == "function" then
         speakerID, speakerName = group:SpeakerFor(view)
     end
+    stageGiftConsent(view, result, decision, group, session, options)
     session:queueMessage("npc", response, {
         speakerID = speakerID,
         speakerName = speakerName,
@@ -125,6 +232,7 @@ function Internal.QueueDeterministicResponse(
                 and group.activeTurn and group.activeTurn.id,
         },
     })
+    recordNPCResponseTurn(session, ir, response, decision, speakerID)
     return true
 end
 

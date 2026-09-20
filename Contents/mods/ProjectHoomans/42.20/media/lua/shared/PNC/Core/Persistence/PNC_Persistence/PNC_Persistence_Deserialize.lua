@@ -1,6 +1,7 @@
 PNC = PNC or {}
 PNC.Persistence = PNC.Persistence or {}
 PNC.Persistence.Internal = PNC.Persistence.Internal or {}
+require "PNC/Conversation/Memory/PNC_ConversationMemory"
 
 local Persistence = PNC.Persistence
 local Internal = Persistence.Internal
@@ -12,6 +13,9 @@ local Inventory = PNC.Inventory
 local RelationshipTypes = PNC.RelationshipTypes
 local RelationshipMath = PNC.RelationshipMath
 local FactionTypes = PNC.FactionTypes
+local MemoryEvents = PNC.Conversation
+    and PNC.Conversation.Memory
+    and PNC.Conversation.Memory.Events or nil
 local Reset = Persistence.Reset
     or require "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset"
 
@@ -98,6 +102,7 @@ function Persistence.DeserializeRecord(raw, fallbackID)
     local anchor
     local record
     local identity
+    local identityBirthBefore
     local progression
     local inventoryData
     local bodyHint
@@ -114,6 +119,7 @@ function Persistence.DeserializeRecord(raw, fallbackID)
     anchor = raw.anchor or raw
     identity = type(raw.identity) == "table"
         and Core.DeepCopy(raw.identity) or nil
+    identityBirthBefore = identity and identity.birth or nil
     inventoryData = type(raw.inventory) == "table"
         and Core.DeepCopy(raw.inventory) or nil
     definition = buildDefinition(
@@ -201,10 +207,23 @@ function Persistence.DeserializeRecord(raw, fallbackID)
             raw.recipeKnowledge or record.recipeKnowledge)
         record.runtime.recipeKnowledgeIndex = nil
     end
-    return Internal.FinalizeDeserializedRecord(
+    record = Internal.FinalizeDeserializedRecord(
         record,
         raw,
         identity,
         progression
     )
+    if record and MemoryEvents
+        and type(MemoryEvents.Normalize) == "function"
+    then
+        record.memory = MemoryEvents.Normalize(raw.m or raw.memory)
+    end
+    if record and record.identity
+        and record.identity.birth ~= identityBirthBefore
+        and PNC.Registry
+        and type(PNC.Registry.MarkDirty) == "function"
+    then
+        PNC.Registry.MarkDirty(record, "identity")
+    end
+    return record
 end

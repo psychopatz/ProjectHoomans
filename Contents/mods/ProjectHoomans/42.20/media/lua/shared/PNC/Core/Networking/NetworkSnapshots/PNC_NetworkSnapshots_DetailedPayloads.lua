@@ -187,6 +187,7 @@ function Network.BuildSnapshot(record, inventorySummaryOverride)
         canRevive = canRevive,
         reviveUntil = record.health and record.health.reviveUntil or 0,
         recentDamageUntil = record.health and record.health.recentDamageUntil or 0,
+        recentDamageType = record.health and record.health.recentDamageType or nil,
         bodyHealth = bodyHealth,
         treatmentState = treatmentState,
         medicalCareState = medicalCareState,

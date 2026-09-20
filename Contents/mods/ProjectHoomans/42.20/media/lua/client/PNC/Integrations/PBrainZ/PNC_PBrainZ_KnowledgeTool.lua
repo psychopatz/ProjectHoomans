@@ -15,6 +15,9 @@ Handlers.disclose_knowledge = function(result, packet, npcID, arguments)
         return
     end
     local topicID = Runtime.Trim(arguments.topic_id)
+    local preferenceItemType = Runtime.Trim(
+        arguments.preference_item_type
+    )
     result.topicID = topicID
     local request = PNC.Client and PNC.Client.RequestNPCKnowledgeTopic
     if request and topicID ~= "" then
@@ -26,6 +29,7 @@ Handlers.disclose_knowledge = function(result, packet, npcID, arguments)
                     and packet.conversation_context
                     and packet.conversation_context.conversation_token,
                 origin = "llm_tool",
+                preferenceItemType = preferenceItemType,
             }
         )
         result.accepted = accepted == true

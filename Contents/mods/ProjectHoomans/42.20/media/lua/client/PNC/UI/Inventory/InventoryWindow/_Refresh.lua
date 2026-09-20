@@ -33,6 +33,7 @@ local function playerRowsStateSignature(rows)
             tostring(row.id or ""),
             row.favorite == true and "f" or "-",
             row.equipped == true and "e" or "-",
+            tostring(row.giftPreference or ""),
             tostring(row.stack or 1),
             table.concat(row.itemIDs or { row.id or "" }, ","),
             tostring(row.stateKey or ""),
@@ -41,18 +42,31 @@ local function playerRowsStateSignature(rows)
     return table.concat(protectedState, ",")
 end
 
+local function playerGiftKnowledge(window)
+    local npcID = window and window.npcId
+        and tostring(window.npcId) or ""
+    local snapshot = npcID ~= ""
+        and ClientState.npcKnowledge
+        and ClientState.npcKnowledge[npcID] or nil
+    return snapshot, tonumber(snapshot and snapshot.revision) or 0
+end
+
 local function buildPlayerRows(window, containerEntry, player, playerCount)
+    local knowledge, knowledgeRevision = playerGiftKnowledge(window)
     local rows = Model.BuildPlayerRows(
         containerEntry,
         player,
         window.expandedPlayerGroups,
-        window.giftMode == true
+        window.giftMode == true,
+        knowledge and knowledge.giftPreferences or nil
     )
     window.playerRowsCache = rows
     window.playerRowsSignature = playerRowsStateSignature(rows)
     window.playerRowsContainer = containerEntry
         and containerEntry.container or nil
     window.playerRowsCount = playerCount
+    window.playerRowsNPCID = window.npcId and tostring(window.npcId) or ""
+    window.playerRowsKnowledgeRevision = knowledgeRevision
     window.playerRowsDirty = false
     return rows
 end
@@ -83,12 +97,17 @@ function ISPNCInventoryWindow:refreshInventory(force)
     local playerContainer = currentPlayerContainer
         and currentPlayerContainer.container or nil
     local currentPlayerRows = self.playerRowsCache
+    local _, giftKnowledgeRevision = playerGiftKnowledge(self)
+    local currentNPCID = self.npcId and tostring(self.npcId) or ""
     -- prerender calls refreshInventory every frame; keep native item probing
     -- and sorting behind explicit inventory invalidation.
     if self.playerRowsDirty == true
         or type(currentPlayerRows) ~= "table"
         or self.playerRowsContainer ~= playerContainer
         or tonumber(self.playerRowsCount) ~= tonumber(playerCount)
+        or self.playerRowsNPCID ~= currentNPCID
+        or tonumber(self.playerRowsKnowledgeRevision)
+            ~= giftKnowledgeRevision
     then
         currentPlayerRows = buildPlayerRows(
             self, currentPlayerContainer, player, playerCount
