@@ -11,6 +11,9 @@ local Internal = Input.Internal or {}
 Input.Internal = Internal
 local ResponseAdapter = require
     "PNC/Semantics/PNC_SemanticDialogueInput_Presentation_Responses"
+Internal.IdentityExchangeUnavailableResponse =
+    ResponseAdapter.IdentityExchangeUnavailable
+Internal.IdentityQuestionResponse = ResponseAdapter.IdentityQuestion
 
 local GENERIC_OFFER_ITEMS = {
     anything = true,

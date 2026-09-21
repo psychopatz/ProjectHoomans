@@ -54,13 +54,23 @@ local function resolveWeather(world)
     }
 end
 
-local function resolveIdentityQuestion(context)
+local function resolveIdentityQuestion(ir, state, context)
     local text
     if context and context.identityTrust == "untrustworthy" then
+        local response = catalogResponse(
+            "semantic.question.identity", ir, state, context
+        )
+        if response then return response end
         text = "I don't share my name with liars. What's yours, truthfully?"
-    elseif context and context.identityState == "known" then
+    elseif context and context.identityState == "known"
+        and context.identityClaimVerified == true
+    then
         text = identityText(context) .. " What's your name?"
     else
+        local response = catalogResponse(
+            "semantic.question.identity", ir, state, context
+        )
+        if response then return response end
         text = "I'll tell you my name once we've established some trust."
             .. " What's your name?"
     end
@@ -250,7 +260,9 @@ return function(ir, state, context)
     if ir.subject == "TIME" then return resolveTime(world) end
     if ir.subject == "DATE" then return resolveDate(world) end
     if ir.subject == "WEATHER" then return resolveWeather(world) end
-    if ir.subject == "IDENTITY" then return resolveIdentityQuestion(context) end
+    if ir.subject == "IDENTITY" then
+        return resolveIdentityQuestion(ir, state, context)
+    end
     if ir.subject == "RELATIONSHIP_STATUS" then
         return resolveRelationshipStatus(ir, state, context)
     end

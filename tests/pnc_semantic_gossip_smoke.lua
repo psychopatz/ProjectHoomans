@@ -3,6 +3,39 @@ T.addPackagePaths()
 
 PsychopatzCore = {}
 PNC = {}
+PNC.Identity = {
+    HashText = function(value, seed)
+        local hash = tonumber(seed) or 5381
+        local index
+        for index = 1, #tostring(value or "") do
+            hash = (hash * 33 + string.byte(value, index)) % 2147483646
+        end
+        return math.max(1, hash)
+    end,
+    MixSeed = function(seed)
+        return tonumber(seed)
+    end,
+}
+T.load(
+    "ProjectHoomans",
+    "shared",
+    "PNC/Core/Relationships/PNC_EntityRef.lua"
+)
+local memory = T.load(
+    "ProjectHoomans",
+    "shared",
+    "PNC/Conversation/Memory/PNC_ConversationMemory.lua"
+)
+T.load(
+    "ProjectHoomans",
+    "common_lua",
+    "PNC/Conversation/Definitions/Memory/EventTypes/00_PNC_ConversationMemoryEventTypes.lua"
+)
+T.load(
+    "ProjectHoomans",
+    "common_lua",
+    "PNC/Conversation/Definitions/Memory/GossipTemplates/00_PNC_ConversationGossipTemplates.lua"
+)
 
 local Semantic = T.load(
     "PsychopatzCore",
@@ -77,5 +110,71 @@ T.equal(preview.decision.branch, "GOSSIP_RECEIVED",
 T.equal(preview.decision.response.fallback,
     "I haven't heard anything about Sarah yet.",
     "local gossip response remains honest when private knowledge is absent")
+
+local remembered = router:Preview("what's the gossip?", {
+    llmEnabled = false,
+    semanticEntityIndex = entityIndex,
+    npcGossip = {
+        statements = {
+            "I got away when a whole horde came after me.",
+            "Sarah stood up for someone during an attack.",
+        },
+    },
+})
+T.equal(remembered.decision.response.fallback,
+    "I got away when a whole horde came after me. Sarah stood up for someone during an attack.",
+    "gossip response uses the server-provided shareable memories")
+
+local indexedRecords = {}
+PNC.Registry = {
+    Get = function(id) return indexedRecords[tostring(id)] end,
+}
+local function candidate(eventCode, targetID, expectedCode)
+    local targetRecord = {
+        id = targetID,
+        name = targetID,
+        identitySeed = 37,
+    }
+    local targetKey = PNC.EntityRef.ForNPC(targetID)
+    indexedRecords[targetID] = targetRecord
+    local target = memory.Events.ResolveTarget(targetKey)
+    local speaker = eventCode == 1104 and targetRecord or {
+        id = "speaker_" .. targetID,
+        identitySeed = 91,
+    }
+    speaker.memory = {
+        v = memory.Events.VERSION,
+        d = 1,
+        l = {
+            eventCode,
+            target.seed,
+            1,
+            memory.Events.FLAG_SHAREABLE + memory.Events.FLAG_DURABLE,
+        },
+    }
+    local codes = memory.Events.BuildGossipCodes(
+        speaker,
+        targetKey,
+        targetRecord.name,
+        "colonist",
+        memory.Events.MAX_GOSSIP
+    )
+    T.equal(codes[1], expectedCode,
+        "shareable event memory becomes a registered gossip candidate")
+    return memory.GetGossipTemplateByCode(codes[1])
+end
+
+local abandonment = candidate(1102, "abandoned_subject", 2003)
+T.equal(abandonment.textKey, "negative.warning.abandoned",
+    "abandonment maps to the localized warning candidate")
+local protection = candidate(1103, "protected_subject", 1003)
+T.equal(protection.textKey, "positive.protection",
+    "protection maps to the localized praise candidate")
+local hordeSurvival = candidate(1104, "horde_survivor", 4002)
+T.equal(hordeSurvival.textKey, "neutral.horde_survival",
+    "horde survival maps to the localized self-story candidate")
+local rescue = candidate(1101, "rescued_subject", 1002)
+T.equal(rescue.textKey, "positive.rescue.return",
+    "rescue remains an active registered gossip candidate")
 
 T.finish("pnc_semantic_gossip_smoke")

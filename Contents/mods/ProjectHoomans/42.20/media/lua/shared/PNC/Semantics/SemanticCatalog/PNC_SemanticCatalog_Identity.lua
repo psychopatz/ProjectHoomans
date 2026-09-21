@@ -138,6 +138,35 @@ function Internal.RegisterIdentityPatterns()
         0.97,
         154
     )
+
+    registerPattern(
+        "pnc.identity.self_name_my_names",
+        identityMatch({ "my", "name's" }),
+        identityClaimEmit(),
+        0.98,
+        155
+    )
+    registerPattern(
+        "pnc.identity.self_name_you_can_call_me",
+        identityMatch({ "you", "can", "call", "me" }),
+        identityClaimEmit(),
+        0.98,
+        155
+    )
+    registerPattern(
+        "pnc.identity.self_name_i_go_by",
+        identityMatch({ "i", "go", "by" }),
+        identityClaimEmit(),
+        0.98,
+        155
+    )
+    registerPattern(
+        "pnc.identity.self_name_i_am_called",
+        identityMatch({ "i'm", "called" }),
+        identityClaimEmit(),
+        0.98,
+        155
+    )
 end
 
 return Internal

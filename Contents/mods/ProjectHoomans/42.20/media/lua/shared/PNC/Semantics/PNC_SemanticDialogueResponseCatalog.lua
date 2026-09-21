@@ -10,6 +10,8 @@ PNC.Semantics = PNC.Semantics or {}
 
 local Catalog = PNC.Semantics.ResponseCatalog or {}
 PNC.Semantics.ResponseCatalog = Catalog
+local GeneratedDialogue = require
+    "PNC/Semantics/PNC_SemanticGeneratedDialogue"
 
 Catalog.VERSION = 1
 Catalog.MAX_POOLS = 64
@@ -207,6 +209,42 @@ function Catalog.Get(id)
     return Catalog.POOLS[tostring(id or "")]
 end
 
+function Catalog.Extend(id, definition)
+    id = tostring(id or "")
+    local pool = Catalog.Get(id)
+    local variants = type(definition) == "table" and definition.variants
+    if not pool then return false, "response_pool_unavailable" end
+    if type(variants) ~= "table" or #variants == 0 then
+        return false, "response_pool_requires_variants"
+    end
+    if #pool.variants + #variants > Catalog.MAX_VARIANTS then
+        return false, "response_variant_limit"
+    end
+
+    local seenIDs = {}
+    local index
+    local variant
+    for index = 1, #pool.variants do
+        variant = pool.variants[index]
+        seenIDs[variant.id] = true
+    end
+    local additions = {}
+    local normalized
+    for index = 1, #variants do
+        normalized = normalizedVariant(id, #pool.variants + index, variants[index])
+        if not normalized then return false, "invalid_response_variant" end
+        if seenIDs[normalized.id] then
+            return false, "duplicate_response_variant_id"
+        end
+        seenIDs[normalized.id] = true
+        additions[#additions + 1] = normalized
+    end
+    for index = 1, #additions do
+        pool.variants[#pool.variants + 1] = additions[index]
+    end
+    return true, pool
+end
+
 function Catalog.RegisterTextFallbacks()
     local count = 0
     for _, pool in pairs(Catalog.POOLS) do
@@ -370,6 +408,23 @@ Catalog.Register("semantic.offer", {
             id = "semantic.offer.default",
             templateID = "semantic.offer.declined",
             fallback = "No thanks, I'm not hungry.",
+        },
+    },
+})
+
+Catalog.Register("semantic.question.identity", {
+    variants = {
+        {
+            id = "semantic.question.identity.default",
+            templateID = "semantic.question.identity",
+            fallback = "I'll tell you my name once we've established some trust. What's your name?",
+        },
+        {
+            id = "semantic.question.identity.untrustworthy",
+            templateID = "semantic.question.identity",
+            fallback = "I don't share my name with liars. What's yours, truthfully?",
+            when = { identityTrust = "untrustworthy" },
+            priority = 2,
         },
     },
 })
@@ -889,5 +944,25 @@ Catalog.Register("semantic.threat", {
         },
     },
 })
+
+local generatedPools = GeneratedDialogue and GeneratedDialogue.responsePools
+if type(generatedPools) ~= "table" then
+    error("generated dialogue dataset requires responsePools")
+end
+local generatedIndex
+local generatedPool
+local extended
+local reason
+for generatedIndex = 1, #generatedPools do
+    generatedPool = generatedPools[generatedIndex]
+    if type(generatedPool) ~= "table" then
+        error("generated dialogue dataset contains an invalid response pool")
+    end
+    extended, reason = Catalog.Extend(generatedPool.id, generatedPool)
+    if extended ~= true then
+        error("generated dialogue responses could not extend "
+            .. tostring(generatedPool.id) .. " (" .. tostring(reason) .. ")")
+    end
+end
 
 return Catalog

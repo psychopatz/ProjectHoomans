@@ -19,13 +19,17 @@ local skillLevel = 0
 local grounded = false
 local canSpendAttack = true
 local holds = 0
+local npcX = 1
+local npcY = 0
+local hordeMemoryWrites = {}
+local hordeEncounterMarks = {}
 
 local targetZombie = {
     isDead = function() return false end,
     isOnFloor = function() return grounded end,
     isCrawling = function() return grounded end,
-    getX = function() return 1 end,
-    getY = function() return 0 end,
+    getX = function() return npcX end,
+    getY = function() return npcY end,
     getZ = function() return 0 end,
 }
 
@@ -88,6 +92,32 @@ PNC = {
             return (dx * dx) + (dy * dy)
         end,
         IsManagedNPCBody = function() return false end,
+        IsAuthority = function() return true end,
+    },
+    EntityRef = {
+        ForNPC = function(id) return "npc:" .. tostring(id) end,
+    },
+    Conversation = {
+        Memory = {
+            Events = {
+                RecordRelationshipMemory = function(record, memory, targetKey)
+                    hordeMemoryWrites[#hordeMemoryWrites + 1] = {
+                        npcID = record and record.id,
+                        type = memory and memory.type,
+                        aboutKey = memory and memory.aboutKey,
+                        targetKey = targetKey,
+                        shareable = memory and memory.shareable,
+                    }
+                    return true
+                end,
+            },
+        },
+    },
+    SocialEncounterTracker = {
+        MarkHordeAttack = function(npcID)
+            hordeEncounterMarks[#hordeEncounterMarks + 1] = npcID
+            return true
+        end,
     },
     PathService = {
         MoveToward = function(_, _, x, y, _, mode, _, reason)
@@ -397,6 +427,115 @@ T.truthy(
     moves[#moves].x < record.x,
     "fixed retreat leg must continue away from danger"
 )
+local boundaryRetreat = record.runtime.combatRetreat
+T.equal(boundaryRetreat.retreatDistance, 5.75,
+    "near-miss retreat clears the detected horde radius")
+T.equal(boundaryRetreat.safetyRadius, nil,
+    "near-miss retreat cannot stop at one attacker's defense radius")
+T.truthy(boundaryRetreat.hordeSurvivalPending,
+    "detected horde retreat arms a survival memory")
+T.equal(hordeEncounterMarks[1], record.id,
+    "horde retreat marks its active shared encounter")
+T.equal(#hordeMemoryWrites, 0,
+    "horde survival is not recorded before the retreat reaches safety")
+npcX = boundaryRetreat.goalX
+npcY = boundaryRetreat.goalY
+record.x = npcX
+record.y = npcY
+now = now + 250
+local boundaryContinued, boundarySafeReason =
+    PNC.CombatTactics.Internal.ContinueLockedRetreat(
+        record,
+        targetZombie,
+        target,
+        boundaryRetreat,
+        now
+    )
+T.equal(boundaryContinued, false,
+    "near-miss horde retreat ends after reaching safety")
+T.equal(boundarySafeReason, "retreat_complete",
+    "near-miss retreat completes the full horde escape leg")
+T.equal(#hordeMemoryWrites, 1,
+    "safe near-miss retreat records exactly one horde story")
+T.equal(hordeMemoryWrites[1].type, "survived_horde_attack",
+    "near-miss survival uses the gossip event type")
+T.equal(hordeMemoryWrites[1].aboutKey, "npc:boundary_retreat",
+    "horde story is about the NPC who escaped")
+T.equal(hordeMemoryWrites[1].targetKey, "npc:boundary_retreat",
+    "horde story is stored in the NPC's own gossip journal")
+T.equal(hordeMemoryWrites[1].shareable, true,
+    "horde story is shareable")
+npcX = 1
+npcY = 0
+
+-- The direct threat-avoidance path also records horde survival only after
+-- its retreat endpoint is reached.
+now = now + 250
+record = makeRecord("avoid_horde")
+PNC.CombatTactics.MarkZombieNearMiss(record, 1, 0, 0, now)
+local avoided = PNC.CombatTactics.AvoidThreat(record, targetZombie, target, {})
+T.equal(avoided, true, "horde detector starts threat avoidance")
+local avoidRetreat = record.runtime.combatRetreat
+T.equal(avoidRetreat.retreatDistance, 5.75,
+    "threat avoidance clears the detected horde radius")
+T.truthy(avoidRetreat.hordeSurvivalPending,
+    "threat avoidance arms a horde survival memory")
+T.equal(hordeEncounterMarks[2], record.id,
+    "threat avoidance marks its active shared encounter")
+T.equal(#hordeMemoryWrites, 1,
+    "threat avoidance does not record survival at retreat start")
+npcX = avoidRetreat.goalX
+npcY = avoidRetreat.goalY
+record.x = npcX
+record.y = npcY
+now = now + 250
+local avoidContinued, avoidSafeReason =
+    PNC.CombatTactics.Internal.ContinueLockedRetreat(
+        record,
+        targetZombie,
+        target,
+        avoidRetreat,
+        now
+    )
+T.equal(avoidContinued, false,
+    "threat-avoidance retreat ends at its endpoint")
+T.equal(avoidSafeReason, "retreat_complete",
+    "threat-avoidance reaches the retreat endpoint")
+T.equal(#hordeMemoryWrites, 2,
+    "threat-avoidance survival is recorded once at the endpoint")
+T.equal(hordeMemoryWrites[2].npcID, record.id,
+    "threat-avoidance story belongs to the escaping NPC")
+npcX = 1
+npcY = 0
+
+-- Follow leash clamping can shorten a retreat. It must not turn that into
+-- a survivor story while the NPC is still inside the detected horde radius.
+now = now + 250
+record = makeRecord("leashed_horde")
+record.orderSpec = { kind = "follow" }
+PNC.CombatTactics.MarkZombieNearMiss(record, 1, 0, 0, now)
+local leashedAvoided = PNC.CombatTactics.AvoidThreat(
+    record, targetZombie, target, {}
+)
+T.equal(leashedAvoided, true, "follow-order horde avoidance starts")
+local leashedRetreat = record.runtime.combatRetreat
+T.truthy(leashedRetreat.goalX < 5.75,
+    "follow leash shortened the horde escape endpoint")
+npcX = leashedRetreat.goalX
+npcY = leashedRetreat.goalY
+record.x = npcX
+record.y = npcY
+now = now + 250
+local leashedContinued = PNC.CombatTactics.Internal.ContinueLockedRetreat(
+    record, targetZombie, target, leashedRetreat, now
+)
+T.equal(leashedContinued, false, "leashed horde retreat reaches its endpoint")
+T.equal(#hordeMemoryWrites, 2,
+    "leashed retreat inside the horde radius does not create survivor gossip")
+T.equal(leashedRetreat.hordeSurvivalPending, false,
+    "incomplete horde escape clears its pending survivor story")
+npcX = 1
+npcY = 0
 
 -- A successful zombie hit uses the same horde gate as an avoided hit, then
 -- keeps a low-stamina fighter safe until the re-engagement threshold is met.

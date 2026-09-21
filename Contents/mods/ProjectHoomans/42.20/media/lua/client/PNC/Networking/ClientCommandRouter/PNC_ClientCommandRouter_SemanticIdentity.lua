@@ -41,6 +41,25 @@ Internal.RegisterServerCommand(Const.CMD_SEMANTIC_IDENTITY_RESULT,
         ClientState.semanticIdentityResults =
             ClientState.semanticIdentityResults or {}
         ClientState.semanticIdentityResults[npcID] = args
+        local responseArgs = type(args.responseArgs) == "table"
+            and args.responseArgs or {}
+        local disclosedName = tostring(responseArgs[2] or "")
+        local identityDisclosureConfirmed = args.accepted == true
+            and args.kind == "identity_claim"
+            and args.truthful == true
+            and args.responseKey
+                == "UI_PNC_Conversation_Semantic_IdentityExchangeConfirmed"
+            and disclosedName ~= ""
+        if identityDisclosureConfirmed then
+            ClientState.identityDisclosureVerified =
+                ClientState.identityDisclosureVerified or {}
+            ClientState.identityDisclosureVerified[npcID] = {
+                verified = true,
+                characterUUID = tostring(ClientState.playerContext
+                    and ClientState.playerContext.characterUUID or ""),
+                displayName = disclosedName,
+            }
+        end
         if args.trustLabel then
             ClientState.identityTrust = ClientState.identityTrust or {}
             ClientState.identityTrust[npcID] = args.trustLabel
@@ -67,8 +86,38 @@ Internal.RegisterServerCommand(Const.CMD_SEMANTIC_IDENTITY_RESULT,
         end
 
         local view = activeViewFor(npcID)
-        if view and view.session and (args.responseText or args.responseKey) then
-            local fallback = tostring(args.responseText or "")
+        if identityDisclosureConfirmed and view and view.spec
+            and type(view.spec.context) == "table"
+        then
+            local context = view.spec.context
+            local firstName = string.match(disclosedName, "^(%S+)")
+                or disclosedName
+            context.identityState = "known"
+            context.identityClaimVerified = true
+            context.npcName = disclosedName
+            context.npcFullName = disclosedName
+            context.npcFirstName = firstName
+        end
+        local unavailableResponse
+        if args.accepted ~= true and args.kind == "identity_claim" then
+            local semanticInput = PNC.Semantics
+                and PNC.Semantics.DialogueInput
+            local inputInternal = semanticInput and semanticInput.Internal
+            if inputInternal
+                and type(inputInternal.IdentityExchangeUnavailableResponse)
+                    == "function"
+            then
+                unavailableResponse =
+                    inputInternal.IdentityExchangeUnavailableResponse()
+            end
+        end
+
+        if view and view.session and (args.responseText or args.responseKey
+            or unavailableResponse)
+        then
+            local fallback = unavailableResponse
+                and unavailableResponse.fallback
+                or tostring(args.responseText or "")
             local text = fallback
             local translation = PNC.Translation
             if args.responseKey and translation
@@ -86,7 +135,7 @@ Internal.RegisterServerCommand(Const.CMD_SEMANTIC_IDENTITY_RESULT,
                 )
                 if ok and localized then text = tostring(localized) end
             end
-            local response = {
+            local response = unavailableResponse or {
                 key = args.responseKey,
                 text = text ~= "" and text or nil,
                 fallback = fallback,

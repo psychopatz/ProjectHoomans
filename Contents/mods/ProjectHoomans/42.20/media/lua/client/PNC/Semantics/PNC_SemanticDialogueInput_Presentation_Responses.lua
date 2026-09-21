@@ -25,6 +25,16 @@ local function semanticTranslationKey(response)
     local keys = {
         ["semantic.identity.exchange"] =
             "UI_PNC_Conversation_Semantic_IdentityExchange",
+        ["semantic.identity.exchange.unavailable"] =
+            "UI_PNC_Conversation_Semantic_IdentityExchangeUnavailable",
+        ["semantic.question.identity.stranger_alt_1"] =
+            "UI_PNC_Conversation_Semantic_QuestionIdentityStrangerAlt1",
+        ["semantic.question.identity.stranger_alt_2"] =
+            "UI_PNC_Conversation_Semantic_QuestionIdentityStrangerAlt2",
+        ["semantic.question.identity.wary_alt_1"] =
+            "UI_PNC_Conversation_Semantic_QuestionIdentityWaryAlt1",
+        ["semantic.question.identity.wary_alt_2"] =
+            "UI_PNC_Conversation_Semantic_QuestionIdentityWaryAlt2",
         ["semantic.social.self_reflection.friendly"] =
             "UI_PNC_Conversation_Semantic_SelfReflectionFriendly",
         ["semantic.social.self_reflection.trusted"] =
@@ -114,6 +124,36 @@ function ResponseAdapter.Payload(decision)
         args = response.args,
         translationKey = translationKey,
     }
+end
+
+function ResponseAdapter.IdentityExchangeUnavailable()
+    return ResponseAdapter.Payload({
+        response = {
+            templateID = "semantic.identity.exchange.unavailable",
+            fallback = "I couldn't verify your name just now. Could you tell me again?",
+        },
+    })
+end
+
+function ResponseAdapter.IdentityQuestion(context, state)
+    local localResponse = PNC.Semantics
+        and PNC.Semantics.LocalResponse or nil
+    local response
+    if localResponse and type(localResponse.Resolve) == "function" then
+        response = localResponse.Resolve(
+            { intent = "QUESTION", subject = "IDENTITY" },
+            state,
+            type(context) == "table" and context or {},
+            "QUESTION_RECEIVED"
+        )
+    end
+    if type(response) ~= "table" then
+        response = {
+            templateID = "semantic.question.identity",
+            fallback = "I'll tell you my name once we've established some trust. What's your name?",
+        }
+    end
+    return ResponseAdapter.Payload({ response = response })
 end
 
 function ResponseAdapter.CampAcknowledgement(result, actionResult)

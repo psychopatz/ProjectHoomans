@@ -33,6 +33,7 @@ local FACTION_INCIDENT_BY_SOCIAL_EVENT = {
     saved_from_incapacitation = "member_rescued",
     protected_from_attacker = "member_protected",
     survived_combat_together = "members_fought_together",
+    survived_horde_attack = "members_fought_together",
     abandoned_in_combat = "member_abandoned",
 }
 

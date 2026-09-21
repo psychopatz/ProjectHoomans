@@ -31,7 +31,16 @@ return function(dependencies)
     return function(ir, state, context, giftOffer)
         local branch = "SOCIAL_ACKNOWLEDGED"
         local reason = "semantic_acknowledgement"
-        if ir.intent == "GREET" or ir.speechAct == "GREET" then
+        -- A pending identity answer is a conversational obligation. Resolve
+        -- a name claim or topic evasion before generic intent routes can
+        -- consume self-state reports, questions, or other social turns.
+        if isIdentityClaim(ir) then
+            branch = "IDENTITY_CLAIM_RECEIVED"
+            reason = "recognized_self_name_claim"
+        elseif isIdentityEvasion(ir, state, context) then
+            branch = "IDENTITY_NAME_EVASION"
+            reason = "identity_question_evaded"
+        elseif ir.intent == "GREET" or ir.speechAct == "GREET" then
             branch = "GREET_ACKNOWLEDGED"
             reason = "recognized_greeting"
         elseif ir.intent == "COMPLIMENT"
@@ -74,12 +83,6 @@ return function(dependencies)
         elseif ir.intent == "GOSSIP" then
             branch = "GOSSIP_RECEIVED"
             reason = "recognized_gossip"
-        elseif isIdentityClaim(ir) then
-            branch = "IDENTITY_CLAIM_RECEIVED"
-            reason = "recognized_self_name_claim"
-        elseif isIdentityEvasion(ir, state, context) then
-            branch = "IDENTITY_NAME_EVASION"
-            reason = "identity_question_evaded"
         elseif ir.intent == "SELF_REFLECTION"
             or ir.speechAct == "SELF_REFLECTION"
         then

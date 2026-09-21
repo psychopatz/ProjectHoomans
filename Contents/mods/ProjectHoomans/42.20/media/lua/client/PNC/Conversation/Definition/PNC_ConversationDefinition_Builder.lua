@@ -12,6 +12,7 @@ local Palette = PNC.NPCTypePalette
 local FlavorAddress = PNC.FlavorAddress
 local Context = require "PNC/Conversation/Definition/PNC_ConversationDefinition_Context"
 local ExtensionParts = require "PNC/Conversation/Definition/PNC_ConversationDefinition_ExtensionParts"
+local IdentityChoice = require "PNC/Conversation/Blocks/PNC_ConversationIdentityChoice"
 
 local function semanticInputFactory()
     if type(Conversation.CreateSemanticDialogueInput) == "function" then
@@ -38,7 +39,8 @@ local function semanticInputFactory()
 end
 
 local function buildConversationContext(entry, player, timeID, relationshipID, npcID)
-    local identityState, name, projection, clientState = Context.IdentityProjection(entry)
+    local identityState, name, projection, clientState, identityClaimVerified =
+        Context.IdentityProjection(entry)
     local faction = Context.FactionPresentation(entry)
     local blockContext = Composer.BuildContext(
         entry, player, timeID, relationshipID
@@ -59,6 +61,7 @@ local function buildConversationContext(entry, player, timeID, relationshipID, n
         player = player,
         npcName = name,
         identityState = identityState,
+        identityClaimVerified = identityClaimVerified == true,
         -- Transport state is deliberately separate from what the player is
         -- allowed to see. A pending snapshot must not erase the social menu.
         identityRequestState = projection and (
@@ -93,6 +96,7 @@ local function buildConversationContext(entry, player, timeID, relationshipID, n
 
     return {
         identityState = identityState,
+        identityClaimVerified = identityClaimVerified == true,
         projection = projection,
         clientState = clientState,
         identityArguments = identityArguments,
@@ -105,6 +109,17 @@ local function buildConversationMenu(contextData, npcID)
     local identityArguments = contextData.identityArguments
     local blockContext = contextData.blockContext
     local presentationContext = contextData.presentationContext
+    local askNameChoice
+    if contextData.identityState == "unknown" and contextData.projection
+        and (contextData.projection.canAskName == true
+            or contextData.projection.state == "loading")
+    then
+        askNameChoice = IdentityChoice.Build(
+            npcID,
+            contextData.projection,
+            identityArguments
+        )
+    end
     local dossierChoice = {
         id = "view_dossier",
         log = false,
@@ -117,6 +132,7 @@ local function buildConversationMenu(contextData, npcID)
         next = "greeting",
     }
     local menuOptions = {
+        askNameChoice = askNameChoice,
         dossierChoice = dossierChoice,
         presentationContext = presentationContext,
     }

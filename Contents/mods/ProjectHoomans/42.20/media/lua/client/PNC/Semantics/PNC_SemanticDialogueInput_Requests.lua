@@ -11,37 +11,64 @@ function Requests.RequestCognitionForIR(view, ir)
     local lifecycle
     local context
     local request
+    local accepted
+    local reason
+    local requestID
+    local pending
+    local waiting = false
+    local isGossip = false
+    local npcID = tostring(view and view.spec and view.spec.npcID or "")
     local session = view and view.session or nil
     if session then
         session.semanticMemoryTargetID = nil
     end
-    if type(ir) ~= "table"
-        or ir.intent ~= "QUESTION"
-    then
+    if type(ir) ~= "table" then
         return false, "not_a_fact_question"
     end
-    subject = tostring(ir.subject or "")
-    if subject == ""
-        or subject == "TIME"
-        or subject == "DATE"
-        or subject == "WEATHER"
-        or subject == "IDENTITY"
-        or subject == "GIFT_PREFERENCE"
-    then
-        return false, "local_world_fact"
-    end
-    fact = ir.extensions and ir.extensions.facts
-        and ir.extensions.facts[subject] or nil
-    if type(fact) == "table" and fact.status == "known" then
-        return false, "fact_already_known"
-    end
-    target = ir.target
-    if type(target) ~= "table" or target.unresolved == true then
-        return false, "target_unresolved"
-    end
-    targetID = target.id or target.entityID or target.npcID
-    if tostring(targetID or "") == "" then
-        return false, "target_id_unavailable"
+    if ir.intent == "GOSSIP" then
+        isGossip = true
+        subject = "GOSSIP"
+        target = ir.target
+        if target ~= nil then
+            if type(target) ~= "table" or target.unresolved == true then
+                return false, "target_unresolved"
+            end
+            targetID = target.id or target.entityID or target.npcID
+            if tostring(targetID or "") == "" then
+                return false, "target_id_unavailable"
+            end
+        else
+            -- The server resolves this sentinel to the authenticated speaker
+            -- identity. It never trusts a client-supplied identity for a
+            -- targetless gossip request.
+            targetID = "self"
+        end
+    elseif ir.intent == "QUESTION" then
+        subject = tostring(ir.subject or "")
+        if subject == ""
+            or subject == "TIME"
+            or subject == "DATE"
+            or subject == "WEATHER"
+            or subject == "IDENTITY"
+            or subject == "GIFT_PREFERENCE"
+        then
+            return false, "local_world_fact"
+        end
+        fact = ir.extensions and ir.extensions.facts
+            and ir.extensions.facts[subject] or nil
+        if type(fact) == "table" and fact.status == "known" then
+            return false, "fact_already_known"
+        end
+        target = ir.target
+        if type(target) ~= "table" or target.unresolved == true then
+            return false, "target_unresolved"
+        end
+        targetID = target.id or target.entityID or target.npcID
+        if tostring(targetID or "") == "" then
+            return false, "target_id_unavailable"
+        end
+    else
+        return false, "not_a_fact_question"
     end
     if session then
         session.semanticMemoryTargetID = tostring(targetID)
@@ -50,16 +77,44 @@ function Requests.RequestCognitionForIR(view, ir)
     lifecycle = context and context.conversationLifecycleState or nil
     request = PNC.Client and PNC.Client.RequestSemanticCognition
     if type(request) ~= "function" then
+        if session then session.semanticMemoryTargetID = nil end
         return false, "cognition_request_unavailable"
     end
-    return request(
-        view and view.spec and view.spec.npcID,
+    accepted, reason, requestID = request(
+        npcID,
         {
             subject = subject,
             targetID = targetID,
             conversationToken = lifecycle and lifecycle.token,
         }
     )
+    if accepted ~= true then
+        if session then session.semanticMemoryTargetID = nil end
+        return accepted, reason, requestID, false
+    end
+    if isGossip then
+        local clientState = PNC.Network and PNC.Network.ClientState or nil
+        local pendingRequests = clientState
+            and clientState.pendingSemanticCognition or nil
+        pending = pendingRequests and pendingRequests[npcID] or nil
+        waiting = type(pending) == "table"
+            and tostring(pending.requestID or "")
+                == tostring(requestID or "")
+        if waiting and session and not view.groupConversation then
+            clientState.semanticCognitionDialogueRequests =
+                clientState.semanticCognitionDialogueRequests or {}
+            clientState.semanticCognitionDialogueRequests[
+                tostring(requestID)
+            ] = {
+                view = view,
+                session = session,
+                npcID = npcID,
+                requestID = tostring(requestID),
+            }
+            session.semanticGossipRequestID = tostring(requestID)
+        end
+    end
+    return accepted, reason, requestID, waiting
 end
 
 local function identityClaimName(ir)
@@ -167,7 +222,9 @@ local function pendingIdentity(context)
         and context.semanticDialogueContext.pendingIdentityExchange
 end
 
--- Identity disclosure and claims retain their existing network contracts.
+-- Identity questions are answered locally and leave a bounded semantic turn
+-- for the player to state their name. Only the server-validated claim below
+-- may trigger the identity knowledge disclosure.
 function Requests.PrepareIdentityRequest(view, ir, context)
     local npcID = view and view.spec and view.spec.npcID
     local lifecycle = context and context.conversationLifecycleState or nil
@@ -181,21 +238,6 @@ function Requests.PrepareIdentityRequest(view, ir, context)
             kind = "gift_preference_disclosure",
             npcID = npcID,
             preferenceItemType = itemType,
-            conversationToken = lifecycle and lifecycle.token,
-        }
-    end
-
-    if ir.intent == "QUESTION" and ir.subject == "IDENTITY" then
-        if context.identityTrust == "untrustworthy" then
-            return nil
-        end
-        if context.identityState == "known"
-        then
-            return nil
-        end
-        return {
-            kind = "identity_disclosure",
-            npcID = npcID,
             conversationToken = lifecycle and lifecycle.token,
         }
     end
@@ -225,9 +267,10 @@ function Requests.DispatchIdentityRequest(request)
     request = type(request) == "table" and request or nil
     local client = PNC.Client
     if not request or not client then return false, "identity_request_unavailable" end
-    if request.kind == "identity_disclosure"
-        or request.kind == "gift_preference_disclosure"
-    then
+    if request.kind == "identity_disclosure" then
+        return false, "identity_claim_required"
+    end
+    if request.kind == "gift_preference_disclosure" then
         if type(client.RequestNPCKnowledgeTopic) ~= "function" then
             return false, "identity_disclosure_unavailable"
         end
@@ -237,10 +280,8 @@ function Requests.DispatchIdentityRequest(request)
                 tostring(request.npcID)
             ]
         if pending then return false, "identity_request_pending" end
-        local topicID = request.kind == "gift_preference_disclosure"
-            and "gift_preferences" or "identity_name"
         return client.RequestNPCKnowledgeTopic(
-            request.npcID, topicID, {
+            request.npcID, "gift_preferences", {
                 conversationToken = request.conversationToken,
                 origin = "semantic_dialogue",
                 preferenceItemType = request.preferenceItemType,

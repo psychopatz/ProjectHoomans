@@ -237,7 +237,9 @@ function SocialEvents.Process(eventSpec)
                 reason = incidentReason,
                 details = incidentDetails,
             }
-            if event.type == "survived_combat_together" then
+            if event.type == "survived_combat_together"
+                or event.type == "survived_horde_attack"
+            then
                 PNC.FactionIncidentService.RecordPositiveEvent(
                     targetFactionID,
                     actorFactionID,

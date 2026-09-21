@@ -47,6 +47,7 @@ function Commands.HandleSemanticIdentity(player, args)
     local record = request.record
     local targetKey = request.targetKey
     local lease = request.lease
+    local actualName
 
     local at = worldAgeHours()
     local before = Relationships.Get(npcID, targetKey)
@@ -54,7 +55,7 @@ function Commands.HandleSemanticIdentity(player, args)
     local trustLabel = nil
     local effect
     if kind == Identity.EVENT_CLAIM then
-        local actualName = IdentityPresentation.PlayerName(
+        actualName = IdentityPresentation.PlayerName(
             player,
             request.context
         )
@@ -114,7 +115,8 @@ function Commands.HandleSemanticIdentity(player, args)
                 player,
                 request,
                 record,
-                truthful
+                truthful,
+                actualName
             )
     end
 

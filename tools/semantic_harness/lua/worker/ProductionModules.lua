@@ -18,6 +18,11 @@ function ProductionModules.load(context)
         ["PsychopatzCore/UI/Conversation/Parts/PsychopatzConversationPart"] = "native_ui",
         ["PsychopatzCore/UI/Conversation/Parts/PsychopatzConversationLLMInput"] = "native_ui",
     }
+    local headlessStubs = {
+        ["PNC/Semantics/PNC_SemanticTelemetryPrompt"] = {
+            Offer = function() return false end,
+        },
+    }
 
     Runtime.moduleManifest = {}
     Runtime.loadedModules = {}
@@ -63,6 +68,16 @@ function ProductionModules.load(context)
     load("ProjectHoomans", "shared", "PNC/Semantics/PNC_SemanticIdentityNetwork.lua", "semantic")
     load(
         "ProjectHoomans", "server",
+        "PNC/Conversation/ConversationAuthority/PNC_ConversationAuthority_Context.lua",
+        "authority"
+    )
+    load(
+        "ProjectHoomans", "server",
+        "PNC/Conversation/ConversationAuthority/PNC_ConversationAuthority_Validation.lua",
+        "authority"
+    )
+    load(
+        "ProjectHoomans", "server",
         "PNC/Knowledge/PlayerKnowledgeCommands/PNC_PlayerKnowledgeCommands_Core.lua",
         "authority"
     )
@@ -71,6 +86,15 @@ function ProductionModules.load(context)
     -- Only the named native UI edges are replaced in this headless worker.
     -- Unexpected production require failures still fail startup.
     require = function(name)
+        local headlessStub = headlessStubs[name]
+        if headlessStub then
+            Runtime.headlessRequires[name] = {
+                role = "headless_presentation",
+                reason = "telemetry prompt UI is omitted in the headless worker",
+            }
+            return headlessStub
+        end
+
         local ok, value = pcall(originalRequire, name)
         if ok then return value end
         local reason = tostring(value or "require_failed")
@@ -90,6 +114,8 @@ function ProductionModules.load(context)
 
     load("ProjectHoomans", "client", "PNC/Networking/ClientCommandRouter/PNC_ClientCommandRouter_Registry.lua", "network")
     load("ProjectHoomans", "client", "PNC/Networking/ClientCommandRouter/PNC_ClientCommandRouter_SemanticIdentity.lua", "network")
+    load("ProjectHoomans", "client", "PNC/Networking/ClientRequests/PNC_ClientRequests_Internal.lua", "network")
+    load("ProjectHoomans", "client", "PNC/Networking/ClientRequests/PNC_ClientRequests_Identity.lua", "network")
 
     PsychopatzConversationLLMInput = originalInputClass
     context.Translations.installInstrumentation(context)

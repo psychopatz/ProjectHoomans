@@ -136,6 +136,16 @@ end
 local function nameReply(result, context)
     local line
     local index
+    local replyContext = result and type(result.replyContext) == "table"
+        and result.replyContext or {}
+    if replyContext.outcome == "identity_exchange_prompt" then
+        local responseText = tostring(result.responseText or "")
+        if responseText ~= "" then return responseText end
+        return localized(
+            "UI_PNC_Conversation_Semantic_QuestionIdentity",
+            "I'll tell you my name once we've established some trust. What's your name?"
+        )
+    end
     if not result or result.accepted ~= true then
         line, index = choose("ask_name:rejected", CATALOG.ask_name.rejected,
             resultSalt(result, context))

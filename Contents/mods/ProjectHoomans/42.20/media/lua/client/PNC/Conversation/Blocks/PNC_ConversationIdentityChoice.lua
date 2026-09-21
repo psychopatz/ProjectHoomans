@@ -1,31 +1,29 @@
--- Build 42.20 adapter for the identity-disclosure conversation action.
--- Identity knowledge is intentionally separate from declarative topic blocks
--- because it invokes the authoritative knowledge service.
+-- Build 42.20 adapter for the semantic identity-exchange conversation action.
+-- Asking for a name starts the semantic prompt; verified claims reach the
+-- authoritative knowledge service through the semantic input lifecycle.
 PNC = PNC or {}
 PNC.Conversation = PNC.Conversation or {}
 
 local IdentityChoice = PNC.Conversation.IdentityChoice or {}
 PNC.Conversation.IdentityChoice = IdentityChoice
 
-local function currentConversationToken(npcID)
+local function currentConversationView(npcID)
     local view = PsychopatzCore and PsychopatzCore.Conversation
         and PsychopatzCore.Conversation.instance or nil
-    local context = view and view.spec and view.spec.context or nil
-    local state = context and context.conversationLifecycleState or nil
-    if context and tostring(view.spec.npcID or "") == tostring(npcID or "")
-        and state and state.token
-    then return state.token end
+    if view and view.spec
+        and tostring(view.spec.npcID or "") == tostring(npcID or "")
+    then return view end
     return nil
 end
 
 function IdentityChoice.Request(npcID)
-    if PNC.Client and PNC.Client.RequestNPCKnowledgeTopic then
-        return PNC.Client.RequestNPCKnowledgeTopic(npcID, "identity_name", {
-            conversationToken = currentConversationToken(npcID),
-            origin = "conversation",
-        })
+    local view = currentConversationView(npcID)
+    local input = PNC.Semantics and PNC.Semantics.DialogueInput or nil
+    if not view then return false, "conversation_unavailable" end
+    if not input or type(input.Submit) ~= "function" then
+        return false, "semantic_dialogue_input_unavailable"
     end
-    return false
+    return input.Submit(view, "what is your name")
 end
 
 function IdentityChoice.Build(npcID, projection, identityArguments)
@@ -40,18 +38,19 @@ function IdentityChoice.Build(npcID, projection, identityArguments)
             args = identityArguments,
         },
         action = function()
-            -- Keep the identity projection unknown while the disclosure is
-            -- in flight. Only the request lifecycle is loading; the social
-            -- category menu must remain usable.
+            -- This action starts dialogue, not a knowledge request. Keep the
+            -- identity unknown until a truthful player-name claim is verified.
             projection.state = "unknown"
-            projection.requestState = "loading"
-            projection.knowledgePending = true
+            projection.requestState = "prompting"
+            projection.knowledgePending = false
             projection.canAskName = false
             local accepted = IdentityChoice.Request(npcID)
             if accepted ~= true then
                 projection.requestState = "error"
                 projection.knowledgePending = false
                 projection.canAskName = true
+            else
+                projection.requestState = "prompted"
             end
         end,
     }

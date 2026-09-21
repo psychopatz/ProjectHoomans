@@ -18,6 +18,7 @@ local DEBUG_EVENTS = {
     witnessed_player_hurt = "combat",
     player_damaged_npc = "combat",
     survived_combat_together = "combat",
+    survived_horde_attack = "combat",
     abandoned_in_combat = "combat",
 }
 local worldAgeHours = Internal.worldAgeHours

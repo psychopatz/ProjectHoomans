@@ -115,6 +115,7 @@ local function selectorContext(ir, state, context)
         subject = ir and ir.subject,
         relationshipState = context.relationshipState
             or context.conversationRelationshipID,
+        identityTrust = context.identityTrust,
         pendingRequest = state and state.pendingRequest
             or context.pendingRequest,
         worldContext = world,
@@ -383,9 +384,45 @@ function Response.Resolve(ir, state, context, branch)
             }
         )
         if response then
-            local name = targetText(ir.target)
-            response.fallback = "I haven't heard anything about "
-                .. name .. " yet."
+            local information = ir.slots and ir.slots.information or nil
+            local gossip = context and context.npcGossip or nil
+            local statements = type(gossip) == "table"
+                and gossip.statements or nil
+            local gossipLines = {}
+            local index
+            local line
+            if type(statements) == "table" then
+                for index = 1, math.min(#statements, 4) do
+                    line = statements[index]
+                    if type(line) == "string" and line ~= "" then
+                        gossipLines[#gossipLines + 1] = line
+                    end
+                end
+            end
+            if #gossipLines > 0 then
+                response.templateID = "semantic.gossip.memory"
+                response.fallback = table.concat(gossipLines, " ")
+                response.args = nil
+                return response
+            end
+            if type(information) == "table"
+                and information.event == "NEWS"
+            then
+                local target = type(ir.target) == "table"
+                    and ir.target.unresolved ~= true
+                    and ir.target or nil
+                local name = target and targetText(target) or ""
+                if name ~= "" and name ~= "them" then
+                    response.fallback = "I haven't heard anything new about "
+                        .. name .. " lately."
+                else
+                    response.fallback = "I haven't heard any news lately."
+                end
+            else
+                local name = targetText(ir.target)
+                response.fallback = "I haven't heard anything about "
+                    .. name .. " yet."
+            end
             return response
         end
     end

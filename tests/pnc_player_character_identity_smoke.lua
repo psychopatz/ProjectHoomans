@@ -46,6 +46,15 @@ ModData = {
 
 function getGameTime()
     return {
+        getYear = function()
+            return 1993
+        end,
+        getMonth = function()
+            return 8
+        end,
+        getDay = function()
+            return 1
+        end,
         getWorldAgeHours = function()
             return worldHour
         end,

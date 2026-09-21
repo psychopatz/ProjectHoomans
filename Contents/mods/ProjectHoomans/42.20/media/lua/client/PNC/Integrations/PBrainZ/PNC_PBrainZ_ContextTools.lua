@@ -39,7 +39,7 @@ function Tools.GetDefinitions()
             type = "function",
             ["function"] = {
                 name = "ask_name",
-                description = "Ask the NPC to say their name through authoritative identity knowledge disclosure.",
+                description = "Begin a reciprocal identity exchange. Ask the player for their name first; the semantic identity system verifies it before the NPC shares their own name.",
                 parameters = {
                     type = "object",
                     properties = {},

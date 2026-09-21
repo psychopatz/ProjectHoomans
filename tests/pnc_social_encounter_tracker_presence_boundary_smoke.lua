@@ -38,7 +38,7 @@ for name, _ in pairs(publicFunctions) do
     T.equal(type(PNC.SocialEncounterTracker[name]), "function",
         "entry point should preserve SocialEncounterTracker." .. name)
 end
-T.equal(publicCount, 11, "social-encounter function declaration count")
+T.equal(publicCount, 12, "social-encounter function declaration count")
 T.equal(type(PNC.SocialEncounterTracker.Encounters), "table",
     "entry point should preserve encounter state")
 T.equal(PNC.SocialEncounterTracker.ABANDON_DISTANCE, 20,

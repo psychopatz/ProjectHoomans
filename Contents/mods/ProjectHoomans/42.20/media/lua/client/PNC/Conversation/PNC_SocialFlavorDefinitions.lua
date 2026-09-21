@@ -429,4 +429,186 @@ Flavor.Register("social.conversation_safety_danger", {
     },
 })
 
+Flavor.Register("social.zombie_horde_detected", {
+    id = "social.zombie_horde_detected",
+    family = "zombie_awareness",
+    npc = {
+        translatedLine(
+            "UI_PNC_Conversation_ZombieHorde_01",
+            "Too many of the dead. We need to get clear."
+        ),
+        translatedLine(
+            "UI_PNC_Conversation_ZombieHorde_02",
+            "There are too many of them. Let's make some space."
+        ),
+        translatedLine(
+            "UI_PNC_Conversation_ZombieHorde_03",
+            "They're closing in. Circle around and keep moving."
+        ),
+    },
+    variants = {
+        {
+            id = "hostile",
+            when = { socialRole = "hostile" },
+            npc = {
+                translatedLine(
+                    "UI_PNC_Conversation_ZombieHorde_04",
+                    "That pack is too big for you. Move."
+                ),
+                translatedLine(
+                    "UI_PNC_Conversation_ZombieHorde_05",
+                    "I'm not dying for your bad call. Fall back."
+                ),
+            },
+        },
+        {
+            id = "neutral",
+            when = { socialRole = "neutral" },
+            npc = {
+                translatedLine(
+                    "UI_PNC_Conversation_ZombieHorde_06",
+                    "There are too many. Let's get some distance."
+                ),
+                translatedLine(
+                    "UI_PNC_Conversation_ZombieHorde_07",
+                    "We should move before they close in."
+                ),
+            },
+        },
+        {
+            id = "colonist",
+            when = { socialRole = { "colonist", "member" } },
+            npc = {
+                translatedLine(
+                    "UI_PNC_Conversation_ZombieHorde_08",
+                    "Too many for a straight fight. Keep our group together."
+                ),
+                translatedLine(
+                    "UI_PNC_Conversation_ZombieHorde_09",
+                    "Watch our rear while we move. Don't let anyone fall behind."
+                ),
+            },
+        },
+        {
+            id = "lover",
+            when = { socialRole = "lover" },
+            npc = {
+                translatedLine(
+                    "UI_PNC_Conversation_ZombieHorde_10",
+                    "Stay close. I don't like how many there are."
+                ),
+                translatedLine(
+                    "UI_PNC_Conversation_ZombieHorde_11",
+                    "Come with me. We'll get around them together."
+                ),
+            },
+        },
+        {
+            id = "family",
+            when = { socialRole = "family" },
+            npc = {
+                translatedLine(
+                    "UI_PNC_Conversation_ZombieHorde_12",
+                    "Keep beside me until we're clear."
+                ),
+                translatedLine(
+                    "UI_PNC_Conversation_ZombieHorde_13",
+                    "Don't get separated. We need to stay together."
+                ),
+            },
+        },
+    },
+})
+
+Flavor.Register("social.zombie_stamina_retreat", {
+    id = "social.zombie_stamina_retreat",
+    family = "zombie_awareness",
+    npc = {
+        translatedLine(
+            "UI_PNC_Conversation_ZombieRetreat_01",
+            "I need a moment before I can swing again."
+        ),
+        translatedLine(
+            "UI_PNC_Conversation_ZombieRetreat_02",
+            "I'm winded. Keep those dead back while I recover."
+        ),
+        translatedLine(
+            "UI_PNC_Conversation_ZombieRetreat_03",
+            "I can't keep this pace. I'm falling back."
+        ),
+    },
+    variants = {
+        {
+            id = "hostile",
+            when = { socialRole = "hostile" },
+            npc = {
+                translatedLine(
+                    "UI_PNC_Conversation_ZombieRetreat_04",
+                    "Cover me. I need a moment, and I won't ask twice."
+                ),
+                translatedLine(
+                    "UI_PNC_Conversation_ZombieRetreat_05",
+                    "I'm winded. Keep up or handle them yourself."
+                ),
+            },
+        },
+        {
+            id = "neutral",
+            when = { socialRole = "neutral" },
+            npc = {
+                translatedLine(
+                    "UI_PNC_Conversation_ZombieRetreat_06",
+                    "I need to catch my breath. Let's put some distance between us."
+                ),
+                translatedLine(
+                    "UI_PNC_Conversation_ZombieRetreat_07",
+                    "I'm running out of steam. Keep them back."
+                ),
+            },
+        },
+        {
+            id = "colonist",
+            when = { socialRole = { "colonist", "member" } },
+            npc = {
+                translatedLine(
+                    "UI_PNC_Conversation_ZombieRetreat_08",
+                    "Cover me while I catch my breath!"
+                ),
+                translatedLine(
+                    "UI_PNC_Conversation_ZombieRetreat_09",
+                    "I need a moment. Keep the group moving."
+                ),
+            },
+        },
+        {
+            id = "lover",
+            when = { socialRole = "lover" },
+            npc = {
+                translatedLine(
+                    "UI_PNC_Conversation_ZombieRetreat_10",
+                    "Stay close while I catch my breath."
+                ),
+                translatedLine(
+                    "UI_PNC_Conversation_ZombieRetreat_11",
+                    "I need to slow down. Keep them away from us."
+                ),
+            },
+        },
+        {
+            id = "family",
+            when = { socialRole = "family" },
+            npc = {
+                translatedLine(
+                    "UI_PNC_Conversation_ZombieRetreat_12",
+                    "Wait for me. I'm not leaving you behind."
+                ),
+                translatedLine(
+                    "UI_PNC_Conversation_ZombieRetreat_13",
+                    "Give me a moment. We need to get somewhere safe."
+                ),
+            },
+        },
+    },
+})
+
 return PNC.SocialFlavorDefinitions

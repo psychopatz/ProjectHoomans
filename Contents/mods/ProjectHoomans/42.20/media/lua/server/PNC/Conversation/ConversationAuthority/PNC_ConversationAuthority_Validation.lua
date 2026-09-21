@@ -16,11 +16,25 @@ local function validateLease(player, record, token)
     if not lease or tostring(lease.token or "") ~= tostring(token or "") then
         return false, "invalid_lease"
     end
+    if not Scene or type(Scene.ValidateConversationLease) ~= "function" then
+        return false, "conversation_authority_unavailable"
+    end
+    local active, validatedLease = Scene.ValidateConversationLease(
+        record,
+        player,
+        token
+    )
+    if active ~= true then return false, validatedLease end
+    lease = validatedLease or lease
     local ok, reason = PNC.ConversationScene.Begin(record, zombie, player, token, {
         maximumDistance = lease.maximumDistance,
         dangerRadius = lease.dangerRadius,
         guardThreats = lease.guardThreats ~= false,
         allowHostileParley = lease.hostileParley == true,
+        -- This token already identifies an established conversation. The
+        -- distance guard is only for the initial Begin; heartbeats also turn
+        -- it off after startup. Rechecking here rejected valid dialogue turns.
+        enforceDistance = false,
     })
     return ok == true, reason, lease
 end

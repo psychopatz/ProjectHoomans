@@ -35,6 +35,17 @@ local function orderKind(record)
         and record.orderSpec.kind or "")
 end
 
+local function isIdleKind(record, kind)
+    local idleKind = tostring(Const.ORDER_IDLE or "idle")
+    local tacticalClass = tostring(record and record.tacticalClass or "")
+    if tacticalClass == tostring(Const.TACTICAL_CLASS_HOSTILE or "hostile")
+        or tacticalClass == "hostile"
+    then
+        return false
+    end
+    return kind == "" or kind == idleKind
+end
+
 local function ownerToken(record, source, ownerKind)
     local runtime = record and record.runtime or {}
     local activity = runtime.facilityActivity
@@ -173,6 +184,27 @@ local function workContext(record, order, kind)
     )
 end
 
+local function idleContext(record, order)
+    local idleKind = tostring(Const.ORDER_IDLE or "idle")
+    return context(
+        idleKind,
+        idleKind,
+        firstNumber(order.x, record.x, record.anchorX),
+        firstNumber(order.y, record.y, record.anchorY),
+        firstNumber(order.z, record.z, record.anchorZ),
+        firstNumber(
+            order.threatRadius,
+            Const.IDLE_ENGAGE_RADIUS,
+            Const.GUARD_ENGAGE_RADIUS,
+            Const.GUARD_RADIUS,
+            Const.TARGET_IMMEDIATE_THREAT_RADIUS,
+            6
+        ),
+        nil,
+        ownerToken(record, idleKind, idleKind)
+    )
+end
+
 local function travelConversationContext(record)
     local runtime = record and record.runtime or nil
     local lease = runtime and runtime.conversationLease or nil
@@ -236,6 +268,9 @@ function Internal.ResolveContext(record)
             "seat",
             ownerToken(record, "roaming_seat", kind)
         )
+    end
+    if isIdleKind(record, kind) then
+        return idleContext(record, order)
     end
     if not PASSIVE_ORDERS[kind] then return nil end
     if kind == tostring(Const.ORDER_CAMP or "camp") then

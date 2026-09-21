@@ -113,6 +113,79 @@ class SemanticHarnessTests(unittest.TestCase):
             for event in result["transport"]
         ))
 
+    def test_news_questions_use_gossip_semantics_not_inventory(self) -> None:
+        for utterance in (
+            "you got any new",
+            "you got any news",
+            "have you got any news",
+            "do you have any news",
+            "any gossip?",
+            "any gossips?",
+            "tell me some gossip",
+            "what's the gossip?",
+            "have you heard any rumors?",
+        ):
+            with self.subTest(utterance=utterance):
+                with LuaSemanticWorker(merge({}, DEFAULT_SCENARIO)) as worker:
+                    result = worker.input(utterance)
+
+                semantic = result["result"]
+                ir = semantic["ir"]
+                self.assertEqual(ir["intent"], "GOSSIP")
+                self.assertEqual(ir["speechAct"], "GOSSIP")
+                self.assertEqual(ir["subject"], "GOSSIP")
+                self.assertEqual(
+                    ir["slots"]["information"]["event"],
+                    "NEWS",
+                )
+                self.assertEqual(
+                    semantic["decision"]["branch"],
+                    "GOSSIP_RECEIVED",
+                )
+                self.assertTrue(self.message_text(result))
+                self.assertNotIn(
+                    "query_inventory",
+                    {call["label"] for call in result["toolCalls"]},
+                )
+                self.assertFalse(any(
+                    event["command"] == "SemanticInventoryQuery"
+                    for event in result["transport"]
+                ))
+
+        known_npc_scenario = merge({}, DEFAULT_SCENARIO)
+        known_npc_scenario["npc"]["identityState"] = "known"
+        known_npc_scenario["npc"]["forename"] = "Sarah"
+        with LuaSemanticWorker(known_npc_scenario) as worker:
+            named_news_query = worker.input("any news about Sarah?")
+        named_semantic = named_news_query["result"]
+        self.assertEqual(
+            named_semantic["ir"]["intent"],
+            "GOSSIP",
+        )
+        self.assertEqual(
+            named_semantic["ir"]["target"]["name"],
+            "Sarah Vale",
+        )
+        self.assertEqual(
+            named_semantic["decision"]["branch"],
+            "GOSSIP_RECEIVED",
+        )
+        self.assertNotIn(
+            "query_inventory",
+            {call["label"] for call in named_news_query["toolCalls"]},
+        )
+
+        with LuaSemanticWorker(merge({}, DEFAULT_SCENARIO)) as worker:
+            new_item_query = worker.input("you got any new batteries")
+        self.assertEqual(
+            new_item_query["result"]["decision"]["branch"],
+            "INVENTORY_QUERY_RECEIVED",
+        )
+        self.assertIn(
+            "query_inventory",
+            {call["label"] for call in new_item_query["toolCalls"]},
+        )
+
     def test_gift_uses_editable_player_inventory_and_mutates_npc_projection(self) -> None:
         with LuaSemanticWorker(merge({}, DEFAULT_SCENARIO)) as worker:
             result = worker.input("here's an apple for you")
@@ -231,7 +304,10 @@ class SemanticHarnessTests(unittest.TestCase):
         self.assertLess(result["relationshipAfter"]["approval"], 0)
         self.assertLess(result["relationshipAfter"]["respect"], 0)
         self.assertIn("trust", self.message_text(result).lower())
-        self.assertIn("liars", self.message_text(follow_up).lower())
+        follow_up_text = self.message_text(follow_up).lower()
+        self.assertTrue(any(
+            marker in follow_up_text for marker in ("trust", "lie", "liar")
+        ))
 
     def test_self_reflection_is_not_an_insult_and_directed_insult_is(self) -> None:
         with LuaSemanticWorker(merge({}, DEFAULT_SCENARIO)) as worker:
@@ -308,10 +384,13 @@ class SemanticHarnessTests(unittest.TestCase):
         payload = result["messages"][0]["payload"]
         self.assertEqual(
             payload["key"],
-            "UI_PNC_Conversation_ToolReply_AskNameNamed_1",
+            "UI_PNC_Conversation_Semantic_IdentityExchangeConfirmed",
         )
-        self.assertEqual(payload["args"], ["Mara Vale"])
-        self.assertEqual(payload["text"], "Ako si Mara Vale.")
+        self.assertEqual(payload["args"], ["Patrick", "Mara Vale"])
+        self.assertEqual(
+            payload["text"],
+            "Sige, Patrick. Ikinagagalak kitang makilala. Ako si Mara Vale.",
+        )
         self.assertTrue(any(
             lookup["kind"] == "trFormat"
             and lookup["key"] == payload["key"]
@@ -336,14 +415,20 @@ class SemanticHarnessTests(unittest.TestCase):
             wary = worker.input("what is your name")
         with LuaSemanticWorker(scenario) as worker:
             reflection = worker.input("I'm an idiot")
-        self.assertEqual(
-            initial["messages"][0]["payload"]["text"],
-            "Sasabihin ko ang pangalan ko kapag may tiwala na tayo. Ano ang pangalan mo?",
-        )
-        self.assertEqual(
-            wary["messages"][0]["payload"]["text"],
-            "Hindi ko ibinabahagi ang pangalan ko sa mga sinungaling. Ano ang tunay mong pangalan?",
-        )
+        initial_payload = initial["messages"][0]["payload"]
+        self.assertTrue(initial_payload["translationKey"].startswith(
+            "UI_PNC_Conversation_Semantic_QuestionIdentity"
+        ))
+        self.assertNotIn("Mara", initial_payload["text"])
+        self.assertTrue(any(
+            word in initial_payload["text"].lower()
+            for word in ("pangalan", "tawag")
+        ))
+        wary_payload = wary["messages"][0]["payload"]
+        self.assertTrue(wary_payload["translationKey"].startswith(
+            "UI_PNC_Conversation_Semantic_QuestionIdentityWary"
+        ))
+        self.assertIn("pangalan", wary_payload["text"].lower())
         self.assertIn("sarili", reflection["messages"][0]["payload"]["text"].lower())
 
     def test_action_boundary_uses_configurable_mock_and_reports_tools(self) -> None:

@@ -39,8 +39,21 @@ function SemanticAdapters.configure(context)
     local number = Values.number
     local playerData = context.playerData
     local npcData = context.npcData
+    local conversationData = context.scenario.conversation or {}
     local runtime = context.runtime
     local player = context.player
+    local conversationToken = tostring(conversationData.token or "")
+
+    npcData.id = npcData.id or npcData.npcID
+    npcData.runtime = type(npcData.runtime) == "table"
+        and npcData.runtime or {}
+    if type(npcData.runtime.conversationLease) ~= "table" then
+        npcData.runtime.conversationLease = {
+            token = conversationToken,
+            maximumDistance = 6,
+            dangerRadius = 8,
+        }
+    end
 
     local function identityName(npc)
         return SemanticAdapters.identityName(context, npc)
@@ -58,6 +71,7 @@ function SemanticAdapters.configure(context)
     PNC.Core.DeepCopy = function(value) return Values.copy(value) end
     PNC.Const = PNC.Const or {}
     PNC.Const.MODULE = "ProjectHoomans"
+    PNC.Const.CMD_SEMANTIC_IDENTITY_REQUEST = "SemanticIdentityRequest"
     PNC.Const.CMD_SEMANTIC_IDENTITY_RESULT = "SemanticIdentityResult"
     PNC.Network = PNC.Network or {}
     PNC.Network.ClientState = PNC.Network.ClientState or {}
@@ -68,12 +82,43 @@ function SemanticAdapters.configure(context)
     PNC.Network.Internal = PNC.Network.Internal or {}
     PNC.Semantics = PNC.Semantics or {}
     PNC.Conversation = PNC.Conversation or {}
+    PNC.Conversation.Registry = PNC.Conversation.Registry or {}
     PNC.Conversation.Relationship = {
         ReceivePresentation = function() return true end,
     }
+    PNC.ConversationScene = PNC.ConversationScene or {}
+    local function validateHarnessLease(record, leasePlayer, token)
+        local lease = record and record.runtime
+            and record.runtime.conversationLease or nil
+        if leasePlayer ~= player then return false, "player_mismatch" end
+        if type(lease) ~= "table" or tostring(lease.token or "") == "" then
+            return false, "lease_missing"
+        end
+        if tostring(lease.token) ~= tostring(token or "") then
+            return false, "invalid_lease"
+        end
+        return true, lease
+    end
+    PNC.ConversationScene.ValidateConversationLease = function(
+        record, leasePlayer, token
+    )
+        return validateHarnessLease(record, leasePlayer, token)
+    end
+    PNC.ConversationScene.Begin = function(
+        record, _, leasePlayer, token
+    )
+        local valid, leaseOrReason = validateHarnessLease(
+            record, leasePlayer, token
+        )
+        if not valid then return false, leaseOrReason end
+        return true
+    end
     PNC.Registry = PNC.Registry or {}
     PNC.Registry.Get = function(id)
         return tostring(id) == tostring(npcData.npcID) and npcData or nil
+    end
+    PNC.Registry.GetLiveZombie = function(id)
+        return tostring(id) == tostring(npcData.id) and {} or nil
     end
     PNC.PlayerCharacters = PNC.PlayerCharacters or {}
     PNC.PlayerCharacters.GetRegistryRecord = function(characterUUID)
@@ -112,6 +157,13 @@ function SemanticAdapters.configure(context)
         elseif effect.tags and effect.tags.truthful then
             relationship.identityTrust = "trusted"
         end
+        local clientState = PNC.Network and PNC.Network.ClientState
+        if clientState then
+            clientState.conversationRelationships =
+                clientState.conversationRelationships or {}
+            clientState.conversationRelationships[tostring(npcID)] =
+                Values.copy(relationship)
+        end
         return true, "applied", {
             eventID = effectContext and effectContext.eventID,
             memoryID = effectContext and effectContext.eventID,
@@ -138,7 +190,7 @@ function SemanticAdapters.configure(context)
         end
         Runtime.disclosures = number(Runtime.disclosures, 0) + 1
         Runtime.knowledge = options
-        return { revealed = { "identity.name" } }
+        return { accepted = true, revealed = { "identity.name" } }
     end
     PNC.PlayerKnowledgeCommands = PNC.PlayerKnowledgeCommands or {}
     PNC.PlayerKnowledgeCommands.Internal = PNC.PlayerKnowledgeCommands.Internal or {}
@@ -198,6 +250,16 @@ function SemanticAdapters.configure(context)
         end
     end
     sendClientCommand = function(_, module, command, payload)
+        if module == PNC.Const.MODULE
+            and command == PNC.Const.CMD_SEMANTIC_IDENTITY_REQUEST
+        then
+            local callback = PNC.PlayerKnowledgeCommands
+                and PNC.PlayerKnowledgeCommands.HandleSemanticIdentity
+            if type(callback) == "function" then
+                callback(player, payload)
+                return true
+            end
+        end
         Runtime.transport[#Runtime.transport + 1] = {
             direction = "client_command",
             module = module,
@@ -231,6 +293,9 @@ function SemanticAdapters.configure(context)
     -- The server-side semantic validators and client result router stay real.
     PNC.Client = PNC.Client or {}
     PNC.Client.Internal = PNC.Client.Internal or {}
+    PNC.Core.IsClientOnly = function()
+        return runtime.mode == "multiplayer"
+    end
     PNC.Client.RequestNPCKnowledgeTopic = function(npcID, topicID, options)
         Runtime.transport[#Runtime.transport + 1] = {
             direction = "client_to_server",
@@ -244,27 +309,24 @@ function SemanticAdapters.configure(context)
         }
         return true
     end
-    PNC.Client.SubmitSemanticIdentity = function(npcID, options)
-        local requestID = "identity_exchange:" .. tostring(Runtime.turn)
-        local args = {
-            requestID = requestID,
-            npcID = npcID,
-            kind = options and options.kind,
-            claimedName = options and options.claimedName,
-            conversationToken = options and options.conversationToken,
-            origin = options and options.origin,
-        }
-        Runtime.transport[#Runtime.transport + 1] = {
-            direction = "client_to_server",
-            mode = runtime.mode,
-            command = "SemanticIdentityRequest",
-            payload = Values.copy(args),
-        }
-        local Commands = PNC.PlayerKnowledgeCommands
-        if not Commands or type(Commands.HandleSemanticIdentity) ~= "function" then
-            return false, "identity_authority_unavailable"
+    local Commands = PNC.PlayerKnowledgeCommands
+    if not Commands.__semanticIdentityHarnessBridge then
+        local handleIdentity = Commands.HandleSemanticIdentity
+        if type(handleIdentity) == "function" then
+            Commands.HandleSemanticIdentity = function(
+                dispatchPlayer, args
+            )
+                Runtime.transport[#Runtime.transport + 1] = {
+                    direction = "client_to_server",
+                    mode = (Runtime.scenario
+                        and Runtime.scenario.runtime or {}).mode,
+                    command = PNC.Const.CMD_SEMANTIC_IDENTITY_REQUEST,
+                    payload = Values.copy(args),
+                }
+                return handleIdentity(dispatchPlayer, args)
+            end
+            Commands.__semanticIdentityHarnessBridge = true
         end
-        return Commands.HandleSemanticIdentity(player, args)
     end
 
     PNC.Client.SendCompanionCommand = function(commandID, npcID, scope, commandContext)

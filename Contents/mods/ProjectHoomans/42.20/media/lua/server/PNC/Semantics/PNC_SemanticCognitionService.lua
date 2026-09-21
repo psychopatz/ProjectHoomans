@@ -71,29 +71,105 @@ local function requestOptions(args)
     return output
 end
 
-local function attachMemoryGossip(projection, speakerRecord, options)
+local function currentPlayerKey(player)
+    local PlayerCharacters = PNC.PlayerCharacters
+    local ok
+    local key
+    if not player or not PlayerCharacters
+        or type(PlayerCharacters.GetEntityKey) ~= "function"
+    then
+        return nil
+    end
+    ok, key = pcall(
+        PlayerCharacters.GetEntityKey,
+        player,
+        { callback = "semantic_cognition_gossip" }
+    )
+    if not ok or type(key) ~= "string" or key == "" then
+        return nil
+    end
+    return key
+end
+
+local function currentPlayerName(player)
+    local ok
+    local name
+    if not player then return nil end
+    if type(player.getUsername) == "function" then
+        ok, name = pcall(player.getUsername, player)
+        if ok and type(name) == "string" and name ~= "" then
+            return name
+        end
+    end
+    if type(player.getDisplayName) == "function" then
+        ok, name = pcall(player.getDisplayName, player)
+        if ok and type(name) == "string" and name ~= "" then
+            return name
+        end
+    end
+    return nil
+end
+
+local function attachMemoryGossip(projection, speakerRecord, options, player)
     local targetValue = options.targetID or options.target
     local target
     local subjectName
     local codes
+    local selfQuery = tostring(targetValue or "") == "self"
     if not projection or not MemoryEvents
         or type(MemoryEvents.ResolveTarget) ~= "function"
         or type(MemoryEvents.BuildGossipCodes) ~= "function"
     then
         return
     end
-    target = MemoryEvents.ResolveTarget(targetValue)
-    subjectName = target and target.record and target.record.name or nil
-    if not target or type(subjectName) ~= "string" or subjectName == "" then
-        return
+    if selfQuery then
+        targetValue = currentPlayerKey(player)
+        target = targetValue
+            and MemoryEvents.ResolveTarget(targetValue) or nil
+        subjectName = target and target.kind == "player"
+            and (currentPlayerName(player) or "you")
+            or target and target.record and target.record.name or nil
+        if target and type(subjectName) == "string" and subjectName ~= "" then
+            codes = MemoryEvents.BuildGossipCodes(
+                speakerRecord,
+                target,
+                subjectName,
+                speakerRecord.tacticalClass,
+                MemoryEvents.MAX_GOSSIP
+            )
+        end
+    else
+        target = MemoryEvents.ResolveTarget(targetValue)
+        subjectName = target and target.record and target.record.name or nil
+        if target and type(subjectName) == "string" and subjectName ~= "" then
+            codes = MemoryEvents.BuildGossipCodes(
+                speakerRecord,
+                target,
+                subjectName,
+                speakerRecord.tacticalClass,
+                MemoryEvents.MAX_GOSSIP
+            )
+        end
     end
-    codes = MemoryEvents.BuildGossipCodes(
-        speakerRecord,
-        target,
-        subjectName,
-        speakerRecord.tacticalClass,
-        MemoryEvents.MAX_GOSSIP
-    )
+    if selfQuery and (type(codes) ~= "table" or #codes == 0) then
+        local EntityRef = PNC.EntityRef
+        local selfTargetKey = EntityRef and EntityRef.ForNPC
+            and EntityRef.ForNPC(speakerRecord.id) or nil
+        local selfTarget = selfTargetKey
+            and MemoryEvents.ResolveTarget(selfTargetKey) or nil
+        local selfName = selfTarget and selfTarget.record
+            and selfTarget.record.name or speakerRecord.name or "me"
+        if selfTarget and type(selfName) == "string" and selfName ~= "" then
+            codes = MemoryEvents.BuildGossipCodes(
+                speakerRecord,
+                selfTarget,
+                selfName,
+                speakerRecord.tacticalClass,
+                MemoryEvents.MAX_GOSSIP
+            )
+            subjectName = selfName
+        end
+    end
     if type(codes) == "table" and #codes > 0 then
         projection._memoryGossip = {
             codes = codes,
@@ -208,7 +284,7 @@ function Service.BuildForConversation(player, npcID, options)
             and record.identity or nil
         projection.identitySeed = record.identitySeed
             or identity and (identity.identitySeed or identity.seed)
-        attachMemoryGossip(projection, record, options)
+        attachMemoryGossip(projection, record, options, player)
     end
     return projection
 end

@@ -18,9 +18,16 @@ local Registry = PNC.Registry
 API.VERSION = 1
 API.ORIGINS = API.ORIGINS or {
     conversation = true,
+    semantic_dialogue = true,
+    semantic_identity_claim = true,
     llm_tool = true,
     debug = true,
 }
+-- Preserve semantic provenance while routing these requests through the same
+-- conversation-lease validation used by native conversation disclosures.
+API.ORIGINS.semantic_dialogue = API.ORIGINS.semantic_dialogue ~= false
+API.ORIGINS.semantic_identity_claim =
+    API.ORIGINS.semantic_identity_claim ~= false
 
 local function safeID(value)
     value = tostring(value or "")
@@ -104,9 +111,27 @@ local function authorizeDisclosure(player, npcID, options)
     local context, reason = contextFor(player, "knowledge_disclosure")
     local record = recordFor(npcID)
     local origin = tostring(options.origin or "conversation")
+    local topicID = tostring(options.topicID or "")
+    local verifiedIdentityClaim = options.verifiedIdentityClaim == true
     if not context then return nil, nil, reason end
     if not record then return nil, nil, "npc_not_found" end
     if not API.ORIGINS[origin] then return nil, nil, "invalid_knowledge_origin" end
+
+    -- Identity is disclosed during conversation only after the server has
+    -- compared the player's claim with their authoritative character record.
+    -- HandleDisclosure forwards a whitelist of request fields, so a client
+    -- cannot supply verifiedIdentityClaim through the network route.
+    if topicID == "identity_name" and origin ~= "debug"
+        and (origin ~= "semantic_identity_claim"
+            or verifiedIdentityClaim ~= true)
+    then
+        return nil, nil, "identity_claim_required"
+    end
+    if origin == "semantic_identity_claim"
+        and (topicID ~= "identity_name" or verifiedIdentityClaim ~= true)
+    then
+        return nil, nil, "identity_claim_required"
+    end
 
     if origin == "debug" then
         local router = PNC.ServerCommandRouter
@@ -358,6 +383,9 @@ function API.DiscloseForPlayer(player, options)
             player, context, record, npcID, options, lease
         )
     end
+    -- Semantic origins preserve caller provenance above. They still enter
+    -- the knowledge service through direct_disclosure so its disclosure
+    -- eligibility checks remain active.
     local sourceType = options.origin == "debug" and "debug"
         or "direct_disclosure"
     local disclosure

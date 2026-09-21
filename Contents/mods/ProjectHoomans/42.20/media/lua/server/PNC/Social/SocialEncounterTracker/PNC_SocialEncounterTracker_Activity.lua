@@ -84,6 +84,18 @@ function Tracker.RecordActivity(spec)
     return encounter.id, "recorded"
 end
 
+function Tracker.MarkHordeAttack(npcID)
+    local key = EntityRef and EntityRef.ForNPC
+        and EntityRef.ForNPC(tostring(npcID or "")) or nil
+    local encounterID = key and Tracker.ByParticipant[key] or nil
+    local encounter = encounterID and Tracker.Encounters[encounterID] or nil
+    if not encounter or not encounter.participants[key] then
+        return false, "encounter_not_found"
+    end
+    encounter.hordeAttack = true
+    return true, "horde_attack_marked", encounter.id
+end
+
 function Tracker.RecordNPCDamaged(
     targetRecord,
     threatID,

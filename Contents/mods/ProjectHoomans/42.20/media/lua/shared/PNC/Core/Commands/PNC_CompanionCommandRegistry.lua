@@ -616,6 +616,55 @@ local function applyAttackType(record, definition)
     return true
 end
 
+local function prepareFollowOrder(record)
+    if not record then return false, "npc_not_found" end
+    local runtime = record.runtime
+    local workOrderId = runtime and runtime.workOrderId or nil
+    if workOrderId then
+        local work = PNC.WorkService
+        local order = work and work.Queries
+            and type(work.Queries.Get) == "function"
+            and work.Queries.Get(workOrderId) or nil
+        local operation = tostring(order and order.operation or "")
+        if not order or (operation ~= "PROVISION_PICKUP"
+            and operation ~= "CORPSE_HAUL")
+        then
+            return false, "WORK_ORDER_IN_PROGRESS"
+        end
+        if not work.Commands
+            or type(work.Commands.Cancel) ~= "function"
+        then
+            return false, "WORK_ORDER_IN_PROGRESS"
+        end
+        local cancelled, cancelResult = work.Commands.Cancel(
+            order.id, "companion_follow_requested")
+        if not cancelled then
+            return false, cancelResult or "WORK_ORDER_CANCELLATION_FAILED"
+        end
+        if cancelResult == "CANCELLATION_DEFERRED" then
+            return false, "WORK_ORDER_CANCELLING"
+        end
+    end
+
+    local travel = PNC.Travel
+    if travel and travel.Service and travel.Model
+        and type(travel.Service.Cancel) == "function"
+        and type(travel.Model.IsActive) == "function"
+        and travel.Model.IsActive(record.travel)
+    then
+        local cancelled, cancelReason = travel.Service.Cancel(
+            record, "companion_follow_requested")
+        if cancelled == false and cancelReason ~= "journey_inactive" then
+            return false, cancelReason or "TRAVEL_CANCELLATION_FAILED"
+        end
+    end
+
+    record.runtime = record.runtime or {}
+    record.runtime.homeState = "AWAY"
+    record.runtime.homeJourneyId = nil
+    return true
+end
+
 function Commands.Apply(record, player, commandID, radius, commandContext)
     local definition = Commands.Get(commandID)
     local allowed
@@ -642,6 +691,14 @@ function Commands.Apply(record, player, commandID, radius, commandContext)
     if type(definition.buildOrder) == "function" then
         orderSpec = definition.buildOrder(record, player, orderOptions)
         if type(orderSpec) ~= "table" then return false, "invalid_order" end
+        if tostring(orderSpec.kind or "")
+            == tostring(Const.ORDER_FOLLOW or "follow")
+        then
+            local prepared, prepareReason = prepareFollowOrder(record)
+            if not prepared then
+                return false, prepareReason or "FOLLOW_PREPARATION_FAILED"
+            end
+        end
         OrderSystem.SetOrder(record, orderSpec)
     end
     applyAttackType(record, definition)

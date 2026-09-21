@@ -177,6 +177,31 @@ Definitions.survived_combat_together = {
     reciprocalNPCObservers = true,
 }
 
+Definitions.survived_horde_attack = {
+    id = "survived_horde_attack",
+    allowedSourceSystems = { combat = true },
+    targetMemory = {
+        type = "survived_horde_attack",
+        approvalEffect = 4,
+        respectEffect = 8,
+        moraleEffect = 4,
+        familiarityGain = 5,
+        strength = 1,
+        decayPerDay = 0.02,
+        permanent = false,
+        shareable = true,
+        knowledgeSource = "experienced",
+        tags = {
+            combat = true,
+            shared_danger = true,
+            teamwork = true,
+            horde = true,
+        },
+    },
+    contributionCaps = { approval = 35, respect = 60 },
+    reciprocalNPCObservers = true,
+}
+
 Definitions.abandoned_in_combat = {
     id = "abandoned_in_combat",
     allowedSourceSystems = { combat = true },

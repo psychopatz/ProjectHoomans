@@ -163,6 +163,7 @@ function Math.ModifySocialEvent(
     elseif eventType == "protected_from_attacker"
         or eventType == "witnessed_player_kill"
         or eventType == "survived_combat_together"
+        or eventType == "survived_horde_attack"
     then
         factor = 1.15 - profile.bravery * 0.30
         effects.approvalEffect = scalePositive(
@@ -182,7 +183,9 @@ function Math.ModifySocialEvent(
         breakdown.braveryRespect = factor
     end
 
-    if eventType == "survived_combat_together" then
+    if eventType == "survived_combat_together"
+        or eventType == "survived_horde_attack"
+    then
         factor = 0.90 + profile.loyalty * 0.20
         effects.approvalEffect = scalePositive(
             effects.approvalEffect,

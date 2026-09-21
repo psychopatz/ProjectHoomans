@@ -84,3 +84,34 @@ WordNet package and license are documented at:
 
 - https://wordnet.princeton.edu/documentation/wnpkgs7wn
 - https://wordnet.princeton.edu/license-and-commercial-use
+
+## Common dialogue interactions
+
+`common_interactions.json` is the reviewed Project Hoomans seed for everyday
+greetings, identity questions, wellbeing/activity questions, and state-aware
+response variety. Its utterance patterns are exact full-phrase matches that
+emit only existing `GREET` or `QUESTION` semantics. Question subjects use
+existing `IDENTITY`, `WELLBEING`, and `ACTIVITY` response paths. Identity
+responses retain the existing name-disclosure trust gate, while supplemental
+lines vary by the NPC's identity-trust state.
+
+DailyDialog and EmpatheticDialogues are recorded as coverage references for
+dialogue-act and emotion-aware interaction categories. This seed contains
+Hoomans-authored examples; it does not copy corpus turns. Corpus text should be
+reviewed for its own license and manually mapped before any phrase is added to
+the runtime seed.
+
+Compile the reviewed interaction data with:
+
+```sh
+python3 tools/semantic_compiler/build.py \
+  --dialogue-source tools/semantic_compiler/common_interactions.json
+```
+
+The compact result is
+`Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticGeneratedDialogue.lua`.
+The existing semantic catalog registers the exact patterns with the Core
+Registry, and the existing response catalog appends the bounded variants to
+their current pools. The compiler rejects unsupported intents, fuzzy patterns,
+unknown response conditions, duplicate IDs/utterances, and oversized pools.
+No external corpus or linguistic package is loaded by Lua at runtime.

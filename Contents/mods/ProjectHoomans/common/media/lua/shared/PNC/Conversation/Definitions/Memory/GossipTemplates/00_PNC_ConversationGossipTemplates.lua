@@ -1,8 +1,10 @@
 -- Each phrase has its own stable code and translation key.
 require "PNC/Conversation/Definitions/Memory/GossipTemplates/Positive/Praise/Helping/01_PNC_GossipTemplate"
 require "PNC/Conversation/Definitions/Memory/GossipTemplates/Positive/Praise/Rescue/01_PNC_GossipTemplate"
+require "PNC/Conversation/Definitions/Memory/GossipTemplates/Positive/Praise/Protection/01_PNC_GossipTemplate"
 require "PNC/Conversation/Definitions/Memory/GossipTemplates/Negative/Mockery/LostGear/01_PNC_GossipTemplate"
 require "PNC/Conversation/Definitions/Memory/GossipTemplates/Negative/Mockery/Retreat/01_PNC_GossipTemplate"
+require "PNC/Conversation/Definitions/Memory/GossipTemplates/Negative/Warning/Abandonment/01_PNC_GossipTemplate"
 require "PNC/Conversation/Definitions/Memory/GossipTemplates/Negative/Suspicion/ChangingStory/01_PNC_GossipTemplate"
 require "PNC/Conversation/Definitions/Memory/GossipTemplates/Death/Report/01_PNC_GossipTemplate"
 require "PNC/Conversation/Definitions/Memory/GossipTemplates/Death/Sacrifice/01_PNC_GossipTemplate"
@@ -12,6 +14,7 @@ require "PNC/Conversation/Definitions/Memory/GossipTemplates/Death/CorpseReactio
 require "PNC/Conversation/Definitions/Memory/GossipTemplates/Death/CorpseReaction/Hostile/01_PNC_GossipTemplate"
 require "PNC/Conversation/Definitions/Memory/GossipTemplates/Death/CorpseReaction/Neutral/01_PNC_GossipTemplate"
 require "PNC/Conversation/Definitions/Memory/GossipTemplates/Neutral/Sighting/01_PNC_GossipTemplate"
+require "PNC/Conversation/Definitions/Memory/GossipTemplates/Neutral/Survival/HordeAttack/01_PNC_GossipTemplate"
 require "PNC/Conversation/Definitions/Memory/GossipTemplates/Positive/Sympathy/Loss/01_PNC_GossipTemplate"
 require "PNC/Conversation/Definitions/Memory/GossipTemplates/Negative/Warning/Danger/01_PNC_GossipTemplate"
 return true

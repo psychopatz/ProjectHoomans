@@ -68,20 +68,26 @@ function Service.SendToPlayer(record, player, reason)
     if not record or record.alive == false then return false, "NPC_MISSING" end
     if not player then return false, "PLAYER_MISSING" end
     -- Home-bound construction work must not be torn out by follow. Provision
-    -- pickups are different: they are interruptible world-space errands, and
-    -- an explicit follow command must be able to cancel one cleanly.
+    -- pickups and corpse hauls are interruptible field tasks, so an explicit
+    -- follow command cancels either one through its registered cleanup path.
     if record.runtime and record.runtime.workOrderId then
         local work = PNC.WorkService
         local order = work and work.Queries and work.Queries.Get
             and work.Queries.Get(record.runtime.workOrderId) or nil
-        if not order or order.operation ~= "PROVISION_PICKUP"
-            or not work.Commands or not work.Commands.Cancel
+        local operation = tostring(order and order.operation or "")
+        if not order
+            or (operation ~= "PROVISION_PICKUP"
+                and operation ~= "CORPSE_HAUL")
+            or not work.Commands
+            or type(work.Commands.Cancel) ~= "function"
         then
             return false, "WORK_ORDER_IN_PROGRESS"
         end
         local cancelled, cancelResult = work.Commands.Cancel(
             order.id, "follow_player_requested")
-        if not cancelled then return false, cancelResult end
+        if not cancelled then
+            return false, cancelResult or "WORK_ORDER_CANCELLATION_FAILED"
+        end
         if cancelResult == "CANCELLATION_DEFERRED" then
             return false, "WORK_ORDER_CANCELLING"
         end
@@ -109,6 +115,7 @@ function Service.SendToPlayer(record, player, reason)
             "follow_player_requested")
     end
     if PNC.Travel and PNC.Travel.Service and PNC.Travel.Model
+        and type(PNC.Travel.Service.Cancel) == "function"
         and PNC.Travel.Model.IsActive(record.travel)
     then
         PNC.Travel.Service.Cancel(record, "follow_player_requested")

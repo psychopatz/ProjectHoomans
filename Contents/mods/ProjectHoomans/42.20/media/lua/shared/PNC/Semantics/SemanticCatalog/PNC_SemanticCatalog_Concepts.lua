@@ -73,6 +73,10 @@ function Internal.RegisterVocabulary()
     registerConcept("WANT", { "want", "wants", "need", "needs" })
     registerConcept("GIFT", { "gift", "present" }, 3)
     registerConcept("HEAR", { "hear", "heard" })
+    registerConcept("NEWS", {
+        "news", "gossip", "gossips", "rumor", "rumors",
+        "rumour", "rumours",
+    })
     registerConcept("BITTEN", { "bitten", "got bitten", "was bitten" })
     registerConcept("WATER", {
         "water", "drinking water",

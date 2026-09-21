@@ -54,6 +54,10 @@ function Tracker.EndEncounter(encounterID, occurredAt)
     local j
     local resultValue
     local emitted = 0
+    local eventType
+    local actorKey
+    local targetKey
+    local hordeAttack
     occurredAt = finite(occurredAt, nil)
     if not encounter or not occurredAt then
         return false, "encounter_not_found", 0
@@ -70,6 +74,7 @@ function Tracker.EndEncounter(encounterID, occurredAt)
         })
     end
     if encounterQualifies(encounter, occurredAt) then
+        hordeAttack = encounter.hordeAttack == true
         for left, _ in pairs(encounter.participants) do
             if participantAlive(encounter, left)
                 and encounter.participants[left].eligibleForShared ~= false
@@ -83,12 +88,25 @@ function Tracker.EndEncounter(encounterID, occurredAt)
                 left = keys[i]
                 right = keys[j]
                 if EntityRef.IsNPC(left) or EntityRef.IsNPC(right) then
+                    actorKey = left
+                    targetKey = right
+                    if hordeAttack and EntityRef.IsNPC(right)
+                        and not EntityRef.IsNPC(left)
+                    then
+                        actorKey = right
+                        targetKey = left
+                    end
+                    eventType = hordeAttack
+                        and "survived_horde_attack"
+                        or "survived_combat_together"
                     resultValue = emit({
-                        id = "social:shared_combat:" .. encounter.id
+                        id = "social:shared_"
+                            .. (hordeAttack and "horde_attack" or "combat")
+                            .. ":" .. encounter.id
                             .. ":" .. left .. ":" .. right,
-                        type = "survived_combat_together",
-                        actorKey = left,
-                        targetKey = right,
+                        type = eventType,
+                        actorKey = actorKey,
+                        targetKey = targetKey,
                         occurredAt = occurredAt,
                         sourceSystem = "combat",
                         x = encounter.x,
@@ -100,6 +118,7 @@ function Tracker.EndEncounter(encounterID, occurredAt)
                                 countEntries(encounter.threatIDs),
                             durationHours =
                                 occurredAt - encounter.startedAt,
+                            hordeAttack = hordeAttack,
                         },
                     })
                     if resultValue.ok then

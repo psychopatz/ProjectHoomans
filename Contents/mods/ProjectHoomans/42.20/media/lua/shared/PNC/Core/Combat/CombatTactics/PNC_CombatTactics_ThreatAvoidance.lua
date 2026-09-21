@@ -12,6 +12,12 @@ local Const = PNC.Const
 local Skills = PNC.Skills
 local Stamina = PNC.Stamina
 
+local function hordeEscapeDistance(distance)
+    local minimumDistance = (tonumber(Const.COMBAT_HORDE_RADIUS) or 5.5)
+        + (tonumber(Const.COMBAT_RETREAT_SAFETY_BUFFER) or 0.25)
+    return math.max(tonumber(distance) or minimumDistance, minimumDistance)
+end
+
 function Tactics.AvoidThreat(record, zombie, target, options)
     local state
     local now
@@ -61,8 +67,10 @@ function Tactics.AvoidThreat(record, zombie, target, options)
         and "run" or "walk"
     started, startReason = Internal.StartRetreat(
         record, zombie, target,
-        tonumber(options.distance)
-            or tonumber(Const.COMPANION_AVOID_THREAT_DISTANCE) or 5,
+        hordeEscapeDistance(
+            tonumber(options.distance)
+                or tonumber(Const.COMPANION_AVOID_THREAT_DISTANCE) or 5
+        ),
         tostring(options.mode or mode),
         tonumber(options.stopDistance) or 0.8,
         tonumber(options.lockMs)
@@ -78,6 +86,9 @@ function Tactics.AvoidThreat(record, zombie, target, options)
     if started then
         state.attackPressureUntil = 0
         state.damagePressureUntil = 0
+        if Internal.MarkHordeSurvivalPending then
+            Internal.MarkHordeSurvivalPending(record, state)
+        end
     end
     return started, startReason
 end

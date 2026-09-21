@@ -233,6 +233,29 @@ local function targetFromSite(site)
     }
 end
 
+local function shelterTargetIsLocal(mobile, target)
+    local home = mobile and mobile.site and mobile.site.home or nil
+    local originX = home and tonumber(home.x) or nil
+    local originY = home and tonumber(home.y) or nil
+    local targetX = target and tonumber(target.x) or nil
+    local targetY = target and tonumber(target.y) or nil
+    if originX == nil or originY == nil
+        or targetX == nil or targetY == nil
+    then
+        return false
+    end
+    local searchRadius = math.max(
+        0,
+        math.min(
+            160,
+            tonumber(Constants.MOBILE_AMBIENT_SHELTER_SEARCH_RADIUS) or 80
+        )
+    )
+    local targetRadius = math.max(0, tonumber(target.radius) or 0)
+    return Core.Distance(originX, originY, targetX, targetY)
+        <= searchRadius + targetRadius
+end
+
 function H.FindShelterTarget(faction, at, ownershipSnapshot)
     local timingName, timingStart = beginDiagnosticTiming(
         "MobileAmbient.FindShelterTarget"
@@ -241,40 +264,33 @@ function H.FindShelterTarget(faction, at, ownershipSnapshot)
     local site = mobile.site or {}
     local snapshot = ownershipSnapshot or H.PlayerOwnershipSnapshot()
     local filter = H.ShelterFilter(snapshot)
-    local houseTimingName, houseTimingStart = beginDiagnosticTiming(
-        "MobileAmbient.FindRandomHouse"
+    local home = site.home
+    local originX = home and tonumber(home.x) or nil
+    local originY = home and tonumber(home.y) or nil
+    local originZ = home and tonumber(home.z) or 0
+    if originX == nil or originY == nil then
+        endDiagnosticTiming(timingName, timingStart, "missing_mobile_origin")
+        return nil, "missing_mobile_origin"
+    end
+    local nearTimingName, nearTimingStart = beginDiagnosticTiming(
+        "MobileAmbient.FindAvailableNear"
     )
-    local selected, reason = Resolver.FindRandomHouse({
-        z = site.home and site.home.z or 0,
-        createdAt = at,
-        randomIndex = (tonumber(mobile.relocationCount) or 0) + 1,
-        siteFilter = filter,
-    })
+    local selected, reason = Resolver.FindAvailableNear(
+        originX,
+        originY,
+        originZ,
+        {
+            createdAt = at,
+            searchRadius = Constants.MOBILE_AMBIENT_SHELTER_SEARCH_RADIUS,
+            searchStep = 8,
+            siteFilter = filter,
+        }
+    )
     endDiagnosticTiming(
-        houseTimingName,
-        houseTimingStart,
+        nearTimingName,
+        nearTimingStart,
         selected and "selected" or reason
     )
-    if not selected then
-        local nearTimingName, nearTimingStart = beginDiagnosticTiming(
-            "MobileAmbient.FindAvailableNear"
-        )
-        selected, reason = Resolver.FindAvailableNear(
-            site.home and site.home.x or 0,
-            site.home and site.home.y or 0,
-            site.home and site.home.z or 0,
-            {
-                createdAt = at,
-                searchRadius = Constants.MOBILE_AMBIENT_SHELTER_SEARCH_RADIUS,
-                siteFilter = filter,
-            }
-        )
-        endDiagnosticTiming(
-            nearTimingName,
-            nearTimingStart,
-            selected and "selected" or reason
-        )
-    end
     if not selected or not H.IsValidShelterSite(selected, snapshot) then
         endDiagnosticTiming(
             timingName,
@@ -386,6 +402,27 @@ local function sameOrder(left, right)
         and left.shelterSiteID == right.shelterSiteID
 end
 
+local function shouldHoldForNoShelter(mobile)
+    if not mobile
+        or mobile.controlMode ~= Constants.MOBILE_CONTROL_AMBIENT
+        or not mobile.ambient
+        or mobile.ambient.holdForNoShelter ~= true
+        or mobile.activity
+            == Constants.MOBILE_ACTIVITY_TRAVELING_TO_SETTLEMENT
+    then
+        return false
+    end
+    if H.IsPlayerRoamArea and H.IsPlayerRoamArea(mobile) then
+        return false
+    end
+    if H.IsPlayerRoamStreetPool
+        and H.IsPlayerRoamStreetPool(mobile)
+    then
+        return false
+    end
+    return true
+end
+
 function H.AmbientOrder(faction, mobile, site)
     local ambient = mobile and mobile.ambient or nil
     local target = ambient and ambient.target or nil
@@ -393,6 +430,9 @@ function H.AmbientOrder(faction, mobile, site)
         and mobile.strategicTarget
     then
         target = mobile.strategicTarget
+    end
+    if shouldHoldForNoShelter(mobile) then
+        return { kind = Const.ORDER_GUARD }
     end
     if not target then return nil end
     local home = site and site.home or {}
@@ -483,10 +523,12 @@ function H.RepairMobileOrders(faction)
     local timingName, timingStart = beginDiagnosticTiming(
         "MobileAmbient.RepairMobileOrders"
     )
+    local mobile = faction and faction.mobile or nil
+    local holdForNoShelter = shouldHoldForNoShelter(mobile)
     local expected = H.MobileOrder(
         faction,
-        faction.mobile,
-        faction.mobile and faction.mobile.site
+        mobile,
+        mobile and mobile.site
     )
     if not expected then
         endDiagnosticTiming(timingName, timingStart, "no_expected_order")
@@ -501,13 +543,37 @@ function H.RepairMobileOrders(faction)
         local ambientVisit = PNC.AmbientVisitService
             and PNC.AmbientVisitService.IsOrderProtected
             and PNC.AmbientVisitService.IsOrderProtected(record)
+        local memberExpected = expected
+        if holdForNoShelter then
+            local current = record.orderSpec
+            local preserveHoldPosition = record.runtime
+                and record.runtime.mobileNoShelterHold == true
+                and current
+                and current.kind == expected.kind
+            local fallbackX = finite(record.x, finite(record.anchorX, 0))
+            local fallbackY = finite(record.y, finite(record.anchorY, 0))
+            local fallbackZ = finite(record.z, finite(record.anchorZ, 0))
+            memberExpected = {
+                kind = expected.kind,
+                x = preserveHoldPosition
+                    and finite(current.x, fallbackX) or fallbackX,
+                y = preserveHoldPosition
+                    and finite(current.y, fallbackY) or fallbackY,
+                z = preserveHoldPosition
+                    and finite(current.z, fallbackZ) or fallbackZ,
+            }
+            record.runtime = record.runtime or {}
+            record.runtime.mobileNoShelterHold = true
+        elseif record.runtime then
+            record.runtime.mobileNoShelterHold = nil
+        end
         if not facilityActive and not ambientVisit
-            and not sameOrder(record.orderSpec, expected)
+            and not sameOrder(record.orderSpec, memberExpected)
         then
             if PNC.OrderSystem and PNC.OrderSystem.SetOrder then
-                PNC.OrderSystem.SetOrder(record, H.Copy(expected))
+                PNC.OrderSystem.SetOrder(record, H.Copy(memberExpected))
             else
-                record.orderSpec = H.Copy(expected)
+                record.orderSpec = H.Copy(memberExpected)
             end
             repaired = repaired + 1
         end
@@ -769,6 +835,28 @@ function H.RefreshAmbient(faction, at, context)
         and Constants.MOBILE_AMBIENT_ROAD
         or Constants.MOBILE_AMBIENT_SHELTER
     local target = ambient.target
+    local staleShelterTarget = ambient.objective
+        == Constants.MOBILE_AMBIENT_SHELTER
+        and target ~= nil
+        and not shelterTargetIsLocal(mobile, target)
+    if staleShelterTarget then
+        ambient = {
+            phase = phase,
+            objective = nil,
+            target = nil,
+            holdForNoShelter = true,
+            nextCheckAt = at + Constants.MOBILE_AMBIENT_CHECK_HOURS,
+            nextObjectiveAt = at,
+            retryAt = at,
+            revision = (tonumber(ambient.revision) or 0) + 1,
+        }
+        faction = updateMobile(faction, {
+            ambient = ambient,
+        }, "mobile_ambient_shelter_out_of_range")
+        mobile = faction.mobile or mobile
+        ambient = mobile.ambient or ambient
+        target = nil
+    end
     local needsTarget = ambient.phase ~= phase
         or ambient.objective ~= objective
         or not target
@@ -789,6 +877,7 @@ function H.RefreshAmbient(faction, at, context)
         -- Leave the objective due for the next pump. This keeps target
         -- discovery resumable without changing its eventual result.
         incrementDiagnostic("MobileAmbient.TargetSelectionDeferred")
+        if staleShelterTarget then H.RepairMobileOrders(faction) end
         endDiagnosticTiming(timingName, timingStart, "selection_deferred")
         return faction, target ~= nil
     end
@@ -832,6 +921,8 @@ function H.RefreshAmbient(faction, at, context)
                 phase = phase,
                 objective = nil,
                 target = nil,
+                holdForNoShelter = objective
+                    == Constants.MOBILE_AMBIENT_SHELTER,
                 nextCheckAt = at + Constants.MOBILE_AMBIENT_CHECK_HOURS,
                 nextObjectiveAt = at,
                 retryAt = at + Constants.MOBILE_AMBIENT_RETRY_HOURS,

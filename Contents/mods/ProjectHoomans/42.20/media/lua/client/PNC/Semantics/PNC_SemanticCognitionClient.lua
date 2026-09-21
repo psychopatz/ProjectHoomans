@@ -32,6 +32,7 @@ end
 function Client.Reset()
     ClientState.semanticCognition = {}
     ClientState.pendingSemanticCognition = {}
+    ClientState.semanticCognitionDialogueRequests = {}
     ClientState.semanticMemoryGossip = {}
     ClientState.lastSemanticCognitionRequestAt = {}
     ClientState.lastSemanticCognitionReceiveAt = 0
@@ -99,6 +100,23 @@ local function applyMemoryGossip(id, payload, pending)
         }
     end
     return true
+end
+
+local function notifyDialogueGossip(id, payload, pending)
+    local requests = ClientState.semanticCognitionDialogueRequests
+    local requestID = tostring(pending and pending.requestID or "")
+    local request = requests and requests[requestID] or nil
+    local input = PNC.Semantics and PNC.Semantics.DialogueInput or nil
+    if requestID ~= "" and requests then
+        requests[requestID] = nil
+    end
+    if pending and string.upper(tostring(pending.subject or ""))
+        == "GOSSIP"
+        and request and input
+        and type(input.CompleteGossipRequest) == "function"
+    then
+        pcall(input.CompleteGossipRequest, request, payload)
+    end
 end
 
 function Client.GetGossipContext(npcID, targetID)
@@ -181,6 +199,7 @@ function Client.ApplyPayload(payload)
         if matchingRequest then
             applyMemoryGossip(id, payload, pending)
             ClientState.pendingSemanticCognition[id] = nil
+            notifyDialogueGossip(id, payload, pending)
         end
         return false, ClientState.lastSemanticCognitionFailure
     end
@@ -192,6 +211,11 @@ function Client.ApplyPayload(payload)
     )
     if not merged then
         ClientState.lastSemanticCognitionFailure = reason
+        if matchingRequest then
+            applyMemoryGossip(id, payload, pending)
+            ClientState.pendingSemanticCognition[id] = nil
+            notifyDialogueGossip(id, payload, pending)
+        end
         return false, reason
     end
     ClientState.semanticCognition[id] = merged
@@ -200,6 +224,7 @@ function Client.ApplyPayload(payload)
     if matchingRequest then
         applyMemoryGossip(id, payload, pending)
         ClientState.pendingSemanticCognition[id] = nil
+        notifyDialogueGossip(id, payload, pending)
     end
     return true, changed == true and "updated" or reason
 end

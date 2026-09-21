@@ -66,7 +66,17 @@ function Fallback.OrFailure(
             hasOrderAction = true
         end
     end
-    if hasNameAction then return "Sure. Let me introduce myself.", false end
+    if hasNameAction then
+        local fallback = "I'll tell you my name once we've established some trust. What's your name?"
+        local translation = PNC.Translation
+        if translation and type(translation.TrFormat) == "function" then
+            return translation.TrFormat(
+                "UI_PNC_Conversation_Semantic_QuestionIdentity",
+                fallback
+            ), false
+        end
+        return fallback, false
+    end
     if hasSocialAction then return "I hear you.", false end
     if hasOrderAction then return "All right.", false end
     local failure = Runtime.Trim(arguments and arguments.error)

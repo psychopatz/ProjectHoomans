@@ -206,6 +206,9 @@ function Composer.BuildRootNode(context, options)
         end
     else
         choices = categoryChoices(context)
+        if options.askNameChoice then
+            table.insert(choices, 1, options.askNameChoice)
+        end
         if options.dossierChoice then choices[#choices + 1] = options.dossierChoice end
         local record = context.npcRecord or {}
         local verifier = PNC.Identity and PNC.Identity.Verifier or nil

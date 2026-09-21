@@ -17,6 +17,23 @@ local FollowCandidateCacheKeys = {}
 local MAX_FOLLOW_OWNER_CACHES = 32
 local FOLLOW_CANDIDATE_REUSE_DISTANCE = 3.0
 
+local function observeZombieHorde(record, count, threshold, now)
+    if (tonumber(count) or 0) < (tonumber(threshold) or 3) then
+        return
+    end
+    local hooks = PNC and PNC.SocialEventHooks
+    if hooks and type(hooks.ObserveZombieHorde) == "function" then
+        pcall(
+            hooks.ObserveZombieHorde,
+            record,
+            count,
+            threshold,
+            now,
+            "follow"
+        )
+    end
+end
+
 local function getSharedCandidates(record, x, y, z, radius, now)
     local ownerKey = Internal.GetFollowOwnerKey(record)
     local ownerCache = FollowCandidateCache[ownerKey]
@@ -102,6 +119,7 @@ function Internal.AssessFollowHazards(record, zombie, now)
     local cacheDy
     local combatCount
     local hostileZombies
+    local hordeThreshold
 
     record.runtime = runtime
     cacheDx = cached and x - (tonumber(cached.x) or x) or 0
@@ -168,13 +186,14 @@ function Internal.AssessFollowHazards(record, zombie, now)
             end
         end
     end
-    cached.active = cached.count
-            >= (tonumber(Const.FOLLOW_HORDE_AVOID_COUNT) or 3)
+    hordeThreshold = tonumber(Const.FOLLOW_HORDE_AVOID_COUNT) or 3
+    cached.active = cached.count >= hordeThreshold
         or cached.nearestDistance <= nearDistance
     if cached.count <= 0 then
         cached.nearestDistance = nil
     end
     runtime.followHazard = cached
+    observeZombieHorde(record, cached.count, hordeThreshold, now)
     return cached
 end
 

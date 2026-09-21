@@ -173,6 +173,10 @@ function Internal.SubmitSingle(view, value, part)
         timestamp = Internal.Now(),
     }
     local preview
+    local cognitionAccepted
+    local cognitionRequestID
+    local cognitionPending
+    local clearSemanticMemoryTarget = false
     if type(router.Preview) == "function" then
         preview = router:Preview(value, context, options)
     else
@@ -189,13 +193,26 @@ function Internal.SubmitSingle(view, value, part)
     end
 
     if Internal.RequestCognitionForIR then
-        Internal.RequestCognitionForIR(view, preview.ir)
+        cognitionAccepted, _, cognitionRequestID, cognitionPending =
+            Internal.RequestCognitionForIR(view, preview.ir)
+        if preview.ir and preview.ir.intent == "GOSSIP"
+            and cognitionAccepted == true
+            and cognitionPending ~= true
+        then
+            -- Single-player/server-hosted cognition can finish synchronously.
+            -- Rebuild the snapshot after the server fills its memory cache so
+            -- this same turn can use the returned gossip.
+            context = Internal.ShallowContext(view)
+            clearSemanticMemoryTarget = true
+        end
     end
     local identityRequest = Internal.PrepareIdentityRequest
         and Internal.PrepareIdentityRequest(view, preview.ir, context)
 
     local decision = preview.decision or {}
-    if decision.route == "llm_fallback" then
+    local isIdentityClaim = identityRequest
+        and identityRequest.kind == "identity_claim"
+    if decision.route == "llm_fallback" and not isIdentityClaim then
         if Internal.ClearPendingGiftConsent then
             Internal.ClearPendingGiftConsent(view)
         end
@@ -205,6 +222,9 @@ function Internal.SubmitSingle(view, value, part)
             )
             if submitted then
                 recordConversationTopics(view, preview, value)
+                if clearSemanticMemoryTarget and view.session then
+                    view.session.semanticMemoryTargetID = nil
+                end
                 return true
             end
         end
@@ -214,11 +234,28 @@ function Internal.SubmitSingle(view, value, part)
     if type(router.Preview) == "function" then
         result = router:ProcessIR(preview.ir, context, options)
     end
+    if clearSemanticMemoryTarget and view.session then
+        view.session.semanticMemoryTargetID = nil
+    end
     view.lastSemanticDialogueResult = result
 
     local finalDecision = result and result.decision or {}
+    local deferGossipResponse = cognitionPending == true
+        and cognitionRequestID ~= nil
+        and preview.ir and preview.ir.intent == "GOSSIP"
+        and finalDecision.branch == "GOSSIP_RECEIVED"
+        and not view.groupConversation
+    if deferGossipResponse then
+        view.session.semanticGossipRequestID = tostring(cognitionRequestID)
+        view.session.semanticGossipRequestValue = value
+        view.session.semanticGossipRequestResult = result
+        view.session.semanticDialoguePending = {
+            kind = "semantic_gossip",
+            requestID = tostring(cognitionRequestID),
+        }
+    end
     if finalDecision.branch == "ASK_CLARIFICATION"
-        and SemanticTelemetryPrompt
+        and type(SemanticTelemetryPrompt) == "table"
         and type(SemanticTelemetryPrompt.Offer) == "function"
     then
         SemanticTelemetryPrompt.Offer(view, value, result, "local")
@@ -241,12 +278,76 @@ function Internal.SubmitSingle(view, value, part)
         view,
         value,
         result,
-        { deferResponse = deferIdentityResponse == true }
+        { deferResponse = deferIdentityResponse == true
+            or deferGossipResponse == true }
     )
-    if identityRequest and Internal.DispatchIdentityRequest then
-        Internal.DispatchIdentityRequest(identityRequest)
+    if identityRequest then
+        local dispatched = false
+        if Internal.DispatchIdentityRequest then
+            dispatched = Internal.DispatchIdentityRequest(identityRequest)
+        end
+        if identityRequest.kind == "identity_claim" and dispatched ~= true
+            and Internal.IdentityExchangeUnavailableResponse
+            and Internal.QueueDeterministicResponse
+        then
+            Internal.QueueDeterministicResponse(
+                view,
+                value,
+                result,
+                nil,
+                {
+                    response = Internal.IdentityExchangeUnavailableResponse(),
+                }
+            )
+        end
     end
     return submitted, submitReason
+end
+
+function Input.CompleteGossipRequest(request)
+    local view = request and request.view or nil
+    local session = request and request.session or nil
+    local requestID = tostring(request and request.requestID or "")
+    local result
+    local decision
+    local localResponse
+    local context
+    local value
+    if not view or not session or requestID == ""
+        or view.session ~= session or session.closed == true
+        or view.closed == true or view.closing == true
+        or tostring(session.semanticGossipRequestID or "") ~= requestID
+        or type(session.semanticDialoguePending) ~= "table"
+        or tostring(session.semanticDialoguePending.requestID or "")
+            ~= requestID
+    then
+        return false, "stale_gossip_request"
+    end
+    result = session.semanticGossipRequestResult
+    value = session.semanticGossipRequestValue
+    decision = result and result.decision or nil
+    if not result or not result.ir or not decision then
+        return false, "gossip_response_unavailable"
+    end
+    context = Internal.ShallowContext(view)
+    localResponse = PNC.Semantics and PNC.Semantics.LocalResponse or nil
+    if localResponse and type(localResponse.Resolve) == "function" then
+        decision.response = localResponse.Resolve(
+            result.ir,
+            session.semanticDialogueState,
+            context,
+            decision.branch
+        ) or decision.response
+    end
+    session.semanticMemoryTargetID = nil
+    session.semanticGossipRequestID = nil
+    session.semanticGossipRequestResult = nil
+    session.semanticGossipRequestValue = nil
+    session.semanticDialoguePending = nil
+    if type(Internal.QueueDeterministicResponse) ~= "function" then
+        return false, "response_queue_unavailable"
+    end
+    return Internal.QueueDeterministicResponse(view, value, result, nil)
 end
 
 return Internal

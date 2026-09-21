@@ -6,6 +6,7 @@ PsychopatzCore = {
 
 local sent = {}
 local disclosures = 0
+local knowledgeDisclosure
 local relationship = {
     approval = 0,
     respect = 0,
@@ -84,9 +85,10 @@ PNC = {
         end,
     },
     NPCKnowledgeAPI = {
-        DiscloseForPlayer = function()
+        DiscloseForPlayer = function(_, options)
             disclosures = disclosures + 1
-            return { revealed = { "identity.name" } }
+            knowledgeDisclosure = options
+            return { accepted = true, revealed = { "identity.name" } }
         end,
     },
     Network = {
@@ -235,15 +237,23 @@ local truthful, truthfulPayload = Commands.HandleSemanticIdentity({}, {
 T.truthy(truthful, "exact player name claim is accepted")
 T.truthy(truthfulPayload.truthful, "truthful claim is marked truthful")
 T.equal(truthfulPayload.responseText,
-    "Nice to meet you. I'm Mara Vale.",
-    "truthful claim receives the canonical NPC name")
+    "Okay Patrick, nice to meet you. I'm Mara Vale.",
+    "truthful claim confirms the player and introduces the NPC")
 T.equal(truthfulPayload.responseKey,
-    "UI_PNC_Conversation_ToolReply_AskNameNamed_1",
-    "truthful claim carries the localized NPC-name response key")
-T.equal(truthfulPayload.responseArgs[1], "Mara Vale",
-    "truthful claim carries the canonical NPC name as a format argument")
+    "UI_PNC_Conversation_Semantic_IdentityExchangeConfirmed",
+    "truthful claim carries the localized identity confirmation key")
+T.equal(truthfulPayload.responseArgs[1], "Patrick",
+    "truthful claim formats the player's canonical first name")
+T.equal(truthfulPayload.responseArgs[2], "Mara Vale",
+    "truthful claim formats the canonical NPC name")
 T.equal(disclosures, 1,
     "truthful claim commits the existing NPC identity disclosure fact")
+T.equal(knowledgeDisclosure.topicID, "identity_name",
+    "truthful claim requests the NPC identity fact from the knowledge API")
+T.equal(knowledgeDisclosure.origin, "semantic_identity_claim",
+    "knowledge disclosure retains its semantic identity provenance")
+T.equal(knowledgeDisclosure.verifiedIdentityClaim, true,
+    "knowledge disclosure only follows the server-verified player claim")
 T.truthy(effects[1].respect > 0,
     "truthful introduction improves the relationship")
 

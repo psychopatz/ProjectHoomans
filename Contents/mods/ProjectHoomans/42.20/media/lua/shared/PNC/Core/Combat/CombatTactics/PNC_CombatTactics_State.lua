@@ -162,6 +162,13 @@ function Internal.EnsureRetreatState(record)
     state.retreatDistance = tonumber(state.retreatDistance) or nil
     state.safetyRadius = tonumber(state.safetyRadius) or nil
     state.reengagePending = state.reengagePending == true
+    state.hordeSurvivalPending = state.hordeSurvivalPending == true
+    state.hordeSurvivalOriginX = state.hordeSurvivalOriginX ~= nil
+        and tonumber(state.hordeSurvivalOriginX) or nil
+    state.hordeSurvivalOriginY = state.hordeSurvivalOriginY ~= nil
+        and tonumber(state.hordeSurvivalOriginY) or nil
+    state.hordeSurvivalMinDistance =
+        tonumber(state.hordeSurvivalMinDistance) or nil
     state.lowStaminaPhase = state.lowStaminaPhase or nil
     state.lowStaminaAttackUntil = tonumber(state.lowStaminaAttackUntil) or 0
     state.refreshAt = tonumber(state.refreshAt) or 0

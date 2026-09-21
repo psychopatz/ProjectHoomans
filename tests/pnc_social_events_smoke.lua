@@ -234,13 +234,17 @@ local definitionCount = 0
 for _, _ in pairs(PNC.SocialEventDefinitions) do
     definitionCount = definitionCount + 1
 end
-T.equal(definitionCount, 20, "twenty definitions")
+T.equal(definitionCount, 21, "twenty-one definitions")
 T.truthy(PNC.SocialEventDefinitions.necroa_mask_removed,
     "Necroa mask removal definition")
 T.truthy(PNC.SocialEventDefinitions.necroa_player_mask_removed,
     "Necroa player mask removal definition")
 T.truthy(PNC.SocialEventDefinitions.faction_member_attacked,
     "faction attack definition")
+T.truthy(PNC.SocialEventDefinitions.survived_horde_attack,
+    "horde survival definition")
+T.truthy(PNC.ConductDefinitions.survived_horde_attack,
+    "horde survival conduct definition")
 T.truthy(PNC.ConductDefinitions.faction_member_attacked,
     "faction attack conduct definition")
 T.equal(
@@ -647,6 +651,44 @@ T.equal(evidenceCount(
     PNC.Conduct.GetForEntity(playerKey),
     "survived_combat_together"
 ), 1, "player shared-combat conduct")
+
+PNC.SocialEncounterTracker.Reset()
+local sharedHorde = PNC.SocialEncounterTracker.RecordActivity({
+    actorKey = aliceKey,
+    targetKey = carolKey,
+    threatID = "shared_horde_1",
+    occurredAt = 91.1,
+    targetTookDamage = true,
+})
+PNC.SocialEncounterTracker.RecordActivity({
+    encounterID = sharedHorde,
+    actorKey = aliceKey,
+    targetKey = carolKey,
+    threatID = "shared_horde_2",
+    occurredAt = 91.101,
+})
+T.truthy(PNC.SocialEncounterTracker.MarkHordeAttack(alice.id),
+    "combat retreat marks the current encounter as a horde attack")
+T.truthy(select(1, PNC.SocialEncounterTracker.EndEncounter(
+    sharedHorde,
+    91.102
+)), "shared horde encounter ended")
+T.equal(memoryCount(
+    PNC.Relationships.Get(alice.id, carolKey),
+    "survived_horde_attack"
+), 1, "Alice remembers shared horde survival")
+T.equal(memoryCount(
+    PNC.Relationships.Get(carol.id, aliceKey),
+    "survived_horde_attack"
+), 1, "Carol remembers shared horde survival")
+T.equal(evidenceCount(
+    PNC.Conduct.GetForEntity(aliceKey),
+    "survived_horde_attack"
+), 1, "Alice horde-survival conduct")
+T.equal(evidenceCount(
+    PNC.Conduct.GetForEntity(carolKey),
+    "survived_horde_attack"
+), 1, "Carol horde-survival conduct")
 
 PNC.SocialEncounterTracker.Reset()
 local trivial = PNC.SocialEncounterTracker.RecordActivity({

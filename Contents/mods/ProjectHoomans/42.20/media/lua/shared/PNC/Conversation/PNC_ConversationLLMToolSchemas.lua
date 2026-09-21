@@ -64,10 +64,10 @@ function Tools.BuildIdentityDefinition()
         type = "function",
         ["function"] = {
             name = "ask_name",
-            description = "Ask the NPC to say their name. Use when the player asks "
-                .. "what's your name, who are you, or asks the NPC to introduce "
-                .. "themselves. This invokes authoritative identity knowledge "
-                .. "disclosure; do not invent or persist a name in the reply.",
+            description = "Begin a reciprocal identity exchange. When the player "
+                .. "asks what's your name or who are you, ask the player for "
+                .. "their name first. The semantic identity system verifies the "
+                .. "player's claim before the NPC discloses their own name.",
             parameters = {
                 type = "object",
                 properties = {},

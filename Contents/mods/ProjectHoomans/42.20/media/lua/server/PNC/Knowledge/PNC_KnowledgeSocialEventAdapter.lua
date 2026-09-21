@@ -25,6 +25,10 @@ local MAP = {
         { "personality.bravery", 1, .55 }, { "personality.loyalty", 1, .50 },
     },
     survived_combat_together = { { "personality.bravery", 1, .35 }, { "personality.loyalty", 1, .40 } },
+    survived_horde_attack = {
+        { "personality.bravery", 1, .45 },
+        { "personality.loyalty", 1, .50 },
+    },
     abandoned_in_combat = {
         { "personality.loyalty", -1, .70 }, { "personality.compassion", -1, .55 }, { "personality.bravery", -1, .50 },
     },

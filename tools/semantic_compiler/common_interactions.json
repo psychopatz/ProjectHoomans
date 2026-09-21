@@ -1,0 +1,423 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "name": "Project Hoomans Common Interaction Seed",
+    "version": "1",
+    "contentLicense": "Project Hoomans authored content",
+    "references": [
+      {
+        "name": "DailyDialog",
+        "url": "https://aclanthology.org/I17-1099/",
+        "use": "Everyday dialogue-act coverage guidance; no corpus turns are copied."
+      },
+      {
+        "name": "EmpatheticDialogues",
+        "url": "https://github.com/facebookresearch/EmpatheticDialogues",
+        "use": "Emotion-aware interaction coverage guidance; no corpus turns are copied."
+      }
+    ]
+  },
+  "patterns": [
+    {
+      "id": "pnc.dataset.question.wellbeing.how_are_things_going",
+      "utterance": "how are things going",
+      "emit": { "intent": "QUESTION", "speechAct": "QUESTION", "subject": "WELLBEING" },
+      "confidence": 0.98,
+      "priority": 120
+    },
+    {
+      "id": "pnc.dataset.question.wellbeing.how_is_everything_going",
+      "utterance": "how is everything going",
+      "emit": { "intent": "QUESTION", "speechAct": "QUESTION", "subject": "WELLBEING" },
+      "confidence": 0.98,
+      "priority": 120
+    },
+    {
+      "id": "pnc.dataset.question.wellbeing.hows_everything_going",
+      "utterance": "how's everything going",
+      "emit": { "intent": "QUESTION", "speechAct": "QUESTION", "subject": "WELLBEING" },
+      "confidence": 0.98,
+      "priority": 120
+    },
+    {
+      "id": "pnc.dataset.question.wellbeing.how_are_you_holding_up",
+      "utterance": "how are you holding up",
+      "emit": { "intent": "QUESTION", "speechAct": "QUESTION", "subject": "WELLBEING" },
+      "confidence": 0.99,
+      "priority": 120
+    },
+    {
+      "id": "pnc.dataset.question.wellbeing.are_you_holding_up_okay",
+      "utterance": "are you holding up okay",
+      "emit": { "intent": "QUESTION", "speechAct": "QUESTION", "subject": "WELLBEING" },
+      "confidence": 0.99,
+      "priority": 120
+    },
+    {
+      "id": "pnc.dataset.question.wellbeing.you_doing_all_right",
+      "utterance": "you doing all right",
+      "emit": { "intent": "QUESTION", "speechAct": "QUESTION", "subject": "WELLBEING" },
+      "confidence": 0.97,
+      "priority": 120
+    },
+    {
+      "id": "pnc.dataset.question.wellbeing.how_are_you_managing",
+      "utterance": "how are you managing",
+      "emit": { "intent": "QUESTION", "speechAct": "QUESTION", "subject": "WELLBEING" },
+      "confidence": 0.97,
+      "priority": 120
+    },
+    {
+      "id": "pnc.dataset.question.wellbeing.how_has_your_day_been",
+      "utterance": "how has your day been",
+      "emit": { "intent": "QUESTION", "speechAct": "QUESTION", "subject": "WELLBEING" },
+      "confidence": 0.97,
+      "priority": 120
+    },
+    {
+      "id": "pnc.dataset.question.activity.what_are_you_working_on",
+      "utterance": "what are you working on",
+      "emit": { "intent": "QUESTION", "speechAct": "QUESTION", "subject": "ACTIVITY" },
+      "confidence": 0.98,
+      "priority": 120
+    },
+    {
+      "id": "pnc.dataset.question.activity.what_have_you_been_up_to_lately",
+      "utterance": "what have you been up to lately",
+      "emit": { "intent": "QUESTION", "speechAct": "QUESTION", "subject": "ACTIVITY" },
+      "confidence": 0.98,
+      "priority": 120
+    },
+    {
+      "id": "pnc.dataset.question.activity.what_have_you_been_doing_today",
+      "utterance": "what have you been doing today",
+      "emit": { "intent": "QUESTION", "speechAct": "QUESTION", "subject": "ACTIVITY" },
+      "confidence": 0.98,
+      "priority": 120
+    },
+    {
+      "id": "pnc.dataset.question.activity.what_are_you_focused_on",
+      "utterance": "what are you focused on",
+      "emit": { "intent": "QUESTION", "speechAct": "QUESTION", "subject": "ACTIVITY" },
+      "confidence": 0.97,
+      "priority": 120
+    },
+    {
+      "id": "pnc.dataset.question.identity.may_i_ask_your_name",
+      "utterance": "may i ask your name",
+      "emit": { "intent": "QUESTION", "speechAct": "QUESTION", "subject": "IDENTITY" },
+      "confidence": 0.99,
+      "priority": 120
+    },
+    {
+      "id": "pnc.dataset.question.identity.can_i_ask_your_name",
+      "utterance": "can i ask your name",
+      "emit": { "intent": "QUESTION", "speechAct": "QUESTION", "subject": "IDENTITY" },
+      "confidence": 0.99,
+      "priority": 120
+    },
+    {
+      "id": "pnc.dataset.question.identity.may_i_know_your_name",
+      "utterance": "may i know your name",
+      "emit": { "intent": "QUESTION", "speechAct": "QUESTION", "subject": "IDENTITY" },
+      "confidence": 0.99,
+      "priority": 120
+    },
+    {
+      "id": "pnc.dataset.question.identity.can_you_tell_me_your_name",
+      "utterance": "can you tell me your name",
+      "emit": { "intent": "QUESTION", "speechAct": "QUESTION", "subject": "IDENTITY" },
+      "confidence": 0.99,
+      "priority": 120
+    },
+    {
+      "id": "pnc.dataset.question.identity.what_should_i_call_you",
+      "utterance": "what should i call you",
+      "emit": { "intent": "QUESTION", "speechAct": "QUESTION", "subject": "IDENTITY" },
+      "confidence": 0.98,
+      "priority": 120
+    },
+    {
+      "id": "pnc.dataset.question.identity.who_am_i_talking_to",
+      "utterance": "who am i talking to",
+      "emit": { "intent": "QUESTION", "speechAct": "QUESTION", "subject": "IDENTITY" },
+      "confidence": 0.99,
+      "priority": 120
+    },
+    {
+      "id": "pnc.dataset.question.identity.who_am_i_speaking_with",
+      "utterance": "who am i speaking with",
+      "emit": { "intent": "QUESTION", "speechAct": "QUESTION", "subject": "IDENTITY" },
+      "confidence": 0.99,
+      "priority": 120
+    },
+    {
+      "id": "pnc.dataset.question.identity.what_do_people_call_you",
+      "utterance": "what do people call you",
+      "emit": { "intent": "QUESTION", "speechAct": "QUESTION", "subject": "IDENTITY" },
+      "confidence": 0.98,
+      "priority": 120
+    },
+    {
+      "id": "pnc.dataset.question.identity.what_do_you_go_by",
+      "utterance": "what do you go by",
+      "emit": { "intent": "QUESTION", "speechAct": "QUESTION", "subject": "IDENTITY" },
+      "confidence": 0.98,
+      "priority": 120
+    },
+    {
+      "id": "pnc.dataset.question.identity.mind_telling_me_your_name",
+      "utterance": "mind telling me your name",
+      "emit": { "intent": "QUESTION", "speechAct": "QUESTION", "subject": "IDENTITY" },
+      "confidence": 0.98,
+      "priority": 120
+    },
+    {
+      "id": "pnc.dataset.greeting.long_time_no_see",
+      "utterance": "long time no see",
+      "emit": { "intent": "GREET", "speechAct": "GREET" },
+      "confidence": 0.98,
+      "priority": 120
+    },
+    {
+      "id": "pnc.dataset.greeting.good_to_see_you_again",
+      "utterance": "good to see you again",
+      "emit": { "intent": "GREET", "speechAct": "GREET" },
+      "confidence": 0.98,
+      "priority": 120
+    },
+    {
+      "id": "pnc.dataset.greeting.nice_to_see_you_again",
+      "utterance": "nice to see you again",
+      "emit": { "intent": "GREET", "speechAct": "GREET" },
+      "confidence": 0.98,
+      "priority": 120
+    },
+    {
+      "id": "pnc.dataset.greeting.glad_to_see_you_again",
+      "utterance": "glad to see you again",
+      "emit": { "intent": "GREET", "speechAct": "GREET" },
+      "confidence": 0.97,
+      "priority": 120
+    }
+  ],
+  "responsePools": [
+    {
+      "id": "semantic.greeting",
+      "variants": [
+        {
+          "id": "semantic.greeting.dataset.holding_up",
+          "templateID": "semantic.greeting.dataset.holding_up",
+          "fallback": "Hey. How are you holding up?"
+        },
+        {
+          "id": "semantic.greeting.dataset.good_to_see",
+          "templateID": "semantic.greeting.dataset.good_to_see",
+          "fallback": "Good to see you again."
+        },
+        {
+          "id": "semantic.greeting.dataset.how_things",
+          "templateID": "semantic.greeting.dataset.how_things",
+          "fallback": "Hey. How are things going?"
+        }
+      ]
+    },
+    {
+      "id": "semantic.question.activity",
+      "variants": [
+        {
+          "id": "semantic.question.activity.dataset.keep_moving",
+          "templateID": "semantic.question.activity.dataset.keep_moving",
+          "fallback": "Just doing what I can to keep things moving."
+        },
+        {
+          "id": "semantic.question.activity.dataset.bit_of_everything",
+          "templateID": "semantic.question.activity.dataset.bit_of_everything",
+          "fallback": "A little bit of everything."
+        },
+        {
+          "id": "semantic.question.activity.dataset.taking_care",
+          "templateID": "semantic.question.activity.dataset.taking_care",
+          "fallback": "Just taking care of what needs doing."
+        }
+      ]
+    },
+    {
+      "id": "semantic.question.wellbeing",
+      "variants": [
+        {
+          "id": "semantic.question.wellbeing.dataset.hanging_in",
+          "templateID": "semantic.question.wellbeing.dataset.hanging_in",
+          "fallback": "I'm hanging in there. Thanks for asking."
+        },
+        {
+          "id": "semantic.question.wellbeing.dataset.all_things_considered",
+          "templateID": "semantic.question.wellbeing.dataset.all_things_considered",
+          "fallback": "Doing okay, all things considered."
+        },
+        {
+          "id": "semantic.question.wellbeing.dataset.getting_by",
+          "templateID": "semantic.question.wellbeing.dataset.getting_by",
+          "fallback": "I'm getting by, one day at a time. How about you?"
+        },
+        {
+          "id": "semantic.question.wellbeing.dataset.hungry",
+          "templateID": "semantic.question.wellbeing.dataset.hungry",
+          "fallback": "I'm hungry, but I'll manage. If you have food to spare, I'd appreciate it.",
+          "when": {
+            "needType": "hunger",
+            "needUrgency": ["moderate", "severe", "emergency", "critical"]
+          },
+          "priority": 2
+        },
+        {
+          "id": "semantic.question.wellbeing.dataset.thirsty",
+          "templateID": "semantic.question.wellbeing.dataset.thirsty",
+          "fallback": "I'm pretty thirsty. If you have water, could you spare some?",
+          "when": {
+            "needType": "thirst",
+            "needUrgency": ["moderate", "severe", "emergency", "critical"]
+          },
+          "priority": 3
+        },
+        {
+          "id": "semantic.question.wellbeing.dataset.tired",
+          "templateID": "semantic.question.wellbeing.dataset.tired",
+          "fallback": "I'm tired, though I can manage for now.",
+          "when": {
+            "needType": "fatigue",
+            "needUrgency": ["moderate", "severe", "emergency", "critical"]
+          },
+          "priority": 2
+        }
+      ]
+    },
+    {
+      "id": "semantic.thanks",
+      "variants": [
+        {
+          "id": "semantic.thanks.dataset.no_problem",
+          "templateID": "semantic.thanks.dataset.no_problem",
+          "fallback": "No problem at all."
+        },
+        {
+          "id": "semantic.thanks.dataset.anytime",
+          "templateID": "semantic.thanks.dataset.anytime",
+          "fallback": "Anytime."
+        },
+        {
+          "id": "semantic.thanks.dataset.glady",
+          "templateID": "semantic.thanks.dataset.glady",
+          "fallback": "Glad I could help."
+        }
+      ]
+    },
+    {
+      "id": "semantic.accept",
+      "variants": [
+        {
+          "id": "semantic.accept.dataset.pending_started",
+          "templateID": "semantic.accept.dataset.pending_started",
+          "fallback": "Okay, I'll get started.",
+          "when": { "hasPendingRequest": true },
+          "priority": 1
+        },
+        {
+          "id": "semantic.accept.dataset.pending_care",
+          "templateID": "semantic.accept.dataset.pending_care",
+          "fallback": "All right. I can take care of that.",
+          "when": { "hasPendingRequest": true },
+          "priority": 1
+        }
+      ]
+    },
+    {
+      "id": "semantic.refuse",
+      "variants": [
+        {
+          "id": "semantic.refuse.dataset.pending_unavailable",
+          "templateID": "semantic.refuse.dataset.pending_unavailable",
+          "fallback": "I can't take that on right now.",
+          "when": { "hasPendingRequest": true },
+          "priority": 1
+        },
+        {
+          "id": "semantic.refuse.dataset.pending_enough",
+          "templateID": "semantic.refuse.dataset.pending_enough",
+          "fallback": "Not this time. I have enough to manage.",
+          "when": { "hasPendingRequest": true },
+          "priority": 1
+        }
+      ]
+    },
+    {
+      "id": "semantic.offer",
+      "variants": [
+        {
+          "id": "semantic.offer.dataset.hungry_share",
+          "templateID": "semantic.offer.dataset.hungry_share",
+          "fallback": "That would help a lot. Could I have some?",
+          "when": {
+            "needType": "hunger",
+            "needUrgency": ["moderate", "severe", "emergency", "critical"]
+          },
+          "priority": 2
+        },
+        {
+          "id": "semantic.offer.dataset.hungry_appreciate",
+          "templateID": "semantic.offer.dataset.hungry_appreciate",
+          "fallback": "I'd appreciate a bite. Would you share?",
+          "when": {
+            "needType": "hunger",
+            "needUrgency": ["moderate", "severe", "emergency", "critical"]
+          },
+          "priority": 2
+        }
+      ]
+    },
+    {
+      "id": "semantic.compliment",
+      "variants": [
+        {
+          "id": "semantic.compliment.dataset.kind_of_you",
+          "templateID": "semantic.compliment.dataset.kind_of_you",
+          "fallback": "That's kind of you. I appreciate it."
+        },
+        {
+          "id": "semantic.compliment.dataset.means_a_lot",
+          "templateID": "semantic.compliment.dataset.means_a_lot",
+          "fallback": "Aw, thank you. That means a lot."
+        }
+      ]
+    },
+    {
+      "id": "semantic.question.identity",
+      "variants": [
+        {
+          "id": "semantic.question.identity.dataset.stranger_alt_1",
+          "templateID": "semantic.question.identity.stranger_alt_1",
+          "fallback": "I keep my name to myself until I know someone better. What should I call you?"
+        },
+        {
+          "id": "semantic.question.identity.dataset.stranger_alt_2",
+          "templateID": "semantic.question.identity.stranger_alt_2",
+          "fallback": "Let's get to know each other first. What do people call you?"
+        },
+        {
+          "id": "semantic.question.identity.dataset.wary_alt_1",
+          "templateID": "semantic.question.identity.wary_alt_1",
+          "fallback": "I don't trust you enough to share my name. Who are you, really?",
+          "when": { "identityTrust": "untrustworthy" },
+          "priority": 2
+        },
+        {
+          "id": "semantic.question.identity.dataset.wary_alt_2",
+          "templateID": "semantic.question.identity.wary_alt_2",
+          "fallback": "After that lie, I'm not telling you my name. Tell me the truth about yours.",
+          "when": { "identityTrust": "untrustworthy" },
+          "priority": 2
+        }
+      ]
+    }
+  ]
+}

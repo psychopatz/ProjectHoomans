@@ -176,6 +176,7 @@ local function normalizeAmbient(value)
         phase = phase,
         objective = objective,
         target = target,
+        holdForNoShelter = value.holdForNoShelter == true,
         nextCheckAt = Internal.Timestamp(value.nextCheckAt, 0),
         nextObjectiveAt = Internal.Timestamp(value.nextObjectiveAt, 0),
         retryAt = Internal.Timestamp(value.retryAt, 0),

@@ -180,6 +180,34 @@ T.equal(workRecord.activeBehavior, "CombatGuard:engaged",
     "zone work uses the shared combat guard behavior")
 T.equal(engagements, 2, "zone work enters the shared combat pipeline")
 
+-- A record can be rendered as "Idle" before its durable guard fallback has
+-- been normalized. ThreatGuard must still defend the live NPC without
+-- inventing or mutating an order.
+target.x = 31
+target.y = 30
+target.threatening = true
+local idleRecord = {
+    id = "unassigned-idle",
+    alive = true,
+    attackType = "auto",
+    tacticalClass = "colonist",
+    x = 30,
+    y = 30,
+    z = 0,
+    runtime = {},
+    orderSpec = {},
+    activeBehavior = "Idle",
+}
+
+T.truthy(ThreatGuard.Tick(idleRecord, {}, now),
+    "an unassigned idle NPC enters the shared threat guard")
+T.equal(idleRecord.activeBehavior, "CombatGuard:engaged",
+    "idle defense takes tactical ownership before passive fallback behavior")
+T.equal(engagements, 3,
+    "idle defense enters the shared combat pipeline")
+T.equal(idleRecord.orderSpec.kind, nil,
+    "idle defense does not invent or mutate a durable order")
+
 local wakingRecord = {
     id = "waking-sleeper",
     alive = true,

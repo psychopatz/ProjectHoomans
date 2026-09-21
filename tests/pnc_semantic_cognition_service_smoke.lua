@@ -2,6 +2,7 @@ local T = require "tests/support/test"
 T.addPackagePaths({
     { "ProjectHoomans", "shared" },
     { "ProjectHoomans", "server" },
+    { "ProjectHoomans", "common_lua" },
 })
 
 local dirtyDomain
@@ -16,6 +17,17 @@ PNC = {
     Registry = { Data = {} },
     Network = {},
     ConversationScene = {},
+    Identity = {
+        HashText = function(value, seed)
+            local hash = tonumber(seed) or 5381
+            local index
+            for index = 1, #tostring(value or "") do
+                hash = (hash * 33 + string.byte(value, index)) % 2147483646
+            end
+            return math.max(1, hash)
+        end,
+        MixSeed = function(seed) return tonumber(seed) end,
+    },
 }
 
 function PNC.Registry.Get(id)
@@ -57,6 +69,11 @@ T.load(
     "shared",
     "PNC/Semantics/PNC_SemanticCognitionProjection.lua"
 )
+T.load(
+    "ProjectHoomans",
+    "shared",
+    "PNC/Core/Relationships/PNC_EntityRef.lua"
+)
 local Service = T.load(
     "ProjectHoomans",
     "server",
@@ -65,6 +82,8 @@ local Service = T.load(
 
 local record = {
     id = "observer",
+    name = "Mara",
+    identitySeed = 17,
     alive = true,
     runtime = {
         conversationLease = { token = "lease:1" },
@@ -109,7 +128,9 @@ T.truthy(filtered.facts["SEEN|sarah"],
 T.falsy(filtered.facts["SECRET|sarah"],
     "projection never exposes private cognition")
 
-local player = { username = "Alex" }
+local player = {
+    getUsername = function() return "Alex" end,
+}
 local conversationProjection, reason = Service.BuildForConversation(
     player,
     "observer",
@@ -121,6 +142,71 @@ local conversationProjection, reason = Service.BuildForConversation(
 )
 T.truthy(conversationProjection, "valid conversation lease permits projection")
 T.equal(reason, nil, "valid cognition projection has no failure reason")
+
+local memory = PNC.Conversation.Memory
+T.load(
+    "ProjectHoomans",
+    "common_lua",
+    "PNC/Conversation/Definitions/Memory/EventTypes/00_PNC_ConversationMemoryEventTypes.lua"
+)
+T.load(
+    "ProjectHoomans",
+    "common_lua",
+    "PNC/Conversation/Definitions/Memory/GossipTemplates/00_PNC_ConversationGossipTemplates.lua"
+)
+local playerKey = "player:Alex:char_gossip"
+PNC.PlayerCharacters = {
+    GetEntityKey = function() return playerKey end,
+}
+local playerTarget = memory.Events.ResolveTarget(playerKey)
+record.memory = {
+    v = memory.Events.VERSION,
+    d = 1,
+    l = {
+        1102,
+        playerTarget.seed,
+        1,
+        memory.Events.FLAG_SHAREABLE + memory.Events.FLAG_DURABLE,
+    },
+}
+local gossipProjection = Service.BuildForConversation(
+    player,
+    "observer",
+    {
+        subject = "GOSSIP",
+        targetID = "self",
+        conversationToken = "lease:1",
+    }
+)
+T.equal(gossipProjection._memoryGossip.codes[1], 2003,
+    "targetless gossip resolves the authenticated player's shareable memory")
+T.equal(gossipProjection._memoryGossip.subject, "Alex",
+    "targetless gossip uses the authenticated player's display identity")
+
+local npcTarget = memory.Events.ResolveTarget("npc:observer")
+record.memory = {
+    v = memory.Events.VERSION,
+    d = 1,
+    l = {
+        1104,
+        npcTarget.seed,
+        1,
+        memory.Events.FLAG_SHAREABLE + memory.Events.FLAG_DURABLE,
+    },
+}
+local selfGossipProjection = Service.BuildForConversation(
+    player,
+    "observer",
+    {
+        subject = "GOSSIP",
+        targetID = "self",
+        conversationToken = "lease:1",
+    }
+)
+T.equal(selfGossipProjection._memoryGossip.codes[1], 4002,
+    "targetless gossip falls back to the NPC's shareable horde memory")
+T.equal(selfGossipProjection._memoryGossip.subject, "Mara",
+    "horde survival story keeps the speaking NPC as its subject")
 
 accepted, reason = Service.HandleRequest(player, {
     npcID = "observer",

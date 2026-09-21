@@ -21,30 +21,38 @@ function Presentation.PlayerName(player, context)
         and PNC.PlayerCharacters.GetRegistryRecord
         and PNC.PlayerCharacters.GetRegistryRecord(context.characterUUID)
         or nil
-    local name = record and (record.displayName
-        or record.identity and record.identity.displayName)
-    if record and (record.forename or record.surname) then
+    local name = clean(record and record.displayName)
+    if name == "" then
+        name = clean(record and record.identity
+            and record.identity.displayName)
+    end
+    if record then
         local forename = clean(record.forename)
         local surname = clean(record.surname)
-        local composed = forename
-        if surname ~= "" then
-            composed = composed .. (composed ~= "" and " " or "") .. surname
+        if forename ~= "" or surname ~= "" then
+            local composed = forename
+            if surname ~= "" then
+                composed = composed .. (composed ~= "" and " " or "")
+                    .. surname
+            end
+            name = composed
         end
-        if composed ~= "" then name = composed end
     end
-    if not name and player and player.getDescriptor then
+    if name == "" and player and player.getDescriptor then
         local descriptor = player:getDescriptor()
         local forename = descriptor and descriptor.getForename
             and clean(descriptor:getForename()) or ""
         local surname = descriptor and descriptor.getSurname
             and clean(descriptor:getSurname()) or ""
-        name = forename
-        if surname ~= "" then
-            name = name .. (name ~= "" and " " or "") .. surname
+        if forename ~= "" or surname ~= "" then
+            name = forename
+            if surname ~= "" then
+                name = name .. (name ~= "" and " " or "") .. surname
+            end
         end
     end
-    if not name and player and player.getDisplayName then
-        name = player:getDisplayName()
+    if name == "" and player and player.getDisplayName then
+        name = clean(player:getDisplayName())
     end
     return clean(name)
 end
@@ -55,6 +63,11 @@ local function npcName(record)
         or record and (record.displayName or record.name))
 end
 
+local function firstName(value)
+    value = clean(value)
+    return string.match(value, "^(%S+)") or value
+end
+
 local function localized(key, fallback, ...)
     local translation = PNC.Translation
     if translation and type(translation.TrFormat) == "function" then
@@ -63,21 +76,32 @@ local function localized(key, fallback, ...)
     return fallback
 end
 
-function Presentation.BuildResponse(record, truthful, introduction)
+function Presentation.BuildResponse(
+    record, truthful, introduction, playerName, disclosureSucceeded
+)
     if truthful then
         local name = npcName(record)
+        local playerFirst = firstName(playerName)
         if name == "" and introduction then
             local introduced = clean(introduction)
             local extracted = string.match(introduced, "^[Ii]'m%s+(.+)%.$")
             name = clean(extracted or "")
         end
-        if name ~= "" then
-            local fallback = "Nice to meet you. I'm " .. name .. "."
-            return localized(
-                "UI_PNC_Conversation_ToolReply_AskNameNamed_1",
-                fallback,
-                name
-            ), "UI_PNC_Conversation_ToolReply_AskNameNamed_1", { name }
+        if disclosureSucceeded == true and name ~= ""
+            and playerFirst ~= ""
+        then
+            local fallback = "Okay " .. playerFirst
+                .. ", nice to meet you. I'm " .. name .. "."
+            local key = "UI_PNC_Conversation_Semantic_IdentityExchangeConfirmed"
+            return localized(key, fallback, playerFirst, name), key,
+                { playerFirst, name }
+        end
+        if playerFirst ~= "" then
+            local fallback = "Okay " .. playerFirst
+                .. ", nice to meet you."
+            local key = "UI_PNC_Conversation_Semantic_IdentityExchangeConfirmedUnnamed"
+            return localized(key, fallback, playerFirst), key,
+                { playerFirst }
         end
         return localized(
             "UI_PNC_Conversation_ToolReply_AskNameUnnamed_1",
@@ -89,27 +113,41 @@ function Presentation.BuildResponse(record, truthful, introduction)
         key, nil
 end
 
-function Presentation.ResolveClaim(player, request, record, truthful)
+function Presentation.ResolveClaim(
+    player, request, record, truthful, verifiedPlayerName
+)
     local introduction
-    if truthful then
+    local disclosureSucceeded = false
+    if truthful and clean(verifiedPlayerName) ~= "" then
         local knowledge = PNC.NPCKnowledgeAPI
         if knowledge and type(knowledge.DiscloseForPlayer) == "function" then
-            knowledge.DiscloseForPlayer(player, {
+            local disclosure = knowledge.DiscloseForPlayer(player, {
                 npcID = request.npcID,
                 topicID = "identity_name",
                 requestID = request.requestID .. ":identity_name",
                 conversationToken = request.args.conversationToken
                     or request.args.token,
                 origin = "semantic_identity_claim",
+                verifiedIdentityClaim = true,
             })
+            disclosureSucceeded = type(disclosure) == "table"
+                and disclosure.accepted == true
         end
-        local commands = PNC.PlayerKnowledgeCommands
-        local internal = commands and commands.Internal or nil
-        if internal and type(internal.IntroductionText) == "function" then
-            introduction = internal.IntroductionText(request.npcID)
+        if disclosureSucceeded then
+            local commands = PNC.PlayerKnowledgeCommands
+            local internal = commands and commands.Internal or nil
+            if internal and type(internal.IntroductionText) == "function" then
+                introduction = internal.IntroductionText(request.npcID)
+            end
         end
     end
-    return Presentation.BuildResponse(record, truthful, introduction)
+    return Presentation.BuildResponse(
+        record,
+        truthful,
+        introduction,
+        verifiedPlayerName,
+        disclosureSucceeded
+    )
 end
 
 return Presentation

@@ -82,9 +82,19 @@ function Commands.HandleDisclosure(player, args)
                         disclosure = result
                     end
                 else
-                    disclosure, reason = PNC.NPCKnowledge.DiscoverTopicForPlayer(
-                        player, npcID, topicID, nil, "direct_disclosure", true
-                    )
+                    if topicID == "identity_name" then
+                        reason = "identity_knowledge_api_unavailable"
+                    else
+                        disclosure, reason =
+                            PNC.NPCKnowledge.DiscoverTopicForPlayer(
+                                player,
+                                npcID,
+                                topicID,
+                                nil,
+                                "direct_disclosure",
+                                true
+                            )
+                    end
                 end
             end
             local committed, commitReason = disclosure ~= nil, reason

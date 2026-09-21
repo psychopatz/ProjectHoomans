@@ -84,6 +84,22 @@ PNC.ConductDefinitions = {
         shareable = false,
         tags = { combat = true, teamwork = true, shared_danger = true },
     },
+    survived_horde_attack = {
+        role = "horde_survivor",
+        participants = "actor_and_target",
+        effects = {
+            reliability = 3, courage = 3, groupLoyalty = 2,
+        },
+        decayPerDay = 0.012,
+        visibility = "direct",
+        shareable = true,
+        tags = {
+            combat = true,
+            teamwork = true,
+            shared_danger = true,
+            horde = true,
+        },
+    },
     abandoned_in_combat = {
         role = "abandoner",
         participants = "actor",

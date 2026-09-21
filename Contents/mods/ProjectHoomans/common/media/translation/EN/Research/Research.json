@@ -14,6 +14,7 @@
     "UI_PNC_KnowledgeJournal_protected_from_attacker": "Protected from an attacker",
     "UI_PNC_KnowledgeJournal_saved_from_incapacitation": "Saved from incapacitation",
     "UI_PNC_KnowledgeJournal_survived_combat_together": "Survived combat together",
+    "UI_PNC_KnowledgeJournal_survived_horde_attack": "Survived a horde attack",
     "UI_PNC_KnowledgeJournal_treated_wound": "Wound treated",
     "UI_PNC_KnowledgeJournal_FamiliarityMilestone": "Familiarity milestone",
     "UI_PNC_KnowledgeLearned": "Learned: %1",

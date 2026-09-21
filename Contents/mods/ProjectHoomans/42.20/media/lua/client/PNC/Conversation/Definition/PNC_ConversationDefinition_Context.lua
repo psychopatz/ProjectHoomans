@@ -199,17 +199,36 @@ local function identityProjection(entry)
     local clientState = PNC.Network and PNC.Network.ClientState or {}
     local projection = clientState.npcPresentations
         and clientState.npcPresentations[npcID] or nil
+    local verifiedDisclosures = clientState.identityDisclosureVerified
+    local verifiedDisclosure = verifiedDisclosures
+        and verifiedDisclosures[npcID] or nil
+    local playerContext = clientState.playerContext or {}
+    local identityClaimVerified = type(verifiedDisclosure) == "table"
+        and verifiedDisclosure.verified == true
+        and tostring(verifiedDisclosure.characterUUID or "")
+            == tostring(playerContext.characterUUID or "")
     local learnedName = IdentityPresentation.GetFact(entry, "identity.name")
     local identityKnown = IdentityPresentation.IsNameKnown(entry)
-    local state = learnedName and "known"
-        or projection and projection.state == "known" and "known"
-        or identityKnown and "known" or "unknown"
+    local storedName = identityClaimVerified
+        and tostring(verifiedDisclosure.displayName or "") or ""
+    local knownName = storedName ~= "" and storedName
+        or learnedName and learnedName.value
+        or projection and projection.displayName
+    if (knownName == nil or tostring(knownName) == "") and identityKnown then
+        knownName = IdentityPresentation.GetName(entry)
+    end
+    local state = identityClaimVerified and knownName
+        and tostring(knownName) ~= "" and "known"
+        or "unknown"
+    if projection and not identityClaimVerified then
+        -- Older saves may contain an identity fact learned through the
+        -- premature disclosure route. It is not proof of a verified exchange.
+        projection.canAskName = true
+    end
     local name = state == "known"
-        and tostring(learnedName and learnedName.value
-            or projection and projection.displayName
-            or IdentityPresentation.GetName(entry))
+        and tostring(knownName)
         or systemText("identity.stranger")
-    return state, name, projection, clientState
+    return state, name, projection, clientState, identityClaimVerified
 end
 
 Context.FactionPresentation = factionPresentation
