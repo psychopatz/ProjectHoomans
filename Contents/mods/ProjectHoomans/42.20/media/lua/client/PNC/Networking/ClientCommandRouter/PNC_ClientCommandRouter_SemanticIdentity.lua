@@ -1,4 +1,6 @@
 -- Client presentation for authoritative identity-claim outcomes.
+require "PNC/Semantics/PNC_SemanticDiagnostics"
+
 PNC = PNC or {}
 PNC.Client = PNC.Client or {}
 PNC.Client.Internal = PNC.Client.Internal or {}
@@ -6,6 +8,26 @@ PNC.Client.Internal = PNC.Client.Internal or {}
 local Internal = PNC.Client.Internal
 local Const = PNC.Const
 local ClientState = PNC.Network.ClientState
+local Diagnostics = PNC.Semantics
+    and PNC.Semantics.SemanticDiagnostics or nil
+
+local function auditIdentityResult(args)
+    if not Diagnostics
+        or type(Diagnostics.IsEnabled) ~= "function"
+        or Diagnostics.IsEnabled() ~= true
+    then
+        return false
+    end
+    args = type(args) == "table" and args or {}
+    return Diagnostics.Record("semantic.identity.result_received", {
+        requestID = args.requestID,
+        npcID = args.npcID,
+        kind = args.kind,
+        accepted = args.accepted == true,
+        truthful = args.truthful,
+        reason = args.reason,
+    }, { requestID = args.requestID })
+end
 
 local function activeViewFor(npcID)
     local semanticInput = PNC.Semantics
@@ -30,6 +52,7 @@ end
 Internal.RegisterServerCommand(Const.CMD_SEMANTIC_IDENTITY_RESULT,
     function(args)
         args = type(args) == "table" and args or {}
+        auditIdentityResult(args)
         local npcID = tostring(args.npcID or "")
         local pending = ClientState.pendingSemanticIdentity
             and ClientState.pendingSemanticIdentity[npcID]

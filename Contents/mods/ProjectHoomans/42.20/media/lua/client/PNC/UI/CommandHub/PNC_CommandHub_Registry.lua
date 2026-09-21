@@ -45,8 +45,11 @@ local function toggleChild(childID, fallback)
                 result = false
             end
         end
+        local controller = PNC.CommandHub.ChildController
+        local reason = controller and controller.lastFailureReason or nil
         trace("pnc_toggle_child_result", "child=" .. tostring(childID)
-            .. " result=" .. tostring(result))
+            .. " result=" .. tostring(result)
+            .. " reason=" .. tostring(reason or ""))
         return result
     end
 end

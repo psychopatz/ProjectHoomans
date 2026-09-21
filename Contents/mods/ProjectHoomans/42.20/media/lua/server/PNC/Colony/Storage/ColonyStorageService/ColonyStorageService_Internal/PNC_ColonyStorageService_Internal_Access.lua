@@ -7,6 +7,41 @@ local Repository = Internal.Repository
 local Zones = require "PsychopatzCore/World/PC_ZoneRegistry"
 local GridRegion = require "PsychopatzCore/World/PC_GridRegion"
 
+local function factionForPlayer(player, ownershipContext)
+    local key
+    local ok
+    local reason
+    if type(ownershipContext) == "table" then
+        key = ownershipContext.playerKey or ownershipContext.entityKey
+        if not key and ownershipContext.unavailable == true then
+            return nil, ownershipContext.reason
+        end
+    end
+    if key and PNC.Factions
+        and type(PNC.Factions.GetFactionForPlayerKey) == "function"
+    then
+        return PNC.Factions.GetFactionForPlayerKey(tostring(key))
+    end
+    if PNC.PlayerCharacters
+        and type(PNC.PlayerCharacters.GetEntityKey) == "function"
+        and PNC.Factions
+        and type(PNC.Factions.GetFactionForPlayerKey) == "function"
+    then
+        ok, key, reason = pcall(
+            PNC.PlayerCharacters.GetEntityKey,
+            player,
+            { callback = "colony_storage_snapshot" }
+        )
+        if not ok then return nil, "identity_resolution_failed" end
+        if not key then return nil, reason or "player_identity_unavailable" end
+        return PNC.Factions.GetFactionForPlayerKey(tostring(key))
+    end
+    if PNC.Factions and type(PNC.Factions.GetPlayerFaction) == "function" then
+        return PNC.Factions.GetPlayerFaction(player)
+    end
+    return nil, "faction_lookup_unavailable"
+end
+
 local function activeColony(factionID)
     if not PNC.Communities or not PNC.Communities.GetForFaction then
         return nil
@@ -17,9 +52,10 @@ local function activeColony(factionID)
     return nil
 end
 
-function Service.ResolveForPlayer(player, requestedStorageID)
-    local faction, reason = PNC.Factions and PNC.Factions.GetPlayerFaction
-        and PNC.Factions.GetPlayerFaction(player) or nil, "unaffiliated"
+function Service.ResolveForPlayer(player, requestedStorageID,
+    ownershipContext)
+    local faction, reason = factionForPlayer(player, ownershipContext)
+    reason = reason or "unaffiliated"
     if not faction then return nil, reason end
     local storage
     local colony = activeColony(faction.id)

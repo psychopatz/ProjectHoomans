@@ -35,6 +35,12 @@ function Internal.TickAbstractFollowOwner(record, now)
     local ownerResolved = owner ~= nil
     local distanceBefore
     local distanceAfter
+    local movementSpeed
+    local maxFollowSpeed
+    local catchupStartDistance
+    local catchupRampDistance
+    local catchupBlend
+    local catchupApplied = false
     local auditEnabled = followerPresenceAuditEnabled()
     local arrived = false
     local moved = false
@@ -81,6 +87,28 @@ function Internal.TickAbstractFollowOwner(record, now)
         targetX,
         targetY
     )
+    movementSpeed = tonumber(Const.ABSTRACT_TRAVEL_SPEED)
+        or ((tonumber(Const.ABSTRACT_TRAVEL_STEP) or 5) / 3)
+    if owner then
+        maxFollowSpeed = tonumber(Const.ABSTRACT_FOLLOW_CATCHUP_SPEED)
+            or movementSpeed
+        catchupStartDistance = tonumber(Const.FOLLOW_RUN_DISTANCE) or 10
+        catchupRampDistance = math.max(1, catchupStartDistance * 2)
+        if distanceBefore > catchupStartDistance
+            and maxFollowSpeed > movementSpeed
+        then
+            catchupBlend = math.min(
+                1,
+                (distanceBefore - catchupStartDistance)
+                    / catchupRampDistance
+            )
+            movementSpeed = movementSpeed
+                + ((maxFollowSpeed - movementSpeed) * catchupBlend)
+            catchupApplied = movementSpeed > (
+                tonumber(Const.ABSTRACT_TRAVEL_SPEED) or 0
+            )
+        end
+    end
     if distanceBefore <= stopDistance and beforeZ == targetZ then
         arrived = true
     else
@@ -92,7 +120,9 @@ function Internal.TickAbstractFollowOwner(record, now)
             targetZ,
             "walk",
             stopDistance,
-            reason
+            reason,
+            nil,
+            owner and movementSpeed or nil
         )
         moved = true
     end
@@ -119,6 +149,8 @@ function Internal.TickAbstractFollowOwner(record, now)
             "distanceAfter=" .. tostring(distanceAfter),
             "moved=" .. tostring(moved),
             "arrived=" .. tostring(arrived),
+            "abstractSpeed=" .. tostring(movementSpeed),
+            "catchup=" .. tostring(catchupApplied),
             "cadenceMs=" .. tostring(PNC.Const.TICK_ABSTRACT_MS or 3000),
         })
     end

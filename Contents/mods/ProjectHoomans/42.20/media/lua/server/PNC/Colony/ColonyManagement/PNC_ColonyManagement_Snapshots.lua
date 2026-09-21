@@ -53,7 +53,7 @@ end
 
 local function playerFactionForSnapshot(player, ownershipContext,
     resolverAvailable)
-    if not PNC.Factions then return nil end
+    if not PNC.Factions then return nil, "factions_unavailable" end
     if ownershipContext and ownershipContext.playerKey
         and type(PNC.Factions.GetFactionForPlayerKey) == "function"
     then
@@ -65,19 +65,26 @@ local function playerFactionForSnapshot(player, ownershipContext,
     then
         return PNC.Factions.GetPlayerFaction(player)
     end
-    return nil
+    return nil, "faction_lookup_unavailable"
 end
 
 local function snapshotIdentityStatus(ownershipContext, reason,
-    resolverAvailable)
-    if not resolverAvailable then return { state = "legacy" } end
-    if ownershipContext and ownershipContext.playerKey then
-        return { state = "ready" }
-    end
-    return {
-        state = "pending",
-        reason = tostring(reason or "player_identity_unavailable"),
+    resolverAvailable, playerFaction, factionReason)
+    local status = {
+        state = not resolverAvailable and "legacy" or "ready",
+        factionState = playerFaction and "ready" or "missing",
     }
+    if not resolverAvailable then return status end
+    if ownershipContext and ownershipContext.playerKey then
+        if not playerFaction then
+            status.factionReason = tostring(
+                factionReason or "faction_not_found")
+        end
+        return status
+    end
+    status.state = "pending"
+    status.reason = tostring(reason or "player_identity_unavailable")
+    return status
 end
 
 local function ownedZoneSnapshot(service, player)
@@ -187,7 +194,7 @@ end
 function Management.BuildBaseSnapshot(player)
     local ownershipContext, identityReason, resolverAvailable =
         resolveSnapshotOwner(player)
-    local playerFaction = playerFactionForSnapshot(
+    local playerFaction, factionReason = playerFactionForSnapshot(
         player, ownershipContext, resolverAvailable)
     local colony = activeColonyForFaction(playerFaction)
     local base = colony and PNC.BaseService
@@ -201,12 +208,18 @@ function Management.BuildBaseSnapshot(player)
         id = colony.id,
         factionID = playerFaction and playerFaction.id or nil,
     } or nil
+    local identityStatus = snapshotIdentityStatus(
+        ownershipContext,
+        identityReason,
+        resolverAvailable,
+        playerFaction,
+        factionReason
+    )
     return {
         colony = colonySnapshot,
         faction = faction,
         settlement = base and Internal.BuildSettlementSnapshot(base, {}) or nil,
-        identityStatus = snapshotIdentityStatus(
-            ownershipContext, identityReason, resolverAvailable),
+        identityStatus = identityStatus,
         generatedAt = PNC.NeedsUtils.WorldAgeHours(),
     }
 end
@@ -218,6 +231,7 @@ function Management.BuildSnapshot(player, options)
     local ownedRecords = {}
     local candidateRecords = {}
     local playerFaction, colony
+    local factionReason
     local ownershipContext, identityReason, resolverAvailable =
         resolveSnapshotOwner(player)
     local identityReady = not resolverAvailable
@@ -229,7 +243,7 @@ function Management.BuildSnapshot(player, options)
         end
         return owned(record, player)
     end
-    playerFaction = playerFactionForSnapshot(
+    playerFaction, factionReason = playerFactionForSnapshot(
         player, ownershipContext, resolverAvailable)
     for _, record in pairs(PNC.Registry.Data or {}) do
         if record.alive ~= false then
@@ -290,9 +304,35 @@ function Management.BuildSnapshot(player, options)
     end
     table.sort(people,function(a,b) return a.name<b.name end)
     table.sort(attention,function(a,b) return a.value>b.value end)
-    local storage = PNC.ColonyStorageService
+    local storage
+    local storageReason
+    if PNC.ColonyStorageService
         and PNC.ColonyStorageService.BuildSnapshot
-        and PNC.ColonyStorageService.BuildSnapshot(player, options) or nil
+    then
+        storage, storageReason = PNC.ColonyStorageService.BuildSnapshot(
+            player, options, ownershipContext)
+    end
+    local identityStatus = snapshotIdentityStatus(
+        ownershipContext,
+        identityReason,
+        resolverAvailable,
+        playerFaction,
+        factionReason
+    )
+    local storageAccess = storage and storage.access or nil
+    local storageStatus = {
+        state = storage and storageAccess
+            and storageAccess.hasStockpile == true and "ready"
+            or storage and "blocked"
+            or identityStatus.state == "pending" and "pending"
+            or "unavailable",
+        reason = storageAccess and storageAccess.reason
+            or storageReason,
+        hasStockpile = storageAccess
+            and storageAccess.hasStockpile == true or false,
+        insideBase = storageAccess
+            and storageAccess.insideBase == true or false,
+    }
     local storageState = storage and PNC.ColonyStorageRepository
         and PNC.ColonyStorageRepository.Get(storage.storageId) or nil
     local research = PNC.ColonyResearchService
@@ -335,8 +375,8 @@ function Management.BuildSnapshot(player, options)
         provisionStorage=provisionStorage,
         provisionSettings=provisionSettings,
         settlement=settlement, utilities={ facilities = {} },
-        identityStatus=snapshotIdentityStatus(
-            ownershipContext, identityReason, resolverAvailable),
+        identityStatus=identityStatus,
+        storageStatus=storageStatus,
         zoneState={
             lumber=ownedZoneSnapshot(PNC.LumberService, player),
             fishing=ownedZoneSnapshot(PNC.FishingService, player),

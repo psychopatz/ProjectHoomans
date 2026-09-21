@@ -269,15 +269,33 @@ class SemanticHarnessTests(unittest.TestCase):
                 "player": {
                     "forename": "Psycho",
                     "surname": "Patz",
-                    "displayName": "SteamDisplayName",
+                    "displayName": "Psycho patz",
                 }
             },
         )
         with LuaSemanticWorker(scenario) as worker:
             worker.input("what is your name")
-            result = worker.input("Im psycho, now your turn")
+            result = worker.input("im psycho")
+        identity_claim = result["result"]["ir"]["slots"]["identityClaim"]
+        self.assertEqual(identity_claim["name"], "psycho")
         self.assertEqual(result["relationshipAfter"]["identityTrust"], "trusted")
-        self.assertIn("Mara", self.message_text(result))
+        identity_request = next(
+            event for event in result["transport"]
+            if event.get("command") == "SemanticIdentityRequest"
+        )
+        self.assertEqual(identity_request["payload"]["claimedName"], "psycho")
+        self.assertTrue(identity_request["payload"]["conversationToken"])
+        identity_result = next(
+            event for event in result["transport"]
+            if event.get("command") == "SemanticIdentityResult"
+        )["payload"]
+        self.assertTrue(identity_result["accepted"])
+        self.assertTrue(identity_result["truthful"])
+        self.assertEqual(
+            identity_result["responseText"],
+            "Okay Psycho, nice to meet you. I'm Mara Vale.",
+        )
+        self.assertEqual(identity_result["memoryType"], "identity_introduction")
 
     def test_false_name_does_not_disclose_npc_name(self) -> None:
         with LuaSemanticWorker(merge({}, DEFAULT_SCENARIO)) as worker:

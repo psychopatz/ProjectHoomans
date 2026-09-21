@@ -155,14 +155,26 @@ function PathService.AdvanceAbstract(
     targetX,
     targetY,
     targetZ,
-    stopDistance
+    stopDistance,
+    speedOverride
 )
     local elapsedMs = record and record.runtime
         and tonumber(record.runtime.abstractStepElapsedMs)
         or tonumber(PNC.Const.TICK_ABSTRACT_MS)
         or 3000
-    local speed = tonumber(PNC.Const.ABSTRACT_TRAVEL_SPEED)
+    local baseSpeed = tonumber(PNC.Const.ABSTRACT_TRAVEL_SPEED)
         or ((tonumber(PNC.Const.ABSTRACT_TRAVEL_STEP) or 5) / 3)
+    local requestedSpeed = tonumber(speedOverride)
+    local speed = baseSpeed
+    if requestedSpeed and requestedSpeed > 0 then
+        local followSpeedCap = tonumber(
+            PNC.Const.ABSTRACT_FOLLOW_CATCHUP_SPEED
+        ) or baseSpeed
+        speed = math.min(
+            math.max(baseSpeed, requestedSpeed),
+            math.max(baseSpeed, followSpeedCap)
+        )
+    end
     local step = math.max(0, speed * math.max(0, elapsedMs) / 1000)
     stopDistance = tonumber(stopDistance) or 1.0
     local dist = Internal.Core.Distance(record.x, record.y, targetX, targetY)

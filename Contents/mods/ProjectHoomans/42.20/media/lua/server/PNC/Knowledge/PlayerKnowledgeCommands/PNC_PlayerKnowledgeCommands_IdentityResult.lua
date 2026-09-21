@@ -2,7 +2,29 @@
 if PsychopatzCore and PsychopatzCore.RuntimeRole
     and not PsychopatzCore.RuntimeRole.AllowsServerCode() then return end
 
+require "PNC/Semantics/PNC_SemanticDiagnostics"
+
 local Result = {}
+local Diagnostics = PNC and PNC.Semantics
+    and PNC.Semantics.SemanticDiagnostics or nil
+
+local function logResult(payload)
+    if not Diagnostics
+        or type(Diagnostics.IsEnabled) ~= "function"
+        or Diagnostics.IsEnabled() ~= true
+    then
+        return false
+    end
+    payload = type(payload) == "table" and payload or {}
+    return Diagnostics.Record("semantic.identity.result", {
+        requestID = payload.requestID,
+        npcID = payload.npcID,
+        kind = payload.kind,
+        accepted = payload.accepted == true,
+        truthful = payload.truthful,
+        reason = payload.reason,
+    }, { requestID = payload.requestID })
+end
 
 function Result.RelationshipDelta(before, after)
     return {
@@ -56,6 +78,7 @@ end
 
 function Result.SendRejected(player, args, reason)
     local payload = Result.BuildRejected(args, reason)
+    logResult(payload)
     local network = PNC and PNC.Network
     if network and type(network.SendSemanticIdentityResult) == "function" then
         network.SendSemanticIdentityResult(player, payload)
@@ -64,6 +87,7 @@ function Result.SendRejected(player, args, reason)
 end
 
 function Result.SendAccepted(player, payload)
+    logResult(payload)
     local network = PNC and PNC.Network
     if network and type(network.SendSemanticIdentityResult) == "function" then
         network.SendSemanticIdentityResult(player, payload)

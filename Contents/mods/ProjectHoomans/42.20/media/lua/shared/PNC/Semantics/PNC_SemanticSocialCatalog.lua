@@ -9,7 +9,7 @@ local Registry = Semantic.Registry
 local Social = PNC.Semantics.SocialCatalog or {}
 PNC.Semantics.SocialCatalog = Social
 
-Social.VERSION = 1
+Social.VERSION = 2
 Social.OWNER = "ProjectHoomans"
 
 local function registerConcept(id, aliases, priority)
@@ -24,15 +24,19 @@ local function registerConcept(id, aliases, priority)
     })
 end
 
-local function registerPattern(id, match, emit, confidence, priority)
-    return Registry.RegisterPattern({
+local function registerPattern(id, match, emit, confidence, priority, options)
+    local definition = {
         id = id,
         match = match,
         emit = emit,
         confidence = confidence,
         priority = priority or 0,
         owner = Social.OWNER,
-    })
+    }
+    for key, value in pairs(type(options) == "table" and options or {}) do
+        definition[key] = value
+    end
+    return Registry.RegisterPattern(definition)
 end
 
 local function registerSpeechAct(id)
@@ -62,6 +66,34 @@ local function directedSocialEmit(speechAct, intensity)
             hostility = intensity,
         },
     }
+end
+
+local function registerDirectedPattern(
+    id,
+    match,
+    speechAct,
+    intensity,
+    confidence,
+    priority
+)
+    local matchWithTrailingWords = {}
+    for index = 1, #match do
+        matchWithTrailingWords[index] = match[index]
+    end
+    matchWithTrailingWords[#matchWithTrailingWords + 1] = {
+        kind = "any_phrase",
+        minTokens = 1,
+        maxTokens = 8,
+        allowVerbForms = true,
+        optional = true,
+    }
+    return registerPattern(
+        id,
+        matchWithTrailingWords,
+        directedSocialEmit(speechAct, intensity),
+        confidence,
+        priority
+    )
 end
 
 local function selfReflectionEmit(reflectionType)
@@ -281,21 +313,39 @@ function Social.Register()
     registerSpeechAct("SELF_REFLECTION")
     registerSpeechAct("COMPLIMENT")
 
-    -- These are deliberately short, game-domain phrases.  This is not a
-    -- general profanity detector; adding or removing vocabulary is a data
-    -- change and does not require parser changes.
+    -- Keep hostile vocabulary in the catalog. Explicit hostile phrases may
+    -- carry up to eight trailing words such as "then" without requiring each
+    -- complete sentence to be listed as a separate alias.
     registerConcept("INSULT", {
         "fuck you", "fuck u", "f u", "f*ck you", "f**k you", "f*** you",
-        "fuck-you", "screw you", "screw u", "you suck", "you are useless",
-        "you're useless", "you idiot", "idiot", "you jerk", "jerk",
-        "asshole", "bastard",
+        "f***k you", "fuck-you", "screw you", "screw u", "you suck",
+        "you are useless", "you're useless", "you idiot", "idiot",
+        "you jerk", "jerk", "asshole", "you asshole", "you're an asshole",
+        "you are an asshole", "bastard", "you bastard", "bitch",
+        "you bitch", "moron", "you moron", "stupid", "you are stupid",
+        "you're stupid", "dumb", "you are dumb", "you're dumb", "pathetic",
+        "you are pathetic", "you're pathetic", "worthless", "you are worthless",
+        "you're worthless", "loser", "you are a loser", "you're a loser",
+        "dumbass", "jackass", "dickhead", "asshat", "dipshit", "prick",
+        "twat", "wanker", "cunt", "douchebag", "fuckface", "fucker",
+        "motherfucker", "piece of shit", "you piece of shit", "son of a bitch",
+        "you son of a bitch", "fucking idiot", "you fucking idiot",
+        "fucking moron", "you fucking moron", "fucking asshole",
+        "you fucking asshole",
     }, 3)
     registerConcept("HOSTILE_REMARK", {
         "shut up", "shut the fuck up", "fuck off", "get lost", "back off",
         "leave me alone", "don't come closer", "go away",
+        "go to hell", "piss off", "screw off", "go fuck yourself",
+        "get the fuck out", "leave me the fuck alone", "shut your mouth",
+        "shut your fucking mouth", "stop talking to me", "i hate you",
+        "i hate your guts", "get away from me",
     }, 2)
     registerConcept("PROFANITY", {
-        "fuck", "f*ck", "f**k", "f***", "shit", "damn", "hell",
+        "fuck", "f*ck", "f**k", "f***", "f***k", "f*****", "fuckin",
+        "fucking", "fucked", "shit", "sh*t", "s**t", "shitty", "bullshit",
+        "bullsh*t", "horseshit", "damn", "dammit", "goddamn", "hell",
+        "crap", "ass", "arse", "piss", "pissed", "pissing", "cock",
     }, 1)
     registerConcept("THREATEN", {
         "i will kill you", "i'll kill you", "i am going to kill you",
@@ -389,85 +439,121 @@ function Social.Register()
         0.97,
         145
     )
-    registerPattern(
+    registerDirectedPattern(
         "pnc.social.insult_you_are",
         {
             { kind = "literal", value = "you" },
             { kind = "literal", value = "are" },
+            { kind = "literal", value = "a", optional = true },
             { kind = "literal", value = "an", optional = true },
             { kind = "concept", id = "INSULT" },
         },
-        directedSocialEmit("INSULT", "high"),
+        "INSULT",
+        "high",
         0.98,
         140
     )
-    registerPattern(
+    registerDirectedPattern(
         "pnc.social.insult_youre",
         {
             { kind = "literal", value = "you're" },
+            { kind = "literal", value = "a", optional = true },
             { kind = "literal", value = "an", optional = true },
             { kind = "concept", id = "INSULT" },
         },
-        directedSocialEmit("INSULT", "high"),
+        "INSULT",
+        "high",
         0.98,
         140
     )
 
-    registerPattern(
+    registerDirectedPattern(
+        "pnc.social.insult_you",
+        {
+            { kind = "literal", value = "you" },
+            { kind = "concept", id = "INSULT" },
+        },
+        "INSULT",
+        "high",
+        0.97,
+        139
+    )
+    registerDirectedPattern(
         "pnc.social.insult",
         { "@INSULT" },
-        directedSocialEmit("INSULT", "high"),
+        "INSULT",
+        "high",
         0.96,
         100
     )
-    registerPattern(
+    registerDirectedPattern(
         "pnc.social.insult_prefixed",
         {
             { kind = "literal", value = "hey", optional = true },
             { kind = "concept", id = "INSULT" },
         },
-        directedSocialEmit("INSULT", "high"),
+        "INSULT",
+        "high",
         0.90,
         90
     )
-    registerPattern(
+    registerDirectedPattern(
         "pnc.social.hostile_remark",
         { "@HOSTILE_REMARK" },
-        directedSocialEmit("HOSTILE_REMARK", "high"),
+        "HOSTILE_REMARK",
+        "high",
         0.96,
         100
     )
-    registerPattern(
+    registerDirectedPattern(
         "pnc.social.hostile_remark_prefixed",
         {
             { kind = "literal", value = "hey", optional = true },
             { kind = "concept", id = "HOSTILE_REMARK" },
         },
-        directedSocialEmit("HOSTILE_REMARK", "high"),
+        "HOSTILE_REMARK",
+        "high",
         0.90,
         90
     )
-    registerPattern(
+    registerDirectedPattern(
         "pnc.social.profanity",
         { "@PROFANITY" },
-        directedSocialEmit("HOSTILE_REMARK", "moderate"),
+        "HOSTILE_REMARK",
+        "moderate",
         0.92,
         80
     )
-    registerPattern(
+    registerDirectedPattern(
         "pnc.social.profanity_prefixed",
         {
             { kind = "literal", value = "hey", optional = true },
             { kind = "concept", id = "PROFANITY" },
         },
-        directedSocialEmit("HOSTILE_REMARK", "moderate"),
-        0.86,
+        "HOSTILE_REMARK",
+        "moderate",
+        0.94,
         70
     )
-    registerPattern(
+    registerDirectedPattern(
+        "pnc.social.profanity_you",
+        {
+            { kind = "literal", value = "you" },
+            { kind = "literal", value = "are", optional = true },
+            { kind = "literal", value = "a", optional = true },
+            { kind = "literal", value = "an", optional = true },
+            { kind = "concept", id = "PROFANITY" },
+        },
+        "HOSTILE_REMARK",
+        "moderate",
+        0.94,
+        85
+    )
+    registerDirectedPattern(
         "pnc.social.threaten",
         { "@THREATEN" },
-        directedSocialEmit("THREATEN", "critical"),
+        "THREATEN",
+        "critical",
         0.97,
         120
     )

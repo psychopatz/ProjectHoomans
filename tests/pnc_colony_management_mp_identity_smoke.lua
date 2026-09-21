@@ -9,6 +9,7 @@ local identityCalls = 0
 local identityMode = "ready"
 local fallbackCharacterLookups = 0
 local factionLookups = 0
+local storageContext
 
 local function deepCopy(value)
     if type(value) ~= "table" then return value end
@@ -81,6 +82,22 @@ PNC = {
             error("legacy faction lookup should not run")
         end,
     },
+    ColonyStorageService = {
+        BuildSnapshot = function(_, _, ownershipContext)
+            storageContext = ownershipContext
+            if ownershipContext and ownershipContext.unavailable then
+                return nil, ownershipContext.reason
+            end
+            return {
+                storageId = "storage_mp",
+                access = {
+                    hasStockpile = true,
+                    insideBase = true,
+                    reason = "writable",
+                },
+            }
+        end,
+    },
     Registry = { Data = {
         npc_one = {
             id = "npc_one", name = "One", alive = true,
@@ -113,6 +130,10 @@ T.equal(fallbackCharacterLookups, 0,
     "snapshot ownership does not repeat character lookups")
 T.equal(snapshot.identityStatus.state, "ready",
     "resolved multiplayer identity is reported ready")
+T.equal(storageContext.playerKey, ownerKey,
+    "storage receives the resolved multiplayer identity context")
+T.equal(snapshot.storageStatus.state, "ready",
+    "storage status is ready with the resolved identity")
 T.equal(#snapshot.people, 2,
     "canonical multiplayer faction members appear in the roster")
 
@@ -124,6 +145,8 @@ T.equal(pending.identityStatus.state, "pending",
     "identity failure is explicit in the snapshot")
 T.equal(pending.identityStatus.reason, "binding_context_unavailable",
     "identity failure reason is preserved")
+T.equal(pending.storageStatus.state, "pending",
+    "storage remains pending while multiplayer identity is unavailable")
 T.equal(#pending.people, 0,
     "unresolved identity cannot expose NPCs")
 

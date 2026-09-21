@@ -3,14 +3,14 @@
   "tags": ["identity", "relationship", "singleplayer"],
   "scenario": {
     "player": {
-      "characterUUID": "char_patrick",
-      "forename": "Patrick",
-      "surname": "Patz",
-      "displayName": "SteamAlias"
+      "characterUUID": "char_psycho",
+      "forename": "Psycho",
+      "surname": "patz",
+      "displayName": "Psycho patz"
     }
   },
   "inputs": [
     "who are you",
-    "im patrick"
+    "im psycho"
   ]
 }

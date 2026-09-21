@@ -46,7 +46,8 @@ function Admission.Resolve(player, args)
     local context
     context, reason = H.ContextFor(player, "semantic_identity")
     if not context then return nil, reason end
-    local targetKey = context.playerEntityKey
+    -- PlayerContext.Resolve exposes the authoritative key as `entityKey`.
+    local targetKey = context.entityKey
     if not targetKey then
         return nil, "player_identity_unavailable"
     end

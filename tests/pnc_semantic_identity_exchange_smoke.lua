@@ -28,7 +28,7 @@ PNC = {
             ContextFor = function()
                 return {
                     characterUUID = "char_patrick",
-                    playerEntityKey = "player:sp:char_patrick",
+                    entityKey = "player:sp:char_patrick",
                 }
             end,
             IntroductionText = function()
@@ -231,14 +231,14 @@ local truthful, truthfulPayload = Commands.HandleSemanticIdentity({}, {
     requestID = "identity:truth",
     npcID = "npc_mara",
     kind = "identity_claim",
-    claimedName = "Patrick Patz",
+    claimedName = "Patrick",
     conversationToken = "lease",
 })
-T.truthy(truthful, "exact player name claim is accepted")
+T.truthy(truthful, "player forename claim is accepted")
 T.truthy(truthfulPayload.truthful, "truthful claim is marked truthful")
 T.equal(truthfulPayload.responseText,
     "Okay Patrick, nice to meet you. I'm Mara Vale.",
-    "truthful claim confirms the player and introduces the NPC")
+    "forename claim confirms the player and introduces the NPC")
 T.equal(truthfulPayload.responseKey,
     "UI_PNC_Conversation_Semantic_IdentityExchangeConfirmed",
     "truthful claim carries the localized identity confirmation key")

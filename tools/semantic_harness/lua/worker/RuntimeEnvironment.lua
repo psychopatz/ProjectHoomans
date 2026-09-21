@@ -78,6 +78,13 @@ function RuntimeEnvironment.configure(context)
         getSurname = function() return playerData.surname end,
     }
     local player = {
+        getUsername = function()
+            return playerData.username or playerData.displayName
+                or "harness-player"
+        end,
+        getOnlineID = function()
+            return playerData.onlineID or 1
+        end,
         getDescriptor = function() return descriptor end,
         getDisplayName = function()
             return playerData.displayName

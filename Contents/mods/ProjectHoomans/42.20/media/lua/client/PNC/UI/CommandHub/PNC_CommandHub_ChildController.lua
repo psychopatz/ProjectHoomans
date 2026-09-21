@@ -20,6 +20,7 @@ Controller.closeOrder = { "zone", "colony", "work", "workshop", "settings", "eve
     "storage", "research", "base" }
 Controller.activeID = nil
 Controller.closing = false
+Controller.lastFailureReason = nil
 
 local function isVisible(window)
     return window ~= nil and window.getIsVisible
@@ -171,7 +172,11 @@ end
 function Controller.Toggle(id, owner)
     local key = tostring(id or "")
     local entry = Controller.entries[key]
-    if not entry then return false end
+    Controller.lastFailureReason = nil
+    if not entry then
+        Controller.lastFailureReason = "child_not_registered"
+        return false
+    end
 
     if Controller.activeID == key and Controller.IsOpen(key) then
         -- A detached widget is still owned by this branch. Re-clicking its
@@ -193,9 +198,15 @@ function Controller.Toggle(id, owner)
     end
 
     Controller.CloseAll("switch")
-    if type(entry.open) ~= "function" then return false end
-    local opened = entry.open(owner)
-    if opened == false or opened == nil then return false end
+    if type(entry.open) ~= "function" then
+        Controller.lastFailureReason = "child_open_unavailable"
+        return false
+    end
+    local opened, reason = entry.open(owner)
+    if opened == false or opened == nil then
+        Controller.lastFailureReason = tostring(reason or "open_rejected")
+        return false
+    end
     Controller.activeID = key
     Controller.SyncPositions()
     return true
@@ -475,8 +486,10 @@ Controller.Register("colonist", {
 Controller.Register("storage", {
     open = function(owner)
         local storage = PNC.ColonyStorageUI
-        return storage and storage.Open
-            and storage.Open(owner) or false
+        if not storage or type(storage.Open) ~= "function" then
+            return false, "storage_ui_unavailable"
+        end
+        return storage.Open(owner)
     end,
     close = function()
         local storage = PNC.ColonyStorageUI

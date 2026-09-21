@@ -5,6 +5,9 @@ local Const = PNC.Const
 
 
 Const.ABSTRACT_TRAVEL_SPEED = 1.6666667
+-- Long-range abstract followers may catch up faster, while keeping their
+-- three-second decision cadence and a hard movement-speed ceiling.
+Const.ABSTRACT_FOLLOW_CATCHUP_SPEED = 5.0
 Const.TRAVEL_SCHEMA_VERSION = 2
 Const.TRAVEL_API_VERSION = 2
 Const.TRAVEL_DEFAULT_ARRIVAL_ACTION = "roam"

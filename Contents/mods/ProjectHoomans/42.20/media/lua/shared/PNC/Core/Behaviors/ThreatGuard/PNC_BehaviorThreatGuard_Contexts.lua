@@ -1,6 +1,7 @@
 local ThreatGuard = PNC.BehaviorThreatGuard
 local Internal = ThreatGuard.Internal
 local Const = PNC.Const or {}
+local Core = PNC.Core or {}
 
 Internal.SCAN_MS = tonumber(Const.THREAT_GUARD_SCAN_MS) or 350
 Internal.VALIDATE_MS = tonumber(Const.THREAT_GUARD_VALIDATE_MS) or 250
@@ -20,11 +21,13 @@ local PASSIVE_ORDERS = {
 }
 
 local function firstNumber(...)
-    local values = { ... }
+    local count = select("#", ...)
     local index
-    for index = 1, #values do
-        if tonumber(values[index]) ~= nil then
-            return tonumber(values[index])
+    local value
+    for index = 1, count do
+        value = select(index, ...)
+        if tonumber(value) ~= nil then
+            return tonumber(value)
         end
     end
     return nil
@@ -35,14 +38,15 @@ local function orderKind(record)
         and record.orderSpec.kind or "")
 end
 
+local function isHostileRecord(record)
+    local tacticalClass = tostring(record and record.tacticalClass or "")
+    return tacticalClass == tostring(Const.TACTICAL_CLASS_HOSTILE or "hostile")
+        or tacticalClass == "hostile"
+end
+
 local function isIdleKind(record, kind)
     local idleKind = tostring(Const.ORDER_IDLE or "idle")
-    local tacticalClass = tostring(record and record.tacticalClass or "")
-    if tacticalClass == tostring(Const.TACTICAL_CLASS_HOSTILE or "hostile")
-        or tacticalClass == "hostile"
-    then
-        return false
-    end
+    if isHostileRecord(record) then return false end
     return kind == "" or kind == idleKind
 end
 
@@ -61,7 +65,17 @@ local function ownerToken(record, source, ownerKind)
     return token
 end
 
-local function context(source, ownerKind, x, y, z, radius, presentation, token)
+local function context(
+    source,
+    ownerKind,
+    x,
+    y,
+    z,
+    radius,
+    presentation,
+    token,
+    targetPolicy
+)
     return {
         source = tostring(source or ""),
         ownerKind = tostring(ownerKind or ""),
@@ -71,6 +85,7 @@ local function context(source, ownerKind, x, y, z, radius, presentation, token)
         radius = math.max(0.5, tonumber(radius) or 6),
         presentation = presentation,
         token = token,
+        targetPolicy = tostring(targetPolicy or "area"),
     }
 end
 
@@ -205,6 +220,43 @@ local function idleContext(record, order)
     )
 end
 
+local function resolveOwner(record)
+    local owner
+    if not record then return nil end
+    if type(Core.ResolvePlayerByOnlineID) == "function" then
+        owner = Core.ResolvePlayerByOnlineID(record.ownerOnlineID)
+    end
+    if not owner and type(Core.ResolvePlayerByUsername) == "function" then
+        owner = Core.ResolvePlayerByUsername(record.ownerUsername)
+    end
+    return owner
+end
+
+local function followContext(record, order)
+    local owner = resolveOwner(record)
+    local ownerX = owner and owner.getX and owner:getX() or nil
+    local ownerY = owner and owner.getY and owner:getY() or nil
+    local ownerZ = owner and owner.getZ and owner:getZ() or nil
+    local followKind = tostring(Const.ORDER_FOLLOW or "follow")
+    return context(
+        followKind,
+        followKind,
+        firstNumber(ownerX, order.x, record.x, record.anchorX),
+        firstNumber(ownerY, order.y, record.y, record.anchorY),
+        firstNumber(ownerZ, order.z, record.z, record.anchorZ),
+        firstNumber(
+            order.threatRadius,
+            Const.FOLLOW_COMBAT_LEASH_DISTANCE,
+            Const.GUARD_ENGAGE_RADIUS,
+            Const.TARGET_IMMEDIATE_THREAT_RADIUS,
+            6
+        ),
+        nil,
+        ownerToken(record, followKind, followKind),
+        "owner"
+    )
+end
+
 local function travelConversationContext(record)
     local runtime = record and record.runtime or nil
     local lease = runtime and runtime.conversationLease or nil
@@ -268,6 +320,11 @@ function Internal.ResolveContext(record)
             "seat",
             ownerToken(record, "roaming_seat", kind)
         )
+    end
+    if kind == tostring(Const.ORDER_FOLLOW or "follow")
+        and not isHostileRecord(record)
+    then
+        return followContext(record, order)
     end
     if isIdleKind(record, kind) then
         return idleContext(record, order)

@@ -175,9 +175,9 @@ function Service.DebugAction(player, args)
     return finish(changed == true, reason or "ok", storage, details)
 end
 
-function Service.BuildSnapshot(player, options)
+function Service.BuildSnapshot(player, options, ownershipContext)
     local storage, reason = Service.ResolveForPlayer(
-        player, options and options.storageId
+        player, options and options.storageId, ownershipContext
     )
     if not storage then return nil, reason end
     local snapshot = Query.BuildSnapshot(storage, options)

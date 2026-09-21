@@ -166,15 +166,17 @@ function Internal.UpdateOwnerMotionState(record, owner, now)
     local ownerY = owner:getY()
     local elapsed = now - (tonumber(state.ownerSampleAt) or now)
     local moved = false
+    local reportedMoving
     local dx
     local dy
     local epsilon = tonumber(Const.FOLLOW_OWNER_MOVE_EPSILON) or 0.08
 
-    if owner.isPlayerMoving or owner.isRunning or owner.isSprinting then
-        moved = (owner.isPlayerMoving and owner:isPlayerMoving())
-            or (owner.isRunning and owner:isRunning())
-            or (owner.isSprinting and owner:isSprinting())
-            or false
+    reportedMoving = (owner.isPlayerMoving and owner:isPlayerMoving())
+        or (owner.isRunning and owner:isRunning())
+        or (owner.isSprinting and owner:isSprinting())
+        or false
+    if reportedMoving then
+        moved = true
     elseif state.ownerSampleX ~= nil and elapsed > 0 then
         dx = ownerX - state.ownerSampleX
         dy = ownerY - state.ownerSampleY

@@ -31,6 +31,15 @@ local GIFT_DISPATCH_BRANCHES = {
 local INVENTORY_DISPATCH_BRANCHES = {
     INVENTORY_QUERY_RECEIVED = true,
 }
+local DIRECTED_HOSTILITY_BRANCHES = {
+    HOSTILE_REMARK_RECEIVED = true,
+    THREAT_RECEIVED = true,
+}
+local DIRECTED_HOSTILITY_ACTS = {
+    INSULT = true,
+    HOSTILE_REMARK = true,
+    THREATEN = true,
+}
 
 local function dispatchBranchEligibility(decision, executableBranches)
     if decision.route == "llm_fallback" then
@@ -79,6 +88,68 @@ end
 local actionContext = ActionContext.Build
 Internal.Audit = audit
 Internal.ActionContext = actionContext
+
+local function dispatchSocialIntent(view, result, value)
+    local decision = result and result.decision or {}
+    local ir = result and result.ir or nil
+    local socialContext = ir and ir.socialContext or nil
+    local speechAct = string.upper(tostring(
+        ir and (ir.speechAct or ir.intent) or ""
+    ))
+    local context
+    local submit
+    local accepted
+    local reason
+    local details
+    if not result or result.accepted ~= true then
+        return nil
+    end
+    if decision.route == "llm_fallback"
+        or not DIRECTED_HOSTILITY_BRANCHES[decision.branch]
+        or type(socialContext) ~= "table"
+        or socialContext.directed ~= true
+        or socialContext.selfDirected == true
+        or not DIRECTED_HOSTILITY_ACTS[speechAct]
+    then
+        return nil
+    end
+    context = actionContext(view, result, value)
+    context.speechAct = speechAct
+    submit = PNC.Client
+        and PNC.Client.RequestSemanticSocialInteraction or nil
+    if type(submit) ~= "function" then
+        return {
+            status = "semantic_social_dispatch_unavailable",
+            accepted = false,
+            reason = "semantic_social_transport_unavailable",
+        }
+    end
+    accepted, reason, details = submit({
+        npcID = context.npcID,
+        requestID = context.requestID,
+        conversationID = context.conversationID,
+        conversationToken = context.conversationToken,
+        speechAct = speechAct,
+    }, context)
+    details = type(details) == "table" and details or {
+        accepted = accepted == true,
+        status = accepted == true and "dispatched" or "rejected",
+        reason = accepted == true and nil or reason,
+        requestID = context.requestID,
+        npcID = context.npcID,
+        speechAct = speechAct,
+    }
+    audit("semantic.social.dispatch", {
+        npcID = context.npcID,
+        conversationID = context.conversationID,
+        requestID = details.requestID or context.requestID,
+        speechAct = speechAct,
+        status = details.status,
+        accepted = accepted == true,
+        reason = details.reason or reason,
+    }, { requestID = context.requestID })
+    return details
+end
 
 function Internal.DispatchInventoryQuery(view, result, value)
     local decision = result and result.decision or {}
@@ -176,6 +247,8 @@ function Internal.DispatchAction(view, result, value)
         if not allowed then return blockedDispatch(blockReason) end
         return Internal.DispatchInventoryQuery(view, result, value)
     end
+    local socialResult = dispatchSocialIntent(view, result, value)
+    if socialResult then return socialResult end
     if not decision.actionIntent then return nil end
     local actionAllowed, actionBlockReason = dispatchBranchEligibility(
         decision, EXECUTABLE_ACTION_BRANCHES)

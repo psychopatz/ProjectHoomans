@@ -67,6 +67,11 @@ end
 function Service.SendToPlayer(record, player, reason)
     if not record or record.alive == false then return false, "NPC_MISSING" end
     if not player then return false, "PLAYER_MISSING" end
+    local username = player.getUsername and player:getUsername() or nil
+    local onlineID = player.getOnlineID and player:getOnlineID() or nil
+    if (username == nil or tostring(username) == "") and onlineID == nil then
+        return false, "PLAYER_IDENTITY_MISSING"
+    end
     -- Home-bound construction work must not be torn out by follow. Provision
     -- pickups and corpse hauls are interruptible field tasks, so an explicit
     -- follow command cancels either one through its registered cleanup path.
@@ -92,10 +97,6 @@ function Service.SendToPlayer(record, player, reason)
             return false, "WORK_ORDER_CANCELLING"
         end
     end
-    local x = player.getX and tonumber(player:getX()) or nil
-    local y = player.getY and tonumber(player:getY()) or nil
-    local z = player.getZ and tonumber(player:getZ()) or 0
-    if not x or not y then return false, "PLAYER_LOCATION_MISSING" end
     local courier = record.runtime and record.runtime.storageCourier or nil
     if courier and (courier.state == "RETURNING_HOME"
         or courier.state == "DEPOSITING")
@@ -106,8 +107,6 @@ function Service.SendToPlayer(record, player, reason)
         courier.revision = math.max(0,
             math.floor(tonumber(courier.revision) or 0)) + 1
     end
-    local username = player.getUsername and player:getUsername() or nil
-    local onlineID = player.getOnlineID and player:getOnlineID() or nil
     if PNC.WorkService and PNC.WorkService.Commands
         and PNC.WorkService.Commands.ReleaseWorker
     then
@@ -120,34 +119,7 @@ function Service.SendToPlayer(record, player, reason)
     then
         PNC.Travel.Service.Cancel(record, "follow_player_requested")
     end
-    local dx = (tonumber(record.x) or 0) - x
-    local dy = (tonumber(record.y) or 0) - y
-    if dx * dx + dy * dy <= 100 then
-        return H.SetFollowing(record, username, onlineID)
-    end
-    local journey, journeyReason = PNC.Travel.Service.Start(record, {
-        destination = { x = x, y = y, z = z },
-        routeProvider = "direct",
-        speedProfile = "walk",
-        ownerMod = "ProjectHoomans",
-        ownerRef = "colony_follow_player",
-        visibility = "all",
-        arrivalAction = {
-            type = "colony_follow_player",
-            ownerUsername = username,
-            ownerOnlineID = onlineID,
-        },
-        metadata = {
-            purpose = "follow_player",
-            reason = tostring(reason or "player_requested"),
-            ownerUsername = username,
-        },
-    })
-    if not journey then return false, journeyReason end
-    record.runtime = record.runtime or {}
-    record.runtime.homeState = "AWAY"
-    record.runtime.homeJourneyId = journey.journeyId
-    return true, "TRAVELING_TO_PLAYER", journey
+    return H.SetFollowing(record, username, onlineID)
 end
 
 function Service.Recover(record, baseId)

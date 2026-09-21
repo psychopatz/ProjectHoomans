@@ -247,6 +247,65 @@ Definitions.player_emote_insult = {
     contributionCaps = { approval = -100, respect = -100 },
 }
 
+local function dialogueHostilityDefinition(
+    id,
+    memoryType,
+    approval,
+    respect,
+    morale,
+    decayPerDay,
+    tags
+)
+    return {
+        id = id,
+        allowedSourceSystems = { semantic_dialogue = true },
+        targetMemory = {
+            type = memoryType,
+            approvalEffect = approval,
+            respectEffect = respect,
+            moraleEffect = morale,
+            familiarityGain = 1,
+            strength = 1,
+            decayPerDay = decayPerDay,
+            permanent = false,
+            shareable = false,
+            knowledgeSource = "experienced",
+            tags = tags,
+        },
+        contributionCaps = { approval = -100, respect = -100 },
+    }
+end
+
+Definitions.player_dialogue_hostile_remark = dialogueHostilityDefinition(
+    "player_dialogue_hostile_remark",
+    "player_spoke_hostile_remark",
+    -2,
+    -2,
+    -1,
+    0.08,
+    { hostile = true, dialogue = true, profanity = true }
+)
+
+Definitions.player_dialogue_insult = dialogueHostilityDefinition(
+    "player_dialogue_insult",
+    "player_spoke_insult",
+    -4,
+    -3,
+    -1,
+    0.05,
+    { hostile = true, dialogue = true, abuse = true }
+)
+
+Definitions.player_dialogue_threat = dialogueHostilityDefinition(
+    "player_dialogue_threat",
+    "player_threatened_npc",
+    -8,
+    -8,
+    -4,
+    0.025,
+    { hostile = true, dialogue = true, threat = true }
+)
+
 Definitions.player_emote_thumbsdown = {
     id = "player_emote_thumbsdown",
     allowedSourceSystems = { player_emote = true },

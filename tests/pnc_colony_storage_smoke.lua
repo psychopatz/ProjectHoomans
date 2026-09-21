@@ -178,6 +178,24 @@ local storageB = Repository.GetPrimary("faction_b", "colony_faction_b")
 T.truthy(storageA and storageB and storageA ~= storageB, "faction isolation")
 T.equal(storageA.tier, 1, "initial tier")
 T.equal(storageA.inventory:getLogicalItemCount(), 0, "initial empty storage")
+PNC.PlayerCharacters = {
+    GetEntityKey = function(player)
+        return player.factionKey == "A"
+            and "player:account_a:character_a"
+            or "player:account_b:character_b"
+    end,
+}
+PNC.Factions.GetFactionForPlayerKey = function(key)
+    if key == "player:account_a:character_a" then return factions.A end
+    if key == "player:account_b:character_b" then return factions.B end
+end
+local resolvedStorage, resolvedReason = Service.ResolveForPlayer(playerA,
+    nil, { playerKey = "player:account_a:character_a" })
+T.equal(resolvedStorage and resolvedStorage.id, storageA.id,
+    "storage resolves through the authoritative multiplayer identity")
+T.equal(resolvedReason, nil,
+    "authoritative storage identity does not produce a rejection")
+PNC.PlayerCharacters = nil
 local access = Service.BuildPlayerAccess(playerA, storageA)
 T.equal(access.hasStockpile, true,
     "built stockpile facility grants storage access")

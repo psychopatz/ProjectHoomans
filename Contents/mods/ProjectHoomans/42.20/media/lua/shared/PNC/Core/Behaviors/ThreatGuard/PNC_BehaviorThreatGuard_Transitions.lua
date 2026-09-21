@@ -87,6 +87,7 @@ function Internal.RefreshTarget(record, state, threatContext, now)
     local runtime = record.runtime or {}
     local current = state.target or runtime.target
     local candidate
+    local options
     if current and Targeting and Targeting.UpdateTargetFromWorld then
         if now >= (tonumber(state.nextValidateAt) or 0) then
             current = Targeting.UpdateTargetFromWorld(record, current)
@@ -114,13 +115,28 @@ function Internal.RefreshTarget(record, state, threatContext, now)
             return candidate
         end
     end
+    options = {
+        areaDefense = threatContext.targetPolicy ~= "owner",
+    }
+    if threatContext.targetPolicy == "owner" then
+        options.ownerEngaged = runtime.followState
+            and runtime.followState.ownerEngaged == true or false
+    end
     if Companion and Companion.Internal
         and Companion.Internal.ResolveThreatTarget
     then
         candidate = Companion.Internal.ResolveThreatTarget(
             record,
             threatContext,
-            { areaDefense = true }
+            options
+        )
+    elseif threatContext.targetPolicy == "owner"
+        and Targeting
+        and Targeting.ResolveCompanionProtectionTarget
+    then
+        candidate = Targeting.ResolveCompanionProtectionTarget(
+            record,
+            options.ownerEngaged
         )
     elseif Targeting and Targeting.ResolveRoamingEngageTarget then
         candidate = Targeting.ResolveRoamingEngageTarget(

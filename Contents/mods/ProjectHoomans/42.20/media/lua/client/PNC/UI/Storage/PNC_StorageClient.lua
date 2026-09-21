@@ -71,9 +71,31 @@ function Client.GetStorage(snapshot)
 end
 
 function Client.HasAccess(snapshot)
+    local allowed = Client.GetAccessStatus(snapshot)
+    return allowed == true
+end
+
+function Client.GetAccessStatus(snapshot)
+    local value = snapshot
+    local status
     local storage = Client.GetStorage(snapshot)
     local access = storage and storage.access or nil
-    return access and access.hasStockpile == true or false
+    if type(value) ~= "table" then value = Client.ReadSnapshot().snapshot end
+    if type(value) == "table" and type(value.snapshot) == "table" then
+        value = value.snapshot
+    end
+    status = value and value.storageStatus or nil
+    if not storage then
+        return false, status and status.reason or "storage_unavailable", status
+    end
+    if not access then
+        return false, "storage_access_unavailable", status
+    end
+    if access.hasStockpile ~= true then
+        return false, access.reason or "stockpile_required", access
+    end
+    return true, access.insideBase == true and "writable" or "outside_base",
+        access
 end
 
 return Client

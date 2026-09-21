@@ -257,6 +257,11 @@ function Presentation.BuildNeeds(person, snapshot)
                 "UI_PNC_Needs_IdentityPending",
                 "COLONIST IDENTITY IS STILL SYNCING"), "") }
         end
+        if identityStatus and identityStatus.factionState == "missing" then
+            return { Presentation.Detail(Shared.Tr(
+                "UI_PNC_FactionMemberNoFaction",
+                "NO PLAYER FACTION"), "") }
+        end
         return { Presentation.Detail(Shared.Tr(
             "UI_PNC_Needs_NoCompanions", "NO COMPANIONS"), "") }
     end

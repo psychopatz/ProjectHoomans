@@ -47,9 +47,20 @@ function SemanticAdapters.configure(context)
     npcData.id = npcData.id or npcData.npcID
     npcData.runtime = type(npcData.runtime) == "table"
         and npcData.runtime or {}
+    PNC = PNC or {}
+    PNC.ConversationScene = PNC.ConversationScene or {}
+    PNC.ConversationScene.LEASE_MS =
+        tonumber(PNC.ConversationScene.LEASE_MS) or 3500
+    local leaseDuration = PNC.ConversationScene.LEASE_MS
     if type(npcData.runtime.conversationLease) ~= "table" then
         npcData.runtime.conversationLease = {
             token = conversationToken,
+            playerOnlineID = player and player.getOnlineID
+                and player:getOnlineID() or nil,
+            playerUsername = player and player.getUsername
+                and player:getUsername() or nil,
+            startedAt = tonumber(Runtime.now) or 0,
+            expiresAt = (tonumber(Runtime.now) or 0) + leaseDuration,
             maximumDistance = 6,
             dangerRadius = 8,
         }
@@ -90,12 +101,34 @@ function SemanticAdapters.configure(context)
     local function validateHarnessLease(record, leasePlayer, token)
         local lease = record and record.runtime
             and record.runtime.conversationLease or nil
-        if leasePlayer ~= player then return false, "player_mismatch" end
         if type(lease) ~= "table" or tostring(lease.token or "") == "" then
             return false, "lease_missing"
         end
         if tostring(lease.token) ~= tostring(token or "") then
             return false, "invalid_lease"
+        end
+        local ownsLease = false
+        if lease.playerOnlineID ~= nil
+            and leasePlayer and leasePlayer.getOnlineID
+            and tostring(lease.playerOnlineID)
+                == tostring(leasePlayer:getOnlineID())
+        then
+            ownsLease = true
+        end
+        if not ownsLease and lease.playerUsername ~= nil
+            and leasePlayer and leasePlayer.getUsername
+            and tostring(lease.playerUsername)
+                == tostring(leasePlayer:getUsername())
+        then
+            ownsLease = true
+        end
+        if not ownsLease then
+            return false, "conversation_player_mismatch"
+        end
+        if (tonumber(Runtime.now) or 0)
+            >= (tonumber(lease.expiresAt) or 0)
+        then
+            return false, "conversation_expired"
         end
         return true, lease
     end
@@ -111,7 +144,9 @@ function SemanticAdapters.configure(context)
             record, leasePlayer, token
         )
         if not valid then return false, leaseOrReason end
-        return true
+        leaseOrReason.expiresAt = (tonumber(Runtime.now) or 0)
+            + leaseDuration
+        return true, leaseOrReason
     end
     PNC.Registry = PNC.Registry or {}
     PNC.Registry.Get = function(id)
@@ -135,7 +170,7 @@ function SemanticAdapters.configure(context)
     PNC.PlayerContext.Resolve = function()
         return {
             characterUUID = playerData.characterUUID,
-            playerEntityKey = "player:" .. tostring(playerData.characterUUID),
+            entityKey = "player:" .. tostring(playerData.characterUUID),
         }, "harness_resolved"
     end
     PNC.PlayerContext.Peek = PNC.PlayerContext.Resolve
@@ -201,7 +236,7 @@ function SemanticAdapters.configure(context)
     PNC.PlayerKnowledgeCommands.Internal.ContextFor = function()
         return {
             characterUUID = playerData.characterUUID,
-            playerEntityKey = "player:" .. tostring(playerData.characterUUID),
+            entityKey = "player:" .. tostring(playerData.characterUUID),
         }
     end
     PNC.PlayerKnowledgeCommands.Internal.IntroductionText = function()

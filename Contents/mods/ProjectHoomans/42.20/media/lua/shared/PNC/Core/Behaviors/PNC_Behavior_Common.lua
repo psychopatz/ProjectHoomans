@@ -117,7 +117,18 @@ function Common.ClearCombatTarget(record, reason, zombie)
 end
 
 function Common.GetOwner(record)
-    return Core.ResolvePlayerByOnlineID(record.ownerOnlineID) or Core.ResolvePlayerByUsername(record.ownerUsername)
+    if not record then return nil end
+    local username = record.ownerUsername
+    local owner = Core.ResolvePlayerByOnlineID(record.ownerOnlineID)
+    if owner then
+        if username == nil
+            or not owner.getUsername
+            or owner:getUsername() == username
+        then
+            return owner
+        end
+    end
+    return Core.ResolvePlayerByUsername(username)
 end
 
 -- Returns the already-selected hostile target only while a follow-order
@@ -165,7 +176,8 @@ function Common.MoveRecord(
     mode,
     stopDistance,
     reason,
-    navigationOptions
+    navigationOptions,
+    abstractSpeedOverride
 )
     local moveReason = reason
         or (record and record.runtime and record.runtime.combatBlockReason)
@@ -352,7 +364,14 @@ function Common.MoveRecord(
             controlOwner
         )
     end
-    PathService.AdvanceAbstract(record, tx, ty, tz, stopDistance)
+    PathService.AdvanceAbstract(
+        record,
+        tx,
+        ty,
+        tz,
+        stopDistance,
+        abstractSpeedOverride
+    )
     return true, "abstract_move"
 end
 

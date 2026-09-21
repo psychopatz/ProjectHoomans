@@ -38,6 +38,14 @@ PNC = {
     },
     Core = {
         Now = function() return now end,
+        ResolvePlayerByOnlineID = function(id)
+            if id ~= 7 then return nil end
+            return {
+                getX = function() return 30 end,
+                getY = function() return 30 end,
+                getZ = function() return 0 end,
+            }
+        end,
     },
     BehaviorTargeting = {
         UpdateTargetFromWorld = function(_, current)
@@ -51,8 +59,15 @@ PNC = {
     BehaviorCompanion = {
         Internal = {
             ResolveThreatTarget = function(_, constraint, options)
-                T.equal(options.areaDefense, true,
-                    "passive threat guard uses area-defense targeting")
+                if options.areaDefense == true then
+                    T.equal(options.areaDefense, true,
+                        "passive threat guard uses area-defense targeting")
+                else
+                    T.equal(options.areaDefense, false,
+                        "follow threat guard uses owner-defense targeting")
+                    T.equal(options.ownerEngaged, false,
+                        "follow-idle defense does not broaden to hunting")
+                end
                 T.truthy(constraint.radius,
                     "passive threat guard supplies an engagement radius")
                 return threatActive and target or nil
@@ -199,6 +214,12 @@ local idleRecord = {
     activeBehavior = "Idle",
 }
 
+local idleContext = ThreatGuard.Internal.ResolveContext(idleRecord)
+T.truthy(idleContext, "idle context is admitted")
+T.equal(idleContext.source, "idle", "idle context has an explicit source")
+T.equal(idleContext.radius, 4, "idle context uses the guard engagement radius")
+T.truthy(ThreatGuard.Internal.IsThreat(target, idleContext),
+    "idle context accepts the nearby zombie")
 T.truthy(ThreatGuard.Tick(idleRecord, {}, now),
     "an unassigned idle NPC enters the shared threat guard")
 T.equal(idleRecord.activeBehavior, "CombatGuard:engaged",
@@ -207,6 +228,34 @@ T.equal(engagements, 3,
     "idle defense enters the shared combat pipeline")
 T.equal(idleRecord.orderSpec.kind, nil,
     "idle defense does not invent or mutate a durable order")
+
+local followIdleRecord = {
+    id = "follow-idle",
+    alive = true,
+    attackType = "auto",
+    tacticalClass = "colonist",
+    ownerOnlineID = 7,
+    x = 29,
+    y = 30,
+    z = 0,
+    runtime = {
+        followState = { ownerEngaged = false },
+    },
+    orderSpec = { kind = "follow", ownerOnlineID = 7 },
+}
+
+local followContext = ThreatGuard.Internal.ResolveContext(followIdleRecord)
+T.truthy(followContext, "follow-idle context is admitted")
+T.equal(followContext.targetPolicy, "owner",
+    "follow-idle context selects owner protection")
+T.equal(followContext.x, 30,
+    "follow-idle defense is anchored to the protected owner")
+T.truthy(ThreatGuard.Tick(followIdleRecord, {}, now),
+    "follow-idle NPC enters the shared threat guard")
+T.equal(followIdleRecord.activeBehavior, "CombatGuard:engaged",
+    "follow-idle defense takes tactical ownership")
+T.equal(engagements, 4,
+    "follow-idle defense enters the shared combat pipeline")
 
 local wakingRecord = {
     id = "waking-sleeper",

@@ -283,8 +283,30 @@ function Internal.SubmitSingle(view, value, part)
     )
     if identityRequest then
         local dispatched = false
+        local dispatchReason
+        local requestID
         if Internal.DispatchIdentityRequest then
-            dispatched = Internal.DispatchIdentityRequest(identityRequest)
+            dispatched, dispatchReason, requestID =
+                Internal.DispatchIdentityRequest(identityRequest)
+        end
+        if identityRequest.kind == "identity_claim"
+            or identityRequest.kind == "identity_evasion"
+        then
+            audit("semantic.identity.request_dispatched", {
+                requestID = requestID or result.sequence,
+                inputSequence = result.sequence,
+                npcID = tostring(identityRequest.npcID or ""),
+                conversationID = view.session
+                    and view.session.conversationID or nil,
+                kind = tostring(identityRequest.kind or ""),
+                accepted = dispatched == true,
+                reason = tostring(dispatchReason or ""),
+                claimedNamePresent = identityRequest.claimedName ~= nil
+                    and tostring(identityRequest.claimedName) ~= "",
+                conversationTokenPresent = identityRequest.conversationToken
+                    ~= nil
+                    and tostring(identityRequest.conversationToken) ~= "",
+            }, { requestID = requestID or result.sequence })
         end
         if identityRequest.kind == "identity_claim" and dispatched ~= true
             and Internal.IdentityExchangeUnavailableResponse

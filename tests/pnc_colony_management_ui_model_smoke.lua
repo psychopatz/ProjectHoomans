@@ -106,6 +106,11 @@ local pendingNeeds = Presentation.BuildNeeds(nil, {
 })
 T.equal(pendingNeeds[1].label, "COLONIST IDENTITY IS STILL SYNCING",
     "pending multiplayer identity is not reported as an empty colony")
+local factionNeeds = Presentation.BuildNeeds(nil, {
+    identityStatus = { state = "ready", factionState = "missing" },
+})
+T.equal(factionNeeds[1].label, "NO PLAYER FACTION",
+    "missing multiplayer faction is not reported as an empty colony")
 
 ISPanel = {
     derive = function(self)

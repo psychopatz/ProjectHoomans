@@ -192,4 +192,69 @@ function Client.RequestSemanticInventoryQuery(request, context)
     return result.accepted == true, result.reason or result.status, result
 end
 
+-- Directed hostile semantic acts are committed by the server's social-event
+-- pipeline against the NPC that owns the active conversation lease.
+function Client.RequestSemanticSocialInteraction(request, context)
+    request = type(request) == "table" and request or nil
+    context = type(context) == "table" and context or {}
+    if not request then
+        return false, "semantic_social_request_missing"
+    end
+    local speechAct = string.upper(tostring(request.speechAct or ""))
+    if speechAct ~= "INSULT" and speechAct ~= "HOSTILE_REMARK"
+        and speechAct ~= "THREATEN"
+    then
+        return false, "unsupported_social_speech_act"
+    end
+    local requestID = tostring(request.requestID or "")
+    if requestID == "" then
+        requestID = tostring(context.requestID or "")
+    end
+    if requestID == "" then
+        requestID = Internal.RequestID("semantic_social")
+    end
+    local payload = {
+        requestID = requestID,
+        npcID = tostring(request.npcID or context.npcID or context.targetID
+            or ""),
+        speechAct = speechAct,
+        conversationID = tostring(request.conversationID
+            or context.conversationID or ""),
+        conversationToken = request.conversationToken
+            or context.conversationToken or context.token,
+    }
+    if payload.npcID == "" or payload.requestID == "" then
+        return false, "semantic_social_identity_missing"
+    end
+    local player = Internal.GetPlayer()
+    if Core.IsClientOnly and Core.IsClientOnly() then
+        if not player or not sendClientCommand then
+            return false, "player_unavailable"
+        end
+        sendClientCommand(
+            player,
+            Const.MODULE,
+            Const.CMD_SEMANTIC_SOCIAL_EVENT_REQUEST,
+            payload
+        )
+        return true, "network_queued", {
+            accepted = true,
+            status = "pending",
+            requestID = payload.requestID,
+            npcID = payload.npcID,
+            speechAct = speechAct,
+        }
+    end
+
+    local authority = PNC.SemanticDialogueSocialAuthority
+    if not authority or type(authority.Handle) ~= "function" then
+        return false, "semantic_social_authority_unavailable"
+    end
+    local result = authority.Handle(player, payload)
+    if type(result) ~= "table" then
+        return false, "semantic_social_request_failed"
+    end
+    return result.accepted == true, result.reason or result.status, result
+end
+
 return Client

@@ -152,15 +152,18 @@ function ISPNCColonyStorageWindow:new(x, y, width, height, options)
 end
 
 function StorageUI.CanOpen(snapshot)
-    return Client.HasAccess(snapshot)
+    return Client.GetAccessStatus(snapshot)
 end
 
 function StorageUI.Open(owner)
     local snapshot = Client.ReadSnapshot().snapshot
-    if not StorageUI.CanOpen(snapshot) then
+    local allowed, reason = StorageUI.CanOpen(snapshot)
+    if not allowed then
+        StorageUI.lastOpenReason = reason or "storage_unavailable"
         Client.RequestSnapshot()
-        return nil, "outside_base"
+        return nil, StorageUI.lastOpenReason
     end
+    StorageUI.lastOpenReason = reason
     -- Context-menu callers may discover the hub instance even while the hub
     -- itself is hidden. A hidden owner would immediately close a storage
     -- window on its first prerender, so only retain live owners.
