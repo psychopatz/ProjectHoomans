@@ -88,12 +88,12 @@ Const.ZOMBIE_NPC_DIRECTIVE_RADIUS = 72
 -- Multiplayer NPC attraction uses the vanilla WorldSoundManager transport.
 -- The sound is an AI-only stimulus; no audio emitter is played.
 Const.ZOMBIE_NPC_STIMULUS_INTERVAL_MS = 500
--- WorldSoundPacket relevance is filtered by radius on the server. Match the
--- existing MP interest radius so the zombie-owning client receives the sound
--- even when it is near the zombie but not directly beside the NPC. The low
--- volume keeps the far edge weak while nearby zombies still receive a valid
--- positive attraction.
-Const.ZOMBIE_NPC_STIMULUS_RADIUS = 72
+-- Keep the stimulus inside the same local envelope used to acquire NPC
+-- targets. WorldSound radius is also the zombie hearing radius; using the MP
+-- interest radius here made every pursuit attract zombies from across a large
+-- area. A 14-tile sound is sufficient for nearby pursuit and avoids a horde
+-- cascade beyond the controller's acquisition range.
+Const.ZOMBIE_NPC_STIMULUS_RADIUS = 14
 Const.ZOMBIE_NPC_STIMULUS_VOLUME = 1
 Const.ZOMBIE_NPC_STIMULUS_PROBE_MS = 250
 Const.ZOMBIE_ATTACK_RANGE = 0.95

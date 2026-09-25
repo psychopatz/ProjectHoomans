@@ -217,7 +217,10 @@ local function identityProjection(entry)
     if (knownName == nil or tostring(knownName) == "") and identityKnown then
         knownName = IdentityPresentation.GetName(entry)
     end
-    local state = identityClaimVerified and knownName
+    -- A verified name exchange is one way to know an NPC, but not the only
+    -- one: player-scoped knowledge (including lifelong family/friend facts)
+    -- must also make the speaker's identity visible.
+    local state = (identityKnown or identityClaimVerified) and knownName
         and tostring(knownName) ~= "" and "known"
         or "unknown"
     if projection and not identityClaimVerified then

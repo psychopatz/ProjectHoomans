@@ -97,6 +97,7 @@ function Stimulus.Emit(record, body, now)
     local y
     local z
     local radius
+    local acquisitionRadius
     local volume
     local doSend
     local ok
@@ -126,9 +127,17 @@ function Stimulus.Emit(record, body, now)
     x = math.floor(tonumber(body:getX()) or 0)
     y = math.floor(tonumber(body:getY()) or 0)
     z = math.floor(tonumber(body:getZ()) or 0)
-    radius = math.max(
+    acquisitionRadius = math.max(
         1,
-        math.floor(tonumber(Const.ZOMBIE_NPC_STIMULUS_RADIUS) or 14)
+        math.floor(tonumber(Const.ZOMBIE_AGGRO_RADIUS) or 14)
+    )
+    radius = math.min(
+        acquisitionRadius,
+        math.max(
+            1,
+            math.floor(tonumber(Const.ZOMBIE_NPC_STIMULUS_RADIUS)
+                or acquisitionRadius)
+        )
     )
     volume = math.max(
         1,

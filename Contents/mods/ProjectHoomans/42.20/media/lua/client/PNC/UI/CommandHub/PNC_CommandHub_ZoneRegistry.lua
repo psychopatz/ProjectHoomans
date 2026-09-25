@@ -216,6 +216,12 @@ Registry.Register({
             titleFallback = "BASE ZONE",
             controls = {
                 {
+                    id = "create", action = "create",
+                    titleKey = "UI_PNC_Base_ClaimAction",
+                    titleFallback = "SET TERRITORY",
+                    variant = "primary",
+                },
+                {
                     id = "expand", action = "expand",
                     titleKey = "UI_PNC_Base_ExpandAction",
                     titleFallback = "EXPAND TERRITORY",

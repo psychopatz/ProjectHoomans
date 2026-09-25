@@ -23,6 +23,7 @@ local record = {
 PNC = {
     Const = {
         PRESENCE_LIVE = "live",
+        ZOMBIE_AGGRO_RADIUS = 14,
         ZOMBIE_NPC_STIMULUS_INTERVAL_MS = 500,
         ZOMBIE_NPC_STIMULUS_RADIUS = 72,
         ZOMBIE_NPC_STIMULUS_VOLUME = 1,
@@ -82,7 +83,7 @@ T.equal(#calls, 1, "MP stimulus emitted an unexpected number of sounds")
 T.equal(calls[1].source, nil, "MP stimulus used an NPC shell source")
 T.equal(calls[1].x, 10, "MP stimulus X was not grid-snapped")
 T.equal(calls[1].y, 20, "MP stimulus Y was not grid-snapped")
-T.equal(calls[1].radius, 72, "MP stimulus radius was wrong")
+T.equal(calls[1].radius, 14, "MP stimulus exceeded NPC acquisition radius")
 T.equal(calls[1].volume, 1, "MP stimulus volume was wrong")
 T.equal(calls[1].stressHumans, false, "MP stimulus stressed humans")
 T.equal(calls[1].zombieIgnoreDist, 0,

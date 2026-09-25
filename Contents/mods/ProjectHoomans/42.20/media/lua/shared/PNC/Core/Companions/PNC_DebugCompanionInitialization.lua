@@ -60,13 +60,14 @@ function Initialization.ApplyKnownCompanion(player, npcID, worldAgeHours)
         disclosure = knowledge.DiscoverAllForPlayer(
             player, npcID, worldAgeHours, "lifelong_relationship", true
         )
-    elseif knowledge and knowledge.DiscoverTopicForPlayer then
+    end
+    if knowledge and knowledge.DiscoverTopicForPlayer then
         disclosure = knowledge.DiscoverTopicForPlayer(
             player,
             npcID,
             "identity_name",
             worldAgeHours,
-            "direct_disclosure",
+            "lifelong_relationship",
             true
         )
     end

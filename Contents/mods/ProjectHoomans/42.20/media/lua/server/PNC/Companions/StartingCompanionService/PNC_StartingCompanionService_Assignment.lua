@@ -48,12 +48,13 @@ function H.ApplyLifelongKnowledge(player, character, npcID, spec, at)
         PNC.NPCKnowledge.DiscoverAllForPlayer(
             player, npcID, at, "lifelong_relationship", true
         )
-    elseif PNC.NPCKnowledge
-        and PNC.NPCKnowledge.DiscoverTopicForPlayer
-    then
+    end
+    -- Identity is required for the starter companion UI. Keep this explicit
+    -- even when broad dossier discovery partially fails on an older save.
+    if PNC.NPCKnowledge and PNC.NPCKnowledge.DiscoverTopicForPlayer then
         PNC.NPCKnowledge.DiscoverTopicForPlayer(
             player, npcID, "identity_name", at,
-            "direct_disclosure", true
+            "lifelong_relationship", true
         )
     end
     if PNC.NPCKnowledge
