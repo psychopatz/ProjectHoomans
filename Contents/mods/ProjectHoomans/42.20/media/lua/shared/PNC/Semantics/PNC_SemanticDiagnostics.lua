@@ -33,12 +33,12 @@ end
 
 local function now()
     if PNC.Core and type(PNC.Core.Now) == "function" then
-        local ok, value = pcall(PNC.Core.Now)
-        if ok and tonumber(value) then return tonumber(value) end
+        local value = tonumber(PNC.Core.Now())
+        if value then return value end
     end
     if type(getTimeInMillis) == "function" then
-        local ok, value = pcall(getTimeInMillis)
-        if ok and tonumber(value) then return tonumber(value) end
+        local value = getTimeInMillis()
+        if tonumber(value) then return tonumber(value) end
     end
     return 0
 end

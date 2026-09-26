@@ -11,7 +11,9 @@ end
 function ISPNCInventoryWindow:setTransferEndpoint(endpoint)
     local payloadApplyGeneration
     self.transferEndpoint = endpoint
-    self.npcId = endpoint and endpoint.kind == "npc" and endpoint.id or nil
+    self.npcId = endpoint and endpoint.kind == "npc" and endpoint.id
+        or endpoint and endpoint.npcID or nil
+    self.tradeMode = endpoint and endpoint.kind == "trade" or false
     self.selectedNPCContainer = "root"
     self.selectedPlayerContainer = "root"
     self.expandedPlayerGroups = {}
@@ -31,6 +33,7 @@ function ISPNCInventoryWindow:setTransferEndpoint(endpoint)
         "Read only: enter the base to move stockpile items") or nil
     if self.npcList then self.npcList.role = "npc" end
     if self.npcContainerList then self.npcContainerList.role = "npc" end
+    if self.onTradeModeChanged then self:onTradeModeChanged(self.tradeMode) end
     if self.giveAllButton and self.giveAllButton.setTitle then
         self.giveAllButton:setTitle(endpoint and endpoint.kind == "storage"
             and tr("UI_PNC_Storage_DepositAll", "Deposit All >")
@@ -56,6 +59,7 @@ function ISPNCInventoryWindow:setTransferEndpoint(endpoint)
     then
         self:refreshInventory(true)
     end
+    if self.onResponsiveLayout then self:onResponsiveLayout() end
 end
 
 function ISPNCInventoryWindow:setConversationMode(mode, token, options)
@@ -65,6 +69,12 @@ function ISPNCInventoryWindow:setConversationMode(mode, token, options)
     self.giftMode = nextGiftMode
     self.giftToken = token and tostring(token) or nil
     self.giftIntent = options.giftIntent
+    if self.tradeMode then
+        self.giftMode = false
+        self.giftToken = nil
+        self.giftIntent = nil
+        return
+    end
     self.statusText = self.giftMode
         and "Gift mode: valid gifts only | A Approval (like) / R Respect / F Familiarity"
         or self.statusText

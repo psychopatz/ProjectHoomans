@@ -148,8 +148,8 @@ function Jobs.Start(record, facilityOrId, capability, options)
     if not activityItemFullType and resource and resource.item
         and type(resource.item.getFullType) == "function"
     then
-        local itemOK, fullType = pcall(resource.item.getFullType, resource.item)
-        if itemOK and tostring(fullType or "") ~= "" then
+        local fullType = resource.item:getFullType()
+        if tostring(fullType or "") ~= "" then
             activityItemFullType = tostring(fullType)
         end
     end

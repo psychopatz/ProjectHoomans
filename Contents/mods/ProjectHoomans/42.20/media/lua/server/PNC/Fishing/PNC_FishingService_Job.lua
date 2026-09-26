@@ -18,8 +18,7 @@ local function itemFullType(item)
     local fullType = tostring(item and (item.fullType or item.type) or "")
     if fullType ~= "" then return fullType end
     if item and type(item.getFullType) == "function" then
-        local ok, value = pcall(item.getFullType, item)
-        value = ok and tostring(value or "") or ""
+        local value = tostring(item:getFullType() or "")
         if value ~= "" then return value end
     end
     return nil
@@ -31,8 +30,7 @@ local function fishingToolFullType(record)
     local item
     local fullType
     if body and type(body.getPrimaryHandItem) == "function" then
-        local ok, primary = pcall(body.getPrimaryHandItem, body)
-        item = ok and primary or nil
+        item = body:getPrimaryHandItem()
         fullType = itemFullType(item)
         if fullType and FISHING_TOOL_TYPES[fullType] then
             return fullType

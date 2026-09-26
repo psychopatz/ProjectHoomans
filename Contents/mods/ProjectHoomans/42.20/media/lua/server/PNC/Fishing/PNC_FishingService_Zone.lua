@@ -61,12 +61,12 @@ end
 
 local function registerCoreZone(zone)
     if not Zones or type(Zones.register) ~= "function" then return true end
-    local ok, result = pcall(Zones.register, {
+    local result = Zones.register({
         id = zone.id, ownerType = zone.ownerType, ownerId = zone.ownerId,
         type = "fishing", subtype = "fishing_zone",
         geometry = zone.geometry, revision = zone.revision,
     })
-    return ok and result ~= false
+    return result ~= false
 end
 
 function Service.ValidateZone(zone)
@@ -152,7 +152,7 @@ function Service.DeleteZone(zoneId, reason)
         end
     end
     if Zones and type(Zones.remove) == "function" then
-        pcall(Zones.remove, id)
+        Zones.remove(id)
     end
     data.zones[id] = nil
     for index = #data.zoneOrder, 1, -1 do

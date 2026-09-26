@@ -12,18 +12,9 @@ PNC.LumberService = PNC.LumberService or {}
 local Service = PNC.LumberService
 local Const = PNC.Const or {}
 local Core = PNC.Core or {}
-local GridRegion
-local Zones
-local CoreInventory
-
-do
-    local ok, value = pcall(require, "PsychopatzCore/World/PC_GridRegion")
-    if ok then GridRegion = value end
-    ok, value = pcall(require, "PsychopatzCore/World/PC_ZoneRegistry")
-    if ok then Zones = value end
-    ok, value = pcall(require, "PsychopatzCore/Inventory/PsychopatzInventory")
-    if ok then CoreInventory = value end
-end
+local GridRegion = require "PsychopatzCore/World/PC_GridRegion"
+local Zones = require "PsychopatzCore/World/PC_ZoneRegistry"
+local CoreInventory = require "PsychopatzCore/Inventory/PsychopatzInventory"
 
 Service.MODDATA_KEY = "PNC_LumberWorld_V1"
 Service.SCHEMA_VERSION = 1

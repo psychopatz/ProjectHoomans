@@ -11,8 +11,7 @@ local H = Service.Internal
 local function isTired(record)
     local fatigue
     if PNC.IndividualNeeds and PNC.IndividualNeeds.Get then
-        local ok, value = pcall(PNC.IndividualNeeds.Get, record, "fatigue")
-        if ok then fatigue = tonumber(value) end
+        fatigue = tonumber(PNC.IndividualNeeds.Get(record, "fatigue"))
     end
     fatigue = fatigue or tonumber(record and record.fatigue)
     return fatigue ~= nil and fatigue >= (tonumber(Const.FISHING_FATIGUE_STOP) or 0.70)
@@ -20,8 +19,7 @@ end
 
 local function canAccept(record, spec)
     if not PNC.Inventory or type(PNC.Inventory.CanAccept) ~= "function" then return true end
-    local ok, accepted, reason = pcall(PNC.Inventory.CanAccept, record, { spec }, "root")
-    if not ok then return false, "fishing_inventory_unavailable" end
+    local accepted, reason = PNC.Inventory.CanAccept(record, { spec }, "root")
     return accepted == true, reason or "fishing_inventory_full"
 end
 
@@ -29,9 +27,8 @@ local function addCatch(record, spec)
     if not PNC.Inventory or type(PNC.Inventory.AddItems) ~= "function" then
         return false, "fishing_inventory_unavailable"
     end
-    local ok, added, reason = pcall(PNC.Inventory.AddItems, record, { spec },
+    local added, reason = PNC.Inventory.AddItems(record, { spec },
         "root", "fishing_catch")
-    if not ok then return false, "fishing_inventory_add_failed" end
     return added == true, reason or "fishing_inventory_full"
 end
 
@@ -79,7 +76,7 @@ function Service.TickJob(lease)
             if not added then return false, false, addReason end
             job.catches = (tonumber(job.catches) or 0) + 1
             if PNC.Skills and PNC.Skills.AddXP then
-                pcall(PNC.Skills.AddXP, record, "Fishing", 4)
+                PNC.Skills.AddXP(record, "Fishing", 4)
             end
             if PNC.Tasking and PNC.Tasking.Events and PNC.Tasking.Events.Emit then
                 PNC.Tasking.Events.Emit("FISHING_CATCH", {

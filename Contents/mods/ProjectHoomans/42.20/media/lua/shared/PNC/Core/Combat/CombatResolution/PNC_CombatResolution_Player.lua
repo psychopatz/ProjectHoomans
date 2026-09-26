@@ -7,11 +7,10 @@ end
 
 local function playerBodyPart(bodyDamage, partId)
     local partType = BodyPartType and BodyPartType[tostring(partId or "")] or nil
-    local ok
-    local result
-    if not bodyDamage or not bodyDamage.getBodyPart or not partType then return nil end
-    ok, result = pcall(bodyDamage.getBodyPart, bodyDamage, partType)
-    return ok and result or nil
+    if not bodyDamage or type(bodyDamage.getBodyPart) ~= "function" or not partType then
+        return nil
+    end
+    return bodyDamage:getBodyPart(partType)
 end
 
 local function addPlayerWound(bodyPart, hit)
@@ -28,7 +27,7 @@ local function addPlayerWound(bodyPart, hit)
             bodyPart:setBleedingTime(math.max(current, 45))
         end
         if bodyPart.setDeepWounded then
-            pcall(bodyPart.setDeepWounded, bodyPart, true)
+            bodyPart:setDeepWounded(true)
         end
     elseif hit.woundType == "laceration" then
         if bodyPart.setCutTime then
@@ -67,31 +66,31 @@ function Resolution.ApplyPlayerDamage(player, amount, attackType, weaponItem, hi
     bodyDamage = player.getBodyDamage and player:getBodyDamage() or nil
     bodyPart = playerBodyPart(bodyDamage, hit.partId)
     if bodyPart and bodyPart.AddDamage then
-        applied = pcall(bodyPart.AddDamage, bodyPart, healthLoss) == true
+        bodyPart:AddDamage(healthLoss)
+        applied = true
     end
     if not applied and bodyPart and bodyPart.getHealth and bodyPart.setHealth then
         current = tonumber(bodyPart:getHealth()) or 100
-        applied = pcall(bodyPart.setHealth, bodyPart, math.max(0, current - healthLoss)) == true
+        bodyPart:setHealth(math.max(0, current - healthLoss))
+        applied = true
     end
     if not applied and bodyDamage and bodyDamage.getOverallBodyHealth and bodyDamage.setOverallBodyHealth then
         current = tonumber(bodyDamage:getOverallBodyHealth()) or 100
-        applied = pcall(
-            bodyDamage.setOverallBodyHealth,
-            bodyDamage,
-            math.max(0, current - healthLoss)
-        ) == true
+        bodyDamage:setOverallBodyHealth(math.max(0, current - healthLoss))
+        applied = true
     end
     if not applied and player.getHealth and player.setHealth then
         current = tonumber(player:getHealth()) or 1
-        applied = pcall(player.setHealth, player, math.max(0, current - (healthLoss / 100))) == true
+        player:setHealth(math.max(0, current - (healthLoss / 100)))
+        applied = true
     end
     if not applied then return false end
     addPlayerWound(bodyPart, hit)
     if bodyDamage and bodyDamage.Update then
         bodyDamage:Update()
     end
-    if player.sendPlayerStatsPacket then
-        pcall(function() player:sendPlayerStatsPacket() end)
+    if type(sendPlayerStatsChange) == "function" then
+        sendPlayerStatsChange(player)
     end
     hit.healthLoss = healthLoss
     return applied, hit

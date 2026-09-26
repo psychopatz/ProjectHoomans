@@ -14,8 +14,8 @@ local now = Internal.Now
 local function getCell()
     local engineGetCell = _G and _G.getCell or nil
     if type(engineGetCell) == "function" then
-        local ok, cell = pcall(engineGetCell)
-        if ok and cell then return cell end
+        local cell = engineGetCell()
+        if cell then return cell end
     end
     if IsoWorld and IsoWorld.instance then
         return IsoWorld.instance.currentCell
@@ -26,8 +26,7 @@ end
 function Service.GetSquare(x, y, z)
     local cell = getCell()
     if not cell or type(cell.getGridSquare) ~= "function" then return nil end
-    local ok, square = pcall(cell.getGridSquare, cell, x, y, z)
-    return ok and square or nil
+    return cell:getGridSquare(x, y, z)
 end
 
 function Service.GetTreeAt(x, y, z)
@@ -35,36 +34,33 @@ function Service.GetTreeAt(x, y, z)
     if not square or type(square.getTree) ~= "function" then
         return nil, square
     end
-    local ok, tree = pcall(square.getTree, square)
-    return ok and tree or nil, square
+    return square:getTree(), square
 end
 
 local function treeSignature(tree)
     local size = 0
     local yield = 0
     if tree and type(tree.getSize) == "function" then
-        local ok, value = pcall(tree.getSize, tree)
-        if ok then size = tonumber(value) or 0 end
+        size = tonumber(tree:getSize()) or 0
     end
     if tree and type(tree.getLogYield) == "function" then
-        local ok, value = pcall(tree.getLogYield, tree)
-        if ok then yield = tonumber(value) or 0 end
+        yield = tonumber(tree:getLogYield()) or 0
     end
     return tostring(size) .. ":" .. tostring(yield)
 end
 
 local function treeHealth(tree)
     if tree and type(tree.getHealth) == "function" then
-        local ok, value = pcall(tree.getHealth, tree)
-        if ok and tonumber(value) then return math.max(1, tonumber(value)) end
+        local value = tonumber(tree:getHealth())
+        if value then return math.max(1, value) end
     end
     return 100
 end
 
 local function treeYield(tree)
     if tree and type(tree.getLogYield) == "function" then
-        local ok, value = pcall(tree.getLogYield, tree)
-        if ok and tonumber(value) then return math.max(1, math.floor(value)) end
+        local value = tonumber(tree:getLogYield())
+        if value then return math.max(1, math.floor(value)) end
     end
     return 1
 end
@@ -106,9 +102,7 @@ function Service.ApplyDeferredTreeRemoval(tree, effect)
     if type(square.transmitRemoveItemFromSquare) ~= "function" then
         return false, "TREE_REMOVE_UNAVAILABLE"
     end
-    local ok, result = pcall(square.transmitRemoveItemFromSquare,
-        square, actual)
-    if not ok then return false, tostring(result) end
+    local result = square:transmitRemoveItemFromSquare(actual)
     if result == -1 then return false, "TREE_REMOVE_REJECTED" end
     effect.state = "APPLIED"
     effect.appliedAt = now()
@@ -136,9 +130,8 @@ local function reconcileAbstractTree(tree, actual, square)
     if type(square.transmitRemoveItemFromSquare) ~= "function" then
         return false
     end
-    local ok, result = pcall(square.transmitRemoveItemFromSquare,
-        square, actual)
-    if not ok or result == -1 then return false end
+    local result = square:transmitRemoveItemFromSquare(actual)
+    if result == -1 then return false end
     tree.worldReconciledAt = now()
     markDirty()
     return true
@@ -451,8 +444,7 @@ function Service.FindApproach(tree, record)
         local square = Service.GetSquare(x, y, z)
         local allowed = square ~= nil
         if allowed and type(square.isFree) == "function" then
-            local ok, free = pcall(square.isFree, square, true)
-            allowed = ok and free ~= false
+            allowed = square:isFree(true) ~= false
         end
         -- Abstract NPCs can travel toward an unloaded approach tile. Live
         -- chopping will revalidate the square before applying a hit.

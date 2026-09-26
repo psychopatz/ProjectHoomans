@@ -47,9 +47,8 @@ function H.WorldAvailability(origin)
     local x, y, z = H.Call(origin, "getX"), H.Call(origin, "getY"),
         H.Call(origin, "getZ") or 0
     if x == nil or y == nil then return "origin_missing" end
-    local ok, square = pcall(cell.getGridSquare, cell, math.floor(x),
-        math.floor(y), math.floor(z))
-    return ok and square and "loaded" or "unloaded"
+    local square = cell:getGridSquare(math.floor(x), math.floor(y), math.floor(z))
+    return square and "loaded" or "unloaded"
 end
 
 local function noSourceReason(origin)

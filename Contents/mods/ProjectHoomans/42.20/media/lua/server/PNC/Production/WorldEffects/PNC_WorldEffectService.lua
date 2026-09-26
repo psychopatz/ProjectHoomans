@@ -60,8 +60,8 @@ end
 
 local function getCell()
     if type(_G and _G.getCell) == "function" then
-        local ok, cell = pcall(_G.getCell)
-        if ok and cell then return cell end
+        local cell = _G.getCell()
+        if cell then return cell end
         return nil, "CELL_LOOKUP_FAILED"
     end
     if IsoWorld and IsoWorld.instance then
@@ -70,17 +70,15 @@ local function getCell()
     return nil, "WORLD_API_UNAVAILABLE"
 end
 
--- This is intentionally the only generic engine exception boundary. Domain
--- code remains direct and all failures are returned to the effect ledger.
+-- Engine lookups remain direct after their API availability checks. Missing
+-- world objects are returned to the effect ledger as ordinary failures.
 local function squareAt(x, y, z)
     local cell, cellReason = getCell()
     if not cell then return nil, cellReason end
     if type(cell.getGridSquare) ~= "function" then
         return nil, "GRID_LOOKUP_UNAVAILABLE"
     end
-    local ok, square = pcall(cell.getGridSquare, cell, x, y, z)
-    if not ok then return nil, "GRID_LOOKUP_FAILED" end
-    return square
+    return cell:getGridSquare(x, y, z)
 end
 
 local function effectID(providerID, ownerID, effect)

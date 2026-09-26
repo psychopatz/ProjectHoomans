@@ -44,9 +44,8 @@ local function squareState(x, y, z)
     if not cell or type(cell.getGridSquare) ~= "function" then
         return "unknown"
     end
-    local ok, square = pcall(cell.getGridSquare, cell, math.floor(x),
-        math.floor(y), math.floor(z))
-    if not ok or not square then return "unloaded" end
+    local square = cell:getGridSquare(math.floor(x), math.floor(y), math.floor(z))
+    if not square then return "unloaded" end
 
     local pathInternal = PNC.PathService and PNC.PathService.Internal
     if pathInternal and pathInternal.isSquareWalkable then
@@ -55,16 +54,13 @@ local function squareState(x, y, z)
         if checked then return walkable == true and "walkable" or "blocked" end
     end
     if type(square.isSolid) == "function" then
-        local checked, solid = pcall(square.isSolid, square)
-        if checked and solid == true then return "blocked" end
+        if square:isSolid() == true then return "blocked" end
     end
     if type(square.isSolidTrans) == "function" then
-        local checked, solid = pcall(square.isSolidTrans, square)
-        if checked and solid == true then return "blocked" end
+        if square:isSolidTrans() == true then return "blocked" end
     end
     if type(square.isFree) == "function" then
-        local checked, free = pcall(square.isFree, square, false)
-        if checked then return free == true and "walkable" or "blocked" end
+        return square:isFree(false) == true and "walkable" or "blocked"
     end
     return "walkable"
 end

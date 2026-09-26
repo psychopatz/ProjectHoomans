@@ -92,18 +92,17 @@ local function currentPlayerKey(player)
 end
 
 local function currentPlayerName(player)
-    local ok
     local name
     if not player then return nil end
     if type(player.getUsername) == "function" then
-        ok, name = pcall(player.getUsername, player)
-        if ok and type(name) == "string" and name ~= "" then
+        name = player:getUsername()
+        if type(name) == "string" and name ~= "" then
             return name
         end
     end
     if type(player.getDisplayName) == "function" then
-        ok, name = pcall(player.getDisplayName, player)
-        if ok and type(name) == "string" and name ~= "" then
+        name = player:getDisplayName()
+        if type(name) == "string" and name ~= "" then
             return name
         end
     end

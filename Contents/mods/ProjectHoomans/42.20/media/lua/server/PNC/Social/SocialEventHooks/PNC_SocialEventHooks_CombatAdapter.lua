@@ -69,17 +69,10 @@ local function distanceSq(x1, y1, x2, y2)
 end
 
 local function canSee(record, target)
-    local ok
-    local visible
     if not Perception or type(Perception.CanSeeWorldObject) ~= "function" then
         return false
     end
-    ok, visible = pcall(
-        Perception.CanSeeWorldObject,
-        record,
-        target
-    )
-    return ok and visible == true
+    return Perception.CanSeeWorldObject(record, target) == true
 end
 
 local function relationshipDelta(before, after)
@@ -112,8 +105,8 @@ end
 local function socialRole(record)
     local interactions = PNC.VanillaEmoteInteractions
     if interactions and type(interactions.ResolveNPCType) == "function" then
-        local ok, value = pcall(interactions.ResolveNPCType, record)
-        if ok and value then return tostring(value) end
+        local value = interactions.ResolveNPCType(record)
+        if value then return tostring(value) end
     end
     return "neutral"
 end
@@ -121,11 +114,8 @@ end
 local function dayIndex(worldAgeHours)
     local interactions = PNC and PNC.VanillaEmoteInteractions
     if interactions and type(interactions.DayIndex) == "function" then
-        local ok, value = pcall(
-            interactions.DayIndex,
-            worldAgeHours
-        )
-        if ok and tonumber(value) then
+        local value = interactions.DayIndex(worldAgeHours)
+        if tonumber(value) then
             return math.max(0, math.floor(tonumber(value)))
         end
     end
@@ -141,15 +131,12 @@ local function memoryToday(relationship, memoryType, worldAgeHours)
     local createdAt
     local index
     if interactions and type(interactions.HasMemoryToday) == "function" then
-        local ok, value = pcall(
-            interactions.HasMemoryToday,
+        local value = interactions.HasMemoryToday(
             relationship,
             memoryType,
             worldAgeHours
         )
-        if ok then
-            hasToday = value == true
-        end
+        hasToday = value == true
     end
     if hasToday == false then
         return nil, false

@@ -784,12 +784,12 @@ function Commands.ApplyGroupCamp(player, commandContext)
     if coordinator and type(coordinator.StartGroupCamp) == "function" then
         ownerKey = "player"
         if player.getOnlineID then
-            local ok, onlineID = pcall(player.getOnlineID, player)
-            if ok and onlineID ~= nil then ownerKey = tostring(onlineID) end
+            local onlineID = player:getOnlineID()
+            if onlineID ~= nil then ownerKey = tostring(onlineID) end
         end
         if ownerKey == "player" and player.getUsername then
-            local ok, username = pcall(player.getUsername, player)
-            if ok and username ~= nil and tostring(username) ~= "" then
+            local username = player:getUsername()
+            if username ~= nil and tostring(username) ~= "" then
                 ownerKey = tostring(username)
             end
         end

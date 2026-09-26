@@ -1,0 +1,19 @@
+{
+    "UI_PNC_Trading_Accept": "Tanggapin",
+    "UI_PNC_Trading_Available": "Magagamit",
+    "UI_PNC_Trading_Cancel": "Kanselahin",
+    "UI_PNC_Trading_Capacity": "Kapasidad",
+    "UI_PNC_Trading_Category": "Kategorya",
+    "UI_PNC_Trading_Complete": "Kumpleto ang kalakalan",
+    "UI_PNC_Trading_Failed": "Nabigo ang kalakalan",
+    "UI_PNC_Trading_Item": "Gamit",
+    "UI_PNC_Trading_Net": "Net",
+    "UI_PNC_Trading_Offer": "Alok",
+    "UI_PNC_Trading_PlayerHeading": "IYONG ALOK",
+    "UI_PNC_Trading_Price": "Presyo",
+    "UI_PNC_Trading_Reset": "I-reset",
+    "UI_PNC_Trading_Submitting": "Isinusumite ang kalakalan...",
+    "UI_PNC_Trading_Title": "Kalakalan",
+    "UI_PNC_Trading_TotalCost": "KABUUANG GASTOS",
+    "UI_PNC_Trading_TotalValue": "KABUUANG HALAGA"
+}

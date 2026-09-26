@@ -13,7 +13,7 @@ local function invalidateCorpseRender(corpse)
     end
     dirtyLevel = FBORenderChunk
         and FBORenderChunk.DIRTY_OBJECT_MODIFY or 66
-    pcall(corpse.invalidateRenderChunkLevel, corpse, dirtyLevel)
+    corpse:invalidateRenderChunkLevel(dirtyLevel)
 end
 
 local function squareAt(x, y, z)
@@ -56,7 +56,7 @@ local function removeCorpseFromSquareList(square, corpse)
     if not list or not list.remove then return end
     for i = list:size() - 1, 0, -1 do
         if list:get(i) == corpse then
-            pcall(list.remove, list, i)
+            list:remove(i)
         end
     end
 end
@@ -170,25 +170,25 @@ function Internal.removeCorpse(corpse)
     end
     square, current, raw = corpseSquares(corpse)
     if square and square.transmitRemoveItemFromSquare then
-        pcall(square.transmitRemoveItemFromSquare, square, corpse)
+        square:transmitRemoveItemFromSquare(corpse)
     end
     if current and current ~= square
         and current.transmitRemoveItemFromSquare
     then
-        pcall(current.transmitRemoveItemFromSquare, current, corpse)
+        current:transmitRemoveItemFromSquare(corpse)
     end
     detachCorpseMembership(corpse, square, current, raw)
     if corpse.removeFromWorld then
-        pcall(corpse.removeFromWorld, corpse)
+        corpse:removeFromWorld()
     end
     if corpse.removeFromSquare then
-        pcall(corpse.removeFromSquare, corpse)
+        corpse:removeFromSquare()
     end
     if corpse.setSquare then
-        pcall(corpse.setSquare, corpse, nil)
+        corpse:setSquare(nil)
     end
     if corpse.setCurrent then
-        pcall(corpse.setCurrent, corpse, nil)
+        corpse:setCurrent(nil)
     end
     return true
 end

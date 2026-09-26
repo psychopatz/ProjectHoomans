@@ -508,8 +508,8 @@ local function saveEquipmentVariable(active, name)
 end
 
 local function setEquipmentVariable(body, name, value)
-    if body and body.setVariable then
-        body:setVariable(name, tostring(value or ""))
+    if body and body.SetVariable then
+        body:SetVariable(name, tostring(value or ""))
     end
 end
 
@@ -518,20 +518,20 @@ local function restoreEquipment(active)
     local snapshot = active and active.equipmentSnapshot or nil
     if not body or not snapshot then return end
     if body.setPrimaryHandItem then
-        pcall(body.setPrimaryHandItem, body, snapshot.primary)
+        body:setPrimaryHandItem(snapshot.primary)
     end
     if body.setSecondaryHandItem then
-        pcall(body.setSecondaryHandItem, body, snapshot.secondary)
+        body:setSecondaryHandItem(snapshot.secondary)
     end
     for name, previous in pairs(active.previousEquipmentVariables or {}) do
         if previous.value ~= nil then
             setEquipmentVariable(body, name, previous.value)
         elseif body.clearVariable then
-            pcall(body.clearVariable, body, name)
+            body:clearVariable(name)
         end
     end
     if body.resetEquippedHandsModels then
-        pcall(body.resetEquippedHandsModels, body)
+        body:resetEquippedHandsModels()
     end
     active.equipmentSnapshot = nil
     active.equipmentOverride = nil
@@ -543,7 +543,6 @@ local function applyRangedEquipment(active)
     local equipment = PNC.Equipment
     local created = false
     local primaryType
-    local ok
     if not body or not body.setPrimaryHandItem then
         return false, "hand_setter_unavailable"
     end
@@ -565,19 +564,19 @@ local function applyRangedEquipment(active)
         saveEquipmentVariable(active, name)
     end
     primaryType = primaryTypeForItem(item)
-    ok = pcall(body.setPrimaryHandItem, body, item)
-    if not ok or readValue(body, "getPrimaryHandItem") ~= item then
+    body:setPrimaryHandItem(item)
+    if body:getPrimaryHandItem() ~= item then
         restoreEquipment(active)
         return false, "temporary_primary_equip_failed"
     end
     if body.setSecondaryHandItem then
-        pcall(body.setSecondaryHandItem, body, nil)
+        body:setSecondaryHandItem(nil)
     end
     setEquipmentVariable(body, "PNCPrimary", itemFullType(item))
     setEquipmentVariable(body, "PNCSecondary", "")
     setEquipmentVariable(body, "PNCPrimaryType", primaryType)
     if body.resetEquippedHandsModels then
-        pcall(body.resetEquippedHandsModels, body)
+        body:resetEquippedHandsModels()
     end
     active.equipmentOverride = {
         item = item,

@@ -46,12 +46,9 @@ local function nativeListContainsItem(list, item)
 end
 
 local function playerEquipsItem(player, item)
-    local ok
-    local equipped
     if nativeFlag(item, "isEquipped") then return true end
     if player and player.isEquipped then
-        ok, equipped = pcall(player.isEquipped, player, item)
-        if ok and equipped == true then return true end
+        if player:isEquipped(item) == true then return true end
     end
     if player and player.getPrimaryHandItem and player:getPrimaryHandItem() == item then
         return true

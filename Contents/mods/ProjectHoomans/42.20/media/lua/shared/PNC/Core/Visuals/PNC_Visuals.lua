@@ -19,17 +19,17 @@ local function applyIdentityVoice(zombie, record, appearance)
         }
     end
     if survivor.voicePrefix and descriptor.setVoicePrefix then
-        pcall(descriptor.setVoicePrefix, descriptor, survivor.voicePrefix)
+        descriptor:setVoicePrefix(survivor.voicePrefix)
     elseif survivor.voice and descriptor.setVoicePrefix then
-        pcall(descriptor.setVoicePrefix, descriptor, survivor.voice)
+        descriptor:setVoicePrefix(survivor.voice)
     end
     if survivor.voiceType ~= nil and descriptor.setVoiceType then
-        pcall(descriptor.setVoiceType, descriptor,
+        descriptor:setVoiceType(
             math.max(0, math.min(3, math.floor(
                 tonumber(survivor.voiceType) or 0))))
     end
     if survivor.voicePitch ~= nil and descriptor.setVoicePitch then
-        pcall(descriptor.setVoicePitch, descriptor,
+        descriptor:setVoicePitch(
             math.max(-100, math.min(100, tonumber(survivor.voicePitch) or 0)))
     end
 end
@@ -88,33 +88,33 @@ function Visuals.MaintainHumanAppearance(zombie, appearance, isFemale, refreshMo
         return false
     end
     if zombie.setFemaleEtc then
-        pcall(zombie.setFemaleEtc, zombie, isFemale == true)
+        zombie:setFemaleEtc(isFemale == true)
     end
     if zombie.setNoTeeth then
-        pcall(zombie.setNoTeeth, zombie, true)
+        zombie:setNoTeeth(true)
     end
     humanVisual = zombie.getHumanVisual and zombie:getHumanVisual() or nil
     clearBodySoiledState(humanVisual)
     if humanVisual then
         if appearance.skinTexture and humanVisual.setSkinTextureName then
-            pcall(humanVisual.setSkinTextureName, humanVisual, appearance.skinTexture)
+            humanVisual:setSkinTextureName(appearance.skinTexture)
         end
         if appearance.hairModel and humanVisual.setHairModel then
-            pcall(humanVisual.setHairModel, humanVisual, appearance.hairModel)
+            humanVisual:setHairModel(appearance.hairModel)
         end
         if appearance.beardModel and humanVisual.setBeardModel then
-            pcall(humanVisual.setBeardModel, humanVisual, appearance.beardModel)
+            humanVisual:setBeardModel(appearance.beardModel)
         end
         immutableColor = makeImmutableColor(appearance.skinColor)
         if immutableColor and humanVisual.setSkinColor then
-            pcall(humanVisual.setSkinColor, humanVisual, immutableColor)
+            humanVisual:setSkinColor(immutableColor)
         end
         immutableColor = makeImmutableColor(appearance.hairColor)
         if immutableColor and humanVisual.setHairColor then
-            pcall(humanVisual.setHairColor, humanVisual, immutableColor)
+            humanVisual:setHairColor(immutableColor)
         end
         if immutableColor and humanVisual.setBeardColor then
-            pcall(humanVisual.setBeardColor, humanVisual, immutableColor)
+            humanVisual:setBeardColor(immutableColor)
         end
     end
     if refreshModel == true then
@@ -139,9 +139,7 @@ function Visuals.ClearAttachedItems(zombie)
         entry = attachedItems:get(i)
         item = entry and entry.getItem and entry:getItem() or nil
         if item and zombie.removeAttachedItem then
-            pcall(function()
-                zombie:removeAttachedItem(item)
-            end)
+            zombie:removeAttachedItem(item)
         end
     end
 end
@@ -170,9 +168,8 @@ local function safeSetWornItem(zombie, item)
     if Core and Core.ProtectClothingFromFall then
         Core.ProtectClothingFromFall(item)
     end
-    return pcall(function()
-        zombie:setWornItem(bodyLocation, item)
-    end)
+    zombie:setWornItem(bodyLocation, item)
+    return true
 end
 
 function Visuals.AddClothingVisual(zombie, fullType, visualState)

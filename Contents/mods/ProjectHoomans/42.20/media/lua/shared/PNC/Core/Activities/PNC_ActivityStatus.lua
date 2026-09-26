@@ -85,8 +85,7 @@ end
 
 local function fullTypeFromItem(item)
     if not item or type(item.getFullType) ~= "function" then return nil end
-    local ok, fullType = pcall(item.getFullType, item)
-    fullType = ok and tostring(fullType or "") or ""
+    local fullType = tostring(item:getFullType() or "")
     return fullType ~= "" and fullType or nil
 end
 

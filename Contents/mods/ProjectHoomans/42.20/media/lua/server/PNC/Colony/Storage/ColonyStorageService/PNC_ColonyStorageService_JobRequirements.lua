@@ -12,8 +12,7 @@ end
 
 local function requirementsRegistry()
     if PNC.JobRequirements then return PNC.JobRequirements end
-    local ok, registry = pcall(require, "PNC/Core/Jobs/PNC_JobRequirements")
-    return ok and registry or nil
+    return require "PNC/Core/Jobs/PNC_JobRequirements"
 end
 
 local function normalizeCreatedItem(item)
@@ -27,8 +26,7 @@ local function makeItem(fullType)
     if not PNC.Equipment or type(PNC.Equipment.CreateItem) ~= "function" then
         return nil
     end
-    local ok, item = pcall(PNC.Equipment.CreateItem, fullType)
-    if not ok then return nil end
+    local item = PNC.Equipment.CreateItem(fullType)
     return normalizeCreatedItem(item)
 end
 
@@ -84,8 +82,7 @@ local function lumberToolDiagnostic(record, body)
     if not lumber or type(lumber.GetToolDiagnostic) ~= "function" then
         return nil
     end
-    local ok, diagnostic = pcall(lumber.GetToolDiagnostic, record, body)
-    return ok and diagnostic or nil
+    return lumber.GetToolDiagnostic(record, body)
 end
 
 local function canonicalRequirementSatisfied(record, product)
@@ -161,9 +158,8 @@ local function restoreInventory(storage, backup)
     then
         return false
     end
-    local ok, inventory = pcall(
-        CoreInventory.Serializer.deserialize, backup)
-    if not ok or not inventory then return false end
+    local inventory = CoreInventory.Serializer.deserialize(backup)
+    if not inventory then return false end
     storage.inventory = inventory
     return true
 end
@@ -193,29 +189,26 @@ local function applyEquipment(record, itemID, body, physicalItem)
         and PNC.Equipment.Internal.isNetworkedGame() ~= true
         and type(body.setPrimaryHandItem) == "function"
     then
-        local ok, handReason = pcall(
-            body.setPrimaryHandItem, body, physicalItem)
-        if not ok then return false, "live_primary_equip_failed:" .. tostring(handReason) end
+        body:setPrimaryHandItem(physicalItem)
         if type(body.getPrimaryHandItem) == "function" then
-            local readOK, current = pcall(body.getPrimaryHandItem, body)
-            if not readOK or current ~= physicalItem then
+            local current = body:getPrimaryHandItem()
+            if current ~= physicalItem then
                 return false, "live_primary_equip_failed"
             end
         end
     elseif body and PNC.Equipment
         and type(PNC.Equipment.EnsureCombatHands) == "function"
     then
-        local callOK, applied, applyReason = pcall(
-            PNC.Equipment.EnsureCombatHands, body, record)
-        if not callOK or applied == false then
+        local applied, applyReason = PNC.Equipment.EnsureCombatHands(
+            body, record)
+        if applied == false then
             return false, "live_hands_sync_failed:" .. tostring(applyReason)
         end
     elseif body and PNC.Equipment
         and type(PNC.Equipment.ApplyHands) == "function"
     then
-        local callOK, applied, applyReason = pcall(
-            PNC.Equipment.ApplyHands, body, record)
-        if not callOK or applied == false then
+        local applied, applyReason = PNC.Equipment.ApplyHands(body, record)
+        if applied == false then
             return false, "live_hands_sync_failed:" .. tostring(applyReason)
         end
     end
@@ -417,7 +410,7 @@ function Service.DebugSupplyJobRequirements(player, args)
     Internal.CommitStorage(storage)
     clearLumberWaiting(record)
     if PNC.Registry and type(PNC.Registry.MarkDirty) == "function" then
-        pcall(PNC.Registry.MarkDirty, record, "debug_job_requirements")
+        PNC.Registry.MarkDirty(record, "debug_job_requirements")
     end
     Service.Metrics.withdrawals = Service.Metrics.withdrawals + 1
     return finish(player, args, true, "job_requirements_granted", storage, {

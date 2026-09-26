@@ -38,8 +38,7 @@ end
 local function liveBody(npcID)
     local registry = PNC and PNC.Registry or nil
     if not registry or type(registry.GetLiveZombie) ~= "function" then return nil end
-    local ok, body = pcall(registry.GetLiveZombie, npcID)
-    return ok and body or nil
+    return registry.GetLiveZombie(npcID)
 end
 
 local function snapshot(npcID, entry)

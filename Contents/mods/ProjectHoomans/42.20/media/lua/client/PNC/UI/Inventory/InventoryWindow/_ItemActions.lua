@@ -4,6 +4,9 @@ local Helpers = require "PNC/UI/Inventory/InventoryWindow/_Helpers"
 local tr = Helpers.tr
 
 function ISPNCInventoryWindow:showItemContext(role, row)
+    if self.tradeMode then
+        return self:showTradeContext(role, row)
+    end
     local context = ISContextMenu.get(0, getMouseX(), getMouseY())
     if self.readOnly then
         local option = context:addOption(
@@ -97,6 +100,7 @@ function ISPNCInventoryWindow:showItemContext(role, row)
 end
 
 function ISPNCInventoryWindow:sendItemAction(actionID, itemID)
+    if self.tradeMode then return false, "trade_action_unavailable" end
     if self.giftMode then
         self.statusText = "Gift mode: item actions are disabled"
         return false

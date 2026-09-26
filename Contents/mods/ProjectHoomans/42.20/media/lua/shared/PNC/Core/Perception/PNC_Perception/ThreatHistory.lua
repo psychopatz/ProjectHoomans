@@ -45,7 +45,8 @@ function Internal.PickNearest(firstTarget, secondTarget)
     return secondTarget
 end
 
-local function sameTarget(target, kind, id, onlineID, username, provider)
+local function sameTarget(target, kind, id, onlineID, username, provider,
+        generation)
     if not target or tostring(target.kind or "") ~= tostring(kind or "") then
         return false
     end
@@ -65,6 +66,8 @@ local function sameTarget(target, kind, id, onlineID, username, provider)
         return tostring(target.provider or "") == tostring(provider or "")
             and tostring(target.actorId or target.id or "")
                 == tostring(id or "")
+            and (generation == nil or target.generation == nil
+                or tonumber(target.generation) == tonumber(generation))
     end
     return false
 end
@@ -113,6 +116,7 @@ function Perception.RememberAttacker(record, damageEvent, now)
         kind = kind,
         id = id,
         provider = damageEvent.attackerProvider or damageEvent.provider,
+        generation = damageEvent.attackerGeneration,
         onlineID = damageEvent.attackerOnlineID,
         username = damageEvent.attackerUsername,
         expiresAt = (tonumber(now) or Core.Now())
@@ -266,7 +270,8 @@ function Perception.IsTargetThreatening(record, target)
             recent.id,
             recent.onlineID,
             recent.username,
-            recent.provider
+            recent.provider,
+            recent.generation
         )
     then
         return true

@@ -297,8 +297,8 @@ function Catalog.Commands.BuildFromScripts(manager)
     if not manager or not manager.getAllCraftRecipes then
         return false, "SCRIPT_MANAGER_UNAVAILABLE"
     end
-    local ok, recipes = pcall(manager.getAllCraftRecipes, manager)
-    if not ok or not recipes then return false, "CRAFT_RECIPES_UNAVAILABLE" end
+    local recipes = manager:getAllCraftRecipes()
+    if not recipes then return false, "CRAFT_RECIPES_UNAVAILABLE" end
     return Catalog.Commands.Rebuild(recipes)
 end
 

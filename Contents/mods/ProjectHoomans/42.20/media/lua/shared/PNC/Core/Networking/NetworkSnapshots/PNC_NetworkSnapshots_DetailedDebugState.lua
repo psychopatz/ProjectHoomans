@@ -302,13 +302,10 @@ function Parts.BuildSeatingDebugState(record)
     local seatDistance
 
     if character and character.getX and character.getY and character.getZ then
-        local bodyOk, bodyX, bodyY, bodyZ = pcall(function()
-            return character:getX(), character:getY(), character:getZ()
-        end)
-        if bodyOk then
-            bodyPosition = { x = tonumber(bodyX), y = tonumber(bodyY),
-                z = tonumber(bodyZ) }
-        end
+        local bodyX, bodyY, bodyZ = character:getX(), character:getY(),
+            character:getZ()
+        bodyPosition = { x = tonumber(bodyX), y = tonumber(bodyY),
+            z = tonumber(bodyZ) }
     end
     if activity and activity.seating == true then
         seatAnchor = copyCampPoint(activity.seatAnchor or activity.target)

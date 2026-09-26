@@ -274,8 +274,8 @@ local function identityVoiceSeed(snapshot, body)
     local fallback
     fallback = snapshot and snapshot.id or nil
     if fallback == nil and body and body.getModData then
-        local ok, modData = pcall(body.getModData, body)
-        if ok and modData then
+        local modData = body:getModData()
+        if modData then
             fallback = modData.PNC_UUID
         end
     end

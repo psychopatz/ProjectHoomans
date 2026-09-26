@@ -45,8 +45,7 @@ function ActionContext.Build(view, result, value)
     if registry and type(registry.GetLiveZombie) == "function"
         and recipientID
     then
-        local ok, body = pcall(registry.GetLiveZombie, recipientID)
-        if ok then origin = body end
+        origin = registry.GetLiveZombie(recipientID)
     end
     origin = origin or spec.context and spec.context.player
         or getSpecificPlayer and getSpecificPlayer(0) or nil

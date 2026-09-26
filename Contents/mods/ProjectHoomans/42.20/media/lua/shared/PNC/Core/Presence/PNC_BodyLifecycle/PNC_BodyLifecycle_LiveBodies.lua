@@ -24,6 +24,10 @@ function Lifecycle.StampLiveBody(record, zombie)
     modData.PNC_NPC = true
     modData.PNC_UUID = tostring(record.id)
     modData.PNC_BodyKind = "live"
+    local factionID = PNC.Factions
+        and type(PNC.Factions.GetFactionID) == "function"
+        and PNC.Factions.GetFactionID(record) or nil
+    modData.PNC_FactionID = factionID and tostring(factionID) or nil
     modData.PNC_BodyLease = tostring(record.runtime.bodyLease)
     modData.PNC_CorpseToken = nil
     modData.PNC_TagVersion = Const.BODY_TAG_VERSION

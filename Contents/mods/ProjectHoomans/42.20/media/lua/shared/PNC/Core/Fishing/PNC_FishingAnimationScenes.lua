@@ -36,8 +36,7 @@ Scenes.Register("fishing.cast", {
             return false
         end
         if zombie.faceLocationF and fishing.waterX and fishing.waterY then
-            pcall(zombie.faceLocationF, zombie,
-                fishing.waterX, fishing.waterY)
+            zombie:faceLocationF(fishing.waterX, fishing.waterY)
         end
         return true
     end,

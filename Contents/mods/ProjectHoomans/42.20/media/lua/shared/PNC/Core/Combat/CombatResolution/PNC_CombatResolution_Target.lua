@@ -55,6 +55,7 @@ function Resolution.ApplyTargetDamage(attackerRecord, attackerBody, target, opti
         end
     end
     hit = Resolution.BuildHitEvent(attackerRecord, target, options)
+    hit.immediateSelfDefense = target.immediateSelfDefense == true
     if hit.amount <= 0 then return false, "invalid_damage", hit end
     if target.kind == "foreign_npc" then
         local allowed

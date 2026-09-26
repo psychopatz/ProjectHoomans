@@ -1,0 +1,19 @@
+{
+    "UI_PNC_Trading_Accept": "Accept",
+    "UI_PNC_Trading_Available": "Available",
+    "UI_PNC_Trading_Cancel": "Cancel",
+    "UI_PNC_Trading_Capacity": "Capacity",
+    "UI_PNC_Trading_Category": "Category",
+    "UI_PNC_Trading_Complete": "Trade complete",
+    "UI_PNC_Trading_Failed": "Trade failed",
+    "UI_PNC_Trading_Item": "Item",
+    "UI_PNC_Trading_Net": "Net",
+    "UI_PNC_Trading_Offer": "Offer",
+    "UI_PNC_Trading_PlayerHeading": "YOUR OFFER",
+    "UI_PNC_Trading_Price": "Price",
+    "UI_PNC_Trading_Reset": "Reset",
+    "UI_PNC_Trading_Submitting": "Submitting trade...",
+    "UI_PNC_Trading_Title": "Trading",
+    "UI_PNC_Trading_TotalCost": "TOTAL COST",
+    "UI_PNC_Trading_TotalValue": "TOTAL VALUE"
+}

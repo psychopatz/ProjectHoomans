@@ -71,7 +71,7 @@ function Internal.applyCorpseWornItems(corpse, wornEntries)
         end
     end
     if targetWornItems.clear then
-        pcall(targetWornItems.clear, targetWornItems)
+        targetWornItems:clear()
     end
     for i = 1, #wornEntries do
         entry = wornEntries[i]
@@ -96,9 +96,8 @@ function Internal.applyCorpseWornItems(corpse, wornEntries)
         then
             CorpseItems.AddExisting(container, item)
             claimed[item] = true
-            if pcall(targetWornItems.setItem, targetWornItems, entry.location, item) then
-                applied = applied + 1
-            end
+            targetWornItems:setItem(entry.location, item)
+            applied = applied + 1
         end
     end
     return applied > 0 or #wornEntries == 0
@@ -116,7 +115,7 @@ function Internal.transmitCorpseState(corpse, fullSync)
             and Internal.announceCorpse(corpse) or false
     end
     if corpse.transmitModData then
-        pcall(corpse.transmitModData, corpse)
+        corpse:transmitModData()
         return true
     end
     return false

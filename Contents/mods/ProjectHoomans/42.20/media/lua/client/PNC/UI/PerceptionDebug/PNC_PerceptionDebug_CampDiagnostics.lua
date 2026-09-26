@@ -36,8 +36,8 @@ end
 local function now()
     local core = PNC.Core
     if core and type(core.Now) == "function" then
-        local ok, value = pcall(core.Now)
-        if ok and number(value) then return value end
+        local value = number(core.Now())
+        if value then return value end
     end
     return 0
 end

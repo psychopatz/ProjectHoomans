@@ -3,7 +3,8 @@ local Inventory = PNC.Inventory
 
 local function mirrorMagazine(weaponItem, count)
     if weaponItem and weaponItem.setCurrentAmmoCount then
-        pcall(weaponItem.setCurrentAmmoCount, weaponItem, math.max(0, math.floor(tonumber(count) or 0)))
+        weaponItem:setCurrentAmmoCount(
+            math.max(0, math.floor(tonumber(count) or 0)))
     end
 end
 

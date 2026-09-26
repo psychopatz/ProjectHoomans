@@ -186,9 +186,9 @@ end
 
 local function syncNative(item)
     if item and type(item.syncItemFields) == "function" then
-        pcall(item.syncItemFields, item)
+        item:syncItemFields()
     end
-    if sendItemStats and item then pcall(sendItemStats, item) end
+    if sendItemStats and item then sendItemStats(item) end
 end
 
 local function sourceAmount(entry)
@@ -274,9 +274,8 @@ local function restoreSource(entry, before)
             and rawSourceAmount(entry) ~= before.rawAmount
     then
         if container and type(container.adjustAmount) == "function" then
-            local ok, value = pcall(container.adjustAmount, container,
-                before.amount)
-            restored = ok and value ~= false
+            container:adjustAmount(before.amount)
+            restored = true
         end
         if (not restored or not container)
             and type(object.setWaterAmount) == "function"
@@ -287,7 +286,7 @@ local function restoreSource(entry, before)
         end
     end
     if restored and type(object.sync) == "function" then
-        pcall(object.sync, object)
+        object:sync()
     end
     if restored and before.rawAmount ~= nil then
         currentAmount = rawSourceAmount(entry)

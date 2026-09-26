@@ -75,6 +75,7 @@ function IncomingDamage.Apply(context)
             attackerKind = context.attackerKind or "foreign_npc",
             attackerProvider = context.attackerProvider or context.provider,
             attackerID = context.attackerID,
+            attackerGeneration = context.attackerGeneration,
             attackerOnlineID = context.attackerOnlineID,
             attackerUsername = context.attackerUsername,
             weaponFullType = context.weaponFullType,

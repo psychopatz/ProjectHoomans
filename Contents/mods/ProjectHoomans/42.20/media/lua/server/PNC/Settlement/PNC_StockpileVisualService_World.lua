@@ -14,13 +14,11 @@ end
 
 function World.SquareAt(point)
     if not point or type(getCell) ~= "function" then return nil end
-    local ok, cell = pcall(getCell)
-    if not ok or not cell or type(cell.getGridSquare) ~= "function" then
+    local cell = getCell()
+    if not cell or type(cell.getGridSquare) ~= "function" then
         return nil
     end
-    local squareOk, square = pcall(cell.getGridSquare, cell,
-        point.x, point.y, point.z)
-    return squareOk and square or nil
+    return cell:getGridSquare(point.x, point.y, point.z)
 end
 
 function World.SquareKey(square)
@@ -165,8 +163,8 @@ function World.AddObject(square, facility, spec, point)
         and IsoThumpable and type(IsoThumpable.new) == "function"
         and type(getCell) == "function"
     then
-        local cellOk, cell = pcall(getCell)
-        if cellOk and cell then
+        local cell = getCell()
+        if cell then
             ok, object = pcall(IsoThumpable.new, cell, square,
                 spec.sprite, spec.north == true)
             if not ok or not object then

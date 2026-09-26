@@ -56,8 +56,7 @@ local function identityKey(snapshot, body)
     local id = snapshot and snapshot.id or "body"
     local lease = snapshot and snapshot.liveBodyLease or nil
     if lease == nil and body and body.getOnlineID then
-        local ok, onlineID = pcall(body.getOnlineID, body)
-        if ok then lease = onlineID end
+        lease = body:getOnlineID()
     end
     return tostring(id) .. ":" .. tostring(lease or "")
 end

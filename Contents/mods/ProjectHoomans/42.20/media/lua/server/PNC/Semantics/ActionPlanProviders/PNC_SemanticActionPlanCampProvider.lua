@@ -38,8 +38,7 @@ local function liveBody(record)
     if not Registry or type(Registry.GetLiveZombie) ~= "function" then
         return nil
     end
-    local ok, body = pcall(Registry.GetLiveZombie, record and record.id)
-    return ok and body or nil
+    return Registry.GetLiveZombie(record and record.id)
 end
 
 local function parameters(step)

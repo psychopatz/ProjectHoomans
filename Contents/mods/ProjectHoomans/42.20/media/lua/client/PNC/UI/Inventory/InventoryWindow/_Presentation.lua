@@ -12,6 +12,9 @@ local function selectedContainerLabel(containers, selected)
 end
 
 function ISPNCInventoryWindow:prerender()
+    if self.tradeMode and self.prerenderTrade then
+        return self:prerenderTrade()
+    end
     local now = inventoryNow()
     if self.inventoryRefreshPending == true
         and now - (tonumber(self.inventoryRefreshStartedAt) or now)

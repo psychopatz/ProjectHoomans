@@ -132,35 +132,24 @@ function Internal.clearHands(zombie)
         return
     end
     if zombie.setPrimaryHandItem then
-        pcall(function()
-            zombie:setPrimaryHandItem(nil)
-        end)
+        zombie:setPrimaryHandItem(nil)
     end
     if zombie.setSecondaryHandItem then
-        pcall(function()
-            zombie:setSecondaryHandItem(nil)
-        end)
+        zombie:setSecondaryHandItem(nil)
     end
     Internal.refreshHands(zombie)
 end
 
 function Internal.getPrimaryHandItem(zombie)
-    local ok
-    local item
     if not zombie or type(zombie.getPrimaryHandItem) ~= "function" then
         return nil, false
     end
-    ok, item = pcall(zombie.getPrimaryHandItem, zombie)
-    if not ok then
-        return nil, false
-    end
-    return item, true
+    return zombie:getPrimaryHandItem(), true
 end
 
 function Internal.isPrimaryHandStateCurrent(zombie, descriptor, attackMode)
     local item
     local readable
-    local ok
     local fullType
     item, readable = Internal.getPrimaryHandItem(zombie)
     if not readable then
@@ -179,8 +168,8 @@ function Internal.isPrimaryHandStateCurrent(zombie, descriptor, attackMode)
         -- lightweight test doubles and unusual modded InventoryItems.
         return true
     end
-    ok, fullType = pcall(item.getFullType, item)
-    if not ok or fullType == nil then
+    fullType = item:getFullType()
+    if fullType == nil then
         return true
     end
     return tostring(fullType) == tostring(descriptor.fullType)

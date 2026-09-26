@@ -85,6 +85,7 @@ require "PNC/Social/PNC_RelationshipService"
 require "PNC/Colonists/PNC_ColonistDepartureService"
 require "PNC/Social/PNC_RelationshipDebug"
 require "PNC/Knowledge/PNC_NPCKnowledgeService"
+require "PNC/Compatibility/Mods/ProjectALife/PNC_ProjectALife_RelationPersistence"
 require "PNC/Server/PNC_PersistenceCoordinator"
 require "PNC/Semantics/PNC_SemanticCognitionService"
 require "PNC/Semantics/PNC_SemanticCognitionEvidence"
@@ -110,3 +111,4 @@ if PNC.ProfilerIntegration and PNC.ProfilerIntegration.InstallServer then
     PNC.ProfilerIntegration.InstallServer()
 end
 require "PNC/Server/PNC_Server"
+require "PNC/Compatibility/Mods/ProjectALife/PNC_ProjectALife_EventObservers"

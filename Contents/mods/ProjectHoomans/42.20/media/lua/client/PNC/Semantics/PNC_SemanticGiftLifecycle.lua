@@ -29,8 +29,7 @@ local function nowValue(value)
     if getTimestampMs then return getTimestampMs() end
     local core = PNC.Core
     if core and type(core.Now) == "function" then
-        local ok, result = pcall(core.Now)
-        if ok then return tonumber(result) or 0 end
+        return tonumber(core.Now()) or 0
     end
     return 0
 end

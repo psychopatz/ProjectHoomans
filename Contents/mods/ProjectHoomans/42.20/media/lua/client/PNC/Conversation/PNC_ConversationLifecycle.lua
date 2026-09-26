@@ -88,18 +88,17 @@ local function conversationTopicMask(view)
     local events = PNC.Conversation and PNC.Conversation.Memory
         and PNC.Conversation.Memory.Events or nil
     if not events or type(events.GetConversationTopicMask) ~= "function" then
-        pcall(require, "PNC/Conversation/Memory/PNC_ConversationMemory")
+        require "PNC/Conversation/Memory/PNC_ConversationMemory"
     end
     -- Close can happen before any semantic or provider request loads the
     -- definitions. Require this lightweight catalog here so visible session
     -- messages are still classified and transferred to today's memory.
-    pcall(require,
-        "PNC/Conversation/Definitions/Memory/ConversationTopics/00_PNC_ConversationMemoryTopics")
+    require "PNC/Conversation/Definitions/Memory/ConversationTopics/00_PNC_ConversationMemoryTopics"
     events = PNC.Conversation and PNC.Conversation.Memory
         and PNC.Conversation.Memory.Events or nil
     if events and type(events.GetConversationTopicMask) == "function" then
-        local ok, mask = pcall(events.GetConversationTopicMask, session, 64)
-        if ok then return tonumber(mask) end
+        local mask = events.GetConversationTopicMask(session, 64)
+        return tonumber(mask)
     end
     local mask = session and tonumber(session.conversationTopicMask) or nil
     if not mask or mask ~= mask or mask == math.huge or mask == -math.huge then
@@ -125,7 +124,7 @@ local function clearWorkingContext(view, spec)
         and PNC.Semantics.DialogueInput or nil
 
     if history and type(history.Clear) == "function" then
-        pcall(history.Clear, namespace, npcID, characterUUID)
+        history.Clear(namespace, npcID, characterUUID)
     end
     if session then
         session.closed = true
@@ -135,8 +134,7 @@ local function clearWorkingContext(view, spec)
         if session.semanticDialogueContext
             and type(session.semanticDialogueContext.Reset) == "function"
         then
-            pcall(session.semanticDialogueContext.Reset,
-                session.semanticDialogueContext)
+            session.semanticDialogueContext:Reset()
         end
         session.semanticDialogueContext = nil
         session.semanticDialogueState = nil

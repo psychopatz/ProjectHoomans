@@ -365,7 +365,8 @@ function Internal.prepareCorpseItems(record, zombie)
         for index = 1, #candidates do
             if not usedVisuals[candidates[index]] then
                 usedVisuals[candidates[index]] = true
-                return pcall(targetVisual.copyFrom, targetVisual, candidates[index])
+                targetVisual:copyFrom(candidates[index])
+                return true
             end
         end
         return false
@@ -451,7 +452,7 @@ function Internal.prepareCorpseItems(record, zombie)
                 item = takeForInventory(fullType)
                 applyDescriptorMetadata(item, descriptor)
                 if item and descriptor.cond ~= nil and item.setCondition then
-                    pcall(item.setCondition, item, math.max(0, math.floor(tonumber(descriptor.cond) or 0)))
+                    item:setCondition(math.max(0, math.floor(tonumber(descriptor.cond) or 0)))
                 end
                 if item and descriptor.wornSlot and zombie.setWornItem then
                     copyLiveVisual(item, fullType)
@@ -460,9 +461,9 @@ function Internal.prepareCorpseItems(record, zombie)
                     end
                     pcall(zombie.setWornItem, zombie, tostring(descriptor.wornSlot), item)
                 elseif item and descriptor.equipSlot == "primary" and zombie.setPrimaryHandItem then
-                    pcall(zombie.setPrimaryHandItem, zombie, item)
+                    zombie:setPrimaryHandItem(item)
                 elseif item and descriptor.equipSlot == "secondary" and zombie.setSecondaryHandItem then
-                    pcall(zombie.setSecondaryHandItem, zombie, item)
+                    zombie:setSecondaryHandItem(item)
                 end
             end
         end

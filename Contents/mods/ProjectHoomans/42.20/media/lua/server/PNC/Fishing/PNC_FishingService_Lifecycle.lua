@@ -74,7 +74,7 @@ function Service.CancelJob(npcId, reason)
     if record and body and record.runtime and record.runtime.animationScene
         and record.runtime.animationScene.id == "fishing.cast"
         and PNC.AnimationScenes and PNC.AnimationScenes.Stop
-    then pcall(PNC.AnimationScenes.Stop, record, body, reason or "fishing_stopped") end
+    then PNC.AnimationScenes.Stop(record, body, reason or "fishing_stopped") end
     H.ReleaseFishingSpot(job, zone)
     if zone then zone.workers[tostring(npcId)] = nil end
     job.active, job.leaseId = false, nil

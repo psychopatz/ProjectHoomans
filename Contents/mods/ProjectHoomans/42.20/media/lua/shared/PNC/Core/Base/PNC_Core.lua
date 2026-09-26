@@ -94,7 +94,8 @@ function Core.ProtectClothingFromFall(item)
     if not item or not item.setChanceToFall then
         return false
     end
-    return pcall(item.setChanceToFall, item, 0)
+    item:setChanceToFall(0)
+    return true
 end
 
 function Core.ProtectVisualClothingFromFall(zombie)
@@ -128,7 +129,7 @@ function Core.ProtectVisualClothingFromFall(zombie)
                 state = { item = scriptItem, chanceToFall = chanceToFall }
                 Core._VisualFallProtection[fullType] = state
             end
-            pcall(scriptItem.DoParam, scriptItem, "ChanceToFall", "0")
+            scriptItem:DoParam("ChanceToFall", "0")
         end
     end
     return Core.TableSize(Core._VisualFallProtection)
@@ -139,12 +140,7 @@ function Core.RestoreVisualClothingFallProtection()
     local state
     for fullType, state in pairs(Core._VisualFallProtection) do
         if state.item and state.item.DoParam then
-            pcall(
-                state.item.DoParam,
-                state.item,
-                "ChanceToFall",
-                tostring(state.chanceToFall)
-            )
+            state.item:DoParam("ChanceToFall", tostring(state.chanceToFall))
         end
         Core._VisualFallProtection[fullType] = nil
     end

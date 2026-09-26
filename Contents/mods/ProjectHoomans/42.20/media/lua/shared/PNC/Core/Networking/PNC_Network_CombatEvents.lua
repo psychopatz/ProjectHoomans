@@ -150,6 +150,7 @@ end
 function Network.BroadcastFirearmShot(payload)
     local deliveryRadius
     local sent = 0
+    local client
     logFirearmAudit("broadcast_start", payload,
         "authority=" .. tostring(Core and Core.IsAuthority and Core.IsAuthority()),
         "server=" .. tostring(isServer and isServer()))
@@ -188,12 +189,14 @@ function Network.BroadcastFirearmShot(payload)
             "playersSent=" .. tostring(sent))
         return sent > 0
     end
-    if triggerEvent then
-        triggerEvent("OnServerCommand", Const.MODULE, Const.CMD_FIREARM_SHOT, payload)
+    client = PNC and PNC.Client
+    if client and type(client.HandleServerCommand) == "function" then
+        client.HandleServerCommand(Const.CMD_FIREARM_SHOT, payload)
         logFirearmAudit("broadcast_local_complete", payload,
-            "route=OnServerCommand", "playersSent=local")
+            "route=local_client_dispatch", "playersSent=local")
         return true
     end
-    logFirearmAudit("broadcast_rejected", payload, "reason=triggerEvent_unavailable")
+    logFirearmAudit("broadcast_rejected", payload,
+        "reason=local_client_command_handler_unavailable")
     return false
 end

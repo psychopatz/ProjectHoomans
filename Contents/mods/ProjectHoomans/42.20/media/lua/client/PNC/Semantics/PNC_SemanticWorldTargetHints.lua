@@ -94,8 +94,7 @@ function Hints.Resolve(target, context, options)
 
     local cell = options.cell
     if not cell and type(getCell) == "function" then
-        local ok, result = pcall(getCell)
-        if ok then cell = result end
+        cell = getCell()
     end
     if not cell then
         Hints.Cache[key] = { at = timestamp, reason = "cell_unavailable" }

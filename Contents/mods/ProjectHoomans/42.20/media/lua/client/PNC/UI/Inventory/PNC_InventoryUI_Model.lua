@@ -9,5 +9,6 @@ require "PNC/UI/Inventory/PNC_InventoryUI_Model/_PlayerContainers"
 require "PNC/UI/Inventory/PNC_InventoryUI_Model/_PlayerRows"
 require "PNC/UI/Inventory/PNC_InventoryUI_Model/_NPCRows"
 require "PNC/UI/Inventory/PNC_InventoryUI_Model/_Weights"
+require "PNC/UI/Inventory/PNC_InventoryUI_Model/_TradeRows"
 
 return PNC.InventoryUIModel

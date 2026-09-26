@@ -29,10 +29,7 @@ end
 
 function H.PlayerNumberFor(builder)
     if builder and type(builder.getPlayerNum) == "function" then
-        local ok, playerNumber = pcall(builder.getPlayerNum, builder)
-        if ok and playerNumber ~= nil then
-            return tonumber(playerNumber) or 0
-        end
+        return tonumber(builder:getPlayerNum()) or 0
     end
     return 0
 end

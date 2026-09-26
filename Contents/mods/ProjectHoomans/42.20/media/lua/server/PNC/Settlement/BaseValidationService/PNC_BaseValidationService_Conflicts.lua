@@ -75,14 +75,13 @@ end
 
 function H.SafehouseValue(safehouse, method)
     if not safehouse or not safehouse[method] then return nil end
-    local ok, value = pcall(safehouse[method], safehouse)
-    return ok and tonumber(value) or nil
+    return tonumber(safehouse[method](safehouse))
 end
 
 function H.ConflictsWithSafehouse(footprint)
     if not SafeHouse or not SafeHouse.getSafehouseList then return nil end
-    local ok, list = pcall(SafeHouse.getSafehouseList)
-    if not ok or not list then return nil end
+    local list = SafeHouse.getSafehouseList()
+    if not list then return nil end
     local count = list.size and list:size() or #list
     local index
     for index = 0, count - 1 do

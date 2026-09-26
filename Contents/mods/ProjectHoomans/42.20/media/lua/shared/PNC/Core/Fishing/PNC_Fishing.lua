@@ -35,8 +35,7 @@ end
 
 function Fishing.SkillLevel(record)
     if PNC.Skills and type(PNC.Skills.GetLevel) == "function" then
-        local ok, value = pcall(PNC.Skills.GetLevel, record, "Fishing")
-        if ok then return clamp(value, 0, 10) end
+        return clamp(PNC.Skills.GetLevel(record, "Fishing"), 0, 10)
     end
     return 0
 end

@@ -72,6 +72,9 @@ local function buildPlayerRows(window, containerEntry, player, playerCount)
 end
 
 function ISPNCInventoryWindow:refreshInventory(force)
+    if self.tradeMode and self.refreshTradeInventory then
+        return self:refreshTradeInventory(force)
+    end
     local player = getSpecificPlayer and getSpecificPlayer(0) or getPlayer and getPlayer() or nil
     local endpoint = self.transferEndpoint
     if not endpoint then return end

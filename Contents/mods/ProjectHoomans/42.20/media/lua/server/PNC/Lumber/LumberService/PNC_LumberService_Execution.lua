@@ -35,7 +35,7 @@ end
 
 local function faceTree(body, tree)
     if body and tree and type(body.faceLocationF) == "function" then
-        pcall(body.faceLocationF, body, tree.x + 0.5, tree.y + 0.5)
+        body:faceLocationF(tree.x + 0.5, tree.y + 0.5)
     end
 end
 
@@ -45,13 +45,13 @@ local function beginChopAnimation(record, body)
     then
         local scene = record.runtime and record.runtime.animationScene
         if not scene or scene.id ~= "lumber.chop" then
-            pcall(PNC.AnimationScenes.Request, record, body, "lumber.chop", {
+            PNC.AnimationScenes.Request(record, body, "lumber.chop", {
                 reason = "lumber_chop", repeatMode = "loop",
             })
         end
     end
     if body and type(body.setVariable) == "function" then
-        pcall(body.setVariable, body, "PNCLumbering", true)
+        body:setVariable("PNCLumbering", true)
     end
 end
 
@@ -59,9 +59,9 @@ local function stopChopAnimation(record, body)
     local scene = record and record.runtime and record.runtime.animationScene
     if scene and scene.id == "lumber.chop"
         and PNC.AnimationScenes and PNC.AnimationScenes.Stop
-    then pcall(PNC.AnimationScenes.Stop, record, body, "lumber_stopped") end
+    then PNC.AnimationScenes.Stop(record, body, "lumber_stopped") end
     if body and type(body.setVariable) == "function" then
-        pcall(body.setVariable, body, "PNCLumbering", false)
+        body:setVariable("PNCLumbering", false)
     end
 end
 
@@ -162,20 +162,13 @@ local function tickLive(job, record, body, tree, at)
     if at - lastHit >= Service.HIT_INTERVAL_MS then
         beforeWorldObjects = captureOutputItems
             and captureOutputItems(square, nil, nil, true) or nil
-        local ok, result = pcall(actual.WeaponHit, actual, body, tool.item)
-        if not ok then
-            stopChopAnimation(record, body)
-            job.state, job.phase = "FAILED", "FAILED"
-            return false, false, tostring(result)
-        end
+        actual:WeaponHit(body, tool.item)
         persistLiveToolCondition(record, tool.item)
         job.lastHitAt = at
         job.lastProgressAt = at
         if type(actual.getHealth) == "function" then
-            local healthOK, health = pcall(actual.getHealth, actual)
-            if healthOK and tonumber(health) then
-                tree.remainingWork = math.max(0, tonumber(health))
-            end
+            local health = tonumber(actual:getHealth())
+            if health then tree.remainingWork = math.max(0, health) end
         end
         tree.revision = (tonumber(tree.revision) or 0) + 1
         markDirty()
@@ -217,7 +210,7 @@ local function updateAbstractToolWear(record, job, tool)
     job.toolHitCount = 0
     if PNC.Inventory and type(PNC.Inventory.ApplyDelta) == "function" then
         local condition = math.max(0, tool.condition - 1)
-        pcall(PNC.Inventory.ApplyDelta, record, {
+        PNC.Inventory.ApplyDelta(record, {
             { op = "update", itemID = tool.itemID, cond = condition },
         }, "lumber_tool_wear")
     end
@@ -331,7 +324,7 @@ local function tagOutputItem(item, worldObject, effectID)
             LUMBER_OUTPUT_MARKER_VERSION
     end
     if type(worldObject and worldObject.transmitModData) == "function" then
-        pcall(worldObject.transmitModData, worldObject)
+        worldObject:transmitModData()
     end
 end
 
@@ -453,10 +446,11 @@ local function oneShotAnimation(record, body, sceneID, reason)
     then
         return "failed", "LUMBER_ANIMATION_UNAVAILABLE"
     end
-    local ok, result = pcall(PNC.AnimationScenes.Request, record, body,
-        sceneID, { reason = reason, repeatMode = "once" })
-    if not ok or result == false then
-        return "failed", tostring(result or "LUMBER_ANIMATION_FAILED")
+    local result = PNC.AnimationScenes.Request(record, body, sceneID, {
+        reason = reason, repeatMode = "once",
+    })
+    if result == false then
+        return "failed", "LUMBER_ANIMATION_FAILED"
     end
     return "started"
 end
@@ -519,15 +513,15 @@ end
 
 local function removeWorldObject(square, worldObject)
     if type(square and square.removeWorldObject) == "function" then
-        local ok = pcall(square.removeWorldObject, square, worldObject)
-        return ok
+        square:removeWorldObject(worldObject)
+        return true
     end
     local removed = true
     if type(worldObject and worldObject.removeFromWorld) == "function" then
-        removed = pcall(worldObject.removeFromWorld, worldObject)
+        worldObject:removeFromWorld()
     end
     if type(worldObject and worldObject.removeFromSquare) == "function" then
-        removed = pcall(worldObject.removeFromSquare, worldObject)
+        worldObject:removeFromSquare()
     end
     return removed
 end
@@ -536,9 +530,8 @@ local function restoreWorldObject(square, item)
     if not square or not item
         or type(square.AddWorldInventoryItem) ~= "function"
     then return false end
-    local ok, restored = pcall(square.AddWorldInventoryItem, square, item,
-        0.0, 0.0, 0.0)
-    return ok and restored ~= nil
+    local restored = square:AddWorldInventoryItem(item, 0.0, 0.0, 0.0)
+    return restored ~= nil
 end
 
 local function pickupWorldItem(square, worldObject, item, body)

@@ -77,11 +77,11 @@ local function treeCount(region)
         for y, spans in pairs(level.rows or {}) do
             for index = 1, #spans, 2 do
                 for x = spans[index], spans[index + 1] do
-                    local ok, square = pcall(cell.getGridSquare, cell, x, y, z)
+                    local square = cell:getGridSquare(x, y, z)
                     local tree
-                    if ok and square and type(square.getTree) == "function" then
-                        ok, tree = pcall(square.getTree, square)
-                        if ok and tree then count = count + 1 end
+                    if square and type(square.getTree) == "function" then
+                        tree = square:getTree()
+                        if tree then count = count + 1 end
                     end
                 end
             end

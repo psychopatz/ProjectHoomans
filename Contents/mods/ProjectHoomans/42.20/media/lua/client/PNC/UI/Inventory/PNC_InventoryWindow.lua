@@ -23,6 +23,8 @@ require "PNC/UI/Inventory/InventoryWindow/_BulkTransfers"
 require "PNC/UI/Inventory/InventoryWindow/_DragDrop"
 require "PNC/UI/Inventory/InventoryWindow/_ItemActions"
 require "PNC/UI/Inventory/InventoryWindow/_ContainerNavigation"
+require "PNC/UI/Inventory/InventoryWindow/_Trade"
+require "PNC/UI/Inventory/InventoryWindow/_TradePresentation"
 require "PNC/UI/Inventory/InventoryWindow/_Presentation"
 require "PNC/UI/Inventory/InventoryWindow/_Lifecycle"
 

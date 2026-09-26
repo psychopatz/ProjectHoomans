@@ -5,6 +5,7 @@ local tr = Helpers.tr
 local INVENTORY_REFRESH_COOLDOWN_MS = Helpers.INVENTORY_REFRESH_COOLDOWN_MS
 
 function ISPNCInventoryWindow:onRefreshNPCInventory()
+    if self.tradeMode then return false end
     local endpoint = self.transferEndpoint
     local now = inventoryNow()
     local last = tonumber(self.lastInventoryRefreshAt)

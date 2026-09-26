@@ -41,12 +41,7 @@ end
 
 local function pointFromSquare(square)
     if not square then return nil end
-    local function read(method)
-        if type(square[method]) ~= "function" then return nil end
-        local ok, value = pcall(square[method], square)
-        return ok and tonumber(value) or nil
-    end
-    local x, y, z = read("getX"), read("getY"), read("getZ")
+    local x, y, z = tonumber(square.x), tonumber(square.y), tonumber(square.z)
     if not x or not y or not z then return nil end
     return x, y, z
 end

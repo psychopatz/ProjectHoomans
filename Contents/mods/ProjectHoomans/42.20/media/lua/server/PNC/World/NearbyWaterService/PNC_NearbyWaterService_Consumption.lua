@@ -36,7 +36,7 @@ end
 
 local function syncSource(object)
     if object and type(object.sync) == "function" then
-        pcall(object.sync, object)
+        object:sync()
     end
 end
 
@@ -263,9 +263,9 @@ function Service.Consume(record, entry, liters)
                 details
         end
         if type(entry.item.syncItemFields) == "function" then
-            pcall(entry.item.syncItemFields, entry.item)
+            entry.item:syncItemFields()
         end
-        if sendItemStats then pcall(sendItemStats, entry.item) end
+        if sendItemStats then sendItemStats(entry.item) end
     end
     if amount <= 0 then return false, "INSUFFICIENT_WATER" end
     if Locator.Invalidate then

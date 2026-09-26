@@ -23,12 +23,8 @@ local Util = require
     "PsychopatzCore/Inventory/PsychopatzInventoryUtil"
 local Portable = require
     "PsychopatzCore/Inventory/PsychopatzPortableItemState"
-local ItemTransfer
-do
-    local loaded, value = pcall(require,
-        "PsychopatzCore/Inventory/PsychopatzItemTransfer")
-    if loaded then ItemTransfer = value end
-end
+local ItemTransfer =
+    require "PsychopatzCore/Inventory/PsychopatzItemTransfer"
 local Events = require "PsychopatzCore/Events/PC_EventBus"
 local EventTypes =
     require "PNC/Core/Events/PNC_EventDefinitions"
@@ -36,28 +32,25 @@ local FLUID_EPSILON = 0.0001
 
 local function syncPhysicalItem(nativeItem)
     if nativeItem and type(nativeItem.syncItemFields) == "function" then
-        pcall(nativeItem.syncItemFields, nativeItem)
+        nativeItem:syncItemFields()
     end
-    if sendItemStats and nativeItem then
-        pcall(sendItemStats, nativeItem)
+    if type(sendItemStats) == "function" and nativeItem then
+        sendItemStats(nativeItem)
     end
 end
 
 local function removePhysicalUnit(adapter, nativeItem)
     local count
-    local readOK
     if nativeItem and type(nativeItem.getCount) == "function" then
-        readOK, count = pcall(nativeItem.getCount, nativeItem)
-        count = readOK and tonumber(count) or nil
+        count = tonumber(nativeItem:getCount())
     end
     if count and count > 1 then
         if type(nativeItem.setCount) ~= "function" then
             return false, "physical_stack_update_unavailable"
         end
-        local updated = pcall(nativeItem.setCount, nativeItem, count - 1)
-        if not updated then return false, "physical_stack_update_failed" end
+        nativeItem:setCount(count - 1)
         return true, nil, function()
-            pcall(nativeItem.setCount, nativeItem, count)
+            nativeItem:setCount(count)
             syncPhysicalItem(nativeItem)
             return true
         end
@@ -317,7 +310,6 @@ local function drainPhysicalFluid(nativeItem, amount)
     local before = container and container.getAmount
         and tonumber(container:getAmount()) or nil
     local beforeState
-    local ok
     local removed
     local after
     if not container or not container.removeFluid or not before then
@@ -326,16 +318,13 @@ local function drainPhysicalFluid(nativeItem, amount)
     beforeState = Portable.CaptureFluid(nativeItem)
     -- Match the vanilla drink path: the second argument is the non-utensil
     -- flag. Passing true can invoke a different container treatment in B42.
-    ok, removed = pcall(container.removeFluid, container, amount, false)
-    if not ok then
-        ok, removed = pcall(container.removeFluid, container, amount)
-    end
-    if ok and removed and type(removed.release) == "function" then
+    removed = container:removeFluid(amount, false)
+    if removed and type(removed.release) == "function" then
         pcall(removed.release, removed)
     end
     after = tonumber(container:getAmount())
     local expected = math.max(0, before - math.max(0, tonumber(amount) or 0))
-    if not ok or not after or after >= before - 0.000001
+    if not after or after >= before - 0.000001
         or math.abs(after - expected) > FLUID_EPSILON
     then
         if beforeState then Portable.ApplyFluid(nativeItem, beforeState) end
@@ -354,27 +343,14 @@ local function consumePhysicalFood(adapter, nativeItem, replacement)
     local removed, reason, undo = removePhysicalUnit(adapter, nativeItem)
     local added = {}
     local replacementResult
-    local addedOK
     if not removed then return false, reason end
     if replacement then
-        if ItemTransfer and ItemTransfer.AddToContainer then
-            addedOK, replacementResult = pcall(
-                ItemTransfer.AddToContainer, adapter.container, replacement, 1)
-            if not addedOK then replacementResult = nil end
-        elseif adapter.container and adapter.container.AddItems then
-            addedOK, replacementResult = pcall(
-                adapter.container.AddItems, adapter.container, replacement, 1)
-            if not addedOK then replacementResult = nil end
-        end
+        replacementResult = ItemTransfer.AddToContainer(
+            adapter.container, replacement, 1)
         added = Util.javaList(replacementResult)
         if #added <= 0 then
             if undo then undo() end
             return false, "physical_replacement_add_failed"
-        end
-        if not ItemTransfer and sendAddItemToContainer then
-            for index = 1, #added do
-                pcall(sendAddItemToContainer, adapter.container, added[index])
-            end
         end
     end
     syncPhysicalItem(nativeItem)

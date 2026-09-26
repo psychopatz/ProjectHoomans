@@ -34,8 +34,28 @@ end
 
 local function isTargetable(snapshot, body)
     local modData
+    local registry = PNC.Registry
+    local record
     if not body or (body.isDead and body:isDead()) then
         return false
+    end
+    record = registry
+        and registry.FindRecordByZombie
+        and registry.FindRecordByZombie(body)
+        or nil
+    if record then
+        local settings = PNC.Sandbox
+        local stealth = PNC.Stealth
+        if settings and settings.CanZombieTargetRecord
+            and not settings.CanZombieTargetRecord(record)
+        then
+            return false
+        end
+        if stealth and stealth.ShouldSuppressZombieAggro
+            and stealth.ShouldSuppressZombieAggro(record)
+        then
+            return false
+        end
     end
     if snapshot then
         return snapshot.presenceState == Const.PRESENCE_LIVE

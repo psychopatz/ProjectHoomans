@@ -47,7 +47,6 @@ function Service.CanPlayerMeetNPC(player, record, body, radius)
     local z
     local maxRadius
     local distSq
-    local ok
     local visible
     if not player or not record then return false, "invalid_meeting_subject" end
     if player.isDead and player:isDead() then
@@ -78,8 +77,7 @@ function Service.CanPlayerMeetNPC(player, record, body, radius)
     if type(player.CanSee) ~= "function" then
         return false, "visibility_api_unavailable", distSq
     end
-    ok, visible = pcall(player.CanSee, player, body)
-    if not ok then return false, "visibility_check_failed", distSq end
+    visible = player:CanSee(body)
     if visible ~= true then return false, "not_visible", distSq end
     return true, "visible", distSq
 end

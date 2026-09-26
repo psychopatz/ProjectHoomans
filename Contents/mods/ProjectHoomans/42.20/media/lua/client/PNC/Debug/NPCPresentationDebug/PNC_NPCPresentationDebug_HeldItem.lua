@@ -56,8 +56,8 @@ local function resolvedID(body, id)
 end
 
 local function setVariable(body, name, value)
-    if body and type(body.setVariable) == "function" then
-        pcall(body.setVariable, body, name, tostring(value or ""))
+    if body and type(body.SetVariable) == "function" then
+        body:SetVariable(name, tostring(value or ""))
     end
 end
 
@@ -152,20 +152,20 @@ local function restore(active)
     local body = active and active.body or nil
     if not body then return false end
     if type(body.setPrimaryHandItem) == "function" then
-        pcall(body.setPrimaryHandItem, body, active.primary)
+        body:setPrimaryHandItem(active.primary)
     end
     if type(body.setSecondaryHandItem) == "function" then
-        pcall(body.setSecondaryHandItem, body, active.secondary)
+        body:setSecondaryHandItem(active.secondary)
     end
     for name, value in pairs(active.variables or {}) do
         if value ~= nil then
             setVariable(body, name, value)
         elseif type(body.clearVariable) == "function" then
-            pcall(body.clearVariable, body, name)
+            body:clearVariable(name)
         end
     end
     if type(body.resetEquippedHandsModels) == "function" then
-        pcall(body.resetEquippedHandsModels, body)
+        body:resetEquippedHandsModels()
     end
     return true
 end
@@ -174,28 +174,27 @@ local function apply(active, item)
     local body = active.body
     local primaryType = primaryTypeFor(item)
     local requiresBoth = readMethod(item, "isRequiresEquippedBothHands") == true
-    local ok
     if not body or type(body.setPrimaryHandItem) ~= "function" then
         return false, "hand_setter_unavailable"
     end
-    ok = pcall(body.setPrimaryHandItem, body, item)
-    if not ok or (type(body.getPrimaryHandItem) == "function"
-        and not handMatches(body, "getPrimaryHandItem", item))
+    body:setPrimaryHandItem(item)
+    if type(body.getPrimaryHandItem) == "function"
+        and not handMatches(body, "getPrimaryHandItem", item)
     then
         return false, "temporary_primary_equip_failed"
     end
     if type(body.setSecondaryHandItem) == "function" then
         if requiresBoth then
-            pcall(body.setSecondaryHandItem, body, item)
+            body:setSecondaryHandItem(item)
         else
-            pcall(body.setSecondaryHandItem, body, nil)
+            body:setSecondaryHandItem(nil)
         end
     end
     setVariable(body, "PNCPrimary", itemFullType(item))
     setVariable(body, "PNCSecondary", requiresBoth and itemFullType(item) or "")
     setVariable(body, "PNCPrimaryType", primaryType)
     if type(body.resetEquippedHandsModels) == "function" then
-        pcall(body.resetEquippedHandsModels, body)
+        body:resetEquippedHandsModels()
     end
     active.item = item
     active.fullType = itemFullType(item)

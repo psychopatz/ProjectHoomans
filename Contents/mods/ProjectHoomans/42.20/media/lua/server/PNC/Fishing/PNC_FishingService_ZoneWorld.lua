@@ -15,8 +15,7 @@ local OFFSETS = {
 
 local function getCell()
     if _G and type(_G.getCell) == "function" then
-        local ok, cell = pcall(_G.getCell)
-        if ok then return cell end
+        return _G.getCell()
     end
     if IsoWorld and IsoWorld.instance then return IsoWorld.instance.currentCell end
     return nil
@@ -25,40 +24,32 @@ end
 function Service.GetSquare(x, y, z)
     local cell = getCell()
     if not cell or type(cell.getGridSquare) ~= "function" then return nil end
-    local ok, square = pcall(cell.getGridSquare, cell, x, y, z)
-    return ok and square or nil
+    return cell:getGridSquare(x, y, z)
 end
 
 local function isWater(square)
-    local properties
-    local ok
-    local result
     if not square then return false end
     if square.water == true then return true end
-    if type(square.isWater) == "function" then
-        ok, result = pcall(square.isWater, square)
-        if ok and result == true then return true end
+    if type(square.isWater) == "function" and square:isWater() == true then
+        return true
     end
     if type(square.getProperties) == "function" then
-        ok, properties = pcall(square.getProperties, square)
-        if ok and properties and type(properties.has) == "function"
+        local properties = square:getProperties()
+        if properties and type(properties.has) == "function"
             and IsoFlagType and IsoFlagType.water
+            and properties:has(IsoFlagType.water) == true
         then
-            ok, result = pcall(properties.has, properties, IsoFlagType.water)
-            if ok and result == true then return true end
+            return true
         end
     end
     return false
 end
 
 local function isWalkable(square)
-    local ok
-    local result
     if not square or isWater(square) then return false end
     if square.walkable == false or square.solid == true then return false end
-    if type(square.isFree) == "function" then
-        ok, result = pcall(square.isFree, square, true)
-        if ok and result == false then return false end
+    if type(square.isFree) == "function" and square:isFree(true) == false then
+        return false
     end
     return true
 end

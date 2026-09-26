@@ -5,10 +5,29 @@ function Resolution.ApplyNPCDamage(targetRecord, targetBody, hit)
     local wounds = PNC.NPCWounds
     local network = PNC.Network
     local relationships = PNC.Relationships
+    local attackerRecord
     local applied
     local result
     if not targetRecord or not wounds or not wounds.ApplyCombatDamage then
         return false, "invalid_npc_target"
+    end
+    if hit and hit.attackerKind == "npc" and hit.attackerID
+        and PNC.Registry and PNC.Registry.Get
+        and relationships and relationships.AreNPCsEnemies
+    then
+        attackerRecord = PNC.Registry.Get(hit.attackerID)
+        if attackerRecord then
+            local relationOk, enemy = pcall(
+                relationships.AreNPCsEnemies,
+                attackerRecord,
+                targetRecord
+            )
+            if not relationOk or (enemy ~= true
+                and hit.immediateSelfDefense ~= true)
+            then
+                return false, "npc_target_not_allowed"
+            end
+        end
     end
     applied, result = wounds.ApplyCombatDamage(targetRecord, targetBody, hit)
     if not applied then return false, "npc_damage_rejected", result end
@@ -31,7 +50,7 @@ function Resolution.ApplyNPCDamage(targetRecord, targetBody, hit)
         and PNC.Factions
         and PNC.Factions.OnNPCAggression
     then
-        local attackerRecord = PNC.Registry
+        attackerRecord = PNC.Registry
             and PNC.Registry.Get
             and PNC.Registry.Get(hit.attackerID) or nil
         local at = getGameTime and getGameTime()

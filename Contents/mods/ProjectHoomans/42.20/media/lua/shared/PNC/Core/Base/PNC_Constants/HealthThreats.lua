@@ -74,11 +74,18 @@ Const.ZOMBIE_ATTACKER_OBSERVATION_MS = 1500
 Const.TARGET_SWITCH_DISTANCE_RATIO = 0.72
 Const.TARGET_RECENT_ATTACKER_MS = 5000
 Const.ZOMBIE_AGGRO_RADIUS = 14
+-- Nearby eligible NPCs can hold attention beyond the immediate-player range.
+Const.ZOMBIE_NPC_COMMIT_RADIUS = 10.0
+-- Only a closer player this near may reclaim a committed NPC pursuit.
+Const.ZOMBIE_NPC_PLAYER_RECLAIM_RADIUS = 2.4
 Const.ZOMBIE_AGGRO_KEEP_RADIUS = 2.4
 Const.ZOMBIE_TARGET_PLAYER_KEEP_RADIUS = 2.0
 Const.ZOMBIE_NPC_AGGRO_LEASE_MS = 8000
 Const.ZOMBIE_NPC_PATH_REFRESH_MS = 350
 Const.ZOMBIE_NPC_PATH_REFRESH_DISTANCE = 0.6
+-- Keep a stable goal long enough for async pathfinding to finish. Re-path
+-- sooner only when the NPC has moved far enough to invalidate that goal.
+Const.ZOMBIE_NPC_PATH_STABLE_RETRY_MS = 1500
 -- Server-selected MP movement directives are short-lived. The server
 -- refreshes them only when the target changes/moves or this interval elapses;
 -- clients stop pursuing automatically when the lease expires.

@@ -98,7 +98,7 @@ end
 
 local function registerCoreZone(zone)
     if not Zones or type(Zones.register) ~= "function" then return true end
-    local ok, result = pcall(Zones.register, {
+    local result = Zones.register({
         id = zone.id,
         ownerType = zone.ownerType,
         ownerId = zone.ownerId,
@@ -107,12 +107,12 @@ local function registerCoreZone(zone)
         geometry = zone.geometry,
         revision = zone.revision,
     })
-    return ok and result ~= false
+    return result ~= false
 end
 
 local function unregisterCoreZone(zoneId)
     if Zones and type(Zones.remove) == "function" then
-        pcall(Zones.remove, zoneId)
+        Zones.remove(zoneId)
     end
 end
 

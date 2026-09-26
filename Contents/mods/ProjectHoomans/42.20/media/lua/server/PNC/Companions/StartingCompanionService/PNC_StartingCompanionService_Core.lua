@@ -22,8 +22,7 @@ end
 
 function H.PlayerFemale(player)
     if player and player.isFemale then
-        local ok, value = pcall(player.isFemale, player)
-        if ok then return value == true end
+        return player:isFemale() == true
     end
     local descriptor = player and player.getDescriptor
         and player:getDescriptor() or nil

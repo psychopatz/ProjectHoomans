@@ -72,8 +72,7 @@ local function cellFor(options)
     options = type(options) == "table" and options or {}
     if options.cell then return options.cell end
     if type(getCell) == "function" then
-        local ok, cell = pcall(getCell)
-        if ok then return cell end
+        return getCell()
     end
     return nil
 end
@@ -85,9 +84,8 @@ function Geometry.GetSquare(cell, x, y, z)
     local iy = number(y)
     local iz = number(z) or 0
     if ix == nil or iy == nil then return nil end
-    local ok, square = pcall(cell.getGridSquare, cell,
+    return cell:getGridSquare(
         math.floor(ix), math.floor(iy), math.floor(iz))
-    return ok and square or nil
 end
 
 

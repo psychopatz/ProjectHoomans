@@ -132,28 +132,20 @@ local function listValues(value)
     return output
 end
 
-local function call(object, method, ...)
-    if not object or type(object[method]) ~= "function" then return nil end
-    local ok, value = pcall(object[method], object, ...)
-    return ok and value or nil
-end
-
 local function voiceOptions(isFemale)
     local output = {}
     local raw
     local values
     local bodyType = isFemale and 1 or 2
     if type(getAllVoiceStyles) == "function" then
-        local ok
-        ok, raw = pcall(getAllVoiceStyles)
-        if not ok then raw = nil end
+        raw = getAllVoiceStyles()
     end
     values = listValues(raw)
     for _, style in ipairs(values) do
-        local prefix = call(style, "getPrefix")
-        local name = call(style, "getName")
-        local styleBodyType = tonumber(call(style, "getBodyTypeDefault"))
-        local styleType = tonumber(call(style, "getVoiceType")) or 0
+        local prefix = style:getPrefix()
+        local name = style:getName()
+        local styleBodyType = tonumber(style:getBodyTypeDefault())
+        local styleType = tonumber(style:getVoiceType()) or 0
         if prefix and (styleBodyType == nil or styleBodyType == bodyType) then
             output[#output + 1] = {
                 id = #output + 1,

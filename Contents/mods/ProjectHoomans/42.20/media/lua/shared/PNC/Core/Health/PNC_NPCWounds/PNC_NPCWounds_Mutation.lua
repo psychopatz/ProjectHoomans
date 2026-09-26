@@ -120,6 +120,10 @@ function Wounds.ApplyCombatDamage(record, npcBody, damageEvent)
         attackerID = damageEvent and damageEvent.attackerID,
         attackerKind = damageEvent
             and damageEvent.attackerKind or "npc",
+        attackerProvider = damageEvent
+            and damageEvent.attackerProvider,
+        attackerGeneration = damageEvent
+            and damageEvent.attackerGeneration,
         attackerOnlineID =
             damageEvent and damageEvent.attackerOnlineID,
         attackerUsername =

@@ -91,8 +91,7 @@ end
 
 local function safehouseValue(safehouse, method)
     if not safehouse or not safehouse[method] then return nil end
-    local ok, value = pcall(safehouse[method], safehouse)
-    return ok and finite(value, nil) or nil
+    return finite(safehouse[method](safehouse), nil)
 end
 
 local function loadSafehouses()
@@ -100,8 +99,8 @@ local function loadSafehouses()
     if not SafeHouse or not SafeHouse.getSafehouseList then
         return output
     end
-    local ok, list = pcall(SafeHouse.getSafehouseList)
-    if not ok or not list then return output end
+    local list = SafeHouse.getSafehouseList()
+    if not list then return output end
     local count = list.size and list:size() or #list
     local index
     for index = 0, count - 1 do

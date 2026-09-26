@@ -89,7 +89,7 @@ function Fishing.Tick(record, zombie)
         Common.HaltMovement(record, zombie, "fishing_spot")
     end
     if zombie and zombie.faceLocationF and waterX and waterY then
-        pcall(zombie.faceLocationF, zombie, waterX, waterY)
+        zombie:faceLocationF(waterX, waterY)
     end
 
     if zombie and PNC.AnimationScenes
@@ -97,7 +97,7 @@ function Fishing.Tick(record, zombie)
     then
         local scene = record.runtime and record.runtime.animationScene
         if not scene or scene.id ~= "fishing.cast" then
-            pcall(PNC.AnimationScenes.Request, record, zombie, "fishing.cast", {
+            PNC.AnimationScenes.Request(record, zombie, "fishing.cast", {
                 reason = "fishing", repeatMode = "loop",
             })
         end

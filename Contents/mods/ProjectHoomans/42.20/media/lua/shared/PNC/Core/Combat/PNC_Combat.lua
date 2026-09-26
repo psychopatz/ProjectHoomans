@@ -239,13 +239,11 @@ function Internal.prepareAttackMovement(record, zombie, reason)
 end
 
 local function itemFullType(item)
-    local ok
-    local fullType
     if not item or type(item.getFullType) ~= "function" then
         return nil
     end
-    ok, fullType = pcall(item.getFullType, item)
-    if not ok or fullType == nil or tostring(fullType) == "" then
+    local fullType = item:getFullType()
+    if fullType == nil or tostring(fullType) == "" then
         return nil
     end
     return tostring(fullType)

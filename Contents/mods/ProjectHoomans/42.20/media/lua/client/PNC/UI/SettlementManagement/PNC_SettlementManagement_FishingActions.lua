@@ -14,8 +14,7 @@ local OFFSETS = {
 
 local function worldCell()
     if _G and type(_G.getCell) == "function" then
-        local ok, cell = pcall(_G.getCell)
-        if ok then return cell end
+        return _G.getCell()
     end
     return nil
 end
@@ -31,10 +30,11 @@ local function squareIsWater(square)
     if type(square.getProperties) == "function"
         and IsoFlagType and IsoFlagType.water
     then
-        local ok, properties = pcall(square.getProperties, square)
-        if ok and properties and type(properties.has) == "function" then
-            ok, result = pcall(properties.has, properties, IsoFlagType.water)
-            if ok and result == true then return true end
+        local properties = square:getProperties()
+        if properties and type(properties.has) == "function"
+            and properties:has(IsoFlagType.water) == true
+        then
+            return true
         end
     end
     return false
@@ -44,8 +44,7 @@ local function squareIsWalkableLand(square)
     if not square or squareIsWater(square) then return false end
     if square.walkable == false or square.solid == true then return false end
     if type(square.isFree) == "function" then
-        local ok, result = pcall(square.isFree, square, true)
-        if ok and result == false then return false end
+        if square:isFree(true) == false then return false end
     end
     return true
 end
@@ -70,8 +69,8 @@ local function inspectRegion(region)
         for y, spans in pairs(level.rows or {}) do
             for index = 1, #spans, 2 do
                 for x = spans[index], spans[index + 1] do
-                    local ok, square = pcall(cell.getGridSquare, cell, x, y, z)
-                    if not ok or not square then
+                    local square = cell:getGridSquare(x, y, z)
+                    if not square then
                         result.unloadedTiles = result.unloadedTiles + 1
                     elseif squareIsWater(square) then
                         water[tileKey(x, y, z)] = true

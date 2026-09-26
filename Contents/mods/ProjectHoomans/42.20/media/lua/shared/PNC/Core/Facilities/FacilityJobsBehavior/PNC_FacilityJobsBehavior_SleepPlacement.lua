@@ -53,8 +53,7 @@ function Internal.ValidateSleepSquare(x, y, z, zombie)
         return type(getCell) ~= "function", "SLEEP_SQUARE_UNLOADED"
     end
     if square.isFree then
-        local ok, free = pcall(square.isFree, square, false)
-        if not ok or free ~= true then
+        if square:isFree(false) ~= true then
             return false, "SLEEP_SQUARE_BLOCKED"
         end
     end

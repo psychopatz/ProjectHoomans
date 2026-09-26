@@ -119,6 +119,26 @@ T.truthy(diaryEntries[1].entry.npcText,
     "diary contains dynamic NPC reply text")
 T.truthy(#spoken > 0, "NPC reply flavor is spoken when the body is live")
 
+PNC.CompanionCommandFlavor.Register("companion_dogs_good_boy", {
+    npc = { { fallback = "Who's a good boy?" } },
+})
+local dogGreetingResult =
+    PNC.CompanionCommandPresentation.HandleSocialGreeting({
+        eventID = "dog-event-one",
+        npcID = "npc-one",
+        flavorID = "companion_dogs_good_boy",
+        eventType = "companion_dog",
+        interactionType = "companion_dog_greeting",
+    })
+T.equal(dogGreetingResult, true,
+    "Companion Dogs greeting reaches the canonical presenter")
+T.equal(
+    PNC.CompanionCommandFlavor.Resolve(
+        "companion_dogs_good_boy", "npc", "dog-event-one", {}
+    ),
+    "Who's a good boy?",
+    "Companion Dogs greeting resolves its registered flavor")
+
 PNC.RelationshipPresentation = {
     Summarize = function(relationship) return relationship end,
     BuildEvaluation = function(summary) return summary end,

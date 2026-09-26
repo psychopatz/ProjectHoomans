@@ -10,8 +10,7 @@ Gate.DEFAULT_THRESHOLD = 0.90
 local function readFatigue(record)
     local fatigue
     if PNC.IndividualNeeds and PNC.IndividualNeeds.Get then
-        local ok, value = pcall(PNC.IndividualNeeds.Get, record, "fatigue")
-        if ok then fatigue = tonumber(value) end
+        fatigue = tonumber(PNC.IndividualNeeds.Get(record, "fatigue"))
     end
     if fatigue == nil and record and type(record.needs) == "table" then
         fatigue = tonumber(record.needs.fatigue)

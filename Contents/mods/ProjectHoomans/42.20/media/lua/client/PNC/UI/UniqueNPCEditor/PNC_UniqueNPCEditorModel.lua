@@ -461,26 +461,21 @@ local function validateNPCTraitSet(source, label)
 end
 
 local function findVanillaTrait(id)
-    local list
-    local ok
     if not CharacterTraitDefinition
         or not CharacterTraitDefinition.getTraits
     then
         return nil
     end
-    ok, list = pcall(CharacterTraitDefinition.getTraits)
-    if not ok or not list then return nil end
+    local list = CharacterTraitDefinition.getTraits()
+    if not list then return nil end
     for index = 0, list:size() - 1 do
         local trait = list:get(index)
-        local traitType
-        local traitID
         if trait and trait.getType then
-            ok, traitType = pcall(trait.getType, trait)
-            if ok and traitType and traitType.getName then
-                ok, traitID = pcall(traitType.getName, traitType)
-                if ok and tostring(traitID) == tostring(id) then
-                    return trait
-                end
+            local traitType = trait:getType()
+            if traitType and traitType.getName
+                and tostring(traitType:getName()) == tostring(id)
+            then
+                return trait
             end
         end
     end

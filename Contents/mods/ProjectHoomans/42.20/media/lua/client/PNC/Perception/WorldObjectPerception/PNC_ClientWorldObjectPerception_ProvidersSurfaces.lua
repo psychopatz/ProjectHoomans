@@ -34,8 +34,8 @@ local function sleepProvider(object, square, record)
     if SquareRules
         and type(SquareRules.ClassifySleepSurface) == "function"
     then
-        local ok, result = pcall(SquareRules.ClassifySleepSurface, object)
-        if ok and (result == "bed" or result == "sofa") then
+        local result = SquareRules.ClassifySleepSurface(object)
+        if result == "bed" or result == "sofa" then
             surface = result
         end
     end
@@ -44,8 +44,7 @@ local function sleepProvider(object, square, record)
         local labels = metadata.labels or {}
         local bed = false
         if Catalog and type(Catalog.Matches) == "function" then
-            local matchOk, matched = pcall(Catalog.Matches, "bed", metadata)
-            bed = matchOk and matched == true
+            bed = Catalog.Matches("bed", metadata) == true
         end
         local sofa = containsToken(labels, "sofa")
             or containsToken(labels, "couch")
@@ -86,13 +85,12 @@ local function approximateSitting(object, record)
     local labels = metadata.labels or {}
     local matchedChair = false
     if Catalog and type(Catalog.Matches) == "function" then
-        local ok, matched = pcall(Catalog.Matches, "chair", metadata)
-        matchedChair = ok and matched == true
+        matchedChair = Catalog.Matches("chair", metadata) == true
     end
     local sofa = false
     if SquareRules and type(SquareRules.ClassifySleepSurface) == "function" then
-        local ok, surface = pcall(SquareRules.ClassifySleepSurface, object)
-        sofa = ok and surface == "sofa"
+        local surface = SquareRules.ClassifySleepSurface(object)
+        sofa = surface == "sofa"
     end
     local namedSeat = containsToken(labels, "chair")
         or containsToken(labels, "seat")
@@ -119,15 +117,15 @@ local function surfaceCandidate(object, square, metadata)
     if SquareRules
         and type(SquareRules.ClassifySleepSurface) == "function"
     then
-        local ok, surface = pcall(SquareRules.ClassifySleepSurface, object)
-        if ok and (surface == "bed" or surface == "sofa") then
+        local surface = SquareRules.ClassifySleepSurface(object)
+        if surface == "bed" or surface == "sofa" then
             return true
         end
     end
     if Catalog and type(Catalog.Matches) == "function" then
-        local bedOk, bed = pcall(Catalog.Matches, "bed", metadata)
-        local chairOk, chair = pcall(Catalog.Matches, "chair", metadata)
-        if (bedOk and bed == true) or (chairOk and chair == true) then
+        local bed = Catalog.Matches("bed", metadata)
+        local chair = Catalog.Matches("chair", metadata)
+        if bed == true or chair == true then
             return true
         end
     end
@@ -146,8 +144,8 @@ end
 
 local function sittingProvider(object, square, record)
     if SeatingManager and type(SeatingManager.getInstance) == "function" then
-        local ok, manager = pcall(SeatingManager.getInstance)
-        if ok and manager
+        local manager = SeatingManager.getInstance()
+        if manager
             and type(manager.getTilePositionCount) == "function"
         then
             local countOk, count = pcall(manager.getTilePositionCount,

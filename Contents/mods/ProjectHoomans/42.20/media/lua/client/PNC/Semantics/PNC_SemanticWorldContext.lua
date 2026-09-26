@@ -92,20 +92,19 @@ local function nowMillis(options)
         return tonumber(options.now) or 0
     end
     if type(getTimeInMillis) == "function" then
-        local ok, value = pcall(getTimeInMillis)
-        if ok and tonumber(value) then return tonumber(value) end
+        local value = getTimeInMillis()
+        if tonumber(value) then return tonumber(value) end
     end
     if type(getTimestampMs) == "function" then
-        local ok, value = pcall(getTimestampMs)
-        if ok and tonumber(value) then return tonumber(value) end
+        local value = getTimestampMs()
+        if tonumber(value) then return tonumber(value) end
     end
     return 0
 end
 
 local function globalObject(getter)
     if type(getter) ~= "function" then return nil end
-    local ok, value = pcall(getter)
-    return ok and value or nil
+    return getter()
 end
 
 local function isCharacterArgument(value)
@@ -131,8 +130,7 @@ local function localPlayer(options)
         return options.player
     end
     if type(getSpecificPlayer) == "function" then
-        local ok, player = pcall(getSpecificPlayer, 0)
-        if ok then return player end
+        return getSpecificPlayer(0)
     end
     return nil
 end

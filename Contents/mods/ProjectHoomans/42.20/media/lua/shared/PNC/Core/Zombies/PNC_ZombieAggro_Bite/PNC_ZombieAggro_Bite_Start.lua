@@ -8,21 +8,34 @@ local State = ZombieAggro.State
 local function validateTarget(zombie, npcBody, record)
     local laneClear
     local laneReason
-    if not zombie or not npcBody or not record
-        or zombie.isDead and zombie:isDead()
-        or record.alive == false
+    if not zombie or not npcBody or not record then
+        return false, "missing_target"
+    end
+    if zombie.isDead and zombie:isDead() then
+        return false, "zombie_dead"
+    end
+    if record.alive == false
         or record.health and record.health.state == "dead"
-        or record.presenceState ~= Const.PRESENCE_LIVE
-        or npcBody.isDead and npcBody:isDead()
-        or BiteInternal.ShouldPreventZombieAttack(record)
     then
-        return false
+        return false, "npc_dead"
+    end
+    if record.presenceState ~= Const.PRESENCE_LIVE then
+        return false, "npc_not_live"
+    end
+    if npcBody.isDead and npcBody:isDead() then
+        return false, "npc_body_dead"
+    end
+    if BiteInternal.ShouldPreventZombieAttack(record) then
+        return false, "npc_attack_protected"
     end
     laneClear, laneReason = ZombieAggro.HasBiteLane(
         zombie, npcBody, record
     )
     BiteInternal.RememberAttackLane(record, laneClear, laneReason)
-    return laneClear == true
+    if laneClear ~= true then
+        return false, laneReason or "bite_lane_blocked"
+    end
+    return true
 end
 
 local function canOwnBite(zombie, now)
@@ -113,12 +126,59 @@ function ZombieAggro.TryStartBite(zombie, npcBody, record)
     local now
     local bumpType
     local entry
-    if not validateTarget(zombie, npcBody, record) then return false end
+    local valid
+    local validationReason
+    valid, validationReason = validateTarget(zombie, npcBody, record)
+    if not valid then
+        if ZombieAggro.LogPursuitDiagnostic then
+            ZombieAggro.LogPursuitDiagnostic(
+                zombie,
+                record and record.id or nil,
+                "bite",
+                "validation_rejected",
+                "reason=" .. tostring(validationReason),
+                Core.Now()
+            )
+        end
+        return false
+    end
     zombieId = AggroInternal.ensureZombieID(zombie)
-    if not zombieId then return false end
-    if BiteInternal.GetBiteEntry(zombieId) then return true end
+    if not zombieId then
+        if ZombieAggro.LogPursuitDiagnostic then
+            ZombieAggro.LogPursuitDiagnostic(
+                zombie, record.id, "bite", "missing_zombie_id", "",
+                Core.Now()
+            )
+        end
+        return false
+    end
+    if BiteInternal.GetBiteEntry(zombieId) then
+        if ZombieAggro.LogPursuitDiagnostic then
+            ZombieAggro.LogPursuitDiagnostic(
+                zombie, record.id, "bite", "bite_already_active",
+                "zombieId=" .. tostring(zombieId), Core.Now()
+            )
+        end
+        return true
+    end
     now = Core.Now()
-    if not canOwnBite(zombie, now) then return false end
+    if not canOwnBite(zombie, now) then
+        if ZombieAggro.LogPursuitDiagnostic then
+            ZombieAggro.LogPursuitDiagnostic(
+                zombie, record.id, "bite", "action_or_cooldown_rejected",
+                "zombieId=" .. tostring(zombieId)
+                    .. " action=" .. tostring(
+                        BiteInternal.ActionState(zombie)
+                    )
+                    .. " bumpType=" .. tostring(
+                        zombie.getBumpType
+                            and zombie:getBumpType() or ""
+                    ),
+                now
+            )
+        end
+        return false
+    end
     bumpType = chooseBumpType(npcBody, record)
     entry = createEntry(
         zombieId, zombie, npcBody, record, bumpType,

@@ -81,8 +81,7 @@ local function cellFor(context)
         return context.cell
     end
     if type(getCell) == "function" then
-        local ok, cell = pcall(getCell)
-        if ok then return cell end
+        return getCell()
     end
     return nil
 end

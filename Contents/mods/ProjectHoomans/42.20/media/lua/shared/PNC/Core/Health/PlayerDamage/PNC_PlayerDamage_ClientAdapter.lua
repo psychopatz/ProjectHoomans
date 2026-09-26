@@ -30,10 +30,7 @@ local function isLocalPlayer(character)
         return false
     end
     if character.isLocalPlayer then
-        local ok
-        local result
-        ok, result = pcall(character.isLocalPlayer, character)
-        if ok and result == true then
+        if character:isLocalPlayer() == true then
             return true
         end
     end

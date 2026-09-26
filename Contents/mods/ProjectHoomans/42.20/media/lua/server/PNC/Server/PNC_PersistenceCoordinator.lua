@@ -42,6 +42,9 @@ function Coordinator.Commit(reason)
         identity = PNC.PlayerCharacters and PNC.PlayerCharacters.Dirty == true,
         knowledge = PNC.NPCKnowledge and PNC.NPCKnowledge.Dirty == true,
         factions = PNC.Factions and PNC.Factions.Dirty == true,
+        projectALifeRelations = PNC.Compatibility
+            and PNC.Compatibility.ProjectALifePolicy
+            and PNC.Compatibility.ProjectALifePolicy.Dirty == true,
         communities = PNC.Communities and PNC.Communities.Dirty == true,
         colonyStorage = PNC.ColonyStorageRepository
             and PNC.ColonyStorageRepository.Dirty == true,
@@ -78,6 +81,12 @@ function Coordinator.Commit(reason)
             PNC.NPCKnowledge.Dirty = true
         end
         if PNC.Factions and initialDirty.factions then PNC.Factions.Dirty = true end
+        if PNC.Compatibility
+            and PNC.Compatibility.ProjectALifePolicy
+            and initialDirty.projectALifeRelations
+        then
+            PNC.Compatibility.ProjectALifePolicy.Dirty = true
+        end
         if PNC.Communities and initialDirty.communities then
             PNC.Communities.Dirty = true
         end
@@ -150,6 +159,9 @@ function Coordinator.Commit(reason)
     ok, why = save("knowledge", PNC.NPCKnowledge)
     if not ok then return failure(why) end
     ok, why = save("factions", PNC.Factions)
+    if not ok then return failure(why) end
+    ok, why = save("projectALifeRelations", PNC.Compatibility
+        and PNC.Compatibility.ProjectALifePolicy)
     if not ok then return failure(why) end
     ok, why = save("communities", PNC.Communities)
     if not ok then return failure(why) end

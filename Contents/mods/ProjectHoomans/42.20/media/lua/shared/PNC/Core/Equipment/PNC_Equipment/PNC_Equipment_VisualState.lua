@@ -210,7 +210,8 @@ function Internal.applyPrimaryInventoryState(item, record)
         )))
     end
     if state.ammoCount ~= nil and item.setCurrentAmmoCount then
-        pcall(item.setCurrentAmmoCount, item, math.max(0, math.floor(tonumber(state.ammoCount) or 0)))
+        item:setCurrentAmmoCount(
+            math.max(0, math.floor(tonumber(state.ammoCount) or 0)))
     end
     return item
 end

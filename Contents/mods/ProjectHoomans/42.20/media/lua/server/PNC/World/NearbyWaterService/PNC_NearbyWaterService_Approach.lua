@@ -26,16 +26,14 @@ end
 function H.CanOccupy(x, y, z)
     local internal = PNC.PathService and PNC.PathService.Internal
     if internal and internal.isSquareWalkable then
-        local ok, walkable = pcall(internal.isSquareWalkable, x, y, z)
-        if ok then return walkable == true end
+        return internal.isSquareWalkable(x, y, z) == true
     end
     local cell = getCell and getCell() or nil
     local square = cell and cell.getGridSquare
         and cell:getGridSquare(math.floor(x), math.floor(y), z) or nil
     if not square then return false end
     if type(square.isFree) == "function" then
-        local ok, free = pcall(square.isFree, square, false)
-        if ok then return free == true end
+        return square:isFree(false) == true
     end
     return true
 end

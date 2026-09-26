@@ -310,8 +310,7 @@ local function cellFor(context)
         return context.cell
     end
     if type(getCell) == "function" then
-        local ok, cell = pcall(getCell)
-        if ok then return cell end
+        return getCell()
     end
     return nil
 end
@@ -373,10 +372,9 @@ function Resolver.ValidateCampfireHint(target, context)
     if not cell or type(cell.getGridSquare) ~= "function" then
         return nil, "campfire_validation_unavailable"
     end
-    local ok
-    ok, square = pcall(cell.getGridSquare, cell,
+    square = cell:getGridSquare(
         math.floor(hint.x), math.floor(hint.y), math.floor(hint.z))
-    if not ok or not square then return nil, "campfire_hint_not_loaded" end
+    if not square then return nil, "campfire_hint_not_loaded" end
     requestedID = raw.campfireID or target.campfireID or target.fireID
     entry = campfireEntryOnSquare(square, requestedID)
     if not entry then return nil, "campfire_hint_stale" end

@@ -60,6 +60,21 @@ function InventoryWindow.Open(npcId, options)
     return window
 end
 
+function InventoryWindow.OpenTrade(npcId, traderID, snapshot, options)
+    options = type(options) == "table" and options or {}
+    local window = getOrCreateWindow()
+    local endpoint = TransferEndpoint.Trade(traderID, {
+        npcID = npcId,
+        snapshot = snapshot,
+        requestSnapshot = options.requestSnapshot,
+        commit = options.commit,
+    })
+    window:setTransferEndpoint(endpoint)
+    window:setConversationMode(nil, nil)
+    window:bringToTop()
+    return window
+end
+
 function InventoryWindow.OpenLocalDraft(draft, options)
     options = type(options) == "table" and options or {}
     local window = getOrCreateWindow()
@@ -116,6 +131,12 @@ function InventoryWindow.OnResult(result)
     then
         composer.ReceiveGiftResult(result)
     end
+end
+
+function InventoryWindow.OnTradeResult(result)
+    local window = InventoryWindow.instance
+    if not window or window.tradeMode ~= true then return false end
+    return window:applyTradeResult(result)
 end
 
 function InventoryWindow.OnColonyStorageResult(result)

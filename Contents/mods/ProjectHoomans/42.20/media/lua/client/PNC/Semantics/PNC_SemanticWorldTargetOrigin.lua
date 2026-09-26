@@ -14,12 +14,12 @@ end
 
 function Origin.NowMs()
     if type(getTimestampMs) == "function" then
-        local ok, value = pcall(getTimestampMs)
-        if ok and number(value) then return number(value) end
+        local value = getTimestampMs()
+        if number(value) then return number(value) end
     end
     if type(getTimeInMillis) == "function" then
-        local ok, value = pcall(getTimeInMillis)
-        if ok and number(value) then return number(value) end
+        local value = getTimeInMillis()
+        if number(value) then return number(value) end
     end
     return 0
 end
@@ -49,8 +49,8 @@ local function liveNPCBody(npcID)
     local key = tostring(npcID or "")
     if key == "" then return nil end
     if registry and type(registry.GetLiveZombie) == "function" then
-        local ok, result = pcall(registry.GetLiveZombie, key)
-        if ok and result then return result end
+        local result = registry.GetLiveZombie(key)
+        if result then return result end
     end
     sync = PNC.ClientPresenceSync
     snapshot = PNC.Network and PNC.Network.ClientState
@@ -74,8 +74,7 @@ function Origin.Resolve(context, options)
     add(liveNPCBody(context.npcID or context.targetID))
     add(context.player)
     if type(getSpecificPlayer) == "function" then
-        local ok, player = pcall(getSpecificPlayer, 0)
-        if ok then add(player) end
+        add(getSpecificPlayer(0))
     end
     for index = 1, #candidates do
         local x, y, z = coordinateSource(candidates[index])

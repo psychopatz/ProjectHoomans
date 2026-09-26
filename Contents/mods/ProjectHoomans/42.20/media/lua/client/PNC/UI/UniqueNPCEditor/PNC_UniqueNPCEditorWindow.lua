@@ -163,27 +163,25 @@ end
 
 local function vanillaTraitOptions()
     local output = {}
-    local ok
-    local traitList
     if not CharacterTraitDefinition
         or not CharacterTraitDefinition.getTraits
     then
         return output
     end
-    ok, traitList = pcall(CharacterTraitDefinition.getTraits)
-    if not ok or not traitList then return output end
+    local traitList = CharacterTraitDefinition.getTraits()
+    if not traitList then return output end
     for index = 0, traitList:size() - 1 do
         local trait = traitList:get(index)
         local traitType
         local traitID
         local label
         if trait then
-            ok, traitType = pcall(trait.getType, trait)
-            if ok and traitType and traitType.getName then
-                ok, traitID = pcall(traitType.getName, traitType)
+            traitType = trait:getType()
+            if traitType and traitType.getName then
+                traitID = traitType:getName()
             end
-            ok, label = pcall(trait.getLabel, trait)
-            if ok and traitID and label then
+            label = trait:getLabel()
+            if traitID and label then
                 output[#output + 1] = {
                     id = tostring(traitID), label = tostring(label),
                 }
@@ -202,8 +200,8 @@ local function appearanceOptions(isFemale)
         { id = "", label = tr("UI_PNC_UniqueNPCEditor_None", "None") },
     }
     if type(getAllHairStyles) ~= "function" then return output end
-    local ok, styles = pcall(getAllHairStyles, isFemale == true)
-    if not ok or not styles then return output end
+    local styles = getAllHairStyles(isFemale == true)
+    if not styles then return output end
     for index = 0, styles:size() - 1 do
         local id = tostring(styles:get(index))
         if id == "" then
@@ -238,8 +236,8 @@ local function beardOptions(isFemale)
         { id = "", label = tr("UI_PNC_UniqueNPCEditor_None", "None") },
     }
     if type(getAllBeardStyles) ~= "function" then return output end
-    local ok, styles = pcall(getAllBeardStyles)
-    if not ok or not styles then return output end
+    local styles = getAllBeardStyles()
+    if not styles then return output end
     for index = 0, styles:size() - 1 do
         local id = tostring(styles:get(index))
         if id ~= "" then

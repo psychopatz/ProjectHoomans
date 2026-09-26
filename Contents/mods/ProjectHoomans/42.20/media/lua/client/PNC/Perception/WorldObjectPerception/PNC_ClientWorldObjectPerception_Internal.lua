@@ -123,26 +123,24 @@ end
 
 local function nowMs()
     if type(getTimestampMs) == "function" then
-        local ok, value = pcall(getTimestampMs)
-        if ok and number(value) then return number(value) end
+        local value = getTimestampMs()
+        if number(value) then return number(value) end
     end
     if type(getTimeInMillis) == "function" then
-        local ok, value = pcall(getTimeInMillis)
-        if ok and number(value) then return number(value) end
+        local value = getTimeInMillis()
+        if number(value) then return number(value) end
     end
     return 0
 end
 
 local function currentPlayer()
     if type(getSpecificPlayer) ~= "function" then return nil end
-    local ok, player = pcall(getSpecificPlayer, 0)
-    return ok and player or nil
+    return getSpecificPlayer(0)
 end
 
 local function currentCell()
     if type(getCell) ~= "function" then return nil end
-    local ok, cell = pcall(getCell)
-    return ok and cell or nil
+    return getCell()
 end
 
 local function objectName(metadata)

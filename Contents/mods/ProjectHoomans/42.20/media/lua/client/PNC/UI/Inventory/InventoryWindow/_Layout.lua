@@ -96,6 +96,28 @@ function ISPNCInventoryWindow:createChildren()
     self.depositStorageButton:instantiate()
     self.depositStorageButton:setVisible(true)
     self:addChild(self.depositStorageButton)
+
+    self.tradeResetButton = ISButton:new(8, 440, 92, 22,
+        tr("UI_PNC_Trading_Reset", "Reset"),
+        self, ISPNCInventoryWindow.onTradeReset)
+    self.tradeResetButton:initialise()
+    self.tradeResetButton:instantiate()
+    self.tradeResetButton:setVisible(false)
+    self:addChild(self.tradeResetButton)
+    self.tradeAcceptButton = ISButton:new(108, 440, 180, 22,
+        tr("UI_PNC_Trading_Accept", "Accept"),
+        self, ISPNCInventoryWindow.onTradeAccept)
+    self.tradeAcceptButton:initialise()
+    self.tradeAcceptButton:instantiate()
+    self.tradeAcceptButton:setVisible(false)
+    self:addChild(self.tradeAcceptButton)
+    self.tradeCancelButton = ISButton:new(316, 440, 180, 22,
+        tr("UI_PNC_Trading_Cancel", "Cancel"),
+        self, ISPNCInventoryWindow.onTradeCancel)
+    self.tradeCancelButton:initialise()
+    self.tradeCancelButton:instantiate()
+    self.tradeCancelButton:setVisible(false)
+    self:addChild(self.tradeCancelButton)
     getTooltipHost().Install(self, getTooltipOptions())
     self:onResponsiveLayout()
     self:applyOpacityStyle()
@@ -107,6 +129,9 @@ function ISPNCInventoryWindow:onResponsiveLayout()
         or not self.playerContainerList or not self.npcContainerList
     then
         return
+    end
+    if self.tradeMode and self.onTradeResponsiveLayout then
+        return self:onTradeResponsiveLayout()
     end
     local titleHeight = self:titleBarHeight()
     local top = titleHeight + 70

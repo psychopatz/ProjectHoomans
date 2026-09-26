@@ -31,44 +31,34 @@ end
 
 local function readVisualColor(humanVisual, methodName)
     local getter
-    local ok
-    local color
     if not humanVisual then
         return nil
     end
     getter = humanVisual[methodName]
-    if not getter then
+    if type(getter) ~= "function" then
         return nil
     end
-    ok, color = pcall(getter, humanVisual)
-    return ok and colorToTable(color) or nil
+    return colorToTable(getter(humanVisual))
 end
 
 local function readVisualString(humanVisual, methodName)
     local getter
-    local ok
-    local value
     if not humanVisual then
         return nil
     end
     getter = humanVisual[methodName]
-    if not getter then
+    if type(getter) ~= "function" then
         return nil
     end
-    ok, value = pcall(getter, humanVisual)
-    return ok and normalizeString(value) or nil
+    return normalizeString(getter(humanVisual))
 end
 
 function Identity.GetCharacterAppearance(character)
-    local humanVisual
     if not character or not character.getHumanVisual then
         return nil
     end
-    local ok
-    ok, humanVisual = pcall(character.getHumanVisual, character)
-    if not ok or not humanVisual then
-        return nil
-    end
+    local humanVisual = character:getHumanVisual()
+    if not humanVisual then return nil end
     return {
         skinTexture = readVisualString(humanVisual, "getSkinTexture"),
         skinColor = readVisualColor(humanVisual, "getSkinColor"),
@@ -127,9 +117,7 @@ function Identity.GenerateResolvedIdentity(source)
         resolvedFemale = resolvedFemale == true
     end
     if desc and desc.setFemale then
-        pcall(function()
-            desc:setFemale(resolvedFemale)
-        end)
+        desc:setFemale(resolvedFemale)
     end
     forename = normalizeString(source and source.forename)
         or normalizeString(survivorOverride.forename)

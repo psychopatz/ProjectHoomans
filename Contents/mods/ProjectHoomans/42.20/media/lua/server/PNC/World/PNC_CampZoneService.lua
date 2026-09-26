@@ -159,8 +159,7 @@ end
 local function cellFor(options)
     if type(options) == "table" and options.cell then return options.cell end
     if type(getCell) == "function" then
-        local ok, cell = pcall(getCell)
-        if ok then return cell end
+        return getCell()
     end
     return nil
 end
@@ -248,14 +247,13 @@ local function scanRoom(zone, room, cell, record)
     local function inspect(square, trustedRoom)
         local provider
         local id
-        local ok
         local matchesRoom
         if not square then return end
         if not trustedRoom and zone.scope == CampSite.SCOPES.ROOM
             and Geometry.MatchesRoom
         then
-            ok, matchesRoom = pcall(Geometry.MatchesRoom, square, zone)
-            if not ok or matchesRoom ~= true then return end
+            matchesRoom = Geometry.MatchesRoom(square, zone)
+            if matchesRoom ~= true then return end
         end
         for index = 1, #providerList do
             id = providerList[index]
@@ -458,7 +456,6 @@ end
 
 local function evaluateNeed(definitions, record, id)
     local definition
-    local ok
     local actionable
     local metadata
     if not definitions or type(definitions.Get) ~= "function"
@@ -468,9 +465,8 @@ local function evaluateNeed(definitions, record, id)
     end
     definition = definitions.Get(id)
     if not definition then return nil end
-    ok, actionable, metadata = pcall(
-        definitions.Evaluate, definition, record, false)
-    if not ok or actionable ~= true then return nil end
+    actionable, metadata = definitions.Evaluate(definition, record, false)
+    if actionable ~= true then return nil end
     metadata = type(metadata) == "table" and metadata or {}
     return {
         id = id,

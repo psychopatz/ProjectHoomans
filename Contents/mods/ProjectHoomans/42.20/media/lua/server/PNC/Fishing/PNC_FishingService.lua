@@ -13,15 +13,8 @@ local Core = PNC.Core or {}
 local Reset = (PNC.Persistence and PNC.Persistence.Reset)
     or require "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset"
 local Internal = Service.Internal or {}
-local GridRegion
-local Zones
-
-do
-    local ok, value = pcall(require, "PsychopatzCore/World/PC_GridRegion")
-    if ok then GridRegion = value end
-    ok, value = pcall(require, "PsychopatzCore/World/PC_ZoneRegistry")
-    if ok then Zones = value end
-end
+local GridRegion = require "PsychopatzCore/World/PC_GridRegion"
+local Zones = require "PsychopatzCore/World/PC_ZoneRegistry"
 
 Service.Internal = Internal
 Internal.GridRegion = GridRegion
@@ -124,8 +117,8 @@ local function normalizeLoaded()
             or Internal.Copy(PNC.Fishing.DEFAULT_LOOT)
         data.zones[zone.id] = zone
         if zone.id ~= key then data.zones[key] = nil end
-        if Zones and Zones.register then
-            pcall(Zones.register, { id = zone.id, ownerType = zone.ownerType,
+        if Zones and type(Zones.register) == "function" then
+            Zones.register({ id = zone.id, ownerType = zone.ownerType,
                 ownerId = zone.ownerId, type = "fishing",
                 subtype = "fishing_zone", geometry = zone.geometry,
                 revision = zone.revision })

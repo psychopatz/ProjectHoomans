@@ -44,6 +44,9 @@ Diagnostics.FollowerPresenceAuditEnabled = false
 Diagnostics.FollowerAbandonmentAuditEnabled = false
 Diagnostics.InventoryAuditEnabled = false
 Diagnostics.NeedsAuditEnabled = false
+-- Zombie pursuit tracing is opt-in because it can emit from both the
+-- authoritative update loop and the multiplayer receive path.
+Diagnostics.ZombieAggroAuditEnabled = false
 -- Firearm tracing is opt-in. It is intentionally disabled on a normal load
 -- because it assembles per-shot fields and can produce substantial console
 -- traffic during firefights.
@@ -61,6 +64,7 @@ local FOLLOWER_ABANDONMENT_AUDIT_SETTING_ID =
     "ProjectHoomans.FollowerAbandonmentAudit"
 local INVENTORY_AUDIT_SETTING_ID = "ProjectHoomans.InventoryAudit"
 local NEEDS_AUDIT_SETTING_ID = "ProjectHoomans.NeedsAudit"
+local ZOMBIE_AGGRO_AUDIT_SETTING_ID = "ProjectHoomans.ZombieAggroAudit"
 local function initializeCentralDebugSettings()
     local settings = PsychopatzCore and PsychopatzCore.DebugSettings
     if not settings or type(settings.Register) ~= "function" then
@@ -169,12 +173,24 @@ local function initializeCentralDebugSettings()
             Diagnostics.NeedsAuditEnabled = enabled == true
         end,
     })
+    settings.Register({
+        id = ZOMBIE_AGGRO_AUDIT_SETTING_ID,
+        source = "Project Hoomans",
+        order = 140,
+        title = "Zombie aggro audit",
+        description = "Logs zombie target selection, pursuit, bites, and multiplayer directives.",
+        defaultEnabled = false,
+        runtimeMutable = true,
+        apply = function(enabled)
+            Diagnostics.ZombieAggroAuditEnabled = enabled == true
+        end,
+    })
     Diagnostics.Enabled = settings.IsEnabled(PERFORMANCE_SETTING_ID) == true
     Diagnostics.TimingEnabled = Diagnostics.Enabled
         and Diagnostics.TimingEnabled ~= false
     Diagnostics.RuntimeLogEnabled = Diagnostics.Enabled
         and Diagnostics.RuntimeLogEnabled ~= false
-    -- The registry applies these two cheap diagnostic gates at startup or
+    -- The registry applies these cheap diagnostic gates at startup or
     -- after an explicit Debug Settings Apply action. Direct callers can still
     -- use SetSeatingAuditEnabled as a temporary emergency runtime override.
     Diagnostics.SeatingAuditEnabled = settings.IsEnabled(
@@ -191,6 +207,8 @@ local function initializeCentralDebugSettings()
         INVENTORY_AUDIT_SETTING_ID) == true
     Diagnostics.NeedsAuditEnabled = settings.IsEnabled(
         NEEDS_AUDIT_SETTING_ID) == true
+    Diagnostics.ZombieAggroAuditEnabled = settings.IsEnabled(
+        ZOMBIE_AGGRO_AUDIT_SETTING_ID) == true
 end
 
 initializeCentralDebugSettings()
@@ -431,6 +449,22 @@ function Diagnostics.IsNeedsAuditEnabled()
     return Diagnostics.NeedsAuditEnabled == true
 end
 
+function Diagnostics.SetZombieAggroAuditEnabled(enabled)
+    Diagnostics.ZombieAggroAuditEnabled = enabled == true
+    if Diagnostics.ZombieAggroAuditEnabled == true then
+        if PNC.Core and PNC.Core.LogInfo then
+            PNC.Core.LogInfo("ZombieAggro.audit event=enabled")
+        else
+            print("[PNC][INFO] ZombieAggro.audit event=enabled")
+        end
+    end
+    return Diagnostics.ZombieAggroAuditEnabled
+end
+
+function Diagnostics.IsZombieAggroAuditEnabled()
+    return Diagnostics.ZombieAggroAuditEnabled == true
+end
+
 function Diagnostics.SetFirearmAuditEnabled(enabled)
     Diagnostics.FirearmAuditEnabled = enabled == true
     if Diagnostics.FirearmAuditEnabled == true then
@@ -500,6 +534,27 @@ function Diagnostics.LogSleepAudit(eventName, fields)
     local message
     if Diagnostics.SleepAuditEnabled ~= true then return false end
     output = { "sleep_audit", "event=" .. tostring(eventName or "unknown") }
+    for _, field in ipairs(fields or {}) do
+        output[#output + 1] = tostring(field)
+    end
+    message = table.concat(output, " ")
+    if PNC.Core and PNC.Core.LogInfo then
+        PNC.Core.LogInfo(message)
+    else
+        print("[PNC][INFO] " .. message)
+    end
+    return true
+end
+
+-- Zombie aggro uses the existing ZombieAggro.* prefixes so server, single
+-- player, and multiplayer captures remain searchable with the old filters.
+-- Callers should avoid assembling expensive detail fields while disabled;
+-- this helper also gates direct callers for isolated tests and compatibility.
+function Diagnostics.LogZombieAggroAudit(channel, fields)
+    local output
+    local message
+    if Diagnostics.ZombieAggroAuditEnabled ~= true then return false end
+    output = { "ZombieAggro." .. tostring(channel or "pursuit") }
     for _, field in ipairs(fields or {}) do
         output[#output + 1] = tostring(field)
     end

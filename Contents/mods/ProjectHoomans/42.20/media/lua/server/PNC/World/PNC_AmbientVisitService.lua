@@ -11,6 +11,8 @@ PNC.AmbientVisitService = PNC.AmbientVisitService or {}
 local Service = PNC.AmbientVisitService
 local Const = PNC.Const or {}
 local Core = PNC.Core
+local Zones = require "PsychopatzCore/World/PC_ZoneRegistry"
+local GridRegion = require "PsychopatzCore/World/PC_GridRegion"
 
 Service.VERSION = 1
 Service.DEFAULT_DURATION_HOURS = 4
@@ -64,13 +66,12 @@ end
 
 local function worldHours(value)
     local gameTime
-    local ok
     local result
     if value ~= nil then return number(value, 0) end
     gameTime = type(getGameTime) == "function" and getGameTime() or nil
     if gameTime and type(gameTime.getWorldAgeHours) == "function" then
-        ok, result = pcall(gameTime.getWorldAgeHours, gameTime)
-        if ok and number(result) ~= nil then return number(result) end
+        result = gameTime:getWorldAgeHours()
+        if number(result) ~= nil then return number(result) end
     end
     return 0
 end
@@ -94,13 +95,12 @@ end
 
 local function liveBody(record)
     local registry = PNC.Registry
-    local ok
     local body
     if not registry or type(registry.GetLiveZombie) ~= "function" then
         return nil
     end
-    ok, body = pcall(registry.GetLiveZombie, record and record.id)
-    if not ok or not body then return nil end
+    body = registry.GetLiveZombie(record and record.id)
+    if not body then return nil end
     if type(body.isDead) == "function" and body:isDead() then return nil end
     return body
 end
@@ -475,26 +475,21 @@ local function activePlayerBase(player)
 end
 
 local function baseZone(base)
-    local ok
-    local zones
     local zone
-    local grid
     if not base or not base.baseZoneId then
         return nil, "visitor_base_zone_missing"
     end
-    ok, zones = pcall(require, "PsychopatzCore/World/PC_ZoneRegistry")
-    if not ok or not zones or type(zones.get) ~= "function" then
+    if type(Zones.get) ~= "function" then
         return nil, "visitor_base_zone_unavailable"
     end
-    zone = zones.get(base.baseZoneId)
+    zone = Zones.get(base.baseZoneId)
     if not zone or type(zone.geometry) ~= "table" then
         return nil, "visitor_base_zone_missing"
     end
-    ok, grid = pcall(require, "PsychopatzCore/World/PC_GridRegion")
-    if not ok or not grid or type(grid.containsXY) ~= "function" then
+    if type(GridRegion.containsXY) ~= "function" then
         return nil, "visitor_base_geometry_unavailable"
     end
-    return { base = base, zone = zone, grid = grid }
+    return { base = base, zone = zone, grid = GridRegion }
 end
 
 local function pointInBase(baseContext, x, y)

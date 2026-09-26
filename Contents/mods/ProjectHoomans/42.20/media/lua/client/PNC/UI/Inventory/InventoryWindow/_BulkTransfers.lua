@@ -4,6 +4,7 @@ local Helpers = require "PNC/UI/Inventory/InventoryWindow/_Helpers"
 local tr = Helpers.tr
 
 function ISPNCInventoryWindow:onDepositAllStorage()
+    if self.tradeMode then return false end
     if not self.npcId then return false end
     if #InventoryWindow.CollectBulkTransferIDs(self.npcList) < 1 then
         self.statusText = tr("UI_PNC_Storage_NoCourierItems",
@@ -37,6 +38,7 @@ function InventoryWindow.CollectBulkTransferIDs(list)
 end
 
 function ISPNCInventoryWindow:onGiveAll()
+    if self.tradeMode then return false end
     local ok
     local reason
     local details
@@ -73,6 +75,7 @@ function ISPNCInventoryWindow:onGiveAll()
 end
 
 function ISPNCInventoryWindow:onTakeAll()
+    if self.tradeMode then return false end
     if self.readOnly then return false end
     if self.giftMode then
         self.statusText = "Gift mode: taking items is disabled"

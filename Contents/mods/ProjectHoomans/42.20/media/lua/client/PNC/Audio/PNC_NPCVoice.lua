@@ -56,8 +56,7 @@ local function getGender(snapshot, body)
         return snapshot.isFemale == true
     end
     if body and body.isFemale then
-        local ok, value = pcall(body.isFemale, body)
-        if ok then return value == true end
+        return body:isFemale() == true
     end
     return false
 end
@@ -67,8 +66,8 @@ local function getSeed(snapshot, body)
     local fallback
     fallback = snapshot and snapshot.id or nil
     if fallback == nil and body and body.getModData then
-        local ok, modData = pcall(body.getModData, body)
-        if ok and modData then
+        local modData = body:getModData()
+        if modData then
             fallback = modData.PNC_UUID
         end
     end
@@ -84,20 +83,16 @@ local function readStyle(style)
     local name
     if not style then return nil end
     if style.getPrefix then
-        local ok, value = pcall(style.getPrefix, style)
-        if ok then prefix = value end
+        prefix = style:getPrefix()
     end
     if style.getVoiceType then
-        local ok, value = pcall(style.getVoiceType, style)
-        if ok then voiceType = value end
+        voiceType = style:getVoiceType()
     end
     if style.getBodyTypeDefault then
-        local ok, value = pcall(style.getBodyTypeDefault, style)
-        if ok then bodyTypeDefault = value end
+        bodyTypeDefault = style:getBodyTypeDefault()
     end
     if style.getName then
-        local ok, value = pcall(style.getName, style)
-        if ok then name = value end
+        name = style:getName()
     end
     if not prefix or prefix == "" then return nil end
     return {
@@ -117,27 +112,18 @@ local function getStyles(isFemale)
     local wantedPrefix = isFemale and "VoiceFemale" or "VoiceMale"
     local wantedBodyType = isFemale and 1 or 2
     if getAllVoiceStyles then
-        local ok, value = pcall(getAllVoiceStyles)
-        if ok then styles = value end
+        styles = getAllVoiceStyles()
     end
     if styles and styles.size and styles.get then
-        local ok, size = pcall(styles.size, styles)
-        if ok then
-            local i
-            for i = 0, (tonumber(size) or 0) - 1 do
-                local gotStyle
-                local style
-                gotStyle, style = pcall(styles.get, styles, i)
-                if gotStyle then
-                    style = readStyle(style)
-                    if style and (
-                        style.bodyTypeDefault == wantedBodyType
-                        or style.bodyTypeDefault == 0
-                            and style.prefix == wantedPrefix
-                    ) then
-                        result[#result + 1] = style
-                    end
-                end
+        local i
+        for i = 0, styles:size() - 1 do
+            local style = readStyle(styles:get(i))
+            if style and (
+                style.bodyTypeDefault == wantedBodyType
+                or style.bodyTypeDefault == 0
+                    and style.prefix == wantedPrefix
+            ) then
+                result[#result + 1] = style
             end
         end
     end
@@ -327,8 +313,8 @@ local function playAt(snapshot, sound, mode, options)
     y = math.floor(tonumber(snapshot.y) or 0)
     z = math.floor(tonumber(snapshot.z) or 0)
     if not alias or not getWorld then return 0, profile end
-    ok, world = pcall(getWorld)
-    if not ok or not world or not world.getFreeEmitter then
+    world = getWorld()
+    if not world or not world.getFreeEmitter then
         return 0, profile
     end
     ok, emitter = pcall(
@@ -354,15 +340,9 @@ local function playAt(snapshot, sound, mode, options)
         local square
         local cell
         if world.getCell then
-            ok, cell = pcall(world.getCell, world)
-            if ok and cell and cell.getGridSquare then
-                ok, square = pcall(
-                    cell.getGridSquare,
-                    cell,
-                    x,
-                    y,
-                    z
-                )
+            cell = world:getCell()
+            if cell and cell.getGridSquare then
+                square = cell:getGridSquare(x, y, z)
             end
         end
         if not square then return 0, profile end

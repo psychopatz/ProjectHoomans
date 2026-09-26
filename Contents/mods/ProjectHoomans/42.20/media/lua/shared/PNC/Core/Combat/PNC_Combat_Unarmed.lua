@@ -93,7 +93,7 @@ function Unarmed.ApplyZombieShove(attackerZombie, targetZombie, options)
         targetZombie:setHitForce(1.08)
     end
     if targetZombie.setStaggerBack then
-        pcall(targetZombie.setStaggerBack, targetZombie, true)
+        targetZombie:setStaggerBack(true)
     end
     return true
 end

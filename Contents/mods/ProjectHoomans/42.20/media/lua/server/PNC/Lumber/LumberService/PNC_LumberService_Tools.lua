@@ -58,8 +58,7 @@ local function ensureCanonicalLumberTool(record)
             and PNC.Inventory
             and type(PNC.Inventory.EquipPrimary) == "function"
         then
-            pcall(PNC.Inventory.EquipPrimary, record, item.id,
-                "lumber_tool_select")
+            PNC.Inventory.EquipPrimary(record, item.id, "lumber_tool_select")
         end
         return item
     end
@@ -72,8 +71,7 @@ local function ensureCanonicalLumberTool(record)
         and PNC.Inventory
         and type(PNC.Inventory.SyncFromEquipment) == "function"
     then
-        pcall(PNC.Inventory.SyncFromEquipment, record,
-            "lumber_tool_inventory_sync")
+        PNC.Inventory.SyncFromEquipment(record, "lumber_tool_inventory_sync")
         return findCanonicalLumberTool(record)
     end
     return nil
@@ -120,27 +118,23 @@ local function readLivePrimary(body)
     if not body or type(body.getPrimaryHandItem) ~= "function" then
         return nil
     end
-    local ok, item = pcall(body.getPrimaryHandItem, body)
-    return ok and item or nil
+    return body:getPrimaryHandItem()
 end
 
 local function inspectLiveTool(item)
     if not item then return nil, "lumber_tool_missing" end
     local broken = false
     if type(item.isBroken) == "function" then
-        local ok, value = pcall(item.isBroken, item)
-        broken = ok and value == true
+        broken = item:isBroken() == true
     end
     if broken then return nil, "lumber_tool_broken" end
     local tagged = false
     if ItemTag and type(item.hasTag) == "function" then
-        local ok, value = pcall(item.hasTag, item, ItemTag.CHOP_TREE)
-        tagged = ok and value == true
+        tagged = item:hasTag(ItemTag.CHOP_TREE) == true
     end
     local damage
     if type(item.getTreeDamage) == "function" then
-        local ok, value = pcall(item.getTreeDamage, item)
-        if ok then damage = tonumber(value) end
+        damage = tonumber(item:getTreeDamage())
     end
     if not tagged and not damage then return nil, "tool_cannot_chop" end
     return { item = item, canChop = true, treeDamage = math.max(1, damage or 10) }
@@ -157,9 +151,8 @@ local function findLiveInventoryTool(body)
     then
         return nil, "physical_inventory_unavailable"
     end
-    local ok
-    ok, container = pcall(body.getInventory, body)
-    if not ok or not container then
+    container = body:getInventory()
+    if not container then
         return nil, "physical_inventory_unavailable"
     end
     physical = CoreInventory.wrapPhysicalInventory(container, {
@@ -181,7 +174,6 @@ end
 local function addLiveItemToInventory(body, item)
     local container
     local physical
-    local ok
     local added
     if not body or not item or type(body.getInventory) ~= "function"
         or not CoreInventory
@@ -189,18 +181,18 @@ local function addLiveItemToInventory(body, item)
     then
         return nil, "physical_inventory_unavailable"
     end
-    ok, container = pcall(body.getInventory, body)
-    if not ok or not container then
+    container = body:getInventory()
+    if not container then
         return nil, "physical_inventory_unavailable"
     end
-    ok, physical = pcall(CoreInventory.wrapPhysicalInventory, container, {
+    physical = CoreInventory.wrapPhysicalInventory(container, {
         recursive = true, syncOnMutation = true,
     })
-    if not ok or not physical or type(physical.add) ~= "function" then
+    if not physical or type(physical.add) ~= "function" then
         return nil, "physical_inventory_unavailable"
     end
-    ok, added = pcall(physical.add, physical, item)
-    if ok and added ~= false then
+    added = physical:add(item)
+    if added ~= false then
         return type(added) == "table" and added[1] or item
     end
 
@@ -208,8 +200,8 @@ local function addLiveItemToInventory(body, item)
     -- codec cannot inspect a freshly-created weapon. The live body still
     -- owns the exact item, and the next physical query verifies it.
     if type(container.AddItem) == "function" then
-        local nativeOK, nativeAdded = pcall(container.AddItem, container, item)
-        if nativeOK and nativeAdded ~= false then
+        local nativeAdded = container:AddItem(item)
+        if nativeAdded ~= false then
             return nativeAdded or item
         end
     end
@@ -220,26 +212,17 @@ local function equipLiveTool(body, item)
     if not body or not item or type(body.setPrimaryHandItem) ~= "function" then
         return nil, "lumber_tool_equip_unavailable"
     end
-    local ok, result = pcall(body.setPrimaryHandItem, body, item)
-    if not ok or result == false then
-        return nil, "lumber_tool_equip_failed"
-    end
+    body:setPrimaryHandItem(item)
 
     local bothHands = false
     if type(item.isRequiresEquippedBothHands) == "function" then
-        local handsOK, requiresBoth = pcall(
-            item.isRequiresEquippedBothHands, item)
-        bothHands = handsOK and requiresBoth == true
+        bothHands = item:isRequiresEquippedBothHands() == true
     end
     if bothHands and type(body.setSecondaryHandItem) ~= "function" then
         return nil, "lumber_tool_secondary_equip_unavailable"
     end
     if bothHands and type(body.setSecondaryHandItem) == "function" then
-        local secondaryOK, secondaryResult = pcall(
-            body.setSecondaryHandItem, body, item)
-        if not secondaryOK or secondaryResult == false then
-            return nil, "lumber_tool_secondary_equip_failed"
-        end
+        body:setSecondaryHandItem(item)
     end
 
     local equipped = inspectLiveTool(readLivePrimary(body))
@@ -271,24 +254,21 @@ local function materializeLiveTool(record, body)
     if canonical and canonical.id and PNC.Inventory
         and type(PNC.Inventory.MaterializeItem) == "function"
     then
-        local materializeOK = pcall(
-            PNC.Inventory.MaterializeItem, record, body, canonical.id)
-        if materializeOK then
-            local inventoryTool = findLiveInventoryTool(body)
-            if inventoryTool then return inventoryTool.item end
-        end
+        PNC.Inventory.MaterializeItem(record, body, canonical.id)
+        local inventoryTool = findLiveInventoryTool(body)
+        if inventoryTool then return inventoryTool.item end
     end
 
     if not equipment or type(equipment.CreateItem) ~= "function" then
         return nil, "lumber_tool_materialization_unavailable"
     end
-    local ok, item, reason = pcall(equipment.CreateItem, fullType)
-    if not ok or not item then
+    local item, reason = equipment.CreateItem(fullType)
+    if not item then
         return nil, "lumber_tool_materialize_failed:" .. tostring(reason)
     end
     local internal = equipment.Internal
     if internal and type(internal.applyPrimaryInventoryState) == "function" then
-        pcall(internal.applyPrimaryInventoryState, item, record)
+        internal.applyPrimaryInventoryState(item, record)
     end
     local added, addReason = addLiveItemToInventory(body, item)
     if not added then return nil, addReason end
@@ -330,7 +310,7 @@ local function resolveLiveTool(record, body)
         or equipment and type(equipment.ApplyHands) == "function"
         and equipment.ApplyHands or nil
     if ensureHands then
-        pcall(ensureHands, body, record)
+        ensureHands(body, record)
         item = readLivePrimary(body)
         tool, reason = inspectLiveTool(item)
         if tool then
@@ -362,8 +342,8 @@ end
 
 local function toolFullType(item)
     if not item or type(item.getFullType) ~= "function" then return nil end
-    local ok, fullType = pcall(item.getFullType, item)
-    return ok and fullType and tostring(fullType) or nil
+    local fullType = item:getFullType()
+    return fullType and tostring(fullType) or nil
 end
 
 local function requiredToolTypes()
@@ -404,8 +384,7 @@ local function toolDiagnostic(record, body)
             diagnostic.selectedFullType = diagnostic.livePrimaryFullType
             diagnostic.treeDamage = liveTool.treeDamage
             if type(liveItem.getCondition) == "function" then
-                local ok, condition = pcall(liveItem.getCondition, liveItem)
-                if ok then diagnostic.condition = tonumber(condition) end
+                diagnostic.condition = tonumber(liveItem:getCondition())
             end
             return diagnostic
         end
@@ -420,9 +399,7 @@ local function toolDiagnostic(record, body)
         diagnostic.selectedFullType = toolFullType(inventoryTool.item)
         diagnostic.treeDamage = inventoryTool.treeDamage
         if type(inventoryTool.item.getCondition) == "function" then
-            local ok, condition = pcall(
-                inventoryTool.item.getCondition, inventoryTool.item)
-            if ok then diagnostic.condition = tonumber(condition) end
+            diagnostic.condition = tonumber(inventoryTool.item:getCondition())
         end
         return diagnostic
     end
@@ -461,20 +438,19 @@ local function persistLiveToolCondition(record, item)
         and inventory.equipped.primary or nil
     local state = itemID and inventory.items and inventory.items[itemID] or nil
     if not state or type(item.getCondition) ~= "function" then return end
-    local ok, condition = pcall(item.getCondition, item)
-    condition = ok and tonumber(condition) or nil
+    local condition = tonumber(item:getCondition())
     if condition == nil or tonumber(state.cond) == condition then return end
     state.cond = condition
     if PNC.Registry and type(PNC.Registry.MarkDirty) == "function" then
-        pcall(PNC.Registry.MarkDirty, record, "lumber_tool_wear")
+        PNC.Registry.MarkDirty(record, "lumber_tool_wear")
     end
 end
 
 local function skillRate(record)
     local level = 0
     if PNC.Skills and type(PNC.Skills.GetLevel) == "function" then
-        local ok, value = pcall(PNC.Skills.GetLevel, record, "Axe")
-        if ok then level = math.max(0, tonumber(value) or 0) end
+        local value = PNC.Skills.GetLevel(record, "Axe")
+        level = math.max(0, tonumber(value) or 0)
     end
     return 1 + math.min(0.75, level * 0.05)
 end

@@ -16,8 +16,7 @@ local function itemFullType(item)
     local direct = tostring(item and (item.fullType or item.type) or "")
     if direct ~= "" then return direct end
     if item and type(item.getFullType) == "function" then
-        local ok, fullType = pcall(item.getFullType, item)
-        fullType = ok and tostring(fullType or "") or ""
+        local fullType = tostring(item:getFullType() or "")
         if fullType ~= "" then return fullType end
     end
     return nil

@@ -119,8 +119,8 @@ end
 local function runtimeNow(fallback)
     if number(fallback) ~= nil then return number(fallback) end
     if Core and type(Core.Now) == "function" then
-        local ok, value = pcall(Core.Now)
-        if ok and number(value) ~= nil then return number(value) end
+        local value = Core.Now()
+        if number(value) ~= nil then return number(value) end
     end
     return 0
 end
@@ -128,13 +128,13 @@ end
 local function playerKey(player)
     local value
     if player and type(player.getOnlineID) == "function" then
-        local ok, onlineID = pcall(player.getOnlineID, player)
-        if ok and onlineID ~= nil then value = tostring(onlineID) end
+        local onlineID = player:getOnlineID()
+        if onlineID ~= nil then value = tostring(onlineID) end
     end
     if value and value ~= "" then return value end
     if player and type(player.getUsername) == "function" then
-        local ok, username = pcall(player.getUsername, player)
-        if ok and username ~= nil and tostring(username) ~= "" then
+        local username = player:getUsername()
+        if username ~= nil and tostring(username) ~= "" then
             return tostring(username)
         end
     end
@@ -144,8 +144,7 @@ end
 local function recordFor(npcID)
     local registry = PNC.Registry
     if not registry or type(registry.Get) ~= "function" then return nil end
-    local ok, record = pcall(registry.Get, npcID)
-    return ok and record or nil
+    return registry.Get(npcID)
 end
 
 local function liveBody(record)
@@ -153,8 +152,8 @@ local function liveBody(record)
     if not registry or type(registry.GetLiveZombie) ~= "function" then
         return nil
     end
-    local ok, body = pcall(registry.GetLiveZombie, record and record.id)
-    if not ok or not body then return nil end
+    local body = registry.GetLiveZombie(record and record.id)
+    if not body then return nil end
     if body.isDead and body:isDead() then return nil end
     return body
 end
@@ -222,8 +221,8 @@ local function reached(zone, body, record)
         local geometry = PNC.Semantics
             and PNC.Semantics.CampSiteGeometry or nil
         if square and geometry and type(geometry.MatchesRoom) == "function" then
-            local ok, matched = pcall(geometry.MatchesRoom, square, zone)
-            if ok and matched == true then return true end
+            local matched = geometry.MatchesRoom(square, zone)
+            if matched == true then return true end
         end
         if boundsContain(zone and zone.roomBounds, x, y, z) then
             return true
@@ -244,8 +243,7 @@ local function movementState(record, body, at)
     local pathService = PNC.PathService
     local getter = pathService and pathService.GetMovementRecoveryState
     if type(getter) ~= "function" then return nil end
-    local ok, state = pcall(getter, record, body, at)
-    return ok and state or nil
+    return getter(record, body, at)
 end
 
 local function buildOrder(session, entry, record, placementState)
@@ -253,7 +251,6 @@ local function buildOrder(session, entry, record, placementState)
     local definition = commands and type(commands.Get) == "function"
         and commands.Get("camp") or nil
     local options
-    local ok
     local order
     if not definition or type(definition.buildOrder) ~= "function" then
         return nil, "camp_definition_unavailable"
@@ -275,9 +272,9 @@ local function buildOrder(session, entry, record, placementState)
         placementCampID = session.id,
         placementIndex = entry.index,
     }
-    ok, order = pcall(definition.buildOrder, record, nil, options)
-    if not ok or type(order) ~= "table" then
-        return nil, ok and "invalid_camp_order" or tostring(order)
+    order = definition.buildOrder(record, nil, options)
+    if type(order) ~= "table" then
+        return nil, "invalid_camp_order"
     end
     return order
 end
@@ -309,8 +306,6 @@ local function setRecordOrder(session, entry, record, state, at, reason)
     local orderSystem = PNC.OrderSystem
     local network = PNC.Network
     local order
-    local previousPlacement
-    local ok
     local errorMessage
     if not record or not orderSystem
         or type(orderSystem.SetOrder) ~= "function"
@@ -320,13 +315,8 @@ local function setRecordOrder(session, entry, record, state, at, reason)
     order, errorMessage = buildOrder(session, entry, record, state)
     if not order then return false, errorMessage end
     record.runtime = record.runtime or {}
-    previousPlacement = record.runtime.campPlacement
     writePlacementRuntime(record, session, entry, state, at, reason)
-    ok, errorMessage = pcall(orderSystem.SetOrder, record, order)
-    if not ok then
-        record.runtime.campPlacement = previousPlacement
-        return false, tostring(errorMessage)
-    end
+    orderSystem.SetOrder(record, order)
     record.runtime.lastCompanionCommand = "camp"
     record.runtime.lastCompanionCommandAt = at
     record.runtime.lastCompanionCommandRevision =

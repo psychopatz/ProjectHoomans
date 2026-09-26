@@ -42,8 +42,8 @@ local function placeDirectWorkstation(facility)
     if type(getCell) ~= "function" then
         return false, "WORKSTATION_WORLD_UNAVAILABLE"
     end
-    local cellOk, cell = pcall(getCell)
-    local square = cellOk and cell and cell.getGridSquare
+    local cell = getCell()
+    local square = cell and cell.getGridSquare
         and cell:getGridSquare(tonumber(placement.x) or 0,
             tonumber(placement.y) or 0, tonumber(placement.z) or 0) or nil
     if not square or type(square.addWorkstationEntity) ~= "function" then

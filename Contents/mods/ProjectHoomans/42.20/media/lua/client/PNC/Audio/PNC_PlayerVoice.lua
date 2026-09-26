@@ -25,8 +25,8 @@ end
 
 local function currentPlayer()
     if getSpecificPlayer then
-        local ok, player = pcall(getSpecificPlayer, 0)
-        if ok and player then return player end
+        local player = getSpecificPlayer(0)
+        if player then return player end
     end
     if getPlayer then
         local ok, player = pcall(getPlayer)

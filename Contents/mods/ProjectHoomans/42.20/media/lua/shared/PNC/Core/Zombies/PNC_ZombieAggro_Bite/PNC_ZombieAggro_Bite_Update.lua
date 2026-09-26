@@ -66,6 +66,7 @@ function ZombieAggro.UpdateBiteState(zombie, now)
     local record
     local npcBody
     local releaseReason
+    local actionState
     if not zombie then return false end
     zombieId = AggroInternal.ensureZombieID(zombie)
     entry = BiteInternal.GetBiteEntry(zombieId)
@@ -79,6 +80,25 @@ function ZombieAggro.UpdateBiteState(zombie, now)
     end
     if entry.phase == "release" then
         updateRelease(zombieId, entry, record, zombie, now)
+        return true
+    end
+    actionState = BiteInternal.ActionState(zombie)
+    if actionState == "staggerback" then
+        if ZombieAggro.LogPursuitDiagnostic then
+            ZombieAggro.LogPursuitDiagnostic(
+                zombie,
+                entry.npcId,
+                "bite",
+                "bite_interrupted_by_hit",
+                "phase=" .. tostring(entry.phase)
+                    .. " damageApplied="
+                    .. tostring(entry.appliedDamage == true),
+                now
+            )
+        end
+        BiteInternal.BeginRelease(
+            zombieId, npcBody, "attacker_hit_staggerback", now
+        )
         return true
     end
     releaseReason = shouldReleaseActiveBite(zombie, npcBody, record)

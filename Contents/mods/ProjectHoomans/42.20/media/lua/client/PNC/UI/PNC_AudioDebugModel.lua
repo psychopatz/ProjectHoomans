@@ -143,8 +143,7 @@ function Model.GetVoiceStyles()
     local styles = {}
     local raw = nil
     if getAllVoiceStyles then
-        local ok, value = pcall(getAllVoiceStyles)
-        if ok then raw = value end
+        raw = getAllVoiceStyles()
     end
     for _, style in ipairs(listValues(raw)) do
         local value = readStyle(style)
@@ -206,8 +205,8 @@ function Model.GetCurrentPlayer()
         if player then return player end
     end
     if getSpecificPlayer then
-        local ok, player = pcall(getSpecificPlayer, 0)
-        if ok and player then return player end
+        local player = getSpecificPlayer(0)
+        if player then return player end
     end
     return nil
 end

@@ -6,6 +6,7 @@ local tr = Helpers.tr
 local mouseInside = Helpers.mouseInside
 
 function ISPNCInventoryWindow:beginInventoryDrag(role, row)
+    if self.tradeMode then return false end
     if self.readOnly then
         self.statusText = tr("UI_PNC_Storage_ReadOnlyAway",
             "Read only: enter the base to move stockpile items")
@@ -26,6 +27,7 @@ function ISPNCInventoryWindow:sendTransfer(
     destinationOverride,
     quantity
 )
+    if self.tradeMode then return false end
     local endpoint = self.transferEndpoint
     local selection
     if self.readOnly or not endpoint or not row or row.restricted == true then
@@ -53,6 +55,7 @@ function ISPNCInventoryWindow:requestTransfer(
     row,
     destinationOverride
 )
+    if self.tradeMode then return false end
     local maximum = Model.GetRowQuantity(row)
     if self.readOnly or not row or row.restricted == true then return false end
     if self.giftMode and direction ~= "player_to_npc" then
@@ -79,6 +82,7 @@ function ISPNCInventoryWindow:requestTransfer(
 end
 
 function ISPNCInventoryWindow:acceptVanillaItems(items)
+    if self.tradeMode then return false end
     local player = getSpecificPlayer and getSpecificPlayer(0)
         or getPlayer and getPlayer() or nil
     if self.readOnly then return false end
@@ -109,6 +113,10 @@ function ISPNCInventoryWindow:acceptVanillaItems(items)
 end
 
 function ISPNCInventoryWindow:completeInventoryDrop(targetRole)
+    if self.tradeMode then
+        self.dragState = nil
+        return false
+    end
     if self.readOnly then
         self.dragState = nil
         return false
@@ -145,6 +153,10 @@ function ISPNCInventoryWindow:completeInventoryDrop(targetRole)
 end
 
 function ISPNCInventoryWindow:completeInventoryDropAtMouse()
+    if self.tradeMode then
+        self.dragState = nil
+        return false
+    end
     if self.readOnly then
         self.dragState = nil
         return false
