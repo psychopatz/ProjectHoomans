@@ -13,6 +13,94 @@ local Diagnostics = PNC.PerformanceScalingDiagnostics
 local SCAN_MS = Internal.SCAN_MS
 local VALIDATE_MS = Internal.VALIDATE_MS
 
+local function publishZombieGroupAlert(record, target, now)
+    local zombie
+    if not target or target.kind ~= "zombie"
+        or not PNC.Perception
+        or not PNC.Perception.PublishZombieGroupAlert
+        or not PNC.Perception.FindZombieByID
+    then
+        return
+    end
+    zombie = PNC.Perception.FindZombieByID(target.zombieId)
+    if zombie and not zombie:isDead() then
+        PNC.Perception.PublishZombieGroupAlert(record, zombie, now)
+    end
+end
+
+local function auditDecision(eventName, record, zombie, target, reason)
+    local runtime
+    local state
+    local now
+    local key
+    if not Diagnostics or Diagnostics.NPCThreatAuditEnabled ~= true
+        or not Diagnostics.LogNPCThreatAudit or not record
+    then
+        return
+    end
+    runtime = record.runtime or {}
+    record.runtime = runtime
+    state = runtime.npcThreatAudit or {}
+    runtime.npcThreatAudit = state
+    now = PNC.Core and PNC.Core.Now and PNC.Core.Now() or 0
+    key = tostring(eventName or "decision") .. "|"
+        .. tostring(reason or "") .. "|"
+        .. tostring(target and target.kind or "none") .. "|"
+        .. tostring(target and (target.zombieId or target.id) or "")
+    if state.key == key and now - (tonumber(state.at) or 0) < 500 then
+        return
+    end
+    state.key = key
+    state.at = now
+    Diagnostics.LogNPCThreatAudit(eventName, {
+        "authority=" .. tostring(PNC.Core and PNC.Core.IsAuthority
+            and PNC.Core.IsAuthority() or "unknown"),
+        "npc=" .. tostring(record.id or ""),
+        "behavior=" .. tostring(record.activeBehavior or ""),
+        "targetKind=" .. tostring(target and target.kind or ""),
+        "targetId=" .. tostring(target
+            and (target.zombieId or target.id or target.onlineID) or ""),
+        "distance=" .. tostring(target and target.distSq
+            and math.sqrt(tonumber(target.distSq) or 0) or ""),
+        "visible=" .. tostring(target and target.visible == true),
+        "proximityAlert=" .. tostring(target
+            and target.proximityAlert == true),
+        "alertOnly=" .. tostring(target and target.alertOnly == true),
+        "threatening=" .. tostring(target and target.threatening == true),
+        "nativeTarget=" .. tostring(zombie and zombie.getTarget
+            and zombie:getTarget() ~= nil or false),
+        "action=" .. tostring(zombie and zombie.getActionStateName
+            and zombie:getActionStateName() or ""),
+        "pathPhase=" .. tostring(record.runtime
+            and record.runtime.pathing and record.runtime.pathing.phase or ""),
+        "reason=" .. tostring(reason or ""),
+    })
+end
+
+local function retainableTarget(target, now, threatContext)
+    local retainMs
+    local dx
+    local dy
+    if not target or target.kind ~= "zombie" then return false end
+    retainMs = tonumber(Const.THREAT_GUARD_TARGET_RETAIN_MS) or 3500
+    if now - (tonumber(target.lastSeenAt) or 0) > retainMs then
+        return false
+    end
+    if tonumber(target.z) ~= nil
+        and math.abs((tonumber(target.z) or 0) - threatContext.z) >= 1
+    then
+        return false
+    end
+    dx = (tonumber(target.x) or 0) - threatContext.x
+    dy = (tonumber(target.y) or 0) - threatContext.y
+    if dx * dx + dy * dy > threatContext.radius * threatContext.radius then
+        return false
+    end
+    target.visible = false
+    target.alertOnly = true
+    return true
+end
+
 local function preserveTravelConversationScene(record, scene)
     local runtime = record and record.runtime or nil
     local lease = runtime and runtime.conversationLease or nil
@@ -52,9 +140,32 @@ function Internal.LogTransition(eventName, record, zombie, state, target, reason
         and zombie:getActionStateName() or ""
     local nativeTarget = zombie and zombie.getTarget
         and zombie:getTarget() ~= nil or false
-    if not Diagnostics or Diagnostics.SeatingAuditEnabled ~= true
-        or not Diagnostics.LogSeatingAudit
+    if Diagnostics and Diagnostics.NPCThreatAuditEnabled == true
+        and Diagnostics.LogNPCThreatAudit
     then
+        Diagnostics.LogNPCThreatAudit("threat_guard_" .. tostring(eventName), {
+            "npc=" .. tostring(record and record.id or ""),
+            "behavior=" .. tostring(record and record.activeBehavior or ""),
+            "source=" .. tostring(state and state.source or ""),
+            "phase=" .. tostring(state and state.phase or ""),
+            "targetId=" .. tostring(target and (target.zombieId
+                or target.id or target.onlineID) or ""),
+            "targetKind=" .. tostring(target and target.kind or ""),
+            "targetThreatening=" .. tostring(target
+                and target.threatening == true),
+            "proximityAlert=" .. tostring(target
+                and target.proximityAlert == true),
+            "alertOnly=" .. tostring(target and target.alertOnly == true),
+            "targetSource=" .. tostring(runtime.targetSource or ""),
+            "attackType=" .. tostring(record and record.attackType or ""),
+            "nativeAction=" .. tostring(action or ""),
+            "nativeTarget=" .. tostring(nativeTarget),
+            "reason=" .. tostring(reason or ""),
+        })
+        return
+    end
+    if not Diagnostics or Diagnostics.SeatingAuditEnabled ~= true
+        or not Diagnostics.LogSeatingAudit then
         return
     end
     Diagnostics.LogSeatingAudit("threat_guard_" .. tostring(eventName), {
@@ -94,8 +205,20 @@ function Internal.RefreshTarget(record, state, threatContext, now)
             state.nextValidateAt = now + VALIDATE_MS
         end
         if Internal.IsThreat(current, threatContext) then
+            publishZombieGroupAlert(record, current, now)
+            auditDecision("target_valid", record, nil, current, "validated")
             return current
         end
+        if retainableTarget(current, now, threatContext) then
+            auditDecision("target_retained", record, nil, current,
+                "visibility_or_registry_gap")
+            return current
+        end
+    end
+    if state.target and retainableTarget(state.target, now, threatContext) then
+        auditDecision("target_retained", record, nil, state.target,
+            "refresh_returned_nil")
+        return state.target
     end
     runtime.target = nil
     runtime.targetSource = nil
@@ -106,12 +229,28 @@ function Internal.RefreshTarget(record, state, threatContext, now)
     if Targeting and Targeting.ResolveImmediateNPCThreat then
         candidate = Targeting.ResolveImmediateNPCThreat(record)
         if Internal.IsThreat(candidate, threatContext) then
+            auditDecision("target_acquired", record, nil, candidate,
+                "immediate_npc")
             return candidate
         end
     end
     if Targeting and Targeting.ResolveImmediateZombieThreat then
         candidate = Targeting.ResolveImmediateZombieThreat(record)
         if Internal.IsThreat(candidate, threatContext) then
+            publishZombieGroupAlert(record, candidate, now)
+            auditDecision("target_acquired", record, nil, candidate,
+                "immediate_zombie")
+            return candidate
+        end
+    end
+    if PNC.Perception and PNC.Perception.FindProximityZombieAlert then
+        candidate = PNC.Perception.FindProximityZombieAlert(
+            record,
+            threatContext.radius
+        )
+        if Internal.IsThreat(candidate, threatContext) then
+            auditDecision("target_acquired", record, nil, candidate,
+                candidate.alertOnly and "group_alert" or "proximity")
             return candidate
         end
     end
@@ -144,8 +283,44 @@ function Internal.RefreshTarget(record, state, threatContext, now)
             threatContext.radius
         )
     end
-    if Internal.IsThreat(candidate, threatContext) then return candidate end
+    if Internal.IsThreat(candidate, threatContext) then
+        auditDecision("target_acquired", record, nil, candidate,
+            "resolver")
+        return candidate
+    end
+    auditDecision("target_rejected", record, nil, candidate, "no_eligible_threat")
     return nil
+end
+
+function Internal.CanAttackTarget(record, target)
+    if not record or not target then return false end
+    if tostring(record.attackType or Const.ATTACK_TYPE_AUTO or "auto")
+        == tostring(Const.ATTACK_TYPE_NONE or "none")
+    then
+        return false
+    end
+    if target.kind == "zombie" and record.hostility
+        and record.hostility.attackZombies == false
+    then
+        return false
+    end
+    return true
+end
+
+function Internal.AlertTarget(record, zombie, state, target)
+    state.phase = "alerted"
+    record.activeBehavior = "CombatGuard:alerted"
+    Common.SetCombatTarget(record, target, "threat_guard_alert")
+    if Common and Common.HaltMovement then
+        Common.HaltMovement(record, zombie, "threat_guard_alert")
+    end
+    if PNC.Combat and PNC.Combat.FaceTarget then
+        PNC.Combat.FaceTarget(record, zombie, target, 500, "threat_guard_alert")
+    end
+    Common.SetCombatDebug(record, target, "proximity_alert", "none", "alerted")
+    Internal.LogTransition("alert", record, zombie, state, target,
+        "alert_only")
+    return true
 end
 
 function Internal.ClearState(record, zombie, reason)
@@ -205,14 +380,20 @@ end
 function Internal.Engage(record, zombie, state, target, threatContext)
     local scene = record.runtime and record.runtime.animationScene or nil
     local runtime = record.runtime or {}
-    if not Internal.AttackEnabled(record) then
-        return Internal.EnterAvoidance(
+    if target.alertOnly == true then
+        return Internal.AlertTarget(record, zombie, state, target)
+    end
+    if not Internal.CanAttackTarget(record, target) then
+        if Internal.EnterAvoidance(
             record,
             zombie,
             state,
             target,
             threatContext
-        )
+        ) then
+            return true
+        end
+        return Internal.AlertTarget(record, zombie, state, target)
     end
     if scene and not preserveTravelConversationScene(record, scene) then
         if not releaseCombatScene(record, zombie, scene) then

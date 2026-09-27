@@ -235,6 +235,53 @@ T.truthy(preflightResult and preflightResult.preflight
 T.equal(preflightResult.preflight.actors.actor_2.reasonDetail, "ready",
     "valid preflight did not report the NPC as ready")
 
+-- Combat state is intentionally not an Opera admission boundary. The scene
+-- lease owns the actor for this debug action and the normal runtime state is
+-- restored when the session stops.
+record.runtime.target = {}
+record.runtime.combatTarget = {}
+record.runtime.attackAction = true
+record.runtime.inCombatUntil = clock + 5000
+npc.actionState = "attack"
+local combatPreflightAccepted, combatPreflightResult =
+    Authority.HandleRequest(player, {
+        action = "preflight",
+        blueprintId = "social.kiss_test",
+        actors = {
+            actor_1 = "__local_player__",
+            actor_2 = "npc1",
+        },
+    })
+T.truthy(combatPreflightAccepted,
+    "combat-state preflight request was rejected")
+T.truthy(combatPreflightResult.preflight.ready,
+    "combat state still blocked Puppet Opera preflight")
+T.equal(combatPreflightResult.preflight.actors.actor_2.reasonDetail,
+    "ready",
+    "combat-state preflight did not report the NPC as ready")
+local combatStartAccepted, combatSession = Authority.HandleRequest(player, {
+    action = "start",
+    blueprintId = "social.kiss_test",
+    actors = {
+        actor_1 = "__local_player__",
+        actor_2 = "npc1",
+    },
+    loop = false,
+})
+T.truthy(combatStartAccepted,
+    "combat state still blocked Puppet Opera session admission")
+T.truthy(combatSession and combatSession.sessionId,
+    "combat-state start did not create a session")
+T.truthy(Authority.HandleRequest(player, {
+    action = "stop",
+    sessionId = combatSession.sessionId,
+}), "combat-state session could not be stopped")
+record.runtime.target = nil
+record.runtime.combatTarget = nil
+record.runtime.attackAction = nil
+record.runtime.inCombatUntil = nil
+npc.actionState = nil
+
 local customAccepted, customResult = Authority.HandleRequest(player, {
     action = "preflight",
     blueprintId = "social.kiss_test_custom",

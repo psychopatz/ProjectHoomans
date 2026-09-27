@@ -28,6 +28,7 @@ function Parts.BuildCombatDebugState(record, combat, firearmState)
     local action = runtime.attackAction
     local now = Core.Now()
     local zombieAttacker = runtime.zombieAttacker
+    local zombieAlert = runtime.zombieAlert
     local zombieStimulus = runtime.zombieStimulus
     local attackLane = runtime.zombieAttackLane
     local zombieAttackerAge = zombieAttacker
@@ -88,6 +89,9 @@ function Parts.BuildCombatDebugState(record, combat, firearmState)
             visible = target.visible ~= false,
             visibilityKind = target.visibilityKind,
             threatening = target.threatening == true,
+            proximityAlert = target.proximityAlert == true,
+            alertOnly = target.alertOnly == true,
+            alertSequence = target.alertSequence,
         } or nil,
         mode = combat.combatModeResolved,
         weaponStatus = combat.weaponStatus,
@@ -158,6 +162,23 @@ function Parts.BuildCombatDebugState(record, combat, firearmState)
                     zombieAttacker.path2Active == true,
             } or nil,
         zombieStimulus = zombieStimulusDebug,
+        zombieAlert = zombieAlert and {
+            zombieId = zombieAlert.zombieId,
+            sourceId = zombieAlert.sourceId,
+            sequence = zombieAlert.sequence,
+            x = zombieAlert.x,
+            y = zombieAlert.y,
+            z = zombieAlert.z,
+            distSq = zombieAlert.distSq,
+            ageMs = math.max(
+                0,
+                now - (tonumber(zombieAlert.observedAt) or now)
+            ),
+            remainingMs = math.max(
+                0,
+                (tonumber(zombieAlert.expiresAt) or now) - now
+            ),
+        } or nil,
         aimConfidence = aim.confidence,
         aimRequiredConfidence = aim.requiredConfidence,
         aimReadyInMs = aim.readyAt

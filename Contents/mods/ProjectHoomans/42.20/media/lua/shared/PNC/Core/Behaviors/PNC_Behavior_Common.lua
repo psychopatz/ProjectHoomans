@@ -77,6 +77,18 @@ function Common.SetCombatTarget(record, target, source)
     runtime.target = target
     runtime.targetSource = tostring(source or "combat")
     runtime.targetAt = Core and Core.Now and Core.Now() or nil
+    if Diagnostics and Diagnostics.NPCThreatAuditEnabled == true
+        and Diagnostics.LogNPCThreatAudit
+    then
+        Diagnostics.LogNPCThreatAudit("combat_target_set", {
+            "npc=" .. tostring(record.id or ""),
+            "targetKind=" .. tostring(target.kind or ""),
+            "targetId=" .. tostring(target.zombieId or target.id or ""),
+            "source=" .. tostring(source or "combat"),
+            "proximityAlert=" .. tostring(target.proximityAlert == true),
+            "alertOnly=" .. tostring(target.alertOnly == true),
+        })
+    end
     return true
 end
 
@@ -84,10 +96,25 @@ function Common.ClearCombatTarget(record, reason, zombie)
     local equipmentInfo = Equipment.Describe(record)
     local combatTactics = PNC.CombatTactics
     local committedAttack
+    local previousTarget = record and record.runtime
+        and record.runtime.target or nil
     record.runtime = record.runtime or {}
     record.runtime.target = nil
     record.runtime.targetSource = nil
     record.runtime.targetAt = nil
+    if Diagnostics and Diagnostics.NPCThreatAuditEnabled == true
+        and Diagnostics.LogNPCThreatAudit
+    then
+        Diagnostics.LogNPCThreatAudit("combat_target_clear", {
+            "npc=" .. tostring(record and record.id or ""),
+            "targetKind=" .. tostring(previousTarget
+                and previousTarget.kind or ""),
+            "targetId=" .. tostring(previousTarget
+                and (previousTarget.zombieId or previousTarget.id) or ""),
+            "reason=" .. tostring(reason or "no_target"),
+            "behavior=" .. tostring(record and record.activeBehavior or ""),
+        })
+    end
     if combatTactics and combatTactics.EndStaminaRecovery then
         combatTactics.EndStaminaRecovery(record)
     end

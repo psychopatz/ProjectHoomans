@@ -47,6 +47,10 @@ Diagnostics.NeedsAuditEnabled = false
 -- Zombie pursuit tracing is opt-in because it can emit from both the
 -- authoritative update loop and the multiplayer receive path.
 Diagnostics.ZombieAggroAuditEnabled = false
+-- NPC threat tracing is opt-in. It samples threat acquisition, group alerts,
+-- target retention, and combat/path handoff without adding hot-path logging
+-- to normal sessions.
+Diagnostics.NPCThreatAuditEnabled = false
 -- Firearm tracing is opt-in. It is intentionally disabled on a normal load
 -- because it assembles per-shot fields and can produce substantial console
 -- traffic during firefights.
@@ -65,6 +69,7 @@ local FOLLOWER_ABANDONMENT_AUDIT_SETTING_ID =
 local INVENTORY_AUDIT_SETTING_ID = "ProjectHoomans.InventoryAudit"
 local NEEDS_AUDIT_SETTING_ID = "ProjectHoomans.NeedsAudit"
 local ZOMBIE_AGGRO_AUDIT_SETTING_ID = "ProjectHoomans.ZombieAggroAudit"
+local NPC_THREAT_AUDIT_SETTING_ID = "ProjectHoomans.NPCThreatAudit"
 local function initializeCentralDebugSettings()
     local settings = PsychopatzCore and PsychopatzCore.DebugSettings
     if not settings or type(settings.Register) ~= "function" then
@@ -185,6 +190,18 @@ local function initializeCentralDebugSettings()
             Diagnostics.ZombieAggroAuditEnabled = enabled == true
         end,
     })
+    settings.Register({
+        id = NPC_THREAT_AUDIT_SETTING_ID,
+        source = "Project Hoomans",
+        order = 145,
+        title = "NPC threat audit",
+        description = "Logs NPC zombie alerting, target retention, group propagation, and combat handoff.",
+        defaultEnabled = false,
+        runtimeMutable = true,
+        apply = function(enabled)
+            Diagnostics.NPCThreatAuditEnabled = enabled == true
+        end,
+    })
     Diagnostics.Enabled = settings.IsEnabled(PERFORMANCE_SETTING_ID) == true
     Diagnostics.TimingEnabled = Diagnostics.Enabled
         and Diagnostics.TimingEnabled ~= false
@@ -209,6 +226,8 @@ local function initializeCentralDebugSettings()
         NEEDS_AUDIT_SETTING_ID) == true
     Diagnostics.ZombieAggroAuditEnabled = settings.IsEnabled(
         ZOMBIE_AGGRO_AUDIT_SETTING_ID) == true
+    Diagnostics.NPCThreatAuditEnabled = settings.IsEnabled(
+        NPC_THREAT_AUDIT_SETTING_ID) == true
 end
 
 initializeCentralDebugSettings()
@@ -465,6 +484,22 @@ function Diagnostics.IsZombieAggroAuditEnabled()
     return Diagnostics.ZombieAggroAuditEnabled == true
 end
 
+function Diagnostics.SetNPCThreatAuditEnabled(enabled)
+    Diagnostics.NPCThreatAuditEnabled = enabled == true
+    if Diagnostics.NPCThreatAuditEnabled == true then
+        if PNC.Core and PNC.Core.LogInfo then
+            PNC.Core.LogInfo("npc_threat_audit event=enabled")
+        else
+            print("[PNC][INFO] npc_threat_audit event=enabled")
+        end
+    end
+    return Diagnostics.NPCThreatAuditEnabled
+end
+
+function Diagnostics.IsNPCThreatAuditEnabled()
+    return Diagnostics.NPCThreatAuditEnabled == true
+end
+
 function Diagnostics.SetFirearmAuditEnabled(enabled)
     Diagnostics.FirearmAuditEnabled = enabled == true
     if Diagnostics.FirearmAuditEnabled == true then
@@ -555,6 +590,26 @@ function Diagnostics.LogZombieAggroAudit(channel, fields)
     local message
     if Diagnostics.ZombieAggroAuditEnabled ~= true then return false end
     output = { "ZombieAggro." .. tostring(channel or "pursuit") }
+    for _, field in ipairs(fields or {}) do
+        output[#output + 1] = tostring(field)
+    end
+    message = table.concat(output, " ")
+    if PNC.Core and PNC.Core.LogInfo then
+        PNC.Core.LogInfo(message)
+    else
+        print("[PNC][INFO] " .. message)
+    end
+    return true
+end
+
+function Diagnostics.LogNPCThreatAudit(eventName, fields)
+    local output
+    local message
+    if Diagnostics.NPCThreatAuditEnabled ~= true then return false end
+    output = {
+        "npc_threat_audit",
+        "event=" .. tostring(eventName or "unknown"),
+    }
     for _, field in ipairs(fields or {}) do
         output[#output + 1] = tostring(field)
     end

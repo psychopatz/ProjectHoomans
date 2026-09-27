@@ -82,6 +82,7 @@ function Targeting.UpdateTargetFromWorld(record, target)
             target.visible = true
             target.visibilityKind = visibilityKind
             target.lastSeenAt = now
+            target.alertOnly = nil
             target.threatening = Perception.IsTargetThreatening
                 and Perception.IsTargetThreatening(record, target)
                 or false
@@ -110,6 +111,7 @@ function Targeting.UpdateTargetFromWorld(record, target)
             target.visible = true
             target.visibilityKind = visibilityKind
             target.lastSeenAt = now
+            target.alertOnly = nil
             target.threatening = Perception.IsTargetThreatening
                 and Perception.IsTargetThreatening(record, target)
                 or false
@@ -137,6 +139,7 @@ function Targeting.UpdateTargetFromWorld(record, target)
             target.visible = true
             target.visibilityKind = visibilityKind
             target.lastSeenAt = now
+            target.alertOnly = nil
             target.threatening = Perception.IsTargetThreatening
                 and Perception.IsTargetThreatening(record, target)
                 or false
@@ -180,6 +183,7 @@ function Targeting.UpdateTargetFromWorld(record, target)
             target.visible = true
             target.visibilityKind = visibilityKind
             target.lastSeenAt = now
+            target.alertOnly = nil
             target.threatening = true
             return target
         end

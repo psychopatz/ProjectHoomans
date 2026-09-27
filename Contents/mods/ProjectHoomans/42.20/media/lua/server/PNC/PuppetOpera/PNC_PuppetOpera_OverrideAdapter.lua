@@ -1,9 +1,9 @@
 -- Temporary Puppet Opera ownership for resumable NPC behavior.
 --
--- Puppet Opera may suspend any ordinary Hoomans behavior and presentation
--- lease. Combat, vehicles, traversal, grounded recovery, and foreign owners
--- remain safety boundaries. The durable order and provider runtime are kept in
--- place so the normal owner can resume after this lease is released.
+-- Puppet Opera may suspend ordinary Hoomans behavior and presentation leases.
+-- Vehicles, traversal, grounded recovery, and foreign owners remain safety
+-- boundaries. The durable order and provider runtime are kept in place so the
+-- normal owner can resume after this lease is released.
 
 if PsychopatzCore and PsychopatzCore.RuntimeRole
     and not PsychopatzCore.RuntimeRole.AllowsServerCode()
@@ -29,10 +29,6 @@ local OWNER_HEARTBEAT_MS = 10000
 local OWNER_RESERVATION_TTL_MS = 30000
 
 local UNSAFE_ACTION_STATES = {
-    attack = true,
-    ["attack-network"] = true,
-    lunge = true,
-    lungenetwork = true,
     climbfence = true,
     climbwindow = true,
     climbwall = true,
@@ -241,27 +237,6 @@ local function pathIsActive(runtime)
         or false
 end
 
-local function hasCombat(runtime, record, body)
-    if runtime and (
-        runtime.target ~= nil
-            or runtime.combatTarget ~= nil
-            or runtime.attackAction ~= nil
-            or nowValue() < (tonumber(runtime.inCombatUntil) or 0)
-    ) then
-        return true
-    end
-    if PNC.LiveBodyControl
-        and PNC.LiveBodyControl.IsPresentationCombatActive
-        and PNC.LiveBodyControl.IsPresentationCombatActive(record, nowValue())
-    then
-        return true
-    end
-    if body and body.getTarget and body:getTarget() ~= nil then
-        return true
-    end
-    return false
-end
-
 function Override.IsOwned(record, sessionID)
     local value = record and record.runtime
         and record.runtime[OVERRIDE_KEY] or nil
@@ -304,9 +279,6 @@ function Override.GetReadiness(record, body, options)
         ~= tostring(options.sessionId or "")
     then
         return false, "npc_owned_by_other_puppet_session"
-    end
-    if hasCombat(runtime, record, body) then
-        return false, "npc_in_combat"
     end
     actionState = actionStateOf(body)
     modData = body.getModData and body:getModData() or nil

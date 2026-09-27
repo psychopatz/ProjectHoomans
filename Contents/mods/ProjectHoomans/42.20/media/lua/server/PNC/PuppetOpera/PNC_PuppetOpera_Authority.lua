@@ -85,10 +85,6 @@ local function hasValue(value)
 end
 
 local UNSAFE_NPC_ACTION_STATES = {
-    attack = true,
-    ["attack-network"] = true,
-    lunge = true,
-    lungenetwork = true,
     bumped = true,
     climbfence = true,
     climbwindow = true,
@@ -169,14 +165,6 @@ local function invalidPlayer(player)
     if player.isSeatedInVehicle and player:isSeatedInVehicle() then
         return "player_seated"
     end
-    if player.isAttacking and player:isAttacking() then
-        return "player_in_combat"
-    end
-    if player.isPerformingAttackAnimation
-        and player:isPerformingAttackAnimation()
-    then
-        return "player_in_combat"
-    end
     return nil
 end
 
@@ -206,15 +194,6 @@ local function invalidNPC(record, body, activeSession)
             and PNC.Compatibility.ActorOwnership.IsForeignOwned(body)
         then
             return "npc_owned_by_foreign_mod"
-        end
-        if PNC.LiveBodyControl
-            and PNC.LiveBodyControl.IsPresentationCombatActive
-            and PNC.LiveBodyControl.IsPresentationCombatActive(record, now())
-        then
-            return "npc_in_combat"
-        end
-        if runtime.target ~= nil or runtime.combatTarget ~= nil then
-            return "npc_in_combat"
         end
         if PNC.PathService and PNC.PathService.IsTraversalActive
             and PNC.PathService.IsTraversalActive(record, body)

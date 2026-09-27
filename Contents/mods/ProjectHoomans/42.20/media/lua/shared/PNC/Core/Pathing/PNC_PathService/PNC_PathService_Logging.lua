@@ -11,6 +11,7 @@ PathService.Internal = PathService.Internal or {}
 
 local Internal = PathService.Internal
 local Core = PNC.Core
+local Diagnostics = PNC.PerformanceScalingDiagnostics
 
 function Internal.describeGoal(goal)
     if not goal then
@@ -126,6 +127,28 @@ function Internal.logMoveWarning(record, zombie, lane, event, reason, extra)
     if lane then
         lane.lastWarnKey = key
         lane.lastWarnAt = now
+    end
+    if Diagnostics and Diagnostics.NPCThreatAuditEnabled == true
+        and Diagnostics.LogNPCThreatAudit
+        and record and tostring(record.activeBehavior or "")
+            :find("CombatGuard", 1, true)
+    then
+        local target = record.runtime and record.runtime.target or nil
+        Diagnostics.LogNPCThreatAudit("combat_path_warning", {
+            "npc=" .. tostring(record.id or ""),
+            "event=" .. tostring(event or ""),
+            "reason=" .. tostring(reason or ""),
+            "behavior=" .. tostring(record.activeBehavior or ""),
+            "targetKind=" .. tostring(target and target.kind or ""),
+            "targetId=" .. tostring(target
+                and (target.zombieId or target.id) or ""),
+            "targetSource=" .. tostring(record.runtime
+                and record.runtime.targetSource or ""),
+            "pathPhase=" .. tostring(lane and lane.phase or ""),
+            "pathOwner=" .. tostring(lane and lane.ownerMode or ""),
+            "action=" .. tostring(actionState ~= ""
+                and actionState or "idle"),
+        })
     end
     Core.LogWarn(Internal.buildMoveLogMessage(record, zombie, lane, event, reason, extra))
 end

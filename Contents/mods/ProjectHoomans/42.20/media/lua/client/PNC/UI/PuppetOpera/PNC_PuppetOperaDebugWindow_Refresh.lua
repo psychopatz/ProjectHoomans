@@ -109,6 +109,7 @@ function Class:refreshViews()
     self:refreshActorSlots()
     self:refreshAnimationTabs()
     if Model.RefreshPreflight then Model.RefreshPreflight(false) end
+    if self.syncPreflightStatus then self:syncPreflightStatus() end
     if Model.InvalidateRefreshCache then Model.InvalidateRefreshCache() end
     self.layoutTab:refresh()
     self.playerAnimationTab:refreshCatalog()

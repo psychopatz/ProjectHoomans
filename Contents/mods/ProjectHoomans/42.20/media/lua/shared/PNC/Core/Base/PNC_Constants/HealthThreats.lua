@@ -67,6 +67,14 @@ Const.ZOMBIE_TARGET_RADIUS = 12
 Const.TARGET_VISUAL_MEMORY_MS = 2200
 Const.TARGET_REASSESS_MS = 350
 Const.TARGET_IMMEDIATE_THREAT_RADIUS = 6.0
+-- A visible zombie inside this radius is an alert stimulus.  Alerting is
+-- separate from the direct-attacker lane so neutral NPCs can wake, face, or
+-- avoid a threat without automatically becoming broad hunters.
+Const.ZOMBIE_PROXIMITY_ALERT_RADIUS = 6.0
+Const.ZOMBIE_GROUP_ALERT_RADIUS = 8.0
+Const.ZOMBIE_ALERT_TTL_MS = 1800
+Const.ZOMBIE_ALERT_REPUBLISH_MS = 350
+Const.THREAT_GUARD_TARGET_RETAIN_MS = 3500
 -- Server zombie aggro records are refreshed continuously while a zombie owns
 -- an NPC pursuit lease. Perception uses this short window in multiplayer,
 -- where the zombie's unsupported IsoZombie-shaped engine target stays unset.

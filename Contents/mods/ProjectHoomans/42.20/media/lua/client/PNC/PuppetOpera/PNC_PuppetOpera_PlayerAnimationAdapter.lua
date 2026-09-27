@@ -64,14 +64,6 @@ function Adapter.Observe(sessionID)
     if body ~= active.body then
         return false, "local_player_changed"
     end
-    if body and body.isAttacking and body:isAttacking() then
-        return false, "player_entered_combat"
-    end
-    if body and body.isPerformingAttackAnimation
-        and body:isPerformingAttackAnimation()
-    then
-        return false, "player_entered_combat"
-    end
     local runtime = Player.Runtime and Player.Runtime() or nil
     if runtime and runtime.active == true then
         if tostring(runtime.owner or "") ~= tostring(active.owner or "") then

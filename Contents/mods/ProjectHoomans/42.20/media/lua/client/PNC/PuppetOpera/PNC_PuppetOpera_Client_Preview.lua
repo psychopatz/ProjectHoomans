@@ -76,13 +76,8 @@ function Client.PreviewNPC(entry, npcID, body, record)
     end
     local id = tostring(npcID or "")
     local active = debugPlayer.active
-    if active then
-        if tostring(active.npcId or "") ~= id
-            or State.previewNPCID ~= id
-            or previewNPCMarker(active.body) ~= PREVIEW_NPC_OWNER
-        then
-            return false, "npc_preview_owned_by_other"
-        end
+    if active and previewNPCMarker(active.body) ~= PREVIEW_NPC_OWNER then
+        return false, "npc_preview_owned_by_other"
     end
     if active and debugPlayer.Stop then
         clearPreviewNPCMarker(active.body)

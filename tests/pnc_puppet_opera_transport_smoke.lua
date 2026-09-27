@@ -18,10 +18,10 @@ function previewBody:getModData() return self.modData end
 local previewDebugger = {
     active = nil,
 }
-function previewDebugger.PlayXML(_, _, body, _, options)
+function previewDebugger.PlayXML(_, _, npcID, body, _, options)
     previewCalls[#previewCalls + 1] = options
     previewDebugger.active = {
-        npcId = "npc-preview",
+        npcId = tostring(npcID or ""),
         body = body,
     }
     return true, "xml_pipeline_started"
@@ -416,9 +416,30 @@ T.truthy(previewCalls[1] and previewCalls[1].nonCombat == true,
     "Puppet NPC preview did not use the non-combat bump lease")
 T.equal(previewCalls[1].sceneId, "ProjectHoomans.PuppetOperaPreview:npc-preview",
     "Puppet NPC preview did not identify its owner")
+
+local secondPreviewBody = {
+    modData = {},
+}
+function secondPreviewBody:getModData() return self.modData end
+local switchedPreview, switchedPreviewReason = Client.PreviewNPC({
+    state = "bumped",
+    node = "PNC_WaveHi",
+    anim = "Bob_WaveHi",
+    playable = true,
+}, "npc-second", secondPreviewBody, { id = "npc-second" })
+T.truthy(switchedPreview,
+    "Puppet NPC preview could not switch to a second owned actor")
+T.equal(switchedPreviewReason, "xml_pipeline_started",
+    "Puppet NPC actor switch returned the wrong start reason")
+T.equal(previewDebugger.active.npcId, "npc-second",
+    "Puppet NPC actor switch kept the previous actor active")
+T.falsy(previewBody.modData.PNC_PuppetOperaPreviewOwner,
+    "Puppet NPC actor switch left the previous ownership marker behind")
+T.equal(previewDebugger.active.body, secondPreviewBody,
+    "Puppet NPC actor switch did not activate the requested body")
 T.truthy(Client.StopPreview(),
     "Puppet NPC preview could not be stopped")
-T.falsy(previewBody.modData.PNC_PuppetOperaPreviewOwner,
+T.falsy(secondPreviewBody.modData.PNC_PuppetOperaPreviewOwner,
     "Puppet NPC preview left its ownership marker behind")
 
 local maintainCalls = 0
@@ -446,7 +467,7 @@ T.equal(maintainCalls, 1,
     "Puppet preview loop did not maintain its owned NPC")
 T.equal(replayCalls, 1,
     "Puppet preview loop did not replay after its bounded delay")
-T.truthy(previewCalls[2] and previewCalls[2].loop == true,
+T.truthy(previewCalls[3] and previewCalls[3].loop == true,
     "Puppet NPC preview did not pass loop ownership to the adapter")
 T.falsy(Client.SetPreviewLoopEnabled(false),
     "Puppet preview loop did not disable")

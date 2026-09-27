@@ -6,9 +6,12 @@ local Internal = ThreatGuard.Internal
 function Internal.IsThreat(target, threatContext)
     local dx
     local dy
-    if not target or target.kind == nil or target.visible == false
+    if not target or target.kind == nil
         or not threatContext
     then
+        return false
+    end
+    if target.visible == false and target.proximityAlert ~= true then
         return false
     end
     if target.immediateSelfDefense == true then return true end

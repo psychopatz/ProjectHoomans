@@ -204,6 +204,16 @@ function Behavior.Tick(record, zombie, now)
     local companionHandled
     local previousJob = record and record.activeJob or nil
 
+    -- Behavior state, movement leases, and combat targets are authoritative
+    -- writes. The server tick owns them in MP; the same authority path is
+    -- used by singleplayer/listen-server. Keep a shared-load client from
+    -- mutating the decision state if a future hook calls this entry point.
+    if PNC.Core and type(PNC.Core.IsAuthority) == "function"
+        and PNC.Core.IsAuthority() ~= true
+    then
+        return false
+    end
+
     if ScalingDiagnostics then
         ScalingDiagnostics.Increment("NPCDecisions.BehaviorTicks")
     end

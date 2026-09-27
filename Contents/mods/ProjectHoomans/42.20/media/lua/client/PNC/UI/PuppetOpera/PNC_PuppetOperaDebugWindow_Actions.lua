@@ -88,6 +88,51 @@ function Class:prepareRuntime()
     return normalized
 end
 
+function Class:setPreflightBlockedStatus(reason, actorID, actorLabel)
+    local detail = actorLabel and (actorLabel .. " - ") or ""
+    self:setEditorStatus(
+        "preflight_blocked:" .. detail .. tostring(reason)
+            .. (actorID and " [" .. tostring(actorID) .. "]" or ""),
+        true
+    )
+end
+
+function Class:syncPreflightStatus()
+    if self.editorStatus ~= "preflight_pending"
+        or not Model.GetPreflightReadiness
+    then
+        return
+    end
+    local ready, reason, actorID, actorLabel =
+        Model.GetPreflightReadiness()
+    if ready == true then
+        self:clearEditorStatus()
+    elseif ready == false then
+        self:setPreflightBlockedStatus(reason, actorID, actorLabel)
+    end
+end
+
+function Class:checkRuntimeReadiness()
+    if Model.RefreshPreflight then
+        local accepted, reason = Model.RefreshPreflight(false)
+        if not accepted then
+            self:setEditorStatus(reason, true)
+            return false
+        end
+    end
+    if not Model.GetPreflightReadiness then return true end
+
+    local ready, reason, actorID, actorLabel =
+        Model.GetPreflightReadiness()
+    if ready == true then return true end
+    if ready == nil then
+        self:setEditorStatus("preflight_pending", true)
+        return false
+    end
+    self:setPreflightBlockedStatus(reason, actorID, actorLabel)
+    return false
+end
+
 function Class:requestPlacementPreview(force)
     if not Client.StartPlacementPreview then
         self:setEditorStatus("placement_preview_unavailable", true)
@@ -137,6 +182,10 @@ function Class:onControl(button)
             local bindings, bindingReason = Model.GetRuntimeActorBindings()
             if not bindings then
                 self:setEditorStatus(bindingReason, true)
+            elseif not self:checkRuntimeReadiness() then
+                -- The server preflight is authoritative. Do not issue a
+                -- start request while the current actor set is blocked or
+                -- while its readiness response is still in flight.
             elseif id == "play" then
                 local accepted, reason = Client.Start(blueprintID, nil,
                     self.loopEnabled, definition, bindings)

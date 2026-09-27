@@ -96,11 +96,6 @@ local function ownerDescription(record, body)
         local foreign = PNC.Compatibility.ActorOwnership.GetForeignOwner(body)
         if foreign then return "foreign:" .. tostring(foreign) end
     end
-    if runtime.target ~= nil or runtime.combatTarget ~= nil
-        or runtime.attackAction ~= nil
-    then
-        return "combat"
-    end
     if runtime.moveIntent and runtime.moveIntent.kind == "move" then
         return "movement"
     end

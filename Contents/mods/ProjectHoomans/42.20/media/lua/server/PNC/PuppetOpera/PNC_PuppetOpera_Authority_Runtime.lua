@@ -74,9 +74,22 @@ local function activeSafety(session, timestamp)
             local movementSafe
             movementSafe, reason = puppetMovementIsSafe(session, actor)
             if not movementSafe then return false, reason end
+            local traversalActive = PNC.PathService
+                and PNC.PathService.IsTraversalActive
+                and PNC.PathService.IsTraversalActive(
+                    actor.record,
+                    actor.body
+                )
+                or false
+            local traversalOwned = traversalActive
+                and NPCMovement
+                and NPCMovement.IsOwned
+                and NPCMovement.IsOwned(actor.record, session.sessionId)
+                or false
             if unsafeNPCActionState(actor.body)
                 and not npcAnimation.IsOwned(actor.body, session.sessionId)
                 and not nonCombatBumpCanBeReleased(actor.body)
+                and not traversalOwned
             then
                 return false, actorFailureReason(
                     "npc_action_state_interrupted",
@@ -84,19 +97,8 @@ local function activeSafety(session, timestamp)
                     actor.body
                 )
             end
-            if PNC.PathService and PNC.PathService.IsTraversalActive
-                and PNC.PathService.IsTraversalActive(actor.record, actor.body)
-            then
+            if traversalActive and not traversalOwned then
                 return false, "npc_traversal_started:" .. tostring(actorID)
-            end
-            if PNC.LiveBodyControl
-                and PNC.LiveBodyControl.IsPresentationCombatActive
-                and PNC.LiveBodyControl.IsPresentationCombatActive(
-                    actor.record,
-                    timestamp
-                )
-            then
-                return false, "npc_entered_combat:" .. tostring(actorID)
             end
             local runtime = actor.record and actor.record.runtime or nil
             local overrideOwned = npcOverride.IsOwned(
@@ -104,10 +106,7 @@ local function activeSafety(session, timestamp)
                 session.sessionId
             )
             if runtime and (
-                runtime.target ~= nil
-                    or runtime.combatTarget ~= nil
-                    or runtime.attackAction ~= nil
-                    or hasValue(runtime.animationScene)
+                hasValue(runtime.animationScene)
                     or hasValue(runtime.conversationLease)
                     or hasValue(runtime.taskLeaseId)
                     or hasValue(runtime.orderLeaseId)
@@ -117,12 +116,6 @@ local function activeSafety(session, timestamp)
                     or hasValue(runtime.treatment)
                     or hasValue(runtime.roamAmbient)
             ) then
-                if runtime.target ~= nil
-                    or runtime.combatTarget ~= nil
-                    or runtime.attackAction ~= nil
-                then
-                    return false, "npc_entered_combat:" .. tostring(actorID)
-                end
                 if not overrideOwned then
                     return false, "npc_behavior_ownership_lost:"
                         .. tostring(actorID)

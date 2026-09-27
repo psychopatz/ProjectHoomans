@@ -42,6 +42,9 @@ function ThreatGuard.Tick(record, zombie, now)
         if target then
             state.lastThreatAt = now
             state.target = target
+            if target.alertOnly == true then
+                return Internal.AlertTarget(record, zombie, state, target)
+            end
             if state.phase == "avoid" and not Internal.AttackEnabled(record) then
                 return Internal.EnterAvoidance(
                     record,
@@ -55,6 +58,19 @@ function ThreatGuard.Tick(record, zombie, now)
                 Internal.ClearState(record, zombie, "attack_disabled")
                 return false
             end
+            if not Internal.CanAttackTarget(record, target) then
+                if Internal.EnterAvoidance(
+                    record,
+                    zombie,
+                    state,
+                    target,
+                    threatContext
+                )
+                then
+                    return true
+                end
+                return Internal.AlertTarget(record, zombie, state, target)
+            end
             if not Internal.EngageTarget(record, zombie, target, threatContext) then
                 Common.ClearCombatTarget(
                     record,
@@ -66,8 +82,9 @@ function ThreatGuard.Tick(record, zombie, now)
                 record.activeBehavior = "CombatGuard:reacquiring"
                 return true
             end
-            state.phase = "engaged"
-            record.activeBehavior = "CombatGuard:engaged"
+            state.phase = target.alertOnly == true and "alerted" or "engaged"
+            record.activeBehavior = target.alertOnly == true
+                and "CombatGuard:alerted" or "CombatGuard:engaged"
             return true
         end
         if now < (tonumber(state.lastThreatAt) or now)

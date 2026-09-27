@@ -5,6 +5,7 @@
 
 local Network = PNC.Network
 local Core = PNC.Core
+local Const = PNC.Const
 local Equipment = PNC.Equipment
 local Stamina = PNC.Stamina
 local Firearms = PNC.Firearms
@@ -55,6 +56,9 @@ function Network.BuildPresenceDelta(record)
     local zombieAttackerAt = record.runtime
         and tonumber(record.runtime.zombieAttacker
             and record.runtime.zombieAttacker.observedAt) or 0
+    local zombieAlertAt = record.runtime
+        and tonumber(record.runtime.zombieAlert
+            and record.runtime.zombieAlert.observedAt) or 0
     local zombieStimulusAt = record.runtime
         and tonumber(record.runtime.zombieStimulus
             and record.runtime.zombieStimulus.emittedAt) or 0
@@ -63,6 +67,10 @@ function Network.BuildPresenceDelta(record)
             and now - zombieAttackerAt <= 1500)
         or (zombieStimulusAt > 0
             and now - zombieStimulusAt <= 1500)
+        or (zombieAlertAt > 0
+            and now - zombieAlertAt <= (
+                tonumber(Const and Const.ZOMBIE_ALERT_TTL_MS) or 1800
+            ))
     local zombieDebugTransitioned = record.runtime
         and record.runtime.zombieDebugWasActive ~= zombieDebugActive
         or false
