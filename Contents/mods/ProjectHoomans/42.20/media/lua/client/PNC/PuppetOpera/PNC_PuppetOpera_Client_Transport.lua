@@ -180,6 +180,10 @@ function Client.ReceiveState(snapshot)
             State.beatIndex = snapshot.beatIndex
             State.beatStartedAck = false
             State.beatFinishedAck = false
+            State.timelineNodeID = nil
+            State.timelineNodeType = nil
+            State.timelineNodeFinished = false
+            State.timelineElapsedMs = 0
         end
     end
     return true

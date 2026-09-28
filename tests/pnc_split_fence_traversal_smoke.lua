@@ -10,6 +10,7 @@ local finished = false
 local moveWarnings = {}
 local pathInvalidations = {}
 local traversalEvents = {}
+local traversalWriteOptions
 
 local fromSquare = {
     getX = function() return 0 end,
@@ -76,6 +77,17 @@ PNC = {
             body:setY(y)
             body:setZ(z)
         end,
+    },
+    ActorControl = {
+        IsPuppetOwned = function() return true end,
+        CanWrite = function(_, _, laneName, options)
+            traversalWriteOptions = {
+                lane = laneName,
+                options = options,
+            }
+            return options and options.allowPuppetMovement == true
+        end,
+        NoteBlocked = function() end,
     },
 }
 
@@ -154,6 +166,9 @@ now = 1200
 T.truthy(PNC.PathService.Internal.updateTraversalAction(
     zombie, record, lane, now
 ), "raise phase ended early")
+T.truthy(traversalWriteOptions
+    and traversalWriteOptions.options.allowPuppetMovement == true,
+    "Puppet Opera-owned traversal did not use its movement write allowance")
 T.equal(zombie.x, 0.5, "raise phase moved before the transfer event")
 
 zombie.variables.PNCTraversalPhase = "transfer"

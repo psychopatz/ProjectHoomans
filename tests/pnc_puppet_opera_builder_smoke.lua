@@ -134,6 +134,39 @@ T.truthy(boundSceneRow and boundSceneRow.liveID == "npc-one",
     "scene actor row did not expose its bound live actor ID")
 T.equal(boundSceneRow.liveName, "NPC One",
     "scene actor row did not expose its bound live actor name")
+local flowRows = Model.GetActorRows({
+    phase = "playing",
+    actors = {
+        actor_1 = {
+            state = "moving",
+            movementOwned = true,
+            arrived = false,
+            facing = false,
+            lastReason = "npc_moving",
+        },
+        actor_2 = {
+            state = "animating",
+            animationOwned = true,
+            arrived = true,
+            facing = true,
+            lastReason = "npc_animation_started",
+        },
+    },
+})
+local playerFlow
+local npcFlow
+for _, row in ipairs(flowRows) do
+    if row.id == "actor_1" then playerFlow = row end
+    if row.id == "actor_2" then npcFlow = row end
+end
+T.equal(playerFlow.flow, "Position / moving",
+    "actor position flow was not projected into the builder")
+T.equal(npcFlow.flow, "Animation / playing",
+    "actor animation flow was not projected into the builder")
+T.truthy(npcFlow.owned,
+    "animation ownership was not exposed to the builder")
+T.truthy(playerFlow.controlled and npcFlow.controlled,
+    "active Opera snapshot did not expose its control lock")
 local animationTargets = Model.GetAnimationTargetRows("npc")
 local sceneTarget
 local previewTarget
@@ -176,6 +209,27 @@ T.equal(Model.GetActorKind(addedID), "nearby_live_npc",
     "dropped live actor did not create an NPC slot")
 T.truthy(Model.AssignAnimation(addedID, npcEntry),
     "builder could not assign an explicit track to the added NPC slot")
+local timelineRows = Model.GetTimelineRows(nil)
+local actorTwoTimeline
+for _, row in ipairs(timelineRows) do
+    if row.id == "actor_2" then actorTwoTimeline = row break end
+end
+T.truthy(actorTwoTimeline and actorTwoTimeline.nodes[1],
+    "timeline projection did not expose the assigned NPC clip")
+local timelineNodeID = actorTwoTimeline.nodes[1].id
+T.truthy(Model.SetTimelineNodeDuration("actor_2", timelineNodeID, 400),
+    "timeline clip duration could not be resized")
+T.truthy(Model.SetTimelineNodeOffset("actor_2", timelineNodeID, 120),
+    "timeline clip could not be dragged to a new offset")
+local movedTimeline = Model.GetTimelineRows(nil)
+for _, row in ipairs(movedTimeline) do
+    if row.id == "actor_2" then
+        T.equal(row.nodes[1].startMs, 120,
+            "timeline drag did not persist the new clip offset")
+        T.equal(row.nodes[1].durationMs, 400,
+            "timeline resize did not persist the new clip duration")
+    end
+end
 local bindings, bindingReason = Model.GetRuntimeActorBindings()
 T.truthy(bindings, "multi-NPC bindings were not collected: " .. tostring(bindingReason))
 T.equal(bindings.actor_1, "__local_player__", "player binding changed")
@@ -212,10 +266,14 @@ T.equal(Model.GetDraft().id, duplicateID,
 
 local newAccepted, newDraft = Model.CreateNew()
 T.truthy(newAccepted and newDraft, "builder could not create a new scene")
-local firstAdded, firstID = Model.AddActorContainer()
-local secondAdded, secondID = Model.AddActorContainer()
+local firstAdded, firstID = Model.AddLiveActorToScene(
+    "npc-two", 3, 0, 0)
+local secondAdded, secondID = Model.AddLiveActorToScene(
+    "npc-one", -3, 0, 0)
 T.truthy(firstAdded and secondAdded,
-    "new scene could not add its first two actor containers")
+    "new scene could not auto-create actor containers from drops")
+T.truthy(firstID and secondID and firstID ~= secondID,
+    "new scene drops did not receive distinct actor containers")
 local newAnchors = newDraft.anchorFrame.anchors
 T.equal(newAnchors[newDraft.actors[firstID].anchor].faceTarget, secondID,
     "first new actor anchor did not face the second actor")

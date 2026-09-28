@@ -74,6 +74,27 @@ local function targetKey(x, y, z)
     return table.concat({ tostring(x), tostring(y), tostring(z) }, ":")
 end
 
+local function applyInteractionDistance(plan, actorIDs, distance)
+    distance = tonumber(distance)
+    if not distance or #actorIDs ~= 2 then return end
+    local first = plan.actors[actorIDs[1]]
+    local second = plan.actors[actorIDs[2]]
+    if not first or not second then return end
+    local dx = second.worldX - first.worldX
+    local dy = second.worldY - first.worldY
+    local current = math.sqrt(dx * dx + dy * dy)
+    if current < 0.0001 or current <= distance then return end
+    local midpointX = (first.worldX + second.worldX) * 0.5
+    local midpointY = (first.worldY + second.worldY) * 0.5
+    local scale = (distance * 0.5) / current
+    local offsetX = dx * scale
+    local offsetY = dy * scale
+    first.worldX = midpointX - offsetX
+    first.worldY = midpointY - offsetY
+    second.worldX = midpointX + offsetX
+    second.worldY = midpointY + offsetY
+end
+
 function Anchors.BuildPlan(blueprint, player, options)
     if type(blueprint) ~= "table" then
         return nil, "blueprint_missing"
@@ -119,6 +140,12 @@ function Anchors.BuildPlan(blueprint, player, options)
             rightY = rightY,
         },
         tolerance = tonumber(frame.tolerance) or 0.75,
+        interactionDistance = tonumber(frame.interactionDistance),
+        movementStopDistance = tonumber(frame.movementStopDistance),
+        arrivalTolerance = tonumber(frame.arrivalTolerance)
+            or tonumber(frame.movementStopDistance)
+            or tonumber(frame.tolerance)
+            or 0.75,
         actors = {},
         occupied = {},
     }
@@ -158,6 +185,10 @@ function Anchors.BuildPlan(blueprint, player, options)
             faceTarget = anchor.faceTarget,
         }
     end
+    local actorIDs = {}
+    for actorID in pairs(plan.actors) do actorIDs[#actorIDs + 1] = actorID end
+    table.sort(actorIDs)
+    applyInteractionDistance(plan, actorIDs, plan.interactionDistance)
     return plan
 end
 

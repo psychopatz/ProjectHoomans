@@ -18,7 +18,7 @@ function previewBody:getModData() return self.modData end
 local previewDebugger = {
     active = nil,
 }
-function previewDebugger.PlayXML(_, _, npcID, body, _, options)
+function previewDebugger.PlayXML(_, npcID, body, _, options)
     previewCalls[#previewCalls + 1] = options
     previewDebugger.active = {
         npcId = tostring(npcID or ""),
@@ -653,5 +653,64 @@ currentRuntime.result = {
 Client.Pump()
 T.equal(sent[#sent].payload.action, "player_beat_finished",
     "client did not acknowledge the completed player beat")
+
+local playerTrack = blueprint.beats[1].tracks.actor_1.byKind.local_player
+playerTrack.timeline = {
+    {
+        id = "player_pause",
+        type = "delay",
+        startMs = 0,
+        durationMs = 100,
+    },
+    {
+        id = "player_action",
+        type = "animation",
+        startMs = 100,
+        durationMs = 200,
+        track = {
+            route = "player_action",
+            mode = "action",
+            catalog = "player",
+            action = "RemoveBush",
+            animation = "Bob_Shove",
+        },
+    },
+}
+currentRuntime.entry = nil
+currentRuntime.active = false
+currentRuntime.result = nil
+clock = 3000
+local timelineSnapshot = {
+    sessionId = "puppet:client:timeline",
+    blueprintId = "social.kiss_test",
+    revision = 1,
+    phase = Opera.Phases.PLAYING,
+    beatIndex = 1,
+    beatStartAt = 3100,
+    actors = {
+        actor_1 = { kind = "local_player" },
+        actor_2 = { kind = "nearby_live_npc" },
+    },
+}
+Client.ReceiveState(timelineSnapshot)
+Client.Pump()
+T.falsy(currentRuntime.entry,
+    "player timeline ignored its leading delay")
+clock = 3200
+Client.Pump()
+T.truthy(currentRuntime.entry,
+    "player timeline did not start its offset animation")
+T.equal(sent[#sent].payload.action, "player_beat_started",
+    "offset player animation did not acknowledge its beat start")
+clock = 3250
+currentRuntime.active = false
+currentRuntime.result = {
+    ok = true,
+    reason = "player_action_finished",
+    at = clock,
+}
+Client.Pump()
+T.equal(sent[#sent].payload.action, "player_beat_finished",
+    "offset player timeline did not acknowledge completion")
 
 return T.finish("pnc_puppet_opera_transport_smoke")

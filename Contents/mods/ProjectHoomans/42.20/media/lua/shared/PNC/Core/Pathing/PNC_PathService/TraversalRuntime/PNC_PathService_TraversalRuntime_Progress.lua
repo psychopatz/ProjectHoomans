@@ -58,29 +58,32 @@ local function advanceTraversalPhase(zombie, record, action, now)
 end
 
 local function setTraversalPosition(zombie, record, lane, now, x, y, z)
+    local puppetMovementWrite = false
     if ActorControl and ActorControl.IsPuppetOwned
         and ActorControl.IsPuppetOwned(record)
     then
-        local allowed = ActorControl.CanWrite
+        puppetMovementWrite = ActorControl.CanWrite
             and ActorControl.CanWrite(
                 record,
                 nil,
                 "traversal_position",
                 { allowPuppetMovement = true }
-            )
-        if not allowed then
-            if ActorControl.NoteBlocked then
-                ActorControl.NoteBlocked(
-                    record,
-                    "traversal_position",
-                    "puppet_opera_writer_blocked:traversal_position"
-                )
-            end
+            ) == true
+        if not puppetMovementWrite then
             return false
         end
     end
-    if LiveBodyControl and LiveBodyControl.SetAuthoritativePosition then
-        LiveBodyControl.SetAuthoritativePosition(zombie, x, y, z)
+    if puppetMovementWrite then
+        zombie:setX(x)
+        zombie:setY(y)
+        zombie:setZ(z)
+        if zombie.setLastX then zombie:setLastX(x) end
+        if zombie.setLastY then zombie:setLastY(y) end
+        if zombie.setLastZ then zombie:setLastZ(z) end
+    elseif LiveBodyControl and LiveBodyControl.SetAuthoritativePosition then
+        if LiveBodyControl.SetAuthoritativePosition(zombie, x, y, z) == false then
+            return false
+        end
     else
         zombie:setX(x)
         zombie:setY(y)

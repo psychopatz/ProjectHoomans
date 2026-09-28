@@ -17,6 +17,45 @@ local findLiveActorRow = Internal.findLiveActorRow
 local actorDiscoveryRadius = Internal.actorDiscoveryRadius
 local Anchors = Internal.Anchors
 
+local function snapshotIsActive(snapshot)
+    local phase = snapshot and tostring(snapshot.phase or "") or ""
+    return snapshot ~= nil
+        and phase ~= "completed"
+        and phase ~= "restored"
+        and phase ~= "aborted"
+end
+
+local function runtimeFlowStage(bindingID, state, phase)
+    if not bindingID then return "Unassigned" end
+    state = tostring(state or "")
+    phase = tostring(phase or "")
+    if phase == "completed" or phase == "restored"
+        or phase == "aborted"
+    then
+        return "Done / " .. phase
+    end
+    if phase == "stopping" then return "Stopping" end
+    if state == "moving" or state == "arrived" or state == "facing"
+        or state == "preview_ready" or state == "pending"
+    then
+        return "Position / " .. (state == "preview_ready" and "ready"
+            or state)
+    end
+    if state == "animation_queued" or state == "animation_ready"
+        or state == "animating" or state == "animation_delay"
+        or state == "animation_finished"
+    then
+        local suffix = state
+        if state == "animation_queued" then suffix = "queued" end
+        if state == "animation_ready" then suffix = "ready" end
+        if state == "animating" then suffix = "playing" end
+        if state == "animation_delay" then suffix = "delay" end
+        if state == "animation_finished" then suffix = "finished" end
+        return "Animation / " .. suffix
+    end
+    return "Idle / " .. (state ~= "" and state or "bound")
+end
+
 function Model.GetActorRows(snapshot)
     local refreshCache = Internal.getRefreshCache
         and Internal.getRefreshCache() or nil
@@ -44,14 +83,34 @@ function Model.GetActorRows(snapshot)
             anchor = definition.anchor or "-",
             state = runtime and runtime.state
                 or (binding and "bound" or "unbound"),
+            flow = runtimeFlowStage(
+                binding,
+                runtime and runtime.state or (binding and "bound" or "unbound"),
+                snapshot and snapshot.phase
+            ),
             bindingID = binding,
             liveID = liveID,
             liveName = live and live.name or nil,
             liveShortID = live and live.shortID or nil,
             target = runtime and runtime.target or nil,
+            arrived = runtime and runtime.arrived == true or false,
+            facing = runtime and runtime.facing == true or false,
+            lastReason = runtime and runtime.lastReason or nil,
+            timelineNodeID = runtime and runtime.timelineNodeID or nil,
+            timelineNodeType = runtime and runtime.timelineNodeType or nil,
+            timelineElapsedMs = runtime and runtime.timelineElapsedMs or nil,
+            movementOwned = runtime and runtime.movementOwned == true
+                or false,
+            animationOwned = runtime and runtime.animationOwned == true
+                or false,
+            overrideOwned = runtime and runtime.overrideOwned == true
+                or false,
+            overrideOwnerKind = runtime and runtime.overrideOwnerKind or nil,
+            controlled = runtime ~= nil and snapshotIsActive(snapshot) or false,
             owned = runtime and (
                 runtime.movementOwned == true
                 or runtime.animationOwned == true
+                or runtime.overrideOwned == true
             ) or false,
             supported = resolvedKind == "local_player"
                 or resolvedKind == "nearby_live_npc",

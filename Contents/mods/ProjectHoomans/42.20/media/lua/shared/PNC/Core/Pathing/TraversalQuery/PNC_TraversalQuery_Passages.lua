@@ -12,19 +12,25 @@ function TraversalQuery.GetPassageBetween(fromSquare, toSquare)
     if not fromSquare or not toSquare or fromSquare == toSquare then
         return nil
     end
-    object = Internal.CallFirst(fromSquare, { "getDoorTo", "getIsoDoorTo" }, toSquare)
+    -- Java ground truth (zombie.iso.IsoGridSquare, PZ 42.20): getDoorTo(IsoGridSquare)
+    -- and getWindowTo(IsoGridSquare)/getWindowThumpableTo(IsoGridSquare) exist;
+    -- getIsoDoorTo and getWindowOrWindowThumpableTo do not exist at all. A name
+    -- that exists with a non-matching signature is worse than a dead one: it
+    -- fails overload resolution inside PZ's Kahlua bridge, which corrupts the
+    -- shared MethodArguments pool and breaks unrelated bridged calls later.
+    object = Internal.CallFirst(fromSquare, { "getDoorTo" }, toSquare)
     if object then
         return object
     end
-    object = Internal.CallFirst(toSquare, { "getDoorTo", "getIsoDoorTo" }, fromSquare)
+    object = Internal.CallFirst(toSquare, { "getDoorTo" }, fromSquare)
     if object then
         return object
     end
-    object = Internal.CallFirst(fromSquare, { "getWindowTo", "getWindowOrWindowThumpableTo", "getWindowThumpableTo" }, toSquare)
+    object = Internal.CallFirst(fromSquare, { "getWindowTo", "getWindowThumpableTo" }, toSquare)
     if object then
         return object
     end
-    object = Internal.CallFirst(toSquare, { "getWindowTo", "getWindowOrWindowThumpableTo", "getWindowThumpableTo" }, fromSquare)
+    object = Internal.CallFirst(toSquare, { "getWindowTo", "getWindowThumpableTo" }, fromSquare)
     if object then
         return object
     end

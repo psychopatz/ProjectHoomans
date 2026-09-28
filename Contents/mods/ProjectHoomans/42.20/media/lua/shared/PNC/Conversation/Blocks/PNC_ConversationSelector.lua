@@ -72,6 +72,9 @@ function Selector.IsCategoryEligible(categoryID, context, allowSystem)
     if not repeatOK then return false, repeatReason end
     local eligible, reason = Rules.EvaluateAll(category.gates, context)
     if not eligible then return false, reason end
+    eligible, reason = Registry.EvaluateCategoryEligibility(
+        category, context)
+    if not eligible then return false, reason end
     if context and type(context.categoryValidator) == "function" then
         local valid, details = context.categoryValidator(category)
         if valid == true then return true end

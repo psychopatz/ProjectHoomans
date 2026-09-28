@@ -53,6 +53,12 @@ local function isRoamingIdle(record)
         or false
 end
 
+local function isAlertOnly(record)
+    local target = record and record.runtime
+        and record.runtime.target or nil
+    return target and target.alertOnly == true or false
+end
+
 local function isAbstractDormant(record)
     local order = record.orderSpec or {}
     local health = record.health or {}
@@ -105,7 +111,9 @@ function LOD.Resolve(record)
         return "abstract_far"
     end
     if record.runtime and record.runtime.attackAction then return "combat_action" end
-    if record.runtime and record.runtime.target then return "combat" end
+    if record.runtime and record.runtime.target then
+        return isAlertOnly(record) and "threat_alert" or "combat"
+    end
     if record.health and record.health.state == "incapacitated" then
         return "incapacitated"
     end
@@ -128,6 +136,9 @@ function LOD.GetCadence(record)
         )
     end
     if tier == "combat_action" then return 50 end
+    if tier == "threat_alert" then
+        return tonumber(Const.TICK_LIVE_WARM_MS) or 250
+    end
     if tier == "combat" then
         return math.min(tonumber(Const.TICK_LIVE_HOT_MS) or 100, 75)
     end
@@ -165,6 +176,9 @@ function LOD.GetDecisionInterval(record)
     local tier = LOD.Resolve(record)
     if tier == "presence_wake" then return 50 end
     if tier == "combat_action" then return 50 end
+    if tier == "threat_alert" then
+        return tonumber(Const.TICK_LIVE_WARM_MS) or 250
+    end
     if tier == "combat" then return 100 end
     if tier == "follow_owner" then
         return tonumber(Const.FOLLOW_DECISION_INTERVAL_MS) or 100
@@ -199,6 +213,9 @@ function LOD.GetVitalsInterval(record)
         or tier == "incapacitated"
     then
         return tonumber(Const.SIMULATION_VITALS_HOT_MS) or 250
+    end
+    if tier == "threat_alert" then
+        return tonumber(Const.SIMULATION_VITALS_LIVE_MS) or 1000
     end
     if tier == "abstract_near" or tier == "abstract_active"
         or tier == "abstract_travel" or tier == "abstract_follow"

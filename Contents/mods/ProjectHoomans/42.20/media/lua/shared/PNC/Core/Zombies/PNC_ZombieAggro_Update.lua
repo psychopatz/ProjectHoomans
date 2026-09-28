@@ -709,6 +709,13 @@ local function pursueForcedTarget(zombie, npcBody, record, now, hitSettling)
             zombie, record, npcBody, now, approach
         )
     end
+    -- The pursuit lane already has the authoritative zombie/NPC pair. Publish
+    -- the group stimulus here once per zombie cadence so NPC behavior ticks do
+    -- not repeat the fan-out work. The helper remains authority-gated for
+    -- singleplayer and multiplayer safety.
+    if PNC.Perception and PNC.Perception.PublishZombieGroupAlert then
+        PNC.Perception.PublishZombieGroupAlert(record, zombie, now)
+    end
 end
 
 local function acquireNearestTarget(zombie)

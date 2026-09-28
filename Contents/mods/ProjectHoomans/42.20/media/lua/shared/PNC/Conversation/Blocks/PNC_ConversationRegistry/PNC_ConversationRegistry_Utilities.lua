@@ -15,6 +15,8 @@ Registry.blocks = Registry.blocks or {}
 Registry.invalidCategories = Registry.invalidCategories or {}
 Registry.invalidBlocks = Registry.invalidBlocks or {}
 Registry.conditionHandlers = Registry.conditionHandlers or {}
+Registry.categoryEligibilityProviders =
+    Registry.categoryEligibilityProviders or {}
 Registry.effectHandlers = Registry.effectHandlers or {}
 Registry.revision = tonumber(Registry.revision) or 0
 

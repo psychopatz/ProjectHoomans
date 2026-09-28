@@ -211,6 +211,120 @@ T.equal(blueprint.beats[1].tracks.npc_b.bump, "PNC_WaveHi",
 T.truthy(Opera.Blueprints.ValidateRuntime(blueprint),
     "two-NPC blueprint failed the runtime policy")
 
+local timelineRegistered, timelineBlueprint =
+    Opera.Blueprints.Register("rumors.timeline_npc", {
+        id = "rumors.timeline_npc",
+        version = 1,
+        actors = {
+            npc_a = { kind = "nearby_live_npc", anchor = "left" },
+            npc_b = { kind = "nearby_live_npc", anchor = "right" },
+        },
+        anchorFrame = {
+            tolerance = 0.75,
+            anchors = {
+                left = {
+                    right = -1, forward = 0, z = 0, faceTarget = "npc_b",
+                },
+                right = {
+                    right = 1, forward = 0, z = 0, faceTarget = "npc_a",
+                },
+            },
+        },
+        beats = {
+            {
+                id = "timeline_exchange",
+                durationMs = 900,
+                tracks = {
+                    npc_a = {
+                        bump = "PNC_WaveHi",
+                        animation = "Bob_EmoteWaveHi",
+                        nonCombat = true,
+                        timeline = {
+                            {
+                                id = "pause",
+                                type = "delay",
+                                startMs = 0,
+                                durationMs = 200,
+                            },
+                            {
+                                id = "wave",
+                                type = "animation",
+                                startMs = 200,
+                                durationMs = 400,
+                                track = {
+                                    bump = "PNC_WaveHi",
+                                    animation = "Bob_EmoteWaveHi",
+                                    nonCombat = true,
+                                },
+                            },
+                        },
+                    },
+                    npc_b = {
+                        bump = "PNC_WaveHi",
+                        animation = "Bob_EmoteWaveHi",
+                        nonCombat = true,
+                    },
+                },
+            },
+        },
+        playback = { defaultMode = "once", allowLoop = false, gapMs = 0 },
+    })
+T.truthy(timelineRegistered and timelineBlueprint,
+    "timeline blueprint could not be normalized")
+local timelineNodes = Opera.Blueprints.GetTimeline(
+    timelineBlueprint.beats[1],
+    "npc_a",
+    "nearby_live_npc"
+)
+T.equal(timelineNodes[1].type, "delay",
+    "timeline delay node was not preserved by normalization")
+T.equal(timelineNodes[2].track.bump, "PNC_WaveHi",
+    "timeline animation node did not normalize its track")
+local groupedRegistered, groupedReason = Opera.Blueprints.Register(
+    "rumors.grouped_timeline",
+    {
+        id = "rumors.grouped_timeline",
+        version = 1,
+        actors = {
+            npc_a = { kind = "nearby_live_npc", anchor = "left" },
+            npc_b = { kind = "nearby_live_npc", anchor = "right" },
+        },
+        anchorFrame = {
+            anchors = {
+                left = { right = -1, forward = 0, z = 0, faceTarget = "npc_b" },
+                right = { right = 1, forward = 0, z = 0, faceTarget = "npc_a" },
+            },
+        },
+        beats = {
+            {
+                id = "grouped",
+                durationMs = 900,
+                tracks = {
+                    npc_a = {
+                        bump = "PNC_WaveHi",
+                        animation = "Bob_EmoteWaveHi",
+                        timeline = {
+                            {
+                                id = "sequence",
+                                type = "sequence",
+                                children = {},
+                            },
+                        },
+                    },
+                    npc_b = {
+                        bump = "PNC_WaveHi",
+                        animation = "Bob_EmoteWaveHi",
+                    },
+                },
+            },
+        },
+    }
+)
+T.falsy(groupedRegistered,
+    "unsupported timeline groups were accepted without a runtime compiler")
+T.contains(groupedReason, "timeline_group_requires_compiler",
+    "unsupported timeline group did not expose its bounded failure reason")
+
 T.load(
     "ProjectHoomans",
     "server",
@@ -280,6 +394,38 @@ T.falsy(Authority.ByActor["npc-a"],
 T.falsy(Authority.ByActor["npc-b"],
     "second NPC session index was not released")
 T.truthy(#sent > 0, "two-NPC transport emitted no state")
+
+local timelineAccepted, timelineSession = Authority.HandleRequest(player, {
+    action = "start",
+    blueprintId = "rumors.timeline_npc",
+    actors = {
+        npc_a = "npc-a",
+        npc_b = "npc-b",
+    },
+    loop = false,
+})
+T.truthy(timelineAccepted, "authority rejected the timeline blueprint")
+npcA.x = timelineSession.actors.npc_a.target.worldX
+npcA.y = timelineSession.actors.npc_a.target.worldY
+npcB.x = timelineSession.actors.npc_b.target.worldX
+npcB.y = timelineSession.actors.npc_b.target.worldY
+Authority.PumpSession(timelineSession, clock)
+Authority.PumpSession(timelineSession, clock)
+T.equal(timelineSession.phase, Opera.Phases.READY,
+    "timeline blueprint did not pass the movement/facing barriers")
+clock = timelineSession.beatStartAt + 1
+Authority.PumpSession(timelineSession, clock)
+Authority.PumpSession(timelineSession, clock)
+T.equal(timelineSession.actors.npc_a.state, "animation_delay",
+    "timeline delay did not hold the first NPC animation")
+T.equal(timelineSession.actors.npc_a.timelineNodeID, "pause",
+    "timeline delay did not expose its active node")
+clock = timelineSession.beatStartAt + 201
+Authority.PumpSession(timelineSession, clock)
+T.equal(timelineSession.actors.npc_a.timelineNodeID, "wave",
+    "timeline cursor did not advance to the NPC animation node")
+T.truthy(timelineSession.closed,
+    "timeline NPC scene did not finish after its delayed animation")
 
 -- The scene-builder blueprint is deliberately kind-neutral. Exercise the
 -- same normalized definition with two NPC bindings so the server cannot

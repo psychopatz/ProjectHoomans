@@ -189,6 +189,10 @@ function Skills.AddXP(record, skillID, amount)
         Events.emit(EventTypes.NPC_SKILL_LEVEL_UP,
             record, skillID, finalLevel)
     end
+    if type(record.runtime) == "table" then
+        record.runtime.skillSnapshotRevision =
+            (tonumber(record.runtime.skillSnapshotRevision) or 0) + 1
+    end
     if PNC.Registry and PNC.Registry.MarkDirty then
         PNC.Registry.MarkDirty(record, "skills")
     end
@@ -229,12 +233,30 @@ function Skills.BuildSnapshot(record)
     local levels = {}
     local skillIDs
     local i
+    local runtime
+    local cacheKey
     if type(record) ~= "table" then
         return levels
+    end
+    runtime = type(record.runtime) == "table" and record.runtime or nil
+    cacheKey = tostring(record.recordRevision or 0)
+        .. "|" .. tostring(runtime and runtime.skillSnapshotRevision or 0)
+        .. "|" .. tostring(record.archetypeID or "")
+        .. "|" .. tostring(record.weaponMode or "")
+        .. "|" .. tostring(record.tacticalClass or "")
+    if runtime
+        and runtime.skillSnapshotCacheKey == cacheKey
+        and type(runtime.skillSnapshotCache) == "table"
+    then
+        return runtime.skillSnapshotCache
     end
     skillIDs = Catalog.GetAllSkillIDs()
     for i = 1, #skillIDs do
         levels[skillIDs[i]] = Skills.GetLevel(record, skillIDs[i])
+    end
+    if runtime then
+        runtime.skillSnapshotCacheKey = cacheKey
+        runtime.skillSnapshotCache = levels
     end
     return levels
 end

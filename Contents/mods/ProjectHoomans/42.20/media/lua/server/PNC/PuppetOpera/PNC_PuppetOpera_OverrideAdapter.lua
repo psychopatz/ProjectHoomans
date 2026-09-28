@@ -137,6 +137,17 @@ local function actionStateOf(body)
     return ""
 end
 
+-- The engine exposes every bump animation through the same `bumped` action
+-- state. A bump carrying the PNC lease is already owned by a PNC animation
+-- writer, so Opera must be able to replace it regardless of the combat label.
+-- The lease is the ownership boundary; ordinary unsafe action states remain
+-- guarded below.
+local function replaceableBump(body)
+    local modData = body and body.getModData and body:getModData() or nil
+    return modData ~= nil
+        and modData.PNC_BumpActionLease == true
+end
+
 local function contextOf(record)
     local internal = ThreatGuard and ThreatGuard.Internal or nil
     local runtime = record and record.runtime or nil
@@ -259,6 +270,7 @@ function Override.GetReadiness(record, body, options)
     local ownerKind
     local suspendable
     local modData
+    local bumpReplaceable = false
     if not record then return false, "npc_record_missing" end
     if not body then return false, "npc_body_unavailable" end
     if record.alive == false or body.isDead and body:isDead() then
@@ -283,10 +295,8 @@ function Override.GetReadiness(record, body, options)
     actionState = actionStateOf(body)
     modData = body.getModData and body:getModData() or nil
     if actionState == "bumped" then
-        if not modData
-            or modData.PNC_BumpActionLease ~= true
-            or modData.PNC_BumpNonCombat ~= true
-        then
+        bumpReplaceable = replaceableBump(body)
+        if not bumpReplaceable then
             return false, "npc_action_state_busy"
         end
     end
@@ -324,6 +334,7 @@ function Override.GetReadiness(record, body, options)
         suspendable = suspendable,
         reason = suspendable and "suspendable" or "ready",
         actionState = actionState,
+        bumpReplaceable = bumpReplaceable,
     }
 end
 
@@ -433,8 +444,7 @@ function Override.Acquire(session, actor)
     end
     modData = body.getModData and body:getModData() or nil
     if modData
-        and modData.PNC_BumpActionLease == true
-        and modData.PNC_BumpNonCombat == true
+        and replaceableBump(body)
         and PNC.Animation
         and PNC.Animation.FinishBump
     then

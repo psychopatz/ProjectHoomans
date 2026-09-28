@@ -31,14 +31,12 @@ local function finishLiveDrag(self, list, x, y)
                         actorID, right, forward, 0, occupant.id
                     )
                 else
-                    if type(self.model.GetSelectedActorID) == "function" then
-                        accepted, reason = self.model.AddLiveActorToScene(
-                            actorID, right, forward, 0,
-                            self.model.GetSelectedActorID()
-                        )
-                    else
-                        reason = "live_actor_model_unavailable"
-                    end
+                    -- An empty tile is an automatic slot-assignment drop.
+                    -- Passing the previously selected slot here caused the
+                    -- second free actor to target the first bound slot.
+                    accepted, reason = self.model.AddLiveActorToScene(
+                        actorID, right, forward, 0
+                    )
                 end
             else
                 reason = "live_actor_drop_outside_grid"

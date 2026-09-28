@@ -114,7 +114,10 @@ local fence = {
     getProperties = function() return fenceProperties end,
     isHoppable = function() return true end,
 }
-squares["0:0"].getHoppableThumpable = function(_, northEdge)
+-- IsoGridSquare.getHoppableThumpable()/getWallHoppable() take a GridSquareEdge,
+-- not the north flag, so the boolean edge probe must model the real overloads:
+-- getHoppable(boolean) / getHoppableWall(boolean) / getThumpableWallOrHoppable(boolean).
+squares["0:0"].getThumpableWallOrHoppable = function(_, northEdge)
     return northEdge == false and fence or nil
 end
 canPlan, kind = PNC.TraversalQuery.CanPlanStep(

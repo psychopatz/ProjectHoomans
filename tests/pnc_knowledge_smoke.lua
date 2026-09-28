@@ -100,6 +100,7 @@ T.truthy(identitySaveCalls >= 1,
 T.equal(Knowledge.GetDescriptor("char_a", npc.id, "identity.name").value,
     "Burton Gilmore", "introduced name is recorded")
 T.equal(Knowledge.Dirty, false, "introduction commits immediately")
+
 local repeatedIntroduction = Knowledge.DiscoverTopicForPlayer(
     {}, npc.id, "identity_name", 5, "direct_disclosure"
 )

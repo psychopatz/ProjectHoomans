@@ -27,6 +27,11 @@ for _, source in ipairs({
     -- not a face-to-face disclosure and therefore must not use the normal
     -- conversation lease/familiarity gate.
     { "radio_disclosure", 1, true, true, true },
+    -- A validated conversation partner can disclose a related NPC's name.
+    -- The conversation lease supplies the authority boundary; the source
+    -- bypasses descriptor discovery so identity.name can be revealed even
+    -- when the player has not previously discovered the merchant.
+    { "conversation_referral", .90, true, true, true },
     { "lifelong_relationship", 1, true, true, true },
 }) do
     Sources.Register(source[1], {

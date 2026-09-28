@@ -64,7 +64,7 @@ local function drawActorRow(list, y, row, alternate)
         UIFont.Small
     )
     list:drawTextRight(
-        Layout.Ellipsize(tostring(actor.state), UIFont.Small,
+        Layout.Ellipsize(tostring(actor.flow or actor.state), UIFont.Small,
             math.max(32, list:getWidth() * 0.42)),
         list:getWidth() - 8,
         y + 5,

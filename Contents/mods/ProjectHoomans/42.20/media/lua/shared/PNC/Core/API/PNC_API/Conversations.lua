@@ -33,6 +33,7 @@ function API.Conversations.GetCapabilities()
         modularJSONText = true,
         languageFallback = "EN",
         customConditions = true,
+        categoryEligibilityProviders = true,
         customEffects = true,
         relationshipAxes = { "approval", "respect", "familiarity" },
         derivedAttitudes = { "ADMIRE", "PITY", "FEAR", "DESPISE" },
@@ -90,6 +91,16 @@ function API.Conversations.UnregisterConditionHandler(id)
     return PNC.Conversation.Registry.UnregisterConditionHandler(id)
 end
 
+function API.Conversations.RegisterCategoryEligibilityProvider(id, provider)
+    return PNC.Conversation.Registry
+        .RegisterCategoryEligibilityProvider(id, provider)
+end
+
+function API.Conversations.UnregisterCategoryEligibilityProvider(id)
+    return PNC.Conversation.Registry
+        .UnregisterCategoryEligibilityProvider(id)
+end
+
 function API.Conversations.RegisterEffectHandler(id, handler)
     return PNC.Conversation.Registry.RegisterEffectHandler(id, handler)
 end
@@ -97,4 +108,3 @@ end
 function API.Conversations.UnregisterEffectHandler(id)
     return PNC.Conversation.Registry.UnregisterEffectHandler(id)
 end
-

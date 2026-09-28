@@ -1,6 +1,7 @@
--- Local zombie pursuit for singleplayer plus server-directed MP coordinates.
--- Managed NPCs are IsoZombie shells, so neither lane installs one as a native
--- combat target.
+-- Client-side zombie safety and MP directive application.
+-- Standalone singleplayer target selection is owned by ZombieAggro.Pump; this
+-- handler remains installed there for managed-shell safety only. Managed NPCs
+-- are IsoZombie shells, so neither lane installs one as a native combat target.
 
 PNC = PNC or {}
 PNC.ClientPresenceSync = PNC.ClientPresenceSync or {}
@@ -57,6 +58,14 @@ local ACTION_OWNED_ELSEWHERE = {
 local function isMultiplayerMode()
     return (isServer and isServer() == true)
         or (isClient and isClient() == true)
+end
+
+local function isStandaloneSingleplayer()
+    -- Standalone singleplayer still runs the authoritative server scheduler
+    -- in PNC_Server_SubsystemPumps. Keep this event hook passive after the
+    -- managed-shell safety guard so it cannot run a second target-selection
+    -- and pathing lane for the same zombie.
+    return not isMultiplayerMode()
 end
 
 local function isLivePlayer(player)
@@ -298,6 +307,19 @@ function Internal.UpdateClientZombieAggro(zombie, now)
         return false
     end
     if Effects.EnforceManagedSafetyGuard(zombie) then return false end
+    if isStandaloneSingleplayer()
+        and PNC.ZombieAggro
+        and type(PNC.ZombieAggro.Pump) == "function"
+    then
+        logPursuitDiagnostic(
+            zombie,
+            nil,
+            "sp_authority_lane",
+            "client_fallback_skipped",
+            now
+        )
+        return false
+    end
     if PNC.ZombieAggro
         and PNC.ZombieAggro.Internal
         and PNC.ZombieAggro.Internal.ShouldYieldToPursuitOwner
@@ -482,8 +504,8 @@ function Internal.OnClientZombieAggroUpdate(zombie)
 end
 
 -- This file is client-side, but also runs in standalone singleplayer where
--- isClient() is false. Register in both modes: SP selects locally, while an MP
--- client applies only the server's short-lived coordinate directive.
+-- isClient() is false. Register in both modes: SP keeps only the safety guard,
+-- while an MP client applies the server's short-lived coordinate directive.
 if Events and Events.OnZombieUpdate then
     if Sync.ClientZombieAggroUpdateHandler then
         Events.OnZombieUpdate.Remove(

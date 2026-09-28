@@ -133,6 +133,47 @@ local function releaseCombatScene(record, zombie, scene)
     return not remaining or remaining.blocking ~= true
 end
 
+local function alertTargetKey(target)
+    if not target then return "" end
+    return tostring(target.kind or "") .. "|"
+        .. tostring(target.zombieId or target.id or target.onlineID or "")
+        .. "|" .. tostring(target.alertSequence or target.lastSeenAt or "")
+end
+
+-- Alert-only targets are intentionally conservative about movement: the
+-- recipient has heard a nearby threat but has not confirmed line of sight.
+-- They must still be able to stand up from a seat/sleep/ground scene. Retry
+-- the handoff at a bounded cadence if a native wake transaction still owns
+-- the body; do not call Interrupt/Stop on every behavior tick.
+local function releaseAlertScene(record, zombie, now)
+    local runtime = record and record.runtime or nil
+    local scene = runtime and runtime.animationScene or nil
+    local sceneKey
+    local released
+    if not runtime then return true end
+    if not scene or scene.blocking ~= true
+        or preserveTravelConversationScene(record, scene)
+    then
+        if not scene then
+            runtime.threatGuardAlertSceneKey = nil
+            runtime.threatGuardAlertSceneNextAt = nil
+        end
+        return true
+    end
+    sceneKey = tostring(scene.revision or scene.id or scene)
+    if runtime.threatGuardAlertSceneKey ~= sceneKey then
+        runtime.threatGuardAlertSceneKey = sceneKey
+        runtime.threatGuardAlertSceneNextAt = 0
+    end
+    if now < (tonumber(runtime.threatGuardAlertSceneNextAt) or 0) then
+        return runtime.animationScene ~= scene
+            or scene.blocking ~= true
+    end
+    released = releaseCombatScene(record, zombie, scene)
+    runtime.threatGuardAlertSceneNextAt = now + 250
+    return released
+end
+
 function Internal.LogTransition(eventName, record, zombie, state, target, reason)
     local runtime = record and record.runtime or {}
     local modData = zombie and zombie.getModData and zombie:getModData() or nil
@@ -205,7 +246,6 @@ function Internal.RefreshTarget(record, state, threatContext, now)
             state.nextValidateAt = now + VALIDATE_MS
         end
         if Internal.IsThreat(current, threatContext) then
-            publishZombieGroupAlert(record, current, now)
             auditDecision("target_valid", record, nil, current, "validated")
             return current
         end
@@ -308,18 +348,56 @@ function Internal.CanAttackTarget(record, target)
 end
 
 function Internal.AlertTarget(record, zombie, state, target)
+    local runtime = record.runtime or {}
+    local now = PNC.Core and PNC.Core.Now and PNC.Core.Now() or 0
+    local key = alertTargetKey(target)
+    local changed = state.alertTargetKey ~= key
+        or state.phase ~= "alerted"
+    record.runtime = runtime
+    releaseAlertScene(record, zombie, now)
     state.phase = "alerted"
+    state.target = target
     record.activeBehavior = "CombatGuard:alerted"
-    Common.SetCombatTarget(record, target, "threat_guard_alert")
-    if Common and Common.HaltMovement then
-        Common.HaltMovement(record, zombie, "threat_guard_alert")
+    state.alertTargetKey = key
+    if changed then
+        Common.SetCombatTarget(record, target, "threat_guard_alert")
+        if Common and Common.HaltMovement then
+            Common.HaltMovement(record, zombie, "threat_guard_alert")
+        end
+        if PNC.Combat and PNC.Combat.FaceTarget then
+            PNC.Combat.FaceTarget(
+                record,
+                zombie,
+                target,
+                500,
+                "threat_guard_alert"
+            )
+        end
+        Common.SetCombatDebug(
+            record,
+            target,
+            "proximity_alert",
+            "none",
+            "alerted"
+        )
+        Internal.LogTransition("alert", record, zombie, state, target,
+            "alert_only")
+        runtime.threatGuardAlertFaceAt = now + 500
+    elseif PNC.Combat and PNC.Combat.FaceTarget
+        and now >= (tonumber(runtime.threatGuardAlertFaceAt) or 0)
+    then
+        -- Keep the actor oriented toward a remembered threat without
+        -- reissuing movement holds, combat-target writes, or debug payload
+        -- changes every server behavior tick.
+        PNC.Combat.FaceTarget(
+            record,
+            zombie,
+            target,
+            500,
+            "threat_guard_alert_refresh"
+        )
+        runtime.threatGuardAlertFaceAt = now + 500
     end
-    if PNC.Combat and PNC.Combat.FaceTarget then
-        PNC.Combat.FaceTarget(record, zombie, target, 500, "threat_guard_alert")
-    end
-    Common.SetCombatDebug(record, target, "proximity_alert", "none", "alerted")
-    Internal.LogTransition("alert", record, zombie, state, target,
-        "alert_only")
     return true
 end
 
@@ -333,6 +411,9 @@ function Internal.ClearState(record, zombie, reason)
     if state and tonumber(state.nextScanAt) ~= nil then
         runtime.threatGuardNextScanAt = state.nextScanAt
     end
+    runtime.threatGuardAlertSceneKey = nil
+    runtime.threatGuardAlertSceneNextAt = nil
+    runtime.threatGuardAlertFaceAt = nil
     Internal.LogTransition("exit", record, zombie, state, nil, reason)
 end
 

@@ -168,6 +168,20 @@ T.equal(npcNPCKiss.actors.actor_2.kind, "nearby_live_npc",
     "NPC/NPC scene did not fix actor 2 to NPC")
 T.truthy(Opera.Blueprints.ValidateRuntime(npcNPCKiss),
     "dedicated NPC/NPC kiss blueprint failed runtime policy")
+local closePlan = Opera.Anchors.BuildPlan(npcNPCKiss, player)
+T.truthy(closePlan, "dedicated kiss anchor plan failed")
+local firstClose = closePlan.actors.actor_1
+local secondClose = closePlan.actors.actor_2
+local closeDX = secondClose.worldX - firstClose.worldX
+local closeDY = secondClose.worldY - firstClose.worldY
+T.truthy(
+    math.sqrt(closeDX * closeDX + closeDY * closeDY) <= 0.5501,
+    "dedicated kiss actors were not pulled into close interaction distance"
+)
+T.equal(closePlan.movementStopDistance, 0.20,
+    "dedicated kiss plan did not use its tight movement stop distance")
+T.equal(closePlan.arrivalTolerance, 0.20,
+    "dedicated kiss plan did not use its tight arrival tolerance")
 local blueprint = Opera.GetBlueprint("social.kiss_test")
 T.truthy(blueprint, "kiss blueprint missing")
 T.falsy(blueprint.actors.actor_1.kind,
@@ -259,6 +273,8 @@ T.truthy(combatPreflightResult.preflight.ready,
 T.equal(combatPreflightResult.preflight.actors.actor_2.reasonDetail,
     "ready",
     "combat-state preflight did not report the NPC as ready")
+T.falsy(combatPreflightResult.preflight.actors.actor_2.owner == "combat",
+    "combat runtime fields still surfaced as a Puppet Opera combat owner")
 local combatStartAccepted, combatSession = Authority.HandleRequest(player, {
     action = "start",
     blueprintId = "social.kiss_test",

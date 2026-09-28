@@ -29,6 +29,7 @@ local function publishGroupAlert(record, zombie, now, radius)
     local candidate
     local body
     local runtime
+    local alert
     local distanceSq
     local limitSq
     local sequence
@@ -44,6 +45,9 @@ local function publishGroupAlert(record, zombie, now, radius)
         or setmetatable({}, { __mode = "k" })
     publishState = Perception.ZombieAlertPublishAt[zombie]
     if publishState and now < (tonumber(publishState.nextAt) or 0) then
+        if Diagnostics and Diagnostics.Increment then
+            Diagnostics.Increment("NPCThreat.GroupAlert.Throttled")
+        end
         return false
     end
     Perception.ZombieAlertSequence =
@@ -68,19 +72,30 @@ local function publishGroupAlert(record, zombie, now, radius)
             if distanceSq <= limitSq then
                 runtime = candidate.runtime or {}
                 candidate.runtime = runtime
-                runtime.zombieAlert = {
-                    zombieId = zombieId,
-                    x = zombie:getX(),
-                    y = zombie:getY(),
-                    z = zombie:getZ(),
-                    observedAt = now,
-                    expiresAt = now + (
-                        tonumber(Const.ZOMBIE_ALERT_TTL_MS) or 1800
-                    ),
-                    sequence = sequence,
-                    sourceId = record.id,
-                    distSq = distanceSq,
-                }
+                alert = runtime.zombieAlert
+                if type(alert) ~= "table"
+                    or tostring(alert.zombieId or "") ~= tostring(zombieId)
+                then
+                    alert = {}
+                    runtime.zombieAlert = alert
+                end
+                if tonumber(alert.sequence) ~= sequence then
+                    runtime.zombieAlertCheckAt = 0
+                end
+                -- Reuse the per-NPC alert object while the same zombie owns
+                -- the alert. This avoids a table allocation per recipient on
+                -- every refresh.
+                alert.zombieId = zombieId
+                alert.x = zombie:getX()
+                alert.y = zombie:getY()
+                alert.z = zombie:getZ()
+                alert.observedAt = now
+                alert.expiresAt = now + (
+                    tonumber(Const.ZOMBIE_ALERT_TTL_MS) or 1800
+                )
+                alert.sequence = sequence
+                alert.sourceId = record.id
+                alert.distSq = distanceSq
                 recipients = recipients + 1
             end
         end
@@ -89,6 +104,10 @@ local function publishGroupAlert(record, zombie, now, radius)
         nextAt = now + (tonumber(Const.ZOMBIE_ALERT_REPUBLISH_MS) or 350),
         sequence = sequence,
     }
+    if Diagnostics and Diagnostics.Increment then
+        Diagnostics.Increment("NPCThreat.GroupAlert.Published")
+        Diagnostics.Increment("NPCThreat.GroupAlert.Recipients", recipients)
+    end
     if Diagnostics and Diagnostics.NPCThreatAuditEnabled == true
         and Diagnostics.LogNPCThreatAudit
     then
@@ -150,7 +169,15 @@ function Perception.FindProximityZombieAlert(record, radius)
     local entry
     local target
     local limit
-    if not record or not Perception.GetVisibleZombieEntries then return nil end
+    local nextAlertCheckAt
+    local nextProximityScanAt
+    if not record
+        or record.hostility
+            and record.hostility.attackZombies == false
+        or not Perception.GetVisibleZombieEntries
+    then
+        return nil
+    end
     if Core and type(Core.IsAuthority) == "function"
         and Core.IsAuthority() ~= true
     then
@@ -161,6 +188,13 @@ function Perception.FindProximityZombieAlert(record, radius)
     record.runtime = runtime
     alert = runtime.zombieAlert
     if alert and now < (tonumber(alert.expiresAt) or 0) then
+        nextAlertCheckAt = tonumber(runtime.zombieAlertCheckAt) or 0
+        if now < nextAlertCheckAt then
+            return buildAlertOnlyTarget(alert)
+        end
+        runtime.zombieAlertCheckAt = now + (
+            tonumber(Const.ZOMBIE_ALERT_LOS_RECHECK_MS) or 250
+        )
         zombie = Perception.FindZombieByID
             and Perception.FindZombieByID(alert.zombieId) or nil
         if zombie and not zombie:isDead() then
@@ -183,9 +217,15 @@ function Perception.FindProximityZombieAlert(record, radius)
             end
             return buildAlertOnlyTarget(alert)
         end
+        runtime.zombieAlert = nil
     elseif alert then
         runtime.zombieAlert = nil
     end
+    nextProximityScanAt = tonumber(runtime.zombieProximityScanAt) or 0
+    if now < nextProximityScanAt then return nil end
+    runtime.zombieProximityScanAt = now + (
+        tonumber(Const.ZOMBIE_ALERT_PROXIMITY_SCAN_MS) or 500
+    )
     limit = tonumber(radius)
         or tonumber(Const.ZOMBIE_PROXIMITY_ALERT_RADIUS)
         or tonumber(Const.TARGET_IMMEDIATE_THREAT_RADIUS)
@@ -203,6 +243,9 @@ function Perception.FindProximityZombieAlert(record, radius)
             if target then
                 target.proximityAlert = true
                 publishGroupAlert(record, entry.zombie, now)
+                if Diagnostics and Diagnostics.Increment then
+                    Diagnostics.Increment("NPCThreat.ProximityAlert.Hit")
+                end
                 return target
             end
         end

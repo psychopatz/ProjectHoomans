@@ -46,7 +46,8 @@ local function activeSafety(session, timestamp)
     local puppetMovementIsSafe = Internal.puppetMovementIsSafe
     local actorFailureReason = Internal.actorFailureReason
     local unsafeNPCActionState = Internal.unsafeNPCActionState
-    local nonCombatBumpCanBeReleased = Internal.nonCombatBumpCanBeReleased
+    local managedBumpCanBeReleased = Internal.managedBumpCanBeReleased
+        or Internal.nonCombatBumpCanBeReleased
     local hasValue = Internal.hasValue
     local inRange = Internal.inRange
     local npcAnimation = NPCAnimation
@@ -88,7 +89,7 @@ local function activeSafety(session, timestamp)
                 or false
             if unsafeNPCActionState(actor.body)
                 and not npcAnimation.IsOwned(actor.body, session.sessionId)
-                and not nonCombatBumpCanBeReleased(actor.body)
+                and not managedBumpCanBeReleased(actor.body)
                 and not traversalOwned
             then
                 return false, actorFailureReason(
@@ -183,6 +184,10 @@ local function scheduleBeat(session, timestamp)
     session.beatStartedBy = {}
     session.beatFinishedBy = {}
     session.beatRevision = nil
+    for _, actor in pairs(session.actors or {}) do
+        actor.state = "animation_queued"
+        actor.lastReason = "beat_scheduled"
+    end
     Internal.setPhase(
         session,
         Opera.Phases.READY,
@@ -205,6 +210,13 @@ local function prepareBeat(session, timestamp)
     for _, actor in pairs(session.actors or {}) do
         actor.animationStartedAt = nil
         actor.animationOwned = false
+        actor.timelineStartedAt = nil
+        actor.timelineNodeID = nil
+        actor.timelineNodeType = nil
+        actor.timelineNodeFinished = false
+        actor.timelineElapsedMs = 0
+        actor.state = "animation_ready"
+        actor.lastReason = "beat_prepared"
     end
     Internal.setPhase(
         session,
@@ -250,15 +262,19 @@ local function beatFinished(session, timestamp)
 end
 
 local function pumpMoving(session, timestamp)
+    local stateChanged = false
     for actorID, actor in pairs(session.actors or {}) do
         if actor.kind == "nearby_live_npc" then
+            local previousState = actor.state
             local ok, reason = NPCMovement.Observe(session, actor)
             if not ok then
                 return false, tostring(reason or "npc_movement_failed")
                     .. ":" .. tostring(actorID)
             end
+            if actor.state ~= previousState then stateChanged = true end
         end
     end
+    if stateChanged then Internal.sendState(session, false) end
     local allArrived = true
     for _, actor in pairs(session.actors or {}) do
         if not actor.arrived then allArrived = false break end
@@ -323,11 +339,222 @@ local function pumpReady(session, timestamp)
     return true
 end
 
+local function timelineFor(beat, actorID, actorKind)
+    if Blueprints.GetTimeline then
+        return Blueprints.GetTimeline(beat, actorID, actorKind) or {}
+    end
+    local track = Blueprints.GetTrack
+        and Blueprints.GetTrack(beat, actorID, actorKind)
+        or beat.tracks and beat.tracks[actorID]
+        or beat.npc
+    return {
+        {
+            id = "legacy_" .. tostring(actorID),
+            type = "animation",
+            startMs = 0,
+            durationMs = tonumber(beat.durationMs) or 900,
+            track = track,
+        },
+    }
+end
+
+local function timelineStartOffset(beat, actorID, actorKind)
+    local earliest
+    for _, node in ipairs(timelineFor(beat, actorID, actorKind)) do
+        if node.type == "animation" then
+            local startMs = tonumber(node.startMs or node.offsetMs) or 0
+            if earliest == nil or startMs < earliest then
+                earliest = startMs
+            end
+        end
+    end
+    return earliest or 0
+end
+
+local function releaseTimelineAnimation(session, actor)
+    if not actor.animationOwned then return true end
+    local released, reason = NPCAnimation.Release(session, actor)
+    if released ~= true then
+        return false, reason or "npc_animation_release_failed"
+    end
+    actor.animationOwned = false
+    return true
+end
+
+local function pendingTimelineNode(nodes, elapsed, actor)
+    for index, node in ipairs(nodes or {}) do
+        local startMs = tonumber(node.startMs or node.offsetMs) or 0
+        local durationMs = tonumber(node.durationMs) or 0
+        local nodeID = tostring(node.id or ("node_" .. tostring(index)))
+        local finished = actor.timelineNodeFinished == true
+            and tostring(actor.timelineNodeID or "") == nodeID
+        if not finished
+            and elapsed >= startMs
+            and elapsed < startMs + durationMs
+        then
+            return node, index
+        end
+    end
+    return nil
+end
+
+local function hasPendingTimelineNode(nodes, elapsed, actor)
+    for index, node in ipairs(nodes or {}) do
+        local startMs = tonumber(node.startMs or node.offsetMs) or 0
+        local durationMs = tonumber(node.durationMs) or 0
+        local nodeID = tostring(node.id or ("node_" .. tostring(index)))
+        local finished = actor.timelineNodeFinished == true
+            and tostring(actor.timelineNodeID or "") == nodeID
+        if not finished and startMs + durationMs > elapsed then
+            return true
+        end
+    end
+    return false
+end
+
+local function observeTimelineAnimation(
+    session,
+    actor,
+    nodeBeat,
+    track,
+    nodes,
+    elapsed,
+    nodeID
+)
+    local ok, status = NPCAnimation.Observe(
+        session,
+        actor,
+        nodeBeat,
+        track
+    )
+    if not ok then return false, status end
+    if status == "finished" then
+        local released, releaseReason = releaseTimelineAnimation(
+            session,
+            actor
+        )
+        if not released then return false, releaseReason end
+        actor.timelineNodeFinished = true
+        actor.lastReason = "npc_animation_finished:" .. nodeID
+        if not hasPendingTimelineNode(nodes, elapsed, actor) then
+            actor.state = "animation_finished"
+            session.beatFinishedBy[actor.id] = true
+        else
+            actor.state = "animation_delay"
+        end
+    elseif elapsed < tonumber(session.phaseDeadline or 0) then
+        local maintained, maintainReason = NPCAnimation.Maintain(
+            session,
+            actor,
+            nodeBeat,
+            session.phaseDeadline,
+            track
+        )
+        if maintained ~= true then
+            return false, maintainReason
+                or "npc_animation_maintain_failed"
+        end
+    end
+    return true
+end
+
+local function pumpNPCAnimationTimeline(session, actor, beat, timestamp)
+    local nodes = timelineFor(beat, actor.id, actor.kind)
+    local elapsed = timestamp - (tonumber(actor.timelineStartedAt) or timestamp)
+    local node, nodeIndex = pendingTimelineNode(nodes, elapsed, actor)
+    local previousState = actor.state
+    if node and node.type == "animation" then
+        local nodeID = tostring(node.id or ("node_" .. tostring(nodeIndex)))
+        local track = node.track or node
+        local durationMs = tonumber(node.durationMs)
+            or tonumber(beat.durationMs) or 900
+        local nodeBeat = { durationMs = durationMs }
+        if tostring(actor.timelineNodeID or "") ~= nodeID
+            or actor.timelineNodeType ~= "animation"
+        then
+            local released, releaseReason = releaseTimelineAnimation(
+                session,
+                actor
+            )
+            if not released then return false, releaseReason end
+            local accepted, startReason = NPCAnimation.Start(
+                session,
+                actor,
+                nodeBeat,
+                track
+            )
+            if not accepted then
+                return false, startReason or "npc_animation_start_failed"
+            end
+            actor.timelineNodeID = nodeID
+            actor.timelineNodeType = "animation"
+            actor.timelineNodeFinished = false
+            actor.animationOwned = true
+            actor.animationStartedAt = timestamp
+            actor.state = "animating"
+            actor.lastReason = "npc_animation_started:" .. nodeID
+            local observed, observeReason = observeTimelineAnimation(
+                session,
+                actor,
+                nodeBeat,
+                track,
+                nodes,
+                elapsed,
+                nodeID
+            )
+            if not observed then return false, observeReason end
+        elseif actor.animationOwned then
+            local observed, observeReason = observeTimelineAnimation(
+                session,
+                actor,
+                nodeBeat,
+                track,
+                nodes,
+                elapsed,
+                nodeID
+            )
+            if not observed then return false, observeReason end
+        end
+    elseif node then
+        local released, releaseReason = releaseTimelineAnimation(
+            session,
+            actor
+        )
+        if not released then return false, releaseReason end
+        actor.timelineNodeID = tostring(
+            node.id or ("node_" .. tostring(nodeIndex))
+        )
+        actor.timelineNodeType = node.type or "delay"
+        actor.timelineNodeFinished = false
+        actor.state = node.type == "delay"
+            and "animation_delay" or "animation_queued"
+        actor.lastReason = "timeline_" .. tostring(node.type or "wait")
+    elseif not hasPendingTimelineNode(nodes, elapsed, actor) then
+        local released, releaseReason = releaseTimelineAnimation(
+            session,
+            actor
+        )
+        if not released then return false, releaseReason end
+        actor.timelineNodeFinished = true
+        actor.state = "animation_finished"
+        actor.lastReason = "timeline_finished"
+        session.beatFinishedBy[actor.id] = true
+    else
+        local released, releaseReason = releaseTimelineAnimation(
+            session,
+            actor
+        )
+        if not released then return false, releaseReason end
+        actor.state = "animation_delay"
+        actor.lastReason = "timeline_waiting"
+    end
+    actor.timelineElapsedMs = math.max(0, math.floor(elapsed))
+    return true, nil, previousState ~= actor.state
+end
+
 local function pumpPlaying(session, timestamp)
     local beat = session.blueprint.beats[session.beatIndex]
-    local accepted
-    local status
-    local reason
+    local stateChanged = false
     if not session.beatStartedAt then
         if timestamp < tonumber(session.beatStartAt or 0) then
             return true
@@ -335,17 +562,7 @@ local function pumpPlaying(session, timestamp)
         session.beatStartedAt = timestamp
         for actorID, actor in pairs(session.actors or {}) do
             if actor.kind == "nearby_live_npc" then
-                local track = Blueprints.GetTrack
-                    and Blueprints.GetTrack(beat, actorID, actor.kind)
-                    or beat.tracks and beat.tracks[actorID]
-                    or beat.npc
-                accepted, reason = NPCAnimation.Start(
-                    session, actor, beat, track
-                )
-                if not accepted then
-                    return false, reason or "npc_animation_start_failed"
-                end
-                actor.animationOwned = true
+                actor.timelineStartedAt = timestamp
                 session.beatStartedBy[actorID] = true
             elseif actor.kind == "local_player" then
                 session.beatStartedBy[actorID] = false
@@ -361,36 +578,26 @@ local function pumpPlaying(session, timestamp)
         if actor.kind == "local_player"
             and not session.beatStartedBy[actorID]
             and timestamp > session.beatStartedAt
+                + timelineStartOffset(beat, actorID, actor.kind)
                 + Opera.Config.acknowledgementTimeoutMs
         then
             return false, "player_animation_ack_timeout"
         end
     end
     for actorID, actor in pairs(session.actors or {}) do
-        if actor.kind == "nearby_live_npc" and actor.animationOwned then
-            local track = Blueprints.GetTrack
-                and Blueprints.GetTrack(beat, actorID, actor.kind)
-                or beat.tracks and beat.tracks[actorID]
-                or beat.npc
-            local ok
-            ok, status = NPCAnimation.Observe(session, actor, beat, track)
-            if not ok then return false, status end
-            if status == "finished" then
-                session.beatFinishedBy[actorID] = true
-            elseif timestamp < session.phaseDeadline then
-                local maintained, maintainReason = NPCAnimation.Maintain(
-                    session,
-                    actor,
-                    beat,
-                    session.phaseDeadline,
-                    track
-                )
-                if maintained ~= true then
-                    return false, maintainReason
-                        or "npc_animation_maintain_failed"
-                end
-            end
+        if actor.kind == "nearby_live_npc" then
+            local ok, reason, changed = pumpNPCAnimationTimeline(
+                session,
+                actor,
+                beat,
+                timestamp
+            )
+            if not ok then return false, reason end
+            stateChanged = stateChanged or changed == true
         end
+    end
+    if stateChanged then
+        Internal.sendState(session, false)
     end
     local allFinished = true
     for actorID in pairs(session.actors or {}) do

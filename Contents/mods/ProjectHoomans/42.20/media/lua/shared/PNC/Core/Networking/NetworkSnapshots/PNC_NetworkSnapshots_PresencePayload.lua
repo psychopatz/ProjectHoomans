@@ -6,6 +6,7 @@
 local Network = PNC.Network
 local Core = PNC.Core
 local Const = PNC.Const
+local Diagnostics = PNC.PerformanceScalingDiagnostics
 local Equipment = PNC.Equipment
 local Stamina = PNC.Stamina
 local Firearms = PNC.Firearms
@@ -62,15 +63,23 @@ function Network.BuildPresenceDelta(record)
     local zombieStimulusAt = record.runtime
         and tonumber(record.runtime.zombieStimulus
             and record.runtime.zombieStimulus.emittedAt) or 0
-    local zombieDebugActive =
+    local baseZombieDebugActive =
         (zombieAttackerAt > 0
             and now - zombieAttackerAt <= 1500)
         or (zombieStimulusAt > 0
             and now - zombieStimulusAt <= 1500)
-        or (zombieAlertAt > 0
-            and now - zombieAlertAt <= (
-                tonumber(Const and Const.ZOMBIE_ALERT_TTL_MS) or 1800
-            ))
+    -- Alert state is gameplay state. It must not make every nearby NPC build
+    -- the full combat-debug observation payload in normal play. Opt-in threat
+    -- auditing may still request the richer view at a slower cadence.
+    local zombieAlertDebugActive = Diagnostics
+        and Diagnostics.NPCThreatAuditEnabled == true
+        and zombieAlertAt > 0
+        and now - zombieAlertAt <= (
+            tonumber(Const and Const.ZOMBIE_ALERT_TTL_MS) or 1800
+        )
+        or false
+    local zombieDebugActive = baseZombieDebugActive
+        or zombieAlertDebugActive
     local zombieDebugTransitioned = record.runtime
         and record.runtime.zombieDebugWasActive ~= zombieDebugActive
         or false
@@ -81,7 +90,13 @@ function Network.BuildPresenceDelta(record)
         or combatDebugTransitioned
         or zombieDebugTransitioned
         or (inCombat and now - lastCombatDebugAt >= 150)
-        or (zombieDebugActive and now - lastCombatDebugAt >= 350)
+        or (baseZombieDebugActive
+            and now - lastCombatDebugAt >= 350)
+        or (zombieAlertDebugActive
+            and now - lastCombatDebugAt >= (
+                tonumber(Const and Const.ZOMBIE_ALERT_DEBUG_REFRESH_MS)
+                    or 750
+            ))
     then
         local equipmentInfo = Equipment
             and Equipment.Describe

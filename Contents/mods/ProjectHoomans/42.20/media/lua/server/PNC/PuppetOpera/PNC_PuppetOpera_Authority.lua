@@ -135,12 +135,15 @@ local function unsafeNPCActionState(body)
     return UNSAFE_NPC_ACTION_STATES[npcActionState(body)] == true
 end
 
-local function nonCombatBumpCanBeReleased(body)
+local function managedBumpCanBeReleased(body)
     local modData = body and body.getModData and body:getModData() or nil
-    return npcActionState(body) == "bumped"
-        and modData
-        and modData.PNC_BumpActionLease == true
-        and modData.PNC_BumpNonCombat == true
+    if npcActionState(body) ~= "bumped"
+        or not modData
+        or modData.PNC_BumpActionLease ~= true
+    then
+        return false
+    end
+    return true
 end
 
 local function actorFailureReason(reason, actorID, body)
@@ -476,7 +479,8 @@ Internal.hasValue = hasValue
 Internal.npcActionState = npcActionState
 Internal.npcActionContextState = npcActionContextState
 Internal.unsafeNPCActionState = unsafeNPCActionState
-Internal.nonCombatBumpCanBeReleased = nonCombatBumpCanBeReleased
+Internal.nonCombatBumpCanBeReleased = managedBumpCanBeReleased
+Internal.managedBumpCanBeReleased = managedBumpCanBeReleased
 Internal.actorFailureReason = actorFailureReason
 Internal.invalidPlayer = invalidPlayer
 Internal.invalidNPC = invalidNPC

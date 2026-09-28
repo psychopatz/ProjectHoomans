@@ -16,12 +16,40 @@ end
 
 local fromSquare
 local toSquare
+local doorLocked = false
+local doorBlockedByEngine = false
+local doorToggleRefuses = false
+local doorToggleCalls = 0
+local silentToggleCalls = 0
+local zombieOutside = false
+local doorRoom = { __class = "IsoRoom" }
 local door = {
     __class = "IsoDoor",
     IsOpen = function() return opened end,
+    isOpen = function() return opened end,
+    isLocked = function() return doorLocked end,
+    isLockedByKey = function() return doorLocked end,
+    isBarricaded = function() return doorBlockedByEngine end,
+    getKeyId = function() return -1 end,
+    setLocked = function(_, value) doorLocked = value end,
+    setLockedByKey = function(_, value) doorLocked = value end,
+    getOppositeSquare = function() return toSquare end,
+    -- Engine predicate (IsoDoor.couldBeOpen): barricades and obstruction.
+    couldBeOpen = function() return not doorBlockedByEngine end,
+    -- The character-aware engine toggle is unusable for zombie bodies (it
+    -- dereferences a null IsoPlayer), so the adapter must never call it.
+    ToggleDoor = function()
+        doorToggleCalls = doorToggleCalls + 1
+        error("IsoDoor.ToggleDoor must not be used for an NPC body")
+    end,
     getSquare = function() return fromSquare end,
     DirtySlice = function() end,
-    ToggleDoorSilent = function() opened = not opened end,
+    -- Engine silent toggle: character independent, refuses a barricaded door.
+    ToggleDoorSilent = function()
+        silentToggleCalls = silentToggleCalls + 1
+        if doorToggleRefuses then return end
+        opened = not opened
+    end,
     syncIsoObject = function() synced = synced + 1 end,
     getProperties = function()
         return {
@@ -35,6 +63,7 @@ fromSquare = {
     getX = function() return 0 end,
     getY = function() return 0 end,
     getZ = function() return 0 end,
+    getRoom = function() return doorRoom end,
     getDoorTo = function() return nil end,
     getObjects = function() return newList({ door }) end,
     InvalidateSpecialObjectPaths = function() end,
@@ -44,6 +73,7 @@ toSquare = {
     getX = function() return 1 end,
     getY = function() return 0 end,
     getZ = function() return 0 end,
+    getRoom = function() return nil end,
     getDoorTo = function(_, other)
         if other == fromSquare then return door end
         return nil
@@ -118,6 +148,12 @@ local zombie = {
     isFacingObject = function() return true end,
     isCollidedWithDoor = function() return false end,
     playSound = function() end,
+    -- Inside-side data used for the lock rule (IsoDoor.canBeOpenFromInside).
+    isOutside = function() return zombieOutside end,
+    getCurrentSquare = function() return fromSquare end,
+    getInventory = function()
+        return { haveThisKeyId = function() return nil end }
+    end,
 }
 local lane = {
     blockedStepFromX = 0.75,
@@ -172,30 +208,40 @@ T.equal(interaction, "door_open", "feeler passage interaction")
 T.equal(opened, true, "feeler-resolved door state")
 PNC.LiveBodyControl = nil
 
+-- The engine decides whether a character may open a door (IsoDoor.couldBeOpen /
+-- IsoDoor.ToggleDoor): barricades, the open-from-inside lock rule, obstruction
+-- and keys, plus the lock rule for a key holder or a character on the inside.
 opened = false
-door.isLockedByKey = function() return true end
-T.equal(PNC.PathService.Internal.openDoorForNPC(zombie, door), false, "key-locked door stays closed")
-T.equal(opened, false, "key-locked door state")
+doorBlockedByEngine = true
+silentToggleCalls = 0
+T.equal(PNC.PathService.Internal.openDoorForNPC(zombie, door), false,
+    "engine-refused door stays closed")
+T.equal(opened, false, "engine-refused door state")
+T.equal(silentToggleCalls, 0, "engine-refused door is not toggled")
+doorBlockedByEngine = false
 
-door.isLockedByKey = nil
-door.isLocked = function() return true end
-door.isObstructed = function() return true end
-IsoDoor = {
-    getDoubleDoorIndex = function() return -1 end,
-    getGarageDoorIndex = function() return 0 end,
-    toggleGarageDoor = function()
-        opened = true
-    end,
-}
-T.equal(
-    PNC.PathService.Internal.openDoorForNPC(zombie, door),
-    true,
-    "friendly NPC opens a locked garage like Bandits"
-)
-T.equal(opened, true, "garage door state")
-door.isLocked = nil
-door.isObstructed = nil
-IsoDoor = nil
+-- A locked door is refused for a body outside without a key, and the refusal
+-- backs off instead of hammering the door every tick.
+PNC.PathService.Internal.Core.Now = function() return 10000 end
+opened = false
+doorLocked = true
+zombieOutside = true
+silentToggleCalls = 0
+T.equal(PNC.PathService.Internal.openDoorForNPC(zombie, door), false,
+    "locked door is refused for a body outside")
+T.equal(PNC.PathService.Internal.openDoorForNPC(zombie, door), false,
+    "locked door keeps failing inside the backoff window")
+T.equal(silentToggleCalls, 0, "refused door is not toggled")
+
+-- The same locked door opens for the NPC standing inside, exactly like the
+-- player's first open used to, and that open clears the lock for good.
+PNC.PathService.Internal.Core.Now = function() return 20000 end
+opened = false
+zombieOutside = false
+T.equal(PNC.PathService.Internal.openDoorForNPC(zombie, door), true,
+    "NPC inside opens the locked door without the player")
+T.equal(opened, true, "locked door state after the NPC opened it")
+T.equal(doorLocked, false, "NPC open clears the lock like a player open")
 zombie.isCollidedWithDoor = function() return false end
 local windowOpened = false
 local window = {
@@ -294,6 +340,92 @@ interacted = PNC.PathService.Internal.tryDoorOrWindowInteraction(
     zombie, { id = "side_window_reject_test" }, lane, 0.75, 2.5, 0
 )
 T.equal(interacted, false, "non-facing adjacent window was selected")
-T.finish("pnc_door_interaction_smoke")
+-- The Lua layer defers to the engine predicate (IsoDoor.couldBeOpen) instead of
+-- re-deriving obstruction rules, so a door the predicate allows still opens even
+-- when its square reports isObstructed().
+opened = false
+door.isObstructed = function() return true end
+doorBlockedByEngine = false
+PNC.PathService.Internal.Core.Now = function() return 40000 end
+T.equal(PNC.PathService.Internal.openDoorForNPC(zombie, door), true,
+    "door whose square reports isObstructed still opens when the engine allows it")
+T.equal(opened, true, "obstructed-square door state")
+door.isObstructed = nil
+
+-- Indexing a member the engine does not expose may raise instead of returning
+-- nil. The passage compatibility probe must treat that as "method unavailable"
+-- rather than breaking door opening.
+opened = false
+local raisingDoor = setmetatable({}, {
+    __index = function(_, key)
+        if key == "__class" then return "IsoDoor" end
+        if key == "IsOpen" or key == "isOpen" then
+            return function() return opened end
+        end
+        if key == "isLocked" then return function() return false end end
+        if key == "getSquare" then return function() return fromSquare end end
+        if key == "DirtySlice" or key == "syncIsoObject" then
+            return function() end
+        end
+        if key == "ToggleDoorSilent" then
+            return function() opened = not opened end
+        end
+        if key == "getProperties" then
+            return function()
+                return {
+                    has = function() return false end,
+                    get = function() return nil end,
+                }
+            end
+        end
+        error("attempt to index unknown member " .. tostring(key))
+    end,
+})
+T.equal(PNC.PathService.Internal.openDoorForNPC(zombie, raisingDoor), true,
+    "unexposed member lookup does not break door opening")
+T.equal(opened, true, "raising-member door state")
+
+-- Every door goes through the character-independent silent toggle: the
+-- character-aware IsoDoor.ToggleDoor raises for a zombie body (null IsoPlayer),
+-- so the adapter must never call it, multi-tile door or not.
+opened = false
+doorToggleCalls = 0
+PNC.PathService.Internal.Core.Now = function() return 50000 end
+IsoDoor = {
+    getDoubleDoorIndex = function() return 0 end,
+    getGarageDoorIndex = function() return -1 end,
+}
+T.equal(PNC.PathService.Internal.openDoorForNPC(zombie, door), true,
+    "double door opens for an NPC")
+T.equal(opened, true, "double door state")
+T.equal(doorToggleCalls, 0, "character toggle is never used for an NPC body")
+IsoDoor = nil
+
+-- A raising engine toggle must be contained: the pass continues, the failure is
+-- reported once, and the door backs off instead of dumping a stack trace every
+-- tick.
+opened = false
+doorToggleRefuses = false
+local raisingToggleDoor = {
+    __class = "IsoDoor",
+    IsOpen = function() return opened end,
+    isOpen = function() return opened end,
+    isLocked = function() return false end,
+    couldBeOpen = function() return true end,
+    getSquare = function() return fromSquare end,
+    ToggleDoor = function()
+        doorToggleCalls = doorToggleCalls + 1
+        error("character toggle must not be used")
+    end,
+    ToggleDoorSilent = function()
+        error("engine door toggle failure")
+    end,
+}
+doorToggleCalls = 0
+PNC.PathService.Internal.Core.Now = function() return 60000 end
+T.equal(PNC.PathService.Internal.openDoorForNPC(zombie, raisingToggleDoor), false,
+    "raising engine toggle reports failure")
+T.equal(opened, false, "raising engine toggle leaves the door closed")
+T.equal(doorToggleCalls, 0, "raising case still avoids the character toggle")
 
 T.finish("pnc_door_interaction_smoke")

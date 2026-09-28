@@ -41,6 +41,9 @@ function Registry.GetFingerprint()
         ids[#ids + 1] = table.concat(parts, "|")
     end
     for id in pairs(Registry.conditionHandlers) do ids[#ids + 1] = "g:" .. id end
+    for id in pairs(Registry.categoryEligibilityProviders) do
+        ids[#ids + 1] = "cp:" .. id
+    end
     for id in pairs(Registry.effectHandlers) do ids[#ids + 1] = "e:" .. id end
     table.sort(ids)
     local value = Registry.API_VERSION

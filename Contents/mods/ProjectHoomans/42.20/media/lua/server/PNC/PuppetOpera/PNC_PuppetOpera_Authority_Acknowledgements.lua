@@ -57,7 +57,7 @@ local function handlePlayerAcknowledgement(player, session, args, action)
         if not Anchors.IsAt(
             session.playerBody,
             actor.target,
-            session.plan.tolerance
+            session.plan.arrivalTolerance or session.plan.tolerance
         ) then
             return false, "player_arrival_not_verified"
         end
@@ -65,6 +65,7 @@ local function handlePlayerAcknowledgement(player, session, args, action)
         actor.state = "arrived"
         actor.lastReason = "player_arrived_verified"
         Internal.trace(session, "player_arrived", { actor = actorID })
+        Internal.sendState(session, false)
         return true, "player_arrival_verified"
     end
     if action == "player_facing" then
@@ -89,6 +90,7 @@ local function handlePlayerAcknowledgement(player, session, args, action)
         actor.facing = true
         actor.lastReason = "player_facing_verified"
         Internal.trace(session, "player_facing", { actor = actorID })
+        Internal.sendState(session, false)
         return true, "player_facing_verified"
     end
     if action == "player_beat_started" then
@@ -102,10 +104,13 @@ local function handlePlayerAcknowledgement(player, session, args, action)
         if not actor then return false, "player_actor_missing" end
         session.beatStartedBy[actorID] = true
         actor.animationOwned = true
+        actor.state = "animating"
+        actor.lastReason = "player_animation_started"
         Internal.trace(session, "player_beat_started", {
             actor = actorID,
             beat = session.beatIndex,
         })
+        Internal.sendState(session, false)
         return true, "player_beat_start_verified"
     end
     if action == "player_beat_finished" then
@@ -119,10 +124,13 @@ local function handlePlayerAcknowledgement(player, session, args, action)
         if not actor then return false, "player_actor_missing" end
         session.beatFinishedBy[actorID] = true
         actor.animationOwned = false
+        actor.state = "animation_finished"
+        actor.lastReason = "player_animation_finished"
         Internal.trace(session, "player_beat_finished", {
             actor = actorID,
             beat = session.beatIndex,
         })
+        Internal.sendState(session, false)
         return true, "player_beat_finish_verified"
     end
     if action == "player_cancelled" then

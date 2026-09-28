@@ -7,6 +7,7 @@
 require "ISUI/ISPanel"
 require "PsychopatzCore/UI/PsychopatzUI"
 require "PNC/UI/PuppetOpera/PNC_PuppetOperaAnchorGrid"
+require "PNC/UI/PuppetOpera/PNC_PuppetOperaTimelinePanel"
 
 PNC = PNC or {}
 

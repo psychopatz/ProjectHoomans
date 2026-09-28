@@ -178,14 +178,20 @@ function TraversalQuery.GetFenceBetween(fromSquare, toSquare)
     squares = { fromSquare, toSquare }
     for i = 1, #squares do
         square = squares[i]
+        -- Java ground truth (zombie.iso.IsoGridSquare, PZ 42.20): only
+        -- getHoppable(boolean north), getHoppableWall(boolean),
+        -- getThumpableWallOrHoppable(boolean) and getWall(boolean) accept this
+        -- north flag. getWallHoppable()/getHoppableThumpable() exist but take a
+        -- GridSquareEdge, so passing the flag makes them fail overload
+        -- resolution; that failure corrupts Kahlua's shared MethodArguments
+        -- pool and later breaks unrelated bridged calls (item creation), so
+        -- they must not be probed with a boolean.
         object = Internal.CallFirst(
             square,
             {
                 "getHoppable",
-                "getWallHoppable",
                 "getHoppableWall",
                 "getThumpableWallOrHoppable",
-                "getHoppableThumpable",
             },
             northEdge
         )

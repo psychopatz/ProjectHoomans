@@ -7,6 +7,7 @@ local providers = {
 }
 local publicFunctions = {
     "Spawn", "Despawn", "SetOrder", "SetHostility", "SetLoadout",
+    "SetEquipmentSlot",
     "ApplyDamage", "ApplyDebugWound", "ApplyDebugInfection",
     "ClearKnoxInfection", "DebugBandageAlmostDirty", "GetSnapshot",
     "GetCharacterPayload", "DebugCommand",

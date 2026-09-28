@@ -94,6 +94,13 @@ function ZombieAggro.RefreshActiveSet(now, force)
     local radius = tonumber(Const.ZOMBIE_AGGRO_RADIUS) or 12
     local radiusSq = radius * radius
     local zombie
+    local queryCache
+    local cellSize
+    local cellX
+    local cellY
+    local cellZ
+    local cellKey
+    local queryRadius
     now = tonumber(now) or Core.Now()
     if force ~= true and now - (tonumber(state.lastRefreshAt) or 0)
         < (tonumber(Const.ZOMBIE_AGGRO_ACTIVE_REFRESH_MS) or 250)
@@ -101,6 +108,15 @@ function ZombieAggro.RefreshActiveSet(now, force)
         return false
     end
     state.lastRefreshAt = now
+    queryCache = {}
+    cellSize = math.max(
+        2,
+        tonumber(Const.CLIENT_ZOMBIE_AGGRO_CELL_SIZE) or 8
+    )
+    -- One expanded query can serve every NPC in the same spatial cell. The
+    -- per-body distance check below keeps the exact radius semantics while
+    -- avoiding one Spatial.QueryZombies call for every group member.
+    queryRadius = radius + (cellSize * 1.5)
     if Diagnostics then
         Diagnostics.Increment("ZombieAggro.AggroRefreshes")
     end
@@ -109,20 +125,31 @@ function ZombieAggro.RefreshActiveSet(now, force)
             if record and body and record.alive ~= false then
                 if Diagnostics then
                     Diagnostics.Increment("ZombieAggro.RefreshNPCs")
-                    Diagnostics.Increment("ZombieAggro.CandidateQueries")
-                    if record.presenceState
-                        ~= PNC.Const.PRESENCE_LIVE
-                    then
-                        Diagnostics.Increment(
-                            "LiveAbstract.AbstractAggroQueries"
-                        )
-                    end
                 end
-                candidates = Spatial.QueryZombies(
-                    body:getX(),
-                    body:getY(),
-                    radius
-                )
+                cellX = math.floor(body:getX() / cellSize)
+                cellY = math.floor(body:getY() / cellSize)
+                cellZ = math.floor(body:getZ() or 0)
+                cellKey = tostring(cellX) .. ":" .. tostring(cellY)
+                    .. ":" .. tostring(cellZ)
+                candidates = queryCache[cellKey]
+                if not candidates then
+                    if Diagnostics then
+                        Diagnostics.Increment("ZombieAggro.CandidateQueries")
+                        if record.presenceState
+                            ~= PNC.Const.PRESENCE_LIVE
+                        then
+                            Diagnostics.Increment(
+                                "LiveAbstract.AbstractAggroQueries"
+                            )
+                        end
+                    end
+                    candidates = Spatial.QueryZombies(
+                        body:getX(),
+                        body:getY(),
+                        queryRadius
+                    )
+                    queryCache[cellKey] = candidates
+                end
                 if Diagnostics then
                     Diagnostics.Increment(
                         "ZombieAggro.CandidateCount",

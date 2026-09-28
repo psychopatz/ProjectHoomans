@@ -339,6 +339,110 @@ local function normalizeTrackForKind(rawTrack, actorKind, beatID, durationMs)
     return normalizeFutureBeat(rawTrack, beatID, durationMs)
 end
 
+local function copyTrackFields(track)
+    local result = {}
+    for key, value in pairs(track or {}) do
+        if key ~= "timeline" then result[key] = value end
+    end
+    return result
+end
+
+local normalizeTimelineNodes
+
+normalizeTimelineNodes = function(
+    rawNodes,
+    actorKind,
+    beatID,
+    defaultDurationMs,
+    depth
+)
+    if type(rawNodes) ~= "table" or #rawNodes == 0 then
+        return nil, "timeline_nodes_required:" .. tostring(beatID)
+    end
+    depth = tonumber(depth) or 0
+    if depth > 4 then
+        return nil, "timeline_nesting_too_deep:" .. tostring(beatID)
+    end
+    local nodes = {}
+    local seen = {}
+    local animationCount = 0
+    for index, rawNode in ipairs(rawNodes) do
+        if type(rawNode) ~= "table" then
+            return nil, "timeline_node_not_a_table:" .. tostring(beatID)
+        end
+        local nodeID = validID(
+            rawNode.id or ("node_" .. tostring(index)),
+            64
+        )
+        local nodeType = cleanText(rawNode.type or "animation", 16)
+        local startMs = integerInRange(
+            rawNode.startMs or rawNode.offsetMs,
+            0,
+            10000,
+            0
+        )
+        if not nodeID or not startMs then
+            return nil, "timeline_node_metadata_invalid:"
+                .. tostring(beatID)
+        end
+        if seen[nodeID] then
+            return nil, "timeline_node_duplicate:" .. tostring(beatID)
+        end
+        seen[nodeID] = true
+        local node = {
+            id = nodeID,
+            type = nodeType,
+            startMs = startMs,
+            label = validID(rawNode.label, 96),
+        }
+        if nodeType == "animation" then
+            animationCount = animationCount + 1
+            local durationMs = integerInRange(
+                rawNode.durationMs,
+                1,
+                10000,
+                defaultDurationMs
+            )
+            if not durationMs then
+                return nil, "timeline_animation_duration_invalid:"
+                    .. tostring(beatID)
+            end
+            local payload = type(rawNode.track) == "table"
+                and rawNode.track or rawNode
+            local normalized, reason = normalizeTrackForKind(
+                payload,
+                actorKind,
+                tostring(beatID) .. ":" .. tostring(nodeID),
+                durationMs
+            )
+            if not normalized then return nil, reason end
+            node.durationMs = durationMs
+            node.track = copyTrackFields(normalized)
+        elseif nodeType == "delay" then
+            node.durationMs = integerInRange(
+                rawNode.durationMs,
+                0,
+                10000,
+                0
+            )
+        elseif nodeType == "sequence" or nodeType == "parallel" then
+            -- The first runtime slice executes a flat cursor. Reject group
+            -- nodes here instead of accepting a structure the server would
+            -- silently skip. A later compiler can lower these groups into
+            -- the same flat animation/delay nodes used by the cursor.
+            return nil, "timeline_group_requires_compiler:"
+                .. tostring(beatID)
+        else
+            return nil, "timeline_node_type_unsupported:" .. tostring(nodeType)
+        end
+        nodes[#nodes + 1] = node
+    end
+    if animationCount == 0 then
+        return nil, "timeline_animation_required:" .. tostring(beatID)
+    end
+    return nodes
+end
+
 local function normalizeActorTrack(rawTrack, actorDefinition, beatID, durationMs)
     if type(rawTrack) ~= "table" then
         return nil, "actor_track_missing:" .. tostring(beatID)
@@ -347,37 +451,63 @@ local function normalizeActorTrack(rawTrack, actorDefinition, beatID, durationMs
     -- Fixed-kind legacy blueprints retain their original direct track shape.
     -- Neutral slots use a variant map so one scene can be assigned to a
     -- player, an NPC, or two NPCs without rewriting the blueprint.
+    local normalized
+    local reason
     if actorDefinition.kind then
-        return normalizeTrackForKind(
+        normalized, reason = normalizeTrackForKind(
             rawTrack,
             actorDefinition.kind,
             beatID,
             durationMs
         )
-    end
-
-    local rawVariants = rawTrack.byKind or rawTrack.variants
-    if type(rawVariants) ~= "table" then
-        return nil, "actor_track_variants_required:" .. tostring(beatID)
-    end
-    local variants = {}
-    for _, actorKind in ipairs(actorDefinition.allowedKinds or {}) do
-        local variant = rawVariants[actorKind]
-        if not variant then
-            return nil, "actor_track_variant_missing:" .. tostring(beatID)
-                .. ":" .. tostring(actorDefinition.id)
-                .. ":" .. tostring(actorKind)
+    else
+        local rawVariants = rawTrack.byKind or rawTrack.variants
+        if type(rawVariants) ~= "table" then
+            return nil, "actor_track_variants_required:" .. tostring(beatID)
         end
-        local normalized, reason = normalizeTrackForKind(
-            variant,
-            actorKind,
-            beatID,
-            durationMs
-        )
-        if not normalized then return nil, reason end
-        variants[actorKind] = normalized
+        local variants = {}
+        for _, actorKind in ipairs(actorDefinition.allowedKinds or {}) do
+            local variant = rawVariants[actorKind]
+            if not variant then
+                return nil, "actor_track_variant_missing:" .. tostring(beatID)
+                    .. ":" .. tostring(actorDefinition.id)
+                    .. ":" .. tostring(actorKind)
+            end
+            local variantTrack, variantReason = normalizeTrackForKind(
+                variant,
+                actorKind,
+                beatID,
+                durationMs
+            )
+            if not variantTrack then return nil, variantReason end
+            if type(variant.timeline) == "table" then
+                local timeline, timelineReason = normalizeTimelineNodes(
+                    variant.timeline,
+                    actorKind,
+                    beatID,
+                    durationMs,
+                    0
+                )
+                if not timeline then return nil, timelineReason end
+                variantTrack.timeline = timeline
+            end
+            variants[actorKind] = variantTrack
+        end
+        return { byKind = variants }
     end
-    return { byKind = variants }
+    if not normalized then return nil, reason end
+    if type(rawTrack.timeline) == "table" then
+        local timeline, timelineReason = normalizeTimelineNodes(
+            rawTrack.timeline,
+            actorDefinition.kind,
+            beatID,
+            durationMs,
+            0
+        )
+        if not timeline then return nil, timelineReason end
+        normalized.timeline = timeline
+    end
+    return normalized
 end
 
 local function normalizeBeats(rawBeats, actors)
@@ -453,6 +583,12 @@ function Registry.Normalize(id, definition)
     if type(definition) ~= "table" then return nil, "definition_required" end
     local normalizedID = validID(id or definition.id, 96)
     if not normalizedID then return nil, "blueprint_id_invalid" end
+    local sceneType = validID(definition.sceneType, 64)
+    local closeScene = string.find(normalizedID, "kiss", 1, true) ~= nil
+        or string.find(tostring(sceneType or ""), "kiss", 1, true) ~= nil
+    local defaultInteractionDistance = closeScene and 0.55 or nil
+    local defaultMovementStopDistance = closeScene and 0.20 or nil
+    local defaultArrivalTolerance = closeScene and 0.20 or nil
 
     local frame = type(definition.anchorFrame) == "table"
         and definition.anchorFrame or {}
@@ -495,9 +631,27 @@ function Registry.Normalize(id, definition)
     end
     local version = integerInRange(definition.version, 1, 999, 1)
     local tolerance = numberInRange(frame.tolerance, 0.25, 2.0, 0.75)
+    local interactionDistance = numberInRange(
+        frame.interactionDistance, 0.25, 2.0, defaultInteractionDistance
+    )
+    local movementStopDistance = numberInRange(
+        frame.movementStopDistance, 0.10, 0.75, defaultMovementStopDistance
+    )
+    local arrivalTolerance = numberInRange(
+        frame.arrivalTolerance, 0.10, 2.0, defaultArrivalTolerance
+    )
     local gapMs = integerInRange(playback.gapMs, 0, 5000, 250)
     if version == nil then return nil, "blueprint_version_invalid" end
     if tolerance == nil then return nil, "anchor_tolerance_invalid" end
+    if frame.interactionDistance ~= nil and interactionDistance == nil then
+        return nil, "anchor_interaction_distance_invalid"
+    end
+    if frame.movementStopDistance ~= nil and movementStopDistance == nil then
+        return nil, "anchor_movement_stop_distance_invalid"
+    end
+    if frame.arrivalTolerance ~= nil and arrivalTolerance == nil then
+        return nil, "anchor_arrival_tolerance_invalid"
+    end
     if gapMs == nil then return nil, "playback_gap_invalid" end
     return {
         id = normalizedID,
@@ -506,7 +660,7 @@ function Registry.Normalize(id, definition)
             definition.definitionType or "opera",
             32
         ),
-        sceneType = validID(definition.sceneType, 64),
+        sceneType = sceneType,
         legacy = definition.legacy == true,
         labelKey = validID(definition.labelKey, 128),
         label = cleanText(definition.label or normalizedID, 128),
@@ -516,6 +670,9 @@ function Registry.Normalize(id, definition)
             origin = cleanText(frame.origin or "server_player_relative", 64),
             orientation = cleanText(frame.orientation or "player_facing", 64),
             tolerance = tolerance,
+            interactionDistance = interactionDistance,
+            movementStopDistance = movementStopDistance,
+            arrivalTolerance = arrivalTolerance,
             anchors = anchors,
         },
         beats = beats,
@@ -564,6 +721,23 @@ function Registry.GetTrack(beat, actorID, actorKind)
         return actorKind and track.byKind[tostring(actorKind)] or nil
     end
     return track
+end
+
+function Registry.GetTimeline(beat, actorID, actorKind)
+    local track = Registry.GetTrack(beat, actorID, actorKind)
+    if type(track) ~= "table" then return nil end
+    if type(track.timeline) == "table" and #track.timeline > 0 then
+        return track.timeline
+    end
+    return {
+        {
+            id = "legacy_" .. tostring(actorID or "actor"),
+            type = "animation",
+            startMs = 0,
+            durationMs = tonumber(beat.durationMs) or 900,
+            track = track,
+        },
+    }
 end
 
 function Registry.ValidateRuntime(blueprint)
@@ -714,7 +888,7 @@ local function dedicatedKissBlueprint(id, label, sceneType, actorKinds)
     local actorDefinitions = {}
     local anchors = {
         left = {
-            right = -1,
+            right = 0,
             forward = 0,
             z = 0,
             faceTarget = "actor_2",
@@ -768,6 +942,9 @@ local function dedicatedKissBlueprint(id, label, sceneType, actorKinds)
             origin = "server_player_relative",
             orientation = "player_facing",
             tolerance = 0.75,
+            interactionDistance = 0.55,
+            movementStopDistance = 0.20,
+            arrivalTolerance = 0.20,
             anchors = anchors,
         },
         beats = {

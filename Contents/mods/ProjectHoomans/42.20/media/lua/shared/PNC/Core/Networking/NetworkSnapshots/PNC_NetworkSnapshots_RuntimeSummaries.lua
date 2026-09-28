@@ -24,8 +24,10 @@ end
 
 function Parts.ResolveAIState(record)
     local healthState = record.health and tostring(record.health.state or "normal") or "normal"
-    local hasTarget = record.runtime and record.runtime.target ~= nil
-    local inCombat = hasTarget
+    local target = record.runtime and record.runtime.target or nil
+    local hasTarget = target ~= nil
+    local confirmedTarget = hasTarget and target.alertOnly ~= true
+    local inCombat = confirmedTarget
         or ((tonumber(record.runtime and record.runtime.inCombatUntil or 0) or 0) > Core.Now())
     if record.alive == false then
         return "Dead", false
@@ -40,6 +42,9 @@ function Parts.ResolveAIState(record)
     end
     if record.presenceState == Const.PRESENCE_ABSTRACT then
         return "Abstract", false
+    end
+    if hasTarget and target.alertOnly == true and not inCombat then
+        return "Alerted", false
     end
     if inCombat then
         return "Combat", true

@@ -50,6 +50,11 @@ local LayoutTab = T.load(
 
 T.equal(LayoutTab, ISPNCPuppetOperaLayoutTab,
     "layout tab hub did not preserve its public class identity")
+T.truthy(ISPNCPuppetOperaTimelinePanel,
+    "layout tab did not load the animation flow panel")
+T.truthy(type(ISPNCPuppetOperaTimelinePanel.render) == "function"
+    and type(ISPNCPuppetOperaTimelinePanel.onMouseDown) == "function",
+    "animation flow panel did not install its interaction contract")
 T.truthy(PNC.PuppetOperaLayoutTabInternal,
     "layout tab spokes did not receive a shared private contract table")
 T.truthy(type(PNC.PuppetOperaLayoutTabInternal.resizeRows) == "function"
@@ -225,8 +230,8 @@ T.equal(routed.actorID, "npc-valid-drop",
     "valid live drop did not route its actor identifier")
 T.equal(routed.right, 2, "valid live drop lost its right offset")
 T.equal(routed.forward, 3, "valid live drop lost its forward offset")
-T.equal(routed.targetID, "actor-selected",
-    "valid live drop lost the selected target actor")
+T.falsy(routed.targetID,
+    "empty-tile live drop should use automatic slot assignment")
 T.equal(validStatus.reason, "live_actor_added_to_scene",
     "valid live drop did not preserve success status")
 T.falsy(validStatus.failed, "valid live drop was marked as failed")

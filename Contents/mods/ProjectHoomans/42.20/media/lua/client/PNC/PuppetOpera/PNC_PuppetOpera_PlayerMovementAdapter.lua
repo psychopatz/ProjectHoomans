@@ -44,9 +44,9 @@ local function targetSquare(target)
     local cell = getCell()
     if not cell or not cell.getGridSquare then return nil end
     return cell:getGridSquare(
-        tonumber(target.x) or 0,
-        tonumber(target.y) or 0,
-        tonumber(target.z) or 0
+        math.floor(tonumber(target.worldX) or tonumber(target.x) or 0),
+        math.floor(tonumber(target.worldY) or tonumber(target.y) or 0),
+        math.floor(tonumber(target.worldZ) or tonumber(target.z) or 0)
     )
 end
 

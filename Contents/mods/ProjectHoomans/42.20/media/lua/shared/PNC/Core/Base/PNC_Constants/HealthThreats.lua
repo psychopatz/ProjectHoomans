@@ -73,7 +73,12 @@ Const.TARGET_IMMEDIATE_THREAT_RADIUS = 6.0
 Const.ZOMBIE_PROXIMITY_ALERT_RADIUS = 6.0
 Const.ZOMBIE_GROUP_ALERT_RADIUS = 8.0
 Const.ZOMBIE_ALERT_TTL_MS = 1800
-Const.ZOMBIE_ALERT_REPUBLISH_MS = 350
+-- Alert publication is authoritative and throttled per zombie. Keep the
+-- interval below the TTL without making every NPC decision rebuild the fanout.
+Const.ZOMBIE_ALERT_REPUBLISH_MS = 500
+Const.ZOMBIE_ALERT_PROXIMITY_SCAN_MS = 500
+Const.ZOMBIE_ALERT_LOS_RECHECK_MS = 250
+Const.ZOMBIE_ALERT_DEBUG_REFRESH_MS = 750
 Const.THREAT_GUARD_TARGET_RETAIN_MS = 3500
 -- Server zombie aggro records are refreshed continuously while a zombie owns
 -- an NPC pursuit lease. Perception uses this short window in multiplayer,

@@ -15,20 +15,27 @@ function Internal.normalizeItemWeightReduction(value)
     return math.max(0, math.min(1, value))
 end
 
+-- Item probes instantiate engine items through PZ's Kahlua Java bridge, which
+-- can raise a raw Java exception instead of returning nil. Every probe stays
+-- guarded so a bad descriptor degrades to "no probe" instead of breaking the
+-- caller's metadata resolution.
 function Internal.createItemProbe(fullType)
     local item
+    local ok
     if PNC.Equipment and type(PNC.Equipment.CreateItem) == "function" then
         item = PNC.Equipment.CreateItem(fullType)
     end
     local instanceItemFn = rawget(_G, "instanceItem")
     if not item and type(instanceItemFn) == "function" then
-        item = instanceItemFn(fullType)
+        ok, item = pcall(instanceItemFn, fullType)
+        if not ok then item = nil end
     end
     local itemFactory = rawget(_G, "InventoryItemFactory")
     if not item and itemFactory
         and type(itemFactory.CreateItem) == "function"
     then
-        item = itemFactory.CreateItem(fullType)
+        ok, item = pcall(itemFactory.CreateItem, fullType)
+        if not ok then item = nil end
     end
     if type(item) == "table"
         and not item.getActualWeight

@@ -18,6 +18,8 @@ local function buildSummaryPayload(record, inv)
     local currentGenerator = PNC.Const and tonumber(PNC.Const.GENERATOR_VERSION) or 1
     local summary
     local templateRef = record and record.inventoryTemplateRef or nil
+    local runtime = record and record.runtime or nil
+    local cacheKey
     if not templateRef and type(persistedBaseline) == "table" then
         templateRef = persistedBaseline.templateRef
     end
@@ -33,8 +35,16 @@ local function buildSummaryPayload(record, inv)
     if not inv then
         return nil
     end
+    cacheKey = tostring(inv.revision or 0)
+        .. "|" .. tostring(templateRef or "")
+    if runtime
+        and runtime.inventorySummaryCacheKey == cacheKey
+        and type(runtime.inventorySummaryCache) == "table"
+    then
+        return Core.DeepCopy(runtime.inventorySummaryCache)
+    end
     local encumbrance = Inventory.GetEncumbranceState(record, inv)
-    return {
+    summary = {
         revision = inv.revision,
         usedWeight = tonumber(inv.cachedWeight) or 0,
         maxWeight = tonumber(inv.maxWeight) or 0,
@@ -47,6 +57,11 @@ local function buildSummaryPayload(record, inv)
         persistenceMode = inv.persistenceMode,
         templateRef = inv.template and inv.template.templateRef or templateRef,
     }
+    if runtime then
+        runtime.inventorySummaryCacheKey = cacheKey
+        runtime.inventorySummaryCache = summary
+    end
+    return Core.DeepCopy(summary)
 end
 
 function Inventory.BuildSummaryPayload(record)

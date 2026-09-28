@@ -36,6 +36,10 @@ Client.State = Client.State or {
     beatIndex = nil,
     beatStartedAck = false,
     beatFinishedAck = false,
+    timelineNodeID = nil,
+    timelineNodeType = nil,
+    timelineNodeFinished = false,
+    timelineElapsedMs = 0,
     pendingMovementRelease = nil,
     pendingAnimationRelease = nil,
     previewPlayerOwner = nil,
@@ -80,6 +84,10 @@ local function resetTransient()
     State.beatIndex = nil
     State.beatStartedAck = false
     State.beatFinishedAck = false
+    State.timelineNodeID = nil
+    State.timelineNodeType = nil
+    State.timelineNodeFinished = false
+    State.timelineElapsedMs = 0
 end
 
 -- Keep the coordinator call sites stable while transport owns the request

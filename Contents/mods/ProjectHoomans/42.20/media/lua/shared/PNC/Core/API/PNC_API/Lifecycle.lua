@@ -207,3 +207,49 @@ function API.SetLoadout(npcId, equipmentSpec)
     Internal.ApplyLiveEquipment(record, "equipment")
     return true
 end
+
+local function setEquipmentSlot(record, slotKind, slotName, fullType)
+    local normalizedKind = tostring(slotKind or "")
+    local normalizedName = type(slotName) == "string" and slotName or ""
+    if fullType ~= nil and tostring(fullType) == "" then
+        fullType = nil
+    end
+    if normalizedKind == "primary" then
+        return Equipment.SetPrimary(record, fullType)
+    end
+    if normalizedKind == "secondary" then
+        return Equipment.SetSecondary(record, fullType)
+    end
+    if normalizedKind == "attached" and normalizedName ~= "" then
+        return Equipment.SetAttached(record, normalizedName, fullType)
+    end
+    if normalizedKind == "worn" and normalizedName ~= "" then
+        return Equipment.SetWorn(record, normalizedName, fullType)
+    end
+    return false
+end
+
+-- Mutates one native Hoomans equipment slot without replacing the generated
+-- appearance loadout. Add-ons should use this for a weapon override instead
+-- of passing a partial table to SetLoadout(), which is a full replacement.
+function API.SetEquipmentSlot(npcId, slotKind, slotName, fullType)
+    local record = Registry.Get(npcId)
+    if not record then return false end
+    if not setEquipmentSlot(record, slotKind, slotName, fullType) then
+        return false
+    end
+    if Inventory and Inventory.SyncFromEquipment then
+        Inventory.SyncFromEquipment(record, "set_equipment_slot")
+    end
+    if record.equipment and record.equipment.primaryFullType then
+        record.weaponMode = Equipment.ResolveWeaponMode(
+            record.equipment.primaryFullType)
+    else
+        record.weaponMode = "melee"
+    end
+    if Registry.MarkDirty then
+        Registry.MarkDirty(record, "equipment")
+    end
+    Internal.ApplyLiveEquipment(record, "equipment")
+    return true
+end

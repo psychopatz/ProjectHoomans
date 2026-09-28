@@ -25,11 +25,20 @@ local function sameSquare(left, right)
 end
 
 function Internal.passageMethodReturnsTrue(object, names)
+    local method
+    local ok
+    local value
     if not object then return false end
     for i = 1, #names do
-        local method = object[names[i]]
-        if type(method) == "function" and method(object) == true then
-            return true
+        -- Probe compatibly: names differ between PZ point releases and an
+        -- unknown member may resolve to nil or raise, so both the lookup and
+        -- the call stay isolated here instead of breaking door passage.
+        ok, method = pcall(function() return object[names[i]] end)
+        if ok and type(method) == "function" then
+            ok, value = pcall(method, object)
+            if ok and value == true then
+                return true
+            end
         end
     end
     return false

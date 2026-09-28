@@ -74,6 +74,9 @@ function Adapter.Start(session, actor)
     local tx = target.x
     local ty = target.y
     local tz = target.z
+    local stopDistance = session.plan
+        and tonumber(session.plan.movementStopDistance)
+        or 0.65
     local policyName
     local providerName
     local policy
@@ -104,7 +107,7 @@ function Adapter.Start(session, actor)
                     y = ty,
                     z = tz,
                     mode = "walk",
-                    stopDistance = 0.65,
+                    stopDistance = stopDistance,
                 },
                 policyName,
                 providerName,
@@ -143,7 +146,7 @@ function Adapter.Start(session, actor)
             ty,
             tz,
             "walk",
-            0.65,
+            stopDistance,
             ownershipReason,
             navigation,
             owner
@@ -156,7 +159,7 @@ function Adapter.Start(session, actor)
             ty,
             tz,
             "walk",
-            0.65,
+            stopDistance,
             ownershipReason,
             navigation,
             owner
@@ -210,7 +213,11 @@ function Adapter.Observe(session, actor)
     if not intentMatchesClaim(intent, claim, session.sessionId) then
         return false, "npc_movement_intent_replaced"
     end
-    if Anchors.IsAt(body, actor.target, session.plan.tolerance) then
+    if Anchors.IsAt(
+        body,
+        actor.target,
+        session.plan.arrivalTolerance or session.plan.tolerance
+    ) then
         actor.arrived = true
         actor.state = "arrived"
         actor.lastReason = "npc_arrived"

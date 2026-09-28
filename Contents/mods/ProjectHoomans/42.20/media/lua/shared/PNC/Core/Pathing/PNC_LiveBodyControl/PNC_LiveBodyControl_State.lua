@@ -368,6 +368,74 @@ local function passageMovementState(actionState)
         or actionState == "lungenetwork"
 end
 
+-- Managed bodies must open the door the engine reports at the feeler tile
+-- themselves: the engine's door toggle is player-driven in Build 42, so a body
+-- that only cancels its vanilla movement re-requests the same blocked path
+-- forever (NPCs stalled at closed doors). Attempts are rate limited per body so
+-- a door that refuses to open (locked, barricaded) cannot spam the engine.
+local PASSAGE_DOOR_ATTEMPT_AT = setmetatable({}, { __mode = "k" })
+local PASSAGE_DOOR_OPEN_LOGGED = setmetatable({}, { __mode = "k" })
+local PASSAGE_DOOR_ATTEMPT_MS = 250
+
+local function passageObjectBool(object, name)
+    local method = object and object[name] or nil
+    local ok
+    local value
+    if type(method) ~= "function" then return false end
+    ok, value = pcall(method, object)
+    return ok and value == true
+end
+
+local function isClosedPassageDoor(object)
+    if not object or not instanceof then return false end
+    if instanceof(object, "IsoDoor") then
+        return not passageObjectBool(object, "IsOpen")
+            and not passageObjectBool(object, "isOpen")
+    end
+    if instanceof(object, "IsoThumpable")
+        and object.isDoor
+        and object:isDoor() == true
+    then
+        return not passageObjectBool(object, "IsOpen")
+    end
+    return false
+end
+
+local function describePassageSquare(object)
+    local square = object and object.getSquare and object:getSquare() or nil
+    if not square then return "unknown" end
+    return tostring(square:getX()) .. "," .. tostring(square:getY())
+        .. "," .. tostring(square:getZ())
+end
+
+local function openPassageDoorAhead(zombie, object, now)
+    local pathService = PNC.PathService and PNC.PathService.Internal or nil
+    local openDoorForNPC = pathService and pathService.openDoorForNPC or nil
+    local last
+    local square
+    if type(openDoorForNPC) ~= "function" then return false end
+    if not isClosedPassageDoor(object) then return false end
+    now = tonumber(now) or 0
+    last = tonumber(PASSAGE_DOOR_ATTEMPT_AT[zombie])
+    if last and now > 0 and now - last < PASSAGE_DOOR_ATTEMPT_MS then
+        return false
+    end
+    PASSAGE_DOOR_ATTEMPT_AT[zombie] = now
+    if openDoorForNPC(zombie, object) ~= true then return false end
+    PASSAGE_DOOR_ATTEMPT_AT[zombie] = nil
+    square = object.getSquare and object:getSquare() or nil
+    if square and not PASSAGE_DOOR_OPEN_LOGGED[square]
+        and PNC.Core and PNC.Core.LogWarn
+    then
+        PASSAGE_DOOR_OPEN_LOGGED[square] = true
+        PNC.Core.LogWarn(
+            "[PNC][PATH] vanilla_passage_door_opened square="
+                .. describePassageSquare(object)
+        )
+    end
+    return true
+end
+
 function LiveBodyControl.BlockVanillaPassage(zombie, lane, now)
     local modData
     local actionState
@@ -383,6 +451,18 @@ function LiveBodyControl.BlockVanillaPassage(zombie, lane, now)
     actionState = LiveBodyControl.GetActionStateName(zombie)
     if not passageMovementState(actionState) then
         return false
+    end
+    -- Open a closed door the body is pressed against and let the vanilla path
+    -- continue, instead of cancelling movement and leaving the body to
+    -- re-request a path that the closed door keeps failing. An already open
+    -- door is not a blockage either.
+    if kind == "door" then
+        if not isClosedPassageDoor(object) then
+            return false, kind
+        end
+        if openPassageDoorAhead(zombie, object, now) then
+            return false, kind
+        end
     end
     modData = zombie.getModData and zombie:getModData() or nil
     if modData

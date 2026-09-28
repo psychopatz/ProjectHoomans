@@ -26,8 +26,17 @@ function Lifecycle.SweepPersistedLiveShells(now)
         return stats
     end
     stats.available = true
-    for i = zombieList:size() - 1, 0, -1 do
-        zombie = zombieList:get(i)
+    -- Snapshot the live zombie list before sweeping. Removal during the sweep
+    -- (and engine-side pruning) shrinks cell:getZombieList() below the walk
+    -- cursor, and indexing it then raised IndexOutOfBoundsException out of the
+    -- tick, aborting the whole sweep.
+    local shells = {}
+    local size = zombieList:size()
+    for i = 0, size - 1 do
+        shells[#shells + 1] = zombieList:get(i)
+    end
+    for i = 1, #shells do
+        zombie = shells[i]
         npcId, strong, weak = Internal.GetLiveShellIdentity(zombie)
         naked = Internal.IsNakedStartupShell(zombie)
         -- Unmarked naked-zombie correlation is a startup-only sweep. Distant

@@ -81,16 +81,13 @@ function Class:createChildren()
     self.grid:instantiate()
     self:addChild(self.grid)
 
-    self.details = UI.CreateKeyValueList(self, {
-        itemHeight = 25,
-        valueXRatio = 0.34,
-        valueXMax = 92,
-        ellipsize = true,
-        labelX = 8,
-        labelY = 6,
-        valueY = 6,
-        drawSelection = false,
-    })
+    self.timeline = ISPNCPuppetOperaTimelinePanel:new(0, 0, 1, 1)
+    self.timeline:initialise()
+    self.timeline:instantiate()
+    self:addChild(self.timeline)
+    -- Compatibility alias for layout extensions; this is now a flow panel,
+    -- not the old key/value metadata dump.
+    self.details = self.timeline
     self.removeButton = UI.CreateButton(self, {
         id = "remove_actor",
         title = tr("UI_PNC_PuppetOpera_RemoveActor", "Remove selected actor"),
@@ -116,6 +113,8 @@ function Class:setContext(window)
     self.model = window and window.model or nil
     self.grid:setModel(self.model)
     self.grid.ownerWindow = window
+    self.timeline.ownerWindow = window
+    self.timeline:setModel(self.model)
     self:refresh()
 end
 
