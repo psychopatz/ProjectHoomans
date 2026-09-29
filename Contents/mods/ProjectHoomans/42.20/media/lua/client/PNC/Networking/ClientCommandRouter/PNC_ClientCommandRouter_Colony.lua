@@ -79,16 +79,35 @@ Internal.RegisterServerCommand(Const.CMD_COLONY_JOURNAL, function(args)
     applyColonyJournal(args and args.delta or {})
 end)
 
+--[[
+    A sectioned response carries only the projection groups the caller asked
+    for, so it is merged into whatever the client already holds. Omitting a key
+    therefore preserves the previous value instead of clearing it. A response
+    built without sections replaces the snapshot, as before.
+]]
+local function applySnapshot(scopeKey, incoming, sectioned)
+    local current = ClientState[scopeKey]
+    if sectioned == true and type(current) == "table"
+        and type(incoming) == "table"
+    then
+        for key, value in pairs(incoming) do current[key] = value end
+        return current
+    end
+    return incoming
+end
+
 Internal.RegisterServerCommand(Const.CMD_COLONY_MANAGEMENT, function(args)
     args = type(args) == "table" and args or {}
     if args.scope == "base" then
-        ClientState.colonyBase = args.snapshot or {}
+        ClientState.colonyBase = applySnapshot(
+            "colonyBase", args.snapshot, args.sectioned)
         ClientState.colonyBaseRevision =
             (tonumber(ClientState.colonyBaseRevision) or 0) + 1
         ClientState.lastColonyBaseReceiveAt = Core.Now()
         return
     end
-    ClientState.colonyManagement = args.snapshot
+    ClientState.colonyManagement = applySnapshot(
+        "colonyManagement", args.snapshot, args.sectioned)
     ClientState.colonyManagementRevision =
         (tonumber(ClientState.colonyManagementRevision) or 0) + 1
     ClientState.lastColonyManagementReceiveAt = Core.Now()

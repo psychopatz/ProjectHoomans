@@ -27,8 +27,11 @@ end
 
 local function sendToPlayer(player, command, payload)
     if isServer and isServer() and player and sendServerCommand then
-        sendServerCommand(player, Const.MODULE, command, payload)
-        return true
+        -- Server-socket sends are limited by the engine packet buffer, so they
+        -- go through the payload budget, which decomposes an oversized payload
+        -- across several packets. Local (single-player) routing below is not
+        -- size-limited and keeps its existing behavior.
+        return Internal.SendChunked(player, Const.MODULE, command, payload)
     end
     if not isServer or not isServer() then
         triggerEvent("OnServerCommand", Const.MODULE, command, payload)

@@ -29,6 +29,22 @@ local function endpointText(row)
     return table.concat(output, " | ")
 end
 
+local function outfitSummary(rows)
+    local output = {}
+    for _, row in ipairs(rows or {}) do
+        output[#output + 1] = text(row.key) .. "x" .. text(row.count)
+            .. (row.shell and "*" or "")
+    end
+    return #output > 0 and table.concat(output, " ") or "none"
+end
+
+local function huskEntryText(entry)
+    return string.format("npc=%s pos=%d,%d,%s outfit=%s age=%sh try=%s%s",
+        text(entry.npcId), tonumber(entry.x) or 0, tonumber(entry.y) or 0,
+        text(entry.z), text(entry.outfitId), text(entry.ageHours),
+        text(entry.attempts), entry.abandoned and " ABANDONED" or "")
+end
+
 local function itemText(row)
     local output = {}
     for _, item in ipairs(row.items or {}) do
@@ -146,6 +162,55 @@ function ISPNCWorldEffectDebugWindow:refreshSnapshot()
         self.details:addItem("summary_" .. key, {
             label = key:upper(), value = text(summary[key] or 0),
         })
+    end
+    local husks = snapshot.husks
+    if type(husks) == "table" and husks.available ~= false then
+        local ledger = husks.ledger or {}
+        local reaper = husks.reaper or {}
+        local bodies = husks.bodies or {}
+        self.details:addItem("husks_header", { label = "HUSKS", value = "" })
+        self.details:addItem("husks_ledger", {
+            label = "Ledger",
+            value = string.format("%s/%s  %sB~  reaped %s",
+                text(ledger.entries), text(ledger.maxEntries),
+                text(ledger.estimatedBytes), text(ledger.reaped)),
+        })
+        self.details:addItem("husks_reaper", {
+            label = "Reaper",
+            value = string.format(
+                "%s  pending %s  failed %s  aband %s  orphan %s",
+                reaper.active and "active" or "idle", text(reaper.pending),
+                text(reaper.failed), text(reaper.abandoned),
+                text(reaper.orphanReaps)),
+        })
+        self.details:addItem("husks_bodies", {
+            label = "Bodies",
+            value = string.format(
+                "marked %s  unmarked %s  orphans %s  outfitMatch %s  nospawn=%s",
+                text(bodies.marked), text(bodies.unmarked),
+                text(bodies.orphans), text(bodies.fingerprint),
+                tostring(bodies.disabled == true)),
+        })
+        self.details:addItem("husks_outfits", {
+            label = "Outfits",
+            value = outfitSummary(bodies.outfits) .. "   (*=shell)",
+        })
+        self.details:addItem("husks_shellids", {
+            label = "Shell IDs",
+            value = text(husks.shellOutfits and husks.shellOutfits.ids),
+        })
+        for index, entry in ipairs(husks.entries or {}) do
+            self.details:addItem("husk_" .. tostring(index), {
+                label = "Husk " .. tostring(index),
+                value = huskEntryText(entry),
+            })
+        end
+        if husks.truncated then
+            self.details:addItem("husks_truncated", {
+                label = "Husks",
+                value = "more recorded losses not shown",
+            })
+        end
     end
     local row = selected(self.effects)
     if row then

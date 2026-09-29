@@ -104,7 +104,9 @@ end
 
 function Client.RequestWorldEffectDebug(state, kind, limit)
     local player = Internal.GetPlayer()
-    local args = { state = state, kind = kind, limit = limit }
+    local args = {
+        state = state, kind = kind, limit = limit, includeHusks = true,
+    }
     if not Client.CanUseDebug() then
         ClientState.worldEffectDebugAuthorized = false
         ClientState.worldEffectDebug = nil

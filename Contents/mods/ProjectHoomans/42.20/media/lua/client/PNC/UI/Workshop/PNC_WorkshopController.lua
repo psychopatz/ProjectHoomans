@@ -61,8 +61,16 @@ function Controller.Refresh(window, update)
     return Controller.Rebuild(window)
 end
 
+-- The workshop catalog renders from `workshop`, and "build station" opens the
+-- facility modal with the settlement, stockpile rows, and research catalog. It
+-- therefore keeps those groups and drops the colonist roster, zone, building
+-- queue, task, and provision projections it never reads.
+local WORKSHOP_SECTIONS = {
+    "header", "workshop", "storage", "settlement", "research",
+}
+
 function Controller.RequestSnapshot(window)
-    local _, _, requestedAt = Client.RequestSnapshot()
+    local _, _, requestedAt = Client.RequestSnapshot(nil, WORKSHOP_SECTIONS)
     window.lastRequestAt = requestedAt or now()
 end
 

@@ -93,10 +93,18 @@ local function summary(record, player, options)
         and PNC.NeedsEvaluator.Queries.BuildView(record)
         or { score = record.social and record.social.morale or 0,
             modifiers = {} }
-    local journal = PNC.Journals and PNC.Journals.GetNPC
-        and PNC.Journals.GetNPC(record.id,
-            PNC.Journals.NPC_CAPACITY or 32, true)
-        or {}
+    -- The journal is the heaviest per-colonist field and both client readers
+    -- only render it for the selected colonist, so it travels only for the
+    -- requested detail target. A caller that names no target keeps the previous
+    -- complete-summary behavior.
+    local detailNpcID = options and options.detailNpcID
+    local journal
+    if detailNpcID == nil or tostring(detailNpcID) == tostring(record.id) then
+        journal = PNC.Journals and PNC.Journals.GetNPC
+            and PNC.Journals.GetNPC(record.id,
+                PNC.Journals.NPC_CAPACITY or 32, true)
+            or {}
+    end
     local order = record.orderSpec or {}
     local playerOnlineID = player and player.getOnlineID
         and tonumber(player:getOnlineID()) or nil

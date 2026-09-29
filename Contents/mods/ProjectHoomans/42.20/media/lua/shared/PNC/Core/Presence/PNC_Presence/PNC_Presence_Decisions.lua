@@ -74,6 +74,15 @@ function Presence.ShouldAbstract(record, nearest)
     local handoff
     nearest = nearest or Internal.FindNearestPlayer(record)
     if record.presenceState ~= Const.PRESENCE_LIVE then return false end
+    -- A shell that already left the loaded world cannot be kept or recovered.
+    -- Presence must release the lease before forceLive/target exceptions can
+    -- hold a record paired with a body that no longer exists; otherwise the
+    -- engine's anonymous population copy becomes a permanent husk.
+    if PNC.BodyLifecycle and PNC.BodyLifecycle.IsRecordBodyLost
+        and PNC.BodyLifecycle.IsRecordBodyLost(record) == true
+    then
+        return true
+    end
     handoff = travelHandoffRequired(record)
     -- forceLive keeps an NPC embodied for gameplay, but it must not bind it to
     -- a movement lane that cannot serve its journey.

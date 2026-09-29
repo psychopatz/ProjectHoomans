@@ -164,6 +164,29 @@ local function beginMaterialization(record, reason, now)
 end
 
 local function spawnBody(record, position, reason)
+    local lifecycle = PNC.BodyLifecycle
+    local zombie
+    local factoryReason
+    if lifecycle and lifecycle.SpawnLiveBody then
+        zombie, factoryReason = lifecycle.SpawnLiveBody(
+            record, position, reason)
+        if zombie then
+            return zombie
+        end
+        markLifecycleFailure(
+            record,
+            "materialize_failed",
+            tostring(factoryReason or "spawn_returned_no_body")
+        )
+        Core.LogWarn(
+            "Failed to materialize NPC " .. tostring(record.id)
+                .. " reason=" .. tostring(reason)
+                .. " factory=" .. tostring(factoryReason or "unknown")
+        )
+        return nil
+    end
+    -- Load-order fallback: BodyLifecycle is composed before Presence, so this
+    -- lane is only reachable if that ordering is ever broken.
     local zombieList = addZombiesInOutfit(
         position.x, position.y, position.z, 1, "Naked",
         record.isFemale and 100 or 0,
@@ -181,7 +204,7 @@ local function spawnBody(record, position, reason)
         )
         return nil
     end
-    local zombie = zombieList:get(0)
+    zombie = zombieList:get(0)
     -- Claim the IsoZombie before visual/equipment setup and before the next
     -- engine/mod update can observe a partially configured body.
     if ActorOwnership and ActorOwnership.MarkHoomansOwned then

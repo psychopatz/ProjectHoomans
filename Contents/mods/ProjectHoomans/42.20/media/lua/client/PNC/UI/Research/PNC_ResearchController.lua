@@ -112,8 +112,13 @@ function Controller.Refresh(window, update)
     return View.Refresh(window, update)
 end
 
+-- The research view renders catalog entries and only reads the storage
+-- authorization flag, so it asks for the light access projection instead of the
+-- stockpile rows, colonist roster, settlement, and zone projections.
+local RESEARCH_SECTIONS = { "header", "research", "storageAccess" }
+
 function Controller.RequestSnapshot(window)
-    local _, _, requestedAt = Client.RequestSnapshot()
+    local _, _, requestedAt = Client.RequestSnapshot(nil, RESEARCH_SECTIONS)
     window.lastRequestAt = requestedAt
 end
 

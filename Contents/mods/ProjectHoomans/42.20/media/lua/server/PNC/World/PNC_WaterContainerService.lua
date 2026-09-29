@@ -20,21 +20,36 @@ local Diagnostics = PNC.PerformanceScalingDiagnostics
 
 local EPSILON = 0.0001
 
+-- Project Zomboid exposes Java members through a curated allowlist
+-- (zombie.Lua.LuaManager$Exposer). Reading a member that is not exposed on a
+-- Java object raises a Java RuntimeException instead of returning nil, so the
+-- read itself has to be guarded for this helper to honour its own contract.
+local function indexMember(object, member)
+    return object[member]
+end
+
 local function call(object, method, ...)
-    local fn = object and object[method]
-    local ok
-    local value
-    if type(fn) ~= "function" then return nil end
-    ok, value = pcall(fn, object, ...)
+    if object == nil then return nil end
+    local loaded, fn = pcall(indexMember, object, method)
+    if not loaded or type(fn) ~= "function" then return nil end
+    local ok, value = pcall(fn, object, ...)
     return ok and value or nil
 end
 
+-- java.lang.Class is itself not exposed, so object:getClass():getName() throws
+-- ("attempted index: getName of non-table: class ..."). Use the Java-backed
+-- global the base game also uses, then fall back to plain Lua fields.
+local classNameOf = getClassSimpleName
+
 local function objectType(object)
-    local class = call(object, "getClass")
-    return tostring(call(class, "getName")
-        or call(object, "getClassName")
-        or object and object.className
-        or object and object.__type
+    if object == nil then return "" end
+    if classNameOf then
+        local ok, name = pcall(classNameOf, object)
+        if ok and name ~= nil then return tostring(name) end
+    end
+    return tostring(call(object, "getClassName")
+        or call(object, "className")
+        or call(object, "__type")
         or "")
 end
 

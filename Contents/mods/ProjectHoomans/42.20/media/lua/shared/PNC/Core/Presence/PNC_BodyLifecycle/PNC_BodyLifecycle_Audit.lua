@@ -39,6 +39,14 @@ function Lifecycle.AuditLoadedBodies(now, force)
     end
     Lifecycle.NextAuditAt = now + (tonumber(Const.BODY_AUDIT_INTERVAL_MS) or 250)
     reg.EnsureLoaded()
+    -- A save created before the husk lifecycle existed still contains anonymous
+    -- husks whose loss was never observed. Seed those losses once the registry
+    -- is available so the reaper can delete the bodies when they stream back.
+    if Lifecycle.SeedHuskLedgerFromRecords
+        and Lifecycle.HuskLedgerSeeded ~= true
+    then
+        Lifecycle.SeedHuskLedgerFromRecords(now)
+    end
     if Census and Census.GetLifecycleCandidates then
         zombieArray = Census.GetLifecycleCandidates(now, force)
         zombieCount = #zombieArray
@@ -166,7 +174,31 @@ function Lifecycle.AuditLoadedBodies(now, force)
             local registered = reg.LiveByID and reg.LiveByID[id] or nil
             if candidate.presenceState == Const.PRESENCE_LIVE and not accepted[id] then
                 if registered then
-                    Internal.removeZombie(registered)
+                    if Internal.matchesRecordBody(candidate, registered) then
+                        local attached = Internal.isBodyAttached(registered)
+                        local verified = Internal.removeZombie(registered) == true
+                        if (not attached or not verified)
+                            and Lifecycle.NoteLostBody
+                        then
+                            -- The shell left the loaded world before this pass,
+                            -- so the engine holds an anonymous copy of it now.
+                            Lifecycle.NoteLostBody(
+                                candidate,
+                                registered,
+                                verified and "audit_after_virtualization"
+                                    or "audit_removal_unverified"
+                            )
+                        end
+                    elseif Lifecycle.NoteLostBody then
+                        Lifecycle.NoteLostBody(
+                            candidate, registered, "audit_stale_handle")
+                    end
+                elseif Lifecycle.NoteLostBody then
+                    -- The body was never seen on this authority, yet the record
+                    -- leases a shell: the population manager can still hand an
+                    -- unmarked copy back, so the loss must be remembered.
+                    Lifecycle.NoteLostBody(
+                        candidate, nil, "audit_body_missing")
                 end
                 reg.LiveByID[id] = nil
                 candidate.runtime = candidate.runtime or {}

@@ -143,6 +143,73 @@ function Internal.clearBodyCombat(zombie)
     end
 end
 
+--[[
+    Engine membership predicates.
+
+    `getCurrentSquare()` is the engine's own test for "this zombie is still in
+    the loaded world": IsoMovingObject:removeFromSquare() nulls `current`, and
+    every virtualizing path (chunk unload, out-of-loaded-area update) calls it
+    right after removeFromWorld(). A body whose square is nil has either been
+    removed by us or absorbed into the anonymous population record, and PNC
+    ModData does not survive that trip.
+]]
+function Internal.isBodyAttached(zombie)
+    if not zombie then
+        return false
+    end
+    if not zombie.getCurrentSquare then
+        -- Unknown query surface (stubs and legacy bodies): assume attached so
+        -- removal still runs instead of writing a spurious ledger entry.
+        return true
+    end
+    return zombie:getCurrentSquare() ~= nil
+end
+
+function Internal.isBodyDetached(zombie)
+    if not zombie then
+        return true
+    end
+    if not zombie.getCurrentSquare then
+        return true
+    end
+    return zombie:getCurrentSquare() == nil
+end
+
+-- True when `zombie` is provably the body the record currently leases. Guards
+-- every removal so a stale Lua handle can never delete a recycled body that
+-- the engine has already handed to a different zombie or NPC.
+function Internal.matchesRecordBody(record, zombie)
+    local registry
+    local modData
+    local lease
+    if not record or not zombie then
+        return false
+    end
+    registry = Internal.registry and Internal.registry() or nil
+    if registry and registry.LiveByID
+        and registry.LiveByID[tostring(record.id)] == zombie
+    then
+        return true
+    end
+    modData = zombie.getModData and zombie:getModData() or nil
+    if not modData then
+        return false
+    end
+    if tostring(modData.PNC_UUID or "") ~= tostring(record.id) then
+        return false
+    end
+    if tostring(modData.PNC_BodyKind or "live") ~= "live" then
+        return false
+    end
+    lease = record.runtime and record.runtime.bodyLease
+    if lease ~= nil and modData.PNC_BodyLease ~= nil
+        and tostring(modData.PNC_BodyLease) ~= tostring(lease)
+    then
+        return false
+    end
+    return true
+end
+
 function Internal.removeZombie(zombie)
     if not zombie then
         return false
@@ -158,7 +225,10 @@ function Internal.removeZombie(zombie)
     if zombie.removeFromSquare then
         zombie:removeFromSquare()
     end
-    return true
+    -- Verified result: callers use this to distinguish "removed" from "was
+    -- already virtualized away", which is what orphaned the husk to begin
+    -- with. Never report success for a body we did not actually detach.
+    return Internal.isBodyDetached(zombie)
 end
 
 function Internal.removeCorpse(corpse)

@@ -166,6 +166,14 @@ local record = {
     },
 }
 Inventory.EnsureRecordInventory(record)
+-- Project Zomboid provides this Java-backed global; the service captures it at
+-- load time, so the harness has to define it before the module is loaded. It
+-- resolves only the live-Java source fixture created further below.
+local javaProbeObject
+getClassSimpleName = function(object)
+    if object ~= nil and object == javaProbeObject then return "IsoObject" end
+    return nil
+end
 local Service = T.load("ProjectHoomans", "server",
     "PNC/World/PNC_WaterContainerService.lua")
 
@@ -444,5 +452,59 @@ T.truthy(string.find(refillLogs[#refillLogs],
 T.truthy(string.find(refillLogs[#refillLogs],
     "sourceRollback=true", 1, true),
     "failed refill log records source rollback")
+
+-- Regression: the refill audit resolves the source class name from a live Java
+-- object. Project Zomboid exposes Java members through a curated allowlist, so
+-- reading an unexposed member raises a Java RuntimeException instead of
+-- returning nil; a Lua-table stand-in hides that. This source behaves like the
+-- live IsoObject: only real members resolve, anything else raises.
+local javaSourceMembers = {
+    getFluidAmount = function() return 2 end,
+    setWaterAmount = function() end,
+}
+local javaSourceObject = setmetatable({}, {
+    __index = function(_, member)
+        local resolved = javaSourceMembers[member]
+        if resolved ~= nil then return resolved end
+        error("attempted index: " .. tostring(member)
+            .. " of non-table: class zombie.iso.IsoObject", 2)
+    end,
+})
+local javaSource = { kind = "faucet", x = 10, y = 10, z = 0,
+    key = "sink:12:10:0", object = javaSourceObject }
+javaProbeObject = javaSourceObject
+
+local function resetJavaRefillState()
+    destinationContainer:adjustAmount(0)
+    record.inventory.items.can.itemState = {
+        fluidAmount = 0, fluidCapacity = 1, fluidPrimaryType = "Water",
+        fluids = {},
+    }
+    sourceAmount = 2
+end
+
+resetJavaRefillState()
+local javaCallOK, javaRefillOK, javaFilled =
+    pcall(Service.Refill, record, "can", javaSource)
+T.truthy(javaCallOK,
+    "an unexposed Java member does not abort the refill transaction")
+T.truthy(javaRefillOK, "a live Java source object still refills the container")
+T.equal(javaFilled, 1, "a live Java source object fills the free capacity")
+T.truthy(string.find(refillLogs[#refillLogs],
+    "sourceObjectType=IsoObject", 1, true),
+    "refill audit resolves the Java source class name")
+
+-- Without the Java helper the audit falls back to member probes on the same
+-- object; those reads are unexposed too and must stay contained.
+javaProbeObject = nil
+resetJavaRefillState()
+javaCallOK, javaRefillOK, javaFilled =
+    pcall(Service.Refill, record, "can", javaSource)
+T.truthy(javaCallOK,
+    "guarded member probing never leaks a Java index failure")
+T.truthy(javaRefillOK,
+    "a live Java source object refills without the class-name helper")
+T.equal(javaFilled, 1,
+    "fallback member probing still transfers the free capacity")
 
 T.finish("pnc_water_refill_smoke")

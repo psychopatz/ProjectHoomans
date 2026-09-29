@@ -47,14 +47,19 @@ function Client.HasUpdate(lastRevision, lastReceiveAt)
         update
 end
 
+-- This window reads only the stockpile projection and its access status, so it
+-- does not ask the server to build the colonist, catalog, or settlement groups.
+local STORAGE_SECTIONS = { "header", "storage" }
+
 function Client.RequestSnapshot()
     local management = PNC.ColonyManagementClient
     if management and type(management.RequestSnapshot) == "function" then
-        local ok, reason = management.RequestSnapshot()
+        local ok, reason = management.RequestSnapshot(nil, STORAGE_SECTIONS)
         return ok, reason, now()
     end
     if PNC.Client and PNC.Client.RequestColonyManagement then
-        local ok, reason = PNC.Client.RequestColonyManagement()
+        local ok, reason = PNC.Client.RequestColonyManagement(nil, nil,
+            STORAGE_SECTIONS)
         return ok, reason, now()
     end
     return false, "client_unavailable", now()

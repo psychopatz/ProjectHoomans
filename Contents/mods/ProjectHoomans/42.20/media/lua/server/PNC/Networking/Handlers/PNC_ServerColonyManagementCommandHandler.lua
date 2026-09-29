@@ -30,7 +30,11 @@ Router.Register(Const.CMD_COLONY_MANAGEMENT_REQUEST, function(player, args)
     Network.SendColonyManagement(
         player,
         builder(player, args),
-        args.snapshotScope == "base" and "base" or nil
+        args.snapshotScope == "base" and "base" or nil,
+        {
+            sectioned = type(args.sections) == "table",
+            sections = args.sections,
+        }
     )
 end)
 
@@ -74,7 +78,11 @@ Router.Register(Const.CMD_COLONY_MANAGEMENT_ACTION,
             )
         else
             Network.SendColonyManagement(player, snapshot,
-                baseResponse and "base" or nil)
+                baseResponse and "base" or nil,
+                {
+                    sectioned = type(rawArgs and rawArgs.sections) == "table",
+                    sections = rawArgs and rawArgs.sections,
+                })
         end
     end
 )

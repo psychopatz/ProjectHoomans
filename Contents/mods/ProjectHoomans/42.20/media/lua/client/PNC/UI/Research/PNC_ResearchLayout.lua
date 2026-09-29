@@ -26,8 +26,12 @@ function LayoutModel.ApplyResponsiveLayout(window)
         x = rect.x, y = filterFlow.bottom + gap, width = rect.width,
     }, { scale = scale, minWidth = 118, gap = 5 })
     local debugFlow
-    local debugAuthorized = window.snapshot and window.snapshot.storage
-        and window.snapshot.storage.debugAuthorized == true or false
+    -- The window holds either the light access projection or a full stockpile
+    -- projection, depending on which window requested most recently.
+    local storageView = window.snapshot
+        and (window.snapshot.storageAccess or window.snapshot.storage) or nil
+    local debugAuthorized = storageView
+        and storageView.debugAuthorized == true or false
     if debugAuthorized and window.debugExpanded then
         debugFlow = Layout.Flow({ window.debugBlueprint, window.debugSpearKit }, {
             x = rect.x, y = actionFlow.bottom + gap, width = rect.width,

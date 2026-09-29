@@ -251,6 +251,14 @@ end
 
 function Presentation.BuildNeeds(person, snapshot)
     if not person then
+        -- A refused payload means the roster is unknown, not empty. Report the
+        -- transport failure instead of claiming the colony has no colonists.
+        local syncStatus = snapshot and snapshot.syncStatus
+        if syncStatus and syncStatus.state == "unavailable" then
+            return { Presentation.Detail(Shared.Tr(
+                "UI_PNC_Needs_SyncUnavailable",
+                "COLONY DATA COULD NOT BE SYNCED"), "") }
+        end
         local identityStatus = snapshot and snapshot.identityStatus
         if identityStatus and identityStatus.state == "pending" then
             return { Presentation.Detail(Shared.Tr(

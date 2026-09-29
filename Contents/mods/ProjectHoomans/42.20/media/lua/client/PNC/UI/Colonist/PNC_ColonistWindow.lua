@@ -53,24 +53,49 @@ end
 
 function ISPNCColonistWindow:onPersonSelected()
     Controller.OnPersonSelected(self)
-    if self.tab == "task" then
-        self:requestSnapshot("task_person_selected")
-    end
+    -- Selection drives the on-demand per-colonist detail, so it always
+    -- refreshes rather than only on the task tab.
+    self:requestSnapshot("person_selected")
 end
 
 function ISPNCColonistWindow:onColonistControl(button)
     return Controller.OnControl(self, button)
 end
 
+--[[
+    The roster and its default tabs read the header, the colonist projections,
+    and the settlement facilities. The DEBUG tab additionally reads the
+    provision/storage diagnostics, so the stockpile projection is requested
+    only while that tab is open instead of on every poll.
+]]
+local ROSTER_SECTIONS = { "header", "roster", "settlement" }
+local DEBUG_SECTIONS = { "header", "roster", "settlement", "storage" }
+
+function ISPNCColonistWindow:colonistSections()
+    if self.tab == "debug" then return DEBUG_SECTIONS end
+    return ROSTER_SECTIONS
+end
+
 function ISPNCColonistWindow:requestSnapshot(source)
     local taskBrainNpcID = self.tab == "task"
         and self.selectedPersonID or nil
-    local _, _, requestedAt = Client.RequestSnapshot(taskBrainNpcID)
+    -- The selected colonist's journal travels on demand; other colonists omit
+    -- it, which keeps the roster inside one packet for large colonies.
+    local _, _, requestedAt = Client.RequestSnapshot(taskBrainNpcID,
+        self:colonistSections(), self.selectedPersonID)
     self.lastRequestAt = requestedAt
 end
 
 function ISPNCColonistWindow:refresh(update)
+    local previousSelection = self.selectedPersonID
     Controller.Refresh(self, update)
+    -- The roster may establish the initial selection on this refresh, which the
+    -- request that produced it could not know about. Ask once for that
+    -- colonist's detail; the selection is unchanged by the reply, so this does
+    -- not loop.
+    if self.selectedPersonID ~= previousSelection then
+        self:requestSnapshot("selection_changed")
+    end
 end
 
 function ISPNCColonistWindow:prerender()

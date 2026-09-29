@@ -97,6 +97,27 @@ local function clientState()
     return PNC.Network and PNC.Network.ClientState or {}
 end
 
+-- Shared instance so the per-frame read path allocates nothing while a command
+-- is syncing normally.
+local READY_SYNC = { state = "ready" }
+
+--[[
+    A refused or missing colony-management payload must be visible to the UI.
+    Without this the colonist roster and every colony gate render as if the
+    colony were empty.
+]]
+local function attachSyncStatus(snapshot, scope)
+    local target = type(snapshot) == "table" and snapshot or {}
+    local client = PNC.Client
+    local command = PNC.Const and PNC.Const.CMD_COLONY_MANAGEMENT
+    local status
+    if command and client and type(client.GetPayloadSync) == "function" then
+        status = client.GetPayloadSync(command, scope)
+    end
+    target.syncStatus = type(status) == "table" and status or READY_SYNC
+    return target
+end
+
 local function applyManualActivityDiagnostics(snapshot, state)
     local diagnostics = state.manualActivityDiagnostics
     local people = snapshot and snapshot.people
@@ -115,7 +136,8 @@ end
 
 function Client.ReadSnapshot()
     local state = clientState()
-    local snapshot = state.colonyManagement or state.colonyBase or {}
+    local snapshot = attachSyncStatus(
+        state.colonyManagement or state.colonyBase, nil)
     applyManualActivityDiagnostics(snapshot, state)
     return {
         snapshot = snapshot,
@@ -131,7 +153,8 @@ end
 function Client.ReadBaseSnapshot()
     local state = clientState()
     return {
-        snapshot = state.colonyBase or state.colonyManagement or {},
+        snapshot = attachSyncStatus(
+            state.colonyBase or state.colonyManagement, "base"),
         revision = state.colonyBase
             and (tonumber(state.colonyBaseRevision) or 0)
             or (tonumber(state.colonyManagementRevision) or 0),
@@ -157,11 +180,19 @@ function Client.HasBaseUpdate(lastRevision, lastReceiveAt)
         update
 end
 
-function Client.RequestSnapshot(taskBrainNpcID)
+--[[
+    `sections` limits the server projection to the groups the caller needs, so
+    the colonist roster does not have to carry the stockpile, catalogs, or
+    settlement projections it never reads. `detailNpcID` names the colonist
+    whose heavy per-person detail (currently the journal) should travel; every
+    other colonist omits it.
+]]
+function Client.RequestSnapshot(taskBrainNpcID, sections, detailNpcID)
     local ok = false
     local reason = "client_unavailable"
     if PNC.Client and PNC.Client.RequestColonyManagement then
-        ok, reason = PNC.Client.RequestColonyManagement(taskBrainNpcID)
+        ok, reason = PNC.Client.RequestColonyManagement(taskBrainNpcID, nil,
+            sections, detailNpcID)
     end
     return ok, reason, PNC.Core.Now()
 end

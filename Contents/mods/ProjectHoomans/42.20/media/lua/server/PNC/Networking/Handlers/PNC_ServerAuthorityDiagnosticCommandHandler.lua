@@ -119,6 +119,7 @@ Router.Register(Const.CMD_WORLD_EFFECT_DEBUG_REQUEST,
             state = rawArgs and rawArgs.state,
             kind = rawArgs and rawArgs.kind,
             limit = rawArgs and rawArgs.limit,
+            includeHusks = true,
         }), true, nil)
     end
 )

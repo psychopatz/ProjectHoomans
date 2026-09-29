@@ -549,10 +549,29 @@ function Service.BuildSnapshot(options)
         return tostring(left.effectId) < tostring(right.effectId)
     end)
     while #rows > limit do rows[#rows] = nil end
+    -- Husk lifecycle diagnostics ride the same on-demand snapshot, so the debug
+    -- window shows them in singleplayer (host builds it directly) and in
+    -- multiplayer (the authority builds it and the client renders the payload)
+    -- without a second command. Opt-in via `includeHusks` because this builder
+    -- also feeds gameplay payloads, which must not pay for the census. Bounded
+    -- and pcall-guarded: a debug payload must never fail because of an optional
+    -- subsystem.
+    local husks
+    if options.includeHusks == true
+        and PNC.BodyLifecycle
+        and type(PNC.BodyLifecycle.BuildHuskDebugSnapshot) == "function"
+    then
+        local ok, snapshot = pcall(PNC.BodyLifecycle.BuildHuskDebugSnapshot, {
+            entryLimit = 12,
+            outfitLimit = 6,
+        })
+        if ok then husks = snapshot end
+    end
     return {
         schemaVersion = Service.SCHEMA_VERSION, serverTime = now(),
         summary = summary, rows = rows, truncated = matched > #rows,
         filter = { state = requestedState or "PENDING", kind = requestedKind },
+        husks = husks,
     }
 end
 

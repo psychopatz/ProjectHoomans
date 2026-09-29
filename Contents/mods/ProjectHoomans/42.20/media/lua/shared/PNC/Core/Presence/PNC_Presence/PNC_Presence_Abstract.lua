@@ -41,6 +41,18 @@ local function logFollowerTransition(record, fromState, toState, reason, zombie)
     })
 end
 
+-- True when `zombie` is provably the body the record currently leases. The
+-- registry can keep a stale handle after the engine recycled a removed
+-- IsoZombie, and reading position or inventory from an unrelated body corrupts
+-- the record and can remove somebody else's body.
+local function isLeasedBody(record, zombie)
+    local internal = PNC.BodyLifecycle and PNC.BodyLifecycle.Internal
+    if not internal or not internal.matchesRecordBody then
+        return true
+    end
+    return internal.matchesRecordBody(record, zombie) == true
+end
+
 local function worldAgeHours()
     return getGameTime and getGameTime()
         and getGameTime().getWorldAgeHours
@@ -137,6 +149,12 @@ function Presence.Abstract(record, reason)
         or record.presenceState ~= Const.PRESENCE_LIVE
     then
         return false
+    end
+    if zombie and not isLeasedBody(record, zombie) then
+        -- Never read position, inventory or travel state from a handle the
+        -- record no longer leases. The body is already gone; the missing-body
+        -- lane below still releases the lease and arms the husk ledger.
+        zombie = nil
     end
     -- Capture the exact follow/combat state before live runtime is cleared.
     -- The server-side service stores only one compact pending marker; all

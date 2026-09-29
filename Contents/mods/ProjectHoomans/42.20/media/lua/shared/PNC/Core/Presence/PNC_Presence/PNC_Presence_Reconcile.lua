@@ -7,6 +7,19 @@ local Spatial = PNC.SpatialIndex
 function Presence.Reconcile(record)
     local nearest
     if record.alive == false then return end
+    -- A live shell that left the loaded world must be released before anything
+    -- else. ShouldMaterialize is consulted first and its forceLive branch
+    -- returns true for an already-live record, so Materialize short-circuits
+    -- and the abstraction lane would never run: the record would stay paired
+    -- with a body the engine already virtualized into an anonymous husk.
+    if record.presenceState == Const.PRESENCE_LIVE
+        and PNC.BodyLifecycle
+        and PNC.BodyLifecycle.IsRecordBodyLost
+        and PNC.BodyLifecycle.IsRecordBodyLost(record) == true
+    then
+        Presence.Abstract(record, "body_lost")
+        return
+    end
     nearest = Internal.FindNearestPlayer(record)
     record.runtime = record.runtime or {}
     record.runtime.nearestPlayerDistSq = nearest and nearest.distSq or nil

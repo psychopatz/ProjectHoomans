@@ -177,6 +177,9 @@ local function onResetLua()
     ClientState.colonyBase = nil
     ClientState.colonyBaseRevision = 0
     ClientState.lastColonyBaseReceiveAt = nil
+    ClientState.payloadSync = {}
+    ClientState.payloadSyncCount = 0
+    ClientState.pendingChunks = {}
     ClientState.colonyJournal = {
         rows = {}, cursor = 0, latestSequence = 0, rowSequences = {},
     }

@@ -148,16 +148,35 @@ function Lifecycle.SpawnReanimatedZombie(record, corpse)
         outfit = PNC.VisualProfiles and PNC.VisualProfiles.ResolveSpawnOutfit
             and PNC.VisualProfiles.ResolveSpawnOutfit(record) or nil
         femaleChance = record.isFemale == true and 100 or 0
-        zombieList = addZombiesInOutfit(
-            x, y, z, 1, outfit, femaleChance,
-            false, -- crawler
-            false, -- fall on front
-            false, -- fake dead
-            false, -- knocked down
-            false, -- invulnerable
-            false, -- sitting
-            1      -- health
-        )
+        -- This body is ours even though it is created by the same engine call
+        -- the population manager uses for husks. Keep it inside the spawn
+        -- window so the husk reaper cannot mistake it for a resurrected shell
+        -- before PNC stamps its corpse identity.
+        if Internal.WithSpawnWindow then
+            zombieList = Internal.WithSpawnWindow(function()
+                return addZombiesInOutfit(
+                    x, y, z, 1, outfit, femaleChance,
+                    false, -- crawler
+                    false, -- fall on front
+                    false, -- fake dead
+                    false, -- knocked down
+                    false, -- invulnerable
+                    false, -- sitting
+                    1      -- health
+                )
+            end)
+        else
+            zombieList = addZombiesInOutfit(
+                x, y, z, 1, outfit, femaleChance,
+                false, -- crawler
+                false, -- fall on front
+                false, -- fake dead
+                false, -- knocked down
+                false, -- invulnerable
+                false, -- sitting
+                1      -- health
+            )
+        end
         zombie = zombieList and zombieList.size
             and zombieList:size() > 0 and zombieList:get(0) or nil
     end

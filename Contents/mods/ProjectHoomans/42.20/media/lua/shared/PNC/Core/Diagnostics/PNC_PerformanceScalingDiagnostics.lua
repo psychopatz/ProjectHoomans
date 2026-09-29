@@ -55,6 +55,10 @@ Diagnostics.NPCThreatAuditEnabled = false
 -- because it assembles per-shot fields and can produce substantial console
 -- traffic during firefights.
 Diagnostics.FirearmAuditEnabled = false
+-- Server payload sizing is opt-in. When enabled it logs one bounded line per
+-- guarded server send with the estimated bytes per top-level section, which is
+-- how an over-budget command is attributed to its owner.
+Diagnostics.NetworkPayloadAuditEnabled = false
 Diagnostics.SeatingSessionSequence =
     tonumber(Diagnostics.SeatingSessionSequence) or 0
 
@@ -70,6 +74,7 @@ local INVENTORY_AUDIT_SETTING_ID = "ProjectHoomans.InventoryAudit"
 local NEEDS_AUDIT_SETTING_ID = "ProjectHoomans.NeedsAudit"
 local ZOMBIE_AGGRO_AUDIT_SETTING_ID = "ProjectHoomans.ZombieAggroAudit"
 local NPC_THREAT_AUDIT_SETTING_ID = "ProjectHoomans.NPCThreatAudit"
+local NETWORK_PAYLOAD_AUDIT_SETTING_ID = "ProjectHoomans.NetworkPayloadAudit"
 local function initializeCentralDebugSettings()
     local settings = PsychopatzCore and PsychopatzCore.DebugSettings
     if not settings or type(settings.Register) ~= "function" then
@@ -202,6 +207,18 @@ local function initializeCentralDebugSettings()
             Diagnostics.NPCThreatAuditEnabled = enabled == true
         end,
     })
+    settings.Register({
+        id = NETWORK_PAYLOAD_AUDIT_SETTING_ID,
+        source = "Project Hoomans",
+        order = 150,
+        title = "Network payload audit",
+        description = "Logs estimated bytes per section for every guarded server payload.",
+        defaultEnabled = false,
+        runtimeMutable = true,
+        apply = function(enabled)
+            Diagnostics.NetworkPayloadAuditEnabled = enabled == true
+        end,
+    })
     Diagnostics.Enabled = settings.IsEnabled(PERFORMANCE_SETTING_ID) == true
     Diagnostics.TimingEnabled = Diagnostics.Enabled
         and Diagnostics.TimingEnabled ~= false
@@ -228,6 +245,8 @@ local function initializeCentralDebugSettings()
         ZOMBIE_AGGRO_AUDIT_SETTING_ID) == true
     Diagnostics.NPCThreatAuditEnabled = settings.IsEnabled(
         NPC_THREAT_AUDIT_SETTING_ID) == true
+    Diagnostics.NetworkPayloadAuditEnabled = settings.IsEnabled(
+        NETWORK_PAYLOAD_AUDIT_SETTING_ID) == true
 end
 
 initializeCentralDebugSettings()
@@ -296,6 +315,10 @@ local COUNTER_NAMES = {
     "UI.NameplateEntryBuilds",
     "UI.NameplateRenderCalls",
     "UI.NameplateEntriesRendered",
+    "Network.PayloadBudgetRejected",
+    "Network.PayloadBudgetSends",
+    "Network.PayloadChunkSends",
+    "Network.PayloadChunkRebuilds",
 }
 
 for _, name in ipairs(COUNTER_NAMES) do
@@ -514,6 +537,32 @@ end
 
 function Diagnostics.IsFirearmAuditEnabled()
     return Diagnostics.FirearmAuditEnabled == true
+end
+
+function Diagnostics.IsNetworkPayloadAuditEnabled()
+    return Diagnostics.NetworkPayloadAuditEnabled == true
+end
+
+-- One bounded line per guarded server payload. The caller assembles the fields
+-- only after this gate, so a normal session pays a boolean check.
+function Diagnostics.LogNetworkPayload(eventName, fields)
+    local output
+    local message
+    if Diagnostics.NetworkPayloadAuditEnabled ~= true then return false end
+    output = {
+        "network_payload",
+        "event=" .. tostring(eventName or "unknown"),
+    }
+    for _, field in ipairs(fields or {}) do
+        output[#output + 1] = tostring(field)
+    end
+    message = table.concat(output, " ")
+    if PNC.Core and PNC.Core.LogInfo then
+        PNC.Core.LogInfo(message)
+    else
+        print("[PNC][INFO] " .. message)
+    end
+    return true
 end
 
 function Diagnostics.NewSeatingSessionId(npcId)

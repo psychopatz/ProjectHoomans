@@ -9,7 +9,15 @@ local Const = PNC.Const
 local Core = PNC.Core
 local ClientState = PNC.Network.ClientState
 
-function Client.RequestColonyManagement(taskBrainNpcID, snapshotScope)
+--[[
+    Requests a colony-management projection.
+
+    `sections` lists the projection groups the caller needs. Omitted groups are
+    not built and not sent, which is what keeps the colonist roster inside one
+    engine packet. Passing no `sections` requests the complete snapshot.
+]]
+function Client.RequestColonyManagement(taskBrainNpcID, snapshotScope, sections,
+    detailNpcID)
     local player = Internal.GetPlayer()
     local options = {}
     if taskBrainNpcID ~= nil and tostring(taskBrainNpcID) ~= "" then
@@ -17,6 +25,12 @@ function Client.RequestColonyManagement(taskBrainNpcID, snapshotScope)
     end
     if snapshotScope ~= nil and tostring(snapshotScope) ~= "" then
         options.snapshotScope = tostring(snapshotScope)
+    end
+    if type(sections) == "table" and #sections > 0 then
+        options.sections = sections
+    end
+    if detailNpcID ~= nil and tostring(detailNpcID) ~= "" then
+        options.detailNpcID = tostring(detailNpcID)
     end
     if Core.IsClientOnly and Core.IsClientOnly() then
         if player and sendClientCommand then
@@ -35,25 +49,37 @@ function Client.RequestColonyManagement(taskBrainNpcID, snapshotScope)
     end
     if not builder then return false end
     local snapshot = builder(player, options)
-    if options.snapshotScope == "base" then
-        ClientState.colonyBase = snapshot
-        ClientState.colonyBaseRevision =
-            (tonumber(ClientState.colonyBaseRevision) or 0) + 1
-        ClientState.lastColonyBaseReceiveAt = Core.Now()
-    else
-        ClientState.colonyManagement = snapshot
-        ClientState.colonyManagementRevision =
-            (tonumber(ClientState.colonyManagementRevision) or 0) + 1
-        ClientState.lastColonyManagementReceiveAt = Core.Now()
+    -- The local path has no packet budget, but it must still merge sectioned
+    -- rebuilds so a partial request cannot clear the rest of the snapshot.
+    local function apply(scopeKey, revisionKey, receivedAtKey)
+        local current = ClientState[scopeKey]
+        if options.sections ~= nil and type(current) == "table"
+            and type(snapshot) == "table"
+        then
+            for key, value in pairs(snapshot) do current[key] = value end
+            snapshot = current
+        end
+        ClientState[scopeKey] = snapshot
+        ClientState[revisionKey] =
+            (tonumber(ClientState[revisionKey]) or 0) + 1
+        ClientState[receivedAtKey] = Core.Now()
     end
+    if options.snapshotScope == "base" then
+        apply("colonyBase", "colonyBaseRevision", "lastColonyBaseReceiveAt")
+    else
+        apply("colonyManagement", "colonyManagementRevision",
+            "lastColonyManagementReceiveAt")
+    end
+    snapshot = options.snapshotScope == "base"
+        and ClientState.colonyBase or ClientState.colonyManagement
     if PNC.ColonyNamePrompt and PNC.ColonyNamePrompt.OpenIfNeeded then
         PNC.ColonyNamePrompt.OpenIfNeeded(snapshot)
     end
     return true
 end
 
-function Client.RequestBaseBootstrap()
-    return Client.RequestColonyManagement(nil, "base")
+function Client.RequestBaseBootstrap(sections)
+    return Client.RequestColonyManagement(nil, "base", sections)
 end
 
 function Client.RequestColonyJournal(after, limit)

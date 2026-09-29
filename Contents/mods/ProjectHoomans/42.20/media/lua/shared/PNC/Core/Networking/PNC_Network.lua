@@ -39,6 +39,9 @@ PNC.Network.ClientState = PNC.Network.ClientState or {
     llmToolResultOrder = {},
     playerEmoteInteractionResults = {},
     playerEmoteInteractionResultOrder = {},
+    -- Per command+scope record of the last payload-budget refusal, so a UI can
+    -- report a sync failure instead of rendering empty data.
+    payloadSync = {},
     playerContext = nil,
     rosterRevision = 0,
     rosterEntryRevisions = {},

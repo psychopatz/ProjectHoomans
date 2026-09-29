@@ -3,17 +3,26 @@ local Internal = Network.Internal
 local Core = PNC.Core
 local Const = PNC.Const
 
-function Network.SendColonyManagement(targetPlayer, snapshot, scope)
+function Network.SendColonyManagement(targetPlayer, snapshot, scope, options)
+    options = type(options) == "table" and options or {}
     local payload = { snapshot=snapshot, serverTime=Core.Now() }
     if scope ~= nil then payload.scope = tostring(scope) end
-    if isServer and isServer() and targetPlayer then sendServerCommand(targetPlayer, Const.MODULE, Const.CMD_COLONY_MANAGEMENT, payload)
+    if options.sectioned == true then
+        payload.sectioned = true
+        payload.sections = options.sections
+    end
+    if isServer and isServer() and targetPlayer then
+        -- The colony-management projection is the largest mod payload, so it
+        -- is decomposed across packets instead of silently failing.
+        Internal.SendChunked(targetPlayer, Const.MODULE,
+            Const.CMD_COLONY_MANAGEMENT, payload)
     elseif not isServer or not isServer() then triggerEvent("OnServerCommand", Const.MODULE, Const.CMD_COLONY_MANAGEMENT, payload) end
 end
 
 function Network.SendColonyJournal(targetPlayer, delta)
     local payload = { delta = delta, serverTime = Core.Now() }
     if isServer and isServer() and targetPlayer then
-        sendServerCommand(targetPlayer, Const.MODULE,
+        Internal.SendGuarded(targetPlayer, Const.MODULE,
             Const.CMD_COLONY_JOURNAL, payload)
     elseif not isServer or not isServer() then
         triggerEvent("OnServerCommand", Const.MODULE,
@@ -26,7 +35,7 @@ function Network.SendSettlementDelta(targetPlayer, settlement, actionResult, sto
         storage = storage,
         serverTime = Core.Now() }
     if isServer and isServer() and targetPlayer then
-        sendServerCommand(targetPlayer, Const.MODULE,
+        Internal.SendChunked(targetPlayer, Const.MODULE,
             Const.CMD_SETTLEMENT_DELTA, payload)
     elseif not isServer or not isServer() then
         triggerEvent("OnServerCommand", Const.MODULE,

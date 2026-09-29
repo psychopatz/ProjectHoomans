@@ -23,6 +23,12 @@ function H.OnClientCommand(module, command, player, args)
 end
 
 function H.OnServerStarted()
+    -- The payload budget guard wraps the engine send function, which can only
+    -- be verified once the server socket exists.
+    local networkInternal = PNC.Network and PNC.Network.Internal
+    if networkInternal and networkInternal.InstallSendGuard then
+        networkInternal.InstallSendGuard()
+    end
     Registry.Load()
     if PNC.NPCKnowledge and PNC.NPCKnowledge.Load then
         PNC.NPCKnowledge.Load()

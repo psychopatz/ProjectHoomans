@@ -436,6 +436,90 @@ local function openPassageDoorAhead(zombie, object, now)
     return true
 end
 
+--[[
+    Heavy hand items on a climbing zombie.
+
+    Vanilla IsoGameCharacter.climbThroughWindow() calls dropHeavyItems(), and in
+    Build 42 that multiplayer branch sends PlayerDropHeldItems plus Equip, whose
+    setData casts the character to IsoPlayer. Any IsoZombie that vanilla makes
+    climb a window - open windows are climbable for zombies - therefore throws a
+    ClassCastException, logs "Packet send failed" and leaves the shell's hand
+    slot desynchronized from the server.
+
+    Ordinary zombies are already cleared by the client aggro controller
+    (PNC_ClientZombieAggroController_BodyEffects.ClearHeldItems). Managed NPC
+    shells re-acquire equipment whenever they are (re)materialized, so the same
+    clearance has to run for them right before the vanilla update reaches
+    IsoZombie.tryThump(). Only heavy items move: weapons stay in hand so NPC
+    visuals and animations are unaffected, and an item that cannot be stored is
+    left where it is rather than dropped or lost.
+]]
+local function isHeavyHeldItem(item)
+    local ok
+    local value
+    local itemType
+    if not item then
+        return false
+    end
+    if item.IsInventoryContainer then
+        ok, value = pcall(item.IsInventoryContainer, item)
+        if ok and value == true then
+            return true
+        end
+    end
+    if item.hasTag and ItemTag and ItemTag.HEAVY_ITEM then
+        ok, value = pcall(item.hasTag, item, ItemTag.HEAVY_ITEM)
+        if ok and value == true then
+            return true
+        end
+    end
+    if item.getType then
+        ok, value = pcall(item.getType, item)
+        itemType = ok and tostring(value or "") or ""
+        if itemType == "Generator" or itemType == "CorpseMale"
+            or itemType == "CorpseFemale" or itemType == "Animal"
+            or itemType == "CorpseAnimal"
+        then
+            return true
+        end
+    end
+    return false
+end
+
+function LiveBodyControl.ClearHeavyHeldItems(zombie)
+    local hasPrimary
+    local hasSecondary
+    local moved = false
+    if not zombie or not zombie.getPrimaryHandItem then
+        return false
+    end
+    -- Match the engine's own client branch of dropHeavyItems() and the existing
+    -- ordinary-zombie mitigation: clear the hand slot only. The item still
+    -- exists in the shell's server-side inventory, so nothing can be lost or
+    -- duplicated, and the next equipment sync re-renders it.
+    if zombie.setPrimaryHandItem then
+        hasPrimary = zombie:getPrimaryHandItem()
+        if hasPrimary ~= nil and isHeavyHeldItem(hasPrimary) then
+            pcall(zombie.setPrimaryHandItem, zombie, nil)
+            moved = true
+        end
+    end
+    if zombie.setSecondaryHandItem then
+        hasSecondary = zombie:getSecondaryHandItem()
+        if hasSecondary ~= nil and isHeavyHeldItem(hasSecondary) then
+            pcall(zombie.setSecondaryHandItem, zombie, nil)
+            moved = true
+        end
+    end
+    if moved and PNC.PerformanceScalingDiagnostics
+        and PNC.PerformanceScalingDiagnostics.Increment
+    then
+        pcall(PNC.PerformanceScalingDiagnostics.Increment,
+            "LiveBodyControl.HeavyItemsCleared")
+    end
+    return moved
+end
+
 function LiveBodyControl.BlockVanillaPassage(zombie, lane, now)
     local modData
     local actionState
@@ -447,6 +531,13 @@ function LiveBodyControl.BlockVanillaPassage(zombie, lane, now)
     if not object then
         VANILLA_PASSAGE_GUARD_LOGGED[zombie] = nil
         return false
+    end
+    -- While the body is crossing the sight line of a climbable passage, vanilla
+    -- may reach IsoZombie.tryThump() -> climbThroughWindow() this same frame.
+    -- Stow heavy hand items first: that is the only reason the engine's
+    -- player-only drop packet fires for a zombie.
+    if kind == "window" or kind == "window_frame" or kind == "thumpable" then
+        LiveBodyControl.ClearHeavyHeldItems(zombie)
     end
     actionState = LiveBodyControl.GetActionStateName(zombie)
     if not passageMovementState(actionState) then

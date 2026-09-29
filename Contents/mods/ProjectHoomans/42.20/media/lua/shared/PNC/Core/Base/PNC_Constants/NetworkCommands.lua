@@ -118,3 +118,16 @@ Const.CMD_PLAYER_EMOTE_INTERACTION = "PlayerEmoteInteraction"
 Const.CMD_PLAYER_EMOTE_INTERACTION_RESULT = "PlayerEmoteInteractionResult"
 Const.CMD_SOCIAL_GREETING = "SocialGreeting"
 Const.CMD_NPC_PRESENTATION_ANIMATION = "NPCPresentationAnimation"
+
+-- The engine serializes each server command into a fixed per-connection packet
+-- buffer (1,000,000 bytes in the supported baseline) and throws
+-- BufferOverflowException once it is full, before the packet is sent. Every mod
+-- payload must therefore stay under a budget that leaves room for the module,
+-- command, and framing bytes. See PNC_Network_Server_Budget.
+Const.NETWORK_PAYLOAD_BUDGET_BYTES = 786432
+-- Marker carried by the bounded replacement payload the client receives when a
+-- command was refused for exceeding the budget.
+Const.NETWORK_PAYLOAD_ENVELOPE = "pncOversize"
+-- Marker carried by each packet of a payload that was decomposed across several
+-- packets. The client rebuilds the payload and dispatches it once, in full.
+Const.NETWORK_PAYLOAD_CHUNK = "pncChunk"

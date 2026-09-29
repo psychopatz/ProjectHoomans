@@ -65,18 +65,34 @@ function Query.GetVisibleRows(storage, options)
     return rows
 end
 
+--[[
+    Builds the stockpile projection.
+
+    `options.includeRows == false` skips the per-stack row scan and omits the
+    fields derived from it. Consumers that only need access/authorization state
+    (for example the research and workshop windows) use that to avoid walking a
+    large stockpile on every poll, and to avoid carrying the rows themselves.
+]]
 function Query.BuildSnapshot(storage, options)
     if not storage or not storage.inventory then return nil end
+    options = type(options) == "table" and options or {}
+    local includeRows = options.includeRows ~= false
     local capacity = Definitions.GetCapacity(storage.tier)
     local used = storage.inventory:getWeight()
-    local allRows = Query.GetVisibleRows(storage, {})
-    local rows = options and (options.search or options.sort)
-        and Query.GetVisibleRows(storage, options) or allRows
+    local allRows
+    local rows
     local batchCount = 0
-    for index = 1, #allRows do
-        if allRows[index].quantity > 1 then batchCount = batchCount + 1 end
+    local uniqueRecordCount = 0
+    if includeRows then
+        allRows = Query.GetVisibleRows(storage, {})
+        rows = options.search or options.sort
+            and Query.GetVisibleRows(storage, options) or allRows
+        for index = 1, #allRows do
+            if allRows[index].quantity > 1 then batchCount = batchCount + 1 end
+        end
+        uniqueRecordCount = #allRows - batchCount
     end
-    return {
+    local snapshot = {
         schemaVersion = Definitions.SCHEMA_VERSION,
         storageId = storage.id,
         ownerFactionId = storage.ownerFactionId,
@@ -91,11 +107,14 @@ function Query.BuildSnapshot(storage, options)
         inventoryRevision = storage.inventory.revision,
         logicalItemCount = storage.inventory:getLogicalItemCount(),
         serializedRecordCount = storage.inventory:getRecordCount(),
-        batchCount = batchCount,
-        uniqueRecordCount = #allRows - batchCount,
-        rows = rows,
         activity = Journal.Snapshot(storage),
     }
+    if includeRows then
+        snapshot.batchCount = batchCount
+        snapshot.uniqueRecordCount = uniqueRecordCount
+        snapshot.rows = rows
+    end
+    return snapshot
 end
 
 return Query

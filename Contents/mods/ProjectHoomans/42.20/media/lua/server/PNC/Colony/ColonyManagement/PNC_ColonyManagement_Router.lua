@@ -48,6 +48,7 @@ function Management.HandleAction(player, args)
     end
     local snapshot = snapshotBuilder(player, {
         taskBrainNpcID = args.taskBrainNpcID,
+        sections = args.sections,
     })
     return snapshot, {
         ok = outcome.ok == true,

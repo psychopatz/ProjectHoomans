@@ -13,10 +13,13 @@ Lifecycle.Internal = Lifecycle.Internal or {}
 
 require "PNC/Core/Presence/PNC_BodyLifecycle/PNC_BodyLifecycle_State"
 require "PNC/Core/Presence/PNC_BodyLifecycle/PNC_BodyLifecycle_World"
+require "PNC/Core/Presence/PNC_BodyLifecycle/PNC_BodyLifecycle_BodyFactory"
+require "PNC/Core/Presence/PNC_BodyLifecycle/PNC_BodyLifecycle_HuskLedger"
 require "PNC/Core/Presence/PNC_BodyLifecycle/PNC_BodyLifecycle_CorpseItems"
 require "PNC/Core/Presence/PNC_BodyLifecycle/PNC_BodyLifecycle_CorpseAwareness"
 require "PNC/Core/Presence/PNC_BodyLifecycle/PNC_BodyLifecycle_CorpseWornItems"
 require "PNC/Core/Presence/PNC_BodyLifecycle/PNC_BodyLifecycle_LiveBodies"
+require "PNC/Core/Presence/PNC_BodyLifecycle/PNC_BodyLifecycle_HuskReaper"
 require "PNC/Core/Presence/PNC_BodyLifecycle/PNC_BodyLifecycle_Startup"
 require "PNC/Core/Presence/PNC_BodyLifecycle/PNC_BodyLifecycle_Corpses"
 require "PNC/Core/Presence/PNC_BodyLifecycle/PNC_BodyLifecycle_Reanimation"

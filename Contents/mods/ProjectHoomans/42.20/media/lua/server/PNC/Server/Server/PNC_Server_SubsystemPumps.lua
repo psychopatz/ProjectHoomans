@@ -119,6 +119,11 @@ function H.PrepareTick(now)
         "PumpStartupBodyCleanup", nil, now, false)
     safeOptional("server_prepare.body_audit", BodyLifecycle,
         "AuditLoadedBodies", nil, now, false)
+    -- Deletes husks the engine virtualized out of the loaded world and handed
+    -- back as anonymous population bodies. Must run after the body audit so a
+    -- lease that just went missing is already in the ledger.
+    safeOptional("server_prepare.husk_reaper", BodyLifecycle,
+        "PumpHuskReaper", nil, now, false)
     safeOptional("server_prepare.vehicle_reservations", PNC.CompanionVehicle,
         "AuditLoadedReservations", nil, now, false)
     if now - H.LastLivePositionSafetyRefreshAt

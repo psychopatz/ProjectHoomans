@@ -38,6 +38,12 @@ function Lifecycle.StampLiveBody(record, zombie)
         PNC.RecipeKnowledge.BindLiveBody(record, zombie)
     end
     record.runtime.startupBodyHint = nil
+    -- Remember the persistent outfit PNC uses for shells. It survives
+    -- virtualization (unlike ModData) and is the only durable hint that a body
+    -- later handed back by the population manager was one of ours.
+    if Lifecycle.NoteShellOutfitID and zombie.getPersistentOutfitID then
+        pcall(Lifecycle.NoteShellOutfitID, zombie:getPersistentOutfitID())
+    end
     Internal.mark(record, "live", "bound", "body_stamped")
     return record.runtime.bodyLease
 end
@@ -66,9 +72,108 @@ function Internal.detachLiveBody(record, reason)
     return true
 end
 
+--[[
+    True when a LIVE record's leased shell is no longer in the loaded world.
+
+    The engine virtualizes an outdoor, ground-level shell that pathfinds outside
+    the loaded area, and it virtualizes every shell of an unloading chunk. It
+    persists only position, direction, persistent outfit id and state booleans,
+    so the body that comes back is anonymous. A record in this state can never
+    recover its body: presence must abstract it (the ledger/reaper lane then
+    owns the husk), even when forceLive or a combat target would normally hold
+    the record embodied.
+]]
+function Lifecycle.IsRecordBodyLost(record)
+    local registry
+    local zombie
+    local runtime
+    local now
+    local graceMs
+    if not record or record.presenceState ~= Const.PRESENCE_LIVE then
+        return false
+    end
+    runtime = record.runtime
+    if runtime and runtime.vehiclePassenger
+        and runtime.vehiclePassenger.active == true
+    then
+        -- A boarding passenger intentionally has no body yet.
+        return false
+    end
+    registry = Internal.registry and Internal.registry() or nil
+    zombie = registry and registry.GetLiveZombie
+        and registry.GetLiveZombie(record.id) or nil
+    if zombie and Internal.isBodyAttached(zombie) == true then
+        if runtime then
+            runtime.bodyLostSince = nil
+        end
+        return false
+    end
+    -- An unleased LIVE record has no body to recover, so there is nothing to
+    -- wait for.
+    if runtime == nil or runtime.bodyLease == nil then
+        return true
+    end
+    -- Losing a leased body is permanent once it happens, but a single
+    -- square-less frame (engine cull, teleport in progress) must not abstract
+    -- the record and arm a reap. Require the condition to persist across the
+    -- grace window.
+    now = Core and Core.Now and Core.Now() or 0
+    graceMs = tonumber(Const.BODY_LOST_GRACE_MS) or 400
+    if runtime.bodyLostSince == nil then
+        runtime.bodyLostSince = now
+    end
+    if graceMs > 0
+        and (now - (tonumber(runtime.bodyLostSince) or now)) < graceMs
+    then
+        return false
+    end
+    return true
+end
+
+--[[
+    Release the live shell of `record`.
+
+    Removal is verified and identity-guarded:
+      * a handle that no longer matches the record's lease is never touched
+        (the engine recycles removed IsoZombie objects, so a stale reference
+        can point at an unrelated body),
+      * a body that was already virtualized away, or whose removal did not
+        take, is written to the husk ledger so the reaper can delete it when
+        the population manager hands it back.
+]]
 function Lifecycle.RemoveLiveBody(record, zombie, reason)
-    if zombie then
-        Internal.removeZombie(zombie)
+    local attached
+    local verified
+    if zombie and Internal.matchesRecordBody
+        and Internal.matchesRecordBody(record, zombie)
+    then
+        attached = Internal.isBodyAttached(zombie)
+        verified = Internal.removeZombie(zombie) == true
+        if (not attached or not verified) and Lifecycle.NoteLostBody then
+            Lifecycle.NoteLostBody(
+                record,
+                zombie,
+                verified and "removal_after_virtualization"
+                    or "removal_unverified"
+            )
+        end
+    elseif zombie then
+        if Lifecycle.NoteLostBody then
+            Lifecycle.NoteLostBody(record, zombie, "stale_body_handle")
+        end
+        if Core and Core.LogWarn then
+            pcall(Core.LogWarn, "PNC live body handle rejected npc="
+                .. tostring(record and record.id or "unknown")
+                .. " reason=lease_mismatch release="
+                .. tostring(reason or "abstract"))
+        end
+    elseif record and record.runtime and record.runtime.bodyLease ~= nil
+        and Lifecycle.NoteLostBody
+    then
+        -- The lease survives but no handle does: the shell was virtualized and
+        -- the engine holds an anonymous copy. Record the loss from the lease
+        -- hint so the reaper can still delete the husk.
+        Lifecycle.NoteLostBody(record, nil, "missing_body_handle")
     end
     return Internal.detachLiveBody(record, reason)
 end
