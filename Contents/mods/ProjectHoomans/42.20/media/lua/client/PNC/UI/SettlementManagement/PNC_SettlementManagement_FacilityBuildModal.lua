@@ -1,6 +1,7 @@
 require "ISUI/ISPanel"
 require "PsychopatzCore/UI/PsychopatzUI"
 local FacilityState = require "PNC/Core/Settlement/PNC_FacilityState"
+local Shared = require "PNC/UI/Shared/PNC_ColonyUIShared"
 
 PNC = PNC or {}
 PNC.FacilityBuildUI = PNC.FacilityBuildUI or {}
@@ -54,9 +55,20 @@ end
 local function playerCount(fullType)
     local player = getSpecificPlayer and getSpecificPlayer(0) or nil
     local inventory = player and player.getInventory and player:getInventory() or nil
-    local values = inventory and inventory.getItemsFromType
-        and inventory:getItemsFromType(fullType, true) or nil
-    return values and values.size and values:size() or 0
+    if not inventory or not inventory.getItemsFromType then return 0 end
+    local values = inventory:getItemsFromType(fullType, true)
+    if not values then return 0 end
+    local size = values.size and tonumber(values:size()) or 0
+    if type(values.get) ~= "function" then return size end
+    -- Sum units, not stacks: one stack can hold more than one unit, and the
+    -- server reserves real units.
+    local total = 0
+    for index = 0, size - 1 do
+        local item = values:get(index)
+        total = total + math.max(1, math.floor(tonumber(
+            item and item.getCount and item:getCount() or 1) or 1))
+    end
+    return total
 end
 
 local function humanizeIdentifier(value)
@@ -360,8 +372,15 @@ function FacilityCard:onMouseDown()
     return true
 end
 
-function FacilityCard:render()
-    ISPanel.render(self)
+local cardWarned
+
+--[[
+    Rendering the card body is separated from the stencil bookkeeping so the
+    clip is always released. A Lua error inside a child's render aborts the whole
+    UIManager pass, and a stencil that stays set would clip every later window;
+    so the body runs in pcall and the clip is cleared unconditionally.
+]]
+local function renderCard(self)
     local option = self.option or {}
     local selected = self.owner.selectedId == option.id
     local border = selected and themeColor("accent",
@@ -380,11 +399,20 @@ function FacilityCard:render()
     local titleFont, metaFont = UIFont.Small, UIFont.Small
     local titleHeight, lineHeight = fontHeight(titleFont),
         math.max(14, fontHeight(metaFont))
-    -- Give the native build image a real visual area. Keep the metadata below
-    -- it so tall object textures never collide with the title or requirements.
-    local imageHeight = math.max(42, math.min(136,
-        math.floor(self.height * 0.44)))
+    -- Reserve the metadata block first, then give the native build image what
+    -- is left. A fixed image height pushed the text out of short cards.
+    local titleLines = wrapText(option.name, titleFont, contentWidth, 2)
+    -- The Facilities tab renders the same numbers, unclipped, in its
+    -- REQUIREMENTS pane, so it turns the card's material lines off instead of
+    -- repeating two truncated copies of them over the preview image.
+    local showMaterials = self.showMaterialLines ~= false
+    local metaLines = showMaterials and 4 or 2
+    local textBlockHeight = math.max(1, #titleLines) * titleHeight
+        + metaLines * lineHeight + 10
+    local imageHeight = math.max(0, math.min(136,
+        math.floor(self.height * 0.44), self.height - textBlockHeight - 12))
     local imageY, textY = 6, imageHeight + 8
+    local showImage = imageHeight >= 32
 
     local surfaceAlpha = self.owner and self.owner.window
         and self.owner.window.contentSurfaceAlpha or 0.92
@@ -396,30 +424,50 @@ function FacilityCard:render()
     self:drawRectBorder(0, 0, self.width, self.height,
         border.a or 1, border.r, border.g, border.b)
     local imageAlpha = option.enabled and 1 or 0.42
-    if not drawNativePreview(self, option.previewTiles, padding, imageY,
-        contentWidth, imageHeight, imageAlpha)
-    then
-        ImageResolver.Draw(self, option.texture, padding, imageY,
+    if showImage then
+        if not drawNativePreview(self, option.previewTiles, padding, imageY,
             contentWidth, imageHeight, imageAlpha)
+        then
+            ImageResolver.Draw(self, option.texture, padding, imageY,
+                contentWidth, imageHeight, imageAlpha)
+        end
     end
 
-    local titleLines = wrapText(option.name, titleFont, contentWidth, 2)
     for index, line in ipairs(titleLines) do
         drawCentered(self, line, textY + (index - 1) * titleHeight,
             titleFont, textTint, self.width / 2, contentWidth)
     end
     textY = textY + math.max(1, #titleLines) * titleHeight + 3
-    drawCentered(self, option.costText, textY, metaFont, warning,
-        self.width / 2, contentWidth)
-    textY = textY + lineHeight
-    drawCentered(self, option.sourceText, textY, metaFont, muted,
-        self.width / 2, contentWidth)
-    textY = textY + lineHeight
+    if showMaterials then
+        drawCentered(self, option.costText, textY, metaFont, warning,
+            self.width / 2, contentWidth)
+        textY = textY + lineHeight
+        drawCentered(self, option.sourceText, textY, metaFont, muted,
+            self.width / 2, contentWidth)
+        textY = textY + lineHeight
+    end
     drawCentered(self, option.skillText, textY, metaFont, muted,
         self.width / 2, contentWidth)
     textY = textY + lineHeight
     drawCentered(self, option.status, textY, metaFont, statusTint,
         self.width / 2, contentWidth)
+end
+
+function FacilityCard:render()
+    ISPanel.render(self)
+    -- Clip to the card. Facility text wraps to an unknown number of lines and
+    -- used to be painted straight over the details/requirements bands below.
+    if self.setStencilRect then
+        self:setStencilRect(0, 0, self.width, self.height)
+    end
+    local ok, err = pcall(renderCard, self)
+    if self.clearStencilRect then self:clearStencilRect() end
+    if not ok and not cardWarned then
+        cardWarned = true
+        if PNC.Core and PNC.Core.LogWarn then
+            PNC.Core.LogWarn("facility card render failed: " .. tostring(err))
+        end
+    end
 end
 
 function FacilityCard:new(x, y, width, height, owner, option)
@@ -562,8 +610,17 @@ function ISPNCFacilityBuildWindow:onResponsiveLayout()
         descriptionLines = wrapText(selectedDescription, descriptionFont,
             rect.width, 2)
     end
+    -- The failure line shares the description block so the footer and cards
+    -- keep their spacing whether or not a build error is showing.
+    local errorLines = {}
+    if self.buildError and tostring(self.buildError) ~= "" then
+        errorLines = wrapText(tostring(self.buildError), descriptionFont,
+            rect.width, 1)
+    end
     self.descriptionLines = descriptionLines
-    local descriptionHeight = #descriptionLines * descriptionLineHeight
+    self.buildErrorLines = errorLines
+    local descriptionHeight = (#descriptionLines + #errorLines)
+        * descriptionLineHeight
     local footerY = rect.y + rect.height - footerHeight
     local descriptionY = footerY - descriptionHeight
     local cardsBottom = descriptionY
@@ -665,12 +722,23 @@ function ISPNCFacilityBuildWindow:setSelected(id)
         if value.id == id then option = value; break end
     end
     self.selectedOption = option
+    self.buildError = nil
     if self.confirmButton then
         self.confirmButton:setEnable(option and option.enabled == true)
     end
     if self.debugMaterialsButton then
         self.debugMaterialsButton:setEnable(canUseDebug() and option ~= nil)
     end
+end
+
+-- Show why a build attempt was rejected instead of silently closing. The
+-- reason may be a settlement reason code or a raw placement code.
+function ISPNCFacilityBuildWindow:setBuildError(reason)
+    reason = tostring(reason or "")
+    if reason == "" then reason = "BUILD_FAILED" end
+    self.buildError = tr("UI_PNC_Building_BuildFailed", "BUILD FAILED") .. ": "
+        .. Shared.SettlementReason(reason)
+    self:requestResponsiveLayout(true)
 end
 
 function ISPNCFacilityBuildWindow:prerender()
@@ -684,6 +752,16 @@ function ISPNCFacilityBuildWindow:prerender()
             self:drawText(line, self.descriptionX,
                 self.descriptionY + (index - 1) * lineHeight,
                 color.r, color.g, color.b, color.a or 1, UIFont.Small)
+        end
+        local errorLines = self.buildErrorLines or {}
+        if #errorLines > 0 then
+            local danger = Theme.colors.danger
+            for index, line in ipairs(errorLines) do
+                self:drawText(line, self.descriptionX,
+                    self.descriptionY
+                        + (#self.descriptionLines + index - 1) * lineHeight,
+                    danger.r, danger.g, danger.b, danger.a or 1, UIFont.Small)
+            end
         end
     end
 end
@@ -715,9 +793,17 @@ function ISPNCFacilityBuildWindow:onAction(button)
     if button.internal == "build" and self.selectedOption
         and self.selectedOption.enabled
     then
-        local started = self.onConfirm
-            and self.onConfirm(self.selectedOption.id)
-        if started == false then return end
+        local started, reason
+        if self.onConfirm then
+            started, reason = self.onConfirm(self.selectedOption.id)
+        end
+        if started == false then
+            -- Never close on a rejected build. Closing here is what made the
+            -- window vanish with no selector, no build and no explanation.
+            self:setBuildError(reason)
+            return
+        end
+        self.buildError = nil
         self:close()
         return
     end

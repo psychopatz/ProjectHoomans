@@ -8,10 +8,13 @@ local FacilityState = require "PNC/Core/Settlement/PNC_FacilityState"
 local Tab = {}
 local UI = PsychopatzCore.UI
 
+-- Building a facility lives in the FACILITIES tab, which owns the catalog, the
+-- requirement rows and the placement hand-off. The old "BUILD A BUILDING"
+-- modal duplicated that with its own snapshot, which is why it could disagree
+-- with the tab about materials, so its toolbar entry is gone.
 local TOOLBAR = {
     { "overlay", "UI_PNC_Base_ShowLayout", "SHOW BASE LAYOUT", "selected" },
     { "fishing_zone", "UI_PNC_Fishing_ZoneAction", "CREATE FISHING ZONE", "primary" },
-    { "build_facility", "UI_PNC_Facility_BuildAction", "BUILD A BUILDING", "success" },
     { "barricade", "UI_PNC_Base_BarricadeAction", "REINFORCE", "primary" },
     { "hq", "UI_PNC_Base_UpgradeAction", "UPGRADE HQ", "primary" },
 }

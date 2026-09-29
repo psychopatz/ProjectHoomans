@@ -42,38 +42,91 @@ function LayoutModel.Apply(window, content)
     Layout.SetBounds(window.baseBuildingNext, content.x + width - pageWidth,
         toolbarY, pageWidth, buttonHeight)
 
+    --[[
+        Vertical budget.
+
+        The bands are carved out of one remaining height instead of each
+        clamping itself with its own floor. The previous floors could exceed the
+        space left by the footer, which pushed the requirements and blueprint
+        bands into the footer (and each other) at smaller window sizes.
+    ]]
     local footerHeight = buttonHeight
-    local detailsHeight = math.max(Layout.Pixels(64, window.uiScale),
-        math.min(Layout.Pixels(82, window.uiScale), math.floor(height * 0.16)))
+    local cardsY = toolbarY + buttonHeight + gap
+    local footerY = content.y + height - footerHeight
+    local remaining = footerY - cardsY - gap * 3
+    local detailsHeight = math.max(Layout.Pixels(52, window.uiScale),
+        math.min(Layout.Pixels(72, window.uiScale), math.floor(height * 0.14)))
     local lowerHeight = math.max(Layout.Pixels(96, window.uiScale),
         math.min(Layout.Pixels(170, window.uiScale), math.floor(height * 0.30)))
-    local cardsY = toolbarY + buttonHeight + gap
-    local cardsBottom = content.y + height - footerHeight - detailsHeight
-        - lowerHeight - gap * 4
-    local cardsHeight = math.max(Layout.Pixels(110, window.uiScale),
-        cardsBottom - cardsY)
+    local minimumCards = Layout.Pixels(96, window.uiScale)
+    local cardsHeight = remaining - detailsHeight - lowerHeight
+    if cardsHeight < minimumCards then
+        -- Take the shortfall from the lower band first, then the details band.
+        local deficit = minimumCards - cardsHeight
+        local lowerFloor = Layout.Pixels(72, window.uiScale)
+        local lowerCut = math.min(deficit, math.max(0, lowerHeight - lowerFloor))
+        lowerHeight = lowerHeight - lowerCut
+        deficit = deficit - lowerCut
+        local detailsFloor = Layout.Pixels(38, window.uiScale)
+        local detailsCut = math.min(deficit,
+            math.max(0, detailsHeight - detailsFloor))
+        detailsHeight = detailsHeight - detailsCut
+        deficit = deficit - detailsCut
+        cardsHeight = remaining - detailsHeight - lowerHeight
+        if deficit > 0 then
+            -- Genuinely too short: keep the bands inside the window and let
+            -- the lists absorb the loss rather than overlapping the footer.
+            cardsHeight = math.max(1, cardsHeight)
+        end
+    end
     local cards = {}
     for _, card in ipairs(window.baseBuildingCards or {}) do
         if card:getIsVisible() then cards[#cards + 1] = card end
     end
     local columns = math.min(4, math.max(1, #cards))
-    local cardWidth = math.max(1, math.floor((width - gap * (columns - 1))
-        / columns))
+    -- Never stretch a single facility across the whole window: a full-width
+    -- card centres its text over empty space and reads as a broken layout.
+    local maxCardWidth = Layout.Pixels(300, window.uiScale)
+    local cardWidth = math.floor((width - gap * (columns - 1)) / columns)
+    cardWidth = math.max(1, math.min(cardWidth, maxCardWidth))
+    local rowWidth = cardWidth * columns + gap * (columns - 1)
+    local cardX = content.x + math.max(0, math.floor((width - rowWidth) / 2))
     for index, card in ipairs(cards) do
-        Layout.SetBounds(card, content.x + (index - 1)
-            * (cardWidth + gap), cardsY, cardWidth, cardsHeight)
+        Layout.SetBounds(card, cardX + (index - 1) * (cardWidth + gap),
+            cardsY, cardWidth, cardsHeight)
     end
     local detailsY = cardsY + cardsHeight + gap
     Layout.SetBounds(window.baseBuildingDetails, content.x, detailsY,
         width, detailsHeight)
     local lowerY = detailsY + detailsHeight + gap
-    local queueWidth = math.max(Layout.Pixels(220, window.uiScale),
-        math.floor(width * 0.34))
-    Layout.SetBounds(window.baseBuildingMaterialPane, content.x, lowerY,
-        width - queueWidth - gap, lowerHeight)
-    Layout.SetBounds(window.baseBuildingNativeQueuePane,
-        content.x + width - queueWidth, lowerY, queueWidth, lowerHeight)
-    local footerY = content.y + height - footerHeight
+    -- Clamp the split so the requirements pane can never be squeezed to zero
+    -- or pushed left of the content rect by a narrow window.
+    local queueWidth = math.min(
+        math.max(Layout.Pixels(220, window.uiScale),
+            math.floor(width * 0.34)),
+        math.max(Layout.Pixels(140, window.uiScale),
+            math.floor(width * 0.5)))
+    local materialWidth = math.max(1, width - queueWidth - gap)
+    -- The lists carry their own 25px section heading; layoutContent() offsets
+    -- the rows below it. Without it the rows drew inside the heading band,
+    -- which is what made REQUIREMENTS and BLUEPRINT QUEUE look misplaced.
+    if window.layoutPane then
+        window:layoutPane(window.baseBuildingMaterialPane, content.x, lowerY,
+            materialWidth, lowerHeight)
+        window:layoutPane(window.baseBuildingNativeQueuePane,
+            content.x + materialWidth + gap, lowerY, queueWidth, lowerHeight)
+    else
+        Layout.SetBounds(window.baseBuildingMaterialPane, content.x, lowerY,
+            materialWidth, lowerHeight)
+        Layout.SetBounds(window.baseBuildingNativeQueuePane,
+            content.x + materialWidth + gap, lowerY, queueWidth, lowerHeight)
+        if window.baseBuildingMaterialPane.layoutContent then
+            window.baseBuildingMaterialPane:layoutContent()
+        end
+        if window.baseBuildingNativeQueuePane.layoutContent then
+            window.baseBuildingNativeQueuePane:layoutContent()
+        end
+    end
     local controls = { window.baseBuildingBuildButton,
         window.baseBuildingDebugButton, window.baseBuildingCancelPlacement,
         window.baseBuildingQueueOverlay }

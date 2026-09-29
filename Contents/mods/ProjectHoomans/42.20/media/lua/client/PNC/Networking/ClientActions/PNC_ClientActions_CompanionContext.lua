@@ -123,6 +123,7 @@ end
 
 local function rejectUnsafeCampLocally(player, npcId, scope, context)
     local commands = PNC.CompanionCommands
+    local authority = PNC.ClientCompanionAuthority
     local record = commandRecord(npcId, context)
     local radius = tonumber(Const.COMPANION_COMMAND_RADIUS) or 20
     local reason
@@ -130,7 +131,14 @@ local function rejectUnsafeCampLocally(player, npcId, scope, context)
     if not commands then return false end
     if npcId ~= nil then
         if not record then return false end
-        if commands.CanPlayerCommand
+        -- The client authority helper reproduces the server's ownership rule
+        -- from replicated faction data, which the authoritative check cannot do
+        -- on a multiplayer client.
+        if authority and authority.CanPlayerCommand then
+            if authority.CanPlayerCommand(record, player, radius) ~= true then
+                return false
+            end
+        elseif commands.CanPlayerCommand
             and commands.CanPlayerCommand(record, player, radius) ~= true
         then
             return false

@@ -68,13 +68,21 @@ end
 
 local function commandableCompanions(player)
     local commands = PNC.CompanionCommands
+    local authority = PNC.ClientCompanionAuthority
     local snapshots = PNC.Network and PNC.Network.ClientState
         and PNC.Network.ClientState.snapshots or {}
     local output = {}
+    local commandable
     for id, snapshot in pairs(snapshots) do
-        if snapshot and commands and commands.CanPlayerCommand
-            and commands.CanPlayerCommand(snapshot, player) == true
-        then
+        commandable = false
+        if snapshot then
+            if authority and authority.CanPlayerCommand then
+                commandable = authority.CanPlayerCommand(snapshot, player) == true
+            elseif commands and commands.CanPlayerCommand then
+                commandable = commands.CanPlayerCommand(snapshot, player) == true
+            end
+        end
+        if commandable then
             output[#output + 1] = {
                 id = tostring(snapshot.id or id),
                 name = companionName(snapshot),

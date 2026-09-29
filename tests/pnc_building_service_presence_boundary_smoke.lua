@@ -52,7 +52,13 @@ for name in pairs(publicFunctions) do
     T.equal(type(PNC.BuildingService[name]), "function",
         "entry point preserves BuildingService." .. name)
 end
-T.equal(publicCount, 3, "building-service public function count")
+T.equal(publicCount, 4, "building-service public function count")
+-- The base projection ships only the blueprint queue; the recipe catalog is
+-- rebuilt client-side from SpriteConfigManager, so this entry point is public.
+T.truthy(publicFunctions.BuildQueueProjection,
+    "building-service exposes the queue-only projection")
+T.equal(type(PNC.BuildingService.BuildQueueProjection), "function",
+    "queue-only projection is callable")
 T.equal(type(PNC.WorkService.CancellationHandlers.BUILD_OBJECT), "function",
     "building cancellation handler remains registered")
 

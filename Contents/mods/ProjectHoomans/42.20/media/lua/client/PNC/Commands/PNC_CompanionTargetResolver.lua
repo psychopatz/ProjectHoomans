@@ -42,6 +42,24 @@ local function isCompanion(source)
         and Commands.IsCompanion(source) == true
 end
 
+--[[
+    Ownership for the client-side recipient filter. The authoritative registry
+    resolves ownership through server-only faction and identity services, which
+    are not loaded on a multiplayer client, so the replicated faction projection
+    is consulted too. The server still validates every interaction that is
+    issued.
+]]
+local function ownedByPlayer(source, player)
+    local authority = PNC.ClientCompanionAuthority
+    if authority and type(authority.IsOwnedByPlayer) == "function"
+        and authority.IsOwnedByPlayer(source, player) == true
+    then
+        return true
+    end
+    return Commands and Commands.IsOwnedByPlayer
+        and Commands.IsOwnedByPlayer(source, player) == true or false
+end
+
 local function isClientTargetCandidate(source, player, radius, scope)
     local x
     local y
@@ -58,8 +76,7 @@ local function isClientTargetCandidate(source, player, radius, scope)
     if scope == SCOPE_COLONISTS then
         if not isCompanion(source) then return false end
         if hasOwnerIdentity(source)
-            and (not Commands.IsOwnedByPlayer
-                or not Commands.IsOwnedByPlayer(source, player))
+            and not ownedByPlayer(source, player)
         then
             return false
         end
@@ -156,10 +173,7 @@ local function isSpeechRecipient(source, player)
         return false
     end
     if not isCompanion(source) then return false end
-    if hasOwnerIdentity(source)
-        and (not Commands.IsOwnedByPlayer
-            or not Commands.IsOwnedByPlayer(source, player))
-    then
+    if hasOwnerIdentity(source) and not ownedByPlayer(source, player) then
         return false
     end
     return true

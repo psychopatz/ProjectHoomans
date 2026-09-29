@@ -15,12 +15,15 @@ local function costTypes(cost)
     return {}
 end
 
+-- Sum matching stock rows. Availability is additive across stacks of the same
+-- type; the previous max() under-reported a material spread over several
+-- stacks and could show a build as unaffordable when it was affordable.
 local function storedCount(storage, types)
     local total = 0
     for _, row in ipairs(storage and storage.rows or {}) do
         for _, fullType in ipairs(types or {}) do
             if tostring(row.fullType or "") == tostring(fullType or "") then
-                total = math.max(total,
+                total = total + math.max(0,
                     math.floor(tonumber(row.quantity) or 0))
             end
         end
@@ -28,17 +31,63 @@ local function storedCount(storage, types)
     return total
 end
 
+-- Quantity, not stack count. getItemsFromType lists stacks, and one stack can
+-- hold more than one unit.
 local function playerCount(types)
     local player = getSpecificPlayer and getSpecificPlayer(0) or nil
     local inventory = player and player.getInventory
         and player:getInventory() or nil
-    local best = 0
+    if not inventory or not inventory.getItemsFromType then return 0 end
+    local total = 0
     for _, fullType in ipairs(types or {}) do
-        local values = inventory and inventory.getItemsFromType
-            and inventory:getItemsFromType(fullType, true) or nil
-        if values and values.size then best = math.max(best, values:size()) end
+        local values = inventory:getItemsFromType(fullType, true)
+        local size = values and values.size and tonumber(values:size()) or 0
+        if size > 0 then
+            if type(values.get) ~= "function" then
+                -- Lightweight list stub (isolated smoke tests).
+                total = total + size
+            else
+                for index = 0, size - 1 do
+                    local item = values:get(index)
+                    total = total + math.max(1, math.floor(tonumber(
+                        item and item.getCount and item:getCount() or 1)
+                        or 1))
+                end
+            end
+        end
     end
-    return best
+    return total
+end
+
+--[[
+    The Base window polls its own lightweight snapshot, while the Colony
+    Storage window polls the colony-management one. The base projection now
+    carries the stockpile rows; when it does not (an older server, or before
+    the first base poll lands), reuse the cached management projection rather
+    than pricing every requirement at zero.
+]]
+local function stockpileFor(window)
+    local base = window and window.snapshot and window.snapshot.storage or nil
+    if base and type(base.rows) == "table" then return base end
+    local ClientState = PNC.Network and PNC.Network.ClientState or nil
+    local management = ClientState and ClientState.colonyManagement or nil
+    local fallback = management and management.storage or nil
+    if fallback and type(fallback.rows) == "table" then return fallback end
+    return base or fallback
+end
+
+-- Stockpile projection the build UI prices requirements against. Exported so
+-- the view passes the same storage into BuildOptions that the requirement rows
+-- use; passing snapshot.storage directly is what produced "0 in stock".
+function Data.Stockpile(window, snapshot)
+    if snapshot and snapshot ~= (window and window.snapshot) then
+        if type(snapshot.storage) == "table"
+            and type(snapshot.storage.rows) == "table"
+        then
+            return snapshot.storage
+        end
+    end
+    return stockpileFor(window)
 end
 
 function Data.SelectedOption(window)
@@ -111,19 +160,52 @@ function Data.Categories(options)
     return categories, seen
 end
 
+--[[
+    Availability for a native build requirement list, computed from the
+    stockpile projection the Base window now receives.
+
+    Mirrors the server's BuildingService requirement snapshot, including summing
+    alternative item types the way CountProductionAvailable does, so a recipe
+    row built on the client reports the same available/ready numbers the server
+    would use when it reserves the materials.
+]]
+function Data.MaterialAvailability(storage, requirements)
+    local output = {}
+    for _, requirement in ipairs(requirements or {}) do
+        local types = requirement.itemTypes or costTypes(requirement)
+        local names = {}
+        for _, fullType in ipairs(types or {}) do
+            names[#names + 1] = tostring(fullType)
+        end
+        local amount = math.max(1, math.floor(
+            tonumber(requirement.amount) or 1))
+        local available = storedCount(storage, types)
+        output[#output + 1] = {
+            itemTypes = types,
+            names = names,
+            amount = amount,
+            consumed = requirement.consumed ~= false,
+            available = available,
+            ready = available >= amount,
+        }
+    end
+    return output
+end
+
 function Data.MaterialRows(window, option)
     local rows = {}
     if not option then return rows end
     local definition = PNC.FacilityDefinitions
         and PNC.FacilityDefinitions.Get(option.id) or nil
+    local fromPlayer = definition and definition.bootstrapFromPlayer == true
+    local storage = fromPlayer and nil or stockpileFor(window)
     for _, cost in ipairs(option.buildMaterials or {}) do
         local types = costTypes(cost)
         local fullType = types[1]
         local required = math.max(0, math.floor(tonumber(
             cost.amount or cost.quantity) or 0))
-        local available = definition and definition.bootstrapFromPlayer == true
-            and playerCount(types) or storedCount(window.snapshot
-                and window.snapshot.storage, types)
+        local available = fromPlayer and playerCount(types)
+            or storedCount(storage, types)
         local metadata = InventoryModel.Probe(fullType)
         rows[#rows + 1] = {
             fullType = fullType,
@@ -132,8 +214,7 @@ function Data.MaterialRows(window, option)
             required = required,
             available = available,
             ready = available >= required,
-            source = definition and definition.bootstrapFromPlayer == true
-                and "PLAYER" or "STOCKPILE",
+            source = fromPlayer and "PLAYER" or "STOCKPILE",
         }
     end
     return rows

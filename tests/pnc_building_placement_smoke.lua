@@ -72,6 +72,26 @@ T.equal(cell:getDrag(), window.buildPlacement,
 T.equal(window.buildPlacement.containers[1], "player-container",
     "native placement receives vanilla crafting containers")
 
+-- A repeated BUILD/PLACE click must not restart the live cursor: tearing the
+-- cursor down and rebuilding it is what made the placement overlay flash.
+local firstCursor = window.buildPlacement
+local repeatOk = Placement.Begin(window, {
+    recipeKey = "TestWall", objectInfoName = "TestWall",
+})
+T.equal(repeatOk, true, "repeated placement click reports success")
+T.equal(window.buildPlacement, firstCursor,
+    "repeated placement click keeps the live cursor")
+T.equal(cell:getDrag(), firstCursor,
+    "repeated placement click keeps the IsoCell drag state")
+
+-- A different object still restarts the placement with a fresh cursor.
+local switchOk = Placement.Begin(window, {
+    recipeKey = "TestDoor", objectInfoName = "TestDoor",
+})
+T.equal(switchOk, true, "switching objects restarts placement")
+T.truthy(window.buildPlacement ~= firstCursor,
+    "switching objects creates a new cursor")
+
 Placement.Cancel(window)
 T.falsy(window.buildPlacement, "cancel clears the placement cursor")
 T.falsy(cell:getDrag(), "cancel clears the IsoCell drag state")

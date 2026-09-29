@@ -40,9 +40,16 @@ end
 
 function Provider.isEnabled(entry, player)
     local record = target(entry)
-    local commandable = Commands and Commands.CanPlayerCommand
-        and Commands.CanPlayerCommand(record, player,
+    local authority = PNC.ClientCompanionAuthority
+    local commandable
+    if authority and authority.CanPlayerCommand then
+        commandable = authority.CanPlayerCommand(record, player,
             PNC.Const.COMPANION_COMMAND_RADIUS) == true
+    else
+        commandable = Commands and Commands.CanPlayerCommand
+            and Commands.CanPlayerCommand(record, player,
+                PNC.Const.COMPANION_COMMAND_RADIUS) == true
+    end
     return commandable and (followsPlayer(record, player)
         or Controller.IsAssigned(entry and entry.id))
 end

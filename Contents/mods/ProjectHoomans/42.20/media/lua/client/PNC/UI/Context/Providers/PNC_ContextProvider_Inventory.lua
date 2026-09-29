@@ -3,6 +3,7 @@ PNC.ContextHub = PNC.ContextHub or {}
 
 local Provider = { id = "inventory" }
 local Commands = PNC.CompanionCommands
+local Authority = PNC.ClientCompanionAuthority
 
 local function tr(key, fallback)
     local value = getText and PNC.Translation.GetKey(key) or nil
@@ -13,17 +14,30 @@ local function target(entry)
     return entry and (entry.record or entry.snapshot) or nil
 end
 
+--[[
+    Ownership and commandability come from the client authority helper, which
+    falls back to the server-replicated faction projection on a multiplayer
+    client where the faction and player-character services are not loaded. When
+    the helper itself is unavailable the authoritative registry is used, so a
+    load-order problem degrades to the previous behavior rather than hiding the
+    option.
+]]
 local function canManageCompanion(entry, player)
+    local record = target(entry)
+    local radius = tonumber(PNC.Const.INVENTORY_INTERACTION_RADIUS) or 3
+    if Authority and Authority.CanPlayerCommand then
+        return Authority.CanPlayerCommand(record, player, radius) == true
+    end
     return Commands and Commands.CanPlayerCommand
-        and Commands.CanPlayerCommand(
-            target(entry),
-            player,
-            tonumber(PNC.Const.INVENTORY_INTERACTION_RADIUS) or 3
-        ) == true
+        and Commands.CanPlayerCommand(record, player, radius) == true
 end
 
 local function isOwnedCompanion(entry, player)
     local record = target(entry)
+    if Authority and Authority.IsOwnedByPlayer then
+        return Authority.IsCompanion(record) == true
+            and Authority.IsOwnedByPlayer(record, player) == true
+    end
     if Commands and Commands.IsCompanion and Commands.IsOwnedByPlayer then
         return Commands.IsCompanion(record) == true
             and Commands.IsOwnedByPlayer(record, player) == true

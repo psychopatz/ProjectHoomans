@@ -10,6 +10,21 @@ local H = PNC.BuildingServiceInternal
 local Catalog = PNC.BuildRecipeCatalog
 local Repository = PNC.WorkRepository
 local Definitions = PNC.WorkDefinitions
+local BuildAudit = require "PNC/Core/Diagnostics/PNC_BuildAudit"
+
+-- Blueprint queueing is the server half of the Base window's PLACE flow. Every
+-- rejection returns a reason the client renders, and this trace makes the
+-- reason visible in console.txt together with the request correlation id.
+local function traceQueue(stage, args, fields)
+    if not BuildAudit.Enabled() then return end
+    local output = {
+        BuildAudit.RequestField(args and args.requestId),
+        "recipe=" .. tostring(args and (args.recipeKey
+            or args.objectInfoName)),
+    }
+    for _, field in ipairs(fields or {}) do output[#output + 1] = field end
+    BuildAudit.Log(stage, output)
+end
 
 local function activityItemFullType(requirements, reservation)
     local reserved = reservation and reservation.requirements or nil
@@ -67,7 +82,13 @@ function Service.Queue(player, args)
     reservation, reason = PNC.ColonyStorageService.ReserveProductionMaterials(
         context.storage.id, requirements,
         "blueprint:" .. tostring(blueprint.objectInfoName))
-    if not reservation then return nil, reason or "MISSING_MATERIALS" end
+    if not reservation then
+        traceQueue("blueprint_reservation_failed", args, {
+            "reason=" .. tostring(reason)})
+        return nil, reason or "MISSING_MATERIALS"
+    end
+    traceQueue("blueprint_reserved", args, {
+        "reservation=" .. tostring(reservation.id)})
     local preparedFacility
     if nativeFacility then
         local z = math.floor(tonumber(blueprint.z) or 0)
@@ -121,8 +142,13 @@ function Service.Queue(player, args)
         if preparedFacility and PNC.FacilityService.RemoveNativeWorkstation then
             PNC.FacilityService.RemoveNativeWorkstation(preparedFacility.id)
         end
+        traceQueue("blueprint_queue_failed", args, {
+            "reason=" .. tostring(reason)})
         return nil, reason or "BUILD_QUEUE_FAILED"
     end
+    traceQueue("blueprint_queued", args, {
+        "order=" .. tostring(order.id),
+        "facility=" .. tostring(preparedFacility and preparedFacility.id)})
     if preparedFacility then
         preparedFacility.constructionWorkOrderId = order.id
         preparedFacility.constructionState = "UNDER_CONSTRUCTION"

@@ -386,6 +386,35 @@ local function passageObjectBool(object, name)
     return ok and value == true
 end
 
+--[[
+    A hoppable, not-tall door or fence is vaulted by vanilla through
+    IsoZombie.tryThump() -> IsoGameCharacter.climbOverFence() ->
+    ClimbOverFenceState, whose shouldFallAfterVaultOver() dereferences
+    BodyDamage that an IsoZombie does not have. Entering that player-only state
+    throws a NullPointerException on every vault attempt, on client and server
+    alike. PNC refuses the state for managed carriers, so the vanilla vault has
+    to be prevented before tryThump() runs.
+]]
+function LiveBodyControl.IsHoppableLowDoor(object)
+    local ok
+    local hoppable
+    local tall
+    if not object or not object.isHoppable then
+        return false
+    end
+    ok, hoppable = pcall(object.isHoppable, object)
+    if not ok or hoppable ~= true then
+        return false
+    end
+    if object.isTallHoppable then
+        ok, tall = pcall(object.isTallHoppable, object)
+        if ok and tall == true then
+            return false
+        end
+    end
+    return true
+end
+
 local function isClosedPassageDoor(object)
     if not object or not instanceof then return false end
     if instanceof(object, "IsoDoor") then
@@ -486,6 +515,81 @@ local function isHeavyHeldItem(item)
     return false
 end
 
+--[[
+    Mirrors the movement test vanilla uses before trying a window climb
+    (IsoZombie.updateInternal only reaches tryThump() while the body is moving,
+    i.e. next position differs from current). Used to decide whether a climbable
+    passage ahead must be blocked even without a PNC passage state.
+]]
+function LiveBodyControl.IsNativeMoving(zombie)
+    local ok
+    local nextX
+    local nextY
+    local x
+    local y
+    if not (zombie and zombie.getNextX and zombie.getNextY
+        and zombie.getX and zombie.getY)
+    then
+        return false
+    end
+    ok, nextX, nextY = pcall(function()
+        return zombie:getNextX(), zombie:getNextY()
+    end)
+    if not ok then
+        return false
+    end
+    ok, x, y = pcall(function()
+        return zombie:getX(), zombie:getY()
+    end)
+    if not ok then
+        return false
+    end
+    return nextX ~= x or nextY ~= y
+end
+
+--[[
+    Climb-ahead probe used by the zombie-update lane.
+
+    Vanilla can only climb a window it finds on the feeler tile, so this is the
+    cheap, exact test for "the engine may reach climbThroughWindow() this
+    frame". It must run for every PNC shell, including shells the managed-safety
+    gate rejects (duplicates, lease mismatches): those are the bodies that
+    otherwise fall through to the player-only climb and its player-only drop
+    packet, throwing a ClassCastException for the IsoZombie.
+]]
+--[[
+    The broken engine path is client-only: dropHeavyItems() sends
+    PlayerDropHeldItems only when the engine is a client and the character is
+    local. On a dedicated server there is no packet to fail, so the guard must
+    not touch the authoritative hand slots there.
+]]
+local function isClientState()
+    return isClient ~= nil and isClient() == true
+end
+
+function LiveBodyControl.ClearHeavyItemsForClimbAhead(zombie)
+    if not isClientState() then
+        return false
+    end
+    return LiveBodyControl.ClearHeavyItemsForClimbAheadUnchecked(zombie)
+end
+
+function LiveBodyControl.ClearHeavyItemsForClimbAheadUnchecked(zombie)
+    local object
+    local kind
+    if not zombie then
+        return false
+    end
+    object, kind = LiveBodyControl.GetVanillaPassageAhead(zombie)
+    if not object then
+        return false
+    end
+    if kind ~= "window" and kind ~= "window_frame" and kind ~= "thumpable" then
+        return false
+    end
+    return LiveBodyControl.ClearHeavyHeldItems(zombie)
+end
+
 function LiveBodyControl.ClearHeavyHeldItems(zombie)
     local hasPrimary
     local hasSecondary
@@ -532,26 +636,48 @@ function LiveBodyControl.BlockVanillaPassage(zombie, lane, now)
         VANILLA_PASSAGE_GUARD_LOGGED[zombie] = nil
         return false
     end
-    -- While the body is crossing the sight line of a climbable passage, vanilla
-    -- may reach IsoZombie.tryThump() -> climbThroughWindow() this same frame.
-    -- Stow heavy hand items first: that is the only reason the engine's
-    -- player-only drop packet fires for a zombie.
-    if kind == "window" or kind == "window_frame" or kind == "thumpable" then
-        LiveBodyControl.ClearHeavyHeldItems(zombie)
-    end
+    --[[
+        A climbable passage ahead is the exact geometry where vanilla reaches
+        IsoZombie.tryThump() -> IsoGameCharacter.climbThroughWindow() this same
+        frame. Two things must happen before that:
+
+        Heavy hand items are stowed earlier in the zombie-update lane by
+        ClearHeavyItemsForClimbAhead (client only, because the failing packet is
+        client only). Here native movement is stopped: the original guard only
+        did this for bodies already in a PNC passage state, so a shell whose
+        action state was idle - right after a window smash or a
+        rematerialization, for example - fell through to the player-only climb.
+    ]]
+    local climbable = kind == "window"
+        or kind == "window_frame"
+        or kind == "thumpable"
+    -- A hoppable low door or fence is vaulted through the player-only
+    -- ClimbOverFenceState, which throws for an IsoZombie. It must be treated as
+    -- a hazard on both sides, not just on the client.
+    local vaultHazard = kind == "door"
+        and LiveBodyControl.IsHoppableLowDoor(object)
+    local moving = LiveBodyControl.IsNativeMoving(zombie)
     actionState = LiveBodyControl.GetActionStateName(zombie)
-    if not passageMovementState(actionState) then
+    if not passageMovementState(actionState)
+        and not ((climbable and isClientState() and moving)
+            or (vaultHazard and moving))
+    then
         return false
     end
-    -- Open a closed door the body is pressed against and let the vanilla path
-    -- continue, instead of cancelling movement and leaving the body to
-    -- re-request a path that the closed door keeps failing. An already open
-    -- door is not a blockage either.
     if kind == "door" then
-        if not isClosedPassageDoor(object) then
-            return false, kind
-        end
-        if openPassageDoorAhead(zombie, object, now) then
+        if vaultHazard then
+            -- Fall through to the block below. Opening a hoppable low door
+            -- would only create the vaultable state that throws, so the PNC
+            -- action runtime owns this crossing instead.
+        elseif isClosedPassageDoor(object) then
+            -- Open a closed door the body is pressed against and let the
+            -- vanilla path continue, instead of cancelling movement and leaving
+            -- the body to re-request a path that the closed door keeps failing.
+            if openPassageDoorAhead(zombie, object, now) then
+                return false, kind
+            end
+        else
+            -- An already open, non-vaultable door is not a blockage.
             return false, kind
         end
     end
@@ -579,6 +705,17 @@ function LiveBodyControl.BlockVanillaPassage(zombie, lane, now)
         and ZombieIdleState.instance
     then
         zombie:changeState(ZombieIdleState.instance())
+    end
+    if PNC.PerformanceScalingDiagnostics
+        and PNC.PerformanceScalingDiagnostics.Increment
+    then
+        if climbable then
+            pcall(PNC.PerformanceScalingDiagnostics.Increment,
+                "LiveBodyControl.VanillaClimbBlocked")
+        elseif vaultHazard then
+            pcall(PNC.PerformanceScalingDiagnostics.Increment,
+                "LiveBodyControl.VanillaVaultBlocked")
+        end
     end
     if not VANILLA_PASSAGE_GUARD_LOGGED[zombie]
         and PNC.Core

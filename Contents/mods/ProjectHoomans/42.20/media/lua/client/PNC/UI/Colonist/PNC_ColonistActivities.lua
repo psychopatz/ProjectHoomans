@@ -62,6 +62,17 @@ local DEFINITIONS = {
         key = "UI_PNC_CommandCorpseHaul",
         fallback = "GRAB CORPSES",
     },
+    {
+        -- Opens the colonist's inventory window. This is a client view rather
+        -- than a dispatched order, so it is laid out on its own below the
+        -- command grid and given a taller control, and it is only offered while
+        -- the colonist is materialized (live, not abstract).
+        id = "manual_inventory",
+        separate = true,
+        opensInventory = true,
+        key = "UI_PNC_CommandAccessInventory",
+        fallback = "ACCESS INVENTORY",
+    },
 }
 
 Activities.Definitions = DEFINITIONS
@@ -239,6 +250,49 @@ end
 
 TOGGLE.presentation = togglePresentation
 
+--[[
+    Access Inventory opens a client view of the colonist's inventory, so it only
+    applies while that colonist is materialized in the world: a live body has an
+    authoritative inventory to read, while an abstracted colonist has no loaded
+    body behind the request and a dead one has nothing to show.
+]]
+local function inventoryPresentation(person, definition)
+    local state = {
+        title = Shared.Tr(definition.key, definition.fallback),
+        variant = "default",
+    }
+    if not person then
+        state.enabled = false
+        state.reason = "no_colonist_selected"
+        state.tooltip = Shared.Tr("UI_PNC_Activities_SelectHelp",
+            "Choose a colonist to command their next personal activity.")
+        return state
+    end
+    if person.alive == false then
+        state.enabled = false
+        state.reason = "colonist_dead"
+        state.tooltip = Shared.Tr("UI_PNC_Activities_InventoryDead",
+            "This colonist is no longer alive.")
+        return state
+    end
+    local live = tostring(PNC.Const and PNC.Const.PRESENCE_LIVE or "live")
+    if tostring(person.presenceState or "") ~= live then
+        state.enabled = false
+        state.reason = "colonist_not_live"
+        state.tooltip = Shared.Tr("UI_PNC_Activities_InventoryNotLive",
+            "Only available while this colonist is present in the world.")
+        return state
+    end
+    state.enabled = true
+    state.tooltip = Shared.Tr("UI_PNC_Activities_InventoryHelp",
+        "Open this colonist's inventory.")
+    return state
+end
+
+if BY_ID.manual_inventory then
+    BY_ID.manual_inventory.presentation = inventoryPresentation
+end
+
 local function activityInfo(person)
     return person and person.actionInformation or nil
 end
@@ -411,18 +465,60 @@ local function gridOptions(window, width)
     }
 end
 
+-- The inventory control sits outside the command grid so it can be full width
+-- and taller than a command cell, which keeps it visually separate from the
+-- orders above it.
+local SEPARATE_CONTROL_HEIGHT = 48
+local SEPARATE_CONTROL_GAP = 8
+
+local function separateControls(component)
+    return component and component.separateList or nil
+end
+
+local function separateHeight(component, options)
+    local list = separateControls(component)
+    local count = list and #list or 0
+    if count <= 0 then return 0 end
+    local height = Layout.Pixels(SEPARATE_CONTROL_HEIGHT, options.scale)
+    local gap = Layout.Pixels(SEPARATE_CONTROL_GAP, options.scale)
+    return (count * height) + ((count - 1) * gap)
+end
+
+--[[
+    Places the standalone controls below the grid. `gridTop` plus the grid's own
+    height gives the first available row.
+]]
+local function layoutSeparateControls(component, options, width, gridBottom)
+    local list = separateControls(component)
+    if not list or #list == 0 then return end
+    local scale = options.scale
+    local height = Layout.Pixels(SEPARATE_CONTROL_HEIGHT, scale)
+    local gap = Layout.Pixels(SEPARATE_CONTROL_GAP, scale)
+    local y = gridBottom + gap
+    for index = 1, #list do
+        Layout.SetBounds(list[index], 0, y, math.max(1, width), height)
+        y = y + height + gap
+    end
+end
+
 local function controlsHeight(window, width, component)
     component = getComponent(window, component)
     if not component then return 0 end
     local options = gridOptions(window, width)
     local header = Layout.Pixels(25, options.scale)
+    local top = header + Layout.Pixels(8, options.scale)
     local result = Layout.Grid(component.controlList, {
         x = 0,
-        y = header + Layout.Pixels(8, options.scale),
+        y = top,
         width = math.max(1, tonumber(width) or 1),
         height = 1,
     }, options) or {}
-    return header + Layout.Pixels(8, options.scale) + result.height
+    local gridHeight = tonumber(result.height) or 0
+    local extra = separateHeight(component, options)
+    if extra > 0 then
+        extra = extra + Layout.Pixels(SEPARATE_CONTROL_GAP, options.scale)
+    end
+    return top + gridHeight + extra
 end
 
 function Activities.Create(window, _)
@@ -432,6 +528,7 @@ function Activities.Create(window, _)
         pane = pane,
         controls = {},
         controlList = {},
+        separateList = {},
     }
     window.activityComponent = component
     pane.render = function(panel)
@@ -470,7 +567,11 @@ function Activities.Create(window, _)
         end
         button.activityCommandID = definition.id
         component.controls[definition.id] = button
-        component.controlList[#component.controlList + 1] = button
+        if definition.separate == true then
+            component.separateList[#component.separateList + 1] = button
+        else
+            component.controlList[#component.controlList + 1] = button
+        end
     end
     return component
 end
@@ -487,17 +588,23 @@ function Activities.Apply(window, activeTab, Layout, component)
     for _, button in ipairs(component.controlList or {}) do
         button:setVisible(activeTab == true)
     end
+    for _, button in ipairs(component.separateList or {}) do
+        button:setVisible(activeTab == true)
+    end
     if not activeTab then return end
     syncControls(window, component)
     if not pane then return end
     local options = gridOptions(window, pane:getWidth())
     local header = Layout.Pixels(25, options.scale)
-    Layout.Grid(component.controlList, {
+    local top = header + Layout.Pixels(8, options.scale)
+    local result = Layout.Grid(component.controlList, {
         x = 0,
-        y = header + Layout.Pixels(8, options.scale),
+        y = top,
         width = pane:getWidth(),
         height = 1,
-    }, options)
+    }, options) or {}
+    layoutSeparateControls(component, options, pane:getWidth(),
+        top + (tonumber(result.height) or 0))
 end
 
 function Activities.BuildRows(context)
@@ -580,6 +687,16 @@ function Activities.OnControl(window, button)
             end
             return false
         end
+    end
+    -- Access Inventory is a client view rather than a dispatched order, so it
+    -- resolves here instead of through the companion command transport.
+    if definition.opensInventory == true then
+        local inventory = PNC.InventoryWindow
+        if inventory and type(inventory.Open) == "function" then
+            inventory.Open(person.id)
+            return true
+        end
+        return false
     end
     local client = PNC.Client
     local execute = client and client.ExecuteCompanionCommand or nil

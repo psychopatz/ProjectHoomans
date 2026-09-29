@@ -13,9 +13,24 @@ local function currentSnapshot()
     return type(snapshot) == "table" and snapshot or nil
 end
 
+--[[
+    The Base window polls the lightweight base projection, the Colony Storage
+    window polls the management one. Placement validity used to read the
+    management settlement only, so a session that had opened the Base window
+    without a management refresh could not place anything: every tile was
+    rejected as outside the base with nothing in the log to say why. Resolve
+    the settlement from whichever projection is populated.
+]]
 local function currentSettlement()
-    local snapshot = currentSnapshot()
-    return snapshot and snapshot.settlement or nil
+    local network = PNC.Network
+    local state = network and network.ClientState or nil
+    if type(state) ~= "table" then return nil end
+    local management = state.colonyManagement
+    local settlement = type(management) == "table"
+        and management.settlement or nil
+    if settlement then return settlement end
+    local base = state.colonyBase
+    return type(base) == "table" and base.settlement or nil
 end
 
 local function nativeObjectInfoFor(blueprint)

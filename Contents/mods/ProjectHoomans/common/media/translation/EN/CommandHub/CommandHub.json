@@ -1,4 +1,5 @@
 {
+    "UI_PNC_CommandAccessInventory": "Access Inventory",
     "UI_PNC_CommandAttackAuto": "Auto",
     "UI_PNC_CommandAttackMelee": "Melee",
     "UI_PNC_CommandAttackNone": "Don't Attack",

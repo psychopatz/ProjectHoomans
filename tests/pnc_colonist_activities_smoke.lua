@@ -112,6 +112,7 @@ local Activities = T.load(
 
 local person = {
     id = "npc_alex", name = "Alex", alive = true, activity = "Eating",
+    presenceState = "live",
     journal = {
         { "projecthoomans.npc.skill.levelUp", 150, "Axe", 3 },
         { "projecthoomans.npc.needs.foodConsumed", 120,
@@ -142,6 +143,20 @@ T.truthy(activities.controls.manual_refill,
 T.equal(activities.controls.manual_refill.title,
     "REFILL WATER",
     "manual water refill uses the wrong activity label")
+
+-- Access Inventory is laid out outside the command grid so it can be full width
+-- and taller, and it opens a client view instead of dispatching an order.
+local inventoryButton = activities.controls.manual_inventory
+T.truthy(inventoryButton, "activities tab does not expose inventory access")
+T.equal(inventoryButton.title, "ACCESS INVENTORY",
+    "inventory access uses the wrong label")
+local inGrid = false
+for _, control in ipairs(activities.controlList) do
+    if control == inventoryButton then inGrid = true end
+end
+T.equal(inGrid, false, "inventory access must sit outside the command grid")
+T.equal(#activities.separateList, 1,
+    "inventory access is not the only standalone control")
 
 local rows = Activities.BuildRows({ selectedPerson = person, window = window })
 T.equal(rows[1].detail, "Eating - Apple (PLAYING)",
@@ -309,5 +324,48 @@ T.falsy(debug.pane == activities.pane,
 Debug.Apply(window, false, UI.Layout, debug)
 T.equal(activities.pane.visible, true,
     "inactive debug tab hides the Activities controls pane")
+
+-- ---------------------------------------------------------------------------
+-- Access Inventory: live-only client view.
+-- ---------------------------------------------------------------------------
+local openedInventory
+PNC.InventoryWindow = {
+    Open = function(npcID) openedInventory = npcID end,
+}
+
+person.presenceState = "live"
+Activities.Apply(window, true, UI.Layout, activities)
+T.equal(inventoryButton.enabled, true,
+    "live colonist should expose inventory access")
+T.equal(inventoryButton.height, 48,
+    "inventory access is not taller than a command cell")
+T.truthy(inventoryButton.y > 33 + 34,
+    "inventory access is not placed below the command grid")
+
+local commandCount = #commands
+T.truthy(Activities.OnControl(window, {
+    internal = "manual_inventory",
+    activityCommandID = "manual_inventory",
+}), "inventory access did not open the window")
+T.equal(openedInventory, person.id,
+    "inventory access opened the wrong colonist")
+T.equal(#commands, commandCount,
+    "inventory access must not dispatch a companion command")
+
+-- An abstracted colonist has no loaded body to read an inventory from.
+person.presenceState = "abstract"
+openedInventory = nil
+Activities.Apply(window, true, UI.Layout, activities)
+T.equal(inventoryButton.enabled, false,
+    "abstracted colonist should not expose inventory access")
+T.falsy(Activities.OnControl(window, {
+    internal = "manual_inventory",
+    activityCommandID = "manual_inventory",
+}), "disabled inventory access still opened the window")
+T.equal(openedInventory, nil,
+    "abstracted colonist inventory must not open")
+
+person.presenceState = "live"
+Activities.Apply(window, true, UI.Layout, activities)
 
 T.finish("pnc_colonist_activities_smoke")

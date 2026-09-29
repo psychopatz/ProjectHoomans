@@ -149,6 +149,23 @@ function LiveBodyControl.OnZombieUpdate(zombie)
     local now
     local animation = PNC.Animation
     local canPump = true
+    --[[
+        Engine climb guard, placed before the managed-safety gate on purpose.
+
+        A shell that gate rejects - a duplicate replicated body, a lease
+        mismatch, a body whose ModData is only partially present - still runs
+        vanilla IsoZombie.updateInternal(), which reaches tryThump() ->
+        climbThroughWindow() -> dropHeavyItems() and sends the player-only
+        PlayerDropHeldItems/Equip packets for a zombie. Clearing heavy hand
+        items for every PNC shell with a climbable window ahead removes the only
+        reason that packet path fires.
+    ]]
+    if PNC.Core and PNC.Core.IsManagedNPCBody
+        and PNC.Core.IsManagedNPCBody(zombie)
+        and LiveBodyControl.ClearHeavyItemsForClimbAhead
+    then
+        LiveBodyControl.ClearHeavyItemsForClimbAhead(zombie)
+    end
     if not LiveBodyControl.EnforceManagedSafety(
         zombie,
         "zombie_update"

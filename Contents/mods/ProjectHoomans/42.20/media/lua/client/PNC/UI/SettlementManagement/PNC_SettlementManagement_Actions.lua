@@ -1,5 +1,4 @@
 local Facility = require "PNC/UI/SettlementManagement/PNC_SettlementManagement_FacilityActions"
-local BuildModal = require "PNC/UI/SettlementManagement/PNC_SettlementManagement_FacilityBuildModal"
 local LayoutOverlay = require "PNC/UI/SettlementManagement/PNC_SettlementLayoutOverlay"
 local Support = require "PNC/UI/SettlementManagement/PNC_SettlementManagement_SelectorSupport"
 local Fishing = require "PNC/UI/SettlementManagement/PNC_SettlementManagement_FishingActions"
@@ -105,11 +104,11 @@ function Actions.Handle(window, action, facility)
     if action == "overlay" then LayoutOverlay.Toggle(settlement); return true end
     if action == "fishing_zone" then return Fishing.Begin(window) end
     if action == "build_facility" then
-        BuildModal.Open(settlement, function(definitionId)
-            return Facility.BeginBuild(window, definitionId)
-        end, window.snapshot and window.snapshot.storage,
-            window.snapshot and window.snapshot.research)
-        return true
+        -- Retired: the FACILITIES tab owns facility construction now. The
+        -- action id is still accepted so an old keybind or stale UI cannot
+        -- open the legacy window, and it points at the same code path.
+        local BuildingTab = require "PNC/UI/Base/PNC_BaseBuildingTab"
+        return BuildingTab.OnControl(window, { internal = "build_selected" })
     end
     if action == "barricade" then
         PNC.Client.RequestBuildBarricade({ baseId = settlement.id,

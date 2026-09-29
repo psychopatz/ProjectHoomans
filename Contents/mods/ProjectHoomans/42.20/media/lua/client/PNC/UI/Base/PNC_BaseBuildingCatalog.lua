@@ -7,6 +7,8 @@ local QueueOverlay = require
     "PNC/UI/Base/PNC_BaseBuildingQueueOverlay"
 local QueueActions = require
     "PNC/UI/Base/PNC_BaseBuildingQueueActions"
+local Data = require "PNC/UI/Base/PNC_BaseBuildingData"
+local BuildAudit = require "PNC/Core/Diagnostics/PNC_BuildAudit"
 
 local function trace(event, message)
     local hub = PNC.CommandHub
@@ -458,6 +460,13 @@ function Building.OnRecipeCell(window, row, key)
         updateFavoriteControls(window)
         if key == "action" then
             if row.enabled == true then
+                if BuildAudit.Enabled() then
+                    BuildAudit.Log("click", {
+                        "button=recipe_row_action",
+                        "object=" .. tostring(row.recipe.objectInfoName
+                            or row.recipe.recipeKey),
+                    })
+                end
                 Placement.Begin(window, row.recipe)
             elseif row.debugGrantEnabled == true then
                 giveRecipeMaterials(window, row.recipe)
@@ -690,9 +699,15 @@ function Building.Apply(window, active)
             and window.buildRecipePreviewCompact ~= true)
     end
     updateFavoriteControls(window)
-    if not active then
-        Placement.Cancel(window)
-    end
+    -- Do NOT cancel the placement here.
+    --
+    -- The placement cursor is window-level state (window.buildPlacement), not
+    -- catalog state, and this Apply runs with active=false on every snapshot
+    -- refresh whenever the FACILITIES tab is the visible one. Cancelling here
+    -- tore down every facility placement roughly one refresh after BUILD, which
+    -- is why a native workstation could never be placed. Tab-level deactivation
+    -- in PNC_BaseBuildingTab.Apply already cancels when the player leaves both
+    -- build tabs, and the CANCEL PLACEMENT button covers the explicit case.
     if active and window.detailsPane then window.detailsPane:setVisible(false) end
 end
 
@@ -865,6 +880,65 @@ local function rebuildQueue(window, queue)
     end)
 end
 
+--[[
+    The buildable recipe list.
+
+    The server no longer ships the whole catalog in the lightweight base
+    projection: it is derived from SpriteConfigManager, which the client also
+    has, so the client rebuilds it from the shared catalog and prices each
+    recipe against the stockpile projection the same snapshot carries.
+
+    This is what makes the tab list every buildable object the engine knows
+    about - vanilla and modded alike, walls included - while
+    FilterFacilityRecipes keeps out the ones that already live in the FACILITIES
+    tab.
+]]
+function Building.CatalogRecipes(window, building)
+    building = building or {}
+    local shipped = building.recipes
+    if type(shipped) == "table" and #shipped > 0 then
+        return Building.FilterFacilityRecipes(shipped)
+    end
+    local catalog = PNC.BuildRecipeCatalog
+    if not catalog or type(catalog.Build) ~= "function" then return {} end
+    local ok, descriptors = pcall(catalog.Build)
+    if not ok or type(descriptors) ~= "table" then
+        if BuildAudit.Enabled() then
+            BuildAudit.Log("recipe_catalog_failed", {
+                "stage=local_build",
+                "reason=" .. tostring(descriptors),
+            })
+        end
+        return {}
+    end
+    local storage = Data.Stockpile(window)
+    local rows = {}
+    for _, descriptor in ipairs(descriptors) do
+        rows[#rows + 1] = {
+            id = descriptor.id,
+            recipeKey = descriptor.recipeKey,
+            objectInfoName = descriptor.objectInfoName,
+            displayName = descriptor.displayName,
+            recipeName = descriptor.recipeName,
+            category = descriptor.category,
+            iconName = descriptor.iconName,
+            buildWork = descriptor.buildWork,
+            requiredSkills = descriptor.requiredSkills,
+            requirements = descriptor.requirements,
+            materials = Data.MaterialAvailability(storage,
+                descriptor.requirements),
+        }
+    end
+    if BuildAudit.Enabled() then
+        BuildAudit.Log("recipe_catalog", {
+            "source=client",
+            "recipes=" .. tostring(#rows),
+            "stockpile=" .. tostring(storage ~= nil),
+        })
+    end
+    return Building.FilterFacilityRecipes(rows)
+end
+
 function Building.Rebuild(window, snapshot)
     snapshot = snapshot or window.snapshot or {}
     window.snapshot = snapshot
@@ -877,7 +951,7 @@ function Building.Rebuild(window, snapshot)
     end
     local building = snapshot.building or {}
     QueueActions.Reconcile(window, snapshot, building.queue or {})
-    local recipes = Building.FilterFacilityRecipes(building.recipes or {})
+    local recipes = Building.CatalogRecipes(window, building)
     QueueOverlay.SetQueue(building.queue or {})
     rebuildCategories(window, recipes)
     rebuildRecipes(window, recipes)
@@ -907,10 +981,30 @@ function Building.OnControl(window, buttonValue)
     local action = tostring(buttonValue and buttonValue.internal or "")
     if action == "place" then
         local recipe = activeRecipe(window)
-        if recipe then Placement.Begin(window, recipe) end
+        if not recipe then return false end
+        if BuildAudit.Enabled() then
+            BuildAudit.Log("click", {
+                "button=place_blueprint",
+                "object=" .. tostring(recipe.objectInfoName or recipe.recipeKey),
+            })
+        end
+        local started, reason = Placement.Begin(window, recipe)
+        if started == false then
+            -- The placement cursor never appeared, so this click did nothing.
+            -- Report it instead of returning success.
+            local Shared = require "PNC/UI/Shared/PNC_ColonyUIShared"
+            Shared.NotifyBuildFailure(reason)
+            return false
+        end
         return true
     elseif action == "cancel_placement" then
-        Placement.Cancel(window)
+        if BuildAudit.Enabled() then
+            BuildAudit.Log("cancel_clicked", {
+                "button=cancel_placement",
+                "placement=" .. tostring(window.buildPlacement ~= nil),
+            })
+        end
+        Placement.Cancel(window, "user_cancel")
         return true
     elseif action == "toggle_queue_overlay" then
         local building = window.snapshot and window.snapshot.building or {}

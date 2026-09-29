@@ -8,6 +8,7 @@ local PlacementUI = PNC.BuildingPlacementUI
 local UI = PsychopatzCore.UI
 local Theme = UI.Theme
 local Layout = UI.Layout
+local BuildAudit = require "PNC/Core/Diagnostics/PNC_BuildAudit"
 
 local function tr(key, fallback)
     local value = getText and PNC.Translation.GetKey(key) or nil
@@ -58,6 +59,14 @@ end
 
 function ISPNCBuildingPlacementWindow:close(suppressBack)
     local callback = not suppressBack and self.onBack or nil
+    BuildAudit.TracePlacement("pnc_build_placement_ui_close",
+        { "suppress_back=" .. tostring(suppressBack == true) })
+    if BuildAudit.Enabled() then
+        BuildAudit.Log("placement_ui_close", {
+            "suppress_back=" .. tostring(suppressBack == true),
+            "had_callback=" .. tostring(callback ~= nil),
+        })
+    end
     self:setVisible(false)
     self:removeFromUIManager()
     if PlacementUI.instance == self then PlacementUI.instance = nil end
@@ -89,6 +98,13 @@ function PlacementUI.Open(options)
         math.floor((screenWidth - width) / 2), 24, width, height, {
             title = tr("UI_PNC_BuildingPlacement_Title", "PLACEMENT"),
             resizable = false,
+            -- This is a transient hint, not a workspace: it must not collapse,
+            -- pin or minimise while the player is placing. collapsible=false
+            -- keeps the native frame but pins the window, so the collapse state
+            -- machine never runs (ISCollapsableWindow collapses an unpinned
+            -- window when the mouse leaves it).
+            collapsible = false,
+            persistenceKey = false,
             onBack = options.onBack,
         })
     window:initialise(); window:instantiate(); window:addToUIManager()
@@ -96,6 +112,14 @@ function PlacementUI.Open(options)
     if window.setAlwaysOnTop then window:setAlwaysOnTop(true) end
     window:bringToTop()
     PlacementUI.instance = window
+    BuildAudit.TracePlacement("pnc_build_placement_ui_open", {})
+    if BuildAudit.Enabled() then
+        BuildAudit.Log("placement_ui_open", {
+            "x=" .. tostring(window.x),
+            "y=" .. tostring(window.y),
+            "width=" .. tostring(window.width),
+        })
+    end
     return window
 end
 

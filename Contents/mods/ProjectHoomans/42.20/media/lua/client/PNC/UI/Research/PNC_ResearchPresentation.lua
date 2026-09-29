@@ -38,7 +38,13 @@ local function sourceLabel(source)
 end
 
 local function statusLabel(item)
-    local definition = STATUS[item.status] or STATUS.unavailable
+    local definition = STATUS[item.status]
+    if not definition then
+        -- Unknown or absent status: no badge rather than the missing-station
+        -- warning. STATUS.unavailable is reserved for a genuinely absent
+        -- station, which the model reports explicitly.
+        return ""
+    end
     local value = tr(definition.key, definition.fallback)
     if item.status == "active" and item.progress ~= nil then
         value = value .. " " .. tostring(item.progress) .. "%"
@@ -57,10 +63,21 @@ local function drawRight(list, value, right, y, colorName)
 end
 
 function Presentation.DrawCatalogRow(list, y, entry, alternate)
-    local row = entry.item or {}
+    --[[
+        list:addItem(name, data) stores `data` under entry.item, and the
+        research tree stores an envelope there: a kind, the item or group, and
+        the selected flag.
+        The input handlers (View.AttachListHandlers) already read that envelope.
+        This renderer used to read entry.item AS the row, so every row drew the
+        envelope: no name, sourceLabel(nil) -> "TECHNOLOGY", and status nil ->
+        the "NO RESEARCH TABLE" fallback badge on every row, even with a built
+        research table and research actively running.
+    ]]
+    local envelope = entry.item or {}
     local font = Theme.Font(list.uiScale)
     local height = list.itemheight
-    if row.kind == "group" then
+    if envelope.kind == "group" then
+        local row = envelope
         local group = row.group or {}
         local background = Theme.colors.surfaceRaised
         list:drawRect(0, y, list:getWidth(), height, 0.62,
@@ -79,10 +96,17 @@ function Presentation.DrawCatalogRow(list, y, entry, alternate)
         return y + height
     end
 
-    UI.DrawListSelection(list, y, height, row.selected == true, alternate)
+    local row = envelope.item or {}
+    UI.DrawListSelection(list, y, height, envelope.selected == true, alternate)
     local status, statusColor = statusLabel(row)
-    local badgeWidth = UI.DrawBadge(list, status,
-        list:getWidth() - 8, y + 6, statusColor)
+    -- An unrecognised status must not draw a badge at all. Rendering the
+    -- missing-station warning as the fallback is what made a working research
+    -- table look absent.
+    local badgeWidth = 0
+    if status ~= "" then
+        badgeWidth = UI.DrawBadge(list, status,
+            list:getWidth() - 8, y + 6, statusColor)
+    end
     local right = list:getWidth() - badgeWidth - 18
     local name = Layout.Ellipsize(row.name, font, math.max(90, right - 16))
     local textColor = row.status == "known" and Theme.colors.textMuted

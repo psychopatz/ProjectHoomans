@@ -22,11 +22,36 @@ local BASE_SNAPSHOT_ACTIONS = {
     work_cancel = true, work_resume = true,
 }
 
+-- Build actions are traced end to end by the build audit channel. The trace id
+-- travels as the requestId, so the client click, the request, the server
+-- verdict and the material/queue stages all print the same req= token.
+local BUILD_TRACE_ACTIONS = {
+    facility_create = true,
+    facility_component_set = true,
+    building_queue = true,
+}
+
+local BuildAudit = require "PNC/Core/Diagnostics/PNC_BuildAudit"
+
 function Client.RequestColonyAction(action, options)
     local player = Internal.GetPlayer()
     local args = type(options) == "table" and Core.DeepCopy(options) or {}
     args.action = tostring(action or "")
     args.requestId = args.requestId or Internal.RequestID("colony")
+    if BUILD_TRACE_ACTIONS[args.action] then
+        BuildAudit.TracePlacement("pnc_build_request_sent", {
+            "action=" .. args.action,
+            "req=" .. tostring(args.requestId),
+        })
+    end
+    if BuildAudit.Enabled() and BUILD_TRACE_ACTIONS[args.action] then
+        BuildAudit.MarkSent(args.requestId)
+        BuildAudit.Log("request_sent", {
+            BuildAudit.RequestField(args.requestId),
+            "action=" .. args.action,
+            "scope=" .. tostring(args.snapshotScope or "management"),
+        })
+    end
     if BASE_SNAPSHOT_ACTIONS[args.action] then
         args.snapshotScope = "base"
     end

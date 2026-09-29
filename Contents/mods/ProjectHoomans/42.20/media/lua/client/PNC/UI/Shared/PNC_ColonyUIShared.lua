@@ -85,6 +85,21 @@ Shared.SETTLEMENT_REASON_KEYS = {
     FARMLAND_REQUIRED = "UI_PNC_SettlementReason_FarmlandRequired",
     WORLD_SQUARE_UNLOADED = "UI_PNC_SettlementReason_SquareUnloaded",
     NO_STOCKPILE_ACCESS_NODE = "UI_PNC_SettlementReason_StockpileNode",
+    -- Build/placement outcomes. These previously reached the client only as
+    -- part of a snapshot and were never rendered, so a rejected build was
+    -- indistinguishable from a successful one.
+    FACILITY_AREA_UNAVAILABLE = "UI_PNC_SettlementReason_AreaUnavailable",
+    SELECTOR_UNAVAILABLE = "UI_PNC_SettlementReason_SelectorUnavailable",
+    BUILD_RECIPE_NOT_FOUND = "UI_PNC_SettlementReason_RecipeUnavailable",
+    BUILD_QUEUE_FAILED = "UI_PNC_SettlementReason_QueueFailed",
+    FACILITY_NATIVE_BUILD_FAILED =
+        "UI_PNC_SettlementReason_WorkstationFailed",
+    BUILD_TARGET_OUTSIDE_BASE = "UI_PNC_SettlementReason_OutsideBase",
+    BUILD_TARGET_REQUIRED = "UI_PNC_SettlementReason_TargetRequired",
+    BUILD_TARGET_INVALID = "UI_PNC_SettlementReason_TargetInvalid",
+    BUILD_TARGET_ALREADY_QUEUED = "UI_PNC_SettlementReason_TargetQueued",
+    PLACEMENT_UNAVAILABLE = "UI_PNC_SettlementReason_PlacementUnavailable",
+    PLAYER_UNAVAILABLE = "UI_PNC_SettlementReason_PlayerUnavailable",
 }
 Shared.NEED_METER_THRESHOLDS = {
     hunger = {
@@ -124,6 +139,30 @@ function Shared.SettlementReason(reason)
     reason = tostring(reason or "")
     local key = Shared.SETTLEMENT_REASON_KEYS[reason]
     return key and Shared.Tr(key, reason) or reason
+end
+
+-- Single entry point for "your build was rejected". Both the server verdict
+-- and a local pre-flight failure route through here so a build never fails
+-- silently after its window, selector or cursor has already closed.
+function Shared.NotifyBuildFailure(reason)
+    local player = getSpecificPlayer and getSpecificPlayer(0) or nil
+    if not player or not HaloTextHelper or not HaloTextHelper.addBadText then
+        return false
+    end
+    HaloTextHelper.addBadText(player,
+        Shared.Tr("UI_PNC_Building_BuildFailed", "BUILD FAILED") .. ": "
+            .. tostring(Shared.SettlementReason(reason)))
+    return true
+end
+
+function Shared.NotifyBuildQueued()
+    local player = getSpecificPlayer and getSpecificPlayer(0) or nil
+    if not player or not HaloTextHelper or not HaloTextHelper.addGoodText then
+        return false
+    end
+    HaloTextHelper.addGoodText(player,
+        Shared.Tr("UI_PNC_Building_BuildQueued", "CONSTRUCTION ORDER QUEUED"))
+    return true
 end
 
 function Shared.ListValue(list)

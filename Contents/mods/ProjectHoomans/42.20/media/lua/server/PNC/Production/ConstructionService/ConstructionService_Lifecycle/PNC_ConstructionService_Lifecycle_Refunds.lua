@@ -15,6 +15,22 @@ function H.RefundConstruction(order)
     local refund = Internal.CancellationRefund(order)
     if #refund.products == 0 then return true, refund end
     local payload = order.payload or {}
+    -- Player-funded (bootstrap) builds were paid out of a survivor's own
+    -- inventory. Return those materials to that survivor; the stockpile below
+    -- is only a fallback for a player who cannot be resolved right now.
+    local routing = payload.refund or {}
+    local Costs = PNC.FacilityCostService
+    if routing.toPlayer == true and Costs and Costs.RefundPlayer then
+        local player = Costs.ResolvePlayer and Costs.ResolvePlayer(routing) or nil
+        if player then
+            local paid, payReason = Costs.RefundPlayer(player, refund.products)
+            if paid then return true, refund end
+            if PNC.Core and PNC.Core.LogWarn then
+                PNC.Core.LogWarn("player construction refund failed reason="
+                    .. tostring(payReason))
+            end
+        end
+    end
     local input = payload.input or {}
     local storageId = payload.storageId or input.storageId
     if (not storageId or tostring(storageId) == "")

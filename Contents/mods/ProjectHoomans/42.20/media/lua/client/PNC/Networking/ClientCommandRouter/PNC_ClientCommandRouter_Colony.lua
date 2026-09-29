@@ -85,6 +85,72 @@ end)
     therefore preserves the previous value instead of clearing it. A response
     built without sections replaces the snapshot, as before.
 ]]
+--[[
+    Construction feedback.
+
+    facility_create and building_queue results reach the client already, but
+    nothing read them: the request is fire-and-forget, the selector and the
+    placement cursor close before the server answers, and a rejected build
+    therefore looked exactly like a successful one. Report the verdict once per
+    request so a failure is always visible.
+]]
+local BUILD_RESULT_ACTIONS = {
+    facility_create = true,
+    facility_component_set = true,
+    building_queue = true,
+}
+
+-- The same verdict is often delivered twice: once with the management
+-- snapshot and again on the settlement delta that follows it. Remember the
+-- last few request ids so a failure is reported exactly once.
+local reportedRequestIds = {}
+local reportedRequestOrder = {}
+local REPORTED_REQUEST_LIMIT = 8
+
+local function alreadyReported(requestId)
+    if not requestId then return false end
+    if reportedRequestIds[requestId] then return true end
+    reportedRequestIds[requestId] = true
+    reportedRequestOrder[#reportedRequestOrder + 1] = requestId
+    while #reportedRequestOrder > REPORTED_REQUEST_LIMIT do
+        local oldest = table.remove(reportedRequestOrder, 1)
+        reportedRequestIds[oldest] = nil
+    end
+    return false
+end
+
+local function notifyBuildResult(result)
+    if type(result) ~= "table" then return end
+    local action = tostring(result.action or "")
+    if not BUILD_RESULT_ACTIONS[action] then return end
+    local requestId = result.requestId and tostring(result.requestId) or nil
+    if alreadyReported(requestId) then return end
+    local BuildAudit = require "PNC/Core/Diagnostics/PNC_BuildAudit"
+    BuildAudit.TracePlacement("pnc_build_result", {
+        "action=" .. action,
+        "ok=" .. tostring(result.ok == true),
+        "reason=" .. tostring(result.reason),
+        BuildAudit.RequestField(requestId),
+    })
+    if BuildAudit.Enabled() then
+        BuildAudit.Log("result", {
+            BuildAudit.RequestField(requestId),
+            "action=" .. action,
+            "ok=" .. tostring(result.ok == true),
+            "reason=" .. tostring(result.reason),
+            BuildAudit.ElapsedField(requestId, "rtt_ms"),
+        })
+    end
+    local Shared = require "PNC/UI/Shared/PNC_ColonyUIShared"
+    if result.ok == false then
+        Shared.NotifyBuildFailure(result.reason)
+        return
+    end
+    if action == "building_queue" then Shared.NotifyBuildQueued() end
+end
+
+Internal.NotifyBuildResult = notifyBuildResult
+
 local function applySnapshot(scopeKey, incoming, sectioned)
     local current = ClientState[scopeKey]
     if sectioned == true and type(current) == "table"
@@ -98,6 +164,7 @@ end
 
 Internal.RegisterServerCommand(Const.CMD_COLONY_MANAGEMENT, function(args)
     args = type(args) == "table" and args or {}
+    notifyBuildResult(args.snapshot and args.snapshot.actionResult)
     if args.scope == "base" then
         ClientState.colonyBase = applySnapshot(
             "colonyBase", args.snapshot, args.sectioned)
@@ -128,6 +195,7 @@ end)
 
 Internal.RegisterServerCommand(Const.CMD_SETTLEMENT_DELTA, function(args)
     args = type(args) == "table" and args or {}
+    notifyBuildResult(args.actionResult)
     local baseSnapshot = ClientState.colonyBase
     if type(baseSnapshot) == "table" then
         baseSnapshot.settlement = args.settlement

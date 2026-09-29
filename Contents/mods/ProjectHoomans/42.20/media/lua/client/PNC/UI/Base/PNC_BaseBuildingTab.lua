@@ -6,6 +6,8 @@ local Placement = require
     "PNC/UI/Base/PNC_BaseBuildingPlacement"
 local QueueOverlay = require
     "PNC/UI/Base/PNC_BaseBuildingQueueOverlay"
+local Shared = require "PNC/UI/Shared/PNC_ColonyUIShared"
+local BuildAudit = require "PNC/Core/Diagnostics/PNC_BuildAudit"
 
 local Building = {}
 
@@ -56,7 +58,13 @@ function Building.Apply(window, active)
     View.Apply(window, facilitiesActive)
     BuildingCatalog.Apply(window, buildingsActive)
     if not active then
-        Placement.Cancel(window)
+        if BuildAudit.Enabled() then
+            BuildAudit.Log("tab_inactive", {
+                "tab=" .. tostring(window.tab),
+                "placement=" .. tostring(window.buildPlacement ~= nil),
+            })
+        end
+        Placement.Cancel(window, "tab_inactive")
     end
 end
 
@@ -100,12 +108,47 @@ function Building.OnControl(window, button)
     end
     local option = Data.SelectedOption(window)
     if id == "build_selected" and option and option.enabled == true then
+        local traceId = BuildAudit.TraceId()
+        if BuildAudit.Enabled() then
+            BuildAudit.Log("click", {
+                BuildAudit.RequestField(traceId),
+                "button=build_selected",
+                "definition=" .. tostring(option.id),
+                "tab=" .. tostring(window.tab),
+                "placement=" .. tostring(window.buildPlacement ~= nil),
+            })
+        end
+        BuildAudit.TracePlacement("pnc_build_click", {
+            "definition=" .. tostring(option.id),
+            BuildAudit.RequestField(traceId),
+        })
         local FacilityActions = require
             "PNC/UI/SettlementManagement/PNC_SettlementManagement_FacilityActions"
-        local started = FacilityActions.BeginBuild(window, option.id) ~= false
+        local started, reason = FacilityActions.BeginBuild(window, option.id)
+        BuildAudit.TracePlacement("pnc_build_begin_result", {
+            "definition=" .. tostring(option.id),
+            "started=" .. tostring(started ~= false),
+            "reason=" .. tostring(reason),
+            "placement=" .. tostring(window.buildPlacement ~= nil),
+        })
+        if BuildAudit.Enabled() then
+            BuildAudit.Log("begin_result", {
+                BuildAudit.RequestField(traceId),
+                "definition=" .. tostring(option.id),
+                "started=" .. tostring(started ~= false),
+                "reason=" .. tostring(reason),
+                "placement=" .. tostring(window.buildPlacement ~= nil),
+            })
+        end
         View.Apply(window, true)
         window:requestResponsiveLayout(true)
-        return started
+        if started == false then
+            -- Nothing opened behind the BUILD button. Say why instead of
+            -- leaving the player with a closed window and no explanation.
+            Shared.NotifyBuildFailure(reason)
+            return false
+        end
+        return true
     end
     if id == "debug_materials" and option and canUseDebug() then
         if PNC.Client and PNC.Client.RequestDebugFacilityMaterials then
@@ -124,7 +167,14 @@ function Building.OnControl(window, button)
         return false
     end
     if id == "cancel_placement" then
-        Placement.Cancel(window)
+        if BuildAudit.Enabled() then
+            BuildAudit.Log("cancel_clicked", {
+                "button=cancel_placement",
+                "tab=" .. tostring(window.tab),
+                "placement=" .. tostring(window.buildPlacement ~= nil),
+            })
+        end
+        Placement.Cancel(window, "user_cancel")
         return true
     end
     if id == "toggle_queue_overlay" then

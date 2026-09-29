@@ -215,10 +215,59 @@ function Management.BuildBaseSnapshot(player)
         playerFaction,
         factionReason
     )
+    --[[
+        The Base window's Facilities tab prices every build requirement against
+        the stockpile, so this projection has to carry the stockpile rows. It
+        did not, and every requirement therefore read as "0 in stock" no matter
+        how full the stockpile was, which disabled BUILD and made the server
+        reject the order with MISSING_MATERIALS.
+
+        Trim what only the Colony Storage window renders (journal activity,
+        storage metrics, debug authorization): this payload is polled every few
+        seconds while the window is open, and the rows are the only part the
+        build UI needs.
+    ]]
+    local storage
+    if PNC.ColonyStorageService
+        and type(PNC.ColonyStorageService.BuildSnapshot) == "function"
+    then
+        storage = PNC.ColonyStorageService.BuildSnapshot(
+            player, { includeRows = true }, ownershipContext)
+        if storage then
+            storage.activity = nil
+            storage.metrics = nil
+            storage.debugAuthorized = nil
+        end
+    end
+    --[[
+        The Buildings tab reads snapshot.building for its queue. The base
+        projection never carried it, so the tab showed "NO MATCHING RECIPES"
+        and an empty blueprint queue while the same data was only available
+        through the heavier management projection.
+
+        Only the queue travels: the recipe catalog is derived from
+        SpriteConfigManager on both sides, so the client rebuilds it locally and
+        prices it against the stockpile rows above. Shipping a few hundred
+        descriptors with per-requirement stock on a two-second poll would be
+        pure payload.
+    ]]
+    local building
+    if colony and PNC.BuildingService
+        and type(PNC.BuildingService.BuildQueueProjection) == "function"
+    then
+        building = {
+            queue = PNC.BuildingService.BuildQueueProjection(colony,
+                storage and storage.storageId or storage and storage.id or nil),
+            generation = PNC.BuildRecipeCatalog
+                and PNC.BuildRecipeCatalog.Generation or nil,
+        }
+    end
     return {
         colony = colonySnapshot,
         faction = faction,
         settlement = base and Internal.BuildSettlementSnapshot(base, {}) or nil,
+        storage = storage,
+        building = building,
         identityStatus = identityStatus,
         generatedAt = PNC.NeedsUtils.WorldAgeHours(),
     }

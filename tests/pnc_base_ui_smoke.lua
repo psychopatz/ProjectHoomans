@@ -119,6 +119,28 @@ T.contains(baseTabSource, "task and task.id ~= nil",
     "Base tab does not recognize active construction tasks")
 T.contains(queueSource, "Components.SetRowsStable",
     "Base construction queue still clears its native list on refresh")
+T.falsy(baseTabSource:find('"build_facility"', 1, true),
+    "Base tab still offers the retired BUILD A BUILDING modal")
+local buildingLayoutSource = T.read("ProjectHoomans", "client",
+    "PNC/UI/Base/PNC_BaseBuildingLayout.lua")
+T.contains(buildingLayoutSource, "window:layoutPane(",
+    "Facilities lists are not offset below their section headings")
+T.contains(buildingLayoutSource, "minimumCards",
+    "Facilities bands are still clamped by independent floors")
+T.contains(buildingLayoutSource, "maxCardWidth",
+    "A single facility card still stretches across the whole window")
+T.falsy(buildingCardsSource:find("option.skillText", 1, true),
+    "Details strip still repeats the card name/status/skill")
+T.contains(facilityModalSource, "setStencilRect",
+    "Facility card text is not clipped to the card rect")
+-- The placement cursor is window-level state. The Buildings catalog runs its
+-- Apply with active=false on every snapshot refresh while the FACILITIES tab is
+-- visible, so cancelling from its Apply killed every facility placement one
+-- refresh after BUILD. The catalog keeps only the explicit cancel button path.
+T.falsy(buildingCatalogSource:find("catalog_inactive", 1, true),
+    "Buildings catalog still cancels the placement during Apply")
+T.contains(buildingSource, 'Placement.Cancel(window, "tab_inactive")',
+    "leaving both build tabs no longer cancels a live placement")
 
 package.preload["PNC/UI/Inventory/PNC_InventoryUI_Model"] = function()
     return { Probe = function() return {} end }

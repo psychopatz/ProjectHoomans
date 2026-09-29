@@ -59,6 +59,16 @@ Diagnostics.FirearmAuditEnabled = false
 -- guarded server send with the estimated bytes per top-level section, which is
 -- how an over-budget command is attributed to its owner.
 Diagnostics.NetworkPayloadAuditEnabled = false
+-- Build pipeline tracing. Off by default: every call site guards on
+-- Diagnostics.BuildAuditEnabled before assembling fields, so the disabled path
+-- costs one boolean read. When enabled it emits one line per build stage with
+-- a correlation id and millisecond stamps, which is how a build that opens a
+-- selector, cursor or overlay and then silently vanishes is attributed to the
+-- stage that tore it down.
+Diagnostics.BuildAuditEnabled = false
+Diagnostics.BuildTraceSequence = tonumber(Diagnostics.BuildTraceSequence) or 0
+Diagnostics.BuildTraceSentAt = Diagnostics.BuildTraceSentAt or {}
+Diagnostics.BuildTraceReceivedAt = Diagnostics.BuildTraceReceivedAt or {}
 Diagnostics.SeatingSessionSequence =
     tonumber(Diagnostics.SeatingSessionSequence) or 0
 
@@ -75,6 +85,7 @@ local NEEDS_AUDIT_SETTING_ID = "ProjectHoomans.NeedsAudit"
 local ZOMBIE_AGGRO_AUDIT_SETTING_ID = "ProjectHoomans.ZombieAggroAudit"
 local NPC_THREAT_AUDIT_SETTING_ID = "ProjectHoomans.NPCThreatAudit"
 local NETWORK_PAYLOAD_AUDIT_SETTING_ID = "ProjectHoomans.NetworkPayloadAudit"
+local BUILD_AUDIT_SETTING_ID = "ProjectHoomans.BuildAudit"
 local function initializeCentralDebugSettings()
     local settings = PsychopatzCore and PsychopatzCore.DebugSettings
     if not settings or type(settings.Register) ~= "function" then
@@ -219,6 +230,18 @@ local function initializeCentralDebugSettings()
             Diagnostics.NetworkPayloadAuditEnabled = enabled == true
         end,
     })
+    settings.Register({
+        id = BUILD_AUDIT_SETTING_ID,
+        source = "Project Hoomans",
+        order = 155,
+        title = "Build pipeline audit",
+        description = "Traces every facility build from click through placement, request, material consumption and queueing.",
+        defaultEnabled = false,
+        runtimeMutable = true,
+        apply = function(enabled)
+            Diagnostics.BuildAuditEnabled = enabled == true
+        end,
+    })
     Diagnostics.Enabled = settings.IsEnabled(PERFORMANCE_SETTING_ID) == true
     Diagnostics.TimingEnabled = Diagnostics.Enabled
         and Diagnostics.TimingEnabled ~= false
@@ -247,6 +270,8 @@ local function initializeCentralDebugSettings()
         NPC_THREAT_AUDIT_SETTING_ID) == true
     Diagnostics.NetworkPayloadAuditEnabled = settings.IsEnabled(
         NETWORK_PAYLOAD_AUDIT_SETTING_ID) == true
+    Diagnostics.BuildAuditEnabled = settings.IsEnabled(
+        BUILD_AUDIT_SETTING_ID) == true
 end
 
 initializeCentralDebugSettings()
@@ -680,6 +705,69 @@ function Diagnostics.LogFirearmAudit(eventName, fields)
     local message
     if Diagnostics.FirearmAuditEnabled ~= true then return false end
     output = { "firearm_audit", "event=" .. tostring(eventName or "unknown") }
+    for _, field in ipairs(fields or {}) do
+        output[#output + 1] = tostring(field)
+    end
+    message = table.concat(output, " ")
+    if PNC.Core and PNC.Core.LogInfo then
+        PNC.Core.LogInfo(message)
+    else
+        print("[PNC][INFO] " .. message)
+    end
+    return true
+end
+
+-- Build pipeline tracing. One line per stage, prefixed with build_audit so the
+-- whole flow can be filtered out of console.txt with a single search. Callers
+-- guard on Diagnostics.BuildAuditEnabled before assembling fields; the helper
+-- re-checks so direct callers stay safe.
+function Diagnostics.BuildAuditNowMs()
+    if type(getTimestampMs) ~= "function" then return 0 end
+    return tonumber(getTimestampMs()) or 0
+end
+
+function Diagnostics.IsBuildAuditEnabled()
+    return Diagnostics.BuildAuditEnabled == true
+end
+
+function Diagnostics.SetBuildAuditEnabled(enabled)
+    Diagnostics.BuildAuditEnabled = enabled == true
+    return Diagnostics.BuildAuditEnabled
+end
+
+-- Correlation id shared by the client click, the network request and the
+-- server-side handling of that request.
+function Diagnostics.NextBuildTraceId()
+    Diagnostics.BuildTraceSequence = Diagnostics.BuildTraceSequence + 1
+    return "build" .. tostring(Diagnostics.BuildTraceSequence)
+end
+
+function Diagnostics.MarkBuildRequestSent(requestId)
+    if Diagnostics.BuildAuditEnabled ~= true then return false end
+    requestId = tostring(requestId or "")
+    if requestId == "" then return false end
+    Diagnostics.BuildTraceSentAt[requestId] =
+        Diagnostics.BuildAuditNowMs()
+    return true
+end
+
+-- Milliseconds between the client sending a request and the verdict arriving.
+function Diagnostics.BuildRequestElapsedMs(requestId)
+    requestId = tostring(requestId or "")
+    local sentAt = Diagnostics.BuildTraceSentAt[requestId]
+    if not sentAt then return nil end
+    return Diagnostics.BuildAuditNowMs() - sentAt
+end
+
+function Diagnostics.LogBuildAudit(stage, fields)
+    local output
+    local message
+    if Diagnostics.BuildAuditEnabled ~= true then return false end
+    output = {
+        "build_audit",
+        "stage=" .. tostring(stage or "unknown"),
+        "t=" .. tostring(Diagnostics.BuildAuditNowMs()),
+    }
     for _, field in ipairs(fields or {}) do
         output[#output + 1] = tostring(field)
     end

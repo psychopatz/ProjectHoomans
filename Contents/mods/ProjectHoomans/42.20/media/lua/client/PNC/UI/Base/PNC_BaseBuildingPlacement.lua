@@ -4,6 +4,7 @@ local Policy = require
 local Footprint = require "PNC/Core/Settlement/PNC_BuildingFootprint"
 local QueueOverlay = require
     "PNC/UI/Base/PNC_BaseBuildingQueueOverlay"
+local BuildAudit = require "PNC/Core/Diagnostics/PNC_BuildAudit"
 
 local function call(object, method, ...)
     if not object or type(object[method]) ~= "function" then return nil end
@@ -21,8 +22,51 @@ local function closeFacilityPlacementUI(active)
     if placementUI and placementUI.Close then placementUI.Close() end
 end
 
+--[[
+    Placement needs to see the world, and the Base window covers most of the
+    screen. Hide it for the duration of the placement and bring it back on every
+    teardown path (confirm, cancel, back, tab switch, window close). The small
+    placement notice stays up so the player still has the rotate hint and the
+    cancel action.
+]]
+local function hideOwnerWhilePlacing(window)
+    if not window or window.pncPlacementHidden == true then return end
+    if type(window.setVisible) ~= "function" then return end
+    window.pncPlacementHidden = true
+    window.pncPlacementWasVisible = window.getIsVisible
+        and window:getIsVisible() ~= false or true
+    window:setVisible(false)
+    if window.removeFromUIManager then window:removeFromUIManager() end
+    BuildAudit.TracePlacement("pnc_build_window_hidden", {})
+end
+
+local function restoreOwnerAfterPlacing(window)
+    if not window or window.pncPlacementHidden ~= true then return end
+    window.pncPlacementHidden = false
+    if window.pncPlacementWasVisible == false then
+        window.pncPlacementWasVisible = nil
+        return
+    end
+    window.pncPlacementWasVisible = nil
+    if type(window.setVisible) ~= "function" then return end
+    if window.addToUIManager then window:addToUIManager() end
+    window:setVisible(true)
+    if window.bringToTop then window:bringToTop() end
+    BuildAudit.TracePlacement("pnc_build_window_restored", {})
+end
+
+Placement.HideOwnerWhilePlacing = hideOwnerWhilePlacing
+Placement.RestoreOwnerAfterPlacing = restoreOwnerAfterPlacing
+
 local function fail(reason)
     Placement.lastError = reason
+    BuildAudit.TracePlacement("pnc_build_placement_failed",
+        { "reason=" .. tostring(reason) })
+    if BuildAudit.Enabled() then
+        BuildAudit.Log("placement_failed", {
+            "reason=" .. tostring(reason),
+        })
+    end
     if PNC and PNC.Core and PNC.Core.LogWarn then
         PNC.Core.LogWarn("building placement failed: " .. tostring(reason))
     end
@@ -116,6 +160,27 @@ local function setBoundaryValidity(cursor, square)
     cursor.pncPlacementError = reason
     cursor.pncBaseValid = valid == true
     cursor.pncEngineValid = true
+    -- Validity is recomputed every frame, so trace only when the outcome
+    -- changes. "Invalid everywhere" is what makes a build impossible and it is
+    -- otherwise silent: canBeBuild=false stops onPlacement from ever running,
+    -- so no other line in this file would report it.
+    local signature = valid == true and "valid" or tostring(reason or "invalid")
+    if cursor.pncValiditySignature ~= signature then
+        cursor.pncValiditySignature = signature
+        BuildAudit.TracePlacement("pnc_build_placement_validity", {
+            "valid=" .. tostring(valid == true),
+            "reason=" .. tostring(reason),
+            "settlement=" .. tostring(Policy.CurrentSettlement() ~= nil),
+        })
+        if BuildAudit.Enabled() then
+            BuildAudit.Log("placement_validity", {
+                "valid=" .. tostring(valid == true),
+                "reason=" .. tostring(reason),
+                "settlement=" .. tostring(Policy.CurrentSettlement() ~= nil),
+                "footprint=" .. tostring(cursor.pncFootprint ~= nil),
+            })
+        end
+    end
     return valid == true
 end
 
@@ -425,10 +490,21 @@ if Events and Events.OnGameStart and Events.OnGameStart.Add then
     Events.OnGameStart.Add(installPlacementEvents)
 end
 
-function Placement.Cancel(window)
+function Placement.Cancel(window, reason)
     local active = window and window.buildPlacement or nil
     local current = currentPlayer()
     local cell = getCell and getCell() or nil
+    if active or Placement.activeCursor then
+        BuildAudit.TracePlacement("pnc_build_placement_cancel",
+            { "reason=" .. tostring(reason or "unspecified") })
+    end
+    if BuildAudit.Enabled() and (active or Placement.activeCursor) then
+        BuildAudit.Log("placement_cancel", {
+            "reason=" .. tostring(reason or "unspecified"),
+            "had_cursor=" .. tostring((active or Placement.activeCursor) ~= nil),
+            "had_ui=" .. tostring(active ~= nil),
+        })
+    end
     if active and cell and type(cell.setDrag) == "function" then
         local playerNum = active.player
         if playerNum == nil and current then
@@ -440,6 +516,7 @@ function Placement.Cancel(window)
     if Placement.activeCursor == active then Placement.activeCursor = nil end
     if window then window.buildPlacement = nil end
     closeFacilityPlacementUI(active)
+    restoreOwnerAfterPlacing(window)
     Placement.lastError = nil
 end
 
@@ -450,7 +527,30 @@ function Placement.Begin(window, recipe)
     end
     local character = currentPlayer()
     if not character then return fail("PLAYER_UNAVAILABLE") end
-    Placement.Cancel(window)
+    -- A second click on the same BUILD/PLACE action used to cancel the live
+    -- cursor and its overlay and then rebuild both, which reads as the overlay
+    -- flashing away. The cursor is already in the requested state, so keep it.
+    local existing = window.buildPlacement
+    if existing and existing.pncPlacement == true
+        and tostring(existing.pncFacilityDefinitionId or "")
+            == tostring(recipe.facilityDefinitionId or "")
+        and tostring(existing.objectInfoName or "")
+            == tostring(recipe.objectInfoName or "")
+    then
+        BuildAudit.TracePlacement("pnc_build_placement_kept",
+            { "object=" .. tostring(recipe.objectInfoName) })
+        if BuildAudit.Enabled() then
+            BuildAudit.Log("placement_kept", {
+                "object=" .. tostring(recipe.objectInfoName),
+                "facility=" .. tostring(recipe.facilityDefinitionId),
+            })
+        end
+        return true
+    end
+    -- Cancelling here is what makes a repeated BUILD click flash the overlay:
+    -- the old cursor is torn down before the new one exists. The reason tag
+    -- separates this from a real user/tab cancel in the trace.
+    Placement.Cancel(window, "placement_restart")
 
     local descriptor = PNC.BuildRecipeCatalog
         and PNC.BuildRecipeCatalog.Get(recipe.objectInfoName)
@@ -484,6 +584,7 @@ function Placement.Begin(window, recipe)
     cursor.character = character
     cursor.recipeKey = recipe.recipeKey
     cursor.objectInfoName = recipe.objectInfoName
+    cursor.pncFacilityDefinitionId = recipe.facilityDefinitionId
     cursor.haveMaterial = function() return true end
     cursor.skipBuildAction = true
     cursor.dragNilAfterPlace = true
@@ -496,6 +597,19 @@ function Placement.Begin(window, recipe)
         cursor.pncCollisionOrder = conflictingOrder
         cursor.pncPlacementError = reason
         if not valid then
+            -- The placement clicked into an area the server would reject. Tell
+            -- the player now instead of only rendering the cursor tooltip.
+            local Shared = require "PNC/UI/Shared/PNC_ColonyUIShared"
+            if BuildAudit.Enabled() then
+                BuildAudit.Log("placement_rejected", {
+                    "object=" .. tostring(cursor.objectInfoName),
+                    "reason=" .. tostring(reason),
+                })
+            end
+            BuildAudit.TracePlacement("pnc_build_placement_rejected",
+                { "object=" .. tostring(cursor.objectInfoName),
+                    "reason=" .. tostring(reason) })
+            Shared.NotifyBuildFailure(reason)
             fail(reason)
             cursor.canBeBuild = false
             return false
@@ -513,17 +627,52 @@ function Placement.Begin(window, recipe)
             options.facilityExpectedRevision =
                 recipe.facilityExpectedRevision
         end
-        PNC.Client.RequestColonyAction("building_queue", options)
+        local traceId = "build?"
+        if BuildAudit.Enabled() then
+            traceId = BuildAudit.TraceId()
+            options.requestId = traceId
+            BuildAudit.Log("placement_confirm", {
+                BuildAudit.RequestField(traceId),
+                "object=" .. tostring(cursor.objectInfoName),
+                "facility=" .. tostring(options.facilityDefinitionId),
+                "x=" .. tostring(options.x),
+                "y=" .. tostring(options.y),
+                "z=" .. tostring(options.z),
+            })
+        end
+        local sent, sendReason = PNC.Client.RequestColonyAction(
+            "building_queue", options)
+        if sent == false then
+            -- The order never left the client. Keep the cursor alive so the
+            -- player can retry instead of losing the placement silently.
+            if BuildAudit.Enabled() then
+                BuildAudit.Log("request_blocked", {
+                    BuildAudit.RequestField(traceId),
+                    "action=building_queue",
+                    "reason=" .. tostring(sendReason),
+                })
+            end
+            fail(sendReason or "BUILD_QUEUE_FAILED")
+            cursor.canBeBuild = false
+            return false
+        end
         Placement.HideTooltip(cursor)
         if Placement.activeCursor == cursor then Placement.activeCursor = nil end
         if window then window.buildPlacement = nil end
         closeFacilityPlacementUI(cursor)
+        restoreOwnerAfterPlacing(window)
     end
     cursor.onCancel = function()
+        if BuildAudit.Enabled() then
+            BuildAudit.Log("placement_native_cancel", {
+                "object=" .. tostring(cursor.objectInfoName),
+            })
+        end
         Placement.HideTooltip(cursor)
         if Placement.activeCursor == cursor then Placement.activeCursor = nil end
         if window then window.buildPlacement = nil end
         closeFacilityPlacementUI(cursor)
+        restoreOwnerAfterPlacing(window)
     end
 
     local cell = getCell and getCell() or nil
@@ -533,13 +682,25 @@ function Placement.Begin(window, recipe)
     window.buildPlacement = cursor
     Placement.activeCursor = cursor
     cell:setDrag(cursor, cursor.player)
+    BuildAudit.TracePlacement("pnc_build_placement_open", {
+        "object=" .. tostring(cursor.objectInfoName),
+        "facility=" .. tostring(recipe.facilityDefinitionId),
+        "facility_ui=" .. tostring(cursor.pncFacilityPlacement == true),
+    })
+    if BuildAudit.Enabled() then
+        BuildAudit.Log("placement_open", {
+            "object=" .. tostring(cursor.objectInfoName),
+            "facility=" .. tostring(recipe.facilityDefinitionId),
+            "facility_ui=" .. tostring(cursor.pncFacilityPlacement == true),
+        })
+    end
     if cursor.pncFacilityPlacement then
         local placementUI = require
             "PNC/UI/Base/PNC_BaseBuildingPlacementModal"
         if placementUI and placementUI.Open then
             placementUI.Open({
                 onBack = function()
-                    Placement.Cancel(window)
+                    Placement.Cancel(window, "placement_ui_back")
                     local buildUI = PNC and PNC.FacilityBuildUI or nil
                     if buildUI and buildUI.Reopen then
                         buildUI.Reopen()
@@ -548,6 +709,9 @@ function Placement.Begin(window, recipe)
             })
         end
     end
+    -- Get the base window out of the way so the player can actually see the
+    -- world while placing. It comes back on every teardown path.
+    hideOwnerWhilePlacing(window)
     Placement.lastError = nil
     return true
 end

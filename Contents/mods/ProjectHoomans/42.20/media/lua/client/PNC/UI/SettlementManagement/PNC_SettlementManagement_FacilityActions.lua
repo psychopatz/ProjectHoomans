@@ -2,6 +2,7 @@ local Shared = require "PNC/UI/Shared/PNC_ColonyUIShared"
 local GridRegion = require "PsychopatzCore/World/PC_GridRegion"
 local Support = require "PNC/UI/SettlementManagement/PNC_SettlementManagement_SelectorSupport"
 local Placement = require "PNC/UI/Base/PNC_BaseBuildingPlacement"
+local BuildAudit = require "PNC/Core/Diagnostics/PNC_BuildAudit"
 local Farming = PNC.Farming
 
 local Facility = {}
@@ -163,7 +164,15 @@ end
 function Facility.BeginBuild(window, definitionId)
     local settlement = Support.Settlement and Support.Settlement(window)
         or window.snapshot and window.snapshot.settlement
-    if not settlement then return false end
+    if not settlement then
+        if BuildAudit.Enabled() then
+            BuildAudit.Log("begin_rejected", {
+                "definition=" .. tostring(definitionId),
+                "reason=SETTLEMENT_UNAVAILABLE",
+            })
+        end
+        return false, "SETTLEMENT_UNAVAILABLE"
+    end
     local definitions = PNC.FacilityDefinitions
     local definition = definitions and definitions.Get
         and definitions.Get(definitionId) or nil
@@ -173,6 +182,14 @@ function Facility.BeginBuild(window, definitionId)
         local catalog = PNC.BuildRecipeCatalog
         local descriptor = catalog and catalog.Get
             and catalog.Get(objectInfoName) or nil
+        if BuildAudit.Enabled() then
+            BuildAudit.Log("begin_route", {
+                "definition=" .. tostring(definitionId),
+                "route=native_placement",
+                "object=" .. tostring(objectInfoName),
+                "descriptor=" .. tostring(descriptor ~= nil),
+            })
+        end
         if not descriptor then return false, "BUILD_RECIPE_NOT_FOUND" end
         -- Direct workstations use the same native cursor/blueprint flow as
         -- the Building tab. The server binds the facility identity to this
@@ -191,12 +208,54 @@ function Facility.BeginBuild(window, definitionId)
     -- legacy facilities still use the footprint only for placement.
     local role = definitionId == "farm" and "facility.footprint"
         or areaRole(draft) or "facility.footprint"
-    Support.OpenSelector(window, areaOptions(window, draft, nil, function(region)
+    if BuildAudit.Enabled() then
+        BuildAudit.Log("begin_route", {
+            "definition=" .. tostring(definitionId),
+            "route=area_selector",
+            "role=" .. tostring(role),
+        })
+    end
+    -- The caller closes the build window when this returns true, so a selector
+    -- that never opened has to report failure. Swallowing it left the player
+    -- with no window, no selector and no explanation.
+    local options = areaOptions(window, draft, nil, function(region)
+        local requestId
+        if BuildAudit.Enabled() then
+            requestId = BuildAudit.TraceId()
+            BuildAudit.Log("selector_confirmed", {
+                BuildAudit.RequestField(requestId),
+                "definition=" .. tostring(definitionId),
+                "role=" .. tostring(role),
+            })
+        end
         PNC.Client.RequestCreateFacility({ baseId = settlement.id,
             expectedRevision = settlement.revision, definitionId = definitionId,
+            requestId = requestId,
             component = { kind = "region", role = role, region = region } })
         Support.ApplyLocalResult(window)
-    end))
+    end)
+    if not options then return false, "FACILITY_AREA_UNAVAILABLE" end
+    -- Trace the selector's own lifecycle. Without this a selector that closes
+    -- itself (or is closed by another request) looks identical to one that was
+    -- never opened.
+    options.onCancel = function()
+        if BuildAudit.Enabled() then
+            BuildAudit.Log("selector_cancelled", {
+                "definition=" .. tostring(definitionId),
+                "role=" .. tostring(role),
+            })
+        end
+    end
+    local selector, reason = Support.OpenSelector(window, options)
+    if not selector then
+        if BuildAudit.Enabled() then
+            BuildAudit.Log("selector_failed", {
+                "definition=" .. tostring(definitionId),
+                "reason=" .. tostring(reason),
+            })
+        end
+        return false, reason or "SELECTOR_UNAVAILABLE"
+    end
     return true
 end
 

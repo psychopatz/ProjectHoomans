@@ -56,6 +56,7 @@ local SEGMENT_SYSTEMS = {
     ColonySettings = "Debug",
     CombatOverlayDisabled = "Debug",
     CombatOverlayEnabled = "Debug",
+    CommandAccessInventory = "CommandHub",
     CommandAttackAuto = "CommandHub",
     CommandAttackMelee = "CommandHub",
     CommandAttackNone = "CommandHub",

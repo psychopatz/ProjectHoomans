@@ -5,6 +5,7 @@ PNC.ContextHub = PNC.ContextHub or {}
 
 local ContextHub = PNC.ContextHub
 local Commands = PNC.CompanionCommands
+local Authority = PNC.ClientCompanionAuthority
 local Provider = { id = "companion_commands" }
 
 local function tr(key, fallback)
@@ -16,7 +17,17 @@ local function commandTarget(entry)
     return entry and (entry.record or entry.snapshot) or nil
 end
 
+-- Commandability uses the client authority helper, which reproduces the
+-- server's ownership rule from replicated faction data on a multiplayer
+-- client. The server still authorizes every command that is issued.
 function Provider.isEnabled(entry, player)
+    if Authority and Authority.CanPlayerCommand then
+        return Authority.CanPlayerCommand(
+            commandTarget(entry),
+            player,
+            PNC.Const.COMPANION_COMMAND_RADIUS
+        ) == true
+    end
     if not Commands or not Commands.CanPlayerCommand then return false end
     return Commands.CanPlayerCommand(
         commandTarget(entry),

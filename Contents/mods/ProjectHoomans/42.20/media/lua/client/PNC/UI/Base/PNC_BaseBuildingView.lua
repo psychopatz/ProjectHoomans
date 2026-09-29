@@ -188,7 +188,7 @@ function View.Rebuild(window, snapshot)
         snapshot.building and snapshot.building.queue or {})
     QueueOverlay.SetQueue(snapshot.building and snapshot.building.queue or {})
     local allOptions = settlement and BuildUI.BuildOptions(
-        settlement, snapshot.storage, snapshot.research) or {}
+        settlement, Data.Stockpile(window, snapshot), snapshot.research) or {}
     window.baseBuildingOptions = Data.CatalogOptions(allOptions,
         window.baseBuildingCatalogKind or "buildings")
     Cards.RebuildCategories(window)

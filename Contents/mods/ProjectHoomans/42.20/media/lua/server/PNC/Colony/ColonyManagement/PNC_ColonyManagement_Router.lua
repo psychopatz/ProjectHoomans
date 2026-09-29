@@ -8,6 +8,15 @@ PNC.ColonyManagement.Internal = PNC.ColonyManagement.Internal or {}
 local Management = PNC.ColonyManagement
 local Internal = Management.Internal
 local Definitions = PNC.NeedsDefinitions
+local BuildAudit = require "PNC/Core/Diagnostics/PNC_BuildAudit"
+-- Server half of the build trace. Every rejection reason in the build pipeline
+-- surfaces here, correlated with the client's req= token.
+local BUILD_TRACE_ACTIONS = {
+    facility_create = true,
+    facility_component_set = true,
+    building_queue = true,
+    building_debug_get_items = true,
+}
 local BASE_SNAPSHOT_ACTIONS = {
     base_create = true, base_expand = true, base_shrink = true,
     barricade_build = true, hq_upgrade = true,
@@ -50,6 +59,16 @@ function Management.HandleAction(player, args)
         taskBrainNpcID = args.taskBrainNpcID,
         sections = args.sections,
     })
+    if BuildAudit.Enabled() and BUILD_TRACE_ACTIONS[action] then
+        BuildAudit.Log("server_action", {
+            BuildAudit.RequestField(args.requestId),
+            "action=" .. action,
+            "ok=" .. tostring(outcome.ok == true),
+            "reason=" .. tostring(outcome.reason),
+            "player=" .. tostring(player and player.getUsername
+                and player:getUsername() or "?"),
+        })
+    end
     return snapshot, {
         ok = outcome.ok == true,
         reason = outcome.reason,

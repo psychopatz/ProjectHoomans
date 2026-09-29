@@ -7,6 +7,7 @@ local Territory = require
 local Placement = require
     "PNC/UI/Base/PNC_BaseBuildingPlacement"
 local Options = require "PsychopatzCore/UI/PsychopatzCommandHubOptions"
+local BuildAudit = require "PNC/Core/Diagnostics/PNC_BuildAudit"
 local Layout = PsychopatzCore.UI.Layout
 local WidgetWindow = PsychopatzCore.UI.WidgetWindow
 local Client = PNC.ColonyManagementClient
@@ -93,6 +94,16 @@ function ISPNCBaseWindow:prerender()
     if self.owner and self.owner.getIsVisible
         and not self.owner:getIsVisible()
     then
+        -- The window follows its owner: when the CommandHub hides, this window
+        -- closes and any in-flight placement is cancelled with it.
+        self.pncCloseReason = "owner_hidden"
+        BuildAudit.TracePlacement("pnc_build_window_owner_hidden",
+            { "placement=" .. tostring(self.buildPlacement ~= nil) })
+        if BuildAudit.Enabled() then
+            BuildAudit.Log("window_owner_hidden", {
+                "placement=" .. tostring(self.buildPlacement ~= nil),
+            })
+        end
         self:close()
         return
     end
@@ -114,7 +125,21 @@ function ISPNCBaseWindow:prerender()
 end
 
 function ISPNCBaseWindow:close()
-    Placement.Cancel(self)
+    -- Closing the Base window tears down any live placement cursor. This is the
+    -- expected behaviour, but it is also the quiet way a build overlay
+    -- disappears, so the reason is tagged in the build trace.
+    BuildAudit.TracePlacement("pnc_build_window_close", {
+        "placement=" .. tostring(self.buildPlacement ~= nil),
+        "reason=" .. tostring(self.pncCloseReason or "close"),
+    })
+    if BuildAudit.Enabled() then
+        BuildAudit.Log("window_close", {
+            "placement=" .. tostring(self.buildPlacement ~= nil),
+            "reason=" .. tostring(self.pncCloseReason or "close"),
+        })
+    end
+    self.pncCloseReason = nil
+    Placement.Cancel(self, "window_close")
     self:saveGeometry(true)
     self:setVisible(false)
     self:removeFromUIManager()
