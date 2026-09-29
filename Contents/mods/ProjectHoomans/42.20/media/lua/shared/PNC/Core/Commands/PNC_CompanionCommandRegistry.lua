@@ -654,7 +654,7 @@ local function applyAttackType(record, definition)
     return true
 end
 
-local function prepareFollowOrder(record)
+local function prepareFollowOrder(record, player)
     if not record then return false, "npc_not_found" end
     local runtime = record.runtime
     local workOrderId = runtime and runtime.workOrderId or nil
@@ -698,6 +698,61 @@ local function prepareFollowOrder(record)
     end
 
     record.runtime = record.runtime or {}
+
+    -- A stationary facility lease (sleep or a seat) owns the body: MoveRecord
+    -- resolves it ahead of any movement and halts the request with
+    -- sleep_hold/seated_hold. The order system's facility abort is the
+    -- authoritative release; stop it here first as a best effort so the follow
+    -- order is not installed behind a presentation that is on its way out.
+    local activity = record.runtime.facilityActivity
+    if activity
+        and (tostring(activity.capability or "") == "sleep"
+            or activity.seating == true)
+    then
+        local jobs = PNC.FacilityJobs
+        if jobs and type(jobs.Stop) == "function" then
+            jobs.Stop(record, "companion_follow_requested")
+        end
+        -- If a stationary lease survived the stop, the follower's movement
+        -- request will be refused by the presentation guard. Report it here
+        -- instead of installing a follow order that cannot move.
+        local remaining = record.runtime and record.runtime.facilityActivity
+        if remaining
+            and (tostring(remaining.capability or "") == "sleep"
+                or remaining.seating == true)
+            and PNC.Core and PNC.Core.LogWarn
+        then
+            PNC.Core.LogWarn(
+                "follow_hold_lease_present npc=" .. tostring(record.id)
+                    .. " capability=" .. tostring(remaining.capability)
+                    .. " phase=" .. tostring(remaining.phase)
+            )
+        end
+    end
+
+    -- Resolve the owner identity at command time. The abstract follower lane can
+    -- only repair a missing record field from the order, so both copies must
+    -- exist before the order is normalized.
+    if player then
+        local username = player.getUsername and player:getUsername() or nil
+        local onlineID = player.getOnlineID and player:getOnlineID() or nil
+        if username ~= nil and tostring(username) ~= "" then
+            record.ownerUsername = tostring(username)
+        end
+        if onlineID ~= nil then
+            record.ownerOnlineID = onlineID
+        end
+    end
+    if record.ownerUsername == nil and record.ownerOnlineID == nil
+        and PNC.Core and PNC.Core.LogWarn
+    then
+        -- Without an identity the bodyless follower can only retry resolution
+        -- and then walk to its anchor, which for a colonist is the base it may
+        -- already occupy. Surface the impossible state instead of freezing.
+        PNC.Core.LogWarn(
+            "follow_owner_identity_missing npc=" .. tostring(record.id))
+    end
+
     record.runtime.homeState = "AWAY"
     record.runtime.homeJourneyId = nil
     return true
@@ -752,7 +807,8 @@ function Commands.Apply(record, player, commandID, radius, commandContext)
         if tostring(orderSpec.kind or "")
             == tostring(Const.ORDER_FOLLOW or "follow")
         then
-            local prepared, prepareReason = prepareFollowOrder(record)
+            local prepared, prepareReason = prepareFollowOrder(
+                record, player)
             if not prepared then
                 return false, prepareReason or "FOLLOW_PREPARATION_FAILED"
             end

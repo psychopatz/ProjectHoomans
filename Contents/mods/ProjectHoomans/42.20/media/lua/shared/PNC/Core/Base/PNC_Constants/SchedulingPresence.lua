@@ -7,6 +7,10 @@ Const.TICK_LIVE_HOT_MS = 100
 Const.TICK_LIVE_WARM_MS = 250
 Const.TICK_LIVE_COLD_MS = 1000
 Const.TICK_ABSTRACT_MS = 3000
+-- A sleep wake transaction that cannot finish (for example an abstract record
+-- with no body to release) must not gate every behavior tick forever. After the
+-- transaction deadline plus this slack the pending flag is cleared and reported.
+Const.SLEEP_WAKE_HARD_TIMEOUT_MS = 30000
 Const.TICK_ABSTRACT_FAR_MS = 15000
 Const.TICK_ABSTRACT_DORMANT_MS = 60000
 Const.SCHEDULER_MAX_RECORDS_PER_TICK = 24

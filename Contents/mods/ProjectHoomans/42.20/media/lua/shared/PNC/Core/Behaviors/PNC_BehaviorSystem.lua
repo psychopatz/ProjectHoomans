@@ -62,6 +62,30 @@ local function tickPendingSleepWake(record, zombie)
     -- callback is unwinding, but it must not consume the tick that releases
     -- the old sleep carrier. The wake transaction itself enforces authority
     -- and ActorControl checks before any position or reservation write.
+    local deadline = tonumber(activity.sleepWakeDeadlineAt)
+    local now = PNC.Core and PNC.Core.Now and tonumber(PNC.Core.Now()) or 0
+    if deadline
+        and now > deadline
+            + (tonumber(PNC.Const and PNC.Const.SLEEP_WAKE_HARD_TIMEOUT_MS)
+                or 30000)
+    then
+        -- The transaction could not finish, for example because the record is
+        -- abstract and has no body to release. Releasing the gate is safer than
+        -- starving every later behavior tick, and the reason stays observable.
+        activity.sleepWakePending = nil
+        activity.sleepWakeReason = "wake_deadline_exceeded"
+        activity.sleepWakeAbandonedAt = now
+        runtime.sleepWakePending = nil
+        if PNC.Core and PNC.Core.LogWarn then
+            PNC.Core.LogWarn(
+                "sleep_wake_abandoned npc=" .. tostring(record.id)
+                    .. " reason=wake_deadline_exceeded"
+                    .. " capability=" .. tostring(activity.capability)
+                    .. " phase=" .. tostring(activity.phase)
+            )
+        end
+        return false
+    end
     internal.TickSleepWake(record, zombie)
     return true
 end

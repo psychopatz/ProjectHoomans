@@ -6,6 +6,9 @@ local LUA_ROOT =
 local resetCount = 0
 local liveBody = {}
 local facilityAbortCount = 0
+-- Lets a case model a lease that survives the first abort, which is the only
+-- state the later movement-order retry exists for.
+local keepLeaseAfterAbort = false
 
 PNC = {
     Const = {
@@ -27,16 +30,17 @@ PNC = {
     },
     FacilityJobs = {
         AbortForOrderChange = function(record, _, reason)
-            T.truthy(record.orderSpec.kind == "facility_activity"
-                    or record.orderSpec.kind == "camp",
-                "facility activity is still current during abort")
+            T.truthy(record.orderSpec ~= nil,
+                "order abort runs while the previous order is current")
             T.equal(reason,
                 record.orderSpec.kind == "camp"
                     and "camp_entered" or "order_changed",
                 "order abort reason")
             facilityAbortCount = facilityAbortCount + 1
-            record.runtime.facilityActivity = nil
-            record.runtime.animationScene = nil
+            if not keepLeaseAfterAbort then
+                record.runtime.facilityActivity = nil
+                record.runtime.animationScene = nil
+            end
             return true, "facility_activity_aborted"
         end,
     },
@@ -130,6 +134,32 @@ T.equal(record.runtime.campPlacement.state, "moving",
     "camp placement lock survives stale facility cleanup")
 T.falsy(record.runtime.facilityActivity,
     "stale facility activity is gone before camp movement resumes")
-T.finish("pnc_order_transition_smoke")
+-- A lease that survives the first abort must be retried for a movement order:
+-- otherwise the durable order says follow while every movement request is still
+-- halted by the stationary presentation guard.
+keepLeaseAfterAbort = true
+record.orderSpec = { kind = "colony_home" }
+record.runtime.facilityActivity = { capability = "sleep" }
+record.runtime.animationScene = { id = "facility.sleep.floor" }
+local abortsBeforeRetry = facilityAbortCount
+PNC.OrderSystem.SetOrder(record, {
+    kind = "follow",
+    ownerUsername = "alice",
+})
+T.equal(facilityAbortCount, abortsBeforeRetry + 2,
+    "a surviving facility lease is retried for a movement order")
+T.equal(record.orderSpec.kind, "follow",
+    "follow order replaces the stale home order")
+
+-- A fallback order (no explicit kind) must not keep aborting a lease: the
+-- automatic needs route can legitimately install facility activities and a
+-- generic fallback is not a movement command.
+record.orderSpec = { kind = "colony_home" }
+record.runtime.facilityActivity = { capability = "sleep" }
+local abortsBeforeFallback = facilityAbortCount
+PNC.OrderSystem.SetOrder(record, nil)
+T.equal(facilityAbortCount, abortsBeforeFallback + 1,
+    "a fallback order does not retry a surviving facility lease")
+keepLeaseAfterAbort = false
 
 T.finish("pnc_order_transition_smoke")

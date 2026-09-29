@@ -187,6 +187,21 @@ function OrderSystem.Normalize(record, orderSpec)
     return fallbackOrder(record)
 end
 
+-- Orders that move the NPC own the body: a live stationary facility lease
+-- (sleep, seat, relax) is resolved before movement in MoveRecord and halts every
+-- movement request with sleep_hold/seated_hold. The first facility abort above
+-- is authoritative; this predicate lets the later block retry the release when a
+-- movement order arrives and the lease survived that first attempt.
+local function movementOrderKind(kind)
+    kind = tostring(kind or "")
+    if kind == "" then return false end
+    return kind == tostring(Const.ORDER_FOLLOW or "follow")
+        or kind == tostring(Const.ORDER_TRAVEL or "travel")
+        or kind == tostring(Const.ORDER_GUARD or "guard")
+        or kind == tostring(Const.ORDER_PATROL or "patrol")
+        or kind == tostring(Const.ORDER_ROAM or "roam")
+end
+
 function OrderSystem.SetOrder(record, orderSpec)
     local zombie
     local previousOrder = record.orderSpec
@@ -252,9 +267,10 @@ function OrderSystem.SetOrder(record, orderSpec)
     -- Commands such as follow/home must revoke that lease before the new order
     -- is normalized; otherwise the old relaxing scene consumes every tick and
     -- the command appears to have been ignored.
-    if previousKind == "facility_activity"
+    if activeFacility
         and requestedKind ~= "facility_activity"
-        and activeFacility
+        and (movementOrderKind(requestedKind)
+            or previousKind == "facility_activity")
         and PNC.FacilityJobs
         and PNC.FacilityJobs.AbortForOrderChange
     then
@@ -302,8 +318,13 @@ function OrderSystem.SetOrder(record, orderSpec)
         record.followerAbandonment = nil
     end
     if record.orderSpec.kind == Const.ORDER_FOLLOW then
+        -- Keep an identity already resolved on the record: an order built by an
+        -- NPC-to-NPC or rehydrated path may not carry one, and a nil write here
+        -- would freeze a bodyless follower on its anchor.
         record.ownerUsername = record.orderSpec.ownerUsername
+            or record.ownerUsername
         record.ownerOnlineID = record.orderSpec.ownerOnlineID
+            or record.ownerOnlineID
     end
     record.runtime.target = nil
     record.runtime.lastPathX = nil

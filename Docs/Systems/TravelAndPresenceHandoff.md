@@ -441,15 +441,21 @@ if presentationKind then ... Common.HaltMovement(record, zombie, "sleep_hold")
 ```
 
 `ResolveStationaryPresentation` (`PNC_LiveBodyControl_State.lua:262-277`) returns
-`sleep`/`sleep_wake`/`seat` whenever
-`record.runtime.facilityActivity` is a live sleep or seat lease
-(`IsSleeping` `:238-248`, `IsSleepWakeActive` `:250-257`, `IsSeated`). A colonist
-that reached the base is exactly where the home/needs route assigns sleep and
-seat activities, so an abstract follower there can be permanently halted. The
-guard is silent unless the seating diagnostics are enabled, and
-`TickAbstractFollowOwner` ignores `MoveRecord`'s return value and sets
-`moved = true` unconditionally (`FollowOwner.lua:160-172`) - so even the existing
-audit would claim movement.
+`sleep`/`sleep_wake`/`seat` whenever `record.runtime.facilityActivity` is a live
+sleep or seat lease (`IsSleeping` `:238-248`, `IsSleepWakeActive` `:250-257`,
+`IsSeated`). A colonist that reached the base is exactly where the home/needs
+route assigns sleep and seat activities. The guard is silent unless the seating
+diagnostics are enabled, and `TickAbstractFollowOwner` ignores `MoveRecord`'s
+return value and sets `moved = true` unconditionally (`FollowOwner.lua:160-172`) -
+so even the existing audit would claim movement.
+
+Important correction: a follow command does **not** leave the lease in place by
+itself. `OrderSystem.SetOrder` already sweeps a live facility activity for *any*
+non-facility order, before the new order is normalized
+(`PNC_OrderSystem.lua:224-243`). H1 therefore requires the lease to be
+re-acquired after the order (the automatic needs/facility route re-assigning
+sleep or a seat at the base) or the abort to be deferred/partial - it is not the
+order path itself.
 
 **H2 - the owner cannot be resolved, so the follower walks to its anchor.**
 `FollowOwner.lua:86-91` falls back to `record.anchorX/Y/Z` with
@@ -462,30 +468,31 @@ The owner comes from `Common.GetOwner` using `record.ownerUsername` /
 `player:getUsername()` / `player:getOnlineID()`
 (`PNC_CompanionCommandDefinitions.lua:55-61`). The abstract lane has a repair
 path for a missing record field (`FollowOwner.lua:30-44`) but it depends on the
-order having a usable identity in the first place.
+order having a usable identity in the first place. By elimination this is the
+leading hypothesis: it needs no lease at all, it is completely silent, and for a
+colonist standing at its anchor it produces exactly zero movement.
 
-Ruled out: the `tickPendingSleepWake` early return (H3) cannot be the cause here
+Ruled out: the `tickPendingSleepWake` early return cannot be the cause here
 because the AI row proves the follow tick ran. It remains a latent freeze risk
-for the other order kinds and is worth bounding.
+(bounded below).
 
-## 7.3 Root defect shared by H1 and H2
+## 7.3 Defects this pass actually fixes
 
-**A player order does not revoke the facility lease that owns the NPC.** The
-only revocation is in `OrderSystem.SetOrder`:
+The order/lease precedence is **not** the bug (see the correction above).
+What is defective is that both failure modes above are silent and unbounded, so
+a frozen follower is indistinguishable from a working one:
 
-```lua
-if previousKind == "facility_activity" and requestedKind ~= "facility_activity"
-   and activeFacility and PNC.FacilityJobs.AbortForOrderChange then ... -- :255-269
-```
-
-The condition tests the *previous durable order kind*, but the lease lives in
-`record.runtime.facilityActivity` independently of it. A colonist whose durable
-order is `colony_home` (or `travel`) while a sleep/seat activity is live -
-precisely the "went home, then was ordered to follow" case - keeps the lease, so
-`MoveRecord` keeps halting every movement request with `sleep_hold`/`seated_hold`
-while `orderSpec.kind` already says `follow`. This is the same class as P0-3 in
-section 3 (`Start` bypassing `SetOrder`): the lease/order precedence is wrong,
-not the movement code.
+1. `TickAbstractFollowOwner` discards `MoveRecord`'s result and reports
+   `moved = true` even when the request was refused (`FollowOwner.lua:160-172`).
+2. An unresolved owner immediately falls back to the anchor with no retry, no
+   telemetry, and no way to tell "following" from "standing at home"
+   (`FollowOwner.lua:86-91`).
+3. `record.ownerUsername` / `record.ownerOnlineID` can be wiped by a follow order
+   that carries no identity (`PNC_OrderSystem.lua:304-306` assigns the order
+   values unconditionally, so a nil order value overwrote a valid record value).
+4. `tickPendingSleepWake` returns before the follow branch for as long as
+   `activity.sleepWakePending` is set, with no escape if the wake transaction
+   cannot finish on a bodyless record (`PNC_BehaviorSystem.lua:49-67`).
 
 Note this is **not** a regression from the Phase 0-3 work: the handoff predicate
 requires `Model.IsActive(record.travel)`, and `prepareFollowOrder`
@@ -493,7 +500,7 @@ requires `Model.IsActive(record.travel)`, and `prepareFollowOrder`
 order is applied, so no journey is active afterwards and
 `travelHandoffRequired` is false. The watchdog only inspects records with an
 active journey. The previous work simply let colonists reach the base, which is
-where the lease is taken.
+where these latent paths are exercised.
 
 ## 7.4 Plan
 
@@ -563,3 +570,29 @@ Immediate workaround for the reported case: bring the player within
 `MATERIALIZE_DISTANCE` (28) of the colonist so the body is re-created, which lets
 the sleep/seat lease release normally, or issue a non-follow order (stay/guard)
 and then follow again after they wake.
+
+## 7.5 Implemented (observability + bounded behaviour)
+
+| change | file |
+| --- | --- |
+| `moved` now reflects the real displacement; a refused move logs `abstract_follow_move_held` with the blocking capability/phase | `BehaviorCompanion/PNC_BehaviorCompanion_FollowOwner.lua` |
+| bounded owner-resolution retry (`FOLLOW_OWNER_RESOLVE_MAX_ATTEMPTS`, default 5) with `FollowOwner:owner_unresolved`, one `abstract_follow_owner_unresolved` report, and a presence wake before the anchor fallback | same |
+| `prepareFollowOrder(record, player)` resolves and writes `ownerUsername`/`ownerOnlineID` at command time, best-effort stops a stationary lease, and warns `follow_hold_lease_present` / `follow_owner_identity_missing` | `Commands/PNC_CompanionCommandRegistry.lua` |
+| a follow order no longer wipes a valid owner identity when the order omits it | `Orders/PNC_OrderSystem.lua` |
+| a facility lease that survived the first abort is retried for a movement order | same |
+| `tickPendingSleepWake` hard bound (`SLEEP_WAKE_HARD_TIMEOUT_MS`, default 30 s) that releases the gate and logs `sleep_wake_abandoned` instead of starving every later tick | `Behaviors/PNC_BehaviorSystem.lua` |
+| two new tunables | `PNC_Constants/BehaviorInventory.lua`, `SchedulingPresence.lua` |
+| test coverage: refused move reported, bounded owner retry, movement-order lease retry, fallback order does not retry | `tests/pnc_abstract_follow_smoke.lua`, `tests/pnc_order_transition_smoke.lua` |
+
+Still needs one runtime confirmation: enable `ProjectHoomans.FollowerPresenceAudit`
+and reproduce. The new lines name the cause directly -
+`abstract_follow_owner_unresolved` (H2) or `abstract_follow_move_held` with
+`capability=sleep|seat` (H1). Without that evidence neither hypothesis should be
+called fixed: this pass guarantees the failure is bounded and visible instead of
+silent, and removes the two ways it could become permanent.
+
+Test status: focused suites for orders, facility, companion, follow, job, sleep,
+presence, travel, home and constants run 72 tests with the 4 pre-existing
+failures unrelated to this change; `pnc_constants_presence_boundary_smoke` had a
+stale count expectation (565 vs 592 at `HEAD`) and was refreshed to the true
+current value so it guards constant growth again.

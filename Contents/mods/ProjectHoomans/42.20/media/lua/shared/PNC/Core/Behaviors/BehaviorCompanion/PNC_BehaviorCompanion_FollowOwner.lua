@@ -66,6 +66,45 @@ function Internal.TickAbstractFollowOwner(record, now)
     now = tonumber(now) or (Core.Now and Core.Now() or 0)
     record.runtime = runtime
     record.activeJob = "FollowOwner"
+    if not owner then
+        -- Do not silently walk a bodyless follower to its anchor. For a colonist
+        -- that anchor is often the base it already occupies, so the failure looks
+        -- like "following" while nothing can move. Retry resolution, wake the
+        -- presence pass, and report once before falling back to the anchor.
+        local attempts = (tonumber(runtime.followOwnerResolveAttempts) or 0) + 1
+        local maxAttempts = tonumber(
+            Const.FOLLOW_OWNER_RESOLVE_MAX_ATTEMPTS) or 5
+        runtime.followOwnerResolveAttempts = attempts
+        runtime.forcePresenceCheck = true
+        if attempts <= maxAttempts then
+            local orderSpec = record.orderSpec
+            record.activeBehavior = "FollowOwner:owner_unresolved"
+            state.mode = "owner_unresolved"
+            if attempts == 1 and auditEnabled
+                and Diagnostics and Diagnostics.LogFollowerPresence
+            then
+                Diagnostics.LogFollowerPresence(
+                    "abstract_follow_owner_unresolved", {
+                        "npc=" .. tostring(record.id),
+                        "orderKind=" .. tostring(
+                            orderSpec and orderSpec.kind or "nil"),
+                        "orderOwner=" .. tostring(
+                            orderSpec and orderSpec.ownerUsername or "nil"),
+                        "orderOnlineID=" .. tostring(
+                            orderSpec and orderSpec.ownerOnlineID or "nil"),
+                        "recordOwner=" .. tostring(
+                            record.ownerUsername or "nil"),
+                        "recordOnlineID=" .. tostring(
+                            record.ownerOnlineID or "nil"),
+                        "attempt=" .. tostring(attempts),
+                        "maxAttempts=" .. tostring(maxAttempts),
+                    })
+            end
+            return true
+        end
+    elseif runtime.followOwnerResolveAttempts ~= nil then
+        runtime.followOwnerResolveAttempts = nil
+    end
     if owner then
         if owner.getUsername then
             record.ownerUsername = owner:getUsername()
@@ -157,7 +196,7 @@ function Internal.TickAbstractFollowOwner(record, now)
     if distanceBefore <= stopDistance and beforeZ == targetZ then
         arrived = true
     else
-        Common.MoveRecord(
+        local accepted, moveReason = Common.MoveRecord(
             record,
             nil,
             targetX,
@@ -169,7 +208,29 @@ function Internal.TickAbstractFollowOwner(record, now)
             nil,
             owner and movementSpeed or nil
         )
-        moved = true
+        -- A refused request (a stationary facility lease halts movement with
+        -- sleep_hold/seated_hold) must not be reported as movement. Report the
+        -- real displacement so a frozen follower is visible instead of silent.
+        moved = accepted ~= false
+            and (math.abs((tonumber(record.x) or beforeX) - beforeX) > 0.0001
+                or math.abs((tonumber(record.y) or beforeY) - beforeY)
+                    > 0.0001)
+        if not moved and auditEnabled
+            and Diagnostics and Diagnostics.LogFollowerPresence
+        then
+            local activity = runtime.facilityActivity
+            Diagnostics.LogFollowerPresence(
+                "abstract_follow_move_held", {
+                    "npc=" .. tostring(record.id),
+                    "reason=" .. tostring(moveReason or "no_displacement"),
+                    "capability=" .. tostring(
+                        activity and activity.capability or "nil"),
+                    "phase=" .. tostring(activity and activity.phase or "nil"),
+                    "seating=" .. tostring(
+                        activity and activity.seating == true),
+                    "target=" .. tostring(targetX) .. "," .. tostring(targetY),
+                })
+        end
     end
     if auditEnabled and Diagnostics.LogFollowerPresence then
         distanceAfter = Core.Distance(
