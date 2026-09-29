@@ -249,6 +249,14 @@ function Service.EnsureHomeAnchor(record, baseId, reason)
         -- not rebuild the zone point on every idle behavior tick.
         return true, "AT_HOME"
     end
+    -- A return journey that failed leaves a bounded cooldown behind so this
+    -- idle behavior tick does not create a fresh doomed journey every tick.
+    local retryAt = tonumber(record.runtime and record.runtime.homeRetryAt)
+    if retryAt and (PNC.Core and PNC.Core.Now and PNC.Core.Now() or 0)
+        < retryAt
+    then
+        return false, "HOME_RETRY_COOLDOWN"
+    end
 
     -- This covers both NPCs outside the base and old saves whose durable
     -- colony_home anchor still points at an edge stockpile. The command's

@@ -73,11 +73,64 @@ function Identity.IsNameKnown(npc)
         or Identity.GetFact(npc, "identity.name") ~= nil
 end
 
+-- Presentation placeholders are transport values, not names the player learned.
+-- The server's own projection uses the same literal (`PresentationFor` sets
+-- `displayName = "Unknown survivor"` while the name is unknown), so every
+-- consumer that decides whether to *display* a name must reject them.
+local placeholderNames
+
+local function buildPlaceholderNames()
+    local values = {
+        Identity.UnknownName,
+        Identity.UnknownArchetype,
+        Identity.UnknownFaction,
+        "STRANGER",
+        "UNKNOWN",
+    }
+    local output = {}
+    for index = 1, #values do
+        local value = values[index]
+        if type(value) == "string" and value ~= "" then
+            output[string.upper(value)] = true
+        end
+    end
+    return output
+end
+
+function Identity.IsPlaceholderName(value)
+    if type(value) ~= "string" or value == "" then return false end
+    placeholderNames = placeholderNames or buildPlaceholderNames()
+    return placeholderNames[string.upper(value)] == true
+end
+
 function Identity.GetName(npc)
     local fact = Identity.GetFact(npc, "identity.name")
     if fact then return tostring(fact.value or Identity.UnknownName) end
     if Identity.IsNameKnown(npc) then return Identity.GetDebugName(npc) end
     return not clientState() and Identity.GetDebugName(npc) or Identity.UnknownName
+end
+
+-- A descriptor can exist without a usable value (a snapshot whose truth failed
+-- to resolve, or a value that did not survive transport). Callers that decide
+-- whether to *display* a name must treat that as still-unknown: `GetName`
+-- deliberately returns the placeholder, and rendering it as a learned name
+-- produces a plate that reads "Unknown survivor" as if the player had been told.
+function Identity.GetKnownName(npc)
+    local fact = Identity.GetFact(npc, "identity.name")
+    if fact then
+        local value = tostring(fact.value or "")
+        if value ~= "" and not Identity.IsPlaceholderName(value) then
+            return value
+        end
+    end
+    if Identity.IsNameKnown(npc) then
+        local debugName = tostring(Identity.GetDebugName(npc, "") or "")
+        if debugName ~= "" and not Identity.IsPlaceholderName(debugName) then
+            return debugName
+        end
+    end
+    if not clientState() then return Identity.GetDebugName(npc) end
+    return nil
 end
 
 function Identity.GetArchetype(npc)

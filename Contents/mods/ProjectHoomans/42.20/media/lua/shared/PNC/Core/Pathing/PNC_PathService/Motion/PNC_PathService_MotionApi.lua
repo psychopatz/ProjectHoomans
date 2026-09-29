@@ -170,6 +170,14 @@ function PathService.AdvanceAbstract(
         local followSpeedCap = tonumber(
             PNC.Const.ABSTRACT_FOLLOW_CATCHUP_SPEED
         ) or baseSpeed
+        -- A long-range follow request may deliberately exceed the ordinary
+        -- catch-up cap; honor the dedicated ceiling when one is configured.
+        local longRangeCap = tonumber(
+            PNC.Const.ABSTRACT_FOLLOW_LONG_RANGE_SPEED
+        )
+        if longRangeCap and longRangeCap > followSpeedCap then
+            followSpeedCap = longRangeCap
+        end
         speed = math.min(
             math.max(baseSpeed, requestedSpeed),
             math.max(baseSpeed, followSpeedCap)

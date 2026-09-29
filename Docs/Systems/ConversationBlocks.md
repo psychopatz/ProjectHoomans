@@ -104,6 +104,28 @@ Register on both client and server from `shared`. Never register a block only
 from `client` or only from `server`, because the registry fingerprints must
 match for multiplayer authority checks.
 
+## Categories that need another mod
+
+A category can name an optional integration it depends on:
+
+```lua
+Conversations.RegisterCategory("examplemod:trade", {
+    ownerModID = "ExampleMod",
+    labelKey = "category.trade",
+    textSource = { modID = "ExampleMod", pathPattern = "..." },
+    requiresModID = "SomeOtherMod",
+    unavailableTextKey = "category.trade.requires_other_mod",
+})
+```
+
+When `SomeOtherMod` is not loaded the category stays in the response channel but
+renders disabled, labelled with the unavailable text, and shows that text as a
+hover tooltip; the label is also suffixed with it so the requirement is readable
+without hovering. `PNC.Compatibility.HasMod(modID)` answers the check through
+`getModInfoByID` with the activated-mod list as a fallback, and caches the
+result. Any other eligibility failure still hides the category, because only a
+missing integration is expected and explainable.
+
 ## Registering content
 
 Load the API from a shared Lua file and register categories before their blocks.

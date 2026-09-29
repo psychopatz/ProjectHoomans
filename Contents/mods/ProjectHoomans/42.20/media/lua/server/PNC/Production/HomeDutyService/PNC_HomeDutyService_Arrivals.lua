@@ -5,6 +5,11 @@ local Service = PNC.HomeDutyService
 local H = Service.Internal
 
 if PNC.Travel and PNC.Travel.Arrivals then
+    -- A failed home arrival must never be replaced by a roam order: that hides
+    -- the failure and leaves the record claiming it is still returning home.
+    PNC.Travel.Arrivals.StrictActionTypes =
+        PNC.Travel.Arrivals.StrictActionTypes or {}
+    PNC.Travel.Arrivals.StrictActionTypes.colony_home = true
     PNC.Travel.Arrivals.RegisterHandler("colony_home",
         function(record, _, action)
             local point, reason, base = Service.GetHomePoint(

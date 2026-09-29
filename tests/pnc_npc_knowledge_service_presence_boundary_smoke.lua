@@ -44,7 +44,11 @@ for name, _ in pairs(publicFunctions) do
     T.equal(type(PNC.NPCKnowledge[name]), "function",
         "entry point should preserve NPCKnowledge." .. name)
 end
-T.equal(publicCount, 28, "public function declaration count")
+-- Re-baselined for the gift-preference knowledge entry points
+-- (`GetGiftPreference`, `RecordGiftPreferences`). The guard still asserts every
+-- declared entry point is reachable through the composition root, so a new
+-- provider function must be added to this count deliberately.
+T.equal(publicCount, 30, "public function declaration count")
 
 for i = 1, #providers do
     package.loaded[prefix .. providers[i]] = nil

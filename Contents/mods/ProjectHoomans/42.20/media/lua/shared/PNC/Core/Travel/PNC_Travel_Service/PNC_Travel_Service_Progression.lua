@@ -2,11 +2,18 @@ local Service = PNC.Travel.Service
 local Internal = Service.Internal
 local Projection = PNC.Travel.Projection
 local Route = PNC.Travel.Route
+local Model = PNC.Travel.Model
 
 function Service.Advance(recordOrID, atWorldHour)
     local record = Internal.ResolveRecord(recordOrID)
     local journey = record and record.travel or nil
     if not journey then return nil, false end
+    if not Model.IsActive(journey) and journey.state ~= "arrived" then
+        -- A cancelled or blocked journey must never re-project its record: it
+        -- would overwrite the NPC's authoritative position at the next
+        -- materialization with a route it never travelled.
+        return nil, false
+    end
     local previousState = journey.state
     local previousX = tonumber(record.x) or 0
     local previousY = tonumber(record.y) or 0

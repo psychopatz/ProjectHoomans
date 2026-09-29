@@ -56,10 +56,32 @@ local function evaluateCategory(context, category)
         textValid, textReason = ensureBlockText(selected)
     end
 
+    -- A category may declare the optional companion mod it depends on. When
+    -- that mod is absent the entry stays in the menu but disabled, so the player
+    -- learns why the feature is missing instead of it silently disappearing.
+    local unavailable = false
+    local unavailableText
+    local requiredModID = category.requiresModID
+    if type(requiredModID) == "string" and requiredModID ~= "" then
+        local compatibility = PNC.Compatibility
+        local hasMod = compatibility
+            and type(compatibility.HasMod) == "function"
+            and compatibility.HasMod(requiredModID)
+        if not hasMod then
+            unavailable = true
+            unavailableText = category.unavailableTextKey
+                and payload(category.textSource, category.unavailableTextKey)
+                or nil
+        end
+    end
+
     local visible = categoryEligible and selected and textValid
         and categoryTextValid or false
     local reason = "visible"
-    if not categoryEligible then
+    if unavailable then
+        reason = "integration_unavailable"
+        visible = false
+    elseif not categoryEligible then
         reason = categoryReason or "category_ineligible"
     elseif not categoryTextValid then
         reason = categoryTextReason or "category_text_invalid"
@@ -85,6 +107,9 @@ local function evaluateCategory(context, category)
         categoryTextValid = categoryTextValid == true,
         visible = visible == true,
         reason = reason,
+        -- Disabled-but-shown: the integration is missing, nothing else failed.
+        unavailable = unavailable,
+        unavailableText = unavailableText,
     }
 end
 
@@ -119,14 +144,15 @@ local function categoryChoices(context)
         context.categoryDiagnostics = diagnostics
     end
     for _, diagnostic in ipairs(diagnostics) do
-        if diagnostic.visible then
+        if diagnostic.visible or diagnostic.unavailable then
             local selectedCategory = Registry.GetCategory(diagnostic.id)
-            choices[#choices + 1] = {
+            local label = payload(
+                selectedCategory.textSource,
+                selectedCategory.labelKey
+            )
+            local choicesEntry = {
                 id = selectedCategory.id,
-                text = payload(
-                    selectedCategory.textSource,
-                    selectedCategory.labelKey
-                ),
+                text = label,
                 -- Ask About is a topic browser and stays out of the
                 -- transcript; ordinary categories are player lines so
                 -- the NPC never appears to start a one-sided exchange.
@@ -136,6 +162,17 @@ local function categoryChoices(context)
                     Composer.RequestCategory(context.npcID, selectedCategory.id)
                 end,
             }
+            if diagnostic.unavailable then
+                -- Visible but disabled, with the reason as both a suffix and a
+                -- hover tooltip so the requirement is readable either way.
+                choicesEntry.enabled = false
+                choicesEntry.tooltip = diagnostic.unavailableText
+                if diagnostic.unavailableText then
+                    choicesEntry.text = label
+                        .. " (" .. tostring(diagnostic.unavailableText) .. ")"
+                end
+            end
+            choices[#choices + 1] = choicesEntry
         end
     end
     return choices

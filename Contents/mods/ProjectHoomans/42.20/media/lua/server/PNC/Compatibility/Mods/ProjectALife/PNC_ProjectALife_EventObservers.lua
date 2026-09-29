@@ -1,5 +1,12 @@
 -- Observe public A-Life encounter and reputation APIs on the server.
 
+-- Server-only file: a pure multiplayer client must not install the transport or
+-- register observers. Same runtime-role guard the rest of the server tree uses;
+-- required here because this file requires its transport at load time.
+if PsychopatzCore and PsychopatzCore.RuntimeRole
+    and not PsychopatzCore.RuntimeRole.AllowsServerCode()
+then return end
+
 require "PNC/Compatibility/Mods/ProjectALife/PNC_ProjectALife_EventServer"
 
 local Server = PNC.Compatibility.ProjectALifeEvents.Server

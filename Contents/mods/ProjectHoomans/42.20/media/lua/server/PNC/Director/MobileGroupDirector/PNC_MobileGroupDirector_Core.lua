@@ -88,12 +88,40 @@ function H.PathMode(value, fallback)
     return Constants.MOBILE_PATH_RANDOM
 end
 
-function H.FactionRole(faction, index)
+-- `override` requests a different role sequence for this one group: a trading
+-- caravan roams as a trader plus guards while its faction leader stays at the
+-- base. The caller validates every token against the archetype's allowed roles,
+-- so an override can never assign a role the faction may not hold.
+function H.FactionRole(faction, index, override)
+    if type(override) == "table" and override[index] then
+        return override[index]
+    end
     local roles = H.RoleOrder[faction.archetypeID] or {}
     return roles[index]
         or PNC.FactionArchetypes.GetDefaultRole(
             faction.archetypeID
         )
+end
+
+-- Validate a caller-supplied role order against the faction archetype before a
+-- single NPC is created. Returns a copied order, or nil plus a reason.
+function H.ValidRoleOrder(faction, override)
+    local Archetypes = PNC.FactionArchetypes
+    local output = {}
+    local index
+    local role
+    if type(override) ~= "table" then return nil, "role_order_required" end
+    if #override < 1 then return nil, "role_order_empty" end
+    for index = 1, #override do
+        role = override[index]
+        if type(role) ~= "string"
+            or not Archetypes.IsRoleAllowed(faction.archetypeID, role)
+        then
+            return nil, "invalid_role_order"
+        end
+        output[index] = role
+    end
+    return output
 end
 
 function H.NPCArchetype(faction)

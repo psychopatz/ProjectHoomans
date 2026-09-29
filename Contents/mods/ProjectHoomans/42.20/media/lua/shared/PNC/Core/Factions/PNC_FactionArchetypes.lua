@@ -12,8 +12,8 @@ local DEFINITIONS = {
         label = "Settlement",
         description = "A permanent survivor organization attempting to maintain a defended home and stable population.",
         allowedRoles = {
-            leader = true, guard = true, medic = true, farmer = true,
-            builder = true, scavenger = true, cook = true,
+            leader = true, trader = true, guard = true, medic = true,
+            farmer = true, builder = true, scavenger = true, cook = true,
             mechanic = true, civilian = true,
         },
         defaultRole = "civilian",
@@ -84,7 +84,7 @@ local DEFINITIONS = {
         label = "Refugee Group",
         description = "A displaced survivor organization seeking safety, shelter, or a permanent home.",
         allowedRoles = {
-            leader = true, guard = true, medic = true,
+            leader = true, trader = true, guard = true, medic = true,
             scavenger = true, caregiver = true, civilian = true,
         },
         defaultRole = "civilian",

@@ -214,8 +214,20 @@ local function identityProjection(entry)
     local knownName = storedName ~= "" and storedName
         or learnedName and learnedName.value
         or projection and projection.displayName
-    if (knownName == nil or tostring(knownName) == "") and identityKnown then
-        knownName = IdentityPresentation.GetName(entry)
+    -- Every candidate must be a real name. A descriptor without a usable value
+    -- and the server's own "Unknown survivor" projection are both placeholders,
+    -- and rendering either as a learned name produces a plate that claims the
+    -- player was told something they were not.
+    if knownName ~= nil
+        and IdentityPresentation.IsPlaceholderName
+        and IdentityPresentation.IsPlaceholderName(tostring(knownName))
+    then
+        knownName = nil
+    end
+    if (knownName == nil or tostring(knownName) == "") and identityKnown
+        and IdentityPresentation.GetKnownName
+    then
+        knownName = IdentityPresentation.GetKnownName(entry)
     end
     -- A verified name exchange is one way to know an NPC, but not the only
     -- one: player-scoped knowledge (including lifelong family/friend facts)

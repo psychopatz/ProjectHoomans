@@ -521,11 +521,35 @@ Authority mutation also includes membership, leadership, archival/destruction,
 server-authoritative mobile lifecycle APIs. `PNC.MobileGroupDirector` owns
 generation, abstract relocation, its due check, and debug path-mode changes.
 
+A generation request may carry `roleOrder` and `assignLeader = false`.
+`roleOrder` replaces the archetype's positional roster for that one group after
+every token has been validated against `allowedRoles` (`invalid_role_order`
+otherwise), and `assignLeader = false` stops the director from promoting the
+first spawned member to faction leader. Both exist for the roaming trading
+caravan, which travels as a trader plus guards while its faction leader stays at
+the base.
+
 A directed relation mutation increments that relation, its source faction,
 and the registry. An official treaty increments both relation records, both
 factions, and the registry exactly once. Rejected, duplicate, unchanged, and
 copied read operations increment nothing. NPC affiliation/derived behavior
 uses existing record dirty tracking and never changes `presenceRevision`.
+
+### Roles
+
+`PNC.FactionConstants.ROLES` is the single faction-role vocabulary:
+`leader, lieutenant, guard, enforcer, raider, trader, medic, farmer, builder,
+scavenger, cook, mechanic, laborer, caregiver, civilian, prisoner`.
+`civilian` means a member with no specific job and is the default role of the
+`settler` and `refugee` archetypes.
+
+Not every archetype may hold every role: `PNC_FactionArchetypes.lua` gates each
+role per archetype and `Factions.SetNPCRole` returns `role_not_allowed`
+otherwise. A role written past that gate is silently coerced back to the
+archetype default on the next affiliation normalization, so a system that needs
+a new role in a settlement must extend `allowedRoles` instead of writing the
+record directly. `settler` and `refugee` allow `trader`; looter camps deliberately
+allow neither.
 
 ## Migration
 

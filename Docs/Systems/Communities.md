@@ -121,6 +121,11 @@ communityJoinedAt = 0
 
 Roles are leader, resident, guard, medic, worker, dependent, and prisoner.
 Community role is independent of faction role and does not assign an AI job.
+Settlement generation derives the community role from the member's faction role
+instead of a second positional table: `leader` becomes `resident` (community
+leadership is tracked by `community.leaderNPCID`), `guard` and `medic` are kept,
+and every other faction role - including `trader` and `civilian` - becomes
+`resident`.
 
 An NPC must already belong to the owning faction, may belong to at most one
 community, and may remain faction-affiliated without a community. Transfers
@@ -255,8 +260,21 @@ plus a standalone
 **Generate NPC Group** action for existing factions. The result reports live
 and abstract counts so unloaded-site behavior is visible. New factions and
 communities use archetype-aware naming pools rather than debug timestamps.
-Generated roles are archetype-aware as well, so trading companies receive a
-trader and looter gangs receive raiders and enforcers.
+Generated roles are archetype-aware as well: `settler` and `refugee`
+settlements are staffed `leader / trader / guard / medic / ... / civilian`, the
+mobile `trader` archetype is staffed `leader / trader / guard / ...`, and looter
+camps receive raiders and enforcers with no trader. Members past the end of the
+role order fall back to the archetype default role, which is `civilian` - a
+member with no specific job - for every settlement archetype.
+
+Existing worlds: `PNC.SettlementTraderStaffing.Reconcile()` runs once per world
+start and promotes one member of an already-generated settler/refugee settlement
+to `trader` when the settlement has at least
+`PNC.SettlementTraderStaffing.MINIMUM_MEMBERS` members and no trader, preferring
+a member whose role is an unassigned `civilian`. It never creates NPCs,
+never promotes in a looter camp or a mobile group, and is bounded by
+`MAX_PROMOTIONS_PER_PASS`. `PNC.SettlementTraderStaffing.TraderMember(factionID)`
+is the query a companion system should use instead of predicting role positions.
 
 Normal roster and detailed snapshots expose only a bounded faction
 presentation summary: faction ID/name/archetype plus the NPC's membership,

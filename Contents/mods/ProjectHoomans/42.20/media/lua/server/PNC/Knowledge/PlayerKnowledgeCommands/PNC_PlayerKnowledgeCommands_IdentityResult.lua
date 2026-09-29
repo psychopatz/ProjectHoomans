@@ -63,6 +63,12 @@ function Result.BuildAccepted(fields)
         responseText = fields.responseText,
         responseKey = fields.responseKey,
         responseArgs = fields.responseArgs,
+        -- Player-scoped identity projection for this NPC, built after the
+        -- disclosure committed. The client mirrors it through the same
+        -- knowledge receiver used by NPCPresentation/KnowledgeDisclosure, so a
+        -- learned name reaches the world nameplate in the same beat as the
+        -- portrait plate instead of waiting for the next knowledge request.
+        presentation = fields.presentation,
         relationship = relationship,
         relationshipBefore = fields.relationshipBefore,
         relationshipAfter = relationship,

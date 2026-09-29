@@ -566,6 +566,44 @@ function Commands.CanPlayerCommand(record, player, radius)
     return true, "commandable"
 end
 
+local function playerRadioActive(player)
+    local deviceState = PsychopatzCore and PsychopatzCore.RadioDeviceState or nil
+    if not deviceState or type(deviceState.FindActivePlayerDevice) ~= "function" then
+        return false
+    end
+    -- Reuses the same "turned on and audible" verdict the radio UI and the
+    -- discovery broadcasts already rely on, so radio behavior stays consistent.
+    local ok, device = pcall(deviceState.FindActivePlayerDevice, player)
+    return ok and device ~= nil
+end
+
+-- Radio relay lets an owner reach a colonist who is out of earshot, on another
+-- floor, or currently abstract, provided both ends carry working radio gear.
+-- Only definitions that opt in with `radioRelay = true` are eligible, so the
+-- proximity-only verbs (emotes, camp placement, inventory handling) keep the
+-- strict CanPlayerCommand contract.
+function Commands.CanRelayCommand(record, player, definition)
+    local gate = PNC.CommandRelayGate
+    local radioGear
+    if not gate or type(gate.Evaluate) ~= "function" then
+        return false, "relay_unavailable"
+    end
+    if type(definition) ~= "table" or definition.radioRelay ~= true then
+        return false, "relay_not_allowed"
+    end
+    radioGear = Equipment and Equipment.RadioGear or nil
+    return gate.Evaluate({
+        companion = Commands.IsCompanion(record) == true,
+        owned = Commands.IsOwnedByPlayer(record, player) == true,
+        dead = record ~= nil and record.alive == false,
+        reachableDirectly = false,
+        relayAllowed = true,
+        playerRadio = playerRadioActive(player),
+        npcRadio = radioGear and type(radioGear.HasEquipped) == "function"
+            and radioGear.HasEquipped(record) == true or false,
+    })
+end
+
 local function refreshEquipmentState(record)
     local equipmentInfo
     if not Equipment or not Equipment.Describe then return end
@@ -673,13 +711,33 @@ function Commands.Apply(record, player, commandID, radius, commandContext)
     local orderOptions = commandContext
     local campSite
     local details
+    local relayedViaRadio = false
     if not Core.IsAuthority() then return false, "not_authority" end
     if not definition then return false, "unknown_command" end
     if definition.clientOnly == true then
         return false, "client_action_required"
     end
     allowed, reason = Commands.CanPlayerCommand(record, player, radius)
-    if not allowed then return false, reason end
+    if not allowed then
+        -- Out of earshot is not the same as out of contact: a relay-eligible
+        -- command may still be accepted over the radio. When the relay path
+        -- itself is unavailable the original proximity reason is kept, because
+        -- "relay is missing" explains nothing about why the order failed.
+        local directReason = reason
+        local relayed, relayReason = Commands.CanRelayCommand(
+            record, player, definition)
+        if relayed ~= true then
+            if relayReason == "relay_unavailable"
+                or relayReason == "relay_not_allowed"
+            then
+                return false, directReason
+            end
+            return false, relayReason or directReason
+        end
+        reason = relayReason
+        relayedViaRadio = relayReason == (PNC.CommandRelayGate
+            and PNC.CommandRelayGate.RELAY or "radio_relay")
+    end
     allowed, reason = Commands.CanApply(record, player, commandID)
     if not allowed then return false, reason end
     if tostring(commandID or "") == "camp" then
@@ -717,6 +775,7 @@ function Commands.Apply(record, player, commandID, radius, commandContext)
         (tonumber(record.runtime.lastCompanionCommandRevision) or 0) + 1
     record.runtime.lastCompanionCommandOwner = player.getUsername
         and tostring(player:getUsername() or "") or nil
+    record.runtime.lastCompanionCommandRelay = relayedViaRadio == true
     Network.BroadcastRecord(
         record,
         "companion_command_" .. tostring(definition.id)

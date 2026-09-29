@@ -162,7 +162,9 @@ function H.SpawnCommunityMembers(
             community.id,
             record.id,
             {
-                communityRole = H.CommunityRole(index),
+                communityRole = H.CommunityRole(
+                    spawnDefinition.factionRole
+                ),
                 joinedAt = at,
                 strictCapacity = spec.strictCapacity == true,
             }

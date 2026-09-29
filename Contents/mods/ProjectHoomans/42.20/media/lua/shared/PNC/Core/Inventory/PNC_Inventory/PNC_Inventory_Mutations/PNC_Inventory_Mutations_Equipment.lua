@@ -118,6 +118,83 @@ function Inventory.ClearWaterContainer(record, reason)
         reason or "unequip_water_container")
 end
 
+-- Belt/webbing attachment is the equipment lane a radio uses, so it mirrors
+-- SetWorn exactly: the item leaves its container, the location map owns it, and
+-- the live materialization lanes can project it with Equipment.Apply.
+function Inventory.SetAttached(record, itemID, attachedSlot, reason)
+    local inv = Inventory.EnsureRecordInventory(record, {
+        reconcileWaterContainer = false,
+    })
+    local item
+    local previousItemID
+    local previous
+    local oldSlot
+    local op
+    local ops = {}
+    if not inv then return false, "inventory_unavailable" end
+    itemID = Internal.normalizeString(itemID)
+    attachedSlot = Internal.normalizeString(attachedSlot)
+    item = itemID and inv.items[itemID] or nil
+    if itemID and not item then return false, "item_not_found" end
+    if itemID and not attachedSlot then return false, "attached_slot_missing" end
+    if item and item.interactionLocked then return false, "item_not_available" end
+
+    if item then
+        if item.container ~= "root" then
+            Internal.setItemContainer(inv, item, "root")
+            ops[#ops + 1] = Internal.buildOperation("move", {
+                itemID = item.id,
+                to = "root",
+            })
+        end
+        oldSlot = item.attachedSlot
+        if oldSlot and inv.attached[oldSlot] == itemID then
+            inv.attached[oldSlot] = nil
+        end
+        previousItemID = inv.attached[attachedSlot]
+        previous = previousItemID and inv.items[previousItemID] or nil
+        if previous then previous.attachedSlot = nil end
+        inv.attached[attachedSlot] = itemID
+        item.attachedSlot = attachedSlot
+    else
+        previousItemID = inv.attached[attachedSlot]
+        previous = previousItemID and inv.items[previousItemID] or nil
+        if previous then previous.attachedSlot = nil end
+        inv.attached[attachedSlot] = nil
+    end
+
+    op = Internal.buildOperation("attach", {
+        slot = attachedSlot,
+        itemID = itemID,
+        previousItemID = previousItemID,
+        oldSlot = oldSlot,
+    })
+    ops[#ops + 1] = op
+    Internal.bumpRevision(record, ops, reason or "inventory_attach")
+    Inventory.SyncEquipmentFromInventory(record)
+    Inventory.RebuildCaches(record)
+    if PNC.Registry and PNC.Registry.MarkDirty then
+        PNC.Registry.MarkDirty(record, "inventory")
+    end
+    return true, item and "attached" or "removed"
+end
+
+function Inventory.ClearAttached(record, itemID, reason)
+    local inv = Inventory.EnsureRecordInventory(record, {
+        reconcileWaterContainer = false,
+    })
+    local item = inv and inv.items
+        and inv.items[Internal.normalizeString(itemID)] or nil
+    if not item then return false, "item_not_found" end
+    if not item.attachedSlot then return true, "unchanged" end
+    return Inventory.SetAttached(
+        record,
+        nil,
+        item.attachedSlot,
+        reason or "inventory_detach"
+    )
+end
+
 function Inventory.SetWorn(record, itemID, wornSlot, reason)
     local inv = Inventory.EnsureRecordInventory(record, {
         reconcileWaterContainer = false,

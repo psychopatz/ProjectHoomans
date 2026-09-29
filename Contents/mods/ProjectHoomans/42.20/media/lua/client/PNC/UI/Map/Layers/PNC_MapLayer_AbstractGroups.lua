@@ -2,6 +2,7 @@
 
 require "ISUI/Maps/ISWorldMap"
 require "PNC/UI/Mobile/PNC_MobileGroupDebugModel"
+require "PNC/UI/Mobile/PNC_MobileGroupTrackModel"
 
 PNC = PNC or {}
 PNC.AbstractGroupMapLayer = PNC.AbstractGroupMapLayer or {}
@@ -10,8 +11,15 @@ local GroupLayer = PNC.AbstractGroupMapLayer
 local Layers = PNC.MapLayers
 local ClientState = PNC.Network.ClientState
 local MobileModel = PNC.MobileGroupDebugModel
+local TrackModel = PNC.MobileGroupTrackModel
 
 GroupLayer.lastRequestAt = GroupLayer.lastRequestAt or 0
+-- Per-group interpolation state, keyed by group id and rebuilt only when a new
+-- director snapshot arrives. Bounded by the snapshot's own group list.
+GroupLayer.Tracks = GroupLayer.Tracks or {}
+GroupLayer.TrackCount = GroupLayer.TrackCount or 0
+GroupLayer.SnapshotToken = GroupLayer.SnapshotToken
+GroupLayer.positionScratch = GroupLayer.positionScratch or {}
 
 local COLORS = {
     LOOTER = { r = 1.00, g = 0.22, b = 0.16 },
@@ -111,20 +119,98 @@ local function drawHover(map, group, x, y, color)
     end
 end
 
+local function worldAgeHours()
+    local gameTime = getGameTime and getGameTime() or nil
+    return gameTime and gameTime.getWorldAgeHours
+        and tonumber(gameTime:getWorldAgeHours()) or nil
+end
+
+-- Rebuilds the glide tracks for one snapshot. Cheap by construction: one pass
+-- over the snapshot's groups, no allocation for groups that already have a
+-- track, and the reused table set is recycled rather than discarded.
+local function rebuildTracks(snapshot)
+    local received = ClientState.lastDirectorDebugReceiveAt
+    if received == GroupLayer.SnapshotToken then return end
+    GroupLayer.SnapshotToken = received
+    local tracks = GroupLayer.Tracks
+    local pool = GroupLayer.TrackPool or {}
+    GroupLayer.TrackPool = pool
+    local at = worldAgeHours()
+    local used, groupID
+    local kept = {}
+    for _, group in ipairs(snapshot.groups or {}) do
+        groupID = tostring(group.id or "")
+        if groupID ~= "" then
+            local existing = tracks[groupID]
+            local track = TrackModel.Begin(group, at, existing)
+            if track then
+                kept[groupID] = track
+            elseif existing then
+                -- Group left transit: return its table to the pool.
+                pool[#pool + 1] = existing
+            end
+        end
+    end
+    -- Retire tracks for groups that vanished or stopped travelling.
+    for groupID, existing in pairs(tracks) do
+        if not kept[groupID] then pool[#pool + 1] = existing end
+    end
+    GroupLayer.Tracks = kept
+    GroupLayer.TrackCount = 0
+    for _ in pairs(kept) do
+        GroupLayer.TrackCount = GroupLayer.TrackCount + 1
+    end
+end
+
+local function clearTracks()
+    local tracks = GroupLayer.Tracks
+    if GroupLayer.SnapshotToken == nil and next(tracks) == nil then
+        return
+    end
+    local pool = GroupLayer.TrackPool or {}
+    for _, existing in pairs(tracks) do
+        pool[#pool + 1] = existing
+    end
+    GroupLayer.TrackPool = pool
+    GroupLayer.Tracks = {}
+    GroupLayer.TrackCount = 0
+    GroupLayer.SnapshotToken = nil
+end
+
+-- Marker position for one group: the server's confirmed location for groups
+-- that are not in transit, otherwise the interpolated in-between point.
+local function markerPosition(group, at)
+    local location = group.location
+    if not location or not location.x or not location.y then return nil end
+    local track = GroupLayer.Tracks[tostring(group.id or "")]
+    if not track or not at then return location.x, location.y end
+    local projected = TrackModel.Position(track, at, GroupLayer.positionScratch)
+    if not projected then return location.x, location.y end
+    return projected.x, projected.y
+end
+
 function GroupLayer.Render(map)
-    if not isVisible() or not map or not map.mapAPI then return end
+    if not isVisible() or not map or not map.mapAPI then
+        if GroupLayer.TrackCount > 0 then clearTracks() end
+        return
+    end
     GroupLayer.Update(false)
-    if ClientState.directorDebugAuthorized ~= true then return end
+    if ClientState.directorDebugAuthorized ~= true then
+        if GroupLayer.TrackCount > 0 then clearTracks() end
+        return
+    end
     local snapshot = ClientState.directorDebug or {}
+    rebuildTracks(snapshot)
+    local at = GroupLayer.TrackCount > 0 and worldAgeHours() or nil
     local mouseX, mouseY = map:getMouseX(), map:getMouseY()
     local hovered, hoveredX, hoveredY, hoveredColor
     local showNames = PNC.MapDisplay.AreNamesVisible
         and PNC.MapDisplay.AreNamesVisible()
     for _, group in ipairs(snapshot.groups or {}) do
-        local location = group.location
-        if location and location.x and location.y then
-            local x = map.mapAPI:worldToUIX(location.x, location.y)
-            local y = map.mapAPI:worldToUIY(location.x, location.y)
+        local px, py = markerPosition(group, at)
+        if px then
+            local x = map.mapAPI:worldToUIX(px, py)
+            local y = map.mapAPI:worldToUIY(px, py)
             local color = markerColor(group)
             if group.mobile then drawRoute(map, group, color) end
             local dx, dy = mouseX - x, mouseY - y
@@ -150,6 +236,16 @@ function GroupLayer.Render(map)
     if hovered then
         drawHover(map, hovered, hoveredX, hoveredY, hoveredColor)
     end
+end
+
+-- Test/diagnostic seam: the marker coordinate a snapshot group is drawn at,
+-- after track interpolation. Does not mutate layer state.
+function GroupLayer.MarkerPosition(group)
+    return markerPosition(group, worldAgeHours())
+end
+
+function GroupLayer.ClearTracks()
+    clearTracks()
 end
 
 if Layers and Layers.Register then

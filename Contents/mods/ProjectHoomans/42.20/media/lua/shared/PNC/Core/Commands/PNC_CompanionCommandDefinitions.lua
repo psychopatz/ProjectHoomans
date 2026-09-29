@@ -108,6 +108,10 @@ Commands.Register({
     emote = "followme",
     icon = "media/ui/Emotes/PNC_EmoteFollow.png",
     buildOrder = followOrder,
+    -- Recall over the radio: offers reach a colonist who is out of earshot or
+    -- currently abstract, but only while both sides carry working radio gear.
+    -- The emote radial still gates on proximity client-side.
+    radioRelay = true,
 })
 
 Commands.Register({
@@ -234,6 +238,8 @@ Commands.Register({
     label = "Go Home",
     emote = "followme",
     icon = "media/ui/Emotes/PNC_EmoteFollow.png",
+    -- Sending a colonist home is the order most often issued at radio range.
+    radioRelay = true,
     apply = function(record, player)
         if PNC.ScavengeService and PNC.ScavengeService.BringBack then
             local handled = PNC.ScavengeService.BringBack(record, player)

@@ -109,6 +109,11 @@ function H.PrepareTick(now)
     if PNC.Travel and PNC.Travel.Service then
         safeOptional("server_prepare.abstract_travel",
             PNC.Travel.Service, "RefreshAbstractPositions", nil, now, false)
+        -- Bounded watchdog for live journeys that lost their movement owner or
+        -- stopped making progress. Without it a journey whose travel order was
+        -- replaced stays active with nothing able to advance or end it.
+        safeOptional("server_prepare.live_travel_watchdog",
+            PNC.Travel.Service, "AuditActiveLiveJourneys", nil, now, false)
     end
     safeOptional("server_prepare.body_startup_cleanup", BodyLifecycle,
         "PumpStartupBodyCleanup", nil, now, false)

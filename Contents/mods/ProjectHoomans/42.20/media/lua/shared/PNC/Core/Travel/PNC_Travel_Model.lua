@@ -62,6 +62,22 @@ function Model.IsActive(journey)
         and Model.ActiveStates[tostring(journey.state or "")] == true
 end
 
+-- A live journey that cannot be walked has to hand off to the abstract lane.
+-- `handoffForced` is set by the live escalation ladder once the movement lane is
+-- demonstrably stuck; the remaining-distance rule covers the obvious long haul
+-- before it ever stalls.
+function Model.LiveHandoffRequired(journey)
+    local total
+    local travelled
+    if not Model.IsActive(journey) then return false end
+    if tostring(journey.controller or "") == "abstract" then return false end
+    if journey.handoffForced == true then return true end
+    total = tonumber(journey.distanceTotal) or 0
+    travelled = tonumber(journey.distanceTravelled) or 0
+    return (total - travelled)
+        > (tonumber(Const.TRAVEL_LIVE_MAX_DISTANCE) or 64)
+end
+
 function Model.New(record, request, worldHour)
     request = type(request) == "table" and request or {}
     worldHour = tonumber(worldHour) or 0
@@ -132,6 +148,10 @@ function Model.New(record, request, worldHour)
         arrivalHandled = false,
         revision = 1,
         lastStateReason = "started",
+        liveRecoveryCount = 0,
+        liveEscalationCount = 0,
+        watchdogFailures = 0,
+        createdAtMs = Core and Core.Now and Core.Now() or nil,
     }
     if route.totalDistance <= journey.arrivalRadius then
         journey.distanceTravelled = route.totalDistance
@@ -206,6 +226,32 @@ function Model.Normalize(raw, record, worldHour)
         and tostring(raw.arrivalHandledReason)
         or nil
     journey.controller = tostring(raw.controller or "abstract")
+    journey.handoffForced = raw.handoffForced == true
+    journey.handoffReason = raw.handoffReason
+        and tostring(raw.handoffReason)
+        or nil
+    journey.liveRecoveryCount = math.max(
+        0,
+        math.floor(tonumber(raw.liveRecoveryCount) or 0)
+    )
+    journey.liveEscalationCount = math.max(
+        0,
+        math.floor(tonumber(raw.liveEscalationCount) or 0)
+    )
+    journey.watchdogFailures = math.max(
+        0,
+        math.floor(tonumber(raw.watchdogFailures) or 0)
+    )
+    journey.failureReason = raw.failureReason
+        and tostring(raw.failureReason)
+        or nil
+    journey.arrivalAttempts = math.max(
+        0,
+        math.floor(tonumber(raw.arrivalAttempts) or 0)
+    )
+    journey.arrivalFailedReason = raw.arrivalFailedReason
+        and tostring(raw.arrivalFailedReason)
+        or nil
     journey.revision = math.max(1, math.floor(tonumber(raw.revision) or 1))
     journey.routeVersion = math.max(
         1,
@@ -255,6 +301,14 @@ function Model.BuildSummary(journey, includeRoute)
         arrivalHandled = journey.arrivalHandled == true,
         arrivalHandledBy = journey.arrivalHandledBy,
         arrivalHandledReason = journey.arrivalHandledReason,
+        arrivalAttempts = journey.arrivalAttempts,
+        arrivalFailedReason = journey.arrivalFailedReason,
+        handoffForced = journey.handoffForced == true,
+        handoffReason = journey.handoffReason,
+        liveRecoveryCount = journey.liveRecoveryCount,
+        liveEscalationCount = journey.liveEscalationCount,
+        watchdogFailures = journey.watchdogFailures,
+        failureReason = journey.failureReason,
     }
     if includeRoute ~= false then
         summary.route = {

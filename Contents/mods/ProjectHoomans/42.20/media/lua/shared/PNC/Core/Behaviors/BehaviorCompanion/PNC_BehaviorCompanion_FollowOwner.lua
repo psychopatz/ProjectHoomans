@@ -23,6 +23,25 @@ end
 function Internal.TickAbstractFollowOwner(record, now)
     local owner = Common.GetOwner(record)
     local runtime = record.runtime or {}
+    -- The durable follow order carries the owner identity even when the record
+    -- fields are missing (rehydrated saves, or a radio order issued while the
+    -- colonist was already abstract). Recover it before the owner lookup so a
+    -- bodyless follower never walks to its anchor while its player waits.
+    local orderSpec = record.orderSpec
+    if not owner and orderSpec
+        and tostring(orderSpec.kind or "")
+            == tostring(Const.ORDER_FOLLOW or "follow")
+    then
+        if record.ownerUsername == nil and orderSpec.ownerUsername ~= nil then
+            record.ownerUsername = orderSpec.ownerUsername
+        end
+        if record.ownerOnlineID == nil and orderSpec.ownerOnlineID ~= nil then
+            record.ownerOnlineID = orderSpec.ownerOnlineID
+        end
+        if record.ownerUsername ~= nil or record.ownerOnlineID ~= nil then
+            owner = Common.GetOwner(record)
+        end
+    end
     local state = Internal.GetFollowState(record)
     local beforeX = tonumber(record.x) or 0
     local beforeY = tonumber(record.y) or 0
@@ -107,6 +126,32 @@ function Internal.TickAbstractFollowOwner(record, now)
             catchupApplied = movementSpeed > (
                 tonumber(Const.ABSTRACT_TRAVEL_SPEED) or 0
             )
+        end
+        -- A teleport can leave the follower hundreds of tiles behind. The flat
+        -- catch-up cap would take minutes to close that, so past a long-range
+        -- separation close a bounded fraction of the remaining gap per tick.
+        -- The speed is derived from the tick's real elapsed time and stays
+        -- under a hard ceiling, so the follower converges without overshooting.
+        local longRangeDistance = tonumber(
+            Const.ABSTRACT_FOLLOW_LONG_RANGE_DISTANCE) or 64
+        if distanceBefore > longRangeDistance then
+            local elapsedSeconds = math.max(
+                0.001,
+                (tonumber(runtime.abstractStepElapsedMs)
+                    or tonumber(Const.TICK_ABSTRACT_MS) or 3000) / 1000
+            )
+            local closeFraction = tonumber(
+                Const.ABSTRACT_FOLLOW_LONG_RANGE_CLOSE) or 0.35
+            local longRangeCap = tonumber(
+                Const.ABSTRACT_FOLLOW_LONG_RANGE_SPEED) or 80
+            movementSpeed = math.max(
+                movementSpeed,
+                math.min(
+                    (distanceBefore * closeFraction) / elapsedSeconds,
+                    longRangeCap
+                )
+            )
+            catchupApplied = true
         end
     end
     if distanceBefore <= stopDistance and beforeZ == targetZ then

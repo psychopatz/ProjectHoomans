@@ -155,6 +155,11 @@ local function summary(record, player, options)
             and PNC.Core.DeepCopy(record.runtime.facilityDebugWork) or nil,
         order=PNC.Core.DeepCopy(order),
         followingCurrentPlayer=followingCurrentPlayer == true,
+        -- The colonist UI cannot inspect record.equipment, so radio gear is
+        -- published here for the command buttons that depend on it.
+        radioGear=PNC.Equipment and PNC.Equipment.RadioGear
+            and PNC.Equipment.RadioGear.Describe
+            and PNC.Equipment.RadioGear.Describe(record) or nil,
         priorityType=priorityType, priority=priority,
         location={x=record.x,y=record.y,z=record.z} }
 end

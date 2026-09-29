@@ -12,6 +12,9 @@ local Const = PNC.Const
 local Core = PNC.Core
 
 Arrivals.Handlers = Arrivals.Handlers or {}
+-- Action types whose failure must never fall back to the default handler. The
+-- owning domain registers its type here next to its handler.
+Arrivals.StrictActionTypes = Arrivals.StrictActionTypes or {}
 
 local function copySerializable(value, depth, budget)
     local valueType = type(value)
@@ -195,9 +198,13 @@ function Arrivals.Dispatch(record, journey, reason)
     )
     if not ok or handled == false then
         journey.arrivalHandled = false
+        -- A strict action type owns its own failure. Substituting the default
+        -- handler would hide it behind an unrelated order.
         if requestedType ~= (
             Const.TRAVEL_DEFAULT_ARRIVAL_ACTION or "roam"
-        ) then
+        ) and not (Arrivals.StrictActionTypes
+            and Arrivals.StrictActionTypes[requestedType] == true)
+        then
             actionType = tostring(
                 Const.TRAVEL_DEFAULT_ARRIVAL_ACTION or "roam"
             )
@@ -216,17 +223,25 @@ function Arrivals.Dispatch(record, journey, reason)
     end
     if not ok or handled == false then
         journey.arrivalHandled = false
+        journey.arrivalAttempts = (tonumber(journey.arrivalAttempts) or 0) + 1
+        journey.arrivalFailedReason = tostring(
+            reason or "arrival_handler_failed"
+        )
+        journey.arrivalRetryAt = Core.Now()
+            + (tonumber(Const.TRAVEL_ARRIVAL_RETRY_MS) or 5000)
         if Core and Core.LogWarn then
             Core.LogWarn(
                 "PNC arrival action failed npc="
                     .. tostring(record.id)
                     .. " type="
                     .. tostring(requestedType)
+                    .. " attempt="
+                    .. tostring(journey.arrivalAttempts)
                     .. " error="
                     .. tostring(reason)
             )
         end
-        return false, tostring(reason or "arrival_handler_failed")
+        return false, journey.arrivalFailedReason
     end
 
     journey.arrivalHandledBy = actionType

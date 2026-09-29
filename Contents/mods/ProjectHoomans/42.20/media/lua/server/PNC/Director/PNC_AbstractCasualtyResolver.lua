@@ -22,11 +22,29 @@ local function exposure(record)
     return (tonumber(roles[role]) or 0.35) * 0.65 + (1 - condition(record)) * 0.35
 end
 
+-- Some factions model a roaming service rather than a warband. Losing their
+-- members to an offscreen dice roll removes the only trade access a region has,
+-- so the faction can declare its members resilient to abstract death. The flag
+-- lives on the faction tags, which persist without a record schema change, and
+-- is read lazily so load order does not matter.
+local function abstractDeathImmune(record)
+    local affiliation = record and record.affiliation or nil
+    local factionID = affiliation and affiliation.factionID or nil
+    local factions = PNC.Factions
+    local faction = factionID and factions and factions.Get
+        and factions.Get(factionID) or nil
+    return type(faction) == "table"
+        and type(faction.tags) == "table"
+        and faction.tags.abstractDeathImmune == true
+end
+
 local function candidates(group, seed)
     local output = {}
     for _, npcID in ipairs(group.memberIds or {}) do
         local record = PNC.Registry and PNC.Registry.Get(npcID) or nil
-        if record and record.alive ~= false then
+        if record and record.alive ~= false
+            and not abstractDeathImmune(record)
+        then
             output[#output + 1] = { record = record, exposure = exposure(record),
                 tie = PNC.AbstractScavengeResolver.Hash(tostring(seed) .. ":" .. npcID) }
         end
@@ -65,6 +83,7 @@ local function injure(record, severity, attackerID, seed)
 end
 
 local function kill(record)
+    if abstractDeathImmune(record) then return false end
     record.runtime = type(record.runtime) == "table" and record.runtime or {}
     if PNC.Health and PNC.Health.Kill then
         return PNC.Health.Kill(record, nil, "abstract_combat")
@@ -96,7 +115,9 @@ function Casualties.KillMembers(group, npcIDs, reason)
     for _, npcID in ipairs(group and group.memberIds or {}) do
         local record = requested[tostring(npcID)]
             and PNC.Registry and PNC.Registry.Get(npcID) or nil
-        if record and record.alive ~= false then
+        if record and record.alive ~= false
+            and not abstractDeathImmune(record)
+        then
             kill(record)
             deaths[#deaths + 1] = npcID
             Store.Emit("ABSTRACT_MEMBER_KILLED", {

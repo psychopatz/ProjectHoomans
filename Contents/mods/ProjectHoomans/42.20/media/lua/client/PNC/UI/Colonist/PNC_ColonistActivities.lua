@@ -12,6 +12,21 @@ local Layout = UI.Layout
 
 local DEFINITIONS = {
     {
+        -- Single control for the two movement orders a player issues constantly.
+        -- It reads the colonist's follow state and offers the opposite order, so
+        -- recalling someone from the base is one click instead of a menu hunt.
+        id = "radio_follow_toggle",
+        toggle = true,
+        followCommandID = "follow",
+        homeCommandID = "return_home",
+        offTitleKey = "UI_PNC_CommandFollow",
+        offTitleFallback = "FOLLOW ME",
+        offVariant = "primary",
+        onTitleKey = "UI_PNC_CommandReturnHome",
+        onTitleFallback = "GO HOME",
+        onVariant = "selected",
+    },
+    {
         id = "manual_eat",
         capabilities = { "survival.eat.inventory", "food.dine" },
         key = "UI_PNC_CommandEat",
@@ -55,6 +70,174 @@ local BY_ID = {}
 for _, definition in ipairs(DEFINITIONS) do
     BY_ID[definition.id] = definition
 end
+
+local TOGGLE = BY_ID.radio_follow_toggle
+
+local function livePlayer()
+    return getSpecificPlayer and getSpecificPlayer(0) or nil
+end
+
+-- Mirrors the authority's radio verdict by reusing the same device check the
+-- radio UI and discovery broadcasts already depend on.
+local function playerRadioActive()
+    local deviceState = PsychopatzCore and PsychopatzCore.RadioDeviceState or nil
+    local player = livePlayer()
+    if not deviceState or type(deviceState.FindActivePlayerDevice) ~= "function"
+        or not player
+    then
+        return false
+    end
+    local ok, device = pcall(deviceState.FindActivePlayerDevice, player)
+    return ok and device ~= nil
+end
+
+-- A colonist is only "commandable in person" while materialized and standing
+-- within the companion command radius on the same floor, which is exactly what
+-- Commands.CanPlayerCommand enforces server-side.
+local function reachableDirectly(person)
+    local player = livePlayer()
+    local location = person and person.location or nil
+    local live = tostring(PNC.Const and PNC.Const.PRESENCE_LIVE or "live")
+    local x, y, z, distanceSq, radius
+    if not player or not location then return false end
+    if tostring(person.presenceState or "") ~= live then return false end
+    x, y, z = tonumber(location.x), tonumber(location.y), tonumber(location.z)
+    if not x or not y or not z then return false end
+    if math.floor(tonumber(player:getZ()) or 0) ~= math.floor(z) then
+        return false
+    end
+    if not (PNC.Core and type(PNC.Core.DistanceSq) == "function") then
+        return false
+    end
+    distanceSq = PNC.Core.DistanceSq(player:getX(), player:getY(), x, y)
+    radius = tonumber(PNC.Const and PNC.Const.COMPANION_COMMAND_RADIUS) or 20
+    return distanceSq <= radius * radius
+end
+
+local function relayEligible(commandID)
+    local registry = PNC.CompanionCommands
+    local definition = registry and registry.Get
+        and registry.Get(commandID) or nil
+    return definition ~= nil and definition.radioRelay == true
+end
+
+-- Sending a colonist home is only meaningful after the player has created a
+-- base by claiming its territory: that claim is what gives the authority a
+-- home point to travel to. Read the same base snapshot the Command Hub and the
+-- Base window gate on, so the colonist bar cannot offer an order the server
+-- will reject with "no base".
+local function playerHasBase()
+    local client = PNC.ColonyManagementClient
+    local snapshot
+    if client and type(client.ReadBaseSnapshot) == "function" then
+        local update = client.ReadBaseSnapshot()
+        snapshot = type(update) == "table" and update.snapshot or nil
+    end
+    if type(snapshot) ~= "table" then
+        local state = PNC.Network and PNC.Network.ClientState or nil
+        snapshot = state
+            and (state.colonyBase or state.colonyManagement) or nil
+    end
+    return type(snapshot) == "table"
+        and type(snapshot.settlement) == "table"
+end
+
+local function toggleCommandID(person)
+    return person and person.followingCurrentPlayer == true
+        and TOGGLE.homeCommandID or TOGGLE.followCommandID
+end
+
+TOGGLE.resolveCommandID = toggleCommandID
+
+-- One verdict shared with the server: the relay gate owns the rules, this
+-- function only gathers the facts a client snapshot can answer.
+local function toggleFacts(person, commandID)
+    return {
+        companion = person ~= nil,
+        -- The colony roster only ever lists records this player owns.
+        owned = person ~= nil,
+        dead = person ~= nil and person.alive == false,
+        reachableDirectly = reachableDirectly(person),
+        relayAllowed = relayEligible(commandID),
+        playerRadio = playerRadioActive(),
+        npcRadio = person ~= nil and person.radioGear ~= nil
+            and person.radioGear.equipped == true or false,
+    }
+end
+
+local function togglePresentation(person, definition)
+    local gate = PNC.CommandRelayGate
+    local commandID = definition.resolveCommandID(person)
+    local following = person ~= nil
+        and person.followingCurrentPlayer == true
+    local state = { toggleState = following }
+    local function actionTitle(follows)
+        return follows
+            and Shared.Tr(definition.onTitleKey, definition.onTitleFallback)
+            or Shared.Tr(definition.offTitleKey, definition.offTitleFallback)
+    end
+    local function actionVariant(follows)
+        return follows and definition.onVariant or definition.offVariant
+    end
+    -- The title and variant are always computed so the panel renders correctly
+    -- even when the core toggle control is unavailable; the control's own state
+    -- setter simply re-applies the same pair.
+    state.title = actionTitle(following)
+    state.variant = actionVariant(following)
+    if not person then
+        state.enabled = false
+        state.reason = "no_colonist_selected"
+        state.tooltip = Shared.Tr("UI_PNC_Activities_SelectHelp",
+            "Choose a colonist to command their next personal activity.")
+        return state
+    end
+    local help = following
+        and Shared.Tr("UI_PNC_RadioRelay_GoHomeHelp",
+            "Send this colonist home and end their errands.")
+        or Shared.Tr("UI_PNC_RadioRelay_FollowHelp",
+            "Call this colonist to follow you.")
+    -- Go Home is base-anchored, so it stays disabled until the player has
+    -- claimed a base territory. The follow face of the same toggle never needs
+    -- a base and is judged by the relay gate alone.
+    if commandID == TOGGLE.homeCommandID and not playerHasBase() then
+        state.enabled = false
+        state.reason = "base_required"
+        state.tooltip = help .. "\n" .. Shared.Tr(
+            "UI_PNC_CommandHub_Disabled_NoBase", "Requires a colony base.")
+        return state
+    end
+    local allowed
+    local reason
+    local detail
+    if not gate or type(gate.Evaluate) ~= "function" then
+        state.enabled = false
+        state.reason = "relay_gate_unavailable"
+        state.tooltip = help
+        return state
+    end
+    allowed, reason = gate.Evaluate(toggleFacts(person, commandID))
+    if allowed ~= true then
+        local line = gate.Reason(reason)
+        detail = line and Shared.Tr(line.key, line.fallback) or nil
+        state.enabled = false
+        state.reason = reason
+        state.tooltip = detail and (help .. "\n" .. detail) or help
+        return state
+    end
+    if reason == gate.RELAY then
+        detail = Shared.Tr("UI_PNC_RadioRelay_HelpRelay",
+            "Radio relay: you and this colonist both hold a live walkie-talkie.")
+    else
+        detail = Shared.Tr("UI_PNC_RadioRelay_HelpDirect",
+            "Within earshot: the order is given in person.")
+    end
+    state.enabled = true
+    state.reason = reason
+    state.tooltip = help .. "\n" .. detail
+    return state
+end
+
+TOGGLE.presentation = togglePresentation
 
 local function activityInfo(person)
     return person and person.actionInformation or nil
@@ -158,19 +341,60 @@ local function syncControls(window, component)
     local person = Selector.GetSelected(window.people)
     for _, definition in ipairs(DEFINITIONS) do
         local button = component.controls[definition.id]
-        local isActive = active(definition, person)
-        local title = Shared.Tr(definition.key, definition.fallback)
-        if definition.id == "manual_sleep" then
-            title = title .. ": " .. Shared.Tr(
-                isActive and "UI_PNC_MonitorOn" or "UI_PNC_MonitorOff",
-                isActive and "ON" or "OFF")
-        elseif isActive then
-            title = title .. " (" .. Shared.Tr(
-                "UI_PNC_MonitorActive", "active") .. ")"
+        local state
+        if definition.presentation then
+            state = definition.presentation(person, definition)
+        else
+            local isActive = active(definition, person)
+            local title = Shared.Tr(definition.key, definition.fallback)
+            if definition.id == "manual_sleep" then
+                title = title .. ": " .. Shared.Tr(
+                    isActive and "UI_PNC_MonitorOn" or "UI_PNC_MonitorOff",
+                    isActive and "ON" or "OFF")
+            elseif isActive then
+                title = title .. " (" .. Shared.Tr(
+                    "UI_PNC_MonitorActive", "active") .. ")"
+            end
+            state = {
+                title = title,
+                enabled = person ~= nil and person.alive ~= false,
+                variant = isActive and "selected" or "default",
+            }
         end
-        if button.setTitle then button:setTitle(title) else button.title = title end
-        button:setEnable(person ~= nil and person.alive ~= false)
-        UI.SetButtonVariant(button, isActive and "selected" or "default")
+        -- setEnable snapshots the enabled colours, so it has to run before any
+        -- variant restyle; otherwise ISButton restores stale colours on the next
+        -- enable and the button keeps looking disabled.
+        button:setEnable(state.enabled == true)
+        if definition.toggle and type(button.setToggleState) == "function" then
+            -- The core toggle control owns the label swap and each state's
+            -- variant; the panel only feeds it the current state. Labels are
+            -- re-resolved here so a language change reaches the button too.
+            if type(button.setToggleLabels) == "function" then
+                button:setToggleLabels(
+                    Shared.Tr(definition.offTitleKey,
+                        definition.offTitleFallback),
+                    Shared.Tr(definition.onTitleKey,
+                        definition.onTitleFallback))
+            end
+            button:setToggleState(state.toggleState == true)
+        else
+            if button.setTitle then
+                button:setTitle(state.title)
+            else
+                button.title = state.title
+            end
+            UI.SetButtonVariant(button, state.variant or "default")
+        end
+        -- A disabled toggle always reads as unavailable, whichever variant its
+        -- own state setter just applied.
+        if definition.toggle and state.enabled ~= true then
+            UI.SetButtonVariant(button, "quiet")
+        end
+        if button.setTooltip then
+            button:setTooltip(state.tooltip)
+        else
+            button.tooltip = state.tooltip
+        end
     end
 end
 
@@ -217,15 +441,33 @@ function Activities.Create(window, _)
             0, 0, panel:getWidth())
     end
     for _, definition in ipairs(DEFINITIONS) do
-        local button = UI.CreateButton(pane, {
-            id = definition.id,
-            title = Shared.Tr(definition.key, definition.fallback),
-            target = window,
-            onclick = UI.ButtonCallback(function(control)
-                return window:onColonistControl(control)
-            end),
-            variant = "default",
-        })
+        local onclick = UI.ButtonCallback(function(control)
+            return window:onColonistControl(control)
+        end)
+        local button
+        if definition.toggle and type(UI.CreateToggleButton) == "function" then
+            -- Core's reusable toggle control owns the two-state label and
+            -- variant swap; the panel only feeds it state from syncControls.
+            button = UI.CreateToggleButton(pane, {
+                id = definition.id,
+                offTitle = Shared.Tr(definition.offTitleKey,
+                    definition.offTitleFallback),
+                onTitle = Shared.Tr(definition.onTitleKey,
+                    definition.onTitleFallback),
+                offVariant = definition.offVariant,
+                onVariant = definition.onVariant,
+                target = window,
+                onclick = onclick,
+            })
+        else
+            button = UI.CreateButton(pane, {
+                id = definition.id,
+                title = Shared.Tr(definition.key, definition.fallback),
+                target = window,
+                onclick = onclick,
+                variant = "default",
+            })
+        end
         button.activityCommandID = definition.id
         component.controls[definition.id] = button
         component.controlList[#component.controlList + 1] = button
@@ -322,22 +564,39 @@ function Activities.OnControl(window, button)
     local commandID = button and (button.activityCommandID or button.internal)
     local definition = BY_ID[tostring(commandID or "")]
     if not person or not definition or person.alive == false then return false end
+    -- A toggle resolves the order it means to issue from the colonist's current
+    -- state, so the same control can both call a colonist and send one home.
+    local targetCommandID = definition.resolveCommandID
+        and definition.resolveCommandID(person) or definition.id
+    if definition.presentation then
+        local state = definition.presentation(person, definition)
+        if not state or state.enabled ~= true then
+            -- The button is disabled in this state; keep the reason visible in
+            -- the activity status rows instead of failing silently.
+            local client = PNC.Client
+            if client and client.RecordManualActivityDiagnostic then
+                client.RecordManualActivityDiagnostic(person.id, targetCommandID,
+                    false, state and state.reason or "command_unavailable")
+            end
+            return false
+        end
+    end
     local client = PNC.Client
     local execute = client and client.ExecuteCompanionCommand or nil
     if not execute then return false end
     local requestID = PNC.Core and PNC.Core.GenerateID
         and PNC.Core.GenerateID("colonist_activity")
-        or tostring(person.id) .. ":" .. tostring(definition.id)
-    local sent, reason = execute(definition.id, person.id, nil, {
+        or tostring(person.id) .. ":" .. tostring(targetCommandID)
+    local sent, reason = execute(targetCommandID, person.id, nil, {
         source = "colonist_activities",
         requestID = requestID,
     })
     if client.RecordManualActivityDiagnostic then
-        client.RecordManualActivityDiagnostic(person.id, definition.id,
+        client.RecordManualActivityDiagnostic(person.id, targetCommandID,
             sent == true, reason, requestID)
     end
     if window.requestSnapshot then
-        window:requestSnapshot("colonist_activity_" .. definition.id)
+        window:requestSnapshot("colonist_activity_" .. targetCommandID)
     end
     return sent == true
 end

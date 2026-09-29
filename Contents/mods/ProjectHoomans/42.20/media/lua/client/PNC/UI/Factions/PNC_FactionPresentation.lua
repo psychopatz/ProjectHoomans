@@ -32,8 +32,22 @@ function FactionPresentation.Resolve(targetOrEntry)
     local Identity = PNC.NPCIdentityPresentation
 
     local name = Identity and Identity.GetName and Identity.GetName(entry) or nil
-    if not name and context then
+    -- `GetName` never returns nil: an identity fact without a usable value comes
+    -- back as the placeholder. Treat that as unknown so the conversation context's
+    -- already-resolved name can win, instead of painting a plate that reads
+    -- "UNKNOWN SURVIVOR" over a name the player has actually been told.
+    if name and Identity and Identity.IsPlaceholderName
+        and Identity.IsPlaceholderName(tostring(name))
+    then
+        name = nil
+    end
+    if (not name or name == "") and context then
         name = sanitizeString(context.npcName)
+        if name and Identity and Identity.IsPlaceholderName
+            and Identity.IsPlaceholderName(name)
+        then
+            name = nil
+        end
     end
 
     local isNameKnown = false

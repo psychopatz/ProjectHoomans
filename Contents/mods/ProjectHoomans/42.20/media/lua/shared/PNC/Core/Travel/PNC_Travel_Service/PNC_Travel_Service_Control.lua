@@ -54,10 +54,23 @@ function Service.Start(recordOrID, request)
     -- clear that old owner before publishing the new durable travel order.
     resetMovementForTravel(record, "travel_started")
     record.travel = journey
-    record.orderSpec = {
+    local travelOrder = {
         kind = Const.ORDER_TRAVEL or "travel",
         journeyId = journey.journeyId,
     }
+    -- Publishing through the order system revokes a blocking facility scene.
+    -- It is only safe once the travel normalizer is registered: an early start
+    -- would otherwise normalize the journey order into a generic fallback.
+    if PNC.OrderSystem and PNC.OrderSystem.SetOrder
+        and PNC.OrderSystem.Normalizers
+        and PNC.OrderSystem.Normalizers[
+            tostring(Const.ORDER_TRAVEL or "travel")
+        ]
+    then
+        PNC.OrderSystem.SetOrder(record, travelOrder)
+    else
+        record.orderSpec = travelOrder
+    end
     record.runtime = record.runtime or {}
     record.runtime.target = nil
     record.runtime.forcePresenceCheck = true

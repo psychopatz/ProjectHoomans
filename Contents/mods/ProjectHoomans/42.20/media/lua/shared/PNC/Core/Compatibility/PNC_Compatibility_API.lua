@@ -13,6 +13,38 @@ local API = PNC.Compatibility.API
 API.VERSION = 1
 API.Adapters = API.Adapters or {}
 
+-- Optional companion mods declare themselves, and Hoomans then keeps a
+-- dependent conversation category or UI entry visible but disabled instead of
+-- silently hiding it. The answer is cached because the menu is rebuilt while the
+-- player hovers, and an activated mod list cannot change during a session.
+function PNC.Compatibility.HasMod(modID)
+    modID = type(modID) == "string" and modID or ""
+    if modID == "" then return true end
+    local cache = PNC.Compatibility.ModCache
+    if not cache then
+        cache = {}
+        PNC.Compatibility.ModCache = cache
+    end
+    if cache[modID] ~= nil then return cache[modID] end
+
+    local info = getModInfoByID and getModInfoByID(modID) or nil
+    local loaded = false
+    if info then
+        local isAvailable = info.isAvailable
+        loaded = type(isAvailable) ~= "function"
+            or isAvailable(info) ~= false
+    end
+    if not loaded and getActivatedMods then
+        local mods = getActivatedMods()
+        local contains = mods and mods.contains
+        if type(contains) == "function" then
+            loaded = contains(mods, modID) == true
+        end
+    end
+    cache[modID] = loaded
+    return loaded
+end
+
 local function adapterID(value)
     if value == nil then return nil end
     local id = tostring(value)

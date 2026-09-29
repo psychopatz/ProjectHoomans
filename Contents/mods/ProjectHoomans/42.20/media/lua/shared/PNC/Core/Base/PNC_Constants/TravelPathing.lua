@@ -8,6 +8,12 @@ Const.ABSTRACT_TRAVEL_SPEED = 1.6666667
 -- Long-range abstract followers may catch up faster, while keeping their
 -- three-second decision cadence and a hard movement-speed ceiling.
 Const.ABSTRACT_FOLLOW_CATCHUP_SPEED = 5.0
+-- A player teleport can strand an abstract follower far beyond ordinary
+-- separation. Past this distance the follower closes a bounded fraction of
+-- the remaining gap each tick, up to this hard speed ceiling (tiles/second).
+Const.ABSTRACT_FOLLOW_LONG_RANGE_DISTANCE = 64
+Const.ABSTRACT_FOLLOW_LONG_RANGE_CLOSE = 0.35
+Const.ABSTRACT_FOLLOW_LONG_RANGE_SPEED = 80
 Const.TRAVEL_SCHEMA_VERSION = 2
 Const.TRAVEL_API_VERSION = 2
 Const.TRAVEL_DEFAULT_ARRIVAL_ACTION = "roam"
@@ -25,6 +31,28 @@ Const.TRAVEL_POSITION_REFRESH_MS = 250
 -- without producing a planner error.
 Const.TRAVEL_LIVE_PROGRESS_TIMEOUT_MS = 12000
 Const.TRAVEL_LIVE_RECOVERY_COOLDOWN_MS = 5000
+-- A live journey with this much route left cannot be served by embodied
+-- locomotion: the engine pather needs loaded ground along the whole route, and
+-- fake locomotion refuses unloaded, solid and occupied squares. Such a journey
+-- hands off to the elapsed-time abstract lane instead of stalling forever at
+-- the streamed edge of the world.
+Const.TRAVEL_LIVE_MAX_DISTANCE = 64
+-- Escalation ladder for a live journey whose movement lane keeps stalling.
+Const.TRAVEL_LIVE_MAX_RECOVERIES = 3
+Const.TRAVEL_LIVE_MAX_ESCALATIONS = 2
+Const.TRAVEL_LIVE_ESCALATION_COOLDOWN_MS = 15000
+-- A live journey that keeps no lane progress for this long has lost its owner
+-- (order replaced, movement lane vanished) and is escalated by the watchdog.
+Const.TRAVEL_JOURNEY_STALL_TIMEOUT_MS = 45000
+Const.TRAVEL_JOURNEY_WATCHDOG_INTERVAL_MS = 5000
+Const.TRAVEL_JOURNEY_WATCHDOG_MAX_PER_PASS = 8
+Const.TRAVEL_JOURNEY_WATCHDOG_MAX_FAILURES = 2
+-- Bounded arrival redispatch: a failed arrival action must not run again on
+-- every projection tick.
+Const.TRAVEL_ARRIVAL_MAX_ATTEMPTS = 3
+Const.TRAVEL_ARRIVAL_RETRY_MS = 5000
+-- A failed home journey is retried by the home duty after this cooldown.
+Const.TRAVEL_HOME_RETRY_COOLDOWN_MS = 60000
 Const.TRAVEL_MAP_LABEL_MIN_ZOOM = 10
 Const.LIVE_TRAVEL_STEALTH_NEAR_RADIUS = 7
 Const.LIVE_TRAVEL_STEALTH_HORDE_RADIUS = 12

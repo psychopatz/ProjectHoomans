@@ -31,6 +31,13 @@ function Equipment.Apply(zombie, record)
         laneOk, reasons[#reasons + 1] =
             Equipment.ApplyReplicaHands(zombie, record)
         if not laneOk then ok = false end
+        -- Radio gear is additive and never clears the attachment map, so the
+        -- server body can carry it without disturbing holstered weapons. A
+        -- failure is contained here: the radio command gate reads the record's
+        -- equipment data, not the body, so presentation can never break it.
+        if Equipment.RadioGear and Equipment.RadioGear.ApplyToBody then
+            Equipment.RadioGear.ApplyToBody(zombie, equipment)
+        end
         Visuals.RefreshModel(zombie)
         return ok, table.concat(reasons, "|")
     end

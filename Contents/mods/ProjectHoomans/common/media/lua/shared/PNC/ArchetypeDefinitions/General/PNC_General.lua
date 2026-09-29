@@ -52,6 +52,10 @@ local bundle = {
     loadout = {
         bagChoices = { "Base.Bag_Schoolbag", "Base.Bag_DuffelBag" },
         supplies = {
+            -- Belt radio. attachedSlot is an attachment location, so the item is
+            -- never bagged or duplicated: it becomes the colonist's equipped
+            -- radio and is what allows radio-relayed orders (see RadioGear).
+            { key = "general_radio", type = "Base.WalkieTalkie2", stack = 1, attachedSlot = "Walkie Belt Right" },
             { key = "general_bandage", type = "Base.Bandage", stack = 2, preferredContainer = "bag" },
             { key = "general_water", type = "Base.WaterBottle", stack = 1, preferredContainer = "bag" },
             { key = "general_crisps", type = "Base.Crisps", stack = 1, preferredContainer = "bag" },

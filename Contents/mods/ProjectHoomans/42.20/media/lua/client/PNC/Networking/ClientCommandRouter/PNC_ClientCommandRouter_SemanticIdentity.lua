@@ -29,6 +29,44 @@ local function auditIdentityResult(args)
     }, { requestID = args.requestID })
 end
 
+-- A confirmed identity exchange must reach `ClientState.npcKnowledge` or the
+-- world nameplate keeps hiding the NPC even though the portrait plate and the
+-- conversation log already show the learned name. The disclosure clock records
+-- when the claim was confirmed so the knowledge router can report how long the
+-- mirror took, or that it never arrived on this route.
+local function markIdentityDisclosurePending(npcID, disclosedName)
+    if npcID == "" then return false end
+    ClientState.identityDisclosurePending = ClientState.identityDisclosurePending
+        or {}
+    ClientState.identityDisclosurePending[npcID] = {
+        at = PNC.Core and PNC.Core.Now and PNC.Core.Now() or 0,
+        requestID = ClientState.semanticIdentityResults
+            and ClientState.semanticIdentityResults[npcID]
+            and ClientState.semanticIdentityResults[npcID].requestID or nil,
+        name = disclosedName,
+    }
+    return true
+end
+
+local function auditIdentityResultApplied(args, npcID, disclosedName)
+    if not Diagnostics
+        or type(Diagnostics.IsEnabled) ~= "function"
+        or Diagnostics.IsEnabled() ~= true
+    then
+        return false
+    end
+    local knowledge = ClientState.npcKnowledge and ClientState.npcKnowledge[npcID]
+    return Diagnostics.Record("semantic.identity.result_applied", {
+        requestID = args and args.requestID,
+        npcID = npcID,
+        disclosedName = disclosedName,
+        knowledgeMirrored = knowledge ~= nil,
+        presentationState = ClientState.npcPresentations
+            and ClientState.npcPresentations[npcID]
+            and ClientState.npcPresentations[npcID].state or nil,
+    }, { requestID = args and args.requestID })
+end
+
 local function activeViewFor(npcID)
     local semanticInput = PNC.Semantics
         and PNC.Semantics.DialogueInput or nil
@@ -82,7 +120,17 @@ Internal.RegisterServerCommand(Const.CMD_SEMANTIC_IDENTITY_RESULT,
                     and ClientState.playerContext.characterUUID or ""),
                 displayName = disclosedName,
             }
+            markIdentityDisclosurePending(npcID, disclosedName)
         end
+        -- The server ships the canonical identity projection with the accepted
+        -- result. Mirror it through the shared knowledge receiver so the world
+        -- nameplate learns the same fact the portrait plate already shows.
+        if identityDisclosureConfirmed and type(args.presentation) == "table"
+            and Internal.ApplyNPCPresentation
+        then
+            Internal.ApplyNPCPresentation(args.presentation)
+        end
+        auditIdentityResultApplied(args, npcID, disclosedName)
         if args.trustLabel then
             ClientState.identityTrust = ClientState.identityTrust or {}
             ClientState.identityTrust[npcID] = args.trustLabel

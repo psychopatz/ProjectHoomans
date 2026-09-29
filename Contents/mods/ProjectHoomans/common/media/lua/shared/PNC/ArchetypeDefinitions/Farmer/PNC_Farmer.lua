@@ -46,6 +46,8 @@ local bundle = {
     loadout = {
         bagChoices = { "Base.Bag_Satchel", "Base.Bag_DuffelBag" },
         supplies = {
+            -- Belt radio: colonist equipment required for radio-relayed orders.
+            { key = "farmer_radio", type = "Base.WalkieTalkie2", stack = 1, attachedSlot = "Walkie Belt Right" },
             { key = "farmer_bandage", type = "Base.Bandage", stack = 2, preferredContainer = "bag" },
             { key = "farmer_water", type = "Base.WaterBottle", stack = 1, preferredContainer = "bag" },
             { key = "farmer_cabbage", type = "Base.Cabbage", stack = 1, preferredContainer = "bag" },

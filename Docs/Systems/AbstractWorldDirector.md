@@ -223,6 +223,18 @@ Results distinguish victory, stalemate, withdrawal, and destruction and retain
 round pressure, effective values, morale changes, retreat checks, injuries,
 deaths, ammunition/medical use, winner, reason ended, and seed.
 
+### Factions resilient to abstract death
+
+A faction may declare `tags.abstractDeathImmune = true` on its record. The
+casualty resolver then skips its members when it builds the exposure pool, in
+`KillMembers`, and in `kill` itself, so no abstract path - combat rounds,
+requested kills, or mobile accidents - can remove them. The flag is read from
+the faction record, which already persists tags, so it needs no schema change
+and survives reload. It exists for factions that model a roaming service rather
+than a warband, such as a trading caravan, where an offscreen dice roll would
+otherwise delete a region's only trade access. Live combat is unaffected: this
+guards the abstract simulation only.
+
 ## Events
 
 The Abstract World Store's local event bus emits action start/completion/

@@ -12,6 +12,8 @@ if not (PNC.Semantics and PNC.Semantics.IdentityExchange) then
 end
 
 local Commands = PNC.PlayerKnowledgeCommands
+local H = Commands.Internal or {}
+Commands.Internal = H
 local Identity = PNC.Semantics.IdentityExchange
 local IdentityAdmission = require
     "PNC/Knowledge/PlayerKnowledgeCommands/PNC_PlayerKnowledgeCommands_IdentityAdmission"
@@ -120,6 +122,16 @@ function Commands.HandleSemanticIdentity(player, args)
             )
     end
 
+    -- IdentityProjection reads the disclosure before the following knowledge
+    -- snapshot arrives. Ship the canonical projection with the authoritative
+    -- result so the client can mirror `identity.name` immediately.
+    local presentation
+    if kind == Identity.EVENT_CLAIM
+        and type(H.PresentationFor) == "function"
+    then
+        presentation = H.PresentationFor(player, npcID, requestID)
+    end
+
     local payload = IdentityResult.BuildAccepted({
         requestID = requestID,
         npcID = npcID,
@@ -130,6 +142,7 @@ function Commands.HandleSemanticIdentity(player, args)
         responseText = responseText,
         responseKey = responseKey,
         responseArgs = responseArgs,
+        presentation = presentation,
         relationship = summary,
         relationshipBefore = before,
         relationshipDelta = delta,

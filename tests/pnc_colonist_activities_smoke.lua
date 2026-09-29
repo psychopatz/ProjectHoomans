@@ -240,6 +240,47 @@ T.truthy(diagnosticRow,
 T.equal(diagnosticRow.detail, "manual_refill = WATER_CONTAINER_FULL",
     "activities tab hides the precise refill rejection reason")
 
+-- Go Home is base-anchored: the colonist bar must mirror the authority's
+-- "no base, no home point" rule instead of offering an order that the server
+-- would reject. Follow Me keeps working without a base.
+local baseUpdate = { snapshot = { settlement = { id = "base_1" } } }
+PNC.ColonyManagementClient = {
+    ReadBaseSnapshot = function() return baseUpdate end,
+}
+PNC.CommandRelayGate = {
+    DIRECT = "direct",
+    RELAY = "radio_relay",
+    Evaluate = function() return true, "direct" end,
+    Reason = function() return nil end,
+}
+local toggle = activities.controls.radio_follow_toggle
+T.truthy(toggle, "colonist bar does not expose the follow/home toggle")
+
+person.followingCurrentPlayer = true
+baseUpdate.snapshot.settlement = nil
+Activities.Apply(window, true, UI.Layout, activities)
+T.falsy(toggle.enabled, "go home is enabled without a base territory")
+T.equal(variants[toggle.internal], "quiet",
+    "disabled go home does not read as unavailable")
+
+local dispatched = Activities.OnControl(window, {
+    internal = "radio_follow_toggle",
+    activityCommandID = "radio_follow_toggle",
+})
+T.falsy(dispatched, "go home dispatched without a base territory")
+T.equal(diagnostics[#diagnostics].commandID, "return_home",
+    "disabled go home is diagnosed against the wrong command")
+T.equal(diagnostics[#diagnostics].reason, "base_required",
+    "go home does not report the missing base territory")
+
+baseUpdate.snapshot.settlement = { id = "base_1" }
+Activities.Apply(window, true, UI.Layout, activities)
+T.truthy(toggle.enabled, "go home stays disabled after the base is claimed")
+
+person.followingCurrentPlayer = nil
+Activities.Apply(window, true, UI.Layout, activities)
+T.truthy(toggle.enabled, "follow me is gated by the base territory")
+
 local Registry = T.load(
     "ProjectHoomans", "client", "PNC/UI/Colonist/PNC_ColonistRegistry.lua")
 T.load("ProjectHoomans", "client", "PNC/UI/Colonist/PNC_ColonistTabs.lua")

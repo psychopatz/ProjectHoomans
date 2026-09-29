@@ -79,6 +79,38 @@ local function projectionIsCurrent(payload)
     return true
 end
 
+-- A confirmed semantic identity exchange is mirrored into `npcKnowledge` by a
+-- later knowledge payload (the semantic route itself carries no snapshot). This
+-- records how long that mirror took so the latency is observable instead of
+-- guessed, and clears the pending marker so a missing mirror stays visible.
+local function auditIdentityKnowledgeMirror(npcID, snapshot)
+    local pending = ClientState.identityDisclosurePending
+        and ClientState.identityDisclosurePending[npcID] or nil
+    if not pending then return false end
+    ClientState.identityDisclosurePending[npcID] = nil
+    local at = Core.Now and Core.Now() or 0
+    local elapsed = at - (tonumber(pending.at) or at)
+    if PNC.Semantics and PNC.Semantics.SemanticDiagnostics
+        and type(PNC.Semantics.SemanticDiagnostics.Record) == "function"
+    then
+        PNC.Semantics.SemanticDiagnostics.Record(
+            "semantic.knowledge.identity_mirrored",
+            {
+                requestID = pending.requestID,
+                npcID = npcID,
+                disclosedName = pending.name,
+                mirroredName = tostring(
+                    (snapshot and snapshot.identity
+                        and snapshot.identity.displayName) or ""
+                ),
+                elapsedMs = elapsed,
+            },
+            { requestID = pending.requestID }
+        )
+    end
+    return true
+end
+
 -- Multiplayer replies and direct in-process calls share this cache receiver.
 function Internal.ApplyNPCKnowledgeSnapshot(snapshot, reason)
     queueSnapshotMemoryPrimitives(snapshot)
@@ -100,6 +132,7 @@ function Internal.ApplyNPCKnowledgeSnapshot(snapshot, reason)
         end
         local nameFact = identityNameFact(snapshot)
         if nameFact then
+            auditIdentityKnowledgeMirror(npcID, snapshot)
             ClientState.npcPresentations = ClientState.npcPresentations or {}
             local presentation = ClientState.npcPresentations[npcID] or {}
             presentation.npcID = npcID

@@ -52,6 +52,15 @@ function Director.GenerateForFaction(factionID, spec)
     )
     if not site then return false, siteReason end
     local count = H.GroupSize(spec.groupSize)
+    -- An optional per-group role sequence (validated against the archetype) so a
+    -- caller can generate a group that is not the archetype's default roster,
+    -- for example a trading caravan that roams without its faction leader.
+    local roleOrder
+    if spec.roleOrder ~= nil then
+        local roleReason
+        roleOrder, roleReason = H.ValidRoleOrder(faction, spec.roleOrder)
+        if not roleOrder then return false, roleReason end
+    end
     local requestedPresence = H.PresenceMode(spec.presenceMode)
     local siteLoaded = Resolver.IsSiteLoaded(site)
     local requestLive = requestedPresence == "live"
@@ -119,7 +128,7 @@ function Director.GenerateForFaction(factionID, spec)
                 and "both" or nil,
             factionID = faction.id,
             membershipStatus = "member",
-            factionRole = H.FactionRole(faction, index),
+            factionRole = H.FactionRole(faction, index, roleOrder),
             factionJoinedAt = at,
             debug = spec.debug == true,
             generation = spec.generation,
@@ -199,7 +208,13 @@ function Director.GenerateForFaction(factionID, spec)
         rollbackCreated(reason or "mobile_group_commit_failed")
         return false, reason
     end
-    if not faction.leaderNPCID and created[1] then
+    -- `spec.assignLeader == false` keeps the group leaderless: a trading
+    -- caravan is led from its faction's base, so the roaming members must not
+    -- silently become the faction leader.
+    if spec.assignLeader ~= false
+        and not faction.leaderNPCID
+        and created[1]
+    then
         Factions.SetLeader(faction.id, created[1].id, at)
     end
     if PNC.AbstractGroups and PNC.AbstractGroups.ImportMobileFaction then

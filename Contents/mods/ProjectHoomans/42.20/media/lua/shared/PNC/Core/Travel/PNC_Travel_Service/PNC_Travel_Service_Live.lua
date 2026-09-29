@@ -4,6 +4,63 @@ local Projection = PNC.Travel.Projection
 local Const = PNC.Const or {}
 local Core = PNC.Core
 
+-- Live progress bookkeeping is per live stint. It must not leak across a
+-- presence flip (a fresh body would inherit a stale stall clock) and it is not
+-- persisted, so a reload starts a clean stint as well.
+local function clearLiveStallState(journey)
+    journey.liveLastX = nil
+    journey.liveLastY = nil
+    journey.liveLastZ = nil
+    journey.liveLastDistance = nil
+    journey.liveLastProgressAt = nil
+    journey.liveStallCount = 0
+    journey.liveLastRecoveryAt = nil
+end
+
+-- Hand the journey to the elapsed-time abstract lane. The body is not removed
+-- here: the presence pass owns presence transitions and this runs inside the
+-- behavior tick.
+local function requestHandoff(record, journey, now)
+    journey.handoffForced = true
+    journey.handoffReason = "live_stalled"
+    record.runtime = record.runtime or {}
+    record.runtime.forcePresenceCheck = true
+    if PNC.SimulationClock and PNC.SimulationClock.Wake then
+        PNC.SimulationClock.Wake(record, "presence", now)
+    end
+    return true
+end
+
+-- Escalation ladder for a live journey whose movement lane keeps stalling: ask
+-- for the abstract lane first, then end the journey explicitly so it can never
+-- stay active without a lane that can advance it.
+local function escalateLiveFailure(record, journey, now)
+    local cooldown = math.max(
+        1000,
+        tonumber(Const.TRAVEL_LIVE_ESCALATION_COOLDOWN_MS) or 15000
+    )
+    local maxEscalations = tonumber(Const.TRAVEL_LIVE_MAX_ESCALATIONS) or 2
+    local lastEscalation = tonumber(journey.liveLastEscalationAt)
+    if lastEscalation ~= nil and now - lastEscalation < cooldown then
+        return false
+    end
+    journey.liveLastEscalationAt = now
+    journey.liveEscalationCount =
+        (tonumber(journey.liveEscalationCount) or 0) + 1
+    Internal.LogTravelDiag(
+        record,
+        journey,
+        "live_escalation",
+        journey.liveEscalationCount > maxEscalations
+            and "live_unreachable" or "handoff_requested"
+    )
+    if journey.liveEscalationCount > maxEscalations then
+        Service.FailJourney(record, "live_unreachable", "live_stall")
+        return true
+    end
+    return requestHandoff(record, journey, now)
+end
+
 local function liveBodyPosition(record, body)
     return body and body.getX and body:getX() or tonumber(record and record.x) or 0,
         body and body.getY and body:getY() or tonumber(record and record.y) or 0,
@@ -87,6 +144,12 @@ local function recoverLiveStall(record, body, journey, now)
     end
 
     journey.liveRecoveryCount = (tonumber(journey.liveRecoveryCount) or 0) + 1
+    if journey.liveRecoveryCount
+        > (tonumber(Const.TRAVEL_LIVE_MAX_RECOVERIES) or 3)
+        and escalateLiveFailure(record, journey, now)
+    then
+        return true
+    end
     journey.lastStateReason = fallback
         and "travel_live_stall_fallback"
         or "travel_live_stall_replan"
@@ -171,6 +234,13 @@ function Service.TickLive(recordOrID, body, atWorldHour)
     -- return-home percentage persist forever and keeps the movement owner
     -- alive against an unreachable final tile.
     if journey.state == "en_route" and homeZoneReached(record, journey) then
+        -- The base zone is a valid arrival boundary, so anchor the route
+        -- distance with it. Otherwise the journey reports less than 100%
+        -- forever and keeps a movement lane alive against an unreachable tile.
+        journey.distanceTravelled = math.max(
+            tonumber(journey.distanceTravelled) or 0,
+            tonumber(journey.distanceTotal) or 0
+        )
         Service.SetState(record, "arrived", "home_zone_reached")
     end
     -- Live bodies can drift just beyond the final stop radius after their
@@ -263,8 +333,18 @@ end
 
 function Service.OnMaterialized(record)
     local journey = record and record.travel or nil
+    local body
     if not journey then return end
+    clearLiveStallState(journey)
     Service.Advance(record, Internal.WorldHour())
+    -- Symmetric with OnAbstracted: the fresh body is the source of truth for
+    -- route progress, so a body that spawned away from the linear projection
+    -- cannot leave the live lane targeting a segment it never reached.
+    body = PNC.Registry and PNC.Registry.GetLiveZombie
+        and PNC.Registry.GetLiveZombie(record.id) or nil
+    if body then
+        Service.SyncLivePosition(record, body, Internal.WorldHour())
+    end
     journey.controller = "live"
     journey.lastAdvancedWorldHour = Internal.WorldHour()
     Service.Emit("materialized", record, journey, "presence_live")
@@ -276,7 +356,10 @@ function Service.OnAbstracted(record, body)
     if body then
         Service.SyncLivePosition(record, body, Internal.WorldHour())
     end
+    clearLiveStallState(journey)
     journey.controller = "abstract"
+    journey.handoffForced = nil
+    journey.handoffReason = nil
     journey.lastAdvancedWorldHour = Internal.WorldHour()
     Service.Emit("abstracted", record, journey, "presence_abstract")
 end

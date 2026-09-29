@@ -129,10 +129,21 @@ Providers.Register("pnc_social_profile", {
 
 Providers.Register("pnc_identity", {
     GetValue = function(record, descriptor)
-        local identity = PNC.Identity and PNC.Identity.GetCharacterSummary
+        local field = descriptor and descriptor.presentation
+            and descriptor.presentation.truthField
+        if not field then return nil end
+        -- The canonical display name lives on the record itself. Reading it
+        -- directly keeps the name disclosure independent of archetype
+        -- resolution, which `GetCharacterSummary` also performs and which can
+        -- fail for a runtime-spawned record with an unresolved archetype id.
+        local identity = type(record) == "table" and record.identity or nil
+        if field == "displayName" and type(identity) == "table" then
+            local name = identity.displayName
+            if type(name) == "string" and name ~= "" then return name end
+        end
+        local summary = PNC.Identity and PNC.Identity.GetCharacterSummary
             and PNC.Identity.GetCharacterSummary(record) or {}
-        local field = descriptor and descriptor.presentation and descriptor.presentation.truthField
-        return identity and field and identity[field] or nil
+        return summary and summary[field] or nil
     end,
 })
 

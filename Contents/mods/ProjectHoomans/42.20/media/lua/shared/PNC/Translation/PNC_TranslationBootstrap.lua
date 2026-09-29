@@ -387,6 +387,7 @@ local SEGMENT_SYSTEMS = {
     Point = "Debug",
     Provision = "Provision",
     ProvisionDebug = "Debug",
+    RadioRelay = "CommandHub",
     Recovery = "Health",
     RelationshipApproval = "Character",
     RelationshipChange = "Character",

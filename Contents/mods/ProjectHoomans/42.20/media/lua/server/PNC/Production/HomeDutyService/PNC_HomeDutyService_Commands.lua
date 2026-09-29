@@ -64,6 +64,46 @@ function Service.SendHome(record, baseId, reason, options)
     return true, "RETURNING_HOME", journey
 end
 
+-- Called by the travel service when a return-home journey ends without
+-- arriving (unreachable live lane, lost owner). The home duty owns the retry:
+-- restore the durable home order so the AtHome behavior ticks again and
+-- EnsureHomeAnchor re-issues the journey once the retry cooldown expires.
+function Service.OnTravelFailed(record, reason, journey)
+    local runtime = record and record.runtime or nil
+    local base
+    local point
+    local order
+    if not runtime then return false end
+    runtime.homeState = "RETURN_HOME_FAILED"
+    runtime.homeJourneyId = nil
+    runtime.homeFailureReason = tostring(reason or "travel_failed")
+    runtime.homeRetryAt = (PNC.Core and PNC.Core.Now and PNC.Core.Now() or 0)
+        + (tonumber(PNC.Const and PNC.Const.TRAVEL_HOME_RETRY_COOLDOWN_MS)
+            or 60000)
+    base = H.BaseFor(record, runtime.homeBaseId)
+    if not base then return false end
+    runtime.homeBaseId = base.id
+    point = PNC.HomeDutyService.GetHomePoint(record, base.id)
+    if not point then return false end
+    order = {
+        kind = "colony_home",
+        baseId = base.id,
+        x = point.x,
+        y = point.y,
+        z = point.z,
+        radius = point.radius,
+    }
+    if PNC.OrderSystem and PNC.OrderSystem.SetOrder then
+        PNC.OrderSystem.SetOrder(record, order)
+    else
+        record.orderSpec = order
+    end
+    if PNC.Registry and PNC.Registry.MarkDirty then
+        PNC.Registry.MarkDirty(record, "home_state")
+    end
+    return true
+end
+
 function Service.SendToPlayer(record, player, reason)
     if not record or record.alive == false then return false, "NPC_MISSING" end
     if not player then return false, "PLAYER_MISSING" end

@@ -43,9 +43,14 @@ function H.NormalizedPresenceMode(value)
         and value or "auto"
 end
 
+-- Settlement rosters are positional: member spawn index -> Project Hoomans
+-- faction role. Every trading archetype lists its trader explicitly so a
+-- settlement of that archetype is staffed with one, and members past the end of
+-- the list fall back to the archetype default role (civilian: a member with no
+-- specific job).
 local ROLE_ORDER = {
     settler = {
-        "leader", "guard", "medic", "farmer",
+        "leader", "trader", "guard", "medic", "farmer",
         "builder", "scavenger", "cook", "mechanic",
     },
     looter = {
@@ -57,8 +62,8 @@ local ROLE_ORDER = {
         "mechanic", "scavenger", "laborer",
     },
     refugee = {
-        "leader", "medic", "guard", "caregiver",
-        "scavenger",
+        "leader", "trader", "guard", "medic",
+        "caregiver", "scavenger",
     },
 }
 
@@ -70,11 +75,19 @@ function H.FactionRole(archetypeID, index)
         )
 end
 
-function H.CommunityRole(index)
-    if index == 1 then return "resident" end
-    if index == 2 then return "guard" end
-    if index == 3 then return "medic" end
-    return "resident"
+-- The community role is derived from the faction role instead of a second
+-- positional table, so a settlement has one roster with one authority. `leader`
+-- is never emitted: the community service normalizes it to a resident role and
+-- tracks its leader through community.leaderNPCID. Faction roles that carry no
+-- community meaning (trader, farmer, civilian, ...) are plain residents.
+local COMMUNITY_ROLE_BY_FACTION_ROLE = {
+    leader = "resident",
+    guard = "guard",
+    medic = "medic",
+}
+
+function H.CommunityRole(factionRole)
+    return COMMUNITY_ROLE_BY_FACTION_ROLE[factionRole] or "resident"
 end
 
 function H.NPCArchetype(factionArchetypeID)
