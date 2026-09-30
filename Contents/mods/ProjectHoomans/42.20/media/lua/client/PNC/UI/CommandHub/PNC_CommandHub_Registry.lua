@@ -121,16 +121,30 @@ function Gates.HasRadio()
     return hasRadio()
 end
 
+--[[
+    (exists, built, inProgress)
+
+    `built` drives storage/work gating. `inProgress` matters for the bootstrap
+    button: hiding "build stockpile" merely because a stockpile *record* exists
+    left a planned-but-idle stockpile with no rebuild path anywhere in the UI
+    (the FACILITIES tab never lists the stockpile), which is a soft-lock.
+]]
 local function stockpileStatus(settlement)
-    local exists, built = false, false
+    local exists, built, inProgress = false, false, false
     for _, facility in ipairs(settlement.facilities or {}) do
         if tostring(facility.definitionId or "") == "stockpile" then
             exists = true
             built = FacilityState.IsBuilt(facility)
+            -- Older stubs and partially loaded contexts may not expose the
+            -- shared state helper; never let the gate throw.
+            local state = type(FacilityState.ConstructionState) == "function"
+                and FacilityState.ConstructionState(facility) or nil
+            inProgress = state == "RECONSTRUCTING"
+                or state == "UNDER_CONSTRUCTION"
             break
         end
     end
-    return exists, built
+    return exists, built, inProgress
 end
 
 local function costTypes(cost)
@@ -202,14 +216,19 @@ function Gates.GetBaseAndStockpileStatus()
     local snapshot = baseSnapshot()
     local settlement = type(snapshot) == "table" and snapshot.settlement or nil
     local hasBase = type(settlement) == "table"
-    local stockpileExists, hasStockpile = false, false
+    local stockpileExists, hasStockpile, stockpileInProgress = false, false, false
     if hasBase then
-        stockpileExists, hasStockpile = stockpileStatus(settlement)
+        stockpileExists, hasStockpile, stockpileInProgress =
+            stockpileStatus(settlement)
     end
     return {
         hasBase = hasBase,
         hasStockpile = hasStockpile,
-        hasStockpileFacility = stockpileExists,
+        -- "A stockpile is already handled" - built or actively being worked on.
+        -- A planned-and-idle stockpile must not hide its own build button.
+        hasStockpileFacility = stockpileExists
+            and (hasStockpile or stockpileInProgress),
+        stockpileRecordExists = stockpileExists,
         enabled = hasBase and hasStockpile,
     }
 end

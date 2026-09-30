@@ -12,6 +12,7 @@ local BASE_SNAPSHOT_ACTIONS = {
     facility_create = true, facility_upgrade = true,
     facility_capacity_set = true, facility_component_set = true,
     facility_component_remove = true, facility_destroy = true,
+    facility_reconcile = true,
     stockpile_node_create = true, stockpile_node_remove = true,
     farm_plot_crop = true, farm_plot_policy = true, farm_plot_debug = true,
     facility_anchor_role_replace = true,
@@ -65,6 +66,7 @@ Router.Register(Const.CMD_COLONY_MANAGEMENT_ACTION,
             farm_plot_crop = true, farm_plot_policy = true, farm_plot_debug = true,
             facility_anchor_role_replace = true,
             facility_destroy = true, stockpile_node_create = true,
+            facility_reconcile = true,
             stockpile_node_remove = true,
         }
         if settlementAction[tostring(rawArgs and rawArgs.action or "")]

@@ -1,7 +1,9 @@
 require "PsychopatzCore/UI/PsychopatzUI"
 
 local LayoutModel = {}
-local Layout = PsychopatzCore.UI.Layout
+local UI = PsychopatzCore.UI
+local Layout = UI.Layout
+local Theme = UI.Theme
 
 function LayoutModel.Apply(window, content)
     local gap = Layout.Pixels(8, window.uiScale)
@@ -43,6 +45,62 @@ function LayoutModel.Apply(window, content)
         toolbarY, pageWidth, buttonHeight)
 
     --[[
+        Footer sizing.
+
+        The action buttons used to be fixed at 120/132px, so a long title like
+        "GIVE BUILDING MATERIALS" was drawn wider than its own button and bled
+        over the next one. Measure each label, clamp it, and wrap the rows onto
+        a second line when the window is too narrow - the row count has to be
+        known here, because the bands above are budgeted against the footer.
+    ]]
+    local footerActions = {}
+    for _, control in ipairs({ window.baseBuildingBuildButton,
+        window.baseBuildingDebugButton, window.baseBuildingCancelPlacement,
+        window.baseBuildingQueueOverlay }) do
+        if control and control:getIsVisible() then
+            footerActions[#footerActions + 1] = control
+        end
+    end
+    local cancelWidth = Layout.Pixels(110, window.uiScale)
+    local controlPadding = Layout.Pixels(30, window.uiScale)
+    local minimumControl = Layout.Pixels(104, window.uiScale)
+    local maximumControl = Layout.Pixels(220, window.uiScale)
+    local titleFont = Theme and Theme.Font and Theme.Font(window.uiScale)
+        or (UIFont and UIFont.Small) or nil
+    local function controlWidth(control)
+        local title = control and control.title
+        local measured = 0
+        if type(title) == "string" and title ~= ""
+            and titleFont and Theme and type(Theme.TextWidth) == "function"
+        then
+            measured = tonumber(Theme.TextWidth(titleFont, title)) or 0
+        end
+        return math.max(minimumControl, math.min(maximumControl,
+            math.floor(measured + controlPadding)))
+    end
+    -- Every row reserves the CANCEL column, so the right-aligned CANCEL can
+    -- never overlap an action button.
+    local rowLimit = math.max(minimumControl,
+        width - cancelWidth - Layout.Pixels(12, window.uiScale))
+    local footerRows, currentRow = {}, nil
+    for _, control in ipairs(footerActions) do
+        local controlWidthValue = controlWidth(control)
+        local extra = currentRow and #currentRow.items > 0 and gap or 0
+        if not currentRow or (currentRow.width + extra + controlWidthValue
+            > rowLimit and #currentRow.items > 0)
+        then
+            currentRow = { width = 0, items = {} }
+            footerRows[#footerRows + 1] = currentRow
+            extra = 0
+        end
+        currentRow.items[#currentRow.items + 1] = {
+            control = control, width = controlWidthValue,
+        }
+        currentRow.width = currentRow.width + extra + controlWidthValue
+    end
+    if #footerRows == 0 then footerRows[1] = { width = 0, items = {} } end
+
+    --[[
         Vertical budget.
 
         The bands are carved out of one remaining height instead of each
@@ -50,7 +108,8 @@ function LayoutModel.Apply(window, content)
         space left by the footer, which pushed the requirements and blueprint
         bands into the footer (and each other) at smaller window sizes.
     ]]
-    local footerHeight = buttonHeight
+    local footerHeight = buttonHeight * #footerRows
+        + gap * math.max(0, #footerRows - 1)
     local cardsY = toolbarY + buttonHeight + gap
     local footerY = content.y + height - footerHeight
     local remaining = footerY - cardsY - gap * 3
@@ -127,22 +186,17 @@ function LayoutModel.Apply(window, content)
             window.baseBuildingNativeQueuePane:layoutContent()
         end
     end
-    local controls = { window.baseBuildingBuildButton,
-        window.baseBuildingDebugButton, window.baseBuildingCancelPlacement,
-        window.baseBuildingQueueOverlay }
-    local x = content.x
-    for _, control in ipairs(controls) do
-        if control:getIsVisible() then
-            local desired = control == window.baseBuildingBuildButton
-                and Layout.Pixels(120, window.uiScale)
-                or Layout.Pixels(132, window.uiScale)
-            Layout.SetBounds(control, x, footerY, desired, footerHeight)
-            x = x + desired + gap
+    for rowIndex, row in ipairs(footerRows) do
+        local rowY = footerY + (rowIndex - 1) * (buttonHeight + gap)
+        local x = content.x
+        for _, entry in ipairs(row.items) do
+            Layout.SetBounds(entry.control, x, rowY, entry.width, buttonHeight)
+            x = x + entry.width + gap
         end
     end
-    local cancelWidth = Layout.Pixels(110, window.uiScale)
     Layout.SetBounds(window.baseBuildingCloseButton,
-        content.x + width - cancelWidth, footerY, cancelWidth, footerHeight)
+        content.x + width - cancelWidth,
+        footerY + (footerHeight - buttonHeight), cancelWidth, buttonHeight)
     local pageCount = tonumber(window.baseBuildingPageCount) or 1
     window.baseBuildingPrevious:setVisible(pageCount > 1)
     window.baseBuildingNext:setVisible(pageCount > 1)

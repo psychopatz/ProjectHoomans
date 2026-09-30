@@ -838,6 +838,29 @@ local function technologyKnown(research, technologyId)
     return false
 end
 
+-- Name the research a facility is waiting on. A bare "RESEARCH REQUIRED" read
+-- as an unresolvable gate because nothing in the tab said which technology, and
+-- the research entry is only discoverable by its own name in the tree.
+local function technologyLabel(technologyId)
+    technologyId = tostring(technologyId or "")
+    if technologyId == "" then return nil end
+    local research = PNC.ColonyResearchDefinitions
+    local entry = research and research.Get
+        and research.Get(technologyId) or nil
+    local labelKey = entry and entry.labelKey or nil
+    if labelKey then
+        local label = tr(labelKey, technologyId)
+        if label and label ~= "" then return label end
+    end
+    -- Definitions unavailable (isolated tests, partial load): keep the line
+    -- readable instead of printing the raw namespaced id.
+    local separator = string.find(technologyId, ":", 1, true)
+    local text = separator and string.sub(technologyId, separator + 1)
+        or technologyId
+    if text == "" then return technologyId end
+    return string.upper(string.sub(text, 1, 1)) .. string.sub(text, 2)
+end
+
 local function stockpileState(settlement)
     local exists, built = false, false
     for _, facility in ipairs(settlement and settlement.facilities or {}) do
@@ -914,8 +937,10 @@ local function buildOptions(settlement, storage, research)
             or hqReady and affordable and technologyReady
             and tr("UI_PNC_Facility_Available", "AVAILABLE")
             or not hqReady and tr("UI_PNC_Facility_RequiresHQ", "HQ LEVEL TOO LOW")
-            or not technologyReady and tr("UI_PNC_Facility_RequiresTechnology",
-                "RESEARCH REQUIRED")
+            or not technologyReady and (tr(
+                "UI_PNC_Facility_RequiresTechnology", "RESEARCH REQUIRED")
+                .. ": " .. tostring(
+                    technologyLabel(definition.requiredTechnology)))
             or tr("UI_PNC_Facility_MissingMaterials", "NEED MORE MATERIALS")
         values[#values + 1] = {
             id = id,

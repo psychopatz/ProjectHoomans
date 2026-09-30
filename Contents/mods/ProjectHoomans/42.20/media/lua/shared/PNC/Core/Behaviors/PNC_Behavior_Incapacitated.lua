@@ -40,5 +40,15 @@ function Incapacitated.Tick(record, zombie)
             Animation.Apply(zombie, record, "Crawl")
         end
     end
+    -- Keep asking for help while down.  This rides the tick that already runs
+    -- for downed NPCs, so it costs one timestamp comparison per downed NPC
+    -- per tick and never scans the world.  Only the server owns the audience
+    -- gate and the network send; the hook is absent on a pure client, and
+    -- presentation may never fail behavior.
+    local hooks = PNC.SocialEventHooks
+    local tick = hooks and hooks.TickIncapacitatedDistress
+    if type(tick) == "function" then
+        pcall(tick, record)
+    end
     return true
 end

@@ -10,8 +10,11 @@ require "PsychopatzCore/Conversation/PsychopatzSocialFlavor"
 require "PsychopatzCore/Conversation/PsychopatzNameParts"
 require "PsychopatzCore/Events/PC_EventBus"
 require "PNC/Core/Identity/PNC_FlavorAddress"
+require "PNC/Core/Social/PNC_FlavorTextResolver"
 require "PNC/Conversation/PNC_ConversationDiary"
 require "PNC/Conversation/PNC_SocialFlavorDefinitions"
+require "PNC/Conversation/PNC_SocialFlavorDefinitions_Incapacitated"
+require "PNC/Conversation/PNC_SocialFlavorDefinitions_LeaderDeath"
 require "PNC/Compatibility/Mods/Bandits/PNC_Bandits_HoomansFlavorDefinitions"
 require "PNC/Compatibility/Mods/Necroa/PNC_Necroa_HoomansFlavorDefinitions"
 
@@ -238,6 +241,29 @@ function Presentation.Receive(ambientFlavor, summary, networkArgs)
     context.socialRole = context.socialRole or role
     context.relationshipState = context.relationshipState or relationshipState
     context.relationshipTier = context.relationshipTier or relationshipTier
+    -- Downed distress lines may address the attacker by name.  The server
+    -- sends the authoritative display name; fall back to a neutral noun so a
+    -- plea never renders a raw token.
+    if context.downedAttackerName == nil then
+        local attackerKind = clean(context.downedThreat, nil)
+        context.downedAttackerName = attackerKind == "player"
+            and (networkArgs and networkArgs.attackerUsername or nil)
+            or nil
+    end
+    if clean(context.downedAttackerName, nil) == nil
+        and clean(context.downedThreat, nil) ~= nil
+    then
+        context.attackerName = "you"
+    else
+        context.attackerName = clean(context.downedAttackerName, "you")
+    end
+    if context.downedNeed ~= nil or context.downedAudience ~= nil then
+        -- Keep the resolver's own keys present for the `when` matchers even
+        -- if the transport dropped the compound wrapper.
+        context.downedAudience = context.downedAudience or role
+        context.downedThreat = context.downedThreat or "unknown"
+        context.downedNeed = context.downedNeed or "help"
+    end
     local voiceGateway = PNC.VoiceGateway
     if not context.voiceBinding
         and voiceGateway

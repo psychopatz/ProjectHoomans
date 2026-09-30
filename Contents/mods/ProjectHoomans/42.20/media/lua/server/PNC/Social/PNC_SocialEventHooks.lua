@@ -13,6 +13,8 @@ require "PNC/Social/SocialEventHooks/PNC_SocialEventHooks_Encounter"
 require "PNC/Social/SocialEventHooks/PNC_SocialEventHooks_ThreatAttribution"
 require "PNC/Social/SocialEventHooks/PNC_SocialEventHooks_CombatAdapter"
 require "PNC/Social/SocialEventHooks/PNC_SocialEventHooks_DamageAdapter"
+require "PNC/Social/SocialEventHooks/PNC_SocialEventHooks_DownedDistress"
+require "PNC/Social/SocialEventHooks/PNC_SocialEventHooks_LeaderLoss"
 require "PNC/Social/SocialEventHooks/PNC_SocialEventHooks_ClientKill"
 
 return PNC.SocialEventHooks

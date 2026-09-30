@@ -55,6 +55,10 @@ Const.INCAPACITATED_GRACE_MS = 1500
 Const.INCAPACITATED_HP = 1
 Const.INCAPACITATED_ENGINE_BUFFER = 1000
 Const.DEBUG_COMBAT_HOLD_MS = 2500
+-- How long a fighting NPC keeps its weapon in hand after the last engagement
+-- tick.  The window is refreshed on every engagement tick, so it only expires
+-- once the NPC has genuinely disengaged.
+Const.COMBAT_STANCE_HOLD_MS = 6000
 Const.DEFAULT_HP_MAX = 100
 Const.DEFAULT_ENGINE_BUFFER = 1000
 Const.RECENT_DAMAGE_SHOW_MS = 4000

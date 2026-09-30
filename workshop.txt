@@ -1,6 +1,6 @@
 version=1
 id=3799685526
-title=ProjectHoomans
+title=ProjectHoomans WIP
 description=Project Hoomans
 description=Bring the large-scale NPC, faction, and settlement gameplay of Project Zomboid Build 45 into Build 42.
 description=Project Hoomans is a large-scale NPC and colony simulation system focused on making the world feel alive. NPCs aren't simply spawned around the player to perform a few scripted tasks. 
@@ -154,5 +154,8 @@ description=[img]https://cdn3.emoji.gg/emojis/3549-spiffohuggie.png[/img]
 description=[img]http://i.imgur.com/oEtvFdv.png[/img][url=https://steamcommunity.com/id/bpatrickoliverb/myworkshopfiles/appid=108600][img]http://i.imgur.com/aJmBEpZ.png[/img][/url][img]http://i.imgur.com/Mftyk3C.png[/img][url=https://ko-fi.com/psychopatz][img]http://i.imgur.com/uPY3dEJ.png[/img][/url]
 description=
 description=[i]Found a bug? Please report it in the discussions![/i]
+description=
+description=Workshop ID: 3799685526
+description=Mod ID: ProjectHoomans
 tags=Build 42;Balance;Framework;Multiplayer;Realistic;WIP
 visibility=public

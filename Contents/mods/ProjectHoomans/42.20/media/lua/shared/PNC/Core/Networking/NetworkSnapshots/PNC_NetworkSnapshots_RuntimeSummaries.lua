@@ -60,9 +60,12 @@ function Parts.BuildCombatSummary(record, equipmentInfo)
     local tactical = record.runtime and record.runtime.combatTactical or {}
     local aim = record.runtime and record.runtime.combatAim or {}
     local fireLane = record.runtime and record.runtime.combatFireLane or {}
+    local stance = PNC.CombatStance
     equipmentInfo = equipmentInfo or Equipment and Equipment.Describe and Equipment.Describe(record) or {}
     return {
         targetKind = target and target.kind or "none",
+        -- Fighting mode: weapon presented in hand rather than holstered.
+        combatStance = stance and stance.IsArmed and stance.IsArmed(record) == true or false,
         combatModeResolved = equipmentInfo.combatModeResolved or record.weaponMode,
         weaponStatus = equipmentInfo.weaponStatus or "unknown",
         combatBlockReason = record.runtime and record.runtime.combatBlockReason or nil,

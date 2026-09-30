@@ -26,6 +26,20 @@ end
 
 function Internal.isAttackMode(record)
     local runtime = record and record.runtime or nil
+    -- Mirrored fighting mode.  Client-side snapshot record views carry only
+    -- this boolean, so remote and single-player bodies agree with the
+    -- authority without rebuilding the combat runtime.
+    if runtime and runtime.combatStance == true then
+        return true
+    end
+    -- Fighting mode is an explicit stance, not a property of one attack.  The
+    -- stance keeps the weapon in hand through target re-acquisition, ranged
+    -- repositioning, reloads, and melee cooldown; it expires only after the
+    -- NPC disengages, so idle NPCs still holster normally.
+    local stance = PNC.CombatStance
+    if stance and stance.IsArmed and stance.IsArmed(record) then
+        return true
+    end
     if runtime and runtime.target ~= nil then
         return true
     end

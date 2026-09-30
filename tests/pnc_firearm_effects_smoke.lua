@@ -273,10 +273,23 @@ PNC.ClientFirearmEffects.OnTick()
 T.equal(#PNC.ClientFirearmEffects.ActiveLights, 0, "muzzle light cleaned")
 T.equal(removedLights, 0, "native muzzle light is engine-owned")
 
--- A tracked shooter must prefer the same relative nameplate anchor used by
--- the coordinate probe, instead of emitting another body-centred native line.
+-- A tracked shooter must render Hoomans' own effect path, but the origin has to
+-- be the world-space barrel tip, not the nameplate anchor. The expected tip is
+-- derived here from the fixture geometry and the documented bore constants,
+-- independently of the module: shooter (10,20) aiming at (16,22), so the unit
+-- bearing is (6,2)/sqrt(40); 0.55 tiles along that bore, 0.05 tiles to the
+-- right of it, and 0.45 tiles up from the floor.
 anchorAvailable = true
 PNC.Network.FindZombieByOnlineID = function() return body end
+local boreSpan = math.sqrt((6 * 6) + (2 * 2))
+local boreX, boreY = 6 / boreSpan, 2 / boreSpan
+local tipX = 10 + (boreX * 0.55) - (boreY * 0.05)
+local tipY = 20 + (boreY * 0.55) + (boreX * 0.05)
+local tipScreenX, tipScreenY = ISCoordConversion.ToScreen(tipX, tipY, 0.45)
+local aimScreenX, aimScreenY = ISCoordConversion.ToScreen(16, 22, 0)
+local aimDX = aimScreenX - tipScreenX
+local aimDY = aimScreenY - tipScreenY
+local aimSpan = math.sqrt((aimDX * aimDX) + (aimDY * aimDY))
 local anchoredPayload = {}
 for key, value in pairs(payload) do anchoredPayload[key] = value end
 anchoredPayload.shotId = "npc_modded_rifle:anchored:1:1100"
@@ -284,10 +297,34 @@ T.equal(PNC.ClientFirearmEffects.Play(anchoredPayload), true,
     "tracked anchored shot rendered")
 T.equal(muzzleFlash, 1, "tracked anchored shot bypasses native muzzle flash")
 T.equal(nativeTracerCalls, 3, "tracked anchored shot bypasses native tracer")
-T.equal(PNC.ClientFirearmEffects.ActiveMuzzleFlashes[1].x, 1234,
-    "tracked muzzle flash uses the relative anchor")
+T.near(PNC.ClientFirearmEffects.ActiveMuzzleFlashes[1].x, tipScreenX, 0.0001,
+    "tracked muzzle flash starts at the projected barrel tip")
+T.near(PNC.ClientFirearmEffects.ActiveMuzzleFlashes[1].y, tipScreenY, 0.0001,
+    "tracked muzzle flash uses barrel height, not the old 1.1-tile lift")
+T.equal(PNC.ClientFirearmEffects.ActiveMuzzleFlashes[1].anchorSource,
+    "world_bore", "tracked flash records the world bore origin")
 T.equal(PNC.ClientFirearmEffects.ActiveTracers[1].anchorSource,
-    "nameplate_relative", "tracked tracer records the relative anchor source")
+    "world_bore", "tracked tracer records the world bore origin")
+T.near(PNC.ClientFirearmEffects.ActiveTracers[1].x, tipScreenX, 0.0001,
+    "tracked tracer starts at the projected barrel tip")
+T.near(PNC.ClientFirearmEffects.ActiveTracers[1].y, tipScreenY, 0.0001,
+    "tracked tracer starts at barrel height")
+-- Origin and direction must come from the same world line. That agreement is
+-- what puts the tracer on the bore instead of beside it. The middle pellet of
+-- the three-shot fan carries the unpolluted bore line; the outer two bracket it
+-- by the weapon's spread.
+local centerPellet = PNC.ClientFirearmEffects.ActiveTracers[2]
+T.near(centerPellet.x, tipScreenX, 0.0001,
+    "every pellet leaves the same barrel tip")
+T.near(centerPellet.dx, aimDX / aimSpan, 0.0001,
+    "centre pellet points from the barrel tip to the aim point")
+T.near(centerPellet.dy, aimDY / aimSpan, 0.0001,
+    "centre pellet vertical component follows the bore line")
+T.truthy(PNC.ClientFirearmEffects.ActiveTracers[1].direction
+        < centerPellet.direction
+        and centerPellet.direction
+        < PNC.ClientFirearmEffects.ActiveTracers[3].direction,
+    "pellet spread fans around the bore line instead of displacing it")
 PNC.ClientFirearmEffects.Reset()
 local selfPayload = {}
 for key, value in pairs(anchoredPayload) do selfPayload[key] = value end
@@ -322,14 +359,14 @@ T.equal(lastLight.args[7], 9, "muzzle light uses reduced radius")
 T.equal(#PNC.ClientFirearmEffects.ActiveMuzzleFlashes, 1,
     "fallback muzzle flash queued at the weapon-forward point")
 T.equal(#PNC.ClientFirearmEffects.ActiveTracers, 3, "fallback tracers queued")
-T.equal(PNC.ClientFirearmEffects.ActiveMuzzleFlashes[1].x, 1234,
-    "fallback muzzle flash uses cached nameplate anchor")
-T.equal(PNC.ClientFirearmEffects.ActiveMuzzleFlashes[1].y, 5678,
-    "fallback muzzle flash uses cached nameplate shoulder offset")
-T.equal(PNC.ClientFirearmEffects.ActiveTracers[1].x, 1234,
-    "fallback tracer uses cached nameplate anchor")
-T.equal(PNC.ClientFirearmEffects.ActiveTracers[1].y, 5678,
-    "fallback tracer uses cached nameplate shoulder offset")
+T.near(PNC.ClientFirearmEffects.ActiveMuzzleFlashes[1].x, tipScreenX, 0.0001,
+    "fallback muzzle flash uses the projected barrel tip without a live body")
+T.near(PNC.ClientFirearmEffects.ActiveMuzzleFlashes[1].y, tipScreenY, 0.0001,
+    "fallback muzzle flash keeps barrel height without a live body")
+T.near(PNC.ClientFirearmEffects.ActiveTracers[1].x, tipScreenX, 0.0001,
+    "fallback tracer uses the projected barrel tip")
+T.near(PNC.ClientFirearmEffects.ActiveTracers[1].y, tipScreenY, 0.0001,
+    "fallback tracer keeps barrel height")
 PNC.ClientFirearmEffects.OnPreUIDraw()
 T.equal(rendered > 0, true, "fallback firearm effects rendered")
 T.truthy(renderLines[1], "fallback muzzle/tracer renderline submitted")

@@ -26,7 +26,14 @@ function Service.Commands.Queue(spec)
     then
         return nil, "UNKNOWN_OPERATION"
     end
-    local locationPolicy = Internal.locationPolicy(spec)
+    -- Fall back to the operation's default policy when the caller does not
+    -- state one. Research-family work defaults to ANYWHERE/REMOTE/STAY so an
+    -- away colonist keeps the order instead of the scheduler releasing and
+    -- re-claiming it every pass.
+    local policySpec = type(spec.locationPolicy) == "table" and spec
+        or { locationPolicy = Definitions.LocationPolicy
+            and Definitions.LocationPolicy(operation) or nil }
+    local locationPolicy = Internal.locationPolicy(policySpec)
     local order = {
         schemaVersion = Repository.SCHEMA_VERSION,
         id = Repository.NextId(), operation = operation,

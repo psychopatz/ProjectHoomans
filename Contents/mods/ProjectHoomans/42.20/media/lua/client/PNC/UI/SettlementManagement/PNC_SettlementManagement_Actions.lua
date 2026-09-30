@@ -128,6 +128,39 @@ function Actions.Handle(window, action, facility)
     elseif action == "facility_cancel_construction" then
         local ConfirmModal = require "PNC/UI/Factions/PNC_FactionMemberModal"
         local task = facility.activeTask
+        if not (task and task.id) then
+            --[[
+                The facility is not BUILT but has no live order to cancel. That
+                combination used to make this button a silent no-op, which left
+                a stuck stockpile unrecoverable (no storage access, no rebuild
+                entry point). Ask the server to reconcile the facility state
+                instead, and always report the outcome.
+            ]]
+            local state = facility.constructionState
+            local repairable = state ~= nil and tostring(state) ~= ""
+                and tostring(state) ~= "BUILT"
+            if repairable then
+                ConfirmModal.Open({
+                    title = Support.Tr("UI_PNC_Work_RepairTitle",
+                        "Repair Facility"),
+                    message = Support.Tr("UI_PNC_Work_RepairMessage",
+                        "This facility has no active construction order but is not finished. Repair its state?"),
+                    detail = Support.Tr("UI_PNC_Work_RepairDetail",
+                        "Use this when a construction project was lost. Completed buildings are restored; unfinished ones stay planned and can be rebuilt."),
+                    confirmLabel = Support.Tr("UI_PNC_Work_RepairConfirm",
+                        "REPAIR FACILITY"),
+                    danger = true,
+                    context = { facilityId = facility.id },
+                    onConfirm = function(context)
+                        PNC.Client.RequestColonyAction("facility_reconcile", {
+                            facilityId = context.facilityId,
+                        })
+                        Support.ApplyLocalResult(window)
+                    end,
+                })
+            end
+            return true
+        end
         if task and task.id then
             ConfirmModal.Open({
                 title = Support.Tr("UI_PNC_Work_CancelConstructionTitle",

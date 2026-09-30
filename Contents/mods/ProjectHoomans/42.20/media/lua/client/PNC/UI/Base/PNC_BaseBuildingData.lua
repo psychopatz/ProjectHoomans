@@ -90,6 +90,31 @@ function Data.Stockpile(window, snapshot)
     return stockpileFor(window)
 end
 
+--[[
+    Research knowledge the facility gate reads.
+
+    The base projection now ships the learned technology ids; when it does not
+    (older server, or before the first base poll), fall back to the cached
+    management projection, whose learned set is kept current by the colony
+    knowledge delta handler.
+]]
+local function researchFor(window, snapshot)
+    snapshot = snapshot or (window and window.snapshot) or {}
+    local base = snapshot.research
+    if base and type(base.learnedTechnologyIds) == "table" then return base end
+    local ClientState = PNC.Network and PNC.Network.ClientState or nil
+    local management = ClientState and ClientState.colonyManagement or nil
+    local fallback = management and management.research or nil
+    if fallback and type(fallback.learnedTechnologyIds) == "table" then
+        return fallback
+    end
+    return base or fallback
+end
+
+function Data.Research(window, snapshot)
+    return researchFor(window, snapshot)
+end
+
 function Data.SelectedOption(window)
     for _, option in ipairs(window.baseBuildingOptions or {}) do
         if tostring(option.id) == tostring(window.baseBuildingSelectedID) then

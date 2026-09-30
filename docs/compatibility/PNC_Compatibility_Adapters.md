@@ -4,36 +4,88 @@ Hoomans bodies are `IsoZombie` carriers, so every mod-specific integration
 must establish ownership before it changes zombie state. The shared boundary
 is `PNC.Compatibility.ActorOwnership`.
 
-## Adapter contract
+## Integration classes
 
-Add one file under:
+Pick exactly one class per provider and never claim a capability the provider
+cannot honour.
 
-`Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Core/Compatibility/Mods/`
+| Class | Owns foreign actors? | Registration | Capabilities | Current |
+|---|---|---|---|---|
+| `foreign_actor` | Yes, on the `IsoZombie` class | `ActorOwnership.RegisterAdapter` with `detect` | whatever is really implemented (`targeting`, `relationships`, `damage`, `events`) | Bandits, Project A-Life |
+| `policy_hook` | No | `PNC.Compatibility.API.RegisterAdapter`, no `detect` | `events` only | Necroa |
+| `feature_integration` | No | none | none — publish a namespace | Companion Dogs |
 
-Register the foreign ownership predicate from that file:
+`ActorOwnership.RegisterAdapter` is the only registration that also installs an
+ownership predicate, so any provider whose bodies live on the `IsoZombie` class
+must use it. A provider that only needs to keep Hoomans bodies out of its own
+lanes is a `policy_hook` and must not claim `targeting`, `relationships`, or
+`damage`.
+
+## Provider module shape
+
+Every provider lives in one folder and follows the same hub-and-spokes layout:
+
+```
+PNC/Core/Compatibility/Mods/<Provider>/PNC_<Provider>_Adapter.lua   -- entry hub
+PNC/Core/Compatibility/Mods/<Provider>/PNC_<Provider>_<Role>.lua    -- role spokes
+```
+
+- The **hub** is thin: namespace bootstrap, ordered literal `require` lines,
+  then registration. It returns the provider namespace table. Providers load
+  before consumers.
+- A **spoke** depends only on the provider's shared `Internal` table, which its
+  `_Access` spoke owns. A spoke must never `require` a sibling; if two spokes
+  need the same helper, that helper belongs in `Internal`.
+- A guarded `X or require "…/sibling"` fallback is allowed only where the spoke
+  must also stay loadable on its own, and the hub must still load that provider
+  before the consumer.
+- Every registering adapter declares `id`, `version`, `apiVersion`, and
+  `capabilities`. Do not add spec fields nothing reads.
+- A spoke that must run before shared composition (for example a PZ file-map
+  patch) is loaded from `PNC/00_PNC_Init.lua` instead of the hub, and the hub
+  documents why.
+
+A `foreign_actor` adapter therefore looks like:
 
 ```lua
 PNC = PNC or {}
 PNC.Compatibility = PNC.Compatibility or {}
+local Bridge = PNC.Compatibility.Necroa or {}
+Bridge.Internal = Bridge.Internal or {}
+PNC.Compatibility.Necroa = Bridge
 
 local Ownership = PNC.Compatibility.ActorOwnership
+    or require "PNC/Core/Compatibility/PNC_ActorOwnership"
 
-return Ownership.RegisterAdapter({
+require "PNC/Core/Compatibility/Mods/Necroa/PNC_Necroa_Access"
+require "PNC/Core/Compatibility/Mods/Necroa/PNC_Necroa_Targeting"
+
+if not Ownership or type(Ownership.RegisterAdapter) ~= "function" then
+    return Bridge
+end
+
+Ownership.RegisterAdapter({
     id = "Necroa",
-    version = "Necroa-B42.20",
-    detect = function(body)
-        if Ownership.IsHoomansOwned(body) then return false end
-        local modData = body and body.getModData
-            and body:getModData() or nil
-        return modData and modData.NecroaActor == true or false
-    end,
-    updateFiles = {
-        "client/NecroaUpdate.lua",
-    },
+    version = "Necroa3-B42.20",
+    apiVersion = 1,
+    detect = Bridge.Internal.IsNecroaBody,
+    capabilities = { targeting = true, events = true },
+    enumerateTargets = Bridge.Targeting.EnumerateTargets,
 })
+
+return Bridge
 ```
 
-Require the adapter from `PNC_SharedComposition.lua`.
+Require the hub from the layer composition root that owns it
+(`PNC_SharedComposition.lua`, `PNC_ServerComposition.lua`,
+`PNC_ClientComposition.lua`).
+
+`tests/pnc_compatibility_shape_smoke.lua` enforces this shape: hub thinness,
+literal requires, exactly one hub per provider, every spoke reachable from its
+hub, no unrooted spokes, no unguarded sibling requires, and required
+registration metadata.
+
+## Shared compatibility contract
 
 The reusable actor contract lives in `PNC/Core/Compatibility`:
 
@@ -52,9 +104,43 @@ The reusable actor contract lives in `PNC/Core/Compatibility`:
 
 Adapters should implement only the capabilities they can prove. Unknown
 ownership, missing brains, stale references, and unavailable callbacks fail
-closed. A new integration should normally provide `targeting`,
+closed. A new `foreign_actor` integration should normally provide `targeting`,
 `relationships`, and `damage`; add `events` only for native reactions that can
 be safely handled by the foreign mod.
+
+## Project A-Life interaction slice
+
+Project A-Life support is isolated under:
+
+`PNC/Core/Compatibility/Mods/ProjectALife/`
+
+| File | Owns |
+|---|---|
+| `PNC_ProjectALife_Adapter.lua` | hub: namespace, spoke order, registration, inbound event routing |
+| `PNC_ProjectALife_Access.lua` | body/record lookup, identity recovery, shared predicates |
+| `PNC_ProjectALife_Policy.lua` | directed stance table, resolution, conflict escalation |
+| `PNC_ProjectALife_Targeting.lua` | actor records to stable foreign refs, target enumeration |
+| `PNC_ProjectALife_Combat.lua` | attack permission in both directions, damage delivery |
+| `PNC_ProjectALife_DamageBridge.lua` | reroutes A-Life hits on managed bodies into `IncomingDamage` |
+| `PNC_ProjectALife_ReverseBridge.lua` | stops A-Life classifying managed bodies as default enemies |
+
+Two rules keep this provider honest:
+
+1. **Engagement is owner-centric.** A managed actor engages a Project A-Life
+   actor only when that actor has already hurt the managed actor (self defence)
+   or when `ProjectALife.Relations.hostileToPlayer` says it is at war with the
+   managed actor's owner. A faction stance for the pair is an additional
+   configured signal; the default is `neutral` and therefore no engagement.
+2. **A stance must survive re-resolution.** `AttackExecution.captureTargetRef`
+   and `resolveActionTarget` rebuild a committed `foreign_npc` target without
+   `factionId`, so the adapter recovers the A-Life faction from the live body
+   (`ProjectALifeUID` plus `ActorRegistry`). Losing it made perception approve a
+   target that damage time then rejected forever.
+
+Conflict escalation writes only directed faction pairs. A hit with an unknown
+faction on either side is recorded for diagnostics but never escalated to a
+`*` wildcard, which would otherwise turn one stray hit into permanent warfare
+against every faction.
 
 ## Bandits interaction slice
 

@@ -83,6 +83,11 @@ function Internal.ApplyParley(record, zombie, reason)
     record.runtime = record.runtime or {}
     record.runtime.attackAction = nil
     record.runtime.inCombatUntil = 0
+    -- Parley is a disengage: drop the fighting-mode hold so the weapon is
+    -- holstered before the conversation scene starts.
+    if PNC.CombatStance and PNC.CombatStance.Clear then
+        PNC.CombatStance.Clear(record)
+    end
     record.nextThinkAt = Internal.Now()
 end
 

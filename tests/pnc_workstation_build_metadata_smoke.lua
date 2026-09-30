@@ -138,8 +138,10 @@ T.equal(primitive.costText, "3 Iron Bar (3 total)",
     "native material cost is shown")
 T.truthy(primitive.enabled, "primitive workstation is not research gated")
 T.falsy(proper.enabled, "proper workstation remains research gated")
-T.equal(proper.status, "RESEARCH REQUIRED",
+T.contains(proper.status, "RESEARCH REQUIRED",
     "proper workstation exposes research gating")
+T.contains(proper.status, "Workshop",
+    "gated workstation names the research that unlocks it")
 T.truthy(research, "research Log Table workstation is present")
 T.equal(research.name, "RESEARCH TABLE",
     "research facility uses its build-specific Research Table name")

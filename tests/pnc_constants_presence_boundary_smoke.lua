@@ -28,7 +28,7 @@ local count = 0
 for _ in pairs(PNC.Const) do count = count + 1 end
 -- Change detector: update this when a constant is intentionally added or
 -- removed so the growth is reviewed instead of silent.
-T.equal(count, 613, "constant key count")
+T.equal(count, 614, "constant key count")
 T.equal(PNC.Const.PERSISTENCE_VERSION, 16, "persistence contract")
 T.equal(PNC.Const.NETWORK_PAYLOAD_BUDGET_BYTES, 786432,
     "server payload budget contract")
@@ -53,5 +53,7 @@ T.equal(PNC.Const.TRAVEL_LIVE_PROGRESS_TIMEOUT_MS, 12000,
 T.equal(PNC.Const.FOLLOW_RETREAT_MAX_DISTANCE,
     PNC.Const.FOLLOW_COMBAT_LEASH_DISTANCE, "derived follow constant")
 T.equal(PNC.Const.COMBAT_DEBUG_VISIBLE_ZOMBIE_LIMIT, 6, "final provider loaded")
+T.truthy((tonumber(PNC.Const.COMBAT_STANCE_HOLD_MS) or 0) > 0,
+    "weapon-drawn fighting-mode hold contract")
 
 T.finish("pnc_constants_presence_boundary_smoke")

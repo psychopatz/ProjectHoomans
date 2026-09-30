@@ -77,4 +77,23 @@ function Relationships.CanBanditAttackHooman(context)
     return false, "bandit_not_hostile_to_source"
 end
 
+-- Entry point used by the capability adapter: pick the direction from the
+-- target's provider. Both underlying rules stay bandit-brain owned below.
+function Relationships.CanAttack(context)
+    local target = context and context.target
+    local attacker = context and context.attacker
+    if target and target.provider == "Bandits" then
+        return Relationships.CanHoomanAttackBandit({
+            attacker = attacker,
+            target = target,
+            context = context.context,
+        })
+    end
+    return Relationships.CanBanditAttackHooman({
+        attacker = attacker,
+        target = target,
+        context = context.context,
+    })
+end
+
 return Relationships

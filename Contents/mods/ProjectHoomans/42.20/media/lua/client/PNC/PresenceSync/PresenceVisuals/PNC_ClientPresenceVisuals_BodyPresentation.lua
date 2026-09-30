@@ -135,11 +135,14 @@ local function applyBodyPresentation(
         modData.PNC_ClientHandsKey = handsKey
     end
     if not remoteReplica
-        and snapshot.attackMode == true
+        and snapshot.combatStance == true
         and Equipment
-        and Equipment.EnsureCombatHands
+        and Equipment.ApplyCombatState
     then
-        Equipment.EnsureCombatHands(zombie, recordView)
+        -- Fighting mode owns both lanes: the weapon leaves the holster map and
+        -- appears in hand.  Idempotent, so holding the stance costs nothing
+        -- once the item is already presented.
+        Equipment.ApplyCombatState(zombie, recordView, true)
     end
     if syncBandageVisuals then
         syncBandageVisuals(zombie, snapshot)

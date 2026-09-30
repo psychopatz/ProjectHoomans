@@ -87,6 +87,39 @@ Definitions.WORLD_EFFECT_BY_OPERATION = {
     CORPSE_HAUL = "CORPSE_TRANSFER",
 }
 
+--[[
+    Default work-location policy per operation.
+
+    Research-family study is assigned at the base so it visibly starts at the
+    research table, then keeps its order if the colonist wanders off:
+    execution = REMOTE means the scheduler's "worker_left_home" branch does not
+    fire, so the claim and the facility reservation survive and the abstract
+    progress clock keeps running. With the inherited HOME/HOME default that same
+    branch fired on every pass while the researcher was away - release the
+    claim, drop the reservation, mark the repository dirty, push a SendHome
+    command, re-find a worker, re-claim the station, repeat - which is the
+    per-tick loop that stalled the server.
+
+    returnHome = STAY: nobody is dragged back mid-task. The consequence is that
+    an order queued while every colonist is away waits for one to come home
+    (visible as WORKER_NOT_AT_HOME / NO_HOME_WORKER on the work order) instead
+    of pulling a colonist from across the map.
+
+    Lumber and corpse hauling pass their own policies at their call sites; this
+    table covers the shared research queue in one place. Callers that pass an
+    explicit locationPolicy still win.
+]]
+Definitions.LOCATION_POLICY_BY_OPERATION = {
+    RESEARCH = { start = "HOME", execution = "REMOTE",
+        returnHome = "STAY" },
+    READ_BOOK = { start = "HOME", execution = "REMOTE",
+        returnHome = "STAY" },
+}
+
+function Definitions.LocationPolicy(operation)
+    return Definitions.LOCATION_POLICY_BY_OPERATION[tostring(operation or "")]
+end
+
 function Definitions.ExecutionPolicy(operation)
     operation = tostring(operation or "")
     local explicit = Definitions.EXECUTION_POLICY[operation]

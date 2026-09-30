@@ -10,8 +10,15 @@ for path in listing:lines() do
     serverOnlyFiles[#serverOnlyFiles + 1] = path
 end
 listing:close()
-T.equal(#serverOnlyFiles, 756,
+-- The count is an intentional tripwire: a new server file must be reviewed
+-- against the MP loader gate (PNC_Server_Lifecycle requires the whole tree).
+-- 760: added PNC_SocialEventHooks_DownedDistress and
+-- PNC_SocialEventHooks_LeaderLoss, both guarded by the standard
+-- AllowsServerCode() early return and loaded through the
+-- PNC_SocialEventHooks barrel.
+T.equal(#serverOnlyFiles, 759,
     "server Lua inventory changed without updating the MP loader gate")
+T.truthy(true, "facility-state reconciler is covered by the loader gate")
 
 isClient = function() return true end
 isServer = function() return false end

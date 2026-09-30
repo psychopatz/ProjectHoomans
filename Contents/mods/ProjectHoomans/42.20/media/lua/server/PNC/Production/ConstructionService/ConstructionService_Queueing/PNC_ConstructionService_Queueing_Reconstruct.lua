@@ -74,6 +74,12 @@ function Service.QueueReconstruct(player, facility, change)
         end
         return nil, reason
     end
+    -- Durable memory of what to restore if this order never finishes: without
+    -- it a lost order leaves the facility PLANNED, which for the stockpile is a
+    -- storage lock-out (GetStockpile requires BUILT).
+    facility.previousConstructionState =
+        PNC.FacilityState and PNC.FacilityState.ConstructionState
+        and PNC.FacilityState.ConstructionState(facility) or "BUILT"
     facility.constructionState = "RECONSTRUCTING"
     facility.constructionWorkOrderId = order.id
     PNC.FacilityService.RefreshState(facility)

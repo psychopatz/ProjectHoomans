@@ -39,6 +39,10 @@ function Internal.handleSettlementAction(player, args, action)
             and PNC.FacilityService.RemoveComponent,
         facility_destroy = PNC.FacilityService
             and PNC.FacilityService.Destroy,
+        -- Recovery entry point: repair a facility whose construction order is
+        -- gone instead of leaving it stuck in a state that locks the colony out.
+        facility_reconcile = PNC.FacilityService
+            and PNC.FacilityService.ReconcileAction,
         stockpile_node_create = PNC.StockpileAccessService
             and PNC.StockpileAccessService.Create,
         stockpile_node_remove = PNC.StockpileAccessService

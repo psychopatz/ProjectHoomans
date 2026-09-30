@@ -169,6 +169,7 @@ function Network.BuildPresenceDelta(record)
         activeBehavior = record.activeBehavior,
         inCombat = inCombat,
         attackMode = record.runtime and record.runtime.target ~= nil or false,
+        combatStance = combat and combat.combatStance == true or false,
         firearmState = firearmState,
         vehiclePassenger = vehiclePassenger and {
             active = vehiclePassenger.active == true,

@@ -3,6 +3,11 @@
 -- Adapters translate a foreign actor system into stable references. They own
 -- their actor lookup, relationship rules, damage implementation, and native
 -- presentation. Hoomans core only calls the capabilities that are present.
+--
+-- Integration classes (foreign_actor / policy_hook / feature_integration), the
+-- provider module shape, and the spoke dependency rules are documented in
+-- docs/compatibility/PNC_Compatibility_Adapters.md and enforced by
+-- tests/pnc_compatibility_shape_smoke.lua.
 
 PNC = PNC or {}
 PNC.Compatibility = PNC.Compatibility or {}

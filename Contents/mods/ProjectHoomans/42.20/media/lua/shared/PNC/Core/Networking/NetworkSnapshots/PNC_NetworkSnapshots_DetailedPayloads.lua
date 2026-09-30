@@ -221,6 +221,9 @@ function Network.BuildSnapshot(record, inventorySummaryOverride)
         aiState = aiState,
         inCombat = inCombat,
         attackMode = attackMode,
+        -- Explicit fighting-mode flag: a remote body draws its weapon from this
+        -- instead of reconstructing the whole combat runtime.
+        combatStance = combat and combat.combatStance == true or false,
         visualState = visualState,
         pathDebugState = buildPathDebugState(record),
         combatDebugState = buildCombatDebugState(

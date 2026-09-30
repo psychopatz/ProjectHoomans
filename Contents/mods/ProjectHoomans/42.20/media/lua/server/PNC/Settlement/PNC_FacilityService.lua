@@ -20,6 +20,7 @@ require "PNC/Settlement/FacilityService/PNC_FacilityService_AnchorFinalization"
 require "PNC/Settlement/FacilityService/PNC_FacilityService_Removal"
 require "PNC/Settlement/FacilityService/PNC_FacilityService_Queries"
 require "PNC/Settlement/FacilityService/PNC_FacilityService_Snapshots"
+require "PNC/Settlement/FacilityService/PNC_FacilityService_Reconcile"
 require "PNC/Settlement/FacilityService/PNC_FacilityService_Bootstrap"
 
 return PNC.FacilityService

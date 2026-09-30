@@ -262,12 +262,34 @@ function Management.BuildBaseSnapshot(player)
                 and PNC.BuildRecipeCatalog.Generation or nil,
         }
     end
+    --[[
+        The Facilities tab gates workstation builds on researched technologies.
+        It read snapshot.research, which this projection never carried, so a
+        learned technology still reported RESEARCH REQUIRED forever.
+
+        Only the learned id list travels: the full research projection walks
+        every stockpile record looking for books and blueprints, which is far
+        too heavy for a two-second poll, and the gate only needs to know what is
+        already known.
+    ]]
+    local research
+    if colony and PNC.ResearchRepository
+        and type(PNC.ResearchRepository.Get) == "function"
+    then
+        local state = PNC.ResearchRepository.Get(colony.id, false)
+        research = {
+            learnedTechnologyIds = state and PNC.Core.DeepCopy(
+                state.learnedTechnologyIds) or {},
+            knowledgeRevision = state and state.knowledgeRevision or 0,
+        }
+    end
     return {
         colony = colonySnapshot,
         faction = faction,
         settlement = base and Internal.BuildSettlementSnapshot(base, {}) or nil,
         storage = storage,
         building = building,
+        research = research,
         identityStatus = identityStatus,
         generatedAt = PNC.NeedsUtils.WorldAgeHours(),
     }

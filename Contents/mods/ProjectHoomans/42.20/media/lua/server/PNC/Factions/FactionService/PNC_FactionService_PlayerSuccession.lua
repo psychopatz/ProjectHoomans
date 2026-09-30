@@ -151,13 +151,48 @@ function Factions.HandlePlayerCharacterDeath(
                 "player_leadership_succeeded"
             )
         end
+        Internal.AnnounceLeaderLost(
+            faction, playerKey, "player", nil, at)
         return true, "leadership_succeeded", Internal.copy(faction)
     end
-    return Internal.convertPlayerFactionToRefugees(
+    local converted, reason = Internal.convertPlayerFactionToRefugees(
         faction,
         playerKey,
         at
     )
+    if converted then
+        Internal.AnnounceLeaderLost(
+            faction, playerKey, "promoted", faction.leaderNPCID, at)
+    end
+    return converted, reason
+end
+
+-- Speaks the leadership-loss line for the survivors.  Presentation only: a
+-- missing or failing social module must never affect the succession result,
+-- so this is pcall-guarded and reports nothing back.
+-- `succession` is passed as a plain literal ("player" | "promoted") so this
+-- faction module keeps no dependency on the flavor layer; the social module
+-- maps those onto PNC.FlavorTextConst.Succession.
+function Internal.AnnounceLeaderLost(
+    faction,
+    deadPlayerKey,
+    succession,
+    successorNPCID,
+    at
+)
+    local hooks = PNC.SocialEventHooks
+    if not hooks or type(hooks.OnLeaderLost) ~= "function" then
+        return false, "unavailable"
+    end
+    pcall(
+        hooks.OnLeaderLost,
+        faction,
+        deadPlayerKey,
+        succession,
+        successorNPCID,
+        at
+    )
+    return true
 end
 
 function Factions.ReconcilePlayerMemberships(worldAgeHours)

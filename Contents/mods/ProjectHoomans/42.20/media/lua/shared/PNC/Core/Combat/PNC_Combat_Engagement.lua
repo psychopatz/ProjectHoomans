@@ -14,6 +14,7 @@ local Const = PNC.Const
 local Combat = PNC.Combat
 local Equipment = PNC.Equipment
 local Tactics = PNC.CombatTactics
+local Stance = PNC.CombatStance
 local Defense = PNC.CombatDefense
 local Common = PNC.BehaviorCommon
 local PathService = PNC.PathService
@@ -601,6 +602,12 @@ function Engagement.Tick(record, zombie, target)
     end
 
     if Equipment.ApplyCombatState then
+        -- Refresh the fighting-mode hold before presentation reads it, so a
+        -- reload, a spacing reposition, or a target re-acquisition never
+        -- re-holsters the weapon mid-fight.
+        if Stance and Stance.Maintain then
+            Stance.Maintain(record)
+        end
         Equipment.ApplyCombatState(zombie, record, true)
     end
     setDebug(

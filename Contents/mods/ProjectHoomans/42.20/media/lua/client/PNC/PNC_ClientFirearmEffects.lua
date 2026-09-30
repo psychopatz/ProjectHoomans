@@ -2,6 +2,17 @@
     PNC Client Firearm Effects
     Replays authoritative firearm-shot events as short-lived local effects.
     It never applies damage or changes ammunition.
+
+    Alignment methodology: every barrel-anchored effect (muzzle flash, tracer,
+    and the muzzle square used for the light) starts at the world-space barrel
+    tip, resolved from the shot bearing the payload already carries -- never
+    from the animation facing and never from the nameplate anchor. Origin and
+    direction therefore come from one world line, which is what keeps a flying
+    round on the bore; this matches Project A-Life's tracer methodology.
+
+    Deliberately unchanged by that path: the tracer/flash/light colors, the
+    light radius and lifetime, the textures, and the screen-space tracer
+    renderer are Hoomans' own design.
 ]]
 
 PNC = PNC or {}
@@ -39,6 +50,15 @@ local MUZZLE_FLASH_COLOR = { r = 1.0, g = 0.28, b = 0.02 }
 local MUZZLE_CORE_COLOR = { r = 1.0, g = 0.88, b = 0.32 }
 local TRACER_COLOR = { r = 1.0, g = 0.76, b = 0.18 }
 local SHELL_TRACER_COLOR = { r = 1.0, g = 0.56, b = 0.06 }
+
+-- Bore-line geometry. A tracer leaves the barrel, so the muzzle offset is
+-- applied along the *shot bearing* and lifted to barrel height. The defaults
+-- match Project A-Life's proven muzzle values so both mods draw the same line.
+local BORE_MUZZLE_TILES = 0.55
+local BORE_HEIGHT_TILES = 0.45
+local BORE_SIDE_TILES = 0.05
+local BORE_MIN_MODEL_LENGTH = 0.15
+local BORE_MAX_MODEL_LENGTH = 2.5
 
 local function nowMs()
     if PNC.Core and type(PNC.Core.Now) == "function" then
@@ -164,70 +184,92 @@ local function resolveWeapon(body, payload)
     return nil
 end
 
+-- The live shot bearing in world space. The payload already carries the
+-- authoritative shooter and aim point, so the bore is never taken from the
+-- animation facing first: while aiming, strafing, or blending, the character
+-- can face somewhere the barrel is not pointing, and offsetting the muzzle
+-- along that facing is what detached the tracer from the gun. Facing stays as
+-- the last resort for a shot that carries no aim point at all.
+local function resolveBoreDirection(body, payload)
+    local bodyX = tonumber(body and readMethod(body, "getX"))
+    local bodyY = tonumber(body and readMethod(body, "getY"))
+    local originX = bodyX or tonumber(payload and payload.sx)
+    local originY = bodyY or tonumber(payload and payload.sy)
+    local targetX = tonumber(payload and payload.tx)
+    local targetY = tonumber(payload and payload.ty)
+    local dx
+    local dy
+    local length
+    local facing
+    local forwardX
+    local forwardY
+    local angle
+    if originX and originY and targetX and targetY then
+        dx, dy = targetX - originX, targetY - originY
+        length = math.sqrt((dx * dx) + (dy * dy))
+        if length > 0.001 then return dx / length, dy / length end
+    end
+    facing = body and readMethod(body, "getForwardDirection") or nil
+    forwardX = facing and tonumber(readMethod(facing, "getX")) or nil
+    forwardY = facing and tonumber(readMethod(facing, "getY")) or nil
+    if forwardX and forwardY
+        and math.abs(forwardX) + math.abs(forwardY) > 0.001
+    then
+        length = math.sqrt((forwardX * forwardX) + (forwardY * forwardY))
+        return forwardX / length, forwardY / length
+    end
+    angle = tonumber(body and readMethod(body, "getAnimAngleRadians"))
+    if angle then return math.cos(angle), math.sin(angle) end
+    return nil, nil
+end
+
+-- Barrel length along the bore, from the weapon model's muzzle attachment when
+-- a modded weapon supplies one. Clamped, because a missing or unusual model
+-- script must not be able to fling the tracer away from the shooter. The
+-- attachment's lateral and vertical terms are deliberately unused: they were
+-- previously applied on the wrong axes, which is part of why the muzzle never
+-- sat on the barrel line.
+local function modelBoreLength(weapon)
+    local staticModel = weapon and readMethod(weapon, "getStaticModel") or nil
+    local manager
+    local model
+    local attachment
+    local offset
+    local length
+    if not staticModel or not getScriptManager then return nil end
+    manager = getScriptManager()
+    model = manager and readMethod(manager, "getModelScript", staticModel) or nil
+    attachment = model and readMethod(model, "getAttachmentById", "muzzle") or nil
+    offset = attachment and readMethod(attachment, "getOffset") or nil
+    length = offset and tonumber(readMethod(offset, "y")) or nil
+    if length and length >= BORE_MIN_MODEL_LENGTH
+        and length <= BORE_MAX_MODEL_LENGTH
+    then
+        return length
+    end
+    return nil
+end
+
+-- World-space barrel tip: shooter position advanced along the shot bearing by
+-- the barrel length, laterally offset inside the bore frame, and lifted to
+-- barrel height instead of the old absolute 1.1 tiles that floated the effect
+-- well above the weapon.
 local function getMuzzlePosition(body, weapon, payload)
     local x = tonumber(body and readMethod(body, "getX")) or tonumber(payload.sx) or 0
     local y = tonumber(body and readMethod(body, "getY")) or tonumber(payload.sy) or 0
     local squareZ = tonumber(body and readMethod(body, "getZ")) or tonumber(payload.sz) or 0
-    local angle
-    local facing = body and readMethod(body, "getForwardDirection") or nil
-    local forwardX = facing and tonumber(readMethod(facing, "getX")) or nil
-    local forwardY = facing and tonumber(readMethod(facing, "getY")) or nil
-    -- HandWeapon does not expose a stable B42 isTwoHandWeapon() Lua method.
-    -- Use a weapon-agnostic forward offset, then refine it from the model's
-    -- muzzle attachment when a modded weapon supplies one.
-    local forward = 0.65
-    local right = 0.05
-    local up = 1.1
-    local staticModel = weapon and readMethod(weapon, "getStaticModel") or nil
-    local model
-    local attachment
-    local offset
-    local manager
-    if staticModel and getScriptManager then
-        manager = getScriptManager()
-        model = manager and readMethod(manager, "getModelScript", staticModel) or nil
-        attachment = model and readMethod(model, "getAttachmentById", "muzzle") or nil
-        offset = attachment and readMethod(attachment, "getOffset") or nil
-        if offset then
-            forward = tonumber(readMethod(offset, "y")) or forward
-            right = tonumber(readMethod(offset, "x")) or right
-            up = up + (tonumber(readMethod(offset, "z")) or 0)
-        end
+    local boreX, boreY = resolveBoreDirection(body, payload)
+    local forward = modelBoreLength(weapon) or BORE_MUZZLE_TILES
+    local rightX
+    local rightY
+    if not boreX or not boreY then
+        -- Nothing to aim along: keep the world axis so the shot still renders.
+        boreX, boreY = 1, 0
     end
-    if not forwardX or not forwardY
-        or math.abs(forwardX) + math.abs(forwardY) <= 0.001
-    then
-        angle = tonumber(body and readMethod(body, "getAnimAngleRadians"))
-    end
-    if angle then
-        forwardX = math.cos(angle)
-        forwardY = math.sin(angle)
-    end
-    if not forwardX or not forwardY
-        or math.abs(forwardX) + math.abs(forwardY) <= 0.001
-    then
-        local tx = tonumber(payload.tx)
-        local ty = tonumber(payload.ty)
-        if tx and ty and (math.abs(tx - x) > 0.0001 or math.abs(ty - y) > 0.0001) then
-            -- PZ's character angle is a normal world-space angle: zero points
-            -- along +X. Keep the fallback in that same convention.
-            local dx = tx - x
-            local dy = ty - y
-            local length = math.sqrt((dx * dx) + (dy * dy))
-            if length > 0.0001 then
-                forwardX = dx / length
-                forwardY = dy / length
-            end
-        else
-            forwardX = 1
-            forwardY = 0
-        end
-    end
-    local rightX = -forwardY
-    local rightY = forwardX
-    return x + (forwardX * forward) + (rightX * right),
-        y + (forwardY * forward) + (rightY * right),
-        squareZ + up,
+    rightX, rightY = -boreY, boreX
+    return x + (boreX * forward) + (rightX * BORE_SIDE_TILES),
+        y + (boreY * forward) + (rightY * BORE_SIDE_TILES),
+        squareZ + BORE_HEIGHT_TILES,
         squareZ
 end
 
@@ -536,11 +578,30 @@ local function getTracerColor(payload)
     return TRACER_COLOR
 end
 
+-- Screen origin for a barrel-anchored effect. A real shot projects the
+-- world-space barrel tip, which is the same coordinate space Project A-Life's
+-- tracers render in, so origin and direction finally agree. The cached
+-- nameplate anchor is only a fallback now, or the explicit target of the
+-- dry-fire anchor probe used by the debug action.
+local function resolveMuzzleScreen(body, payload, muzzleX, muzzleY, muzzleZ)
+    local screenX
+    local screenY
+    local cache
+    if payload and payload.anchorProbe == true then
+        screenX, screenY, cache = cachedMuzzleScreen(body, payload)
+        if cache then return screenX, screenY, "nameplate_relative" end
+    end
+    screenX, screenY = projectToScreen(muzzleX, muzzleY, muzzleZ)
+    if screenX and screenY then return screenX, screenY, "world_bore" end
+    screenX, screenY, cache = cachedMuzzleScreen(body, payload)
+    if cache then return screenX, screenY, "nameplate_relative" end
+    return nil, nil, "none"
+end
+
 local function addMuzzleFlash(body, payload, muzzleX, muzzleY, muzzleZ)
     local screenX
     local screenY
-    local anchorCache
-    local anchorSource = "world_projection"
+    local anchorSource
     local directionX
     local directionY
     local dx
@@ -548,11 +609,13 @@ local function addMuzzleFlash(body, payload, muzzleX, muzzleY, muzzleZ)
     if #Effects.ActiveMuzzleFlashes >= MAX_MUZZLE_FLASHES then
         return 0
     end
-    screenX, screenY, anchorCache = cachedMuzzleScreen(body, payload)
-    if anchorCache then anchorSource = "nameplate_relative" end
-    if not screenX or not screenY then
-        screenX, screenY = projectToScreen(muzzleX, muzzleY, muzzleZ)
-    end
+    screenX, screenY, anchorSource = resolveMuzzleScreen(
+        body,
+        payload,
+        muzzleX,
+        muzzleY,
+        muzzleZ
+    )
     if not screenX or not screenY then return 0 end
     directionX, directionY = resolveScreenDirection(
         body,
@@ -585,8 +648,7 @@ local function addTracer(body, payload, muzzleX, muzzleY, muzzleZ)
     local spread = math.max(0, tonumber(payload.projectileSpread) or 0)
     local startX
     local startY
-    local anchorCache
-    local anchorSource = "world_projection"
+    local anchorSource
     local directionX
     local directionY
     local directionRadians
@@ -600,11 +662,7 @@ local function addTracer(body, payload, muzzleX, muzzleY, muzzleZ)
     local added = 0
     local i
     if not sx or not sy then return 0 end
-    startX, startY, anchorCache = cachedMuzzleScreen(body, payload)
-    if anchorCache then anchorSource = "nameplate_relative" end
-    if not startX or not startY then
-        startX, startY = projectToScreen(sx, sy, sz)
-    end
+    startX, startY, anchorSource = resolveMuzzleScreen(body, payload, sx, sy, sz)
     if not startX or not startY then return 0 end
     directionX, directionY = resolveScreenDirection(
         body,
@@ -706,10 +764,12 @@ function Effects.Play(payload)
     end
     body = resolveBody(payload)
     weapon = resolveWeapon(body, payload)
-    -- A visible nameplate gives us the same cached starter point used by the
-    -- debug probe. Prefer that visual path for tracked shots; the native B42
-    -- tracer API accepts a body/endpoint but does not accept our hand anchor.
-    -- Untracked/off-screen shooters retain the native engine path.
+    -- A shooter whose nameplate is being tracked uses Hoomans' own firearm
+    -- effect path, because the native B42 tracer API accepts a body/endpoint
+    -- but cannot be handed our bore line. Untracked/off-screen shooters keep
+    -- the native engine path. Whichever path runs, the origin comes from the
+    -- world-space barrel tip, so the line leaves the gun rather than the
+    -- nameplate anchor.
     anchoredFallback = hasLiveAnchor(body, payload)
     logFirearmAudit("anchor_route", payload,
         "live=" .. tostring(anchoredFallback),
@@ -820,8 +880,10 @@ function Effects.SimulateShot(body, npcID, playerIndex)
         sz = z,
         -- Deliberately use a non-matching type so a held weapon cannot route
         -- this dry-fire probe through the native effect path. The purpose of
-        -- this action is to visualize the cached fallback anchor itself.
+        -- this action is to visualize the cached fallback anchor itself, so it
+        -- opts into the nameplate anchor instead of the world bore line.
         weaponFullType = "PNC.DebugSimulatedWeapon",
+        anchorProbe = true,
         projectileCount = 1,
         projectileSpread = 0,
         ammoType = "PNC.DebugAmmo",

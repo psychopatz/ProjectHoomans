@@ -11,6 +11,12 @@ package.preload["PNC/Core/Settlement/PNC_FacilityState"] = function()
         IsBuilt = function(facility)
             return facility and facility.constructionState == "BUILT"
         end,
+        -- Mirrors the shared module: a missing state means already built.
+        ConstructionState = function(facility)
+            local value = facility and facility.constructionState
+            if value == nil or tostring(value) == "" then return "BUILT" end
+            return tostring(value)
+        end,
     }
 end
 
@@ -88,14 +94,24 @@ T.equal(beginBuild.window, owner,
 T.equal(beginBuild.definitionId, "stockpile",
     "hub stockpile button did not use the stockpile definition")
 
+-- A stockpile record that is only PLANNED and idle must keep the bootstrap
+-- button: the FACILITIES tab never lists the stockpile, so hiding the button
+-- left a stuck stockpile with no rebuild path at all (a soft-lock).
 snapshot = {
     colony = { id = "colony-1" },
     settlement = { facilities = {
         { definitionId = "stockpile", constructionState = "PLANNED" },
     } },
 }
+T.truthy(Registry.IsVisible(stockpile),
+    "planned stockpile hid its own rebuild path")
+T.falsy(PNC.CommandHub.Gates.GetBaseAndStockpileStatus().hasStockpile,
+    "planned stockpile was reported as usable storage")
+
+-- Work in flight hides the button; it is already being handled.
+snapshot.settlement.facilities[1].constructionState = "RECONSTRUCTING"
 T.falsy(Registry.IsVisible(stockpile),
-    "stockpile bootstrap remained visible after being planned")
+    "stockpile being reconstructed still offered a second build")
 
 snapshot.settlement.facilities[1].constructionState = "BUILT"
 local status = PNC.CommandHub.Gates.GetBaseAndStockpileStatus()

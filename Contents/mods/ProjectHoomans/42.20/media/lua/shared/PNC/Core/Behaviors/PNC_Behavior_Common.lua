@@ -77,6 +77,12 @@ function Common.SetCombatTarget(record, target, source)
     runtime.target = target
     runtime.targetSource = tostring(source or "combat")
     runtime.targetAt = Core and Core.Now and Core.Now() or nil
+    -- Acquiring a target is the instant fighting mode begins.  Start the
+    -- weapon-drawn hold here so presentation never depends on the next
+    -- engagement tick having already run.
+    if PNC.CombatStance and PNC.CombatStance.Maintain then
+        PNC.CombatStance.Maintain(record, runtime.targetAt)
+    end
     if Diagnostics and Diagnostics.NPCThreatAuditEnabled == true
         and Diagnostics.LogNPCThreatAudit
     then

@@ -46,6 +46,10 @@ local function buildRecordView(snapshot)
         },
         runtime = {
             attackMode = snapshot and snapshot.attackMode == true or false,
+            -- Fighting mode mirrored from the authority.  Equipment presentation
+            -- reads this so a body that is fighting holds its weapon in hand
+            -- even on a frame with no attack action in flight.
+            combatStance = snapshot and snapshot.combatStance == true or false,
             debug = snapshot and snapshot.debugState and snapshot.debugState.debugEnabled == true or false,
             localNavigation = {
                 provider = visualState.nativeMoveActive == true
