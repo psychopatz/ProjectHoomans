@@ -137,7 +137,7 @@ end
 
 function Controller.AddDetail(window, label, detail, colorName)
     local PresentationBase = require
-        "PNC/UI/Shared/PNC_ColonyPresentation"
+        "PNC/UI/Communities/PNC_ColonyPresentation"
     Components.AddRow(window.details,
         PresentationBase.Detail(label, detail, colorName))
 end

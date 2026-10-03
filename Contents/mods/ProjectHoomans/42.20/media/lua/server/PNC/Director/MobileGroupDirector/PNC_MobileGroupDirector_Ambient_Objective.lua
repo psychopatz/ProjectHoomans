@@ -1,0 +1,277 @@
+-- Strategic target selection and abstract objective synchronization.
+if PsychopatzCore and PsychopatzCore.RuntimeRole
+    and not PsychopatzCore.RuntimeRole.AllowsServerCode() then return end
+
+local H = PNC.MobileGroupDirectorInternal
+local Internal = H.Internal
+local Constants = PNC.FactionConstants
+local Factions = PNC.Factions
+local Resolver = PNC.CommunitySiteResolver
+local Core = PNC.Core
+local Const = PNC.Const
+local Config = PNC.DirectorConfig or {}
+local Diagnostics = PNC.PerformanceScalingDiagnostics
+local beginDiagnosticTiming = Internal.AmbientTargets.beginDiagnosticTiming
+local endDiagnosticTiming = Internal.AmbientTargets.endDiagnosticTiming
+local incrementDiagnostic = Internal.incrementDiagnostic or function() end
+local setDiagnosticGauge = Internal.setDiagnosticGauge or function() end
+local finite = Internal.AmbientTargets.finite
+local sameTarget = function(left, right)
+    if not left or not right then return left == right end
+    return left.kind == right.kind
+        and left.siteID == right.siteID
+        and left.baseID == right.baseID
+        and math.abs(finite(left.x, 0) - finite(right.x, 0)) < 0.1
+        and math.abs(finite(left.y, 0) - finite(right.y, 0)) < 0.1
+        and math.abs(finite(left.z, 0) - finite(right.z, 0)) < 0.1
+end
+
+local function ambientOwnershipSnapshot(context)
+    if context and context.ownershipSnapshot then
+        return context.ownershipSnapshot
+    end
+    local snapshot = H.PlayerOwnershipSnapshot()
+    if context then context.ownershipSnapshot = snapshot end
+    return snapshot
+end
+
+function H.AmbientPhase(at)
+    local hour = finite(at, 0) % 24
+    if hour >= Constants.MOBILE_AMBIENT_DAY_START_HOUR
+        and hour < Constants.MOBILE_AMBIENT_NIGHT_START_HOUR
+    then
+        return Constants.MOBILE_AMBIENT_DAY
+    end
+    return Constants.MOBILE_AMBIENT_NIGHT
+end
+
+function H.FindPlayerBaseTarget(faction)
+    local mobile = faction and faction.mobile or nil
+    local current = mobile and mobile.strategicTarget or nil
+    local BaseService = PNC.BaseService
+    if current and current.baseID and BaseService and BaseService.Get then
+        local base = BaseService.Get(current.baseID)
+        if base and BaseService.BuildSnapshot then
+            local snapshot = BaseService.BuildSnapshot(base)
+            local bounds = snapshot and snapshot.geometry
+                and snapshot.geometry.bounds or nil
+            if bounds then
+                return {
+                    kind = "player_base",
+                    baseID = base.id,
+                    factionID = base.factionId,
+                    zoneID = base.baseZoneId,
+                    x = (bounds.minX + bounds.maxX) / 2,
+                    y = (bounds.minY + bounds.maxY) / 2,
+                    z = bounds.minZ,
+                    radius = math.max(8, math.min(
+                        32,
+                        math.sqrt(
+                            ((bounds.maxX - bounds.minX) / 2) ^ 2
+                                + ((bounds.maxY - bounds.minY) / 2) ^ 2
+                        )
+                    )),
+                }
+            end
+        end
+    end
+    if not Core or not Core.ForEachPlayer
+        or not Factions or not Factions.GetPlayerFaction
+        or not BaseService or not BaseService.GetForFaction
+    then
+        return nil
+    end
+    local best
+    local bestDistance = math.huge
+    local origin = mobile and mobile.site and mobile.site.home or {}
+    Core.ForEachPlayer(function(player)
+        local playerFaction = Factions.GetPlayerFaction(player)
+        local base = playerFaction
+            and BaseService.GetForFaction(playerFaction.id) or nil
+        if base and BaseService.BuildSnapshot then
+            local snapshot = BaseService.BuildSnapshot(base)
+            local bounds = snapshot and snapshot.geometry
+                and snapshot.geometry.bounds or nil
+            if bounds then
+                local targetX = (bounds.minX + bounds.maxX) / 2
+                local targetY = (bounds.minY + bounds.maxY) / 2
+                local distance = Core.DistanceSq(
+                    origin.x or 0,
+                    origin.y or 0,
+                    targetX,
+                    targetY
+                )
+                if distance < bestDistance then
+                    bestDistance = distance
+                    best = {
+                        kind = "player_base",
+                        baseID = base.id,
+                        factionID = base.factionId,
+                        zoneID = base.baseZoneId,
+                        x = targetX,
+                        y = targetY,
+                        z = bounds.minZ,
+                        radius = math.max(8, math.min(
+                            32,
+                            math.sqrt(
+                                ((bounds.maxX - bounds.minX) / 2) ^ 2
+                                    + ((bounds.maxY - bounds.minY) / 2) ^ 2
+                            )
+                        )),
+                    }
+                end
+            end
+        end
+    end)
+    return best
+end
+
+function H.TargetPlayerBaseSite(faction, at, searchRadius)
+    local target = H.FindPlayerBaseTarget(faction)
+    if not target then return nil, "no_player_base" end
+    local snapshot = H.PlayerOwnershipSnapshot()
+    local site = Resolver.FindAvailableNear(
+        target.x,
+        target.y,
+        target.z,
+        {
+            createdAt = at,
+            searchRadius = searchRadius
+                or Constants.MOBILE_AMBIENT_SHELTER_SEARCH_RADIUS,
+            siteFilter = H.ShelterFilter(snapshot),
+        }
+    )
+    if site and H.IsValidShelterSite(site, snapshot) then
+        return site, "player_base_staging_site"
+    end
+    return nil, "no_player_base_staging_site"
+end
+
+local function abstractTargetLocation(faction, target, objective)
+    local Locations = PNC.AbstractLocations
+    if not Locations then return nil end
+    if target.kind == "building" then
+        local site = {
+            id = target.siteID,
+            kind = "building",
+            home = { x = target.x, y = target.y, z = target.z,
+                radius = target.radius },
+            bounds = target.bounds,
+        }
+        return Locations.RegisterSite and Locations.RegisterSite(site, {
+            tags = { SHELTER = true },
+        }) or nil
+    end
+    local factionKey = string.gsub(tostring(faction.id), "[^%w_%-%.:]", "_")
+    local id = "aloc_mobile_nav_" .. string.sub(factionKey, 1, 120)
+        .. "_" .. tostring(math.floor(target.x))
+        .. "_" .. tostring(math.floor(target.y))
+    return Locations.Register and Locations.Register({
+        id = id,
+        type = "TEMPORARY",
+        x = target.x,
+        y = target.y,
+        z = target.z,
+        tags = { ROAD = true, SHELTER = false },
+    }) or nil
+end
+
+function H.SyncAbstractObjective(faction, objective, target, at)
+    local Groups = PNC.AbstractGroups
+    local Traversal = PNC.AbstractTraversal
+    if faction and faction.mobile
+        and faction.mobile.activity
+            == Constants.MOBILE_ACTIVITY_TRAVELING_TO_SETTLEMENT
+    then
+        return false
+    end
+    if not Groups or not Groups.FindByFactionID or not Traversal
+        or not target
+    then
+        return false
+    end
+    local group = Groups.FindByFactionID(faction.id)
+    if not group then return false end
+    local live = Groups.HasLiveMembers
+        and Groups.HasLiveMembers(group) == true
+    if live then
+        group.mobileAmbient = true
+        group.ambientObjective = objective
+    end
+    if live and Groups.RefreshLOD then
+        Groups.RefreshLOD(group, at)
+    end
+    local location = abstractTargetLocation(faction, target, objective)
+    if type(location) == "table" and location.id then
+        group.mobileAmbient = true
+        group.ambientObjective = objective
+        if not live
+            and group.location and group.location.id ~= location.id
+            and group.state ~= "TRAVELING"
+        then
+            Traversal.Begin(group, location, at)
+        end
+        if PNC.AbstractGroupManagerInternal
+            and PNC.AbstractGroupManagerInternal.Touch
+        then
+            PNC.AbstractGroupManagerInternal.Touch(
+                group,
+                "mobile_ambient_objective"
+            )
+        end
+        return true
+    end
+    return false
+end
+
+local function updateMobile(faction, patch, reason)
+    if not Factions or not Factions.UpdateMobileGroup then
+        return faction
+    end
+    local ok = Factions.UpdateMobileGroup(faction.id, patch, reason)
+    return ok and Factions.Get(faction.id) or faction
+end
+
+function H.RefreshStrategic(faction, at)
+    local mobile = faction and faction.mobile or nil
+    if not mobile
+        or mobile.controlMode ~= Constants.MOBILE_CONTROL_STRATEGIC
+    then
+        return faction, false
+    end
+    if H.IsPlayerRoamArea and H.IsPlayerRoamArea(mobile) then
+        return faction, false
+    end
+    if mobile.activity
+        == Constants.MOBILE_ACTIVITY_TRAVELING_TO_SETTLEMENT
+    then
+        return faction, false
+    end
+    local timingName, timingStart = beginDiagnosticTiming(
+        "MobileAmbient.RefreshStrategic"
+    )
+    local target = H.FindPlayerBaseTarget(faction)
+    local current = mobile.strategicTarget
+    if target and not sameTarget(current, target) then
+        faction = updateMobile(faction, {
+            strategicTarget = target,
+        }, "mobile_player_base_target")
+    elseif not target and current and current.baseID then
+        faction = updateMobile(faction, {
+            strategicTarget = nil,
+        }, "mobile_player_base_lost")
+    end
+    H.RepairMobileOrders(faction)
+    endDiagnosticTiming(
+        timingName,
+        timingStart,
+        target and "target" or "no_target"
+    )
+    return faction, target ~= nil
+end
+
+Internal.ambientOwnershipSnapshot = ambientOwnershipSnapshot
+Internal.updateMobile = updateMobile
+Internal.sameTarget = sameTarget
+
+return H

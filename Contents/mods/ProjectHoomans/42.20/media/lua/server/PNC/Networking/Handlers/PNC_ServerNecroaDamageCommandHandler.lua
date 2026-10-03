@@ -32,7 +32,7 @@ Router.Register(Const.CMD_NECROA_INCOMING_DAMAGE, function(player, args)
 
     args = type(args) == "table" and args or {}
     id = tostring(args.npcID or "")
-    if id == "" or string.len(id) > 128 then return end
+    if id == "" or #id > 128 then return end
 
     amount = boundedNumber(args.amount, 0.01, 40)
     x = boundedNumber(args.attackerX, -100000, 100000)

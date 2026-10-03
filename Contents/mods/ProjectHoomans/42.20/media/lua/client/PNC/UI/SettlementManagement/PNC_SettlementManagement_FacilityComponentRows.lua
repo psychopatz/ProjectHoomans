@@ -148,166 +148,177 @@ local function stockpileRows(facility, storage)
     return rows
 end
 
-function Rows.Build(facility, storage)
-    if facility.definitionId == "stockpile" then
-        return stockpileRows(facility, storage)
+local function appendRoleRows(rows, facility, level, role)
+    local limit = level.componentLimits[role]
+    local assigned, pending = {}, {}
+    for index = 1, #(facility.components or {}) do
+        local component = facility.components[index]
+        if component.role == role then assigned[#assigned + 1] = component end
     end
+    for index = 1, #(facility.pendingComponents or {}) do
+        local component = facility.pendingComponents[index]
+        if component.role == role then pending[#pending + 1] = component end
+    end
+    local minimum = tonumber(limit.minCount) or 0
+    local maximum = tonumber(limit.maxCount) or math.max(1, minimum)
+    local managed = limit.managed == true
+    local componentAction = not managed and #assigned < maximum and {
+        kind = limit.kind, role = role,
+    } or nil
+    local recipe = costText(facility, role)
+    local detail = tostring(#assigned) .. ' / ' .. tostring(maximum)
+    if recipe then detail = detail .. ' | ' .. recipe end
+    rows[#rows + 1] = {
+        key = role,
+        label = roleLabel(role),
+        iconPath = componentIconPath(role),
+        detail = detail .. (#pending > 0 and '  BUILDING'
+            or #assigned >= minimum and '  READY' or '  REQUIRED'),
+        complete = #assigned >= minimum and #pending == 0,
+        componentAction = #pending > 0 and nil or componentAction,
+        actionLabel = managed and text('UI_PNC_Facility_BuiltIn',
+            'BUILT-IN') or limit.kind == 'abstract'
+            and text('UI_PNC_Facility_BuildModule', 'BUILD')
+            or text('UI_PNC_Facility_AssignInline', 'ASSIGN'),
+    }
+    for index = 1, #assigned do
+        local component = assigned[index]
+        local childAction, childSecondary, childActionLabel
+        if not managed then
+            if component.kind ~= 'abstract' then
+                if role == 'growing.plot' then
+                    childAction = { kind = 'farm_plot_crop', role = role,
+                        componentId = component.id }
+                else
+                    childAction = { kind = component.kind, role = role,
+                        componentId = component.id }
+                end
+            end
+            childSecondary = role ~= 'work.zone' and {
+                kind = component.kind, role = role,
+                componentId = component.id, remove = true } or nil
+            childActionLabel = component.kind == 'abstract'
+                and text('UI_PNC_Task_Deconstruct', 'DECONSTRUCT')
+                or role == 'growing.plot' and text(
+                    'UI_PNC_Farming_ChangeSeeds', 'CHANGE SEEDS')
+                or text('UI_PNC_Facility_EditInline', 'MANAGE')
+        else
+            childActionLabel = text('UI_PNC_Facility_BuiltIn', 'BUILT-IN')
+        end
+        rows[#rows + 1] = {
+            key = component.id,
+            label = '- ' .. roleLabel(role) .. ' #' .. tostring(index),
+            iconPath = componentIconPath(role),
+            detail = componentDetail(facility, component),
+            child = true,
+            complete = true,
+            componentAction = childAction,
+            secondaryAction = childSecondary,
+            actionLabel = childActionLabel,
+            secondaryActionLabel = not managed and role ~= 'work.zone' and text(
+                'UI_PNC_Task_Deconstruct', 'DECONSTRUCT') or nil,
+        }
+    end
+    for index = 1, #pending do
+        local component = pending[index]
+        rows[#rows + 1] = {
+            key = 'pending:' .. tostring(component.id or role),
+            label = '- ' .. roleLabel(role) .. ' #' .. tostring(index)
+                .. ' (QUEUED)',
+            iconPath = componentIconPath(role),
+            detail = componentDetail(facility, component),
+            child = true,
+            complete = false,
+        }
+    end
+end
+
+local function buildRoleRows(facility, level)
     local rows = {}
-    local level = PNC.FacilityDefinitions.GetLevel(
-        facility.definitionId, facility.level)
     local roles = {}
     for role, limit in pairs(level and level.componentLimits or {}) do
         if not limit.legacy then roles[#roles + 1] = role end
     end
     table.sort(roles)
     for roleIndex = 1, #roles do
-        local role = roles[roleIndex]
-        local limit = level.componentLimits[role]
-        local assigned, pending = {}, {}
-        for index = 1, #(facility.components or {}) do
-            local component = facility.components[index]
-            if component.role == role then assigned[#assigned + 1] = component end
-        end
-        for index = 1, #(facility.pendingComponents or {}) do
-            local component = facility.pendingComponents[index]
-            if component.role == role then pending[#pending + 1] = component end
-        end
-        local minimum = tonumber(limit.minCount) or 0
-        local maximum = tonumber(limit.maxCount) or math.max(1, minimum)
-        local managed = limit.managed == true
-        local componentAction = not managed and #assigned < maximum and {
-            kind = limit.kind, role = role,
-        } or nil
-        local recipe = costText(facility, role)
-        local detail = tostring(#assigned) .. " / " .. tostring(maximum)
-        if recipe then detail = detail .. " | " .. recipe end
-        rows[#rows + 1] = {
-            key = role,
-            label = roleLabel(role),
-            iconPath = componentIconPath(role),
-            detail = detail .. (#pending > 0 and "  BUILDING"
-                or #assigned >= minimum and "  READY" or "  REQUIRED"),
-            complete = #assigned >= minimum and #pending == 0,
-            componentAction = #pending > 0 and nil or componentAction,
-            actionLabel = managed and text("UI_PNC_Facility_BuiltIn",
-                "BUILT-IN") or limit.kind == "abstract"
-                and text("UI_PNC_Facility_BuildModule", "BUILD")
-                or text("UI_PNC_Facility_AssignInline", "ASSIGN"),
-        }
-        for index = 1, #assigned do
-            local component = assigned[index]
-            local childAction, childSecondary, childActionLabel
-            if not managed then
-                if component.kind ~= "abstract" then
-                    if role == "growing.plot" then
-                        childAction = { kind = "farm_plot_crop", role = role,
-                            componentId = component.id }
-                    else
-                        childAction = { kind = component.kind, role = role,
-                            componentId = component.id }
-                    end
-                end
-                childSecondary = role ~= "work.zone" and {
-                    kind = component.kind, role = role,
-                    componentId = component.id, remove = true } or nil
-                childActionLabel = component.kind == "abstract"
-                    and text("UI_PNC_Task_Deconstruct", "DECONSTRUCT")
-                    or role == "growing.plot" and text(
-                        "UI_PNC_Farming_ChangeSeeds", "CHANGE SEEDS")
-                    or text("UI_PNC_Facility_EditInline", "MANAGE")
-            else
-                childActionLabel = text("UI_PNC_Facility_BuiltIn", "BUILT-IN")
-            end
-            rows[#rows + 1] = {
-                key = component.id,
-                label = "- " .. roleLabel(role) .. " #" .. tostring(index),
-                iconPath = componentIconPath(role),
-                detail = componentDetail(facility, component),
-                child = true,
-                complete = true,
-                componentAction = childAction,
-                secondaryAction = childSecondary,
-                actionLabel = childActionLabel,
-                secondaryActionLabel = not managed and role ~= "work.zone" and text(
-                    "UI_PNC_Task_Deconstruct", "DECONSTRUCT") or nil,
-            }
-        end
-        for index = 1, #pending do
-            local component = pending[index]
-            rows[#rows + 1] = {
-                key = "pending:" .. tostring(component.id or role),
-                label = "- " .. roleLabel(role) .. " #" .. tostring(index)
-                    .. " (QUEUED)",
-                iconPath = componentIconPath(role),
-                detail = componentDetail(facility, component),
-                child = true,
-                complete = false,
-            }
+        appendRoleRows(rows, facility, level, roles[roleIndex])
+    end
+    return rows
+end
+
+local function appendRoomProfileRows(rows, facility)
+    local profile = facility.roomProfile
+    if not profile then return end
+    local bedCount = tonumber(profile.bedCount)
+        or tonumber(profile.resourceCounts
+            and profile.resourceCounts['sleep.bed']) or 0
+    local scanStatus = tostring(profile.scanStatus or 'UNKNOWN')
+    local scanReady = scanStatus == 'READY'
+    local configuredCapacity = tonumber(profile.capacityOverride)
+    local effectiveCapacity = tonumber(profile.capacity) or bedCount
+    local capacityDetail = configuredCapacity
+        and tostring(configuredCapacity) .. ' '
+            .. text('UI_PNC_Facility_Sleepers', 'SLEEPERS')
+        or text('UI_PNC_Facility_CapacityAutomatic', 'AUTO') .. ' | '
+            .. tostring(effectiveCapacity) .. ' '
+            .. text('UI_PNC_Facility_Sleepers', 'SLEEPERS')
+    rows[#rows + 1] = {
+        key = 'room_capacity',
+        label = text('UI_PNC_Facility_Capacity', 'CAPACITY'),
+        detail = capacityDetail,
+        complete = true,
+        componentAction = { kind = 'set_room_capacity' },
+        actionLabel = text('UI_PNC_Facility_SetCapacity', 'SET'),
+    }
+    rows[#rows + 1] = {
+        key = 'discovered:sleep.bed',
+        label = text('UI_PNC_Facility_Beds', 'BEDS'),
+        iconPath = componentIconPath('sleep.bed'),
+        detail = tostring(bedCount) .. ' | ' .. (scanReady
+            and text('UI_PNC_Facility_ResourceScanReady', 'SCANNED')
+            or scanStatus),
+        complete = scanReady,
+    }
+    local discovered = {}
+    for index = 1, #(facility.discoveredComponents or {}) do
+        local component = facility.discoveredComponents[index]
+        if component.role == 'sleep.bed' then
+            discovered[#discovered + 1] = component
         end
     end
-    local profile = facility.roomProfile
-    if profile then
-        local bedCount = tonumber(profile.bedCount)
-            or tonumber(profile.resourceCounts
-                and profile.resourceCounts["sleep.bed"]) or 0
-        local scanStatus = tostring(profile.scanStatus or "UNKNOWN")
-        local scanReady = scanStatus == "READY"
-        local configuredCapacity = tonumber(profile.capacityOverride)
-        local effectiveCapacity = tonumber(profile.capacity) or bedCount
-        local capacityDetail = configuredCapacity
-            and tostring(configuredCapacity) .. " "
-                .. text("UI_PNC_Facility_Sleepers", "SLEEPERS")
-            or text("UI_PNC_Facility_CapacityAutomatic", "AUTO") .. " | "
-                .. tostring(effectiveCapacity) .. " "
-                .. text("UI_PNC_Facility_Sleepers", "SLEEPERS")
+    for index = 1, #discovered do
+        local component = discovered[index]
         rows[#rows + 1] = {
-            key = "room_capacity",
-            label = text("UI_PNC_Facility_Capacity", "CAPACITY"),
-            detail = capacityDetail,
-            complete = true,
-            componentAction = { kind = "set_room_capacity" },
-            actionLabel = text("UI_PNC_Facility_SetCapacity", "SET"),
+            key = component.resourceKey or 'discovered:bed:' .. tostring(index),
+            label = '- ' .. text('UI_PNC_Facility_Bed', 'BED')
+                .. ' #' .. tostring(index),
+            iconPath = componentIconPath('sleep.bed'),
+            detail = componentDetail(facility, component),
+            child = true,
+            complete = component.available ~= false,
         }
+    end
+    if bedCount == 0 and scanReady then
         rows[#rows + 1] = {
-            key = "discovered:sleep.bed",
-            label = text("UI_PNC_Facility_Beds", "BEDS"),
-            iconPath = componentIconPath("sleep.bed"),
-            detail = tostring(bedCount) .. " | " .. (scanReady
-                and text("UI_PNC_Facility_ResourceScanReady", "SCANNED")
-                or scanStatus),
+            key = 'discovered:floor',
+            label = '- ' .. text('UI_PNC_Facility_FloorSleeping',
+                'FLOOR SLEEPING'),
+            detail = text('UI_PNC_Facility_FloorSleepingHelp',
+                'No bed detected; sleeping uses the room floor.'),
+            child = true,
             complete = scanReady,
         }
-        local discovered = {}
-        for index = 1, #(facility.discoveredComponents or {}) do
-            local component = facility.discoveredComponents[index]
-            if component.role == "sleep.bed" then
-                discovered[#discovered + 1] = component
-            end
-        end
-        for index = 1, #discovered do
-            local component = discovered[index]
-            rows[#rows + 1] = {
-                key = component.resourceKey or "discovered:bed:" .. tostring(index),
-                label = "- " .. text("UI_PNC_Facility_Bed", "BED")
-                    .. " #" .. tostring(index),
-                iconPath = componentIconPath("sleep.bed"),
-                detail = componentDetail(facility, component),
-                child = true,
-                complete = component.available ~= false,
-            }
-        end
-        if bedCount == 0 and scanReady then
-            rows[#rows + 1] = {
-                key = "discovered:floor",
-                label = "- " .. text("UI_PNC_Facility_FloorSleeping",
-                    "FLOOR SLEEPING"),
-                detail = text("UI_PNC_Facility_FloorSleepingHelp",
-                    "No bed detected; sleeping uses the room floor."),
-                child = true,
-                complete = scanReady,
-            }
-        end
     end
+end
+
+function Rows.Build(facility, storage)
+    if facility.definitionId == 'stockpile' then
+        return stockpileRows(facility, storage)
+    end
+    local level = PNC.FacilityDefinitions.GetLevel(
+        facility.definitionId, facility.level)
+    local rows = buildRoleRows(facility, level)
+    appendRoomProfileRows(rows, facility)
     return rows
 end
 

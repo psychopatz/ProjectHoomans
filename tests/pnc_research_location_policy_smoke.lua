@@ -61,9 +61,11 @@ T.falsy(Location.ExecutionIsRemote(explicit),
     "explicit caller policy is not overridden")
 
 -- And the queue path applies the default when the caller states none.
-local queueSource = T.read("ProjectHoomans", "server",
+local queueRoot = T.read("ProjectHoomans", "server",
     "PNC/Production/WorkService/PNC_WorkService_QueueAndClaims.lua")
-T.contains(queueSource, "Definitions.LocationPolicy",
+local queueProvider = T.read("ProjectHoomans", "server",
+    "PNC/Production/WorkService/PNC_WorkService_Queue.lua")
+T.contains(queueRoot .. "\n" .. queueProvider, "Definitions.LocationPolicy",
     "queue does not apply the operation default location policy")
 
 T.finish("pnc_research_location_policy_smoke")

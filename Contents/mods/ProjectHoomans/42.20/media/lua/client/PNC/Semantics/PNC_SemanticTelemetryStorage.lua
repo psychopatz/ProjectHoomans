@@ -12,6 +12,7 @@ local LIMITS = { maxString = 8192, maxDepth = 8, maxCollection = 32 }
 local MAX_TRIGGER_LENGTH = 4096
 local MAX_DETAILS_LENGTH = 2048
 local MAX_SEMANTIC_LENGTH = 128
+local MAX_FILENAME_PROBES = 1024
 
 local function text(value, maximum)
     if value == nil then return "" end
@@ -82,7 +83,7 @@ local function nextFileName(triggerText)
     local triggerPart = filenamePart(triggerText)
     local index, reason = readNextIndex()
     if not index then return nil, reason end
-    while true do
+    for _ = 1, MAX_FILENAME_PROBES do
         if index > 2147483647 then
             return nil, "telemetry_index_exhausted"
         end
@@ -93,6 +94,7 @@ local function nextFileName(triggerText)
         if not exists then return fileName, index end
         index = index + 1
     end
+    return nil, "telemetry_probe_limit"
 end
 
 local function cleanDecision(input)

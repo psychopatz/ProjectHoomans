@@ -1,5 +1,7 @@
 local T = require "tests/support/test"
 T.addPackagePaths()
+package.path = T.path("PsychopatzCore", "common_client", "?.lua")
+    .. ";" .. package.path
 
 local function copyColor(color)
     return {
@@ -100,7 +102,9 @@ function ISButton:getY() return self.y end
 function ISButton:getWidth() return self.width end
 function ISButton:getHeight() return self.height end
 function ISButton:setTitle(value) self.title = value end
-function ISButton:setImage(value) self.image = value end
+function ISButton:setImage(value)
+    self.image = value
+end
 function ISButton:setFont(value) self.font = value end
 function ISButton:setTextureRGBA(r, g, b, a)
     self.textureColor = { r = r, g = g, b = b, a = a }
@@ -140,8 +144,36 @@ end
 
 ISPanel = {}
 ISScrollingListBox = {}
+ISTextEntryBox = {}
+function ISTextEntryBox:new(text, x, y, width, height)
+    local entry = {
+        text = text or "",
+        x = x or 0,
+        y = y or 0,
+        width = width or 1,
+        height = height or 1,
+    }
+    setmetatable(entry, { __index = self })
+    return entry
+end
+function ISTextEntryBox:initialise() end
+function ISTextEntryBox:instantiate() end
+function ISTextEntryBox:setX(value) self.x = value end
+function ISTextEntryBox:setY(value) self.y = value end
+function ISTextEntryBox:setWidth(value) self.width = value end
+function ISTextEntryBox:setHeight(value) self.height = value end
+function ISTextEntryBox:getWidth() return self.width end
+function ISTextEntryBox:getHeight() return self.height end
+function ISTextEntryBox:setText(value) self.text = value or "" end
+function ISTextEntryBox:getText() return self.text end
+function ISTextEntryBox:setMultipleLine(value) self.multipleLine = value end
+function ISTextEntryBox:setMaxLines(value) self.maxLines = value end
+function ISTextEntryBox:setMaxTextLength(value) self.maxTextLength = value end
+function ISTextEntryBox:setClearButton(value) self.clearButton = value end
+function ISTextEntryBox:setOnlyNumbers(value) self.onlyNumbers = value end
 package.preload["ISUI/ISButton"] = function() return true end
 package.preload["ISUI/ISPanel"] = function() return true end
+package.preload["ISUI/ISTextEntryBox"] = function() return true end
 package.preload["ISUI/ISScrollingListBox"] = function() return true end
 package.preload["PsychopatzCore/UI/Core/PsychopatzUILayout"] = function()
     return UI.Layout
@@ -232,6 +264,15 @@ T.load(
     "common_client",
     "PsychopatzCore/UI/Conversation/Parts/PsychopatzConversationLLMInput.lua"
 )
+UI.ImageResolver.Resolve = function(path) return path end
+UI.Theme.colors = colors
+UI.Theme.Color = function(name, alpha)
+    local color = colors[name] or colors.text
+    local result = copyColor(color)
+    if alpha ~= nil then result.a = alpha end
+    return result
+end
+UI.Theme.GetRevision = function() return themeRevision end
 
 local input = PsychopatzConversationLLMInput:new(0, 0, 320, 108, {
     modeButtons = {

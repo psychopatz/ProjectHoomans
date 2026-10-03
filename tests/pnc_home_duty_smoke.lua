@@ -292,14 +292,8 @@ local player = {
 local following, followReason = PNC.HomeDutyService.SendToPlayer(
     traveler, player, "test")
 T.equal(following, true, "map-scale follow journey accepted")
-T.equal(followReason, "TRAVELING_TO_PLAYER", "follow journey state")
-T.equal(startedRequest.destination.x, 200, "follow journey targets player x")
-T.equal(startedRequest.arrivalAction.type, "colony_follow_player",
-    "follow journey uses durable arrival")
-local followArrived = arrivals.colony_follow_player(traveler,
-    traveler.travel, startedRequest.arrivalAction)
-T.equal(followArrived, true, "follow arrival handled")
-T.equal(traveler.orderSpec.kind, "follow", "arrival installs follow order")
+T.equal(followReason, "FOLLOWING_PLAYER", "follow command state")
+T.equal(traveler.orderSpec.kind, "follow", "follow command installs follow order")
 T.equal(traveler.orderSpec.ownerUsername, "owner", "follow owner is preserved")
 
 local buildingWorker = {
@@ -325,8 +319,8 @@ local provisionFollowed, provisionFollowReason =
     PNC.HomeDutyService.SendToPlayer(provisionWorker, player, "player_requested")
 T.equal(provisionFollowed, true,
     "follow can override an interruptible provision pickup")
-T.equal(provisionFollowReason, "TRAVELING_TO_PLAYER",
-    "provision follow starts player travel")
+T.equal(provisionFollowReason, "FOLLOWING_PLAYER",
+    "provision follow installs the player order")
 T.equal(cancelledProvision, "work-provision:follow_player_requested",
     "follow cancels the provision pickup with an explicit reason")
 

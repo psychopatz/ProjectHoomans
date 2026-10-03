@@ -61,6 +61,18 @@ T.falsy(Controller.IsSearchActive({ runActive = false,
 
 local windowSource = T.read("ProjectHoomans", "client",
     "PNC/UI/Scavenge/PNC_ScavengeWindow.lua")
+    .. T.read("ProjectHoomans", "client",
+        "PNC/UI/Scavenge/PNC_ScavengeWindow_Manifest.lua")
+    .. T.read("ProjectHoomans", "client",
+        "PNC/UI/Scavenge/PNC_ScavengeWindow_Status.lua")
+    .. T.read("ProjectHoomans", "client",
+        "PNC/UI/Scavenge/PNC_ScavengeWindow_Actions.lua")
+    .. T.read("ProjectHoomans", "client",
+        "PNC/UI/Scavenge/PNC_ScavengeWindow_View.lua")
+    .. T.read("ProjectHoomans", "client",
+        "PNC/UI/Scavenge/PNC_ScavengeWindow_Render.lua")
+    .. T.read("ProjectHoomans", "client",
+        "PNC/UI/Scavenge/PNC_ScavengeWindow_Lifecycle.lua")
 T.contains(windowSource, "UI.CreateToggleButton",
     "dedicated UI exposes start/stop visual state")
 T.contains(windowSource, "Controller.StopSearch",

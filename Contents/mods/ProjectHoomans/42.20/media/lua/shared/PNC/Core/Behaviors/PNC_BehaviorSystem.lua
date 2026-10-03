@@ -224,233 +224,46 @@ local function finishFollowerReconcile(record, job, handled, now)
     })
 end
 
-function Behavior.Tick(record, zombie, now)
-    local job
-    local companionHandled
-    local previousJob = record and record.activeJob or nil
-
-    -- Behavior state, movement leases, and combat targets are authoritative
-    -- writes. The server tick owns them in MP; the same authority path is
-    -- used by singleplayer/listen-server. Keep a shared-load client from
-    -- mutating the decision state if a future hook calls this entry point.
-    if PNC.Core and type(PNC.Core.IsAuthority) == "function"
-        and PNC.Core.IsAuthority() ~= true
-    then
-        return false
-    end
-
-    if ScalingDiagnostics then
-        ScalingDiagnostics.Increment("NPCDecisions.BehaviorTicks")
-    end
-
-    if record.alive == false then
-        if AnimationScenes and AnimationScenes.Stop then
-            AnimationScenes.Stop(
-                record,
-                zombie,
-                "npc_dead"
-            )
-        end
-        record.activeJob = "Dead"
-        record.activeBehavior = "Dead"
-        Common.ClearCombatTarget(record, "dead")
-        if zombie then
-            Animation.Apply(zombie, record, "Idle")
-        end
-        return
-    end
-
-    -- Sleep teardown owns the actor until native bump release, valid exit
-    -- placement, surface cleanup, and reservation release have completed.
-    -- This must run before Puppet/scene/job ownership, otherwise a newly
-    -- requested presentation scene can leave the NPC visibly stuck in the
-    -- old sleep state.
-    if tickPendingSleepWake(record, zombie) then
-        return
-    end
-
-    -- The Puppet lease suspends every ordinary behavior before recovery,
-    -- stale-provider repair, or job selection can issue a competing write.
-    -- Safety boundaries deliberately fall through so combat, vehicles,
-    -- traversal, and grounded recovery can abort the scene and take control.
-    if puppetOperaOwnsBehavior(record)
-        and not puppetOperaSafetyBoundary(record, zombie, now)
-    then
-        return
-    end
-
-    -- Direct follow/guard/patrol/roam/travel orders do not own a Tasking
-    -- lease, so give them the same bounded liveness boundary. The recovery
-    -- probe observes PathService and re-issues the order only after a real
-    -- movement/action timeout; legitimate holds and traversal passages pass
-    -- through untouched.
-    if OrderSystem and OrderSystem.RecoverStalled
-        and OrderSystem.RecoverStalled(record, zombie, now)
-    then
-        return
-    end
-
-    -- An order command can arrive after a scene callback has already failed
-    -- or after an older build left only the runtime activity behind. Repair
-    -- that stale presentation lease before it can consume this tick again.
-    clearStaleFacilityState(record, zombie)
-
-    if record.health and record.health.state == "incapacitated" then
-        if AnimationScenes and AnimationScenes.Stop then
-            AnimationScenes.Stop(
-                record,
-                zombie,
-                "npc_incapacitated"
-            )
-        end
-        Incapacitated.Tick(record, zombie)
-        return
-    end
-
-    -- Abstract followers have no IsoZombie and therefore must not pass
-    -- through live-only seating, perception, animation, or engine-pathing
-    -- gates. Their durable follow order is advanced by a bounded lightweight
-    -- controller until presence reconciliation materializes them again.
-    if isAbstractFollowRecord(record)
-        and Companion
-        and Companion.Internal
-        and Companion.Internal.TickAbstractFollowOwner
-    then
-        Companion.Internal.TickAbstractFollowOwner(record, now)
-        return
-    end
-
-    -- Knockdown owns the actor before scenes, attacks, movement, or ordinary
-    -- jobs. This guarantees a grounded NPC cannot start an attack lease that
-    -- prevents its get-up recovery.
-    if LiveBodyControl and LiveBodyControl.TickGroundedRecovery
-        and LiveBodyControl.TickGroundedRecovery(record, zombie, now)
-    then
-        return
-    end
-
-    -- A committed windup owns the actor until its delayed hit/finish frame.
-    -- Perception may legitimately return no fresh target for one frame, but
-    -- that must not holster the weapon or abandon the animation in progress.
-    if Combat and Combat.TickCommittedAction
-        and Combat.TickCommittedAction(record, zombie)
-    then
-        return
-    end
-
-    -- ThreatGuard is the single tactical owner for passive orders and
-    -- presentation leases. It runs before any job or scene can clear its
-    -- target, while the original order remains available for resumption.
-    if ThreatGuard and ThreatGuard.Tick
-        and ThreatGuard.Tick(record, zombie, now)
-    then
-        return
-    end
-
-    -- Scenes are presentation leases, never tactical locks. ThreatGuard must
-    -- validate or claim a passive threat before this safety check runs; if it
-    -- rejects a stale target it also clears the combat lease, allowing the
-    -- original seat/sleep activity to continue without a restart loop.
-    if AnimationScenes and AnimationScenes.InterruptForSafety then
-        AnimationScenes.InterruptForSafety(
-            record,
-            zombie,
-            now
-        )
-    end
-
-    -- Puppet Opera is a temporary presentation lease. ThreatGuard and the
-    -- committed-combat fence above still win; once they yield, do not let a
-    -- normal job/ambient/scene tick overwrite the session's movement lane.
-    -- The server-side lease owns the corresponding restore handoff.
-    if puppetOperaOwnsBehavior(record) then
-        return
-    end
-
-    -- Roaming ambience is a transient presentation lease. It is evaluated
-    -- before seating so a night-time bed choice wins over a chair, while the
-    -- service itself remains server-loaded and dynamically resolved here.
-    local roamingAmbient = PNC.RoamAmbient
-    if roamingAmbient and roamingAmbient.Tick
-        and roamingAmbient.Tick(record, zombie, now)
-    then
-        return
-    end
-
-    -- A roaming seat is a transient presentation lease. It owns only the
-    -- live route/scene while active; the durable roam order remains intact.
-    -- The server service is loaded after this shared coordinator, so resolve
-    -- it dynamically instead of capturing a nil module at load time.
-    local roamingSeat = PNC.RoamingSeat
-    if roamingSeat and roamingSeat.Tick
-        and roamingSeat.Tick(record, zombie, now)
-    then
-        return
-    end
-
-    if AnimationScenes and AnimationScenes.Tick
-        and AnimationScenes.Tick(record, zombie, now)
-    then
-        return
-    end
-
-    -- A doctor lease owns the actor before self-treatment and job selection.
-    -- Without this fence a wounded doctor could start self-bandaging while
-    -- the server medical executor was walking it to another patient.
-    if record.runtime and record.runtime.medicalCare then
-        return
-    end
-
-    if Treatment and Treatment.Tick and Treatment.Tick(record, zombie, now) then
-        return
-    end
-
-    -- Semantic action plans are an exclusive, resumable execution lease for
-    -- ordinary behavior. Safety/combat gates above retain priority; once they
-    -- yield, the plan provider owns the actor until its current step changes.
-    -- This prevents the normal job selector from overwriting a provider's
-    -- movement intent between the Tasking pump and PathService.Pump.
-    local planOwner = ActionPlanOwnership
-        and ActionPlanOwnership.Get
-        and ActionPlanOwnership.Get(record) or nil
-    if planOwner then
-        record.activeJob = "SemanticActionPlan"
-        record.activeBehavior = "SemanticActionPlan:"
-            .. tostring(planOwner.action or "unknown")
-        return
-    end
-
-    job = JobSystem.Select(record)
-    if ScalingDiagnostics then
-        if previousJob == job then
-            ScalingDiagnostics.Increment(
-                "NPCDecisions.BehaviorSameJobReselections"
-            )
-        elseif previousJob ~= nil then
-            ScalingDiagnostics.Increment(
-                "NPCDecisions.BehaviorJobSwitches"
-            )
-        end
-    end
-    record.activeJob = job
-    record.activeBehavior = job
-
-    if Registry.Tick(record, zombie, job, now) then
-        return
-    end
-
-    companionHandled = Companion.Tick(record, zombie, job)
-    finishFollowerReconcile(record, job, companionHandled, now)
-    if companionHandled then
-        return
-    end
-
-    if Hostile.Tick(record, zombie, job) then
-        return
-    end
-
-    Common.ClearCombatTarget(record, "idle")
-    if zombie then
-        Animation.Apply(zombie, record, "Idle")
-    end
-end
+Behavior.Internal = Behavior.Internal or {}
+Behavior.Internal.TickDispatch = {
+    JobSystem = JobSystem,
+    Animation = Animation,
+    Common = Common,
+    Registry = Registry,
+    Companion = Companion,
+    Hostile = Hostile,
+    ScalingDiagnostics = ScalingDiagnostics,
+    finishFollowerReconcile = finishFollowerReconcile,
+}
+require "PNC/Core/Behaviors/PNC_BehaviorSystem_Tick_Dispatch"
+Behavior.Internal.TickOwnership = {
+    LiveBodyControl = LiveBodyControl,
+    Combat = Combat,
+    ThreatGuard = ThreatGuard,
+    AnimationScenes = AnimationScenes,
+    Treatment = Treatment,
+    puppetOperaOwnsBehavior = puppetOperaOwnsBehavior,
+}
+require "PNC/Core/Behaviors/PNC_BehaviorSystem_Tick_Ownership"
+Behavior.Internal.TickPreflight = {
+    Animation = Animation,
+    Common = Common,
+    OrderSystem = OrderSystem,
+    Incapacitated = Incapacitated,
+    Companion = Companion,
+    AnimationScenes = AnimationScenes,
+    tickPendingSleepWake = tickPendingSleepWake,
+    puppetOperaOwnsBehavior = puppetOperaOwnsBehavior,
+    puppetOperaSafetyBoundary = puppetOperaSafetyBoundary,
+    clearStaleFacilityState = clearStaleFacilityState,
+    isAbstractFollowRecord = isAbstractFollowRecord,
+}
+require "PNC/Core/Behaviors/PNC_BehaviorSystem_Tick_Preflight"
+Behavior.Internal.Tick = {
+    ScalingDiagnostics = ScalingDiagnostics,
+    ActionPlanOwnership = ActionPlanOwnership,
+    Preflight = Behavior.Internal.TickPreflight,
+    Dispatch = Behavior.Internal.TickDispatch,
+    Ownership = Behavior.Internal.TickOwnership,
+}
+require "PNC/Core/Behaviors/PNC_BehaviorSystem_Tick"

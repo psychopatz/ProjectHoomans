@@ -512,6 +512,10 @@ local sourceFiles = {
     { "server", "PNC/PuppetOpera/PNC_PuppetOpera_Authority_Requests.lua" },
     { "server", "PNC/PuppetOpera/PNC_PuppetOpera_Authority_Acknowledgements.lua" },
     { "server", "PNC/PuppetOpera/PNC_PuppetOpera_OverrideAdapter.lua" },
+    { "server", "PNC/PuppetOpera/PNC_PuppetOpera_Override_Context.lua" },
+    { "server", "PNC/PuppetOpera/PNC_PuppetOpera_Override_Readiness.lua" },
+    { "server", "PNC/PuppetOpera/PNC_PuppetOpera_Override_Maintenance.lua" },
+    { "server", "PNC/PuppetOpera/PNC_PuppetOpera_Override_Lifecycle.lua" },
 }
 local forbiddenProtectedCall = "p" .. "call"
 for _, specification in ipairs(sourceFiles) do

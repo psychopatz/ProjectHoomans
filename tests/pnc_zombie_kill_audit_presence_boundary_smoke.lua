@@ -6,6 +6,8 @@ local audit = T.read("ProjectHoomans", "client",
     "PNC/PNC_ClientZombieKillAudit.lua")
 local serverHooks = T.read("ProjectHoomans", "server",
     "PNC/Social/SocialEventHooks/PNC_SocialEventHooks_CombatAdapter.lua")
+local serverWitnesses = T.read("ProjectHoomans", "server",
+    "PNC/Social/SocialEventHooks/PNC_SocialEventHooks_CombatAdapter_Witnesses.lua")
 
 T.contains(composition, 'require "PNC/PNC_ClientZombieKillAudit"',
     "client composition does not load zombie-kill audit")
@@ -17,9 +19,11 @@ T.contains(audit, "onClientKill = onClientKill",
     "client audit does not observe zombie deaths")
 T.contains(audit, "nativeZombieKills",
     "client audit does not report the native kill counter")
-T.contains(serverHooks, "function H.OnWeaponHitCharacter",
+T.contains(serverHooks, "PNC_SocialEventHooks_CombatAdapter_Witnesses",
+    "server combat adapter does not load witness callbacks")
+T.contains(serverWitnesses, "function H.OnWeaponHitCharacter",
     "server combat callback is not available to the core detector")
-T.contains(serverHooks, 'phase=relationship_dispatch',
+T.contains(serverWitnesses, 'phase=relationship_dispatch',
     "server relationship dispatch result is not auditable")
 
 T.finish("pnc_zombie_kill_audit_presence_boundary_smoke")

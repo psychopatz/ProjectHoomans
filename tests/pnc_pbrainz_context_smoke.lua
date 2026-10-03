@@ -120,15 +120,16 @@ T.equal(context.recent_conversation[2].role, "user", "player dialogue retained")
 T.equal(context.recent_conversation[2].content, "Do you need anything?", "player content retained")
 T.equal(context.available_tools[1]["function"].name, "social_react", "valid social tool name")
 T.equal(context.available_tools[2]["function"].name, "ask_name", "valid identity tool name")
-T.equal(context.available_tools[3]["function"].name, "order_follow", "valid order tool name")
-T.equal(context.available_tools[4]["function"].name, "order_camp", "valid camp tool name")
+T.equal(context.available_tools[3]["function"].name, "disclose_knowledge", "valid knowledge tool name")
+T.equal(context.available_tools[4]["function"].name, "order_follow", "valid order tool name")
+T.equal(context.available_tools[5]["function"].name, "order_camp", "valid camp tool name")
 T.truthy(string.find(
-    context.available_tools[4]["function"].description,
+    context.available_tools[5]["function"].description,
     "stay here for now",
     1,
     true
 ), "camp intent guidance is exposed to the LLM")
-T.equal(#context.available_tools, 4, "client-only tools are not exposed")
+T.equal(#context.available_tools, 5, "client-only tools are not exposed")
 T.equal(context.semantic_ir_contract.outputField, "semantic_ir",
     "LLM context advertises the shared semantic output contract")
 T.equal(context.dialogue_situation.npc.activity.id, "traveling",

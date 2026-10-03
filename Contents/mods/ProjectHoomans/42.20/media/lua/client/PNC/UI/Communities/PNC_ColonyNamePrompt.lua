@@ -141,6 +141,10 @@ function ISPNCColonyNamePrompt:render()
 end
 
 function ISPNCColonyNamePrompt:close()
+    -- This prompt is modal while it is open. Release the mouse capture before
+    -- removing the window so a failed or successful submission cannot leave
+    -- the rest of the game UI locked behind a stale capture.
+    if self.setCapture then self:setCapture(false) end
     self:setVisible(false)
     self:removeFromUIManager()
     Prompt.instance = nil
@@ -177,6 +181,8 @@ function Prompt.Open(options)
         title = copy.windowTitle,
         mode = mode,
         resizable = false,
+        collapsible = false,
+        persistenceKey = false,
         persistGeometry = false,
         responsiveSpec = {
             width = 430,
@@ -194,6 +200,10 @@ function Prompt.Open(options)
         "UI_PNC_ColonyNamePrompt_DefaultName", "Survivor Group")))
     window:addToUIManager()
     window:setVisible(true)
+    -- A faction name prompt is a transient modal, not a workspace window:
+    -- keep it above the game UI and route input to it until it closes.
+    if window.setAlwaysOnTop then window:setAlwaysOnTop(true) end
+    if window.setCapture then window:setCapture(true) end
     window:bringToTop()
     if window.nameEntry.focus then window.nameEntry:focus() end
     Prompt.instance = window

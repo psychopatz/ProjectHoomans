@@ -3,12 +3,25 @@ local T = require "tests/support/test"
 local source = T.read(
     "ProjectHoomans", "server", "PNC/Production/PNC_WorkService.lua")
 local prefix = "PNC/Production/WorkService/"
+local coreSource = T.read(
+    "ProjectHoomans", "server", prefix .. "PNC_WorkService_Core.lua")
+T.falsy(coreSource:find(
+    'require "PNC/Core/Needs/PNC_WorkFatigueGate"', 1, true),
+    "WorkService core must use the composition-owned fatigue gate")
+T.falsy(coreSource:find(
+    'require "PNC/Core/Production/WorkDefinition/PNC_WorkPolicy"', 1, true),
+    "WorkService core must use the composition-owned work policy")
 local providers = {
     "PNC_WorkService_WorkLocation",
     "PNC_WorkService_Core",
+    "PNC_WorkService_OperationRegistry",
     "PNC_WorkService_QueueAndClaims",
     "PNC_WorkService_WorkerReconciliation",
+    "PNC_WorkService_WorkerReconciliation_Claims",
+    "PNC_WorkService_WorkerReconciliation_State",
     "PNC_WorkService_Targets",
+    "PNC_WorkService_Targets_Providers",
+    "PNC_WorkService_Targets_Claim",
     "PNC_WorkService_Progress",
     "PNC_WorkService_Commands",
     "PNC_WorkService_Queries",

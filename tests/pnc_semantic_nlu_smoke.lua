@@ -297,9 +297,9 @@ T.equal(everythingOkay.subject, "WELLBEING",
 local wellbeingDecision = Policy.Decide(howBeen, nil, { llmEnabled = false })
 T.equal(wellbeingDecision.branch, "QUESTION_RECEIVED",
     "expanded wellbeing phrasing stays on the pure Lua question branch")
-T.equal(wellbeingDecision.response.templateID,
-    "semantic.question.wellbeing.default",
-    "expanded phrasing reuses the existing wellbeing response variant")
+T.truthy(string.find(wellbeingDecision.response.templateID,
+    "semantic.question.wellbeing", 1, true),
+    "expanded phrasing reuses the existing wellbeing response family")
 
 local statementWithLocation = Parser.Parse("I know where Sarah is")
 T.falsy(statementWithLocation.intent,

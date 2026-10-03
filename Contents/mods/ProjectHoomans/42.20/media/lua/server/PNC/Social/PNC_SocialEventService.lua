@@ -10,6 +10,8 @@ require "PNC/Social/SocialEventService/PNC_SocialEventService_Context"
 require "PNC/Social/SocialEventService/PNC_SocialEventService_Validation"
 require "PNC/Social/SocialEventService/PNC_SocialEventService_Observers"
 require "PNC/Social/SocialEventService/PNC_SocialEventService_Process"
+require "PNC/Social/SocialEventService/PNC_SocialEventService_Process_Bridges"
+require "PNC/Social/SocialEventService/PNC_SocialEventService_Process_Transaction"
 require "PNC/Social/SocialEventService/PNC_SocialEventService_Emit"
 
 return PNC.SocialEvents

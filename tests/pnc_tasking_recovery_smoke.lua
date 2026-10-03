@@ -169,12 +169,26 @@ T.equal(Tasking.Diagnostics.counters.executorRecoveries, 1,
 
 local entry = T.read(ROOT .. "PNC/Tasking/PNC_Tasking.lua")
 local pump = T.read(ROOT .. "PNC/Tasking/Tasking/PNC_Tasking_Pump.lua")
+    .. T.read(ROOT
+        .. "PNC/Tasking/Tasking/PNC_Tasking_Pump_Context.lua")
+    .. T.read(ROOT
+        .. "PNC/Tasking/Tasking/PNC_Tasking_Pump_Reconciliation.lua")
+    .. T.read(ROOT
+        .. "PNC/Tasking/Tasking/PNC_Tasking_Pump_Evaluation.lua")
+    .. T.read(ROOT
+        .. "PNC/Tasking/Tasking/PNC_Tasking_Pump_Execution.lua")
 local core = T.read(ROOT .. "PNC/Tasking/Tasking/PNC_Tasking_Core.lua")
 local provider = T.read(ROOT .. "PNC/Tasking/PNC_WorkTaskProvider.lua")
+    .. T.read(ROOT .. "PNC/Tasking/PNC_WorkTaskProvider_Context.lua")
+    .. T.read(ROOT .. "PNC/Tasking/PNC_WorkTaskProvider_Assignment.lua")
+    .. T.read(ROOT .. "PNC/Tasking/PNC_WorkTaskProvider_Lease.lua")
+    .. T.read(ROOT .. "PNC/Tasking/PNC_WorkTaskProvider_Execution.lua")
 local commands = T.read(ROOT
     .. "PNC/Production/WorkService/PNC_WorkService_Commands.lua")
 local scheduler = T.read(ROOT
     .. "PNC/Production/WorkService/PNC_WorkService_Scheduler.lua")
+local schedulerOrders = T.read(ROOT
+    .. "PNC/Production/WorkService/PNC_WorkService_Scheduler_Orders.lua")
 local needProvider = T.read(ROOT
     .. "PNC/Needs/NeedFacilityTriggers/PNC_NeedFacilityTriggers_Provider.lua")
 local facilityLifecycle = T.read(T.path("ProjectHoomans", "shared", "")
@@ -190,13 +204,23 @@ T.contains(pump, "RecoverStalledLease", "pump stall watchdog")
 T.contains(pump, "RecoverExecutorFailure", "pump executor recovery")
 T.contains(pump, "if not suspended then promoteMaterializedLease(lease) end",
     "Puppet ownership pauses abstract-task promotion")
-T.contains(T.read(ROOT .. "PNC/Tasking/Tasking/PNC_Tasking_Recovery.lua"),
-    "puppetOperaResumeAt", "Puppet resume watchdog baseline")
+local recoverySource = T.read(ROOT
+    .. "PNC/Tasking/Tasking/PNC_Tasking_Recovery.lua")
+    .. T.read(ROOT
+        .. "PNC/Tasking/Tasking/PNC_Tasking_Recovery_Context.lua")
+    .. T.read(ROOT
+        .. "PNC/Tasking/Tasking/PNC_Tasking_Recovery_Retry.lua")
+    .. T.read(ROOT
+        .. "PNC/Tasking/Tasking/PNC_Tasking_Recovery_Stall.lua")
+    .. T.read(ROOT
+        .. "PNC/Tasking/Tasking/PNC_Tasking_Recovery_Executor.lua")
+T.contains(recoverySource, "puppetOperaResumeAt",
+    "Puppet resume watchdog baseline")
 T.contains(provider, "RecordRecovery", "durable work recovery counter")
 T.contains(provider, "recoveryQuarantined", "quarantined work exclusion")
 T.contains(commands, "function Service.Commands.Quarantine",
     "durable work quarantine command")
-T.contains(scheduler, "recoveryQuarantined",
+T.contains(scheduler .. "\n" .. schedulerOrders, "recoveryQuarantined",
     "scheduler quarantine guard")
 T.contains(needProvider, "function Triggers.GetRecoveryState",
     "NeedFacility progress contract")
@@ -227,7 +251,7 @@ end
 local orderSystem = T.read(T.path("ProjectHoomans", "shared", "")
     .. "PNC/Core/Orders/PNC_OrderSystem.lua")
 local behaviorSystem = T.read(T.path("ProjectHoomans", "shared", "")
-    .. "PNC/Core/Behaviors/PNC_BehaviorSystem.lua")
+    .. "PNC/Core/Behaviors/PNC_BehaviorSystem_Tick.lua")
 local lumberExecutor = T.read(ROOT .. "PNC/Lumber/PNC_LumberExecutor.lua")
 T.contains(orderSystem, "function OrderSystem.RecoverStalled",
     "direct orders share the bounded recovery boundary")

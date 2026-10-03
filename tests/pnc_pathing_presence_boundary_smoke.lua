@@ -2,11 +2,29 @@ local T = require "tests/support/test"
 
 local ROOT = T.path("ProjectHoomans", "root", "")
 
+local SHARED_SEGMENTS = {
+    ["PNC/Composition/PNC_SharedComposition_Foundation"] =
+        "shared/PNC/Composition/PNC_SharedComposition_Foundation.lua",
+    ["PNC/Composition/PNC_SharedComposition_IdentitySocial"] =
+        "shared/PNC/Composition/PNC_SharedComposition_IdentitySocial.lua",
+    ["PNC/Composition/PNC_SharedComposition_InventoryWorld"] =
+        "shared/PNC/Composition/PNC_SharedComposition_InventoryWorld.lua",
+    ["PNC/Composition/PNC_SharedComposition_CombatRuntime"] =
+        "shared/PNC/Composition/PNC_SharedComposition_CombatRuntime.lua",
+    ["PNC/Composition/PNC_SharedComposition_Final"] =
+        "shared/PNC/Composition/PNC_SharedComposition_Final.lua",
+}
+
 local function capture(path)
     local calls = {}
     local originalRequire = require
     require = function(name)
-        calls[#calls + 1] = name
+        local segment = SHARED_SEGMENTS[name]
+        if segment then
+            T.load(ROOT .. segment)
+        else
+            calls[#calls + 1] = name
+        end
         return true
     end
     T.load(path)

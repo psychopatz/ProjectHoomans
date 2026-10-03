@@ -98,53 +98,42 @@ function Model.BuildNPCItems(snapshot)
     return output
 end
 
-function Model.BuildRows(snapshot, authorized, reason)
-    local rows = {}
-    if authorized ~= true then
-        rows[#rows + 1] = row(
-            text("UI_PNC_CommunityAuthorization"),
-            reason or "not_authorized",
-            "danger"
-        )
-        return rows
-    end
-    snapshot = snapshot or {}
-    local registry = snapshot.registry or {}
-    local community = snapshot.selectedCommunity
-    local npc = snapshot.selectedNPC
-    local selectedFaction
+local function selectedFactionFor(snapshot)
     for _, faction in ipairs(snapshot.factions or {}) do
         if faction.id == snapshot.selectedFactionID then
-            selectedFaction = faction
-            break
+            return faction
         end
     end
+    return nil
+end
+
+local function appendOverviewRows(rows, snapshot, registry, selectedFaction)
     rows[#rows + 1] = row(
-        text("UI_PNC_CommunityRegistry"),
-        "schema " .. tostring(registry.schemaVersion or 0)
-            .. " / revision "
+        text('UI_PNC_CommunityRegistry'),
+        'schema ' .. tostring(registry.schemaVersion or 0)
+            .. ' / revision '
             .. tostring(registry.revision or 0)
-            .. " / count " .. tostring(registry.count or 0)
+            .. ' / count ' .. tostring(registry.count or 0)
     )
     if snapshot.action then
         rows[#rows + 1] = row(
-            text("UI_PNC_CommunityLastAction"),
-            tostring(snapshot.action.action) .. ": "
+            text('UI_PNC_CommunityLastAction'),
+            tostring(snapshot.action.action) .. ': '
                 .. tostring(snapshot.action.reason),
-            snapshot.action.ok and "success" or "danger"
+            snapshot.action.ok and 'success' or 'danger'
         )
     end
     local mobileGroups = snapshot.mobileGroups or {}
     rows[#rows + 1] = row(
-        "Mobile groups",
+        'Mobile groups',
         #mobileGroups,
-        #mobileGroups > 0 and "warning" or "textMuted"
+        #mobileGroups > 0 and 'warning' or 'textMuted'
     )
     local mobileCounts = snapshot.mobileCounts or {}
     rows[#rows + 1] = row(
-        "Mobile states",
+        'Mobile states',
         string.format(
-            "road=%d street=%d en_route=%d pending=%d",
+            'road=%d street=%d en_route=%d pending=%d',
             mobileCounts.road_roaming or 0,
             mobileCounts.street_roaming or 0,
             mobileCounts.en_route or 0,
@@ -155,197 +144,225 @@ function Model.BuildRows(snapshot, authorized, reason)
         local types = {}
         for _, faction in ipairs(mobileGroups) do
             types[#types + 1] = tostring(faction.archetypeID)
-                .. ":" .. tostring(
+                .. ':' .. tostring(
                     faction.mobile and faction.mobile.controlMode
-                        or "unknown"
+                        or 'unknown'
                 )
         end
         rows[#rows + 1] = row(
-            "Mobile types",
-            table.concat(types, ", ")
+            'Mobile types',
+            table.concat(types, ', ')
         )
     end
     if selectedFaction and selectedFaction.mobile then
         local mobile = selectedFaction.mobile
         rows[#rows + 1] = row(
-            "Mobile state",
+            'Mobile state',
             MobileModel.StateText(mobile)
-                .. " / " .. tostring(mobile.presence or "unknown"),
-            MobileModel.State(mobile) == "en_route"
-                and "danger" or "warning"
+                .. ' / ' .. tostring(mobile.presence or 'unknown'),
+            MobileModel.State(mobile) == 'en_route'
+                and 'danger' or 'warning'
         )
         rows[#rows + 1] = row(
-            "Mobile activity",
-            tostring(mobile.activity or "street_roaming")
+            'Mobile activity',
+            tostring(mobile.activity or 'street_roaming')
         )
         rows[#rows + 1] = row(
-            "Selected faction type",
+            'Selected faction type',
             tostring(selectedFaction.archetypeID)
-                .. " / " .. tostring(selectedFaction.name)
+                .. ' / ' .. tostring(selectedFaction.name)
         )
         rows[#rows + 1] = row(
-            "Mobile control",
-            tostring(mobile.controlMode or "ambient")
-                .. " / path=" .. tostring(mobile.pathMode or "random"),
-            mobile.controlMode == "strategic" and "danger" or "warning"
+            'Mobile control',
+            tostring(mobile.controlMode or 'ambient')
+                .. ' / path=' .. tostring(mobile.pathMode or 'random'),
+            mobile.controlMode == 'strategic' and 'danger' or 'warning'
         )
         rows[#rows + 1] = row(
-            "Mobile objective",
-            mobileDetail(mobile) or "pending",
-            mobile.controlMode == "strategic" and "danger" or "warning"
+            'Mobile objective',
+            mobileDetail(mobile) or 'pending',
+            mobile.controlMode == 'strategic' and 'danger' or 'warning'
         )
         rows[#rows + 1] = row(
-            "Mobile target",
+            'Mobile target',
             mobileTargetText(mobile)
         )
         if mobile.travel then
             rows[#rows + 1] = row(
-                "Settlement travel",
-                tostring(mobile.travel.kind or "settlement")
-                    .. " / day "
+                'Settlement travel',
+                tostring(mobile.travel.kind or 'settlement')
+                    .. ' / day '
                     .. tostring(mobile.travel.departureDay or 0)
-                    .. " / started "
-                    .. tostring(mobile.travel.startedAt or 0) .. " h",
-                "danger"
+                    .. ' / started '
+                    .. tostring(mobile.travel.startedAt or 0) .. ' h',
+                'danger'
             )
         end
         rows[#rows + 1] = row(
-            "Mobile staging",
-            tostring(mobile.siteID or "unknown")
-                .. " / next move "
-                .. tostring(mobile.nextMoveAt or 0) .. " h"
+            'Mobile staging',
+            tostring(mobile.siteID or 'unknown')
+                .. ' / next move '
+                .. tostring(mobile.nextMoveAt or 0) .. ' h'
         )
     end
-    if not community then
-        rows[#rows + 1] = row(
-            text("UI_PNC_CommunitySelection"),
-            text("UI_PNC_CommunityNone"),
-            "textMuted"
-        )
-        return rows
-    end
+end
+
+local function appendCommunityRows(rows, snapshot, registry, community)
     rows[#rows + 1] = row(
-        text("UI_PNC_CommunityName"), community.name
+        text('UI_PNC_CommunityName'), community.name
     )
     rows[#rows + 1] = row(
-        text("UI_PNC_CommunityID"), community.id
+        text('UI_PNC_CommunityID'), community.id
     )
     rows[#rows + 1] = row(
-        text("UI_PNC_CommunityFaction"),
+        text('UI_PNC_CommunityFaction'),
         community.factionID
     )
     rows[#rows + 1] = row(
-        text("UI_PNC_CommunityModeStatus"),
-        community.mode .. " / " .. community.status
+        text('UI_PNC_CommunityModeStatus'),
+        community.mode .. ' / ' .. community.status
     )
     rows[#rows + 1] = row(
-        text("UI_PNC_CommunityHome"),
-        number(community.home.x) .. ", "
-            .. number(community.home.y) .. ", "
+        text('UI_PNC_CommunityHome'),
+        number(community.home.x) .. ', '
+            .. number(community.home.y) .. ', '
             .. number(community.home.z)
-            .. " r=" .. number(community.home.radius)
+            .. ' r=' .. number(community.home.radius)
     )
     local site = community.site
     rows[#rows + 1] = row(
-        text("UI_PNC_CommunitySite"),
+        text('UI_PNC_CommunitySite'),
         site and (
-            tostring(site.kind) .. " / "
-                .. tostring(site.status) .. " / "
+            tostring(site.kind) .. ' / '
+                .. tostring(site.status) .. ' / '
                 .. tostring(site.id)
-        ) or text("UI_PNC_CommunityNone"),
+        ) or text('UI_PNC_CommunityNone'),
         site and (
-            site.status == "occupied"
-                and "success" or "warning"
-        ) or "textMuted"
+            site.status == 'occupied'
+                and 'success' or 'warning'
+        ) or 'textMuted'
     )
     if site and site.claimantKey then
         rows[#rows + 1] = row(
-            text("UI_PNC_CommunitySiteClaim"),
+            text('UI_PNC_CommunitySiteClaim'),
             site.claimantKey,
-            "warning"
+            'warning'
         )
     end
     rows[#rows + 1] = row(
-        text("UI_PNC_CommunityLeader"),
-        community.leaderNPCID or text("UI_PNC_CommunityNone")
+        text('UI_PNC_CommunityLeader'),
+        community.leaderNPCID or text('UI_PNC_CommunityNone')
     )
     rows[#rows + 1] = row(
-        text("UI_PNC_CommunityPopulation"),
+        text('UI_PNC_CommunityPopulation'),
         tostring(community.currentPopulation)
-            .. "/" .. tostring(
+            .. '/' .. tostring(
                 community.populationCapacity
             )
             .. (community.overcrowded
-                and " (overcrowded)" or "")
+                and ' (overcrowded)' or '')
     )
     rows[#rows + 1] = row(
-        text("UI_PNC_CommunityCapacity"),
-        "beds=" .. tostring(community.capacity.beds)
-            .. " storage="
+        text('UI_PNC_CommunityCapacity'),
+        'beds=' .. tostring(community.capacity.beds)
+            .. ' storage='
             .. tostring(community.capacity.storage)
     )
     rows[#rows + 1] = row(
-        text("UI_PNC_CommunitySecurity"),
+        text('UI_PNC_CommunitySecurity'),
         community.security
     )
     rows[#rows + 1] = row(
-        text("UI_PNC_CommunityMorale"), community.morale
+        text('UI_PNC_CommunityMorale'), community.morale
     )
     for _, category in ipairs(
         snapshot.supplyCategories or {}
     ) do
         rows[#rows + 1] = row(
-            text("UI_PNC_CommunitySupply")
-                .. " " .. category,
+            text('UI_PNC_CommunitySupply')
+                .. ' ' .. category,
             community.supplies[category]
         )
     end
     rows[#rows + 1] = row(
-        text("UI_PNC_CommunityRevisions"),
-        "community=" .. tostring(community.revision)
-            .. " registry=" .. tostring(registry.revision)
+        text('UI_PNC_CommunityRevisions'),
+        'community=' .. tostring(community.revision)
+            .. ' registry=' .. tostring(registry.revision)
     )
-    if npc then
-        rows[#rows + 1] = row(
-            text("UI_PNC_CommunitySelectedNPC"), npc.name
-        )
-        rows[#rows + 1] = row(
-            text("UI_PNC_CommunityNPCAffiliation"),
-            tostring(npc.communityID or "none")
-                .. " / " .. tostring(npc.communityRole)
-        )
-        rows[#rows + 1] = row(
-            text("UI_PNC_CommunityNPCLocation"),
-            number(npc.x) .. ", " .. number(npc.y)
-                .. ", " .. number(npc.z)
-        )
-        rows[#rows + 1] = row(
-            text("UI_PNC_CommunityContainment"),
-            tostring(npc.insideHome)
-                .. " / distance "
-                .. number(npc.distanceFromHome),
-            npc.insideHome and "success" or "warning"
-        )
-        rows[#rows + 1] = row(
-            text("UI_PNC_CommunityNPCRevisions"),
-            "affiliation="
-                .. tostring(npc.affiliationRevision)
-                .. " record=" .. tostring(npc.recordRevision)
-                .. " presence="
-                .. tostring(npc.presenceRevision)
-        )
-    end
+end
+
+local function appendSelectedNpcRows(rows, npc)
+    if not npc then return end
+    rows[#rows + 1] = row(
+        text('UI_PNC_CommunitySelectedNPC'), npc.name
+    )
+    rows[#rows + 1] = row(
+        text('UI_PNC_CommunityNPCAffiliation'),
+        tostring(npc.communityID or 'none')
+            .. ' / ' .. tostring(npc.communityRole)
+    )
+    rows[#rows + 1] = row(
+        text('UI_PNC_CommunityNPCLocation'),
+        number(npc.x) .. ', ' .. number(npc.y)
+            .. ', ' .. number(npc.z)
+    )
+    rows[#rows + 1] = row(
+        text('UI_PNC_CommunityContainment'),
+        tostring(npc.insideHome)
+            .. ' / distance '
+            .. number(npc.distanceFromHome),
+        npc.insideHome and 'success' or 'warning'
+    )
+    rows[#rows + 1] = row(
+        text('UI_PNC_CommunityNPCRevisions'),
+        'affiliation='
+            .. tostring(npc.affiliationRevision)
+            .. ' record=' .. tostring(npc.recordRevision)
+            .. ' presence='
+            .. tostring(npc.presenceRevision)
+    )
+end
+
+local function appendValidationRows(rows, snapshot)
     local validation = snapshot.validation
-    if validation then
+    if not validation then return end
+    rows[#rows + 1] = row(
+        text('UI_PNC_CommunityValidation'),
+        validation.ok and 'valid'
+            or ('errors=' .. tostring(
+                #(validation.errors or {})
+            )),
+        validation.ok and 'success' or 'danger'
+    )
+end
+
+function Model.BuildRows(snapshot, authorized, reason)
+    local rows = {}
+    if authorized ~= true then
         rows[#rows + 1] = row(
-            text("UI_PNC_CommunityValidation"),
-            validation.ok and "valid"
-                or ("errors=" .. tostring(
-                    #(validation.errors or {})
-                )),
-            validation.ok and "success" or "danger"
+            text('UI_PNC_CommunityAuthorization'),
+            reason or 'not_authorized',
+            'danger'
         )
+        return rows
     end
+    snapshot = snapshot or {}
+    local registry = snapshot.registry or {}
+    local community = snapshot.selectedCommunity
+    local npc = snapshot.selectedNPC
+    local selectedFaction = selectedFactionFor(snapshot)
+    appendOverviewRows(rows, snapshot, registry, selectedFaction)
+    if not community then
+        rows[#rows + 1] = row(
+            text('UI_PNC_CommunitySelection'),
+            text('UI_PNC_CommunityNone'),
+            'textMuted'
+        )
+        return rows
+    end
+    appendCommunityRows(rows, snapshot, registry, community)
+    appendSelectedNpcRows(rows, npc)
+    appendValidationRows(rows, snapshot)
     return rows
 end
 

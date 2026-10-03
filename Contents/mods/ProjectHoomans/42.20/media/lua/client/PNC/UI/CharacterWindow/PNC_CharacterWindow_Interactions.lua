@@ -134,82 +134,73 @@ function Tabs.LayoutInteractions(view)
     end
 end
 
-function Tabs.RenderInteractions(view, _, _, topY)
-    local entries = Diary.Get(view.npcId)
-    local pad = Layout.Pixels(12, view.uiScale)
-    local lineHeight = Layout.Pixels(18, view.uiScale)
-    local width = math.max(100, view.width - pad * 2)
-    local color = Theme.colors.text
-    local muted = Theme.colors.textMuted
-    local y = topY + Layout.Pixels(6, view.uiScale)
-    local current = ClientState.conversationRelationships
-        and ClientState.conversationRelationships[tostring(view.npcId)]
-        or Relationship and Relationship.GetPresentation
-        and Relationship.GetPresentation(view.npcId) or nil
-    local established = view.snapshot and view.snapshot.startingRelationship
-        or view.payload and view.payload.startingRelationship
-    if established then
-        view:drawText(translated(
-            "UI_PNC_EstablishedRelationship",
-            "ESTABLISHED RELATIONSHIP"
-        ), pad, y, muted.r, muted.g, muted.b, muted.a, UIFont.Small)
-        y = y + lineHeight + 4
-        view:drawText(relationshipLabel(established.kind), pad, y,
-            color.r, color.g, color.b, color.a, UIFont.Small)
-        y = y + lineHeight
-        view:drawText(translated(
-            "UI_PNC_KnownBeforeOutbreak",
-            "Known since before the outbreak • Lifelong familiarity"
-        ), pad + Layout.Pixels(10, view.uiScale), y,
-            muted.r, muted.g, muted.b, muted.a, UIFont.Small)
-        y = y + lineHeight + Layout.Pixels(12, view.uiScale)
-    end
-    if current then
-        local attitude = Graph and Graph.ResolveAttitude
-            and Graph.ResolveAttitude(current.approval, current.respect)
-            or current.state or "indifferent"
-        view:drawText(translated(
-            "UI_PNC_CurrentRelationship",
-            "CURRENT RELATION"
-        ), pad, y, muted.r, muted.g, muted.b, muted.a, UIFont.Small)
-        y = y + lineHeight + 4
-        view:drawText(relationshipLabel(attitude), pad, y,
-            color.r, color.g, color.b, color.a, UIFont.Small)
-        y = y + lineHeight
-        view:drawText(
-            translated("UI_PNC_RelationshipApproval", "Approval")
-                .. " " .. signed(current.approval)
-                .. "   "
-                .. translated("UI_PNC_RelationshipRespect", "Respect")
-                .. " " .. signed(current.respect),
-            pad + Layout.Pixels(10, view.uiScale), y,
-            muted.r, muted.g, muted.b, muted.a, UIFont.Small
-        )
-        y = y + lineHeight
-        view:drawText(
-            translated("UI_PNC_RelationshipFamiliarity", "Familiarity")
-                .. " " .. signed(current.familiarity),
-            pad + Layout.Pixels(10, view.uiScale), y,
-            muted.r, muted.g, muted.b, muted.a, UIFont.Small
-        )
-        y = y + lineHeight + Layout.Pixels(12, view.uiScale)
-    end
-    if #entries == 0 then
-        if established then return y + pad end
-        view:drawText(translated(
-            "UI_PNC_NoPlayerInteractions",
-            "NO PLAYER INTERACTIONS RECORDED"
-        ), pad, y,
-            muted.r, muted.g, muted.b, muted.a, UIFont.Small)
-        y = y + lineHeight * 2
-        view:drawText(translated(
-            "UI_PNC_InteractionHistoryHint",
-            "Conversation choices, gifts, and recruitment attempts"
-        ),
-            pad, y, color.r, color.g, color.b, color.a, UIFont.Small)
-        return y + lineHeight + pad
-    end
+local function renderEstablishedRelationship(view, y, pad, lineHeight, color, muted, established)
+    if not established then return y end
+    view:drawText(translated(
+        "UI_PNC_EstablishedRelationship",
+        "ESTABLISHED RELATIONSHIP"
+    ), pad, y, muted.r, muted.g, muted.b, muted.a, UIFont.Small)
+    y = y + lineHeight + 4
+    view:drawText(relationshipLabel(established.kind), pad, y,
+        color.r, color.g, color.b, color.a, UIFont.Small)
+    y = y + lineHeight
+    view:drawText(translated(
+        "UI_PNC_KnownBeforeOutbreak",
+        "Known since before the outbreak • Lifelong familiarity"
+    ), pad + Layout.Pixels(10, view.uiScale), y,
+        muted.r, muted.g, muted.b, muted.a, UIFont.Small)
+    return y + lineHeight + Layout.Pixels(12, view.uiScale)
+end
 
+local function renderCurrentRelationship(view, y, pad, lineHeight, color, muted, current)
+    if not current then return y end
+    local attitude = Graph and Graph.ResolveAttitude
+        and Graph.ResolveAttitude(current.approval, current.respect)
+        or current.state or "indifferent"
+    view:drawText(translated(
+        "UI_PNC_CurrentRelationship",
+        "CURRENT RELATION"
+    ), pad, y, muted.r, muted.g, muted.b, muted.a, UIFont.Small)
+    y = y + lineHeight + 4
+    view:drawText(relationshipLabel(attitude), pad, y,
+        color.r, color.g, color.b, color.a, UIFont.Small)
+    y = y + lineHeight
+    view:drawText(
+        translated("UI_PNC_RelationshipApproval", "Approval")
+            .. " " .. signed(current.approval)
+            .. "   "
+            .. translated("UI_PNC_RelationshipRespect", "Respect")
+            .. " " .. signed(current.respect),
+        pad + Layout.Pixels(10, view.uiScale), y,
+        muted.r, muted.g, muted.b, muted.a, UIFont.Small
+    )
+    y = y + lineHeight
+    view:drawText(
+        translated("UI_PNC_RelationshipFamiliarity", "Familiarity")
+            .. " " .. signed(current.familiarity),
+        pad + Layout.Pixels(10, view.uiScale), y,
+        muted.r, muted.g, muted.b, muted.a, UIFont.Small
+    )
+    return y + lineHeight + Layout.Pixels(12, view.uiScale)
+end
+
+local function renderEmptyInteractions(view, y, pad, lineHeight, color, muted, established)
+    if established then return y + pad end
+    view:drawText(translated(
+        "UI_PNC_NoPlayerInteractions",
+        "NO PLAYER INTERACTIONS RECORDED"
+    ), pad, y,
+        muted.r, muted.g, muted.b, muted.a, UIFont.Small)
+    y = y + lineHeight * 2
+    view:drawText(translated(
+        "UI_PNC_InteractionHistoryHint",
+        "Conversation choices, gifts, and recruitment attempts"
+    ),
+        pad, y, color.r, color.g, color.b, color.a, UIFont.Small)
+    return y + lineHeight + pad
+end
+
+local function renderInteractionEntries(view, y, entries, pad, lineHeight, width, color, muted)
     view:drawText(translated(
         "UI_PNC_PlayerNPCInteractions",
         "PLAYER / NPC INTERACTIONS"
@@ -270,6 +261,28 @@ function Tabs.RenderInteractions(view, _, _, topY)
         y = y + lineHeight + 8
     end
     return y + pad
+end
+
+function Tabs.RenderInteractions(view, _, _, topY)
+    local entries = Diary.Get(view.npcId)
+    local pad = Layout.Pixels(12, view.uiScale)
+    local lineHeight = Layout.Pixels(18, view.uiScale)
+    local width = math.max(100, view.width - pad * 2)
+    local color = Theme.colors.text
+    local muted = Theme.colors.textMuted
+    local y = topY + Layout.Pixels(6, view.uiScale)
+    local current = ClientState.conversationRelationships
+        and ClientState.conversationRelationships[tostring(view.npcId)]
+        or Relationship and Relationship.GetPresentation
+        and Relationship.GetPresentation(view.npcId) or nil
+    local established = view.snapshot and view.snapshot.startingRelationship
+        or view.payload and view.payload.startingRelationship
+    y = renderEstablishedRelationship(view, y, pad, lineHeight, color, muted, established)
+    y = renderCurrentRelationship(view, y, pad, lineHeight, color, muted, current)
+    if #entries == 0 then
+        return renderEmptyInteractions(view, y, pad, lineHeight, color, muted, established)
+    end
+    return renderInteractionEntries(view, y, entries, pad, lineHeight, width, color, muted)
 end
 
 return Tabs

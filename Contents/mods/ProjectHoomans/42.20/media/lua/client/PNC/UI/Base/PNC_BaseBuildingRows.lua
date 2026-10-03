@@ -4,6 +4,11 @@ local Rows = {}
 local UI = PsychopatzCore.UI
 local Theme = UI.Theme
 local Layout = UI.Layout
+local function tr(key, fallback)
+    local value = getText and PNC.Translation.GetKey(key) or nil
+    if not value or value == key or value == "" then return fallback end
+    return value
+end
 
 function Rows.Material(list, y, entry, alternate)
     local row = entry.item or {}

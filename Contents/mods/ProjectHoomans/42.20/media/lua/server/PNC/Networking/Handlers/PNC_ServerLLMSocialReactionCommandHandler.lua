@@ -14,12 +14,14 @@ PNC.Conversation.Authority = PNC.Conversation.Authority or {}
 local Router = PNC.ServerCommandRouter
 local Const = PNC.Const
 local Registry = PNC.Registry
+local Relationships = PNC.Relationships
 local Network = PNC.Network
 local Presentation = PNC.RelationshipPresentation
 local Tools = PNC.ConversationLLMTools
 local Policy = PNC.Conversation
     and PNC.Conversation.LLMSocialReactionPolicy
 local Authority = PNC.Conversation.Authority
+Authority.Internal = Authority.Internal or {}
 
 local MAX_ID_LENGTH = 128
 
@@ -217,246 +219,43 @@ local function releaseLLMRequest(player, args)
     return ok == true, reason
 end
 
-local function handle(player, args)
-    args = type(args) == "table" and args or {}
-    local requestID = string.sub(text(args.requestID), 1, MAX_ID_LENGTH)
-    local callID = string.sub(text(args.callID), 1, MAX_ID_LENGTH)
-    local npcID = string.sub(text(args.npcID), 1, MAX_ID_LENGTH)
-    local token = text(args.token)
-    local reaction = Tools and Tools.NormalizeReaction
-        and Tools.NormalizeReaction(args.kind or args.reaction) or nil
-    local intensity = Tools and Tools.NormalizeIntensity
-        and Tools.NormalizeIntensity(args.intensity) or "normal"
-    local subtype = socialSubtype(reaction, args.subtype)
-    local record
-    local lease
-    local pendingRequest
-    local targetKey
-    local before
-    local beforeExists
-    local after
-    local effect
-    local applied
-    local reason
-    local details
-    local capabilities
-    local at
-    local cooldownType
-    local cooldownUntil
-    local result
-    local idempotencyKey
+Authority.Internal.LLMSocialReaction = {
+    Authority = Authority,
+    Registry = Registry,
+    Relationships = Relationships,
+    Network = Network,
+    Presentation = Presentation,
+    Tools = Tools,
+    Policy = Policy,
+    MAX_ID_LENGTH = MAX_ID_LENGTH,
+    log = log,
+    text = text,
+    socialSubtype = socialSubtype,
+    buildReplyContext = buildReplyContext,
+    worldAgeHours = worldAgeHours,
+    playerOwnsLease = playerOwnsLease,
+    relationshipFor = relationshipFor,
+    summaryOf = summaryOf,
+    summaryFor = summaryFor,
+    snapshotOf = snapshotOf,
+    sendResult = sendResult,
+    rejected = rejected,
+}
 
-    if requestID == "" then return rejected(player, args, "request_id_required") end
-    if callID == "" then return rejected(player, args, "call_id_required") end
-    if npcID == "" then return rejected(player, args, "npc_id_required") end
-    if not reaction then return rejected(player, args, "unknown_reaction") end
+require "PNC/Networking/Handlers/PNC_ServerLLMSocialReactionCommandHandler_ApplyEffect"
+require "PNC/Networking/Handlers/PNC_ServerLLMSocialReactionCommandHandler_BuildResult"
+require "PNC/Networking/Handlers/PNC_ServerLLMSocialReactionCommandHandler_DeliverResult"
+require "PNC/Networking/Handlers/PNC_ServerLLMSocialReactionCommandHandler_LeaseLifecycle"
+require "PNC/Networking/Handlers/PNC_ServerLLMSocialReactionCommandHandler_AdmissionRequest"
+require "PNC/Networking/Handlers/PNC_ServerLLMSocialReactionCommandHandler_AdmissionLease"
+require "PNC/Networking/Handlers/PNC_ServerLLMSocialReactionCommandHandler_AdmissionPolicy"
+require "PNC/Networking/Handlers/PNC_ServerLLMSocialReactionCommandHandler_Admission"
+require "PNC/Networking/Handlers/PNC_ServerLLMSocialReactionCommandHandler_Handle"
 
-    record = Registry and Registry.Get and Registry.Get(npcID) or nil
-    if not record then return rejected(player, args, "npc_not_found") end
-
-    local internal = Authority.Internal or {}
-    if not internal.ValidateLLMRequest and not internal.ValidateLease then
-        return rejected(player, args, "conversation_authority_unavailable")
-    end
-    local leaseOK
-    if internal.ValidateLLMRequest then
-        leaseOK, reason, lease = internal.ValidateLLMRequest(
-            player,
-            record,
-            token,
-            requestID
-        )
-    else
-        leaseOK, reason, lease = internal.ValidateLease(player, record, token)
-    end
-    if not leaseOK then return rejected(player, args, reason) end
-    if not playerOwnsLease(player, lease) then
-        return rejected(player, args, "conversation_player_mismatch")
-    end
-
-    lease.llmToolCalls = lease.llmToolCalls or {}
-    idempotencyKey = requestID .. ":" .. callID
-    if lease.llmToolCalls[idempotencyKey] then
-        result = lease.llmToolCalls[idempotencyKey]
-        log(
-            "social_react_duplicate",
-            "npc=" .. npcID .. " request=" .. requestID
-                .. " call=" .. callID
-        )
-        sendResult(player, result)
-        return result
-    end
-    pendingRequest = lease.requestID ~= nil
-    if pendingRequest and lease.consumed == true then
-        return rejected(player, args, "llm_request_consumed")
-    end
-
-    if not PNC.PlayerCharacters or not PNC.PlayerCharacters.GetEntityKey then
-        return rejected(player, args, "player_identity_unavailable")
-    end
-    targetKey, reason = PNC.PlayerCharacters.GetEntityKey(player, {
-        callback = "llm_social_reaction",
-        worldAgeHours = worldAgeHours(),
-    })
-    if not targetKey then return rejected(player, args, reason) end
-
-    local beforeRelationship = relationshipFor(npcID, targetKey)
-    beforeExists = beforeRelationship ~= nil
-    before = snapshotOf(beforeRelationship)
-    log(
-        "social_react_received",
-        "npc=" .. npcID .. " request=" .. requestID
-            .. " call=" .. callID .. " reaction=" .. tostring(reaction)
-            .. " intensity=" .. tostring(intensity)
-            .. " subtype=" .. tostring(subtype or "")
-            .. " target=" .. tostring(targetKey)
-            .. " before_approval=" .. tostring(before.approval or 0)
-            .. " before_respect=" .. tostring(before.respect or 0)
-    )
-    if not Tools or not Tools.GetEffect or not Policy
-        or not Policy.Evaluate
-    then
-        return rejected(player, args, "social_reaction_policy_unavailable")
-    end
-    at = worldAgeHours()
-    local available, availabilityReason, availabilityDetails =
-        Policy.Evaluate(reaction, record, player, beforeRelationship, at)
-    if not available then
-        capabilities = Policy.BuildCapabilities
-            and Policy.BuildCapabilities(
-                record, player, beforeRelationship, at
-            ) or nil
-        if type(availabilityDetails) ~= "table" then
-            availabilityDetails = {}
-        end
-        availabilityDetails.capabilities = capabilities
-        return rejected(player, args, availabilityReason, availabilityDetails)
-    end
-    effect, reason = Tools.GetEffect(reaction, intensity, subtype)
-    if not effect then return rejected(player, args, reason) end
-
-    cooldownType, cooldownUntil = Policy.CooldownMutation(reaction, at)
-    applied, reason, details = PNC.Relationships.ApplyConversationEffect(
-        npcID,
-        targetKey,
-        effect,
-        {
-            blockID = "llm_social_reaction",
-            choiceID = requestID,
-            outcomeID = callID .. ":" .. reaction,
-            interactionType = effect.interactionType
-                or effect.memoryType or effect.type,
-            worldAgeHours = at,
-            cooldownType = cooldownType,
-            cooldownUntil = cooldownUntil,
-            sourceSystem = "llm_social_reaction",
-            interaction = {
-                kind = "llm_social_reaction",
-                source = "llm_tool",
-                interactionType = effect.interactionType
-                    or effect.memoryType or effect.type,
-                reaction = reaction,
-                intensity = intensity,
-                subtype = subtype,
-                applied = true,
-            },
-        }
-    )
-    if applied ~= true then
-        log(
-            "social_react_apply_failed",
-            "npc=" .. npcID .. " request=" .. requestID
-                .. " call=" .. callID .. " reaction=" .. reaction
-                .. " reason=" .. tostring(reason or "relationship_rejected")
-        )
-        return rejected(player, args, reason or "relationship_rejected")
-    end
-
-    after = relationshipFor(npcID, targetKey) or {}
-    local relationshipSummary = summaryFor(player, npcID, after)
-    local relationshipBefore = summaryOf(before, beforeExists, npcID)
-    local relationshipAfter = relationshipSummary
-        or summaryOf(after, true, npcID)
-    capabilities = Policy.BuildCapabilities
-        and Policy.BuildCapabilities(record, player, after, at) or nil
-    local relationshipDelta = {
-        approval = (tonumber(after.approval) or 0)
-            - (tonumber(before.approval) or 0),
-        respect = (tonumber(after.respect) or 0)
-            - (tonumber(before.respect) or 0),
-        familiarity = (tonumber(after.familiarity) or 0)
-            - (tonumber(before.familiarity) or 0),
-    }
-    result = {
-        requestID = requestID,
-        callID = callID,
-        npcID = npcID,
-        tool = "social_react",
-        accepted = true,
-        reason = reason or "applied",
-        reaction = reaction,
-        intensity = intensity,
-        subtype = subtype,
-        explicit = subtype == "sexual_advance",
-        replyContext = buildReplyContext(
-            reaction,
-            subtype,
-            true,
-            reason or "applied"
-        ),
-        relationship = relationshipSummary,
-        relationshipBefore = relationshipBefore,
-        relationshipAfter = relationshipAfter,
-        relationshipDelta = relationshipDelta,
-        relationshipRevision = relationshipSummary
-            and relationshipSummary.revision or nil,
-        memoryID = details and details.memoryID or nil,
-        memoryType = details and details.memoryType or nil,
-        interactionType = details and details.interactionType or nil,
-        eventID = details and details.eventID or nil,
-        capabilities = capabilities,
-        policyVersion = Policy.VERSION,
-        cooldownType = cooldownType,
-        cooldownUntil = cooldownUntil,
-        approvalDelta = relationshipDelta.approval,
-        respectDelta = relationshipDelta.respect,
-        familiarityDelta = relationshipDelta.familiarity,
-    }
-    lease.llmToolCalls[idempotencyKey] = result
-    if pendingRequest then
-        lease.consumed = true
-        lease.consumedAt = getTimeInMillis and getTimeInMillis() or nil
-    end
-    log(
-        "social_react_applied",
-        "npc=" .. npcID .. " request=" .. requestID
-            .. " call=" .. callID .. " reaction=" .. reaction
-            .. " memory=" .. tostring(result.memoryID or "")
-            .. " event=" .. tostring(details and details.eventID or "")
-            .. " after_approval=" .. tostring(after.approval or 0)
-            .. " after_respect=" .. tostring(after.respect or 0)
-            .. " revision=" .. tostring(result.relationshipRevision or "")
-    )
-    sendResult(player, result)
-    if Network and Network.SendConversationRelationship then
-        Network.SendConversationRelationship(
-            player,
-            relationshipSummary,
-            "llm_social_reaction",
-            {
-                source = "llm_tool",
-                eventID = result.eventID,
-                relationshipBefore = relationshipBefore,
-                relationshipAfter = relationshipAfter,
-                relationshipDelta = relationshipDelta,
-            }
-        )
-    end
-    return result
-end
-
-Authority.HandleLLMSocialReaction = handle
-Router.Register(Const.CMD_LLM_SOCIAL_REACTION, handle)
+Router.Register(
+    Const.CMD_LLM_SOCIAL_REACTION,
+    Authority.HandleLLMSocialReaction
+)
 if Const.CMD_LLM_REQUEST_RESERVE then
     Router.Register(Const.CMD_LLM_REQUEST_RESERVE, function(player, args)
         return reserveLLMRequest(player, args)

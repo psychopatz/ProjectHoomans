@@ -1,5 +1,6 @@
 local T = require "tests/support/test"
 T.addPackagePaths()
+T.stubClientUI()
 
 local layout = {
     defaults = {},

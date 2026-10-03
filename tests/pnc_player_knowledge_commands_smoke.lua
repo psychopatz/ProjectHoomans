@@ -38,6 +38,9 @@ PNC = {
     Factions = { GetPresentation = function()
         return { name = "Pinecrest Settlement" }
     end },
+    ServerCommandRouter = {
+        CanUseDebug = function() return true end,
+    },
     NPCKnowledge = {
         Registry = { revision = 9 },
         GetDescriptor = function()
@@ -118,6 +121,7 @@ T.equal(unknown.snapshot.identity.displayName, nil,
 local failed = Commands.HandleDisclosure({}, {
     requestID = "disclose:1", npcID = "npc_doyle", topicID = "identity_name",
     conversationToken = "lease:one",
+    origin = "debug",
 })
 T.equal(failed.success, false, "failed commit rejects disclosure")
 T.equal(failed.responseText, nil, "failed commit cannot display introduction")
@@ -132,6 +136,7 @@ commitSucceeds = true
 local retried = Commands.HandleDisclosure({}, {
     requestID = "disclose:1", npcID = "npc_doyle", topicID = "identity_name",
     conversationToken = "lease:one",
+    origin = "debug",
 })
 T.truthy(retried.success, "retry succeeds after durable commit")
 T.equal(disclosureCalls, 1, "retry does not duplicate learned evidence")
@@ -143,6 +148,7 @@ T.equal(retried.presentation.state, "known", "committed projection is known")
 local replay = Commands.HandleDisclosure({}, {
     requestID = "disclose:1", npcID = "npc_doyle", topicID = "identity_name",
     conversationToken = "lease:one",
+    origin = "debug",
 })
 T.truthy(replay.success and replay.replayed == true,
     "successful request ID is idempotently replayed")

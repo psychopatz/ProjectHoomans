@@ -6,54 +6,20 @@ local findNativeItem = Helpers.findNativeItem
 local localPlayer = Helpers.localPlayer
 local EditorModel
 
-function Endpoint.LocalDraft(draft)
-    local endpoint = {
-        kind = "local_draft",
-        role = "counterparty",
-        id = "editor-draft",
-        displayName = draft and draft.displayName or "Unique NPC Draft",
-        draft = draft,
-        selectedContainer = "root",
-        expandedGroups = {},
-    }
-    local function record()
-        if not EditorModel then
-            EditorModel = require "PNC/UI/UniqueNPCEditor/PNC_UniqueNPCEditorModel"
-        end
-        return EditorModel.EnsureRuntimeRecord(draft)
+
+local function ensureEditorModel()
+    if not EditorModel then
+        EditorModel = require "PNC/UI/UniqueNPCEditor/PNC_UniqueNPCEditorModel"
     end
-    function endpoint:payload()
-        self.displayName = draft and draft.displayName or self.displayName
-        local current = record()
-        return current and {
-            inventory = current.inventory,
-            snapshot = { id = self.id, name = self.displayName },
-        } or nil
-    end
-    function endpoint:inventory()
-        local current = record()
-        return current and current.inventory or nil
-    end
-    function endpoint:revision()
-        local inventory = self:inventory()
-        return inventory and tonumber(inventory.revision) or -1
-    end
-    function endpoint:containers()
-        return Model.BuildNPCContainers(self:inventory())
-    end
-    function endpoint:rows()
-        return Model.BuildNPCRows(
-            self:inventory(), self.selectedContainer, self.expandedGroups
-        )
-    end
-    function endpoint:weight()
-        return Model.GetNPCContainerWeight(
-            self:inventory(), self.selectedContainer
-        )
-    end
-    function endpoint:requestSnapshot() end
-    function endpoint:send(direction, selection, destination)
-        local current = record()
+    return EditorModel
+end
+
+local function recordDraft(draft)
+    return ensureEditorModel().EnsureRuntimeRecord(draft)
+end
+
+local function sendLocalDraft(self, draft, direction, selection, destination)
+        local current = recordDraft(draft)
         local player = localPlayer()
         local specs = {}
         local skipped = {}
@@ -125,9 +91,10 @@ function Endpoint.LocalDraft(draft)
             }
         end
         return ok, reason
-    end
-    function endpoint:action(actionID, itemID)
-        local current = record()
+end
+
+local function runLocalDraftAction(draft, actionID, itemID)
+        local current = recordDraft(draft)
         local Actions = PNC.InventoryActions
         local ok
         local reason
@@ -140,6 +107,53 @@ function Endpoint.LocalDraft(draft)
             draft._dirty = true
         end
         return ok, reason
+end
+
+function Endpoint.LocalDraft(draft)
+    local endpoint = {
+        kind = "local_draft",
+        role = "counterparty",
+        id = "editor-draft",
+        displayName = draft and draft.displayName or "Unique NPC Draft",
+        draft = draft,
+        selectedContainer = "root",
+        expandedGroups = {},
+    }
+    function endpoint:payload()
+        self.displayName = draft and draft.displayName or self.displayName
+        local current = recordDraft(draft)
+        return current and {
+            inventory = current.inventory,
+            snapshot = { id = self.id, name = self.displayName },
+        } or nil
+    end
+    function endpoint:inventory()
+        local current = recordDraft(draft)
+        return current and current.inventory or nil
+    end
+    function endpoint:revision()
+        local inventory = self:inventory()
+        return inventory and tonumber(inventory.revision) or -1
+    end
+    function endpoint:containers()
+        return Model.BuildNPCContainers(self:inventory())
+    end
+    function endpoint:rows()
+        return Model.BuildNPCRows(
+            self:inventory(), self.selectedContainer, self.expandedGroups
+        )
+    end
+    function endpoint:weight()
+        return Model.GetNPCContainerWeight(
+            self:inventory(), self.selectedContainer
+        )
+    end
+    function endpoint:requestSnapshot() end
+    function endpoint:send(direction, selection, destination)
+        return sendLocalDraft(self, draft, direction, selection, destination)
+    end
+    function endpoint:action(actionID, itemID)
+        return runLocalDraftAction(draft, actionID, itemID)
     end
     return endpoint
 end

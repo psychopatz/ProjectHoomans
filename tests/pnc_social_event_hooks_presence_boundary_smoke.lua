@@ -10,6 +10,8 @@ local providers = {
     "PNC_SocialEventHooks_Encounter",
     "PNC_SocialEventHooks_ThreatAttribution",
     "PNC_SocialEventHooks_CombatAdapter",
+    "PNC_SocialEventHooks_CombatAdapter_Awareness",
+    "PNC_SocialEventHooks_CombatAdapter_Witnesses",
     "PNC_SocialEventHooks_DamageAdapter",
     "PNC_SocialEventHooks_ClientKill",
 }
@@ -61,7 +63,7 @@ for name in pairs(publicFunctions) do
     T.equal(type(PNC.SocialEventHooks[name]), "function",
         "entry point preserves SocialEventHooks." .. name)
 end
-T.equal(publicCount, 14, "social-event-hooks public function count")
+T.equal(publicCount, 16, "social-event-hooks public function count")
 T.equal(type(PNC.SocialEventHooks.RescueContributions), "table",
     "rescue contributions remain initialized")
 T.equal(type(PNC.SocialEventHooks.ThreatAttributions), "table",

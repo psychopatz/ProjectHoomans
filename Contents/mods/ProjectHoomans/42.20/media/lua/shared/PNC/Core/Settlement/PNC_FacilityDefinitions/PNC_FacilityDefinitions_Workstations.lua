@@ -1,7 +1,6 @@
 local Definitions = PNC.FacilityDefinitions
     or require "PNC/Core/Settlement/PNC_FacilityDefinitions/PNC_FacilityDefinitions_Core"
-local WorkDefinitions = PNC.WorkDefinitions
-    or require "PNC/Core/Production/WorkDefinition/PNC_WorkDefinitions"
+local WorkDefinitions = PNC.WorkDefinitions or { STATIONS = {} }
 
 Definitions.Register({
     id = "research_facility",

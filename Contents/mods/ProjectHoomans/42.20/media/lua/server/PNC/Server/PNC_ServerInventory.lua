@@ -4,8 +4,6 @@ then
     return
 end
 
-require "PNC/00_PNC_Init"
-
 PNC = PNC or {}
 PNC.ServerInventory = PNC.ServerInventory or {}
 PNC.ServerInventory.Internal = PNC.ServerInventory.Internal or {}

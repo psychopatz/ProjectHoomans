@@ -1,5 +1,7 @@
 local T = require "tests/support/test"
 T.addPackagePaths()
+package.path = T.path("PsychopatzCore", "common_client", "?.lua")
+    .. ";" .. package.path
 
 local function derive(base)
     local child = {}
@@ -48,6 +50,10 @@ end
 
 function Part:setVisible(value)
     self.visible = value
+end
+function Part:addChild(child)
+    self.children = self.children or {}
+    self.children[#self.children + 1] = child
 end
 
 local function makeEntry()
@@ -98,6 +104,20 @@ local function makeEntry()
     function entry:focus() self.focused = true end
     function entry:unfocus() self.unfocused = true end
 
+    return entry
+end
+
+ISTextEntryBox = {}
+function ISTextEntryBox:new(text, x, y, width, height)
+    local entry = makeEntry()
+    entry.text = text or ""
+    entry.x, entry.y = x or 0, y or 0
+    entry.width, entry.height = width or 1, height or 1
+    function entry:initialise() end
+    function entry:instantiate() end
+    function entry:setClearButton(value) self.clearButton = value end
+    function entry:setOnlyNumbers(value) self.onlyNumbers = value end
+    function entry:setMaxTextLength(value) self.maxTextLength = value end
     return entry
 end
 
@@ -169,7 +189,14 @@ function Keyboard.isKeyDown(key)
 end
 
 package.preload["ISUI/ISButton"] = function() return true end
+package.preload["ISUI/ISPanel"] = function() return ISPanel end
+package.preload["ISUI/ISTextEntryBox"] = function() return true end
+package.preload["ISUI/ISScrollingListBox"] = function() return true end
 package.preload["PsychopatzCore/UI/PsychopatzUI"] = function() return UI end
+package.preload["PsychopatzCore/UI/Components/PsychopatzUIControls"] =
+    function() return UI end
+package.preload["PsychopatzCore/UI/Components/PsychopatzTextEntry"] =
+    function() return UI end
 package.preload["PsychopatzCore/UI/Conversation/Parts/PsychopatzConversationPart"] =
     function()
         PsychopatzConversationPart = Part

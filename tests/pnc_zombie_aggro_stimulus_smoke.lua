@@ -110,9 +110,8 @@ T.equal(calls[2].doSend, false,
 T.equal(calls[2].sourceIsZombie, false,
     "SP stimulus was marked as a zombie source")
 
--- PathFindState already owns Behavior2:update(). The aggro path helper must
--- refresh that location goal directly instead of calling IsoZombie's guarded
--- wrapper, while idle zombies still use the wrapper to establish locomotion.
+-- The aggro path helper uses Behavior2 directly in every action state, so
+-- IsoZombie's guarded path wrapper cannot drop a refresh during locomotion.
 T.load(
     "ProjectHoomans",
     "shared",
@@ -148,8 +147,10 @@ actionState = "idle"
 T.truthy(
     PNC.ZombieAggro.RequestCoordinatePath(pathZombie, 1, 2, 0),
     "idle zombie did not accept a coordinate goal")
-T.equal(wrapperCalls, 1,
-    "idle zombie did not use the locomotion wrapper route")
+T.equal(directCalls, 2,
+    "idle zombie did not use the direct Behavior2 route")
+T.equal(wrapperCalls, 0,
+    "idle zombie used the guarded locomotion wrapper route")
 
 isClient = function() return true end
 now = 3000

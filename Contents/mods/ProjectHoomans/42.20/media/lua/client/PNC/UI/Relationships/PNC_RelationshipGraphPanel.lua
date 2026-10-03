@@ -329,45 +329,17 @@ function ISPNCRelationshipGraphPanel:drawDepartureThreshold(
     )
 end
 
-function ISPNCRelationshipGraphPanel:render()
-    ISPanel.render(self)
-    local contentOpacity = self:getContentOpacity()
-    local evaluation = self.evaluation or Graph.Evaluate(
-        0,
-        0,
-        "inspect"
-    )
-    local graphOnly = self.graphOnly == true
-    local top = graphOnly and 0 or 28
-    local graphSize = graphOnly
-        and math.max(2, math.min(self.width, self.height))
-        or math.max(120, math.min(self.width - 24, self.height - 154))
-    local graphX = math.floor((self.width - graphSize) / 2)
-    local graphY = top
-    local half = graphSize / 2
-    self:drawColorRect(
-        0, 0, self.width, self.height, COLORS.background, "content"
-    )
-    if not graphOnly then
-        self:drawTextCentre(
-            tostring(evaluation.requirement.label),
-            self.width / 2,
-            6,
-            0.90,
-            0.93,
-            0.95,
-            contentOpacity,
-            UIFont.Small
-        )
-    end
-    self:drawColorRect(graphX, graphY, half, half, COLORS.pity, "content")
-    self:drawColorRect(
+local function drawGraphSurface(
+    panel, graphX, graphY, graphSize, half, evaluation, contentOpacity
+)
+    panel:drawColorRect(graphX, graphY, half, half, COLORS.pity, "content")
+    panel:drawColorRect(
         graphX + half, graphY, half, half, COLORS.admire, "content"
     )
-    self:drawColorRect(
+    panel:drawColorRect(
         graphX, graphY + half, half, half, COLORS.despise, "content"
     )
-    self:drawColorRect(
+    panel:drawColorRect(
         graphX + half,
         graphY + half,
         half,
@@ -375,41 +347,41 @@ function ISPNCRelationshipGraphPanel:render()
         COLORS.fear,
         "content"
     )
-    self:drawSuccessRegion(
+    panel:drawSuccessRegion(
         graphX,
         graphY,
         graphSize,
         evaluation
     )
-    self:drawDepartureThreshold(
+    panel:drawDepartureThreshold(
         graphX, graphY, graphSize, evaluation
     )
-    self:drawRect(
+    panel:drawRect(
         graphX,
         graphY + half,
         graphSize,
         1,
-        self:contentAlpha(COLORS.grid[1]),
+        panel:contentAlpha(COLORS.grid[1]),
         COLORS.grid[2],
         COLORS.grid[3],
         COLORS.grid[4]
     )
-    self:drawRect(
+    panel:drawRect(
         graphX + half,
         graphY,
         1,
         graphSize,
-        self:contentAlpha(COLORS.grid[1]),
+        panel:contentAlpha(COLORS.grid[1]),
         COLORS.grid[2],
         COLORS.grid[3],
         COLORS.grid[4]
     )
-    self:drawRectBorder(
+    panel:drawRectBorder(
         graphX,
         graphY,
         graphSize,
         graphSize,
-        self:contentAlpha(COLORS.border[1]),
+        panel:contentAlpha(COLORS.border[1]),
         COLORS.border[2],
         COLORS.border[3],
         COLORS.border[4]
@@ -421,7 +393,7 @@ function ISPNCRelationshipGraphPanel:render()
         { "FEAR", graphX + half * 1.5, graphY + graphSize - 22 },
     }
     for _, label in ipairs(labels) do
-        self:drawTextCentre(
+        panel:drawTextCentre(
             label[1],
             label[2],
             label[3],
@@ -440,11 +412,17 @@ function ISPNCRelationshipGraphPanel:render()
         graphSize,
         graphSize
     )
-    self:drawDiamond(markerX, markerY)
+    panel:drawDiamond(markerX, markerY)
+    return markerX, markerY
+end
+
+local function drawGraphSummary(
+    panel, graphY, graphSize, evaluation, contentOpacity, graphOnly
+)
     if not graphOnly then
-        self:drawTextCentre(
+        panel:drawTextCentre(
             "RESPECT  -100                                      +100",
-            self.width / 2,
+            panel.width / 2,
             graphY + graphSize + 7,
             0.62,
             0.68,
@@ -453,7 +431,7 @@ function ISPNCRelationshipGraphPanel:render()
             UIFont.Small
         )
         local summaryY = graphY + graphSize + 29
-        self:drawText(
+        panel:drawText(
             "Attitude: " .. capitalize(evaluation.attitude)
                 .. "   Approval " .. signed(evaluation.approval)
                 .. "   Respect " .. signed(evaluation.respect),
@@ -473,7 +451,7 @@ function ISPNCRelationshipGraphPanel:render()
                 .. " / inside green: "
                 .. tostring(evaluation.insideSuccessRegion)
             ) or "Green region disabled for relationship-only inspection"
-        self:drawText(
+        panel:drawText(
             resultText,
             10,
             summaryY + 20,
@@ -483,7 +461,7 @@ function ISPNCRelationshipGraphPanel:render()
             contentOpacity,
             UIFont.Small
         )
-        self:drawText(
+        panel:drawText(
             "Context " .. signed(evaluation.contextBonus)
                 .. "   Base " .. signed(evaluation.baseScore),
             10,
@@ -497,7 +475,7 @@ function ISPNCRelationshipGraphPanel:render()
         local modifierY = summaryY + 60
         for index = 1, math.min(2, #(evaluation.modifiers or {})) do
             local modifier = evaluation.modifiers[index]
-            self:drawText(
+            panel:drawText(
                 signed(modifier.value) .. " " .. modifier.label,
                 10,
                 modifierY + (index - 1) * 18,
@@ -509,28 +487,15 @@ function ISPNCRelationshipGraphPanel:render()
             )
         end
     end
-    -- Conversation panels use graphOnly to save space, but the hover
-    -- explanation is still the only direct way to inspect why a point is in
-    -- the green acceptance region. Keep it available in that presentation.
-    self:drawHover(
-        graphX,
-        graphY,
-        graphSize,
-        markerX,
-        markerY,
-        evaluation
-    )
 end
 
-function ISPNCRelationshipGraphPanel:new(x, y, width, height)
-    local object = ISPanel:new(x, y, width, height)
-    setmetatable(object, self)
-    self.__index = self
-    object.evaluation = Graph.Evaluate(0, 0, "inspect")
-    object.graphOnly = false
-    object.opacity = 1
-    object.contentOpacity = 1
-    return object
-end
+
+local Internal = PNC.RelationshipGraphPanel.Internal or {}
+PNC.RelationshipGraphPanel.Internal = Internal
+Internal.Colors = COLORS
+Internal.DrawGraphSurface = drawGraphSurface
+Internal.DrawGraphSummary = drawGraphSummary
+
+require "PNC/UI/Relationships/PNC_RelationshipGraphPanel_Render"
 
 return ISPNCRelationshipGraphPanel

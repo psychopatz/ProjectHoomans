@@ -13,6 +13,10 @@ local providers = {
     "PNC_RelationshipService_PersonalBoundary",
 }
 
+local nestedProviders = {
+    "PNC_RelationshipService_EventMutation_Apply",
+}
+
 local previous = 0
 local publicFunctions = {}
 local i
@@ -24,6 +28,39 @@ for i = 1, #providers do
     previous = position
     local providerSource = T.read(
         "ProjectHoomans", "server", prefix .. provider .. ".lua")
+    for name in providerSource:gmatch(
+        "function%s+Relationships%.([%w_]+)"
+    ) do
+        publicFunctions[name] = true
+    end
+end
+
+local eventMutationSource = T.read(
+    "ProjectHoomans",
+    "server",
+    "PNC/Social/RelationshipService/PNC_RelationshipService_EventMutation.lua"
+)
+T.falsy(
+    string.find(
+        eventMutationSource,
+        'require "PNC/Conversation/Memory/PNC_ConversationMemory"',
+        1,
+        true
+    ),
+    "relationship mutation does not hard-load Conversation Memory"
+)
+local nestedPrevious = 0
+for i = 1, #nestedProviders do
+    local provider = nestedProviders[i]
+    local needle = 'require "PNC/Social/RelationshipService/' .. provider .. '"'
+    local position = assert(eventMutationSource:find(needle, 1, true), needle)
+    T.truthy(position > nestedPrevious, provider .. " nested load order")
+    nestedPrevious = position
+    local providerSource = T.read(
+        "ProjectHoomans",
+        "server",
+        "PNC/Social/RelationshipService/" .. provider .. ".lua"
+    )
     for name in providerSource:gmatch(
         "function%s+Relationships%.([%w_]+)"
     ) do

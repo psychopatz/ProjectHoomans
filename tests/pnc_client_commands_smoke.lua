@@ -105,9 +105,10 @@ T.load(FILE)
 
 local Client = PNC.Client
 local State = PNC.Network.ClientState
+Client.Internal.ResetZombiePursuitDirectives()
 
 T.equal(State.zombiePursuitDirectives["17"], nil,
-    "legacy pursuit directives survived receiver initialization")
+    "pursuit reset retained a directive from the previous client session")
 Client.HandleServerCommand("ZombiePursuit", {
     active = true,
     zombieOnlineID = 18,
@@ -118,8 +119,8 @@ Client.HandleServerCommand("ZombiePursuit", {
     expiresAt = 6000,
     revision = 1,
 })
-T.equal(State.zombiePursuitDirectives["18"], nil,
-    "retired pursuit receiver retained a new directive")
+T.equal(State.zombiePursuitDirectives["18"].npcId, "npc_legacy",
+    "pursuit receiver did not retain the active directive")
 State.zombiePursuitDirectives["19"] = {
     npcId = "npc_stale",
 }

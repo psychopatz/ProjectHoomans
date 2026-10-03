@@ -225,23 +225,11 @@ function TravelLayer.InvalidateEntryCache()
     TravelLayer.EntryCacheAt = nil
 end
 
-function TravelLayer.Render(map)
-    if not TravelLayer.Enabled or not map or not map.mapAPI then
-        if HoverPortrait and HoverPortrait.Hide then
-            HoverPortrait.Hide(map)
-        end
-        return
-    end
-    local entries = listProjectedEntries()
-    local showLabels = Display and Display.AreNamesVisible
-        and Display.AreNamesVisible() or false
-    local dotSize = TravelLayer.GetDotSize(map)
-    local mouseX = map:getMouseX()
-    local mouseY = map:getMouseY()
+local function drawTravelMarkers(map, entries, showLabels, dotSize,
+    mouseX, mouseY)
     local hoveredEntry
     local hoveredX
     local hoveredY
-    local i
     local entry
     local sx
     local sy
@@ -325,6 +313,11 @@ function TravelLayer.Render(map)
         end
     end
 
+
+    return hoveredEntry, hoveredX, hoveredY
+end
+
+local function drawTravelHover(map, hoveredEntry, hoveredX, hoveredY)
     if hoveredEntry then
         local portraitVisible = HoverPortrait
             and HoverPortrait.Update
@@ -362,6 +355,25 @@ function TravelLayer.Render(map)
     elseif HoverPortrait and HoverPortrait.Hide then
         HoverPortrait.Hide(map)
     end
+end
+
+function TravelLayer.Render(map)
+    if not TravelLayer.Enabled or not map or not map.mapAPI then
+        if HoverPortrait and HoverPortrait.Hide then
+            HoverPortrait.Hide(map)
+        end
+        return
+    end
+    local entries = listProjectedEntries()
+    local showLabels = Display and Display.AreNamesVisible
+        and Display.AreNamesVisible() or false
+    local dotSize = TravelLayer.GetDotSize(map)
+    local mouseX = map:getMouseX()
+    local mouseY = map:getMouseY()
+    local hoveredEntry, hoveredX, hoveredY = drawTravelMarkers(
+        map, entries, showLabels, dotSize, mouseX, mouseY
+    )
+    drawTravelHover(map, hoveredEntry, hoveredX, hoveredY)
 end
 
 Layers.Register("pnc_travel", {

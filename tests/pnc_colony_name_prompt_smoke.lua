@@ -73,7 +73,10 @@ package.preload["PsychopatzCore/UI/PsychopatzUI"] = function()
 end
 UIFont = { Small = 1 }
 
+local lastWindowOptions
+
 function UI.NewWindow(class, options)
+    lastWindowOptions = options
     local window = class:new(0, 0, 430, 170, options)
     window.title = options.title
     window.uiScale = 1
@@ -81,6 +84,8 @@ function UI.NewWindow(class, options)
     function window:addToUIManager() self.added = true end
     function window:setVisible(value) self.visible = value end
     function window:getIsVisible() return self.visible end
+    function window:setAlwaysOnTop(value) self.alwaysOnTop = value end
+    function window:setCapture(value) self.capture = value end
     function window:bringToTop() self.focused = true end
     function window:removeFromUIManager() self.added = false end
     return window
@@ -112,9 +117,20 @@ T.equal(Prompt.instance.saveButton.title, "SAVE",
     "manual modal save action changed")
 T.equal(Prompt.instance.cancelButton.title, "CANCEL",
     "manual modal cancel action changed")
+T.equal(lastWindowOptions.collapsible, false,
+    "faction name prompt remained collapsible")
+T.equal(lastWindowOptions.persistenceKey, false,
+    "faction name prompt persisted transient geometry")
+T.truthy(Prompt.instance.alwaysOnTop,
+    "faction name prompt was not kept above the game UI")
+T.truthy(Prompt.instance.capture,
+    "faction name prompt did not capture input")
+local manualWindow = Prompt.instance
 Prompt.instance.nameEntry:setText("Morgan Wardens")
 Prompt.instance:onSave()
 T.equal(renamed, "Morgan Wardens", "manual modal did not submit the new name")
+T.falsy(manualWindow.capture,
+    "faction name prompt kept input capture after closing")
 T.falsy(Prompt.instance, "manual modal remained open after a successful rename")
 
 snapshot.faction.renamePending = true
@@ -124,6 +140,10 @@ T.truthy(Prompt.OpenIfNeeded(snapshot),
 T.equal(Prompt.instance.mode, "first", "first-faction mode changed")
 T.equal(Prompt.instance.title, "NAME YOUR FACTION",
     "first-faction title changed")
+T.truthy(Prompt.instance.alwaysOnTop,
+    "first-faction prompt was not kept above the game UI")
+T.truthy(Prompt.instance.capture,
+    "first-faction prompt did not capture input")
 T.falsy(Prompt.OpenIfNeeded(snapshot),
     "first-faction prompt ignored its revision de-duplication")
 Prompt.Close()

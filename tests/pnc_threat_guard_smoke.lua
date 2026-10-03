@@ -14,6 +14,7 @@ local target = {
     z = 0,
     visible = true,
     threatening = true,
+    lastSeenAt = -3000,
 }
 
 PNC = {
@@ -80,6 +81,7 @@ PNC = {
         },
     },
     BehaviorCommon = {
+        SetCombatDebug = function() end,
         SetCombatTarget = function(record, resolved)
             record.runtime.target = resolved
             return true

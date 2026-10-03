@@ -19,6 +19,7 @@ from tools.semantic_compiler.compiler import (  # noqa: E402
     load_dialogue_dataset,
     load_allowlist,
     render_dialogue_lua,
+    render_dialogue_lua_shards,
     render_lua,
 )
 
@@ -33,6 +34,41 @@ DEFAULT_DIALOGUE_OUTPUT = (
     / "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/"
     / "PNC_SemanticGeneratedDialogue.lua"
 )
+
+
+def _dialogue_module_prefix(output: Path) -> str:
+    parts = output.parts
+    for index in range(len(parts) - 2):
+        if parts[index:index + 3] != ("media", "lua", "shared"):
+            continue
+        root = Path(*parts[:index + 3])
+        return output.relative_to(root).with_suffix("").as_posix()
+    raise ValueError(
+        "dialogue output must be under a Project Zomboid media/lua/shared tree")
+
+
+def _write_dialogue_output(output: Path, compiled: dict) -> list[Path]:
+    module_prefix = _dialogue_module_prefix(output)
+    shards = render_dialogue_lua_shards(compiled, module_prefix)
+    pattern_modules = [
+        module for module, _ in shards if "_Patterns_" in module]
+    response_modules = [
+        module for module, _ in shards if "_Responses_" in module]
+    stale_patterns = output.parent.glob(output.stem + "_Patterns_*.lua")
+    stale_responses = output.parent.glob(output.stem + "_Responses_*.lua")
+    for stale in (*stale_patterns, *stale_responses):
+        stale.unlink()
+    output.write_text(
+        render_dialogue_lua(compiled, pattern_modules, response_modules),
+        encoding="utf-8",
+        newline="\n",
+    )
+    paths = [output]
+    for module, source in shards:
+        shard_path = output.parent / (Path(module).name + ".lua")
+        shard_path.write_text(source, encoding="utf-8", newline="\n")
+        paths.append(shard_path)
+    return paths
 
 
 def main(arguments: list[str] | None = None) -> int:
@@ -100,14 +136,14 @@ def main(arguments: list[str] | None = None) -> int:
     if compiled_dialogue is not None:
         output = options.dialogue_output.expanduser().resolve()
         output.parent.mkdir(parents=True, exist_ok=True)
-        with output.open("w", encoding="utf-8", newline="\n") as stream:
-            stream.write(render_dialogue_lua(compiled_dialogue))
+        paths = _write_dialogue_output(output, compiled_dialogue)
         pattern_count = len(compiled_dialogue["patterns"])
         variant_count = sum(
             len(pool["variants"]) for pool in compiled_dialogue["responsePools"])
         print(
-            f"wrote {output} ({pattern_count} exact interaction patterns, "
-            f"{variant_count} response variants)"
+            f"wrote {output} and {len(paths) - 1} data shards "
+            f"({pattern_count} exact interaction patterns, {variant_count} "
+            "response variants)"
         )
     return 0
 

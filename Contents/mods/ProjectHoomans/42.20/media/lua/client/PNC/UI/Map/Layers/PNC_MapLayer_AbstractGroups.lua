@@ -164,7 +164,12 @@ end
 
 local function clearTracks()
     local tracks = GroupLayer.Tracks
-    if GroupLayer.SnapshotToken == nil and next(tracks) == nil then
+    local hasTrack = false
+    for _ in pairs(tracks) do
+        hasTrack = true
+        break
+    end
+    if GroupLayer.SnapshotToken == nil and not hasTrack then
         return
     end
     local pool = GroupLayer.TrackPool or {}

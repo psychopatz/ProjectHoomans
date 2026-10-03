@@ -48,6 +48,9 @@ end
 
 Internal.ownsRequest = ownsRequest
 
+require "PNC/PuppetOpera/PNC_PuppetOpera_Authority_Requests_Session"
+require "PNC/PuppetOpera/PNC_PuppetOpera_Authority_Requests_Readonly"
+
 function Authority.HandleRequest(player, args)
     args = type(args) == "table" and args or {}
     local id = Internal.ownerID(player)
@@ -57,152 +60,25 @@ function Authority.HandleRequest(player, args)
         return false, "debug_not_authorized"
     end
     local action = tostring(args.action or "")
-    local accepted
-    local reason
-    if action == "start" then
-        accepted, reason = Internal.startSession(player, args, false)
-        if not accepted then
-            Internal.sendError(player, reason, session)
-            return false, reason
+    local handled, accepted, result, reported
+    handled, accepted, result, reported = Internal.handleSessionAction(
+        player, session, args, action
+    )
+    if handled then
+        if not accepted and not reported then
+            Internal.sendError(player, result, session)
         end
-        return true, reason
+        return accepted, result
     end
-    if action == "preview_start" then
-        if session and not session.previewOnly then
-            Internal.sendError(player, "playback_session_active", session)
-            return false, "playback_session_active"
+    handled, accepted, result, reported = Internal.handleReadonlyAction(
+        player, session, args, action, id
+    )
+    if handled then
+        if not accepted and not reported then
+            Internal.sendError(player, result, session)
         end
-        accepted, reason = Internal.startSession(player, args, true)
-        if not accepted then
-            Internal.sendError(player, reason, session)
-            return false, reason
-        end
-        return true, reason
+        return accepted, result
     end
-    if action == "preview_stop" then
-        if not session then return true, "preview_missing" end
-        if not session.previewOnly then
-            Internal.sendError(player, "playback_session_active", session)
-            return false, "playback_session_active"
-        end
-        accepted, reason = ownsRequest(session, player, args)
-        if not accepted then
-            Internal.sendError(player, reason, session)
-            return false, reason
-        end
-        Internal.closeSession(session, Opera.Phases.RESTORED, "preview_stop")
-        return true, "preview_stopped"
-    end
-    if action == "preview_refresh" then
-        if not session then return false, "preview_missing" end
-        if not session.previewOnly then
-            Internal.sendError(player, "playback_session_active", session)
-            return false, "playback_session_active"
-        end
-        accepted, reason = ownsRequest(session, player, args)
-        if not accepted then
-            Internal.sendError(player, reason, session)
-            return false, reason
-        end
-        local refreshAt = Internal.now()
-        local safe
-        safe, reason = Internal.activeSafety(session, refreshAt)
-        if not safe then
-            Internal.abortSession(session, reason)
-            return false, reason
-        end
-        safe, reason = Internal.maintainOverrides(session, refreshAt)
-        if not safe then
-            Internal.abortSession(session, reason)
-            return false, reason
-        end
-        session.phaseDeadline = refreshAt + (
-            tonumber(Opera.Config.placementPreviewLeaseMs) or 30000
-        )
-        Internal.sendState(session, false)
-        return true, "preview_refreshed"
-    end
-    if action == "preflight" then
-        local preflight
-        preflight, reason = Internal.buildPreflight(player, args)
-        if not preflight then
-            Internal.sendError(player, reason, session)
-            return false, reason
-        end
-        Internal.sendToClient(player, Const.CMD_PUPPET_OPERA_STATE, {
-            phase = session and session.phase
-                or (preflight.ready and "ready" or "blocked"),
-            blueprintId = preflight.blueprintId,
-            preflight = preflight,
-        })
-        return true, { preflight = preflight }
-    end
-    if action == "replay" then
-        if session then
-            local actorBindings = {}
-            for actorID, actor in pairs(session.actors or {}) do
-                if actor.bindingID then
-                    actorBindings[actorID] = actor.bindingID
-                end
-            end
-            local loop = session.loopEnabled
-            Internal.closeSession(session, Opera.Phases.RESTORED, "replay")
-            args.actors = args.actors or actorBindings
-            args.npcID = args.npcID or session.npcID
-            args.loop = args.loop == true or loop
-        end
-        accepted, reason = Internal.startSession(player, args, false)
-        if not accepted then
-            Internal.sendError(player, reason, session)
-            return false, reason
-        end
-        return true, reason
-    end
-    if action == "stop" then
-        accepted, reason = ownsRequest(session, player, args)
-        if not accepted then
-            Internal.sendError(player, reason, session)
-            return false, reason
-        end
-        Internal.closeSession(session, Opera.Phases.RESTORED, "user_stop")
-        return true, "stopped"
-    end
-    if action == "snapshot" then
-        if session then
-            Internal.sendState(session, false)
-        else
-            Internal.sendToClient(player, Const.CMD_PUPPET_OPERA_STATE, {
-                phase = "idle",
-                blueprints = Opera.ListBlueprints(),
-                lastSnapshot = Authority.LastSnapshots[id],
-            })
-        end
-        return true, "snapshot_sent"
-    end
-    if action == "dump_trace" then
-        if not session then
-            local last = Authority.LastSnapshots[id]
-            if last then
-                Internal.sendToClient(player, Const.CMD_PUPPET_OPERA_TRACE, last)
-            else
-                Internal.sendToClient(
-                    player,
-                    Const.CMD_PUPPET_OPERA_TRACE,
-                    { trace = {} }
-                )
-            end
-            return true, "trace_sent"
-        end
-        accepted, reason = ownsRequest(session, player, args)
-        if not accepted then return false, reason end
-        Internal.sendToClient(
-            player,
-            Const.CMD_PUPPET_OPERA_TRACE,
-            Opera.BuildSnapshot(session, true)
-        )
-        return true, "trace_sent"
-    end
-
     if not session then
         Internal.sendError(player, "session_missing")
         return false, "session_missing"
@@ -215,10 +91,10 @@ function Authority.HandleRequest(player, args)
             action
         )
     end
-    accepted, reason = ownsRequest(session, player, args)
+    accepted, result = Internal.ownsRequest(session, player, args)
     if not accepted then
-        Internal.sendError(player, reason)
-        return false, reason
+        Internal.sendError(player, result)
+        return false, result
     end
     return false, "puppet_opera_action_unknown"
 end

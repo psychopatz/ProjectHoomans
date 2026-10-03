@@ -237,7 +237,11 @@ T.truthy(payload.vanillaTraits.overweight == true,
     "vanilla weight trait was not serialized")
 T.truthy(payload.vanillaTraitsAuthored == true,
     "authored trait source was not serialized")
-T.truthy(payload.semanticCognition.facts["SEEN|npc_sarah"],
+T.equal(payload.semanticCognition.c, 1,
+    "semantic cognition did not use the compact persistence codec")
+local serializedCognition = PNC.Semantics.CognitionProjection.Normalize(
+    payload.semanticCognition, record.id)
+T.truthy(serializedCognition.facts["SEEN|npc_sarah"],
     "semantic cognition was not serialized")
 T.equal(payload.semanticActionPlan.planID, "plan:npc_kahlua",
     "semantic action plan was not serialized")
@@ -270,7 +274,9 @@ T.truthy(restored.vanillaTraits.overweight == true,
     "vanilla weight trait did not round trip")
 T.truthy(restored.vanillaTraitsAuthored == true,
     "authored trait source did not round trip")
-T.truthy(restored.semanticCognition.facts["SEEN|npc_sarah"],
+local restoredCognition = PNC.Semantics.CognitionProjection.Normalize(
+    restored.semanticCognition, restored.id)
+T.truthy(restoredCognition.facts["SEEN|npc_sarah"],
     "semantic cognition did not round trip")
 T.equal(restored.semanticActionPlan.planID, "plan:npc_kahlua",
     "semantic action plan did not round trip")

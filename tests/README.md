@@ -6,6 +6,10 @@ Run the isolated Lua suite with compact output:
 python3 tests/run_tests.py
 python3 tests/run_tests.py profiler
 python3 tests/run_tests.py --jobs 4 --verbose
+
+# Detect private local helpers referenced across split Lua modules
+python3 tests/refactor_binding_smoke.py
+python3 tests/refactor_binding_smoke.py --all
 ```
 
 The runner discovers the newest numeric Project Hoomans and PsychopatzCore

@@ -4,10 +4,16 @@ PNC = PNC or {}
 PNC.AnimationDebugPlayer = PNC.AnimationDebugPlayer or {}
 
 local Player = PNC.AnimationDebugPlayer
+local Internal = Player.Internal or {}
+Player.Internal = Internal
 local Catalog = PNC.AnimationDebugCatalog
 local Core = PNC.Core
 local Animation = PNC.Animation
 local staleActiveAtLoad = Player.active
+local Equipment = {}
+local Track = {}
+local Conditions = {}
+local activeTrack
 
 -- Direct body:PlayAnim* calls are part of the legacy ILuaGameCharacter
 -- surface. Build 42's model path is driven by AnimationPlayer tracks, so the
@@ -166,123 +172,6 @@ function Player.ResolveBody(npcId, fallback)
     return getBodyFromPresence(npcId)
 end
 
-local function conditionValue(condition)
-    local kind = tostring(condition and condition.kind or "")
-    local raw = condition and condition.value or nil
-    if kind == "BOOL" then
-        return tostring(raw) == "true"
-    end
-    if kind == "GTR" then
-        return (tonumber(raw) or 0) + 0.01
-    end
-    if kind == "LESS" then
-        return (tonumber(raw) or 0) - 0.01
-    end
-    if kind == "STRNEQ" then
-        return tostring(raw or "") .. "__PNC_DEBUG_NOT_EQUAL__"
-    end
-    return tostring(raw or "")
-end
-
-local function readVariable(body, condition)
-    local kind = tostring(condition and condition.kind or "")
-    local name = condition and condition.name or nil
-    local adapter = name
-        and SELECTOR_ADAPTERS[string.lower(tostring(name))]
-        or nil
-    if not name or name == "" then return nil end
-    if adapter then return adapter.get(body) end
-    if kind == "BOOL" and body.getVariableBoolean then
-        return body:getVariableBoolean(name) == true
-    end
-    if (kind == "GTR" or kind == "LESS")
-        and body.getVariableFloat
-    then
-        return body:getVariableFloat(name, 0.0)
-    end
-    if body.getVariableString then
-        return tostring(body:getVariableString(name) or "")
-    end
-    return nil
-end
-
-local function saveAndApplyConditions(active)
-    local body = active.body
-    if not body.setVariable then return end
-    for _, condition in ipairs(active.entry.conditions or {}) do
-        local name = condition.name
-        if name and name ~= "" then
-            local normalized = string.lower(tostring(name))
-            local adapter = SELECTOR_ADAPTERS[normalized]
-            if READ_ONLY_SELECTORS[normalized] then
-                active.skippedSelectors[#active.skippedSelectors + 1] =
-                    tostring(name)
-            elseif active.previousVariables[name] == nil then
-                active.previousVariables[name] = {
-                    condition = condition,
-                    value = readVariable(body, condition),
-                    adapter = adapter,
-                }
-                if adapter then
-                    adapter.set(body, conditionValue(condition))
-                else
-                    body:setVariable(name, conditionValue(condition))
-                end
-            elseif adapter then
-                adapter.set(body, conditionValue(condition))
-            else
-                body:setVariable(name, conditionValue(condition))
-            end
-        end
-    end
-    -- Every PNC node depends on the human-shell discriminator, either
-    -- directly or through its inherited base node.
-    body:setVariable("PNCActor", true)
-end
-
-local function restoreConditions(active)
-    local body = active and active.body or nil
-    if not body or not body.setVariable then return end
-    for name, previous in pairs(active.previousVariables or {}) do
-        if previous.adapter then
-            previous.adapter.set(body, previous.value)
-        elseif previous.value ~= nil then
-            body:setVariable(name, previous.value)
-        elseif body.clearVariable then
-            body:clearVariable(name)
-        end
-    end
-    body:setVariable("PNCActor", true)
-end
-
-local function markPreview(active)
-    local modData = active.body.getModData
-        and active.body:getModData()
-        or nil
-    if not modData then return end
-    modData.PNC_AnimationDebugPreview = true
-    modData.PNC_AnimationDebugMode = active.mode
-    modData.PNC_AnimationDebugState = active.entry.state
-    modData.PNC_AnimationDebugNode = active.entry.node
-    modData.PNC_AnimationDebugClip = active.entry.anim
-    modData.PNC_AnimationDebugStartedAt = active.startedAt
-end
-
-local function clearPreview(active)
-    local modData = active
-        and active.body
-        and active.body.getModData
-        and active.body:getModData()
-        or nil
-    if not modData then return end
-    modData.PNC_AnimationDebugPreview = nil
-    modData.PNC_AnimationDebugMode = nil
-    modData.PNC_AnimationDebugState = nil
-    modData.PNC_AnimationDebugNode = nil
-    modData.PNC_AnimationDebugClip = nil
-    modData.PNC_AnimationDebugStartedAt = nil
-end
-
 local function findBumpType(entry)
     if not entry or entry.state ~= "bumped" then return nil end
     for _, condition in ipairs(entry.conditions or {}) do
@@ -322,269 +211,6 @@ end
 local function writeField(target, fieldName, value)
     if not target then return false end
     return pcall(function() target[fieldName] = value end)
-end
-
-local function activeTrack(active)
-    if not active then return nil end
-    return active.track
-end
-
-local function trackDuration(track)
-    return tonumber(readValue(track, "getDuration")) or 0
-end
-
-local function trackTime(track)
-    return tonumber(readValue(track, "getCurrentTimeValue"))
-        or tonumber(readValue(track, "getCurrentTrackTime"))
-        or 0
-end
-
-local function setTrackTime(track, value)
-    local ok = invoke(track, "setCurrentTimeValue", tonumber(value) or 0)
-    if not ok then return false end
-    -- Keeping previousTimeValue at the same frame prevents a held track from
-    -- repeatedly firing its non-looped-finished event on subsequent updates.
-    invoke(track, "setPreviousTimeValue", tonumber(value) or 0)
-    return true
-end
-
-local function setTrackPlaying(track, value)
-    if writeField(track, "isPlaying", value == true) then return true end
-    -- A zero speed is the safest fallback when Java public-field writes are
-    -- not available through the current Kahlua bridge.
-    if value ~= true then
-        return invoke(track, "setSpeedDelta", 0.0)
-    end
-    return false
-end
-
-local function releaseOwnedTrack(active)
-    local player
-    local multiTrack
-    local ok
-    if not active or not active.track then return end
-    player = active.animationPlayer
-    multiTrack = player and readValue(player, "getMultiTrack") or nil
-    if multiTrack then
-        ok = invoke(multiTrack, "removeTrack", active.track)
-        if ok then
-            active.track = nil
-            return
-        end
-    end
-    -- If removeTrack is not Lua-exposed, reset marks currentClip empty and the
-    -- engine removes the track on its next multi-track update.
-    invoke(active.track, "reset")
-    active.track = nil
-end
-
-local function nativePlayClip(active)
-    local body = active and active.body or nil
-    local ok
-    local animationPlayer
-    local track
-    local reason
-    if not body or type(body.getAnimationPlayer) ~= "function" then
-        return false, "animation_player_unavailable"
-    end
-    ok, animationPlayer, reason = invoke(body, "getAnimationPlayer")
-    if not ok or not animationPlayer then
-        return false, "animation_player_unavailable"
-    end
-    ok, track, reason = invoke(
-        animationPlayer,
-        "play",
-        tostring(active.entry.anim),
-        active.entry.looped == true
-    )
-    if not ok then return false, "animation_player_play_failed" end
-    if not track then return false, "animation_clip_not_found" end
-
-    -- AnimationPlayer:play creates a raw track with a zero initial blend
-    -- weight. Give this debugger-owned track visible full-body ownership.
-    invoke(track, "setBlendWeight", 1.0)
-    invoke(
-        track,
-        "setSpeedDelta",
-        tonumber(active.entry.speed) or 1.0
-    )
-    writeField(track, "isPrimary", true)
-    active.animationPlayer = animationPlayer
-    active.track = track
-    active.trackSource = "AnimationPlayer.play"
-    active.nativeTrack = true
-    active.trackDuration = trackDuration(track)
-    return true
-end
-
-local function holdTrack(active, requestedTime)
-    local track = activeTrack(active)
-    local duration
-    local time
-    if not track then return false, "debug_track_unavailable" end
-    duration = trackDuration(track)
-    time = tonumber(requestedTime)
-    if time == nil then time = duration > 0 and duration or trackTime(track) end
-    if duration > 0 then time = math.min(duration, math.max(0, time)) end
-    if not setTrackTime(track, time) then
-        return false, "track_time_setter_unavailable"
-    end
-    if not setTrackPlaying(track, false) then
-        return false, "track_pause_unavailable"
-    end
-    active.poseHeld = true
-    active.holdTime = time
-    active.trackDuration = duration
-    return true
-end
-
-local function maintainTrack(active)
-    local track = activeTrack(active)
-    local duration
-    local time
-    local finished
-    if not track or active.poseHeld == true or active.holdPose ~= true then
-        return false
-    end
-    if active.entry.looped == true then return false end
-    duration = trackDuration(track)
-    time = trackTime(track)
-    finished = readValue(track, "isFinished") == true
-        or duration > 0 and time >= duration - 0.0001
-    if not finished then return false end
-    return holdTrack(active, duration)
-end
-
-local function itemFullType(item)
-    local value = readValue(item, "getFullType")
-    return value and tostring(value) or nil
-end
-
-local function isRangedWeapon(item)
-    local value
-    if not item then return false end
-    value = readValue(item, "isRanged")
-    if value ~= nil then return value == true end
-    value = readValue(item, "getSubCategory")
-    return tostring(value or "") == "Firearm"
-end
-
-local function findRangedInventoryItem(body)
-    local inventory = readValue(body, "getInventory")
-    local items = inventory and readValue(inventory, "getItems") or nil
-    local count = tonumber(items and readValue(items, "size")) or 0
-    local item
-    for index = 0, count - 1 do
-        item = readValue(items, "get", index)
-        if isRangedWeapon(item) then return item end
-    end
-    return nil
-end
-
-local function primaryTypeForItem(item)
-    local equipment = PNC.Equipment
-    local internal = equipment and equipment.Internal or nil
-    local primaryType
-    if internal and internal.resolvePrimaryType then
-        primaryType = readValue(internal, "resolvePrimaryType", item)
-        if primaryType == "handgun" or primaryType == "rifle" then
-            return primaryType
-        end
-    end
-    if string.find(string.lower(itemFullType(item) or ""), "pistol", 1, true)
-        or string.find(string.lower(itemFullType(item) or ""), "revolver", 1, true)
-    then
-        return "handgun"
-    end
-    return "rifle"
-end
-
-local function saveEquipmentVariable(active, name)
-    local body = active.body
-    if not body or not body.getVariableString then return end
-    active.previousEquipmentVariables[name] = {
-        value = readValue(body, "getVariableString", name),
-    }
-end
-
-local function setEquipmentVariable(body, name, value)
-    if body and body.SetVariable then
-        body:SetVariable(name, tostring(value or ""))
-    end
-end
-
-local function restoreEquipment(active)
-    local body = active and active.body or nil
-    local snapshot = active and active.equipmentSnapshot or nil
-    if not body or not snapshot then return end
-    if body.setPrimaryHandItem then
-        body:setPrimaryHandItem(snapshot.primary)
-    end
-    if body.setSecondaryHandItem then
-        body:setSecondaryHandItem(snapshot.secondary)
-    end
-    for name, previous in pairs(active.previousEquipmentVariables or {}) do
-        if previous.value ~= nil then
-            setEquipmentVariable(body, name, previous.value)
-        elseif body.clearVariable then
-            body:clearVariable(name)
-        end
-    end
-    if body.resetEquippedHandsModels then
-        body:resetEquippedHandsModels()
-    end
-    active.equipmentSnapshot = nil
-    active.equipmentOverride = nil
-end
-
-local function applyRangedEquipment(active)
-    local body = active and active.body or nil
-    local item
-    local equipment = PNC.Equipment
-    local created = false
-    local primaryType
-    if not body or not body.setPrimaryHandItem then
-        return false, "hand_setter_unavailable"
-    end
-    if active.equipmentSnapshot then return true, "already_forced" end
-
-    item = findRangedInventoryItem(body)
-    if not item and equipment and equipment.CreateItem then
-        item = equipment.CreateItem("Base.DoubleBarrelShotgun")
-        created = item ~= nil
-    end
-    if not item or not isRangedWeapon(item) then
-        return false, "no_ranged_weapon_available"
-    end
-    active.equipmentSnapshot = {
-        primary = readValue(body, "getPrimaryHandItem"),
-        secondary = readValue(body, "getSecondaryHandItem"),
-    }
-    for _, name in ipairs({ "PNCPrimary", "PNCSecondary", "PNCPrimaryType" }) do
-        saveEquipmentVariable(active, name)
-    end
-    primaryType = primaryTypeForItem(item)
-    body:setPrimaryHandItem(item)
-    if body:getPrimaryHandItem() ~= item then
-        restoreEquipment(active)
-        return false, "temporary_primary_equip_failed"
-    end
-    if body.setSecondaryHandItem then
-        body:setSecondaryHandItem(nil)
-    end
-    setEquipmentVariable(body, "PNCPrimary", itemFullType(item))
-    setEquipmentVariable(body, "PNCSecondary", "")
-    setEquipmentVariable(body, "PNCPrimaryType", primaryType)
-    if body.resetEquippedHandsModels then
-        body:resetEquippedHandsModels()
-    end
-    active.equipmentOverride = {
-        item = item,
-        fullType = itemFullType(item),
-        primaryType = primaryType,
-        created = created,
-    }
-    return true, created and "temporary_created" or "temporary_inventory_item"
 end
 
 function Player.CanPipeline(entry)
@@ -640,10 +266,10 @@ function Player.Stop(reason)
     then
         Animation.FinishBump(active.body, true)
     end
-    releaseOwnedTrack(active)
-    restoreEquipment(active)
-    restoreConditions(active)
-    clearPreview(active)
+    Track.release(active)
+    Equipment.restore(active)
+    Conditions.restore(active)
+    Conditions.clear(active)
     if active.body
         and active.body.setUseless
         and active.uselessBefore ~= nil
@@ -717,15 +343,15 @@ local function begin(
     }
     Player.active = active
     if applySelectors ~= false then
-        saveAndApplyConditions(active)
+        Conditions.save(active)
     end
     if Player.forceRanged then
-        local rangedOK, rangedReason = applyRangedEquipment(active)
+        local rangedOK, rangedReason = Equipment.applyRanged(active)
         if not rangedOK then
             active.equipmentFailure = rangedReason
         end
     end
-    markPreview(active)
+    Conditions.mark(active)
     return active
 end
 
@@ -774,7 +400,7 @@ function Player.PlayXML(entry, npcId, body, record, options)
     local bumpType = findBumpType(entry)
     if bumpType and Animation and Animation.PlayBump then
         active.mode = "xml_pipeline"
-        markPreview(active)
+        Conditions.mark(active)
         local ok, playReason = Animation.PlayBump(
             body,
             active.record,
@@ -792,7 +418,7 @@ function Player.PlayXML(entry, npcId, body, record, options)
         return completeStart(active, false, "node_has_no_clip")
     end
     if body.setUseless then body:setUseless(false) end
-    local nativeOK, nativeReason = nativePlayClip(active)
+    local nativeOK, nativeReason = Track.nativePlay(active)
     if not nativeOK then
         if body.PlayAnimUnlooped then
             body:PlayAnimUnlooped(tostring(entry.anim))
@@ -849,7 +475,7 @@ function Player.PlayRaw(entry, npcId, body, record)
         return completeStart(active, false, "node_has_no_clip")
     end
     if body.setUseless then body:setUseless(false) end
-    local nativeOK, nativeReason = nativePlayClip(active)
+    local nativeOK, nativeReason = Track.nativePlay(active)
     if not nativeOK then
         if body.PlayAnimUnlooped then
             body:PlayAnimUnlooped(tostring(entry.anim))
@@ -948,10 +574,10 @@ function Player.SetHoldPose(enabled)
         if not Player.holdPose and Player.active.poseHeld then
             local active = Player.active
             local track = activeTrack(active)
-            local duration = track and trackDuration(track) or 0
+            local duration = track and Track.duration(track) or 0
             if track
-                and setTrackTime(track, 0)
-                and setTrackPlaying(track, true)
+                and Track.setTime(track, 0)
+                and Track.setPlaying(track, true)
             then
                 active.poseHeld = false
                 active.holdTime = nil
@@ -968,7 +594,7 @@ function Player.HoldCurrentFrame()
     if isPipelineMode(active.mode) then
         return false, "pipeline_pose_hold_unsupported"
     end
-    return holdTrack(active)
+    return Track.hold(active)
 end
 
 function Player.IsRangedOverrideActive()
@@ -981,11 +607,11 @@ function Player.ToggleRangedWeapon()
     local reason
     if not active then return false, "nothing_playing" end
     if active.equipmentSnapshot then
-        restoreEquipment(active)
+        Equipment.restore(active)
         Player.forceRanged = false
         return false, "temporary_ranged_restored"
     end
-    ok, reason = applyRangedEquipment(active)
+    ok, reason = Equipment.applyRanged(active)
     if ok then Player.forceRanged = true end
     return ok, reason
 end
@@ -1003,8 +629,8 @@ function Player.Maintain(body, now)
     if not isPipelineMode(active.mode) and body.setUseless then
         body:setUseless(false)
     end
-    markPreview(active)
-    maintainTrack(active)
+    Conditions.mark(active)
+    Track.maintain(active)
     if isPipelineMode(active.mode)
         and Animation
         and Animation.PumpBumpRelease
@@ -1151,6 +777,21 @@ end
 function Player.GetCatalog()
     return Catalog
 end
+
+Player.Internal = Player.Internal or {}
+Player.Internal.Equipment = Equipment
+Player.Internal.Track = Track
+Player.Internal.Conditions = Conditions
+Player.Internal.SELECTOR_ADAPTERS = SELECTOR_ADAPTERS
+Player.Internal.READ_ONLY_SELECTORS = READ_ONLY_SELECTORS
+Player.Internal.Animation = Animation
+Player.Internal.invoke = invoke
+Player.Internal.readValue = readValue
+Player.Internal.writeField = writeField
+require "PNC/Debug/PNC_AnimationDebugPlayer_Conditions"
+require "PNC/Debug/PNC_AnimationDebugPlayer_Track"
+require "PNC/Debug/PNC_AnimationDebugPlayer_Equipment"
+activeTrack = Player.Internal.activeTrack
 
 -- Lua reloads retain the PNC namespace. Recover a preview interrupted by an
 -- earlier debugger break so it cannot keep snapshot animation ownership.

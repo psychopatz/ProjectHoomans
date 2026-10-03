@@ -186,6 +186,8 @@ function Test.addPackagePaths(specifications)
         { "ProjectHoomans", "common_lua" },
         { "PsychopatzCore", "common" },
         { "PsychopatzCore", "shared" },
+        { "PsychopatzCore", "server" },
+        { "PsychopatzCore", "client" },
     }
     local paths = {}
     for index = 1, #specifications do
@@ -198,6 +200,31 @@ function Test.addPackagePaths(specifications)
         defaultPackagePathsAdded = true
     end
     return package.path
+end
+
+-- Some client integration tests exercise request/payload logic without a
+-- Project Zomboid UI runtime. Keep the UI module boundary loadable while
+-- leaving actual widget behavior to the game client.
+function Test.stubClientUI()
+    local ui = {
+        Layout = {
+            Pixels = function(_, value) return value end,
+        },
+        Window = {},
+        NewWindow = function() return nil end,
+        SetLabelTheme = function() end,
+        CreateTextEntry = function() return {} end,
+    }
+    function ui.Window:derive()
+        return {}
+    end
+    package.preload["PsychopatzCore/UI/PsychopatzUI"] = function()
+        PsychopatzCore = PsychopatzCore or {}
+        PsychopatzCore.UI = ui
+        return ui
+    end
+    package.preload["ISUI/ISComboBox"] = function() return {} end
+    package.preload["ISUI/ISLabel"] = function() return {} end
 end
 
 function Test.load(mod, layer, relative)

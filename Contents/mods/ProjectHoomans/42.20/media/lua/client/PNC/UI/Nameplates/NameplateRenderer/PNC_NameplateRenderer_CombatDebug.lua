@@ -342,44 +342,7 @@ local function drawZombieAttackerDebug(
     )
 end
 
-local function drawCombatDebug(manager, entry)
-    local zombie = entry.zombie
-    local debugState = entry.snapshot
-        and entry.snapshot.combatDebugState or nil
-    local target
-    local blocker
-    local movement
-    local worldX
-    local worldY
-    local worldZ
-    local targetDistance
-    local lines
-    local textColor
-    local screenX
-    local screenY
-    local lineHeight
-    local labelX
-    local labelY
-    local i
-    local active
-    if not zombie
-        or zombie:isDead()
-        or type(debugState) ~= "table"
-    then
-        return
-    end
-    worldX = zombie:getX()
-    worldY = zombie:getY()
-    worldZ = zombie:getZ()
-    target = debugState.target
-
-    active = type(target) == "table"
-        or type(debugState.action) == "table"
-        or type(debugState.tacticalMove) == "table"
-        or type(debugState.zombieAttacker) == "table"
-        or entry.snapshot.attackMode == true
-        or entry.snapshot.inCombat == true
-    if not active then return end
+local function drawCombatRanges(manager, zombie, debugState, worldX, worldY, worldZ)
     drawCombatCone(manager, zombie, debugState)
     drawWorldCircle(
         manager,
@@ -416,8 +379,8 @@ local function drawCombatDebug(manager, entry)
         true,
         COMBAT_DEBUG_CIRCLE_SEGMENTS
     )
-    if debugState.mode == "melee"
-        or debugState.mode == "mixed"
+    if debugState.mode == 'melee'
+        or debugState.mode == 'mixed'
     then
         drawWorldCircle(
             manager,
@@ -430,8 +393,8 @@ local function drawCombatDebug(manager, entry)
             COMBAT_DEBUG_CIRCLE_SEGMENTS
         )
     end
-    if debugState.mode == "ranged"
-        or debugState.mode == "mixed"
+    if debugState.mode == 'ranged'
+        or debugState.mode == 'mixed'
     then
         drawWorldCircle(
             manager,
@@ -454,8 +417,14 @@ local function drawCombatDebug(manager, entry)
             COMBAT_DEBUG_CIRCLE_SEGMENTS
         )
     end
+end
 
-    if type(target) == "table"
+local function drawCombatTargets(manager, zombie, debugState, worldX, worldY, worldZ)
+    local target = debugState.target
+    local targetDistance
+    local blocker = debugState.fireLaneBlocker
+    local movement = debugState.tacticalMove
+    if type(target) == 'table'
         and tonumber(target.x)
         and tonumber(target.y)
     then
@@ -473,9 +442,7 @@ local function drawCombatDebug(manager, entry)
             COMBAT_MARKER_HALF_SIZE
         )
     end
-
-    blocker = debugState.fireLaneBlocker
-    if type(blocker) == "table"
+    if type(blocker) == 'table'
         and tonumber(blocker.x)
         and tonumber(blocker.y)
     then
@@ -488,9 +455,7 @@ local function drawCombatDebug(manager, entry)
             COMBAT_MARKER_HALF_SIZE + 3
         )
     end
-
-    movement = debugState.tacticalMove
-    if type(movement) == "table"
+    if type(movement) == 'table'
         and tonumber(movement.x)
         and tonumber(movement.y)
     then
@@ -513,86 +478,76 @@ local function drawCombatDebug(manager, entry)
             COMBAT_MARKER_HALF_SIZE
         )
     end
+    return targetDistance
+end
 
-    lines = Renderer.BuildCombatDebugLines(
-        debugState,
-        targetDistance
+local function appendCombatAnimationLines(lines, zombie, debugState)
+    if type(debugState.action) ~= 'table' then return end
+    lines[#lines + 1] = Renderer.BuildBodyAnimationDebugLine(
+        zombie,
+        debugState.action
     )
-    if type(debugState.action) == "table" then
-        lines[#lines + 1] =
-            Renderer.BuildBodyAnimationDebugLine(
-                zombie,
-                debugState.action
-            )
-        local trackLine =
-            Renderer.BuildAnimationTrackDebugLine(zombie)
-        if trackLine then
-            lines[#lines + 1] = trackLine
-        end
-        local traceLine =
-            Renderer.BuildAnimationTraceDebugLine(zombie)
-        if traceLine then
-            lines[#lines + 1] = traceLine
-        end
+    local trackLine = Renderer.BuildAnimationTrackDebugLine(zombie)
+    if trackLine then lines[#lines + 1] = trackLine end
+    local traceLine = Renderer.BuildAnimationTraceDebugLine(zombie)
+    if traceLine then lines[#lines + 1] = traceLine end
+end
+
+local function combatTextColor(debugState, line)
+    if string.sub(line, 1, 8) == 'DEFENSE ' then
+        return COMBAT_DEFENSE_COLOR
     end
-    if #lines <= 0 then return end
+    if string.sub(line, 1, 5) == 'ANIM '
+        or string.sub(line, 1, 6) == 'TRACK '
+    then
+        return DEBUG_COLOR
+    end
     if debugState.fireLaneSafe == false then
-        textColor = COMBAT_UNSAFE_COLOR
-    elseif debugState.decision
+        return COMBAT_UNSAFE_COLOR
+    end
+    if debugState.decision
         and string.find(
             tostring(debugState.decision),
-            "retreat",
+            'retreat',
             1,
             true
         )
     then
-        textColor = COMBAT_AIM_COLOR
-    else
-        textColor = COMBAT_CONE_COLOR
+        return COMBAT_AIM_COLOR
     end
-    screenX, screenY = screenPoint(
+    return COMBAT_CONE_COLOR
+end
+
+local function drawCombatText(manager, zombie, debugState, lines)
+    local screenX, screenY = screenPoint(
         manager,
-        worldX,
-        worldY,
-        worldZ
+        zombie:getX(),
+        zombie:getY(),
+        zombie:getZ()
     )
-    lineHeight = getTextManager():getFontHeight(Fonts.debug) + 2
-    labelY = screenY + 18
-    for i = 1, #lines do
-        labelX = screenX + 18
-        if string.sub(lines[i], 1, 8) == "DEFENSE " then
-            textColor = COMBAT_DEFENSE_COLOR
-        elseif string.sub(lines[i], 1, 5) == "ANIM "
-            or string.sub(lines[i], 1, 6) == "TRACK "
-        then
-            textColor = DEBUG_COLOR
-        elseif debugState.fireLaneSafe == false then
-            textColor = COMBAT_UNSAFE_COLOR
-        elseif debugState.decision
-            and string.find(
-                tostring(debugState.decision),
-                "retreat",
-                1,
-                true
-            )
-        then
-            textColor = COMBAT_AIM_COLOR
-        else
-            textColor = COMBAT_CONE_COLOR
-        end
+    local lineHeight = getTextManager():getFontHeight(Fonts.debug) + 2
+    local labelY = screenY + 18
+    for index = 1, #lines do
         Presentation.DrawOutlinedText(
             manager,
-            lines[i],
-            labelX,
-            labelY + ((i - 1) * lineHeight),
-            textColor,
+            lines[index],
+            screenX + 18,
+            labelY + ((index - 1) * lineHeight),
+            combatTextColor(debugState, lines[index]),
             1,
             Fonts.debug
         )
     end
 end
 
-Renderer.RenderCombatDebug = drawCombatDebug
-Renderer.ResolveZombieAttacker = resolveZombieAttacker
+
+Internal.DrawCombatRanges = drawCombatRanges
+Internal.DrawCombatTargets = drawCombatTargets
+Internal.AppendCombatAnimationLines = appendCombatAnimationLines
+Internal.CombatTextColor = combatTextColor
+Internal.DrawCombatText = drawCombatText
+Internal.ResolveZombieAttacker = resolveZombieAttacker
+
+require "PNC/UI/Nameplates/NameplateRenderer/PNC_NameplateRenderer_CombatDebug_Render"
 
 return Renderer

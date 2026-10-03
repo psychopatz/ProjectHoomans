@@ -1,0 +1,121 @@
+if PsychopatzCore and PsychopatzCore.RuntimeRole
+    and not PsychopatzCore.RuntimeRole.AllowsServerCode() then return end
+
+PNC = PNC or {}
+PNC.WorkService = PNC.WorkService or {}
+PNC.WorkService.Internal = PNC.WorkService.Internal or {}
+
+local Service = PNC.WorkService
+local Internal = Service.Internal
+local Repository = PNC.WorkRepository
+local Definitions = PNC.WorkDefinitions
+local Status = Definitions.STATUS
+local EventsBus = PsychopatzCore and PsychopatzCore.Events
+local EventTypes = PNC.EventTypes or {}
+local emit = Internal.emit
+local now = Internal.now
+local terminal = Internal.terminal
+local copy = Internal.copy
+local markAssignmentDirty = Internal.markAssignmentDirty
+
+local function releaseClaim(order, reason, cancelInputs, cleanupOperation)
+    if not order then return end
+    local worldEffectPending = order.status == Status.WORLD_EFFECT_PENDING
+        and type(order.worldEffect) == "table"
+        and tostring(order.worldEffect.state or "PENDING") ~= "APPLIED"
+    local carryHandoff = order.operation == "CORPSE_HAUL"
+        and tostring(order.phase or "") == "CARRYING"
+        and order.completionStarted ~= true
+        and order.status ~= Status.CANCELLING
+        and order.status ~= Status.CANCELLED
+        and order.status ~= Status.COMPLETED
+        and order.status ~= Status.FAILED
+    if cleanupOperation == true and not worldEffectPending
+        and not order.completionCommitted
+        and (order.operation == "PROVISION_PICKUP"
+            or order.operation == "CORPSE_HAUL"
+            or order.operation == "LUMBER")
+    then
+        local cancellation = Service.CancellationHandlers
+            and Service.CancellationHandlers[order.operation]
+        if cancellation then
+            local cleaned, cleanupReason = cancellation(order)
+            if cleaned == false then
+                return false, cleanupReason or "WORK_RELEASE_CLEANUP_FAILED"
+            end
+        end
+    end
+    local input = order.payload and order.payload.input
+    if PNC.WorkInputService and input
+        and (cancelInputs == true or input.staged == true)
+    then
+        -- Collected inputs physically live on the current NPC and must return
+        -- to the stockpile before a replacement can collect them. An input
+        -- that is only reserved can remain attached to the durable order.
+        PNC.WorkInputService.Cancel(order)
+    end
+    if order.stationId and Service.ClaimsByStation[order.stationId] == order.id then
+        Service.ClaimsByStation[order.stationId] = nil
+    end
+    if order.workerId and Service.ClaimsByWorker[order.workerId] == order.id then
+        Service.ClaimsByWorker[order.workerId] = nil
+    end
+    if order.facilityReservationId and PNC.FacilityReservations then
+        PNC.FacilityReservations.Release(order.facilityReservationId,
+            reason or "work_released")
+    end
+    local record = order.workerId and PNC.Registry and PNC.Registry.Get
+        and PNC.Registry.Get(order.workerId) or nil
+    if record and record.runtime and record.runtime.workOrderId == order.id then
+        record.runtime.workOrderId = nil
+        record.runtime.lastProductionWorkAt = nil
+        if Internal.clearWorkLocation then
+            Internal.clearWorkLocation(record, order.id)
+        end
+        if PNC.OrderSystem and PNC.OrderSystem.SetOrder then
+            PNC.OrderSystem.SetOrder(record, order.previousOrder)
+        end
+    end
+    order.workerId, order.stationId, order.facilityId = nil, nil, nil
+    order.facilityReservationId, order.previousOrder = nil, nil
+    order.stationTarget, order.collectionTarget = nil, nil
+    order.targetKind = nil
+    if not carryHandoff then
+        order.phase, order.livePhase = nil, nil
+    else
+        -- A worker release during visible carry drops the corpse in place but
+        -- keeps the durable phase/coordinate projection so another worker
+        -- can resume from that world square instead of searching the source.
+        order.phase, order.livePhase = "CARRYING", "CARRYING"
+    end
+    order.executionMode, order.lastAbstractAt = nil, nil
+    return true
+end
+
+local function assignedOrderForRecord(record)
+    local runtime = record and record.runtime or nil
+    local orderId = runtime and runtime.workOrderId or nil
+    local order = orderId and Repository.Get(orderId) or nil
+    if order and not terminal(order)
+        and tostring(order.workerId or "") == tostring(record.id or "")
+    then
+        return order
+    end
+    return nil
+end
+
+local function restoreOrderIsSafe(record, previous)
+    if type(previous) ~= "table" then return false end
+    if tostring(previous.kind or "") ~= "production_work" then return true end
+    local orderId = previous.workOrderId
+    local order = orderId and Repository.Get(orderId) or nil
+    return order ~= nil and not terminal(order)
+        and tostring(order.workerId or "") == tostring(record.id or "")
+end
+
+
+Internal.releaseClaim = releaseClaim
+Internal.assignedOrderForRecord = assignedOrderForRecord
+Internal.restoreOrderIsSafe = restoreOrderIsSafe
+
+return Service

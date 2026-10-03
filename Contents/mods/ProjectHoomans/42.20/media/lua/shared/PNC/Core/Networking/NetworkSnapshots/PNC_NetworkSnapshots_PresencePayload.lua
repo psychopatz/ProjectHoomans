@@ -28,163 +28,31 @@ local buildSeatingDebugState = Parts.BuildSeatingDebugState
 local buildIdentityOwnershipSummary =
     Parts.BuildIdentityOwnershipSummary
 
-function Network.BuildPresenceDelta(record)
-    local aiState
-    local inCombat
-    local now = Core.Now()
-    local ownership = buildIdentityOwnershipSummary(record)
-    local staminaInfo = Stamina and Stamina.BuildSnapshot and Stamina.BuildSnapshot(record) or {}
-    local firearmState = Firearms and Firearms.BuildDebugState
-        and Firearms.BuildDebugState(record)
-        or nil
-    local vehiclePassenger = record.runtime and record.runtime.vehiclePassenger or nil
-    local medicalCareState = PNC.Treatment
-        and PNC.Treatment.BuildMedicalCareSnapshot
-        and PNC.Treatment.BuildMedicalCareSnapshot(record) or nil
-    aiState, inCombat = resolveAIState(record)
-    local pathDebugState
-    local lastPathDebugAt = record.runtime
-        and tonumber(record.runtime.pathDebugReplicatedAt) or 0
-    if lastPathDebugAt <= 0 or now - lastPathDebugAt >= 350 then
-        pathDebugState = buildPathDebugState(record)
-        if record.runtime then
-            record.runtime.pathDebugReplicatedAt = now
-        end
-    end
-    local combatDebugState
-    local lastCombatDebugAt = record.runtime
-        and tonumber(record.runtime.combatDebugReplicatedAt) or 0
-    local zombieAttackerAt = record.runtime
-        and tonumber(record.runtime.zombieAttacker
-            and record.runtime.zombieAttacker.observedAt) or 0
-    local zombieAlertAt = record.runtime
-        and tonumber(record.runtime.zombieAlert
-            and record.runtime.zombieAlert.observedAt) or 0
-    local zombieStimulusAt = record.runtime
-        and tonumber(record.runtime.zombieStimulus
-            and record.runtime.zombieStimulus.emittedAt) or 0
-    local baseZombieDebugActive =
-        (zombieAttackerAt > 0
-            and now - zombieAttackerAt <= 1500)
-        or (zombieStimulusAt > 0
-            and now - zombieStimulusAt <= 1500)
-    -- Alert state is gameplay state. It must not make every nearby NPC build
-    -- the full combat-debug observation payload in normal play. Opt-in threat
-    -- auditing may still request the richer view at a slower cadence.
-    local zombieAlertDebugActive = Diagnostics
-        and Diagnostics.NPCThreatAuditEnabled == true
-        and zombieAlertAt > 0
-        and now - zombieAlertAt <= (
-            tonumber(Const and Const.ZOMBIE_ALERT_TTL_MS) or 1800
-        )
-        or false
-    local zombieDebugActive = baseZombieDebugActive
-        or zombieAlertDebugActive
-    local zombieDebugTransitioned = record.runtime
-        and record.runtime.zombieDebugWasActive ~= zombieDebugActive
-        or false
-    local combatDebugTransitioned = record.runtime
-        and record.runtime.combatDebugWasActive ~= inCombat
-        or false
-    if lastCombatDebugAt <= 0
-        or combatDebugTransitioned
-        or zombieDebugTransitioned
-        or (inCombat and now - lastCombatDebugAt >= 150)
-        or (baseZombieDebugActive
-            and now - lastCombatDebugAt >= 350)
-        or (zombieAlertDebugActive
-            and now - lastCombatDebugAt >= (
-                tonumber(Const and Const.ZOMBIE_ALERT_DEBUG_REFRESH_MS)
-                    or 750
-            ))
-    then
-        local equipmentInfo = Equipment
-            and Equipment.Describe
-            and Equipment.Describe(record)
-            or {}
-        local combat = buildCombatSummary(record, equipmentInfo)
-        combatDebugState = buildCombatDebugState(
-            record,
-            combat,
-            firearmState
-        )
-        if record.runtime then
-            record.runtime.combatDebugReplicatedAt = now
-        end
-    end
-    if record.runtime then
-        record.runtime.combatDebugWasActive = inCombat
-        record.runtime.zombieDebugWasActive = zombieDebugActive
-    end
-    return {
-        interestDetailed = true,
-        id = record.id,
-        x = record.x,
-        y = record.y,
-        z = record.z,
-        -- Keep the compact ownership identity on presence deltas as well as
-        -- roster/detail payloads. A client may first learn an NPC through a
-        -- mobile presence update, so conversation and map UI must not infer
-        -- membership from the tactical class.
-        factionID = ownership.factionID,
-        colonyOwned = ownership.colonyOwned,
-        recruited = ownership.recruited,
-        ownerUsername = ownership.ownerUsername,
-        ownerOnlineID = ownership.ownerOnlineID,
-        presenceState = record.presenceState,
-        zombieTargetable = Settings
-            and Settings.CanZombieTargetRecord
-            and Settings.CanZombieTargetRecord(record)
-            or false,
-        alive = record.alive,
-        hpCurrent = record.health and record.health.current or nil,
-        hpMax = record.health and record.health.max or nil,
-        healthState = record.health and record.health.state or nil,
-        attackType = record.attackType or "auto",
-        commandFeedback = buildCommandFeedback(record),
-        corpseHaulManualDiagnostic = buildCorpseHaulDiagnostic(record),
-        bandageFeedback = buildBandageFeedback(record),
-        actionInformation = buildActionInformation(record),
-        staminaRecovery = buildStaminaRecoverySummary(record),
-        treatmentState = PNC.BehaviorTreatment
-            and PNC.BehaviorTreatment.BuildSnapshot
-            and PNC.BehaviorTreatment.BuildSnapshot(record) or nil,
-        medicalCareState = medicalCareState,
-        recentDamageUntil = record.health and record.health.recentDamageUntil or 0,
-        recentDamageType = record.health and record.health.recentDamageType or nil,
-        staminaCurrent = staminaInfo.current,
-        staminaMax = staminaInfo.max,
-        staminaBaseMax = staminaInfo.baseMax,
-        staminaState = staminaInfo.state,
-        staminaVisibleUntil = staminaInfo.visibleUntil,
-        encumbranceLevel = staminaInfo.encumbranceLevel,
-        encumbranceRatio = staminaInfo.encumbranceRatio,
-        presenceRevision = record.presenceRevision,
-        replicaSequence = record.runtime
-            and record.runtime.replicaSequence or nil,
-        liveBodyInstanceID = record.liveBodyInstanceID,
-        liveBodyOnlineID = record.liveBodyOnlineID,
-        liveBodyLease = record.runtime and record.runtime.bodyLease or nil,
-        aiState = aiState,
-        activeBehavior = record.activeBehavior,
-        inCombat = inCombat,
-        attackMode = record.runtime and record.runtime.target ~= nil or false,
-        combatStance = combat and combat.combatStance == true or false,
-        firearmState = firearmState,
-        vehiclePassenger = vehiclePassenger and {
-            active = vehiclePassenger.active == true,
-            vehicleId = vehiclePassenger.vehicleId,
-            seat = vehiclePassenger.seat,
-            ownerOnlineID = vehiclePassenger.ownerOnlineID,
-            boardedAt = vehiclePassenger.boardedAt,
-        } or nil,
-        visualState = buildVisualState(record),
-        pathDebugState = pathDebugState,
-        combatDebugState = combatDebugState,
-        campResourceDebug = buildCampResourceDebugState(record),
-        seatingDebug = buildSeatingDebugState(record),
-        travel = buildTravelSummary(record, false),
-    }
-end
+local PresencePayload = Network.Internal.PresencePayload or {}
+Network.Internal.PresencePayload = PresencePayload
+PresencePayload.Core = Core
+PresencePayload.Const = Const
+PresencePayload.Diagnostics = Diagnostics
+PresencePayload.Equipment = Equipment
+PresencePayload.Stamina = Stamina
+PresencePayload.Firearms = Firearms
+PresencePayload.Settings = Settings
+PresencePayload.BuildTravelSummary = buildTravelSummary
+PresencePayload.ResolveAIState = resolveAIState
+PresencePayload.BuildCombatSummary = buildCombatSummary
+PresencePayload.BuildCommandFeedback = buildCommandFeedback
+PresencePayload.BuildCorpseHaulDiagnostic = buildCorpseHaulDiagnostic
+PresencePayload.BuildBandageFeedback = buildBandageFeedback
+PresencePayload.BuildActionInformation = buildActionInformation
+PresencePayload.BuildStaminaRecoverySummary = buildStaminaRecoverySummary
+PresencePayload.BuildVisualState = buildVisualState
+PresencePayload.BuildPathDebugState = buildPathDebugState
+PresencePayload.BuildCombatDebugState = buildCombatDebugState
+PresencePayload.BuildCampResourceDebugState = buildCampResourceDebugState
+PresencePayload.BuildSeatingDebugState = buildSeatingDebugState
+PresencePayload.BuildIdentityOwnershipSummary = buildIdentityOwnershipSummary
+
+require "PNC/Core/Networking/NetworkSnapshots/PNC_NetworkSnapshots_PresencePayload_CombatDebug"
+require "PNC/Core/Networking/NetworkSnapshots/PNC_NetworkSnapshots_PresencePayload_Build"
 
 return Network

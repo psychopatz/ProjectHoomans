@@ -9,17 +9,18 @@ local Cognition = PNC.Semantics and PNC.Semantics.CognitionClient
     or require "PNC/Semantics/PNC_SemanticCognitionClient"
 
 local function recordCampResult(args)
-    local debug
+    local perceptionDebug
     local diagnostics
     args = type(args) == "table" and args or {}
     if string.upper(tostring(args.action or "")) ~= "CAMP" then return end
-    debug = PNC.PerceptionDebug
-    diagnostics = debug and debug.CampDiagnostics or nil
+    perceptionDebug = PNC.PerceptionDebug
+    diagnostics = perceptionDebug and perceptionDebug.CampDiagnostics or nil
     if not diagnostics or type(diagnostics.RecordServer) ~= "function" then
         pcall(require,
             "PNC/UI/PerceptionDebug/PNC_PerceptionDebug_CampDiagnostics")
-        debug = PNC.PerceptionDebug
-        diagnostics = debug and debug.CampDiagnostics or nil
+        perceptionDebug = PNC.PerceptionDebug
+        diagnostics = perceptionDebug
+            and perceptionDebug.CampDiagnostics or nil
     end
     if diagnostics and type(diagnostics.RecordServer) == "function" then
         diagnostics.RecordServer(args)

@@ -50,161 +50,15 @@ function Targeting.BindLiveTarget(zombie, target)
     end
 end
 
-function Targeting.UpdateTargetFromWorld(record, target)
-    local targetRecord
-    local player
-    local zombie
-    local targetZombie
-    local now
-    local memoryUntil
-    local visible
-    local visibilityKind
-    if not target then
-        return nil
-    end
-    now = Core.Now()
-    memoryUntil = (tonumber(target.lastSeenAt) or 0) + (tonumber(Const.TARGET_VISUAL_MEMORY_MS) or 2200)
-    if target.kind == "npc" then
-        targetRecord = Registry.Get(target.id)
-        targetZombie = targetRecord and Registry.GetLiveZombie(target.id) or nil
-        visible = false
-        visibilityKind = nil
-        if targetZombie and Perception.CanSeeWorldObject then
-            visible, visibilityKind = Perception.CanSeeWorldObject(record, targetZombie)
-        end
-        if targetRecord and targetRecord.alive ~= false and targetZombie
-            and visible
-        then
-            target.x = targetRecord.x
-            target.y = targetRecord.y
-            target.z = targetRecord.z
-            target.distSq = Core.DistanceSq(record.x, record.y, target.x, target.y)
-            target.visible = true
-            target.visibilityKind = visibilityKind
-            target.lastSeenAt = now
-            target.alertOnly = nil
-            target.threatening = Perception.IsTargetThreatening
-                and Perception.IsTargetThreatening(record, target)
-                or false
-            return target
-        end
-        if targetRecord and targetRecord.alive ~= false and now < memoryUntil then
-            target.visible = false
-            target.distSq = Core.DistanceSq(record.x, record.y, target.x, target.y)
-            return target
-        end
-        return nil
-    end
-    if target.kind == "player" then
-        player = Core.ResolvePlayerByOnlineID(target.onlineID) or Core.ResolvePlayerByUsername(target.username)
-        visible = false
-        visibilityKind = nil
-        if player and Perception.CanSeeWorldObject then
-            visible, visibilityKind = Perception.CanSeeWorldObject(record, player)
-        end
-        if player and visible then
-            target.player = player
-            target.x = player:getX()
-            target.y = player:getY()
-            target.z = player:getZ()
-            target.distSq = Core.DistanceSq(record.x, record.y, target.x, target.y)
-            target.visible = true
-            target.visibilityKind = visibilityKind
-            target.lastSeenAt = now
-            target.alertOnly = nil
-            target.threatening = Perception.IsTargetThreatening
-                and Perception.IsTargetThreatening(record, target)
-                or false
-            return target
-        end
-        if player and now < memoryUntil then
-            target.visible = false
-            target.distSq = Core.DistanceSq(record.x, record.y, target.x, target.y)
-            return target
-        end
-        return nil
-    end
-    if target.kind == "zombie" then
-        zombie = Perception.FindZombieByID and Perception.FindZombieByID(target.zombieId) or nil
-        visible = false
-        visibilityKind = nil
-        if zombie and Perception.CanSeeWorldObject then
-            visible, visibilityKind = Perception.CanSeeWorldObject(record, zombie)
-        end
-        if zombie and visible then
-            target.x = zombie:getX()
-            target.y = zombie:getY()
-            target.z = zombie:getZ()
-            target.distSq = Core.DistanceSq(record.x, record.y, target.x, target.y)
-            target.visible = true
-            target.visibilityKind = visibilityKind
-            target.lastSeenAt = now
-            target.alertOnly = nil
-            target.threatening = Perception.IsTargetThreatening
-                and Perception.IsTargetThreatening(record, target)
-                or false
-            return target
-        end
-        if zombie and now < memoryUntil then
-            target.visible = false
-            target.distSq = Core.DistanceSq(record.x, record.y, target.x, target.y)
-            return target
-        end
-        return Perception.FindNearestEnemyZombie(record, Const.ZOMBIE_TARGET_RADIUS)
-    end
-    if target.kind == "foreign_npc" then
-        local resolved = target.worldObject and target
-            or CompatibilityAPI
-            and CompatibilityAPI.ResolveTarget
-            and CompatibilityAPI.ResolveTarget(target)
-            or nil
-        local foreignBody = resolved and resolved.worldObject or nil
-        visible = false
-        visibilityKind = nil
-        if foreignBody and foreignBody.isAlive
-            and foreignBody:isAlive()
-            and Perception.CanSeeWorldObject
-        then
-            visible, visibilityKind = Perception.CanSeeWorldObject(
-                record,
-                foreignBody
-            )
-        end
-        if foreignBody and foreignBody.isAlive
-            and foreignBody:isAlive() and visible
-        then
-            target.worldObject = foreignBody
-            target.x = foreignBody:getX()
-            target.y = foreignBody:getY()
-            target.z = foreignBody:getZ()
-            target.distSq = Core.DistanceSq(
-                record.x, record.y, target.x, target.y
-            )
-            target.visible = true
-            target.visibilityKind = visibilityKind
-            target.lastSeenAt = now
-            target.alertOnly = nil
-            target.threatening = true
-            return target
-        end
-        if foreignBody and foreignBody.isAlive
-            and foreignBody:isAlive() and now < memoryUntil
-        then
-            target.visible = false
-            target.distSq = Core.DistanceSq(
-                record.x, record.y, target.x, target.y
-            )
-            return target
-        end
-        return nil
-    end
-    return nil
-end
-
 local function sameTarget(left, right)
     if not left or not right or left.kind ~= right.kind then return false end
-    if left.kind == "npc" then return tostring(left.id or "") == tostring(right.id or "") end
-    if left.kind == "zombie" then return tostring(left.zombieId or "") == tostring(right.zombieId or "") end
+    if left.kind == "npc" then
+        return tostring(left.id or "") == tostring(right.id or "")
+    end
+    if left.kind == "zombie" then
+        return tostring(left.zombieId or "")
+            == tostring(right.zombieId or "")
+    end
     if left.kind == "player" then
         if left.onlineID ~= nil and right.onlineID ~= nil then
             return tonumber(left.onlineID) == tonumber(right.onlineID)
@@ -351,3 +205,21 @@ function Targeting.ResolveRoamingEngageTarget(record, radius)
         return Perception.ResolveRoamingTarget(source, radius)
     end)
 end
+
+Targeting.Internal = Targeting.Internal or {}
+Targeting.Internal.WorldTargetResolver = {
+    Core = Core,
+    Const = Const,
+    Registry = Registry,
+    Perception = Perception,
+    CompatibilityAPI = CompatibilityAPI,
+}
+require "PNC/Core/Behaviors/PNC_Behavior_Targeting_WorldTargetResolver"
+local WorldTargetResolver = Targeting.Internal.WorldTargetResolver
+
+Targeting.Internal.UpdateTargetFromWorld = {
+    Core = Core,
+    Const = Const,
+    Resolver = WorldTargetResolver.Resolve,
+}
+require "PNC/Core/Behaviors/PNC_Behavior_Targeting_UpdateTargetFromWorld"

@@ -2,6 +2,8 @@ local T = require "tests/support/test"
 
 local source = T.read(
     "ProjectHoomans", "server", "PNC/Server/PNC_ServerInventory.lua")
+T.falsy(source:find('require "PNC/00_PNC_Init"', 1, true),
+    "server inventory must use composition-owned shared initialization")
 local prefix = "PNC/Server/ServerInventory/"
 local providers = {
     "PNC_ServerInventory_Context",

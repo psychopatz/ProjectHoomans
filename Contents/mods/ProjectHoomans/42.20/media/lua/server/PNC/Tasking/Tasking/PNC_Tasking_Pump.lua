@@ -1,3 +1,4 @@
+-- Server-authoritative task pump composition root.
 if PsychopatzCore and PsychopatzCore.RuntimeRole
     and not PsychopatzCore.RuntimeRole.AllowsServerCode() then return end
 
@@ -5,284 +6,63 @@ local Tasking = PNC.Tasking
 local Priority = PNC.TaskPriority
 local Leases = PNC.TaskLeaseService
 local ScalingDiagnostics = PNC.PerformanceScalingDiagnostics
-local ActorControl = PNC.ActorControl
 local H = Tasking.Internal
 local Events = Tasking.Events
 local Inbox = Tasking.Inbox
 
-local function clockNow(fallback)
-    if PNC.Core and type(PNC.Core.Now) == "function" then
-        return tonumber(PNC.Core.Now()) or fallback
-    end
-    return fallback
-end
+require "PNC/Tasking/Tasking/PNC_Tasking_Pump_Context"
+require "PNC/Tasking/Tasking/PNC_Tasking_Pump_Reconciliation"
+require "PNC/Tasking/Tasking/PNC_Tasking_Pump_Evaluation"
+require "PNC/Tasking/Tasking/PNC_Tasking_Pump_Execution"
 
-local function budgetExhausted(startedAt)
-    local budget = math.max(1, tonumber(Tasking.TIME_BUDGET_MS) or 2)
-    return clockNow(startedAt) - startedAt >= budget
-end
-
-local function puppetOperaSuspends(lease)
-    local record
-    if not lease or not ActorControl
-        or not ActorControl.IsPuppetOwned
-        or not PNC.Registry
-        or not PNC.Registry.Get
-    then
-        return false
-    end
-    record = PNC.Registry.Get(lease.npcId)
-    return record ~= nil and ActorControl.IsPuppetOwned(record)
-end
-
-local function promoteMaterializedLease(lease)
-    if not lease or tostring(lease.executionMode or "") ~= "ABSTRACT" then
-        return
-    end
-    local record = PNC.Registry and PNC.Registry.Get
-        and PNC.Registry.Get(lease.npcId) or nil
-    local activity = record and record.runtime
-        and record.runtime.facilityActivity or nil
-    if not record or record.presenceState ~= PNC.Const.PRESENCE_LIVE
-        or not activity or activity.taskLeaseId ~= lease.leaseId
-    then return end
-    lease.executionMode = "LIVE"
-    activity.abstract = false
-end
-
-local function reconcileOrphanedActivities(at)
-    if at < (tonumber(Tasking.NextOrphanReconcileAt) or 0) then
-        return 0
-    end
-    Tasking.NextOrphanReconcileAt = at
-        + Tasking.ORPHAN_RECONCILE_INTERVAL_MS
-    if not PNC.Registry or not PNC.Registry.ForEach
-        or not PNC.FacilityJobs or not PNC.FacilityJobs.Stop
-    then return 0 end
-    local recovered = 0
-    PNC.Registry.ForEach(function(record)
-        if ActorControl and ActorControl.IsPuppetOwned
-            and ActorControl.IsPuppetOwned(record)
-        then
-            -- A Puppet lease is a temporary presentation override. Do not
-            -- let orphan cleanup erase the facility runtime that the scene
-            -- will hand back to after release.
-            return
+function H.Pump(at, budget)
+        at = tonumber(at) or PNC.Core.Now()
+        if at < Tasking.NextPumpAt then return 0 end
+        Tasking.NextPumpAt = at + Tasking.PUMP_INTERVAL_MS
+    local pumpStartedAt = H.PumpClockNow(at)
+        local timerName
+        local timerStart
+        if ScalingDiagnostics then
+            timerName, timerStart = ScalingDiagnostics.BeginTiming(
+                "Tasking.Pump", at)
+            ScalingDiagnostics.Increment("Tasking.PumpCalls")
+            ScalingDiagnostics.SetGauge("Tasking.ActiveLeases", #Leases.Active)
+            ScalingDiagnostics.SetGauge("Tasking.EventInboxSize", Inbox.Count())
         end
-        local activity = record and record.runtime
-            and record.runtime.facilityActivity or nil
-        local leaseId = activity and tostring(activity.taskLeaseId or "") or ""
-        -- Automatic need activities always carry a task lease. Manual and
-        -- ambient activities intentionally do not, so they are not treated
-        -- as stale just because they are lease-free.
-        if activity and activity.automatic == true and leaseId ~= ""
-            and not Leases.Get(leaseId)
-        then
-            local ok, stopped, stopReason = H.SafeCall(
-                "task_orphan_facility_stop",
-                PNC.FacilityJobs.Stop,
-                {
-                    npcId = record and record.id,
-                    leaseId = leaseId,
-                    domain = "NeedFacility",
-                },
-                record,
-                "orphaned_facility_activity"
-            )
-            if ok and stopped == true then
-                recovered = recovered + 1
-                Events.Emit("ORPHANED_FACILITY_ACTIVITY_RECOVERED", {
-                    record = record, source = "Tasking.OrphanRecovery",
-                })
-            elseif ok then
-                H.RecordFailure(
-                    "task_orphan_facility_stop",
-                    {
-                        npcId = record and record.id,
-                        leaseId = leaseId,
-                        domain = "NeedFacility",
-                    },
-                    stopReason or "ORPHAN_FACILITY_STOP_REJECTED"
-                )
+        H.PumpReconcileOrphanedActivities(at)
+        if Tasking.Initialized ~= true then
+            Tasking.Initialized = true
+            if PNC.Registry and PNC.Registry.ForEach then
+                PNC.Registry.ForEach(function(record)
+                    if record and record.alive ~= false then
+                        Events.Emit("TASKING_INITIALIZED", {
+                            record = record, source = "Tasking.Initialization",
+                        })
+                    end
+                end)
             end
         end
-    end)
-    return recovered
+    local processed = H.PumpReevaluate(at, pumpStartedAt, budget)
+    local executorSteps = H.PumpExecutors(at, pumpStartedAt)
+        local actionPlans = PNC.Semantics
+            and PNC.Semantics.ActionPlanService or nil
+        if actionPlans and type(actionPlans.Pump) == "function" then
+            H.SafeCall("semantic_action_plan_pump", actionPlans.Pump, {
+                domain = "semantic_action_plan",
+            }, at)
+        end
+        if ScalingDiagnostics then
+            ScalingDiagnostics.Increment("Tasking.ReevaluationsProcessed", processed)
+            ScalingDiagnostics.Increment("Tasking.ExecutorSteps", executorSteps)
+            ScalingDiagnostics.SetGauge("Tasking.ActiveLeases", #Leases.Active)
+            ScalingDiagnostics.SetGauge("Tasking.EventInboxSize", Inbox.Count())
+        end
+        if timerName then ScalingDiagnostics.EndTiming(timerName, timerStart) end
+        return processed
 end
 
 function Tasking.Commands.Pump(at, budget)
-    at = tonumber(at) or PNC.Core.Now()
-    if at < Tasking.NextPumpAt then return 0 end
-    Tasking.NextPumpAt = at + Tasking.PUMP_INTERVAL_MS
-    local pumpStartedAt = clockNow(at)
-    local timerName
-    local timerStart
-    if ScalingDiagnostics then
-        timerName, timerStart = ScalingDiagnostics.BeginTiming(
-            "Tasking.Pump", at)
-        ScalingDiagnostics.Increment("Tasking.PumpCalls")
-        ScalingDiagnostics.SetGauge("Tasking.ActiveLeases", #Leases.Active)
-        ScalingDiagnostics.SetGauge("Tasking.EventInboxSize", Inbox.Count())
-    end
-    reconcileOrphanedActivities(at)
-    if Tasking.Initialized ~= true then
-        Tasking.Initialized = true
-        if PNC.Registry and PNC.Registry.ForEach then
-            PNC.Registry.ForEach(function(record)
-                if record and record.alive ~= false then
-                    Events.Emit("TASKING_INITIALIZED", {
-                        record = record, source = "Tasking.Initialization",
-                    })
-                end
-            end)
-        end
-    end
-    local processed = 0
-    local reevaluationTimerName
-    local reevaluationTimerStart
-    if ScalingDiagnostics then
-        reevaluationTimerName, reevaluationTimerStart =
-            ScalingDiagnostics.BeginTiming("Tasking.Reevaluate", at)
-    end
-    local maximum = math.max(1, math.floor(tonumber(budget)
-        or Tasking.MAX_REEVALUATIONS_PER_PUMP))
-    while processed < maximum and Inbox.Count() > 0 do
-        local entry = Inbox.Pop()
-        if entry then
-            Tasking.Diagnostics.counters.eventProcesses =
-                Tasking.Diagnostics.counters.eventProcesses + 1
-            local event = entry.latestEvent
-            if event then event.causes = Inbox.Causes(entry) end
-            local ok, result, reason = H.SafeCall(
-                "task_reevaluate", Tasking.Commands.Reevaluate, {
-                    npcId = entry.npcId, eventId = entry.latestEventId,
-                    domain = entry.latestEvent
-                        and entry.latestEvent.source or nil,
-                }, entry.npcId, entry.cause, event)
-            if not ok then
-                Events.Emit("TASK_REEVALUATION_FAILED", {
-                    npcId = entry.npcId, source = "Tasking.Pump",
-                    entityId = entry.latestEventId,
-                    payload = { error = reason, causes = Inbox.Causes(entry) },
-                })
-            elseif result == false and reason == "TASK_CLEANUP_FAILED" then
-                Events.Emit("TASK_REEVALUATION_RETRY", {
-                    npcId = entry.npcId, source = "Tasking.Pump",
-                    entityId = entry.latestEventId,
-                    payload = { reason = reason },
-                })
-            end
-            processed = processed + 1
-        end
-        if budgetExhausted(pumpStartedAt) then break end
-    end
-    if reevaluationTimerName then
-        ScalingDiagnostics.EndTiming(
-            reevaluationTimerName, reevaluationTimerStart)
-    end
-    local executorBudget = Tasking.MAX_EXECUTOR_TICKS_PER_PUMP
-    local activeCount = #Leases.Active
-    local executorSteps = 0
-    local executorTimerName
-    local executorTimerStart
-    if ScalingDiagnostics then
-        executorTimerName, executorTimerStart = ScalingDiagnostics.BeginTiming(
-            "Tasking.Executor", at)
-    end
-    for _ = 1, math.min(activeCount, executorBudget) do
-        if budgetExhausted(pumpStartedAt) then break end
-        if #Leases.Active <= 0 then break end
-        executorSteps = executorSteps + 1
-        Tasking.ExecutorCursor = (Tasking.ExecutorCursor % #Leases.Active) + 1
-        local lease = Leases.Get(Leases.Active[Tasking.ExecutorCursor])
-        local suspended = puppetOperaSuspends(lease)
-        local domainTimerName
-        local domainTimerStart
-        if ScalingDiagnostics and lease then
-            domainTimerName, domainTimerStart = ScalingDiagnostics.BeginTiming(
-                "Tasking.Domain." .. tostring(lease.sourceDomain or "unknown"),
-                at)
-        end
-        if not suspended then promoteMaterializedLease(lease) end
-        local provider = lease and Tasking.Providers[lease.sourceDomain]
-        local executor = provider and type(provider.Tick) == "function"
-            and provider or lease and Tasking.Executors[lease.executionMode]
-        local recoveryState
-        if suspended then
-            -- Puppet Opera owns the live presentation. Keep the durable task
-            -- lease and its provider state intact until the scene releases it;
-            -- executor recovery/cancellation must not tear down the state that
-            -- will be resumed afterwards.
-        elseif lease and lease.cancellationRequested ~= true then
-            _, recoveryState = H.RecoverStalledLease(lease, at)
-            recoveryState = recoveryState or H.GetRecoveryState(lease, at)
-        end
-        if recoveryState == "RECOVERED"
-            or recoveryState == "RECOVERY_BACKOFF"
-            or recoveryState == "RECOVERY_PENDING"
-            or recoveryState == "QUARANTINED"
-        then
-            -- A recovery attempt owns this executor slot. Do not let the
-            -- stale executor run again while cleanup is pending/backing off.
-        elseif lease and lease.cancellationRequested == true
-            and not (PNC.TaskRequestDefinitions
-                and PNC.TaskRequestDefinitions.NON_INTERRUPTIBLE_PHASE[lease.phase])
-        then
-            H.StopLease(lease, lease.cancellationReason)
-        elseif executor then
-            local ok, result, reason = H.SafeCall("executor_tick",
-                executor.Tick, { npcId = lease.npcId,
-                    leaseId = lease.leaseId,
-                    domain = lease.sourceDomain }, lease)
-            if not ok or result == false then
-                Tasking.Diagnostics.counters.executorFailures =
-                    Tasking.Diagnostics.counters.executorFailures + 1
-                if provider and type(provider.OnExecutorFailure) == "function" then
-                    H.SafeCall("provider_executor_failure",
-                        provider.OnExecutorFailure, {
-                            npcId = lease.npcId,
-                            leaseId = lease.leaseId,
-                            domain = lease.sourceDomain,
-                        }, lease, reason or "EXECUTOR_REJECTED")
-                end
-                local recovered, recoveryResult = H.RecoverExecutorFailure(
-                    lease, at, "task_executor_failed")
-                Events.Emit("TASK_EXECUTOR_FAILED", {
-                    npcId = lease.npcId, source = "Tasking.Pump",
-                    entityId = lease.leaseId,
-                    payload = { reason = reason or "EXECUTOR_REJECTED",
-                        sourceDomain = lease.sourceDomain,
-                        recovery = recoveryResult,
-                        recovered = recovered == true },
-                })
-            else
-                Tasking.Diagnostics.counters.executorTicks =
-                    Tasking.Diagnostics.counters.executorTicks + 1
-            end
-        end
-        if domainTimerName then
-            ScalingDiagnostics.EndTiming(
-                domainTimerName, domainTimerStart, lease and lease.npcId)
-        end
-    end
-    if executorTimerName then
-        ScalingDiagnostics.EndTiming(executorTimerName, executorTimerStart)
-    end
-    local actionPlans = PNC.Semantics
-        and PNC.Semantics.ActionPlanService or nil
-    if actionPlans and type(actionPlans.Pump) == "function" then
-        H.SafeCall("semantic_action_plan_pump", actionPlans.Pump, {
-            domain = "semantic_action_plan",
-        }, at)
-    end
-    if ScalingDiagnostics then
-        ScalingDiagnostics.Increment("Tasking.ReevaluationsProcessed", processed)
-        ScalingDiagnostics.Increment("Tasking.ExecutorSteps", executorSteps)
-        ScalingDiagnostics.SetGauge("Tasking.ActiveLeases", #Leases.Active)
-        ScalingDiagnostics.SetGauge("Tasking.EventInboxSize", Inbox.Count())
-    end
-    if timerName then ScalingDiagnostics.EndTiming(timerName, timerStart) end
-    return processed
+    return H.Pump(at, budget)
 end
 
 return Tasking

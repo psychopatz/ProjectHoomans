@@ -29,7 +29,7 @@ getItemNameFromFullType = function(fullType)
 end
 
 local Presentation = require(
-    "PNC/UI/Shared/PNC_ColonyPresentation"
+    "PNC/UI/Communities/PNC_ColonyPresentation"
 )
 
 local snapshot = {

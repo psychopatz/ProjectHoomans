@@ -439,8 +439,8 @@ local crowdWitnesses = PNC.CorpseAwareness.ObserveCorpse(
     crowdDead,
     crowdCorpse
 )
-T.equal(crowdWitnesses, 12, "per-corpse witness cap is enforced")
-T.equal(#sentGreetings - speechStart, 6,
-    "global speech budget prevents a crowd from flooding replies")
+T.equal(crowdWitnesses, 8, "per-corpse reaction budget is enforced")
+T.equal(#sentGreetings - speechStart, 8,
+    "per-scan reaction budget prevents a crowd from flooding replies")
 
 T.finish("pnc_corpse_awareness_smoke")

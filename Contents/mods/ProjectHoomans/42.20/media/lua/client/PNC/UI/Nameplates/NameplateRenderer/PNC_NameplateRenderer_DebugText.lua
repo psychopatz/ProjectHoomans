@@ -99,161 +99,141 @@ function Renderer.BuildPathDebugLines(debugState, currentFinalDistance)
     return lines
 end
 
-function Renderer.BuildCombatDebugLines(debugState, currentTargetDistance)
-    local lines = {}
-    local mode
-    local decision
-    local pressure
-    local horde
-    local target
-    local targetLine
-    local aim
-    local lane
-    local ammo
-    local action
-    local movement
-    if type(debugState) ~= "table" then return lines end
-    mode = tostring(debugState.mode or "unknown")
-    decision = tostring(
-        debugState.decision
-            or debugState.blockReason
-            or "observing"
-    )
-    lines[#lines + 1] = "COMBAT " .. mode
-        .. " | " .. decision
+local function appendCombatSummary(lines, debugState, mode, decision)
+    lines[#lines + 1] = 'COMBAT ' .. mode
+        .. ' | ' .. decision
         .. (
             debugState.assessmentAgeMs ~= nil
-                and " age=" .. tostring(
+                and ' age=' .. tostring(
                     math.floor(
                         tonumber(debugState.assessmentAgeMs) or 0
                     )
-                ) .. "ms"
-                or ""
+                ) .. 'ms'
+                or ''
         )
+end
 
-    pressure = tostring(
+local function appendThreatSummary(lines, debugState)
+    local pressure = tostring(
         tonumber(debugState.visiblePressureCount) or 0
-    ) .. "/" .. tostring(
+    ) .. '/' .. tostring(
         tonumber(debugState.pressureCount) or 0
     )
-    horde = tostring(
+    local horde = tostring(
         tonumber(debugState.visibleHordeCount) or 0
-    ) .. "/" .. tostring(
+    ) .. '/' .. tostring(
         tonumber(debugState.hordeCount) or 0
     )
-    lines[#lines + 1] = "THREAT near="
+    lines[#lines + 1] = 'THREAT near='
         .. tostring(tonumber(debugState.surroundedCount) or 0)
-        .. " pressure=" .. pressure
-        .. " tol=" .. tostring(
-            tonumber(debugState.pressureTolerance) or "-"
+        .. ' pressure=' .. pressure
+        .. ' tol=' .. tostring(
+            tonumber(debugState.pressureTolerance) or '-'
         )
-        .. " horde=" .. horde
-        .. " crowd=" .. tostring(
+        .. ' horde=' .. horde
+        .. ' crowd=' .. tostring(
             tonumber(debugState.targetCrowdCount) or 0
         )
-        .. " sta=" .. tostring(
+        .. ' sta=' .. tostring(
             debugState.staminaRatio ~= nil
                 and math.floor(
                     (tonumber(debugState.staminaRatio) or 0)
                         * 100 + 0.5
-                ) .. "%"
-                or "-"
+                ) .. '%'
+                or '-'
         )
-        .. "/" .. tostring(
+        .. '/' .. tostring(
             debugState.staminaCurrent ~= nil
                 and math.floor(
                     tonumber(debugState.staminaCurrent) or 0
                 )
-                or "-"
+                or '-'
         )
-
     if debugState.visibleZombieCount ~= nil
         or debugState.nearbyZombieCount ~= nil
     then
-        lines[#lines + 1] = "VIEW zombies="
+        lines[#lines + 1] = 'VIEW zombies='
             .. tostring(
                 tonumber(debugState.visibleZombieCount) or 0
             )
-            .. "/" .. tostring(
+            .. '/' .. tostring(
                 tonumber(debugState.nearbyZombieCount) or 0
             )
-            .. " intent=" .. tostring(
-                debugState.attackType or "auto"
+            .. ' intent=' .. tostring(
+                debugState.attackType or 'auto'
             )
-            .. " tactical=" .. tostring(
-                debugState.tacticalState or "-"
+            .. ' tactical=' .. tostring(
+                debugState.tacticalState or '-'
             )
-            .. " retreat=" .. tostring(
-                debugState.retreatPhase or "-"
+            .. ' retreat=' .. tostring(
+                debugState.retreatPhase or '-'
             )
-            .. ":" .. tostring(
-                debugState.retreatReason or "-"
+            .. ':' .. tostring(
+                debugState.retreatReason or '-'
             )
-            .. " biteLane=" .. tostring(
+            .. ' biteLane=' .. tostring(
                 debugState.biteLaneClear == true
-                    and "clear"
-                    or debugState.biteLaneReason or "-"
+                    and 'clear'
+                    or debugState.biteLaneReason or '-'
             )
     end
-    if type(debugState.viewZombies) == "table" then
-        local index
-        local viewed
-        for index = 1, #debugState.viewZombies do
-            viewed = debugState.viewZombies[index]
-            lines[#lines + 1] = "Z" .. tostring(index)
-                .. " id=" .. tostring(viewed.id or "-")
-                .. " d=" .. tostring(
-                    rounded(
-                        viewed.distSq
-                            and math.sqrt(
-                                tonumber(viewed.distSq) or 0
-                            ),
-                        2
-                    ) or "-"
-                )
-                .. " mode=" .. tostring(viewed.intent or "visible")
-                .. " state=" .. tostring(
-                    viewed.actionState or "-"
-                )
-                .. " los=" .. tostring(
-                    viewed.visibilityKind or "-"
-                )
-                .. (
-                    tostring(viewed.bumpType or "") ~= ""
-                        and " bump=" .. tostring(viewed.bumpType)
-                        or ""
-                )
-                .. (
-                    viewed.targetKind ~= nil
-                        and " target="
-                            .. tostring(viewed.targetKind)
-                            .. "["
-                            .. tostring(
-                                viewed.targetName
-                                    or viewed.targetId
-                                    or "?"
-                            )
-                            .. "]"
-                            .. (
-                                viewed.targetSource ~= nil
-                                    and " via="
-                                        .. tostring(viewed.targetSource)
-                                    or ""
-                            )
-                        or " target=none"
-                )
-        end
-    end
+end
 
-    target = debugState.target
-    if type(target) == "table" then
-        targetLine = "TARGET " .. tostring(target.kind or "unknown")
+local function appendViewedZombieRows(lines, debugState)
+    if type(debugState.viewZombies) ~= 'table' then return end
+    for index = 1, #debugState.viewZombies do
+        local viewed = debugState.viewZombies[index]
+        lines[#lines + 1] = 'Z' .. tostring(index)
+            .. ' id=' .. tostring(viewed.id or '-')
+            .. ' d=' .. tostring(
+                rounded(
+                    viewed.distSq
+                        and math.sqrt(
+                            tonumber(viewed.distSq) or 0
+                        ),
+                    2
+                ) or '-'
+            )
+            .. ' mode=' .. tostring(viewed.intent or 'visible')
+            .. ' state=' .. tostring(viewed.actionState or '-')
+            .. ' los=' .. tostring(viewed.visibilityKind or '-')
+            .. (
+                tostring(viewed.bumpType or '') ~= ''
+                    and ' bump=' .. tostring(viewed.bumpType)
+                    or ''
+            )
+            .. (
+                viewed.targetKind ~= nil
+                    and ' target='
+                        .. tostring(viewed.targetKind)
+                        .. '['
+                        .. tostring(
+                            viewed.targetName
+                                or viewed.targetId
+                                or '?'
+                        )
+                        .. ']'
+                        .. (
+                            viewed.targetSource ~= nil
+                                and ' via='
+                                    .. tostring(viewed.targetSource)
+                                or ''
+                        )
+                    or ' target=none'
+            )
+    end
+end
+
+local function appendCombatTarget(lines, debugState, currentTargetDistance)
+    local target = debugState.target
+    if type(target) == 'table' then
+        local targetLine = 'TARGET ' .. tostring(target.kind or 'unknown')
             .. (
                 target.id ~= nil
-                    and "[" .. tostring(target.id) .. "]"
-                    or ""
+                    and '[' .. tostring(target.id) .. ']'
+                    or ''
             )
-            .. " d=" .. tostring(
+            .. ' d=' .. tostring(
                 rounded(
                     currentTargetDistance
                         or (
@@ -263,139 +243,164 @@ function Renderer.BuildCombatDebugLines(debugState, currentTargetDistance)
                             )
                         ),
                     2
-                ) or "-"
+                ) or '-'
             )
-            .. " los=" .. tostring(
+            .. ' los=' .. tostring(
                 target.visible == false
-                    and (target.visibilityKind or "lost")
-                    or (target.visibilityKind or "clear")
+                    and (target.visibilityKind or 'lost')
+                    or (target.visibilityKind or 'clear')
             )
         if target.threatening == true then
-            targetLine = targetLine .. " ACTIVE"
+            targetLine = targetLine .. ' ACTIVE'
         end
         lines[#lines + 1] = targetLine
     else
-        lines[#lines + 1] = "TARGET none"
+        lines[#lines + 1] = 'TARGET none'
     end
+end
 
-    if mode == "ranged" or mode == "mixed" then
-        aim = tonumber(debugState.aimConfidence)
-        if debugState.fireLaneSafe == false then
-            lane = "BLOCKED"
-            if debugState.fireLaneBlocker then
-                lane = lane .. ":"
-                    .. tostring(
-                        debugState.fireLaneBlocker.kind or "friendly"
-                    )
-            end
-        elseif debugState.fireLaneSafe == true then
-            lane = "CLEAR"
-        else
-            lane = "UNCHECKED"
-        end
-        ammo = debugState.magazineCount ~= nil
-            and (
-                tostring(debugState.magazineCount)
-                .. "/" .. tostring(
-                    debugState.magazineCapacity or "?"
+local function appendCombatRanged(lines, debugState, mode)
+    if mode ~= 'ranged' and mode ~= 'mixed' then return end
+    local aim = tonumber(debugState.aimConfidence)
+    local lane
+    if debugState.fireLaneSafe == false then
+        lane = 'BLOCKED'
+        if debugState.fireLaneBlocker then
+            lane = lane .. ':'
+                .. tostring(
+                    debugState.fireLaneBlocker.kind or 'friendly'
                 )
-            ) or "-"
-        lines[#lines + 1] = "RANGED aim="
-            .. tostring(
-                aim and math.floor(aim * 100 + 0.5) or "-"
-            )
-            .. "% ready="
-            .. tostring(
-                debugState.aimReadyInMs ~= nil
-                    and tostring(
-                        math.floor(
-                            tonumber(debugState.aimReadyInMs) or 0
-                        )
-                    ) .. "ms"
-                    or "-"
-            )
-            .. " lane=" .. lane
-            .. " ammo=" .. ammo
-            .. " reserve=" .. tostring(
-                debugState.ammoReserveUnlimited == true
-                    and "inf"
-                    or debugState.ammoReserveCount or "-"
-            )
-            .. (
-                debugState.reloadActive == true
-                    and " RELOAD"
-                    or ""
-            )
+        end
+    elseif debugState.fireLaneSafe == true then
+        lane = 'CLEAR'
+    else
+        lane = 'UNCHECKED'
     end
+    local ammo = debugState.magazineCount ~= nil
+        and (
+            tostring(debugState.magazineCount)
+            .. '/' .. tostring(
+                debugState.magazineCapacity or '?'
+            )
+        ) or '-'
+    lines[#lines + 1] = 'RANGED aim='
+        .. tostring(
+            aim and math.floor(aim * 100 + 0.5) or '-'
+        )
+        .. '% ready='
+        .. tostring(
+            debugState.aimReadyInMs ~= nil
+                and tostring(
+                    math.floor(
+                        tonumber(debugState.aimReadyInMs) or 0
+                    )
+                ) .. 'ms'
+                or '-'
+        )
+        .. ' lane=' .. lane
+        .. ' ammo=' .. ammo
+        .. ' reserve=' .. tostring(
+            debugState.ammoReserveUnlimited == true
+                and 'inf'
+                or debugState.ammoReserveCount or '-'
+        )
+        .. (
+            debugState.reloadActive == true
+                and ' RELOAD'
+                or ''
+        )
+end
 
-    action = debugState.action
-    if type(action) == "table" then
-        lines[#lines + 1] = "ACTION "
-            .. tostring(action.attackType or "-")
-            .. "/" .. tostring(action.attackKind or "-")
-            .. " anim=" .. tostring(action.anim or "-")
-            .. " retry=" .. tostring(
+local function appendCombatActionAndMovement(lines, debugState)
+    local action = debugState.action
+    if type(action) == 'table' then
+        lines[#lines + 1] = 'ACTION '
+            .. tostring(action.attackType or '-')
+            .. '/' .. tostring(action.attackKind or '-')
+            .. ' anim=' .. tostring(action.anim or '-')
+            .. ' retry=' .. tostring(
                 tonumber(action.animationRetries) or 0
             )
-            .. " via=" .. tostring(
-                action.animationTriggerMode or "-"
+            .. ' via=' .. tostring(
+                action.animationTriggerMode or '-'
             )
-            .. " state=" .. tostring(
-                action.animationActionState or "-"
+            .. ' state=' .. tostring(
+                action.animationActionState or '-'
             )
-            .. " hit=" .. tostring(
+            .. ' hit=' .. tostring(
                 math.floor(
                     tonumber(action.hitRemainingMs) or 0
                 )
             )
-            .. "ms finish=" .. tostring(
+            .. 'ms finish=' .. tostring(
                 math.floor(
                     tonumber(action.finishRemainingMs) or 0
                 )
-            ) .. "ms"
+            ) .. 'ms'
     end
 
-    movement = debugState.tacticalMove
-    if type(movement) == "table" then
-        lines[#lines + 1] = "MOVE "
-            .. tostring(movement.phase or "-")
-            .. "/" .. tostring(movement.mode or "-")
-            .. " reason=" .. tostring(movement.reason or "-")
-            .. " lock=" .. tostring(
+    local movement = debugState.tacticalMove
+    if type(movement) == 'table' then
+        lines[#lines + 1] = 'MOVE '
+            .. tostring(movement.phase or '-')
+            .. '/' .. tostring(movement.mode or '-')
+            .. ' reason=' .. tostring(movement.reason or '-')
+            .. ' lock=' .. tostring(
                 math.floor(
                     tonumber(movement.lockRemainingMs) or 0
                 )
-            ) .. "ms"
+            ) .. 'ms'
     end
-    lines[#lines + 1] = "DEFENSE r="
-        .. tostring(rounded(debugState.defenseRadius, 1) or "-")
-        .. " nearby=" .. tostring(
+end
+
+local function appendCombatDefense(lines, debugState)
+    lines[#lines + 1] = 'DEFENSE r='
+        .. tostring(rounded(debugState.defenseRadius, 1) or '-')
+        .. ' nearby=' .. tostring(
             tonumber(debugState.defenseNearbyCount) or 0
         )
-        .. " fit=" .. tostring(
+        .. ' fit=' .. tostring(
             debugState.defenseFitness ~= nil
                 and math.floor(tonumber(debugState.defenseFitness) or 0)
-                or "-"
+                or '-'
         )
-        .. " dodge=" .. tostring(
+        .. ' dodge=' .. tostring(
             debugState.defenseAvoidChance ~= nil
                 and math.floor(
                     (tonumber(debugState.defenseAvoidChance) or 0)
                         * 100 + 0.5
-                ) .. "%"
-                or "-"
+                ) .. '%'
+                or '-'
         )
-        .. " gear=" .. tostring(
+        .. ' gear=' .. tostring(
             debugState.defenseProtection ~= nil
                 and math.floor(
                     (tonumber(debugState.defenseProtection) or 0)
                         + 0.5
-                ) .. "%"
-                or "-"
+                ) .. '%'
+                or '-'
         )
-        .. " type=" .. tostring(debugState.defenseDamageType or "-")
-        .. " last=" .. tostring(debugState.defenseOutcome or "-")
-        .. (debugState.defensePushed == true and "+push" or "")
+        .. ' type=' .. tostring(debugState.defenseDamageType or '-')
+        .. ' last=' .. tostring(debugState.defenseOutcome or '-')
+        .. (debugState.defensePushed == true and '+push' or '')
+end
+
+function Renderer.BuildCombatDebugLines(debugState, currentTargetDistance)
+    if type(debugState) ~= 'table' then return {} end
+    local lines = {}
+    local mode = tostring(debugState.mode or 'unknown')
+    local decision = tostring(
+        debugState.decision
+            or debugState.blockReason
+            or 'observing'
+    )
+    appendCombatSummary(lines, debugState, mode, decision)
+    appendThreatSummary(lines, debugState)
+    appendViewedZombieRows(lines, debugState)
+    appendCombatTarget(lines, debugState, currentTargetDistance)
+    appendCombatRanged(lines, debugState, mode)
+    appendCombatActionAndMovement(lines, debugState)
+    appendCombatDefense(lines, debugState)
     return lines
 end
 

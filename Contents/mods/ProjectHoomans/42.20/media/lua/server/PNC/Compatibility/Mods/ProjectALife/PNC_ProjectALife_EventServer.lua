@@ -1,3 +1,6 @@
+if PsychopatzCore and PsychopatzCore.RuntimeRole
+    and not PsychopatzCore.RuntimeRole.AllowsServerCode() then return end
+
 -- Authority-checked transport for Project A-Life flavor events.
 
 PNC = PNC or {}

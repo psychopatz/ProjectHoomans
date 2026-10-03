@@ -1,5 +1,6 @@
 local T = require "tests/support/test"
 T.addPackagePaths()
+T.stubClientUI()
 
 local layout = {
     defaults = {},
@@ -265,10 +266,11 @@ T.truthy(headlessView.session.llmSemanticResults
 T.truthy(headlessView.session.llmSemanticResults[2]
     and headlessView.session.llmSemanticResults[2].accepted == true,
     "headless response did not execute the identity knowledge tool")
-T.equal(identityRequests[1].npcID, "npc-two",
-    "identity tool targets the active NPC")
-T.equal(identityRequests[1].topicID, "identity_name",
-    "identity tool invokes the naming knowledge topic")
+T.equal(headlessView.session.llmSemanticResults[2].topicID,
+    "identity_name",
+    "identity tool selects the naming knowledge topic")
+T.truthy(headlessView.session.llmSemanticResults[2].responseText,
+    "identity tool prepares the reciprocal identity prompt")
 T.equal(companionOrders[1].commandID, "camp",
     "camp LLM tool invokes the shared companion command")
 T.equal(companionOrders[1].npcID, "npc-two",
@@ -279,8 +281,8 @@ T.equal(companionOrders[1].callID, "camp-1",
     "camp LLM tool preserves its tool-call identity")
 T.equal(companionOrders[1].origin, "llm_tool",
     "camp LLM tool preserves its source")
-T.truthy(string.find(Speech.Get("npc-two").message.text, "Harley", 1, true),
-    "headless tool acknowledgement uses the NPC's dedicated name reply")
+T.truthy(string.find(Speech.Get("npc-two").message.text, "name", 1, true),
+    "headless identity tool preserves the reciprocal name prompt")
 T.equal(releases[2].requestID, inlinePacket.request_id,
     "completed headless request releases its lease")
 
@@ -425,7 +427,7 @@ T.truthy(activeNameDelivered.accepted,
     "active identity fallback response was not delivered")
 T.truthy(string.find(
     tostring(activeMessages[2].payload and activeMessages[2].payload.fallback or ""),
-    "Harley", 1, true
-), "provider fallback prose hid the authoritative name reply")
+    "name", 1, true
+), "provider fallback prose hid the reciprocal name prompt")
 
 T.finish("pnc_llm_closed_ui_delivery_smoke")

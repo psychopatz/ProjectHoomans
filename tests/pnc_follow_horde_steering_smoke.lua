@@ -217,6 +217,9 @@ ownerMoving = false
 ownerX = 2.8
 nearbyZombies = {}
 record.runtime.followHazard = nil
+record.runtime.followState.ownerSampleX = ownerX
+record.runtime.followState.ownerSampleY = 0
+record.runtime.followState.ownerSampleAt = now
 lastMove = nil
 local haltsBeforeStandstill = haltCalls
 T.truthy(PNC.BehaviorCompanion.Tick(record, {

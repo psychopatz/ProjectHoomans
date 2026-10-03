@@ -91,7 +91,7 @@ T.truthy(attackPumps == 2,
     "expired committed attack skipped its finish pump")
 
 local behaviorSource = T.read(
-    "ProjectHoomans", "shared", "PNC/Core/Behaviors/PNC_BehaviorSystem.lua"
+    "ProjectHoomans", "shared", "PNC/Core/Behaviors/PNC_BehaviorSystem_Tick.lua"
 )
 local committedAt = T.truthy(string.find(
     behaviorSource,

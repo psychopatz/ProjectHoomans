@@ -136,9 +136,6 @@ function Controller.Open(npcId, context)
     npcId = npcId and tostring(npcId) or nil
     local npcIds = Controller.TeamIDs()
     if #npcIds < 1 and npcId then npcIds[1] = npcId end
-    if not PNC.ScavengeUI then
-        require "PNC/UI/Scavenge/PNC_ScavengeWindow"
-    end
     if not PNC.ScavengeUI or not PNC.ScavengeUI.OpenSetup then return false end
     context = type(context) == "table" and context or {}
     context.npcIds = npcIds

@@ -1,6 +1,8 @@
 local T = require "tests/support/test"
 
 T.addPackagePaths()
+package.path = T.path("PsychopatzCore", "common_client", "?.lua")
+    .. ";" .. package.path
 
 local Parent = {}
 Parent.__index = Parent

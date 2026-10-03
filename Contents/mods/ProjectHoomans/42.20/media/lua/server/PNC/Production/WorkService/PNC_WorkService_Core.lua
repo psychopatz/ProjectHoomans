@@ -10,10 +10,12 @@ local Internal = Service.Internal
 local Repository = PNC.WorkRepository
 local Definitions = PNC.WorkDefinitions
 local Status = Definitions.STATUS
-local WorkPolicy = PNC.WorkPolicy
-    or require "PNC/Core/Production/WorkDefinition/PNC_WorkPolicy"
-local FatigueGate = PNC.WorkFatigueGate
-    or require "PNC/Core/Needs/PNC_WorkFatigueGate"
+local WorkPolicy = PNC.WorkPolicy or {
+    CanAutoClaim = function() return true end,
+}
+local FatigueGate = PNC.WorkFatigueGate or {
+    Check = function() return true end,
+}
 local EventsBus = PsychopatzCore and PsychopatzCore.Events
 local EventTypes = PNC.EventTypes or {}
 
@@ -261,63 +263,6 @@ local function findWorker(order)
             or "NO_HOME_WORKER")
 end
 
-function Service.RegisterCompletion(operation, handler)
-    operation = tostring(operation or "")
-    if operation == "" or type(handler) ~= "function" then return false end
-    Service.CompletionHandlers[operation] = handler
-    return true
-end
-
-function Service.RegisterCompletionRecovery(operation, handler)
-    operation = tostring(operation or "")
-    if operation == "" or type(handler) ~= "function" then return false end
-    Service.CompletionRecoveryHandlers[operation] = handler
-    return true
-end
-
-function Service.RegisterPreparation(operation, handler)
-    operation = tostring(operation or "")
-    if operation == "" or type(handler) ~= "function" then return false end
-    Service.PreparationHandlers[operation] = handler
-    return true
-end
-
-function Service.RegisterCollection(operation, handler)
-    operation = tostring(operation or "")
-    if operation == "" or type(handler) ~= "function" then return false end
-    Service.CollectionHandlers[operation] = handler
-    return true
-end
-
-function Service.RegisterTargetProvider(operation, handler)
-    operation = tostring(operation or "")
-    if operation == "" or type(handler) ~= "function" then return false end
-    Service.TargetProviders[operation] = handler
-    return true
-end
-
-function Service.RegisterExecution(operation, handler)
-    operation = tostring(operation or "")
-    if operation == "" or type(handler) ~= "function" then return false end
-    Service.ExecutionHandlers[operation] = handler
-    return true
-end
-
-function Service.RegisterAbstractExecution(operation, handler)
-    operation = tostring(operation or "")
-    if operation == "" or type(handler) ~= "function" then return false end
-    Service.AbstractExecutionHandlers[operation] = handler
-    return true
-end
-
-function Service.RegisterReconciler(id, handler)
-    id = tostring(id or "")
-    if id == "" or type(handler) ~= "function" then return false end
-    Service.ReconcileHandlers[id] = handler
-    return true
-end
-
-
 Internal.emit = emit
 Internal.now = now
 Internal.terminal = terminal
@@ -330,5 +275,7 @@ Internal.belongsToOrder = belongsToOrder
 Internal.markAssignmentDirty = markAssignmentDirty
 Internal.workerAvailable = workerAvailable
 Internal.findWorker = findWorker
+
+require "PNC/Production/WorkService/PNC_WorkService_OperationRegistry"
 
 return Service

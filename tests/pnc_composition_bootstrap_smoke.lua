@@ -2,11 +2,29 @@ local T = require "tests/support/test"
 
 local ROOT = T.path("ProjectHoomans", "root", "")
 
+local SHARED_SEGMENTS = {
+    ["PNC/Composition/PNC_SharedComposition_Foundation"] =
+        "shared/PNC/Composition/PNC_SharedComposition_Foundation.lua",
+    ["PNC/Composition/PNC_SharedComposition_IdentitySocial"] =
+        "shared/PNC/Composition/PNC_SharedComposition_IdentitySocial.lua",
+    ["PNC/Composition/PNC_SharedComposition_InventoryWorld"] =
+        "shared/PNC/Composition/PNC_SharedComposition_InventoryWorld.lua",
+    ["PNC/Composition/PNC_SharedComposition_CombatRuntime"] =
+        "shared/PNC/Composition/PNC_SharedComposition_CombatRuntime.lua",
+    ["PNC/Composition/PNC_SharedComposition_Final"] =
+        "shared/PNC/Composition/PNC_SharedComposition_Final.lua",
+}
+
 local function capture(path, setup)
     local calls = {}
     local originalRequire = require
     require = function(name)
-        calls[#calls + 1] = name
+        local segment = SHARED_SEGMENTS[name]
+        if segment then
+            T.load(ROOT .. segment)
+        else
+            calls[#calls + 1] = name
+        end
         return true
     end
     if setup then setup(calls) end
@@ -26,6 +44,8 @@ local anchorCases = {
     {
         path = ROOT .. "shared/PNC/00_PNC_Init.lua",
         composition = "PNC/Composition/PNC_SharedComposition",
+        compositionIndex = 2,
+        expectedCalls = 2,
     },
     {
         path = ROOT .. "server/PNC/00_PNC_Server_Init.lua",
@@ -48,8 +68,9 @@ local anchorCases = {
 
 for _, case in ipairs(anchorCases) do
     local calls = capture(case.path)
-    T.equal(#calls, 1, case.path .. " must remain thin")
-    T.equal(calls[1], case.composition,
+    T.equal(#calls, case.expectedCalls or 1,
+        case.path .. " must remain thin")
+    T.equal(calls[case.compositionIndex or 1], case.composition,
         case.path .. " composition delegation")
 end
 
@@ -67,6 +88,16 @@ T.equal(sharedCalls[travelIndex - 1], "PNC/Core/Pathing/PNC_PathService",
 T.equal(sharedCalls[travelIndex + 1],
     "PNC/Core/MapCommands/PNC_MapCommandService",
     "shared Travel initialization successor")
+local sharedWorkDefinitionsIndex = indexOf(
+    sharedCalls,
+    "PNC/Core/Production/WorkDefinition/PNC_WorkDefinitions"
+)
+local sharedFacilityDefinitionsIndex = indexOf(
+    sharedCalls,
+    "PNC/Core/Settlement/PNC_FacilityDefinitions"
+)
+T.truthy(sharedWorkDefinitionsIndex < sharedFacilityDefinitionsIndex,
+    "shared facility definitions load after work definitions")
 
 PNC = {}
 local serverCalls = capture(
@@ -103,6 +134,13 @@ local nearbyWaterIndex = indexOf(serverCalls,
 local campResourceIndex = indexOf(serverCalls,
     "PNC/World/PNC_CampResourceService")
 local taskingIndex = indexOf(serverCalls, "PNC/Tasking/PNC_Tasking")
+local workFatigueGateIndex = indexOf(
+    serverCalls,
+    "PNC/Core/Needs/PNC_WorkFatigueGate"
+)
+local productionIndex = indexOf(serverCalls, "PNC/Production/PNC_Production")
+T.truthy(workFatigueGateIndex < productionIndex,
+    "server production loads after the shared fatigue gate")
 T.equal(serverCalls[facilityJobsIndex + 1],
     "PNC/Settlement/FacilityJobs/PNC_RoamingSeatService",
     "roaming seat service loads after facility jobs")
@@ -125,10 +163,13 @@ T.equal(serverCalls[directorIndex + 1],
 T.equal(serverCalls[directorIndex + 2],
     "PNC/Needs/PNC_NeedsScheduler",
     "server settlement visit service initializes before need scheduling")
-T.equal(serverCalls[#serverCalls - 1], "<install-server-profiler>",
+T.equal(serverCalls[#serverCalls - 2], "<install-server-profiler>",
     "server profiler installation timing")
-T.equal(serverCalls[#serverCalls], "PNC/Server/PNC_Server",
+T.equal(serverCalls[#serverCalls - 1], "PNC/Server/PNC_Server",
     "server runtime starts after dependencies")
+T.equal(serverCalls[#serverCalls],
+    "PNC/Compatibility/Mods/ProjectALife/PNC_ProjectALife_EventObservers",
+    "server observers load after runtime")
 local conversationServerIndex = indexOf(
     serverCalls,
     "PNC/Conversation/PNC_ConversationServer"
@@ -139,6 +180,22 @@ T.equal(serverCalls[conversationServerIndex - 1],
 T.equal(serverCalls[conversationServerIndex + 1],
     "PNC/Compatibility/Mods/Necroa/PNC_Necroa_ExposureServer",
     "server Conversation initialization successor")
+local conversationMemoryIndex = indexOf(
+    serverCalls,
+    "PNC/Conversation/Memory/PNC_ConversationMemory"
+)
+local persistenceResetIndex = indexOf(
+    serverCalls,
+    "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset"
+)
+local relationshipServiceIndex = indexOf(
+    serverCalls,
+    "PNC/Social/PNC_RelationshipService"
+)
+T.truthy(persistenceResetIndex < conversationMemoryIndex,
+    "server Persistence Reset loads before Conversation Memory")
+T.truthy(conversationMemoryIndex < relationshipServiceIndex,
+    "server Conversation Memory loads before relationship mutation")
 
 local eventMarkers = {}
 PNC = {}
@@ -156,6 +213,26 @@ local clientMonitorIndex = indexOf(clientCalls, "PNC/UI/PNC_NPCMonitor")
 T.equal(clientCalls[clientMonitorIndex + 1],
     "PNC/UI/UniqueNPC/PNC_UniqueNPCDebugWindow",
     "unique NPC debug window loads after NPC monitor tracking")
+local targetResolverIndex = indexOf(
+    clientCalls,
+    "PNC/Commands/PNC_CompanionTargetResolver"
+)
+local projectALifeClientIndex = indexOf(
+    clientCalls,
+    "PNC/Compatibility/Mods/ProjectALife/PNC_ProjectALife_EventClient"
+)
+T.truthy(targetResolverIndex < projectALifeClientIndex,
+    "client composition loads target resolution before Project A-Life events")
+local colonyManagementClientIndex = indexOf(
+    clientCalls,
+    "PNC/Networking/PNC_ColonyManagementClient"
+)
+local inventoryWindowIndex = indexOf(
+    clientCalls,
+    "PNC/UI/Inventory/PNC_InventoryWindow"
+)
+T.truthy(colonyManagementClientIndex < inventoryWindowIndex,
+    "client composition loads colony state before UI windows")
 
 PNC = { Conversation = {} }
 local conversationSharedCalls = capture(
@@ -169,6 +246,7 @@ local expectedConversationShared = {
     "PNC/Conversation/Blocks/PNC_ConversationSelector",
     "PNC/Conversation/PNC_ConversationScene",
     "PNC/Conversation/PNC_ConversationLLMTools",
+    "PNC/Conversation/Memory/PNC_ConversationMemory",
     "PNC/Conversation/Definitions/00_PNC_ConversationDefinitions",
 }
 for index = 1, #expectedConversationShared do
@@ -224,8 +302,8 @@ local semanticInputIndex = indexOf(
     conversationRuntimeCalls,
     "PNC/PNC_ConversationSemantics"
 )
-T.truthy(semanticInputIndex,
-    "conversation runtime loads the semantic conversation adapter")
+T.falsy(semanticInputIndex,
+    "conversation runtime leaves semantic adapter wiring to composition")
 for _, dependency in ipairs(conversationRuntimeCalls) do
     T.falsy(string.sub(dependency, 1, 7) == "PNC/UI/",
         "Conversation runtime does not load PNC UI modules")
@@ -247,7 +325,13 @@ local expectedConversationComposition = {
     "PNC/UI/Factions/PNC_FactionPresentation",
     "PNC/UI/Relationships/PNC_RelationshipGraphPanel",
     "PNC/UI/Context/PNC_ContextHub",
+    "PNC/Knowledge/PNC_NPCIdentityPresentation",
+    "PNC/Semantics/PNC_SemanticGiftLifecycle",
+    "PNC/Semantics/PNC_SemanticGiftContext",
+    "PNC/Compatibility/Mods/Bandits/PNC_Bandits_HoomansFlavorDefinitions",
+    "PNC/Compatibility/Mods/Necroa/PNC_Necroa_HoomansFlavorDefinitions",
     "PNC/Conversation/Composition/PNC_ConversationClientComposition",
+    "PNC/PNC_ConversationSemantics",
     "PNC/UI/Context/Providers/PNC_ContextProvider_Conversation",
     "PNC/Integrations/PBrainZ/PNC_PBrainZ",
     "PNC/Integrations/PBrainZ/PNC_PBrainZ_Bridge",

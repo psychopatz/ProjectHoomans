@@ -1,5 +1,3 @@
-require "PNC/00_PNC_Init"
-
 PNC = PNC or {}
 
 -- Project Hoomans-specific mapping for the generic PsychopatzCore tooltip.

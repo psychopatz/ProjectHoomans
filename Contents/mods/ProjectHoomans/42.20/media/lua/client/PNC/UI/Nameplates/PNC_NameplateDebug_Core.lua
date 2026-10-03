@@ -1,0 +1,231 @@
+local Debug = PNC.NameplateDebug
+local Const = PNC.Const
+
+local SYNTH_FRAMES = {
+    Walk = 24,
+    Run = 20,
+    SneakWalk = 24,
+    Crawl = 20,
+    Idle = 16,
+}
+
+local SYNTH_CYCLE_MS = {
+    Walk = 900,
+    Run = 720,
+    SneakWalk = 1100,
+    Crawl = 1300,
+    Idle = 1500,
+}
+
+local ANIMATION_FRAME_RATE = 30
+local DEBUG_TRACK_LAYER_COUNT = 4
+local DEBUG_TRACKS_PER_LAYER = 4
+
+local function syntheticAnimFrame(zombie, animName, moving, animSpeed)
+    if not zombie then return nil, nil, nil end
+    animName = tostring(animName or "Idle")
+    local frameCount = SYNTH_FRAMES[animName]
+    local cycleMs = SYNTH_CYCLE_MS[animName]
+    if not frameCount or not cycleMs then return nil, nil, nil end
+
+    local modData = zombie.getModData and zombie:getModData() or nil
+    local now = PNC.Core and PNC.Core.Now and PNC.Core.Now() or 0
+    local key = table.concat({
+        animName,
+        tostring(moving == true),
+        string.format("%.3f", tonumber(animSpeed) or 0),
+    }, "|")
+    local elapsed = 0
+    if modData then
+        if modData.PNC_DebugAnimCycleKey ~= key then
+            modData.PNC_DebugAnimCycleKey = key
+            modData.PNC_DebugAnimCycleStartAt = now
+        end
+        now = tonumber(now) or 0
+        elapsed = math.max(0, now - (tonumber(modData.PNC_DebugAnimCycleStartAt) or now))
+    end
+    local phase = frameCount <= 1 and 0
+        or ((elapsed * math.max(0.05, tonumber(animSpeed) or 0)) % cycleMs) / cycleMs
+    local frame = math.max(0, math.min(frameCount - 1, math.floor((phase * frameCount) + 0.0001)))
+    return frame, frameCount, phase
+end
+
+local function settingEnabled(settings, key)
+    return not settings or settings[key] ~= false
+end
+
+local function nameplateDebugEnabled(settings)
+    return settings and (
+        settings.showNameplateDebug == true
+            or settings.showAIDebug == true
+    ) or false
+end
+
+local function translatedText(key, fallback)
+    local value = getText and PNC.Translation.GetKey(key) or nil
+    if value and tostring(value) ~= tostring(key) then
+        return tostring(value)
+    end
+    return fallback
+end
+
+local BEHAVIOR_LABEL = translatedText(
+    "UI_PNC_NameplateDebug_Behavior",
+    "Behavior"
+)
+
+function Debug.CampResourceText(snapshot, settings)
+    local camp
+    local activity
+    local task
+    local phase
+    if not settings or settings.showCampDebug ~= true then return "" end
+    camp = snapshot and snapshot.campResourceDebug
+        or snapshot and snapshot.debugState
+        and snapshot.debugState.campResourceDebug or nil
+    if not camp then return "Camp: none" end
+    activity = camp.activity
+    task = activity and tostring(activity.capability or "facility") or "idle"
+    phase = activity and tostring(activity.phase or "working") or "idle"
+    return "Camp: " .. tostring(camp.mode or "camp")
+        .. " | Task: " .. string.upper(task)
+        .. " | Phase: " .. string.upper(phase)
+end
+
+function Debug.SeatingText(snapshot, settings)
+    if not settings
+        or (not nameplateDebugEnabled(settings)
+            and settings.showCampDebug ~= true)
+    then return "" end
+    local seating = snapshot and snapshot.seatingDebug
+        or snapshot and snapshot.debugState
+        and snapshot.debugState.seatingDebug or nil
+    if not seating then return "" end
+    local active = seating.active == true and "ACTIVE" or "IDLE"
+    return "Seats: " .. tostring(seating.mode or "none")
+        .. " " .. active
+        .. " | Phase: " .. string.upper(tostring(seating.phase or "idle"))
+        .. " | Seat: " .. string.upper(tostring(seating.seatState or "idle"))
+end
+
+local function infectionState(snapshot)
+    local infection = snapshot and snapshot.bodyHealth
+        and snapshot.bodyHealth.infection or nil
+    local infected = infection
+        and (infection.active == true
+            or infection.fatal == true
+            or infection.pendingFatal == true)
+        or false
+    return infected, infection
+end
+
+function Debug.BuildText(snapshot, hasBoundBody, settings)
+    local debugState = snapshot and snapshot.debugState or nil
+    local combatDebug = snapshot and snapshot.combatDebugState or nil
+    local firearmState = snapshot and snapshot.firearmState or nil
+    local activeBehavior = debugState and debugState.activeBehavior
+        or snapshot and snapshot.activeBehavior or nil
+    local parts = {}
+    local campText = Debug.CampResourceText(snapshot, settings)
+    local seatingText = Debug.SeatingText(snapshot, settings)
+    local aiDebugVisible = not settings
+        or nameplateDebugEnabled(settings)
+        or settings.showCampDebug == nil
+    if not debugState then
+        local aiText = aiDebugVisible
+            and settingEnabled(settings, "debugShowAI")
+            and "AI: Unknown" or ""
+        local behaviorText = aiDebugVisible
+            and settingEnabled(settings, "debugShowAI")
+            and activeBehavior and tostring(activeBehavior) ~= ""
+            and BEHAVIOR_LABEL .. ": " .. tostring(activeBehavior) or ""
+        local unknown = aiText
+        if behaviorText ~= "" then unknown = unknown ~= ""
+            and (unknown .. " | " .. behaviorText) or behaviorText end
+        if campText ~= "" then unknown = unknown ~= ""
+            and (unknown .. " | " .. campText) or campText end
+        if seatingText ~= "" then unknown = unknown ~= ""
+            and (unknown .. " | " .. seatingText) or seatingText end
+        return unknown
+    end
+    local presence = string.upper(tostring(snapshot.presenceState or "unknown"))
+    if snapshot.presenceState == Const.PRESENCE_LIVE then
+        presence = presence .. "/" .. (hasBoundBody and "BOUND" or "MISSING")
+    end
+    if aiDebugVisible and settingEnabled(settings, "debugShowPresence") then
+        parts[#parts + 1] = "Presence: " .. presence
+    end
+    if aiDebugVisible and settingEnabled(settings, "debugShowAI") then
+        parts[#parts + 1] =
+            "AI: " .. tostring(debugState.aiState or snapshot.aiState or "Unknown")
+        if activeBehavior and tostring(activeBehavior) ~= "" then
+            parts[#parts + 1] =
+                BEHAVIOR_LABEL .. ": " .. tostring(activeBehavior)
+        end
+    end
+    if aiDebugVisible and settingEnabled(settings, "debugShowJob") then
+        parts[#parts + 1] = "Job: " .. tostring(debugState.activeJob or "-")
+    end
+    if aiDebugVisible and settingEnabled(settings, "debugShowOrder") then
+        parts[#parts + 1] = "Order: " .. tostring(debugState.orderKind or "-")
+    end
+    if aiDebugVisible and settingEnabled(settings, "debugShowTarget") then
+        parts[#parts + 1] =
+            "Target: " .. tostring(debugState.targetKind or "none")
+    end
+    if aiDebugVisible and settingEnabled(settings, "debugShowCombat") then
+        parts[#parts + 1] = "Mode: " .. tostring(
+            debugState.combatModeResolved or debugState.weaponMode or "-"
+        )
+        parts[#parts + 1] =
+            "Weapon: " .. tostring(debugState.weaponStatus or "-")
+        if combatDebug then
+            parts[#parts + 1] = "Intent: "
+                .. tostring(combatDebug.attackType or "auto")
+                .. "/" .. tostring(combatDebug.mode or "-")
+            parts[#parts + 1] = "Tactic: " .. tostring(
+                combatDebug.decision
+                    or combatDebug.retreatReason
+                    or combatDebug.blockReason
+                    or "observing"
+            )
+            parts[#parts + 1] = "ViewZ: "
+                .. tostring(
+                    tonumber(combatDebug.visibleZombieCount) or 0
+                )
+                .. "/" .. tostring(
+                    tonumber(combatDebug.nearbyZombieCount) or 0
+                )
+        end
+    end
+    if aiDebugVisible and settingEnabled(settings, "debugShowMagazine")
+        and firearmState
+    then
+        parts[#parts + 1] = "Mag: "
+            .. tostring(firearmState.count or 0)
+            .. "/"
+            .. tostring(firearmState.capacity or 0)
+            .. (firearmState.reloadActive == true and " (reloading)" or "")
+        parts[#parts + 1] = "Reserve: " .. (
+            firearmState.unlimitedReserve == true
+                and "infinite"
+                or tostring(firearmState.reserveCount or 0)
+        )
+    end
+    if aiDebugVisible and settingEnabled(settings, "debugShowStamina") then
+        parts[#parts + 1] = "Stamina: " .. tostring(
+            debugState.staminaState or snapshot.staminaState or "-"
+        )
+    end
+    if aiDebugVisible and settingEnabled(settings, "debugShowBlock") then
+        parts[#parts + 1] =
+            "Block: " .. tostring(debugState.combatBlockReason or "-")
+    end
+    if campText ~= "" then parts[#parts + 1] = campText end
+    if seatingText ~= "" then parts[#parts + 1] = seatingText end
+    return table.concat(parts, " | ")
+end
+
+Debug._SyntheticAnimFrame = syntheticAnimFrame
+Debug._SettingEnabled = settingEnabled
+Debug._InfectionState = infectionState

@@ -8,6 +8,8 @@ local providers = {
     "PNC_SocialEventService_Validation",
     "PNC_SocialEventService_Observers",
     "PNC_SocialEventService_Process",
+    "PNC_SocialEventService_Process_Bridges",
+    "PNC_SocialEventService_Process_Transaction",
     "PNC_SocialEventService_Emit",
 }
 

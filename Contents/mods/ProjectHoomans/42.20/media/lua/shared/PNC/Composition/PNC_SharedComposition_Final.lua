@@ -1,0 +1,21 @@
+-- Ordered shared composition segment: Final.
+require "PNC/Semantics/PNC_SemanticIdentityExchange"
+require "PNC/Semantics/PNC_SemanticIdentityNetwork"
+require "PNC/Core/Commands/PNC_CompanionCommandRelayGate"
+require "PNC/Core/Commands/PNC_CompanionCommandRegistry"
+require "PNC/Core/Commands/PNC_CompanionCommandDefinitions"
+require "PNC/Core/Commands/PNC_CompanionCommandFlavor"
+require "PNC/Core/Commands/PNC_CompanionCommandFlavorDefinitions"
+require "PNC/Core/Commands/PNC_VanillaEmoteInteractions"
+require "PNC/Core/Health/PNC_Treatment"
+require "PNC/Core/Health/PNC_Revive"
+require "PNC/Core/API/PNC_API"
+-- Stable generated catalog entry point. The desktop manager updates this
+-- self-contained catalog; the composition root has one fixed import path.
+require "PNC/Generated/UniqueNPC/PNC_UniqueNPCDefinitions"
+require "PNC/Core/Health/PNC_PlayerDamage"
+require "PNC/Core/PuppetOpera/PNC_PuppetOpera_Blueprints"
+require "PNC/Core/PuppetOpera/PNC_PuppetOpera_Anchors"
+require "PNC/Core/PuppetOpera/PNC_PuppetOpera_Trace"
+require "PNC/Core/PuppetOpera/PNC_PuppetOpera"
+require "PNC/Integrations/PNC_PsychopatzProfiler"

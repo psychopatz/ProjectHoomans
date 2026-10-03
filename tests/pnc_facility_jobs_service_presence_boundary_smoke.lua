@@ -7,8 +7,13 @@ local prefix =
 local providers = {
     "PNC_FacilityJobs_Service_Core",
     "PNC_FacilityJobs_Service_ManualTargets",
+    "PNC_FacilityJobs_Service_ManualWater",
+    "PNC_FacilityJobs_Service_ManualSleep",
+    "PNC_FacilityJobs_Service_ManualStart",
     "PNC_FacilityJobs_Service_Toggle",
     "PNC_FacilityJobs_Service_Resolution",
+    "PNC_FacilityJobs_Service_Start_Targeting",
+    "PNC_FacilityJobs_Service_StartState",
     "PNC_FacilityJobs_Service_Start",
 }
 
@@ -42,6 +47,22 @@ end
 T.equal(publicCount, 4, "facility-jobs public function count")
 T.equal(type(PNC.FacilityJobsServiceInternal.BaseForRecord), "function",
     "forward base resolver remains available to manual targets")
+
+local startStateSource = T.read(
+    "ProjectHoomans", "server", prefix
+        .. "PNC_FacilityJobs_Service_StartState.lua")
+local startStateProviders = {
+    "PNC_FacilityJobs_Service_StartState_Activity",
+    "PNC_FacilityJobs_Service_StartState_Order",
+}
+previous = 0
+for i = 1, #startStateProviders do
+    local provider = startStateProviders[i]
+    local needle = 'require "' .. prefix .. provider .. '"'
+    local position = assert(startStateSource:find(needle, 1, true), needle)
+    T.truthy(position > previous, provider .. " start-state load order")
+    previous = position
+end
 
 for i = 1, #providers do
     package.loaded[prefix .. providers[i]] = nil

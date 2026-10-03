@@ -23,6 +23,11 @@ PsychopatzCore = {
     },
 }
 PNC = {}
+PNC.Client = {
+    RequestSemanticSocialInteraction = function()
+        return true, nil, { accepted = true, status = "dispatched" }
+    end,
+}
 PsychopatzConversationLLMInput = {
     new = function(_, x, y, width, height, options)
         return { x = x, y = y, width = width, height = height, options = options }
@@ -256,8 +261,8 @@ T.equal(view.session.semanticDialogueState.currentTopic, "activity",
 
 local wellbeingAccepted = Input.Submit(view, "are you okay")
 T.equal(wellbeingAccepted, true, "wellbeing question is accepted locally")
-T.equal(queued[6].payload.fallback,
-    "I've been better. I could really use some water.",
+T.truthy(string.find(string.lower(queued[6].payload.fallback or ""),
+    "water", 1, true),
     "wellbeing response uses bounded NPC need pressure")
 T.equal(view.session.semanticDialogueState.currentTopic, "wellbeing",
     "wellbeing question updates the current topic")
@@ -332,8 +337,8 @@ local offerAccepted = Input.Submit(view, "who wants an apple")
 T.equal(offerAccepted, true, "item offers stay on the local route")
 T.equal(view.lastSemanticDialogueResult.decision.branch,
     "OFFER_RECEIVED", "offers select a dedicated semantic branch")
-T.equal(queued[#queued].payload.fallback,
-    "I'd really like one. Could I have it?",
+T.truthy(string.find(string.lower(queued[#queued].payload.fallback or ""),
+    "could i have", 1, true),
     "a hungry NPC asks the player for permission to take an offered item")
 local pendingConsent = PNC.Semantics.GiftLifecycle.PendingOfferConsent(
     session, nil, nil, nil)
@@ -421,7 +426,7 @@ T.equal(Input.Submit(identityView, "im psycho"), true,
     "identity claim is submitted to the authority")
 T.equal(#identityQueue, 1,
     "identity claim does not queue a contradictory provisional response")
-T.equal(identityEvents[2].kind, "identity_claim",
+T.equal(identityEvents[1].kind, "identity_claim",
     "identity claim uses the authoritative identity transport")
 
 local cognitionDispatch

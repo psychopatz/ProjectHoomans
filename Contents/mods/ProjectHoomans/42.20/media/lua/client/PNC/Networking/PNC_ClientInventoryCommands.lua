@@ -49,7 +49,7 @@ local function receiveRelationshipAfter(npcID, after, delta, source, eventID)
         source = source or "inventory",
         eventID = eventID or after.eventID,
         revision = after.revision,
-    })
+})
 end
 
 local function removeFromContainer(inventory, itemID)
@@ -104,163 +104,17 @@ local function rebuildCachedEquipment(cached, authoritativeEquipment)
     end
 end
 
-local function applyInventoryDelta(args)
-    local npcID = args and args.npcId and tostring(args.npcId) or nil
-    local cached = npcID and ClientState.characterPayloads
-        and ClientState.characterPayloads[npcID] or nil
-    local inventory = cached and cached.inventory or nil
-    local currentRevision
-    local incomingRevision
-    local fromRevision
-    local i
-    local op
-    local item
-    local container
-    if not inventory or type(inventory.items) ~= "table" or type(args.ops) ~= "table" then
-        requestInventoryResync(npcID, "payload_missing")
-        return false
-    end
-    currentRevision = tonumber(inventory.revision)
-        or tonumber(inventory.summary and inventory.summary.revision) or 0
-    incomingRevision = tonumber(args.inventoryRevision)
-    fromRevision = tonumber(args.fromRevision)
-    if args.fullRequired == true or incomingRevision == nil
-        or incomingRevision < currentRevision
-    then
-        requestInventoryResync(npcID, "revision_invalid")
-        return false
-    end
-    if incomingRevision == currentRevision then
-        return #args.ops == 0
-    end
-    if fromRevision ~= nil and fromRevision ~= currentRevision then
-        requestInventoryResync(npcID, "revision_gap")
-        return false
-    end
-    inventory = Core.DeepCopy(inventory)
-    inventory.containers = inventory.containers or {}
-    for i = 1, #args.ops do
-        op = args.ops[i]
-        if op.op == "add" and type(op.item) == "table" and op.item.id then
-            item = Core.DeepCopy(op.item)
-            if inventory.items[item.id] then
-                requestInventoryResync(npcID, "duplicate_item")
-                return false
-            end
-            inventory.items[item.id] = item
-            container = inventory.containers[item.container or op.container or "root"]
-            if container then
-                container.items[#container.items + 1] = item.id
-            end
-        elseif op.op == "remove" and op.itemID then
-            if not inventory.items[op.itemID] then
-                requestInventoryResync(npcID, "missing_item")
-                return false
-            end
-            removeFromContainer(inventory, op.itemID)
-            inventory.items[op.itemID] = nil
-        elseif op.op == "move" and op.itemID and inventory.items[op.itemID] then
-            removeFromContainer(inventory, op.itemID)
-            inventory.items[op.itemID].container = op.to
-            container = inventory.containers[op.to]
-            if container then
-                container.items[#container.items + 1] = op.itemID
-            end
-        elseif op.op == "update" and op.itemID and inventory.items[op.itemID] then
-            item = inventory.items[op.itemID]
-            if op.stack ~= nil then item.stack = op.stack end
-            if op.uses ~= nil then item.uses = op.uses end
-            if op.cond ~= nil then item.cond = op.cond end
-            if op.itemState ~= nil then
-                item.itemState = Core.DeepCopy(op.itemState)
-            end
-            if op.ammoCount ~= nil then item.ammoCount = op.ammoCount end
-            if op.fav ~= nil then item.fav = op.fav == true end
-            if op.interactionLocked ~= nil then
-                item.interactionLocked = op.interactionLocked == true
-                item.interactionLockReason = item.interactionLocked
-                    and op.interactionLockReason or nil
-            end
-        elseif op.op == "replace" and op.itemID
-            and inventory.items[op.itemID] and op.type
-        then
-            item = inventory.items[op.itemID]
-            item.type = op.type
-            if op.itemState ~= nil then
-                item.itemState = Core.DeepCopy(op.itemState)
-            end
-        elseif op.op == "replace" then
-            requestInventoryResync(npcID, "unsupported_delta")
-            return false
-        elseif op.op == "move" or op.op == "update" then
-            requestInventoryResync(npcID, "missing_delta_item")
-            return false
-        elseif op.op == "equip" and op.slot then
-            inventory.equipped = inventory.equipped or {}
-            if op.oldSlot and inventory.equipped[op.oldSlot] == op.itemID then
-                inventory.equipped[op.oldSlot] = nil
-            end
-            if op.previousItemID and inventory.items[op.previousItemID] then
-                inventory.items[op.previousItemID].equipSlot = nil
-            end
-            inventory.equipped[op.slot] = op.itemID
-            if op.itemID and inventory.items[op.itemID] then
-                inventory.items[op.itemID].equipSlot = op.slot
-            end
-        elseif op.op == "wear" and op.slot then
-            inventory.worn = inventory.worn or {}
-            if op.oldSlot and inventory.worn[op.oldSlot] == op.itemID then
-                inventory.worn[op.oldSlot] = nil
-            end
-            if op.previousItemID and inventory.items[op.previousItemID] then
-                inventory.items[op.previousItemID].wornSlot = nil
-            end
-            inventory.worn[op.slot] = op.itemID
-            if op.itemID and inventory.items[op.itemID] then
-                inventory.items[op.itemID].wornSlot = op.slot
-            end
-        end
-    end
-    inventory.summary = Core.DeepCopy(args.summary or inventory.summary or {})
-    inventory.summary.revision = tonumber(args.inventoryRevision) or inventory.summary.revision
-    inventory.revision = inventory.summary.revision
-    cached.inventory = inventory
-    if ClientState.inventoryResyncPending then
-        ClientState.inventoryResyncPending[npcID] = nil
-    end
-    rebuildCachedEquipment(cached, args.equipment)
-    if Diagnostics and Diagnostics.InventoryAuditEnabled == true
-        and Diagnostics.LogInventoryAudit
-    then
-        local fields = {
-            "npc=" .. tostring(npcID or ""),
-            "fromRevision=" .. tostring(fromRevision or ""),
-            "inventoryRevision=" .. tostring(incomingRevision or ""),
-            "opCount=" .. tostring(#args.ops),
-        }
-        for index = 1, #args.ops do
-            op = args.ops[index]
-            fields[#fields + 1] = "op" .. tostring(index) .. "="
-                .. tostring(op and op.op or "unknown")
-                .. ":item=" .. tostring(op and op.itemID
-                    or op and op.item and op.item.id or "")
-            if op and op.itemState then
-                fields[#fields + 1] = "op" .. tostring(index)
-                    .. "Fluid=" .. tostring(op.itemState.fluidAmount or "")
-                    .. "/" .. tostring(op.itemState.fluidCapacity or "")
-                    .. "/" .. tostring(op.itemState.fluidPrimaryType or "")
-            end
-        end
-        Diagnostics.LogInventoryAudit("client_delta_applied", fields)
-    end
-    if PNC.InventoryWindow
-        and PNC.InventoryWindow.OnInventoryPayloadApplied
-    then
-        PNC.InventoryWindow.OnInventoryPayloadApplied(
-            npcID, incomingRevision, "inventory_delta")
-    end
-    return true
-end
+Internal.InventoryDelta = {
+    ClientState = ClientState,
+    Core = Core,
+    Diagnostics = Diagnostics,
+    requestInventoryResync = requestInventoryResync,
+    removeFromContainer = removeFromContainer,
+    rebuildCachedEquipment = rebuildCachedEquipment,
+}
+
+require "PNC/Networking/PNC_ClientInventoryCommands_DeltaOperations"
+require "PNC/Networking/PNC_ClientInventoryCommands_Delta"
 
 local function applyCharacterInventoryPayload(args, source)
     local npcID = args and args.npcId and tostring(args.npcId) or nil
@@ -438,7 +292,7 @@ Internal.RegisterServerCommand(Const.CMD_CHARACTER_INVENTORY_PAYLOAD,
 
 Internal.RegisterServerCommand(Const.CMD_INVENTORY_DELTA, function(args)
     if args.npcId then
-        applyInventoryDelta(args)
+        Internal.ApplyInventoryDelta(args)
     end
 end)
 

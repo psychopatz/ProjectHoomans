@@ -64,10 +64,9 @@ function Adapter.captureLoose(record, body)
     local capturedSpecs = {}
     local excluded = collectPresentationItems(body)
     local physical = CoreInventory.wrapPhysicalInventory(container)
-    local iterator = physical:iterate()
-    while true do
-        local nativeItem = iterator()
-        if not nativeItem then break end
+    local nativeItems = physical:query(nil)
+    for index = 1, #nativeItems do
+        local nativeItem = nativeItems[index]
         if not excluded[nativeItem] then
             local encoded, reason = CoreInventory.encodeItem(nativeItem, 1)
             if not encoded then return false, reason end

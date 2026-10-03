@@ -108,9 +108,10 @@ local function conversationTopicMask(view)
     return mask > 0 and mask or nil
 end
 
-local function clearWorkingContext(view, spec)
+local function clearWorkingContext(view, spec, preserveSafetyFeedback)
     local session = view and view.session or nil
     local historyPart = view and view.historyPart or nil
+    local preservedMessages = {}
     local namespace = session and session.namespace
         or spec and spec.namespace or "ProjectHoomans"
     local npcID = session and session.npcID
@@ -146,15 +147,27 @@ local function clearWorkingContext(view, spec)
     if historyPart then
         local messagesCleared = false
         local typingCleared = false
+        if preserveSafetyFeedback == true
+            and type(historyPart.messages) == "table"
+        then
+            for _, message in ipairs(historyPart.messages) do
+                local source = message and message.source
+                if type(source) == "table"
+                    and source.eventType == "conversation_safety"
+                then
+                    preservedMessages[#preservedMessages + 1] = message
+                end
+            end
+        end
         if type(historyPart.setMessages) == "function" then
             messagesCleared = pcall(
                 historyPart.setMessages,
                 historyPart,
-                {}
+                preservedMessages
             )
         end
         if not messagesCleared then
-            historyPart.messages = {}
+            historyPart.messages = preservedMessages
         end
         if type(historyPart.setTyping) == "function" then
             typingCleared = pcall(
@@ -265,140 +278,24 @@ local function logAvailability(state, spec, reason)
     }, " "))
 end
 
-function Lifecycle.Create()
-    return {
-        begin = function(view, spec)
-            if requestNameplateFallback(
-                view,
-                spec,
-                "hostile_nameplate_fallback"
-            ) then
-                return false, "nameplate_fallback"
-            end
-            local reason = Safety.Check(spec)
-            if reason then
-                if reason == "npc_unavailable"
-                    and isNameplateConversation(spec)
-                then
-                    logAvailability(nil, spec, reason)
-                end
-                return false, reason
-            end
-            local _, _, _, npcID = Safety.ResolveActors(spec)
-            local state = {
-                npcID = npcID,
-                token = tostring(npcID)
-                    .. ":"
-                    .. tostring(currentTime())
-                    .. ":"
-                    .. tostring(ZombRand and ZombRand(1000000) or 0),
-                lastHeartbeatAt = 0,
-                nextSafetyCheckAt = 0,
-                cachedSafetyReason = nil,
-                allowHostileParley = spec and spec.context
-                    and spec.context.allowHostileParley == true,
-                enforceDistance = not isNameplateConversation(spec),
-                guardThreats = Safety.GuardsThreats(spec),
-                started = false,
-            }
-            local started, startReason = refresh(state, spec)
-            if not isNetworkClient() and started ~= true then
-                return false, startReason or "npc_unavailable"
-            end
-            state.started = true
-            state.lastHeartbeatAt = currentTime()
-            spec.context.conversationLifecycleState = state
-            return state
-        end,
-        update = function(view, spec, state)
-            if not state then return "npc_unavailable" end
-            if requestNameplateFallback(
-                view,
-                spec,
-                "hostile_nameplate_fallback"
-            ) then
-                return "nameplate_fallback"
-            end
-            local time = currentTime()
-            local safetyChecked = false
-            if time >= (tonumber(state.nextSafetyCheckAt) or 0) then
-                state.nextSafetyCheckAt = time + 180
-                state.cachedSafetyReason = Safety.Check(spec)
-                safetyChecked = true
-            end
-            if safetyChecked
-                and state.cachedSafetyReason == "npc_unavailable"
-                and isNameplateConversation(spec)
-            then
-                if not state.unavailableSince then
-                    state.unavailableSince = time
-                end
-                logAvailability(state, spec, state.cachedSafetyReason)
-                if time - state.unavailableSince
-                    < NAMEPLATE_UNAVAILABLE_GRACE_MS
-                then
-                    state.cachedSafetyReason = nil
-                    return nil
-                end
-            elseif safetyChecked and state.unavailableSince then
-                logAvailability(state, spec, "recovered")
-                state.unavailableSince = nil
-                state.lastAvailabilitySignature = nil
-            end
-            if state.cachedSafetyReason then
-                return state.cachedSafetyReason
-            end
-            if time - (tonumber(state.lastHeartbeatAt) or 0) >= 1000 then
-                refresh(state, spec)
-                state.lastHeartbeatAt = time
-            end
-            return nil
-        end,
-        finish = function(view, spec, state, reason)
-            presentSafetyFeedback(spec, state, reason)
-            if Farewell and type(Farewell.Schedule) == "function" then
-                Farewell.Schedule(spec, state, reason)
-            end
-            if PNC.Core and PNC.Core.LogInfo then
-                PNC.Core.LogInfo(table.concat({
-                    "Conversation closed",
-                    "npc=" .. tostring(state and state.npcID
-                        or spec and spec.npcID or "unknown"),
-                    "token=" .. tostring(state and state.token or "none"),
-                    "guardThreats=" .. tostring(not state
-                        or state.guardThreats ~= false),
-                    "reason=" .. tostring(reason or "closed"),
-                }, " "))
-            end
-            local topicMask = conversationTopicMask(view)
-            if state then
-                if isNetworkClient() then
-                    send(Scene.CMD_END, state, reason, {
-                        llmRequestID = state and state.llmRequestID or nil,
-                        memoryTopicMask = topicMask,
-                    })
-                else
-                    local _, zombie, record = Safety.ResolveActors(spec)
-                    if Scene and Scene.End then
-                        Scene.End(
-                            record,
-                            zombie,
-                            state.token,
-                            "conversation_" .. tostring(reason or "closed"),
-                            {
-                                llmRequestID = state and state.llmRequestID or nil,
-                                memoryTopicMask = topicMask,
-                                player = spec and spec.context
-                                    and spec.context.player,
-                            }
-                        )
-                    end
-                end
-            end
-            clearWorkingContext(view, spec)
-        end,
-    }
-end
+
+Lifecycle.Internal = Lifecycle.Internal or {}
+Lifecycle.Internal.CurrentTime = currentTime
+Lifecycle.Internal.IsNetworkClient = isNetworkClient
+Lifecycle.Internal.IsNameplateConversation = isNameplateConversation
+Lifecycle.Internal.RequestNameplateFallback = requestNameplateFallback
+Lifecycle.Internal.Send = send
+Lifecycle.Internal.Refresh = refresh
+Lifecycle.Internal.PresentSafetyFeedback = presentSafetyFeedback
+Lifecycle.Internal.LogAvailability = logAvailability
+Lifecycle.Internal.ConversationTopicMask = conversationTopicMask
+Lifecycle.Internal.ClearWorkingContext = clearWorkingContext
+Lifecycle.Internal.Safety = Safety
+Lifecycle.Internal.Farewell = Farewell
+Lifecycle.Internal.Scene = Scene
+Lifecycle.Internal.NameplateUnavailableGraceMs = NAMEPLATE_UNAVAILABLE_GRACE_MS
+
+require "PNC/Conversation/PNC_ConversationLifecycle_Create"
 
 function Lifecycle.RequestCeasefire(context)
     local state = context and context.conversationLifecycleState or nil

@@ -32,9 +32,17 @@ local function normalizedOfferQuery(value)
 end
 
 local function stageGiftConsent(view, result, decision, group, session, options)
+    local response = decision.response
+    local responseID = type(response) == "table"
+        and tostring(response.id or "") or ""
+    local responseTemplateID = type(response) == "table"
+        and tostring(response.templateID or "") or ""
+    local interestedOffer = responseTemplateID == "semantic.offer.interested"
+        or string.find(responseID, "semantic.offer.dataset.hungry_", 1, true)
+        or string.find(responseTemplateID, "semantic.offer.dataset.hungry_", 1, true)
     if decision.branch ~= "OFFER_RECEIVED"
-        or type(decision.response) ~= "table"
-        or decision.response.templateID ~= "semantic.offer.interested"
+        or type(response) ~= "table"
+        or not interestedOffer
     then
         return false
     end

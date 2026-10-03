@@ -80,7 +80,36 @@ PNC = {
 }
 
 -- Isolate this composer spoke from UI and conversation-definition loading.
-require = function() return true end
+require = function(name)
+    if name
+        == "PNC/Conversation/Blocks/ConversationComposer/PNC_ConversationComposer_Gifts_Receive"
+    then
+        return T.load(
+            "ProjectHoomans",
+            "client",
+            "PNC/Conversation/Blocks/ConversationComposer/PNC_ConversationComposer_Gifts_Receive.lua"
+        )
+    end
+    if name
+        == "PNC/Conversation/Blocks/ConversationComposer/PNC_ConversationComposer_Gifts_Receive_Context"
+    then
+        return T.load(
+            "ProjectHoomans",
+            "client",
+            "PNC/Conversation/Blocks/ConversationComposer/PNC_ConversationComposer_Gifts_Receive_Context.lua"
+        )
+    end
+    if name
+        == "PNC/Conversation/Blocks/ConversationComposer/PNC_ConversationComposer_Gifts_Receive_Presentation"
+    then
+        return T.load(
+            "ProjectHoomans",
+            "client",
+            "PNC/Conversation/Blocks/ConversationComposer/PNC_ConversationComposer_Gifts_Receive_Presentation.lua"
+        )
+    end
+    return true
+end
 local Composer = T.load(
     "ProjectHoomans",
     "client",

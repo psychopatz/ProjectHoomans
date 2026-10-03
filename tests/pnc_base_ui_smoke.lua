@@ -22,18 +22,28 @@ local inventoryListInputSource = T.read("ProjectHoomans", "client",
     "PNC/UI/Inventory/PNC_InventoryUI_List/_Input.lua")
 local facilityModalSource = T.read("ProjectHoomans", "client",
     "PNC/UI/SettlementManagement/PNC_SettlementManagement_FacilityBuildModal.lua")
+local facilityCardSource = T.read("ProjectHoomans", "client",
+    "PNC/UI/SettlementManagement/PNC_SettlementManagement_FacilityBuildCard.lua")
 local hubSource = T.read("ProjectHoomans", "client",
     "PNC/UI/CommandHub/PNC_CommandHub.lua")
 local hubWindowSource = T.read("ProjectHoomans", "client",
     "PNC/UI/CommandHub/PNC_CommandHub_Window.lua")
 local registrySource = T.read("ProjectHoomans", "client",
     "PNC/UI/CommandHub/PNC_CommandHub_Registry.lua")
+local registryActionsSource = T.read("ProjectHoomans", "client",
+    "PNC/UI/CommandHub/PNC_CommandHub_Registry_Actions.lua")
+local registryCategoriesSource = T.read("ProjectHoomans", "client",
+    "PNC/UI/CommandHub/PNC_CommandHub_Registry_Categories.lua")
 local baseTabSource = T.read("ProjectHoomans", "client",
     "PNC/UI/SettlementManagement/PNC_SettlementManagement_Tab.lua")
 local territorySource = T.read("ProjectHoomans", "client",
     "PNC/UI/CommandHub/PNC_CommandHub_BaseTerritoryActions.lua")
 local outcomesSource = T.read("ProjectHoomans", "client",
     "PNC/Conversation/Blocks/ConversationComposer/PNC_ConversationComposer_Outcomes.lua")
+    .. "\n" .. T.read("ProjectHoomans", "client",
+        "PNC/Conversation/Blocks/ConversationComposer/PNC_ConversationComposer_Outcomes_Receive.lua")
+    .. "\n" .. T.read("ProjectHoomans", "client",
+        "PNC/Conversation/Blocks/ConversationComposer/PNC_ConversationComposer_Outcomes_Receive_Presentation.lua")
 local colonyRequestsSource = T.read("ProjectHoomans", "client",
     "PNC/Networking/ClientRequests/PNC_ClientRequests_ColonyActions.lua")
 
@@ -67,7 +77,7 @@ T.contains(inventoryListInputSource, "function ISPNCInventoryList:resolveMouse",
     "Building catalog list does not normalize resized/scrolling input coordinates")
 T.contains(buildingCatalogSource, "buildRecipePreview",
     "Buildings catalog is missing the selected-recipe preview pane")
-T.contains(facilityModalSource, "BuildUI.DrawNativePreview",
+T.contains(facilityCardSource, "BuildUI.DrawNativePreview",
     "Native building preview compositor is not shared with the Buildings tab")
 T.contains(buildingViewSource, "REQUIREMENTS",
     "Building tab does not expose the lower material requirements pane")
@@ -97,11 +107,11 @@ T.contains(hubWindowSource, "function Hub.OpenTerritorySetup",
     "Command Hub does not expose the conversation territory setup opener")
 T.contains(hubWindowSource, "requestColonySnapshot()",
     "Command Hub does not bootstrap its colony snapshot")
-T.contains(registrySource, "UI_PNC_CommandHub_Category_Base",
+T.contains(registryCategoriesSource, "UI_PNC_CommandHub_Category_Base",
     "Command Hub category is not named Base")
-T.contains(registrySource, "enabled = Gates.HasColony",
+T.contains(registryCategoriesSource, "enabled = Gates.HasColony",
     "Base category is still gated behind stockpile completion")
-T.contains(registrySource, "PNC.BaseUI",
+T.contains(registryActionsSource, "PNC.BaseUI",
     "Command Hub does not use the Base widget")
 T.contains(territorySource, "local latest = snapshotFor(window)",
     "Base territory requests still capture stale multiplayer state")
@@ -123,15 +133,19 @@ T.falsy(baseTabSource:find('"build_facility"', 1, true),
     "Base tab still offers the retired BUILD A BUILDING modal")
 local buildingLayoutSource = T.read("ProjectHoomans", "client",
     "PNC/UI/Base/PNC_BaseBuildingLayout.lua")
-T.contains(buildingLayoutSource, "window:layoutPane(",
+local buildingLayoutControlsSource = T.read("ProjectHoomans", "client",
+    "PNC/UI/Base/PNC_BaseBuildingLayout_Controls.lua")
+local buildingLayoutPanesSource = T.read("ProjectHoomans", "client",
+    "PNC/UI/Base/PNC_BaseBuildingLayout_Panes.lua")
+T.contains(buildingLayoutPanesSource, "window:layoutPane(",
     "Facilities lists are not offset below their section headings")
-T.contains(buildingLayoutSource, "minimumCards",
+T.contains(buildingLayoutControlsSource, "minimumCards",
     "Facilities bands are still clamped by independent floors")
-T.contains(buildingLayoutSource, "maxCardWidth",
+T.contains(buildingLayoutPanesSource, "maxCardWidth",
     "A single facility card still stretches across the whole window")
 T.falsy(buildingCardsSource:find("option.skillText", 1, true),
     "Details strip still repeats the card name/status/skill")
-T.contains(facilityModalSource, "setStencilRect",
+T.contains(facilityCardSource, "setStencilRect",
     "Facility card text is not clipped to the card rect")
 -- The placement cursor is window-level state. The Buildings catalog runs its
 -- Apply with active=false on every snapshot refresh while the FACILITIES tab is

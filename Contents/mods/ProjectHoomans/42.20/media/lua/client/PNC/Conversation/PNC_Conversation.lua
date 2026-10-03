@@ -11,14 +11,6 @@ require "PNC/Conversation/Blocks/ConversationComposer/PNC_ConversationComposer"
 require "PNC/Conversation/PNC_ConversationRelationshipPanel"
 require "PNC/Conversation/PNC_ConversationLifecycle"
 require "PNC/Conversation/PNC_ConversationGroup"
-require "PNC/PNC_ConversationSemantics"
-local ConversationSemantics = PNC.ConversationSemantics
-if ConversationSemantics
-    and type(ConversationSemantics.RegisterConversation) == "function"
-then
-    ConversationSemantics.RegisterConversation(
-        PNC.Conversation, PNC.Conversation.Group, PNC.Conversation.Time)
-end
 require "PNC/Conversation/PNC_SocialFlavorPresentation"
 require "PNC/Conversation/PNC_ConversationLiveAnimation"
 

@@ -1,8 +1,13 @@
 local T = require "tests/support/test"
 
-local PLAYER_FILE =
-    T.path("ProjectHoomans", "client", "PNC/Debug/")
-        .. "PNC_AnimationDebugPlayer.lua"
+local PLAYER_ROOT = T.path("ProjectHoomans", "client", "PNC/Debug/")
+local PLAYER_FILE = PLAYER_ROOT .. "PNC_AnimationDebugPlayer.lua"
+local CONDITIONS_FILE =
+    PLAYER_ROOT .. "PNC_AnimationDebugPlayer_Conditions.lua"
+local TRACK_FILE =
+    PLAYER_ROOT .. "PNC_AnimationDebugPlayer_Track.lua"
+local EQUIPMENT_FILE =
+    PLAYER_ROOT .. "PNC_AnimationDebugPlayer_Equipment.lua"
 
 local now = 1000
 local pipelineCalls = {}
@@ -82,6 +87,9 @@ local body = {
         )
         state.variables[name] = value
     end,
+    SetVariable = function(_, name, value)
+        state.variables[name] = value
+    end,
     clearVariable = function(_, name)
         state.variables[name] = nil
     end,
@@ -109,8 +117,19 @@ local body = {
     dbgGetAnimTrackWeight = function() return 1.0 end,
 }
 
-function require() return true end
+local originalRequire = require
+require = function(name)
+    if name == "PNC/Debug/PNC_AnimationDebugPlayer_Conditions" then
+        T.load(CONDITIONS_FILE)
+    elseif name == "PNC/Debug/PNC_AnimationDebugPlayer_Track" then
+        T.load(TRACK_FILE)
+    elseif name == "PNC/Debug/PNC_AnimationDebugPlayer_Equipment" then
+        T.load(EQUIPMENT_FILE)
+    end
+    return true
+end
 T.load(PLAYER_FILE)
+require = originalRequire
 
 local player = PNC.AnimationDebugPlayer
 local xmlEntry = {

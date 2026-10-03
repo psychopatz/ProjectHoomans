@@ -414,6 +414,8 @@ local workWindowSource = T.read("ProjectHoomans", "client",
     "PNC/UI/CommandHub/PNC_CommandHub_WorkWindow.lua")
 local settingsWindowSource = T.read("ProjectHoomans", "client",
     "PNC/UI/CommandHub/PNC_CommandHub_SettingsWindow.lua")
+local settingsActionsSource = T.read("ProjectHoomans", "client",
+    "PNC/UI/CommandHub/PNC_CommandHub_SettingsWindow_Actions.lua")
 local displaySettingsSource = T.read("ProjectHoomans", "client",
     "PNC/UI/Nameplates/PNC_NameplateDisplaySettings.lua")
 T.contains(settingsWindowSource, "GetSurfaceOpacityLift",
@@ -436,9 +438,9 @@ T.falsy(string.find(displaySettingsSource, "PsychopatzCore_CommandHub", 1, true)
     "relationship display settings leaked into the Core command-hub store")
 T.contains(settingsWindowSource, "slider = row.control",
     "settings lift fields do not expose their slider contract")
-T.contains(settingsWindowSource, "ApplyRegisteredToolbarScale",
+T.contains(settingsActionsSource, "ApplyRegisteredToolbarScale",
     "settings does not refresh title-bar controls")
-T.contains(settingsWindowSource, "Theme.GetPresetIDs",
+T.contains(settingsActionsSource, "Theme.GetPresetIDs",
     "settings does not expose theme presets")
 T.contains(workWindowSource, "UI.CreateCheckbox",
     "work window does not create authorization checkboxes")
@@ -619,29 +621,31 @@ T.contains(colonySource, "function Colony.Register",
     "colony command provider has no extension point for future settings")
 local childControllerSource = T.read("ProjectHoomans", "client",
     "PNC/UI/CommandHub/PNC_CommandHub_ChildController.lua")
+local childControllerBranchesSource = T.read("ProjectHoomans", "client",
+    "PNC/UI/CommandHub/PNC_CommandHub_ChildController_Branches.lua")
 T.contains(childControllerSource, "CoreHub.Actions",
     "zone actions are not using the Core action window")
 T.falsy(string.find(childControllerSource, "Hub.ActionsUI", 1, true),
     "child controller still depends on the removed PNC action window")
-T.contains(childControllerSource, 'Controller.Register("events"',
+T.contains(childControllerBranchesSource, 'Controller.Register("events"',
     "colony journal is not managed by the child controller")
-T.contains(childControllerSource, "PNC.ColonyJournalUI",
+T.contains(childControllerBranchesSource, "PNC.ColonyJournalUI",
     "child controller does not manage the colony journal instance")
-T.contains(childControllerSource, 'Controller.Register("colonist"',
+T.contains(childControllerBranchesSource, 'Controller.Register("colonist"',
     "colonist window is not managed by the child controller")
-T.contains(childControllerSource, "PNC.ColonistUI",
+T.contains(childControllerBranchesSource, "PNC.ColonistUI",
     "child controller does not manage the colonist instance")
-T.contains(childControllerSource, 'Controller.Register("storage"',
+T.contains(childControllerBranchesSource, 'Controller.Register("storage"',
     "storage window is not managed by the child controller")
-T.contains(childControllerSource, "PNC.ColonyStorageUI",
+T.contains(childControllerBranchesSource, "PNC.ColonyStorageUI",
     "child controller does not manage the storage instance")
-T.contains(childControllerSource, 'Controller.Register("base"',
+T.contains(childControllerBranchesSource, 'Controller.Register("base"',
     "base window is not managed by the child controller")
-T.contains(childControllerSource, "PNC.BaseUI",
+T.contains(childControllerBranchesSource, "PNC.BaseUI",
     "child controller does not manage the Base instance")
-T.contains(childControllerSource, 'Controller.Register("colony"',
+T.contains(childControllerBranchesSource, 'Controller.Register("colony"',
     "colony branch is not managed by the child controller")
-T.contains(childControllerSource, "PNC.ProvisionSettingsUI",
+T.contains(childControllerBranchesSource, "PNC.ProvisionSettingsUI",
     "colony branch does not manage provision settings")
 local zoneSource = T.read("ProjectHoomans", "client",
     "PNC/UI/CommandHub/PNC_CommandHub_ZoneWindow.lua")
@@ -665,13 +669,17 @@ T.contains(buildingTabSource, "CanUseDebug",
     "building surface dropped its debug availability gate")
 local registrySource = T.read("ProjectHoomans", "client",
     "PNC/UI/CommandHub/PNC_CommandHub_Registry.lua")
+local registryActionsSource = T.read("ProjectHoomans", "client",
+    "PNC/UI/CommandHub/PNC_CommandHub_Registry_Actions.lua")
+local registryCategoriesSource = T.read("ProjectHoomans", "client",
+    "PNC/UI/CommandHub/PNC_CommandHub_Registry_Categories.lua")
 T.falsy(string.find(buildingTabSource, '"build_stockpile"', 1, true),
     "stockpile bootstrap leaked into the Building child UI")
-T.contains(registrySource, 'id = "stockpile"',
+T.contains(registryCategoriesSource, 'id = "stockpile"',
     "stockpile bootstrap is not registered on the root hub")
-T.contains(registrySource, 'Facility.BeginBuild(owner, "stockpile")',
+T.contains(registryActionsSource, 'Facility.BeginBuild(owner, "stockpile")',
     "root stockpile bootstrap bypasses the facility build protocol")
-T.contains(registrySource, "stockpileBootstrapVisible",
+T.contains(registryActionsSource, "stockpileBootstrapVisible",
     "root stockpile bootstrap does not own one-time visibility")
 T.contains(workSource, "PsychopatzCore/UI/PsychopatzCommandHubOptions",
     "work window does not consume Core options")

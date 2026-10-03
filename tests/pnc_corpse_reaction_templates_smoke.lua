@@ -28,7 +28,7 @@ T.load(ROOT .. "Comrade/01_PNC_GossipTemplate.lua")
 T.load(ROOT .. "Hostile/01_PNC_GossipTemplate.lua")
 T.load(ROOT .. "Neutral/01_PNC_GossipTemplate.lua")
 
-T.equal(#definitions, 25, "five relationship groups each have five variants")
+T.equal(#definitions, 49, "corpse reactions include base and revenge variants")
 for _, definition in ipairs(definitions) do
     T.truthy(not ids[definition.id], "gossip IDs must be unique")
     T.truthy(not codes[definition.code], "gossip codes must be unique")
@@ -36,8 +36,10 @@ for _, definition in ipairs(definitions) do
     codes[definition.code] = true
     events[definition.event] = (events[definition.event] or 0) + 1
     T.truthy(definition.textKey, "every reaction has a localized text key")
-    T.equal(#definition.arguments, 2,
-        "reaction arguments include corpse and faction identity")
+    local expectedArguments = string.find(definition.event, "revenge", 1, true)
+        and 3 or 2
+    T.equal(#definition.arguments, expectedArguments,
+        "reaction arguments include corpse, faction, and revenge identity")
 end
 
 for _, event in ipairs({

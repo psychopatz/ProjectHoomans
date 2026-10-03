@@ -6,8 +6,7 @@ PNC.Conversation = PNC.Conversation or {}
 
 local History = PNC.Conversation.History or {}
 PNC.Conversation.History = History
-local Reset = (PNC.Persistence and PNC.Persistence.Reset)
-    or require "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset"
+local Reset = PNC.Persistence and PNC.Persistence.Reset
 History.MODDATA_KEY = "PNC_ConversationHistory"
 History.VERSION = 1
 History.Registry = History.Registry or { version = History.VERSION, entries = {} }

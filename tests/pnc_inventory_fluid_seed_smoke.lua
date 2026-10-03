@@ -124,7 +124,7 @@ local record = {
 Inventory.EnsureRecordInventory(record)
 T.equal(record.inventory.items.water.itemState, nil,
     "default water bottle stored redundant record state")
-T.equal(dirtyReason, nil,
-    "default water bottle unexpectedly marked the record dirty")
+T.equal(dirtyReason, "inventory_structure_normalized",
+    "record hydration reports its required identity-card repair")
 
 T.finish("pnc_inventory_fluid_seed_smoke")

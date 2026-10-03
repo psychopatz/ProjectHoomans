@@ -13,6 +13,7 @@ local enemy = {
     z = 0,
     visible = true,
     threatening = true,
+    lastSeenAt = -3000,
 }
 
 local player = {
@@ -98,6 +99,7 @@ PNC = {
     },
     BehaviorMoveIntent = { Hold = function() return true end },
     BehaviorCommon = {
+        SetCombatDebug = function() end,
         SetCombatTarget = function(targetRecord, target)
             targetRecord.runtime.target = target
             return true

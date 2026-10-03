@@ -15,10 +15,6 @@ local UI = PsychopatzCore.UI
 local Layout = UI.Layout
 local WidgetWindow = UI.WidgetWindow
 local Client = PNC.ColonyManagementClient
-if not Client then
-    require "PNC/Networking/PNC_ColonyManagementClient"
-    Client = PNC.ColonyManagementClient
-end
 
 local function trace(event, message)
     local hub = UI.CommandHub

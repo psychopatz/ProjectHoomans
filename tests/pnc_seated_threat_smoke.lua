@@ -16,6 +16,7 @@ local target = {
     z = 0,
     visible = true,
     threatening = true,
+    lastSeenAt = -3000,
 }
 
 PNC = {
@@ -45,6 +46,7 @@ PNC = {
         TickEngage = function() engagements = engagements + 1 end,
     },
     BehaviorCommon = {
+        SetCombatDebug = function() end,
         SetCombatTarget = function(record, resolved)
             record.runtime.target = resolved
             return true
@@ -133,6 +135,7 @@ target = {
     z = 0,
     visible = true,
     threatening = true,
+    lastSeenAt = -3000,
 }
 threatActive = true
 now = 2000
@@ -188,6 +191,7 @@ target = {
     z = 0,
     visible = true,
     threatening = true,
+    lastSeenAt = -3000,
 }
 threatActive = true
 now = 3000

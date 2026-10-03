@@ -1,7 +1,5 @@
 -- Nearby Hoomans speakers for normalized Project A-Life world events.
 
-require "PNC/Commands/PNC_CompanionTargetResolver"
-require "PNC/Conversation/PNC_SocialFlavorPresentation"
 require "PNC/Compatibility/Mods/ProjectALife/PNC_ProjectALife_FlavorDefinitions"
 
 local Client = PNC.Compatibility.ProjectALifeEvents.Client

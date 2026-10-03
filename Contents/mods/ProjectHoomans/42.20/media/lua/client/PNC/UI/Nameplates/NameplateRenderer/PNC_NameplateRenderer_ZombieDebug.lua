@@ -85,106 +85,87 @@ local function drawMarkerOnce(manager, drawn, key, x, y, z, color, size)
     drawWorldMarker(manager, x, y, z, color, size)
 end
 
-local function drawSoundDebug(manager, entry, drawn, now)
-    local snapshot = entry.snapshot
-    local combat = snapshot and snapshot.combatDebugState or nil
-    local stimulus = combat and combat.zombieStimulus or nil
-    local attacker = combat and combat.zombieAttacker or nil
-    local zombie
-    local observation
-    local observedMatch = false
-    local soundColor = SOUND_MISMATCH_COLOR
-    local soundX
-    local soundY
-    local soundZ
-    local nativeX
-    local nativeY
-    local nativeZ
-    local nativeStateName
-    local useless
-    local moving
-    local path
-    local locationKnown
-    local responding
-    local newSoundMarker
-    local lines = {}
-    local lineHeight
-    local labelX
-    local labelY
-    local i
-
-    if type(combat) ~= "table" then return end
-    if Renderer.ResolveZombieAttacker and type(attacker) == "table" then
-        zombie = Renderer.ResolveZombieAttacker(attacker)
-    end
-    if zombie and zombie.isDead and zombie:isDead() then zombie = nil end
-    observation = findClientObservation(zombie, now)
-
-    if type(stimulus) == "table" then
-        soundX = tonumber(stimulus.x)
-        soundY = tonumber(stimulus.y)
-        soundZ = tonumber(stimulus.z) or 0
-        if stimulus.state == "emitted" then
-            soundColor = SOUND_EMITTED_COLOR
-            if observation and observation.found == true then
-                observedMatch = distanceSq(
-                    soundX,
-                    soundY,
-                    tonumber(observation.x),
-                    tonumber(observation.y)
-                ) <= 2.25
-                if observedMatch then
-                    soundColor = SOUND_OBSERVED_COLOR
-                end
+local function appendStimulusDebug(manager, drawn, stimulus, observation)
+    local info = {
+        observedMatch = false,
+        soundColor = SOUND_MISMATCH_COLOR,
+    }
+    if type(stimulus) ~= 'table' then return info end
+    info.soundX = tonumber(stimulus.x)
+    info.soundY = tonumber(stimulus.y)
+    info.soundZ = tonumber(stimulus.z) or 0
+    if stimulus.state == 'emitted' then
+        info.soundColor = SOUND_EMITTED_COLOR
+        if observation and observation.found == true then
+            info.observedMatch = distanceSq(
+                info.soundX,
+                info.soundY,
+                tonumber(observation.x),
+                tonumber(observation.y)
+            ) <= 2.25
+            if info.observedMatch then
+                info.soundColor = SOUND_OBSERVED_COLOR
             end
-        elseif stimulus.state == "suppressed" then
-            soundColor = SOUND_SUPPRESSED_COLOR
         end
-        if soundX and soundY then
-            local soundKey = "stimulus:"
-                .. tostring(stimulus.sequence or formatPosition(soundX, soundY, soundZ))
-            newSoundMarker = not drawn[soundKey]
-            drawMarkerOnce(
+    elseif stimulus.state == 'suppressed' then
+        info.soundColor = SOUND_SUPPRESSED_COLOR
+    end
+    if info.soundX and info.soundY then
+        local soundKey = 'stimulus:'
+            .. tostring(stimulus.sequence or formatPosition(
+                info.soundX, info.soundY, info.soundZ
+            ))
+        info.newSoundMarker = not drawn[soundKey]
+        drawMarkerOnce(
+            manager,
+            drawn,
+            soundKey,
+            info.soundX,
+            info.soundY,
+            info.soundZ,
+            info.soundColor,
+            SOUND_MARKER_HALF_SIZE
+        )
+        if stimulus.state == 'emitted' and info.newSoundMarker then
+            drawWorldCircle(
                 manager,
-                drawn,
-                soundKey,
-                soundX,
-                soundY,
-                soundZ,
-                soundColor,
-                SOUND_MARKER_HALF_SIZE
+                info.soundX,
+                info.soundY,
+                info.soundZ,
+                tonumber(stimulus.radius),
+                info.soundColor,
+                true,
+                SOUND_CIRCLE_SEGMENTS
             )
-            if stimulus.state == "emitted" and newSoundMarker then
-                drawWorldCircle(
-                    manager,
-                    soundX,
-                    soundY,
-                    soundZ,
-                    tonumber(stimulus.radius),
-                    soundColor,
-                    true,
-                    SOUND_CIRCLE_SEGMENTS
-                )
-            end
-        end
-        lines[#lines + 1] = "PNC_SOUND "
-            .. tostring(stimulus.state or "unknown")
-            .. " seq=" .. tostring(stimulus.sequence or "-")
-            .. " pos=" .. formatPosition(soundX, soundY, soundZ)
-            .. " r=" .. tostring(stimulus.radius or "-")
-            .. " v=" .. tostring(stimulus.volume or "-")
-            .. " age=" .. tostring(math.floor(tonumber(stimulus.ageMs) or 0))
-            .. "ms"
-        if stimulus.reason then
-            lines[#lines + 1] = "SOUND_REASON "
-                .. tostring(stimulus.reason)
         end
     end
+    info.lines = {
+        'PNC_SOUND '
+            .. tostring(stimulus.state or 'unknown')
+            .. ' seq=' .. tostring(stimulus.sequence or '-')
+            .. ' pos=' .. formatPosition(
+                info.soundX, info.soundY, info.soundZ
+            )
+            .. ' r=' .. tostring(stimulus.radius or '-')
+            .. ' v=' .. tostring(stimulus.volume or '-')
+            .. ' age=' .. tostring(math.floor(
+                tonumber(stimulus.ageMs) or 0
+            )) .. 'ms',
+    }
+    if stimulus.reason then
+        info.lines[#info.lines + 1] = 'SOUND_REASON '
+            .. tostring(stimulus.reason)
+    end
+    return info
+end
 
+local function appendWorldSoundDebug(lines, manager, drawn, stimulus,
+    observation, attacker, now, info)
     if observation and observation.found == true then
-        local observedKey = "observed:"
-            .. tostring(attacker and (attacker.zombieId or attacker.onlineID) or "unknown")
-        local observedColor = observedMatch
+        local observedKey = 'observed:'
+            .. tostring(attacker and (attacker.zombieId or attacker.onlineID)
+                or 'unknown')
+        local observedColor = info.observedMatch
             and SOUND_OBSERVED_COLOR or SOUND_MISMATCH_COLOR
         drawMarkerOnce(
             manager,
@@ -196,95 +177,158 @@ local function drawSoundDebug(manager, entry, drawn, now)
             observedColor,
             SOUND_MARKER_HALF_SIZE - 2
         )
-        if soundX and soundY and observation.x and observation.y
-            and not observedMatch
+        if info.soundX and info.soundY and observation.x and observation.y
+            and not info.observedMatch
         then
             drawWorldLine(
                 manager,
-                soundX,
-                soundY,
-                soundZ,
+                info.soundX,
+                info.soundY,
+                info.soundZ,
                 tonumber(observation.x),
                 tonumber(observation.y),
-                tonumber(observation.z) or soundZ,
+                tonumber(observation.z) or info.soundZ,
                 SOUND_MISMATCH_COLOR
             )
         end
-        lines[#lines + 1] = "WORLD_SOUND observed pos="
+        lines[#lines + 1] = 'WORLD_SOUND observed pos='
             .. formatPosition(observation.x, observation.y, observation.z)
-            .. " match=" .. (observedMatch and "PNC" or "OTHER")
-            .. " attract=" .. tostring(rounded(observation.attract, 2) or "-")
-            .. " r=" .. tostring(observation.radius or "-")
-            .. " v=" .. tostring(observation.volume or "-")
-            .. " age=" .. tostring(math.floor(
+            .. ' match=' .. (info.observedMatch and 'PNC' or 'OTHER')
+            .. ' attract=' .. tostring(rounded(observation.attract, 2) or '-')
+            .. ' r=' .. tostring(observation.radius or '-')
+            .. ' v=' .. tostring(observation.volume or '-')
+            .. ' age=' .. tostring(math.floor(
                 math.max(0, now - (tonumber(observation.observedAt) or now))
-            )) .. "ms"
-    elseif type(stimulus) == "table" and stimulus.state == "emitted" then
-        lines[#lines + 1] = "WORLD_SOUND NOT_OBSERVED"
-    elseif type(stimulus) ~= "table" then
-        lines[#lines + 1] = "WORLD_SOUND none (SP native lane)"
+            )) .. 'ms'
+    elseif type(stimulus) == 'table' and stimulus.state == 'emitted' then
+        lines[#lines + 1] = 'WORLD_SOUND NOT_OBSERVED'
+    elseif type(stimulus) ~= 'table' then
+        lines[#lines + 1] = 'WORLD_SOUND none (SP native lane)'
     end
+end
 
+local function appendNativeDebug(lines, manager, drawn, zombie, attacker)
     if zombie then
-        nativeX = zombie:getX()
-        nativeY = zombie:getY()
-        nativeZ = zombie:getZ()
-        nativeStateName, useless, moving, path, locationKnown, responding =
+        local nativeX = zombie:getX()
+        local nativeY = zombie:getY()
+        local nativeZ = zombie:getZ()
+        local nativeStateName, useless, moving, path, locationKnown, responding =
             nativeState(zombie)
         drawMarkerOnce(
             manager,
             drawn,
-            "native:" .. tostring(attacker and (attacker.zombieId or attacker.onlineID) or zombie),
+            'native:' .. tostring(
+                attacker and (attacker.zombieId or attacker.onlineID) or zombie
+            ),
             nativeX,
             nativeY,
             nativeZ,
             NATIVE_AI_COLOR,
             SOUND_MARKER_HALF_SIZE - 3
         )
-        lines[#lines + 1] = "NATIVE target=" .. nativeTargetLabel(zombie)
-            .. " state=" .. nativeStateName
-            .. " useless=" .. tostring(useless)
-            .. " moving=" .. tostring(moving)
-            .. " path2=" .. tostring(path)
-            .. " known=" .. tostring(locationKnown)
-            .. " responding=" .. tostring(responding)
-    elseif type(attacker) == "table" then
-        lines[#lines + 1] = "NATIVE unavailable owner/replica not local"
+        lines[#lines + 1] = 'NATIVE target=' .. nativeTargetLabel(zombie)
+            .. ' state=' .. nativeStateName
+            .. ' useless=' .. tostring(useless)
+            .. ' moving=' .. tostring(moving)
+            .. ' path2=' .. tostring(path)
+            .. ' known=' .. tostring(locationKnown)
+            .. ' responding=' .. tostring(responding)
+        return nativeX, nativeY, nativeZ
     end
+    if type(attacker) == 'table' then
+        lines[#lines + 1] = 'NATIVE unavailable owner/replica not local'
+    end
+    return nil, nil, nil
+end
 
-    if #lines <= 0 then return end
-    if zombie then
+local function soundDebugTextColor(line, soundColor, observation, observedMatch)
+    if string.sub(line, 1, 9) == 'PNC_SOUND' then
+        return soundColor
+    end
+    if string.sub(line, 1, 12) == 'SOUND_REASON'
+        or string.find(line, 'NOT_OBSERVED', 1, true)
+    then
+        return SOUND_MISMATCH_COLOR
+    end
+    if string.sub(line, 1, 11) == 'WORLD_SOUND' then
+        return observation and observedMatch
+            and SOUND_OBSERVED_COLOR or SOUND_MISMATCH_COLOR
+    end
+    return NATIVE_AI_COLOR
+end
+
+local function drawSoundDebugText(manager, lines, soundColor, observation,
+    observedMatch, nativeX, nativeY, nativeZ, soundX, soundY, soundZ)
+    local labelX
+    local labelY
+    if nativeX then
         labelX, labelY = screenPoint(manager, nativeX, nativeY, nativeZ)
     elseif soundX and soundY then
         labelX, labelY = screenPoint(manager, soundX, soundY, soundZ)
     else
         return
     end
-    lineHeight = getTextManager():getFontHeight(Fonts.debug) + 2
+    local lineHeight = getTextManager():getFontHeight(Fonts.debug) + 2
     labelX = labelX + 16
     labelY = labelY - (#lines * lineHeight) - 6
-    for i = 1, #lines do
-        local color = NATIVE_AI_COLOR
-        if string.sub(lines[i], 1, 9) == "PNC_SOUND" then
-            color = soundColor
-        elseif string.sub(lines[i], 1, 12) == "SOUND_REASON"
-            or string.find(lines[i], "NOT_OBSERVED", 1, true)
-        then
-            color = SOUND_MISMATCH_COLOR
-        elseif string.sub(lines[i], 1, 11) == "WORLD_SOUND" then
-            color = observation and observedMatch
-                and SOUND_OBSERVED_COLOR or SOUND_MISMATCH_COLOR
-        end
+    for index = 1, #lines do
         Presentation.DrawOutlinedText(
             manager,
-            lines[i],
+            lines[index],
             labelX,
-            labelY + ((i - 1) * lineHeight),
-            color,
+            labelY + ((index - 1) * lineHeight),
+            soundDebugTextColor(
+                lines[index], soundColor, observation, observedMatch
+            ),
             1,
             Fonts.debug
         )
     end
+end
+
+local function drawSoundDebug(manager, entry, drawn, now)
+    local snapshot = entry.snapshot
+    local combat = snapshot and snapshot.combatDebugState or nil
+    local stimulus = combat and combat.zombieStimulus or nil
+    local attacker = combat and combat.zombieAttacker or nil
+    if type(combat) ~= 'table' then return end
+    local zombie
+    if Renderer.ResolveZombieAttacker and type(attacker) == 'table' then
+        zombie = Renderer.ResolveZombieAttacker(attacker)
+    end
+    if zombie and zombie.isDead and zombie:isDead() then zombie = nil end
+    local observation = findClientObservation(zombie, now)
+    local stimulusInfo = appendStimulusDebug(
+        manager, drawn, stimulus, observation
+    )
+    local lines = stimulusInfo.lines or {}
+    appendWorldSoundDebug(
+        lines,
+        manager,
+        drawn,
+        stimulus,
+        observation,
+        attacker,
+        now,
+        stimulusInfo
+    )
+    local nativeX, nativeY, nativeZ = appendNativeDebug(
+        lines, manager, drawn, zombie, attacker
+    )
+    if #lines <= 0 then return end
+    drawSoundDebugText(
+        manager,
+        lines,
+        stimulusInfo.soundColor,
+        observation,
+        stimulusInfo.observedMatch,
+        nativeX,
+        nativeY,
+        nativeZ,
+        stimulusInfo.soundX,
+        stimulusInfo.soundY,
+        stimulusInfo.soundZ
+    )
 end
 
 Renderer.RenderZombieDebug = drawSoundDebug

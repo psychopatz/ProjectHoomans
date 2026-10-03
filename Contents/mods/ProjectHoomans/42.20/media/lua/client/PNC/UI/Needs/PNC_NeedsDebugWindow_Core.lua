@@ -1,0 +1,159 @@
+local NeedsUI = PNC.NeedsDebugUI
+local UI = PsychopatzCore.UI
+local Theme = PsychopatzCore.UI.Theme
+local Layout = PsychopatzCore.UI.Layout
+local ClientState = PNC.Network.ClientState
+local Definitions = PNC.NeedsDefinitions
+
+local function text(value) return getText and PNC.Translation.GetKey(value) or value end
+local function selected(list) local entry = list and list:getItem(); return entry and entry.item or nil end
+local function calorieBalance(nutrition)
+    nutrition = nutrition or {}
+    return tonumber(nutrition.calories) or 0,
+        math.max(0, tonumber(nutrition.calorieOverflow) or 0)
+end
+local function drawItem(list, y, entry, alternate)
+    local item = entry.item
+    UI.DrawListSelection(list, y, list.itemheight, list.selected == entry.index, alternate)
+    list:drawText(Layout.Ellipsize(item.label, UIFont.Small, list:getWidth() - 14), 7, y + 4,
+        Theme.colors.text.r, Theme.colors.text.g, Theme.colors.text.b, Theme.colors.text.a, UIFont.Small)
+    list:drawText(Layout.Ellipsize(item.detail or "", UIFont.Small, list:getWidth() - 14), 7, y + 22,
+        Theme.colors.textMuted.r, Theme.colors.textMuted.g, Theme.colors.textMuted.b, Theme.colors.textMuted.a, UIFont.Small)
+    return y + list.itemheight
+end
+ISPNCNeedsDebugWindow = PsychopatzWindow:derive("ISPNCNeedsDebugWindow")
+function ISPNCNeedsDebugWindow:initialise() PsychopatzWindow.initialise(self) end
+function ISPNCNeedsDebugWindow:createChildren()
+    PsychopatzWindow.createChildren(self)
+    self.groups = UI.CreateList(self, { itemHeight = 40, doDrawItem = drawItem })
+    self.individuals = UI.CreateList(self, { itemHeight = 40, doDrawItem = drawItem })
+    self.details = UI.CreateKeyValueList(self, {
+        itemHeight = 24,
+        labelX = 8,
+        labelY = 5,
+        valueY = 5,
+        valueX = 120,
+        valueRightPadding = 10,
+    })
+    self.controls = {}
+    local actions = { "refresh", "group_mode", "individual_mode", "profile", "supply_log", "need", "minus10", "plus10", "set0", "set25", "set50", "set75", "set100", "reset", "hour", "six_hours", "day", "scavenge", "activity", "force_eval", "force_food", "force_water", "force_medical", "clear_retry", "dump_scores", "force_provision", "provision_dirty", "provision_retry", "dump_provision" }
+    for _, id in ipairs(actions) do self.controls[#self.controls + 1] = UI.CreateButton(self, { id = id, title = id:gsub("_", " "):upper(), target = self, onclick = ISPNCNeedsDebugWindow.onAction, variant = id == "scavenge" and "success" or "quiet" }) end
+    self:requestResponsiveLayout(true)
+    self.needIndex = 1
+    self.mode = "group"
+    self:requestSnapshot()
+end
+function ISPNCNeedsDebugWindow:onResponsiveLayout()
+    local rect = self:getContentRect({ top = 28, bottom = 12 })
+    local flow = Layout.Flow(self.controls, { x = rect.x, y = rect.y, width = rect.width }, { scale = self.uiScale, minWidth = 68 })
+    local top, gap = flow.bottom + 24, 8
+    local width = math.floor((rect.width - gap * 2) * 0.25)
+    self.layout = { groups = { x=rect.x,y=top,width=width,height=rect.height-(top-rect.y) }, individuals = { x=rect.x+width+gap,y=top,width=width,height=rect.height-(top-rect.y) }, details = { x=rect.x+width*2+gap*2,y=top,width=rect.width-width*2-gap*2,height=rect.height-(top-rect.y) } }
+    for widget, bounds in pairs({ [self.groups]=self.layout.groups, [self.individuals]=self.layout.individuals, [self.details]=self.layout.details }) do Layout.SetBounds(widget, bounds.x,bounds.y,bounds.width,bounds.height) end
+end
+function ISPNCNeedsDebugWindow:requestSnapshot()
+    local group, npc = selected(self.groups), selected(self.individuals)
+    PNC.Client.RequestNeedsDebug(group and group.id, npc and npc.id)
+    self.lastRequestAt = PNC.Core.Now()
+end
+function ISPNCNeedsDebugWindow:refreshSnapshot()
+    local snapshot = ClientState.needsDebug or {}
+    local oldGroup, oldNPC = selected(self.groups), selected(self.individuals)
+    self.groups:clear(); self.individuals:clear(); self.details:clear()
+    for _, group in ipairs(snapshot.groups or {}) do self.groups:addItem(group.name, { id=group.id, label=group.name, detail=string.format("%s | %d | H %.2f T %.2f F %.2f", group.type, group.members, group.needs.hunger, group.needs.thirst, group.needs.fatigue), value=group }) end
+    for _, npc in ipairs(snapshot.individuals or {}) do
+        local nutritionEnabled = type(npc.nutrition) == "table"
+            and ((PNC.Sandbox
+                and PNC.Sandbox.PlayerOwnedNPCNutritionRealismEnabled
+                and PNC.Sandbox.PlayerOwnedNPCNutritionRealismEnabled() == true)
+                or not (PNC.Sandbox
+                    and PNC.Sandbox.PlayerOwnedNPCNutritionRealismEnabled))
+        local calories, overflow = 0, 0
+        if nutritionEnabled then
+            calories, overflow = calorieBalance(npc.nutrition)
+        end
+        local nutritionText = nutritionEnabled
+            and string.format(" | %.0f kcal + %.0f reserve %.1f kg",
+                calories, overflow, npc.nutrition.weight or 0) or ""
+        self.individuals:addItem(npc.name, { id=npc.id, label=npc.name,
+            detail=string.format("H %.2f T %.2f F %.2f%s",
+                npc.needs.hunger, npc.needs.thirst, npc.needs.fatigue,
+                nutritionText),
+            value=npc })
+    end
+    local function restore(list, id)
+        for index, entry in ipairs(list.items or {}) do
+            if entry.item and entry.item.id == id then list.selected = index; return end
+        end
+        if #list.items > 0 then list.selected = 1 end
+    end
+    restore(self.groups, snapshot.selectedGroup and snapshot.selectedGroup.id or oldGroup and oldGroup.id)
+    restore(self.individuals, snapshot.selectedNPC and snapshot.selectedNPC.id or oldNPC and oldNPC.id)
+    local group, npc = selected(self.groups), selected(self.individuals)
+    local owner = self.mode == "group" and group and group.value or npc and npc.value
+    local profiler = snapshot.profiler or {}
+    self.details:addItem("profiler", { label="Profiler", value=profiler.enabled and "enabled" or "disabled" })
+    if profiler.enabled and profiler.data then
+        self.details:addItem("profile groups", { label="Group updates", value=tostring(profiler.data.groupUpdates or 0) })
+        self.details:addItem("profile npc", { label="Individual updates", value=tostring(profiler.data.individualUpdates or 0) })
+        self.details:addItem("profile duration", { label="Last pump ms", value=tostring(profiler.data.lastDurationMs or 0) })
+    end
+    self.details:addItem("supply logging", { label="Supply transaction log", value=snapshot.supplyLoggingEnabled and "enabled" or "disabled" })
+    if profiler.supply then
+        for _, metric in ipairs({ "supplyRequests", "supplyRequestsSatisfiedFromPersonalInventory", "supplyRequestsSentToStorage", "supplyRequestsSucceeded", "supplyRequestsFailed", "candidateQueries", "candidateItemsEvaluated", "supplyRetriesSuppressed", "reservationsCreated", "reservationFailures", "instantAcquisitions", "acquisitionFailures", "deltaInventoryMutations", "deltaInventoryCompactions", "deltaToFullPromotions", "provisionPolicyRevision", "provisionDirtyNPCs", "provisionEvaluations", "provisionRulesEvaluated", "provisionRulesSatisfied", "provisionRulesDeficient", "provisionRequestsCreated", "provisionRequestsSucceeded", "provisionRequestsFailed", "provisionRequestsSuppressedByIncoming", "provisionRequestsSuppressedByNeedRequest", "provisionSchedulerQueueSize", "provisionSchedulerProcessed", "provisionStorageShortages" }) do
+            self.details:addItem(metric, { label=metric, value=tostring(profiler.supply[metric] or 0) })
+        end
+    end
+    if owner then
+        for _, line in ipairs({ {"Owner", owner.owner or owner.faction or owner.name}, {"ID", owner.id}, {"Activity", owner.activity or "idle"}, {"Location", owner.location and string.format("%.0f, %.0f, %.0f", owner.location.x or 0, owner.location.y or 0, owner.location.z or 0) or "n/a"}, {"Next destination", owner.destination and tostring(owner.destination) or "n/a"}, {"Last update", tostring(owner.needs.lastUpdateWorldAge)}, {"Elapsed hours", string.format("%.2f", owner.elapsed or 0)} }) do self.details:addItem(line[1], { label=line[1], value=line[2] }) end
+        for _, needType in ipairs(Definitions.TYPES) do self.details:addItem(needType, { label=needType:upper() .. " / condition", value=string.format("%.2f / 1  %s%s", owner.needs[needType], Definitions.GetLevel(needType, owner.needs[needType]), owner.rates and string.format("  rate %+.4f/h", owner.rates[needType]) or "") }) end
+        if self.mode == "individual" then
+            for _, statType in ipairs(PNC.ConditionStats
+                and PNC.ConditionStats.TYPES or {})
+            do
+                local definition = PNC.ConditionStats.DEFINITIONS[statType]
+                local amount = tonumber(owner.conditionStats
+                    and owner.conditionStats[statType]) or definition.default
+                self.details:addItem("condition " .. statType, {
+                    label = statType:upper() .. " / condition",
+                    value = string.format("%.2f / %.2f  %s  rate %+.3f/h",
+                        amount, definition.maximum,
+                        PNC.ConditionStats.GetLevel(statType, amount),
+                        tonumber(owner.conditionRates
+                            and owner.conditionRates[statType]) or 0),
+                })
+            end
+            self.details:addItem("inventory mode", { label="Inventory mode", value=tostring(owner.inventoryMode or "UNKNOWN") })
+            self.details:addItem("delta records", { label="Delta record count", value=tostring(owner.deltaRecordCount or 0) })
+            self.details:addItem("promotion", { label="FULL promotion reason", value=tostring(owner.fullPromotionReason or "none") })
+            local supply = owner.supply or {}
+            self.details:addItem("supply current", { label="Current supply kind", value=tostring(supply.currentKind or "none") })
+            for _, kind in ipairs({ "FOOD", "HYDRATION", "MEDICAL" }) do
+                local lane = supply.byKind and supply.byKind[kind] or {}
+                self.details:addItem("supply " .. kind, { label=kind .. " state", value=string.format("%s | %s | retry %.2f", tostring(lane.phase or "IDLE"), tostring(lane.lastResult or lane.lastFailureReason or "none"), tonumber(lane.nextRetry) or 0) })
+                self.details:addItem("candidates " .. kind, { label=kind .. " candidates", value=string.format("personal %d | storage %d | selected %d", tonumber(lane.personalCandidateCount) or 0, tonumber(lane.storageCandidateCount) or 0, #(lane.selected or {})) })
+                for _, selectedItem in ipairs(lane.selected or {}) do
+                    self.details:addItem("selected", { label="  selected", value=string.format("%s x%d score %.1f", tostring(selectedItem.fullType), tonumber(selectedItem.quantity) or 0, tonumber(selectedItem.score) or 0) })
+                end
+            end
+            local provision = owner.provision or {}
+            self.details:addItem("provision last", { label="Provision last evaluation", value=tostring(provision.lastEvaluation or "none") })
+            for _, definition in ipairs(PNC.ProvisionRuleRegistry.List()) do
+                local value = provision.evaluations
+                    and provision.evaluations[definition.id] or {}
+                self.details:addItem("provision " .. definition.id, {
+                    label = "Provision " .. definition.id,
+                    value = string.format("on %.1f + in %.1f | < %.1f -> %.1f | %s | %s",
+                        tonumber(value.onHand) or 0,
+                        tonumber(value.incoming) or 0,
+                        tonumber(value.refillBelow) or 0,
+                        tonumber(value.target) or 0,
+                        value.satisfied and "satisfied" or "deficient",
+                        tostring(value.policySource or "unknown")),
+                })
+            end
+        end
+        for _, entry in ipairs(owner.history or {}) do self.details:addItem("history", { label=tostring(entry.reason), value=tostring(entry.needType) .. " " .. tostring(entry.before) .. " -> " .. tostring(entry.after) }) end
+    end
+    self.lastReceiveAt = ClientState.lastNeedsDebugReceiveAt or PNC.Core.Now()
+end

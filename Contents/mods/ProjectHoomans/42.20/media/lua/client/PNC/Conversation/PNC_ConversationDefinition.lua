@@ -2,9 +2,6 @@
 PNC = PNC or {}
 PNC.Conversation = PNC.Conversation or {}
 
-if not PNC.NPCIdentityPresentation then
-    require "PNC/Knowledge/PNC_NPCIdentityPresentation"
-end
 require "PNC/Core/Identity/PNC_FlavorAddress"
 if not PNC.Conversation.Audience then
     require "PNC/Conversation/PNC_ConversationAudience"

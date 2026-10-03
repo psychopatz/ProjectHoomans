@@ -15,6 +15,8 @@ require "PNC/Core/Facilities/FacilityJobsBehavior/PNC_FacilityJobsBehavior_Sleep
 require "PNC/Core/Facilities/FacilityJobsBehavior/PNC_FacilityJobsBehavior_Camp"
 require "PNC/Core/Facilities/FacilityJobsBehavior/PNC_FacilityJobsBehavior_Lifecycle"
 require "PNC/Core/Facilities/FacilityJobsBehavior/PNC_FacilityJobsBehavior_Scenes"
+require "PNC/Core/Facilities/FacilityJobsBehavior/PNC_FacilityJobsBehavior_Arrival"
+require "PNC/Core/Facilities/FacilityJobsBehavior/PNC_FacilityJobsBehavior_SceneStart"
 require "PNC/Core/Facilities/FacilityJobsBehavior/PNC_FacilityJobsBehavior_Tick"
 require "PNC/Core/Facilities/FacilityJobsBehavior/PNC_FacilityJobsBehavior_Api"
 

@@ -11,6 +11,7 @@ local now = Internal.Now
 local registerCoreZone = Internal.RegisterCoreZone
 local unregisterCoreZone = Internal.UnregisterCoreZone
 local markDirty = Internal.MarkDirty
+local ensureData = Internal.EnsureData
 
 function Service.CreateZone(args)
     args = type(args) == "table" and args or {}

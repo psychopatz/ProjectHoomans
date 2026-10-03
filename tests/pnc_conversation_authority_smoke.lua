@@ -97,6 +97,9 @@ PNC = {
         end,
     },
     ConversationScene = {
+        ValidateConversationLease = function()
+            return true
+        end,
         Begin = function(_, _, _, token)
             if token ~= "lease-token" then return false, "invalid_lease" end
             return true, record.runtime.conversationLease
@@ -108,7 +111,9 @@ T.load(SHARED .. "PNC/Core/Base/PNC_Constants.lua")
 T.load(SHARED .. "PNC/Conversation/Blocks/PNC_ConversationRegistry.lua")
 T.load(SHARED .. "PNC/Conversation/Blocks/PNC_ConversationRules.lua")
 T.load(SHARED .. "PNC/Conversation/Blocks/PNC_ConversationSelector.lua")
+T.load(SHARED .. "PNC/Conversation/Memory/PNC_ConversationMemory.lua")
 T.load(COMMON .. "PNC/Conversation/Definitions/00_PNC_ConversationDefinitions.lua")
+T.load(SHARED .. "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_Reset.lua")
 T.load(SERVER .. "PNC/Conversation/PNC_ConversationHistory.lua")
 T.load(SERVER .. "PNC/Conversation/PNC_ConversationAuthority.lua")
 

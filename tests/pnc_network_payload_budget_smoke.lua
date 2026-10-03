@@ -258,7 +258,7 @@ package.preload["PNC/UI/Communities/PNC_ColonistJournalPresentation"] = function
 end
 
 local Presentation = T.load("ProjectHoomans", "client",
-    "PNC/UI/Shared/PNC_ColonyPresentation.lua")
+    "PNC/UI/Communities/PNC_ColonyPresentation.lua")
 
 local syncRows = Presentation.BuildNeeds(nil, {
     syncStatus = { state = "unavailable", reason = "payload_too_large" },

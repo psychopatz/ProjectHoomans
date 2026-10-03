@@ -8,6 +8,23 @@ local Bridge = PNC.Compatibility.ProjectALifeDamageBridge
     or { installAttempts = 0 }
 PNC.Compatibility.ProjectALifeDamageBridge = Bridge
 Bridge.installAttempts = tonumber(Bridge.installAttempts) or 0
+Bridge.metrics = Bridge.metrics or {
+    hoomansRouted = 0,
+    hoomansRejected = 0,
+    playerRouted = 0,
+    playerRejected = 0,
+    lastRoute = nil,
+    lastReason = nil,
+}
+
+local function rememberRoute(route, applied, reason)
+    local metrics = Bridge.metrics
+    local key = applied == true and route .. "Routed"
+        or route .. "Rejected"
+    metrics[key] = (tonumber(metrics[key]) or 0) + 1
+    metrics.lastRoute = route
+    metrics.lastReason = reason
+end
 
 local function isHoomansBody(body)
     local ownership = PNC.Compatibility.ActorOwnership
@@ -25,6 +42,12 @@ local function hasAuthority()
         return ok and allowed == true
     end
     return type(isServer) == "function" and isServer() == true
+end
+
+local function isPlayer(body)
+    if body == nil or type(instanceof) ~= "function" then return false end
+    local ok, value = pcall(instanceof, body, "IsoPlayer")
+    return ok and value == true
 end
 
 local function attackerId(shell)
@@ -67,6 +90,76 @@ local function actorRecord(alife, shell)
     if type(reader) ~= "function" then return nil end
     local ok, record = pcall(reader, uid)
     return ok and type(record) == "table" and record or nil
+end
+
+local function playerPart(zone)
+    if zone == "head" then return "Head" end
+    if zone == "torso" then return "Torso_Upper" end
+    return nil
+end
+
+local function applyPlayerDamage(alife, combat, shell, target, weapon)
+    local humanDamage = alife and alife.HumanDamage
+    local resolution = PNC.CombatResolution
+    if not humanDamage or type(humanDamage.points) ~= "function"
+        or not resolution or type(resolution.ApplyPlayerDamage) ~= "function"
+    then
+        return false, false, "player_damage_pipeline_unavailable"
+    end
+
+    local ok, amount, zone = pcall(humanDamage.points, weapon, 1)
+    if not ok then
+        rememberRoute("player", false, "damage_points_failed")
+        return false, true, "damage_points_failed"
+    end
+    amount = tonumber(amount) or 0
+    if amount <= 0 then
+        rememberRoute("player", false, "damage_points_invalid")
+        return false, true, "damage_points_invalid"
+    end
+
+    local ranged = false
+    if combat and type(combat.isRanged) == "function" then
+        local rangedOk, value = pcall(combat.isRanged, weapon)
+        ranged = rangedOk and value == true
+    end
+
+    local hit = {
+        amount = amount,
+        attackType = ranged and "ranged" or "melee",
+        attackKind = "project_alife_combat_damage",
+        attackerKind = "npc",
+        attackerProvider = "ProjectALifeNPCs",
+        attackerID = attackerId(shell),
+        attackerGeneration = attackerGeneration(shell),
+        weaponItem = weapon,
+        partId = playerPart(zone),
+        woundType = ranged and "bullet" or "laceration",
+    }
+    pcall(function() hit.weaponFullType = weapon:getFullType() end)
+
+    local appliedOk, applied = pcall(
+        resolution.ApplyPlayerDamage,
+        target,
+        amount,
+        hit.attackType,
+        weapon,
+        hit
+    )
+    if appliedOk and applied == true then
+        rememberRoute("player", true, "hoomans_player_damage")
+        if type(isServer) == "function" and isServer()
+            and type(sendDamage) == "function"
+        then
+            pcall(sendDamage, target)
+        end
+        return true, true, "hoomans_player_damage"
+    end
+
+    rememberRoute("player", false,
+        appliedOk and "player_damage_rejected" or "player_damage_error")
+    return false, true,
+        appliedOk and "player_damage_rejected" or "player_damage_error"
 end
 
 local function applyIncomingDamage(alife, combat, shell, target, weapon)
@@ -142,6 +235,7 @@ local function applyIncomingDamage(alife, combat, shell, target, weapon)
         weaponFullType = weaponFullType,
     })
     if appliedOk and applied == true then
+        rememberRoute("hoomans", true, "hoomans_damage")
         local adapter = PNC.Compatibility.ProjectALifeAdapter
         if adapter and type(adapter.RecordConflict) == "function" then
             local record = actorRecord(alife, shell)
@@ -168,8 +262,87 @@ local function applyIncomingDamage(alife, combat, shell, target, weapon)
                 }
             )
         end
+    else
+        rememberRoute("hoomans", false,
+            appliedOk and "hoomans_damage_rejected" or "hoomans_damage_error")
     end
     return appliedOk and applied == true
+end
+
+local function installLineOfFireBridge()
+    local alife = ProjectALife
+    local lineOfFire = alife and alife.LineOfFire
+    if not lineOfFire or type(lineOfFire.resolve) ~= "function" then
+        return false
+    end
+    if Bridge.lineOfFire == lineOfFire
+        and lineOfFire.resolve == Bridge.lineWrapper
+    then
+        return true
+    end
+
+    local originalResolve = lineOfFire.resolve
+    local wrapper
+    wrapper = function(shell, target, weapon, applyCharacterHit,
+            mayHitCharacter)
+        local actor = actorRecord(alife, shell)
+        local function routeLineHit(body)
+            if isHoomansBody(body) then
+                if hasAuthority() and actor ~= nil
+                    and canProjectALifeAttack(actor, body, "damage")
+                then
+                    return applyIncomingDamage(
+                        alife, alife.Combat, shell, body, weapon)
+                end
+                rememberRoute("hoomans", false, "line_target_not_allowed")
+                return false
+            end
+            if isPlayer(body) then
+                local applied, supported = applyPlayerDamage(
+                    alife, alife.Combat, shell, body, weapon)
+                if supported then return applied end
+            end
+            if type(applyCharacterHit) == "function" then
+                return applyCharacterHit(body)
+            end
+            return nil
+        end
+        return originalResolve(
+            shell, target, weapon, routeLineHit, mayHitCharacter)
+    end
+
+    lineOfFire.resolve = wrapper
+    Bridge.lineOfFire = lineOfFire
+    Bridge.lineWrapper = wrapper
+    return true
+end
+
+local function installGunnerBridge()
+    local alife = ProjectALife
+    local gunner = alife and alife.ModuleGunner
+    if not gunner or type(gunner.grazePlayer) ~= "function" then
+        return false
+    end
+    if Bridge.gunner == gunner
+        and gunner.grazePlayer == Bridge.gunnerWrapper
+    then
+        return true
+    end
+
+    local originalGrazePlayer = gunner.grazePlayer
+    local wrapper
+    wrapper = function(shell, weapon, body)
+        if isPlayer(body) and hasAuthority() then
+            local applied, supported = applyPlayerDamage(
+                alife, alife.Combat, shell, body, weapon)
+            if supported then return applied end
+        end
+        return originalGrazePlayer(shell, weapon, body)
+    end
+    gunner.grazePlayer = wrapper
+    Bridge.gunner = gunner
+    Bridge.gunnerWrapper = wrapper
+    return true
 end
 
 local function installDamageBridge()
@@ -192,12 +365,19 @@ local function installDamageBridge()
     local originalResolveAttack = combat.resolveAttack
     local wrapper
     wrapper = function(actor, shell, target, shove, reaction, shoveFloor)
-        if not isHoomansBody(target) or not hasAuthority() then
+        local targetIsHoomans = isHoomansBody(target)
+        local targetIsPlayer = isPlayer(target)
+        if (not targetIsHoomans and not targetIsPlayer)
+            or not hasAuthority()
+        then
             return originalResolveAttack(
                 actor, shell, target, shove, reaction, shoveFloor)
         end
 
-        if not canProjectALifeAttack(actor, target, "damage") then
+        if targetIsHoomans
+            and not canProjectALifeAttack(actor, target, "damage")
+        then
+            rememberRoute("hoomans", false, "target_not_allowed")
             return false
         end
 
@@ -211,6 +391,11 @@ local function installDamageBridge()
             if isHoomansBody(victim) then
                 return applyIncomingDamage(
                     alife, combat, hitShell, victim, hitWeapon)
+            end
+            if isPlayer(victim) then
+                local applied, supported = applyPlayerDamage(
+                    alife, combat, hitShell, victim, hitWeapon)
+                if supported then return applied end
             end
             if type(originalDamageAdapter) == "function" then
                 return originalDamageAdapter(
@@ -251,6 +436,11 @@ local function installDamageBridge()
                                 alife, combat, lineShell, body, lineWeapon)
                         end
                         return
+                    end
+                    if isPlayer(body) then
+                        local applied, supported = applyPlayerDamage(
+                            alife, combat, lineShell, body, lineWeapon)
+                        if supported then return applied end
                     end
                     if type(applyCharacterHit) == "function" then
                         return applyCharacterHit(body)
@@ -298,12 +488,27 @@ end
 
 local function retryInstall()
     Bridge.installAttempts = Bridge.installAttempts + 1
-    if installDamageBridge() or Bridge.installAttempts >= 120 then
+    local damageInstalled = installDamageBridge()
+    local lineInstalled = installLineOfFireBridge()
+    local gunnerInstalled = installGunnerBridge()
+    local ready = damageInstalled
+        and (not (ProjectALife and ProjectALife.LineOfFire)
+            or lineInstalled)
+        and (not (ProjectALife and ProjectALife.ModuleGunner)
+            or gunnerInstalled)
+    if ready or Bridge.installAttempts >= 120 then
         removeRetry()
     end
 end
 
-if not installDamageBridge() and Events and Events.OnTick
+local installedDamage = installDamageBridge()
+local installedLine = installLineOfFireBridge()
+local installedGunner = installGunnerBridge()
+local installed = installedDamage
+    and (not (ProjectALife and ProjectALife.LineOfFire) or installedLine)
+    and (not (ProjectALife and ProjectALife.ModuleGunner) or installedGunner)
+
+if not installed and Events and Events.OnTick
     and Events.OnTick.Add
 then
     Bridge.retry = retryInstall

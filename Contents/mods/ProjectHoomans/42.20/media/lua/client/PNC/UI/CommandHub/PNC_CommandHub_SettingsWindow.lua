@@ -89,6 +89,19 @@ local function branchTitle()
         "ACTION PANEL: RIGHT")
 end
 
+local SettingsInternal = Hub.SettingsInternal or {}
+Hub.SettingsInternal = SettingsInternal
+SettingsInternal.Hub = Hub
+SettingsInternal.Options = Options
+SettingsInternal.Theme = Theme
+SettingsInternal.CoreHub = CoreHub
+SettingsInternal.DisplaySettings = DisplaySettings
+SettingsInternal.Trace = trace
+SettingsInternal.Translate = tr
+SettingsInternal.GetAudio = getAudio
+SettingsInternal.ThemeTitle = themeTitle
+SettingsInternal.BranchTitle = branchTitle
+
 ISPNCCommandHubSettingsWindow = PsychopatzWindow:derive(
     "ISPNCCommandHubSettingsWindow"
 )
@@ -98,243 +111,189 @@ function ISPNCCommandHubSettingsWindow:initialise()
     Options.ApplyOpacity(self, Options.GetOpacity())
 end
 
-function ISPNCCommandHubSettingsWindow:createChildren()
-    PsychopatzWindow.createChildren(self)
-    self.fields = {}
-    local opacityRow = UI.CreateFormRow(self, {
-        id = "command-hub-setting-row:opacity",
-        label = tr("UI_PNC_CommandHub_Settings_Opacity", "Opacity"),
+local function fieldReferences(row)
+    return {
+        row = row,
+        label = row.label,
+        slider = row.control,
+        valueLabel = row.valueLabel,
+    }
+end
+
+local function createSliderField(window, config)
+    local row
+    row = UI.CreateFormRow(window, {
+        id = config.id,
+        label = tr(config.labelKey, config.fallback),
+        valueLabel = true,
+        valueText = config.formatter(config.value),
+        createControl = function(parent)
+            return UI.CreateSlider(parent, {
+                id = config.id .. ':slider',
+                target = window,
+                min = config.min,
+                max = config.max,
+                step = 1,
+                value = config.value,
+                onChange = function(_, nextValue)
+                    UI.SetLabelText(row.valueLabel,
+                        config.formatter(nextValue))
+                end,
+            })
+        end,
+    })
+    return fieldReferences(row)
+end
+
+local function createOpacityField(window)
+    local row
+    row = UI.CreateFormRow(window, {
+        id = 'command-hub-setting-row:opacity',
+        label = tr('UI_PNC_CommandHub_Settings_Opacity', 'Opacity'),
         valueLabel = true,
         valueText = formatOpacity(Options.GetOpacityPercent()),
         createControl = function(parent)
             return UI.CreateSlider(parent, {
-                id = "command-hub-opacity",
-                target = self,
+                id = 'command-hub-opacity',
+                target = window,
                 min = 20,
                 max = 100,
                 step = 1,
                 value = Options.GetOpacityPercent(),
                 onChange = function(_, value)
-                    self:updateOpacityLabel(value)
+                    window:updateOpacityLabel(value)
                 end,
             })
         end,
     })
-    self.fields.opacity = {
-        row = opacityRow,
-        label = opacityRow.label,
-        slider = opacityRow.control,
-        valueLabel = opacityRow.valueLabel,
+    return fieldReferences(row)
+end
+
+local function createSettingsFields(window)
+    return {
+        opacity = createOpacityField(window),
+        surfaceLift = createSliderField(window, {
+            id = 'command-hub-setting-row:surface-lift',
+            labelKey = 'UI_PNC_CommandHub_Settings_SurfaceLift',
+            fallback = 'Surface opacity lift',
+            value = Options.GetSurfaceOpacityLift() * 100,
+            min = 0,
+            max = 25,
+            formatter = formatLift,
+        }),
+        detailLift = createSliderField(window, {
+            id = 'command-hub-setting-row:detail-lift',
+            labelKey = 'UI_PNC_CommandHub_Settings_DetailLift',
+            fallback = 'Detail opacity lift',
+            value = Options.GetDetailOpacityLift() * 100,
+            min = 0,
+            max = 25,
+            formatter = formatLift,
+        }),
+        titlebarScale = createSliderField(window, {
+            id = 'command-hub-setting-row:titlebar-scale',
+            labelKey = 'UI_PNC_CommandHub_Settings_TitlebarScale',
+            fallback = 'Title-bar control size',
+            value = Options.GetTitlebarControlScale() * 100,
+            min = 50,
+            max = 125,
+            formatter = formatControlScale,
+        }),
+        nameplateTextScale = createSliderField(window, {
+            id = 'command-hub-setting-row:nameplate-text-scale',
+            labelKey = 'UI_PNC_CommandHub_Settings_NameplateTextScale',
+            fallback = 'Nameplate text size',
+            value = DisplaySettings.GetNameplateTextScale() * 100,
+            min = DisplaySettings.MinNameplateTextScale * 100,
+            max = DisplaySettings.MaxNameplateTextScale * 100,
+            formatter = formatNameplateTextScale,
+        }),
+        nameplateBarScale = createSliderField(window, {
+            id = 'command-hub-setting-row:nameplate-bar-scale',
+            labelKey = 'UI_PNC_CommandHub_Settings_NameplateBarScale',
+            fallback = 'Nameplate bar size',
+            value = DisplaySettings.GetNameplateBarScale() * 100,
+            min = DisplaySettings.MinNameplateBarScale * 100,
+            max = DisplaySettings.MaxNameplateBarScale * 100,
+            formatter = formatNameplateBarScale,
+        }),
+        relationshipFeedbackScale = createSliderField(window, {
+            id = 'command-hub-setting-row:relationship-feedback-scale',
+            labelKey = 'UI_PNC_CommandHub_Settings_RelationshipFeedbackScale',
+            fallback = 'Relationship feedback size',
+            value = DisplaySettings.GetRelationshipFeedbackScale() * 100,
+            min = DisplaySettings.MinRelationshipFeedbackScale * 100,
+            max = DisplaySettings.MaxRelationshipFeedbackScale * 100,
+            formatter = formatRelationshipFeedbackScale,
+        }),
     }
-    local function createLiftField(id, labelKey, fallback, value)
-        local row
-        row = UI.CreateFormRow(self, {
-            id = id,
-            label = tr(labelKey, fallback),
-            valueLabel = true,
-            valueText = formatLift(value),
-            createControl = function(parent)
-                return UI.CreateSlider(parent, {
-                    id = id .. ":slider",
-                    target = self,
-                    min = 0,
-                    max = 25,
-                    step = 1,
-                    value = value,
-                    onChange = function(_, nextValue)
-                        UI.SetLabelText(row.valueLabel, formatLift(nextValue))
-                    end,
-                })
-            end,
-        })
-        -- Every field exposes the same contract: the layout owns the row,
-        -- while the settings logic owns the control and display label.
-        return {
-            row = row,
-            label = row.label,
-            slider = row.control,
-            valueLabel = row.valueLabel,
-        }
-    end
-    self.fields.surfaceLift = createLiftField(
-        "command-hub-setting-row:surface-lift",
-        "UI_PNC_CommandHub_Settings_SurfaceLift",
-        "Surface opacity lift", Options.GetSurfaceOpacityLift() * 100)
-    self.fields.detailLift = createLiftField(
-        "command-hub-setting-row:detail-lift",
-        "UI_PNC_CommandHub_Settings_DetailLift",
-        "Detail opacity lift", Options.GetDetailOpacityLift() * 100)
-    local titlebarScaleRow
-    titlebarScaleRow = UI.CreateFormRow(self, {
-        id = "command-hub-setting-row:titlebar-scale",
-        label = tr("UI_PNC_CommandHub_Settings_TitlebarScale",
-            "Title-bar control size"),
-        valueLabel = true,
-        valueText = formatControlScale(
-            Options.GetTitlebarControlScale() * 100),
-        createControl = function(parent)
-            return UI.CreateSlider(parent, {
-                id = "command-hub-titlebar-scale",
-                target = self,
-                min = 50,
-                max = 125,
-                step = 1,
-                value = Options.GetTitlebarControlScale() * 100,
-                onChange = function(_, value)
-                    UI.SetLabelText(titlebarScaleRow.valueLabel,
-                        formatControlScale(value))
-                end,
-            })
-        end,
-    })
-    self.fields.titlebarScale = {
-        row = titlebarScaleRow,
-        label = titlebarScaleRow.label,
-        slider = titlebarScaleRow.control,
-        valueLabel = titlebarScaleRow.valueLabel,
-    }
-    local nameplateTextScaleRow
-    nameplateTextScaleRow = UI.CreateFormRow(self, {
-        id = "command-hub-setting-row:nameplate-text-scale",
-        label = tr("UI_PNC_CommandHub_Settings_NameplateTextScale",
-            "Nameplate text size"),
-        valueLabel = true,
-        valueText = formatNameplateTextScale(
-            DisplaySettings.GetNameplateTextScale() * 100),
-        createControl = function(parent)
-            return UI.CreateSlider(parent, {
-                id = "command-hub-nameplate-text-scale",
-                target = self,
-                min = DisplaySettings.MinNameplateTextScale * 100,
-                max = DisplaySettings.MaxNameplateTextScale * 100,
-                step = 1,
-                value = DisplaySettings.GetNameplateTextScale() * 100,
-                onChange = function(_, value)
-                    UI.SetLabelText(nameplateTextScaleRow.valueLabel,
-                        formatNameplateTextScale(value))
-                end,
-            })
-        end,
-    })
-    self.fields.nameplateTextScale = {
-        row = nameplateTextScaleRow,
-        label = nameplateTextScaleRow.label,
-        slider = nameplateTextScaleRow.control,
-        valueLabel = nameplateTextScaleRow.valueLabel,
-    }
-    local nameplateBarScaleRow
-    nameplateBarScaleRow = UI.CreateFormRow(self, {
-        id = "command-hub-setting-row:nameplate-bar-scale",
-        label = tr("UI_PNC_CommandHub_Settings_NameplateBarScale",
-            "Nameplate bar size"),
-        valueLabel = true,
-        valueText = formatNameplateBarScale(
-            DisplaySettings.GetNameplateBarScale() * 100),
-        createControl = function(parent)
-            return UI.CreateSlider(parent, {
-                id = "command-hub-nameplate-bar-scale",
-                target = self,
-                min = DisplaySettings.MinNameplateBarScale * 100,
-                max = DisplaySettings.MaxNameplateBarScale * 100,
-                step = 1,
-                value = DisplaySettings.GetNameplateBarScale() * 100,
-                onChange = function(_, value)
-                    UI.SetLabelText(nameplateBarScaleRow.valueLabel,
-                        formatNameplateBarScale(value))
-                end,
-            })
-        end,
-    })
-    self.fields.nameplateBarScale = {
-        row = nameplateBarScaleRow,
-        label = nameplateBarScaleRow.label,
-        slider = nameplateBarScaleRow.control,
-        valueLabel = nameplateBarScaleRow.valueLabel,
-    }
-    local relationshipFeedbackScaleRow
-    relationshipFeedbackScaleRow = UI.CreateFormRow(self, {
-        id = "command-hub-setting-row:relationship-feedback-scale",
-        label = tr("UI_PNC_CommandHub_Settings_RelationshipFeedbackScale",
-            "Relationship feedback size"),
-        valueLabel = true,
-        valueText = formatRelationshipFeedbackScale(
-            DisplaySettings.GetRelationshipFeedbackScale() * 100),
-        createControl = function(parent)
-            return UI.CreateSlider(parent, {
-                id = "command-hub-relationship-feedback-scale",
-                target = self,
-                min = DisplaySettings.MinRelationshipFeedbackScale * 100,
-                max = DisplaySettings.MaxRelationshipFeedbackScale * 100,
-                step = 1,
-                value = DisplaySettings.GetRelationshipFeedbackScale() * 100,
-                onChange = function(_, value)
-                    UI.SetLabelText(relationshipFeedbackScaleRow.valueLabel,
-                        formatRelationshipFeedbackScale(value))
-                end,
-            })
-        end,
-    })
-    self.fields.relationshipFeedbackScale = {
-        row = relationshipFeedbackScaleRow,
-        label = relationshipFeedbackScaleRow.label,
-        slider = relationshipFeedbackScaleRow.control,
-        valueLabel = relationshipFeedbackScaleRow.valueLabel,
-    }
-    self.audioSectionLabel = label(self,
-        audioText("UI_PsychopatzCore_AudioSettingsTitle", "Sounds"),
+end
+
+local function createSupplementalControls(window)
+    window.audioSectionLabel = label(window,
+        audioText('UI_PsychopatzCore_AudioSettingsTitle', 'Sounds'),
         Theme.colors.textMuted)
     local audio = getAudio()
-    self.audioCheckbox = UI.CreateCheckbox(self, {
-        id = "pnc-command-hub-setting:player-speech-tts",
-        label = audioText("UI_PsychopatzCore_SettingPlayerSpeechTTS",
-            "Speak player dialogue with TTS"),
-        target = self,
+    window.audioCheckbox = UI.CreateCheckbox(window, {
+        id = 'pnc-command-hub-setting:player-speech-tts',
+        label = audioText('UI_PsychopatzCore_SettingPlayerSpeechTTS',
+            'Speak player dialogue with TTS'),
+        target = window,
         value = audio and audio.IsPlayerSpeechEnabled
             and audio.IsPlayerSpeechEnabled() or false,
     })
-    self.helpLabel = label(self,
-        tr("UI_PNC_CommandHub_Settings_Help",
-            "Adjust opacity, nameplate text and bar sizes, relationship feedback, child surface lifts, title-bar controls, theme, panel side, and sound here."),
+    window.helpLabel = label(window,
+        tr('UI_PNC_CommandHub_Settings_Help',
+            'Adjust opacity, nameplate text and bar sizes, relationship feedback, child surface lifts, title-bar controls, theme, panel side, and sound here.'),
         Theme.colors.textMuted)
-    self.themeButton = UI.CreateButton(self, {
-        id = "theme", title = themeTitle(), target = self,
+    window.themeButton = UI.CreateButton(window, {
+        id = 'theme', title = themeTitle(), target = window,
         onclick = ISPNCCommandHubSettingsWindow.onThemeCycle,
-        variant = "quiet",
+        variant = 'quiet',
     })
-    self.branchButton = UI.CreateButton(self, {
-        id = "branch", title = branchTitle(), target = self,
+    window.branchButton = UI.CreateButton(window, {
+        id = 'branch', title = branchTitle(), target = window,
         onclick = ISPNCCommandHubSettingsWindow.onBranchToggle,
-        variant = "quiet",
+        variant = 'quiet',
     })
-    self.statusLabel = label(self, "", Theme.colors.textMuted)
-    self.resetButton = UI.CreateButton(self, {
-        id = "reset", title = tr("UI_PNC_CommandHub_Settings_Reset", "RESET"),
-        target = self, onclick = ISPNCCommandHubSettingsWindow.onReset,
-        variant = "quiet",
+    window.statusLabel = label(window, '', Theme.colors.textMuted)
+    window.resetButton = UI.CreateButton(window, {
+        id = 'reset', title = tr('UI_PNC_CommandHub_Settings_Reset', 'RESET'),
+        target = window, onclick = ISPNCCommandHubSettingsWindow.onReset,
+        variant = 'quiet',
     })
-    self.closeButton = UI.CreateButton(self, {
-        id = "close", title = tr("UI_PNC_CommandHub_Settings_Close", "CLOSE"),
-        target = self, onclick = ISPNCCommandHubSettingsWindow.onClose,
-        variant = "quiet",
+    window.closeButton = UI.CreateButton(window, {
+        id = 'close', title = tr('UI_PNC_CommandHub_Settings_Close', 'CLOSE'),
+        target = window, onclick = ISPNCCommandHubSettingsWindow.onClose,
+        variant = 'quiet',
     })
-    self.applyButton = UI.CreateButton(self, {
-        id = "apply", title = tr("UI_PNC_CommandHub_Settings_Apply", "APPLY"),
-        target = self, onclick = ISPNCCommandHubSettingsWindow.onApply,
-        variant = "primary",
+    window.applyButton = UI.CreateButton(window, {
+        id = 'apply', title = tr('UI_PNC_CommandHub_Settings_Apply', 'APPLY'),
+        target = window, onclick = ISPNCCommandHubSettingsWindow.onApply,
+        variant = 'primary',
     })
+end
+
+local function installWidgetWindow(window)
+    if not WidgetWindow then return end
+    WidgetWindow.Install(window, {
+        id = 'pnc-command-hub-settings-widget',
+        onDetachedChanged = function()
+            local controller = Hub.ChildController
+            if controller and controller.SyncPositions then
+                controller.SyncPositions()
+            end
+        end,
+    })
+end
+
+function ISPNCCommandHubSettingsWindow:createChildren()
+    PsychopatzWindow.createChildren(self)
+    self.fields = createSettingsFields(self)
+    createSupplementalControls(self)
     self:populate()
     self:requestResponsiveLayout(true)
-    if WidgetWindow then
-        WidgetWindow.Install(self, {
-            id = "pnc-command-hub-settings-widget",
-            onDetachedChanged = function()
-                local controller = Hub.ChildController
-                if controller and controller.SyncPositions then
-                    controller.SyncPositions()
-                end
-            end,
-        })
-    end
+    installWidgetWindow(self)
 end
 
 function ISPNCCommandHubSettingsWindow:updateOpacityLabel(value)
@@ -350,19 +309,6 @@ function ISPNCCommandHubSettingsWindow:setStatus(value)
     if self.statusLabel then
         UI.SetLabelText(self.statusLabel, text)
         self.statusLabel:setVisible(text ~= "")
-    end
-end
-
-local function applyOpacityToWindows(hub, opacity)
-    if Hub.ChildController and Hub.ChildController.ApplyOpacity then
-        return Hub.ChildController.ApplyOpacity(opacity)
-    end
-    Options.ApplyOpacity(hub, opacity)
-    local actions = CoreHub.Actions and CoreHub.Actions.instance or nil
-    if actions then Options.ApplyOpacity(actions, opacity) end
-    local zones = Hub.ZoneUI and Hub.ZoneUI.instances or {}
-    for _, window in pairs(zones) do
-        if window then Options.ApplyOpacity(window, opacity) end
     end
 end
 
@@ -411,112 +357,6 @@ function ISPNCCommandHubSettingsWindow:populate()
     self.themeButton:setTitle(themeTitle())
 end
 
-function ISPNCCommandHubSettingsWindow:onReset()
-    trace("pnc_settings_reset_start", "has_hub="
-        .. tostring(Hub.instance ~= nil))
-    local hub = self:getHub()
-    if hub then
-        Options.Reset()
-        Theme.Reset()
-        DisplaySettings.ResetNameplateTextScale(true)
-        DisplaySettings.ResetNameplateBarScale(true)
-        DisplaySettings.ResetRelationshipFeedbackScale(true)
-        local audio = getAudio()
-        if audio and audio.Set then
-            local defaults = audio.defaults or {}
-            audio.Set("playerSpeechTTS", defaults.playerSpeechTTS == true, true)
-        end
-        applyOpacityToWindows(hub, Options.GetOpacity())
-        Options.ApplyRegisteredToolbarScale()
-    end
-    self:populate()
-    self:setStatus(tr("UI_PNC_CommandHub_Settings_Applied",
-        "Settings applied."))
-    trace("pnc_settings_reset_result", "result=true")
-end
-
-function ISPNCCommandHubSettingsWindow:onThemeCycle()
-    local ids = Theme.GetPresetIDs()
-    local current = Theme.GetPresetID()
-    local index = 1
-    for position, id in ipairs(ids) do
-        if id == current then index = position end
-    end
-    local nextIndex = index + 1
-    if nextIndex > #ids then nextIndex = 1 end
-    Theme.SetPreset(ids[nextIndex])
-    self.themeButton:setTitle(themeTitle())
-    self:setStatus(tr("UI_PNC_CommandHub_Settings_Applied",
-        "Settings applied."))
-end
-
-function ISPNCCommandHubSettingsWindow:onBranchToggle()
-    trace("pnc_settings_branch_start", "current=" .. tostring(Options.GetBranch()))
-    local branch = Options.GetBranch() == "right" and "left" or "right"
-    Options.SetBranch(branch)
-    self.branchButton:setTitle(branchTitle())
-    self:setStatus(tr("UI_PNC_CommandHub_Settings_Applied",
-        "Settings applied."))
-    if Hub.ChildController and Hub.ChildController.SyncPositions then
-        Hub.ChildController.SyncPositions()
-    else
-        local hub = Hub.instance
-        if hub and CoreHub.Actions and CoreHub.Actions.SyncPosition then
-            CoreHub.Actions.SyncPosition(hub)
-        end
-        if Hub.ZoneUI and Hub.ZoneUI.SyncPositions then
-            Hub.ZoneUI.SyncPositions()
-        end
-    end
-    trace("pnc_settings_branch_result", "branch=" .. tostring(branch))
-end
-
-function ISPNCCommandHubSettingsWindow:onApply()
-    trace("pnc_settings_apply_start", "has_hub=" .. tostring(Hub.instance ~= nil))
-    local hub = self:getHub()
-    if not hub then
-        trace("pnc_settings_apply_result", "result=false reason=missing_hub")
-        return
-    end
-    local opacity = math.floor(self.fields.opacity.slider:getValue() + 0.5)
-    if not opacity then
-        self:setStatus(tr("UI_PNC_CommandHub_Settings_Invalid",
-            "Enter a valid opacity value."))
-        trace("pnc_settings_apply_result", "result=false reason=invalid_values")
-        return
-    end
-    Options.SetOpacityPercent(opacity)
-    Options.SetSurfaceOpacityLift(
-        math.floor(self.fields.surfaceLift.slider:getValue() + 0.5) / 100)
-    Options.SetDetailOpacityLift(
-        math.floor(self.fields.detailLift.slider:getValue() + 0.5) / 100)
-    Options.SetTitlebarControlScale(
-        math.floor(self.fields.titlebarScale.slider:getValue() + 0.5) / 100)
-    DisplaySettings.SetNameplateTextScale(
-        math.floor(self.fields.nameplateTextScale.slider:getValue()
-            + 0.5) / 100,
-        true)
-    DisplaySettings.SetNameplateBarScale(
-        math.floor(self.fields.nameplateBarScale.slider:getValue()
-            + 0.5) / 100,
-        true)
-    DisplaySettings.SetRelationshipFeedbackScale(
-        math.floor(self.fields.relationshipFeedbackScale.slider:getValue()
-            + 0.5) / 100,
-        true)
-    local audio = getAudio()
-    if self.audioCheckbox and audio and audio.Set then
-        audio.Set("playerSpeechTTS", self.audioCheckbox:getChecked(), true)
-    end
-    applyOpacityToWindows(hub, opacity / 100)
-    Options.ApplyRegisteredToolbarScale()
-    self:populate()
-    self:setStatus(tr("UI_PNC_CommandHub_Settings_Applied",
-        "Settings applied."))
-    trace("pnc_settings_apply_result", "result=true opacity="
-        .. tostring(opacity))
-end
-
 function ISPNCCommandHubSettingsWindow:onClose()
     self:close()
 end
@@ -546,6 +386,7 @@ function ISPNCCommandHubSettingsWindow:new(x, y, width, height, options)
 end
 
 require "PNC/UI/CommandHub/PNC_CommandHub_SettingsWindow_Layout"
+require "PNC/UI/CommandHub/PNC_CommandHub_SettingsWindow_Actions"
 
 function SettingsUI.Open(owner)
     trace("pnc_settings_window_open", "has_owner=" .. tostring(owner ~= nil))

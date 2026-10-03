@@ -197,152 +197,21 @@ function Internal.AssessFollowHazards(record, zombie, now)
     return cached
 end
 
-local function canUseFollowSteer(record, x, y, z, dirX, dirY)
-    if TraversalQuery and TraversalQuery.CanStep
-        and not TraversalQuery.CanStep(
-            record.x,
-            record.y,
-            record.z,
-            record.x + (dirX * 0.75),
-            record.y + (dirY * 0.75),
-            z
-        )
-    then
-        return false
-    end
-    return not TraversalQuery
-        or not TraversalQuery.CanOccupy
-        or TraversalQuery.CanOccupy(x, y, z)
-end
-
-function Internal.ResolveHordeAwareFollowTarget(
-    record,
-    slotTarget,
-    slotDist,
-    hazard,
-    now
-)
-    local runtime = record.runtime or {}
-    local target = runtime.followAvoidanceTarget or {}
-    local baseX
-    local baseY
-    local repelX
-    local repelY
-    local tangentX
-    local tangentY
-    local dirX
-    local dirY
-    local dot
-    local distance
-    local candidateX
-    local candidateY
-    local candidateZ
-
-    record.runtime = runtime
-    runtime.followAvoidanceTarget = target
-    if not slotTarget
-        or not hazard
-        or hazard.active ~= true
-        or slotTarget.indoorApproach == true
-        or math.abs((tonumber(slotTarget.z) or record.z) - record.z) >= 1
-    then
-        target.active = false
-        return nil
-    end
-    if target.active == true
-        and now < (tonumber(target.expiresAt) or 0)
-        and Core.DistanceSq(
-            record.x,
-            record.y,
-            tonumber(target.x) or record.x,
-            tonumber(target.y) or record.y
-        ) > 0.49
-    then
-        return target
-    end
-
-    baseX, baseY = Internal.NormalizeDirection(
-        slotTarget.x - record.x,
-        slotTarget.y - record.y
-    )
-    repelX, repelY = Internal.NormalizeDirection(
-        tonumber(hazard.repelX) or 0,
-        tonumber(hazard.repelY) or 0
-    )
-    if not baseX or not repelX then
-        target.active = false
-        return nil
-    end
-
-    dirX, dirY = Internal.NormalizeDirection(
-        baseX + (
-            repelX * math.min(1.35, 0.45 + hazard.count * 0.2)
-        ),
-        baseY + (
-            repelY * math.min(1.35, 0.45 + hazard.count * 0.2)
-        )
-    )
-    dot = dirX and ((dirX * baseX) + (dirY * baseY)) or -1
-    if dot < 0.55 then
-        tangentX = -baseY
-        tangentY = baseX
-        if (tangentX * repelX) + (tangentY * repelY) < 0 then
-            tangentX = -tangentX
-            tangentY = -tangentY
-        end
-        dirX, dirY = Internal.NormalizeDirection(
-            (baseX * 0.68) + (tangentX * 0.72),
-            (baseY * 0.68) + (tangentY * 0.72)
-        )
-    end
-    if not dirX then
-        target.active = false
-        return nil
-    end
-
-    distance = math.min(
-        tonumber(Const.FOLLOW_HORDE_STEER_DISTANCE) or 3.4,
-        math.max(0.65, tonumber(slotDist) or 0.65)
-    )
-    candidateZ = tonumber(slotTarget.z) or record.z
-    candidateX = record.x + (dirX * distance)
-    candidateY = record.y + (dirY * distance)
-    if not canUseFollowSteer(
-        record,
-        candidateX,
-        candidateY,
-        candidateZ,
-        dirX,
-        dirY
-    ) then
-        -- The opposite side still makes forward progress toward the owner.
-        dirX, dirY = Internal.NormalizeDirection(
-            (baseX * 0.68) + (baseY * 0.72),
-            (baseY * 0.68) - (baseX * 0.72)
-        )
-        candidateX = record.x + (dirX * distance)
-        candidateY = record.y + (dirY * distance)
-        if not canUseFollowSteer(
-            record,
-            candidateX,
-            candidateY,
-            candidateZ,
-            dirX,
-            dirY
-        ) then
-            target.active = false
-            return nil
-        end
-    end
-
-    target.x = candidateX
-    target.y = candidateY
-    target.z = candidateZ
-    target.stopDistance = 0.55
-    target.active = true
-    target.avoidance = true
-    target.hazardCount = hazard.count
-    target.expiresAt = now
-        + (tonumber(Const.FOLLOW_HORDE_STEER_MS) or 350)
-    return target
+if not Internal.ResolveHordeAwareFollowTarget then
+    Internal.FollowHazardCandidatePlanner = {
+        Const = Const,
+        TraversalQuery = TraversalQuery,
+        NormalizeDirection = Internal.NormalizeDirection,
+    }
+    require "PNC/Core/Behaviors/BehaviorCompanion/PNC_BehaviorCompanion_FollowHazardSteering_CandidatePlanner"
+    Internal.FollowHazardTargetResolver = {
+        Core = Core,
+        Const = Const,
+        CandidatePlanner = Internal.FollowHazardCandidatePlanner,
+    }
+    require "PNC/Core/Behaviors/BehaviorCompanion/PNC_BehaviorCompanion_FollowHazardSteering_TargetResolver"
+    Internal.FollowHazardSteering = {
+        TargetResolver = Internal.FollowHazardTargetResolver,
+    }
+    require "PNC/Core/Behaviors/BehaviorCompanion/PNC_BehaviorCompanion_FollowHazardSteering"
 end

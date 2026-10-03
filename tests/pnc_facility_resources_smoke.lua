@@ -173,6 +173,8 @@ local sofaProperties = {
 local sofaGrid = {
     getWidth = function() return 2 end,
     getHeight = function() return 1 end,
+    getSpriteGridPosX = function() return 0 end,
+    getSpriteGridPosY = function() return 0 end,
 }
 local sofaSprite = {
     getName = function() return "furniture_seating_01_0" end,

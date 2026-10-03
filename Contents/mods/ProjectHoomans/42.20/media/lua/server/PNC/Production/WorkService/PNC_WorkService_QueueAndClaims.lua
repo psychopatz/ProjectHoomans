@@ -1,172 +1,21 @@
+-- WorkService queue and claim providers composition root.
 if PsychopatzCore and PsychopatzCore.RuntimeRole
-    and not PsychopatzCore.RuntimeRole.AllowsServerCode() then return end
+    and not PsychopatzCore.RuntimeRole.AllowsServerCode()
+then return end
 
 PNC = PNC or {}
 PNC.WorkService = PNC.WorkService or {}
 PNC.WorkService.Internal = PNC.WorkService.Internal or {}
 
+require "PNC/Production/WorkService/PNC_WorkService_Queue"
+require "PNC/Production/WorkService/PNC_WorkService_Claims"
+
 local Service = PNC.WorkService
 local Internal = Service.Internal
-local Repository = PNC.WorkRepository
-local Definitions = PNC.WorkDefinitions
-local Status = Definitions.STATUS
-local EventsBus = PsychopatzCore and PsychopatzCore.Events
-local EventTypes = PNC.EventTypes or {}
-local emit = Internal.emit
-local now = Internal.now
-local terminal = Internal.terminal
-local copy = Internal.copy
-local markAssignmentDirty = Internal.markAssignmentDirty
+Service.Commands = Service.Commands or {}
 
 function Service.Commands.Queue(spec)
-    spec = type(spec) == "table" and spec or {}
-    local operation = tostring(spec.operation or "")
-    if not Definitions.CAPABILITY_BY_OPERATION[operation]
-        and not Service.TargetProviders[operation]
-    then
-        return nil, "UNKNOWN_OPERATION"
-    end
-    -- Fall back to the operation's default policy when the caller does not
-    -- state one. Research-family work defaults to ANYWHERE/REMOTE/STAY so an
-    -- away colonist keeps the order instead of the scheduler releasing and
-    -- re-claiming it every pass.
-    local policySpec = type(spec.locationPolicy) == "table" and spec
-        or { locationPolicy = Definitions.LocationPolicy
-            and Definitions.LocationPolicy(operation) or nil }
-    local locationPolicy = Internal.locationPolicy(policySpec)
-    local order = {
-        schemaVersion = Repository.SCHEMA_VERSION,
-        id = Repository.NextId(), operation = operation,
-        colonyId = tostring(spec.colonyId or ""),
-        factionId = tostring(spec.factionId or ""),
-        baseId = tostring(spec.baseId or ""),
-        recipeId = tonumber(spec.recipeId),
-        recipeRevision = tonumber(spec.recipeRevision),
-        requiredStationId = spec.requiredStationId
-            and tostring(spec.requiredStationId) or nil,
-        requiredWorkerId = spec.requiredWorkerId
-            and tostring(spec.requiredWorkerId) or nil,
-        productionSkillId = spec.productionSkillId
-            and tostring(spec.productionSkillId) or nil,
-        funded = spec.funded == true,
-        projectLifecycle = spec.projectLifecycle,
-        quantity = math.max(1, math.floor(tonumber(spec.quantity) or 1)),
-        requiredWork = math.max(1, tonumber(spec.requiredWork) or 100),
-        progress = math.max(0, tonumber(spec.progress) or 0),
-        requiredSkills = copy(spec.requiredSkills or {}),
-        locationPolicy = locationPolicy,
-        manual = spec.manual == true,
-        payload = copy(spec.payload or {}),
-        phase = spec.phase,
-        status = Status.QUEUED, priority = tonumber(spec.priority) or 0,
-        revision = 0, createdAt = now(), updatedAt = now(),
-        lastProgressAt = now(),
-    }
-    Repository.Put(order)
-    markAssignmentDirty(order, "WORK_REQUEST_QUEUED")
-    emit(EventTypes.WORK_ORDER_QUEUED, { workOrderId = order.id,
-        colonyId = order.colonyId, operation = order.operation })
-    return copy(order)
+    return Internal.Queue(spec)
 end
 
-local function releaseClaim(order, reason, cancelInputs, cleanupOperation)
-    if not order then return end
-    local worldEffectPending = order.status == Status.WORLD_EFFECT_PENDING
-        and type(order.worldEffect) == "table"
-        and tostring(order.worldEffect.state or "PENDING") ~= "APPLIED"
-    local carryHandoff = order.operation == "CORPSE_HAUL"
-        and tostring(order.phase or "") == "CARRYING"
-        and order.completionStarted ~= true
-        and order.status ~= Status.CANCELLING
-        and order.status ~= Status.CANCELLED
-        and order.status ~= Status.COMPLETED
-        and order.status ~= Status.FAILED
-    if cleanupOperation == true and not worldEffectPending
-        and not order.completionCommitted
-        and (order.operation == "PROVISION_PICKUP"
-            or order.operation == "CORPSE_HAUL"
-            or order.operation == "LUMBER")
-    then
-        local cancellation = Service.CancellationHandlers
-            and Service.CancellationHandlers[order.operation]
-        if cancellation then
-            local cleaned, cleanupReason = cancellation(order)
-            if cleaned == false then
-                return false, cleanupReason or "WORK_RELEASE_CLEANUP_FAILED"
-            end
-        end
-    end
-    local input = order.payload and order.payload.input
-    if PNC.WorkInputService and input
-        and (cancelInputs == true or input.staged == true)
-    then
-        -- Collected inputs physically live on the current NPC and must return
-        -- to the stockpile before a replacement can collect them. An input
-        -- that is only reserved can remain attached to the durable order.
-        PNC.WorkInputService.Cancel(order)
-    end
-    if order.stationId and Service.ClaimsByStation[order.stationId] == order.id then
-        Service.ClaimsByStation[order.stationId] = nil
-    end
-    if order.workerId and Service.ClaimsByWorker[order.workerId] == order.id then
-        Service.ClaimsByWorker[order.workerId] = nil
-    end
-    if order.facilityReservationId and PNC.FacilityReservations then
-        PNC.FacilityReservations.Release(order.facilityReservationId,
-            reason or "work_released")
-    end
-    local record = order.workerId and PNC.Registry and PNC.Registry.Get
-        and PNC.Registry.Get(order.workerId) or nil
-    if record and record.runtime and record.runtime.workOrderId == order.id then
-        record.runtime.workOrderId = nil
-        record.runtime.lastProductionWorkAt = nil
-        if Internal.clearWorkLocation then
-            Internal.clearWorkLocation(record, order.id)
-        end
-        if PNC.OrderSystem and PNC.OrderSystem.SetOrder then
-            PNC.OrderSystem.SetOrder(record, order.previousOrder)
-        end
-    end
-    order.workerId, order.stationId, order.facilityId = nil, nil, nil
-    order.facilityReservationId, order.previousOrder = nil, nil
-    order.stationTarget, order.collectionTarget = nil, nil
-    order.targetKind = nil
-    if not carryHandoff then
-        order.phase, order.livePhase = nil, nil
-    else
-        -- A worker release during visible carry drops the corpse in place but
-        -- keeps the durable phase/coordinate projection so another worker
-        -- can resume from that world square instead of searching the source.
-        order.phase, order.livePhase = "CARRYING", "CARRYING"
-    end
-    order.executionMode, order.lastAbstractAt = nil, nil
-    return true
-end
-
-local function assignedOrderForRecord(record)
-    local runtime = record and record.runtime or nil
-    local orderId = runtime and runtime.workOrderId or nil
-    local order = orderId and Repository.Get(orderId) or nil
-    if order and not terminal(order)
-        and tostring(order.workerId or "") == tostring(record.id or "")
-    then
-        return order
-    end
-    return nil
-end
-
-local function restoreOrderIsSafe(record, previous)
-    if type(previous) ~= "table" then return false end
-    if tostring(previous.kind or "") ~= "production_work" then return true end
-    local orderId = previous.workOrderId
-    local order = orderId and Repository.Get(orderId) or nil
-    return order ~= nil and not terminal(order)
-        and tostring(order.workerId or "") == tostring(record.id or "")
-end
-
-
-Internal.releaseClaim = releaseClaim
-Internal.assignedOrderForRecord = assignedOrderForRecord
-Internal.restoreOrderIsSafe = restoreOrderIsSafe
-
-return Service
+return PNC.WorkService

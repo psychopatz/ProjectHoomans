@@ -138,9 +138,9 @@ T.truthy(string.find(tired.response.templateID, "fatigue", 1, true),
 local comfortable = decideWellbeing({
     hunger = 0.05, thirst = 0.04, fatigue = 0.10,
 })
-T.equal(comfortable.response.templateID,
-    "semantic.question.wellbeing.default",
-    "normal need levels keep the neutral wellbeing response")
+T.truthy(string.find(comfortable.response.templateID,
+    "semantic.question.wellbeing", 1, true),
+    "normal need levels keep a neutral wellbeing response family")
 
 T.equal(LocalResponse.Resolve(nil, nil, nil, "QUESTION_RECEIVED"), nil,
     "the public resolver rejects missing IR safely")

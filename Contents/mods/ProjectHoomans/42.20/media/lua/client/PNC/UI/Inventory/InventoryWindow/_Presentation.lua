@@ -11,21 +11,7 @@ local function selectedContainerLabel(containers, selected)
     return entry and entry.label or "Inventory"
 end
 
-function ISPNCInventoryWindow:prerender()
-    if self.tradeMode and self.prerenderTrade then
-        return self:prerenderTrade()
-    end
-    local now = inventoryNow()
-    if self.inventoryRefreshPending == true
-        and now - (tonumber(self.inventoryRefreshStartedAt) or now)
-            >= INVENTORY_REFRESH_TIMEOUT_MS
-    then
-        self:finishInventoryRefresh(false, now)
-    end
-    self:applyOpacityStyle()
-    self:refreshInventory(false)
-    self:updateInventoryTooltip()
-    UI.Window.prerender(self)
+local function drawInventoryPanes(self)
     local player = getSpecificPlayer and getSpecificPlayer(0) or getPlayer and getPlayer() or nil
     local headingY = self.headingY or self:titleBarHeight() + 8
     local containerY = self.containerLabelY or headingY + 21
@@ -82,6 +68,10 @@ function ISPNCInventoryWindow:prerender()
         npcX + paneWidth - 4, containerY,
         0.90, 0.90, 0.90, 1, UIFont.Small
     )
+    return containerY, playerX, npcX, paneWidth
+end
+
+local function drawInventoryListHeaders(self, containerY, playerX, npcX, paneWidth)
     local listY = self.playerList and self.playerList:getY() or containerY + 38
     self:drawText(tr("UI_PNC_Inventory_Item", "Item"), self.playerList:getX() + 40, listY - 19,
         0.85, 0.85, 0.85, 1, UIFont.Small)
@@ -112,6 +102,9 @@ function ISPNCInventoryWindow:prerender()
         self.npcContainerList:getX() + math.floor(self.npcContainerList.width / 2),
         listY - 19, 0.85, 0.85, 0.85, 1, UIFont.Small
     )
+end
+
+local function drawInventoryStatus(self, now)
     local refreshFeedback = self.inventoryRefreshFeedback
         and self.inventoryRefreshFeedbackUntil
         and now < self.inventoryRefreshFeedbackUntil
@@ -131,6 +124,9 @@ function ISPNCInventoryWindow:prerender()
             0.64, 0.64, 0.64, 1, UIFont.Small
         )
     end
+end
+
+local function drawInventoryDragFeedback(self)
     if self.dragState and self.dragState.row then
         self:drawText(
             tostring(self.dragState.row.name),
@@ -140,6 +136,28 @@ function ISPNCInventoryWindow:prerender()
         )
     end
 end
+
+function ISPNCInventoryWindow:prerender()
+    if self.tradeMode and self.prerenderTrade then
+        return self:prerenderTrade()
+    end
+    local now = inventoryNow()
+    if self.inventoryRefreshPending == true
+        and now - (tonumber(self.inventoryRefreshStartedAt) or now)
+            >= INVENTORY_REFRESH_TIMEOUT_MS
+    then
+        self:finishInventoryRefresh(false, now)
+    end
+    self:applyOpacityStyle()
+    self:refreshInventory(false)
+    self:updateInventoryTooltip()
+    UI.Window.prerender(self)
+    local containerY, playerX, npcX, paneWidth = drawInventoryPanes(self)
+    drawInventoryListHeaders(self, containerY, playerX, npcX, paneWidth)
+    drawInventoryStatus(self, now)
+    drawInventoryDragFeedback(self)
+end
+
 
 function ISPNCInventoryWindow:onMouseDown(x, y)
     if UI.Window.onMouseDown then

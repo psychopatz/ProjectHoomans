@@ -97,6 +97,31 @@ T.equal(
     false,
     "duplicate ambient event is ignored"
 )
+
+local memoryModule = "PNC/Conversation/Memory/PNC_ConversationMemory"
+local definitionModule =
+    "PNC/Conversation/Definitions/Memory/00_PNC_ConversationMemoryDefinitions"
+local previousMemoryLoader = package.preload[memoryModule]
+local previousDefinitionLoader = package.preload[definitionModule]
+package.preload[memoryModule] = function()
+    error("conversation memory must come from composition")
+end
+package.preload[definitionModule] = function()
+    error("conversation memory definitions must come from composition")
+end
+PNC.Conversation.Memory = nil
+T.equal(
+    Presentation.HandleSocialGreeting({
+        eventID = "conversation:corpse_reaction:without-memory",
+        npcID = "npc-one",
+        eventType = "corpse_reaction",
+        gossipPacket = { c = "missing-template" },
+    }),
+    false,
+    "corpse gossip waits for composed Conversation Memory"
+)
+package.preload[memoryModule] = previousMemoryLoader
+package.preload[definitionModule] = previousDefinitionLoader
 T.equal(Message.GetGameDay(speech.message.worldAgeHours), 0,
     "canonical speech message carries game-day metadata")
 

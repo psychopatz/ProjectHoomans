@@ -1,3 +1,6 @@
+if PsychopatzCore and PsychopatzCore.RuntimeRole
+    and not PsychopatzCore.RuntimeRole.AllowsServerCode() then return end
+
 -- Server-authoritative discovery state for the local player's stealth
 -- diagnostic.  This is intentionally separate from zombie targeting: it
 -- observes the existing stealth predicate and sends only the result to the

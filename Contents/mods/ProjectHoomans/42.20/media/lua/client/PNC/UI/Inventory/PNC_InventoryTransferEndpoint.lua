@@ -1,5 +1,3 @@
-require "PNC/00_PNC_Init"
-
 PNC = PNC or {}
 PNC.InventoryTransferEndpoint = PNC.InventoryTransferEndpoint or {}
 

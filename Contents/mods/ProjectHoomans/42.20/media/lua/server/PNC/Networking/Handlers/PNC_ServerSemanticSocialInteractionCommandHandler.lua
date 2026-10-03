@@ -124,168 +124,31 @@ local function sendRelationship(player, npcID, requestID, eventID,
     )
 end
 
-function Authority.Handle(player, args)
-    args = type(args) == "table" and args or {}
-    local requestID = text(args.requestID, 96)
-    local npcID = text(args.npcID, 128)
-    local speechAct = string.upper(text(args.speechAct, 32))
-    local conversationID = text(args.conversationID, 96)
-    local conversationToken = text(
-        args.conversationToken or args.token,
-        128
-    )
-    local eventType = EVENT_TYPE_BY_SPEECH_ACT[speechAct]
-    local record
-    local body
-    local validateLease
-    local valid
-    local reason
-    local at
-    local actorKey
-    local targetKey
-    local definition
-    local eventID
-    local processed
-    local detail
-    local beforeSummary
-    local afterSummary
-    local accepted
+Authority.Internal = Authority.Internal or {}
+Authority.Internal.SemanticSocial = {
+    Authority = Authority,
+    Router = Router,
+    Const = Const,
+    Core = Core,
+    Registry = Registry,
+    PlayerCharacters = PlayerCharacters,
+    EntityRef = EntityRef,
+    Definitions = Definitions,
+    SocialEvents = SocialEvents,
+    Network = Network,
+    RelationshipPresentation = RelationshipPresentation,
+    EVENT_TYPE_BY_SPEECH_ACT = EVENT_TYPE_BY_SPEECH_ACT,
+    text = text,
+    worldAgeHours = worldAgeHours,
+    rejected = rejected,
+    relationshipDelta = relationshipDelta,
+    relationshipSummary = relationshipSummary,
+    detailFor = detailFor,
+    sendRelationship = sendRelationship,
+}
 
-    if not Core or not Core.IsAuthority or Core.IsAuthority() ~= true then
-        return rejected(requestID, npcID, speechAct, "not_authority")
-    end
-    if not player or player.isDead and player:isDead() then
-        return rejected(requestID, npcID, speechAct, "player_unavailable")
-    end
-    if requestID == "" then
-        return rejected(requestID, npcID, speechAct, "request_id_required")
-    end
-    if npcID == "" or conversationID == "" then
-        return rejected(requestID, npcID, speechAct,
-            "conversation_identity_required")
-    end
-    if not eventType then
-        return rejected(requestID, npcID, speechAct,
-            "unsupported_social_speech_act")
-    end
-    if not Registry or type(Registry.Get) ~= "function"
-        or type(Registry.GetLiveZombie) ~= "function"
-    then
-        return rejected(requestID, npcID, speechAct,
-            "npc_registry_unavailable")
-    end
-    record = Registry.Get(npcID)
-    body = Registry.GetLiveZombie(npcID)
-    if not record or record.alive == false or not body
-        or body.isDead and body:isDead()
-    then
-        return rejected(requestID, npcID, speechAct, "npc_unavailable")
-    end
-
-    local conversationAuthority = PNC.Conversation
-        and PNC.Conversation.Authority or nil
-    local authorityInternal = conversationAuthority
-        and conversationAuthority.Internal or nil
-    validateLease = authorityInternal and authorityInternal.ValidateLease
-    if type(validateLease) ~= "function" then
-        return rejected(requestID, npcID, speechAct,
-            "conversation_authority_unavailable")
-    end
-    valid, reason = validateLease(player, record, conversationToken)
-    if valid ~= true then
-        return rejected(requestID, npcID, speechAct,
-            reason or "invalid_conversation")
-    end
-
-    if not PlayerCharacters or type(PlayerCharacters.GetEntityKey)
-        ~= "function"
-    then
-        return rejected(requestID, npcID, speechAct,
-            "player_identity_unavailable")
-    end
-    at = worldAgeHours()
-    actorKey = PlayerCharacters.GetEntityKey(player, {
-        callback = "semantic_dialogue_social",
-        worldAgeHours = at,
-    })
-    targetKey = EntityRef and type(EntityRef.ForNPC) == "function"
-        and EntityRef.ForNPC(npcID) or nil
-    if not actorKey or not targetKey then
-        return rejected(requestID, npcID, speechAct,
-            "social_identity_unavailable")
-    end
-    definition = Definitions and Definitions[eventType] or nil
-    if not definition
-        or not definition.allowedSourceSystems
-        or definition.allowedSourceSystems.semantic_dialogue ~= true
-    then
-        return rejected(requestID, npcID, speechAct,
-            "social_event_definition_unavailable")
-    end
-    if not SocialEvents or type(SocialEvents.Emit) ~= "function" then
-        return rejected(requestID, npcID, speechAct,
-            "social_event_service_unavailable")
-    end
-
-    eventID = table.concat({
-        "social:semantic_dialogue",
-        tostring(actorKey),
-        npcID,
-        conversationID,
-        requestID,
-    }, ":")
-    processed = SocialEvents.Emit({
-        id = eventID,
-        type = eventType,
-        actorKey = actorKey,
-        targetKey = targetKey,
-        occurredAt = at,
-        sourceSystem = "semantic_dialogue",
-        context = {
-            conversationID = conversationID,
-            speechAct = speechAct,
-        },
-    })
-    if type(processed) ~= "table" or processed.ok ~= true then
-        return rejected(requestID, npcID, speechAct,
-            processed and processed.reason or "social_event_rejected")
-    end
-    detail = detailFor(processed, npcID, actorKey)
-    if detail then
-        sendRelationship(
-            player,
-            npcID,
-            requestID,
-            eventID,
-            eventType,
-            detail
-        )
-    end
-    beforeSummary = detail and relationshipSummary(
-        detail.relationshipBefore,
-        true,
-        npcID
-    ) or nil
-    afterSummary = detail and relationshipSummary(
-        detail.relationshipAfter,
-        true,
-        npcID
-    ) or nil
-    accepted = (tonumber(processed.relationshipsChanged) or 0) > 0
-    return {
-        accepted = accepted,
-        status = accepted and "applied" or "rejected",
-        reason = accepted and nil or "relationship_not_changed",
-        requestID = requestID,
-        npcID = npcID,
-        speechAct = speechAct,
-        eventID = eventID,
-        eventType = eventType,
-        relationshipBefore = beforeSummary,
-        relationshipAfter = afterSummary,
-        relationshipDelta = relationshipDelta(beforeSummary, afterSummary),
-    }
-end
+require "PNC/Networking/Handlers/PNC_ServerSemanticSocialInteractionCommandHandler_ApplySocialEvent"
+require "PNC/Networking/Handlers/PNC_ServerSemanticSocialInteractionCommandHandler_Handle"
 
 Router.Register(Const.CMD_SEMANTIC_SOCIAL_EVENT_REQUEST, function(player, args)
     Authority.Handle(player, args)

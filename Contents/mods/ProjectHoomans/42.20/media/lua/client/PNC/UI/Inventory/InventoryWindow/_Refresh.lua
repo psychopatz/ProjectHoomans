@@ -71,15 +71,7 @@ local function buildPlayerRows(window, containerEntry, player, playerCount)
     return rows
 end
 
-function ISPNCInventoryWindow:refreshInventory(force)
-    if self.tradeMode and self.refreshTradeInventory then
-        return self:refreshTradeInventory(force)
-    end
-    local player = getSpecificPlayer and getSpecificPlayer(0) or getPlayer and getPlayer() or nil
-    local endpoint = self.transferEndpoint
-    if not endpoint then return end
-    if force == true then self.playerRowsDirty = true end
-    self:updateInventoryRefreshButton(inventoryNow())
+local function collectRefreshContext(self, endpoint, player)
     endpoint.selectedContainer = self.selectedNPCContainer or "root"
     endpoint.expandedGroups = self.expandedNPCGroups or {}
     local revision = endpoint:revision()
@@ -116,23 +108,10 @@ function ISPNCInventoryWindow:refreshInventory(force)
             self, currentPlayerContainer, player, playerCount
         )
     end
-    local signature = table.concat({
-        tostring(endpoint.kind),
-        tostring(endpoint.id or ""),
-        tostring(revision),
-        tostring(playerCount),
-        tostring(self.playerRowsSignature or ""),
-        tostring(self.selectedNPCContainer),
-        tostring(self.selectedPlayerContainer),
-        self.readOnly and "readonly" or "writable",
-        tostring(self.npcId and ClientState.snapshots
-            and ClientState.snapshots[self.npcId]
-            and ClientState.snapshots[self.npcId].storageCourier
-            and ClientState.snapshots[self.npcId].storageCourier.revision or 0),
-    }, "|")
-    if not force and signature == self.contextSignature then return end
-    self.contextSignature = signature
+    return revision, currentPlayerContainer, playerCount, currentPlayerRows
+end
 
+local function refreshInventoryLists(self, endpoint, player, currentPlayerContainer, currentPlayerRows, playerCount)
     self.playerContainers = Model.BuildPlayerContainers(player)
     if not Model.FindContainer(self.playerContainers, self.selectedPlayerContainer) then
         self.selectedPlayerContainer = "root"
@@ -188,6 +167,9 @@ function ISPNCInventoryWindow:refreshInventory(force)
         self.npcContainers,
         self.selectedNPCContainer
     )
+end
+
+local function updateCourierStatus(self)
     local snapshot = self.npcId and ClientState.snapshots
         and ClientState.snapshots[self.npcId] or nil
     local payload = self:payload()
@@ -217,6 +199,9 @@ function ISPNCInventoryWindow:refreshInventory(force)
         self.statusText = tr("UI_PNC_Storage_ReadOnlyAway",
             "Read only: enter the base to move stockpile items")
     end
+end
+
+local function updateInventoryIdentity(self, endpoint)
     local npcName = endpoint.kind == "storage"
         and tostring(endpoint.displayName or "Colony Storage")
         or endpoint.kind == "local_draft"
@@ -228,6 +213,39 @@ function ISPNCInventoryWindow:refreshInventory(force)
     if self.setTitle then
         self:setTitle(tr("UI_PNC_Inventory_Title", "Inventory") .. " - " .. tostring(npcName))
     end
+end
+
+function ISPNCInventoryWindow:refreshInventory(force)
+    if self.tradeMode and self.refreshTradeInventory then
+        return self:refreshTradeInventory(force)
+    end
+    local player = getSpecificPlayer and getSpecificPlayer(0) or getPlayer and getPlayer() or nil
+    local endpoint = self.transferEndpoint
+    if not endpoint then return end
+    if force == true then self.playerRowsDirty = true end
+    self:updateInventoryRefreshButton(inventoryNow())
+    local revision, currentPlayerContainer, playerCount, currentPlayerRows =
+        collectRefreshContext(self, endpoint, player)
+    local signature = table.concat({
+        tostring(endpoint.kind),
+        tostring(endpoint.id or ""),
+        tostring(revision),
+        tostring(playerCount),
+        tostring(self.playerRowsSignature or ""),
+        tostring(self.selectedNPCContainer),
+        tostring(self.selectedPlayerContainer),
+        self.readOnly and "readonly" or "writable",
+        tostring(self.npcId and ClientState.snapshots
+            and ClientState.snapshots[self.npcId]
+            and ClientState.snapshots[self.npcId].storageCourier
+            and ClientState.snapshots[self.npcId].storageCourier.revision or 0),
+    }, "|")
+    if not force and signature == self.contextSignature then return end
+    self.contextSignature = signature
+
+    refreshInventoryLists(self, endpoint, player, currentPlayerContainer, currentPlayerRows, playerCount)
+    updateCourierStatus(self)
+    updateInventoryIdentity(self, endpoint)
 end
 
 local function invalidatePlayerRows()
