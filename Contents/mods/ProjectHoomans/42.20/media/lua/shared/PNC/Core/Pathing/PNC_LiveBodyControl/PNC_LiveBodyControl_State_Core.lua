@@ -107,7 +107,65 @@ function LiveBodyControl.EnforceManagedNativeIntent(zombie)
     -- Callers are already on a managed-body boundary. This primitive owns
     -- only the native intent reset; higher-level body suppression adds its
     -- own useless/movement state after calling it.
+    local actionState
+    local modData
+    local record
+    local lane
+    local ownedTraversal = false
     if not zombie then return false end
+    actionState = LiveBodyControl.GetActionStateName(zombie)
+    if LiveBodyControl.IsNativePassageState
+        and LiveBodyControl.IsNativePassageState(actionState)
+    then
+        modData = zombie.getModData and zombie:getModData() or nil
+        ownedTraversal = modData
+            and modData.PNC_BumpActionLease == true
+            and LiveBodyControl.IsTraversalBumpType
+            and LiveBodyControl.IsTraversalBumpType(
+                modData.PNC_BumpRequestedType
+            )
+            or false
+        if not ownedTraversal
+            and PNC.Registry
+            and PNC.Registry.FindRecordByZombie
+        then
+            record = PNC.Registry.FindRecordByZombie(zombie)
+            lane = record and record.runtime
+                and record.runtime.pathing or nil
+            ownedTraversal = lane
+                and (lane.traversalAction ~= nil
+                    or lane.vanillaFenceAction ~= nil)
+                or false
+        end
+        if not ownedTraversal then
+            -- IsoZombie carriers do not have the player BodyDamage object
+            -- expected by ClimbOverFenceState/ClimbThroughWindowState. A
+            -- stale native passage state must be released before Java can
+            -- re-enter the same state and throw every frame.
+            local behavior = zombie.getPathFindBehavior2
+                and zombie:getPathFindBehavior2() or nil
+            if behavior then
+                if behavior.cancel then behavior:cancel() end
+                if behavior.reset then behavior:reset() end
+            end
+            if zombie.setPath2 then zombie:setPath2(nil) end
+            if LiveBodyControl.SuppressZombieState then
+                LiveBodyControl.SuppressZombieState(
+                    zombie,
+                    nil,
+                    PNC.Core and PNC.Core.Now and PNC.Core.Now() or 0,
+                    true
+                )
+            end
+            if record and record.runtime then
+                record.runtime.nativePassageRecovery = {
+                    state = actionState,
+                    reason = "unowned_managed_native_passage",
+                    at = PNC.Core and PNC.Core.Now and PNC.Core.Now() or 0,
+                }
+            end
+        end
+    end
     if not Internal.clearVanillaIntent(zombie) then return false end
     if zombie.setVariable then
         -- A managed body is an IsoZombie carrier. Clearing target references
@@ -140,4 +198,3 @@ function LiveBodyControl.SuppressVanillaIntent(
     )
     return true
 end
-

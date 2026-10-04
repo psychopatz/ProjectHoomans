@@ -178,6 +178,61 @@ function Utility.DescribeCoreRecord(record)
     return H.Describe(Utility.GetStatic(typeID), state, record[C.QUANTITY])
 end
 
+local function mergeCanonicalLiquidState(descriptor, item, typeID)
+    local inventory = PNC.Inventory
+    local describe = inventory and inventory.DescribeLiquidContainer
+    local liquid
+    local amount
+    local yield
+    local recognized
+
+    if type(describe) ~= "function" then return descriptor end
+    liquid = describe(item)
+    if type(liquid) ~= "table" then return descriptor end
+
+    -- The hydration planner and the physical liquid-container service are
+    -- authoritative for live fluid state.  Static item profiles can lag
+    -- behind a partially consumed Build 42 container, which used to make the
+    -- planner select a bottle that ConsumePersonalItem rejected.
+    recognized = liquid.canDrink == true or liquid.canFill == true
+        or liquid.capacity ~= nil or liquid.amount ~= nil
+    if not recognized then return descriptor end
+
+    descriptor = descriptor or {
+        typeId = typeID,
+        fullType = item.type,
+        quantity = math.max(1, math.floor(tonumber(item.stack) or 1)),
+        hunger = 0,
+        thirst = 0,
+        calories = 0,
+        negativeThirst = 0,
+        useDelta = 0,
+        remainingUses = 1,
+        food = false,
+        bandage = false,
+        unsafe = false,
+        burnt = false,
+        burntMultiplier = 1,
+        effectiveValues = true,
+        remainingFraction = 1,
+    }
+
+    amount = math.max(0, tonumber(liquid.amount) or 0)
+    yield = tonumber(descriptor.hydrationYieldPerLiter) or 0.50
+    descriptor.fluidAmount = amount
+    descriptor.fluidType = liquid.primaryType or descriptor.fluidType
+    descriptor.fluidHydration = true
+    descriptor.fluidContainer = true
+    descriptor.fluidSafe = liquid.safeWater == true
+    descriptor.hydration = liquid.canDrink == true
+        and descriptor.fluidSafe
+        and amount > 0.000001
+    descriptor.thirst = descriptor.hydration and amount * yield or 0
+    descriptor.state = liquid.state or descriptor.state
+
+    return descriptor
+end
+
 function Utility.DescribeNPCItem(item)
     if type(item) ~= "table" then return nil end
     local typeID = CoreInventory.getItemTypeId(item.type, false)
@@ -186,7 +241,9 @@ function Utility.DescribeNPCItem(item)
     local merged = {}
     for key, value in pairs(state) do merged[key] = value end
     if item.uses ~= nil then merged.usedDelta = item.uses end
-    return H.Describe(Utility.GetStatic(typeID, item.type), merged, item.stack)
+    local descriptor = H.Describe(Utility.GetStatic(typeID, item.type),
+        merged, item.stack)
+    return mergeCanonicalLiquidState(descriptor, item, typeID)
 end
 
 function Utility.Supports(descriptor, request)

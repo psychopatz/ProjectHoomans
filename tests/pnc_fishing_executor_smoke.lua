@@ -18,7 +18,7 @@ PNC = {
         GetJob = function(id) return jobs[tostring(id)] end,
         GetZone = function() return { id = "fishing:zone", enabled = true } end,
         ValidateZone = function() return true end,
-        IsNearby = function() return true end,
+        IsNearby = function() return false end,
         ValidateJob = function() return true end,
         StartJob = function() return true end,
         TickJob = function() return false, false, "fishing_npc_tired" end,
@@ -76,6 +76,9 @@ T.equal(recovery.lastProgressAt, 100,
 jobs.npc.phase = "WAITING"
 recovery = Executor.GetRecoveryState({ npcId = "npc" })
 T.falsy(recovery.watchable, "fishing waiting state is not treated as a stall")
+jobs.npc.phase = "TRAVEL"
+recovery = Executor.GetRecoveryState({ npcId = "npc" })
+T.truthy(recovery.watchable, "fishing travel is observable by recovery")
 T.falsy(Executor.Tick({ npcId = "npc", leaseId = "lease:1" }),
     "terminal fishing tick")
 T.equal(PNC.FishingCancelReason, "fishing_npc_tired", "tick cancellation")

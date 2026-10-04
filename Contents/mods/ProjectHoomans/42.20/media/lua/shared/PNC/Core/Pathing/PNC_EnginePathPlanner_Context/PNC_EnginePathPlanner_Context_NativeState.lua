@@ -5,6 +5,97 @@ PNC.EnginePathPlanner.Internal = PNC.EnginePathPlanner.Internal or {}
 local Planner = PNC.EnginePathPlanner
 local Internal = PNC.EnginePathPlanner.Internal
 local Const = PNC.Const or {}
+local Diagnostics = PNC.PerformanceScalingDiagnostics
+local NATIVE_AUDIT_REPEAT_MS = 1000
+
+local function shouldSampleNativeAudit(record, body, navigation, force)
+    local runtime
+    local audit
+    local stateName
+    local hasPath
+    local moving
+    local nativeActive
+    local now
+    local repeatMs
+    if force == true or not record then return true end
+    runtime = record.runtime or {}
+    record.runtime = runtime
+    audit = runtime.nativeHandoffAudit or {}
+    runtime.nativeHandoffAudit = audit
+    stateName = Internal.GetEngineStateName(body)
+    hasPath = body and body.getPath2 and body:getPath2() ~= nil or false
+    moving = body and body.isMoving and body:isMoving() == true or false
+    nativeActive = navigation and navigation.nativeActive == true or false
+    now = PNC.Core and PNC.Core.Now and PNC.Core.Now() or 0
+    repeatMs = (hasPath or nativeActive) and 250 or NATIVE_AUDIT_REPEAT_MS
+    if audit.stateName == stateName
+        and audit.hasPath == hasPath
+        and audit.moving == moving
+        and audit.nativeActive == nativeActive
+        and audit.controllerMode == (navigation
+            and navigation.controllerMode or "")
+        and now - (tonumber(audit.at) or 0) < repeatMs
+    then
+        return false
+    end
+    audit.stateName = stateName
+    audit.hasPath = hasPath
+    audit.moving = moving
+    audit.nativeActive = nativeActive
+    audit.controllerMode = navigation and navigation.controllerMode or ""
+    audit.at = now
+    return true
+end
+
+function Internal.GetEngineStateName(body)
+    if not body then return "" end
+    if body.getCurrentStateName then
+        return string.lower(tostring(body:getCurrentStateName() or ""))
+    end
+    -- Compatibility fallback for isolated test doubles and older bridges.
+    return body.getActionStateName
+        and string.lower(tostring(body:getActionStateName() or "")) or ""
+end
+
+function Internal.IsNativeWalkTowardState(stateName)
+    stateName = string.lower(tostring(stateName or ""))
+    return stateName == "walktoward"
+        or stateName == "walktowardstate"
+        or stateName == "walktowardnetwork"
+        or stateName == "walktowardnetworkstate"
+end
+
+local function isSuspiciousNativeBoundary(body)
+    return Internal.IsNativeWalkTowardState(
+        Internal.GetEngineStateName(body)
+    )
+end
+
+function Internal.RecordNativeHandoff(
+    record,
+    body,
+    eventName,
+    navigation,
+    extra,
+    force
+)
+    if not Diagnostics
+        or Diagnostics.NativeHandoffAuditEnabled ~= true
+        or not Diagnostics.LogNativeHandoff
+        or (force ~= true and not isSuspiciousNativeBoundary(body))
+        or not shouldSampleNativeAudit(record, body, navigation, force)
+    then
+        return false
+    end
+    return Diagnostics.LogNativeHandoff(
+        record,
+        body,
+        eventName,
+        "native_path",
+        navigation,
+        extra
+    )
+end
 
 function Internal.GetPathBehavior(body)
     return body and body.getPathFindBehavior2
@@ -63,13 +154,15 @@ end
 -- Behavior2 is still acquiring the route. Releasing only this stale state is
 -- important; entering PathFindState would make Java execute Behavior2 a second
 -- time during the same update.
-function Internal.EnsureNativeMovementOwner(body)
-    local actionState
-    if not body or not body.getActionStateName then
+function Internal.EnsureNativeMovementOwner(body, boundary, record)
+    local engineState
+    if not body
+        or (not body.getCurrentStateName and not body.getActionStateName)
+    then
         return false
     end
-    actionState = string.lower(tostring(body:getActionStateName() or ""))
-    if actionState ~= "walktoward"
+    engineState = Internal.GetEngineStateName(body)
+    if not Internal.IsNativeWalkTowardState(engineState)
         or not body.changeState
         or not ZombieIdleState
         or not ZombieIdleState.instance
@@ -79,8 +172,37 @@ function Internal.EnsureNativeMovementOwner(body)
     if body.getPath2 and body:getPath2() == nil then
         return false
     end
+    Internal.RecordNativeHandoff(
+        record,
+        body,
+        "walktoward_conflict_before",
+        record and record.runtime and record.runtime.localNavigation or nil,
+        "boundary=" .. tostring(boundary or "unknown")
+    )
     body:changeState(ZombieIdleState.instance())
+    -- IsoGameCharacter.doDeferredMovement only rejects path2 when the legacy
+    -- AI state is still WalkTowardState. Keep the movement flag untouched:
+    -- Behavior2 has just set it to true and the native route still owns the
+    -- locomotion presentation. Clearing it here creates the idle/walk fight
+    -- this fence is intended to prevent.
+    Internal.RecordNativeHandoff(
+        record,
+        body,
+        "walktoward_conflict_after",
+        record and record.runtime and record.runtime.localNavigation or nil,
+        "boundary=" .. tostring(boundary or "unknown"),
+        true
+    )
     return true
+end
+
+-- Public boundary for managed-body callbacks. The planner pump also uses the
+-- internal helper, but the engine can recreate WalkTowardState after
+-- Behavior2 publishes path2. This repairs the state for the next engine
+-- frame; the generic animation ownership fence is what prevents the conflict
+-- from being recreated during the current frame.
+function Planner.ReconcileNativeMovementOwner(body, record, boundary)
+    return Internal.EnsureNativeMovementOwner(body, boundary or "reconcile", record)
 end
 
 local function hasOwnedNativeAction(record, body, now)

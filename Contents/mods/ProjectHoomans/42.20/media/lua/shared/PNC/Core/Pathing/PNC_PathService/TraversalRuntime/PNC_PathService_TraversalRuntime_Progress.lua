@@ -243,8 +243,13 @@ function Internal.updateTraversalAction(zombie, record, lane, now)
     if not finished and not timedOut then
         return true, action.kind .. "_finish"
     end
+    -- Position is authoritative for the crossing boundary. Build 42 can
+    -- omit the final animation-state signal for a managed IsoZombie, but if
+    -- the carrier is already on the landing side the traversal succeeded.
+    -- Treating that case as a timeout invalidates the route and sends fishing
+    -- and other shoreline work back into the same passage repeatedly.
     finishReason = crossed
-        and (finished and "anim_finished" or "hard_timeout")
+        and (finished and "anim_finished" or "crossed")
         or "same_side"
     if Internal.logTraversalEvent then
         Internal.logTraversalEvent(

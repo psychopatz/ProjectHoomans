@@ -216,6 +216,25 @@ T.equal(storedReason, "job_requirements_added",
 T.equal(storedDetails.target, "storage",
     "storage-only requirement target is preserved")
 
+local controllerSource = T.read("ProjectHoomans", "client",
+    "PNC/UI/Storage/PNC_StorageController.lua")
+local modalSource = T.read("ProjectHoomans", "client",
+    "PNC/UI/Storage/PNC_StorageJobRequirementsModal.lua")
+local modalModelSource = T.read("ProjectHoomans", "client",
+    "PNC/UI/Storage/PNC_StorageJobRequirementsModal_Model.lua")
+T.contains(controllerSource, '"job_requirements", "UI_PNC_Storage_JobRequirements"',
+    "storage debug drawer still exposes a Lumber-only action")
+T.contains(controllerSource, "JobRequirementsModal.Open",
+    "storage debug drawer does not open the job requirements modal")
+T.falsy(controllerSource:find("job_requirements_lumber", 1, true),
+    "storage controller still hardcodes Lumber")
+T.contains(modalSource, 'target = "storage"',
+    "job requirements modal does not target colony storage")
+T.contains(modalSource, "Model.Operations",
+    "job requirements modal cannot enumerate registered jobs")
+T.contains(modalModelSource, "WorkRegistry.All",
+    "job requirements modal does not include the work catalog")
+
 local duplicate, duplicateReason = Loaded.DebugSupplyJobRequirements(
     { id = "admin" }, {
         storageId = storage.id, operation = "LUMBER", target = "worker",

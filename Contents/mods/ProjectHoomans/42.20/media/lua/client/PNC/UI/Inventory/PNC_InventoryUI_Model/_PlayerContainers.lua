@@ -1,12 +1,16 @@
 local Helpers = require "PNC/UI/Inventory/PNC_InventoryUI_Model/_Native"
 local safeCall = Helpers.safeCall
 local probe = Helpers.probe
+local isFastAggregateType = Helpers.isFastAggregateType
 local ROOT_INVENTORY_TEXTURE = Helpers.rootInventoryTexture
 
 local Model = PNC.InventoryUIModel
 
 local function addPlayerContainer(output, seen, item, depth)
     if not item or depth > 4 then return end
+    if isFastAggregateType(safeCall(item, "getFullType", "")) then
+        return
+    end
     local itemID = tostring(safeCall(item, "getID", ""))
     if itemID == "" or seen[itemID] then return end
     local nested = item.getItemContainer and item:getItemContainer()

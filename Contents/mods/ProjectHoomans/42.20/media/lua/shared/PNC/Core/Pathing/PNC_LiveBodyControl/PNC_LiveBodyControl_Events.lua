@@ -192,6 +192,19 @@ function LiveBodyControl.OnZombieUpdate(zombie)
     then
         record = PNC.Registry.FindRecordByZombie(zombie)
         if record then
+            navigation = record.runtime
+                and record.runtime.localNavigation or nil
+            if PNC.EnginePathPlanner.Internal
+                and PNC.EnginePathPlanner.Internal.RecordNativeHandoff
+            then
+                PNC.EnginePathPlanner.Internal.RecordNativeHandoff(
+                    record,
+                    zombie,
+                    "zombie_update_before_pump",
+                    navigation,
+                    "boundary=OnZombieUpdate"
+                )
+            end
             if Diagnostics
                 and record.presenceState == PNC.Const.PRESENCE_ABSTRACT
             then
@@ -203,6 +216,13 @@ function LiveBodyControl.OnZombieUpdate(zombie)
                 or ActorControl.CanPump(record)
             if canPump then
                 PNC.EnginePathPlanner.PumpFrame(record, zombie)
+                if PNC.EnginePathPlanner.ReconcileNativeMovementOwner then
+                    PNC.EnginePathPlanner.ReconcileNativeMovementOwner(
+                        zombie,
+                        record,
+                        "after_pump"
+                    )
+                end
                 navigation = record.runtime
                     and record.runtime.localNavigation or nil
                 now = Core.Now and Core.Now() or 0
@@ -228,10 +248,20 @@ function LiveBodyControl.OnZombieUpdate(zombie)
     end
     -- The single-player planner can touch native state after the shared
     -- safety pass. Reapply only the target/lunge boundary here; do not reset
-    -- the action state, because PNC may currently own a traversal animation
-    -- or a native movement lease.
+    -- arbitrary action state, because PNC may currently own a traversal
+    -- animation or a native movement lease. The final owner fence only
+    -- releases a stale WalkToward owner when Behavior2 already has path2.
     if LiveBodyControl.EnforceManagedNativeIntent then
         LiveBodyControl.EnforceManagedNativeIntent(zombie)
+    end
+    if PNC.EnginePathPlanner
+        and PNC.EnginePathPlanner.ReconcileNativeMovementOwner
+    then
+        PNC.EnginePathPlanner.ReconcileNativeMovementOwner(
+            zombie,
+            record,
+            "after_managed_intent"
+        )
     end
     -- This runs before IsoZombie.updateInternal() reaches its post-event
     -- tryThump() call. If vanilla sees a window on the feeler tile, stop the
@@ -242,6 +272,31 @@ function LiveBodyControl.OnZombieUpdate(zombie)
             zombie,
             nil,
             Core and Core.Now and Core.Now() or 0
+        )
+    end
+    -- The passage guard can touch the native action state after the first
+    -- ownership fence. Reconcile once more so the next engine frame starts
+    -- with a clean owner. OnZombieUpdate is after doDeferredMovement, so the
+    -- generic animation fence is still required for same-frame prevention.
+    if PNC.EnginePathPlanner
+        and PNC.EnginePathPlanner.ReconcileNativeMovementOwner
+    then
+        PNC.EnginePathPlanner.ReconcileNativeMovementOwner(
+            zombie,
+            record,
+            "after_passage_guard"
+        )
+    end
+    if record
+        and PNC.EnginePathPlanner.Internal
+        and PNC.EnginePathPlanner.Internal.RecordNativeHandoff
+    then
+        PNC.EnginePathPlanner.Internal.RecordNativeHandoff(
+            record,
+            zombie,
+            "zombie_update_after_callbacks",
+            record.runtime and record.runtime.localNavigation or nil,
+            "boundary=OnZombieUpdate"
         )
     end
 end

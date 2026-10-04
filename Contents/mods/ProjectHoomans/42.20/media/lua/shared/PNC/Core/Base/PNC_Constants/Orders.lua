@@ -24,6 +24,10 @@ Const.ORDER_LUMBER = "lumber"
 Const.ORDER_FISHING = "fishing"
 
 Const.FISHING_DEFAULT_RADIUS = 16
+-- Live fishing work starts when the NPC reaches the shoreline stand point.
+-- Keep this separate from the zone-selection radius above: a live worker must
+-- be close enough for its fishing scene and server-side progress to agree.
+Const.FISHING_INTERACTION_RADIUS = 1.75
 Const.FISHING_ZONE_RADIUS = 12
 Const.FISHING_MAX_ZONE_TILES = 10000
 Const.FISHING_MAX_WORKERS = 16

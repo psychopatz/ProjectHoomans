@@ -28,7 +28,7 @@ local count = 0
 for _ in pairs(PNC.Const) do count = count + 1 end
 -- Change detector: update this when a constant is intentionally added or
 -- removed so the growth is reviewed instead of silent.
-T.equal(count, 614, "constant key count")
+T.equal(count, 616, "constant key count")
 T.equal(PNC.Const.PERSISTENCE_VERSION, 16, "persistence contract")
 T.equal(PNC.Const.NETWORK_PAYLOAD_BUDGET_BYTES, 786432,
     "server payload budget contract")

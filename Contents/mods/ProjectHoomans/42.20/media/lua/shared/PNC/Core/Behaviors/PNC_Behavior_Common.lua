@@ -99,6 +99,10 @@ function Common.ClearCombatTarget(record, reason, zombie)
         -- kept both the activity label and weapon presentation in Fighting
         -- after ordinary movement had already resumed.
         record.runtime.inCombatUntil = 0
+        if Equipment.ReleaseCombatLease then
+            Equipment.ReleaseCombatLease(record, zombie, "combat_target_clear")
+            equipmentInfo = Equipment.Describe(record)
+        end
     end
     if not zombie and PNC.Registry and PNC.Registry.GetLiveZombie then
         zombie = PNC.Registry.GetLiveZombie(record.id)

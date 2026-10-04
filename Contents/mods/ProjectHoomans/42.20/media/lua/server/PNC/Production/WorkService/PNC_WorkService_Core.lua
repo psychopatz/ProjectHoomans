@@ -165,6 +165,16 @@ local function workerAvailable(record, order)
     then
         return false, "REQUIRED_WORKER_MISMATCH"
     end
+    if order.operation ~= "WORK_ITEM_PICKUP"
+        and order.operation ~= "WORK_ITEM_RETURN"
+        and PNC.WorkItemService
+        and type(PNC.WorkItemService.Check) == "function"
+    then
+        local report = PNC.WorkItemService.Check(record, order.operation)
+        if not report.ok then
+            return false, report.reason or "WAITING_FOR_WORK_ITEM"
+        end
+    end
     if Service.ClaimsByWorker[tostring(record.id)] then
         return false, "WORKER_ALREADY_CLAIMED"
     end
@@ -263,6 +273,21 @@ local function findWorker(order)
             or "NO_HOME_WORKER")
 end
 
+local function releaseWorkItemForOrder(order, reason)
+    if not order or order.operation == "WORK_ITEM_PICKUP"
+        or order.operation == "WORK_ITEM_RETURN"
+    then return true end
+    local record = order.workerId and PNC.Registry and PNC.Registry.Get
+        and PNC.Registry.Get(order.workerId) or nil
+    local workItems = PNC.WorkItemService
+    if record and workItems and type(workItems.Release) == "function" then
+        local released, releaseReason = workItems.Release(
+            record, order.operation, nil, { reason = reason })
+        if released == false then return false, releaseReason end
+    end
+    return true
+end
+
 Internal.emit = emit
 Internal.now = now
 Internal.terminal = terminal
@@ -275,6 +300,7 @@ Internal.belongsToOrder = belongsToOrder
 Internal.markAssignmentDirty = markAssignmentDirty
 Internal.workerAvailable = workerAvailable
 Internal.findWorker = findWorker
+Internal.releaseWorkItemForOrder = releaseWorkItemForOrder
 
 require "PNC/Production/WorkService/PNC_WorkService_OperationRegistry"
 

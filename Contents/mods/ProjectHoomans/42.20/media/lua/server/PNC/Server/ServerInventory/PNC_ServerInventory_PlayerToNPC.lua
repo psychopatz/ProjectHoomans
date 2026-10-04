@@ -13,9 +13,11 @@ local Inventory = PNC.Inventory
 local ItemTransfer = Internal.ItemTransfer
 local isNativeBulkProtected = Internal.isNativeBulkProtected
 local isNonEmptyContainer = Internal.isNonEmptyContainer
+local isNativeIdentityItem = Internal.isNativeIdentityItem
 local compactSpec = Internal.compactSpec
 local refreshLiveEquipment = Internal.refreshLiveEquipment
 local syncResult = Internal.syncResult
+local transferCurrency = Internal.transferPlayerToNPCCurrency
 
 local function rollbackProjections(projections)
     for index = #(projections or {}), 1, -1 do
@@ -53,10 +55,23 @@ end
 
 local function transferPlayerToNPC(player, record, args, sinceRevision)
     local itemIDs = type(args.itemIDs) == "table" and args.itemIDs or {}
+    local currencyAmount = math.floor(tonumber(args.currencyAmount) or 0)
+    if currencyAmount > 0 then
+        if type(transferCurrency) ~= "function" then
+            return false, "currency_service_unavailable"
+        end
+        return transferCurrency(player, record, args, sinceRevision)
+    end
     local maxItems = tonumber(Const.INVENTORY_TRANSFER_MAX_ITEMS) or 64
     if #itemIDs < 1 or #itemIDs > maxItems then return false, "invalid_item_count" end
     local resolved, reason = ItemTransfer.ResolvePlayerItems(player, itemIDs)
     if not resolved then return false, reason end
+    for index = 1, #resolved do
+        local protected, protectedReason = isNativeIdentityItem(
+            resolved[index]
+        )
+        if protected then return false, protectedReason end
+    end
     if args.bulk == true then
         local eligibleIDs = {}
         local eligibleItems = {}

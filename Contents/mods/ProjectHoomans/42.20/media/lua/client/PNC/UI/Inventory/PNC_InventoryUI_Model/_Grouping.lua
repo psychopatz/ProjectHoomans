@@ -9,6 +9,7 @@ local function groupKey(row)
         row.favorite == true and "favorite" or "ordinary",
         row.equipped == true and "equipped" or "carried",
         row.restricted == true and "restricted" or "interactive",
+        row.aggregate == true and "aggregate" or "physical",
         tostring(row.stateKey or ""),
     }, "\031")
 end
@@ -79,6 +80,10 @@ function Model.GroupRows(rows, expandedGroups)
 end
 
 function Model.GetRowQuantity(row)
+    if row and row.currency == true then
+        return math.max(1, math.floor(tonumber(row.currencyUnits)
+            or tonumber(row.stack) or 1))
+    end
     return row and math.max(1, math.floor(tonumber(row.stack) or 1)) or 0
 end
 
@@ -91,21 +96,54 @@ function Model.BuildTransferSelection(row, requestedQuantity)
     if not row or row.restricted == true or quantity < 1 or quantity > available then
         return nil, "invalid_quantity"
     end
-    for index = 1, #members do
-        local member = members[index]
-        local memberQuantity = math.max(
-            1,
-            math.floor(tonumber(member.stack) or 1)
-        )
-        if selected < quantity then
-            itemIDs[#itemIDs + 1] = member.id
-            selected = selected + math.min(memberQuantity, quantity - selected)
+    if row.currency == true then
+        return {
+            itemIDs = {},
+            quantity = quantity,
+            itemQuantity = 0,
+            currency = true,
+            currencyAmount = math.max(1, math.floor(quantity)),
+            currencyUnitValue = 1,
+            -- nil means value-based currency. Core is then free to spend
+            -- loose money, bundles, or a mixture and re-normalize it.
+            currencyFullType = nil,
+            currencyContainer = row.container,
+        }
+    end
+    if row and row.aggregate == true
+        and type(row.itemIDs) == "table"
+    then
+        for index = 1, #row.itemIDs do
+            local itemID = row.itemIDs[index]
+            local memberQuantity = math.max(
+                1, math.floor(tonumber(row.itemIDQuantities
+                    and row.itemIDQuantities[index]) or 1)
+            )
+            if selected < quantity and itemID then
+                itemIDs[#itemIDs + 1] = itemID
+                selected = selected + math.min(
+                    memberQuantity, quantity - selected)
+            end
+        end
+    else
+        for index = 1, #members do
+            local member = members[index]
+            local memberQuantity = math.max(
+                1,
+                math.floor(tonumber(member.stack) or 1)
+            )
+            if selected < quantity then
+                itemIDs[#itemIDs + 1] = member.id
+                selected = selected + math.min(
+                    memberQuantity, quantity - selected)
+            end
         end
     end
     if selected < quantity then return nil, "quantity_unavailable" end
     return {
         itemIDs = itemIDs,
         quantity = quantity,
+        itemQuantity = quantity,
     }
 end
 

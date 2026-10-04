@@ -19,6 +19,9 @@ local buildTravelSummary = H.buildTravelSummary
 local buildMapPresentationSummary = H.buildMapPresentationSummary
 local buildDetailedDebugState = H.buildDetailedDebugState
 
+local buildWorkPresentation = Equipment
+    and Equipment.BuildWorkPresentationSummary or function() return nil end
+
 function H.BuildPresentationProjection(record, state)
     local combat = state.combat
     local firearmState = state.firearmState
@@ -56,6 +59,7 @@ function H.BuildPresentationProjection(record, state)
                 or {},
             attached = Core.DeepCopy(record.equipment
                 and record.equipment.attached or {}),
+            workPresentation = buildWorkPresentation(record),
         },
         inventorySummary = state.inventorySummary,
         characterWindow = {

@@ -19,6 +19,66 @@ local skillRate = Internal.SkillRate
 local WorldEffects = Internal.WorldEffects
 local FatigueGate = Internal.FatigueGate
 
+local LIVE_APPROACH_STOP_DISTANCE = tonumber(
+    Service.LIVE_APPROACH_STOP_DISTANCE) or 0.25
+local LIVE_TRAVEL_STALL_TIMEOUT_MS = tonumber(
+    Service.LIVE_TRAVEL_STALL_TIMEOUT_MS) or 12000
+local LIVE_TRAVEL_RECOVERY_COOLDOWN_MS = tonumber(
+    Service.LIVE_TRAVEL_RECOVERY_COOLDOWN_MS) or 3000
+local LIVE_TRAVEL_MAX_RECOVERIES = tonumber(
+    Service.LIVE_TRAVEL_MAX_RECOVERIES) or 2
+
+local function playerRequiresLiveExecution(record)
+    if type(record) ~= "table" then return false end
+    local runtime = record.runtime or {}
+    if runtime.forceAbstract == true then return false end
+    if runtime.forceLive == true then return true end
+
+    -- Presence owns the distance policy. Use its public decision when it is
+    -- available; the runtime distance is only a bounded fallback for test and
+    -- compatibility compositions that do not load Presence.
+    if PNC.Presence
+        and type(PNC.Presence.ShouldMaterialize) == "function"
+    then
+        local ok, shouldMaterialize = pcall(
+            PNC.Presence.ShouldMaterialize, record)
+        if ok and shouldMaterialize == true then return true end
+    end
+    local distanceSq = tonumber(runtime.nearestPlayerDistSq)
+    local distance = PNC.Const
+        and tonumber(PNC.Const.MATERIALIZE_DISTANCE) or 28
+    return distanceSq ~= nil and distanceSq <= distance * distance
+end
+
+local function requestLiveHandoff(record, tree, at)
+    record.runtime = record.runtime or {}
+    local handoff = record.runtime.lumberHandoff
+    if type(handoff) ~= "table" or handoff.treeKey ~= tree.key then
+        handoff = { treeKey = tree.key, attempts = 0 }
+        record.runtime.lumberHandoff = handoff
+    end
+    handoff.treeLoaded = true
+    handoff.lastReason = "loaded_tree_requires_live_execution"
+
+    local requestedAt = tonumber(handoff.lastRequestedAt) or 0
+    if at - requestedAt < 1000 then return "live_handoff_pending" end
+
+    handoff.attempts = (tonumber(handoff.attempts) or 0) + 1
+    handoff.lastRequestedAt = at
+    record.runtime.forcePresenceCheck = true
+
+    local clock = PNC.SimulationClock
+    if clock and type(clock.Wake) == "function" then
+        pcall(clock.Wake, record, "presence", at)
+    end
+    local scheduler = PNC.Scheduler
+    if scheduler and type(scheduler.Schedule) == "function" then
+        local slot = tonumber(scheduler.SLOT_MS) or 50
+        pcall(scheduler.Schedule, record, at + slot)
+    end
+    return "live_handoff_requested"
+end
+
 local function adjacentToTree(body, tree)
     if not body or not tree then return false end
     local x = type(body.getX) == "function" and body:getX() or nil
@@ -65,6 +125,121 @@ local function npcFatigueIsSufficient(record)
     return FatigueGate.Check(record)
 end
 
+local function travelWatchKey(tree, approach)
+    return table.concat({
+        tostring(tree and tree.key or ""),
+        tostring(approach and approach.x or ""),
+        tostring(approach and approach.y or ""),
+        tostring(approach and approach.z or ""),
+    }, "|")
+end
+
+local function observeLiveTravel(record, body, tree, approach, at)
+    record.runtime = record.runtime or {}
+    local key = travelWatchKey(tree, approach)
+    local watch = record.runtime.lumberTravelWatch
+    local bx = body and type(body.getX) == "function"
+        and body:getX() or record.x
+    local by = body and type(body.getY) == "function"
+        and body:getY() or record.y
+    local pathService = PNC.PathService
+    local recovery
+    local lastPathProgress
+    if type(watch) ~= "table" or watch.key ~= key then
+        watch = {
+            key = key,
+            startedAt = at,
+            lastProgressAt = at,
+            lastX = bx,
+            lastY = by,
+            recoveries = 0,
+            nextRetryAt = 0,
+        }
+        record.runtime.lumberTravelWatch = watch
+    end
+
+    if watch.lastX ~= nil and watch.lastY ~= nil then
+        local dx = (tonumber(bx) or 0) - (tonumber(watch.lastX) or 0)
+        local dy = (tonumber(by) or 0) - (tonumber(watch.lastY) or 0)
+        if math.sqrt((dx * dx) + (dy * dy)) >= 0.05 then
+            watch.lastProgressAt = at
+        end
+    end
+    watch.lastX, watch.lastY = bx, by
+
+    if pathService and type(pathService.GetMovementRecoveryState)
+        == "function"
+    then
+        recovery = pathService.GetMovementRecoveryState(record, body, at)
+        lastPathProgress = recovery and tonumber(recovery.lastProgressAt)
+        if lastPathProgress and lastPathProgress > (
+            tonumber(watch.lastProgressAt) or 0)
+        then
+            watch.lastProgressAt = lastPathProgress
+        end
+    end
+
+    -- PathService owns native recovery. Reconcile the stale vanilla state at
+    -- the task boundary as well, because Behavior2 can publish path2 after
+    -- the regular planner fence in the same engine frame.
+    if recovery and recovery.ownerMode == "engine_path"
+        and PNC.EnginePathPlanner
+        and type(PNC.EnginePathPlanner.ReconcileNativeMovementOwner)
+            == "function"
+    then
+        PNC.EnginePathPlanner.ReconcileNativeMovementOwner(body)
+    end
+    record.runtime.lumberTravelDiagnostic = recovery and {
+        phase = recovery.phase,
+        ownerMode = recovery.ownerMode,
+        nativeStallRecoveryCount = recovery.nativeStallRecoveryCount,
+        nativeBackoff = recovery.nativeBackoff,
+        nativeFallback = recovery.nativeFallback,
+        lastProgressAt = recovery.lastProgressAt,
+        lastProgressReason = recovery.lastProgressReason,
+    } or nil
+
+    if at < (tonumber(watch.nextRetryAt) or 0) then
+        return "backoff", watch, recovery
+    end
+    -- A native backoff, fallback handoff, or traversal is already an active
+    -- recovery owner. Do not let lumber cancel/recreate the same route.
+    if recovery and (
+        recovery.nativeBackoff == true
+        or recovery.nativeFallback == true
+        or recovery.watchable == false
+    ) then
+        watch.lastProgressAt = at
+        watch.nextRetryAt = at + LIVE_TRAVEL_RECOVERY_COOLDOWN_MS
+        return "backoff", watch, recovery
+    end
+    if at - (tonumber(watch.lastProgressAt) or at)
+        < LIVE_TRAVEL_STALL_TIMEOUT_MS
+    then
+        return nil, watch, recovery
+    end
+
+    if (tonumber(watch.recoveries) or 0) < LIVE_TRAVEL_MAX_RECOVERIES then
+        local resetAccepted = true
+        if pathService and pathService.Commands
+            and type(pathService.Commands.Reset) == "function"
+        then
+            resetAccepted = pathService.Commands.Reset(
+                record, body, "lumber_travel_stall") ~= false
+        elseif pathService and type(pathService.Reset) == "function" then
+            resetAccepted = pathService.Reset(
+                body, record, "lumber_travel_stall") ~= false
+        end
+        if resetAccepted then
+            watch.recoveries = (tonumber(watch.recoveries) or 0) + 1
+            watch.lastProgressAt = at
+            watch.nextRetryAt = at + LIVE_TRAVEL_RECOVERY_COOLDOWN_MS
+            return "recovered", watch, recovery
+        end
+    end
+    return "stalled", watch, recovery
+end
+
 
 local function tickLive(job, record, body, tree, at)
     local actual, square = Service.GetTreeAt(tree.x, tree.y, tree.z)
@@ -105,32 +280,47 @@ local function tickLive(job, record, body, tree, at)
     end
     local bx = body and body.getX and body:getX() or record.x
     local by = body and body.getY and body:getY() or record.y
-    local bz = body and body.getZ and body:getZ() or record.z
     -- The approach point is a navigation hint, not the interaction point.
     -- Bodies can stop slightly off the selected square while still being in
     -- the valid tree interaction envelope. Test adjacency first so a visually
     -- arrived worker does not remain in TRAVEL forever.
     local adjacent = adjacentToTree(body, tree)
+    if adjacent then
+        record.runtime = record.runtime or {}
+        record.runtime.lumberTravelWatch = nil
+    else
+        local travelState = observeLiveTravel(
+            record, body, tree, approach, at)
+        if travelState == "backoff" then
+            job.state, job.phase = "WAITING", "WAITING_FOR_TRAVEL"
+            updateRuntime(record, job, tree)
+            return true, false, "lumber_travel_backoff"
+        end
+        if travelState == "recovered" then
+            job.state, job.phase = "WAITING", "WAITING_FOR_TRAVEL"
+            updateRuntime(record, job, tree)
+            return true, false, "lumber_travel_recovery"
+        end
+        if travelState == "stalled" then
+            Service.ReleaseTree(tree.key, "travel_stalled")
+            job.targetKey, job.approach = nil, nil
+            job.state, job.phase = "READY", "BLOCKED"
+            updateRuntime(record, job, tree)
+            return true, false, "lumber_travel_stalled"
+        end
+    end
     local distance = math.abs((tonumber(bx) or 0) - approach.x)
         + math.abs((tonumber(by) or 0) - approach.y)
-    if not adjacent and (distance > 1.0
-        or math.abs((tonumber(bz) or 0) - approach.z) > 0.6) then
-        job.state, job.phase = "TRAVELING", "TRAVEL"
-        if PNC.BehaviorCommon and PNC.BehaviorCommon.MoveRecord then
-            PNC.BehaviorCommon.MoveRecord(record, body,
-                approach.x, approach.y, approach.z, "walk", 0.7, "lumber")
-        end
-        updateRuntime(record, job, tree)
-        return true, false, "traveling"
-    end
     if not adjacent then
         job.state, job.phase = "TRAVELING", "TRAVEL"
         if PNC.BehaviorCommon and PNC.BehaviorCommon.MoveRecord then
             PNC.BehaviorCommon.MoveRecord(record, body,
-                approach.x, approach.y, approach.z, "walk", 0.7, "lumber")
+                approach.x, approach.y, approach.z, "walk",
+                LIVE_APPROACH_STOP_DISTANCE, "lumber")
         end
         updateRuntime(record, job, tree)
-        return true, false, "not_adjacent"
+        return true, false, distance > 1.0
+            and "traveling" or "not_adjacent"
     end
     if PNC.BehaviorCommon and PNC.BehaviorCommon.HaltMovement then
         PNC.BehaviorCommon.HaltMovement(record, body, "lumber_chop")
@@ -153,16 +343,21 @@ local function tickLive(job, record, body, tree, at)
     job.state, job.phase = "WORKING", "CHOPPING"
     local lastHit = tonumber(job.lastHitAt) or 0
     local beforeWorldObjects
+    local healthBefore
+    local healthAfter
     if at - lastHit >= Service.HIT_INTERVAL_MS then
         beforeWorldObjects = Internal.CaptureOutputItems
             and Internal.CaptureOutputItems(square, nil, nil, true) or nil
+        healthBefore = type(actual.getHealth) == "function"
+            and tonumber(actual:getHealth()) or nil
         actual:WeaponHit(body, tool.item)
         persistLiveToolCondition(record, tool.item)
         job.lastHitAt = at
-        job.lastProgressAt = at
         if type(actual.getHealth) == "function" then
-            local health = tonumber(actual:getHealth())
-            if health then tree.remainingWork = math.max(0, health) end
+            healthAfter = tonumber(actual:getHealth())
+            if healthAfter then
+                tree.remainingWork = math.max(0, healthAfter)
+            end
         end
         tree.revision = (tonumber(tree.revision) or 0) + 1
         markDirty()
@@ -174,6 +369,7 @@ local function tickLive(job, record, body, tree, at)
         return true, false, "tree_chunk_loading_after_hit"
     end
     if not stillThere or tonumber(tree.remainingWork) <= 0 then
+        job.lastProgressAt = at
         job.activityItemFullType = nil
         stopChopAnimation(record, body)
         local outputEffect = Internal.EnsureLumberOutputEffect(tree, "LIVE", nil,
@@ -193,6 +389,19 @@ local function tickLive(job, record, body, tree, at)
         updateRuntime(record, job, tree)
         return true, false, "tree_depleted_live_output_pending"
     end
+    if healthBefore ~= nil and healthAfter ~= nil
+        and healthAfter >= healthBefore
+    then
+        -- Keep a bad native weapon from looking like productive work. The
+        -- live animation is presentation only; a hit is progress only when
+        -- the engine reports a lower IsoTree health value.
+        job.activityItemFullType = nil
+        stopChopAnimation(record, body)
+        job.state, job.phase = "WAITING", "WAITING_FOR_TOOL"
+        updateRuntime(record, job, tree)
+        return true, false, "tool_zero_tree_damage"
+    end
+    job.lastProgressAt = at
     updateRuntime(record, job, tree)
     return true, false, "chopping"
 end
@@ -234,6 +443,12 @@ end
 
 local function tickAbstract(job, record, tree, at)
     local actual, square = Service.GetTreeAt(tree.x, tree.y, tree.z)
+    record.runtime = record.runtime or {}
+    record.runtime.lumberHandoff = record.runtime.lumberHandoff or {}
+    record.runtime.lumberHandoff.treeKey = tree.key
+    record.runtime.lumberHandoff.treeLoaded = square ~= nil
+    record.runtime.lumberHandoff.lastReason = square
+        and "abstract_loaded_offscreen" or "tree_chunk_loading"
     if square then
         if not actual then
             -- A player or another authoritative system may have removed the
@@ -247,11 +462,17 @@ local function tickAbstract(job, record, tree, at)
             updateRuntime(record, job, nil)
             return true, false, "physical_tree_missing"
         end
-        -- A loaded physical tree is authoritative. Wait for materialization
-        -- instead of silently deleting a tree that a player can observe.
-        job.state, job.phase = "WAITING", "WAITING_FOR_MATERIALIZATION"
-        updateRuntime(record, job, tree)
-        return true, false, "loaded_tree_requires_live_execution"
+        -- A loaded physical tree is authoritative while it is observable.
+        -- Outside the presence observation range, abstract work may continue
+        -- against the ledger; completion creates the durable, identity-checked
+        -- TREE_REMOVE effect and never calls the engine tree API here.
+        if playerRequiresLiveExecution(record) then
+            local handoffReason = requestLiveHandoff(record, tree, at)
+            job.state, job.phase = "WAITING",
+                "WAITING_FOR_MATERIALIZATION"
+            updateRuntime(record, job, tree)
+            return true, false, handoffReason
+        end
     end
     local tool, toolReason = resolveAbstractTool(record)
     if not tool then
@@ -300,7 +521,7 @@ local function tickAbstract(job, record, tree, at)
         updateRuntime(record, job, nil)
         return true, false, "tree_depleted_abstract_output"
     end
-    return true, false, actual and "physical_tree_appeared" or "abstract_chopping"
+    return true, false, "abstract_chopping"
 end
 
 Internal.TickLive = tickLive

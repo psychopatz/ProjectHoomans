@@ -9,7 +9,8 @@ Definitions.OPERATION = {
     DECONSTRUCT = "DECONSTRUCT",
     BUILD_OBJECT = "BUILD_OBJECT", READ_BOOK = "READ_BOOK",
     PROVISION_PICKUP = "PROVISION_PICKUP", CORPSE_HAUL = "CORPSE_HAUL",
-    LUMBER = "LUMBER",
+    LUMBER = "LUMBER", WORK_ITEM_PICKUP = "WORK_ITEM_PICKUP",
+    WORK_ITEM_RETURN = "WORK_ITEM_RETURN",
 }
 
 Definitions.STATUS = {
@@ -48,6 +49,8 @@ Definitions.JOB_BY_OPERATION = {
     PROVISION_PICKUP = "Provisioner",
     CORPSE_HAUL = "CorpseHaul",
     LUMBER = "Lumber",
+    WORK_ITEM_PICKUP = "WorkItemLogistics",
+    WORK_ITEM_RETURN = "WorkItemLogistics",
 }
 
 Definitions.CAPABILITY_BY_OPERATION = {

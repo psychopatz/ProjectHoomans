@@ -87,6 +87,9 @@ local function remotePresentationChanged(state, snapshot)
     local medicalPhase = medical and medical.phase or "idle"
     local medicalTaskId = medical and medical.taskId or ""
     local medicalBump = medical and medical.bump or ""
+    local equipment = snapshot and snapshot.equipmentSummary or nil
+    local workPresentation = snapshot and snapshot.workPresentation
+        or equipment and equipment.workPresentation
     local changed = state.presentationRevision ~= revision
         or state.presentationHealthState ~= healthState
         or state.presentationAnim ~= anim
@@ -104,7 +107,8 @@ local function remotePresentationChanged(state, snapshot)
         or state.presentationMedicalTaskId ~= medicalTaskId
         or state.presentationMedicalBump ~= medicalBump
         or state.presentationAppearance ~= (snapshot and snapshot.appearance)
-        or state.presentationEquipment ~= (snapshot and snapshot.equipmentSummary)
+        or state.presentationEquipment ~= equipment
+        or state.presentationWork ~= workPresentation
     state.presentationRevision = revision
     state.presentationHealthState = healthState
     state.presentationAnim = anim
@@ -122,7 +126,8 @@ local function remotePresentationChanged(state, snapshot)
     state.presentationMedicalTaskId = medicalTaskId
     state.presentationMedicalBump = medicalBump
     state.presentationAppearance = snapshot and snapshot.appearance
-    state.presentationEquipment = snapshot and snapshot.equipmentSummary
+    state.presentationEquipment = equipment
+    state.presentationWork = workPresentation
     return changed
 end
 

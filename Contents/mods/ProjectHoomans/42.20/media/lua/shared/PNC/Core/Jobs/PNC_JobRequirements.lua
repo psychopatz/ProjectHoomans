@@ -47,6 +47,14 @@ function Registry.Describe(operation)
     return definition and copyValue(definition) or nil
 end
 
+function Registry.All()
+    local output = {}
+    for index = 1, #Registry.Order do
+        output[index] = Registry.Order[index]
+    end
+    return output
+end
+
 -- Requirements are data, not behavior. Jobs may register additional
 -- operations (fishing, farming, and so on) without changing the storage
 -- debug transaction or the live/abstract inventory adapters.
@@ -66,6 +74,24 @@ Registry.Register("LUMBER", {
             durable = true,
             equipSlot = "primary",
             validator = "lumber_tool",
+        },
+    },
+})
+
+Registry.Register("FISHING", {
+    labelKey = "UI_PNC_Job_Fishing",
+    requirements = {
+        {
+            role = "primary_tool",
+            labelKey = "UI_PNC_JobRequirement_FishingTool",
+            candidates = {
+                "Base.FishingRod",
+                "Base.CraftedFishingRod",
+            },
+            quantity = 1,
+            durable = true,
+            equipSlot = "primary",
+            validator = "fishing_tool",
         },
     },
 })

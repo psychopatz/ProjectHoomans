@@ -25,6 +25,7 @@ Shared.ROSTER_ICON_PATHS = {
     bleeding = "media/ui/Moodles/32/Status_Bleeding.png",
     pained = "media/ui/Moodles/32/Mood_Pained.png",
     critical = "media/ui/Moodles/32/Mood_Angry.png",
+    missing_tool = "media/ui/inventoryPanes/nocraft.png",
 }
 Shared.ROSTER_ICON_TOOLTIP_KEYS = {
     hunger = "UI_PNC_Roster_Tooltip_Hunger",
@@ -33,6 +34,7 @@ Shared.ROSTER_ICON_TOOLTIP_KEYS = {
     bleeding = "UI_PNC_Roster_Tooltip_Bleeding",
     pained = "UI_PNC_Roster_Tooltip_Pained",
     critical = "UI_PNC_Roster_Tooltip_Critical",
+    missing_tool = "UI_PNC_Roster_Tooltip_MissingTool",
 }
 Shared.ROSTER_ICON_TOOLTIP_FALLBACKS = {
     hunger = "This colonist is hungry and needs food.",
@@ -41,6 +43,7 @@ Shared.ROSTER_ICON_TOOLTIP_FALLBACKS = {
     bleeding = "This colonist has an untreated wound and is bleeding.",
     pained = "This colonist has a bandaged wound and is still recovering.",
     critical = "This colonist has a critical need that requires immediate attention.",
+    missing_tool = "This colonist is missing a valid tool for the assigned job.",
 }
 Shared.CONDITION_LABEL_KEYS = {
     stress = "UI_PNC_Stat_Stress",
@@ -218,6 +221,70 @@ function Shared.WorstNeed(person)
     return Shared.LEVELS[worstIndex], worstType
 end
 
+local function itemName(fullType)
+    fullType = tostring(fullType or "")
+    if fullType == "" then return "required tool" end
+    if getItemNameFromFullType then
+        local translated = getItemNameFromFullType(fullType)
+        if translated and tostring(translated) ~= "" then
+            return tostring(translated)
+        end
+    end
+    local value = string.match(fullType, "([^%.]+)$") or fullType
+    value = string.gsub(value, "_", " ")
+    return value
+end
+
+local function diagnosticCandidates(diagnostic)
+    local values = diagnostic.missingCandidates
+        or diagnostic.requiredItems
+        or diagnostic.candidates
+    if type(values) == "table" and #values > 0 then return values end
+    for _, requirement in ipairs(diagnostic.requirements or {}) do
+        if not requirement.selected and type(requirement.candidates) == "table"
+            and #requirement.candidates > 0
+        then
+            return requirement.candidates
+        end
+    end
+    return {}
+end
+
+local function missingToolIndicator(person)
+    local action = person and person.actionInformation or nil
+    if type(action) ~= "table" then return nil end
+    local diagnostic = action.workItemDiagnostic
+    local liveDiagnostic = action.toolDiagnostic
+    if type(liveDiagnostic) == "table" and liveDiagnostic.usable == false then
+        diagnostic = liveDiagnostic
+    end
+    if type(diagnostic) ~= "table" then return nil end
+    if diagnostic.role and diagnostic.role ~= "primary_tool" then return nil end
+    local missing = diagnostic.ok == false
+        or diagnostic.usable == false
+        or (diagnostic.ok == nil and not diagnostic.selectedFullType)
+    if not missing then return nil end
+
+    local fullTypes = diagnosticCandidates(diagnostic)
+    local names = {}
+    for index = 1, #fullTypes do
+        names[#names + 1] = itemName(fullTypes[index])
+    end
+    if #names == 0 then names[1] = "required tool" end
+    local reason = tostring(diagnostic.reason or "")
+    local tooltip = Shared.Tr(Shared.ROSTER_ICON_TOOLTIP_KEYS.missing_tool,
+        Shared.ROSTER_ICON_TOOLTIP_FALLBACKS.missing_tool)
+        .. ": " .. table.concat(names, ", ")
+    if reason ~= "" then tooltip = tooltip .. " (" .. reason .. ")" end
+    return {
+        id = "missing_tool",
+        texturePath = Shared.ROSTER_ICON_PATHS.missing_tool,
+        tooltip = tooltip,
+        fullTypes = fullTypes,
+        reason = reason,
+    }
+end
+
 function Shared.RosterIndicators(person)
     local indicators = {}
     local critical = false
@@ -249,6 +316,8 @@ function Shared.RosterIndicators(person)
         add("pained")
     end
     if critical then add("critical") end
+    local missingTool = missingToolIndicator(person)
+    if missingTool then indicators[#indicators + 1] = missingTool end
     return indicators
 end
 

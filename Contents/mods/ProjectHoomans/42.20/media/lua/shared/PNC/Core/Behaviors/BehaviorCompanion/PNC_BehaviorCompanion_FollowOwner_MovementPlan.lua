@@ -59,7 +59,8 @@ function H.Run(record, zombie, owner, ownerDist, followState, hazard, now)
             "formation_hold",
             record.runtime.stealthActive
                 and "holding_follow_stealth"
-                or "holding_follow_position"
+                or "holding_follow_position",
+            now
         )
     end
     Internal.SetFollowMode(record, "moving")

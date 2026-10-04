@@ -13,6 +13,7 @@ local Const = PNC.Const
 local Factions = PNC.Factions
 local Communities = PNC.Communities
 local EntityRef = PNC.EntityRef
+local Currency = PsychopatzCore and PsychopatzCore.Currency
 
 local PUMP_INTERVAL_MS = 1000
 local DEMAND_LIFETIME_HOURS = 0.05
@@ -49,6 +50,17 @@ function H.RemoveMoney(player, amount)
     local inventory = player and player.getInventory
         and player:getInventory() or nil
     if not inventory then return false, 0 end
+    amount = math.max(0, math.floor(tonumber(amount) or 0))
+    if Currency and type(Currency.Snapshot) == "function"
+        and type(Currency.RemoveUnits) == "function"
+    then
+        local snapshot = Currency.Snapshot(inventory, { recursive = true })
+        if snapshot.units < amount then return false, snapshot.units end
+        local removed, reason = Currency.RemoveUnits(
+            inventory, amount, { recursive = true })
+        if not removed then return false, snapshot.units end
+        return true, snapshot.units - amount
+    end
     local loose = H.MoneyItems(inventory, "Base.Money")
     local wealth = #loose
     if wealth < amount then return false, wealth end
@@ -63,4 +75,3 @@ function H.RemoveMoney(player, amount)
 end
 
 return Tolls
-

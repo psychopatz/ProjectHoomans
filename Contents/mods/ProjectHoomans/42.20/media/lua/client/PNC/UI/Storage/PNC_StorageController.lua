@@ -8,6 +8,8 @@ local Components = require
 local Presentation = require "PNC/UI/Storage/PNC_StoragePresentation"
 local LayoutModule = require "PNC/UI/Storage/PNC_StorageLayout"
 local Client = require "PNC/UI/Storage/PNC_StorageClient"
+local JobRequirementsModal = require
+    "PNC/UI/Storage/PNC_StorageJobRequirementsModal"
 
 local SORT_LABEL_KEY = "UI_PNC_Storage_Sort"
 local TooltipHost
@@ -93,8 +95,8 @@ function Controller.CreateChildren(window)
         { "validate", "UI_PNC_Storage_Validate", "Validate" },
         { "compact", "UI_PNC_Storage_Compact", "Compact" },
         { "recalculate", "UI_PNC_Storage_Recalculate", "Recalculate Weight" },
-        { "job_requirements_lumber", "UI_PNC_Storage_DebugForLumber",
-            "Debug for Lumber" },
+        { "job_requirements", "UI_PNC_Storage_JobRequirements",
+            "Spawn Job Requirements" },
     }
     for _, definition in ipairs(definitions) do
         window.storageControls[#window.storageControls + 1] = UI.CreateButton(
@@ -289,24 +291,23 @@ function Controller.OnControl(window, button)
         return true
     end
 
+    if action == "job_requirements" then
+        local storage = window.snapshot and window.snapshot.storage or nil
+        JobRequirementsModal.Open({
+            storageId = storage and storage.storageId or nil,
+            owner = window,
+        })
+        return true
+    end
+
     local selected = window.storageList and window.storageList:selectedRow()
         or nil
     local debugAction = action
-    local extra = {}
-    if action == "job_requirements_lumber" then
-        debugAction = "job_requirements"
-        extra.operation = "LUMBER"
-        extra.target = "worker"
-        extra.npcId = window.selectedPersonID
-    end
     if PNC.Client and PNC.Client.RequestColonyAction then
         PNC.Client.RequestColonyAction("storage_debug", {
             storageId = window.snapshot and window.snapshot.storage
                 and window.snapshot.storage.storageId,
             debugAction = debugAction,
-            operation = extra.operation,
-            target = extra.target,
-            npcId = extra.npcId,
             recordIndex = selected and selected.recordIndex,
             fullType = "Base.Nails",
             quantity = action == "remove" and selected

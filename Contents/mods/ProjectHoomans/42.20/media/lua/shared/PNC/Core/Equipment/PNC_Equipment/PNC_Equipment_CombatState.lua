@@ -19,6 +19,9 @@ function Equipment.ApplyCombatState(zombie, record, attackMode, force)
     local attachedReason
     local handsReason
     local handStateCurrent
+    local workPresentation
+    local workHeld
+    local primaryFullType
 
     if not zombie or not record then
         return false, "missing_body_or_record"
@@ -28,12 +31,21 @@ function Equipment.ApplyCombatState(zombie, record, attackMode, force)
     end
     record.runtime = record.runtime or {}
     attackMode = attackMode == true
+    workPresentation = Equipment.ResolveWorkPresentation
+        and Equipment.ResolveWorkPresentation(record) or nil
+    workHeld = workPresentation and workPresentation.held == true
     equipment = Equipment.EnsureRecordEquipment(record)
-    descriptor = Internal.buildWeaponDescriptor(equipment.primaryFullType, false)
+    primaryFullType = equipment.primaryFullType
+    if not attackMode and workHeld and workPresentation
+        and workPresentation.fullType
+    then
+        primaryFullType = workPresentation.fullType
+    end
+    descriptor = Internal.buildWeaponDescriptor(primaryFullType, false)
     handStateCurrent = Internal.isPrimaryHandStateCurrent(
         zombie,
         descriptor,
-        attackMode
+        attackMode or workHeld
     )
     if force ~= true
         and record.runtime.equipmentAttackModeApplied == attackMode
@@ -43,13 +55,15 @@ function Equipment.ApplyCombatState(zombie, record, attackMode, force)
         return true, "unchanged"
     end
 
-    descriptor = Internal.buildWeaponDescriptor(equipment.primaryFullType, true)
-    ok, attachedReason, handsReason = Internal.applyCombatPresentation(zombie, record, equipment, descriptor, attackMode)
+    descriptor = Internal.buildWeaponDescriptor(primaryFullType, true)
+    ok, attachedReason, handsReason = Internal.applyCombatPresentation(
+        zombie, record, equipment, descriptor, attackMode or workHeld
+    )
     Visuals.RefreshModel(zombie)
     return ok, tostring(attachedReason) .. "|" .. tostring(handsReason)
 end
 
-function Equipment.EnsureCombatHands(zombie, record)
+function Equipment.EnsureCombatHands(zombie, record, options)
     local equipment
     local descriptor
     local current
@@ -59,7 +73,7 @@ function Equipment.EnsureCombatHands(zombie, record)
         return false, "missing_body_or_record"
     end
     if Internal.isNetworkedGame() then
-        return Equipment.ApplyReplicaHands(zombie, record)
+        return Equipment.ApplyReplicaHands(zombie, record, options)
     end
     equipment = Equipment.EnsureRecordEquipment(record)
     descriptor = Internal.buildWeaponDescriptor(equipment.primaryFullType, false)
@@ -81,6 +95,15 @@ function Equipment.EnsureCombatHands(zombie, record)
         Equipment.PRESENTATION_REVISION
     Visuals.RefreshModel(zombie)
     return ok, reason
+end
+
+-- Work tools are a presentation concern separate from combat stance. Jobs
+-- use this entry point so a rod, axe, or construction tool is visibly held
+-- while combat can still replace it through ApplyCombatState.
+function Equipment.EnsureWorkHands(zombie, record, options)
+    options = type(options) == "table" and options or {}
+    options.forceHeld = true
+    return Equipment.EnsureCombatHands(zombie, record, options)
 end
 
 function Equipment.ResolveWeaponMode(fullType)
@@ -142,11 +165,21 @@ function Equipment.ActivateMeleeFallback(record, zombie, fallbackReason)
         return tostring(left.id) < tostring(right.id)
     end)
     selectedID = candidates[1] and candidates[1].id or nil
-    ok, reason = Inventory.EquipPrimary(
-        record,
-        selectedID,
-        selectedID and "combat_melee_fallback" or "combat_shove_fallback"
-    )
+    if Equipment.AcquirePrimaryLease then
+        ok, reason = Equipment.AcquirePrimaryLease(
+            record, "combat", selectedID, {
+                priority = "COMBAT",
+                reason = selectedID and "combat_melee_fallback"
+                    or "combat_shove_fallback",
+                replaceEqual = true,
+            })
+    else
+        ok, reason = Inventory.EquipPrimary(
+            record,
+            selectedID,
+            selectedID and "combat_melee_fallback" or "combat_shove_fallback"
+        )
+    end
     if not ok then return false, reason end
     record.runtime = record.runtime or {}
     if temporary then
@@ -205,11 +238,17 @@ function Equipment.RestoreRangedFallback(record, zombie)
         clearTemporaryFallback(runtime)
         return false, "ranged_fallback_unavailable"
     end
-    ok, reason = Inventory.EquipPrimary(
-        record,
-        runtime.weaponFallbackFromID,
-        "combat_ranged_restore"
-    )
+    if Equipment.ReleasePrimaryLease then
+        ok, reason = Equipment.ReleasePrimaryLease(record, "combat", {
+            reason = "combat_ranged_restore",
+        })
+    else
+        ok, reason = Inventory.EquipPrimary(
+            record,
+            runtime.weaponFallbackFromID,
+            "combat_ranged_restore"
+        )
+    end
     if not ok then return false, reason end
     clearTemporaryFallback(runtime)
     runtime.weaponFallbackFrom = nil

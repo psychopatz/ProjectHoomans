@@ -165,24 +165,33 @@ function Service.DeleteZone(zoneId, reason)
     return true, "fishing_zone_deleted"
 end
 
-local function distanceSq(record, x, y)
-    local rx, ry = tonumber(record and record.x) or 0, tonumber(record and record.y) or 0
+local function distanceSq(record, x, y, body)
+    local rx = body and body.getX and body:getX()
+        or tonumber(record and record.x) or 0
+    local ry = body and body.getY and body:getY()
+        or tonumber(record and record.y) or 0
     local dx, dy = rx - x, ry - y
     return dx * dx + dy * dy
 end
 
-function Service.IsNearby(record, zone, radius)
-    local spot
+function Service.IsNearby(record, zone, radius, selectedSpot, body)
+    local spot = selectedSpot
     local distance
-    for _, candidate in ipairs(zone and zone.fishingSpots or {}) do
-        local value = distanceSq(record, candidate.standX, candidate.standY)
-        if not spot or value < distance
-            or (value == distance and tostring(candidate.id) < tostring(spot.id))
-        then spot, distance = candidate, value end
+    if not spot then
+        for _, candidate in ipairs(zone and zone.fishingSpots or {}) do
+            local value = distanceSq(record, candidate.standX, candidate.standY, body)
+            if not spot or value < distance
+                or (value == distance
+                    and tostring(candidate.id) < tostring(spot.id))
+            then spot, distance = candidate, value end
+        end
+    else
+        distance = distanceSq(record, spot.standX, spot.standY, body)
     end
-    local rz = tonumber(record and record.z) or 0
+    local rz = body and body.getZ and body:getZ()
+        or tonumber(record and record.z) or 0
     local sz = spot and tonumber(spot.standZ) or rz
-    radius = tonumber(radius) or Service.ACTIVATION_RADIUS
+    radius = tonumber(radius) or Service.INTERACTION_RADIUS
     return spot ~= nil and math.abs(rz - sz) <= 0.6
         and distance <= radius * radius, spot,
         distance and math.sqrt(distance) or nil

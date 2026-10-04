@@ -150,7 +150,22 @@ local function applyBodyPresentation(
     if ClientActionProps and ClientActionProps.Attach
         and ActionProps and ActionProps.Resolve
     then
-        ClientActionProps.Attach(zombie, ActionProps.Resolve(snapshot))
+        local actionDescriptor = ActionProps.Resolve(snapshot)
+        local propOK, propReason = ClientActionProps.Attach(
+            zombie, actionDescriptor
+        )
+        local actionPropData = zombie.getModData
+            and zombie:getModData() or nil
+        if actionPropData then
+            actionPropData.PNCActionPropStatus = {
+                ok = propOK == true,
+                reason = tostring(propReason or "none"),
+                scene = snapshot.visualState
+                    and snapshot.visualState.sceneId or nil,
+                fullType = actionDescriptor
+                    and actionDescriptor.primaryFullType or nil,
+            }
+        end
     end
     if AnimationTrace and AnimationTrace.Sample then
         AnimationTrace.Sample(zombie, "client_post_equipment", now)

@@ -67,6 +67,11 @@ Const.NPC_GROUNDED_COUNTER_STAGGER_TIMEOUT_MS = 1400
 Const.FOLLOW_DECISION_INTERVAL_MS = 200
 Const.FOLLOW_TICK_INTERVAL_MS = 100
 Const.FOLLOW_IDLE_TICK_INTERVAL_MS = 350
+-- Stationary followers do not need to repeat movement ownership and
+-- presentation work at the live-follow cadence. The hold lease still wakes
+-- immediately when the owner, combat lane, or native route changes.
+Const.FOLLOW_HOLD_REFRESH_MS = 1000
+Const.FOLLOW_HOLD_FACING_INTERVAL_MS = 750
 Const.FOLLOW_THREAT_ACTIVE_SCAN_MS = 150
 Const.FOLLOW_THREAT_IDLE_SCAN_MS = 350
 -- Passive behavior uses one lightweight tactical arbiter. Keep acquisition
@@ -126,6 +131,7 @@ Const.COMPANION_COMMAND_RADIUS = 20
 Const.INVENTORY_INTERACTION_RADIUS = 3.0
 Const.INVENTORY_TRANSFER_MAX_ITEMS = 256
 Const.INVENTORY_TRANSFER_MAX_QUANTITY = 1024
+Const.INVENTORY_CURRENCY_MAX_AMOUNT = 1000000
 Const.INVENTORY_HARD_CAPACITY_MULTIPLIER = 3.0
 Const.INVENTORY_HARD_CAPACITY = 50
 Const.INVENTORY_ITEM_STATE_MAX_MODDATA_KEYS = 64

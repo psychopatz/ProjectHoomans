@@ -19,6 +19,8 @@ function LiveBodyControl.EnforceManagedSafety(zombie, source)
     local keepEngineMovementActive
     local now
     local actionLeaseActive
+    local managedTraversalOwner
+    local pathLane
     local unsafeNativeTraversalState
     local needsImmediateRepair
     local presentationKind
@@ -96,8 +98,21 @@ function LiveBodyControl.EnforceManagedSafety(zombie, source)
     actionState = LiveBodyControl.GetActionStateName(zombie)
     unsafeNativeTraversalState = actionState == "climbfence"
         or actionState == "climbwindow"
+    pathLane = record and record.runtime
+        and record.runtime.pathing or nil
+    managedTraversalOwner = modData
+        and modData.PNC_BumpActionLease == true
+        and LiveBodyControl.IsTraversalBumpType
+        and LiveBodyControl.IsTraversalBumpType(
+            modData.PNC_BumpRequestedType
+        )
+        or pathLane
+        and (pathLane.traversalAction ~= nil
+            or pathLane.vanillaFenceAction ~= nil)
+        or false
     actionLeaseActive = Internal.hasBumpActionLease(zombie, now)
         or Internal.hasNativeGetUpLease(zombie, now)
+        or managedTraversalOwner
         or keepEngineMovementActive
             and (Internal.GROUNDED_STATES[actionState] == true
                 or Internal.GETUP_STATES[actionState] == true)

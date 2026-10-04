@@ -286,6 +286,30 @@ T.equal(reason, "storage_full", "capacity rejection reason")
 T.equal(#playerContainer.values, 2, "capacity rollback preserved source")
 T.equal(storageA.inventory:getLogicalItemCount(), 0, "capacity rollback preserved destination")
 
+local storageInternal = Service.Internal
+local C = storageInternal.Constants
+local observedStorageRevision = storageA.revision
+local storageChanged = storageInternal.HasStorageChanged(
+    storageA.id, observedStorageRevision)
+T.falsy(storageChanged,
+    "unchanged storage revision does not invalidate waiting jobs")
+local reservationRecords = {
+    {
+        [C.UNIT_WEIGHT] = 150,
+        [C.QUANTITY] = 1,
+    },
+}
+local reserved, reserveReason = storageInternal.ReserveOutputCapacity(
+    storageA, reservationRecords, "lumber:worker_a")
+T.equal(reserved, true, "output capacity reservation")
+local competing, competingReason = storageInternal.ReserveOutputCapacity(
+    storageA, reservationRecords, "lumber:worker_b")
+T.equal(competing, false, "competing output reservation rejected")
+T.equal(competingReason, "storage_full",
+    "competing output reservation reports capacity")
+T.truthy(storageInternal.ReleaseOutputCapacity("lumber:worker_a"),
+    "output capacity reservation released")
+
 local nails = item("Base.Nails", 0.01)
 T.truthy(Inventory.deposit(storageA.inventory, nails, 100), "nails batch deposit")
 T.equal(storageA.inventory:getLogicalItemCount(), 100, "nails logical quantity")
@@ -322,6 +346,7 @@ InventoryItemFactory = {
         return item(fullType, fullType == "Base.Nails" and 0.01 or 1)
     end,
 }
+local withdrawalRevision = loaded.revision
 ok, reason = Service.RequestPlayerWithdrawal(playerA, {
     requestId = "withdraw:1",
     storageId = loaded.id,
@@ -336,6 +361,10 @@ T.equal(loaded.inventory:getLogicalItemCount(), 95,
 T.equal(#playerContainer.values, 7,
     "withdrawal materializes items in player inventory")
 T.equal(#activity(loaded), 2, "withdrawal journal entry")
+storageChanged = storageInternal.HasStorageChanged(
+    loaded.id, withdrawalRevision)
+T.truthy(storageChanged,
+    "removing any stored item invalidates the shared storage revision")
 T.equal(activity(loaded)[2][Journal.FIELD.OPERATION],
     Journal.OPERATION.TAKE, "withdrawal journal operation")
 T.equal(activity(loaded)[2][Journal.FIELD.QUANTITY], 5,

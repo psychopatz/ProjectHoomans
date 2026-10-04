@@ -116,4 +116,48 @@ T.contains(compositionSource, "PNC/UI/Colonist/PNC_Colonist",
 T.falsy(compositionSource:find("PNC/UI/Needs/PNC_NeedsDebugWindow", 1, true),
     "legacy needs debug window is still loaded in client composition")
 
+PNC.Translation = {
+    GetKey = function(_, fallback) return fallback end,
+    TrFormat = function(_, fallback) return fallback end,
+}
+PNC.NeedsDefinitions = {
+    GetLevel = function() return "NORMAL" end,
+}
+getItemNameFromFullType = function(fullType)
+    return tostring(fullType):match("([^%.]+)$")
+end
+local shared = T.load("ProjectHoomans", "client",
+    "PNC/UI/Shared/PNC_ColonyUIShared.lua")
+local missingIndicators = shared.RosterIndicators({
+    actionInformation = {
+        workItemDiagnostic = {
+            operation = "LUMBER",
+            ok = false,
+            state = "WAITING_FOR_WORK_ITEM",
+            reason = "no_valid_candidate",
+            role = "primary_tool",
+            missingCandidates = { "Base.Axe", "Base.HandAxe" },
+        },
+    },
+})
+T.equal(missingIndicators[1].id, "missing_tool",
+    "missing work tool does not create a roster indicator")
+T.equal(missingIndicators[1].texturePath,
+    "media/ui/inventoryPanes/nocraft.png",
+    "missing work tool uses the vanilla no-craft icon")
+T.contains(missingIndicators[1].tooltip, "Axe",
+    "missing work tool tooltip does not name the required tool")
+T.contains(shared.ROSTER_ICON_PATHS.missing_tool, "nocraft.png",
+    "missing work tool icon path is not registered")
+local readyIndicators = shared.RosterIndicators({
+    actionInformation = {
+        workItemDiagnostic = {
+            operation = "LUMBER", ok = true,
+            role = "primary_tool", selectedFullType = "Base.Axe",
+        },
+    },
+})
+T.equal(#readyIndicators, 0,
+    "ready work item incorrectly shows a missing-tool indicator")
+
 T.finish("pnc_colonist_ui_smoke")

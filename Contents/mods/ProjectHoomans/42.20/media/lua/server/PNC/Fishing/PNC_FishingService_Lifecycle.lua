@@ -12,14 +12,28 @@ function Service.StartJob(lease)
     local zone = job and Service.GetZone(job.zoneId) or nil
     local record = job and PNC.Registry and PNC.Registry.Get
         and PNC.Registry.Get(job.npcId) or nil
+    local executionMode = tostring(lease and lease.executionMode or "ABSTRACT")
+    local live = executionMode == "LIVE"
+    local body = PNC.Registry and PNC.Registry.GetLiveZombie
+        and PNC.Registry.GetLiveZombie(job and job.npcId) or nil
+    local nearby
     if not job or not zone or not record then return false, "fishing_npc_not_found" end
     if PNC.HomeDutyService and PNC.HomeDutyService.IsCamped
         and PNC.HomeDutyService.IsCamped(record) == true
     then return false, "NPC_CAMPED" end
     if not Service.ValidateZone(zone) then return false, "fishing_zone_invalid" end
-    if not Service.IsNearby(record, zone) then return false, "fishing_npc_not_nearby" end
+    local tool = H.ResolveFishingTool(record, job.activityItemID)
     local spot, spotReason = H.ReserveFishingSpot(zone, job, record)
     if not spot then return false, spotReason end
+    job.activityItemID = tool.itemID
+    job.activityItemFullType = tool.fullType
+    job.toolReady = tool.ready == true
+    job.toolReason = tool.reason
+    job.recordPrimaryID = tool.recordPrimaryID
+    job.recordPrimary = tool.recordPrimary
+    job.nativePrimary = tool.nativePrimary
+    nearby = tool.ready and Service.IsNearby(record, zone, nil, spot, body)
+        or false
     if job.previousOrderCaptured ~= true then
         local current = type(record.orderSpec) == "table" and record.orderSpec or nil
         if current and tostring(current.kind or "") == tostring(Const.ORDER_FISHING or "fishing")
@@ -29,12 +43,26 @@ function Service.StartJob(lease)
         job.previousOrderCaptured = true
     end
     Service.Runtime.previousOrders[job.npcId] = H.Copy(job.previousOrder)
-    job.leaseId, job.executionMode = lease.leaseId, tostring(lease.executionMode or "ABSTRACT")
+    job.leaseId, job.executionMode = lease.leaseId, executionMode
     job.lastProgressAt = H.Now()
-    job.state, job.phase = "READY", "WAITING"
-    job.activityItemFullType = H.FishingToolFullType(record)
+    job.state = "READY"
+    job.lastReason = "fishing_tool_check"
+    if not tool.ready then
+        -- TOOL_CHECK is observable and deliberately carries no work
+        -- progress. The specific tool reason remains in toolReason.
+        job.state, job.phase = "READY", "TOOL_CHECK"
+        job.lastReason = tool.reason or "fishing_tool_missing"
+        job.lastFailureReason = job.lastReason
+    elseif live and not nearby then
+        job.state, job.phase = "READY", "TRAVEL"
+        job.lastReason = "traveling"
+    else
+        -- A valid abstract worker can check its tool and begin simulation on
+        -- the next execution tick without requiring a loaded body/chunk.
+        job.state, job.phase = "READY", "TOOL_CHECK"
+    end
     job.revision = (tonumber(job.revision) or 0) + 1
-    H.UpdateFishingRuntime(record, job, zone, "WAITING")
+    H.UpdateFishingRuntime(record, job, zone, job.phase)
     if PNC.OrderSystem and PNC.OrderSystem.SetOrder then
         PNC.OrderSystem.SetOrder(record, {
             kind = Const.ORDER_FISHING or "fishing", fishingJobId = job.id,
@@ -44,6 +72,21 @@ function Service.StartJob(lease)
         })
     end
     H.MarkDirty()
+    if Service.FishingDiagnostics
+        and Service.FishingDiagnostics.RecordTransition
+    then
+        Service.FishingDiagnostics.RecordTransition(record, job, body,
+            job.lastReason or job.phase, {
+                event = "start", phase = job.phase,
+                toolID = job.activityItemID,
+                tool = job.activityItemFullType,
+                recordPrimary = job.recordPrimary,
+                nativePrimary = job.nativePrimary,
+                handReady = tool.ready,
+                handReason = tool.reason,
+                claim = "reserved",
+            })
+    end
     return true
 end
 
@@ -82,6 +125,12 @@ function Service.CancelJob(npcId, reason)
     job.revision = (tonumber(job.revision) or 0) + 1
     Service.RestoreOrder(npcId)
     H.MarkDirty()
+    if Service.FishingDiagnostics
+        and Service.FishingDiagnostics.RecordTransition
+    then
+        Service.FishingDiagnostics.RecordTransition(record, job, body,
+            reason or "cancelled", { event = "cancel" })
+    end
     return true
 end
 

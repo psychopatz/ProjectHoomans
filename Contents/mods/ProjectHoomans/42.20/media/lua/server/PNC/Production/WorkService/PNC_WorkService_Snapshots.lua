@@ -113,6 +113,44 @@ local function lumberProgress(record, order)
     return progress, required, lumber
 end
 
+local function workItemDiagnostic(record, operation)
+    local service = PNC.WorkItemService
+    if not service or type(service.Check) ~= "function" then return nil end
+    local report = service.Check(record, operation)
+    if type(report) ~= "table"
+        or type(report.requirements) ~= "table"
+        or #report.requirements < 1
+    then
+        return nil
+    end
+
+    local output = {
+        operation = report.operation,
+        ok = report.ok == true,
+        state = report.state,
+        reason = report.reason,
+        role = report.role,
+        selectedFullType = report.selected
+            and report.selected.fullType or nil,
+        requirements = copy(report.requirements),
+    }
+    for index = 1, #report.requirements do
+        local requirement = report.requirements[index]
+        if not requirement.selected then
+            output.role = requirement.role
+            output.labelKey = requirement.labelKey
+            output.requiredItems = copy(requirement.candidates or {})
+            output.candidates = copy(requirement.candidates or {})
+            output.missingCandidates = copy(requirement.candidates or {})
+            break
+        end
+    end
+    if service.Status then
+        output.lease = copy(service.Status(record, operation))
+    end
+    return output
+end
+
 function Service.Queries.BuildTaskSnapshot(colonyId)
     local output = {}
     for _, order in ipairs(Service.Queries.List(colonyId)) do
@@ -292,6 +330,26 @@ function Service.BuildActionInformation(record)
     if order.operation == "LUMBER" then
         progress, required, lumber = lumberProgress(record, order)
     end
+    local displayPhase = lumber and lumber.phase
+        or record.orderSpec and record.orderSpec.phase or nil
+    local displayWaitingFor = lumber and lumber.waitingFor or nil
+    local displayWaitingReason = lumber and lumber.waitingReason or nil
+    -- claimStation publishes the lease before the first lumber execution
+    -- tick replaces the old WAITING_FOR_WORKER runtime record. Once this
+    -- order is assigned, expose its phase instead of a stale worker wait.
+    local assignedToRecord = order.workerId ~= nil
+        and tostring(order.workerId) == tostring(record.id)
+    if order.operation == "LUMBER"
+        and assignedToRecord
+        and displayPhase == "WAITING_FOR_WORKER"
+    then
+        displayPhase = order.phase or order.livePhase or "TRAVEL"
+        if displayPhase == "WAITING_FOR_WORKER" then
+            displayPhase = "TRAVEL"
+        end
+        displayWaitingFor = nil
+        displayWaitingReason = nil
+    end
     local activeLocation = workLocationState
         and workLocationState(record, order) or nil
     local activePolicy = locationPolicy and locationPolicy(order) or nil
@@ -301,11 +359,16 @@ function Service.BuildActionInformation(record)
         workOrderId = order.id,
         operation = order.operation,
         status = order.status,
-        phase = lumber and lumber.phase
-            or record.orderSpec and record.orderSpec.phase or nil,
-        waitingFor = lumber and lumber.waitingFor or nil,
-        waitingReason = lumber and lumber.waitingReason or nil,
+        phase = displayPhase,
+        waitingFor = displayWaitingFor,
+        waitingReason = displayWaitingReason,
+        blockedReason = lumber and lumber.blockedReason or order.blockedReason,
+        lastReason = lumber and lumber.lastReason or nil,
+        retryAt = lumber and lumber.retryAt or nil,
+        capacity = lumber and PNC.Core.DeepCopy(lumber.capacity) or nil,
+        movement = lumber and PNC.Core.DeepCopy(lumber.movement) or nil,
         toolDiagnostic = lumber and PNC.Core.DeepCopy(lumber.tool) or nil,
+        workItemDiagnostic = workItemDiagnostic(record, order.operation),
         progress = progress,
         requiredWork = required,
         percent = math.floor((progress / required) * 100 + 0.5),

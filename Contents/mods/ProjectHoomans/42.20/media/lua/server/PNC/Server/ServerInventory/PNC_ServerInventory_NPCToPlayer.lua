@@ -12,14 +12,23 @@ local Inventory = PNC.Inventory
 local ItemTransfer = Internal.ItemTransfer
 local nativeListToArray = Internal.nativeListToArray
 local isCompactBulkProtected = Internal.isCompactBulkProtected
+local isCompactIdentityItem = Internal.isCompactIdentityItem
 local rollbackNativeItems = Internal.rollbackNativeItems
 local compactContainerHasItems = Internal.compactContainerHasItems
 local portableCompactItemState = Internal.portableCompactItemState
 local refreshLiveEquipment = Internal.refreshLiveEquipment
 local syncResult = Internal.syncResult
+local transferCurrency = Internal.transferNPCToPlayerCurrency
 
 local function transferNPCToPlayer(player, record, args, sinceRevision)
     local requestedIDs = type(args.itemIDs) == "table" and args.itemIDs or {}
+    local currencyAmount = math.floor(tonumber(args.currencyAmount) or 0)
+    if currencyAmount > 0 then
+        if type(transferCurrency) ~= "function" then
+            return false, "currency_service_unavailable"
+        end
+        return transferCurrency(player, record, args, sinceRevision)
+    end
     local inv = Inventory.EnsureRecordInventory(record, {
         reconcileWaterContainer = false,
     })
@@ -46,6 +55,11 @@ local function transferNPCToPlayer(player, record, args, sinceRevision)
         if itemID == "" or seen[itemID] or not item then
             rollbackNativeItems(nativeItems)
             return false, "item_not_found"
+        end
+        local protected, protectedReason = isCompactIdentityItem(item)
+        if protected then
+            rollbackNativeItems(nativeItems)
+            return false, protectedReason
         end
         if args.bulk ~= true and item.interactionLocked == true then
             rollbackNativeItems(nativeItems)

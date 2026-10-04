@@ -119,6 +119,17 @@ function Animation.Apply(zombie, record, animState, profileOverride, movingOverr
         Internal.applyBumpLeaseBodyMode(zombie)
         return false
     end
+    if Animation.IsNativeLocomotionOwner
+        and Animation.IsNativeLocomotionOwner(record)
+    then
+        -- Native pathing owns setMoving/action-state while path2 is active.
+        -- Keep the native style synchronizer as the only presentation writer;
+        -- Animation.Apply must not recreate WalkTowardState in parallel.
+        if Animation.SyncNativeLocomotionStyle then
+            Animation.SyncNativeLocomotionStyle(zombie, record)
+        end
+        return false
+    end
     if movingOverride ~= nil then
         moving = movingOverride == true
     else

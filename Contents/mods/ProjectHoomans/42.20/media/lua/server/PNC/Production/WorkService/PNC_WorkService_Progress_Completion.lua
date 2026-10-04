@@ -18,6 +18,7 @@ local terminal = Internal.terminal
 local copy = Internal.copy
 local releaseClaim = Internal.releaseClaim
 local returnHomeAfterWork = Internal.returnHomeAfterWork
+local releaseWorkItemForOrder = Internal.releaseWorkItemForOrder
 
 local function complete(order)
     if order.completionCommitted == true then return true end
@@ -69,6 +70,17 @@ local function complete(order)
             tostring(reason or "COMPLETION_FAILED")
         order.completionStarted = nil
         Repository.MarkDirty(); return false, order.blockedReason
+    end
+    if releaseWorkItemForOrder then
+        local released, releaseReason = releaseWorkItemForOrder(order,
+            "work_order_complete")
+        if released == false then
+            order.completionStarted = nil
+            order.status, order.blockedReason = Status.BLOCKED,
+                releaseReason or "WORK_ITEM_RETURN_FAILED"
+            Repository.MarkDirty()
+            return false, order.blockedReason
+        end
     end
     local completedWorker = worker
     order.completionCommitted = true

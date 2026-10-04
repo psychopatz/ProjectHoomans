@@ -62,6 +62,125 @@ local function recipeTarget(info)
     return itemName(fullType, tr("UI_PNC_Action_ItemTarget", "item"))
 end
 
+local LUMBER_PHASE_LABELS = {
+    TRAVEL = { key = "UI_PNC_Action_LumberTraveling", fallback = "Traveling to" },
+    CHOPPING = { key = "UI_PNC_Action_LumberChopping", fallback = "Chopping" },
+    OUTPUT_APPROACH = { key = "UI_PNC_Action_LumberCollecting", fallback = "Collecting wood" },
+    GRAB_PENDING = { key = "UI_PNC_Action_LumberGrabbing", fallback = "Grabbing wood" },
+    CARRYING = { key = "UI_PNC_Action_LumberDelivering", fallback = "Delivering wood" },
+    OUTPUT_DESTINATION_APPROACH = { key = "UI_PNC_Action_LumberDelivering", fallback = "Delivering wood" },
+    DEPOSIT_PENDING = { key = "UI_PNC_Action_LumberDepositing", fallback = "Depositing wood" },
+    WAITING_FOR_TOOL = { key = "UI_PNC_Action_LumberWaitingTool", fallback = "Waiting for tool" },
+    WAITING_FOR_FATIGUE = { key = "UI_PNC_Action_LumberWaitingFatigue", fallback = "Waiting to recover" },
+    WAITING_FOR_STOCKPILE = { key = "UI_PNC_Action_LumberWaitingStockpile", fallback = "Waiting for stockpile" },
+    WAITING_FOR_TREE_CHUNK = { key = "UI_PNC_Action_LumberWaitingTree", fallback = "Waiting for tree" },
+    WAITING_FOR_MATERIALIZATION = { key = "UI_PNC_Action_LumberWaitingWorld", fallback = "Waiting for world" },
+    WAITING_FOR_TRAVEL = { key = "UI_PNC_Action_LumberWaitingTravel", fallback = "Waiting to travel" },
+    WAITING_FOR_WORKER = { key = "UI_PNC_Action_LumberWaitingWorker", fallback = "Waiting for worker" },
+}
+
+local LUMBER_REASON_LABELS = {
+    storage_full = "storage full",
+    lumber_travel_stalled = "navigation stalled",
+    native_no_goal_progress = "navigation stalled",
+    no_approach_point = "no reachable work point",
+    lumber_tool_missing = "missing lumber tool",
+    tool_cannot_chop = "invalid lumber tool",
+}
+
+local function lumberReason(info)
+    local reason = info and (info.blockedReason or info.waitingReason) or nil
+    if not reason or tostring(reason) == "" then return nil end
+    reason = tostring(reason)
+    return LUMBER_REASON_LABELS[reason]
+        or string.lower(string.gsub(reason, "_", " "))
+end
+
+local function lumberActionText(info, target)
+    if string.upper(tostring(info.operation or "")) ~= "LUMBER" then
+        return nil
+    end
+
+    local phase = string.upper(tostring(info.phase or info.status or ""))
+    local reason = lumberReason(info)
+    if phase == "BLOCKED" then
+        return tr("UI_PNC_Action_Blocked", "Blocked")
+            .. (reason and ": " .. reason or "")
+    end
+    local definition = LUMBER_PHASE_LABELS[phase]
+    if not definition then
+        return nil
+    end
+
+    local label = tr(definition.key, definition.fallback)
+    if reason and (string.find(phase, "^WAITING_", 1) == 1
+        or phase == "DEPOSIT_PENDING")
+    then
+        label = label .. " (" .. reason .. ")"
+    end
+    if phase == "TRAVEL" or phase == "CHOPPING" then
+        return label .. " " .. target
+    end
+    return label
+end
+
+local function actionProgress(info, explicitWork)
+    local percent = tostring(math.max(0, math.min(100, math.floor(tonumber(info.percent) or 0))))
+    if explicitWork then
+        return tr("UI_PNC_Action_WorkProgress", "work") .. " " .. percent .. "%"
+    end
+    return percent .. "%"
+end
+
+local FISHING_PHASE_LABELS = {
+    TRAVEL = { key = "UI_PNC_Action_Traveling", fallback = "traveling" },
+    WAITING = { key = "UI_PNC_Action_Preparing", fallback = "preparing" },
+    TOOL_CHECK = { key = "UI_PNC_Action_FishingToolCheck", fallback = "checking tool" },
+    WORKING = { key = "UI_PNC_Action_FishingWorking", fallback = "working" },
+    ATTEMPT = { key = "UI_PNC_Action_FishingAttempt", fallback = "attempting" },
+    OUTPUT = { key = "UI_PNC_Action_FishingOutput", fallback = "storing catch" },
+    WAITING_FOR_TOOL = { key = "UI_PNC_Action_FishingWaitingTool", fallback = "waiting for tool" },
+    WAITING_FOR_OUTPUT = { key = "UI_PNC_Action_FishingWaitingOutput", fallback = "waiting for output" },
+    WAITING_FOR_SPOT = { key = "UI_PNC_Action_FishingWaitingSpot", fallback = "waiting for fishing spot" },
+}
+
+function Presentation.FishingActionStatus(snapshot)
+    local info = snapshot and snapshot.actionInformation or nil
+    local behaviorId = string.lower(tostring(info and info.behaviorId or ""))
+    local orderKind = string.lower(tostring(info and info.orderKind or ""))
+    if not info or info.kind ~= "behavior"
+        or (orderKind ~= "fishing"
+            and string.find(behaviorId, "fishing", 1, true) ~= 1)
+    then
+        return "", ACTION_COLOR, false
+    end
+
+    local phase = string.upper(tostring(info.phase or "WAITING"))
+    local definition = FISHING_PHASE_LABELS[phase]
+        or { fallback = string.lower(string.gsub(phase, "_", " ")) }
+    local label = definition.key
+        and tr(definition.key, definition.fallback) or definition.fallback
+    local jobLabel = tr("UI_PNC_Job_Fishing", "FISHING")
+    local percent = math.max(0, math.min(100,
+        math.floor(tonumber(info.percent) or 0)))
+    local workingLabel = tr("UI_PNC_Action_Working", "Working")
+    local text = workingLabel .. " " .. jobLabel .. " - " .. label
+        .. " " .. tostring(percent) .. "%"
+    if phase == "WORKING" or phase == "WAITING"
+        or phase == "ATTEMPT" or phase == "OUTPUT"
+    then
+        text = text .. " (attempts " .. tostring(info.attemptIndex or 0)
+            .. ", catches " .. tostring(info.catches or 0) .. ")"
+    end
+    if info.waitingReason and tostring(info.waitingReason) ~= ""
+        and string.find(phase, "^WAITING", 1) == 1
+    then
+        text = text .. " (" .. string.lower(string.gsub(
+            tostring(info.waitingReason), "_", " ")) .. ")"
+    end
+    return text, ACTION_COLOR, true
+end
+
 function Presentation.WorkActionStatus(snapshot)
     local info = snapshot and snapshot.actionInformation or nil
     if not info then return "", ACTION_COLOR, false end
@@ -111,6 +230,11 @@ function Presentation.WorkActionStatus(snapshot)
         target = tostring(operation)
     end
     local text = verb .. " " .. target
+    local lumberText = lumberActionText(info, target)
+    if lumberText then
+        return lumberText .. " - " .. actionProgress(info, true),
+            ACTION_COLOR, true
+    end
     local status = tostring(info.status or "")
     if status == "TRAVEL_TO_STOCKPILE" then
         if operation == "PROVISION_PICKUP" then
@@ -132,8 +256,7 @@ function Presentation.WorkActionStatus(snapshot)
         end
         text = text .. " (" .. string.gsub(waiting, "[_:]", " ") .. ")"
     end
-    return text .. "  " .. tostring(math.max(0,
-        math.min(100, math.floor(tonumber(info.percent) or 0)))) .. "%",
+    return text .. "  " .. actionProgress(info, false),
         ACTION_COLOR, true
 end
 
@@ -177,10 +300,14 @@ function Presentation.ActionStatus(snapshot)
     if info and info.kind == "treatment" then
         return Presentation.TreatmentStatus(snapshot)
     end
+    local fishingText, fishingColor, fishingActive =
+        Presentation.FishingActionStatus(snapshot)
+    if fishingText ~= "" then
+        return fishingText, fishingColor, fishingActive
+    end
     local text, color, active = Presentation.ActivityActionStatus(snapshot)
     if text ~= "" then return text, color, active end
     text, color, active = Presentation.WorkActionStatus(snapshot)
     if text ~= "" then return text, color, active end
     return Presentation.TreatmentStatus(snapshot)
 end
-

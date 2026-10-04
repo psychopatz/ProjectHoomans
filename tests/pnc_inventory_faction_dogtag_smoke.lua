@@ -41,6 +41,18 @@ inventory.Internal.findItemByTemplateKey = function(inv, templateKey)
     end
     return nil
 end
+inventory.Internal.removeItemByID = function(inv, itemID)
+    if not inv or not inv.items or not inv.items[itemID] then return false end
+    inv.items[itemID] = nil
+    for _, container in pairs(inv.containers or {}) do
+        for index = #container.itemIDs, 1, -1 do
+            if container.itemIDs[index] == itemID then
+                table.remove(container.itemIDs, index)
+            end
+        end
+    end
+    return true
+end
 inventory.EnsureRecordInventory = function(record)
     return record and record.inventory or nil
 end
@@ -93,8 +105,13 @@ local record = {
                 interactionLocked = true,
                 interactionLockReason = "identity_card",
             },
+            foreign_card = {
+                id = "foreign_card",
+                type = "Base.IDcard",
+                customName = "ID Card: Tawanda Tang",
+            },
         },
-        containers = { root = { itemIDs = { "card_1" } } },
+        containers = { root = { itemIDs = { "card_1", "foreign_card" } } },
         worn = {},
         attached = {},
         equipped = {},
@@ -153,6 +170,8 @@ T.equal(card.customName, "ID Card: Ash Marlowe Recruited",
     "renamed NPC is shown on their ID card")
 T.equal(card.identityNPCName, "Ash Marlowe Recruited",
     "ID card name metadata follows the NPC")
+T.equal(record.inventory.items.foreign_card, nil,
+    "foreign named identity cards are removed during canonical repair")
 
 Inventory.EnsureRecordInventory = function(record)
     if not record.inventory then

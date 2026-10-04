@@ -14,6 +14,11 @@ local Equipment = PNC.Equipment
 
 local function buildRecordView(snapshot)
     local visualState = snapshot and snapshot.visualState or {}
+    local equipmentSummary = snapshot and snapshot.equipmentSummary or {}
+    local workPresentation = snapshot and snapshot.workPresentation
+        or equipmentSummary.workPresentation
+    local primaryFullType = equipmentSummary.primaryFullType
+        or workPresentation and workPresentation.fullType
     local moving = visualState.moving == true
     local specialActive = visualState.specialActive == true
     return {
@@ -37,12 +42,13 @@ local function buildRecordView(snapshot)
         identity = snapshot and snapshot.identity or nil,
         appearance = snapshot and snapshot.appearance or nil,
         equipment = {
-            primaryFullType = snapshot and snapshot.equipmentSummary and snapshot.equipmentSummary.primaryFullType or nil,
-            primaryVisual = snapshot and snapshot.equipmentSummary and snapshot.equipmentSummary.primaryVisual or nil,
-            secondaryFullType = snapshot and snapshot.equipmentSummary and snapshot.equipmentSummary.secondaryFullType or nil,
-            worn = snapshot and snapshot.equipmentSummary and snapshot.equipmentSummary.worn or {},
-            wornVisuals = snapshot and snapshot.equipmentSummary and snapshot.equipmentSummary.wornVisuals or {},
-            attached = snapshot and snapshot.equipmentSummary and snapshot.equipmentSummary.attached or {},
+            primaryFullType = primaryFullType,
+            primaryVisual = equipmentSummary.primaryVisual,
+            secondaryFullType = equipmentSummary.secondaryFullType,
+            worn = equipmentSummary.worn or {},
+            wornVisuals = equipmentSummary.wornVisuals or {},
+            attached = equipmentSummary.attached or {},
+            workPresentation = workPresentation,
         },
         runtime = {
             attackMode = snapshot and snapshot.attackMode == true or false,
@@ -50,6 +56,7 @@ local function buildRecordView(snapshot)
             -- reads this so a body that is fighting holds its weapon in hand
             -- even on a frame with no attack action in flight.
             combatStance = snapshot and snapshot.combatStance == true or false,
+            workPresentation = workPresentation,
             debug = snapshot and snapshot.debugState and snapshot.debugState.debugEnabled == true or false,
             localNavigation = {
                 provider = visualState.nativeMoveActive == true
@@ -104,4 +111,3 @@ Internal.EnsureReplicaClothingSnapshot =
 
 
 Internal.BuildRecordView = buildRecordView
-

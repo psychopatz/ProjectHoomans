@@ -11,6 +11,7 @@ PNC.ServerInventory.Internal = PNC.ServerInventory.Internal or {}
 require "PNC/Server/ServerInventory/PNC_ServerInventory_Context"
 require "PNC/Server/ServerInventory/PNC_ServerInventory_NativeItems"
 require "PNC/Server/ServerInventory/PNC_ServerInventory_CompactItems"
+require "PNC/Server/ServerInventory/PNC_ServerInventory_Currency"
 require "PNC/Server/ServerInventory/PNC_ServerInventory_PlayerToNPC"
 require "PNC/Server/ServerInventory/PNC_ServerInventory_NPCToPlayer"
 require "PNC/Server/ServerInventory/PNC_ServerInventory_GiftEffects"

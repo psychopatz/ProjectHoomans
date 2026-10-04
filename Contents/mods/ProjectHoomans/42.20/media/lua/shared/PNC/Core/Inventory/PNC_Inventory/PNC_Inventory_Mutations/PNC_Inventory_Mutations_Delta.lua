@@ -122,10 +122,16 @@ local function applyInventoryOperation(record, inv, op)
     return nil
 end
 
-function Inventory.ApplyDelta(record, ops, reason)
-    local inv = Inventory.EnsureRecordInventory(record, {
+function Inventory.ApplyDelta(record, ops, reason, options)
+    local ensureOptions = {
         reconcileWaterContainer = false,
-    })
+    }
+    if type(options) == "table" then
+        ensureOptions.skipCanonicalRepair = options.skipCanonicalRepair == true
+        ensureOptions.skipHydrationLifecycle =
+            options.skipHydrationLifecycle == true
+    end
+    local inv = Inventory.EnsureRecordInventory(record, ensureOptions)
     local snapshot = PNC.Core and PNC.Core.DeepCopy
         and PNC.Core.DeepCopy(inv) or nil
     local appliedOps = {}

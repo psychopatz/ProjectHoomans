@@ -126,6 +126,16 @@ function InventoryWindow.OnResult(result)
         or (tr("UI_PNC_Inventory_Failed", "Inventory action failed") .. ": " .. readable)
     window.contextSignature = nil
     window.playerRowsDirty = true
+    if result.success == true then
+        -- In MP the result command and native item replication can arrive on
+        -- adjacent ticks. Rebuild a few times at a bounded cadence so the
+        -- player pane cannot cache the pre-transfer physical inventory.
+        window.playerRowsReconcileRetries = 3
+        window.playerRowsReconcileNextAt = Helpers.inventoryNow()
+    else
+        window.playerRowsReconcileRetries = 0
+        window.playerRowsReconcileNextAt = nil
+    end
     if window.giftMode and composer
         and composer.ReceiveGiftResult
     then

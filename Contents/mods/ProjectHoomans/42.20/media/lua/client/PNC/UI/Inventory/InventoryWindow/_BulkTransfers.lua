@@ -37,6 +37,25 @@ function InventoryWindow.CollectBulkTransferIDs(list)
     return ids
 end
 
+-- Button state must not materialize every member ID of a large grouped row.
+-- The complete selection is resolved only after the player explicitly starts
+-- a bulk transfer.
+function InventoryWindow.HasBulkTransferItems(list)
+    for _, entry in ipairs(list and list.items or {}) do
+        local row = entry and entry.item or nil
+        if row and row.favorite ~= true and row.equipped ~= true
+            and row.restricted ~= true
+            and ((tonumber(row.stack) or 0) > 0
+                or tostring(row.id or "") ~= ""
+                or type(row.itemIDs) == "table"
+                    and #row.itemIDs > 0)
+        then
+            return true
+        end
+    end
+    return false
+end
+
 function ISPNCInventoryWindow:onGiveAll()
     if self.tradeMode then return false end
     local ok
@@ -46,7 +65,10 @@ function ISPNCInventoryWindow:onGiveAll()
     if self.readOnly then return false end
     local endpoint = self.transferEndpoint
     local selection = TransferEndpoint.BulkSelection(nil, self.playerList)
-    if not endpoint or #selection.itemIDs < 1 then
+    if not endpoint
+        or (#selection.itemIDs < 1
+            and (tonumber(selection.currencyAmount) or 0) < 1)
+    then
         self.statusText = self.giftMode
             and "No valid gifts in this container"
             or self.statusText
@@ -84,7 +106,11 @@ function ISPNCInventoryWindow:onTakeAll()
     local endpoint = self.transferEndpoint
     local selection = TransferEndpoint.BulkSelection(endpoint, self.npcList)
     local available = endpoint and endpoint.kind == "storage"
-        and #selection.records or #selection.itemIDs
+        and #selection.records
+        or #selection.itemIDs
+    if (tonumber(selection.currencyAmount) or 0) > 0 then
+        available = available + 1
+    end
     if not endpoint or available < 1 then return false end
     return endpoint:send("to_player", selection,
         self.selectedPlayerContainer, { bulk = true })

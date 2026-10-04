@@ -16,6 +16,13 @@ local GridRegion = require "PsychopatzCore/World/PC_GridRegion"
 local Zones = require "PsychopatzCore/World/PC_ZoneRegistry"
 local CoreInventory = require "PsychopatzCore/Inventory/PsychopatzInventory"
 
+-- The shared composition normally loads this before server jobs. Keep the
+-- direct lumber test/compatibility entry point loadable as well.
+if not PNC.WorkItemService then
+    require "PNC/Core/Jobs/PNC_JobRequirements"
+    require "PNC/Core/Jobs/PNC_WorkItemService"
+end
+
 Service.MODDATA_KEY = "PNC_LumberWorld_V1"
 Service.SCHEMA_VERSION = 1
 Service.MAX_ZONE_TILES = tonumber(Const.LUMBER_MAX_ZONE_TILES) or 10000
@@ -32,6 +39,13 @@ Service.CLAIM_TTL_MS = 30000
 Service.HIT_INTERVAL_MS = 1500
 Service.ABSTRACT_MAX_ELAPSED_MS = 15000
 Service.ABSTRACT_TOOL_HITS_PER_CONDITION = 8
+-- Live Lumber approaches are cardinal work points beside the tree. Keep the
+-- native route's stopping envelope tighter than the tree interaction envelope
+-- so a completed path cannot leave the worker outside WeaponHit range.
+Service.LIVE_APPROACH_STOP_DISTANCE = 0.25
+Service.LIVE_TRAVEL_STALL_TIMEOUT_MS = 12000
+Service.LIVE_TRAVEL_RECOVERY_COOLDOWN_MS = 3000
+Service.LIVE_TRAVEL_MAX_RECOVERIES = 2
 
 Service.Runtime = Service.Runtime or {
     claims = {},
@@ -50,6 +64,7 @@ Service.Internal.Core = Core
 Service.Internal.GridRegion = GridRegion
 Service.Internal.Zones = Zones
 Service.Internal.Const = Const
+require "PNC/Lumber/LumberService/PNC_LumberService_Diagnostics"
 require "PNC/Lumber/LumberService/PNC_LumberService_State"
 require "PNC/Lumber/LumberService/PNC_LumberService_Zones"
 require "PNC/Lumber/LumberService/PNC_LumberService_Trees"

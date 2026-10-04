@@ -18,7 +18,8 @@ Scenes.Register("fishing.cast", {
     repeatMode = "loop",
     blocking = false,
     steps = {
-        { id = "cast_idle", bump = "FishingSpearIdle", durationMs = 0 },
+        { id = "cast", bump = "FishingCast", durationMs = 1200 },
+        { id = "cast_idle", bump = "FishingIdle", durationMs = 0 },
     },
     interrupts = {
         movement = true,
@@ -35,11 +36,33 @@ Scenes.Register("fishing.cast", {
         then
             return false
         end
+        local phase = tostring(fishing.phase or "WAITING")
+        if phase ~= "WAITING" and phase ~= "WORKING" then
+            return false
+        end
         if zombie.faceLocationF and fishing.waterX and fishing.waterY then
             zombie:faceLocationF(fishing.waterX, fishing.waterY)
         end
         return true
     end,
+})
+
+Scenes.Register("fishing.strike", {
+    label = tr("UI_PNC_FishingScene_Strike"),
+    description = tr("UI_PNC_FishingScene_StrikeDescription"),
+    category = "fishing",
+    priority = 45,
+    repeatMode = "once",
+    blocking = false,
+    steps = {
+        { id = "strike", bump = "FishingStrike", durationMs = 900 },
+    },
+    interrupts = {
+        movement = true,
+        combat = true,
+        externalBump = true,
+        abstract = true,
+    },
 })
 
 return true

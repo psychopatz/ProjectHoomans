@@ -56,6 +56,8 @@ local records = {}
 local squares = {}
 local outputs = {}
 local fatigueReads = 0
+local presenceWakeCalls = 0
+local presenceScheduleCalls = 0
 _G.getCell = function()
     return {
         getGridSquare = function(_, x, y, z)
@@ -108,6 +110,13 @@ PNC = {
         MarkDirty = function() end,
     },
     Tasking = { Events = { Emit = function() end } },
+    SimulationClock = {
+        Wake = function() presenceWakeCalls = presenceWakeCalls + 1 end,
+    },
+    Scheduler = {
+        SLOT_MS = 50,
+        Schedule = function() presenceScheduleCalls = presenceScheduleCalls + 1 end,
+    },
     IndividualNeeds = {
         Get = function(record, needType)
             fatigueReads = fatigueReads + 1
@@ -145,9 +154,8 @@ local tree = Service.GetTree("1:1:0")
 T.truthy(tree, "loaded tree discovered")
 T.equal(tree.remainingWork, 10, "tree ledger starts from health")
 
--- Once the square is unavailable, abstract work may advance the ledger but
--- must not touch the physical tree object.
-squares["1:1:0"] = nil
+-- Abstract work must not touch the physical tree object, whether the target
+-- square is loaded offscreen or unavailable.
 records.worker = {
     id = "worker", alive = true, x = 0, y = 0, z = 0,
     presenceState = "abstract", equipment = {
@@ -159,12 +167,40 @@ local job = Service.GetJob("worker")
 local lease = { npcId = "worker", leaseId = "lease:abstract",
     executionMode = "ABSTRACT" }
 T.truthy(Service.StartJob(lease), "abstract job start")
-now = 2500
+-- A nearby player still requires the live lane. Lumber only requests the
+-- presence handoff; it does not spawn or mutate the worker directly.
+records.worker.runtime.nearestPlayerDistSq = 0
+now = 1100
+local handoffTicked, handoffComplete, handoffReason = Service.TickJob(lease)
+T.truthy(handoffTicked and not handoffComplete,
+    "nearby loaded tree waits for live handoff")
+T.equal(handoffReason, "live_handoff_requested",
+    "nearby loaded tree requests presence handoff")
+T.equal(presenceWakeCalls, 1, "presence wake requested once")
+T.equal(presenceScheduleCalls, 1, "presence scheduler wake requested once")
+records.worker.runtime.nearestPlayerDistSq = nil
+
+-- A loaded square outside the presence observation range should not stall
+-- abstract simulation. It requests no live handoff and leaves the tree
+-- object untouched.
+now = 1500
+local loadedTicked, loadedComplete, loadedReason = Service.TickJob(lease)
+T.truthy(loadedTicked and not loadedComplete,
+    "loaded offscreen tree remains abstractly executable")
+T.equal(loadedReason, "abstract_chopping",
+    "loaded offscreen tree uses abstract progress")
+T.equal(abstractTree.hits, 0,
+    "abstract loaded-tree progress does not call WeaponHit")
+T.equal(presenceWakeCalls, 1,
+    "offscreen abstract work does not request materialization")
+
+squares["1:1:0"] = nil
+now = 2000
 local ticked, complete = Service.TickJob(lease)
 T.truthy(ticked and not complete, "abstract chopping tick")
-now = 4000
+now = 3000
 ticked, complete = Service.TickJob(lease)
-T.truthy(ticked and not complete, "abstract output tick")
+T.truthy(ticked, "abstract output tick")
 T.equal(Service.GetTree("1:1:0").status, "DEPLETED",
     "abstract ledger depletion")
 T.equal(outputs[1].type, "Base.Log", "abstract output type")
@@ -272,6 +308,7 @@ local axe = {
 function axe:getFullType() return self.fullType end
 function axe:getID() return "axe:1" end
 local moveCalls = 0
+local moveStopDistance
 local liveToolCreated = false
 local enduranceChecks = 0
 local body = {
@@ -292,9 +329,22 @@ local body = {
     setPrimaryHandItem = function(self, item) self.primary = item end,
 }
 ItemTag = { CHOP_TREE = "chop" }
+local hammer = {
+    fullType = "Base.Hammer",
+    hasTag = function(_, tag) return tag == "chop" end,
+    getTreeDamage = function() return 0 end,
+    isBroken = function() return false end,
+}
+local rejectedHammer, hammerReason = Service.Internal.inspectLiveTool(hammer)
+T.falsy(rejectedHammer,
+    "live lumber rejects a zero-damage hammer despite its chop tag")
+T.equal(hammerReason, "tool_cannot_chop",
+    "live lumber reports the native zero-damage tool")
+
 PNC.BehaviorCommon = {
-    MoveRecord = function(_, zombie)
+    MoveRecord = function(_, zombie, _, _, _, _, stopDistance)
         moveCalls = moveCalls + 1
+        moveStopDistance = stopDistance
         zombie.lastMoveReason = "lumber"
     end,
     HaltMovement = function() end,
@@ -327,8 +377,34 @@ T.truthy(Service.StartJob(liveLease), "live job start")
 now = 5000
 T.truthy(Service.TickJob(liveLease), "live travel tick")
 T.equal(moveCalls, 1, "live lumber reissues movement when not adjacent")
+T.equal(moveStopDistance, 0.25,
+    "live lumber uses a tight native approach stop distance")
+
+local travelResetCalls = 0
+PNC.PathService = {
+    Commands = {
+        Reset = function(_, _, reason)
+            travelResetCalls = travelResetCalls + 1
+            T.equal(reason, "lumber_travel_stall",
+                "live travel watchdog identifies its reset reason")
+            return true, "reset"
+        end,
+    },
+}
+now = 18000
+local recoveredTravel, recoveredComplete, recoveredReason =
+    Service.TickJob(liveLease)
+T.truthy(recoveredTravel and not recoveredComplete,
+    "stalled live travel remains recoverable")
+T.equal(recoveredReason, "lumber_travel_recovery",
+    "stalled live travel reports a bounded recovery")
+T.equal(travelResetCalls, 1,
+    "stalled live travel resets the shared path lane once")
+T.equal(Service.GetJob("live").phase, "WAITING_FOR_TRAVEL",
+    "stalled live travel exposes its recovery phase")
+
 squares[liveKey] = nil
-now = 6500
+now = 20000
 local waitingTick, waitingComplete = Service.TickJob(liveLease)
 T.truthy(waitingTick and not waitingComplete,
     "live lumber waits for an unloaded target chunk")
@@ -340,7 +416,21 @@ T.equal(records.live.runtime.lumber.waitingFor, "world",
     "unloaded live target publishes a world wait diagnostic")
 squares[liveKey] = liveSquare
 body.x, records.live.x = 3.5, 3.5
-now = 8000
+local originalLiveHit = liveTree.WeaponHit
+liveTree.WeaponHit = function(self)
+    self.hits = self.hits + 1
+end
+now = 23000
+local noDamageTick, noDamageComplete, noDamageReason =
+    Service.TickJob(liveLease)
+T.truthy(noDamageTick and not noDamageComplete,
+    "live lumber detects a hit without native tree progress")
+T.equal(noDamageReason, "tool_zero_tree_damage",
+    "live lumber reports zero native tree damage")
+T.equal(Service.GetJob("live").phase, "WAITING_FOR_TOOL",
+    "zero native damage pauses live work for tool recovery")
+liveTree.WeaponHit = originalLiveHit
+now = 24500
 T.truthy(Service.TickJob(liveLease), "live chopping tick")
 T.truthy(liveToolCreated, "live lumber materialized the configured axe")
 T.equal(body.primary, axe, "live lumber equips the axe in the primary hand")
@@ -349,7 +439,7 @@ T.truthy(fatigueReads > 0,
     "live lumber reads the NPC-owned fatigue system")
 T.equal(enduranceChecks, 0,
     "live lumber never probes player endurance or Moodles")
-T.equal(liveTree.hits, 1, "server live tree hit")
+T.equal(liveTree.hits, 2, "server live tree hit")
 T.equal(Service.GetTree(liveKey).status, "DEPLETED",
     "live tree depletion")
 local liveOutputEffect = Service.GetTree(liveKey).outputEffect
@@ -375,7 +465,7 @@ T.equal(liveSquare.worldObjects[1]:getItem():getModData().PNC_LumberOutputEffect
 T.equal(#outputs, 1, "live output is owned by vanilla")
 
 PNC.Registry.GetLiveZombie = function() return nil end
-now = 8500
+now = 25000
 local workerWaitTick, workerWaitComplete = Service.TickJob(liveLease)
 T.truthy(workerWaitTick and not workerWaitComplete,
     "live output waits when its NPC body is unavailable")
@@ -439,10 +529,10 @@ PNC.ColonyStorageService = {
     },
 }
 body.x, body.y, records.live.x, records.live.y = 4.5, 4.5, 4.5, 4.5
-now = 9500
+now = 26000
 local outputTick = Service.TickJob(liveLease)
 T.truthy(outputTick, "live output approaches its floor loot")
-now = 10000
+now = 26500
 outputTick = Service.TickJob(liveLease)
 T.truthy(outputTick, "live output completes its grab animation")
 T.equal(liveOutputEffect.pickupState, "NPC_INVENTORY",
@@ -458,13 +548,13 @@ T.equal(liveOutputEffect.destinationNodeId, "node:1",
 T.equal(liveOutputEffect.destinationStorageId, "storage:1",
     "live output persists the selected storage")
 body.x, body.y, records.live.x, records.live.y = 6.0, 6.0, 6.0, 6.0
-now = 11500
+now = 28000
 outputTick = Service.TickJob(liveLease)
 T.truthy(outputTick, "live output approaches the stockpile")
-now = 12000
+now = 28500
 outputTick = Service.TickJob(liveLease)
 T.truthy(outputTick, "live output starts its deposit animation")
-now = 12500
+now = 29000
 local outputWorked, outputComplete = Service.TickJob(liveLease)
 T.truthy(outputWorked and outputComplete,
     "live output deposits and completes the lumber job")

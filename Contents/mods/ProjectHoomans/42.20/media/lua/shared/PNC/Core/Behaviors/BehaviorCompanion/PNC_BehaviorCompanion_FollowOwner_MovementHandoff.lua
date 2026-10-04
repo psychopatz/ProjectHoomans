@@ -32,7 +32,8 @@ function H.TryHandle(record, zombie, owner, ownerDist, followState, hazard, now)
             zombie,
             owner,
             "idle_near_owner",
-            "owner_stationary_hold"
+            "owner_stationary_hold",
+            now
         )
     end
     followState.stationaryHolding = false

@@ -82,7 +82,11 @@ function Internal.BeginRequest(body, finalTarget, navigation, now, reason)
         return false
     end
     Internal.ClearEngineRequest(body, navigation)
-    Internal.EnsureNativeMovementOwner(body)
+    Internal.EnsureNativeMovementOwner(
+        body,
+        "begin_request",
+        navigation and navigation.record or nil
+    )
     if Diagnostics then
         Diagnostics.Increment("Pathing.EnginePathRequests")
     end
@@ -97,7 +101,11 @@ function Internal.BeginRequest(body, finalTarget, navigation, now, reason)
         -- release that stale state after the request as well as before it.
         -- Otherwise IsoGameCharacter.doDeferredMovement sees both owners and
         -- discards/slow-walks the native route.
-        Internal.EnsureNativeMovementOwner(body)
+        Internal.EnsureNativeMovementOwner(
+            body,
+            "after_behavior_path_request",
+            navigation and navigation.record or nil
+        )
     end
     navigation.requestPending = true
     navigation.nativeActive = true

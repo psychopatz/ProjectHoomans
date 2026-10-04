@@ -8,6 +8,82 @@ local Core = PNC.Core
 local Visuals = PNC.Visuals
 local Inventory = PNC.Inventory
 
+-- Compact network-safe presentation projection for a currently leased work
+-- item. WorkItemService remains the owner of the lease; Equipment only
+-- exposes the held state needed by remote hand presentation.
+function Equipment.BuildWorkPresentationSummary(record)
+    local runtime = record and record.runtime or nil
+    local workItems = runtime and runtime.workItems or nil
+    local activeJob = string.upper(tostring(record and record.activeJob or ""))
+    local order = record and record.orderSpec or nil
+    local activeOperation = string.upper(tostring(
+        order and order.operation or ""
+    ))
+    local selected
+    local selectedOperation
+    local selectedScore = -1
+    local operation
+    local lease
+    local leaseOperation
+    local score
+
+    if type(workItems) ~= "table" then return nil end
+    for operation, lease in pairs(workItems) do
+        if type(lease) == "table"
+            and tostring(lease.state or "") == "HELD"
+        then
+            leaseOperation = string.upper(tostring(
+                lease.operation or operation or ""
+            ))
+            score = 1
+            if activeOperation ~= ""
+                and leaseOperation == activeOperation
+            then
+                score = score + 2
+            end
+            if activeJob ~= ""
+                and leaseOperation ~= ""
+                and string.find(activeJob, leaseOperation, 1, true)
+            then
+                score = score + 1
+            end
+            if score > selectedScore
+                or (score == selectedScore
+                    and tostring(leaseOperation)
+                        < tostring(selectedOperation or ""))
+            then
+                selected = lease
+                selectedOperation = leaseOperation
+                selectedScore = score
+            end
+        end
+    end
+
+    if not selected then return nil end
+    return {
+        held = true,
+        operation = selectedOperation,
+        owner = selected.owner,
+        itemID = selected.itemID,
+        fullType = selected.fullType
+            or record.equipment and record.equipment.primaryFullType
+            or nil,
+        inventoryRevision = selected.inventoryRevision,
+    }
+end
+
+function Equipment.ResolveWorkPresentation(record)
+    local runtime = record and record.runtime or nil
+    local synchronized = runtime and runtime.workPresentation or nil
+    if type(synchronized) == "table" and synchronized.held == true then
+        return synchronized
+    end
+    if type(Equipment.BuildWorkPresentationSummary) == "function" then
+        return Equipment.BuildWorkPresentationSummary(record)
+    end
+    return nil
+end
+
 -- Remote multiplayer bodies are presentation replicas. Their real worn items
 -- remain server-owned. ItemVisuals are repaired only when the synchronized
 -- worn set is genuinely absent, mirroring Bandits' appearance latch.
@@ -136,7 +212,7 @@ end
 Equipment.EnsureReplicaVisuals =
     Equipment.ApplyReplicaVisuals
 
-function Equipment.ApplyReplicaHands(zombie, record)
+function Equipment.ApplyReplicaHands(zombie, record, options)
     local equipment
     local descriptor
     local attackMode
@@ -149,13 +225,38 @@ function Equipment.ApplyReplicaHands(zombie, record)
     local attachedReason
     local handsReason
     local i
+    local workPresentation
+    local workHeld
+    local primaryFullType
     if not zombie or not record then
         return false, "missing_body_or_record"
     end
     equipment = Equipment.EnsureRecordEquipment(record)
-    attackMode = Internal.isAttackMode(record)
+    options = type(options) == "table" and options or {}
+    workPresentation = Equipment.ResolveWorkPresentation(record)
+    workHeld = options.forceHeld == true
+        or workPresentation and workPresentation.held == true
+    attackMode = Internal.isAttackMode(record) or workHeld
+    primaryFullType = equipment.primaryFullType
+    -- Compact presence deltas intentionally omit the full equipment block.
+    -- The work lease still carries the authoritative tool type, so use it as
+    -- the presentation fallback instead of silently rendering bare hands.
+    if not Internal.isAttackMode(record)
+        and workHeld
+        and workPresentation
+        and workPresentation.fullType
+    then
+        primaryFullType = workPresentation.fullType
+        equipment.primaryFullType = primaryFullType
+    elseif (not primaryFullType or primaryFullType == "")
+        and workPresentation
+        and workPresentation.fullType
+    then
+        primaryFullType = workPresentation.fullType
+        equipment.primaryFullType = primaryFullType
+    end
     descriptor = Internal.buildWeaponDescriptor(
-        equipment.primaryFullType,
+        primaryFullType,
         false
     )
     Internal.setEquipmentVariables(
@@ -185,10 +286,11 @@ function Equipment.ApplyReplicaHands(zombie, record)
     -- for presentation. Latch the synchronized state so the update loop does
     -- not clear/recreate hand and attachment models every frame.
     signatureParts = {
-        tostring(equipment.primaryFullType or ""),
+        tostring(primaryFullType or ""),
         Internal.visualStateSignature(equipment.primaryVisual),
         tostring(equipment.secondaryFullType or ""),
-        attackMode and "attack" or "idle",
+        attackMode and (workHeld and "work" or "attack")
+            or "idle",
     }
     attachedEntries = Equipment.GetOrderedAttachedEntries(equipment)
     for i = 1, #attachedEntries do
@@ -213,7 +315,7 @@ function Equipment.ApplyReplicaHands(zombie, record)
     end
 
     descriptor = Internal.buildWeaponDescriptor(
-        equipment.primaryFullType,
+        primaryFullType,
         true
     )
     ok, attachedReason, handsReason = Internal.applyCombatPresentation(

@@ -153,4 +153,23 @@ T.equal(opened, false, "barricaded door is not opened for an NPC")
 T.equal(blocked, true, "barricaded door still cancels vanilla movement")
 
 doorBarricaded = false
+
+-- Fence hazards can reach IsoZombie.tryThump after the PNC update callback.
+-- The guard must reset the exposed Java movement state before that engine
+-- phase, otherwise Build 42 enters the player-only climb state.
+local nativeResetCount = 0
+LiveBodyControl.ResetNativeMovementState = function()
+    nativeResetCount = nativeResetCount + 1
+    return true
+end
+LiveBodyControl.GetVanillaPassageAhead = function()
+    return {}, "fence"
+end
+local fenceBlocked, fenceKind = LiveBodyControl.BlockVanillaPassage(
+    body, nil, 50000)
+T.equal(fenceBlocked, true, "fence hazard is blocked")
+T.equal(fenceKind, "fence", "fence hazard kind is reported")
+T.equal(nativeResetCount, 1,
+    "fence guard resets the legacy native movement state")
+
 T.finish("pnc_vanilla_passage_door_smoke")

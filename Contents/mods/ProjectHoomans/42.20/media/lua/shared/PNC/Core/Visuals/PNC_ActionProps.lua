@@ -73,6 +73,7 @@ end
 function ActionProps.Resolve(snapshot)
     local action = snapshot and snapshot.actionInformation or nil
     local visual = snapshot and snapshot.visualState or nil
+    local workPresentation = snapshot and snapshot.workPresentation or nil
     local capability = text(action, "capability")
     local actionKind = text(action, "kind")
     local operation = text(action, "operation")
@@ -134,6 +135,12 @@ function ActionProps.Resolve(snapshot)
         or text(action, "orderKind") == "fishing")
         and sceneIs(visual, "fishing.cast")
     then
+        if fullType == "" then
+            fullType = text(workPresentation, "fullType")
+        end
+        if itemID == nil then
+            itemID = value(workPresentation, "itemID")
+        end
         return buildDescriptor(
             "fishing", action, visual, fullType, itemID, "primary")
     end

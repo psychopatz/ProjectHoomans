@@ -17,6 +17,7 @@ local tickLiveOutput = Internal.TickLiveOutput
 local tickLive = Internal.TickLive
 local tickAbstract = Internal.TickAbstract
 local toolDiagnostic = Internal.ToolDiagnostic
+local lumberDiagnostics = Service.LumberDiagnostics
 
 local function tickJob(lease)
     local npcId = tostring(lease and lease.npcId or "")
@@ -102,12 +103,14 @@ local function waitingFor(phase, reason)
     if phase == "WAITING_FOR_FATIGUE" then return "fatigue" end
     if phase == "WAITING_FOR_MATERIALIZATION" then return "live_execution" end
     if phase == "WAITING_FOR_TREE_CHUNK" then return "world" end
+    if phase == "WAITING_FOR_TRAVEL" then return "travel" end
     if phase == "WAITING_FOR_STOCKPILE" then return "stockpile" end
     if phase == "OUTPUT_PENDING" then return "output" end
     if phase == "GRAB_PENDING" or phase == "DEPOSIT_PENDING" then
         return "output"
     end
-    if phase == "TRAVEL" or reason == "traveling"
+    if phase == "TRAVEL" or phase == "WAITING_FOR_TRAVEL"
+        or reason == "traveling"
         or reason == "not_adjacent"
     then return "travel" end
     if phase == "WAITING_FOR_WORKER" or reason == "waiting_for_worker" then
@@ -129,9 +132,22 @@ local function publishTickDiagnostic(lease, reason, complete)
         record.runtime.lumber = runtime
     end
     local phase = tostring(job.phase or runtime.phase or "")
-    runtime.lastReason = reason
-    runtime.waitingFor = waitingFor(phase, reason)
-    runtime.waitingReason = runtime.waitingFor and reason or nil
+    local diagnosticReason = reason
+    if phase == "WAITING_FOR_STOCKPILE" and job.outputWaitReason then
+        diagnosticReason = job.outputWaitReason
+    end
+    runtime.lastReason = diagnosticReason
+    runtime.waitingFor = waitingFor(phase, diagnosticReason)
+    runtime.waitingReason = runtime.waitingFor and diagnosticReason or nil
+    runtime.retryAt = job.outputRetryAt
+    runtime.capacity = job.outputCapacityDetails
+    if phase == "BLOCKED" then
+        runtime.blockedReason = diagnosticReason or runtime.lastReason
+        runtime.blockedAt = runtime.blockedAt or now()
+    else
+        runtime.blockedReason = nil
+        runtime.blockedAt = nil
+    end
     if runtime.waitingFor == "primary_tool" then
         local body = PNC.Registry.GetLiveZombie
             and PNC.Registry.GetLiveZombie(npcId) or nil
@@ -143,6 +159,16 @@ local function publishTickDiagnostic(lease, reason, complete)
         runtime.waitingFor = nil
         runtime.waitingReason = nil
         runtime.tool = nil
+    end
+    if lumberDiagnostics and lumberDiagnostics.RecordTransition then
+        local body = PNC.Registry.GetLiveZombie
+            and PNC.Registry.GetLiveZombie(npcId) or nil
+        local handoff = record.runtime.lumberHandoff or {}
+        lumberDiagnostics.RecordTransition(record, job, body, reason, {
+            treeKey = runtime.treeKey,
+            treeLoaded = handoff.treeLoaded,
+            complete = complete,
+        })
     end
 end
 

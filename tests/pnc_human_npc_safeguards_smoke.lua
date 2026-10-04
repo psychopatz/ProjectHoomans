@@ -300,6 +300,20 @@ T.equal(useless, true,
 PNC.Core.IsAuthority = function() return true end
 managedRecord = nil
 
+-- A managed IsoZombie must never retain an engine-owned passage state. PNC's
+-- scripted traversal action is the only allowed owner of a fence crossing.
+actionState = "climbfence"
+managedRecord = { runtime = { pathing = {} } }
+zombieUpdateHandler(managedBody)
+T.equal(actionState, "idle",
+    "unowned managed fence state was not recovered")
+actionState = "climbfence"
+managedRecord.runtime.pathing.traversalAction = { kind = "fence_climb" }
+zombieUpdateHandler(managedBody)
+T.equal(actionState, "climbfence",
+    "owned scripted fence state was interrupted by native safety")
+managedRecord = nil
+
 -- Seating owns the native carrier after entry. A stale turn-alerted state is
 -- reset without broadening the normal global suppressed-state policy.
 actionState = "turnalerted"

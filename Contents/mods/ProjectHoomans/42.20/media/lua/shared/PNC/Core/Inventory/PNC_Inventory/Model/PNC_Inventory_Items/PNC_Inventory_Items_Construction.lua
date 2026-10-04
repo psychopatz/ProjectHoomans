@@ -4,6 +4,8 @@ local Portable = require "PsychopatzCore/Inventory/PsychopatzPortableItemState"
 local FACTION_DOGTAG_TYPE = "Base.Necklace_DogTag"
 local FACTION_DOGTAG_TEMPLATE_KEY = "tmpl:faction_dogtag:0"
 local FACTION_DOGTAG_VERSION = 1
+local IDENTITY_CARD_TYPE = "Base.IDcard"
+local IDENTITY_CARD_TEMPLATE_KEY = "tmpl:identity_card:0"
 
 local function buildItem(record, spec, fullType, profile)
     return {
@@ -128,29 +130,52 @@ end
 
 function Internal.ensureIdentityCard(record, inv)
     local item
+    local candidate
+    local candidates
     local displayName
     local identityNPCID
     local changed = false
     if not record or not inv or type(inv.items) ~= "table" then
         return nil
     end
-    item = Internal.findItemByTemplateKey(inv, "tmpl:identity_card:0")
     displayName = tostring(
         record.name or record.displayName or "Unknown NPC"
     )
     identityNPCID = tostring(record.id or "")
+    candidates = {}
+    for _, candidate in pairs(inv.items) do
+        local customName = tostring(candidate and candidate.customName or "")
+        local isNamedCard = string.sub(customName, 1, 8) == "ID Card:"
+        if candidate and (
+            candidate.templateKey == IDENTITY_CARD_TEMPLATE_KEY
+                or candidate.legacyTemplateKey == IDENTITY_CARD_TEMPLATE_KEY
+                or candidate.identityNPCId ~= nil
+                or candidate.identityNPCName ~= nil
+                or candidate.interactionLockReason == "identity_card"
+                or (candidate.type == IDENTITY_CARD_TYPE and isNamedCard)
+        ) then
+            candidates[#candidates + 1] = candidate
+            if not item and candidate.identityNPCId == identityNPCID then
+                item = candidate
+            elseif not item
+                and candidate.templateKey == IDENTITY_CARD_TEMPLATE_KEY
+            then
+                item = candidate
+            end
+        end
+    end
     if not item then
         item = Internal.createItem(record, inv, {
-            type = "Base.IDcard",
+            type = IDENTITY_CARD_TYPE,
             container = "root",
-            templateKey = "tmpl:identity_card:0",
+            templateKey = IDENTITY_CARD_TEMPLATE_KEY,
         })
         changed = item ~= nil
     end
     if item then
         -- Repair generator revision 3's incorrectly-cased script item ID.
         changed = changed
-            or item.type ~= "Base.IDcard"
+            or item.type ~= IDENTITY_CARD_TYPE
             or item.customName ~= "ID Card: " .. displayName
             or item.identityNPCId ~= identityNPCID
             or item.identityNPCName ~= displayName
@@ -160,8 +185,18 @@ function Internal.ensureIdentityCard(record, inv)
         item.customName = "ID Card: " .. displayName
         item.identityNPCId = identityNPCID
         item.identityNPCName = displayName
+        item.templateKey = IDENTITY_CARD_TEMPLATE_KEY
         item.interactionLocked = true
         item.interactionLockReason = "identity_card"
+    end
+    for index = 1, #candidates do
+        candidate = candidates[index]
+        if candidate ~= item and candidate.id
+            and Internal.removeItemByID
+            and Internal.removeItemByID(inv, candidate.id)
+        then
+            changed = true
+        end
     end
     return item, changed
 end

@@ -23,6 +23,7 @@ local nativePlayerItem = {
     isFavorite = function() return false end,
     isEquipped = function() return false end,
 }
+local describedType = "Base.Bandage"
 local nativeCreatedItem = {}
 local failCompactRemove = false
 local addedItemIDs = {}
@@ -92,7 +93,7 @@ package.preload["PsychopatzCore/Inventory/PsychopatzItemTransfer"] = function()
         ResolvePlayerItems = function() return { nativePlayerItem } end,
         DescribeItem = function()
             return {
-                fullType = "Base.Bandage",
+                fullType = describedType,
                 state = { condition = 8 },
             }
         end,
@@ -157,5 +158,44 @@ T.equal(record.inventory.items["npc-existing"] ~= nil, true,
 T.equal(record.inventory.containers.root.items[1], "npc-existing",
     "compact source membership remains after failed removal")
 T.equal(deltaSyncs, 0, "failed transfers do not publish inventory deltas")
+
+describedType = "Base.IDcard"
+local sourceRemovalBeforeIdentity = sourceRemovalCalls
+ok, reason = Service.Transfer(player, {
+    id = record.id,
+    direction = "player_to_npc",
+    itemIDs = { "55" },
+    npcContainer = "root",
+    inventoryRevision = 9,
+    requestId = "identity-card-rejected",
+})
+T.equal(ok, false, "player identity cards are rejected server-side")
+T.equal(reason, "identity_card_protected",
+    "player identity card rejection reason")
+T.equal(sourceRemovalCalls, sourceRemovalBeforeIdentity,
+    "rejected identity cards never remove the player source item")
+
+record.inventory.items["npc-dogtag"] = {
+    id = "npc-dogtag",
+    type = "Base.Necklace_DogTag",
+    templateKey = "tmpl:faction_dogtag:0",
+    interactionLocked = true,
+    interactionLockReason = "faction_dogtag",
+    container = "root",
+}
+record.inventory.containers.root.items[1] = "npc-dogtag"
+ok, reason = Service.Transfer(player, {
+    id = record.id,
+    direction = "npc_to_player",
+    itemIDs = { "npc-dogtag" },
+    playerContainer = "root",
+    inventoryRevision = 9,
+    requestId = "identity-dogtag-rejected",
+})
+T.equal(ok, false, "NPC identity dogtags are rejected server-side")
+T.equal(reason, "faction_dogtag_protected",
+    "NPC dogtag rejection reason")
+T.truthy(record.inventory.items["npc-dogtag"],
+    "rejected NPC dogtags remain in the authoritative inventory")
 
 T.finish("pnc_inventory_transfer_rollback_smoke")

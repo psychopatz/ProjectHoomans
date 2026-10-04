@@ -39,9 +39,9 @@ local function passageObjectAtFeeler(zombie)
     if not current or not feeler
         or not current.testCollideSpecialObjects
     then
-        return nil
+        return nil, current, feeler
     end
-    return current:testCollideSpecialObjects(feeler)
+    return current:testCollideSpecialObjects(feeler), current, feeler
 end
 
 -- IsoZombie.tryThump() runs after OnZombieUpdate and independently scans the
@@ -50,23 +50,43 @@ end
 -- same special object before the engine reaches tryThump and hand the frame
 -- back to PNC's path/traversal retry lane.
 function LiveBodyControl.GetVanillaPassageAhead(zombie)
-    local object = passageObjectAtFeeler(zombie)
+    local object
+    local current
+    local feeler
     local kind
-    if not object or not instanceof then
-        return nil, nil
+    local query
+    local fence
+    local fenceTall
+    object, current, feeler = passageObjectAtFeeler(zombie)
+    if object and instanceof then
+        if instanceof(object, "IsoWindow") then
+            kind = "window"
+        elseif instanceof(object, "IsoWindowFrame") then
+            kind = "window_frame"
+        elseif instanceof(object, "IsoThumpable") then
+            kind = "thumpable"
+        elseif instanceof(object, "IsoDoor") then
+            kind = "door"
+        end
+        if kind then return object, kind end
     end
-    if instanceof(object, "IsoWindow") then
-        kind = "window"
-    elseif instanceof(object, "IsoWindowFrame") then
-        kind = "window_frame"
-    elseif instanceof(object, "IsoThumpable") then
-        kind = "thumpable"
-    elseif instanceof(object, "IsoDoor") then
-        kind = "door"
-    else
-        return nil, nil
+    -- Fences are not consistently returned by
+    -- IsoGridSquare:testCollideSpecialObjects. Use the same edge query as
+    -- the movement traversal planner so a managed carrier cannot fall
+    -- through IsoZombie.tryThump into the player-only vault state.
+    query = PNC.TraversalQuery
+    if query and query.GetFenceBetween and current and feeler then
+        local ok
+        ok, fence, fenceTall = pcall(
+            query.GetFenceBetween,
+            current,
+            feeler
+        )
+        if ok and fence then
+            return fence, "fence", fenceTall == true
+        end
     end
-    return object, kind
+    return nil, nil
 end
 
 local function passageMovementState(actionState)

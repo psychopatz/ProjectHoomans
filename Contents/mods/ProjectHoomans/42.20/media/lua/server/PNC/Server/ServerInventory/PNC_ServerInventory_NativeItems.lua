@@ -85,7 +85,34 @@ local function isCompactBulkProtected(item)
     ) or false
 end
 
+local function isCompactIdentityItem(item)
+    local modData = item and item.itemState
+        and item.itemState.modData or nil
+    local customName = tostring(item and item.customName or "")
+    if not item then return false, nil end
+    if item.type == "Base.IDcard"
+        or item.templateKey == "tmpl:identity_card:0"
+        or item.legacyTemplateKey == "tmpl:identity_card:0"
+        or item.identityNPCId ~= nil
+        or item.identityNPCName ~= nil
+        or item.interactionLockReason == "identity_card"
+    then
+        return true, "identity_card_protected"
+    end
+    if item.type == "Base.Necklace_DogTag"
+        and ((type(modData) == "table"
+                and modData.PNC_FactionDogTag == true)
+            or item.templateKey == "tmpl:faction_dogtag:0"
+            or item.interactionLockReason == "faction_dogtag"
+            or string.sub(customName, 1, 10) == "Dog Tags:")
+    then
+        return true, "faction_dogtag_protected"
+    end
+    return false, nil
+end
+
 Internal.nativeListToArray = nativeListToArray
 Internal.isNonEmptyContainer = isNonEmptyContainer
 Internal.isNativeBulkProtected = isNativeBulkProtected
 Internal.isCompactBulkProtected = isCompactBulkProtected
+Internal.isCompactIdentityItem = isCompactIdentityItem

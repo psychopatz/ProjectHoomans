@@ -27,6 +27,10 @@ PsychopatzCore = {
         Layout = {},
     },
 }
+T.load(T.path(
+    "PsychopatzCore", "common",
+    "PsychopatzCore/Economy/PsychopatzCurrency.lua"
+))
 
 local testNow = 1000
 PNC = {
@@ -307,6 +311,99 @@ for _, row in ipairs(expandedPlayerRows) do
 end
 T.equal(expandedAmmoCount, 3, "expanded group has header and members")
 
+-- A player may carry literal money items rather than one compact record. The
+-- viewer must aggregate these during the native scan instead of allocating a
+-- full tooltip/protection row for every unit.
+local moneyItems = {}
+for index = 1, 10000 do
+    local itemID = "money_" .. tostring(index)
+    moneyItems[index] = {
+        getID = function() return itemID end,
+        getFullType = function() return "Base.Money" end,
+        getDisplayName = function() return "Money" end,
+        isFavorite = function() return false end,
+        isEquipped = function() return false end,
+    }
+end
+for index = 1, 3 do
+    moneyItems[#moneyItems + 1] = {
+        getID = function() return "bundle_" .. tostring(index) end,
+        getFullType = function() return "Base.MoneyBundle" end,
+        getDisplayName = function() return "Money Bundle" end,
+        isFavorite = function() return false end,
+        isEquipped = function() return false end,
+    }
+end
+local largeMoneyContainer = {
+    getItems = function() return javaList(moneyItems) end,
+}
+local largeMoneyPlayer = {
+    getInventory = function() return largeMoneyContainer end,
+    getWornItems = function() return javaList({}) end,
+}
+local largeMoneyRows = PNC.InventoryUIModel.BuildPlayerRows({
+    id = "root", container = largeMoneyContainer,
+}, largeMoneyPlayer)
+T.equal(#largeMoneyRows, 1,
+    "money and bundles collapse into one currency row")
+local largeMoneyRow = largeMoneyRows[1]
+T.truthy(largeMoneyRow ~= nil, "unified money row is visible")
+T.equal(largeMoneyRow.aggregate, true,
+    "literal money row uses the aggregate display path")
+T.equal(largeMoneyRow.currency, true,
+    "literal money row uses the currency display path")
+T.equal(largeMoneyRow.category, "Currency",
+    "currency rows use the dedicated category")
+T.equal(largeMoneyRow.stack, 10300,
+    "currency row displays total value")
+T.equal(largeMoneyRow.currencyUnits, 10300,
+    "currency row preserves both physical values")
+T.equal(largeMoneyRow.currencyLoose, 10000,
+    "currency row tracks loose money internally")
+T.equal(largeMoneyRow.currencyBundles, 3,
+    "currency row tracks bundles internally")
+T.equal(largeMoneyRow.itemIDs, nil,
+    "currency row does not retain one transfer ID per unit")
+local largeMoneySelection = PNC.InventoryUIModel.BuildTransferSelection(
+    largeMoneyRow, 250
+)
+T.equal(largeMoneySelection.quantity, 250,
+    "aggregate money selection preserves requested quantity")
+T.equal(largeMoneySelection.currencyAmount, 250,
+    "currency selection preserves value rather than expanding IDs")
+T.equal(largeMoneySelection.currencyFullType, nil,
+    "money selection uses value-based normalization")
+T.equal(#largeMoneySelection.itemIDs, 0,
+    "currency selection does not expand physical IDs")
+local largeBundleSelection = PNC.InventoryUIModel.BuildTransferSelection(
+    largeMoneyRow, 300
+)
+T.equal(largeBundleSelection.currencyAmount, 300,
+    "currency selection uses requested value units")
+T.equal(largeBundleSelection.currencyFullType, nil,
+    "bundle value selection remains type-agnostic")
+
+local countedBundle = {
+    getID = function() return "counted_bundle" end,
+    getFullType = function() return "Base.MoneyBundle" end,
+    getCount = function() return 82 end,
+    getDisplayName = function() return "Money Bundle" end,
+    isFavorite = function() return false end,
+    isEquipped = function() return false end,
+}
+local countedBundleRows = PNC.InventoryUIModel.BuildPlayerRows({
+    id = "root",
+    container = { getItems = function() return javaList({ countedBundle }) end },
+}, largeMoneyPlayer)
+T.equal(countedBundleRows[1].stack, 8200,
+    "counted native stack displays its currency value")
+T.equal(countedBundleRows[1].currencyUnits, 8200,
+    "counted native stack keeps its logical currency value")
+local countedBundleSelection = PNC.InventoryUIModel.BuildTransferSelection(
+    countedBundleRows[1], 8200)
+T.equal(countedBundleSelection.currencyAmount, 8200,
+    "counted native stack transfers its logical value")
+
 local npcContainers = PNC.InventoryUIModel.BuildNPCContainers({
     items = {
         npc_bag = {
@@ -395,6 +492,35 @@ T.equal(#stateSeparatedRows, 2,
     "stateful NPC food rows were incorrectly grouped")
 T.equal(stateSeparatedRows[1].groupHeader, nil,
     "stateful NPC food row became a misleading group header")
+
+local currencyNPCRows = PNC.InventoryUIModel.BuildNPCRows({
+    items = {
+        npc_money = {
+            id = "npc_money", type = "Base.Money", container = "root",
+            stack = 22,
+        },
+        npc_bundles = {
+            id = "npc_bundles", type = "Base.MoneyBundle",
+            container = "root", stack = 18,
+        },
+    },
+    containers = {
+        root = { items = { "npc_money", "npc_bundles" } },
+    },
+}, "root")
+local currencyNPCMoney
+for _, row in ipairs(currencyNPCRows) do
+    if row.currency == true then currencyNPCMoney = row end
+end
+T.truthy(currencyNPCMoney ~= nil, "NPC unified currency row is visible")
+T.equal(currencyNPCMoney.stack, 1822, "NPC currency value is visible")
+local currencyNPCBundleSelection = PNC.InventoryUIModel.BuildTransferSelection(
+    currencyNPCMoney, 100
+)
+T.equal(currencyNPCBundleSelection.currencyAmount, 100,
+    "NPC currency transfer uses value units")
+T.equal(currencyNPCBundleSelection.currencyFullType, nil,
+    "NPC currency transfer is type-agnostic")
 
 T.load(T.path("ProjectHoomans", "client", "PNC/Knowledge/PNC_NPCIdentityPresentation.lua"))
 package.preload["PNC/Knowledge/PNC_NPCIdentityPresentation"] =
@@ -577,6 +703,9 @@ local eligibleIDs = PNC.InventoryWindow.CollectBulkTransferIDs({
         { item = playerRowsByID["43"] },
     },
 })
+T.equal(PNC.InventoryWindow.HasBulkTransferItems({
+    items = { { item = largeMoneyRows[1] } },
+}), true, "large aggregate row enables bulk transfer without expansion")
 T.equal(#eligibleIDs, 1, "bulk transfer protected-item filtering")
 T.equal(eligibleIDs[1], "ordinary", "bulk transfer eligible item")
 window:showItemContext("player", { id = "player_item_1" })

@@ -72,6 +72,21 @@ T.equal(task[1].percent, 35,
 T.equal(task[1].activityItemFullType, "Base.Axe",
     "task snapshot reports the active lumber axe")
 
+-- The work lease is claimed before the first lumber execution tick. The
+-- presentation snapshot must not keep showing the bootstrap worker wait.
+order.phase = nil
+order.livePhase = nil
+record.runtime.lumber.phase = "WAITING_FOR_WORKER"
+record.runtime.lumber.waitingFor = "worker"
+record.runtime.lumber.waitingReason = "WAITING_FOR_WORKER"
+local claimedTreeAction = Snapshots.BuildActionInformation(record)
+T.equal(claimedTreeAction.phase, "TRAVEL",
+    "claimed lumber order projects a travel phase immediately")
+T.falsy(claimedTreeAction.waitingFor,
+    "claimed lumber order clears stale worker wait presentation")
+T.falsy(claimedTreeAction.waitingReason,
+    "claimed lumber order clears stale worker wait reason")
+
 record.runtime.lumber.remainingWork = 0
 record.runtime.lumber.phase = "OUTPUT_APPROACH"
 local completedTreeAction = Snapshots.BuildActionInformation(record)

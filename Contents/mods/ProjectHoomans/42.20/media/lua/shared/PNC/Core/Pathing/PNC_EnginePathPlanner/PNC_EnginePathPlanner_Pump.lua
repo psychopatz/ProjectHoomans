@@ -112,7 +112,7 @@ function Planner.Pump(record, body, source)
         return true, recoveryState
     end
     suppressConflictingNativeState(body, navigation, now)
-    Internal.EnsureNativeMovementOwner(body)
+    Internal.EnsureNativeMovementOwner(body, "pump_pre", record)
     if Diagnostics then
         Diagnostics.RecordPathPump(record, source)
         if record and record.presenceState == PNC.Const.PRESENCE_ABSTRACT then
@@ -176,7 +176,11 @@ function Planner.Pump(record, body, source)
         -- path.  Clear it in the same frame so Java never owns movement in
         -- parallel with path2.  Traversal states are intentionally excluded
         -- by EnsureNativeMovementOwner and remain available for handoff.
-        Internal.EnsureNativeMovementOwner(body)
+        Internal.EnsureNativeMovementOwner(
+            body,
+            "after_behavior_update",
+            record
+        )
         suppressConflictingNativeState(body, navigation, now)
         if Internal.ResultMatches(result, "Failed") then
             -- Behavior2 can report failure before the route has advanced far

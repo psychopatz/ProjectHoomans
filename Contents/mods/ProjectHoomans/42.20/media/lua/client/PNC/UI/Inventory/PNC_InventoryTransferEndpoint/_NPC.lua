@@ -63,7 +63,9 @@ function Endpoint.NPC(npcID)
             direction = direction == "to_target"
                 and "player_to_npc" or "npc_to_player",
             itemIDs = selection.itemIDs,
-            quantity = selection.quantity,
+            quantity = selection.itemQuantity or selection.quantity,
+            currencyAmount = selection.currencyAmount,
+            currencyFullType = selection.currencyFullType,
             inventoryRevision = self:revision(),
             bulk = options.bulk == true,
             gift = options.gift == true,
@@ -71,8 +73,16 @@ function Endpoint.NPC(npcID)
         }
         if direction == "to_target" then
             args.npcContainer = destination or self.selectedContainer
+            args.playerContainer = selection.currencyContainer
+                or (selection.currencyContainers
+                    and selection.currencyContainers[1])
+                or "root"
         else
             args.playerContainer = destination or "root"
+            args.npcContainer = selection.currencyContainer
+                or (selection.currencyContainers
+                    and selection.currencyContainers[1])
+                or self.selectedContainer
         end
         return PNC.Client.SendInventoryTransfer(args)
     end

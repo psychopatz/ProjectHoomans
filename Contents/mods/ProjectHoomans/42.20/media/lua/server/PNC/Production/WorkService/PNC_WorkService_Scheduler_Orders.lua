@@ -65,6 +65,17 @@ local function processOrder(order, at)
             order.cancellationReason or "recovered_cancellation")
         return
     end
+    if not order.workerId and PNC.WorkItemService
+        and type(PNC.WorkItemService.PrepareOrder) == "function"
+    then
+        local ready, preparationReason = PNC.WorkItemService.PrepareOrder(order)
+        if ready ~= true then
+            order.status, order.blockedReason = Status.WAITING_RESOURCE,
+                tostring(preparationReason or "WAITING_FOR_WORK_ITEM")
+            Repository.MarkDirty()
+            return
+        end
+    end
     local prepare = Service.PreparationHandlers[order.operation]
     if prepare then
         local ready, preparationReason = prepare(order)

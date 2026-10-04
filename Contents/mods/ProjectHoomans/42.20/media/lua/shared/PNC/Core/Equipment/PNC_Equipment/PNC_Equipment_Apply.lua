@@ -15,6 +15,9 @@ function Equipment.Apply(zombie, record)
     local laneOk
     local handsReason
     local reasons = {}
+    local workPresentation
+    local workHeld
+    local primaryFullType
 
     if not zombie or not record then
         return false, "missing_body_or_record"
@@ -24,6 +27,16 @@ function Equipment.Apply(zombie, record)
     end
 
     equipment = Equipment.EnsureRecordEquipment(record)
+    workPresentation = Equipment.ResolveWorkPresentation
+        and Equipment.ResolveWorkPresentation(record) or nil
+    workHeld = workPresentation and workPresentation.held == true
+    primaryFullType = equipment.primaryFullType
+    if not Internal.isAttackMode(record)
+        and workHeld and workPresentation
+        and workPresentation.fullType
+    then
+        primaryFullType = workPresentation.fullType
+    end
     if isServer and isServer() == true then
         laneOk, reasons[#reasons + 1] =
             Internal.applyWornItems(zombie, equipment, record)
@@ -41,7 +54,7 @@ function Equipment.Apply(zombie, record)
         Visuals.RefreshModel(zombie)
         return ok, table.concat(reasons, "|")
     end
-    descriptor = Internal.buildWeaponDescriptor(equipment.primaryFullType, true)
+    descriptor = Internal.buildWeaponDescriptor(primaryFullType, true)
 
     laneOk, reasons[#reasons + 1] = Internal.applyWornItems(zombie, equipment, record)
     if not laneOk then
@@ -53,7 +66,7 @@ function Equipment.Apply(zombie, record)
         record,
         equipment,
         descriptor,
-        Internal.isAttackMode(record)
+        Internal.isAttackMode(record) or workHeld
     )
     reasons[#reasons + 1] = handsReason
     if not laneOk then
@@ -69,6 +82,9 @@ function Equipment.ApplyHands(zombie, record)
     local descriptor
     local ok
     local reason
+    local workPresentation
+    local workHeld
+    local primaryFullType
 
     if not zombie or not record then
         return false, "missing_body_or_record"
@@ -78,13 +94,23 @@ function Equipment.ApplyHands(zombie, record)
     end
 
     equipment = Equipment.EnsureRecordEquipment(record)
-    descriptor = Internal.buildWeaponDescriptor(equipment.primaryFullType, true)
+    workPresentation = Equipment.ResolveWorkPresentation
+        and Equipment.ResolveWorkPresentation(record) or nil
+    workHeld = workPresentation and workPresentation.held == true
+    primaryFullType = equipment.primaryFullType
+    if not Internal.isAttackMode(record)
+        and workHeld and workPresentation
+        and workPresentation.fullType
+    then
+        primaryFullType = workPresentation.fullType
+    end
+    descriptor = Internal.buildWeaponDescriptor(primaryFullType, true)
     ok, _, reason = Internal.applyCombatPresentation(
         zombie,
         record,
         equipment,
         descriptor,
-        Internal.isAttackMode(record)
+        Internal.isAttackMode(record) or workHeld
     )
     Visuals.RefreshModel(zombie)
     return ok, reason

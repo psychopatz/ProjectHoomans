@@ -145,6 +145,7 @@ T.equal(shapedZone.geometry, selectedRegion,
     "selected fishing region was not preserved")
 
 local lease = { npcId = "npc", leaseId = "lease:fishing", executionMode = "ABSTRACT" }
+records.npc.x, records.npc.y = 100, 100
 T.truthy(Service.StartJob(lease), "abstract fishing start")
 T.equal(Service.GetJob("npc").activityItemFullType, "Base.FishingRod",
     "fishing job captures the equipped rod")
@@ -163,12 +164,24 @@ T.equal(tiredReason, "fishing_npc_tired", "tired stop reason")
 records.npc.fatigue = 0
 records.npc.x, records.npc.y = 100, 100
 local farOK, _, farReason = Service.TickJob(lease)
-T.falsy(farOK, "far abstract NPC cannot fish")
-T.equal(farReason, "fishing_npc_not_nearby", "nearby gate reason")
+T.truthy(farOK, farReason or "far abstract NPC continues simulated fishing")
+T.equal(Service.GetJob("npc").phase, "WORKING",
+    "abstract fishing is not gated by live-world proximity")
 records.npc.x, records.npc.y = 1.5, 1.5
 canAccept = false
 local fullOK, _, fullReason = Service.TickJob(lease)
-T.falsy(fullOK, "full inventory stops fishing")
+T.truthy(fullOK, "full inventory holds fishing instead of cancelling it")
 T.equal(fullReason, "fishing_inventory_full", "full inventory stop reason")
+T.equal(Service.GetJob("npc").phase, "WAITING_FOR_OUTPUT",
+    "full inventory exposes an output wait phase")
+canAccept = true
+now = 13000
+local resumed, _, resumedReason = Service.TickJob(lease)
+T.truthy(resumed, resumedReason or "fishing resumes after output capacity returns")
+now = 18000
+resumed, _, resumedReason = Service.TickJob(lease)
+T.truthy(resumed, resumedReason or "fishing resumes after output wait")
+T.truthy(Service.GetJob("npc").catches > 1,
+    "the deferred catch is retried after output capacity returns")
 
 T.finish("pnc_fishing_service_smoke")

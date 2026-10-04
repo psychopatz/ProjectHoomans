@@ -10,6 +10,12 @@ local Common = PNC.BehaviorCommon
 
 local KIND = Const.ORDER_FISHING or "fishing"
 local JOB = "Fishing"
+-- The server starts fishing inside its activation radius. Keep the shared
+-- behavior tolerance slightly wider than the old 0.8-tile movement threshold
+-- so a valid shoreline position does not oscillate forever just outside the
+-- animation point.
+local FISHING_STAND_RADIUS = tonumber(Const.FISHING_INTERACTION_RADIUS)
+    or 1.75
 
 local function normalize(_, spec)
     spec = type(spec) == "table" and spec or {}
@@ -47,16 +53,32 @@ local function actorPosition(record, zombie)
     return tonumber(x) or 0, tonumber(y) or 0, tonumber(z) or 0
 end
 
+local function recordAnimationRequest(record, sceneID, started, reason)
+    if not record then return end
+    record.runtime = record.runtime or {}
+    record.runtime.fishingAnimationRequest = {
+        scene = sceneID,
+        ok = started == true,
+        reason = tostring(reason or (started and "requested" or "rejected")),
+        at = PNC.Core and PNC.Core.Now and PNC.Core.Now() or 0,
+    }
+end
+
 function Fishing.Tick(record, zombie)
     local order = record and record.orderSpec or nil
     local standX, standY, standZ, waterX, waterY
     local actorX, actorY, actorZ
+    local fishingRuntime
+    local phase
     if not order or tostring(order.kind or "") ~= tostring(KIND) then
         return false
     end
 
+    fishingRuntime = record.runtime and record.runtime.fishing or nil
+    phase = tostring(fishingRuntime and fishingRuntime.phase
+        or order.phase or "WAITING")
     record.activeJob = JOB
-    record.activeBehavior = "Fishing:" .. tostring(order.phase or "WAITING")
+    record.activeBehavior = "Fishing:" .. phase
     if Common and Common.ClearCombatTarget then
         Common.ClearCombatTarget(record, "fishing", zombie)
     end
@@ -70,9 +92,25 @@ function Fishing.Tick(record, zombie)
         return true
     end
 
+    -- The server keeps the order alive while it retries equipment, output,
+    -- or a fishing-spot claim. Do not walk toward the water during those
+    -- waits: movement here used to make a failed tool handoff look like a
+    -- navigation loop and could also move the NPC away from its home state.
+    if phase == "TOOL_CHECK" or phase == "WAITING_FOR_TOOL"
+        or phase == "WAITING_FOR_OUTPUT"
+        or phase == "WAITING_FOR_SPOT"
+    then
+        record.activeBehavior = "Fishing:" .. phase
+        if Common and Common.HaltMovement then
+            Common.HaltMovement(record, zombie, "fishing_" .. string.lower(phase))
+        end
+        return true
+    end
+
     actorX, actorY, actorZ = actorPosition(record, zombie)
     if math.abs(actorZ - standZ) > 0.6
-        or PNC.Core.Distance(actorX, actorY, standX, standY) > 0.8
+        or PNC.Core.Distance(actorX, actorY, standX, standY)
+            > FISHING_STAND_RADIUS
     then
         if record.presenceState == Const.PRESENCE_ABSTRACT then
             record.activeBehavior = "Fishing:WaitingNearby"
@@ -88,6 +126,10 @@ function Fishing.Tick(record, zombie)
     if Common and Common.HaltMovement then
         Common.HaltMovement(record, zombie, "fishing_spot")
     end
+    if phase ~= "WAITING" and phase ~= "WORKING" then
+        record.activeBehavior = "Fishing:" .. phase
+        return true
+    end
     if zombie and zombie.faceLocationF and waterX and waterY then
         zombie:faceLocationF(waterX, waterY)
     end
@@ -96,10 +138,35 @@ function Fishing.Tick(record, zombie)
         and type(PNC.AnimationScenes.Request) == "function"
     then
         local scene = record.runtime and record.runtime.animationScene
+        local lastAttemptAt = fishingRuntime
+            and fishingRuntime.lastAttemptAt or nil
+        local lastAnimatedAttemptAt = record.runtime
+            and record.runtime.fishingAnimationAttemptAt or nil
+        if scene and scene.id == "fishing.strike" then
+            return true
+        end
+        if lastAttemptAt and lastAttemptAt ~= lastAnimatedAttemptAt then
+            local started, requestReason = PNC.AnimationScenes.Request(
+                record, zombie, "fishing.strike", {
+                    reason = "fishing_attempt", repeatMode = "once",
+                })
+            recordAnimationRequest(
+                record, "fishing.strike", started, requestReason
+            )
+            if started then
+                record.runtime.fishingAnimationAttemptAt = lastAttemptAt
+                return true
+            end
+        end
         if not scene or scene.id ~= "fishing.cast" then
-            PNC.AnimationScenes.Request(record, zombie, "fishing.cast", {
-                reason = "fishing", repeatMode = "loop",
-            })
+            local started, requestReason = PNC.AnimationScenes.Request(
+                record, zombie, "fishing.cast", {
+                    reason = "fishing", repeatMode = "loop",
+                }
+            )
+            recordAnimationRequest(
+                record, "fishing.cast", started, requestReason
+            )
         end
     end
     return true

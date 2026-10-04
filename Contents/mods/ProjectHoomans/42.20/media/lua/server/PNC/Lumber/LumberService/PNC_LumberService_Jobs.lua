@@ -107,6 +107,9 @@ function Service.CancelJob(npcId, reason)
     then
         PNC.LumberWorkAdapter.CancelOrder(job, reason or "job_cancelled")
     end
+    if Internal.ReleaseOutputCapacity then
+        Internal.ReleaseOutputCapacity(job)
+    end
     Service.ReleaseTree(job.targetKey, reason or "job_cancelled")
     job.targetKey = nil
     job.leaseId = nil
@@ -128,6 +131,7 @@ local function updateRuntime(record, job, tree)
         displayTree = Service.GetTree(job.pendingOutput.treeKey)
     end
     record.runtime = record.runtime or {}
+    local previous = record.runtime.lumber or {}
     record.runtime.lumber = {
         jobId = job.id, zoneId = job.zoneId,
         treeKey = displayTree and displayTree.key or job.targetKey,
@@ -141,6 +145,18 @@ local function updateRuntime(record, job, tree)
         activityItemFullType = job.activityItemFullType,
         remainingWork = displayTree and displayTree.remainingWork or nil,
         maxWork = displayTree and displayTree.maxWork or nil,
+        -- Diagnostics are published after each tick, but must survive the
+        -- next UpdateRuntime rebuild or the UI loses the real wait/block
+        -- reason between scheduler frames.
+        lastReason = previous.lastReason,
+        waitingFor = previous.waitingFor,
+        waitingReason = previous.waitingReason,
+        blockedReason = previous.blockedReason,
+        blockedAt = previous.blockedAt,
+        retryAt = job.outputRetryAt or previous.retryAt,
+        capacity = job.outputCapacityDetails or previous.capacity,
+        movement = record.runtime.lumberTravelDiagnostic
+            or job.travelDiagnostic or previous.movement,
     }
 end
 

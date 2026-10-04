@@ -41,6 +41,25 @@ PNC = {
             return { kind = "at_home" }
         end
     end },
+    WorkItemService = {
+        Check = function(_, operation)
+            if operation ~= "FISHING" then return nil end
+            return {
+                operation = "FISHING", ok = false,
+                state = "WAITING_FOR_WORK_ITEM",
+                reason = "no_valid_candidate",
+                role = "primary_tool",
+                requirements = {
+                    {
+                        role = "primary_tool", labelKey = "Fishing tool",
+                        candidates = { "Base.FishingRod" },
+                        selected = nil,
+                    },
+                },
+            }
+        end,
+        Status = function() return nil end,
+    },
 }
 
 local Status = T.load("ProjectHoomans", "shared",
@@ -175,6 +194,10 @@ local fishing = Status.Build({
 })
 T.equal(fishing.activityItemFullType, "Base.CraftedFishingRod",
     "fishing activity exposes the equipped rod")
+T.equal(fishing.workItemDiagnostic.state, "WAITING_FOR_WORK_ITEM",
+    "fishing activity does not expose its work-item diagnostic")
+T.equal(fishing.workItemDiagnostic.missingCandidates[1],
+    "Base.FishingRod", "fishing diagnostic omits missing candidates")
 
 PNC.Const = { ORDER_SCAVENGE = "scavenge" }
 PNC.ScavengeService = { Internal = {

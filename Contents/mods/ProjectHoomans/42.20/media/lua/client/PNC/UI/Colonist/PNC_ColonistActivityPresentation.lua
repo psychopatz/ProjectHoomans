@@ -20,6 +20,27 @@ local WORK_OPERATION_LABELS = {
     MEDICAL_CARE = "MEDICAL CARE",
 }
 
+local WORK_REASON_LABELS = {
+    storage_full = "storage full",
+    lumber_travel_stalled = "navigation stalled",
+    native_no_goal_progress = "navigation stalled",
+    no_approach_point = "no reachable work point",
+    lumber_tool_missing = "missing lumber tool",
+    tool_cannot_chop = "invalid lumber tool",
+    physical_inventory_unavailable = "inventory unavailable",
+    LUMBER_STORAGE_NOT_FOUND = "stockpile unavailable",
+    LUMBER_STOCKPILE_NOT_FOUND = "stockpile unavailable",
+    TREE_CHUNK_LOADING = "tree area loading",
+}
+
+local function workReason(info)
+    local reason = info and (info.blockedReason or info.waitingReason) or nil
+    if not reason or tostring(reason) == "" then return nil end
+    reason = tostring(reason)
+    return WORK_REASON_LABELS[reason]
+        or string.lower(string.gsub(reason, "_", " "))
+end
+
 function Presentation.Current(person)
     local info = person and person.actionInformation or nil
     if type(info) ~= "table" then
@@ -34,6 +55,10 @@ function Presentation.Current(person)
                 "Work Order"))
         end
         local phase = tostring(info.phase or info.status or "")
+        local reason = workReason(info)
+        if reason and (phase == "BLOCKED" or info.waitingFor) then
+            phase = phase .. ": " .. reason
+        end
         return phase ~= "" and label .. " (" .. phase .. ")" or label
     end
     if info.kind == "return_home" then

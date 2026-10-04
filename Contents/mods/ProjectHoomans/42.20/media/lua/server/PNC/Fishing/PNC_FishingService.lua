@@ -24,6 +24,8 @@ Service.SCHEMA_VERSION = 1
 Service.MAX_ZONE_TILES = tonumber(Const.FISHING_MAX_ZONE_TILES) or 10000
 Service.MAX_WORKERS_PER_ZONE = tonumber(Const.FISHING_MAX_WORKERS) or 16
 Service.ACTIVATION_RADIUS = tonumber(Const.FISHING_DEFAULT_RADIUS) or 16
+Service.INTERACTION_RADIUS = tonumber(Const.FISHING_INTERACTION_RADIUS)
+    or 1.75
 Service.CLAIM_TTL_MS = 30000
 Service.MAX_ELAPSED_MS = 15000
 Service.Runtime = Service.Runtime or { spotClaims = {}, previousOrders = {} }
@@ -130,6 +132,10 @@ local function normalizeLoaded()
         job.zoneId = tostring(job.zoneId or "")
         job.active = job.active ~= false
         job.leaseId = nil
+        -- Claims are runtime-only. The next live tick or lease start must
+        -- rebind the persisted job to a fresh claim instead of treating the
+        -- cleared in-memory table as a lost worker.
+        job.spotClaimNeedsRebind = job.active == true
         job.previousOrder, job.previousOrderCaptured = nil, nil
     end
 end
@@ -170,6 +176,7 @@ end
 
 require "PNC/Fishing/PNC_FishingService_ZoneWorld"
 require "PNC/Fishing/PNC_FishingService_Zone"
+require "PNC/Fishing/PNC_FishingService_Diagnostics"
 require "PNC/Fishing/PNC_FishingService_Job"
 require "PNC/Fishing/PNC_FishingService_Lifecycle"
 require "PNC/Fishing/PNC_FishingService_Work"

@@ -87,6 +87,9 @@ end
 
 local function statusForJob(job)
     local phase = tostring(job and job.phase or "")
+    if phase == "BLOCKED" then
+        return Status.BLOCKED or "BLOCKED"
+    end
     if phase == "CHOPPING" or phase == "GRAB_PENDING"
         or phase == "DEPOSIT_PENDING"
     then
@@ -111,7 +114,9 @@ local function statusForJob(job)
     then
         return Status.TRAVEL_TO_STOCKPILE or "TRAVEL_TO_STOCKPILE"
     end
-    if phase == "TRAVEL" or phase == "OUTPUT_APPROACH" then
+    if phase == "TRAVEL" or phase == "WAITING_FOR_TRAVEL"
+        or phase == "OUTPUT_APPROACH"
+    then
         return Status.TRAVEL_TO_STATION or "TRAVEL_TO_STATION"
     end
     return Status.WAITING_RESOURCE or "WAITING_RESOURCE"
@@ -127,6 +132,15 @@ local function updateLiveTarget(order, job)
     then return end
     local projectionChanged = false
     local projectedStatus = statusForJob(job)
+    local lumberRuntime = record.runtime and record.runtime.lumber or nil
+    local projectedBlockReason = job.phase == "BLOCKED"
+        and lumberRuntime
+        and (lumberRuntime.blockedReason or lumberRuntime.lastReason)
+        or nil
+    if order.blockedReason ~= projectedBlockReason then
+        order.blockedReason = projectedBlockReason
+        projectionChanged = true
+    end
     if projectedStatus
         and order.status ~= Status.CANCELLED
         and order.status ~= Status.COMPLETED
@@ -225,6 +239,17 @@ end
 function Adapter.Complete(order)
     local job = jobForOrder(order)
     if not job then return true end
+    if Service.Internal and Service.Internal.ReleaseOutputCapacity then
+        Service.Internal.ReleaseOutputCapacity(job)
+    end
+    local record = recordFor(order.workerId)
+    if record and PNC.WorkItemService and PNC.WorkItemService.Release then
+        local released, releaseReason = PNC.WorkItemService.Release(
+            record, "LUMBER", nil, {
+            reason = "lumber_work_complete",
+        })
+        if released == false then return false, releaseReason end
+    end
     if Service.ReleaseTree then
         Service.ReleaseTree(job.targetKey, "lumber_work_complete")
     end
@@ -242,6 +267,17 @@ end
 function Adapter.Cancel(order)
     local job = jobForOrder(order)
     if not job then return true end
+    if Service.Internal and Service.Internal.ReleaseOutputCapacity then
+        Service.Internal.ReleaseOutputCapacity(job)
+    end
+    local record = recordFor(order.workerId)
+    if record and PNC.WorkItemService and PNC.WorkItemService.Release then
+        local released, releaseReason = PNC.WorkItemService.Release(
+            record, "LUMBER", nil, {
+            reason = "lumber_work_cancelled",
+        })
+        if released == false then return false, releaseReason end
+    end
     if Service.ReleaseTree then
         Service.ReleaseTree(job.targetKey, "lumber_work_released")
     end

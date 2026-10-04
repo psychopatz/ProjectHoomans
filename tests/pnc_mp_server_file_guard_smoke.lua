@@ -58,6 +58,8 @@ listing:close()
 -- PNC_LumberService_Execution_OutputCapture,
 -- Execution_OutputDelivery, Execution_TreeWork and Execution_Dispatch are
 -- loaded by the LumberService execution composition root.
+-- PNC_LumberService_Diagnostics is loaded by LumberService before the
+-- execution state machine.
 -- PNC_LumberWorkAdapter_Lifecycle, OrderBridge and WorldEffects are loaded
 -- by the LumberWorkAdapter composition root.
 -- PNC_WorldEffectService_Context, Registry, Reconciliation, Snapshot and
@@ -80,6 +82,7 @@ listing:close()
 -- PNC_WorkService_OperationRegistry is loaded by the WorkService core.
 -- PNC_WorkService_Targets_Providers and Targets_Claim are loaded by the
 -- WorkService target composition root.
+-- PNC_WorkItemService_Logistics is loaded by the Production composition root.
 -- PNC_WorkService_WorkerReconciliation_Claims and _State are loaded by the
 -- WorkService worker reconciliation composition root.
 -- PNC_SocialEventHooks_DamageAdapter_Context, Recorders and Polling are
@@ -128,6 +131,8 @@ listing:close()
 -- mutation composition root.
 -- PNC_ServerInventory_Transfer_Handle is loaded by the inventory transfer
 -- authority composition root.
+-- PNC_ServerInventory_Currency is loaded by the inventory server barrel and
+-- keeps currency mutation on the same authoritative MP path.
 -- The four CampResourceService discovery spokes are loaded by its guarded
 -- discovery composition root.
 -- The three NPCKnowledgeAPI spokes are loaded by its guarded API composition
@@ -141,7 +146,7 @@ listing:close()
 -- activity root.
 -- The three need-facility effect spokes are loaded by its guarded root.
 -- The four UniqueNPCRegistry providers are loaded by its guarded root.
-T.equal(#serverOnlyFiles, 980,
+T.equal(#serverOnlyFiles, 984,
     "server Lua inventory changed without updating the MP loader gate")
 T.truthy(true, "facility-state reconciler is covered by the loader gate")
 

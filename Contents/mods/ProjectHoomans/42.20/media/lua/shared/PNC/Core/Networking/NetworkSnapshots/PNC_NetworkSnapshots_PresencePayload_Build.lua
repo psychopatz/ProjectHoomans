@@ -3,6 +3,7 @@ local Network = PNC.Network
 local H = Network.Internal.PresencePayload
 if not H then return Network end
 local Core = H.Core
+local Equipment = PNC.Equipment
 local Stamina = H.Stamina
 local Firearms = H.Firearms
 local Settings = H.Settings
@@ -105,7 +106,12 @@ function Network.BuildPresenceDelta(record)
         activeBehavior = record.activeBehavior,
         inCombat = inCombat,
         attackMode = record.runtime and record.runtime.target ~= nil or false,
-        combatStance = combat and combat.combatStance == true or false,
+        -- `combat` was never a local in this builder. That made every
+        -- presence delta report a false stance, so multiplayer replicas could
+        -- not honor the combat lease even while the server had one active.
+        combatStance = record.runtime
+            and (record.runtime.combatStance == true or inCombat == true)
+            or inCombat == true,
         firearmState = firearmState,
         vehiclePassenger = vehiclePassenger and {
             active = vehiclePassenger.active == true,
@@ -115,6 +121,12 @@ function Network.BuildPresenceDelta(record)
             boardedAt = vehiclePassenger.boardedAt,
         } or nil,
         visualState = buildVisualState(record),
+        -- Presence deltas omit the full clothing projection, but work-held
+        -- state must refresh while a live job is running.
+        workPresentation = Equipment
+            and Equipment.BuildWorkPresentationSummary
+            and Equipment.BuildWorkPresentationSummary(record)
+            or nil,
         pathDebugState = pathDebugState,
         combatDebugState = combatDebugState,
         campResourceDebug = buildCampResourceDebugState(record),

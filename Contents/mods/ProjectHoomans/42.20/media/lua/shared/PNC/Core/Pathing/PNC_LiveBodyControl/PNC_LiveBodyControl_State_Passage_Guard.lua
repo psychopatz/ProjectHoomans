@@ -6,13 +6,16 @@ local passageMovementState = Internal.passageMovementState
 local isClosedPassageDoor = Internal.isClosedPassageDoor
 local openPassageDoorAhead = Internal.openPassageDoorAhead
 local isClientState = Internal.isClientState
+
 function LiveBodyControl.BlockVanillaPassage(zombie, lane, now)
     local modData
     local actionState
     local object
     local kind
     local behavior
+    local fenceHazard
     if not zombie then return false end
+    modData = zombie.getModData and zombie:getModData() or nil
     object, kind = LiveBodyControl.GetVanillaPassageAhead(zombie)
     if not object then
         VANILLA_PASSAGE_GUARD_LOGGED[zombie] = nil
@@ -33,6 +36,7 @@ function LiveBodyControl.BlockVanillaPassage(zombie, lane, now)
     local climbable = kind == "window"
         or kind == "window_frame"
         or kind == "thumpable"
+    fenceHazard = kind == "fence"
     -- A hoppable low door or fence is vaulted through the player-only
     -- ClimbOverFenceState, which throws for an IsoZombie. It must be treated as
     -- a hazard on both sides, not just on the client.
@@ -42,7 +46,8 @@ function LiveBodyControl.BlockVanillaPassage(zombie, lane, now)
     actionState = LiveBodyControl.GetActionStateName(zombie)
     if not passageMovementState(actionState)
         and not ((climbable and isClientState() and moving)
-            or (vaultHazard and moving))
+            or vaultHazard
+            or fenceHazard)
     then
         return false
     end
@@ -63,7 +68,6 @@ function LiveBodyControl.BlockVanillaPassage(zombie, lane, now)
             return false, kind
         end
     end
-    modData = zombie.getModData and zombie:getModData() or nil
     if modData
         and modData.PNC_BumpActionLease == true
         and LiveBodyControl.IsTraversalBumpType(
@@ -80,6 +84,9 @@ function LiveBodyControl.BlockVanillaPassage(zombie, lane, now)
     end
     if zombie.setPath2 then zombie:setPath2(nil) end
     Internal.clearVanillaIntent(zombie)
+    if (climbable or vaultHazard or fenceHazard)
+        and LiveBodyControl.ResetNativeMovementState
+    then LiveBodyControl.ResetNativeMovementState(zombie) end
     if LiveBodyControl.SuppressZombieState then
         LiveBodyControl.SuppressZombieState(zombie, lane, now)
     elseif zombie.changeState
@@ -97,6 +104,9 @@ function LiveBodyControl.BlockVanillaPassage(zombie, lane, now)
         elseif vaultHazard then
             pcall(PNC.PerformanceScalingDiagnostics.Increment,
                 "LiveBodyControl.VanillaVaultBlocked")
+        elseif fenceHazard then
+            pcall(PNC.PerformanceScalingDiagnostics.Increment,
+                "LiveBodyControl.VanillaFenceBlocked")
         end
     end
     if not VANILLA_PASSAGE_GUARD_LOGGED[zombie]

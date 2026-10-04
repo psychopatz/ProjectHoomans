@@ -72,6 +72,8 @@ end
 
 local function buildHandsKey(snapshot)
     local equipment = snapshot and snapshot.equipmentSummary or {}
+    local workPresentation = snapshot and snapshot.workPresentation
+        or equipment.workPresentation
     local action = snapshot and snapshot.actionInformation or {}
     return table.concat({
         tostring(snapshot and snapshot.liveBodyInstanceID or ""),
@@ -81,6 +83,10 @@ local function buildHandsKey(snapshot)
         tostring(equipment.primaryFullType or ""),
         stableTableSignature(equipment.primaryVisual),
         tostring(equipment.secondaryFullType or ""),
+        tostring(workPresentation and workPresentation.held == true),
+        tostring(workPresentation and workPresentation.operation or ""),
+        tostring(workPresentation and workPresentation.itemID or ""),
+        tostring(workPresentation and workPresentation.fullType or ""),
         tostring(action.kind or ""),
         tostring(action.operation or ""),
         tostring(action.activityId or ""),

@@ -17,7 +17,11 @@ function Endpoint.SelectionForRow(endpoint, row, requestedQuantity)
 end
 
 function Endpoint.BulkSelection(endpoint, list)
-    local selection = { itemIDs = {}, records = {}, quantity = 0 }
+    local selection = {
+        itemIDs = {}, records = {}, quantity = 0,
+        itemQuantity = 0, currencyAmount = 0,
+        currencyContainers = {}, currencyFullType = nil,
+    }
     local seen = {}
     for _, entry in ipairs(list and list.items or {}) do
         local row = entry and entry.item or nil
@@ -36,6 +40,16 @@ function Endpoint.BulkSelection(endpoint, list)
                     selection.quantity = selection.quantity + quantity
                 end
             else
+            if row.currency == true then
+                -- Currency rows are already expressed in value units. Do not
+                -- preserve a physical Money/MoneyBundle type here: the
+                -- authoritative Core service normalizes the destination.
+                selection.currencyAmount = selection.currencyAmount
+                    + quantity
+                selection.currencyContainers[#selection.currencyContainers + 1] =
+                    row.container
+                selection.quantity = selection.quantity + quantity
+            else
                 local rowIDs = row.itemIDs or { row.id }
                 for index = 1, #rowIDs do
                     local itemID = rowIDs[index]
@@ -44,9 +58,21 @@ function Endpoint.BulkSelection(endpoint, list)
                         selection.itemIDs[#selection.itemIDs + 1] = itemID
                     end
                 end
+                selection.itemQuantity = selection.itemQuantity + quantity
                 selection.quantity = selection.quantity + quantity
             end
         end
+        end
+    end
+    -- Keep the existing normal-item transfer transaction unchanged. A mixed
+    -- bulk request would otherwise combine physical IDs and currency value
+    -- semantics without an atomic cross-domain rollback.
+    if #selection.itemIDs > 0 then
+        selection.currencyAmount = 0
+        selection.currencyContainers = {}
+        selection.currencyFullType = nil
+    elseif selection.currencyFullType == false then
+        selection.currencyFullType = nil
     end
     return selection
 end

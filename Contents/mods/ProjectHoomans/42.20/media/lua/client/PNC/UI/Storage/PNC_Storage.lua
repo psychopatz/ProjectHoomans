@@ -5,5 +5,6 @@ require "PNC/UI/Storage/PNC_StorageClient"
 require "PNC/UI/Storage/PNC_StoragePresentation"
 require "PNC/UI/Storage/PNC_StorageLayout"
 require "PNC/UI/Storage/PNC_StorageController"
+require "PNC/UI/Storage/PNC_StorageJobRequirementsModal"
 
 return require "PNC/UI/Storage/PNC_StorageWindow"

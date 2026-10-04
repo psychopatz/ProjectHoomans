@@ -95,42 +95,110 @@ function Internal.ShouldIssueFollowMove(record, target, mode, now)
     return true
 end
 
-function Internal.HoldAndFaceOwner(record, zombie, owner, mode, reason)
-    local _, changed = Internal.SetFollowMode(record, mode)
-    Internal.ResetFollowMoveIssue(record)
+function Internal.HoldAndFaceOwner(record, zombie, owner, mode, reason, now)
+    local state, changed = Internal.SetFollowMode(record, mode)
+    local runtime = record.runtime or {}
+    local path = runtime.pathing
+    local navigation = runtime.localNavigation
+    local combatNeedsClear
+    local movementNeedsRepair
+    local holdRefreshDue
+    local facingDue
+    local facingApplied
+    now = tonumber(now)
+        or PNC.Core and PNC.Core.Now and PNC.Core.Now()
+        or 0
+
+    -- A hold is a lease, not a per-tick command. Only reset the movement
+    -- intent when entering the lease; repeatedly clearing it made the hold
+    -- path look active to every downstream movement/presentation service.
+    if changed then
+        Internal.ResetFollowMoveIssue(record)
+        state.holdCombatCleared = false
+        state.holdNextRefreshAt = 0
+        state.holdFacingNextAt = 0
+    end
     record.activeBehavior = mode == "idle_near_owner"
         and "FollowOwner:idle" or "FollowOwner:formation_hold"
-    Common.ClearCombatTarget(record, reason)
+
+    combatNeedsClear = changed
+        or runtime.target ~= nil
+        or runtime.attackAction ~= nil
+        or (tonumber(runtime.inCombatUntil) or 0) > now
+        or state.holdCombatCleared ~= true
+    movementNeedsRepair = changed
+        or path and (
+            path.phase == "requested"
+            or path.phase == "active"
+            or path.traversalAction ~= nil
+        )
+        or navigation and (
+            navigation.nativeActive == true
+            or navigation.nativeTraversalState ~= nil
+        )
+    holdRefreshDue = changed
+        or combatNeedsClear
+        or movementNeedsRepair
+        or now >= (tonumber(state.holdNextRefreshAt) or 0)
+
+    -- Keep the hot path to a few field reads while the follower remains in a
+    -- stable formation hold. Owner movement and combat are decided by the
+    -- enclosing follow tick before this function, while the route checks
+    -- above repair unexpected native/path ownership immediately.
+    if not holdRefreshDue then
+        return true
+    end
+
+    if combatNeedsClear then
+        Common.ClearCombatTarget(record, reason)
+        state.holdCombatCleared = true
+    end
     if not zombie then return true end
 
-    if changed then
+    if changed or movementNeedsRepair then
         Common.HaltMovement(record, zombie, "follow_hold")
-        if Animation and Animation.Apply then
+        if changed and Animation and Animation.Apply then
             Animation.Apply(zombie, record, "Idle")
         end
     end
-    if PNC.PathService and PNC.PathService.RequestAmbientFacing
-        and PNC.PathService.RequestAmbientFacing(
-            record,
-            zombie,
-            "follow_owner"
+    facingDue = changed
+        or now >= (tonumber(state.holdFacingNextAt) or 0)
+    if facingDue then
+        if PNC.PathService and PNC.PathService.RequestAmbientFacing
+            and PNC.PathService.RequestAmbientFacing(
+                record,
+                zombie,
+                "follow_owner"
+            )
+        then
+            facingApplied = true
+        end
+        if not facingApplied
+            and PNC.PathService
+            and PNC.PathService.RequestIdleFacing
+        then
+            PNC.PathService.RequestIdleFacing(
+                record,
+                zombie,
+                owner:getX(),
+                owner:getY(),
+                "follow_owner"
+            )
+            facingApplied = true
+        elseif not facingApplied and zombie.faceThisObject then
+            zombie:faceThisObject(owner)
+            facingApplied = true
+        elseif not facingApplied and zombie.faceLocationF then
+            zombie:faceLocationF(owner:getX(), owner:getY())
+            facingApplied = true
+        end
+        state.holdFacingNextAt = now + (
+            tonumber(Const.FOLLOW_HOLD_FACING_INTERVAL_MS) or 750
         )
-    then
-        return true
     end
-    if PNC.PathService and PNC.PathService.RequestIdleFacing then
-        PNC.PathService.RequestIdleFacing(
-            record,
-            zombie,
-            owner:getX(),
-            owner:getY(),
-            "follow_owner"
-        )
-    elseif zombie.faceThisObject then
-        zombie:faceThisObject(owner)
-    elseif zombie.faceLocationF then
-        zombie:faceLocationF(owner:getX(), owner:getY())
-    end
+    state.holdNextRefreshAt = now + (
+        tonumber(Const.FOLLOW_HOLD_REFRESH_MS) or 1000
+    )
     return true
 end
 

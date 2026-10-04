@@ -3,6 +3,7 @@ if PsychopatzCore and PsychopatzCore.RuntimeRole
 
 local Service = PNC.LumberService
 local Internal = Service.Internal
+local WorkItems = PNC.WorkItemService
 
 local function isChoppingFullType(fullType)
     local lower = string.lower(tostring(fullType or ""))
@@ -51,7 +52,13 @@ local function ensureCanonicalLumberTool(record)
         local inventory = record and record.inventory
         local primaryID = inventory and inventory.equipped
             and inventory.equipped.primary or nil
-        if tostring(primaryID or "") ~= tostring(item.id or "")
+        if WorkItems and WorkItems.Ensure then
+            local ready = WorkItems.Ensure(record, "LUMBER", nil, {
+                owner = "work:LUMBER", priority = "WORK",
+                applyHands = false,
+            })
+            if not ready then return nil end
+        elseif tostring(primaryID or "") ~= tostring(item.id or "")
             and PNC.Inventory
             and type(PNC.Inventory.EquipPrimary) == "function"
         then
@@ -69,7 +76,15 @@ local function ensureCanonicalLumberTool(record)
         and type(PNC.Inventory.SyncFromEquipment) == "function"
     then
         PNC.Inventory.SyncFromEquipment(record, "lumber_tool_inventory_sync")
-        return findCanonicalLumberTool(record)
+        item = findCanonicalLumberTool(record)
+        if item and WorkItems and WorkItems.Ensure then
+            local ready = WorkItems.Ensure(record, "LUMBER", nil, {
+                owner = "work:LUMBER", priority = "WORK",
+                applyHands = false,
+            })
+            if not ready then return nil end
+        end
+        return item
     end
     return nil
 end
@@ -80,3 +95,13 @@ Internal.CanonicalItemFullType = canonicalItemFullType
 Internal.CanonicalItemBroken = canonicalItemBroken
 Internal.FindCanonicalLumberTool = findCanonicalLumberTool
 Internal.EnsureCanonicalLumberTool = ensureCanonicalLumberTool
+
+if WorkItems and WorkItems.RegisterValidator then
+    WorkItems.RegisterValidator("lumber_tool", function(_, item)
+        if not isChoppingFullType(canonicalItemFullType(item)) then
+            return false, "tool_cannot_chop"
+        end
+        if canonicalItemBroken(item) then return false, "lumber_tool_broken" end
+        return true
+    end)
+end

@@ -71,6 +71,19 @@ PNC.Registry = {
     Data = {},
     DirtyByID = dirty,
 }
+local dogTagRefreshes = {}
+PNC.Inventory = {
+    RefreshFactionDogTag = function(record, faction)
+        dogTagRefreshes[#dogTagRefreshes + 1] = {
+            record = record,
+            faction = faction,
+        }
+        return {}, true
+    end,
+}
+PNC.Network = {
+    BroadcastRecord = function() end,
+}
 function PNC.Registry.Get(id)
     return PNC.Registry.Data[tostring(id)]
 end
@@ -261,6 +274,26 @@ local alice = newNPC("npc_alice", "hostile")
 local bob = newNPC("npc_bob", "neutral")
 local cara = newNPC("npc_cara", "neutral")
 local dana = newNPC("npc_dana", "neutral")
+local leader = newNPC("npc_leader", "neutral")
+local refreshBeforeLeaderCreate = #dogTagRefreshes
+local leaderCreateOK, _, leaderFaction = Factions.Create({
+    name = "Leader Watch",
+    archetypeID = "settler",
+    leaderNPCID = leader.id,
+    createdAt = 100,
+})
+T.truthy(leaderCreateOK, "faction creation with a leader")
+T.equal(#dogTagRefreshes, refreshBeforeLeaderCreate + 1,
+    "faction creation refreshes the existing leader dogtag")
+T.equal(dogTagRefreshes[#dogTagRefreshes].record, leader,
+    "leader dogtag refresh targets the leader record")
+local refreshBeforeRename = #dogTagRefreshes
+local renameOK = Factions.SetName(leaderFaction.id, "Leader Watch Renamed")
+T.truthy(renameOK, "generic faction rename")
+T.equal(#dogTagRefreshes, refreshBeforeRename + 1,
+    "generic faction rename refreshes NPC dogtags")
+T.equal(dogTagRefreshes[#dogTagRefreshes].faction.name,
+    "Leader Watch Renamed", "renamed faction reaches dogtag refresh")
 local aliceBaseline = {
     faction = alice.faction,
     attackPlayers = alice.hostility.attackPlayers,

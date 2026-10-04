@@ -130,6 +130,50 @@ local function scavengeActivity(record)
     }
 end
 
+local function buildWorkItemDiagnostic(record, operation)
+    local service = PNC.WorkItemService
+    if not service or type(service.Check) ~= "function" then return nil end
+    local report = service.Check(record, operation)
+    if type(report) ~= "table"
+        or type(report.requirements) ~= "table"
+        or #report.requirements < 1
+    then
+        return nil
+    end
+    local copy = Core and Core.DeepCopy
+    local output = {
+        operation = report.operation,
+        ok = report.ok == true,
+        state = report.state,
+        reason = report.reason,
+        role = report.role,
+        selectedFullType = report.selected
+            and report.selected.fullType or nil,
+        requirements = copy and copy(report.requirements)
+            or report.requirements,
+    }
+    for index = 1, #report.requirements do
+        local requirement = report.requirements[index]
+        if not requirement.selected then
+            output.role = requirement.role
+            output.labelKey = requirement.labelKey
+            output.requiredItems = copy and copy(requirement.candidates or {})
+                or requirement.candidates or {}
+            output.candidates = copy and copy(requirement.candidates or {})
+                or requirement.candidates or {}
+            output.missingCandidates = copy
+                and copy(requirement.candidates or {})
+                or requirement.candidates or {}
+            break
+        end
+    end
+    if service.Status then
+        local lease = service.Status(record, operation)
+        output.lease = copy and copy(lease) or lease
+    end
+    return output
+end
+
 local function facilityItem(record, runtime, capability)
     local function selectedItemFullType(kind)
         local selected = tostring(runtime.activityItemFullType or "")
@@ -348,8 +392,36 @@ Status.Register("current_job", 10, function(record)
     end
     local fishing = runtime.fishing
     if fishing and information.orderKind == "fishing" then
+        local workPoints = tonumber(fishing.workPoints) or 0
+        local requiredWorkPoints = tonumber(fishing.requiredWorkPoints) or 0
         information.phase = tostring(fishing.phase or "")
         information.activityItemFullType = fishing.activityItemFullType
+        information.activityItemID = fishing.activityItemID
+        information.recordPrimaryID = fishing.recordPrimaryID
+        information.waitingFor = fishing.waitingFor
+        information.waitingReason = fishing.waitingReason
+        information.workPoints = workPoints
+        information.requiredWorkPoints = requiredWorkPoints
+        information.percent = requiredWorkPoints > 0
+            and math.floor(math.max(0, math.min(100,
+                (workPoints / requiredWorkPoints) * 100)) + 0.5) or 0
+        information.attemptIndex = tonumber(fishing.attemptIndex) or 0
+        information.catches = tonumber(fishing.catches) or 0
+        information.lastChance = fishing.lastAttemptChance
+        information.lastRoll = fishing.lastAttemptRoll
+        information.lastSuccess = fishing.lastAttemptSuccess
+        information.lastReason = fishing.lastReason
+        information.lastFailureReason = fishing.lastFailureReason
+        information.leaseOwner = fishing.leaseOwner
+        information.leasePriority = fishing.leasePriority
+        information.animationScene = fishing.animationScene
+        information.animationRequest = fishing.animationRequest
+        information.animationReason = fishing.animationReason
+        information.actionPropAttach = fishing.actionPropAttach
+        information.toolReady = fishing.toolReady == true
+        information.executionMode = fishing.executionMode
+        information.workItemDiagnostic = buildWorkItemDiagnostic(
+            record, "FISHING")
     end
     local lumber = runtime.lumber
     if tostring(record.activeJob or "") == "Lumber" and lumber then
@@ -360,6 +432,8 @@ Status.Register("current_job", 10, function(record)
         information.waitingReason = lumber.waitingReason
         information.toolDiagnostic = Core and Core.DeepCopy
             and Core.DeepCopy(lumber.tool) or nil
+        information.workItemDiagnostic = buildWorkItemDiagnostic(
+            record, "LUMBER")
     end
     return behavior(current, humanize(current), information)
 end)

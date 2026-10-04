@@ -3,7 +3,12 @@ local TooltipModel = require
     "PsychopatzCore/UI/Inventory/PsychopatzInventoryTooltipModel"
 local TooltipOptions = require
     "PNC/UI/Inventory/PNC_InventoryUI_CoreTooltipOptions"
+local Currency = PsychopatzCore and PsychopatzCore.Currency
 local PROBE_CACHE = {}
+local FAST_AGGREGATE_TYPES = {
+    ["Base.Money"] = true,
+    ["Base.MoneyBundle"] = true,
+}
 local ROOT_INVENTORY_TEXTURE = getTexture
     and getTexture("media/ui/Icon_InventoryBasic.png")
     or nil
@@ -118,6 +123,117 @@ local function nativeInteractionLocked(item)
             or modData.identityNPCName ~= nil)
 end
 
+-- These item types are immutable value tokens for the purposes of the
+-- player-side viewer. Do not build a full tooltip/protection row for every
+-- physical unit when the engine is carrying thousands of them. Authority
+-- still revalidates every transfer; this is only a display/index shortcut.
+local function canFastAggregate(item, fullType)
+    fullType = tostring(fullType or safeCall(item, "getFullType", ""))
+    if not FAST_AGGREGATE_TYPES[fullType] then return false end
+    if nativeFlag(item, "isFavorite")
+        or nativeFlag(item, "isEquipped")
+        or safeCall(item, "isCustomName", false) == true
+    then
+        return false
+    end
+    if nativeInteractionLocked(item) or nativeContainerHasItems(item) then
+        return false
+    end
+    return true
+end
+
+local function isFastAggregateType(fullType)
+    return FAST_AGGREGATE_TYPES[tostring(fullType or "")] == true
+end
+
+local function nativeQuantity(item)
+    local count = safeCall(item, "getCount", 1)
+    count = tonumber(count)
+    if not count or count < 1 then return 1 end
+    return math.max(1, math.floor(count))
+end
+
+local function currencyName()
+    local key = "UI_PNC_Inventory_Currency"
+    if type(getText) == "function" then
+        local translated = getText(key)
+        if translated and translated ~= key then return translated end
+    end
+    return "Currency"
+end
+
+local function newCurrencyRow(containerKey, source)
+    local moneyType = Currency and Currency.MONEY_TYPE or "Base.Money"
+    local metadata = probe(moneyType)
+    return {
+        source = source or "player",
+        id = "currency:" .. tostring(source or "player") .. ":"
+            .. tostring(containerKey or "root"),
+        currency = true,
+        currencyComponent = false,
+        currencySection = currencyName(),
+        aggregate = true,
+        -- Keep the base Money metadata for the icon/tooltip, but make the
+        -- row a value token. The physical type is deliberately not sent by
+        -- the transfer selector; Core normalizes both currency types.
+        fullType = moneyType,
+        name = metadata.name or "Money",
+        category = currencyName(),
+        baseCategory = metadata.category,
+        texture = metadata.texture,
+        weight = 0,
+        unitWeight = 0,
+        container = containerKey,
+        currencyUnitValue = 1,
+        stack = 0,
+        currencyQuantity = 0,
+        currencyPhysicalQuantity = 0,
+        currencyUnits = 0,
+        currencyLoose = 0,
+        currencyBundles = 0,
+        currencyUnitEntries = 0,
+        currencyStackEntries = {},
+        currencyComponents = {},
+        favorite = false,
+        equipped = false,
+        restricted = false,
+        itemIDs = nil,
+    }
+end
+
+local function addCurrencyValue(row, fullType, quantity, physicalQuantity)
+    quantity = math.max(0, math.floor(tonumber(quantity) or 0))
+    if not row or quantity < 1 then return end
+    physicalQuantity = math.max(1, math.floor(
+        tonumber(physicalQuantity) or quantity))
+    local value = Currency and Currency.ValueFor
+        and Currency.ValueFor(fullType, quantity)
+        or fullType == "Base.MoneyBundle" and quantity * 100 or quantity
+    row.currencyUnits = row.currencyUnits + value
+    row.currencyQuantity = row.currencyQuantity + quantity
+    row.currencyPhysicalQuantity = row.currencyPhysicalQuantity
+        + physicalQuantity
+    row.currencyComponents[#row.currencyComponents + 1] = {
+        fullType = tostring(fullType or ""),
+        quantity = quantity,
+        physicalQuantity = physicalQuantity,
+    }
+    -- The special row is selected in currency units, not physical entries.
+    -- This makes 1 MoneyBundle and 100 Money interchangeable in the viewer.
+    row.stack = row.currencyUnits
+    if fullType == (Currency and Currency.BUNDLE_TYPE or "Base.MoneyBundle") then
+        row.currencyBundles = row.currencyBundles + quantity
+    else
+        row.currencyLoose = row.currencyLoose + quantity
+    end
+    row.stateKey = table.concat({
+        "currency", tostring(row.container or "root"),
+        tostring(row.stack), tostring(row.currencyUnits),
+        tostring(row.currencyLoose),
+        tostring(row.currencyBundles),
+    }, ":")
+end
+
 -- This is the client-side equivalent of the server's native bulk-transfer
 -- protection.  Keep it in the row model so click, drag, and bulk transfer all
 -- render and enforce the same eligibility decision.  The local editor copies
@@ -178,6 +294,12 @@ end
 return {
     safeCall = safeCall,
     probe = probe,
+    canFastAggregate = canFastAggregate,
+    isFastAggregateType = isFastAggregateType,
+    nativeQuantity = nativeQuantity,
+    currency = Currency,
+    newCurrencyRow = newCurrencyRow,
+    addCurrencyValue = addCurrencyValue,
     playerItemRow = playerItemRow,
     isNPCDepositForbidden = isNPCDepositForbidden,
     rootInventoryTexture = ROOT_INVENTORY_TEXTURE,

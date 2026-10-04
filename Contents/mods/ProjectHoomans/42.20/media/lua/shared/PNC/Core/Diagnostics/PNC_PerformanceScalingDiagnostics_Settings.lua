@@ -21,6 +21,8 @@ local ZOMBIE_AGGRO_AUDIT_SETTING_ID = "ProjectHoomans.ZombieAggroAudit"
 local NPC_THREAT_AUDIT_SETTING_ID = "ProjectHoomans.NPCThreatAudit"
 local NETWORK_PAYLOAD_AUDIT_SETTING_ID = "ProjectHoomans.NetworkPayloadAudit"
 local BUILD_AUDIT_SETTING_ID = "ProjectHoomans.BuildAudit"
+local NATIVE_HANDOFF_AUDIT_SETTING_ID =
+    "ProjectHoomans.NativeHandoffAudit"
 local function initializeCentralDebugSettings()
     local settings = PsychopatzCore and PsychopatzCore.DebugSettings
     if not settings or type(settings.Register) ~= "function" then
@@ -177,6 +179,18 @@ local function initializeCentralDebugSettings()
             Diagnostics.BuildAuditEnabled = enabled == true
         end,
     })
+    settings.Register({
+        id = NATIVE_HANDOFF_AUDIT_SETTING_ID,
+        source = "Project Hoomans",
+        order = 160,
+        title = "Native locomotion handoff audit",
+        description = "Traces native path publication, WalkToward re-entry, and same-frame owner repairs.",
+        defaultEnabled = false,
+        runtimeMutable = true,
+        apply = function(enabled)
+            Diagnostics.NativeHandoffAuditEnabled = enabled == true
+        end,
+    })
     Diagnostics.Enabled = settings.IsEnabled(PERFORMANCE_SETTING_ID) == true
     Diagnostics.TimingEnabled = Diagnostics.Enabled
         and Diagnostics.TimingEnabled ~= false
@@ -207,9 +221,10 @@ local function initializeCentralDebugSettings()
         NETWORK_PAYLOAD_AUDIT_SETTING_ID) == true
     Diagnostics.BuildAuditEnabled = settings.IsEnabled(
         BUILD_AUDIT_SETTING_ID) == true
+    Diagnostics.NativeHandoffAuditEnabled = settings.IsEnabled(
+        NATIVE_HANDOFF_AUDIT_SETTING_ID) == true
 end
 
 initializeCentralDebugSettings()
 
 return true
-

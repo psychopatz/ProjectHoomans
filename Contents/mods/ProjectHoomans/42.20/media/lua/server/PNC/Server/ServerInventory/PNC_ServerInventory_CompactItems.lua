@@ -10,6 +10,32 @@ local Internal = Service.Internal
 local ItemTransfer = Internal.ItemTransfer
 local isNonEmptyContainer = Internal.isNonEmptyContainer
 
+local function isNativeIdentityItem(item)
+    local description = ItemTransfer.DescribeItem(item)
+    local state
+    local modData
+    local customName
+    if not description then return false, nil end
+    if description.fullType == "Base.IDcard" then
+        return true, "identity_card_protected"
+    end
+    if description.fullType ~= "Base.Necklace_DogTag" then
+        return false, nil
+    end
+    state = description.state or {}
+    modData = state.modData
+    customName = tostring(state.customName or "")
+    if type(modData) == "table"
+        and modData.PNC_FactionDogTag == true
+    then
+        return true, "faction_dogtag_protected"
+    end
+    if string.sub(customName, 1, 10) == "Dog Tags:" then
+        return true, "faction_dogtag_protected"
+    end
+    return false, nil
+end
+
 local function compactSpec(item)
     local description, reason = ItemTransfer.DescribeItem(item)
     if not description then return nil, reason end
@@ -86,3 +112,4 @@ Internal.compactSpec = compactSpec
 Internal.rollbackNativeItems = rollbackNativeItems
 Internal.compactContainerHasItems = compactContainerHasItems
 Internal.portableCompactItemState = portableCompactItemState
+Internal.isNativeIdentityItem = isNativeIdentityItem

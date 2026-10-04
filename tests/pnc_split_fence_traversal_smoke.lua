@@ -264,26 +264,20 @@ handled, state = internal.updateScriptedSpecialMove(
     zombie, record, lane, now
 )
 T.truthy(handled, "timeout traversal handoff was not handled")
-T.equal(state, "traversal_repaired",
-    "timeout traversal did not enter the route repair handoff")
-T.equal(lane.lastTraversalFinishReason, "hard_timeout",
-    "scripted timeout completion reason")
+T.equal(state, "traversal_completed",
+    "crossed traversal did not complete without an animation signal")
+T.equal(lane.lastTraversalFinishReason, "crossed",
+    "crossed traversal completion reason")
 T.equal(zombie.x, 1.5, "timeout traversal did not reach its landing")
 T.truthy(finished, "timeout traversal did not release its bump")
-T.equal(#pathInvalidations, 1,
-    "timed-out traversal did not invalidate its native route")
-T.equal(pathInvalidations[1].reason, "traversal_repaired",
-    "timed-out traversal used the wrong route invalidation reason")
-T.equal(pathInvalidations[1].body, zombie,
-    "timed-out traversal invalidated the wrong body route")
-T.equal(lane.ownerMode, "engine_path_waiting",
-    "timed-out traversal did not return ownership to the route planner")
-T.equal(lane.lastNavigationInvalidatedAt, now,
-    "timed-out traversal lost the route invalidation timestamp")
+T.equal(#pathInvalidations, 0,
+    "crossed traversal incorrectly invalidated its native route")
+T.equal(lane.ownerMode, "fake_locomotion",
+    "crossed traversal did not return ownership to locomotion")
 local timeoutEvent = traversalEvents[#traversalEvents]
 T.equal(timeoutEvent.event, "complete",
     "crossed timeout was not logged as traversal completion")
-T.equal(timeoutEvent.reason, "hard_timeout",
+T.equal(timeoutEvent.reason, "crossed",
     "crossed timeout completion reason changed")
 T.contains(timeoutEvent.detail, "crossed=true",
     "timeout traversal log lost the crossing result")
@@ -291,15 +285,4 @@ T.contains(timeoutEvent.detail, "finished=false",
     "timeout traversal log lost the animation result")
 T.contains(timeoutEvent.detail, "timedOut=true",
     "timeout traversal log lost the deadline result")
-local routeFailed
-for i = 1, #moveWarnings do
-    if moveWarnings[i].event == "route_failed" then
-        routeFailed = moveWarnings[i]
-    end
-end
-T.truthy(routeFailed,
-    "timeout route repair did not emit its route failure diagnostic")
-T.equal(routeFailed.reason, "traversal_hard_timeout",
-    "timeout route repair diagnostic reason changed")
-
 T.finish("pnc_split_fence_traversal_smoke")

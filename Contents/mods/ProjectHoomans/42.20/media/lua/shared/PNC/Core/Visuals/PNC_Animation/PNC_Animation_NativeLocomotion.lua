@@ -11,6 +11,17 @@ local LocomotionProfiles = PNC.LocomotionProfiles
 local AnimationTrace = PNC.AnimationTrace
 local ActorControl = PNC.ActorControl
 
+-- Native pathing owns movement state while an engine route is active. Generic
+-- animation writers must yield here; SyncNativeLocomotionStyle remains the
+-- presentation-only writer for this ownership mode.
+function Animation.IsNativeLocomotionOwner(record)
+    local runtime = record and record.runtime or nil
+    local navigation = runtime and runtime.localNavigation or nil
+    return navigation ~= nil
+        and navigation.provider == "engine_path"
+        and navigation.nativeActive == true
+end
+
 function Animation.SyncNativeLocomotionStyle(zombie, record)
     local runtime
     local navigation

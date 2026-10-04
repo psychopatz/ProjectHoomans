@@ -89,6 +89,16 @@ function Internal.applyHoldAnimation(zombie, record, lane)
         end
         return
     end
+    if Animation.IsNativeLocomotionOwner
+        and Animation.IsNativeLocomotionOwner(record)
+    then
+        -- Native pathing owns movement state. Keep its presentation current,
+        -- but do not apply the generic Idle/Walk writer from this hold path.
+        if Animation.SyncNativeLocomotionStyle then
+            Animation.SyncNativeLocomotionStyle(zombie, record)
+        end
+        return
+    end
     if lane and Core.Now() < (tonumber(lane.visualMovingUntil) or 0) then
         if Animation and Animation.Apply then
             Animation.Apply(zombie, record, lane.moveAnim or "Walk", lane.motionProfile, true)

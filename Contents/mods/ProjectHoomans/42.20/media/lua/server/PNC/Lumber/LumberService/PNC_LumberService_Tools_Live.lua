@@ -5,6 +5,7 @@ local Service = PNC.LumberService
 local Internal = Service.Internal
 local CoreInventory = Internal.CoreInventory
 local canonicalItemFullType = Internal.CanonicalItemFullType
+local isChoppingFullType = Internal.IsChoppingFullType
 local ensureCanonicalLumberTool = Internal.EnsureCanonicalLumberTool
 local findCanonicalLumberTool = Internal.FindCanonicalLumberTool
 
@@ -22,16 +23,20 @@ local function inspectLiveTool(item)
         broken = item:isBroken() == true
     end
     if broken then return nil, "lumber_tool_broken" end
-    local tagged = false
-    if ItemTag and type(item.hasTag) == "function" then
-        tagged = item:hasTag(ItemTag.CHOP_TREE) == true
-    end
     local damage
     if type(item.getTreeDamage) == "function" then
         damage = tonumber(item:getTreeDamage())
     end
-    if not tagged and not damage then return nil, "tool_cannot_chop" end
-    return { item = item, canChop = true, treeDamage = math.max(1, damage or 10) }
+    -- ItemTag.CHOP_TREE is useful metadata, but it cannot make a native item
+    -- damage a tree. IsoTree:WeaponHit() reads the weapon's actual
+    -- getTreeDamage() value, and Base.Hammer (among other tools) returns 0.
+    -- Lua considers numeric zero truthy, so the old `not damage` check let
+    -- zero-damage tools reach the live hit boundary and play an animation
+    -- forever without changing the tree.
+    if damage == nil or damage <= 0 then
+        return nil, "tool_cannot_chop"
+    end
+    return { item = item, canChop = true, treeDamage = damage }
 end
 
 local function findLiveInventoryTool(body)
@@ -141,7 +146,9 @@ local function materializeLiveTool(record, body)
     local canonical = ensureCanonicalLumberTool(record)
     local fullType = canonical and canonicalItemFullType(canonical)
         or workToolFullType(record)
-    if fullType == "" then return nil, "lumber_tool_missing" end
+    if fullType == "" or not isChoppingFullType(fullType) then
+        return nil, "lumber_tool_missing"
+    end
 
     -- Prefer the canonical item path so condition/visual state and the
     -- persisted inventory ID stay associated with the physical axe.

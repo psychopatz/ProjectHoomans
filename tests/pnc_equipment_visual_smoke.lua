@@ -186,9 +186,12 @@ end
 
 local primarySet = 0
 local handModelsReset = 0
+local equipmentVariables = {}
 local zombie = {
     attached = {},
-    setVariable = function() end,
+    setVariable = function(_, key, value)
+        equipmentVariables[key] = value
+    end,
     setPrimaryHandItem = function(self, item)
         self.primary = item
         primarySet = primarySet + 1
@@ -250,6 +253,25 @@ T.equal(zombie.attached.Back, weapon, "idle primary returns to holster")
 T.truthy(primarySet >= 3, "primary hand state was not refreshed")
 T.truthy(handModelsReset > 0, "hand models were not refreshed")
 T.truthy(refreshCount > 0, "equipment presentation did not refresh the model")
+
+record.equipment.primaryFullType = "Base.ClawHammer"
+record.runtime = {
+    workItems = {
+        FISHING = {
+            operation = "FISHING",
+            owner = "work:FISHING",
+            itemID = "rod",
+            fullType = "Base.FishingRod",
+            state = "HELD",
+        },
+    },
+}
+zombie.primary = nil
+applied = PNC.Equipment.ApplyHands(zombie, record)
+T.equal(applied, true, "work lease equipment apply")
+T.equal(zombie.primary, weapon, "work lease forces the tool into the hand")
+T.equal(equipmentVariables.PNCPrimary, "Base.FishingRod",
+    "work lease presentation uses the leased tool rather than the stale weapon")
 
 local appliedCondition
 local shirtBodyLocation = {}
@@ -510,6 +532,28 @@ T.equal(replicaZombie.primary, weapon,
     "replica hand latch did not repair an engine-discarded model")
 T.equal(replicaPrimarySets, 4,
     "replica hand repair did not perform exactly one rebuild")
+
+-- Work presentation is independent from combat stance. The client must keep
+-- a leased tool in the primary hand when the authority reports a work item.
+replicaRecord.runtime = {
+    workPresentation = {
+        held = true,
+        operation = "FISHING",
+        itemID = "rod_1",
+        fullType = "Base.FishingRod",
+    },
+}
+replicaRecord.equipment.primaryFullType = nil
+replicaZombie.primary = nil
+T.equal(
+    PNC.Equipment.ApplyReplicaHands(replicaZombie, replicaRecord),
+    true,
+    "work-held replica hand apply"
+)
+T.equal(replicaZombie.primary, weapon,
+    "work-held replica holstered the fishing tool")
+T.equal(replicaVariables.PNCPrimary, "Base.FishingRod",
+    "work-held delta did not project its tool type")
 T.equal(replicaVisualClears, 1,
     "replica did not repair exactly one missing visual set")
 T.equal(replicaWornClears, 0,

@@ -91,6 +91,14 @@ function Provider.GetRecoveryState(lease)
         local record = PNC.Registry and PNC.Registry.Get
             and PNC.Registry.Get(lease.npcId) or nil
         snapshot = Recovery.ApplyMovementRecovery(snapshot, lease, record)
+        if order.operation == "LUMBER" then
+            -- PathService owns live movement recovery. A Lumber travel lane
+            -- may be repathed, switched from native to scripted movement, or
+            -- briefly have no lane while the same target is reissued. Do not
+            -- release the durable Lumber claim and restore the NPC's home
+            -- order during that bounded handoff.
+            snapshot.watchable = false
+        end
     end
     return snapshot
 end

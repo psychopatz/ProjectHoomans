@@ -4,6 +4,7 @@ local isNPCDepositForbidden = Helpers.isNPCDepositForbidden
 local TooltipModel = Helpers.tooltipModel
 local TooltipOptions = Helpers.tooltipOptions
 local ROOT_INVENTORY_TEXTURE = Helpers.rootInventoryTexture
+local Currency = Helpers.currency
 
 local Model = PNC.InventoryUIModel
 
@@ -34,12 +35,22 @@ end
 
 function Model.BuildNPCRows(inventory, containerID, expandedGroups)
     local rows = {}
+    local currencyRow
     local container = inventory and inventory.containers
         and inventory.containers[containerID or "root"]
         or nil
     for _, itemID in ipairs(container and container.items or {}) do
         local item = inventory.items and inventory.items[itemID] or nil
         if item then
+            if Currency and Currency.IsType(item.type) then
+                if not currencyRow then
+                    currencyRow = Helpers.newCurrencyRow(
+                        containerID or "root", "npc")
+                end
+                Helpers.addCurrencyValue(
+                    currencyRow, item.type,
+                    math.max(1, math.floor(tonumber(item.stack) or 1)), 1)
+            else
             local metadata = probe(item.type)
             rows[#rows + 1] = {
                 source = "npc",
@@ -64,9 +75,14 @@ function Model.BuildNPCRows(inventory, containerID, expandedGroups)
             }
             rows[#rows].stateKey = TooltipModel.StateSignature(
                 rows[#rows], nil, false, TooltipOptions.modelOptions)
+            end
         end
     end
+    if currencyRow and currencyRow.currencyUnits > 0 then
+        rows[#rows + 1] = currencyRow
+    end
     table.sort(rows, function(a, b)
+        if a.currency ~= b.currency then return a.currency == true end
         if a.equipped ~= b.equipped then return a.equipped == true end
         return string.lower(a.name) < string.lower(b.name)
     end)

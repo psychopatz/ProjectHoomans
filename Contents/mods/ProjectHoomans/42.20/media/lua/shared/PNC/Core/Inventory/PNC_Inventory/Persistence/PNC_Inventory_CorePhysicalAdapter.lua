@@ -8,8 +8,13 @@ local C = require "PsychopatzCore/Inventory/PsychopatzInventoryConstants"
 local CoreInventory = require "PsychopatzCore/Inventory/PsychopatzInventory"
 local StateCodec = require "PNC/Core/Inventory/PNC_Inventory/Persistence/PNC_Inventory_CoreStateCodec"
 local Internal = Inventory.Internal
+local InitialCurrency = PsychopatzCore and PsychopatzCore.Currency
 local Adapter = Internal.CorePhysicalAdapter or {}
 Internal.CorePhysicalAdapter = Adapter
+
+local function currencyService()
+    return PsychopatzCore and PsychopatzCore.Currency or InitialCurrency
+end
 
 local function isLooseMeta(meta)
     return meta[10] == nil and meta[11] == nil and meta[12] == nil
@@ -63,14 +68,24 @@ function Adapter.captureLoose(record, body)
     -- model. A codec failure must leave the previous NPC inventory intact.
     local capturedSpecs = {}
     local excluded = collectPresentationItems(body)
+    local currency = currencyService()
     local physical = CoreInventory.wrapPhysicalInventory(container)
     local nativeItems = physical:query(nil)
     for index = 1, #nativeItems do
         local nativeItem = nativeItems[index]
         if not excluded[nativeItem] then
-            local encoded, reason = CoreInventory.encodeItem(nativeItem, 1)
+            local fullType
+            if nativeItem and type(nativeItem.getFullType) == "function" then
+                local typeOK, nativeType = pcall(
+                    nativeItem.getFullType, nativeItem)
+                if typeOK then fullType = nativeType end
+            end
+            local quantity = currency and currency.IsType(fullType)
+                and currency.ItemQuantity(nativeItem) or 1
+            local encoded, reason = CoreInventory.encodeItem(
+                nativeItem, quantity)
             if not encoded then return false, reason end
-            local fullType = CoreInventory.getItemFullType(encoded[C.TYPE_ID])
+            fullType = CoreInventory.getItemFullType(encoded[C.TYPE_ID])
             if not fullType then return false, "npc_item_type_unavailable" end
             local spec = StateCodec.readState(encoded)
             spec.type, spec.container = fullType, "root"
@@ -118,12 +133,15 @@ function Adapter.materializeItem(record, body, itemID)
     if not item or not container then
         return false, "physical_inventory_unavailable"
     end
+    local quantity = math.max(1, math.floor(tonumber(item.stack) or 1))
+    local currency = currencyService()
     encoded, reason = CoreInventory.encodeItem(
-        StateCodec.pseudoItem(item), 1)
+        StateCodec.pseudoItem(item),
+        currency and currency.IsType(item.type) and quantity or 1)
     if not encoded then return false, reason or "item_encode_failed" end
     physical, reason = CoreInventory.wrapPhysicalInventory(container)
     if not physical then return false, reason end
-    addOK, addedItems = physical:add(encoded)
+    addOK, addedItems = physical:add(encoded, quantity)
     if not addOK then return false, addedItems or "physical_add_failed" end
     local addedItem = addedItems and addedItems[1]
     return true, "materialized", function()

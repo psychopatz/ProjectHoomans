@@ -299,6 +299,39 @@ actionText = PNC.NameplatePresentation.ActionStatus(snapshot)
 T.contains(actionText, "Building", "object build action verb")
 T.contains(actionText, "Log Fence", "object build action target")
 T.contains(actionText, "57%", "object build action progress")
+snapshot.actionInformation = {
+    kind = "work_order",
+    operation = "LUMBER",
+    status = "TRAVEL_TO_STATION",
+    phase = "CHOPPING",
+    percent = 31,
+}
+actionText = PNC.NameplatePresentation.ActionStatus(snapshot)
+T.contains(actionText, "Chopping LUMBER", "lumber work phase is shown")
+T.contains(actionText, "work 31%", "lumber work progress is explicit")
+T.falsy(string.find(actionText, "traveling", 1, true),
+    "chopping lumber is not mislabeled as traveling")
+snapshot.actionInformation.phase = "OUTPUT_DESTINATION_APPROACH"
+snapshot.actionInformation.status = "TRAVEL_TO_STOCKPILE"
+snapshot.actionInformation.percent = 99
+actionText = PNC.NameplatePresentation.ActionStatus(snapshot)
+T.contains(actionText, "Delivering wood", "lumber delivery phase is shown")
+T.contains(actionText, "work 99%", "lumber delivery retains work progress")
+T.falsy(string.find(actionText, "traveling", 1, true),
+    "lumber delivery is not mislabeled as generic traveling")
+snapshot.actionInformation.phase = "WAITING_FOR_STOCKPILE"
+snapshot.actionInformation.waitingFor = "stockpile"
+snapshot.actionInformation.waitingReason = "storage_full"
+actionText = PNC.NameplatePresentation.ActionStatus(snapshot)
+T.contains(actionText, "Waiting for stockpile (storage full)",
+    "lumber stockpile capacity reason is visible")
+snapshot.actionInformation.phase = "BLOCKED"
+snapshot.actionInformation.waitingFor = nil
+snapshot.actionInformation.waitingReason = nil
+snapshot.actionInformation.blockedReason = "lumber_travel_stalled"
+actionText = PNC.NameplatePresentation.ActionStatus(snapshot)
+T.contains(actionText, "Blocked: navigation stalled",
+    "lumber navigation block reason is visible")
 snapshot.actionInformation = { kind = "return_home", percent = 35 }
 actionText = PNC.NameplatePresentation.ActionStatus(snapshot)
 T.contains(actionText, "Returning Home", "home travel action")

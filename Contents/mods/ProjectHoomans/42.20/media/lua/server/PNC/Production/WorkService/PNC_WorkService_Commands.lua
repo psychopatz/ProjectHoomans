@@ -18,6 +18,7 @@ local terminal = Internal.terminal
 local copy = Internal.copy
 local markAssignmentDirty = Internal.markAssignmentDirty
 local releaseClaim = Internal.releaseClaim
+local releaseWorkItemForOrder = Internal.releaseWorkItemForOrder
 
 function Service.Commands.Cancel(orderId, reason)
     local order = Repository.Get(orderId)
@@ -75,6 +76,29 @@ function Service.Commands.Cancel(orderId, reason)
             order.updatedAt, order.revision = now(), order.revision + 1
             Repository.MarkDirty()
             return false, cancellationReason or "CANCELLATION_FAILED"
+        end
+    end
+    if releaseWorkItemForOrder then
+        local released, releaseReason = releaseWorkItemForOrder(order,
+            "work_order_cancelled")
+        if released == false then
+            local restoreStatus = order.cancellationPreviousStatus
+            if restoreStatus and restoreStatus ~= Status.CANCELLING then
+                order.status = restoreStatus
+                order.cancellationRequested =
+                    order.cancellationPreviousRequested
+                order.cancellationReason = order.cancellationPreviousReason
+                order.blockedReason = order.cancellationPreviousBlockedReason
+                order.cancellationPreviousStatus = nil
+                order.cancellationPreviousRequested = nil
+                order.cancellationPreviousReason = nil
+                order.cancellationPreviousBlockedReason = nil
+            end
+            order.cancellationFailureReason =
+                releaseReason or "WORK_ITEM_RETURN_FAILED"
+            order.updatedAt, order.revision = now(), order.revision + 1
+            Repository.MarkDirty()
+            return false, releaseReason or "WORK_ITEM_RETURN_FAILED"
         end
     end
     releaseClaim(order, order.cancellationReason, true, false)

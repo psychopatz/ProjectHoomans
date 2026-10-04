@@ -8,6 +8,8 @@ local tr = Helpers.tr
 local INVENTORY_REFRESH_COOLDOWN_MS = Helpers.INVENTORY_REFRESH_COOLDOWN_MS
 local INVENTORY_REFRESH_TIMEOUT_MS = Helpers.INVENTORY_REFRESH_TIMEOUT_MS
 local INVENTORY_REFRESH_FEEDBACK_MS = Helpers.INVENTORY_REFRESH_FEEDBACK_MS
+local PLAYER_ROWS_RECONCILE_RETRIES = 3
+local PLAYER_ROWS_RECONCILE_INTERVAL_MS = 100
 
 local function resetList(list, rows)
     list:clear()
@@ -29,13 +31,16 @@ local function playerRowsStateSignature(rows)
     local protectedState = {}
     for index = 1, #(rows or {}) do
         local row = rows[index]
+        local itemSignature = row.aggregate == true
+            and tostring(row.aggregateFingerprint or row.stack or 1)
+            or table.concat(row.itemIDs or { row.id or "" }, ",")
         protectedState[index] = table.concat({
             tostring(row.id or ""),
             row.favorite == true and "f" or "-",
             row.equipped == true and "e" or "-",
             tostring(row.giftPreference or ""),
             tostring(row.stack or 1),
-            table.concat(row.itemIDs or { row.id or "" }, ","),
+            itemSignature,
             tostring(row.stateKey or ""),
         }, "")
     end
@@ -138,19 +143,19 @@ local function refreshInventoryLists(self, endpoint, player, currentPlayerContai
     if self.giveAllButton and self.giveAllButton.setEnable then
         self.giveAllButton:setEnable(
             not self.readOnly
-                and #InventoryWindow.CollectBulkTransferIDs(self.playerList) > 0
+                and InventoryWindow.HasBulkTransferItems(self.playerList)
         )
     end
     if self.takeAllButton and self.takeAllButton.setEnable then
         self.takeAllButton:setEnable(
             not self.readOnly and not self.giftMode
-                and #InventoryWindow.CollectBulkTransferIDs(self.npcList) > 0
+                and InventoryWindow.HasBulkTransferItems(self.npcList)
         )
     end
     if self.depositStorageButton and self.depositStorageButton.setEnable then
         self.depositStorageButton:setEnable(
             endpoint.kind == "npc" and not self.giftMode
-                and #InventoryWindow.CollectBulkTransferIDs(self.npcList) > 0
+                and InventoryWindow.HasBulkTransferItems(self.npcList)
         )
     end
     self:updateInventoryRefreshButton(inventoryNow())
@@ -222,8 +227,19 @@ function ISPNCInventoryWindow:refreshInventory(force)
     local player = getSpecificPlayer and getSpecificPlayer(0) or getPlayer and getPlayer() or nil
     local endpoint = self.transferEndpoint
     if not endpoint then return end
+    local now = inventoryNow()
     if force == true then self.playerRowsDirty = true end
-    self:updateInventoryRefreshButton(inventoryNow())
+    local reconcileRetries = tonumber(self.playerRowsReconcileRetries) or 0
+    if reconcileRetries > 0
+        and now >= (tonumber(self.playerRowsReconcileNextAt) or now)
+    then
+        self.playerRowsDirty = true
+        self.contextSignature = nil
+        self.playerRowsReconcileRetries = reconcileRetries - 1
+        self.playerRowsReconcileNextAt = now
+            + PLAYER_ROWS_RECONCILE_INTERVAL_MS
+    end
+    self:updateInventoryRefreshButton(now)
     local revision, currentPlayerContainer, playerCount, currentPlayerRows =
         collectRefreshContext(self, endpoint, player)
     local signature = table.concat({

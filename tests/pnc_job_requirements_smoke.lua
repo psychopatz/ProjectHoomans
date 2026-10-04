@@ -3,6 +3,12 @@ local T = require "tests/support/test"
 local Registry = T.load("ProjectHoomans", "shared",
     "PNC/Core/Jobs/PNC_JobRequirements.lua")
 
+T.truthy(Registry.All, "job requirement registry has no ordered listing")
+T.equal(Registry.All()[1], "LUMBER",
+    "job requirement listing does not preserve registration order")
+T.equal(Registry.All()[2], "FISHING",
+    "job requirement listing omits fishing")
+
 local definition = Registry.Get("lumber")
 T.truthy(definition, "lumber requirement definition registered")
 T.equal(#definition.requirements, 1,

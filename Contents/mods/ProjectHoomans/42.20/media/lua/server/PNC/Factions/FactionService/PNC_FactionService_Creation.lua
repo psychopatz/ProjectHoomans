@@ -9,6 +9,50 @@ local Constants = PNC.FactionConstants
 local Types = PNC.FactionTypes
 local Archetypes = PNC.FactionArchetypes
 local EntityRef = PNC.EntityRef
+
+local function refreshFactionDogTags(faction, reason)
+    local inventory = PNC.Inventory
+    local factionID = faction and faction.id or nil
+    local members
+    local member
+    local record
+    local _, changed
+    if not Factions.GetMembers or not inventory
+        or type(inventory.RefreshFactionDogTag) ~= "function"
+    then
+        return
+    end
+    members = Factions.GetMembers(factionID)
+    if type(members) ~= "table" then return end
+    for index = 1, #members do
+        member = members[index]
+        if member and member.alive ~= false then
+            record = PNC.Registry and PNC.Registry.Get
+                and PNC.Registry.Get(member.npcID) or nil
+            if record and record.alive ~= false
+                and record.affiliation
+                and tostring(record.affiliation.factionID or "")
+                    == tostring(factionID or "")
+            then
+                _, changed = inventory.RefreshFactionDogTag(
+                    record,
+                    faction
+                )
+                if changed == true and PNC.Network
+                    and type(PNC.Network.BroadcastRecord) == "function"
+                then
+                    PNC.Network.BroadcastRecord(
+                        record,
+                        reason or "faction_dogtag_refreshed"
+                    )
+                end
+            end
+        end
+    end
+end
+
+Internal.refreshFactionDogTags = refreshFactionDogTags
+
 function Factions.Create(spec)
     local id
     local faction
@@ -87,6 +131,7 @@ function Factions.Create(spec)
     end
     if leader then Internal.commitAffiliation(leader, leaderAffiliation) end
     Internal.touchRegistry()
+    refreshFactionDogTags(faction, "faction_dogtag_created")
     if PNC.ColonyStorageRepository
         and PNC.ColonyStorageRepository.GetPrimary
     then
@@ -117,6 +162,7 @@ function Factions.SetName(factionID, value)
     faction.name = name
     Internal.touchFaction(faction)
     Internal.touchRegistry()
+    refreshFactionDogTags(faction, "faction_dogtag_renamed")
     return true, "renamed", Internal.copy(faction)
 end
 

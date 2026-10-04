@@ -76,11 +76,7 @@ function LayoutModule.Apply(window, active)
         and window.storageDebugExpanded == true
     for _, button in ipairs(window.storageControls or {}) do
         button:setVisible(drawerVisible == true)
-        if button.internal == "job_requirements_lumber"
-            and button.setEnable
-        then
-            button:setEnable(window.selectedPersonID ~= nil)
-        end
+        if button.setEnable then button:setEnable(drawerVisible == true) end
     end
 
     if not active then

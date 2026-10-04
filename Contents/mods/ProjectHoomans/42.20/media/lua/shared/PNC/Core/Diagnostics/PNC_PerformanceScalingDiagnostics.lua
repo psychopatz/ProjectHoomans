@@ -67,6 +67,10 @@ Diagnostics.NetworkPayloadAuditEnabled = false
 -- selector, cursor or overlay and then silently vanishes is attributed to the
 -- stage that tore it down.
 Diagnostics.BuildAuditEnabled = false
+-- Native handoff tracing is opt-in. It logs only suspicious native movement
+-- boundaries, not every frame, so the normal disabled path remains a boolean
+-- read at the callers.
+Diagnostics.NativeHandoffAuditEnabled = false
 Diagnostics.BuildTraceSequence = tonumber(Diagnostics.BuildTraceSequence) or 0
 Diagnostics.BuildTraceSentAt = Diagnostics.BuildTraceSentAt or {}
 Diagnostics.BuildTraceReceivedAt = Diagnostics.BuildTraceReceivedAt or {}
@@ -232,6 +236,66 @@ end
 
 function Diagnostics.IsEnabled()
     return Diagnostics.Enabled == true
+end
+
+function Diagnostics.IsNativeHandoffAuditEnabled()
+    return Diagnostics.NativeHandoffAuditEnabled == true
+end
+
+-- This is deliberately a bounded event log. Callers should invoke it only at
+-- ownership boundaries or when WalkToward/path2 is already suspicious; the
+-- function itself still rechecks the setting for isolated callers/tests.
+function Diagnostics.LogNativeHandoff(
+    record,
+    body,
+    eventName,
+    source,
+    navigation,
+    extra
+)
+    local engineState
+    local actionState
+    local hasPath
+    local moving
+    local fields
+    local message
+    if Diagnostics.NativeHandoffAuditEnabled ~= true then return false end
+    navigation = navigation or record and record.runtime
+        and record.runtime.localNavigation or nil
+    engineState = body and body.getCurrentStateName
+        and string.lower(tostring(body:getCurrentStateName() or "")) or ""
+    actionState = body and body.getActionStateName
+        and string.lower(tostring(body:getActionStateName() or "")) or ""
+    hasPath = body and body.getPath2 and body:getPath2() ~= nil or false
+    moving = body and body.isMoving and body:isMoving() == true or false
+    fields = {
+        "native_handoff",
+        "event=" .. tostring(eventName or "unknown"),
+        "source=" .. tostring(source or "unknown"),
+        "npc=" .. tostring(record and record.id or "nil"),
+        "state=" .. tostring(engineState ~= "" and engineState or "unknown"),
+        "action=" .. tostring(actionState ~= "" and actionState or "idle"),
+        "path2=" .. tostring(hasPath),
+        "moving=" .. tostring(moving),
+        "nativeActive=" .. tostring(navigation
+            and navigation.nativeActive == true),
+        "controller=" .. tostring(navigation
+            and navigation.controllerMode or ""),
+        "revision=" .. tostring(navigation
+            and navigation.requestRevision or ""),
+        "requestPending=" .. tostring(navigation
+            and navigation.requestPending == true),
+        "at=" .. tostring(PNC.Core and PNC.Core.Now
+            and PNC.Core.Now() or 0),
+    }
+    if extra and extra ~= "" then fields[#fields + 1] = tostring(extra) end
+    message = table.concat(fields, " ")
+    if PNC.Core and PNC.Core.LogInfo then
+        PNC.Core.LogInfo(message)
+    else
+        print("[PNC][INFO] " .. message)
+    end
+    return true
 end
 
 function Diagnostics.SetSeatingAuditEnabled(enabled)

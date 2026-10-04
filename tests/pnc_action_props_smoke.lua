@@ -200,6 +200,23 @@ T.equal(state.javaAction:getPrimaryHandItem().fullType, "Base.HandAxe",
 T.equal(state.javaAction:getSecondaryHandItem().fullType, "Base.HandAxe",
     "two-handed item metadata fills the secondary action hand")
 
+local fishing = PNC.ActionProps.Resolve({
+    actionInformation = {
+        job = "Fishing",
+        orderKind = "fishing",
+    },
+    workPresentation = {
+        held = true,
+        itemID = "rod-1",
+        fullType = "Base.FishingRod",
+    },
+    visualState = { sceneId = "fishing.cast", sceneStartedAt = 30 },
+})
+T.equal(fishing.primaryFullType, "Base.FishingRod",
+    "fishing action prop uses the shared work lease tool")
+T.equal(fishing.primaryItemID, "rod-1",
+    "fishing action prop preserves the leased tool identity")
+
 local workInput = PNC.ActionProps.Resolve({
     actionInformation = {
         operation = "CRAFT",
