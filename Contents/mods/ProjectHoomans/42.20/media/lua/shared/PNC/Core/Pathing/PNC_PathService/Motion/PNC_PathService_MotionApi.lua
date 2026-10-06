@@ -132,6 +132,19 @@ function PathService.MoveToward(
         and tonumber(navigation.steeringIndex) or nil
     intent.steeringKind = navigation
         and tostring(navigation.steeringKind or "") or nil
+    -- Keep destination semantics on the shared movement intent. The path
+    -- provider owns readiness/recovery; feature code only describes the
+    -- destination contract (for example a fishing shoreline stand).
+    intent.targetKind = navigation
+        and tostring(navigation.targetKind or "") or nil
+    intent.targetValidation = navigation
+        and tostring(navigation.targetValidation or "") or nil
+    intent.targetWaterX = navigation
+        and tonumber(navigation.targetWaterX) or nil
+    intent.targetWaterY = navigation
+        and tonumber(navigation.targetWaterY) or nil
+    intent.targetWaterZ = navigation
+        and tonumber(navigation.targetWaterZ) or nil
     intent.ownerKind = controlOwner and controlOwner.kind or nil
     intent.ownerSessionId = controlOwner
         and (controlOwner.sessionId or controlOwner.ownerSessionId) or nil

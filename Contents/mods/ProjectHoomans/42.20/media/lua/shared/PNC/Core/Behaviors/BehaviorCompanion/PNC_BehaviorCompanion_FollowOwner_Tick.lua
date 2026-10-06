@@ -25,6 +25,8 @@ function Internal.TickFollowOwner(record, zombie)
     local followState
     local hazard
     local ownerEngaged
+    record.runtime = record.runtime or {}
+    record.runtime.followOrderActive = true
     if Stealth and Stealth.UpdateFollowState then
         Stealth.UpdateFollowState(record, owner)
     end
@@ -35,21 +37,19 @@ function Internal.TickFollowOwner(record, zombie)
         then
             CompanionVehicle.Tick(record, zombie, nil)
         end
-        Internal.SetFollowMode(record, "returning_to_anchor")
+        -- Losing the owner reference is a transient MP/live-to-abstract
+        -- condition, not a cancellation of the follow order. Never send an
+        -- actively following colonist to its base as a side effect of one
+        -- failed owner lookup; hold and retry the authoritative owner.
+        Internal.SetFollowMode(record, "owner_unresolved")
         if Stealth and Stealth.Clear then
             Stealth.Clear(record, "owner_missing")
         end
-        Common.ClearCombatTarget(record, "owner_missing_return_anchor")
-        Common.MoveRecord(
-            record,
-            zombie,
-            record.anchorX,
-            record.anchorY,
-            record.anchorZ,
-            "walk",
-            0.8,
-            "owner_missing_return_anchor"
-        )
+        Common.ClearCombatTarget(record, "owner_missing_hold")
+        record.activeBehavior = "FollowOwner:owner_unresolved"
+        if zombie and Common.HaltMovement then
+            Common.HaltMovement(record, zombie, "follow_owner_unresolved")
+        end
         return true
     end
 

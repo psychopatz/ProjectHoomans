@@ -110,6 +110,8 @@ PNC.Network.ClientState.snapshots[record.id] = {
 local projected = T.truthy(PNC.TravelDirectory.GetProjected(record.id))
 T.truthy(math.abs(projected.x - 50) < 0.001,
     "client directory did not extrapolate abstract movement")
+T.equal(projected.presenceState, "abstract",
+    "client directory dropped the NPC presence state")
 T.truthy(math.abs(projected.percent - 0.5) < 0.001,
     "client directory progress is incorrect")
 T.truthy(type(summary.route.segments) == "table",

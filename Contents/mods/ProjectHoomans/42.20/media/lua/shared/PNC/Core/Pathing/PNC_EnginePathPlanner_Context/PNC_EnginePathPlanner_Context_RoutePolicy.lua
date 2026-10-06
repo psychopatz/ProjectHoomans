@@ -45,6 +45,60 @@ function Internal.ConsumeRequestBudget(now)
     return true
 end
 
+local function targetSquare(x, y, z)
+    if PNC.TraversalQuery and PNC.TraversalQuery.GetSquare then
+        return PNC.TraversalQuery.GetSquare(x, y, z)
+    end
+    return Internal.GetSquare(x, y, z)
+end
+
+local function targetQueryAvailable()
+    local cell = type(getCell) == "function" and getCell() or nil
+    return PNC.TraversalQuery
+        and type(PNC.TraversalQuery.GetSquare) == "function"
+        and cell ~= nil
+        and type(cell.getGridSquare) == "function"
+end
+
+-- Native pathing must not be asked to solve a destination that is outside
+-- the currently materialized world. This is a readiness gate, not a
+-- walkability decision: doors, fences, and occupied interaction tiles remain
+-- the traversal provider's responsibility.
+function Internal.CheckTargetReadiness(record, body, finalTarget, navigation)
+    local target
+    local water
+    if not finalTarget or not body then
+        return true, "target_readiness_unchecked"
+    end
+    -- Isolated harnesses and dedicated runtime bridges may not expose a
+    -- loaded-cell query. Preserve the existing native behavior in that case;
+    -- a real game cell query is required before declaring a chunk unloaded.
+    if not targetQueryAvailable() then
+        return true, "target_readiness_unavailable"
+    end
+    target = targetSquare(finalTarget.x, finalTarget.y, finalTarget.z)
+    if not target then
+        return false, "target_chunk_unloaded"
+    end
+    if navigation and navigation.targetValidation == "shoreline_pair" then
+        if navigation.targetWaterX == nil
+            or navigation.targetWaterY == nil
+            or navigation.targetWaterZ == nil
+        then
+            return false, "fishing_water_missing"
+        end
+        water = targetSquare(
+            navigation.targetWaterX,
+            navigation.targetWaterY,
+            navigation.targetWaterZ
+        )
+        if not water then
+            return false, "fishing_water_chunk_unloaded"
+        end
+    end
+    return true, "target_ready"
+end
+
 function Internal.RouteNeed(record, body, finalTarget)
     local bodyZ = body and body:getZ() or 0
     local finalZ = tonumber(finalTarget and finalTarget.z) or bodyZ

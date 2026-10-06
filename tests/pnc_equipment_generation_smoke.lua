@@ -204,14 +204,13 @@ local reserve = itemByTemplateKey(bothInventory, "tmpl:weapon:reserve")
 local identityCard = itemByTemplateKey(bothInventory, "tmpl:identity_card:0")
 T.truthy(primary, "both-weapon spawn has no primary")
 T.truthy(reserve, "both-weapon spawn has no reserve")
-T.truthy(identityCard, "NPC identity card was not generated")
-T.equal(identityCard.type, "Base.IDcard", "NPC identity card type")
-T.equal(identityCard.customName, "ID Card: Unknown NPC", "NPC identity card name")
-T.equal(identityCard.identityNPCId, bothRecord.id, "NPC identity card UUID")
-T.equal(identityCard.interactionLocked, true,
-    "NPC identity card is interaction locked")
-T.equal(identityCard.interactionLockReason, "identity_card",
-    "NPC identity card lock reason")
+T.equal(identityCard, nil,
+    "live NPC identity card stays metadata-only")
+local identityPayload = PNC.Inventory.BuildFullPayload(bothRecord)
+T.equal(identityPayload.identityMetadata.npcId, bothRecord.id,
+    "live NPC identity metadata carries the stable UUID")
+T.equal(identityPayload.identityMetadata.displayName, "Unknown NPC",
+    "live NPC identity metadata carries the display name")
 T.equal(rangedTypes[primary.type], true, "ranged weapon is active when both spawn")
 T.equal(rangedTypes[reserve.type] == true, false, "melee weapon is reserve when both spawn")
 T.equal(bothRecord.weaponMode, "mixed", "both-weapon combat mode")

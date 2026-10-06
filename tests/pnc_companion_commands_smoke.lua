@@ -11,6 +11,10 @@ local marked = {}
 local liveBodies = {}
 local sentHome = {}
 local releasedWorkers = {}
+local activeLease
+local fishingJob
+local cancelledTaskCount = 0
+local cancelledFishingCount = 0
 local manualProvisionRequests = 0
 local manualCorpseHaulRequests = 0
 local validatedCampOrigin
@@ -168,10 +172,11 @@ PNC = {
         end,
     },
     HomeDutyService = {
-        SendHome = function(record, _, reason)
+        SendHome = function(record, _, reason, options)
             sentHome[#sentHome + 1] = {
                 id = record.id,
                 reason = reason,
+                options = options,
             }
             return true, "RETURNING_HOME"
         end,
@@ -316,6 +321,31 @@ PNC.PlayerCharacters = {
             },
         },
     },
+}
+PNC.TaskLeaseService = {
+    ForNPC = function(id)
+        return activeLease and activeLease.npcId == id
+            and activeLease or nil
+    end,
+}
+PNC.Tasking = {
+    Commands = {
+        CancelForNPC = function(id)
+            cancelledTaskCount = cancelledTaskCount + 1
+            activeLease = nil
+            return true, "LEASE_RELEASED"
+        end,
+    },
+}
+PNC.FishingService = {
+    GetJob = function(id)
+        return fishingJob and fishingJob.npcId == id and fishingJob or nil
+    end,
+    CancelJob = function(id)
+        cancelledFishingCount = cancelledFishingCount + 1
+        fishingJob.active = false
+        return true, "fishing_task_cancelled"
+    end,
 }
 PNC.EntityRef = {
     ForPlayerIdentity = function(account, uuid)
@@ -534,6 +564,45 @@ T.equal(records.owned.orderSpec.kind, "follow",
     "group follow did not update closest companion")
 T.equal(records.owned_second.orderSpec.kind, "follow",
     "group follow did not update second companion")
+-- Abstract Follow Me remains radio-gated for immersion. Without the relay the
+-- order is rejected; with both radios active it is accepted while the NPC is
+-- still abstract, so the abstract movement tick can chase the player.
+affected, reason = PNC.CompanionCommands.Execute(player, {
+    id = "abstract",
+    commandID = "follow",
+})
+T.equal(affected, 0, "abstract Follow Me bypassed the radio relay")
+T.equal(reason, "not_live", "abstract Follow Me radio rejection reason")
+
+PNC.CommandRelayGate = {
+    RELAY = "radio_relay",
+    Evaluate = function() return true, "radio_relay" end,
+}
+PsychopatzCore = {
+    RadioDeviceState = {
+        FindActivePlayerDevice = function() return {} end,
+    },
+}
+Equipment = {
+    RadioGear = {
+        HasEquipped = function(record)
+            return record == records.abstract
+        end,
+    },
+}
+affected, reason = PNC.CompanionCommands.Execute(player, {
+    id = "abstract",
+    commandID = "follow",
+})
+T.equal(affected, 1, "radio-relayed abstract Follow Me was rejected: "
+    .. tostring(reason))
+T.equal(reason, "commanded", "radio-relayed abstract Follow Me result")
+T.equal(records.abstract.orderSpec.kind, "follow",
+    "radio-relayed abstract Follow Me did not install a follow order")
+PNC.CommandRelayGate = nil
+PsychopatzCore = nil
+Equipment = nil
+
 -- Group camp consumes the client-discovered candidate ids, then applies the
 -- server's live/materialized/radius gate. Abstract and far followers remain
 -- on their existing follow order instead of receiving a camp they cannot
@@ -615,8 +684,24 @@ T.equal(affected, 1, "single go-home command target count")
 T.equal(sentHome[#sentHome].id, "owned", "single go-home target")
 T.equal(sentHome[#sentHome].reason, "companion_command",
     "single go-home source")
+T.truthy(sentHome[#sentHome].options
+    and sentHome[#sentHome].options.allowFollowOverride == true,
+    "player go-home explicitly overrides the follower owner")
 T.equal(releasedWorkers[#releasedWorkers].id, "owned",
     "go-home command released active work")
+
+activeLease = { npcId = "owned", sourceDomain = "fishing" }
+fishingJob = { npcId = "owned", active = true }
+local taskAffected, taskReason = PNC.CompanionCommands.Execute(player, {
+    id = "owned",
+    commandID = "return_home",
+})
+T.equal(taskAffected, 1, "go-home can preempt an active fishing task")
+T.equal(taskReason, "commanded", "go-home after fishing task result")
+T.equal(cancelledTaskCount, 1,
+    "go-home cancels the tasking lease before travel")
+T.equal(cancelledFishingCount, 1,
+    "go-home cancels a persisted fishing job fallback")
 affected, reason = PNC.CompanionCommands.Execute(player, {
     commandID = "return_home",
     scope = "group",

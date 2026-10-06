@@ -9,43 +9,85 @@ local Internal = Lifecycle.Internal
 local Core = PNC.Core
 local Const = PNC.Const
 
+local function corpseFactionSnapshot(record)
+    local factionID = record and record.affiliation
+        and record.affiliation.factionID or nil
+    local faction
+    if factionID and PNC.Factions then
+        if type(PNC.Factions.GetPresentation) == "function" then
+            faction = PNC.Factions.GetPresentation(factionID)
+        elseif type(PNC.Factions.Get) == "function" then
+            faction = PNC.Factions.Get(factionID)
+        end
+    end
+    return factionID and tostring(factionID) or nil,
+        faction and tostring(faction.name or "") or nil
+end
+
 local function findExistingCorpse(record, zombie)
     local cell = getCell and getCell() or nil
-    local x = record and record.corpse and record.corpse.x
-        or zombie and zombie.getX and zombie:getX() or record and record.x
-    local y = record and record.corpse and record.corpse.y
-        or zombie and zombie.getY and zombie:getY() or record and record.y
-    local z = record and record.corpse and record.corpse.z
-        or zombie and zombie.getZ and zombie:getZ() or record and record.z
-    local square
+    local points = {}
+    local seenPoints = {}
     local expectedToken = record and record.corpse
         and record.corpse.token or record and record.corpseToken
     local accepted
+    local function addPoint(x, y, z)
+        local key
+        x = math.floor(tonumber(x) or 0)
+        y = math.floor(tonumber(y) or 0)
+        z = math.floor(tonumber(z) or 0)
+        key = tostring(x) .. ":" .. tostring(y) .. ":" .. tostring(z)
+        if not seenPoints[key] then
+            seenPoints[key] = true
+            points[#points + 1] = { x = x, y = y, z = z }
+        end
+    end
     if not cell or not cell.getGridSquare or not record
         or not Internal.forEachCorpse
     then
         return nil
     end
-    square = cell:getGridSquare(
-        math.floor(tonumber(x) or 0),
-        math.floor(tonumber(y) or 0),
-        math.floor(tonumber(z) or 0)
-    )
-    if not square then return nil end
-    Internal.forEachCorpse(square, function(candidate)
-        local modData = candidate.getModData and candidate:getModData() or nil
-        local markerId = modData and (
-            modData.PNC_DeathMarkerID or modData.PNC_UUID
-        ) or nil
-        local token = modData and modData.PNC_CorpseToken or nil
-        if not accepted and tostring(markerId or "") == tostring(record.id)
-            and (not expectedToken or not token
-                or tostring(token) == tostring(expectedToken))
-        then
-            accepted = candidate
+    addPoint(record and record.corpse and record.corpse.x,
+        record and record.corpse and record.corpse.y,
+        record and record.corpse and record.corpse.z)
+    if zombie then
+        addPoint(zombie.getX and zombie:getX(), zombie.getY and zombie:getY(),
+            zombie.getZ and zombie:getZ())
+    end
+    addPoint(record.x, record.y, record.z)
+    for index = 1, #points do
+        local point = points[index]
+        local square = cell:getGridSquare(point.x, point.y, point.z)
+        if square then
+            Internal.forEachCorpse(square, function(candidate)
+                local modData = candidate.getModData
+                    and candidate:getModData() or nil
+                local markerId = modData and (
+                    modData.PNC_DeathMarkerID or modData.PNC_UUID
+                ) or nil
+                local token = modData and modData.PNC_CorpseToken or nil
+                if not accepted
+                    and tostring(markerId or "") == tostring(record.id)
+                    and (not expectedToken or not token
+                        or tostring(token) == tostring(expectedToken))
+                then
+                    accepted = candidate
+                end
+            end)
         end
-    end)
+        if accepted then break end
+    end
     return accepted
+end
+
+local function matchesCorpseShell(record, zombie)
+    local modData = zombie and zombie.getModData
+        and zombie:getModData() or nil
+    local markerID = modData and (modData.PNC_UUID
+        or modData.PNC_DeathMarkerID) or nil
+    return markerID ~= nil
+        and tostring(markerID) == tostring(record and record.id or "")
+        and tostring(modData.PNC_BodyKind or "") == "corpse"
 end
 
 function Internal.makeCorpseInert(corpse, createdWorldHour)
@@ -166,6 +208,8 @@ function Lifecycle.CreateVanillaCorpse(record, zombie, reason, deathContext)
     local runtime
     local sourceBodyInstanceID
     local sourceBodyOnlineID
+    local factionID
+    local factionName
     if not record or not zombie then
         return false, nil
     end
@@ -177,6 +221,8 @@ function Lifecycle.CreateVanillaCorpse(record, zombie, reason, deathContext)
         -- the transient zombie shell instead of converting a second corpse.
         token = record.corpse and record.corpse.token
             or record.corpseToken or Core.GenerateID("corpse")
+        local identityItemsRemoved = Internal.removeManagedIdentityItems
+            and Internal.removeManagedIdentityItems(existing) or 0
         local _, _, _, identityChanged =
             Internal.ensureCorpseIdentityCard(record, existing)
         local dogTagChanged = false
@@ -185,7 +231,7 @@ function Lifecycle.CreateVanillaCorpse(record, zombie, reason, deathContext)
                 Internal.ensureCorpseFactionDogTag(record, existing)
             dogTagChanged = changed == true
         end
-        if identityChanged or dogTagChanged then
+        if identityItemsRemoved > 0 or identityChanged or dogTagChanged then
             Internal.transmitCorpseState(existing)
         end
         Internal.stampCorpse(record, existing, token)
@@ -209,6 +255,22 @@ function Lifecycle.CreateVanillaCorpse(record, zombie, reason, deathContext)
     if runtime.corpseState == "finalizing"
         or runtime.corpseState == "inert_loaded"
     then
+        -- Reanimation/recovery can hand the authority a transient zombie at
+        -- the new square while the real corpse remains at its saved square.
+        -- If lookup missed both objects, retire only a body explicitly tagged
+        -- to this corpse (or the still-leased live body), never an unrelated
+        -- zombie. Leaving this shell alive causes weapon-state flicker and
+        -- duplicate nameplate/body entries.
+        if (Internal.matchesRecordBody
+                and Internal.matchesRecordBody(record, zombie))
+            or matchesCorpseShell(record, zombie)
+        then
+            Internal.clearBodyCombat(zombie)
+            Internal.removeZombie(zombie)
+            runtime.corpseState = "missing"
+            Internal.mark(record, "corpse", "missing",
+                "stale_corpse_shell_removed")
+        end
         return true, nil
     end
     x = zombie.getX and zombie:getX() or record.x
@@ -217,6 +279,7 @@ function Lifecycle.CreateVanillaCorpse(record, zombie, reason, deathContext)
     token = record.corpse and record.corpse.token
         or record.corpseToken or Core.GenerateID("corpse")
     createdWorldHour = record.corpse and tonumber(record.corpse.createdWorldHour) or Internal.worldHour()
+    factionID, factionName = corpseFactionSnapshot(record)
     record.x = x
     record.y = y
     record.z = z
@@ -226,6 +289,10 @@ function Lifecycle.CreateVanillaCorpse(record, zombie, reason, deathContext)
         y = y,
         z = z,
         createdWorldHour = createdWorldHour,
+        identityName = tostring(record.name or record.displayName
+            or "Unknown NPC"),
+        factionID = factionID,
+        factionName = factionName,
     }
     if zombie.setReanimate then
         zombie:setReanimate(false)
@@ -234,6 +301,9 @@ function Lifecycle.CreateVanillaCorpse(record, zombie, reason, deathContext)
         zombie:setReanim(false)
     end
     Internal.clearBodyCombat(zombie)
+    if Internal.removeManagedIdentityItems then
+        Internal.removeManagedIdentityItems(zombie)
+    end
     Internal.prepareCorpseItems(record, zombie)
     sourceWornItems = zombie.getWornItems and zombie:getWornItems() or nil
     wornEntries = Internal.captureWornEntries(sourceWornItems)
@@ -258,6 +328,9 @@ function Lifecycle.CreateVanillaCorpse(record, zombie, reason, deathContext)
     if corpse then
         -- Guarantee the stable quest identity on the final vanilla-owned
         -- container before the one complete-corpse MP sync.
+        if Internal.removeManagedIdentityItems then
+            Internal.removeManagedIdentityItems(corpse)
+        end
         Internal.ensureCorpseIdentityCard(record, corpse)
         if Internal.ensureCorpseFactionDogTag then
             Internal.ensureCorpseFactionDogTag(record, corpse)

@@ -171,7 +171,7 @@ T.truthy(PNC.Inventory.ApplyDelta(record, {
 local firstDelta = PNC.Inventory.BuildDeltaPayload(record, 0)
 T.equal(firstDelta.inventoryRevision, 1, "first delta revision")
 T.equal(#firstDelta.ops, 2, "first delta operation count")
-T.equal(firstDelta.summary.itemCount, 2, "first delta summary item count")
+T.equal(firstDelta.summary.itemCount, 1, "first delta summary item count")
 
 T.truthy(PNC.Inventory.ApplyDelta(record, {
     { op = "update", itemID = "loot_1", stack = 3, cond = 0.75, ammoCount = 0 },
@@ -231,15 +231,9 @@ for itemID, item in pairs(record.inventory.items) do
         break
     end
 end
-T.truthy(identityCardID, "identity-card template item missing")
-T.truthy(PNC.Inventory.ApplyDelta(record, {
-    {
-        op = "update",
-        itemID = identityCardID,
-        cond = 0,
-        ammoCount = 0,
-    },
-}, "test_zero_state"), "zero-valued template state update failed")
+T.equal(identityCardID, nil, "identity-card template stays metadata-only")
+T.equal(PNC.Inventory.BuildFullPayload(record).identityMetadata.npcId, record.id,
+    "identity metadata survives full payload construction")
 
 local saved = PNC.Inventory.Serialize(record)
 T.equal(saved[1], 2, "NPC inventory schema")
@@ -317,8 +311,10 @@ local reloadedCard = PNC.Inventory.Internal.findItemByTemplateKey(
     reloaded.inventory,
     "tmpl:identity_card:0"
 )
-T.equal(reloadedCard.cond, 0, "zero condition lost on rebase")
-T.equal(reloadedCard.ammoCount, 0, "zero ammo state lost on rebase")
+T.equal(reloadedCard, nil,
+    "identity card is not reintroduced during inventory rebase")
+T.equal(PNC.Inventory.BuildFullPayload(reloaded).identityMetadata.npcId, reloaded.id,
+    "identity metadata survives inventory rebase")
 
 do
 local malformedSource = {

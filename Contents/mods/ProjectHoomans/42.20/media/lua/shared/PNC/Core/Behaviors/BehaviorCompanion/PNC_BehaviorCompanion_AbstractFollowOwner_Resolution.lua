@@ -19,10 +19,11 @@ local function followerPresenceAuditEnabled()
         and Diagnostics.IsFollowerPresenceAuditEnabled() == true
 end
 
-function H.Resolve(record, runtime)
+function H.Resolve(record, runtime, now)
     local owner = Common.GetOwner(record)
     local orderSpec = record.orderSpec
     local state
+    local previousAttempts = tonumber(runtime.followOwnerResolveAttempts) or 0
     local auditEnabled = followerPresenceAuditEnabled()
     -- The durable follow order carries the owner identity even when record
     -- fields are missing after a rehydrated save or an abstract radio order.
@@ -44,39 +45,47 @@ function H.Resolve(record, runtime)
     if not owner then
         -- Do not silently walk a bodyless follower to its anchor. For a colonist
         -- that anchor is often the base it already occupies, so the failure looks
-        -- like "following" while nothing can move. Retry resolution, wake the
-        -- presence pass, and report once before falling back to the anchor.
-        local attempts = (tonumber(runtime.followOwnerResolveAttempts) or 0) + 1
-        local maxAttempts = tonumber(
-            Const.FOLLOW_OWNER_RESOLVE_MAX_ATTEMPTS) or 5
+        -- like "following" while nothing can move. Retry on the normal abstract
+        -- follow cadence instead of forcing a 50 ms presence wake on every miss.
+        -- The order remains authoritative until it is explicitly cancelled.
+        local attempts = math.min(previousAttempts + 1, 2147483647)
         runtime.followOwnerResolveAttempts = attempts
-        runtime.forcePresenceCheck = true
-        if attempts <= maxAttempts then
-            record.activeBehavior = "FollowOwner:owner_unresolved"
-            state.mode = "owner_unresolved"
-            if attempts == 1 and auditEnabled
-                and Diagnostics and Diagnostics.LogFollowerPresence
-            then
-                Diagnostics.LogFollowerPresence(
-                    "abstract_follow_owner_unresolved", {
-                        "npc=" .. tostring(record.id),
-                        "orderKind=" .. tostring(
-                            orderSpec and orderSpec.kind or "nil"),
-                        "orderOwner=" .. tostring(
-                            orderSpec and orderSpec.ownerUsername or "nil"),
-                        "orderOnlineID=" .. tostring(
-                            orderSpec and orderSpec.ownerOnlineID or "nil"),
-                        "recordOwner=" .. tostring(
-                            record.ownerUsername or "nil"),
-                        "recordOnlineID=" .. tostring(
-                            record.ownerOnlineID or "nil"),
-                        "attempt=" .. tostring(attempts),
-                        "maxAttempts=" .. tostring(maxAttempts),
-                    })
-            end
-            return nil, state, true
+        record.activeBehavior = "FollowOwner:owner_unresolved"
+        state.mode = "owner_unresolved"
+        if attempts == 1 and auditEnabled
+            and Diagnostics and Diagnostics.LogFollowerPresence
+        then
+            Diagnostics.LogFollowerPresence(
+                "abstract_follow_owner_unresolved", {
+                    "npc=" .. tostring(record.id),
+                    "orderKind=" .. tostring(
+                        orderSpec and orderSpec.kind or "nil"),
+                    "orderOwner=" .. tostring(
+                        orderSpec and orderSpec.ownerUsername or "nil"),
+                    "orderOnlineID=" .. tostring(
+                        orderSpec and orderSpec.ownerOnlineID or "nil"),
+                    "recordOwner=" .. tostring(
+                        record.ownerUsername or "nil"),
+                    "recordOnlineID=" .. tostring(
+                        record.ownerOnlineID or "nil"),
+                    "attempt=" .. tostring(attempts),
+                    "retryCadenceMs=" .. tostring(
+                        Const.TICK_ABSTRACT_MS or 3000),
+                    "now=" .. tostring(now or "nil"),
+                })
         end
+        return nil, state, true
     elseif runtime.followOwnerResolveAttempts ~= nil then
+        if previousAttempts > 0 and auditEnabled
+            and Diagnostics and Diagnostics.LogFollowerPresence
+        then
+            Diagnostics.LogFollowerPresence(
+                "abstract_follow_owner_resolved", {
+                    "npc=" .. tostring(record.id),
+                    "attempts=" .. tostring(previousAttempts),
+                    "now=" .. tostring(now or "nil"),
+                })
+        end
         runtime.followOwnerResolveAttempts = nil
     end
     return owner, state, false

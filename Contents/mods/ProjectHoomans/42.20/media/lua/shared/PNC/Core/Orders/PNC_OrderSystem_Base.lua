@@ -150,10 +150,31 @@ function OrderSystem.Normalize(record, orderSpec)
     end
 
     if kind == Const.ORDER_FOLLOW then
+        local anchor = type(spec.homeAnchor) == "table"
+            and spec.homeAnchor or nil
+        local normalizedAnchor
+        if anchor and tonumber(anchor.x) and tonumber(anchor.y) then
+            normalizedAnchor = {
+                baseId = anchor.baseId ~= nil
+                    and tostring(anchor.baseId) or nil,
+                x = tonumber(anchor.x),
+                y = tonumber(anchor.y),
+                z = tonumber(anchor.z) or tonumber(record.z) or 0,
+                radius = math.max(1, tonumber(anchor.radius) or 3),
+                homeZoneId = anchor.homeZoneId ~= nil
+                    and tostring(anchor.homeZoneId) or nil,
+                stockpileNodeId = anchor.stockpileNodeId ~= nil
+                    and tostring(anchor.stockpileNodeId) or nil,
+            }
+        end
         return {
             kind = kind,
             ownerUsername = spec.ownerUsername or record.ownerUsername,
             ownerOnlineID = spec.ownerOnlineID or record.ownerOnlineID,
+            -- Follow owns movement, but the last authoritative home anchor
+            -- remains durable so an explicit Go Home can resume the same
+            -- destination after an abstract/save-load interval.
+            homeAnchor = normalizedAnchor,
         }
     end
 

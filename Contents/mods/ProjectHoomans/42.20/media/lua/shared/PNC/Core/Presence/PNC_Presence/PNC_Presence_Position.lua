@@ -5,6 +5,28 @@ local Const = PNC.Const
 local Spatial = PNC.SpatialIndex
 local MaterializationSafety = PNC.MaterializationSafety
 
+local function resolveFollowOwner(record)
+    local orderSpec = record and record.orderSpec or nil
+    local behaviorCommon = PNC.BehaviorCommon
+    local owner
+    if not orderSpec
+        or tostring(orderSpec.kind or "") ~= tostring(
+            Const.ORDER_FOLLOW or "follow"
+        )
+        or not behaviorCommon
+        or type(behaviorCommon.GetOwner) ~= "function"
+    then
+        return nil
+    end
+    owner = behaviorCommon.GetOwner(record)
+    if not owner or type(owner.getX) ~= "function"
+        or type(owner.getY) ~= "function"
+    then
+        return nil
+    end
+    return owner
+end
+
 function Internal.FindMaterializeSquare(record, now, reason)
     local cell
     local query
@@ -88,6 +110,7 @@ function Internal.FindNearestPlayer(record)
         tonumber(Const.ABSTRACT_NEAR_DISTANCE) or 80,
         tonumber(Const.ABSTRACT_DISTANCE) or 40
     )
+    local owner = resolveFollowOwner(record)
     local players = Spatial and Spatial.QueryPlayers
         and Spatial.QueryPlayers(record.x, record.y, radius) or nil
     local nearest
@@ -95,6 +118,20 @@ function Internal.FindNearestPlayer(record)
     local i
     local player
     local distSq
+    if owner then
+        return {
+            player = owner,
+            x = owner:getX(),
+            y = owner:getY(),
+            z = owner.getZ and owner:getZ() or record.z,
+            distSq = Core.DistanceSq(
+                record.x,
+                record.y,
+                owner:getX(),
+                owner:getY()
+            ),
+        }
+    end
     if not players then
         return Core.GetNearestPlayerPosition(record.x, record.y)
     end

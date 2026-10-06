@@ -9,6 +9,14 @@ local logClientPresenceRemoval = Internal.LogClientPresenceRemoval
 local refreshClientBodyIdentityIndex =
     Internal.RefreshClientBodyIdentityIndex
 
+local function invalidateMapTravelCache()
+    if PNC.MapTravelLayer
+        and PNC.MapTravelLayer.InvalidateEntryCache
+    then
+        PNC.MapTravelLayer.InvalidateEntryCache()
+    end
+end
+
 Internal.RegisterServerCommand(Const.CMD_ROSTER_DELTA, function(args)
     local entries = args.entries
     local entry
@@ -75,6 +83,7 @@ Internal.RegisterServerCommand(Const.CMD_ROSTER_DELTA, function(args)
     then
         ClientState.rosterRevision = tonumber(args.directoryRevision)
     end
+    invalidateMapTravelCache()
     refreshClientBodyIdentityIndex()
 end)
 
@@ -112,6 +121,7 @@ Internal.RegisterServerCommand(Const.CMD_SYNC_RECORD, function(args)
     else
         storeSnapshot(snapshot, false, false, args.event or "sync_record")
     end
+    invalidateMapTravelCache()
     refreshClientBodyIdentityIndex()
 end)
 
@@ -143,6 +153,7 @@ Internal.RegisterServerCommand(Const.CMD_REMOVE_RECORD, function(args)
     if ClientState.characterPayloads then
         ClientState.characterPayloads[id] = nil
     end
+    invalidateMapTravelCache()
     refreshClientBodyIdentityIndex()
 end)
 

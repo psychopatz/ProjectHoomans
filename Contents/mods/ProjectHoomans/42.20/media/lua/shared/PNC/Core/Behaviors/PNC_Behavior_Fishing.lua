@@ -67,9 +67,10 @@ end
 function Fishing.Tick(record, zombie)
     local order = record and record.orderSpec or nil
     local standX, standY, standZ, waterX, waterY
-    local actorX, actorY, actorZ
+    local actorX, actorY, actorZ, waterZ
     local fishingRuntime
     local phase
+    local navigationOptions
     if not order or tostring(order.kind or "") ~= tostring(KIND) then
         return false
     end
@@ -83,7 +84,7 @@ function Fishing.Tick(record, zombie)
         Common.ClearCombatTarget(record, "fishing", zombie)
     end
 
-    standX, standY, standZ, waterX, waterY = coordinates(record)
+    standX, standY, standZ, waterX, waterY, waterZ = coordinates(record)
     if not standX or not standY then
         record.activeBehavior = "Fishing:WaitingForSpot"
         if Common and Common.HaltMovement then
@@ -117,8 +118,16 @@ function Fishing.Tick(record, zombie)
             return true
         end
         if Common and Common.MoveRecord then
+            navigationOptions = {
+                navigationPolicy = "local",
+                targetKind = "fishing_stand",
+                targetValidation = "shoreline_pair",
+                targetWaterX = waterX,
+                targetWaterY = waterY,
+                targetWaterZ = waterZ,
+            }
             Common.MoveRecord(record, zombie, standX, standY, standZ,
-                "walk", 0.65, "fishing_spot")
+                "walk", 0.65, "fishing_spot", navigationOptions)
         end
         return true
     end

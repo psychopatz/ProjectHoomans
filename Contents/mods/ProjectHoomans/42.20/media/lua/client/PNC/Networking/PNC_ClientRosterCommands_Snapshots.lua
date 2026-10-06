@@ -106,6 +106,47 @@ local function logClientPresenceTransition(current, incoming, eventName)
     })
 end
 
+local function logClientPresencePosition(current, incoming, eventName)
+    local orderKind
+    local oldX
+    local oldY
+    local newX
+    local newY
+    if not Diagnostics
+        or not Diagnostics.IsFollowerPresenceAuditEnabled
+        or Diagnostics.IsFollowerPresenceAuditEnabled() ~= true
+        or not Diagnostics.LogFollowerPresence
+        or type(incoming) ~= "table"
+    then
+        return
+    end
+    orderKind = incoming.orderKind
+        or type(current) == "table" and current.orderKind or nil
+    if tostring(orderKind or "") ~= tostring(Const.ORDER_FOLLOW or "follow")
+    then
+        return
+    end
+    oldX = type(current) == "table" and tonumber(current.x) or nil
+    oldY = type(current) == "table" and tonumber(current.y) or nil
+    newX = tonumber(incoming.x)
+    newY = tonumber(incoming.y)
+    if newX == nil or newY == nil
+        or oldX == nil or oldY == nil
+        or oldX == newX and oldY == newY
+    then
+        return
+    end
+    Diagnostics.LogFollowerPresence("client_presence_position", {
+        "npc=" .. tostring(incoming.id or ""),
+        "source=client",
+        "event=" .. tostring(eventName or "snapshot"),
+        "from=" .. tostring(oldX) .. "," .. tostring(oldY),
+        "to=" .. tostring(newX) .. "," .. tostring(newY),
+        "presence=" .. tostring(incoming.presenceState or "nil"),
+        "owner=" .. tostring(incoming.ownerUsername or "nil"),
+    })
+end
+
 local function logClientPresenceRemoval(current, id, reason, eventName)
     if not Diagnostics
         or Diagnostics.FollowerPresenceAuditEnabled ~= true
@@ -195,6 +236,7 @@ local function storeSnapshot(
     end
     if Diagnostics and Diagnostics.FollowerPresenceAuditEnabled == true then
         logClientPresenceTransition(current, incoming, eventName)
+        logClientPresencePosition(current, incoming, eventName)
     end
     if replace == true or incoming.deathMarker == true then
         ClientState.snapshots[id] = incoming

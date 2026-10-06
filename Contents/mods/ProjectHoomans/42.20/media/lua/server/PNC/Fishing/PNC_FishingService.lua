@@ -27,6 +27,10 @@ Service.ACTIVATION_RADIUS = tonumber(Const.FISHING_DEFAULT_RADIUS) or 16
 Service.INTERACTION_RADIUS = tonumber(Const.FISHING_INTERACTION_RADIUS)
     or 1.75
 Service.CLAIM_TTL_MS = 30000
+-- A failed live route must not blacklist a shoreline forever. Keep the
+-- failed-spot exclusion long enough to let another candidate be tried, then
+-- allow the job to retry after the world/path state may have changed.
+Service.SPOT_RETRY_COOLDOWN_MS = 15000
 Service.MAX_ELAPSED_MS = 15000
 Service.Runtime = Service.Runtime or { spotClaims = {}, previousOrders = {} }
 Service.Data = Service.Data or nil

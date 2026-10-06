@@ -24,7 +24,11 @@ end
 function Service.GetSquare(x, y, z)
     local cell = getCell()
     if not cell or type(cell.getGridSquare) ~= "function" then return nil end
-    return cell:getGridSquare(x, y, z)
+    return cell:getGridSquare(
+        math.floor(tonumber(x) or 0),
+        math.floor(tonumber(y) or 0),
+        math.floor(tonumber(z) or 0)
+    )
 end
 
 local function isWater(square)
@@ -52,6 +56,29 @@ local function isWalkable(square)
         return false
     end
     return true
+end
+
+-- Spot coordinates are persisted, so a zone scan is not enough to prove that
+-- the same shoreline pair is still usable when a live worker starts moving.
+-- Keep this query server-owned and side-effect free; the traversal supervisor
+-- performs the corresponding loaded-target gate for the live body.
+function H.ValidateFishingSpot(spot)
+    local stand
+    local water
+    if type(spot) ~= "table" then
+        return false, "fishing_spot_missing"
+    end
+    stand = Service.GetSquare(spot.standX, spot.standY, spot.standZ)
+    if not stand then return false, "fishing_stand_unloaded" end
+    water = Service.GetSquare(spot.waterX, spot.waterY, spot.waterZ)
+    if not water then return false, "fishing_water_unloaded" end
+    if not isWalkable(stand) then
+        return false, "fishing_stand_blocked"
+    end
+    if not isWater(water) then
+        return false, "fishing_water_invalid"
+    end
+    return true, "fishing_spot_ready"
 end
 
 local function spotID(x, y, z)

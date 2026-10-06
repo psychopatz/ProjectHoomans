@@ -22,6 +22,9 @@ function Service.StartJob(lease)
         and PNC.HomeDutyService.IsCamped(record) == true
     then return false, "NPC_CAMPED" end
     if not Service.ValidateZone(zone) then return false, "fishing_zone_invalid" end
+    -- Set this before reserving so abstract jobs do not consume an exclusive
+    -- live stand claim during the initial lease handoff.
+    job.leaseId, job.executionMode = lease.leaseId, executionMode
     local tool = H.ResolveFishingTool(record, job.activityItemID)
     local spot, spotReason = H.ReserveFishingSpot(zone, job, record)
     if not spot then return false, spotReason end
@@ -43,7 +46,6 @@ function Service.StartJob(lease)
         job.previousOrderCaptured = true
     end
     Service.Runtime.previousOrders[job.npcId] = H.Copy(job.previousOrder)
-    job.leaseId, job.executionMode = lease.leaseId, executionMode
     job.lastProgressAt = H.Now()
     job.state = "READY"
     job.lastReason = "fishing_tool_check"

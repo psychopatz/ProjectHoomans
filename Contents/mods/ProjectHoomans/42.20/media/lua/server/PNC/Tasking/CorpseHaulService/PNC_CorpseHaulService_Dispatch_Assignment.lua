@@ -14,14 +14,14 @@ local WorkRepository = PNC.WorkRepository
 
 local function findBaseAssignment(base)
     local configuration = Internal.configurationFor(base)
-    local destinationRegion = configuration and configuration.destinationRegion
+    if not configuration or not configuration.sourceRegion then
+        return nil, "CORPSE_HAUL_NOT_CONFIGURED"
+    end
+    local destinationRegion = configuration.destinationRegion
     local facilities = destinationRegion and {} or Internal.stockpileFacilities(base)
     local corpses = Internal.scanBaseCorpses(base)
     local sawReserved = false
     local sawDropFailure = false
-    if not configuration or not configuration.sourceRegion then
-        return nil, "CORPSE_HAUL_NOT_CONFIGURED"
-    end
     if #corpses <= 0 then
         return nil, "NO_CORPSE_IN_SOURCE_REGION"
     end
@@ -132,4 +132,3 @@ Internal.findBaseAssignment = findBaseAssignment
 Internal.queuePendingOrders = queuePendingOrders
 
 return Service
-

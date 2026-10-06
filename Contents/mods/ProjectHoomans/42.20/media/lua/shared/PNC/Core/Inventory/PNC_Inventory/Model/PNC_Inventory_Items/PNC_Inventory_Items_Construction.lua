@@ -7,6 +7,70 @@ local FACTION_DOGTAG_VERSION = 1
 local IDENTITY_CARD_TYPE = "Base.IDcard"
 local IDENTITY_CARD_TEMPLATE_KEY = "tmpl:identity_card:0"
 
+local function isLegacyIdentityItem(item)
+    local itemState = item and item.itemState or nil
+    local modData = itemState and itemState.modData or nil
+    local fullType = item and tostring(item.type or "") or ""
+    if fullType == IDENTITY_CARD_TYPE then
+        return item.templateKey == IDENTITY_CARD_TEMPLATE_KEY
+            or item.legacyTemplateKey == IDENTITY_CARD_TEMPLATE_KEY
+            or item.identityNPCId ~= nil
+            or item.identityNPCName ~= nil
+            or item.interactionLockReason == "identity_card"
+            or type(modData) == "table" and modData.PNC_IDCard == true
+    end
+    if fullType == FACTION_DOGTAG_TYPE then
+        return item.templateKey == FACTION_DOGTAG_TEMPLATE_KEY
+            or item.interactionLockReason == "faction_dogtag"
+            or type(modData) == "table"
+                and modData.PNC_FactionDogTag == true
+    end
+    return false
+end
+
+-- Identity cards and faction dogtags are presentation metadata for a live
+-- NPC. Older versions stored them as ordinary logical inventory items, which
+-- made every hydration, delta, and corpse conversion carry physical copies.
+-- Remove only the items Project Hoomans authored; vanilla cards/dogtags stay.
+function Internal.removeLegacyIdentityItems(record, inv, options)
+    local removed = {}
+    local ops = {}
+    local itemID
+    local item
+    options = type(options) == "table" and options or {}
+    if type(inv) ~= "table" or type(inv.items) ~= "table" then
+        return false, removed
+    end
+    for itemID, item in pairs(inv.items) do
+        if isLegacyIdentityItem(item) then
+            removed[#removed + 1] = tostring(itemID)
+        end
+    end
+    table.sort(removed)
+    for index = 1, #removed do
+        itemID = removed[index]
+        item = inv.items[itemID]
+        if item and Internal.removeItemByID(inv, itemID) then
+            ops[#ops + 1] = { op = "remove", itemID = itemID }
+        end
+    end
+    if #ops > 0 and options.bumpRevision ~= false
+        and record and record.inventory == inv
+    then
+        Internal.bumpRevision(
+            record,
+            ops,
+            options.reason or "inventory_identity_metadata_only"
+        )
+        if inv.persistenceMode ~= "FULL" then
+            inv.persistenceMode = "BASELINE_DELTA"
+        end
+    end
+    return #ops > 0, removed
+end
+
+Internal.IsLegacyIdentityItem = isLegacyIdentityItem
+
 local function buildItem(record, spec, fullType, profile)
     return {
         id = Internal.normalizeString(spec.id)
@@ -207,6 +271,9 @@ local function factionForRecord(record, faction)
     if type(faction) == "table" then return faction end
     factionID = record and record.affiliation
         and record.affiliation.factionID or nil
+    factionID = factionID or record and record.factionID
+    factionID = factionID or record and record.corpse
+        and record.corpse.factionID or nil
     factions = PNC.Factions
     if factionID and factions and type(factions.Get) == "function" then
         return factions.Get(factionID)
@@ -218,6 +285,27 @@ local function factionDogtagMetadata(record, faction)
     local factionID = faction and tostring(faction.id or "") or ""
     local factionName = faction and tostring(faction.name or "") or ""
     local npcID = record and tostring(record.id or "") or ""
+    if factionID == "" then
+        factionID = record and record.affiliation
+            and tostring(record.affiliation.factionID or "") or ""
+        factionID = factionID ~= "" and factionID
+            or tostring(record and record.factionID or "")
+        factionID = factionID ~= "" and factionID
+            or tostring(record and record.corpse
+                and record.corpse.factionID or "")
+    end
+    if factionName == "" then
+        factionName = tostring(record and record.factionName or "")
+        factionName = factionName ~= "" and factionName
+            or tostring(record and record.corpse
+                and record.corpse.factionName or "")
+    end
+    if factionName == "" and factionID ~= ""
+        and PNC.Factions and type(PNC.Factions.Get) == "function"
+    then
+        faction = PNC.Factions.Get(factionID)
+        factionName = faction and tostring(faction.name or "") or ""
+    end
     if factionID == "" or factionName == "" or npcID == "" then
         return nil
     end
@@ -238,8 +326,8 @@ local function findFactionDogtag(inv, npcID)
         if candidate and candidate.templateKey == FACTION_DOGTAG_TEMPLATE_KEY then
             metadata = candidate.itemState
                 and candidate.itemState.modData or nil
-            if not metadata or metadata.PNC_FactionDogTag ~= true
-                or tostring(metadata.PNC_FactionDogTagNPCId or "")
+            if metadata and metadata.PNC_FactionDogTag == true
+                and tostring(metadata.PNC_FactionDogTagNPCId or "")
                     == tostring(npcID or "")
             then
                 return candidate
@@ -355,58 +443,30 @@ function Internal.ensureFactionDogTag(record, inv, faction)
 end
 
 function Inventory.RefreshFactionDogTag(record, faction)
-    local inv
-    local item
     local metadata
-    local existingItem
-    local wasCurrent
-    local spec
-    local ops
-    local applied
+    local runtime
+    local previous
+    local changed = false
     if not record then return nil, false, "record_required" end
     local resolvedFaction = factionForRecord(record, faction)
     metadata = factionDogtagMetadata(record, resolvedFaction)
-    existingItem = findFactionDogtag(record.inventory, record.id)
     if not metadata then
-        return existingItem, false, "faction_unavailable"
+        return nil, false, "faction_unavailable"
     end
-    wasCurrent = factionDogtagIsCurrent(existingItem, metadata)
-    if wasCurrent then
-        return existingItem, false, "unchanged"
-    end
-    if type(Inventory.EnsureRecordInventory) == "function" then
-        inv = Inventory.EnsureRecordInventory(record, {
-            reconcileWaterContainer = false,
-        })
-    else
-        inv = record.inventory
-    end
-    if not inv then return nil, false, "inventory_unavailable" end
-    item = findFactionDogtag(inv, record.id)
-    if factionDogtagIsCurrent(item, metadata) then
-        return item, true, "updated"
-    end
-    spec = copyFactionDogtagItem(item, metadata,
-        metadata.PNC_FactionDogTagFactionName)
-    if type(Inventory.ApplyDelta) ~= "function" then
-        return nil, false, "inventory_mutation_unavailable"
-    end
-    ops = {}
-    if item then
-        if not item.id then return nil, false, "dogtag_id_unavailable" end
-        ops[#ops + 1] = { op = "remove", itemID = item.id }
-        spec.id = item.id
-    end
-    ops[#ops + 1] = { op = "add", item = spec }
-    applied = Inventory.ApplyDelta(
-        record,
-        ops,
-        "faction_dogtag_refresh"
-    )
-    if not applied then return nil, false, "inventory_update_failed" end
-    item = findFactionDogtag(record.inventory, record.id)
-    if not factionDogtagIsCurrent(item, metadata) then
-        return item, false, "inventory_update_incomplete"
-    end
-    return item, true, "updated"
+    runtime = record.runtime or {}
+    record.runtime = runtime
+    previous = runtime.virtualFactionDogTagMetadata
+    changed = not previous
+        or tostring(previous.PNC_FactionDogTagFactionId or "")
+            ~= tostring(metadata.PNC_FactionDogTagFactionId or "")
+        or tostring(previous.PNC_FactionDogTagFactionName or "")
+            ~= tostring(metadata.PNC_FactionDogTagFactionName or "")
+    runtime.virtualFactionDogTagMetadata = {
+        PNC_FactionDogTag = true,
+        PNC_FactionDogTagVersion = FACTION_DOGTAG_VERSION,
+        PNC_FactionDogTagNPCId = metadata.PNC_FactionDogTagNPCId,
+        PNC_FactionDogTagFactionId = metadata.PNC_FactionDogTagFactionId,
+        PNC_FactionDogTagFactionName = metadata.PNC_FactionDogTagFactionName,
+    }
+    return nil, changed, changed and "metadata_only" or "unchanged"
 end

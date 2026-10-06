@@ -4,12 +4,55 @@ if PsychopatzCore and PsychopatzCore.RuntimeRole
 local Service = PNC.HomeDutyService
 local H = Service.Internal
 
+function H.CancelActiveTask(record, reason)
+    local lease
+    local stopped
+    local stopReason
+    local fishing
+    local job
+    if not record then return false, "NPC_MISSING" end
+    lease = PNC.TaskLeaseService and PNC.TaskLeaseService.ForNPC
+        and PNC.TaskLeaseService.ForNPC(record.id) or nil
+    if lease and PNC.Tasking and PNC.Tasking.Commands
+        and PNC.Tasking.Commands.CancelForNPC
+    then
+        stopped, stopReason = PNC.Tasking.Commands.CancelForNPC(
+            record.id, reason or "return_home_command")
+        if stopped == false or stopReason == "CANCELLATION_DEFERRED" then
+            return false, stopReason or "TASK_CANCELLATION_FAILED"
+        end
+    end
+    -- A persisted fishing job can outlive a missing task lease after a load.
+    -- Cancel it through FishingService so its executor cannot reassert the
+    -- old order after an explicit player home command.
+    fishing = PNC.FishingService
+    job = fishing and fishing.GetJob and fishing.GetJob(record.id) or nil
+    if job and job.active == true and fishing.CancelJob then
+        stopped, stopReason = fishing.CancelJob(
+            record.id, reason or "return_home_command")
+        if stopped == false then
+            return false, stopReason or "FISHING_CANCELLATION_FAILED"
+        end
+    end
+    return true
+end
+
 function Service.SendHome(record, baseId, reason, options)
     if not record or record.alive == false then return false, "NPC_MISSING" end
+    local allowFollowOverride = type(options) == "table"
+        and options.allowFollowOverride == true
+    -- Work/fatigue/courier/home reconciliation is not allowed to replace a
+    -- player-follow order. An explicit player "go home" command opts into
+    -- the replacement; all implicit callers must leave Follow authoritative.
+    if Service.IsFollowing and Service.IsFollowing(record)
+        and not allowFollowOverride
+    then
+        return false, "FOLLOWING_PLAYER"
+    end
     local point, pointReason, base = Service.GetHomePoint(record, baseId)
     if not point then return false, pointReason end
     local forceDestination = type(options) == "table"
-        and options.forceDestination == true
+        and (options.forceDestination == true or allowFollowOverride)
     if Service.IsReturningHome(record, base.id) then
         -- A stale colony_home order can outlive the travel journey that was
         -- created to repair it. Without restoring the travel order here,
@@ -50,17 +93,25 @@ function Service.SendHome(record, baseId, reason, options)
             type = "colony_home", baseId = base.id,
             x = point.x, y = point.y, z = point.z,
             radius = point.radius,
+            homeZoneId = point.homeZoneId,
+            stockpileNodeId = point.stockpileNodeId,
         },
         metadata = {
             purpose = "return_home", baseId = base.id,
             reason = tostring(reason or "duty_required"),
         },
+        allowFollowOverride = allowFollowOverride,
     })
     if not journey then return false, journeyReason end
     record.runtime = record.runtime or {}
-    record.runtime.homeState = "RETURNING_HOME"
     record.runtime.homeBaseId = base.id
-    record.runtime.homeJourneyId = journey.journeyId
+    if journey.state == "arrived" then
+        record.runtime.homeState = "AT_HOME"
+        record.runtime.homeJourneyId = nil
+    else
+        record.runtime.homeState = "RETURNING_HOME"
+        record.runtime.homeJourneyId = journey.journeyId
+    end
     return true, "RETURNING_HOME", journey
 end
 
@@ -74,6 +125,9 @@ function Service.OnTravelFailed(record, reason, journey)
     local point
     local order
     if not runtime then return false end
+    if Service.IsFollowing and Service.IsFollowing(record) then
+        return false, "FOLLOWING_PLAYER"
+    end
     runtime.homeState = "RETURN_HOME_FAILED"
     runtime.homeJourneyId = nil
     runtime.homeFailureReason = tostring(reason or "travel_failed")
@@ -92,6 +146,8 @@ function Service.OnTravelFailed(record, reason, journey)
         y = point.y,
         z = point.z,
         radius = point.radius,
+        homeZoneId = point.homeZoneId,
+        stockpileNodeId = point.stockpileNodeId,
     }
     if PNC.OrderSystem and PNC.OrderSystem.SetOrder then
         PNC.OrderSystem.SetOrder(record, order)
@@ -153,7 +209,15 @@ function Service.SendToPlayer(record, player, reason)
         PNC.WorkService.Commands.ReleaseWorker(record.id,
             "follow_player_requested")
     end
-    if PNC.Travel and PNC.Travel.Service and PNC.Travel.Model
+    if PNC.Travel and PNC.Travel.Service
+        and type(PNC.Travel.Service.Supersede) == "function"
+    then
+        local superseded, supersedeReason = PNC.Travel.Service.Supersede(
+            record, "follow_player_requested")
+        if superseded == false and supersedeReason ~= "journey_missing" then
+            return false, supersedeReason or "TRAVEL_SUPERSEDE_FAILED"
+        end
+    elseif PNC.Travel and PNC.Travel.Service and PNC.Travel.Model
         and type(PNC.Travel.Service.Cancel) == "function"
         and PNC.Travel.Model.IsActive(record.travel)
     then

@@ -54,11 +54,14 @@ function Service.GetCorpseToken(corpse, create)
 end
 
 function Service.IsEligibleCorpse(corpse)
-    local item = corpse and corpse.getItem and corpse:getItem() or nil
-    local fullType = item and item.getFullType and tostring(item:getFullType() or "") or ""
     if not corpse then return false end
+    -- Do not call IsoDeadBody:getItem() from a broad world scan. Build 42
+    -- materializes/serializes the corpse inventory there; a damaged or
+    -- oversized food item can throw BufferOverflowException and stall the
+    -- entire OnTick loop. forEachCorpse already restricts this callback to
+    -- engine corpse objects, and isAnimal is the non-serializing distinction
+    -- needed here.
     if corpse.isAnimal and corpse:isAnimal() == true then return false end
-    if fullType == "Base.CorpseAnimal" then return false end
     -- forEachCorpse already restricts this object to the engine's corpse
     -- collection. The home-service check belongs to worker authorization, not
     -- corpse ownership: ordinary vanilla human corpses are valid haul targets.

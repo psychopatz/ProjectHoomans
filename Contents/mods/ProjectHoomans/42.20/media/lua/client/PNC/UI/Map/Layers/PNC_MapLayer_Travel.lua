@@ -61,21 +61,18 @@ function TravelLayer.FindMarkerAt(map, x, y, padding)
         return nil
     end
     local entries = listProjectedEntries()
+    local positions = TravelLayer.BuildMarkerScreenPositions(map, entries)
     local half = TravelLayer.GetDotSize(map) / 2
         + (tonumber(padding) or 3)
     local index
     for index = #entries, 1, -1 do
         local entry = entries[index]
         if entry.x and entry.y then
-            local sx = map.mapAPI:worldToUIX(
-                entry.x,
-                entry.y
-            )
-            local sy = map.mapAPI:worldToUIY(
-                entry.x,
-                entry.y
-            )
-            if math.abs(x - sx) <= half
+            local position = positions[index]
+            local sx = position and position.x or nil
+            local sy = position and position.y or nil
+            if sx and sy
+                and math.abs(x - sx) <= half
                 and math.abs(y - sy) <= half
             then
                 return entry, sx, sy
@@ -83,6 +80,53 @@ function TravelLayer.FindMarkerAt(map, x, y, padding)
         end
     end
     return nil
+end
+
+-- Followers can share a canonical abstract coordinate while converging on
+-- the owner. Keep that world coordinate authoritative, but spread only the
+-- screen marker positions for exact/near-exact overlaps so a group does not
+-- look like it was pruned to one green square.
+function TravelLayer.BuildMarkerScreenPositions(map, entries)
+    local positions = {}
+    local groups = {}
+    local entry
+    local key
+    local group
+    local i
+    local peerIndex
+    local radius
+    local angle
+    if not map or not map.mapAPI then return positions end
+    for i = 1, #(entries or {}) do
+        entry = entries[i]
+        if entry and entry.x ~= nil and entry.y ~= nil then
+            positions[i] = {
+                x = map.mapAPI:worldToUIX(entry.x, entry.y),
+                y = map.mapAPI:worldToUIY(entry.x, entry.y),
+            }
+            key = tostring(math.floor((tonumber(entry.x) or 0) + 0.5))
+                .. ":"
+                .. tostring(math.floor((tonumber(entry.y) or 0) + 0.5))
+            group = groups[key]
+            if not group then
+                group = {}
+                groups[key] = group
+            end
+            group[#group + 1] = i
+        end
+    end
+    radius = math.max(8, TravelLayer.GetDotSize(map) * 0.9)
+    for _, group in pairs(groups) do
+        if #group > 1 then
+            for peerIndex = 1, #group do
+                i = group[peerIndex]
+                angle = ((peerIndex - 1) / #group) * math.pi * 2
+                positions[i].x = positions[i].x + math.cos(angle) * radius
+                positions[i].y = positions[i].y + math.sin(angle) * radius
+            end
+        end
+    end
+    return positions
 end
 
 local function colorFor(entry)
@@ -107,6 +151,22 @@ local function displayLabel(entry)
         return name .. " [" .. tostring(roleTag) .. "]"
     end
     return name
+end
+
+local function debugPresenceEnabled()
+    local client = PNC.Client
+    return client
+        and type(client.CanUseDebug) == "function"
+        and client.CanUseDebug() == true
+end
+
+local function debugPresenceLabel(entry)
+    if not debugPresenceEnabled() then return nil end
+    local value = entry and entry.presenceState
+    if value == nil or tostring(value) == "" then
+        return "UNKNOWN"
+    end
+    return string.upper(tostring(value))
 end
 
 local function drawMarkerIcon(map, entry, sx, sy, dotSize)
@@ -233,6 +293,7 @@ local function drawTravelMarkers(map, entries, showLabels, dotSize,
     local entry
     local sx
     local sy
+    local positions = TravelLayer.BuildMarkerScreenPositions(map, entries)
     local color
     local selected
     local markerHovered
@@ -240,9 +301,11 @@ local function drawTravelMarkers(map, entries, showLabels, dotSize,
     for i = 1, #entries do
         entry = entries[i]
         if entry.x and entry.y then
-            sx = map.mapAPI:worldToUIX(entry.x, entry.y)
-            sy = map.mapAPI:worldToUIY(entry.x, entry.y)
-            if sx >= -dotSize and sy >= -dotSize
+            local position = positions[i]
+            sx = position and position.x or nil
+            sy = position and position.y or nil
+            if sx and sy
+                and sx >= -dotSize and sy >= -dotSize
                 and sx <= map.width + dotSize
                 and sy <= map.height + dotSize
                 and not isOverControls(map, sx, sy)
@@ -330,7 +393,9 @@ local function drawTravelHover(map, hoveredEntry, hoveredX, hoveredY)
             or false
         if not portraitVisible then
             local label = displayLabel(hoveredEntry)
+            local presence = debugPresenceLabel(hoveredEntry)
             local eta = etaText(hoveredEntry)
+            if presence then label = label .. " [" .. presence .. "]" end
             if eta then label = label .. " — " .. eta end
             local width = getTextManager():MeasureStringX(UIFont.Small, label) + 12
             local height = getTextManager():getFontHeight(UIFont.Small) + 8

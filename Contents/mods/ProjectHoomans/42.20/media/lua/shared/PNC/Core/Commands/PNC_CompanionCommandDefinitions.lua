@@ -6,6 +6,47 @@ PNC = PNC or {}
 local Commands = PNC.CompanionCommands
 local Const = PNC.Const
 
+local function cancelActiveTask(record, reason)
+    if PNC.HomeDutyService and PNC.HomeDutyService.Internal
+        and type(PNC.HomeDutyService.Internal.CancelActiveTask)
+            == "function"
+    then
+        return PNC.HomeDutyService.Internal.CancelActiveTask(
+            record, reason)
+    end
+    local lease
+    local stopped
+    local stopReason
+    local fishing
+    local job
+    if not record then return false, "NPC_MISSING" end
+    if PNC.TaskLeaseService and PNC.TaskLeaseService.ForNPC then
+        lease = PNC.TaskLeaseService.ForNPC(record.id)
+    end
+    if lease and PNC.Tasking and PNC.Tasking.Commands
+        and PNC.Tasking.Commands.CancelForNPC
+    then
+        stopped, stopReason = PNC.Tasking.Commands.CancelForNPC(
+            record.id, reason or "return_home_command")
+        if stopped == false or stopReason == "CANCELLATION_DEFERRED" then
+            return false, stopReason or "TASK_CANCELLATION_FAILED"
+        end
+    end
+    -- A persisted fishing job can outlive a missing task lease after a load.
+    -- Cancel it through FishingService as a fallback so its executor cannot
+    -- reassert the old order after the player explicitly sends the NPC home.
+    fishing = PNC.FishingService
+    job = fishing and fishing.GetJob and fishing.GetJob(record.id) or nil
+    if job and job.active == true and fishing.CancelJob then
+        stopped, stopReason = fishing.CancelJob(
+            record.id, reason or "return_home_command")
+        if stopped == false then
+            return false, stopReason or "FISHING_CANCELLATION_FAILED"
+        end
+    end
+    return true
+end
+
 local function currentPosition(record)
     local zombie = record and record.id and PNC.Registry
         and PNC.Registry.GetLiveZombie
@@ -108,9 +149,8 @@ Commands.Register({
     emote = "followme",
     icon = "media/ui/Emotes/PNC_EmoteFollow.png",
     buildOrder = followOrder,
-    -- Recall over the radio: offers reach a colonist who is out of earshot or
-    -- currently abstract, but only while both sides carry working radio gear.
-    -- The emote radial still gates on proximity client-side.
+    -- Follow Me is relay-eligible so an abstract colonist can receive the
+    -- order remotely, but only when both radios satisfy the relay gate.
     radioRelay = true,
 })
 
@@ -241,8 +281,15 @@ Commands.Register({
     -- Sending a colonist home is the order most often issued at radio range.
     radioRelay = true,
     apply = function(record, player)
+        local homeOptions = {
+            allowFollowOverride = true,
+        }
+        local stopped, stopReason = cancelActiveTask(
+            record, "return_home_command")
+        if stopped == false then return false, stopReason end
         if PNC.ScavengeService and PNC.ScavengeService.BringBack then
-            local handled = PNC.ScavengeService.BringBack(record, player)
+            local handled = PNC.ScavengeService.BringBack(
+                record, player, homeOptions)
             if handled == true then return true end
         end
         local home = PNC.HomeDutyService
@@ -256,7 +303,8 @@ Commands.Register({
             )
         end
         if not home or not home.SendHome then return false end
-        return home.SendHome(record, nil, "companion_command") == true
+        return home.SendHome(
+            record, nil, "companion_command", homeOptions) == true
     end,
 })
 

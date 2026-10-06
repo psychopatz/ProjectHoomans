@@ -105,6 +105,9 @@ local function clearLiveRuntime(record)
     record.runtime.roamGoalX = nil
     record.runtime.roamGoalY = nil
     record.runtime.roamGoalZ = nil
+    record.runtime.presenceHandoffRequested = nil
+    record.runtime.presenceHandoffReason = nil
+    record.runtime.presenceHandoffAt = nil
 end
 
 local function captureInventory(record, zombie)
@@ -170,11 +173,24 @@ function Presence.Abstract(record, reason)
             worldAgeHours()
         )
     end
+    if Internal.LogTraversal then
+        Internal.LogTraversal(record, "presence_transition", zombie, {
+            "from=live",
+            "to=abstract",
+            "reason=" .. tostring(reason or "abstract"),
+        })
+    end
     notifyAbstraction(record, reason)
     clearLiveRuntime(record)
     if zombie then
         removeLiveBody(record, zombie, reason)
     else
+        -- There is no safe body handle to pass to the engine cleanup API in
+        -- this branch. Drop only the record-owned navigation state; a stale
+        -- engine handle must never be touched after lease loss.
+        record.runtime.localNavigation = nil
+        record.runtime.pathing = nil
+        record.runtime.moveIntent = nil
         if PNC.Travel and PNC.Travel.Service then
             PNC.Travel.Service.OnAbstracted(record, nil)
         end

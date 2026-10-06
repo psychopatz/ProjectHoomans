@@ -119,46 +119,41 @@ local record = {
 }
 
 local tag, changed, reason = Inventory.RefreshFactionDogTag(record)
-T.truthy(changed, "faction membership adds a persistent dogtag")
-T.equal(reason, "updated", "first dogtag refresh result")
-T.equal(tag.type, "Base.Necklace_DogTag", "vanilla dogtag item type")
-T.equal(tag.customName, "Dog Tags: North Watch",
-    "dogtag display uses the faction name")
-T.equal(tag.itemState.modData.PNC_FactionDogTagFactionName, "North Watch",
-    "dogtag metadata stores only the faction name")
-T.equal(tag.itemState.modData.PNC_FactionDogTagFactionId, "faction_1",
-    "dogtag metadata stores the stable faction ID")
-T.equal(tag.itemState.modData.PNC_FactionDogTagNPCId, "npc_17",
-    "dogtag metadata binds it to the NPC")
-T.equal(tag.interactionLocked, true, "dogtag remains a required identity item")
-T.equal(deltaCount, 1, "dogtag is written through the inventory mutation API")
+T.truthy(changed, "faction membership changes virtual dogtag metadata")
+T.equal(reason, "metadata_only", "first dogtag refresh result")
+T.equal(tag, nil, "live dogtag has no physical inventory item")
+local virtualTag = record.runtime.virtualFactionDogTagMetadata
+T.equal(virtualTag.PNC_FactionDogTagFactionName, "North Watch",
+    "virtual dogtag metadata stores the faction name")
+T.equal(virtualTag.PNC_FactionDogTagFactionId, "faction_1",
+    "virtual dogtag metadata stores the stable faction ID")
+T.equal(virtualTag.PNC_FactionDogTagNPCId, "npc_17",
+    "virtual dogtag metadata binds it to the NPC")
+T.equal(deltaCount, 0, "virtual dogtag refresh writes no inventory delta")
 
-local tagID = tag.id
 local unchangedTag, unchanged, unchangedReason =
     Inventory.RefreshFactionDogTag(record)
 T.equal(unchanged, false, "unchanged metadata does not write another delta")
 T.equal(unchangedReason, "unchanged", "idempotent refresh result")
-T.equal(unchangedTag.id, tagID, "idempotent refresh preserves the item")
-T.equal(deltaCount, 1, "idempotent refresh does not bump inventory again")
+T.equal(unchangedTag, nil, "idempotent refresh keeps the live item virtual")
+T.equal(deltaCount, 0, "idempotent refresh does not bump inventory again")
 
 factions.faction_1.name = "North Watch Reformed"
 tag, changed = Inventory.RefreshFactionDogTag(record)
-T.truthy(changed, "faction rename updates the existing dogtag")
-T.equal(tag.id, tagID, "rename preserves the same item identity")
-T.equal(tag.customName, "Dog Tags: North Watch Reformed",
-    "renamed faction appears on the tag")
-T.equal(tag.itemState.modData.PNC_FactionDogTagFactionName,
+T.truthy(changed, "faction rename updates virtual dogtag metadata")
+T.equal(tag, nil, "faction rename does not materialize a live dogtag")
+T.equal(record.runtime.virtualFactionDogTagMetadata.PNC_FactionDogTagFactionName,
     "North Watch Reformed", "metadata is updated to the renamed faction")
 
 record.affiliation.factionID = "faction_2"
 tag, changed = Inventory.RefreshFactionDogTag(record)
-T.truthy(changed, "recruitment transfer updates the dogtag faction")
-T.equal(tag.id, tagID, "transfer preserves the same dogtag")
-T.equal(tag.itemState.modData.PNC_FactionDogTagFactionId, "faction_2",
+T.truthy(changed, "recruitment transfer updates virtual dogtag metadata")
+T.equal(tag, nil, "transfer does not materialize a live dogtag")
+T.equal(record.runtime.virtualFactionDogTagMetadata.PNC_FactionDogTagFactionId, "faction_2",
     "transfer changes the stable faction ID")
-T.equal(tag.itemState.modData.PNC_FactionDogTagFactionName, "River Guard",
+T.equal(record.runtime.virtualFactionDogTagMetadata.PNC_FactionDogTagFactionName, "River Guard",
     "transfer changes the faction name")
-T.equal(deltaCount, 3, "each actual faction change writes exactly one delta")
+T.equal(deltaCount, 0, "faction metadata changes write no inventory delta")
 
 record.name = "Ash Marlowe Recruited"
 local card, cardChanged = Inventory.Internal.ensureIdentityCard(
@@ -207,10 +202,10 @@ local generatedTag, generatedChanged, generatedReason =
     Inventory.RefreshFactionDogTag(generatedRecord)
 T.truthy(generatedChanged,
     "newly hydrated faction metadata triggers the caller's broadcast")
-T.equal(generatedReason, "updated", "template-generated tag refresh result")
-T.equal(generatedTag.type, "Base.Necklace_DogTag",
-    "faction tag generated with an empty inventory is recognized")
-T.equal(deltaCount, 3,
-    "template-generated tag does not write an unnecessary inventory delta")
+T.equal(generatedReason, "metadata_only", "template-generated metadata refresh result")
+T.equal(generatedTag, nil,
+    "template-generated metadata does not create a physical dogtag")
+T.equal(deltaCount, 0,
+    "template-generated metadata does not write an inventory delta")
 
 T.finish("pnc_inventory_faction_dogtag_smoke")

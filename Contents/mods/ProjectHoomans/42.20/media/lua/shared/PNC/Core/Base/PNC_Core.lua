@@ -295,6 +295,7 @@ function Core.ForEachPlayer(callback)
     local players
     local i
     local player
+    local visited = false
     if type(callback) ~= "function" then
         return
     end
@@ -304,10 +305,15 @@ function Core.ForEachPlayer(callback)
             for i = 0, players:size() - 1 do
                 player = players:get(i)
                 if player then
+                    visited = true
                     callback(player)
                 end
             end
-            return
+            -- An empty hosted-server list is not authoritative evidence that
+            -- no local player exists.  Fall through to getSpecificPlayer so
+            -- presence, spatial indexing, and roster delivery all agree in
+            -- single-player and listen-server sessions.
+            if visited then return end
         end
     end
     if getNumActivePlayers and getSpecificPlayer then

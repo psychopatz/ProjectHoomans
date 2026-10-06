@@ -15,6 +15,7 @@ local Registry = PNC.Registry
 Starting.NextRetryAt = Starting.NextRetryAt or {}
 Starting.RETRY_DELAY_MS = 5000
 Starting.ENRICHMENT_VERSION = 5
+Starting.RELATIONSHIP_KEY_VERSION = 1
 
 function H.NowMs()
     return PNC.Core and PNC.Core.Now and PNC.Core.Now() or 0

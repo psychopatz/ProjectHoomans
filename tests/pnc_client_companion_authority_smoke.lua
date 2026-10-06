@@ -74,6 +74,11 @@ local Authority = T.load("ProjectHoomans", "client",
     "PNC/Commands/PNC_ClientCompanionAuthority.lua")
 
 T.truthy(Authority, "client authority module loaded")
+PNC.CompanionCommands.Register({
+    id = "follow",
+    radioRelay = true,
+    buildOrder = function() return { kind = "follow" } end,
+})
 
 -- ---------------------------------------------------------------------------
 -- The authoritative gate is genuinely unavailable on this client.
@@ -127,6 +132,30 @@ T.equal(Authority.CanPlayerCommand(companion({ alive = false }),
 T.equal(Authority.CanPlayerCommand(
     companion({ presenceState = "abstract" }), nearPlayer, 20), false,
     "an abstracted NPC is not commandable")
+T.equal(Authority.CanRelayCommand(
+    companion({ presenceState = "abstract" }), nearPlayer, "follow"), false,
+    "abstract Follow Me bypassed the unavailable relay gate")
+PNC.CommandRelayGate = {
+    Evaluate = function(facts)
+        return facts.playerRadio == true and facts.npcRadio == true,
+            facts.playerRadio == true and facts.npcRadio == true
+                and "radio_relay" or "npc_radio_missing"
+    end,
+}
+PsychopatzCore = {
+    RadioDeviceState = {
+        FindActivePlayerDevice = function() return {} end,
+    },
+}
+local abstractWithRadio = companion({
+    presenceState = "abstract",
+    radioGear = { equipped = true },
+})
+T.equal(Authority.CanRelayCommand(
+    abstractWithRadio, nearPlayer, "follow"), true,
+    "abstract Follow Me with two radios was not relay-commandable")
+PNC.CommandRelayGate = nil
+PsychopatzCore = nil
 T.equal(Authority.CanPlayerCommand(companion({ z = 2 }), playerAt(10.5, 10.5, 0),
     20), false, "a colonist on another floor is not commandable")
 T.equal(Authority.CanPlayerCommand(companion({ x = 400, y = 400 }), nearPlayer,

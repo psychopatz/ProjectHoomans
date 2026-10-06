@@ -139,12 +139,14 @@ function Internal.buildTemplateSnapshot(record, options)
     local template = buildIdentityTemplate(record)
     local bagContainerID
 
-    Internal.ensureIdentityCard(record, base)
     addAppearanceItems(record, base, template)
-    Internal.ensureFactionDogTag(record, base)
     bagContainerID = addTemplateBag(record, base, template)
     addStartingWeapons(record, base, template)
     SupplyBuilder.Add(record, base, template, bagContainerID)
+    -- A live NPC exposes identity through the record/payload projection. Do
+    -- not let authored legacy template entries reintroduce physical identity
+    -- items into the deterministic baseline.
+    Internal.removeLegacyIdentityItems(record, base, { bumpRevision = false })
 
     base.template.equipmentPoolID = template.startingEquipment.poolID
     base.template.weaponMode = template.startingEquipment.weaponMode

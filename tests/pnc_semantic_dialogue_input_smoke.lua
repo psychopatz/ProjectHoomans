@@ -288,7 +288,7 @@ T.equal(view.session.semanticDialoguePending.rawText,
 view.session.semanticDialoguePending = nil
 
 local part = Input.CreatePart({ x = 1, y = 2, width = 3, height = 4 }, {})
-T.equal(part.options.partID, "semanticInput", "input factory owns its part id")
+T.equal(part.options.partID, "llmInput", "input factory owns its part id")
 T.equal(part.options.submit, Input.Submit, "input factory binds hybrid submit")
 
 local startupState = Input.GetState(nil)

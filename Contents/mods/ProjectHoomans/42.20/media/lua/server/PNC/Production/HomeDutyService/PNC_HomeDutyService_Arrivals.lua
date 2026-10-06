@@ -12,9 +12,29 @@ if PNC.Travel and PNC.Travel.Arrivals then
     PNC.Travel.Arrivals.StrictActionTypes.colony_home = true
     PNC.Travel.Arrivals.RegisterHandler("colony_home",
         function(record, _, action)
-            local point, reason, base = Service.GetHomePoint(
-                record, action and action.baseId)
+            local point
+            local reason
+            local base = Service.GetBase(record, action and action.baseId)
+            if action and tonumber(action.x) and tonumber(action.y)
+                and base
+            then
+                -- The travel request was already authority-created from a
+                -- validated HomePoint. Commit that exact destination instead
+                -- of resolving the nearest node again at arrival time.
+                point = {
+                    x = tonumber(action.x),
+                    y = tonumber(action.y),
+                    z = tonumber(action.z) or tonumber(record.z) or 0,
+                    radius = math.max(1, tonumber(action.radius) or 3),
+                    homeZoneId = action.homeZoneId or base.baseZoneId,
+                    stockpileNodeId = action.stockpileNodeId,
+                }
+            else
+                point, reason, base = Service.GetHomePoint(
+                    record, action and action.baseId)
+            end
             if not point then return false, reason end
+            if not base then return false, "BASE_NOT_FOUND" end
             local ok, why = H.SetAtHome(record, base, point)
             local courier = record.runtime and record.runtime.storageCourier
             if ok and courier and (courier.state == "RETURNING_HOME"
@@ -35,4 +55,3 @@ if PNC.Travel and PNC.Travel.Arrivals then
 end
 
 return Service
-

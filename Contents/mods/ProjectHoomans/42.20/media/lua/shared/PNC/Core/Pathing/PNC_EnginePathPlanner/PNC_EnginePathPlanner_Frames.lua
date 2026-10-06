@@ -5,6 +5,36 @@ local Internal = Planner.Internal
 local Core = PNC.Core
 local ActorControl = PNC.ActorControl
 
+local function canPumpFrame(record, body)
+    local navigation = record and record.runtime
+        and record.runtime.localNavigation or nil
+    local bodyInternal = PNC.BodyLifecycle
+        and PNC.BodyLifecycle.Internal or nil
+    local liveState = PNC.Const and PNC.Const.PRESENCE_LIVE or "live"
+    if record and record.presenceState
+        and record.presenceState ~= liveState
+    then
+        return false, "presence_not_live"
+    end
+    if navigation and navigation.presenceRevision ~= nil
+        and navigation.presenceRevision ~= record.presenceRevision
+    then
+        return false, "stale_presence_revision"
+    end
+    if navigation and navigation.bodyLease ~= nil
+        and (not record.runtime
+            or navigation.bodyLease ~= record.runtime.bodyLease)
+    then
+        return false, "stale_body_lease"
+    end
+    if bodyInternal and bodyInternal.matchesRecordBody
+        and bodyInternal.matchesRecordBody(record, body) ~= true
+    then
+        return false, "body_lease_mismatch"
+    end
+    return true
+end
+
 local function recordSinglePlayerNativeFrame(
     record,
     body,
@@ -48,6 +78,25 @@ local function recordSinglePlayerNativeFrame(
 end
 
 function Planner.PumpFrame(record, body)
+    local canPump, pumpReason = canPumpFrame(record, body)
+    if not canPump then
+        local bodyInternal = PNC.BodyLifecycle
+            and PNC.BodyLifecycle.Internal or nil
+        local owned = true
+        if bodyInternal and bodyInternal.matchesRecordBody then
+            owned = bodyInternal.matchesRecordBody(record, body) == true
+        end
+        if owned and Internal.ClearEngineRequest then
+            Internal.ClearEngineRequest(
+                body,
+                record and record.runtime
+                    and record.runtime.localNavigation or nil
+            )
+        elseif record and record.runtime then
+            record.runtime.localNavigation = nil
+        end
+        return false, pumpReason
+    end
     if Core and Core.IsAuthority and not Core.IsAuthority() then
         return false, "client_replica"
     end

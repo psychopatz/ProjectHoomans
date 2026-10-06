@@ -23,6 +23,8 @@ local NETWORK_PAYLOAD_AUDIT_SETTING_ID = "ProjectHoomans.NetworkPayloadAudit"
 local BUILD_AUDIT_SETTING_ID = "ProjectHoomans.BuildAudit"
 local NATIVE_HANDOFF_AUDIT_SETTING_ID =
     "ProjectHoomans.NativeHandoffAudit"
+local PRESENCE_TRAVERSAL_AUDIT_SETTING_ID =
+    "ProjectHoomans.PresenceTraversalAudit"
 local function initializeCentralDebugSettings()
     local settings = PsychopatzCore and PsychopatzCore.DebugSettings
     if not settings or type(settings.Register) ~= "function" then
@@ -191,6 +193,18 @@ local function initializeCentralDebugSettings()
             Diagnostics.NativeHandoffAuditEnabled = enabled == true
         end,
     })
+    settings.Register({
+        id = PRESENCE_TRAVERSAL_AUDIT_SETTING_ID,
+        source = "Project Hoomans",
+        order = 165,
+        title = "Presence and traversal audit",
+        description = "Traces live/abstract handoff, body leases, unloaded chunks, and bounded movement recovery for every NPC.",
+        defaultEnabled = false,
+        runtimeMutable = true,
+        apply = function(enabled)
+            Diagnostics.PresenceTraversalAuditEnabled = enabled == true
+        end,
+    })
     Diagnostics.Enabled = settings.IsEnabled(PERFORMANCE_SETTING_ID) == true
     Diagnostics.TimingEnabled = Diagnostics.Enabled
         and Diagnostics.TimingEnabled ~= false
@@ -223,6 +237,8 @@ local function initializeCentralDebugSettings()
         BUILD_AUDIT_SETTING_ID) == true
     Diagnostics.NativeHandoffAuditEnabled = settings.IsEnabled(
         NATIVE_HANDOFF_AUDIT_SETTING_ID) == true
+    Diagnostics.PresenceTraversalAuditEnabled = settings.IsEnabled(
+        PRESENCE_TRAVERSAL_AUDIT_SETTING_ID) == true
 end
 
 initializeCentralDebugSettings()

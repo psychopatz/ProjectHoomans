@@ -143,6 +143,12 @@ function ISButton:setEnable(value)
 end
 
 ISPanel = {}
+function ISPanel:derive(name)
+    local child = { Type = name }
+    child.__index = child
+    setmetatable(child, { __index = self })
+    return child
+end
 ISScrollingListBox = {}
 ISTextEntryBox = {}
 function ISTextEntryBox:new(text, x, y, width, height)

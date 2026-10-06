@@ -9,6 +9,7 @@ local function groupKey(row)
         row.favorite == true and "favorite" or "ordinary",
         row.equipped == true and "equipped" or "carried",
         row.restricted == true and "restricted" or "interactive",
+        row.virtual == true and "virtual" or "physical",
         row.aggregate == true and "aggregate" or "physical",
         tostring(row.stateKey or ""),
     }, "\031")

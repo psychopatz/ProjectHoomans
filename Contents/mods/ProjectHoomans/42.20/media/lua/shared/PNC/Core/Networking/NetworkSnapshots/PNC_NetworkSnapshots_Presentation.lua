@@ -42,6 +42,12 @@ function Parts.BuildIdentityOwnershipSummary(record)
 end
 
 function Parts.BuildTravelSummary(record, includeRoute)
+    if PNC.Travel and PNC.Travel.Service
+        and PNC.Travel.Service.IsFollowOwned
+        and PNC.Travel.Service.IsFollowOwned(record)
+    then
+        return nil
+    end
     return PNC.Travel
         and PNC.Travel.Model
         and PNC.Travel.Model.BuildSummary

@@ -10,6 +10,31 @@ local Inventory = PNC.Inventory
 local Internal = Inventory.Internal
 local Core = PNC.Core
 
+local function buildIdentityMetadata(record)
+    local factionID = record and record.affiliation
+        and record.affiliation.factionID or record and record.factionID
+    local faction
+    local factionName
+    if factionID and PNC.Factions then
+        if type(PNC.Factions.GetPresentation) == "function" then
+            faction = PNC.Factions.GetPresentation(factionID)
+        elseif type(PNC.Factions.Get) == "function" then
+            faction = PNC.Factions.Get(factionID)
+        end
+    end
+    factionName = faction and tostring(faction.name or "")
+        or record and (record.factionName
+            or record.corpse and record.corpse.factionName) or nil
+    return {
+        npcId = record and tostring(record.id or "") or "",
+        displayName = record and tostring(
+            record.name or record.displayName or "Unknown NPC"
+        ) or "Unknown NPC",
+        factionID = factionID and tostring(factionID) or nil,
+        factionName = factionName ~= "" and factionName or nil,
+    }
+end
+
 local function buildSummaryPayload(record, inv)
     local raw = record and record.persistedInventory or nil
     local persistedSummary = raw and (raw.summary or raw.inventorySummary) or nil
@@ -95,6 +120,7 @@ function Inventory.BuildFullPayload(record)
         persistenceMode = inv.persistenceMode,
         template = Core.DeepCopy(inv.template or {}),
         summary = buildSummaryPayload(record, inv),
+        identityMetadata = buildIdentityMetadata(record),
         equipped = Core.DeepCopy(inv.equipped or {}),
         worn = Core.DeepCopy(inv.worn or {}),
         attached = Core.DeepCopy(inv.attached or {}),
@@ -133,6 +159,7 @@ function Inventory.BuildDeltaPayload(record, sinceRevision)
             inventoryRevision = inv.revision,
             ops = {},
             summary = Inventory.BuildSummaryPayload(record),
+            identityMetadata = buildIdentityMetadata(record),
             equipment = Core.DeepCopy(record.equipment or {}),
         }
     end
@@ -144,6 +171,7 @@ function Inventory.BuildDeltaPayload(record, sinceRevision)
             fromRevision = sinceRevision,
             inventoryRevision = inv.revision,
             fullRequired = true,
+            identityMetadata = buildIdentityMetadata(record),
         }
     end
     local expectedRevision = sinceRevision
@@ -158,6 +186,7 @@ function Inventory.BuildDeltaPayload(record, sinceRevision)
                     fromRevision = sinceRevision,
                     inventoryRevision = inv.revision,
                     fullRequired = true,
+                    identityMetadata = buildIdentityMetadata(record),
                 }
             end
             payload[#payload + 1] = Core.DeepCopy(entry.op)
@@ -172,6 +201,7 @@ function Inventory.BuildDeltaPayload(record, sinceRevision)
             fromRevision = sinceRevision,
             inventoryRevision = inv.revision,
             fullRequired = true,
+            identityMetadata = buildIdentityMetadata(record),
         }
     end
     return {
@@ -180,6 +210,7 @@ function Inventory.BuildDeltaPayload(record, sinceRevision)
         inventoryRevision = inv.revision,
         ops = payload,
         summary = Inventory.BuildSummaryPayload(record),
+        identityMetadata = buildIdentityMetadata(record),
         equipment = Core.DeepCopy(record.equipment or {}),
     }
 end

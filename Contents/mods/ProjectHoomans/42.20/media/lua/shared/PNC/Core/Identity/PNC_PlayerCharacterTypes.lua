@@ -84,6 +84,7 @@ function Types.NormalizeStartingCompanionGrant(value)
         selectedAt = timestamp(value.selectedAt, 0),
         grantedAt = timestamp(value.grantedAt, 0),
         enrichmentVersion = revision(value.enrichmentVersion),
+        relationshipKeyVersion = revision(value.relationshipKeyVersion),
     }
 end
 

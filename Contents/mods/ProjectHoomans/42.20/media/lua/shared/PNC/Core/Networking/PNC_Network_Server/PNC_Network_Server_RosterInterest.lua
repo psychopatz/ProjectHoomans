@@ -5,6 +5,21 @@ local Const = PNC.Const
 local ServerState = Network.ServerState
 local ScalingDiagnostics = PNC.PerformanceScalingDiagnostics
 
+local function hasHostedLocalPlayer()
+    local count
+    local i
+    if type(getNumActivePlayers) ~= "function"
+        or type(getSpecificPlayer) ~= "function"
+    then
+        return false
+    end
+    count = tonumber(getNumActivePlayers()) or 0
+    for i = 0, count - 1 do
+        if getSpecificPlayer(i) then return true end
+    end
+    return false
+end
+
 local function recordPayloadDiagnostics(eventName)
     local eventKey
     if not ScalingDiagnostics
@@ -261,6 +276,23 @@ function Network.FlushRosterDeltas(now, force)
             entries = entries,
         })
     end)
+    -- Singleplayer normally enumerates the local player through
+    -- Core.ForEachPlayer. Keep a guarded loopback fallback for startup/load
+    -- phases where that list is not populated yet; this remains one coalesced
+    -- roster payload, not a per-frame presence tick.
+    if triggerEvent
+        and ((not isServer or not isServer()) or hasHostedLocalPlayer())
+    then
+        triggerEvent(
+            "OnServerCommand",
+            Const.MODULE,
+            Const.CMD_ROSTER_DELTA,
+            {
+                directoryRevision = ServerState.rosterRevision,
+                entries = entries,
+            }
+        )
+    end
     ServerState.rosterDeltas = {}
     ServerState.lastRosterFlushAt = now
     return #entries

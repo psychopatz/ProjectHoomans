@@ -49,6 +49,22 @@ T.truthy(
 )
 T.equal(logCount, 1, "enabled follower audit emits one log")
 
+local beforeBoundedBurst = logCount
+for i = 1, 40 do
+    Diagnostics.LogFollowerPresence("client_presence_position", {
+        "npc=npc-" .. tostring(i),
+    })
+end
+T.equal(
+    logCount - beforeBoundedBurst,
+    8,
+    "position audit is capped per time window"
+)
+T.truthy(
+    (Diagnostics.FollowerPresenceAuditBudget.dropped or 0) > 0,
+    "bounded follower audit records dropped events without logging them"
+)
+
 definition.apply(false)
 T.falsy(
     Diagnostics.IsFollowerPresenceAuditEnabled(),
@@ -58,6 +74,30 @@ T.falsy(
     Diagnostics.LogFollowerPresence("disabled_again", { "unexpected=true" }),
     "disabled follower audit remains silent"
 )
-T.equal(logCount, 1, "disabled follower audit has no logger overhead")
+T.equal(logCount, 9, "disabled follower audit has no logger overhead")
+
+local traversalDefinition = definitions["ProjectHoomans.PresenceTraversalAudit"]
+T.truthy(traversalDefinition, "presence traversal setting was registered")
+T.falsy(traversalDefinition.defaultEnabled, "traversal audit defaults off")
+T.truthy(traversalDefinition.runtimeMutable, "traversal audit is runtime mutable")
+T.falsy(
+    Diagnostics.IsPresenceTraversalAuditEnabled(),
+    "traversal audit starts disabled"
+)
+traversalDefinition.apply(true)
+T.truthy(
+    Diagnostics.IsPresenceTraversalAuditEnabled(),
+    "traversal audit applies at runtime"
+)
+T.truthy(
+    Diagnostics.LogPresenceTraversal("enabled", { "expected=true" }),
+    "enabled traversal audit logs"
+)
+T.equal(logCount, 10, "enabled traversal audit emits one log")
+traversalDefinition.apply(false)
+T.falsy(
+    Diagnostics.IsPresenceTraversalAuditEnabled(),
+    "traversal audit can be disabled at runtime"
+)
 
 T.finish("pnc_follower_presence_diagnostics_smoke")

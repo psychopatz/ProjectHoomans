@@ -52,8 +52,9 @@ Const.FOLLOW_CATCHUP_EXIT_DISTANCE = 6.0
 Const.FOLLOW_OWNER_COMBAT_MEMORY_MS = 1400
 -- An abstract follower must not silently walk to its anchor when the owner
 -- cannot be resolved: for a colonist that anchor is the base it already stands
--- on, so the failure looks like "following" while nothing can move. Retry owner
--- resolution for this many decision ticks, then fall back to the anchor.
+-- on, so the failure looks like "following" while nothing can move. Keep this
+-- value as a compatibility/debug threshold; the abstract resolver now uses a
+-- bounded cadence and does not abandon an active follow order at this count.
 Const.FOLLOW_OWNER_RESOLVE_MAX_ATTEMPTS = 5
 Const.FOLLOW_PATH_BLOCKED_COOLDOWN_MS = 1200
 Const.NPC_GROUNDED_RECOVERY_MS = 1400

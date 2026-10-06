@@ -41,6 +41,46 @@ local function workReason(info)
         or string.lower(string.gsub(reason, "_", " "))
 end
 
+local function fishingItemName(fullType)
+    fullType = tostring(fullType or "")
+    if fullType == "" then return nil end
+    if type(getItemNameFromFullType) == "function" then
+        local resolved = getItemNameFromFullType(fullType)
+        if resolved and tostring(resolved) ~= "" then
+            return tostring(resolved)
+        end
+    end
+    local shortType = string.match(fullType, "([^%.]+)$") or fullType
+    return string.gsub(shortType, "_", " ")
+end
+
+local function isFishingInformation(info)
+    local behaviorID = string.lower(tostring(info and info.behaviorId or ""))
+    local orderKind = string.lower(tostring(info and info.orderKind or ""))
+    return info and info.kind == "behavior"
+        and (orderKind == "fishing"
+            or string.find(behaviorID, "fishing", 1, true) == 1)
+end
+
+function Presentation.Fishing(info)
+    local label = Shared.Tr("UI_PNC_Job_Fishing", "FISHING")
+    local phase = string.upper(tostring(info and info.phase or ""))
+    local text = phase ~= "" and label .. " (" .. phase .. ")" or label
+    local attempts = tonumber(info and info.attemptIndex) or 0
+    local catches = tonumber(info and info.catches) or 0
+    local lastCatch = fishingItemName(info and info.lastCatchItemType)
+    if info and info.lastSuccess == false and attempts > 0 then
+        text = text .. " - "
+            .. Shared.Tr("UI_PNC_Fishing_NoCatch", "NO CATCH")
+    end
+    if lastCatch then
+        text = text .. " - "
+            .. Shared.Tr("UI_PNC_Fishing_LastCatch", "LAST CATCH")
+            .. ": " .. lastCatch .. " x" .. tostring(catches)
+    end
+    return text
+end
+
 function Presentation.Current(person)
     local info = person and person.actionInformation or nil
     if type(info) ~= "table" then
@@ -66,6 +106,9 @@ function Presentation.Current(person)
     end
     if info.kind == "at_home" then
         return Shared.Tr("UI_PNC_Action_Idle", "Idle")
+    end
+    if isFishingInformation(info) then
+        return Presentation.Fishing(info)
     end
     if info.kind == "treatment" then
         local label = Shared.Tr("UI_PNC_Task_MedicalCare", "MEDICAL CARE")

@@ -2,6 +2,10 @@ local T = require "tests/support/test"
 
 T.addPackagePaths()
 
+getItemNameFromFullType = function(fullType)
+    return fullType == "Base.SmallmouthBass" and "Smallmouth Bass" or nil
+end
+
 local Presentation = T.load("ProjectHoomans", "client",
     "PNC/UI/Colonist/PNC_ColonistActivityPresentation.lua")
 
@@ -30,6 +34,15 @@ local dual = Presentation.Current({
         fallback = "Drinking", activityConsumptionMode = "dual",
     },
 })
+local fishing = Presentation.Current({
+    name = "Fisher", activity = "working",
+    actionInformation = {
+        kind = "behavior", behaviorId = "Fishing:WORKING",
+        orderKind = "fishing", phase = "WORKING", attemptIndex = 4,
+        catches = 2, lastSuccess = true,
+        lastCatchItemType = "Base.SmallmouthBass",
+    },
+})
 
 T.contains(work, "CORPSE HAUL",
     "roster exposes the actual work operation")
@@ -41,5 +54,7 @@ T.contains(treatment, "MEDICAL CARE (bandaging)",
     "roster does not expose canonical treatment activity")
 T.equal(dual, "CONSUMING",
     "roster uses a neutral label for dual-purpose consumption")
+T.contains(fishing, "LAST CATCH: Smallmouth Bass x2",
+    "roster exposes the latest remote fishing catch")
 
 T.finish("pnc_colonist_selector_activity_smoke")

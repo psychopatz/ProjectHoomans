@@ -6,6 +6,7 @@ local now = 1000
 local fallbackCalls = 0
 local completeCalls = 0
 local warningCalls = 0
+local invalidateCalls = 0
 
 PNC = {
     Core = {
@@ -26,6 +27,12 @@ PNC = {
             return true
         end,
     },
+    EnginePathPlanner = {
+        Invalidate = function()
+            invalidateCalls = invalidateCalls + 1
+            return true
+        end,
+    },
     PathService = { Internal = {} },
 }
 
@@ -40,6 +47,14 @@ end
 Internal.logMoveWarning = function()
     warningCalls = warningCalls + 1
 end
+Internal.tryNativeStallPassage = function()
+    return false
+end
+Internal.applyHoldAnimation = function() end
+Internal.isAtGoal = function()
+    return false
+end
+Internal.PROGRESS_TIMEOUT_MS = 100
 Internal.noteNativeGoalFailure = function()
     error("follow native failure must recover before the goal circuit breaker")
 end
@@ -65,6 +80,7 @@ local lane = {
     goal = goal,
     intentReason = "follow_owner_walk",
     requestedOrder = "follow",
+    navigationProvider = "engine_path",
     lastProgressAt = now,
     lastGoalProgressAt = now,
 }
@@ -75,7 +91,7 @@ local handled, state = Internal.recordNativeMove(
     body,
     lane,
     navigation,
-    {},
+    PNC.EnginePathPlanner,
     now,
     "engine_path_failed",
     body:getX(),
@@ -83,17 +99,50 @@ local handled, state = Internal.recordNativeMove(
     body:getZ()
 )
 
-T.truthy(handled and state == "native_path_fallback",
-    "follow native failure did not activate movement fallback")
-T.equal(fallbackCalls, 1,
-    "follow native failure did not call the navigation fallback")
+T.truthy(handled and state == "native_repath",
+    "follow native failure did not request a native replan")
+T.equal(fallbackCalls, 0,
+    "follow native failure incorrectly activated fake locomotion")
 T.equal(completeCalls, 0,
     "follow native failure incorrectly completed the move as blocked")
-T.equal(warningCalls, 1,
-    "follow native fallback was not diagnosed")
+T.equal(warningCalls, 0,
+    "follow native replan emitted an unbounded warning")
+T.equal(invalidateCalls, 1,
+    "follow native failure did not invalidate the stale native request")
 T.truthy(lane.goal == goal,
-    "follow native fallback discarded the active owner goal")
-T.truthy(lane.ownerMode == "fake_locomotion",
-    "follow native fallback did not transfer lane ownership")
+    "follow native replan discarded the active owner goal")
+T.truthy(lane.ownerMode == "native_backoff",
+    "follow native replan did not retain native lane ownership")
+T.equal(lane.navigationProvider, "engine_path",
+    "follow native replan changed the movement provider")
+
+local stalledLane = {
+    goal = goal,
+    intentReason = "follow_owner_walk",
+    requestedOrder = "follow",
+    navigationProvider = "engine_path",
+    lastProgressAt = 0,
+    lastGoalProgressAt = 0,
+}
+local stalledHandled, stalledState = Internal.recordNativeMove(
+    record,
+    body,
+    stalledLane,
+    navigation,
+    PNC.EnginePathPlanner,
+    now,
+    "native_path_moving",
+    body:getX(),
+    body:getY(),
+    body:getZ()
+)
+T.truthy(stalledHandled and stalledState == "native_repath",
+    "follow native stall did not request a native replan")
+T.equal(fallbackCalls, 0,
+    "follow native stall incorrectly activated fake locomotion")
+T.equal(completeCalls, 0,
+    "follow native stall incorrectly completed the move")
+T.truthy(stalledLane.ownerMode == "native_backoff",
+    "follow native stall did not retain native lane ownership")
 
 T.finish("pnc_follow_native_failure_smoke")

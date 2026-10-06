@@ -136,7 +136,20 @@ local function restoreJournalAndTravel(record, raw)
                 or tonumber(raw.travel.lastAdvancedWorldHour)
                 or 0
         )
-        if record.travel and PNC.Travel.Model.IsActive(record.travel) then
+        -- Follow owns the canonical position through the presence lane. An
+        -- older save may contain a terminal or active home journey beside a
+        -- durable Follow order; retaining that route lets load-time travel
+        -- reconciliation replay the base destination over the follower.
+        -- Keep the saved position/order and retire the stale route instead.
+        if record.travel
+            and tostring(record.orderSpec and record.orderSpec.kind or "")
+                == tostring(Const.ORDER_FOLLOW or "follow")
+        then
+            record.travel = nil
+            if PNC.Registry and PNC.Registry.MarkDirty then
+                PNC.Registry.MarkDirty(record, "follow_travel_reconciled")
+            end
+        elseif record.travel and PNC.Travel.Model.IsActive(record.travel) then
             record.orderSpec = {
                 kind = Const.ORDER_TRAVEL or "travel",
                 journeyId = record.travel.journeyId,

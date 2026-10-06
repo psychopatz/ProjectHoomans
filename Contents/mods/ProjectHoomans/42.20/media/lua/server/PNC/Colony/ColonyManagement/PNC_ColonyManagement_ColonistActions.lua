@@ -91,6 +91,13 @@ local function colonistHomeAction(player, args, recover)
     if recover == true then
         return PNC.HomeDutyService.Recover(record, args.baseId)
     end
+    if PNC.HomeDutyService.Internal
+        and PNC.HomeDutyService.Internal.CancelActiveTask
+    then
+        local stopped, stopReason = PNC.HomeDutyService.Internal.CancelActiveTask(
+            record, "return_home_requested")
+        if stopped == false then return false, stopReason end
+    end
     if PNC.WorkService and PNC.WorkService.Commands
         and PNC.WorkService.Commands.ReleaseWorker
         and record.runtime and record.runtime.workOrderId
@@ -98,7 +105,9 @@ local function colonistHomeAction(player, args, recover)
         PNC.WorkService.Commands.ReleaseWorker(record.id, "return_home_requested")
     end
     return PNC.HomeDutyService.SendHome(
-        record, args.baseId, "player_requested")
+        record, args.baseId, "player_requested", {
+            allowFollowOverride = true,
+        })
 end
 
 local function colonistFollowAction(player, args)

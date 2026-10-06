@@ -144,10 +144,10 @@ local function playerRadioActive(player)
     return ok and device ~= nil
 end
 
--- Radio relay lets an owner reach a colonist who is out of earshot, on another
--- floor, or currently abstract, provided both ends carry working radio gear.
--- Only definitions that opt in with radioRelay = true are eligible, so the
--- proximity-only verbs keep the strict CanPlayerCommand contract.
+-- Radio relay lets an owner reach commands, including Follow Me, when they
+-- are out of earshot, on another floor, or currently abstract, provided both
+-- ends carry working radio gear. Only definitions that opt in with
+-- radioRelay = true are eligible for this path.
 function Commands.CanRelayCommand(record, player, definition)
     local gate = PNC.CommandRelayGate
     local radioGear

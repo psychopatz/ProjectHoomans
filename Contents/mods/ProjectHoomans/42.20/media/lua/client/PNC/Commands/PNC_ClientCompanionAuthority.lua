@@ -92,6 +92,30 @@ function Authority.IsCompanion(record)
         and record.recruited == true
 end
 
+local function playerRadioActive(player)
+    local deviceState = PsychopatzCore and PsychopatzCore.RadioDeviceState
+        or nil
+    local ok
+    local device
+    if not deviceState
+        or type(deviceState.FindActivePlayerDevice) ~= "function"
+        or not player
+    then
+        return false
+    end
+    ok, device = pcall(deviceState.FindActivePlayerDevice, player)
+    return ok and device ~= nil
+end
+
+local function npcRadioActive(record)
+    local radioGear = record and record.radioGear
+    local equipment = PNC.Equipment
+    local gear = equipment and equipment.RadioGear or nil
+    if radioGear and radioGear.equipped == true then return true end
+    return gear and type(gear.HasEquipped) == "function"
+        and gear.HasEquipped(record) == true or false
+end
+
 local function livePosition(record)
     local registry = PNC.Registry
     local zombie = registry and type(registry.GetLiveZombie) == "function"
@@ -107,14 +131,15 @@ end
 --[[
     Commandability. Tries the authoritative check first, then reproduces the
     same rules from replicated state: recruited, owned, live, same floor, within
-    the command radius.
+    the command radius. Abstract records require the separate radio relay gate.
 ]]
 function Authority.CanPlayerCommand(record, player, radius)
     if type(record) ~= "table" or not player then
         return false, "invalid_player"
     end
     if Commands and type(Commands.CanPlayerCommand) == "function"
-        and Commands.CanPlayerCommand(record, player, radius) == true
+        and Commands.CanPlayerCommand(
+            record, player, radius) == true
     then
         return true, "commandable"
     end
@@ -155,6 +180,33 @@ function Authority.CanPlayerCommand(record, player, radius)
         return false, "too_far"
     end
     return true, "commandable"
+end
+
+-- Client affordance for an abstract Follow Me command. Abstract records are
+-- never directly commandable; Follow Me becomes available only when the same
+-- two-way radio relay gate used by the server can be satisfied.
+function Authority.CanRelayCommand(record, player, commandID)
+    local gate = PNC.CommandRelayGate
+    local definition = Commands and Commands.Get
+        and Commands.Get(commandID) or nil
+    if type(record) ~= "table" or not player then
+        return false, "invalid_player"
+    end
+    if not gate or type(gate.Evaluate) ~= "function" then
+        return false, "relay_unavailable"
+    end
+    if not definition or definition.radioRelay ~= true then
+        return false, "relay_not_allowed"
+    end
+    return gate.Evaluate({
+        companion = Authority.IsCompanion(record) == true,
+        owned = Authority.IsOwnedByPlayer(record, player) == true,
+        dead = record.alive == false,
+        reachableDirectly = false,
+        relayAllowed = true,
+        playerRadio = playerRadioActive(player),
+        npcRadio = npcRadioActive(record),
+    })
 end
 
 return Authority

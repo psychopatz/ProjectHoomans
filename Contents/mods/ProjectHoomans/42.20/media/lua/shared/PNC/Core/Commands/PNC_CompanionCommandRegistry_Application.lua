@@ -95,7 +95,15 @@ local function prepareFollowOrder(record, player)
     end
 
     local travel = PNC.Travel
-    if travel and travel.Service and travel.Model
+    if travel and travel.Service
+        and type(travel.Service.Supersede) == "function"
+    then
+        local superseded, supersedeReason = travel.Service.Supersede(
+            record, "companion_follow_requested")
+        if superseded == false and supersedeReason ~= "journey_missing" then
+            return false, supersedeReason or "TRAVEL_SUPERSEDE_FAILED"
+        end
+    elseif travel and travel.Service and travel.Model
         and type(travel.Service.Cancel) == "function"
         and type(travel.Model.IsActive) == "function"
         and travel.Model.IsActive(record.travel)

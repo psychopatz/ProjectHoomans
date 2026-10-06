@@ -314,6 +314,9 @@ end
 function Service.GetCurrentTarget(recordOrID)
     local record = Internal.ResolveRecord(recordOrID)
     local journey = record and record.travel or nil
+    if Service.IsFollowOwned and Service.IsFollowOwned(record) then
+        return nil
+    end
     if not journey or not journey.route then return nil end
     local segment = journey.route.segments
         and journey.route.segments[journey.segmentIndex] or nil
@@ -334,7 +337,11 @@ end
 function Service.OnMaterialized(record)
     local journey = record and record.travel or nil
     local body
-    if not journey then return end
+    if not journey
+        or (Service.IsFollowOwned and Service.IsFollowOwned(record))
+    then
+        return
+    end
     clearLiveStallState(journey)
     Service.Advance(record, Internal.WorldHour())
     -- Symmetric with OnAbstracted: the fresh body is the source of truth for
@@ -352,7 +359,11 @@ end
 
 function Service.OnAbstracted(record, body)
     local journey = record and record.travel or nil
-    if not journey then return end
+    if not journey
+        or (Service.IsFollowOwned and Service.IsFollowOwned(record))
+    then
+        return
+    end
     if body then
         Service.SyncLivePosition(record, body, Internal.WorldHour())
     end

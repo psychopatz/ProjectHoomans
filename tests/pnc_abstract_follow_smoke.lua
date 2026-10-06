@@ -149,14 +149,31 @@ T.equal(loggedField("moved=false"), "abstract_follow_tick",
 moveRefusalReason = nil
 record.runtime.facilityActivity = nil
 
+-- Even if the resolver provider is unavailable for one abstract tick, the
+-- follow lane must hold position rather than falling back to the home anchor.
+local savedResolution = PNC.BehaviorCompanion.Internal.AbstractFollowOwnerResolution
+local savedResolve = savedResolution.Resolve
+savedResolution.Resolve = nil
+record.testOwner = nil
+local unresolvedX = record.x
+local unresolvedY = record.y
+now = now + 3000
+PNC.BehaviorCompanion.Internal.TickAbstractFollowOwner(record, now)
+T.near(record.x, unresolvedX, 0.0001,
+    "fallback abstract follow must not walk to the home anchor")
+T.near(record.y, unresolvedY, 0.0001,
+    "fallback abstract follow must hold its current position")
+savedResolution.Resolve = savedResolve
+
 -- An unresolved owner must not silently walk to the anchor: for a colonist the
 -- anchor is the base it already occupies, which looks like "following" while
--- nothing moves. Retry resolution first, wake presence, then fall back.
+-- nothing moves. Keep retrying on the abstract cadence and recover when the
+-- owner becomes resolvable.
 record.testOwner = nil
 record.runtime.followOwnerResolveAttempts = nil
 local anchorStartX = record.x
 local attempts
-for attempts = 1, 5 do
+for attempts = 1, 6 do
     now = now + 3000
     local attemptX = record.x
     PNC.BehaviorCompanion.Internal.TickAbstractFollowOwner(record, now)
@@ -166,15 +183,17 @@ for attempts = 1, 5 do
         "unresolved owner behavior")
     T.equal(record.runtime.followState.mode, "owner_unresolved",
         "unresolved owner follow mode")
-    T.truthy(record.runtime.forcePresenceCheck == true,
-        "unresolved owner must wake the presence pass")
+    T.falsy(record.runtime.forcePresenceCheck,
+        "unresolved owner must not force a hot presence loop")
 end
--- The next attempt exceeds the budget and falls back to the anchor.
+-- The owner becomes available later; the follower must resume toward the owner
+-- rather than remaining at or returning to its anchor.
+record.testOwner = owner
 now = now + 3000
 PNC.BehaviorCompanion.Internal.TickAbstractFollowOwner(record, now)
-T.truthy(record.x < anchorStartX,
-    "ownerless abstract follower still returns to its anchor after the retry")
-T.equal(record.runtime.followState.mode, "returning_to_anchor",
-    "ownerless abstract follower mode after the retry budget")
+T.truthy(record.x > anchorStartX,
+    "abstract follower did not resume toward its owner")
+T.equal(record.runtime.followState.mode, "abstract_follow",
+    "abstract follower mode after owner recovery")
 
 T.finish("pnc_abstract_follow_smoke")

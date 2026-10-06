@@ -103,12 +103,12 @@ local hydrated = Inventory.EnsureRecordInventory(record, {
     reconcileWaterContainer = false,
 })
 T.equal(hydrated, record.inventory, "hydration returned the record inventory")
-T.equal(Inventory.Internal.countMapEntries(record.inventory.items), 3,
-    "invalid item entries were removed and the identity card was repaired")
+T.equal(Inventory.Internal.countMapEntries(record.inventory.items), 2,
+    "invalid item entries were removed without adding an identity item")
 T.equal(record.inventory.items.invalid_type, nil,
     "unsupported item type was removed")
-T.equal(#record.inventory.containers.root.items, 2,
-    "root membership discarded stale and duplicate IDs while retaining the identity card")
+T.equal(#record.inventory.containers.root.items, 1,
+    "root membership discarded stale and duplicate IDs")
 T.equal(record.inventory.containers.root.items[1], "bottle_root",
     "root item retained its correct container")
 T.equal(#record.inventory.containers.crate.items, 1,

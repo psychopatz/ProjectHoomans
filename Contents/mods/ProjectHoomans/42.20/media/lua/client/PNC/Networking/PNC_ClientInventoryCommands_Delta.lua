@@ -37,6 +37,13 @@ function Internal.ApplyInventoryDelta(args)
         return false
     end
     if incomingRevision == currentRevision then
+        if args.identityMetadata ~= nil then
+            inventory = Core.DeepCopy(inventory)
+            inventory.identityMetadata = Core.DeepCopy(
+                args.identityMetadata
+            )
+            cached.inventory = inventory
+        end
         return #args.ops == 0
     end
     if fromRevision ~= nil and fromRevision ~= currentRevision then
@@ -59,6 +66,9 @@ function Internal.ApplyInventoryDelta(args)
     inventory.summary = Core.DeepCopy(args.summary or inventory.summary or {})
     inventory.summary.revision = tonumber(args.inventoryRevision) or inventory.summary.revision
     inventory.revision = inventory.summary.revision
+    if args.identityMetadata ~= nil then
+        inventory.identityMetadata = Core.DeepCopy(args.identityMetadata)
+    end
     cached.inventory = inventory
     if ClientState.inventoryResyncPending then
         ClientState.inventoryResyncPending[npcID] = nil

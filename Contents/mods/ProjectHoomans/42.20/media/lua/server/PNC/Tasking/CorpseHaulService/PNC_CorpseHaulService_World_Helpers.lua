@@ -7,6 +7,8 @@ PNC.CorpseHaulService.Internal = PNC.CorpseHaulService.Internal or {}
 
 local Service = PNC.CorpseHaulService
 local Internal = Service.Internal
+local Core = PNC.Core
+local Lifecycle = PNC.BodyLifecycle
 
 local Zones = require "PsychopatzCore/World/PC_ZoneRegistry"
 local GridRegion = require "PsychopatzCore/World/PC_GridRegion"
@@ -164,7 +166,10 @@ function Service.GetDestinationTileStats(baseOrId)
             and PNC.BaseService.Get(baseOrId) or nil
     local configuration = Internal.configurationFor(base)
     local baseId = tostring(base and base.id or "")
-    local now = Core.Now()
+    local now = Core and Core.Now and Core.Now() or 0
+    Service.Runtime = Service.Runtime or {}
+    Service.Runtime.destinationStatsByBase =
+        Service.Runtime.destinationStatsByBase or {}
     local cached = Service.Runtime.destinationStatsByBase[baseId]
     local region = configuration and configuration.destinationRegion or nil
     local stats

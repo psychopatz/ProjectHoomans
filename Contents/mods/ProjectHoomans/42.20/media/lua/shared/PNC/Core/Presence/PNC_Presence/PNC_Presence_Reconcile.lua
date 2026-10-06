@@ -6,17 +6,25 @@ local Spatial = PNC.SpatialIndex
 
 function Presence.Reconcile(record)
     local nearest
+    local bodyLost
+    local shouldMaterialize
+    local shouldAbstract
     if record.alive == false then return end
     -- A live shell that left the loaded world must be released before anything
     -- else. ShouldMaterialize is consulted first and its forceLive branch
     -- returns true for an already-live record, so Materialize short-circuits
     -- and the abstraction lane would never run: the record would stay paired
     -- with a body the engine already virtualized into an anonymous husk.
-    if record.presenceState == Const.PRESENCE_LIVE
+    bodyLost = record.presenceState == Const.PRESENCE_LIVE
         and PNC.BodyLifecycle
         and PNC.BodyLifecycle.IsRecordBodyLost
         and PNC.BodyLifecycle.IsRecordBodyLost(record) == true
-    then
+    if bodyLost then
+        if Internal.LogTraversal then
+            Internal.LogTraversal(record, "body_lease_lost", nil, {
+                "reason=body_lost",
+            })
+        end
         Presence.Abstract(record, "body_lost")
         return
     end
@@ -25,9 +33,24 @@ function Presence.Reconcile(record)
     record.runtime.nearestPlayerDistSq = nearest and nearest.distSq or nil
     record.runtime.lastPresenceCheckAt = Core.Now()
     record.runtime.forcePresenceCheck = nil
-    if Presence.ShouldMaterialize(record, nearest) then
+    shouldMaterialize = Presence.ShouldMaterialize(record, nearest)
+    shouldAbstract = not shouldMaterialize
+        and Presence.ShouldAbstract(record, nearest)
+    if shouldMaterialize and record.presenceState ~= Const.PRESENCE_LIVE then
+        if Internal.LogTraversal then
+            Internal.LogTraversal(record, "presence_decision", nil, {
+                "decision=materialize",
+                "reason=range_enter",
+            })
+        end
         Presence.Materialize(record, "range_enter", nearest)
-    elseif Presence.ShouldAbstract(record, nearest) then
+    elseif shouldAbstract then
+        if Internal.LogTraversal then
+            Internal.LogTraversal(record, "presence_decision", nil, {
+                "decision=abstract",
+                "reason=range_exit",
+            })
+        end
         Presence.Abstract(record, "range_exit")
     end
 end

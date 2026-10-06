@@ -29,6 +29,9 @@ function Network.BuildPresenceDelta(record)
     local inCombat
     local now = Core.Now()
     local ownership = buildIdentityOwnershipSummary(record)
+    local radioGear = Equipment and Equipment.RadioGear
+        and Equipment.RadioGear.Describe
+        and Equipment.RadioGear.Describe(record) or nil
     local staminaInfo = Stamina and Stamina.BuildSnapshot and Stamina.BuildSnapshot(record) or {}
     local firearmState = Firearms and Firearms.BuildDebugState
         and Firearms.BuildDebugState(record)
@@ -68,6 +71,7 @@ function Network.BuildPresenceDelta(record)
         recruited = ownership.recruited,
         ownerUsername = ownership.ownerUsername,
         ownerOnlineID = ownership.ownerOnlineID,
+        radioGear = radioGear,
         presenceState = record.presenceState,
         zombieTargetable = Settings
             and Settings.CanZombieTargetRecord

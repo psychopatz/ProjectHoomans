@@ -239,6 +239,37 @@ function Service.Remove(player, args)
     return { ok = true, event = "StockpileAccessNodeRemoved" }
 end
 
+local function isBetterNode(candidate, distance, best, bestDistance)
+    local candidateID
+    local bestID
+    local candidateZ
+    local bestZ
+    local candidateY
+    local bestY
+    local candidateX
+    local bestX
+    if not bestDistance or distance < bestDistance then return true end
+    if distance > bestDistance or not best then return false end
+    candidateZ = tonumber(candidate.z) or 0
+    bestZ = tonumber(best.z) or 0
+    candidateY = tonumber(candidate.y) or 0
+    bestY = tonumber(best.y) or 0
+    candidateX = tonumber(candidate.x) or 0
+    bestX = tonumber(best.x) or 0
+    if candidateZ ~= bestZ then
+        return candidateZ < bestZ
+    end
+    if candidateY ~= bestY then
+        return candidateY < bestY
+    end
+    if candidateX ~= bestX then
+        return candidateX < bestX
+    end
+    candidateID = tostring(candidate.id or "")
+    bestID = tostring(best.id or "")
+    return candidateID < bestID
+end
+
 function Service.FindNearest(baseId, x, y, z, options)
     options = type(options) == "table" and options or {}
     local base = PNC.BaseService.Get(baseId)
@@ -248,7 +279,9 @@ function Service.FindNearest(baseId, x, y, z, options)
         if validStoredNode(base, node, options.requireLoaded == true) then
             local dx, dy, dz = node.x - x, node.y - y, node.z - z
             local distance = dx * dx + dy * dy + dz * dz
-            if not bestDistance or distance < bestDistance then best, bestDistance = node, distance end
+            if isBetterNode(node, distance, best, bestDistance) then
+                best, bestDistance = node, distance
+            end
         end
     end
     for facilityId, present in pairs(base and base.facilityIds or {}) do
@@ -258,7 +291,7 @@ function Service.FindNearest(baseId, x, y, z, options)
         if node then
             local dx, dy, dz = node.x - x, node.y - y, node.z - z
             local distance = dx * dx + dy * dy + dz * dz
-            if not bestDistance or distance < bestDistance then
+            if isBetterNode(node, distance, best, bestDistance) then
                 best, bestDistance = node, distance
             end
         end

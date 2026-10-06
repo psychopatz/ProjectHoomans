@@ -140,7 +140,10 @@ function Endpoint.LocalDraft(draft)
     end
     function endpoint:rows()
         return Model.BuildNPCRows(
-            self:inventory(), self.selectedContainer, self.expandedGroups
+            self:inventory(),
+            self.selectedContainer,
+            self.expandedGroups,
+            { id = self.id, displayName = self.displayName }
         )
     end
     function endpoint:weight()

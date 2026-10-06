@@ -195,18 +195,28 @@ local function claimKey(zone, spot)
     return tostring(zone.id) .. ":" .. tostring(spot.id)
 end
 
-local function chooseAvailableSpot(zone, record, npcId, excluded)
+local function usesLiveSpotClaim(job)
+    return tostring(job and job.executionMode or "") == "LIVE"
+end
+
+local function chooseAvailableSpot(zone, record, npcId, excluded, executionMode)
     local selected
     local selectedDistance
     local at = H.Now()
+    local live = tostring(executionMode or "") == "LIVE"
     for _, spot in ipairs(zone.fishingSpots or {}) do
         local key = claimKey(zone, spot)
         local claim = Service.Runtime.spotClaims[key]
         if claim and at >= (tonumber(claim.expiresAt) or 0) then
             Service.Runtime.spotClaims[key], claim = nil, nil
         end
-        if (not excluded or excluded[tostring(spot.id)] ~= true)
-            and (not claim or tostring(claim.npcId) == tostring(npcId))
+        local ready = true
+        if live and H.ValidateFishingSpot then
+            ready = H.ValidateFishingSpot(spot)
+        end
+        if ready and (not excluded or excluded[tostring(spot.id)] ~= true)
+            and (not live or not claim
+                or tostring(claim.npcId) == tostring(npcId))
         then
             local value = distanceSq(record, spot.standX, spot.standY)
             if not selected or value < selectedDistance
@@ -225,13 +235,39 @@ local function reserveSpot(zone, job, record)
             break
         end
     end
+    if spot and job.failedSpots
+        and job.failedSpots[tostring(spot.id)] == true
+    then
+        spot = nil
+    end
+    if spot and usesLiveSpotClaim(job) then
+        local valid, validationReason
+        if H.ValidateFishingSpot then
+            valid, validationReason = H.ValidateFishingSpot(spot)
+            if not valid then
+                job.lastSpotValidationReason = validationReason
+                spot = nil
+            end
+        end
+    end
+    if spot and usesLiveSpotClaim(job) then
+        local claim = Service.Runtime.spotClaims[claimKey(zone, spot)]
+        if claim and H.Now() < (tonumber(claim.expiresAt) or 0)
+            and tostring(claim.npcId) ~= tostring(job.npcId)
+        then
+            spot = nil
+        end
+    end
     spot = spot or chooseAvailableSpot(
-        zone, record, job.npcId, job.failedSpots)
+        zone, record, job.npcId, job.failedSpots, job.executionMode)
     if not spot then return nil, "fishing_spot_unavailable" end
-    Service.Runtime.spotClaims[claimKey(zone, spot)] = {
-        npcId = job.npcId, expiresAt = H.Now() + Service.CLAIM_TTL_MS,
-    }
+    if usesLiveSpotClaim(job) then
+        Service.Runtime.spotClaims[claimKey(zone, spot)] = {
+            npcId = job.npcId, expiresAt = H.Now() + Service.CLAIM_TTL_MS,
+        }
+    end
     job.spotId, job.spot = spot.id, H.Copy(spot)
+    job.lastSpotValidationReason = nil
     job.spotClaimNeedsRebind = nil
     return spot
 end
@@ -249,6 +285,10 @@ end
 
 local function renewSpot(job, zone)
     if not job or not zone or not job.spotId then return false end
+    -- Abstract fishing is a logical simulation and does not occupy a live
+    -- shoreline stand. It must continue even when a materialized NPC owns the
+    -- same water pool's physical claim.
+    if not usesLiveSpotClaim(job) then return true end
     local claim = Service.Runtime.spotClaims[
         tostring(zone.id) .. ":" .. tostring(job.spotId)
     ]
@@ -346,6 +386,9 @@ local function updateRuntime(record, job, zone, phase)
         executionMode = job.executionMode,
         lastReason = job.lastReason,
         lastFailureReason = job.lastFailureReason,
+        lastCatchItemType = job.lastCatchItemType,
+        lastCatchAt = job.lastCatchAt,
+        lastCatchAttemptIndex = job.lastCatchAttemptIndex,
         leaseOwner = activeLease and activeLease.owner or nil,
         leasePriority = activeLease and activeLease.priority or nil,
         animationScene = previousAnimation and previousAnimation.scene

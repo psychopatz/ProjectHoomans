@@ -262,6 +262,67 @@ T.equal(
     "debug change feed does not enter social persistence"
 )
 
+-- Legacy player identity keys migrate without losing the relationship record.
+local legacyMigrationKey = PNC.EntityRef.ForPlayerIdentity(
+    "Patrick",
+    "char_migrate"
+)
+local canonicalMigrationKey = PNC.EntityRef.ForPlayerIdentity(
+    "sp_slot_0",
+    "char_migrate"
+)
+PNC.Relationships.SetInitialBaseline(
+    alice.id,
+    legacyMigrationKey,
+    { approval = 85, respect = 70, familiarity = 100 },
+    0
+)
+PNC.Relationships.AddMemory(
+    alice.id,
+    legacyMigrationKey,
+    memory("migration_memory", legacyMigrationKey, {
+        approvalEffect = 0,
+        respectEffect = 0,
+    })
+)
+local migrated, migrationReason = PNC.Relationships.MigrateTargetKey(
+    alice.id,
+    legacyMigrationKey,
+    canonicalMigrationKey,
+    1
+)
+T.equal(migrated, true, "legacy player relationship key migrates")
+T.equal(migrationReason, "migrated", "relationship key migration result")
+T.equal(
+    PNC.Relationships.Get(alice.id, legacyMigrationKey),
+    nil,
+    "legacy relationship key is removed after migration"
+)
+T.equal(
+    PNC.Relationships.GetApproval(alice.id, canonicalMigrationKey),
+    85,
+    "migrated relationship preserves approval"
+)
+T.equal(
+    PNC.Relationships.GetRespect(alice.id, canonicalMigrationKey),
+    70,
+    "migrated relationship preserves respect"
+)
+T.equal(
+    PNC.Relationships.GetFamiliarity(alice.id, canonicalMigrationKey),
+    100,
+    "migrated relationship preserves familiarity"
+)
+local migratedRelationship = PNC.Relationships.Get(
+    alice.id,
+    canonicalMigrationKey
+)
+T.equal(
+    migratedRelationship.memories[1].aboutKey,
+    canonicalMigrationKey,
+    "migrated memory retargets its about key"
+)
+
 -- 6-9. Numeric clamping.
 local clampKey = PNC.EntityRef.ForNPC("npc_clamp")
 local high = PNC.RelationshipTypes.NewRelationship(clampKey)

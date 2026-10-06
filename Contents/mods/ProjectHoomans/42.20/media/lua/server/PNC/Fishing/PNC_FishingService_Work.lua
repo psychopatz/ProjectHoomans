@@ -51,6 +51,7 @@ function Service.TickJob(lease)
         or job and job.executionMode or "ABSTRACT") == "LIVE"
     local body = live and PNC.Registry and PNC.Registry.GetLiveZombie
         and PNC.Registry.GetLiveZombie(npcId) or nil
+    local movementRecovery
     local function finish(ok, complete, reason, details)
         if Service.FishingDiagnostics
             and Service.FishingDiagnostics.RecordTransition
@@ -112,19 +113,33 @@ function Service.TickJob(lease)
             handReady = tool.ready, handReason = tool.reason,
         })
     end
+    local at = H.Now()
+    if job.spotRetryAt and at >= (tonumber(job.spotRetryAt) or 0) then
+        job.failedSpots = nil
+        job.spotRetryAt = nil
+    end
     if not H.RenewFishingSpot(job, zone) then
         local reclaimed = H.ReserveFishingSpot(zone, job, record)
         if not reclaimed then
             job.state, job.phase = "WAITING", "WAITING_FOR_SPOT"
             job.lastReason = "fishing_spot_unavailable"
             job.lastFailureReason = job.lastReason
-            job.lastProgressAt = H.Now()
+            job.spotRetryAt = at + Service.SPOT_RETRY_COOLDOWN_MS
+            job.lastProgressAt = at
             H.UpdateFishingRuntime(record, job, zone, job.phase)
             H.MarkDirty()
             return finish(true, false, job.lastReason, { event = "spot_wait" })
         end
     end
-    local at = H.Now()
+    if live and PNC.PathService
+        and type(PNC.PathService.GetMovementRecoveryState) == "function"
+    then
+        movementRecovery = PNC.PathService.GetMovementRecoveryState(
+            record,
+            body,
+            at
+        )
+    end
     if live and not Service.IsNearby(record, zone, nil, job.spot, body) then
         local distance = distanceToSpot(record, body, job.spot)
         local travel = job.travel or {}
@@ -139,7 +154,17 @@ function Service.TickJob(lease)
         end
         travel.lastDistance = distance
         job.travel = travel
-        if at - (tonumber(travel.lastProgressAt) or at) >= 12000 then
+        -- PathService owns movement progress, retry, fallback, and presence
+        -- handoff. Fishing only reacts after that shared lane explicitly
+        -- reports blocked; its old distance-only watchdog raced native
+        -- recovery and made healthy remote travel look unreachable.
+        local sharedBlocked = movementRecovery
+            and movementRecovery.phase == "blocked"
+        local sharedLaneMissing = movementRecovery == nil
+            or movementRecovery.active ~= true
+        if (sharedBlocked or sharedLaneMissing)
+            and at - (tonumber(travel.lastProgressAt) or at) >= 12000
+        then
             local failedSpot = tostring(job.spotId or "")
             job.failedSpots = job.failedSpots or {}
             job.failedSpots[failedSpot] = true
@@ -148,6 +173,7 @@ function Service.TickJob(lease)
             if replacement and tostring(replacement.id) ~= failedSpot then
                 job.state, job.phase = "READY", "TRAVEL"
                 job.lastReason = "fishing_spot_rerouted"
+                job.spotRetryAt = nil
                 job.travel = nil
                 job.lastProgressAt = at
                 H.UpdateFishingRuntime(record, job, zone, job.phase)
@@ -159,6 +185,7 @@ function Service.TickJob(lease)
             job.state, job.phase = "WAITING", "WAITING_FOR_SPOT"
             job.lastReason = "fishing_spot_unreachable"
             job.lastFailureReason = job.lastReason
+            job.spotRetryAt = at + Service.SPOT_RETRY_COOLDOWN_MS
             job.lastProgressAt = at
             H.UpdateFishingRuntime(record, job, zone, job.phase)
             H.MarkDirty()
@@ -352,6 +379,9 @@ function Service.TickJob(lease)
                     })
             end
             job.catches = (tonumber(job.catches) or 0) + 1
+            job.lastCatchItemType = spec.type
+            job.lastCatchAt = at
+            job.lastCatchAttemptIndex = job.attemptIndex
             if PNC.Skills and PNC.Skills.AddXP then
                 PNC.Skills.AddXP(record, "Fishing", 4)
             end

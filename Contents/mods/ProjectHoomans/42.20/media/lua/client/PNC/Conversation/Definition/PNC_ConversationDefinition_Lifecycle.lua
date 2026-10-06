@@ -1,4 +1,6 @@
 -- Conversation entry points and active-view lifecycle adapters.
+pcall(require, "PNC/Conversation/PNC_ConversationRuntimeDebugOverlay")
+
 PNC = PNC or {}
 PNC.Conversation = PNC.Conversation or {}
 
@@ -102,6 +104,36 @@ function Conversation.Open(entry, player, forcedTime)
     end
     local definition = Conversation.BuildDefinition(entry, player, forcedTime)
     local view = PsychopatzCore.Conversation.Open(definition)
+    if view then
+        -- Core's audit panel is created while Core.Open constructs the view,
+        -- so publish the route marker on the shared view for its live
+        -- component report.  The Hoomans overlay remains the fallback when
+        -- a stale Core copy has no native audit panel.
+        view.pncRouteSource = "PNC.Conversation.Open [Workshop/ProjectHoomans]"
+    end
+    -- Core owns the full view, but this route-level marker is intentionally
+    -- independent of the Core overlay.  It exposes stale/mismatched Core
+    -- copies instead of silently assuming the source trees are loaded.
+    local runtimeDebugEnabled = view
+        and PsychopatzCore
+        and PsychopatzCore.Conversation
+        and type(PsychopatzCore.Conversation.IsRuntimeDebugEnabled)
+            == "function"
+        and PsychopatzCore.Conversation.IsRuntimeDebugEnabled(view.spec)
+    if view and runtimeDebugEnabled and not view.debugOverlay
+        and PNCConversationRuntimeDebugOverlay
+        and type(view.addToUIManager) == "function"
+    then
+        local overlay = PNCConversationRuntimeDebugOverlay:new(view)
+        overlay:initialise()
+        overlay:instantiate()
+        overlay:addToUIManager()
+        if overlay.setAlwaysOnTop then overlay:setAlwaysOnTop(true) end
+        if overlay.bringToTop then overlay:bringToTop() end
+        view.pncRuntimeDebugOverlay = overlay
+    end
+    if view and view.setAlwaysOnTop then view:setAlwaysOnTop(true) end
+    if view and view.bringToTop then view:bringToTop() end
     Relationship.RequestPresentation(definition.npcID)
     if PNC.Client and PNC.Client.RequestNPCKnowledge then
         PNC.Client.RequestNPCKnowledge(definition.npcID)

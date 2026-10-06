@@ -44,6 +44,18 @@ function Service.Start(recordOrID, request)
     then
         return nil, "destination_missing"
     end
+    -- Follow owns the canonical position through the presence lane. A
+    -- generic travel request must not silently steal that ownership (home,
+    -- work, courier, and external callers all converge here). An explicit
+    -- player travel command may opt in to replacing Follow, but implicit
+    -- callers must receive a stable refusal instead of creating a second
+    -- movement owner.
+    if Service.IsFollowOwned
+        and Service.IsFollowOwned(record)
+        and request.allowFollowOverride ~= true
+    then
+        return nil, "FOLLOWING_PLAYER"
+    end
     if Model.IsActive(record.travel) then
         Service.Cancel(record, "replaced")
     end
@@ -170,11 +182,47 @@ function Service.Cancel(recordOrID, reason)
     return Service.SetState(record, "cancelled", reason or "cancelled")
 end
 
+-- Retire a journey whenever another movement owner takes over. Cancel alone
+-- is insufficient for an arrived/cancelled journey: the terminal route still
+-- contains a projected destination and materialization used to replay that
+-- destination over a follower's current abstract position.
+function Service.Supersede(recordOrID, reason)
+    local record = Internal.ResolveRecord(recordOrID)
+    local journey = record and record.travel or nil
+    local cancelled
+    local cancelReason
+    if not record or not journey then
+        return false, "journey_missing"
+    end
+    if Model.IsActive(journey) then
+        cancelled, cancelReason = Service.Cancel(
+            record,
+            reason or "journey_superseded"
+        )
+        if cancelled == false and cancelReason ~= "journey_inactive" then
+            return false, cancelReason or "journey_cancel_failed"
+        end
+    end
+    -- A cancellation listener may replace the journey, so only clear the
+    -- instance that this request actually superseded.
+    if record.travel == journey then
+        record.travel = nil
+        Internal.MarkChanged(record, "travel", "travel_superseded", false)
+    end
+    return true, "travel_superseded"
+end
+
 function Service.Retarget(recordOrID, request)
     local record = Internal.ResolveRecord(recordOrID)
     local previous = record and record.travel or nil
     if not record or not previous then return nil, "journey_missing" end
     request = type(request) == "table" and request or {}
+    if Service.IsFollowOwned
+        and Service.IsFollowOwned(record)
+        and request.allowFollowOverride ~= true
+    then
+        return nil, "FOLLOWING_PLAYER"
+    end
     if type(request.destination) ~= "table"
         and (request.x == nil or request.y == nil)
     then

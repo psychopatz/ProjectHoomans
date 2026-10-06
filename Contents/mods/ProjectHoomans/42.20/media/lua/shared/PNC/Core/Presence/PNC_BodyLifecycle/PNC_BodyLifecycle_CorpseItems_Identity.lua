@@ -3,6 +3,8 @@ local Internal = Lifecycle.Internal
 local CorpseItems =
     require "PsychopatzCore/Inventory/PsychopatzCorpseItems"
 local ID_CARD_SCHEMA_VERSION = 1
+local INJECTION_KEY_FIELD = CorpseItems.INJECTION_KEY_FIELD
+    or "PsychopatzCore_CorpseItemKey"
 
 local function identityCardKey(npcId)
     return "ProjectHoomans:identity-card:" .. tostring(npcId or "")
@@ -69,6 +71,64 @@ local function identityCardSpec(record)
         end,
     }
 end
+
+local function managedIdentityArtifact(item)
+    local modData = item and item.getModData and item:getModData() or nil
+    local key = modData and modData[INJECTION_KEY_FIELD] or nil
+    local fullType = Internal.itemFullType(item)
+    if type(modData) == "table"
+        and (modData.PNC_IDCard == true
+            or modData.PNC_FactionDogTag == true)
+    then
+        return true
+    end
+    key = key and tostring(key) or ""
+    if string.sub(key, 1, string.len("ProjectHoomans:identity-card:"))
+            == "ProjectHoomans:identity-card:"
+        or string.sub(key, 1, string.len("ProjectHoomans:faction-dogtag:"))
+            == "ProjectHoomans:faction-dogtag:"
+    then
+        return true
+    end
+    -- Logical legacy items are stamped by the inventory layer rather than
+    -- CorpseItems, so their PNC ownership is represented by the interaction
+    -- reason/template fields instead of corpse injection ModData.
+    return fullType == "Base.IDcard" and modData
+        and modData.PNC_IDCard == true
+        or fullType == "Base.Necklace_DogTag" and modData
+            and modData.PNC_FactionDogTag == true
+end
+
+function Internal.removeManagedIdentityItems(target)
+    local container
+    local items
+    local stale = {}
+    local index
+    if not target then return 0 end
+    container = target.getContainer and target:getContainer()
+        or target.getInventory and target:getInventory()
+        or nil
+    if not container or not container.getItems or not container.Remove then
+        return 0
+    end
+    items = container:getItems()
+    if not items or not items.size or not items.get then return 0 end
+    for index = 0, items:size() - 1 do
+        if managedIdentityArtifact(items:get(index)) then
+            stale[#stale + 1] = items:get(index)
+        end
+    end
+    for index = 1, #stale do
+        if pcall(container.Remove, container, stale[index]) then
+            if sendRemoveItemFromContainer then
+                pcall(sendRemoveItemFromContainer, container, stale[index])
+            end
+        end
+    end
+    return #stale
+end
+
+Internal.IsManagedIdentityArtifact = managedIdentityArtifact
 
 function Internal.ensureCorpseIdentityCard(record, target)
     local container

@@ -44,6 +44,8 @@ local function normalizeMarker(source, fallbackID)
         createdWorldHour = tonumber(source.createdWorldHour) or 0,
         factionID = source.factionID
             or source.affiliation and source.affiliation.factionID,
+        factionName = normalizeString(source.factionName
+            or source.corpse and source.corpse.factionName),
         infected = source.infected == true,
         colonyOwned = colonyOwned,
         colonist = colonyOwned,
@@ -140,6 +142,7 @@ function Registry.AddDeathMarker(record)
         factionID = PNC.Identity and PNC.Identity.Verifier
             and PNC.Identity.Verifier.GetFactionID(record)
             or record.affiliation and record.affiliation.factionID,
+        factionName = record.corpse and record.corpse.factionName,
         portrait = PNC.Identity
             and PNC.Identity.BuildPortraitSummary
             and PNC.Identity.BuildPortraitSummary(record)

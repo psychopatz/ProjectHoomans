@@ -8,6 +8,13 @@ function Service.Advance(recordOrID, atWorldHour)
     local record = Internal.ResolveRecord(recordOrID)
     local journey = record and record.travel or nil
     if not journey then return nil, false end
+    if Service.IsFollowOwned and Service.IsFollowOwned(record) then
+        -- Follow is driven by the abstract/live presence lane. This guard is
+        -- intentionally broader than terminal-state handling so an old active
+        -- return-home journey cannot win a race with a newly persisted follow
+        -- order either.
+        return journey, false
+    end
     if not Model.IsActive(journey) and journey.state ~= "arrived" then
         -- A cancelled or blocked journey must never re-project its record: it
         -- would overwrite the NPC's authoritative position at the next

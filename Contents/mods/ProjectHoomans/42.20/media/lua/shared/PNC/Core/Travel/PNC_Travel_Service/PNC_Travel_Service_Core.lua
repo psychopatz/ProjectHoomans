@@ -66,6 +66,19 @@ function Service.WorldHour()
     return worldHour()
 end
 
+-- Follow owns the canonical position through the presence lane. A stale
+-- travel journey may still exist in an older save or during an order
+-- transition, but it must never be allowed to project a route over the
+-- owner's current position.
+function Service.IsFollowOwned(record)
+    local order = record and record.orderSpec or nil
+    local runtime = record and record.runtime or nil
+    return tostring(order and order.kind or "")
+            == tostring(Const.ORDER_FOLLOW or "follow")
+        or runtime and runtime.followOrderActive == true
+        or false
+end
+
 function Service.RegisterListener(eventName, listener)
     eventName = tostring(eventName or "")
     if eventName == "" or type(listener) ~= "function" then return false end

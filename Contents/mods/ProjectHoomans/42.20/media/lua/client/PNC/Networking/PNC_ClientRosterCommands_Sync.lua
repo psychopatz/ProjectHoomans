@@ -11,6 +11,14 @@ local storeSnapshot = Internal.StoreSnapshot
 local refreshClientBodyIdentityIndex =
     Internal.RefreshClientBodyIdentityIndex
 
+local function invalidateMapTravelCache()
+    if PNC.MapTravelLayer
+        and PNC.MapTravelLayer.InvalidateEntryCache
+    then
+        PNC.MapTravelLayer.InvalidateEntryCache()
+    end
+end
+
 Internal.RegisterServerCommand(Const.CMD_FULL_SYNC, function(args)
     local snapshots = args.snapshots
     local snapshot
@@ -152,5 +160,6 @@ Internal.RegisterServerCommand(Const.CMD_ROSTER_SYNC_END, function(args)
     ClientState.characterPayloads = {}
     ClientState.rosterRevision = incomingRevision
     clearPendingRoster()
+    invalidateMapTravelCache()
     refreshClientBodyIdentityIndex()
 end)

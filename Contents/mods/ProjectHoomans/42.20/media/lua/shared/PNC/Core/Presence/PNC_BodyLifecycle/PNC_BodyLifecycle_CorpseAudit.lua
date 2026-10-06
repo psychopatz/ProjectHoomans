@@ -40,6 +40,9 @@ function Internal.pumpPendingCorpses()
             end
         end)
         if found and record then
+            if Internal.removeManagedIdentityItems then
+                Internal.removeManagedIdentityItems(found)
+            end
             if Internal.ensureCorpseIdentityCard then
                 Internal.ensureCorpseIdentityCard(record, found)
             end
@@ -143,9 +146,11 @@ function Internal.auditCorpseRecord(record)
         Internal.removeCorpse(duplicate)
     end
     if accepted and Internal.ensureCorpseIdentityCard then
+        local removed = Internal.removeManagedIdentityItems
+            and Internal.removeManagedIdentityItems(accepted) or 0
         local _, _, _, changed =
             Internal.ensureCorpseIdentityCard(record, accepted)
-        identityCardCreated = changed == true
+        identityCardCreated = changed == true or removed > 0
     end
     if accepted and Internal.ensureCorpseFactionDogTag then
         local _, _, _, changed =

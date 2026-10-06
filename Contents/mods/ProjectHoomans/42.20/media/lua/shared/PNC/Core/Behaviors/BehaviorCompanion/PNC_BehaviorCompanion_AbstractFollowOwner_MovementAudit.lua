@@ -68,6 +68,10 @@ function H.LogTick(
             .. "," .. tostring(record.z),
         "target=" .. tostring(targetX) .. "," .. tostring(targetY)
             .. "," .. tostring(targetZ),
+        "targetMode=exact_owner",
+        "handoffRequested=" .. tostring(
+            runtime.abstractFollowMaterializeRequested == true
+        ),
         "distanceBefore=" .. tostring(
             Core.Distance(beforeX, beforeY, targetX, targetY)),
         "distanceAfter=" .. tostring(distanceAfter),

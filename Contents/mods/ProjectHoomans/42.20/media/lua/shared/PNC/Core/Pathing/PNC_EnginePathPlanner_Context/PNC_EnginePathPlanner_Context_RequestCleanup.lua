@@ -97,7 +97,10 @@ function Internal.ClearEngineRequest(body, navigation)
         navigation.lastObservedY = nil
         navigation.lastObservedZ = nil
         navigation.lastPhysicalProgressAt = 0
+        navigation.targetReadinessWaitStartedAt = nil
         navigation.nativeBumpStartedAt = 0
+        navigation.presenceRevision = nil
+        navigation.bodyLease = nil
     end
 end
 

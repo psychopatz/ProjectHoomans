@@ -179,6 +179,9 @@ end
 local function isAbstractFollowRecord(record)
     local runtime
     local order
+    local orderKind
+    local activeJob
+    local activeBehavior
     if not record or record.presenceState ~= Const.PRESENCE_ABSTRACT then
         return false
     end
@@ -187,9 +190,15 @@ local function isAbstractFollowRecord(record)
     if runtime.vehiclePassenger and runtime.vehiclePassenger.active == true then
         return false
     end
-    return tostring(order.kind or "") == tostring(
-        Const.ORDER_FOLLOW or "follow"
-    )
+    orderKind = tostring(order.kind or "")
+    if orderKind ~= "" then
+        return orderKind == tostring(Const.ORDER_FOLLOW or "follow")
+    end
+    activeJob = tostring(record.activeJob or "")
+    activeBehavior = tostring(record.activeBehavior or "")
+    return runtime.followOrderActive == true
+        or activeJob == "FollowOwner"
+        or string.sub(activeBehavior, 1, 11) == "FollowOwner"
 end
 
 local function finishFollowerReconcile(record, job, handled, now)

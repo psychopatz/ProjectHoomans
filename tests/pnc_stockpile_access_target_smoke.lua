@@ -9,6 +9,11 @@ PsychopatzCore = {
 }
 
 local zone = { geometry = { id = "base-zone" } }
+local base = {
+    id = "base:1", baseZoneId = "zone:1",
+    stockpileNodeIds = {}, facilityIds = { ["facility:1"] = true },
+}
+local storedNodes = {}
 package.preload["PsychopatzCore/World/PC_ZoneRegistry"] = function()
     return { get = function(id) return id == "zone:1" and zone or nil end }
 end
@@ -40,12 +45,7 @@ end
 
 PNC = {
     BaseService = {
-        Get = function(id)
-            return id == "base:1" and {
-                id = "base:1", baseZoneId = "zone:1",
-                stockpileNodeIds = {}, facilityIds = { ["facility:1"] = true },
-            } or nil
-        end,
+        Get = function(id) return id == "base:1" and base or nil end,
     },
     SettlementRepository = {
         GetComponent = function(id)
@@ -61,7 +61,7 @@ PNC = {
                 componentIds = { ["component:stockpile"] = true },
             } or nil
         end,
-        GetStockpileNode = function() return nil end,
+        GetStockpileNode = function(id) return storedNodes[id] end,
     },
     PathService = {
         Internal = {
@@ -89,5 +89,17 @@ T.falsy(Service.FindNearest("base:1", 0, 0, 0, {
     requireLoaded = true,
 }), "live work does not target an unloaded stockpile")
 getCell = unloadedCell
+
+-- Equal-distance stored nodes must resolve deterministically. This matters
+-- because the selected node becomes the durable home/facing anchor.
+storedNodes["node-z"] = { id = "node-z", baseId = "base:1",
+    x = 5, y = 5, z = 0, radius = 2 }
+storedNodes["node-a"] = { id = "node-a", baseId = "base:1",
+    x = 5, y = 5, z = 0, radius = 2 }
+base.stockpileNodeIds = { ["node-z"] = true, ["node-a"] = true }
+local tied = Service.FindNearest("base:1", 5, 5, 0)
+T.truthy(tied, "equal-distance stored access nodes resolve")
+T.equal(tied.id, "node-a",
+    "equal-distance home access selection uses a stable node id tie-break")
 
 T.finish("pnc_stockpile_access_target_smoke")

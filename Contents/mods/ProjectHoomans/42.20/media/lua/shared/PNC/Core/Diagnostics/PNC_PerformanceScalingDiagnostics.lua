@@ -71,6 +71,10 @@ Diagnostics.BuildAuditEnabled = false
 -- boundaries, not every frame, so the normal disabled path remains a boolean
 -- read at the callers.
 Diagnostics.NativeHandoffAuditEnabled = false
+-- Presence/traversal tracing is opt-in. It covers every NPC, not only
+-- followers, and is emitted at presence and recovery boundaries rather than
+-- from the ordinary movement tick.
+Diagnostics.PresenceTraversalAuditEnabled = false
 Diagnostics.BuildTraceSequence = tonumber(Diagnostics.BuildTraceSequence) or 0
 Diagnostics.BuildTraceSentAt = Diagnostics.BuildTraceSentAt or {}
 Diagnostics.BuildTraceReceivedAt = Diagnostics.BuildTraceReceivedAt or {}
@@ -240,6 +244,22 @@ end
 
 function Diagnostics.IsNativeHandoffAuditEnabled()
     return Diagnostics.NativeHandoffAuditEnabled == true
+end
+
+function Diagnostics.IsPresenceTraversalAuditEnabled()
+    return Diagnostics.PresenceTraversalAuditEnabled == true
+end
+
+function Diagnostics.SetPresenceTraversalAuditEnabled(enabled)
+    Diagnostics.PresenceTraversalAuditEnabled = enabled == true
+    if Diagnostics.PresenceTraversalAuditEnabled == true then
+        if PNC.Core and PNC.Core.LogInfo then
+            PNC.Core.LogInfo("presence_traversal event=enabled")
+        else
+            print("[PNC][INFO] presence_traversal event=enabled")
+        end
+    end
+    return Diagnostics.PresenceTraversalAuditEnabled
 end
 
 -- This is deliberately a bounded event log. Callers should invoke it only at

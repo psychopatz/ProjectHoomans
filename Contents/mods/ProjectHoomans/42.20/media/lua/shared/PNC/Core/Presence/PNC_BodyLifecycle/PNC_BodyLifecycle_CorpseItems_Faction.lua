@@ -13,6 +13,15 @@ local function factionDogtagMetadata(record)
     local metadata
     local factionID = record and record.affiliation
         and tostring(record.affiliation.factionID or "") or ""
+    local factionName = record and tostring(record.factionName or "") or ""
+    factionID = factionID ~= "" and factionID
+        or tostring(record and record.factionID or "")
+    factionID = factionID ~= "" and factionID
+        or tostring(record and record.corpse
+            and record.corpse.factionID or "")
+    factionName = factionName ~= "" and factionName
+        or tostring(record and record.corpse
+            and record.corpse.factionName or "")
     local faction
     local npcID = tostring(record and record.id or "")
     local inventoryRevision = inv and tonumber(inv.revision) or 0
@@ -57,15 +66,18 @@ local function factionDogtagMetadata(record)
     end
     faction = not metadata and factionID ~= "" and PNC.Factions
         and PNC.Factions.Get and PNC.Factions.Get(factionID) or nil
-    if not metadata and faction and tostring(faction.id or "") ~= ""
-        and tostring(faction.name or "") ~= "" and npcID ~= ""
+    if factionName == "" and faction then
+        factionName = tostring(faction.name or "")
+    end
+    if not metadata and factionID ~= "" and factionName ~= ""
+        and npcID ~= ""
     then
         metadata = {
             PNC_FactionDogTag = true,
             PNC_FactionDogTagVersion = FACTION_DOGTAG_SCHEMA_VERSION,
             PNC_FactionDogTagNPCId = npcID,
-            PNC_FactionDogTagFactionId = tostring(faction.id),
-            PNC_FactionDogTagFactionName = tostring(faction.name),
+            PNC_FactionDogTagFactionId = factionID,
+            PNC_FactionDogTagFactionName = factionName,
         }
     end
     if runtime then

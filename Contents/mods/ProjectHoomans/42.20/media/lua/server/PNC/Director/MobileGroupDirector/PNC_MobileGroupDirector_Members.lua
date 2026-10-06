@@ -32,6 +32,13 @@ function H.FactionMembersAreAbstract(faction)
 end
 
 function H.SetRecordAtSite(record, point, site, faction, mobile)
+    if record and record.orderSpec
+        and tostring(record.orderSpec.kind or "")
+            == tostring(Const.ORDER_FOLLOW or "follow")
+    then
+        -- Mobile-group relocation cannot displace a durable Follow Me order.
+        return false, "FOLLOWING_PLAYER"
+    end
     local order = H.MobileOrder(faction, mobile, site)
     record.x = point.x
     record.y = point.y

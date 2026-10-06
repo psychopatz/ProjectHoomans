@@ -2,6 +2,45 @@
 
 local Internal = PNC.PathService.Internal
 local Diagnostics = PNC.PerformanceScalingDiagnostics
+local Const = PNC.Const or {}
+
+local function isFollowOwnerLane(record, lane)
+    if lane then
+        if string.sub(tostring(lane.intentReason or ""), 1, 12)
+            == "follow_owner"
+        then
+            return true
+        end
+        if tostring(lane.requestedOrder or "")
+            == tostring(Const.ORDER_FOLLOW or "follow")
+        then
+            return true
+        end
+    end
+    return record and record.orderSpec
+        and tostring(record.orderSpec.kind or "")
+            == tostring(Const.ORDER_FOLLOW or "follow")
+        or false
+end
+
+local function auditTraversal(record, eventName, zombie, lane, extra)
+    local presence = PNC.Presence
+    local presenceInternal = presence and presence.Internal or nil
+    local fields
+    if not presenceInternal or not presenceInternal.LogTraversal then
+        return
+    end
+    fields = {
+        "goal=" .. tostring(lane and lane.goal
+            and Internal.describeGoal(lane.goal) or "nil"),
+        "ownerMode=" .. tostring(lane and lane.ownerMode or "nil"),
+        "noProgress=" .. tostring(lane and lane.noProgressCount or 0),
+    }
+    for _, field in ipairs(extra or {}) do
+        fields[#fields + 1] = tostring(field)
+    end
+    presenceInternal.LogTraversal(record, eventName, zombie, fields)
+end
 
 local function prepareBody(zombie, lane, now)
     if lane.navigationProvider ~= "engine_path"
@@ -55,6 +94,9 @@ function Internal.stepScriptedMove(zombie, record, lane, goal, now)
         stepDistance = 0
     end
     if stepped then
+        if PNC.Presence and PNC.Presence.ClearTraversalHandoff then
+            PNC.Presence.ClearTraversalHandoff(record, "scripted_progress")
+        end
         Internal.setWalkAnim(
             zombie,
             record,
@@ -116,6 +158,21 @@ function Internal.stepScriptedMove(zombie, record, lane, goal, now)
             ""
         )
         if lane.noProgressCount >= 2 then
+            auditTraversal(record, "scripted_progress_timeout", zombie, lane, {
+                "reason=progress_timeout",
+                "result=" .. tostring(stepResult or "unknown"),
+            })
+            if not record.travel
+                and not isFollowOwnerLane(record, lane)
+                and PNC.Presence
+                and PNC.Presence.RequestTraversalHandoff
+                and PNC.Presence.RequestTraversalHandoff(
+                    record,
+                    "scripted_progress_timeout"
+                )
+            then
+                return true, "presence_handoff_requested"
+            end
             Internal.logMoveWarning(
                 record,
                 zombie,

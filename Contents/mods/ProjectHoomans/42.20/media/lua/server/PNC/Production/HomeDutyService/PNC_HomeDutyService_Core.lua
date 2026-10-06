@@ -15,11 +15,22 @@ function H.BaseFor(record, baseId)
     if baseId and tostring(baseId) ~= "" then
         return PNC.BaseService and PNC.BaseService.Get(baseId) or nil
     end
+    local order = record and record.orderSpec or nil
+    local followKind = PNC.Const and PNC.Const.ORDER_FOLLOW or "follow"
+    local orderBaseId = order and order.kind == "colony_home"
+        and order.baseId or order and order.kind == followKind
+        and type(order.homeAnchor) == "table"
+        and order.homeAnchor.baseId or nil
+    local travelAction = record and record.travel
+        and record.travel.arrivalAction or nil
+    if not orderBaseId and type(travelAction) == "table"
+        and tostring(travelAction.type or "") == "colony_home"
+    then
+        orderBaseId = travelAction.baseId
+    end
     local remembered = record and record.runtime
         and record.runtime.homeBaseId
-        or record and record.orderSpec
-            and record.orderSpec.kind == "colony_home"
-            and record.orderSpec.baseId
+        or orderBaseId
         or nil
     if remembered and tostring(remembered) ~= "" then
         local base = PNC.BaseService and PNC.BaseService.Get(remembered) or nil
@@ -102,6 +113,61 @@ local function betterHomePoint(current, candidate)
             and candidate.x < current.x)
 end
 
+local function normalizeHomeAnchor(source, defaultBaseId)
+    if type(source) ~= "table" then return nil end
+    local x, y = tonumber(source.x), tonumber(source.y)
+    if not x or not y then return nil end
+    local baseId = source.baseId or defaultBaseId
+    return {
+        baseId = baseId ~= nil and tostring(baseId) or nil,
+        x = x,
+        y = y,
+        z = tonumber(source.z) or 0,
+        radius = math.max(1, tonumber(source.radius) or 3),
+        homeZoneId = source.homeZoneId ~= nil
+            and tostring(source.homeZoneId) or nil,
+        stockpileNodeId = source.stockpileNodeId ~= nil
+            and tostring(source.stockpileNodeId) or nil,
+    }
+end
+
+local function homeAnchorSource(record)
+    local order = record and record.orderSpec or nil
+    local followKind = PNC.Const and PNC.Const.ORDER_FOLLOW or "follow"
+    if type(order) == "table"
+        and tostring(order.kind or "") == "colony_home"
+    then
+        return order, false
+    end
+    if type(order) == "table"
+        and tostring(order.kind or "") == tostring(followKind)
+        and type(order.homeAnchor) == "table"
+    then
+        return order.homeAnchor, true
+    end
+    local action = record and record.travel
+        and record.travel.arrivalAction or nil
+    if type(action) == "table"
+        and tostring(action.type or "") == "colony_home"
+    then
+        return action, true
+    end
+    return nil, false
+end
+
+local function nearestStockpileNode(record, base, origin)
+    local service = PNC.StockpileAccessService
+    if not service or not service.FindNearest or not base then
+        return nil
+    end
+    return service.FindNearest(
+        base.id,
+        tonumber(origin and origin.x) or tonumber(record and record.x) or 0,
+        tonumber(origin and origin.y) or tonumber(record and record.y) or 0,
+        tonumber(origin and origin.z) or tonumber(record and record.z) or 0
+    )
+end
+
 function H.HomeAnchorInZone(record, base)
     local order = record and record.orderSpec or nil
     local zone = base and base.baseZoneId and Zones.get(base.baseZoneId) or nil
@@ -112,6 +178,14 @@ function H.HomeAnchorInZone(record, base)
     end
     local x, y = tonumber(order.x), tonumber(order.y)
     if not x or not y or not GridRegion.containsXY then return false end
+    -- Orders written before the access-point anchor was persisted may still
+    -- contain the old zone-center destination. Let the normal home command
+    -- repair that legacy in-memory state when an explicit access node exists.
+    if order.stockpileNodeId == nil
+        and nearestStockpileNode(record, base) ~= nil
+    then
+        return false
+    end
     return GridRegion.containsXY(zone.geometry, math.floor(x), math.floor(y))
 end
 
@@ -195,16 +269,82 @@ function H.ZoneInteriorPoint(record, base)
     return nil
 end
 
+local function durableHomePoint(record, base)
+    local source, preserved = homeAnchorSource(record)
+    local x, y, z
+    local inside
+    local baseId
+    if type(source) ~= "table" then return nil end
+    baseId = source.baseId
+    if baseId ~= nil
+        and tostring(baseId) ~= tostring(base and base.id or "")
+    then
+        return nil
+    end
+    x, y = tonumber(source.x), tonumber(source.y)
+    z = tonumber(source.z) or tonumber(record and record.z) or 0
+    if not x or not y then return nil end
+    local zone = base and base.baseZoneId and Zones.get(base.baseZoneId) or nil
+    local geometry = zone and zone.geometry or nil
+    if not geometry then return nil end
+    if GridRegion.containsPoint then
+        inside = GridRegion.containsPoint(geometry, x, y, z)
+    elseif GridRegion.containsXY then
+        inside = GridRegion.containsXY(geometry, math.floor(x), math.floor(y))
+    end
+    if inside ~= true then return nil end
+    return {
+        x = x,
+        y = y,
+        z = z,
+        radius = math.max(1, tonumber(source.radius) or 3),
+        homeZoneId = base.baseZoneId,
+        stockpileNodeId = source.stockpileNodeId,
+        preservedHomeAnchor = preserved == true,
+    }
+end
+
 function H.HomePoint(record, base)
+    local node
+    local remembered
+    local order = record and record.orderSpec or nil
+    local followKind = PNC.Const and PNC.Const.ORDER_FOLLOW or "follow"
+    local legacyFollow = type(order) == "table"
+        and tostring(order.kind or "") == tostring(followKind)
+        and type(order.homeAnchor) ~= "table"
+    local stableOrigin
     if not base then return nil, "BASE_NOT_FOUND" end
-    local node = PNC.StockpileAccessService
-        and PNC.StockpileAccessService.FindNearest
-        and PNC.StockpileAccessService.FindNearest(
-            base.id,
-            tonumber(record and record.x) or 0,
-            tonumber(record and record.y) or 0,
-            tonumber(record and record.z) or 0
-        ) or nil
+    -- The arrival order is the durable home/facing anchor. Reusing it keeps
+    -- load/reconciliation ticks from selecting a new geometric point and
+    -- preserves an existing save without migration.
+    remembered = durableHomePoint(record, base)
+    if remembered
+        and (remembered.preservedHomeAnchor == true
+            or remembered.stockpileNodeId ~= nil)
+    then
+        return remembered
+    end
+    if legacyFollow and H.ZoneInteriorPoint then
+        -- Older follow orders predate the durable anchor. Resolve those saves
+        -- from the base-zone geometry, never from the NPC's remote position.
+        stableOrigin = H.ZoneInteriorPoint(record, base)
+    end
+    node = nearestStockpileNode(record, base, stableOrigin)
+    if remembered and node == nil then return remembered end
+    if node and tonumber(node.x) and tonumber(node.y) then
+        -- A stockpile access node is an explicit walkable/facing point. It
+        -- is preferable to a bounding-box center, which may be an interior
+        -- tile with no usable approach or may vary as zone geometry changes.
+        return {
+            x = tonumber(node.x),
+            y = tonumber(node.y),
+            z = tonumber(node.z) or 0,
+            radius = math.max(1, tonumber(node.radius) or 2),
+            homeZoneId = base.baseZoneId,
+            stockpileNodeId = node.id,
+        }
+    end
+    if remembered then return remembered end
     local zonePoint, zoneReason = H.ZoneInteriorPoint(record, base)
     if zonePoint then
         -- Keep the ID for existing recovery/debug consumers, but never use
@@ -271,6 +411,9 @@ function Service.EnsureHomeAnchor(record, baseId, reason)
 end
 
 function H.SetAtHome(record, base, point)
+    if Service.IsFollowing and Service.IsFollowing(record) then
+        return false, "FOLLOWING_PLAYER"
+    end
     record.runtime = record.runtime or {}
     record.runtime.homeState = "AT_HOME"
     record.runtime.homeBaseId = base.id
@@ -279,6 +422,7 @@ function H.SetAtHome(record, base, point)
         kind = "colony_home", baseId = base.id,
         x = point.x, y = point.y, z = point.z,
         radius = point.radius,
+        stockpileNodeId = point.stockpileNodeId,
     }
     if PNC.OrderSystem and PNC.OrderSystem.SetOrder then
         PNC.OrderSystem.SetOrder(record, order)
@@ -292,6 +436,28 @@ function H.SetAtHome(record, base, point)
 end
 
 function H.SetFollowing(record, username, onlineID)
+    local source = homeAnchorSource(record)
+    local runtime = record and record.runtime or nil
+    local homeAnchor = normalizeHomeAnchor(
+        source,
+        runtime and runtime.homeBaseId or nil
+    )
+    if not homeAnchor then
+        local base = H.BaseFor(record, runtime and runtime.homeBaseId or nil)
+        local point = base and H.HomePoint(record, base) or nil
+        if point then
+            homeAnchor = normalizeHomeAnchor(point, base.id)
+        end
+    end
+    if PNC.Travel and PNC.Travel.Service
+        and type(PNC.Travel.Service.Supersede) == "function"
+    then
+        local superseded, supersedeReason = PNC.Travel.Service.Supersede(
+            record, "follow_player_requested")
+        if superseded == false and supersedeReason ~= "journey_missing" then
+            return false, supersedeReason or "TRAVEL_SUPERSEDE_FAILED"
+        end
+    end
     record.runtime = record.runtime or {}
     record.runtime.homeState = "AWAY"
     record.runtime.homeJourneyId = nil
@@ -299,6 +465,7 @@ function H.SetFollowing(record, username, onlineID)
         kind = PNC.Const.ORDER_FOLLOW,
         ownerUsername = username,
         ownerOnlineID = onlineID,
+        homeAnchor = homeAnchor,
     }
     if PNC.OrderSystem and PNC.OrderSystem.SetOrder then
         PNC.OrderSystem.SetOrder(record, order)

@@ -120,9 +120,23 @@ function Common.ClearCombatTarget(record, reason, zombie)
 end
 
 function Common.GetOwner(record)
+    local orderSpec
+    local username
+    local onlineID
+    local owner
     if not record then return nil end
-    local username = record.ownerUsername
-    local owner = Core.ResolvePlayerByOnlineID(record.ownerOnlineID)
+    orderSpec = record.orderSpec
+    username = record.ownerUsername
+    onlineID = record.ownerOnlineID
+    if orderSpec
+        and tostring(orderSpec.kind or "") == tostring(
+            Const.ORDER_FOLLOW or "follow"
+        )
+    then
+        username = username or orderSpec.ownerUsername
+        onlineID = onlineID or orderSpec.ownerOnlineID
+    end
+    owner = Core.ResolvePlayerByOnlineID(onlineID)
     if owner then
         if username == nil
             or not owner.getUsername

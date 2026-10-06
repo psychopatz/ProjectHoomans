@@ -13,9 +13,36 @@ local FlavorAddress = PNC.FlavorAddress
 local Context = require "PNC/Conversation/Definition/PNC_ConversationDefinition_Context"
 local ExtensionParts = require "PNC/Conversation/Definition/PNC_ConversationDefinition_ExtensionParts"
 local IdentityChoice = require "PNC/Conversation/Blocks/PNC_ConversationIdentityChoice"
+local semanticInputWarningEmitted = false
+
+local function warnSemanticInput(reason)
+    if semanticInputWarningEmitted then return end
+    semanticInputWarningEmitted = true
+    local message = "conversation_input_unavailable reason=" .. tostring(reason)
+    if PNC.Core and type(PNC.Core.LogWarn) == "function" then
+        PNC.Core.LogWarn(message)
+    elseif type(print) == "function" then
+        print("[PNC][WARN] " .. message)
+    end
+end
 
 local function semanticInputFactory()
     if type(Conversation.CreateSemanticDialogueInput) == "function" then
+        return Conversation.CreateSemanticDialogueInput
+    end
+
+    -- The composition root normally installs this adapter. BuildDefinition
+    -- is also called by preview/debug entry points, though, and those can
+    -- arrive before the registration callback. The semantic input module is
+    -- already the owner of the widget factory, so use it directly as a safe
+    -- same-process fallback and then publish the canonical Conversation
+    -- factory for later definitions.
+    local directInput = PNC.Semantics
+        and PNC.Semantics.DialogueInput or nil
+    if directInput and type(directInput.CreatePart) == "function" then
+        Conversation.CreateSemanticDialogueInput = function(bounds, options)
+            return directInput.CreatePart(bounds, options)
+        end
         return Conversation.CreateSemanticDialogueInput
     end
 
@@ -25,17 +52,21 @@ local function semanticInputFactory()
     -- load guarded so those callers can use the base conversation input.
     require "PNC/Conversation/PNC_ConversationTime"
     require "PNC/Conversation/PNC_ConversationGroup"
-    local loaded = pcall(require, "PNC/PNC_ConversationSemantics")
+    local loaded, loadError = pcall(require, "PNC/PNC_ConversationSemantics")
     local adapter = PNC.ConversationSemantics
     if not loaded or not adapter
         or type(adapter.RegisterConversation) ~= "function"
     then
+        warnSemanticInput(loadError or "adapter_unavailable")
         return nil
     end
-    adapter.RegisterConversation(
+    local _, registrationReason = adapter.RegisterConversation(
         Conversation, PNC.Conversation.Group, PNC.Conversation.Time)
-    return type(Conversation.CreateSemanticDialogueInput) == "function"
-        and Conversation.CreateSemanticDialogueInput or nil
+    if type(Conversation.CreateSemanticDialogueInput) ~= "function" then
+        warnSemanticInput(registrationReason or "factory_unavailable")
+        return nil
+    end
+    return Conversation.CreateSemanticDialogueInput
 end
 
 local function buildConversationContext(entry, player, timeID, relationshipID, npcID)
@@ -167,6 +198,9 @@ function Conversation.BuildDefinition(entry, player, forcedTime)
         persistHistory = false,
         activeMessageLimit = 64,
         character = entry and entry.zombie or nil,
+        -- Expose the complete Hoomans conversation immediately. Core still
+        -- supports staged opening for callers that opt in explicitly.
+        animateOpening = false,
         -- Standard face-to-face talk uses the readable subtle treatment.
         -- Radio and walkie-talkie callers can opt into CRT with their own
         -- explicit conversation screenVariant.

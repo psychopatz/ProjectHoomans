@@ -257,6 +257,8 @@
     "UI_PNC_Farming_WarmSeason": "WARM SEASON",
     "UI_PNC_FishingScene_Cast": "Fishing",
     "UI_PNC_FishingScene_CastDescription": "A looping fishing pose for a shoreline work spot.",
+    "UI_PNC_Fishing_LastCatch": "LAST CATCH",
+    "UI_PNC_Fishing_NoCatch": "NO CATCH",
     "UI_PNC_Fishing_InvalidConnected": "Selection must be one connected area.",
     "UI_PNC_Fishing_NoLand": "Selection must include land.",
     "UI_PNC_Fishing_NoShoreline": "No walkable land tile touches the selected water.",

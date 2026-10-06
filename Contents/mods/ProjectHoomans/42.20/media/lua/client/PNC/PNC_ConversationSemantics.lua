@@ -16,15 +16,29 @@ local groupCoordinator
 local Adapter = PNC.ConversationSemantics or {}
 PNC.ConversationSemantics = Adapter
 
+local function inputAvailable()
+    return type(Input) == "table"
+        and type(Input.CreatePart) == "function"
+end
+
+function Adapter.HasSemanticDialogueInput()
+    return inputAvailable()
+end
+
 function Adapter.CreateSemanticDialogueInput(bounds, options)
+    if not inputAvailable() then return nil end
     return Input.CreatePart(bounds, options)
 end
 
 function Adapter.RegisterConversation(conversation, group, time)
-    if type(conversation) == "table" then
-        conversation.CreateSemanticDialogueInput =
-            Adapter.CreateSemanticDialogueInput
+    if not inputAvailable() then
+        return false, "dialogue_input_unavailable"
     end
+    if type(conversation) ~= "table" then
+        return false, "conversation_unavailable"
+    end
+    conversation.CreateSemanticDialogueInput =
+        Adapter.CreateSemanticDialogueInput
     if type(group) == "table" and type(group.Create) == "function" then
         groupCoordinator = group
     end

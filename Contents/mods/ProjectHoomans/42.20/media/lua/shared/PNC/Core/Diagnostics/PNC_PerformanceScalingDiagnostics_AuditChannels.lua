@@ -57,6 +57,29 @@ function Diagnostics.IsFollowerAbandonmentAuditEnabled()
     return Diagnostics.FollowerAbandonmentAuditEnabled == true
 end
 
+-- Callers guard this channel before assembling body, path, or chunk fields.
+-- The channel is intentionally broader than follower_presence: it is for
+-- every NPC and every live/abstract traversal boundary.
+function Diagnostics.LogPresenceTraversal(eventName, fields)
+    local output
+    local message
+    if Diagnostics.PresenceTraversalAuditEnabled ~= true then return false end
+    output = {
+        "presence_traversal",
+        "event=" .. tostring(eventName or "unknown"),
+    }
+    for _, field in ipairs(fields or {}) do
+        output[#output + 1] = tostring(field)
+    end
+    message = table.concat(output, " ")
+    if PNC.Core and PNC.Core.LogInfo then
+        PNC.Core.LogInfo(message)
+    else
+        print("[PNC][INFO] " .. message)
+    end
+    return true
+end
+
 -- Callers guard this function before assembling fields. That keeps the
 -- disabled path free of snapshots, clocks, tables, and string concatenation.
 function Diagnostics.LogSeatingAudit(eventName, fields)

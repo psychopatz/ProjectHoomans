@@ -8,6 +8,10 @@ local reconciled
 local broadcast
 local provisionOrder
 local cancelledProvision
+local nearestNode = {
+    id = "stockpile-1", x = 15, y = 16, z = 0, radius = 2,
+}
+local nearestQuery
 
 package.preload["PsychopatzCore/World/PC_ZoneRegistry"] = function()
     return {
@@ -52,10 +56,10 @@ PNC = {
         end,
     },
     StockpileAccessService = {
-        FindNearest = function(baseId)
+        FindNearest = function(baseId, x, y, z)
+            nearestQuery = { x = x, y = y, z = z }
             if baseId == "base-1" then
-                return { id = "stockpile-1", x = 15, y = 16, z = 0,
-                    radius = 2 }
+                return nearestNode
             end
         end,
     },
@@ -121,6 +125,40 @@ PNC = {
 
 T.load(T.path("ProjectHoomans", "server", "PNC/Production/PNC_HomeDutyService.lua"))
 
+local cancelledTask
+local cancelledFishing
+local activeFishingJob = { id = "fishing-1", active = true }
+PNC.TaskLeaseService = {
+    ForNPC = function(id)
+        return id == "npc-task" and { npcId = id, sourceDomain = "fishing" }
+            or nil
+    end,
+}
+PNC.Tasking = {
+    Commands = {
+        CancelForNPC = function()
+            cancelledTask = true
+            return true, "LEASE_RELEASED"
+        end,
+    },
+}
+PNC.FishingService = {
+    GetJob = function() return activeFishingJob end,
+    CancelJob = function()
+        cancelledFishing = true
+        activeFishingJob.active = false
+        return true, "fishing_task_cancelled"
+    end,
+}
+local taskRecord = { id = "npc-task", alive = true }
+local taskStopped, taskStopReason =
+    PNC.HomeDutyService.Internal.CancelActiveTask(
+        taskRecord, "player_return_home")
+T.equal(taskStopped, true, "home command task cleanup succeeds")
+T.equal(taskStopReason, nil, "home task cleanup has no rejection reason")
+T.truthy(cancelledTask, "home command cancels the tasking lease")
+T.truthy(cancelledFishing, "home command cancels persisted fishing state")
+
 local npc = {
     id = "npc-1", alive = true, x = 1, y = 2, z = 0,
     presenceState = "abstract", runtime = {},
@@ -142,15 +180,19 @@ local sent, reason = PNC.HomeDutyService.SendHome(npc, "base-1", "test")
 T.equal(sent, true, "return-home journey accepted")
 T.equal(reason, "RETURNING_HOME", "return-home state")
 T.equal(startedRequest.destination.x, 15, "journey targets base-zone x")
-T.equal(startedRequest.destination.y, 15, "journey targets base-zone y")
+T.equal(startedRequest.destination.y, 16,
+    "journey targets the persisted stockpile access y")
 T.equal(startedRequest.arrivalAction.type, "colony_home",
     "journey uses durable home arrival")
-T.equal(startedRequest.arrivalRadius, 3,
+T.equal(startedRequest.arrivalRadius, 2,
     "home journey preserves the configured arrival radius")
 T.equal(startedRequest.metadata.purpose, "return_home",
     "journey metadata identifies home travel")
 T.equal(PNC.HomeDutyService.BuildState(npc).state, "RETURNING_HOME",
     "home state exposes travel")
+local firstHomeArrival = startedRequest.arrivalAction
+T.equal(firstHomeArrival.stockpileNodeId, "stockpile-1",
+    "home journey carries the selected stockpile identity")
 
 -- A stale AtHome order must not keep owning the behavior tick while the
 -- return-home journey is still active.
@@ -170,12 +212,20 @@ T.equal(npc.orderSpec.journeyId, npc.travel.journeyId,
     "restored travel order points at the active journey")
 
 npc.x, npc.y, npc.travel.state = 15, 15, "arrived"
+nearestNode = { id = "stockpile-2", x = 90, y = 91, z = 0, radius = 4 }
 local arrived = arrivals.colony_home(npc, npc.travel,
-    startedRequest.arrivalAction)
+    firstHomeArrival)
 T.equal(arrived, true, "arrival handled")
 T.equal(npc.orderSpec.kind, "colony_home", "arrival installs At Home order")
+T.equal(npc.orderSpec.x, 15,
+    "arrival commits the authority-created home x")
+T.equal(npc.orderSpec.y, 16,
+    "arrival commits the authority-created home y")
+T.equal(npc.orderSpec.stockpileNodeId, "stockpile-1",
+    "arrival does not replace the home anchor with a newly resolved node")
 T.equal(PNC.HomeDutyService.BuildState(npc).state, "AT_HOME",
     "home state after arrival")
+nearestNode = { id = "stockpile-1", x = 15, y = 16, z = 0, radius = 2 }
 npc.affiliation.communityID = nil
 T.equal(PNC.HomeDutyService.BuildState(npc).state, "AT_HOME",
     "remembered home base survives missing legacy affiliation")
@@ -217,6 +267,33 @@ T.truthy(checkedHome and checkedHome.y ~= 15,
     "home anchor selected a blocked center tile")
 getCell = nil
 
+local legacyHome = {
+    id = "npc-legacy-home", alive = true, x = 15, y = 15, z = 0,
+    runtime = {},
+    orderSpec = { kind = "colony_home", baseId = "base-1",
+        x = 15, y = 15, z = 0, radius = 3 },
+    affiliation = { communityID = "colony-1" },
+}
+local legacyPoint = PNC.HomeDutyService.GetHomePoint(
+    legacyHome, "base-1")
+T.equal(legacyPoint.y, 16,
+    "legacy zone-center home anchor repairs to stockpile access")
+
+nearestQuery = nil
+local legacyFollower = {
+    id = "npc-legacy-follower", alive = true, x = 900, y = 901, z = 0,
+    runtime = {},
+    orderSpec = { kind = "follow", ownerUsername = "owner" },
+    affiliation = { communityID = "colony-1" },
+}
+local legacyFollowerPoint = PNC.HomeDutyService.GetHomePoint(
+    legacyFollower, "base-1")
+T.equal(legacyFollowerPoint.y, 16,
+    "legacy follow home anchor resolves to the base access point")
+T.truthy(nearestQuery and tonumber(nearestQuery.x) < 50
+    and tonumber(nearestQuery.y) < 50,
+    "legacy follow lookup uses stable base geometry instead of remote NPC coordinates")
+
 local staleHome = {
     id = "npc-stale-home", alive = true, x = 15, y = 16, z = 0,
     presenceState = "abstract", runtime = {},
@@ -231,8 +308,8 @@ T.equal(repairReason, "RETURNING_HOME",
     "stale home anchor uses the durable return journey")
 T.equal(startedRequest.destination.x, 15,
     "stale home anchor retargets to base-zone x")
-T.equal(startedRequest.destination.y, 15,
-    "stale home anchor retargets to base-zone y")
+T.equal(startedRequest.destination.y, 16,
+    "stale home anchor keeps the active journey destination")
 
 PNC.BehaviorCommon = {
     ClearCombatTarget = function() end,
@@ -270,7 +347,7 @@ T.equal(recoverReason, "COLONIST_RECOVERED", "recovery reason")
 T.equal(released, "npc-1:colonist_recovered", "work claim released")
 T.equal(abstracted, "colonist_recovery", "live body safely abstracted")
 T.equal(npc.x, 15, "recovered at base-zone x")
-T.equal(npc.y, 15, "recovered at base-zone y")
+T.equal(npc.y, 16, "recovered at the stockpile access y")
 T.equal(npc.orderSpec.kind, "colony_home", "recovered colonist is At Home")
 T.equal(details.stockpileNodeId, "stockpile-1",
     "recovery preserves legacy stockpile metadata")
@@ -295,6 +372,28 @@ T.equal(following, true, "map-scale follow journey accepted")
 T.equal(followReason, "FOLLOWING_PLAYER", "follow command state")
 T.equal(traveler.orderSpec.kind, "follow", "follow command installs follow order")
 T.equal(traveler.orderSpec.ownerUsername, "owner", "follow owner is preserved")
+T.equal(traveler.orderSpec.homeAnchor.y, 16,
+    "follow order preserves the colonist home anchor")
+local preservedFollowHome = PNC.HomeDutyService.GetHomePoint(
+    traveler, nil)
+T.equal(preservedFollowHome.y, 16,
+    "follow home resolution does not switch to the current-position node")
+
+local explicitHome, explicitHomeReason = PNC.HomeDutyService.SendHome(
+    traveler, nil, "companion_command", { allowFollowOverride = true })
+T.equal(explicitHome, true,
+    "explicit go-home can replace a follower even inside the home zone")
+T.equal(explicitHomeReason, "RETURNING_HOME",
+    "explicit go-home starts the durable home journey")
+T.equal(startedRequest.destination.y, 16,
+    "explicit go-home uses the preserved home anchor")
+
+local implicitHome, implicitHomeReason = PNC.HomeDutyService.SendHome(
+    traveler, "base-1", "work_fatigue_gate")
+T.equal(implicitHome, false,
+    "implicit home duty must not replace an active follower")
+T.equal(implicitHomeReason, "FOLLOWING_PLAYER",
+    "implicit home refusal identifies the active Follow owner")
 
 local buildingWorker = {
     id = "npc-builder", alive = true, x = 15, y = 15, z = 0,

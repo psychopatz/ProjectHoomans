@@ -77,7 +77,7 @@ for name, _ in pairs(publicFunctions) do
     T.equal(type(PNC.Relationships[name]), "function",
         "entry point should preserve Relationships." .. name)
 end
-T.equal(publicCount, 14, "relationship function declaration count")
+T.equal(publicCount, 15, "relationship function declaration count")
 T.equal(PNC.Relationships.Personal.Queries.Get,
     PNC.Relationships.Get, "personal Get compatibility")
 T.equal(PNC.Relationships.Personal.Commands.AddMemory,

@@ -19,6 +19,7 @@ PNC = {
     Const = {
         PRESENCE_LIVE = "live",
         PRESENCE_ABSTRACT = "abstract",
+        ORDER_FOLLOW = "follow",
         ORDER_TRAVEL = "travel",
         ORDER_ROAM = "roam",
         ROAM_MODE_AREA = "area",
@@ -480,6 +481,87 @@ T.truthy(restoredTrading.arrivalAction.type == "trading"
     and restoredTrading.arrivalAction.marketID == "market:west-point"
     and restoredTrading.arrivalHandled == true,
     "arrival action did not survive journey persistence")
+
+-- Follow owns the position lane even when an older save left a terminal
+-- return-home journey attached to the record. The stale route must not project
+-- its base destination into the abstract follower or the map summary.
+local blockedFollowRecord = {
+    id = "blocked-follow-start",
+    name = "Blocked Follow Start",
+    x = 7400,
+    y = 6100,
+    z = 0,
+    alive = true,
+    presenceState = "abstract",
+    runtime = { followOrderActive = true },
+    orderSpec = { kind = "follow" },
+}
+records[blockedFollowRecord.id] = blockedFollowRecord
+local blockedFollowJourney, blockedFollowReason =
+    PNC.Travel.Service.Start(blockedFollowRecord, {
+        destination = { x = 100, y = 100, z = 0 },
+    })
+T.falsy(blockedFollowJourney,
+    "generic travel must not replace a Follow owner")
+T.equal(blockedFollowReason, "FOLLOWING_PLAYER",
+    "Follow replacement refusal is explicit")
+local explicitTravel = T.truthy(PNC.Travel.Service.Start(
+    blockedFollowRecord,
+    {
+        destination = { x = 100, y = 100, z = 0 },
+        allowFollowOverride = true,
+    }
+))
+T.truthy(explicitTravel, "explicit movement override remains available")
+
+local staleFollowRecord = {
+    id = "stale-follow",
+    name = "Stale Follow",
+    x = 7400,
+    y = 6100,
+    z = 0,
+    alive = true,
+    presenceState = "abstract",
+    runtime = {},
+    orderSpec = { kind = "travel" },
+}
+records[staleFollowRecord.id] = staleFollowRecord
+worldHour = 0
+local staleFollowJourney = T.truthy(PNC.Travel.Service.Start(
+    staleFollowRecord,
+    {
+        journeyId = "journey:stale-follow",
+        destination = { x = 100, y = 100, z = 0 },
+        speedTilesPerWorldHour = 100,
+    }
+))
+staleFollowRecord.x, staleFollowRecord.y = 7400, 6100
+staleFollowRecord.orderSpec = { kind = "follow" }
+staleFollowRecord.runtime.followOrderActive = true
+staleFollowJourney.state = "arrived"
+staleFollowJourney.arrivalHandled = true
+staleFollowJourney.distanceTravelled = staleFollowJourney.distanceTotal
+local protected, protectedChanged = PNC.Travel.Service.Advance(
+    staleFollowRecord, 20)
+T.equal(protected, staleFollowJourney,
+    "follow protection returns the attached stale journey")
+T.falsy(protectedChanged, "stale follow journey must not advance")
+T.near(staleFollowRecord.x, 7400, 0.001,
+    "terminal travel must not reset the follower x")
+T.near(staleFollowRecord.y, 6100, 0.001,
+    "terminal travel must not reset the follower y")
+T.falsy(PNC.Travel.Service.GetProgress(staleFollowRecord),
+    "follow position must not expose stale travel progress")
+
+staleFollowJourney.state = "en_route"
+local superseded, supersedeReason = PNC.Travel.Service.Supersede(
+    staleFollowRecord, "companion_follow_requested")
+T.truthy(superseded, "follow supersedes an active stale journey")
+T.equal(supersedeReason, "travel_superseded", "supersede reason")
+T.falsy(staleFollowRecord.travel,
+    "follow supersede must retire the stale journey")
+T.equal(staleFollowRecord.orderSpec.kind, "follow",
+    "supersede must not replace the follow order")
 
 -- Population-scale abstraction: all 100 records advance in one O(N) refresh,
 -- without creating or pathing any live engine bodies.

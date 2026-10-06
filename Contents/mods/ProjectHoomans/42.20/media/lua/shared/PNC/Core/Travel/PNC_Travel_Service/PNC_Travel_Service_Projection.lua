@@ -33,7 +33,11 @@ end
 function Service.GetProgress(recordOrID, atWorldHour)
     local record = Internal.ResolveRecord(recordOrID)
     local journey = record and record.travel or nil
-    if not journey then return nil end
+    if not journey
+        or (Service.IsFollowOwned and Service.IsFollowOwned(record))
+    then
+        return nil
+    end
     local projected = journey
     if record.presenceState ~= Const.PRESENCE_LIVE then
         projected = Projection.Project(

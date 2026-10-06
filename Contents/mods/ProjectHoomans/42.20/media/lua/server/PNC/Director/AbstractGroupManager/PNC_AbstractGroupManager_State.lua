@@ -57,6 +57,14 @@ function Groups.SynchronizeMembersAtLocation(group)
         if record and record.alive ~= false and not live
             and record.presenceState ~= Const.PRESENCE_LIVE
         then
+            if record.orderSpec
+                and tostring(record.orderSpec.kind or "")
+                    == tostring(Const.ORDER_FOLLOW or "follow")
+            then
+                -- A strategic group arrival must not reset a follower to the
+                -- group's location. Follow owns the record position.
+                return
+            end
             local offsetX = ((index - 1) % 3) - 1
             local offsetY = math.floor((index - 1) / 3)
             record.x, record.y, record.z = location.x + offsetX,
@@ -97,4 +105,3 @@ function Groups.Remove(groupID, reason)
 end
 
 return Groups
-

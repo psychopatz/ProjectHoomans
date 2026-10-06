@@ -172,6 +172,21 @@ local function updateActiveLane(record, zombie, lane, now, caller)
             return handled, state
         end
     end
+    if lane.navigationProvider == "engine_path"
+        and navigation
+        and navigation.nativeActive ~= true
+        and (navigation.lastPlanReason == "target_chunk_unloaded"
+            or navigation.lastPlanReason == "fishing_water_chunk_unloaded")
+        and Internal.handleNativeTargetReadinessWait
+    then
+        return Internal.handleNativeTargetReadinessWait(
+            record,
+            zombie,
+            lane,
+            navigation,
+            now
+        )
+    end
     if lane.navigationProvider == "engine_path" then
         lane.ownerMode = "engine_path_waiting"
         if now >= (tonumber(lane.visualMovingUntil) or 0) then

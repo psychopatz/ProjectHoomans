@@ -10,7 +10,9 @@ local portraitTargetCount = 0
 local portraitOptions
 local portraitTarget
 local portraitContext
+local portraitDebugPresence
 local clock = 1000
+local debugEnabled = false
 
 PNC = {
     Core = {
@@ -35,8 +37,9 @@ PNC = {
             function panel:initialise() end
             function panel:instantiate() end
             function panel:setVisible(value) self.visible = value end
-            function panel:setContext(entry)
+            function panel:setContext(entry, showPresence)
                 portraitContext = entry
+                portraitDebugPresence = showPresence
             end
             function panel:setTarget(spec)
                 portraitTargetCount = portraitTargetCount + 1
@@ -50,6 +53,9 @@ PNC = {
             return panel
         end,
     },
+}
+PNC.Client = {
+    CanUseDebug = function() return debugEnabled end,
 }
 
 T.load("ProjectHoomans", "client", "PNC/UI/Map/PNC_MapHoverPortrait.lua")
@@ -96,6 +102,15 @@ T.truthy(portraitTarget.id == portraitEntry.id
     "hover portrait did not use descriptor rendering")
 T.truthy(portraitContext == portraitEntry,
     "hover portrait card did not receive NPC badge/name context")
+T.falsy(portraitDebugPresence,
+    "map hover exposed debug presence without debug access")
+debugEnabled = true
+clock = 1100
+T.truthy(PNC.MapHoverPortrait.Update(map, portraitEntry, 100, 100),
+    "debug-enabled map hover did not remain visible")
+T.truthy(portraitDebugPresence == true,
+    "map hover did not pass debug presence visibility to the card")
+debugEnabled = false
 clock = 1200
 T.truthy(PNC.MapHoverPortrait.Update(map, portraitEntry, 120, 120),
     "same portrait did not remain reusable")

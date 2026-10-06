@@ -18,6 +18,7 @@ local hoveredPortrait
 local portraitHidden = 0
 local clock = 1000
 local listProjectedCount = 0
+local debugEnabled = false
 
 getTexture = function() return nil end
 getTimestampMs = function() return clock end
@@ -56,6 +57,7 @@ PNC = {
                     tacticalClass = "colonist",
                     recruited = true,
                     state = "live",
+                    presenceState = "abstract",
                     x = 30,
                     y = 40,
                 },
@@ -133,6 +135,9 @@ PNC = {
             return entry and entry.name or "Unknown"
         end,
     },
+    Client = {
+        CanUseDebug = function() return debugEnabled end,
+    },
 }
 
 T.load(PALETTE)
@@ -171,6 +176,18 @@ local map = {
 }
 
 T.truthy(layer and layer.render, "travel map layer did not register")
+local overlapPositions = PNC.MapTravelLayer.BuildMarkerScreenPositions(
+    map,
+    {
+        { id = "follow_a", x = 30, y = 40 },
+        { id = "follow_b", x = 30, y = 40 },
+    }
+)
+T.truthy(
+    overlapPositions[1].x ~= overlapPositions[2].x
+        or overlapPositions[1].y ~= overlapPositions[2].y,
+    "overlapping follower markers were not separated on the map"
+)
 layer.render(map)
 T.truthy(listProjectedCount == 1,
     "travel map entries were not loaded for the first frame")
@@ -200,6 +217,19 @@ T.truthy(labels[1] == "Moving Follower [trader]" and labels[2] == nil,
     "map layer duplicated the name owned by the visible portrait card")
 T.truthy(hoveredPortrait and hoveredPortrait.id == "idle",
     "hovered map marker was not sent to the portrait presenter")
+
+labels = {}
+mouseX = 30
+mouseY = 40
+debugEnabled = true
+layer.render(map)
+T.equal(labels[2], "Working Colonist [ABSTRACT]",
+    "debug hover tooltip did not expose abstract NPC presence")
+debugEnabled = false
+labels = {}
+layer.render(map)
+T.equal(labels[2], "Working Colonist",
+    "map hover exposed debug presence without debug access")
 
 labels = {}
 mouseX = -100

@@ -10,6 +10,7 @@ local Const = PNC.Const
 local Stamina = PNC.Stamina
 local Identity = PNC.Identity
 local Settings = PNC.Sandbox
+local Equipment = PNC.Equipment
 local buildIdentityOwnershipSummary =
     Parts.BuildIdentityOwnershipSummary
 local buildStaminaRecoverySummary = Parts.BuildStaminaRecoverySummary
@@ -20,6 +21,7 @@ function Network.BuildRosterSnapshot(record, includeTravelRoute)
     local staminaInfo
     local identity
     local ownership
+    local radioGear
     if type(record) ~= "table" then
         return nil
     end
@@ -27,6 +29,9 @@ function Network.BuildRosterSnapshot(record, includeTravelRoute)
     staminaInfo = Stamina and Stamina.BuildSnapshot and Stamina.BuildSnapshot(record) or {}
     identity = Parts.BuildIdentitySummary(record)
     ownership = buildIdentityOwnershipSummary(record)
+    radioGear = Equipment and Equipment.RadioGear
+        and Equipment.RadioGear.Describe
+        and Equipment.RadioGear.Describe(record) or nil
     return {
         interestDetailed = false,
         id = record.id,
@@ -59,6 +64,7 @@ function Network.BuildRosterSnapshot(record, includeTravelRoute)
         attackType = record.attackType or "auto",
         ownerUsername = ownership.ownerUsername,
         ownerOnlineID = ownership.ownerOnlineID,
+        radioGear = radioGear,
         hpCurrent = record.health and record.health.current or nil,
         hpMax = record.health and record.health.max or nil,
         healthState = record.health and record.health.state or nil,

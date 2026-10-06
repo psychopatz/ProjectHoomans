@@ -20,6 +20,14 @@ end
 inventory.Internal.ensureIdentityCard = function()
     return {}, false
 end
+inventory.Internal.removeLegacyIdentityItems = function(_, inv)
+    local removed = false
+    if inv and inv.items and inv.items.dogtag then
+        inv.items.dogtag = nil
+        removed = true
+    end
+    return removed
+end
 inventory.Internal.ensureFactionDogTag = function(record, inv)
     repairCalls = repairCalls + 1
     local item = inv.items.dogtag
@@ -86,8 +94,14 @@ inventory.ApplyDelta = function(record, operations)
 end
 
 local persistedInventory = {
-    items = {},
-    containers = { root = { items = {} } },
+    items = {
+        dogtag = {
+            id = "dogtag",
+            type = "Base.Necklace_DogTag",
+            templateKey = "tmpl:faction_dogtag:0",
+        },
+    },
+    containers = { root = { items = { "dogtag" } } },
     template = { generatorVersion = 4 },
 }
 inventory.Deserialize = function(record)
@@ -122,12 +136,10 @@ local record = {
 }
 
 local inv = inventory.EnsureRecordInventory(record)
-T.truthy(inv.items.dogtag,
-    "persisted baseline delta removal is repaired on hydration")
-T.equal(repairCalls, 1,
-    "persisted hydration performs the canonical identity repair")
-T.truthy(#dirtyReasons > 0,
-    "persisted identity repair marks the authoritative record dirty")
+T.equal(inv.items.dogtag, nil,
+    "persisted legacy dogtag is removed instead of re-created")
+T.equal(repairCalls, 0,
+    "persisted hydration does not generate a physical identity item")
 T.equal(record.persistedInventory, nil,
     "persisted payload is consumed after hydration")
 
@@ -142,7 +154,7 @@ local secondRecord = {
     },
 }
 inventory.EnsureRecordInventory(secondRecord)
-T.truthy(secondRecord.inventory.items.dogtag,
-    "current generator inventories also repair a missing current dogtag")
+T.equal(secondRecord.inventory.items.dogtag, nil,
+    "current generator inventories keep identity metadata out of items")
 
 T.finish("pnc_inventory_persisted_repair_smoke")

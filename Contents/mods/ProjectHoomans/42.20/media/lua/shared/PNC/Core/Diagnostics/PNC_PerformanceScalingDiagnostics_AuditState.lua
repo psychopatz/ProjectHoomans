@@ -3,6 +3,59 @@ PNC.PerformanceScalingDiagnostics =
     PNC.PerformanceScalingDiagnostics or {}
 local Diagnostics = PNC.PerformanceScalingDiagnostics
 
+-- Presence auditing is useful during a handoff investigation, but it can be
+-- enabled while several followers are producing roster and animation updates.
+-- Keep the central channel bounded so an opt-in trace cannot become an I/O
+-- driven frame-rate regression. Structural events share the general budget;
+-- high-frequency position samples also have their own smaller budget so they
+-- cannot starve transitions or abstract follow ticks.
+local FOLLOWER_AUDIT_WINDOW_MS = 1000
+local FOLLOWER_AUDIT_MAX_EVENTS = 24
+local FOLLOWER_AUDIT_MAX_POSITION_EVENTS = 8
+
+Diagnostics.FollowerPresenceAuditBudget =
+    Diagnostics.FollowerPresenceAuditBudget or {
+        windowStart = nil,
+        events = 0,
+        positionEvents = 0,
+        dropped = 0,
+    }
+
+local function followerAuditNow()
+    if PNC.Core and type(PNC.Core.Now) == "function" then
+        return tonumber(PNC.Core.Now()) or 0
+    end
+    if getTimeInMillis then return tonumber(getTimeInMillis()) or 0 end
+    return 0
+end
+
+local function allowFollowerPresenceEvent(eventName)
+    local budget = Diagnostics.FollowerPresenceAuditBudget
+    local now = followerAuditNow()
+    local start = tonumber(budget.windowStart)
+    local isPosition = tostring(eventName or "")
+        == "client_presence_position"
+
+    if start == nil
+        or now < start
+        or now - start >= FOLLOWER_AUDIT_WINDOW_MS
+    then
+        budget.windowStart = now
+        budget.events = 0
+        budget.positionEvents = 0
+    end
+    if budget.events >= FOLLOWER_AUDIT_MAX_EVENTS
+        or (isPosition
+            and budget.positionEvents >= FOLLOWER_AUDIT_MAX_POSITION_EVENTS)
+    then
+        budget.dropped = (tonumber(budget.dropped) or 0) + 1
+        return false
+    end
+    budget.events = budget.events + 1
+    if isPosition then budget.positionEvents = budget.positionEvents + 1 end
+    return true
+end
+
 function Diagnostics.LogSeatingState(
     eventName,
     record,
@@ -165,6 +218,7 @@ end
 function Diagnostics.LogFollowerPresence(eventName, fields)
     local output
     if Diagnostics.FollowerPresenceAuditEnabled ~= true then return false end
+    if not allowFollowerPresenceEvent(eventName) then return false end
     output = { "follower_presence", "event=" .. tostring(eventName or "unknown") }
     for _, field in ipairs(fields or {}) do
         output[#output + 1] = tostring(field)

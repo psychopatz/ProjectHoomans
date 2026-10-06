@@ -52,6 +52,13 @@ local function portraitSpec(entry)
     }
 end
 
+local function debugPresenceEnabled()
+    local client = PNC.Client
+    return client
+        and type(client.CanUseDebug) == "function"
+        and client.CanUseDebug() == true
+end
+
 local function hasCurrentLayout(panel)
     if not PortraitCard
         or not panel
@@ -177,7 +184,9 @@ function HoverPortrait.Update(map, entry, markerX, markerY)
     end
     panel = HoverPortrait.Ensure(map)
     if not panel then return false end
-    if panel.setContext then panel:setContext(entry) end
+    if panel.setContext then
+        panel:setContext(entry, debugPresenceEnabled())
+    end
     if map._pncPortraitVisibleKey ~= bindingKey and panel.setTarget then
         spec = portraitSpec(entry)
         if panel:setTarget(spec) ~= true then

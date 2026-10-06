@@ -190,10 +190,17 @@ local fishing = Status.Build({
     runtime = { fishing = {
         phase = "WORKING",
         activityItemFullType = "Base.CraftedFishingRod",
+        lastCatchItemType = "Base.SmallmouthBass",
+        lastCatchAt = 1100,
+        lastCatchAttemptIndex = 4,
     } },
 })
 T.equal(fishing.activityItemFullType, "Base.CraftedFishingRod",
     "fishing activity exposes the equipped rod")
+T.equal(fishing.lastCatchItemType, "Base.SmallmouthBass",
+    "fishing activity exposes the last committed catch")
+T.equal(fishing.lastCatchAttemptIndex, 4,
+    "fishing activity exposes the catch attempt index")
 T.equal(fishing.workItemDiagnostic.state, "WAITING_FOR_WORK_ITEM",
     "fishing activity does not expose its work-item diagnostic")
 T.equal(fishing.workItemDiagnostic.missingCandidates[1],

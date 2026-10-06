@@ -64,6 +64,55 @@ function Internal.BeginRequest(body, finalTarget, navigation, now, reason)
     local multiplayerAuthority = Internal.IsMultiplayerAuthority()
     local nativeSafe
     local unsafeReason
+    local targetReady
+    local targetReason
+    local record = navigation and navigation.record or nil
+    local liveState = PNC.Const and PNC.Const.PRESENCE_LIVE or "live"
+    if record and record.presenceState
+        and record.presenceState ~= liveState
+    then
+        navigation.lastPlanReason = "presence_not_live"
+        return false
+    end
+    if record and navigation.presenceRevision ~= nil
+        and navigation.presenceRevision ~= record.presenceRevision
+    then
+        navigation.lastPlanReason = "stale_presence_revision"
+        return false
+    end
+    if record and navigation.bodyLease ~= nil
+        and (not record.runtime
+            or navigation.bodyLease ~= record.runtime.bodyLease)
+    then
+        navigation.lastPlanReason = "stale_body_lease"
+        return false
+    end
+    targetReady, targetReason = Internal.CheckTargetReadiness(
+        record,
+        body,
+        finalTarget,
+        navigation
+    )
+    if not targetReady then
+        navigation.lastPlanReason = targetReason
+        navigation.plannedAt = now
+        navigation.targetReadinessWaitStartedAt =
+            navigation.targetReadinessWaitStartedAt or now
+        navigation.planFailures =
+            (tonumber(navigation.planFailures) or 0) + 1
+        if PNC.Presence and PNC.Presence.Internal
+            and PNC.Presence.Internal.LogTraversal
+        then
+            PNC.Presence.Internal.LogTraversal(record, "target_deferred", body, {
+                "reason=" .. tostring(targetReason),
+                "target=" .. tostring(finalTarget.x) .. ","
+                    .. tostring(finalTarget.y) .. ","
+                    .. tostring(finalTarget.z),
+            })
+        end
+        return false
+    end
+    navigation.targetReadinessWaitStartedAt = nil
     nativeSafe, unsafeReason = Planner.CanUseNativePath(body)
     if not nativeSafe then
         if Diagnostics and Diagnostics.SeatingAuditEnabled == true then
@@ -109,6 +158,9 @@ function Internal.BeginRequest(body, finalTarget, navigation, now, reason)
     end
     navigation.requestPending = true
     navigation.nativeActive = true
+    navigation.presenceRevision = record and record.presenceRevision or nil
+    navigation.bodyLease = record and record.runtime
+        and record.runtime.bodyLease or nil
     navigation.controllerMode = multiplayerAuthority
         and "client_goto" or "behavior2_move"
     navigation.lastBehaviorResult = nil
@@ -134,6 +186,15 @@ function Internal.BeginRequest(body, finalTarget, navigation, now, reason)
     navigation.steeringKind = multiplayerAuthority
         and "engine_native_client"
         or "engine_native_behavior2"
+    if PNC.Presence and PNC.Presence.Internal
+        and PNC.Presence.Internal.LogTraversal
+    then
+        PNC.Presence.Internal.LogTraversal(record, "native_route_started", body, {
+            "reason=" .. tostring(reason or "native_request"),
+            "target=" .. tostring(x) .. "," .. tostring(y) .. ","
+                .. tostring(z),
+        })
+    end
     Internal.SetServerMovementLease(body, navigation, true)
     if Diagnostics and Diagnostics.SeatingAuditEnabled == true then
         auditPathRequest(body, navigation, "path_request", reason, now)

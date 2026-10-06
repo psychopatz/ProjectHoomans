@@ -157,6 +157,19 @@ card:render()
 T.truthy(emblemDrawCount == 1,
     "layered organizational faction emblem did not replace placeholder")
 
+card:setContext({
+    id = "npc_card",
+    displayName = "Dion Amaya",
+    presenceState = "abstract",
+}, true)
+card:render()
+local sawPresence = false
+for _, text in ipairs(card.texts) do
+    if text == "ABSTRACT" then sawPresence = true end
+end
+T.truthy(card.contextPresence == "ABSTRACT" and sawPresence,
+    "debug hover card did not show abstract presence")
+
 card:setCardPosition(20, 30)
 T.truthy(card.x == 20 and card.y == 30,
     "portrait card position did not update without reconstruction")

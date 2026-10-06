@@ -257,6 +257,8 @@
     "UI_PNC_Farming_WarmSeason": "MAINIT NA PANAHON",
     "UI_PNC_FishingScene_Cast": "Pangingisda",
     "UI_PNC_FishingScene_CastDescription": "Isang looping fishing pose para sa isang lugar ng trabaho sa baybayin.",
+    "UI_PNC_Fishing_LastCatch": "HULING HULI",
+    "UI_PNC_Fishing_NoCatch": "WALANG HULI",
     "UI_PNC_Fishing_InvalidConnected": "Ang pagpili ay dapat na isang konektadong lugar.",
     "UI_PNC_Fishing_NoLand": "Dapat kasama sa pagpili ang lupa.",
     "UI_PNC_Fishing_NoShoreline": "Walang nalalakad na tile ng lupa ang nakadikit sa napiling tubig.",

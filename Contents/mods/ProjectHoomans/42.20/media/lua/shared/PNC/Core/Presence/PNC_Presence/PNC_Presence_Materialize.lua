@@ -111,6 +111,12 @@ local function resolveSpawnPosition(record, reason, now)
     x, y, z, recoveryReason, deferredReason, resourceTarget =
         Internal.FindMaterializeSquare(record, now, reason)
     if deferredReason and deferredReason ~= "no_safe_square" then
+        if Internal.LogTraversal then
+            Internal.LogTraversal(record, "materialize_deferred", nil, {
+                "reason=" .. tostring(deferredReason),
+                "chunkReady=false",
+            })
+        end
         if MaterializationSafety and MaterializationSafety.Defer then
             MaterializationSafety.Defer(record, deferredReason, now)
         else
@@ -151,6 +157,9 @@ local function resolveSpawnPosition(record, reason, now)
 end
 
 local function beginMaterialization(record, reason, now)
+    if Presence.ClearTraversalHandoff then
+        Presence.ClearTraversalHandoff(record, "materialize_begin")
+    end
     record.runtime.bodyLease = nil
     record.runtime.lifecycle = record.runtime.lifecycle or {}
     record.runtime.lifecycle.phase = "materializing"
@@ -277,7 +286,26 @@ local function finishMaterialization(
         end
     end
     record.presenceState = Const.PRESENCE_LIVE
+    if record.runtime
+        and record.runtime.abstractFollowMaterializeRequested == true
+    then
+        -- This force-live flag is a one-shot wake from the abstract follow
+        -- lane. Do not leave it attached to the live record or it will defeat
+        -- the normal live-to-abstract distance policy on the next pass.
+        if record.runtime.abstractFollowOwnsForceLive == true then
+            record.runtime.forceLive = nil
+        end
+        record.runtime.abstractFollowOwnsForceLive = nil
+        record.runtime.abstractFollowMaterializeRequested = nil
+    end
     Registry.RegisterLiveZombie(record, zombie)
+    if Internal.LogTraversal then
+        Internal.LogTraversal(record, "presence_transition", zombie, {
+            "from=" .. tostring(fromState or Const.PRESENCE_ABSTRACT),
+            "to=live",
+            "reason=" .. tostring(reason or "materialize"),
+        })
+    end
     if PNC.Travel and PNC.Travel.Service then
         PNC.Travel.Service.OnMaterialized(record)
     end

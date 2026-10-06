@@ -25,6 +25,105 @@ local function isCampAnchorLane(lane)
     )
 end
 
+local function auditTraversal(record, eventName, zombie, lane, extra)
+    local presence = PNC.Presence
+    local presenceInternal = presence and presence.Internal or nil
+    local fields
+    if not presenceInternal or not presenceInternal.LogTraversal then
+        return
+    end
+    fields = {
+        "goal=" .. tostring(lane and lane.goal
+            and Internal.describeGoal(lane.goal) or "nil"),
+        "targetKind=" .. tostring(lane and lane.targetKind or "nil"),
+        "targetValidation=" .. tostring(
+            lane and lane.targetValidation or "nil"
+        ),
+        "ownerMode=" .. tostring(lane and lane.ownerMode or "nil"),
+        "noProgress=" .. tostring(lane and lane.noProgressCount or 0),
+    }
+    for _, field in ipairs(extra or {}) do
+        fields[#fields + 1] = tostring(field)
+    end
+    presenceInternal.LogTraversal(record, eventName, zombie, fields)
+end
+
+local function requestTraversalHandoff(record, zombie, lane, reason)
+    -- Travel owns its elapsed-time handoff policy. FollowOwner also has a
+    -- durable owner target and an existing range-based live/abstract policy;
+    -- Presence owns the range-based live/abstract transition. Do not invoke
+    -- it for a durable Travel journey, which has its own elapsed-time
+    -- projection and handoff policy; FollowOwner is intentionally allowed
+    -- through so a far/stalled live body can return to the existing abstract
+    -- owner-follow lane instead of being converted to fake locomotion.
+    if record and record.travel then
+        return false
+    end
+    if PNC.Presence and PNC.Presence.RequestTraversalHandoff
+        and PNC.Presence.RequestTraversalHandoff(record, reason)
+    then
+        auditTraversal(record, "handoff_requested", zombie, lane, {
+            "reason=" .. tostring(reason or "movement_stall"),
+            "lane=non_travel",
+        })
+        return true
+    end
+    return false
+end
+
+local function scheduleFollowNativeRepath(
+    record,
+    zombie,
+    lane,
+    now,
+    reason,
+    enginePlanner
+)
+    local goalRevision = tonumber(lane.goalRevision) or 0
+    if lane.followNativeRecoveryGoalRevision ~= goalRevision then
+        lane.followNativeRecoveryGoalRevision = goalRevision
+        lane.followNativeRecoveryCount = 0
+    end
+    local retryCount = math.min(
+        8,
+        (tonumber(lane.followNativeRecoveryCount) or 0) + 1
+    )
+    local retryDelay = math.max(
+        250,
+        tonumber(Const.FOLLOW_PATH_BLOCKED_COOLDOWN_MS)
+            or tonumber(Const.ENGINE_PATH_REPLAN_MS)
+            or 1000
+    )
+    local planner = enginePlanner or PNC.EnginePathPlanner
+    if planner and planner.Invalidate then
+        planner.Invalidate(record, reason or "follow_native_repath", zombie)
+    end
+    lane.followNativeRecoveryCount = retryCount
+    lane.lastNavigationInvalidatedAt = now
+    lane.nativeBackoffUntil = now + retryDelay * math.min(4, retryCount)
+    lane.ownerMode = "native_backoff"
+    lane.lastRecoveryReason = "follow_native_repath"
+    lane.lastRecoverAt = now
+    lane.lastProgressAt = now
+    lane.lastGoalProgressAt = now
+    lane.noProgressCount = 0
+    lane.nativeStallRecoveryCount = 0
+    lane.blockReason = nil
+    if Internal.clearNativeGoalBlock then
+        Internal.clearNativeGoalBlock(lane)
+    end
+    if Diagnostics and type(Diagnostics.Increment) == "function" then
+        Diagnostics.Increment("Pathing.Replans")
+        Diagnostics.Increment("Pathing.Retries")
+    end
+    auditTraversal(record, "native_repath", zombie, lane, {
+        "reason=" .. tostring(reason or "follow_native_repath"),
+        "retry=" .. tostring(retryCount),
+        "policy=follow_native_provider",
+    })
+    return true, "native_repath"
+end
+
 local function activateNativeFallback(record, lane, now, reason)
     local router = PNC.NavigationRouter
     local durationMs = math.max(
@@ -50,6 +149,9 @@ local function activateNativeFallback(record, lane, now, reason)
     if Diagnostics then
         Diagnostics.Increment("Pathing.NativeFallbacks")
     end
+    auditTraversal(record, "native_fallback", nil, lane, {
+        "reason=" .. tostring(reason or "native_path_fallback"),
+    })
 end
 
 local function handleNativeFailure(
@@ -57,13 +159,33 @@ local function handleNativeFailure(
     zombie,
     lane,
     now,
-    nativeState
+    nativeState,
+    enginePlanner
 )
     lane.ownerMode = "engine_path_waiting"
     lane.lastStepAt = now
     lane.lastStepDistance = 0
     lane.lastStepLabel = nativeState
-    if isFollowOwnerLane(lane) or isCampAnchorLane(lane) then
+    if isFollowOwnerLane(lane) then
+        -- A follow failure is a native-provider failure, not an order
+        -- failure. Keep the engine_path provider and let its normal bounded
+        -- retry acquire a fresh route. Activating the direct provider here
+        -- made visible followers use fake locomotion after one transient
+        -- Behavior2 failure.
+        return scheduleFollowNativeRepath(
+            record,
+            zombie,
+            lane,
+            now,
+            nativeState or "native_path_failed",
+            enginePlanner
+        )
+    end
+    if isCampAnchorLane(lane) then
+        auditTraversal(record, "native_route_failed", zombie, lane, {
+            "reason=" .. tostring(nativeState or "native_path_failed"),
+            "policy=follow_or_camp_fallback",
+        })
         -- Follow and camp are durable local movement commands. Native
         -- failure is a provider failure, not an order failure: keep the lane
         -- alive and give the scripted mover the same destination so it can
@@ -94,6 +216,14 @@ local function handleNativeFailure(
     if Internal.noteNativeGoalFailure
         and Internal.noteNativeGoalFailure(lane, lane.goal, now)
     then
+        if requestTraversalHandoff(
+            record,
+            zombie,
+            lane,
+            nativeState or "native_path_unreachable"
+        ) then
+            return true, "presence_handoff_requested"
+        end
         Internal.logMoveWarning(
             record,
             zombie,
@@ -133,6 +263,9 @@ local function recordPhysicalStep(
     lane.lastPhysicalMoveAt = now
     lane.lastX = toX
     lane.lastY = toY
+    lane.followNativeRecoveryCount = 0
+    lane.followNativeRecoveryGoalRevision =
+        tonumber(lane.goalRevision) or 0
     lane.nativeStallRecoveryCount = 0
     lane.nativeBackoffUntil = 0
     lane.visualMovingUntil = now + Internal.LOCOMOTION_VISUAL_LEASE_MS
@@ -184,6 +317,10 @@ local function handleNativeTimeout(
     end
     lane.noProgressCount = (tonumber(lane.noProgressCount) or 0) + 1
     lane.blockReason = "native_no_goal_progress"
+    auditTraversal(record, "native_progress_timeout", zombie, lane, {
+        "reason=" .. tostring(lane.blockReason),
+        "nativeState=" .. tostring(nativeTraversalState or "none"),
+    })
     Internal.logMoveWarning(
         record,
         zombie,
@@ -192,6 +329,31 @@ local function handleNativeTimeout(
         lane.blockReason,
         "goal=" .. Internal.describeGoal(lane.goal)
     )
+    if isFollowOwnerLane(lane) then
+        -- Keep a stalled visible follower on the native provider. If it is
+        -- outside the materialization radius, the existing Presence handoff
+        -- owns the transition to abstract FollowOwner; nearby followers keep
+        -- a bounded native replan and remain visible.
+        if lane.followNativeRecoveryCount
+            and tonumber(lane.followNativeRecoveryCount) >= 2
+            and requestTraversalHandoff(
+                record,
+                zombie,
+                lane,
+                "native_progress_timeout"
+            )
+        then
+            return true, "presence_handoff_requested"
+        end
+        return scheduleFollowNativeRepath(
+            record,
+            zombie,
+            lane,
+            now,
+            "native_progress_timeout",
+            enginePlanner
+        )
+    end
     if lane.noProgressCount >= 3 then
         if enginePlanner.Invalidate then
             enginePlanner.Invalidate(
@@ -201,6 +363,14 @@ local function handleNativeTimeout(
             )
         end
         lane.lastNavigationInvalidatedAt = now
+        if requestTraversalHandoff(
+            record,
+            zombie,
+            lane,
+            "native_progress_timeout"
+        ) then
+            return true, "presence_handoff_requested"
+        end
         return Internal.completeMove(
             zombie,
             record,
@@ -221,6 +391,14 @@ local function handleNativeTimeout(
                 )
             end
             lane.lastNavigationInvalidatedAt = now
+            if requestTraversalHandoff(
+                record,
+                zombie,
+                lane,
+                "native_stall_backoff_exhausted"
+            ) then
+                return true, "presence_handoff_requested"
+            end
             return Internal.completeMove(
                 zombie,
                 record,
@@ -271,6 +449,52 @@ local function handleNativeTimeout(
     return true, "native_repath"
 end
 
+-- A route request can be valid but not actionable yet because its destination
+-- chunk is not materialized. Keep this in the shared path supervisor so
+-- fishing, travel, work, and follow all receive the same bounded behavior.
+function Internal.handleNativeTargetReadinessWait(
+    record,
+    zombie,
+    lane,
+    navigation,
+    now
+)
+    local startedAt = tonumber(
+        navigation and navigation.targetReadinessWaitStartedAt
+    )
+    local timeoutMs = math.max(
+        1000,
+        tonumber(Const.ENGINE_PATH_TARGET_READINESS_TIMEOUT_MS) or 6000
+    )
+    if not startedAt then
+        return true, "target_readiness_waiting"
+    end
+    lane.ownerMode = "engine_path_waiting"
+    lane.blockReason = navigation.lastPlanReason
+        or "target_chunk_unloaded"
+    lane.lastIssueAt = now
+    if now - startedAt < timeoutMs then
+        return true, "target_readiness_waiting"
+    end
+    auditTraversal(record, "target_readiness_timeout", zombie, lane, {
+        "reason=" .. tostring(lane.blockReason),
+        "waitMs=" .. tostring(now - startedAt),
+    })
+    if requestTraversalHandoff(
+        record,
+        zombie,
+        lane,
+        lane.blockReason or "target_chunk_unloaded"
+    ) then
+        return true, "presence_handoff_requested"
+    end
+    -- Travel has its own durable journey watchdog, which will consume the
+    -- lack of physical progress. Do not complete that journey as blocked here.
+    navigation.targetReadinessWaitStartedAt = now
+    navigation.plannedAt = now
+    return true, "target_readiness_retry"
+end
+
 function Internal.recordNativeMove(
     record,
     zombie,
@@ -308,7 +532,7 @@ function Internal.recordNativeMove(
         or nativeState == "engine_path_timeout"
     then
         return handleNativeFailure(
-            record, zombie, lane, now, nativeState
+            record, zombie, lane, now, nativeState, enginePlanner
         )
     end
 
@@ -333,6 +557,12 @@ function Internal.recordNativeMove(
         toZ,
         stepDistance
     )
+    if stepDistance > 0.0001
+        and PNC.Presence
+        and PNC.Presence.ClearTraversalHandoff
+    then
+        PNC.Presence.ClearTraversalHandoff(record, "native_progress")
+    end
     recordGoalProgress(lane, now, goalDistance, goalProgress)
     if Internal.syncRecordPosition then
         Internal.syncRecordPosition(record, zombie)

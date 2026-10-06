@@ -28,8 +28,12 @@ function Endpoint.NPC(npcID)
         return Model.BuildNPCContainers(self:inventory())
     end
     function endpoint:rows()
+        local payload = self:payload()
         return Model.BuildNPCRows(
-            self:inventory(), self.selectedContainer, self.expandedGroups
+            payload and payload.inventory or nil,
+            self.selectedContainer,
+            self.expandedGroups,
+            payload and payload.snapshot or nil
         )
     end
     function endpoint:weight()

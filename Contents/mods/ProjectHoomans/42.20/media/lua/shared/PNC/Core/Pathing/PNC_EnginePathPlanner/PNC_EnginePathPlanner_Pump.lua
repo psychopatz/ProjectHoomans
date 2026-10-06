@@ -6,6 +6,55 @@ local Core = PNC.Core
 local Diagnostics = PNC.PerformanceScalingDiagnostics
 local ActorControl = PNC.ActorControl
 
+local function currentLiveBody(record, body, navigation)
+    local liveState = PNC.Const and PNC.Const.PRESENCE_LIVE or "live"
+    local bodyInternal = PNC.BodyLifecycle
+        and PNC.BodyLifecycle.Internal or nil
+    if not record or record.presenceState
+        and record.presenceState ~= liveState
+    then
+        return false, "presence_not_live"
+    end
+    if navigation and navigation.presenceRevision ~= nil
+        and navigation.presenceRevision ~= record.presenceRevision
+    then
+        return false, "stale_presence_revision"
+    end
+    if navigation and navigation.bodyLease ~= nil
+        and (not record.runtime
+            or navigation.bodyLease ~= record.runtime.bodyLease)
+    then
+        return false, "stale_body_lease"
+    end
+    if bodyInternal and bodyInternal.matchesRecordBody
+        and bodyInternal.matchesRecordBody(record, body) ~= true
+    then
+        return false, "body_lease_mismatch"
+    end
+    return true
+end
+
+local function discardStaleNavigation(record, body, navigation, reason)
+    local bodyInternal = PNC.BodyLifecycle
+        and PNC.BodyLifecycle.Internal or nil
+    local owned = true
+    if bodyInternal and bodyInternal.matchesRecordBody then
+        owned = bodyInternal.matchesRecordBody(record, body) == true
+    end
+    if owned then
+        Internal.ClearEngineRequest(body, navigation)
+    elseif record and record.runtime then
+        record.runtime.localNavigation = nil
+    end
+    if PNC.Presence and PNC.Presence.Internal
+        and PNC.Presence.Internal.LogTraversal
+    then
+        PNC.Presence.Internal.LogTraversal(record, "native_pump_rejected", nil, {
+            "reason=" .. tostring(reason or "stale_navigation"),
+        })
+    end
+end
+
 local function suppressConflictingNativeState(body, navigation, now)
     local liveBodyControl = PNC.LiveBodyControl
     local actionState
@@ -48,6 +97,11 @@ function Planner.Pump(record, body, source)
         or not navigation.nativeActive
     then
         return false, "native_inactive"
+    end
+    local current, currentReason = currentLiveBody(record, body, navigation)
+    if not current then
+        discardStaleNavigation(record, body, navigation, currentReason)
+        return false, currentReason
     end
     -- PathService owns the Puppet movement claim.  If the scene is in a
     -- beat/facing/arrival phase, do not let a scheduled Behavior2/native pump

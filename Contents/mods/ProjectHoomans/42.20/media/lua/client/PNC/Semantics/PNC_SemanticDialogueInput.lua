@@ -95,7 +95,13 @@ end
 
 function Input.CreatePart(bounds, options)
     options = options or {}
-    options.partID = options.partID or "semanticInput"
+    local definition = options.definition
+    local definitionPartID = type(definition) == "table"
+        and definition.partID or nil
+    options.partID = options.partID or definitionPartID or "llmInput"
+    if options.title == nil and type(definition) == "table" then
+        options.title = definition.title
+    end
     options.minimumWidth = options.minimumWidth or 280
     options.minimumHeight = options.minimumHeight or 82
     options.submit = options.submit or Input.Submit

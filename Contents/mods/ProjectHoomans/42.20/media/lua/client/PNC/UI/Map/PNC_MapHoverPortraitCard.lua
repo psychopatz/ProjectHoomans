@@ -21,6 +21,12 @@ PNCMapHoverPortraitCard.DebugBackground = false
 
 local FACTION_COLOR = { r = 0.82, g = 0.61, b = 0.16 }
 local WORKER_COLOR = { r = 0.16, g = 0.55, b = 0.78 }
+local PRESENCE_COLORS = {
+    LIVE = { r = 0.24, g = 0.86, b = 0.38 },
+    ABSTRACT = { r = 1.00, g = 0.68, b = 0.18 },
+    CORPSE = { r = 0.65, g = 0.65, b = 0.65 },
+    UNKNOWN = { r = 0.70, g = 0.70, b = 0.70 },
+}
 local EmblemRenderer = PNC.FactionEmblemRenderer
 local Identity = PNC.NPCIdentityPresentation
 
@@ -28,6 +34,13 @@ local function firstGlyph(value, fallback)
     local text = tostring(value or "")
     if text == "" then return fallback end
     return string.upper(string.sub(text, 1, 1))
+end
+
+local function presenceLabel(entry, enabled)
+    if enabled ~= true then return nil end
+    local value = entry and entry.presenceState
+    if value == nil or tostring(value) == "" then return "UNKNOWN" end
+    return string.upper(tostring(value))
 end
 
 function PNCMapHoverPortraitCard:initialise()
@@ -67,7 +80,7 @@ function PNCMapHoverPortraitCard:setTarget(spec)
     return self.portrait:setTarget(nil, spec) == true
 end
 
-function PNCMapHoverPortraitCard:setContext(entry)
+function PNCMapHoverPortraitCard:setContext(entry, showPresence)
     local presentation = PNC.FactionPresentation
         and PNC.FactionPresentation.Resolve(entry) or nil
     local name = presentation and presentation.npcName or Identity.GetName(entry)
@@ -77,11 +90,13 @@ function PNCMapHoverPortraitCard:setContext(entry)
     local emblem = presentation and presentation.emblem or nil
     local emblemRevision = emblem
         and tonumber(emblem.revision) or -1
+    local presence = presenceLabel(entry, showPresence)
     if self.contextName == name
         and self.contextFaction == faction
         and self.contextFactionID == factionID
         and self.contextWorkerRole == workerRole
         and self.contextEmblemRevision == emblemRevision
+        and self.contextPresence == presence
     then
         return
     end
@@ -90,9 +105,38 @@ function PNCMapHoverPortraitCard:setContext(entry)
     self.contextFactionID = factionID
     self.contextWorkerRole = workerRole
     self.contextEmblemRevision = emblemRevision
+    self.contextPresence = presence
+    self.contextPresenceColor = PRESENCE_COLORS[presence]
+        or PRESENCE_COLORS.UNKNOWN
     self.factionEmblem = emblem
     self.factionGlyph = firstGlyph(faction, "?")
     self.workerGlyph = firstGlyph(workerRole, "?")
+end
+
+function PNCMapHoverPortraitCard:drawPresenceBadge()
+    if not self.contextPresence then return end
+    local color = self.contextPresenceColor or PRESENCE_COLORS.UNKNOWN
+    local width = self.contextPresence == "ABSTRACT" and 84 or 68
+    local height = 18
+    local x = 4
+    local y = 4
+    self:drawRect(x + 2, y + 2, width, height, 0.55, 0, 0, 0)
+    self:drawRect(x, y, width, height, 0.94,
+        color.r, color.g, color.b)
+    if self.drawRectBorder then
+        self:drawRectBorder(x, y, width, height, 1,
+            0.04, 0.04, 0.04)
+    end
+    self:drawTextCentre(
+        self.contextPresence,
+        x + width / 2,
+        y + 2,
+        0.04,
+        0.04,
+        0.04,
+        1,
+        UIFont.Small
+    )
 end
 
 function PNCMapHoverPortraitCard:setFactionIcon(texture)
@@ -206,6 +250,7 @@ end
 
 function PNCMapHoverPortraitCard:render()
     ISPanel.render(self)
+    self:drawPresenceBadge()
     local nameY = self.portraitSize
     self:drawRect(
         0,

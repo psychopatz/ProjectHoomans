@@ -111,13 +111,23 @@ function H.Apply(
                     or stopDistance
             end
         end
-        if providerName ~= NavigationRouter.DIRECT_PROVIDER then
+            if providerName ~= NavigationRouter.DIRECT_PROVIDER then
             intentNavigation = {
                 navigationPolicy = policyName,
                 navigationProvider = providerName,
                 finalX = finalX,
                 finalY = finalY,
                 finalZ = finalZ,
+                targetKind = navigationOptions
+                    and navigationOptions.targetKind or nil,
+                targetValidation = navigationOptions
+                    and navigationOptions.targetValidation or nil,
+                targetWaterX = navigationOptions
+                    and navigationOptions.targetWaterX or nil,
+                targetWaterY = navigationOptions
+                    and navigationOptions.targetWaterY or nil,
+                targetWaterZ = navigationOptions
+                    and navigationOptions.targetWaterZ or nil,
                 waypointIndex = steeringTarget
                     and steeringTarget.waypointIndex or nil,
                 steeringIndex = steeringTarget

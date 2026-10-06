@@ -8,6 +8,71 @@ local Currency = Helpers.currency
 
 local Model = PNC.InventoryUIModel
 
+local function virtualMetadataRow(
+    containerID, npcID, id, fullType, name, reason
+)
+    local metadata = probe(fullType)
+    local rowID = "virtual:" .. tostring(id) .. ":" .. tostring(npcID or "")
+    return {
+        source = "npc",
+        id = rowID,
+        fullType = fullType,
+        name = name,
+        category = metadata.category,
+        texture = metadata.texture,
+        weight = 0,
+        unitWeight = 0,
+        conditionMax = metadata.conditionMax,
+        stateful = false,
+        virtual = true,
+        interactionLocked = true,
+        restricted = true,
+        restrictionReason = reason or "identity_metadata",
+        container = containerID,
+        stack = 1,
+        equipped = false,
+        favorite = false,
+        stateKey = "virtual:" .. rowID .. ":" .. tostring(name or ""),
+    }
+end
+
+local function appendVirtualIdentityRows(rows, inventory, containerID, snapshot)
+    local identity = inventory and inventory.identityMetadata or nil
+    local organizationalFaction = snapshot
+        and snapshot.organizationalFaction or nil
+    local npcID = identity and identity.npcId
+        or snapshot and snapshot.id or ""
+    local displayName = identity and identity.displayName
+        or snapshot and snapshot.displayName or nil
+    local factionID = identity and identity.factionID
+        or organizationalFaction and organizationalFaction.factionID
+    local factionName = identity and identity.factionName
+        or organizationalFaction and organizationalFaction.name
+    local factionLabel
+    if tostring(containerID or "root") ~= "root" then return end
+    if displayName and tostring(displayName) ~= "" then
+        rows[#rows + 1] = virtualMetadataRow(
+            "root",
+            npcID,
+            "identity-card",
+            "Base.IDcard",
+            "ID Card: " .. tostring(displayName)
+        )
+    end
+    if factionID and tostring(factionID) ~= ""
+        and factionName and tostring(factionName) ~= ""
+    then
+        factionLabel = "Dog Tags: " .. tostring(factionName)
+        rows[#rows + 1] = virtualMetadataRow(
+            "root",
+            npcID,
+            "faction-dogtag:" .. tostring(factionID),
+            "Base.Necklace_DogTag",
+            factionLabel
+        )
+    end
+end
+
 function Model.BuildNPCContainers(inventory)
     local output = {
         { id = "root", label = "Inventory", texture = ROOT_INVENTORY_TEXTURE },
@@ -33,12 +98,20 @@ function Model.BuildNPCContainers(inventory)
     return output
 end
 
-function Model.BuildNPCRows(inventory, containerID, expandedGroups)
+function Model.BuildNPCRows(
+    inventory, containerID, expandedGroups, characterSnapshot
+)
     local rows = {}
     local currencyRow
     local container = inventory and inventory.containers
         and inventory.containers[containerID or "root"]
         or nil
+    appendVirtualIdentityRows(
+        rows,
+        inventory,
+        containerID or "root",
+        characterSnapshot
+    )
     for _, itemID in ipairs(container and container.items or {}) do
         local item = inventory.items and inventory.items[itemID] or nil
         if item then

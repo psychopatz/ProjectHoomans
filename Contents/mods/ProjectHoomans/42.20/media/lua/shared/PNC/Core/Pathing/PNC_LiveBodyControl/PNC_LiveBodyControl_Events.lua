@@ -9,6 +9,22 @@ local Diagnostics = PNC.PerformanceScalingDiagnostics
 local ActorControl = PNC.ActorControl
 local plantProtectionState = setmetatable({}, { __mode = "k" })
 
+local function canAdvanceNative(record, zombie)
+    local bodyInternal = PNC.BodyLifecycle
+        and PNC.BodyLifecycle.Internal or nil
+    if not record then return false end
+    if record.presenceState
+        and record.presenceState ~= (PNC.Const
+            and PNC.Const.PRESENCE_LIVE or "live")
+    then
+        return false
+    end
+    if bodyInternal and bodyInternal.matchesRecordBody then
+        return bodyInternal.matchesRecordBody(record, zombie) == true
+    end
+    return true
+end
+
 local function hasFarmingPlant(square)
     return square and square.hasFarmingPlant
         and square:hasFarmingPlant() == true
@@ -191,7 +207,7 @@ function LiveBodyControl.OnZombieUpdate(zombie)
         and PNC.EnginePathPlanner.PumpFrame
     then
         record = PNC.Registry.FindRecordByZombie(zombie)
-        if record then
+        if record and canAdvanceNative(record, zombie) then
             navigation = record.runtime
                 and record.runtime.localNavigation or nil
             if PNC.EnginePathPlanner.Internal
@@ -245,6 +261,12 @@ function LiveBodyControl.OnZombieUpdate(zombie)
                 end
             end
         end
+    end
+    if record and not canAdvanceNative(record, zombie) then
+        -- A body callback can arrive after Presence.Abstract detached its
+        -- lease. Do not let the trailing owner fences or passage guards
+        -- resurrect native movement for that stale body.
+        return
     end
     -- The single-player planner can touch native state after the shared
     -- safety pass. Reapply only the target/lunge boundary here; do not reset

@@ -35,27 +35,6 @@ local function inventoryAuditEnabled()
         and type(diagnostics.LogInventoryAudit) == "function"
 end
 
-local function inventoryValuesEqual(left, right, seen)
-    local key
-    if left == right then return true end
-    if type(left) ~= "table" or type(right) ~= "table" then
-        return false
-    end
-    seen = seen or {}
-    seen[left] = seen[left] or {}
-    if seen[left][right] then return true end
-    seen[left][right] = true
-    for key, value in pairs(left) do
-        if not inventoryValuesEqual(value, right[key], seen) then
-            return false
-        end
-    end
-    for key, _ in pairs(right) do
-        if left[key] == nil then return false end
-    end
-    return true
-end
-
 local function logInventoryHydration(
     record,
     itemCountBefore,
@@ -111,29 +90,17 @@ local function finalizeRecordInventory(
     local dirtyReason
     local dirtyMarked = false
     local waterReconciled = false
-    local identityCard
-    local identityCardChanged
-    local factionDogTag
-    local factionDogTagChanged
+    local legacyIdentityRemoved
     Internal.normalizeLegacyBagSlot(inv)
     Internal.getRuntimeState(record)
     Internal.refreshNextItemSerial(record, inv)
     if options.skipCanonicalRepair ~= true then
-        identityCard, identityCardChanged = Internal.ensureIdentityCard(
+        legacyIdentityRemoved = Internal.removeLegacyIdentityItems(
             record,
-            inv
+            inv,
+            { reason = "inventory_identity_metadata_only" }
         )
-        if identityCardChanged then
-            structureChanged = true
-        end
-        -- Canonical identity items must be repaired on every hydration, not
-        -- only on the generator migration that originally introduced them.
-        -- A BASELINE_DELTA can explicitly remove a template dogtag after the
-        -- baseline is generated, so version-gating this repair leaves the
-        -- saved inventory permanently incomplete.
-        factionDogTag, factionDogTagChanged =
-            Internal.ensureFactionDogTag(record, inv)
-        if factionDogTagChanged then
+        if legacyIdentityRemoved then
             structureChanged = true
         end
     end
@@ -202,59 +169,17 @@ local function finalizePersistedInventory(record, inv, options)
 end
 
 function Inventory.RepairCanonicalIdentityItems(record)
-    local before
-    local after
-    local ops
-    local item
-    local previous
-    local itemID
-    local applied
     if not record or type(record.inventory) ~= "table"
         or type(record.inventory.items) ~= "table"
-        or not PNC.Core or type(PNC.Core.DeepCopy) ~= "function"
-        or type(Inventory.ApplyDelta) ~= "function"
     then
         return false
     end
-    before = PNC.Core.DeepCopy(record.inventory)
-    Internal.ensureIdentityCard(record, record.inventory)
-    Internal.ensureFactionDogTag(record, record.inventory)
-    after = record.inventory
-    ops = {}
-    for itemID, previous in pairs(before.items or {}) do
-        item = after.items and after.items[itemID] or nil
-        if not item then
-            ops[#ops + 1] = { op = "remove", itemID = itemID }
-        elseif not inventoryValuesEqual(previous, item) then
-            ops[#ops + 1] = { op = "remove", itemID = itemID }
-            ops[#ops + 1] = {
-                op = "add",
-                item = PNC.Core.DeepCopy(item),
-            }
-        end
-    end
-    for itemID, item in pairs(after.items or {}) do
-        if not before.items or not before.items[itemID] then
-            ops[#ops + 1] = {
-                op = "add",
-                item = PNC.Core.DeepCopy(item),
-            }
-        end
-    end
-    if #ops <= 0 then
-        record.inventory = before
-        Inventory.RebuildCaches(record)
-        return false
-    end
-    record.inventory = before
+    local removed = Internal.removeLegacyIdentityItems(record, record.inventory)
     Inventory.RebuildCaches(record)
-    applied = Inventory.ApplyDelta(
-        record,
-        ops,
-        "inventory_identity_repair",
-        { skipCanonicalRepair = true, skipHydrationLifecycle = true }
-    )
-    return applied == true
+    if removed and PNC.Registry and PNC.Registry.MarkDirty then
+        PNC.Registry.MarkDirty(record, "inventory_identity_metadata_only")
+    end
+    return removed == true
 end
 
 function Inventory.EnsureRecordInventory(record, options)
@@ -269,11 +194,6 @@ function Inventory.EnsureRecordInventory(record, options)
     local persistedInventory
     persistedHandled, persistedInventory = restorePersistedInventory(record, options)
     if persistedHandled then
-        if options.skipCanonicalRepair ~= true then
-            if Inventory.RepairCanonicalIdentityItems(record) then
-                options.skipCanonicalRepair = true
-            end
-        end
         return finalizePersistedInventory(record, persistedInventory, options)
     end
     if type(record.inventory) ~= "table"

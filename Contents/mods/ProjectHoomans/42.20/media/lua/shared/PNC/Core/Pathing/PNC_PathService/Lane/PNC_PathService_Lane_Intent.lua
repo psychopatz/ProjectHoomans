@@ -27,6 +27,11 @@ function Internal.captureIntentContext(record, lane, intent)
     lane.finalGoalX = intent and tonumber(intent.finalX) or nil
     lane.finalGoalY = intent and tonumber(intent.finalY) or nil
     lane.finalGoalZ = intent and tonumber(intent.finalZ) or nil
+    lane.targetKind = intent and intent.targetKind or nil
+    lane.targetValidation = intent and intent.targetValidation or nil
+    lane.targetWaterX = intent and tonumber(intent.targetWaterX) or nil
+    lane.targetWaterY = intent and tonumber(intent.targetWaterY) or nil
+    lane.targetWaterZ = intent and tonumber(intent.targetWaterZ) or nil
     lane.waypointIndex = intent
         and tonumber(intent.waypointIndex) or nil
     lane.steeringIndex = intent

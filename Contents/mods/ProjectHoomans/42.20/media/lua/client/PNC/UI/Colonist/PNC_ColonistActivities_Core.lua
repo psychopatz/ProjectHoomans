@@ -4,6 +4,8 @@ require "ISUI/ISPanel"
 local Presentation = require "PNC/UI/Communities/PNC_ColonyPresentation"
 local JournalPresentation = require "PNC/UI/Communities/PNC_ColonistJournalPresentation"
 local Selector = require "PNC/UI/Colonist/PNC_ColonistSelector"
+local ActivityPresentation = require
+    "PNC/UI/Colonist/PNC_ColonistActivityPresentation"
 local Shared = require "PNC/UI/Shared/PNC_ColonyUIShared"
 
 local Activities = {}
@@ -209,7 +211,7 @@ local function togglePresentation(person, definition)
             "Call this colonist to follow you.")
     -- Go Home is base-anchored, so it stays disabled until the player has
     -- claimed a base territory. The follow face of the same toggle never needs
-    -- a base and is judged by the relay gate alone.
+    -- a base, but a remote/abstract target still requires the radio relay gate.
     if commandID == TOGGLE.homeCommandID and not playerHasBase() then
         state.enabled = false
         state.reason = "base_required"
@@ -313,6 +315,14 @@ end
 local function currentActivity(person)
     local info = activityInfo(person)
     if not info then return Shared.Text(person and person.activity, "IDLE") end
+    local behaviorID = string.lower(tostring(info.behaviorId or ""))
+    local orderKind = string.lower(tostring(info.orderKind or ""))
+    if info.kind == "behavior"
+        and (orderKind == "fishing"
+            or string.find(behaviorID, "fishing", 1, true) == 1)
+    then
+        return ActivityPresentation.Fishing(info)
+    end
     if info.kind == "work_order" then
         local operation = tostring(info.operation or "")
         local label

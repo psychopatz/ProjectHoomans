@@ -97,6 +97,17 @@ function OrderSystem.SetOrder(record, orderSpec)
 
     record.orderSpec = OrderSystem.Normalize(record, orderSpec)
     if tostring(record.orderSpec.kind or "")
+        == tostring(Const.ORDER_FOLLOW or "follow")
+    then
+        -- Keep a short-lived runtime intent marker as a handoff guard. The
+        -- durable order remains authoritative, but this marker prevents an
+        -- abstract record whose order table is being rebuilt from falling
+        -- through to GuardAnchor/AtHome for one scheduler pass.
+        record.runtime.followOrderActive = true
+    else
+        record.runtime.followOrderActive = nil
+    end
+    if tostring(record.orderSpec.kind or "")
         ~= tostring(Const.ORDER_CAMP or "camp")
     then
         -- A queued camp placement is runtime coordination state, not a

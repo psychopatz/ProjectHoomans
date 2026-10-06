@@ -296,6 +296,43 @@ person.followingCurrentPlayer = nil
 Activities.Apply(window, true, UI.Layout, activities)
 T.truthy(toggle.enabled, "follow me is gated by the base territory")
 
+-- Abstract followers must still be callable from the colonist panel. The
+-- command remains radio-gated, but once both radios are active it is sent
+-- while the NPC is still abstract.
+person.presenceState = "abstract"
+PNC.CommandRelayGate.Evaluate = function()
+    return false, "relay_unavailable"
+end
+Activities.Apply(window, true, UI.Layout, activities)
+T.falsy(toggle.enabled, "abstract follower bypassed the radio relay gate")
+T.equal(Activities.Internal.Toggle.presentation(person, Activities.Internal.Toggle).reason,
+    "relay_unavailable", "abstract follow panel used the wrong rejection reason")
+getSpecificPlayer = function() return {} end
+PsychopatzCore = {
+    UI = UI,
+    RadioDeviceState = {
+        FindActivePlayerDevice = function() return {} end,
+    },
+}
+person.radioGear = { equipped = true }
+PNC.CommandRelayGate.Evaluate = function(facts)
+    if facts.playerRadio == true and facts.npcRadio == true then
+        return true, "radio_relay"
+    end
+    return false, "npc_radio_missing"
+end
+Activities.Apply(window, true, UI.Layout, activities)
+T.truthy(toggle.enabled, "radio-equipped abstract follower was not enabled")
+T.truthy(Activities.OnControl(window, {
+    internal = "radio_follow_toggle",
+    activityCommandID = "radio_follow_toggle",
+}), "abstract follower panel did not dispatch Follow Me")
+T.equal(commands[3].commandID, "follow",
+    "abstract follower panel dispatched the wrong command")
+T.equal(commands[3].npcID, person.id,
+    "abstract follower panel dispatched to the wrong colonist")
+person.presenceState = "live"
+
 local Registry = T.load(
     "ProjectHoomans", "client", "PNC/UI/Colonist/PNC_ColonistRegistry.lua")
 T.load("ProjectHoomans", "client", "PNC/UI/Colonist/PNC_ColonistTabs.lua")

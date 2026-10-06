@@ -85,7 +85,7 @@ function Service.CompleteNPCCourier(record)
     return ok, reason, details, storage, record
 end
 
-function Service.RequestNPCCourierDeposit(player, args)
+function Service.RequestNPCCourierDeposit(player, args, homeOptions)
     args = type(args) == "table" and args or {}
     if not Internal.RememberRequest(player, args.requestId) then
         return false, "duplicate_request"
@@ -134,7 +134,7 @@ function Service.RequestNPCCourierDeposit(player, args)
         return ok, why, details, storage, record
     end
     local sent, sendReason, journey = PNC.HomeDutyService.SendHome(
-        record, access.baseId, "storage_courier")
+        record, access.baseId, "storage_courier", homeOptions)
     if not sent then
         updateCourier(record, "FAILED", sendReason)
         return false, sendReason, nil, storage, record
@@ -147,4 +147,3 @@ function Service.RequestNPCCourierDeposit(player, args)
 end
 
 return Service
-

@@ -12,6 +12,7 @@ local npcs = {}
 local spawnCount = 0
 local assignCount = 0
 local relationshipCount = 0
+local relationshipKeys = {}
 local knowledgeCount = 0
 local commitCount = 0
 local randomSequence = 1000
@@ -88,6 +89,9 @@ PNC = {
     },
     PlayerCharacters = {
         GetRegistryRecord = function() return record end,
+        GetEntityKey = function(_, context)
+            return "player:canonical:" .. record.uuid, "resolved"
+        end,
         ApplyStartingCompanionState = function(_, value)
             record.startingCompanions = value
             return true, "updated", value
@@ -142,8 +146,16 @@ PNC = {
         end,
     },
     Relationships = {
-        SetInitialBaseline = function(_, _, standing)
+        MigrateTargetKey = function(_, legacyKey, canonicalKey)
+            relationshipKeys[#relationshipKeys + 1] = {
+                legacy = legacyKey,
+                canonical = canonicalKey,
+            }
+            return false, "source_not_found"
+        end,
+        SetInitialBaseline = function(_, targetKey, standing)
             relationshipCount = relationshipCount + 1
+            relationshipKeys[#relationshipKeys + 1] = targetKey
             T.equal(standing.familiarity >= 90, true,
                 "lifelong familiarity baseline")
             return {}
@@ -210,6 +222,12 @@ T.equal(#result.npcIDs, 6, "six selected companions returned")
 T.equal(spawnCount, 6, "one NPC per selected trait")
 T.equal(assignCount, 6, "all companions assigned")
 T.equal(relationshipCount, 6, "all relationships initialized")
+for _, key in ipairs(relationshipKeys) do
+    if type(key) == "string" then
+        T.equal(key, "player:canonical:" .. record.uuid,
+            "relationships use the canonical player entity key")
+    end
+end
 T.equal(knowledgeCount, 6, "all dossiers initialized")
 T.equal(commitCount, 13, "selection, ID assignment, and each grant committed")
 for _, npcID in ipairs(result.npcIDs) do
@@ -269,8 +287,20 @@ T.equal(brother.identity.survivor.skinColor.r, 0.44,
 T.equal(brother.identity.survivor.skinTexture, "MaleBody03",
     "existing blood relative receives player skin texture")
 
+record.startingCompanions.grants.PNC_HasSister.relationshipKeyVersion = nil
 granted, reason = PNC.StartingCompanions.Ensure(
     player, record.uuid, 14
+)
+T.equal(granted, true, "existing grant repairs its relationship key")
+T.equal(reason, "granted", "relationship key repair result")
+T.equal(
+    record.startingCompanions.grants.PNC_HasSister.relationshipKeyVersion,
+    1,
+    "relationship key repair persists its version marker"
+)
+
+granted, reason = PNC.StartingCompanions.Ensure(
+    player, record.uuid, 15
 )
 T.equal(granted, false, "reconnect does not grant again")
 T.equal(reason, "granted", "reconnect sees persisted grants")
@@ -281,20 +311,25 @@ T.equal(assignCount, 6, "reconnect performs no reassignment")
 lover.affiliation = nil
 record.startingCompanions.grants.PNC_IsMarried.enrichmentVersion = 2
 granted, reason = PNC.StartingCompanions.Ensure(
-    player, record.uuid, 15
+    player, record.uuid, 16
 )
 T.equal(granted, true, "stale enrollment is repaired")
 T.equal(reason, "granted", "repair completes grant")
 T.equal(assignCount, 7, "only stale companion is reassigned")
 granted, reason = PNC.StartingCompanions.Ensure(
-    player, record.uuid, 16
+    player, record.uuid, 17
 )
 T.equal(granted, false, "completed repair is not repeated")
 T.equal(reason, "granted", "completed repair remains resolved")
 T.equal(assignCount, 7, "repair performs no per-frame reassignment")
+T.equal(
+    record.startingCompanions.grants.PNC_HasBrother.relationshipKeyVersion,
+    1,
+    "existing grant records relationship key repair version"
+)
 local stableCommitCount = commitCount
 for frame = 1, 120 do
-    PNC.StartingCompanions.Ensure(player, record.uuid, 16 + frame)
+    PNC.StartingCompanions.Ensure(player, record.uuid, 17 + frame)
 end
 T.equal(assignCount, 7,
     "steady lifecycle checks never repeat companion assignment")

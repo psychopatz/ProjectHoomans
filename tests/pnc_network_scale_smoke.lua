@@ -103,6 +103,11 @@ PNC = {
                 weaponStatus = "ready",
             }
         end,
+        RadioGear = {
+            Describe = function(record)
+                return { equipped = record.radioEquipped == true }
+            end,
+        },
         BuildWornVisualSummary = function()
             return {
                 Shirt = {
@@ -232,6 +237,7 @@ local nearbyRecord = {
         needs = { hunger = 0.90, thirst = 0.91, fatigue = 0.10 },
     },
     equipment = { worn = {}, attached = {} },
+    radioEquipped = true,
     runtime = {},
     generation = {
         source = "starting_companion_trait",
@@ -332,6 +338,8 @@ T.equal(relationshipSnapshot.startingRelationship.kind, "brother",
     "detailed snapshot carries starting relationship kind")
 T.equal(relationshipRoster.startingRelationship.since, "before_outbreak",
     "roster snapshot carries starting relationship age")
+T.equal(relationshipRoster.radioGear.equipped, true,
+    "roster snapshot carries NPC radio gear state")
 T.equal(relationshipSnapshot.startingRelationship.traitID, nil,
     "detailed snapshot does not leak trait ID")
 T.equal(relationshipSnapshot.startingRelationship.playerCharacterUUID, nil,
@@ -343,6 +351,8 @@ T.equal(relationshipSnapshot.name, nil,
 local followDelta = PNC.Network.BuildPresenceDelta(nearbyRecord)
 T.equal(followDelta.activeBehavior, "FollowOwner:idle",
     "presence delta carries the current behavior for nameplate debug")
+T.equal(followDelta.radioGear.equipped, true,
+    "presence delta carries NPC radio gear state")
 T.equal(followDelta.staminaRecovery.sessionId, 4,
     "presence delta omitted stamina recovery session")
 T.equal(PNC.Network.BuildSnapshot(nearbyRecord)

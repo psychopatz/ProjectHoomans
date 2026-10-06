@@ -69,7 +69,7 @@ function Service.RequestSnapshot(player, arguments)
     return true, "snapshot_sent", Service.BuildSnapshot(session)
 end
 
-function Service.BringBack(record, player)
+function Service.BringBack(record, player, homeOptions)
     local session = record and sessionForNPC(record.id) or nil
     if session then
         releaseReservations(session, "bring_back")
@@ -93,7 +93,7 @@ function Service.BringBack(record, player)
         local ok = PNC.ColonyStorageService.RequestNPCCourierDeposit(player, {
             npcId = record.id,
             requestId = PNC.Core.GenerateID("scavenge_bring_back"),
-        })
+        }, homeOptions)
         if ok == true then return true end
     end
     return false

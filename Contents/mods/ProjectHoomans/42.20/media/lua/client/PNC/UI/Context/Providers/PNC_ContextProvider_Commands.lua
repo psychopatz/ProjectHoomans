@@ -17,20 +17,32 @@ local function commandTarget(entry)
     return entry and (entry.record or entry.snapshot) or nil
 end
 
+local function isAbstractTarget(record)
+    local live = PNC.Const and PNC.Const.PRESENCE_LIVE or "live"
+    return type(record) == "table"
+        and tostring(record.presenceState or live) ~= tostring(live)
+end
+
 -- Commandability uses the client authority helper, which reproduces the
 -- server's ownership rule from replicated faction data on a multiplayer
 -- client. The server still authorizes every command that is issued.
 function Provider.isEnabled(entry, player)
+    local target = commandTarget(entry)
+    if isAbstractTarget(target) and Authority
+        and Authority.CanRelayCommand
+    then
+        return Authority.CanRelayCommand(target, player, "follow") == true
+    end
     if Authority and Authority.CanPlayerCommand then
         return Authority.CanPlayerCommand(
-            commandTarget(entry),
+            target,
             player,
             PNC.Const.COMPANION_COMMAND_RADIUS
         ) == true
     end
     if not Commands or not Commands.CanPlayerCommand then return false end
     return Commands.CanPlayerCommand(
-        commandTarget(entry),
+        target,
         player,
         PNC.Const.COMPANION_COMMAND_RADIUS
     ) == true
@@ -51,6 +63,7 @@ function Provider.addOptions(menu, entry, player)
     local groupRoot
     local targetMenu
     local groupIcon
+    local abstractFollowOnly = isAbstractTarget(commandTarget(entry))
     menu:addSubMenu(root, commandMenu)
     if root and getTexture then
         root.iconTexture = getTexture(
@@ -59,7 +72,9 @@ function Provider.addOptions(menu, entry, player)
     end
     for i = 1, #definitions do
         definition = definitions[i]
-        if definition.semanticOnly == true then
+        if abstractFollowOnly and definition.id ~= "follow" then
+            definition = nil
+        elseif definition.semanticOnly == true then
             definition = nil
         elseif definition.manualTabOnly == true then
             definition = nil

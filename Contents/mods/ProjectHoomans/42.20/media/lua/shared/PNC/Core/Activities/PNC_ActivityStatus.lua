@@ -412,6 +412,9 @@ Status.Register("current_job", 10, function(record)
         information.lastSuccess = fishing.lastAttemptSuccess
         information.lastReason = fishing.lastReason
         information.lastFailureReason = fishing.lastFailureReason
+        information.lastCatchItemType = fishing.lastCatchItemType
+        information.lastCatchAt = fishing.lastCatchAt
+        information.lastCatchAttemptIndex = fishing.lastCatchAttemptIndex
         information.leaseOwner = fishing.leaseOwner
         information.leasePriority = fishing.leasePriority
         information.animationScene = fishing.animationScene

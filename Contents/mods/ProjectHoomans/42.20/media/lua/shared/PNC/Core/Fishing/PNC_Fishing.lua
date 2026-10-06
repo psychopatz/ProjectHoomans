@@ -9,9 +9,30 @@ local Fishing = PNC.Fishing
 local Const = PNC.Const or {}
 
 Fishing.DEFAULT_LOOT = Fishing.DEFAULT_LOOT or {
-    { type = "Base.FishFillet", weight = 5 },
-    { type = "Base.SmallmouthBass", weight = 3 },
-    { type = "Base.Crayfish", weight = 2 },
+    -- Native rod fishing returns whole fish. These weights approximate the
+    -- native worm-bait pool while keeping abstract NPC fishing independent of
+    -- client-only Fishing.Fish objects and live engine state.
+    { type = "Base.LargemouthBass", weight = 7 },
+    { type = "Base.SmallmouthBass", weight = 7 },
+    { type = "Base.WhiteBass", weight = 7 },
+    { type = "Base.SpottedBass", weight = 7 },
+    { type = "Base.StripedBass", weight = 7 },
+    { type = "Base.Bluegill", weight = 7 },
+    { type = "Base.WhiteCrappie", weight = 5 },
+    { type = "Base.BlackCrappie", weight = 5 },
+    { type = "Base.RedearSunfish", weight = 5 },
+    { type = "Base.YellowPerch", weight = 5 },
+    { type = "Base.Sauger", weight = 7 },
+    { type = "Base.GreenSunfish", weight = 9 },
+    { type = "Base.Walleye", weight = 5 },
+    { type = "Base.FreshwaterDrum", weight = 7 },
+    { type = "Base.BlueCatfish", weight = 5 },
+    { type = "Base.ChannelCatfish", weight = 5 },
+    { type = "Base.FlatheadCatfish", weight = 5 },
+    { type = "Base.Muskellunge", weight = 5 },
+    { type = "Base.AligatorGar", weight = 5 },
+    { type = "Base.Paddlefish", weight = 1 },
+    { type = "Base.BaitFish", weight = 7 },
 }
 
 local function clamp(value, minimum, maximum)

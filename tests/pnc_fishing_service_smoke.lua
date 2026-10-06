@@ -156,6 +156,14 @@ local ticked, _, tickReason = Service.TickJob(lease)
 T.truthy(ticked, tickReason or "abstract fishing tick")
 T.truthy(#added > 0, "catch enters canonical inventory")
 T.truthy(Service.GetJob("npc").catches > 0, "catch count advances")
+T.equal(Service.GetJob("npc").lastCatchItemType, added[#added].type,
+    "last catch item is retained on the fishing job")
+T.equal(records.npc.runtime.fishing.lastCatchItemType, added[#added].type,
+    "last catch item reaches fishing runtime")
+local claimCount = 0
+for _, _ in pairs(Service.Runtime.spotClaims) do claimCount = claimCount + 1 end
+T.equal(claimCount, 0,
+    "abstract fishing does not reserve an exclusive live shoreline claim")
 
 records.npc.fatigue = 0.71
 local tiredOK, _, tiredReason = Service.TickJob(lease)
@@ -183,5 +191,15 @@ resumed, _, resumedReason = Service.TickJob(lease)
 T.truthy(resumed, resumedReason or "fishing resumes after output wait")
 T.truthy(Service.GetJob("npc").catches > 1,
     "the deferred catch is retried after output capacity returns")
+
+local failedSpotID = tostring(zone.fishingSpots[1].id)
+local stalledJob = {
+    npcId = "stalled", executionMode = "LIVE", spotId = failedSpotID,
+    failedSpots = { [failedSpotID] = true },
+}
+local replacement = Service.Internal.ReserveFishingSpot(
+    zone, stalledJob, records.npc)
+T.truthy(not replacement or tostring(replacement.id) ~= failedSpotID,
+    "a live retry does not immediately reuse its failed fishing spot")
 
 T.finish("pnc_fishing_service_smoke")

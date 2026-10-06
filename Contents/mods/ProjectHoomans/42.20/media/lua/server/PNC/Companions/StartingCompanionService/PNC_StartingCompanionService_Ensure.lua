@@ -70,6 +70,8 @@ function Starting.Ensure(player, characterUUID, at)
         if not grant or grant.status ~= "granted"
             or (tonumber(grant.enrichmentVersion) or 0)
                 < Starting.ENRICHMENT_VERSION
+            or (tonumber(grant.relationshipKeyVersion) or 0)
+                < Starting.RELATIONSHIP_KEY_VERSION
         then
             needsWork = true
             break
@@ -104,4 +106,3 @@ function Starting.Ensure(player, characterUUID, at)
 end
 
 return Starting
-
