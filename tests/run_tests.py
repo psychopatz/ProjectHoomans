@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import re
 import subprocess
@@ -32,6 +33,57 @@ class Result:
     returncode: int
     output: str
     elapsed: float
+
+
+def kahlua_backend(options: argparse.Namespace):
+    """Load the opt-in generic harness through the Hoomans adapter boundary."""
+
+    harness_root = options.kahlua_harness or os.environ.get("PZ_HEADLESS_HARNESS")
+    profile = options.kahlua_profile or os.environ.get("PZ_HEADLESS_PROFILE")
+    if not harness_root:
+        raise RuntimeError(
+            "Kahlua backend requires --kahlua-harness or PZ_HEADLESS_HARNESS"
+        )
+    if not profile:
+        raise RuntimeError(
+            "Kahlua backend requires --kahlua-profile or PZ_HEADLESS_PROFILE"
+        )
+    root = Path(harness_root).expanduser().resolve()
+    if not root.is_dir():
+        raise RuntimeError(f"Kahlua harness root does not exist: {root}")
+    sys.path.insert(0, str(root / "src"))
+    try:
+        from pz_headless.integrations.project_hoomans import (
+            ProjectHoomansKahluaBackend,
+        )
+    except ImportError as error:
+        raise RuntimeError(f"cannot import Kahlua harness from {root}: {error}") from error
+    return ProjectHoomansKahluaBackend(
+        profile_path=Path(profile).expanduser().resolve(),
+        allow_runtime_mismatch=options.allow_runtime_mismatch,
+        java=options.kahlua_java,
+        javac=options.kahlua_javac,
+        max_output_bytes=options.max_output_bytes,
+        max_memory_mb=options.kahlua_memory_mb,
+    )
+
+
+def run_kahlua_one(
+    path: Path,
+    backend: object,
+    mode: str,
+    timeout: float,
+) -> Result:
+    started = time.monotonic()
+    report = backend.run_one(path.stem, path, mode, timeout)  # type: ignore[attr-defined]
+    status = str(report.get("status"))
+    returncode = 0 if status == "passed" else 2 if status == "incompatible" else 1
+    return Result(
+        path,
+        returncode,
+        json.dumps(report, ensure_ascii=False, indent=2),
+        time.monotonic() - started,
+    )
 
 
 def newest_runtime(mod_root: Path) -> str:
@@ -123,6 +175,12 @@ def parse_args(arguments: list[str]) -> argparse.Namespace:
     parser.add_argument("--fail-fast", action="store_true")
     parser.add_argument("--list", action="store_true")
     parser.add_argument("--verbose", action="store_true")
+    parser.add_argument(
+        "--backend",
+        choices=("portable", "kahlua"),
+        default="portable",
+        help="portable Lua smoke runner or exact-PZ-JAR Kahlua adapter",
+    )
     parser.add_argument("--lua", default="lua", help="Lua executable for smoke tests")
     parser.add_argument(
         "--max-output-bytes",
@@ -137,7 +195,34 @@ def parse_args(arguments: list[str]) -> argparse.Namespace:
     )
     parser.add_argument(
         "--harness-report",
-        help="write bounded lifecycle JSON report from the harness runner",
+        help="write the selected backend's structured JSON report",
+    )
+    parser.add_argument(
+        "--kahlua-harness",
+        help="pz-headless-harness root; defaults to PZ_HEADLESS_HARNESS",
+    )
+    parser.add_argument(
+        "--kahlua-profile",
+        help="immutable engine profile; defaults to PZ_HEADLESS_PROFILE",
+    )
+    parser.add_argument(
+        "--kahlua-mode",
+        choices=("server", "client"),
+        default="server",
+        help="authority fixture used for each Kahlua smoke test",
+    )
+    parser.add_argument("--kahlua-java", help="Java executable for the Kahlua backend")
+    parser.add_argument("--kahlua-javac", help="javac executable for the Kahlua backend")
+    parser.add_argument(
+        "--kahlua-memory-mb",
+        type=int,
+        default=512,
+        help="JVM heap limit for the Kahlua backend",
+    )
+    parser.add_argument(
+        "--allow-runtime-mismatch",
+        action="store_true",
+        help="run Kahlua tests when the profile game version differs from mod runtimes",
     )
     return parser.parse_args(arguments)
 
@@ -154,7 +239,7 @@ def main(arguments: list[str] | None = None) -> int:
         print("No matching Lua tests.", file=sys.stderr)
         return 2
     try:
-        environment = test_environment(options.verbose)
+        environment = test_environment(options.verbose) if options.backend == "portable" else {}
     except (OSError, RuntimeError) as error:
         print(f"Test environment error: {error}", file=sys.stderr)
         return 2
@@ -163,7 +248,21 @@ def main(arguments: list[str] | None = None) -> int:
     results: list[Result] = []
     workers = max(1, min(options.jobs, len(tests)))
     harness_runner = None
-    if not options.legacy_runner:
+    kahlua_runner = None
+    if options.backend == "kahlua":
+        if options.legacy_runner:
+            print("--legacy-runner is only valid with --backend portable", file=sys.stderr)
+            return 2
+        try:
+            kahlua_runner = kahlua_backend(options)
+        except (OSError, RuntimeError, ValueError) as error:
+            print(f"Kahlua backend configuration error: {error}", file=sys.stderr)
+            return 2
+        if workers != 1:
+            if options.verbose:
+                print("Kahlua backend runs one bounded JVM process at a time")
+            workers = 1
+    elif not options.legacy_runner:
         try:
             harness_runner = BoundedLuaTestRunner(
                 ROOT,
@@ -174,17 +273,29 @@ def main(arguments: list[str] | None = None) -> int:
             print(f"Harness runner configuration error: {error}", file=sys.stderr)
             return 2
     with ThreadPoolExecutor(max_workers=workers) as executor:
-        futures = {
-            executor.submit(
-                run_one,
-                path,
-                environment,
-                options.timeout,
-                runner=harness_runner,
-                executable=options.lua,
-            ): path
-            for path in tests
-        }
+        if kahlua_runner is not None:
+            futures = {
+                executor.submit(
+                    run_kahlua_one,
+                    path,
+                    kahlua_runner,
+                    options.kahlua_mode,
+                    options.timeout,
+                ): path
+                for path in tests
+            }
+        else:
+            futures = {
+                executor.submit(
+                    run_one,
+                    path,
+                    environment,
+                    options.timeout,
+                    runner=harness_runner,
+                    executable=options.lua,
+                ): path
+                for path in tests
+            }
         for future in as_completed(futures):
             result = future.result()
             results.append(result)
@@ -202,16 +313,24 @@ def main(arguments: list[str] | None = None) -> int:
     failures = [result for result in results if result.returncode != 0]
     elapsed = time.monotonic() - started
     if options.harness_report:
-        if harness_runner is None:
-            print("--harness-report requires the bounded harness runner", file=sys.stderr)
+        report_path = Path(options.harness_report).expanduser()
+        if kahlua_runner is not None:
+            report_path.parent.mkdir(parents=True, exist_ok=True)
+            report_path.write_text(
+                json.dumps(kahlua_runner.report(), ensure_ascii=False, indent=2) + "\n",
+                encoding="utf-8",
+            )
+        elif harness_runner is not None:
+            write_report(harness_runner.report(), report_path)
+        else:
+            print("--harness-report requires a managed backend runner", file=sys.stderr)
             return 2
-        write_report(harness_runner.report(), Path(options.harness_report).expanduser())
     if failures:
         print(f"FAIL {len(failures)}/{len(results)} executed in {elapsed:.2f}s")
         for result in failures:
             print(f"\n--- {result.path.name} ({result.elapsed:.2f}s) ---")
             print(bounded_output(result.output, options.max_output_lines))
-        return 1
+        return 2 if any(result.returncode == 2 for result in failures) else 1
     print(f"PASS {len(results)}/{len(tests)} in {elapsed:.2f}s ({workers} workers)")
     return 0
 
