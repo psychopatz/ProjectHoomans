@@ -140,4 +140,48 @@ function Network.BuildPresenceDelta(record)
 end
 
 
+-- Combat damage is a high-frequency mutation. It must replicate the
+-- authoritative health/wound result, but it does not need to rebuild the
+-- inventory, skills, appearance, route, and debug projections carried by a
+-- detailed snapshot. Keep this payload merge-compatible with the client
+-- snapshot cache so UI and remote incapacitation state update immediately.
+function Network.BuildCombatDamageDelta(record)
+    local health = record and record.health or {}
+    local runtime = record and record.runtime or {}
+    local wounds = PNC.NPCWounds
+    local bodyHealth = wounds and wounds.BuildSnapshot
+        and wounds.BuildSnapshot(record) or nil
+    local visualState = buildVisualState and buildVisualState(record) or nil
+    return {
+        interestDetailed = true,
+        id = record and record.id or nil,
+        x = record and record.x or nil,
+        y = record and record.y or nil,
+        z = record and record.z or nil,
+        presenceState = record and record.presenceState or nil,
+        alive = record and record.alive or false,
+        hpCurrent = health.current,
+        hpMax = health.max,
+        healthState = health.state,
+        recentDamageUntil = health.recentDamageUntil or 0,
+        recentDamageType = health.recentDamageType,
+        bodyHealth = bodyHealth,
+        activeJob = record and record.activeJob or nil,
+        activeBehavior = record and record.activeBehavior or nil,
+        inCombat = true,
+        attackMode = runtime.target ~= nil or runtime.attackAction ~= nil,
+        combatStance = runtime.combatStance == true
+            or runtime.target ~= nil
+            or runtime.attackAction ~= nil,
+        visualState = visualState,
+        weaponFullType = record and record.equipment
+            and record.equipment.primaryFullType or nil,
+        presenceRevision = record and record.presenceRevision or nil,
+        replicaSequence = runtime.replicaSequence,
+        liveBodyInstanceID = record and record.liveBodyInstanceID or nil,
+        liveBodyOnlineID = record and record.liveBodyOnlineID or nil,
+        liveBodyLease = runtime.bodyLease,
+    }
+end
+
 return Network

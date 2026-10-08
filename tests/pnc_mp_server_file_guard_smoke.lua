@@ -146,7 +146,7 @@ listing:close()
 -- activity root.
 -- The three need-facility effect spokes are loaded by its guarded root.
 -- The four UniqueNPCRegistry providers are loaded by its guarded root.
-T.equal(#serverOnlyFiles, 984,
+T.equal(#serverOnlyFiles, 985,
     "server Lua inventory changed without updating the MP loader gate")
 T.truthy(true, "facility-state reconciler is covered by the loader gate")
 

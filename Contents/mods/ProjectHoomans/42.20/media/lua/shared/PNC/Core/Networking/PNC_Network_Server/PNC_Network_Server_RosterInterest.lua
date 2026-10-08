@@ -32,6 +32,10 @@ local function recordPayloadDiagnostics(eventName)
     if eventKey == "" then eventKey = "unknown" end
     if eventKey == "tick" then
         ScalingDiagnostics.Increment("Network.PayloadBuild.PresenceDelta")
+    elseif eventKey == "combat_damage" then
+        ScalingDiagnostics.Increment(
+            "Network.PayloadBuild.CombatDamageDelta"
+        )
     else
         ScalingDiagnostics.Increment("Network.PayloadBuild.FullSnapshot")
     end
@@ -322,12 +326,21 @@ function Internal.CollectRecordRecipients(record)
 end
 
 function Internal.BuildRecordPayload(record, eventName)
+    local snapshot
     recordPayloadDiagnostics(eventName)
+    if eventName == "tick" then
+        snapshot = Network.BuildPresenceDelta(record)
+    elseif eventName == "combat_damage"
+        and type(Network.BuildCombatDamageDelta) == "function"
+    then
+        snapshot = Network.BuildCombatDamageDelta(record)
+    else
+        snapshot = Network.BuildSnapshot(record)
+    end
     return {
         event = eventName or "update",
         directoryRevision = ServerState.rosterRevision,
-        snapshot = eventName == "tick" and Network.BuildPresenceDelta(record)
-            or Network.BuildSnapshot(record),
+        snapshot = snapshot,
     }
 end
 

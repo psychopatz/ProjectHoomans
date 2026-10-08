@@ -83,6 +83,13 @@ Const.ZOMBIE_ALERT_REPUBLISH_MS = 500
 Const.ZOMBIE_ALERT_PROXIMITY_SCAN_MS = 500
 Const.ZOMBIE_ALERT_LOS_RECHECK_MS = 250
 Const.ZOMBIE_ALERT_DEBUG_REFRESH_MS = 750
+-- One authoritative NPC attack wakes nearby members of the attacked owner's
+-- group. Recipients keep the alert locally until its short lease expires;
+-- consumers never rescan the whole NPC index on every behavior tick.
+Const.NPC_GROUP_ALERT_RADIUS = 8.0
+Const.NPC_ALERT_TTL_MS = 1800
+Const.NPC_ALERT_REPUBLISH_MS = 500
+Const.NPC_ALERT_LOS_RECHECK_MS = 250
 Const.THREAT_GUARD_TARGET_RETAIN_MS = 3500
 -- Server zombie aggro records are refreshed continuously while a zombie owns
 -- an NPC pursuit lease. Perception uses this short window in multiplayer,

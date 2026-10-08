@@ -8,6 +8,19 @@ local Core = PNC.Core
 local Const = PNC.Const
 local Stealth = PNC.Stealth
 
+local function publishNPCGroupAlert(record, target)
+    if target
+        and (target.kind == "npc" or target.kind == "player")
+        and Perception.PublishNPCGroupAlert
+    then
+        Perception.PublishNPCGroupAlert(
+            record,
+            target,
+            Core.Now and Core.Now() or 0
+        )
+    end
+end
+
 local function hasPersonalEnemy(record)
     local relationships = record
         and record.social
@@ -106,6 +119,7 @@ function Perception.ResolveCompanionProtectionTarget(record, ownerEngaged)
     local immediate = Perception.ResolveRecentAttacker(record, now)
     local owner
     local ownerThreat
+    local npcGroupThreat
     if immediate then
         immediate.immediateSelfDefense = true
         return immediate
@@ -127,6 +141,14 @@ function Perception.ResolveCompanionProtectionTarget(record, ownerEngaged)
         )
         if ownerThreat then return ownerThreat end
     end
+    if Perception.FindNPCGroupAlert then
+        npcGroupThreat = Perception.FindNPCGroupAlert(
+            record,
+            Internal.GetCompanionDefenseRadius(),
+            true
+        )
+        if npcGroupThreat then return npcGroupThreat end
+    end
     if ownerEngaged == true then
         return Perception.ResolveCompanionTarget(record)
     end
@@ -147,7 +169,10 @@ function Perception.ResolveHostileTarget(record)
         Core.Now and Core.Now() or 0
     ) or Perception.FindImmediateZombieThreat(record)
 
-    if immediateThreat then return immediateThreat end
+    if immediateThreat then
+        publishNPCGroupAlert(record, immediateThreat)
+        return immediateThreat
+    end
 
     if hostileConfig.attackNPCs ~= false then
         npcTarget = Perception.FindNearestEnemyNPC(record, 12)
@@ -165,7 +190,12 @@ function Perception.ResolveHostileTarget(record)
         zombieTarget = Perception.FindBestEnemyZombie(record, Const.ZOMBIE_TARGET_RADIUS)
     end
 
-    return Internal.PickNearest(Internal.PickNearest(npcTarget, playerTarget), zombieTarget)
+    local selectedTarget = Internal.PickNearest(
+        Internal.PickNearest(npcTarget, playerTarget),
+        zombieTarget
+    )
+    publishNPCGroupAlert(record, selectedTarget)
+    return selectedTarget
 end
 
 function Perception.ResolveRoamingTarget(record, radius)

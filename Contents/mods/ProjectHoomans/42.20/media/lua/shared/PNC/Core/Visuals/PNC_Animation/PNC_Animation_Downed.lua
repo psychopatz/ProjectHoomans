@@ -49,7 +49,11 @@ function Animation.ApplyDowned(zombie, record, movingOrProfile)
         zombie:setFallOnFront(false)
     end
     if zombie.setCanWalk then
-        zombie:setCanWalk(true)
+        -- A stationary incapacitated NPC must not retain an engine walk
+        -- lease from the action that preceded the downed transition. Crawl
+        -- movement is explicitly owned by PNC and re-enables walking only
+        -- for the intentional follow-owner crawl path.
+        zombie:setCanWalk(moving == true)
     end
     if zombie.setMoving then
         zombie:setMoving(moving == true)

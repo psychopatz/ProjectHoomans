@@ -198,9 +198,9 @@ function Conversation.BuildDefinition(entry, player, forcedTime)
         persistHistory = false,
         activeMessageLimit = 64,
         character = entry and entry.zombie or nil,
-        -- Expose the complete Hoomans conversation immediately. Core still
-        -- supports staged opening for callers that opt in explicitly.
-        animateOpening = false,
+        -- Preserve Core's staged opening so the conversation presentation
+        -- enters through its normal portrait/history/choice reveal sequence.
+        animateOpening = true,
         -- Standard face-to-face talk uses the readable subtle treatment.
         -- Radio and walkie-talkie callers can opt into CRT with their own
         -- explicit conversation screenVariant.

@@ -69,6 +69,11 @@ Router.Register(Const.CMD_NECROA_INCOMING_DAMAGE, function(player, args)
         amount = amount,
         type = tostring(args.type or "necroa_damage"),
         woundType = tostring(args.woundType or "burn"),
+        attackType = args.attackType and tostring(args.attackType) or nil,
+        attackKind = args.attackKind and tostring(args.attackKind)
+            or "necroa_explosion",
+        damageClass = args.damageClass and tostring(args.damageClass)
+            or "explosion",
         attackerKind = "foreign_npc",
         attackerProvider = "Necroa",
         attackerX = x,

@@ -28,7 +28,9 @@ function Behavior.Tick(record, zombie, now)
     local state
     local partId
     local threat
+    local groupAlert
     local safetyRadius
+    local baseSafetyRadius
     local applied
     local label
     if not record or record.alive == false or not Wounds
@@ -63,19 +65,38 @@ function Behavior.Tick(record, zombie, now)
     safetyRadius = tonumber(Const.NPC_ZOMBIE_DEFENSE_RADIUS)
         or tonumber(Const.SELF_BANDAGE_INTERRUPT_RADIUS)
         or 2.2
+    baseSafetyRadius = safetyRadius
+    if Perception and Perception.FindNPCGroupAlert then
+        groupAlert = Perception.FindNPCGroupAlert(
+            record,
+            tonumber(Const.NPC_GROUP_ALERT_RADIUS) or safetyRadius,
+            true
+        )
+        if groupAlert then
+            safetyRadius = math.max(
+                safetyRadius,
+                tonumber(groupAlert.alertRadius)
+                    or tonumber(Const.NPC_GROUP_ALERT_RADIUS)
+                    or safetyRadius
+            )
+        end
+    end
     threat = Perception and Perception.ResolveRecentAttacker
         and Perception.ResolveRecentAttacker(record, now) or nil
-    if not insideSafetyRadius(threat, safetyRadius) then
+    if not insideSafetyRadius(threat, baseSafetyRadius) then
         threat = nil
     end
     if not threat and Perception and Perception.FindImmediateZombieThreat then
         threat = Perception.FindImmediateZombieThreat(
             record,
-            safetyRadius
+            baseSafetyRadius
         )
     end
     if not threat then
-        threat = findThreat(record, safetyRadius)
+        threat = findThreat(record, baseSafetyRadius)
+    end
+    if not threat then
+        threat = groupAlert
     end
     if state.phase == "bandaging" then
         if insideSafetyRadius(threat, safetyRadius) then

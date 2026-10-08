@@ -9,6 +9,7 @@ local variables = {}
 local crawler = false
 local onFloor = false
 local fallOnFront = false
+local canWalk = nil
 local actionState = "staggerback"
 local staggerBack = true
 local stateEventDelay = 700
@@ -80,7 +81,7 @@ local zombie = {
     setCrawler = function(_, value) crawler = value == true end,
     setOnFloor = function(_, value) onFloor = value == true end,
     setFallOnFront = function(_, value) fallOnFront = value == true end,
-    setCanWalk = function() end,
+    setCanWalk = function(_, value) canWalk = value == true end,
     setRunning = function() end,
     setUseless = function() end,
     setWalkType = function() end,
@@ -95,6 +96,7 @@ local stationary = {
 }
 
 PNC.Animation.SyncLocomotion(zombie, stationary)
+T.falsy(canWalk, "stationary incapacitated body cannot retain engine walking")
 T.equal(staggerBack, false, "incapacitation clears stagger latch")
 T.equal(stateEventDelay, 0, "incapacitation expires stagger action timer")
 T.equal(legacyIdleResets, 0, "incapacitation avoids legacy idle timer reset")
@@ -134,6 +136,7 @@ local moving = {
 }
 
 PNC.Animation.SyncLocomotion(zombie, moving)
+T.truthy(canWalk, "intentional crawl keeps engine movement available")
 T.equal(actionState, "idle", "moving crawl releases repeated hit reaction")
 T.equal(finishingEvents, 1, "moving crawl reports hit-reaction completion")
 T.equal(staggerBack, false, "moving crawl clears pending stagger latch")

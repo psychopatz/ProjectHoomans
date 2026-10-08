@@ -315,8 +315,8 @@ T.equal(definition.npcID, "npc-12", "NPC id")
 T.equal(definition.portrait.preferDescriptor, true,
     "live NPC portrait uses the human descriptor preview")
 T.equal(definition.backgroundID, "dawn", "background definition")
-T.equal(definition.animateOpening, false,
-    "full conversation opens with all panels available")
+T.equal(definition.animateOpening, true,
+    "full conversation preserves the staged opening animation")
 T.equal(definition.context.relationshipID, "Crossroads Exchange",
     "faction subtitle")
 T.equal(definition.context.timeID, "Lead Scavenger", "role subtitle")

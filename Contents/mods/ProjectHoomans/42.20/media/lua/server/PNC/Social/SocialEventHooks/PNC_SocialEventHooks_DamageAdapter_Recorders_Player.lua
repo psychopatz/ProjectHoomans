@@ -31,6 +31,9 @@ local witnessCanSeeDamage = H.DamageWitnessCanSeeDamage
 local damageAttackerID = H.DamageAttackerID
 local deliverTeammateDamageFlavor = H.DeliverTeammateDamageFlavor
 local copyHurtContext = H.DamageCopyHurtContext
+local PLAYER_HURT_WITNESS_COOLDOWN_MS =
+    tonumber(Hooks.PlayerHurtWitnessCooldownMs) or 750
+local PLAYER_HURT_WITNESS_MAX_KEYS = 256
 
 function H.RecordPlayerDamagedNPC(player, record, hit)
     local actorKey
@@ -108,8 +111,10 @@ function H.RecordPlayerHurtWitnesses(player, attacker, context)
     local attackerID = context and context.attackerID
         or call(attacker, "getOnlineID")
         or "unknown"
-    local position = positionOf(attacker)
+    local position
     local safeContext
+    local throttleKey
+    local currentTime
     if not isAuthority() then
         return 0, 0, "not_authority"
     end
@@ -122,6 +127,27 @@ function H.RecordPlayerHurtWitnesses(player, attacker, context)
     if not actorKey then
         return 0, 0, "player_identity_unavailable"
     end
+    throttleKey = tostring(actorKey) .. ":" .. tostring(attackerID)
+    currentTime = nowMillis()
+    if Hooks.LastPlayerHurtWitnessAt[throttleKey]
+        and currentTime < Hooks.LastPlayerHurtWitnessAt[throttleKey]
+    then
+        -- Witness notifications are presentation/social work.  Damage and
+        -- the attacker's authoritative combat state are already committed;
+        -- repeated hit callbacks do not need another full live-NPC scan.
+        return 0, 0, "witness_cooldown"
+    end
+    if Hooks.LastPlayerHurtWitnessAt[throttleKey] == nil then
+        local order = Hooks.PlayerHurtWitnessThrottleOrder
+        order[#order + 1] = throttleKey
+        if #order > PLAYER_HURT_WITNESS_MAX_KEYS then
+            local oldest = table.remove(order, 1)
+            Hooks.LastPlayerHurtWitnessAt[oldest] = nil
+        end
+    end
+    Hooks.LastPlayerHurtWitnessAt[throttleKey] =
+        currentTime + PLAYER_HURT_WITNESS_COOLDOWN_MS
+    position = positionOf(attacker)
     safeContext = copyHurtContext(context, attacker)
     safeContext.attackerID = attackerID
     Registry.ForEachLive(function(record, body, npcID)

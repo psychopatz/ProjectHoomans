@@ -28,6 +28,10 @@ require "PNC/Core/Compatibility/Mods/Bandits/PNC_Bandits_Targeting"
 require "PNC/Core/Compatibility/Mods/Bandits/PNC_Bandits_Relationships"
 require "PNC/Core/Compatibility/Mods/Bandits/PNC_Bandits_Combat"
 require "PNC/Core/Compatibility/Mods/Bandits/PNC_Bandits_Flavor"
+require "PNC/Core/Compatibility/Mods/Bandits/PNC_Bandits_IncomingBridge"
+require "PNC/Core/Compatibility/Mods/Bandits/PNC_Bandits_IncomingContext"
+require "PNC/Core/Compatibility/Mods/Bandits/PNC_Bandits_IncomingDamage"
+require "PNC/Core/Compatibility/Mods/Bandits/PNC_Bandits_RuntimeHook"
 
 local Access = Bridge.Internal
 local Targeting = Bridge.Targeting

@@ -35,11 +35,28 @@ end
 -- an owned combat handoff from stale or foreign state.
 function Common.SetCombatTarget(record, target, source)
     local runtime
+    local previousTarget
+    local previousSource
+    local previousKey
+    local targetKey
+    local targetChanged
     if not record or type(target) ~= "table" or target.kind == nil then
         return false
     end
     record.runtime = record.runtime or {}
     runtime = record.runtime
+    previousTarget = runtime.target
+    previousSource = runtime.targetSource
+    previousKey = previousTarget
+        and tostring(previousTarget.zombieId
+            or previousTarget.id
+            or previousTarget.onlineID or "") or ""
+    targetKey = tostring(target.zombieId or target.id
+        or target.onlineID or "")
+    targetChanged = previousTarget == nil
+        or tostring(previousTarget.kind or "") ~= tostring(target.kind or "")
+        or previousKey ~= targetKey
+        or tostring(previousSource or "") ~= tostring(source or "combat")
     runtime.target = target
     runtime.targetSource = tostring(source or "combat")
     runtime.targetAt = Core and Core.Now and Core.Now() or nil
@@ -49,7 +66,8 @@ function Common.SetCombatTarget(record, target, source)
     if PNC.CombatStance and PNC.CombatStance.Maintain then
         PNC.CombatStance.Maintain(record, runtime.targetAt)
     end
-    if Diagnostics and Diagnostics.NPCThreatAuditEnabled == true
+    if targetChanged
+        and Diagnostics and Diagnostics.NPCThreatAuditEnabled == true
         and Diagnostics.LogNPCThreatAudit
     then
         Diagnostics.LogNPCThreatAudit("combat_target_set", {
@@ -74,7 +92,8 @@ function Common.ClearCombatTarget(record, reason, zombie)
     record.runtime.target = nil
     record.runtime.targetSource = nil
     record.runtime.targetAt = nil
-    if Diagnostics and Diagnostics.NPCThreatAuditEnabled == true
+    if previousTarget
+        and Diagnostics and Diagnostics.NPCThreatAuditEnabled == true
         and Diagnostics.LogNPCThreatAudit
     then
         Diagnostics.LogNPCThreatAudit("combat_target_clear", {

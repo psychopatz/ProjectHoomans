@@ -130,6 +130,21 @@ function Internal.RefreshTarget(record, state, threatContext, now)
             return candidate
         end
     end
+    if PNC.Perception and PNC.Perception.FindNPCGroupAlert then
+        candidate = PNC.Perception.FindNPCGroupAlert(
+            record,
+            math.max(
+                tonumber(threatContext.radius) or 0,
+                tonumber(Const.NPC_GROUP_ALERT_RADIUS) or 0
+            ),
+            true
+        )
+        if Internal.IsThreat(candidate, threatContext) then
+            auditDecision("target_acquired", record, nil, candidate,
+                "npc_group_alert")
+            return candidate
+        end
+    end
     options = {
         areaDefense = threatContext.targetPolicy ~= "owner",
     }

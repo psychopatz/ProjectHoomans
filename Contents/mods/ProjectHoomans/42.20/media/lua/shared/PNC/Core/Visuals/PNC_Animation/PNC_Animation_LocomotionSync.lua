@@ -35,12 +35,6 @@ function Animation.SyncLocomotion(zombie, record)
     path = runtime and runtime.pathing or nil
     navigation = runtime and runtime.localNavigation or nil
     now = Core and Core.Now and Core.Now() or 0
-    if treatment and treatment.phase == "bandaging"
-        and now < (tonumber(treatment.finishAt) or 0)
-    then
-        Internal.setManagedUseless(zombie, false, true)
-        return
-    end
     if record and record.health and record.health.state == "incapacitated" then
         downedMoving = path and (
             path.phase == "requested"
@@ -53,6 +47,12 @@ function Animation.SyncLocomotion(zombie, record)
             record,
             downedMoving and (path.motionProfile or true) or false
         )
+        return
+    end
+    if treatment and treatment.phase == "bandaging"
+        and now < (tonumber(treatment.finishAt) or 0)
+    then
+        Internal.setManagedUseless(zombie, false, true)
         return
     end
     if Animation.PumpBumpRelease(zombie, now) then

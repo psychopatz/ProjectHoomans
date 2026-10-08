@@ -201,6 +201,22 @@ T.truthy(events[1].id ~= events[2].id,
     "combat observations receive unique event IDs")
 T.truthy(#logs >= 6, "combat observation stages are logged")
 
+local throttledCount, throttledCandidates, throttledReason =
+    H.RecordNPCDamagedPlayer(
+        player,
+        attackerRecord,
+        attackerBody,
+        { amount = 12, healthLoss = 4.08, woundType = "scratch" }
+    )
+T.equal(throttledCount, 0,
+    "repeated player hurt does not rescan witnesses immediately")
+T.equal(throttledCandidates, 0,
+    "repeated player hurt reports no witness scan candidates")
+T.equal(throttledReason, "witness_cooldown",
+    "repeated player hurt uses the witness cooldown")
+T.equal(#events, 2,
+    "witness cooldown does not create a duplicate social event")
+
 local teammateBody = {
     getX = function() return 1 end,
     getY = function() return 0 end,

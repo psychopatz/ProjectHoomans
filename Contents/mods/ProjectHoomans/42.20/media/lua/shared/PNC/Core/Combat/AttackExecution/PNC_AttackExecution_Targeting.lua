@@ -34,6 +34,16 @@ function AttackExecution.captureTargetRef(target)
         x = target.x,
         y = target.y,
         z = target.z,
+        -- Preserve the evidence that authorized this target.  The hit is
+        -- resolved after a delayed animation frame, so the target snapshot
+        -- must carry the bounded self-defense provenance into that frame.
+        proximityAlert = target.proximityAlert == true,
+        groupAlert = target.groupAlert == true,
+        ownerDefense = target.ownerDefense == true,
+        alertSequence = target.alertSequence,
+        alertRadius = target.alertRadius,
+        alertOnly = target.alertOnly == true,
+        immediateSelfDefense = target.immediateSelfDefense == true,
         -- Runtime-only identity anchor. The stable ID remains authoritative
         -- across index rebuilds; this direct reference closes the short gap
         -- between attack commit and the delayed hit frame.
@@ -74,6 +84,13 @@ function AttackExecution.resolveActionTarget(targetRef)
             y = targetRecord.y,
             z = targetRecord.z,
             distSq = 0,
+            proximityAlert = targetRef.proximityAlert == true,
+            groupAlert = targetRef.groupAlert == true,
+            ownerDefense = targetRef.ownerDefense == true,
+            alertSequence = targetRef.alertSequence,
+            alertRadius = targetRef.alertRadius,
+            alertOnly = targetRef.alertOnly == true,
+            immediateSelfDefense = targetRef.immediateSelfDefense == true,
         }
     end
     if targetRef.kind == "zombie" then

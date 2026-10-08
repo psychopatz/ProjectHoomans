@@ -10,6 +10,14 @@ PNC.Compatibility.IncomingDamage =
     PNC.Compatibility.IncomingDamage or {}
 
 local IncomingDamage = PNC.Compatibility.IncomingDamage
+local DamageContext = PNC.Compatibility.DamageContext
+
+local function normalizeContext(context)
+    if DamageContext and type(DamageContext.Normalize) == "function" then
+        return DamageContext.Normalize(context)
+    end
+    return type(context) == "table" and context or {}
+end
 
 local function targetRecord(target, context)
     local modData
@@ -40,9 +48,14 @@ function IncomingDamage.Apply(context)
     local applied
     local result
     local ok
-    context = type(context) == "table" and context or {}
+    context = normalizeContext(context)
     target = context.target or context.victim
     if not target then return false, "incoming_target_missing" end
+    if PNC.Core and type(PNC.Core.IsAuthority) == "function"
+        and PNC.Core.IsAuthority() ~= true
+    then
+        return false, "incoming_damage_not_authority"
+    end
     if PNC.Compatibility.ActorOwnership
         and PNC.Compatibility.ActorOwnership.IsHoomansOwned
         and not PNC.Compatibility.ActorOwnership.IsHoomansOwned(target)
@@ -71,6 +84,9 @@ function IncomingDamage.Apply(context)
             amount = amount,
             partId = context.partId,
             woundType = context.woundType or "laceration",
+            attackType = context.attackType,
+            attackKind = context.attackKind,
+            weaponItem = context.weaponItem,
             type = context.type or "foreign_combat_damage",
             attackerKind = context.attackerKind or "foreign_npc",
             attackerProvider = context.attackerProvider or context.provider,

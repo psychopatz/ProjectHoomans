@@ -7,6 +7,7 @@ local bridgeFile = T.path(
 )
 
 local incomingCalls = 0
+local incomingContext
 local playerCalls = 0
 local nativeFallbackCalls = 0
 local weapon = {
@@ -51,6 +52,7 @@ PNC = {
         IncomingDamage = {
             Apply = function(context)
                 incomingCalls = incomingCalls + 1
+                incomingContext = context
                 T.equal(context.target, hoomansBody,
                     "A-Life routed damage to the wrong Hoomans body")
                 return true
@@ -121,6 +123,12 @@ T.truthy(ProjectALife.Combat.resolveAttack(
 ), "Hoomans attack bridge rejected a valid hit")
 T.equal(incomingCalls, 1,
     "A-Life did not route a managed Hoomans target through wounds")
+T.equal(incomingContext.attackType, "melee",
+    "A-Life inbound damage lost its attack type")
+T.equal(incomingContext.attackKind, "project_alife_combat_damage",
+    "A-Life inbound damage lost its provider kind")
+T.equal(incomingContext.weaponItem, weapon,
+    "A-Life inbound damage lost its weapon item")
 
 T.truthy(ProjectALife.Combat.resolveAttack(
     actor, shell, player, false, "HeadLeft", false
@@ -151,6 +159,14 @@ T.truthy(ProjectALife.Combat.resolveAttack(
 ), "unmanaged target changed the native A-Life lane")
 T.equal(nativeFallbackCalls, 1,
     "unmanaged target was incorrectly captured by the compatibility bridge")
+
+PNC.Core.IsAuthority = function() return false end
+local nativeBeforeClientTarget = nativeFallbackCalls
+T.falsy(ProjectALife.Combat.resolveAttack(
+    actor, shell, hoomansBody, false, "HeadLeft", false
+), "A-Life client lane mutated a managed Hoomans body")
+T.equal(nativeFallbackCalls, nativeBeforeClientTarget,
+    "A-Life client lane fell through to native managed-body damage")
 
 T.equal(PNC.Compatibility.ProjectALifeDamageBridge.metrics.hoomansRouted, 2,
     "Hoomans route metric was not recorded")

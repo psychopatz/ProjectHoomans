@@ -101,4 +101,15 @@ T.falsy(rejected, "inbound bridge accepted a non-Hoomans body")
 T.equal(reason, "incoming_target_not_hoomans_owned",
     "inbound bridge returned the wrong ownership rejection")
 
+PNC.Core.IsAuthority = function() return false end
+local clientRejected, clientReason = incoming.Apply({
+    target = managedBody,
+    attacker = attacker,
+    amount = 12,
+})
+T.falsy(clientRejected,
+    "inbound bridge mutated a managed body on a multiplayer client")
+T.equal(clientReason, "incoming_damage_not_authority",
+    "inbound bridge returned the wrong client authority rejection")
+
 T.finish("pnc_compatibility_incoming_damage_smoke")

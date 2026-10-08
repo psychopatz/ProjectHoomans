@@ -26,6 +26,14 @@ function Hosts.Build(entry, player)
     if not PNC.Conversation.BuildDefinition
         or not PsychopatzCore.Conversation.CreateHeadless
     then
+        if print then
+            print("[PNC][LLM] inline_host_failed reason=dependencies_unavailable"
+                .. " build_definition="
+                .. tostring(type(PNC.Conversation.BuildDefinition) == "function")
+                .. " create_headless="
+                .. tostring(type(PsychopatzCore.Conversation.CreateHeadless)
+                    == "function"))
+        end
         return nil
     end
     local definition = PNC.Conversation.BuildDefinition(entry, player)
@@ -74,7 +82,7 @@ function Hosts.Rebuild(player, resolved, requestedMode)
     )
     local primaryID = tostring(primaryTarget and primaryTarget.id or "")
     local primaryIndex
-    if not primaryTarget then return false end
+    if not primaryTarget then return false, "no_primary_target" end
     for _, old in ipairs(Inline.hosts or {}) do
         local id = tostring(old and old.spec and old.spec.npcID or "")
         if id ~= "" then oldHosts[id] = old end
@@ -104,7 +112,7 @@ function Hosts.Rebuild(player, resolved, requestedMode)
                         created:close("inline_target_build_failed")
                     end
                 end
-                return false
+                return false, "target_host_build_failed:" .. id
             end
         end
     end
@@ -114,7 +122,7 @@ function Hosts.Rebuild(player, resolved, requestedMode)
                 created:close("inline_target_build_failed")
             end
         end
-        return false
+        return false, "no_hosts"
     end
     for _, unused in pairs(oldHosts) do
         if unused and unused.close then unused:close("inline_retargeted") end

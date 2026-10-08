@@ -5,6 +5,16 @@ local Const = PNC.Const
 local Registry = PNC.Registry
 local Settings = PNC.Sandbox
 
+local function bodyIsDead(body)
+    local ok
+    local dead
+    if not body or not body.isDead then
+        return false
+    end
+    ok, dead = pcall(body.isDead, body)
+    return ok and dead == true
+end
+
 function Health.IsDead(record, body)
     local health = record and record.health or nil
     if not record or record.alive == false then
@@ -13,23 +23,63 @@ function Health.IsDead(record, body)
     if health and health.state == "dead" then
         return true
     end
-    return body and body.isDead and body:isDead() == true or false
+    return bodyIsDead(body)
+end
+
+local function bodyState(body)
+    local ok
+    local dead
+    if not body then
+        return "missing"
+    end
+    if not body.isDead then
+        return "unknown"
+    end
+    ok, dead = pcall(body.isDead, body)
+    if not ok then
+        return "unknown"
+    end
+    return dead == true and "dead" or "live"
+end
+
+local function rejectionDetail(record, body, health, reason, amount)
+    return {
+        reason = tostring(reason or "damage_rejected"),
+        amount = tonumber(amount) or 0,
+        recordAlive = record and record.alive ~= false or false,
+        healthState = health and tostring(health.state or "") or "",
+        healthCurrent = health and tonumber(health.current) or nil,
+        healthMax = health and tonumber(health.max) or nil,
+        bodyState = bodyState(body),
+    }
 end
 
 local function canApplyDamage(record, body, amount, damageEvent, now)
     if Core and Core.IsAuthority and not Core.IsAuthority() then
-        return false
+        return false, "not_authority"
     end
-    if Health.IsDead(record, body)
-        or amount <= 0
+    if not record then
+        return false, "missing_record"
+    end
+    if record.alive == false
+        or record.health and record.health.state == "dead"
     then
-        return false
+        return false, "dead_record"
     end
-    return not (
-        damageEvent
+    if bodyIsDead(body) then
+        return false, "dead_body"
+    end
+    if amount <= 0 then
+        return false, "invalid_amount"
+    end
+    if damageEvent
         and damageEvent.attackerKind == "zombie"
-        and not Settings.CanZombieTargetRecord(record, now)
-    )
+        and (not Settings or not Settings.CanZombieTargetRecord
+            or not Settings.CanZombieTargetRecord(record, now))
+    then
+        return false, "zombie_target_not_allowed"
+    end
+    return true
 end
 
 local function rememberDamageSource(record, damageEvent, now)
@@ -74,12 +124,12 @@ local function finishIncapacitated(
             zombie,
             damageEvent and damageEvent.type or "zombie_infection"
         )
-        return true
+        return true, "infection_death"
     end
     if now - (tonumber(health.downedAt) or 0)
         < Const.INCAPACITATED_GRACE_MS
     then
-        return false
+        return false, "incapacitated_grace"
     end
     Health.Kill(
         record,
@@ -87,7 +137,7 @@ local function finishIncapacitated(
         damageEvent and damageEvent.type or "incapacitated_finish",
         damageEvent
     )
-    return true
+    return true, "incapacitated_finished"
 end
 
 local function applyHealthDamage(record, health, amount, damageEvent)
@@ -122,12 +172,39 @@ local function handleDepletedHealth(record, zombie, damageEvent)
 end
 
 function Health.ApplyDamage(record, zombie, damageEvent)
-    local health = Health.Ensure(record)
+    local health
     local amount =
         tonumber(damageEvent and damageEvent.amount or 0) or 0
-    local now = Core.Now()
-    if not canApplyDamage(record, zombie, amount, damageEvent, now) then
-        return false
+    local now
+    local allowed
+    local reason
+    local transitioned
+    if not record then
+        return false, "missing_record", rejectionDetail(
+            record,
+            zombie,
+            nil,
+            "missing_record",
+            amount
+        )
+    end
+    health = Health.Ensure(record)
+    now = Core.Now()
+    allowed, reason = canApplyDamage(
+        record,
+        zombie,
+        amount,
+        damageEvent,
+        now
+    )
+    if not allowed then
+        return false, reason, rejectionDetail(
+            record,
+            zombie,
+            health,
+            reason,
+            amount
+        )
     end
     rememberDamageSource(record, damageEvent, now)
     if health.state == "incapacitated" then
@@ -141,9 +218,19 @@ function Health.ApplyDamage(record, zombie, damageEvent)
     end
     applyHealthDamage(record, health, amount, damageEvent)
     if health.current <= 0 then
-        return handleDepletedHealth(record, zombie, damageEvent)
+        transitioned = handleDepletedHealth(record, zombie, damageEvent)
+        if transitioned then
+            return true, "incapacitated"
+        end
+        return false, "incapacitation_transition_rejected", rejectionDetail(
+            record,
+            zombie,
+            health,
+            "incapacitation_transition_rejected",
+            amount
+        )
     end
-    return true
+    return true, "applied"
 end
 
 function Health.ApplyStrainDamage(

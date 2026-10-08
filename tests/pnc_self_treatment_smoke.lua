@@ -5,6 +5,7 @@ local FILE =
 
 local now = 1000
 local threat
+local groupAlert
 local treatable = true
 local consumed = 0
 local bumpType
@@ -35,6 +36,7 @@ PNC = {
     Perception = {
         ResolveRecentAttacker = function() return nil end,
         FindImmediateZombieThreat = function() return threat end,
+        FindNPCGroupAlert = function() return groupAlert end,
         FindNearestEnemyNPC = function() return nil end,
         FindNearestEnemyZombie = function() return threat end,
         FindNearestEnemyPlayer = function() return nil end,
@@ -167,6 +169,28 @@ threat = { kind = "zombie", x = 2.3, y = 0, z = 0, distSq = 5.29 }
 now = now + 100
 T.equal(PNC.BehaviorTreatment.Tick(record, zombie, now), true,
     "enemy outside red safety radius does not cancel treatment")
+
+threat = nil
+groupAlert = {
+    kind = "npc",
+    id = "hostile_group_source",
+    x = 4,
+    y = 0,
+    z = 0,
+    distSq = 16,
+    alertRadius = 8,
+    groupAlert = true,
+    threatening = true,
+    visible = false,
+    alertOnly = true,
+}
+now = now + 100
+T.equal(PNC.BehaviorTreatment.Tick(record, zombie, now), false,
+    "owner group alert interrupts treatment even without direct perception")
+T.equal(record.runtime.target, groupAlert,
+    "group alert is handed directly to the combat lane")
+T.equal(bumpFinished, 1, "group threat releases the treatment animation")
+groupAlert = nil
 
 threat = { kind = "zombie", x = 2, y = 0, z = 0, distSq = 4 }
 now = now + 100

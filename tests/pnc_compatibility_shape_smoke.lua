@@ -19,6 +19,8 @@ local PROVIDERS = {
         version = "Bandits2-B42.20",
         spokes = {
             "Access", "Targeting", "Relationships", "Combat", "Flavor",
+            "IncomingBridge", "IncomingContext", "IncomingDamage",
+            "RuntimeHook",
         },
         -- Loaded from PNC/00_PNC_Init.lua so it patches PZ's animation file map
         -- before any other shared module reads it.

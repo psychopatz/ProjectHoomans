@@ -9,11 +9,13 @@ PNC.PBrainZ.Internal = PNC.PBrainZ.Internal or {}
 local Integration = PNC.PBrainZ
 local Internal = Integration.Internal
 local Config = Internal.InlineChatConfig
+local Runtime = Internal.Runtime
 local Keybinds = PsychopatzCore.Keybinds
 local Targets = PNC.CompanionTargetResolver
 local Inline = Integration.Inline
 local Diagnostics = Internal.InlineChatDiagnostics or {}
 Internal.InlineChatDiagnostics = Diagnostics
+Diagnostics._openRejectAt = Diagnostics._openRejectAt or {}
 
 local function enabled()
     local trace = PsychopatzCore and PsychopatzCore.DebugTrace
@@ -111,6 +113,17 @@ function Diagnostics.LogMode(event, requested, committed, reason)
             .. " reason=" .. tostring(reason or "nil")
             .. " " .. describeButtons()
     )
+end
+
+function Diagnostics.LogOpenRejected(reason, details)
+    local key = tostring(reason or "unknown")
+    local now = Runtime and Runtime.Now and tonumber(Runtime.Now()) or 0
+    local previous = tonumber(Diagnostics._openRejectAt[key]) or -math.huge
+    if now - previous < 1000 then return end
+    Diagnostics._openRejectAt[key] = now
+    if not print then return end
+    print("[PNC][LLM] inline_open_rejected reason=" .. key
+        .. " " .. tostring(details or ""))
 end
 
 function Diagnostics.LogSubmitRejection(view, reason)

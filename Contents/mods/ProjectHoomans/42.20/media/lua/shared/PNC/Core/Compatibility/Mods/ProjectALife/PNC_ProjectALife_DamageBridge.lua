@@ -128,6 +128,7 @@ local function applyPlayerDamage(alife, combat, shell, target, weapon)
         amount = amount,
         attackType = ranged and "ranged" or "melee",
         attackKind = "project_alife_combat_damage",
+        damageClass = ranged and "firearm" or "melee",
         attackerKind = "npc",
         attackerProvider = "ProjectALifeNPCs",
         attackerID = attackerId(shell),
@@ -227,6 +228,10 @@ local function applyIncomingDamage(alife, combat, shell, target, weapon)
         amount = amount,
         partId = partId,
         woundType = woundType,
+        attackType = ranged and "ranged" or "melee",
+        attackKind = "project_alife_combat_damage",
+        damageClass = ranged and "firearm" or "melee",
+        weaponItem = weapon,
         type = "project_alife_combat_damage",
         attackerKind = "foreign_npc",
         attackerProvider = "ProjectALifeNPCs",
@@ -367,9 +372,13 @@ local function installDamageBridge()
     wrapper = function(actor, shell, target, shove, reaction, shoveFloor)
         local targetIsHoomans = isHoomansBody(target)
         local targetIsPlayer = isPlayer(target)
-        if (not targetIsHoomans and not targetIsPlayer)
-            or not hasAuthority()
-        then
+        if targetIsHoomans and not hasAuthority() then
+            -- A client may observe A-Life's attack loop, but it must not let
+            -- the provider's native IsoZombie path mutate a managed body.
+            -- The authoritative A-Life/Hoomans simulation owns this hit.
+            return false
+        end
+        if not targetIsHoomans and not targetIsPlayer then
             return originalResolveAttack(
                 actor, shell, target, shove, reaction, shoveFloor)
         end

@@ -146,7 +146,10 @@ T.equal(records.neutral_1.health.current, 85, "scaled neutral custom HP")
 T.equal(records.neutral_1.health.body.openWoundCount, 1, "player hit creates NPC body-part wound")
 T.equal(records.neutral_1.health.body.wounds.Head.type, "laceration", "player melee wound type")
 T.equal(engineHealth, 1000, "engine buffer restored")
-T.equal(broadcasts, 1, "damage broadcast")
+T.equal(broadcasts, 0,
+    "player damage does not build a snapshot inline")
+T.equal(records.neutral_1.runtime.forceSyncEvent, "combat_damage",
+    "player damage queues the coalesced combat snapshot")
 
 local colonist = makeRecord("colonist_1", "colonist")
 local legacyCompanion = makeRecord("legacy_1", "companion")

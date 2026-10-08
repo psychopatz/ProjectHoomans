@@ -185,7 +185,7 @@ local function renderWoundRows(view, x, y, width, fontHeight, rows, body, debugA
                 y = y + fontHeight
                 view:drawText(wound.bandageDirty == true and "- DEBUG Dirty timer: READY" or string.format("- DEBUG Dirty in: %.3f world h", dirtyRemaining), x + 15, y, 0.55, 0.82, 1, 1, UIFont.Small)
                 y = y + fontHeight
-                view:drawText(string.format("- DEBUG Healed: %.2f / %.2f pts | Remaining: %.2f | Rate: %.2f/h", healed, initial, remaining, rate), x + 15, y, 0.55, 0.82, 1, UIFont.Small)
+                view:drawText(string.format("- DEBUG Healed: %.2f / %.2f pts | Remaining: %.2f | Rate: %.2f/h", healed, initial, remaining, rate), x + 15, y, 0.55, 0.82, 1, 1, UIFont.Small)
             end
         else
             view:drawText("- " .. woundLabel(wound), x + 15, y, 0.89, 0.28, 0.28, 1, UIFont.Small)

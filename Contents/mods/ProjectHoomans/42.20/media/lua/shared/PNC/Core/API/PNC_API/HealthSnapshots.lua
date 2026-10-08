@@ -18,6 +18,7 @@ function API.ApplyDamage(npcId, damageEvent)
     local record = Registry.Get(npcId)
     local zombie
     local applied
+    local reason
     if not Core or not Core.IsAuthority or not Core.IsAuthority() then
         return false, "not_authority"
     end
@@ -25,9 +26,9 @@ function API.ApplyDamage(npcId, damageEvent)
         return false
     end
     zombie = Registry.GetLiveZombie(npcId)
-    applied = Health.ApplyDamage(record, zombie, damageEvent or {})
+    applied, reason = Health.ApplyDamage(record, zombie, damageEvent or {})
     if not applied then
-        return false, "damage_rejected"
+        return false, reason or "damage_rejected"
     end
     Network.BroadcastRecord(record, "damage")
     if record.alive == false then

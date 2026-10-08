@@ -157,6 +157,8 @@ function Policy.ApplyIncomingDamage(target, context)
     payload.attackerProvider = payload.attackerProvider or "Necroa"
     payload.attackerKind = payload.attackerKind or "foreign_npc"
     payload.type = payload.type or "necroa_damage"
+    payload.attackKind = payload.attackKind or "necroa_explosion"
+    payload.damageClass = payload.damageClass or "explosion"
 
     if core and core.IsAuthority and core.IsAuthority() then
         incoming = PNC.Compatibility.IncomingDamage
@@ -186,6 +188,12 @@ function Policy.ApplyIncomingDamage(target, context)
             amount = payload.amount,
             type = tostring(payload.type),
             woundType = payload.woundType and tostring(payload.woundType) or nil,
+            attackType = payload.attackType
+                and tostring(payload.attackType) or nil,
+            attackKind = payload.attackKind
+                and tostring(payload.attackKind) or nil,
+            damageClass = payload.damageClass
+                and tostring(payload.damageClass) or nil,
             attackerX = tonumber(payload.attackerX),
             attackerY = tonumber(payload.attackerY),
             attackerZ = tonumber(payload.attackerZ),

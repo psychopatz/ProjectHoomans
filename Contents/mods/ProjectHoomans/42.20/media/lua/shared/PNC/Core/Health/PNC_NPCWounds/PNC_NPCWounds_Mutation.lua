@@ -3,6 +3,32 @@ local Wounds = PNC.NPCWounds
 local Internal = Wounds.Internal
 local Core = PNC.Core
 
+local function resolveCombatWoundType(damageEvent)
+    local requested = tostring(
+        damageEvent and damageEvent.woundType or ""
+    )
+    local resolver = PNC.CombatResolution
+        and PNC.CombatResolution.ResolveWoundType
+    if type(resolver) == "function" then
+        return resolver(
+            damageEvent and damageEvent.attackType,
+            damageEvent and damageEvent.weaponItem,
+            requested,
+            damageEvent and damageEvent.attackKind,
+            damageEvent and damageEvent.weaponFullType
+        )
+    end
+    if damageEvent
+        and tostring(damageEvent.attackType or "") == "ranged"
+        and (requested == ""
+            or requested == "scratch"
+            or requested == "laceration")
+    then
+        return "bullet"
+    end
+    return requested ~= "" and requested or "scratch"
+end
+
 function Internal.AddWound(
     record,
     part,
@@ -89,9 +115,7 @@ function Wounds.ApplyCombatDamage(record, npcBody, damageEvent)
         and tostring(damageEvent.partId)
         or Wounds.ChoosePartId()
     local part = Wounds.Parts[partId]
-    local woundType = tostring(
-        damageEvent and damageEvent.woundType or "scratch"
-    )
+    local woundType = resolveCombatWoundType(damageEvent)
     local amount = math.max(
         0,
         tonumber(damageEvent and damageEvent.amount) or 0
@@ -109,7 +133,10 @@ function Wounds.ApplyCombatDamage(record, npcBody, damageEvent)
     if not Internal.WoundStats[woundType] then
         woundType = "scratch"
     end
-    local applied = PNC.Health.ApplyDamage(record, npcBody, {
+    local applied
+    local healthReason
+    local healthDetail
+    applied, healthReason, healthDetail = PNC.Health.ApplyDamage(record, npcBody, {
         amount = amount,
         partId = part.id,
         type = tostring(
@@ -137,7 +164,21 @@ function Wounds.ApplyCombatDamage(record, npcBody, damageEvent)
     if not applied then
         return false, {
             outcome = "damage_rejected",
+            reason = tostring(healthReason or "health_rejected"),
             partId = part.id,
+            healthState = record.health
+                and tostring(record.health.state or "") or "",
+            healthCurrent = record.health
+                and tonumber(record.health.current) or nil,
+            healthMax = record.health
+                and tonumber(record.health.max) or nil,
+            bodyState = type(healthDetail) == "table"
+                and healthDetail.bodyState or nil,
+            attackType = damageEvent and damageEvent.attackType or nil,
+            attackKind = damageEvent and damageEvent.attackKind or nil,
+            woundType = woundType,
+            weaponFullType = damageEvent
+                and damageEvent.weaponFullType or nil,
         }
     end
     local wound
@@ -162,6 +203,14 @@ function Wounds.ApplyCombatDamage(record, npcBody, damageEvent)
         woundType = wound and wound.type or woundType,
         damage = amount,
         infected = Wounds.HasActiveInfection(record),
+        healthState = record.health
+            and tostring(record.health.state or "") or "",
+        healthCurrent = record.health
+            and tonumber(record.health.current) or nil,
+        attackType = damageEvent and damageEvent.attackType or nil,
+        attackKind = damageEvent and damageEvent.attackKind or nil,
+        weaponFullType = damageEvent
+            and damageEvent.weaponFullType or nil,
     }
 end
 

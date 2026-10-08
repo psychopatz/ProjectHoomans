@@ -31,10 +31,12 @@ function Internal.InstallSharedPerformanceWrappers()
     Internal.Wrap(PNC.Network, "BroadcastRecord",
         "ProjectHoomans.Network.BroadcastRecord")
     -- Keep the network event envelope separate from the snapshot builders.
-    -- BuildRecordPayload selects one of these two paths, so the capture can
-    -- distinguish a full combat-event snapshot from a compact presence tick.
+    -- BuildRecordPayload selects the detailed, combat-damage, or presence
+    -- path so captures can attribute each payload cost correctly.
     Internal.Wrap(PNC.Network, "BuildSnapshot",
         "ProjectHoomans.Network.Snapshot.Full")
+    Internal.Wrap(PNC.Network, "BuildCombatDamageDelta",
+        "ProjectHoomans.Network.Snapshot.CombatDamageDelta")
     Internal.Wrap(PNC.Network, "BuildPresenceDelta",
         "ProjectHoomans.Network.Snapshot.PresenceDelta")
     Internal.Wrap(PNC.Equipment, "Describe",

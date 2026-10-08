@@ -68,20 +68,18 @@ T.truthy(PNC.Health.IsDead(deadRecord, liveBody),
     "dead registry state is authoritative")
 T.truthy(PNC.Health.IsDead(liveRecord, deadBody),
     "dead engine body is authoritative")
-T.falsy(
-    PNC.Health.ApplyDamage(deadRecord, liveBody, {
+local applied, reason = PNC.Health.ApplyDamage(deadRecord, liveBody, {
         amount = 10,
         attackerKind = "zombie",
-    }),
-    "damage cannot be applied to a dead record"
-)
-T.falsy(
-    PNC.Health.ApplyDamage(liveRecord, deadBody, {
-        amount = 10,
-        attackerKind = "zombie",
-    }),
-    "damage cannot be applied through a dead engine body"
-)
+    })
+T.falsy(applied, "damage cannot be applied to a dead record")
+T.equal(reason, "dead_record", "dead record returns a stable damage reason")
+applied, reason = PNC.Health.ApplyDamage(liveRecord, deadBody, {
+    amount = 10,
+    attackerKind = "zombie",
+})
+T.falsy(applied, "damage cannot be applied through a dead engine body")
+T.equal(reason, "dead_body", "dead body returns a stable damage reason")
 T.falsy(PNC.Health.ApplyStrainDamage(deadRecord, liveBody, 10, 0.75, "strain"),
     "strain cannot be applied to a dead record")
 T.falsy(PNC.Health.Kill(deadRecord, liveBody, "repeat_death"),

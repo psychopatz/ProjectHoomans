@@ -89,6 +89,8 @@ registration metadata.
 
 The reusable actor contract lives in `PNC/Core/Compatibility`:
 
+- `PNC_Compatibility_DamageContext.lua` normalizes provider hit metadata
+  before provider damage enters the Hoomans-owned pipeline.
 - `PNC_Compatibility_API.lua` provides registration, stable target references,
   target enumeration, relationship checks, damage dispatch, and protected
   optional event callbacks.
@@ -148,6 +150,10 @@ Bandits support is isolated under:
 
 `PNC/Core/Compatibility/Mods/Bandits/`
 
+`PNC_Bandits_IncomingBridge.lua` wraps Bandits' public hit entry point
+at runtime without editing Workshop files, routes managed Hoomans bodies
+through the canonical damage context, and submits bounded client requests
+for multiplayer authority validation.
 The adapter discovers Bandits through `BanditZombie` caches, revalidates
 `BanditBrain` hostility at both selection and damage time, and delegates hits
 to the Bandits body. The Bandits-side bridge is under:

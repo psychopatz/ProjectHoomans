@@ -26,8 +26,13 @@ PNC = {
         end,
     },
     NPCWounds = {
-        PartOrder = {},
-        Parts = {},
+        PartOrder = { "Head" },
+        Parts = {
+            Head = {
+                id = "Head", label = "Head", weight = 1,
+                x = 0.5, y = 0.08,
+            },
+        },
     },
     NeedsDefinitions = {
         CONSEQUENCES = { criticalThreshold = 0.84 },
@@ -59,9 +64,16 @@ PNC = {
             return tonumber(value) >= 0.84 and "CRITICAL" or "NORMAL"
         end,
     },
-    Client = { CanUseDebug = function() return false end },
+    Client = { CanUseDebug = function() return true end },
 }
 UIFont = { Small = "Small" }
+PsychopatzCore = {
+    UI = {
+        Layout = {
+            Ellipsize = function(value) return value end,
+        },
+    },
+}
 getTexture = function() return nil end
 getTextManager = function()
     return { getFontHeight = function() return 14 end }
@@ -70,11 +82,17 @@ end
 T.load(T.path("ProjectHoomans", "client", "PNC/UI/CharacterWindow/PNC_CharacterWindow_Health.lua"))
 
 local drawn = {}
+local drawCalls = {}
 local view = {
     width = 500,
     height = 500,
     healthHitRegions = {},
-    drawText = function(_, value) drawn[#drawn + 1] = tostring(value) end,
+    drawText = function(_, value, x, y, r, g, b, a, font)
+        drawn[#drawn + 1] = tostring(value)
+        drawCalls[#drawCalls + 1] = {
+            x = x, y = y, r = r, g = g, b = b, a = a, font = font,
+        }
+    end,
     drawTextureScaled = function() end,
 }
 local snapshot = {
@@ -82,7 +100,19 @@ local snapshot = {
     hpMax = 100,
     healthState = "normal",
     bodyHealth = {
-        wounds = {},
+        wounds = {
+            Head = {
+                type = "scratch",
+                damage = 2,
+                severity = 2,
+                bandaged = true,
+                bandageName = "Bandage",
+                bandageHealedPoints = 1,
+                bandageInitialDamage = 3,
+                healRatePerWorldHour = 1,
+                dirtyAtWorldHour = 1,
+            },
+        },
         wholeBodyAilments = {
             starvation = { severity = 0.75 },
             dehydration = { severity = 1 },
@@ -112,9 +142,24 @@ T.contains(text, "Losing blood - Active bleeding",
 T.contains(text, "Medical Activity", "health details show medical activity")
 T.contains(text, "Self-bandaging | Head | Bandage: Bandage",
     "health details show self-treatment target")
-T.equal(view.healthHitRegions[#view.healthHitRegions].partId, "WholeBody",
-    "whole-body detail is a selectable health region")
-local region = view.healthHitRegions[#view.healthHitRegions]
+T.contains(text, "DEBUG Healed:",
+    "health details render debug healing text")
+for i = 1, #drawCalls do
+    T.equal(type(drawCalls[i].a), "number",
+        "health drawText call " .. tostring(i) .. " has numeric alpha")
+T.equal(drawCalls[i].font, UIFont.Small,
+        "health drawText call " .. tostring(i) .. " passes font after alpha")
+end
+PNC.Client.CanUseDebug = function() return false end
+local wholeBodyRegion
+for i = 1, #view.healthHitRegions do
+    if view.healthHitRegions[i].partId == "WholeBody" then
+        wholeBodyRegion = view.healthHitRegions[i]
+        break
+    end
+end
+T.truthy(wholeBodyRegion, "whole-body detail is a selectable health region")
+local region = wholeBodyRegion
 T.falsy(PNC.CharacterWindowTabs.OnHealthRightMouseUp(view,
     region.x + 1, region.y + 1),
     "whole-body ailment does not open a bandage menu")

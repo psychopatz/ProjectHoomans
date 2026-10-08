@@ -17,6 +17,13 @@ local Open = Internal.InlineChatOpen or {}
 Internal.InlineChatOpen = Open
 local LLMInput = PsychopatzConversationLLMInput
 
+local function reject(reason, details)
+    if Diagnostics and Diagnostics.LogOpenRejected then
+        Diagnostics.LogOpenRejected(reason, details)
+    end
+    return false
+end
+
 local function semanticInput()
     pcall(require, "PNC/PNC_ConversationSemantics")
     local semantics = PNC.Semantics
@@ -55,21 +62,34 @@ function Integration.SubmitInline(view, value, part)
 end
 
 function Integration.OpenInline(binding)
-    if Integration.GetPending and Integration.GetPending()
-    then
-        return false
+    local pending = Integration.GetPending and Integration.GetPending() or nil
+    if pending then
+        return reject("request_pending",
+            "npc=" .. tostring(pending.npcID or "unknown"))
     end
-    if Targets.CurrentView() then return false end
+    local currentView = Targets.CurrentView()
+    if currentView then
+        return reject("conversation_active",
+            "npc=" .. tostring(currentView.spec
+                and currentView.spec.npcID or "unknown"))
+    end
     local player = getSpecificPlayer and getSpecificPlayer(0)
         or getPlayer and getPlayer() or nil
-    if not player or not Resolver then return false end
+    if not player then return reject("player_unavailable") end
+    if not Resolver then return reject("target_resolver_unavailable") end
     Inline.mode = Resolver.NormalizeMode(Inline.mode or Config.MODE_NEAREST)
     Inline.scope = Resolver.NormalizeScope(
         Inline.scope or Config.SCOPE_COLONISTS
     )
     local resolved = Targets.ResolveRecipients(player)
     local candidate = resolved and resolved.primary
-    if not candidate then return false end
+    if not candidate then
+        return reject("no_primary_target",
+            "mode=" .. tostring(Inline.mode)
+                .. " scope=" .. tostring(Inline.scope)
+                .. " count=" .. tostring(resolved
+                    and #(resolved.targets or {}) or 0))
+    end
     if Inline.part and tostring(Inline.targetID) == tostring(candidate.id)
         and Inline.mode == (Inline.part.inputMode or Inline.mode)
     then
@@ -79,7 +99,11 @@ function Integration.OpenInline(binding)
         return true
     end
     if Inline.part then Integration.CloseInline("retargeted") end
-    if not Hosts.Rebuild(player, resolved) then return false end
+    local rebuilt, rebuildReason = Hosts.Rebuild(player, resolved)
+    if not rebuilt then
+        return reject(rebuildReason or "host_rebuild_failed",
+            "target=" .. tostring(candidate.id or "unknown"))
+    end
     Inline.nextLifecycleAt = 0
     Inline.nextContextRefreshAt = 0
     Inline.nextControlsRefreshAt = 0
@@ -110,6 +134,7 @@ function Integration.OpenInline(binding)
         onClose = function() Integration.CloseInline("user_closed") end,
         closeTitle = "X",
     })
+    if not part then return reject("input_widget_unavailable") end
     part:initialise()
     part:instantiate()
     part:addToUIManager()

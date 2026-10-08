@@ -22,6 +22,17 @@ local Session = Internal.InlineChatSession
 local Lifecycle = Internal.InlineChatLifecycle or {}
 Internal.InlineChatLifecycle = Lifecycle
 
+local function logBlockedKeybind(reason, details)
+    if not Keybinds.IsPressed
+        or not Keybinds.IsPressed("ProjectHoomans.PBrainZChat")
+    then
+        return
+    end
+    if Diagnostics and Diagnostics.LogOpenRejected then
+        Diagnostics.LogOpenRejected(reason, details)
+    end
+end
+
 local function updateHostLifecycles()
     local hosts = Inline.hosts or {}
     local entries = Inline.entries or {}
@@ -206,19 +217,40 @@ end
 
 function Lifecycle.Register()
     if Keybinds and Keybinds.RegisterPress then
-        Keybinds.RegisterPress({
+        local binding = Keybinds.RegisterPress({
             id = "ProjectHoomans.PBrainZChat",
             label = "UI_PNC_PBrainZ_TalkKey",
             tooltip = "UI_PNC_PBrainZ_TalkTooltip",
             defaultKey = getKeyCode and (tonumber(getKeyCode("V")) or 47)
                 or 47,
             isEnabled = function()
-                return not (Integration.GetPending
-                        and Integration.GetPending())
-                    and not Targets.CurrentView()
+                local pending = Integration.GetPending
+                    and Integration.GetPending() or nil
+                if pending then
+                    logBlockedKeybind("request_pending",
+                        "npc=" .. tostring(pending.npcID or "unknown"))
+                    return false
+                end
+                local view = Targets.CurrentView()
+                if view then
+                    logBlockedKeybind("conversation_active",
+                        "npc=" .. tostring(view.spec
+                            and view.spec.npcID or "unknown"))
+                    return false
+                end
+                return true
             end,
             onTrigger = Integration.OpenInline,
         })
+        if Runtime and Runtime.Log then
+            Runtime.Log("inline_keybind_registered",
+                "id=ProjectHoomans.PBrainZChat"
+                    .. " registered=" .. tostring(
+                        binding ~= nil and binding ~= false)
+                    .. " key=" .. tostring(
+                        Keybinds.GetKeyCode and Keybinds.GetKeyCode(binding)
+                            or "unknown"))
+        end
     end
     if Events and Events.OnTick and not Integration._inlineTickHookRegistered then
         Events.OnTick.Add(Integration.UpdateInline)

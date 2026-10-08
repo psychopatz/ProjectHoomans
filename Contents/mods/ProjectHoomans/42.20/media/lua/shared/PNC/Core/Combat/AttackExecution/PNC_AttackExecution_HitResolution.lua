@@ -11,6 +11,18 @@ local Resolution = PNC.CombatResolution
 local FirearmEffects = PNC.FirearmEffects
 local Diagnostics = PNC.PerformanceScalingDiagnostics
 
+local function applyTargetDamage(record, zombie, target, options)
+    if not Resolution
+        or type(Resolution.ApplyTargetDamage) ~= "function"
+    then
+        return false, "damage_service_unavailable", nil
+    end
+    -- Keep this as a direct final call.  Wrapping the call in a Lua `and`
+    -- expression collapses its multiple return values and loses the damage
+    -- detail needed by the authority audit.
+    return Resolution.ApplyTargetDamage(record, zombie, target, options)
+end
+
 local function logFirearmAudit(eventName, record, action, ...)
     local fields
     local i
@@ -104,8 +116,14 @@ end
 
 function Internal.applyAttackActionHit(record, zombie, action, target)
     local zombieTarget
+    local weaponItem = Internal.resolveWeaponItem
+        and Internal.resolveWeaponItem(record, zombie) or nil
+    local weaponFullType = action and action.weaponFullType
+        or record and record.equipment
+        and record.equipment.primaryFullType or nil
     local attackApplied
     local attackReason
+    local attackDetail
     local rangedReady
     local rangedReason
     local rangedProfile
@@ -117,7 +135,6 @@ function Internal.applyAttackActionHit(record, zombie, action, target)
     end
 
     if action.attackType == "ranged" and action.ammoConsumed ~= true then
-        local weaponItem = Internal.resolveWeaponItem and Internal.resolveWeaponItem(record) or nil
         local consumed
         local ammoReason
         if Resolution and Resolution.ConsumeAmmo then
@@ -138,7 +155,7 @@ function Internal.applyAttackActionHit(record, zombie, action, target)
                 record,
                 zombie,
                 target,
-                Internal.resolveWeaponItem and Internal.resolveWeaponItem(record, zombie) or nil
+                weaponItem
             )
         else
             logFirearmAudit("attack_effect_rejected", record, action,
@@ -189,7 +206,8 @@ function Internal.applyAttackActionHit(record, zombie, action, target)
                     damage = action.damage,
                     attackType = "melee",
                     attackKind = action.attackKind,
-                    weaponItem = Internal.resolveWeaponItem(record),
+                    weaponItem = weaponItem,
+                    weaponFullType = weaponFullType,
                 })
             if attackApplied then
                 commitMeleeImpactAudio(record, action, target)
@@ -206,13 +224,18 @@ function Internal.applyAttackActionHit(record, zombie, action, target)
             return false, attackReason or "invalid_player_target"
         end
         if target.kind == "npc" then
-            attackApplied, attackReason = Resolution and Resolution.ApplyTargetDamage
-                and Resolution.ApplyTargetDamage(record, zombie, target, {
+            attackApplied, attackReason, attackDetail = applyTargetDamage(
+                record,
+                zombie,
+                target,
+                {
                     damage = action.damage,
                     attackType = "melee",
                     attackKind = action.attackKind,
-                    weaponItem = Internal.resolveWeaponItem(record),
-                })
+                    weaponItem = weaponItem,
+                    weaponFullType = weaponFullType,
+                }
+            )
             if attackApplied then
                 commitMeleeImpactAudio(record, action, target)
                 AttackExecution.applyWeaponWear(record)
@@ -223,9 +246,9 @@ function Internal.applyAttackActionHit(record, zombie, action, target)
                     Skills.AddXP(record, action.skillID or "Strength", 5)
                     Skills.AddXP(record, "Maintenance", 1)
                 end
-                return true, attackReason or "hit_npc"
+                return true, attackReason or "hit_npc", attackDetail
             end
-            return false, attackReason or "npc_damage_rejected"
+            return false, attackReason or "npc_damage_rejected", attackDetail
         end
         if target.kind == "foreign_npc" then
             attackApplied, attackReason = Resolution and Resolution.ApplyTargetDamage
@@ -233,7 +256,8 @@ function Internal.applyAttackActionHit(record, zombie, action, target)
                     damage = action.damage,
                     attackType = "melee",
                     attackKind = action.attackKind,
-                    weaponItem = Internal.resolveWeaponItem(record),
+                    weaponItem = weaponItem,
+                    weaponFullType = weaponFullType,
                 })
             if attackApplied then
                 commitMeleeImpactAudio(record, action, target)
@@ -273,7 +297,8 @@ function Internal.applyAttackActionHit(record, zombie, action, target)
                     damage = action.damage,
                     attackType = "ranged",
                     attackKind = action.attackKind,
-                    weaponItem = Internal.resolveWeaponItem(record),
+                    weaponItem = weaponItem,
+                    weaponFullType = weaponFullType,
                 })
             if attackApplied then
                 AttackExecution.applyWeaponWear(record)
@@ -289,13 +314,18 @@ function Internal.applyAttackActionHit(record, zombie, action, target)
             return false, attackReason or "invalid_player_target"
         end
         if target.kind == "npc" then
-            attackApplied, attackReason = Resolution and Resolution.ApplyTargetDamage
-                and Resolution.ApplyTargetDamage(record, zombie, target, {
+            attackApplied, attackReason, attackDetail = applyTargetDamage(
+                record,
+                zombie,
+                target,
+                {
                     damage = action.damage,
                     attackType = "ranged",
                     attackKind = action.attackKind,
-                    weaponItem = Internal.resolveWeaponItem(record),
-                })
+                    weaponItem = weaponItem,
+                    weaponFullType = weaponFullType,
+                }
+            )
             if attackApplied then
                 AttackExecution.applyWeaponWear(record)
                 if Stamina and Stamina.SpendAttack then
@@ -305,9 +335,9 @@ function Internal.applyAttackActionHit(record, zombie, action, target)
                     Skills.AddXP(record, "Aiming", 5)
                     Skills.AddXP(record, "Reloading", 2)
                 end
-                return true, attackReason or "hit_npc"
+                return true, attackReason or "hit_npc", attackDetail
             end
-            return false, attackReason or "npc_damage_rejected"
+            return false, attackReason or "npc_damage_rejected", attackDetail
         end
         if target.kind == "foreign_npc" then
             attackApplied, attackReason = Resolution and Resolution.ApplyTargetDamage
@@ -315,7 +345,8 @@ function Internal.applyAttackActionHit(record, zombie, action, target)
                     damage = action.damage,
                     attackType = "ranged",
                     attackKind = action.attackKind,
-                    weaponItem = Internal.resolveWeaponItem(record),
+                    weaponItem = weaponItem,
+                    weaponFullType = weaponFullType,
                 })
             if attackApplied then
                 AttackExecution.applyWeaponWear(record)

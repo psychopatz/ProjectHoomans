@@ -94,8 +94,23 @@ local function applyIncapacitatedLiveState(record, zombie)
     local LiveBodyControl = resolveLiveBodyControl()
     local path = record and record.runtime and record.runtime.pathing or nil
     local moving = path and (path.phase == "requested" or path.phase == "active") and path.mode == "crawl"
+    local treatment = record and record.runtime
+        and record.runtime.selfTreatment or nil
     if not zombie then
         return
+    end
+    if treatment and treatment.phase == "bandaging" then
+        if Animation and Animation.FinishBump then
+            pcall(Animation.FinishBump, zombie, true)
+        end
+        treatment.phase = "idle"
+        treatment.partId = nil
+        treatment.bandageType = nil
+        treatment.bandageName = nil
+        treatment.startedAt = 0
+        treatment.finishAt = 0
+        treatment.interruptedReason = "incapacitated"
+        record.runtime.tacticalState = nil
     end
     if zombie.setRunning then
         zombie:setRunning(false)
@@ -112,10 +127,7 @@ local function applyIncapacitatedLiveState(record, zombie)
     if zombie.setHealth then
         zombie:setHealth(Const.INCAPACITATED_ENGINE_BUFFER)
     end
-    if Animation and Animation.ApplyDowned
-        and not (record.runtime and record.runtime.selfTreatment
-            and record.runtime.selfTreatment.phase == "bandaging")
-    then
+    if Animation and Animation.ApplyDowned then
         Animation.ApplyDowned(zombie, record, moving == true)
     end
 end

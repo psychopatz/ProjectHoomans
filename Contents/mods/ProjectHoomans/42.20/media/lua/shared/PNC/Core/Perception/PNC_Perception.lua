@@ -11,6 +11,7 @@ PNC.Perception.Internal = PNC.Perception.Internal or {}
 require "PNC/Core/Perception/PNC_Perception/ThreatHistory"
 require "PNC/Core/Perception/PNC_Perception/Visibility"
 require "PNC/Core/Perception/PNC_Perception/ActorSearch"
+require "PNC/Core/Perception/PNC_Perception/NPCThreatAlert"
 require "PNC/Core/Perception/PNC_Perception/ZombieSearch"
 require "PNC/Core/Perception/PNC_Perception/ImmediateEnemy"
 require "PNC/Core/Perception/PNC_Perception/ImmediateThreat"

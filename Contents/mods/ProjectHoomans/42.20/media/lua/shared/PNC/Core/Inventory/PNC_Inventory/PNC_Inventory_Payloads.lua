@@ -44,6 +44,10 @@ local function buildSummaryPayload(record, inv)
     local summary
     local templateRef = record and record.inventoryTemplateRef or nil
     local runtime = record and record.runtime or nil
+    local cachedInventory = record
+        and type(record.inventory) == "table"
+        and record.inventory
+        or nil
     local cacheKey
     if not templateRef and type(persistedBaseline) == "table" then
         templateRef = persistedBaseline.templateRef
@@ -56,6 +60,24 @@ local function buildSummaryPayload(record, inv)
         summary.templateRef = summary.templateRef or templateRef
         return summary
     end
+
+    -- Summary payloads are read-only projections. Once a hydrated inventory
+    -- has produced a summary for the current revision, do not re-enter the
+    -- hydration lifecycle just to read that same summary again. Full payloads
+    -- and mutation paths still use EnsureRecordInventory and retain all
+    -- repair/equipment/water reconciliation behavior.
+    if not inv and cachedInventory
+        and type(record.persistedInventory) ~= "table"
+        and runtime
+        and runtime.inventorySummaryCacheKey == (
+            tostring(cachedInventory.revision or 0)
+                .. "|" .. tostring(templateRef or "")
+        )
+        and type(runtime.inventorySummaryCache) == "table"
+    then
+        return Core.DeepCopy(runtime.inventorySummaryCache)
+    end
+
     inv = inv or Inventory.EnsureRecordInventory(record)
     if not inv then
         return nil

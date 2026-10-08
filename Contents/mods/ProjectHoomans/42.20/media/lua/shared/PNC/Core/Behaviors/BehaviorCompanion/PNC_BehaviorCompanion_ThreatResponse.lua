@@ -17,6 +17,12 @@ local function targetWithinConstraint(target, constraint)
     if type(constraint) ~= "table" then return true end
     if not target or target.x == nil or target.y == nil then return false end
     radius = math.max(0, tonumber(constraint.radius) or 0)
+    if target.groupAlert == true then
+        radius = math.max(
+            radius,
+            tonumber(target.alertRadius) or radius
+        )
+    end
     dx = (tonumber(target.x) or 0) - (tonumber(constraint.x) or 0)
     dy = (tonumber(target.y) or 0) - (tonumber(constraint.y) or 0)
     return (dx * dx) + (dy * dy) <= radius * radius

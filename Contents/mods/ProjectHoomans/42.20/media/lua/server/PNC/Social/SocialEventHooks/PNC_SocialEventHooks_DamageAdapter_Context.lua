@@ -25,6 +25,11 @@ Hooks.VanillaDamageSnapshots = Hooks.VanillaDamageSnapshots or {}
 Hooks.VanillaDamageMarkers = Hooks.VanillaDamageMarkers or {}
 Hooks.LastVanillaDamagePollAt = Hooks.LastVanillaDamagePollAt or 0
 Hooks.LastTeammateHurtAt = Hooks.LastTeammateHurtAt or {}
+Hooks.LastPlayerHurtWitnessAt = Hooks.LastPlayerHurtWitnessAt or {}
+Hooks.PlayerHurtWitnessThrottleOrder =
+    Hooks.PlayerHurtWitnessThrottleOrder or {}
+Hooks.PlayerHurtWitnessCooldownMs =
+    tonumber(Hooks.PlayerHurtWitnessCooldownMs) or 750
 
 local function call(object, method, ...)
     if not object or not object[method] then

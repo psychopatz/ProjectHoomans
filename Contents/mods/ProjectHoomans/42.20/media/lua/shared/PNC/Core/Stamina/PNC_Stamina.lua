@@ -58,14 +58,23 @@ local function ensureState(record, nowOverride)
         if type(record.stamina) ~= "table" then
             record.stamina = {}
         end
-        record.stamina.baseMax = derivedCache.baseMax
-        record.stamina.max = derivedCache.max
-        record.stamina.encumbranceLevel = derivedCache.encumbranceLevel
-        record.stamina.encumbranceRatio = derivedCache.encumbranceRatio
+        -- Derived values are immutable until the inventory revision or the
+        -- refresh deadline changes. Do not rewrite the whole stamina table on
+        -- every hot combat tick; besides the allocations, those assignments
+        -- used to dominate large-follower captures.
+        record.stamina.baseMax = record.stamina.baseMax
+            or derivedCache.baseMax
+        record.stamina.max = record.stamina.max or derivedCache.max
+        record.stamina.encumbranceLevel = record.stamina.encumbranceLevel
+            or derivedCache.encumbranceLevel
+        record.stamina.encumbranceRatio = record.stamina.encumbranceRatio
+            or derivedCache.encumbranceRatio
         record.stamina.encumbranceDrainMultiplier =
-            derivedCache.encumbranceDrainMultiplier
+            record.stamina.encumbranceDrainMultiplier
+            or derivedCache.encumbranceDrainMultiplier
         record.stamina.encumbranceRecoveryMultiplier =
-            derivedCache.encumbranceRecoveryMultiplier
+            record.stamina.encumbranceRecoveryMultiplier
+            or derivedCache.encumbranceRecoveryMultiplier
         record.stamina.current = clamp(
             tonumber(record.stamina.current)
                 or tonumber(derivedCache.max) or 100,
@@ -253,6 +262,9 @@ function Stamina.Update(record, zombie, now)
     local recoverRate
     local runtime
     local moveDrain
+    local pathing
+    local moving
+    local severelyEncumbered
     now = tonumber(now) or Core.Now()
     stamina = ensureState(record, now)
     if not stamina then
@@ -263,6 +275,23 @@ function Stamina.Update(record, zombie, now)
     elapsed = math.max(0, now - lastUpdatedAt) / 1000
     stamina.lastUpdatedAt = now
     if elapsed <= 0 then
+        return
+    end
+
+    pathing = runtime and runtime.pathing or nil
+    moving = pathing
+        and (pathing.phase == "requested" or pathing.phase == "active")
+        or false
+    severelyEncumbered = (tonumber(stamina.encumbranceRatio) or 0)
+        >= (tonumber(Const.ENCUMBRANCE_SEVERE_RATIO) or 1.75)
+    -- Full, stationary NPCs have no stamina state to integrate. Keeping the
+    -- timestamp current preserves correct elapsed time when they start moving
+    -- again and avoids running movement/recovery logic for the idle majority.
+    if not moving
+        and (tonumber(stamina.current) or 0)
+            >= (tonumber(stamina.max) or 100)
+        and not severelyEncumbered
+    then
         return
     end
 

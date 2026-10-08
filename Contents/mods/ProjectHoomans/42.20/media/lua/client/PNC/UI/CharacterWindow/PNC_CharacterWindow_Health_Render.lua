@@ -58,7 +58,7 @@ function Tabs.RenderHealth(view, snapshot, payload, topY)
         view:drawText(Shared.Text("UI_PNC_Health_IncapacitatedHelp", "Bandage the wounds; they will stand once sufficiently recovered."), x, y, 0.72, 0.72, 0.72, 1, UIFont.Small)
         y = y + fontHeight + 6
     end
-    view:drawText(Shared.Text("IGUI_health_RightClickTreatement", "Right click an injury to treat it."), padding, padding + bodyBounds.height + 4, 1, 1, 1, UIFont.Small)
+    view:drawText(Shared.Text("IGUI_health_RightClickTreatement", "Right click an injury to treat it."), padding, padding + bodyBounds.height + 4, 1, 1, 1, 1, UIFont.Small)
     return math.max(y, padding + bodyBounds.height) + 12
 end
 

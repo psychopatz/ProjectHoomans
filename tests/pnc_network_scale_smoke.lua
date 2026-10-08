@@ -800,6 +800,16 @@ T.equal(PNC.Network.BuildRosterSnapshot(nearbyRecord).replicaSequence,
     firstReplicaSequence,
     "roster snapshot did not carry the current replica sequence")
 
+sent = {}
+PNC.Network.BroadcastRecord(nearbyRecord, "combat_damage")
+T.equal(#sent, 8, "combat damage recipient count")
+T.truthy(sent[1].payload.snapshot.bodyHealth ~= nil,
+    "combat damage omitted wound state")
+T.equal(sent[1].payload.snapshot.skillLevels, nil,
+    "combat damage rebuilt detailed skill state")
+T.equal(sent[1].payload.snapshot.inventorySummary, nil,
+    "combat damage rebuilt inventory state")
+
 nearbyRecord.x = 100
 sent = {}
 PNC.Network.RefreshInterestSets(4000)
