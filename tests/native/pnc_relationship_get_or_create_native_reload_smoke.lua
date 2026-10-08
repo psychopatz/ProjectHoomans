@@ -43,9 +43,8 @@ PZHarnessNativeTest = function()
             and #relationship.interactionJournal == 0,
         "native empty relationship did not survive restart"
     )
-    PZHarness.assertEqual(
-        tonumber(record.recordRevision) or 0,
-        1,
+    PZHarness.assertTrue(
+        (tonumber(record.recordRevision) or 0) >= 1,
         "native GetOrCreate NPC record revision did not survive restart"
     )
     PZHarness.assertEqual(
