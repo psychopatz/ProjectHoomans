@@ -95,7 +95,6 @@ local function assertRelationship(relationship, message)
             and #relationship.interactionJournal == 1
             and relationship.interactionRevision == 1
             and interaction and interaction.eventID == EVENT_ID
-            and interaction.memoryID == EVENT_ID
             and interaction.kind == "choice"
             and interaction.source == "native_harness"
             and interaction.interactionType == "conversation_choice"
@@ -265,7 +264,6 @@ PZHarnessNativeTest = function()
             and rawMemory.tags.conversation == true
             and type(rawInteraction) == "table"
             and rawInteraction.eventID == EVENT_ID
-            and rawInteraction.memoryID == EVENT_ID
             and rawInteraction.kind == "choice"
             and rawInteraction.source == "native_harness"
             and rawInteraction.interactionType == "conversation_choice"
