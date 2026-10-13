@@ -126,10 +126,6 @@ function ISPNCColonyStorageWindow:render()
         Theme.colors.text.r, Theme.colors.text.g,
         Theme.colors.text.b, Theme.colors.text.a,
         Theme.Font(self.uiScale, "title"))
-    UI.DrawSectionTitle(self,
-        Shared.Tr("UI_PNC_Storage_GeneralStockpile", "GENERAL STOCKPILE"),
-        self.storageList:getX(), self.storageList:getY() - 21,
-        self.storageList:getWidth())
     local Presentation = require "PNC/UI/Storage/PNC_StoragePresentation"
     Presentation.DrawSummary(self, Theme)
 end

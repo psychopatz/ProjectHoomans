@@ -75,6 +75,11 @@ function Building.Rebuild(window, snapshot)
     return View.Rebuild(window, snapshot)
 end
 
+function Building.FocusFacility(window, definitionId)
+    if window.tab ~= "facilities" then return false end
+    return View.Focus(window, definitionId)
+end
+
 -- Kept below as a compatibility note for callers that inspect the old
 -- catalog-kind state. The active branch above deliberately owns the tab
 -- boundary so room cards never get rebuilt from the recipe catalog.

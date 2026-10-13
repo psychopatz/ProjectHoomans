@@ -48,6 +48,10 @@ function Controller.ApplyContentStyle(window)
     window.lastContentOpacitySignature = signature
 end
 
+function Controller.RenderSplitter(window)
+    return Workshop.RenderSplitter(window)
+end
+
 function Controller.Rebuild(window)
     window.tab = "workshop"
     return Workshop.Rebuild(window, window.snapshot or {}, Shared.Tr)
@@ -76,6 +80,19 @@ end
 
 function Controller.OnControl(window, button)
     return Workshop.OnControl(window, button)
+end
+
+function Controller.ToggleInventoryGroup(window, role, groupKey)
+    if role ~= "workshop_recipe" and role ~= "workshop_salvage" then
+        return false
+    end
+    local key = tostring(groupKey or "")
+    if key == "" then return false end
+    window.workshopCollapsedGroups = window.workshopCollapsedGroups or {}
+    window.workshopCollapsedGroups[key] =
+        window.workshopCollapsedGroups[key] ~= true
+    window:rebuildDetails()
+    return true
 end
 
 return Controller

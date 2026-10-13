@@ -205,4 +205,32 @@ function View.Rebuild(window, snapshot)
     return true
 end
 
+function View.Focus(window, id)
+    local wanted = tostring(id or "")
+    if wanted == "" then return false end
+    local target
+    for _, option in ipairs(window.baseBuildingOptions or {}) do
+        if tostring(option.id) == wanted then
+            target = option
+            break
+        end
+    end
+    if not target then return false end
+
+    -- Put the focused facility on the visible category and page before the
+    -- cards are rebuilt. Selecting an off-page id alone leaves the first page
+    -- visible, which made a successful focus request look like a no-op.
+    window.baseBuildingCategory = target.category
+    local filtered = Data.FilteredOptions(window)
+    for index, option in ipairs(filtered) do
+        if tostring(option.id) == wanted then
+            window.baseBuildingPage = math.ceil(index / Data.PAGE_SIZE)
+            break
+        end
+    end
+    View.Rebuild(window, window.snapshot or {})
+    View.SetSelected(window, wanted)
+    return true
+end
+
 return View

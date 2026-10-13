@@ -1,5 +1,6 @@
 require "ISUI/ISPanel"
 require "PsychopatzCore/UI/PsychopatzUI"
+local Settings = require "PsychopatzCore/Settings/PsychopatzSettings"
 
 local Shared = require "PNC/UI/Shared/PNC_ColonyUIShared"
 local Components = {}
@@ -9,6 +10,66 @@ local Layout = UI.Layout
 local rosterTextures = {}
 local ROSTER_ICON_SIZE = 22
 local ROSTER_ICON_Y = 4
+
+local function cloneCatalogColumns(columns)
+    local copy = {}
+    for index, column in ipairs(columns or {}) do
+        copy[index] = {
+            key = column.key,
+            x = tonumber(column.x) or 0,
+        }
+    end
+    return copy
+end
+
+local function catalogColumnValueMap(raw)
+    local values = {}
+    for pair in string.gmatch(tostring(raw or ""), "([^;]+)") do
+        local key, value = string.match(pair, "^([^=]+)=([^=]+)$")
+        if key and value then
+            local position = tonumber(value)
+            if position then values[key] = position end
+        end
+    end
+    return values
+end
+
+-- Column positions are user preferences, so persist them through the same
+-- per-user Settings store used by the other Core UI preferences.  The state
+-- is keyed by window type and only stores stable column keys plus normalized
+-- positions; screen size and runtime layout remain window-owned.
+function Components.CreateCatalogColumnState(options)
+    options = options or {}
+    local namespace = tostring(options.namespace or "ProjectHoomansCatalogUI")
+    local key = tostring(options.key or "columns")
+    local store = Settings.Open(namespace, {
+        fileName = options.fileName,
+        defaults = { [key] = "" },
+    })
+    if not store.loaded then store:Load() end
+
+    local state = {
+        columns = cloneCatalogColumns(options.columns),
+        store = store,
+        key = key,
+    }
+    local saved = catalogColumnValueMap(store:Get(key, ""))
+    for _, column in ipairs(state.columns) do
+        local position = saved[column.key]
+        if position then column.x = math.max(0.01, math.min(0.99, position)) end
+    end
+
+    function state:save()
+        local values = {}
+        for _, column in ipairs(self.columns or {}) do
+            values[#values + 1] = tostring(column.key) .. "="
+                .. string.format("%.6f", tonumber(column.x) or 0)
+        end
+        self.store:Set(self.key, table.concat(values, ";"), true)
+    end
+
+    return state
+end
 
 local function rosterTexture(path)
     if not path or not getTexture then return nil end
@@ -251,6 +312,192 @@ local function createPane(window, itemHeight, drawItem)
     })
     pane.content = list
     return pane, list
+end
+
+-- Fixed catalog column header.  Catalog rows belong to a scrolling list, but
+-- the column labels belong to the pane.  Keeping this as a shared component
+-- prevents each catalog from reimplementing sticky-header drawing and keeps
+-- the scrollbar's viewport limited to actual rows.
+local CatalogHeader = ISPanel:derive("ISPNCCatalogHeader")
+local CATALOG_SPLITTER_WIDTH = 12
+local DEFAULT_COLUMN_MINIMUMS = { 150, 80, 45, 95, 95 }
+
+local function sumColumnMinimums(minimums, first, last)
+    local total = 0
+    for index = first, last do
+        total = total + (tonumber(minimums[index]) or 1)
+    end
+    return total
+end
+
+local function setDividerBounds(divider, x, height)
+    divider:setX(math.floor(x - CATALOG_SPLITTER_WIDTH / 2))
+    divider:setY(0)
+    divider:setWidth(CATALOG_SPLITTER_WIDTH)
+    divider:setHeight(math.max(1, math.floor(height)))
+end
+
+function CatalogHeader:initialise()
+    ISPanel.initialise(self)
+    self.backgroundColor = Theme.Color("surfaceRaised")
+    self.borderColor = Theme.Color("border")
+    self.drawBorder = true
+    self.splitters = {}
+    self:setWantMouseEvents(true)
+end
+
+function CatalogHeader:setContent(title, cells, columns)
+    self.title = tostring(title or "")
+    self.cells = cells or {}
+    self.columns = columns or self.columns or {}
+    self:layoutSplitters()
+end
+
+function CatalogHeader:contentWidth()
+    local list = self.linkedLists and self.linkedLists[1] or nil
+    if list and list.catalogContentWidth then
+        return math.max(1, tonumber(list:catalogContentWidth())
+            or self:getWidth())
+    end
+    return math.max(1, self:getWidth())
+end
+
+function CatalogHeader:boundaryRange(index, width)
+    local minimums = self.columnMinimums or DEFAULT_COLUMN_MINIMUMS
+    -- The title occupies the first section before columns[1].x.  Each
+    -- catalog column entry marks the start of the next section, so a header
+    -- with four cells has five resizable sections and four splitters.
+    local count = #self.columns + 1
+    local leftMinimum = sumColumnMinimums(minimums, 1, index)
+    local rightMinimum = sumColumnMinimums(minimums, index + 1, count)
+    if leftMinimum + rightMinimum > width then
+        leftMinimum = math.floor(width * index / count)
+        rightMinimum = math.max(1, width - leftMinimum)
+    end
+    return math.max(1, leftMinimum),
+        math.max(leftMinimum, width - rightMinimum)
+end
+
+function CatalogHeader:updateColumnBoundary(index, value)
+    local width = self:contentWidth()
+    if width <= 0 then return end
+    local minimum, maximum = self:boundaryRange(index, width)
+    local boundary = math.max(minimum, math.min(maximum,
+        tonumber(value) or minimum))
+    self.columns[index].x = boundary / width
+    self:layoutSplitters()
+    for _, list in ipairs(self.linkedLists or {}) do
+        if list.invalidateCatalogControls then
+            list:invalidateCatalogControls()
+        end
+    end
+    if type(self.onColumnResize) == "function" then
+        self.onColumnResize(self, index, boundary, width)
+    end
+end
+
+function CatalogHeader:layoutSplitters()
+    if not self.columns or #self.columns < 1 then return end
+    if self:getWidth() <= 1 then return end
+    local width = self:contentWidth()
+    for index, divider in ipairs(self.splitters or {}) do
+        local column = self.columns[index]
+        if column then
+            local minimum, maximum = self:boundaryRange(index, width)
+            divider:setRange(minimum, maximum)
+            local boundary = math.max(minimum, math.min(maximum,
+                width * (tonumber(column.x) or 0)))
+            column.x = boundary / width
+            if not divider.dragging then
+                divider:setValue(boundary, true)
+            end
+            setDividerBounds(divider, boundary, self:getHeight())
+            divider:bringToTop()
+        end
+    end
+end
+
+function CatalogHeader:configure(options)
+    options = options or {}
+    self.linkedLists = options.lists or {}
+    self.columnMinimums = options.minWidths or DEFAULT_COLUMN_MINIMUMS
+    self.onColumnResize = options.onColumnResize
+    self.onColumnResizeEnd = options.onColumnResizeEnd
+    self.splitters = {}
+    for index = 1, #self.columns do
+        local divider = UI.CreateResizableDivider(self, {
+            width = CATALOG_SPLITTER_WIDTH,
+            height = self:getHeight(),
+            drawIndicator = true,
+            onChange = function(value)
+                self:updateColumnBoundary(index, value)
+            end,
+            onRelease = function(value)
+                if type(self.onColumnResizeEnd) == "function" then
+                    self.onColumnResizeEnd(self, index, value)
+                end
+            end,
+        })
+        self.splitters[index] = divider
+    end
+    self:layoutSplitters()
+end
+
+function CatalogHeader:render()
+    ISPanel.render(self)
+    local font = Theme.Font(self.uiScale)
+    local muted = Theme.colors.textMuted
+    local accent = Theme.colors.accent
+    local width = self:contentWidth()
+    local firstColumn = self.columns[1]
+    local titleRight = firstColumn
+        and math.floor(width * (tonumber(firstColumn.x) or 0.4))
+        or width
+    self:drawText(Layout.Ellipsize(self.title, font,
+        math.max(1, titleRight - 43)), 39, 7,
+        muted.r, muted.g, muted.b, muted.a, font)
+    for index, column in ipairs(self.columns) do
+        local value = self.cells[column.key]
+        if value ~= nil and value ~= "" then
+            local x = math.floor(width * (tonumber(column.x) or 0)) + 4
+            local nextColumn = self.columns[index + 1]
+            local right = nextColumn
+                and math.floor(width * (tonumber(nextColumn.x) or 1))
+                or width
+            self:drawText(Layout.Ellipsize(tostring(value), font,
+                math.max(1, right - x - 4)), x, 7,
+                muted.r, muted.g, muted.b, muted.a, font)
+        end
+    end
+    local border = Theme.colors.border or muted
+    for index = 1, #self.columns do
+        local x = math.floor(width * (tonumber(self.columns[index].x) or 0))
+        self:drawRect(x, 0, 1, self:getHeight(), 0.65,
+            border.r, border.g, border.b)
+    end
+    self:drawRect(0, self:getHeight() - 1, width, 1, 0.9,
+        accent.r, accent.g, accent.b)
+end
+
+function CatalogHeader:new(x, y, width, height, uiScale, columns)
+    local object = ISPanel:new(x, y, width, height)
+    setmetatable(object, self)
+    self.__index = self
+    object.uiScale = uiScale
+    object.columns = columns or {}
+    object.title = ""
+    object.cells = {}
+    return object
+end
+
+function Components.CreateCatalogHeader(window, columns, options)
+    local header = CatalogHeader:new(0, 0, 1, 32,
+        window and window.uiScale or 1, columns)
+    header:initialise()
+    header:instantiate()
+    header:configure(options)
+    if window then window:addChild(header) end
+    return header
 end
 
 function Components.CreatePane(window, itemHeight, drawItem)

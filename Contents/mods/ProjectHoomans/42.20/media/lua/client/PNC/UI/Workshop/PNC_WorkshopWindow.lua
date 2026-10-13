@@ -47,6 +47,10 @@ function ISPNCWorkshopWindow:onWorkshopControl(button)
     return Controller.OnControl(self, button)
 end
 
+function ISPNCWorkshopWindow:toggleInventoryGroup(role, groupKey)
+    return Controller.ToggleInventoryGroup(self, role, groupKey)
+end
+
 function ISPNCWorkshopWindow:rebuildDetails()
     return Controller.Rebuild(self)
 end
@@ -84,6 +88,8 @@ end
 
 function ISPNCWorkshopWindow:render()
     PsychopatzWindow.render(self)
+    if self.finishRenderClip then self:finishRenderClip() end
+    Controller.RenderSplitter(self)
 end
 
 function ISPNCWorkshopWindow:close()

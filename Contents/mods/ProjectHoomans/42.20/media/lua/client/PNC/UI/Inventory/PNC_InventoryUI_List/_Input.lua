@@ -48,24 +48,39 @@ function ISPNCInventoryList:onMouseDown(x, y)
     end
     local row = self:selectedRow()
     if row and self.ownerWindow then
-        if row.groupHeader and inputX <= 16
+        if row.groupHeader
             and self.ownerWindow.toggleInventoryGroup
         then
             self.ownerWindow:toggleInventoryGroup(self.role, row.groupKey)
         elseif type(self.catalogColumns) == "table"
             and type(row.catalogCells) == "table" and row.catalogHeader ~= true
-            and self.onCatalogCell
+            and (self.onCatalogCell or self.onCatalogControl)
         then
             local index
             for index = #self.catalogColumns, 1, -1 do
                 local column = self.catalogColumns[index]
-                local left = math.floor(self.width * (tonumber(column.x) or 0))
-                if inputX >= left then
+                local left, right
+                if self.catalogColumnBounds then
+                    left, right = self:catalogColumnBounds(index)
+                else
+                    local contentWidth = self.catalogContentWidth
+                        and self:catalogContentWidth() or self.width
+                    left = math.floor(contentWidth
+                        * (tonumber(column.x) or 0))
                     local nextColumn = self.catalogColumns[index + 1]
-                    local right = nextColumn and math.floor(self.width
-                        * (tonumber(nextColumn.x) or 1)) or self.width
-                    self.onCatalogCell(self.ownerWindow, row, column.key,
-                        inputX - left, math.max(1, right - left))
+                    right = nextColumn and math.floor(contentWidth
+                        * (tonumber(nextColumn.x) or 1)) or contentWidth
+                end
+                if inputX >= left and inputX < right then
+                    local cellControls = row.catalogControls
+                        and row.catalogControls[column.key]
+                    if self.onCatalogCell and type(cellControls) ~= "table" then
+                        self.onCatalogCell(self.ownerWindow, row, column.key,
+                            inputX - left, math.max(1, right - left))
+                    end
+                    -- Catalog columns own their hit area. A blank gap beside
+                    -- a child button must not fall through to row transfer or
+                    -- any feature's legacy whole-cell action.
                     return true
                 end
             end

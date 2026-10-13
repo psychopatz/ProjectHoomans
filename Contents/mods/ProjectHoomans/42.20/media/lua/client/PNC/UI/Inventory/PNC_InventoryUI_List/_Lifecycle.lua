@@ -25,6 +25,11 @@ function ISPNCInventoryList:new(x, y, width, height, ownerWindow, role)
     o.drawBorder = true
     o.backgroundColor = { r = 0, g = 0, b = 0, a = 0.62 }
     o.borderColor = { r = 0.45, g = 0.45, b = 0.45, a = 0.9 }
+    -- Catalog controls are child widgets positioned in list coordinates. Let
+    -- the native list keep them inside its viewport stencil while the shared
+    -- control layer applies the current scroll offset explicitly.
+    o.useStencilForChildren = true
+    o.catalogControlButtons = {}
     o.equippedItemIcon = getTexture and getTexture("media/ui/icon.png") or nil
     -- Use the base-game favorite glyph so recipe rows and inventory rows
     -- present favorites consistently with the native build menu.

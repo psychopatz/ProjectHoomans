@@ -71,39 +71,6 @@ local function drawInventoryPanes(self)
     return containerY, playerX, npcX, paneWidth
 end
 
-local function drawInventoryListHeaders(self, containerY, playerX, npcX, paneWidth)
-    local listY = self.playerList and self.playerList:getY() or containerY + 38
-    self:drawText(tr("UI_PNC_Inventory_Item", "Item"), self.playerList:getX() + 40, listY - 19,
-        0.85, 0.85, 0.85, 1, UIFont.Small)
-    if self.giftMode then
-        self:drawText(
-            tr("UI_PNC_Inventory_GiftPreference", "Like / Dislike"),
-            self.playerList:getX() + math.floor(self.playerList.width * 0.64),
-            listY - 19,
-            0.55, 0.88, 0.68, 1, UIFont.Small
-        )
-    else
-        self:drawText(tr("UI_PNC_Inventory_Category", "Category"),
-            self.playerList:getX() + math.floor(self.playerList.width * 0.64),
-            listY - 19, 0.85, 0.85, 0.85, 1, UIFont.Small)
-    end
-    self:drawText(tr("UI_PNC_Inventory_Item", "Item"), self.npcList:getX() + 40, listY - 19,
-        0.85, 0.85, 0.85, 1, UIFont.Small)
-    self:drawText(tr("UI_PNC_Inventory_Category", "Category"),
-        self.npcList:getX() + math.floor(self.npcList.width * 0.64),
-        listY - 19, 0.85, 0.85, 0.85, 1, UIFont.Small)
-    self:drawTextCentre(
-        tr("UI_PNC_Inventory_Bags", "Bags"),
-        self.playerContainerList:getX() + math.floor(self.playerContainerList.width / 2),
-        listY - 19, 0.85, 0.85, 0.85, 1, UIFont.Small
-    )
-    self:drawTextCentre(
-        tr("UI_PNC_Inventory_Bags", "Bags"),
-        self.npcContainerList:getX() + math.floor(self.npcContainerList.width / 2),
-        listY - 19, 0.85, 0.85, 0.85, 1, UIFont.Small
-    )
-end
-
 local function drawInventoryStatus(self, now)
     local refreshFeedback = self.inventoryRefreshFeedback
         and self.inventoryRefreshFeedbackUntil
@@ -123,6 +90,21 @@ local function drawInventoryStatus(self, now)
             self.width / 2, self.statusY or self.height - 42,
             0.64, 0.64, 0.64, 1, UIFont.Small
         )
+    end
+end
+
+local function drawInventoryContainerHeaders(self)
+    if self.tradeMode then return end
+    local listY = self.playerList and self.playerList:getY() or 0
+    local label = tr("UI_PNC_Inventory_Bags", "Bags")
+    for _, list in ipairs({
+        self.playerContainerList, self.npcContainerList,
+    }) do
+        if list then
+            self:drawTextCentre(label,
+                list:getX() + math.floor(list.width / 2), listY - 19,
+                0.85, 0.85, 0.85, 1, UIFont.Small)
+        end
     end
 end
 
@@ -153,7 +135,7 @@ function ISPNCInventoryWindow:prerender()
     self:updateInventoryTooltip()
     UI.Window.prerender(self)
     local containerY, playerX, npcX, paneWidth = drawInventoryPanes(self)
-    drawInventoryListHeaders(self, containerY, playerX, npcX, paneWidth)
+    drawInventoryContainerHeaders(self)
     drawInventoryStatus(self, now)
     drawInventoryDragFeedback(self)
 end

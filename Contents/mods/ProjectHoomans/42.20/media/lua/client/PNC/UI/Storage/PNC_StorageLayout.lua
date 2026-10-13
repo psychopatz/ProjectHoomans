@@ -55,6 +55,7 @@ function LayoutModule.Apply(window, active)
     active = active == true
     window.storageSearch:setVisible(active)
     window.storageList:setVisible(active)
+    window.storageCatalogHeader:setVisible(active)
     window.storageSortButton:setVisible(active)
 
     local storage = window.snapshot and window.snapshot.storage or nil
@@ -116,6 +117,10 @@ function LayoutModule.Apply(window, active)
     listHeight = math.max(Layout.Pixels(60, scale), listHeight)
     Layout.SetBounds(window.storageList, content.x,
         window.layout.storageListY, listWidth, listHeight)
+    Layout.SetBounds(window.storageCatalogHeader, content.x,
+        window.layout.storageListY - Layout.Pixels(28, scale),
+        listWidth, Layout.Pixels(28, scale))
+    window.storageCatalogHeader:layoutSplitters()
     Components.LayoutScrollbar(window.storageList)
 
     if showActivity then

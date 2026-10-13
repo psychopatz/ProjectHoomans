@@ -90,6 +90,9 @@ function ISPNCInventoryWindow:setConversationMode(mode, token, options)
     if giftModeChanged then
         self.contextSignature = nil
         self.playerRowsDirty = true
+        if self.refreshCatalogHeaders then
+            self:refreshCatalogHeaders()
+        end
         self:refreshInventory(true)
     end
 end

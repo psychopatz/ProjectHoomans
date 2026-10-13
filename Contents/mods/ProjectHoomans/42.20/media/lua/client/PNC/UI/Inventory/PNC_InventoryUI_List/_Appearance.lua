@@ -36,29 +36,59 @@ local function giftPreferenceText(value)
     return fallback
 end
 
-local function drawCatalogColumns(self, y, row, dimmed)
+local function catalogCellsForRow(self, row)
+    if type(row.catalogCells) == "table" then
+        return row.catalogCells
+    end
+    if type(self.catalogColumns) ~= "table" then return nil end
+    local cells = {}
+    for _, column in ipairs(self.catalogColumns) do
+        if column.key == "category" then
+            local value = row.category or "Item"
+            if self.ownerWindow and self.ownerWindow.giftMode
+                and self.role == "player"
+            then
+                value = giftPreferenceText(row.giftPreference) or value
+            end
+            cells[column.key] = value
+        elseif column.key == "quantity"
+            or column.key == "availability"
+        then
+            cells[column.key] = row.stack
+        end
+    end
+    return cells
+end
+
+local function drawCatalogColumns(self, y, row, dimmed, cells)
     local columns = self.catalogColumns
-    if type(columns) ~= "table" or type(row.catalogCells) ~= "table" then
+    if type(columns) ~= "table" or type(cells) ~= "table" then
         return false
     end
+    local contentWidth = self.catalogContentWidth
+        and self:catalogContentWidth() or self.width
     local index
     for index = 1, #columns do
         local column = columns[index]
-        local value = row.catalogCells[column.key]
-        local x = math.floor(self.width * (tonumber(column.x) or 0))
+        local value = cells[column.key]
+        local x = math.floor(contentWidth * (tonumber(column.x) or 0))
         local nextColumn = columns[index + 1]
-        local right = nextColumn and math.floor(self.width
-            * (tonumber(nextColumn.x) or 1)) or self.width
+        local right = nextColumn and math.floor(contentWidth
+            * (tonumber(nextColumn.x) or 1)) or contentWidth
         local available = math.max(1, right - x - 4)
         local r, g, b = catalogColor(row.catalogColors
             and row.catalogColors[column.key], dimmed,
             self.readableRestricted == true)
-        local text = tostring(value or "")
-        if Layout and Layout.Ellipsize then
-            text = Layout.Ellipsize(text, UIFont.Small, available)
+        local controls = row.catalogControls
+            and row.catalogControls[column.key]
+        if type(controls) ~= "table" then
+            local text = tostring(value or "")
+            if Layout and Layout.Ellipsize then
+                text = Layout.Ellipsize(text, UIFont.Small, available)
+            end
+            self:drawText(text, x, y + 7,
+                r, g, b, 1, UIFont.Small)
         end
-        self:drawText(text, x, y + 7,
-            r, g, b, 1, UIFont.Small)
     end
     return true
 end
@@ -68,7 +98,9 @@ function ISPNCInventoryList:doDrawItem(y, listItem, alt)
     if not row then return y + self.itemheight end
     local selected = self.selected == listItem.index
     local stripe = (listItem.index or 0) % 2 == 0
-    local dimmed = row.restricted == true
+    -- Group rows are navigational headers, not unavailable inventory items.
+    -- Keep them readable even when their child rows are restricted.
+    local dimmed = row.restricted == true and row.groupHeader ~= true
     if selected then
         self:drawRect(0, y, self.width, self.itemheight,
             scaledOpacity(self, 0.32), 0.32, 0.36, 0.40)
@@ -113,13 +145,21 @@ function ISPNCInventoryList:doDrawItem(y, listItem, alt)
     end
     local countText = row.stack and row.stack > 1
         and (" (" .. tostring(row.stack) .. ")") or ""
-    local textColor = dimmed
-        and (self.readableRestricted and 0.62 or 0.40) or 0.86
-    local custom = drawCatalogColumns(self, y, row, dimmed)
-    local categoryX = math.floor(self.width * 0.64)
+    local textColor
+    if row.groupHeader then
+        textColor = row.skillHeader and 0.92 or 0.82
+    else
+        textColor = dimmed
+            and (self.readableRestricted and 0.62 or 0.40) or 0.86
+    end
+    local catalogCells = catalogCellsForRow(self, row)
+    local custom = drawCatalogColumns(self, y, row, dimmed, catalogCells)
+    local contentWidth = self.catalogContentWidth
+        and self:catalogContentWidth() or self.width
+    local categoryX = math.floor(contentWidth * 0.64)
     local nameWidth = math.max(1, self.width - 49 - indent)
     if custom and self.catalogColumns[1] then
-        local firstColumnX = math.floor(self.width
+        local firstColumnX = math.floor(contentWidth
             * (tonumber(self.catalogColumns[1].x) or 1))
         nameWidth = math.max(1, firstColumnX - 43 - indent)
     elseif not custom then
@@ -153,7 +193,7 @@ function ISPNCInventoryList:doDrawItem(y, listItem, alt)
         local category = tostring(row.category or "Item")
         if Layout and Layout.Ellipsize then
             category = Layout.Ellipsize(category, UIFont.Small,
-                math.max(1, self.width - categoryX - 4))
+                math.max(1, contentWidth - categoryX - 4))
         end
         self:drawText(
             category,

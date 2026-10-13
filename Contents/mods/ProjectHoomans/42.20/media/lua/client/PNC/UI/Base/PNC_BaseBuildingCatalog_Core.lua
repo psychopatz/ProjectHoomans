@@ -17,6 +17,8 @@ local Preview = require
     "PNC/UI/Base/PNC_BaseBuildingCatalog_Preview"
 local BuildingLayout = require
     "PNC/UI/Base/PNC_BaseBuildingCatalog_Layout"
+local Headers = require
+    "PNC/UI/Base/PNC_BaseBuildingCatalog_Headers"
 
 local function trace(event, message)
     local hub = PNC.CommandHub
@@ -49,11 +51,12 @@ local MATERIAL_COLUMNS = {
     { key = "available", x = 0.82 },
 }
 
-local function makeList(window, role, columns, callback)
+local function makeList(window, role, columns, callback, controlCallback)
     local list = ISPNCInventoryList:new(0, 0, 100, 100, window, role)
     list.selectOnly = true
     list.catalogColumns = columns
     list.onCatalogCell = callback
+    list.onCatalogControl = controlCallback
     list:initialise(); list:instantiate(); window:addChild(list)
     return list
 end
@@ -197,11 +200,7 @@ local function rebuildMaterials(window)
     local state = listState(list, function(row)
         return row and row.fullType or row and row.name
     end)
-    local rows = {{
-        kind = "catalog_header", key = "materials", name = "REQUIRED ITEMS",
-        restricted = true, catalogHeader = true,
-        catalogCells = { required = "REQUIRED", available = "STOCK" },
-    }}
+    local rows = {}
     local recipe = activeRecipe(window)
     local selectedOrder = selectedQueue(window)
     local materials = selectedOrder and selectedOrder.materials
@@ -258,6 +257,15 @@ function Building.OnRecipeCell(window, row, key)
     end
 end
 
+function Building.OnRecipeControl(window, row, key, control)
+    if key ~= "action" or not control
+        or control.command ~= "activate"
+    then
+        return false
+    end
+    return Building.OnRecipeCell(window, row, key) ~= false
+end
+
 function Building.OnQueueCell(window, row, key)
     trace("pnc_building_queue_click", "key="
         .. tostring(row and row.order and row.order.id or "")
@@ -267,15 +275,29 @@ function Building.OnQueueCell(window, row, key)
     end
 end
 
+function Building.OnQueueControl(window, row, key, control)
+    if key ~= "action" or not control
+        or control.command ~= "activate"
+    then
+        return false
+    end
+    return Building.OnQueueCell(window, row, key)
+end
+
 function Building.Create(window, builder)
     window.buildCategory = window.buildCategory or "ALL"
-    window.buildCategoryList = makeList(window, "build_category")
-    window.buildRecipeList = makeList(window, "build_recipe", RECIPE_COLUMNS,
-        Building.OnRecipeCell)
-    window.buildQueueList = makeList(window, "build_queue", QUEUE_COLUMNS,
-        Building.OnQueueCell)
+    Headers.InitializeState(window)
+    window.buildCategoryList = makeList(window, "build_category",
+        window.buildCategoryColumns)
+    window.buildRecipeList = makeList(window, "build_recipe",
+        window.buildRecipeColumns,
+        Building.OnRecipeCell, Building.OnRecipeControl)
+    window.buildQueueList = makeList(window, "build_queue",
+        window.buildQueueColumns,
+        Building.OnQueueCell, Building.OnQueueControl)
     window.buildMaterialList = makeList(window, "build_material",
-        MATERIAL_COLUMNS)
+        window.buildMaterialColumns)
+    Headers.Create(window)
     window.buildRecipePreview = Preview.Create(window)
     window.buildPlace = button(window, builder, "place",
         "PLACE BLUEPRINT", "accent")
@@ -328,7 +350,8 @@ end
 
 function Building.Layout(window, LayoutApi, content)
     return BuildingLayout.Apply(window, LayoutApi, content,
-        RECIPE_COLUMNS, RECIPE_COLUMNS_COMPACT)
+        window.buildRecipeColumns or RECIPE_COLUMNS,
+        window.buildRecipeColumns or RECIPE_COLUMNS_COMPACT)
 end
 
 function Building.Apply(window, active)
@@ -338,6 +361,7 @@ function Building.Apply(window, active)
     window.buildRecipeList:setVisible(active)
     window.buildQueueList:setVisible(active)
     window.buildMaterialList:setVisible(active)
+    Headers.Apply(window, active)
     window.buildPlace:setVisible(active)
     window.buildCancelPlacement:setVisible(active)
     local debugAvailable = PNC.Client and PNC.Client.CanUseDebug
@@ -393,6 +417,7 @@ Internal.BuildAudit = BuildAudit
 Internal.InventoryModel = InventoryModel
 Internal.Preview = Preview
 Internal.BuildingLayout = BuildingLayout
+Internal.Headers = Headers
 Internal.RECIPE_COLUMNS = RECIPE_COLUMNS
 Internal.RECIPE_COLUMNS_COMPACT = RECIPE_COLUMNS_COMPACT
 Internal.QUEUE_COLUMNS = QUEUE_COLUMNS

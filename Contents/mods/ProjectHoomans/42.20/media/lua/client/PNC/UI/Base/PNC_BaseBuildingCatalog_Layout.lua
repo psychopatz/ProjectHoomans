@@ -1,4 +1,6 @@
 local Layout = {}
+local Headers = require
+    "PNC/UI/Base/PNC_BaseBuildingCatalog_Headers"
 
 local function applyToolbar(window, LayoutApi, content, width, gap, debugAvailable)
     local buttons = {
@@ -56,7 +58,7 @@ local function applyCompactLayout(
         - filterWidth - controlGap * 2)
     local favoriteX = recipeX + searchWidth + controlGap
     local filterX = favoriteX + favoriteWidth + controlGap
-    LayoutApi.SetBounds(window.buildCategoryList, content.x, top,
+    Headers.LayoutList(LayoutApi, window, "categories", content.x, top,
         categoryWidth, topHeight)
     LayoutApi.SetBounds(window.buildSearch, recipeX, top, searchWidth,
         controlHeight)
@@ -65,11 +67,11 @@ local function applyCompactLayout(
     LayoutApi.SetBounds(window.buildFavoritesFilter, filterX, top,
         filterWidth, controlHeight)
     local recipeListTop = top + controlHeight + controlGap
-    LayoutApi.SetBounds(window.buildRecipeList, recipeX, recipeListTop,
+    Headers.LayoutList(LayoutApi, window, "recipes", recipeX, recipeListTop,
         recipeWidth, math.max(1, topHeight - controlHeight - controlGap))
-    LayoutApi.SetBounds(window.buildQueueList, content.x, bottomY,
+    Headers.LayoutList(LayoutApi, window, "queue", content.x, bottomY,
         queueWidth, bottomHeight)
-    LayoutApi.SetBounds(window.buildMaterialList, materialX, bottomY,
+    Headers.LayoutList(LayoutApi, window, "materials", materialX, bottomY,
         materialWidth, bottomHeight)
     if window.buildRecipePreview then
         window.buildRecipePreview:setVisible(false)
@@ -85,7 +87,8 @@ local function applyWideLayout(
     local right = math.max(1, width - left - middle - gap * 2)
     local middleX = content.x + left + gap
     local rightX = middleX + middle + gap
-    LayoutApi.SetBounds(window.buildCategoryList, content.x, top, left, height)
+    Headers.LayoutList(LayoutApi, window, "categories", content.x, top,
+        left, height)
     local controlHeight = 27
     local controlGap = 6
     local favoriteWidth = 112
@@ -101,8 +104,8 @@ local function applyWideLayout(
     LayoutApi.SetBounds(window.buildFavoritesFilter, filterX, top,
         filterWidth, controlHeight)
     local recipeListTop = top + controlHeight + controlGap
-    LayoutApi.SetBounds(window.buildRecipeList, middleX, recipeListTop, middle,
-        math.max(1, height - controlHeight - controlGap))
+    Headers.LayoutList(LayoutApi, window, "recipes", middleX, recipeListTop,
+        middle, math.max(1, height - controlHeight - controlGap))
     local previewHeight = math.max(130, math.min(210,
         math.floor(height * 0.30)))
     if window.buildRecipePreview then
@@ -113,9 +116,9 @@ local function applyWideLayout(
     local lowerTop = top + previewHeight + gap
     local lowerHeight = math.max(1, height - previewHeight - gap)
     local queueHeight = math.max(1, math.floor(lowerHeight * 0.48))
-    LayoutApi.SetBounds(window.buildQueueList, rightX, lowerTop, right,
+    Headers.LayoutList(LayoutApi, window, "queue", rightX, lowerTop, right,
         queueHeight)
-    LayoutApi.SetBounds(window.buildMaterialList, rightX,
+    Headers.LayoutList(LayoutApi, window, "materials", rightX,
         lowerTop + queueHeight + gap, right, math.max(1,
             lowerHeight - queueHeight - gap))
 end
@@ -133,8 +136,8 @@ function Layout.Apply(window, LayoutApi, content, recipeColumns, compactRecipeCo
     local height = math.max(1, (tonumber(content.height) or 1)
         - toolbarHeight - gap)
     local compact = width < 1000 or height < 600
-    window.buildRecipeList.catalogColumns = compact
-        and compactRecipeColumns or recipeColumns
+    window.buildRecipeList.catalogColumns = window.buildRecipeColumns
+        or recipeColumns
     local rowHeight = compact and height < 520 and 28 or 32
     window.buildRecipePreviewCompact = compact
     for _, list in ipairs({ window.buildCategoryList,

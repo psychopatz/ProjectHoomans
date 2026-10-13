@@ -23,10 +23,11 @@ end
 local function setListMode(list, window)
     if not list then return end
     list.selectOnly = true
-    list.catalogColumns = TRADE_COLUMNS
-    list.onCatalogCell = function(target, row, key, offset, width)
-        if target and target.onTradeCatalogCell then
-            return target:onTradeCatalogCell(row, key, offset, width)
+    list.catalogColumns = window.tradeColumnState
+        and window.tradeColumnState.columns or TRADE_COLUMNS
+    list.onCatalogControl = function(target, row, key, control, button)
+        if target and target.onTradeCatalogControl then
+            return target:onTradeCatalogControl(row, key, control, button)
         end
         return false
     end
@@ -51,6 +52,7 @@ function ISPNCInventoryWindow:onTradeResponsiveLayout()
     local traderX = gap * 2 + paneWidth
     Layout.SetBounds(self.playerList, gap, top, paneWidth, listHeight)
     Layout.SetBounds(self.npcList, traderX, top, paneWidth, listHeight)
+    self:layoutCatalogHeaders(top, paneWidth, listHeight, paneWidth, traderX)
     Layout.SetBounds(self.tradeResetButton, gap, buttonY, 92, 22)
     Layout.SetBounds(self.tradeAcceptButton, gap + 100, buttonY,
         math.max(80, paneWidth - 100), 22)
@@ -72,8 +74,10 @@ function ISPNCInventoryWindow:onTradeModeChanged(active)
         for _, list in ipairs({ self.playerList, self.npcList }) do
             if list then
                 list.selectOnly = false
-                list.catalogColumns = nil
+                list.catalogColumns = self.inventoryColumnState
+                    and self.inventoryColumnState.columns or nil
                 list.onCatalogCell = nil
+                list.onCatalogControl = nil
             end
         end
         if self.playerContainerList then self.playerContainerList:setVisible(true) end
@@ -88,8 +92,12 @@ function ISPNCInventoryWindow:onTradeModeChanged(active)
         configureButton(self.tradeResetButton, false, false)
         configureButton(self.tradeAcceptButton, false, false)
         configureButton(self.tradeCancelButton, false, false)
+        self:refreshCatalogHeaders()
+        self:setCatalogHeaderVisibility()
         return
     end
+    self:refreshCatalogHeaders()
+    self:setCatalogHeaderVisibility()
     self.tradeDraft = self.tradeDraft or { buy = {}, sell = {} }
     setListMode(self.playerList, self)
     setListMode(self.npcList, self)
@@ -111,7 +119,17 @@ local function applyDraft(row, draft)
     local maximum = rowQuantity(row)
     row.selectedQuantity = math.min(maximum, quantity)
     row.catalogCells = row.catalogCells or {}
-    row.catalogCells.action = "-  " .. tostring(row.selectedQuantity) .. "  +"
+    row.catalogCells.action = tostring(row.selectedQuantity)
+    row.catalogControls = {
+        action = {
+            { id = "trade_minus", title = "-", command = "decrement",
+                enabled = row.selectedQuantity > 0, variant = "quiet" },
+            { id = "trade_value", title = tostring(row.selectedQuantity),
+                enabled = false, variant = "quiet" },
+            { id = "trade_plus", title = "+", command = "increment",
+                enabled = row.selectedQuantity < maximum, variant = "primary" },
+        },
+    }
 end
 
 local function playerSellPrice(endpoint, row)
@@ -237,13 +255,22 @@ function ISPNCInventoryWindow:changeTradeQuantity(row, delta)
     return true
 end
 
-function ISPNCInventoryWindow:onTradeCatalogCell(row, key, offset, width)
+function ISPNCInventoryWindow:onTradeCatalogControl(row, key, control)
     if not row or row.catalogHeader == true then return false end
-    if key == "action" then
-        local half = math.max(1, number(width, 1) / 2)
-        return self:changeTradeQuantity(row, number(offset, 0) < half and -1 or 1)
+    if key ~= "action" then return false end
+    local command = control and control.command
+    if command == "decrement" then
+        return self:changeTradeQuantity(row, -1)
+    elseif command == "increment" then
+        return self:changeTradeQuantity(row, 1)
     end
-    return self:changeTradeQuantity(row, 1)
+    return false
+end
+
+function ISPNCInventoryWindow:onTradeCatalogCell()
+    -- Whole-cell trade actions are retired. Quantity changes come from the
+    -- reusable native catalog buttons above.
+    return false
 end
 
 function ISPNCInventoryWindow:onInventoryRowClick(role, row)

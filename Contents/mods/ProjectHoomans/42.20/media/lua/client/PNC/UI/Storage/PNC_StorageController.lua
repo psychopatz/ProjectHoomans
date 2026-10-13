@@ -58,6 +58,27 @@ function Controller.CreateChildren(window)
     window.storageList:initialise()
     window.storageList:instantiate()
     window:addChild(window.storageList)
+    window.storageColumnState = Components.CreateCatalogColumnState({
+        namespace = "ProjectHoomansStorageUI",
+        fileName = "ProjectHoomans_StorageUI.txt",
+        key = "generalStockpileColumns",
+        columns = { { key = "category", x = 0.64 } },
+    })
+    window.storageList.catalogColumns = window.storageColumnState.columns
+    window.storageCatalogHeader = Components.CreateCatalogHeader(
+        window, window.storageColumnState.columns, {
+            lists = { window.storageList },
+            minWidths = { 170, 90 },
+            onColumnResizeEnd = function()
+                window.storageColumnState:save()
+            end,
+        }
+    )
+    window.storageCatalogHeader:setContent(
+        tr("UI_PNC_Storage_GeneralStockpile", "GENERAL STOCKPILE"),
+        { category = tr("UI_PNC_Inventory_Category", "CATEGORY") },
+        window.storageColumnState.columns
+    )
     getTooltipHost().Install(window, getTooltipOptions())
     window.storageActivityPane, window.storageActivityList =
         Components.CreatePane(window, 24, Presentation.DrawActivityRow)

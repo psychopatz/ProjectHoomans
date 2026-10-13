@@ -169,6 +169,33 @@ function Controller.CloseAll(reason)
     return true
 end
 
+-- Open a branch with an explicit request. Most hub buttons use Toggle, but
+-- secondary UI actions sometimes need to switch branches and carry a focus
+-- target with them (for example, Workshop can point Base at one facility).
+function Controller.Open(id, owner, options)
+    local key = tostring(id or "")
+    local entry = Controller.entries[key]
+    Controller.lastFailureReason = nil
+    if not entry then
+        Controller.lastFailureReason = "child_not_registered"
+        return false
+    end
+
+    Controller.CloseAll("switch")
+    if type(entry.open) ~= "function" then
+        Controller.lastFailureReason = "child_open_unavailable"
+        return false
+    end
+    local opened, reason = entry.open(owner, options)
+    if opened == false or opened == nil then
+        Controller.lastFailureReason = tostring(reason or "open_rejected")
+        return false
+    end
+    Controller.activeID = key
+    Controller.SyncPositions()
+    return true
+end
+
 function Controller.Toggle(id, owner)
     local key = tostring(id or "")
     local entry = Controller.entries[key]
@@ -197,19 +224,7 @@ function Controller.Toggle(id, owner)
         return true
     end
 
-    Controller.CloseAll("switch")
-    if type(entry.open) ~= "function" then
-        Controller.lastFailureReason = "child_open_unavailable"
-        return false
-    end
-    local opened, reason = entry.open(owner)
-    if opened == false or opened == nil then
-        Controller.lastFailureReason = tostring(reason or "open_rejected")
-        return false
-    end
-    Controller.activeID = key
-    Controller.SyncPositions()
-    return true
+    return Controller.Open(key, owner)
 end
 
 function Controller.ApplyOpacity(opacity)

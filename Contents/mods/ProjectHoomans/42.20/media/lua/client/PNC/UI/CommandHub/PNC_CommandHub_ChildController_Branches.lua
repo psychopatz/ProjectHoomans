@@ -256,10 +256,10 @@ Controller.Register("research", {
 })
 
 Controller.Register("base", {
-    open = function(owner)
+    open = function(owner, options)
         local base = PNC.BaseUI
         return base and base.Open
-            and base.Open(owner) or false
+            and base.Open(owner, options) or false
     end,
     close = function()
         local base = PNC.BaseUI

@@ -34,10 +34,7 @@ local function rebuildCategories(window, recipes)
         return row and row.category
     end)
     state.key = state.key or window.buildCategory or "ALL"
-    local rows = {{
-        kind = "catalog_header", key = "categories", name = "CATEGORIES",
-        restricted = true, catalogHeader = true, catalogCells = {},
-    }}
+    local rows = {}
     for _, category in ipairs(categories(recipes)) do
         rows[#rows + 1] = { kind = "category", key = tostring(category),
             name = category, category = category,
@@ -56,13 +53,7 @@ local function rebuildRecipes(window, recipes)
         local recipe = row and row.recipe
         return recipe and (recipe.objectInfoName or recipe.recipeKey)
     end)
-    local rows = {{
-        kind = "catalog_header", key = "recipes", name = "BUILDABLE RECIPES",
-        restricted = true, catalogHeader = true,
-        catalogCells = {
-            category = "CATEGORY", stock = "STOCK", action = "ACTION",
-        },
-    }}
+    local rows = {}
     local search = window.buildSearch and window.buildSearch:getText() or ""
     search = string.lower(tostring(search or ""))
     local chosen = activeRecipe(window)
@@ -107,6 +98,15 @@ local function rebuildRecipes(window, recipes)
                         action = ready and "PLACE"
                             or debugGrantEnabled and "GIVE" or "NO STOCK",
                     },
+                    catalogControls = {
+                        action = {{ id = "building_recipe_action",
+                            title = ready and "PLACE"
+                                or debugGrantEnabled and "GIVE" or "NO STOCK",
+                            command = "activate",
+                            enabled = ready or debugGrantEnabled,
+                            variant = ready and "primary"
+                                or debugGrantEnabled and "warning" or "quiet" }},
+                    },
                     catalogColors = {
                         stock = ready and "success" or "warning",
                         action = ready and "accent" or "warning",
@@ -125,7 +125,8 @@ local function rebuildRecipes(window, recipes)
         local message = window.buildFavoritesOnly == true
             and "NO FAVORITED RECIPES" or "NO MATCHING RECIPES"
         rows[#rows + 1] = {
-            kind = "empty", key = "recipes", name = message, restricted = true,
+            kind = "empty", key = "recipes", name = message,
+            restricted = true, catalogCells = {},
         }
     end
     setCatalogRows(list, rows)
@@ -147,16 +148,11 @@ local function rebuildQueue(window, queue)
     local state = listState(list, function(row)
         return row and row.order and row.order.id
     end)
-    local rows = {{
-        kind = "catalog_header", key = "queue", name = "BUILD QUEUE",
-        restricted = true, catalogHeader = true,
-        catalogCells = {
-            worker = "WORKER", progress = "PROGRESS", action = "ACTION",
-        },
-    }}
+    local rows = {}
     for _, order in ipairs(queue or {}) do
         local worker = order.workerName or "UNASSIGNED"
         local blocked = order.blockedReason
+        local action = QueueActions.ActionLabel(window, order)
         rows[#rows + 1] = {
             kind = "queue", key = tostring(order.id or "unknown"),
             name = tostring(order.displayName or order.objectInfoName
@@ -165,8 +161,12 @@ local function rebuildQueue(window, queue)
                 worker = worker,
                 progress = tostring(order.percent or 0) .. "% "
                     .. tostring(order.status or "QUEUED"),
-                action = QueueActions.ActionLabel(window, order),
+                action = action,
             },
+            catalogControls = { action = {{ id = "building_queue_action",
+                title = action, command = "activate",
+                enabled = QueueActions.CanCancel(window, order),
+                variant = "warning" }} },
             catalogColors = {
                 progress = blocked and "warning" or "accent",
                 action = "warning",

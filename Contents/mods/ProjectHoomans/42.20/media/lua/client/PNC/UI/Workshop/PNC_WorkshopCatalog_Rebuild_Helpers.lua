@@ -29,6 +29,17 @@ local function applySubtab(window, active)
         window.workshopSalvageList:setVisible(active
             and window.workshopSubtab == "salvage")
     end
+    if window.workshopQueueHeader then
+        window.workshopQueueHeader:setVisible(active)
+    end
+    if window.workshopRecipeHeader then
+        window.workshopRecipeHeader:setVisible(active
+            and window.workshopSubtab == "craft")
+    end
+    if window.workshopSalvageHeader then
+        window.workshopSalvageHeader:setVisible(active
+            and window.workshopSubtab == "salvage")
+    end
 end
 
 Rebuild.ApplySubtab = applySubtab
@@ -85,9 +96,13 @@ local function hasStation(snapshot, station)
     return false
 end
 
+local function stationIdentity(station)
+    return tostring(station and (station.id or station.facilityId
+        or station.definitionId) or "workshop")
+end
+
 local function stationSortKey(entry, operation)
-    local station = stationFor(entry, operation)
-    return tostring(station and station.id or "workshop")
+    return stationIdentity(stationFor(entry, operation))
 end
 
 local function productionSkillId(entry, operation)
@@ -139,36 +154,82 @@ local function sortBySkillAndStation(values, operation)
     return output
 end
 
-local function addSkillHeader(list, skillId, tr)
+-- A station row only adds value when one skill spans multiple stations. The
+-- default workshop station is otherwise redundant beneath every skill row.
+local function stationGroupingRequired(values, operation, skillId)
+    local firstStation
+    for _, value in ipairs(values or {}) do
+        if productionSkillId(value, operation) == skillId then
+            local currentStation = stationSortKey(value, operation)
+            if firstStation and firstStation ~= currentStation then
+                return true
+            end
+            firstStation = currentStation
+        end
+    end
+    return false
+end
+
+local function groupKey(kind, operation, value, parent)
+    return tostring(kind) .. ":" .. tostring(operation) .. ":"
+        .. tostring(parent or "") .. ":" .. tostring(value or "")
+end
+
+local function groupExpanded(window, key)
+    local collapsed = window and window.workshopCollapsedGroups or {}
+    return collapsed[tostring(key)] ~= true
+end
+
+local function skillGroupKey(operation, skillId)
+    return groupKey("skill", operation, skillId)
+end
+
+local function stationGroupKey(operation, skillId, station)
+    return groupKey("station", operation, stationIdentity(station), skillId)
+end
+
+local function addSkillHeader(list, skillId, tr, key, expanded)
     local label = productionSkillLabel(skillId, tr)
-    list:addItem("skill:" .. tostring(skillId or "other"), {
-        name = label, restricted = true, catalogHeader = true,
-        skillHeader = true,
-        catalogCells = { category = label, quantity = "", availability = "",
+    list:addItem(key, {
+        name = label, restricted = false, catalogHeader = true,
+        skillHeader = true, groupHeader = true, groupKey = key,
+        expanded = expanded ~= false,
+        catalogCells = { category = "", quantity = "", availability = "",
             action = "" },
     })
 end
 
-local function addStationHeader(list, station, tr)
+local function addStationHeader(list, station, tr, key, expanded)
     local label = stationLabel(station, tr)
-    list:addItem("station:" .. tostring(station and station.id or "workshop"), {
-        name = label, restricted = true, catalogHeader = true,
-        stationHeader = true,
-        catalogCells = { category = label, quantity = "", availability = "",
+    list:addItem(key, {
+        name = label, restricted = false, catalogHeader = true,
+        stationHeader = true, groupHeader = true, groupChild = true,
+        groupKey = key,
+        expanded = expanded ~= false,
+        catalogCells = { category = "", quantity = "", availability = "",
             action = "" },
     })
 end
 
 local function openStationBuild(window, station)
-    local settlement = window.snapshot and window.snapshot.settlement
-    if not settlement then return false end
-    local BuildModal = require "PNC/UI/SettlementManagement/PNC_SettlementManagement_FacilityBuildModal"
-    local Facility = require "PNC/UI/SettlementManagement/PNC_SettlementManagement_FacilityActions"
-    BuildModal.Open(settlement, function(definitionId)
-        return Facility.BeginBuild(window, definitionId)
-    end, window.snapshot.storage, window.snapshot.research,
-        station and station.facilityId or "workshop")
-    return true
+    local definitionId = station and station.facilityId or "workshop"
+    local owner = window and window.owner or nil
+    local controller = PNC.CommandHub
+        and PNC.CommandHub.ChildController or nil
+    if controller and type(controller.Open) == "function" then
+        local opened = controller.Open("base", owner, {
+            tab = "facilities",
+            focusDefinitionId = definitionId,
+        })
+        if opened then return true end
+    end
+
+    -- The branch controller is normally present, but keep the action usable
+    -- when Workshop is opened by another owner or during an early load pass.
+    -- This still uses the integrated Base window and never recreates the
+    -- legacy FacilityBuildWindow modal.
+    local BaseUI = require "PNC/UI/Base/PNC_BaseWindow"
+    return BaseUI.OpenForFacility(owner, definitionId) ~= nil
 end
 
 local function canCraft(resolved, quantity)
@@ -190,31 +251,47 @@ local function quantityFor(window, recipeId)
     return quantity
 end
 
-function Rebuild.OnCatalogCell(window, row, key, localX, width)
-    if row.enabled ~= true then return end
+function Rebuild.OnCatalogControl(window, row, key, control)
+    if row.enabled ~= true then return false end
+    local command = control and control.command
     if row.rowKind == "recipe" then
         local quantity = quantityFor(window, row.recipe.id)
         if key == "quantity" then
+            if command ~= "increment" and command ~= "decrement" then
+                return false
+            end
             quantity = math.max(1, math.min(99, quantity
-                + (localX >= width * 0.5 and 1 or -1)))
+                + (command == "increment" and 1 or -1)))
             window.workshopQuantities[tostring(row.recipe.id)] = quantity
             window:rebuildDetails()
+            return true
         elseif key == "action" then
+            if command ~= "activate" then return false end
             if row.stationMissing then
-                openStationBuild(window, row.requiredStation)
+                return openStationBuild(window, row.requiredStation)
             elseif canCraft(row.recipe, quantity) then
                 PNC.Client.RequestColonyAction("craft_queue",
                     { recipeId = row.recipe.id, quantity = quantity })
+                return true
             end
         end
     elseif row.rowKind == "salvage" and key == "action" then
+        if command ~= "activate" then return false end
         if row.stationMissing then
-            openStationBuild(window, row.requiredStation)
+            return openStationBuild(window, row.requiredStation)
         else
             PNC.Client.RequestColonyAction("disassemble_queue",
                 { recordIndex = row.recordIndex })
+            return true
         end
     end
+    return false
+end
+
+function Rebuild.OnCatalogCell()
+    -- Whole-cell catalog hit testing is intentionally retired. The shared
+    -- list consumes the cell and dispatches only native child buttons.
+    return false
 end
 
 local function selectedOrder(window)
@@ -237,8 +314,12 @@ Internal.ProductionSkillId = productionSkillId
 Internal.ProductionSkillLabel = productionSkillLabel
 Internal.SkillSortKey = skillSortKey
 Internal.SortBySkillAndStation = sortBySkillAndStation
+Internal.StationGroupingRequired = stationGroupingRequired
 Internal.AddSkillHeader = addSkillHeader
 Internal.AddStationHeader = addStationHeader
+Internal.GroupExpanded = groupExpanded
+Internal.SkillGroupKey = skillGroupKey
+Internal.StationGroupKey = stationGroupKey
 Internal.OpenStationBuild = openStationBuild
 Internal.CanCraft = canCraft
 Internal.QuantityFor = quantityFor

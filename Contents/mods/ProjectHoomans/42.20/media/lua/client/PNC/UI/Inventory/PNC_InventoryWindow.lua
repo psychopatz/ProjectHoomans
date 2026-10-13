@@ -16,6 +16,7 @@ ISPNCInventoryWindow = UI.Window:derive("ISPNCInventoryWindow")
 
 require "PNC/UI/Inventory/InventoryWindow/_Helpers"
 require "PNC/UI/Inventory/InventoryWindow/_Layout"
+require "PNC/UI/Inventory/InventoryWindow/_CatalogHeaders"
 require "PNC/UI/Inventory/InventoryWindow/_Endpoint"
 require "PNC/UI/Inventory/InventoryWindow/_RefreshControls"
 require "PNC/UI/Inventory/InventoryWindow/_Refresh"

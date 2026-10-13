@@ -14,12 +14,35 @@ local stationSortKey = Internal.StationSortKey
 local productionSkillId = Internal.ProductionSkillId
 local productionSkillLabel = Internal.ProductionSkillLabel
 local sortBySkillAndStation = Internal.SortBySkillAndStation
+local stationGroupingRequired = Internal.StationGroupingRequired
 local addSkillHeader = Internal.AddSkillHeader
 local addStationHeader = Internal.AddStationHeader
+local groupExpanded = Internal.GroupExpanded
+local skillGroupKey = Internal.SkillGroupKey
+local stationGroupKey = Internal.StationGroupKey
 local openStationBuild = Internal.OpenStationBuild
 local canCraft = Internal.CanCraft
 local quantityFor = Internal.QuantityFor
 local selectedOrder = Internal.SelectedOrder
+
+local function quantityControls(quantity)
+    quantity = math.max(1, math.floor(tonumber(quantity) or 1))
+    return {
+        { id = "quantity_minus", title = "-", command = "decrement",
+            enabled = quantity > 1, variant = "quiet" },
+        { id = "quantity_value", title = tostring(quantity), enabled = false,
+            variant = "quiet" },
+        { id = "quantity_plus", title = "+", command = "increment",
+            enabled = quantity < 99, variant = "quiet" },
+    }
+end
+
+local function actionControl(title, enabled, variant)
+    return {
+        { id = "catalog_action", title = title, command = "activate",
+            enabled = enabled == true, variant = variant or "primary" },
+    }
+end
 
 function Rebuild.OnControl(window, buttonValue)
     local action = tostring(buttonValue and buttonValue.internal or "")
@@ -39,18 +62,9 @@ function Rebuild.OnControl(window, buttonValue)
     return false
 end
 
-local function addCatalogHeader(list, name, availabilityTitle)
-    list:addItem(name, { name = name, restricted = true, catalogHeader = true,
-        catalogCells = { category = "CATEGORY", quantity = "COUNT",
-            availability = availabilityTitle or "STOCK", action = "ACTION" } })
-end
-
 local function rebuildQueue(window, orders)
     if not window.workshopQueueList then return end
     window.workshopQueueList:clear()
-    window.workshopQueueList:addItem("PRODUCTION QUEUE", { name = "PRODUCTION QUEUE",
-        restricted = true, catalogHeader = true,
-        catalogCells = { worker = "WORKER", progress = "PROGRESS" } })
     for _, order in ipairs(orders) do
         local required = math.max(1, tonumber(order.requiredWork) or 1)
         local percent = math.floor(math.min(1,
@@ -66,29 +80,40 @@ end
 
 local function rebuildCraftRows(window, recipes, tr, isStationReady)
     window.workshopRecipeList:clear()
-    addCatalogHeader(window.workshopRecipeList,
-        tr("UI_PNC_Workshop_Craftable", "CRAFTABLE ITEMS"))
     local rows = {}
     for _, recipe in ipairs(recipes or {}) do
         if recipe and recipe.descriptor and recipe.status == "AVAILABLE" then
             rows[#rows + 1] = recipe
         end
     end
-    local activeSkill, activeStation
+    local activeSkill, activeStation, skillExpanded, stationExpanded,
+        showStationHeaders
     for _, recipe in ipairs(sortBySkillAndStation(rows, "CRAFT")) do
         local skillId = productionSkillId(recipe, "CRAFT")
         if activeSkill ~= skillId then
             activeSkill, activeStation = skillId, nil
-            addSkillHeader(window.workshopRecipeList, skillId, tr)
+            showStationHeaders = stationGroupingRequired(rows, "CRAFT",
+                skillId)
+            local key = skillGroupKey("CRAFT", skillId)
+            skillExpanded = groupExpanded(window, key)
+            stationExpanded = not showStationHeaders
+            addSkillHeader(window.workshopRecipeList, skillId, tr, key,
+                skillExpanded)
         end
-        local requiredStation = stationFor(recipe, "CRAFT")
-        if not activeStation
-            or stationSortKey(activeStation, "CRAFT")
-                ~= stationSortKey(recipe, "CRAFT")
-        then
-            activeStation = { requiredStation = requiredStation }
-            addStationHeader(window.workshopRecipeList, requiredStation, tr)
-        end
+        if skillExpanded then
+            local requiredStation = stationFor(recipe, "CRAFT")
+            local stationKey = stationGroupKey("CRAFT", skillId,
+                requiredStation)
+            if showStationHeaders and (not activeStation
+                or stationSortKey(activeStation, "CRAFT")
+                    ~= stationSortKey(recipe, "CRAFT")
+            ) then
+                activeStation = { requiredStation = requiredStation }
+                stationExpanded = groupExpanded(window, stationKey)
+                addStationHeader(window.workshopRecipeList, requiredStation,
+                    tr, stationKey, stationExpanded)
+            end
+            if stationExpanded then
             local output = recipe.descriptor.outputs
                 and recipe.descriptor.outputs[1] or nil
             local fullType = output and output.itemTypes and output.itemTypes[1]
@@ -105,43 +130,62 @@ local function rebuildCraftRows(window, recipes, tr, isStationReady)
                 or tr("UI_PNC_Workshop_MissingMaterials", "MISSING MATERIALS")
             window.workshopRecipeList:addItem(recipe.descriptor.displayName, {
                 rowKind = "recipe", recipe = recipe, enabled = enabled,
+                groupChild = true, groupKey = stationKey,
                 restricted = not enabled and not missingStation,
                 station = requiredStation, requiredStation = requiredStation,
                 stationMissing = missingStation,
                 name = tostring(recipe.descriptor.displayName or recipe.key),
                 texture = metadata.texture, catalogCells = {
                     category = productionSkillLabel(skillId, tr),
-                    quantity = "-  " .. tostring(quantity) .. "  +",
+                    quantity = tostring(quantity),
                     availability = stocked and "AVAILABLE" or "UNAVAILABLE",
                     action = action },
+                catalogControls = {
+                    quantity = quantityControls(quantity),
+                    action = actionControl(action, enabled,
+                        missingStation and "warning"
+                            or enabled and "primary" or "warning"),
+                },
                 catalogColors = { availability = stocked and "success"
                     or "warning", action = missingStation and "warning"
                     or enabled and "accent" or "warning" },
             })
+            end
+        end
     end
 end
 
 local function rebuildSalvageRows(window, candidates, tr, isStationReady)
     window.workshopSalvageList:clear()
-    addCatalogHeader(window.workshopSalvageList,
-        tr("UI_PNC_Workshop_Salvageable", "SALVAGEABLE ITEMS"),
-        tr("UI_PNC_Workshop_PotentialYield", "POTENTIAL YIELD"))
-    local activeSkill, activeStation = nil, nil
+    local activeSkill, activeStation, skillExpanded, stationExpanded,
+        showStationHeaders = nil, nil, nil, nil, nil
     for _, candidate in ipairs(sortBySkillAndStation(
         candidates or {}, "DISASSEMBLE")) do
         local skillId = productionSkillId(candidate, "DISASSEMBLE")
         if activeSkill ~= skillId then
             activeSkill, activeStation = skillId, nil
-            addSkillHeader(window.workshopSalvageList, skillId, tr)
+            showStationHeaders = stationGroupingRequired(candidates,
+                "DISASSEMBLE", skillId)
+            local key = skillGroupKey("DISASSEMBLE", skillId)
+            skillExpanded = groupExpanded(window, key)
+            stationExpanded = not showStationHeaders
+            addSkillHeader(window.workshopSalvageList, skillId, tr, key,
+                skillExpanded)
         end
-        local requiredStation = stationFor(candidate, "DISASSEMBLE")
-        if not activeStation
-            or stationSortKey(activeStation, "DISASSEMBLE")
-                ~= stationSortKey(candidate, "DISASSEMBLE")
-        then
-            activeStation = { requiredStation = requiredStation }
-            addStationHeader(window.workshopSalvageList, requiredStation, tr)
-        end
+        if skillExpanded then
+            local requiredStation = stationFor(candidate, "DISASSEMBLE")
+            local stationKey = stationGroupKey("DISASSEMBLE", skillId,
+                requiredStation)
+            if showStationHeaders and (not activeStation
+                or stationSortKey(activeStation, "DISASSEMBLE")
+                    ~= stationSortKey(candidate, "DISASSEMBLE")
+            ) then
+                activeStation = { requiredStation = requiredStation }
+                stationExpanded = groupExpanded(window, stationKey)
+                addStationHeader(window.workshopSalvageList, requiredStation,
+                    tr, stationKey, stationExpanded)
+            end
+            if stationExpanded then
         local metadata = InventoryModel.Probe(candidate.fullType)
         local missingStation = not isStationReady(requiredStation)
         local requiredStationReady = not missingStation
@@ -155,6 +199,7 @@ local function rebuildSalvageRows(window, candidates, tr, isStationReady)
         end
         local yieldText = #yields > 0 and table.concat(yields, ", ") or "NONE"
         local row = { rowKind = "salvage", enabled = enabled,
+            groupChild = true, groupKey = stationKey,
             restricted = not enabled and not missingStation,
             station = requiredStation, requiredStation = requiredStation,
             stationMissing = missingStation, fullType = candidate.fullType,
@@ -166,10 +211,19 @@ local function rebuildSalvageRows(window, candidates, tr, isStationReady)
                     and tr("UI_PNC_Workshop_BuildStation", "BUILD STATION")
                     or enabled and tr("UI_PNC_Workshop_SalvageAction", "SALVAGE")
                     or tr("UI_PNC_Workshop_NoStation", "NO CRAFT STATION") },
+            catalogControls = { action = actionControl(
+                missingStation
+                    and tr("UI_PNC_Workshop_BuildStation", "BUILD STATION")
+                    or enabled and tr("UI_PNC_Workshop_SalvageAction", "SALVAGE")
+                    or tr("UI_PNC_Workshop_NoStation", "NO CRAFT STATION"),
+                enabled, missingStation and "warning"
+                    or enabled and "primary" or "warning") },
             catalogColors = { availability = #yields > 0 and "success" or "warning",
                 action = missingStation and "warning"
                     or enabled and "accent" or "warning" } }
         window.workshopSalvageList:addItem(row.name, row)
+    end
+        end
     end
 end
 

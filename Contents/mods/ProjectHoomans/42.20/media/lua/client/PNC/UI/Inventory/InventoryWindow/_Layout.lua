@@ -65,6 +65,7 @@ function ISPNCInventoryWindow:createChildren()
     self.npcList:initialise()
     self.npcList:instantiate()
     self:addChild(self.npcList)
+    self:initializeCatalogHeaders()
 
     self.giveAllButton = ISButton:new(8, 440, 92, 22,
         tr("UI_PNC_Inventory_GiveAll", "Give All >"),
@@ -160,6 +161,7 @@ function ISPNCInventoryWindow:onResponsiveLayout()
         railWidth,
         listHeight
     )
+    self:layoutCatalogHeaders(top, itemWidth, listHeight, paneWidth, npcX)
     Layout.SetBounds(self.giveAllButton, gap, buttonY, 92, 22)
     Layout.SetBounds(self.refreshNPCButton, gap + 100, buttonY,
         math.max(80, paneWidth - 100), 22)

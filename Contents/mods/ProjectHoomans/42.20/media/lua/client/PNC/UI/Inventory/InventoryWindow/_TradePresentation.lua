@@ -11,8 +11,6 @@ function ISPNCInventoryWindow:prerenderTrade()
     local traderX = self.npcPaneX or math.floor(self.width / 2)
     local paneWidth = self.paneWidth or math.floor((self.width - 24) / 2)
     local headingY = self.headingY or self:titleBarHeight() + 8
-    local headerY = self.containerLabelY or headingY + 30
-    local listY = self.playerList and self.playerList:getY() or headerY + 28
     local opacity = self.contentSurfaceOpacity or 1
     self:drawRect(playerX, headingY - 3, paneWidth, 21,
         0.55 * opacity, 0.09, 0.12, 0.16)
@@ -27,32 +25,6 @@ function ISPNCInventoryWindow:prerenderTrade()
             or "CARAVAN TRADER")), UIFont.Small, paneWidth - 8),
         traderX + 4, headingY, 1.00, 0.82, 0.62, 1, UIFont.Small
     )
-    self:drawText(
-        tr("UI_PNC_Trading_Item", "Item"), playerX + 40, headerY,
-        0.85, 0.85, 0.85, 1, UIFont.Small
-    )
-    self:drawText(
-        tr("UI_PNC_Trading_Item", "Item"), traderX + 40, headerY,
-        0.85, 0.85, 0.85, 1, UIFont.Small
-    )
-    local columns = self.playerList and self.playerList.catalogColumns or {}
-    for index = 1, #columns do
-        local column = columns[index]
-        local x1 = math.floor((self.playerList and self.playerList.width or 1)
-            * (tonumber(column.x) or 0))
-        local x2 = math.floor((self.npcList and self.npcList.width or 1)
-            * (tonumber(column.x) or 0))
-        local labels = {
-            category = tr("UI_PNC_Trading_Category", "Category"),
-            availability = tr("UI_PNC_Trading_Available", "Available"),
-            unitPrice = tr("UI_PNC_Trading_Price", "Price"),
-            action = tr("UI_PNC_Trading_Offer", "Offer"),
-        }
-        self:drawText(labels[column.key] or tostring(column.key),
-            playerX + x1, listY - 19, 0.62, 0.70, 0.78, 1, UIFont.Small)
-        self:drawText(labels[column.key] or tostring(column.key),
-            traderX + x2, listY - 19, 0.62, 0.70, 0.78, 1, UIFont.Small)
-    end
     local totals = self.tradeTotals or self:getTradeTotals()
     local footerY = self.statusY or (self.height - 44)
     local traderUsed, traderMax = 0, 0

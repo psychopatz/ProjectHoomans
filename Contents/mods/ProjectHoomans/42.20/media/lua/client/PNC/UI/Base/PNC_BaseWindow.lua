@@ -171,7 +171,8 @@ end
 
 require "PNC/UI/Base/PNC_BaseWindowLifecycle"
 
-function BaseUI.Open(owner)
+function BaseUI.Open(owner, options)
+    options = type(options) == "table" and options or {}
     trace("pnc_base_open_start", "existing="
         .. tostring(BaseUI.instance ~= nil) .. " has_owner="
         .. tostring(owner ~= nil))
@@ -198,11 +199,38 @@ function BaseUI.Open(owner)
     Options.ApplyOpacity(window, Options.GetOpacity())
     window:bringToTop()
     window:refresh()
+    local requestedTab = options.tab
+    if requestedTab == "base" or requestedTab == "facilities"
+        or requestedTab == "buildings"
+    then
+        window:onTab({ internal = requestedTab })
+    end
+    local focusDefinitionId = options.focusDefinitionId
+    if focusDefinitionId and BuildingTab.FocusFacility
+        and BuildingTab.FocusFacility(window, focusDefinitionId)
+    then
+        window:requestResponsiveLayout(true)
+    elseif focusDefinitionId and window.baseBuildCardOwner
+        and window.baseBuildCardOwner.setSelected
+    then
+        window.baseBuildCardOwner:setSelected(focusDefinitionId)
+        window:requestResponsiveLayout(true)
+    end
     window:requestSnapshot("opened")
     trace("pnc_base_open_result", "visible="
         .. tostring(window.getIsVisible and window:getIsVisible() == true)
-        .. " tab=" .. tostring(window.tab))
+        .. " tab=" .. tostring(window.tab)
+        .. " focus=" .. tostring(focusDefinitionId))
     return window
+end
+
+function BaseUI.OpenForFacility(owner, definitionId)
+    local id = tostring(definitionId or "")
+    if id == "" then return nil end
+    return BaseUI.Open(owner, {
+        tab = "facilities",
+        focusDefinitionId = id,
+    })
 end
 
 function BaseUI.Close()
