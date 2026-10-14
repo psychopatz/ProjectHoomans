@@ -15,11 +15,22 @@ local function notifyBodyRemoval(record, zombie, reason)
     end
 end
 
-local function removeShell(record, zombie, reason)
+local function removeShell(record, zombie, reason, ledgerEntry)
     local now = Core.Now()
     local id = record and record.id or nil
     local instanceID = Internal.GetStartupBodyInstanceID(zombie)
+    local populationID = Internal.GetStartupBodyPopulationID
+        and Internal.GetStartupBodyPopulationID(zombie) or nil
+    local onlineID = Internal.normalizeOnlineID
+        and Internal.normalizeOnlineID(zombie) or nil
     local reg
+    local removed
+    if not zombie then
+        return false
+    end
+    if Internal.IsProtectedBody and Internal.IsProtectedBody(zombie) then
+        return false
+    end
     if PNC.LiveBodyControl and PNC.LiveBodyControl.ApplyHumanizedBodyFlags then
         -- Positional legacy shells may have lost every PNC marker, so the
         -- managed-only safety predicate cannot recognize them yet. Apply the
@@ -32,8 +43,32 @@ local function removeShell(record, zombie, reason)
     else
         Internal.clearBodyCombat(zombie)
     end
+    removed = Internal.removeZombie(zombie) == true
+    if Lifecycle.IdentityAudit and Lifecycle.IdentityAudit.RecordRemoval then
+        Lifecycle.IdentityAudit.RecordRemoval(
+            zombie,
+            "startup_shell_removal",
+            id,
+            reason,
+            removed
+        )
+    end
+    if not removed then
+        if Core.LogWarn then
+        Core.LogWarn("PNC persisted_shell_remove_failed npc="
+                .. tostring(id or "orphan")
+                .. " bodyInstanceID=" .. tostring(instanceID or "nil")
+                .. " populationID=" .. tostring(populationID or "nil")
+                .. " onlineID=" .. tostring(onlineID or "nil")
+                .. " reason=" .. tostring(reason)
+                .. " attached=" .. tostring(Internal.isBodyAttached(zombie)))
+        end
+        return false
+    end
     notifyBodyRemoval(record, zombie, reason)
-    Internal.removeZombie(zombie)
+    if ledgerEntry and Lifecycle.ConsumeHuskEntry then
+        Lifecycle.ConsumeHuskEntry(ledgerEntry)
+    end
     if record then
         record.runtime = record.runtime or {}
         record.runtime.materializeRetryAt = now
@@ -55,6 +90,8 @@ local function removeShell(record, zombie, reason)
     end
     Core.LogWarn("PNC persisted_shell_repaired npc=" .. tostring(id or "orphan")
         .. " bodyInstanceID=" .. tostring(instanceID or "nil")
+        .. " populationID=" .. tostring(populationID or "nil")
+        .. " onlineID=" .. tostring(onlineID or "nil")
         .. " reason=" .. tostring(reason))
     return true
 end

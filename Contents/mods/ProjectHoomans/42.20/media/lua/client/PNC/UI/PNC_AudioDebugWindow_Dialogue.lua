@@ -53,14 +53,14 @@ function ISPNCAudioDebugDialoguesTab:createChildren()
     self.pitchValue = makeLabel(self, "0", "accent")
 
     self.searchLabel = makeLabel(self, TEXT.searchVoice, "textMuted")
-    self.search = UI.CreateTextEntry(self, {
+    self.search = UI.CreateSearchEntry(self, {
         clearButton = true,
         width = 200,
         height = 26,
+        onTextChange = function()
+            self:refreshList()
+        end,
     })
-    self.search.onTextChangeFunction = function()
-        self:refreshList()
-    end
 
     self.targetLabel = makeLabel(self, "", "textMuted")
     self.status = makeLabel(self, "", "textMuted")

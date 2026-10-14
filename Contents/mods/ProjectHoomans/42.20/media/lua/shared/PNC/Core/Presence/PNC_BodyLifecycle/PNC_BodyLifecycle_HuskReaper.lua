@@ -60,11 +60,10 @@ local function isAuthority()
 end
 
 --[[
-    Husks in a world that cannot spawn vanilla zombies are simply orphans.
-
-    The predicate lives on the ledger so the reclaim and the debug census agree.
-    It needs no recorded loss, no position match and no persistent outfit id,
-    which is what makes it work for shells the engine handed back anonymously.
+    The fallback predicate lives on the ledger so the reclaim and debug census
+    agree. It is positive-only: a learned PNC carrier id is required. An
+    unmarked body with no carrier or ledger identity remains ordinary/unknown
+    and is never deleted by this lane.
 ]]
 local function matchesOrphanedShell(zombie)
     return Lifecycle.IsOrphanedShell
@@ -82,8 +81,8 @@ local function logPumpActive()
             .. tostring(Lifecycle.HuskLedgerCount
                 and Lifecycle.HuskLedgerCount() or 0)
             .. " orphansEnabled=" .. tostring(
-                Lifecycle.AreZombieSpawnsDisabled
-                    and Lifecycle.AreZombieSpawnsDisabled() or false))
+            Lifecycle.ShellCarrierCount
+                and Lifecycle.ShellCarrierCount() or 0))
     end
 end
 
@@ -98,9 +97,35 @@ local function zombieModData(zombie)
     return nil
 end
 
+local function isProtectedBody(zombie)
+    local ownership
+    local ok
+    local value
+    if not zombie then
+        return false
+    end
+    if zombie.isReanimatedPlayer then
+        ok, value = pcall(zombie.isReanimatedPlayer, zombie)
+        if ok and value == true then
+            return true
+        end
+    end
+    ownership = PNC.Compatibility and PNC.Compatibility.ActorOwnership
+    if ownership and ownership.IsForeignOwned then
+        ok, value = pcall(ownership.IsForeignOwned, zombie)
+        if ok and value == true then
+            return true
+        end
+    end
+    return false
+end
+
 -- Any PNC marker means the body is ours or a restored shell. Those are owned by
 -- the registry/audit lanes and must never be reaped here.
 local function isMarkedBody(zombie)
+    if isProtectedBody(zombie) then
+        return true
+    end
     local modData = zombieModData(zombie)
     if PNC.Core and PNC.Core.IsManagedNPCBody
         and PNC.Core.IsManagedNPCBody(zombie)
@@ -127,6 +152,39 @@ local function isDeadBody(zombie)
     return ok and dead == true
 end
 
+local function bodyIdentity(zombie)
+    local outfitID
+    local populationID
+    local onlineID
+    local ok
+    if not zombie then
+        return {}
+    end
+    if zombie.getPersistentOutfitID then
+        ok, outfitID = pcall(zombie.getPersistentOutfitID, zombie)
+        if not ok then outfitID = nil end
+    end
+    if Lifecycle.GetBodyPopulationID then
+        ok, populationID = pcall(Lifecycle.GetBodyPopulationID, zombie)
+        if not ok then populationID = nil end
+    end
+    if Internal.normalizeOnlineID then
+        ok, onlineID = pcall(Internal.normalizeOnlineID, zombie)
+        if not ok then onlineID = nil end
+    elseif zombie.getOnlineID then
+        ok, onlineID = pcall(zombie.getOnlineID, zombie)
+        if not ok then onlineID = nil end
+    end
+    return {
+        outfitID = outfitID,
+        populationID = populationID,
+        onlineID = onlineID,
+        x = zombie.getX and zombie:getX() or nil,
+        y = zombie.getY and zombie:getY() or nil,
+        z = zombie.getZ and zombie:getZ() or nil,
+    }
+end
+
 local function pendingContains(zombie)
     local pending = Lifecycle.HuskReaper.pending
     local i
@@ -138,7 +196,99 @@ local function pendingContains(zombie)
     return false
 end
 
-local function logReap(entry, reason)
+local function findLoadedHuskForRecord(npcId, entries, now)
+    local census = PNC.WorldCensus
+    local bodies
+    local entry
+    local zombie
+    local i
+    local j
+    if not census or not census.GetAll then
+        return nil
+    end
+    bodies = census.GetAll(now or Core.Now(), false)
+    if type(bodies) ~= "table" then
+        return nil
+    end
+    for i = 1, #entries do
+        entry = entries[i]
+        if entry and tostring(entry.npcId or "") == tostring(npcId)
+        then
+            for j = 1, #bodies do
+                zombie = bodies[j]
+                if zombie and not isDeadBody(zombie)
+                    and not isMarkedBody(zombie)
+                    and Lifecycle.HuskLedgerMatchesEntry
+                    and Lifecycle.HuskLedgerMatchesEntry(
+                        zombie, entry, true
+                    )
+                then
+                    return true
+                end
+            end
+        end
+    end
+    return false
+end
+
+function Lifecycle.HasPendingHuskForRecord(npcId)
+    local id = npcId ~= nil and tostring(npcId) or nil
+    local ledger
+    local hasLedgerEntry = false
+    local hasBlockingLedgerEntry = false
+    local loadedHusk
+    local i
+    local pending
+    if not id then
+        return false
+    end
+    if Lifecycle.HuskLedgerCount then
+        Lifecycle.HuskLedgerCount()
+    end
+    ledger = Lifecycle.HuskLedger
+    for i = 1, #(ledger and ledger.entries or {}) do
+        if ledger.entries[i]
+            and tostring(ledger.entries[i].npcId or "") == id
+        then
+            hasLedgerEntry = true
+            if tostring(ledger.entries[i].reason or "") ~= "startup_seed"
+            then
+                hasBlockingLedgerEntry = true
+            end
+        end
+    end
+    pending = Lifecycle.HuskReaper.pending
+    for i = 1, #pending do
+        if pending[i].entry
+            and tostring(pending[i].entry.npcId or "") == id
+        then
+            return true, "pending_reap"
+        end
+    end
+    if not hasLedgerEntry then
+        return false, "no_ledger_entry"
+    end
+    loadedHusk = findLoadedHuskForRecord(
+        id,
+        ledger.entries,
+        Core and Core.Now and Core.Now() or 0
+    )
+    if loadedHusk == true then
+        return true, "loaded_husk"
+    end
+    if loadedHusk == nil and hasBlockingLedgerEntry then
+        -- Fail closed if the loaded-world census is unavailable. A persisted
+        -- non-seed loss is not enough to block when the census is healthy, but
+        -- spawning while the world cannot be inspected could duplicate a husk.
+        return true, "census_unavailable"
+    end
+    -- The ledger row remains armed for a future population-manager respawn,
+    -- but it does not prove that a husk is currently loaded. Allow the NPC to
+    -- materialize now; OnZombieCreate will still reclaim a later match.
+    return false, "ledger_only"
+end
+
+local function logReap(entry, reason, identity)
     local reaper = Lifecycle.HuskReaper
     local count = (tonumber(reaper.reaped) or 0) + 1
     reaper.reaped = count
@@ -154,7 +304,12 @@ local function logReap(entry, reason)
             .. " pos=" .. tostring(entry and math.floor(entry.x) or "?")
             .. "," .. tostring(entry and math.floor(entry.y) or "?")
             .. "," .. tostring(entry and math.floor(entry.z) or "?")
-            .. " reason=" .. tostring(reason or "husk_respawn"))
+            .. " reason=" .. tostring(reason or "husk_respawn")
+            .. " outfitID=" .. tostring(identity and identity.outfitID or "nil")
+            .. " populationID=" .. tostring(
+                identity and identity.populationID or "nil")
+            .. " onlineID=" .. tostring(identity and identity.onlineID or "nil")
+            .. " detached=true")
     end
 end
 
@@ -167,6 +322,7 @@ end
 local function queueHuskReap(zombie, entry, reason)
     local reaper = Lifecycle.HuskReaper
     local pending = reaper.pending
+    local identity
     if not zombie or pendingContains(zombie) then
         return false
     end
@@ -176,17 +332,39 @@ local function queueHuskReap(zombie, entry, reason)
     if #pending >= (tonumber(Const.HUSK_REAP_PENDING_MAX) or 32) then
         return false
     end
+    -- Positive identity proof is already established here. Neutralize the
+    -- body before it reaches the next NPC combat tick while removal waits for
+    -- the safe post-create pump.
+    if Lifecycle.ClearEngineInvulnerability then
+        pcall(Lifecycle.ClearEngineInvulnerability, zombie)
+    end
+    if Internal.clearBodyCombat then
+        pcall(Internal.clearBodyCombat, zombie)
+    end
     if entry then
         Lifecycle.ConsumeHuskEntry(entry)
     else
         reaper.orphanReaps = (tonumber(reaper.orphanReaps) or 0) + 1
         noteIncrement("HuskReaper.OrphanQueued")
     end
+    identity = bodyIdentity(zombie)
+    if Core and Core.LogInfo then
+        pcall(Core.LogInfo, "PNC husk identified npc="
+            .. tostring(entry and entry.npcId or "unknown")
+            .. " reason=" .. tostring(reason or "husk_respawn")
+            .. " outfitID=" .. tostring(identity.outfitID or "nil")
+            .. " populationID=" .. tostring(identity.populationID or "nil")
+            .. " onlineID=" .. tostring(identity.onlineID or "nil")
+            .. " pos=" .. tostring(identity.x or "nil") .. ","
+            .. tostring(identity.y or "nil") .. ","
+            .. tostring(identity.z or "nil"))
+    end
     pending[#pending + 1] = {
         zombie = zombie,
         entry = entry,
         reason = reason or "husk_respawn",
         attempts = 0,
+        identity = identity,
     }
     noteGauge("HuskReaper.Pending", #pending)
     return true
@@ -217,15 +395,65 @@ function Lifecycle.OnZombieCreate(zombie)
             return
         end
     end
-    -- No recorded loss matched. In a world that cannot spawn vanilla zombies,
-    -- an unmarked body wearing a learned shell outfit is still an orphaned
-    -- shell, so reclaim it here instead of leaving it in the world. The gate is
-    -- cached, so a normal-population world pays two table lookups per spawn.
-    if Lifecycle.AreZombieSpawnsDisabled
-        and Lifecycle.AreZombieSpawnsDisabled() == true
+    -- A missed ledger callback can still be recovered by the positive carrier
+    -- fingerprint. Do not use the current zombie-spawn setting as ownership
+    -- evidence: ordinary zombies may be present in an existing save.
+    if matchesOrphanedShell(zombie)
     then
         queueHuskReap(zombie, nil, "orphaned_shell")
     end
+end
+
+local function sameLedgerPosition(entry, zombie)
+    local radius
+    local dx
+    local dy
+    local dz
+    if not entry or not zombie or not zombie.getX then
+        return false
+    end
+    radius = tonumber(Const.HUSK_LEDGER_MATCH_RADIUS) or 2
+    dz = (tonumber(zombie:getZ()) or 0) - (tonumber(entry.z) or 0)
+    if math.abs(dz) > 1 then
+        return false
+    end
+    dx = (tonumber(zombie:getX()) or 0) - (tonumber(entry.x) or 0)
+    dy = (tonumber(zombie:getY()) or 0) - (tonumber(entry.y) or 0)
+    return dx * dx + dy * dy <= radius * radius
+end
+
+local function matchesPendingStartupSeed(record)
+    local entry = record and record.entry or nil
+    local queuedIdentity = record and record.identity or nil
+    local currentPopulationID
+    local expectedPopulationID
+    if not entry or tostring(entry.reason or "") ~= "startup_seed"
+        or not queuedIdentity
+    then
+        return false
+    end
+    -- This fallback is only for the create-event proof that was accepted while
+    -- PZ still returned outfit 0. It never turns a later anonymous zombie into
+    -- a candidate merely because it occupies an NPC's saved position.
+    if queuedIdentity.outfitID ~= nil
+        and tonumber(queuedIdentity.outfitID) ~= 0
+    then
+        return false
+    end
+    expectedPopulationID = entry.populationId
+    if expectedPopulationID ~= nil
+        and tostring(expectedPopulationID) ~= ""
+        and tostring(expectedPopulationID) ~= "0"
+        and Lifecycle.GetBodyPopulationID
+    then
+        currentPopulationID = Lifecycle.GetBodyPopulationID(record.zombie)
+        if currentPopulationID ~= nil
+            and tostring(currentPopulationID) ~= tostring(expectedPopulationID)
+        then
+            return false
+        end
+    end
+    return sameLedgerPosition(entry, record.zombie)
 end
 
 local function revalidatePending(record)
@@ -238,7 +466,11 @@ local function revalidatePending(record)
     end
     if entry then
         if not Lifecycle.HuskLedgerMatchesEntry(record.zombie, entry) then
-            return false, "identity_drifted"
+            if not matchesPendingStartupSeed(record) then
+                return false, "identity_drifted"
+            end
+            record.reason = tostring(record.reason or "husk_respawn")
+                .. "_outfit_rewritten"
         end
         return true
     end
@@ -250,6 +482,10 @@ end
 
 local function removeHusk(record)
     local zombie = record.zombie
+    record.identity = record.identity or bodyIdentity(zombie)
+    if Lifecycle.ClearEngineInvulnerability then
+        pcall(Lifecycle.ClearEngineInvulnerability, zombie)
+    end
     if PNC.LiveBodyControl and PNC.LiveBodyControl.ApplyHumanizedBodyFlags then
         pcall(PNC.LiveBodyControl.ApplyHumanizedBodyFlags, zombie)
     end
@@ -257,10 +493,17 @@ local function removeHusk(record)
         pcall(PNC.LiveBodyControl.SuppressZombieSounds, zombie)
     end
     local removed = Internal.removeZombie(zombie)
-    if removed == true or Internal.isBodyDetached(zombie) then
-        return true
+    local detached = removed == true or Internal.isBodyDetached(zombie)
+    if Lifecycle.IdentityAudit and Lifecycle.IdentityAudit.RecordRemoval then
+        Lifecycle.IdentityAudit.RecordRemoval(
+            zombie,
+            "husk_reaper_removal",
+            record.entry and record.entry.npcId or nil,
+            record.reason,
+            detached
+        )
     end
-    return false
+    return detached
 end
 
 local function rearmsEntry(record)
@@ -316,11 +559,18 @@ local function processPending(now)
             end
         elseif removeHusk(record) then
             table.remove(pending, i)
-            logReap(record.entry, record.reason)
+            logReap(record.entry, record.reason, record.identity)
             removed = removed + 1
         else
             table.remove(pending, i)
             reaper.failed = (tonumber(reaper.failed) or 0) + 1
+            if Core and Core.LogWarn then
+                pcall(Core.LogWarn, "PNC husk removal failed npc="
+                    .. tostring(record.entry and record.entry.npcId or "unknown")
+                    .. " reason=" .. tostring(record.reason or "unknown")
+                    .. " attached=" .. tostring(
+                        Internal.isBodyAttached(record.zombie)))
+            end
             rearmsEntry(record)
             noteIncrement("HuskReaper.Retry")
         end
@@ -340,9 +590,9 @@ local function sweepLoadedHusks(now)
     end
     local ledgerCount = Lifecycle.HuskLedgerCount
         and Lifecycle.HuskLedgerCount() or 0
-    local orphanRule = Lifecycle.AreZombieSpawnsDisabled
-        and Lifecycle.AreZombieSpawnsDisabled() == true
-    if ledgerCount <= 0 and not orphanRule then
+    local carrierRule = Lifecycle.ShellCarrierCount
+        and Lifecycle.ShellCarrierCount() > 0
+    if ledgerCount <= 0 and not carrierRule then
         return 0
     end
     bodies = census.GetAll(now, false)
@@ -361,7 +611,7 @@ local function sweepLoadedHusks(now)
                 if queueHuskReap(zombie, entry, "loaded_husk_sweep") then
                     found = found + 1
                 end
-            elseif orphanRule
+            elseif matchesOrphanedShell(zombie)
                 and queueHuskReap(zombie, nil, "orphaned_shell_sweep")
             then
                 found = found + 1

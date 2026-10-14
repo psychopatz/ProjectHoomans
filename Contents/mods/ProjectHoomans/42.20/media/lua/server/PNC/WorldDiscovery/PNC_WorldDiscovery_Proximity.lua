@@ -77,10 +77,10 @@ function Discovery.ResolvePhysicalPresence(player, entity)
         if attempted >= limit then break end
         local record = PNC.Registry and PNC.Registry.Get
             and PNC.Registry.Get(npcID) or nil
-        local forceAbstract = record and record.runtime
-            and record.runtime.forceAbstract == true
+        local hardAbstract = record and record.runtime
+            and record.runtime.hardAbstract == true
         if record and record.alive ~= false
-            and not forceAbstract
+            and not hardAbstract
             and PNC.Const
             and record.presenceState ~= PNC.Const.PRESENCE_LIVE
             and PNC.Presence and PNC.Presence.Materialize

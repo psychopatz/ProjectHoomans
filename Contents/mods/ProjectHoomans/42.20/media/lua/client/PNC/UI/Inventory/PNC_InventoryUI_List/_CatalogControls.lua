@@ -142,6 +142,10 @@ function ISPNCInventoryList:dispatchCatalogControl(button)
     local columnKey = button.psychopatzCatalogColumn
     local control = button.psychopatzCatalogControl
     if not row or not columnKey or not control then return false end
+    -- Native button callbacks can still arrive from a stale overlay during a
+    -- list rebuild. Enforce the row control capability here as well as in the
+    -- feature-specific callback.
+    if control.enabled == false then return false end
     if self.onCatalogControl then
         return self.onCatalogControl(self.ownerWindow, row, columnKey,
             control, button)
@@ -239,7 +243,9 @@ function ISPNCInventoryList:refreshCatalogControls()
     for rowIndex, entry in ipairs(self.items or {}) do
         local row = entry and entry.item or nil
         local rowControls = row and row.catalogControls or nil
-        if type(rowControls) == "table" and row.catalogHeader ~= true then
+        if type(rowControls) == "table"
+            and (row.catalogHeader ~= true or row.stationHeader == true)
+        then
             local top = self.topOfItem and self:topOfItem(rowIndex)
                 or ((rowIndex - 1) * height)
             top = number(top, (rowIndex - 1) * height) + scrollY

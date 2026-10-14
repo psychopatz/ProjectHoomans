@@ -6,6 +6,8 @@
 
 require "PsychopatzCore/UI/PsychopatzUI"
 local FacilityState = require "PNC/Core/Settlement/PNC_FacilityState"
+local FacilityBuildTarget = require
+    "PNC/UI/Shared/PNC_FacilityBuildTarget"
 
 PNC = PNC or {}
 PNC.FacilityBuildUI = PNC.FacilityBuildUI or {}
@@ -66,48 +68,7 @@ local function stockpileCount(storage, fullType)
 end
 
 local function buildDescriptorFor(definition)
-    if not definition or definition.directWorkstation ~= true then return nil end
-    local objectInfoName = definition.buildRecipeObjectInfoName
-        or definition.entityScript
-    local catalog = PNC.BuildRecipeCatalog
-    if not catalog then return nil end
-    local aliases = {
-        objectInfoName,
-        definition.entityScript,
-        definition.stationId,
-        tr(definition.displayNameKey, humanizeIdentifier(definition.id)),
-    }
-    if catalog.Queries and catalog.Queries.FindForAliases then
-        local descriptor = catalog.Queries.FindForAliases(aliases)
-        if descriptor then return descriptor end
-    end
-    if catalog.Get and objectInfoName then
-        local descriptor = catalog.Get(objectInfoName)
-        if descriptor then return descriptor end
-    end
-    if catalog.Queries and catalog.Queries.FindForObjectInfo
-        and objectInfoName
-    then
-        local descriptor = catalog.Queries.FindForObjectInfo(objectInfoName)
-        if descriptor then return descriptor end
-    end
-    if catalog.Queries and catalog.Queries.FindNativeObjectInfo
-        and objectInfoName
-    then
-        local info = catalog.Queries.FindNativeObjectInfo(objectInfoName)
-        if info then
-            return {
-                objectInfoName = tostring(objectInfoName),
-                displayName = tr(definition.displayNameKey,
-                    humanizeIdentifier(definition.id)),
-                category = definition.category,
-                nativeObjectInfo = info,
-                nativeOnly = true,
-                requirements = {},
-            }
-        end
-    end
-    return nil
+    return FacilityBuildTarget.DescriptorFor(definition)
 end
 
 local function descriptorTexture(descriptor)
@@ -218,6 +179,9 @@ local function facilitySkillProfile(definition)
 end
 
 local function buildOptions(settlement, storage, research)
+    -- Legacy definitions remain save-compatibility data and are never normal
+    -- build or search results. Workshop station handoff must target a direct
+    -- workstation definition instead.
     local values = {}
     local ids = {}
     for id, _ in pairs(PNC.FacilityDefinitions.ByID or {}) do ids[#ids + 1] = id end

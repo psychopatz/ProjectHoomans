@@ -2,25 +2,38 @@ local Rebuild = {}
 local UI = PsychopatzCore and PsychopatzCore.UI or nil
 local InventoryModel = require "PNC/UI/Inventory/PNC_InventoryUI_Model"
 local FacilityState = require "PNC/Core/Settlement/PNC_FacilityState"
+local FacilityBuildTarget = require
+    "PNC/UI/Shared/PNC_FacilityBuildTarget"
+
+local function trace(event, message)
+    local core = PsychopatzCore
+    local hub = core and (core.CommandHub
+        or core.UI and core.UI.CommandHub) or nil
+    if hub and type(hub.Trace) == "function" then
+        hub.Trace(event, message)
+    end
+end
 
 local function setButtonState(button, selected, enabled)
     if not button then return end
     button:setEnable(enabled == true)
     if UI and UI.SetButtonVariant then
-        UI.SetButtonVariant(button, selected and "selected" or "quiet")
+        UI.SetButtonVariant(button, selected and "selected"
+            or enabled and "default" or "quiet")
     end
 end
 
 local function applySubtab(window, active)
-    local availability = window.workshopLaneAvailability or {}
-    if availability[window.workshopSubtab] ~= true then
-        window.workshopSubtab = availability.craft and "craft"
-            or availability.salvage and "salvage" or "craft"
+    local selectable = window.workshopLaneSelectable
+        or window.workshopLaneAvailability or {}
+    if selectable[window.workshopSubtab] ~= true then
+        window.workshopSubtab = selectable.craft and "craft"
+            or selectable.salvage and "salvage" or "craft"
     end
     setButtonState(window.workshopCraftTab,
-        window.workshopSubtab == "craft", availability.craft)
+        window.workshopSubtab == "craft", selectable.craft)
     setButtonState(window.workshopSalvageTab,
-        window.workshopSubtab == "salvage", availability.salvage)
+        window.workshopSubtab == "salvage", selectable.salvage)
     if window.workshopRecipeList.setVisible then
         window.workshopRecipeList:setVisible(active
             and window.workshopSubtab == "craft")
@@ -54,32 +67,34 @@ local function activeOrders(snapshot)
     return output
 end
 
-local function defaultStation()
+local function defaultStation(operation)
     local definitions = PNC and PNC.WorkDefinitions or nil
     local station = definitions and definitions.GetStation
-        and definitions.GetStation("CRAFT") or nil
-    return station or {
-        id = "workshop", facilityId = "workshop",
-        capability = "work.craft", role = "work.craft",
-        legacyRoles = { "work.disassemble" },
-        labelKey = "UI_PNC_Workshop_CraftingStation",
-    }
+        and definitions.GetStation(operation) or nil
+    return station
 end
 
 local function stationFor(entry, operation)
     return entry and entry.requiredStation
-        or defaultStation()
+        or defaultStation(operation)
 end
 
 local function stationLabel(station, tr)
     local key = station and station.labelKey
-        or "UI_PNC_Workshop_CraftingStation"
-    return tr(key, key)
+        or "UI_PNC_Workshop_NoCraftStation"
+    return tr(key, station and key or "NO CRAFT STATION")
+end
+
+local function stationTargetId(station)
+    local target = FacilityBuildTarget.Resolve(station)
+    return target and target.optionId or nil
 end
 
 local function hasStation(snapshot, station)
-    local facilityId = station and station.facilityId or "workshop"
-    local role = station and station.role or "work.craft"
+    if not station then return false end
+    local facilityId = station.facilityId or station.id
+    local role = station.role
+    if not facilityId or not role then return false end
     for _, facility in ipairs(snapshot.settlement
         and snapshot.settlement.facilities or {}) do
         if facility.definitionId == facilityId
@@ -98,7 +113,7 @@ end
 
 local function stationIdentity(station)
     return tostring(station and (station.id or station.facilityId
-        or station.definitionId) or "workshop")
+        or station.definitionId) or "unresolved")
 end
 
 local function stationSortKey(entry, operation)
@@ -199,37 +214,69 @@ local function addSkillHeader(list, skillId, tr, key, expanded)
     })
 end
 
-local function addStationHeader(list, station, tr, key, expanded)
+local function addStationHeader(list, station, tr, key, expanded, status)
     local label = stationLabel(station, tr)
-    list:addItem(key, {
-        name = label, restricted = false, catalogHeader = true,
+    local statusLabel = status and status.label or nil
+    local title = label
+    if statusLabel and statusLabel ~= "" then
+        title = label .. "  [" .. statusLabel .. "]"
+    end
+
+    local row = {
+        name = title, restricted = false, catalogHeader = true,
         stationHeader = true, groupHeader = true, groupChild = true,
         groupKey = key,
         expanded = expanded ~= false,
+        requiredStation = station,
+        stationMissing = status and status.missing == true or false,
+        stationStatus = status and status.kind or nil,
         catalogCells = { category = "", quantity = "", availability = "",
-            action = "" },
-    })
+            action = status and status.actionLabel or "" },
+        catalogColors = { action = status and status.colorName or nil },
+    }
+    if status and status.actionLabel then
+        row.catalogControls = {
+            action = {{
+                id = "catalog_action", title = status.actionLabel,
+                command = "activate", enabled = true, variant = "warning",
+            }},
+        }
+    end
+    list:addItem(key, row)
 end
 
 local function openStationBuild(window, station)
-    local definitionId = station and station.facilityId or "workshop"
+    local target, reason = FacilityBuildTarget.Resolve(station)
+    if not target then return false, reason end
+    trace("pnc_workshop_station_open_request", "facility="
+        .. tostring(target.facilityId) .. " object="
+        .. tostring(target.objectInfoName) .. " search="
+        .. tostring(target.searchText))
     local owner = window and window.owner or nil
     local controller = PNC.CommandHub
         and PNC.CommandHub.ChildController or nil
     if controller and type(controller.Open) == "function" then
         local opened = controller.Open("base", owner, {
             tab = "facilities",
-            focusDefinitionId = definitionId,
+            focusDefinitionId = target.optionId,
+            focusObjectInfoName = target.objectInfoName,
+            searchText = target.searchText,
         })
+        trace("pnc_workshop_station_open_result", "facility="
+            .. tostring(target.facilityId) .. " opened=" .. tostring(opened))
         if opened then return true end
     end
 
     -- The branch controller is normally present, but keep the action usable
     -- when Workshop is opened by another owner or during an early load pass.
-    -- This still uses the integrated Base window and never recreates the
-    -- legacy FacilityBuildWindow modal.
+    -- This still uses the integrated Base window and never creates a second
+    -- facility-build surface.
     local BaseUI = require "PNC/UI/Base/PNC_BaseWindow"
-    return BaseUI.OpenForFacility(owner, definitionId) ~= nil
+    local opened = BaseUI.OpenForFacility(owner, target.optionId, target)
+    trace("pnc_workshop_station_open_result", "facility="
+        .. tostring(target.facilityId) .. " opened=" .. tostring(opened))
+    return opened ~= nil and opened ~= false, opened == false
+        and "facility_focus_not_found" or nil
 end
 
 local function canCraft(resolved, quantity)
@@ -252,9 +299,15 @@ local function quantityFor(window, recipeId)
 end
 
 function Rebuild.OnCatalogControl(window, row, key, control)
-    if row.enabled ~= true then return false end
+    if not row or not control or control.enabled == false then return false end
     local command = control and control.command
-    if row.rowKind == "recipe" then
+    if row.stationHeader and key == "action" then
+        if command ~= "activate" then return false end
+        if row.stationMissing then
+            return openStationBuild(window, row.requiredStation)
+        end
+        return false
+    elseif row.rowKind == "recipe" then
         local quantity = quantityFor(window, row.recipe.id)
         if key == "quantity" then
             if command ~= "increment" and command ~= "decrement" then
@@ -288,12 +341,6 @@ function Rebuild.OnCatalogControl(window, row, key, control)
     return false
 end
 
-function Rebuild.OnCatalogCell()
-    -- Whole-cell catalog hit testing is intentionally retired. The shared
-    -- list consumes the cell and dispatches only native child buttons.
-    return false
-end
-
 local function selectedOrder(window)
     local row = window.workshopQueueList:selectedRow()
     return row and row.order or activeOrders(window.snapshot or {})[1]
@@ -308,6 +355,8 @@ Internal.ActiveOrders = activeOrders
 Internal.DefaultStation = defaultStation
 Internal.StationFor = stationFor
 Internal.StationLabel = stationLabel
+Internal.StationTargetId = stationTargetId
+Internal.FacilityBuildTarget = FacilityBuildTarget
 Internal.HasStation = hasStation
 Internal.StationSortKey = stationSortKey
 Internal.ProductionSkillId = productionSkillId

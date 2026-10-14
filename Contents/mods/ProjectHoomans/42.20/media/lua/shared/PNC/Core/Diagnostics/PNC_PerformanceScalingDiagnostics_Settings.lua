@@ -25,6 +25,8 @@ local NATIVE_HANDOFF_AUDIT_SETTING_ID =
     "ProjectHoomans.NativeHandoffAudit"
 local PRESENCE_TRAVERSAL_AUDIT_SETTING_ID =
     "ProjectHoomans.PresenceTraversalAudit"
+local BODY_IDENTITY_AUDIT_SETTING_ID =
+    "ProjectHoomans.BodyIdentityAudit"
 local function initializeCentralDebugSettings()
     local settings = PsychopatzCore and PsychopatzCore.DebugSettings
     if not settings or type(settings.Register) ~= "function" then
@@ -205,6 +207,18 @@ local function initializeCentralDebugSettings()
             Diagnostics.PresenceTraversalAuditEnabled = enabled == true
         end,
     })
+    settings.Register({
+        id = BODY_IDENTITY_AUDIT_SETTING_ID,
+        source = "Project Hoomans",
+        order = 168,
+        title = "Body identity and restore audit",
+        description = "Logs restored zombie identity fields and lifecycle boundaries without changing cleanup.",
+        defaultEnabled = false,
+        runtimeMutable = true,
+        apply = function(enabled)
+            Diagnostics.BodyIdentityAuditEnabled = enabled == true
+        end,
+    })
     Diagnostics.Enabled = settings.IsEnabled(PERFORMANCE_SETTING_ID) == true
     Diagnostics.TimingEnabled = Diagnostics.Enabled
         and Diagnostics.TimingEnabled ~= false
@@ -239,6 +253,8 @@ local function initializeCentralDebugSettings()
         NATIVE_HANDOFF_AUDIT_SETTING_ID) == true
     Diagnostics.PresenceTraversalAuditEnabled = settings.IsEnabled(
         PRESENCE_TRAVERSAL_AUDIT_SETTING_ID) == true
+    Diagnostics.BodyIdentityAuditEnabled = settings.IsEnabled(
+        BODY_IDENTITY_AUDIT_SETTING_ID) == true
 end
 
 initializeCentralDebugSettings()

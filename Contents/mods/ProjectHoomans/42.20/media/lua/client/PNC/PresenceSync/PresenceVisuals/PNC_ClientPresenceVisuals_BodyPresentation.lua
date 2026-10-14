@@ -65,7 +65,9 @@ local function applyBodyPresentation(
         modData.PNC_TagVersion = Const.BODY_TAG_VERSION
         modData.PNC_PersistedShell = true
         modData.PNC_ShellVersion = Const.BODY_SHELL_VERSION
-        modData.PNC_BaseOutfit = "Naked"
+        modData.PNC_ShellCarrier = Const.BODY_SHELL_OUTFIT
+        modData.PNC_ShellCarrierVersion = Const.BODY_SHELL_CARRIER_VERSION
+        modData.PNC_BaseOutfit = Const.BODY_SHELL_OUTFIT
     end
     if PNC.ClientHumanNPCSafeguards
         and PNC.ClientHumanNPCSafeguards.RegisterHumanBody

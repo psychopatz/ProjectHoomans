@@ -2,18 +2,26 @@ require "PNC/UI/Inventory/PNC_InventoryUI_List"
 local Settings = require "PsychopatzCore/Settings/PsychopatzSettings"
 
 local Workshop = {}
-local Theme = PsychopatzCore.UI.Theme
+local Theme = PsychopatzCore and PsychopatzCore.UI
+    and PsychopatzCore.UI.Theme or {}
 local Components = require "PNC/UI/Shared/PNC_ColonyUIComponents"
+local GroupState = require "PNC/UI/Workshop/PNC_WorkshopGroupState"
 local Rebuild = require
     "PNC/UI/Workshop/PNC_WorkshopCatalog_Rebuild"
 local DEFAULT_SPLIT_RATIO = 0.34
 local MINIMUM_QUEUE_WIDTH = 250
 local MINIMUM_CATALOG_WIDTH = 480
 local SPLITTER_HIT_WIDTH = 16
+local SEARCH_ROW_HEIGHT = 32
 local CATALOG_HEADER_HEIGHT = 32
+local SEARCH_CONTROL_GAP = 6
+local SEARCH_CONTROL_WIDTH = 112
 local SPLIT_STORE = Settings.Open("ProjectHoomansWorkshopUI", {
     fileName = "ProjectHoomans_WorkshopUI.txt",
-    defaults = { workshopSplitRatio = DEFAULT_SPLIT_RATIO },
+    defaults = {
+        workshopSplitRatio = DEFAULT_SPLIT_RATIO,
+        workshopCollapsedGroups = "",
+    },
 })
 local CATALOG_COLUMNS = {
     { key = "category", x = 0.40 }, { key = "quantity", x = 0.57 },
@@ -51,9 +59,18 @@ local function saveSplitRatio(value)
         math.min(0.7, tonumber(value) or DEFAULT_SPLIT_RATIO)), true)
 end
 
+local function loadCollapsedGroups()
+    return GroupState.Load(SPLIT_STORE)
+end
+
+local function saveCollapsedGroups(groups)
+    GroupState.Save(SPLIT_STORE, groups)
+end
+
 function Workshop.Create(window, UIBuilder)
     window.workshopQuantities = window.workshopQuantities or {}
-    window.workshopCollapsedGroups = window.workshopCollapsedGroups or {}
+    window.workshopCollapsedGroups = window.workshopCollapsedGroups
+        or loadCollapsedGroups()
     window.workshopSubtab = window.workshopSubtab or "craft"
     window.workshopSplitRatio = window.workshopSplitRatio
         or loadSplitRatio()
@@ -106,6 +123,17 @@ function Workshop.Create(window, UIBuilder)
         "UI_PNC_Workshop_CraftingTab")
     window.workshopSalvageTab = button(window, UIBuilder, "tab_salvage",
         "UI_PNC_Workshop_SalvageTab")
+    window.workshopSearch = UIBuilder.CreateSearchEntry(window, {
+        clearButton = true,
+        tooltip = PNC.Translation.GetKey("UI_PNC_Search", "Search catalog"),
+        onTextChange = function()
+            window:rebuildDetails()
+        end,
+    })
+    window.workshopCollapseAll = button(window, UIBuilder, "collapse_all",
+        "UI_PNC_Workshop_CollapseAll", "quiet")
+    window.workshopExpandAll = button(window, UIBuilder, "expand_all",
+        "UI_PNC_Workshop_ExpandAll", "quiet")
     window.workshopPause = button(window, UIBuilder, "pause",
         "UI_PNC_Work_Pause", "warning")
     window.workshopCancel = button(window, UIBuilder, "cancel",
@@ -153,13 +181,26 @@ function Workshop.Layout(window, Layout, content)
     Layout.SetBounds(window.workshopSalvageTab, rightX + halfRight + 6,
         content.y, right - halfRight - 6, 27)
     local top, height = content.y + 34, math.max(1, content.height - 34)
-    local listTop = top + CATALOG_HEADER_HEIGHT
-    local listHeight = math.max(1, height - CATALOG_HEADER_HEIGHT)
-    Layout.SetBounds(window.workshopQueueHeader, content.x, top, left,
+    local headerTop = top + SEARCH_ROW_HEIGHT
+    local listTop = headerTop + CATALOG_HEADER_HEIGHT
+    local listHeight = math.max(1, height - SEARCH_ROW_HEIGHT
+        - CATALOG_HEADER_HEIGHT)
+    local controlWidth = math.min(SEARCH_CONTROL_WIDTH,
+        math.max(80, math.floor((right - SEARCH_CONTROL_GAP) / 3)))
+    local searchWidth = math.max(120, right - controlWidth * 2
+        - SEARCH_CONTROL_GAP * 2)
+    Layout.SetBounds(window.workshopSearch, rightX, top, searchWidth, 27)
+    local collapseX = rightX + searchWidth + SEARCH_CONTROL_GAP
+    Layout.SetBounds(window.workshopCollapseAll, collapseX, top,
+        controlWidth, 27)
+    Layout.SetBounds(window.workshopExpandAll,
+        collapseX + controlWidth + SEARCH_CONTROL_GAP, top,
+        controlWidth, 27)
+    Layout.SetBounds(window.workshopQueueHeader, content.x, headerTop, left,
         CATALOG_HEADER_HEIGHT)
-    Layout.SetBounds(window.workshopRecipeHeader, rightX, top, right,
+    Layout.SetBounds(window.workshopRecipeHeader, rightX, headerTop, right,
         CATALOG_HEADER_HEIGHT)
-    Layout.SetBounds(window.workshopSalvageHeader, rightX, top, right,
+    Layout.SetBounds(window.workshopSalvageHeader, rightX, headerTop, right,
         CATALOG_HEADER_HEIGHT)
     Layout.SetBounds(window.workshopQueueList, content.x, listTop, left,
         listHeight)
@@ -210,6 +251,9 @@ function Workshop.Apply(window, active)
     window.workshopSalvageTab:setVisible(active)
     window.workshopQueueList:setVisible(active)
     window.workshopQueueHeader:setVisible(active)
+    window.workshopSearch:setVisible(active)
+    window.workshopCollapseAll:setVisible(active)
+    window.workshopExpandAll:setVisible(active)
     window.workshopRecipeHeader:setVisible(active
         and window.workshopSubtab == "craft")
     window.workshopSalvageHeader:setVisible(active
@@ -243,13 +287,25 @@ function Workshop.OnCatalogControl(window, row, key, control)
     return Rebuild.OnCatalogControl(window, row, key, control)
 end
 
--- Kept as a no-op compatibility surface for callers that still reference the
--- old whole-cell callback. Catalog actions now come from native child buttons.
-function Workshop.OnCatalogCell()
-    return false
+local function setAllGroups(window, collapsed)
+    window.workshopCollapsedGroups = window.workshopCollapsedGroups or {}
+    local known = window.workshopKnownGroupKeys or {}
+    for key in pairs(known) do
+        window.workshopCollapsedGroups[key] = collapsed == true
+    end
+    saveCollapsedGroups(window.workshopCollapsedGroups)
+    window:rebuildDetails()
+    return true
+end
+
+function Workshop.SaveCollapsedGroups(window)
+    saveCollapsedGroups(window and window.workshopCollapsedGroups or {})
 end
 
 function Workshop.OnControl(window, buttonValue)
+    local action = tostring(buttonValue and buttonValue.internal or "")
+    if action == "collapse_all" then return setAllGroups(window, true) end
+    if action == "expand_all" then return setAllGroups(window, false) end
     return Rebuild.OnControl(window, buttonValue)
 end
 

@@ -182,14 +182,40 @@ function Internal.matchesRecordBody(record, zombie)
     local registry
     local modData
     local lease
+    local registryMatch = false
+    local ownership
+    local ok
+    local value
     if not record or not zombie then
         return false
+    end
+    if zombie.isReanimatedPlayer then
+        ok, value = pcall(zombie.isReanimatedPlayer, zombie)
+        if ok and value == true then
+            return false
+        end
+    end
+    ownership = PNC.Compatibility and PNC.Compatibility.ActorOwnership
+    if ownership and ownership.IsForeignOwned then
+        ok, value = pcall(ownership.IsForeignOwned, zombie)
+        if ok and value == true then
+            return false
+        end
     end
     registry = Internal.registry and Internal.registry() or nil
     if registry and registry.LiveByID
         and registry.LiveByID[tostring(record.id)] == zombie
     then
-        return true
+        registryMatch = true
+        -- A detached handle is safe to classify as the former body because
+        -- removeZombie is a no-op on it. An attached recycled object must also
+        -- carry the live PNC marker; registry pointer identity alone can be
+        -- stale after the engine reuses an IsoZombie instance.
+        if not zombie.getCurrentSquare
+            or not Internal.isBodyAttached(zombie)
+        then
+            return true
+        end
     end
     modData = zombie.getModData and zombie:getModData() or nil
     if not modData then
@@ -198,32 +224,52 @@ function Internal.matchesRecordBody(record, zombie)
     if tostring(modData.PNC_UUID or "") ~= tostring(record.id) then
         return false
     end
-    if tostring(modData.PNC_BodyKind or "live") ~= "live" then
+    if modData.PNC_BodyKind ~= nil
+        and tostring(modData.PNC_BodyKind) ~= "live"
+    then
+        return false
+    end
+    if modData.PNC_BodyKind == nil and modData.PNC_NPC ~= true then
         return false
     end
     lease = record.runtime and record.runtime.bodyLease
-    if lease ~= nil and modData.PNC_BodyLease ~= nil
-        and tostring(modData.PNC_BodyLease) ~= tostring(lease)
-    then
+    if lease ~= nil then
+        if modData.PNC_BodyLease == nil
+            or tostring(modData.PNC_BodyLease) ~= tostring(lease)
+        then
+            return false
+        end
+    elseif registryMatch then
+        -- A real attached live record should always have a lease. Refuse the
+        -- pointer-only case when no explicit lease is available.
+        return false
+    end
+    if modData.PNC_BodyLease == nil and lease == nil then
         return false
     end
     return true
 end
 
 function Internal.removeZombie(zombie)
+    local pass
     if not zombie then
         return false
     end
     Internal.clearBodyCombat(zombie)
-    -- Match the proven Dynamic Trading V2 removal path. The zombie manager may
-    -- keep a persisted shell eligible for reload; removing the concrete world
-    -- object and square membership directly makes the transition deterministic
-    -- and keeps errors visible instead of hiding them behind pcall.
-    if zombie.removeFromWorld then
-        zombie:removeFromWorld()
-    end
-    if zombie.removeFromSquare then
-        zombie:removeFromSquare()
+    -- Match the proven Dynamic Trading V2 removal path, but isolate the two
+    -- engine calls. Some restore frames reject removeFromWorld while still
+    -- accepting removeFromSquare; one exception must not make us report a
+    -- successful cleanup or skip the second operation.
+    for pass = 1, 2 do
+        if zombie.getCurrentSquare and Internal.isBodyDetached(zombie) then
+            return true
+        end
+        if zombie.removeFromWorld then
+            pcall(zombie.removeFromWorld, zombie)
+        end
+        if zombie.removeFromSquare then
+            pcall(zombie.removeFromSquare, zombie)
+        end
     end
     -- Verified result: callers use this to distinguish "removed" from "was
     -- already virtualized away", which is what orphaned the husk to begin

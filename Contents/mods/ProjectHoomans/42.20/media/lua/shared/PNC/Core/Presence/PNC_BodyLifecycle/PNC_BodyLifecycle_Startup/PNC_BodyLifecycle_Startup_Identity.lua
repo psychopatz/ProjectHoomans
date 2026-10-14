@@ -1,8 +1,9 @@
 -- Persisted live-body shell cleanup and relog reconciliation.
 --
 -- IsoZombie bodies are engine-owned world objects and can be restored before
--- the PNC registry has rebuilt its runtime lease.  Treat those restored bodies
--- as disposable shells: remove them before materializing the record again.
+-- the PNC registry has rebuilt its runtime lease. Treat only bodies with a
+-- positive PNC/ledger proof as disposable shells; anonymous bodies remain
+-- untouched and make materialization defer until the ambiguity is gone.
 
 PNC = PNC or {}
 PNC.BodyLifecycle = PNC.BodyLifecycle or {}
@@ -13,14 +14,50 @@ local Internal = Lifecycle.Internal
 local Core = PNC.Core
 local Const = PNC.Const
 
+local function isProtectedBody(zombie)
+    local ownership
+    local ok
+    local value
+    if not zombie then
+        return false
+    end
+    if zombie.isDead then
+        ok, value = pcall(zombie.isDead, zombie)
+        if ok and value == true then
+            return true
+        end
+    end
+    if zombie.isReanimatedPlayer then
+        ok, value = pcall(zombie.isReanimatedPlayer, zombie)
+        if ok and value == true then
+            return true
+        end
+    end
+    ownership = PNC.Compatibility and PNC.Compatibility.ActorOwnership
+    if ownership and ownership.IsForeignOwned then
+        ok, value = pcall(ownership.IsForeignOwned, zombie)
+        if ok and value == true then
+            return true
+        end
+    end
+    return false
+end
+
 Lifecycle.StartupCleanup = Lifecycle.StartupCleanup or {
     begun = false,
     active = false,
-    complete = true,
+    -- Presence must not assume that the engine restore phase is complete
+    -- before OnGameStart/OnServerStarted has reconciled restored IsoZombies.
+    complete = false,
     passes = 0,
     quietPasses = 0,
     startedAt = 0,
     removed = 0,
+    -- The batch reconciler owns this snapshot; materialization only reads it
+    -- through Lifecycle.IsStartupRecordBlocked.
+    lastBatch = nil,
+    settleUntil = 0,
+    nextMaterializeAt = 0,
 }
 
 local function listCount(list)
@@ -38,12 +75,27 @@ local function isNakedShell(zombie)
     return listCount(wornItems) <= 0 and listCount(itemVisuals) <= 0
 end
 
+local function isDurableShellCarrier(zombie)
+    local outfitID
+    local ok
+    if not zombie or not Lifecycle.IsShellCarrierID
+        or not zombie.getPersistentOutfitID
+    then
+        return false
+    end
+    ok, outfitID = pcall(zombie.getPersistentOutfitID, zombie)
+    if not ok or outfitID == nil then
+        return false
+    end
+    return Lifecycle.IsShellCarrierID(outfitID) == true
+end
+
 local function getLiveShellIdentity(zombie)
     local modData
     local npcId
     local strong = false
     local weak = false
-    if not zombie or (zombie.isDead and zombie:isDead()) then
+    if not zombie or isProtectedBody(zombie) then
         return nil, false, false
     end
     modData = zombie.getModData and zombie:getModData() or nil
@@ -68,16 +120,30 @@ local function getLiveShellIdentity(zombie)
     if zombie.isUseless then
         weak = zombie:isUseless() == true
     end
+    -- A virtualized population body does not retain PNC ModData. Its learned
+    -- persistent outfit id is the durable carrier, but only ids recorded from
+    -- PNC-created bodies are trusted; this avoids treating vanilla Naked
+    -- zombies as NPC shells.
+    strong = strong or isDurableShellCarrier(zombie)
     return npcId, strong, weak
 end
 
 local function getBodyInstanceID(zombie)
     local value = zombie and zombie.getPersistentOutfitID
         and zombie:getPersistentOutfitID() or nil
-    if value == nil then
+    if value == nil or tostring(value) == "" or tostring(value) == "0"
+        or (tonumber(value) ~= nil and tonumber(value) == 0)
+    then
         return nil
     end
     return tostring(value)
+end
+
+local function getBodyPopulationID(zombie)
+    if Lifecycle.GetBodyPopulationID then
+        return Lifecycle.GetBodyPopulationID(zombie)
+    end
+    return nil
 end
 
 local function isCanonicalBody(record, zombie)
@@ -87,10 +153,29 @@ local function isCanonicalBody(record, zombie)
     if not record or not zombie then
         return false
     end
-    if reg and reg.LiveByID and reg.LiveByID[tostring(record.id)] == zombie then
-        return true
-    end
     modData = zombie.getModData and zombie:getModData() or nil
+    if modData
+        and tostring(modData.PNC_UUID or "") == tostring(record.id)
+        and tostring(modData.PNC_BodyKind or "live") ~= "corpse"
+        and modData.PNC_DeathMarkerID == nil
+    then
+        lease = record.runtime and record.runtime.bodyLease
+        if record.presenceState == Const.PRESENCE_LIVE then
+            -- Explicit UUID/live markers are canonical when the active lease
+            -- agrees. If an old save has no lease yet, preserve the marked
+            -- live body while runtime is rebuilt; a mismatched lease is a
+            -- stale shell and must be cleaned.
+            return lease == nil
+                or modData.PNC_BodyLease == nil
+                or tostring(modData.PNC_BodyLease) == tostring(lease)
+        end
+    end
+    if reg and reg.LiveByID and reg.LiveByID[tostring(record.id)] == zombie then
+        -- Pointer identity alone is not enough for an attached object: PZ can
+        -- recycle an IsoZombie after virtualization. Keep the compatibility
+        -- fallback for test/legacy surfaces that expose no square query.
+        return not zombie.getCurrentSquare
+    end
     lease = record.runtime and record.runtime.bodyLease
     return record.presenceState == Const.PRESENCE_LIVE
         and lease ~= nil
@@ -116,10 +201,17 @@ end
 
 local function bodyHintMatches(record, zombie)
     local hint = record and record.runtime and record.runtime.startupBodyHint or nil
+    local wantedPopulation = hint and hint.populationId or nil
     local wanted = hint and hint.instanceID
+    local actualPopulation
     local dx
     local dy
     local dz
+    if wantedPopulation ~= nil then
+        actualPopulation = getBodyPopulationID(zombie)
+        return actualPopulation ~= nil
+            and tostring(actualPopulation) == tostring(wantedPopulation)
+    end
     if wanted == nil
         or tostring(wanted) ~= tostring(getBodyInstanceID(zombie) or "")
     then
@@ -137,54 +229,134 @@ local function bodyHintMatches(record, zombie)
     return math.abs(dz) <= 1 and (dx * dx + dy * dy) <= (3.5 * 3.5)
 end
 
-local function resolveRecordForShell(reg, zombie, npcId, strongSignature, naked)
-    local exact = npcId and reg.Get and reg.Get(npcId) or nil
-    local best
-    local bestScore
-    if exact then
-        return exact, "uuid"
+local function populationHintMatches(record, zombie)
+    local hint = record and record.runtime and record.runtime.startupBodyHint
+        or nil
+    local wanted = hint and hint.populationId or nil
+    local actual
+    if wanted == nil then
+        return false
     end
-    if not reg.ForEach then
-        return nil, nil
+    actual = getBodyPopulationID(zombie)
+    return actual ~= nil and tostring(actual) == tostring(wanted)
+end
+
+local function startupRecordCandidates(
+    reg,
+    zombie,
+    npcId,
+    strongSignature,
+    naked
+)
+    local candidates = {}
+    local exact
+
+    -- A persisted UUID is an actor identity, not a location hint. Keep this
+    -- fast path, but still reject records which are already terminal corpses.
+    exact = npcId and reg and reg.Get and reg.Get(npcId) or nil
+    if exact and exact.alive ~= false
+        and exact.presenceState ~= Const.PRESENCE_CORPSE
+    then
+        candidates[1] = {
+            record = exact,
+            reason = "uuid",
+            score = 300000,
+            identity = true,
+        }
+        return candidates
     end
+    if not reg or not reg.ForEach then
+        return candidates
+    end
+
     reg.ForEach(function(record)
         local distSq
-        local radius
         local score
+        local reason
+        local identity = false
         if record and record.alive ~= false
             and record.presenceState ~= Const.PRESENCE_CORPSE
         then
-            if bodyHintMatches(record, zombie) then
+            if populationHintMatches(record, zombie) then
+                score = 200000
+                reason = "population_id"
+                identity = true
+            elseif bodyHintMatches(record, zombie) then
                 score = 100000
-            else
+                reason = "body_hint"
+                identity = true
+            elseif strongSignature then
                 distSq = distanceSqToRecord(zombie, record)
-                radius = strongSignature and 3.5 or naked and 1.25 or 0
-                if distSq and radius > 0 and distSq <= radius * radius then
-                    -- Unmarked positional cleanup is only valid while the soul
-                    -- is abstract. This avoids deleting an unrelated naked
-                    -- zombie merely because it later walks beside a live NPC.
-                    if strongSignature or record.presenceState ~= Const.PRESENCE_LIVE then
-                        score = math.floor((radius * radius - distSq) * 100) + 1
-                    end
+                if distSq and distSq <= (3.5 * 3.5) then
+                    -- A PNCShellCarrier proves that this is a PNC shell, but
+                    -- its carrier id is shared by NPCs. Position is therefore
+                    -- only a candidate and must pass the batch one-to-one
+                    -- check before any deletion is authorized.
+                    score = math.floor((3.5 * 3.5 - distSq) * 100) + 1
+                    reason = "signature_position"
                 end
+            elseif naked then
+                -- A naked zombie has no PNC identity. It is deliberately not
+                -- a cleanup candidate: ordinary zombies can have the same
+                -- appearance and may occupy an NPC's previous square.
+                return
             end
-            if score and (not bestScore or score > bestScore) then
-                best = record
-                bestScore = score
+            if score then
+                candidates[#candidates + 1] = {
+                    record = record,
+                    reason = reason,
+                    score = score,
+                    identity = identity,
+                }
             end
         end
     end)
-    return best, bodyHintMatches(best, zombie) and "body_hint"
-        or strongSignature and "signature_position"
-        or naked and "naked_position"
-        or nil
+    return candidates
+end
+
+local function resolveRecordForShell(reg, zombie, npcId, strongSignature, naked)
+    local candidates = startupRecordCandidates(
+        reg,
+        zombie,
+        npcId,
+        strongSignature,
+        naked
+    )
+    local best
+    local bestScore
+    local topCount = 0
+    local i
+    if #candidates <= 0 then
+        return nil, naked and "unidentified_naked_shell" or nil
+    end
+    for i = 1, #candidates do
+        if not bestScore or candidates[i].score > bestScore then
+            best = candidates[i]
+            bestScore = candidates[i].score
+            topCount = 1
+        elseif candidates[i].score == bestScore then
+            topCount = topCount + 1
+        end
+    end
+    if topCount > 1 then
+        return nil, "ambiguous_" .. tostring(best.reason)
+    end
+    if best.reason == "signature_position" and #candidates > 1 then
+        return nil, "ambiguous_signature_position"
+    end
+    return best.record, best.reason
 end
 
 Internal.StartupListCount = listCount
+Internal.IsProtectedBody = isProtectedBody
 Internal.IsNakedStartupShell = isNakedShell
+Internal.IsDurableShellCarrier = isDurableShellCarrier
 Internal.GetLiveShellIdentity = getLiveShellIdentity
 Internal.GetStartupBodyInstanceID = getBodyInstanceID
+Internal.GetStartupBodyPopulationID = getBodyPopulationID
 Internal.IsCanonicalStartupBody = isCanonicalBody
 Internal.StartupDistanceSqToRecord = distanceSqToRecord
 Internal.StartupBodyHintMatches = bodyHintMatches
+Internal.StartupPopulationHintMatches = populationHintMatches
+Internal.GetStartupRecordCandidates = startupRecordCandidates
 Internal.ResolveRecordForStartupShell = resolveRecordForShell

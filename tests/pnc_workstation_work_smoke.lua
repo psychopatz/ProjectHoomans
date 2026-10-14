@@ -65,7 +65,7 @@ local workers = {
 }
 for _, worker in ipairs(workers) do PNC.Registry.Data[worker.id] = worker end
 
-local Definitions = require "PNC/Core/Production/PNC_WorkDefinitions"
+local Definitions = require "PNC/Core/Production/WorkDefinition/PNC_WorkDefinitions"
 local Repository = require "PNC/Production/PNC_WorkRepository"
 Repository.Import(nil)
 local Work = require "PNC/Production/PNC_WorkService"

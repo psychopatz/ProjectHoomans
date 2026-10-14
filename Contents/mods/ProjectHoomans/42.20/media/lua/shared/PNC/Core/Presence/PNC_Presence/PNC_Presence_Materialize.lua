@@ -10,6 +10,7 @@ local Equipment = PNC.Equipment
 local LiveBodyControl = PNC.LiveBodyControl
 local MaterializationSafety = PNC.MaterializationSafety
 local Diagnostics = PNC.PerformanceScalingDiagnostics
+local PresenceDiagnostics = Internal.PresenceDiagnostics
 local ActorOwnership = PNC.Compatibility
     and PNC.Compatibility.ActorOwnership or nil
 
@@ -78,6 +79,58 @@ local function startupReady()
         or PNC.BodyLifecycle.IsStartupBodyCleanupComplete()
 end
 
+local function markLifecycleFailure(record, reason, detail)
+    record.runtime.lifecycle = record.runtime.lifecycle or {}
+    record.runtime.lifecycle.phase = Const.PRESENCE_ABSTRACT
+    record.runtime.lifecycle.bodyState = "missing"
+    record.runtime.lifecycle.lastReason = reason
+    record.runtime.lifecycle.lastError = detail
+    record.runtime.lifecycle.lastTransitionAt = Core.Now()
+end
+
+local function scheduleMaterializationRetry(record, dueAt)
+    if not record then return end
+    record.runtime = record.runtime or {}
+    record.runtime.materializeRetryAt = tonumber(dueAt) or Core.Now()
+    record.runtime.forcePresenceCheck = true
+    if PNC.SimulationClock and PNC.SimulationClock.Wake then
+        PNC.SimulationClock.Wake(
+            record,
+            "presence",
+            record.runtime.materializeRetryAt
+        )
+    end
+    if PNC.Scheduler and PNC.Scheduler.Schedule then
+        PNC.Scheduler.Schedule(record, record.runtime.materializeRetryAt)
+    end
+end
+
+local function allowStartupMaterialization(record, now)
+    local lifecycle = PNC.BodyLifecycle
+    local state = lifecycle and lifecycle.StartupCleanup or nil
+    local nextAt
+    local burstUntil
+    if not state or state.complete ~= true then
+        return true
+    end
+    burstUntil = (tonumber(state.completedAt) or 0)
+        + (tonumber(Const.BODY_SHELL_STARTUP_BURST_MS) or 5000)
+    if (tonumber(now) or 0) > burstUntil then
+        return true
+    end
+    nextAt = tonumber(state.nextMaterializeAt) or 0
+    if nextAt > (tonumber(now) or 0) then
+        record.runtime = record.runtime or {}
+        scheduleMaterializationRetry(record, nextAt)
+        markLifecycleFailure(record, "materialize_deferred",
+            "startup_population_settle")
+        return false
+    end
+    state.nextMaterializeAt = (tonumber(now) or 0)
+        + (tonumber(Const.BODY_SHELL_STARTUP_MATERIALIZE_SPACING_MS) or 250)
+    return true
+end
+
 local function prepareRecord(record)
     record.runtime = record.runtime or {}
     if PNC.Inventory and PNC.Inventory.EnsureRecordInventory then
@@ -91,14 +144,6 @@ local function prepareRecord(record)
             PNC.Travel.Service.WorldHour()
         )
     end
-end
-
-local function markLifecycleFailure(record, reason, detail)
-    record.runtime.lifecycle = record.runtime.lifecycle or {}
-    record.runtime.lifecycle.phase = Const.PRESENCE_ABSTRACT
-    record.runtime.lifecycle.bodyState = "missing"
-    record.runtime.lifecycle.lastReason = reason
-    record.runtime.lifecycle.lastError = detail
 end
 
 local function resolveSpawnPosition(record, reason, now)
@@ -120,8 +165,10 @@ local function resolveSpawnPosition(record, reason, now)
         if MaterializationSafety and MaterializationSafety.Defer then
             MaterializationSafety.Defer(record, deferredReason, now)
         else
-            record.runtime.materializeRetryAt = now
-                + (tonumber(Const.MATERIALIZE_CHUNK_RETRY_MS) or 250)
+            scheduleMaterializationRetry(
+                record,
+                now + (tonumber(Const.MATERIALIZE_CHUNK_RETRY_MS) or 250)
+            )
         end
         markLifecycleFailure(
             record,
@@ -136,7 +183,7 @@ local function resolveSpawnPosition(record, reason, now)
             "materialize_position_blocked",
             "no_safe_square:" .. tostring(recoveryReason or "unknown")
         )
-        record.runtime.materializeRetryAt = Core.Now() + 5000
+        scheduleMaterializationRetry(record, Core.Now() + 5000)
         Core.LogWarn(
             "NPC position recovery deferred npc=" .. tostring(record.id)
                 .. " name=" .. tostring(record.name or "Unknown NPC")
@@ -197,9 +244,10 @@ local function spawnBody(record, position, reason)
     -- Load-order fallback: BodyLifecycle is composed before Presence, so this
     -- lane is only reachable if that ordering is ever broken.
     local zombieList = addZombiesInOutfit(
-        position.x, position.y, position.z, 1, "Naked",
+        position.x, position.y, position.z, 1,
+        Const.BODY_SHELL_OUTFIT or "PNCShellCarrier",
         record.isFemale and 100 or 0,
-        false, false, false, false, true, false, 1
+        false, false, false, false, false, false, 1
     )
     if not zombieList or zombieList:size() <= 0 then
         markLifecycleFailure(
@@ -246,6 +294,34 @@ local function configureBody(record, zombie)
     end
 end
 
+local function abortMaterialization(record, zombie, reason)
+    local lifecycle = PNC.BodyLifecycle
+    local removed = false
+    if lifecycle and lifecycle.AbortSpawnedBody then
+        removed = lifecycle.AbortSpawnedBody(zombie) == true
+    elseif lifecycle and lifecycle.Internal
+        and lifecycle.Internal.removeZombie
+    then
+        removed = lifecycle.Internal.removeZombie(zombie) == true
+    elseif zombie then
+        if zombie.removeFromWorld then zombie:removeFromWorld() end
+        if zombie.removeFromSquare then zombie:removeFromSquare() end
+        removed = not zombie.getCurrentSquare
+            or zombie:getCurrentSquare() == nil
+    end
+    markLifecycleFailure(record, "materialize_failed", reason)
+    scheduleMaterializationRetry(
+        record,
+        Core.Now() + (tonumber(Const.MATERIALIZE_CHUNK_RETRY_MS) or 250)
+    )
+    if not removed then
+        Core.LogWarn("PNC materialization rollback unverified npc="
+            .. tostring(record and record.id or "unknown")
+            .. " reason=" .. tostring(reason or "unknown"))
+    end
+    return nil
+end
+
 local function finishMaterialization(
     record, zombie, position, original, net, reason
 )
@@ -286,6 +362,13 @@ local function finishMaterialization(
         end
     end
     record.presenceState = Const.PRESENCE_LIVE
+    record.runtime = record.runtime or {}
+    record.runtime.lifecycle = record.runtime.lifecycle or {}
+    record.runtime.lifecycle.phase = "live"
+    record.runtime.lifecycle.bodyState = "present"
+    record.runtime.lifecycle.lastReason = reason or "materialize"
+    record.runtime.lifecycle.lastError = nil
+    record.runtime.lifecycle.lastTransitionAt = Core.Now()
     if record.runtime
         and record.runtime.abstractFollowMaterializeRequested == true
     then
@@ -328,35 +411,244 @@ local function finishMaterialization(
     return zombie
 end
 
+function Presence.RebindRestoredBody(record, zombie, reason)
+    local position
+    local configured
+    local configureError
+    if not Core.IsAuthority() or not record or not zombie then
+        return false
+    end
+    record.runtime = record.runtime or {}
+    if record.runtime.vehiclePassenger
+        and record.runtime.vehiclePassenger.active == true
+    then
+        -- A persisted vehicle passenger is intentionally bodyless. Startup
+        -- sweep owns the identity-safe removal of the restored shell.
+        return false
+    end
+    if record.runtime.bodyLease == nil
+        and record.runtime.startupBodyHint
+        and record.runtime.startupBodyHint.lease ~= nil
+    then
+        record.runtime.bodyLease = record.runtime.startupBodyHint.lease
+    end
+    position = {
+        x = tonumber(zombie:getX()) or tonumber(record.x) or 0,
+        y = tonumber(zombie:getY()) or tonumber(record.y) or 0,
+        z = tonumber(zombie:getZ()) or tonumber(record.z) or 0,
+    }
+    configured, configureError = pcall(configureBody, record, zombie)
+    if not configured then
+        Core.LogWarn("PNC restored body configure failed npc="
+            .. tostring(record.id) .. " reason=" .. tostring(configureError))
+        return false
+    end
+    if PNC.BodyLifecycle
+        and PNC.BodyLifecycle.ClearEngineInvulnerability
+        and not PNC.BodyLifecycle.ClearEngineInvulnerability(zombie)
+    then
+        Core.LogWarn("PNC restored body rejected as invulnerable npc="
+            .. tostring(record.id))
+        return false
+    end
+    finishMaterialization(
+        record,
+        zombie,
+        position,
+        position,
+        Internal.ResolveNetwork(),
+        reason or "startup_population_rebind"
+    )
+    if Core.LogInfo then
+        Core.LogInfo("PNC restored body rebound npc=" .. tostring(record.id)
+            .. " populationId="
+            .. tostring(PNC.BodyLifecycle.GetBodyPopulationID
+                and PNC.BodyLifecycle.GetBodyPopulationID(zombie) or "nil"))
+    end
+    return true
+end
+
 function Presence.Materialize(record, reason, nearest)
     local now
     local position
     local zombie
     local original
+    local pendingHusk
+    local pendingHuskReason
+    local cleanedShells
+    local shellCleanupBlocked
+    local shellCleanupReason
+    local startupBodyBlocked
+    local startupBodyBlockReason
     local net = Internal.ResolveNetwork()
     if not Core.IsAuthority() or record.alive == false
         or record.presenceState == Const.PRESENCE_LIVE
     then
+        if PresenceDiagnostics and PresenceDiagnostics.LogMaterializeGate then
+            PresenceDiagnostics.LogMaterializeGate(record, "precondition",
+                "authority_or_dead_or_already_live")
+        end
         return Registry.GetLiveZombie(record.id)
     end
-    if not startupReady() then return nil end
-    prepareRecord(record)
-    original = { x = record.x, y = record.y, z = record.z }
-    now = Core.Now()
-    position = resolveSpawnPosition(record, reason, now)
-    if not position then return nil end
-    if not Internal.ConsumeMaterializationBudget(record, reason, nearest) then
+    if record.runtime and record.runtime.lifecycle
+        and record.runtime.lifecycle.phase == "materializing"
+    then
+        if PresenceDiagnostics and PresenceDiagnostics.LogMaterializeGate then
+            PresenceDiagnostics.LogMaterializeGate(record, "lifecycle_phase",
+                "already_materializing")
+        end
         return nil
     end
-    if PNC.BodyLifecycle and PNC.BodyLifecycle.CleanupRecordShells
-        and PNC.BodyLifecycle.CleanupRecordShells(record, now) > 0
-    then
+    if not startupReady() then
+        if PresenceDiagnostics and PresenceDiagnostics.LogMaterializeGate then
+            PresenceDiagnostics.LogMaterializeGate(record, "startup_cleanup",
+                "startup_not_ready")
+        end
         return nil
+    end
+    prepareRecord(record)
+    now = Core.Now()
+    if not allowStartupMaterialization(record, now) then
+        if PresenceDiagnostics and PresenceDiagnostics.LogMaterializeGate then
+            PresenceDiagnostics.LogMaterializeGate(record, "startup_spacing",
+                record.runtime.lifecycle.lastError or "deferred")
+        end
+        return nil
+    end
+    if PNC.BodyLifecycle and PNC.BodyLifecycle.IsStartupRecordBlocked then
+        startupBodyBlocked, startupBodyBlockReason =
+            PNC.BodyLifecycle.IsStartupRecordBlocked(record, now)
+        if startupBodyBlocked then
+            scheduleMaterializationRetry(
+                record,
+                now + (tonumber(Const.BODY_SHELL_MAINTENANCE_MS) or 1000)
+            )
+            markLifecycleFailure(record, "materialize_deferred",
+                startupBodyBlockReason or "startup_body_reconciliation")
+            if PresenceDiagnostics
+                and PresenceDiagnostics.LogMaterializeGate
+            then
+                PresenceDiagnostics.LogMaterializeGate(
+                    record,
+                    "startup_body_reconciliation",
+                    startupBodyBlockReason or "ambiguous_or_unmarked_body"
+                )
+            end
+            return nil
+        end
+    end
+    if PNC.BodyLifecycle and PNC.BodyLifecycle.HasPendingHuskForRecord then
+        pendingHusk, pendingHuskReason =
+            PNC.BodyLifecycle.HasPendingHuskForRecord(record.id)
+    end
+    if pendingHusk
+    then
+        scheduleMaterializationRetry(
+            record,
+            Core.Now() + (tonumber(Const.BODY_SHELL_MAINTENANCE_MS) or 1000)
+        )
+        markLifecycleFailure(record, "materialize_deferred",
+            "husk_reclamation_pending")
+        if PresenceDiagnostics and PresenceDiagnostics.LogMaterializeGate then
+            PresenceDiagnostics.LogMaterializeGate(record, "husk_reclamation",
+                pendingHuskReason or "pending_husk")
+        end
+        return nil
+    end
+    original = { x = record.x, y = record.y, z = record.z }
+    position = resolveSpawnPosition(record, reason, now)
+    if not position then
+        if PresenceDiagnostics and PresenceDiagnostics.LogMaterializeGate then
+            PresenceDiagnostics.LogMaterializeGate(record, "spawn_position",
+                record.runtime.lifecycle.lastError or "position_unavailable")
+        end
+        return nil
+    end
+    if not Internal.ConsumeMaterializationBudget(record, reason, nearest) then
+        if PresenceDiagnostics and PresenceDiagnostics.LogMaterializeGate then
+            PresenceDiagnostics.LogMaterializeGate(record, "admission_budget",
+                record.runtime.materializeAdmissionReason
+                    or "tick_budget")
+        end
+        return nil
+    end
+    if PNC.BodyLifecycle and PNC.BodyLifecycle.CleanupRecordShells then
+        cleanedShells, shellCleanupBlocked, shellCleanupReason =
+            PNC.BodyLifecycle.CleanupRecordShells(record, now)
+        if shellCleanupBlocked then
+            markLifecycleFailure(record, "materialize_deferred",
+                shellCleanupReason or "recognized_shell_removal_failed")
+            scheduleMaterializationRetry(
+                record,
+                now + (tonumber(Const.BODY_SHELL_MAINTENANCE_MS) or 1000)
+            )
+            if PresenceDiagnostics and PresenceDiagnostics.LogMaterializeGate then
+                PresenceDiagnostics.LogMaterializeGate(record,
+                    "record_shell_cleanup",
+                    shellCleanupReason or "recognized_shell_removal_failed")
+            end
+            return nil
+        end
+        if (tonumber(cleanedShells) or 0) > 0 then
+            if PresenceDiagnostics and PresenceDiagnostics.LogMaterializeGate then
+                PresenceDiagnostics.LogMaterializeGate(record,
+                    "record_shell_cleanup", "shell_removed_before_spawn")
+            end
+            return nil
+        end
     end
     beginMaterialization(record, reason, now)
-    zombie = spawnBody(record, position, reason)
-    if not zombie then return nil end
-    configureBody(record, zombie)
+    local spawnOk, spawnResult = pcall(spawnBody, record, position, reason)
+    if not spawnOk then
+        markLifecycleFailure(
+            record,
+            "materialize_failed",
+            "spawn_exception:" .. tostring(spawnResult)
+        )
+        scheduleMaterializationRetry(
+            record,
+            now + (tonumber(Const.MATERIALIZE_CHUNK_RETRY_MS) or 250)
+        )
+        Core.LogWarn("PNC materialization spawn exception npc="
+            .. tostring(record.id) .. " reason=" .. tostring(spawnResult))
+        if PresenceDiagnostics and PresenceDiagnostics.LogMaterializeGate then
+            PresenceDiagnostics.LogMaterializeGate(record, "spawn_exception",
+                tostring(spawnResult))
+        end
+        return nil
+    end
+    zombie = spawnResult
+    if not zombie then
+        scheduleMaterializationRetry(
+            record,
+            now + (tonumber(Const.MATERIALIZE_CHUNK_RETRY_MS) or 250)
+        )
+        if PresenceDiagnostics and PresenceDiagnostics.LogMaterializeGate then
+            PresenceDiagnostics.LogMaterializeGate(record, "spawn_body",
+                "spawn_returned_no_body")
+        end
+        return nil
+    end
+    local configured, configureError = pcall(configureBody, record, zombie)
+    if not configured then
+        if PresenceDiagnostics and PresenceDiagnostics.LogMaterializeGate then
+            PresenceDiagnostics.LogMaterializeGate(record, "configure_body",
+                "configure_failed:" .. tostring(configureError))
+        end
+        return abortMaterialization(record, zombie,
+            "configure_failed:" .. tostring(configureError))
+    end
+    if PNC.BodyLifecycle
+        and PNC.BodyLifecycle.ClearEngineInvulnerability
+        and not PNC.BodyLifecycle.ClearEngineInvulnerability(zombie)
+    then
+        if PresenceDiagnostics and PresenceDiagnostics.LogMaterializeGate then
+            PresenceDiagnostics.LogMaterializeGate(record, "body_safety",
+                "invulnerable_body_rejected")
+        end
+        return abortMaterialization(record, zombie,
+            "invulnerable_body_rejected")
+    end
     return finishMaterialization(
         record,
         zombie,

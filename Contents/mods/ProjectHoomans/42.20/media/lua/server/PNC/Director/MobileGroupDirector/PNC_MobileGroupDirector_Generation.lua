@@ -173,7 +173,11 @@ function Director.GenerateForFaction(factionID, spec)
             end
         end
         if requestedPresence == "abstract" then
-            record.runtime.forceAbstract = true
+            -- Abstract is an initial placement preference, not a permanent
+            -- bodyless lock. Nearby players must still be able to materialize
+            -- this NPC through the normal presence pipeline.
+            record.runtime.abstractPreference = true
+            record.runtime.forceAbstract = nil
             if record.presenceState == Const.PRESENCE_LIVE
                 and PNC.Presence and PNC.Presence.Abstract
             then

@@ -43,7 +43,7 @@ end
 
 function ISPNCScavengeWindow:createChildren()
     UI.Window.createChildren(self)
-    self.searchEntry = UI.CreateTextEntry(self, {
+    self.searchEntry = UI.CreateSearchEntry(self, {
         clearButton = true,
         width = 200,
         height = 26,

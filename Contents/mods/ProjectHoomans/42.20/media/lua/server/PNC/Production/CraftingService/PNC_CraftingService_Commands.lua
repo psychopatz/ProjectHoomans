@@ -13,7 +13,7 @@ local function requiredStationId(descriptor, operation)
     local definitions = PNC.WorkDefinitions
     local station = definitions and definitions.GetStationForRecipe
         and definitions.GetStationForRecipe(descriptor, operation) or nil
-    return station and station.id or "workshop"
+    return station and station.id or nil
 end
 
 local function retainedActivityItemFullType(requirements, reservation)
@@ -56,6 +56,12 @@ function Service.Commands.QueueCraft(player, recipeId, quantity)
             if row.consumed ~= false then requirements[#requirements + 1] = row end
         end
     end
+    local requiredStation = requiredStationId(resolved.descriptor, "CRAFT")
+    local requiresStation = resolved.descriptor
+        and resolved.descriptor.requiresSpecificWorkstation == true
+    if requiresStation and not requiredStation then
+        return nil, "STATION_UNRESOLVED"
+    end
     local reservation
     reservation, reason = PNC.ColonyStorageService.ReserveProductionMaterials(
         ctx.storage.id, requirements, "craft:" .. tostring(recipeId))
@@ -64,7 +70,7 @@ function Service.Commands.QueueCraft(player, recipeId, quantity)
     order, reason = PNC.WorkService.Commands.Queue({ operation = "CRAFT",
         colonyId = ctx.colony.id, factionId = ctx.faction.id, baseId = ctx.base.id,
         recipeId = recipeId, quantity = quantity,
-        requiredStationId = requiredStationId(resolved.descriptor, "CRAFT"),
+        requiredStationId = requiredStation,
         productionSkillId = resolved.descriptor.productionSkillId,
         requiredWork = math.max(20, resolved.descriptor.craftTime * quantity),
         requiredSkills = resolved.descriptor.requiredSkills,

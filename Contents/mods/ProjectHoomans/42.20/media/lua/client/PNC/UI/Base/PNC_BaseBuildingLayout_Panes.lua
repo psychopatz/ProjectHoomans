@@ -1,4 +1,7 @@
 local Panes = {}
+local MINIMUM_MATERIAL_WIDTH = 320
+local MINIMUM_QUEUE_WIDTH = 220
+local SPLITTER_HIT_WIDTH = 16
 
 function Panes.Apply(window, content, Layout, metrics)
     local gap = metrics.gap
@@ -27,14 +30,31 @@ function Panes.Apply(window, content, Layout, metrics)
     Layout.SetBounds(window.baseBuildingDetails, content.x, detailsY,
         width, detailsHeight)
     local lowerY = detailsY + detailsHeight + gap
+    local splitterWidth = Layout.Pixels(SPLITTER_HIT_WIDTH,
+        window.uiScale or 1)
     -- Clamp the split so the requirements pane can never be squeezed to zero
     -- or pushed left of the content rect by a narrow window.
-    local queueWidth = math.min(
-        math.max(Layout.Pixels(220, window.uiScale),
-            math.floor(width * 0.34)),
-        math.max(Layout.Pixels(140, window.uiScale),
-            math.floor(width * 0.5)))
-    local materialWidth = math.max(1, width - queueWidth - gap)
+    local split = Layout.HorizontalSplit({
+        x = content.x,
+        y = lowerY,
+        width = width,
+        height = lowerHeight,
+    }, {
+        -- metrics.gap is already scaled by the Base layout. Keep the Core
+        -- splitter from scaling that value a second time, while still
+        -- scaling the pane minimums with this window.
+        scale = 1,
+        gap = gap,
+        firstRatio = window.baseBuildingLowerSplitRatio or 0.66,
+        minFirst = Layout.Pixels(MINIMUM_MATERIAL_WIDTH,
+            window.uiScale or 1),
+        minSecond = Layout.Pixels(MINIMUM_QUEUE_WIDTH,
+            window.uiScale or 1),
+    })
+    local materialWidth = split.first.width
+    local queueWidth = split.second.width
+    window.baseBuildingLowerSplitAvailable = split.available
+    window.baseBuildingLowerSplitRatio = split.first.width / split.available
     -- The lists carry their own 25px section heading; layoutContent() offsets
     -- the rows below it. Without it the rows drew inside the heading band,
     -- which is what made REQUIREMENTS and BLUEPRINT QUEUE look misplaced.
@@ -42,12 +62,12 @@ function Panes.Apply(window, content, Layout, metrics)
         window:layoutPane(window.baseBuildingMaterialPane, content.x, lowerY,
             materialWidth, lowerHeight)
         window:layoutPane(window.baseBuildingNativeQueuePane,
-            content.x + materialWidth + gap, lowerY, queueWidth, lowerHeight)
+            split.second.x, lowerY, queueWidth, lowerHeight)
     else
         Layout.SetBounds(window.baseBuildingMaterialPane, content.x, lowerY,
             materialWidth, lowerHeight)
         Layout.SetBounds(window.baseBuildingNativeQueuePane,
-            content.x + materialWidth + gap, lowerY, queueWidth, lowerHeight)
+            split.second.x, lowerY, queueWidth, lowerHeight)
         if window.baseBuildingMaterialPane.layoutContent then
             window.baseBuildingMaterialPane:layoutContent()
         end
@@ -56,6 +76,16 @@ function Panes.Apply(window, content, Layout, metrics)
         end
     end
 
+    local divider = window.baseBuildingLowerSplitDivider
+    if divider then
+        Layout.SetBounds(divider,
+            content.x + split.first.width
+                + math.floor((split.gap - splitterWidth) / 2),
+            lowerY, splitterWidth, lowerHeight)
+        divider:setRange(split.minimumFirst, split.maximumFirst)
+        divider:setValue(split.first.width, true)
+        divider:bringToTop()
+    end
 end
 
 return Panes

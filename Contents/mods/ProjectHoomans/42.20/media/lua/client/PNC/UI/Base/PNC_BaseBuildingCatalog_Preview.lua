@@ -7,7 +7,7 @@ local function facilityBuildUI()
     local buildUI = PNC.FacilityBuildUI
     if buildUI and buildUI.DrawNativePreview then return buildUI end
     local ok, loaded = pcall(require,
-        "PNC/UI/SettlementManagement/PNC_SettlementManagement_FacilityBuildModal")
+        "PNC/UI/Shared/PNC_FacilityBuildProvider")
     if ok and loaded then return loaded end
     return buildUI
 end

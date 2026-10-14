@@ -161,15 +161,30 @@ end
 local function restoreBodyHint(record, raw)
     local bodyHint = type(raw.bodyHint) == "table"
         and raw.bodyHint or nil
-    if bodyHint and bodyHint.instanceID ~= nil then
+    if bodyHint
+        and (bodyHint.instanceID ~= nil or bodyHint.populationId ~= nil)
+    then
         record.runtime.startupBodyHint = {
-            instanceID = tostring(bodyHint.instanceID),
+            instanceID = bodyHint.instanceID ~= nil
+                and tostring(bodyHint.instanceID) or nil,
             onlineID = tonumber(bodyHint.onlineID),
             lease = Internal.normalizeString(bodyHint.lease),
+            populationId = Internal.normalizeString(bodyHint.populationId),
             x = Internal.normalizeNumber(bodyHint.x, record.x),
             y = Internal.normalizeNumber(bodyHint.y, record.y),
             z = Internal.normalizeNumber(bodyHint.z, record.z),
         }
+        record.runtime.lastLiveBodyInstanceID =
+            record.runtime.startupBodyHint.instanceID
+        record.runtime.lastLiveBodyPopulationID =
+            record.runtime.startupBodyHint.populationId
+        record.runtime.lastLiveBodyOnlineID =
+            record.runtime.startupBodyHint.onlineID
+        record.runtime.lastLiveBodyLease =
+            record.runtime.startupBodyHint.lease
+        record.runtime.lastLiveBodyX = record.runtime.startupBodyHint.x
+        record.runtime.lastLiveBodyY = record.runtime.startupBodyHint.y
+        record.runtime.lastLiveBodyZ = record.runtime.startupBodyHint.z
     end
 end
 

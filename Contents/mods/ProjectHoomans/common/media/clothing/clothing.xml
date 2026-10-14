@@ -18,6 +18,15 @@
 		<m_AllowTopTint>false</m_AllowTopTint>
 		<m_AllowTShirtDecal>false</m_AllowTShirtDecal>
 	</m_MaleOutfits>
+	<m_MaleOutfits>
+		<m_Name>PNCShellCarrier</m_Name>
+		<m_Guid>7c2c7e1b-3d5e-4b2d-8d9e-6a2a8a4f9c11</m_Guid>
+		<m_Top>false</m_Top>
+		<m_Pants>false</m_Pants>
+		<m_AllowPantsHue>false</m_AllowPantsHue>
+		<m_AllowTopTint>false</m_AllowTopTint>
+		<m_AllowTShirtDecal>false</m_AllowTShirtDecal>
+	</m_MaleOutfits>
 	<m_FemaleOutfits>
 		<m_Name>PNCCompanionFemale</m_Name>
 		<m_Guid>f2672f1f-55eb-4c2f-a60b-5a9aa0307062</m_Guid>
@@ -32,6 +41,15 @@
 		<m_Guid>032bb209-4c22-4272-8556-a4e2d166e69a</m_Guid>
 		<m_Top>true</m_Top>
 		<m_Pants>true</m_Pants>
+		<m_AllowPantsHue>false</m_AllowPantsHue>
+		<m_AllowTopTint>false</m_AllowTopTint>
+		<m_AllowTShirtDecal>false</m_AllowTShirtDecal>
+	</m_FemaleOutfits>
+	<m_FemaleOutfits>
+		<m_Name>PNCShellCarrier</m_Name>
+		<m_Guid>f4d1b2a9-6e3c-4f7a-9b5d-2c8e1a7f0d44</m_Guid>
+		<m_Top>false</m_Top>
+		<m_Pants>false</m_Pants>
 		<m_AllowPantsHue>false</m_AllowPantsHue>
 		<m_AllowTopTint>false</m_AllowTopTint>
 		<m_AllowTShirtDecal>false</m_AllowTShirtDecal>

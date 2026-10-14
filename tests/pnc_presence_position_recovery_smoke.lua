@@ -164,7 +164,8 @@ T.equal(materialized, body, "saved NPC materialized")
 T.equal(registeredBody, body, "repaired body registered")
 T.equal(spawn.x, 0.5, "vehicle-stuck spawn repaired x")
 T.equal(spawn.y, 0.5, "vehicle-stuck spawn repaired y")
-T.equal(spawn.outfit, "Naked", "PNC engine shell uses naked base outfit")
+T.equal(spawn.outfit, "PNCShellCarrier",
+    "PNC engine shell uses the durable carrier outfit")
 T.equal(record.x, spawn.x, "repaired record x")
 T.equal(record.presenceState, "live", "repaired record live")
 T.equal(record.runtime.positionRecovery.lastEvent, "materialize_relocate",
@@ -324,6 +325,49 @@ materialized = PNC.Presence.Materialize(movingRecord, "range_enter")
 T.equal(materialized, body, "moving abstract NPC materialized after settle")
 T.equal(spawnCount, previousSpawnCount + 1, "moving NPC created one body")
 T.equal(spawn.x, 8.5, "moving NPC uses latest abstract position")
+
+local failingRecord = {
+    id = "spawn_exception_retry",
+    name = "Spawn Exception Retry",
+    alive = true,
+    presenceState = "abstract",
+    x = 0.5,
+    y = 0.5,
+    z = 0,
+    runtime = {},
+}
+PNC.BodyLifecycle = {
+    SpawnLiveBody = function()
+        error("fixture_spawn_failure")
+    end,
+}
+now = 7000
+materialized = PNC.Presence.Materialize(failingRecord, "force_live_spawn")
+T.equal(materialized, nil, "spawn exception remains abstract")
+T.equal(
+    failingRecord.runtime.lifecycle.phase,
+    "abstract",
+    "spawn exception left a stale materializing phase"
+)
+T.equal(
+    failingRecord.runtime.materializeRetryAt,
+    7250,
+    "spawn exception retry was scheduled"
+)
+T.equal(presenceWakeAt, 7250, "spawn exception woke presence lane")
+
+PNC.BodyLifecycle = {
+    SpawnLiveBody = function() return body end,
+    ClearEngineInvulnerability = function() return true end,
+}
+now = 7250
+materialized = PNC.Presence.Materialize(failingRecord, "force_live_spawn")
+T.equal(materialized, body, "failed spawn retried successfully")
+T.equal(
+    failingRecord.runtime.lifecycle.phase,
+    "live",
+    "successful materialization did not mark lifecycle live"
+)
 T.finish("pnc_presence_position_recovery_smoke")
 
 T.finish("pnc_presence_position_recovery_smoke")

@@ -145,15 +145,31 @@ end
 
 function Network.BroadcastBodyRemoval(id, bodyInstanceID, bodyOnlineID, reason)
     local payload
+    local normalizedInstanceID
     if not Core.IsAuthority() then
         return false
     end
+    normalizedInstanceID = bodyInstanceID ~= nil
+        and tostring(bodyInstanceID) or nil
+    if normalizedInstanceID == "" or normalizedInstanceID == "0" then
+        normalizedInstanceID = nil
+    end
     payload = {
         id = id and tostring(id) or nil,
-        bodyInstanceID = bodyInstanceID ~= nil and tostring(bodyInstanceID) or nil,
+        bodyInstanceID = normalizedInstanceID,
         bodyOnlineID = tonumber(bodyOnlineID),
         reason = tostring(reason or "stale_body"),
     }
+    if payload.id == nil
+        and payload.bodyInstanceID == nil
+        and payload.bodyOnlineID == nil
+    then
+        if Core.LogWarn then
+            Core.LogWarn("PNC body removal suppressed without identity reason="
+                .. tostring(payload.reason))
+        end
+        return false
+    end
     if isServer and isServer() then
         -- A stale engine zombie can be present on a client before that client
         -- has entered the NPC interest set. Send instance removals to every
@@ -162,7 +178,13 @@ function Network.BroadcastBodyRemoval(id, bodyInstanceID, bodyOnlineID, reason)
             Internal.SendToPlayer(player, Const.CMD_REMOVE_BODY, payload)
         end)
     else
-        triggerEvent("OnServerCommand", Const.MODULE, Const.CMD_REMOVE_BODY, payload)
+        -- Integrated singleplayer shares the authoritative body with the
+        -- client. A loopback command would make the client scan every local
+        -- IsoZombie and can match ordinary zombies through instance ID 0.
+        if Core.LogDebug then
+            Core.LogDebug("PNC body removal kept local authority reason="
+                .. tostring(payload.reason))
+        end
     end
     return true
 end

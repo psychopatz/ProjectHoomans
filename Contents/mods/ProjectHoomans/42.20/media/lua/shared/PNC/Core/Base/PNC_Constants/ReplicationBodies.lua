@@ -38,9 +38,30 @@ Const.CORPSE_REANIMATE_RETRY_MAX = 3
 Const.CORPSE_REANIMATE_RETRY_MS = 2000
 Const.BODY_TAG_VERSION = 1
 Const.BODY_SHELL_VERSION = 1
+-- A PNC-only empty outfit whose engine persistent id is carried by a
+-- virtualized zombie-population record. Keep legacy Naked bodies readable
+-- while new bodies use this collision-resistant carrier.
+Const.BODY_SHELL_OUTFIT = "PNCShellCarrier"
+Const.BODY_SHELL_OUTFIT_LEGACY = "Naked"
+Const.BODY_SHELL_CARRIER_VERSION = 1
 Const.BODY_SHELL_RESPAWN_DELAY_MS = 50
 Const.BODY_SHELL_MAINTENANCE_MS = 1000
 Const.BODY_SHELL_STARTUP_PASSES = 3
+-- Leave a short engine-population settling window after shell cleanup before
+-- presence resumes. Re-materialization is then spaced so a relog near several
+-- NPCs cannot create a same-frame zombie burst.
+Const.BODY_SHELL_STARTUP_SETTLE_MS = 1500
+Const.BODY_SHELL_STARTUP_MATERIALIZE_SPACING_MS = 250
+Const.BODY_SHELL_STARTUP_BURST_MS = 5000
+-- Startup cleanup is best-effort. A missing/streaming cell must not strand
+-- every abstract NPC forever behind the materialization gate.
+Const.BODY_SHELL_STARTUP_MAX_WAIT_MS = 10000
+-- A createZombie fallback bypasses ordinary population admission. It is safe
+-- only because BodyFactory immediately dresses it in the PNC-only carrier,
+-- verifies a non-zero persistent outfit id, clears engine invulnerability,
+-- and aborts the body if any of those steps fail. NPC presence must not be
+-- disabled by the world's ordinary zombie-count setting.
+Const.BODY_FACTORY_ALLOW_FALLBACK = true
 --[[
     Husk lifecycle budget.
 
@@ -54,6 +75,10 @@ Const.BODY_SHELL_STARTUP_PASSES = 3
 ]]
 Const.HUSK_LEDGER_MODDATA_KEY = "PNC_HuskLedger"
 Const.HUSK_LEDGER_LAYOUT_VERSION = 2
+-- Carrier ids learned before the positive-only orphan policy was installed
+-- must not be trusted on an existing save: older code promoted every outfit
+-- id, including vanilla Naked, into this set.
+Const.HUSK_LEDGER_CARRIER_POLICY_VERSION = 1
 Const.HUSK_LEDGER_MAX_ENTRIES = 48
 Const.HUSK_LEDGER_MAX_PER_RECORD = 2
 -- Long enough that a husk in an area the player revisits days later is still reaped.
@@ -73,6 +98,7 @@ Const.HUSK_DEBUG_MAX_OUTFITS = 8
 -- The engine picks a shell outfit id per call, so the learned set accumulates
 -- across sessions. Bound it so the persisted diagnostics cannot grow forever.
 Const.HUSK_LEDGER_MAX_SHELL_OUTFITS = 32
+Const.HUSK_LEDGER_MAX_SHELL_CARRIERS = 256
 -- IsoWorld.getZombiesDisabled() is a Java call on the hot zombie-spawn path;
 -- cache it for this long.
 Const.ZOMBIE_SPAWN_DISABLED_CACHE_MS = 1000

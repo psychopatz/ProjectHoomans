@@ -120,6 +120,8 @@ Lifecycle.OnZombieCreate(husk)
 T.equal(#Reaper.pending, 1, "matched husk was not queued")
 T.equal(Lifecycle.HuskLedgerCount(), 0,
     "queued husk loss stayed armed for a second reap")
+T.truthy(Lifecycle.HasPendingHuskForRecord("npc_reap"),
+    "queued husk was invisible to materialization deduplication")
 
 T.equal(Lifecycle.PumpHuskReaper(5000, true), 1, "pump reclaimed no husk")
 T.equal(husk.removedFromWorld, true, "husk was not removed from the world")
@@ -129,8 +131,53 @@ T.equal(husk.humanized, true, "husk was removed without the safety flags")
 T.equal(Reaper.reaped, 1, "reap counter")
 T.equal(reapedLogs, 1, "reap was not reported")
 T.equal(#Reaper.pending, 0, "pending queue was not drained")
+T.falsy(Lifecycle.HasPendingHuskForRecord("npc_reap"),
+    "reaped husk still blocked materialization")
 
--- 2. Our own body: the factory's spawn window must suppress interception even
+-- 2. A persisted startup seed is only a future identity hint. It must remain
+-- matchable by the reaper, but it must not block a nearby abstract NPC when no
+-- matching husk is currently present in the world.
+local startupSeed = Lifecycle.NoteLostBody(
+    makeRecord("npc_startup_seed", 1100.4, 1200.6, 0, "42"),
+    makeHusk(1100.4, 1200.6, 0, 42),
+    "startup_seed"
+)
+T.truthy(startupSeed, "startup seed was not armed")
+T.truthy(Lifecycle.FindHuskEntry(makeHusk(1100.4, 1200.6, 0, 42)),
+    "startup seed was not matchable")
+T.falsy(Lifecycle.HasPendingHuskForRecord("npc_startup_seed"),
+    "startup seed incorrectly blocked materialization")
+T.truthy(Lifecycle.ConsumeHuskEntry(startupSeed),
+    "startup seed cleanup failed")
+
+-- 2b. A persisted non-seed loss is only a future population-manager hint
+-- when no matching unmarked body is loaded. It must not strand the record in
+-- abstract mode for the ledger TTL.
+local staleEntry = Lifecycle.NoteLostBody(
+    makeRecord("npc_stale_ledger", 1200.4, 1300.6, 0, "43"),
+    makeHusk(1200.4, 1300.6, 0, 43),
+    "audit_body_missing"
+)
+T.truthy(staleEntry, "stale ledger loss was not armed")
+censusBodies = {}
+T.falsy(Lifecycle.HasPendingHuskForRecord("npc_stale_ledger"),
+    "stale ledger row blocked materialization without a loaded husk")
+
+-- An identity-matching unmarked body remains protected even though the
+-- ledger row is persisted rather than queued by the create callback.
+local loadedLedgerHusk = makeHusk(1200.4, 1300.6, 0, 43)
+censusBodies = { loadedLedgerHusk }
+local pendingLoaded, pendingLoadedReason =
+    Lifecycle.HasPendingHuskForRecord("npc_stale_ledger")
+T.truthy(pendingLoaded,
+    "loaded ledger husk did not block materialization")
+T.equal(pendingLoadedReason, "loaded_husk",
+    "loaded ledger husk reported the wrong guard reason")
+censusBodies = {}
+T.truthy(Lifecycle.ConsumeHuskEntry(staleEntry),
+    "stale ledger cleanup failed")
+
+-- 3. Our own body: the factory's spawn window must suppress interception even
 -- when a ledger entry would otherwise match.
 armLoss("npc_own", 300.4, 400.6, 0, 42)
 local own = makeHusk(300.4, 400.6, 0, 42)
@@ -140,25 +187,25 @@ Internal.SpawnInProgress = false
 T.equal(#Reaper.pending, 0, "spawn window did not suppress interception")
 T.equal(Lifecycle.HuskLedgerCount(), 1, "suppressed match consumed the loss")
 
--- 3. A marked body belongs to the registry/audit lanes, never the reaper.
+-- 4. A marked body belongs to the registry/audit lanes, never the reaper.
 local marked = makeHusk(300.4, 400.6, 0, 42)
 marked.modData.PNC_UUID = "npc_own"
 Lifecycle.OnZombieCreate(marked)
 T.equal(#Reaper.pending, 0, "marked body was queued for reaping")
 
--- 4. An unmarked body with no ledger match is untouched.
+-- 5. An unmarked body with no ledger match is untouched.
 local ordinary = makeHusk(500, 500, 0, 7)
 Lifecycle.OnZombieCreate(ordinary)
 T.equal(#Reaper.pending, 0, "ordinary zombie was queued for reaping")
 
--- 5. Client side / non-authority instances never reap.
+-- 6. Client side / non-authority instances never reap.
 authority = false
 local foreign = makeHusk(300.4, 400.6, 0, 42)
 Lifecycle.OnZombieCreate(foreign)
 T.equal(#Reaper.pending, 0, "non-authority instance queued a reap")
 authority = true
 
--- 6. A removal that does not take keeps the loss so a later pass can retry.
+-- 7. A removal that does not take keeps the loss so a later pass can retry.
 local stuck = makeHusk(300.4, 400.6, 0, 42, true)
 Lifecycle.OnZombieCreate(stuck)
 T.equal(#Reaper.pending, 1, "stuck husk was not queued")
@@ -169,7 +216,7 @@ T.equal(Lifecycle.HuskLedgerCount(), 1,
     "failed removal forgot the husk instead of rearming it")
 T.equal(Reaper.abandoned, 0, "unexpected early abandon")
 
--- 7. Attempts are bounded: an unreapable husk stops being retried and is kept
+-- 8. Attempts are bounded: an unreapable husk stops being retried and is kept
 -- only as an expiring diagnostic record, so a refusal cannot loop forever.
 local attempts = 0
 while attempts < 6 and Reaper.abandoned == 0 do
@@ -185,7 +232,7 @@ T.equal(Lifecycle.HuskLedgerCount(), 1,
 T.falsy(Lifecycle.FindHuskEntry(makeHusk(300.4, 400.6, 0, 42)),
     "abandoned husk was still matchable")
 
--- 8. The loaded sweep catches husks whose create event was missed. It must not
+-- 9. The loaded sweep catches husks whose create event was missed. It must not
 -- touch the abandoned record either.
 local sweepEntry = armLoss("npc_sweep", 800.4, 900.6, 0, 42)
 T.truthy(sweepEntry, "sweep loss was not armed")
@@ -197,21 +244,29 @@ T.truthy(Lifecycle.PumpHuskReaper(20000, true) >= 1,
     "loaded sweep did not reclaim the husk")
 T.equal(sweepHusk.removedFromWorld, true, "swept husk was not removed")
 
--- 9. Orphan rule. In a world that cannot spawn vanilla zombies, ANY unmarked
--- body is an orphaned PNC shell: the reclaim must not depend on a learned
--- outfit id (a Lua-created body cannot set one there) or on a recorded loss.
+-- 10. Positive carrier fallback. Spawn settings are not ownership evidence:
+-- ordinary zombies may already exist in an existing save. Only a learned
+-- PNC-only carrier id can trigger the no-ledger fallback.
 T.truthy(Lifecycle.NoteShellOutfitID(42), "shell outfit id was not learned")
 T.truthy(Lifecycle.IsShellOutfitID(42), "learned shell outfit not recognized")
 T.falsy(Lifecycle.IsShellOutfitID(7), "unrelated outfit recognized as a shell")
+T.truthy(Lifecycle.NoteShellCarrierID(42), "shell carrier id was not learned")
 
 -- The spawn gate is cached for a short window, so advance the clock past it
 -- before changing the configuration.
 spawnsDisabled = true
 nowMs = nowMs + 2000
 censusBodies = {}
-local orphan = makeHusk(1500.4, 1600.6, 0, 0)
+local ordinaryDisabled = makeHusk(1500.4, 1600.6, 0, 0)
+T.falsy(Lifecycle.IsOrphanedShell(ordinaryDisabled),
+    "unmarked ordinary body was treated as an orphan")
+Lifecycle.OnZombieCreate(ordinaryDisabled)
+T.equal(#Reaper.pending, 0,
+    "unmarked ordinary body was queued in a zombie-disabled world")
+
+local orphan = makeHusk(1501.4, 1601.6, 0, 42)
 T.truthy(Lifecycle.IsOrphanedShell(orphan),
-    "unmarked body was not an orphan in a zombie-disabled world")
+    "learned carrier shell was not recognized")
 Lifecycle.OnZombieCreate(orphan)
 T.equal(#Reaper.pending, 1, "orphaned shell was not queued")
 Lifecycle.PumpHuskReaper(30000, true)
@@ -236,9 +291,9 @@ T.equal(#Reaper.pending, 0, "marked body was queued as an orphan")
 -- Toggling zombie spawning back on disables the rule entirely.
 spawnsDisabled = false
 nowMs = nowMs + 2000
-local vanillaSafe = makeHusk(1700.4, 1800.6, 0, 42)
+local vanillaSafe = makeHusk(1700.4, 1800.6, 0, 7)
 T.falsy(Lifecycle.IsOrphanedShell(vanillaSafe),
-    "orphan rule stayed active in a vanilla-eligible world")
+    "unlearned vanilla outfit was treated as a carrier")
 Lifecycle.OnZombieCreate(vanillaSafe)
 T.equal(#Reaper.pending, 0,
     "a vanilla-eligible world queued an unmarked zombie")

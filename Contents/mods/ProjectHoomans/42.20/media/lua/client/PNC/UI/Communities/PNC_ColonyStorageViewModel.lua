@@ -4,20 +4,29 @@ PNC.ColonyStorageViewModel = PNC.ColonyStorageViewModel or {}
 local ViewModel = PNC.ColonyStorageViewModel
 local InventoryModel = PNC.InventoryUIModel
     or require "PNC/UI/Inventory/PNC_InventoryUI_Model"
+local SearchIndex = require "PsychopatzCore/UI/PsychopatzSearchIndex"
+local SEARCH_INDEXES = setmetatable({}, { __mode = "k" })
 
 local function lower(value)
     return string.lower(tostring(value or ""))
 end
 
-function ViewModel.GetVisibleRows(storage, search, sort)
-    search = lower(search)
+function ViewModel.GetVisibleRows(storage, search, sort, revision)
     sort = tostring(sort or "name")
-    local rows = {}
-    for _, row in ipairs(storage and storage.rows or {}) do
-        if search == "" or string.find(lower(row.name), search, 1, true)
-            or string.find(lower(row.fullType), search, 1, true)
-        then rows[#rows + 1] = row end
+    if not storage then return {} end
+    local index = SEARCH_INDEXES[storage]
+    if not index then
+        index = SearchIndex.New({
+            key = function(row) return row and row.recordIndex end,
+            fields = function(row)
+                return { row and row.name, row and row.fullType }
+            end,
+        })
+        SEARCH_INDEXES[storage] = index
     end
+    index:SetSource(storage.rows or {}, revision or storage.inventoryRevision
+        or storage.revision)
+    local rows = index:Query(search)
     table.sort(rows, function(left, right)
         if sort == "quantity" and left.quantity ~= right.quantity then
             return left.quantity > right.quantity
@@ -30,11 +39,13 @@ function ViewModel.GetVisibleRows(storage, search, sort)
     return rows
 end
 
-function ViewModel.BuildInventoryRows(storage, search, sort, collapsedGroups)
+function ViewModel.BuildInventoryRows(storage, search, sort, collapsedGroups,
+    revision)
     local categories = {}
     local order = {}
     collapsedGroups = type(collapsedGroups) == "table" and collapsedGroups or {}
-    for _, row in ipairs(ViewModel.GetVisibleRows(storage, search, sort)) do
+    for _, row in ipairs(ViewModel.GetVisibleRows(storage, search, sort,
+        revision)) do
         local metadata = InventoryModel.Probe(row.fullType)
         local category = tostring(metadata.category or "Item")
         local bucket = categories[category]

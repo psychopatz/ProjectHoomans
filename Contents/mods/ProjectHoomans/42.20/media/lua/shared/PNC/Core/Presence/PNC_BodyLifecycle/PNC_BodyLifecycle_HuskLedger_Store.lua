@@ -8,10 +8,11 @@
     manager later hands back as a real zombie. That body is the "husk".
 
     The ledger keeps a bounded, persisted memory of those losses so the reaper
-    can delete the husk at the moment it is handed back. Entries only exist for
-    bodies that carried an engine identity hint (persistent outfit id); without
-    that hint a husk is indistinguishable from an ordinary zombie and we refuse
-    to arm a reap rather than risk deleting a vanilla body.
+    can delete the husk at the moment it is handed back. Entries require an
+    engine identity hint (persistent outfit id, with population id retained
+    when exposed); without any hint a husk is indistinguishable from an
+    ordinary zombie and we refuse to arm a reap rather than risk deleting a
+    vanilla body.
 
     Entries never leave the ledger except by reaping or expiry, so a save that
     already contains husks is cleaned up on the next load instead of growing.
@@ -30,6 +31,7 @@ Lifecycle.HuskLedger = Lifecycle.HuskLedger or {
     entries = {},
     index = {},
     shellOutfitIds = {},
+    shellCarrierIds = {},
     loaded = false,
     writes = 0,
     refreshes = 0,
@@ -137,15 +139,15 @@ end
 
     Entries are written as positional arrays so the global ModData payload does
     not repeat a key name per field per entry. Field order is append-only and
-    guarded by HUSK_LEDGER_LAYOUT_VERSION: bump the version when it changes and
-    older rows are discarded instead of misread.
+    guarded by HUSK_LEDGER_LAYOUT_VERSION. The optional population id is
+    appended after the existing v2 fields so old rows remain readable.
 
         1 x, 2 y, 3 z, 4 outfitId, 5 at (world hours), 6 attempts,
-        7 npcId, 8 reason, 9 abandoned
+        7 npcId, 8 reason, 9 abandoned, 10 populationId (optional)
 ]]
 local ENTRY_LAYOUT = {
     "x", "y", "z", "outfitId", "at", "attempts", "npcId", "reason",
-    "abandoned",
+    "abandoned", "populationId",
 }
 
 local function unpackEntry(row)
@@ -171,6 +173,7 @@ local function unpackEntry(row)
         attempts = math.max(0, math.floor(tonumber(row[6]) or 0)),
         reason = row[8] ~= nil and tostring(row[8]) or nil,
         abandoned = row[9] == true or nil,
+        populationId = row[10] ~= nil and tostring(row[10]) or nil,
         chunkKey = chunkKey(x, y),
     }
 end
@@ -186,6 +189,16 @@ local function packEntry(entry, row)
     return row
 end
 
+local function compatibleLayout(version, current)
+    -- v1 rows have the original nine fields; v2 only appends populationId.
+    -- Both are decoded by unpackEntry above. Unknown future layouts are not
+    -- guessed at because a positional row could otherwise become unsafe.
+    return version == nil
+        or version == 1
+        or version == 2
+        or version == current
+end
+
 local function persist(ledger)
     local store = ledger.store
     local packed
@@ -199,24 +212,45 @@ local function persist(ledger)
     end
     store.entries = packed
     store.shellOutfitIds = ledger.shellOutfitIds
+    store.shellCarrierIds = ledger.shellCarrierIds
     store.layoutVersion = tonumber(Const.HUSK_LEDGER_LAYOUT_VERSION) or 2
+    store.shellCarrierPolicyVersion = tonumber(
+        Const.HUSK_LEDGER_CARRIER_POLICY_VERSION
+    ) or 1
 end
 
 local function ensureLoaded()
     local ledger = Lifecycle.HuskLedger
+    ledger.shellOutfitIds = ledger.shellOutfitIds or {}
+    ledger.shellCarrierIds = ledger.shellCarrierIds or {}
     if ledger.loaded == true then
         return ledger
     end
     ledger.loaded = true
     local store = storage()
     local layoutVersion = tonumber(Const.HUSK_LEDGER_LAYOUT_VERSION) or 2
+    local carrierPolicyVersion = tonumber(
+        Const.HUSK_LEDGER_CARRIER_POLICY_VERSION
+    ) or 1
+    local storedLayoutVersion
+    local storedCarrierPolicyVersion
     local index
     if store then
-        if tonumber(store.layoutVersion) ~= layoutVersion then
-            -- Unknown layout: drop the rows rather than misread them. Learned
-            -- shell outfits are version-stable and kept.
+        storedLayoutVersion = tonumber(store.layoutVersion)
+        if not compatibleLayout(storedLayoutVersion, layoutVersion) then
+            -- Unknown layout: drop the rows rather than misread them. Known
+            -- v1/v2 rows are intentionally retained and migrated below.
             store.entries = {}
             store.layoutVersion = layoutVersion
+        end
+        storedCarrierPolicyVersion = tonumber(store.shellCarrierPolicyVersion)
+        if storedCarrierPolicyVersion ~= carrierPolicyVersion then
+            -- The previous implementation learned carrier ids from every
+            -- outfit returned by the engine. Clear that untrusted namespace
+            -- once; the next genuinely stamped PNCShellCarrier body relearns
+            -- its id under the stricter policy.
+            store.shellCarrierIds = {}
+            store.shellCarrierPolicyVersion = carrierPolicyVersion
         end
         ledger.store = store
         ledger.entries = {}
@@ -230,6 +264,9 @@ local function ensureLoaded()
         end
         if type(store.shellOutfitIds) == "table" then
             ledger.shellOutfitIds = store.shellOutfitIds
+        end
+        if type(store.shellCarrierIds) == "table" then
+            ledger.shellCarrierIds = store.shellCarrierIds
         end
         ledger.store = store
         persist(ledger)

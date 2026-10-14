@@ -271,6 +271,37 @@ T.equal(PNC.CompanionVehicle.GetSeatReservation(secondVehicle, 1), false,
 T.equal(syncedAdds >= 4, true, "reservation additions synchronized")
 T.equal(syncedRemoves >= 3, true, "reservation removals synchronized")
 
+local savedPassenger = {
+    id = "saved_vehicle_passenger",
+    name = "Saved Vehicle Passenger",
+    alive = true,
+    presenceState = "abstract",
+    ownerOnlineID = 42,
+    runtime = {},
+}
+local removed
+records[#records + 1] = savedPassenger
+local savedMarker = makeItem("PNC.VehicleSeatReservation")
+local savedData = savedMarker:getModData()
+savedData.PNC_VehicleSeatReservation = true
+savedData.PNC_VehicleSeatReservationVersion = 1
+savedData.PNC_NPC_ID = savedPassenger.id
+savedData.PNC_NPC_NAME = savedPassenger.name
+savedData.PNC_VEHICLE_ID = "vehicle:8"
+savedData.PNC_SEAT = 1
+secondVehicleParts[2]:getItemContainer():AddItem(savedMarker)
+removed = PNC.CompanionVehicle.AuditLoadedReservations(now + 10000, true)
+T.equal(removed, 0, "relog passenger reservation was not discarded")
+T.truthy(
+    savedPassenger.runtime.vehiclePassenger
+        and savedPassenger.runtime.vehiclePassenger.active == true,
+    "relog passenger runtime reservation was not restored"
+)
+T.equal(savedPassenger.runtime.vehiclePassenger.vehicleId, "vehicle:8",
+    "relog passenger vehicle identity restored")
+T.equal(savedPassenger.runtime.vehiclePassenger.seat, 1,
+    "relog passenger seat restored")
+
 local stale = makeItem("PNC.VehicleSeatReservation")
 local staleData = stale:getModData()
 staleData.PNC_VehicleSeatReservation = true
@@ -279,10 +310,10 @@ staleData.PNC_NPC_NAME = "Missing NPC"
 staleData.PNC_VEHICLE_ID = "vehicle:8"
 staleData.PNC_SEAT = 1
 secondVehicleParts[2]:getItemContainer():AddItem(stale)
-local removed = PNC.CompanionVehicle.AuditLoadedReservations(now, true)
+removed = PNC.CompanionVehicle.AuditLoadedReservations(now, true)
 T.equal(removed, 1, "audit removes stale persisted token")
-T.equal(PNC.CompanionVehicle.GetSeatReservation(secondVehicle, 1), false,
-    "stale persisted token no longer occupies seat")
+T.equal(PNC.CompanionVehicle.GetSeatReservation(secondVehicle, 1), true,
+    "valid relog reservation remains after stale token cleanup")
 T.finish("pnc_companion_vehicle_smoke")
 
 T.finish("pnc_companion_vehicle_smoke")

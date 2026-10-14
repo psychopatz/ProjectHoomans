@@ -39,12 +39,13 @@ getGameTime = function()
     }
 end
 
-local function makeZombie(x, y, z, outfitId)
+local function makeZombie(x, y, z, outfitId, populationId)
     return {
         getX = function() return x end,
         getY = function() return y end,
         getZ = function() return z end,
         getPersistentOutfitID = function() return outfitId end,
+        persistentId = populationId,
     }
 end
 
@@ -68,13 +69,14 @@ local Lifecycle = PNC.BodyLifecycle
 local Ledger = Lifecycle.HuskLedger
 
 local record = makeRecord("npc_a", 100, 200, 0, "42")
-local loss = makeZombie(100.4, 200.6, 0, 42)
+local loss = makeZombie(100.4, 200.6, 0, 42, 901)
 
 local entry = Lifecycle.NoteLostBody(record, loss, "removal_after_virtualization")
 T.truthy(entry, "lost body was not recorded")
 T.near(entry.x, 100.4, 0.001, "recorded husk x")
 T.near(entry.y, 200.6, 0.001, "recorded husk y")
 T.equal(entry.outfitId, "42", "recorded outfit identity hint")
+T.equal(entry.populationId, "901", "recorded population identity hint")
 T.equal(entry.npcId, "npc_a", "recorded npc id")
 T.equal(#Ledger.entries, 1, "ledger entry count")
 -- Persistence is a compact positional payload, not the live entry tables, so
@@ -83,6 +85,7 @@ T.equal(#store.entries, 1, "persisted husk row count")
 T.near(store.entries[1][1], 100.4, 0.001, "packed husk x")
 T.equal(store.entries[1][4], "42", "packed outfit identity hint")
 T.equal(store.entries[1][7], "npc_a", "packed npc id")
+T.equal(store.entries[1][10], "901", "packed population identity hint")
 T.falsy(store.entries[1].x, "packed rows must not repeat field names")
 T.equal(Ledger.writes, 1, "ledger write count")
 
@@ -97,6 +100,7 @@ T.truthy(Lifecycle.FindHuskEntry(makeZombie(100.4, 200.6, 0, 42)),
 local reloaded = Ledger.entries[1]
 T.equal(reloaded.npcId, "npc_a", "reloaded npc id")
 T.equal(reloaded.outfitId, "42", "reloaded outfit hint")
+T.equal(reloaded.populationId, "901", "reloaded population hint")
 T.falsy(reloaded.chunkKey == nil, "reloaded entries must be indexed")
 
 -- A second loss for the same record in the same chunk refreshes the entry
@@ -122,6 +126,8 @@ T.equal(Lifecycle.FindHuskEntry(makeZombie(101.2, 201.1, 0, 42)),
     Ledger.entries[1], "matching husk body was not found")
 T.falsy(Lifecycle.FindHuskEntry(makeZombie(100.4, 200.6, 0, 77)),
     "husk matched with the wrong persistent outfit")
+T.falsy(Lifecycle.FindHuskEntry(makeZombie(100.4, 200.6, 0, 42, 902)),
+    "husk matched with the wrong population identity")
 T.falsy(Lifecycle.FindHuskEntry(makeZombie(110, 200.6, 0, 42)),
     "husk matched outside the recorded radius")
 T.truthy(Lifecycle.FindHuskEntry(makeZombie(100.4, 200.6, 1, 42)),

@@ -18,6 +18,74 @@ local worldAgeHours = Deps.worldAgeHours
 local logDebug = Deps.logDebug
 local persist = Deps.persist
 
+local function isProtectedBody(zombie)
+    local ownership
+    local ok
+    local value
+    if not zombie then
+        return false
+    end
+    if zombie.isReanimatedPlayer then
+        ok, value = pcall(zombie.isReanimatedPlayer, zombie)
+        if ok and value == true then
+            return true
+        end
+    end
+    ownership = PNC.Compatibility and PNC.Compatibility.ActorOwnership
+    if ownership and ownership.IsForeignOwned then
+        ok, value = pcall(ownership.IsForeignOwned, zombie)
+        if ok and value == true then
+            return true
+        end
+    end
+    return false
+end
+
+local function safeMember(object, name)
+    local ok, value = pcall(function() return object and object[name] end)
+    return ok and value or nil
+end
+
+local function validEngineIdentity(value)
+    local numeric
+    if value == nil then
+        return false
+    end
+    if tostring(value) == "" or tostring(value) == "0" then
+        return false
+    end
+    numeric = tonumber(value)
+    return numeric == nil or numeric ~= 0
+end
+
+local function populationIDOf(zombie)
+    local value
+    local getter
+    if not zombie then
+        return nil
+    end
+    value = safeMember(zombie, "persistentId")
+    if value == nil then
+        getter = safeMember(zombie, "getPersistentID")
+        if not getter then
+            getter = safeMember(zombie, "getPersistentId")
+        end
+        if getter then
+            local ok, result = pcall(getter, zombie)
+            if ok then value = result end
+        end
+    end
+    value = tonumber(value)
+    if not value or value == 0 then
+        return nil
+    end
+    return tostring(value)
+end
+
+function Lifecycle.GetBodyPopulationID(zombie)
+    return populationIDOf(zombie)
+end
+
 local function positionOf(record, zombie)
     local x
     local y
@@ -52,22 +120,159 @@ end
 
 local function outfitHint(record, zombie)
     local value
+    local readFromEngine = false
     if zombie and zombie.getPersistentOutfitID then
+        readFromEngine = true
         local ok, outfitID = pcall(zombie.getPersistentOutfitID, zombie)
         if ok then
             value = outfitID
         end
     end
-    if value == nil and record then
+    -- A returned zero is an explicit engine result, not a missing API. Never
+    -- replace it with an old record hint: doing so turns a non-identifying
+    -- zombie into a false positive during startup cleanup.
+    if not readFromEngine and value == nil and record then
         value = record.liveBodyInstanceID
+            or (record.runtime and record.runtime.lastIdentityOutfitID)
+            or (record.runtime and record.runtime.lastLiveBodyInstanceID)
             or (record.runtime and record.runtime.startupBodyHint
                 and record.runtime.startupBodyHint.instanceID)
             or nil
     end
-    if value == nil then
+    if not validEngineIdentity(value) then
         return nil
     end
     return tostring(value)
+end
+
+local function samePosition(entry, zombie, radiusSq)
+    local dx
+    local dy
+    local dz
+    if not entry or not zombie then
+        return false
+    end
+    dz = (tonumber(zombie:getZ()) or 0) - (tonumber(entry.z) or 0)
+    if math.abs(dz) > 1 then
+        return false
+    end
+    dx = (tonumber(zombie:getX()) or 0) - (tonumber(entry.x) or 0)
+    dy = (tonumber(zombie:getY()) or 0) - (tonumber(entry.y) or 0)
+    return (dx * dx + dy * dy) <= radiusSq
+end
+
+local function isUnmarkedBody(zombie)
+    local modData
+    if not zombie then
+        return false
+    end
+    if isProtectedBody(zombie) then
+        return false
+    end
+    if PNC.Core and PNC.Core.IsManagedNPCBody
+        and PNC.Core.IsManagedNPCBody(zombie) == true
+    then
+        return false
+    end
+    modData = zombie.getModData and zombie:getModData() or nil
+    if not modData then
+        return true
+    end
+    return modData.PNC_UUID == nil
+        and modData.PNC_NPC ~= true
+        and modData.PNC_Owner == nil
+        and modData.PNC_PersistedShell ~= true
+        and modData.PNC_BodyLease == nil
+        and modData.PNC_TagVersion == nil
+        and modData.PNC_DeathMarkerID == nil
+end
+
+-- Legacy saves contain ledger rows written while PZ returned persistent outfit
+-- id 0. Those rows cannot prove engine identity. They remain recoverable only
+-- through a much narrower migration lane: the row must name a live NPC, the
+-- NPC must currently be abstract/bodyless (or have a vehicle reservation),
+-- the body must be unmarked, and it must still be at the recorded shell
+-- position. Clothing is intentionally not part of the proof: PZ can apply a
+-- default outfit while restoring a zero-ID population shell. This is
+-- deliberately not a general naked-zombie rule.
+local function isLegacyAnonymousHusk(entry, zombie, radiusSq)
+    local registry
+    local record
+    local passenger
+    local reason
+    local bodyOutfitID
+    local bodyOutfitIsZero = false
+    local canonical
+    local canonicalAttached
+    if not entry or not zombie or entry.npcId == nil then
+        return false
+    end
+    reason = tostring(entry.reason or "")
+    if reason ~= "audit_after_virtualization"
+        and reason ~= "audit_removal_unverified"
+        and reason ~= "audit_body_missing"
+        and reason ~= "audit_stale_handle"
+        and reason ~= "missing_body_handle"
+        and reason ~= "startup_seed"
+    then
+        return false
+    end
+    if validEngineIdentity(entry.populationId) then
+        return false
+    end
+    if zombie.getPersistentOutfitID then
+        local ok
+        ok, bodyOutfitID = pcall(zombie.getPersistentOutfitID, zombie)
+        bodyOutfitIsZero = ok and (bodyOutfitID == nil
+            or tonumber(bodyOutfitID) == 0)
+    end
+    -- Most old rows have outfitId=0. A few startup_seed rows contain the
+    -- pre-virtualization id, while the body restored by PZ now reports 0;
+    -- permit that one known migration shape only.
+    if validEngineIdentity(entry.outfitId)
+        and not (reason == "startup_seed" and bodyOutfitIsZero)
+    then
+        return false
+    end
+    registry = Internal.registry and Internal.registry() or nil
+    record = registry and registry.Get and registry.Get(entry.npcId) or nil
+    if not record or record.alive == false
+        or record.presenceState == Const.PRESENCE_CORPSE
+    then
+        return false
+    end
+    passenger = record.runtime and record.runtime.vehiclePassenger or nil
+    if record.presenceState == Const.PRESENCE_LIVE
+        and not (passenger and passenger.active == true)
+    then
+        -- A stale registry lease can leave the record marked live after the
+        -- original body was virtualized. Permit the exact ledger migration
+        -- only when no attached canonical body still owns that record.
+        canonical = registry.GetLiveZombie and registry.GetLiveZombie(entry.npcId)
+            or registry.LiveByID and registry.LiveByID[tostring(entry.npcId)]
+        if canonical then
+            canonicalAttached = true
+            if Internal.isBodyAttached then
+                local ok, attached = pcall(Internal.isBodyAttached, canonical)
+                canonicalAttached = ok and attached == true
+            end
+            if canonicalAttached then
+                return false
+            end
+        end
+    end
+    -- Clothing is not proof here: PZ can apply a default outfit while
+    -- restoring a zero-ID population shell. The ledger, record state, marker
+    -- absence and exact position are the migration proof.
+    if not isUnmarkedBody(zombie) then
+        return false
+    end
+    return samePosition(entry, zombie, radiusSq)
+end
+
+function Lifecycle.IsLegacyAnonymousHusk(entry, zombie)
+    local radius = tonumber(Const.HUSK_LEDGER_MATCH_RADIUS) or 2
+    return isLegacyAnonymousHusk(entry, zombie, radius * radius)
 end
 
 --[[
@@ -81,6 +286,20 @@ function Lifecycle.NoteLostBody(record, zombie, reason)
     local x, y, z = positionOf(record, zombie)
     local npcId = record and record.id ~= nil and tostring(record.id) or nil
     local hint = outfitHint(record, zombie)
+    local populationId = populationIDOf(zombie)
+        or (record and validEngineIdentity(record.liveBodyPopulationID)
+            and tostring(record.liveBodyPopulationID) or nil)
+        or (record and record.runtime
+            and validEngineIdentity(record.runtime.lastIdentityPopulationID)
+            and tostring(record.runtime.lastIdentityPopulationID) or nil)
+        or (record and record.runtime
+            and validEngineIdentity(record.runtime.lastLiveBodyPopulationID)
+            and tostring(record.runtime.lastLiveBodyPopulationID) or nil)
+        or (record and record.runtime and record.runtime.startupBodyHint
+            and validEngineIdentity(
+                record.runtime.startupBodyHint.populationId
+            )
+            and tostring(record.runtime.startupBodyHint.populationId) or nil)
     local key
     local existing
     local entry
@@ -92,7 +311,7 @@ function Lifecycle.NoteLostBody(record, zombie, reason)
         ledger.skipped = (tonumber(ledger.skipped) or 0) + 1
         return nil
     end
-    if hint == nil then
+    if hint == nil and populationId == nil then
         -- No engine identity hint means the resurrected body is
         -- indistinguishable from an ordinary zombie. Prefer a permanent husk
         -- over deleting a vanilla zombie.
@@ -118,6 +337,7 @@ function Lifecycle.NoteLostBody(record, zombie, reason)
         existing.y = y
         existing.z = z
         existing.outfitId = hint
+        existing.populationId = populationId or existing.populationId
         existing.at = worldAgeHours()
         existing.reason = reason ~= nil and tostring(reason) or existing.reason
         existing.attempts = 0
@@ -135,6 +355,7 @@ function Lifecycle.NoteLostBody(record, zombie, reason)
         at = worldAgeHours(),
         attempts = 0,
         reason = reason ~= nil and tostring(reason) or nil,
+        populationId = populationId,
         chunkKey = key,
     }
     ledger.entries[#ledger.entries + 1] = entry
@@ -156,30 +377,49 @@ function Lifecycle.NoteLostBody(record, zombie, reason)
     return entry
 end
 
-local function matchesEntry(entry, zombie, radiusSq)
+local function matchesEntry(entry, zombie, radiusSq, includeAbandoned)
     local outfitId
+    local populationId
     local dx
     local dy
     local dz
-    if not entry or entry.outfitId == nil or not zombie then
+    if not entry or not zombie then
         return false
     end
     -- An abandoned entry is kept only as a record of an unreapable husk: it must
     -- never queue another removal attempt.
-    if entry.abandoned == true then
+    if entry.abandoned == true and includeAbandoned ~= true then
         return false
+    end
+    if validEngineIdentity(entry.populationId) then
+        populationId = populationIDOf(zombie)
+        -- The population id is the strongest identity and survives the
+        -- engine's virtualization boundary. A population-only ledger entry is
+        -- safe to match; an ordinary zombie cannot claim another population
+        -- record's exact id.
+        if populationId == nil
+            or tostring(entry.populationId) ~= tostring(populationId)
+        then
+            if populationId ~= nil then
+                return false
+            end
+        else
+            return true
+        end
     end
     outfitId = outfitHint(nil, zombie)
-    if outfitId == nil or tostring(entry.outfitId) ~= tostring(outfitId) then
+    if isLegacyAnonymousHusk(entry, zombie, radiusSq) then
+        return true
+    end
+    if not validEngineIdentity(entry.outfitId) then
+        return isLegacyAnonymousHusk(entry, zombie, radiusSq)
+    end
+    if outfitId == nil
+        or tostring(entry.outfitId) ~= tostring(outfitId)
+    then
         return false
     end
-    dz = (tonumber(zombie:getZ()) or 0) - (tonumber(entry.z) or 0)
-    if math.abs(dz) > 1 then
-        return false
-    end
-    dx = (tonumber(zombie:getX()) or 0) - (tonumber(entry.x) or 0)
-    dy = (tonumber(zombie:getY()) or 0) - (tonumber(entry.y) or 0)
-    return (dx * dx + dy * dy) <= radiusSq
+    return samePosition(entry, zombie, radiusSq)
 end
 
 local function findInChunk(ledger, key, zombie, radiusSq)
@@ -200,9 +440,10 @@ end
     Find the ledger entry a freshly created body resurrects.
 
     Strict by construction: an entry only matches when the body carries the
-    same engine persistent outfit id, sits within the recorded radius and on the
-    same level. A population record keeps those fields, so the match survives
-    chunk reload and save/load.
+    same engine persistent outfit id, sits within the recorded radius and on
+    the same level. When the engine exposes its population id, that id must
+    also agree. The outfit/position proof remains for the create-event window
+    before the population manager assigns the returned body's id.
 ]]
 function Lifecycle.FindHuskEntry(zombie)
     local ledger = ensureLoaded()
@@ -216,8 +457,24 @@ function Lifecycle.FindHuskEntry(zombie)
     local offsetY
     local i
     local j
+    local populationId
     if #ledger.entries <= 0 or not zombie or not zombie.getX then
         return nil
+    end
+    -- Search the bounded ledger by exact population identity before using the
+    -- positional index. The body may have moved after being handed back, but
+    -- the exact engine identity remains safe and authoritative.
+    populationId = populationIDOf(zombie)
+    if populationId ~= nil then
+        for i = 1, #ledger.entries do
+            if ledger.entries[i].abandoned ~= true
+                and validEngineIdentity(ledger.entries[i].populationId)
+                and tostring(ledger.entries[i].populationId)
+                    == tostring(populationId)
+            then
+                return ledger.entries[i]
+            end
+        end
     end
     x = tonumber(zombie:getX())
     y = tonumber(zombie:getY())
@@ -239,12 +496,17 @@ function Lifecycle.FindHuskEntry(zombie)
 end
 
 -- Revalidation hook used by the reaper between queueing and removal.
-function Lifecycle.HuskLedgerMatchesEntry(zombie, entry)
+function Lifecycle.HuskLedgerMatchesEntry(zombie, entry, includeAbandoned)
     if not entry or not zombie then
         return false
     end
     local radius = tonumber(Const.HUSK_LEDGER_MATCH_RADIUS) or 2
-    return matchesEntry(entry, zombie, radius * radius)
+    return matchesEntry(
+        entry,
+        zombie,
+        radius * radius,
+        includeAbandoned == true
+    )
 end
 
 -- Put a loss back after a failed removal attempt. Keeps the entry bounded by

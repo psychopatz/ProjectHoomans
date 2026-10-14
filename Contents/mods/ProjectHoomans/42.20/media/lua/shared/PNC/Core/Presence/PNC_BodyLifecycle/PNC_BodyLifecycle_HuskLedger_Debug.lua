@@ -20,6 +20,15 @@ local ensureLoaded = Deps.ensureLoaded
 local isMarkedZombie = Deps.isMarkedZombie
 local ENTRY_LAYOUT = Deps.ENTRY_LAYOUT
 
+local function validHint(value)
+    local numeric
+    if value == nil or tostring(value) == "" or tostring(value) == "0" then
+        return false
+    end
+    numeric = tonumber(value)
+    return numeric == nil or numeric ~= 0
+end
+
 local function clampLimit(value, fallback, maximum)
     local number = math.floor(tonumber(value) or fallback)
     if number < 1 then
@@ -238,6 +247,8 @@ function Lifecycle.DebugHuskReport(limit)
         "orphans=" .. tostring(bodies.orphans),
         "reaped=" .. tostring(reaper.reaped),
         "abandoned=" .. tostring(reaper.abandoned),
+        "fallbackBlocked=" .. tostring(Lifecycle.BodyFactory
+            and Lifecycle.BodyFactory.fallbackBlocked or 0),
         "estBytes=" .. tostring(ledger.estimatedBytes),
         "unmarkedOutfits=" .. table.concat(parts, ","),
     }, " ")
@@ -302,7 +313,10 @@ function Lifecycle.SeedHuskLedgerFromRecords(now)
             return
         end
         hint = record.runtime and record.runtime.startupBodyHint or nil
-        if not hint or hint.instanceID == nil then
+        if not hint
+            or not (validHint(hint.instanceID)
+                or validHint(hint.populationId))
+        then
             return
         end
         registry = Internal.registry and Internal.registry() or nil
@@ -334,7 +348,9 @@ function Lifecycle.BuildHuskLedgerDiagnostics()
         skipped = tonumber(ledger.skipped) or 0,
         lastFactory = Lifecycle.BodyFactory
             and Lifecycle.BodyFactory.lastFactory or nil,
+        fallbackBlocked = Lifecycle.BodyFactory
+            and tonumber(Lifecycle.BodyFactory.fallbackBlocked) or 0,
+        failedSpawns = Lifecycle.BodyFactory
+            and tonumber(Lifecycle.BodyFactory.failedSpawns) or 0,
     }
 end
-
-

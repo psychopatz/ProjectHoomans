@@ -75,7 +75,13 @@ function Lifecycle.AuditLoadedBodies(now, force)
             deathMarker = deathMarkerId
                 and reg.GetDeathMarker
                 and reg.GetDeathMarker(deathMarkerId) or nil
-            if haulProtected then
+            if Internal.IsProtectedBody
+                and Internal.IsProtectedBody(zombie)
+            then
+                -- Foreign-owned, reanimated-player, or dead/corpse bodies are
+                -- outside the live-shell cleanup authority. Their own lane
+                -- (or the vanilla engine) owns them; never delete them here.
+            elseif haulProtected then
                 -- Vanilla grapple reanimates a corpse into a temporary
                 -- IsoZombie and copies its ModData. Do not let the ordinary
                 -- death-marker audit consume that transient body.
@@ -145,9 +151,13 @@ function Lifecycle.AuditLoadedBodies(now, force)
                         expected = reg.LiveByID and reg.LiveByID[npcId] or nil
                         if expected ~= zombie then
                             reg.LiveByID[npcId] = zombie
-                            record.liveBodyInstanceID = zombie.getPersistentOutfitID and zombie:getPersistentOutfitID() or nil
                             record.liveBodyOnlineID = Internal.normalizeOnlineID(zombie)
                             stats.rebound = stats.rebound + 1
+                        end
+                        if Lifecycle.RefreshLiveBodyIdentity then
+                            Lifecycle.RefreshLiveBodyIdentity(
+                                record, zombie, "body_audit"
+                            )
                         end
                         Internal.ensureRuntime(record).lastAuditAt = now
                         Internal.mark(record, "live", "bound", "body_audit_valid")
@@ -202,8 +212,18 @@ function Lifecycle.AuditLoadedBodies(now, force)
                 end
                 reg.LiveByID[id] = nil
                 candidate.runtime = candidate.runtime or {}
+                if Internal.CaptureDetachedBodyHint then
+                    Internal.CaptureDetachedBodyHint(candidate)
+                end
+                candidate.runtime.lastLiveBodyInstanceID =
+                    candidate.liveBodyInstanceID
+                        or candidate.runtime.lastLiveBodyInstanceID
+                candidate.runtime.lastLiveBodyPopulationID =
+                    candidate.liveBodyPopulationID
+                        or candidate.runtime.lastLiveBodyPopulationID
                 candidate.runtime.bodyLease = nil
                 candidate.liveBodyInstanceID = nil
+                candidate.liveBodyPopulationID = nil
                 candidate.liveBodyOnlineID = nil
                 candidate.presenceState = Const.PRESENCE_ABSTRACT
                 candidate.presenceRevision = (tonumber(candidate.presenceRevision) or 0) + 1

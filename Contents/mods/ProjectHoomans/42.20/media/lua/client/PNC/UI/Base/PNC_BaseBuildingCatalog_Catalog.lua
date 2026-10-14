@@ -9,6 +9,7 @@ local setCatalogRows = Internal.setCatalogRows
 local updateFavoriteControls = Internal.updateFavoriteControls
 local RecipeState = Internal.RecipeState
 local QueueActions = Internal.QueueActions
+local SearchIndex = require "PsychopatzCore/UI/PsychopatzSearchIndex"
 
 local function categories(recipes)
     local output, seen = { "ALL" }, { ALL = true }
@@ -53,28 +54,35 @@ local function rebuildRecipes(window, recipes)
         local recipe = row and row.recipe
         return recipe and (recipe.objectInfoName or recipe.recipeKey)
     end)
-    local rows = {}
     local search = window.buildSearch and window.buildSearch:getText() or ""
-    search = string.lower(tostring(search or ""))
+    window.buildRecipeSearchIndex = window.buildRecipeSearchIndex
+        or SearchIndex.New({
+            key = function(recipe)
+                return recipe and (recipe.objectInfoName
+                    or recipe.recipeKey or recipe.id)
+            end,
+            fields = function(recipe)
+                return { recipe and recipe.displayName,
+                    recipe and recipe.category, recipe and recipe.recipeName,
+                    recipe and recipe.objectInfoName,
+                    recipe and recipe.recipeKey, recipe and recipe.id }
+            end,
+        })
+    window.buildRecipeSearchIndex:SetSource(recipes or {},
+        window.lastReceiveRevision)
     local chosen = activeRecipe(window)
     state.key = state.key or chosen
         and (chosen.objectInfoName or chosen.recipeKey) or nil
     local found = false
-    for _, recipe in ipairs(recipes or {}) do
-        if window.buildCategory == "ALL"
-            or tostring(recipe.category) == tostring(window.buildCategory)
-        then
-            local recipeText = string.lower(table.concat({
-                tostring(recipe.displayName or ""),
-                tostring(recipe.category or ""),
-                tostring(recipe.recipeName or ""),
-                tostring(recipe.objectInfoName or ""),
-            }, " "))
+    local matchingRecipes = window.buildRecipeSearchIndex:Query(search,
+        function(recipe)
+            return window.buildCategory == "ALL"
+                or tostring(recipe.category) == tostring(window.buildCategory)
+        end)
+    local rows = {}
+    for _, recipe in ipairs(matchingRecipes) do
             local favorite = isFavorite(recipe)
-            local matchesSearch = search == ""
-                or string.find(recipeText, search, 1, true) ~= nil
-            if matchesSearch and (window.buildFavoritesOnly ~= true
-                or favorite) then
+            if window.buildFavoritesOnly ~= true or favorite then
                 local ready = true
                 for _, material in ipairs(recipe.materials or {}) do
                     if material.ready ~= true then ready = false; break end
@@ -119,7 +127,6 @@ local function rebuildRecipes(window, recipes)
                     window.buildSelectedRecipe, found = recipe, true
                 end
             end
-        end
     end
     if #rows == 1 then
         local message = window.buildFavoritesOnly == true

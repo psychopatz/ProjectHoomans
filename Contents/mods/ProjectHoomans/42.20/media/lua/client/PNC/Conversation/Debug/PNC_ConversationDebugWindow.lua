@@ -1,6 +1,5 @@
 require "PsychopatzCore/UI/PsychopatzUI"
 require "PsychopatzCore/UI/Conversation/PsychopatzConversationText"
-require "ISUI/ISTextEntryBox"
 require "PNC/Conversation/Blocks/PNC_ConversationTextLoader"
 require "PNC/Conversation/Debug/PNC_ConversationDebugModel"
 
@@ -80,10 +79,11 @@ end
 function ISPNCConversationDebugWindow:createChildren()
     PsychopatzWindow.createChildren(self)
     self.context = Model.DefaultContext()
-    self.search = ISTextEntryBox:new("", 0, 0, 260, 26)
-    self.search:initialise()
-    self.search:instantiate()
-    self:addChild(self.search)
+    self.search = UI.CreateSearchEntry(self, {
+        clearButton = true,
+        width = 260,
+        height = 26,
+    })
     self.blocks = UI.CreateList(self, { itemHeight = 44, doDrawItem = drawBlock })
     self.details = UI.CreateKeyValueList(self, {
         itemHeight = 24,

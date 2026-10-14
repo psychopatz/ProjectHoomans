@@ -16,11 +16,7 @@ local function now()
 end
 
 function Controller.CreateChildren(window)
-    -- The legacy catalog renderer uses this value as its surface guard. Keep
-    -- the compatibility value local to the Workshop window; it is not a
-    -- Colony Management tab anymore.
     window.tab = "workshop"
-    window.workshopSurface = true
     window.lastReceiveRevision = -1
     window.lastReceiveAt = 0
     window.lastRequestAt = 0
@@ -65,10 +61,10 @@ function Controller.Refresh(window, update)
     return Controller.Rebuild(window)
 end
 
--- The workshop catalog renders from `workshop`, and "build station" opens the
--- facility modal with the settlement, stockpile rows, and research catalog. It
--- therefore keeps those groups and drops the colonist roster, zone, building
--- queue, task, and provision projections it never reads.
+-- The workshop catalog renders from `workshop`, and "build station" hands off
+-- to the integrated Base facilities catalog. It therefore keeps the
+-- settlement, stockpile, and research groups and drops the colonist roster,
+-- zone, building queue, task, and provision projections it never reads.
 local WORKSHOP_SECTIONS = {
     "header", "workshop", "storage", "settlement", "research",
 }
@@ -91,6 +87,7 @@ function Controller.ToggleInventoryGroup(window, role, groupKey)
     window.workshopCollapsedGroups = window.workshopCollapsedGroups or {}
     window.workshopCollapsedGroups[key] =
         window.workshopCollapsedGroups[key] ~= true
+    Workshop.SaveCollapsedGroups(window)
     window:rebuildDetails()
     return true
 end

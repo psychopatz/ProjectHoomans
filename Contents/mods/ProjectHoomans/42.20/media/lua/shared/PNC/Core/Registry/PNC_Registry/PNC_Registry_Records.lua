@@ -90,6 +90,9 @@ function Registry.GetLiveZombie(id)
 end
 
 function Registry.RegisterLiveZombie(record, zombie)
+    local previousZombie
+    local previousInstanceID
+    local previousPopulationID
     if not record or not zombie then
         return
     end
@@ -97,9 +100,38 @@ function Registry.RegisterLiveZombie(record, zombie)
         Core.LogWarn("Cannot register NPC body without PNC.BodyLifecycle id=" .. tostring(record.id))
         return
     end
+    previousZombie = Registry.LiveByID[record.id]
+    previousInstanceID = record.liveBodyInstanceID
+    previousPopulationID = record.liveBodyPopulationID
     Registry.LiveByID[record.id] = zombie
     PNC.BodyLifecycle.StampLiveBody(record, zombie)
-    record.liveBodyInstanceID = zombie.getPersistentOutfitID and zombie:getPersistentOutfitID() or nil
+    -- StampLiveBody captures the identity after validating the engine result.
+    -- During restore the raw getter may still return nil/0; never overwrite a
+    -- valid stamped hint with that transient value or the later husk loss
+    -- cannot be correlated safely.
+    if PNC.BodyLifecycle.RefreshLiveBodyIdentity then
+        PNC.BodyLifecycle.RefreshLiveBodyIdentity(
+            record,
+            zombie,
+            "registry_register"
+        )
+    end
+    if previousZombie == zombie then
+        -- StampLiveBody deliberately clears the current hint before recapture.
+        -- If this is an audit/rebind of the same attached object and the Java
+        -- getter is still in its transient zero window, retain the last valid
+        -- identity instead of replacing it with nil.
+        if record.liveBodyInstanceID == nil
+            and previousInstanceID ~= nil
+        then
+            record.liveBodyInstanceID = previousInstanceID
+        end
+        if record.liveBodyPopulationID == nil
+            and previousPopulationID ~= nil
+        then
+            record.liveBodyPopulationID = previousPopulationID
+        end
+    end
     record.liveBodyOnlineID = zombie.getOnlineID and tonumber(zombie:getOnlineID()) or nil
     if record.liveBodyOnlineID and record.liveBodyOnlineID < 0 then
         record.liveBodyOnlineID = nil
@@ -116,6 +148,7 @@ function Registry.UnregisterLiveZombie(id)
             record.runtime.bodyLease = nil
         end
         record.liveBodyInstanceID = nil
+        record.liveBodyPopulationID = nil
         record.liveBodyOnlineID = nil
         record.presenceRevision = (tonumber(record.presenceRevision) or 0) + 1
     end

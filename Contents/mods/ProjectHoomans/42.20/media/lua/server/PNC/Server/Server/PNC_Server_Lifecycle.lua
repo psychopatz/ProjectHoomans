@@ -65,15 +65,18 @@ function H.OnServerStarted()
     then
         PlayerCharacterLifecycle.OnServerStarted(Core.Now())
     end
+    if PNC.CompanionVehicle and PNC.CompanionVehicle.AuditLoadedReservations then
+        -- Vehicle reservation markers are durable. Rehydrate passenger state
+        -- before startup body cleanup so a relog cannot rebind an NPC body
+        -- that belongs inside a car.
+        PNC.CompanionVehicle.AuditLoadedReservations(Core.Now(), true)
+    end
     if BodyLifecycle and BodyLifecycle.RunStartupBodyCleanupNow then
         BodyLifecycle.RunStartupBodyCleanupNow(
             Core.Now(),
             "server_started",
             true
         )
-    end
-    if PNC.CompanionVehicle and PNC.CompanionVehicle.AuditLoadedReservations then
-        PNC.CompanionVehicle.AuditLoadedReservations(Core.Now(), true)
     end
     if BodyLifecycle and BodyLifecycle.AuditLoadedBodies then
         BodyLifecycle.AuditLoadedBodies(Core.Now(), true)

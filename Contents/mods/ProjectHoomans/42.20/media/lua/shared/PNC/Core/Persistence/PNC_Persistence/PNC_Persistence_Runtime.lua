@@ -42,6 +42,8 @@ function Persistence.RebuildRuntime(record)
         stealthReason = "loaded",
         forceLive = false,
         forceAbstract = false,
+        hardAbstract = false,
+        abstractPreference = false,
         debug = false,
         bodyLease = nil,
         lifecycle = {

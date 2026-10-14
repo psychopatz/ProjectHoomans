@@ -13,14 +13,7 @@ local function stationSnapshot(operation, recipe)
     local definitions = PNC.WorkDefinitions
     local source = definitions and definitions.GetStationForRecipe
         and definitions.GetStationForRecipe(recipe, operation) or nil
-    source = source or definitions and definitions.GetStation
-        and definitions.GetStation(operation) or nil
-    source = source or {
-        id = "workshop", facilityId = "workshop",
-        capability = "work.craft", role = "work.craft",
-        legacyRoles = { "work.disassemble" },
-        labelKey = "UI_PNC_Workshop_CraftingStation",
-    }
+    if not source then return nil end
     local station = {}
     for key, value in pairs(source) do
         if key ~= "legacyRoles" then station[key] = value end

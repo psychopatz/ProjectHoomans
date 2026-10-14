@@ -29,7 +29,7 @@ T.truthy(Leases.SetPhase(lease.leaseId, "WORKING"), "atomic section finishes")
 T.truthy(lease.cancellationRequested, "cancellation remains pending for cleanup")
 
 T.load("ProjectHoomans", "shared",
-    "PNC/Core/Production/PNC_WorkDefinitions.lua")
+    "PNC/Core/Production/WorkDefinition/PNC_WorkDefinitions.lua")
 local releasedReservation, cancelledInputs
 local order = { id = "work:1", operation = "CRAFT", status = "WORKING",
     completionStarted = true, workerId = "npc", stationId = "station",

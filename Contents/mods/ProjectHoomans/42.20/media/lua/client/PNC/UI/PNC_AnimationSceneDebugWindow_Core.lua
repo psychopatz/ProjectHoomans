@@ -62,7 +62,7 @@ end
 function ISPNCAnimationSceneDebugWindow:createChildren()
     PsychopatzWindow.createChildren(self)
 
-    self.search = UI.CreateTextEntry(self, {
+    self.search = UI.CreateSearchEntry(self, {
         clearButton = true,
         width = 100,
         height = 26,

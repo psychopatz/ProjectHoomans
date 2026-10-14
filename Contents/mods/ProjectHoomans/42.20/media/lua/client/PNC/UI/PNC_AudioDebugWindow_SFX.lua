@@ -31,14 +31,14 @@ function ISPNCAudioDebugSFXTab:createChildren()
     self.categoryBox.selected = 1
 
     self.searchLabel = makeLabel(self, TEXT.searchSFX, "textMuted")
-    self.search = UI.CreateTextEntry(self, {
+    self.search = UI.CreateSearchEntry(self, {
         clearButton = true,
         width = 260,
         height = 26,
+        onTextChange = function()
+            self:refreshList()
+        end,
     })
-    self.search.onTextChangeFunction = function()
-        self:refreshList()
-    end
 
     self.status = makeLabel(self, "", "textMuted")
     self.list = UI.CreateList(self, {

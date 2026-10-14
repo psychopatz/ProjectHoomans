@@ -16,11 +16,13 @@ local function handlePresence(record, npcId, command)
     if command == "force_live" then
         record.runtime.forceLive = true
         record.runtime.forceAbstract = false
+        record.runtime.hardAbstract = false
         Presence.Materialize(record, "debug_force_live")
         return true, true
     end
     if command == "force_abstract" then
-        record.runtime.forceAbstract = true
+        record.runtime.forceAbstract = nil
+        record.runtime.hardAbstract = true
         record.runtime.forceLive = false
         Presence.Abstract(record, "debug_force_abstract")
         return true, true

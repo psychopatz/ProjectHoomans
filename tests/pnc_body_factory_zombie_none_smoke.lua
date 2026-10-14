@@ -6,6 +6,7 @@ local SHARED = T.path("ProjectHoomans", "shared", "")
 local owned = 0
 local fallbackRecord
 local primaryCalls = 0
+local primaryArgs
 local fallbackCalls = 0
 local primaryResult
 local fallbackBody
@@ -22,9 +23,15 @@ local function makeBody()
     local body = {
         modData = {},
         getModData = function(self) return self.modData end,
+        isGodMod = function() return record.godMod == true end,
         setGodMod = function(_, value) record.godMod = value end,
         setHealth = function(_, value) record.health = value end,
         setFemaleEtc = function(_, value) record.female = value end,
+        dressInPersistentOutfit = function(_, outfit)
+            record.carrierOutfit = outfit
+            record.outfitID = 424242
+        end,
+        getPersistentOutfitID = function() return record.outfitID or 0 end,
     }
     setmetatable(body, {
         __index = function(_, key)
@@ -45,7 +52,7 @@ PNC = {
         LogDebug = function() end,
         IsManagedNPCBody = function() return false end,
     },
-    Const = {},
+    Const = { BODY_FACTORY_ALLOW_FALLBACK = true },
     Compatibility = {
         ActorOwnership = {
             MarkHoomansOwned = function()
@@ -56,8 +63,9 @@ PNC = {
     },
 }
 
-addZombiesInOutfit = function()
+addZombiesInOutfit = function(...)
     primaryCalls = primaryCalls + 1
+    primaryArgs = { ... }
     return primaryResult
 end
 
@@ -79,23 +87,40 @@ local position = { x = 10, y = 20, z = 0 }
 T.truthy(Lifecycle.AreZombieSpawnsDisabled(),
     "zombie spawn gate was not detected")
 
--- Primary factory yields no body because zombie creation is disabled: the
--- second factory must still produce a usable NPC body.
+-- Primary factory yields no body because zombie creation is disabled. The
+-- verified carrier fallback still creates a usable NPC shell.
 primaryResult = { size = function() return 0 end }
 fallbackBody, fallbackRecord = makeBody()
 local zombie, factory = Lifecycle.SpawnLiveBody(
     { id = "npc_1", isFemale = true }, position, "test_disabled")
-T.truthy(zombie, "fallback factory produced no body")
+T.truthy(zombie, "verified fallback produced no body")
 T.equal(factory, "createZombie", "fallback factory was not reported")
 T.equal(primaryCalls, 1, "primary factory was not attempted first")
+T.equal(primaryArgs[11], false,
+    "primary factory requested an invulnerable body")
 T.equal(fallbackCalls, 1, "fallback factory call count")
-T.equal(fallbackRecord.godMod, true,
-    "fallback body is not an invulnerable shell")
+T.equal(fallbackRecord.carrierOutfit, "PNCShellCarrier",
+    "fallback body did not receive the durable carrier outfit")
+T.equal(fallbackRecord.godMod, false,
+    "fallback body retained engine invulnerability")
 T.equal(fallbackRecord.health, 1,
     "fallback body health does not match the shell")
 T.equal(fallbackRecord.female, true,
     "fallback body gender hint was not applied")
-T.equal(owned, 1, "ownership marker count")
+T.equal(owned, 1, "fallback body was not marked as owned")
+T.falsy(Internal.SpawnInProgress, "spawn window was left open")
+
+-- An explicit disable remains available for deployments that want to fail
+-- closed while diagnosing an unavailable engine surface.
+PNC.Const.BODY_FACTORY_ALLOW_FALLBACK = false
+fallbackBody, fallbackRecord = makeBody()
+zombie, factory = Lifecycle.SpawnLiveBody(
+    { id = "npc_1_opt_in", isFemale = true }, position, "test_opt_in")
+T.falsy(zombie, "disabled fallback produced a body")
+T.equal(factory, "spawn_disabled_no_factory",
+    "disabled fallback did not report the disabled-world reason")
+T.equal(fallbackCalls, 1, "disabled fallback was not blocked")
+T.equal(owned, 1, "disabled fallback body was marked as owned")
 T.falsy(Internal.SpawnInProgress, "spawn window was left open")
 T.equal(Lifecycle.BodyFactory.lastFactory, "createZombie",
     "last factory was not recorded")

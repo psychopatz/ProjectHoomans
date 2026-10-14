@@ -5,7 +5,39 @@ local Const = PNC.Const
 
 local lastReservationAuditAt = 0
 
+local function restorePassenger(record, data, vehicle)
+    local runtime
+    local current
+    if not record or record.alive == false or not data then
+        return false
+    end
+    runtime = record.runtime or {}
+    record.runtime = runtime
+    current = runtime.vehiclePassenger
+    if current and current.active == true then
+        return tostring(current.vehicleId or "")
+                == tostring(data.vehicleId or "")
+            and tonumber(current.seat) == tonumber(data.seat)
+    end
+    -- Reservation items are the durable vehicle-passenger marker. Rehydrate
+    -- the runtime reservation before startup body cleanup so a relog cannot
+    -- rebind or spawn an NPC body inside a reserved seat.
+    runtime.vehiclePassenger = {
+        active = true,
+        vehicleId = tostring(data.vehicleId or ""),
+        seat = tonumber(data.seat),
+        ownerOnlineID = tonumber(record.ownerOnlineID),
+        boardedAt = Core.Now(),
+        _vehicle = vehicle,
+    }
+    runtime.vehicleBlockReason = nil
+    runtime.forcePresenceCheck = true
+    record.activeBehavior = "FollowOwner:vehicle_passenger"
+    return true
+end
+
 local function auditContainer(
+    vehicle,
     vehicleId,
     part,
     container,
@@ -17,6 +49,7 @@ local function auditContainer(
     local stale = {}
     local removed = 0
     local i
+    local seatMatches
     Internal.ForEachContainerItem(container, function(item)
         local data = Internal.ReservationData(item)
         local key
@@ -25,10 +58,18 @@ local function auditContainer(
             key =
                 tostring(data.npcId or "")
                 .. ":" .. tostring(data.seat or "")
-            valid = actualSeat ~= nil
+            seatMatches = actualSeat ~= nil
                 and actualSeat >= 0
                 and tostring(data.vehicleId or "") == tostring(vehicleId)
                 and tonumber(data.seat) == actualSeat
+            if seatMatches then
+                restorePassenger(
+                    Internal.FindRecord(data.npcId),
+                    data,
+                    vehicle
+                )
+            end
+            valid = seatMatches
                 and Internal.IsActiveReservation(
                     data,
                     vehicleId,
@@ -58,6 +99,7 @@ function Internal.AuditVehicle(vehicle)
     local removed = 0
     Internal.ForEachVehicleContainer(vehicle, function(part, container)
         removed = removed + auditContainer(
+            vehicle,
             vehicleId,
             part,
             container,

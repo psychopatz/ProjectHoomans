@@ -25,15 +25,16 @@ local canCraft = Internal.CanCraft
 local quantityFor = Internal.QuantityFor
 local selectedOrder = Internal.SelectedOrder
 
-local function quantityControls(quantity)
+local function quantityControls(quantity, canAdjustQuantity)
     quantity = math.max(1, math.floor(tonumber(quantity) or 1))
+    canAdjustQuantity = canAdjustQuantity == true
     return {
         { id = "quantity_minus", title = "-", command = "decrement",
-            enabled = quantity > 1, variant = "quiet" },
+            enabled = canAdjustQuantity and quantity > 1, variant = "quiet" },
         { id = "quantity_value", title = tostring(quantity), enabled = false,
             variant = "quiet" },
         { id = "quantity_plus", title = "+", command = "increment",
-            enabled = quantity < 99, variant = "quiet" },
+            enabled = canAdjustQuantity and quantity < 99, variant = "quiet" },
     }
 end
 
@@ -44,11 +45,35 @@ local function actionControl(title, enabled, variant)
     }
 end
 
+local function stationHeaderStatus(tr, stationRequired, stationResolved,
+    missingStation)
+    if missingStation then
+        return {
+            kind = "missing",
+            missing = true,
+            label = tr("UI_PNC_Workshop_MissingStation", "MISSING STATION"),
+            actionLabel = tr("UI_PNC_Workshop_BuildStation", "BUILD STATION"),
+            colorName = "warning",
+        }
+    end
+    if not stationRequired then return nil end
+    if not stationResolved then
+        return {
+            kind = "unresolved",
+            label = tr("UI_PNC_Workshop_NoStation", "NO CRAFT STATION"),
+            colorName = "warning",
+        }
+    end
+    return nil
+end
+
 function Rebuild.OnControl(window, buttonValue)
     local action = tostring(buttonValue and buttonValue.internal or "")
-    if action == "tab_craft" and window.workshopLaneAvailability.craft then
+    local selectable = window.workshopLaneSelectable
+        or window.workshopLaneAvailability or {}
+    if action == "tab_craft" and selectable.craft then
         window.workshopSubtab = "craft"; Rebuild.ApplySubtab(window, true); return true
-    elseif action == "tab_salvage" and window.workshopLaneAvailability.salvage then
+    elseif action == "tab_salvage" and selectable.salvage then
         window.workshopSubtab = "salvage"; Rebuild.ApplySubtab(window, true); return true
     end
     local order = selectedOrder(window)
@@ -86,6 +111,14 @@ local function rebuildCraftRows(window, recipes, tr, isStationReady)
             rows[#rows + 1] = recipe
         end
     end
+    if #rows == 0 then
+        local message = tr("UI_PNC_Workshop_NoMatchingItems",
+            "NO MATCHING ITEMS")
+        window.workshopRecipeList:addItem(message, {
+            name = message, restricted = true, catalogCells = {},
+        })
+        return
+    end
     local activeSkill, activeStation, skillExpanded, stationExpanded,
         showStationHeaders
     for _, recipe in ipairs(sortBySkillAndStation(rows, "CRAFT")) do
@@ -104,14 +137,22 @@ local function rebuildCraftRows(window, recipes, tr, isStationReady)
             local requiredStation = stationFor(recipe, "CRAFT")
             local stationKey = stationGroupKey("CRAFT", skillId,
                 requiredStation)
-            if showStationHeaders and (not activeStation
+            local stationResolved = requiredStation ~= nil
+            local stationRequired = recipe.descriptor
+                and recipe.descriptor.requiresSpecificWorkstation == true
+            local stationUnresolved = stationRequired and not stationResolved
+            local missingStation = stationResolved
+                and not isStationReady(requiredStation) or false
+            local headerStatus = stationHeaderStatus(tr, stationRequired,
+                stationResolved, missingStation)
+            if (showStationHeaders or missingStation) and (not activeStation
                 or stationSortKey(activeStation, "CRAFT")
                     ~= stationSortKey(recipe, "CRAFT")
             ) then
                 activeStation = { requiredStation = requiredStation }
                 stationExpanded = groupExpanded(window, stationKey)
                 addStationHeader(window.workshopRecipeList, requiredStation,
-                    tr, stationKey, stationExpanded)
+                    tr, stationKey, stationExpanded, headerStatus)
             end
             if stationExpanded then
             local output = recipe.descriptor.outputs
@@ -120,14 +161,24 @@ local function rebuildCraftRows(window, recipes, tr, isStationReady)
             local metadata, quantity = InventoryModel.Probe(fullType),
                 quantityFor(window, recipe.id)
             local stocked = canCraft(recipe, quantity)
-            local missingStation = not isStationReady(requiredStation)
-            local requiredStationReady = not missingStation
-            local enabled = missingStation or stocked and requiredStationReady
-            local action = missingStation
+            local requiredStationReady = not stationRequired
+                or stationResolved and not missingStation
+            local canAdjustQuantity = requiredStationReady
+            local enabled = stationUnresolved and false
+                or missingStation or stocked and requiredStationReady
+            local action = stationUnresolved
+                and tr("UI_PNC_Workshop_NoStation", "NO CRAFT STATION")
+                or missingStation
                 and tr("UI_PNC_Workshop_BuildStation", "BUILD STATION")
                 or stocked and requiredStationReady
                 and tr("UI_PNC_Workshop_CraftAction", "CRAFT")
                 or tr("UI_PNC_Workshop_MissingMaterials", "MISSING MATERIALS")
+            local rowAction = missingStation and "" or action
+            local rowActionControl
+            if not missingStation then
+                rowActionControl = actionControl(action, enabled,
+                    enabled and "primary" or "warning")
+            end
             window.workshopRecipeList:addItem(recipe.descriptor.displayName, {
                 rowKind = "recipe", recipe = recipe, enabled = enabled,
                 groupChild = true, groupKey = stationKey,
@@ -139,16 +190,20 @@ local function rebuildCraftRows(window, recipes, tr, isStationReady)
                     category = productionSkillLabel(skillId, tr),
                     quantity = tostring(quantity),
                     availability = stocked and "AVAILABLE" or "UNAVAILABLE",
-                    action = action },
+                    action = rowAction },
                 catalogControls = {
-                    quantity = quantityControls(quantity),
-                    action = actionControl(action, enabled,
-                        missingStation and "warning"
-                            or enabled and "primary" or "warning"),
+                    quantity = quantityControls(quantity, canAdjustQuantity),
+                    action = rowActionControl,
                 },
                 catalogColors = { availability = stocked and "success"
                     or "warning", action = missingStation and "warning"
                     or enabled and "accent" or "warning" },
+                capabilities = {
+                    adjustQuantity = canAdjustQuantity,
+                    queue = stocked and requiredStationReady,
+                    buildStation = missingStation,
+                    unresolvedStation = stationUnresolved,
+                },
             })
             end
         end
@@ -157,6 +212,14 @@ end
 
 local function rebuildSalvageRows(window, candidates, tr, isStationReady)
     window.workshopSalvageList:clear()
+    if #(candidates or {}) == 0 then
+        local message = tr("UI_PNC_Workshop_NoMatchingItems",
+            "NO MATCHING ITEMS")
+        window.workshopSalvageList:addItem(message, {
+            name = message, restricted = true, catalogCells = {},
+        })
+        return
+    end
     local activeSkill, activeStation, skillExpanded, stationExpanded,
         showStationHeaders = nil, nil, nil, nil, nil
     for _, candidate in ipairs(sortBySkillAndStation(
@@ -176,18 +239,23 @@ local function rebuildSalvageRows(window, candidates, tr, isStationReady)
             local requiredStation = stationFor(candidate, "DISASSEMBLE")
             local stationKey = stationGroupKey("DISASSEMBLE", skillId,
                 requiredStation)
-            if showStationHeaders and (not activeStation
+            local stationResolved = requiredStation ~= nil
+            local stationRequired = stationResolved
+            local missingStation = stationResolved
+                and not isStationReady(requiredStation) or false
+            local headerStatus = stationHeaderStatus(tr, stationRequired,
+                stationResolved, missingStation)
+            if (showStationHeaders or missingStation) and (not activeStation
                 or stationSortKey(activeStation, "DISASSEMBLE")
                     ~= stationSortKey(candidate, "DISASSEMBLE")
             ) then
                 activeStation = { requiredStation = requiredStation }
                 stationExpanded = groupExpanded(window, stationKey)
                 addStationHeader(window.workshopSalvageList, requiredStation,
-                    tr, stationKey, stationExpanded)
+                    tr, stationKey, stationExpanded, headerStatus)
             end
             if stationExpanded then
         local metadata = InventoryModel.Probe(candidate.fullType)
-        local missingStation = not isStationReady(requiredStation)
         local requiredStationReady = not missingStation
         local enabled = missingStation or requiredStationReady
         local yields = {}
@@ -198,6 +266,16 @@ local function rebuildSalvageRows(window, candidates, tr, isStationReady)
                 .. tostring(yieldMetadata.name or value.fullType)
         end
         local yieldText = #yields > 0 and table.concat(yields, ", ") or "NONE"
+        local action = missingStation
+            and tr("UI_PNC_Workshop_BuildStation", "BUILD STATION")
+            or enabled and tr("UI_PNC_Workshop_SalvageAction", "SALVAGE")
+            or tr("UI_PNC_Workshop_NoStation", "NO CRAFT STATION")
+        local rowAction = missingStation and "" or action
+        local rowActionControl
+        if not missingStation then
+            rowActionControl = actionControl(action, enabled,
+                enabled and "primary" or "warning")
+        end
         local row = { rowKind = "salvage", enabled = enabled,
             groupChild = true, groupKey = stationKey,
             restricted = not enabled and not missingStation,
@@ -207,17 +285,8 @@ local function rebuildSalvageRows(window, candidates, tr, isStationReady)
             texture = metadata.texture, recordIndex = candidate.recordIndex,
             catalogCells = { category = productionSkillLabel(skillId, tr),
                 quantity = tostring(candidate.quantity), availability = yieldText,
-                action = missingStation
-                    and tr("UI_PNC_Workshop_BuildStation", "BUILD STATION")
-                    or enabled and tr("UI_PNC_Workshop_SalvageAction", "SALVAGE")
-                    or tr("UI_PNC_Workshop_NoStation", "NO CRAFT STATION") },
-            catalogControls = { action = actionControl(
-                missingStation
-                    and tr("UI_PNC_Workshop_BuildStation", "BUILD STATION")
-                    or enabled and tr("UI_PNC_Workshop_SalvageAction", "SALVAGE")
-                    or tr("UI_PNC_Workshop_NoStation", "NO CRAFT STATION"),
-                enabled, missingStation and "warning"
-                    or enabled and "primary" or "warning") },
+                action = rowAction },
+            catalogControls = { action = rowActionControl },
             catalogColors = { availability = #yields > 0 and "success" or "warning",
                 action = missingStation and "warning"
                     or enabled and "accent" or "warning" } }

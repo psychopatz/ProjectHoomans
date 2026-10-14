@@ -31,7 +31,7 @@ local LIVE_TRAVEL_MAX_RECOVERIES = tonumber(
 local function playerRequiresLiveExecution(record)
     if type(record) ~= "table" then return false end
     local runtime = record.runtime or {}
-    if runtime.forceAbstract == true then return false end
+    if runtime.hardAbstract == true then return false end
     if runtime.forceLive == true then return true end
 
     -- Presence owns the distance policy. Use its public decision when it is

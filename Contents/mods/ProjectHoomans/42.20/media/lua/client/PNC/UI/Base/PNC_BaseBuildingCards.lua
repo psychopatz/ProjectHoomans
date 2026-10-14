@@ -4,8 +4,7 @@ require "PsychopatzCore/UI/PsychopatzUI"
 local Components = require
     "PNC/UI/Shared/PNC_ColonyUIComponents"
 local Data = require "PNC/UI/Base/PNC_BaseBuildingData"
-local BuildUI = require
-    "PNC/UI/SettlementManagement/PNC_SettlementManagement_FacilityBuildModal"
+local BuildUI = require "PNC/UI/Shared/PNC_FacilityBuildProvider"
 
 local Cards = {}
 local UI = PsychopatzCore.UI
@@ -165,12 +164,13 @@ function Cards.RebuildCategories(window)
         -- an internal empty-state fallback, but is not rendered as a tab.
         window.baseBuildingCategory = categories[1] or "ALL"
     end
+    local globalSearch = Data.IsSearchActive(window)
     for _, button in ipairs(window.baseBuildingCategoryButtons or {}) do
         local visible = seen[button.category] == true
         button.baseCategoryVisible = visible
         button:setVisible(visible)
         UI.SetButtonVariant(button,
-            button.category == window.baseBuildingCategory
+            not globalSearch and button.category == window.baseBuildingCategory
                 and "selected" or "quiet")
     end
 end

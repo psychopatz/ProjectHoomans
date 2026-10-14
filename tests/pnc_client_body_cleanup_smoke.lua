@@ -62,7 +62,7 @@ local duplicate = makeBody({
         PNC_BodyLease = "lease-old",
     },
 })
-local nakedLegacy = makeBody({
+local ordinaryNakedNearby = makeBody({
     instanceID = 1003,
     onlineID = 13,
     x = 10.4,
@@ -145,7 +145,8 @@ T.load(FILE)
 PNC.ClientPresenceSync.OnTick()
 T.equal(canonical.wasRemoved(), false, "canonical client body preserved")
 T.equal(duplicate.wasRemoved(), true, "old UUID body pruned")
-T.equal(nakedLegacy.wasRemoved(), true, "nearby naked legacy body pruned")
+T.equal(ordinaryNakedNearby.wasRemoved(), false,
+    "nearby ordinary naked body preserved")
 T.equal(unrelatedNaked.wasRemoved(), false, "unrelated naked body preserved")
 T.equal(onlineIDCollision.wasRemoved(), false,
     "online-ID collision body preserved")
@@ -186,6 +187,21 @@ T.equal(PNC.ClientPresenceSync.RemoveBodyInstance({
 T.equal(exact.wasRemoved(), true, "exact server-directed body removed")
 T.equal(removalCollision.wasRemoved(), false,
     "online-ID collision was not removed with another NPC")
+
+local ordinaryZeroInstance = makeBody({
+    instanceID = 0,
+    onlineID = nil,
+    x = 80,
+    y = 80,
+    naked = true,
+})
+T.equal(PNC.ClientPresenceSync.RemoveBodyInstance({
+    id = "zero_id_test",
+    bodyInstanceID = "0",
+    reason = "server_startup_cleanup",
+}), 0, "zero instance ID did not match an ordinary zombie")
+T.equal(ordinaryZeroInstance.wasRemoved(), false,
+    "ordinary zero-instance zombie was preserved")
 
 getCell = function() return nil end
 PNC.ClientPresenceSync.Internal.RefreshBodyMap(1000)

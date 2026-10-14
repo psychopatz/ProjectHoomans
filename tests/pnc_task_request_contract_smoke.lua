@@ -40,7 +40,7 @@ PNC = {
     end } },
 }
 T.load("ProjectHoomans", "shared",
-    "PNC/Core/Production/PNC_WorkDefinitions.lua")
+    "PNC/Core/Production/WorkDefinition/PNC_WorkDefinitions.lua")
 T.load("ProjectHoomans", "shared",
     "PNC/Core/Tasking/PNC_TaskRequestDefinitions.lua")
 

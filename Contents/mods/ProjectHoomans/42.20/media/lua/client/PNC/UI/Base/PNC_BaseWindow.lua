@@ -6,6 +6,8 @@ local BuildingTab = require "PNC/UI/Base/PNC_BaseBuildingTab"
 local Queue = require "PNC/UI/Base/PNC_BaseQueue"
 local SummaryPanel = require "PNC/UI/Base/PNC_BaseSummary"
 local Options = require "PsychopatzCore/UI/PsychopatzCommandHubOptions"
+local FacilityBuildTarget = require
+    "PNC/UI/Shared/PNC_FacilityBuildTarget"
 
 PNC = PNC or {}
 PNC.BaseUI = PNC.BaseUI or {}
@@ -205,31 +207,53 @@ function BaseUI.Open(owner, options)
     then
         window:onTab({ internal = requestedTab })
     end
+    local searchText = options.searchText or options.searchQuery
+    if searchText ~= nil then
+        local searchField = requestedTab == "facilities"
+            and window.baseBuildingSearch or window.buildSearch
+        if searchField and searchField.setText then
+            local value = tostring(searchText)
+            local current = searchField.getText and searchField:getText() or ""
+            if current ~= value then searchField:setText(value) end
+        end
+    end
     local focusDefinitionId = options.focusDefinitionId
-    if focusDefinitionId and BuildingTab.FocusFacility
-        and BuildingTab.FocusFacility(window, focusDefinitionId)
-    then
-        window:requestResponsiveLayout(true)
-    elseif focusDefinitionId and window.baseBuildCardOwner
-        and window.baseBuildCardOwner.setSelected
-    then
-        window.baseBuildCardOwner:setSelected(focusDefinitionId)
-        window:requestResponsiveLayout(true)
+    local focusRequested = focusDefinitionId ~= nil
+    local focusResolved = not focusRequested
+    if focusRequested and BuildingTab.FocusFacility then
+        focusResolved = BuildingTab.FocusFacility(window,
+            focusDefinitionId, options.focusObjectInfoName) == true
+        if focusResolved then window:requestResponsiveLayout(true) end
     end
     window:requestSnapshot("opened")
+    BaseUI.lastOpenResult = {
+        window = window,
+        focusRequested = focusRequested,
+        focusResolved = focusResolved,
+        focusDefinitionId = focusDefinitionId,
+        focusObjectInfoName = options.focusObjectInfoName,
+    }
     trace("pnc_base_open_result", "visible="
         .. tostring(window.getIsVisible and window:getIsVisible() == true)
         .. " tab=" .. tostring(window.tab)
-        .. " focus=" .. tostring(focusDefinitionId))
+        .. " focus=" .. tostring(focusDefinitionId)
+        .. " focus_object=" .. tostring(options.focusObjectInfoName)
+        .. " focus_resolved=" .. tostring(focusResolved))
+    if focusRequested and not focusResolved then
+        return false, "facility_focus_not_found"
+    end
     return window
 end
 
-function BaseUI.OpenForFacility(owner, definitionId)
+function BaseUI.OpenForFacility(owner, definitionId, target)
     local id = tostring(definitionId or "")
     if id == "" then return nil end
+    target = target or FacilityBuildTarget.Resolve(id)
     return BaseUI.Open(owner, {
         tab = "facilities",
         focusDefinitionId = id,
+        focusObjectInfoName = target and target.objectInfoName or nil,
+        searchText = target and target.searchText or id,
     })
 end
 

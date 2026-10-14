@@ -93,7 +93,7 @@ end
 
 function ISPNCNPCPresentationDebugAnimationTab:createChildren()
     ISPanel.createChildren(self)
-    self.search = UI.CreateTextEntry(self, {
+    self.search = UI.CreateSearchEntry(self, {
         clearButton = true,
         width = 100,
         height = 25,

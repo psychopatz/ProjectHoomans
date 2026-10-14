@@ -201,6 +201,16 @@ local function normalizeRecipe(recipe)
     skills, reason = normalizeSkills(recipe)
     if not skills then return nil, reason or "SKILLS_UNAVAILABLE" end
     local tags = normalizeTags(recipe)
+    local stationId
+    local definitions = PNC.WorkDefinitions
+    if definitions and definitions.GetStationIdForTags then
+        stationId = definitions.GetStationIdForTags(tags)
+    end
+    -- Build 42 separates recipes that need a specific workstation from
+    -- recipes that can be done in hand or on any surface. Preserve that
+    -- distinction so a valid handcraft recipe is not treated as unresolved.
+    local requiresSpecificWorkstation = call(recipe,
+        "requiresSpecificWorkstation") == true
     local xpAwards = normalizeXPAwards(recipe)
     local category = tostring(call(recipe, "getCategory") or "")
     local moduleName = tostring(call(recipe, "getModuleName")
@@ -220,6 +230,8 @@ local function normalizeRecipe(recipe)
         xpAwards = xpAwards,
         productionSkillId = primaryProductionSkill(xpAwards, skills),
         tags = tags,
+        requiredStationId = stationId,
+        requiresSpecificWorkstation = requiresSpecificWorkstation,
         craftTime = tonumber(call(recipe, "getTime")) or 100,
         needToBeLearn = call(recipe, "needToBeLearn") == true,
         supported = true,
@@ -295,11 +307,30 @@ end
 function Catalog.Commands.BuildFromScripts(manager)
     manager = manager or (ScriptManager and ScriptManager.instance)
     if not manager or not manager.getAllCraftRecipes then
+        Catalog.Diagnostics.lastBuildFailure = "SCRIPT_MANAGER_UNAVAILABLE"
         return false, "SCRIPT_MANAGER_UNAVAILABLE"
     end
-    local recipes = manager:getAllCraftRecipes()
-    if not recipes then return false, "CRAFT_RECIPES_UNAVAILABLE" end
-    return Catalog.Commands.Rebuild(recipes)
+    -- CraftRecipeManager is a Java boundary. A failure while enumerating its
+    -- collection must stay inside the optional Hoomans catalog and never
+    -- interrupt vanilla handcraft/build UI initialization.
+    local ok, recipes = pcall(manager.getAllCraftRecipes, manager)
+    if not ok then
+        Catalog.Diagnostics.lastBuildFailure = "CRAFT_RECIPES_ENUMERATION_FAILED"
+        return false, "CRAFT_RECIPES_ENUMERATION_FAILED"
+    end
+    if not recipes then
+        Catalog.Diagnostics.lastBuildFailure = "CRAFT_RECIPES_UNAVAILABLE"
+        return false, "CRAFT_RECIPES_UNAVAILABLE"
+    end
+    local rebuilt, result, reason = pcall(Catalog.Commands.Rebuild, recipes)
+    if not rebuilt then
+        Catalog.Diagnostics.lastBuildFailure = "RECIPE_CATALOG_REBUILD_FAILED"
+        return false, "RECIPE_CATALOG_REBUILD_FAILED"
+    end
+    if result ~= true then
+        Catalog.Diagnostics.lastBuildFailure = reason
+    end
+    return result, reason
 end
 
 function Catalog.Queries.Get(key) return Catalog.ByKey[tostring(key or "")] end
@@ -326,9 +357,34 @@ function Catalog.Queries.Diagnostics()
 end
 
 local function buildOnce()
-    if not Catalog.Ready then Catalog.Commands.BuildFromScripts() end
+    if Catalog.Ready then return true end
+    -- On the client, defer optional recipe introspection until the local
+    -- player exists. Vanilla HandcraftLogic also resolves player 0 during
+    -- list filtering; keeping this catalog on the same lifecycle boundary
+    -- avoids touching the native recipe graph during player bootstrap.
+    local serverRuntime = isServer and isServer() == true
+    local clientRuntime = not serverRuntime
+    if PNC.Core and PNC.Core.IsClientOnly then
+        clientRuntime = PNC.Core.IsClientOnly() == true
+    end
+    if clientRuntime and getSpecificPlayer and not getSpecificPlayer(0) then
+        Catalog.Diagnostics.lastBuildFailure = "PLAYER_UNAVAILABLE"
+        Catalog.Diagnostics.buildDeferred = true
+        return false, "PLAYER_UNAVAILABLE"
+    end
+    Catalog.Diagnostics.buildDeferred = false
+    local ok, result, reason = pcall(Catalog.Commands.BuildFromScripts)
+    if not ok then
+        Catalog.Diagnostics.lastBuildFailure = "RECIPE_CATALOG_BUILD_FAILED"
+        return false, "RECIPE_CATALOG_BUILD_FAILED"
+    end
+    if result ~= true and reason then
+        Catalog.Diagnostics.lastBuildFailure = reason
+    end
+    return result, reason
 end
 if Events and Events.OnGameStart then Events.OnGameStart.Add(buildOnce) end
 if Events and Events.OnServerStarted then Events.OnServerStarted.Add(buildOnce) end
+if Events and Events.OnCreatePlayer then Events.OnCreatePlayer.Add(buildOnce) end
 
 return Catalog

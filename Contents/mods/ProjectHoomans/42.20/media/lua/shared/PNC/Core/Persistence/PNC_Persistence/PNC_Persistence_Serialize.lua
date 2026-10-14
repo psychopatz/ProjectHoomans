@@ -111,21 +111,44 @@ local function serializeSkillBaseLevels(record)
 end
 
 local function addBodyHint(payload, record)
-    local startupBodyHint = record.runtime
-        and record.runtime.startupBodyHint or nil
-    if record.liveBodyInstanceID == nil and not startupBodyHint then
+    local runtime = record.runtime or {}
+    local startupBodyHint = runtime.startupBodyHint
+    local instanceID = record.liveBodyInstanceID
+        or startupBodyHint and startupBodyHint.instanceID
+        or runtime.lastLiveBodyInstanceID or nil
+    local populationID = record.liveBodyPopulationID
+        or startupBodyHint and startupBodyHint.populationId
+        or runtime.lastLiveBodyPopulationID or nil
+    local onlineID = record.liveBodyOnlineID
+        or startupBodyHint and startupBodyHint.onlineID
+        or runtime.lastLiveBodyOnlineID or nil
+    local lease = runtime.bodyLease
+        or startupBodyHint and startupBodyHint.lease
+        or runtime.lastLiveBodyLease or nil
+    if instanceID == nil and populationID == nil
+    then
         return
     end
     payload.bodyHint = {
-        instanceID = record.liveBodyInstanceID
-            or startupBodyHint and startupBodyHint.instanceID or nil,
-        onlineID = record.liveBodyOnlineID
-            or startupBodyHint and startupBodyHint.onlineID or nil,
-        lease = record.runtime and record.runtime.bodyLease
-            or startupBodyHint and startupBodyHint.lease or nil,
-        x = Internal.normalizeNumber(record.x, 0),
-        y = Internal.normalizeNumber(record.y, 0),
-        z = Internal.normalizeNumber(record.z, 0),
+        instanceID = instanceID,
+        onlineID = onlineID,
+        lease = lease,
+        populationId = populationID,
+        x = Internal.normalizeNumber(
+            startupBodyHint and startupBodyHint.x
+                or runtime.lastLiveBodyX or record.x,
+            0
+        ),
+        y = Internal.normalizeNumber(
+            startupBodyHint and startupBodyHint.y
+                or runtime.lastLiveBodyY or record.y,
+            0
+        ),
+        z = Internal.normalizeNumber(
+            startupBodyHint and startupBodyHint.z
+                or runtime.lastLiveBodyZ or record.z,
+            0
+        ),
     }
 end
 

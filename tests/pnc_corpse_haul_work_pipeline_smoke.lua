@@ -255,7 +255,7 @@ local record = {
 PNC.Registry.Data[record.id] = record
 
 local Definitions = T.load("ProjectHoomans", "shared",
-    "PNC/Core/Production/PNC_WorkDefinitions.lua")
+    "PNC/Core/Production/WorkDefinition/PNC_WorkDefinitions.lua")
 local Repository = T.load("ProjectHoomans", "server",
     "PNC/Production/PNC_WorkRepository.lua")
 Repository.Import(nil)

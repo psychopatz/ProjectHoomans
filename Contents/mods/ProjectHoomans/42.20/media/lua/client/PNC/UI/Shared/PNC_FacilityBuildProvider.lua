@@ -1,3 +1,9 @@
+-- Shared facility-build data and visual provider.
+--
+-- The integrated Base window consumes this provider directly. Window
+-- lifecycle, placement, and settlement navigation belong to their owning
+-- surfaces and are intentionally not initialized here.
+
 require "ISUI/ISPanel"
 require "PsychopatzCore/UI/PsychopatzUI"
 
@@ -6,9 +12,11 @@ PNC.FacilityBuildUI = PNC.FacilityBuildUI or {}
 
 local BuildUI = PNC.FacilityBuildUI
 require "PNC/UI/SettlementManagement/PNC_SettlementManagement_FacilityBuildCatalog"
-require "PNC/UI/SettlementManagement/PNC_SettlementManagement_FacilityBuildCard"
+require "PNC/UI/Shared/PNC_FacilityBuildCard"
+local FacilityBuildTarget = require
+    "PNC/UI/Shared/PNC_FacilityBuildTarget"
+
 local FacilityCard = BuildUI.FacilityCard
-BuildUI.lastOpenArgs = BuildUI.lastOpenArgs or nil
 local UI = PsychopatzCore.UI
 local Theme = UI.Theme
 local Layout = UI.Layout
@@ -20,7 +28,6 @@ local CATEGORY_LABELS = {
 }
 local PAGE_SIZE = 4
 local FACILITY_WINDOW_SPEC = {
-    -- Logical pixels scaled from PsychopatzCore's 1920x1080 baseline.
     width = 1180,
     height = 760,
     minWidth = 760,
@@ -60,38 +67,9 @@ BuildInternal.CanUseDebug = canUseDebug
 BuildInternal.WindowSpec = facilityWindowSpec
 BuildInternal.Theme = Theme
 BuildInternal.FacilityCard = FacilityCard
+BuildInternal.FacilityBuildTarget = FacilityBuildTarget
 BuildInternal.CategoryOrder = CATEGORY_ORDER
 BuildInternal.CategoryLabels = CATEGORY_LABELS
 BuildInternal.PageSize = PAGE_SIZE
-
-ISPNCFacilityBuildWindow = PsychopatzWindow:derive("ISPNCFacilityBuildWindow")
-
-function ISPNCFacilityBuildWindow:initialise()
-    PsychopatzWindow.initialise(self)
-end
-
-function ISPNCFacilityBuildWindow:close()
-    self:setVisible(false); self:removeFromUIManager()
-    if BuildUI.instance == self then BuildUI.instance = nil end
-end
-
-function ISPNCFacilityBuildWindow:new(x, y, width, height, options)
-    local object = PsychopatzWindow:new(x, y, width, height, options)
-    setmetatable(object, self); self.__index = self
-    object.options = options.options or {}
-    object.onConfirm = options.onConfirm
-    object.focusDefinitionId = options.focusDefinitionId
-    object.settlement = options.settlement
-    object.storage = options.storage
-    object.research = options.research
-    object.snapshotRevision = tonumber(options.snapshotRevision) or 0
-    object.debugMaterialsPending = false
-    object.openArgs = options.openArgs
-    return object
-end
-
-
-require "PNC/UI/SettlementManagement/PNC_SettlementManagement_FacilityBuildPresentation"
-require "PNC/UI/SettlementManagement/PNC_SettlementManagement_FacilityBuildInteraction"
 
 return BuildUI

@@ -20,10 +20,10 @@ local inventoryListSource = T.read("ProjectHoomans", "client",
     "PNC/UI/Inventory/PNC_InventoryUI_List.lua")
 local inventoryListInputSource = T.read("ProjectHoomans", "client",
     "PNC/UI/Inventory/PNC_InventoryUI_List/_Input.lua")
-local facilityModalSource = T.read("ProjectHoomans", "client",
-    "PNC/UI/SettlementManagement/PNC_SettlementManagement_FacilityBuildModal.lua")
+local facilityProviderSource = T.read("ProjectHoomans", "client",
+    "PNC/UI/Shared/PNC_FacilityBuildProvider.lua")
 local facilityCardSource = T.read("ProjectHoomans", "client",
-    "PNC/UI/SettlementManagement/PNC_SettlementManagement_FacilityBuildCard.lua")
+    "PNC/UI/Shared/PNC_FacilityBuildCard.lua")
 local hubSource = T.read("ProjectHoomans", "client",
     "PNC/UI/CommandHub/PNC_CommandHub.lua")
 local hubWindowSource = T.read("ProjectHoomans", "client",
@@ -51,6 +51,12 @@ T.contains(windowSource, 'id = "pnc-command-hub-base-widget"',
     "Base window is not installed as a detachable widget")
 T.contains(windowSource, 'persistenceKey = "PNC.CommandHub.Base"',
     "Base window does not persist its geometry")
+T.contains(windowSource, "focusObjectInfoName",
+    "Base handoff does not accept native object identity")
+T.contains(windowSource, "focus_resolved",
+    "Base handoff does not report whether focus succeeded")
+T.contains(windowSource, "facility_focus_not_found",
+    "Base handoff silently accepts an unresolved facility")
 T.contains(windowSource, '{ "base", tr',
     "Base tab is missing")
 T.contains(windowSource, '{ "facilities", tr',
@@ -67,6 +73,8 @@ T.contains(buildingCardsSource, "BuildUI.FacilityCard",
     "Building tab does not reuse the established facility card surface")
 T.contains(buildingViewSource, "Data.CatalogOptions",
     "Base catalogs are not separated into facilities and buildings")
+T.contains(buildingViewSource, "FacilityBuildTarget.MatchesOption",
+    "Base facility focus does not use canonical native identity")
 T.contains(buildingDataSource, 'option.id ~= "stockpile"',
     "Stockpile is still exposed in the Facilities catalog")
 T.contains(buildingCatalogSource, "FilterFacilityRecipes",
@@ -79,6 +87,10 @@ T.contains(buildingCatalogSource, "buildRecipePreview",
     "Buildings catalog is missing the selected-recipe preview pane")
 T.contains(facilityCardSource, "BuildUI.DrawNativePreview",
     "Native building preview compositor is not shared with the Buildings tab")
+T.contains(buildingViewSource, "PNC/UI/Shared/PNC_FacilityBuildProvider",
+    "Buildings tab still depends on the removed facility modal")
+T.contains(facilityProviderSource, "PNC_FacilityBuildTarget",
+    "Facility provider does not expose the canonical build target resolver")
 T.contains(buildingViewSource, "REQUIREMENTS",
     "Building tab does not expose the lower material requirements pane")
 T.contains(buildingViewSource, "ISScrollingListBox.onMouseDown(list, x, y)",

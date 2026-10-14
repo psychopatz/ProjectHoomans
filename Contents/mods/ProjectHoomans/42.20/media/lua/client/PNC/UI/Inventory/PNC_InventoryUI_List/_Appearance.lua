@@ -98,12 +98,20 @@ function ISPNCInventoryList:doDrawItem(y, listItem, alt)
     if not row then return y + self.itemheight end
     local selected = self.selected == listItem.index
     local stripe = (listItem.index or 0) % 2 == 0
+    local skillHeader = row.skillHeader == true
+    local stationHeader = row.stationHeader == true
     -- Group rows are navigational headers, not unavailable inventory items.
     -- Keep them readable even when their child rows are restricted.
     local dimmed = row.restricted == true and row.groupHeader ~= true
     if selected then
         self:drawRect(0, y, self.width, self.itemheight,
             scaledOpacity(self, 0.32), 0.32, 0.36, 0.40)
+    elseif skillHeader then
+        self:drawRect(0, y, self.width, self.itemheight,
+            scaledOpacity(self, 0.18), 0.08, 0.25, 0.18)
+    elseif stationHeader then
+        self:drawRect(0, y, self.width, self.itemheight,
+            scaledOpacity(self, 0.16), 0.08, 0.15, 0.22)
     elseif stripe then
         self:drawRect(0, y, self.width, self.itemheight,
             scaledOpacity(self, 0.13), 0.13, 0.13, 0.46)
@@ -111,12 +119,26 @@ function ISPNCInventoryList:doDrawItem(y, listItem, alt)
         self:drawRect(0, y, self.width, self.itemheight,
             scaledOpacity(self, 0.07), 0.07, 0.07, 0.46)
     end
-    local indent = row.groupHeader and 12 or row.groupChild and 12 or 0
+    if skillHeader then
+        self:drawRect(0, y, 3, self.itemheight,
+            scaledOpacity(self, 0.70), 0.25, 0.86, 0.50)
+    elseif stationHeader then
+        local red, green, blue = 0.28, 0.68, 0.92
+        if row.stationMissing or row.stationStatus == "unresolved" then
+            red, green, blue = 0.96, 0.68, 0.20
+        end
+        self:drawRect(0, y, 3, self.itemheight,
+            scaledOpacity(self, 0.80), red, green, blue)
+    end
+    local indent = skillHeader and 12
+        or stationHeader and 28
+        or row.groupChild and 42 or 0
     if row.groupHeader then
         local treeTexture = row.expanded and self.treeExpanded or self.treeCollapsed
         if treeTexture then
             self:drawTextureScaledAspect(
-                treeTexture, 1, y + 9, 12, 12, 1, 1, 1, 1
+                treeTexture, stationHeader and 15 or 1, y + 9,
+                12, 12, 1, 1, 1, 1
             )
         end
     end
@@ -145,12 +167,20 @@ function ISPNCInventoryList:doDrawItem(y, listItem, alt)
     end
     local countText = row.stack and row.stack > 1
         and (" (" .. tostring(row.stack) .. ")") or ""
-    local textColor
-    if row.groupHeader then
-        textColor = row.skillHeader and 0.92 or 0.82
+    local textRed, textGreen, textBlue
+    if skillHeader then
+        textRed, textGreen, textBlue = 0.92, 0.96, 0.94
+    elseif stationHeader then
+        if row.stationMissing or row.stationStatus == "unresolved" then
+            textRed, textGreen, textBlue = 1.00, 0.76, 0.28
+        else
+            textRed, textGreen, textBlue = 0.68, 0.86, 0.96
+        end
     else
-        textColor = dimmed
-            and (self.readableRestricted and 0.62 or 0.40) or 0.86
+        textRed, textGreen, textBlue = dimmed
+            and (self.readableRestricted and 0.62 or 0.40) or 0.86,
+            dimmed and (self.readableRestricted and 0.62 or 0.40) or 0.86,
+            dimmed and (self.readableRestricted and 0.68 or 0.46) or 0.92
     end
     local catalogCells = catalogCellsForRow(self, row)
     local custom = drawCatalogColumns(self, y, row, dimmed, catalogCells)
@@ -172,7 +202,7 @@ function ISPNCInventoryList:doDrawItem(y, listItem, alt)
     self:drawText(
         name,
         39 + indent, y + 7,
-        textColor, textColor, textColor, 1, UIFont.Small
+        textRed, textGreen, textBlue, 1, UIFont.Small
     )
     local preferenceColumn = not custom and self.ownerWindow
         and self.ownerWindow.giftMode and self.role == "player"

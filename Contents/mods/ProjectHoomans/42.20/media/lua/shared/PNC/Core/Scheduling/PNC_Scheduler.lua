@@ -108,6 +108,13 @@ function Scheduler.Initialize(records, now)
     Scheduler.Initialized = true
 end
 
+function Scheduler.EnsureInitialized(records, now)
+    if not Scheduler.Initialized then
+        Scheduler.Initialize(records, now)
+    end
+    return Scheduler.Initialized == true
+end
+
 function Scheduler.PopDue(records, now)
     local output = {}
     local deferred = {}
@@ -123,7 +130,7 @@ function Scheduler.PopDue(records, now)
     local overdueMs
     local oldestOverdueMs = 0
     if not Scheduler.Initialized then
-        Scheduler.Initialize(records, now)
+        Scheduler.EnsureInitialized(records, now)
         slot = Scheduler.LastSlot
     end
     while slot < currentSlot do

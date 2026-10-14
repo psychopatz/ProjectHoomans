@@ -182,7 +182,10 @@ function H.SpawnCommunityMembers(
             )
         end
         if presenceMode == "abstract" then
-            record.runtime.forceAbstract = true
+            -- Abstract is an initial placement preference, not a permanent
+            -- proximity veto.
+            record.runtime.abstractPreference = true
+            record.runtime.forceAbstract = nil
             if record.presenceState == PNC.Const.PRESENCE_LIVE then
                 PNC.Presence.Abstract(
                     record,

@@ -12,28 +12,41 @@ local persist = Deps.persist
 local noteIncrement = Deps.noteIncrement
 local logDebug = Deps.logDebug
 
+local function validEngineIdentity(value)
+    local numeric
+    if value == nil then
+        return false
+    end
+    if tostring(value) == "" or tostring(value) == "0" then
+        return false
+    end
+    numeric = tonumber(value)
+    return numeric == nil or numeric ~= 0
+end
+
 --[[
     PNC shell outfit identity.
 
-    Every live shell is dressed with the persistent outfit "Naked", and the
-    engine stores the persistent outfit id in the anonymous population record
-    that a virtualized shell becomes. That id therefore survives where ModData
-    does not, which makes it the one durable hint that a body is (or was) a PNC
-    shell.
+    New live shells use the PNC-only persistent outfit "PNCShellCarrier", and
+    the engine stores its persistent outfit id in the anonymous population
+    record that a virtualized shell becomes. That id therefore survives where
+    ModData does not, which makes it a durable hint that a body is (or was) a
+    PNC shell. Legacy saves may still contain the old "Naked" carrier and are
+    handled by strict ledger and positional hints.
 
     The ids are LEARNED from shells PNC actually creates and persisted, so this
     never depends on the outfit script name or on a Lua-side outfit lookup.
 
-    This is deliberately NOT used as a global husk rule: vanilla also dresses
-    bathroom zombies with the "Naked" outfit, so matching on the outfit alone
-    would delete ordinary zombies. It is only trusted in worlds that cannot
-    legitimately contain vanilla zombies at all (zombie spawning disabled), plus
-    the strict ledger path everywhere else.
+    The general shell-outfit set is deliberately NOT used as a global husk
+    rule: vanilla also dresses bathroom zombies with the "Naked" outfit, so
+    matching on that set alone would delete ordinary zombies. The separate
+    carrier set is only trusted after PNC has learned the id from a body it
+    created.
 ]]
 function Lifecycle.NoteShellOutfitID(outfitID)
     local ledger
     local key
-    if outfitID == nil then
+    if not validEngineIdentity(outfitID) then
         return false
     end
     ledger = ensureLoaded()
@@ -54,13 +67,62 @@ function Lifecycle.NoteShellOutfitID(outfitID)
     return true
 end
 
+-- A carrier id is a stricter subset of shell ids. Legacy Naked ids remain in
+-- shellOutfitIds for positional husk matching, but they must never become a
+-- global startup signature because vanilla bathroom zombies can share them.
+function Lifecycle.NoteShellCarrierID(outfitID)
+    local ledger
+    local key
+    if not validEngineIdentity(outfitID) then
+        return false
+    end
+    ledger = ensureLoaded()
+    key = tostring(outfitID)
+    if key == "" or ledger.shellCarrierIds[key] == true then
+        return false
+    end
+    -- The legacy shell-outfit set may already be full. Carrier ids are a
+    -- separate, stronger namespace and must still be learnable; otherwise an
+    -- old save permanently prevents the new durable PNCShellCarrier path.
+    if Lifecycle.ShellCarrierCount()
+        >= (tonumber(Const.HUSK_LEDGER_MAX_SHELL_CARRIERS)
+            or tonumber(Const.HUSK_LEDGER_MAX_SHELL_OUTFITS)
+            or 32)
+    then
+        return false
+    end
+    ledger.shellCarrierIds[key] = true
+    if not ledger.shellOutfitIds[key]
+        and Lifecycle.ShellOutfitCount()
+            < (tonumber(Const.HUSK_LEDGER_MAX_SHELL_OUTFITS) or 32)
+    then
+        ledger.shellOutfitIds[key] = true
+    end
+    persist(ledger)
+    noteIncrement("HuskLedger.ShellCarriersLearned")
+    if Core and Core.LogInfo then
+        pcall(Core.LogInfo, "PNC shell_carrier_learned outfitID=" .. key
+            .. " carrierCount=" .. tostring(Lifecycle.ShellCarrierCount()))
+    end
+    return true
+end
+
 function Lifecycle.IsShellOutfitID(outfitID)
     local ledger
-    if outfitID == nil then
+    if not validEngineIdentity(outfitID) then
         return false
     end
     ledger = ensureLoaded()
     return ledger.shellOutfitIds[tostring(outfitID)] == true
+end
+
+function Lifecycle.IsShellCarrierID(outfitID)
+    local ledger
+    if not validEngineIdentity(outfitID) then
+        return false
+    end
+    ledger = ensureLoaded()
+    return ledger.shellCarrierIds[tostring(outfitID)] == true
 end
 
 function Lifecycle.ShellOutfitCount()
@@ -73,36 +135,38 @@ function Lifecycle.ShellOutfitCount()
     return count
 end
 
+function Lifecycle.ShellCarrierCount()
+    local ledger = ensureLoaded()
+    local count = 0
+    local _ = nil
+    for _ in pairs(ledger.shellCarrierIds) do
+        count = count + 1
+    end
+    return count
+end
+
 --[[
-    Simple orphan rule for worlds that cannot spawn vanilla zombies.
-
-    When `IsoWorld.getZombiesDisabled()` is true the engine creates no zombies
-    at all: every gate (IsoChunk, the population manager, addZombiesInOutfit)
-    is shut. Any body in such a world that carries no PNC ModData and is not
-    owned by a foreign mod can therefore only be a shell PNC lost - the
-    population manager handed a virtualized NPC body back without its ModData.
-
-    That makes the reclaim independent of the persistent outfit id (which a
-    Lua-created body cannot set in a disabled world) and independent of any
-    recorded loss position: it just deletes the orphan.
-
-    In a normal-population world this is false and the strict ledger path stays
-    in force, because vanilla dresses bathroom zombies with the same "Naked"
-    outfit that PNC uses.
+    Positive-only fallback for a restored shell whose ledger callback was
+    missed. An unmarked zombie is not proof of PNC ownership: ordinary zombies
+    can already exist in a save even when the current spawn setting is zero.
+    The only anonymous fallback we trust is a persistent outfit id previously
+    learned from a body PNC actually stamped with PNCShellCarrier. Legacy Naked
+    bodies remain on the strict ledger/position migration path.
 ]]
 function Lifecycle.IsOrphanedShell(zombie)
     local ownership
     local ok
     local value
+    local outfitID
     if not zombie then
         return false
     end
-    if not (Lifecycle.AreZombieSpawnsDisabled
-        and Lifecycle.AreZombieSpawnsDisabled() == true)
-    then
-        return false
+    if zombie.isDead then
+        ok, value = pcall(zombie.isDead, zombie)
+        if ok and value == true then
+            return false
+        end
     end
-    -- A reanimated player is a vanilla body that may exist in any world.
     if zombie.isReanimatedPlayer then
         ok, value = pcall(zombie.isReanimatedPlayer, zombie)
         if ok and value == true then
@@ -116,7 +180,16 @@ function Lifecycle.IsOrphanedShell(zombie)
             return false
         end
     end
-    return true
+    if not zombie.getPersistentOutfitID
+        or not Lifecycle.IsShellCarrierID
+    then
+        return false
+    end
+    ok, outfitID = pcall(zombie.getPersistentOutfitID, zombie)
+    if not ok or not validEngineIdentity(outfitID) then
+        return false
+    end
+    return Lifecycle.IsShellCarrierID(outfitID) == true
 end
 
 return Lifecycle

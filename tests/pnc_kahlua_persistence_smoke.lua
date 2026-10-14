@@ -155,6 +155,7 @@ local record = {
     persistedInventory = { revision = 0 },
     liveBodyInstanceID = 9191,
     liveBodyOnlineID = 91,
+    liveBodyPopulationID = "7319",
     runtime = {
         bodyLease = "lease-persisted",
     },
@@ -229,6 +230,8 @@ T.truthy(payload.equipmentSpawnMode == "ranged", "equipment spawn override was n
 T.truthy(payload.equipmentPoolID == "Default", "equipment pool was not serialized")
 T.truthy(payload.bodyHint.instanceID == 9191, "live body instance hint was not serialized")
 T.truthy(payload.bodyHint.lease == "lease-persisted", "live body lease hint was not serialized")
+T.truthy(payload.bodyHint.populationId == "7319",
+    "live body population hint was not serialized")
 T.truthy(payload.generation.generationId == "POP_GROUP_0000042",
     "population provenance was not serialized")
 T.truthy(payload.vanillaTraits.highthirst == true,
@@ -266,6 +269,8 @@ T.truthy(restored.runtime.startupBodyHint.instanceID == "9191",
     "startup body instance hint did not round trip")
 T.truthy(restored.runtime.startupBodyHint.lease == "lease-persisted",
     "startup body lease hint did not round trip")
+T.truthy(restored.runtime.startupBodyHint.populationId == "7319",
+    "startup body population hint did not round trip")
 T.truthy(restored.generation.generationId == "POP_GROUP_0000042",
     "population provenance did not round trip")
 T.truthy(restored.vanillaTraits.highthirst == true,

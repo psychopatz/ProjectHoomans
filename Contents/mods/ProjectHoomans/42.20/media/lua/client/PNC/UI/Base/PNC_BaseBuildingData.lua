@@ -1,4 +1,5 @@
 local InventoryModel = require "PNC/UI/Inventory/PNC_InventoryUI_Model"
+local SearchIndex = require "PsychopatzCore/UI/PsychopatzSearchIndex"
 
 local Data = {}
 
@@ -124,23 +125,35 @@ function Data.SelectedOption(window)
     return nil
 end
 
+function Data.IsSearchActive(window)
+    local search = window and window.baseBuildingSearch
+    local value = search and search:getText() or ""
+    return SearchIndex.Normalize(value) ~= ""
+end
+
 function Data.FilteredOptions(window)
-    local output = {}
     local search = window.baseBuildingSearch and window.baseBuildingSearch:getText()
         or ""
-    search = string.lower(tostring(search or ""))
-    for _, option in ipairs(window.baseBuildingOptions or {}) do
-        local categoryMatches = window.baseBuildingCategory == "ALL"
-            or tostring(option.category) == tostring(window.baseBuildingCategory)
-        local text = string.lower(table.concat({ tostring(option.name or ""),
-            tostring(option.id or ""), tostring(option.status or "") }, " "))
-        if categoryMatches and (search == ""
-            or string.find(text, search, 1, true) ~= nil)
-        then
-            output[#output + 1] = option
-        end
-    end
-    return output
+    window.baseFacilitySearchIndex = window.baseFacilitySearchIndex
+        or SearchIndex.New({
+            key = function(option) return option and option.id end,
+            fields = function(option)
+                return { option and option.name, option and option.id,
+                    option and option.status, option and option.category }
+            end,
+        })
+    window.baseFacilitySearchIndex:SetSource(window.baseBuildingOptions or {},
+        window.lastReceiveRevision)
+    local globalSearch = SearchIndex.Normalize(search) ~= ""
+    local category = tostring(window.baseBuildingCategory or "ALL")
+    return window.baseFacilitySearchIndex:Query(search, function(option)
+        -- A non-empty facilities search is global. Retain the selected
+        -- category so clearing the search restores the user's context, but do
+        -- not let that category hide matches from another facility group.
+        return globalSearch
+            or category == "ALL"
+            or tostring(option.category) == category
+    end)
 end
 
 -- The legacy facility catalog contains room facilities and direct workstation

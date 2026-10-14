@@ -16,13 +16,12 @@ package.preload["PNC/UI/Inventory/PNC_InventoryUI_Model"] = function()
     return PNC.InventoryUIModel
 end
 local buildStationCalls = {}
-package.preload[
-    "PNC/UI/SettlementManagement/PNC_SettlementManagement_FacilityBuildModal"
-] = function()
-    return { Open = function(_, _, _, _, focusDefinitionId)
-        buildStationCalls[#buildStationCalls + 1] = focusDefinitionId
-    end }
-end
+PNC.CommandHub = { ChildController = {
+    Open = function(_, _, options)
+        buildStationCalls[#buildStationCalls + 1] = options.focusDefinitionId
+        return true
+    end,
+} }
 package.preload[
     "PNC/UI/SettlementManagement/PNC_SettlementManagement_FacilityActions"
 ] = function() return { BeginBuild = function() return true end } end
@@ -53,6 +52,8 @@ local snapshot = {
         { recordIndex = 2, fullType = "Base.Apple", quantity = 80 },
     } },
     workshop = { knownRecipes = {{ id = 7, status = "AVAILABLE",
+        requiredStation = { id = "forge", facilityId = "forge",
+            role = "work.craft" },
         descriptor = { key = "spear", displayName = "Crafted Spear",
             inputs = {{ itemTypes = { "Base.Plank" }, amount = 1 }},
             outputs = {{ itemTypes = { "Base.SpearCrafted" }, amount = 1 }} },
@@ -94,14 +95,19 @@ T.truthy(window.workshopLaneAvailability.craft
 snapshot.settlement.facilities = {}
 T.truthy(Workshop.Rebuild(window, snapshot,
     function(_, fallback) return fallback end) == true)
+local missingHeader = window.workshopRecipeList.items[2]
 local missingRecipe = window.workshopRecipeList.items[3]
-T.truthy(missingRecipe.stationMissing
-    and missingRecipe.enabled == true
-    and missingRecipe.catalogCells.action == "BUILD STATION",
-    "missing station did not expose its build shortcut")
-Workshop.OnCatalogCell(window, missingRecipe, "action", 0, 100)
-T.equal(buildStationCalls[1], "workshop",
-    "station shortcut did not focus the required building")
+T.truthy(missingHeader.stationHeader
+    and missingHeader.stationMissing
+    and missingHeader.catalogCells.action == "BUILD STATION",
+    "missing station header did not expose its build shortcut")
+T.equal(missingRecipe.catalogCells.action, "",
+    "missing station action was repeated on the recipe row")
+Workshop.OnCatalogControl(window, missingHeader, "action", {
+    internal = "activate",
+})
+T.equal(buildStationCalls[1], "forge",
+    "station shortcut did not focus the required direct workstation")
 T.finish("pnc_colony_management_workshop_catalog_smoke")
 
 T.finish("pnc_colony_management_workshop_catalog_smoke")

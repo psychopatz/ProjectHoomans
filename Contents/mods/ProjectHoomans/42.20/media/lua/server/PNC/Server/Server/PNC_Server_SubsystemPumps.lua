@@ -115,6 +115,11 @@ function H.PrepareTick(now)
         safeOptional("server_prepare.live_travel_watchdog",
             PNC.Travel.Service, "AuditActiveLiveJourneys", nil, now, false)
     end
+    -- Vehicle reservation markers are durable and must be rehydrated before
+    -- startup body reconciliation. Otherwise the first tick can rebind a
+    -- passenger shell before the vehicle audit restores its bodyless state.
+    safeOptional("server_prepare.vehicle_reservations", PNC.CompanionVehicle,
+        "AuditLoadedReservations", nil, now, false)
     safeOptional("server_prepare.body_startup_cleanup", BodyLifecycle,
         "PumpStartupBodyCleanup", nil, now, false)
     safeOptional("server_prepare.body_audit", BodyLifecycle,
@@ -124,8 +129,6 @@ function H.PrepareTick(now)
     -- lease that just went missing is already in the ledger.
     safeOptional("server_prepare.husk_reaper", BodyLifecycle,
         "PumpHuskReaper", nil, now, false)
-    safeOptional("server_prepare.vehicle_reservations", PNC.CompanionVehicle,
-        "AuditLoadedReservations", nil, now, false)
     if now - H.LastLivePositionSafetyRefreshAt
         >= (tonumber(Const.LIVE_POSITION_SAFETY_REFRESH_MS) or 1000)
     then
@@ -135,6 +138,11 @@ function H.PrepareTick(now)
     end
     safeOptional("server_prepare.spatial_rebuild", Spatial, "Rebuild", nil,
         now, false)
+    -- Initialize before the interest pass. PopDue used to initialize after
+    -- nearby wakes were scheduled, which reset the buckets and discarded the
+    -- very materialization requests created during the relog tick.
+    safeOptional("server_prepare.scheduler_initialize", PNC.Scheduler,
+        "EnsureInitialized", nil, Registry.Data, now)
     -- Compatibility adapters share the same scheduler as core systems. This
     -- keeps their work visible to the profiler and prevents a second OnTick
     -- callback from competing with the server tick's phase ordering.

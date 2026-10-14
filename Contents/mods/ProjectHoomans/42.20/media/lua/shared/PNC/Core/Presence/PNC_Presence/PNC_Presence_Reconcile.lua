@@ -3,11 +3,14 @@ local Internal = Presence.Internal
 local Core = PNC.Core
 local Const = PNC.Const
 local Spatial = PNC.SpatialIndex
+local Registry = PNC.Registry
+local Audit = Internal.PresenceDiagnostics
 
 function Presence.Reconcile(record)
     local nearest
     local bodyLost
     local shouldMaterialize
+    local materializeReason
     local shouldAbstract
     if record.alive == false then return end
     -- A live shell that left the loaded world must be released before anything
@@ -33,9 +36,27 @@ function Presence.Reconcile(record)
     record.runtime.nearestPlayerDistSq = nearest and nearest.distSq or nil
     record.runtime.lastPresenceCheckAt = Core.Now()
     record.runtime.forcePresenceCheck = nil
-    shouldMaterialize = Presence.ShouldMaterialize(record, nearest)
+    shouldMaterialize, materializeReason = Presence.ShouldMaterialize(
+        record,
+        nearest
+    )
     shouldAbstract = not shouldMaterialize
         and Presence.ShouldAbstract(record, nearest)
+    if record.presenceState == Const.PRESENCE_ABSTRACT
+        and Audit
+        and Audit.LogDecision
+    then
+        Audit.LogDecision(record,
+            shouldMaterialize and "allow" or "block",
+            materializeReason,
+            nearest,
+            {
+                indexed = Internal.lastInterestIndexed,
+                fallback = Internal.lastInterestUsedRegistryFallback,
+                schedulerDueAt = record.runtime
+                    and record.runtime.schedulerDueAt,
+            })
+    end
     if shouldMaterialize and record.presenceState ~= Const.PRESENCE_LIVE then
         if Internal.LogTraversal then
             Internal.LogTraversal(record, "presence_decision", nil, {
@@ -56,7 +77,7 @@ function Presence.Reconcile(record)
 end
 
 local function collectCandidate(
-    seen, ordered, record, player, radiusSq
+    seen, ordered, record, player, radiusSq, source
 )
     local distSq
     local entry
@@ -71,42 +92,68 @@ local function collectCandidate(
     if distSq > radiusSq then return end
     entry = seen[record.id]
     if not entry then
-        entry = { record = record, distSq = distSq }
+        entry = {
+            record = record,
+            distSq = distSq,
+            source = source or "spatial",
+        }
         seen[record.id] = entry
         ordered[#ordered + 1] = entry
     elseif distSq < entry.distSq then
         entry.distSq = distSq
+        if source == "spatial" then entry.source = source end
     end
 end
 
-local function collectCandidates(radius)
+local function collectCandidates(radius, useRegistryFallback)
     local seen = {}
     local ordered = {}
+    local players = {}
     local candidates
+    local indexedCount = 0
     local i
     Core.ForEachPlayer(function(player)
+        players[#players + 1] = player
         candidates = Spatial.QueryNPCs(
             player:getX(),
             player:getY(),
             radius
         )
+        indexedCount = indexedCount + #candidates
         for i = 1, #candidates do
             collectCandidate(
                 seen,
                 ordered,
                 candidates[i],
                 player,
-                radius * radius
+                radius * radius,
+                "spatial"
             )
         end
     end)
+    if useRegistryFallback and Registry and Registry.ForEach then
+        Registry.ForEach(function(record)
+            local player
+            for i = 1, #players do
+                player = players[i]
+                collectCandidate(
+                    seen,
+                    ordered,
+                    record,
+                    player,
+                    radius * radius,
+                    "registry_fallback"
+                )
+            end
+        end)
+    end
     table.sort(ordered, function(left, right)
         if left.distSq == right.distSq then
             return tostring(left.record.id) < tostring(right.record.id)
         end
         return left.distSq < right.distSq
     end)
-    return ordered
+    return ordered, #players, indexedCount
 end
 
 local function wakeCandidates(ordered, now)
@@ -121,6 +168,10 @@ local function wakeCandidates(ordered, now)
         record.runtime = record.runtime or {}
         record.runtime.nearestPlayerDistSq = entry.distSq
         record.runtime.forcePresenceCheck = true
+        record.runtime.presenceInterestSource = entry.source
+        record.runtime.presenceInterestIndexed = entry.source == "spatial"
+        record.runtime.presenceInterestFallback =
+            entry.source == "registry_fallback"
         if PNC.SimulationClock and PNC.SimulationClock.Wake then
             PNC.SimulationClock.Wake(record, "presence", now)
         end
@@ -133,6 +184,10 @@ end
 function Presence.RefreshMaterializationCandidates(now, force)
     local ordered
     local count
+    local playerCount
+    local indexedCount
+    local useRegistryFallback
+    local indexWasReady
     local radius = tonumber(Const.MATERIALIZE_DISTANCE) or 28
     now = tonumber(now) or Core.Now()
     if force ~= true
@@ -143,14 +198,30 @@ function Presence.RefreshMaterializationCandidates(now, force)
     end
     Internal.LastInterestRefreshAt = now
     if not Spatial or not Spatial.QueryNPCs then return 0 end
-    ordered = collectCandidates(radius)
-    count = #ordered
-    wakeCandidates(ordered, now)
-    if count > 0 and Spatial.Rebuild then
-        -- PrepareTick already rebuilds the shared index before this interest
-        -- pass. Respect the spatial/census throttle here so a nearby abstract
-        -- NPC cannot force a second full engine scan in the same tick.
+    indexWasReady = Spatial.NPCInitialized == true
+    if Spatial.Rebuild then
+        -- Rebuild before querying. On a relog the registry can be loaded while
+        -- the index is still empty; querying first creates a one-tick blind
+        -- spot and makes the nearby NPC look permanently abstract.
         Spatial.Rebuild(now, false)
     end
+    useRegistryFallback = not indexWasReady
+        or Spatial.NPCInitialized ~= true
+        or now - (tonumber(Internal.LastRegistryFallbackAt) or 0) >= 1000
+    ordered, playerCount, indexedCount = collectCandidates(
+        radius,
+        useRegistryFallback
+    )
+    if useRegistryFallback then
+        Internal.LastRegistryFallbackAt = now
+    end
+    count = #ordered
+    Internal.lastInterestIndexed = indexedCount
+    Internal.lastInterestUsedRegistryFallback = useRegistryFallback
+    if Audit and Audit.LogInterest then
+        Audit.LogInterest(now, playerCount, indexedCount,
+            useRegistryFallback, count)
+    end
+    wakeCandidates(ordered, now)
     return count
 end

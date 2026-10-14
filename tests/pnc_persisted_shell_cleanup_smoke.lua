@@ -15,6 +15,7 @@ local warnings = {}
 local records = {}
 local bodies = {}
 local directSafetyApplications = 0
+local reboundBodies = 0
 
 PNC = {
     Const = {
@@ -26,6 +27,7 @@ PNC = {
         BODY_SHELL_RESPAWN_DELAY_MS = 350,
         BODY_SHELL_MAINTENANCE_MS = 1000,
         BODY_SHELL_STARTUP_PASSES = 3,
+        BODY_SHELL_STARTUP_SETTLE_MS = 1500,
     },
     Core = {
         Now = function() return now end,
@@ -51,6 +53,12 @@ PNC = {
             }
         end,
     },
+    Presence = {
+        RebindRestoredBody = function(record)
+            reboundBodies = reboundBodies + 1
+            return record and record.id == "population"
+        end,
+    },
 }
 
 local function makeBody(spec)
@@ -61,6 +69,7 @@ local function makeBody(spec)
     local body = {
         getModData = function() return modData end,
         getPersistentOutfitID = function() return spec.instanceID end,
+        populationID = spec.populationID,
         getOnlineID = function() return spec.onlineID or -1 end,
         getX = function() return spec.x end,
         getY = function() return spec.y end,
@@ -102,6 +111,9 @@ T.load(ROOT .. "Presence/PNC_BodyLifecycle/PNC_BodyLifecycle_State.lua")
 T.load(ROOT .. "Presence/PNC_BodyLifecycle/PNC_BodyLifecycle_World.lua")
 T.load(ROOT .. "Presence/PNC_BodyLifecycle/PNC_BodyLifecycle_LiveBodies.lua")
 T.load(ROOT .. "Presence/PNC_BodyLifecycle/PNC_BodyLifecycle_Startup.lua")
+PNC.BodyLifecycle.GetBodyPopulationID = function(body)
+    return body and body.populationID
+end
 
 records.marked = {
     id = "marked",
@@ -131,6 +143,17 @@ records.canonical = {
     y = 30,
     z = 0,
     runtime = { bodyLease = "lease-current" },
+}
+records.population = {
+    id = "population",
+    alive = true,
+    presenceState = "live",
+    x = 70,
+    y = 70,
+    z = 0,
+    runtime = {
+        startupBodyHint = { instanceID = "707", populationId = "7319" },
+    },
 }
 
 local marked = makeBody({
@@ -174,6 +197,14 @@ local canonical = makeBody({
     },
 })
 PNC.Registry.LiveByID.canonical = canonical
+local population = makeBody({
+    instanceID = 707,
+    populationID = "7319",
+    onlineID = 77,
+    x = 70,
+    y = 70,
+    naked = true,
+})
 
 PNC.BodyLifecycle.BeginStartupBodyCleanup(now)
 local first = PNC.BodyLifecycle.PumpStartupBodyCleanup(now, true)
@@ -182,6 +213,8 @@ T.equal(marked.wasRemoved(), true, "marked persisted shell removed")
 T.equal(legacyNaked.wasRemoved(), true, "naked body-hint shell removed")
 T.equal(unrelatedNaked.wasRemoved(), false, "unrelated naked zombie preserved")
 T.equal(canonical.wasRemoved(), false, "canonical body preserved")
+T.equal(population.wasRemoved(), false, "population body was rebound")
+T.equal(reboundBodies, 1, "population body rebind was attempted once")
 T.equal(#removals, 2, "instance removal packets sent")
 T.equal(#warnings, 2, "repair logs emitted")
 
@@ -191,8 +224,14 @@ now = now + 16
 PNC.BodyLifecycle.PumpStartupBodyCleanup(now, false)
 T.equal(
     PNC.BodyLifecycle.IsStartupBodyCleanupComplete(),
+    false,
+    "startup gate remains closed during population settle"
+)
+now = now + 1500
+T.equal(
+    PNC.BodyLifecycle.IsStartupBodyCleanupComplete(),
     true,
-    "startup gate released after quiet passes"
+    "startup gate released after population settle"
 )
 
 records.priority = {

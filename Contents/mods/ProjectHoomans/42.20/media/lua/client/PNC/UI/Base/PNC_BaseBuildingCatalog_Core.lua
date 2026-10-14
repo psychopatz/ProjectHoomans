@@ -309,7 +309,7 @@ function Building.Create(window, builder)
         "toggle_queue_overlay", "SHOW QUEUE OVERLAY", "quiet")
     window.buildCancelOrder = button(window, builder, "cancel_order",
         "CANCEL ORDER", "warning")
-    window.buildSearch = builder.CreateTextEntry(window, {
+    window.buildSearch = builder.CreateSearchEntry(window, {
         clearButton = true,
         width = 1,
         height = 1,

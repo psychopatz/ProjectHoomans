@@ -104,10 +104,6 @@ function Begin.Start(Placement, deps, window, recipe)
             placementUI.Open({
                 onBack = function()
                     Placement.Cancel(window, "placement_ui_back")
-                    local buildUI = PNC and PNC.FacilityBuildUI or nil
-                    if buildUI and buildUI.Reopen then
-                        buildUI.Reopen()
-                    end
                 end,
             })
         end

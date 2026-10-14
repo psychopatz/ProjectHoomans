@@ -49,7 +49,7 @@ package.preload["PNC/UI/Base/PNC_BaseBuildingData"] = function()
     return { SelectedOption = function() return Option end }
 end
 package.preload[
-    "PNC/UI/SettlementManagement/PNC_SettlementManagement_FacilityBuildModal"
+    "PNC/UI/Shared/PNC_FacilityBuildProvider"
 ] = function()
     return { FacilityCard = panelClass() }
 end

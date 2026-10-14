@@ -9,6 +9,119 @@ local Internal = Lifecycle.Internal
 local Core = PNC.Core
 local Const = PNC.Const
 
+local function validEngineIdentity(value)
+    local numeric
+    if value == nil or tostring(value) == "" or tostring(value) == "0" then
+        return false
+    end
+    numeric = tonumber(value)
+    return numeric == nil or numeric ~= 0
+end
+
+local function readPersistentOutfitID(zombie)
+    local ok
+    local value
+    if not zombie or not zombie.getPersistentOutfitID then
+        return nil, false
+    end
+    ok, value = pcall(zombie.getPersistentOutfitID, zombie)
+    if not ok then
+        return nil, true
+    end
+    return validEngineIdentity(value) and tostring(value) or nil, true
+end
+
+local function carrierIdentityAllowed(zombie, source)
+    local modData
+    if source == "body_stamp" then
+        return true
+    end
+    if not zombie or not zombie.getModData then
+        return false
+    end
+    local ok, value = pcall(function()
+        modData = zombie:getModData()
+        return modData and modData.PNC_ShellCarrier or nil
+    end)
+    return ok and value ~= nil
+        and tostring(value) == tostring(Const.BODY_SHELL_OUTFIT)
+end
+
+-- Capture identity after the engine has finished registering the body. The
+-- create event is too early for populationId on PZ: createRealZombieAlways
+-- fires OnZombieCreate before ZombiePopulationManager.registerZombie. This
+-- helper is therefore also called by the loaded-body audit on later ticks.
+function Lifecycle.RefreshLiveBodyIdentity(record, zombie, source)
+    local outfitID
+    local outfitAPI
+    local populationID
+    local changed = false
+    local runtime
+    local carrierAllowed
+    if not record or not zombie then
+        return false
+    end
+    runtime = record.runtime or {}
+    record.runtime = runtime
+    runtime.identityCaptureAttempts =
+        (tonumber(runtime.identityCaptureAttempts) or 0) + 1
+    outfitID, outfitAPI = readPersistentOutfitID(zombie)
+    if outfitID ~= nil and record.liveBodyInstanceID ~= outfitID then
+        record.liveBodyInstanceID = outfitID
+        changed = true
+    end
+    if Lifecycle.GetBodyPopulationID then
+    populationID = Lifecycle.GetBodyPopulationID(zombie)
+    end
+    if validEngineIdentity(populationID)
+        and record.liveBodyPopulationID ~= tostring(populationID)
+    then
+        record.liveBodyPopulationID = tostring(populationID)
+        changed = true
+    end
+    runtime.lastIdentitySource = tostring(source or "unknown")
+    runtime.lastIdentityAt = Core.Now and Core.Now() or 0
+    if outfitID ~= nil then
+        runtime.lastIdentityOutfitID = outfitID
+        carrierAllowed = carrierIdentityAllowed(zombie, source)
+        if carrierAllowed and Lifecycle.NoteShellCarrierID then
+            pcall(Lifecycle.NoteShellCarrierID, outfitID)
+        elseif Lifecycle.NoteShellOutfitID then
+            pcall(Lifecycle.NoteShellOutfitID, outfitID)
+        end
+    end
+    if validEngineIdentity(populationID) then
+        runtime.lastIdentityPopulationID = tostring(populationID)
+    end
+    if changed then
+        local registry = Internal.registry and Internal.registry() or nil
+        if source ~= "body_stamp" and registry and registry.MarkDirty then
+            registry.MarkDirty(record, "live_body_identity")
+        end
+        if Core.LogInfo then
+            pcall(Core.LogInfo, "PNC live_body_identity npc="
+                .. tostring(record.id)
+                .. " source=" .. tostring(source or "unknown")
+                .. " outfitID=" .. tostring(outfitID or "nil")
+                .. " populationID=" .. tostring(populationID or "nil"))
+        end
+    elseif outfitAPI and outfitID == nil
+        and runtime.identityUnavailableFor ~= tostring(runtime.bodyLease or "")
+    then
+        -- One warning per body lease is enough to expose the engine boundary
+        -- without turning the audit pump into a log generator.
+        runtime.identityUnavailableFor = tostring(runtime.bodyLease or "")
+        if Core.LogWarn then
+            pcall(Core.LogWarn, "PNC live_body_identity_unavailable npc="
+                .. tostring(record.id)
+                .. " source=" .. tostring(source or "unknown")
+                .. " outfitID=0_or_nil populationID="
+                .. tostring(populationID or "nil"))
+        end
+    end
+    return outfitID ~= nil or validEngineIdentity(populationID)
+end
+
 function Lifecycle.StampLiveBody(record, zombie)
     local modData
     if not record or not zombie or not zombie.getModData then
@@ -33,30 +146,107 @@ function Lifecycle.StampLiveBody(record, zombie)
     modData.PNC_TagVersion = Const.BODY_TAG_VERSION
     modData.PNC_PersistedShell = true
     modData.PNC_ShellVersion = Const.BODY_SHELL_VERSION
-    modData.PNC_BaseOutfit = "Naked"
+    modData.PNC_ShellCarrier = Const.BODY_SHELL_OUTFIT
+    modData.PNC_ShellCarrierVersion = Const.BODY_SHELL_CARRIER_VERSION
+    modData.PNC_BaseOutfit = Const.BODY_SHELL_OUTFIT
     if PNC.RecipeKnowledge and PNC.RecipeKnowledge.BindLiveBody then
         PNC.RecipeKnowledge.BindLiveBody(record, zombie)
     end
     record.runtime.startupBodyHint = nil
-    -- Remember the persistent outfit PNC uses for shells. It survives
-    -- virtualization (unlike ModData) and is the only durable hint that a body
-    -- later handed back by the population manager was one of ours.
-    if Lifecycle.NoteShellOutfitID and zombie.getPersistentOutfitID then
-        pcall(Lifecycle.NoteShellOutfitID, zombie:getPersistentOutfitID())
+    record.liveBodyInstanceID = nil
+    record.liveBodyPopulationID = nil
+    record.runtime.lastIdentitySource = nil
+    record.runtime.lastIdentityOutfitID = nil
+    record.runtime.lastIdentityPopulationID = nil
+    record.runtime.identityUnavailableFor = nil
+    Lifecycle.RefreshLiveBodyIdentity(record, zombie, "body_stamp")
+    if Lifecycle.IdentityAudit and Lifecycle.IdentityAudit.Capture then
+        Lifecycle.IdentityAudit.Capture(
+            zombie,
+            "body_stamp",
+            record.id,
+            true
+        )
+    end
+    local registry = Internal.registry and Internal.registry() or nil
+    if registry and registry.MarkDirty then
+        registry.MarkDirty(record, "live_body_hint")
     end
     Internal.mark(record, "live", "bound", "body_stamped")
     return record.runtime.bodyLease
 end
 
+local function captureDetachedBodyHint(record)
+    local runtime
+    local previous
+    local instanceID
+    local populationID
+    local onlineID
+    local lease
+    local x
+    local y
+    local z
+    if not record then
+        return nil
+    end
+    runtime = record.runtime or {}
+    record.runtime = runtime
+    previous = runtime.startupBodyHint
+    instanceID = record.liveBodyInstanceID
+        or runtime.lastLiveBodyInstanceID
+        or previous and previous.instanceID or nil
+    populationID = record.liveBodyPopulationID
+        or runtime.lastLiveBodyPopulationID
+        or previous and previous.populationId or nil
+    onlineID = record.liveBodyOnlineID
+        or runtime.lastLiveBodyOnlineID
+        or previous and previous.onlineID or nil
+    lease = runtime.bodyLease
+        or runtime.lastLiveBodyLease
+        or previous and previous.lease or nil
+    x = record.x
+    y = record.y
+    z = record.z
+    if x == nil and previous then x = previous.x end
+    if y == nil and previous then y = previous.y end
+    if z == nil and previous then z = previous.z end
+    runtime.lastLiveBodyInstanceID = instanceID
+    runtime.lastLiveBodyPopulationID = populationID
+    runtime.lastLiveBodyOnlineID = onlineID
+    runtime.lastLiveBodyLease = lease
+    runtime.lastLiveBodyX = x
+    runtime.lastLiveBodyY = y
+    runtime.lastLiveBodyZ = z
+    if instanceID ~= nil or populationID ~= nil then
+        runtime.startupBodyHint = {
+            instanceID = instanceID,
+            onlineID = onlineID,
+            lease = lease,
+            populationId = populationID,
+            x = x,
+            y = y,
+            z = z,
+        }
+    end
+    return runtime.startupBodyHint
+end
+
+Internal.CaptureDetachedBodyHint = captureDetachedBodyHint
+
 function Internal.detachLiveBody(record, reason)
     local reg = Internal.registry()
     if record then
         record.runtime = record.runtime or {}
+        -- Keep the last engine identity alive long enough for the record
+        -- serializer to persist it. PZ may restore the removed shell after a
+        -- relog even when removeZombie() reported a successful detach.
+        captureDetachedBodyHint(record)
         record.runtime.bodyLease = nil
         if reg and reg.LiveByID then
             reg.LiveByID[record.id] = nil
         end
         record.liveBodyInstanceID = nil
+        record.liveBodyPopulationID = nil
         record.liveBodyOnlineID = nil
         record.presenceRevision = (tonumber(record.presenceRevision) or 0) + 1
         if record.presenceState ~= Const.PRESENCE_CORPSE then
@@ -149,6 +339,15 @@ function Lifecycle.RemoveLiveBody(record, zombie, reason)
     then
         attached = Internal.isBodyAttached(zombie)
         verified = Internal.removeZombie(zombie) == true
+        if Lifecycle.IdentityAudit and Lifecycle.IdentityAudit.RecordRemoval then
+            Lifecycle.IdentityAudit.RecordRemoval(
+                zombie,
+                "live_body_removal",
+                record and record.id or nil,
+                reason,
+                verified
+            )
+        end
         if (not attached or not verified) and Lifecycle.NoteLostBody then
             Lifecycle.NoteLostBody(
                 record,

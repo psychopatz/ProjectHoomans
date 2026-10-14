@@ -47,7 +47,7 @@ function Controller.CreateChildren(window)
         "DEBUG TOOLS"), "")
     window.detailsPane:setVisible(false)
 
-    window.storageSearch = UI.CreateTextEntry(window, {
+    window.storageSearch = UI.CreateSearchEntry(window, {
         clearButton = true,
         width = 180,
         height = 26,
@@ -223,7 +223,7 @@ local function rebuildStorage(window, snapshot)
 
     local rows = Presentation.BuildInventoryRows(storage,
         window.storageSearch:getText(), window.storageSort,
-        window.storageCollapsedGroups)
+        window.storageCollapsedGroups, window.lastReceiveRevision)
     if #rows == 0 then
         window.storageList:addItem(tr("UI_PNC_Storage_Empty",
             "No items stored"), {

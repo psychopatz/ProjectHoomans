@@ -228,7 +228,7 @@ PNC.Registry.Data.worker = { id = "worker", alive = true,
     allowedJobs = { Researcher = true, WorkshopWorker = true } }
 PNC.Registry.Data.worker.allowedJobs.Constructor = true
 
-require "PNC/Core/Production/PNC_WorkDefinitions"
+require "PNC/Core/Production/WorkDefinition/PNC_WorkDefinitions"
 require "PNC/Core/Colony/Research/PNC_ColonyResearchDefinitions"
 local WorkRepository = require "PNC/Production/PNC_WorkRepository"
 WorkRepository.Import(nil)

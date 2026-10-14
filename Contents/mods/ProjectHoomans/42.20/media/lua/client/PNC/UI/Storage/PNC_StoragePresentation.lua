@@ -21,8 +21,10 @@ function Presentation.DrawActivityRow(list, y, entry, alternate)
     return y + list.itemheight
 end
 
-function Presentation.BuildInventoryRows(storage, search, sort, collapsed)
-    return ViewModel.BuildInventoryRows(storage, search, sort, collapsed)
+function Presentation.BuildInventoryRows(storage, search, sort, collapsed,
+    revision)
+    return ViewModel.BuildInventoryRows(storage, search, sort, collapsed,
+        revision)
 end
 
 function Presentation.BuildActivityRows(storage, tr)

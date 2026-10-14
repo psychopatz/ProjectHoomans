@@ -79,6 +79,30 @@ local passenger = {
 }
 T.truthy(PNC.Scheduler.GetCadence(passenger) <= 100, "vehicle passenger tracking cadence is too slow")
 
+-- A nearby interest wake must survive scheduler initialization. This is the
+-- relog regression: the old order inserted a wake and then PopDue reset the
+-- buckets while initializing the scheduler.
+local relogRecord = {
+    id = "relog_interest",
+    identitySeed = 1234,
+    presenceState = "abstract",
+    runtime = {},
+}
+PNC.Scheduler.Initialized = false
+PNC.Scheduler.Buckets = {}
+PNC.Scheduler.SlotByID = {}
+PNC.Scheduler.LastSlot = nil
+PNC.Scheduler.EnsureInitialized({
+    [relogRecord.id] = relogRecord,
+}, 3000)
+PNC.Scheduler.Schedule(relogRecord, 3000)
+local relogDue = PNC.Scheduler.PopDue({
+    [relogRecord.id] = relogRecord,
+}, 3000)
+T.equal(#relogDue, 1, "relog interest wake was lost during initialization")
+T.equal(relogDue[1], relogRecord,
+    "relog interest wake returned the wrong record")
+
 local strategicRuns = {}
 PNC.Scheduler.RegisterJob("strategic_a", 10, function()
     strategicRuns[#strategicRuns + 1] = "a"

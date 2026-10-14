@@ -12,6 +12,18 @@ local Network = PNC.Network
 local LiveBodyControl = PNC.LiveBodyControl
 local canRequestRemoteSync = Sync.Internal.CanRequestRemoteSync
 
+local function normalizeBodyInstanceID(value)
+    local normalized
+    if value == nil then
+        return nil
+    end
+    normalized = tostring(value)
+    if normalized == "" or normalized == "0" then
+        return nil
+    end
+    return normalized
+end
+
 local function getBodyInstanceID(body)
     local value = body and body.getPersistentOutfitID
         and body:getPersistentOutfitID() or nil
@@ -21,16 +33,37 @@ local function getBodyInstanceID(body)
     return tostring(value)
 end
 
-local function isNakedBody(body)
-    local worn
-    local visuals
-    if not body or (body.isDead and body:isDead()) then
+local function isProtectedBody(body)
+    local ownership
+    local ok
+    local value
+    local modData
+    if not body then
         return false
     end
-    worn = body.getWornItems and body:getWornItems() or nil
-    visuals = body.getItemVisuals and body:getItemVisuals() or nil
-    return (not worn or not worn.size or worn:size() <= 0)
-        and (not visuals or not visuals.size or visuals:size() <= 0)
+    if body.isDead then
+        ok, value = pcall(body.isDead, body)
+        if ok and value == true then
+            return true
+        end
+    end
+    if body.isReanimatedPlayer then
+        ok, value = pcall(body.isReanimatedPlayer, body)
+        if ok and value == true then
+            return true
+        end
+    end
+    ownership = PNC.Compatibility and PNC.Compatibility.ActorOwnership
+    if ownership and ownership.IsForeignOwned then
+        ok, value = pcall(ownership.IsForeignOwned, body)
+        if ok and value == true then
+            return true
+        end
+    end
+    modData = body.getModData and body:getModData() or nil
+    return modData ~= nil
+        and modData.PNC_Owner ~= nil
+        and tostring(modData.PNC_Owner) ~= "ProjectHoomans"
 end
 
 local function removeLocalBody(body)
@@ -65,8 +98,7 @@ function Cleanup.RemoveBodyInstance(args)
     if type(args) ~= "table" or not getCell then
         return 0
     end
-    wantedInstance = args.bodyInstanceID ~= nil
-        and tostring(args.bodyInstanceID) or nil
+    wantedInstance = normalizeBodyInstanceID(args.bodyInstanceID)
     wantedOnline = tonumber(args.bodyOnlineID)
     wantedID = args.id ~= nil and tostring(args.id) or nil
     cell = getCell()
@@ -91,6 +123,20 @@ function Cleanup.RemoveBodyInstance(args)
             identifierMatch = wantedID
                 and modData and tostring(modData.PNC_UUID or "") == wantedID
         end
+        if identifierMatch and not isProtectedBody(body) then
+            -- The server may provide a persistent-outfit hint for an
+            -- anonymous restored shell, but that number is not an actor
+            -- identity on the client. Only remove a marked PNC body here;
+            -- anonymous shells are removed by the authoritative server lane.
+            if not wantedID
+                or not (modData and tostring(modData.PNC_UUID or "")
+                    == wantedID)
+            then
+                identifierMatch = false
+            end
+        else
+            identifierMatch = false
+        end
         if identifierMatch then
             removeLocalBody(body)
             removed = removed + 1
@@ -100,6 +146,7 @@ function Cleanup.RemoveBodyInstance(args)
     if removed > 0 and Core and Core.LogInfo then
         Core.LogInfo("PNC client stale body removed npc=" .. tostring(wantedID or "unknown")
             .. " bodyInstanceID=" .. tostring(wantedInstance or "nil")
+            .. " count=" .. tostring(removed)
             .. " reason=" .. tostring(args.reason or "server_remove"))
     end
     return removed
@@ -114,10 +161,6 @@ function Cleanup.PruneSnapshotDuplicates(snapshot, canonicalBody)
     local body
     local modData
     local sameIdentity
-    local unmarkedNaked
-    local dx
-    local dy
-    local dz
     local removed = 0
     local now
     local pruneState
@@ -153,19 +196,10 @@ function Cleanup.PruneSnapshotDuplicates(snapshot, canonicalBody)
             modData = body.getModData and body:getModData() or nil
             sameIdentity = modData
                 and tostring(modData.PNC_UUID or "") == id
-            unmarkedNaked = not (modData and modData.PNC_UUID)
-                and isNakedBody(body)
-            if unmarkedNaked then
-                dx = (tonumber(body:getX()) or 0)
-                    - (tonumber(snapshot.x) or 0)
-                dy = (tonumber(body:getY()) or 0)
-                    - (tonumber(snapshot.y) or 0)
-                dz = (tonumber(body:getZ()) or 0)
-                    - (tonumber(snapshot.z) or 0)
-                unmarkedNaked = math.abs(dz) <= 1
-                    and (dx * dx + dy * dy) <= (1.25 * 1.25)
-            end
-            if sameIdentity or unmarkedNaked then
+            if sameIdentity and not isProtectedBody(body)
+                and (modData.PNC_Owner == nil
+                    or tostring(modData.PNC_Owner) == "ProjectHoomans")
+            then
                 removeLocalBody(body)
                 removed = removed + 1
             end

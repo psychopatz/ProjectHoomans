@@ -94,6 +94,10 @@ end
 
 function ISPNCWorkshopWindow:close()
     self:saveGeometry(true)
+    if self.workshopCollapsedGroups then
+        local Workshop = require "PNC/UI/Workshop/PNC_WorkshopCatalog"
+        Workshop.SaveCollapsedGroups(self)
+    end
     self:setVisible(false)
     self:removeFromUIManager()
     if WorkshopUI.instance == self then WorkshopUI.instance = nil end

@@ -10,12 +10,15 @@
           == noZombies, or SystemDisabler.doZombieCreation is false,
              or SandboxOptions.zombies == 6    ("Zombie Count: None")
 
-    NPC bodies must not inherit the sandbox zombie population setting, so when
-    the primary helper yields no body a second factory is attempted.
-    `createZombie` uses the same engine construction path
-    (VirtualZombieManager.createRealZombieAlways) but is gated only by the
-    debug-only SystemDisabler.doZombieCreation flag, so it still produces NPC
-    bodies in a "Zombie Count: None" world.
+    NPC bodies must not inherit the sandbox zombie population setting. The old
+    implementation therefore used `createZombie` as a second factory. That
+    path bypasses normal population admission, so it is accepted only after
+    the new body is dressed in the PNC-only carrier and its persistent outfit
+    id is verified. A body that cannot carry that identity is detached and
+    discarded before it can enter the NPC or ordinary-zombie lanes. The
+    direct VirtualZombieManager path is preferred because the global
+    createZombie helper cannot resolve an engine square on some dedicated
+    server frames even when a real square object is available.
 
     Both factories run inside Internal.SpawnInProgress. The husk reaper ignores
     bodies created inside that window because they are ours and are about to be
@@ -29,8 +32,10 @@ PNC.BodyLifecycle.Internal = PNC.BodyLifecycle.Internal or {}
 local Lifecycle = PNC.BodyLifecycle
 local Internal = Lifecycle.Internal
 local Core = PNC.Core
+local Const = PNC.Const
 
-local PRIMARY_OUTFIT = "Naked"
+local PRIMARY_OUTFIT = Const and Const.BODY_SHELL_OUTFIT
+    or "PNCShellCarrier"
 local PRIMARY_HEALTH = 1
 
 Lifecycle.BodyFactory = Lifecycle.BodyFactory or {
@@ -134,7 +139,7 @@ local function spawnPrimary(record, position)
     local list = addZombiesInOutfit(
         position.x, position.y, position.z, 1, PRIMARY_OUTFIT,
         isFemaleChance(record),
-        false, false, false, false, true, false, PRIMARY_HEALTH
+        false, false, false, false, false, false, PRIMARY_HEALTH
     )
     if not list or not list.size or list:size() <= 0 then
         return nil
@@ -167,11 +172,9 @@ local function applyPrimaryParity(zombie, record)
         Kahlua throws a Java exception when Lua indexes a member the exposer
         does not publish, and the engine dumps a stack trace for every caught
         exception, so a single wrong member name spams the log on every spawn.
-        `dressInPersistentOutfit` (interface-declared), `dressInRandomOutfit`
-        and `lunger` (public fields) are all unavailable; the engine's own
-        `createZombie` path therefore keeps its random outfit. That is fine:
-        PNC applies the real visuals and equipment afterwards, and the husk
-        reclaim no longer depends on the persistent outfit id.
+    The fallback dresses the body in `PNCShellCarrier` after setting the
+    requested gender. The carrier is not the NPC's visible outfit; PNC applies
+    the real visuals and equipment afterwards.
     ]]
     if zombie.setFemaleEtc then
         pcall(zombie.setFemaleEtc, zombie,
@@ -180,38 +183,208 @@ local function applyPrimaryParity(zombie, record)
     if zombie.setHealth then
         pcall(zombie.setHealth, zombie, PRIMARY_HEALTH)
     end
-    if zombie.setGodMod then
-        pcall(zombie.setGodMod, zombie, true)
-    end
     return zombie
 end
 
-local function spawnFallback(record, position)
-    if type(createZombie) ~= "function" then
+local function clearEngineInvulnerability(zombie)
+    local checker
+    local setter
+    local ok
+    local value
+    if not zombie then
+        return false
+    end
+    ok, checker = pcall(function() return zombie.isGodMod end)
+    if not ok or not checker then
+        ok, checker = pcall(function() return zombie.isInvulnerable end)
+        if not ok then checker = nil end
+    end
+    ok, setter = pcall(function() return zombie.setGodMod end)
+    if ok and setter then
+        pcall(setter, zombie, false)
+    end
+    if not checker then
+        return true
+    end
+    ok, value = pcall(checker, zombie)
+    return not (ok and value == true)
+end
+
+local function abortSpawnedBody(zombie)
+    local method
+    local ok
+    local attached
+    if not zombie then
+        return true
+    end
+    if Internal.removeZombie then
+        local ok, removed = pcall(Internal.removeZombie, zombie)
+        attached = Internal.isBodyAttached
+            and Internal.isBodyAttached(zombie) or false
+        if ok and (removed == true or not attached) then
+            return true
+        end
+    end
+    ok, method = pcall(function() return zombie.removeFromWorld end)
+    if ok and type(method) == "function" then
+        pcall(method, zombie)
+    end
+    ok, method = pcall(function() return zombie.removeFromSquare end)
+    if ok and type(method) == "function" then
+        pcall(method, zombie)
+    end
+    attached = Internal.isBodyAttached
+        and Internal.isBodyAttached(zombie) or false
+    return not attached
+end
+
+Lifecycle.ClearEngineInvulnerability = clearEngineInvulnerability
+Lifecycle.AbortSpawnedBody = abortSpawnedBody
+
+local function resolveSpawnSquare(position)
+    local cell
+    local square
+    local ok
+    if type(getCell) ~= "function" then
         return nil
     end
+    ok, cell = pcall(getCell)
+    if not ok or not cell then
+        return nil
+    end
+    if cell.getGridSquare then
+        ok, square = pcall(function()
+            return cell:getGridSquare(position.x, position.y, position.z)
+        end)
+        if ok and square then
+            return square
+        end
+    end
+    -- Materialization normally runs in a loaded player-interest square. This
+    -- second lookup is also useful during a server-side restore frame where
+    -- ServerMap has the square but IsoCell has not exposed it through its
+    -- double-coordinate lookup yet.
+    if cell.getOrCreateGridSquare then
+        ok, square = pcall(function()
+            return cell:getOrCreateGridSquare(
+                position.x, position.y, position.z
+            )
+        end)
+        if ok and square then
+            local waterOK, water = pcall(square.isWaterSquare, square)
+            if not waterOK or water ~= true then
+                return square
+            end
+        end
+    end
+    return nil
+end
+
+local function spawnViaVirtualZombieManager(position, direction)
+    local manager
+    local choices
+    local square
+    local ok
+    local zombie
+    local managerOK
+    managerOK, manager = pcall(function()
+        return VirtualZombieManager and VirtualZombieManager.instance or nil
+    end)
+    if not managerOK or not manager then
+        return nil
+    end
+    square = resolveSpawnSquare(position)
+    if not square then
+        return nil
+    end
+    ok, choices = pcall(function() return manager.choices end)
+    if not ok or not choices then
+        return nil
+    end
+    ok = pcall(function() choices:clear() end)
+    if not ok then
+        return nil
+    end
+    ok = pcall(function() choices:add(square) end)
+    if not ok then
+        pcall(function() choices:clear() end)
+        return nil
+    end
+    ok, zombie = pcall(function()
+        return manager:createRealZombieAlways(direction, false, 0, 0)
+    end)
+    pcall(function() choices:clear() end)
+    if ok and zombie then
+        return zombie, "createRealZombieAlways"
+    end
+    return nil
+end
+
+local function spawnFallback(record, position)
+    local dresser
+    local getter
+    local outfitID
+    local ok
     local direction = randomDirection()
     if direction == nil then
         return nil
     end
-    local zombie = createZombie(
-        position.x, position.y, position.z, nil, 0, direction
+    local zombie, factoryName = spawnViaVirtualZombieManager(
+        position, direction
     )
+    if not zombie and type(createZombie) == "function" then
+        zombie = createZombie(
+            position.x, position.y, position.z, nil, 0, direction
+        )
+        factoryName = zombie and "createZombie" or nil
+    end
     if not zombie then
         return nil
     end
-    return applyPrimaryParity(zombie, record)
+    applyPrimaryParity(zombie, record)
+    -- createZombie fires OnZombieCreate before this function returns. The
+    -- spawn window suppresses reaping during that hand-off, but the body must
+    -- still receive the durable carrier before the window closes.
+    ok, dresser = pcall(function()
+        return zombie.dressInPersistentOutfit
+    end)
+    if not ok or type(dresser) ~= "function"
+        or not pcall(dresser, zombie, PRIMARY_OUTFIT)
+    then
+        abortSpawnedBody(zombie)
+        return nil
+    end
+    ok, getter = pcall(function()
+        return zombie.getPersistentOutfitID
+    end)
+    if not ok or type(getter) ~= "function" then
+        abortSpawnedBody(zombie)
+        return nil
+    end
+    ok, outfitID = pcall(getter, zombie)
+    if not ok or outfitID == nil or tostring(outfitID) == ""
+        or tostring(outfitID) == "0" or tonumber(outfitID) == 0
+    then
+        abortSpawnedBody(zombie)
+        return nil
+    end
+    Lifecycle.BodyFactory.lastFallbackOutfitID = tostring(outfitID)
+    if Internal.isBodyAttached and not Internal.isBodyAttached(zombie) then
+        abortSpawnedBody(zombie)
+        return nil
+    end
+    return zombie, factoryName
 end
 
 local function guardedSpawn(factory, record, position)
     if type(factory) ~= "function" then
         return nil, false
     end
-    local ok, zombie = pcall(factory, record, position)
+    local ok, zombie, detail = pcall(factory, record, position)
     if ok and zombie then
-        return zombie, true
+        return zombie, true, detail
     end
-    return nil, ok
+    return nil, ok, detail
 end
 
 --[[
@@ -226,7 +399,7 @@ function Lifecycle.SpawnLiveBody(record, position, reason)
     local zombie
     local factoryName
     local primaryOk
-    local fallbackOk
+    local fallbackOk = false
     local disabled
     if not record or not position then
         return nil, "invalid_spawn_request"
@@ -238,12 +411,15 @@ function Lifecycle.SpawnLiveBody(record, position, reason)
     zombie, primaryOk = guardedSpawn(spawnPrimary, record, position)
     if zombie then
         factoryName = "addZombiesInOutfit"
-    else
+    elseif PNC.Const and PNC.Const.BODY_FACTORY_ALLOW_FALLBACK == true then
         local fallbackZombie
-        fallbackZombie, fallbackOk = guardedSpawn(spawnFallback, record, position)
+        local fallbackFactory
+        fallbackZombie, fallbackOk, fallbackFactory = guardedSpawn(
+            spawnFallback, record, position
+        )
         if fallbackZombie then
             zombie = fallbackZombie
-            factoryName = "createZombie"
+            factoryName = fallbackFactory or "createZombie"
             factory.fallbackSpawns = (tonumber(factory.fallbackSpawns) or 0) + 1
             noteIncrement("BodyFactory.FallbackSpawns")
             logOnce("fallbackLogged", "info",
@@ -252,6 +428,12 @@ function Lifecycle.SpawnLiveBody(record, position, reason)
                     .. tostring(Lifecycle.AreZombieSpawnsDisabled())
                     .. " reason=" .. tostring(reason or "unknown"))
         end
+    else
+        factory.fallbackBlocked = (tonumber(factory.fallbackBlocked) or 0) + 1
+        noteIncrement("BodyFactory.FallbackBlocked")
+        logOnce("fallbackBlockedLogged", "warn",
+            "PNC body factory fallback blocked; keeping NPC abstract"
+                .. " reason=" .. tostring(reason or "unknown"))
     end
     Internal.SpawnInProgress = false
     if not zombie then
@@ -266,6 +448,14 @@ function Lifecycle.SpawnLiveBody(record, position, reason)
             return nil, "spawn_disabled_no_factory"
         end
         return nil, "spawn_returned_no_body"
+    end
+    if not clearEngineInvulnerability(zombie) then
+        factory.failedSpawns = (tonumber(factory.failedSpawns) or 0) + 1
+        noteIncrement("BodyFactory.InvulnerableRejected")
+        abortSpawnedBody(zombie)
+        logOnce("invulnerableLogged", "warn",
+            "PNC body factory rejected invulnerable engine body")
+        return nil, "spawn_invulnerable_body_rejected"
     end
     factory.lastFactory = factoryName
     if PNC.Compatibility and PNC.Compatibility.ActorOwnership

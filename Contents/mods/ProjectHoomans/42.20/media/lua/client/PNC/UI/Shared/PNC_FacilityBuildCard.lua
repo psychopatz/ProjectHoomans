@@ -1,7 +1,7 @@
 -- Shared facility build card and native preview surface.
 --
--- This provider owns the reusable visual card consumed by both the facility
--- modal and the integrated Buildings tab.  BuildUI keeps the public exports.
+-- This provider owns the reusable visual card consumed by facility catalogs
+-- and the integrated Buildings tab. BuildUI keeps the public exports.
 
 require "ISUI/ISPanel"
 require "PsychopatzCore/UI/PsychopatzUI"
@@ -191,9 +191,8 @@ Internal.CardWrapText = wrapText
 
 local FacilityCard = ISPanel:derive("PNCFacilityBuildCard")
 
--- The Base widget uses the same card surface as the original modal. Exporting
--- the class keeps the visual contract in one place while allowing the modal
--- itself to remain available to legacy callers during migration.
+-- Exporting the class keeps the visual contract in one place for every
+-- facility catalog surface.
 BuildUI.FacilityCard = FacilityCard
 
 function FacilityCard:onMouseDown()

@@ -39,6 +39,47 @@ function H.GetSyncInterval(record)
     return 500
 end
 
+local function shouldReconcileAbstractFollowHandoff(record)
+    local runtime = record and record.runtime or nil
+    if not record
+        or record.presenceState ~= Const.PRESENCE_ABSTRACT
+        or not runtime
+        or runtime.abstractFollowMaterializeRequested ~= true
+    then
+        return false
+    end
+    -- Vehicle passengers are intentionally bodyless. The behavior lane may
+    -- set a generic wake flag while a vehicle order is being reconciled, but
+    -- that must never turn a reserved passenger into a free zombie body.
+    if runtime.vehiclePassenger
+        and runtime.vehiclePassenger.active == true
+    then
+        return false
+    end
+    return Presence and type(Presence.Reconcile) == "function"
+end
+
+local function nextRecordDueAt(record, now)
+    local runtime = record and record.runtime or nil
+    local retryAt = runtime and tonumber(runtime.materializeRetryAt) or nil
+    if retryAt and retryAt > (tonumber(now) or 0) then
+        return retryAt
+    end
+    if shouldReconcileAbstractFollowHandoff(record) then
+        -- A follower requested a live body during this behavior tick. If the
+        -- immediate attempt was blocked before a subsystem installed its own
+        -- retry deadline, use the bounded materialization retry interval; a
+        -- raw scheduler slot here would create a hot loop for every follower
+        -- while startup/chunk admission is unavailable.
+        return (tonumber(now) or 0)
+            + math.max(
+                tonumber(Scheduler.SLOT_MS) or 50,
+                tonumber(Const.MATERIALIZE_CHUNK_RETRY_MS) or 250
+            )
+    end
+    return (tonumber(now) or 0) + Scheduler.GetCadence(record)
+end
+
 function H.ProcessRecord(record, now)
     local timerName
     local timerStart
@@ -120,6 +161,14 @@ function H.ProcessRecord(record, now)
         -- disembarking one. Refresh the lease-bound body before any pathing or
         -- animation work so this tick never pumps a removed IsoZombie (and a
         -- newly materialized passenger is immediately eligible for setup).
+        -- Abstract follow has the inverse ordering problem: its bodyless
+        -- movement lane requests the live handoff inside Behavior.Tick, after
+        -- the normal presence pass has already run. Reconcile that explicit
+        -- request immediately instead of waiting for the cold abstract
+        -- cadence or relying on a later spatial-interest scan.
+        if shouldReconcileAbstractFollowHandoff(record) then
+            Presence.Reconcile(record)
+        end
         zombie = Registry.GetLiveZombie(record.id)
         record.lastThinkAt = now
         decisionInterval = SimulationLOD
@@ -173,7 +222,7 @@ function H.ProcessRecord(record, now)
         Network.QueuePeriodicRoster(record, now)
     end
     if Scheduler and Scheduler.Schedule then
-        Scheduler.Schedule(record, now + Scheduler.GetCadence(record))
+        Scheduler.Schedule(record, nextRecordDueAt(record, now))
     end
     if timerName then
         ScalingDiagnostics.EndTiming(timerName, timerStart, record.id)

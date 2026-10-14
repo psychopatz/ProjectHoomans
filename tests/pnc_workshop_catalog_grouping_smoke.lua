@@ -79,6 +79,7 @@ local forgeWorkshop = recipe("Forge Hinge", "BLACKSMITH", station("workshop",
     "CRAFTING STATION"))
 local forgeAdvanced = recipe("Forge Buckle", "BLACKSMITH", station("forge",
     "ADVANCED FORGE"))
+forgeAdvanced.descriptor.requiresSpecificWorkstation = true
 local recipes = { forgeAdvanced, carving, forgeWorkshop }
 
 T.falsy(Internal.StationGroupingRequired({ carving }, "CRAFT", "CARVING"),
@@ -106,5 +107,41 @@ T.equal(rows[5].item.rowKind, "recipe", "first blacksmith recipe emitted")
 T.equal(rows[6].item.stationHeader, true,
     "blacksmith keeps its second meaningful station group")
 T.equal(rows[7].item.rowKind, "recipe", "second blacksmith recipe emitted")
+
+local missingWindow = {
+    tab = "workshop", workshopQuantities = {},
+    workshopCollapsedGroups = {}, workshopRecipeList = list(),
+}
+Internal.RebuildCraftRows(missingWindow, recipes, translation,
+    function(stationValue)
+        return stationValue and stationValue.id ~= "forge"
+    end)
+local missingRows = missingWindow.workshopRecipeList.items
+local missingHeader = missingRows[4].item
+local missingRecipe = missingRows[5].item
+T.truthy(missingHeader.stationHeader
+    and string.find(missingHeader.name, "MISSING STATION", 1, true),
+    "missing station status was not promoted to its nested header")
+T.truthy(missingHeader.catalogControls
+    and missingHeader.catalogControls.action
+    and missingHeader.catalogControls.action[1].title == "BUILD STATION",
+    "missing station header did not expose one build action")
+T.equal(missingRecipe.catalogCells.action, "",
+    "missing station action was repeated on every recipe row")
+T.falsy(missingRecipe.catalogControls.action,
+    "missing station recipe still created a duplicate action button")
+
+local singleMissingWindow = {
+    tab = "workshop", workshopQuantities = {},
+    workshopCollapsedGroups = {}, workshopRecipeList = list(),
+}
+Internal.RebuildCraftRows(singleMissingWindow, { forgeAdvanced }, translation,
+    function() return false end)
+local singleMissingRows = singleMissingWindow.workshopRecipeList.items
+T.equal(#singleMissingRows, 3,
+    "a single missing station must still get an actionable nested header")
+T.truthy(singleMissingRows[2].item.stationHeader
+    and singleMissingRows[2].item.stationMissing,
+    "single missing station header was omitted")
 
 return T.finish("pnc_workshop_catalog_grouping_smoke")

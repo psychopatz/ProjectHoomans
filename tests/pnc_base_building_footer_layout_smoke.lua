@@ -31,6 +31,25 @@ PsychopatzCore = {
             SetBounds = function(element, x, y, width, height)
                 element.bounds = { x = x, y = y, width = width, height = height }
             end,
+            HorizontalSplit = function(rect, options)
+                local gap = options.gap or 0
+                local available = rect.width - gap
+                local first = math.floor(available
+                    * (options.firstRatio or 0.4) + 0.5)
+                first = math.max(options.minFirst,
+                    math.min(available - options.minSecond, first))
+                return {
+                    gap = gap,
+                    available = available,
+                    first = { x = rect.x, width = first },
+                    second = {
+                        x = rect.x + first + gap,
+                        width = available - first,
+                    },
+                    minimumFirst = options.minFirst,
+                    maximumFirst = available - options.minSecond,
+                }
+            end,
         },
     },
 }

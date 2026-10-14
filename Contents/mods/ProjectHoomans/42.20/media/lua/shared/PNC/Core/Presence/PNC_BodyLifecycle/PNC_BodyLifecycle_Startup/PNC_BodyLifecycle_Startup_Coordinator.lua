@@ -16,6 +16,9 @@ function Lifecycle.BeginStartupBodyCleanup(now, forceReset)
     state.startedAt = tonumber(now) or Core.Now()
     state.removed = 0
     state.lastStats = nil
+    state.lastBatch = nil
+    state.settleUntil = 0
+    state.nextMaterializeAt = 0
     return state
 end
 
@@ -23,6 +26,13 @@ function Lifecycle.RunStartupBodyCleanupNow(now, source, forceReset)
     local state = Lifecycle.BeginStartupBodyCleanup(now, forceReset == true)
     local passCount = (tonumber(Const.BODY_SHELL_STARTUP_PASSES) or 3) + 2
     local i
+    -- Seed persisted husk proofs before the first body snapshot. The server
+    -- lifecycle and the single-player OnGameStart path both enter here; doing
+    -- it at this shared boundary prevents startup cleanup from classifying a
+    -- proven restored shell as an ordinary anonymous zombie.
+    if Lifecycle.SeedHuskLedgerFromRecords then
+        Lifecycle.SeedHuskLedgerFromRecords(now)
+    end
     for i = 1, passCount do
         Lifecycle.PumpStartupBodyCleanup(now, true)
         if state.complete == true then
@@ -67,16 +77,52 @@ function Lifecycle.PumpStartupBodyCleanup(now, force)
         state.active = false
         state.complete = true
         state.completedAt = now
+        state.settleUntil = now
+            + (tonumber(Const.BODY_SHELL_STARTUP_SETTLE_MS) or 1500)
+        state.nextMaterializeAt = state.settleUntil
         state.nextMaintenanceAt = now
             + (tonumber(Const.BODY_SHELL_MAINTENANCE_MS) or 1000)
         Core.LogInfo("PNC startup body cleanup complete passes="
-            .. tostring(state.passes) .. " removed=" .. tostring(state.removed))
+            .. tostring(state.passes) .. " removed=" .. tostring(state.removed)
+            .. " ambiguous=" .. tostring(stats.ambiguous or 0)
+            .. " ordinaryUnknown=" .. tostring(stats.ordinaryUnknown or 0)
+            .. " blockedRecords=" .. tostring(stats.blockedRecords or 0))
     end
     return stats
 end
 
 function Lifecycle.IsStartupBodyCleanupComplete()
-    return Lifecycle.StartupCleanup.complete ~= false
+    local state = Lifecycle.StartupCleanup
+    local now = Core.Now()
+    if state.complete ~= true then
+        if state.begun == true
+            and (tonumber(state.startedAt) or 0) > 0
+            and now - (tonumber(state.startedAt) or now)
+                >= (tonumber(Const.BODY_SHELL_STARTUP_MAX_WAIT_MS) or 10000)
+        then
+            -- Do not deadlock presence when the early sweep could not inspect
+            -- the cell. Materialize still performs its per-record shell
+            -- cleanup immediately before spawning, while the maintenance
+            -- sweep continues after this bounded fail-open.
+            state.active = false
+            state.complete = true
+            state.failedOpen = true
+            state.completedAt = now
+            state.settleUntil = now
+            state.nextMaterializeAt = now
+            state.nextMaintenanceAt = now
+                + (tonumber(Const.BODY_SHELL_MAINTENANCE_MS) or 1000)
+            if Core.LogWarn then
+                Core.LogWarn("PNC startup body cleanup fail-open"
+                    .. " reason=deadline"
+                    .. " passes=" .. tostring(state.passes)
+                    .. " removed=" .. tostring(state.removed))
+            end
+            return true
+        end
+        return false
+    end
+    return now >= (tonumber(state.settleUntil) or 0)
 end
 
 function Lifecycle.OnEarlyZombieUpdate(zombie)

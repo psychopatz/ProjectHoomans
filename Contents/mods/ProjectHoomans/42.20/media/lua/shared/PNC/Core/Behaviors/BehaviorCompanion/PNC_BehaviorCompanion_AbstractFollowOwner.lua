@@ -5,6 +5,7 @@ local Core = PNC.Core
 local Const = PNC.Const
 local Common = PNC.BehaviorCommon
 local Diagnostics = PNC.PerformanceScalingDiagnostics
+local CompanionVehicle = PNC.CompanionVehicle
 
 local function followerPresenceAuditEnabled()
     return Diagnostics
@@ -84,6 +85,7 @@ end
 -- threat response, formation scan, animation, and engine pathing work.
 function Internal.TickAbstractFollowOwner(record, now)
     local owner
+    local vehicleService = PNC.CompanionVehicle or CompanionVehicle
     local runtime = record.runtime or {}
     local state
     local ownerResolved
@@ -96,6 +98,7 @@ function Internal.TickAbstractFollowOwner(record, now)
     local targetZ
     local stopDistance
     local reason
+    local vehicleHandled
     local auditEnabled = followerPresenceAuditEnabled()
     now = tonumber(now) or (Core.Now and Core.Now() or 0)
     record.runtime = runtime
@@ -110,6 +113,22 @@ function Internal.TickAbstractFollowOwner(record, now)
     else
         owner = Common.GetOwner(record)
         state = Internal.GetFollowState(record)
+    end
+    if vehicleService
+        and vehicleService.IsPassenger
+        and vehicleService.IsPassenger(record)
+        and vehicleService.Tick
+    then
+        -- Bodyless passengers still need the vehicle handoff tick. Without
+        -- this, a relogged passenger can remain reserved forever because the
+        -- live-body vehicle coordinator is not running for an abstract NPC.
+        vehicleHandled = vehicleService.Tick(record, nil, owner)
+        if vehicleHandled and vehicleService.IsPassenger(record) then
+            record.activeBehavior = "FollowOwner:vehicle_passenger"
+            runtime.followOrderActive = true
+            runtime.forcePresenceCheck = nil
+            return true
+        end
     end
     ownerResolved = owner ~= nil
     if ownerUnresolved then

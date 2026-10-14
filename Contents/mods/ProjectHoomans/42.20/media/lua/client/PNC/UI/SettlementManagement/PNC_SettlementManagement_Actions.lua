@@ -103,13 +103,6 @@ function Actions.Handle(window, action, facility)
     if not settlement then return false end
     if action == "overlay" then LayoutOverlay.Toggle(settlement); return true end
     if action == "fishing_zone" then return Fishing.Begin(window) end
-    if action == "build_facility" then
-        -- Retired: the FACILITIES tab owns facility construction now. The
-        -- action id is still accepted so an old keybind or stale UI cannot
-        -- open the legacy window, and it points at the same code path.
-        local BuildingTab = require "PNC/UI/Base/PNC_BaseBuildingTab"
-        return BuildingTab.OnControl(window, { internal = "build_selected" })
-    end
     if action == "barricade" then
         PNC.Client.RequestBuildBarricade({ baseId = settlement.id,
             expectedRevision = settlement.revision })

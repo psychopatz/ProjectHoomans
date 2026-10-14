@@ -75,6 +75,10 @@ Diagnostics.NativeHandoffAuditEnabled = false
 -- followers, and is emitted at presence and recovery boundaries rather than
 -- from the ordinary movement tick.
 Diagnostics.PresenceTraversalAuditEnabled = false
+-- Body identity tracing is opt-in. It samples engine identity fields at
+-- restore/registration boundaries so the normal zombie update path remains
+-- a single boolean read when the probe is disabled.
+Diagnostics.BodyIdentityAuditEnabled = false
 Diagnostics.BuildTraceSequence = tonumber(Diagnostics.BuildTraceSequence) or 0
 Diagnostics.BuildTraceSentAt = Diagnostics.BuildTraceSentAt or {}
 Diagnostics.BuildTraceReceivedAt = Diagnostics.BuildTraceReceivedAt or {}
@@ -248,6 +252,10 @@ end
 
 function Diagnostics.IsPresenceTraversalAuditEnabled()
     return Diagnostics.PresenceTraversalAuditEnabled == true
+end
+
+function Diagnostics.IsBodyIdentityAuditEnabled()
+    return Diagnostics.BodyIdentityAuditEnabled == true
 end
 
 function Diagnostics.SetPresenceTraversalAuditEnabled(enabled)

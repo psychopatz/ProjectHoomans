@@ -124,54 +124,71 @@ function Presence.ClearTraversalHandoff(record, reason)
 end
 
 function Presence.ShouldMaterialize(record, nearest)
+    local runtime
+    local explicitLiveRequest
     nearest = nearest or Internal.FindNearestPlayer(record)
     if record.alive == false
         or record.presenceState == Const.PRESENCE_CORPSE
     then
-        return false
+        return false, "dead_or_corpse"
     end
-    if record.runtime and record.runtime.forceAbstract then return false end
+    runtime = record.runtime or {}
+    -- A vehicle passenger is intentionally bodyless. This guard must remain
+    -- before every force-live override: disembarking and follow handoffs may
+    -- request a body, but a passenger must stay represented by the vehicle
+    -- reservation until the vehicle service releases it.
+    if runtime.vehiclePassenger
+        and runtime.vehiclePassenger.active == true
+    then
+        return false, "vehicle_passenger"
+    end
     if PNC.BodyLifecycle
         and PNC.BodyLifecycle.IsStartupBodyCleanupComplete
         and not PNC.BodyLifecycle.IsStartupBodyCleanupComplete()
     then
-        return false
+        return false, "startup_gate"
     end
-    -- Vehicle passengers intentionally have no IsoZombie body until exit.
-    if record.runtime and record.runtime.vehiclePassenger
-        and record.runtime.vehiclePassenger.active == true
+    if Core.Now() < (tonumber(runtime.materializeRetryAt) or 0)
     then
-        return false
+        return false, "retry_backoff"
     end
-    if record.runtime
-        and Core.Now() < (tonumber(record.runtime.materializeRetryAt) or 0)
-    then
-        return false
+    explicitLiveRequest = runtime.forceLive == true
+        or runtime.abstractFollowMaterializeRequested == true
+    -- `abstract` is the normal unloaded state. The legacy forceAbstract flag
+    -- was also written by directors for initial placement, so treating it as
+    -- a permanent proximity veto strands those NPCs forever. Only an explicit
+    -- hardAbstract lock may block normal range-enter materialization. The
+    -- vehicle-passenger guard above deliberately remains absolute.
+    if runtime.hardAbstract == true and not explicitLiveRequest then
+        return false, "hard_abstract"
     end
-    if record.runtime and record.runtime.presenceHandoffRequested == true
+    if runtime.presenceHandoffRequested == true
         and not withinDistance(nearest, Const.MATERIALIZE_DISTANCE)
     then
-        return false
+        return false, "presence_handoff_out_of_range"
     end
-    if record.runtime and record.runtime.forceLive then
+    if runtime.forceLive == true then
         if travelHandoffRequired(record)
             and not withinDistance(nearest, Const.MATERIALIZE_DISTANCE)
         then
             -- A forced-live record keeps its body while a player can see it.
             -- With nobody near, a journey that cannot be walked stays on the
             -- abstract lane instead of thrashing the body every presence pass.
-            return false
+            return false, "travel_handoff_out_of_range"
         end
-        return true
+        return true, "explicit_live"
     end
     if travelHandoffRequired(record)
         and not withinDistance(nearest, Const.MATERIALIZE_DISTANCE)
     then
-        return false
+        return false, "travel_handoff_out_of_range"
     end
-    return nearest and nearest.distSq
+    if nearest and nearest.distSq
         <= (Const.MATERIALIZE_DISTANCE * Const.MATERIALIZE_DISTANCE)
-        or false
+    then
+        return true, "within_materialize_distance"
+    end
+    return false, "outside_materialize_distance"
 end
 
 function Presence.ShouldAbstract(record, nearest)
@@ -198,7 +215,7 @@ function Presence.ShouldAbstract(record, nearest)
     if record.runtime and record.runtime.forceLive and not handoff then
         return false
     end
-    if record.runtime and record.runtime.forceAbstract then return true end
+    if record.runtime and record.runtime.hardAbstract then return true end
     if record.runtime and record.runtime.target
         and not (Common
             and Common.IsActiveFollowCombatTarget

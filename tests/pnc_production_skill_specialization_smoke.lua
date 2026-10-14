@@ -48,7 +48,7 @@ T.equal(descriptor.productionSkillId, "Welding",
     "vanilla XP skill is normalized to the crafting skill catalog")
 T.equal(descriptor.xpAwards[1].skillId, "Welding", "XP award skill")
 
-local Definitions = require "PNC/Core/Production/PNC_WorkDefinitions"
+local Definitions = require "PNC/Core/Production/WorkDefinition/PNC_WorkDefinitions"
 local station = Definitions.GetStationForRecipe(descriptor, "CRAFT")
 T.equal(station.id, "forge", "forge tag routes to direct workstation")
 local profile = Definitions.GetStationSkillProfile("forge")

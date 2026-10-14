@@ -51,7 +51,7 @@ PNC.Registry.Data.live_provisioner = {
     x = 3, y = 4, z = 0, runtime = {},
 }
 
-local Definitions = require "PNC/Core/Production/PNC_WorkDefinitions"
+local Definitions = require "PNC/Core/Production/WorkDefinition/PNC_WorkDefinitions"
 local Repository = require "PNC/Production/PNC_WorkRepository"
 Repository.Import(nil)
 local Work = require "PNC/Production/PNC_WorkService"

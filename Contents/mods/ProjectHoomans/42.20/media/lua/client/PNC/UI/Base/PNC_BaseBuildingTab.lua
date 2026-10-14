@@ -75,9 +75,9 @@ function Building.Rebuild(window, snapshot)
     return View.Rebuild(window, snapshot)
 end
 
-function Building.FocusFacility(window, definitionId)
+function Building.FocusFacility(window, definitionId, objectInfoName)
     if window.tab ~= "facilities" then return false end
-    return View.Focus(window, definitionId)
+    return View.Focus(window, definitionId, objectInfoName)
 end
 
 -- Kept below as a compatibility note for callers that inspect the old

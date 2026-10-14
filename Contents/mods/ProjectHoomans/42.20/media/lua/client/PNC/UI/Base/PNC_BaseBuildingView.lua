@@ -1,5 +1,6 @@
 require "PsychopatzCore/UI/PsychopatzUI"
 require "PNC/UI/Inventory/PNC_InventoryUI_List"
+local Settings = require "PsychopatzCore/Settings/PsychopatzSettings"
 
 local Components = require
     "PNC/UI/Shared/PNC_ColonyUIComponents"
@@ -7,15 +8,35 @@ local Data = require "PNC/UI/Base/PNC_BaseBuildingData"
 local Cards = require "PNC/UI/Base/PNC_BaseBuildingCards"
 local Rows = require "PNC/UI/Base/PNC_BaseBuildingRows"
 local LayoutModel = require "PNC/UI/Base/PNC_BaseBuildingLayout"
-local BuildUI = require
-    "PNC/UI/SettlementManagement/PNC_SettlementManagement_FacilityBuildModal"
+local BuildUI = require "PNC/UI/Shared/PNC_FacilityBuildProvider"
 local QueueOverlay = require
     "PNC/UI/Base/PNC_BaseBuildingQueueOverlay"
 local QueueActions = require
     "PNC/UI/Base/PNC_BaseBuildingQueueActions"
+local FacilityBuildTarget = require
+    "PNC/UI/Shared/PNC_FacilityBuildTarget"
 
 local View = {}
 local UI = PsychopatzCore.UI
+local DEFAULT_LOWER_SPLIT_RATIO = 0.66
+local SPLITTER_HIT_WIDTH = 16
+local SPLIT_STORE = Settings.Open("ProjectHoomansBaseBuildingUI", {
+    fileName = "ProjectHoomans_BaseBuildingUI.txt",
+    defaults = { facilityLowerSplitRatio = DEFAULT_LOWER_SPLIT_RATIO },
+})
+
+local function loadLowerSplitRatio()
+    if not SPLIT_STORE.loaded then SPLIT_STORE:Load() end
+    local value = SPLIT_STORE:Get("facilityLowerSplitRatio",
+        DEFAULT_LOWER_SPLIT_RATIO)
+    return math.max(0.2, math.min(0.8,
+        tonumber(value) or DEFAULT_LOWER_SPLIT_RATIO))
+end
+
+local function saveLowerSplitRatio(value)
+    SPLIT_STORE:Set("facilityLowerSplitRatio", math.max(0.2,
+        math.min(0.8, tonumber(value) or DEFAULT_LOWER_SPLIT_RATIO)), true)
+end
 local function tr(key, fallback)
     local value = getText and PNC.Translation.GetKey(key) or nil
     if not value or value == key then return fallback end
@@ -54,10 +75,11 @@ end
 
 function View.Create(window)
     Cards.Create(window)
+    window.baseBuildingLowerSplitRatio = loadLowerSplitRatio()
     window.baseBuildCardOwner.setSelected = function(_, id)
         View.SetSelected(window, id)
     end
-    window.baseBuildingSearch = UI.CreateTextEntry(window, {
+    window.baseBuildingSearch = UI.CreateSearchEntry(window, {
         clearButton = true, width = 1, height = 1,
         onTextChange = function()
             View.Rebuild(window, window.snapshot or {})
@@ -68,6 +90,22 @@ function View.Create(window)
         Components.CreatePane(window, 42, Rows.Material)
     window.baseBuildingNativeQueuePane, window.baseBuildingNativeQueue =
         Components.CreatePane(window, 42, Rows.NativeQueue)
+    window.baseBuildingLowerSplitDivider = UI.CreateResizableDivider(window, {
+        width = SPLITTER_HIT_WIDTH,
+        value = 0,
+        drawIndicator = true,
+        onChange = function(value)
+            local available = tonumber(window.baseBuildingLowerSplitAvailable)
+                or 1
+            window.baseBuildingLowerSplitRatio = math.max(0.2, math.min(0.8,
+                (tonumber(value) or 0) / available))
+            window:invalidateLayout("base_facilities_split_drag")
+            window:requestResponsiveLayout(false)
+        end,
+        onRelease = function()
+            saveLowerSplitRatio(window.baseBuildingLowerSplitRatio)
+        end,
+    })
     window.baseBuildingBuildButton = UI.CreateButton(window, {
         id = "build_selected", title = tr("UI_PNC_Facility_BuildConfirm", "BUILD"),
         target = window, onclick = window.onBaseBuildingControl,
@@ -148,7 +186,7 @@ function View.Apply(window, active)
         window.baseBuildingCancelPlacement, window.baseBuildingQueueOverlay,
         window.baseBuildingCancelOrder, window.baseBuildingSearch,
         window.baseBuildingPrevious, window.baseBuildingNext,
-        window.baseBuildingCloseButton,
+        window.baseBuildingCloseButton, window.baseBuildingLowerSplitDivider,
     }
     for _, control in ipairs(controls) do control:setVisible(active) end
     for _, button in ipairs(window.baseBuildingCategoryButtons or {}) do
@@ -205,14 +243,28 @@ function View.Rebuild(window, snapshot)
     return true
 end
 
-function View.Focus(window, id)
+function View.Focus(window, id, objectInfoName)
     local wanted = tostring(id or "")
     if wanted == "" then return false end
     local target
     for _, option in ipairs(window.baseBuildingOptions or {}) do
-        if tostring(option.id) == wanted then
+        if FacilityBuildTarget.MatchesOption(option, wanted, objectInfoName) then
             target = option
             break
+        end
+    end
+    -- Base can already be open with the same search text from a previous
+    -- station request. Rebuild once so the active search can materialize
+    -- compatibility definitions before giving up on the focus request.
+    if not target then
+        View.Rebuild(window, window.snapshot or {})
+        for _, option in ipairs(window.baseBuildingOptions or {}) do
+            if FacilityBuildTarget.MatchesOption(option, wanted,
+                objectInfoName)
+            then
+                target = option
+                break
+            end
         end
     end
     if not target then return false end
@@ -223,13 +275,13 @@ function View.Focus(window, id)
     window.baseBuildingCategory = target.category
     local filtered = Data.FilteredOptions(window)
     for index, option in ipairs(filtered) do
-        if tostring(option.id) == wanted then
+        if FacilityBuildTarget.MatchesOption(option, wanted, objectInfoName) then
             window.baseBuildingPage = math.ceil(index / Data.PAGE_SIZE)
             break
         end
     end
     View.Rebuild(window, window.snapshot or {})
-    View.SetSelected(window, wanted)
+    View.SetSelected(window, target.id)
     return true
 end
 
