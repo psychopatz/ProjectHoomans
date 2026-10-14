@@ -232,6 +232,44 @@ T.equal(resultWindow.statusText,
 T.equal(resultWindow.tradePending, false,
     "rejected trade clears the pending state")
 
+local cacheWindow = {
+    tradeMode = true,
+    tradeInventoryDirty = false,
+    tradeSnapshotRevision = 7,
+    tradePlayerContainerID = "root",
+    selectedPlayerContainer = "root",
+    tradePlayerRows = {},
+    tradeStockRows = {},
+    transferEndpoint = {
+        kind = "trade",
+        revision = function() return 7 end,
+    },
+}
+T.equal(ISPNCInventoryWindow.refreshTradeInventory(cacheWindow, false), nil,
+    "clean trade refresh returns without rebuilding")
+T.equal(ISPNCInventoryWindow.markTradeInventoryDirty(cacheWindow), true,
+    "trade inventory invalidation marks the window dirty")
+T.equal(cacheWindow.tradeInventoryDirty, true,
+    "trade invalidation keeps the rebuild pending")
+
+local acceptedWindow = {
+    tradeMode = true,
+    tradePending = true,
+    tradeDraft = { buy = {}, sell = {} },
+    tradePlayerRows = {},
+    tradeStockRows = {},
+    transferEndpoint = {
+        setSnapshot = function(self, snapshot) self.snapshot = snapshot end,
+    },
+    refreshTradeInventory = function(self, force) self.refreshed = force end,
+}
+T.equal(ISPNCInventoryWindow.applyTradeResult(acceptedWindow, {
+    accepted = true,
+    snapshot = { stockVersion = 8 },
+}), true, "accepted trade remains successful")
+T.equal(acceptedWindow.tradePlayerRowsReconcileRetries, 3,
+    "accepted trade schedules bounded inventory reconciliation")
+
 local layout = PsychopatzCore.UI.Layout
 layout.SetBounds = function() end
 local layoutWindow = {

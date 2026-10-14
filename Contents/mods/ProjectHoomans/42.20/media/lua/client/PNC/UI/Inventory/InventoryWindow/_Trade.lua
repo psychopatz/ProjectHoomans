@@ -16,6 +16,8 @@ local TRADE_COLUMNS = {
 -- edge, so a rejected trade looked like a no-op even when the server replied.
 local TRADE_FOOTER_HEIGHT = 78
 local TRADE_STATUS_OFFSET = 38
+local TRADE_PLAYER_ROWS_RECONCILE_RETRIES = 3
+local TRADE_PLAYER_ROWS_RECONCILE_INTERVAL_MS = 100
 
 local function number(value, fallback)
     value = tonumber(value)
@@ -78,6 +80,11 @@ function ISPNCInventoryWindow:onTradeModeChanged(active)
     if not self.tradeMode then
         self.tradeDraft = nil
         self.tradePending = false
+        self.tradeInventoryDirty = false
+        self.tradeSnapshotRevision = nil
+        self.tradePlayerContainerID = nil
+        self.tradePlayerRowsReconcileRetries = 0
+        self.tradePlayerRowsReconcileNextAt = nil
         for _, list in ipairs({ self.playerList, self.npcList }) do
             if list then
                 list.selectOnly = false
@@ -106,6 +113,7 @@ function ISPNCInventoryWindow:onTradeModeChanged(active)
     self:refreshCatalogHeaders()
     self:setCatalogHeaderVisibility()
     self.tradeDraft = self.tradeDraft or { buy = {}, sell = {} }
+    self.tradeInventoryDirty = true
     setListMode(self.playerList, self)
     setListMode(self.npcList, self)
     if self.playerContainerList then self.playerContainerList:setVisible(false) end
@@ -204,11 +212,49 @@ local function refreshList(list, rows)
     end
 end
 
+function ISPNCInventoryWindow:markTradeInventoryDirty()
+    if not self.tradeMode then return false end
+    self.tradeInventoryDirty = true
+    self.contextSignature = nil
+    return true
+end
+
+local function markTradeRefresh(window)
+    if type(window.markTradeInventoryDirty) == "function" then
+        return window:markTradeInventoryDirty()
+    end
+    window.tradeInventoryDirty = true
+    window.contextSignature = nil
+    return true
+end
+
 function ISPNCInventoryWindow:refreshTradeInventory(force)
     local player = getSpecificPlayer and getSpecificPlayer(0)
         or getPlayer and getPlayer() or nil
     local endpoint = self.transferEndpoint
     if not endpoint or endpoint.kind ~= "trade" then return end
+    local now = Helpers.inventoryNow and Helpers.inventoryNow() or 0
+    local reconcileRetries = tonumber(self.tradePlayerRowsReconcileRetries) or 0
+    if force ~= true and reconcileRetries > 0
+        and now >= (tonumber(self.tradePlayerRowsReconcileNextAt) or now)
+    then
+        self.tradeInventoryDirty = true
+        self.tradePlayerRowsReconcileRetries = reconcileRetries - 1
+        self.tradePlayerRowsReconcileNextAt = now
+            + TRADE_PLAYER_ROWS_RECONCILE_INTERVAL_MS
+    end
+    if force == true then self.tradeInventoryDirty = true end
+    local endpointRevision = endpoint.revision and endpoint:revision() or 0
+    if not self.tradeInventoryDirty
+        and self.tradePlayerRows
+        and self.tradeStockRows
+        and tostring(self.tradeSnapshotRevision or "")
+            == tostring(endpointRevision)
+        and tostring(self.tradePlayerContainerID or "root")
+            == tostring(self.selectedPlayerContainer or "root")
+    then
+        return
+    end
     self.tradeDraft = self.tradeDraft or { buy = {}, sell = {} }
     self.playerContainers = Model.BuildPlayerContainers(player)
     self.selectedPlayerContainer = self.selectedPlayerContainer or "root"
@@ -247,6 +293,10 @@ function ISPNCInventoryWindow:refreshTradeInventory(force)
         .. tostring(#playerRows) .. "|" .. tostring(#stockRows) .. "|"
         .. tostring(self.tradeTotals.buyTotal) .. "|"
         .. tostring(self.tradeTotals.sellTotal)
+    self.tradeInventoryDirty = false
+    self.tradeSnapshotRevision = endpointRevision
+    self.tradePlayerContainerID = tostring(
+        self.selectedPlayerContainer or "root")
 end
 
 function ISPNCInventoryWindow:getTradeTotals()
@@ -285,7 +335,7 @@ function ISPNCInventoryWindow:changeTradeQuantity(row, delta)
         rowQuantity(row), current + math.floor(number(delta, 0))
     ))
     self.tradeDraft[side][key] = nextQuantity
-    self.contextSignature = nil
+    markTradeRefresh(self)
     self:refreshTradeInventory(true)
     return true
 end
@@ -370,7 +420,9 @@ function ISPNCInventoryWindow:onTradeReset()
     self.tradePending = false
     self.tradeStatusKind = nil
     self.statusText = nil
-    self.contextSignature = nil
+    markTradeRefresh(self)
+    self.tradePlayerRowsReconcileRetries = 0
+    self.tradePlayerRowsReconcileNextAt = nil
     self:refreshTradeInventory(true)
     return true
 end
@@ -399,7 +451,17 @@ function ISPNCInventoryWindow:applyTradeResult(result)
         self.statusText = tr("UI_PNC_Trading_Failed", "Trade failed") .. ": "
             .. tostring(result.reason or "rejected"):gsub("_", " ")
     end
-    self.contextSignature = nil
+    markTradeRefresh(self)
+    if result.accepted == true then
+        self.tradePlayerRowsReconcileRetries =
+            TRADE_PLAYER_ROWS_RECONCILE_RETRIES
+        local now = Helpers.inventoryNow and Helpers.inventoryNow() or 0
+        self.tradePlayerRowsReconcileNextAt = now
+            + TRADE_PLAYER_ROWS_RECONCILE_INTERVAL_MS
+    else
+        self.tradePlayerRowsReconcileRetries = 0
+        self.tradePlayerRowsReconcileNextAt = nil
+    end
     self:refreshTradeInventory(true)
     return result.accepted == true
 end

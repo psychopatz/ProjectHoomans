@@ -22,6 +22,11 @@ function ISPNCInventoryWindow:setTransferEndpoint(endpoint)
     self.giftToken = nil
     self.giftIntent = nil
     self.contextSignature = nil
+    self.tradeInventoryDirty = self.tradeMode
+    self.tradeSnapshotRevision = nil
+    self.tradePlayerContainerID = nil
+    self.tradePlayerRowsReconcileRetries = 0
+    self.tradePlayerRowsReconcileNextAt = nil
     self.lastInventoryRefreshAt = nil
     self.inventoryRefreshPending = false
     self.inventoryRefreshStartedAt = nil
