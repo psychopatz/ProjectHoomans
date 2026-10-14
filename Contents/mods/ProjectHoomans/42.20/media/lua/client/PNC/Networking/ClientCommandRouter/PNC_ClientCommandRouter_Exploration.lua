@@ -24,6 +24,10 @@ function Internal.ApplyWorldDiscoverySnapshot(payload)
     then
         PNC.RadioDiscoveryPresentation.ShowResult(payload)
     end
+    local radioOS = PsychopatzCore and PsychopatzCore.RadioOS
+    if radioOS and radioOS.EmitContactRefresh then
+        radioOS.EmitContactRefresh("projecthoomans:contacts")
+    end
     return true
 end
 

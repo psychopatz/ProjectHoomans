@@ -384,22 +384,4 @@ if CustomRadio and CustomRadio.RegisterListener and ScanChannel then
         end)
 end
 
-if RadioActions and RadioActions.Register then
-    RadioActions.Register({
-        id = "projecthoomans.contacts",
-        label = tr("UI_PNC_Contacts", "Contacts"),
-        signalLabel = tr("UI_PNC_Contacts", "Contacts"),
-        placement = RadioActions.PLACEMENT_SIGNAL
-            or "psychopatz.radio.signal",
-        order = 90,
-        isAvailable = function()
-            return PNC.ContactsUI and PNC.ContactsUI.Open ~= nil
-        end,
-        onClick = function()
-            PNC.ContactsUI.Open()
-            return true
-        end,
-    })
-end
-
 return RadioActions
