@@ -165,4 +165,139 @@ T.equal(#selectedSellRows[1].itemIDs, 1,
 T.equal(selectedSellRows[1].itemIDs[1], "katana-1",
     "trade request keeps deterministic aggregate selection order")
 
+local totals = ISPNCInventoryWindow.getTradeTotals({
+    tradePlayerRows = {
+        { selectedQuantity = 1, unitPrice = 225 },
+    },
+    tradeStockRows = {
+        { selectedQuantity = 2, unitPrice = 30 },
+    },
+})
+T.equal(totals.buyTotal, 60, "trade totals calculate the buy side")
+T.equal(totals.sellTotal, 225, "trade totals calculate the sell side")
+T.equal(totals.netTotal, -165,
+    "negative net clearly represents money paid to the player")
+
+local submitted = nil
+local acceptWindow = {
+    tradeMode = true,
+    tradePending = false,
+    tradeStockRows = {},
+    tradePlayerRows = {
+        {
+            fullType = "Base.Katana",
+            selectedQuantity = 1,
+            itemIDs = { "katana-1" },
+            itemIDQuantities = { 1 },
+        },
+    },
+    tradeRequestRows = ISPNCInventoryWindow.tradeRequestRows,
+    tradeAcceptButton = {
+        setEnable = function(self, enabled) self.enabled = enabled end,
+    },
+    transferEndpoint = {
+        commit = function(_, buyRows, sellRows)
+            submitted = { buyRows = buyRows, sellRows = sellRows }
+            return true
+        end,
+    },
+}
+T.equal(ISPNCInventoryWindow.onTradeAccept(acceptWindow), true,
+    "accept starts an asynchronous trade submission")
+T.equal(acceptWindow.tradePending, true,
+    "accept keeps the button pending until the server result")
+T.equal(acceptWindow.statusText, "Submitting trade...",
+    "accept exposes its pending status")
+T.equal(#submitted.sellRows, 1,
+    "accept forwards the selected sell basket")
+
+local resultWindow = {
+    tradeMode = true,
+    tradePending = true,
+    tradeDraft = { buy = {}, sell = {} },
+    tradePlayerRows = {},
+    tradeStockRows = {},
+    transferEndpoint = {
+        setSnapshot = function(self, snapshot) self.snapshot = snapshot end,
+    },
+    refreshTradeInventory = function(self, force) self.refreshed = force end,
+}
+T.equal(ISPNCInventoryWindow.applyTradeResult(resultWindow, {
+    accepted = false,
+    reason = "trader_budget_exhausted",
+}), false, "rejected trade remains rejected in the UI")
+T.equal(resultWindow.statusText,
+    "Trade failed: trader budget exhausted",
+    "server rejection is visible in the UI status")
+T.equal(resultWindow.tradePending, false,
+    "rejected trade clears the pending state")
+
+local layout = PsychopatzCore.UI.Layout
+layout.SetBounds = function() end
+local layoutWindow = {
+    width = 600,
+    height = 360,
+    playerList = {},
+    npcList = {},
+    titleBarHeight = function() return 20 end,
+    resizeWidgetHeight = function() return 12 end,
+    layoutCatalogHeaders = function() end,
+}
+ISPNCInventoryWindow.onTradeResponsiveLayout(layoutWindow)
+T.equal(layoutWindow.statusY - layoutWindow.footerY, 38,
+    "trade layout reserves a separate status row")
+T.truthy(layoutWindow.statusY < layoutWindow.height,
+    "trade status row stays inside the minimum window")
+
+layout.Ellipsize = function(text) return text end
+PsychopatzCore.UI.Window = { prerender = function() end }
+UIFont = { Small = "small" }
+T.load(
+    "ProjectHoomans",
+    "client",
+    "PNC/UI/Inventory/InventoryWindow/_TradePresentation.lua"
+)
+local footerDraws = {}
+local footerWindow = {
+    width = 600,
+    height = 360,
+    playerPaneX = 8,
+    npcPaneX = 308,
+    paneWidth = 284,
+    headingY = 28,
+    footerY = 270,
+    statusY = 308,
+    contentSurfaceOpacity = 1,
+    npcDisplayName = "Trader",
+    tradeTotals = { buyTotal = 0, sellTotal = 1139, netTotal = -1139 },
+    transferEndpoint = {
+        snapshot = { budget = 0 },
+        weight = function() return 24.8, 33.0 end,
+    },
+    statusText = "Trade failed: trader budget exhausted",
+    tradeStatusKind = "failure",
+    applyOpacityStyle = function() end,
+    refreshInventory = function() end,
+    drawRect = function() end,
+    drawText = function(_, text, _, y)
+        footerDraws[#footerDraws + 1] = { text = text, y = y }
+    end,
+    drawTextRight = function(_, text, _, y)
+        footerDraws[#footerDraws + 1] = { text = text, y = y }
+    end,
+}
+ISPNCInventoryWindow.prerenderTrade(footerWindow)
+local footerText = {}
+for _, draw in ipairs(footerDraws) do
+    footerText[#footerText + 1] = tostring(draw.text)
+end
+local footerTextJoined = table.concat(footerText, " | ")
+T.truthy(string.find(footerTextJoined, "PLAYER RECEIVES: $1139", 1, true),
+    "footer explains a negative net as money received")
+T.truthy(string.find(footerTextJoined, "BUDGET: $0", 1, true),
+    "footer exposes the trader budget")
+T.truthy(string.find(footerTextJoined,
+    "Trade failed: trader budget exhausted", 1, true),
+    "footer exposes the server rejection")
+
 T.finish("pnc_inventory_trade_smoke")

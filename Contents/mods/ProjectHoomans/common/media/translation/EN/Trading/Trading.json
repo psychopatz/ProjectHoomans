@@ -1,6 +1,7 @@
 {
     "UI_PNC_Trading_Accept": "Accept",
     "UI_PNC_Trading_Available": "Available",
+    "UI_PNC_Trading_Budget": "BUDGET",
     "UI_PNC_Trading_Cancel": "Cancel",
     "UI_PNC_Trading_Capacity": "Capacity",
     "UI_PNC_Trading_Category": "Category",
@@ -11,6 +12,8 @@
     "UI_PNC_Trading_Offer": "Offer",
     "UI_PNC_Trading_PlayerHeading": "YOUR OFFER",
     "UI_PNC_Trading_Price": "Price",
+    "UI_PNC_Trading_PlayerPays": "PLAYER PAYS",
+    "UI_PNC_Trading_PlayerReceives": "PLAYER RECEIVES",
     "UI_PNC_Trading_Reset": "Reset",
     "UI_PNC_Trading_Submitting": "Submitting trade...",
     "UI_PNC_Trading_Title": "Trading",

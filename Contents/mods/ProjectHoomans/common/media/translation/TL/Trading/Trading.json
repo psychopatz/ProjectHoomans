@@ -1,6 +1,7 @@
 {
     "UI_PNC_Trading_Accept": "Tanggapin",
     "UI_PNC_Trading_Available": "Magagamit",
+    "UI_PNC_Trading_Budget": "BADYET",
     "UI_PNC_Trading_Cancel": "Kanselahin",
     "UI_PNC_Trading_Capacity": "Kapasidad",
     "UI_PNC_Trading_Category": "Kategorya",
@@ -11,6 +12,8 @@
     "UI_PNC_Trading_Offer": "Alok",
     "UI_PNC_Trading_PlayerHeading": "IYONG ALOK",
     "UI_PNC_Trading_Price": "Presyo",
+    "UI_PNC_Trading_PlayerPays": "NAGBABAYAD ANG MANLALARO",
+    "UI_PNC_Trading_PlayerReceives": "TATANGGAP ANG MANLALARO",
     "UI_PNC_Trading_Reset": "I-reset",
     "UI_PNC_Trading_Submitting": "Isinusumite ang kalakalan...",
     "UI_PNC_Trading_Title": "Kalakalan",

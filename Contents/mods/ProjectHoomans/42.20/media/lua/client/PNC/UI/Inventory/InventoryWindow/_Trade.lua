@@ -11,6 +11,12 @@ local TRADE_COLUMNS = {
     { key = "action", x = 0.84 },
 }
 
+-- Reserve a complete footer row for the two-line totals plus the asynchronous
+-- server result. The old 56px reservation left the result text on the resize
+-- edge, so a rejected trade looked like a no-op even when the server replied.
+local TRADE_FOOTER_HEIGHT = 78
+local TRADE_STATUS_OFFSET = 38
+
 local function number(value, fallback)
     value = tonumber(value)
     return value or fallback or 0
@@ -44,7 +50,7 @@ function ISPNCInventoryWindow:onTradeResponsiveLayout()
     if not self.playerList or not self.npcList then return end
     local titleHeight = self:titleBarHeight()
     local top = titleHeight + 74
-    local bottom = 56 + self:resizeWidgetHeight()
+    local bottom = TRADE_FOOTER_HEIGHT + self:resizeWidgetHeight()
     local gap = 8
     local paneWidth = math.max(180, math.floor((self.width - gap * 3) / 2))
     local listHeight = math.max(120, self.height - top - bottom)
@@ -63,7 +69,8 @@ function ISPNCInventoryWindow:onTradeResponsiveLayout()
     self.paneWidth = paneWidth
     self.headingY = titleHeight + 8
     self.containerLabelY = titleHeight + 31
-    self.statusY = buttonY + 27
+    self.footerY = buttonY + 27
+    self.statusY = self.footerY + TRADE_STATUS_OFFSET
 end
 
 function ISPNCInventoryWindow:onTradeModeChanged(active)
@@ -343,10 +350,12 @@ function ISPNCInventoryWindow:onTradeAccept()
     if #buyRows < 1 and #sellRows < 1 then return false end
     self.tradePending = true
     self.statusText = tr("UI_PNC_Trading_Submitting", "Submitting trade...")
+    self.tradeStatusKind = "pending"
     self.tradeAcceptButton:setEnable(false)
     local ok, reason = self.transferEndpoint:commit(buyRows, sellRows)
     if ok ~= true then
         self.tradePending = false
+        self.tradeStatusKind = "failure"
         self.statusText = tr("UI_PNC_Trading_Failed", "Trade failed") .. ": "
             .. tostring(reason or "unavailable"):gsub("_", " ")
         self:refreshTradeInventory(true)
@@ -359,6 +368,7 @@ function ISPNCInventoryWindow:onTradeReset()
     if not self.tradeMode then return false end
     self.tradeDraft = { buy = {}, sell = {} }
     self.tradePending = false
+    self.tradeStatusKind = nil
     self.statusText = nil
     self.contextSignature = nil
     self:refreshTradeInventory(true)
@@ -382,8 +392,10 @@ function ISPNCInventoryWindow:applyTradeResult(result)
     end
     if result.accepted == true then
         self.tradeDraft = { buy = {}, sell = {} }
+        self.tradeStatusKind = "success"
         self.statusText = tr("UI_PNC_Trading_Complete", "Trade complete")
     else
+        self.tradeStatusKind = "failure"
         self.statusText = tr("UI_PNC_Trading_Failed", "Trade failed") .. ": "
             .. tostring(result.reason or "rejected"):gsub("_", " ")
     end
