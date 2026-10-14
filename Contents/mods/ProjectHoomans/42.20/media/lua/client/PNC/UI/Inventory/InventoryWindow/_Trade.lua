@@ -18,6 +18,8 @@ local TRADE_FOOTER_HEIGHT = 78
 local TRADE_STATUS_OFFSET = 38
 local TRADE_PLAYER_ROWS_RECONCILE_RETRIES = 3
 local TRADE_PLAYER_ROWS_RECONCILE_INTERVAL_MS = 100
+local TRADE_SNAPSHOT_REQUEST_COOLDOWN_MS = 750
+local TRADE_SNAPSHOT_REQUEST_TIMEOUT_MS = 4000
 
 local function number(value, fallback)
     value = tonumber(value)
@@ -33,9 +35,13 @@ local function setListMode(list, window)
     list.selectOnly = true
     list.catalogColumns = window.tradeColumnState
         and window.tradeColumnState.columns or TRADE_COLUMNS
-    list.onCatalogControl = function(target, row, key, control, button)
-        if target and target.onTradeCatalogControl then
-            return target:onTradeCatalogControl(row, key, control, button)
+    -- The reusable list normally passes ownerWindow as the first callback
+    -- argument. Keep the feature window in the closure as well: a native
+    -- button can outlive a list rebuild and must never turn a visible trade
+    -- control into a silent no-op because that transient target is stale.
+    list.onCatalogControl = function(_, row, key, control, button)
+        if window and window.onTradeCatalogControl then
+            return window:onTradeCatalogControl(row, key, control, button)
         end
         return false
     end
@@ -82,6 +88,13 @@ function ISPNCInventoryWindow:onTradeModeChanged(active)
         self.tradePending = false
         self.tradeInventoryDirty = false
         self.tradeSnapshotRevision = nil
+        self.tradeSnapshotGeneration = nil
+        self.tradeStateSignatureCache = nil
+        self.tradeQuotesStale = false
+        self.tradeQuoteRefreshActive = false
+        self.tradeSnapshotRequestAt = nil
+        self.tradeSnapshotRequestDeadlineAt = nil
+        self.tradeSnapshotRequestNextAt = nil
         self.tradePlayerContainerID = nil
         self.tradePlayerRowsReconcileRetries = 0
         self.tradePlayerRowsReconcileNextAt = nil
@@ -113,6 +126,16 @@ function ISPNCInventoryWindow:onTradeModeChanged(active)
     self:refreshCatalogHeaders()
     self:setCatalogHeaderVisibility()
     self.tradeDraft = self.tradeDraft or { buy = {}, sell = {} }
+    self.tradeStateSignatureCache = {}
+    self.tradeQuotesStale = false
+    self.tradeQuoteRefreshActive = false
+    self.tradeSnapshotRequestAt = nil
+    self.tradeSnapshotRequestDeadlineAt = nil
+    self.tradeSnapshotRequestNextAt = nil
+    local endpoint = self.transferEndpoint
+    self.tradeSnapshotGeneration = endpoint
+        and endpoint.snapshotGeneration
+        and endpoint:snapshotGeneration() or nil
     self.tradeInventoryDirty = true
     setListMode(self.playerList, self)
     setListMode(self.npcList, self)
@@ -147,7 +170,33 @@ local function applyDraft(row, draft)
     }
 end
 
+local function quoteKey(fullType, itemID)
+    return tostring(fullType or "") .. "\031" .. tostring(itemID or "")
+end
+
+local function buildSellQuoteIndex(endpoint)
+    local index = {}
+    local snapshot = endpoint and endpoint.snapshot or {}
+    for _, sellRow in ipairs(snapshot.sellRows or {}) do
+        local fullType = tostring(sellRow.fullType or "")
+        local unitPrice = math.max(0, math.floor(number(
+            sellRow.unitPrice, 0)))
+        if fullType ~= "" and type(sellRow.itemIDs) == "table" then
+            for _, itemID in ipairs(sellRow.itemIDs) do
+                local key = quoteKey(fullType, itemID)
+                if tostring(itemID or "") ~= "" then
+                    index[key] = unitPrice
+                end
+            end
+        end
+    end
+    return index
+end
+
 local function playerSellPrice(endpoint, row)
+    if row and row.tradeQuote ~= nil then
+        return math.max(0, math.floor(number(row.tradeQuote, 0)))
+    end
     if endpoint and endpoint.priceFor then
         return endpoint:priceFor(row.fullType, "SELL", row.itemIDs or { row.id })
     end
@@ -178,11 +227,21 @@ end
 
 local function buildPlayerRows(window, player, container)
     local endpoint = window.transferEndpoint
+    local quoteIndex = buildSellQuoteIndex(endpoint)
     local rows = Model.BuildTradePlayerRows(
         container,
         player,
-        window.expandedPlayerGroups,
-        nil
+        nil,
+        nil,
+        {
+            stateSignatureCache = window.tradeStateSignatureCache,
+            quoteForItem = function(item)
+                return quoteIndex[quoteKey(
+                    item and item.fullType,
+                    item and item.id
+                )] or 0
+            end,
+        }
     )
     for index = 1, #rows do
         local row = rows[index]
@@ -219,6 +278,50 @@ function ISPNCInventoryWindow:markTradeInventoryDirty()
     return true
 end
 
+local function requestTradeSnapshot(window, now)
+    if not window.tradeQuotesStale then return false end
+    local nextAt = tonumber(window.tradeSnapshotRequestNextAt)
+    if nextAt and now < nextAt then return false end
+    local requestedAt = tonumber(window.tradeSnapshotRequestAt)
+    local deadlineAt = tonumber(window.tradeSnapshotRequestDeadlineAt)
+    if requestedAt and deadlineAt and now < deadlineAt then
+        return false
+    end
+    local endpoint = window.transferEndpoint
+    if not endpoint or type(endpoint.requestSnapshot) ~= "function" then
+        return false
+    end
+    local ok = endpoint:requestSnapshot()
+    window.tradeSnapshotRequestNextAt = now
+        + TRADE_SNAPSHOT_REQUEST_COOLDOWN_MS
+    if ok == true then
+        window.tradeSnapshotRequestAt = now
+        window.tradeSnapshotRequestDeadlineAt = now
+            + TRADE_SNAPSHOT_REQUEST_TIMEOUT_MS
+    else
+        window.tradeSnapshotRequestAt = nil
+        window.tradeSnapshotRequestDeadlineAt = nil
+    end
+    return ok == true
+end
+
+function ISPNCInventoryWindow:invalidateTradeInventoryState()
+    if not self.tradeMode then return false end
+    self.tradeStateSignatureCache = {}
+    self.tradeInventoryDirty = true
+    self.contextSignature = nil
+    self.tradeQuotesStale = true
+    self.tradeQuoteRefreshActive = true
+    self.statusText = tr(
+        "UI_PNC_Trading_RefreshingQuotes",
+        "Refreshing trader quotes..."
+    )
+    self.tradeStatusKind = "refresh"
+    local now = Helpers.inventoryNow and Helpers.inventoryNow() or 0
+    requestTradeSnapshot(self, now)
+    return true
+end
+
 local function markTradeRefresh(window)
     if type(window.markTradeInventoryDirty) == "function" then
         return window:markTradeInventoryDirty()
@@ -234,6 +337,27 @@ function ISPNCInventoryWindow:refreshTradeInventory(force)
     local endpoint = self.transferEndpoint
     if not endpoint or endpoint.kind ~= "trade" then return end
     local now = Helpers.inventoryNow and Helpers.inventoryNow() or 0
+    local endpointGeneration = endpoint.snapshotGeneration
+        and endpoint:snapshotGeneration() or nil
+    if endpointGeneration ~= nil
+        and tostring(self.tradeSnapshotGeneration or "")
+            ~= tostring(endpointGeneration)
+    then
+        self.tradeSnapshotGeneration = endpointGeneration
+        self.tradeStateSignatureCache = {}
+        self.tradeQuotesStale = false
+        self.tradeQuoteRefreshActive = false
+        self.tradeSnapshotRequestAt = nil
+        self.tradeSnapshotRequestDeadlineAt = nil
+        self.tradeSnapshotRequestNextAt = nil
+        if self.tradeStatusKind == "refresh" then
+            self.tradeStatusKind = nil
+            self.statusText = nil
+        end
+        self.tradeInventoryDirty = true
+        self.contextSignature = nil
+    end
+    requestTradeSnapshot(self, now)
     local reconcileRetries = tonumber(self.tradePlayerRowsReconcileRetries) or 0
     if force ~= true and reconcileRetries > 0
         and now >= (tonumber(self.tradePlayerRowsReconcileNextAt) or now)
@@ -287,7 +411,9 @@ function ISPNCInventoryWindow:refreshTradeInventory(force)
     if self.tradeAcceptButton then
         local hasRows = self.tradeTotals.buyQuantity > 0
             or self.tradeTotals.sellQuantity > 0
-        self.tradeAcceptButton:setEnable(not self.tradePending and hasRows)
+        self.tradeAcceptButton:setEnable(
+            not self.tradePending and not self.tradeQuotesStale and hasRows
+        )
     end
     self.contextSignature = tostring(endpoint:revision()) .. "|"
         .. tostring(#playerRows) .. "|" .. tostring(#stockRows) .. "|"
@@ -396,6 +522,14 @@ end
 
 function ISPNCInventoryWindow:onTradeAccept()
     if not self.tradeMode or self.tradePending then return false end
+    if self.tradeQuotesStale then
+        self.statusText = tr(
+            "UI_PNC_Trading_RefreshingQuotes",
+            "Refreshing trader quotes..."
+        )
+        self.tradeStatusKind = "refresh"
+        return false, "trade_snapshot_stale"
+    end
     local buyRows, sellRows = self:tradeRequestRows()
     if #buyRows < 1 and #sellRows < 1 then return false end
     self.tradePending = true

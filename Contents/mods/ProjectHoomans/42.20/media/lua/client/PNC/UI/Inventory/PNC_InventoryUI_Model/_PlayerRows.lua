@@ -24,7 +24,8 @@ local function addAggregateItem(row, item)
 end
 
 function Model.BuildPlayerRows(
-    containerEntry, player, expandedGroups, giftOnly, giftPreferences
+    containerEntry, player, expandedGroups, giftOnly, giftPreferences,
+    options
 )
     local rows = {}
     local aggregateRows = {}
@@ -56,7 +57,8 @@ function Model.BuildPlayerRows(
                         containerEntry.id,
                         player,
                         false,
-                        giftPreferences
+                        giftPreferences,
+                        options
                     )
                     aggregate.name = tostring(
                         Helpers.probe(fullType).name or aggregate.name)
@@ -75,7 +77,8 @@ function Model.BuildPlayerRows(
                     containerEntry.id,
                     player,
                     giftOnly == true,
-                    giftPreferences
+                    giftPreferences,
+                    options
                 )
                 if not giftOnly or row.giftValid == true then
                     rows[#rows + 1] = row

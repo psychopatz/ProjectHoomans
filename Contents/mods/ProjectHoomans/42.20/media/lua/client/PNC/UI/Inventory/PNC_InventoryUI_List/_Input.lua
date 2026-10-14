@@ -96,8 +96,36 @@ function ISPNCInventoryList:onMouseDown(x, y)
 end
 
 function ISPNCInventoryList:onMouseUp(x, y)
+    local dispatchSerial = tonumber(self.catalogControlDispatchSerial) or 0
     if ISScrollingListBox.onMouseUp then
         ISScrollingListBox.onMouseUp(self, x, y)
+    end
+    -- Native child buttons normally dispatch before this list callback.  If
+    -- the event was delivered only to the list during a UI-tree rebuild,
+    -- resolve the visible control here so trade quantity buttons cannot be
+    -- rendered but inert.  A serial changed by the native path suppresses
+    -- this fallback and prevents double increments.
+    if dispatchSerial == (tonumber(self.catalogControlDispatchSerial) or 0)
+        and self.catalogControlAt
+        and self.dispatchCatalogControlDefinition
+    then
+        local inputX, inputY = self:resolveMouse(x, y)
+        local row, columnKey, control = self:catalogControlAt(inputX, inputY)
+        -- UIElement normally supplies coordinates local to this list.  Keep
+        -- the live-cursor path above for resized/scrolling parents, but try
+        -- the event-local pair too when a parent delivered a stale cursor
+        -- projection.  This is especially important for the player pane,
+        -- whose list can have a different scroll state from the trader pane.
+        if not row and tonumber(x) and tonumber(y)
+            and (inputX ~= tonumber(x) or inputY ~= tonumber(y))
+        then
+            row, columnKey, control = self:catalogControlAt(
+                tonumber(x), tonumber(y)
+            )
+        end
+        if row and columnKey and control then
+            self:dispatchCatalogControlDefinition(row, columnKey, control)
+        end
     end
     if self.ownerWindow and self.ownerWindow.completeInventoryDrop then
         self.ownerWindow:completeInventoryDrop(self.role)

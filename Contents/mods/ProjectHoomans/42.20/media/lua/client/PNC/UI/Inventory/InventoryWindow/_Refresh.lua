@@ -267,8 +267,12 @@ end
 local function invalidatePlayerRows()
     local window = InventoryWindow.instance
     if not window then return end
-    if window.tradeMode and window.markTradeInventoryDirty then
-        window:markTradeInventoryDirty()
+    if window.tradeMode then
+        if window.invalidateTradeInventoryState then
+            window:invalidateTradeInventoryState()
+        elseif window.markTradeInventoryDirty then
+            window:markTradeInventoryDirty()
+        end
         return
     end
     window.playerRowsDirty = true

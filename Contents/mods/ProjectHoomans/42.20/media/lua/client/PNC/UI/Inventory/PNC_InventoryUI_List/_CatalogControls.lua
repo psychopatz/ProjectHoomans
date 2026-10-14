@@ -136,25 +136,90 @@ local function layoutControls(left, right, controls)
     end
 end
 
+-- Resolve the control under the cursor using the same row/column geometry as
+-- the native child buttons.  The overlay is the primary input path, but the
+-- list can receive the mouse event first when Project Zomboid is rebuilding
+-- or scrolling the child tree.  Keeping this hit test beside the layout code
+-- gives callers a deterministic fallback without duplicating geometry.
+function ISPNCInventoryList:catalogControlAt(x, y)
+    if type(self.catalogColumns) ~= "table"
+        or type(self.rowAt) ~= "function"
+    then
+        return nil
+    end
+    local inputX = number(x, 0)
+    local inputY = number(y, 0)
+    local rowIndex = self:rowAt(inputX, inputY)
+    local entry = self.items and self.items[rowIndex] or nil
+    local row = entry and entry.item or nil
+    if not row or row.catalogHeader == true then return nil end
+
+    local defaultHeight = number(self.itemheight, 32)
+    local top = self.topOfItem and self:topOfItem(rowIndex)
+        or ((rowIndex - 1) * defaultHeight)
+    top = number(top, (rowIndex - 1) * defaultHeight)
+    local rowHeight = number(entry.height, defaultHeight)
+    if inputY < top or inputY >= top + rowHeight then return nil end
+
+    for columnIndex = #self.catalogColumns, 1, -1 do
+        local column = self.catalogColumns[columnIndex]
+        local left, right = self:catalogColumnBounds(columnIndex)
+        if inputX >= left and inputX < right then
+            local controls = row.catalogControls
+                and row.catalogControls[column.key]
+            if type(controls) ~= "table" then return nil end
+            layoutControls(left, right, controls)
+            for controlIndex, control in ipairs(controls) do
+                local controlLeft = number(control._layoutX, left)
+                local controlWidth = number(control._layoutWidth,
+                    math.max(1, right - left))
+                if inputX >= controlLeft
+                    and inputX < controlLeft + controlWidth
+                    and inputY >= top + ROW_PADDING
+                    and inputY < top + rowHeight - ROW_PADDING
+                then
+                    return row, column.key, control, controlIndex
+                end
+            end
+            return nil
+        end
+    end
+    return nil
+end
+
+local function dispatchCatalogControlDefinition(list, row, columnKey,
+    control, button)
+    if not row or not columnKey or not control then return false end
+    if control.enabled == false then return false end
+    -- Record that a real control dispatch was attempted.  The list-level
+    -- fallback uses this serial to avoid invoking a successful native button
+    -- twice during the same mouse-up event.
+    list.catalogControlDispatchSerial =
+        (tonumber(list.catalogControlDispatchSerial) or 0) + 1
+    if list.onCatalogControl then
+        return list.onCatalogControl(list.ownerWindow, row, columnKey,
+            control, button)
+    end
+    if list.ownerWindow and list.ownerWindow.onCatalogControl then
+        return list.ownerWindow:onCatalogControl(row, columnKey,
+            control, button)
+    end
+    return false
+end
+
 function ISPNCInventoryList:dispatchCatalogControl(button)
     if not button then return false end
     local row = button.psychopatzCatalogRow
     local columnKey = button.psychopatzCatalogColumn
     local control = button.psychopatzCatalogControl
-    if not row or not columnKey or not control then return false end
-    -- Native button callbacks can still arrive from a stale overlay during a
-    -- list rebuild. Enforce the row control capability here as well as in the
-    -- feature-specific callback.
-    if control.enabled == false then return false end
-    if self.onCatalogControl then
-        return self.onCatalogControl(self.ownerWindow, row, columnKey,
-            control, button)
-    end
-    if self.ownerWindow and self.ownerWindow.onCatalogControl then
-        return self.ownerWindow:onCatalogControl(row, columnKey,
-            control, button)
-    end
-    return false
+    return dispatchCatalogControlDefinition(self, row, columnKey, control,
+        button)
+end
+
+function ISPNCInventoryList:dispatchCatalogControlDefinition(row, columnKey,
+    control, button)
+    return dispatchCatalogControlDefinition(self, row, columnKey, control,
+        button)
 end
 
 function ISPNCInventoryList:invalidateCatalogControls()

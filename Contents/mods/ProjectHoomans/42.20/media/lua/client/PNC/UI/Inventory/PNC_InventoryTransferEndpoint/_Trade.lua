@@ -10,6 +10,7 @@ function Endpoint.Trade(traderID, options)
         id = traderID and tostring(traderID) or nil,
         npcID = options.npcID and tostring(options.npcID) or nil,
         snapshot = options.snapshot or {},
+        snapshotSerial = 1,
         selectedContainer = "root",
         expandedGroups = {},
         readOnly = false,
@@ -17,6 +18,7 @@ function Endpoint.Trade(traderID, options)
 
     function endpoint:setSnapshot(snapshot)
         self.snapshot = type(snapshot) == "table" and snapshot or {}
+        self.snapshotSerial = (tonumber(self.snapshotSerial) or 0) + 1
         return self.snapshot
     end
 
@@ -32,6 +34,10 @@ function Endpoint.Trade(traderID, options)
         return math.max(0, math.floor(tonumber(
             self.snapshot and self.snapshot.stockVersion or 0
         ) or 0))
+    end
+
+    function endpoint:snapshotGeneration()
+        return math.max(0, math.floor(tonumber(self.snapshotSerial) or 0))
     end
 
     function endpoint:containers()

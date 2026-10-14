@@ -248,7 +248,7 @@ function Model.GetPlayerItemTransferBlockReason(item, player)
 end
 
 local function playerItemRow(
-    item, containerKey, player, includeGiftOnly, giftPreferences
+    item, containerKey, player, includeGiftOnly, giftPreferences, options
 )
     local fullType = tostring(safeCall(item, "getFullType", ""))
     local metadata = probe(fullType)
@@ -284,10 +284,26 @@ local function playerItemRow(
         restrictionReason = restrictionReason,
         giftValid = giftValid,
     }
-    -- Grouping must ignore quantity/weight, while the tooltip cache still
-    -- tracks them when it evaluates the row directly.
-    row.stateKey = TooltipModel.StateSignature(row, player, false,
-        TooltipOptions.modelOptions)
+    -- Trade rows also need the full display-state signature.  A half-eaten,
+    -- rotten, damaged, opened, fluid-filled, or otherwise stateful item must
+    -- never disappear into a visually identical transfer row.  The trade
+    -- caller may provide a short-lived cache keyed by exact native identity so
+    -- an inventory rebuild does not repeat the same tooltip probe for every
+    -- quantity-button click.
+    local stateCache = options and options.stateSignatureCache
+    local cacheKey = tostring(row.id or "") .. "\031"
+        .. tostring(row.container or "")
+    if type(stateCache) == "table" and cacheKey ~= "\031"
+        and stateCache[cacheKey] ~= nil
+    then
+        row.stateKey = stateCache[cacheKey]
+    else
+        row.stateKey = TooltipModel.StateSignature(row, player, false,
+            TooltipOptions.modelOptions)
+        if type(stateCache) == "table" and cacheKey ~= "\031" then
+            stateCache[cacheKey] = row.stateKey
+        end
+    end
     return row
 end
 
