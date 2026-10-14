@@ -76,6 +76,8 @@ end
 local ordinary = item("ordinary", "Base.Crisps", false, false)
 local favorite = item("favorite", "Base.Bandage", true, false)
 local equipped = item("equipped", "Base.Knife", false, true)
+local stacked = item("stacked", "Base.Nails", false, false)
+stacked.getCount = function() return 5 end
 local player = {
     isEquipped = function() return false end,
     getPrimaryHandItem = function() return nil end,
@@ -95,5 +97,42 @@ T.equal(#rows, 1, "trade player rows hide favorite and equipped items")
 T.equal(rows[1].fullType, "Base.Crisps",
     "trade player rows retain ordinary items")
 T.equal(rows[1].tradeSide, "sell", "player row is a sell row")
+
+local stackedRows = Model.BuildTradePlayerRows({
+    id = "root",
+    container = {
+        getItems = function() return javaList({ stacked }) end,
+    },
+}, player, {})
+T.equal(#stackedRows, 0, "counted stacks are safely disabled for trade")
+
+PNC.InventoryTransferEndpoint = {}
+local Endpoint = T.load(
+    "ProjectHoomans",
+    "client",
+    "PNC/UI/Inventory/PNC_InventoryTransferEndpoint/_Trade.lua"
+)
+local endpoint = Endpoint.Trade("trader-kestrel", {
+    snapshot = {
+        items = {
+            { fullType = "Base.Bandage", quantity = 1,
+                unitPrice = 30, sellPrice = 15 },
+        },
+        sellRows = {
+            { fullType = "Base.Katana", quantity = 1,
+                itemIDs = { "katana-1" }, unitPrice = 225 },
+            { fullType = "Base.Katana", quantity = 1,
+                itemIDs = { "katana-2" }, unitPrice = 100 },
+        },
+    },
+})
+T.equal(endpoint:priceFor("Base.Katana", "SELL"), 225,
+    "non-stocked sell row uses the authoritative quote")
+T.equal(endpoint:priceFor("Base.Katana", "SELL", { "katana-2" }), 100,
+    "concrete sell row keeps its instance quote")
+T.equal(endpoint:priceFor("Base.Katana", "SELL", { "missing" }), 0,
+    "unmatched concrete sell identity remains unavailable")
+T.equal(endpoint:priceFor("Base.Machete", "SELL"), 0,
+    "unknown sell row remains unavailable")
 
 T.finish("pnc_inventory_trade_smoke")

@@ -19,6 +19,19 @@ local function tradablePlayerRow(row)
         and row.disabled ~= true
 end
 
+local function hasUnsupportedStack(row)
+    local members = row and row.members
+    local item
+    if type(members) == "table" and #members > 0 then
+        for index = 1, #members do
+            item = members[index] and members[index].nativeItem
+            if Helpers.nativeQuantity(item) > 1 then return true end
+        end
+        return false
+    end
+    return Helpers.nativeQuantity(row and row.nativeItem) > 1
+end
+
 local function decorate(row, side, available, unitPrice)
     local quantity = math.max(1, math.floor(number(available, 1)))
     local price = math.max(0, math.floor(number(unitPrice, 0)))
@@ -56,7 +69,7 @@ function Model.BuildTradePlayerRows(
     local rows = {}
     for index = 1, #source do
         local row = source[index]
-        if tradablePlayerRow(row) then
+        if tradablePlayerRow(row) and not hasUnsupportedStack(row) then
             rows[#rows + 1] = decorate(
                 row,
                 "sell",
@@ -77,6 +90,7 @@ function Model.BuildTradeStockRows(items)
             item and (item.quantity or item.availableQuantity), 0
         )))
         if fullType ~= "" and quantity > 0
+            and number(item and item.unitPrice, 0) > 0
             and item.tradable ~= false
             and item.disabled ~= true
             and item.guardEquipment ~= true

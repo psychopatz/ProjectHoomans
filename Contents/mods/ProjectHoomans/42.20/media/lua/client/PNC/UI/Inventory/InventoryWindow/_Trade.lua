@@ -134,9 +134,31 @@ end
 
 local function playerSellPrice(endpoint, row)
     if endpoint and endpoint.priceFor then
-        return endpoint:priceFor(row.fullType, "SELL")
+        return endpoint:priceFor(row.fullType, "SELL", row.itemIDs or { row.id })
     end
     return number(row.unitPrice, 0)
+end
+
+local function selectedItemIDs(row, requestedQuantity)
+    local ids = row and row.itemIDs or { row and row.id }
+    local quantities = row and row.itemIDQuantities or nil
+    local outputIDs = {}
+    local outputQuantities = {}
+    local selected = 0
+    requestedQuantity = math.max(0, math.floor(number(requestedQuantity, 0)))
+    for index = 1, #(ids or {}) do
+        if selected >= requestedQuantity then break end
+        local itemID = ids[index]
+        local available = math.max(1, math.floor(number(
+            quantities and quantities[index], 1)))
+        local take = math.min(available, requestedQuantity - selected)
+        if itemID and take > 0 then
+            outputIDs[#outputIDs + 1] = itemID
+            outputQuantities[#outputQuantities + 1] = take
+            selected = selected + take
+        end
+    end
+    return outputIDs, outputQuantities
 end
 
 local function buildPlayerRows(window, player, container)
@@ -158,7 +180,13 @@ local function buildPlayerRows(window, player, container)
         row.catalogColors.unitPrice = "success"
         applyDraft(row, window.tradeDraft and window.tradeDraft.sell)
     end
-    return rows
+    local pricedRows = {}
+    for index = 1, #rows do
+        if rows[index].unitPrice > 0 then
+            pricedRows[#pricedRows + 1] = rows[index]
+        end
+    end
+    return pricedRows
 end
 
 local function refreshList(list, rows)
@@ -296,10 +324,13 @@ function ISPNCInventoryWindow:tradeRequestRows()
     end
     for _, row in ipairs(self.tradePlayerRows or {}) do
         if row.selectedQuantity and row.selectedQuantity > 0 then
+            local itemIDs, itemIDQuantities = selectedItemIDs(
+                row, row.selectedQuantity)
             sellRows[#sellRows + 1] = {
                 fullType = row.fullType,
                 quantity = row.selectedQuantity,
-                itemIDs = row.itemIDs or { row.id },
+                itemIDs = itemIDs,
+                itemIDQuantities = itemIDQuantities,
             }
         end
     end

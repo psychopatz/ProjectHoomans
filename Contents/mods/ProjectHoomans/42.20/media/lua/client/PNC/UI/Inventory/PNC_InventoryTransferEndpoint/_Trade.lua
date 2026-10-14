@@ -48,11 +48,34 @@ function Endpoint.Trade(traderID, options)
         )
     end
 
-    function endpoint:priceFor(fullType, operation)
+    function endpoint:priceFor(fullType, operation, itemIDs)
+        if operation == "SELL" then
+            for _, item in ipairs(self.snapshot and self.snapshot.sellRows or {}) do
+                if tostring(item.fullType or "") == tostring(fullType or "") then
+                    if type(itemIDs) == "table" and type(item.itemIDs) == "table" then
+                        local wanted = {}
+                        for _, itemID in ipairs(itemIDs) do
+                            wanted[tostring(itemID)] = true
+                        end
+                        for _, itemID in ipairs(item.itemIDs) do
+                            if wanted[tostring(itemID)] then
+                                return math.max(0, math.floor(
+                                    tonumber(item.unitPrice) or 0))
+                            end
+                        end
+                    elseif type(itemIDs) ~= "table" then
+                        return math.max(0, math.floor(tonumber(item.unitPrice) or 0))
+                    end
+                end
+            end
+            -- A concrete sell quote must come from a matching server row;
+            -- never fall back to a stock definition quote for a player item.
+            return 0
+        end
         for _, item in ipairs(self.snapshot and self.snapshot.items or {}) do
             if tostring(item.fullType or "") == tostring(fullType or "") then
                 local value = operation == "SELL"
-                    and (item.sellPrice or item.unitPrice)
+                    and item.sellPrice
                     or item.unitPrice
                 return math.max(0, math.floor(tonumber(value) or 0))
             end
