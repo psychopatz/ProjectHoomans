@@ -135,4 +135,34 @@ T.equal(endpoint:priceFor("Base.Katana", "SELL", { "missing" }), 0,
 T.equal(endpoint:priceFor("Base.Machete", "SELL"), 0,
     "unknown sell row remains unavailable")
 
+-- The window must transmit only the identities selected from an aggregate
+-- row, not every identity displayed in that row.
+PsychopatzCore = { UI = { Layout = {} } }
+package.preload["PNC/UI/Inventory/InventoryWindow/_Helpers"] = function()
+    return { tr = function(_, fallback) return fallback end }
+end
+ISPNCInventoryWindow = {}
+T.load(
+    "ProjectHoomans",
+    "client",
+    "PNC/UI/Inventory/InventoryWindow/_Trade.lua"
+)
+local window = {
+    tradeStockRows = {},
+    tradePlayerRows = {
+        {
+            fullType = "Base.Katana",
+            selectedQuantity = 1,
+            itemIDs = { "katana-1", "katana-2" },
+            itemIDQuantities = { 1, 1 },
+        },
+    },
+}
+local _, selectedSellRows = ISPNCInventoryWindow.tradeRequestRows(window)
+T.equal(#selectedSellRows, 1, "trade request retains one selected sell row")
+T.equal(#selectedSellRows[1].itemIDs, 1,
+    "trade request sends only selected item identities")
+T.equal(selectedSellRows[1].itemIDs[1], "katana-1",
+    "trade request keeps deterministic aggregate selection order")
+
 T.finish("pnc_inventory_trade_smoke")
