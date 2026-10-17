@@ -1,6 +1,6 @@
 # Contextual Semantic Intelligence — progress
 
-**Updated:** 2026-10-17. **Phase:** 1 — Wellbeing contextual reaction pilot. **Status:** Phase 1A Semantic Lab gate accepted; Phase 1B is the sole Next Chunk. Native SP/MP acceptance remains OPEN.
+**Updated:** 2026-10-17. **Phase:** 2 — bounded multi-turn wellbeing follow-up. **Status:** Phase 2 Semantic Lab gate accepted; Phase 3 is the sole Next Chunk. Native SP/MP acceptance remains OPEN.
 
 ## Revision evidence
 
@@ -65,12 +65,22 @@ Phase 0A is accepted only for its documented Semantic Lab correctness baseline. 
 - python3 -m unittest tools.semantic_harness.tests.test_wellbeing_projection -v: PASS 7/7. python3 -m unittest discover -s tools/semantic_harness/tests -q: PASS 57/57. tools/semantic_harness/run_harness.sh --test pnc_semantic: PASS 66/66. CLI report: PASS 66/66, 198 events, conflicts=[], audit_truncated=null; these are protocol/replay observations, not semantic proof.
 - The existing identity, gift, task and social coverage remained green through the broader Semantic Lab suite. Every new regression turn used llmCalls=0, with no transport events, tool calls or gameplay effects. Native SP: NOT TESTED. Native MP: NOT TESTED.
 
-## ONE current Next Chunk — Phase 2 bounded multi-turn wellbeing baseline
+## Phase 2 verification evidence — accepted for the Semantic Lab gate
 
-1. Start with one bounded persistent-worker case for "Are you okay?" -> "What's wrong?", and inspect the existing pending-request/topic/entity context before changing behavior.
-2. Add only the narrowest deterministic follow-up resolution needed for a factually grounded response; preserve speaker/target context and do not activate tasks or obligations.
-3. Assert before/after context, sequence, idempotence/preview behavior where available, zero PBrainZ calls and no unauthorized transport/tool effects. Preserve all Phase 1 and existing semantic coverage.
-4. Keep native SP/MP explicitly open; do not expand to social, paraphrase or PBrainZ phases until the Phase 2 bounded gate is evidenced.
+- Implementation revision: Project Hoomans `41ecbb4f` (`feat(semantic): resolve bounded wellbeing follow-ups`); the detailed evidence is in [`PHASE2_MULTITURN.md`](PHASE2_MULTITURN.md).
+- The real production parser now recognizes authored `What's wrong?` and `What is wrong?` follow-ups as `QUESTION/WELLBEING` with a bounded wellbeing continuation marker. The existing response path uses compact prior-NPC-answer context and the existing catalog selector; no new reaction arbiter or gameplay action path was added.
+- Persistent real-worker evidence: injured, thirst, panic, and unknown snapshots selected grounded follow-up variants. The two-turn case retained `currentTopic=wellbeing`, `lastSpeaker=npc`, advanced semantic state `1 -> 2` and dialogue context `2 -> 4`, used `llmCalls=0`, and emitted no transport/tool/action effects.
+- The worker `PREVIEW` command ran the production router twice for `What is wrong?`; both results matched, each before/after context matched, and the surrounding state was unchanged apart from protocol request IDs. No response was queued and no context turn was recorded.
+- `tools/semantic_harness/run_harness.sh --doctor --doctor-json`: **PASS**. Focused contextual/wellbeing tests: **PASS 12/12**. Full Python suite: **PASS 59/59**. Lua `pnc_semantic`: **PASS 66/66**. CLI report: **PASS 66/66**, 198 events, `conflicts=[]`, `audit_truncated=null`; those protocol/replay values are not semantic proof.
+- EN/TL conversation JSON parsed with all eight follow-up keys present; a real TL worker turn resolved the new injured follow-up key. `pz-verify` reported zero Kahlua errors; existing hardcoded-string/token-size findings remain outside this bounded gate.
+- Native SP: **NOT TESTED**. Native MP: **NOT TESTED**. Empty Semantic Lab transport and PZ process presence are not native acceptance evidence.
+
+## ONE current Next Chunk — Phase 3 bounded social-reaction baseline
+
+1. Start with one bounded persistent-worker relationship/social reaction case and inspect existing topic, speaker, and relationship context before changing behavior.
+2. Add only the narrowest deterministic response mapping needed for that case; preserve current authority boundaries and do not activate tasks or obligations.
+3. Assert before/after context, sequence, preview behavior where applicable, zero PBrainZ calls, and no unauthorized transport/tool effects. Preserve all Phase 2 and existing semantic coverage.
+4. Keep native SP/MP explicitly open; do not expand to paraphrase, group, or PBrainZ phases until the Phase 3 bounded gate is evidenced.
 
 ## Remaining roadmap
 
