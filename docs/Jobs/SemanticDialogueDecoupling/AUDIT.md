@@ -1,41 +1,32 @@
-# Corrective audit — current repo vs product goal (2026-10-17)
+# Corrected audit — 2026-10-17
 
-## Evidence boundaries
+## Repository and evidence
 
-**Source verified through connected GitHub:** Project Hoomans `main` `d345e5c3ba41ba752517b405320e6d61e847a3f8`, PsychopatzCore `main` `0212491d2af3597cceaa7353e62f01ef54adca44`. The agent's historical `PROGRESS.md` recorded an Hoomans implementation at `e804750f36e1...` and locally modified Core at `afc1bda0f5f3aaec1bbe1693f1264cd5d990ed5d`; the latter commit and other reported Core candidate/router commits could **not** be found on the connected Core remote. No claim about the user's local installed Core or current worktree cleanliness is made here.
+Project Hoomans GitHub `main` inspected at `56288e50e6d782634df7f26ceaa0f0cb7c0922f9` before this documentation correction, source implementing the candidate/flow/response-plan/sharded-translation architecture. PsychopatzCore remote `main` has **advanced to `44a4d534a9520440070ae7943d7ae9fb848f71ce`**; it now includes `Parser.ParseCandidates`, dialogue router candidate parser/selector + flow commit hooks, and manifest-aware `scope.registerSystem(systemName, basePath, manifestPath)`.
 
-**Agent-reported, not independently rerun:** 97/97 Semantic Lab Python, 68/68 focused Lua, translation-shard parity, manifest smoke, response-plan smoke; full headless suite 12 failures, described in old ledger as pre-existing UI/native failures. Core legacy catalog smoke additionally fails a hardcoded 316-vs-334 coverage assertion after unrelated in-flight catalog edits. No hosted CI runs found; no controlled native SP/MP acceptance captured. User reports some limited successful live play, without a complete recorded test matrix. Preserve prior detail in `IMPLEMENTATION_EVIDENCE.md`.
+**IMPORTANT CORRECTION:** The previous audit's claim that *published Core lacks all three APIs and requires Workshop republishing* is now **stale**. The Core API features are code-verified on the latest connected GitHub branch; the exact local/staged files used by a future test remain a separate fact. Do not block on Workshop publication or assume a live game is running.
 
-## Finding A — dependency release mismatch (CRITICAL)
+Previous agent's local C0B report states compatibility work committed as `27e1fd94` in the user's worktree and app polling repeated; that local commit was not independently recovered from connected GitHub by this audit. Treat as **user-provided agent report**, not GitHub proof. Avoid undoing its local files. The remote Hoomans main at audit time is not a source of local worktree status.
 
-Hoomans `PNC_TranslationBootstrap.lua` passes a manifest third argument to `Scope.registerSystem`, with `manifests/Conversation.json`. Published Core `PsychopatzCustomTranslationManager.lua` implements `scope.registerSystem(systemName, basePath)`; its registration normalization has no manifest field. Published Core therefore ignores the third argument and reads legacy `EN/Conversation/Conversation.json`, which Hoomans removed.
+## Code-verified implemented foundation
 
-Hoomans candidate integration expects optional `Parser.ParseCandidates` and router candidate/flow hooks. Published Core parser exposes `Parser.Parse` but not `ParseCandidates`; published Core router has no matching candidate/commit hooks.
+- Hoomans `PNC_SemanticDialogueCandidateEligibility.lua` selects/rejects bounded candidate interpretations.
+- `PNC_SemanticDialogueFlowRegistry.lua` and `...FlowKernel.lua` register validated flows and maintain bounded active/suspended state. `...Flow_Identity.lua` and `...Flow_Wellbeing.lua` are registered.
+- `PNC_SemanticDialogueResponsePlan.lua` supports typed segments, plan validation, `Attach`, `Compose` and rendering.
+- Hoomans `common/media/translation/manifests/Conversation.json` lists 12 EN + 12 TL shards. Core now supports manifest registration. Preserve stable keys and the previously reported 521-key per-language baseline; don't reshard files without evidence.
+- Semantic Lab has a persistent production Lua worker, GUI transcript, scenario controls and trace, plus tests. It is **not proven to offer the complete interactive branch authoring UI** requested.
 
-**Consequences:** installed Hoomans + published Core are not established compatible. Exact runtime behavior depends on which Core revision is installed. Do not infer all in-game text fails: default response fallbacks and alternate paths can mask missing localized catalogs. Establish the deployed file set first. Do not weaken authority as a workaround.
+## Remaining implementation gaps (not completed solely by headless passes)
 
-## Finding B — flow kernel is not yet behavioral authority (HIGH)
+1. **Semantic Lab usability/trust:** user reports the present headless-centered harness approach is broken/unhelpful for agent visualization. Audit and repair the **existing GUI + shared worker/session** so it loads production modules and exposes real selected IR/flow/node, reply, translation and side effects. Do not make another JSON-only harness or pile up synthetic fixtures.
+2. **Flow has weak response authority:** `PNC_SemanticDialoguePolicy_Flow.lua` computes `flowPreview` but still calls the central `resolveIntentBranch`, then `PNC_SemanticDialogueLocalResponse_Resolve.lua` chooses response by legacy branch. No verified production consumer of `decision.flow.responsePool`. A flow-state trace can pass while replies ignore the selected flow.
+3. **Response composition not adopted:** policy uses `ResponsePlan.Attach` on a selected reply. No normal-game `Plan.Compose` call site was located; multi-act EN/TL NPC speech remains to implement.
+4. **Flow authoring not done:** GUI has transcript and trace, not a functional graph/transition editor backed by the production registry.
+5. **Some translation/domain integration remains:** direct `Trading` system lookup was reported to fall back; needs specific scope/consumer proof. Source shard parity is necessary but does not guarantee correct display without an actual lookup through Core.
+6. **Native PZ evidence:** user reports limited live success, but controlled SP/MP acceptance is for the **user at the end**. Do not turn it into a Codex blocker or require a PZ process.
 
-`PNC_SemanticDialogueFlowRegistry.lua`, `...FlowKernel.lua` and two modules `...Flow_Identity.lua` / `...Flow_Wellbeing.lua` are real. The kernel previews/commits bounded state and returns `responsePool` metadata. But `PNC_SemanticDialoguePolicy_Flow.lua` still calls `resolveIntentBranch` to choose branch; `PNC_SemanticDialogueLocalResponse_Resolve.lua` still selects text by that branch. No production consumer of `decision.flow.responsePool` was established in this static review. A successful flow transition therefore does **not** prove a flow chose the reply or action.
-
-Registry `PNC_SemanticDialogueFlowCatalog.lua` explicitly lists two flow modules. New conversation types can be registered but an end-to-end no-central-switch addition has not been demonstrated.
-
-## Finding C — response planning is infrastructure, not full realization (HIGH)
-
-`PNC_SemanticDialogueResponsePlan.lua` validates bounded turns/segments, builds/attaches plans and exposes `Compose`/`RenderTurns`. In ordinary policy `PNC_SemanticDialoguePolicy_Decision.lua`, `ResponsePlan.Attach(result.response, result.branch)` wraps an **already selected** response. The `Plan.Compose` production call site was not found outside isolated smoke tests. Multi-act in-game composition, flow-selected plans and grammatical EN/TL realization remain unaccepted.
-
-## Finding D — Semantic Lab is a trace tool, not the requested flow editor (HIGH)
-
-Existing Tk `tools/semantic_harness/gui.py` has a conversation editor, mock scenarios/settings, transcript and trace panel. There is no found interactive graph-node/edge editing or production flow registration UI. Worker trace and graph-validity tests are real, but do not establish the desired authoring interface.
-
-## Finding E — translation files moved correctly; runtime contract unresolved
-
-Hoomans now has `common/media/translation/manifests/Conversation.json` listing **12 shards for EN and 12 for TL**, and removed the former 521-key per-language monolith. Historical ledger reports 521-key exact-value/placeholder parity in both languages; independent runtime recheck against the **deployed** matching Core is still required. The `Trading` custom catalog remains outside 15 bootstrap systems; agent reported its direct lookup falls back to default. Do not call other catalogs broken without source/consumer evidence.
-
-## Finding F — headless acceptance overclaimed
-
-The existing worker invokes many real Lua modules and can test parser, state, registry and fallback contracts, so it is valuable for diagnosis. It mocks critical PZ UI/network/world boundaries and cannot establish game display, server authority, native file loading or actual MP synchronization. The full Lua headless suite has 12 reported failures; classify and reproduce individually rather than globally relabeling them harmless. Native-only limitation is not a reason to manufacture more JSON fixtures.
+## Test evidence classification
+Earlier agent ledger reported 97/97 Python harness, 68/68 focused Lua, and 12 failing full headless Lua tests (native/UI-associated), plus Core catalog smoke count mismatch. These are **agent-reported**, not independently executed here. Keep regression failures accurately categorized; never claim 100% or 'native accepted' from green fixtures. The goal is **working observable behavior through the existing Semantic Lab**, not maximizing test counts.
 
 ## Verdict
-
-Original phases 0A–8 are **implemented with reported worker-level tests**, not accepted as the completed real-game architecture. Open a corrective integration phase: reconcile installed/published Core, establish live game baseline, then make flow selection actually own response behavior, implement real visual authoring, finish multi-act composition and domain/localization acceptance. Preserve the working code; no Jess rewrite or new job.
+Reopen any local goal marked `blocked` only for absent PZ/Workshop (unless it has a separate genuine blocker). Preserve implemented Core and Hoomans code; proceed with practical harness repair, flow-driven behavior, visual authoring and coherent EN/TL reply integration. Final real-game testing is handed to the user.

@@ -1,25 +1,29 @@
-# Semantic Dialogue Decoupling — one unified /goal
+# Semantic Dialogue Decoupling — one unified implementation goal
 
-**Current mode:** corrective integration and real-game acceptance. **Not maintenance-ready.** The original implementation phases 0A–8 have substantial production Lua and supporting worker-test evidence. This goal is **not** completed as an end-to-end extensible in-game dialogue authoring system.
+**Active state:** implementation and Semantic Lab repair; **not blocked by native game availability**. One roadmap, one progress ledger and one /goal, all under `docs/Jobs/SemanticDialogueDecoupling/`.
 
-One job: `docs/Jobs/SemanticDialogueDecoupling/`. Dialogue flow ownership, Core compatibility, translation catalogs, response composition, the Semantic Lab UI and native Build 42 validation are **phases of the same goal**, never separately managed jobs.
+## Product goal
+
+Extend Project Hoomans' offline Lua NPC conversation system so an agent can register a small, bounded dialogue flow, inspect its branch/state/response in the actual **Semantic Lab interface**, and add localized EN/TL variations without expanding a monolithic intent switch. Preserve server-authoritative actions, optional PBrainZ, existing responses and the identity/wellbeing regression fix.
+
+## Work split (NOT separate goals)
+- **Implementation and developer acceptance:** Codex owns Lua/Core integration, dialogue behavior, Semantic Lab GUI/worker repair, localized catalogs, direct regression tests and reproducible evidence.
+- **Final native Project Zomboid testing:** **USER-OWNED AFTER IMPLEMENTATION HANDOFF**. The user launches PZ, decides when/where to test, and reports observed problems. No Codex PZ-process polling, forced launches, dedicated-server setup, Workshop uploads or Steam publishing steps.
+- **Git commits to source repositories** are distinct from **Steam Workshop publishing**. Only the former may be performed in the already authorized Git workflow. The latter is never authorized by this goal.
 
 ## Read order
+1. Root `AGENTS.md`, then `AGENT_RUNBOOK.md`.
+2. `AUDIT.md` and `CORE_COMPATIBILITY.md` (latest source evidence).
+3. `ARCHITECTURE.md`, `FLOW_CONTRACT.md`, `TRANSLATION_MIGRATION.md`.
+4. `ROADMAP.md`, `HARNESS_ACCEPTANCE.md`, `USER_LIVE_TEST_HANDOFF.md`.
+5. **`PROGRESS.md`** (the sole current Next Chunk), then `GOAL_PROMPT.md`.
+6. `IMPLEMENTATION_EVIDENCE.md` holds older implementation history and test claims, not marching orders.
 
-1. Repository `AGENTS.md`, then `AGENT_RUNBOOK.md` (safe current-checkout/main policy).
-2. `AUDIT.md` (2026-10-17 source verification and claimed vs proven behavior).
-3. `ARCHITECTURE.md`, `FLOW_CONTRACT.md` and `TRANSLATION_MIGRATION.md` (existing/desired contracts).
-4. `DEPLOYMENT_ACCEPTANCE.md` (Hoomans/Core installed dependency and native verification).
-5. `ROADMAP.md` and `HARNESS_ACCEPTANCE.md` (corrective phases and real-game gates).
-6. `PROGRESS.md` (ONE active Next Chunk); `GOAL_PROMPT.md` (new Codex bootstrap).
-7. `IMPLEMENTATION_EVIDENCE.md` (archived previous progress/test claims; read for provenance, **not** current marching orders).
+Supporting source: `docs/Systems/Semantics.md`, `docs/Systems/TranslationAudit.md`, `docs/architecture/PROJECT_HOOMANS_DOMAIN_CONTRACT.md`, `tools/semantic_harness/README.md`.
 
-Canonical background: `docs/Systems/Semantics.md`, `docs/Systems/TranslationAudit.md`, `docs/architecture/PROJECT_HOOMANS_DOMAIN_CONTRACT.md`, `tools/semantic_harness/README.md`.
+## Completion states
+- **Ready for user live test:** Codex implementation and meaningful Semantic Lab checks complete; hand off concise scenarios and known limitations. Codex stops instead of waiting for PZ.
+- **User-accepted:** after the user independently tests and accepts or requests fixes.
+- **Blocked:** real code/tool/Git obstacle that prevents further implementation, not absent native app, missing Workshop publication, or an unanswered live-test request.
 
-## Product acceptance
-
-A registered new conversation type must choose its **real in-game** response and transitions through production Lua without requiring a new branch in a central intent switch. Both EN/TL translations resolve using the **installed** Core dependency; commands and relationships remain server authoritative. A usable visual flow inspector/editor must operate on the production registry, not a mock graph. Live SP and hosted MP evidence ultimately close the goal.
-
-The existing identity/wellbeing regression fix at `105dadedd31c` and implemented translation shards/flow modules are protected foundations. Do not recreate them.
-
-The user explicitly rejected adding more headless-only fixture churn as proof of success. The real Lua worker is useful supporting evidence, while live game behavior and installed-dependency parity determine product acceptance.
+Do not create another goal namespace, branch/PR or TXT deliverable.

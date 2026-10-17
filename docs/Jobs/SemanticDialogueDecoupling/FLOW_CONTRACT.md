@@ -1,25 +1,16 @@
-# Flow ownership and registered-module contract
+# Flow registry and behavioral ownership contract
 
-Status: **registry/kernel implemented; production behavioral ownership still incomplete.** Preserve existing `PNC_SemanticDialogueFlowRegistry` and `...FlowKernel` rather than replacing them.
+**Already built:** registry/kernel, bounded active/suspended sessions, preview/commit, identity and wellbeing modules. **Incomplete:** flow authority over response selection and third-module end-to-end extensibility.
 
-## Verified current behavior
-- Identity and wellbeing definition modules register via `PNC_SemanticDialogueFlowCatalog.lua`.
-- Definitions contain triggers, nodes, typed captures, accepts, `responsePool`, and `onMatch`/`onRefuse`/`onUnrelated` controls.
-- Registry rejects duplicate IDs, unsupported frame fields, conflicting slot owners, missing nodes and unreachable transitions; kernel has bounded active/suspended sessions and preview vs commit.
-- Current `Policy.Decide` attaches `flowPreview` but chooses response branch via `resolveIntentBranch`; actual pool selection remains in `LocalResponse.Resolve` based on that branch.
+## Required behavior
+1. Core candidates + Hoomans eligibility choose a valid semantic frame. Mutating or ambiguous fuzzy input is clarified/blocked before response/gameplay action.
+2. Flow `Preview` selects a safe registered flow/node/transition with `responsePool`/typed response plan metadata. Its response choice must **drive** production response catalog selection when eligible; no normal reply chosen first by legacy `resolveIntentBranch`.
+3. Existing intent policy remains a safe adapter for unhandled/non-migrated interactions and gameplay service requests. Do not inject new global special cases for each future flow. Exactly one response and one authoritative action path per accepted utterance.
+4. `Commit` advances state once for a real accepted turn. Two previews are side-effect-free. A flow must not send transport, change trust or auto-schedule tasks.
+5. Speakers/addressees have bounded isolated sessions, explicit suspend/resume and scoped refusal. Identity can be interrupted by wellbeing and later resumed; `im fine thanks` must never be treated as a false name.
+6. Prove extensibility by adding one harmless third Lua flow, using the existing catalog and (where new prose is needed) existing EN/TL shards. **Do not modify the central intent branch or central resolver just to support that flow.**
+7. Existing Semantic Lab GUI must expose the real candidate, flow ID, node transition, selected response pool/template, pending obligation, and outcome; its visual editor must save/register through validated production definitions and allow a new flow to be tested.
+8. Response plans may combine typed dialogue acts later, respecting EN/TL grammar, short bounded outputs and actual NPC speech sequencing.
 
-## Target behavioral contract
-1. **Safe eligibility first:** only valid IR and authorized intents can activate a flow; fuzzy or ambiguous mutating input must clarify and must not dispatch effects. Flow participation may not bypass entity/authority checks.
-2. **Flow controls reaction:** after preview eligibility, an appropriate flow response pool/plan is selected by the production responder. A flow may ask a follow-up, give a contextual response, clarify or return to a suspended topic without a new `elseif` in central `resolveIntentBranch`.
-3. **Legacy fallback:** unmigrated branches continue to work; there is a single deterministic winner and one response, not both a flow and legacy policy responding.
-4. **Single commit:** `Preview` is idempotent and effect-free; only accepted user turns advance the active/suspended session exactly once. A gameplay effect requires existing server authorization. An NPC reply must not be misinterpreted as player input.
-5. **Stable state:** bounded flow/node/slots/speaker/addressee, stack max and expiry. Multiple NPCs cannot share one pending obligation. Explicit refusal is scoped to the currently addressed question; the original `im fine thanks` identity regression remains protected.
-6. **Extension demonstration:** introduce one harmless third pilot flow (e.g. smalltalk / player asks about NPC activity) using a separate Lua definition and authored response pool, optionally an EN/TL shard entry. No central intent/resolver special-casing; compare before/after real PZ traces.
-7. **Single source of truth:** the flow declares semantic meaning and response references; translation files contain localized prose only; the semantic GUI previews/edits definitions using the validated production registry. Do not create a second JSON executor.
-8. **Diagnostics:** report candidate eligibility, flow selection/transition, chosen response pool/template, fallbacks and authoritative effects. Check native SP/MP first, then add focused worker tests only for a demonstrated gap.
-
-## Implementation sequence
-- After deployed Core handshake and native baseline, integrate response selection at the existing policy/response boundary with a small compatibility adapter. Avoid rewriting all social/command branches.
-- Migrate identity and wellbeing behavior while keeping their real game decisions and keys unchanged.
-- Add a third simple flow proving future extensibility.
-- Only then expand graphical authoring and multi-act response realization.
+## Engineering sequence
+Repair the harness presentation/worker seam first; capture one meaningful existing full-turn identity/wellbeing trace. Wire existing flow metadata into selection behind safety checks; preserve legacy parity and authoritative result adapters. Add third flow and prove its response through Semantic Lab. Then implement real flow inspector/editing and multi-act content. Do not make normal UI testing contingent on user starting Project Zomboid.

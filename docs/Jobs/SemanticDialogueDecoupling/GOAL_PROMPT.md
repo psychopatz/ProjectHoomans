@@ -1,14 +1,20 @@
-# Unified corrective /goal — copy directly into Codex
+# /goal — unified semantic dialogue implementation, harness-first
 
 ```text
 /goal
-Repository: psychopatz/ProjectHoomans (existing authorized checkout/main), with dependency psychopatz/psychopatzCore (separately check auth, divergence, installed version).
-Single goal: docs/Jobs/SemanticDialogueDecoupling/. No new branches or PRs, TXT files, parallel job ledgers, destructive sync or force push.
-Read AGENTS.md; this job's README.md, AGENT_RUNBOOK.md, AUDIT.md, ARCHITECTURE.md, FLOW_CONTRACT.md, TRANSLATION_MIGRATION.md, DEPLOYMENT_ACCEPTANCE.md, ROADMAP.md, HARNESS_ACCEPTANCE.md, PROGRESS.md. IMPLEMENTATION_EVIDENCE.md is archived provenance, not current instructions.
-State: Hoomans main d345e5c3 contains real candidate/flow/response-plan/sharded-translation code. Published Core main 0212491d lacks reported local Core candidate/router/manifest APIs; local Core afc1bda0 was agent-reported but is not found on Core remote. Flows currently track transitions while old intent branch still chooses responses. UI is trace-oriented, not an actual flow graph editor. Agent-reported headless passes do not equal native SP/MP acceptance.
-FIRST: execute ONLY C0A Next Chunk in PROGRESS.md. Verify both real local checkouts, remote heads, dirty files/ownership and actual installed PZ mod paths/checksums; compare published/local/installed Core parser, router and manifest registration contracts against Hoomans. Test native EN/TL Conversation shard lookup if a controllable real game exists. Record the precise compatibility matrix and smallest safe Core publication/deployment approach. Do NOT rebuild the kernel, add JSON fixtures or start flow refactoring yet.
-Next phases only after gates: C0B safe compatible Core rollout; C1 opt-in live PZ dialogue trace; C2 flow-driven branch/response selection with legacy-authority adapter and third flow; C3 actual visual flow inspector/editor over production Lua; C4 real multi-act EN/TL composition; C5 localization/domain verification; C6 real SP/MP/performance.
-Use live Project Zomboid and installed dependency evidence for behavioral/UI/authority claims. Use Semantic Lab production Lua only as focused supporting tests. Preserve the identity/wellbeing regression, stable IR/public APIs, bounded preview/commit, server identity/inventory/task authority, MarketSense and optional PBrainZ. Do not treat 97/97 worker passes as live acceptance, ignore the 12 full headless failures, or claim absent native game passed.
-One PROGRESS.md, one bounded Next Chunk, exact SHAs/paths/commands/live evidence/status after each chunk. Commit/publish Hoomans main only with fast-forward-safe verified authorization; Core changes require separate Core authorization and safe handling of unrelated dirty radio/UI/asset work. Never overwrite a divergence.
-Report what is implemented, actual acceptance versus missing gates, committed SHAs, and next chunk or genuine blocker. Maintenance-ready only after documented native gates pass.
+Repository: psychopatz/ProjectHoomans with dependency psychopatz/psychopatzCore.
+Single job: docs/Jobs/SemanticDialogueDecoupling/. Use existing checkout/main, no new branch, PR, TXT file or second goal.
+READ AGENTS.md and the job README.md, AGENT_RUNBOOK.md, AUDIT.md, CORE_COMPATIBILITY.md, ARCHITECTURE.md, FLOW_CONTRACT.md, TRANSLATION_MIGRATION.md, ROADMAP.md, HARNESS_ACCEPTANCE.md, PROGRESS.md, USER_LIVE_TEST_HANDOFF.md. IMPLEMENTATION_EVIDENCE.md is historical, not current orders.
+
+CRITICAL USER SCOPE: You IMPLEMENT and TEST using the existing Semantic Lab GUI and real production Lua worker. The USER alone performs final live Project Zomboid SP/MP testing after implementation handoff. Do not start/poll PZ processes, demand apps=[], request Workshop publication, package/upload/republish Steam Workshop mods, or mark goal blocked because game/Workshop is unavailable. A directory named "Workshop" is just the local project location; Git commits are NOT Workshop publishing.
+
+Current source truth: Hoomans has a candidate/flow kernel, identity and wellbeing modules, response plans and EN/TL translation shards. PsychopatzCore GitHub main 44a4d534 now includes ParseCandidates, router candidate/flow hooks and manifest-aware translation registration; confirm local checkout compatibility rather than repeating the stale Core-release blocker. Preserve any local C0B work and unrelated radio assets.
+
+START ONE NEXT CHUNK D0A in PROGRESS.md: examine and repair the EXISTING Semantic Lab GUI/worker production conversation visualization, verifying a real identity→wellbeing→status→identity sequence with selected NPC reply, flow state, EN/TL translation and no erroneous identity/relationship requests. If GUI display unavailable, diagnose and fix source issues, use focused real Lua worker as fallback, leave only GUI verification pending, and keep coding; do not wait on user launching PZ.
+
+Then implement the remaining roadmap phases, one bounded accepted chunk at a time: D1 flow-owned reply selection, D2 third registered flow (no central intent branch edit), D3 usable visual flow browser/editor wired to actual Lua registry, D4 real multi-act EN/TL composition, D5 domain/translation regression, D6 concise USER live-test handoff. Keep original identity regression safe, offline Lua PBrainZ-optional, parser/IR/backwards compatibility, authoritative server actions and bounded state.
+
+Harness is the PRIMARY agent testing guide. Repair it instead of generating redundant JSON fixtures or reporting only passing headless counts. Run focused real production Lua regressions and inspect actual selected text, flow/node, state, action request, translation. Do not claim unexecuted GUI/native tests passed.
+
+Work safely in authorized repositories, preserve dirty work, no force/reset/plain git pull, source commits only where permitted. Update ONE PROGRESS.md with exact tests/SHAs and next chunk. Finish with READY FOR USER LIVE TEST; do not block on native game/Workshop and do not perform final live tests yourself.
 ```
