@@ -75,7 +75,13 @@ local view = {
             },
         },
     },
-    session = {},
+    session = {
+        participants = {
+            { id = "npc_13", name = "Robin", kind = "npc" },
+            { id = "char_alex", name = "Alexandra", kind = "player" },
+            { id = "npc_12", name = "Harley", kind = "npc" },
+        },
+    },
     historyPart = { messages = {
         { speaker = "npc", payload = { fallback = "Stay close." } },
         { speaker = "npc", payload = {
@@ -136,6 +142,16 @@ T.equal(context.dialogue_situation.npc.activity.id, "traveling",
     "legacy provider callers still receive a bounded activity situation")
 T.equal(context.dialogue_situation.social.relationshipState, "Acquaintance",
     "legacy provider callers retain the relationship situation")
+T.equal(context.scene.current_speaker_id, "npc_12",
+    "provider scene binds the actual current speaker")
+T.equal(context.participants[1].id, "npc_13",
+    "provider context preserves the first group participant")
+T.equal(context.participants[2].id, "char_alex",
+    "provider context preserves the player participant")
+T.equal(context.participants[3].id, "npc_12",
+    "provider context preserves the current NPC participant")
+T.equal(context.scene.participants[1].id, "npc_13",
+    "scene participants reuse the bounded participant projection")
 
 view.session.semanticDialoguePending = {
     rawText = "Can you do something about this?",
