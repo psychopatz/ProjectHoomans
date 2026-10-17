@@ -118,6 +118,31 @@ changing production Lua. The engine seam stays configurable while the parser,
 policy, identity authority, translation manager, and tool-reply catalog remain
 real.
 
+## Per-NPC semantic wellbeing scenarios
+
+An editable scenario can set `npc.healthState`, `npc.activeBehavior`,
+`npc.needs` (hunger/thirst/fatigue), and `npc.conditionStats`
+(stress/boredom/panic). These fields are projected to the production Lua
+dialogue situation. If a dedicated NPC state table is absent, legacy
+`world` values continue to provide mock needs/conditions. An explicit
+empty table means the NPC fact is unknown; setting health/activity to
+`null` also removes the default assumption in the worker.
+
+Turn output includes `routedSituation`, read from the actual production
+semantic router after input submission. Inspect its `npc` fields alongside
+the returned IR, decision, message payloads, `contextBefore`/
+`contextAfter`, transport, and `llmCalls`. The case replay conflict
+ledger is **not** a semantic-reaction assertion.
+
+The production-worker tests for these scenarios are:
+
+```bash
+python3 -m unittest tools.semantic_harness.tests.test_wellbeing_projection -v
+```
+
+Refer to `docs/Jobs/ContextualSemanticIntelligence/HARNESS_ACCEPTANCE.md`
+for the complete acceptance matrix and real-game limitations.
+
 ## Diagnostics
 
 Run this before debugging a startup problem:
