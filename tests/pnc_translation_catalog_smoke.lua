@@ -19,7 +19,7 @@ T.truthy(conversationManifest,
 local systems = {
     "Character", "CommandHub", "Conversation", "Debug", "Discovery",
     "Factions", "Health", "Inventory", "Needs", "Provision", "Research",
-    "Scavenge", "Settlement", "Tasks", "Workshop",
+    "Scavenge", "Settlement", "Tasks", "Trading", "Workshop",
 }
 
 local function readCatalog(language, system)

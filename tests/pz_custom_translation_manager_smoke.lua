@@ -103,15 +103,20 @@ T.equal(Translation.GetKey("UI_PNC_DebugHub_NPCMonitor_Title"), "Monitor ng NPC"
 T.equal(Translation.GetKey("UI_PNC_DebugHub_NPCMonitor_Description"),
     "Siyasatin ang lifecycle, awtoridad, presensya, labanan, at runtime body ng mga NPC.",
     "Debug Hub subtitle resolves through the localized catalog")
-T.falsy(Translation.Systems.Trading,
-    "Trading remains outside the current 15-system bootstrap registration")
-T.equal(Translation.GetKey("UI_PNC_Trading_Title", "Trading"), "Trading",
-    "unregistered Trading key uses the caller fallback after native lookup misses")
+T.truthy(Translation.Systems.Trading,
+    "Trading catalog registers through the public Hoomans facade")
+T.equal(Translation.GetKey("UI_PNC_Trading_Title", "Trading"), "Kalakalan",
+    "Trading title resolves through the localized public catalog")
+T.equal(Translation.GetKey("UI_PNC_Trading_Complete", "Trade complete"),
+    "Kumpleto ang kalakalan",
+    "Trading completion text resolves through the localized public catalog")
 T.equal(Translation.Get("Character", "missing.key", "Visible fallback"),
     "Visible fallback",
     "missing key uses the caller fallback")
 T.truthy(Manager.Data.ProjectHoomans.Character,
-    "only the resolved Hoomans catalog is exposed in Data")
+    "resolved Hoomans character catalog is exposed in Core data")
+T.truthy(Manager.Data.ProjectHoomans.Trading,
+    "resolved Hoomans Trading catalog is exposed in Core data")
 T.truthy(readersClosed >= 2, "English and localized readers are closed")
 T.equal(Translation.GetKey("ContextMenu_WalkTo"), "Walk to",
     "genuine native keys still use the engine translation API")

@@ -101,6 +101,38 @@ local function semanticTranslationKey(response)
             "UI_PNC_Conversation_Semantic_RelationshipStatusAcknowledgedWithdrawn",
         ["semantic.question.wellbeing.unknown"] =
             "UI_PNC_Conversation_Semantic_QuestionWellbeingUnknown",
+        ["semantic.question.wellbeing.panic"] =
+            "UI_PNC_Conversation_Semantic_QuestionWellbeingPanic",
+        ["semantic.question.wellbeing.stress"] =
+            "UI_PNC_Conversation_Semantic_QuestionWellbeingStress",
+        ["semantic.question.wellbeing.thirst"] =
+            "UI_PNC_Conversation_Semantic_QuestionWellbeingThirst",
+        ["semantic.question.wellbeing.thirst_alt"] =
+            "UI_PNC_Conversation_Semantic_QuestionWellbeingThirstAlt",
+        ["semantic.question.wellbeing.hunger"] =
+            "UI_PNC_Conversation_Semantic_QuestionWellbeingHunger",
+        ["semantic.question.wellbeing.hunger_alt"] =
+            "UI_PNC_Conversation_Semantic_QuestionWellbeingHungerAlt",
+        ["semantic.question.wellbeing.fatigue"] =
+            "UI_PNC_Conversation_Semantic_QuestionWellbeingFatigue",
+        ["semantic.question.wellbeing.fatigue_alt"] =
+            "UI_PNC_Conversation_Semantic_QuestionWellbeingFatigueAlt",
+        ["semantic.question.wellbeing.injured"] =
+            "UI_PNC_Conversation_Semantic_QuestionWellbeingInjured",
+        ["semantic.question.wellbeing.default"] =
+            "UI_PNC_Conversation_Semantic_QuestionWellbeingDefault",
+        ["semantic.question.wellbeing.dataset.hanging_in"] =
+            "UI_PNC_Conversation_Semantic_QuestionWellbeingDatasetHangingIn",
+        ["semantic.question.wellbeing.dataset.all_things_considered"] =
+            "UI_PNC_Conversation_Semantic_QuestionWellbeingDatasetAllThingsConsidered",
+        ["semantic.question.wellbeing.dataset.getting_by"] =
+            "UI_PNC_Conversation_Semantic_QuestionWellbeingDatasetGettingBy",
+        ["semantic.question.wellbeing.dataset.hungry"] =
+            "UI_PNC_Conversation_Semantic_QuestionWellbeingDatasetHungry",
+        ["semantic.question.wellbeing.dataset.thirsty"] =
+            "UI_PNC_Conversation_Semantic_QuestionWellbeingDatasetThirsty",
+        ["semantic.question.wellbeing.dataset.tired"] =
+            "UI_PNC_Conversation_Semantic_QuestionWellbeingDatasetTired",
         ["semantic.question.wellbeing.follow_up.panic"] =
             "UI_PNC_Conversation_Semantic_QuestionWellbeingFollowUpPanic",
         ["semantic.question.wellbeing.follow_up.stress"] =

@@ -23,7 +23,7 @@ local MANIFESTS = {
 local SYSTEMS = {
     "Character", "CommandHub", "Conversation", "Debug", "Discovery",
     "Factions", "Health", "Inventory", "Needs", "Provision", "Research",
-    "Scavenge", "Settlement", "Tasks", "Workshop",
+    "Scavenge", "Settlement", "Tasks", "Trading", "Workshop",
 }
 
 require "PNC/Translation/PNC_TranslationBootstrap_Segments"

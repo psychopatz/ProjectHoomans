@@ -406,6 +406,7 @@ Translation.Internal.SegmentSystems = {
     TollTitle = "Debug",
     TollWar = "Debug",
     ToolFeedback = "Tasks",
+    Trading = "Trading",
     Trait = "Character",
     UniqueNPCDebug = "Debug",
     UniqueNPCEditor = "Character",
@@ -418,4 +419,3 @@ Translation.Internal.SegmentSystems = {
     WorldSignalScanner = "Debug",
     Wound = "Health",
 }
-
