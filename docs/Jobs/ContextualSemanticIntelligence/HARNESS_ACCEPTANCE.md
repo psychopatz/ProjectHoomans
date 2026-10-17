@@ -8,6 +8,30 @@
 - `runner.py` `run_case` only builds turn records and `ConflictLedger` checks duplicates/sequence/malformed records. An `ok` result and zero conflicts do **not** assert good dialogue or correct NPC facts. Add explicit assertions in `tools/semantic_harness/tests/` against worker results and messages.
 - The worker models only a narrow production semantic dependency closure and mocks native UI/network; source inspection does not prove current runtime startup or full-game behavior.
 
+## Phase 0A: editable per-NPC wellbeing context
+
+The Semantic Lab scenario now accepts optional `npc.healthState`, `npc.activeBehavior`, `npc.needs`, and `npc.conditionStats`. The Python scenario defaults explicitly set a healthy/idle NPC to preserve old fixture behavior. A scenario can set `npc.healthState: null` and `npc.activeBehavior: null` to represent unknowns.
+
+- `npc.needs` is a dictionary of `hunger`, `thirst`, `fatigue`; `npc.conditionStats` holds `stress`, `boredom`, `panic`. Omit an entire table to use legacy `world` values; **an explicit empty object disables fallback** for that table so the projected information remains unknown.
+- The Lua worker projects those NPC facts into the production input context and returns `routedSituation` directly from the actual `semanticDialogueRouter.context.dialogueSituation` after Submit, rather than calculating a test-only duplicate decision.
+- `python3 -m unittest tools.semantic_harness.tests.test_wellbeing_projection -v` explicitly checks production Lua route and output for healthy, injured, severe thirst, panic, unknown health and legacy compatibility; it also verifies zero unintended actions/provider calls. On 2026-10-17 the real worker run passed all 6 tests with Project Hoomans `bddeaf3c` and PsychopatzCore `0212491d` under Lua 5.3.6.
+- The Phase 0A cases have now been executed against the accessible PsychopatzCore checkout. Native Project Zomboid SP/MP acceptance remains separate and pending; the worker's mocked UI/network edges are not game evidence.
+
+A scenario override for an injured NPC may be edited in the GUI's runtime JSON editor or saved under a distinct untracked local scenario file:
+
+```json
+{
+  "npc": {
+    "healthState": "injured",
+    "activeBehavior": "treatment",
+    "needs": {"hunger": 0.05, "thirst": 0.05, "fatigue": 0.05},
+    "conditionStats": {"stress": 0, "panic": 0, "boredom": 0}
+  }
+}
+```
+
+Probe with `tools/semantic_harness/run_harness.sh --cli --jsonl --scenario <path-to-scenario> --input "Are you okay?"`; verify `routedSituation.npc.healthState` and `result.decision.response`. Do not claim an accepted result from the example alone.
+
 ## Mandatory loop for each behavior chunk
 
 1. Inspect current HEAD, Core checkout revision and `tools/semantic_harness/README.md`; collect doctor result first.

@@ -1,20 +1,14 @@
-# Contextual Semantic Intelligence — /goal agent bootstrap
+# Contextual Semantic Intelligence — job-local /goal
 
-Copy the block below into the dedicated Codex goal agent. This file is **job-local**: never replace a global /goal or another agent's active job.
-
-    /goal
-    Repository: psychopatz/ProjectHoomans (use verified local checkout and current HEAD).
-    Job namespace: docs/Jobs/ContextualSemanticIntelligence/
-    Read in order: AGENTS.md; docs/Jobs/ContextualSemanticIntelligence/AGENT_RUNBOOK.md; AUDIT.md; ARCHITECTURE.md; ROADMAP.md; HARNESS_ACCEPTANCE.md; PROGRESS.md; docs/Systems/Semantics.md; docs/architecture/PROJECT_HOOMANS_DOMAIN_CONTRACT.md; tools/semantic_harness/README.md.
-    Purpose: improve offline Lua NPC contextual reactions inspired by Façade; preserve Core NLU, existing conditioned responses, authoritative game domains, and optional PBrainZ.
-    Current phase: 0 Semantic Lab correctness baseline.
-    Start with exactly ONE Next Chunk from this job's PROGRESS.md: Phase 0A realistic harness wellbeing projection and real-Lua behavioral baseline; do not implement new reaction arbitration yet.
-    Required validation: doctor; real production Lua Semantic Lab tests with explicit IR/decision/messages/context/no-side-effect assertions; focused Lua smoke suite; replay conflict ledger; native game acceptance when the phase requires it. JSON fixtures and absence of conflicts alone do not prove language correctness.
-    Preserve: existing IR/public APIs/authority, game-source truth, WordNet offline workflow, SP/MP boundaries, bounded event-driven work, and repository AGENTS.md file-watcher precautions.
-    Concurrency: isolate this job's docs, working branch, worker sessions and evidence paths; coordinate shared production files with other active agents. Do not edit other jobs' progress.
-    On success: update only this job's PROGRESS.md to evidence-backed current state and next bounded chunk; update ROADMAP.md only if gates materially change; commit coherently to an authorized destination and report exact SHA/CI.
-    Stop only for true safety/authorization/technical blockers or when all mandatory gates are accepted (maintenance-ready); never invent work or claim unrun tests passed.
-
-## Maintaining this goal
-
-As each Next Chunk is accepted, `PROGRESS.md` becomes the source for the next task. Keep this bootstrap compact and stable unless its durable rules or project target change; detailed requirements belong to the other documents.
+```text
+/goal
+Repository: psychopatz/ProjectHoomans; inspect actual local checkout/branch/HEAD before edits.
+Job: docs/Jobs/ContextualSemanticIntelligence/ — do not modify other jobs' progress or assume exclusive access to shared files.
+Read: AGENTS.md, then job AGENT_RUNBOOK.md, AUDIT.md, ARCHITECTURE.md, ROADMAP.md, HARNESS_ACCEPTANCE.md, PROGRESS.md; docs/Systems/Semantics.md; tools/semantic_harness/README.md.
+Current phase: 0 Semantic Lab correctness baseline.
+ONE Next Chunk: finish Phase 0A verification of the new NPC-state projection and routedSituation real-Lua tests. Run the doctor, production Lua worker unittest, semantic smoke suite and relevant regressions. Fix failures in the existing harness/production seam without adding a fake interpreter, and record actual responses for healthy/injured/thirsty/unknown NPCs. The latest untested code is on feat/contextual-semantic-harness-phase0a; docs planning base is docs/job-contextual-semantic-intelligence-20261017.
+Critical: JSON fixture validity and the conflict ledger alone NEVER prove conversation correctness; inspect real IR, decision, response, routedSituation, context before/after and absence of unintended tool/transport/LLM use. Do not mark unrun game/CI tests passed.
+After 0A passes: make exactly one bounded 0B baseline matrix chunk; continue through ROADMAP only upon accepted gates. Reuse existing Core parser, state, WordNet compiler and Project Hoomans conditional response catalog; avoid Jess rewrites and duplicate systems.
+Maintain server authority, MarketSense ownership, offline Lua first, PBrainZ optional, Build 42 media safety and unchanged IR/network contracts. Coordinate shared files with concurrent goal agents. Keep edits and PROGRESS evidence in this job namespace; commit coherently to authorized destination without force or plain git pull.
+Report actual changed files, test commands/results, commit SHA, live SP/MP status, next chunk or true blocker. Maintenance-ready only when all mandatory gates are accepted.
+```

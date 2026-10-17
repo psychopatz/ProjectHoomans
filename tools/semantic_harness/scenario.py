@@ -55,6 +55,8 @@ DEFAULT_SCENARIO: dict[str, Any] = {
         "forename": "Mara",
         "surname": "Vale",
         "identityState": "unknown",
+        "healthState": "healthy",
+        "activeBehavior": "idle",
         "traits": ["reserved"],
         "relationship": {
             "approval": 0,
@@ -176,6 +178,16 @@ def validate_scenario(scenario: dict[str, Any]) -> None:
         raise ValueError("player.characterUUID is required")
     if not str(npc.get("npcID", "")):
         raise ValueError("npc.npcID is required")
+    # Nullable state fields permit deliberately unknown NPC facts. Legacy
+    # scenarios without explicit NPC needs still use world-level values.
+    for field in ("healthState", "activeBehavior"):
+        value = npc.get(field)
+        if value is not None and not isinstance(value, str):
+            raise ValueError(f"npc.{field} must be a string or null")
+    for field in ("needs", "conditionStats"):
+        value = npc.get(field)
+        if value is not None and not isinstance(value, dict):
+            raise ValueError(f"npc.{field} must be an object or null")
     for owner in (player, npc):
         inventory = owner.get("inventory")
         if inventory is not None and not isinstance(inventory, dict):

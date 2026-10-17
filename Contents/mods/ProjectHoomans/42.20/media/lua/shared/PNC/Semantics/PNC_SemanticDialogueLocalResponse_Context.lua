@@ -47,11 +47,33 @@ local function followsRelationshipStatusAnswer(context)
             or responseTurn.topic == "RELATIONSHIP_STATUS")
 end
 
+local function followsWellbeingAnswer(context)
+    local recentTurns = recentTurnsFrom(context, 3)
+    if #recentTurns == 0 then return false end
+
+    local responseTurn = recentTurns[1]
+    -- The current player turn may already be recorded by a direct caller;
+    -- the normal input lifecycle evaluates the response before recording it.
+    if type(responseTurn) == "table"
+        and responseTurn.speaker == "player"
+        and responseTurn.intent == "QUESTION"
+    then
+        responseTurn = recentTurns[2]
+    end
+
+    return type(responseTurn) == "table"
+        and responseTurn.speaker == "npc"
+        and responseTurn.speechAct == "ANSWER"
+        and responseTurn.branch == "QUESTION_RECEIVED"
+        and responseTurn.subject == "WELLBEING"
+end
+
 local resolveQuestion = require
     "PNC/Semantics/PNC_SemanticDialogueLocalResponse_Questions"
 
 
 Internal.FollowsRelationshipStatusAnswer = followsRelationshipStatusAnswer
+Internal.FollowsWellbeingAnswer = followsWellbeingAnswer
 Internal.ResolveQuestion = resolveQuestion
 
 return Response

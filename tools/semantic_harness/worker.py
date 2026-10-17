@@ -73,6 +73,11 @@ class LuaSemanticWorker:
     def input(self, text: str) -> dict[str, Any]:
         return self._request("INPUT", str(text))
 
+    def preview(self, text: str) -> dict[str, Any]:
+        """Preview a production semantic turn without recording or dispatching it."""
+
+        return self._request("PREVIEW", str(text))
+
     def set_language(self, language: str) -> dict[str, Any]:
         """Change the production translation manager language in this session."""
 

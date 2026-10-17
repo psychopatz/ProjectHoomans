@@ -19,6 +19,53 @@ Catalog.Register("semantic.thanks", {
     },
 })
 
+Catalog.Register("semantic.apology", {
+    variants = {
+        {
+            id = "semantic.apology.stressed",
+            templateID = "semantic.social.apology.stressed",
+            fallback = "I know things are tense. Let's keep it calm.",
+            when = {
+                emotionType = { "stress", "panic" },
+                emotionUrgency = {
+                    "moderate", "severe", "critical", "emergency",
+                },
+            },
+            priority = 4,
+        },
+        {
+            id = "semantic.apology.friendly",
+            templateID = "semantic.social.apology.friendly",
+            fallback = "It's okay. We can put that behind us.",
+            when = { socialStyle = { "friendly", "protective" } },
+            priority = 3,
+        },
+        {
+            id = "semantic.apology.trusted",
+            templateID = "semantic.social.apology.trusted",
+            fallback = "I appreciate you saying that. We're all under pressure.",
+            when = {
+                relationshipState = {
+                    "Friend", "Trusted", "Ally", "Member", "Lover",
+                },
+            },
+            priority = 2,
+        },
+        {
+            id = "semantic.apology.withdrawn",
+            templateID = "semantic.social.apology.withdrawn",
+            fallback = "All right. Let's leave it there.",
+            when = { socialStyle = "withdrawn" },
+            priority = 1,
+        },
+        {
+            id = "semantic.apology.default",
+            templateID = "semantic.social.apology.default",
+            fallback = "Noted. Let's move on.",
+        },
+    },
+})
+
 Catalog.Register("semantic.compliment", {
     variants = {
         {
@@ -75,10 +122,47 @@ Catalog.Register("semantic.accept", {
 Catalog.Register("semantic.refuse", {
     variants = {
         {
+            id = "semantic.refuse.stressed",
+            templateID = "semantic.social.dispute_stressed",
+            fallback = "I hear you, but I can't take that on while I'm this tense.",
+            when = {
+                emotionType = { "stress", "panic" },
+                emotionUrgency = {
+                    "moderate", "severe", "critical", "emergency",
+                },
+            },
+            priority = 4,
+        },
+        {
             id = "semantic.refuse.request",
             templateID = "semantic.social.refuse_request",
             fallback = "No problem. I'll leave it.",
             when = { hasPendingRequest = true },
+            priority = 5,
+        },
+        {
+            id = "semantic.refuse.friendly",
+            templateID = "semantic.social.dispute_friendly",
+            fallback = "I see it differently, but we're okay.",
+            when = { socialStyle = { "friendly", "protective" } },
+            priority = 2,
+        },
+        {
+            id = "semantic.refuse.trusted",
+            templateID = "semantic.social.dispute_trusted",
+            fallback = "I respect that. I still don't agree.",
+            when = {
+                relationshipState = {
+                    "Friend", "Trusted", "Ally", "Member", "Lover",
+                },
+            },
+            priority = 1,
+        },
+        {
+            id = "semantic.refuse.withdrawn",
+            templateID = "semantic.social.dispute_withdrawn",
+            fallback = "Let's leave it there.",
+            when = { socialStyle = "withdrawn" },
             priority = 1,
         },
         {
@@ -226,6 +310,36 @@ Catalog.Register("semantic.hostile_remark", {
 Catalog.Register("semantic.threat", {
     variants = {
         {
+            id = "semantic.threat.stressed",
+            templateID = "semantic.social.threat_stressed",
+            fallback = "I've had enough. Back off before this gets worse.",
+            when = {
+                emotionType = { "stress", "panic" },
+                emotionUrgency = {
+                    "moderate", "severe", "critical", "emergency",
+                },
+            },
+            priority = 5,
+        },
+        {
+            id = "semantic.threat.withdrawn",
+            templateID = "semantic.social.threat_withdrawn",
+            fallback = "Keep your distance. I'm not discussing this.",
+            when = { socialStyle = "withdrawn" },
+            priority = 2,
+        },
+        {
+            id = "semantic.threat.trusted",
+            templateID = "semantic.social.threat_trusted",
+            fallback = "Don't make this personal. Step back.",
+            when = {
+                relationshipState = {
+                    "Friend", "Trusted", "Ally", "Member", "Lover",
+                },
+            },
+            priority = 1,
+        },
+        {
             id = "semantic.threat.default",
             templateID = "semantic.social.threat_boundary",
             fallback = "Back off.",
@@ -240,10 +354,9 @@ Catalog.Register("semantic.threat", {
             templateID = "semantic.social.threat_busy",
             fallback = "Pick another fight.",
             when = { busy = true },
-            priority = 2,
+            priority = 3,
         },
     },
 })
 
 return true
-

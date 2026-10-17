@@ -196,6 +196,34 @@ return {
                 ["speechAct"] = "QUESTION",
                 ["subject"] = "WELLBEING",
             },
+            ["id"] = "pnc.dataset.question.wellbeing.how_are_you_doing",
+            ["match"] = {
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "how",
+                },
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "are",
+                },
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "you",
+                },
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "doing",
+                },
+            },
+            ["priority"] = 120,
+        },
+    {
+            ["confidence"] = 0.99,
+            ["emit"] = {
+                ["intent"] = "QUESTION",
+                ["speechAct"] = "QUESTION",
+                ["subject"] = "WELLBEING",
+            },
             ["id"] = "pnc.dataset.question.wellbeing.how_are_you_holding_up",
             ["match"] = {
                 {

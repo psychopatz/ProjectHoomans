@@ -166,6 +166,9 @@ function Response.Resolve(ir, state, context, branch)
         })
     end
     if branch == "SOCIAL_ACKNOWLEDGED" then
+        if ir.intent == "APOLOGIZE" then
+            return catalogResponse("semantic.apology", ir, state, context)
+        end
         if ir.intent == "ACKNOWLEDGE"
             and followsRelationshipStatusAnswer(context)
         then
