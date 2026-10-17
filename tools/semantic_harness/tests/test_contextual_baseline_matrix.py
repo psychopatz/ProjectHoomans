@@ -136,7 +136,7 @@ class ContextualBaselineMatrixTests(unittest.TestCase):
             {"SemanticIdentityRequest", "AdjustRelationship"},
         )
 
-    def test_wellbeing_follow_up_records_current_bounded_clarification(self) -> None:
+    def test_wellbeing_follow_up_reuses_bounded_answer_context(self) -> None:
         result = run_case(HarnessCase.from_mapping({
             "id": "contextual_wellbeing_follow_up",
             "scenario": {
@@ -159,13 +159,74 @@ class ContextualBaselineMatrixTests(unittest.TestCase):
             response_prefix="semantic.question.wellbeing.injured",
         )
         self.assertTrue(second["accepted"], second.get("reason"))
-        self.assertEqual(second["result"]["decision"]["branch"], "ASK_CLARIFICATION")
-        self.assertEqual(second["result"]["ir"].get("intent"), None)
+        second_result = second["result"]
+        self.assertEqual(second_result["ir"]["intent"], "QUESTION")
+        self.assertEqual(second_result["ir"]["subject"], "WELLBEING")
+        self.assertEqual(
+            second_result["ir"]["provenance"]["pattern"],
+            "pnc.question.wellbeing_follow_up_whats_wrong",
+        )
+        self.assertEqual(
+            second_result["ir"]["extensions"]["dialogueFollowUp"],
+            "WELLBEING",
+        )
+        self.assertEqual(second_result["decision"]["branch"], "QUESTION_RECEIVED")
+        self.assertTrue(
+            second_result["decision"]["response"]["templateID"].startswith(
+                "semantic.question.wellbeing.follow_up.injured"
+            )
+        )
         self.assertEqual(second["contextBefore"]["state"]["sequence"], 1)
         self.assertEqual(second["contextAfter"]["state"]["sequence"], 2)
+        before_dialogue = second["contextBefore"]["dialogue"]
+        after_dialogue = second["contextAfter"]["dialogue"]
+        self.assertEqual(before_dialogue["sequence"], 2)
+        self.assertEqual(before_dialogue["currentTopic"], "wellbeing")
+        self.assertEqual(before_dialogue["lastSpeaker"], "npc")
+        self.assertEqual(after_dialogue["sequence"], 4)
+        self.assertEqual(after_dialogue["currentTopic"], "wellbeing")
+        self.assertLessEqual(len(after_dialogue["recentTurns"]), 12)
         self.assertEqual(second["llmCalls"], 0)
         self.assertEqual(second["transport"], [])
         self.assertEqual(second["toolCalls"], [])
+
+    def test_wellbeing_follow_up_preview_is_idempotent(self) -> None:
+        scenario = merge(DEFAULT_SCENARIO, {
+            "npc": {
+                "healthState": "injured",
+                "activeBehavior": "treatment",
+                "needs": {},
+                "conditionStats": {},
+            },
+        })
+        with LuaSemanticWorker(scenario) as worker:
+            first = worker.input("Are you okay?")
+            before = worker.snapshot()
+            preview_one = worker.preview("What is wrong?")
+            preview_two = worker.preview("What is wrong?")
+            after = worker.snapshot()
+        self.assertTrue(first["accepted"], first.get("reason"))
+        self.assertTrue(preview_one["accepted"], preview_one.get("reason"))
+        self.assertTrue(preview_two["accepted"], preview_two.get("reason"))
+        self.assertEqual(
+            preview_one["result"]["ir"]["provenance"]["pattern"],
+            "pnc.question.wellbeing_follow_up_what_is_wrong",
+        )
+        self.assertEqual(
+            preview_one["result"]["decision"]["response"]["templateID"],
+            "semantic.question.wellbeing.follow_up.injured",
+        )
+        self.assertEqual(preview_one["result"], preview_two["result"])
+        self.assertEqual(preview_one["contextBefore"], preview_one["contextAfter"])
+        self.assertEqual(preview_two["contextBefore"], preview_two["contextAfter"])
+        self.assertEqual(
+            {key: value for key, value in before.items() if key != "id"},
+            {key: value for key, value in after.items() if key != "id"},
+        )
+        self.assertEqual(preview_one["messages"], [])
+        self.assertEqual(preview_one["transport"], [])
+        self.assertEqual(preview_one["toolCalls"], [])
+        self.assertEqual(preview_one["llmCalls"], 0)
 
 
 if __name__ == "__main__":

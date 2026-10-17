@@ -284,6 +284,39 @@ function Internal.RegisterWorldFactQuestions()
     )
 
     registerPattern(
+        "pnc.question.wellbeing_follow_up_whats_wrong",
+        {
+            { kind = "literal", value = "what's" },
+            { kind = "literal", value = "wrong" },
+        },
+        {
+            intent = "QUESTION",
+            speechAct = "QUESTION",
+            subject = "WELLBEING",
+            extensions = { dialogueFollowUp = "WELLBEING" },
+        },
+        0.97,
+        90
+    )
+
+    registerPattern(
+        "pnc.question.wellbeing_follow_up_what_is_wrong",
+        {
+            { kind = "literal", value = "what" },
+            { kind = "literal", value = "is" },
+            { kind = "literal", value = "wrong" },
+        },
+        {
+            intent = "QUESTION",
+            speechAct = "QUESTION",
+            subject = "WELLBEING",
+            extensions = { dialogueFollowUp = "WELLBEING" },
+        },
+        0.97,
+        90
+    )
+
+    registerPattern(
         "pnc.question.gift_preference_like",
         {
             { kind = "literal", value = "do" },
@@ -358,4 +391,3 @@ function Internal.RegisterWorldFactQuestions()
 end
 
 return Internal
-

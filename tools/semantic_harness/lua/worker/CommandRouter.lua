@@ -4,7 +4,7 @@ local CommandRouter = {}
 
 local capabilities = {
     "CONFIG", "RESET", "INPUT", "LANGUAGE", "TOOL_REPLY",
-    "SNAPSHOT", "PING", "CAPABILITIES", "QUIT",
+    "PREVIEW", "SNAPSHOT", "PING", "CAPABILITIES", "QUIT",
 }
 
 function CommandRouter.hello(context)
@@ -37,6 +37,9 @@ function CommandRouter.dispatch(context, request)
     elseif command == "INPUT" then
         if payload == nil then return nil, "input_required" end
         return context.Conversation.turn(context, tostring(payload))
+    elseif command == "PREVIEW" then
+        if payload == nil then return nil, "input_required" end
+        return context.Conversation.preview(context, tostring(payload))
     elseif command == "LANGUAGE" then
         if payload == nil then return nil, "language_required" end
         return context.Translations.setLanguage(context,

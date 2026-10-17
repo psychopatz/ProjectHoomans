@@ -163,6 +163,80 @@ Catalog.Register("semantic.question.wellbeing.unknown", {
     },
 })
 
+Catalog.Register("semantic.question.wellbeing.follow_up", {
+    variants = {
+        {
+            id = "semantic.question.wellbeing.follow_up.panic",
+            templateID = "semantic.question.wellbeing.follow_up.panic",
+            fallback = "I'm still pretty shaken up.",
+            when = {
+                emotionType = "panic",
+                emotionUrgency = { "critical", "emergency" },
+            },
+            priority = 4,
+        },
+        {
+            id = "semantic.question.wellbeing.follow_up.stress",
+            templateID = "semantic.question.wellbeing.follow_up.stress",
+            fallback = "I'm still tense and having trouble settling down.",
+            when = {
+                emotionType = "stress",
+                emotionUrgency = { "critical", "emergency" },
+            },
+            priority = 3,
+        },
+        {
+            id = "semantic.question.wellbeing.follow_up.thirst",
+            templateID = "semantic.question.wellbeing.follow_up.thirst",
+            fallback = "I'm still pretty thirsty.",
+            when = {
+                needType = "thirst",
+                needUrgency = { "moderate", "severe", "emergency", "critical" },
+            },
+            priority = 3,
+        },
+        {
+            id = "semantic.question.wellbeing.follow_up.hunger",
+            templateID = "semantic.question.wellbeing.follow_up.hunger",
+            fallback = "I'm still hungry.",
+            when = {
+                needType = "hunger",
+                needUrgency = { "moderate", "severe", "emergency", "critical" },
+            },
+            priority = 2,
+        },
+        {
+            id = "semantic.question.wellbeing.follow_up.fatigue",
+            templateID = "semantic.question.wellbeing.follow_up.fatigue",
+            fallback = "I'm still worn out.",
+            when = {
+                needType = "fatigue",
+                needUrgency = { "moderate", "severe", "emergency", "critical" },
+            },
+            priority = 2,
+        },
+        {
+            id = "semantic.question.wellbeing.follow_up.injured",
+            templateID = "semantic.question.wellbeing.follow_up.injured",
+            fallback = "I took a bad hit. It's still bothering me.",
+            when = { healthState = { "injured", "wounded", "critical" } },
+            priority = 2,
+        },
+        {
+            id = "semantic.question.wellbeing.follow_up.unknown",
+            templateID = "semantic.question.wellbeing.follow_up.unknown",
+            fallback = "I don't have enough detail to say what's wrong yet.",
+            when = { healthState = "unknown" },
+            priority = 1,
+        },
+        {
+            id = "semantic.question.wellbeing.follow_up.default",
+            templateID = "semantic.question.wellbeing.follow_up.default",
+            fallback = "I don't have enough detail to say what's wrong yet.",
+        },
+    },
+})
+
 Catalog.Register("semantic.self_state", {
     variants = {
         {

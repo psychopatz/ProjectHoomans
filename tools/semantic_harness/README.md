@@ -134,6 +134,12 @@ the returned IR, decision, message payloads, `contextBefore`/
 `contextAfter`, transport, and `llmCalls`. The case replay conflict
 ledger is **not** a semantic-reaction assertion.
 
+The persistent worker also exposes a `PREVIEW` command through
+`LuaSemanticWorker.preview(text)`. It runs the production router's
+parse/resolve/decision path without recording a turn, queueing a response,
+dispatching an action, or calling a provider; repeated previews are suitable
+for checking idempotence before submission.
+
 The production-worker tests for these scenarios are:
 
 ```bash

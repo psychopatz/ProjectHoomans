@@ -197,9 +197,67 @@ class WellbeingProjectionTests(unittest.TestCase):
         second = result.turns[1]
         self.assertTrue(second["accepted"])
         self.assertEqual(second["llmCalls"], 0)
-        self.assertIsInstance(second["result"]["ir"], dict)
+        self.assertEqual(second["result"]["ir"]["intent"], "QUESTION")
+        self.assertEqual(second["result"]["ir"]["subject"], "WELLBEING")
+        self.assertEqual(
+            second["result"]["ir"]["provenance"]["pattern"],
+            "pnc.question.wellbeing_follow_up_whats_wrong",
+        )
+        self.assertEqual(
+            second["result"]["decision"]["branch"],
+            "QUESTION_RECEIVED",
+        )
+        self.assertEqual(
+            second["result"]["decision"]["response"]["templateID"],
+            "semantic.question.wellbeing.follow_up.injured",
+        )
         self.assertIsInstance(second["contextBefore"]["state"], dict)
-        # Baseline probe only: coherent follow-up reply is Phase 2 acceptance.
+        self.assertEqual(second["contextBefore"]["dialogue"]["currentTopic"], "wellbeing")
+        self.assertEqual(second["contextBefore"]["dialogue"]["lastSpeaker"], "npc")
+        self.assertEqual(second["contextAfter"]["dialogue"]["sequence"], 4)
+        self.assertEqual(second["transport"], [])
+        self.assertEqual(second["toolCalls"], [])
+
+    def test_wellbeing_follow_up_selects_current_strongest_fact(self) -> None:
+        cases = (
+            (
+                "injured",
+                {"healthState": "injured", "needs": {}, "conditionStats": {}},
+                "semantic.question.wellbeing.follow_up.injured",
+            ),
+            (
+                "thirst",
+                {"healthState": "healthy", "needs": {"thirst": 0.95},
+                 "conditionStats": {}},
+                "semantic.question.wellbeing.follow_up.thirst",
+            ),
+            (
+                "panic",
+                {"healthState": "healthy", "needs": {},
+                 "conditionStats": {"panic": 95}},
+                "semantic.question.wellbeing.follow_up.panic",
+            ),
+            (
+                "unknown",
+                {"healthState": None, "activeBehavior": None, "needs": {},
+                 "conditionStats": {}},
+                "semantic.question.wellbeing.follow_up.unknown",
+            ),
+        )
+        for label, npc, expected_template in cases:
+            with self.subTest(case=label):
+                with LuaSemanticWorker(self.scenario(npc)) as worker:
+                    first = worker.input("Are you okay?")
+                    second = worker.input("What's wrong?")
+                self.assertTrue(first["accepted"], first.get("reason"))
+                self.assertTrue(second["accepted"], second.get("reason"))
+                self.assertEqual(
+                    second["result"]["decision"]["response"]["templateID"],
+                    expected_template,
+                )
+                self.assertEqual(second["llmCalls"], 0)
+                self.assertEqual(second["transport"], [])
+                self.assertEqual(second["toolCalls"], [])
 
     def test_invalid_state_shapes_rejected(self) -> None:
         for field in ("healthState", "activeBehavior"):

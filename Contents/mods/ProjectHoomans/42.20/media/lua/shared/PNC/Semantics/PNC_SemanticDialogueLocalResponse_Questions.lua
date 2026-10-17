@@ -95,11 +95,21 @@ local function resolveActivity(ir, state, context)
 end
 
 local function resolveWellbeing(ir, state, context)
+    local extensions = type(ir.extensions) == "table" and ir.extensions or nil
+    local followsWellbeingAnswer = Internal.FollowsWellbeingAnswer
     local situation = context and context.dialogueSituation
     local npc = situation and situation.npc or nil
     local needs = npc and npc.needs or nil
     local emotion = npc and npc.emotion or nil
     local healthState = npc and npc.healthState or nil
+    if extensions and extensions.dialogueFollowUp == "WELLBEING"
+        and type(followsWellbeingAnswer) == "function"
+        and followsWellbeingAnswer(context)
+    then
+        return catalogResponse(
+            "semantic.question.wellbeing.follow_up", ir, state, context
+        )
+    end
     local healthUnknown = type(healthState) ~= "string"
         or healthState == ""
         or healthState == "unknown"
