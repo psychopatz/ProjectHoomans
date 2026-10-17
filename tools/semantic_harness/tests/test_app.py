@@ -6,6 +6,7 @@ from contextlib import redirect_stdout
 from copy import deepcopy
 import io
 import json
+import os
 import subprocess
 import sys
 import unittest
@@ -148,6 +149,29 @@ class AppEntryTests(unittest.TestCase):
         )
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(result.stdout.strip(), "False")
+
+    def test_gui_entrypoint_builds_real_flow_editor_when_display_is_available(self) -> None:
+        if not os.environ.get("DISPLAY"):
+            self.skipTest("GUI display is unavailable")
+
+        probe = (
+            "import tkinter as tk; "
+            "from tools.semantic_harness.cli import _parser; "
+            "from tools.semantic_harness.gui import SemanticHarnessApp; "
+            "root = tk.Tk(); "
+            "instance = SemanticHarnessApp(root, _parser().parse_args([])); "
+            "root.after(1, instance.close); "
+            "root.mainloop()"
+        )
+        result = subprocess.run(
+            [sys.executable, "-c", probe],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        if result.returncode and "couldn't connect to display" in result.stderr:
+            self.skipTest(result.stderr.strip())
+        self.assertEqual(result.returncode, 0, result.stderr)
 
 
 class ScenarioSettingsContractTests(unittest.TestCase):

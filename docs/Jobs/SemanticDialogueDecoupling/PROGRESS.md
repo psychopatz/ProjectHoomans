@@ -15,7 +15,7 @@ The existing Semantic Lab worker now returns one bounded production `observation
 - flow ID, response pool, from/to node, transition/status/commit state, and active/suspended flow sessions before and after the turn;
 - language, bounded translation lookups, fallback count, and observed transport/action calls.
 
-The existing Tk GUI now has a Turn facts inspector, a Raw worker record tab, and a side-effect-free Preview control. Its transcript prefers the production rendered `text` over the English fallback, so TL responses are visible as TL. The GUI is source-verified but not claimed interactively passed: desktop automation reported `apps=[]`; no GUI click-through was available in this session. The real worker is the documented fallback.
+The existing Tk GUI now has a Turn facts inspector, a Raw worker record tab, and a side-effect-free Preview control. Its transcript prefers the production rendered `text` over the English fallback, so TL responses are visible as TL. The dedicated desktop automation surface still reported `apps=[]`, so no automated click-through is claimed; a direct X11 launch probe did construct the real window, wait for the Lua worker, and render the initial production Flow editor graph. The real worker remains the evidence path for semantic behavior.
 
 The meaningful production trace used for acceptance was `who are you` -> `are you okay` -> `im fine thanks` -> `My name is Patrick` in TL. It selected the expected identity/wellbeing candidates, observed `start` -> `interrupt_start` -> `match` -> `match`, preserved/resumed the identity flow, retired it after the name, rendered the actual selected reply, observed no transport/actions for the first three turns, and observed only the expected identity request plus relationship adjustment on completion.
 
@@ -162,6 +162,14 @@ The GitHub Core publication does not need a source-level correction for C0A: 569
 - Replaced the stale phase-table handoff with a bounded user checklist covering the validated identity/wellbeing/greeting sequence, the modular greeting follow-up, EN/TL restart checks, Trading/gossip/inventory/task spot checks, MP authority/speaker isolation/rejoin checks, optional PBrainZ parity, and idle/performance observation.
 - The handoff identifies the exact D4/D5 implementation and evidence commits, the real-worker test totals, the unavailable GUI click-through, and the required fields to capture if live behavior differs.
 - No Project Zomboid process was launched or polled, no external/headless harness was used, and no Workshop publication action was taken.
+
+## Post-handoff GUI correction (2026-10-18)
+
+- Reproduced the reported launch failure with `python3 -m tools.semantic_harness.app`: `NameError: name 'filedialog' is not defined` in `SemanticHarnessApp._build_ui` while constructing `FlowEditorPane`.
+- Fixed the constructor to pass the imported dialog modules stored on the app instance. A real X11 launch remained alive for 12 seconds, and the captured window showed `Lua worker ready`, three production flows, and the Flow editor graph with `onMatch`, `onRefuse`, and `onUnrelated` edges.
+- The real Lua worker catalog/branch probe exposed all production flow graphs (`identity`, `wellbeing`, `greeting`) and exercised greeting match, wellbeing refusal, and identity interruption/resume/completion.
+- Added a subprocess GUI-construction regression test so the real Tk constructor is covered without tearing down Tk in the unittest process.
+- Verification: Semantic Lab Python suite **105/105 PASS**; focused production Lua smokes **6/6 PASS**; `--doctor` **PASS**; `py_compile` and `git diff --check` **PASS**. No Project Zomboid process, external/headless harness, or Workshop publication was used.
 
 ## Historical C0A/C0B source handoff
 
