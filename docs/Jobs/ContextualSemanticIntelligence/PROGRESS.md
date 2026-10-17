@@ -1,6 +1,6 @@
 # Contextual Semantic Intelligence — progress
 
-**Updated:** 2026-10-17. **Phase:** 0 — Semantic Lab correctness baseline. **Status:** Phase 0A Semantic Lab gate accepted; Phase 0B is the sole Next Chunk. Native SP/MP acceptance remains OPEN.
+**Updated:** 2026-10-17. **Phase:** 0 — Semantic Lab correctness baseline. **Status:** Phase 0B baseline-matrix gate accepted; Phase 1A is the sole Next Chunk. Native SP/MP acceptance remains OPEN.
 
 ## Revision evidence
 
@@ -37,12 +37,23 @@
 
 Phase 0A is accepted only for its documented Semantic Lab correctness baseline. The remaining native-game limitations and the Phase 1/2 semantic limitations stay open.
 
-## ONE current Next Chunk — Phase 0B baseline matrix
+## Phase 0B verification evidence — accepted for the reviewed baseline gate
 
-1. Build one small manually reviewed matrix of existing deterministic utterances and the wellbeing two-turn probe; use the real persistent worker, not JSON-only replay.
-2. Record per turn: IR, branch/response, routed situation, context before/after, sequence, LLM count, transport/tool traces and conflict result.
-3. Preserve current semantic behavior and existing 66-test smoke coverage; do not add a reaction arbiter or change response semantics in Phase 0B.
-4. Add only the bounded matrix artifact/assertions needed to make the baseline reproducible, then record exact revisions and native-SP/native-MP status before advancing to Phase 1.
+- `tools/semantic_harness/tests/test_contextual_baseline_matrix.py` at Project Hoomans `35c0e741` is the bounded reviewed matrix; the full observations are in `docs/Jobs/ContextualSemanticIntelligence/BASELINE_MATRIX.md`.
+- `python3 -m unittest tools.semantic_harness.tests.test_contextual_baseline_matrix -v`: **PASS 3/3** in 2.30s on the final verification run.
+- `tools/semantic_harness/run_harness.sh --cli --jsonl --case tools/semantic_harness/scenarios/identity_exchange_case.json`: **PASS** (`ok=true`), 2/2 turns accepted, `conflicts=[]`, no audit truncation; deterministic identity claim routing produced the existing `SemanticIdentityRequest`/`SemanticIdentityResult` boundary and bounded relationship adjustment.
+- `python3 -m unittest discover -s tools/semantic_harness/tests -v`: **PASS 56/56** in 20.51s.
+- `python3 -m unittest tools.semantic_harness.tests.test_wellbeing_projection -v`: **PASS 6/6** in 2.66s; `tools/semantic_harness/run_harness.sh --test pnc_semantic`: **PASS 66/66** in 1.92s.
+- The matrix records greeting, injured wellbeing, fishing activity, time, identity exchange and injured wellbeing follow-up. All assertions read production IR/decision/context and traces from the real worker; deterministic cases used `llmCalls=0` and no unauthorized transport/tool effects. The wellbeing follow-up remains the observed `ASK_CLARIFICATION` continuity gap and was not repaired in Phase 0B.
+- No reaction selector, catalog wording or gameplay behavior was changed in Phase 0B. The identity transport is the harness single-player boundary and is not native multiplayer evidence.
+- Native SP: **NOT TESTED**. Native MP: **NOT TESTED**. No controlled Project Zomboid UI/session/server acceptance is being promoted from these mocks.
+
+## ONE current Next Chunk — Phase 1A wellbeing contextual reaction pilot
+
+1. Trace the existing `QUESTION/WELLBEING` catalog and policy conditions against the already reviewed healthy, injured, severe-thirst, panic/stressed and explicitly unknown states.
+2. Use the existing production context and response paths first; add the narrowest behavior-preserving hook only if the real-worker evidence shows a missing contextual reaction. Do not invent facts for unknown state.
+3. Add focused real-worker assertions for recognized same-utterance reaction differences, with zero PBrainZ calls and no gameplay side effects. Preserve the legacy world fixture and existing 66-test semantic coverage.
+4. Keep native SP/MP explicitly open; do not begin multi-turn, social, paraphrase or PBrainZ phases until the Phase 1A gate is evidenced.
 
 ## Remaining roadmap
 
