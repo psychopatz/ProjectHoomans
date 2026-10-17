@@ -3,6 +3,13 @@
 require "PsychopatzCore/UI/Conversation/Parts/PsychopatzConversationLLMInput"
 require "PsychopatzCore/Semantics/PsychopatzSemanticDialogueRouter"
 require "PNC/Semantics/PNC_SemanticDiagnostics"
+-- Optional module boundary: a legacy package must keep its ordinary
+-- deterministic conversation path if this diagnostic spoke is absent.
+local handshakeLoaded, SemanticCapabilityHandshake = pcall(require,
+    "PNC/Semantics/PNC_SemanticCapabilityHandshake")
+if not handshakeLoaded or type(SemanticCapabilityHandshake) ~= "table" then
+    SemanticCapabilityHandshake = nil
+end
 -- The semantic input is a client entry point as well as a shared-composition
 -- consumer. Load the Hoomans vocabulary here so a partial composition cannot
 -- silently fall through to the generic LLM wait path.
@@ -21,6 +28,7 @@ local Policy = PNC.Semantics.DialoguePolicy
 local Text = PsychopatzCore.Conversation.Text
 local ResponseCatalog = PNC.Semantics.ResponseCatalog
 local LocalResponse = PNC.Semantics.LocalResponse
+local Diagnostics = PNC.Semantics.SemanticDiagnostics
 local Input = PNC.Semantics.DialogueInput or {}
 PNC.Semantics.DialogueInput = Input
 
@@ -35,6 +43,22 @@ if ResponseCatalog and type(ResponseCatalog.RegisterTextFallbacks) == "function"
     -- persisted. Register the current catalog before a full-screen session
     -- loads that history so those old rows remain readable as well.
     ResponseCatalog.RegisterTextFallbacks()
+end
+
+if SemanticCapabilityHandshake
+    and type(SemanticCapabilityHandshake.Report) == "function"
+then
+    SemanticCapabilityHandshake.Report()
+elseif Diagnostics
+    and type(Diagnostics.IsEnabled) == "function"
+    and Diagnostics.IsEnabled() == true
+    and type(Diagnostics.Record) == "function"
+then
+    Diagnostics.Record("semantic.capability_handshake", {
+        ok = false,
+        sourceMarker = "missing",
+        failures = { "capability_handshake_module_unavailable" },
+    }, { dedupeKey = "semantic-capability-handshake" })
 end
 
 Input.VERSION = 2

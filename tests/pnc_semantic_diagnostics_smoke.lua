@@ -32,13 +32,63 @@ PNC = {
         Now = function() return clock end,
         LogInfo = function(message) logs[#logs + 1] = message end,
     },
-    Semantics = {},
+    Semantics = {
+        DialoguePolicy = {
+            SelectCandidate = function() end,
+            CommitFlow = function() end,
+        },
+    },
+}
+PNC.Translation = {
+    Systems = {
+        Conversation = {
+            get = function() return "conversation" end,
+            load = function() return true, { loaded = true } end,
+        },
+    },
+}
+CustomTranslationManager = {
+    Systems = {
+        ProjectHoomans = {
+            Conversation = {
+                manifestPath = "media/translation/manifests/Conversation.json",
+                _manifestState = "loaded",
+                _manifestPath = "media/translation/manifests/Conversation.json",
+                _lastShardCount = 12,
+            },
+        },
+    },
+    registerSystem = function() end,
+    forMod = function() end,
+    getLanguage = function() return "EN" end,
+}
+PsychopatzCore.Semantics = {
+    VERSION = 1,
+    IR = { Validate = function() return true end },
+    Parser = {
+        Parse = function() end,
+        ParseCandidates = function() end,
+        CANDIDATE_VERSION = 1,
+    },
+    DialogueRouter = {
+        VERSION = 1,
+        New = function() end,
+        Preview = function() end,
+        ProcessIR = function() end,
+        SetCandidateParser = function() end,
+        SetCandidateSelector = function() end,
+    },
 }
 
 local Diagnostics = T.load(
     "ProjectHoomans",
     "shared",
     "PNC/Semantics/PNC_SemanticDiagnostics.lua"
+)
+local Handshake = T.load(
+    "ProjectHoomans",
+    "shared",
+    "PNC/Semantics/PNC_SemanticCapabilityHandshake.lua"
 )
 
 T.equal(setting.id, "ProjectHoomans.SemanticDialogueAudit",
@@ -104,6 +154,43 @@ Diagnostics.Record("progress", { planID = "plan-one", state = "TRAVEL" }, {
     consoleIntervalMs = 100,
 })
 T.equal(#logs, 3, "progress logs again after the dedupe interval")
+
+local handshakeOK, handshake = Diagnostics.RecordCapabilityHandshake()
+T.truthy(handshakeOK, "capability handshake accepts the matched contract")
+T.truthy(handshake.ok, "capability handshake reports an OK contract")
+T.truthy(handshake.parserCandidates,
+    "capability handshake sees Core candidate parsing")
+T.truthy(handshake.candidateSelection,
+    "capability handshake sees Hoomans candidate selection")
+T.truthy(handshake.flowCommit,
+    "capability handshake sees Hoomans flow commit")
+T.truthy(handshake.translation.manifestRead,
+    "capability handshake sees the loaded Conversation manifest")
+T.equal(traceEntries[#traceEntries].event,
+    "semantic.capability_handshake",
+    "capability handshake is emitted as a structured event")
+
+Handshake.LastReport = nil
+local parserCandidates = PsychopatzCore.Semantics.Parser.ParseCandidates
+local manifestSource = CustomTranslationManager.Systems.ProjectHoomans.Conversation
+PsychopatzCore.Semantics.Parser.ParseCandidates = nil
+manifestSource.manifestPath = nil
+manifestSource._manifestState = "error"
+manifestSource._manifestPath = nil
+local mismatchOK, mismatch = Diagnostics.RecordCapabilityHandshake()
+T.falsy(mismatchOK, "capability mismatch is not reported as a pass")
+local mismatchReasons = table.concat(mismatch.failures, ",")
+T.contains(mismatchReasons, "parser_parse_candidates",
+    "capability mismatch names the missing parser API")
+T.contains(mismatchReasons, "conversation_manifest_registration",
+    "capability mismatch names the missing manifest registration")
+T.equal(traceEntries[#traceEntries].event,
+    "semantic.capability_handshake",
+    "capability mismatch remains visible as a structured event")
+PsychopatzCore.Semantics.Parser.ParseCandidates = parserCandidates
+manifestSource.manifestPath = "media/translation/manifests/Conversation.json"
+manifestSource._manifestState = "loaded"
+manifestSource._manifestPath = "media/translation/manifests/Conversation.json"
 
 setting.apply(false)
 T.falsy(Diagnostics.IsEnabled(), "setting apply disables semantic audit")

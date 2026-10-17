@@ -5,6 +5,18 @@ PNC.Semantics = PNC.Semantics or {}
 local DialogueInputTrace = PNC.Semantics.DialogueInputTrace or {}
 PNC.Semantics.DialogueInputTrace = DialogueInputTrace
 local Diagnostics = PNC.Semantics.SemanticDiagnostics
+local Handshake = PNC.Semantics.SemanticCapabilityHandshake
+
+local function ensureHandshake()
+    if Diagnostics
+        and type(Diagnostics.IsEnabled) == "function"
+        and Diagnostics.IsEnabled() == true
+        and Handshake
+        and type(Handshake.Report) == "function"
+    then
+        Handshake.Report()
+    end
+end
 
 function DialogueInputTrace.Audit(eventName, data, options)
     if not Diagnostics
@@ -13,6 +25,7 @@ function DialogueInputTrace.Audit(eventName, data, options)
     then
         return false
     end
+    ensureHandshake()
     return Diagnostics.Record(eventName, data, options)
 end
 
@@ -28,6 +41,7 @@ function DialogueInputTrace.RecordTurn(view, value, result, event, extra)
     if not semanticAudit and not legacyTrace then
         return false
     end
+    if semanticAudit then ensureHandshake() end
     local ir = result and result.ir or {}
     local decision = result and result.decision or {}
     local provenance = ir.provenance or {}
