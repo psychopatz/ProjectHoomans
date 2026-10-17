@@ -1,6 +1,6 @@
 # Contextual Semantic Intelligence — progress
 
-**Updated:** 2026-10-17. **Phase:** 2 — bounded multi-turn wellbeing follow-up. **Status:** Phase 2 Semantic Lab gate accepted; Phase 3 is the sole Next Chunk. Native SP/MP acceptance remains OPEN.
+**Updated:** 2026-10-17. **Phase:** 3A — bounded contextual apology reaction. **Status:** Phase 3A Semantic Lab gate accepted; Phase 3B is the sole Next Chunk. Native SP/MP acceptance remains OPEN.
 
 ## Revision evidence
 
@@ -75,12 +75,22 @@ Phase 0A is accepted only for its documented Semantic Lab correctness baseline. 
 - EN/TL conversation JSON parsed with all eight follow-up keys present; a real TL worker turn resolved the new injured follow-up key. `pz-verify` reported zero Kahlua errors; existing hardcoded-string/token-size findings remain outside this bounded gate.
 - Native SP: **NOT TESTED**. Native MP: **NOT TESTED**. Empty Semantic Lab transport and PZ process presence are not native acceptance evidence.
 
-## ONE current Next Chunk — Phase 3 bounded social-reaction baseline
+## Phase 3A verification evidence — accepted for the bounded Semantic Lab gate
 
-1. Start with one bounded persistent-worker relationship/social reaction case and inspect existing topic, speaker, and relationship context before changing behavior.
-2. Add only the narrowest deterministic response mapping needed for that case; preserve current authority boundaries and do not activate tasks or obligations.
-3. Assert before/after context, sequence, preview behavior where applicable, zero PBrainZ calls, and no unauthorized transport/tool effects. Preserve all Phase 2 and existing semantic coverage.
-4. Keep native SP/MP explicitly open; do not expand to paraphrase, group, or PBrainZ phases until the Phase 3 bounded gate is evidenced.
+- Implementation revision: Project Hoomans `bdb0a68b` (`feat(semantic): add contextual apology reactions`); the detailed evidence is in [`PHASE3A_SOCIAL_APOLOGY.md`](PHASE3A_SOCIAL_APOLOGY.md).
+- The bounded slice uses the existing `APOLOGIZE` parser/IR and `SOCIAL_ACKNOWLEDGED` branch. It adds one `semantic.apology` catalog with five explicit variants: stressed, friendly, trusted, withdrawn and default. Catalog priority makes severe stress/panic win over friendly social style; no new reaction arbiter, parser family, task, obligation or relationship mutation was introduced.
+- Focused real-worker tests: **PASS 3/3**. Full Python suite: **PASS 62/62**. Existing contextual social reactions for friendly compliments, busy threats and stressed self-reflection remained deterministic and local.
+- `tools/semantic_harness/run_harness.sh --doctor --doctor-json`: **PASS**. `tools/semantic_harness/run_harness.sh --test pnc_semantic`: **PASS 66/66**. CLI report `/tmp/contextual-semantic-suite-phase3a.json`: **PASS 66/66**, 198 events, `conflicts=[]`, `audit_truncated=null`; those protocol/replay values are not semantic proof.
+- EN/TL conversation JSON each parsed with 509 keys and all five apology keys present. A real TL worker apology selected `UI_PNC_Conversation_Semantic_ApologyFriendly` and returned the TL text. Every focused turn used `llmCalls=0`, empty transport/tool traces, no action result, and equal `relationshipBefore`/`relationshipAfter`.
+- `pz-verify` over the semantic directory: **0 Kahlua errors**. Existing hardcoded-string findings (12 files) and token-size warnings (26 files, including the already-large social catalog) remain documented; they are not treated as a Phase 3A correctness failure. Changed Lua files also passed `luac5.3 -p`.
+- Native SP: **NOT TESTED**. Native MP: **NOT TESTED**. Semantic Lab transport emptiness and a present PZ process are not native acceptance evidence.
+
+## ONE current Next Chunk — Phase 3B bounded offer/reassurance/threat/dispute baseline
+
+1. Audit one remaining authored behavior family from offers, reassurance, threats or disputes and identify the smallest contextual gap; preserve existing catalogs and authority boundaries.
+2. Add only the narrowest deterministic mapping or precedence evidence needed for that gap; do not activate tasks, obligations or relationship mutation without an existing authorized path.
+3. Assert varied relationship/emotion cases, before/after context, preview behavior where applicable, zero PBrainZ calls and no unauthorized transport/tool effects. Preserve all Phase 2 and Phase 3A coverage.
+4. Keep native SP/MP explicitly open; do not expand to paraphrase, group or PBrainZ phases until the bounded Phase 3 social gate is evidenced.
 
 ## Remaining roadmap
 
