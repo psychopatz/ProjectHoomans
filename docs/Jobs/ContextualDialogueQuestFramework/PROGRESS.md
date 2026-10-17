@@ -1,44 +1,42 @@
 # Contextual Dialogue & Quest Framework — current state
 
 **Updated:** 2026-10-18
-**Baseline inspected:** remote ProjectHoomans main a3eb2e4db553f9c03b7f66a6ff6717878e1668e0
-**Phase:** 0 — Gate bridge vertical slice
-**Status:** PLANNED; no implementation tests run by this planning work.
-**Next Chunk:** 0A — Connect ONE semantic-flow world condition to the existing typed gate contract, and prove it through real Lua.
+**Baseline inspected:** ProjectHoomans `main` at `a3eb2e4db553f9c03b7f66a6ff6717878e1668e0`
+**Implementation branch:** `codex/contextual-dialogue-quest-framework-0a`
+**Phase:** 1 — Graph editing foundations (selected; not implemented)
+**Status:** Phase 0 / 0A ACCEPTED by developer evidence; native PZ acceptance remains user-owned.
+**Last implementation commit:** `1a754dc8` (`feat(semantic): bridge weather gates into dialogue flows`)
+**Next Chunk:** 1A — Extend the existing Semantic Lab `flow_editor.py` with bounded node CRUD and structural error inspection.
 
-## Accepted foundation from remote-source inspection
+## Accepted foundation
 
-- Semantic Lab includes a Tk graph editor, production-worker Validate/Register, and actual-Lua flow regression tests; it is not yet complete drag/drop/source-code authoring.
-- Production flow registry validates bounded declarative frames/nodes and has a preview/commit kernel with limited active/suspended sessions.
-- World context and situation providers expose time, rain, fog, indoors and NPC/social facts.
-- Conversation Blocks already own a mature declarative condition system and server-side effect boundary.
-- Prior SemanticDialogueDecoupling job says READY FOR USER LIVE TEST; user native game tests not conflated with this new workstream.
+- Semantic Lab loads the real Project Hoomans/PsychopatzCore Lua route through its persistent worker; the worker exposes IR, candidates, response, flow state, translation, and side effects.
+- Production `ConversationRules` already owned reusable condition handlers. 0A added `Rules.EvaluateGateStatus` with compatibility-preserving PASS/FAIL/UNKNOWN semantics and a pure `pnc:weather` handler; no second parser or Python evaluator was added.
+- Production semantic flow registry/kernel now validate a bounded node gate and route `onPass`/`onFail`/`onUnknown` through that existing evaluator.
+- The new response-only `weather_context` flow uses the authoritative/read-only world snapshot: rain selects `raining`, clear selects `clear`, and missing weather selects `unknown`. Terminal branches do not create or interrupt flow sessions.
+- EN and TL response catalog entries are checked-in under the existing translation shard and presentation-key map.
 
-## Unaccepted gaps
+## 0A evidence
 
-- No verified shared typed condition evaluator between Blocks and semantic flows; semantic Registry V1 currently rejects unknown node fields.
-- No real-Lua contextual branch demonstration with PASS/FAIL/UNKNOWN gate diagnostics in this new job.
-- Graph CRUD/drag/link and synchronized code editor/source persistence missing.
-- Cross-session contextual memory/commitments and standalone authoritative Quest domain not accepted.
-- No new job-specific harness GUI click-through, performance, hosted CI, or native PZ tests.
+- Real worker input `is it raining` produced, for `world.weather=rain|clear|unknown`, respectively: `weather_context/weather_gate -> raining|clear|unknown`, gate `PASS/weather_rain_true`, `FAIL/weather_rain_false`, and `UNKNOWN/weather_rain_unknown`, with the corresponding rendered response.
+- Every branch reported `status=retired`, no active flow after the turn, zero tool calls, zero transport records, zero action side effects, and no LLM calls. TL rain also rendered `UI_PNC_Conversation_Semantic_FlowWeatherRaining` with a translated value.
+- Preview of the unknown branch was repeated and remained pure: no messages, transport, tool calls, or context transition; the worker observation still exposed the gate status/reason and selected node.
+- `python3 -m unittest discover -s tools/semantic_harness/tests -v`: **108 OK**.
+- `python3 tests/run_tests.py pnc_conversation_smoke pnc_semantic_dialogue_flow_smoke pnc_semantic_situation_smoke pnc_semantic_world_context_smoke pnc_semantic_local_response_questions_smoke`: **PASS 5/5**.
+- `tools/semantic_harness/run_harness.sh --doctor --doctor-json`: **ok**, including worker `READY/PING/CAPABILITIES`.
+- `pz-verify` Kahlua checks for all changed production Lua files: **clean**; translation JSON and `git diff --check`: **clean**.
+- The unrelated pre-existing `pnc_semantic_local_route_smoke` greeting-count failure was reproduced on untouched `main` `a3eb2e4d`; it is not attributed to 0A. The harness-only `tools/semantic_harness/lua/worker/RuntimeEnvironment.lua` retains its pre-existing `io.open` Kahlua warning.
 
-## EXACT Next Chunk 0A
+## Remaining unaccepted work
 
-1. Inspect the current local Hoomans and Core checkout/branch/HEAD and existing Blocks condition implementation, semantic FlowRegistry/Kernel, world context projection, worker's scenario/observation routes and relevant tests. Do not assume the planning remote baseline is identical to local checkout.
-2. Choose an existing pure condition pathway to reuse for one semantic flow world fact (prefer rain or time). If no reusable public contract exists, introduce only the narrow read-only adapter/typed validator necessary; do not duplicate the full Blocks engine or reimplement NLU.
-3. Add a minimal context-gated production Lua flow behavior: when input intent is eligible and fact is known, follow the appropriate branch; when fact is false/unknown, choose deterministic different/clarifying response. Do not overwrite existing identity/wellbeing behavior. Preserve preview purity and recheck gameplay action conditions on server if any (prefer an entirely response-only pilot).
-4. Expose selected gate result/reason and from/to node + rendered text in the **existing** Semantic Lab worker observation and visual inspector, rather than only returning a JSON validation success.
-5. Through real Lua worker, run one multi-turn replay with rain=true, rain=false and unknown fact; show actual selected response and absence of tool/transport/LLM calls. Run focused identity/wellbeing/flow tests and doctor/smoke where available; record exact commands/results, GUI inspection if available, and any failures.
-6. Update PROGRESS with accepted/unaccepted result and select precisely one next chunk in Phase 1 (node CRUD), or keep 0A open with a concrete defect. Commit coherent source/test/docs only per actual Git safety and authorization.
+- Graph CRUD/drag/link, undo/redo, synchronized code editing, and durable source persistence remain unimplemented.
+- Cross-session contextual memory/commitments, authoritative quest lifecycle, personality/quest integration, performance bounds, GUI click-through, and native PZ SP/MP acceptance remain open.
+- No Project Zomboid process, MP server, Steam Workshop upload, or native game acceptance was run.
 
-## Exit checks
+## EXACT Next Chunk 1A
 
-- Existing parser/candidate IR unchanged; at least one safe semantic flow truly gates on authoritative-sourced/read-only world fact in production Lua.
-- Clear testable behavioral contrast for fact TRUE/FALSE/UNKNOWN; no guessed fact, no misrouted identity/relationship mutation.
-- Real worker observation contains gate selection reason and actual rendered NPC reply, not just a graph/JSON record.
-- No new per-tick scan, arbitrary user code execution or independent Python semantic evaluator.
-- Developer runtime not falsely presented as live game acceptance.
+Extend the existing `tools/semantic_harness/flow_editor.py` and its current Lua registry worker contract with bounded add/rename/delete/duplicate/connect/disconnect operations, undo/redo, preserved layout, and structural error inspection. Prove one human/agent-created valid branch through the real Lua registry and reject a broken graph; do not create a second flow engine or JSON-only acceptance path. After 1A, update this file and `ROADMAP.md` with exact evidence and select precisely one next chunk.
 
 ## Git/publication note
 
-Planning docs are being prepared on a dedicated documentation branch for review. No local worktree condition is inferred; Codex must inspect its actual checkout and know which branch contains these docs. Workshop upload and native game testing remain user-owned. Do not silently mark planned code as implemented.
+The planning documentation came from PR #4 branch `docs/contextual-dialogue-quest-framework-20261018` (`737e1c19`). This implementation branch contains that documentation plus the 0A commit above. Workshop publication and native game testing remain user-owned.
