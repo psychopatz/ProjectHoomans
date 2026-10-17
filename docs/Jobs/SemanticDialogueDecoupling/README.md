@@ -1,23 +1,25 @@
 # Semantic Dialogue Decoupling — one unified /goal
 
-**Status:** documentation adopted as new implementation goal. **Runtime gameplay refactor:** NOT STARTED. **Target:** Project Hoomans B42.20 with reusable PsychopatzCore. This one job governs typed NLU arbitration, independent dialogue flows, response planning, Semantic Lab authoring, and subsystem-sharded custom translation. These are chapters/phases of ONE ROADMAP and ONE PROGRESS ledger, not separate goal agents.
+**Current mode:** corrective integration and real-game acceptance. **Not maintenance-ready.** The original implementation phases 0A–8 have substantial production Lua and supporting worker-test evidence. This goal is **not** completed as an end-to-end extensible in-game dialogue authoring system.
 
-## Start here
-Read `AGENTS.md` and then:
-1. `AGENT_RUNBOOK.md` — safe existing-checkout/main policy and one-chunk loop.
-2. `AUDIT.md` — verified current code/claims and remaining risks.
-3. `ARCHITECTURE.md` and `FLOW_CONTRACT.md` — stable ownership and future module API.
-4. `TRANSLATION_MIGRATION.md` — internal custom-translation redesign.
-5. `ROADMAP.md` and `HARNESS_ACCEPTANCE.md` — phases and real Lua gates.
-6. `PROGRESS.md` — exactly one active Next Chunk.
-7. `GOAL_PROMPT.md` — copyable bootstrap for a new Codex session.
+One job: `docs/Jobs/SemanticDialogueDecoupling/`. Dialogue flow ownership, Core compatibility, translation catalogs, response composition, the Semantic Lab UI and native Build 42 validation are **phases of the same goal**, never separately managed jobs.
 
-Additional references: `docs/Systems/Semantics.md`, `docs/Systems/TranslationAudit.md`, `docs/architecture/PROJECT_HOOMANS_DOMAIN_CONTRACT.md`, `tools/semantic_harness/README.md`.
+## Read order
 
-## Outcome
-Adding a new conversation type should generally involve a small registered Lua flow (triggers, typed slots, states/transitions), references to existing contextual response planning, localized EN/TL shard(s), and executable Semantic Lab scenarios/assertions—without adding global parser-priority exceptions, giant policy switches or an ever-growing Conversation.json.
+1. Repository `AGENTS.md`, then `AGENT_RUNBOOK.md` (safe current-checkout/main policy).
+2. `AUDIT.md` (2026-10-17 source verification and claimed vs proven behavior).
+3. `ARCHITECTURE.md`, `FLOW_CONTRACT.md` and `TRANSLATION_MIGRATION.md` (existing/desired contracts).
+4. `DEPLOYMENT_ACCEPTANCE.md` (Hoomans/Core installed dependency and native verification).
+5. `ROADMAP.md` and `HARNESS_ACCEPTANCE.md` (corrective phases and real-game gates).
+6. `PROGRESS.md` (ONE active Next Chunk); `GOAL_PROMPT.md` (new Codex bootstrap).
+7. `IMPLEMENTATION_EVIDENCE.md` (archived previous progress/test claims; read for provenance, **not** current marching orders).
 
-## Baseline ownership
-- Current code includes the 2026-10-17 regression fix at Hoomans main `105dadedd31c57be64a3622c4a1f6d2d6f402d35`. This is a SOURCE-VERIFIED baseline; 90/90 Python and 66/66 Lua passes are AGENT-REPORTED (not independently rerun here). Native SP/MP remain NOT TESTED.
-- Historical `docs/Jobs/ContextualSemanticIntelligence/` is **reference evidence**, not a second active driver of this refactor. Its native acceptance remains open and must not be declared complete.
-- Earlier `docs/Jobs/SemanticDialogueOrchestrator/` planning was superseded by this unified namespace at documentation adoption. Do not recreate it or a standalone translation goal.
+Canonical background: `docs/Systems/Semantics.md`, `docs/Systems/TranslationAudit.md`, `docs/architecture/PROJECT_HOOMANS_DOMAIN_CONTRACT.md`, `tools/semantic_harness/README.md`.
+
+## Product acceptance
+
+A registered new conversation type must choose its **real in-game** response and transitions through production Lua without requiring a new branch in a central intent switch. Both EN/TL translations resolve using the **installed** Core dependency; commands and relationships remain server authoritative. A usable visual flow inspector/editor must operate on the production registry, not a mock graph. Live SP and hosted MP evidence ultimately close the goal.
+
+The existing identity/wellbeing regression fix at `105dadedd31c` and implemented translation shards/flow modules are protected foundations. Do not recreate them.
+
+The user explicitly rejected adding more headless-only fixture churn as proof of success. The real Lua worker is useful supporting evidence, while live game behavior and installed-dependency parity determine product acceptance.

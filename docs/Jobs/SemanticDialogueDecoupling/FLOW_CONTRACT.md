@@ -1,46 +1,25 @@
-# Flow registration and arbitration design — proposed API only
+# Flow ownership and registered-module contract
 
-This chapter defines **desired behaviors**, not executable Lua yet. Reconcile with the existing PNC context, policy, identity, response catalog and Core parser before naming actual public APIs.
+Status: **registry/kernel implemented; production behavioral ownership still incomplete.** Preserve existing `PNC_SemanticDialogueFlowRegistry` and `...FlowKernel` rather than replacing them.
 
-## Flow module shape (illustrative)
-```lua
-return {
-    id = "wellbeing",
-    version = 1,
-    triggers = { {intent = "QUESTION", subject = "WELLBEING"} },
-    initial = "disclose_state",
-    nodes = {
-        disclose_state = {
-            reaction = "DISCLOSE_WELLBEING",
-            responsePool = "semantic.question.wellbeing",
-            next = "await_player_status",
-        },
-        await_player_status = {
-            accepts = { {intent = "INFORM", subject = "WELLBEING"} },
-            onMatch = "acknowledge_and_finish",
-            onUnrelated = "suspend",
-        },
-    },
-}
-```
+## Verified current behavior
+- Identity and wellbeing definition modules register via `PNC_SemanticDialogueFlowCatalog.lua`.
+- Definitions contain triggers, nodes, typed captures, accepts, `responsePool`, and `onMatch`/`onRefuse`/`onUnrelated` controls.
+- Registry rejects duplicate IDs, unsupported frame fields, conflicting slot owners, missing nodes and unreachable transitions; kernel has bounded active/suspended sessions and preview vs commit.
+- Current `Policy.Decide` attaches `flowPreview` but chooses response branch via `resolveIntentBranch`; actual pool selection remains in `LocalResponse.Resolve` based on that branch.
 
-This flow **does not** execute game actions or know translation paths. Its references resolve through existing response and translation registries.
+## Target behavioral contract
+1. **Safe eligibility first:** only valid IR and authorized intents can activate a flow; fuzzy or ambiguous mutating input must clarify and must not dispatch effects. Flow participation may not bypass entity/authority checks.
+2. **Flow controls reaction:** after preview eligibility, an appropriate flow response pool/plan is selected by the production responder. A flow may ask a follow-up, give a contextual response, clarify or return to a suspended topic without a new `elseif` in central `resolveIntentBranch`.
+3. **Legacy fallback:** unmigrated branches continue to work; there is a single deterministic winner and one response, not both a flow and legacy policy responding.
+4. **Single commit:** `Preview` is idempotent and effect-free; only accepted user turns advance the active/suspended session exactly once. A gameplay effect requires existing server authorization. An NPC reply must not be misinterpreted as player input.
+5. **Stable state:** bounded flow/node/slots/speaker/addressee, stack max and expiry. Multiple NPCs cannot share one pending obligation. Explicit refusal is scoped to the currently addressed question; the original `im fine thanks` identity regression remains protected.
+6. **Extension demonstration:** introduce one harmless third pilot flow (e.g. smalltalk / player asks about NPC activity) using a separate Lua definition and authored response pool, optionally an EN/TL shard entry. No central intent/resolver special-casing; compare before/after real PZ traces.
+7. **Single source of truth:** the flow declares semantic meaning and response references; translation files contain localized prose only; the semantic GUI previews/edits definitions using the validated production registry. Do not create a second JSON executor.
+8. **Diagnostics:** report candidate eligibility, flow selection/transition, chosen response pool/template, fallbacks and authoritative effects. Check native SP/MP first, then add focused worker tests only for a demonstrated gap.
 
-## Minimal contract
-- **Registry:** stable unique IDs, bounded rule count, explicit trigger frames, compile-time validation for unsupported IDs, missing nodes, duplicate transitions, unreachable states, slot schemas and conflicting owners.
-- **Candidates:** optional backwards-compatible Core multi-candidate inspection (or existing diagnostics extended) with provenance/confidence, exact/fuzzy distinction, typed captures, clear negative/positive eligibility and deterministic limits; maintain existing `Parse` behavior for other consumers.
-- **Arbitration:** hard authority/confidence guard -> active qualified obligation -> explicit safe topic switch/interrupt -> eligible global candidate -> clarification/fallback. A context bonus cannot make an invalid identity capture valid. Ties produce deterministic explanation or safe clarification, not a mutating guess.
-- **State:** reuse `PNC_SemanticDialogueContextState` and Core DialogueState rather than another ModData transcript; bounded `flowId`, `nodeId`, speaker/addressee, typed slots, pending obligations and small suspend stack with expiration/retirement. Cross-speaker and group state isolation required.
-- **Lifecycle:** PREVIEW returns candidates, reasons, selected flow/node and potential reply but **no message queue, network transport, context advance or relationship change**. Submit/accepted commits once, through current authoritative command and response lifecycle.
-- **Response:** the flow emits existing response-catalog pool/variant IDs or a typed dialogue-act plan. The catalog selects contextual wording; translation maps a stable key to localized text; optional PBrainZ may rephrase but cannot decide authority.
-- **Interruption semantics:** the committed `im fine thanks`/name fix is the minimum; general `REFUSE` intent should be scoped to which active question is refused, not automatically a standing identity refusal if multiple flows coexist.
-
-## Minimum pilot
-1. Identity pending; player asks `are you okay`; wellbeing flow takes turn, identity suspends.
-2. NPC answers and asks after player; player says `im fine thanks`; wellbeing accepted without identity/evasion request.
-3. Player later says `My name is Patrick`; qualified identity claim validated by existing server service.
-4. Preview twice, submit once; one transcript step and at most one authorized outcome.
-5. A named second NPC must not inherit the first NPC's pending identity or status.
-6. English and Tagalog keep stable response IDs and correct placeholders.
-
-Do not design a general mission scripting DSL, exhaustive English grammar or whole-drama manager from this pilot.
+## Implementation sequence
+- After deployed Core handshake and native baseline, integrate response selection at the existing policy/response boundary with a small compatibility adapter. Avoid rewriting all social/command branches.
+- Migrate identity and wellbeing behavior while keeping their real game decisions and keys unchanged.
+- Add a third simple flow proving future extensibility.
+- Only then expand graphical authoring and multi-act response realization.

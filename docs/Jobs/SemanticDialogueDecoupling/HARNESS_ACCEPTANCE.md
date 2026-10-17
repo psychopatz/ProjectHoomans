@@ -1,33 +1,28 @@
-# Semantic Lab is mandatory — genuine production Lua behavior
+# Acceptance protocol — LIVE PZ first, Semantic Lab supporting
 
-`tools/semantic_harness/` loads real production PsychopatzCore/PNC semantic and translation modules via a persistent Lua worker, while mocking Project Zomboid UI/world/server edges. It is the primary headless integration acceptance instrument, **not** proof of native SP/MP.
+The primary product is a Project Zomboid Build 42 NPC conversation. A real production-Lua worker is useful for isolated parser/state/catalog questions; its mocked UI, network, world, relation and scheduler do **not** prove that the game behaves correctly.
 
-## Baseline commands (run in actual local checkout)
-```bash
-tools/semantic_harness/run_harness.sh --doctor --doctor-json
-python3 -m unittest tools.semantic_harness.tests.test_semantic_identity_wellbeing_collision -v
-python3 -m unittest discover -s tools/semantic_harness/tests -v
-tools/semantic_harness/run_harness.sh --test pnc_semantic
-python3 tests/run_tests.py pnc_semantic --harness-report /tmp/semantic-decoupling-regression.json
-```
-Confirm Core dependency SHA, Lua/Python versions and loaded production module manifest. Inspect tests/run_tests.py or suite instructions before adapting commands. A report `conflicts=[]` or passing JSON syntax does NOT establish semantic success.
+## Evidence hierarchy
+1. **Actual installed Hoomans/Core compatibility**: check the exact scripts loaded by native PZ and runtime capability handshake.
+2. **Controlled native PZ SP/MP**: correct text, current flow/next step, authority, localization, session and gameplay effects.
+3. **Focused production Lua worker / Core unit tests**: contract-level regression support, never the only evidence for user-visible acceptance.
+4. **Pure Python/JSON/static fixtures**: data and registration validity only.
 
-## Required permanent protected regression
-Run ONE persistent worker dialogue: NPC name obligation -> `are you okay` -> NPC reciprocal wellbeing response -> `im fine thanks`; record exact IR, provenance pattern, chosen branch/response and localized text, pending identity lifecycle, `contextBefore`/`contextAfter`, `transport`, `toolCalls`, relationship effects, `llmCalls`, `loadedModules`. Also test:
-- `I'm fine, thank you`, `I'm hungry`, a second nearby NPC, unrelated question and explicit identity resumption.
-- `My name is Patrick` and `I'm Patrick` (valid true name when profile matches), false explicit name, qualified explicit refusal, and ambiguous context-specific `no`.
-- PREVIEW twice versus accepted SUBMIT once, with no duplicate identity or task effects.
-- Adversarial new semantic flow overlapping identity/command grammar, and fuzzy unauthorized task/relationship actions.
-- EN/TL real response-key and text lookup via instrumented `Translations.lua`; missing TL fallback diagnostics.
+## Live trace requirements
+Opt-in in-game diagnostics should show the **production** IR/candidate ID, eligibility/rejection reason, selected flow/node/transition, response-pool ID and final template key/text, before/after pending obligations, speaker/addressee, actual server request/result, language and Core feature handshake. Debug UI/logging must be rate-bounded and normally disabled.
 
-## Flow acceptance
-Every new/migrated flow must show actual loaded source module, trigger, candidate list/rejected reasons (once available), winner, current node, transition, response key, semantic state changes, and **absence of unintended authoritative request**. Semantic Lab GUI/inspector should display the same values reported by headless worker, not compute its own parallel policy. Authoring must be flow Lua + real module registration; fixtures may be JSON but *never* the implementation itself.
+## High-value controlled native conversations
+- Identity requested -> player asks `are you okay` -> player `im fine thanks` -> identity resumes -> explicit true or false name; no unintended evasion action.
+- `I'm hungry`, `I'm fine, thank you`, context-sensitive `no` and meaningful follow-ups; grounded NPC health/needs, not worker fake values.
+- One additional pilot flow created without changing the central intent policy, selecting actual contextual response and next node.
+- EN/TL real mod-installed translation shards, restart and missing-key fallbacks; composed two-act reply when implemented.
+- Two NPCs, SP and MP (server authority, no duplicate transport, per-speaker isolation, save/rejoin).
+- Provider disabled, then optional PBrainZ with identical semantic authority.
 
-## Translation acceptance
-Exact key/value/placeholder parity, EN/TL per-shard ownership, duplicate failure, lazy load behavior through the actual Core manager, language switching and fallback warnings. Run unit and real worker integration tests, not Python-only dictionaries. Any user-facing modification must be checked in both languages.
+## Existing headless evidence and failures
+Historical progress reports real-worker suites 97/97 Python and 68/68 Lua, but the full headless Lua suite 12/836 fails in existing UI/native-associated paths. Core legacy translation-catalog test reports count 316 vs 334 after unrelated edits. Keep them classified **unresolved**; do not hide, delete, or auto-exempt. Reproduce and tie a failure to a genuine missing native/mock dependency before deciding whether to adapt it. No new giant JSON-only suite just to increase pass counts.
 
-## Native acceptance
-Real game B42 singleplayer and multiplayer (when applicable) must separately establish NPC reply/interaction, server identity/relationship admission, delayed provider events, multi-speaker context, native translation/load/restart, and per-NPC overhead. A present PZ process or a mocked Semantic Lab network result does not close this gate.
+Worker acceptance may demonstrate pure preview vs commit, candidate bounds, duplicate registration, translation key/value parity, and response-plan rendering. These are necessary but **not sufficient** for live completion.
 
-## Evidence
-For every Next Chunk: exact Hoomans+Core SHAs, scenario IDs, commands, Lua/Python/PZ versions, observed IR and outputs, before/after state/action data, pass/fail/skipped, perf when relevant, native/SP/MP status, and updated PROGRESS. Do not assert 90/90 or 66/66 as freshly rerun without actual output.
+## Reporting
+For each corrective phase: exact Hoomans/Core SHA and **installed version**; environment/game build; exact test commands or live steps; observed actual game text/IR/node/transport; expected vs actual; pass/fail/skipped; untested MP and performance; next chunk. Never claim native tests passed from worker trace, PZ source verifier, user spot-check alone, or the absence of new errors.

@@ -1,23 +1,24 @@
-# Unified semantic decoupling agent — operating rules
+# Unified semantic decoupling agent — corrective execution
 
-## Working target and publication
-Use the user's **existing authorized Project Hoomans checkout** and verify its actual branch, HEAD, status, upstream, Core dependencies and other agent ownership before any edit. Do not create new feature branches/PRs by default; the user explicitly prefers direct authorized `main` changes. **Direct main publication is permitted only as a safe fast-forward based on a freshly checked expected SHA and applicable repository permissions.** Never force push, destructively reset, stash others' work, create a replacement checkout over working files, or use ambiguous `git pull`.
-For changes to **PsychopatzCore**, verify repository-specific permissions and the dependency deployment; this Hoomans goal does not silently grant Core main authorization.
+## One goal, existing checkout, main publication
+- Work in the user's existing authorized Project Hoomans checkout. Inspect actual `git status`, HEAD, branch, remotes/upstream, installed Workshop mod path(s), and related PsychopatzCore local/remote state before writing. GitHub remote cleanliness does **not** prove a local worktree is clean.
+- The user does not want new branches or PRs; never create one by default. Hoomans direct `main` commits/pushes are allowed only by safe, authorized, current-expected-SHA fast-forward. No force, destructive reset, stash of others' changes, ambiguous `git pull`, or overwrite of a divergent checkout.
+- Core is a separate repository: verify Core-specific permissions, remote divergence, the agent's unpublished commits and unrelated radio/UI/asset changes. Do not presume the current Hoomans publication authorization applies to Core. Stage/commit only owned files; if Core publication is unsafe, provide a precise non-destructive integration plan.
+- Update only `docs/Jobs/SemanticDialogueDecoupling/PROGRESS.md` as the active ledger. Earlier implementation report is archived in `IMPLEMENTATION_EVIDENCE.md`; other Jobs' progress remains read-only.
 
-## One goal and concurrency
-One `docs/Jobs/SemanticDialogueDecoupling/PROGRESS.md`, one `ROADMAP.md`, one `GOAL_PROMPT.md`. Chapters for parser, flow, translation, authored dialogue and harness all belong to this goal. `docs/Jobs/ContextualSemanticIntelligence` is historical accepted evidence with native checks still open, not this goal's progress ledger. Never spawn competing goal ledgers simply to separate code subsystems.
-
-## Execution loop
-Read root `AGENTS.md`, this job's AUDIT/ARCHITECTURE/FLOW_CONTRACT/TRANSLATION_MIGRATION/ROADMAP/HARNESS_ACCEPTANCE/PROGRESS, then actual production code. Execute exactly ONE Next Chunk, using existing modules and preserving the freshly committed identity safety fix. Execute focused real-Lua tests, broader semantic suites and targeted native PZ scenarios where required. Update only this PROGRESS with revision+evidence and one new Next Chunk. Make coherent direct-main commits **only after safe HEAD/status checks and user/repo policy authorization**; if divergent/uncommitted overlap exists, stop and report rather than overwrite.
+## Execution
+1. Read `AUDIT.md`, `ARCHITECTURE.md`, `FLOW_CONTRACT.md`, `TRANSLATION_MIGRATION.md`, `DEPLOYMENT_ACCEPTANCE.md`, `ROADMAP.md`, `HARNESS_ACCEPTANCE.md`, `PROGRESS.md`; check current production code and actual installed files.
+2. Execute **only the current Next Chunk**. Start with C0A dependency and installed-pair audit. Do not repeat completed flow/kernel/shard implementation and do not launch a broad refactor before the C0 compatibility gate.
+3. Prefer real-game reproduction and low-volume in-game diagnostic instrumentation for presentation/authority/flow claims; use focused production Lua worker for local pure contracts or regressions. If native game cannot be controlled, document the exact blocker and small user-runnable live checklist; never simulate successful SP/MP.
+4. Check each bounded change's effect on identity wellbeing regression, server authority, persistent flow state, EN/TL translation, existing Core consumers and (when applicable) multiplayer transport. Keep tests meaningful, not a count target.
+5. Record exact SHAs and installed file source, command/live steps, actual outputs, pass/fail/not-tested, persistent headless failures and next single bounded chunk; commit coherently after safe publication checks. Advance C0A -> C0B only after a defensible measured gate, and through ROADMAP thereafter.
 
 ## Invariants
-- Offline Lua first; no PBrainZ requirement for any basic dialogue action; provider may not bypass game authority.
-- Parser or flow is never server authority. Keep existing identity, trust, tasks, inventory, MarketSense and MP lease/replay checks.
-- Avoid new monolithic policy/translation files, Jess clones, global runtime WordNet scans, full-NPC-tick grammar runs or a second transcript datastore.
-- Keep new Flow behavior in bounded small Lua modules, translation in keyed EN/TL fragments, and in-game UI loaded from the Build 42 runtime conventions.
-- Never use `pcall`/`xpcall` for normal program logic; follow repository `AGENTS.md`.
-- Avoid temporary staging **directories** under live watched `Contents/mods/**/media` trees.
-- Never claim CI, native SP/MP or live provider acceptance from a mocked worker, stale report or JSON syntax alone.
+- Existing deterministic offline Lua remains available without PBrainZ; no conversational flow or parser bypasses authoritative server identity, relationship, task, inventory or MarketSense policy.
+- Core APIs and IR v1, existing response IDs/network payloads, multilingual keys, native PZ Translate and authored conversation bundles remain stable.
+- No new monolith, duplicate parser/state store, Jess-like rule port, global WordNet runtime, per-NPC OnTick semantic scan, or extra standalone job.
+- Flow preview is pure; accepted turn commits once; each NPC/addressee has bounded isolated state.
+- No temporary staging directories under watched live `media/`. Follow repository `AGENTS.md` with protected calls and file watchers.
 
-## Stop conditions
-A proven unsafe divergent checkout, missing required authorization, unresolvable missing dependency/runtime, or required shared-file ownership conflict is a true blocker. Finishing an individual chunk is not a reason to stop the job if mandatory phases remain. After all mandatory gates are evidenced, set maintenance-ready rather than creating more features.
+## True blockers and completion
+A missing native game control surface blocks the **native acceptance gate**, not safe independent documentation or Core compatibility checks. Unsafe divergence/unauthorized Core push is a real publication blocker; report it, don't bypass. Completion requires the C0–C6 gates with real SP/MP evidence, not headless green tests or an unchanged failure count. Once mandatory gates pass, set maintenance-ready and stop.
