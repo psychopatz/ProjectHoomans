@@ -16,6 +16,9 @@ PNC.Translation = PNC.Translation or {}
 local Translation = PNC.Translation
 local Scope = CustomTranslationManager.forMod("ProjectHoomans")
 local BASE_PATH = "media/translation"
+local MANIFESTS = {
+    Conversation = "manifests/Conversation.json",
+}
 
 local SYSTEMS = {
     "Character", "CommandHub", "Conversation", "Debug", "Discovery",
@@ -29,7 +32,11 @@ local SEGMENT_SYSTEMS = Translation.Internal.SegmentSystems
 Translation.Systems = Translation.Systems or {}
 for _, systemName in ipairs(SYSTEMS) do
     if not Translation.Systems[systemName] then
-        Translation.Systems[systemName] = Scope.registerSystem(systemName, BASE_PATH)
+        Translation.Systems[systemName] = Scope.registerSystem(
+            systemName,
+            BASE_PATH,
+            MANIFESTS[systemName]
+        )
     end
 end
 

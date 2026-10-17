@@ -1,0 +1,15 @@
+{
+  "UI_PNC_Journal_ConsumableDual": "Consumed %1 (+%2% hunger, +%3% thirst relief)",
+  "UI_PNC_Journal_DrinkConsumed": "Drank %1 (+%2% thirst relief)",
+  "UI_PNC_Journal_Empty": "No recorded history yet",
+  "UI_PNC_Journal_EntryCount": "%1 entries",
+  "UI_PNC_Journal_FoodConsumed": "Ate %1 (+%2% hunger)",
+  "UI_PNC_Journal_SkillLevelUp": "Reached %1 level %2",
+  "UI_PNC_Journal_Time": "Day %1 %2:%3",
+  "UI_PNC_Journal_Title": "COLONIST JOURNAL",
+  "UI_PNC_Journal_Unknown": "Recorded event: %1",
+  "UI_PNC_Journal_WaterRefillDrank": "Drank from filled %1 (thirst cleared)",
+  "UI_PNC_Journal_WaterRefilled": "Filled %1 (+%2 L)",
+  "UI_PNC_Journal_Wounded": "Received %1 to %2 (%3 damage)"
+}
+

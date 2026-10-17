@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "languages": {
+    "EN": [
+      "EN/Conversation/Flavor/Address.json",
+      "EN/Conversation/Flavor/Combat.json",
+      "EN/Conversation/Flavor/Social.json",
+      "EN/Conversation/Flavor/VanillaEmote.json",
+      "EN/Conversation/Flavor/WorldActions.json",
+      "EN/Conversation/Identity/Responses.json",
+      "EN/Conversation/Journal/Events.json",
+      "EN/Conversation/PBrainZ/Interface.json",
+      "EN/Conversation/Semantic/Responses.json",
+      "EN/Conversation/Telemetry/Diagnostics.json",
+      "EN/Conversation/ToolReplies/Commands.json",
+      "EN/Conversation/WorldEvents/Events.json"
+    ],
+    "TL": [
+      "TL/Conversation/Flavor/Address.json",
+      "TL/Conversation/Flavor/Combat.json",
+      "TL/Conversation/Flavor/Social.json",
+      "TL/Conversation/Flavor/VanillaEmote.json",
+      "TL/Conversation/Flavor/WorldActions.json",
+      "TL/Conversation/Identity/Responses.json",
+      "TL/Conversation/Journal/Events.json",
+      "TL/Conversation/PBrainZ/Interface.json",
+      "TL/Conversation/Semantic/Responses.json",
+      "TL/Conversation/Telemetry/Diagnostics.json",
+      "TL/Conversation/ToolReplies/Commands.json",
+      "TL/Conversation/WorldEvents/Events.json"
+    ]
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "UI_PNC_Journal_ConsumableDual": "Naubos %1 (+%2% gutom, +%3% ginhawa sa uhaw)",
+  "UI_PNC_Journal_DrinkConsumed": "Uminom ng %1 (+%2% ginhawa sa uhaw)",
+  "UI_PNC_Journal_Empty": "Wala pang naitalang kasaysayan",
+  "UI_PNC_Journal_EntryCount": "%1 entry",
+  "UI_PNC_Journal_FoodConsumed": "Ate %1 (+%2% gutom)",
+  "UI_PNC_Journal_SkillLevelUp": "Umabot sa %1 level %2",
+  "UI_PNC_Journal_Time": "Araw %1 %2:%3",
+  "UI_PNC_Journal_Title": "TALAAN NG KOLONISTA",
+  "UI_PNC_Journal_Unknown": "Naitala na kaganapan: %1",
+  "UI_PNC_Journal_WaterRefillDrank": "Uminom mula sa punong %1 (naalis ang uhaw)",
+  "UI_PNC_Journal_WaterRefilled": "Napunan %1 (+%2 L)",
+  "UI_PNC_Journal_Wounded": "Nakatanggap ng %1 hanggang %2 (%3 pinsala)"
+}
+

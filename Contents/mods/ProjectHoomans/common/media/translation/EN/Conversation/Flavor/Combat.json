@@ -1,0 +1,27 @@
+{
+  "UI_PNC_Flavor_AttackAuto_NPC_1": "I'll handle it.",
+  "UI_PNC_Flavor_AttackAuto_NPC_2": "I'll stay alert.",
+  "UI_PNC_Flavor_AttackAuto_NPC_3": "Leave it to me.",
+  "UI_PNC_Flavor_AttackAuto_Player_1": "{name}, use your best judgment.",
+  "UI_PNC_Flavor_AttackAuto_Player_2": "{name}, handle threats as you see fit.",
+  "UI_PNC_Flavor_AttackAuto_Player_3": "Watch our backs, {name}.",
+  "UI_PNC_Flavor_AttackMelee_NPC_1": "Going in close.",
+  "UI_PNC_Flavor_AttackMelee_NPC_2": "I'll take the front.",
+  "UI_PNC_Flavor_AttackMelee_NPC_3": "Keeping it quiet.",
+  "UI_PNC_Flavor_AttackMelee_Player_1": "{name}, keep it close.",
+  "UI_PNC_Flavor_AttackMelee_Player_2": "Take the front line, {name}.",
+  "UI_PNC_Flavor_AttackMelee_Player_3": "{name}, save your ammunition.",
+  "UI_PNC_Flavor_AttackNone_NPC_1": "I'll avoid trouble.",
+  "UI_PNC_Flavor_AttackNone_NPC_2": "I won't engage.",
+  "UI_PNC_Flavor_AttackNone_NPC_3": "Staying out of it.",
+  "UI_PNC_Flavor_AttackNone_Player_1": "{name}, stay out of the fight.",
+  "UI_PNC_Flavor_AttackNone_Player_2": "Avoid trouble, {name}.",
+  "UI_PNC_Flavor_AttackNone_Player_3": "{name}, don't engage unless I change the order.",
+  "UI_PNC_Flavor_AttackRanged_NPC_1": "I'll cover you.",
+  "UI_PNC_Flavor_AttackRanged_NPC_2": "Keeping my distance.",
+  "UI_PNC_Flavor_AttackRanged_NPC_3": "I've got a clear shot.",
+  "UI_PNC_Flavor_AttackRanged_Player_1": "{name}, keep your distance.",
+  "UI_PNC_Flavor_AttackRanged_Player_2": "Give us ranged cover, {name}.",
+  "UI_PNC_Flavor_AttackRanged_Player_3": "{name}, engage from a safe distance."
+}
+
