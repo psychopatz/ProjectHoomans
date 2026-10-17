@@ -31,6 +31,21 @@ local SPECIAL_TARGETS = {
     suspend = true,
 }
 
+local GATE_FIELDS = {
+    type = true,
+    field = true,
+    operator = true,
+    value = true,
+    reasonKey = true,
+    unknownReasonKey = true,
+    passReasonKey = true,
+    failReasonKey = true,
+    startHour = true,
+    endHour = true,
+    gates = true,
+    gate = true,
+}
+
 local function copyValue(value, depth)
     if type(value) ~= "table" then return value end
     depth = tonumber(depth) or 0
@@ -128,6 +143,32 @@ local function normalizeSlots(slots, label)
     return output
 end
 
+local function normalizeGate(gate, label)
+    if gate == nil then return nil end
+    if type(gate) ~= "table" then
+        return nil, label .. "_must_be_object"
+    end
+    local gateType = stringValue(gate.type)
+    if not gateType then return nil, label .. "_requires_type" end
+    local output = { type = gateType }
+    local key
+    local value
+    for key, value in pairs(gate) do
+        if not GATE_FIELDS[key] then
+            return nil, label .. "_unsupported_field:" .. tostring(key)
+        end
+        if key ~= "type" and type(value) ~= "string"
+            and type(value) ~= "number"
+            and type(value) ~= "boolean"
+            and type(value) ~= "table"
+        then
+            return nil, label .. "_field_invalid:" .. tostring(key)
+        end
+        output[key] = copyValue(value)
+    end
+    return output
+end
+
 local function normalizeNode(nodeID, node, nodes)
     if type(node) ~= "table" then
         return nil, "node_must_be_object:" .. tostring(nodeID)
@@ -138,7 +179,11 @@ local function normalizeNode(nodeID, node, nodes)
         responsePool = stringValue(node.responsePool),
         responseTemplate = stringValue(node.responseTemplate),
     }
-    local slots, reason = normalizeSlots(node.slots, "node_slots")
+    local gate, reason = normalizeGate(node.gate, "node_gate")
+    if node.gate ~= nil and not gate then return nil, reason end
+    output.gate = gate
+    local slots
+    slots, reason = normalizeSlots(node.slots, "node_slots")
     if not slots then return nil, reason .. ":" .. tostring(nodeID) end
     output.slots = slots
 
@@ -170,7 +215,10 @@ local function normalizeNode(nodeID, node, nodes)
         output.accepts = {}
     end
 
-    local fields = { "next", "onMatch", "onUnrelated", "onRefuse" }
+    local fields = {
+        "next", "onMatch", "onUnrelated", "onRefuse",
+        "onPass", "onFail", "onUnknown",
+    }
     local index
     local field
     local target
@@ -184,12 +232,14 @@ local function normalizeNode(nodeID, node, nodes)
         end
         output[field] = target
     end
-    if not output.terminal and #output.accepts == 0 then
+    if not output.terminal and #output.accepts == 0 and not output.gate then
         return nil, "nonterminal_node_requires_accepts:" .. tostring(nodeID)
     end
     if not output.terminal
         and not output.next and not output.onMatch
         and not output.onUnrelated and not output.onRefuse
+        and not output.onPass and not output.onFail
+        and not output.onUnknown
     then
         return nil, "nonterminal_node_requires_transition:" .. tostring(nodeID)
     end
@@ -209,7 +259,10 @@ local function validateReachability(nodes, initial)
             seen[nodeID] = true
             node = nodes[nodeID]
             if node then
-                for _, field in ipairs({ "next", "onMatch", "onRefuse" }) do
+                for _, field in ipairs({
+                    "next", "onMatch", "onRefuse",
+                    "onPass", "onFail", "onUnknown",
+                }) do
                     target = node[field]
                     if target and not SPECIAL_TARGETS[target]
                         and not seen[target]

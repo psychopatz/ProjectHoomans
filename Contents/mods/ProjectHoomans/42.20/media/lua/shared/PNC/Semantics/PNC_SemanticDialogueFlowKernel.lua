@@ -5,6 +5,7 @@
 PNC = PNC or {}
 PNC.Semantics = PNC.Semantics or {}
 
+local Rules = require "PNC/Conversation/Blocks/PNC_ConversationRules"
 local Registry = require
     "PNC/Semantics/PNC_SemanticDialogueFlowCatalog"
 
@@ -109,6 +110,58 @@ end
 
 local function nodeFor(flow, nodeID)
     return flow and flow.nodes and flow.nodes[nodeID] or nil
+end
+
+local function gateResult(flow, node, context)
+    if not node or not node.gate then return nil end
+    local status
+    local reason
+    if type(Rules.EvaluateGateStatus) == "function" then
+        status, reason = Rules.EvaluateGateStatus(node.gate, context)
+    else
+        return {
+            nodeId = node.id,
+            type = node.gate.type,
+            status = "UNKNOWN",
+            reason = "gate_evaluator_unavailable",
+        }
+    end
+    return {
+        nodeId = node.id,
+        type = node.gate.type,
+        status = status,
+        reason = reason,
+    }
+end
+
+local function gatedTarget(flow, nodeID, context)
+    local currentID = nodeID
+    local current = nodeFor(flow, currentID)
+    local lastGate
+    local seen = {}
+    while current and current.gate do
+        if seen[currentID] then
+            return currentID, {
+                nodeId = currentID,
+                type = current.gate.type,
+                status = "UNKNOWN",
+                reason = "gate_cycle",
+            }
+        end
+        seen[currentID] = true
+        lastGate = gateResult(flow, current, context)
+        local field = lastGate.status == "PASS" and "onPass"
+            or lastGate.status == "FAIL" and "onFail" or "onUnknown"
+        local target = current[field]
+        if not target or target == "cancel"
+            or target == "resume" or target == "suspend"
+        then
+            return currentID, lastGate
+        end
+        currentID = target
+        current = nodeFor(flow, currentID)
+    end
+    return currentID, lastGate
 end
 
 local function transitionTarget(node, intent)
@@ -246,6 +299,12 @@ local function addMatch(preview, match, transition, fromNodeID, toNodeID)
     preview.diagnostics.toNodeId = toNodeID
 end
 
+local function attachGate(preview, gate)
+    if not gate then return end
+    preview.gate = copyValue(gate)
+    preview.diagnostics.gate = copyValue(gate)
+end
+
 local function finalizePreview(preview)
     -- Slot extraction uses the IR only while building the preview. Do not
     -- duplicate the complete IR inside every flow diagnostic/result.
@@ -271,6 +330,8 @@ function Kernel.Preview(ir, state, context, options)
     local matched = activeMatch(session, ir)
     if matched then
         local target = transitionTarget(matched.node, ir and ir.intent)
+        local gate
+        target, gate = gatedTarget(matched.flow, target, context)
         addMatch(
             preview,
             matched,
@@ -278,6 +339,7 @@ function Kernel.Preview(ir, state, context, options)
             matched.active.nodeId,
             target or "complete"
         )
+        attachGate(preview, gate)
         preview.slotValues = slotValues(matched.flow, matched.node, ir)
         return finalizePreview(preview)
     end
@@ -304,6 +366,8 @@ function Kernel.Preview(ir, state, context, options)
     local resumed = suspendedMatch(session, ir)
     if resumed then
         local target = transitionTarget(resumed.node, ir and ir.intent)
+        local gate
+        target, gate = gatedTarget(resumed.flow, target, context)
         addMatch(
             preview,
             resumed,
@@ -311,6 +375,7 @@ function Kernel.Preview(ir, state, context, options)
             resumed.active.nodeId,
             target or "complete"
         )
+        attachGate(preview, gate)
         preview.suspendedIndex = resumed.index
         preview.slotValues = slotValues(resumed.flow, resumed.node, ir)
         return finalizePreview(preview)
@@ -320,19 +385,24 @@ function Kernel.Preview(ir, state, context, options)
     preview.diagnostics.candidateFlows = triggered
     if triggeredID then
         local flow = Registry.Get(triggeredID)
-        local node = nodeFor(flow, flow.initial)
+        local target
+        local gate
+        target, gate = gatedTarget(flow, flow.initial, context)
+        local node = nodeFor(flow, target)
         preview.matched = true
         preview.transition = active and active.flowId ~= triggeredID
             and "interrupt_start" or "start"
         preview.flowId = flow.id
-        preview.fromNodeId = active and active.nodeId or nil
-        preview.toNodeId = flow.initial
-        preview.nodeId = flow.initial
+        preview.fromNodeId = gate and flow.initial
+            or (active and active.nodeId or nil)
+        preview.toNodeId = target
+        preview.nodeId = target
         preview.responsePool = node and node.responsePool or nil
         preview.responseTemplate = node and node.responseTemplate or nil
         preview.diagnostics.reason = preview.transition
         preview.diagnostics.flowId = flow.id
-        preview.diagnostics.toNodeId = flow.initial
+        preview.diagnostics.toNodeId = target
+        attachGate(preview, gate)
         return finalizePreview(preview)
     end
 
@@ -404,6 +474,17 @@ function Kernel.Commit(preview, ir, state, context, options)
     if preview.transition == "start"
         or preview.transition == "interrupt_start"
     then
+        local previewFlow = Registry.Get(preview.flowId)
+        local previewNode = previewFlow
+            and nodeFor(previewFlow, preview.toNodeId) or nil
+        if previewNode and previewNode.terminal then
+            -- A terminal gated branch is a response-only route. It must not
+            -- create or interrupt a longer-lived flow session.
+            result.status = "retired"
+            result.active = session and copyValue(session.active) or nil
+            result.suspended = session and copyValue(session.suspended) or {}
+            return result
+        end
         if not session then
             session = newSession(preview, sequence)
         elseif preview.transition == "interrupt_start" then

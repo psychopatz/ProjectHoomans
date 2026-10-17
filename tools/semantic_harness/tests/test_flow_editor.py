@@ -40,7 +40,7 @@ class FlowEditorTests(unittest.TestCase):
             catalog = worker.flow_catalog()
             self.assertEqual(
                 [flow["id"] for flow in catalog["flows"]],
-                ["identity", "wellbeing", "greeting"],
+                ["identity", "wellbeing", "weather_context", "greeting"],
             )
             greeting = next(flow for flow in catalog["flows"] if flow["id"] == "greeting")
 

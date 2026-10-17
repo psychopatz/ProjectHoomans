@@ -82,5 +82,8 @@
   "UI_PNC_Conversation_Semantic_FlowGreetingOpeningQuestionFriendly": "How have you been holding up?",
   "UI_PNC_Conversation_Semantic_FlowGreetingOpeningQuestion": "How have you been?",
   "UI_PNC_Conversation_Semantic_FlowGreetingFollowupFriendly": "You're welcome. It's good to see you too.",
-  "UI_PNC_Conversation_Semantic_FlowGreetingFollowup": "You're welcome. Take care."
+  "UI_PNC_Conversation_Semantic_FlowGreetingFollowup": "You're welcome. Take care.",
+  "UI_PNC_Conversation_Semantic_FlowWeatherRaining": "It is raining right now. I would wait for a break.",
+  "UI_PNC_Conversation_Semantic_FlowWeatherClear": "The weather looks clear right now.",
+  "UI_PNC_Conversation_Semantic_FlowWeatherUnknown": "I cannot confirm the weather from here."
 }

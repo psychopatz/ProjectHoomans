@@ -1,47 +1,68 @@
 local Rules = PNC.Conversation.Rules
 local Registry = PNC.Conversation.Registry
 
-local function invokeCondition(handler, context, gate)
+local function invokeConditionStatus(handler, context, gate)
     local ok
     local passed
     local reason
     if handler.builtin == true then
-        return handler.evaluate(context, gate)
+        passed, reason = handler.evaluate(context, gate)
+    else
+        -- Registered addon callbacks are isolated failure boundaries.
+        ok, passed, reason = pcall(handler.evaluate, context, gate)
+        if not ok then return "FAIL", "condition_handler_error" end
     end
-    -- Registered addon callbacks are isolated failure boundaries.
-    ok, passed, reason = pcall(handler.evaluate, context, gate)
-    if not ok then return false, "condition_handler_error" end
-    return passed == true, reason
+    if passed == true then return "PASS", reason end
+    if passed == false then return "FAIL", reason end
+    return "UNKNOWN", reason or "condition_unknown"
 end
 
-local function evaluateAny(gate, context)
-    local child
-    local passed
-    for _, child in ipairs(gate.gates or {}) do
-        passed = Rules.EvaluateGate(child, context)
-        if passed then return true end
+local function invertStatus(status)
+    if status == "PASS" then return "FAIL" end
+    if status == "FAIL" then return "PASS" end
+    return "UNKNOWN"
+end
+
+local function evaluateGateStatus(gate, context)
+    local handler
+    local status
+    local reason
+    local sawUnknown = false
+    if type(gate) ~= "table" then return "FAIL", "invalid_gate" end
+    if gate.type == "all" then
+        for _, child in ipairs(gate.gates or {}) do
+            status, reason = evaluateGateStatus(child, context)
+            if status == "FAIL" then return status, reason end
+            if status == "UNKNOWN" then sawUnknown = true end
+        end
+        return sawUnknown and "UNKNOWN" or "PASS", reason
     end
-    return false, gate.reasonKey or "no_gate_matched"
+    if gate.type == "any" then
+        for _, child in ipairs(gate.gates or {}) do
+            status, reason = evaluateGateStatus(child, context)
+            if status == "PASS" then return status, reason end
+            if status == "UNKNOWN" then sawUnknown = true end
+        end
+        return sawUnknown and "UNKNOWN" or "FAIL", reason
+    end
+    if gate.type == "not" then
+        status, reason = evaluateGateStatus(gate.gate, context)
+        return invertStatus(status), reason
+    end
+    handler = Registry.conditionHandlers[gate.type]
+    if not handler then return "FAIL", "unknown_condition" end
+    status, reason = invokeConditionStatus(handler, context or {}, gate)
+    if status == "PASS" then return status, reason or "gate_passed" end
+    return status, gate.reasonKey or reason or "gate_failed"
 end
 
 function Rules.EvaluateGate(gate, context)
-    local handler
-    local passed
-    local reason
-    if type(gate) ~= "table" then return false, "invalid_gate" end
-    if gate.type == "all" then
-        return Rules.EvaluateAll(gate.gates, context)
-    end
-    if gate.type == "any" then return evaluateAny(gate, context) end
-    if gate.type == "not" then
-        passed = Rules.EvaluateGate(gate.gate, context)
-        return not passed, gate.reasonKey
-    end
-    handler = Registry.conditionHandlers[gate.type]
-    if not handler then return false, "unknown_condition" end
-    passed, reason = invokeCondition(handler, context or {}, gate)
-    if passed then return true end
-    return false, gate.reasonKey or reason or "gate_failed"
+    local status, reason = evaluateGateStatus(gate, context)
+    return status == "PASS", reason
+end
+
+function Rules.EvaluateGateStatus(gate, context)
+    return evaluateGateStatus(gate, context)
 end
 
 function Rules.EvaluateAll(gates, context)

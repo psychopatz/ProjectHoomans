@@ -7,6 +7,7 @@ local Registry = require
 local definitions = {
     require "PNC/Semantics/PNC_SemanticDialogueFlow_Identity",
     require "PNC/Semantics/PNC_SemanticDialogueFlow_Wellbeing",
+    require "PNC/Semantics/PNC_SemanticDialogueFlow_Weather",
     require "PNC/Semantics/PNC_SemanticDialogueFlow_Greeting",
 }
 

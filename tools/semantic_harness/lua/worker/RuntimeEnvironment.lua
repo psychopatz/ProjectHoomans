@@ -124,13 +124,41 @@ function RuntimeEnvironment.configure(context)
     }
     local climate = {
         getPrecipitationIntensity = function()
-            return world.weather == "rain" and 0.8 or 0
+            if world.weather == "rain" then return 0.8 end
+            if world.weather == "clear" or world.weather == "fog"
+                or world.weather == "snow"
+            then
+                return 0
+            end
+            return nil
         end,
-        isRaining = function() return world.weather == "rain" end,
+        isRaining = function()
+            if world.weather == "rain" then return true end
+            if world.weather == "clear" or world.weather == "fog"
+                or world.weather == "snow"
+            then
+                return false
+            end
+            return nil
+        end,
         getFogIntensity = function()
-            return world.weather == "fog" and 0.8 or 0
+            if world.weather == "fog" then return 0.8 end
+            if world.weather == "clear" or world.weather == "rain"
+                or world.weather == "snow"
+            then
+                return 0
+            end
+            return nil
         end,
-        isFoggy = function() return world.weather == "fog" end,
+        isFoggy = function()
+            if world.weather == "fog" then return true end
+            if world.weather == "clear" or world.weather == "rain"
+                or world.weather == "snow"
+            then
+                return false
+            end
+            return nil
+        end,
         getTemperature = function() return 20 end,
     }
 

@@ -67,6 +67,12 @@ local function semanticTranslationKey(response)
             "UI_PNC_Conversation_Semantic_FlowGreetingFollowupFriendly",
         ["semantic.flow.greeting.followup.default"] =
             "UI_PNC_Conversation_Semantic_FlowGreetingFollowup",
+        ["semantic.flow.weather.raining.default"] =
+            "UI_PNC_Conversation_Semantic_FlowWeatherRaining",
+        ["semantic.flow.weather.clear.default"] =
+            "UI_PNC_Conversation_Semantic_FlowWeatherClear",
+        ["semantic.flow.weather.unknown.default"] =
+            "UI_PNC_Conversation_Semantic_FlowWeatherUnknown",
         ["semantic.social.compliment.default"] =
             "UI_PNC_Conversation_Semantic_ComplimentDefault",
         ["semantic.social.compliment.alternate"] =

@@ -108,6 +108,26 @@ local function historyMatches(context, gate)
     return true
 end
 
+local function weatherMatches(context, gate)
+    context = type(context) == "table" and context or {}
+    local world = type(context.worldContext) == "table"
+        and context.worldContext or {}
+    local weather = type(world.weather) == "table"
+        and world.weather or {}
+    local field = tostring(gate.field or "raining")
+    local actual = weather[field]
+    if actual == nil then
+        return nil, gate.unknownReasonKey or "weather_unknown"
+    end
+    local matches = Internal.Compare(
+        actual, gate.operator or "==", gate.value
+    )
+    if matches then
+        return true, gate.passReasonKey or "weather_matches"
+    end
+    return false, gate.failReasonKey or "weather_mismatch"
+end
+
 local BUILTINS = {
     ["pnc:skill"] = function(context, gate)
         return Internal.Compare(
@@ -142,6 +162,7 @@ local BUILTINS = {
     end,
     ["pnc:time"] = timeMatches,
     ["pnc:history"] = historyMatches,
+    ["pnc:weather"] = weatherMatches,
     ["pnc:base_not_established"] = function(context)
         return context.baseEstablished ~= true
     end,
