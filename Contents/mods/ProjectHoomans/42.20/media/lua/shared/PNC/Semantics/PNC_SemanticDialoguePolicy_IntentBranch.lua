@@ -32,7 +32,7 @@ return function(dependencies)
         local branch = "SOCIAL_ACKNOWLEDGED"
         local reason = "semantic_acknowledgement"
         -- A pending identity answer is a conversational obligation. Resolve
-        -- a name claim or topic evasion before generic intent routes can
+        -- a name claim or explicit refusal before generic intent routes can
         -- consume self-state reports, questions, or other social turns.
         if isIdentityClaim(ir) then
             branch = "IDENTITY_CLAIM_RECEIVED"

@@ -253,21 +253,22 @@ T.equal(exchangeContext:ToContext().pendingIdentityExchange.kind,
     "PLAYER_NAME",
     "identity question creates a bounded player-name obligation")
 exchangeContext:RecordTurn(selfHunger, { speaker = "player" })
-T.falsy(exchangeContext:ToContext().pendingIdentityExchange,
-    "a subsequent topic turn retires the pending name obligation")
+T.equal(exchangeContext:ToContext().pendingIdentityExchange.kind,
+    "PLAYER_NAME",
+    "a topic interruption preserves the pending name obligation")
 T.truthy(IdentityExchange.NamesEqual("Patrick", "patrick"),
     "identity validation compares names case-insensitively")
 T.falsy(IdentityExchange.NamesEqual("Patrick", "Patricia"),
     "identity validation rejects a different exact name")
 
-local identityEvasion = Policy.Decide(selfHunger, state, {
+local identityEvasion = Policy.Decide(Parser.Parse("no"), state, {
     llmEnabled = false,
     npcID = "mara-identity-evasion",
     pendingIdentityExchange = { kind = "PLAYER_NAME", requestedAt = 1 },
     socialStyle = "friendly",
 })
 T.equal(identityEvasion.branch, "IDENTITY_NAME_EVASION",
-    "changing topics while a name answer is pending is an identity evasion")
+    "an explicit refusal while a name answer is pending is identity evasion")
 T.equal(identityEvasion.response.templateID,
     "semantic.identity.evasion.friendly",
     "identity evasion uses the relationship-aware disappointment response")

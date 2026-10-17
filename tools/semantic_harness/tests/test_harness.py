@@ -312,20 +312,25 @@ class SemanticHarnessTests(unittest.TestCase):
             for message in result["messages"]
         ))
 
-    def test_topic_change_after_name_question_costs_trust_and_stays_wary(self) -> None:
+    def test_topic_change_after_name_question_preserves_pending_exchange(self) -> None:
         with LuaSemanticWorker(merge({}, DEFAULT_SCENARIO)) as worker:
             worker.input("what is your name")
             result = worker.input("I'm starving")
             follow_up = worker.input("what is your name")
-        self.assertEqual(result["result"]["decision"]["branch"], "IDENTITY_NAME_EVASION")
-        self.assertEqual(result["relationshipAfter"]["identityTrust"], "untrustworthy")
-        self.assertLess(result["relationshipAfter"]["approval"], 0)
-        self.assertLess(result["relationshipAfter"]["respect"], 0)
-        self.assertIn("trust", self.message_text(result).lower())
-        follow_up_text = self.message_text(follow_up).lower()
-        self.assertTrue(any(
-            marker in follow_up_text for marker in ("trust", "lie", "liar")
-        ))
+        self.assertEqual(result["result"]["decision"]["branch"], "SELF_STATE_RECEIVED")
+        self.assertEqual(result["relationshipAfter"]["identityTrust"], "unknown")
+        self.assertEqual(result["relationshipAfter"]["approval"], 0)
+        self.assertEqual(result["relationshipAfter"]["respect"], 0)
+        self.assertIsNotNone(
+            result["contextAfter"]["dialogue"]["pendingIdentityExchange"]
+        )
+        self.assertEqual(
+            follow_up["result"]["decision"]["branch"],
+            "QUESTION_RECEIVED",
+        )
+        self.assertEqual(
+            follow_up["relationshipBefore"], follow_up["relationshipAfter"]
+        )
 
     def test_self_reflection_is_not_an_insult_and_directed_insult_is(self) -> None:
         with LuaSemanticWorker(merge({}, DEFAULT_SCENARIO)) as worker:

@@ -222,9 +222,13 @@ local function pendingIdentity(context)
         and context.semanticDialogueContext.pendingIdentityExchange
 end
 
--- Identity questions are answered locally and leave a bounded semantic turn
--- for the player to state their name. Only the server-validated claim below
--- may trigger the identity knowledge disclosure.
+local function isIdentityEvasion(ir)
+    return ir and (ir.intent == "REFUSE" or ir.intent == "DISAGREE")
+end
+
+-- Identity questions are answered locally and leave a conversation-local
+-- obligation for the player to state their name. Interruptions remain
+-- harmless; only the server-validated claim below may disclose identity.
 function Requests.PrepareIdentityRequest(view, ir, context)
     local npcID = view and view.spec and view.spec.npcID
     local lifecycle = context and context.conversationLifecycleState or nil
@@ -251,9 +255,7 @@ function Requests.PrepareIdentityRequest(view, ir, context)
         }
     end
 
-    if pendingIdentity(context)
-        and not (ir.intent == "QUESTION" and ir.subject == "IDENTITY")
-    then
+    if pendingIdentity(context) and isIdentityEvasion(ir) then
         return {
             kind = "identity_evasion",
             npcID = npcID,

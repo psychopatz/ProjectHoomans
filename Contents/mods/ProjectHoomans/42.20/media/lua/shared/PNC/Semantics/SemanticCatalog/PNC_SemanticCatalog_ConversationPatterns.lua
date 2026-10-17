@@ -74,6 +74,10 @@ local function registerSelfNeedPatterns(subject)
 end
 
 local function registerSelfWellbeingPattern(prefix, status, thankYou)
+    local thankYouText = thankYou
+    if thankYou == true then
+        thankYouText = "thank you"
+    end
     local match = {}
     local tokenIndex
     for tokenIndex = 1, #prefix.tokens do
@@ -86,18 +90,17 @@ local function registerSelfWellbeingPattern(prefix, status, thankYou)
         kind = "literal",
         value = status.phrase,
     }
-    if thankYou then
-        -- "thank you" is an existing semantic concept phrase. Matching its
-        -- exact text keeps the whole response anchored without stealing a
-        -- standalone THANK utterance.
+    if thankYouText then
+        -- These exact suffixes keep the whole response anchored without
+        -- stealing a standalone THANK utterance.
         match[#match + 1] = {
             kind = "literal",
-            value = "thank you",
+            value = thankYouText,
         }
     end
     registerPattern(
         "pnc.state.self_wellbeing_" .. prefix.id .. "_" .. status.id
-            .. (thankYou and "_thank_you" or ""),
+            .. (thankYouText and "_" .. string.gsub(thankYouText, " ", "_") or ""),
         match,
         {
             intent = "INFORM",
@@ -281,7 +284,8 @@ function Internal.RegisterSelfStatePatterns()
             status = SELF_WELLBEING_STATUSES[statusIndex]
             registerSelfWellbeingPattern(prefix, status, false)
             if status.thankYou == true then
-                registerSelfWellbeingPattern(prefix, status, true)
+                registerSelfWellbeingPattern(prefix, status, "thank you")
+                registerSelfWellbeingPattern(prefix, status, "thanks")
             end
         end
     end

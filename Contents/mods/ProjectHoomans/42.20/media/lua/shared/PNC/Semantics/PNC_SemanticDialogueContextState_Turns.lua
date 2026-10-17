@@ -54,16 +54,19 @@ function Context:RecordTurn(ir, options)
         self.lastSpeaker = speaker
     end
 
-    -- Identity questions create a bounded, conversation-local obligation.
-    -- The next turn can answer it with a self-name claim; any other turn is
-    -- observable as an evasion before the state is advanced again.
+    -- Identity questions create a conversation-local obligation.  Unrelated
+    -- turns are interruptions, not evasion; a self-name claim or explicit
+    -- refusal/disagreement resolves the obligation.
     if not responseOnly then
         if ir.intent == "QUESTION" and ir.subject == "IDENTITY" then
             self.pendingIdentityExchange = {
                 kind = "PLAYER_NAME",
                 requestedAt = sequence,
             }
-        elseif self.pendingIdentityExchange then
+        elseif self.pendingIdentityExchange
+            and (ir.socialContext and ir.socialContext.identityClaim == true
+                or ir.intent == "REFUSE" or ir.intent == "DISAGREE")
+        then
             self.pendingIdentityExchange = nil
         end
     end

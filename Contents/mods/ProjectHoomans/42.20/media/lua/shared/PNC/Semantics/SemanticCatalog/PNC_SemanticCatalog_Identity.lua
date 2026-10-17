@@ -10,13 +10,23 @@ local IDENTITY_TAIL_WORDS = {
     "please", "an",
 }
 
+-- These words commonly begin a first-person state report.  Keep them out of
+-- the open-ended identity capture so an unmatched wellbeing/need utterance
+-- cannot be reinterpreted as a name claim.
+local IDENTITY_CAPTURE_STOP_WORDS = {
+    "fine", "okay", "ok", "alright", "all", "right", "good", "well",
+    "thanks", "thank", "hungry", "thirsty", "parched", "tired",
+    "exhausted", "sleepy", "worn", "out", "now", "your", "turn", "btw",
+    "nice", "to", "meet", "you", "please", "an",
+}
+
 local function identityNameCapture()
     return {
         kind = "any_phrase",
         capture = "name",
         minTokens = 1,
         maxTokens = 2,
-        stopWords = IDENTITY_TAIL_WORDS,
+        stopWords = IDENTITY_CAPTURE_STOP_WORDS,
     }
 end
 

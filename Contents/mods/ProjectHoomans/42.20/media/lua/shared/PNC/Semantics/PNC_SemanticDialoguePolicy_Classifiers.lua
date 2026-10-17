@@ -135,7 +135,10 @@ local function isIdentityEvasion(ir, state, context)
     then
         return false
     end
-    return not (ir and ir.intent == "QUESTION" and ir.subject == "IDENTITY")
+    -- An interruption is not an evasion.  Only an explicit refusal or
+    -- disagreement resolves the pending identity obligation as evasion;
+    -- ordinary questions, state reports, and social turns remain harmless.
+    return ir and (ir.intent == "REFUSE" or ir.intent == "DISAGREE")
 end
 
 local function giftConsentFor(ir, context)
