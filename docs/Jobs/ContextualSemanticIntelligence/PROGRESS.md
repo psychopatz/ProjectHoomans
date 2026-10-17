@@ -1,6 +1,6 @@
 # Contextual Semantic Intelligence — progress
 
-**Updated:** 2026-10-17. **Phase:** 3 — broader contextual social reactions. **Status:** Phase 3 Semantic Lab gate accepted for the bounded authored social families; Phase 4 is the sole Next Chunk. Native SP/MP acceptance remains OPEN.
+**Updated:** 2026-10-17. **Phase:** 4 — semantic paraphrase coverage. **Status:** Phase 4 bounded paraphrase Semantic Lab gate accepted; Phase 5 is the sole Next Chunk. Native SP/MP acceptance remains OPEN.
 
 ## Revision evidence
 
@@ -117,12 +117,23 @@ Phase 0A is accepted only for its documented Semantic Lab correctness baseline. 
 
 Phase 3 is accepted for this bounded Semantic Lab scope: authored apology, existing reassurance/self-reflection, guarded threat, contextual offer and contextual dispute responses, including explicit overlap precedence and no new unauthorized mutation. This does not accept paraphrase breadth, group dialogue, PBrainZ fallback, or native SP/MP behavior.
 
-## ONE current Next Chunk — Phase 4 bounded paraphrase baseline
+## Phase 4 verification evidence — accepted for the bounded Semantic Lab gate
 
-1. Audit one narrowly bounded authored paraphrase family against the existing deterministic IR/catalog IDs; hold out false-positive command/task language.
-2. Add only the smallest safe compiler/catalog extension needed for that family; preserve authority, context bounds and deterministic-first routing.
-3. Assert held-out paraphrase acceptance, false-positive rejection, response identity, preview behavior where applicable, zero PBrainZ calls and no unauthorized effects. Preserve all Phase 2 and Phase 3 coverage.
-4. Keep native SP/MP explicitly open; do not expand to group or PBrainZ phases until the bounded paraphrase gate is evidenced.
+- Implementation revision: Project Hoomans `78674253` (`feat(semantic): add reviewed wellbeing paraphrase`); the detailed evidence is in [`PHASE4_PARAPHRASE.md`](PHASE4_PARAPHRASE.md). PsychopatzCore remained at `0212491d2af3597cceaa7353e62f01ef54adca44`.
+- The baseline probe showed `how are you doing` reaching deterministic `ASK_CLARIFICATION` without an IR intent, subject or pattern, while the authored `how are you holding up` form already reached `QUESTION/WELLBEING`. The bounded change adds only the exact reviewed dialogue-dataset entry `pnc.dataset.question.wellbeing.how_are_you_doing`, with `QUESTION/QUESTION/WELLBEING`, confidence `0.99` and priority `120`; the existing compiler regenerated the Lua data shard.
+- Focused paraphrase tests: **PASS 2/2**. Compiler tests: **PASS 7/7**. Full Python suite: **PASS 67/67**. The focused test also preserves the existing wellbeing paraphrase and holds out `walk with me`, `followed the trail` and `we are following them` as clarification-only, with no action, transport, tool or LLM effect.
+- `tools/semantic_harness/run_harness.sh --doctor --doctor-json`: **PASS**. `tools/semantic_harness/run_harness.sh --test pnc_semantic`: **PASS 66/66**. CLI report `/tmp/contextual-semantic-suite-phase4.json`: **PASS 66/66**, 198 events, `conflicts=[]`, `audit_truncated=null`; these protocol/replay values are not semantic proof.
+- Changed generated Lua passed `luac5.3 -p`. `pz-verify` over the semantic directory reported 0 Kahlua errors and 0 warnings; the broad mod-wide report remains noisy with pre-existing hardcoded-string/token-bloat findings and one existing Kahlua-warning file, but zero Kahlua errors.
+- No WordNet allowlist or fuzzy command behavior was expanded. The reviewed source uses the existing exact dialogue compiler path; no response catalog ID, PBrainZ call, transport effect, gameplay action or relationship mutation was introduced. Native SP: **NOT TESTED**. Native MP: **NOT TESTED**.
+
+Phase 4 is accepted only for this one reviewed paraphrase and its held-out false-positive boundary. It does not accept broad paraphrase coverage, group dialogue, PBrainZ fallback or native SP/MP behavior.
+
+## ONE current Next Chunk — Phase 5 optional PBrainZ/group compatibility audit
+
+1. Audit the existing optional PBrainZ provider seam and group-dialogue state ownership before changing behavior; keep deterministic intent and action authorization authoritative when the provider is disabled or unavailable.
+2. Run a bounded read-only provider parity probe, if the existing seam supports it, asserting semantic IR and authority parity with PBrainZ disabled/enabled and no cross-speaker leakage.
+3. Exercise speaker/conversation scoping for a minimal group case without adding a global NPC transcript or new gameplay obligation.
+4. Keep native SP/MP explicitly open; do not claim provider or group acceptance unless the bounded real-worker evidence passes.
 
 ## Remaining roadmap
 
