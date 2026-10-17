@@ -192,6 +192,31 @@ function Internal.SubmitSingle(view, value, part)
         return false, preview.reason or "semantic_input_rejected"
     end
 
+    -- Recover only a bounded, question-shaped no-match when the current
+    -- conversation supplies a single safe topic. The recovered IR is then
+    -- routed through the same production policy and ProcessIR path as an
+    -- authored pattern; actions still cannot be created by this spoke.
+    if preview.ir and type(Internal.Recover) == "function" then
+        local recovered = Internal.Recover(preview.ir, context, options)
+        if recovered then
+            preview.ir = recovered
+            preview.decision = router:Decide(
+                recovered,
+                context,
+                options
+            )
+            audit("semantic.input.recovered", {
+                npcID = view.spec and view.spec.npcID,
+                conversationID = view.session.conversationID,
+                rawText = value,
+                pattern = recovered.provenance
+                    and recovered.provenance.pattern,
+                topic = recovered.subject,
+                confidence = recovered.confidence,
+            }, { requestID = preview.sequence })
+        end
+    end
+
     if Internal.RequestCognitionForIR then
         cognitionAccepted, _, cognitionRequestID, cognitionPending =
             Internal.RequestCognitionForIR(view, preview.ir)

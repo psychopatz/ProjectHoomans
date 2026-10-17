@@ -150,7 +150,7 @@ Phase 5 is accepted only for deterministic/provider-failure parity, bounded prov
   calls the public production `DialogueInput.Submit` entrypoint, and reads
   production-owned IR/decision/routed-situation results. The fresh parity
   contract passed **4/4**; the real-worker contextual slice passed **26/26**;
-  the full Semantic Lab Python suite passed **81/81** after the native-retest
+  the full Semantic Lab Python suite passed **83/83** after the native-retest
   discrepancy repair.
 - No production semantic behavior changed after Phase 5. No controlled native
   single-player scenario or authoritative multiplayer session was completed
@@ -168,7 +168,7 @@ Phase 5 is accepted only for deterministic/provider-failure parity, bounded prov
   `804eff7b` and `ffad31f4`:
   `python3 -m unittest
   tools.semantic_harness.tests.test_phase6_static_boundaries -v` passed **3/3**;
-  the full Semantic Lab Python suite is now **81/81**. It found no
+  the full Semantic Lab Python suite is now **83/83**. It found no
   `Events.OnTick` registration in the `PNC_SemanticDialogueInput*.lua`
   modules and retained the server-side authority/lease/replay gates. This is
   a static/request-boundary result, not native game evidence.
@@ -180,14 +180,15 @@ Phase 5 is accepted only for deterministic/provider-failure parity, bounded prov
 
 ### Native retest discrepancy repair
 
-The first controlled native conversation exposed two parity gaps: the live
-entry `whats wrong` had no authored alias, and a minor live wound arrived as
+The first controlled native conversation exposed three parity gaps: the live
+entry `whats wrong` had no authored alias, a minor live wound arrived as
 `healthState=normal` with bounded body-health/HP evidence rather than the
-synthetic `injured` state used by the earlier harness cases. Production now
-maps the exact unpunctuated alias and derives `injured` from the live wound/HP
-contract; Semantic Lab accepts the same shape. A full PZ restart is required
-before retesting because the running client has already loaded the old Lua
-modules.
+synthetic `injured` state used by the earlier harness cases, and `what
+happened` was an unregistered natural follow-up. Production now maps the exact
+unpunctuated alias, derives `injured` from the live wound/HP contract, and
+performs bounded contextual fuzzy recovery for safe question-shaped input. A
+full PZ restart is required before retesting because the running client has
+already loaded the old Lua modules.
 
 ## ONE current Next Chunk — Phase 6 native SP/MP and performance acceptance
 

@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import unittest
 
-from tools.semantic_harness.scenario import DEFAULT_SCENARIO
+from tools.semantic_harness.scenario import DEFAULT_SCENARIO, merge
 from tools.semantic_harness.worker import LuaSemanticWorker
 
 
@@ -93,6 +93,55 @@ class SemanticParaphraseTests(unittest.TestCase):
         self.assertEqual(second["llmCalls"], 0)
         self.assertEqual(second["transport"], [])
         self.assertEqual(second["toolCalls"], [])
+
+    def test_contextual_fuzzy_question_recovers_paraphrase_and_typo(self) -> None:
+        scenario = merge(DEFAULT_SCENARIO, {
+            "npc": {
+                "healthState": "injured",
+                "activeBehavior": "treatment",
+                "needs": {},
+                "conditionStats": {},
+            },
+        })
+        for text in ("what happened", "what happened?", "wat happend"):
+            with self.subTest(text=text):
+                with LuaSemanticWorker(scenario) as worker:
+                    first = worker.input("Are you okay?")
+                    second = worker.input(text)
+
+                self.assertTrue(first["accepted"], first.get("reason"))
+                self.assertTrue(second["accepted"], second.get("reason"))
+                ir = second["result"]["ir"]
+                decision = second["result"]["decision"]
+                self.assertEqual(ir["intent"], "QUESTION")
+                self.assertEqual(ir["subject"], "WELLBEING")
+                self.assertEqual(
+                    ir["provenance"]["pattern"],
+                    "pnc.recovery.contextual_question_wellbeing",
+                )
+                self.assertTrue(ir["diagnostics"]["recoveredMatch"])
+                self.assertEqual(decision["branch"], "QUESTION_RECEIVED")
+                self.assertEqual(decision["route"], "deterministic")
+                self.assertEqual(
+                    decision["response"]["templateID"],
+                    "semantic.question.wellbeing.follow_up.injured",
+                )
+                self.assertEqual(second["llmCalls"], 0)
+                self.assertEqual(second["transport"], [])
+                self.assertEqual(second["toolCalls"], [])
+
+    def test_contextual_fuzzy_question_requires_conversation_topic(self) -> None:
+        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+            turn = worker.input("what happened")
+
+        self.assertTrue(turn["accepted"], turn.get("reason"))
+        result = turn["result"]
+        self.assertEqual(result["decision"]["branch"], "ASK_CLARIFICATION")
+        self.assertTrue(result["ir"]["diagnostics"]["noMatch"])
+        self.assertIsNone(result.get("actionResult"))
+        self.assertEqual(turn["llmCalls"], 0)
+        self.assertEqual(turn["transport"], [])
+        self.assertEqual(turn["toolCalls"], [])
 
 
 if __name__ == "__main__":

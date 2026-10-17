@@ -43,8 +43,12 @@ The contract is protected by
 - Real-worker contextual slice (parity, wellbeing projection, paraphrase,
   provider fallback, social reactions and baseline matrix): **PASS 26/26**.
 - `python3 -m unittest discover -s tools/semantic_harness/tests -q`:
-  **PASS 81/81** after the live discrepancy repair below.
+  **PASS 83/83** after the live discrepancy repairs below.
 - `tools/semantic_harness/run_harness.sh --test pnc_semantic`: **PASS 66/66**.
+- `python3 -m unittest tools.semantic_harness.tests.test_semantic_paraphrases -v`:
+  **PASS 5/5**. The production worker recovers the live-shaped `what happened`,
+  its punctuated form, and the typo `wat happend` only after a wellbeing topic
+  is established; an unscoped `what happened` remains clarification-only.
 
 The provider parity cases exercised the real worker with the provider both
 disabled and enabled: authored `follow me` stayed deterministic with no
@@ -56,7 +60,7 @@ context and routed situation.
 
 ## Native retest discrepancy and repair
 
-The first controlled native conversation exposed two behavior gaps that the
+The first controlled native conversation exposed three behavior gaps that the
 original structural parity contract did not catch:
 
 - The live text arrived as `whats wrong`. The catalog only registered
@@ -65,11 +69,15 @@ original structural parity contract did not catch:
   contract reports `normal` plus bounded body-health/HP data for a minor wound
   (and `incapacitated` for a downed NPC). The situation projection therefore
   missed the wound and could answer “I'm okay.”
+- The live follow-up `what happened` is a natural paraphrase, not a registered
+  literal pattern, so it fell through to the semantic telemetry dialog.
 
-The production fix adds the exact `whats wrong` alias and derives the semantic
-`injured` signal from live body-wound/HP evidence or `incapacitated` state. The
-Semantic Lab worker now accepts the same body-health shape, with focused
-post-fix wellbeing/paraphrase coverage **13/13** and full coverage **81/81**.
+The production fix adds the exact `whats wrong` alias, derives the semantic
+`injured` signal from live body-wound/HP evidence or `incapacitated` state, and
+adds bounded contextual fuzzy recovery for safe question topics. Recovered
+questions re-enter the normal policy and response path; they cannot create
+actions or resolve world entities. The Semantic Lab worker now accepts the
+same body-health shape and live-shaped follow-up, with full coverage **83/83**.
 
 ## Explicit limit
 

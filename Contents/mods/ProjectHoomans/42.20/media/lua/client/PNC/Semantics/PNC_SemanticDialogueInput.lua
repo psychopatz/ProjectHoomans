@@ -42,6 +42,7 @@ Input.MAX_INPUT_LENGTH = 4000
 Input.Internal = Input.Internal or {}
 
 require "PNC/Semantics/PNC_SemanticDialogueInput_Context"
+require "PNC/Semantics/PNC_SemanticDialogueInput_Recovery"
 require "PNC/Semantics/PNC_SemanticDialogueInput_Presentation"
 require "PNC/Semantics/PNC_SemanticDialogueInput_Actions"
 require "PNC/Semantics/PNC_SemanticDialogueInput_GiftPresentation"
