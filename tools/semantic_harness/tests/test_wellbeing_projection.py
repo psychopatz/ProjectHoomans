@@ -112,6 +112,41 @@ class WellbeingProjectionTests(unittest.TestCase):
             "UI_PNC_Conversation_Semantic_QuestionWellbeingUnknown",
         )
 
+    def test_unknown_health_defers_to_specific_catalog_reactions(self) -> None:
+        # Phase 1B boundary regression: the local resolver owns only the
+        # unsupported-state guard. Once a stronger need/emotion fact exists,
+        # the normal catalog selector owns matching and priority.
+        cases = (
+            (
+                "urgent_thirst",
+                {"healthState": None, "needs": {"thirst": 0.95},
+                 "conditionStats": {}},
+                "semantic.question.wellbeing.thirst",
+            ),
+            (
+                "panic",
+                {"healthState": None, "needs": {},
+                 "conditionStats": {"panic": 95}},
+                "semantic.question.wellbeing.panic",
+            ),
+            (
+                "panic_precedes_thirst",
+                {"healthState": None, "needs": {"thirst": 0.95},
+                 "conditionStats": {"panic": 95}},
+                "semantic.question.wellbeing.panic",
+            ),
+        )
+        for label, npc, template_prefix in cases:
+            with self.subTest(case=label):
+                with LuaSemanticWorker(self.scenario(npc)) as worker:
+                    result = worker.input("Are you okay?")
+                situation, response = self.assert_offline_wellbeing(result)
+                self.assertIsNone(situation.get("healthState"))
+                self.assertTrue(
+                    response["templateID"].startswith(template_prefix),
+                    response,
+                )
+
     def test_legacy_world_needs_and_editable_activity_remain_supported(self) -> None:
         scenario = self.scenario(
             {"activeBehavior": "fishing"},
