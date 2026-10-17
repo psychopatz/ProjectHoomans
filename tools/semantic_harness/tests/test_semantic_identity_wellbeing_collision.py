@@ -15,6 +15,11 @@ ORIGINAL_TRACE_CASE = (
     / "scenarios"
     / "identity_wellbeing_original_trace_case.json"
 )
+CANDIDATE_ELIGIBILITY_CASE = (
+    Path(__file__).resolve().parents[1]
+    / "scenarios"
+    / "candidate_eligibility_case.json"
+)
 
 
 class SemanticIdentityWellbeingCollisionTests(unittest.TestCase):
@@ -351,6 +356,33 @@ class SemanticIdentityWellbeingCollisionTests(unittest.TestCase):
                 and lookup["fallbackUsed"] is False
                 for lookup in identity_claim["translation"]["lookups"]
             )
+        )
+
+
+    def test_real_worker_rejects_fuzzy_mutating_candidate(self) -> None:
+        run = run_case(load_case(CANDIDATE_ELIGIBILITY_CASE))
+        self.assertEqual(run.conflicts, [])
+        self.assertEqual(len(run.turns), 1)
+        turn = run.turns[0]
+        result = turn["result"]
+        self.assertEqual(result["decision"]["branch"], "ASK_CLARIFICATION")
+        self.assertTrue(result["ir"]["diagnostics"]["noMatch"])
+        diagnostics = result["candidateDiagnostics"]
+        self.assertEqual(diagnostics["reason"], "no_eligible_candidate")
+        self.assertEqual(diagnostics["rejectedCount"], 1)
+        self.assertEqual(
+            diagnostics["rejections"][0]["reason"],
+            "fuzzy_mutating_action",
+        )
+        self.assertEqual(
+            diagnostics["rejections"][0]["patternID"],
+            "pnc.command.follow",
+        )
+        self.assertEqual(turn["transport"], [])
+        self.assertEqual(turn["toolCalls"], [])
+        self.assertIsNone(result.get("actionResult"))
+        self.assertEqual(
+            turn["relationshipBefore"], turn["relationshipAfter"]
         )
 
 

@@ -3,6 +3,8 @@ PNC.Semantics = PNC.Semantics or {}
 
 local Semantic = require "PsychopatzCore/Semantics/PsychopatzSemantic"
 local IR = Semantic.IR
+local CandidateEligibility = require
+    "PNC/Semantics/PNC_SemanticDialogueCandidateEligibility"
 local SemanticOffer = PNC.Gifts
     and PNC.Gifts.Foundation
     and PNC.Gifts.Foundation.SemanticOffer or nil
@@ -202,5 +204,12 @@ Internal.CommandActions = COMMAND_ACTIONS
 Internal.FuzzySafeActions = FUZZY_SAFE_ACTIONS
 Internal.ItemRequestActions = ITEM_REQUEST_ACTIONS
 Internal.RegisterTextFallback = registerTextFallback
+Internal.CandidateEligibility = CandidateEligibility
+
+function Policy.SelectCandidate(bundle, state, context, options, contextResolver)
+    return CandidateEligibility.Select(
+        bundle, state, context, options, contextResolver
+    )
+end
 
 return Policy

@@ -1,0 +1,18 @@
+{
+  "id": "candidate_eligibility",
+  "tags": ["typed-candidates", "fuzzy-safety", "singleplayer"],
+  "scenario": {
+    "player": {
+      "characterUUID": "char_patrick",
+      "forename": "Patrick",
+      "surname": "Patz",
+      "displayName": "Patrick Patz"
+    },
+    "npc": {
+      "npcID": "npc_mara",
+      "forename": "Mara",
+      "surname": "Vale"
+    }
+  },
+  "inputs": ["folow me"]
+}

@@ -71,6 +71,8 @@ function RouterLifecycle.For(view)
             state = session.semanticDialogueState,
             policy = Policy,
             parser = Internal.Parse,
+            candidateParser = Internal.ParseCandidates,
+            candidateSelector = Policy.SelectCandidate,
             contextResolver = Internal.ResolveReferences,
             context = Internal.ShallowContext(view),
         })
@@ -79,6 +81,26 @@ function RouterLifecycle.For(view)
             session.semanticDialogueRouter:SetParser(Internal.Parse)
         else
             session.semanticDialogueRouter.parser = Internal.Parse
+        end
+        if type(session.semanticDialogueRouter.SetCandidateParser)
+            == "function"
+        then
+            session.semanticDialogueRouter:SetCandidateParser(
+                Internal.ParseCandidates
+            )
+        else
+            session.semanticDialogueRouter.candidateParser =
+                Internal.ParseCandidates
+        end
+        if type(session.semanticDialogueRouter.SetCandidateSelector)
+            == "function"
+        then
+            session.semanticDialogueRouter:SetCandidateSelector(
+                Policy.SelectCandidate
+            )
+        else
+            session.semanticDialogueRouter.candidateSelector =
+                Policy.SelectCandidate
         end
         if type(session.semanticDialogueRouter.SetContextResolver) == "function" then
             session.semanticDialogueRouter:SetContextResolver(

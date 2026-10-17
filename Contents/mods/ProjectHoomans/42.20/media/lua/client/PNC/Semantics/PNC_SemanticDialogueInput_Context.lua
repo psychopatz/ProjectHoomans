@@ -115,6 +115,30 @@ function Internal.Parse(value, options)
     return ir, reason
 end
 
+function Internal.ParseCandidates(value, options)
+    local parser = Semantic.Parser and Semantic.Parser.ParseCandidates
+    if type(parser) ~= "function" then
+        return nil, "candidate_parser_unavailable"
+    end
+    local bundle, reason = parser(value, options)
+    if type(bundle) ~= "table" then return bundle, reason end
+    if Topics and type(Topics.Annotate) == "function" then
+        local candidates = bundle.candidates
+        local index
+        local candidate
+        for index = 1, #(type(candidates) == "table" and candidates or {}) do
+            candidate = candidates[index]
+            if candidate and candidate.ir then
+                Topics.Annotate(candidate.ir, value)
+            end
+        end
+        if bundle.selected and bundle.selected.ir then
+            Topics.Annotate(bundle.selected.ir, value)
+        end
+    end
+    return bundle, reason
+end
+
 function Internal.ResolveReferences(ir, state, context, options)
     local output = ir
     if ReferenceResolver
