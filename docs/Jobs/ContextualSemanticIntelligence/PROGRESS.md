@@ -156,8 +156,8 @@ Phase 5 is accepted only for deterministic/provider-failure parity, bounded prov
   `/tmp/contextual-semantic-phase6-performance-final.json`. The follow,
   reviewed wellbeing and unknown fallback branches remained deterministic;
   provider calls were `0/0/0` disabled and `0/0/1` enabled respectively.
-- The static request-driven and server-boundary guard is Project Hoomans
-  `804eff7b`:
+- The static request-driven and server-boundary guards are Project Hoomans
+  `804eff7b` and `ffad31f4`:
   `python3 -m unittest
   tools.semantic_harness.tests.test_phase6_static_boundaries -v` passed **3/3**;
   the full Semantic Lab Python suite is **74/74**. It found no
