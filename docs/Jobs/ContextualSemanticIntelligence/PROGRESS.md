@@ -1,44 +1,31 @@
-# Contextual Semantic Intelligence — current progress
+# Contextual Semantic Intelligence — progress
 
-**As audited:** 2026-10-17. **Phase:** 0 — Semantic Lab correctness baseline. **State:** planned; implementation not started. **Evidence:** static GitHub source audit only.
+**Updated:** 2026-10-17. **Phase:** 0 — Semantic Lab correctness baseline. **Status:** 0A code proposed/committed on feature branch; **runtime acceptance remains OPEN**.
 
-## Revision identity
+## Revision evidence
 
-- Project Hoomans main source audit: `c96cadda1570f59810552f9d3fc55d5c957ba670`.
-- PsychopatzCore main source audit: `efac85a182c86fdb07e7da7ccd693e1a6e66ccc6`.
-- PBrainZ main source audit: `43cc879e673d8d0494d7e77b4ade28fd20a6d4c4`.
-- No claim about any local worktree. Semantic Lab, Lua and Project Zomboid were **not run** in this audit. GitHub Actions runs result was empty; no CI pass claimed.
-- Job planning docs are distinct from tested code. Read the latest HEAD before coding.
+- Audited main: ProjectHoomans `c96cadda1570f59810552f9d3fc55d5c957ba670`; psychopatzCore `efac85a182c86fdb07e7da7ccd693e1a6e66ccc6`; PBrainZ `43cc879e673d8d0494d7e77b4ade28fd20a6d4c4`.
+- Planning base: `7422dba0d4ea729d65af4284cca87c4af8d7693b` from job documentation branch. See feature branch commit history for implementation SHA.
+- No local repository checkout and no complete Semantics production Lua dependencies were available in the authoring sandbox. Lua Semantic Lab, Project Zomboid SP/MP, and hosted CI **have not been executed** for this change. These gates are not passed.
+- Static review established actual production context is created in `PNC_SemanticDialogueInput_ContextProjection.Build`, and the retained router context includes `dialogueSituation`.
 
-## Accepted existing code foundation (source-verified only)
+## Implemented in branch; not yet accepted
 
-- Parser/IR/policy and guarded deterministic route exist.
-- Wellbeing, social and situational response pools with contextual conditions exist.
-- Bounded dialogue/mentions/pending requests and select follow-up behavior exist.
-- Offline WordNet compiler and common interaction source exist.
-- Semantic Lab persistent Lua worker, production module loader, scenario replay, output trace, conflict ledger and unittest/smoke framework exist.
+- `tools/semantic_harness/scenario.py`: default NPC health/activity fields preserve legacy semantics; validates state shapes; explicit null/empty state can represent unknown.
+- `tools/semantic_harness/lua/worker/Conversation.lua`: editable NPC health/activity/needs/conditionStats fed into existing `npcState` and snapshot fields with legacy `scenario.world` fallback only when a dedicated NPC state table is absent. Exposes the **production router's** `routedSituation` on each turn; no new fake semantic interpreter.
+- `tools/semantic_harness/tests/test_wellbeing_projection.py`: new actual `LuaSemanticWorker` checks for healthy/injured/thirst/panic/unknown, legacy world mock compatibility, output safety, multi-turn replay and editable state persistence. The tests have not been executed; failures must be repaired against real behavior, not bypassed or marked passed.
+- Core NLU, Project Hoomans response catalog, gameplay authority and PBrainZ are unchanged.
 
-These are **implemented in code**, not fully accepted by live Project Zomboid test.
+## ONE current Next Chunk — Phase 0A verification/repair
 
-## Outstanding gaps
+1. Safely integrate/rebase this feature branch when job docs reach target checkout; first check local changes and overlapping agents.
+2. Run `tools/semantic_harness/run_harness.sh --doctor --doctor-json`. Check Lua executable and Core repo availability.
+3. Run `python3 -m unittest tools.semantic_harness.tests.test_wellbeing_projection -v`, `python3 -m unittest discover -s tools/semantic_harness/tests -v`, and `tools/semantic_harness/run_harness.sh --test pnc_semantic`. Inspect actual `routedSituation`, IR, response, context and no-action traces. Fix any real-worker or test-contract errors, including false projections.
+4. Collect reproducible baseline outputs for healthy, injured, urgent need and unknown NPC, plus two-turn dialogue. Record exact SHAs, Lua version, command and result in this file. Verify legacy default scenarios remain unchanged.
+5. Mark Phase 0A accepted only when real production-worker behavior assertions and semantic regression tests pass; then set Phase 0B as the sole Next Chunk.
 
-- Semantic Lab wellbeing context currently hardcodes healthy/idle and sources NPC needs from scenario.world.
-- Replay conflict-free status is not a semantic behavior assertion.
-- No recorded exact-HEAD Semantic Lab baseline for healthy/injured/thirsty/unknown wellbeing dialogue.
-- Contextually distinct reaction behavior and multi-turn wellbeing follow-up not proven by real worker.
-- Native SP/MP and performance acceptance outstanding.
+## Remaining roadmap
 
-## One Next Chunk (mandatory): Phase 0A — realistic harness wellbeing projection
+0B baseline characterization -> 1 wellbeing reactions -> 2 multi-turn -> 3 social -> 4 paraphrases -> 5 PBrainZ/groups -> 6 SP/MP + performance acceptance.
 
-1. Inspect current Semantic Lab `scenario.py`, `lua/worker/Conversation.lua`, production situation/context projection and related tests. Record existing case behavior and whether schema already supports fields under `npc`.
-2. Implement the smallest necessary fixture/context changes to vary **NPC** healthState, activeBehavior, needs, conditionStats and relationship through existing production contracts, retaining compatibility with current world-level mock defaults. Do not hardcode expected semantics in worker.
-3. Add explicit test assertions using real `LuaSemanticWorker`: actual module loaded; different scenario values enter the production decision path; trace/IR/response/context available; zero LLM usage; no unintended tool or transport side effects. Record baseline shortcomings honestly — do not implement new reaction policy in this chunk.
-4. Run Semantic Lab doctor, targeted real-worker unittest, existing Lua semantic tests and conflict replay. Report Lua availability and any missing native game evidence.
-
-**Exit gate:** Harness can genuinely represent and trace at least healthy, injured, urgent thirst and unknown/missing-state cases without rewriting the NPC's reality. Tests assert real Lua outputs and preserve historical behavior. If a scenario input is unsupported, document exactly which adapter prevents it. Phase 0B becomes Next Chunk only after 0A passes.
-
-## Subsequent work
-
-0B baseline matrix -> Phase 1 wellbeing reaction -> Phase 2 multi-turn continuity -> Phase 3 social reactions -> Phase 4 reviewed paraphrases -> Phase 5 optional PBrainZ/groups -> Phase 6 live-game SP/MP and performance.
-
-**Publication status:** Job docs are being prepared; code not modified by this planning step. Future agent updates must replace this statement with actual revision evidence.
+No new reaction arbiter or gameplay feature is claimed yet; code currently provides the truthful test foundation.

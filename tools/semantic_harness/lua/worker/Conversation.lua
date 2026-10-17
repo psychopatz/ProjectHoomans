@@ -2,6 +2,20 @@
 
 local Conversation = {}
 
+local NEED_KEYS = { "hunger", "thirst", "fatigue" }
+local CONDITION_KEYS = { "stress", "boredom", "panic" }
+
+local function numbersFor(source, keys, number)
+    local values = {}
+    if type(source) ~= "table" then return values end
+    for index = 1, #keys do
+        local key = keys[index]
+        local value = number(source[key], nil)
+        if value ~= nil then values[key] = value end
+    end
+    return values
+end
+
 function Conversation.buildContext(context)
     local Runtime = context.Runtime
     local Values = context.Values
@@ -16,6 +30,20 @@ function Conversation.buildContext(context)
         context, npc.npcID
     )
     local npcName = context.SemanticAdapters.identityName(context, npc)
+    -- The world-level fields remain a legacy scenario fallback. An explicit
+    -- npc.needs/conditionStats table is authoritative even when empty (unknown).
+    local needSource = type(npc.needs) == "table" and npc.needs or world
+    local conditionSource = type(npc.conditionStats) == "table"
+        and npc.conditionStats or world
+    local needs = numbersFor(needSource, NEED_KEYS, number)
+    local conditions = numbersFor(conditionSource, CONDITION_KEYS, number)
+    local snapshotNeeds = copy(needs)
+    -- Preserve the old snapshot.needs condition fields for worker consumers,
+    -- while exposing conditionStats to the real production situation resolver.
+    for index = 1, #CONDITION_KEYS do
+        local key = CONDITION_KEYS[index]
+        snapshotNeeds[key] = conditions[key]
+    end
     return {
         identityState = npc.identityState or "unknown",
         npcName = npcName,
@@ -24,11 +52,10 @@ function Conversation.buildContext(context)
         npcState = {
             traits = copy(npc.traits or {}),
             identityState = npc.identityState or "unknown",
-            needs = {
-                hunger = number(world.hunger, 0),
-                thirst = number(world.thirst, 0),
-                fatigue = number(world.fatigue, 0),
-            },
+            healthState = npc.healthState,
+            activeBehavior = npc.activeBehavior,
+            needs = copy(needs),
+            conditionStats = copy(conditions),
         },
         relationshipState = relationship.relationshipState
             or npc.relationshipState or "unknown",
@@ -44,16 +71,10 @@ function Conversation.buildContext(context)
         conversationLifecycleState = { token = conversation.token or "harness-lease" },
         entry = {
             snapshot = {
-                activeBehavior = "idle",
-                healthState = "healthy",
-                needs = {
-                    hunger = number(world.hunger, 0),
-                    thirst = number(world.thirst, 0),
-                    fatigue = number(world.fatigue, 0),
-                    stress = number(world.stress, 0),
-                    boredom = number(world.boredom, 0),
-                    panic = number(world.panic, 0),
-                },
+                activeBehavior = npc.activeBehavior,
+                healthState = npc.healthState,
+                needs = snapshotNeeds,
+                conditionStats = copy(conditions),
             },
         },
     }
@@ -139,6 +160,11 @@ function Conversation.turn(context, text)
     local contextBefore = Conversation.contextSnapshot(context, view)
     local accepted, reason = PNC.Semantics.DialogueInput.Submit(view, text)
     local result = view.lastSemanticDialogueResult
+    -- Inspect the exact situation built by the production input router, not
+    -- a separately re-created approximation in the Python test harness.
+    local router = view.session and view.session.semanticDialogueRouter
+    local routedContext = router and router.context
+    local routedSituation = routedContext and routedContext.dialogueSituation
     local newMessages = {}
     local newTrace = {}
     local newTransport = {}
@@ -189,6 +215,7 @@ function Conversation.turn(context, text)
         relationshipAfter = Conversation.relationshipSnapshot(context),
         contextBefore = contextBefore,
         contextAfter = Conversation.contextSnapshot(context, view),
+        routedSituation = Values.copy(routedSituation),
         llmCalls = Runtime.llmCalls,
         loadedModules = Runtime.loadedModules,
     }
