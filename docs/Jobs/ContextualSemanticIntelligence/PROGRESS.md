@@ -1,6 +1,6 @@
 # Contextual Semantic Intelligence — progress
 
-**Updated:** 2026-10-17. **Phase:** 0 — Semantic Lab correctness baseline. **Status:** Phase 0B baseline-matrix gate accepted; Phase 1A is the sole Next Chunk. Native SP/MP acceptance remains OPEN.
+**Updated:** 2026-10-17. **Phase:** 1 — Wellbeing contextual reaction pilot. **Status:** Phase 1A Semantic Lab gate accepted; Phase 1B is the sole Next Chunk. Native SP/MP acceptance remains OPEN.
 
 ## Revision evidence
 
@@ -48,12 +48,22 @@ Phase 0A is accepted only for its documented Semantic Lab correctness baseline. 
 - No reaction selector, catalog wording or gameplay behavior was changed in Phase 0B. The identity transport is the harness single-player boundary and is not native multiplayer evidence.
 - Native SP: **NOT TESTED**. Native MP: **NOT TESTED**. No controlled Project Zomboid UI/session/server acceptance is being promoted from these mocks.
 
-## ONE current Next Chunk — Phase 1A wellbeing contextual reaction pilot
+## Phase 1A verification evidence — accepted for the Semantic Lab gate
 
-1. Trace the existing `QUESTION/WELLBEING` catalog and policy conditions against the already reviewed healthy, injured, severe-thirst, panic/stressed and explicitly unknown states.
-2. Use the existing production context and response paths first; add the narrowest behavior-preserving hook only if the real-worker evidence shows a missing contextual reaction. Do not invent facts for unknown state.
-3. Add focused real-worker assertions for recognized same-utterance reaction differences, with zero PBrainZ calls and no gameplay side effects. Preserve the legacy world fixture and existing 66-test semantic coverage.
-4. Keep native SP/MP explicitly open; do not begin multi-turn, social, paraphrase or PBrainZ phases until the Phase 1A gate is evidenced.
+- Implementation revision: Project Hoomans `2a74683a` (`feat/semantic: ground unknown wellbeing responses`); PsychopatzCore remains pinned at `0212491d2af3597cceaa7353e62f01ef54adca44`; `/usr/bin/lua5.3` Lua 5.3.6; Python 3.12.3 in `tools/semantic_harness/.venv`. The detailed evidence is in [`PHASE1A_WELLBEING.md`](PHASE1A_WELLBEING.md).
+- The existing production path was retained: `QUESTION_RECEIVED` -> local response -> `resolveQuestion` -> `resolveWellbeing` -> response catalog selection. No second reaction arbiter or gameplay action was introduced.
+- Missing health evidence is normalized to selector-only `healthState="unknown"` in `conditionContext`; the routed situation remains source-faithful and omits unavailable health. A separate one-variant unknown pool avoids expanding the already bounded generated wellbeing pool beyond its 16-variant limit. Known healthy, injured, urgent-thirst, panic and stress precedence remains on the existing catalog path.
+- The same utterance, `Are you okay?`, now produces the contextual response identifiers `semantic.question.wellbeing.default`, `.unknown`, `.injured`, `.thirst`, `.panic` and `.stress` for the corresponding real-worker states. Unknown state no longer makes the unsupported “I'm okay” claim; its EN/TL translation key is `UI_PNC_Conversation_Semantic_QuestionWellbeingUnknown`.
+- `tools/semantic_harness/run_harness.sh --doctor --doctor-json`: **PASS**. `python3 -m unittest tools.semantic_harness.tests.test_wellbeing_projection -v`: **PASS 6/6**. `python3 -m unittest discover -s tools/semantic_harness/tests -v`: **PASS 56/56**. `tools/semantic_harness/run_harness.sh --test pnc_semantic`: **PASS 66/66**. CLI report: **PASS 66/66**, `conflicts=[]`, `audit_truncated=null`, 198 events. Empty conflicts are protocol/replay observations, not semantic proof.
+- `pz-verify` reported no new Kahlua or i18n errors in the changed catalog/presentation files. Its existing whole-file token-size warning on the response catalog and two existing identity fallback strings in the local-response file remain outside this bounded chunk; no monolith refactor was started.
+- No PBrainZ call, transport effect, tool call or gameplay side effect occurred in the real-worker matrix (`llmCalls=0`); the unknown routed health field remained absent. Native SP: **NOT TESTED**. Native MP: **NOT TESTED**. No controlled Project Zomboid UI/session/server evidence is promoted.
+
+## ONE current Next Chunk — Phase 1B reaction-selector boundary audit
+
+1. Audit whether the Phase 1A unknown/known precedence is fully owned by the existing local-response/catalog selector boundary or needs a narrow pure reaction-selector hook; do not add a second arbiter.
+2. If the existing boundary is sufficient, document that decision and add only precedence/diagnostic regressions. If a hook is required, keep it pure, deterministic, bounded and side-effect free.
+3. Preserve the same-utterance matrix, offline operation, zero PBrainZ calls, no transport/tool effects and no gameplay actions. Do not begin Phase 2 until the Phase 1B gate is evidenced.
+4. Keep native SP/MP explicitly open; harness protocol results and JSON replay/conflict status are not native-game or semantic-proof evidence.
 
 ## Remaining roadmap
 
