@@ -134,14 +134,16 @@ function Conversation.relationshipSnapshot(context)
     return context.SemanticAdapters.relationshipSnapshotFor(context, npc.npcID)
 end
 
-function Conversation.contextSnapshot(_, view)
+function Conversation.contextSnapshot(harnessContext, view)
     local session = view and view.session
-    local context = session and session.semanticDialogueContext
+    local dialogueContext = session and session.semanticDialogueContext
     local semanticState = session and session.semanticDialogueState
+    local null = harnessContext.Protocol.NULL
     return {
-        dialogue = context and context.ToContext and context:ToContext() or nil,
+        dialogue = dialogueContext and dialogueContext.ToContext
+            and dialogueContext:ToContext() or null,
         state = semanticState and semanticState.Snapshot
-            and semanticState:Snapshot() or nil,
+            and semanticState:Snapshot() or null,
     }
 end
 

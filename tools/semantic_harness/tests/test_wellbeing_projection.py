@@ -49,25 +49,31 @@ class WellbeingProjectionTests(unittest.TestCase):
         cases = (
             ("healthy", {"healthState": "healthy", "needs": neutral_needs,
                          "conditionStats": neutral_conditions},
-             "healthy", None, "semantic.question.wellbeing.default"),
+             "healthy", "thirst", "normal",
+             "semantic.question.wellbeing.default"),
             ("injured", {"healthState": "injured", "needs": neutral_needs,
                          "conditionStats": neutral_conditions},
-             "injured", None, "semantic.question.wellbeing.injured"),
+             "injured", "thirst", "normal",
+             "semantic.question.wellbeing.injured"),
             ("thirst", {"healthState": "healthy",
                         "needs": {"hunger": 0.05, "thirst": 0.95, "fatigue": 0.05},
                         "conditionStats": neutral_conditions},
-             "healthy", "thirst", "semantic.question.wellbeing.thirst"),
+             "healthy", "thirst", None,
+             "semantic.question.wellbeing.thirst"),
             ("panic", {"healthState": "healthy", "needs": neutral_needs,
                        "conditionStats": {"stress": 0.0, "panic": 95, "boredom": 0.0}},
-             "healthy", None, "semantic.question.wellbeing.panic"),
+             "healthy", "thirst", "normal",
+             "semantic.question.wellbeing.panic"),
         )
-        for label, npc, health, need, template_prefix in cases:
+        for label, npc, health, need, urgency, template_prefix in cases:
             with self.subTest(case=label):
                 with LuaSemanticWorker(self.scenario(npc)) as worker:
                     result = worker.input("Are you okay?")
                 situation, response = self.assert_offline_wellbeing(result)
                 self.assertEqual(situation["healthState"], health)
                 self.assertEqual(situation["needs"].get("highest"), need)
+                if urgency is not None:
+                    self.assertEqual(situation["needs"].get("urgency"), urgency)
                 self.assertTrue(
                     response["templateID"].startswith(template_prefix),
                     response,

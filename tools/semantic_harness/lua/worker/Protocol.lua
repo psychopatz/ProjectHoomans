@@ -9,6 +9,11 @@ local Protocol = {
     MAX_MESSAGE_BYTES = 256 * 1024,
 }
 
+-- Lua tables with only nil-valued fields are indistinguishable from empty
+-- arrays to the small protocol encoder. Keep an explicit sentinel for JSON
+-- null so callers can preserve object shape across the worker boundary.
+Protocol.NULL = {}
+
 local function jsonEscape(value)
     value = tostring(value or "")
     value = string.gsub(value, "\\", "\\\\")
@@ -37,6 +42,7 @@ end
 
 local function jsonEncode(value)
     local valueType = type(value)
+    if value == Protocol.NULL then return "null" end
     if value == nil then return "null" end
     if valueType == "boolean" then return value and "true" or "false" end
     if valueType == "number" then
