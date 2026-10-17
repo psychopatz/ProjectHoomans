@@ -1,6 +1,6 @@
 # Contextual Semantic Intelligence — progress
 
-**Updated:** 2026-10-17. **Phase:** 4 — semantic paraphrase coverage. **Status:** Phase 4 bounded paraphrase Semantic Lab gate accepted; Phase 5 is the sole Next Chunk. Native SP/MP acceptance remains OPEN.
+**Updated:** 2026-10-17. **Phase:** 5 — optional PBrainZ/group compatibility. **Status:** Phase 5 bounded compatibility Semantic Lab gate accepted; Phase 6 is the sole Next Chunk. Native SP/MP acceptance remains OPEN.
 
 ## Revision evidence
 
@@ -128,15 +128,27 @@ Phase 3 is accepted for this bounded Semantic Lab scope: authored apology, exist
 
 Phase 4 is accepted only for this one reviewed paraphrase and its held-out false-positive boundary. It does not accept broad paraphrase coverage, group dialogue, PBrainZ fallback or native SP/MP behavior.
 
-## ONE current Next Chunk — Phase 5 optional PBrainZ/group compatibility audit
+## Phase 5 verification evidence — accepted for the bounded Semantic Lab gate
 
-1. Audit the existing optional PBrainZ provider seam and group-dialogue state ownership before changing behavior; keep deterministic intent and action authorization authoritative when the provider is disabled or unavailable.
-2. Run a bounded read-only provider parity probe, if the existing seam supports it, asserting semantic IR and authority parity with PBrainZ disabled/enabled and no cross-speaker leakage.
-3. Exercise speaker/conversation scoping for a minimal group case without adding a global NPC transcript or new gameplay obligation.
-4. Keep native SP/MP explicitly open; do not claim provider or group acceptance unless the bounded real-worker evidence passes.
+- Implementation revision: Project Hoomans `338f97e7` (`test(semantic): verify provider and group parity`); the detailed audit is in [`PHASE5_PBRAINZ_GROUPS.md`](PHASE5_PBRAINZ_GROUPS.md). No production runtime code changed.
+- The ownership audit traced `SubmitProviderFallback` through the optional PBrainZ submit path and confirmed fail-closed deterministic clarification on provider absence/rejection. The bounded provider payload retains semantic fallback/IR, dialogue situation, entity index and participant projections. Group refresh/submit/fan-out retains one canonical interpretation, actual member speaker identity, per-member context routing and one group-wide action dispatch.
+- Real-worker provider parity tests: **PASS 2/2**. Recognized `follow me` had identical deterministic `REQUEST/FOLLOW` IR and authorized action with provider disabled/enabled; unknown input remained clarification-only, and the enabled harness adapter's rejected provider attempt did not authorize an action.
+- Focused provider/group Lua cases: **PASS 3/3** (`pnc_semantic_group`, `pnc_pbrainz_context`, `pnc_pbrainz_provider_availability`). PBrainZ semantic/integration smoke cases excluding the unrelated native-button fixture: **PASS 11/11**. Full Python suite: **PASS 69/69**. Compiler tests: **PASS 7/7**.
+- `tools/semantic_harness/run_harness.sh --doctor --doctor-json`: **PASS**. `tools/semantic_harness/run_harness.sh --test pnc_semantic`: **PASS 66/66**. CLI report `/tmp/contextual-semantic-suite-phase5-semantic.json`: **PASS 66/66**, 198 events, `conflicts=[]`, `audit_truncated=null`; those protocol/replay values are not semantic proof.
+- `pz-verify` over the semantic directory reported 0 Kahlua errors and 0 warnings. The broader PBrainZ selection remains `12/13` only because the unrelated `pnc_pbrainz_native_button_smoke.lua` fixture is stale/missing an `ISUI/ISImage` preload; it fails before semantic assertions and was not changed.
+- Live provider-success behavior was **NOT TESTED**; the enabled worker adapter intentionally rejects the external request after recording the attempted call. Native SP: **NOT TESTED**. Native MP: **NOT TESTED**.
+
+Phase 5 is accepted only for deterministic/provider-failure parity, bounded provider context and group speaker/participant isolation. It does not accept live provider-generated responses or native SP/MP behavior.
+
+## ONE current Next Chunk — Phase 6 native SP/MP and performance acceptance
+
+1. Run controlled Project Zomboid Build 42 single-player scenarios for the accepted semantic slices, including the reviewed paraphrase, contextual reactions, provider-disabled fallback and nearby group behavior.
+2. Run controlled multiplayer/server-authority scenarios for action requests, group turns, leases, late callbacks and save/reload boundaries; record exact build and failures.
+3. Measure dialogue overhead, queue/tick behavior, bounded context size and provider-disabled cost; preserve the existing action-plan and response queues.
+4. Keep live PBrainZ success explicitly open until a real bridge/provider response has been exercised and normalized through the existing Semantic IR contract.
 
 ## Remaining roadmap
 
 0B baseline characterization -> 1 wellbeing reactions -> 2 multi-turn -> 3 social -> 4 paraphrases -> 5 PBrainZ/groups -> 6 SP/MP + performance acceptance.
 
-No new reaction arbiter or gameplay feature is claimed yet; code currently provides the truthful test foundation.
+No new reaction arbiter or gameplay feature is claimed in Phase 5; the production runtime is unchanged and the new evidence is test/audit coverage.
