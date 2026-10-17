@@ -1,0 +1,398 @@
+-- Validated, data-only dialogue-flow registration.
+--
+-- A flow describes semantic frames and bounded transitions. It does not know
+-- how to translate a response or execute a gameplay action.
+PNC = PNC or {}
+PNC.Semantics = PNC.Semantics or {}
+
+local Registry = PNC.Semantics.DialogueFlowRegistry or {}
+PNC.Semantics.DialogueFlowRegistry = Registry
+
+Registry.VERSION = 1
+Registry.DEFAULT_MAX_FLOWS = 32
+Registry.MAX_NODES = 32
+Registry.MAX_TRIGGERS = 8
+Registry.MAX_ACCEPTS = 16
+Registry.MAX_TRANSITIONS = 64
+Registry.Flows = Registry.Flows or {}
+Registry.FlowOrder = Registry.FlowOrder or {}
+Registry.Revision = tonumber(Registry.Revision) or 0
+
+local FRAME_FIELDS = {
+    "intent", "speechAct", "action", "subject", "target", "reference",
+    "identityClaim", "selfDirected", "stateType", "stateValue",
+}
+local FRAME_FIELD_SET = {}
+for index = 1, #FRAME_FIELDS do FRAME_FIELD_SET[FRAME_FIELDS[index]] = true end
+
+local SPECIAL_TARGETS = {
+    cancel = true,
+    resume = true,
+    suspend = true,
+}
+
+local function copyValue(value, depth)
+    if type(value) ~= "table" then return value end
+    depth = tonumber(depth) or 0
+    if depth >= 10 then return nil end
+    local output = {}
+    local key
+    local item
+    for key, item in pairs(value) do
+        if type(key) ~= "function" and type(item) ~= "function" then
+            output[key] = copyValue(item, depth + 1)
+        end
+    end
+    return output
+end
+
+local function stringValue(value)
+    value = tostring(value or "")
+    return value ~= "" and value or nil
+end
+
+local function frameKey(frame)
+    local values = {}
+    local index
+    local field
+    for index = 1, #FRAME_FIELDS do
+        field = FRAME_FIELDS[index]
+        if frame[field] ~= nil then
+            values[#values + 1] = field .. "=" .. tostring(frame[field])
+        end
+    end
+    return table.concat(values, "|")
+end
+
+local function normalizeFrame(frame, label)
+    if type(frame) ~= "table" then
+        return nil, label .. "_must_be_object"
+    end
+    local output = {}
+    local key
+    local value
+    local supported = false
+    for key, value in pairs(frame) do
+        if not FRAME_FIELD_SET[key] then
+            return nil, label .. "_unsupported_field:" .. tostring(key)
+        end
+        if type(value) ~= "string"
+            and type(value) ~= "number"
+            and type(value) ~= "boolean"
+        then
+            return nil, label .. "_field_must_be_scalar:" .. tostring(key)
+        end
+        output[key] = value
+        supported = true
+    end
+    if not supported then return nil, label .. "_empty" end
+    return output
+end
+
+local function normalizeTransition(value, nodes, label)
+    if value == nil then return nil end
+    value = stringValue(value)
+    if not value then return nil, label .. "_empty" end
+    if SPECIAL_TARGETS[value] then return value end
+    if not nodes[value] then
+        return nil, label .. "_unknown_node:" .. value
+    end
+    return value
+end
+
+local function normalizeSlots(slots, label)
+    if slots == nil then return {} end
+    if type(slots) ~= "table" then return nil, label .. "_must_be_object" end
+    local output = {}
+    local name
+    local definition
+    for name, definition in pairs(slots) do
+        if type(name) ~= "string" or name == "" then
+            return nil, label .. "_invalid_name"
+        end
+        if type(definition) ~= "table" then
+            return nil, label .. "_invalid_slot:" .. name
+        end
+        local slotType = stringValue(definition.type)
+        local owner = stringValue(definition.owner)
+        local source = stringValue(definition.source)
+        if not slotType or not owner then
+            return nil, label .. "_slot_requires_type_and_owner:" .. name
+        end
+        output[name] = {
+            type = slotType,
+            owner = owner,
+            source = source,
+        }
+    end
+    return output
+end
+
+local function normalizeNode(nodeID, node, nodes)
+    if type(node) ~= "table" then
+        return nil, "node_must_be_object:" .. tostring(nodeID)
+    end
+    local output = {
+        id = nodeID,
+        terminal = node.terminal == true,
+        responsePool = stringValue(node.responsePool),
+        responseTemplate = stringValue(node.responseTemplate),
+    }
+    local slots, reason = normalizeSlots(node.slots, "node_slots")
+    if not slots then return nil, reason .. ":" .. tostring(nodeID) end
+    output.slots = slots
+
+    if node.accepts ~= nil then
+        if type(node.accepts) ~= "table" then
+            return nil, "node_accepts_must_be_array:" .. tostring(nodeID)
+        end
+        if #node.accepts > Registry.MAX_ACCEPTS then
+            return nil, "node_accept_limit:" .. tostring(nodeID)
+        end
+        output.accepts = {}
+        local seen = {}
+        local index
+        local frame
+        local key
+        for index = 1, #node.accepts do
+            frame, reason = normalizeFrame(
+                node.accepts[index], "node_accept_frame"
+            )
+            if not frame then return nil, reason .. ":" .. tostring(nodeID) end
+            key = frameKey(frame)
+            if seen[key] then
+                return nil, "duplicate_node_transition:" .. tostring(nodeID)
+            end
+            seen[key] = true
+            output.accepts[#output.accepts + 1] = frame
+        end
+    else
+        output.accepts = {}
+    end
+
+    local fields = { "next", "onMatch", "onUnrelated", "onRefuse" }
+    local index
+    local field
+    local target
+    for index = 1, #fields do
+        field = fields[index]
+        target, reason = normalizeTransition(
+            node[field], nodes, "node_" .. field
+        )
+        if node[field] ~= nil and not target then
+            return nil, reason .. ":" .. tostring(nodeID)
+        end
+        output[field] = target
+    end
+    if not output.terminal and #output.accepts == 0 then
+        return nil, "nonterminal_node_requires_accepts:" .. tostring(nodeID)
+    end
+    if not output.terminal
+        and not output.next and not output.onMatch
+        and not output.onUnrelated and not output.onRefuse
+    then
+        return nil, "nonterminal_node_requires_transition:" .. tostring(nodeID)
+    end
+    return output
+end
+
+local function validateReachability(nodes, initial)
+    local seen = {}
+    local pending = { initial }
+    local index
+    local nodeID
+    local node
+    local target
+    while #pending > 0 do
+        nodeID = table.remove(pending, 1)
+        if not seen[nodeID] then
+            seen[nodeID] = true
+            node = nodes[nodeID]
+            if node then
+                for _, field in ipairs({ "next", "onMatch", "onRefuse" }) do
+                    target = node[field]
+                    if target and not SPECIAL_TARGETS[target]
+                        and not seen[target]
+                    then
+                        pending[#pending + 1] = target
+                    end
+                end
+            end
+        end
+    end
+    for nodeID in pairs(nodes) do
+        if not seen[nodeID] then
+            return false, "unreachable_node:" .. tostring(nodeID)
+        end
+    end
+    return true
+end
+
+function Registry.Validate(definition)
+    if type(definition) ~= "table" then return false, "flow_must_be_object" end
+    local flowID = stringValue(definition.id)
+    if not flowID then return false, "flow_requires_id" end
+    if string.find(flowID, "[%s/]") then
+        return false, "flow_id_contains_separator"
+    end
+    local version = tonumber(definition.version) or 0
+    if version < 1 then return false, "flow_requires_version" end
+    if type(definition.triggers) ~= "table"
+        or #definition.triggers == 0
+    then
+        return false, "flow_requires_triggers"
+    end
+    if #definition.triggers > Registry.MAX_TRIGGERS then
+        return false, "flow_trigger_limit"
+    end
+    local normalizedTriggers = {}
+    local index
+    local frame
+    local reason
+    for index = 1, #definition.triggers do
+        frame, reason = normalizeFrame(
+            definition.triggers[index], "flow_trigger"
+        )
+        if not frame then return false, reason end
+        normalizedTriggers[#normalizedTriggers + 1] = frame
+    end
+
+    if type(definition.nodes) ~= "table" then
+        return false, "flow_requires_nodes"
+    end
+    local nodeCount = 0
+    local nodeID
+    for nodeID in pairs(definition.nodes) do nodeCount = nodeCount + 1 end
+    if nodeCount == 0 then return false, "flow_requires_nodes" end
+    if nodeCount > Registry.MAX_NODES then return false, "flow_node_limit" end
+    local initial = stringValue(definition.initial)
+    if not initial or not definition.nodes[initial] then
+        return false, "flow_initial_node_missing"
+    end
+
+    local normalizedNodes = {}
+    for nodeID in pairs(definition.nodes) do
+        if type(nodeID) ~= "string" or nodeID == "" then
+            return false, "flow_invalid_node_id"
+        end
+    end
+    for nodeID, node in pairs(definition.nodes) do
+        normalizedNodes[nodeID], reason = normalizeNode(
+            nodeID, node, definition.nodes
+        )
+        if not normalizedNodes[nodeID] then return false, reason end
+    end
+    local reachable
+    reachable, reason = validateReachability(normalizedNodes, initial)
+    if not reachable then return false, reason end
+
+    local slotOwners = {}
+    for nodeID, node in pairs(normalizedNodes) do
+        local slotName
+        local slot
+        for slotName, slot in pairs(node.slots) do
+            if slotOwners[slotName]
+                and slotOwners[slotName] ~= slot.owner
+            then
+                return false, "conflicting_slot_owner:" .. slotName
+            end
+            slotOwners[slotName] = slot.owner
+        end
+    end
+
+    return true, {
+        id = flowID,
+        version = version,
+        owner = stringValue(definition.owner),
+        initial = initial,
+        triggers = normalizedTriggers,
+        nodes = normalizedNodes,
+        slotOwners = slotOwners,
+    }
+end
+
+function Registry.Register(definition)
+    local valid, normalized = Registry.Validate(definition)
+    if not valid then return false, normalized end
+    if #Registry.FlowOrder >= Registry.DEFAULT_MAX_FLOWS then
+        return false, "flow_limit"
+    end
+    if Registry.Flows[normalized.id] then
+        return false, "duplicate_flow_id:" .. normalized.id
+    end
+    Registry.Flows[normalized.id] = normalized
+    Registry.FlowOrder[#Registry.FlowOrder + 1] = normalized.id
+    Registry.Revision = Registry.Revision + 1
+    return true, normalized
+end
+
+function Registry.Get(flowID)
+    return Registry.Flows[flowID]
+end
+
+function Registry.List()
+    local output = {}
+    for index = 1, #Registry.FlowOrder do
+        output[index] = Registry.FlowOrder[index]
+    end
+    return output
+end
+
+function Registry.GetRevision()
+    return Registry.Revision
+end
+
+function Registry.FrameMatches(frame, ir)
+    if type(frame) ~= "table" or type(ir) ~= "table" then return false end
+    local social = type(ir.socialContext) == "table"
+        and ir.socialContext or {}
+    local state = type(ir.slots) == "table" and ir.slots.state or {}
+    if frame.intent ~= nil and ir.intent ~= frame.intent then return false end
+    if frame.speechAct ~= nil and ir.speechAct ~= frame.speechAct then
+        return false
+    end
+    if frame.action ~= nil and ir.action ~= frame.action then return false end
+    if frame.subject ~= nil and ir.subject ~= frame.subject then return false end
+    if frame.target ~= nil and social.target ~= frame.target then return false end
+    if frame.reference ~= nil then
+        local reference = ir.references and ir.references.reference
+            or ir.object and ir.object.reference
+            or ir.target and ir.target.reference
+        if reference ~= frame.reference then return false end
+    end
+    if frame.identityClaim ~= nil
+        and social.identityClaim ~= frame.identityClaim
+    then
+        return false
+    end
+    if frame.selfDirected ~= nil
+        and social.selfDirected ~= frame.selfDirected
+    then
+        return false
+    end
+    if frame.stateType ~= nil and state.type ~= frame.stateType then
+        return false
+    end
+    if frame.stateValue ~= nil and state.value ~= frame.stateValue then
+        return false
+    end
+    return true
+end
+
+function Registry.MatchesAny(frames, ir)
+    if type(frames) ~= "table" then return false, nil end
+    for index = 1, #frames do
+        if Registry.FrameMatches(frames[index], ir) then
+            return true, frames[index]
+        end
+    end
+    return false, nil
+end
+
+function Registry.Reset()
+    Registry.Flows = {}
+    Registry.FlowOrder = {}
+    Registry.Revision = Registry.Revision + 1
+end
+
+return Registry

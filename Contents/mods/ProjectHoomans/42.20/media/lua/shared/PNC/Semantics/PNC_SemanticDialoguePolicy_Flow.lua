@@ -22,6 +22,7 @@ local isInventoryQuery = Internal.IsInventoryQuery
 local isLocalFactQuestion = Internal.IsLocalFactQuestion
 local unresolvedWorldTargetRequest = Internal.UnresolvedWorldTargetRequest
 local isIdentityClaim = Internal.IsIdentityClaim
+local flowKernel = Internal.FlowKernel
 
 function Policy.Decide(ir, state, context, options)
     options = type(options) == "table" and options or {}
@@ -41,6 +42,16 @@ function Policy.Decide(ir, state, context, options)
         return applyLocalResponse(result, ir, state, context)
     end
 
+    local flowPreview = flowKernel
+        and flowKernel.Preview(ir, state, context, options) or nil
+    local function finish(result)
+        if flowPreview then
+            result.flow = flowPreview
+            result.diagnostics.flow = flowPreview.diagnostics
+        end
+        return applyLocalResponse(result, ir, state, context)
+    end
+
     local diagnostics = ir.diagnostics or {}
     local confidence = tonumber(ir.confidence) or 0
     local giftOffer = classifyGiftOffer(ir)
@@ -53,7 +64,7 @@ function Policy.Decide(ir, state, context, options)
             options
         )
         result.diagnostics.llmEligible = hasLLM
-        return applyLocalResponse(result, ir, state, context)
+        return finish(result)
     end
 
     -- A resolvable reference is required before a semantic action can be
@@ -77,7 +88,7 @@ function Policy.Decide(ir, state, context, options)
             options
         )
         result.diagnostics.llmEligible = hasLLM
-        return applyLocalResponse(result, ir, state, context)
+        return finish(result)
     end
 
     if fuzzyActionNeedsConfirmation(ir, options) then
@@ -90,7 +101,7 @@ function Policy.Decide(ir, state, context, options)
         )
         result.diagnostics.llmEligible = hasLLM
         result.diagnostics.fuzzyActionRequiresConfirmation = true
-        return applyLocalResponse(result, ir, state, context)
+        return finish(result)
     end
 
     local branch, reason = resolveIntentBranch(ir, state, context, giftOffer)
@@ -115,7 +126,7 @@ function Policy.Decide(ir, state, context, options)
         result.diagnostics.stateSequence = state.sequence
         result.diagnostics.currentTopic = state.currentTopic
     end
-    return applyLocalResponse(result, ir, state, context)
+    return finish(result)
 end
 
 function Policy.Process(text, state, context, options)
@@ -127,6 +138,14 @@ function Policy.Process(text, state, context, options)
         end
     end
     local result = Policy.Decide(ir, state, context, options)
+    if type(Policy.CommitFlow) == "function" then
+        local committedFlow = Policy.CommitFlow(
+            result, ir, state, context, options
+        )
+        if type(committedFlow) == "table" then
+            result.flow = committedFlow
+        end
+    end
     if state and type(state.CompletePending) == "function" then
         -- Preserve pending context through decision/response composition, then
         -- retire an obligation answered by this turn.

@@ -1,0 +1,23 @@
+{
+  "id": "identity_wellbeing_flow_case",
+  "tags": ["identity", "wellbeing", "flow", "singleplayer"],
+  "scenario": {
+    "player": {
+      "characterUUID": "char_patrick",
+      "forename": "Patrick",
+      "surname": "Patz",
+      "displayName": "Patrick Patz"
+    },
+    "npc": {
+      "npcID": "npc_mara",
+      "forename": "Mara",
+      "surname": "Vale"
+    }
+  },
+  "inputs": [
+    "who are you",
+    "are you okay",
+    "im fine thanks",
+    "My name is Patrick"
+  ]
+}
