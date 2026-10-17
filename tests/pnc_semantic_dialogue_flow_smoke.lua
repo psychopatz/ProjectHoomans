@@ -125,6 +125,12 @@ local first = router:Process("who are you", context, { timestamp = 2 })
 T.equal(first.flow.status, "started", "identity flow commits once")
 T.equal(first.flow.active.flowId, "identity",
     "identity flow owns the committed session")
+T.equal(first.decision.response.selectionSource, "flow",
+    "identity flow selects the production response")
+T.equal(first.decision.response.sourceFlowID, "identity",
+    "identity response records its owning flow")
+T.equal(first.decision.response.sourcePoolID, "semantic.question.identity",
+    "identity flow response uses its registered pool")
 T.equal(#contextState:FlowSnapshot(), 1,
     "committed flow is visible in bounded context")
 
@@ -151,12 +157,18 @@ T.equal(interruption.flow.active.flowId, "wellbeing",
     "wellbeing becomes active")
 T.equal(interruption.flow.suspended[1].flowId, "identity",
     "identity is suspended per addressee")
+T.equal(interruption.decision.response.selectionSource, "flow",
+    "wellbeing flow selects the production response")
+T.equal(interruption.decision.response.sourceFlowID, "wellbeing",
+    "wellbeing response records its owning flow")
 
 local wellbeing = router:Process("im fine thanks", context, { timestamp = 5 })
 T.equal(wellbeing.flow.transition, "match",
     "wellbeing answer matches its active node")
 T.equal(wellbeing.flow.active.flowId, "identity",
     "identity resumes after wellbeing completes")
+T.falsy(wellbeing.decision.response.selectionSource == "flow",
+    "wellbeing completion keeps its self-state response")
 T.equal(#wellbeing.flow.suspended, 0,
     "completed wellbeing is removed from the stack")
 
@@ -165,6 +177,8 @@ T.equal(identity.flow.transition, "match",
     "identity claim matches its resumed node")
 T.equal(identity.flow.status, "retired",
     "completed identity flow retires its session")
+T.falsy(identity.decision.response.selectionSource == "flow",
+    "identity authority keeps its server-result response")
 T.equal(#contextState:FlowSnapshot(), 0,
     "completed flow leaves no stale session")
 

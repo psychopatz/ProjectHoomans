@@ -1,8 +1,8 @@
 # Semantic Dialogue Decoupling — current implementation state
 
 **Updated:** 2026-10-17
-**Phase:** D0A — Semantic Lab repair and production-worker verification
-**State:** D0A is complete for the developer gate. The real Lua worker and repaired GUI source expose production conversation facts; the next bounded chunk is D1 flow-owned response selection. Native Project Zomboid testing and Workshop publication remain user-owned and are not blockers.
+**Phase:** D1 — flow-owned response selection
+**State:** D1 is complete for the developer gate. Registered flow response pools now select the actual production response on safe flow-owned turns; terminal/authoritative turns preserve their existing response paths. The next bounded chunk is D2, a third registered dialogue type. Native Project Zomboid testing and Workshop publication remain user-owned and are not blockers.
 
 This is the one active progress ledger for this goal. C0A/C0B source work and unrelated Core radio edits remain preserved.
 
@@ -18,6 +18,12 @@ The existing Semantic Lab worker now returns one bounded production `observation
 The existing Tk GUI now has a Turn facts inspector, a Raw worker record tab, and a side-effect-free Preview control. Its transcript prefers the production rendered `text` over the English fallback, so TL responses are visible as TL. The GUI is source-verified but not claimed interactively passed: desktop automation reported `apps=[]`; no GUI click-through was available in this session. The real worker is the documented fallback.
 
 The meaningful production trace used for acceptance was `who are you` -> `are you okay` -> `im fine thanks` -> `My name is Patrick` in TL. It selected the expected identity/wellbeing candidates, observed `start` -> `interrupt_start` -> `match` -> `match`, preserved/resumed the identity flow, retired it after the name, rendered the actual selected reply, observed no transport/actions for the first three turns, and observed only the expected identity request plus relationship adjustment on completion.
+
+## D1 result
+
+The production policy now consumes a registered flow response pool through `LocalResponse.ResolveFlow` after flow preview and before response-plan attachment. The flow kernel selects a target-node pool for matched transitions, so a terminal wellbeing/name answer does not accidentally reuse the opening question pool. Flow-owned responses carry `selectionSource=flow`, `sourceFlowID`, `flowTransition`, and the real selected pool/template into the existing presentation queue. Action-bearing and authoritative identity turns fall back to their existing adapters.
+
+The real-worker trace verified `identity/start -> semantic.question.identity.stranger_alt_2` and `wellbeing/interrupt_start -> semantic.question.wellbeing.dataset.hanging_in` as flow-owned displayed replies. `im fine thanks` retained `semantic.self_state.wellbeing_alt`, and `My name is Patrick` retained the authoritative identity exchange plus exactly one identity request and relationship adjustment.
 
 ## Revision and deployment matrix
 
@@ -75,6 +81,13 @@ The GitHub Core publication does not need a source-level correction for C0A: 569
 - `python3 -m tools.semantic_harness.app --doctor`: **PASS** for repository/Core discovery, Lua, worker syntax and READY/PING/CAPABILITIES; non-blocking venv warning only. The internal worker trace used the checked-out production Hoomans/Core modules.
 - Desktop automation exposed no controllable app (`apps=[]`), so no GUI interaction is claimed as passed. GUI source wiring is covered by the import/translation-preference test and the production worker fallback.
 
+## D1 focused verification
+
+- `lua5.3 tests/pnc_semantic_dialogue_flow_smoke.lua`: **PASS**, including flow-owned identity/wellbeing response selection and preservation of terminal/authoritative replies.
+- `python3 -m unittest tools.semantic_harness.tests.test_semantic_dialogue_flows -q`: **6/6 PASS**.
+- The combined focused Semantic Lab set (`test_app`, `test_semantic_dialogue_flows`, `test_semantic_live_parity`, `test_worker_session`) remained green after D1; the production worker showed the expected selected template, rendered text, flow node and side-effect set.
+- `luac5.3 -p` and focused `pz_verify --kahlua --severity ERROR --no-snippets` passed for the three changed production semantic Lua modules.
+
 ## Focused verification
 
 - python3 -m unittest tools.semantic_harness.tests.test_semantic_live_parity -v: 4/4 PASS.
@@ -97,4 +110,4 @@ C0A exit is satisfied and the read-only C0B handshake remains implemented and so
 
 The controlled native surface is currently unavailable: no Project Zomboid process is running and the native UI inventory is empty. Do not infer native acceptance from the direct Lua smokes or the prior English screenshot. After launching PZ with the matched local pair or an explicitly republished pair, keep `ProjectHoomans.SemanticDialogueAudit` enabled, fully restart PZ, open one NPC conversation, and submit `are you okay` followed by `im fine thanks` or `im hungry`. Capture the complete console line containing `semantic_audit event=semantic.capability_handshake` and verify `ok=true`, `parserCandidates=true`, `candidateSelection=true`, `flowCommit=true`, `routerCandidateHooks=true`, `translation.manifestRegistered=true`, `translation.manifestRead=true`, `translation.catalogLoaded=true`, and `translation.shardCount=12`. Repeat after an EN/TL language restart and record the actual rendered text plus fallback provenance; then run a separate MP server/client pass for authority, duplicate-request, speaker isolation, and rejoin evidence. Any false field must be reported through `failures`, not treated as a pass.
 
-The next development chunk is D1: make registered flow response pools control actual production replies while preserving the identity regression and authoritative adapters. Do not wait for native capability, SP/MP, or Workshop evidence before continuing.
+The next development chunk is D2: register one harmless third dialogue type with a contextual response and follow-up, without editing the central intent branch or resolver. Do not wait for native capability, SP/MP, or Workshop evidence before continuing.

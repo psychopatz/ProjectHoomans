@@ -163,6 +163,9 @@ function OutputProjection.observation(context, record)
         fallback = response.fallback,
         text = response.fallback,
         key = response.templateID,
+        selectionSource = response.selectionSource,
+        sourceFlowID = response.sourceFlowID,
+        flowTransition = response.flowTransition,
     }
     for _, message in ipairs(record.messages or {}) do
         if type(message) == "table" and message.speaker == "npc" then

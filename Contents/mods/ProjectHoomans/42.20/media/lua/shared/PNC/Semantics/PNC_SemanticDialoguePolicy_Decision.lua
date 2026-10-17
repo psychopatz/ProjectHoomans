@@ -17,6 +17,59 @@ local isIdentityEvasion = Internal.IsIdentityEvasion
 local ResponsePlan = require
     "PNC/Semantics/PNC_SemanticDialogueResponsePlan"
 
+local function flowResponseEligible(result, context)
+    local flow = result and result.flow or nil
+    if type(flow) ~= "table" or flow.matched ~= true
+        or type(flow.responsePool) ~= "string"
+        or flow.responsePool == ""
+        or result.action ~= nil
+    then
+        return false
+    end
+    -- Identity claims and other authoritative turns must keep their existing
+    -- server-result response path. A verified identity also keeps the legacy
+    -- known-name presentation instead of reopening the strangers' pool.
+    if result.branch == "IDENTITY_CLAIM_RECEIVED"
+        or result.branch == "GIFT_OFFER_DISPATCHED"
+        or result.branch == "GIFT_SELECTION_REQUIRED"
+        or result.branch == "GIFT_CONSENT_GRANTED"
+    then
+        return false
+    end
+    return not (type(context) == "table"
+        and context.identityState == "known"
+        and context.identityClaimVerified == true)
+end
+
+local function applyFlowResponse(result, ir, state, context)
+    if not flowResponseEligible(result, context)
+        or not LocalResponse
+        or type(LocalResponse.ResolveFlow) ~= "function"
+    then
+        return false
+    end
+    local response, reason = LocalResponse.ResolveFlow(
+        ir, state, context, result.flow
+    )
+    if type(response) ~= "table" then
+        result.diagnostics.flowResponse = {
+            selected = false,
+            poolID = result.flow.responsePool,
+            reason = reason or "flow_response_unavailable",
+        }
+        return false
+    end
+    result.response = response
+    result.diagnostics.flowResponse = {
+        selected = true,
+        poolID = result.flow.responsePool,
+        templateID = response.templateID,
+        flowID = result.flow.flowId,
+        transition = result.flow.transition,
+    }
+    return true
+end
+
 local function responseFor(branch, ir)
     local definition = Policy.ResponseTemplates[branch]
         or Policy.ResponseTemplates.UNKNOWN
@@ -90,7 +143,12 @@ local function decision(ir, route, branch, reason, options)
 end
 
 local function applyLocalResponse(result, ir, state, context)
-    if LocalResponse and type(LocalResponse.Resolve) == "function" then
+    local flowOwned = flowResponseEligible(result, context)
+    local flowSelected = flowOwned
+        and applyFlowResponse(result, ir, state, context) or false
+    if not flowSelected and LocalResponse
+        and type(LocalResponse.Resolve) == "function"
+    then
         local ok, response = pcall(
             LocalResponse.Resolve, ir, state, context, result.branch
         )
@@ -99,7 +157,11 @@ local function applyLocalResponse(result, ir, state, context)
     if ResponsePlan and type(ResponsePlan.Attach) == "function"
         and type(result.response) == "table"
     then
-        ResponsePlan.Attach(result.response, result.branch)
+        ResponsePlan.Attach(
+            result.response,
+            result.branch,
+            result.flow and result.flow.responsePool
+        )
     end
     return result
 end

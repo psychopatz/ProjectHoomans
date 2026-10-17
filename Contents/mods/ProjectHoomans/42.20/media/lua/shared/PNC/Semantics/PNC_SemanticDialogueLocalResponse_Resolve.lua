@@ -13,6 +13,22 @@ local followsRelationshipStatusAnswer =
     Internal.FollowsRelationshipStatusAnswer
 local resolveQuestion = Internal.ResolveQuestion
 
+function Response.ResolveFlow(ir, state, context, flow)
+    if type(flow) ~= "table" or flow.matched ~= true then
+        return nil, "flow_response_not_matched"
+    end
+    local poolID = tostring(flow.responsePool or "")
+    if poolID == "" then return nil, "flow_response_pool_unavailable" end
+    local response = catalogResponse(poolID, ir, state, context)
+    if type(response) ~= "table" then
+        return nil, "flow_response_variant_unavailable"
+    end
+    response.selectionSource = "flow"
+    response.sourceFlowID = flow.flowId
+    response.flowTransition = flow.transition
+    return response
+end
+
 function Response.Resolve(ir, state, context, branch)
     if type(ir) ~= "table" then return nil end
     if branch == "GREET_ACKNOWLEDGED" then

@@ -227,14 +227,18 @@ local function basePreview(ir, speakerID, addresseeID, key)
 end
 
 local function addMatch(preview, match, transition, fromNodeID, toNodeID)
+    local responseNode = match.node
+    if transition == "match" or transition == "resume_match" then
+        responseNode = nodeFor(match.flow, toNodeID)
+    end
     preview.matched = true
     preview.transition = transition
     preview.flowId = match.flow.id
     preview.fromNodeId = fromNodeID
     preview.toNodeId = toNodeID
     preview.nodeId = toNodeID
-    preview.responsePool = match.node.responsePool
-    preview.responseTemplate = match.node.responseTemplate
+    preview.responsePool = responseNode and responseNode.responsePool or nil
+    preview.responseTemplate = responseNode and responseNode.responseTemplate or nil
     preview.slotValues = slotValues(match.flow, match.node, preview.ir)
     preview.diagnostics.reason = transition
     preview.diagnostics.flowId = match.flow.id

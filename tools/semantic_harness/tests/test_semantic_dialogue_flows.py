@@ -102,6 +102,12 @@ class SemanticDialogueFlowTests(unittest.TestCase):
         self.assertEqual(first["flow"]["transition"], "start")
         self.assertEqual(first["flow"]["toNodeId"], "await_player_name")
         self.assertEqual(first["flow"]["activeAfter"][0]["flowId"], "identity")
+        self.assertEqual(first["response"]["selectionSource"], "flow")
+        self.assertEqual(first["response"]["sourceFlowID"], "identity")
+        self.assertEqual(
+            first["response"]["sourcePoolID"],
+            "semantic.question.identity",
+        )
         self.assertEqual(first["response"]["text"], identity["messages"][0]["payload"]["text"])
         self.assertTrue(first["response"]["translated"])
         self.assertEqual(first["translation"]["language"], "TL")
@@ -115,6 +121,8 @@ class SemanticDialogueFlowTests(unittest.TestCase):
             interrupted["flow"]["activeAfter"][0]["suspended"][0]["flowId"],
             "identity",
         )
+        self.assertEqual(interrupted["response"]["selectionSource"], "flow")
+        self.assertEqual(interrupted["response"]["sourceFlowID"], "wellbeing")
         self.assertTrue(interrupted["sideEffects"]["none"])
 
         resumed = status["observation"]
@@ -124,11 +132,13 @@ class SemanticDialogueFlowTests(unittest.TestCase):
         )
         self.assertEqual(resumed["flow"]["transition"], "match")
         self.assertEqual(resumed["flow"]["activeAfter"][0]["flowId"], "identity")
+        self.assertNotEqual(resumed["response"].get("selectionSource"), "flow")
         self.assertTrue(resumed["sideEffects"]["none"])
 
         completed = name["observation"]
         self.assertEqual(completed["flow"]["status"], "retired")
         self.assertEqual(completed["flow"]["activeAfter"], [])
+        self.assertNotEqual(completed["response"].get("selectionSource"), "flow")
         self.assertEqual(
             {action["name"] for action in completed["sideEffects"]["actions"]},
             {"SemanticIdentityRequest", "AdjustRelationship"},
