@@ -13,7 +13,7 @@ claimed maintenance-ready.
 
 - The authorized Hoomans checkout is
   `/home/psychopatz/Zomboid/Workshop/ProjectHoomans`, on `main`, at local
-  revision `d591959c4976ba4f9c9ff646742fc4a1836fab80`. The latest production
+  revision `e804750f36e1844f42843ed1eeeb05537afbfdb9`. The latest production
   response-plan code is `eb417d83930e7de807990323ffd06ede34169c1e` and the
   Conversation shard migration is `279b7b2af8ca4b987cade61885742edcf682aaf7`.
   `origin/main` remains
