@@ -60,6 +60,9 @@
   "UI_PNC_Conversation_Semantic_SelfReflectionWithdrawn": "Don't make a habit of saying things like that.",
   "UI_PNC_Conversation_Semantic_ThreatStressed": "I've had enough. Back off before this gets worse.",
   "UI_PNC_Conversation_Semantic_ThreatTrusted": "Don't make this personal. Step back.",
-  "UI_PNC_Conversation_Semantic_ThreatWithdrawn": "Keep your distance. I'm not discussing this."
+  "UI_PNC_Conversation_Semantic_ThreatWithdrawn": "Keep your distance. I'm not discussing this.",
+  "UI_PNC_Conversation_Semantic_FlowGreetingOpeningFriendly": "Hey! Good to see you.",
+  "UI_PNC_Conversation_Semantic_FlowGreetingOpening": "Hello. Good to see you.",
+  "UI_PNC_Conversation_Semantic_FlowGreetingFollowupFriendly": "You're welcome. It's good to see you too.",
+  "UI_PNC_Conversation_Semantic_FlowGreetingFollowup": "You're welcome. Take care."
 }
-

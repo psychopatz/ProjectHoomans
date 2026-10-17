@@ -182,6 +182,44 @@ T.falsy(identity.decision.response.selectionSource == "flow",
 T.equal(#contextState:FlowSnapshot(), 0,
     "completed flow leaves no stale session")
 
+local greetingContextState = Context.New()
+local greetingRouter = Router.New({
+    policy = Policy,
+    state = Semantic.DialogueState.New(),
+    context = contextFor(greetingContextState, "npc-greeting"),
+})
+local greeting = greetingRouter:Process(
+    "hello", greetingRouter.context, { timestamp = 7 }
+)
+T.equal(greeting.flow.flowId, "greeting",
+    "third modular flow starts from the registered greeting frame")
+T.equal(greeting.flow.status, "started",
+    "greeting flow commits once")
+T.equal(greeting.decision.response.selectionSource, "flow",
+    "greeting flow owns its opening response")
+T.equal(greeting.decision.response.sourceFlowID, "greeting",
+    "greeting response records its owning flow")
+T.equal(greeting.decision.response.sourcePoolID,
+    "semantic.flow.greeting.opening",
+    "greeting flow selects its opening response pool")
+
+local greetingFollowup = greetingRouter:Process(
+    "thanks", greetingRouter.context, { timestamp = 8 }
+)
+T.equal(greetingFollowup.flow.transition, "match",
+    "greeting flow matches the thank-you follow-up")
+T.equal(greetingFollowup.flow.status, "retired",
+    "completed greeting flow retires")
+T.equal(greetingFollowup.decision.response.selectionSource, "flow",
+    "greeting flow owns its follow-up response")
+T.equal(greetingFollowup.decision.response.sourceFlowID, "greeting",
+    "greeting follow-up records its owning flow")
+T.equal(greetingFollowup.decision.response.sourcePoolID,
+    "semantic.flow.greeting.followup",
+    "greeting flow selects its follow-up response pool")
+T.equal(#greetingContextState:FlowSnapshot(), 0,
+    "completed greeting flow leaves no stale session")
+
 local refusalContextState = Context.New()
 local refusalRouter = Router.New({
     policy = Policy,

@@ -60,6 +60,9 @@
   "UI_PNC_Conversation_Semantic_SelfReflectionWithdrawn": "Huwag mong gawing ugali ang pagsasabi ng ganyan.",
   "UI_PNC_Conversation_Semantic_ThreatStressed": "Sobra na. Lumayo ka bago lumala ito.",
   "UI_PNC_Conversation_Semantic_ThreatTrusted": "Huwag mong gawing personal ito. Umatras ka.",
-  "UI_PNC_Conversation_Semantic_ThreatWithdrawn": "Lumayo ka. Hindi ko ito pag-uusapan."
+  "UI_PNC_Conversation_Semantic_ThreatWithdrawn": "Lumayo ka. Hindi ko ito pag-uusapan.",
+  "UI_PNC_Conversation_Semantic_FlowGreetingOpeningFriendly": "Uy! Mabuti at nakita kita.",
+  "UI_PNC_Conversation_Semantic_FlowGreetingOpening": "Kumusta. Mabuti at nakita kita.",
+  "UI_PNC_Conversation_Semantic_FlowGreetingFollowupFriendly": "Walang anuman. Mabuti at nakita rin kita.",
+  "UI_PNC_Conversation_Semantic_FlowGreetingFollowup": "Walang anuman. Mag-ingat ka."
 }
-

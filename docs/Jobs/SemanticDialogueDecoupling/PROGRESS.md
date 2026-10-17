@@ -1,8 +1,8 @@
 # Semantic Dialogue Decoupling — current implementation state
 
-**Updated:** 2026-10-17
-**Phase:** D1 — flow-owned response selection
-**State:** D1 is complete for the developer gate. Registered flow response pools now select the actual production response on safe flow-owned turns; terminal/authoritative turns preserve their existing response paths. The next bounded chunk is D2, a third registered dialogue type. Native Project Zomboid testing and Workshop publication remain user-owned and are not blockers.
+**Updated:** 2026-10-18
+**Phase:** D2 — third modular dialogue type
+**State:** D2 is complete for the developer gate. A registered greeting flow now owns a contextual opening and thank-you follow-up through the production Lua worker, including EN/TL translation facts and clean retirement. The next bounded chunk is D3, the Semantic Lab visual flow editor. Native Project Zomboid testing and Workshop publication remain user-owned and are not blockers.
 
 This is the one active progress ledger for this goal. C0A/C0B source work and unrelated Core radio edits remain preserved.
 
@@ -97,6 +97,20 @@ The GitHub Core publication does not need a source-level correction for C0A: 569
 - lua5.3 tests/psychopatz_custom_core_translation_smoke.lua: FAIL at the stale assertion expecting 316 entries. A read-only run reports the current coverage snapshot as total=362, translated=336, with zero missing keys/catalogs. This is a Core test-maintenance item, not evidence that the Hoomans manifest API is unavailable.
 - No external headless harness was run, and no headless result is being used as native acceptance.
 
+## D2 result
+
+- Added `PNC_SemanticDialogueFlow_Greeting.lua` and registered it through the existing flow catalog. `GREET` starts `greeting`; `THANK` matches the bounded follow-up and retires it. No central intent-branch case or flow-ID policy switch was added for this dialogue type.
+- Added modular `semantic.flow.greeting.opening` and `semantic.flow.greeting.followup` response pools. A friendly NPC context selected the friendly variants; both turns reported `selectionSource=flow`, `sourceFlowID=greeting`, actual rendered TL text, translation keys, zero transport/actions, and the second turn had `activeAfter=[]`.
+- Preserved the existing 12 EN/12 TL manifest shape by adding the four new keys to the existing semantic response shards. The generic flow resolver also now preserves the existing unknown-health safety boundary when the wellbeing flow owns its opening pool.
+
+## D2 focused verification
+
+- `python3 -m unittest discover -s tools/semantic_harness/tests -q`: **100/100 PASS**.
+- `python3 -m unittest tools.semantic_harness.tests.test_semantic_dialogue_flows -q`: **7/7 PASS**, including the third modular flow and real TL rendering.
+- Eight focused Lua smokes (flow, input, diagnostics, response plan, identity presentation/transport, translation catalog/fallback) all exited **0**.
+- `luac5.3 -p` passed changed Lua files; focused `pz_verify --kahlua --severity ERROR --no-snippets` reported zero errors on every changed production Lua file.
+- `python3 -m tools.semantic_harness.app --doctor`: **PASS** (`READY/PING/CAPABILITIES`); only the known active-venv warning remains. Desktop automation still exposed `apps=[]`, so no GUI click-through is claimed.
+
 ## Historical C0A/C0B source handoff
 
 C0A exit is satisfied and the read-only C0B handshake remains implemented and source-smoke-tested. The following items are retained as historical user-owned deployment/live-test handoff; they are not prerequisites for D1–D6 implementation and do not block this goal:
@@ -110,4 +124,4 @@ C0A exit is satisfied and the read-only C0B handshake remains implemented and so
 
 The controlled native surface is currently unavailable: no Project Zomboid process is running and the native UI inventory is empty. Do not infer native acceptance from the direct Lua smokes or the prior English screenshot. After launching PZ with the matched local pair or an explicitly republished pair, keep `ProjectHoomans.SemanticDialogueAudit` enabled, fully restart PZ, open one NPC conversation, and submit `are you okay` followed by `im fine thanks` or `im hungry`. Capture the complete console line containing `semantic_audit event=semantic.capability_handshake` and verify `ok=true`, `parserCandidates=true`, `candidateSelection=true`, `flowCommit=true`, `routerCandidateHooks=true`, `translation.manifestRegistered=true`, `translation.manifestRead=true`, `translation.catalogLoaded=true`, and `translation.shardCount=12`. Repeat after an EN/TL language restart and record the actual rendered text plus fallback provenance; then run a separate MP server/client pass for authority, duplicate-request, speaker isolation, and rejoin evidence. Any false field must be reported through `failures`, not treated as a pass.
 
-The next development chunk is D2: register one harmless third dialogue type with a contextual response and follow-up, without editing the central intent branch or resolver. Do not wait for native capability, SP/MP, or Workshop evidence before continuing.
+The next development chunk is D3: implement the usable Semantic Lab visual flow editor over the existing worker observations and flow registry. Do not wait for native capability, SP/MP, or Workshop evidence before continuing.

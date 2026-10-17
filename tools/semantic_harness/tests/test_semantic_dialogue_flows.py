@@ -84,6 +84,68 @@ class SemanticDialogueFlowTests(unittest.TestCase):
             lookup_count += len(turn["translation"]["lookups"])
         self.assertGreaterEqual(lookup_count, 1)
 
+    def test_third_modular_greeting_flow_owns_contextual_followup(self) -> None:
+        scenario = merge(
+            DEFAULT_SCENARIO,
+            {
+                "npc": {"personality": {"socialStyle": "friendly"}},
+                "runtime": {"language": "TL"},
+            },
+        )
+        with LuaSemanticWorker(scenario) as worker:
+            opening = worker.input("hello")
+            followup = worker.input("thanks")
+
+        opening_observation = opening["observation"]
+        self.assertEqual(opening_observation["ir"]["intent"], "GREET")
+        self.assertEqual(opening_observation["flow"]["flowId"], "greeting")
+        self.assertEqual(opening_observation["flow"]["transition"], "start")
+        self.assertEqual(opening_observation["flow"]["status"], "started")
+        self.assertEqual(
+            opening_observation["flow"]["responsePoolID"],
+            "semantic.flow.greeting.opening",
+        )
+        self.assertEqual(
+            opening_observation["response"]["selectionSource"], "flow"
+        )
+        self.assertEqual(
+            opening_observation["response"]["sourceFlowID"], "greeting"
+        )
+        self.assertEqual(
+            opening_observation["response"]["templateID"],
+            "semantic.flow.greeting.opening.friendly",
+        )
+        self.assertTrue(opening_observation["response"]["translated"])
+        self.assertEqual(
+            opening_observation["response"]["translationKey"],
+            "UI_PNC_Conversation_Semantic_FlowGreetingOpeningFriendly",
+        )
+        self.assertTrue(opening_observation["sideEffects"]["none"])
+
+        followup_observation = followup["observation"]
+        self.assertEqual(followup_observation["ir"]["intent"], "THANK")
+        self.assertEqual(followup_observation["flow"]["flowId"], "greeting")
+        self.assertEqual(followup_observation["flow"]["transition"], "match")
+        self.assertEqual(followup_observation["flow"]["status"], "retired")
+        self.assertEqual(followup_observation["flow"]["activeAfter"], [])
+        self.assertEqual(
+            followup_observation["flow"]["responsePoolID"],
+            "semantic.flow.greeting.followup",
+        )
+        self.assertEqual(
+            followup_observation["response"]["selectionSource"], "flow"
+        )
+        self.assertEqual(
+            followup_observation["response"]["sourceFlowID"], "greeting"
+        )
+        self.assertEqual(
+            followup_observation["response"]["templateID"],
+            "semantic.flow.greeting.followup.friendly",
+        )
+        self.assertTrue(followup_observation["response"]["translated"])
+        self.assertGreater(followup_observation["translation"]["lookupCount"], 0)
+        self.assertTrue(followup_observation["sideEffects"]["none"])
+
     def test_worker_observation_exposes_real_turn_facts_and_side_effects(self) -> None:
         scenario = merge(
             DEFAULT_SCENARIO,

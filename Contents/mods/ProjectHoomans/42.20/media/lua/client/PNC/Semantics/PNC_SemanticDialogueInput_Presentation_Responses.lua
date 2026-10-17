@@ -55,6 +55,14 @@ local function semanticTranslationKey(response)
             "UI_PNC_Conversation_Semantic_IdentityEvasionWithdrawn",
         ["semantic.identity.evasion.default"] =
             "UI_PNC_Conversation_Semantic_IdentityEvasionDefault",
+        ["semantic.flow.greeting.opening.friendly"] =
+            "UI_PNC_Conversation_Semantic_FlowGreetingOpeningFriendly",
+        ["semantic.flow.greeting.opening.default"] =
+            "UI_PNC_Conversation_Semantic_FlowGreetingOpening",
+        ["semantic.flow.greeting.followup.friendly"] =
+            "UI_PNC_Conversation_Semantic_FlowGreetingFollowupFriendly",
+        ["semantic.flow.greeting.followup.default"] =
+            "UI_PNC_Conversation_Semantic_FlowGreetingFollowup",
         ["semantic.social.compliment.default"] =
             "UI_PNC_Conversation_Semantic_ComplimentDefault",
         ["semantic.social.compliment.alternate"] =

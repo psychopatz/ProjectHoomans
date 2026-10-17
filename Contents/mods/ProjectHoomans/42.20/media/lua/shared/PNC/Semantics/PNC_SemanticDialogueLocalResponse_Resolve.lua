@@ -13,6 +13,21 @@ local followsRelationshipStatusAnswer =
     Internal.FollowsRelationshipStatusAnswer
 local resolveQuestion = Internal.ResolveQuestion
 
+local function wellbeingFactsUnknown(context)
+    local situation = type(context) == "table"
+        and context.dialogueSituation or nil
+    local npc = type(situation) == "table" and situation.npc or nil
+    local healthState = type(npc) == "table" and npc.healthState or nil
+    local needs = type(npc) == "table" and npc.needs or nil
+    local emotion = type(npc) == "table" and npc.emotion or nil
+    local healthUnknown = type(healthState) ~= "string"
+        or healthState == ""
+        or healthState == "unknown"
+    return healthUnknown
+        and (type(needs) ~= "table" or needs.highest == nil)
+        and (type(emotion) ~= "table" or emotion.highest == nil)
+end
+
 function Response.ResolveFlow(ir, state, context, flow)
     if type(flow) ~= "table" or flow.matched ~= true then
         return nil, "flow_response_not_matched"
@@ -22,6 +37,18 @@ function Response.ResolveFlow(ir, state, context, flow)
     local response = catalogResponse(poolID, ir, state, context)
     if type(response) ~= "table" then
         return nil, "flow_response_variant_unavailable"
+    end
+    -- The wellbeing flow can own the exchange while the response resolver
+    -- still protects the unknown-facts boundary. Do not let its broad normal
+    -- pool turn missing health evidence into an unsupported "I'm okay" claim.
+    if poolID == "semantic.question.wellbeing"
+        and wellbeingFactsUnknown(context)
+        and type(Response.Resolve) == "function"
+    then
+        local contextual = Response.Resolve(
+            ir, state, context, "QUESTION_RECEIVED"
+        )
+        if type(contextual) == "table" then response = contextual end
     end
     response.selectionSource = "flow"
     response.sourceFlowID = flow.flowId

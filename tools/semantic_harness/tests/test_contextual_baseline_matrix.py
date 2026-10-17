@@ -40,7 +40,7 @@ class ContextualBaselineMatrixTests(unittest.TestCase):
         cases = (
             (
                 "greeting_default", {}, "hello there", "GREET", None,
-                "pnc.social.greet", "semantic.greet.withdrawn",
+                "pnc.social.greet", "semantic.flow.greeting.opening",
             ),
             (
                 "wellbeing_injured", {
