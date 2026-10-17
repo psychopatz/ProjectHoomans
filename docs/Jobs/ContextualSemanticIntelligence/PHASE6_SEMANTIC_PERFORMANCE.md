@@ -41,11 +41,13 @@ events reached the declared bound of 12, and the worker retained 24 queued NPC
 messages plus 48 transcript messages. These are worker-level bounded-history
 observations, not native game queue/tick measurements.
 
-The focused static boundary guard also passed: every
+The focused static boundary guard passed **3/3**: every
 `PNC_SemanticDialogueInput*.lua` module remains free of `Events.OnTick`
-registration. This guards request-driven semantic submission; it does not
-claim that surrounding gameplay, presentation or optional-provider systems
-have no tick work.
+registration, and the server-side semantic social paths retain their
+authority/lease and provider lease-ownership/replay gates. These checks guard
+request-driven submission and server-boundary ownership; they do not claim
+that surrounding gameplay, presentation or optional-provider systems have no
+tick work, nor do they replace live MP evidence.
 
 ## Gate interpretation
 

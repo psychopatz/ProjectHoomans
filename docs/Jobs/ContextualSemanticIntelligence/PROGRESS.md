@@ -156,12 +156,14 @@ Phase 5 is accepted only for deterministic/provider-failure parity, bounded prov
   `/tmp/contextual-semantic-phase6-performance-final.json`. The follow,
   reviewed wellbeing and unknown fallback branches remained deterministic;
   provider calls were `0/0/0` disabled and `0/0/1` enabled respectively.
-- The static request-driven boundary guard is Project Hoomans `804eff7b`:
+- The static request-driven and server-boundary guard is Project Hoomans
+  `804eff7b`:
   `python3 -m unittest
-  tools.semantic_harness.tests.test_phase6_static_boundaries -v` passed **1/1**;
-  the full Semantic Lab Python suite passed **72/72**. It found no
+  tools.semantic_harness.tests.test_phase6_static_boundaries -v` passed **3/3**;
+  the full Semantic Lab Python suite is **74/74**. It found no
   `Events.OnTick` registration in the `PNC_SemanticDialogueInput*.lua`
-  modules. This is a static/request-boundary result, not native game evidence.
+  modules and retained the server-side authority/lease/replay gates. This is
+  a static/request-boundary result, not native game evidence.
 - Native SP: **NOT TESTED**. Native MP: **NOT TESTED**. Existing process,
   console, profiler, Semantic Lab and replay observations are not promoted as
   native proof.
