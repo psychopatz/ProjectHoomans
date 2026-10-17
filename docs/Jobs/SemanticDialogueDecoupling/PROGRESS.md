@@ -120,6 +120,7 @@ The GitHub Core publication does not need a source-level correction for C0A: 569
 
 ## D3 focused verification
 
+- Implementation commit: `a3f95b6c` (`feat(semantic-lab): add production flow editor`).
 - `python3 -m unittest discover -s tools/semantic_harness/tests -q`: **102/102 PASS**.
 - `python3 -m unittest tools.semantic_harness.tests.test_flow_editor -v`: **2/2 PASS**, covering graph edges, production validation, registration, selected replies, and retirement.
 - `python3 -m py_compile` passed the GUI/editor/worker Python modules; `luac5.3 -p` passed the new worker editor and command router; eight focused Lua smokes all exited **0**.
