@@ -3,9 +3,18 @@
 from __future__ import annotations
 
 import unittest
+from pathlib import Path
 
 from tools.semantic_harness.scenario import DEFAULT_SCENARIO, merge
+from tools.semantic_harness.runner import load_case, run_case
 from tools.semantic_harness.worker import LuaSemanticWorker
+
+
+ORIGINAL_TRACE_CASE = (
+    Path(__file__).resolve().parents[1]
+    / "scenarios"
+    / "identity_wellbeing_original_trace_case.json"
+)
 
 
 class SemanticIdentityWellbeingCollisionTests(unittest.TestCase):
@@ -206,6 +215,143 @@ class SemanticIdentityWellbeingCollisionTests(unittest.TestCase):
         self.assertEqual(before["context"], after["context"])
         self.assertEqual(before["relationship"], after["relationship"])
         self.assertEqual(before["transport"], after["transport"])
+
+    def test_original_identity_wellbeing_conversation_trace(self) -> None:
+        run = run_case(load_case(ORIGINAL_TRACE_CASE))
+        self.assertEqual(run.conflicts, [])
+        self.assertEqual(
+            [turn["input"] for turn in run.turns],
+            ["who are you", "are you okay", "im fine thanks", "My name is Patrick"],
+        )
+
+        required_modules = {
+            "PsychopatzCore/Semantics/PsychopatzSemantic.lua",
+            "PNC/Translation/PNC_TranslationBootstrap.lua",
+            "PNC/Semantics/PNC_SemanticDialoguePolicy.lua",
+            "PNC/Semantics/PNC_SemanticDialogueInput_Presentation.lua",
+            "PNC/Semantics/PNC_SemanticIdentityExchange.lua",
+        }
+        for turn in run.turns:
+            self.assertTrue(turn["accepted"], turn.get("reason"))
+            self.assertEqual(turn["llmCalls"], 0)
+            self.assertTrue(required_modules.issubset(set(turn["loadedModules"])))
+            self.assertEqual(turn["translation"]["language"], "EN")
+            self.assertEqual(len(turn["messages"]), 1)
+            message = turn["messages"][0]["payload"]
+            self.assertTrue(message.get("key"))
+            self.assertTrue(message.get("text"))
+
+        first, wellbeing_question, wellbeing_answer, identity_claim = run.turns
+        self.assertIsNone(first["contextBefore"]["state"])
+        self.assertIsNone(first["contextBefore"]["dialogue"])
+        self.assertEqual(
+            first["result"]["ir"]["intent"],
+            "QUESTION",
+        )
+        self.assertEqual(first["result"]["ir"]["subject"], "IDENTITY")
+        self.assertEqual(
+            first["result"]["ir"]["provenance"]["pattern"],
+            "pnc.question.identity",
+        )
+        self.assertEqual(first["result"]["decision"]["branch"], "QUESTION_RECEIVED")
+        self.assertTrue(
+            first["result"]["decision"]["response"]["templateID"].startswith(
+                "semantic.question.identity."
+            )
+        )
+        self.assertEqual(first["transport"], [])
+        self.assertEqual(first["toolCalls"], [])
+        self.assertEqual(first["relationshipBefore"], first["relationshipAfter"])
+        self.assertEqual(
+            self.pending_exchange(first),
+            {"kind": "PLAYER_NAME", "requestedAt": 1},
+        )
+
+        self.assertEqual(wellbeing_question["result"]["ir"]["intent"], "QUESTION")
+        self.assertEqual(wellbeing_question["result"]["ir"]["subject"], "WELLBEING")
+        self.assertEqual(
+            wellbeing_question["result"]["ir"]["provenance"]["pattern"],
+            "pnc.question.wellbeing_okay",
+        )
+        self.assertEqual(
+            wellbeing_question["result"]["decision"]["branch"],
+            "QUESTION_RECEIVED",
+        )
+        self.assertTrue(
+            wellbeing_question["result"]["decision"]["response"]["templateID"].startswith(
+                "semantic.question.wellbeing."
+            )
+        )
+        self.assert_no_identity_effect(wellbeing_question)
+        self.assertEqual(
+            self.pending_exchange(wellbeing_question),
+            {"kind": "PLAYER_NAME", "requestedAt": 1},
+        )
+
+        self.assertEqual(wellbeing_answer["result"]["ir"]["intent"], "INFORM")
+        self.assertEqual(wellbeing_answer["result"]["ir"]["subject"], "WELLBEING")
+        self.assertEqual(
+            wellbeing_answer["result"]["ir"]["provenance"]["pattern"],
+            "pnc.state.self_wellbeing_im_plain_fine_thanks",
+        )
+        self.assertEqual(
+            wellbeing_answer["result"]["decision"]["branch"],
+            "SELF_STATE_RECEIVED",
+        )
+        self.assertTrue(
+            wellbeing_answer["result"]["decision"]["response"]["templateID"].startswith(
+                "semantic.self_state.wellbeing"
+            )
+        )
+        self.assert_no_identity_effect(wellbeing_answer)
+        self.assertEqual(
+            self.pending_exchange(wellbeing_answer),
+            {"kind": "PLAYER_NAME", "requestedAt": 1},
+        )
+
+        self.assertEqual(identity_claim["result"]["ir"]["intent"], "INFORM")
+        self.assertEqual(identity_claim["result"]["ir"]["subject"], "IDENTITY")
+        self.assertEqual(
+            identity_claim["result"]["ir"]["provenance"]["pattern"],
+            "pnc.identity.my_name_is",
+        )
+        self.assertEqual(
+            identity_claim["result"]["decision"]["branch"],
+            "IDENTITY_CLAIM_RECEIVED",
+        )
+        self.assertEqual(
+            identity_claim["result"]["decision"]["response"]["templateID"],
+            "semantic.identity.exchange",
+        )
+        self.assertEqual(
+            [
+                event["command"]
+                for event in identity_claim["transport"]
+                if event.get("direction") in {"client_to_server", "server_to_client"}
+            ],
+            ["SemanticIdentityRequest", "SemanticIdentityResult"],
+        )
+        self.assertEqual(
+            {call["name"] for call in identity_claim["toolCalls"]},
+            {"SemanticIdentityRequest", "AdjustRelationship"},
+        )
+        self.assertEqual(
+            identity_claim["relationshipAfter"]["identityTrust"],
+            "trusted",
+        )
+        self.assertEqual(identity_claim["relationshipAfter"]["approval"], 1)
+        self.assertEqual(identity_claim["relationshipAfter"]["respect"], 2)
+        self.assertEqual(identity_claim["relationshipAfter"]["familiarity"], 6)
+        self.assertEqual(identity_claim["relationshipAfter"]["revision"], 2)
+        self.assertIsNone(self.pending_exchange(identity_claim))
+        self.assertTrue(
+            any(
+                lookup["key"] == "UI_PNC_Conversation_Semantic_IdentityExchangeConfirmed"
+                and lookup["kind"] == "trFormat"
+                and lookup["fallbackUsed"] is False
+                for lookup in identity_claim["translation"]["lookups"]
+            )
+        )
 
 
 if __name__ == "__main__":

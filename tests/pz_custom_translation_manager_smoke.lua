@@ -103,6 +103,10 @@ T.equal(Translation.GetKey("UI_PNC_DebugHub_NPCMonitor_Title"), "Monitor ng NPC"
 T.equal(Translation.GetKey("UI_PNC_DebugHub_NPCMonitor_Description"),
     "Siyasatin ang lifecycle, awtoridad, presensya, labanan, at runtime body ng mga NPC.",
     "Debug Hub subtitle resolves through the localized catalog")
+T.falsy(Translation.Systems.Trading,
+    "Trading remains outside the current 15-system bootstrap registration")
+T.equal(Translation.GetKey("UI_PNC_Trading_Title", "Trading"), "Trading",
+    "unregistered Trading key uses the caller fallback after native lookup misses")
 T.equal(Translation.Get("Character", "missing.key", "Visible fallback"),
     "Visible fallback",
     "missing key uses the caller fallback")
