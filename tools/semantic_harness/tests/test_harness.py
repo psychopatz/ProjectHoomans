@@ -33,7 +33,12 @@ class SemanticHarnessTests(unittest.TestCase):
         self.assertTrue(result["accepted"])
         self.assertEqual(result["result"]["decision"]["route"], "deterministic")
         self.assertIn("PNC/Semantics/PNC_SemanticDialogueInput.lua", result["loadedModules"])
-        self.assertEqual(len(result["messages"]), 1)
+        self.assertEqual(len(result["messages"]), 2)
+        self.assertEqual(
+            [message["payload"]["planTurn"] for message in result["messages"]],
+            [1, 2],
+        )
+        self.assertTrue(result["observation"]["response"]["composed"])
 
     def test_scenario_save_round_trip_preserves_editable_runtime_state(self) -> None:
         scenario = merge(

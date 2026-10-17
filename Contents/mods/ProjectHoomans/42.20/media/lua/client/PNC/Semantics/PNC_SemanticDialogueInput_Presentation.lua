@@ -170,14 +170,26 @@ function Internal.QueueDeterministicResponse(
     local pendingChoices = session.currentNode
         and session.currentNode.choices or session.pendingChoices
     local decision = result.decision or {}
-    local response = options.response or ResponseAdapter.Payload(decision)
+    local responses
+    if type(options.responses) == "table" and #options.responses > 0 then
+        responses = options.responses
+    elseif type(options.response) == "table" then
+        responses = { options.response }
+    else
+        responses = ResponseAdapter.Payloads(decision)
+    end
+    local response = responses[1] or {}
     local ir = result.ir or {}
     if actionResult and type(actionResult.response) == "table" then
-        response = actionResult.response
+        responses = { actionResult.response }
+        response = responses[1]
     end
     local campResponse = ResponseAdapter.CampAcknowledgement(
         result, actionResult)
-    if campResponse then response = campResponse end
+    if campResponse then
+        responses = { campResponse }
+        response = campResponse
+    end
     if actionResult and (actionResult.status == "gift_transfer_pending"
             or actionResult.status == "gift_transferred")
     then
@@ -216,34 +228,63 @@ function Internal.QueueDeterministicResponse(
         speakerID, speakerName = group:SpeakerFor(view)
     end
     stageGiftConsent(view, result, decision, group, session, options)
-    session:queueMessage("npc", response, {
-        speakerID = speakerID,
-        speakerName = speakerName,
-        npcID = speakerID or view.spec and view.spec.npcID,
-        participants = options.participants
-            or group and group.participantIDs or nil,
-        source = {
-            kind = "semantic",
-            channel = "response",
-            branch = decision.branch,
-            action = decision.action,
-            topic = topic,
-            actionResult = actionResult,
-            input = tostring(value or ""),
-            groupID = options.groupID or group and group.id,
-            groupTurnID = options.groupTurnID or group
-                and group.activeTurn and group.activeTurn.id,
-        },
-        provenance = {
-            provider = "lua",
-            parser = "semantic_dialogue_policy",
-            branch = decision.branch,
-            groupID = options.groupID or group and group.id,
-            groupTurnID = options.groupTurnID or group
-                and group.activeTurn and group.activeTurn.id,
-        },
-    })
-    recordNPCResponseTurn(session, ir, response, decision, speakerID)
+    local responseTexts = {}
+    local responseFallbacks = {}
+    local responseIndex
+    local payload
+    for responseIndex, payload in ipairs(responses) do
+        session:queueMessage("npc", payload, {
+            speakerID = speakerID,
+            speakerName = speakerName,
+            npcID = speakerID or view.spec and view.spec.npcID,
+            participants = options.participants
+                or group and group.participantIDs or nil,
+            source = {
+                kind = "semantic",
+                channel = "response",
+                branch = decision.branch,
+                action = decision.action,
+                topic = topic,
+                actionResult = actionResult,
+                input = tostring(value or ""),
+                planTurn = payload.planTurn or responseIndex,
+                planContinuation = payload.planContinuation,
+                groupID = options.groupID or group and group.id,
+                groupTurnID = options.groupTurnID or group
+                    and group.activeTurn and group.activeTurn.id,
+            },
+            provenance = {
+                provider = "lua",
+                parser = "semantic_dialogue_policy",
+                branch = decision.branch,
+                planTurn = payload.planTurn or responseIndex,
+                planContinuation = payload.planContinuation,
+                groupID = options.groupID or group and group.id,
+                groupTurnID = options.groupTurnID or group
+                    and group.activeTurn and group.activeTurn.id,
+            },
+        })
+        if payload.text ~= nil and tostring(payload.text) ~= "" then
+            responseTexts[#responseTexts + 1] = tostring(payload.text)
+        end
+        if payload.fallback ~= nil and tostring(payload.fallback) ~= "" then
+            responseFallbacks[#responseFallbacks + 1] = tostring(payload.fallback)
+        end
+    end
+    local responseForContext = response
+    if #responseTexts > 1 then
+        responseForContext = {
+            text = table.concat(responseTexts, " "),
+            fallback = table.concat(responseFallbacks, " "),
+        }
+    end
+    recordNPCResponseTurn(
+        session,
+        ir,
+        responseForContext,
+        decision,
+        speakerID
+    )
     return true
 end
 

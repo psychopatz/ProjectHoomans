@@ -5,6 +5,7 @@ local OutputProjection = {}
 local MAX_OBSERVATION_CANDIDATES = 8
 local MAX_OBSERVATION_LOOKUPS = 32
 local MAX_OBSERVATION_ACTIONS = 16
+local MAX_OBSERVATION_PLAN_TURNS = 4
 
 local function boundedCandidates(context, result)
     local Values = context.Values
@@ -166,24 +167,52 @@ function OutputProjection.observation(context, record)
         selectionSource = response.selectionSource,
         sourceFlowID = response.sourceFlowID,
         flowTransition = response.flowTransition,
+        plan = Values.copy(response.plan),
+        planTurnCount = type(response.plan) == "table"
+            and math.min(#(response.plan.turns or {}),
+                MAX_OBSERVATION_PLAN_TURNS) or 0,
+        queued = {},
     }
     for _, message in ipairs(record.messages or {}) do
         if type(message) == "table" and message.speaker == "npc" then
             local payload = type(message.payload) == "table"
                 and message.payload or {}
-            responseObservation.text = payload.text or payload.fallback
-            responseObservation.fallback = payload.fallback
+            local text = payload.text or payload.fallback
+            local fallback = payload.fallback
                 or responseObservation.fallback
-            responseObservation.key = payload.key or payload.translationKey
-                or responseObservation.key
-            responseObservation.translationKey = payload.translationKey
-            responseObservation.domain = payload.domain
-            responseObservation.translated = responseObservation.text ~= nil
-                and responseObservation.fallback ~= nil
-                and responseObservation.text ~= responseObservation.fallback
-            break
+            local queued = {
+                text = text,
+                fallback = fallback,
+                key = payload.key or payload.translationKey,
+                translationKey = payload.translationKey,
+                translationKeys = Values.copy(payload.translationKeys),
+                planTurn = payload.planTurn,
+                planTurnID = payload.planTurnID,
+                planContinuation = payload.planContinuation,
+                translated = text ~= nil
+                    and fallback ~= nil
+                    and text ~= fallback,
+            }
+            if #responseObservation.queued < MAX_OBSERVATION_PLAN_TURNS then
+                responseObservation.queued[#responseObservation.queued + 1] =
+                    queued
+            end
+            if #responseObservation.queued == 1 then
+                responseObservation.text = text
+                responseObservation.fallback = fallback
+                responseObservation.key = queued.key
+                responseObservation.translationKey = queued.translationKey
+                responseObservation.translationKeys = queued.translationKeys
+                responseObservation.domain = payload.domain
+                responseObservation.planTurn = queued.planTurn
+                responseObservation.planTurnID = queued.planTurnID
+                responseObservation.planContinuation = queued.planContinuation
+                responseObservation.translated = queued.translated
+            end
         end
     end
+    responseObservation.queueCount = #responseObservation.queued
+    responseObservation.composed = responseObservation.queueCount > 1
     responseObservation.flowResponsePoolID = flow.responsePool
     return {
         schemaVersion = 1,

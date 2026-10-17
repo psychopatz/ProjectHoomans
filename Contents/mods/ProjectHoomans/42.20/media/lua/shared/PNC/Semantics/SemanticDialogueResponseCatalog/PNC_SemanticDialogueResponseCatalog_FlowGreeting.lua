@@ -16,11 +16,71 @@ Catalog.Register("semantic.flow.greeting.opening", {
             fallback = "Hey! Good to see you.",
             when = { socialStyle = "friendly" },
             priority = 2,
+            plan = {
+                dialogueAct = "GREETING_OPENING",
+                sourcePoolID = "semantic.flow.greeting.opening",
+                turns = {
+                    {
+                        id = "greeting",
+                        continuation = "continue",
+                        segments = {
+                            {
+                                kind = "translation",
+                                templateID =
+                                    "semantic.flow.greeting.opening.friendly",
+                                fallback = "Hey! Good to see you.",
+                            },
+                        },
+                    },
+                    {
+                        id = "check_in",
+                        continuation = "await_player",
+                        segments = {
+                            {
+                                kind = "translation",
+                                templateID =
+                                    "semantic.flow.greeting.opening.question.friendly",
+                                fallback = "How have you been holding up?",
+                            },
+                        },
+                    },
+                },
+            },
         },
         {
             id = "semantic.flow.greeting.opening.default",
             templateID = "semantic.flow.greeting.opening.default",
             fallback = "Hello. Good to see you.",
+            plan = {
+                dialogueAct = "GREETING_OPENING",
+                sourcePoolID = "semantic.flow.greeting.opening",
+                turns = {
+                    {
+                        id = "greeting",
+                        continuation = "continue",
+                        segments = {
+                            {
+                                kind = "translation",
+                                templateID =
+                                    "semantic.flow.greeting.opening.default",
+                                fallback = "Hello. Good to see you.",
+                            },
+                        },
+                    },
+                    {
+                        id = "check_in",
+                        continuation = "await_player",
+                        segments = {
+                            {
+                                kind = "translation",
+                                templateID =
+                                    "semantic.flow.greeting.opening.question.default",
+                                fallback = "How have you been?",
+                            },
+                        },
+                    },
+                },
+            },
         },
     },
 })

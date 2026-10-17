@@ -59,6 +59,10 @@ local function semanticTranslationKey(response)
             "UI_PNC_Conversation_Semantic_FlowGreetingOpeningFriendly",
         ["semantic.flow.greeting.opening.default"] =
             "UI_PNC_Conversation_Semantic_FlowGreetingOpening",
+        ["semantic.flow.greeting.opening.question.friendly"] =
+            "UI_PNC_Conversation_Semantic_FlowGreetingOpeningQuestionFriendly",
+        ["semantic.flow.greeting.opening.question.default"] =
+            "UI_PNC_Conversation_Semantic_FlowGreetingOpeningQuestion",
         ["semantic.flow.greeting.followup.friendly"] =
             "UI_PNC_Conversation_Semantic_FlowGreetingFollowupFriendly",
         ["semantic.flow.greeting.followup.default"] =
@@ -175,45 +179,98 @@ local function localizedSegment(templateID, fallback, args)
     return fallback, key
 end
 
-local function localizedResponse(response)
-    local fallback = tostring(response and response.fallback or "")
-    local key = semanticTranslationKey(response)
-    if response and type(response.plan) == "table"
-        and ResponsePlan and type(ResponsePlan.Render) == "function"
+local function fallbackSegment(templateID, fallback)
+    return fallback, nil
+end
+
+local function payloadForPlanTurn(response, rendered, fallbackRendered)
+    local firstSegment = rendered.segments[1] or {}
+    local key = response.templateID or firstSegment.templateID
+    if rendered.index > 1 and firstSegment.templateID then
+        key = firstSegment.templateID
+    end
+    local translationKey = rendered.translationKeys[1]
+    return {
+        key = key,
+        domain = "pnc.system.shared.categories",
+        -- Keep the authored English fallback on every live payload. Text
+        -- resolution still gives a registered translation precedence, but a
+        -- missing/late registration cannot leak a template ID into the UI.
+        text = rendered.text ~= "" and rendered.text or nil,
+        fallback = fallbackRendered.text,
+        args = firstSegment.args or response.args,
+        translationKey = translationKey,
+        translationKeys = rendered.translationKeys,
+        plan = response.plan,
+        planTurn = rendered.index,
+        planTurnID = rendered.id,
+        planContinuation = rendered.continuation,
+        segments = rendered.segments,
+    }
+end
+
+local function payloadsForResponse(response)
+    response = type(response) == "table" and response or {}
+    if type(response.plan) == "table"
+        and ResponsePlan
+        and type(ResponsePlan.RenderDetailed) == "function"
+        and type(ResponsePlan.Validate) == "function"
     then
-        local rendered = ResponsePlan.Render(
-            response.plan,
-            localizedSegment,
-            1
-        )
-        if rendered ~= nil and tostring(rendered) ~= "" then
-            return tostring(rendered), key
+        local valid = ResponsePlan.Validate(response.plan)
+        if valid then
+            local payloads = {}
+            local index
+            for index = 1, #response.plan.turns do
+                local rendered = ResponsePlan.RenderDetailed(
+                    response.plan,
+                    localizedSegment,
+                    index
+                )
+                local fallbackRendered = ResponsePlan.RenderDetailed(
+                    response.plan,
+                    fallbackSegment,
+                    index
+                )
+                if rendered and fallbackRendered
+                    and rendered.text ~= ""
+                then
+                    payloads[#payloads + 1] = payloadForPlanTurn(
+                        response,
+                        rendered,
+                        fallbackRendered
+                    )
+                end
+            end
+            if #payloads > 0 then return payloads end
         end
     end
-    return localizedSegment(
-        response and response.templateID,
+
+    local fallback = tostring(response.fallback or "")
+    local text, translationKey = localizedSegment(
+        response.templateID,
         fallback,
-        response and response.args
+        response.args
     )
+    return {
+        {
+            key = response.templateID,
+            domain = "pnc.system.shared.categories",
+            text = text ~= "" and text or nil,
+            fallback = fallback,
+            args = response.args,
+            translationKey = translationKey,
+            plan = response.plan,
+            planTurn = 1,
+        },
+    }
+end
+
+function ResponseAdapter.Payloads(decision)
+    return payloadsForResponse(decision and decision.response or {})
 end
 
 function ResponseAdapter.Payload(decision)
-    local response = decision and decision.response or {}
-    local fallback = tostring(response.fallback or "")
-    local text, translationKey = localizedResponse(response)
-    return {
-        key = response.templateID,
-        domain = "pnc.system.shared.categories",
-        -- Keep the authored English fallback on the live payload as well as
-        -- in the keyed field. Text.Resolve still gives a registered
-        -- translation precedence, but a missing/late registration cannot
-        -- leak an internal semantic template ID into the UI.
-        text = text ~= "" and text or nil,
-        fallback = fallback,
-        args = response.args,
-        translationKey = translationKey,
-        plan = response.plan,
-    }
+    return ResponseAdapter.Payloads(decision)[1]
 end
 
 function ResponseAdapter.IdentityExchangeUnavailable()

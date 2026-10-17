@@ -150,11 +150,19 @@ local function catalogResponse(poolID, ir, state, context, args)
             .. tostring(ir and ir.rawText or "")
     )
     if type(selected) ~= "table" then return nil end
+    local plan
+    if type(selected.plan) == "table"
+        and ResponsePlan and type(ResponsePlan.Build) == "function"
+    then
+        local valid, normalized = ResponsePlan.Build(selected.plan)
+        if valid then plan = normalized end
+    end
     return {
         templateID = selected.templateID or selected.id,
         fallback = selected.fallback,
         args = copyArgs(args),
         sourcePoolID = poolID,
+        plan = plan,
     }
 end
 

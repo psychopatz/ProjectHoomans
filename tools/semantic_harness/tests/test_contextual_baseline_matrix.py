@@ -33,7 +33,13 @@ class ContextualBaselineMatrixTests(unittest.TestCase):
         self.assertEqual(turn["llmCalls"], 0)
         self.assertEqual(turn["transport"], [])
         self.assertEqual(turn["toolCalls"], [])
-        self.assertEqual(len(turn["messages"]), 1)
+        expected_messages = 2 if response_prefix == "semantic.flow.greeting.opening" else 1
+        self.assertEqual(len(turn["messages"]), expected_messages)
+        if expected_messages > 1:
+            self.assertEqual(
+                [message["payload"]["planTurn"] for message in turn["messages"]],
+                [1, 2],
+            )
         return turn
 
     def test_reviewed_one_turn_matrix_uses_production_context(self) -> None:

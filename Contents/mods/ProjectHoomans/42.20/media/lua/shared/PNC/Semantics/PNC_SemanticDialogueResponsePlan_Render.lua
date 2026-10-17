@@ -13,7 +13,7 @@ end
 local function renderSegment(segment, resolver)
     if segment.kind == "literal" then return segment.text end
     if type(resolver) == "function" then
-        local ok, value = pcall(
+        local ok, value, metadata = pcall(
             resolver,
             segment.templateID,
             segment.fallback,
@@ -21,13 +21,13 @@ local function renderSegment(segment, resolver)
             segment
         )
         if ok and value ~= nil and tostring(value) ~= "" then
-            return boundedText(value)
+            return boundedText(value), metadata
         end
     end
-    return segment.fallback
+    return segment.fallback, nil
 end
 
-function Plan.Render(plan, resolver, turnIndex)
+function Plan.RenderDetailed(plan, resolver, turnIndex)
     local valid, reason = Plan.Validate(plan)
     if not valid then return nil, reason end
     turnIndex = math.floor(tonumber(turnIndex) or 1)
@@ -36,13 +36,45 @@ function Plan.Render(plan, resolver, turnIndex)
     end
     local turn = plan.turns[turnIndex]
     local parts = {}
+    local segments = {}
+    local translationKeys = {}
     local index
     local value
+    local metadata
     for index = 1, #turn.segments do
-        value = renderSegment(turn.segments[index], resolver)
-        if value ~= "" then parts[#parts + 1] = value end
+        value, metadata = renderSegment(turn.segments[index], resolver)
+        if value ~= "" then
+            parts[#parts + 1] = value
+            segments[#segments + 1] = {
+                kind = turn.segments[index].kind,
+                templateID = turn.segments[index].templateID,
+                fallback = turn.segments[index].fallback,
+                args = turn.segments[index].args,
+                text = value,
+                translationKey = metadata,
+            }
+            if metadata ~= nil and tostring(metadata) ~= "" then
+                translationKeys[#translationKeys + 1] = tostring(metadata)
+            end
+        end
     end
-    return boundedText(table.concat(parts, turn.separator), Plan.MAX_RENDER_LENGTH)
+    return {
+        index = turnIndex,
+        id = turn.id,
+        continuation = turn.continuation,
+        text = boundedText(
+            table.concat(parts, turn.separator),
+            Plan.MAX_RENDER_LENGTH
+        ),
+        segments = segments,
+        translationKeys = translationKeys,
+    }
+end
+
+function Plan.Render(plan, resolver, turnIndex)
+    local rendered, reason = Plan.RenderDetailed(plan, resolver, turnIndex)
+    if not rendered then return nil, reason end
+    return rendered.text
 end
 
 function Plan.RenderTurns(plan, resolver)

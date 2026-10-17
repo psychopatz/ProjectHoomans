@@ -120,6 +120,18 @@ class SemanticDialogueFlowTests(unittest.TestCase):
             opening_observation["response"]["translationKey"],
             "UI_PNC_Conversation_Semantic_FlowGreetingOpeningFriendly",
         )
+        self.assertEqual(len(opening["messages"]), 2)
+        self.assertEqual(
+            [message["payload"]["planTurn"] for message in opening["messages"]],
+            [1, 2],
+        )
+        self.assertEqual(
+            opening["messages"][1]["payload"]["translationKey"],
+            "UI_PNC_Conversation_Semantic_FlowGreetingOpeningQuestionFriendly",
+        )
+        self.assertTrue(opening_observation["response"]["composed"])
+        self.assertEqual(opening_observation["response"]["queueCount"], 2)
+        self.assertEqual(opening_observation["response"]["planTurnCount"], 2)
         self.assertTrue(opening_observation["sideEffects"]["none"])
 
         followup_observation = followup["observation"]
@@ -145,6 +157,51 @@ class SemanticDialogueFlowTests(unittest.TestCase):
         self.assertTrue(followup_observation["response"]["translated"])
         self.assertGreater(followup_observation["translation"]["lookupCount"], 0)
         self.assertTrue(followup_observation["sideEffects"]["none"])
+
+    def test_composed_flow_plan_renders_and_queues_in_en_and_tl(self) -> None:
+        for language in ("EN", "TL"):
+            with self.subTest(language=language):
+                scenario = merge(
+                    DEFAULT_SCENARIO,
+                    {"runtime": {"language": language}},
+                )
+                with LuaSemanticWorker(scenario) as worker:
+                    opening = worker.input("hello")
+
+                payloads = [message["payload"] for message in opening["messages"]]
+                self.assertEqual(len(payloads), 2)
+                self.assertEqual(
+                    [payload["planTurn"] for payload in payloads],
+                    [1, 2],
+                )
+                self.assertEqual(
+                    [payload["planContinuation"] for payload in payloads],
+                    ["continue", "await_player"],
+                )
+                self.assertEqual(
+                    payloads[1]["translationKey"],
+                    "UI_PNC_Conversation_Semantic_FlowGreetingOpeningQuestion",
+                )
+                self.assertEqual(
+                    payloads[0]["plan"]["sourcePoolID"],
+                    "semantic.flow.greeting.opening",
+                )
+                self.assertEqual(
+                    opening["observation"]["response"]["queueCount"],
+                    2,
+                )
+                self.assertEqual(
+                    opening["observation"]["response"]["planTurnCount"],
+                    2,
+                )
+                self.assertTrue(opening["observation"]["sideEffects"]["none"])
+                if language == "TL":
+                    self.assertTrue(all(
+                        payload["text"] != payload["fallback"]
+                        for payload in payloads
+                    ))
+                else:
+                    self.assertTrue(all(payload["text"] for payload in payloads))
 
     def test_worker_observation_exposes_real_turn_facts_and_side_effects(self) -> None:
         scenario = merge(

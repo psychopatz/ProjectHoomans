@@ -63,6 +63,8 @@
   "UI_PNC_Conversation_Semantic_ThreatWithdrawn": "Lumayo ka. Hindi ko ito pag-uusapan.",
   "UI_PNC_Conversation_Semantic_FlowGreetingOpeningFriendly": "Uy! Mabuti at nakita kita.",
   "UI_PNC_Conversation_Semantic_FlowGreetingOpening": "Kumusta. Mabuti at nakita kita.",
+  "UI_PNC_Conversation_Semantic_FlowGreetingOpeningQuestionFriendly": "Kumusta ka naman?",
+  "UI_PNC_Conversation_Semantic_FlowGreetingOpeningQuestion": "Kumusta ka?",
   "UI_PNC_Conversation_Semantic_FlowGreetingFollowupFriendly": "Walang anuman. Mabuti at nakita rin kita.",
   "UI_PNC_Conversation_Semantic_FlowGreetingFollowup": "Walang anuman. Mag-ingat ka."
 }

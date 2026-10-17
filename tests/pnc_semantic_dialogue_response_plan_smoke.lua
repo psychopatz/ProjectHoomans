@@ -35,6 +35,16 @@ local firstText = Plan.Render(single, function(templateID, fallback, args)
 end)
 T.equal(firstText, "I'm glad to hear it. Mara Thanks for telling me.",
     "response plan renders localized and literal segments in order")
+local detailed = Plan.RenderDetailed(single, function(templateID, fallback, args)
+    return fallback .. " " .. tostring(args.npcName or templateID),
+        "UI_Test_ResponsePlan"
+end, 1)
+T.equal(detailed.text, firstText,
+    "response plan detailed rendering preserves composed text")
+T.equal(#detailed.segments, 2,
+    "response plan detailed rendering exposes every segment")
+T.equal(detailed.translationKeys[1], "UI_Test_ResponsePlan",
+    "response plan detailed rendering preserves translation provenance")
 
 local secondOK, second = Plan.Build({
     dialogueAct = "WELLBEING_FOLLOWUP",

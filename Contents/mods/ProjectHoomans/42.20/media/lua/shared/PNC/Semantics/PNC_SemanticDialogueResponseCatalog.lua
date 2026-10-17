@@ -12,6 +12,8 @@ local Catalog = PNC.Semantics.ResponseCatalog or {}
 PNC.Semantics.ResponseCatalog = Catalog
 local GeneratedDialogue = require
     "PNC/Semantics/PNC_SemanticGeneratedDialogue"
+local ResponsePlan = require
+    "PNC/Semantics/PNC_SemanticDialogueResponsePlan"
 
 Catalog.VERSION = 1
 Catalog.MAX_POOLS = 64
@@ -170,10 +172,17 @@ local function normalizedVariant(poolID, index, value)
     if fallback == "" then return nil end
     local id = tostring(value.id or (poolID .. "." .. tostring(index)))
     if not validID(id) then return nil end
+    local plan
+    if value.plan ~= nil then
+        local valid, normalized = ResponsePlan.Build(value.plan)
+        if not valid then return nil end
+        plan = normalized
+    end
     local normalized = {
         id = id,
         templateID = tostring(value.templateID or id),
         fallback = fallback,
+        plan = plan,
         when = copy(value.when),
         priority = tonumber(value.priority) or 0,
     }
@@ -321,6 +330,7 @@ function Catalog.Select(id, context, salt)
         id = variant.id,
         templateID = variant.templateID,
         fallback = variant.fallback,
+        plan = variant.plan,
     }, selectedIndex
 end
 
