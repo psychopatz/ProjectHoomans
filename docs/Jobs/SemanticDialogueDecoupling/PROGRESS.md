@@ -75,4 +75,8 @@ C0A exit is satisfied: the local, GitHub, Steam-cache, and native-runtime matrix
 3. Correct or derive the stale Core translation-count assertion in the Core-owned test after the Core change is authorized; do not alter it during this C0A audit.
 4. Capture native EN/TL loaded-vs-fallback provenance, then run the same bounded SP dialogue matrix and a separate MP check.
 
+## Native verification handoff
+
+The controlled native surface is currently unavailable: no Project Zomboid process is running and the native UI inventory is empty. Do not infer native acceptance from the direct Lua smokes or the prior English screenshot. After launching PZ with the matched local pair or an explicitly republished pair, keep `ProjectHoomans.SemanticDialogueAudit` enabled, fully restart PZ, open one NPC conversation, and submit `are you okay` followed by `im fine thanks` or `im hungry`. Capture the complete console line containing `semantic_audit event=semantic.capability_handshake` and verify `ok=true`, `parserCandidates=true`, `candidateSelection=true`, `flowCommit=true`, `routerCandidateHooks=true`, `translation.manifestRegistered=true`, `translation.manifestRead=true`, `translation.catalogLoaded=true`, and `translation.shardCount=12`. Repeat after an EN/TL language restart and record the actual rendered text plus fallback provenance; then run a separate MP server/client pass for authority, duplicate-request, speaker isolation, and rejoin evidence. Any false field must be reported through `failures`, not treated as a pass.
+
 Do not begin C1–C6 until C0B establishes installed-pair identity and native capability/translation evidence.
