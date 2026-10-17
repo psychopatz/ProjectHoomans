@@ -1,6 +1,6 @@
 # Contextual Semantic Intelligence — progress
 
-**Updated:** 2026-10-17. **Phase:** 3C — bounded contextual offer reaction. **Status:** Phase 3C Semantic Lab gate accepted; Phase 3D is the sole Next Chunk. Native SP/MP acceptance remains OPEN.
+**Updated:** 2026-10-17. **Phase:** 3 — broader contextual social reactions. **Status:** Phase 3 Semantic Lab gate accepted for the bounded authored social families; Phase 4 is the sole Next Chunk. Native SP/MP acceptance remains OPEN.
 
 ## Revision evidence
 
@@ -105,12 +105,24 @@ Phase 0A is accepted only for its documented Semantic Lab correctness baseline. 
 - Offer turns emitted one deterministic NPC message, used `llmCalls=0`, empty transport/tool traces, no action result, and equal relationship snapshots. The stress-plus-hunger case selected the stressed offer response, proving the explicit precedence without mutating inventory, relationship, task or obligation state.
 - Native SP: **NOT TESTED**. Native MP: **NOT TESTED**. No Semantic Lab result is promoted as native acceptance evidence.
 
-## ONE current Next Chunk — Phase 3D bounded reassurance/dispute baseline
+## Phase 3D verification evidence — accepted for the bounded Semantic Lab gate
 
-1. Audit one remaining authored behavior family from reassurance or disputes and identify the smallest contextual gap; preserve existing catalogs and authority boundaries.
-2. Add only the narrowest deterministic mapping or precedence evidence needed for that gap; do not activate tasks, obligations or relationship mutation without an existing authorized path.
-3. Assert varied relationship/emotion cases, before/after context, preview behavior where applicable, zero PBrainZ calls and no unauthorized transport/tool effects. Preserve all Phase 2, Phase 3A, Phase 3B and Phase 3C coverage.
-4. Keep native SP/MP explicitly open; do not expand to paraphrase, group or PBrainZ phases until the bounded Phase 3 social gate is evidenced.
+- Implementation revision: Project Hoomans `864b118f` (`feat(semantic): add contextual dispute reactions`); the detailed evidence and Phase 3 closure audit are in [`PHASE3D_SOCIAL_DISPUTE.md`](PHASE3D_SOCIAL_DISPUTE.md).
+- The existing `DISAGREE`/`REFUSE` parser/IR, `SOCIAL_ACKNOWLEDGED` policy branch and `semantic.refuse` pool were retained. Four guarded variants were added: stressed/panicked, friendly, trusted and withdrawn. Explicit precedence is pending request (5) > stress (4) > friendly (2) > trusted/withdrawn (1) > default, so an authorized pending request remains the stronger response context.
+- Focused contextual social tests: **PASS 6/6**. Full Python suite: **PASS 65/65**. Existing reassurance behavior remains covered by the unchanged self-reflection relationship/trait test (friendly and established/reserved cases).
+- `tools/semantic_harness/run_harness.sh --doctor --doctor-json`: **PASS**. `tools/semantic_harness/run_harness.sh --test pnc_semantic`: **PASS 66/66**. CLI report `/tmp/contextual-semantic-suite-phase3d.json`: **PASS 66/66**, 198 events, `conflicts=[]`, `audit_truncated=null`; those protocol/replay values are not semantic proof.
+- EN/TL conversation JSON each parsed with 521 keys and all five dispute/request keys present. Changed Lua files passed `luac5.3 -p`. `pz-verify` over the semantic directory reported **0 Kahlua errors**; existing hardcoded-string and token-size findings remain bounded maintenance findings.
+- Phase 3A–3D together cover apology, reassurance/self-reflection, threat, offer and dispute reactions through the existing production parser, policy and catalog paths. Deterministic cases used `llmCalls=0`; ordinary social turns emitted no transport/tool effects and kept relationship snapshots equal. Threat keeps the existing authorized social-dispatch boundary, which is unavailable in the harness; pending-dispute setup uses the existing follow command and the dispute itself emits no new command.
+- Native SP: **NOT TESTED**. Native MP: **NOT TESTED**. No Semantic Lab result is promoted as native acceptance evidence.
+
+Phase 3 is accepted for this bounded Semantic Lab scope: authored apology, existing reassurance/self-reflection, guarded threat, contextual offer and contextual dispute responses, including explicit overlap precedence and no new unauthorized mutation. This does not accept paraphrase breadth, group dialogue, PBrainZ fallback, or native SP/MP behavior.
+
+## ONE current Next Chunk — Phase 4 bounded paraphrase baseline
+
+1. Audit one narrowly bounded authored paraphrase family against the existing deterministic IR/catalog IDs; hold out false-positive command/task language.
+2. Add only the smallest safe compiler/catalog extension needed for that family; preserve authority, context bounds and deterministic-first routing.
+3. Assert held-out paraphrase acceptance, false-positive rejection, response identity, preview behavior where applicable, zero PBrainZ calls and no unauthorized effects. Preserve all Phase 2 and Phase 3 coverage.
+4. Keep native SP/MP explicitly open; do not expand to group or PBrainZ phases until the bounded paraphrase gate is evidenced.
 
 ## Remaining roadmap
 
