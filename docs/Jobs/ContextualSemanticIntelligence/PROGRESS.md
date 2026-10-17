@@ -1,6 +1,6 @@
 # Contextual Semantic Intelligence — progress
 
-**Updated:** 2026-10-17. **Phase:** 3B — bounded contextual threat reaction. **Status:** Phase 3B Semantic Lab gate accepted; Phase 3C is the sole Next Chunk. Native SP/MP acceptance remains OPEN.
+**Updated:** 2026-10-17. **Phase:** 3C — bounded contextual offer reaction. **Status:** Phase 3C Semantic Lab gate accepted; Phase 3D is the sole Next Chunk. Native SP/MP acceptance remains OPEN.
 
 ## Revision evidence
 
@@ -95,11 +95,21 @@ Phase 0A is accepted only for its documented Semantic Lab correctness baseline. 
 - Threat turns remained deterministic (`llmCalls=0`), emitted no messages in the existing directed-hostility presentation path, no transport or tool calls, and no relationship mutation. The existing authorized social-dispatch result is reported as `accepted=false`, `semantic_social_transport_unavailable` by the harness; this is a harness boundary, not proof of native delivery.
 - Native SP: **NOT TESTED**. Native MP: **NOT TESTED**. No Semantic Lab result is promoted as native acceptance evidence.
 
-## ONE current Next Chunk — Phase 3C bounded offer/reassurance/dispute baseline
+## Phase 3C verification evidence — accepted for the bounded Semantic Lab gate
 
-1. Audit one remaining authored behavior family from offers, reassurance or disputes and identify the smallest contextual gap; preserve existing catalogs and authority boundaries.
+- Implementation revision: Project Hoomans `c74f5966` (`feat(semantic): add contextual offer reactions`); the detailed evidence is in [`PHASE3C_SOCIAL_OFFER.md`](PHASE3C_SOCIAL_OFFER.md).
+- The existing `OFFER` parser/IR, `OFFER_RECEIVED` policy branch and `semantic.offer` catalog were retained. Four variants were added: stressed/panicked, friendly, trusted and withdrawn. Explicit precedence is stress (4) > existing hunger (2) > social tone (1) > default; generated hunger variants remain available and selected for hungry cases.
+- Focused contextual social tests: **PASS 5/5**. Full Python suite: **PASS 64/64**. Phase 2, apology and guarded threat coverage remained green.
+- `tools/semantic_harness/run_harness.sh --doctor --doctor-json`: **PASS**. `tools/semantic_harness/run_harness.sh --test pnc_semantic`: **PASS 66/66**. CLI report `/tmp/contextual-semantic-suite-phase3c.json`: **PASS 66/66**, 198 events, `conflicts=[]`, `audit_truncated=null`; those protocol/replay values are not semantic proof.
+- EN/TL conversation JSON each parsed with 516 keys and all four new offer keys present. Changed Lua files passed `luac5.3 -p`. `pz-verify` over the semantic directory reported **0 Kahlua errors**; existing hardcoded-string and token-size findings remain bounded maintenance findings.
+- Offer turns emitted one deterministic NPC message, used `llmCalls=0`, empty transport/tool traces, no action result, and equal relationship snapshots. The stress-plus-hunger case selected the stressed offer response, proving the explicit precedence without mutating inventory, relationship, task or obligation state.
+- Native SP: **NOT TESTED**. Native MP: **NOT TESTED**. No Semantic Lab result is promoted as native acceptance evidence.
+
+## ONE current Next Chunk — Phase 3D bounded reassurance/dispute baseline
+
+1. Audit one remaining authored behavior family from reassurance or disputes and identify the smallest contextual gap; preserve existing catalogs and authority boundaries.
 2. Add only the narrowest deterministic mapping or precedence evidence needed for that gap; do not activate tasks, obligations or relationship mutation without an existing authorized path.
-3. Assert varied relationship/emotion cases, before/after context, preview behavior where applicable, zero PBrainZ calls and no unauthorized transport/tool effects. Preserve all Phase 2, Phase 3A and Phase 3B coverage.
+3. Assert varied relationship/emotion cases, before/after context, preview behavior where applicable, zero PBrainZ calls and no unauthorized transport/tool effects. Preserve all Phase 2, Phase 3A, Phase 3B and Phase 3C coverage.
 4. Keep native SP/MP explicitly open; do not expand to paraphrase, group or PBrainZ phases until the bounded Phase 3 social gate is evidenced.
 
 ## Remaining roadmap
