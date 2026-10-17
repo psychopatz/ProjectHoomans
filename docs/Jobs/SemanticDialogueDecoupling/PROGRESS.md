@@ -105,6 +105,7 @@ The GitHub Core publication does not need a source-level correction for C0A: 569
 
 ## D2 focused verification
 
+- Implementation commit: `a4c81289` (`feat(semantic): add modular greeting dialogue flow`).
 - `python3 -m unittest discover -s tools/semantic_harness/tests -q`: **100/100 PASS**.
 - `python3 -m unittest tools.semantic_harness.tests.test_semantic_dialogue_flows -q`: **7/7 PASS**, including the third modular flow and real TL rendering.
 - Eight focused Lua smokes (flow, input, diagnostics, response plan, identity presentation/transport, translation catalog/fallback) all exited **0**.
