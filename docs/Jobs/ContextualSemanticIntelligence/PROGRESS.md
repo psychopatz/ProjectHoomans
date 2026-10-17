@@ -148,6 +148,20 @@ Phase 5 is accepted only for deterministic/provider-failure parity, bounded prov
   single-player scenario or authoritative multiplayer session was completed
   in this checkpoint. A bounded non-native real-Lua-worker performance result
   is recorded in [`PHASE6_SEMANTIC_PERFORMANCE.md`](PHASE6_SEMANTIC_PERFORMANCE.md).
+- The non-native measurement is Project Hoomans `3027891d` with
+  PsychopatzCore `0212491d2af3597cceaa7353e62f01ef54adca44`, Python 3.12.3
+  and Lua 5.3.6. The command was
+  `python3 -m tools.semantic_harness.phase6_performance --samples 8 --warmup 2
+  --serial-turns 24`; it passed for the real Lua worker and wrote
+  `/tmp/contextual-semantic-phase6-performance-final.json`. The follow,
+  reviewed wellbeing and unknown fallback branches remained deterministic;
+  provider calls were `0/0/0` disabled and `0/0/1` enabled respectively.
+- The static request-driven boundary guard is Project Hoomans `804eff7b`:
+  `python3 -m unittest
+  tools.semantic_harness.tests.test_phase6_static_boundaries -v` passed **1/1**;
+  the full Semantic Lab Python suite passed **72/72**. It found no
+  `Events.OnTick` registration in the `PNC_SemanticDialogueInput*.lua`
+  modules. This is a static/request-boundary result, not native game evidence.
 - Native SP: **NOT TESTED**. Native MP: **NOT TESTED**. Existing process,
   console, profiler, Semantic Lab and replay observations are not promoted as
   native proof.
