@@ -1,8 +1,8 @@
 # Semantic Dialogue Decoupling — current implementation state
 
 **Updated:** 2026-10-18
-**Phase:** D3 — Semantic Lab visual flow editor
-**State:** D3 is complete for the developer gate. The Semantic Lab now browses normalized production flow graphs, edits bounded drafts, validates them through the production Lua registry, and registers new worker-local flows for immediate worker testing. The next bounded chunk is D4, coherent compositional responses. Native Project Zomboid testing and Workshop publication remain user-owned and are not blockers.
+**Phase:** D4 — coherent compositional responses
+**State:** D4 is complete for the developer gate. Production response plans now survive flow selection, render every bounded turn through the normal EN/TL resolver, and queue the ordered NPC reply sequence. The next bounded chunk is D5, integration and regression sweep. Native Project Zomboid testing and Workshop publication remain user-owned and are not blockers.
 
 This is the one active progress ledger for this goal. C0A/C0B source work and unrelated Core radio edits remain preserved.
 
@@ -126,6 +126,21 @@ The GitHub Core publication does not need a source-level correction for C0A: 569
 - `python3 -m py_compile` passed the GUI/editor/worker Python modules; `luac5.3 -p` passed the new worker editor and command router; eight focused Lua smokes all exited **0**.
 - `python3 -m tools.semantic_harness.app --doctor`: **PASS** (`READY/PING/CAPABILITIES`); only the known active-venv warning remains. Desktop automation still exposed `apps=[]`, so the visual click-through remains unclaimed and the real Lua worker is the evidence fallback.
 
+## D4 result
+
+- Catalog variants can now carry a validated bounded response plan. The production response adapter renders every plan turn through the existing translation resolver, preserves per-segment translation provenance, and queues each turn in order. The context recorder receives one bounded composed response, while the live queue retains turn boundaries and continuation metadata.
+- The modular greeting flow now demonstrates a real two-act opening: a flow-selected greeting followed by a flow-selected check-in. Both EN and TL keys are authored in the existing semantic shard; the worker observation exposes `planTurnCount`, ordered `queued` replies, translation keys, composed status, and the full bounded plan.
+- The existing Semantic Lab GUI already appends every production NPC queue entry to its transcript and displays the new queue/plan facts in Turn facts and Raw worker record. No GUI click-through is claimed because desktop automation still reports `apps=[]`; the real Lua worker is the fallback evidence path.
+
+## D4 focused verification
+
+- Implementation commit: `ea414a04` (`feat(semantic): queue compositional response plans`).
+- `python3 -m unittest discover -s tools/semantic_harness/tests -q`: **103/103 PASS**.
+- `python3 -m unittest tools.semantic_harness.tests.test_semantic_dialogue_flows -v`: **8/8 PASS**, including the real worker EN/TL two-turn queue and translation assertions.
+- `lua5.3` focused production smokes: **8/8 PASS**, including the response-plan detailed-rendering regression; `luac5.3 -p` and `python3 -m py_compile` passed all changed Lua/Python modules.
+- Focused `pz_verify --kahlua --severity ERROR --no-snippets` reported **0 errors** for every changed production Lua file. EN/TL semantic response JSON parsed with both new keys present.
+- `python3 -m tools.semantic_harness.app --doctor`: **PASS** (`READY/PING/CAPABILITIES`); only the known active-venv warning remains. Project Zomboid, external headless harnesses, and Workshop publication were not used or required.
+
 ## Historical C0A/C0B source handoff
 
 C0A exit is satisfied and the read-only C0B handshake remains implemented and source-smoke-tested. The following items are retained as historical user-owned deployment/live-test handoff; they are not prerequisites for D1–D6 implementation and do not block this goal:
@@ -139,4 +154,4 @@ C0A exit is satisfied and the read-only C0B handshake remains implemented and so
 
 The controlled native surface is currently unavailable: no Project Zomboid process is running and the native UI inventory is empty. Do not infer native acceptance from the direct Lua smokes or the prior English screenshot. After launching PZ with the matched local pair or an explicitly republished pair, keep `ProjectHoomans.SemanticDialogueAudit` enabled, fully restart PZ, open one NPC conversation, and submit `are you okay` followed by `im fine thanks` or `im hungry`. Capture the complete console line containing `semantic_audit event=semantic.capability_handshake` and verify `ok=true`, `parserCandidates=true`, `candidateSelection=true`, `flowCommit=true`, `routerCandidateHooks=true`, `translation.manifestRegistered=true`, `translation.manifestRead=true`, `translation.catalogLoaded=true`, and `translation.shardCount=12`. Repeat after an EN/TL language restart and record the actual rendered text plus fallback provenance; then run a separate MP server/client pass for authority, duplicate-request, speaker isolation, and rejoin evidence. Any false field must be reported through `failures`, not treated as a pass.
 
-The next development chunk is D4: implement coherent bounded compositional responses whose multi-act plan changes actual NPC speech sequencing and EN/TL rendering. Do not wait for native capability, SP/MP, or Workshop evidence before continuing.
+The next development chunk is D5: complete the documented integration and regression sweep. Do not wait for native capability, SP/MP, or Workshop evidence before continuing.
