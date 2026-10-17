@@ -103,6 +103,16 @@ local function semanticTranslationKey(response)
             "UI_PNC_Conversation_Semantic_QuestionWellbeingFollowUpUnknown",
         ["semantic.question.wellbeing.follow_up.default"] =
             "UI_PNC_Conversation_Semantic_QuestionWellbeingFollowUpDefault",
+        ["semantic.social.apology.friendly"] =
+            "UI_PNC_Conversation_Semantic_ApologyFriendly",
+        ["semantic.social.apology.trusted"] =
+            "UI_PNC_Conversation_Semantic_ApologyTrusted",
+        ["semantic.social.apology.stressed"] =
+            "UI_PNC_Conversation_Semantic_ApologyStressed",
+        ["semantic.social.apology.withdrawn"] =
+            "UI_PNC_Conversation_Semantic_ApologyWithdrawn",
+        ["semantic.social.apology.default"] =
+            "UI_PNC_Conversation_Semantic_ApologyDefault",
     }
     return keys[templateID]
 end

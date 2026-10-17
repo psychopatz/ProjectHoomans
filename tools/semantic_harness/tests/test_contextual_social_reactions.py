@@ -1,0 +1,183 @@
+"""Phase 3 bounded social-reaction probes on the real Lua worker."""
+
+from __future__ import annotations
+
+import unittest
+
+from tools.semantic_harness.scenario import DEFAULT_SCENARIO, merge
+from tools.semantic_harness.worker import LuaSemanticWorker
+
+
+class ContextualSocialReactionTests(unittest.TestCase):
+    @staticmethod
+    def scenario(npc: dict) -> dict:
+        return merge(DEFAULT_SCENARIO, {"npc": npc})
+
+    def assert_apology_turn(
+        self,
+        turn: dict,
+        *,
+        template: str,
+        translation_key: str,
+        social_style: str,
+    ) -> None:
+        self.assertTrue(turn["accepted"], turn.get("reason"))
+        self.assertEqual(turn["result"]["ir"]["intent"], "APOLOGIZE")
+        self.assertEqual(turn["result"]["ir"]["speechAct"], "APOLOGIZE")
+        self.assertEqual(
+            turn["result"]["decision"]["branch"],
+            "SOCIAL_ACKNOWLEDGED",
+        )
+        self.assertEqual(turn["result"]["decision"]["route"], "deterministic")
+        self.assertEqual(
+            turn["result"]["decision"]["response"]["templateID"],
+            template,
+        )
+        self.assertEqual(
+            turn["messages"][0]["payload"]["translationKey"],
+            translation_key,
+        )
+        self.assertEqual(turn["routedSituation"]["social"]["style"], social_style)
+        self.assertEqual(turn["llmCalls"], 0)
+        self.assertEqual(turn["transport"], [])
+        self.assertEqual(turn["toolCalls"], [])
+        self.assertIsNone(turn["result"].get("actionResult"))
+        self.assertEqual(turn["relationshipBefore"], turn["relationshipAfter"])
+
+    def test_apology_uses_relationship_emotion_and_explicit_precedence(self) -> None:
+        cases = (
+            (
+                "neutral",
+                {
+                    "personality": {"socialStyle": "neutral"},
+                },
+                "semantic.social.apology.default",
+                "UI_PNC_Conversation_Semantic_ApologyDefault",
+                "neutral",
+            ),
+            (
+                "friendly",
+                {
+                    "traits": {"friendly": True},
+                    "relationshipState": "Friend",
+                },
+                "semantic.social.apology.friendly",
+                "UI_PNC_Conversation_Semantic_ApologyFriendly",
+                "friendly",
+            ),
+            (
+                "trusted",
+                {
+                    "traits": {"reserved": True},
+                    "relationshipState": "Member",
+                    "personality": {"socialStyle": "neutral"},
+                },
+                "semantic.social.apology.trusted",
+                "UI_PNC_Conversation_Semantic_ApologyTrusted",
+                "neutral",
+            ),
+            (
+                "stressed",
+                {
+                    "traits": {"reserved": True},
+                    "conditionStats": {"stress": 95},
+                    "personality": {"socialStyle": "neutral"},
+                },
+                "semantic.social.apology.stressed",
+                "UI_PNC_Conversation_Semantic_ApologyStressed",
+                "neutral",
+            ),
+            (
+                "stress_precedes_friendly",
+                {
+                    "traits": {"friendly": True},
+                    "conditionStats": {"stress": 95},
+                    "personality": {"socialStyle": "friendly"},
+                },
+                "semantic.social.apology.stressed",
+                "UI_PNC_Conversation_Semantic_ApologyStressed",
+                "friendly",
+            ),
+        )
+        for label, npc, template, translation_key, social_style in cases:
+            with self.subTest(case=label):
+                with LuaSemanticWorker(self.scenario(npc)) as worker:
+                    result = worker.input("sorry")
+                self.assert_apology_turn(
+                    result,
+                    template=template,
+                    translation_key=translation_key,
+                    social_style=social_style,
+                )
+
+    def test_existing_social_reactions_remain_local_and_contextual(self) -> None:
+        cases = (
+            (
+                "compliment",
+                {"traits": {"friendly": True}, "relationshipState": "Friend"},
+                "you look cute",
+                "COMPLIMENT_RECEIVED",
+                "semantic.social.compliment.friendly",
+            ),
+            (
+                "threat_busy",
+                {"activeBehavior": "combat"},
+                "I will kill you",
+                "THREAT_RECEIVED",
+                "semantic.social.threat_busy",
+            ),
+            (
+                "self_reflection_stressed",
+                {
+                    "conditionStats": {"stress": 95},
+                    "personality": {"socialStyle": "neutral"},
+                },
+                "I'm an idiot",
+                "SELF_REFLECTION_RECEIVED",
+                "semantic.social.self_reflection.stressed",
+            ),
+        )
+        for label, npc, text, branch, template in cases:
+            with self.subTest(case=label):
+                with LuaSemanticWorker(self.scenario(npc)) as worker:
+                    result = worker.input(text)
+                self.assertTrue(result["accepted"], result.get("reason"))
+                self.assertEqual(result["result"]["decision"]["branch"], branch)
+                self.assertEqual(
+                    result["result"]["decision"]["response"]["templateID"],
+                    template,
+                )
+                self.assertEqual(result["llmCalls"], 0)
+                self.assertEqual(result["transport"], [])
+                self.assertEqual(result["toolCalls"], [])
+                self.assertEqual(
+                    result["relationshipBefore"], result["relationshipAfter"]
+                )
+
+    def test_apology_preview_is_idempotent_without_relationship_effect(self) -> None:
+        scenario = self.scenario({
+            "traits": {"friendly": True},
+            "relationshipState": "Friend",
+        })
+        with LuaSemanticWorker(scenario) as worker:
+            worker.input("hello")
+            before = worker.snapshot()
+            preview_one = worker.preview("sorry")
+            preview_two = worker.preview("sorry")
+            after = worker.snapshot()
+        self.assertTrue(preview_one["accepted"], preview_one.get("reason"))
+        self.assertTrue(preview_two["accepted"], preview_two.get("reason"))
+        self.assertEqual(preview_one["result"], preview_two["result"])
+        self.assertEqual(preview_one["contextBefore"], preview_one["contextAfter"])
+        self.assertEqual(preview_one["messages"], [])
+        self.assertEqual(preview_one["transport"], [])
+        self.assertEqual(preview_one["toolCalls"], [])
+        self.assertEqual(preview_one["llmCalls"], 0)
+        self.assertEqual(
+            {key: value for key, value in before.items() if key != "id"},
+            {key: value for key, value in after.items() if key != "id"},
+        )
+
+
+if __name__ == "__main__":
+    unittest.main()

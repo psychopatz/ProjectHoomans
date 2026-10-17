@@ -19,6 +19,53 @@ Catalog.Register("semantic.thanks", {
     },
 })
 
+Catalog.Register("semantic.apology", {
+    variants = {
+        {
+            id = "semantic.apology.stressed",
+            templateID = "semantic.social.apology.stressed",
+            fallback = "I know things are tense. Let's keep it calm.",
+            when = {
+                emotionType = { "stress", "panic" },
+                emotionUrgency = {
+                    "moderate", "severe", "critical", "emergency",
+                },
+            },
+            priority = 4,
+        },
+        {
+            id = "semantic.apology.friendly",
+            templateID = "semantic.social.apology.friendly",
+            fallback = "It's okay. We can put that behind us.",
+            when = { socialStyle = { "friendly", "protective" } },
+            priority = 3,
+        },
+        {
+            id = "semantic.apology.trusted",
+            templateID = "semantic.social.apology.trusted",
+            fallback = "I appreciate you saying that. We're all under pressure.",
+            when = {
+                relationshipState = {
+                    "Friend", "Trusted", "Ally", "Member", "Lover",
+                },
+            },
+            priority = 2,
+        },
+        {
+            id = "semantic.apology.withdrawn",
+            templateID = "semantic.social.apology.withdrawn",
+            fallback = "All right. Let's leave it there.",
+            when = { socialStyle = "withdrawn" },
+            priority = 1,
+        },
+        {
+            id = "semantic.apology.default",
+            templateID = "semantic.social.apology.default",
+            fallback = "Noted. Let's move on.",
+        },
+    },
+})
+
 Catalog.Register("semantic.compliment", {
     variants = {
         {
@@ -246,4 +293,3 @@ Catalog.Register("semantic.threat", {
 })
 
 return true
-
