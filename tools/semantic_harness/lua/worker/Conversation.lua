@@ -37,6 +37,10 @@ function Conversation.buildContext(context)
         and npc.conditionStats or world
     local needs = numbersFor(needSource, NEED_KEYS, number)
     local conditions = numbersFor(conditionSource, CONDITION_KEYS, number)
+    local bodyHealth = type(npc.bodyHealth) == "table"
+        and copy(npc.bodyHealth) or nil
+    local hpCurrent = number(npc.hpCurrent, nil)
+    local hpMax = number(npc.hpMax, nil)
     local snapshotNeeds = copy(needs)
     -- Preserve the old snapshot.needs condition fields for worker consumers,
     -- while exposing conditionStats to the real production situation resolver.
@@ -54,6 +58,9 @@ function Conversation.buildContext(context)
             identityState = npc.identityState or "unknown",
             healthState = npc.healthState,
             activeBehavior = npc.activeBehavior,
+            bodyHealth = bodyHealth,
+            hpCurrent = hpCurrent,
+            hpMax = hpMax,
             needs = copy(needs),
             conditionStats = copy(conditions),
         },
@@ -73,6 +80,9 @@ function Conversation.buildContext(context)
             snapshot = {
                 activeBehavior = npc.activeBehavior,
                 healthState = npc.healthState,
+                bodyHealth = bodyHealth,
+                hpCurrent = hpCurrent,
+                hpMax = hpMax,
                 needs = snapshotNeeds,
                 conditionStats = copy(conditions),
             },

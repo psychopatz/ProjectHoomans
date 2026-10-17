@@ -75,6 +75,25 @@ class SemanticParaphraseTests(unittest.TestCase):
                     turn["relationshipBefore"], turn["relationshipAfter"]
                 )
 
+    def test_live_unpunctuated_wellbeing_follow_up_is_bounded(self) -> None:
+        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+            first = worker.input("Are you okay?")
+            second = worker.input("whats wrong")
+
+        self.assertTrue(first["accepted"], first.get("reason"))
+        self.assertTrue(second["accepted"], second.get("reason"))
+        self.assertEqual(
+            second["result"]["ir"]["provenance"]["pattern"],
+            "pnc.question.wellbeing_follow_up_whats_plain",
+        )
+        self.assertEqual(
+            second["result"]["decision"]["branch"],
+            "QUESTION_RECEIVED",
+        )
+        self.assertEqual(second["llmCalls"], 0)
+        self.assertEqual(second["transport"], [])
+        self.assertEqual(second["toolCalls"], [])
+
 
 if __name__ == "__main__":
     unittest.main()

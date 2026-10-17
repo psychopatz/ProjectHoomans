@@ -159,6 +159,44 @@ class WellbeingProjectionTests(unittest.TestCase):
         self.assertEqual(situation["needs"]["highest"], "thirst")
         self.assertEqual(situation["healthState"], "healthy")
 
+    def test_live_health_snapshot_projects_minor_wound_as_injured(self) -> None:
+        scenario = self.scenario({
+            "healthState": "normal",
+            "hpCurrent": 95,
+            "hpMax": 100,
+            "bodyHealth": {
+                "overallPercent": 95,
+                "openWoundCount": 0,
+                "bandagedWoundCount": 1,
+                "wounds": {"lower_torso": {"type": "scratch"}},
+            },
+            "needs": {},
+            "conditionStats": {},
+        })
+        with LuaSemanticWorker(scenario) as worker:
+            result = worker.input("Are you okay?")
+        situation, response = self.assert_offline_wellbeing(result)
+        self.assertEqual(situation["healthState"], "injured")
+        self.assertEqual(
+            response["templateID"],
+            "semantic.question.wellbeing.injured",
+        )
+
+    def test_live_incapacitated_health_projects_to_injured_response(self) -> None:
+        scenario = self.scenario({
+            "healthState": "incapacitated",
+            "needs": {},
+            "conditionStats": {},
+        })
+        with LuaSemanticWorker(scenario) as worker:
+            result = worker.input("Are you okay?")
+        situation, response = self.assert_offline_wellbeing(result)
+        self.assertEqual(situation["healthState"], "injured")
+        self.assertEqual(
+            response["templateID"],
+            "semantic.question.wellbeing.injured",
+        )
+
     def test_editable_npc_state_round_trips_without_world_mutation(self) -> None:
         scenario = self.scenario({
             "healthState": "injured",

@@ -43,7 +43,7 @@ The contract is protected by
 - Real-worker contextual slice (parity, wellbeing projection, paraphrase,
   provider fallback, social reactions and baseline matrix): **PASS 26/26**.
 - `python3 -m unittest discover -s tools/semantic_harness/tests -q`:
-  **PASS 78/78**.
+  **PASS 81/81** after the live discrepancy repair below.
 - `tools/semantic_harness/run_harness.sh --test pnc_semantic`: **PASS 66/66**.
 
 The provider parity cases exercised the real worker with the provider both
@@ -53,6 +53,23 @@ deterministic clarification with no action or transport, while the enabled
 case recorded exactly one rejected provider attempt. The wellbeing and
 contextual cases read the production router's returned IR, decision, bounded
 context and routed situation.
+
+## Native retest discrepancy and repair
+
+The first controlled native conversation exposed two behavior gaps that the
+original structural parity contract did not catch:
+
+- The live text arrived as `whats wrong`. The catalog only registered
+  `what's wrong` and `what is wrong`, so the follow-up became clarification.
+- The harness could author `healthState="injured"`, but the live NPC health
+  contract reports `normal` plus bounded body-health/HP data for a minor wound
+  (and `incapacitated` for a downed NPC). The situation projection therefore
+  missed the wound and could answer “I'm okay.”
+
+The production fix adds the exact `whats wrong` alias and derives the semantic
+`injured` signal from live body-wound/HP evidence or `incapacitated` state. The
+Semantic Lab worker now accepts the same body-health shape, with focused
+post-fix wellbeing/paraphrase coverage **13/13** and full coverage **81/81**.
 
 ## Explicit limit
 

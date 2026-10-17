@@ -15,6 +15,12 @@ local NEED_WEIGHTS = Internal.NeedWeights
 local CONDITION_TYPES = Internal.ConditionTypes
 local CONDITION_WEIGHTS = Internal.ConditionWeights
 
+local function hasEntries(value)
+    if type(value) ~= "table" then return false end
+    for _ in pairs(value) do return true end
+    return false
+end
+
 local function needs(context)
     local values = fromSource(context, "needs")
     local output = {
@@ -138,6 +144,37 @@ end
 
 local function healthState(context)
     local value = text(fromSource(context, "healthState"))
+    -- The live NPC health contract uses "normal" until incapacitation; the
+    -- semantic response catalog needs a stable injury signal for ordinary
+    -- wounds as well. Prefer explicit semantic states, then derive injury
+    -- from the bounded body-health snapshot or scalar HP projection.
+    if value == "incapacitated" then return "injured" end
+    if value == "wounded" or value == "critical"
+        or value == "injured"
+    then
+        return value
+    end
+
+    local bodyHealth = fromSource(context, "bodyHealth")
+    if type(bodyHealth) == "table" then
+        if bodyHealth.infected == true
+            or (tonumber(bodyHealth.openWoundCount) or 0) > 0
+            or (tonumber(bodyHealth.bandagedWoundCount) or 0) > 0
+            or (tonumber(bodyHealth.overallPercent) or 100) < 99
+            or hasEntries(bodyHealth.wounds)
+        then
+            return "injured"
+        end
+    end
+
+    local current = finite(fromSource(context, "hpCurrent"))
+    local maximum = finite(fromSource(context, "hpMax"))
+    if current ~= nil and maximum ~= nil
+        and maximum > 0 and current < maximum
+    then
+        return "injured"
+    end
+
     return value ~= "" and value or nil
 end
 
