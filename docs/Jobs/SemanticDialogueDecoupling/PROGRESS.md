@@ -14,7 +14,7 @@ The source-level semantic path is compatible in the current local pair, but inst
 
 | Surface | Identity | Result |
 | --- | --- | --- |
-| Hoomans checkout | main 1de5f9208d5624931dca88a46a22f4efe40ad239; origin/main remains 56288e50e6d782634df7f26ceaa0f0cb7c0922f9; uncommitted C0B handshake files present | Complete 42.20 mod, manifest, EN/TL shards, semantic sources, and the new read-only capability spoke; local docs commit is one commit ahead |
+| Hoomans checkout | main; C0B handshake commit 4738f887266211248dbea9a61cbe4ef069ea2085; origin/main remains 56288e50e6d782634df7f26ceaa0f0cb7c0922f9 | Clean complete 42.20 mod, manifest, EN/TL shards, semantic sources, and committed read-only capability spoke; local main is ahead only because publication was not authorized |
 | PsychopatzCore checkout | main 44a4d534a9520440070ae7943d7ae9fb848f71ce; origin/main is identical | Semantic/parser/router/manifest additions are published on GitHub; preserve unrelated dirty edits in .architecture-refactor/output/architecture-audit.md and tools/asset_harness/** |
 | Local Workshop pair | /home/psychopatz/Zomboid/Workshop/ProjectHoomans plus /home/psychopatz/Zomboid/Workshop/psychopatzCore | Only complete current pair found locally |
 | Steam Hoomans cache | Workshop 3799685526 | Incomplete fragment: only 42.20/media/lua/shared/PNC/Core/Compatibility/Mods/Bandits/PNC_Bandits_AnimPathCompat.lua; no mod.info, current semantic files, or translation manifest |
