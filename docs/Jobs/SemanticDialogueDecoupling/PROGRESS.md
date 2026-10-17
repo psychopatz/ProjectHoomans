@@ -1,23 +1,29 @@
 # Semantic Dialogue Decoupling — current evidence and Next Chunk
 
-**As of 2026-10-17:** Phase **0A** (baseline adoption) is **ACCEPTED**. The
-identity/wellbeing regression fix remains preserved in the committed history;
-the modular flow and translation-manifest architecture is still planned.
-Native Build 42 singleplayer/multiplayer acceptance remains **NOT TESTED**.
+**As of 2026-10-17:** Phases **0A** (baseline adoption) and **1** (typed
+candidates/contextual eligibility) are **ACCEPTED**. The committed
+identity/wellbeing regression fix remains preserved; the bounded flow kernel
+and translation-manifest architecture are still planned. Native Build 42
+singleplayer/multiplayer acceptance remains **NOT TESTED**.
 
 ## Repository state and preserved work
 
-- The authorized Hoomans checkout is `/home/psychopatz/Zomboid/Workshop/ProjectHoomans`,
-  on `main`, tracking `origin/main`, at `98e8875cf9ed49250247dac2ac3ad5b0c0b9e9d9`.
-  The protected regression commit `105dadedd31c57be64a3622c4a1f6d2d6f402d35`
-  is an ancestor of this HEAD. It was not reimplemented.
-- The companion Core checkout is `/home/psychopatz/Zomboid/Workshop/psychopatzCore`,
-  on `main`, at local revision `0212491d2af3597cceaa7353e62f01ef54adca44`.
-  It has substantial unrelated in-flight radio/UI/asset edits in its working
-  tree; this goal did not modify, stage, stash, reset, or publish that checkout.
-- Hoomans was clean before Phase 0A edits. The edits below are limited to the
-  production-worker trace fixture, its Python regression assertions, the
-  current translation lookup smoke test, and this evidence ledger.
+- The authorized Hoomans checkout is
+  `/home/psychopatz/Zomboid/Workshop/ProjectHoomans`, on `main`, at local
+  revision `033a603ee9b68fa8c2438bd1cbf2af46ecf01c74`. `origin/main` remains
+  at the pre-phase revision `98e8875cf9ed49250247dac2ac3ad5b0c0b9e9d9`.
+  The protected regression commit
+  `105dadedd31c57be64a3622c4a1f6d2d6f402d35` is an ancestor and was not
+  reimplemented.
+- The companion Core checkout is
+  `/home/psychopatz/Zomboid/Workshop/psychopatzCore`, on `main`, at local
+  revision `56906aa75342f028583460c9de1b88d560c7b398`. It has substantial
+  unrelated in-flight radio/UI/asset edits in its working tree; the semantic
+  commit was path-limited and did not include or overwrite those staged
+  changes.
+- Hoomans is clean at the phase-1 commit. Core remains dirty only from the
+  pre-existing unrelated work plus the isolated semantic commit; neither
+  checkout was reset, stashed, force-pushed, or published.
 
 ## Phase 0A production-worker trace
 
@@ -25,8 +31,8 @@ Added
 `tools/semantic_harness/scenarios/identity_wellbeing_original_trace_case.json`
 and a permanent test in
 `tools/semantic_harness/tests/test_semantic_identity_wellbeing_collision.py`.
-The case runs the real production Lua worker with LLM disabled and records four
-accepted turns. The observed EN trace was:
+The case runs the real production Lua worker with LLM disabled and records
+four accepted turns. The observed EN trace was:
 
 | Input | Semantic IR / provenance | Route / branch | Observed response key and text | Pending identity |
 | --- | --- | --- | --- | --- |
@@ -37,14 +43,52 @@ accepted turns. The observed EN trace was:
 
 The first three turns had empty transport/tool-call collections and unchanged
 relationship snapshots. The final turn emitted one client-to-server
-`SemanticIdentityRequest`, one server-to-client `SemanticIdentityResult` (plus
-the expected event mirror), and tool calls `SemanticIdentityRequest` and
+`SemanticIdentityRequest`, one server-to-client `SemanticIdentityResult` plus
+the expected event mirror, and tool calls `SemanticIdentityRequest` and
 `AdjustRelationship`. Relationship state changed from unknown/revision 1 with
 zero approval, respect, and familiarity to trusted/revision 2 with approval 1,
 respect 2, and familiarity 6. All four turns used EN, `llmCalls=0`, and the
 loaded-module manifest included the real Core semantic parser, Hoomans
 translation bootstrap, dialogue policy, presentation, and identity exchange
 modules. The case runner reported `conflicts=[]` and sequences 1–4.
+
+## Phase 1 typed candidates and contextual eligibility
+
+Phase 1 is implemented in separate commits: Core
+`56906aa75342f028583460c9de1b88d560c7b398` and Hoomans
+`033a603ee9b68fa8c2438bd1cbf2af46ecf01c74`.
+
+- Core now exposes additive `Parser.ParseCandidates`, with a default limit of
+  8 and a hard limit of 16. Each bounded candidate carries its pattern ID,
+  exact/fuzzy pass, confidence, match metrics, typed captures, provenance, and
+  an IR v1 value. Candidate diagnostics include exact/fuzzy counts, selected
+  winner, deterministic tie state, and registry revision. Existing
+  `Parser.Parse` behavior and IR v1 were retained; the Core semantic smoke
+  test compares the legacy winner and candidate winner.
+- Core `DialogueRouter` has optional candidate-parser/selector hooks. The
+  Hoomans lifecycle supplies them without creating a second parser or state
+  store. Preview uses the same pure candidate selection path and does not
+  record a turn or dispatch an action; accepted results retain bounded
+  candidate evidence for the Semantic Lab.
+- Hoomans `DialogueCandidateEligibility` validates IR v1, honors authored
+  pattern priority, supports bounded required-context/required-capture
+  metadata, rejects fuzzy mutating actions before policy dispatch, and
+  clarifies when distinct same-priority candidates remain tied. It reports
+  positive selection and bounded negative reasons without changing dialogue
+  state, relationships, transport, or tools.
+- Real worker case
+  `tools/semantic_harness/scenarios/candidate_eligibility_case.json` sends
+  `folow me`. Production Lua emits the typed fuzzy candidate
+  `pnc.command.follow` (score `0.91`), rejects it as
+  `fuzzy_mutating_action`, returns `ASK_CLARIFICATION`, and records no
+  transport, tool call, action result, or relationship change. The existing
+  `I'm starving` collision remains `pnc.state.self_hunger_im`; authored
+  priority disambiguates it without a global stop-word expansion.
+
+The Phase 1 gate is satisfied: candidate evidence is produced by the real
+Core/Hoomans production worker, invalid mutating interpretations are rejected
+with inspectable reasons, legacy identity/wellbeing behavior remains green,
+and PREVIEW remains side-effect-free.
 
 ## Translation baseline
 
@@ -59,8 +103,8 @@ JSON files; no translation files were moved or rewritten.
   `37a6d55a24b4c70e4b4b3a1533cb1c1a951f15289183d6870a351f707d9c86a4`,
   canonical sorted key/value SHA-256
   `bfe3c2c880a6030291bc12dcd3f1d4e587acd7996e6bdc91583d30bbd8f22b4b`.
-- EN/TL key sets have zero missing and zero extra names. Key-by-key placeholder
-  signatures have zero mismatches.
+- EN/TL key sets have zero missing and zero extra names. Key-by-key
+  placeholder signatures have zero mismatches.
 - `PNC_TranslationBootstrap.lua` registers 15 systems and their registered
   catalogs contain 2,825 keys in each language. The Core manager baseline API
   is `registerSystem`, `forMod`, `load`, `get`, `getLanguage`,
@@ -70,69 +114,64 @@ JSON files; no translation files were moved or rewritten.
   `getLanguageOverride`. It loads one nested per-system JSON lazily, with a
   legacy flat-file fallback.
 - `Trading/Trading.json` exists separately with 20 EN and 20 TL keys but is
-  not among the 15 registered systems. The new real facade smoke assertion
-  records the current lookup: `Translation.Systems.Trading == nil` and
+  not among the 15 registered systems. The real facade smoke assertion records
+  the current lookup: `Translation.Systems.Trading == nil` and
   `Translation.GetKey("UI_PNC_Trading_Title", "Trading") == "Trading"`
   under the TL test setup, because the segment map/native lookup does not
   resolve the unregistered custom catalog. This is a Phase 5/6 migration item,
-  not a Phase 0 fix.
+  not a Phase 0/1 fix.
 
 ## Verification evidence
 
-Doctor passed all required checks: Python 3.12.3, Lua 5.3.6,
-Hoomans/Core paths, worker syntax, and `READY/PING/CAPABILITIES`.
+Doctor passed all required checks: Python 3.12.3, Lua 5.3.6, Hoomans/Core
+paths, worker syntax, and `READY/PING/CAPABILITIES`.
 
-Before the Phase 0A additions, the committed regression and baselines were
-`7/7`, `90/90`, and `66/66`. After the additions:
+Phase 1 verification:
 
-- `python3 -m unittest tools.semantic_harness.tests.test_semantic_identity_wellbeing_collision -q` — **8/8 PASS**.
-- `python3 -m unittest discover -s tools/semantic_harness/tests -q` — **91/91 PASS**.
-- `tools/semantic_harness/run_harness.sh --test pnc_semantic` — **66/66 PASS**.
-- `python3 tests/run_tests.py pnc_semantic --harness-report /tmp/semantic-decoupling-regression-after.json` — **66/66 PASS**.
-- `python3 tests/run_tests.py pz_custom_translation_manager_smoke` — **1/1 PASS**.
-- `git diff --check` — **PASS**.
-- `pz_verify` on the changed Lua test reported no Kahlua errors under
-  `--kahlua --severity ERROR`; the default report had 10 warning-level
-  `KAHL-W001 load(string)` findings and a 3,973-token test-file estimate over
-  the 2,000-token warning threshold. No new production Lua file was changed.
-
-The repository-wide Lua suite remained an unchanged headless baseline failure
-before and after the Phase 0A additions:
-`python3 tests/run_tests.py` — **FAIL 12/834 executed**. The 12 failing files
-were `pnc_building_catalog_local_recipes_smoke.lua`,
-`pnc_building_favorites_smoke.lua`, `pnc_building_tab_selection_smoke.lua`,
-`pnc_colony_management_ui_model_smoke.lua`,
-`pnc_colony_management_workshop_catalog_smoke.lua`,
-`pnc_constants_presence_boundary_smoke.lua`, `pnc_inventory_ui_smoke.lua`,
-`pnc_live_body_heavy_held_items_smoke.lua`,
-`pnc_pbrainz_native_button_smoke.lua`,
-`pnc_persisted_shell_cleanup_smoke.lua`,
-`pnc_puppet_opera_animation_tab_modules_smoke.lua`, and
-`pnc_server_inventory_presence_boundary_smoke.lua`. None is in the semantic
-Phase 0A focused set; no failure was hidden or weakened.
+- `lua5.3 tests/psychopatz_semantic_pattern_matcher_smoke.lua` in Core —
+  **PASS**.
+- `python3 -m unittest tools.semantic_harness.tests.test_semantic_identity_wellbeing_collision -q` — **9/9 PASS**.
+- `python3 -m unittest discover -s tools/semantic_harness/tests -q` —
+  **92/92 PASS**.
+- `tools/semantic_harness/run_harness.sh --test pnc_semantic` —
+  **66/66 PASS**.
+- `python3 tests/run_tests.py pnc_semantic --harness-report /tmp/phase1-semantic-report-after-fix.json` — **66/66 PASS**.
+- `python3 tests/run_tests.py` — **FAIL 12/834 executed in 8.25s**, the
+  unchanged headless baseline set: `pnc_building_catalog_local_recipes_smoke.lua`,
+  `pnc_building_favorites_smoke.lua`, `pnc_building_tab_selection_smoke.lua`,
+  `pnc_colony_management_ui_model_smoke.lua`,
+  `pnc_colony_management_workshop_catalog_smoke.lua`,
+  `pnc_constants_presence_boundary_smoke.lua`, `pnc_inventory_ui_smoke.lua`,
+  `pnc_live_body_heavy_held_items_smoke.lua`,
+  `pnc_pbrainz_native_button_smoke.lua`, `pnc_persisted_shell_cleanup_smoke.lua`,
+  `pnc_puppet_opera_animation_tab_modules_smoke.lua`, and
+  `pnc_server_inventory_presence_boundary_smoke.lua`.
+- `git diff --check` — **PASS** on both repositories after commits.
+- `pz_verify` `--kahlua --severity ERROR` — **PASS** for every changed
+  production Lua file in both repositories. No new Kahlua errors were found;
+  the pre-existing test-file warning profile is not a production regression.
 
 The Hoomans graph index was ready with no parse-partial or skipped files at
 generation `2026-10-08T03:19:15Z`; changed/untracked evidence files were read
 from source because their graph metadata was stale or not tracked. The Core
-translation manager path is excluded from the Core graph, so its API claims
-above are source-verified rather than graph-derived.
+semantic paths were source-verified because the graph did not index them.
 
-## Phase 0A gate and next bounded chunk
+## Phase 1 gate and next bounded chunk
 
-Exit 0A is satisfied: the protected identity semantics are exercised through
-real production Lua, the complete interruption/resumption trace has no false
-identity or relationship effect, focused and semantic suites pass, the current
-EN/TL catalog baseline is hashed, and the native SP/MP gate remains explicitly
-open.
+Exit 1 is satisfied: the protected identity semantics and the new typed
+candidate rejection are exercised through real production Lua, candidate
+provenance and negative eligibility reasons are inspectable, focused and full
+semantic suites pass, and the existing full-suite failures are unchanged and
+unrelated. The native SP/MP gate remains explicitly open.
 
-**Next Chunk: Phase 1 — typed candidates and contextual eligibility.** First
-inspect the current Core/Hoomans candidate and diagnostic contracts, then make
-the smallest compatibility-preserving extension only if the Phase 1 scenario
-proves it necessary. Preserve `Parser.Parse`/IR v1, reject context-invalid
-identity candidates with inspectable reasons, keep PREVIEW pure, and do not add
-global stop-word priority or gameplay authority to the parser. Do not modify
-the dirty Core checkout without a separately authorized Core change and
-deployment decision.
+**Next Chunk: Phase 2 — minimal bounded dialogue-flow kernel.** Reuse the
+existing Core/Hoomans dialogue state; add stable flow registration, typed
+triggers, bounded nodes/transitions, and per-speaker/addressee suspend/resume
+or cancellation. Start with a pure registry/validator and a two-flow pilot
+(`identity` plus `wellbeing`) that only emits existing response/catalog IDs.
+Keep PREVIEW side-effect-free, commit accepted turns once, and do not create a
+second transcript or add central-policy `elseif` branches. Establish the
+production-worker acceptance trace before moving to Phase 3.
 
 Native SP/MP, hosted CI, and live PBrainZ provider acceptance remain
 **NOT TESTED**.
