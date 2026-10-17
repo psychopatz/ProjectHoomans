@@ -379,6 +379,7 @@
     "UI_PNC_Conversation_Semantic_QuestionIdentityStrangerAlt2": "Kilalanin muna natin ang isa't isa. Ano ang tawag sa iyo?",
     "UI_PNC_Conversation_Semantic_QuestionIdentityWaryAlt1": "Hindi pa kita pinagkakatiwalaan para sabihin ang pangalan ko. Sino ka ba talaga?",
     "UI_PNC_Conversation_Semantic_QuestionIdentityWaryAlt2": "Pagkatapos mong magsinungaling, hindi ko sasabihin ang pangalan ko. Sabihin mo muna ang totoo tungkol sa iyo.",
+    "UI_PNC_Conversation_Semantic_QuestionWellbeingUnknown": "Hindi ko sigurado kung kumusta ako ngayon.",
     "UI_PNC_Conversation_Semantic_IdentityExchangeUnavailable": "Hindi ko makumpirma ang pangalan mo sa ngayon. Maaari mo bang sabihin itong muli?",
     "UI_PNC_Conversation_Semantic_IdentityExchange": "Ikinagagalak kitang makilala. Ano ang pangalan mo?",
     "UI_PNC_Conversation_Semantic_IdentityExchangeConfirmed": "Sige, %s. Ikinagagalak kitang makilala. Ako si %s.",

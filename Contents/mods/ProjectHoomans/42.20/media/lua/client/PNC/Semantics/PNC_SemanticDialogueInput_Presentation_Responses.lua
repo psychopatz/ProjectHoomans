@@ -85,6 +85,8 @@ local function semanticTranslationKey(response)
             "UI_PNC_Conversation_Semantic_RelationshipStatusAcknowledgedAlt",
         ["semantic.question.relationship_status.acknowledged.withdrawn"] =
             "UI_PNC_Conversation_Semantic_RelationshipStatusAcknowledgedWithdrawn",
+        ["semantic.question.wellbeing.unknown"] =
+            "UI_PNC_Conversation_Semantic_QuestionWellbeingUnknown",
     }
     return keys[templateID]
 end

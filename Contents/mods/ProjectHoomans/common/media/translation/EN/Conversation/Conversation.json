@@ -379,6 +379,7 @@
     "UI_PNC_Conversation_Semantic_QuestionIdentityStrangerAlt2": "Let's get to know each other first. What do people call you?",
     "UI_PNC_Conversation_Semantic_QuestionIdentityWaryAlt1": "I don't trust you enough to share my name. Who are you, really?",
     "UI_PNC_Conversation_Semantic_QuestionIdentityWaryAlt2": "After that lie, I'm not telling you my name. Tell me the truth about yours.",
+    "UI_PNC_Conversation_Semantic_QuestionWellbeingUnknown": "I'm not sure how I'm doing right now.",
     "UI_PNC_Conversation_Semantic_IdentityExchangeUnavailable": "I couldn't verify your name just now. Could you tell me again?",
     "UI_PNC_Conversation_Semantic_IdentityExchange": "Nice to meet you. What's your name?",
     "UI_PNC_Conversation_Semantic_IdentityExchangeConfirmed": "Okay %s, nice to meet you. I'm %s.",

@@ -101,6 +101,13 @@ local function conditionContext(context)
     local needs = npc.needs or {}
     local emotion = npc.emotion or {}
     local social = situation.social or {}
+    local healthState = context.healthState or npc.healthState
+    -- Keep missing health evidence distinct from a known healthy state for
+    -- response selection. The routed situation remains source-faithful and
+    -- continues to omit the field when the NPC health fact is unavailable.
+    if type(healthState) ~= "string" or healthState == "" then
+        healthState = "unknown"
+    end
     return {
         topic = context.currentTopic or context.topic,
         previousTopic = context.previousTopic,
@@ -124,7 +131,7 @@ local function conditionContext(context)
         emotionUrgency = context.emotionUrgency or emotion.urgency,
         relationshipAttitude = context.relationshipAttitude
             or social.attitude,
-        healthState = context.healthState or npc.healthState,
+        healthState = healthState,
         socialStyle = context.socialStyle or social.style,
         hostilityCount = context.hostilityCount
             or state.socialContext and state.socialContext.hostilityCount,

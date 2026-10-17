@@ -150,6 +150,19 @@ Catalog.Register("semantic.question.wellbeing", {
     },
 })
 
+-- Keep an unsupported wellbeing snapshot out of the normal response pool.
+-- That pool already includes the bounded generated response variants; this
+-- separate pool makes uncertainty explicit without expanding its limit.
+Catalog.Register("semantic.question.wellbeing.unknown", {
+    variants = {
+        {
+            id = "semantic.question.wellbeing.unknown",
+            templateID = "semantic.question.wellbeing.unknown",
+            fallback = "I'm not sure how I'm doing right now.",
+        },
+    },
+})
+
 Catalog.Register("semantic.self_state", {
     variants = {
         {
@@ -307,4 +320,3 @@ Catalog.Register(
 )
 
 return true
-

@@ -1,8 +1,8 @@
 """Real-production-Lua wellbeing scenario and projection acceptance probes.
 
 These tests execute the persistent Semantic Lab Lua worker, not a Python mock
-of the parser or a JSON-only replay. They validate the existing reactions;
-new reaction behavior and native SP/MP acceptance belong to later phases.
+of the parser or a JSON-only replay. They validate the production contextual
+reaction path; native SP/MP acceptance remains a later gate.
 """
 
 from __future__ import annotations
@@ -64,6 +64,10 @@ class WellbeingProjectionTests(unittest.TestCase):
                        "conditionStats": {"stress": 0.0, "panic": 95, "boredom": 0.0}},
              "healthy", "thirst", "normal",
              "semantic.question.wellbeing.panic"),
+            ("stress", {"healthState": "healthy", "needs": neutral_needs,
+                         "conditionStats": {"stress": 95, "panic": 0.0, "boredom": 0.0}},
+             "healthy", "thirst", "normal",
+             "semantic.question.wellbeing.stress"),
         )
         for label, npc, health, need, urgency, template_prefix in cases:
             with self.subTest(case=label):
@@ -92,13 +96,21 @@ class WellbeingProjectionTests(unittest.TestCase):
         })
         with LuaSemanticWorker(scenario) as worker:
             result = worker.input("Are you okay?")
-        situation, _ = self.assert_offline_wellbeing(result)
+        situation, response = self.assert_offline_wellbeing(result)
         self.assertIsNone(situation.get("healthState"))
         self.assertIsNone(situation["needs"].get("highest"))
         self.assertEqual(situation["activity"]["id"], "unknown")
         self.assertIsNone(situation["emotion"].get("highest"))
-        # The existing default reply may still imply health. Improving that
-        # reaction belongs to Phase 1; Phase 0A only proves source fidelity.
+        self.assertTrue(
+            response["templateID"].startswith(
+                "semantic.question.wellbeing.unknown"
+            ),
+            response,
+        )
+        self.assertEqual(
+            result["messages"][0]["payload"]["translationKey"],
+            "UI_PNC_Conversation_Semantic_QuestionWellbeingUnknown",
+        )
 
     def test_legacy_world_needs_and_editable_activity_remain_supported(self) -> None:
         scenario = self.scenario(
