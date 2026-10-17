@@ -1,30 +1,38 @@
 # Semantic Dialogue Decoupling — current evidence and Next Chunk
 
-**As of 2026-10-17:** Phases **0A** (baseline adoption), **1** (typed
-candidates/contextual eligibility), and **2** (bounded dialogue-flow kernel)
-are **ACCEPTED** for the Semantic Lab gate. Phase **3** (identity/wellbeing
-modular pilots) is the active next chunk. Native Build 42
-singleplayer/multiplayer acceptance remains **NOT TESTED**.
+**As of 2026-10-17:** Phases **0A–8** (baseline adoption, typed
+candidates/contextual eligibility, bounded flows, modular pilots, Semantic Lab
+diagnostics, Core manifests, full EN/TL sharding, response plans and domain
+integration) are **ACCEPTED** for the real production-Lua Semantic Lab gate.
+Phase **9** is **BLOCKED** on a controlled native Build 42 session: the local
+game process is absent and no native UI/hosted-MP control surface is available.
+Native SP/MP acceptance therefore remains **NOT TESTED**, and this goal is not
+claimed maintenance-ready.
 
 ## Repository state and preserved work
 
 - The authorized Hoomans checkout is
   `/home/psychopatz/Zomboid/Workshop/ProjectHoomans`, on `main`, at local
-  revision `69e223b48215fee094a8a47f5a7f16ecc640d8f0`. `origin/main` remains
+  revision `d591959c4976ba4f9c9ff646742fc4a1836fab80`. The latest production
+  response-plan code is `eb417d83930e7de807990323ffd06ede34169c1e` and the
+  Conversation shard migration is `279b7b2af8ca4b987cade61885742edcf682aaf7`.
+  `origin/main` remains
   at the pre-phase revision `98e8875cf9ed49250247dac2ac3ad5b0c0b9e9d9`.
   The protected regression commit
   `105dadedd31c57be64a3622c4a1f6d2d6f402d35` is an ancestor and was not
   reimplemented.
 - The companion Core checkout is
   `/home/psychopatz/Zomboid/Workshop/psychopatzCore`, on `main`, at local
-  revision `9e46a8e07e6dea60dd42ff982ae798d49376fa40`. It has substantial
+  revision `afc1bda0f5f3aaec1bbe1693f1264cd5d990ed5d`. It has substantial
   unrelated in-flight radio/UI/asset edits in its working tree; the semantic
   commit was path-limited and did not include or overwrite those staged
   changes.
-- Hoomans is clean at the phase-2 commit. Core remains dirty only from the
+- Hoomans is clean at the latest test commit. Core remains dirty only from the
   pre-existing unrelated work plus the isolated semantic commits; the new
   router hook is committed at `9e46a8e07e6dea60dd42ff982ae798d49376fa40`
-  while 174 unrelated cached paths remain untouched. Neither checkout was
+  and the manifest loader is committed at
+  `afc1bda0f5f3aaec1bbe1693f1264cd5d990ed5d`; 174 unrelated cached paths and
+  20 unrelated unstaged paths remain untouched. Neither checkout was
   reset, stashed, force-pushed, or published.
 
 ## Phase 0A production-worker trace
@@ -125,10 +133,83 @@ the real worker proves preview purity and one-time commit/resume behavior, and
 the existing identity/wellbeing regression suite remains green. Native SP/MP
 remains open.
 
+## Phases 3–4 — modular pilots and Semantic Lab diagnostics
+
+Phase 3 was accepted in Hoomans `42aefe6c` and Phase 4 in `f6b8c868`.
+`PNC_SemanticDialogueFlow_Identity.lua` and
+`PNC_SemanticDialogueFlow_Wellbeing.lua` remain separate registered owners;
+the wellbeing module now owns the qualified refusal transition (`onRefuse =
+"cancel"`) without adding a central policy branch. The existing authoritative
+identity exchange and contextual response pools remain unchanged.
+
+The real worker now exposes candidate diagnostics, flow schema/revision,
+flow diagnostics, transition/status, and selected response evidence. Registry
+smokes cover unsupported frames, unreachable nodes, duplicate frames/IDs and
+conflicting slot owners. The refusal path proves cancellation retires the
+flow with no transport, tool call or relationship mutation.
+
+## Phase 5 — Core manifest reader
+
+PsychopatzCore `afc1bda0f5f3aaec1bbe1693f1264cd5d990ed5d` adds an optional,
+backwards-compatible explicit translation manifest. It validates bounded safe
+relative shard paths, required EN ownership, duplicate paths/keys, lazy reads,
+per-shard caching, language invalidation, EN fallback and coverage/audit
+diagnostics while retaining the legacy nested/flat registration API.
+
+`lua5.3 tests/psychopatz_custom_translation_manifest_smoke.lua` **PASS**;
+the malformed, traversal, missing-EN, duplicate-key, missing-TL, audit,
+language-switch and warmed-read assertions all execute through the real Core
+manager. The pre-existing Core catalog smoke still stops at its hard-coded
+`coverage.counts.total == 316` assertion because unrelated staged Core EN/TL
+catalog edits add 18 keys (actual total 334); that unrelated baseline was not
+modified.
+
+## Phase 6 — complete Conversation EN/TL sharding
+
+Hoomans `279b7b2af8ca4b987cade61885742edcf682aaf7` migrated the exact 521-key
+Conversation catalogs into 12 explicit subsystem shards per language and
+`manifests/Conversation.json`, then removed the two monoliths. The bootstrap
+passes the manifest only for `Conversation`; the other 14 systems retain their
+legacy registrations. A direct parity audit reports EN 521 keys / TL 521
+keys, zero missing, extra or duplicate keys, zero value mismatches and zero
+placeholder-signature mismatches. Canonical key/value hashes remain EN
+`c6e208b9c900ed278c8ad662284a6b11015d8258a62a0625d64e21a4c243c5d4` and TL
+`bfe3c2c880a6030291bc12dcd3f1d4e587acd7996e6bdc91583d30bbd8f22b4b`.
+
+The production worker’s `test_harness` suite is **24/24 PASS** after the
+migration. The shard-aware parity/manager/conversation/plan smoke selection is
+**4/4 PASS**, including duplicate-owner checks and real lookup compatibility.
+
+## Phase 7 — composable response plans
+
+Hoomans `eb417d83930e7de807990323ffd06ede34169c1e` adds bounded typed
+`dialogue_act_plan` data over existing contextual response-pool selections.
+Plans preserve stable template IDs, source pool IDs, bounded args and English
+fallbacks; they support bounded multi-part and multi-turn composition. The
+presentation adapter renders the first turn through the existing semantic
+translation-key mapping, and carries the plan for the existing queue/history
+path. Plans never parse, mutate state, dispatch tools or authorize gameplay.
+
+`lua5.3 tests/pnc_semantic_dialogue_response_plan_smoke.lua` **PASS**;
+the real worker flow test is **5/5 PASS** with the same plan structure and
+stable ID in EN and TL, and TL resolves through the sharded production catalog.
+The focused Semantic Lab Lua gate is **68/68 PASS**.
+
+## Phase 8 — domain compatibility
+
+No new domain policy branch was required. Existing production paths retain
+MarketSense item classification, server task/trade boundaries, optional
+PBrainZ fallback, group speaker isolation and legacy response IDs. The focused
+real-worker social/wellbeing/domain selection is **40/40 PASS**; the focused
+Lua social, gossip, gift, inventory-trade and task selection is **15/15 PASS**;
+the full Semantic Lab Python suite is **97/97 PASS**.
+
 ## Translation baseline
 
-The current custom Conversation catalogs were read directly from the packaged
-JSON files; no translation files were moved or rewritten.
+The pre-migration custom Conversation catalogs were read directly from the
+packaged monoliths before Phase 6. Their hashes remain the parity reference;
+the monoliths were then replaced by the explicit EN/TL shard set described
+above.
 
 - EN: 521 keys, 45,222 bytes, raw SHA-256
   `50d1f1c8c3d12d6ed7cdb10d7e79e5672e8a4fb3e1d59097ec2a7a4a6392d199`,
@@ -140,14 +221,16 @@ JSON files; no translation files were moved or rewritten.
   `bfe3c2c880a6030291bc12dcd3f1d4e587acd7996e6bdc91583d30bbd8f22b4b`.
 - EN/TL key sets have zero missing and zero extra names. Key-by-key
   placeholder signatures have zero mismatches.
-- `PNC_TranslationBootstrap.lua` registers 15 systems and their registered
-  catalogs contain 2,825 keys in each language. The Core manager baseline API
+- `PNC_TranslationBootstrap.lua` still registers 15 systems and their
+  registered catalogs contain 2,825 keys in each language. The Core manager
+  baseline API
   is `registerSystem`, `forMod`, `load`, `get`, `getLanguage`,
   `setLanguageOverride`, `clearLanguageOverride`,
   `SetTranslationAuditEnabled`, `GetTranslationAuditSnapshot`,
   `GetTranslationCoverageRevision`, `GetTranslationCoverageSnapshot`, and
   `getLanguageOverride`. It loads one nested per-system JSON lazily, with a
-  legacy flat-file fallback.
+  legacy flat-file fallback; `Conversation` now selects its explicit manifest
+  and shard files through the same public facade.
 - `Trading/Trading.json` exists separately with 20 EN and 20 TL keys but is
   not among the 15 registered systems. The real facade smoke assertion records
   the current lookup: `Translation.Systems.Trading == nil` and
@@ -210,19 +293,38 @@ generation `2026-10-08T03:19:15Z`; changed/untracked evidence files were read
 from source because their graph metadata was stale or not tracked. The Core
 semantic paths were source-verified because the graph did not index them.
 
-## Phase 2 gate and next bounded chunk
+## Phase 9 — native acceptance and bounded performance
 
-Exit 2 is satisfied: registered identity and wellbeing modules now own typed
-flow transitions over bounded existing context, real production Lua proves
-interrupt/resume/isolation and preview idempotence, and the existing
-full-suite failures are unchanged and unrelated. The native SP/MP gate remains
-explicitly open.
+The non-native performance command
+`python3 -m tools.semantic_harness.phase6_performance --samples 4 --warmup 1
+--serial-turns 24` passed. It measured the real production Lua worker, not
+the engine: provider-disabled median latency was 23.399 ms for `follow me`,
+26.247 ms for wellbeing and 40.025 ms for unknown input; 24 serial turns
+ended at sequence 24 with at most 12 semantic events and 6 recent dialogue
+turns. `test_phase6_static_boundaries` and the performance helper tests were
+**5/5 PASS**, including no semantic-input `OnTick` registration.
 
-**Next Chunk: Phase 3 — identity and wellbeing modular pilots.** Exercise the
-two registered flow modules against the existing response/catalog and
-authoritative identity boundary, add one flow-owned refusal/variant branch
-without a central policy branch, and record the real-worker transition,
-response-key and no-side-effect evidence before moving to Phase 4.
+Native acceptance is a genuine environment blocker. A read-only process check
+found no running Project Zomboid process; the available CUA desktop inventory
+reported no native apps or controllable game session. The installed launcher
+exists, but there is no prepared, controllable SP save plus hosted-MP/server
+pair through which to establish UI, identity authority, save/rejoin,
+translation restart, delayed provider, multi-speaker or native per-NPC
+overhead evidence. No Semantic Lab mock or old console log is promoted as
+native proof.
 
-Native SP/MP, hosted CI, and live PBrainZ provider acceptance remain
-**NOT TESTED**.
+## Final gate and next bounded chunk
+
+Phases 0A–8 are accepted with real production-Lua evidence. The full Lua
+headless suite remains **FAIL 12/836 executed** in 5.78 seconds, exactly the
+unchanged UI/native baseline set (the response-plan smoke adds one passing
+case); the full Python Semantic Lab suite is **97/97 PASS**. Core
+manifest smoke is **PASS** with the unrelated legacy Core catalog-count
+assertion documented above. `git diff --check` is clean for the final Hoomans
+changes, and changed production Lua files report zero Kahlua ERROR findings.
+
+**Next Chunk:** provide a separately controlled Build 42 native SP session and
+hosted-MP/server pair, then run the Phase 9 matrix and record exact build,
+save/rejoin, UI, authority, translation and performance evidence. Until that
+runtime is available, native SP/MP remains **NOT TESTED** and the goal is not
+maintenance-ready.
