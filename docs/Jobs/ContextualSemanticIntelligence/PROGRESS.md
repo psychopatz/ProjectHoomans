@@ -1,6 +1,6 @@
 # Contextual Semantic Intelligence — progress
 
-**Updated:** 2026-10-17. **Phase:** 3A — bounded contextual apology reaction. **Status:** Phase 3A Semantic Lab gate accepted; Phase 3B is the sole Next Chunk. Native SP/MP acceptance remains OPEN.
+**Updated:** 2026-10-17. **Phase:** 3B — bounded contextual threat reaction. **Status:** Phase 3B Semantic Lab gate accepted; Phase 3C is the sole Next Chunk. Native SP/MP acceptance remains OPEN.
 
 ## Revision evidence
 
@@ -85,11 +85,21 @@ Phase 0A is accepted only for its documented Semantic Lab correctness baseline. 
 - `pz-verify` over the semantic directory: **0 Kahlua errors**. Existing hardcoded-string findings (12 files) and token-size warnings (26 files, including the already-large social catalog) remain documented; they are not treated as a Phase 3A correctness failure. Changed Lua files also passed `luac5.3 -p`.
 - Native SP: **NOT TESTED**. Native MP: **NOT TESTED**. Semantic Lab transport emptiness and a present PZ process are not native acceptance evidence.
 
-## ONE current Next Chunk — Phase 3B bounded offer/reassurance/threat/dispute baseline
+## Phase 3B verification evidence — accepted for the bounded Semantic Lab gate
 
-1. Audit one remaining authored behavior family from offers, reassurance, threats or disputes and identify the smallest contextual gap; preserve existing catalogs and authority boundaries.
+- Implementation revision: Project Hoomans `c7d2124f` (`feat(semantic): add guarded threat reactions`); the detailed evidence is in [`PHASE3B_SOCIAL_THREAT.md`](PHASE3B_SOCIAL_THREAT.md).
+- The existing `THREATEN` parser/IR, `THREAT_RECEIVED` policy branch, `semantic.threat` response pool and authorized social-dispatch boundary were retained. Three guarded catalog variants were added: stressed/panicked, withdrawn, and trusted. Explicit precedence is stress (5) > busy (3) > withdrawn (2) > trusted (1) > default; the existing busy response remains selected for the default reserved/busy worker.
+- Focused contextual social tests: **PASS 4/4**. Full Python suite: **PASS 63/63**. Apology, friendly compliment and stressed self-reflection coverage remained green.
+- `tools/semantic_harness/run_harness.sh --doctor --doctor-json`: **PASS**. `tools/semantic_harness/run_harness.sh --test pnc_semantic`: **PASS 66/66**. CLI report `/tmp/contextual-semantic-suite-phase3b.json`: **PASS 66/66**, 198 events, `conflicts=[]`, `audit_truncated=null`; those protocol/replay values are not semantic proof.
+- EN/TL conversation JSON each parsed with 512 keys and all three new threat keys present. Changed Lua files passed `luac5.3 -p`. `pz-verify` over the semantic directory reported **0 Kahlua errors**; existing hardcoded-string and token-size findings remain bounded maintenance findings.
+- Threat turns remained deterministic (`llmCalls=0`), emitted no messages in the existing directed-hostility presentation path, no transport or tool calls, and no relationship mutation. The existing authorized social-dispatch result is reported as `accepted=false`, `semantic_social_transport_unavailable` by the harness; this is a harness boundary, not proof of native delivery.
+- Native SP: **NOT TESTED**. Native MP: **NOT TESTED**. No Semantic Lab result is promoted as native acceptance evidence.
+
+## ONE current Next Chunk — Phase 3C bounded offer/reassurance/dispute baseline
+
+1. Audit one remaining authored behavior family from offers, reassurance or disputes and identify the smallest contextual gap; preserve existing catalogs and authority boundaries.
 2. Add only the narrowest deterministic mapping or precedence evidence needed for that gap; do not activate tasks, obligations or relationship mutation without an existing authorized path.
-3. Assert varied relationship/emotion cases, before/after context, preview behavior where applicable, zero PBrainZ calls and no unauthorized transport/tool effects. Preserve all Phase 2 and Phase 3A coverage.
+3. Assert varied relationship/emotion cases, before/after context, preview behavior where applicable, zero PBrainZ calls and no unauthorized transport/tool effects. Preserve all Phase 2, Phase 3A and Phase 3B coverage.
 4. Keep native SP/MP explicitly open; do not expand to paraphrase, group or PBrainZ phases until the bounded Phase 3 social gate is evidenced.
 
 ## Remaining roadmap
