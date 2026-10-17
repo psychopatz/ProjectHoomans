@@ -144,6 +144,13 @@ Phase 5 is accepted only for deterministic/provider-failure parity, bounded prov
 
 - The bounded status and evidence boundary are recorded in
   [`PHASE6_NATIVE_STATUS.md`](PHASE6_NATIVE_STATUS.md).
+- Semantic Lab/live semantic parity is now contract-tested in
+  [`PHASE6_SEMANTIC_LIVE_PARITY.md`](PHASE6_SEMANTIC_LIVE_PARITY.md): the
+  worker loads the checked-out production input/lifecycle/provider modules,
+  calls the public production `DialogueInput.Submit` entrypoint, and reads
+  production-owned IR/decision/routed-situation results. The fresh parity
+  contract passed **4/4**; the real-worker contextual slice passed **26/26**;
+  the full Semantic Lab Python suite passed **78/78**.
 - No production semantic behavior changed after Phase 5. No controlled native
   single-player scenario or authoritative multiplayer session was completed
   in this checkpoint. A bounded non-native real-Lua-worker performance result
@@ -160,7 +167,7 @@ Phase 5 is accepted only for deterministic/provider-failure parity, bounded prov
   `804eff7b` and `ffad31f4`:
   `python3 -m unittest
   tools.semantic_harness.tests.test_phase6_static_boundaries -v` passed **3/3**;
-  the full Semantic Lab Python suite is **74/74**. It found no
+  the full Semantic Lab Python suite is now **78/78**. It found no
   `Events.OnTick` registration in the `PNC_SemanticDialogueInput*.lua`
   modules and retained the server-side authority/lease/replay gates. This is
   a static/request-boundary result, not native game evidence.
