@@ -84,6 +84,61 @@ class SemanticDialogueFlowTests(unittest.TestCase):
             lookup_count += len(turn["translation"]["lookups"])
         self.assertGreaterEqual(lookup_count, 1)
 
+    def test_worker_observation_exposes_real_turn_facts_and_side_effects(self) -> None:
+        scenario = merge(
+            DEFAULT_SCENARIO,
+            {"runtime": {"language": "TL"}},
+        )
+        with LuaSemanticWorker(scenario) as worker:
+            identity = worker.input("who are you")
+            wellbeing = worker.input("are you okay")
+            status = worker.input("im fine thanks")
+            name = worker.input("My name is Patrick")
+
+        first = identity["observation"]
+        self.assertEqual(first["ir"]["pattern"], "pnc.question.identity")
+        self.assertEqual(first["candidates"]["selectedPattern"], first["ir"]["pattern"])
+        self.assertEqual(first["flow"]["flowId"], "identity")
+        self.assertEqual(first["flow"]["transition"], "start")
+        self.assertEqual(first["flow"]["toNodeId"], "await_player_name")
+        self.assertEqual(first["flow"]["activeAfter"][0]["flowId"], "identity")
+        self.assertEqual(first["response"]["text"], identity["messages"][0]["payload"]["text"])
+        self.assertTrue(first["response"]["translated"])
+        self.assertEqual(first["translation"]["language"], "TL")
+        self.assertGreater(first["translation"]["lookupCount"], 0)
+        self.assertTrue(first["sideEffects"]["none"])
+
+        interrupted = wellbeing["observation"]
+        self.assertEqual(interrupted["flow"]["transition"], "interrupt_start")
+        self.assertEqual(interrupted["flow"]["activeBefore"][0]["flowId"], "identity")
+        self.assertEqual(
+            interrupted["flow"]["activeAfter"][0]["suspended"][0]["flowId"],
+            "identity",
+        )
+        self.assertTrue(interrupted["sideEffects"]["none"])
+
+        resumed = status["observation"]
+        self.assertEqual(
+            resumed["flow"]["activeAfter"][0]["resumedFlowId"],
+            "identity",
+        )
+        self.assertEqual(resumed["flow"]["transition"], "match")
+        self.assertEqual(resumed["flow"]["activeAfter"][0]["flowId"], "identity")
+        self.assertTrue(resumed["sideEffects"]["none"])
+
+        completed = name["observation"]
+        self.assertEqual(completed["flow"]["status"], "retired")
+        self.assertEqual(completed["flow"]["activeAfter"], [])
+        self.assertEqual(
+            {action["name"] for action in completed["sideEffects"]["actions"]},
+            {"SemanticIdentityRequest", "AdjustRelationship"},
+        )
+        self.assertEqual(
+            completed["response"]["text"],
+            name["messages"][0]["payload"]["text"],
+        )
+        self.assertFalse(completed["sideEffects"]["none"])
+
     def test_response_plan_crosses_real_en_and_tl_presentation(self) -> None:
         for language in ("EN", "TL"):
             scenario = merge(
@@ -125,6 +180,11 @@ class SemanticDialogueFlowTests(unittest.TestCase):
             self.assertEqual(preview["messages"], [])
             self.assertEqual(preview["transport"], [])
             self.assertEqual(preview["toolCalls"], [])
+            self.assertTrue(preview["observation"]["sideEffects"]["none"])
+            self.assertEqual(
+                preview["observation"]["flow"]["transition"],
+                "interrupt_start",
+            )
         self.assertEqual(before["context"], after["context"])
         self.assertEqual(before["transport"], after["transport"])
 

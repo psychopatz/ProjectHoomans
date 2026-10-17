@@ -1,14 +1,23 @@
-# Semantic Dialogue Decoupling — current corrective state
+# Semantic Dialogue Decoupling — current implementation state
 
 **Updated:** 2026-10-17
-**Phase:** C0 — compatibility and deployment audit
-**State:** C0A audit complete; C0B handshake implementation is complete in the checkout, but installed Workshop parity and native acceptance remain pending. The product is **not maintenance-ready**.
+**Phase:** D0A — Semantic Lab repair and production-worker verification
+**State:** D0A is complete for the developer gate. The real Lua worker and repaired GUI source expose production conversation facts; the next bounded chunk is D1 flow-owned response selection. Native Project Zomboid testing and Workshop publication remain user-owned and are not blockers.
 
-This is the one active progress ledger for this goal. C1–C6 were not started in this chunk.
+This is the one active progress ledger for this goal. C0A/C0B source work and unrelated Core radio edits remain preserved.
 
-## C0A result
+## D0A result
 
-The source-level semantic path is compatible in the current local pair, but installed Workshop parity and a native capability handshake are still unproven. The broken external pz-headless-harness was not used. The repository’s internal tools/semantic_harness was used only for isolated production-module verification; it is not native PZ proof.
+The existing Semantic Lab worker now returns one bounded production `observation` per turn and preview. It is projected from the live Hoomans/Core result rather than reconstructed in Python and includes:
+
+- deterministic IR and selected candidate pattern, score/pass/fuzzy state, and candidate count;
+- actual NPC rendered text, fallback, response key/template, source pool and translation status;
+- flow ID, response pool, from/to node, transition/status/commit state, and active/suspended flow sessions before and after the turn;
+- language, bounded translation lookups, fallback count, and observed transport/action calls.
+
+The existing Tk GUI now has a Turn facts inspector, a Raw worker record tab, and a side-effect-free Preview control. Its transcript prefers the production rendered `text` over the English fallback, so TL responses are visible as TL. The GUI is source-verified but not claimed interactively passed: desktop automation reported `apps=[]`; no GUI click-through was available in this session. The real worker is the documented fallback.
+
+The meaningful production trace used for acceptance was `who are you` -> `are you okay` -> `im fine thanks` -> `My name is Patrick` in TL. It selected the expected identity/wellbeing candidates, observed `start` -> `interrupt_start` -> `match` -> `match`, preserved/resumed the identity flow, retired it after the name, rendered the actual selected reply, observed no transport/actions for the first three turns, and observed only the expected identity request plus relationship adjustment on completion.
 
 ## Revision and deployment matrix
 
@@ -57,6 +66,15 @@ The GitHub Core publication does not need a source-level correction for C0A: 569
 - The captured native SP session produced semantic audit records for identity, wellbeing question, clarification, hunger, and fine-state inputs. The user-visible conversation screenshot also showed the expected deterministic responses. The native run exercised English only; there is no native EN/TL lookup/fallback provenance, no native MP run, and no exact installed-file hash handshake.
 - The bounded console scan found no Hoomans semantic exception or candidate_parser_unavailable; it did contain unrelated vanilla/map warnings and errors, which are not being attributed to this goal.
 
+## D0A focused verification
+
+- `python3 -m unittest tools.semantic_harness.tests.test_app tools.semantic_harness.tests.test_semantic_dialogue_flows tools.semantic_harness.tests.test_semantic_live_parity tools.semantic_harness.tests.test_worker_session -q`: **21/21 PASS**.
+- `python3 -m unittest discover -s tools/semantic_harness/tests -q`: **99/99 PASS**.
+- The eight focused Lua smokes for diagnostics, input, flow, identity presentation/transport, response plans, translation catalog and translation fallback all exited **0**.
+- `luac5.3 -p` passed for the changed worker Lua modules. Focused `pz_verify --kahlua --severity ERROR --no-snippets` passed for `OutputProjection.lua` and `Conversation.lua`.
+- `python3 -m tools.semantic_harness.app --doctor`: **PASS** for repository/Core discovery, Lua, worker syntax and READY/PING/CAPABILITIES; non-blocking venv warning only. The internal worker trace used the checked-out production Hoomans/Core modules.
+- Desktop automation exposed no controllable app (`apps=[]`), so no GUI interaction is claimed as passed. GUI source wiring is covered by the import/translation-preference test and the production worker fallback.
+
 ## Focused verification
 
 - python3 -m unittest tools.semantic_harness.tests.test_semantic_live_parity -v: 4/4 PASS.
@@ -66,17 +84,17 @@ The GitHub Core publication does not need a source-level correction for C0A: 569
 - lua5.3 tests/psychopatz_custom_core_translation_smoke.lua: FAIL at the stale assertion expecting 316 entries. A read-only run reports the current coverage snapshot as total=362, translated=336, with zero missing keys/catalogs. This is a Core test-maintenance item, not evidence that the Hoomans manifest API is unavailable.
 - No external headless harness was run, and no headless result is being used as native acceptance.
 
-## C0A exit and C0B status
+## Historical C0A/C0B source handoff
 
-C0A exit is satisfied: the local, GitHub, Steam-cache, and native-runtime matrix is recorded with exact current revisions and an actionable deployment path. The read-only C0B handshake is now implemented and directly smoke-tested in the checkout. C0B is not accepted as a deployment gate until the following remaining work is performed:
+C0A exit is satisfied and the read-only C0B handshake remains implemented and source-smoke-tested. The following items are retained as historical user-owned deployment/live-test handoff; they are not prerequisites for D1–D6 implementation and do not block this goal:
 
 1. With separate authorization, build/republish complete Workshop packages for Core 3799682704 and Hoomans 3799685526 from matching clean revisions; do not overwrite the two unrelated dirty Core files.
 2. After deployment, restart PZ and capture a native `semantic.capability_handshake` record showing the installed source marker/fingerprints, Core API marker, `ok=true`, and the manifest reader/catalog load state. A mismatch must remain explicit and actionable.
 3. Correct or derive the stale Core translation-count assertion in the Core-owned test after the Core change is authorized; do not alter it during this C0A audit.
 4. Capture native EN/TL loaded-vs-fallback provenance, then run the same bounded SP dialogue matrix and a separate MP check.
 
-## Native verification handoff
+## User-owned live handoff (not a Codex gate)
 
 The controlled native surface is currently unavailable: no Project Zomboid process is running and the native UI inventory is empty. Do not infer native acceptance from the direct Lua smokes or the prior English screenshot. After launching PZ with the matched local pair or an explicitly republished pair, keep `ProjectHoomans.SemanticDialogueAudit` enabled, fully restart PZ, open one NPC conversation, and submit `are you okay` followed by `im fine thanks` or `im hungry`. Capture the complete console line containing `semantic_audit event=semantic.capability_handshake` and verify `ok=true`, `parserCandidates=true`, `candidateSelection=true`, `flowCommit=true`, `routerCandidateHooks=true`, `translation.manifestRegistered=true`, `translation.manifestRead=true`, `translation.catalogLoaded=true`, and `translation.shardCount=12`. Repeat after an EN/TL language restart and record the actual rendered text plus fallback provenance; then run a separate MP server/client pass for authority, duplicate-request, speaker isolation, and rejoin evidence. Any false field must be reported through `failures`, not treated as a pass.
 
-Do not begin C1–C6 until C0B establishes installed-pair identity and native capability/translation evidence.
+The next development chunk is D1: make registered flow response pools control actual production replies while preserving the identity regression and authoritative adapters. Do not wait for native capability, SP/MP, or Workshop evidence before continuing.

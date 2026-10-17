@@ -17,6 +17,13 @@ from .worker import HarnessError, LuaSemanticWorker
 from .worker_session import WorkerReady, WorkerResult, WorkerSession
 
 
+def npc_message_text(message: dict[str, Any]) -> str:
+    """Return rendered production text before its English fallback."""
+
+    payload = message.get("payload", {})
+    return str(payload.get("text") or payload.get("fallback") or "")
+
+
 class SemanticHarnessApp:
     """Nonblocking Tk adapter over the same session API used by the CLI."""
 
@@ -83,6 +90,8 @@ class SemanticHarnessApp:
             controls, text="Mock runtime…", command=self.open_runtime_settings
         )
         self.settings_button.pack(side="left")
+        self.preview_button = ttk.Button(controls, text="Preview", command=self.preview)
+        self.preview_button.pack(side="left", padx=6)
         self.save_button = ttk.Button(controls, text="Save scenario", command=self.save)
         self.save_button.pack(side="left", padx=6)
         self.snapshot_button = ttk.Button(controls, text="Snapshot", command=self.show_snapshot)
@@ -106,8 +115,22 @@ class SemanticHarnessApp:
         right.grid(row=0, column=1, rowspan=2, sticky="nsew")
         right.rowconfigure(0, weight=1)
         right.columnconfigure(0, weight=1)
-        self.trace = ScrolledText(right, wrap="none", state="disabled")
-        self.trace.grid(row=0, column=0, sticky="nsew", padx=6, pady=6)
+        self.trace_tabs = ttk.Notebook(right)
+        self.trace_tabs.grid(row=0, column=0, sticky="nsew", padx=6, pady=6)
+
+        facts_frame = ttk.Frame(self.trace_tabs)
+        facts_frame.rowconfigure(0, weight=1)
+        facts_frame.columnconfigure(0, weight=1)
+        self.inspector = ScrolledText(facts_frame, wrap="word", state="disabled")
+        self.inspector.grid(row=0, column=0, sticky="nsew")
+        self.trace_tabs.add(facts_frame, text="Turn facts")
+
+        raw_frame = ttk.Frame(self.trace_tabs)
+        raw_frame.rowconfigure(0, weight=1)
+        raw_frame.columnconfigure(0, weight=1)
+        self.trace = ScrolledText(raw_frame, wrap="none", state="disabled")
+        self.trace.grid(row=0, column=0, sticky="nsew")
+        self.trace_tabs.add(raw_frame, text="Raw worker record")
 
         self._append("SYSTEM", "Window ready. Starting the isolated Lua worker…")
         self._set_controls(False)
@@ -119,6 +142,7 @@ class SemanticHarnessApp:
             self.reset_button,
             self.load_button,
             self.settings_button,
+            self.preview_button,
             self.save_button,
             self.snapshot_button,
         ):
@@ -190,6 +214,14 @@ class SemanticHarnessApp:
         self._set_status(f"Ready · Lua PID {result.status.get('pid')}")
         self._set_controls(True)
         self._append("SYSTEM", "Lua worker ready. Production semantic modules are loaded.")
+        self._set_text(
+            self.inspector,
+            pretty({
+                "state": "ready",
+                "worker": result.status,
+                "capabilities": result.capabilities,
+            }),
+        )
         self._set_text(self.trace, pretty(result.capabilities))
 
     def _start_operation(
@@ -221,6 +253,17 @@ class SemanticHarnessApp:
         self._set_text(self.trace, str(error))
         self._messagebox.showerror("Harness error", str(error))
 
+    def _show_response(self, response: dict[str, Any]) -> None:
+        observation = response.get("observation")
+        if not isinstance(observation, dict):
+            observation = {
+                "notice": "This worker response has no turn observation.",
+                "type": response.get("type"),
+                "keys": sorted(response),
+            }
+        self._set_text(self.inspector, pretty(observation))
+        self._set_text(self.trace, pretty(response))
+
     def submit(self) -> None:
         value = self.input_var.get().strip()
         if not value or not self.session.ready or self.busy:
@@ -231,8 +274,7 @@ class SemanticHarnessApp:
             self._append("PLAYER", value)
             for message in response.get("messages", []):
                 if message.get("speaker") == "npc":
-                    payload = message.get("payload", {})
-                    self._append("NPC", payload.get("fallback") or payload.get("text") or "")
+                    self._append("NPC", npc_message_text(message))
             for call in response.get("toolCalls", []):
                 self._append(
                     "TOOL/ACTION",
@@ -240,9 +282,22 @@ class SemanticHarnessApp:
                     f" [{call.get('name')}] · "
                     f"{call.get('status') or call.get('reason') or 'observed'}",
                 )
-            self._set_text(self.trace, pretty(response))
+            self._show_response(response)
 
         self._start_operation(lambda worker: worker.input(value), finish)
+
+    def preview(self) -> None:
+        """Inspect a production decision without recording or dispatching it."""
+
+        value = self.input_var.get().strip()
+        if not value or not self.session.ready or self.busy:
+            return
+
+        def finish(response: dict[str, Any]) -> None:
+            self._show_response(response)
+            self._append("SYSTEM", f"Preview only; no state or action mutation: {value}")
+
+        self._start_operation(lambda worker: worker.preview(value), finish)
 
     def reset(self) -> None:
         if not self.session.ready:
@@ -250,6 +305,7 @@ class SemanticHarnessApp:
 
         def finish(_: dict[str, Any]) -> None:
             self._set_text(self.transcript, "")
+            self._set_text(self.inspector, "")
             self._set_text(self.trace, "")
             self._append("SYSTEM", "Scenario reset.")
 
@@ -273,7 +329,7 @@ class SemanticHarnessApp:
             self.scenario_path = Path(filename)
             self.language_var.set(scenario.get("runtime", {}).get("language", "EN"))
             self._set_text(self.transcript, "")
-            self._set_text(self.trace, pretty(response))
+            self._show_response(response)
             self._append("SYSTEM", f"Loaded {filename}")
 
         self._start_operation(lambda worker: worker.configure(scenario), finish)
@@ -310,7 +366,7 @@ class SemanticHarnessApp:
             return
         self._start_operation(
             lambda worker: worker.snapshot(),
-            lambda response: self._set_text(self.trace, pretty(response)),
+            self._show_response,
         )
 
     def set_language(self) -> None:
@@ -321,7 +377,7 @@ class SemanticHarnessApp:
         def finish(response: dict[str, Any]) -> None:
             self.scenario.setdefault("runtime", {})["language"] = selected
             self._set_status(f"Ready · language {response.get('language', selected)}")
-            self._set_text(self.trace, pretty(response))
+            self._show_response(response)
             self._append("SYSTEM", f"Production translation language set to {selected}.")
 
         self._start_operation(lambda worker: worker.set_language(selected), finish)
@@ -331,7 +387,7 @@ class SemanticHarnessApp:
             return
 
         def finish(response: dict[str, Any]) -> None:
-            self._set_text(self.trace, pretty(response))
+            self._show_response(response)
             self._append("SYSTEM", "Lua worker restarted and the scenario was restored.")
 
         self._start_operation(lambda worker: worker.restart(), finish)

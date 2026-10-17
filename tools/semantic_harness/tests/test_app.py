@@ -14,6 +14,7 @@ from unittest.mock import patch
 from tools.semantic_harness import app
 import tools.semantic_harness.cli as cli_module
 from tools.semantic_harness.cli import _parser, cli
+from tools.semantic_harness.gui import npc_message_text
 from tools.semantic_harness.rendering import pretty
 from tools.semantic_harness.runner import HarnessRun
 from tools.semantic_harness.scenario import DEFAULT_SCENARIO, merge
@@ -61,6 +62,21 @@ def settings_values() -> dict[str, object]:
 
 
 class AppEntryTests(unittest.TestCase):
+    def test_gui_prefers_rendered_translation_over_english_fallback(self) -> None:
+        self.assertEqual(
+            npc_message_text(
+                {
+                    "speaker": "npc",
+                    "payload": {"text": "Kumusta", "fallback": "Hello"},
+                }
+            ),
+            "Kumusta",
+        )
+        self.assertEqual(
+            npc_message_text({"speaker": "npc", "payload": {"fallback": "Hello"}}),
+            "Hello",
+        )
+
     def test_main_routes_cli_and_doctor_arguments(self) -> None:
         with patch.object(app, "install_shutdown_handler"), patch.object(app, "cli", return_value=7) as run_cli:
             self.assertEqual(app.main(["--cli", "--input", "hello"]), 7)

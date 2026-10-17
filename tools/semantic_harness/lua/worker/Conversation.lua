@@ -201,7 +201,7 @@ function Conversation.turn(context, text)
     local toolCalls = context.OutputProjection.normalizedToolCalls(
         context, newTrace, newTransport, result, actionResult
     )
-    return {
+    local response = {
         ok = true,
         type = "turn",
         input = text,
@@ -233,6 +233,8 @@ function Conversation.turn(context, text)
         llmCalls = Runtime.llmCalls,
         loadedModules = Runtime.loadedModules,
     }
+    response.observation = context.OutputProjection.observation(context, response)
+    return response
 end
 
 function Conversation.preview(context, text)
@@ -293,7 +295,7 @@ function Conversation.preview(context, text)
     local toolCalls = context.OutputProjection.normalizedToolCalls(
         context, newTrace, newTransport, result, nil
     )
-    return {
+    local response = {
         ok = true,
         type = "preview",
         input = value,
@@ -324,6 +326,8 @@ function Conversation.preview(context, text)
         llmCalls = Runtime.llmCalls,
         loadedModules = Runtime.loadedModules,
     }
+    response.observation = context.OutputProjection.observation(context, response)
+    return response
 end
 
 return Conversation

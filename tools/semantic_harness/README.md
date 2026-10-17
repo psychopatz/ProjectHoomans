@@ -15,7 +15,12 @@ timeouts, crash detection, and bounded stderr diagnostics.
 - `app.py` is the stable module and direct-script entry point. It routes doctor,
   CLI, and GUI startup without importing Tk for headless use.
 - `cli.py` owns argument parsing, replay, interactive input, and JSONL output.
-- `gui.py` owns the asynchronous Tk conversation and future polling.
+- `gui.py` owns the asynchronous Tk conversation and future polling. Its
+  **Turn facts** tab shows the worker's bounded production observation
+  (selected candidate, rendered NPC response, active/suspended flow nodes,
+  translation lookups, and observed side effects); **Raw worker record** keeps
+  the complete bounded response for deeper inspection. **Preview** calls the
+  production router without recording a turn or dispatching an action.
 - `worker_session.py` serializes worker startup, requests, status reads, and
   cleanup outside the Tk view.
 - `settings_dialog.py` owns the runtime settings form and converts its draft
@@ -50,6 +55,12 @@ Lua module manifest, translation lookups, transport records, and normalized
 tool/action calls (`ask_name`, `validate_identity`, `adjust_relationship`,
 `companion_command`). Friendly labels are diagnostic only; the raw production
 command remains beside them.
+
+Turn and preview responses also include a bounded `observation` object built by
+the Lua worker from the production result. It is the GUI's shared inspection
+contract: `ir`, `candidates`, `response`, `flow.activeBefore`/
+`flow.activeAfter`, `translation`, and `sideEffects`. It does not infer a
+second Python response or policy engine.
 
 ## Launching
 
