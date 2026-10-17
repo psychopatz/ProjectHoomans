@@ -314,6 +314,97 @@ class ContextualSocialReactionTests(unittest.TestCase):
                     result["relationshipBefore"], result["relationshipAfter"]
                 )
 
+    def test_dispute_uses_guarded_context_and_preserves_pending_authority(self) -> None:
+        cases = (
+            (
+                "friendly",
+                {"personality": {"socialStyle": "friendly"}},
+                "semantic.social.dispute_friendly",
+                "UI_PNC_Conversation_Semantic_DisputeFriendly",
+                "friendly",
+            ),
+            (
+                "trusted",
+                {
+                    "relationshipState": "Member",
+                    "personality": {"socialStyle": "neutral"},
+                },
+                "semantic.social.dispute_trusted",
+                "UI_PNC_Conversation_Semantic_DisputeTrusted",
+                "neutral",
+            ),
+            (
+                "withdrawn",
+                {"personality": {"socialStyle": "withdrawn"}},
+                "semantic.social.dispute_withdrawn",
+                "UI_PNC_Conversation_Semantic_DisputeWithdrawn",
+                "withdrawn",
+            ),
+            (
+                "stressed",
+                {
+                    "conditionStats": {"stress": 95},
+                    "personality": {"socialStyle": "neutral"},
+                },
+                "semantic.social.dispute_stressed",
+                "UI_PNC_Conversation_Semantic_DisputeStressed",
+                "neutral",
+            ),
+        )
+        for label, npc, template, translation_key, social_style in cases:
+            with self.subTest(case=label):
+                with LuaSemanticWorker(self.scenario(npc)) as worker:
+                    result = worker.input("I disagree")
+                self.assertTrue(result["accepted"], result.get("reason"))
+                self.assertEqual(result["result"]["ir"]["intent"], "DISAGREE")
+                self.assertEqual(
+                    result["result"]["decision"]["branch"],
+                    "SOCIAL_ACKNOWLEDGED",
+                )
+                self.assertEqual(
+                    result["result"]["decision"]["route"], "deterministic"
+                )
+                self.assertEqual(
+                    result["result"]["decision"]["response"]["templateID"],
+                    template,
+                )
+                self.assertEqual(
+                    result["messages"][0]["payload"]["translationKey"],
+                    translation_key,
+                )
+                self.assertEqual(
+                    result["routedSituation"]["social"]["style"], social_style
+                )
+                self.assertEqual(result["llmCalls"], 0)
+                self.assertEqual(result["transport"], [])
+                self.assertEqual(result["toolCalls"], [])
+                self.assertIsNone(result["result"].get("actionResult"))
+                self.assertEqual(
+                    result["relationshipBefore"], result["relationshipAfter"]
+                )
+
+        with LuaSemanticWorker(
+            self.scenario({"personality": {"socialStyle": "friendly"}})
+        ) as worker:
+            command = worker.input("follow me")
+            pending_dispute = worker.input("I disagree")
+        self.assertTrue(command["result"]["actionResult"]["accepted"])
+        self.assertEqual(
+            pending_dispute["result"]["decision"]["response"]["templateID"],
+            "semantic.social.refuse_request",
+        )
+        self.assertEqual(
+            pending_dispute["messages"][0]["payload"]["translationKey"],
+            "UI_PNC_Conversation_Semantic_RefuseRequest",
+        )
+        self.assertEqual(pending_dispute["transport"], [])
+        self.assertEqual(pending_dispute["toolCalls"], [])
+        self.assertEqual(pending_dispute["llmCalls"], 0)
+        self.assertEqual(
+            pending_dispute["relationshipBefore"],
+            pending_dispute["relationshipAfter"],
+        )
+
     def test_apology_preview_is_idempotent_without_relationship_effect(self) -> None:
         scenario = self.scenario({
             "traits": {"friendly": True},

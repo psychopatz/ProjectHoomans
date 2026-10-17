@@ -122,10 +122,47 @@ Catalog.Register("semantic.accept", {
 Catalog.Register("semantic.refuse", {
     variants = {
         {
+            id = "semantic.refuse.stressed",
+            templateID = "semantic.social.dispute_stressed",
+            fallback = "I hear you, but I can't take that on while I'm this tense.",
+            when = {
+                emotionType = { "stress", "panic" },
+                emotionUrgency = {
+                    "moderate", "severe", "critical", "emergency",
+                },
+            },
+            priority = 4,
+        },
+        {
             id = "semantic.refuse.request",
             templateID = "semantic.social.refuse_request",
             fallback = "No problem. I'll leave it.",
             when = { hasPendingRequest = true },
+            priority = 5,
+        },
+        {
+            id = "semantic.refuse.friendly",
+            templateID = "semantic.social.dispute_friendly",
+            fallback = "I see it differently, but we're okay.",
+            when = { socialStyle = { "friendly", "protective" } },
+            priority = 2,
+        },
+        {
+            id = "semantic.refuse.trusted",
+            templateID = "semantic.social.dispute_trusted",
+            fallback = "I respect that. I still don't agree.",
+            when = {
+                relationshipState = {
+                    "Friend", "Trusted", "Ally", "Member", "Lover",
+                },
+            },
+            priority = 1,
+        },
+        {
+            id = "semantic.refuse.withdrawn",
+            templateID = "semantic.social.dispute_withdrawn",
+            fallback = "Let's leave it there.",
+            when = { socialStyle = "withdrawn" },
             priority = 1,
         },
         {
