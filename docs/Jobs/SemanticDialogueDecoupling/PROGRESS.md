@@ -1,26 +1,75 @@
-# Semantic Dialogue Decoupling — current agent progress
+# Semantic Dialogue Decoupling — current corrective state
 
-**Updated:** 2026-10-17. **State:** ACTIVE — implementation and Semantic Lab repair. **Current phase:** D0. **Do not mark blocked for native game or Workshop.** One unified progress ledger.
+**Updated:** 2026-10-17
+**Phase:** C0 — compatibility and deployment audit
+**State:** C0A audit complete; C0B is next. The product is **not maintenance-ready**.
 
-## New source audit (connected GitHub; no local worktree assumed)
-- Project Hoomans remote main before these docs: `56288e50e6d782634df7f26ceaa0f0cb7c0922f9`.
-- PsychopatzCore remote main: `44a4d534a9520440070ae7943d7ae9fb848f71ce` **now contains** Core `Parser.ParseCandidates`, candidate/router hooks, and manifest-aware `scope.registerSystem`. The old `0212491d`-based Core-blocker language is superseded.
-- The user's Codex transcript reports a local Hoomans commit `27e1fd94` and absent PZ process/Workshop authorization. Connected GitHub main did not contain that commit at this audit point; it is local/agent-report evidence. **Do not lose or overwrite it.**
-- Hoomans code already includes candidates, flow registry/kernel, identity/wellbeing modules, response plan and 12 EN/TL shards. Actual desired flow response ownership/visual flow authoring remains incomplete.
-- Historical tests reported Python 97/97, targeted Lua 68/68; 12 full-headless failures (native/UI related) and a Core legacy catalog-count mismatch. Not independently rerun. Semantic Lab's user-facing usability is not accepted and must be addressed.
-- **User final live test:** pending by design. **Steam Workshop distribution:** not requested and forbidden to this agent. **PZ process:** optional/irrelevant to agent progress.
+This is the one active progress ledger for this goal. C1–C6 were not started in this chunk.
 
-## ONE Next Chunk — D0A: restore useful Semantic Lab visual/production conversation loop
+## C0A result
 
-1. Inspect both actual local Hoomans/Core HEADs, status and compatible APIs; explicitly preserve all uncommitted work, including radio asset project JSON. If the reported local C0B handshake/detailed steps exist, retain them as evidence but **remove the false native/Workshop prerequisite from the active ledger**. Do not trigger any deployment operation.
-2. Run/inspect the existing Semantic Lab **GUI + Lua worker** from its intended entry point. Identify its actual failure modes: startup/config, module load, scenario-to-real-NPC projection, transcript/replies, candidate/flow/translation trace, controls and render. Capture exact code/stack error or missing information; don't assume everything is broken.
-3. Repair one coherent vertical slice of **existing** harness GUI/worker so it can show one full identity -> wellbeing -> status -> identity response conversation with real production Lua selected **displayed text**, flow and translation context, and absence of unintended identity request. If GUI cannot launch in current Codex desktop, fix source-proven issues, run focused real Lua worker, and document a short user-runnable GUI check; don't wait/poll for an app.
-4. Add focused regression only for specific corrected production/harness behavior. No JSON-only fixture campaign, no new synthetic NLP implementation, no unrelated asset/radio edits.
-5. Update this PROGRESS with exact paths, Hoomans/Core SHA, actual UI/worker tests and failures; next single D0B integration/GUI repair chunk if still needed, otherwise D1 flow reply authority. **Continue automatically; no PZ required.**
+The source-level semantic path is compatible in the current local pair, but installed Workshop parity and a native capability handshake are still unproven. The broken external pz-headless-harness was not used. The repository’s internal tools/semantic_harness was used only for isolated production-module verification; it is not native PZ proof.
 
-**D0A exit:** the existing harness is a meaningful observable guide to production Lua conversations, with known GUI limitations clearly recorded. No native SP/MP or Workshop action required.
+## Revision and deployment matrix
 
-## Roadmap
-D0 harness and source compatibility -> D1 flow-selected replies -> D2 third flow -> D3 visual flow editor -> D4 real composition -> D5 EN/TL/domain regressions -> D6 user handoff. Completion state is `READY FOR USER LIVE TEST`, not `blocked` for unavailable native PZ.
+| Surface | Identity | Result |
+| --- | --- | --- |
+| Hoomans checkout | main 56288e50e6d782634df7f26ceaa0f0cb7c0922f9; origin/main is identical | Clean; complete 42.20 mod, manifest, EN/TL shards, and semantic sources present |
+| PsychopatzCore checkout | main 44a4d534a9520440070ae7943d7ae9fb848f71ce; origin/main is identical | Semantic/parser/router/manifest additions are published on GitHub; preserve unrelated dirty edits in .architecture-refactor/output/architecture-audit.md and tools/asset_harness/core/radio_assets.py |
+| Local Workshop pair | /home/psychopatz/Zomboid/Workshop/ProjectHoomans plus /home/psychopatz/Zomboid/Workshop/psychopatzCore | Only complete current pair found locally |
+| Steam Hoomans cache | Workshop 3799685526 | Incomplete fragment: only 42.20/media/lua/shared/PNC/Core/Compatibility/Mods/Bandits/PNC_Bandits_AnimPathCompat.lua; no mod.info, current semantic files, or translation manifest |
+| Steam Core cache | Workshop 3799682704 | Directory absent; no complete Steam Core package was found |
+| Native session | /home/psychopatz/Zomboid/console.txt | The game loaded mod IDs PsychopatzCore, MarketSense, DTCommon, ProjectHoomans, and DTHoomans; the log does not expose the filesystem origin, so the local-pair source is strongly indicated but not cryptographically proven |
 
-The historical `IMPLEMENTATION_EVIDENCE.md` preserves previous phase claims; do not overwrite it just to reset the task count.
+The GitHub Core publication does not need a source-level correction for C0A: 56906aa exposes Parser.ParseCandidates, 9e46a8e adds router candidate/flow hooks, and afc1bda adds manifest catalogs. Steam Workshop publication/install parity remains unresolved and must be handled as C0B, with separate publication authorization.
+
+## Key file fingerprints at audit time
+
+| Checkout-relative path | SHA-256 |
+| --- | --- |
+| Hoomans/Contents/mods/ProjectHoomans/42.20/media/lua/client/PNC/Semantics/PNC_SemanticDialogueInput.lua | 4fe03b079fc1f2a3abb2988f536c42261a7cdad83acb4230d91cd07bc0b8dbda |
+| Hoomans/Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Translation/PNC_TranslationBootstrap.lua | 04355c037b67f6dbb46349d976eec948868b5a9af5251002658f7b8a836cc49d |
+| Hoomans/Contents/mods/ProjectHoomans/common/media/translation/manifests/Conversation.json | 054c3826ace4d826bbec4a539c3fe6f9b17657a43a0886843d8ca4a48c53fa85 |
+| Hoomans/Contents/mods/ProjectHoomans/common/media/translation/EN/Conversation/Semantic/Responses.json | 997dc14ec9b5bafe95f12e5e9e12101ca6d1d7b095fbb96582c077ff37bf4859 |
+| Hoomans/Contents/mods/ProjectHoomans/common/media/translation/TL/Conversation/Semantic/Responses.json | ee613dc802a3ca5f4721e5bc70403f26d3b5287898679bb696352903e537640f |
+| Core/Contents/mods/PsychopatzCore/common/media/lua/shared/PsychopatzCore/Semantics/PsychopatzSemanticParser.lua | a639c5bbf68ca8da296180ebd08783011da2b40ceeba7f781900576f97125ba0 |
+| Core/Contents/mods/PsychopatzCore/common/media/lua/shared/PsychopatzCore/Semantics/PsychopatzSemanticDialogueRouter.lua | 1a123b1fb3948f7599ec11159e61476fffe78f8a28dd057b988660a7a06350ee |
+| Core/Contents/mods/PsychopatzCore/common/media/lua/shared/PsychopatzCore/Translation/PsychopatzCustomTranslationManifest.lua | bfad4350d90b0801e0a8b4116ef8c69d3f714c2c9d26f72ffab48d7bb4967ee8 |
+
+## API and source verification
+
+- Hoomans PNC_SemanticDialogueInput_Context.lua:118 calls PsychopatzCore.Semantics.Parser.ParseCandidates and returns candidate_parser_unavailable instead of silently substituting a parser.
+- Hoomans PNC_SemanticDialogueInput_RouterLifecycle.lua:70-104 passes the candidate parser and Policy.SelectCandidate into DialogueRouter.New, and installs them through the Core setters when available.
+- Core PsychopatzSemanticParser.lua:320-439 exports the bounded candidate bundle with selected candidate and diagnostics.
+- Core PsychopatzSemanticDialogueRouter.lua:67-80,151-214,216-275 accepts candidate parser/selector hooks and calls policy.CommitFlow during ProcessIR.
+- Hoomans PNC_TranslationBootstrap.lua:17-40 registers Conversation with Scope.registerSystem("Conversation", "media/translation", "manifests/Conversation.json"); the other systems retain the two-argument registration form.
+- Core PsychopatzCustomTranslationManager.lua:242-383,789-846 reads packaged files through getModFileReader, validates the manifest, merges only declared shards, and accepts the optional manifest path. Core media is intentionally excluded from the graph, so these Core claims were verified by direct source fallback after coverage reported the exclusion.
+- Hoomans 42.20/mod.info still declares only require=PsychopatzCore,MarketSense; there is no feature-specific minimum or explicit runtime capability handshake. No Hoomans capability marker was found in the captured native log. C0B must make this mismatch fail-visible.
+
+## Translation and native evidence
+
+- Contents/mods/ProjectHoomans/common/media/translation/manifests/Conversation.json declares 12 EN and 12 TL Conversation shards. The EN/TL semantic response shards are distinct; their current hashes are 997dc14e... and ee613dc8... respectively.
+- lua5.3 tests/pnc_translation_catalog_smoke.lua, lua5.3 tests/pnc_conversation_translation_fallback_smoke.lua, and lua5.3 tests/pnc_semantic_dialogue_flow_smoke.lua pass.
+- The internal harness test test_response_plan_crosses_real_en_and_tl_presentation passes, as do the live-entrypoint parity tests. This proves the checked-out worker uses production Lua modules, not that native PZ loaded the same files.
+- The captured native SP session produced semantic audit records for identity, wellbeing question, clarification, hunger, and fine-state inputs. The user-visible conversation screenshot also showed the expected deterministic responses. The native run exercised English only; there is no native EN/TL lookup/fallback provenance, no native MP run, and no exact installed-file hash handshake.
+- The bounded console scan found no Hoomans semantic exception or candidate_parser_unavailable; it did contain unrelated vanilla/map warnings and errors, which are not being attributed to this goal.
+
+## Focused verification
+
+- python3 -m unittest tools.semantic_harness.tests.test_semantic_live_parity -v: 4/4 PASS.
+- python3 -m unittest tools.semantic_harness.tests.test_semantic_identity_wellbeing_collision -v: 9/9 PASS.
+- python3 -m unittest tools.semantic_harness.tests.test_semantic_dialogue_flows -v: 5/5 PASS.
+- Core parser and manifest smokes: PASS.
+- lua5.3 tests/psychopatz_custom_core_translation_smoke.lua: FAIL at the stale assertion expecting 316 entries. A read-only run reports the current coverage snapshot as total=362, translated=336, with zero missing keys/catalogs. This is a Core test-maintenance item, not evidence that the Hoomans manifest API is unavailable.
+- No external headless harness was run, and no headless result is being used as native acceptance.
+
+## C0A exit and ONE next chunk — C0B
+
+C0A exit is satisfied: the local, GitHub, Steam-cache, and native-runtime matrix is recorded with exact current revisions and an actionable deployment path. The safe next chunk is:
+
+1. With separate authorization, build/republish complete Workshop packages for Core 3799682704 and Hoomans 3799685526 from matching clean revisions; do not overwrite the two unrelated dirty Core files.
+2. Add or verify a read-only native capability handshake that reports the loaded mod source marker/hash and the availability of ParseCandidates, candidate selection, CommitFlow, and manifest-aware translation registration. A mismatch must be explicit and actionable.
+3. Correct or derive the stale Core translation-count assertion in the Core-owned test after the Core change is authorized; do not alter it during this C0A audit.
+4. Restart PZ after deployment and capture native EN/TL loaded-vs-fallback provenance, then run the same bounded SP dialogue matrix and a separate MP check.
+
+Do not begin C1–C6 until C0B establishes installed-pair identity and native capability/translation evidence.
