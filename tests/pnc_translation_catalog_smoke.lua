@@ -8,6 +8,13 @@ T.addPackagePaths({
 local Loader = T.load(
     "ProjectHoomans", "shared",
     "PNC/Conversation/Blocks/PNC_ConversationTextLoader.lua")
+local Json = require "PsychopatzCore/Serialization/PsychopatzJson"
+
+local conversationManifest, manifestReason = Json.Decode(T.read(
+    "ProjectHoomans", "common_mod",
+    "media/translation/manifests/Conversation.json"))
+T.truthy(conversationManifest,
+    "Conversation translation manifest loads: " .. tostring(manifestReason))
 
 local systems = {
     "Character", "CommandHub", "Conversation", "Debug", "Discovery",
@@ -16,6 +23,26 @@ local systems = {
 }
 
 local function readCatalog(language, system)
+    if system == "Conversation" then
+        local values = {}
+        local paths = conversationManifest.languages[language]
+        T.truthy(type(paths) == "table",
+            language .. " Conversation manifest paths exist")
+        for _, relativePath in ipairs(paths) do
+            local shard, reason = Loader.Decode(T.read(
+                "ProjectHoomans",
+                "common_mod",
+                "media/translation/" .. relativePath))
+            T.truthy(shard, language .. " Conversation shard: "
+                .. tostring(reason))
+            for key, value in pairs(shard) do
+                T.falsy(values[key],
+                    "Conversation shard key has one owner: " .. key)
+                values[key] = value
+            end
+        end
+        return values
+    end
     local path = "media/translation/" .. language .. "/" .. system
         .. "/" .. system .. ".json"
     local values, reason = Loader.Decode(T.read(

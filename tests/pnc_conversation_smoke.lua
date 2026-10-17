@@ -1208,12 +1208,15 @@ T.truthy(option, "Talk option created")
 option.callback()
 T.equal(opened.npcID, "npc-12", "Talk opens selected NPC")
 
-local conversationCatalog = T.read(
+local combatCatalog = T.read(
     "ProjectHoomans", "common_mod",
-    "media/translation/EN/Conversation/Conversation.json")
-T.truthy(string.find(conversationCatalog, "UI_PNC_Flavor_AttackAuto_NPC_1",
+    "media/translation/EN/Conversation/Flavor/Combat.json")
+T.truthy(string.find(combatCatalog, "UI_PNC_Flavor_AttackAuto_NPC_1",
     1, true), "conversation flavor strings live in the Conversation catalog")
-T.truthy(string.find(conversationCatalog,
+local socialCatalog = T.read(
+    "ProjectHoomans", "common_mod",
+    "media/translation/EN/Conversation/Flavor/Social.json")
+T.truthy(string.find(socialCatalog,
     "UI_PNC_Flavor_SocialGreeting_Colonist_Familiar_First_1", 1, true),
     "greeting strings live in the Conversation catalog")
 T.finish("pnc_conversation_smoke")

@@ -218,17 +218,27 @@ T.falsy(string.find(localizedOrderReply or "", "I ", 1, true),
 local Loader = T.load(
     "ProjectHoomans", "shared",
     "PNC/Conversation/Blocks/PNC_ConversationTextLoader.lua")
+local Json = require "PsychopatzCore/Serialization/PsychopatzJson"
+local conversationManifest = Json.Decode(T.read(
+    "ProjectHoomans", "common_mod",
+    "media/translation/manifests/Conversation.json"))
 for _, systemName in ipairs({
     "Character", "CommandHub", "Conversation", "Debug", "Discovery",
     "Factions", "Health", "Inventory", "Needs", "Provision", "Research",
     "Scavenge", "Settlement", "Tasks", "Workshop",
 }) do
-    local path = "media/translation/TL/" .. systemName .. "/"
-        .. systemName .. ".json"
-    local catalog = Loader.Decode(T.read("ProjectHoomans", "common_mod", path))
-    for key, value in pairs(catalog) do
-        T.equal(Translation.GetKey(key), value,
-            "every modular key resolves through " .. systemName)
+    local paths = systemName == "Conversation"
+        and conversationManifest.languages.TL or {
+            "TL/" .. systemName .. "/" .. systemName .. ".json",
+        }
+    for _, relativePath in ipairs(paths) do
+        local path = "media/translation/" .. relativePath
+        local catalog = Loader.Decode(T.read(
+            "ProjectHoomans", "common_mod", path))
+        for key, value in pairs(catalog) do
+            T.equal(Translation.GetKey(key), value,
+                "every modular key resolves through " .. systemName)
+        end
     end
 end
 
