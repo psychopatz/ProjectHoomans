@@ -58,12 +58,19 @@ Phase 0A is accepted only for its documented Semantic Lab correctness baseline. 
 - `pz-verify` reported no new Kahlua or i18n errors in the changed catalog/presentation files. Its existing whole-file token-size warning on the response catalog and two existing identity fallback strings in the local-response file remain outside this bounded chunk; no monolith refactor was started.
 - No PBrainZ call, transport effect, tool call or gameplay side effect occurred in the real-worker matrix (`llmCalls=0`); the unknown routed health field remained absent. Native SP: **NOT TESTED**. Native MP: **NOT TESTED**. No controlled Project Zomboid UI/session/server evidence is promoted.
 
-## ONE current Next Chunk — Phase 1B reaction-selector boundary audit
+## Phase 1B verification evidence — accepted for the Semantic Lab gate
 
-1. Audit whether the Phase 1A unknown/known precedence is fully owned by the existing local-response/catalog selector boundary or needs a narrow pure reaction-selector hook; do not add a second arbiter.
-2. If the existing boundary is sufficient, document that decision and add only precedence/diagnostic regressions. If a hook is required, keep it pure, deterministic, bounded and side-effect free.
-3. Preserve the same-utterance matrix, offline operation, zero PBrainZ calls, no transport/tool effects and no gameplay actions. Do not begin Phase 2 until the Phase 1B gate is evidenced.
-4. Keep native SP/MP explicitly open; harness protocol results and JSON replay/conflict status are not native-game or semantic-proof evidence.
+- The audit found no new behavior boundary requiring a reaction-selector hook. resolveWellbeing owns only the unsupported-state guard; stronger need/emotion evidence returns to the existing wellbeing catalog, and Catalog.Select owns condition matching plus explicit priority scoring. The detailed decision and graph/source evidence are in [PHASE1B_SELECTOR_AUDIT.md](PHASE1B_SELECTOR_AUDIT.md).
+- Added one focused real-worker regression method covering unknown health with urgent thirst, panic, and simultaneous panic-plus-thirst. The existing catalog returned thirst, panic, and panic respectively; panic precedence remains explicit through the existing priority values. No production selector or arbiter was added.
+- python3 -m unittest tools.semantic_harness.tests.test_wellbeing_projection -v: PASS 7/7. python3 -m unittest discover -s tools/semantic_harness/tests -q: PASS 57/57. tools/semantic_harness/run_harness.sh --test pnc_semantic: PASS 66/66. CLI report: PASS 66/66, 198 events, conflicts=[], audit_truncated=null; these are protocol/replay observations, not semantic proof.
+- The existing identity, gift, task and social coverage remained green through the broader Semantic Lab suite. Every new regression turn used llmCalls=0, with no transport events, tool calls or gameplay effects. Native SP: NOT TESTED. Native MP: NOT TESTED.
+
+## ONE current Next Chunk — Phase 2 bounded multi-turn wellbeing baseline
+
+1. Start with one bounded persistent-worker case for "Are you okay?" -> "What's wrong?", and inspect the existing pending-request/topic/entity context before changing behavior.
+2. Add only the narrowest deterministic follow-up resolution needed for a factually grounded response; preserve speaker/target context and do not activate tasks or obligations.
+3. Assert before/after context, sequence, idempotence/preview behavior where available, zero PBrainZ calls and no unauthorized transport/tool effects. Preserve all Phase 1 and existing semantic coverage.
+4. Keep native SP/MP explicitly open; do not expand to social, paraphrase or PBrainZ phases until the Phase 2 bounded gate is evidenced.
 
 ## Remaining roadmap
 
