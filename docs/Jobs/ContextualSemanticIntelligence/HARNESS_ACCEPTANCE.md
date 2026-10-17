@@ -14,8 +14,8 @@ The Semantic Lab scenario now accepts optional `npc.healthState`, `npc.activeBeh
 
 - `npc.needs` is a dictionary of `hunger`, `thirst`, `fatigue`; `npc.conditionStats` holds `stress`, `boredom`, `panic`. Omit an entire table to use legacy `world` values; **an explicit empty object disables fallback** for that table so the projected information remains unknown.
 - The Lua worker projects those NPC facts into the production input context and returns `routedSituation` directly from the actual `semanticDialogueRouter.context.dialogueSituation` after Submit, rather than calculating a test-only duplicate decision.
-- `python3 -m unittest tools.semantic_harness.tests.test_wellbeing_projection -v` explicitly checks production Lua route and output for healthy, injured, severe thirst, panic, unknown health and legacy compatibility; it also verifies zero unintended actions/provider calls.
-- Each case still needs a real worker run with an accessible PsychopatzCore checkout. **These tests were authored but have not yet been executed at the audit authoring environment.**
+- `python3 -m unittest tools.semantic_harness.tests.test_wellbeing_projection -v` explicitly checks production Lua route and output for healthy, injured, severe thirst, panic, unknown health and legacy compatibility; it also verifies zero unintended actions/provider calls. On 2026-10-17 the real worker run passed all 6 tests with Project Hoomans `bddeaf3c` and PsychopatzCore `0212491d` under Lua 5.3.6.
+- The Phase 0A cases have now been executed against the accessible PsychopatzCore checkout. Native Project Zomboid SP/MP acceptance remains separate and pending; the worker's mocked UI/network edges are not game evidence.
 
 A scenario override for an injured NPC may be edited in the GUI's runtime JSON editor or saved under a distinct untracked local scenario file:
 
