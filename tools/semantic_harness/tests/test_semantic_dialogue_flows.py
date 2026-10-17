@@ -64,6 +64,26 @@ class SemanticDialogueFlowTests(unittest.TestCase):
             [],
         )
 
+    def test_worker_exposes_shared_candidate_flow_and_translation_facts(self) -> None:
+        run = run_case(load_case(FLOW_CASE))
+        lookup_count = 0
+        for turn in run.turns:
+            result = turn["result"]
+            self.assertEqual(
+                result["candidateDiagnostics"]["reason"],
+                "eligible_candidate",
+            )
+            self.assertEqual(
+                result["candidates"]["selected"]["patternID"],
+                result["candidateDiagnostics"]["selectedPattern"],
+            )
+            flow = result["decision"]["flow"]
+            self.assertEqual(flow["schemaVersion"], 1)
+            self.assertIn("flow", result["decision"]["diagnostics"])
+            self.assertIn("flowId", flow["diagnostics"])
+            lookup_count += len(turn["translation"]["lookups"])
+        self.assertGreaterEqual(lookup_count, 1)
+
     def test_real_worker_preview_is_pure_for_flow_interruptions(self) -> None:
         with LuaSemanticWorker(merge({}, DEFAULT_SCENARIO)) as worker:
             worker.input("who are you")

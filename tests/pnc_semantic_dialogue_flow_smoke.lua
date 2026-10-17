@@ -51,6 +51,59 @@ T.falsy(valid, "registry rejects unreachable flow nodes")
 T.equal(reason, "unreachable_node:orphan",
     "registry reports the unreachable node")
 
+local unsupported, unsupportedReason = Registry.Validate({
+    id = "invalid_frame",
+    version = 1,
+    triggers = { { unsupported = true } },
+    initial = "start",
+    nodes = { start = { terminal = true } },
+})
+T.falsy(unsupported, "registry rejects unsupported trigger fields")
+T.equal(unsupportedReason, "flow_trigger_unsupported_field:unsupported",
+    "registry explains unsupported trigger fields")
+
+local duplicateFrame, duplicateFrameReason = Registry.Validate({
+    id = "invalid_duplicate_frame",
+    version = 1,
+    triggers = { { intent = "QUESTION" } },
+    initial = "start",
+    nodes = {
+        start = {
+            accepts = { { intent = "INFORM" }, { intent = "INFORM" } },
+            onMatch = "done",
+        },
+        done = { terminal = true },
+    },
+})
+T.falsy(duplicateFrame, "registry rejects duplicate node frames")
+T.equal(duplicateFrameReason, "duplicate_node_transition:start",
+    "registry explains duplicate node frames")
+
+local conflictingOwner = Registry.Validate({
+    id = "invalid_slot_owner",
+    version = 1,
+    triggers = { { intent = "QUESTION" } },
+    initial = "start",
+    nodes = {
+        start = {
+            accepts = { { intent = "INFORM" } },
+            slots = { value = { type = "string", owner = "one" } },
+            onMatch = "done",
+        },
+        done = {
+            terminal = true,
+            slots = { value = { type = "string", owner = "two" } },
+        },
+    },
+})
+T.falsy(conflictingOwner, "registry rejects conflicting slot owners")
+
+local duplicateRegistered, duplicateReason = Registry.Register(require
+    "PNC/Semantics/PNC_SemanticDialogueFlow_Identity")
+T.falsy(duplicateRegistered, "registry rejects duplicate flow IDs")
+T.equal(duplicateReason, "duplicate_flow_id:identity",
+    "registry explains duplicate flow IDs")
+
 local contextState = Context.New({ maxFlows = 4, maxFlowStack = 2 })
 local state = Semantic.DialogueState.New({ maxEvents = 8 })
 local context = contextFor(contextState, "npc-a")

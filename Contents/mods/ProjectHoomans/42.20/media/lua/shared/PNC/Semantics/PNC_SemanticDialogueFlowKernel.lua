@@ -242,6 +242,13 @@ local function addMatch(preview, match, transition, fromNodeID, toNodeID)
     preview.diagnostics.toNodeId = toNodeID
 end
 
+local function finalizePreview(preview)
+    -- Slot extraction uses the IR only while building the preview. Do not
+    -- duplicate the complete IR inside every flow diagnostic/result.
+    preview.ir = nil
+    return preview
+end
+
 function Kernel.Preview(ir, state, context, options)
     context = type(context) == "table" and context or {}
     options = type(options) == "table" and options or {}
@@ -268,7 +275,7 @@ function Kernel.Preview(ir, state, context, options)
             target or "complete"
         )
         preview.slotValues = slotValues(matched.flow, matched.node, ir)
-        return preview
+        return finalizePreview(preview)
     end
 
     if active and (ir and (ir.intent == "REFUSE" or ir.intent == "DISAGREE"))
@@ -286,7 +293,7 @@ function Kernel.Preview(ir, state, context, options)
             preview.nodeId = target
             preview.diagnostics.reason = preview.transition
             preview.diagnostics.flowId = flow.id
-            return preview
+            return finalizePreview(preview)
         end
     end
 
@@ -302,7 +309,7 @@ function Kernel.Preview(ir, state, context, options)
         )
         preview.suspendedIndex = resumed.index
         preview.slotValues = slotValues(resumed.flow, resumed.node, ir)
-        return preview
+        return finalizePreview(preview)
     end
 
     local triggeredID, triggered = findTriggeredFlow(ir)
@@ -322,11 +329,11 @@ function Kernel.Preview(ir, state, context, options)
         preview.diagnostics.reason = preview.transition
         preview.diagnostics.flowId = flow.id
         preview.diagnostics.toNodeId = flow.initial
-        return preview
+        return finalizePreview(preview)
     end
 
     if active then preview.diagnostics.reason = "unrelated_preserve_active" end
-    return preview
+    return finalizePreview(preview)
 end
 
 local function newSession(preview, sequence)
