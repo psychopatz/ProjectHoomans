@@ -21,6 +21,12 @@ timeouts, crash detection, and bounded stderr diagnostics.
   translation lookups, and observed side effects); **Raw worker record** keeps
   the complete bounded response for deeper inspection. **Preview** calls the
   production router without recording a turn or dispatching an action.
+- `flow_editor.py` owns the **Flow editor** tab's graph model and visual form.
+  It reads normalized definitions from the production Lua registry, draws
+  nodes/edges and selected response pools, and sends draft validation and
+  registration back through the same Lua worker (`Registry.Validate` and
+  `Registry.Register`). It is an authoring surface, not a second Python flow
+  engine.
 - `worker_session.py` serializes worker startup, requests, status reads, and
   cleanup outside the Tk view.
 - `settings_dialog.py` owns the runtime settings form and converts its draft
@@ -61,6 +67,16 @@ the Lua worker from the production result. It is the GUI's shared inspection
 contract: `ir`, `candidates`, `response`, `flow.activeBefore`/
 `flow.activeAfter`, `translation`, and `sideEffects`. It does not infer a
 second Python response or policy engine.
+
+The **Flow editor** tab is the practical authoring loop for registered flows:
+select a production flow to browse its graph, click a node to edit its response
+pool/template, terminal flag, accepted frames, or transition targets, and edit
+the flow ID/owner/initial node/trigger frames above the graph. **Validate draft**
+calls the production registry validator; **Register draft** adds a new valid
+definition to this worker so the next conversation turn can exercise it.
+**Save draft** and **Open draft** persist the bounded definition for review.
+Registration is worker-local and disappears when that worker is restarted; it
+does not write a Workshop package or alter the checked-out Lua source.
 
 ## Launching
 

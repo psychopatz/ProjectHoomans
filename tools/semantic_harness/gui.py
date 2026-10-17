@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any, Callable
 
 from .config import ConfigurationError
+from .flow_editor import FlowEditorPane
 from .rendering import pretty
 from .scenario import load_scenario, save_scenario
 from .settings_dialog import open_runtime_settings as show_runtime_settings
@@ -40,7 +41,7 @@ class SemanticHarnessApp:
         self._ScrolledText = ScrolledText
         self.arguments = arguments
         self.root.title("Project Hoomans Semantic Lab")
-        self.root.geometry("1180x800")
+        self.root.geometry("1320x860")
         self.scenario_path = Path(arguments.scenario) if arguments.scenario else None
         self.scenario = load_scenario(self.scenario_path)
         if arguments.language:
@@ -132,6 +133,22 @@ class SemanticHarnessApp:
         self.trace.grid(row=0, column=0, sticky="nsew")
         self.trace_tabs.add(raw_frame, text="Raw worker record")
 
+        flow_frame = ttk.Frame(self.trace_tabs)
+        flow_frame.rowconfigure(0, weight=1)
+        flow_frame.columnconfigure(0, weight=1)
+        self.flow_editor = FlowEditorPane(
+            flow_frame,
+            self._tk,
+            ttk,
+            ScrolledText,
+            filedialog,
+            messagebox,
+            on_refresh=self.refresh_flow_catalog,
+            on_validate=self.validate_flow_draft,
+            on_register=self.register_flow_draft,
+        )
+        self.trace_tabs.add(flow_frame, text="Flow editor")
+
         self._append("SYSTEM", "Window ready. Starting the isolated Lua worker…")
         self._set_controls(False)
 
@@ -151,6 +168,7 @@ class SemanticHarnessApp:
         self.restart_button.configure(
             state="normal" if self.session.ready and not self.busy else "disabled"
         )
+        self.flow_editor.set_enabled(enabled and not self.busy)
 
     @property
     def worker_ready(self) -> bool:
@@ -223,6 +241,7 @@ class SemanticHarnessApp:
             }),
         )
         self._set_text(self.trace, pretty(result.capabilities))
+        self.flow_editor.set_catalog(result.capabilities.get("flowCatalog", {}))
 
     def _start_operation(
         self,
@@ -367,6 +386,37 @@ class SemanticHarnessApp:
         self._start_operation(
             lambda worker: worker.snapshot(),
             self._show_response,
+        )
+
+    def refresh_flow_catalog(self) -> None:
+        if not self.session.ready or self.busy:
+            return
+        self._start_operation(
+            lambda worker: worker.flow_catalog(),
+            self._flow_catalog_finished,
+        )
+
+    def _flow_catalog_finished(self, response: dict[str, Any]) -> None:
+        self.flow_editor.set_catalog(response)
+        self._append(
+            "SYSTEM",
+            f"Loaded {response.get('flowCount', 0)} normalized production flows.",
+        )
+
+    def validate_flow_draft(self, definition: dict[str, Any]) -> None:
+        if not self.session.ready or self.busy:
+            return
+        self._start_operation(
+            lambda worker: worker.validate_flow(definition),
+            self.flow_editor.show_validation,
+        )
+
+    def register_flow_draft(self, definition: dict[str, Any]) -> None:
+        if not self.session.ready or self.busy:
+            return
+        self._start_operation(
+            lambda worker: worker.register_flow(definition),
+            self.flow_editor.show_registration,
         )
 
     def set_language(self) -> None:

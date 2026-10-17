@@ -1,8 +1,8 @@
 # Semantic Dialogue Decoupling — current implementation state
 
 **Updated:** 2026-10-18
-**Phase:** D2 — third modular dialogue type
-**State:** D2 is complete for the developer gate. A registered greeting flow now owns a contextual opening and thank-you follow-up through the production Lua worker, including EN/TL translation facts and clean retirement. The next bounded chunk is D3, the Semantic Lab visual flow editor. Native Project Zomboid testing and Workshop publication remain user-owned and are not blockers.
+**Phase:** D3 — Semantic Lab visual flow editor
+**State:** D3 is complete for the developer gate. The Semantic Lab now browses normalized production flow graphs, edits bounded drafts, validates them through the production Lua registry, and registers new worker-local flows for immediate worker testing. The next bounded chunk is D4, coherent compositional responses. Native Project Zomboid testing and Workshop publication remain user-owned and are not blockers.
 
 This is the one active progress ledger for this goal. C0A/C0B source work and unrelated Core radio edits remain preserved.
 
@@ -112,6 +112,19 @@ The GitHub Core publication does not need a source-level correction for C0A: 569
 - `luac5.3 -p` passed changed Lua files; focused `pz_verify --kahlua --severity ERROR --no-snippets` reported zero errors on every changed production Lua file.
 - `python3 -m tools.semantic_harness.app --doctor`: **PASS** (`READY/PING/CAPABILITIES`); only the known active-venv warning remains. Desktop automation still exposed `apps=[]`, so no GUI click-through is claimed.
 
+## D3 result
+
+- Added the worker-backed `FLOW_CATALOG`, `FLOW_VALIDATE`, and `FLOW_REGISTER` contract. The Lua worker reads normalized definitions from the production `DialogueFlowRegistry`; validation and registration call the same production `Registry.Validate`/`Registry.Register` used by the semantic policy.
+- Added the GUI **Flow editor** tab with a node/edge Canvas graph, selected-node form, trigger/accept-frame editing, response pool/template and transition fields, draft open/save, production validation, and worker-local registration. It is an authoring/view surface, not a second Python policy engine or a static JSON serializer.
+- The real worker editor regression loaded `identity`, `wellbeing`, and `greeting`, rejected an unreachable draft, registered `lab_editor_compliment`, then exercised `You look cute!` and `thanks` through the registered flow with flow-owned pools and clean retirement.
+
+## D3 focused verification
+
+- `python3 -m unittest discover -s tools/semantic_harness/tests -q`: **102/102 PASS**.
+- `python3 -m unittest tools.semantic_harness.tests.test_flow_editor -v`: **2/2 PASS**, covering graph edges, production validation, registration, selected replies, and retirement.
+- `python3 -m py_compile` passed the GUI/editor/worker Python modules; `luac5.3 -p` passed the new worker editor and command router; eight focused Lua smokes all exited **0**.
+- `python3 -m tools.semantic_harness.app --doctor`: **PASS** (`READY/PING/CAPABILITIES`); only the known active-venv warning remains. Desktop automation still exposed `apps=[]`, so the visual click-through remains unclaimed and the real Lua worker is the evidence fallback.
+
 ## Historical C0A/C0B source handoff
 
 C0A exit is satisfied and the read-only C0B handshake remains implemented and source-smoke-tested. The following items are retained as historical user-owned deployment/live-test handoff; they are not prerequisites for D1–D6 implementation and do not block this goal:
@@ -125,4 +138,4 @@ C0A exit is satisfied and the read-only C0B handshake remains implemented and so
 
 The controlled native surface is currently unavailable: no Project Zomboid process is running and the native UI inventory is empty. Do not infer native acceptance from the direct Lua smokes or the prior English screenshot. After launching PZ with the matched local pair or an explicitly republished pair, keep `ProjectHoomans.SemanticDialogueAudit` enabled, fully restart PZ, open one NPC conversation, and submit `are you okay` followed by `im fine thanks` or `im hungry`. Capture the complete console line containing `semantic_audit event=semantic.capability_handshake` and verify `ok=true`, `parserCandidates=true`, `candidateSelection=true`, `flowCommit=true`, `routerCandidateHooks=true`, `translation.manifestRegistered=true`, `translation.manifestRead=true`, `translation.catalogLoaded=true`, and `translation.shardCount=12`. Repeat after an EN/TL language restart and record the actual rendered text plus fallback provenance; then run a separate MP server/client pass for authority, duplicate-request, speaker isolation, and rejoin evidence. Any false field must be reported through `failures`, not treated as a pass.
 
-The next development chunk is D3: implement the usable Semantic Lab visual flow editor over the existing worker observations and flow registry. Do not wait for native capability, SP/MP, or Workshop evidence before continuing.
+The next development chunk is D4: implement coherent bounded compositional responses whose multi-act plan changes actual NPC speech sequencing and EN/TL rendering. Do not wait for native capability, SP/MP, or Workshop evidence before continuing.

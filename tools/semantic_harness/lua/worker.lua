@@ -37,6 +37,7 @@ local InventoryFixtures = require "worker/InventoryFixtures"
 local ProductionModules = require "worker/ProductionModules"
 local Conversation = require "worker/Conversation"
 local OutputProjection = require "worker/OutputProjection"
+local FlowEditor = require "worker/FlowEditor"
 local ScenarioSession = require "worker/ScenarioSession"
 local CommandRouter = require "worker/CommandRouter"
 
@@ -57,6 +58,7 @@ local Context = {
     ProductionModules = ProductionModules,
     Conversation = Conversation,
     OutputProjection = OutputProjection,
+    FlowEditor = FlowEditor,
     ScenarioSession = ScenarioSession,
 }
 

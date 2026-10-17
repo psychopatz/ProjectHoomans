@@ -101,6 +101,21 @@ class LuaSemanticWorker:
     def snapshot(self) -> dict[str, Any]:
         return self._request("SNAPSHOT")
 
+    def flow_catalog(self) -> dict[str, Any]:
+        """Read normalized production flow definitions from the Lua registry."""
+
+        return self._request("FLOW_CATALOG")
+
+    def validate_flow(self, definition: dict[str, Any]) -> dict[str, Any]:
+        """Validate a draft through the production Lua flow registry."""
+
+        return self._request("FLOW_VALIDATE", definition)
+
+    def register_flow(self, definition: dict[str, Any]) -> dict[str, Any]:
+        """Register a validated draft in this worker's production registry."""
+
+        return self._request("FLOW_REGISTER", definition)
+
     def ping(self) -> dict[str, Any]:
         return self._request("PING")
 

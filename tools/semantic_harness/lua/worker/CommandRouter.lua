@@ -4,7 +4,8 @@ local CommandRouter = {}
 
 local capabilities = {
     "CONFIG", "RESET", "INPUT", "LANGUAGE", "TOOL_REPLY",
-    "PREVIEW", "SNAPSHOT", "PING", "CAPABILITIES", "QUIT",
+    "PREVIEW", "SNAPSHOT", "FLOW_CATALOG", "FLOW_VALIDATE",
+    "FLOW_REGISTER", "PING", "CAPABILITIES", "QUIT",
 }
 
 function CommandRouter.hello(context)
@@ -17,6 +18,7 @@ function CommandRouter.hello(context)
         loadedModules = Runtime.loadedModules,
         moduleManifest = Runtime.moduleManifest,
         headlessRequires = Runtime.headlessRequires,
+        flowCatalog = context.FlowEditor.catalog(context),
         translation = context.OutputProjection.translationSnapshot(context),
     }
 end
@@ -48,6 +50,18 @@ function CommandRouter.dispatch(context, request)
         return context.OutputProjection.toolReply(context, payload)
     elseif command == "SNAPSHOT" then
         return context.ScenarioSession.snapshot(context)
+    elseif command == "FLOW_CATALOG" then
+        return context.FlowEditor.catalog(context)
+    elseif command == "FLOW_VALIDATE" then
+        if type(payload) ~= "table" then
+            return nil, "flow_definition_must_be_object"
+        end
+        return context.FlowEditor.validate(context, payload)
+    elseif command == "FLOW_REGISTER" then
+        if type(payload) ~= "table" then
+            return nil, "flow_definition_must_be_object"
+        end
+        return context.FlowEditor.register(context, payload)
     elseif command == "PING" then
         return {
             ok = true,
@@ -64,6 +78,7 @@ function CommandRouter.dispatch(context, request)
             loadedModules = Runtime.loadedModules,
             moduleManifest = Runtime.moduleManifest,
             headlessRequires = Runtime.headlessRequires,
+            flowCatalog = context.FlowEditor.catalog(context),
             translation = context.OutputProjection.translationSnapshot(context),
         }
     elseif command == "QUIT" then
