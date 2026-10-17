@@ -173,6 +173,14 @@
       "priority": 120
     },
     {
+      "id": "pnc.dataset.question.wellbeing.how_are_you_doing",
+      "utterance": "how are you doing",
+      "emit": { "intent": "QUESTION", "speechAct": "QUESTION", "subject": "WELLBEING" },
+      "confidence": 0.99,
+      "priority": 120
+    },
+
+    {
       "id": "pnc.dataset.greeting.long_time_no_see",
       "utterance": "long time no see",
       "emit": { "intent": "GREET", "speechAct": "GREET" },
