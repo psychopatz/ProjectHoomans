@@ -113,6 +113,12 @@ local function semanticTranslationKey(response)
             "UI_PNC_Conversation_Semantic_ApologyWithdrawn",
         ["semantic.social.apology.default"] =
             "UI_PNC_Conversation_Semantic_ApologyDefault",
+        ["semantic.social.threat.stressed"] =
+            "UI_PNC_Conversation_Semantic_ThreatStressed",
+        ["semantic.social.threat.withdrawn"] =
+            "UI_PNC_Conversation_Semantic_ThreatWithdrawn",
+        ["semantic.social.threat.trusted"] =
+            "UI_PNC_Conversation_Semantic_ThreatTrusted",
     }
     return keys[templateID]
 end

@@ -154,6 +154,80 @@ class ContextualSocialReactionTests(unittest.TestCase):
                     result["relationshipBefore"], result["relationshipAfter"]
                 )
 
+    def test_threat_uses_guarded_emotion_relationship_and_precedence(self) -> None:
+        cases = (
+            (
+                "trusted",
+                {
+                    "traits": {"reserved": True},
+                    "relationshipState": "Member",
+                    "personality": {"socialStyle": "neutral"},
+                },
+                "semantic.social.threat_trusted",
+                "neutral",
+            ),
+            (
+                "withdrawn",
+                {"personality": {"socialStyle": "withdrawn"}},
+                "semantic.social.threat_withdrawn",
+                "withdrawn",
+            ),
+            (
+                "stressed",
+                {
+                    "conditionStats": {"stress": 95},
+                    "personality": {"socialStyle": "neutral"},
+                },
+                "semantic.social.threat_stressed",
+                "neutral",
+            ),
+            (
+                "stress_precedes_withdrawn_and_busy",
+                {
+                    "activeBehavior": "combat",
+                    "conditionStats": {"stress": 95},
+                    "personality": {"socialStyle": "withdrawn"},
+                },
+                "semantic.social.threat_stressed",
+                "withdrawn",
+            ),
+        )
+        for label, npc, template, social_style in cases:
+            with self.subTest(case=label):
+                with LuaSemanticWorker(self.scenario(npc)) as worker:
+                    result = worker.input("I will kill you")
+                self.assertTrue(result["accepted"], result.get("reason"))
+                self.assertEqual(result["result"]["ir"]["intent"], "THREATEN")
+                self.assertEqual(
+                    result["result"]["decision"]["branch"],
+                    "THREAT_RECEIVED",
+                )
+                self.assertEqual(
+                    result["result"]["decision"]["route"], "deterministic"
+                )
+                self.assertEqual(
+                    result["result"]["decision"]["response"]["templateID"],
+                    template,
+                )
+                self.assertEqual(result["messages"], [])
+                self.assertEqual(
+                    result["routedSituation"]["social"]["style"], social_style
+                )
+                self.assertEqual(result["llmCalls"], 0)
+                self.assertEqual(result["transport"], [])
+                self.assertEqual(result["toolCalls"], [])
+                self.assertEqual(
+                    result["result"]["actionResult"],
+                    {
+                        "accepted": False,
+                        "reason": "semantic_social_transport_unavailable",
+                        "status": "semantic_social_dispatch_unavailable",
+                    },
+                )
+                self.assertEqual(
+                    result["relationshipBefore"], result["relationshipAfter"]
+                )
+
     def test_apology_preview_is_idempotent_without_relationship_effect(self) -> None:
         scenario = self.scenario({
             "traits": {"friendly": True},

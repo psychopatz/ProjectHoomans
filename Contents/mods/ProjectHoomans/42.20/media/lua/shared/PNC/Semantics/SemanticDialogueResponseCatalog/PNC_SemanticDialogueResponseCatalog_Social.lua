@@ -273,6 +273,36 @@ Catalog.Register("semantic.hostile_remark", {
 Catalog.Register("semantic.threat", {
     variants = {
         {
+            id = "semantic.threat.stressed",
+            templateID = "semantic.social.threat_stressed",
+            fallback = "I've had enough. Back off before this gets worse.",
+            when = {
+                emotionType = { "stress", "panic" },
+                emotionUrgency = {
+                    "moderate", "severe", "critical", "emergency",
+                },
+            },
+            priority = 5,
+        },
+        {
+            id = "semantic.threat.withdrawn",
+            templateID = "semantic.social.threat_withdrawn",
+            fallback = "Keep your distance. I'm not discussing this.",
+            when = { socialStyle = "withdrawn" },
+            priority = 2,
+        },
+        {
+            id = "semantic.threat.trusted",
+            templateID = "semantic.social.threat_trusted",
+            fallback = "Don't make this personal. Step back.",
+            when = {
+                relationshipState = {
+                    "Friend", "Trusted", "Ally", "Member", "Lover",
+                },
+            },
+            priority = 1,
+        },
+        {
             id = "semantic.threat.default",
             templateID = "semantic.social.threat_boundary",
             fallback = "Back off.",
@@ -287,7 +317,7 @@ Catalog.Register("semantic.threat", {
             templateID = "semantic.social.threat_busy",
             fallback = "Pick another fight.",
             when = { busy = true },
-            priority = 2,
+            priority = 3,
         },
     },
 })
