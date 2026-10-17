@@ -227,23 +227,7 @@ above.
   `bfe3c2c880a6030291bc12dcd3f1d4e587acd7996e6bdc91583d30bbd8f22b4b`.
 - EN/TL key sets have zero missing and zero extra names. Key-by-key
   placeholder signatures have zero mismatches.
-- `PNC_TranslationBootstrap.lua` still registers 15 systems and their
-  registered catalogs contain 2,825 keys in each language. The Core manager
-  baseline API
-  is `registerSystem`, `forMod`, `load`, `get`, `getLanguage`,
-  `setLanguageOverride`, `clearLanguageOverride`,
-  `SetTranslationAuditEnabled`, `GetTranslationAuditSnapshot`,
-  `GetTranslationCoverageRevision`, `GetTranslationCoverageSnapshot`, and
-  `getLanguageOverride`. It loads one nested per-system JSON lazily, with a
-  legacy flat-file fallback; `Conversation` now selects its explicit manifest
-  and shard files through the same public facade.
-- `Trading/Trading.json` exists separately with 20 EN and 20 TL keys but is
-  not among the 15 registered systems. The real facade smoke assertion records
-  the current lookup: `Translation.Systems.Trading == nil` and
-  `Translation.GetKey("UI_PNC_Trading_Title", "Trading") == "Trading"`
-  under the TL test setup, because the segment map/native lookup does not
-  resolve the unregistered custom catalog. This is a Phase 5/6 migration item,
-  not a Phase 0/1 fix.
+- `PNC_TranslationBootstrap.lua` registered 15 systems at the audit snapshot; D5 commit `1d573706` adds the observed `Trading` consumer as the 16th public system while preserving the Core manager API (`registerSystem`, `forMod`, `load`, `get`, `getLanguage`, `setLanguageOverride`, `clearLanguageOverride`, `SetTranslationAuditEnabled`, `GetTranslationAuditSnapshot`, `GetTranslationCoverageRevision`, `GetTranslationCoverageSnapshot`, and `getLanguageOverride`). It still loads one nested per-system JSON lazily, with legacy flat-file fallback; `Conversation` still selects explicit manifest shard files through the same public facade. The D5 public-facade smoke now resolves `Translation.Systems.Trading` and `Translation.GetKey("UI_PNC_Trading_Title", "Trading") == "Kalakalan"` under the TL test setup. The earlier fallback assertion was the evidence-backed regression that D5 repaired.
 
 ## Verification evidence
 

@@ -18,7 +18,7 @@
 4. Make a concrete production-path improvement (flow reply ownership, real branch authoring, composition). Confirm selected actual responses, transitions, state and side effects using harness. Preserve the identity regression and server-authoritative gameplay domains.
 5. Run focused automated tests for real modified behavior; classify unrelated full headless suite failures honestly. If no GUI display, work on verified code/harness startup defects, use production Lua worker as fallback and record GUI pending without treating it as a general blocker.
 6. Update PROGRESS with actual tests run, selected reply/context evidence, Git SHAs, limitations and one Next Chunk. Continue phase sequence autonomously without asking the user to start PZ.
-7. When D0–D5 implementation gates are complete, prepare `USER_LIVE_TEST_HANDOFF.md`, mark `READY FOR USER LIVE TEST`, stop. Native SP/MP remains user-owned and **not a Codex failure**.
+7. When D0–D6 implementation gates are complete, update `USER_LIVE_TEST_HANDOFF.md`, mark `READY FOR USER LIVE TEST`, and stop. Native SP/MP remains user-owned and **not a Codex failure**.
 
 ## Safety
 Offline Lua without PBrainZ, Parser/IR compatibility, context-bounded preview/commit, names/needs/relationships and multiplayer action admission, MarketSense, EN/TL translation keys, Build 42 watch-dir precautions. No routine protected-call blanket, runtime WordNet scanning, per-tick full-NPC semantic loops or duplicate response engine.

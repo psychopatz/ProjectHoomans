@@ -1,8 +1,8 @@
 # Semantic Dialogue Decoupling — current implementation state
 
 **Updated:** 2026-10-18
-**Phase:** D4 — coherent compositional responses
-**State:** D4 is complete for the developer gate. Production response plans now survive flow selection, render every bounded turn through the normal EN/TL resolver, and queue the ordered NPC reply sequence. The next bounded chunk is D5, integration and regression sweep. Native Project Zomboid testing and Workshop publication remain user-owned and are not blockers.
+**Phase:** D6 — developer handoff
+**State:** READY FOR USER LIVE TEST. D0A through D5 implementation gates are complete, and the concise user-owned SP/MP/EN/TL/performance checklist is in `USER_LIVE_TEST_HANDOFF.md`. Native Project Zomboid testing and Workshop publication remain user-owned and are not blockers.
 
 This is the one active progress ledger for this goal. C0A/C0B source work and unrelated Core radio edits remain preserved.
 
@@ -141,6 +141,28 @@ The GitHub Core publication does not need a source-level correction for C0A: 569
 - Focused `pz_verify --kahlua --severity ERROR --no-snippets` reported **0 errors** for every changed production Lua file. EN/TL semantic response JSON parsed with both new keys present.
 - `python3 -m tools.semantic_harness.app --doctor`: **PASS** (`READY/PING/CAPABILITIES`); only the known active-venv warning remains. Project Zomboid, external headless harnesses, and Workshop publication were not used or required.
 
+## D5 result
+
+- The observed production inventory/trade UI consumer calls `PNC.Translation.GetKey("UI_PNC_Trading_*")`. D5 registered the existing EN/TL `Trading/Trading.json` catalogs through the public Hoomans/Core manager and added the `Trading` segment route; the direct public-facade smoke now resolves `UI_PNC_Trading_Title` as `Kalakalan` and `UI_PNC_Trading_Complete` as `Kumpleto ang kalakalan` under TL.
+- The D1 wellbeing flow selects generated `semantic.question.wellbeing.dataset.*` variants. D5 added public presentation mappings and EN/TL values for those generated variants plus the deterministic wellbeing variants, so TL no longer silently displays their English fallbacks. The manifest remains 12 EN/12 TL shards.
+- Added one real-worker regression matrix covering the production translation bootstrap/module manifest, the two-turn flow-owned greeting, identity, generated wellbeing, and dedicated `ask_name` tool reply in both EN and TL. It checks selected translation keys, rendered text, zero translation fallback, and no transport/tool side effects on safe dialogue turns.
+
+## D5 focused verification
+
+- Implementation commit: `1d573706` (`fix(semantic): close translation integration gaps`).
+- `python3 -m unittest discover -s tools/semantic_harness/tests -q`: **104/104 PASS**.
+- Focused integration set (`test_semantic_translation_integration`, dialogue flows, identity/wellbeing collision, contextual social reactions, provider parity, and static boundaries): **29/29 PASS**.
+- Ten focused production Lua smokes—translation catalog, translation fallback, public Core manager, flow, input, gossip, inventory/trading, group, and task request/dispatch—each exited **0**. EN/TL semantic response JSON parsed with **84/84** key parity.
+- `pz-verify --kahlua --severity ERROR --no-snippets` reported **0 errors** for the changed translation bootstrap, segment map, and presentation adapter; `luac5.3 -p`, `py_compile`, and `git diff --check` passed.
+- `python3 -m tools.semantic_harness.app --doctor`: **PASS** (`READY/PING/CAPABILITIES`), with only the known active-venv warning. No Project Zomboid process, external/headless harness, or Workshop publication was used.
+- Desktop automation still reported `apps=[]`; no GUI click-through is claimed. The existing GUI remains source-verified, and the real production Lua worker is the evidence path for this chunk.
+
+## D6 result
+
+- Replaced the stale phase-table handoff with a bounded user checklist covering the validated identity/wellbeing/greeting sequence, the modular greeting follow-up, EN/TL restart checks, Trading/gossip/inventory/task spot checks, MP authority/speaker isolation/rejoin checks, optional PBrainZ parity, and idle/performance observation.
+- The handoff identifies the exact D4/D5 implementation and evidence commits, the real-worker test totals, the unavailable GUI click-through, and the required fields to capture if live behavior differs.
+- No Project Zomboid process was launched or polled, no external/headless harness was used, and no Workshop publication action was taken.
+
 ## Historical C0A/C0B source handoff
 
 C0A exit is satisfied and the read-only C0B handshake remains implemented and source-smoke-tested. The following items are retained as historical user-owned deployment/live-test handoff; they are not prerequisites for D1–D6 implementation and do not block this goal:
@@ -154,4 +176,4 @@ C0A exit is satisfied and the read-only C0B handshake remains implemented and so
 
 The controlled native surface is currently unavailable: no Project Zomboid process is running and the native UI inventory is empty. Do not infer native acceptance from the direct Lua smokes or the prior English screenshot. After launching PZ with the matched local pair or an explicitly republished pair, keep `ProjectHoomans.SemanticDialogueAudit` enabled, fully restart PZ, open one NPC conversation, and submit `are you okay` followed by `im fine thanks` or `im hungry`. Capture the complete console line containing `semantic_audit event=semantic.capability_handshake` and verify `ok=true`, `parserCandidates=true`, `candidateSelection=true`, `flowCommit=true`, `routerCandidateHooks=true`, `translation.manifestRegistered=true`, `translation.manifestRead=true`, `translation.catalogLoaded=true`, and `translation.shardCount=12`. Repeat after an EN/TL language restart and record the actual rendered text plus fallback provenance; then run a separate MP server/client pass for authority, duplicate-request, speaker isolation, and rejoin evidence. Any false field must be reported through `failures`, not treated as a pass.
 
-The next development chunk is D5: complete the documented integration and regression sweep. Do not wait for native capability, SP/MP, or Workshop evidence before continuing.
+Development implementation is complete at the `READY FOR USER LIVE TEST` gate. Stop here for user-owned live Project Zomboid validation; any later fix is a new bounded chunk driven by the user’s captured result.

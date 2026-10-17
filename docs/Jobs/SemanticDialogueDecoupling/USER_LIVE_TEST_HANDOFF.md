@@ -1,23 +1,69 @@
-# Final USER-OWNED Project Zomboid live-test handoff
+# READY FOR USER LIVE TEST
 
-This document is a future checklist, **not an agent task to run Project Zomboid**.
+This is a user-owned Project Zomboid validation checklist. It is not a request
+for Codex to launch the game, poll the native UI, or publish a Workshop item.
 
-When all implementation chunks and meaningful Semantic Lab checks are complete, Codex should mark `PROGRESS.md` as **READY FOR USER LIVE TEST** and stop; it must NOT mark `blocked` due to `apps=[]` or lack of PZ process.
+## What the development checks established
 
-## Codex handoff output
-- Source commit SHAs for Hoomans and Core; note any local uncommitted edits instead of overwriting.
-- List actual implemented behaviors and Semantic Lab tests, plus GUI interactions actually verified vs user-pending.
-- Known limitations and unresolved failures.
-- A short manual test script with expected NPC replies/flow and what diagnostic trace or log to capture if something differs.
-- No Steam Workshop publication instruction or approval request.
+- Hoomans D4 implementation: `ea414a04`; D4 evidence: `2fff9683`.
+- Hoomans D5 translation/domain fix: `1d573706`.
+- The real Semantic Lab worker uses the production Lua entrypoint and passes
+  the full suite (**104/104**), the D5 integration set (**29/29**), and the
+  focused Lua translation/domain smokes.
+- EN/TL public Core translation lookup is verified for identity, generated
+  wellbeing, the two-turn greeting flow, the `ask_name` tool reply, and the
+  observed Trading UI catalog. The worker reports selected keys, rendered
+  text, flow nodes/transitions, fallback provenance, transport, and actions.
+- GUI click-through was not run because desktop automation exposed `apps=[]`.
+  The GUI is source-verified; the real Lua worker is the development evidence
+  fallback. Do not treat this as a GUI interaction pass.
 
-## Suggested tests for the user, whenever THEY choose
-1. In singleplayer with their chosen local mods, NPC requests name -> player asks `are you okay` -> `im fine thanks` -> later supplies a valid name. No false identity penalty or wrong flow.
-2. Try healthy/thirsty/injured NPC context and a real follow-up; observe coherent response and next-step behavior.
-3. Exercise a newly added harmless third flow; verify it chooses the correct reply without legacy-switch changes.
-4. EN/TL language switching/restart; confirm translated reply variants and safe fallback.
-5. Two NPCs/group speaker isolation and optional PBrainZ off/on as desired.
-6. Multiplayer/SP authority, save/rejoin and performance at a scale the user chooses.
+## Singleplayer checklist
 
-## Responding to user findings
-If the user reports a bug, record the precise scenario, source revisions, actual message/trace and a bounded regression Next Chunk; return to development. The agent must never spontaneously poll PZ, request a workshop upload or make its own live-test gating condition.
+1. Start a save with the matching local Hoomans/Core pair and fully restart
+   Project Zomboid after changing mods or language.
+2. Open one NPC conversation and run this short sequence:
+   `hello` → `who are you` → `are you okay` → `im fine thanks` →
+   `My name is <your actual character name>`.
+3. Confirm the visible NPC replies match the selected conversation and that
+   the flow facts, if debug output is enabled, show identity `start`,
+   wellbeing `interrupt_start`, wellbeing `match`, then identity `match` and
+   retirement. A valid name should produce the authoritative identity result;
+   the preceding safe questions should not send commands or mutate inventory.
+4. Test the modular greeting flow with `hello` followed by `thanks`. Confirm
+   its opening and follow-up are the greeting flow’s replies and the flow
+   retires after the follow-up.
+5. Switch to TL, restart, and repeat at least the greeting, identity, and
+   wellbeing turns. Confirm rendered Tagalog text, expected translation keys,
+   and no English-fallback marker for those catalog-backed replies. Repeat in
+   EN and confirm the English values and placeholders remain intact.
+6. Spot-check one Trading UI window, one gossip/news question, one inventory or
+   gift interaction, and one task/action request. Trading labels should come
+   from the registered catalog; gossip must not become an inventory query;
+   action requests must show their normal authority/result boundary.
+
+## Multiplayer checklist
+
+With the same source pair on the server and client, repeat one safe identity /
+wellbeing conversation and one explicit action request.
+
+- Safe dialogue must not create duplicate transport or action events.
+- Identity changes and action admission must be server-authoritative.
+- Two nearby NPCs must keep speaker and flow state isolated.
+- After reconnect/rejoin, the conversation context must not duplicate queued
+  replies or resurrect a retired flow.
+- If PBrainZ is enabled, compare its authored/provider path with the
+  deterministic fallback. If it is disabled, deterministic semantic replies
+  and the safety boundary must remain available.
+
+## Performance and evidence
+
+Observe the console and debug facts during a normal few-minute NPC session:
+there should be no semantic work registered as a per-tick full-NPC scan and no
+new repeated translation/action spam while idle. If a result differs, record
+the language, exact input, NPC/player pair, selected candidate, flow
+transition/node, rendered text, fallback flag/key, transport, actions, and
+whether the issue is SP or MP. Attach the relevant console line or screenshot.
+
+This handoff does not authorize Workshop publication. The user owns the final
+live-test decision and any later publication decision.
