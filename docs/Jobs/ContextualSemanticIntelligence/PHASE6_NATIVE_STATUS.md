@@ -3,9 +3,10 @@
 ## Gate status
 
 **OPEN — not accepted.** No production semantic behavior changed in this
-checkpoint. The required native evidence cannot be obtained from the current
-workspace without a controlled Project Zomboid client and, for multiplayer, a
-controlled authoritative server/client pair.
+checkpoint. A bounded non-native Semantic Lab performance measurement is now
+recorded separately, but the required native evidence cannot be obtained from
+the current workspace without a controlled Project Zomboid client and, for
+multiplayer, a controlled authoritative server/client pair.
 
 ## Evidence boundary
 
@@ -16,9 +17,11 @@ controlled authoritative server/client pair.
   or save/reload behavior.
 - Existing console/process observations were not tied to a reviewed semantic
   scenario and are not promoted as native acceptance.
-- Existing profiler observations were process-wide and not a bounded semantic
-  dialogue benchmark. They do not establish dialogue overhead, queue/tick
-  cost, context-size cost, or provider-disabled cost.
+- [`PHASE6_SEMANTIC_PERFORMANCE.md`](PHASE6_SEMANTIC_PERFORMANCE.md) records a
+  real-Lua-worker measurement of deterministic turn latency, serialized
+  context size and provider-disabled/enabled behavior. It does not establish
+  Project Zomboid engine dialogue overhead, native queue/tick cost or server
+  authority.
 - Live PBrainZ provider success remains **NOT TESTED**; Phase 5 only covered
   deterministic parity and provider rejection/fail-closed behavior.
 

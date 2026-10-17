@@ -145,8 +145,9 @@ Phase 5 is accepted only for deterministic/provider-failure parity, bounded prov
 - The bounded status and evidence boundary are recorded in
   [`PHASE6_NATIVE_STATUS.md`](PHASE6_NATIVE_STATUS.md).
 - No production semantic behavior changed after Phase 5. No controlled native
-  single-player scenario, authoritative multiplayer session, or semantic
-  performance benchmark was completed in this checkpoint.
+  single-player scenario or authoritative multiplayer session was completed
+  in this checkpoint. A bounded non-native real-Lua-worker performance result
+  is recorded in [`PHASE6_SEMANTIC_PERFORMANCE.md`](PHASE6_SEMANTIC_PERFORMANCE.md).
 - Native SP: **NOT TESTED**. Native MP: **NOT TESTED**. Existing process,
   console, profiler, Semantic Lab and replay observations are not promoted as
   native proof.
