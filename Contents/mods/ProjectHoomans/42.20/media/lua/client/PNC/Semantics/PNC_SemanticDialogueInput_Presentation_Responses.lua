@@ -7,6 +7,8 @@ local Input = PNC.Semantics.DialogueInput or {}
 PNC.Semantics.DialogueInput = Input
 local Internal = Input.Internal or {}
 Input.Internal = Internal
+local ResponsePlan = require
+    "PNC/Semantics/PNC_SemanticDialogueResponsePlan"
 
 local ResponseAdapter = {}
 
@@ -141,8 +143,13 @@ local function semanticTranslationKey(response)
     return keys[templateID]
 end
 
-local function localizedResponse(response)
-    local fallback = tostring(response and response.fallback or "")
+local function localizedSegment(templateID, fallback, args)
+    local response = {
+        templateID = templateID,
+        fallback = fallback,
+        args = args,
+    }
+    fallback = tostring(fallback or "")
     local key = semanticTranslationKey(response)
     local translation = PNC.Translation
     if not key or not translation
@@ -150,7 +157,7 @@ local function localizedResponse(response)
     then
         return fallback, key
     end
-    local args = type(response.args) == "table" and response.args or {}
+    args = type(args) == "table" and args or {}
     local firstArg = args.npcName or args.target or args.object
     if type(firstArg) == "table" then firstArg = nil end
     local ok, value = pcall(translation.TrFormat, key, fallback, firstArg)
@@ -158,6 +165,28 @@ local function localizedResponse(response)
         return tostring(value), key
     end
     return fallback, key
+end
+
+local function localizedResponse(response)
+    local fallback = tostring(response and response.fallback or "")
+    local key = semanticTranslationKey(response)
+    if response and type(response.plan) == "table"
+        and ResponsePlan and type(ResponsePlan.Render) == "function"
+    then
+        local rendered = ResponsePlan.Render(
+            response.plan,
+            localizedSegment,
+            1
+        )
+        if rendered ~= nil and tostring(rendered) ~= "" then
+            return tostring(rendered), key
+        end
+    end
+    return localizedSegment(
+        response and response.templateID,
+        fallback,
+        response and response.args
+    )
 end
 
 function ResponseAdapter.Payload(decision)
@@ -175,6 +204,7 @@ function ResponseAdapter.Payload(decision)
         fallback = fallback,
         args = response.args,
         translationKey = translationKey,
+        plan = response.plan,
     }
 end
 

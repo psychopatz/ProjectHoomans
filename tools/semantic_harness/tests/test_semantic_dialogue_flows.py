@@ -84,6 +84,31 @@ class SemanticDialogueFlowTests(unittest.TestCase):
             lookup_count += len(turn["translation"]["lookups"])
         self.assertGreaterEqual(lookup_count, 1)
 
+    def test_response_plan_crosses_real_en_and_tl_presentation(self) -> None:
+        for language in ("EN", "TL"):
+            scenario = merge(
+                DEFAULT_SCENARIO,
+                {"runtime": {"language": language}},
+            )
+            with LuaSemanticWorker(scenario) as worker:
+                turn = worker.input("who are you")
+
+            response = turn["result"]["decision"]["response"]
+            plan = response["plan"]
+            self.assertEqual(plan["schemaVersion"], 1)
+            self.assertEqual(plan["kind"], "dialogue_act_plan")
+            self.assertEqual(plan["sourcePoolID"], "semantic.question.identity")
+            self.assertEqual(
+                plan["turns"][0]["segments"][0]["templateID"],
+                response["templateID"],
+            )
+            payload = turn["messages"][0]["payload"]
+            self.assertEqual(payload["plan"], plan)
+            self.assertEqual(turn["translation"]["language"], language)
+            self.assertGreaterEqual(len(turn["translation"]["lookups"]), 1)
+            if language == "TL":
+                self.assertNotEqual(payload["text"], payload["fallback"])
+
     def test_real_worker_preview_is_pure_for_flow_interruptions(self) -> None:
         with LuaSemanticWorker(merge({}, DEFAULT_SCENARIO)) as worker:
             worker.input("who are you")

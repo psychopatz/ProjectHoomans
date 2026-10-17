@@ -16,6 +16,12 @@ if type(Catalog) ~= "table" then
         "PNC/Semantics/PNC_SemanticDialogueResponseCatalog"
     Catalog = type(loaded) == "table" and loaded or nil
 end
+local ResponsePlan = PNC.Semantics.ResponsePlan
+if type(ResponsePlan) ~= "table" then
+    local loaded = require
+        "PNC/Semantics/PNC_SemanticDialogueResponsePlan"
+    ResponsePlan = type(loaded) == "table" and loaded or nil
+end
 
 local LEGACY_TEXT_FALLBACKS = {
     ["semantic.question.time"] = "I can't tell the exact time.",
@@ -148,6 +154,7 @@ local function catalogResponse(poolID, ir, state, context, args)
         templateID = selected.templateID or selected.id,
         fallback = selected.fallback,
         args = copyArgs(args),
+        sourcePoolID = poolID,
     }
 end
 
@@ -158,5 +165,6 @@ Internal.CopyArgs = copyArgs
 Internal.SocialCounts = socialCounts
 Internal.SelectorContext = selectorContext
 Internal.CatalogResponse = catalogResponse
+Internal.ResponsePlan = ResponsePlan
 
 return Response

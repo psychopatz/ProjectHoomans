@@ -14,6 +14,8 @@ local COMMAND_ACTIONS = Internal.CommandActions
 local isInventoryQuery = Internal.IsInventoryQuery
 local isIdentityClaim = Internal.IsIdentityClaim
 local isIdentityEvasion = Internal.IsIdentityEvasion
+local ResponsePlan = require
+    "PNC/Semantics/PNC_SemanticDialogueResponsePlan"
 
 local function responseFor(branch, ir)
     local definition = Policy.ResponseTemplates[branch]
@@ -93,6 +95,11 @@ local function applyLocalResponse(result, ir, state, context)
             LocalResponse.Resolve, ir, state, context, result.branch
         )
         if ok and type(response) == "table" then result.response = response end
+    end
+    if ResponsePlan and type(ResponsePlan.Attach) == "function"
+        and type(result.response) == "table"
+    then
+        ResponsePlan.Attach(result.response, result.branch)
     end
     return result
 end
