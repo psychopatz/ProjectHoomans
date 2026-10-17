@@ -1,6 +1,6 @@
 # Contextual Semantic Intelligence — progress
 
-**Updated:** 2026-10-17. **Phase:** 5 — optional PBrainZ/group compatibility. **Status:** Phase 5 bounded compatibility Semantic Lab gate accepted; Phase 6 is the sole Next Chunk. Native SP/MP acceptance remains OPEN.
+**Updated:** 2026-10-17. **Phase:** 6 — native SP/MP and performance acceptance. **Status:** Phase 5 bounded compatibility Semantic Lab gate accepted; Phase 6 remains OPEN because no controlled native SP/MP environment is available. Native SP/MP acceptance remains NOT TESTED.
 
 ## Revision evidence
 
@@ -139,6 +139,19 @@ Phase 4 is accepted only for this one reviewed paraphrase and its held-out false
 - Live provider-success behavior was **NOT TESTED**; the enabled worker adapter intentionally rejects the external request after recording the attempted call. Native SP: **NOT TESTED**. Native MP: **NOT TESTED**.
 
 Phase 5 is accepted only for deterministic/provider-failure parity, bounded provider context and group speaker/participant isolation. It does not accept live provider-generated responses or native SP/MP behavior.
+
+## Phase 6 status — native gate remains open
+
+- The bounded status and evidence boundary are recorded in
+  [`PHASE6_NATIVE_STATUS.md`](PHASE6_NATIVE_STATUS.md).
+- No production semantic behavior changed after Phase 5. No controlled native
+  single-player scenario, authoritative multiplayer session, or semantic
+  performance benchmark was completed in this checkpoint.
+- Native SP: **NOT TESTED**. Native MP: **NOT TESTED**. Existing process,
+  console, profiler, Semantic Lab and replay observations are not promoted as
+  native proof.
+- Live PBrainZ provider success: **NOT TESTED**. The accepted Phase 5 result
+  remains deterministic/provider-failure parity only.
 
 ## ONE current Next Chunk — Phase 6 native SP/MP and performance acceptance
 
