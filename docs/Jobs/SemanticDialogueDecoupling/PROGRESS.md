@@ -1,29 +1,31 @@
 # Semantic Dialogue Decoupling — current evidence and Next Chunk
 
-**As of 2026-10-17:** Phases **0A** (baseline adoption) and **1** (typed
-candidates/contextual eligibility) are **ACCEPTED**. The committed
-identity/wellbeing regression fix remains preserved; the bounded flow kernel
-and translation-manifest architecture are still planned. Native Build 42
+**As of 2026-10-17:** Phases **0A** (baseline adoption), **1** (typed
+candidates/contextual eligibility), and **2** (bounded dialogue-flow kernel)
+are **ACCEPTED** for the Semantic Lab gate. Phase **3** (identity/wellbeing
+modular pilots) is the active next chunk. Native Build 42
 singleplayer/multiplayer acceptance remains **NOT TESTED**.
 
 ## Repository state and preserved work
 
 - The authorized Hoomans checkout is
   `/home/psychopatz/Zomboid/Workshop/ProjectHoomans`, on `main`, at local
-  revision `033a603ee9b68fa8c2438bd1cbf2af46ecf01c74`. `origin/main` remains
+  revision `69e223b48215fee094a8a47f5a7f16ecc640d8f0`. `origin/main` remains
   at the pre-phase revision `98e8875cf9ed49250247dac2ac3ad5b0c0b9e9d9`.
   The protected regression commit
   `105dadedd31c57be64a3622c4a1f6d2d6f402d35` is an ancestor and was not
   reimplemented.
 - The companion Core checkout is
   `/home/psychopatz/Zomboid/Workshop/psychopatzCore`, on `main`, at local
-  revision `56906aa75342f028583460c9de1b88d560c7b398`. It has substantial
+  revision `9e46a8e07e6dea60dd42ff982ae798d49376fa40`. It has substantial
   unrelated in-flight radio/UI/asset edits in its working tree; the semantic
   commit was path-limited and did not include or overwrite those staged
   changes.
-- Hoomans is clean at the phase-1 commit. Core remains dirty only from the
-  pre-existing unrelated work plus the isolated semantic commit; neither
-  checkout was reset, stashed, force-pushed, or published.
+- Hoomans is clean at the phase-2 commit. Core remains dirty only from the
+  pre-existing unrelated work plus the isolated semantic commits; the new
+  router hook is committed at `9e46a8e07e6dea60dd42ff982ae798d49376fa40`
+  while 174 unrelated cached paths remain untouched. Neither checkout was
+  reset, stashed, force-pushed, or published.
 
 ## Phase 0A production-worker trace
 
@@ -90,6 +92,39 @@ Core/Hoomans production worker, invalid mutating interpretations are rejected
 with inspectable reasons, legacy identity/wellbeing behavior remains green,
 and PREVIEW remains side-effect-free.
 
+## Phase 2 bounded dialogue-flow kernel
+
+Phase 2 is implemented in Hoomans `69e223b48215fee094a8a47f5a7f16ecc640d8f0`
+and Core `9e46a8e07e6dea60dd42ff982ae798d49376fa40`. The protected fix
+`105dadedd31c57be64a3622c4a1f6d2d6f402d35` remains an ancestor.
+
+- `PNC_SemanticDialogueFlowRegistry.lua` validates bounded stable flow IDs,
+  typed trigger/accept frames, transitions, slot schemas, duplicate frames,
+  conflicting slot owners, unreachable nodes and the finite registry limit.
+  Identity and wellbeing are separate registered definition modules loaded by
+  the catalog; the central policy does not gain one branch per flow.
+- `PNC_SemanticDialogueFlowKernel.lua` provides pure `Preview` and commit-only
+  `Commit` paths. It stores bounded active/suspended sessions in the existing
+  `PNC_SemanticDialogueContextState`, keyed by speaker/addressee, and supports
+  start, interruption, match, resume, cancellation and retirement. It emits
+  existing response-pool IDs and slot evidence; it never dispatches gameplay.
+- The Core router commits the policy's flow preview exactly once after the
+  semantic event is recorded. Invalid/fuzzy/ambiguous turns still use the
+  prior safe policy paths. Direct `Policy.Process` returns the committed flow
+  evidence as well.
+- Real-worker case
+  `tools/semantic_harness/scenarios/identity_wellbeing_flow_case.json`
+  observed transitions `start -> interrupt_start -> match -> match`, statuses
+  `started -> started -> advanced -> retired`, identity suspension/resumption,
+  and an empty flow-session snapshot after completion. A second NPC received a
+  distinct `player-one|npc-b` session. All turns remained deterministic with
+  no LLM calls or unintended transport/tool effects.
+
+The Phase 2 gate is satisfied for the Semantic Lab: the Lua flow smoke passed,
+the real worker proves preview purity and one-time commit/resume behavior, and
+the existing identity/wellbeing regression suite remains green. Native SP/MP
+remains open.
+
 ## Translation baseline
 
 The current custom Conversation catalogs were read directly from the packaged
@@ -151,27 +186,43 @@ Phase 1 verification:
   production Lua file in both repositories. No new Kahlua errors were found;
   the pre-existing test-file warning profile is not a production regression.
 
+Phase 2 verification:
+
+- `lua5.3 tests/pnc_semantic_dialogue_flow_smoke.lua` — **PASS**.
+- `python3 -m unittest tools.semantic_harness.tests.test_semantic_dialogue_flows -q` — **2/2 PASS**.
+- `python3 -m unittest discover -s tools/semantic_harness/tests -q` — **94/94 PASS** in 48.394s.
+- `tools/semantic_harness/run_harness.sh --test pnc_semantic` — **67/67 PASS** in 2.16s.
+- `python3 tests/run_tests.py pnc_semantic --harness-report /tmp/phase2-semantic-report.json` — **67/67 PASS** in 2.20s.
+- `python3 tests/run_tests.py` — **FAIL 12/835 executed in 8.06s**. The
+  12 failing UI/native headless tests are the unchanged Phase 1 baseline set;
+  the added flow smoke accounts for the increase from 834 to 835 tests.
+- `pz_verify --kahlua --severity ERROR` — **PASS** for each changed Hoomans
+  flow/context/policy Lua file and the Core shared router. No Kahlua errors
+  were found. `git diff --check` passed before the phase commits.
+- The graph coverage check at generation `2026-10-08T03:19:15Z` reported the
+  new flow files as not tracked or metadata-changed and the Core router as
+  missing from that project index; those paths were read and tested directly
+  from source. This is a graph freshness limitation, not a claim of indexed
+  completeness.
+
 The Hoomans graph index was ready with no parse-partial or skipped files at
 generation `2026-10-08T03:19:15Z`; changed/untracked evidence files were read
 from source because their graph metadata was stale or not tracked. The Core
 semantic paths were source-verified because the graph did not index them.
 
-## Phase 1 gate and next bounded chunk
+## Phase 2 gate and next bounded chunk
 
-Exit 1 is satisfied: the protected identity semantics and the new typed
-candidate rejection are exercised through real production Lua, candidate
-provenance and negative eligibility reasons are inspectable, focused and full
-semantic suites pass, and the existing full-suite failures are unchanged and
-unrelated. The native SP/MP gate remains explicitly open.
+Exit 2 is satisfied: registered identity and wellbeing modules now own typed
+flow transitions over bounded existing context, real production Lua proves
+interrupt/resume/isolation and preview idempotence, and the existing
+full-suite failures are unchanged and unrelated. The native SP/MP gate remains
+explicitly open.
 
-**Next Chunk: Phase 2 — minimal bounded dialogue-flow kernel.** Reuse the
-existing Core/Hoomans dialogue state; add stable flow registration, typed
-triggers, bounded nodes/transitions, and per-speaker/addressee suspend/resume
-or cancellation. Start with a pure registry/validator and a two-flow pilot
-(`identity` plus `wellbeing`) that only emits existing response/catalog IDs.
-Keep PREVIEW side-effect-free, commit accepted turns once, and do not create a
-second transcript or add central-policy `elseif` branches. Establish the
-production-worker acceptance trace before moving to Phase 3.
+**Next Chunk: Phase 3 — identity and wellbeing modular pilots.** Exercise the
+two registered flow modules against the existing response/catalog and
+authoritative identity boundary, add one flow-owned refusal/variant branch
+without a central policy branch, and record the real-worker transition,
+response-key and no-side-effect evidence before moving to Phase 4.
 
 Native SP/MP, hosted CI, and live PBrainZ provider acceptance remain
 **NOT TESTED**.
