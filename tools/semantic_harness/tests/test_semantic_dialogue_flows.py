@@ -83,3 +83,20 @@ class SemanticDialogueFlowTests(unittest.TestCase):
         self.assertEqual(before["context"], after["context"])
         self.assertEqual(before["transport"], after["transport"])
 
+    def test_wellbeing_refusal_is_a_flow_owned_safe_branch(self) -> None:
+        with LuaSemanticWorker(merge({}, DEFAULT_SCENARIO)) as worker:
+            worker.input("are you okay")
+            refusal = worker.input("no")
+
+        flow = refusal["result"]["decision"]["flow"]
+        self.assertEqual(flow["transition"], "cancel")
+        self.assertEqual(flow["status"], "retired")
+        self.assertEqual(
+            refusal["contextAfter"]["dialogue"]["flowSessions"],
+            [],
+        )
+        self.assertEqual(refusal["transport"], [])
+        self.assertEqual(refusal["toolCalls"], [])
+        self.assertEqual(
+            refusal["relationshipBefore"], refusal["relationshipAfter"]
+        )

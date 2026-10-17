@@ -115,6 +115,29 @@ T.equal(identity.flow.status, "retired",
 T.equal(#contextState:FlowSnapshot(), 0,
     "completed flow leaves no stale session")
 
+local refusalContextState = Context.New()
+local refusalRouter = Router.New({
+    policy = Policy,
+    state = Semantic.DialogueState.New(),
+    context = contextFor(refusalContextState, "npc-refusal"),
+})
+refusalRouter:Process(
+    "are you okay",
+    refusalRouter.context,
+    { timestamp = 7 }
+)
+local refusal = refusalRouter:Process(
+    "no",
+    refusalRouter.context,
+    { timestamp = 8 }
+)
+T.equal(refusal.flow.transition, "cancel",
+    "wellbeing refusal is owned by the wellbeing flow module")
+T.equal(refusal.flow.status, "retired",
+    "refused wellbeing flow retires without a central policy branch")
+T.equal(#refusalContextState:FlowSnapshot(), 0,
+    "refused wellbeing leaves no flow session")
+
 local sharedContext = Context.New({ maxFlows = 4 })
 local routerA = Router.New({
     policy = Policy,

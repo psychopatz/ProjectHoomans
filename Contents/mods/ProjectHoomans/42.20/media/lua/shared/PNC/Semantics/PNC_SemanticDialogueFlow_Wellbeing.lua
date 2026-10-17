@@ -26,6 +26,7 @@ return {
                 },
             },
             onMatch = "complete",
+            onRefuse = "cancel",
             onUnrelated = "suspend",
         },
         complete = { terminal = true },
