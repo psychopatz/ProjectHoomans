@@ -228,6 +228,92 @@ class ContextualSocialReactionTests(unittest.TestCase):
                     result["relationshipBefore"], result["relationshipAfter"]
                 )
 
+    def test_offer_uses_emotion_hunger_and_social_context(self) -> None:
+        cases = (
+            (
+                "friendly",
+                {"personality": {"socialStyle": "friendly"}},
+                "semantic.social.offer_friendly",
+                "UI_PNC_Conversation_Semantic_OfferFriendly",
+                "friendly",
+            ),
+            (
+                "trusted",
+                {
+                    "relationshipState": "Member",
+                    "personality": {"socialStyle": "neutral"},
+                },
+                "semantic.social.offer_trusted",
+                "UI_PNC_Conversation_Semantic_OfferTrusted",
+                "neutral",
+            ),
+            (
+                "withdrawn",
+                {"personality": {"socialStyle": "withdrawn"}},
+                "semantic.social.offer_withdrawn",
+                "UI_PNC_Conversation_Semantic_OfferWithdrawn",
+                "withdrawn",
+            ),
+            (
+                "hungry_preserves_existing_pool",
+                {
+                    "needs": {"hunger": 0.9},
+                    "personality": {"socialStyle": "neutral"},
+                },
+                {
+                    "semantic.offer.hungry",
+                    "semantic.offer.dataset.hungry_share",
+                    "semantic.offer.dataset.hungry_appreciate",
+                },
+                None,
+                "neutral",
+            ),
+            (
+                "stress_precedes_hunger",
+                {
+                    "needs": {"hunger": 0.9},
+                    "conditionStats": {"stress": 95},
+                    "personality": {"socialStyle": "friendly"},
+                },
+                "semantic.social.offer_stressed",
+                "UI_PNC_Conversation_Semantic_OfferStressed",
+                "friendly",
+            ),
+        )
+        for label, npc, expected_template, translation_key, social_style in cases:
+            with self.subTest(case=label):
+                with LuaSemanticWorker(self.scenario(npc)) as worker:
+                    result = worker.input("want some food")
+                self.assertTrue(result["accepted"], result.get("reason"))
+                self.assertEqual(result["result"]["ir"]["intent"], "OFFER")
+                self.assertEqual(result["result"]["ir"]["speechAct"], "OFFER")
+                self.assertEqual(
+                    result["result"]["decision"]["branch"], "OFFER_RECEIVED"
+                )
+                self.assertEqual(
+                    result["result"]["decision"]["route"], "deterministic"
+                )
+                actual_template = result["result"]["decision"]["response"]["templateID"]
+                if isinstance(expected_template, set):
+                    self.assertIn(actual_template, expected_template)
+                else:
+                    self.assertEqual(actual_template, expected_template)
+                if translation_key is not None:
+                    self.assertEqual(
+                        result["messages"][0]["payload"]["translationKey"],
+                        translation_key,
+                    )
+                self.assertEqual(
+                    result["routedSituation"]["social"]["style"], social_style
+                )
+                self.assertEqual(result["llmCalls"], 0)
+                self.assertEqual(result["transport"], [])
+                self.assertEqual(result["toolCalls"], [])
+                self.assertIsNone(result["result"].get("actionResult"))
+                self.assertEqual(
+                    result["relationshipBefore"], result["relationshipAfter"]
+                )
+
     def test_apology_preview_is_idempotent_without_relationship_effect(self) -> None:
         scenario = self.scenario({
             "traits": {"friendly": True},

@@ -80,6 +80,18 @@ Catalog.Register("semantic.greeting", {
 Catalog.Register("semantic.offer", {
     variants = {
         {
+            id = "semantic.offer.stressed",
+            templateID = "semantic.social.offer_stressed",
+            fallback = "I appreciate it, but I need a moment before I can think about food.",
+            when = {
+                emotionType = { "stress", "panic" },
+                emotionUrgency = {
+                    "moderate", "severe", "critical", "emergency",
+                },
+            },
+            priority = 4,
+        },
+        {
             id = "semantic.offer.hungry",
             templateID = "semantic.offer.interested",
             fallback = "I'd really like one. Could I have it?",
@@ -90,6 +102,31 @@ Catalog.Register("semantic.offer", {
             priority = 2,
         },
         {
+            id = "semantic.offer.friendly",
+            templateID = "semantic.social.offer_friendly",
+            fallback = "That's kind of you. I'll keep it in mind.",
+            when = { socialStyle = { "friendly", "protective" } },
+            priority = 1,
+        },
+        {
+            id = "semantic.offer.trusted",
+            templateID = "semantic.social.offer_trusted",
+            fallback = "Thanks. I know I can count on you.",
+            when = {
+                relationshipState = {
+                    "Friend", "Trusted", "Ally", "Member", "Lover",
+                },
+            },
+            priority = 1,
+        },
+        {
+            id = "semantic.offer.withdrawn",
+            templateID = "semantic.social.offer_withdrawn",
+            fallback = "No, thanks. I'd rather handle it myself.",
+            when = { socialStyle = "withdrawn" },
+            priority = 1,
+        },
+        {
             id = "semantic.offer.default",
             templateID = "semantic.offer.declined",
             fallback = "No thanks, I'm not hungry.",
@@ -98,4 +135,3 @@ Catalog.Register("semantic.offer", {
 })
 
 return true
-
