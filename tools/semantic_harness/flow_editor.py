@@ -109,11 +109,43 @@ def flow_graph_model(flow: dict[str, Any]) -> dict[str, Any]:
         "flowID": flow.get("id"),
         "owner": flow.get("owner"),
         "version": flow.get("version"),
+        "workflowKind": flow.get("workflowKind"),
+        "capabilityID": flow.get("capabilityID"),
+        "generated": flow.get("workflowKind") is not None,
         "initial": flow.get("initial"),
         "triggers": copy.deepcopy(flow.get("triggers", [])),
         "nodes": node_rows,
         "edges": edges,
     }
+
+
+def coverage_summary(coverage: list[dict[str, Any]]) -> dict[str, int]:
+    """Count live capability classifications shown by Semantic Lab."""
+
+    summary: dict[str, int] = {}
+    for row in coverage:
+        if not isinstance(row, dict):
+            continue
+        classification = str(row.get("classification") or "unknown")
+        summary[classification] = summary.get(classification, 0) + 1
+    return summary
+
+
+def coverage_lines(coverage: list[dict[str, Any]]) -> list[str]:
+    """Render exact bounded coverage reasons for the visual coverage view."""
+
+    lines: list[str] = []
+    for row in sorted(
+        (item for item in coverage if isinstance(item, dict)),
+        key=lambda item: str(item.get("id") or ""),
+    ):
+        capability = str(row.get("id") or "<unknown>")
+        classification = str(row.get("classification") or "unknown")
+        reason = str(row.get("reason") or "unspecified")
+        flow_id = row.get("flowID")
+        suffix = f" -> {flow_id}" if flow_id else ""
+        lines.append(f"{capability}: {classification} ({reason}){suffix}")
+    return lines
 
 
 def _json_text(value: Any) -> str:
@@ -156,6 +188,7 @@ class FlowEditorPane:
         self._command_catalog: list[str] = []
         self._action_catalog: list[dict[str, Any]] = []
         self._trigger_catalog: list[dict[str, Any]] = []
+        self._coverage: list[dict[str, Any]] = []
         self._history: list[dict[str, Any]] = []
         self._history_index = -1
         self._zoom = 1.0
@@ -188,36 +221,40 @@ class FlowEditorPane:
             primary_toolbar, text="Refresh registry", command=self._on_refresh
         )
         self.refresh_button.grid(row=0, column=0)
+        self.coverage_button = ttk.Button(
+            primary_toolbar, text="Coverage", command=self.show_coverage
+        )
+        self.coverage_button.grid(row=0, column=1, padx=(6, 0))
         self.validate_button = ttk.Button(
             primary_toolbar, text="Validate draft", command=self.validate_draft
         )
-        self.validate_button.grid(row=0, column=1, padx=(6, 0))
+        self.validate_button.grid(row=0, column=2, padx=(6, 0))
         self.register_button = ttk.Button(
             primary_toolbar, text="Register draft", command=self.register_draft
         )
-        self.register_button.grid(row=0, column=2, padx=(6, 0))
+        self.register_button.grid(row=0, column=3, padx=(6, 0))
         self.add_button = ttk.Button(
             primary_toolbar, text="Add node", command=self.add_node
         )
-        self.add_button.grid(row=0, column=3, padx=(10, 0))
+        self.add_button.grid(row=0, column=4, padx=(10, 0))
         self.duplicate_button = ttk.Button(
             primary_toolbar, text="Duplicate", command=self.duplicate_node
         )
-        self.duplicate_button.grid(row=0, column=4, padx=(4, 0))
+        self.duplicate_button.grid(row=0, column=5, padx=(4, 0))
         self.delete_button = ttk.Button(
             primary_toolbar, text="Delete", command=self.delete_node
         )
-        self.delete_button.grid(row=0, column=5, padx=(4, 0))
+        self.delete_button.grid(row=0, column=6, padx=(4, 0))
         self.undo_button = ttk.Button(primary_toolbar, text="Undo", command=self.undo)
-        self.undo_button.grid(row=0, column=6, padx=(10, 0))
+        self.undo_button.grid(row=0, column=7, padx=(10, 0))
         self.redo_button = ttk.Button(primary_toolbar, text="Redo", command=self.redo)
-        self.redo_button.grid(row=0, column=7, padx=(4, 0))
+        self.redo_button.grid(row=0, column=8, padx=(4, 0))
         self.fit_button = ttk.Button(primary_toolbar, text="Fit", command=self.fit_graph)
-        self.fit_button.grid(row=0, column=8, padx=(10, 0))
+        self.fit_button.grid(row=0, column=9, padx=(10, 0))
         self.zoom_button = ttk.Button(
             primary_toolbar, text="100%", command=self.reset_zoom
         )
-        self.zoom_button.grid(row=0, column=9, padx=(4, 0))
+        self.zoom_button.grid(row=0, column=10, padx=(4, 0))
 
         secondary_toolbar = ttk.Frame(toolbar)
         secondary_toolbar.grid(row=1, column=0, sticky="ew", pady=(4, 0))
@@ -262,6 +299,7 @@ class FlowEditorPane:
         )
         self._action_buttons = (
             self.refresh_button,
+            self.coverage_button,
             self.validate_button,
             self.register_button,
             self.add_button,
@@ -504,6 +542,14 @@ class FlowEditorPane:
                 self.fact_box.configure(
                     values=[fact["id"] for fact in self._fact_catalog]
                 )
+            generation = catalog.get("generation", {})
+            raw_coverage = generation.get("coverage")
+            if not isinstance(raw_coverage, list):
+                raw_coverage = catalog.get("capabilityCoverage", [])
+            self._coverage = [
+                copy.deepcopy(row) for row in raw_coverage
+                if isinstance(row, dict)
+            ]
         self._catalog = {
             str(flow.get("id")): flow_draft(flow)
             for flow in flows
@@ -524,7 +570,30 @@ class FlowEditorPane:
             self.flow_list.activate(selected_index)
             self.flow_list.see(selected_index)
         self._select_flow()
-        self.set_status(f"{len(flow_ids)} production flows loaded")
+        summary = coverage_summary(self._coverage)
+        if summary:
+            self.set_status(
+                f"{len(flow_ids)} production flows loaded · "
+                f"coverage generated={summary.get('generated', 0)}"
+                f"/{len(self._coverage)}"
+            )
+        else:
+            self.set_status(f"{len(flow_ids)} production flows loaded")
+
+    def show_coverage(self) -> None:
+        if not self._coverage:
+            self.set_status("No live capability coverage is loaded; refresh registry")
+            return
+        summary = coverage_summary(self._coverage)
+        heading = ", ".join(
+            f"{key}={summary[key]}" for key in sorted(summary)
+        )
+        self._messagebox.showinfo(
+            "Semantic capability coverage",
+            "Live production capability coverage: " + heading
+            + "\n\n" + "\n".join(coverage_lines(self._coverage)),
+        )
+        self.set_status("Displayed live capability coverage and exact reasons")
 
     def _on_flow_list_select(self, _event: Any) -> None:
         selection = self.flow_list.curselection()
@@ -1045,8 +1114,15 @@ class FlowEditorPane:
 
     def register_draft(self) -> None:
         draft = self._commit_fields()
-        if draft is not None:
-            self._on_register(flow_draft(draft))
+        if draft is None:
+            return
+        if draft.get("workflowKind") and draft.get("id") in self._catalog:
+            self.set_status(
+                "Generated flow is regeneration-owned; rename or duplicate "
+                "the draft before authored registration"
+            )
+            return
+        self._on_register(flow_draft(draft))
 
     def compile_source(self) -> None:
         filename = self._filedialog.askopenfilename(

@@ -5,7 +5,12 @@ from __future__ import annotations
 from copy import deepcopy
 import unittest
 
-from tools.semantic_harness.flow_editor import flow_graph_model, graph_render_mode
+from tools.semantic_harness.flow_editor import (
+    coverage_lines,
+    coverage_summary,
+    flow_graph_model,
+    graph_render_mode,
+)
 from tools.semantic_harness.scenario import DEFAULT_SCENARIO
 from tools.semantic_harness.worker import LuaSemanticWorker
 
@@ -24,6 +29,7 @@ class FlowEditorTests(unittest.TestCase):
         graph = flow_graph_model(greeting)
         self.assertEqual(graph["flowID"], "greeting")
         self.assertEqual(graph["initial"], "await_thanks")
+        self.assertFalse(graph["generated"])
         self.assertEqual(
             {node["id"] for node in graph["nodes"]},
             {"await_thanks", "complete"},
@@ -49,6 +55,9 @@ class FlowEditorTests(unittest.TestCase):
             if flow["id"] == "pnc.generated.simple_command.pnc.companion.follow"
         )
         graph = flow_graph_model(follow)
+        self.assertTrue(graph["generated"])
+        self.assertEqual(graph["workflowKind"], "simple_command")
+        self.assertEqual(graph["capabilityID"], "pnc:companion.follow")
         request = next(node for node in graph["nodes"] if node["id"] == "request")
         self.assertEqual(request["action"]["capabilityID"], "pnc:companion.follow")
         self.assertEqual(request["action"]["dispatchCount"], 1)
@@ -72,6 +81,27 @@ class FlowEditorTests(unittest.TestCase):
                 ("result:rejected", "rejected"),
                 ("result:failed", "failed"),
             },
+        )
+
+    def test_semantic_lab_coverage_view_keeps_exact_live_reasons(self) -> None:
+        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+            catalog = worker.flow_catalog()
+
+        coverage = catalog["generation"]["coverage"]
+        summary = coverage_summary(coverage)
+        lines = coverage_lines(coverage)
+        self.assertEqual(sum(summary.values()), 15)
+        self.assertEqual(summary["generated"], 5)
+        self.assertEqual(summary["unsupported_workflow"], 6)
+        self.assertTrue(
+            any(line.startswith("GIFT: generated") for line in lines)
+        )
+        self.assertTrue(
+            any(
+                line.startswith("CAMP: unsupported_workflow")
+                and "task_adapter_requires_parameterized_task_template" in line
+                for line in lines
+            )
         )
 
     def test_catalog_exposes_engine_facts_and_commands(self) -> None:
