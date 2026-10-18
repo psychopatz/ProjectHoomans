@@ -1,10 +1,29 @@
 # Contextual Dialogue & Quest Framework — current progress
 
 **Updated:** 2026-10-18
-**Audited branch/ref:** `docs/contextual-dialogue-quest-framework-20261018` @ `382e93a342f1d6ee13fc2007a7fbbdf66a7afa7c` (remote)
+**Audited branch/ref:** `codex/contextual-dialogue-quest-framework-0a` @ `02ed6246e9c7c81f8a45dcae2dbdfd86f0c056ff` (source commit)
 **PR:** #4 → main, OPEN (not merged); **main baseline:** `a3eb2e4db553f9c03b7f66a6ff6717878e1668e0`
-**Status:** PHASE 2 — Action binding / real end-to-end workbench usefulness **PLANNED / NOT ACCEPTED**. Existing source advances are partially implemented; this document update changes plan only.
-**ONE Next Chunk:** **2A — FOLLOW typed capability trace, approved dispatcher and honest result in existing Semantic Lab.**
+**Status:** PHASE 2 — Action binding / real end-to-end workbench usefulness. **2A ACCEPTED** for the bounded FOLLOW slice; 2B is next. The native PZ runtime remains unrun by instruction.
+**ONE Next Chunk:** **2B — STAY vs WAIT_AT typed capability trace and truthful result in the existing Semantic Lab.**
+
+## 2A acceptance ledger — FOLLOW
+
+- **Implementation commit:** `02ed6246e9c7c81f8a45dcae2dbdfd86f0c056ff` (`Wire semantic FOLLOW capability through existing command dispatcher`).
+- **Discoverable binding:** live `PNC.Semantics.CapabilityCatalog` reports `FOLLOW` as recognized/dispatchable with `pnc:companion.follow`, owner `PNC.CompanionCommands`, route `existing_companion_command`, command `follow`, handler `PNC.Client.SendCompanionCommand`, and typed `arguments/requires/result` metadata. The adapter uses the existing command registry and dispatcher; no second parser or callable field was added.
+- **Committed positive trace:** `Follow me` → Core IR `REQUEST/FOLLOW`, provenance `pnc.command.follow` → policy branch `COMMAND_ACCEPTED` → existing adapter → one mocked-authority `CompanionCommand` transport with `commandID=follow`, `requestID=1`, `npcID=npc_mara`, accepted `network_queued` → one normalized tool call (`authority=mock`) → rendered NPC reply `Okay.`. The observation exposes capability binding, request, action result, flow `matched=false/noFlow=true`, and side-effect facts.
+- **Preview purity:** two previews of `Follow me` produced the same recognized action/binding and zero transport/tool calls/side effects; Preview remains non-dispatching.
+- **Negative safety:** `Don't follow me` produced the existing `STOP` → `stay` route and no `follow`; `Are you following me?`, `maybe follow me`, and `I followed you yesterday` remained clarification/no-dispatch cases. No new command path was introduced.
+- **Unauthorized result:** mocked `unauthorized_companion` returns rejected action status/reason, one observable `follow` transport/tool call, and truthful localized reply `I can't follow you right now.` / TL `Hindi kita masusundan ngayon.`; the stale `Okay.` acknowledgement is not emitted. EN/TL keys are in the canonical Conversation translation catalog.
+- **Workbench surface:** Flow Editor action discovery now shows binding ID/command when present and explicitly labels recognition-only actions; adding a trigger remains trigger-only and reports that Preview never dispatches. A native Tk click-through was not recorded because no native app surface was exposed to the CUA session; headless GUI construction tests remain covered.
+
+## 2A verification
+
+- `tools/semantic_harness/run_harness.sh --doctor --doctor-json` — PASS (Lua worker syntax/boot, repository and display diagnostics).
+- `tools/semantic_harness/.venv/bin/python -m unittest tools.semantic_harness.tests.test_follow_action_binding -v` — PASS, 4/4 (real Lua worker, positive/preview/negative/unauthorized EN+TL).
+- Focused Python flow/context suite — PASS, 25/25; `test_contextual_baseline_matrix` — PASS in isolation.
+- Focused Lua regression suite (`pnc_semantic_command_adapter_smoke`, dialogue/input/flow/response/identity/local-question cases) — PASS, 7/7.
+- `pz_verify.py --file --kahlua --severity ERROR --no-snippets` on all four changed production Lua files — PASS; `luac5.3 -p`, Python `py_compile`, JSON validation, and `git diff --check` — PASS.
+- Full Python discovery still exits nonzero in the existing suite-wide contextual-baseline ordering; the isolated baseline file passes, and the changed FOLLOW acceptance test is green. `pnc_semantic_local_route_smoke` still expects one greeting response while the existing authored greeting plan queues two; this was not changed because it is outside 2A.
 
 ## Accepted / supported foundation
 
