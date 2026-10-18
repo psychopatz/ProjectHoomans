@@ -101,9 +101,9 @@ T.truthy(Fixtures.EqualValue(sourceSnapshot, sourceBefore),
 T.truthy(Fixtures.EqualValue(planOptions, optionsBefore),
     "planner mutated its options")
 
--- A source item carrying the known legacy-template metadata loss is never
--- eligible for seed/delta-only import, even when the surrounding record is
--- otherwise complete.
+-- The versioned metadata codec now carries legacy-template identity exactly;
+-- the planner accepts it only after the source item remains unchanged and the
+-- copied metadata decision is present.
 local legacyRecord = Fixtures.PrepareSourceRecord("npc:p0b:legacy", true)
 T.truthy(PNC.Inventory.ApplyDelta(legacyRecord, {
     {
@@ -124,20 +124,20 @@ legacySnapshot.schemaVersion = legacyPayload.schemaVersion
 local legacyPlan = ImportPlan.Build(legacyPayload, {
     sourceSnapshot = legacySnapshot,
     generatorProvenance = { definitionRevision = legacyRecord.uniqueDefinitionVersion },
+    candidateCodec = Fixtures.CandidateCodec(),
 })
-T.equal(legacyPlan.status, "quarantined",
-    "unrepresentable legacy item was accepted")
-T.equal(legacyPlan.reason, "portable_metadata_unrepresentable",
-    "legacy item quarantine reason")
+T.equal(legacyPlan.status, "ready", "legacy item was not restored")
 T.truthy(Fixtures.HasDecision(
-    legacyPlan, "inventory.legacyTemplateKey", "quarantined",
-    "portable_metadata_unrepresentable"
+    legacyPlan, "inventory.legacyTemplateKey", "copied"
 ), "legacy template decision missing")
+T.equal(
+    legacyPlan.candidate.inventory.items["loot:p0b:legacy"].legacyTemplateKey,
+    "legacy:p0b:item", "legacy template candidate changed")
 T.truthy(Fixtures.EqualValue(legacyPlan.rawPayload, legacyPayload),
-    "legacy quarantine changed the source copy")
+    "legacy plan changed the source copy")
 T.truthy(legacyPlan.rollback and legacyPlan.rollback.sourcePreserved,
     "legacy rollback source-preservation record missing")
-T.equal(legacyPlan.rollback.strategy, "NO_WRITE_QUARANTINE",
+T.equal(legacyPlan.rollback.strategy, "DISABLE_CANDIDATE_MAPPING",
     "legacy rollback strategy changed")
 
 -- Unsupported schemas fail closed before any candidate is built.

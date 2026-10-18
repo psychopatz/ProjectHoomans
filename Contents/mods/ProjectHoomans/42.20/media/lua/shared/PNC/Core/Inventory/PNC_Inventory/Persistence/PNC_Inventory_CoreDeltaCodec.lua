@@ -9,6 +9,7 @@ local C = require "PsychopatzCore/Inventory/PsychopatzInventoryConstants"
 
 local Delta = {}
 local DELTA_SCHEMA = 1
+local METADATA_SCHEMA = 2
 
 local function equal(left, right)
     if left == right then return true end
@@ -29,7 +30,12 @@ local function encodeItem(item)
         StateCodec.pseudoItem(item), item.stack
     )
     if not record then return nil, reason end
-    return { item.templateKey or false, record, StateCodec.metadata(item) }
+    return {
+        item.templateKey or false,
+        record,
+        StateCodec.metadata(item),
+        METADATA_SCHEMA,
+    }
 end
 
 local function equivalent(left, right)
@@ -41,7 +47,7 @@ local function equivalent(left, right)
     then return false end
     local leftMeta, rightMeta = encodedLeft[3], encodedRight[3]
     if (leftMeta[3] == nil) ~= (rightMeta[3] == nil) then return false end
-    for index = 5, 16 do
+    for index = 5, 17 do
         if not equal(leftMeta[index], rightMeta[index]) then return false end
     end
     return true
@@ -116,14 +122,22 @@ local function prepareUpsert(upsert)
     end
     local coreRecord = upsert[2]
     local meta = upsert[3]
+    local metadataSchema = upsert[4]
     if type(coreRecord) ~= "table" or type(meta) ~= "table" then
         return false, "delta_upsert_invalid"
     end
+    local validMetadata, metadataReason = StateCodec.validateMetadataSchema(
+        metadataSchema
+    )
+    if not validMetadata then return false, metadataReason end
     local fullType = CoreInventory.getItemFullType(coreRecord[C.TYPE_ID])
     if not fullType then return false, "unknown_type_id" end
     local spec, reason = StateCodec.readValidatedState(coreRecord)
     if not spec then return nil, reason or "delta_upsert_invalid" end
-    StateCodec.applyMetadata(spec, meta, fullType)
+    local applied, applyReason = StateCodec.applyMetadata(
+        spec, meta, fullType, metadataSchema
+    )
+    if not applied then return nil, applyReason end
     spec.stack = coreRecord[C.QUANTITY]
     return {
         templateKey = templateKey ~= false and templateKey or nil,

@@ -6,6 +6,7 @@ local Utils = require
 local Fields = {}
 local APPEARANCE_SCHEMA = 2
 local INVENTORY_SCHEMA = 2
+local INVENTORY_METADATA_SCHEMA = 2
 
 local function add(decisions, ...)
     return Utils.AddDecision(decisions, ...)
@@ -102,6 +103,7 @@ function Fields.Inventory(source, decisions)
     end
     local output = {
         sourceSchema = INVENTORY_SCHEMA,
+        metadataSchema = INVENTORY_METADATA_SCHEMA,
         persistenceMode = value.persistenceMode,
         revision = value.revision,
         maxWeight = value.maxWeight,
@@ -129,12 +131,19 @@ function Fields.Inventory(source, decisions)
             add(decisions, "inventory.items", "quarantined",
                 "inventory.items." .. tostring(itemID),
                 "item_id_key_mismatch")
-        elseif item.legacyTemplateKey ~= nil then
+        elseif item.legacyTemplateKey ~= nil
+            and (type(item.legacyTemplateKey) ~= "string"
+                or item.legacyTemplateKey == "")
+        then
             blocked = true
             add(decisions, "inventory.legacyTemplateKey", "quarantined",
                 "inventory.items." .. tostring(item.id)
                     .. ".legacyTemplateKey",
-                "portable_metadata_unrepresentable")
+                "portable_metadata_invalid")
+        elseif item.legacyTemplateKey ~= nil then
+            add(decisions, "inventory.legacyTemplateKey", "copied",
+                "inventory.items." .. tostring(item.id)
+                    .. ".legacyTemplateKey", nil)
         end
         output.items[itemID] = Utils.Copy(item)
     end

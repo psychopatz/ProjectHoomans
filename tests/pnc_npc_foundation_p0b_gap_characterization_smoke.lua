@@ -89,14 +89,54 @@ T.equal(beforeItem.legacyTemplateKey, "legacy:p0b:item",
 T.equal(beforeItem.itemState.modData.source, "p0b", "source modData")
 local inventoryPayload = PNC.Inventory.Serialize(inventoryRecord)
 T.truthy(inventoryPayload, "inventory payload")
+T.equal(inventoryPayload[2], "BASELINE_DELTA",
+    "item-state fixture unexpectedly changed persistence mode")
+local legacyDelta
+for i = 1, #(inventoryPayload[5] and inventoryPayload[5][3] or {}) do
+    local candidate = inventoryPayload[5][3][i]
+    if candidate[3] and candidate[3][1] == "loot:p0b:01" then
+        legacyDelta = candidate
+        break
+    end
+end
+T.truthy(legacyDelta, "legacy item delta missing")
+T.equal(legacyDelta[4], 2, "delta metadata schema was not versioned")
 local restoredInventoryRecord = newRecord("npc:p0b:item-state")
 T.truthy(PNC.Inventory.Deserialize(restoredInventoryRecord, inventoryPayload),
     "inventory payload rehydration")
 local afterItem = restoredInventoryRecord.inventory.items["loot:p0b:01"]
 T.truthy(afterItem, "portable item missing after rehydration")
 T.equal(afterItem.customName, "Ledger", "custom name changed")
-T.equal(afterItem.legacyTemplateKey, nil,
-    "legacy template key unexpectedly survived current codec")
+T.equal(afterItem.legacyTemplateKey, "legacy:p0b:item",
+    "legacy template key changed")
 T.equal(afterItem.itemState.modData.source, "p0b", "modData changed")
+
+-- The FULL bridge uses the same versioned metadata contract, so the exact
+-- item state is not dependent on delta mode.
+local fullRecord = newRecord("npc:p0b:item-state-full")
+T.truthy(PNC.Inventory.CreateFromTemplate(fullRecord),
+    "full inventory template creation")
+T.truthy(PNC.Inventory.ApplyDelta(fullRecord, {
+    {
+        op = "add",
+        item = {
+            id = "loot:p0b:full",
+            type = "Base.CustomLoot",
+            stack = 1,
+            container = "root",
+            legacyTemplateKey = "legacy:p0b:full",
+            itemState = { modData = { source = "full" } },
+        },
+    },
+}, "p0b_item_state_full"), "full item-state mutation")
+fullRecord.inventoryPersistenceMode = "FULL"
+local fullPayload = PNC.Inventory.Serialize(fullRecord)
+T.equal(fullPayload[2], "FULL", "full inventory mode changed")
+T.equal(fullPayload[3][5], 2, "full metadata schema was not versioned")
+local restoredFullRecord = newRecord("npc:p0b:item-state-full")
+T.truthy(PNC.Inventory.Deserialize(restoredFullRecord, fullPayload),
+    "full inventory payload rehydration")
+T.equal(restoredFullRecord.inventory.items["loot:p0b:full"].legacyTemplateKey,
+    "legacy:p0b:full", "full legacy template key changed")
 
 T.finish("pnc_npc_foundation_p0b_gap_characterization_smoke")

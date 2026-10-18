@@ -57,6 +57,7 @@ function Bridge.serialize(record)
             inv.template and Util.copy(inv.template) or nil,
             tonumber(inv.rootMaxWeight),
         },
+        StateCodec.metadataSchema(),
     }
 end
 
@@ -73,6 +74,10 @@ function Bridge.deserialize(record, payload)
     )
     if not ok then return nil, "npc_inventory_core_deserialize_failed" end
     if not store then return nil, reason end
+    local metadataSchema, metadataReason = StateCodec.validateMetadataSchema(
+        payload[5]
+    )
+    if not metadataSchema then return nil, metadataReason end
     local inv = Internal.createBaseInventory(record)
     inv.revision = store.revision
     inv.maxWeight = store.maxWeight or inv.maxWeight
@@ -91,7 +96,10 @@ function Bridge.deserialize(record, payload)
             local meta = bucket[j]
             local spec, stateReason = StateCodec.readValidatedState(coreRecord)
             if not spec then return nil, stateReason end
-            StateCodec.applyMetadata(spec, meta, fullType)
+            local applied, applyReason = StateCodec.applyMetadata(
+                spec, meta, fullType, payload[5]
+            )
+            if not applied then return nil, applyReason end
             assigned = assigned + math.max(1, math.floor(tonumber(spec.stack) or 1))
             if not Internal.createItem(record, inv, spec) then return nil, "npc_item_create_failed" end
         end
