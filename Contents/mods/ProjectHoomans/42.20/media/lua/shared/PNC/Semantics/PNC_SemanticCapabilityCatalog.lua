@@ -63,6 +63,7 @@ end
 local function transportFor(source)
     if source == "command_adapter" then return "companion_command" end
     if source == "task_adapter" then return "semantic_task" end
+    if source == "gift_lifecycle" then return "inventory_transfer" end
     return nil
 end
 
@@ -161,6 +162,11 @@ function Catalog.ListActions()
         for action, definition in pairs(taskAdapter.Actions) do
             addAction(rows, byID, action, "task_adapter", definition)
         end
+    end
+
+    local giftCapability = semantics.GiftCapability
+    if type(giftCapability) == "table" then
+        addAction(rows, byID, "GIFT", "gift_lifecycle", giftCapability)
     end
 
     local constraints = semantics.ContextConstraints

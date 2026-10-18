@@ -353,7 +353,8 @@ function OutputProjection.normalizedToolCalls(context, trace, transport, result,
 
     if type(actionResult) == "table" then
         add("action_dispatch", actionResult.commandID or actionResult.action
-            or actionResult.taskID, {
+            or actionResult.taskID
+            or result and result.ir and result.ir.action, {
                 arguments = actionResult.request,
                 commandID = actionResult.commandID,
                 capabilityID = actionResult.capabilityID,

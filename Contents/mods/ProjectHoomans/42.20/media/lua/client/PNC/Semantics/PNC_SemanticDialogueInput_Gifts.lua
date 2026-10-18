@@ -18,6 +18,36 @@ local actionContext = Internal.ActionContext
 local giftResponse = Internal.GiftResponse
 local openGiftSelector = Internal.OpenGiftSelector
 
+-- Public metadata for the existing multi-stage gift route. The lifecycle,
+-- inventory selector, and authoritative transfer remain the owners; this is
+-- discovery/trace data, not a second gift dispatcher.
+local GiftCapability = {
+    capabilityID = "pnc:gift.offer",
+    owner = "PNC.Semantics.GiftLifecycle",
+    route = "existing_inventory_transfer",
+    handlerID = "PNC.Client.SendInventoryTransfer",
+    arguments = {
+        npcID = "recipient_target",
+        itemIDs = "resolved_inventory_selection",
+        quantity = "bounded",
+        inventoryRevision = "target_revision",
+        conversationToken = "authority_lease",
+    },
+    requires = {
+        "conversation_or_gift_authority",
+        "resolved_inventory_selection",
+        "target_inventory_revision",
+    },
+    result = {
+        "requested",
+        "pending",
+        "rejected",
+        "applied",
+        "completed",
+    },
+}
+PNC.Semantics.GiftCapability = GiftCapability
+
 local function targetInventoryRevision(npcID)
     local state = PNC.Network and PNC.Network.ClientState or nil
     local payload = state and state.characterPayloads
@@ -127,22 +157,23 @@ local function sendGiftTransfer(
     session, context, selection, requestID, medicalSupplyRequest
 )
     local client = PNC.Client
+    local transferRequest = {
+        id = context.npcID,
+        direction = "player_to_npc",
+        itemIDs = selection.itemIDs,
+        quantity = selection.quantity,
+        inventoryRevision = targetInventoryRevision(context.npcID),
+        npcContainer = "root",
+        gift = true,
+        conversationToken = context.conversationToken,
+        requestId = requestID,
+        medicalSupplyTaskID = medicalSupplyRequest
+            and medicalSupplyRequest.taskID or nil,
+        medicalSupplyRequestID = medicalSupplyRequest
+            and medicalSupplyRequest.requestID or nil,
+    }
     local sent = client and type(client.SendInventoryTransfer) == "function"
-        and client.SendInventoryTransfer({
-            id = context.npcID,
-            direction = "player_to_npc",
-            itemIDs = selection.itemIDs,
-            quantity = selection.quantity,
-            inventoryRevision = targetInventoryRevision(context.npcID),
-            npcContainer = "root",
-            gift = true,
-            conversationToken = context.conversationToken,
-            requestId = requestID,
-            medicalSupplyTaskID = medicalSupplyRequest
-                and medicalSupplyRequest.taskID or nil,
-            medicalSupplyRequestID = medicalSupplyRequest
-                and medicalSupplyRequest.requestID or nil,
-        }) == true
+        and client.SendInventoryTransfer(transferRequest) == true
     if not sent then
         if session and GiftLifecycle and GiftLifecycle.Clear then
             GiftLifecycle.Clear(session, requestID)
@@ -172,6 +203,11 @@ local function sendGiftTransfer(
         accepted = true,
         pending = true,
         requestID = requestID,
+        action = "GIFT",
+        binding = GiftCapability,
+        capabilityID = GiftCapability.capabilityID,
+        handlerID = GiftCapability.handlerID,
+        request = transferRequest,
         selection = selection,
     }
 end
