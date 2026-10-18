@@ -812,6 +812,12 @@ class FlowEditorPane:
                 lambda item: (
                     f"{item['id']}  ·  "
                     f"{', '.join(item.get('transports', [])) or 'policy only'}"
+                    + (
+                        f"  ·  {item['binding'].get('id')}"
+                        f" → {item['binding'].get('commandID')}"
+                        if isinstance(item.get('binding'), dict)
+                        else "  ·  recognition only"
+                    )
                 ),
             )
             if selected_action is None:
@@ -844,7 +850,17 @@ class FlowEditorPane:
         self._commit_history_change(before)
         self._populate_flow_fields()
         self._draw_graph()
-        self.set_status(f"Action trigger {action} added; validate before registering")
+        binding = selected_action.get("binding") if selected_action else None
+        if isinstance(binding, dict):
+            self.set_status(
+                f"Trigger {action} added; binding {binding.get('id')} → "
+                f"{binding.get('handlerID')} ({binding.get('commandID')}); "
+                "trigger only—Preview never dispatches"
+            )
+        else:
+            self.set_status(
+                f"Trigger {action} added; recognition only—no executable binding"
+            )
 
     def _parse_array(self, widget: Any, label: str) -> list[Any]:
         try:

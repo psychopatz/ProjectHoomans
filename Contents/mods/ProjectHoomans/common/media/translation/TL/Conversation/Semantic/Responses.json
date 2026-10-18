@@ -83,6 +83,8 @@
   "UI_PNC_Conversation_Semantic_FlowGreetingOpeningQuestion": "Kumusta ka?",
   "UI_PNC_Conversation_Semantic_FlowGreetingFollowupFriendly": "Walang anuman. Mabuti at nakita rin kita.",
   "UI_PNC_Conversation_Semantic_FlowGreetingFollowup": "Walang anuman. Mag-ingat ka.",
+  "UI_PNC_Conversation_Semantic_ActionFollowUnavailable": "Hindi kita masusundan ngayon.",
+  "UI_PNC_Conversation_Semantic_ActionStopUnavailable": "Hindi ako makahinto ngayon.",
   "UI_PNC_Conversation_Semantic_FlowWeatherRaining": "Umuulan ngayon. Maghihintay muna ako ng paghupa.",
   "UI_PNC_Conversation_Semantic_FlowWeatherClear": "Mukhang maaliwalas ang panahon ngayon.",
   "UI_PNC_Conversation_Semantic_FlowWeatherUnknown": "Hindi ko makumpirma ang panahon mula rito."

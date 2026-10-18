@@ -110,6 +110,22 @@ local function addAction(rows, byID, action, source, definition)
         if type(definition.metadata) == "table" then
             row.metadata = copyPublic(definition.metadata)
         end
+        if definition.capabilityID or definition.commandID
+            or definition.handlerID or definition.route
+        then
+            row.binding = {
+                id = definition.capabilityID,
+                owner = definition.owner,
+                route = definition.route,
+                commandID = definition.commandID,
+                handlerID = definition.handlerID,
+                arguments = copyPublic(definition.arguments),
+                requires = copyPublic(definition.requires),
+                result = copyPublic(definition.result),
+            }
+            row.bindingID = definition.capabilityID
+            row.bindingStatus = "registered"
+        end
     end
 end
 

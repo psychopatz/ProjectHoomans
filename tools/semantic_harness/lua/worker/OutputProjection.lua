@@ -7,6 +7,22 @@ local MAX_OBSERVATION_LOOKUPS = 32
 local MAX_OBSERVATION_ACTIONS = 16
 local MAX_OBSERVATION_PLAN_TURNS = 4
 
+local function capabilityBinding(context, action)
+    local Values = context.Values
+    local catalog = PNC.Semantics and PNC.Semantics.CapabilityCatalog
+    if not catalog or type(catalog.ListActions) ~= "function" then
+        return nil
+    end
+    action = string.upper(tostring(action or ""))
+    if action == "" then return nil end
+    for _, row in ipairs(catalog.ListActions()) do
+        if type(row) == "table" and tostring(row.id or "") == action then
+            return row.binding and Values.copy(row.binding) or nil
+        end
+    end
+    return nil
+end
+
 local function boundedCandidates(context, result)
     local Values = context.Values
     local bundle = result and result.candidates or {}
@@ -184,6 +200,7 @@ function OutputProjection.observation(context, record)
                 text = text,
                 fallback = fallback,
                 key = payload.key or payload.translationKey,
+                plan = Values.copy(payload.plan),
                 translationKey = payload.translationKey,
                 translationKeys = Values.copy(payload.translationKeys),
                 planTurn = payload.planTurn,
@@ -203,6 +220,11 @@ function OutputProjection.observation(context, record)
                 responseObservation.key = queued.key
                 responseObservation.translationKey = queued.translationKey
                 responseObservation.translationKeys = queued.translationKeys
+                responseObservation.templateID = queued.key
+                responseObservation.plan = queued.plan
+                responseObservation.planTurnCount = queued.plan
+                    and math.min(#(queued.plan.turns or {}),
+                        MAX_OBSERVATION_PLAN_TURNS) or 0
                 responseObservation.domain = payload.domain
                 responseObservation.planTurn = queued.planTurn
                 responseObservation.planTurnID = queued.planTurnID
@@ -228,10 +250,14 @@ function OutputProjection.observation(context, record)
             normalizedText = ir.normalizedText,
             pattern = ir.provenance and ir.provenance.pattern,
         },
+        capabilityBinding = capabilityBinding(context, ir.action),
+        actionResult = Values.copy(result.actionResult),
         candidates = boundedCandidates(context, result),
         response = responseObservation,
         flow = {
             flowId = flow.flowId,
+            matched = flow.matched == true,
+            noFlow = flow.matched ~= true,
             fromNodeId = flow.fromNodeId,
             toNodeId = flow.toNodeId or flow.nodeId,
             transition = flow.transition,
@@ -292,6 +318,14 @@ function OutputProjection.normalizedToolCalls(context, trace, transport, result,
             requestID = values.requestID or values.request_id
                 or result and result.sequence,
             arguments = Values.copy(values.arguments or values.args),
+            commandID = values.commandID,
+            capabilityID = values.capabilityID
+                or values.bindingID
+                or type(values.binding) == "table"
+                and values.binding.id,
+            handlerID = values.handlerID
+                or type(values.binding) == "table"
+                and values.binding.handlerID,
             status = values.status
                 or (values.accepted == true and "accepted" or nil),
             accepted = values.accepted,
@@ -317,8 +351,19 @@ function OutputProjection.normalizedToolCalls(context, trace, transport, result,
     end
 
     if type(actionResult) == "table" then
-        add("action_dispatch", actionResult.action or actionResult.commandID
-            or actionResult.taskID, actionResult)
+        add("action_dispatch", actionResult.commandID or actionResult.action
+            or actionResult.taskID, {
+                arguments = actionResult.request,
+                commandID = actionResult.commandID,
+                capabilityID = actionResult.capabilityID,
+                handlerID = actionResult.handlerID,
+                binding = actionResult.binding,
+                status = actionResult.status,
+                accepted = actionResult.accepted,
+                reason = actionResult.reason,
+                authority = actionResult.authority,
+                source = "production_action_result",
+            })
     end
 
     for _, event in ipairs(transport or {}) do

@@ -184,6 +184,16 @@ function Internal.QueueDeterministicResponse(
         responses = { actionResult.response }
         response = responses[1]
     end
+    local rejectedResponse
+    if not (actionResult and type(actionResult.response) == "table") then
+        rejectedResponse = ResponseAdapter.ActionRejected(
+            result, actionResult
+        )
+    end
+    if rejectedResponse then
+        responses = { rejectedResponse }
+        response = rejectedResponse
+    end
     local campResponse = ResponseAdapter.CampAcknowledgement(
         result, actionResult)
     if campResponse then
@@ -203,9 +213,11 @@ function Internal.QueueDeterministicResponse(
         and actionResult.status ~= "skipped"
         and type(actionResult.response) ~= "table"
     then
-        -- DispatchAction has already converted the authoritative rejection
-        -- into a task-result message. Do not append a misleading "Okay."
-        return true
+        -- The existing dispatcher rejected the request. The explicit
+        -- ActionRejected response above keeps the NPC wording truthful and
+        -- prevents the policy's pre-dispatch acknowledgement from leaking.
+        -- A task/gift adapter may still own a more specific response.
+        if not rejectedResponse then return true end
     end
     if decision.branch == "INVENTORY_QUERY_RECEIVED"
         and actionResult and actionResult.result

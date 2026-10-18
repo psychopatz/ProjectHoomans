@@ -29,6 +29,10 @@ local function semanticTranslationKey(response)
             "UI_PNC_Conversation_Semantic_IdentityExchange",
         ["semantic.identity.exchange.unavailable"] =
             "UI_PNC_Conversation_Semantic_IdentityExchangeUnavailable",
+        ["semantic.action.follow.unavailable"] =
+            "UI_PNC_Conversation_Semantic_ActionFollowUnavailable",
+        ["semantic.action.stop.unavailable"] =
+            "UI_PNC_Conversation_Semantic_ActionStopUnavailable",
         ["semantic.question.identity.stranger_alt_1"] =
             "UI_PNC_Conversation_Semantic_QuestionIdentityStrangerAlt1",
         ["semantic.question.identity.stranger_alt_2"] =
@@ -366,6 +370,46 @@ function ResponseAdapter.CampAcknowledgement(result, actionResult)
         text = text,
         fallback = text,
     }
+end
+
+function ResponseAdapter.ActionRejected(result, actionResult)
+    if type(actionResult) ~= "table"
+        or actionResult.accepted ~= false
+        or actionResult.status == "unmapped"
+        or actionResult.status == "skipped"
+    then
+        return nil
+    end
+    local action = string.upper(tostring(
+        result and result.ir and result.ir.action
+        or actionResult.action or ""
+    ))
+    local fallback = "I couldn't do that right now."
+    if action == "FOLLOW" or tostring(actionResult.commandID) == "follow" then
+        fallback = "I can't follow you right now."
+    elseif action == "STOP" or action == "STAY"
+        or tostring(actionResult.commandID) == "stay"
+    then
+        fallback = "I can't stop right now."
+    end
+    local templateID = "semantic.action.unavailable"
+    if action == "FOLLOW" or tostring(actionResult.commandID) == "follow" then
+        templateID = "semantic.action.follow.unavailable"
+    elseif action == "STOP" or action == "STAY"
+        or tostring(actionResult.commandID) == "stay"
+    then
+        templateID = "semantic.action.stop.unavailable"
+    end
+    return ResponseAdapter.Payload({
+        response = {
+            templateID = templateID,
+            fallback = fallback,
+            args = {
+                action = action,
+                reason = actionResult.reason,
+            },
+        },
+    })
 end
 
 return ResponseAdapter

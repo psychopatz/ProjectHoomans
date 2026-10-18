@@ -30,7 +30,31 @@ function Adapter.RegisterAction(action, definition)
     return true, definition
 end
 
-Adapter.RegisterAction("FOLLOW", "follow")
+-- This descriptor is the public, typed seam consumed by Semantic Lab. It
+-- names the existing command registry and dispatcher; it does not contain a
+-- callback or create a second execution path.
+Adapter.RegisterAction("FOLLOW", {
+    capabilityID = "pnc:companion.follow",
+    owner = "PNC.CompanionCommands",
+    route = "existing_companion_command",
+    commandID = "follow",
+    handlerID = "PNC.Client.SendCompanionCommand",
+    arguments = {
+        npcID = "actor_target",
+        scope = "single_or_group",
+    },
+    requires = {
+        "conversation_or_companion_authority",
+        "resolved_target",
+    },
+    result = {
+        "requested",
+        "rejected",
+        "queued",
+        "accepted",
+        "completed",
+    },
+})
 Adapter.RegisterAction("STAY", "stay")
 -- A direct stop is represented by the existing authoritative stay order. It
 -- stops following at the current position without adding a second command
@@ -58,6 +82,11 @@ function Adapter.Resolve(actionIntent, context)
     local action = normalized(actionIntent.action)
     local definition = Adapter.Actions[action]
     if type(definition) == "string" then return definition end
+    if type(definition) == "table"
+        and type(definition.commandID) == "string"
+    then
+        return definition.commandID
+    end
     if type(definition) == "table" and type(definition.destinations) == "table" then
         local commandID = definition.destinations[destinationCategory(actionIntent)]
         if commandID then return commandID end
@@ -79,6 +108,9 @@ function Adapter.Dispatch(actionIntent, context)
         }
     end
 
+    local definition = Adapter.Actions[normalized(actionIntent.action)]
+    local binding = type(definition) == "table" and definition or nil
+
     local client = PNC.Client
     if not client or type(client.SendCompanionCommand) ~= "function" then
         return {
@@ -86,6 +118,8 @@ function Adapter.Dispatch(actionIntent, context)
             accepted = false,
             reason = "command_transport_unavailable",
             commandID = commandID,
+            action = actionIntent.action,
+            binding = binding,
         }
     end
 
@@ -98,6 +132,18 @@ function Adapter.Dispatch(actionIntent, context)
         semanticAction = actionIntent.action,
         targets = context.targets,
         campSiteHint = context.campSiteHint,
+        groupID = context.groupID,
+        groupTurnID = context.groupTurnID,
+    }
+    local request = {
+        commandID = commandID,
+        npcID = npcID,
+        scope = context.scope or "single",
+        requestID = context.requestID,
+        dialogueID = context.dialogueID,
+        commandSource = "semantic_dialogue",
+        semanticAction = actionIntent.action,
+        targets = context.targets,
         groupID = context.groupID,
         groupTurnID = context.groupTurnID,
     }
@@ -114,6 +160,11 @@ function Adapter.Dispatch(actionIntent, context)
         accepted = accepted == true,
         reason = reason,
         commandID = commandID,
+        action = actionIntent.action,
+        binding = binding,
+        capabilityID = binding and binding.capabilityID or nil,
+        handlerID = binding and binding.handlerID or nil,
+        request = request,
         targets = targets,
         details = details,
     }
