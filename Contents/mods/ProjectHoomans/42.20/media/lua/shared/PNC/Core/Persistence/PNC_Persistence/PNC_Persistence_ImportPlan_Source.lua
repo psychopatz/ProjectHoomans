@@ -4,6 +4,8 @@ local Utils = require
     "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_ImportPlan_Utils"
 local Fields = require
     "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_ImportPlan_Fields"
+local Generator = require
+    "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_ImportPlan_Generator"
 
 local Source = {}
 
@@ -22,6 +24,7 @@ end
 
 function Source.Build(raw, source, options, decisions)
     local identity = Fields.Identity(source, raw, decisions)
+    local generator = Generator.Check(source, identity, decisions, options)
     local policy = Fields.Appearance(source, decisions)
     local inventory = Fields.Inventory(source, decisions)
     local relationships = Fields.Relationships(raw, source, decisions)
@@ -32,7 +35,7 @@ function Source.Build(raw, source, options, decisions)
     else
         add(decisions, "actorId", "copied", "id", nil)
     end
-    if not identity or not policy or not inventory
+    if not identity or not generator or not policy or not inventory
         or not relationships or not location
     then
         return nil
@@ -55,6 +58,7 @@ function Source.Build(raw, source, options, decisions)
             sourceRecordHash = options.sourceRecordHash,
             sourceSnapshotHash = options.sourceSnapshotHash,
             decisionSet = options.decisionSet,
+            generator = Utils.Copy(generator),
         },
         identity = {
             schemaVersion = 1,
@@ -67,6 +71,7 @@ function Source.Build(raw, source, options, decisions)
         appearance = {
             policySchemaVersion = 2,
             policy = policy,
+            generator = Utils.Copy(generator),
         },
         inventory = inventory,
         relationships = { sourceSchema = 3, entries = relationships },

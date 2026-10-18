@@ -102,6 +102,7 @@ function Fields.Inventory(source, decisions)
     end
     local output = {
         sourceSchema = INVENTORY_SCHEMA,
+        persistenceMode = value.persistenceMode,
         revision = value.revision,
         maxWeight = value.maxWeight,
         rootMaxWeight = value.rootMaxWeight,
