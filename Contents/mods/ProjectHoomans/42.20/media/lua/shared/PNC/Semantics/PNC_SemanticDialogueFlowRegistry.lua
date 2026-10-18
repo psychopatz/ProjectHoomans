@@ -334,7 +334,7 @@ local function normalizeNode(nodeID, node, nodes)
 
     local fields = {
         "next", "onMatch", "onUnrelated", "onRefuse",
-        "onPass", "onFail", "onUnknown",
+        "onClarify", "onPass", "onFail", "onUnknown",
     }
     local index
     local field
@@ -377,10 +377,10 @@ local function validateReachability(nodes, initial)
             seen[nodeID] = true
             node = nodes[nodeID]
             if node then
-                for _, field in ipairs({
-                    "next", "onMatch", "onRefuse",
-                    "onPass", "onFail", "onUnknown",
-                }) do
+        for _, field in ipairs({
+            "next", "onMatch", "onClarify", "onRefuse",
+            "onPass", "onFail", "onUnknown",
+        }) do
                     target = node[field]
                     if target and not SPECIAL_TARGETS[target]
                         and not seen[target]

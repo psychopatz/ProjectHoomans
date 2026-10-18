@@ -53,5 +53,7 @@ local function append(target, shard)
 end
 append(result["patterns"], require "PNC/Semantics/PNC_SemanticGeneratedDialogue_Patterns_01")
 append(result["patterns"], require "PNC/Semantics/PNC_SemanticGeneratedDialogue_Patterns_02")
+append(result["patterns"], require "PNC/Semantics/PNC_SemanticGeneratedDialogue_Patterns_03")
 append(result["responsePools"], require "PNC/Semantics/PNC_SemanticGeneratedDialogue_Responses_01")
+append(result["responsePools"], require "PNC/Semantics/PNC_SemanticGeneratedDialogue_Responses_02")
 return result

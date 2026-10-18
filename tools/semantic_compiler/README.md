@@ -117,8 +117,9 @@ unknown response conditions, duplicate IDs/utterances, and oversized pools.
 No external corpus or linguistic package is loaded by Lua at runtime.
 
 Dialogue sources record a license and review date for every reference. A
-reviewed contextual mapping may add only an exact, bounded PROMISE/NEEDS
-pattern when it names the existing `FETCH` concept and `NEEDS_PROPOSAL` state.
+reviewed contextual mapping may add only an exact, bounded PROMISE/NEEDS or
+CLARIFY/NEEDS pattern when it names an existing canonical concept and needs
+state (`FETCH`/`NEEDS_PROPOSAL` or `ANY_ITEM`/`NEEDS_QUANTITY`).
 Its negative examples are compiler-only collision/false-command checks; they
 are never emitted into Lua. A response may carry a reviewed response plan and
 EN/TL text, which is emitted as a small translation shard beside the Lua

@@ -2,6 +2,38 @@
 -- Dialogue patterns shard 02; keep this file data-only.
 return {
     {
+            ["confidence"] = 0.99,
+            ["emit"] = {
+                ["intent"] = "QUESTION",
+                ["speechAct"] = "QUESTION",
+                ["subject"] = "IDENTITY",
+            },
+            ["id"] = "pnc.dataset.question.identity.may_i_know_your_name",
+            ["match"] = {
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "may",
+                },
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "i",
+                },
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "know",
+                },
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "your",
+                },
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "name",
+                },
+            },
+            ["priority"] = 120,
+        },
+    {
             ["confidence"] = 0.98,
             ["emit"] = {
                 ["intent"] = "QUESTION",
@@ -421,34 +453,6 @@ return {
                 {
                     ["kind"] = "literal",
                     ["value"] = "going",
-                },
-            },
-            ["priority"] = 120,
-        },
-    {
-            ["confidence"] = 0.97,
-            ["emit"] = {
-                ["intent"] = "QUESTION",
-                ["speechAct"] = "QUESTION",
-                ["subject"] = "WELLBEING",
-            },
-            ["id"] = "pnc.dataset.question.wellbeing.you_doing_all_right",
-            ["match"] = {
-                {
-                    ["kind"] = "literal",
-                    ["value"] = "you",
-                },
-                {
-                    ["kind"] = "literal",
-                    ["value"] = "doing",
-                },
-                {
-                    ["kind"] = "literal",
-                    ["value"] = "all",
-                },
-                {
-                    ["kind"] = "literal",
-                    ["value"] = "right",
                 },
             },
             ["priority"] = 120,

@@ -52,6 +52,28 @@ class DialogueDatasetCompilerTests(unittest.TestCase):
         )
         self.assertIn("DatasetNeedsPromiseThirst", render_dialogue_lua(compiled))
 
+    def test_reviewed_clarification_mapping_uses_existing_needs_state(self) -> None:
+        compiled = compile_dialogue_dataset(self.source)
+        pattern = next(
+            item for item in compiled["patterns"]
+            if item["id"] == "pnc.dataset.clarify.needs.which_item_do_you_mean"
+        )
+        self.assertEqual(pattern["emit"]["intent"], "CLARIFY")
+        self.assertEqual(pattern["emit"]["subject"], "NEEDS")
+        self.assertEqual(pattern["metadata"]["mapping"]["canonicalConcept"], "ANY_ITEM")
+        self.assertEqual(pattern["metadata"]["mapping"]["dialogueState"], "NEEDS_QUANTITY")
+        pool = next(
+            item for item in compiled["responsePools"]
+            if item["id"] == "semantic.question.needs.quantity"
+        )
+        variant = next(
+            item for item in pool["variants"]
+            if item["id"] == "semantic.question.needs.quantity.dataset.clarify_thirst"
+        )
+        self.assertEqual(variant["plan"]["dialogueAct"], "ASK_CLARIFICATION")
+        self.assertEqual(variant["when"]["lastIntent"], "CLARIFY")
+        self.assertIn(variant["templateID"], compiled["translations"]["TL"])
+
     def test_negative_examples_cannot_become_runtime_patterns(self) -> None:
         invalid = copy.deepcopy(self.source)
         invalid["patterns"][0]["negatives"] = [

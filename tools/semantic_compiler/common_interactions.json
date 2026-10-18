@@ -44,6 +44,29 @@
   },
   "patterns": [
     {
+      "id": "pnc.dataset.clarify.needs.which_item_do_you_mean",
+      "utterance": "which item do you mean",
+      "emit": {
+        "intent": "CLARIFY",
+        "speechAct": "CLARIFY",
+        "subject": "NEEDS",
+        "extensions": {
+          "topic": "NEEDS",
+          "dialogueFollowUp": "NEEDS_QUANTITY"
+        }
+      },
+      "negatives": ["which items do you mean"],
+      "reviewed": true,
+      "sourceRefs": ["MASSIVE", "SGD"],
+      "mapping": {
+        "canonicalConcept": "ANY_ITEM",
+        "dialogueState": "NEEDS_QUANTITY",
+        "sourceRefs": ["MASSIVE", "SGD"]
+      },
+      "confidence": 0.99,
+      "priority": 167
+    },
+    {
       "id": "pnc.dataset.promise.needs.i_ll_pick_some_up",
       "utterance": "i'll pick some up",
       "emit": {
@@ -507,6 +530,47 @@
                     "kind": "translation",
                     "templateID": "UI_PNC_Conversation_Semantic_DatasetNeedsPromiseThirst",
                     "fallback": "I can keep that as a proposal, but I still need the item and amount before I record a commitment."
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+    ,
+    {
+      "id": "semantic.question.needs.quantity",
+      "variants": [
+        {
+          "id": "semantic.question.needs.quantity.dataset.clarify_thirst",
+          "templateID": "UI_PNC_Conversation_Semantic_DatasetNeedsClarifyThirst",
+          "fallback": "I can confirm water is a need, but which item do you mean?",
+          "en": "I can confirm water is a need, but which item do you mean?",
+          "tl": "Makukumpirma kong kailangan ang tubig, pero aling item ang ibig mong sabihin?",
+          "when": {
+            "needType": "thirst",
+            "lastIntent": "CLARIFY"
+          },
+          "priority": 4,
+          "reviewed": true,
+          "sourceRefs": ["MASSIVE", "SGD"],
+          "plan": {
+            "dialogueAct": "ASK_CLARIFICATION",
+            "sourcePoolID": "semantic.question.needs.quantity",
+            "topic": "NEEDS",
+            "groundedFactRefs": ["npc.needs.thirst"],
+            "uncertainty": "ambiguous",
+            "tone": "clarifying",
+            "turns": [
+              {
+                "id": "dataset_needs_clarification",
+                "continuation": "continue",
+                "segments": [
+                  {
+                    "kind": "translation",
+                    "templateID": "UI_PNC_Conversation_Semantic_DatasetNeedsClarifyThirst",
+                    "fallback": "I can confirm water is a need, but which item do you mean?"
                   }
                 ]
               }

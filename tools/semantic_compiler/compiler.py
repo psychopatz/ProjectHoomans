@@ -30,13 +30,14 @@ DIALOGUE_PROMISE_EXTENSIONS = frozenset({"topic", "dialogueFollowUp"})
 DIALOGUE_MAPPING_FIELDS = frozenset({
     "canonicalConcept", "dialogueState", "sourceRefs",
 })
-DIALOGUE_MAPPING_CONCEPTS = frozenset({"FETCH"})
-DIALOGUE_MAPPING_STATES = frozenset({"NEEDS_PROPOSAL"})
+DIALOGUE_MAPPING_CONCEPTS = frozenset({"ANY_ITEM", "FETCH"})
+DIALOGUE_MAPPING_STATES = frozenset({"NEEDS_PROPOSAL", "NEEDS_QUANTITY"})
 DIALOGUE_PLAN_UNCERTAINTIES = frozenset({
     "known", "unknown", "ambiguous", "pending",
 })
 DIALOGUE_RESPONSE_CONDITIONS = frozenset({
     "topic", "previousTopic", "intent", "action", "subject",
+    "lastIntent",
     "relationshipState", "identityTrust", "timeBand", "raining", "foggy",
     "snowing", "indoors", "hasPendingRequest", "npcID", "activity",
     "busy", "needType", "needUrgency", "relationshipAttitude",
@@ -550,24 +551,68 @@ def _compile_dialogue_pattern(
     speech_act = emit.get("speechAct")
     if intent == "QUESTION":
         subject = emit.get("subject")
-        if (speech_act != "QUESTION"
-            or not isinstance(subject, str)
-            or subject not in DIALOGUE_PATTERN_SUBJECTS):
+        if (speech_act != "QUESTION" or not isinstance(subject, str)):
             raise CompileError(
                 f"dialogue pattern {pattern_id} must target an existing safe question subject")
-        if set(emit) != {"intent", "speechAct", "subject"}:
+        if subject in DIALOGUE_PATTERN_SUBJECTS:
+            if set(emit) != {"intent", "speechAct", "subject"}:
+                raise CompileError(
+                    f"dialogue question pattern {pattern_id} contains unsupported semantic fields")
+            normalized_emit = {
+                "intent": "QUESTION",
+                "speechAct": "QUESTION",
+                "subject": subject,
+            }
+        elif subject == "QUANTITY":
+            extensions = emit.get("extensions")
+            if (set(emit) != {
+                    "intent", "speechAct", "subject", "extensions",
+                }
+                    or not isinstance(extensions, dict)
+                    or set(extensions) != DIALOGUE_PROMISE_EXTENSIONS
+                    or extensions.get("topic") != "NEEDS"
+                    or extensions.get("dialogueFollowUp") != "NEEDS_QUANTITY"):
+                raise CompileError(
+                    f"dialogue quantity clarification pattern {pattern_id} must target the existing needs flow")
+            normalized_emit = {
+                "intent": "QUESTION",
+                "speechAct": "QUESTION",
+                "subject": "QUANTITY",
+                "extensions": {
+                    "topic": "NEEDS",
+                    "dialogueFollowUp": "NEEDS_QUANTITY",
+                },
+            }
+        else:
             raise CompileError(
-                f"dialogue question pattern {pattern_id} contains unsupported semantic fields")
-        normalized_emit = {
-            "intent": "QUESTION",
-            "speechAct": "QUESTION",
-            "subject": subject,
-        }
+                f"dialogue pattern {pattern_id} must target an existing safe question subject")
     elif intent == "GREET":
         if speech_act != "GREET" or set(emit) != {"intent", "speechAct"}:
             raise CompileError(
                 f"dialogue greeting pattern {pattern_id} has an unsupported emit")
         normalized_emit = {"intent": "GREET", "speechAct": "GREET"}
+    elif intent == "CLARIFY":
+        extensions = emit.get("extensions")
+        if (speech_act != "CLARIFY"
+                or emit.get("subject") != "NEEDS"
+                or set(emit) != {
+                    "intent", "speechAct", "subject", "extensions",
+                }
+                or not isinstance(extensions, dict)
+                or set(extensions) != DIALOGUE_PROMISE_EXTENSIONS
+                or extensions.get("topic") != "NEEDS"
+                or extensions.get("dialogueFollowUp") != "NEEDS_QUANTITY"):
+            raise CompileError(
+                f"dialogue clarification pattern {pattern_id} must target the existing needs flow")
+        normalized_emit = {
+            "intent": "CLARIFY",
+            "speechAct": "CLARIFY",
+            "subject": "NEEDS",
+            "extensions": {
+                "topic": "NEEDS",
+                "dialogueFollowUp": "NEEDS_QUANTITY",
+            },
+        }
     elif intent == "PROMISE":
         extensions = emit.get("extensions")
         if (speech_act != "PROMISE"
@@ -629,7 +674,8 @@ def _compile_dialogue_pattern(
             "dialogueState": state,
             "sourceRefs": mapping_refs,
         }
-    if intent == "PROMISE" and (not reviewed or not source_refs or not normalized_mapping):
+    if ((intent in {"PROMISE", "CLARIFY"} or normalized_mapping is not None)
+            and (not reviewed or not source_refs or not normalized_mapping)):
         raise CompileError(
             f"dialogue promise pattern {pattern_id} requires reviewed canonical mapping metadata")
 

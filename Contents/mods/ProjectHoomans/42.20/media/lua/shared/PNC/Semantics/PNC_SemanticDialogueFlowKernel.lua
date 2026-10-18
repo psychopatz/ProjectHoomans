@@ -240,6 +240,9 @@ local function transitionTarget(node, intent)
     if intent == "REFUSE" or intent == "DISAGREE" then
         return node.onRefuse or node.onMatch or node.next
     end
+    if intent == "CLARIFY" or intent == "ASK_FOR_CLARIFICATION" then
+        return node.onClarify or node.onMatch or node.next
+    end
     return node.onMatch or node.next
 end
 
