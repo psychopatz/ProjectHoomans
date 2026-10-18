@@ -1,14 +1,14 @@
 # Contextual Dialogue & Quest Framework — current progress
 
-**Updated:** 2026-10-19, after the C3-A real-worker grounded response-plan slice.
+**Updated:** 2026-10-19, after the C3-B real-worker quantity-aware needs slice.
 
-**Local implementation:** branch `codex/contextual-dialogue-quest-framework-0a`; implementation is committed through `9ef46d2e` (C3-A grounded personality-aware response plans), following C2-A `8a4e0b0e`, C1-A `470bb915`, C0-A `ca65049c`, G3C `9946fe69`, and documentation commit `0d7979f0`. Earlier accepted slices remain `0cfcc345` (all dispatchable actions), `b1102486` (safe regeneration), `68c313fe` (multi-stage gifts), `b242e78c` (parameterized tasks), and `6290b3f74279731c7d80e97e077e88c10d35d676` (simple commands). Shared branch history also preserves unrelated concurrent P0B import-planner commits.
+**Local implementation:** branch `codex/contextual-dialogue-quest-framework-0a`; implementation is committed through `a22b1d78` (C3-B quantity-aware needs follow-up), following C3-A `9ef46d2e`, C2-A `8a4e0b0e`, C1-A `470bb915`, C0-A `ca65049c`, G3C `9946fe69`, and documentation commit `32aceac7`. Earlier accepted slices remain `0cfcc345` (all dispatchable actions), `b1102486` (safe regeneration), `68c313fe` (multi-stage gifts), `b242e78c` (parameterized tasks), and `6290b3f74279731c7d80e97e077e88c10d35d676` (simple commands). Shared branch history also preserves unrelated concurrent P0B import-planner commits.
 
 **Upstream baseline:** `origin/docs/contextual-dialogue-quest-framework-20261018` at `a79b01ff14be33178f699c50623a20524b04d46c`; the local implementation is intentionally ahead of that documentation baseline.
 
-**Current goal status:** **IN PROGRESS — G3C, C0-A, C1-A, C2-A, and C3-A accepted; C3-B–C6, full production-harness/performance, and user-owned native-game gates remain open.**
+**Current goal status:** **IN PROGRESS — G3C, C0-A, C1-A, C2-A, C3-A, and C3-B accepted; C3-C–C6, full production-harness/performance, and user-owned native-game gates remain open.**
 
-**ONE Next Chunk:** **C3-B — extend the same existing response-plan/catalog path to one quantity-aware needs follow-up (“Do you need anything?” → “How many?”), preserving pending context and clarification/no-dispatch safety.**
+**ONE Next Chunk:** **C3-C — route one confirmation-safe “I’ll get some” needs offer through the existing response-plan/context path, preserving unconfirmed-promise state without creating an authoritative quest commitment or dispatch.**
 
 ## Accepted historic foundation (do not redo)
 
@@ -157,7 +157,24 @@ Focused and regression evidence for `9ef46d2e`:
 - `luac5.3 -p`, `python3 -m py_compile`, and EN/TL `python3 -m json.tool` checks passed; `pz_verify --kahlua --severity ERROR` reported **0 errors / 0 warnings** for every changed production Lua file; `git diff --check` passed.
 - No Project Zomboid process, multiplayer hosting, mod installation, Workshop publication, or native-game test was launched.
 
-C3-A does not yet implement the quantity-aware needs follow-up, dataset-assisted compilation, Semantic Lab context inspection, performance/isolation measurement, optional PBrainZ parity measurement, or the final mandatory conversation. Those remain later bounded chunks.
+C3-A did not implement the quantity-aware needs follow-up, dataset-assisted compilation, Semantic Lab context inspection, performance/isolation measurement, optional PBrainZ parity measurement, or the final mandatory conversation. C3-B now covers the bounded needs-to-quantity obligation; the remaining items are later bounded chunks.
+
+## C3-B accepted — quantity-aware needs follow-up
+
+C3-B adds one authored `needs` flow to the existing FlowKernel and response-plan/catalog path. The real worker recognizes “Do you need anything?” as a `NEEDS` question, selects an EN/TL `NEEDS_REPORT` plan from authoritative NPC need pressure, opens a bounded pending agenda entry requiring `quantity`, then recognizes “How many?” as a `QUANTITY` follow-up and resolves the existing obligation with a `NEEDS_QUANTITY` plan. The flow registry now preserves bounded node `requiredSlots` and `sourceFactRefs` into the shared pending context; it does not add a dispatcher, transcript store, or second quest/memory authority.
+
+When the NPC need is known, the plan carries `npc.needs.hunger` or `npc.needs.thirst` provenance but explicitly reports that no exact amount is available. When the need is unknown, the response is an `ASK_CLARIFICATION` plan with no grounded fact refs. Standalone “How many?” remains clarification-only. All paths emit no transport, tool, task, gift, quest, or PBrainZ side effect, and the existing C0 characterization was updated to verify the new bounded behavior plus the unchanged “I’ll get some” and weather safety stop.
+
+Focused and regression evidence for `a22b1d78`:
+
+- `python3 -m unittest tools.semantic_harness.tests.test_contextual_conversation_c3b -v` — **3/3 passed**.
+- C0/C3-B/flow-editor regression slice — **9/9 passed**; C3-A + C3-B + C1-A + semantic-flow slice — **15/15 passed**.
+- Full worker suite: `python3 -m unittest discover -s tools/semantic_harness/tests -p 'test_*.py' -q` — **154/154 passed**.
+- `./tools/semantic_harness/run_harness.sh --doctor --doctor-json` passed repository, Core, Tk/display, Lua, worker syntax, boot, PING, and CAPABILITIES checks.
+- `luac5.3 -p`, `python3 -m py_compile`, EN/TL `python3 -m json.tool`, and `git diff --check` passed; `pz_verify --kahlua --severity ERROR` reported **0 errors / 0 warnings** for every changed production Lua file.
+- No Project Zomboid process, multiplayer hosting, mod installation, Workshop publication, or native-game test was launched.
+
+C3-B does not yet implement an authoritative numeric supply amount, the confirmation-safe “I’ll get some” offer/promise path, the full weather interruption/resumption sequence, dataset-assisted compilation, Semantic Lab context inspection, performance/isolation measurement, optional PBrainZ parity measurement, or the final mandatory conversation. Those remain later bounded chunks.
 
 ## Semantic Lab naming audit
 
@@ -182,13 +199,13 @@ The generator's canonical IDs remain unchanged for registry lookup, persisted ma
 
 ## Scope boundary
 
-G0A, G0B, G0C, G0D/G0D-2, G0E, G0F, G0G, G0H, G0I, G3A, G3B, G3C, C0-A, C1-A, C2-A, and C3-A are accepted implementation slices, not completion of the expanded goal. G3B's Semantic Lab/X11 gate, G3C's real-worker boundary, C0-A's worker authority regression gate, C1-A's context/resumption gate, C2-A's Knowledge commitment gate, and C3-A's grounded response-plan gate are verified; native Project Zomboid SP/MP and Workshop actions remain user-owned. Continue with the single C3-B chunk above before any READY FOR USER LIVE TEST claim.
+G0A, G0B, G0C, G0D/G0D-2, G0E, G0F, G0G, G0H, G0I, G3A, G3B, G3C, C0-A, C1-A, C2-A, C3-A, and C3-B are accepted implementation slices, not completion of the expanded goal. G3B's Semantic Lab/X11 gate, G3C's real-worker boundary, C0-A's worker authority regression gate, C1-A's context/resumption gate, C2-A's Knowledge commitment gate, and C3-A/C3-B response-plan gates are verified; native Project Zomboid SP/MP and Workshop actions remain user-owned. Continue with the single C3-C chunk above before any READY FOR USER LIVE TEST claim.
 
 
 ## Approved future goal expansion — Contextual Conversational Intelligence (2026-10-19 planning only)
 
 User-approved target: offline Lua NPCs should understand elliptical follow-ups, topic interruptions and resumption, pending questions/offers/corrections, personality-aware dialogue plans and sparse evidence-backed promises with relevant world/quest/knowledge context; optional PBrainZ may rephrase the SAME authorized plan. Improve `tools/semantic_compiler` and Semantic Lab with reviewed dataset-assisted language/conversation-state generation and a context/plan/evidence inspector. See NEW `CONVERSATIONAL_INTELLIGENCE.md`, `DATASET_CONVERSATION_PIPELINE.md` and `CONVERSATION_ACCEPTANCE.md`, and the refreshed `ROADMAP.md`.
 
-G3C, C0-A, C1-A, C2-A, and C3-A are genuinely accepted locally with the evidence above. The next implementation task is exactly the single C3-B chunk named at the top; it is a quantity-aware needs follow-up, not a claim of C4–C6 completion, corpus import, or native-game validation.
+G3C, C0-A, C1-A, C2-A, C3-A, and C3-B are genuinely accepted locally with the evidence above. The next implementation task is exactly the single C3-C chunk named at the top; it is a confirmation-safe needs offer/promise slice, not a claim of C4–C6 completion, corpus import, or native-game validation.
 
 Remote branch may not reflect the local Codex working checkout. Agent must reconcile current local HEAD/dirty/parallel work, and not discard implementation changes. C0-A measured and repaired the previously recorded four social THREAT test failures and insult final-response problem at the canonical worker authority boundary; C1-A measured topic interruption/resumption at the same worker boundary. Neither slice claims the mandatory multi-turn conversation complete.
