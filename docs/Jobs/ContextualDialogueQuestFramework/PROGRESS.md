@@ -1,14 +1,14 @@
 # Contextual Dialogue & Quest Framework — current progress
 
-**Updated:** 2026-10-19, after the C1-A real-worker pending-follow-up and topic-resumption slice.
+**Updated:** 2026-10-19, after the C2-A real-worker acknowledged-commitment slice.
 
-**Local implementation:** branch `codex/contextual-dialogue-quest-framework-0a`; implementation is committed through `470bb915` (C1-A bounded context-state agenda, resolver trace, terminal-flow interruption/resumption, and real-worker regression test), following C0-A `ca65049c`, G3C `9946fe69`, and the updated documentation commit `a79b01ff14be`. Earlier accepted slices remain `0cfcc345` (all dispatchable actions), `b1102486` (safe regeneration), `68c313fe` (multi-stage gifts), `b242e78c` (parameterized tasks), and `6290b3f74279731c7d80e97e077e88c10d35d676` (simple commands). Shared branch history also preserves unrelated concurrent P0B import-planner commits.
+**Local implementation:** branch `codex/contextual-dialogue-quest-framework-0a`; implementation is committed through `8a4e0b0e` (C2-A owner-linked acknowledged conversation commitments), following C1-A `470bb915`, C0-A `ca65049c`, G3C `9946fe69`, and documentation commit `9feb8776`. Earlier accepted slices remain `0cfcc345` (all dispatchable actions), `b1102486` (safe regeneration), `68c313fe` (multi-stage gifts), `b242e78c` (parameterized tasks), and `6290b3f74279731c7d80e97e077e88c10d35d676` (simple commands). Shared branch history also preserves unrelated concurrent P0B import-planner commits.
 
 **Upstream baseline:** `origin/docs/contextual-dialogue-quest-framework-20261018` at `a79b01ff14be33178f699c50623a20524b04d46c`; the local implementation is intentionally ahead of that documentation baseline.
 
-**Current goal status:** **IN PROGRESS — G3C, C0-A, and C1-A accepted; C2–C6, full production-harness/performance, and user-owned native-game gates remain open.**
+**Current goal status:** **IN PROGRESS — G3C, C0-A, C1-A, and C2-A accepted; C3–C6, full production-harness/performance, and user-owned native-game gates remain open.**
 
-**ONE Next Chunk:** **C2-A — add one bounded, owner-linked episodic commitment adapter on the existing Knowledge/Cognition/Quest authority boundary, accepting only an acknowledged conversation commitment and proving unknown, unacknowledged, and wrong-owner cases remain non-authoritative.**
+**ONE Next Chunk:** **C3-A — extend the existing response plan/catalog with one grounded, personality-aware EN/TL dialogue-act composition path, preserving fact provenance and keeping PBrainZ as optional realization only.**
 
 ## Accepted historic foundation (do not redo)
 
@@ -126,6 +126,22 @@ Focused real-worker evidence in `470bb915`:
 
 C1-A does not yet implement quantity-slot fulfillment, durable episodic commitments, dialogue-act planning, dataset compilation, Semantic Lab inspection, performance/isolation measurement, or the final mandatory conversation. Those remain C2+ work.
 
+## C2-A accepted — owner-linked acknowledged conversation commitments
+
+C2-A keeps durable conversation commitments inside the existing server-authoritative `PNC.NPCKnowledge` journal. `PNC.NPCKnowledgeAPI.RecordConversationCommitmentForPlayer` validates the current player identity, NPC owner, conversation lease, and a successful processed conversation outcome before writing. It records only bounded primitive fields (`commitmentID`, topic/intent, owner and target identities, validated source fact references, acknowledgement event/outcome, optional validated quest instance, expiry, status, and owner provenance); it does not create a transcript store, quest instance, action dispatcher, or client-side identity path. Cognition references are accepted only when the existing cognition service returns a known fact, and quest references are accepted only after the existing quest service returns the same character/giver-scoped instance.
+
+The production Lua worker now loads the real Knowledge registry/service/API and exposes a bounded `COMMITMENT` inspection command. Its save/reload fixture discards the in-memory Knowledge registry, reloads the same ModData-backed service, and reads through the player-scoped API. The focused trace proves `ack-1` → acknowledged commitment → `conversation_commitment:bandages-1` journal entry → save/reload → one authoritative commitment owned by `npc_mara` and `char_patrick`; replay is idempotent and does not issue a second persistence commit. Missing/unknown evidence, absent acknowledgement, and `npc_other` owner mismatch all fail closed before any journal write. The worker fixture uses the existing lease acknowledgement event as the validated evidence source; this is one bounded vertical slice, not the final mandatory conversation.
+
+Focused C2-A evidence in `8a4e0b0e`:
+
+- `python3 -m unittest tools.semantic_harness.tests.test_contextual_conversation_c2 -v` — **2/2 passed**.
+- Full worker suite: `python3 -m unittest discover -s tools/semantic_harness/tests -p 'test_*.py' -q` — **148/148 passed**.
+- `./tools/semantic_harness/run_harness.sh --doctor --doctor-json` passed repository, Core, Tk/display, Lua, worker syntax, boot, PING, and CAPABILITIES checks.
+- `luac5.3 -p` passed all changed production/worker Lua; `python3 -m py_compile` passed changed Python; `pz-verify --kahlua --severity ERROR` reported **0 errors / 0 warnings** for each changed production Knowledge Lua; `git diff --check` passed.
+- No Project Zomboid process, multiplayer hosting, mod installation, Workshop publication, or native-game test was launched.
+
+C2-A does not yet implement quantity-slot fulfillment, the generalized response planner, dataset-assisted compilation, Semantic Lab context inspection, performance/isolation measurement, or the final mandatory conversation. Those remain C3+ work.
+
 ## Semantic Lab naming audit
 
 The generator's canonical IDs remain unchanged for registry lookup, persisted manifests, coverage rows, policy observations, and saved drafts. The Flow editor now presents generated entries as compact labels such as `Quest / Clinic Supplies / Accept`, keeps the full canonical ID in the editable Flow ID field, and shows the workflow kind in the graph header. Selection still maps labels back to the canonical ID; duplicate labels receive a deterministic ID suffix. This is a presentation-only improvement, not a second flow namespace.
@@ -149,13 +165,13 @@ The generator's canonical IDs remain unchanged for registry lookup, persisted ma
 
 ## Scope boundary
 
-G0A, G0B, G0C, G0D/G0D-2, G0E, G0F, G0G, G0H, G0I, G3A, G3B, G3C, C0-A, and C1-A are accepted implementation slices, not completion of the expanded goal. G3B's Semantic Lab/X11 gate, G3C's real-worker boundary, C0-A's worker authority regression gate, and C1-A's context/resumption gate are verified; native Project Zomboid SP/MP and Workshop actions remain user-owned. Continue with the single C2-A chunk above before any READY FOR USER LIVE TEST claim.
+G0A, G0B, G0C, G0D/G0D-2, G0E, G0F, G0G, G0H, G0I, G3A, G3B, G3C, C0-A, C1-A, and C2-A are accepted implementation slices, not completion of the expanded goal. G3B's Semantic Lab/X11 gate, G3C's real-worker boundary, C0-A's worker authority regression gate, C1-A's context/resumption gate, and C2-A's Knowledge commitment gate are verified; native Project Zomboid SP/MP and Workshop actions remain user-owned. Continue with the single C3-A chunk above before any READY FOR USER LIVE TEST claim.
 
 
 ## Approved future goal expansion — Contextual Conversational Intelligence (2026-10-19 planning only)
 
 User-approved target: offline Lua NPCs should understand elliptical follow-ups, topic interruptions and resumption, pending questions/offers/corrections, personality-aware dialogue plans and sparse evidence-backed promises with relevant world/quest/knowledge context; optional PBrainZ may rephrase the SAME authorized plan. Improve `tools/semantic_compiler` and Semantic Lab with reviewed dataset-assisted language/conversation-state generation and a context/plan/evidence inspector. See NEW `CONVERSATIONAL_INTELLIGENCE.md`, `DATASET_CONVERSATION_PIPELINE.md` and `CONVERSATION_ACCEPTANCE.md`, and the refreshed `ROADMAP.md`.
 
-G3C, C0-A, and C1-A are genuinely accepted locally with the evidence above. The next implementation task is exactly the single C2-A chunk named at the top; it is an owner-linked commitment vertical slice, not a claim of C3–C6 completion, corpus import, or native-game validation.
+G3C, C0-A, C1-A, and C2-A are genuinely accepted locally with the evidence above. The next implementation task is exactly the single C3-A chunk named at the top; it is a grounded response-plan vertical slice, not a claim of C4–C6 completion, corpus import, or native-game validation.
 
 Remote branch may not reflect the local Codex working checkout. Agent must reconcile current local HEAD/dirty/parallel work, and not discard implementation changes. C0-A measured and repaired the previously recorded four social THREAT test failures and insult final-response problem at the canonical worker authority boundary; C1-A measured topic interruption/resumption at the same worker boundary. Neither slice claims the mandatory multi-turn conversation complete.
