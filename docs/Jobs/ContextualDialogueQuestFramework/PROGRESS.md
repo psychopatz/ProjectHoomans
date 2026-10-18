@@ -1,14 +1,14 @@
 # Contextual Dialogue & Quest Framework — current progress
 
-**Updated:** 2026-10-19, after the C6-B EN/TL mandatory-conversation slice.
+**Updated:** 2026-10-19, after the C6-C optional-provider parity slice.
 
-**Local implementation:** branch `codex/contextual-dialogue-quest-framework-0a`; implementation is committed through `b4c17de3` (C6-B EN/TL mandatory-conversation matrix), following C6-A `874b1b1e`, C5-D `73b7090c`, C5-C `e9c5b13f`, C5-B `06b2afac`, C5-A `f78bc77c`, C4-D `eceec6c9`, C4-C `cbd1de71`, C4-B `fc6d450d`, C4-A `7eb42777`, C3-D `f41ad18a`, C3-C `536b7141`, C3-B `a22b1d78`, C3-A `9ef46d2e`, C2-A `8a4e0b0e`, C1-A `470bb915`, C0-A `ca65049c`, G3C `9946fe69`, and documentation commit `32aceac7`. Earlier accepted slices remain `0cfcc345` (all dispatchable actions), `b1102486` (safe regeneration), `68c313fe` (multi-stage gifts), `b242e78c` (parameterized tasks), and `6290b3f74279731c7d80e97e077e88c10d35d676` (simple commands). Shared branch history also preserves unrelated concurrent P0B import-planner commits.
+**Local implementation:** branch `codex/contextual-dialogue-quest-framework-0a`; implementation is committed through `c2bf7e71` (C6-C optional-provider parity), following C6-B `b4c17de3`, C6-A `874b1b1e`, C5-D `73b7090c`, C5-C `e9c5b13f`, C5-B `06b2afac`, C5-A `f78bc77c`, C4-D `eceec6c9`, C4-C `cbd1de71`, C4-B `fc6d450d`, C4-A `7eb42777`, C3-D `f41ad18a`, C3-C `536b7141`, C3-B `a22b1d78`, C3-A `9ef46d2e`, C2-A `8a4e0b0e`, C1-A `470bb915`, C0-A `ca65049c`, G3C `9946fe69`, and documentation commit `32aceac7`. Earlier accepted slices remain `0cfcc345` (all dispatchable actions), `b1102486` (safe regeneration), `68c313fe` (multi-stage gifts), `b242e78c` (parameterized tasks), and `6290b3f74279731c7d80e97e077e88c10d35d676` (simple commands). Shared branch history also preserves unrelated concurrent P0B import-planner commits.
 
 **Upstream baseline:** `origin/docs/contextual-dialogue-quest-framework-20261018` at `a79b01ff14be33178f699c50623a20524b04d46c`; the local implementation is intentionally ahead of that documentation baseline.
 
-**Current goal status:** **IN PROGRESS — G3C, C0-A, C1-A, C2-A, C3-A, C3-B, C3-C, C3-D, C4-A, C4-B, C4-C, C5-A, C5-B, C5-C, C5-D, C6-A, and C6-B accepted; C6-C, optional PBrainZ parity, final handoff, and user-owned native-game gates remain open.**
+**Current goal status:** **READY FOR USER LIVE TEST — G3C, C0-A, C1-A, C2-A, C3-A, C3-B, C3-C, C3-D, C4-A, C4-B, C4-C, C5-A, C5-B, C5-C, C5-D, C6-A, C6-B, and C6-C developer gates accepted; native Project Zomboid SP/MP and live external PBrainZ validation remain user-owned.**
 
-**ONE Next Chunk:** **C6-C — verify optional PBrainZ realizes the same authoritative context and dialogue plan without creating facts, commitments, or gameplay effects, with offline Lua parity as the control.**
+**ONE Next Chunk:** **USER LIVE TEST — run the mandatory conversation in native Project Zomboid SP/MP with the intended mod/Core loadout, then optionally validate a real PBrainZ bridge; report any native-only authority, translation, persistence, or multiplayer divergence.**
 
 ## Accepted historic foundation (do not redo)
 
@@ -520,8 +520,35 @@ Focused acceptance evidence `b4c17de3`:
 - Codebase-memory coverage for the C6-B acceptance test returned `no_recorded_issue`; the new file is `not_tracked` in the older indexed generation, so acceptance relies on direct source reads and fresh-worker evidence.
 - No Project Zomboid process, multiplayer hosting, mod installation, Workshop publication, or native-game test was launched.
 
-C6-B does not verify optional PBrainZ shared-plan parity or final user-live-test
-handoff. C6-C is the single next bounded chunk.
+C6-B did not verify optional PBrainZ shared-plan parity or final user-live-test
+handoff. C6-C was the next bounded chunk and is now accepted below.
+
+## C6-C accepted — optional-provider parity and non-authorizing fallback
+
+C6-C verifies the existing optional provider seam against the offline Lua
+control. With the provider enabled, the authored seven-turn contextual
+conversation produces the same IR, context agenda, selected response plan,
+translated text, transport, and zero effects as the provider-disabled worker;
+the deterministic path does not surrender authority to PBrainZ. For an
+unknown utterance, the enabled provider is attempted once, the harness
+provider rejects with its controlled reason, and the existing deterministic
+clarification fallback produces the same response and no action result. No
+provider-created fact, promise, quest commitment, or gameplay mutation is
+accepted.
+
+Focused acceptance evidence `c2bf7e71`:
+
+- `python3 -m unittest tools.semantic_harness.tests.test_contextual_provider_parity_c6c tools.semantic_harness.tests.test_semantic_provider_parity -v` — **4/4 passed** on the real Lua worker.
+- `python3 -m unittest discover -s tools/semantic_harness/tests -q` — **179/179 passed** (`testsRun=179`, `failures=0`, `errors=0`).
+- `python3 -m unittest discover -s tools/semantic_compiler/tests -q` — **15/15 passed**; `python3 -m py_compile`, `git diff --check`, and the harness doctor passed.
+- `pz_verify --kahlua --severity ERROR --no-snippets` scanned 2,938 Lua files and reported **0 errors / 0 warnings**.
+- Codebase-memory coverage for the C6-C parity test returned `no_recorded_issue`; the new file is `not_tracked` in the older indexed generation, so acceptance relies on direct source reads and fresh-worker evidence.
+- The harness provider is deliberately a controlled rejection stub (`harness_llm_disabled`); no live external PBrainZ service was contacted. This proves the shared-plan/non-authorizing control path, not provider-generated prose quality.
+- No Project Zomboid process, multiplayer hosting, mod installation, Workshop publication, or native-game test was launched.
+
+All developer-owned gates are now complete for the offline production Lua
+implementation and Semantic Lab. Native Project Zomboid SP/MP execution and
+live external PBrainZ validation are the single user-owned next chunk.
 
 ## Verification evidence
 
@@ -542,13 +569,13 @@ handoff. C6-C is the single next bounded chunk.
 
 ## Scope boundary
 
-G0A, G0B, G0C, G0D/G0D-2, G0E, G0F, G0G, G0H, G0I, G3A, G3B, G3C, C0-A, C1-A, C2-A, C3-A, C3-B, C3-C, C3-D, C4-A, C4-B, C4-C, C4-D, C5-A, C5-B, C5-C, C5-D, C6-A, and C6-B are accepted implementation slices, not completion of the expanded goal. G3B's Semantic Lab/X11 gate, G3C's real-worker boundary, C0-A's worker authority regression gate, C1-A's context/resumption gate, C2-A's Knowledge commitment gate, C3-A/C3-B/C3-C/C3-D response-plan gates, C4-A's reviewed compiler/worker gate, C4-B's clarification/worker gate, C4-C's weather/resumption worker gate, C4-D's unknown-fact wellbeing gate, C5-A's read-only inspector gate, C5-B's reviewed dataset preview/restart gate, C5-C's artifact-diff gate, C5-D's approved-generation/reload gate, C6-A's measured isolation gate, and C6-B's mandatory-conversation gate are verified; native Project Zomboid SP/MP and Workshop actions remain user-owned. Continue with the single C6-C chunk above before any READY FOR USER LIVE TEST claim.
+G0A, G0B, G0C, G0D/G0D-2, G0E, G0F, G0G, G0H, G0I, G3A, G3B, G3C, C0-A, C1-A, C2-A, C3-A, C3-B, C3-C, C3-D, C4-A, C4-B, C4-C, C4-D, C5-A, C5-B, C5-C, C5-D, C6-A, C6-B, and C6-C are accepted implementation slices. G3B's Semantic Lab/X11 gate, G3C's real-worker boundary, C0-A's worker authority regression gate, C1-A's context/resumption gate, C2-A's Knowledge commitment gate, C3-A/C3-B/C3-C/C3-D response-plan gates, C4-A's reviewed compiler/worker gate, C4-B's clarification/worker gate, C4-C's weather/resumption worker gate, C4-D's unknown-fact wellbeing gate, C5-A's read-only inspector gate, C5-B's reviewed dataset preview/restart gate, C5-C's artifact-diff gate, C5-D's approved-generation/reload gate, C6-A's measured isolation gate, C6-B's mandatory-conversation gate, and C6-C's provider parity/fallback gate are verified. Developer implementation is READY FOR USER LIVE TEST; native Project Zomboid SP/MP, Workshop actions, and live external PBrainZ remain user-owned.
 
 
 ## Approved future goal expansion — Contextual Conversational Intelligence (2026-10-19 planning only)
 
 User-approved target: offline Lua NPCs should understand elliptical follow-ups, topic interruptions and resumption, pending questions/offers/corrections, personality-aware dialogue plans and sparse evidence-backed promises with relevant world/quest/knowledge context; optional PBrainZ may rephrase the SAME authorized plan. Improve `tools/semantic_compiler` and Semantic Lab with reviewed dataset-assisted language/conversation-state generation and a context/plan/evidence inspector. See NEW `CONVERSATIONAL_INTELLIGENCE.md`, `DATASET_CONVERSATION_PIPELINE.md` and `CONVERSATION_ACCEPTANCE.md`, and the refreshed `ROADMAP.md`.
 
-G3C, C0-A, C1-A, C2-A, C3-A, C3-B, C3-C, C3-D, C4-A, C4-B, C4-C, C4-D, C5-A, C5-B, C5-C, C5-D, C6-A, and C6-B are genuinely accepted locally with the evidence above. The next implementation task is exactly the single C6-C chunk named at the top; it is one optional PBrainZ shared-plan parity slice, not a claim of final handoff or native-game validation.
+G3C, C0-A, C1-A, C2-A, C3-A, C3-B, C3-C, C3-D, C4-A, C4-B, C4-C, C4-D, C5-A, C5-B, C5-C, C5-D, C6-A, C6-B, and C6-C are genuinely accepted locally with the evidence above. The single next chunk is now the user-owned native live-test handoff; this is not a claim that the assistant launched Project Zomboid, hosted multiplayer, published Workshop content, or contacted a live external PBrainZ service.
 
 Remote branch may not reflect the local Codex working checkout. Agent must reconcile current local HEAD/dirty/parallel work, and not discard implementation changes. C0-A measured and repaired the previously recorded four social THREAT test failures and insult final-response problem at the canonical worker authority boundary; C1-A measured topic interruption/resumption at the same worker boundary. Neither slice claims the mandatory multi-turn conversation complete.
