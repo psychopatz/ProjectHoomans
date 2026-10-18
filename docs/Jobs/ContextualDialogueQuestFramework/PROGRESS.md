@@ -1,14 +1,14 @@
 # Contextual Dialogue & Quest Framework — current progress
 
-**Updated:** 2026-10-18, after the G0H worker, regression, manifest, and X11 Semantic Lab verification.
+**Updated:** 2026-10-18, after the G0I worker, Lua regression, manifest, and X11 Semantic Lab verification.
 
-**Local implementation:** branch `codex/contextual-dialogue-quest-framework-0a`; implementation is committed through `796cb9d3` (G0H authoritative gossip-memory test), with feature code in `a2253b7c`. Earlier accepted slices remain `0cfcc345` (all dispatchable actions), `b1102486` (safe regeneration), `68c313fe` (multi-stage gifts), `b242e78c` (parameterized tasks), and `6290b3f74279731c7d80e97e077e88c10d35d676` (simple commands). Shared branch history also preserves unrelated concurrent P0B import-planner commits.
+**Local implementation:** branch `codex/contextual-dialogue-quest-framework-0a`; implementation is committed through `77300f59` (G0I stale scoped-cognition rejection), with the G0H feature code in `a2253b7c`. Earlier accepted slices remain `0cfcc345` (all dispatchable actions), `b1102486` (safe regeneration), `68c313fe` (multi-stage gifts), `b242e78c` (parameterized tasks), and `6290b3f74279731c7d80e97e077e88c10d35d676` (simple commands). Shared branch history also preserves unrelated concurrent P0B import-planner commits.
 
 **Upstream baseline:** `origin/docs/contextual-dialogue-quest-framework-20261018` at `d117d861730eaaf94c20e7b372c6ba37ac1f1b59`; PR #4 remains open and unmerged. The local implementation is intentionally ahead of that baseline.
 
-**Current goal status:** **IN PROGRESS — G0H accepted; target-scoped cognition freshness, server-authoritative quest, full production-harness/performance, and native-game gates remain open.**
+**Current goal status:** **IN PROGRESS — G0I accepted; server-authoritative quest, full production-harness/performance, and native-game gates remain open.**
 
-**ONE Next Chunk:** **G0I — verify target-scoped cognition freshness and stale gossip rejection across repeated, renamed, and unavailable targets without inventing memory facts.**
+**ONE Next Chunk:** **G3A — audit and implement one bounded server-owned Clinic Supplies quest contract/flow vertical slice using existing authority, inventory, event, persistence, and response seams; do not invent a quest VM or quest mutation from prose.**
 
 ## Accepted historic foundation (do not redo)
 
@@ -70,10 +70,16 @@ The response catalog now exposes a factual `memoryAvailable` condition derived o
 
 EN and TL worker traces verified registered gossip code `1001` renders the authoritative memory statement, selects `semantic.gossip.memory`, and records one cognition request plus one server-to-client event. With no configured cognition evidence, the same request remains `semantic.gossip.unknown` and emits no cognition transport. The existing target/request matching and bounded gossip-code validation remain in force.
 
+## G0I accepted — target-scoped cognition freshness
+
+Semantic cognition responses now carry the requested target ID through the existing server-to-client envelope. The real client rejects a pending response with a stale request ID or mismatched/missing target before merging its projection or gossip, clears the pending request, and preserves a bounded rejection reason for the existing dialogue completion path. No client-side memory fact is created.
+
+The real Lua worker fixture supports expected target IDs plus deliberately stale response request/target IDs. Worker traces verified the same target ID across a repeated request after an NPC rename, unavailable target mismatch with no cognition transport, and a stale response target that falls back to `semantic.gossip.unknown` without the old statement. Lua smoke tests also cover stale request IDs and matching request IDs crossing target scopes. The change is limited to existing cognition transport/correlation and does not add a parser or dispatcher.
+
 ## Verification evidence
 
-- Focused automatic/task/gift/editor/binding checks: **26/26 passed**, including EN/TL authoritative gossip, bounded-memory repetition, and the separated capability/flow-catalog handshake.
-- Full suite: `python3 -m unittest discover -s tools/semantic_harness/tests -p 'test_*.py'` — **136 tests, 132 passed**. The four failures remain the known pre-existing `ContextualSocialReactionTests.test_threat_uses_guarded_emotion_relationship_and_precedence` cases (`trusted`, `withdrawn`, `stressed`, and `stress_precedes_withdrawn_and_busy`), which exercise unavailable semantic-social transport fallback and are unrelated to automatic flow generation.
+- Current G0I real-worker checks: **2/2 passed**; cognition client/service/fact Lua smoke tests: **3/3 passed**; the broader automatic-flow, translation, and harness slice: **36/36 passed**.
+- Full suite: `python3 -m unittest discover -s tools/semantic_harness/tests -p 'test_*.py'` — **137 tests, 133 passed**. Four failures remain the known pre-existing `ContextualSocialReactionTests.test_threat_uses_guarded_emotion_relationship_and_precedence` cases (`trusted`, `withdrawn`, `stressed`, and `stress_precedes_withdrawn_and_busy`), which exercise unavailable semantic-social transport fallback and are unrelated to automatic flow generation or G0I cognition correlation.
 - Harness doctor: `./tools/semantic_harness/run_harness.sh --doctor --doctor-json` passed Python, repository, virtualenv, Tkinter/display, core repository, Lua, worker syntax, worker boot, and PING/CAPABILITIES checks.
 - Touched Lua passed `luac5.3 -p`; touched Python passed `py_compile`; generated EN/TL JSON parsed; and `git diff --check` passed.
 - X11/XTest evidence used real pointer motion/button events against the Tk Semantic Lab. It is distinct from invoking Tk callbacks programmatically. No repeated CUA probing was needed.
@@ -81,4 +87,4 @@ EN and TL worker traces verified registered gossip code `1001` renders the autho
 
 ## Scope boundary
 
-G0A, G0B, G0C, G0D/G0D-2, G0E, G0F, G0G, and G0H are accepted implementation slices, not completion of the expanded goal. Do not mark the expanded goal READY FOR USER LIVE TEST until target-scoped memory freshness, server-authoritative quest, full production-harness/performance, and user-owned native-game gates are actually verified.
+G0A, G0B, G0C, G0D/G0D-2, G0E, G0F, G0G, G0H, and G0I are accepted implementation slices, not completion of the expanded goal. Do not mark the expanded goal READY FOR USER LIVE TEST until the server-authoritative quest, full production-harness/performance, and user-owned native-game gates are actually verified.
