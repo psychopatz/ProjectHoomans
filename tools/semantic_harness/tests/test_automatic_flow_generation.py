@@ -387,6 +387,17 @@ class AutomaticFlowGenerationTests(unittest.TestCase):
                     for event in result["transport"]
                 ))
 
+        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+            unavailable = worker.input("any gossip?")
+        self.assertEqual(
+            unavailable["result"]["decision"]["response"]["templateID"],
+            "semantic.gossip.unknown",
+        )
+        self.assertFalse(any(
+            event.get("command") == "SemanticCognitionRequest"
+            for event in unavailable["transport"]
+        ))
+
 
 if __name__ == "__main__":
     unittest.main()
