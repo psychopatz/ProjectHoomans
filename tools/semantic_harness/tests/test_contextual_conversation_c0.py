@@ -53,9 +53,11 @@ class ContextualConversationC0Tests(unittest.TestCase):
             turns[3]["result"]["decision"]["response"]["templateID"],
             "semantic.question.needs.quantity.unknown",
         )
-        self.assertIsNone(
-            turns[3]["contextAfter"]["dialogue"].get("pendingFollowUp")
-        )
+        quantity_pending = turns[3]["contextAfter"]["dialogue"][
+            "pendingFollowUp"
+        ]
+        self.assertEqual(quantity_pending["kind"], "PROPOSAL")
+        self.assertEqual(quantity_pending["requiredSlots"], ["offer"])
         self.assertEqual(
             turns[3]["contextAfter"]["dialogue"]["lastFollowUp"]["status"],
             "fulfilled",
@@ -66,11 +68,29 @@ class ContextualConversationC0Tests(unittest.TestCase):
         self.assertEqual(turns[3]["transport"], [])
         self.assertEqual(turns[3]["toolCalls"], [])
         self.assertEqual(turns[3]["llmCalls"], 0)
+        self.assertEqual(turns[4]["result"]["ir"]["intent"], "PROMISE")
+        self.assertEqual(turns[4]["result"]["ir"]["subject"], "NEEDS")
+        self.assertIsNone(turns[4]["result"]["ir"].get("action"))
         self.assertEqual(
             turns[4]["result"]["decision"]["response"]["templateID"],
-            "semantic.ask_clarification",
+            "semantic.question.needs.proposal.unknown",
         )
-        self.assertTrue(turns[4]["result"]["ir"]["diagnostics"]["noMatch"])
+        self.assertEqual(
+            turns[4]["result"]["decision"]["response"]["plan"][
+                "dialogueAct"
+            ],
+            "PROMISE_ACKNOWLEDGEMENT",
+        )
+        self.assertEqual(
+            turns[4]["contextAfter"]["dialogue"]["pendingFollowUp"]["kind"],
+            "PROPOSAL",
+        )
+        self.assertEqual(
+            turns[4]["contextAfter"]["dialogue"]["pendingFollowUp"][
+                "requiredSlots"
+            ],
+            ["confirmation"],
+        )
         self.assertIsNone(turns[4]["result"].get("actionResult"))
         self.assertEqual(
             turns[5]["result"]["decision"]["response"]["templateID"],
@@ -81,8 +101,15 @@ class ContextualConversationC0Tests(unittest.TestCase):
             turns[6]["result"]["decision"]["response"]["templateID"],
             "semantic.question.needs.quantity.unknown",
         )
-        self.assertIsNone(
-            turns[6]["contextAfter"]["dialogue"].get("pendingFollowUp")
+        self.assertEqual(
+            turns[6]["contextAfter"]["dialogue"]["pendingFollowUp"]["kind"],
+            "PROPOSAL",
+        )
+        self.assertEqual(
+            turns[6]["contextAfter"]["dialogue"]["pendingFollowUp"][
+                "requiredSlots"
+            ],
+            ["confirmation"],
         )
         for turn in turns[4:]:
             self.assertEqual(turn["transport"], [])

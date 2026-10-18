@@ -132,7 +132,7 @@ local function pendingFor(flow, node, topic)
     end
     return {
         id = "flow:" .. tostring(flow.id) .. ":" .. tostring(node.id),
-        kind = "QUESTION",
+        kind = node.pendingKind or "QUESTION",
         topic = topic or flow.topic or flow.id,
         owner = "flow",
         flowID = flow.id,
@@ -153,6 +153,17 @@ local function setPending(storage, preview)
     local pending = copyValue(preview.pendingFollowUp)
     pending.openedTurn = pending.openedTurn
         or sequenceFor(nil, storage)
+    local current = type(storage.GetPendingFollowUp) == "function"
+        and storage:GetPendingFollowUp() or nil
+    if type(current) == "table"
+        and current.id ~= pending.id
+        and tostring(current.flowID or "") == tostring(pending.flowID or "")
+        and type(storage.CompletePendingFollowUp) == "function"
+    then
+        -- Advancing within one flow fulfills the prior obligation before
+        -- opening its next bounded question/proposal.
+        storage:CompletePendingFollowUp("fulfilled", "flow_transition")
+    end
     return storage:SetPendingFollowUp(pending)
 end
 

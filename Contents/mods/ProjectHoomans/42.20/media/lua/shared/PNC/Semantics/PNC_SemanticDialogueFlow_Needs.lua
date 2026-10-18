@@ -23,7 +23,34 @@ return {
         },
         quantity_answer = {
             responsePool = "semantic.question.needs.quantity",
-            terminal = true,
+            accepts = {
+                {
+                    intent = "PROMISE",
+                    speechAct = "PROMISE",
+                    subject = "NEEDS",
+                },
+            },
+            requiredSlots = { "offer" },
+            sourceFactRefs = { "npc.needs" },
+            pendingKind = "PROPOSAL",
+            onMatch = "proposal_pending",
+            onRefuse = "cancel",
+            onUnrelated = "suspend",
+        },
+        proposal_pending = {
+            responsePool = "semantic.question.needs.proposal",
+            accepts = {
+                { intent = "ACCEPT" },
+                { intent = "AGREE" },
+            },
+            requiredSlots = { "confirmation" },
+            sourceFactRefs = { "npc.needs" },
+            pendingKind = "PROPOSAL",
+            -- Keep an explicit acceptance in the proposal state until a
+            -- future authority-backed confirmation path is implemented.
+            onMatch = "proposal_pending",
+            onRefuse = "cancel",
+            onUnrelated = "suspend",
         },
     },
 }

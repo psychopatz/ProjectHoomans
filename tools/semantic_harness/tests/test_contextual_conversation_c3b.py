@@ -83,7 +83,11 @@ class ContextualConversationC3BTests(unittest.TestCase):
                 self.assertEqual(
                     second_plan["groundedFactRefs"], ["npc.needs.hunger"]
                 )
-                self.assertIsNone(after.get("pendingFollowUp"))
+                pending_after_quantity = after["pendingFollowUp"]
+                self.assertEqual(pending_after_quantity["kind"], "PROPOSAL")
+                self.assertEqual(
+                    pending_after_quantity["requiredSlots"], ["offer"]
+                )
                 self.assertEqual(after["lastFollowUp"]["status"], "fulfilled")
                 self.assertEqual(
                     after["lastFollowUp"]["requiredSlots"], ["quantity"]

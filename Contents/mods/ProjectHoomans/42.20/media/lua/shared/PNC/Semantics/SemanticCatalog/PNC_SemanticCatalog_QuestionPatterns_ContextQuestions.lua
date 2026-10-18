@@ -397,6 +397,49 @@ function Internal.RegisterWorldFactQuestions()
         98
     )
 
+    -- Keep a conversational supply promise separate from FETCH.  This is a
+    -- proposal about the active needs exchange, not a gameplay command.
+    registerPattern(
+        "pnc.promise.needs_get_some",
+        {
+            { kind = "literal", value = "i'll" },
+            { kind = "concept", id = "FETCH" },
+            { kind = "literal", value = "some" },
+        },
+        {
+            intent = "PROMISE",
+            speechAct = "PROMISE",
+            subject = "NEEDS",
+            extensions = {
+                topic = "needs",
+                dialogueFollowUp = "NEEDS_PROPOSAL",
+            },
+        },
+        0.99,
+        99
+    )
+
+    registerPattern(
+        "pnc.promise.needs_get_some_plain",
+        {
+            { kind = "literal", value = "i" },
+            { kind = "literal", value = "will" },
+            { kind = "concept", id = "FETCH" },
+            { kind = "literal", value = "some" },
+        },
+        {
+            intent = "PROMISE",
+            speechAct = "PROMISE",
+            subject = "NEEDS",
+            extensions = {
+                topic = "needs",
+                dialogueFollowUp = "NEEDS_PROPOSAL",
+            },
+        },
+        0.99,
+        98
+    )
+
     registerPattern(
         "pnc.question.gift_preference_like",
         {

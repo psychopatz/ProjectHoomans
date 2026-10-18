@@ -285,6 +285,11 @@ local function normalizeNode(nodeID, node, nodes)
     end
     output.requiredSlots = requiredSlots
     output.sourceFactRefs = sourceFactRefs
+    local pendingKind = stringValue(node.pendingKind)
+    if node.pendingKind ~= nil and (not pendingKind or #pendingKind > 32) then
+        return nil, "node_pending_kind_invalid:" .. tostring(nodeID)
+    end
+    output.pendingKind = pendingKind
     local gate, reason = normalizeGate(node.gate, "node_gate")
     if node.gate ~= nil and not gate then return nil, reason end
     output.gate = gate

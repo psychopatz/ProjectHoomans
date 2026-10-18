@@ -456,6 +456,100 @@ Catalog.Register("semantic.question.needs.quantity", {
     },
 })
 
+Catalog.Register("semantic.question.needs.proposal", {
+    variants = {
+        {
+            id = "semantic.question.needs.proposal.hunger",
+            templateID = "semantic.question.needs.proposal.hunger",
+            fallback = "I can keep that as a proposal, but I still need the item and amount before I record a commitment.",
+            when = {
+                needType = "hunger",
+                needUrgency = { "moderate", "severe", "emergency", "critical" },
+            },
+            priority = 3,
+            plan = {
+                dialogueAct = "PROMISE_ACKNOWLEDGEMENT",
+                sourcePoolID = "semantic.question.needs.proposal",
+                topic = "NEEDS",
+                groundedFactRefs = { "npc.needs.hunger" },
+                uncertainty = "pending",
+                tone = "direct",
+                turns = {
+                    {
+                        id = "proposal_acknowledged",
+                        continuation = "continue",
+                        segments = {
+                            {
+                                kind = "translation",
+                                templateID = "semantic.question.needs.proposal.hunger",
+                                fallback = "I can keep that as a proposal, but I still need the item and amount before I record a commitment.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        {
+            id = "semantic.question.needs.proposal.thirst",
+            templateID = "semantic.question.needs.proposal.thirst",
+            fallback = "I can keep that as a proposal, but I still need the item and amount before I record a commitment.",
+            when = {
+                needType = "thirst",
+                needUrgency = { "moderate", "severe", "emergency", "critical" },
+            },
+            priority = 3,
+            plan = {
+                dialogueAct = "PROMISE_ACKNOWLEDGEMENT",
+                sourcePoolID = "semantic.question.needs.proposal",
+                topic = "NEEDS",
+                groundedFactRefs = { "npc.needs.thirst" },
+                uncertainty = "pending",
+                tone = "direct",
+                turns = {
+                    {
+                        id = "proposal_acknowledged",
+                        continuation = "continue",
+                        segments = {
+                            {
+                                kind = "translation",
+                                templateID = "semantic.question.needs.proposal.thirst",
+                                fallback = "I can keep that as a proposal, but I still need the item and amount before I record a commitment.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        {
+            id = "semantic.question.needs.proposal.unknown",
+            templateID = "semantic.question.needs.proposal.unknown",
+            fallback = "I can keep that as a proposal, but I need to confirm the item and amount before I record a commitment.",
+            priority = 0,
+            plan = {
+                dialogueAct = "PROMISE_ACKNOWLEDGEMENT",
+                sourcePoolID = "semantic.question.needs.proposal",
+                topic = "NEEDS",
+                groundedFactRefs = {},
+                uncertainty = "pending",
+                tone = "clarifying",
+                turns = {
+                    {
+                        id = "proposal_acknowledged",
+                        continuation = "continue",
+                        segments = {
+                            {
+                                kind = "translation",
+                                templateID = "semantic.question.needs.proposal.unknown",
+                                fallback = "I can keep that as a proposal, but I need to confirm the item and amount before I record a commitment.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+    },
+})
+
 -- Keep an unsupported wellbeing snapshot out of the normal response pool.
 -- That pool already includes the bounded generated response variants; this
 -- separate pool makes uncertainty explicit without expanding its limit.

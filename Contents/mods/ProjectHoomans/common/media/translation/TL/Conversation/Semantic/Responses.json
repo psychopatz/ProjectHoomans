@@ -98,5 +98,8 @@
   "UI_PNC_Conversation_Semantic_QuestionNeedsOfferUnknown": "Hindi ko alam kung ano ang kailangan ko ngayon.",
   "UI_PNC_Conversation_Semantic_QuestionNeedsQuantityHunger": "Alam kong pagkain ang kailangan ko, pero hindi ko pa masabi ang eksaktong dami.",
   "UI_PNC_Conversation_Semantic_QuestionNeedsQuantityThirst": "Alam kong tubig ang kailangan ko, pero hindi ko pa masabi ang eksaktong dami.",
-  "UI_PNC_Conversation_Semantic_QuestionNeedsQuantityUnknown": "Hindi ko makumpirma ang eksaktong dami. Anong gamit ang tinutukoy mo?"
+  "UI_PNC_Conversation_Semantic_QuestionNeedsQuantityUnknown": "Hindi ko makumpirma ang eksaktong dami. Anong gamit ang tinutukoy mo?",
+  "UI_PNC_Conversation_Semantic_QuestionNeedsProposalHunger": "Ituturing ko muna itong panukala, pero kailangan ko pa ang gamit at dami bago ako magtala ng pangako.",
+  "UI_PNC_Conversation_Semantic_QuestionNeedsProposalThirst": "Ituturing ko muna itong panukala, pero kailangan ko pa ang gamit at dami bago ako magtala ng pangako.",
+  "UI_PNC_Conversation_Semantic_QuestionNeedsProposalUnknown": "Ituturing ko muna itong panukala, pero kailangan ko munang tiyakin ang gamit at dami bago ako magtala ng pangako."
 }
