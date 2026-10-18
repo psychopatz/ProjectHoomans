@@ -111,6 +111,18 @@ local function missingMetadata(row, template)
                 or tostring(response.tl or "") == ""
             then
                 missing[#missing + 1] = "responsePools." .. outcome
+            elseif type(response.variants) == "table" then
+                for variantIndex = 1, #response.variants do
+                    local variant = response.variants[variantIndex]
+                    if type(variant) ~= "table"
+                        or tostring(variant.key or "") == ""
+                        or tostring(variant.en or "") == ""
+                        or tostring(variant.tl or "") == ""
+                    then
+                        missing[#missing + 1] = "responsePools."
+                            .. outcome .. ".variants." .. tostring(variantIndex)
+                    end
+                end
             end
         end
     end
@@ -150,15 +162,31 @@ local function buildFlow(row)
         local response = row.responsePools[outcome]
         local poolID = responsePoolID(action, outcome, workflowKind)
         pools[outcome] = poolID
+        local variants = {
+            {
+                id = "default",
+                templateID = response.key,
+                fallback = response.en,
+            },
+        }
+        for variantIndex, variant in ipairs(response.variants or {}) do
+            if type(variant) == "table"
+                and tostring(variant.key or "") ~= ""
+                and tostring(variant.en or "") ~= ""
+                and tostring(variant.tl or "") ~= ""
+            then
+                variants[#variants + 1] = {
+                    id = variant.id or ("context." .. tostring(variantIndex)),
+                    templateID = variant.key,
+                    fallback = variant.en,
+                    priority = tonumber(variant.priority) or 0,
+                    when = copyValue(variant.when),
+                }
+            end
+        end
         responsePools[#responsePools + 1] = {
             id = poolID,
-            variants = {
-                {
-                    id = "default",
-                    templateID = response.key,
-                    fallback = response.en,
-                },
-            },
+            variants = variants,
         }
     end
 

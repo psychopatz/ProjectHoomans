@@ -212,8 +212,8 @@ class AutomaticFlowGenerationTests(unittest.TestCase):
             stay = worker.input("Stay here")
 
         for result, action, response_key in (
-            (follow, "follow", "UI_PNC_Conversation_Semantic_GeneratedFollowQueued"),
-            (stay, "stay", "UI_PNC_Conversation_Semantic_GeneratedStayQueued"),
+            (follow, "follow", "UI_PNC_Conversation_Semantic_GeneratedFollowQueuedWithdrawn"),
+            (stay, "stay", "UI_PNC_Conversation_Semantic_GeneratedStayQueuedWithdrawn"),
         ):
             flow = result["result"]["flow"]
             self.assertTrue(flow["generated"])
@@ -224,6 +224,46 @@ class AutomaticFlowGenerationTests(unittest.TestCase):
             self.assertEqual(result["result"]["actionResult"]["commandID"], action)
             self.assertEqual(len(result["transport"]), 1)
             self.assertEqual(result["messages"][0]["payload"]["translationKey"], response_key)
+
+    def test_generated_simple_command_uses_relationship_and_personality_context(self) -> None:
+        friendly_scenario = merge(
+            DEFAULT_SCENARIO,
+            {"npc": {"traits": {"friendly": True}, "relationshipState": "unknown"}},
+        )
+        trusted_scenario = merge(
+            DEFAULT_SCENARIO,
+            {"npc": {"traits": {"reserved": True}, "relationshipState": "Friend"}},
+        )
+        tl_scenario = merge(
+            friendly_scenario,
+            {"runtime": {"language": "TL"}},
+        )
+
+        with LuaSemanticWorker(friendly_scenario) as worker:
+            friendly = worker.input("Follow me")
+        with LuaSemanticWorker(trusted_scenario) as worker:
+            trusted = worker.input("Follow me")
+        with LuaSemanticWorker(tl_scenario) as worker:
+            tagalog = worker.input("Follow me")
+
+        self.assertEqual(
+            friendly["messages"][0]["payload"]["translationKey"],
+            "UI_PNC_Conversation_Semantic_GeneratedFollowQueuedFriendly",
+        )
+        self.assertEqual(
+            trusted["messages"][0]["payload"]["translationKey"],
+            "UI_PNC_Conversation_Semantic_GeneratedFollowQueuedTrusted",
+        )
+        self.assertEqual(
+            tagalog["messages"][0]["payload"]["translationKey"],
+            "UI_PNC_Conversation_Semantic_GeneratedFollowQueuedFriendly",
+        )
+        self.assertEqual(tagalog["messages"][0]["payload"]["text"], "Siyempre, susundan kita.")
+        for result in (friendly, trusted, tagalog):
+            self.assertTrue(result["result"]["flow"]["generated"])
+            self.assertEqual(result["result"]["flow"]["resultOutcome"], "queued")
+            self.assertEqual(result["result"]["flow"]["dispatchCount"], 1)
+            self.assertEqual(len(result["transport"]), 1)
 
     def test_denied_failed_and_context_gate_are_truthful(self) -> None:
         denied_scenario = merge(
