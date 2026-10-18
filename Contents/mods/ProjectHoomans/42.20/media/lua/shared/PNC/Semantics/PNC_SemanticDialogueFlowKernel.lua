@@ -609,6 +609,15 @@ local function resultOutcome(action, actionResult)
     local detailStatus = type(details) == "table"
         and tostring(details.status or "") or ""
     if actionResult and actionResult.accepted ~= true then
+        if mapping[detailStatus] then
+            return mapping[detailStatus], mapping[detailStatus]
+        end
+        if mapping[status] then
+            return mapping[status], mapping[status]
+        end
+        if mapping[reason] then
+            return mapping[reason], mapping[reason]
+        end
         if status == "failed" or detailStatus == "failed"
             or reason == "task_transport_failed"
         then

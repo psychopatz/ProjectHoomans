@@ -128,11 +128,12 @@ class FlowEditorTests(unittest.TestCase):
                     "wellbeing",
                     "weather_context",
                     "greeting",
-                    "pnc.dialogue.follow.flow",
-                    "pnc.generated.parameterized_task.pnc.task.fetch",
-                    "pnc.generated.parameterized_task.pnc.task.wait.at",
-                    "pnc.generated.simple_command.pnc.companion.follow",
-                    "pnc.generated.simple_command.pnc.companion.stay",
+                "pnc.dialogue.follow.flow",
+                "pnc.generated.parameterized_task.pnc.task.fetch",
+                "pnc.generated.parameterized_task.pnc.task.wait.at",
+                "pnc.generated.simple_command.pnc.companion.follow",
+                "pnc.generated.simple_command.pnc.companion.stay",
+                "pnc.generated.multi_stage_gift.pnc.gift.offer",
                 ],
             )
             greeting = next(flow for flow in catalog["flows"] if flow["id"] == "greeting")

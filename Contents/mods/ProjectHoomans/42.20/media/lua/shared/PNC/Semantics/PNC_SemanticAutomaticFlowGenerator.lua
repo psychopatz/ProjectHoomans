@@ -27,6 +27,15 @@ local TEMPLATES = {
             "parameterized_task:v1:context_gate:typed_slots:one_dispatch:admission_map",
         outcomes = { "admitted", "active", "completed", "rejected", "failed" },
     },
+    multi_stage_gift = {
+        version = 1,
+        fingerprint =
+            "multi_stage_gift:v1:context_gate:typed_slots:one_dispatch:lifecycle_map",
+        outcomes = {
+            "selection_required", "pending", "completed", "rejected", "failed",
+        },
+        nonTerminalOutcomes = { pending = true },
+    },
 }
 
 local REQUIRED_FIELDS = {
@@ -181,9 +190,18 @@ local function buildFlow(row)
         local outcome = template.outcomes[index]
         nodes[outcome] = {
             id = outcome,
-            terminal = true,
+            terminal = not (template.nonTerminalOutcomes
+                and template.nonTerminalOutcomes[outcome] == true),
             responsePool = pools[outcome],
         }
+        if template.nonTerminalOutcomes
+            and template.nonTerminalOutcomes[outcome] == true
+        then
+            nodes[outcome].accepts = copyValue(row.triggerFrames)
+                or genericTrigger(action)
+            nodes[outcome].onMatch = outcome
+            nodes[outcome].onUnrelated = "suspend"
+        end
     end
 
     return {

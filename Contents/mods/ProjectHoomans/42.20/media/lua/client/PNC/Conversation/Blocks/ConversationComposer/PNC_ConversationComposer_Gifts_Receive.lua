@@ -14,6 +14,7 @@ function Composer.ReceiveGiftResult(args)
     if not state then return false end
 
     local values = state.args
+    ReceiveContext.ApplyGeneratedFlowResult(state)
     if values.success ~= true then
         ReceiveContext.ClearConversationState(state, true)
         ReceivePresentation.AppendFailure(state)

@@ -18,8 +18,8 @@ class AutomaticFlowGenerationTests(unittest.TestCase):
         generation = catalog["generation"]
         self.assertEqual(generation["templateVersion"], 1)
         self.assertIn("simple_command:v1", generation["templateFingerprint"])
-        self.assertEqual(generation["summary"]["generated"], 4)
-        self.assertEqual(generation["summary"]["unsupported_workflow"], 7)
+        self.assertEqual(generation["summary"]["generated"], 5)
+        self.assertEqual(generation["summary"]["unsupported_workflow"], 6)
         self.assertEqual(generation["summary"]["metadata_incomplete"], 0)
         rows = {
             row["id"]: row for row in generation["coverage"]

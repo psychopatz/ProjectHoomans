@@ -8,6 +8,21 @@ local ReceiveContext = {}
 local GiftLifecycle = PNC.Semantics and PNC.Semantics.GiftLifecycle
 local GiftContext = PNC.Semantics and PNC.Semantics.GiftContext
 
+local function generatedFlowFor(state)
+    local view = state and state.view or nil
+    local current = view and view.lastSemanticDialogueResult or nil
+    local flow = current and current.flow or nil
+    if type(flow) == "table" and flow.generated == true then
+        return flow, current
+    end
+    local pending = state and state.pending or nil
+    flow = pending and pending.generatedFlow or nil
+    if type(flow) == "table" and flow.generated == true then
+        return flow, current
+    end
+    return nil, current
+end
+
 function ReceiveContext.Build(args)
     args = type(args) == "table" and args or {}
     local view = Internal.ActiveView(args.npcId)
@@ -109,6 +124,47 @@ function ReceiveContext.RecordTransfer(state)
             .. tostring(contextReason or "unknown"))
     end
     return recorded, contextReason
+end
+
+function ReceiveContext.ApplyGeneratedFlowResult(state)
+    local flow, current = generatedFlowFor(state)
+    local view = state and state.view or nil
+    local session = state and state.session or nil
+    local policy = PNC.Semantics and PNC.Semantics.DialoguePolicy or nil
+    local kernel = policy and policy.Internal and policy.Internal.FlowKernel
+    local semanticState = session and session.semanticDialogueState
+    if not flow or not view or not semanticState
+        or not kernel or type(kernel.ApplyActionResult) ~= "function"
+    then
+        return false, "generated_gift_flow_unavailable"
+    end
+
+    local values = state.args or {}
+    local actionResult = {
+        action = "GIFT",
+        capabilityID = "pnc:gift.offer",
+        requestID = state.requestID,
+        accepted = values.success == true,
+        status = values.success == true and "completed" or "failed",
+        reason = values.reason,
+        details = {
+            status = values.success == true and "completed" or "failed",
+        },
+    }
+    local updated, reason = kernel.ApplyActionResult(
+        flow, actionResult, semanticState, {}, { maxFlowStack = 4 }
+    )
+    if type(updated) ~= "table" then
+        return false, reason
+    end
+    if current then
+        current.flow = updated
+        if type(current.decision) == "table" then
+            current.decision.flow = updated
+        end
+    end
+    state.generatedFlow = updated
+    return true, updated
 end
 
 Internal.GiftReceiveContext = ReceiveContext
