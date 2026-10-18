@@ -8,8 +8,8 @@
 | G3A–G3B | RECORDED ACCEPTED | Server-owned Clinic Supplies contract, four generated quest actions and 17/18 capability coverage; worker and X11 proofs recorded. Not native PZ. |
 | **G3C — Quest command/reload boundary** | **RECORDED ACCEPTED** | Real multiplayer-mode Lua worker exercised the production client facade, server router/handler/service, correlated result, bounded duplicate replay, and fresh worker reload. Native PZ networking remains user-owned. |
 | **C0 — Conversational baseline** | **RECORDED ACCEPTED / C0-A** | Real Lua worker characterized the required sequence and safely stopped before unsupported needs/quantity/weather claims; canonical social authority repaired the insult and four THREAT regressions. |
-| **C1 — Conversation frames & ellipsis** | **CURRENT / C1-A NOT STARTED** | Extend existing ContextState/ContextResolver/FlowKernel with one bounded pending-follow-up contract for quantity/reference clarification and topic interruption/resumption across wellbeing and weather; ambiguity abstains. |
-| **C2 — Sparse episodic memory** | PLANNED | Persist only verified acknowledged promises/events and reliable owner IDs; memory across conversation boundary without leakage or full transcript. |
+| **C1 — Conversation frames & ellipsis** | **RECORDED ACCEPTED / C1-A** | Real Lua worker verified a bounded flow-owned pending-follow-up agenda, contextual interruption trace, terminal weather suspension, and compatible wellbeing resumption with zero side effects. |
+| **C2 — Sparse episodic memory** | **CURRENT / C2-A NOT STARTED** | Add one owner-linked commitment adapter using existing Knowledge/Cognition/Quest authority; unknown, unacknowledged, and wrong-owner cases remain non-authoritative. |
 | **C3 — Dialogue-act planner** | PLANNED | Fact-grounded modular response plans with social/personality/relationship variation and truth-preserving EN/TL wording; no unadmitted effect. |
 | **C4 — Dataset-assisted Code Builder** | PLANNED | Reviewed/licensed MASSIVE/WordNet/SGD-style candidates to existing canonical spec, guarded compilers/response pools/manifests, collision and false-command protection; fresh worker. |
 | **C5 — Semantic Lab context/dataset workbench** | PLANNED | Visual trace of agenda, focused references, memory provenance, dialogue plan, typed generated flow and dataset candidate approval, safe code/source diff. |
@@ -17,9 +17,9 @@
 
 ## Sequence and Next Chunk discipline
 
-1. Begin with `PROGRESS.md` **C1-A**. Do not restart already accepted capability-generation phases or publish Workshop in order to test.
-2. Keep C1-A to ONE bounded **pending-follow-up/topic-resumption vertical slice** using existing context and flow ownership. Do not prematurely claim C2–C6 or spawn new docs-only iterations.
-3. Then C2→C3→C4→C5→C6, splitting each into one source+real-worker verifiable vertical chunk. Fix safety/correctness regressions before corpus expansion.
+1. Begin with `PROGRESS.md` **C2-A**. Do not restart already accepted capability-generation phases or publish Workshop in order to test.
+2. Keep C2-A to ONE bounded **owner-linked episodic commitment vertical slice** using existing Knowledge/Cognition/Quest ownership. Do not prematurely claim C3–C6 or spawn new docs-only iterations.
+3. Then C3→C4→C5→C6, splitting each into one source+real-worker verifiable vertical chunk. Fix safety/correctness regressions before corpus expansion.
 4. A dataset is an offline reviewed *input*, never a runtime NLP interpreter. Verified context-state quality outranks corpus quantity. Existing FlowRegistry/response planning/command authority remains the source of truth.
 
 Design: `CONVERSATIONAL_INTELLIGENCE.md`; corpus and compiler: `DATASET_CONVERSATION_PIPELINE.md`; checks: `CONVERSATION_ACCEPTANCE.md`. Earlier flow/gift/quest acceptance remains documented in `PROGRESS.md` and `HISTORY_20261018.md`.

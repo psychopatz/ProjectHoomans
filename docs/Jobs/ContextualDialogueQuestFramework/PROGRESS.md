@@ -1,14 +1,14 @@
 # Contextual Dialogue & Quest Framework — current progress
 
-**Updated:** 2026-10-19, after the C0-A real-worker contextual baseline and canonical social-authority repair.
+**Updated:** 2026-10-19, after the C1-A real-worker pending-follow-up and topic-resumption slice.
 
-**Local implementation:** branch `codex/contextual-dialogue-quest-framework-0a`; implementation is committed through `ca65049c` (C0-A production-worker baseline, social-authority repair, and regression tests), following G3C `9946fe69` and the updated documentation commit `a79b01ff14be`. Earlier accepted slices remain `0cfcc345` (all dispatchable actions), `b1102486` (safe regeneration), `68c313fe` (multi-stage gifts), `b242e78c` (parameterized tasks), and `6290b3f74279731c7d80e97e077e88c10d35d676` (simple commands). Shared branch history also preserves unrelated concurrent P0B import-planner commits.
+**Local implementation:** branch `codex/contextual-dialogue-quest-framework-0a`; implementation is committed through `470bb915` (C1-A bounded context-state agenda, resolver trace, terminal-flow interruption/resumption, and real-worker regression test), following C0-A `ca65049c`, G3C `9946fe69`, and the updated documentation commit `a79b01ff14be`. Earlier accepted slices remain `0cfcc345` (all dispatchable actions), `b1102486` (safe regeneration), `68c313fe` (multi-stage gifts), `b242e78c` (parameterized tasks), and `6290b3f74279731c7d80e97e077e88c10d35d676` (simple commands). Shared branch history also preserves unrelated concurrent P0B import-planner commits.
 
 **Upstream baseline:** `origin/docs/contextual-dialogue-quest-framework-20261018` at `a79b01ff14be33178f699c50623a20524b04d46c`; the local implementation is intentionally ahead of that documentation baseline.
 
-**Current goal status:** **IN PROGRESS — G3C and C0-A accepted; C1–C6, full production-harness/performance, and user-owned native-game gates remain open.**
+**Current goal status:** **IN PROGRESS — G3C, C0-A, and C1-A accepted; C2–C6, full production-harness/performance, and user-owned native-game gates remain open.**
 
-**ONE Next Chunk:** **C1-A — extend the existing DialogueContextState/ContextResolver/FlowKernel with one bounded, domain-neutral pending-follow-up contract for quantity/reference clarification and topic interruption/resumption, then verify it in the real Lua worker across wellbeing and weather without creating gameplay actions.**
+**ONE Next Chunk:** **C2-A — add one bounded, owner-linked episodic commitment adapter on the existing Knowledge/Cognition/Quest authority boundary, accepting only an acknowledged conversation commitment and proving unknown, unacknowledged, and wrong-owner cases remain non-authoritative.**
 
 ## Accepted historic foundation (do not redo)
 
@@ -109,7 +109,22 @@ Focused real-worker evidence in `ca65049c`:
 - Full worker suite: `python3 -m unittest discover -s tools/semantic_harness/tests -p 'test_*.py' -q` — **145/145 passed**.
 - `luac5.3 -p` passed the changed worker Lua; `python3 -m py_compile` passed changed Python; `git diff --check` passed. `pz-verify` was clean for the changed Project Zomboid Lua in the preceding G3C slice; its C0-A run against the harness loader reports the loader's existing `dofile()` as `KAHL-E022`, outside the Project Zomboid mod tree. No Project Zomboid process, multiplayer hosting, mod installation, or Workshop publication was launched.
 
-C0-A does not yet implement generalized needs/quantity/reference resolution, topic interruption/resumption, episodic commitments, or the final mandatory conversation. Those remain C1+ work.
+C0-A did not implement generalized needs/quantity/reference resolution, topic interruption/resumption, episodic commitments, or the final mandatory conversation. C1-A now covers only the bounded topic interruption/resumption contract; the remaining capabilities stay open.
+
+## C1-A accepted — bounded pending follow-up and topic resumption
+
+C1-A extends the existing `DialogueContextState` with a bounded agenda (`pendingFollowUp`, fulfilled history, and prior-topic history), adds a pure `ContextResolver` trace that distinguishes a same-topic follow-up from an interruption, and carries the contract through the existing `DialogueFlowKernel`. A terminal weather flow now suspends an active non-terminal flow instead of discarding it; the next compatible turn resumes the suspended flow. The context object remains the sole conversation-local owner and stores no full transcript or gameplay authority.
+
+The real production Lua worker exercised `Are you okay?` → `Is it raining?` → `What happened?`: wellbeing opened a flow-owned question agenda entry; weather produced `contextualFollowUp.status=interrupted`, changed the topic to weather, and left wellbeing suspended with no action; the recovered wellbeing follow-up produced `contextualFollowUp.status=matched`, resumed the suspended flow, fulfilled the agenda entry, and returned to wellbeing. All responses were deterministic, fact-bounded, and side-effect-free.
+
+Focused real-worker evidence in `470bb915`:
+
+- `python3 -m unittest tools.semantic_harness.tests.test_contextual_conversation_c1 -q` — **1/1 passed**.
+- C0/C1, social, context, weather, flow, paraphrase, wellbeing, identity, translation, and provider-parity slice — **51/51 passed**.
+- Full worker suite: `python3 -m unittest discover -s tools/semantic_harness/tests -p 'test_*.py' -q` — **146/146 passed**.
+- `luac5.3 -p` passed every changed production Lua file; `pz-verify --kahlua --severity ERROR` reported zero errors for every changed production Lua file; `git diff --check` passed. No Project Zomboid process, multiplayer hosting, mod installation, or Workshop publication was launched.
+
+C1-A does not yet implement quantity-slot fulfillment, durable episodic commitments, dialogue-act planning, dataset compilation, Semantic Lab inspection, performance/isolation measurement, or the final mandatory conversation. Those remain C2+ work.
 
 ## Semantic Lab naming audit
 
@@ -126,7 +141,7 @@ The generator's canonical IDs remain unchanged for registry lookup, persisted ma
 - G3A source checks: `luac5.3 -p` passed for the new quest definition/repository/service, server composition, and inventory transfer boundary; `pz_verify --kahlua` reported **0 errors / 0 warnings** for each touched Lua file; `git diff --check` passed.
 
 - Current G0I real-worker checks: **2/2 passed**; cognition client/service/fact Lua smoke tests: **3/3 passed**; the broader automatic-flow, translation, and harness slice: **36/36 passed**.
-- Full suite after C0-A: `python3 -m unittest discover -s tools/semantic_harness/tests -p 'test_*.py' -q` — **145/145 passed**. The four previously failing THREAT cases and the insult final-response regression now exercise the canonical social authority and authored visible responses. The required multi-turn conversation remains a characterized safe stop after the wellbeing turns, as recorded above.
+- Full suite after C1-A: `python3 -m unittest discover -s tools/semantic_harness/tests -p 'test_*.py' -q` — **146/146 passed**. The C0 social regressions remain green, and the C1 pending-follow-up/topic-resumption worker trace is included. The required multi-turn conversation still stops safely before unsupported needs/quantity commitment, as recorded above.
 - Harness doctor: `./tools/semantic_harness/run_harness.sh --doctor --doctor-json` passed Python, repository, virtualenv, Tkinter/display, core repository, Lua, worker syntax, worker boot, and PING/CAPABILITIES checks.
 - Touched Lua passed `luac5.3 -p`; touched Python passed `py_compile`; generated EN/TL JSON parsed; and `git diff --check` passed.
 - X11/XTest evidence used real pointer motion/button events against the Tk Semantic Lab. It is distinct from invoking Tk callbacks programmatically. No repeated CUA probing was needed.
@@ -134,13 +149,13 @@ The generator's canonical IDs remain unchanged for registry lookup, persisted ma
 
 ## Scope boundary
 
-G0A, G0B, G0C, G0D/G0D-2, G0E, G0F, G0G, G0H, G0I, G3A, G3B, G3C, and C0-A are accepted implementation slices, not completion of the expanded goal. G3B's Semantic Lab/X11 gate, G3C's real-worker boundary, and C0-A's worker authority regression gate are verified; native Project Zomboid SP/MP and Workshop actions remain user-owned. Continue with the single C1-A chunk above before any READY FOR USER LIVE TEST claim.
+G0A, G0B, G0C, G0D/G0D-2, G0E, G0F, G0G, G0H, G0I, G3A, G3B, G3C, C0-A, and C1-A are accepted implementation slices, not completion of the expanded goal. G3B's Semantic Lab/X11 gate, G3C's real-worker boundary, C0-A's worker authority regression gate, and C1-A's context/resumption gate are verified; native Project Zomboid SP/MP and Workshop actions remain user-owned. Continue with the single C2-A chunk above before any READY FOR USER LIVE TEST claim.
 
 
 ## Approved future goal expansion — Contextual Conversational Intelligence (2026-10-19 planning only)
 
 User-approved target: offline Lua NPCs should understand elliptical follow-ups, topic interruptions and resumption, pending questions/offers/corrections, personality-aware dialogue plans and sparse evidence-backed promises with relevant world/quest/knowledge context; optional PBrainZ may rephrase the SAME authorized plan. Improve `tools/semantic_compiler` and Semantic Lab with reviewed dataset-assisted language/conversation-state generation and a context/plan/evidence inspector. See NEW `CONVERSATIONAL_INTELLIGENCE.md`, `DATASET_CONVERSATION_PIPELINE.md` and `CONVERSATION_ACCEPTANCE.md`, and the refreshed `ROADMAP.md`.
 
-G3C and C0-A are genuinely accepted locally with the evidence above. The next implementation task is exactly the single C1-A chunk named at the top; it is a bounded context-state vertical slice, not a claim of C2–C6 completion, corpus import, or native-game validation.
+G3C, C0-A, and C1-A are genuinely accepted locally with the evidence above. The next implementation task is exactly the single C2-A chunk named at the top; it is an owner-linked commitment vertical slice, not a claim of C3–C6 completion, corpus import, or native-game validation.
 
-Remote branch may not reflect the local Codex working checkout. Agent must reconcile current local HEAD/dirty/parallel work, and not discard implementation changes. C0-A measured and repaired the previously recorded four social THREAT test failures and the insult final-response problem at the canonical worker authority boundary; it did not claim the mandatory multi-turn conversation complete.
+Remote branch may not reflect the local Codex working checkout. Agent must reconcile current local HEAD/dirty/parallel work, and not discard implementation changes. C0-A measured and repaired the previously recorded four social THREAT test failures and insult final-response problem at the canonical worker authority boundary; C1-A measured topic interruption/resumption at the same worker boundary. Neither slice claims the mandatory multi-turn conversation complete.
