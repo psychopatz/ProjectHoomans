@@ -160,62 +160,87 @@ class FlowEditorPane:
         ttk = self._ttk
         toolbar = ttk.Frame(self.frame)
         toolbar.grid(row=0, column=0, sticky="ew", pady=(0, 6))
-        toolbar.columnconfigure(18, weight=1)
+        toolbar.columnconfigure(0, weight=1)
         self.flow_var = self._tk.StringVar()
 
+        primary_toolbar = ttk.Frame(toolbar)
+        primary_toolbar.grid(row=0, column=0, sticky="w")
+
         self.refresh_button = ttk.Button(
-            toolbar, text="Refresh registry", command=self._on_refresh
+            primary_toolbar, text="Refresh registry", command=self._on_refresh
         )
         self.refresh_button.grid(row=0, column=0)
         self.validate_button = ttk.Button(
-            toolbar, text="Validate draft", command=self.validate_draft
+            primary_toolbar, text="Validate draft", command=self.validate_draft
         )
         self.validate_button.grid(row=0, column=1, padx=(6, 0))
         self.register_button = ttk.Button(
-            toolbar, text="Register draft", command=self.register_draft
+            primary_toolbar, text="Register draft", command=self.register_draft
         )
         self.register_button.grid(row=0, column=2, padx=(6, 0))
-        self.add_button = ttk.Button(toolbar, text="Add node", command=self.add_node)
+        self.add_button = ttk.Button(
+            primary_toolbar, text="Add node", command=self.add_node
+        )
         self.add_button.grid(row=0, column=3, padx=(10, 0))
-        self.duplicate_button = ttk.Button(toolbar, text="Duplicate", command=self.duplicate_node)
+        self.duplicate_button = ttk.Button(
+            primary_toolbar, text="Duplicate", command=self.duplicate_node
+        )
         self.duplicate_button.grid(row=0, column=4, padx=(4, 0))
-        self.delete_button = ttk.Button(toolbar, text="Delete", command=self.delete_node)
+        self.delete_button = ttk.Button(
+            primary_toolbar, text="Delete", command=self.delete_node
+        )
         self.delete_button.grid(row=0, column=5, padx=(4, 0))
-        self.rename_button = ttk.Button(toolbar, text="Rename", command=self.rename_node)
-        self.rename_button.grid(row=0, column=12, padx=(4, 0))
-        self.connect_button = ttk.Button(toolbar, text="Connect", command=self.connect_node)
-        self.connect_button.grid(row=0, column=13, padx=(4, 0))
-        self.trigger_button = ttk.Button(toolbar, text="Add trigger", command=self.add_trigger)
-        self.trigger_button.grid(row=0, column=14, padx=(8, 0))
-        self.command_button = ttk.Button(toolbar, text="Add action", command=self.add_command_trigger)
-        self.command_button.grid(row=0, column=15, padx=(4, 0))
-        self.undo_button = ttk.Button(toolbar, text="Undo", command=self.undo)
+        self.undo_button = ttk.Button(primary_toolbar, text="Undo", command=self.undo)
         self.undo_button.grid(row=0, column=6, padx=(10, 0))
-        self.redo_button = ttk.Button(toolbar, text="Redo", command=self.redo)
+        self.redo_button = ttk.Button(primary_toolbar, text="Redo", command=self.redo)
         self.redo_button.grid(row=0, column=7, padx=(4, 0))
-        self.fit_button = ttk.Button(toolbar, text="Fit", command=self.fit_graph)
+        self.fit_button = ttk.Button(primary_toolbar, text="Fit", command=self.fit_graph)
         self.fit_button.grid(row=0, column=8, padx=(10, 0))
-        self.zoom_button = ttk.Button(toolbar, text="100%", command=self.reset_zoom)
+        self.zoom_button = ttk.Button(
+            primary_toolbar, text="100%", command=self.reset_zoom
+        )
         self.zoom_button.grid(row=0, column=9, padx=(4, 0))
+
+        secondary_toolbar = ttk.Frame(toolbar)
+        secondary_toolbar.grid(row=1, column=0, sticky="ew", pady=(4, 0))
+        secondary_toolbar.columnconfigure(8, weight=1)
+
         self.load_button = ttk.Button(
-            toolbar, text="Open draft", command=self.load_draft
+            secondary_toolbar, text="Open draft", command=self.load_draft
         )
-        self.load_button.grid(row=0, column=10, padx=(6, 0))
+        self.load_button.grid(row=0, column=0, padx=(0, 0))
         self.save_button = ttk.Button(
-            toolbar, text="Save draft", command=self.save_draft
+            secondary_toolbar, text="Save draft", command=self.save_draft
         )
-        self.save_button.grid(row=0, column=11, padx=(6, 0))
+        self.save_button.grid(row=0, column=1, padx=(6, 0))
+        self.rename_button = ttk.Button(
+            secondary_toolbar, text="Rename", command=self.rename_node
+        )
+        self.rename_button.grid(row=0, column=2, padx=(10, 0))
+        self.connect_button = ttk.Button(
+            secondary_toolbar, text="Connect", command=self.connect_node
+        )
+        self.connect_button.grid(row=0, column=3, padx=(4, 0))
+        self.trigger_button = ttk.Button(
+            secondary_toolbar, text="Add trigger", command=self.add_trigger
+        )
+        self.trigger_button.grid(row=0, column=4, padx=(8, 0))
+        self.command_button = ttk.Button(
+            secondary_toolbar, text="Add action", command=self.add_command_trigger
+        )
+        self.command_button.grid(row=0, column=5, padx=(4, 0))
         self.compile_source_button = ttk.Button(
-            toolbar, text="Compile source…", command=self.compile_source
+            secondary_toolbar, text="Compile source…", command=self.compile_source
         )
-        self.compile_source_button.grid(row=0, column=16, padx=(8, 0))
+        self.compile_source_button.grid(row=0, column=6, padx=(8, 0))
         self.generate_source_button = ttk.Button(
-            toolbar, text="Generate source…", command=self.generate_source
+            secondary_toolbar, text="Generate source…", command=self.generate_source
         )
-        self.generate_source_button.grid(row=0, column=17, padx=(4, 0))
+        self.generate_source_button.grid(row=0, column=7, padx=(4, 0))
+
         self.status_var = self._tk.StringVar()
         ttk.Label(toolbar, textvariable=self.status_var).grid(
-            row=0, column=18, sticky="e", padx=(10, 0)
+            row=2, column=0, sticky="w", pady=(4, 0)
         )
         self._action_buttons = (
             self.refresh_button,
@@ -295,10 +320,30 @@ class FlowEditorPane:
         self.canvas.configure(xscrollcommand=x_scroll.set, yscrollcommand=y_scroll.set)
         body.add(graph_frame, weight=4)
 
-        form_frame = ttk.LabelFrame(body, text="Editable flow definition")
+        form_panel = ttk.LabelFrame(body, text="Editable flow definition")
+        form_panel.rowconfigure(0, weight=1)
+        form_panel.columnconfigure(0, weight=1)
+        form_canvas = self._tk.Canvas(form_panel, highlightthickness=0)
+        form_canvas.grid(row=0, column=0, sticky="nsew")
+        form_scroll = ttk.Scrollbar(
+            form_panel, orient="vertical", command=form_canvas.yview
+        )
+        form_scroll.grid(row=0, column=1, sticky="ns")
+        form_canvas.configure(yscrollcommand=form_scroll.set)
+        form_frame = ttk.Frame(form_canvas)
         form_frame.columnconfigure(1, weight=1)
         form_frame.rowconfigure(11, weight=1)
-        body.add(form_frame, weight=2)
+        form_window = form_canvas.create_window((0, 0), window=form_frame, anchor="nw")
+
+        def update_form_scroll_region(_event: Any = None) -> None:
+            form_canvas.configure(scrollregion=form_canvas.bbox("all"))
+
+        def resize_form_content(event: Any) -> None:
+            form_canvas.itemconfigure(form_window, width=event.width)
+
+        form_frame.bind("<Configure>", update_form_scroll_region)
+        form_canvas.bind("<Configure>", resize_form_content)
+        body.add(form_panel, weight=2)
 
         self.flow_id_var = self._tk.StringVar()
         self.owner_var = self._tk.StringVar()
