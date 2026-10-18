@@ -34,3 +34,12 @@ Existing FOLLOW/STAY/WAIT_AT/GIFT routes cannot disappear when adding new flows.
 Not automatically inventing arbitrary human meanings, quest implementation, translations or custom gameplay services. Generation is only for reviewed/registered semantics and validated templates; unsupported metadata is visible. Native game testing and Steam Workshop uploads are user-owned.
 
 Detailed operational contracts: `AUTOMATIC_FLOW_GENERATION.md`, `CAPABILITY_ACTION_BINDINGS.md`, `PROCEDURAL_NLP_COMPILER.md`, `AUTHORING_WORKBENCH.md`.
+
+
+## Contextual conversational intelligence extension (approved 2026-10-19; planned)
+
+This new major phase extends the existing semantic parser/flow action architecture WITHOUT changing authoritative owners. See `CONVERSATIONAL_INTELLIGENCE.md` for exact context frame, dialogue-act planner, topic stack, bounded memory references and unknown-fact semantics. Parser candidates are interpreted with scoped discourse context before response planning; unsupported interpretations clarify rather than assume actions. Durable memories/quest commitments are linked to existing Knowledge/Cognition/Quest owners, not stored in a new ModData chat log.
+
+The same typed ContextState + DialogueActPlan supports offline Lua and optional PBrainZ realization. PBrainZ may phrase a grounded authorized plan but cannot independently create facts or effects. The build-time dataset ingest and `tools/semantic_compiler` integration are specified in `DATASET_CONVERSATION_PIPELINE.md`; no corpus download or embeddings at game runtime.
+
+Existing generated companion/task/gift/quest flows remain intact; conversational agenda helps interpret requests and follow-ups but does not introduce a second dispatcher. Re-run the social-action final response/INSULT regression and recorded four THREAT social-reaction failures as acceptance gates, not by counting successful IR recognition alone.

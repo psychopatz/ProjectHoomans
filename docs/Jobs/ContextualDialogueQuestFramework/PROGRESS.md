@@ -110,3 +110,12 @@ The generator's canonical IDs remain unchanged for registry lookup, persisted ma
 ## Scope boundary
 
 G0A, G0B, G0C, G0D/G0D-2, G0E, G0F, G0G, G0H, G0I, G3A, and G3B are accepted implementation slices, not completion of the expanded goal. G3B's Semantic Lab/X11 gate is verified; native Project Zomboid SP/MP and Workshop actions remain user-owned. Continue with G3C before any READY FOR USER LIVE TEST claim.
+
+
+## Approved future goal expansion — Contextual Conversational Intelligence (2026-10-19 planning only)
+
+User-approved target: offline Lua NPCs should understand elliptical follow-ups, topic interruptions and resumption, pending questions/offers/corrections, personality-aware dialogue plans and sparse evidence-backed promises with relevant world/quest/knowledge context; optional PBrainZ may rephrase the SAME authorized plan. Improve `tools/semantic_compiler` and Semantic Lab with reviewed dataset-assisted language/conversation-state generation and a context/plan/evidence inspector. See NEW `CONVERSATIONAL_INTELLIGENCE.md`, `DATASET_CONVERSATION_PIPELINE.md` and `CONVERSATION_ACCEPTANCE.md`, and the refreshed `ROADMAP.md`.
+
+**DO NOT change the ONE Next Chunk above:** `G3C` remains the current implementation task at audited remote branch `b06533f909acec8ad838df8c3aa0259d9143a30c`. After genuine local G3C acceptance, the agent selects exactly ONE C0 baseline/regression chunk and updates this ledger with real-worker evidence. This document update is a plan only; it does not imply G3C completion, corpus import, context extension or new Lua tests.
+
+Remote branch may not reflect the local Codex working checkout. Agent must reconcile current local HEAD/dirty/parallel work, and not discard implementation changes. New C0 must measure the previously recorded four social THREAT test failures and the insult final-response problem as *candidate* regressions; neither is automatically fixed or conclusively reproduced by this documentation change.

@@ -17,3 +17,14 @@ The existing developer authorization and boundaries remain: source/code work and
 All supported registered capability kinds have auto-generated production flows and exposed unsupported-gap coverage, actual Lua result transitions, deterministic modular source export/worker reload, graph/code editability, EN/TL, regression/collision/performance boundaries, context/personality/memory/quest extensions where still mandatory. Mark **READY FOR USER LIVE TEST** only after those developer gates; native PZ/MP and Workshop remain user's responsibility. A past narrower READY marker does not close this expanded goal.
 
 Block only for real unsafe Git contention, unavailable essential code/test toolchain with no fallback or genuine authorization gap. Absence of Codex desktop CUA is not a blocker. Stop cleanly on true blockers and state exact evidence/action needed.
+
+
+## Newly approved contextual intelligence work (2026-10-19)
+
+The job now includes C0–C6 in `ROADMAP.md`. Do not abandon mandatory **G3C** quest-command/reload verification merely because a new phase was planned. `PROGRESS.md` still has ONE exact Next Chunk; advance it only after actual checked-out code/worker evidence. If local implementation has already passed G3C, document its SHA/traces and select ONE C0 chunk, without recoding the accepted quest stage.
+
+After G3C, begin with real-worker **baseline conversation diagnostics** (wellbeing→what happened→need→how many→offer→topic switch→resume; insult "fuck you" and existing THREAT failures; negative ambiguities). Repair one reusable gap and verify final displayed NPC text, grounded facts, context changes and effects, not just test fixture structure. Keep generalized state in existing ContextState/FlowKernel and planning in existing ResponsePlan, with separate modules only where needed. Do not create an LLM-dependent NLP runtime, a parallel memory database, broad unchecked regexes, or expensive all-NPC tick scans.
+
+Large corpus import must be optional **build-time only** with license/provenance review, no copied non-redistributable dialogue into mod files; no routine online inference. Keep raw datasets out of runtime media folders; emit only reviewed compact modular Lua and EN/TL translation files. Compare precision/false positives and command authorization against protected previous behavior. Protect Codex quota by not producing massive synthetic JSON fixture campaigns.
+
+Native Project Zomboid SP/MP and Workshop actions remain USER-OWNED. Codex CLI CUA `apps=[]` is not an implementation blocker. Use available Lua worker and actual X11/Tk input for GUI proof, or mark exact mouse-driven gate pending and continue. Avoid repetitive docs-only commits and never claim a generated reply is actual gameplay completion.
