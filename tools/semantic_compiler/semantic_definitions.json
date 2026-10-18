@@ -1,0 +1,70 @@
+{
+  "schema": "pnc.semantic_authoring.v1",
+  "source": {
+    "owner": "ProjectHoomans",
+    "version": "1"
+  },
+  "definitions": [
+    {
+      "id": "pnc.dialogue.follow",
+      "owner": "ProjectHoomans",
+      "capability": "pnc:companion.follow",
+      "utterances": {
+        "positives": [
+          "keep close behind me",
+          "please keep close behind me"
+        ],
+        "negatives": [
+          "don't keep close behind me",
+          "are you keeping close behind me",
+          "i kept close behind you"
+        ]
+      },
+      "emit": {
+        "intent": "REQUEST",
+        "speechAct": "REQUEST",
+        "action": "FOLLOW",
+        "reference": "AUTHORED_FOLLOW"
+      },
+      "confidence": 0.99,
+      "priority": 165,
+      "flow": {
+        "id": "pnc.dialogue.follow.flow",
+        "version": 1,
+        "owner": "ProjectHoomans",
+        "triggers": [
+          {
+            "intent": "REQUEST",
+            "speechAct": "REQUEST",
+            "action": "FOLLOW",
+            "pattern": "pnc.dialogue.follow.keep_close_behind_me"
+          },
+          {
+            "intent": "REQUEST",
+            "speechAct": "REQUEST",
+            "action": "FOLLOW",
+            "pattern": "pnc.dialogue.follow.please_keep_close_behind_me"
+          }
+        ],
+        "initial": "accepted",
+        "nodes": {
+          "accepted": {
+            "terminal": true,
+            "responsePool": "semantic.authored.follow"
+          }
+        }
+      },
+      "responses": {
+        "poolID": "semantic.authored.follow",
+        "variants": [
+          {
+            "id": "accepted",
+            "key": "UI_PNC_Conversation_Semantic_AuthoredFollowAccepted",
+            "en": "Okay, I'll come with you.",
+            "tl": "Sige, sasama ako sa iyo."
+          }
+        ]
+      }
+    }
+  ]
+}

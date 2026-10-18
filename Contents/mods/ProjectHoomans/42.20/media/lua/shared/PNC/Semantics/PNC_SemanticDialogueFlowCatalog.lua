@@ -3,6 +3,8 @@ PNC.Semantics = PNC.Semantics or {}
 
 local Registry = require
     "PNC/Semantics/PNC_SemanticDialogueFlowRegistry"
+local GeneratedDefinitions = require
+    "PNC/Semantics/PNC_SemanticGeneratedDefinitions"
 
 local definitions = {
     require "PNC/Semantics/PNC_SemanticDialogueFlow_Identity",
@@ -10,6 +12,10 @@ local definitions = {
     require "PNC/Semantics/PNC_SemanticDialogueFlow_Weather",
     require "PNC/Semantics/PNC_SemanticDialogueFlow_Greeting",
 }
+
+for index = 1, #(GeneratedDefinitions.flows or {}) do
+    definitions[#definitions + 1] = GeneratedDefinitions.flows[index]
+end
 
 for index = 1, #definitions do
     local definition = definitions[index]

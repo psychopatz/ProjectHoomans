@@ -1,10 +1,10 @@
 # Contextual Dialogue & Quest Framework — current progress
 
 **Updated:** 2026-10-18
-**Audited branch/ref:** `codex/contextual-dialogue-quest-framework-0a` @ `9c8d99676c24780fc5a2fbb0d2611d9fb212cefe` (source commit)
+**Audited branch/ref:** `codex/contextual-dialogue-quest-framework-0a` @ `9c8d99676c24780fc5a2fbb0d2611d9fb212cefe` (source commit; 3A worktree pending commit)
 **PR:** #4 → main, OPEN (not merged); **main baseline:** `a3eb2e4db553f9c03b7f66a6ff6717878e1668e0`
 **Status:** PHASE 2 — Action binding / real end-to-end workbench usefulness. **2A, 2B, and 2C ACCEPTED** for the bounded FOLLOW, STAY/WAIT_AT, and GIFT slices. Phase 3 is next; the native PZ runtime remains unrun by instruction.
-**ONE Next Chunk:** **3A — one authored semantic definition through compiler → modular source/manifests → fresh worker restart → real route.**
+**ONE Next Chunk:** **3A — compiler/source/restart slice implemented and verified; commit the bounded source+generated artifacts, then choose the next phase chunk.**
 
 ## 2A acceptance ledger — FOLLOW
 
@@ -63,17 +63,17 @@
 - **Phase 0A accepted only by earlier recorded developer evidence** at `1a754dc8`: shared Conversation Blocks gate status PASS/FAIL/UNKNOWN; `weather_context` response-only flow; earlier real worker outcomes rain/clear/unknown, EN/TL and side-effect-free preview; `108 OK` tests belonged to that earlier revision, not independently rerun here.
 - `382e93a3` source now includes graphical add/duplicate/rename/delete/connect/drag/zoom/pan/undo, live trigger and action discovery, typed engine facts/recent event bus and a producer for server-observed zombie kills. This is **source present**, not latest GUI or worker acceptance.
 - Existing game production routes own commands (`FOLLOW`, `STAY`, `GO HOME`, `CAMP`), tasks (`WAIT_AT`, `GIVE/FETCH`) and multi-stage gift offers. Flow Editor currently adds an `action` TRIGGER, **not executable action binding**.
-- Current compiler `tools/semantic_compiler` already emits reviewed WordNet alias and common interaction patterns/responses; it does not yet compile entire flows/actions/translation manifests from the editor.
+- Current compiler `tools/semantic_compiler` now additionally compiles the reviewed `pnc.semantic_authoring.v1` FOLLOW source into modular patterns/flow/response/EN+TL/explicit-manifest artifacts; the source remains one bounded definition, not a general arbitrary-code generator.
 
 ## Mandatory unaccepted results
 
 - Latest branch has not been newly tested or GUI click-through verified by this audit. Phase 1 node operations may leave invalid graph state, lack layout persistence and do not show execution.
 - No production-validated action/result binding from flow draft to dispatcher, no integrated action inspector and no full gift sequence in editor.
-- JSON draft save and temporary flow registration are not real generated mod source. Synchronized code/graph view, procedural compiler with source diffs/restart proof, authored modular output missing.
+- GUI click-through remains unverified; the 3A compiler/restart proof is source-backed and worker-backed, not a GUI claim. JSON authoring remains offline source input, while checked-in generated Lua/translation artifacts are loaded by the fresh worker.
 - Contextual memory and Quest domain still future.
 - No native PZ SP/MP, Workshop or fresh hosted CI claim. Remote branch state says nothing about an agent's local uncommitted files.
 
-## EXACT Next Chunk 2A (one bounded implementation iteration)
+## Historical 2A execution plan (completed)
 
 1. Inspect actual local branch/HEAD/status, Core+Hoomans module versions, and current `382e93a3` code and relevant tests; preserve user/other-agent changes. Locate Core parser, FlowRegistry/Kernel, `PNC_SemanticCapabilityCatalog`, `PNC_SemanticDialogueInput_Actions`, CommandAdapter/CompanionCommands, worker OutputProjection/Conversation, and existing mock command transport.
 2. Implement a **minimal typed, discoverable FOLLOW binding/route trace** compatible with the existing policy, client-approved dispatcher and server command authority. The Flow Editor's Add action may expose action metadata and binding availability, but cannot invoke a function or treat an added trigger as a game command. Avoid introducing another parser/dispatcher or arbitrary callable Lua fields.
@@ -85,6 +85,14 @@
 ### Exit condition
 
 **One existing FOLLOW capability is visibly bound to and invoked through its own approved production path in the harness, with a truthful acknowledgement or denial.** A new action graph box, a catalog listing, successful generic NLP parse, JSON registration or a prettier canvas does not satisfy 2A.
+
+## 3A acceptance ledger — compiler/source/restart
+
+- **Canonical source:** `tools/semantic_compiler/semantic_definitions.json`, schema `pnc.semantic_authoring.v1`, one typed FOLLOW definition with reviewed positive/negative examples, existing capability reference `pnc:companion.follow`, bounded flow, response pool, and EN/TL text.
+- **Generated outputs:** explicit `PNC_SemanticGeneratedDefinitions.lua` manifest plus patterns/flows/responses shards under `42.20/media/lua/shared/PNC/Semantics/`; EN/TL generated translation shards under `common/media/translation/.../Conversation/Semantic/`; existing `Conversation.json` manifest contains both paths.
+- **Production integration:** existing semantic catalog, flow catalog, and response catalog load the explicit manifest; generated flow triggers can match only their authored pattern provenance, so hand-authored `Follow me` remains `noFlow` while generated phrases enter `pnc.dialogue.follow.flow`.
+- **Fresh-worker trace:** `Keep close behind me` and `Please keep close behind me` → generated exact pattern → Core IR `REQUEST/FOLLOW` → existing `PNC.SemanticCommandAdapter` → one mocked-authority `CompanionCommand` with `commandID=follow` and `capabilityID=pnc:companion.follow`; negated/question/past examples clarify with zero transport/tool calls. Preview is side-effect-free; restart reloads the same generated artifacts and routes again.
+- **Negative/determinism coverage:** compiler rejects unknown capabilities, existing/reserved utterance collisions, duplicate cross-definition utterances, non-imperative positive examples, unknown authored flow patterns, unreachable nodes, and translation collisions. Rebuild hash comparison is byte-identical; `git diff --check`, JSON, Python, `luac5.3`, and Kahlua verification pass.
 
 ## Agent routing and Git
 

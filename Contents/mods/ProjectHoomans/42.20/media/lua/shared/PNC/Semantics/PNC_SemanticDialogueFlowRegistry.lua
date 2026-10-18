@@ -20,7 +20,7 @@ Registry.Revision = tonumber(Registry.Revision) or 0
 
 local FRAME_FIELDS = {
     "intent", "speechAct", "action", "subject", "target", "reference",
-    "identityClaim", "selfDirected", "stateType", "stateValue",
+    "identityClaim", "selfDirected", "stateType", "stateValue", "pattern",
 }
 local FRAME_FIELD_SET = {}
 for index = 1, #FRAME_FIELDS do FRAME_FIELD_SET[FRAME_FIELDS[index]] = true end
@@ -434,6 +434,12 @@ function Registry.FrameMatches(frame, ir)
         return false
     end
     if frame.stateValue ~= nil and state.value ~= frame.stateValue then
+        return false
+    end
+    if frame.pattern ~= nil
+        and (type(ir.provenance) ~= "table"
+            or ir.provenance.pattern ~= frame.pattern)
+    then
         return false
     end
     return true

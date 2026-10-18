@@ -115,3 +115,27 @@ Registry, and the existing response catalog appends the bounded variants to
 their current pools. The compiler rejects unsupported intents, fuzzy patterns,
 unknown response conditions, duplicate IDs/utterances, and oversized pools.
 No external corpus or linguistic package is loaded by Lua at runtime.
+
+## Canonical semantic definitions
+
+`semantic_definitions.json` is the reviewed `pnc.semantic_authoring.v1` source
+for typed action-bearing definitions. It is compiled through the same offline
+tool into explicit pattern, flow, response-pool, translation, and require
+manifest modules. Capability IDs are resolved against the existing production
+adapter descriptors; the compiler rejects unknown capabilities, executable
+negative/question examples, unreachable flow nodes, duplicate utterances, and
+translation-key collisions.
+
+Build the checked-in modular source with:
+
+```sh
+python3 tools/semantic_compiler/build.py \
+  --semantic-source tools/semantic_compiler/semantic_definitions.json
+```
+
+Generated Lua belongs under `42.20/media/lua/shared/PNC/Semantics/`; EN/TL
+shards belong under `common/media/translation/<LANG>/Conversation/Semantic/`,
+and the existing Conversation translation manifest is updated with explicit
+paths. Re-running the command with unchanged input is byte-stable. Generated
+flow triggers may scope to an authored pattern so an authored flow cannot claim
+an unrelated hand-written route with the same action frame.
