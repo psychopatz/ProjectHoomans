@@ -1,57 +1,36 @@
-# Architecture — semantic authoring, production authority and modular compilation
+# Semantic NLP architecture — generated production flows own interaction policy
 
-## Desired pipeline
+## Target runtime
 
-Semantic Lab user/agent editing (Language + Dialogue + Conditions + Action references + Responses)
-→ one validated canonical **data-only semantic definition**
-→ deterministic offline compiler (existing `tools/semantic_compiler` extended, not copied)
-→ modular Build 42 Lua registrations + response pools/EN/TL shards + explicit manifests
-→ production PsychopatzCore parser/IR
-→ Project Hoomans policy, context/flow kernel and shared Conversation Blocks gates
-→ existing client action or gift/task/command adapter
-→ server/domain authority result
-→ grounded NPC response/pending follow-up
-→ Semantic Lab trace of real worker behavior.
+Natural language → **existing PsychopatzCore parser + candidate IR** → **Project Hoomans production flow registry/kernel (generated or legacy)** → typed context/permission/slot checks → **named, registered gameplay capability** routed exactly once via existing approved Input Actions / command/task/gift adapter → real server/domain admission and eventual completion result → explicit *flow result* transition → matching localized NPC response and bounded memory/quest consequences.
 
-**No Python runtime reimplementation of the parser, Lua compiler side effects during preview, direct node-level calls to an arbitrary function, or fake game authority.**
+The **flow is the declarative owner of interaction sequencing, gates and outcome-to-response choices**. The existing gameplay owners retain the effect implementation, target authority, MP admission, inventory mutation and task scheduling. A response-only flow or merely attaching an action trigger must never be reported as a complete executable interaction.
 
-## Domain owners (non-negotiable)
+## Canonical authoring/generation pipeline
 
-| Owner | Owns | What the workbench may do |
-| --- | --- | --- |
-| PsychopatzCore | Generic NLP normalize, concepts, grammar, IR, router | Register compiled reviewed terms/patterns through public API; no Hoomans-specific quest state in Core |
-| Hoomans Semantics/Flow Registry/Kernel | Frames, bounded transitions, dialogue context pointers, response plan | Consume compiled definitions and typed **capability references**, not perform gameplay |
-| Hoomans Conversation Blocks | Existing gate rules, compositional PASS/FAIL/UNKNOWN, locked presentation | Reuse pure evaluator; client previews cannot authorize actions |
-| Engine facts/events and NPC domains | Observation provenance, time/weather, health/needs, personality, relationship, knowledge | Read bounded snapshots; never treat all NPCs as omniscient |
-| Registered command, gift, inventory and task adapters | Prepare and route actual requests, capture results | Bind a capability ID/type to its owner; no duplicate transport |
-| Server/domain service | Validate conversation/ownership/lease, execute, persist/emit authoritative outcome | Revalidate at command time; no mutation through editor/preview |
-| Compiler | Deterministic derivation of validated data to modular artifacts | Fail on collisions/incompatible contracts; produce inspectable diffs |
-| Semantic Lab | UX, typed editors, worker lifecycle, preview/committed replay, generator orchestration | Never become another NLP/policy authority |
-| Quest domain (future) | Bounded authoritative states, objectives and idempotent rewards | Expose status/commands as typed bindings after owned domain exists |
-| PBrainZ (optional) | Verbalization of authorized plans, optional contextual retrieval | Cannot grant quests, fabricate facts or bypass permission |
+Live published production metadata (capabilities, existing parser patterns, facts/gates, response catalogs, workflow descriptors, existing/legacy flows) → template classifier + support inventory → typed versioned editable definition → validator + collision/ownership checks → deterministic compiler → module shards + explicitly required manifests + EN/TL → fresh production worker → trace → graph/code edit in Semantic Lab → regenerate.
 
-## Strict separation of meaning and effects
+Do not create a second dynamic NLP runtime, generic LUA scripting VM or arbitrary source `eval`. Python handles *offline authoring/compilation*; Lua registry handles runtime semantics. Do not use raw JSON artifacts as the only deliverable. Generated node kinds must be versioned in Registry and observable in worker trace.
 
-- **Utterance frame:** intent/speechAct/action/subject/entity slots plus confidence/negation/provenance, all validated by existing Core.
-- **Flow state:** eligible nodes, pending question, interruptions, conditions, response pool and references. Meaning alone cannot mutate inventory/orders/quests.
-- **Action binding:** named capability with typed required parameters and a service owner; optional flow/branch lifecycle mapping. The existing action dispatch remains the sole effect path (or its narrowly extended registered adapter).
-- **Effect report:** request issued, authorization, server admission, completion/failure and correlated actual state. "Accepted" must be disambiguated (input accepted is not server order completed).
-- **Response:** must be selected from actual route/authority outcome. No success claim on rejected, pending or unexecuted action.
+## Runtime ownership and dispatch invariant
 
-For action-bearing requests ensure exact speaker+addressee+target and action slot resolution; fuzzy/negated/question phrasing must not execute. Preview and validation must be effect-free. Maintain group target semantics and server permission checks.
+- **Core** generic parse/IR, Hoomans policy/flow, Conversation Blocks pure gate evaluation.
+- **Capability registry/owners** expose IDs, semantic frame descriptors, typed arguments, permissions, known outcome classes, execution route, workflow category, applicable contexts; no serializing Lua callbacks.
+- **Production dispatcher** is the *only* owner of action invocation. FlowKernel Preview never invokes; committed admission stays in existing ActionInput→adapter route or a narrowly integrated orchestration seam; do NOT dispatch both legacy policy and flow callback.
+- **Server/domain** validates and may return rejected / admitted-queued / applied / failed / eventually-completed. Never acknowledge successful completion solely because parsing/flow matching succeeded.
+- **NPC context, relationship, personality, knowledge, quest** remain domain-owned, consumed as provider facts; unknown fails closed on sensitive branches. Event bus gives observations, not automatic execution or quest award.
+- **PBrainZ** optional output realization, never permission or quest authority.
 
-## Compilation and modularity
+## Generated definition guarantees
 
-Source-of-truth is **versioned declarative definitions** in a reviewed authoring directory outside the PZ watched runtime path. Build artifacts are **owned Lua modules** under existing Build 42.20/common conventions, rather than monolithic if/elseif edits. Use existing semantic catalog and flow registry loading contracts; generate stable explicitly required module indexes and translation keys. Never run untrusted Lua pasted into a draft. Unsupported handwritten source stays untouched; unsupported round-trip must fail with reason.
+Namespaced stable IDs; template version + capability contract version; no per-command hardcoded generator switches beyond reusable workflow categories; deterministic ordering; isolated edit metadata; preserve existing hand-authored custom flows and their IDs; generated file path/manifest accuracy; diff and approval; incremental regeneration from source-of-truth not generated Lua. A capability without requisite metadata produces `UNSUPPORTED` with field-level reason, not guessed behavior. Indexed/bounded runtime (existing flow-node limits evaluated before bulk expansion); measured no per-tick scans; EN/TL graceful fallback.
 
-Generated source is never committed before a precise review of file paths/diff and actual load/restart semantic tests. A compiled definition is considered deployed only after fresh worker loads its module and the predicted real NPC response/action/result route is observed.
+### Rule for legacy behavior
 
-## Context and quests
+Existing FOLLOW/STAY/WAIT_AT/GIFT routes cannot disappear when adding new flows. Introduce routing precedence/compatibility explicitly. The Flow Registry must not swallow requests or duplicate dispatch. For an action-capable generated flow, the outcome response should follow actual adapter result, not a prior terminal pool. If registry selection fails, preserve current safe legacy route and explain fallback in traces.
 
-Retain existing context-state/knowledge/social/relationship ownership; store bounded discourse pointers and committed promises, not a full NPC transcript. Facts carry known/unknown, source, time and identity. Reuse current weather/fact gate code (recorded PASS/FAIL/UNKNOWN). Event bus is observation only; subscription does not imply action or quest progress. Quest instances and reward idempotency will be defined by a separate authority service once action binding/compiler are proven.
+## Non-goals
 
-## Performance, limits and compatibility
+Not automatically inventing arbitrary human meanings, quest implementation, translations or custom gameplay services. Generation is only for reviewed/registered semantics and validated templates; unsupported metadata is visible. Native game testing and Steam Workshop uploads are user-owned.
 
-Compile offline; minimal runtime registration and indexed evaluation. Respect current finite flow limits (registry MAX_NODES=32, default MAX_FLOWS=32 as audited) or explicitly version/benchmark justified changes. Avoid per-frame scans or dynamic heavyweight parsing. Preserve old flows, Core IR schema, Build 42.20 Kahlua, EN/TL fallback, server action permissions, SP/MP scope and PBrainZ-off determinism. Deterministic regeneration must produce byte-stable output when inputs unchanged. Measure parser conflicts and end-to-end latency; do not equate a count of generated patterns with accuracy.
-
-Detailed contracts: `CAPABILITY_ACTION_BINDINGS.md`, `PROCEDURAL_NLP_COMPILER.md`, `CONDITION_CONTEXT.md`, `QUEST_CONTRACT.md`.
+Detailed operational contracts: `AUTOMATIC_FLOW_GENERATION.md`, `CAPABILITY_ACTION_BINDINGS.md`, `PROCEDURAL_NLP_COMPILER.md`, `AUTHORING_WORKBENCH.md`.

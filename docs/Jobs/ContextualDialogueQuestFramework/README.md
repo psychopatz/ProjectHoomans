@@ -1,34 +1,35 @@
 # Contextual Dialogue & Quest Framework — Project Hoomans
 
-**Purpose:** Make Semantic Lab the primary **procedural authoring, compilation, inspection and real-Lua testing workbench** for Project Hoomans' lightweight offline NLP, contextual dialogue, existing game actions and eventual quests. Preserve an optional PBrainZ realization path without making it a requirement.
+**New mandatory product objective (2026-10-18): Semantic Lab is the procedural author, generator, editor and production-Lua test harness for ALL supported Project Hoomans semantic interactions.** This includes conversation states, world/personality/memory/quest context and capability-bound action workflows. It is NOT sufficient to discover FOLLOW/GIFT actions, draw nodes for them, or generate one hardcoded example while their actual production lifecycle lives outside the flow.
 
-**Current source checkpoint:** `docs/contextual-dialogue-quest-framework-20261018` @ `382e93a342f1d6ee13fc2007a7fbbdf66a7afa7c` (2026-10-18). This is branch-source evidence, not a local worktree/GUI/runtime verification. See `PROGRESS.md` for the single current phase and Next Chunk.
+## Core workflow
 
-## User-facing outcome
+**Discover** production semantic patterns, registered capabilities, condition providers, response catalogs and existing flows → **classify** each by reusable workflow shape → **plan generation** (explicit coverage/unsupported reasons) → **generate a canonical editable semantic specification** → **compile reviewed specs into modular production Lua, EN/TL and manifests** → **load a fresh production worker** → **run scenario/negative/permission tests** → **inspect and edit in the existing Semantic Lab UI** → **regenerate only affected assets**.
 
-In ONE existing Semantic Lab environment, a human or coding agent should be able to:
-1. Choose a gameplay capability (e.g. Follow, Wait Here, Wait At, gift, quest offer) from **live registered production owners**, not guess Lua functions.
-2. Add or generate reviewed phrases, speech acts, intents, slots and contextual conditions; see parsing collisions and unsafe ambiguity.
-3. Visually connect conversation, condition, action-binding, result and response states; use a synchronized supported code/source editor for precise changes.
-4. Run preview and committed turns through the **actual production PsychopatzCore + Project Hoomans Lua** pipeline; see accepted/rejected action route, side effects and real NPC wording.
-5. Compile reviewed semantic definitions into deterministic **modular Lua modules/manifests and existing EN/TL translation layout**, review source diffs, restart the worker and confirm the compiled content is loaded and working.
+Every supported registered capability should either appear as an executable production flow with explicit condition/dispatch/result semantics, or be reported as **unsupported/missing metadata/recognition-only/legacy** with exact reason and owner. There must be NO silent gaps and NO invented handlers. Handwritten domain gameplay implementations remain modular and authoritative; generated flows merely orchestrate through published typed bindings.
 
-The generator procedurally creates **supported deterministic semantic artifacts**; it cannot promise unlimited free-form understanding or automatically prove unsafe unreviewed synonyms. Its job is less repetitive authoring, explicit boundaries, fewer collisions/errors, and new commands/flows without giant centralized conditionals.
+Use generic capability templates, NOT per-action if/elseif branches in the generator. At minimum support: simple companion commands; parameterized tasks with target/slot resolution; multi-stage gift/inventory consent workflows; response-only contextual and social dialogue. Later add personality/knowledge/quest-gated flows through the same engine. End goal is breadth of generated *supported* semantics, not an unsupported claim of infinite natural language understanding.
 
-## Scope and ownership
+## State and boundary
 
-- **Existing production owners stay intact.** Core owns generic NLU and IR; Hoomans owns policy, flow state, game context, registered game-action adapters, conversations, social state and quests; gameplay domains own actual effects. `tools/semantic_compiler` is an existing generator seed, not a new runtime parser.
-- Engine facts/events are read-only observations. They **do not** execute gameplay commands. Action bindings are allowlisted references to existing dispatchers and server authorization, never arbitrary Lua source in a node.
-- Reuse Conversation Blocks' typed condition evaluation and Hoomans Knowledge/Personality/Relationship data. Avoid a second gate engine, item taxonomy, quest authority, task scheduler or NPC memory store.
-- Keep Project Zomboid Build 42.20 source conventions. Core/MarketSense/PBrainZ sibling repositories are not changed without source-backed necessity and authorization.
-- Existing `SemanticDialogueDecoupling` live-testing status and `ContextualSemanticIntelligence` historical evidence remain independently owned; do not rewrite their ledgers.
+- **Remote source audited:** branch `docs/contextual-dialogue-quest-framework-20261018` at `f0b6e41b90b025d64ccd7578e526d80876de4969`. Previous phases 2A/2B/2C/3A/4A/4B/4C have recorded worker/X11 acceptance in the historical progress ledger; they are valid *narrow slice* evidence, **not acceptance of automatic generation of full production action flows**.
+- **Current status:** new mandatory Generation phase OPEN. See `PROGRESS.md` for the ONE Next Chunk. Prior `READY FOR USER LIVE TEST` only referred to earlier limited scope and is superseded for this expanded goal.
+- No new production code or test run is established by this documentation change.
+- Actual Project Zomboid SP/MP testing and Steam Workshop publication remain **user-owned**. Codex CLI does NOT need CUA to proceed: use existing X11/Tk and worker tests, mark external unavailable UI only as pending.
 
-## Read order
+## Read order for Codex
 
-`AGENTS.md` → this job's `AGENT_RUNBOOK.md` → `AUDIT.md` → `ARCHITECTURE.md` → **`CAPABILITY_ACTION_BINDINGS.md`** → **`PROCEDURAL_NLP_COMPILER.md`** → `AUTHORING_WORKBENCH.md` → `CONDITION_CONTEXT.md` → `QUEST_CONTRACT.md` → `ROADMAP.md` → `HARNESS_ACCEPTANCE.md` → **`PROGRESS.md`** (sole Next Chunk) → `GOAL_PROMPT.md`.
+1. Root `AGENTS.md`
+2. This job: `AGENT_RUNBOOK.md`, `AUDIT.md`, `ARCHITECTURE.md`
+3. **`AUTOMATIC_FLOW_GENERATION.md`** (current phase's canonical contract)
+4. `CAPABILITY_ACTION_BINDINGS.md`, `PROCEDURAL_NLP_COMPILER.md`, `AUTHORING_WORKBENCH.md`
+5. `CONDITION_CONTEXT.md`, `QUEST_CONTRACT.md`
+6. `ROADMAP.md`, `HARNESS_ACCEPTANCE.md`
+7. **`PROGRESS.md` LAST** (current phase / one Next Chunk); `GOAL_PROMPT.md` bootstrap.
+8. `HISTORY_20261018.md` only when needing detailed older test/commit evidence.
 
-Technical reference: `tools/semantic_harness/README.md`, `tools/semantic_compiler/README.md`, `docs/Systems/Semantics.md`, `docs/Systems/ConversationBlocks.md`, `docs/Systems/CompanionCommands.md`.
+Reference: `tools/semantic_compiler/`, `tools/semantic_harness/`, Hoomans `PNC_SemanticCapabilityCatalog`, `PNC_SemanticDialogueFlowRegistry/Kernel/Catalog`, `PNC_SemanticDialogueInput_Actions`, command/task/gift adapters, and PsychopatzCore parser contracts.
 
-## Finished product / handoff
+## Completion definition
 
-A new interaction is *authored → validated against actual registry/capabilities → compiled to properly packaged source → loaded on fresh worker → run with contextual, EN/TL and negative cases → traces actual dispatch or denial*. Representative Follow, Stay/Wait At and Gift cases prove different ownership paths. Quest and durable-context slices use these same contracts. Performance/scalability bounds measured; developer work ends at **READY FOR USER LIVE TEST**. Native PZ SP/MP tests, Workshop publication and final distribution remain user-owned, never prerequisites for autonomous source development.
+"Generate all" means: inventory all registrable semantic capabilities; generate every template-compatible one without manual per-command files; report unsupported ones explicitly; compile to correct tracked modular PZ assets; execute production-worker positive and denied/ambiguous scenarios for each template family; verify no duplicate dispatch/false acknowledgement; confirm restart/rebuild idempotency, code/graph editing and coverage UI. Context/memory/personality/quest extensions have their own gate and remain unaccepted until proven. Do not stop at static catalog counts, JSON fixtures, a screenshot or CUA availability.

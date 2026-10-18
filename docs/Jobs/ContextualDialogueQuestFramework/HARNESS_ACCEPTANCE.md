@@ -1,51 +1,29 @@
-# Semantic Lab acceptance matrix — observable real Lua behavior
+# Acceptance — automatic semantic flow generation and real production behavior
 
-## Mandatory distinction
+**Primary contract:** one registered capability descriptor can generate a complete first-class production dialogue/action flow with typed parameter/permission/result lifecycle; then the SAME generator handles other registered capabilities of that template class WITHOUT manual per-action flow source or duplicated domain dispatch. Tests must exercise real Hoomans + PsychopatzCore Lua, not a stand-alone Python replica or JSON parser.
 
-A successful Python/JSON fixture or a screenshot of a node graph is not enough. Semantic Lab must run the **actual production PsychopatzCore parser and Hoomans semantic policy/flow/dispatch adapters** in its worker. Its engine, inventory, server and network edges can be mocked, but must be explicitly labeled **mocked**, not reported as native Project Zomboid confirmation.
+## Required coverage and evidence
 
-Trace every turn: input, selected candidate/pattern, IR, intent/negation/references, flow/gate node transition, capability binding ID and actual registered owner, authorization request, outgoing command/task/gift transport, authority/admission result, any eventual result (or `unobservable`), rendered NPC text and translation key/fallback, state before/after, LLM calls and side effects. Distinguish Preview vs Submit.
+Record repository HEAD, Core checkout, catalog identity/revision, `totalCapabilities`, generated counts per workflow template, legacy/manual and unsupported counts + exact reasons, flow ID, load status, source file paths/translation/manifest, template fingerprint, actual selected parser IR/pattern, flow node+gate sequence, capability binding, transport/authority request/response, NPC text, language, preview side effects, and any action completion/rejection. Always distinguish mock server boundary from actual PZ.
 
-## Tier A — now (FOLLOW action binding)
+## G0A mandatory acceptance matrix
 
-| Utterance/scenario | Required evidence |
+| Case | Expected proof |
 | --- | --- |
-| Authorized "Follow me" | Actual parsed REQUEST/FOLLOW (or concrete equivalent), registered command `follow`, exactly one mocked transport/request from existing dispatcher, authoritative mock accepted/queued, truthful outcome-dependent reply |
-| "Don't follow me" | No accidental FOLLOW dispatch; negation semantics preserved |
-| "Are you following me?" | QUESTION does not become order; no transport |
-| "I followed you yesterday" | Informative/past tense does not become imperative order |
-| Unresolved/addressee ambiguity or invalid lease | Clarification or explicit denial; zero side effects, no "order completed" speech |
-| Two repeated previews | Same candidate/decision and **zero** commands, messages persisted or quest mutations |
-| Repeated/late submit | Correct request/correlation/dedupe contract; no duplicate authority effect where supported |
-| Current existing identity/wellbeing/weather | Same real-Lua selected flow, response and expected allowed effects as baseline; no regression |
+| Metadata inventory | Source-registered simple command capabilities enumerated, including FOLLOW and STAY; statuses, missing descriptors, unsupported GIFT/WAIT_AT template families explicit; denominator matches live catalog |
+| Generic generation | FOLLOW+STAY production flow modules from **one reusable simple_command template**, with permission+request+queued/rejected/failure outcome nodes; same generator discovers all other compatible simple commands without per-name `if` logic |
+| Fresh worker load | Restart actual production Lua worker, registry lists generated stable flow IDs and transitions; current legacy flows still load, no duplicate IDs or flow-limit boot break |
+| Authorized FOLLOW/STAY | Real Core IR and selected **generated flow**; exactly one corresponding command via existing dispatcher and mocked authority; actual node/result and truthful queued reply |
+| Permission rejection | Generated flow takes real denied result branch; no affirmative "I will follow" reply; no authorization bypass |
+| Negated/question/ambiguous | "Don't follow me", "Are you following me?", unresolved target and low-confidence variants must NOT run unintended FOLLOW/STAY; prove transport/side-effect facts |
+| Preview vs committed | Two previews effect-free; one committed request triggers at most one dispatch; replay/late result respects request correlation and idempotency |
+| Compiler quality | Kahlua-safe deterministic modular Lua/EN+TL, stable manifest, no conflict with manual identity/wellbeing/weather, repeated generate byte-identical, source diff correct |
+| Inspector/coverage | Existing Semantic Lab shows newly registered action flows (not just Add action trigger), source/owner/template/binding, outcome trace and unsupported capability list |
 
-## Tier B — diversified dispatch
+## Later acceptance
 
-- **Stay vs Wait At**: explicit differences between local stay order and destination-dependent task request, correct target/destination schema, rejection and admission results.
-- **Gift**: offer/consent/selector/real item transfer boundary in harness, correct item and NPC, denial and multi-turn follow-up, no duplicate transfer.
-- **Engine facts/events**: rain true/false/unknown and event publication are **observations**, not commands; unknown fact and player claim cannot grant effects.
-- **Action capability discovery**: a discovered pattern without handler shows recognition-only, unsupported command is disabled, server denied action remains denied despite parser success.
+G0B WAIT_AT plus another eligible parameterized task, G0C full OFFER/GIFT multi-stage, G1 all-compatible-catalog generation and graph/code regen, G2 contextual/weather/personality/memory responses and precision report, G3 quest state/locks/events, G4 representative SP/MP authority contracts, performance and persistence. No generated feature is accepted solely from a static catalog count or synthetic screenshot.
 
-## Tier C — compiler and editor
+Run focused production Lua worker tests, existing command/gift/task/identity/weather/wellbeing regressions, harness doctor, compiler deterministic checks, `git diff --check`, Kahlua/luac, EN/TL resolution; test actual Tk clicks via available X11 if a UI gate is in scope. The earlier ledger recorded **123 Python tests with four social reaction failures**; new acceptance must explicitly account for and investigate current failing tests instead of copying older pass counts or claiming full-suite green.
 
-- Action binding and authored speech examples compile to separate production Lua definition/pattern/flow/response/translation/manifest artifacts under the correct watched-mod paths. No generated files only under tools, tmp or arbitrary unrelated directories.
-- Fresh worker startup loads those exact files, and output matches authored behavior before/after restart. Unsupported Lua is not silently rewritten; stale source causes an explicit error.
-- Idempotent generator rerun on same inputs produces identical bytes and no modified tracked files. Recognizer collision detection includes command negatives and cross-definition priority conflicts.
-- GUI: real Add/Rename/Duplicate/Delete/Connect/Undo/drag operations demonstrated if available; no silent graph corruption; advanced inspector reveals raw worker proof, not synthetic outcome.
-
-## Tier D — later context/quests
-
-Participant identity isolation, reference resolution, interrupted-topic resume, verified memory provenance, personality/relationship context, locked/active/completed quest queries, authenticated objective events, duplicate packet idempotency, reward once, language EN/TL and optional PBrainZ parity, no new idle NPC tick load. Each accepted via actual production worker or server-owned Lua smoke with clearly marked mock boundaries. Native PZ SP/MP remains USER-OWNED.
-
-## Execution / reporting
-
-Recommended commands (only when present in actual checkout):
-- `tools/semantic_harness/run_harness.sh --doctor --doctor-json`
-- `python3 -m unittest tools.semantic_harness.tests.test_flow_editor -v`
-- `python3 -m unittest discover -s tools/semantic_harness/tests -v`
-- `tools/semantic_harness/run_harness.sh --test pnc_semantic`
-- `python3 -m unittest discover -s tools/semantic_compiler/tests -v` when compiler touched
-- `python3 tests/run_tests.py pnc_semantic_dialogue_flow_smoke pnc_semantic_task_request_smoke` where supported
-- Actual Kahlua-compatible syntax review, translation JSON validation, `git diff --check`.
-
-Do not copy previous `108 OK` into new phase as a fresh run. Record precise input/output, command, mocked boundary and SHA, not only counts. Missing GUI automation may be marked PENDING while worker gates progress, but Phase 4 cannot be declared fully GUI-accepted without real UI evidence or explicit user disposition. Never initiate Workshop release or native PZ testing to satisfy developer acceptance.
+Do NOT turn Codex CLI CUA `apps=[]` into a blocker; X11/xdotool/worker fallback is allowed. Native Project Zomboid SP/MP remains user-owned; never publish Steam Workshop or use absent native PZ runtime to block source development.
