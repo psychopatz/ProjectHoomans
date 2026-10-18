@@ -1,10 +1,10 @@
 # Contextual Dialogue & Quest Framework — current progress
 
 **Updated:** 2026-10-18
-**Audited branch/ref:** `codex/contextual-dialogue-quest-framework-0a` @ `d9bc28caca0c0e601ece103f28b08638926a8d80` (source commit)
+**Audited branch/ref:** `codex/contextual-dialogue-quest-framework-0a` @ `b99d27505220fd21b1e49a00cb28e1b35c9aaa86` (source commit)
 **PR:** #4 → main, OPEN (not merged); **main baseline:** `a3eb2e4db553f9c03b7f66a6ff6717878e1668e0`
-**Status:** PHASE 4 — Practical integrated authoring UX. **2A, 2B, 2C, and 3A ACCEPTED**; 4A source-preview seam implemented and worker/app tests pass, while GUI click-through remains unverified. Native PZ runtime remains unrun by instruction.
-**ONE Next Chunk:** **4B — add explicit approved generation/reload handoff from the source preview, preserving preview purity and exact post-restart route evidence.**
+**Status:** PHASE 4 — Practical integrated authoring UX. **2A, 2B, 2C, 3A, 4A, and 4B ACCEPTED** at source/headless gates; GUI click-through remains pending because the computer-use surface exposes no app. Native PZ runtime remains unrun by instruction.
+**ONE Next Chunk:** **4C — perform the GUI author → compile-preview → approved-generate → worker-restart click-through when a native app surface is available.**
 
 ## 2A acceptance ledger — FOLLOW
 
@@ -99,6 +99,16 @@
 - **Semantic Lab seam:** existing Flow editor toolbar now exposes `Compile source…`; it opens the canonical JSON source and calls the offline compiler adapter, not the Lua worker or a second parser.
 - **Preview report:** valid source reports schema, definition/capability/pattern/flow/response IDs, EN/TL keys, exact planned Lua/translation/manifest paths, `previewOnly=true`, `effectFree=true`, and `writes=[]`. Invalid source reports a bounded diagnostic and zero planned writes.
 - **Focused proof:** compiler/worker/Flow editor/app/source-preview tests — PASS, 38/38. `py_compile`, `git diff --check`, and doctor remain PASS. Native PZ SP/MP and real GUI click-through are not claimed; CUA exposes no native app surface in this environment.
+
+## 4B acceptance ledger — approved generation/reload handoff
+
+- **Explicit approval boundary:** Flow editor now separates `Compile source…` (zero-write preview) from `Generate source…` (confirmation dialog, then existing compiler writer). The GUI callback restarts the existing Lua worker after successful generation; no alternate parser or runtime registry is introduced.
+- **Determinism proof:** temp-repository generation writes the modular Lua/EN/TL/manifest set; a second generation over unchanged source produces identical SHA-256 hashes. Invalid source remains diagnostic-only and writes nothing.
+- **Focused proof:** compiler/source-preview/worker/Flow editor/app tests — PASS, 39/39; Lua smoke tests — PASS, 4/4; doctor, Python compilation, JSON, Kahlua, `luac5.3`, and `git diff --check` pass.
+
+## 4C pending GUI gate
+
+- The GUI entrypoint constructs successfully and the source controls are wired, but real Tk click-through cannot be performed in this environment: computer-use state currently exposes `apps=[]`, `browsers=[]`. Do not claim human GUI authoring acceptance until that surface is available. Native PZ SP/MP remains user-owned.
 
 ## Agent routing and Git
 
