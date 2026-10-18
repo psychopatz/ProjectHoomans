@@ -26,6 +26,58 @@ local medicalSupplyGiftTask = H.medicalSupplyGiftTask
 local processedGiftCache = H.processedGiftCache
 local rememberGift = H.rememberGift
 
+local function playerCharacterUUID(player)
+    if type(player) == "table" and player.characterUUID ~= nil then
+        return tostring(player.characterUUID)
+    end
+    local contextService = PNC.PlayerContext
+    if contextService and type(contextService.Peek) == "function" then
+        local context = contextService.Peek(player)
+        if context and context.characterUUID then
+            return tostring(context.characterUUID)
+        end
+    end
+    if contextService and type(contextService.Resolve) == "function" then
+        local context = contextService.Resolve(player, "inventory_transfer")
+        if context and context.characterUUID then
+            return tostring(context.characterUUID)
+        end
+    end
+    return nil
+end
+
+local function emitCommittedTransfer(player, record, args, details, revision)
+    local events = PNC.Tasking and PNC.Tasking.Events
+    local characterUUID = playerCharacterUUID(player)
+    if not events or type(events.Emit) ~= "function"
+        or not record or not record.id
+        or not characterUUID or type(details) ~= "table"
+        or type(details.itemTypes) ~= "table"
+        or #details.itemTypes < 1
+    then
+        return false
+    end
+    return events.Emit("PNC_INVENTORY_ITEM_TRANSFERRED", {
+        npcId = record.id,
+        source = "ServerInventory",
+        entityId = tostring(args.requestId or details.itemIDs
+            and details.itemIDs[1] or record.id),
+        revision = tonumber(revision) or 0,
+        payload = {
+            committed = true,
+            direction = tostring(args.direction or ""),
+            targetNPCID = tostring(record.id),
+            playerCharacterUUID = characterUUID,
+            requestID = tostring(args.requestId or ""),
+            itemTypes = details.itemTypes,
+            itemIDs = details.itemIDs,
+            itemCount = tonumber(details.itemCount) or #details.itemTypes,
+            medicalSupplyTaskID = args.medicalSupplyTaskID,
+            medicalSupplyRequestID = args.medicalSupplyRequestID,
+        },
+    })
+end
+
 function Service.Transfer(player, args)
     args = args or {}
     local record = args.id and Registry.Get(tostring(args.id)) or nil
@@ -169,6 +221,9 @@ function Service.Transfer(player, args)
             medicalExecutor.FulfillBandageSupport(medicalTask.id)
         end
     end
+    if success and args.direction == "player_to_npc" then
+        emitCommittedTransfer(player, record, args, details, sinceRevision)
+    end
     local resultSuccess, resultReason, resultPayload = notify(
         player, success, reason, args, details)
     if giftMode and requestID ~= "" then
@@ -200,4 +255,3 @@ function Service.Transfer(player, args)
 end
 
 return Service
-
