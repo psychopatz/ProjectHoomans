@@ -108,7 +108,7 @@
 
 ## 4C pending GUI gate
 
-- The GUI entrypoint constructs successfully and the source controls are wired. A bounded launch probe with `DISPLAY=:0` entered the Tk mainloop and exited only at the intentional 12-second timeout (`124`); no worker process remained. Real Tk click-through still cannot be performed in this environment: computer-use state currently exposes `apps=[]`, `browsers=[]`. Do not claim human GUI authoring acceptance until that surface is available. Native PZ SP/MP remains user-owned.
+- The GUI entrypoint constructs successfully and the source controls are wired. A bounded launch probe with `DISPLAY=:0` entered the Tk mainloop and exited only at the intentional 12-second timeout (`124`); no worker process remained. A machine-driven Tk widget probe then invoked the actual `Compile source…` and approved `Generate source…` buttons against the canonical source: preview reported zero writes and seven planned paths, generation wrote six isolated artifacts to a temporary output root, and the existing worker restarted from PID `179226` to `179250` before the GUI returned ready. This verifies the GUI callback path, but it is not human/CUA click-through. Real Tk click-through still cannot be performed in this environment: computer-use state currently exposes `apps=[]`, `browsers=[]`. Do not claim human GUI authoring acceptance until that surface is available. Native PZ SP/MP remains user-owned.
 
 ## Agent routing and Git
 
