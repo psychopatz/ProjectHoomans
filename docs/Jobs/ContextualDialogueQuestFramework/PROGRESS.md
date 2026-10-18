@@ -1,10 +1,10 @@
 # Contextual Dialogue & Quest Framework — current progress
 
 **Updated:** 2026-10-18
-**Audited branch/ref:** `codex/contextual-dialogue-quest-framework-0a` @ `5836179c3aa0dd2ed16f423aa81646e43c652e8d` (source commit)
+**Audited branch/ref:** `codex/contextual-dialogue-quest-framework-0a` @ `9c8d99676c24780fc5a2fbb0d2611d9fb212cefe` (source commit)
 **PR:** #4 → main, OPEN (not merged); **main baseline:** `a3eb2e4db553f9c03b7f66a6ff6717878e1668e0`
-**Status:** PHASE 2 — Action binding / real end-to-end workbench usefulness. **2A and 2B ACCEPTED** for the bounded FOLLOW and STAY/WAIT_AT slices; 2C is next. The native PZ runtime remains unrun by instruction.
-**ONE Next Chunk:** **2C — multi-stage GIFT capability trace with consent, authority result, and no-preview-dispatch proof.**
+**Status:** PHASE 2 — Action binding / real end-to-end workbench usefulness. **2A, 2B, and 2C ACCEPTED** for the bounded FOLLOW, STAY/WAIT_AT, and GIFT slices. Phase 3 is next; the native PZ runtime remains unrun by instruction.
+**ONE Next Chunk:** **3A — one authored semantic definition through compiler → modular source/manifests → fresh worker restart → real route.**
 
 ## 2A acceptance ledger — FOLLOW
 
@@ -41,6 +41,22 @@
 - Focused Lua regression suite including `pnc_semantic_wait_at_smoke`, `pnc_semantic_task_adapter_smoke`, companion commands, command adapter, dialogue/input, dialogue and response catalog — PASS, 7/7.
 - Harness doctor — PASS; changed production Lua Kahlua checks, `luac5.3`, Python compilation, JSON validation, and `git diff --check` — PASS.
 - Full Python discovery remains nonzero only in the already recorded suite-wide contextual-baseline ordering; no 2B acceptance test fails in isolation or in the focused set. Native PZ SP/MP and GUI click-through remain intentionally unrun/unverified.
+
+## 2C acceptance ledger — GIFT
+
+- **Implementation commit:** `9c8d99676c24780fc5a2fbb0d2611d9fb212cefe` (`Expose semantic gift capability and authority trace`).
+- **Discoverable binding:** live catalog reports `GIFT` as `pnc:gift.offer` → `PNC.Client.SendInventoryTransfer`, route `existing_inventory_transfer`, with inventory selection, target revision, conversation lease, authority requirements, and requested/pending/rejected/applied/completed result states. This metadata observes the existing GiftLifecycle/selection/transfer owners; it adds no second gift dispatcher.
+- **Committed real-worker trace:** `I want to give you an apple` → Core IR `OFFER/GIFT`, provenance `pnc.social.gift_give_you` → branch `GIFT_OFFER_DISPATCHED` → MarketSense resolves `player_apple_1` / `Base.Apple` → one existing `InventoryTransfer` request (`semantic-gift:npc_mara:1`) → existing server-result bridge emits `InventoryResult` with applied gift/relationship delta → NPC `Thank you for the Apple.`. Observation/tool facts expose the binding, transfer request, pending action result, applied relationship result, and authority statuses.
+- **Preview and selection safety:** two previews of the same offer expose the GIFT binding but produce zero transport/tool calls. Vague `I have a gift for you` stays `GIFT_SELECTION_REQUIRED`; in the headless harness the selector is unavailable and the action is rejected without an InventoryTransfer. Existing Lua consent coverage verifies one-recipient confirmation routes through the same transfer path, refusal does not dispatch, ambiguous multi-recipient consent does not dispatch, and a closed group expires the stale offer.
+- **Authority boundary:** the worker uses the existing inventory transfer and result pipeline with scenario-backed inventory/authority fixtures; it does not claim native PZ SP/MP completion. No duplicate parser, dispatcher, inventory mutation, or tick scan was added.
+
+## 2C verification
+
+- `tools/semantic_harness/.venv/bin/python -m unittest tools.semantic_harness.tests.test_gift_capability_binding -v` — PASS, 2/2.
+- Combined focused Python suite (FOLLOW, STAY/WAIT_AT, GIFT, flow editor, identity/wellbeing, weather) — PASS, 33/33.
+- Focused Lua gift/task/dialogue suite including `pnc_semantic_gift_offer_smoke` and `pnc_semantic_task_dispatch_smoke` — PASS, 4/4; the gift smoke includes consent, refusal, ambiguity, stale-group and existing-transfer assertions.
+- Harness doctor — PASS; changed production Lua Kahlua checks, `luac5.3`, Python compilation, and `git diff --check` — PASS.
+- Full Python discovery retains the previously recorded suite-wide contextual-baseline ordering failure; no 2C focused test fails. Native PZ SP/MP and GUI click-through remain intentionally unrun/unverified.
 
 ## Accepted / supported foundation
 
