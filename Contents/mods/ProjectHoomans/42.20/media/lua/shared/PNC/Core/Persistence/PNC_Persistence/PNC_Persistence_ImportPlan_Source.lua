@@ -10,6 +10,8 @@ local Journey = require
     "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_ImportPlan_Journey"
 local Generator = require
     "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_ImportPlan_Generator"
+local Opaque = require
+    "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_ImportPlan_Opaque"
 
 local Source = {}
 
@@ -33,6 +35,7 @@ function Source.Build(raw, source, options, decisions)
     local inventory = Fields.Inventory(source, decisions)
     local relationships = Social.Build(raw, source, decisions)
     local location = Journey.Build(raw, source, decisions)
+    local opaque = Opaque.Build(raw, decisions)
     local id = actorID(source, raw, options or {})
     if not id then
         add(decisions, "actorId", "quarantined", "id", "actor_id_missing")
@@ -63,6 +66,7 @@ function Source.Build(raw, source, options, decisions)
             sourceSnapshotHash = options.sourceSnapshotHash,
             decisionSet = options.decisionSet,
             generator = Utils.Copy(generator),
+            opaque = opaque,
         },
         identity = {
             schemaVersion = 1,

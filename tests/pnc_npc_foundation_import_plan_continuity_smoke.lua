@@ -44,6 +44,9 @@ T.truthy(Fixtures.HasDecision(ready, "relationships.memory", "copied"),
     "relationship memory decision missing")
 T.truthy(Fixtures.HasDecision(ready, "location.journey", "copied"),
     "journey copy decision missing")
+T.truthy(Fixtures.HasDecision(ready, "source.opaque", "projected",
+    "canonical_mapping_deferred"),
+    "deferred serialized roots were not surfaced")
 T.truthy(ready.rollback and ready.rollback.sourcePreserved,
     "ready rollback source-preservation record missing")
 T.falsy(ready.rollback and ready.rollback.writesPerformed,
@@ -76,6 +79,39 @@ T.equal(opaquePlan.status, "quarantined",
     "unsupported journey opaque field was accepted")
 T.equal(opaquePlan.reason, "opaque_nested_field_not_serialized",
     "opaque journey reason changed")
+
+-- Serialized roots without a bounded P0B adapter remain exact source data in
+-- the candidate.  They are projected for later ownership work, never reset
+-- to defaults or silently omitted from the migration ledger.
+local deferredRaw = ImportPlan.Copy(rawPayload)
+deferredRaw.semanticCognition = {
+    schemaVersion = 7,
+    opaque = { token = "retain-cognition" },
+}
+deferredRaw.futureRoot = { owner = "future-provider", value = 17 }
+local deferredPlan = ImportPlan.Build(deferredRaw, {
+    sourceSnapshot = sourceSnapshot,
+    generatorProvenance = baseOptions.generatorProvenance,
+    candidateCodec = Fixtures.CandidateCodec(),
+})
+T.equal(deferredPlan.status, "ready",
+    "opaque serialized roots incorrectly blocked the read-only plan")
+T.truthy(Fixtures.EqualValue(
+    deferredPlan.candidate.source.opaque.semanticCognition,
+    deferredRaw.semanticCognition
+), "semantic cognition opaque source changed")
+T.truthy(Fixtures.EqualValue(
+    deferredPlan.candidate.source.opaque.futureRoot,
+    deferredRaw.futureRoot
+), "unknown serialized root was discarded")
+T.truthy(Fixtures.HasDecision(
+    deferredPlan, "source.opaque.semanticCognition", "projected",
+    "canonical_mapping_deferred"
+), "semantic cognition mapping decision missing")
+T.truthy(Fixtures.HasDecision(
+    deferredPlan, "source.opaque.futureRoot", "projected",
+    "canonical_mapping_deferred"
+), "unknown root mapping decision missing")
 
 local unsupportedJourney = ImportPlan.Copy(rawPayload)
 unsupportedJourney.travel.schemaVersion = 99
