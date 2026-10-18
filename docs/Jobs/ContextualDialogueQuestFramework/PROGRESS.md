@@ -1,10 +1,10 @@
 # Contextual Dialogue & Quest Framework — current progress
 
 **Updated:** 2026-10-18
-**Audited branch/ref:** `codex/contextual-dialogue-quest-framework-0a` @ `9c8d99676c24780fc5a2fbb0d2611d9fb212cefe` (source commit; 3A worktree pending commit)
+**Audited branch/ref:** `codex/contextual-dialogue-quest-framework-0a` @ `65748a6d86cb7af7d4ebddd1b90b5233cc8fdb74` (source commit)
 **PR:** #4 → main, OPEN (not merged); **main baseline:** `a3eb2e4db553f9c03b7f66a6ff6717878e1668e0`
-**Status:** PHASE 2 — Action binding / real end-to-end workbench usefulness. **2A, 2B, and 2C ACCEPTED** for the bounded FOLLOW, STAY/WAIT_AT, and GIFT slices. Phase 3 is next; the native PZ runtime remains unrun by instruction.
-**ONE Next Chunk:** **3A — compiler/source/restart slice implemented and verified; commit the bounded source+generated artifacts, then choose the next phase chunk.**
+**Status:** PHASE 3 — Procedural semantic compiler. **2A, 2B, 2C, and 3A ACCEPTED** bounded action routes plus one compiler-backed authored FOLLOW definition. Phase 4 is next; the native PZ runtime remains unrun by instruction.
+**ONE Next Chunk:** **4A — expose the canonical semantic source through the existing Semantic Lab authoring/preview seam with explicit compiler diagnostics and no effectful preview.**
 
 ## 2A acceptance ledger — FOLLOW
 
