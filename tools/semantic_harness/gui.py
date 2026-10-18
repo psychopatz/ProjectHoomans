@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any, Callable
 
 from .config import ConfigurationError
+from .conversation_inspector import build_conversation_inspector
 from .authoring import (
     generate_semantic_source as generate_source_artifacts,
     preview_semantic_source,
@@ -140,7 +141,7 @@ class SemanticHarnessApp:
         facts_frame.columnconfigure(0, weight=1)
         self.inspector = ScrolledText(facts_frame, wrap="word", state="disabled")
         self.inspector.grid(row=0, column=0, sticky="nsew")
-        self.trace_tabs.add(facts_frame, text="Turn facts")
+        self.trace_tabs.add(facts_frame, text="Conversation state")
 
         raw_frame = ttk.Frame(self.trace_tabs)
         raw_frame.rowconfigure(0, weight=1)
@@ -297,14 +298,7 @@ class SemanticHarnessApp:
         self._messagebox.showerror("Harness error", str(error))
 
     def _show_response(self, response: dict[str, Any]) -> None:
-        observation = response.get("observation")
-        if not isinstance(observation, dict):
-            observation = {
-                "notice": "This worker response has no turn observation.",
-                "type": response.get("type"),
-                "keys": sorted(response),
-            }
-        self._set_text(self.inspector, pretty(observation))
+        self._set_text(self.inspector, pretty(build_conversation_inspector(response)))
         self._set_text(self.trace, pretty(response))
 
     def submit(self) -> None:
