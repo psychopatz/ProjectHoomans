@@ -1,14 +1,14 @@
 # Contextual Dialogue & Quest Framework — current progress
 
-**Updated:** 2026-10-19, after the C4-A real-worker dataset-assisted compiler slice.
+**Updated:** 2026-10-19, after the C4-B real-worker dataset-assisted clarification slice.
 
-**Local implementation:** branch `codex/contextual-dialogue-quest-framework-0a`; implementation is committed through `7eb42777` (C4-A reviewed dataset-assisted needs/promise mapping), following C3-D `f41ad18a`, C3-C `536b7141`, C3-B `a22b1d78`, C3-A `9ef46d2e`, C2-A `8a4e0b0e`, C1-A `470bb915`, C0-A `ca65049c`, G3C `9946fe69`, and documentation commit `32aceac7`. Earlier accepted slices remain `0cfcc345` (all dispatchable actions), `b1102486` (safe regeneration), `68c313fe` (multi-stage gifts), `b242e78c` (parameterized tasks), and `6290b3f74279731c7d80e97e077e88c10d35d676` (simple commands). Shared branch history also preserves unrelated concurrent P0B import-planner commits.
+**Local implementation:** branch `codex/contextual-dialogue-quest-framework-0a`; implementation is committed through `fc6d450d` (C4-B reviewed dataset-assisted clarification mapping), following C4-A `7eb42777`, C3-D `f41ad18a`, C3-C `536b7141`, C3-B `a22b1d78`, C3-A `9ef46d2e`, C2-A `8a4e0b0e`, C1-A `470bb915`, C0-A `ca65049c`, G3C `9946fe69`, and documentation commit `32aceac7`. Earlier accepted slices remain `0cfcc345` (all dispatchable actions), `b1102486` (safe regeneration), `68c313fe` (multi-stage gifts), `b242e78c` (parameterized tasks), and `6290b3f74279731c7d80e97e077e88c10d35d676` (simple commands). Shared branch history also preserves unrelated concurrent P0B import-planner commits.
 
 **Upstream baseline:** `origin/docs/contextual-dialogue-quest-framework-20261018` at `a79b01ff14be33178f699c50623a20524b04d46c`; the local implementation is intentionally ahead of that documentation baseline.
 
-**Current goal status:** **IN PROGRESS — G3C, C0-A, C1-A, C2-A, C3-A, C3-B, C3-C, C3-D, and C4-A accepted; C4-B–C6, full production-harness/performance, and user-owned native-game gates remain open.**
+**Current goal status:** **IN PROGRESS — G3C, C0-A, C1-A, C2-A, C3-A, C3-B, C3-C, C3-D, C4-A, and C4-B accepted; C4-C–C6, full production-harness/performance, and user-owned native-game gates remain open.**
 
-**ONE Next Chunk:** **C4-B — extend the existing Semantic Code Builder with one bounded reviewed SGD-style correction/clarification mapping through the same generated Lua and EN/TL artifacts, then verify ambiguity abstention and no false dispatch on the real worker.**
+**ONE Next Chunk:** **C4-C — extend the existing Semantic Code Builder with one bounded reviewed topic-switch/weather mapping through the same generated Lua and EN/TL artifacts, then verify interruption/resumption and nearby-negative abstention on the real worker.**
 
 ## Accepted historic foundation (do not redo)
 
@@ -249,6 +249,38 @@ dataset approval UI, numeric needs evidence, authoritative commitment
 confirmation, performance/isolation measurement, optional PBrainZ parity, or
 the final mandatory conversation. C4-B is the single next bounded chunk.
 
+## C4-B accepted — reviewed dataset-assisted needs clarification
+
+C4-B extends the same offline Code Builder and existing needs-flow authority
+with one reviewed SGD/MASSIVE-style correction mapping. The exact
+“Which item do you mean” candidate emits `CLARIFY`/`NEEDS` with the existing
+`NEEDS_QUANTITY` follow-up, and maps review metadata to the existing
+`ANY_ITEM` concept. It is accepted only by the active needs flow: the new
+bounded `onClarify` transition moves to a clarification node that keeps the
+quantity obligation open. No new parser, clarification engine, dispatcher,
+transcript store, or quest/memory authority was introduced.
+
+The generated `semantic.question.needs.quantity` extension provides an
+EN/TL `ASK_CLARIFICATION` plan with `npc.needs.thirst` provenance and
+`ambiguous` uncertainty. The nearby plural negative “Which items do you mean”
+is compiler-only and remains an unknown, non-dispatching input. The existing
+promise and weather interruption behavior remains unchanged.
+
+Focused acceptance evidence `fc6d450d`:
+
+- `python3 -m unittest tools.semantic_compiler.tests.test_dialogue_dataset tools.semantic_harness.tests.test_contextual_conversation_c4a tools.semantic_harness.tests.test_contextual_conversation_c4b tools.semantic_harness.tests.test_contextual_conversation_c3b tools.semantic_harness.tests.test_contextual_conversation_c3c tools.semantic_harness.tests.test_contextual_conversation_c3d -v` — **13/13 passed**.
+- `python3 -m unittest discover -s tools/semantic_compiler/tests -p 'test_*.py' -q` — **13/13 passed**.
+- Full production Lua worker suite via `python3 -m unittest discover -s tools/semantic_harness/tests -p 'test_*.py' -q` — **160/160 passed** (`testsRun=160`, `failures=0`, `errors=0`).
+- `./tools/semantic_harness/run_harness.sh --doctor --doctor-json` passed Python, repository, virtualenv, Tk/display, Core, Lua, worker syntax, boot, PING, and CAPABILITIES checks.
+- `luac5.3 -p`, `python3 -m py_compile`, EN/TL/manifests `python3 -m json.tool`, and `git diff --check` passed. `pz_verify --kahlua --severity ERROR` exited cleanly with **0 errors / 0 warnings** for every changed production Lua file.
+- Codebase-memory coverage for the compiler, generated source, needs-flow, kernel/registry, and C4A/C4B test paths returned `no_recorded_issue`; the indexed generation predates local edits and marked changed files `metadata_changed`/`not_tracked`, so acceptance relies on direct reads and fresh-worker evidence rather than stale graph freshness.
+- No Project Zomboid process, multiplayer hosting, mod installation, Workshop publication, or native-game test was launched.
+
+C4-B does not implement dataset-assisted weather/topic switching, Semantic Lab
+dataset approval UI, numeric needs evidence, authoritative commitment
+confirmation, performance/isolation measurement, optional PBrainZ parity, or
+the final mandatory conversation. C4-C is the single next bounded chunk.
+
 ## Verification evidence
 
 - G3B focused semantic generation/worker suite: `python3 -m unittest tools.semantic_harness.tests.test_quest_flow_binding tools.semantic_harness.tests.test_automatic_flow_generation tools.semantic_harness.tests.test_flow_editor tools.semantic_harness.tests.test_gift_capability_binding -q` — **25/25 passed**. The broader automatic-flow, translation, and harness regression slice passed **36/36**; authoritative quest service smoke `python3 tests/run_tests.py pnc_quest_service_smoke --verbose` passed **1/1**.
@@ -268,13 +300,13 @@ the final mandatory conversation. C4-B is the single next bounded chunk.
 
 ## Scope boundary
 
-G0A, G0B, G0C, G0D/G0D-2, G0E, G0F, G0G, G0H, G0I, G3A, G3B, G3C, C0-A, C1-A, C2-A, C3-A, C3-B, C3-C, C3-D, and C4-A are accepted implementation slices, not completion of the expanded goal. G3B's Semantic Lab/X11 gate, G3C's real-worker boundary, C0-A's worker authority regression gate, C1-A's context/resumption gate, C2-A's Knowledge commitment gate, C3-A/C3-B/C3-C/C3-D response-plan gates, and C4-A's reviewed compiler/worker gate are verified; native Project Zomboid SP/MP and Workshop actions remain user-owned. Continue with the single C4-B chunk above before any READY FOR USER LIVE TEST claim.
+G0A, G0B, G0C, G0D/G0D-2, G0E, G0F, G0G, G0H, G0I, G3A, G3B, G3C, C0-A, C1-A, C2-A, C3-A, C3-B, C3-C, C3-D, C4-A, and C4-B are accepted implementation slices, not completion of the expanded goal. G3B's Semantic Lab/X11 gate, G3C's real-worker boundary, C0-A's worker authority regression gate, C1-A's context/resumption gate, C2-A's Knowledge commitment gate, C3-A/C3-B/C3-C/C3-D response-plan gates, C4-A's reviewed compiler/worker gate, and C4-B's clarification/worker gate are verified; native Project Zomboid SP/MP and Workshop actions remain user-owned. Continue with the single C4-C chunk above before any READY FOR USER LIVE TEST claim.
 
 
 ## Approved future goal expansion — Contextual Conversational Intelligence (2026-10-19 planning only)
 
 User-approved target: offline Lua NPCs should understand elliptical follow-ups, topic interruptions and resumption, pending questions/offers/corrections, personality-aware dialogue plans and sparse evidence-backed promises with relevant world/quest/knowledge context; optional PBrainZ may rephrase the SAME authorized plan. Improve `tools/semantic_compiler` and Semantic Lab with reviewed dataset-assisted language/conversation-state generation and a context/plan/evidence inspector. See NEW `CONVERSATIONAL_INTELLIGENCE.md`, `DATASET_CONVERSATION_PIPELINE.md` and `CONVERSATION_ACCEPTANCE.md`, and the refreshed `ROADMAP.md`.
 
-G3C, C0-A, C1-A, C2-A, C3-A, C3-B, C3-C, C3-D, and C4-A are genuinely accepted locally with the evidence above. The next implementation task is exactly the single C4-B chunk named at the top; it is one reviewed SGD-style correction/clarification mapping with fresh-worker ambiguity and negative protection, not a claim of C4–C6 completion, corpus import, or native-game validation.
+G3C, C0-A, C1-A, C2-A, C3-A, C3-B, C3-C, C3-D, C4-A, and C4-B are genuinely accepted locally with the evidence above. The next implementation task is exactly the single C4-C chunk named at the top; it is one reviewed topic-switch/weather mapping with fresh-worker interruption/resumption and negative protection, not a claim of C4–C6 completion, corpus import, or native-game validation.
 
 Remote branch may not reflect the local Codex working checkout. Agent must reconcile current local HEAD/dirty/parallel work, and not discard implementation changes. C0-A measured and repaired the previously recorded four social THREAT test failures and insult final-response problem at the canonical worker authority boundary; C1-A measured topic interruption/resumption at the same worker boundary. Neither slice claims the mandatory multi-turn conversation complete.
