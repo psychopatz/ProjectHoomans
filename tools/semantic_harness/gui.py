@@ -12,6 +12,7 @@ from .config import ConfigurationError
 from .conversation_inspector import build_conversation_inspector
 from .authoring import (
     generate_semantic_source as generate_source_artifacts,
+    preview_dialogue_source,
     preview_semantic_source,
 )
 from .flow_editor import FlowEditorPane
@@ -166,6 +167,7 @@ class SemanticHarnessApp:
             on_register=self.register_flow_draft,
             on_compile_source=self.compile_semantic_source,
             on_generate_source=self.generate_semantic_source,
+            on_review_dataset=self.review_dialogue_source,
         )
 
         self._append("SYSTEM", "Window ready. Starting the isolated Lua worker…")
@@ -452,6 +454,27 @@ class SemanticHarnessApp:
             diagnostics = report.get("diagnostics") or []
             message = diagnostics[0].get("message") if diagnostics else "invalid source"
             self._append("SYSTEM", f"Compiler preview rejected: {message}")
+
+    def review_dialogue_source(self, source_path: Path) -> None:
+        """Review the canonical dialogue dataset through the existing Code Builder."""
+        report = preview_dialogue_source(source_path)
+        self.flow_editor.show_dataset_report(report)
+        self._set_text(self.inspector, pretty(report))
+        self._set_text(self.trace, pretty(report))
+        review = report.get("candidateReview") or {}
+        summary = review.get("summary") or {}
+        collisions = review.get("collisions") or []
+        if report.get("ok") is True:
+            self._append(
+                "SYSTEM",
+                f"Dataset review valid; {summary.get('approved', 0)} approved, "
+                f"{summary.get('rejected', 0)} rejected, {len(collisions)} collisions; "
+                "no files written.",
+            )
+        else:
+            diagnostics = report.get("diagnostics") or []
+            message = diagnostics[0].get("message") if diagnostics else "invalid dataset"
+            self._append("SYSTEM", f"Dataset review rejected: {message}")
 
     def generate_semantic_source(self, source_path: Path) -> None:
         """Generate approved artifacts, then restart the existing worker."""

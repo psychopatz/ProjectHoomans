@@ -208,6 +208,7 @@ class FlowEditorPane:
         on_register: Callable[[dict[str, Any]], Any],
         on_compile_source: Callable[[Path], Any] | None = None,
         on_generate_source: Callable[[Path], Any] | None = None,
+        on_review_dataset: Callable[[Path], Any] | None = None,
     ) -> None:
         self._tk = tk_module
         self._ttk = ttk
@@ -219,6 +220,7 @@ class FlowEditorPane:
         self._on_register = on_register
         self._on_compile_source = on_compile_source
         self._on_generate_source = on_generate_source
+        self._on_review_dataset = on_review_dataset
         self._catalog: dict[str, dict[str, Any]] = {}
         self._flow_id_to_label: dict[str, str] = {}
         self._flow_label_to_id: dict[str, str] = {}
@@ -333,6 +335,10 @@ class FlowEditorPane:
             secondary_toolbar, text="Generate source…", command=self.generate_source
         )
         self.generate_source_button.grid(row=0, column=7, padx=(4, 0))
+        self.review_dataset_button = ttk.Button(
+            secondary_toolbar, text="Review dataset…", command=self.review_dataset
+        )
+        self.review_dataset_button.grid(row=0, column=8, padx=(8, 0))
 
         self.status_var = self._tk.StringVar()
         ttk.Label(toolbar, textvariable=self.status_var).grid(
@@ -358,6 +364,7 @@ class FlowEditorPane:
             self.save_button,
             self.compile_source_button,
             self.generate_source_button,
+            self.review_dataset_button,
         )
 
     def _build_body(self) -> None:
@@ -1205,6 +1212,18 @@ class FlowEditorPane:
             return
         self._on_generate_source(Path(filename))
 
+    def review_dataset(self) -> None:
+        filename = self._filedialog.askopenfilename(
+            title="Review dialogue dataset candidates",
+            filetypes=[("Dialogue datasets", "*.json"), ("All files", "*")],
+        )
+        if not filename:
+            return
+        if self._on_review_dataset is None:
+            self.set_status("Dataset review is unavailable")
+            return
+        self._on_review_dataset(Path(filename))
+
     def show_source_report(self, report: dict[str, Any]) -> None:
         if report.get("ok") is True:
             writes = report.get("writes") or []
@@ -1222,6 +1241,25 @@ class FlowEditorPane:
             diagnostics = report.get("diagnostics") or []
             message = diagnostics[0].get("message") if diagnostics else "invalid source"
             self.set_status(f"Compiler preview rejected: {message}")
+
+    def show_dataset_report(self, report: dict[str, Any]) -> None:
+        review = report.get("candidateReview") or {}
+        summary = review.get("summary") or {}
+        collisions = review.get("collisions") or []
+        if report.get("ok") is True:
+            self.set_status(
+                "Dataset preview valid; "
+                f"{summary.get('approved', 0)} approved, "
+                f"{summary.get('rejected', 0)} rejected, "
+                f"{len(collisions)} collisions, no files written"
+            )
+            return
+        diagnostics = report.get("diagnostics") or []
+        message = diagnostics[0].get("message") if diagnostics else "invalid dataset"
+        self.set_status(
+            "Dataset preview rejected; "
+            f"{summary.get('rejected', 0)} rejected, {len(collisions)} collisions: {message}"
+        )
 
     def show_validation(self, response: dict[str, Any]) -> None:
         if response.get("valid") is True:
