@@ -1,10 +1,10 @@
 # Contextual Dialogue & Quest Framework — current progress
 
 **Updated:** 2026-10-18
-**Audited branch/ref:** `codex/contextual-dialogue-quest-framework-0a` @ `02ed6246e9c7c81f8a45dcae2dbdfd86f0c056ff` (source commit)
+**Audited branch/ref:** `codex/contextual-dialogue-quest-framework-0a` @ `5836179c3aa0dd2ed16f423aa81646e43c652e8d` (source commit)
 **PR:** #4 → main, OPEN (not merged); **main baseline:** `a3eb2e4db553f9c03b7f66a6ff6717878e1668e0`
-**Status:** PHASE 2 — Action binding / real end-to-end workbench usefulness. **2A ACCEPTED** for the bounded FOLLOW slice; 2B is next. The native PZ runtime remains unrun by instruction.
-**ONE Next Chunk:** **2B — STAY vs WAIT_AT typed capability trace and truthful result in the existing Semantic Lab.**
+**Status:** PHASE 2 — Action binding / real end-to-end workbench usefulness. **2A and 2B ACCEPTED** for the bounded FOLLOW and STAY/WAIT_AT slices; 2C is next. The native PZ runtime remains unrun by instruction.
+**ONE Next Chunk:** **2C — multi-stage GIFT capability trace with consent, authority result, and no-preview-dispatch proof.**
 
 ## 2A acceptance ledger — FOLLOW
 
@@ -24,6 +24,23 @@
 - Focused Lua regression suite (`pnc_semantic_command_adapter_smoke`, dialogue/input/flow/response/identity/local-question cases) — PASS, 7/7.
 - `pz_verify.py --file --kahlua --severity ERROR --no-snippets` on all four changed production Lua files — PASS; `luac5.3 -p`, Python `py_compile`, JSON validation, and `git diff --check` — PASS.
 - Full Python discovery still exits nonzero in the existing suite-wide contextual-baseline ordering; the isolated baseline file passes, and the changed FOLLOW acceptance test is green. `pnc_semantic_local_route_smoke` still expects one greeting response while the existing authored greeting plan queues two; this was not changed because it is outside 2A.
+
+## 2B acceptance ledger — STAY vs WAIT_AT
+
+- **Implementation commit:** `5836179c3aa0dd2ed16f423aa81646e43c652e8d` (`Trace STAY and WAIT_AT through distinct task routes`).
+- **Discoverable bindings:** live catalog now reports `STAY` as `pnc:companion.stay` → `PNC.Client.SendCompanionCommand` / `stay`, and `WAIT_AT` as `pnc:task.wait_at` → `PNC.Client.RequestSemanticTask` / existing semantic-task route. WAIT_AT advertises destination, actor, scope, and bounded-duration argument metadata plus resolved-destination authority requirement and admitted/active/completed result states.
+- **STAY trace:** `Stay here` → Core IR `REQUEST/STAY`, provenance `pnc.command.wait` → one existing `CompanionCommand(stay)` with accepted `network_queued` result → one normalized `stay` action call → NPC `Okay.`. It does not emit a semantic-task request.
+- **WAIT_AT trace:** `Wait at the campfire` → Core IR `REQUEST/WAIT_AT`, provenance `pnc.command.wait_at`, resolved `CAMPFIRE` target → one existing `SemanticTaskRequest` with `target.category=CAMPFIRE` → mocked authority admission `status=admitted`, `planID=mock-plan-wait-at` → one WAIT_AT action call plus the authority request fact → NPC `Okay.`. It does not emit `CompanionCommand`.
+- **Target safety:** `stay at the recycle bin` remains WAIT_AT but the harness authority rejects unresolved target data as `target_unresolved`; exactly one task-result line says `I can't find that place nearby.`. Question `Are you waiting at the campfire?` remains clarification with zero transport/tool calls. Two WAIT_AT previews remain side-effect-free.
+- **Workbench and authority boundary:** the same live action inspector metadata now differentiates command versus task ownership; the task path uses the existing `RequestSemanticTask` contract and a harness-only authority response bridge, not a new parser, dispatcher, tick loop, or callable editor field.
+
+## 2B verification
+
+- `tools/semantic_harness/.venv/bin/python -m unittest tools.semantic_harness.tests.test_stay_wait_at_binding -v` — PASS, 2/2.
+- Combined focused Python suite (FOLLOW, STAY/WAIT_AT, flow editor, identity/wellbeing, weather) — PASS, 31/31.
+- Focused Lua regression suite including `pnc_semantic_wait_at_smoke`, `pnc_semantic_task_adapter_smoke`, companion commands, command adapter, dialogue/input, dialogue and response catalog — PASS, 7/7.
+- Harness doctor — PASS; changed production Lua Kahlua checks, `luac5.3`, Python compilation, JSON validation, and `git diff --check` — PASS.
+- Full Python discovery remains nonzero only in the already recorded suite-wide contextual-baseline ordering; no 2B acceptance test fails in isolation or in the focused set. Native PZ SP/MP and GUI click-through remain intentionally unrun/unverified.
 
 ## Accepted / supported foundation
 
