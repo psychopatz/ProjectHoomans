@@ -1,6 +1,6 @@
 # Roadmap — generated semantic flows, contextual conversational intelligence and quests
 
-**Reconciled against local/remote documentation commit `a79b01ff14be33178f699c50623a20524b04d46c` (2026-10-19), then local G3C `9946fe69`, C0-A `ca65049c`, C1-A `470bb915`, C2-A `8a4e0b0e`, C3-A `9ef46d2e`, C3-B `a22b1d78`, and C3-C `536b7141`; the job-document update is `32aceac7` plus this reconciliation.** G3C through C3-C are recorded accepted by real-worker evidence in `PROGRESS.md`; `PROGRESS.md` alone names the ONE live Next Chunk.
+**Reconciled against local/remote documentation commit `a79b01ff14be33178f699c50623a20524b04d46c` (2026-10-19), then local G3C `9946fe69`, C0-A `ca65049c`, C1-A `470bb915`, C2-A `8a4e0b0e`, C3-A `9ef46d2e`, C3-B `a22b1d78`, C3-C `536b7141`, and C3-D `f41ad18a`; the job-document update is `32aceac7` plus this reconciliation.** G3C through C3-D are recorded accepted by real-worker evidence in `PROGRESS.md`; `PROGRESS.md` alone names the ONE live Next Chunk.
 
 | Phase | Status | Product milestone and acceptance |
 | --- | --- | --- |
@@ -10,15 +10,15 @@
 | **C0 — Conversational baseline** | **RECORDED ACCEPTED / C0-A** | Real Lua worker characterized the required sequence and safely stopped before unsupported needs/quantity/weather claims; canonical social authority repaired the insult and four THREAT regressions. |
 | **C1 — Conversation frames & ellipsis** | **RECORDED ACCEPTED / C1-A** | Real Lua worker verified a bounded flow-owned pending-follow-up agenda, contextual interruption trace, terminal weather suspension, and compatible wellbeing resumption with zero side effects. |
 | **C2 — Sparse episodic memory** | **RECORDED ACCEPTED / C2-A** | Existing Knowledge journal/API records only a bounded owner-linked commitment after a successful conversation acknowledgement; save/load, replay, unknown evidence, unacknowledged, and wrong-owner cases are covered by the real Lua worker. |
-| **C3 — Dialogue-act planner** | **RECORDED ACCEPTED / C3-A + C3-B + C3-C** | Existing response plan/catalog now carries bounded grounded wellbeing and needs acts, topic/uncertainty/tone metadata, validated NPC fact provenance, a flow-owned `NEEDS`→`QUANTITY` obligation, and a confirmation-safe `PROMISE`→`PROPOSAL` state in EN/TL. Unknown facts clarify without invention; unconfirmed promises never dispatch or create authoritative commitments. |
-| **C4 — Dataset-assisted Code Builder** | PLANNED | Reviewed/licensed MASSIVE/WordNet/SGD-style candidates to existing canonical spec, guarded compilers/response pools/manifests, collision and false-command protection; fresh worker. |
+| **C3 — Dialogue-act planner** | **RECORDED ACCEPTED / C3-A + C3-B + C3-C + C3-D** | Existing response plan/catalog now carries bounded grounded wellbeing and needs acts, topic/uncertainty/tone metadata, validated NPC fact provenance, a flow-owned `NEEDS`→`QUANTITY`→`PROPOSAL` context, and weather interruption/resumption in EN/TL. Unknown facts clarify without invention; unconfirmed promises never dispatch or create authoritative commitments. |
+| **C4 — Dataset-assisted Code Builder** | **IN PROGRESS / C4-A next** | Reviewed/licensed MASSIVE/WordNet/SGD-style candidates to existing canonical spec, guarded compilers/response pools/manifests, collision and false-command protection; fresh worker. |
 | **C5 — Semantic Lab context/dataset workbench** | PLANNED | Visual trace of agenda, focused references, memory provenance, dialogue plan, typed generated flow and dataset candidate approval, safe code/source diff. |
 | **C6 — Scale + PBrainZ parity + handoff** | PLANNED | Bounded performance/state, EN/TL and two-NPC player scopes, deterministic offline-first path, optional PBrainZ from shared plan, focused full regression, READY FOR USER LIVE TEST when all developer gates pass. |
 
 ## Sequence and Next Chunk discipline
 
-1. Begin with `PROGRESS.md` **C3-D**. Do not restart already accepted capability-generation phases or publish Workshop in order to test.
-2. Keep C3-D to ONE bounded **weather interruption/resumption turn from the open needs proposal** using the existing weather flow, suspended flow stack, and pending context. Preserve the proposal’s topic/focus and no-dispatch/no-authoritative-commitment behavior; do not prematurely claim C4–C6 or spawn new docs-only iterations.
+1. Begin with `PROGRESS.md` **C4-A**. Do not restart already accepted capability-generation phases or publish Workshop in order to test.
+2. Keep C4-A to ONE bounded **reviewed, licensed dataset-assisted needs/promise mapping** through the existing Code Builder, emitting modular production Lua and EN/TL files and verifying a fresh worker accepts the reviewed positive while rejecting a nearby negative with no false dispatch. Preserve existing canonical semantics and authority; do not prematurely claim C4–C6 or spawn new docs-only iterations.
 3. Then C3→C4→C5→C6, splitting each into one source+real-worker verifiable vertical chunk. Fix safety/correctness regressions before corpus expansion.
 4. A dataset is an offline reviewed *input*, never a runtime NLP interpreter. Verified context-state quality outranks corpus quantity. Existing FlowRegistry/response planning/command authority remains the source of truth.
 
