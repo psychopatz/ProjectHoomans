@@ -140,6 +140,66 @@ T.truthy(legacyPlan.rollback and legacyPlan.rollback.sourcePreserved,
 T.equal(legacyPlan.rollback.strategy, "DISABLE_CANDIDATE_MAPPING",
     "legacy rollback strategy changed")
 
+-- A current schema-16 payload is not a complete restoration source for the
+-- authored appearance policy or the full SurvivorFactory voice profile.  It
+-- must remain untouched and quarantine instead of rerolling either field.
+local rawOnlyBefore = ImportPlan.Copy(rawPayload)
+local rawOnlyPlan = ImportPlan.Build(rawPayload, {
+    candidateCodec = Fixtures.CandidateCodec(),
+})
+T.equal(rawOnlyPlan.status, "quarantined",
+    "raw schema-16 payload was accepted without a source snapshot")
+T.equal(rawOnlyPlan.reason, "voice_profile_incomplete",
+    "raw-only voice loss was not the blocking reason")
+T.truthy(Fixtures.HasDecision(
+    rawOnlyPlan, "identity.voice", "quarantined", "voice_profile_incomplete"
+), "raw-only voice quarantine decision missing")
+T.truthy(Fixtures.HasDecision(
+    rawOnlyPlan, "appearance.policy", "quarantined",
+    "authored_appearance_policy_missing"
+), "raw-only appearance quarantine decision missing")
+T.falsy(rawOnlyPlan.candidate, "raw-only payload produced a candidate")
+T.truthy(Fixtures.EqualValue(rawOnlyPlan.rawPayload, rawOnlyBefore),
+    "raw-only payload was mutated")
+T.truthy(rawOnlyPlan.rollback and rawOnlyPlan.rollback.sourcePreserved,
+    "raw-only rollback source-preservation record missing")
+T.falsy(rawOnlyPlan.rollback and rawOnlyPlan.rollback.writesPerformed,
+    "raw-only planner performed a write")
+
+-- Unsupported appearance policy versions are also quarantined even when the
+-- untouched source snapshot contains the complete voice profile.
+local oldAppearance = ImportPlan.Copy(sourceSnapshot)
+oldAppearance.appearance.schemaVersion = 1
+local oldAppearancePlan = ImportPlan.Build(rawPayload, {
+    sourceSnapshot = oldAppearance,
+    candidateCodec = Fixtures.CandidateCodec(),
+})
+T.equal(oldAppearancePlan.status, "quarantined",
+    "old appearance policy schema was accepted")
+T.equal(oldAppearancePlan.reason, "appearance_schema_unsupported",
+    "old appearance policy reason")
+T.falsy(oldAppearancePlan.candidate,
+    "old appearance policy produced a candidate")
+T.truthy(oldAppearancePlan.rollback and oldAppearancePlan.rollback.sourcePreserved,
+    "old appearance rollback source-preservation record missing")
+
+-- A source snapshot with one missing factory voice value is incomplete; no
+-- default type or pitch may be invented during migration.
+local incompleteVoice = ImportPlan.Copy(sourceSnapshot)
+incompleteVoice.identity.survivor.voicePitch = nil
+local incompleteVoicePlan = ImportPlan.Build(rawPayload, {
+    sourceSnapshot = incompleteVoice,
+    candidateCodec = Fixtures.CandidateCodec(),
+})
+T.equal(incompleteVoicePlan.status, "quarantined",
+    "incomplete voice profile was accepted")
+T.equal(incompleteVoicePlan.reason, "voice_profile_incomplete",
+    "incomplete voice profile reason")
+T.falsy(incompleteVoicePlan.candidate,
+    "incomplete voice profile produced a candidate")
+T.truthy(incompleteVoicePlan.rollback and incompleteVoicePlan.rollback.sourcePreserved,
+    "incomplete voice rollback source-preservation record missing")
+
 -- Unsupported schemas fail closed before any candidate is built.
 local unsupported = ImportPlan.Copy(rawPayload)
 unsupported.schemaVersion = tonumber(rawPayload.schemaVersion) - 1
