@@ -185,6 +185,41 @@ local BUILTINS = {
                 tostring(gate.value or gate.audience)
             ] == true or false
     end,
+    -- Generated simple-command flows use the existing condition evaluator for
+    -- a bounded conversation/target authorization gate. The final command
+    -- adapter and authoritative server still make the gameplay decision; this
+    -- gate only prevents a malformed or unauthorised local context from
+    -- reaching that adapter.
+    ["pnc:semantic_context"] = function(context, gate)
+        context = type(context) == "table" and context or {}
+        local explicit = context.semanticAuthorization
+        if type(explicit) == "table" then
+            local capabilityID = tostring(gate.capabilityID or "")
+            if explicit[capabilityID] ~= nil then
+                return explicit[capabilityID] == true
+            end
+            if explicit.authorized ~= nil then
+                return explicit.authorized == true
+            end
+        elseif explicit ~= nil then
+            return explicit == true
+        end
+        if gate.requiresTarget == true
+            and (context.npcID == nil or tostring(context.npcID) == "")
+        then
+            return false
+        end
+        if gate.requiresAuthority == true then
+            local lifecycle = context.conversationLifecycleState
+            if type(lifecycle) ~= "table"
+                or lifecycle.token == nil
+                or tostring(lifecycle.token) == ""
+            then
+                return false
+            end
+        end
+        return true
+    end,
     ["pnc:time"] = timeMatches,
     ["pnc:history"] = historyMatches,
     ["pnc:weather"] = weatherMatches,

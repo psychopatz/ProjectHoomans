@@ -184,8 +184,31 @@ function Internal.QueueDeterministicResponse(
         responses = { actionResult.response }
         response = responses[1]
     end
+    local generatedFlowResponse = false
+    local localResponse = PNC.Semantics and PNC.Semantics.LocalResponse
+    if not (actionResult and type(actionResult.response) == "table")
+        and result.flow and result.flow.generated == true
+        and type(result.flow.responsePool) == "string"
+        and localResponse
+        and type(localResponse.ResolveFlow) == "function"
+    then
+        local flowResponse = localResponse.ResolveFlow(
+            ir,
+            session and session.semanticDialogueState,
+            type(Internal.ShallowContext) == "function"
+                and Internal.ShallowContext(view) or {},
+            result.flow
+        )
+        if type(flowResponse) == "table" then
+            responses = { ResponseAdapter.Payload({ response = flowResponse }) }
+            response = responses[1]
+            generatedFlowResponse = true
+        end
+    end
     local rejectedResponse
-    if not (actionResult and type(actionResult.response) == "table") then
+    if not generatedFlowResponse
+        and not (actionResult and type(actionResult.response) == "table")
+    then
         rejectedResponse = ResponseAdapter.ActionRejected(
             result, actionResult
         )
@@ -217,7 +240,7 @@ function Internal.QueueDeterministicResponse(
         -- ActionRejected response above keeps the NPC wording truthful and
         -- prevents the policy's pre-dispatch acknowledgement from leaking.
         -- A task/gift adapter may still own a more specific response.
-        if not rejectedResponse then return true end
+        if not rejectedResponse and not generatedFlowResponse then return true end
     end
     if decision.branch == "INVENTORY_QUERY_RECEIVED"
         and actionResult and actionResult.result

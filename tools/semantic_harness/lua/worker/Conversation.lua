@@ -77,6 +77,10 @@ function Conversation.buildContext(context)
         characterUUID = player.characterUUID,
         conversationTopic = conversation.topic or "greeting",
         conversationLifecycleState = { token = conversation.token or "harness-lease" },
+        semanticAuthorization = copy(
+            conversation.semanticAuthorization
+                or npc.semanticAuthorization
+        ),
         entry = {
             snapshot = {
                 activeBehavior = npc.activeBehavior,
@@ -238,6 +242,7 @@ function Conversation.turn(context, text)
             sequence = result.sequence,
             ir = Values.copy(result.ir),
             decision = Values.copy(result.decision),
+            flow = Values.copy(result.flow),
             actionResult = Values.copy(actionResult),
             candidates = Values.copy(result.candidates),
             candidateDiagnostics = Values.copy(result.candidateDiagnostics),
@@ -304,6 +309,16 @@ function Conversation.preview(context, text)
         timestamp = type(Internal.Now) == "function" and Internal.Now() or 0,
     }
     local result = router:Preview(value, projection, options)
+    if result and result.accepted == true
+        and result.ir and type(router.Decide) == "function"
+    then
+        -- Router:Preview intentionally does not commit a turn. Ask the same
+        -- production policy for its pure flow preview so the lab can inspect
+        -- generated gates/bindings without recording or dispatching anything.
+        local decision = router:Decide(result.ir, projection, options)
+        result.decision = decision
+        result.flow = decision and decision.flow
+    end
     local newTrace = {}
     local newTransport = {}
     local newTranslations = {}
@@ -332,6 +347,7 @@ function Conversation.preview(context, text)
             sequence = result.sequence,
             ir = Values.copy(result.ir),
             decision = Values.copy(result.decision),
+            flow = Values.copy(result.flow),
             candidates = Values.copy(result.candidates),
             candidateDiagnostics = Values.copy(result.candidateDiagnostics),
         } or nil,

@@ -50,8 +50,9 @@ class FollowActionBindingTests(unittest.TestCase):
         self.assertEqual(result["ir"]["action"], "FOLLOW")
         self.assertEqual(result["ir"]["provenance"]["pattern"], "pnc.command.follow")
         self.assertEqual(result["decision"]["branch"], "COMMAND_ACCEPTED")
-        self.assertTrue(committed["observation"]["flow"]["noFlow"])
-        self.assertFalse(committed["observation"]["flow"]["matched"])
+        self.assertTrue(committed["observation"]["flow"]["generated"])
+        self.assertTrue(committed["observation"]["flow"]["matched"])
+        self.assertEqual(committed["observation"]["flow"]["resultNodeId"], "queued")
         self.assertEqual(result["actionResult"]["commandID"], "follow")
         self.assertTrue(result["actionResult"]["accepted"])
         self.assertEqual(result["actionResult"]["reason"], "network_queued")
@@ -70,7 +71,10 @@ class FollowActionBindingTests(unittest.TestCase):
         self.assertEqual(len(committed["toolCalls"]), 1)
         self.assertEqual(committed["toolCalls"][0]["name"], "follow")
         self.assertEqual(committed["toolCalls"][0]["authority"], "mock")
-        self.assertEqual(committed["messages"][0]["payload"]["text"], "Okay.")
+        self.assertEqual(
+            committed["messages"][0]["payload"]["text"],
+            "Okay, I'll follow you.",
+        )
 
         # The explicit negated pattern is STOP, so it must never silently
         # reuse the FOLLOW binding or issue a follow command.
@@ -148,7 +152,7 @@ class FollowActionBindingTests(unittest.TestCase):
         )
         self.assertEqual(
             denied["messages"][0]["payload"]["translationKey"],
-            "UI_PNC_Conversation_Semantic_ActionFollowUnavailable",
+            "UI_PNC_Conversation_Semantic_GeneratedFollowRejected",
         )
 
 

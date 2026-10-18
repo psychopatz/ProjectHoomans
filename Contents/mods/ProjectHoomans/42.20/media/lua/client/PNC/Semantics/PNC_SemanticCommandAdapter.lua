@@ -37,8 +37,54 @@ Adapter.RegisterAction("FOLLOW", {
     capabilityID = "pnc:companion.follow",
     owner = "PNC.CompanionCommands",
     route = "existing_companion_command",
+    workflowKind = "simple_command",
+    templateVersion = 1,
+    contractVersion = 1,
     commandID = "follow",
     handlerID = "PNC.Client.SendCompanionCommand",
+    targetScope = "single_or_group",
+    triggerFrames = {
+        { intent = "REQUEST", speechAct = "REQUEST", action = "FOLLOW" },
+    },
+    requiredSlots = {
+        npcID = {
+            type = "entity",
+            owner = "dialogue_context",
+            source = "npcID",
+        },
+    },
+    permissionGate = {
+        type = "pnc:semantic_context",
+        capabilityID = "pnc:companion.follow",
+        requiresTarget = true,
+        requiresAuthority = true,
+    },
+    outcomeMapping = {
+        queued = "queued",
+        accepted = "queued",
+        pending = "queued",
+        network_queued = "queued",
+        rejected = "rejected",
+        failed = "failed",
+    },
+    responsePools = {
+        queued = {
+            key = "UI_PNC_Conversation_Semantic_GeneratedFollowQueued",
+            en = "Okay, I'll follow you.",
+            tl = "Sige, susundan kita.",
+        },
+        rejected = {
+            key = "UI_PNC_Conversation_Semantic_GeneratedFollowRejected",
+            en = "I can't follow you right now.",
+            tl = "Hindi kita masusundan ngayon.",
+        },
+        failed = {
+            key = "UI_PNC_Conversation_Semantic_GeneratedFollowFailed",
+            en = "I couldn't start following you.",
+            tl = "Hindi ko masimulan ang pagsunod sa iyo.",
+        },
+    },
+    translationOwner = "ProjectHoomans",
     arguments = {
         npcID = "actor_target",
         scope = "single_or_group",
@@ -59,8 +105,54 @@ Adapter.RegisterAction("STAY", {
     capabilityID = "pnc:companion.stay",
     owner = "PNC.CompanionCommands",
     route = "existing_companion_command",
+    workflowKind = "simple_command",
+    templateVersion = 1,
+    contractVersion = 1,
     commandID = "stay",
     handlerID = "PNC.Client.SendCompanionCommand",
+    targetScope = "single_or_group",
+    triggerFrames = {
+        { intent = "REQUEST", speechAct = "REQUEST", action = "STAY" },
+    },
+    requiredSlots = {
+        npcID = {
+            type = "entity",
+            owner = "dialogue_context",
+            source = "npcID",
+        },
+    },
+    permissionGate = {
+        type = "pnc:semantic_context",
+        capabilityID = "pnc:companion.stay",
+        requiresTarget = true,
+        requiresAuthority = true,
+    },
+    outcomeMapping = {
+        queued = "queued",
+        accepted = "queued",
+        pending = "queued",
+        network_queued = "queued",
+        rejected = "rejected",
+        failed = "failed",
+    },
+    responsePools = {
+        queued = {
+            key = "UI_PNC_Conversation_Semantic_GeneratedStayQueued",
+            en = "Okay, I'll stay here.",
+            tl = "Sige, mananatili ako rito.",
+        },
+        rejected = {
+            key = "UI_PNC_Conversation_Semantic_GeneratedStayRejected",
+            en = "I can't stay here right now.",
+            tl = "Hindi ako makapananatili rito ngayon.",
+        },
+        failed = {
+            key = "UI_PNC_Conversation_Semantic_GeneratedStayFailed",
+            en = "I couldn't start the stay order.",
+            tl = "Hindi ko masimulan ang utos na manatili.",
+        },
+    },
+    translationOwner = "ProjectHoomans",
     arguments = {
         npcID = "actor_target",
         scope = "single_or_group",
@@ -174,10 +266,16 @@ function Adapter.Dispatch(actionIntent, context)
         context.scope or "single",
         commandContext
     )
+    local resultStatus = accepted ~= true and "rejected"
+        or (commandID == "camp" and reason == "network_queued"
+            and "pending" or "accepted")
+    if accepted ~= true and type(details) == "table"
+        and tostring(details.status or "") == "failed"
+    then
+        resultStatus = "failed"
+    end
     local result = {
-        status = accepted ~= true and "rejected"
-            or (commandID == "camp" and reason == "network_queued"
-                and "pending" or "accepted"),
+        status = resultStatus,
         accepted = accepted == true,
         reason = reason,
         commandID = commandID,

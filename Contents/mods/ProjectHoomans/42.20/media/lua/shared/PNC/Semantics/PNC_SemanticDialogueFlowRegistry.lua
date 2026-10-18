@@ -48,6 +48,18 @@ local GATE_FIELDS = {
     subject = true,
     unit = true,
     unknownPolicy = true,
+    capabilityID = true,
+    requiresTarget = true,
+    requiresAuthority = true,
+}
+
+local ACTION_FIELDS = {
+    capabilityID = true,
+    route = true,
+    targetScope = true,
+    binding = true,
+    resultTransitions = true,
+    dispatchCount = true,
 }
 
 local function copyValue(value, depth)
@@ -147,6 +159,63 @@ local function normalizeSlots(slots, label)
     return output
 end
 
+local function normalizeAction(action, nodes, label)
+    if action == nil then return nil end
+    if type(action) ~= "table" then
+        return nil, label .. "_must_be_object"
+    end
+    local output = {}
+    local key
+    local value
+    for key, value in pairs(action) do
+        if not ACTION_FIELDS[key] then
+            return nil, label .. "_unsupported_field:" .. tostring(key)
+        end
+        if key == "binding" then
+            if type(value) ~= "table" then
+                return nil, label .. "_binding_must_be_object"
+            end
+            output.binding = copyValue(value)
+        elseif key == "resultTransitions" then
+            if type(value) ~= "table" then
+                return nil, label .. "_result_transitions_must_be_object"
+            end
+            output.resultTransitions = {}
+            for outcome, target in pairs(value) do
+                if type(outcome) ~= "string" or type(target) ~= "string"
+                    or target == ""
+                then
+                    return nil, label .. "_invalid_result_transition"
+                end
+                if not SPECIAL_TARGETS[target] and not nodes[target] then
+                    return nil, label .. "_result_unknown_node:" .. target
+                end
+                output.resultTransitions[outcome] = target
+            end
+        elseif key == "dispatchCount" then
+            if value ~= 1 then
+                return nil, label .. "_dispatch_count_must_be_one"
+            end
+            output.dispatchCount = 1
+        else
+            if type(value) ~= "string" and type(value) ~= "number"
+                and type(value) ~= "boolean"
+            then
+                return nil, label .. "_field_invalid:" .. tostring(key)
+            end
+            output[key] = value
+        end
+    end
+    if not output.capabilityID or not output.route
+        or type(output.binding) ~= "table"
+        or type(output.resultTransitions) ~= "table"
+    then
+        return nil, label .. "_requires_typed_binding_and_results"
+    end
+    output.dispatchCount = output.dispatchCount or 1
+    return output
+end
+
 local function normalizeGate(gate, label)
     if gate == nil then return nil end
     if type(gate) ~= "table" then
@@ -193,6 +262,12 @@ local function normalizeNode(nodeID, node, nodes)
     slots, reason = normalizeSlots(node.slots, "node_slots")
     if not slots then return nil, reason .. ":" .. tostring(nodeID) end
     output.slots = slots
+
+    local action, actionReason = normalizeAction(
+        node.action, nodes, "node_action"
+    )
+    if node.action ~= nil and not action then return nil, actionReason end
+    output.action = action
 
     if node.accepts ~= nil then
         if type(node.accepts) ~= "table" then
@@ -247,6 +322,7 @@ local function normalizeNode(nodeID, node, nodes)
         and not output.onUnrelated and not output.onRefuse
         and not output.onPass and not output.onFail
         and not output.onUnknown
+        and not output.action
     then
         return nil, "nonterminal_node_requires_transition:" .. tostring(nodeID)
     end
@@ -275,6 +351,17 @@ local function validateReachability(nodes, initial)
                         and not seen[target]
                     then
                         pending[#pending + 1] = target
+                    end
+                end
+                if node.action
+                    and type(node.action.resultTransitions) == "table"
+                then
+                    for _, target in pairs(node.action.resultTransitions) do
+                        if target and not SPECIAL_TARGETS[target]
+                            and not seen[target]
+                        then
+                            pending[#pending + 1] = target
+                        end
                     end
                 end
             end
@@ -364,6 +451,9 @@ function Registry.Validate(definition)
         id = flowID,
         version = version,
         owner = stringValue(definition.owner),
+        workflowKind = stringValue(definition.workflowKind),
+        templateVersion = tonumber(definition.templateVersion),
+        capabilityID = stringValue(definition.capabilityID),
         initial = initial,
         triggers = normalizedTriggers,
         nodes = normalizedNodes,

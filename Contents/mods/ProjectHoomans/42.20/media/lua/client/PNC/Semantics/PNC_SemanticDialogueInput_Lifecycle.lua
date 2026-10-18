@@ -18,6 +18,41 @@ local DialogueInputTrace = PNC.Semantics.DialogueInputTrace
 local audit = DialogueInputTrace.Audit
 local traceTurn = DialogueInputTrace.RecordTurn
 
+local function applyGeneratedFlowResult(view, result, actionResult)
+    local flow = result and result.flow or nil
+    local policy = PNC.Semantics and PNC.Semantics.DialoguePolicy or nil
+    local kernel = policy and policy.Internal and policy.Internal.FlowKernel
+    local state = view and view.session
+        and view.session.semanticDialogueState or nil
+    if type(flow) ~= "table" or flow.generated ~= true
+        or type(actionResult) ~= "table"
+        or not kernel or type(kernel.ApplyActionResult) ~= "function"
+        or not state or type(Internal.ShallowContext) ~= "function"
+    then
+        return false
+    end
+    local updated, reason = kernel.ApplyActionResult(
+        flow,
+        actionResult,
+        state,
+        Internal.ShallowContext(view),
+        { maxFlowStack = 4 }
+    )
+    if type(updated) ~= "table" then
+        audit("semantic.generated_flow.result_unapplied", {
+            flowID = flow.flowId,
+            reason = reason,
+            status = actionResult.status,
+        })
+        return false
+    end
+    result.flow = updated
+    if type(result.decision) == "table" then
+        result.decision.flow = updated
+    end
+    return true
+end
+
 local function groupMemberShouldHandle(view, result, value)
     local group = view and view.groupConversation
     if not group or type(group.MemberForHost) ~= "function"
@@ -51,6 +86,7 @@ local function finishLocalSubmit(view, value, result, options)
     if groupMemberShouldHandle(view, result, value) then
         actionResult = Internal.DispatchAction(view, result, value)
         view.lastSemanticActionResult = actionResult
+        applyGeneratedFlowResult(view, result, actionResult)
         if Internal.ClearPendingGiftConsent then
             Internal.ClearPendingGiftConsent(view)
         end

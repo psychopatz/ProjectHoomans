@@ -40,6 +40,40 @@ class FlowEditorTests(unittest.TestCase):
             },
         )
 
+    def test_generated_graph_exposes_typed_action_and_result_edges(self) -> None:
+        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+            catalog = worker.flow_catalog()
+
+        follow = next(
+            flow for flow in catalog["flows"]
+            if flow["id"] == "pnc.generated.simple_command.pnc.companion.follow"
+        )
+        graph = flow_graph_model(follow)
+        request = next(node for node in graph["nodes"] if node["id"] == "request")
+        self.assertEqual(request["action"]["capabilityID"], "pnc:companion.follow")
+        self.assertEqual(request["action"]["dispatchCount"], 1)
+        self.assertEqual(
+            {
+                outcome: request["resultTransitions"][outcome]
+                for outcome in ("queued", "rejected", "failed")
+            },
+            {"queued": "queued", "rejected": "rejected", "failed": "failed"},
+        )
+        self.assertEqual(
+            {
+                (edge["field"], edge["toNodeID"])
+                for edge in graph["edges"]
+                if edge["fromNodeID"] == "request"
+                and edge["field"].startswith("result:")
+                and edge["field"] in {"result:queued", "result:rejected", "result:failed"}
+            },
+            {
+                ("result:queued", "queued"),
+                ("result:rejected", "rejected"),
+                ("result:failed", "failed"),
+            },
+        )
+
     def test_catalog_exposes_engine_facts_and_commands(self) -> None:
         with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
             catalog = worker.flow_catalog()
@@ -95,6 +129,8 @@ class FlowEditorTests(unittest.TestCase):
                     "weather_context",
                     "greeting",
                     "pnc.dialogue.follow.flow",
+                    "pnc.generated.simple_command.pnc.companion.follow",
+                    "pnc.generated.simple_command.pnc.companion.stay",
                 ],
             )
             greeting = next(flow for flow in catalog["flows"] if flow["id"] == "greeting")

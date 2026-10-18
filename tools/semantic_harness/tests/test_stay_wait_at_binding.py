@@ -67,7 +67,10 @@ class StayWaitAtBindingTests(unittest.TestCase):
         self.assertNotIn(
             "SemanticTaskRequest", [event["command"] for event in stay["transport"]]
         )
-        self.assertEqual(stay["messages"][0]["payload"]["text"], "Okay.")
+        self.assertEqual(
+            stay["messages"][0]["payload"]["text"],
+            "Okay, I'll stay here.",
+        )
 
         wait_result = wait_at["result"]
         self.assertEqual(wait_result["ir"]["action"], "WAIT_AT")

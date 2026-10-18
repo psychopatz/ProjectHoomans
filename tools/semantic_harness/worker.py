@@ -126,6 +126,16 @@ class LuaSemanticWorker:
 
         return self._request("FLOW_REGISTER", definition)
 
+    def generate_flows(self) -> dict[str, Any]:
+        """Regenerate registered production flows from live capability metadata."""
+
+        return self._request("FLOW_GENERATE")
+
+    def flow_coverage(self) -> list[dict[str, Any]]:
+        """Return the live capability generation classification report."""
+
+        return self._request("FLOW_COVERAGE").get("capabilityCoverage", [])
+
     def ping(self) -> dict[str, Any]:
         return self._request("PING")
 

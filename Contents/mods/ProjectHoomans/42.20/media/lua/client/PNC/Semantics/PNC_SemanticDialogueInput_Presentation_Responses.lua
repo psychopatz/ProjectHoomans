@@ -14,6 +14,9 @@ local ResponseAdapter = {}
 
 local function semanticTranslationKey(response)
     local templateID = tostring(response and response.templateID or "")
+    if string.sub(templateID, 1, 7) == "UI_PNC_" then
+        return templateID
+    end
     if templateID == "semantic.question.identity" then
         local fallback = tostring(response and response.fallback or "")
         if string.find(string.lower(fallback), "liars", 1, true) then

@@ -111,6 +111,16 @@ local function addAction(rows, byID, action, source, definition)
         if type(definition.metadata) == "table" then
             row.metadata = copyPublic(definition.metadata)
         end
+        for _, field in ipairs({
+            "workflowKind", "templateVersion", "contractVersion",
+            "targetScope", "triggerFrames", "requiredSlots",
+            "optionalSlots", "permissionGate", "outcomeMapping",
+            "responsePools", "translationOwner",
+        }) do
+            if definition[field] ~= nil then
+                row[field] = copyPublic(definition[field])
+            end
+        end
         if definition.capabilityID or definition.commandID
             or definition.handlerID or definition.route
         then
@@ -324,6 +334,44 @@ function Catalog.ListCommandActions()
         output[#output + 1] = action.id
     end
     return output
+end
+
+-- Generation is deliberately downstream of capability registration. The
+-- generator consumes this live catalog and returns data-only flow artifacts;
+-- it never becomes a second parser or dispatch path.
+local AutomaticFlowGenerator = require
+    "PNC/Semantics/PNC_SemanticAutomaticFlowGenerator"
+local generatedAutomaticFlows = require
+    "PNC/Semantics/PNC_SemanticGeneratedAutomaticFlows"
+local function automaticGenerationSignature()
+    local values = {}
+    for _, action in ipairs(Catalog.ListActions()) do
+        values[#values + 1] = table.concat({
+            tostring(action.id or ""),
+            tostring(action.bindingID or ""),
+            tostring(action.workflowKind or ""),
+        }, "|")
+    end
+    return table.concat(values, ";")
+end
+
+Catalog.AutomaticFlowGeneration = AutomaticFlowGenerator.Register(
+    Catalog,
+    generatedAutomaticFlows
+)
+Catalog.AutomaticFlowGeneration.sourceSignature =
+    automaticGenerationSignature()
+
+function Catalog.EnsureAutomaticGeneration()
+    local signature = automaticGenerationSignature()
+    local current = Catalog.AutomaticFlowGeneration
+    if type(current) == "table" and current.sourceSignature == signature then
+        return current
+    end
+    current = AutomaticFlowGenerator.Regenerate(Catalog)
+    current.sourceSignature = signature
+    Catalog.AutomaticFlowGeneration = current
+    return current
 end
 
 return Catalog

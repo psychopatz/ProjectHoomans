@@ -6,7 +6,7 @@ local capabilities = {
     "CONFIG", "RESET", "INPUT", "LANGUAGE", "TOOL_REPLY",
     "PREVIEW", "SNAPSHOT", "FLOW_CATALOG", "FLOW_VALIDATE",
     "FLOW_REGISTER", "PING", "CAPABILITIES", "QUIT",
-    "FACT_CATALOG", "EVENT_CATALOG",
+    "FACT_CATALOG", "EVENT_CATALOG", "FLOW_GENERATE", "FLOW_COVERAGE",
 }
 
 function CommandRouter.hello(context)
@@ -63,6 +63,8 @@ function CommandRouter.dispatch(context, request)
             return nil, "flow_definition_must_be_object"
         end
         return context.FlowEditor.register(context, payload)
+    elseif command == "FLOW_GENERATE" or command == "FLOW_COVERAGE" then
+        return context.FlowEditor.generate(context)
     elseif command == "FACT_CATALOG" then
         return {
             ok = true,

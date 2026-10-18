@@ -250,6 +250,16 @@ function Internal.DispatchAction(view, result, value)
     local socialResult = dispatchSocialIntent(view, result, value)
     if socialResult then return socialResult end
     if not decision.actionIntent then return nil end
+    local generatedFlow = result and result.flow or nil
+    if type(generatedFlow) == "table"
+        and generatedFlow.generated == true
+        and generatedFlow.gate
+        and generatedFlow.gate.status ~= "PASS"
+    then
+        return blockedDispatch(
+            "flow_gate_" .. tostring(generatedFlow.gate.status or "UNKNOWN")
+        )
+    end
     local actionAllowed, actionBlockReason = dispatchBranchEligibility(
         decision, EXECUTABLE_ACTION_BRANCHES)
     if not actionAllowed then

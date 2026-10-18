@@ -68,20 +68,38 @@ def flow_graph_model(flow: dict[str, Any]) -> dict[str, Any]:
             for field in TRANSITION_FIELDS
             if node.get(field) not in (None, "")
         }
+        action = node.get("action") if isinstance(node.get("action"), dict) else {}
+        raw_result_transitions = node.get("resultTransitions")
+        if not isinstance(raw_result_transitions, dict):
+            raw_result_transitions = action.get("resultTransitions", {})
+        result_transitions = {
+            str(outcome): target
+            for outcome, target in raw_result_transitions.items()
+            if target not in (None, "")
+        }
         node_rows.append({
             "id": node_id,
             "terminal": node.get("terminal") is True,
+            "action": copy.deepcopy(action) if action else None,
             "responsePool": node.get("responsePool"),
             "responseTemplate": node.get("responseTemplate"),
             "accepts": copy.deepcopy(node.get("accepts", [])),
             "slots": copy.deepcopy(node.get("slots", {})),
             "gate": copy.deepcopy(node.get("gate")),
             "transitions": transitions,
+            "resultTransitions": result_transitions,
         })
         for field, target in transitions.items():
             edges.append({
                 "fromNodeID": node_id,
                 "field": field,
+                "toNodeID": target,
+                "internal": target in nodes,
+            })
+        for outcome, target in result_transitions.items():
+            edges.append({
+                "fromNodeID": node_id,
+                "field": f"result:{outcome}",
                 "toNodeID": target,
                 "internal": target in nodes,
             })
@@ -1305,6 +1323,22 @@ class FlowEditorPane:
             "onUnknown": "?",
         }
 
+        def edge_color(field: str) -> str:
+            if field == "onPass":
+                return "#78c091"
+            if field == "onFail":
+                return "#e18d83"
+            if field == "onUnknown":
+                return "#e7c56d"
+            if field.startswith("result:"):
+                outcome = field.split(":", 1)[1]
+                return {
+                    "queued": "#78c091",
+                    "rejected": "#e18d83",
+                    "failed": "#d99b7b",
+                }.get(outcome, "#b58bd4")
+            return "#6fa8dc"
+
         def compact_text(value: Any, max_chars: int) -> str:
             text = str(value)
             if len(text) <= max_chars:
@@ -1331,7 +1365,7 @@ class FlowEditorPane:
         for edge_index, edge in enumerate(model["edges"]):
             source = positions.get(edge["fromNodeID"])
             target = positions.get(edge["toNodeID"])
-            color = "#78c091" if edge["field"] == "onPass" else "#e18d83" if edge["field"] == "onFail" else "#e7c56d" if edge["field"] == "onUnknown" else "#6fa8dc"
+            color = edge_color(edge["field"])
             if source and target:
                 if target[0] >= source[0]:
                     start = (source[0] + box_width, source[1] + box_height / 2)
@@ -1347,7 +1381,7 @@ class FlowEditorPane:
                     fill=color, arrow="last", width=max(1, int(2 * self._zoom)),
                 )
                 if render_mode != "overview":
-                    label = edge["field"] if render_mode == "detail" else edge_aliases.get(edge["field"], "?")
+                    label = edge["field"] if render_mode == "detail" else edge_aliases.get(edge["field"], "R")
                     self.canvas.create_text(
                         (sx + tx) / 2 + lane, (sy + ty) / 2 + lane,
                         fill=color, text=label, font=("TkDefaultFont", small_font_size),
@@ -1375,7 +1409,7 @@ class FlowEditorPane:
                     arrow="last", width=max(1, int(2 * self._zoom)),
                 )
                 if render_mode != "overview":
-                    field = edge["field"] if render_mode == "detail" else edge_aliases.get(edge["field"], "?")
+                    field = edge["field"] if render_mode == "detail" else edge_aliases.get(edge["field"], "R")
                     target = compact_text(edge["toNodeID"], 12 if render_mode == "compact" else 24)
                     self.canvas.create_text(
                         tx + max(4.0, 8.0 * self._zoom), ty, anchor="w", fill="#ffb4ab",
@@ -1425,6 +1459,9 @@ class FlowEditorPane:
                     font=("TkDefaultFont", small_font_size), width=max(1, width - padding * 2),
                     tags=(tag,),
                 )
+                action = node.get("action") if isinstance(node.get("action"), dict) else {}
+                action_label = action.get("capabilityID") or action.get("route")
+                suffix = f"{suffix} · {action_label}" if action_label else suffix
                 suffix_chars = text_capacity(width, small_font_size)
                 self.canvas.create_text(
                     x + padding, y + status_gap, anchor="nw", fill="#9bd3ae",

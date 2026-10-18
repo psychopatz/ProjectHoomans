@@ -11,11 +11,20 @@ local function capabilityCatalog()
         or require "PNC/Semantics/PNC_SemanticCapabilityCatalog"
 end
 
+local function automaticGenerator()
+    return PNC.Semantics.AutomaticFlowGenerator
+        or require "PNC/Semantics/PNC_SemanticAutomaticFlowGenerator"
+end
+
 local function catalog(context)
     local Values = context.Values
     local flows = {}
     local CapabilityCatalog = capabilityCatalog()
+    if type(CapabilityCatalog.EnsureAutomaticGeneration) == "function" then
+        CapabilityCatalog.EnsureAutomaticGeneration()
+    end
     local semanticCatalog = CapabilityCatalog.Snapshot()
+    local generation = CapabilityCatalog.AutomaticFlowGeneration or {}
     local index
     local flowID
     local flow
@@ -51,6 +60,8 @@ local function catalog(context)
             conceptCount = #semanticCatalog.concepts,
             speechActCount = #semanticCatalog.speechActs,
         },
+        generation = Values.copy(generation),
+        capabilityCoverage = Values.copy(generation.coverage or {}),
     }
 end
 
@@ -108,6 +119,19 @@ function FlowEditor.register(context, definition)
     response.registered = true
     response.valid = true
     response.definition = Values.copy(result)
+    return response
+end
+
+function FlowEditor.generate(context)
+    local Values = context.Values
+    local CapabilityCatalog = capabilityCatalog()
+    local artifact = automaticGenerator().Regenerate(CapabilityCatalog)
+    CapabilityCatalog.AutomaticFlowGeneration = artifact
+    local response = catalog(context)
+    response.type = "flow_generation"
+    response.generated = true
+    response.generation = Values.copy(artifact)
+    response.capabilityCoverage = Values.copy(artifact.coverage or {})
     return response
 end
 
