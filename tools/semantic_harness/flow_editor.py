@@ -48,6 +48,45 @@ def flow_draft(flow: dict[str, Any]) -> dict[str, Any]:
     return copy.deepcopy(flow)
 
 
+def _title_identifier(value: str) -> str:
+    """Turn a bounded registry identifier segment into a UI label."""
+
+    words = str(value).replace("_", " ").replace("-", " ").split()
+    return " ".join(word[:1].upper() + word[1:] for word in words)
+
+
+def flow_display_name(
+    flow_id: str,
+    flow: dict[str, Any] | None = None,
+) -> str:
+    """Return a compact label while preserving the canonical flow ID."""
+
+    flow_id = str(flow_id)
+    flow = flow if isinstance(flow, dict) else {}
+    workflow_kind = str(flow.get("workflowKind") or "")
+    capability_id = str(flow.get("capabilityID") or "")
+    generated = workflow_kind != "" or flow_id.startswith("pnc.generated.")
+    if not generated:
+        return flow_id
+
+    if not capability_id:
+        generated_parts = flow_id.split(".")
+        if len(generated_parts) >= 4:
+            capability_id = ".".join(generated_parts[3:])
+            if capability_id.startswith("pnc."):
+                capability_id = "pnc:" + capability_id[4:]
+    if capability_id.startswith("pnc:"):
+        capability_id = capability_id[4:]
+    segments = [
+        _title_identifier(segment)
+        for segment in capability_id.split(".")
+        if segment
+    ]
+    if segments:
+        return " / ".join(segments)
+    return flow_id
+
+
 def flow_graph_model(flow: dict[str, Any]) -> dict[str, Any]:
     """Build deterministic nodes/edges for the visual graph and tests."""
 
@@ -181,6 +220,8 @@ class FlowEditorPane:
         self._on_compile_source = on_compile_source
         self._on_generate_source = on_generate_source
         self._catalog: dict[str, dict[str, Any]] = {}
+        self._flow_id_to_label: dict[str, str] = {}
+        self._flow_label_to_id: dict[str, str] = {}
         self._draft: dict[str, Any] | None = None
         self._selected_node: str | None = None
         self._node_positions: dict[str, tuple[float, float]] = {}
@@ -328,7 +369,7 @@ class FlowEditorPane:
         flow_frame.rowconfigure(0, weight=1)
         flow_frame.columnconfigure(0, weight=1)
         self.flow_list = self._tk.Listbox(
-            flow_frame, width=24, height=12, exportselection=False,
+            flow_frame, width=34, height=12, exportselection=False,
             selectmode="browse", activestyle="dotbox",
         )
         self.flow_list.grid(row=0, column=0, sticky="nsew")
@@ -556,12 +597,20 @@ class FlowEditorPane:
             if isinstance(flow, dict) and flow.get("id")
         }
         flow_ids = sorted(self._catalog)
+        self._flow_id_to_label = {}
+        self._flow_label_to_id = {}
+        for flow_id in flow_ids:
+            label = flow_display_name(flow_id, self._catalog[flow_id])
+            if label in self._flow_label_to_id:
+                label = f"{label} [{flow_id}]"
+            self._flow_id_to_label[flow_id] = label
+            self._flow_label_to_id[label] = flow_id
         selected_id = self.flow_var.get() if self.flow_var.get() in self._catalog else (
             flow_ids[0] if flow_ids else ""
         )
         self.flow_list.delete(0, "end")
         for flow_id in flow_ids:
-            self.flow_list.insert("end", flow_id)
+            self.flow_list.insert("end", self._flow_id_to_label[flow_id])
         self.flow_var.set(selected_id)
         if selected_id:
             selected_index = flow_ids.index(selected_id)
@@ -599,14 +648,16 @@ class FlowEditorPane:
         selection = self.flow_list.curselection()
         if not selection:
             return
-        self.flow_var.set(str(self.flow_list.get(selection[0])))
+        label = str(self.flow_list.get(selection[0]))
+        self.flow_var.set(self._flow_label_to_id.get(label, label))
         self._select_flow()
 
     def _select_flow_list_item(self, flow_id: str) -> None:
         items = self.flow_list.get(0, "end")
+        label = self._flow_id_to_label.get(flow_id, flow_id)
         self.flow_list.selection_clear(0, "end")
         for index, item in enumerate(items):
-            if str(item) == flow_id:
+            if str(item) == label:
                 self.flow_list.selection_set(index)
                 self.flow_list.activate(index)
                 self.flow_list.see(index)
@@ -1372,8 +1423,14 @@ class FlowEditorPane:
             self.canvas.configure(scrollregion=(0, 0, 720, 600))
             return
 
+        display_name = flow_display_name(model["flowID"], self._draft)
+        workflow = (
+            f"  ·  {model['workflowKind']}"
+            if model.get("generated") and model.get("workflowKind")
+            else ""
+        )
         self.graph_hint_var.set(
-            f"{model['flowID']}  ·  triggers {len(model['triggers'])}  ·  "
+            f"{display_name}{workflow}  ·  triggers {len(model['triggers'])}  ·  "
             f"zoom {round(self._zoom * 100)}%  ·  left-drag nodes · middle-drag map"
         )
         nodes = model["nodes"]

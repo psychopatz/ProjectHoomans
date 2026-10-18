@@ -8,6 +8,7 @@ import unittest
 from tools.semantic_harness.flow_editor import (
     coverage_lines,
     coverage_summary,
+    flow_display_name,
     flow_graph_model,
     graph_render_mode,
 )
@@ -16,6 +17,31 @@ from tools.semantic_harness.worker import LuaSemanticWorker
 
 
 class FlowEditorTests(unittest.TestCase):
+    def test_generated_flow_labels_hide_registry_prefix_but_keep_meaning(self) -> None:
+        self.assertEqual(
+            flow_display_name(
+                "pnc.generated.simple_command.pnc.quest.clinic.supplies.accept",
+                {
+                    "id": "pnc.generated.simple_command.pnc.quest.clinic.supplies.accept",
+                    "workflowKind": "simple_command",
+                    "capabilityID": "pnc:quest.clinic_supplies.accept",
+                },
+            ),
+            "Quest / Clinic Supplies / Accept",
+        )
+        self.assertEqual(
+            flow_display_name("pnc.generated.parameterized_task.pnc.task.wait.at"),
+            "Task / Wait / At",
+        )
+        self.assertEqual(flow_display_name("greeting"), "greeting")
+        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+            catalog = worker.flow_catalog()
+        wait_at = next(
+            flow for flow in catalog["flows"]
+            if flow["id"] == "pnc.generated.parameterized_task.pnc.task.wait.at"
+        )
+        self.assertEqual(flow_display_name(wait_at["id"], wait_at), "Task / Wait At")
+
     def test_graph_render_mode_reduces_detail_before_labels_overlap(self) -> None:
         self.assertEqual(graph_render_mode(0.39), "overview")
         self.assertEqual(graph_render_mode(0.65), "compact")

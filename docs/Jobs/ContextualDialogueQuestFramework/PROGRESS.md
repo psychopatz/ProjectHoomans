@@ -88,6 +88,10 @@ The existing metadata-driven `simple_command` generator now discovers and regist
 
 The real production Lua worker verified input → PsychopatzCore IR → generated flow → typed binding → mocked authoritative result → one NPC response for offer, accept, status, and turn-in. Available, accepted, active, and rewarded results; denied/failed responses; preview-only and repeated-request behavior; EN/TL fallbacks; client/server command envelopes; worker restart-safe catalog loading; and bounded handshake/catalog payloads are covered. The existing Semantic Lab was operated through X11 pointer/button events: Flow editor, Refresh registry, Coverage (`22 production flows loaded`, `coverage generated=17/18`), and Compile source preview (`valid; no files written`, seven planned paths) all completed. This is real mouse-event evidence, not programmatic callback equivalence.
 
+## Semantic Lab naming audit
+
+The generator's canonical IDs remain unchanged for registry lookup, persisted manifests, coverage rows, policy observations, and saved drafts. The Flow editor now presents generated entries as compact labels such as `Quest / Clinic Supplies / Accept`, keeps the full canonical ID in the editable Flow ID field, and shows the workflow kind in the graph header. Selection still maps labels back to the canonical ID; duplicate labels receive a deterministic ID suffix. This is a presentation-only improvement, not a second flow namespace.
+
 ## Verification evidence
 
 - G3B focused semantic generation/worker suite: `python3 -m unittest tools.semantic_harness.tests.test_quest_flow_binding tools.semantic_harness.tests.test_automatic_flow_generation tools.semantic_harness.tests.test_flow_editor tools.semantic_harness.tests.test_gift_capability_binding -q` — **25/25 passed**. The broader automatic-flow, translation, and harness regression slice passed **36/36**; authoritative quest service smoke `python3 tests/run_tests.py pnc_quest_service_smoke --verbose` passed **1/1**.
