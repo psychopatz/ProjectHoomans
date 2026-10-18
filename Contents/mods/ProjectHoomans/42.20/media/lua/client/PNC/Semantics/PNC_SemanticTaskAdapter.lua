@@ -62,13 +62,33 @@ function Adapter.Dispatch(actionIntent, context)
         }
     end
 
-    if type(definitionOrReason.Dispatch) ~= "function" then
+    local definition = definitionOrReason
+    local binding = type(definition) == "table"
+        and definition.capabilityID and {
+            id = definition.capabilityID,
+            owner = definition.owner,
+            route = definition.route,
+            handlerID = definition.handlerID,
+            arguments = definition.arguments,
+            requires = definition.requires,
+            result = definition.result,
+        } or nil
+    local metadata = binding and {
+        binding = binding,
+        capabilityID = binding.id,
+        handlerID = binding.handlerID,
+    } or {}
+
+    if type(definition.Dispatch) ~= "function" then
         return {
             status = "unhandled",
             accepted = false,
             reason = "task_transport_unavailable",
             action = request.action,
             request = request,
+            binding = metadata.binding,
+            capabilityID = metadata.capabilityID,
+            handlerID = metadata.handlerID,
         }
     end
 
@@ -82,10 +102,17 @@ function Adapter.Dispatch(actionIntent, context)
             error = tostring(accepted),
             action = request.action,
             request = request,
+            binding = metadata.binding,
+            capabilityID = metadata.capabilityID,
+            handlerID = metadata.handlerID,
         }
     end
     if type(accepted) == "table" then
         accepted.request = accepted.request or request
+        accepted.binding = accepted.binding or metadata.binding
+        accepted.capabilityID = accepted.capabilityID
+            or metadata.capabilityID
+        accepted.handlerID = accepted.handlerID or metadata.handlerID
         return accepted
     end
     return {
@@ -95,6 +122,9 @@ function Adapter.Dispatch(actionIntent, context)
         details = details,
         action = request.action,
         request = request,
+        binding = metadata.binding,
+        capabilityID = metadata.capabilityID,
+        handlerID = metadata.handlerID,
     }
 end
 
@@ -110,10 +140,34 @@ local function dispatchSemanticTask(request, context)
 end
 
 for _, action in ipairs({
-    "WAIT_AT", "CAMP", "GIVE", "FETCH", "EAT", "DRINK", "REFILL",
-    "CONSUME",
+    "CAMP", "GIVE", "FETCH", "EAT", "DRINK", "REFILL", "CONSUME",
 }) do
     Adapter.RegisterAction(action, { Dispatch = dispatchSemanticTask })
 end
+
+Adapter.RegisterAction("WAIT_AT", {
+    Dispatch = dispatchSemanticTask,
+    capabilityID = "pnc:task.wait_at",
+    owner = "PNC.Semantics.TaskAdapter",
+    route = "existing_semantic_task",
+    handlerID = "PNC.Client.RequestSemanticTask",
+    arguments = {
+        npcID = "actor_target",
+        destination = "resolved_world_target",
+        durationMs = "bounded_optional",
+        scope = "single_or_group",
+    },
+    requires = {
+        "conversation_or_task_authority",
+        "resolved_destination",
+    },
+    result = {
+        "requested",
+        "rejected",
+        "admitted",
+        "active",
+        "completed",
+    },
+})
 
 return Adapter

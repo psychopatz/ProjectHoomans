@@ -123,6 +123,17 @@ DEFAULT_SCENARIO: dict[str, Any] = {
                 },
             },
         },
+        "taskResponses": {
+            "WAIT_AT": {
+                "accepted": True,
+                "reason": "network_queued",
+                "details": {
+                    "status": "admitted",
+                    "planID": "mock-plan-wait-at",
+                    "targetID": "campfire@mock",
+                },
+            },
+        },
     },
 }
 

@@ -304,6 +304,7 @@ function OutputProjection.normalizedToolCalls(context, trace, transport, result,
         SemanticInventoryQuery = "query_inventory",
         InventoryTransfer = "transfer_item",
         CompanionCommand = "companion_command",
+        SemanticTaskRequest = "semantic_task_request",
         AdjustRelationship = "adjust_relationship",
     }
     local function add(kind, name, values)
@@ -372,6 +373,7 @@ function OutputProjection.normalizedToolCalls(context, trace, transport, result,
             or command == "KnowledgeDisclosureRequest"
             or command == "SemanticInventoryQuery"
             or command == "InventoryTransfer"
+            or command == "SemanticTaskRequest"
         then
             add("authority_request", command, {
                 arguments = event.payload,

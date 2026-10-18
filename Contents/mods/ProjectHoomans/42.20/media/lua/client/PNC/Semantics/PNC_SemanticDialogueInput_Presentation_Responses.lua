@@ -384,6 +384,10 @@ function ResponseAdapter.ActionRejected(result, actionResult)
         result and result.ir and result.ir.action
         or actionResult.action or ""
     ))
+    -- Task admission failures already flow through ReceiveSemanticTaskResult,
+    -- which owns their single authoritative task-result line. Avoid adding a
+    -- second generic action-unavailable line for WAIT_AT.
+    if action == "WAIT_AT" then return nil end
     local fallback = "I couldn't do that right now."
     if action == "FOLLOW" or tostring(actionResult.commandID) == "follow" then
         fallback = "I can't follow you right now."

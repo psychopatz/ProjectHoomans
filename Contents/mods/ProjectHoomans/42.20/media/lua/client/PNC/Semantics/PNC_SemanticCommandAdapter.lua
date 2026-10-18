@@ -55,7 +55,28 @@ Adapter.RegisterAction("FOLLOW", {
         "completed",
     },
 })
-Adapter.RegisterAction("STAY", "stay")
+Adapter.RegisterAction("STAY", {
+    capabilityID = "pnc:companion.stay",
+    owner = "PNC.CompanionCommands",
+    route = "existing_companion_command",
+    commandID = "stay",
+    handlerID = "PNC.Client.SendCompanionCommand",
+    arguments = {
+        npcID = "actor_target",
+        scope = "single_or_group",
+    },
+    requires = {
+        "conversation_or_companion_authority",
+        "resolved_target",
+    },
+    result = {
+        "requested",
+        "rejected",
+        "queued",
+        "accepted",
+        "completed",
+    },
+})
 -- A direct stop is represented by the existing authoritative stay order. It
 -- stops following at the current position without adding a second command
 -- implementation.
