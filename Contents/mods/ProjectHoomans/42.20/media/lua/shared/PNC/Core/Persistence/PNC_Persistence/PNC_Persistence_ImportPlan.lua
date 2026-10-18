@@ -13,6 +13,20 @@ local Source = require
 local ImportPlan = {}
 local CURRENT_SCHEMA = tonumber(Const.PERSISTENCE_VERSION) or 16
 
+local function rollbackRecord(sourceHash, status, reason, candidateHash)
+    return {
+        schemaVersion = 1,
+        strategy = status == "ready"
+            and "DISABLE_CANDIDATE_MAPPING"
+            or "NO_WRITE_QUARANTINE",
+        sourceHash = sourceHash,
+        candidateHash = candidateHash,
+        sourcePreserved = true,
+        writesPerformed = false,
+        reason = reason,
+    }
+end
+
 local function validateCandidate(candidate, options, decisions)
     local codec = options and options.candidateCodec
     local serialized
@@ -70,6 +84,8 @@ function ImportPlan.Build(raw, options)
             sourceHash = sourceHash,
             rawPayload = rawPayload,
             decisions = decisions,
+            rollback = rollbackRecord(sourceHash, "quarantined",
+                "malformed_record"),
         }
     end
     if actualVersion ~= expectedVersion then
@@ -81,6 +97,8 @@ function ImportPlan.Build(raw, options)
             sourceHash = sourceHash,
             rawPayload = rawPayload,
             decisions = decisions,
+            rollback = rollbackRecord(sourceHash, "quarantined",
+                "unsupported_schema"),
         }
     end
     if type(raw.id) ~= "string" or raw.id == "" then
@@ -92,6 +110,8 @@ function ImportPlan.Build(raw, options)
             sourceHash = sourceHash,
             rawPayload = rawPayload,
             decisions = decisions,
+            rollback = rollbackRecord(sourceHash, "quarantined",
+                "actor_id_missing"),
         }
     end
     local source = type(options.sourceSnapshot) == "table"
@@ -113,6 +133,7 @@ function ImportPlan.Build(raw, options)
             sourceHash = sourceHash,
             rawPayload = rawPayload,
             decisions = decisions,
+            rollback = rollbackRecord(sourceHash, "quarantined", reason),
         }
     end
     local candidateHash, candidateRoundTripHash = validateCandidate(
@@ -125,6 +146,7 @@ function ImportPlan.Build(raw, options)
             sourceHash = sourceHash,
             rawPayload = rawPayload,
             decisions = decisions,
+            rollback = rollbackRecord(sourceHash, "quarantined", reason),
         }
     end
     return {
@@ -135,6 +157,8 @@ function ImportPlan.Build(raw, options)
         candidate = candidate,
         candidateHash = candidateHash,
         candidateRoundTripHash = candidateRoundTripHash,
+        rollback = rollbackRecord(sourceHash, "ready", nil,
+            candidateHash),
     }
 end
 

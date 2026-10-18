@@ -78,6 +78,35 @@ function Fixtures.PrepareSourceRecord(id, emptyInventory)
     return record
 end
 
+function Fixtures.PrepareContinuitySourceRecord(id)
+    local record = Fixtures.PrepareSourceRecord(id, true)
+    local targetKey = "npc:p0b_friend"
+    local relationship = PNC.RelationshipTypes.NewRelationship(targetKey)
+    relationship.memories = {
+        PNC.RelationshipTypes.NewMemory({
+            id = "memory:p0b:friend",
+            type = "trade_helped",
+            aboutKey = targetKey,
+            createdAt = 14,
+            lastEvaluatedAt = 14,
+            approvalEffect = 11,
+            respectEffect = 7,
+            strength = 1,
+            knowledgeSource = "experienced",
+        }),
+    }
+    record.social.relationships[targetKey] = relationship
+    record.social.revision = 3
+    record.travel = PNC.Travel.Model.New(record, {
+        journeyId = "journey:p0b:plan",
+        origin = { x = record.x, y = record.y, z = record.z },
+        destination = { x = 120, y = 220, z = 0 },
+        metadata = { source = "p0b", opaque = { token = "retain" } },
+        arrivalAction = { type = "roam" },
+    }, 12)
+    return record, targetKey
+end
+
 function Fixtures.CandidateCodec()
     local wire = {}
     return {

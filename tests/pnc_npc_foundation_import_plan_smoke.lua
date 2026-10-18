@@ -88,6 +88,12 @@ T.truthy(Fixtures.HasDecision(ready, "appearance.generator", "verified"),
     "generator compatibility decision missing")
 T.truthy(Fixtures.HasDecision(ready, "candidate.roundTrip", "verified"),
     "candidate round-trip decision missing")
+T.truthy(ready.rollback and ready.rollback.sourcePreserved,
+    "ready rollback source-preservation record missing")
+T.falsy(ready.rollback and ready.rollback.writesPerformed,
+    "ready planner performed a write")
+T.equal(ready.rollback.strategy, "DISABLE_CANDIDATE_MAPPING",
+    "ready rollback strategy changed")
 T.truthy(Fixtures.EqualValue(rawPayload, rawBefore),
     "planner mutated the raw payload")
 T.truthy(Fixtures.EqualValue(sourceSnapshot, sourceBefore),
@@ -129,6 +135,10 @@ T.truthy(Fixtures.HasDecision(
 ), "legacy template decision missing")
 T.truthy(Fixtures.EqualValue(legacyPlan.rawPayload, legacyPayload),
     "legacy quarantine changed the source copy")
+T.truthy(legacyPlan.rollback and legacyPlan.rollback.sourcePreserved,
+    "legacy rollback source-preservation record missing")
+T.equal(legacyPlan.rollback.strategy, "NO_WRITE_QUARANTINE",
+    "legacy rollback strategy changed")
 
 -- Unsupported schemas fail closed before any candidate is built.
 local unsupported = ImportPlan.Copy(rawPayload)
@@ -142,5 +152,9 @@ T.equal(unsupportedPlan.reason, "unsupported_schema",
 T.falsy(unsupportedPlan.candidate, "unsupported schema produced a candidate")
 T.truthy(Fixtures.EqualValue(unsupported, unsupportedBefore),
     "unsupported source was mutated")
+T.truthy(unsupportedPlan.rollback and unsupportedPlan.rollback.sourcePreserved,
+    "unsupported rollback source-preservation record missing")
+T.falsy(unsupportedPlan.rollback and unsupportedPlan.rollback.writesPerformed,
+    "unsupported planner performed a write")
 
 T.finish("pnc_npc_foundation_import_plan_smoke")

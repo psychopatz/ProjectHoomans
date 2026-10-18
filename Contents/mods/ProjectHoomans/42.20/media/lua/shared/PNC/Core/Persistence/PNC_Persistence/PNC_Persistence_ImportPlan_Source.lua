@@ -4,6 +4,10 @@ local Utils = require
     "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_ImportPlan_Utils"
 local Fields = require
     "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_ImportPlan_Fields"
+local Social = require
+    "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_ImportPlan_Social"
+local Journey = require
+    "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_ImportPlan_Journey"
 local Generator = require
     "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_ImportPlan_Generator"
 
@@ -27,8 +31,8 @@ function Source.Build(raw, source, options, decisions)
     local generator = Generator.Check(source, identity, decisions, options)
     local policy = Fields.Appearance(source, decisions)
     local inventory = Fields.Inventory(source, decisions)
-    local relationships = Fields.Relationships(raw, source, decisions)
-    local location = Fields.Location(raw, source, decisions)
+    local relationships = Social.Build(raw, source, decisions)
+    local location = Journey.Build(raw, source, decisions)
     local id = actorID(source, raw, options or {})
     if not id then
         add(decisions, "actorId", "quarantined", "id", "actor_id_missing")
@@ -74,7 +78,15 @@ function Source.Build(raw, source, options, decisions)
             generator = Utils.Copy(generator),
         },
         inventory = inventory,
-        relationships = { sourceSchema = 3, entries = relationships },
+        relationships = {
+            sourceSchema = 3,
+            state = relationships.state,
+            entries = relationships.entries,
+            personality = relationships.personality,
+            personalityOverrides = relationships.personalityOverrides,
+            recentEventIDs = relationships.recentEventIDs,
+            revision = relationships.revision,
+        },
         location = location,
     }
 end
