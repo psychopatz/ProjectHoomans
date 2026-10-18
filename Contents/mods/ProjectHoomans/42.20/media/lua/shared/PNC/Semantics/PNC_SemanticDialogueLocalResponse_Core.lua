@@ -155,6 +155,7 @@ local function selectorContext(ir, state, context)
         intent = ir and ir.intent,
         action = ir and ir.action,
         subject = ir and ir.subject,
+        pattern = ir and ir.provenance and ir.provenance.pattern,
         relationshipState = context.relationshipState
             or context.conversationRelationshipID,
         identityTrust = context.identityTrust,

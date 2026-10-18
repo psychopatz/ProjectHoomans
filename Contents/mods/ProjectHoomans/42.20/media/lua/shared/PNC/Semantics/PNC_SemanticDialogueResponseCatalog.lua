@@ -28,7 +28,7 @@ Catalog.LAST_VARIANTS = Catalog.LAST_VARIANTS or {}
 
 local CONDITION_FIELDS = {
     "topic", "previousTopic", "previousAction", "lastIntent", "lastAction", "lastSpeaker",
-    "intent", "action", "subject",
+    "intent", "action", "subject", "pattern",
     "relationshipState", "identityTrust", "timeBand", "raining", "foggy", "snowing",
     "indoors", "hasPendingRequest", "npcID", "activity", "busy",
     "memoryAvailable",
@@ -128,6 +128,7 @@ local function conditionContext(context)
         intent = context.intent,
         action = context.action,
         subject = context.subject,
+        pattern = context.pattern,
         relationshipState = context.relationshipState,
         identityTrust = context.identityTrust,
         timeBand = world.timeBand or time.band or context.timeBand,

@@ -44,6 +44,21 @@
   },
   "patterns": [
     {
+      "id": "pnc.dataset.question.weather.can_we_talk_about_the_weather",
+      "utterance": "can we talk about the weather",
+      "emit": { "intent": "QUESTION", "speechAct": "QUESTION", "subject": "WEATHER" },
+      "negatives": ["can we talk about weather"],
+      "reviewed": true,
+      "sourceRefs": ["MASSIVE", "SGD"],
+      "mapping": {
+        "canonicalConcept": "WEATHER",
+        "dialogueState": "WEATHER_TOPIC",
+        "sourceRefs": ["MASSIVE", "SGD"]
+      },
+      "confidence": 0.99,
+      "priority": 165
+    },
+    {
       "id": "pnc.dataset.clarify.needs.which_item_do_you_mean",
       "utterance": "which item do you mean",
       "emit": {
@@ -571,6 +586,47 @@
                     "kind": "translation",
                     "templateID": "UI_PNC_Conversation_Semantic_DatasetNeedsClarifyThirst",
                     "fallback": "I can confirm water is a need, but which item do you mean?"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+
+    {
+      "id": "semantic.flow.weather.raining",
+      "variants": [
+        {
+          "id": "semantic.flow.weather.raining.dataset.contextual_switch",
+          "templateID": "UI_PNC_Conversation_Semantic_DatasetWeatherContextualSwitch",
+          "fallback": "It is raining right now. We can return to that proposal when you are ready.",
+          "en": "It is raining right now. We can return to that proposal when you are ready.",
+          "tl": "Umuulan ngayon. Maaari tayong bumalik sa panukalang iyon kapag handa ka na.",
+          "when": {
+            "pattern": "pnc.dataset.question.weather.can_we_talk_about_the_weather"
+          },
+          "priority": 4,
+          "reviewed": true,
+          "sourceRefs": ["MASSIVE", "SGD"],
+          "plan": {
+            "dialogueAct": "WEATHER_REPORT",
+            "sourcePoolID": "semantic.flow.weather.raining",
+            "topic": "WEATHER",
+            "groundedFactRefs": ["world.weather.raining"],
+            "uncertainty": "known",
+            "tone": "conversational",
+            "personalityStyle": "contextual",
+            "turns": [
+              {
+                "id": "dataset_contextual_weather_switch",
+                "continuation": "continue",
+                "segments": [
+                  {
+                    "kind": "translation",
+                    "templateID": "UI_PNC_Conversation_Semantic_DatasetWeatherContextualSwitch",
+                    "fallback": "It is raining right now. We can return to that proposal when you are ready."
                   }
                 ]
               }

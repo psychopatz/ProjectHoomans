@@ -230,6 +230,57 @@ return {
             ["emit"] = {
                 ["intent"] = "QUESTION",
                 ["speechAct"] = "QUESTION",
+                ["subject"] = "WEATHER",
+            },
+            ["id"] = "pnc.dataset.question.weather.can_we_talk_about_the_weather",
+            ["match"] = {
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "can",
+                },
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "we",
+                },
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "talk",
+                },
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "about",
+                },
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "the",
+                },
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "weather",
+                },
+            },
+            ["metadata"] = {
+                ["mapping"] = {
+                    ["canonicalConcept"] = "WEATHER",
+                    ["dialogueState"] = "WEATHER_TOPIC",
+                    ["sourceRefs"] = {
+                        "MASSIVE",
+                        "SGD",
+                    },
+                },
+                ["reviewed"] = true,
+                ["sourceRefs"] = {
+                    "MASSIVE",
+                    "SGD",
+                },
+            },
+            ["priority"] = 165,
+        },
+    {
+            ["confidence"] = 0.99,
+            ["emit"] = {
+                ["intent"] = "QUESTION",
+                ["speechAct"] = "QUESTION",
                 ["subject"] = "WELLBEING",
             },
             ["id"] = "pnc.dataset.question.wellbeing.are_you_holding_up_okay",
@@ -401,58 +452,6 @@ return {
                 {
                     ["kind"] = "literal",
                     ["value"] = "been",
-                },
-            },
-            ["priority"] = 120,
-        },
-    {
-            ["confidence"] = 0.98,
-            ["emit"] = {
-                ["intent"] = "QUESTION",
-                ["speechAct"] = "QUESTION",
-                ["subject"] = "WELLBEING",
-            },
-            ["id"] = "pnc.dataset.question.wellbeing.how_is_everything_going",
-            ["match"] = {
-                {
-                    ["kind"] = "literal",
-                    ["value"] = "how",
-                },
-                {
-                    ["kind"] = "literal",
-                    ["value"] = "is",
-                },
-                {
-                    ["kind"] = "literal",
-                    ["value"] = "everything",
-                },
-                {
-                    ["kind"] = "literal",
-                    ["value"] = "going",
-                },
-            },
-            ["priority"] = 120,
-        },
-    {
-            ["confidence"] = 0.98,
-            ["emit"] = {
-                ["intent"] = "QUESTION",
-                ["speechAct"] = "QUESTION",
-                ["subject"] = "WELLBEING",
-            },
-            ["id"] = "pnc.dataset.question.wellbeing.hows_everything_going",
-            ["match"] = {
-                {
-                    ["kind"] = "literal",
-                    ["value"] = "how's",
-                },
-                {
-                    ["kind"] = "literal",
-                    ["value"] = "everything",
-                },
-                {
-                    ["kind"] = "literal",
-                    ["value"] = "going",
                 },
             },
             ["priority"] = 120,

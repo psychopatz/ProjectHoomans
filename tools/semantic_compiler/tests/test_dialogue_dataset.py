@@ -74,6 +74,31 @@ class DialogueDatasetCompilerTests(unittest.TestCase):
         self.assertEqual(variant["when"]["lastIntent"], "CLARIFY")
         self.assertIn(variant["templateID"], compiled["translations"]["TL"])
 
+    def test_reviewed_weather_mapping_extends_existing_flow_with_localized_plan(self) -> None:
+        compiled = compile_dialogue_dataset(self.source)
+        pattern = next(
+            item for item in compiled["patterns"]
+            if item["id"] == "pnc.dataset.question.weather.can_we_talk_about_the_weather"
+        )
+        self.assertEqual(pattern["emit"]["subject"], "WEATHER")
+        self.assertEqual(pattern["metadata"]["mapping"]["canonicalConcept"], "WEATHER")
+        self.assertEqual(pattern["metadata"]["mapping"]["dialogueState"], "WEATHER_TOPIC")
+        self.assertNotIn("can we talk about weather", json.dumps(pattern))
+
+        pool = next(
+            item for item in compiled["responsePools"]
+            if item["id"] == "semantic.flow.weather.raining"
+        )
+        variant = next(
+            item for item in pool["variants"]
+            if item["id"] == "semantic.flow.weather.raining.dataset.contextual_switch"
+        )
+        self.assertEqual(variant["when"]["pattern"], pattern["id"])
+        self.assertEqual(variant["plan"]["dialogueAct"], "WEATHER_REPORT")
+        self.assertEqual(variant["plan"]["groundedFactRefs"], ["world.weather.raining"])
+        self.assertIn(variant["templateID"], compiled["translations"]["EN"])
+        self.assertIn(variant["templateID"], compiled["translations"]["TL"])
+
     def test_negative_examples_cannot_become_runtime_patterns(self) -> None:
         invalid = copy.deepcopy(self.source)
         invalid["patterns"][0]["negatives"] = [

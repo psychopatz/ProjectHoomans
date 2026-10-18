@@ -24,19 +24,24 @@ WORDNET_OFFSET = re.compile(r"^\d{8}$")
 DIALOGUE_ID = re.compile(r"^[a-z][a-z0-9_.-]{0,95}$")
 DIALOGUE_TEMPLATE_ID = re.compile(r"^[A-Za-z][A-Za-z0-9_.-]{0,95}$")
 DIALOGUE_UTTERANCE = re.compile(r"^[a-z0-9']+(?: [a-z0-9']+)*$")
-DIALOGUE_PATTERN_SUBJECTS = frozenset({"ACTIVITY", "IDENTITY", "WELLBEING"})
+DIALOGUE_PATTERN_SUBJECTS = frozenset({
+    "ACTIVITY", "IDENTITY", "WELLBEING", "WEATHER",
+})
 DIALOGUE_PROMISE_SUBJECTS = frozenset({"NEEDS"})
 DIALOGUE_PROMISE_EXTENSIONS = frozenset({"topic", "dialogueFollowUp"})
 DIALOGUE_MAPPING_FIELDS = frozenset({
     "canonicalConcept", "dialogueState", "sourceRefs",
 })
-DIALOGUE_MAPPING_CONCEPTS = frozenset({"ANY_ITEM", "FETCH"})
-DIALOGUE_MAPPING_STATES = frozenset({"NEEDS_PROPOSAL", "NEEDS_QUANTITY"})
+DIALOGUE_MAPPING_CONCEPTS = frozenset({"ANY_ITEM", "FETCH", "WEATHER"})
+DIALOGUE_MAPPING_STATES = frozenset({
+    "NEEDS_PROPOSAL", "NEEDS_QUANTITY", "WEATHER_TOPIC",
+})
 DIALOGUE_PLAN_UNCERTAINTIES = frozenset({
     "known", "unknown", "ambiguous", "pending",
 })
 DIALOGUE_RESPONSE_CONDITIONS = frozenset({
     "topic", "previousTopic", "intent", "action", "subject",
+    "pattern",
     "lastIntent",
     "relationshipState", "identityTrust", "timeBand", "raining", "foggy",
     "snowing", "indoors", "hasPendingRequest", "npcID", "activity",
