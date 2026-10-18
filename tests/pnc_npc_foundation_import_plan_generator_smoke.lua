@@ -22,6 +22,8 @@ T.truthy(PNC.Inventory.ApplyDelta(sourceRecord, {
 local rawPayload = PNC.Persistence.SerializeRecord(sourceRecord)
 local sourceSnapshot = ImportPlan.Copy(sourceRecord)
 sourceSnapshot.schemaVersion = rawPayload.schemaVersion
+local rawBefore = ImportPlan.Copy(rawPayload)
+local sourceBefore = ImportPlan.Copy(sourceSnapshot)
 local provenance = {
     definitionRevision = sourceRecord.uniqueDefinitionVersion,
 }
@@ -45,6 +47,26 @@ T.truthy(Fixtures.HasDecision(
     "generator_provenance_mismatch_source_authoritative"
 ), "generator mismatch fallback decision missing")
 
+local definitionMismatchSnapshot = ImportPlan.Copy(sourceSnapshot)
+definitionMismatchSnapshot.inventory.template.definitionRevision =
+    tonumber(provenance.definitionRevision) - 1
+local definitionMismatch = ImportPlan.Build(rawPayload, {
+    sourceSnapshot = definitionMismatchSnapshot,
+    generatorProvenance = provenance,
+    candidateCodec = Fixtures.CandidateCodec(),
+})
+T.truthy(ImportPlan.IsReady(definitionMismatch),
+    "exact source items did not survive definition mismatch")
+T.equal(definitionMismatch.candidate.appearance.generator.restoration,
+    "SOURCE_AUTHORITATIVE", "definition mismatch restoration mode")
+T.equal(definitionMismatch.candidateHash,
+    definitionMismatch.candidateRoundTripHash,
+    "definition fallback candidate canonical hash changed")
+T.truthy(Fixtures.HasDecision(
+    definitionMismatch, "appearance.generator", "projected",
+    "generator_provenance_mismatch_source_authoritative"
+), "definition mismatch fallback decision missing")
+
 local seedOnlySnapshot = ImportPlan.Copy(sourceSnapshot)
 seedOnlySnapshot.inventory.items = {}
 seedOnlySnapshot.inventory.persistenceMode = "SEED_ONLY"
@@ -60,5 +82,9 @@ T.equal(seedOnlyPlan.reason, "generator_provenance_mismatch",
     "seed-only generator mismatch reason")
 T.falsy(seedOnlyPlan.candidate,
     "seed-only generator mismatch produced a candidate")
+T.truthy(Fixtures.EqualValue(rawPayload, rawBefore),
+    "generator plans mutated the raw payload")
+T.truthy(Fixtures.EqualValue(sourceSnapshot, sourceBefore),
+    "generator plans mutated the source snapshot")
 
 T.finish("pnc_npc_foundation_import_plan_generator_smoke")
