@@ -1,4 +1,5 @@
 local Provider = {}
+Provider.productionQuestRequest = nil
 
 function Provider.configure(deps)
     local Runtime = deps.Runtime
@@ -16,8 +17,32 @@ function Provider.configure(deps)
     -- The server-side semantic validators and client result router stay real.
     PNC.Client = PNC.Client or {}
     PNC.Client.Internal = PNC.Client.Internal or {}
+    if type(Runtime.productionQuestRequest) == "function" then
+        Provider.productionQuestRequest = Runtime.productionQuestRequest
+    elseif #Runtime.loadedModules > 0
+        and type(PNC.Client.RequestSemanticQuest) == "function"
+    then
+        Provider.productionQuestRequest = PNC.Client.RequestSemanticQuest
+    end
     PNC.Core.IsClientOnly = function()
         return runtime.mode == "multiplayer"
+    end
+    PNC.MedicalCareService = PNC.MedicalCareService or {}
+    PNC.MedicalCareService.List = function()
+        if runtime.questEligible == false then return {} end
+        return {
+            {
+                id = "medical-supply-task-1",
+                status = "WAITING_FOR_SUPPLY",
+                blockedReason = "missing_bandage",
+                supplyRequesterId = npcData.npcID,
+            },
+        }
+    end
+    PNC.Tasking = PNC.Tasking or {}
+    PNC.Tasking.Events = PNC.Tasking.Events or {}
+    if type(PNC.Tasking.Events.Emit) ~= "function" then
+        PNC.Tasking.Events.Emit = function() return true end
     end
     PNC.Client.RequestNPCKnowledgeTopic = function(npcID, topicID, options)
         Runtime.transport[#Runtime.transport + 1] = {
@@ -196,7 +221,7 @@ function Provider.configure(deps)
     -- The worker keeps the production semantic/action/response path intact
     -- and replaces only the remote authoritative quest reply with bounded
     -- scenario data, just as it does for companion and task handlers.
-    PNC.Client.RequestSemanticQuest = function(request, context)
+    local harnessRequestSemanticQuest = function(request, context)
         request = type(request) == "table" and request or {}
         context = type(context) == "table" and context or {}
         local operation = string.lower(tostring(request.operation or ""))
@@ -258,6 +283,20 @@ function Provider.configure(deps)
             payload = Values.copy(result),
         }
         return accepted, reason, result
+    end
+    if runtime.mode == "multiplayer"
+        and type(Provider.productionQuestRequest) == "function"
+    then
+        Runtime.questBoundary = "production"
+        local productionRequest = Provider.productionQuestRequest
+        local productionWrapper = function(request, context)
+            return productionRequest(request, context)
+        end
+        Runtime.questProductionWrapper = productionWrapper
+        PNC.Client.RequestSemanticQuest = productionWrapper
+    else
+        Runtime.questBoundary = "harness"
+        PNC.Client.RequestSemanticQuest = harnessRequestSemanticQuest
     end
 end
 

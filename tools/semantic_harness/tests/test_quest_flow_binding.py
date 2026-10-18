@@ -139,6 +139,84 @@ class QuestFlowBindingTests(unittest.TestCase):
         )
         self.assertEqual(result["translation"]["language"], "TL")
 
+    def test_multiplayer_uses_production_boundary_and_deduplicates_replay(
+        self,
+    ) -> None:
+        scenario = merge(DEFAULT_SCENARIO, {"runtime": {"mode": "multiplayer"}})
+        with LuaSemanticWorker(scenario) as worker:
+            capabilities = worker.capabilities()
+            self.assertIn("REPLAY_SEMANTIC_QUEST", capabilities["capabilities"])
+
+            first = worker.input("Can you help me?")
+            self.assertEqual(worker.snapshot()["questBoundary"], "production")
+            manifest = first["loadedModules"]
+            self.assertIn(
+                "PNC/Quests/PNC_QuestService.lua",
+                manifest,
+            )
+            self.assertIn(
+                "PNC/Networking/Handlers/PNC_ServerSemanticQuestCommandHandler.lua",
+                manifest,
+            )
+            self.assertEqual(
+                first["result"]["actionResult"]["status"],
+                "pending",
+                first["result"]["actionResult"],
+            )
+            self.assertEqual(
+                first["result"]["actionResult"]["reason"], "network_queued"
+            )
+            self.assertEqual(first["result"]["flow"]["resultNodeId"], "queued")
+            self.assertEqual(
+                [(event["direction"], event["command"])
+                 for event in first["transport"]],
+                [
+                    ("client_to_server", "SemanticQuestRequest"),
+                    ("server_to_client", "SemanticQuestResult"),
+                ],
+            )
+            self.assertEqual(
+                first["messages"][0]["payload"]["translationKey"],
+                "UI_PNC_Conversation_Semantic_QuestOffer",
+            )
+
+            request = next(
+                event["payload"]
+                for event in first["transport"]
+                if event["command"] == "SemanticQuestRequest"
+            )
+            before = worker.snapshot()
+            worker.replay_quest_request(request)
+            after = worker.snapshot()
+            self.assertEqual(len(after["transcript"]), len(before["transcript"]))
+            self.assertEqual(len(after["queued"]), len(before["queued"]))
+            duplicate_results = [
+                event for event in after["transport"]
+                if event["command"] == "SemanticQuestResult"
+                and event["payload"].get("duplicate") is True
+            ]
+            self.assertEqual(len(duplicate_results), 1)
+            self.assertEqual(
+                duplicate_results[0]["payload"]["reason"],
+                "duplicate_request",
+            )
+
+            restarted = worker.restart()
+            self.assertIn("PNC/Quests/PNC_QuestService.lua", restarted["loadedModules"])
+            second = worker.input("Can you help me?")
+            self.assertEqual(
+                [(event["direction"], event["command"])
+                 for event in second["transport"]],
+                [
+                    ("client_to_server", "SemanticQuestRequest"),
+                    ("server_to_client", "SemanticQuestResult"),
+                ],
+            )
+            self.assertEqual(
+                second["messages"][0]["payload"]["translationKey"],
+                "UI_PNC_Conversation_Semantic_QuestOffer",
+            )
+
 
 if __name__ == "__main__":
     unittest.main()

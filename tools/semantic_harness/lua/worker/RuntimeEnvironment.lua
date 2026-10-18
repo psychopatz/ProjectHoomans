@@ -53,6 +53,16 @@ function RuntimeEnvironment.configure(context)
     context.world = world
     context.runtime = runtime
     context.semanticFactValues = {}
+    ModData = {
+        get = function(key)
+            return Runtime.modData[tostring(key or "")]
+        end,
+        getOrCreate = function(key)
+            key = tostring(key or "")
+            Runtime.modData[key] = Runtime.modData[key] or {}
+            return Runtime.modData[key]
+        end,
+    }
     if world.zombieKills ~= nil then
         context.semanticFactValues["player.stats.zombie_kills"] = {
             status = "known",
@@ -134,6 +144,7 @@ function RuntimeEnvironment.configure(context)
             )
         end,
     }
+    player.characterUUID = playerData.characterUUID
     context.player = player
 
     local gameTime = {
@@ -241,6 +252,7 @@ function RuntimeEnvironment.configure(context)
     end
     PsychopatzCore.RuntimeRole = {
         AllowsServerCode = function() return true end,
+        IsPureClient = function() return runtime.mode == "multiplayer" end,
     }
     PsychopatzCore.DebugTrace = {
         IsEnabled = function() return true end,

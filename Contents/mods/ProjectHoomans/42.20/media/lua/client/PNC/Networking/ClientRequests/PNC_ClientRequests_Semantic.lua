@@ -162,7 +162,8 @@ function Client.RequestSemanticQuest(request, context)
     if not payload.npcID or not payload.operation then
         return false, "semantic_quest_identity_missing"
     end
-    if Core.IsClientOnly and Core.IsClientOnly() then
+    local clientOnly = PNC.Core and PNC.Core.IsClientOnly
+    if clientOnly and clientOnly() then
         if not player or not sendClientCommand then
             return false, "player_unavailable"
         end

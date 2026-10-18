@@ -7,6 +7,7 @@ local capabilities = {
     "PREVIEW", "SNAPSHOT", "FLOW_CATALOG", "FLOW_VALIDATE",
     "FLOW_REGISTER", "PING", "CAPABILITIES", "QUIT",
     "FACT_CATALOG", "EVENT_CATALOG", "FLOW_GENERATE", "FLOW_COVERAGE",
+    "REPLAY_SEMANTIC_QUEST",
 }
 
 function CommandRouter.hello(context)
@@ -66,6 +67,18 @@ function CommandRouter.dispatch(context, request)
         return context.FlowEditor.register(context, payload)
     elseif command == "FLOW_GENERATE" or command == "FLOW_COVERAGE" then
         return context.FlowEditor.generate(context)
+    elseif command == "REPLAY_SEMANTIC_QUEST" then
+        if type(payload) ~= "table" then
+            return nil, "quest_request_must_be_object"
+        end
+        local router = PNC.ServerCommandRouter
+        local handled = router and type(router.Handle) == "function"
+            and router.Handle(
+                PNC.Const.CMD_SEMANTIC_QUEST_REQUEST,
+                context.player,
+                payload
+            ) or false
+        return { ok = true, type = "semantic_quest_replay", handled = handled }
     elseif command == "FACT_CATALOG" then
         return {
             ok = true,

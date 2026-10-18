@@ -45,6 +45,11 @@ function ScenarioSession.reset(context, scenario)
     Runtime.scenario = scenario
     context.RuntimeState.resetContainers(Runtime)
     ScenarioSession.configureRuntime(context)
+    if scenario.runtime and scenario.runtime.mode == "multiplayer"
+        and type(Runtime.questProductionWrapper) == "function"
+    then
+        PNC.Client.RequestSemanticQuest = Runtime.questProductionWrapper
+    end
     context.Translations.setLanguage(
         context, context.Translations.scenarioLanguage(context)
     )
@@ -71,6 +76,7 @@ function ScenarioSession.reset(context, scenario)
         loadedModules = Runtime.loadedModules,
         moduleManifest = Values.copy(Runtime.moduleManifest),
         headlessRequires = Values.copy(Runtime.headlessRequires),
+        questBoundary = Runtime.questBoundary,
         translation = context.OutputProjection.translationSnapshot(context),
     }
 end
@@ -93,6 +99,7 @@ function ScenarioSession.snapshot(context)
         loadedModules = Runtime.loadedModules,
         moduleManifest = Values.copy(Runtime.moduleManifest),
         headlessRequires = Values.copy(Runtime.headlessRequires),
+        questBoundary = Runtime.questBoundary,
     }
 end
 

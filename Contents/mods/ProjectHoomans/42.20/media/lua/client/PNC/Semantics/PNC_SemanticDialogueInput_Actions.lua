@@ -234,16 +234,23 @@ function Internal.DispatchQuestAction(view, actionIntent, context, value)
     }
     local request = questResult.request or {}
     local requestID = tostring(request.requestID or provisionalID or "")
+    local resultWasConsumed = session and requestID ~= ""
+        and session.semanticQuestRequests
+        and session.semanticQuestRequests[requestID] == nil
+        and type(questResult.result) == "table"
+        and tostring(questResult.result.status or "") == "pending"
     if session and requestID ~= "" then
         session.semanticQuestRequests = session.semanticQuestRequests or {}
         if provisionalID and tostring(provisionalID) ~= requestID then
             session.semanticQuestRequests[tostring(provisionalID)] = nil
         end
-        session.semanticQuestRequests[requestID] = {
-            action = actionIntent.action,
-            rawText = value,
-            request = request,
-        }
+        if not resultWasConsumed then
+            session.semanticQuestRequests[requestID] = {
+                action = actionIntent.action,
+                rawText = value,
+                request = request,
+            }
+        end
     end
     local authoritative = questResult.result
     if type(authoritative) == "table"

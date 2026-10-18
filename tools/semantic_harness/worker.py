@@ -101,6 +101,11 @@ class LuaSemanticWorker:
     def snapshot(self) -> dict[str, Any]:
         return self._request("SNAPSHOT")
 
+    def replay_quest_request(self, request: dict[str, Any]) -> dict[str, Any]:
+        """Replay a captured request through the production server router."""
+
+        return self._request("REPLAY_SEMANTIC_QUEST", request)
+
     def flow_catalog(self) -> dict[str, Any]:
         """Read normalized production flow definitions from the Lua registry."""
 

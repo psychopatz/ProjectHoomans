@@ -51,6 +51,31 @@ function ProductionModules.load(context)
     load("PsychopatzCore", "common", "PsychopatzCore/Translation/PsychopatzCoreTranslation.lua", "translation")
     load("ProjectHoomans", "shared", "PNC/Core/Base/PNC_Constants.lua", "network")
     load("ProjectHoomans", "shared", "PNC/Core/Networking/PNC_Network.lua", "network")
+    load(
+        "ProjectHoomans", "shared",
+        "PNC/Core/Persistence/PNC_Persistence.lua", "persistence"
+    )
+    load(
+        "ProjectHoomans", "shared",
+        "PNC/Quests/PNC_QuestDefinitions.lua", "quest_authority"
+    )
+    load(
+        "ProjectHoomans", "server",
+        "PNC/Networking/PNC_ServerCommandRouter.lua", "quest_authority"
+    )
+    load(
+        "ProjectHoomans", "server",
+        "PNC/Quests/PNC_QuestRepository.lua", "quest_authority"
+    )
+    load(
+        "ProjectHoomans", "server",
+        "PNC/Quests/PNC_QuestService.lua", "quest_authority"
+    )
+    load(
+        "ProjectHoomans", "server",
+        "PNC/Networking/Handlers/PNC_ServerSemanticQuestCommandHandler.lua",
+        "quest_authority"
+    )
     load("ProjectHoomans", "shared", "PNC/Translation/PNC_TranslationBootstrap.lua", "translation")
     load("PsychopatzCore", "common_client", "PsychopatzCore/UI/Conversation/PsychopatzConversationText.lua", "conversation_text")
     load("ProjectHoomans", "shared", "PNC/Semantics/PNC_SemanticMarketSenseAdapter.lua", "inventory")
@@ -144,7 +169,13 @@ function ProductionModules.load(context)
     load("ProjectHoomans", "client", "PNC/Networking/ClientCommandRouter/PNC_ClientCommandRouter_SemanticIdentity.lua", "network")
     load("ProjectHoomans", "client", "PNC/Networking/ClientRequests/PNC_ClientRequests_Internal.lua", "network")
     load("ProjectHoomans", "client", "PNC/Networking/ClientRequests/PNC_ClientRequests_SemanticCognition.lua", "network")
-    load("ProjectHoomans", "client", "PNC/Networking/ClientRequests/PNC_ClientRequests_Semantic.lua", "network")
+    local semanticClient = load(
+        "ProjectHoomans", "client",
+        "PNC/Networking/ClientRequests/PNC_ClientRequests_Semantic.lua",
+        "network"
+    )
+    Runtime.productionQuestRequest = semanticClient
+        and semanticClient.RequestSemanticQuest or nil
     load("ProjectHoomans", "client", "PNC/Networking/ClientRequests/PNC_ClientRequests_Identity.lua", "network")
 
     PsychopatzConversationLLMInput = originalInputClass

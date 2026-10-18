@@ -687,7 +687,10 @@ function Adapter.Dispatch(actionIntent, context)
     local definition = Adapter.Actions[normalized(actionIntent.action)]
     local binding = type(definition) == "table" and definition or nil
 
-    local client = PNC.Client
+    -- Resolve the live facade at dispatch time. The headless harness can
+    -- install its translation fallback after module load; retaining a stale
+    -- table alias would bypass the current client request boundary.
+    local client = (_G.PNC and _G.PNC.Client) or PNC.Client
     if binding and binding.route == "existing_quest_contract" then
         if not client or type(client.RequestSemanticQuest) ~= "function" then
             return {
