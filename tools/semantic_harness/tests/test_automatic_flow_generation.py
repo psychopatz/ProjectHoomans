@@ -361,6 +361,7 @@ class AutomaticFlowGenerationTests(unittest.TestCase):
                     "language": language,
                     "semanticCognitionResponses": {
                         "GOSSIP": {
+                            "targetID": "self",
                             "gossip": {"subject": "Mara", "codes": [1001]},
                         },
                     },
@@ -396,6 +397,119 @@ class AutomaticFlowGenerationTests(unittest.TestCase):
         self.assertFalse(any(
             event.get("command") == "SemanticCognitionRequest"
             for event in unavailable["transport"]
+        ))
+
+    def test_authoritative_gossip_is_target_scoped_across_repeated_renamed_and_unavailable_targets(self) -> None:
+        first_scenario = merge(
+            DEFAULT_SCENARIO,
+            {
+                "npc": {"identityState": "known", "forename": "Sarah"},
+                "runtime": {
+                    "semanticCognitionResponses": {
+                        "GOSSIP": {
+                            "targetID": "npc_mara",
+                            "gossip": {"subject": "Sarah", "codes": [1001]},
+                        },
+                    },
+                },
+            },
+        )
+        with LuaSemanticWorker(first_scenario) as worker:
+            first = worker.input("any news about Sarah?")
+            second_scenario = merge(
+                first_scenario,
+                {
+                    "npc": {"forename": "Morgan"},
+                    "runtime": {
+                        "semanticCognitionResponses": {
+                            "GOSSIP": {
+                                "targetID": "npc_mara",
+                                "gossip": {
+                                    "subject": "Morgan",
+                                    "codes": [1001],
+                                },
+                            },
+                        },
+                    },
+                },
+            )
+            worker.configure(second_scenario)
+            second = worker.input("any news about Morgan?")
+
+        self.assertEqual(
+            first["result"]["decision"]["response"]["fallback"],
+            "Sarah has been looking out for people.",
+        )
+        self.assertEqual(
+            second["result"]["decision"]["response"]["fallback"],
+            "Morgan has been looking out for people.",
+        )
+        second_request = next(
+            event for event in second["transport"]
+            if event.get("command") == "SemanticCognitionRequest"
+        )
+        self.assertEqual(second_request["payload"]["targetID"], "npc_mara")
+        second_response = next(
+            event for event in second["transport"]
+            if event.get("eventName") == "OnServerCommand"
+            and event.get("command") == "SemanticCognition"
+        )
+        self.assertEqual(second_response["payload"]["targetID"], "npc_mara")
+
+        unavailable_scenario = merge(
+            first_scenario,
+            {
+                "runtime": {
+                    "semanticCognitionResponses": {
+                        "GOSSIP": {
+                            "targetID": "npc_unavailable",
+                            "gossip": {"subject": "Sarah", "codes": [1001]},
+                        },
+                    },
+                },
+            },
+        )
+        with LuaSemanticWorker(unavailable_scenario) as worker:
+            unavailable = worker.input("any news about Sarah?")
+        self.assertEqual(
+            unavailable["result"]["decision"]["response"]["templateID"],
+            "semantic.gossip.unknown",
+        )
+        self.assertFalse(any(
+            event.get("command") == "SemanticCognitionRequest"
+            for event in unavailable["transport"]
+        ))
+
+        stale_scenario = merge(
+            first_scenario,
+            {
+                "runtime": {
+                    "semanticCognitionResponses": {
+                        "GOSSIP": {
+                            "targetID": "npc_mara",
+                            "responseTargetID": "npc_unavailable",
+                            "gossip": {"subject": "Sarah", "codes": [1001]},
+                        },
+                    },
+                },
+            },
+        )
+        with LuaSemanticWorker(stale_scenario) as worker:
+            stale = worker.input("any news about Sarah?")
+        self.assertEqual(
+            stale["result"]["decision"]["response"]["templateID"],
+            "semantic.gossip.unknown",
+        )
+        stale_response = next(
+            event for event in stale["transport"]
+            if event.get("eventName") == "OnServerCommand"
+            and event.get("command") == "SemanticCognition"
+        )
+        self.assertEqual(stale_response["payload"]["targetID"], "npc_unavailable")
+        self.assertFalse(any(
+            message.get("payload", {}).get("text")
+            == "Sarah has been looking out for people."
+            for message in stale["messages"]
         ))
 
 

@@ -52,7 +52,7 @@ function PNC.ConversationScene.ValidateConversationLease(
 end
 
 function PNC.Network.SendSemanticCognition(
-    player, projection, reason, requestID, npcID
+    player, projection, reason, requestID, npcID, targetID
 )
     sent = {
         player = player,
@@ -60,6 +60,7 @@ function PNC.Network.SendSemanticCognition(
         reason = reason,
         requestID = requestID,
         npcID = npcID,
+        targetID = targetID,
     }
     return true
 end
@@ -217,6 +218,7 @@ accepted, reason = Service.HandleRequest(player, {
 })
 T.equal(accepted, true, "request handler accepts a valid scoped request")
 T.equal(sent.requestID, "request:1", "response preserves request correlation")
+T.equal(sent.targetID, "sarah", "response preserves the requested target scope")
 T.truthy(sent.projection.facts["SEEN|sarah"],
     "response sends the scoped cognition projection")
 

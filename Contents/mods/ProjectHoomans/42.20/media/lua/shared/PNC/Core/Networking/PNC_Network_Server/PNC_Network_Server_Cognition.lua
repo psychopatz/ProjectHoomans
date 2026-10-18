@@ -8,7 +8,8 @@ function Network.SendSemanticCognition(
     projection,
     reason,
     requestID,
-    npcID
+    npcID,
+    targetID
 )
     local cognition = PNC and PNC.Semantics
         and PNC.Semantics.CognitionProjection or nil
@@ -27,6 +28,7 @@ function Network.SendSemanticCognition(
         reason = reason,
         requestID = requestID,
         npcID = npcID,
+        targetID = targetID,
         serverTime = Core.Now(),
     }
     if type(memoryGossip) == "table"

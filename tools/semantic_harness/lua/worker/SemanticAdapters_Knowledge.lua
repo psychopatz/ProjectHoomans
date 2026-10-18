@@ -66,8 +66,15 @@ function Provider.configure(deps)
         local configured = responses[string.upper(tostring(args.subject or ""))]
         local gossip = type(configured) == "table"
             and configured.gossip or nil
+        local expectedTarget = type(configured) == "table"
+            and (configured.targetID or configured.target) or nil
         if configured == nil or configured == false then
             return false, "cognition_unavailable"
+        end
+        if expectedTarget ~= nil
+            and tostring(args.targetID or "") ~= tostring(expectedTarget)
+        then
+            return false, "cognition_target_unavailable"
         end
         Runtime.transport[#Runtime.transport + 1] = {
             direction = "client_to_server",
@@ -84,12 +91,19 @@ function Provider.configure(deps)
         end
         local network = PNC.Network
         if network and type(network.SendSemanticCognition) == "function" then
+            local responseRequestID = type(configured) == "table"
+                and (configured.responseRequestID or args.requestID)
+                or args.requestID
+            local responseTargetID = type(configured) == "table"
+                and (configured.responseTargetID or args.targetID)
+                or args.targetID
             network.SendSemanticCognition(
                 dispatchPlayer,
                 projection,
                 tostring(configured.reason or "harness_authoritative"),
-                args.requestID,
-                args.npcID
+                responseRequestID,
+                args.npcID,
+                responseTargetID
             )
             return true, "harness_authoritative"
         end

@@ -16,7 +16,8 @@ Router.Register(Const.CMD_SEMANTIC_COGNITION_REQUEST, function(player, args)
             nil,
             "cognition_service_unavailable",
             args and args.requestID,
-            args and args.npcID
+            args and args.npcID,
+            args and args.targetID
         )
     end
 end)
