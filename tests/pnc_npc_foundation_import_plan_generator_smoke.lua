@@ -5,6 +5,8 @@ T.load("tests/pnc_npc_foundation_parity_baseline_smoke.lua")
 local ImportPlan = PNC.Persistence.ImportPlan
 local Fixtures = require
     "tests/support/pnc_npc_foundation_import_plan_fixtures"
+local Utils = require
+    "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_ImportPlan_Utils"
 
 local sourceRecord = Fixtures.PrepareSourceRecord("npc:p0b:generator", true)
 T.truthy(PNC.Inventory.ApplyDelta(sourceRecord, {
@@ -26,6 +28,7 @@ local rawBefore = ImportPlan.Copy(rawPayload)
 local sourceBefore = ImportPlan.Copy(sourceSnapshot)
 local provenance = {
     definitionRevision = sourceRecord.uniqueDefinitionVersion,
+    policyHash = Utils.Hash(sourceRecord.appearance, PNC.Identity),
 }
 
 local mismatchSnapshot = ImportPlan.Copy(sourceSnapshot)
@@ -66,6 +69,41 @@ T.truthy(Fixtures.HasDecision(
     definitionMismatch, "appearance.generator", "projected",
     "generator_provenance_mismatch_source_authoritative"
 ), "definition mismatch fallback decision missing")
+
+local missingPolicySnapshot = ImportPlan.Copy(sourceSnapshot)
+missingPolicySnapshot.inventory.items = {}
+missingPolicySnapshot.inventory.persistenceMode = "SEED_ONLY"
+local missingPolicyPlan = ImportPlan.Build(rawPayload, {
+    sourceSnapshot = missingPolicySnapshot,
+    generatorProvenance = {
+        definitionRevision = provenance.definitionRevision,
+    },
+    candidateCodec = Fixtures.CandidateCodec(),
+})
+T.equal(missingPolicyPlan.status, "quarantined",
+    "seed-only replay ignored missing policy provenance")
+T.equal(missingPolicyPlan.reason, "generator_provenance_incomplete",
+    "missing seed-only policy provenance reason")
+T.falsy(missingPolicyPlan.candidate,
+    "missing seed-only policy provenance produced a candidate")
+
+local policyMismatchSnapshot = ImportPlan.Copy(sourceSnapshot)
+policyMismatchSnapshot.inventory.items = {}
+policyMismatchSnapshot.inventory.persistenceMode = "SEED_ONLY"
+local policyMismatchPlan = ImportPlan.Build(rawPayload, {
+    sourceSnapshot = policyMismatchSnapshot,
+    generatorProvenance = {
+        definitionRevision = provenance.definitionRevision,
+        policyHash = provenance.policyHash .. ":mismatch",
+    },
+    candidateCodec = Fixtures.CandidateCodec(),
+})
+T.equal(policyMismatchPlan.status, "quarantined",
+    "seed-only policy mismatch was accepted")
+T.equal(policyMismatchPlan.reason, "generator_provenance_mismatch",
+    "seed-only policy mismatch reason")
+T.falsy(policyMismatchPlan.candidate,
+    "seed-only policy mismatch produced a candidate")
 
 local seedOnlySnapshot = ImportPlan.Copy(sourceSnapshot)
 seedOnlySnapshot.inventory.items = {}

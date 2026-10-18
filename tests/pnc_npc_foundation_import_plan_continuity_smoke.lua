@@ -9,6 +9,8 @@ T.load("ProjectHoomans", "shared", "PNC/Core/Travel/PNC_Travel.lua")
 local ImportPlan = PNC.Persistence.ImportPlan
 local Fixtures = require
     "tests/support/pnc_npc_foundation_import_plan_fixtures"
+local Utils = require
+    "PNC/Core/Persistence/PNC_Persistence/PNC_Persistence_ImportPlan_Utils"
 local sourceRecord, relationshipTarget =
     Fixtures.PrepareContinuitySourceRecord("npc:p0b:continuity")
 sourceRecord.generation = {
@@ -24,6 +26,7 @@ local baseOptions = {
     sourceSnapshot = sourceSnapshot,
     generatorProvenance = {
         definitionRevision = sourceRecord.uniqueDefinitionVersion,
+        policyHash = Utils.Hash(sourceRecord.appearance, PNC.Identity),
     },
     candidateCodec = Fixtures.CandidateCodec(),
 }

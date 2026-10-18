@@ -38,9 +38,13 @@ function Generator.Check(source, identity, decisions, options)
     local expectedDefinition = provenanceOptions.definitionRevision
         or source and source.uniqueDefinitionVersion
     local expectedTemplateRef = source and source.inventoryTemplateRef
+    local expectedPolicyHash = provenanceOptions.policyHash
     local checks = {}
     local mismatch = false
     local incomplete = false
+    local mode
+    local itemCount
+    local policyHash
     local i
     if type(inventory) ~= "table" or type(template) ~= "table" then
         add(decisions, "appearance.generator", "quarantined",
@@ -71,6 +75,17 @@ function Generator.Check(source, identity, decisions, options)
             expectedDefinition,
         }
     end
+    mode = tostring(inventory.persistenceMode or "")
+    itemCount = countItems(inventory.items)
+    policyHash = source and source.appearance
+        and Utils.Hash(source.appearance, PNC.Identity) or nil
+    if expectedPolicyHash ~= nil then
+        checks[#checks + 1] = {
+            "policyHash", policyHash, expectedPolicyHash,
+        }
+    elseif mode == "SEED_ONLY" and itemCount == 0 then
+        incomplete = true
+    end
     for i = 1, #checks do
         if checks[i][2] == nil and checks[i][4] ~= false then
             incomplete = true
@@ -80,10 +95,6 @@ function Generator.Check(source, identity, decisions, options)
             mismatch = true
         end
     end
-    local mode = tostring(inventory.persistenceMode or "")
-    local itemCount = countItems(inventory.items)
-    local policyHash = source and source.appearance
-        and Utils.Hash(source.appearance, PNC.Identity) or nil
     local result = {
         currentGeneratorVersion = expectedGenerator,
         sourceGeneratorVersion = tonumber(template.generatorVersion),
@@ -93,6 +104,7 @@ function Generator.Check(source, identity, decisions, options)
         templateRef = template.templateRef,
         definitionRevision = template.definitionRevision,
         policyHash = policyHash,
+        expectedPolicyHash = expectedPolicyHash,
     }
     if mismatch or incomplete then
         if mode == "SEED_ONLY" and itemCount == 0 then
