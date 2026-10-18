@@ -464,11 +464,17 @@ class SemanticHarnessApp:
         review = report.get("candidateReview") or {}
         summary = review.get("summary") or {}
         collisions = review.get("collisions") or []
+        artifact_diffs = report.get("artifactDiffs") or []
+        changed = sum(
+            1 for row in artifact_diffs
+            if isinstance(row, dict) and row.get("status") != "unchanged"
+        )
         if report.get("ok") is True:
             self._append(
                 "SYSTEM",
                 f"Dataset review valid; {summary.get('approved', 0)} approved, "
-                f"{summary.get('rejected', 0)} rejected, {len(collisions)} collisions; "
+                f"{summary.get('rejected', 0)} rejected, {len(collisions)} collisions, "
+                f"{changed} artifact diffs; "
                 "no files written.",
             )
         else:

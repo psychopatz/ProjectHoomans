@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import hashlib
+import difflib
+import json
 import re
 from collections import Counter, defaultdict
 from pathlib import Path
@@ -38,6 +40,8 @@ DIALOGUE_TRANSLATION_RELATIVE_ROOT = Path(
 )
 MAX_DATASET_REVIEW_ROWS = 64
 MAX_DATASET_COLLISIONS = 16
+MAX_ARTIFACT_DIFF_LINES = 96
+MAX_ARTIFACT_DIFF_CHARS = 12_000
 
 
 def _planned_paths(compiled: dict[str, Any]) -> list[str]:
@@ -302,36 +306,104 @@ def _dataset_collisions(document: dict[str, Any]) -> tuple[list[dict[str, Any]],
     return collisions[:MAX_DATASET_COLLISIONS], collision_ids
 
 
-def _dialogue_preview_paths(compiled: dict[str, Any]) -> tuple[list[str], list[dict[str, Any]]]:
+def _artifact_diff(
+    repository: Path,
+    relative_path: str,
+    expected: str,
+) -> dict[str, Any]:
+    target = repository / relative_path
+    current: str | None = None
+    read_error: str | None = None
+    try:
+        if target.is_file():
+            current = target.read_text(encoding="utf-8")
+    except (OSError, UnicodeError) as error:
+        read_error = str(error)
+    if read_error:
+        status = "unreadable"
+    elif current is None:
+        status = "added"
+    elif current == expected:
+        status = "unchanged"
+    else:
+        status = "changed"
+    diff_lines = list(difflib.unified_diff(
+        (current or "").splitlines(keepends=True),
+        expected.splitlines(keepends=True),
+        fromfile=f"current/{relative_path}",
+        tofile=f"preview/{relative_path}",
+    ))
+    diff_truncated = len(diff_lines) > MAX_ARTIFACT_DIFF_LINES
+    diff = "".join(diff_lines[:MAX_ARTIFACT_DIFF_LINES])
+    if len(diff) > MAX_ARTIFACT_DIFF_CHARS:
+        diff = diff[:MAX_ARTIFACT_DIFF_CHARS]
+        diff_truncated = True
+    row: dict[str, Any] = {
+        "path": relative_path,
+        "status": status,
+        "expectedChars": len(expected),
+        "expectedSha256": hashlib.sha256(expected.encode("utf-8")).hexdigest(),
+        "currentChars": len(current) if current is not None else 0,
+        "currentSha256": hashlib.sha256(current.encode("utf-8")).hexdigest()
+        if current is not None else None,
+        "diff": diff,
+        "diffTruncated": diff_truncated,
+    }
+    if read_error:
+        row["readError"] = _bounded_text(read_error)
+    return row
+
+
+def _dialogue_preview_paths(
+    compiled: dict[str, Any],
+    repository: Path,
+) -> tuple[list[str], list[dict[str, Any]], list[dict[str, Any]]]:
     module_prefix = "PNC/Semantics/PNC_SemanticGeneratedDialogue"
     rendered = render_dialogue_lua_shards(compiled, module_prefix)
     pattern_modules = [module for module, _source in rendered if "_Patterns_" in module]
     response_modules = [module for module, _source in rendered if "_Responses_" in module]
     entry = render_dialogue_lua(compiled, pattern_modules, response_modules)
-    shards = [
-        {
-            "path": str(DIALOGUE_RELATIVE_ROOT / (Path(module).name + ".lua")),
-            "chars": len(source),
-            "sha256": hashlib.sha256(source.encode("utf-8")).hexdigest(),
-        }
-        for module, source in rendered
-    ]
     entry_path = DIALOGUE_RELATIVE_ROOT / "PNC_SemanticGeneratedDialogue.lua"
-    artifact_rows = [{
-        "path": str(entry_path),
-        "chars": len(entry),
-        "sha256": hashlib.sha256(entry.encode("utf-8")).hexdigest(),
-    }, *shards]
-    artifact_rows.extend({
-        "path": str(DIALOGUE_TRANSLATION_RELATIVE_ROOT / language / "Conversation/Semantic/GeneratedDialogue.json"),
-        "chars": len(render_dialogue_translation(compiled, language)),
-        "sha256": hashlib.sha256(render_dialogue_translation(compiled, language).encode("utf-8")).hexdigest(),
-    } for language in ("EN", "TL"))
-    artifact_rows.append({
-        "path": "Contents/mods/ProjectHoomans/common/media/translation/manifests/Conversation.json",
-        "kind": "manifest_update",
+    expected_sources: dict[str, str] = {str(entry_path): entry}
+    expected_sources.update({
+        str(DIALOGUE_RELATIVE_ROOT / (Path(module).name + ".lua")): source
+        for module, source in rendered
     })
-    return [row["path"] for row in artifact_rows], artifact_rows
+    expected_sources.update({
+        str(DIALOGUE_TRANSLATION_RELATIVE_ROOT / language / "Conversation/Semantic/GeneratedDialogue.json"):
+        render_dialogue_translation(compiled, language)
+        for language in ("EN", "TL")
+    })
+    manifest_relative_path = (
+        "Contents/mods/ProjectHoomans/common/media/translation/manifests/Conversation.json"
+    )
+    manifest_path = repository / manifest_relative_path
+    try:
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8")) \
+            if manifest_path.is_file() else {"version": 1, "languages": {}}
+    except (OSError, UnicodeError, json.JSONDecodeError):
+        manifest = {"version": 1, "languages": {}}
+    for language in ("EN", "TL"):
+        relative_path = f"{language}/Conversation/Semantic/GeneratedDialogue.json"
+        entries = manifest.setdefault("languages", {}).setdefault(language, [])
+        if relative_path not in entries:
+            entries.append(relative_path)
+    expected_sources[manifest_relative_path] = (
+        json.dumps(manifest, ensure_ascii=False, indent=2) + "\n"
+    )
+    artifact_diffs = [
+        _artifact_diff(repository, path, expected)
+        for path, expected in expected_sources.items()
+    ]
+    summary_fields = (
+        "path", "status", "expectedChars", "currentChars",
+        "expectedSha256", "currentSha256", "diffTruncated",
+    )
+    artifacts = [
+        {field: row[field] for field in summary_fields}
+        for row in artifact_diffs
+    ]
+    return list(expected_sources), artifacts, artifact_diffs
 
 
 def preview_dialogue_source(
@@ -420,7 +492,7 @@ def preview_dialogue_source(
         base["diagnostics"] = [{"severity": "error", "message": str(error)}]
         return base
 
-    generated_paths, artifacts = _dialogue_preview_paths(compiled)
+    generated_paths, artifacts, artifact_diffs = _dialogue_preview_paths(compiled, repository)
     variant_count = sum(len(pool["variants"]) for pool in compiled["responsePools"])
     base.update({
         "ok": True,
@@ -434,6 +506,7 @@ def preview_dialogue_source(
         },
         "generatedPaths": generated_paths,
         "artifacts": artifacts,
+        "artifactDiffs": artifact_diffs,
         "writes": [],
     })
     return base

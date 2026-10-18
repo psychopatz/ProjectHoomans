@@ -36,6 +36,11 @@ class DatasetReviewTests(unittest.TestCase):
             8,
         )
         self.assertEqual(first["candidateReview"]["collisions"], [])
+        self.assertTrue(all(row["status"] == "unchanged" for row in first["artifactDiffs"]))
+        self.assertEqual(
+            [row["status"] for row in first["artifacts"]],
+            [row["status"] for row in first["artifactDiffs"]],
+        )
         self.assertIn(
             "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticGeneratedDialogue.lua",
             first["generatedPaths"],
@@ -49,6 +54,25 @@ class DatasetReviewTests(unittest.TestCase):
             first["generatedPaths"],
         )
         self.assertEqual(first["artifacts"], second["artifacts"])
+
+    def test_artifact_diff_view_is_bounded_and_does_not_write(self) -> None:
+        entry = (
+            Path("Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics")
+            / "PNC_SemanticGeneratedDialogue.lua"
+        )
+        with tempfile.TemporaryDirectory() as directory:
+            repository = Path(directory)
+            target = repository / entry
+            target.parent.mkdir(parents=True)
+            target.write_text("return { stale = true }\n", encoding="utf-8")
+            report = preview_dialogue_source(DATASET, repository=repository)
+
+        changed = next(row for row in report["artifactDiffs"] if row["path"] == str(entry))
+        self.assertTrue(report["ok"])
+        self.assertEqual(changed["status"], "changed")
+        self.assertIn("preview/", changed["diff"])
+        self.assertLessEqual(len(changed["diff"]), 12_000)
+        self.assertFalse(report["writes"])
 
     def test_code_builder_reports_collision_and_rejects_the_affected_candidate(self) -> None:
         document = json.loads(DATASET.read_text(encoding="utf-8"))

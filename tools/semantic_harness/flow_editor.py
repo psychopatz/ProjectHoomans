@@ -1246,19 +1246,25 @@ class FlowEditorPane:
         review = report.get("candidateReview") or {}
         summary = review.get("summary") or {}
         collisions = review.get("collisions") or []
+        artifact_diffs = report.get("artifactDiffs") or []
+        changed = sum(
+            1 for row in artifact_diffs
+            if isinstance(row, dict) and row.get("status") != "unchanged"
+        )
         if report.get("ok") is True:
             self.set_status(
                 "Dataset preview valid; "
                 f"{summary.get('approved', 0)} approved, "
                 f"{summary.get('rejected', 0)} rejected, "
-                f"{len(collisions)} collisions, no files written"
+                f"{len(collisions)} collisions, {changed} artifact diffs, no files written"
             )
             return
         diagnostics = report.get("diagnostics") or []
         message = diagnostics[0].get("message") if diagnostics else "invalid dataset"
         self.set_status(
             "Dataset preview rejected; "
-            f"{summary.get('rejected', 0)} rejected, {len(collisions)} collisions: {message}"
+            f"{summary.get('rejected', 0)} rejected, {len(collisions)} collisions, "
+            f"{changed} artifact diffs: {message}"
         )
 
     def show_validation(self, response: dict[str, Any]) -> None:
