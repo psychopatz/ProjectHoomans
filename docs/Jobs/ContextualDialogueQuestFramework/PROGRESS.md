@@ -2,7 +2,7 @@
 
 **Updated:** 2026-10-18, after fresh local worker verification of the G0D safe-regeneration sub-slice.
 
-**Local implementation:** branch `codex/contextual-dialogue-quest-framework-0a`, current commit `b1102486` (G0D safe regeneration; G0C `68c313fe`; G0B `b242e78c`; G0A `6290b3f74279731c7d80e97e077e88c10d35d676`).
+**Local implementation:** branch `codex/contextual-dialogue-quest-framework-0a`, current ledger commit `2c3c9f67` (G0D code `b1102486`; G0C `68c313fe`; G0B `b242e78c`; G0A `6290b3f74279731c7d80e97e077e88c10d35d676`). Shared branch history also preserves unrelated P0B import-planner commit `72455cd1`.
 
 **Upstream baseline:** `origin/docs/contextual-dialogue-quest-framework-20261018` at `d117d861730eaaf94c20e7b372c6ba37ac1f1b59`; PR #4 remains open/unmerged. The local implementation is intentionally ahead of that baseline.
 
@@ -76,7 +76,7 @@ Real worker `FLOW_GENERATE` called twice after all five generated flows were reg
 
 ## Worktree boundary
 
-Unrelated P0B persistence/import-plan edits from another agent are present as unstaged/untracked files and were deliberately preserved, not included in the G0D commit. They are not a blocker to continuing this job.
+The unrelated P0B persistence/import-plan work from another agent was preserved as commit `72455cd1` and is outside this job’s implementation scope. The shared worktree is currently clean; that unrelated work is not a blocker to continuing this job.
 
 ## Scope boundary
 
