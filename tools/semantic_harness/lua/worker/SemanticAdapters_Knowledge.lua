@@ -27,6 +27,14 @@ function Provider.configure(deps)
     PNC.Core.IsClientOnly = function()
         return runtime.mode == "multiplayer"
     end
+    -- The worker is a dual-role production boundary: multiplayer client
+    -- calls are queued through the client transport, while the same worker
+    -- hosts the canonical server handlers for the authoritative leg. Keep
+    -- the server-side Core predicate explicit instead of inheriting the
+    -- native headless runtime role, which has no game server process.
+    PNC.Core.IsAuthority = function()
+        return true
+    end
     PNC.MedicalCareService = PNC.MedicalCareService or {}
     PNC.MedicalCareService.List = function()
         if runtime.questEligible == false then return {} end

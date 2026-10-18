@@ -154,6 +154,35 @@ class ContextualSocialReactionTests(unittest.TestCase):
                     result["relationshipBefore"], result["relationshipAfter"]
                 )
 
+    def test_insults_use_the_authoritative_social_boundary_and_visible_response(self) -> None:
+        for text in ("fuck you", "you are useless"):
+            with self.subTest(text=text):
+                with LuaSemanticWorker(self.scenario({})) as worker:
+                    result = worker.input(text)
+                self.assertTrue(result["accepted"], result.get("reason"))
+                self.assertEqual(result["result"]["ir"]["intent"], "INSULT")
+                self.assertEqual(
+                    result["result"]["decision"]["branch"],
+                    "HOSTILE_REMARK_RECEIVED",
+                )
+                action = result["result"]["actionResult"]
+                self.assertTrue(action["accepted"], action)
+                self.assertEqual(action["status"], "applied")
+                self.assertEqual(action["eventType"], "player_dialogue_insult")
+                self.assertLess(action["relationshipDelta"]["approval"], 0)
+                self.assertLess(action["relationshipDelta"]["respect"], 0)
+                self.assertEqual(
+                    result["result"]["decision"]["response"]["templateID"],
+                    "semantic.social.hostile_withdrawn",
+                )
+                self.assertEqual(len(result["messages"]), 1)
+                self.assertEqual(
+                    result["messages"][0]["payload"]["key"],
+                    "semantic.social.hostile_withdrawn",
+                )
+                self.assertEqual(result["llmCalls"], 0)
+                self.assertEqual(result["toolCalls"], [])
+
     def test_threat_uses_guarded_emotion_relationship_and_precedence(self) -> None:
         cases = (
             (
@@ -209,24 +238,23 @@ class ContextualSocialReactionTests(unittest.TestCase):
                     result["result"]["decision"]["response"]["templateID"],
                     template,
                 )
-                self.assertEqual(result["messages"], [])
+                self.assertEqual(len(result["messages"]), 1)
+                self.assertEqual(
+                    result["messages"][0]["payload"]["key"],
+                    template,
+                )
                 self.assertEqual(
                     result["routedSituation"]["social"]["style"], social_style
                 )
                 self.assertEqual(result["llmCalls"], 0)
                 self.assertEqual(result["transport"], [])
                 self.assertEqual(result["toolCalls"], [])
-                self.assertEqual(
-                    result["result"]["actionResult"],
-                    {
-                        "accepted": False,
-                        "reason": "semantic_social_transport_unavailable",
-                        "status": "semantic_social_dispatch_unavailable",
-                    },
-                )
-                self.assertEqual(
-                    result["relationshipBefore"], result["relationshipAfter"]
-                )
+                action = result["result"]["actionResult"]
+                self.assertTrue(action["accepted"], action)
+                self.assertEqual(action["status"], "applied")
+                self.assertEqual(action["eventType"], "player_dialogue_threat")
+                self.assertLess(action["relationshipDelta"]["approval"], 0)
+                self.assertLess(action["relationshipDelta"]["respect"], 0)
 
     def test_offer_uses_emotion_hunger_and_social_context(self) -> None:
         cases = (

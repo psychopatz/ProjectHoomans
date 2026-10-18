@@ -125,15 +125,26 @@ function Provider.configure(context, SemanticAdapters)
         return tostring(id) == tostring(npcData.id) and {} or nil
     end
     PNC.PlayerCharacters = PNC.PlayerCharacters or {}
+    PNC.PlayerCharacters.GetEntityKey = function()
+        return "player:harness:" .. tostring(playerData.characterUUID),
+            "harness_resolved"
+    end
     PNC.PlayerCharacters.GetRegistryRecord = function(characterUUID)
         if tostring(characterUUID) ~= tostring(playerData.characterUUID) then
             return nil
         end
         return {
+            uuid = playerData.characterUUID,
+            accountKey = "harness",
+            accountIdentity = "harness",
             displayName = playerData.displayName,
             forename = playerData.forename,
             surname = playerData.surname,
         }
+    end
+    PNC.PlayerCharacters.ApplyConductRecord = function(_, conduct)
+        Runtime.playerConduct = Values.copy(conduct)
+        return true, "updated"
     end
     PNC.PlayerContext = PNC.PlayerContext or {}
     PNC.PlayerContext.Resolve = function()

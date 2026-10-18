@@ -76,6 +76,106 @@ function ProductionModules.load(context)
         "PNC/Networking/Handlers/PNC_ServerSemanticQuestCommandHandler.lua",
         "quest_authority"
     )
+    load(
+        "ProjectHoomans", "shared",
+        "PNC/Core/Base/PNC_Core.lua",
+        "social_authority"
+    )
+    load(
+        "ProjectHoomans", "shared",
+        "PNC/Core/Relationships/PNC_EntityRef.lua",
+        "social_authority"
+    )
+    load(
+        "ProjectHoomans", "shared",
+        "PNC/Core/Identity/PNC_Identity.lua",
+        "social_authority"
+    )
+    load(
+        "ProjectHoomans", "shared",
+        "PNC/Core/Relationships/PNC_SocialProfileConstants.lua",
+        "social_authority"
+    )
+    load(
+        "ProjectHoomans", "shared",
+        "PNC/Core/Relationships/PNC_SocialProfileGenerator.lua",
+        "social_authority"
+    )
+    load(
+        "ProjectHoomans", "shared",
+        "PNC/Core/Relationships/PNC_SocialProfileTypes.lua",
+        "social_authority"
+    )
+    load(
+        "ProjectHoomans", "shared",
+        "PNC/Core/Relationships/PNC_SocialProfileMath.lua",
+        "social_authority"
+    )
+    load(
+        "ProjectHoomans", "shared",
+        "PNC/Core/Relationships/PNC_SocialEventDefinitions.lua",
+        "social_authority"
+    )
+    load(
+        "ProjectHoomans", "shared",
+        "PNC/Core/Relationships/PNC_RelationshipConstants.lua",
+        "social_authority"
+    )
+    load(
+        "ProjectHoomans", "shared",
+        "PNC/Core/Relationships/PNC_RelationshipStates.lua",
+        "social_authority"
+    )
+    load(
+        "ProjectHoomans", "shared",
+        "PNC/Core/Relationships/PNC_RelationshipTypes.lua",
+        "social_authority"
+    )
+    load(
+        "ProjectHoomans", "shared",
+        "PNC/Core/Relationships/PNC_RelationshipMath.lua",
+        "social_authority"
+    )
+    load(
+        "ProjectHoomans", "shared",
+        "PNC/Core/Conduct/PNC_ConductConstants.lua",
+        "social_authority"
+    )
+    load(
+        "ProjectHoomans", "shared",
+        "PNC/Core/Conduct/PNC_ConductTypes.lua",
+        "social_authority"
+    )
+    load(
+        "ProjectHoomans", "shared",
+        "PNC/Core/Conduct/PNC_ConductMath.lua",
+        "social_authority"
+    )
+    load(
+        "ProjectHoomans", "shared",
+        "PNC/Core/Conduct/PNC_ConductDefinitions.lua",
+        "social_authority"
+    )
+    load(
+        "ProjectHoomans", "server",
+        "PNC/Social/PNC_ConductService.lua",
+        "social_authority"
+    )
+    load(
+        "ProjectHoomans", "server",
+        "PNC/Social/PNC_RelationshipService.lua",
+        "social_authority"
+    )
+    load(
+        "ProjectHoomans", "server",
+        "PNC/Social/PNC_SocialEventService.lua",
+        "social_authority"
+    )
+    load(
+        "ProjectHoomans", "server",
+        "PNC/Networking/Handlers/PNC_ServerSemanticSocialInteractionCommandHandler.lua",
+        "social_authority"
+    )
     load("ProjectHoomans", "shared", "PNC/Translation/PNC_TranslationBootstrap.lua", "translation")
     load("PsychopatzCore", "common_client", "PsychopatzCore/UI/Conversation/PsychopatzConversationText.lua", "conversation_text")
     load("ProjectHoomans", "shared", "PNC/Semantics/PNC_SemanticMarketSenseAdapter.lua", "inventory")
