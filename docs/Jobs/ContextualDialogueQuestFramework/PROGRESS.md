@@ -1,7 +1,7 @@
 # Contextual Dialogue & Quest Framework — current progress
 
 **Updated:** 2026-10-18
-**Audited branch/ref:** `codex/contextual-dialogue-quest-framework-0a` @ `e899140b4ca7fb264d1370823c9c8035100b619e` (source-generation handoff and GUI-gate audit)
+**Audited branch/ref:** `codex/contextual-dialogue-quest-framework-0a` @ `d411158e` (fresh source-generation callback and unavailable-CUA audit)
 **PR:** #4 → main, OPEN (not merged); **main baseline:** `a3eb2e4db553f9c03b7f66a6ff6717878e1668e0`
 **Status:** PHASE 4 — Practical integrated authoring UX. **2A, 2B, 2C, 3A, 4A, and 4B ACCEPTED** at source/headless gates; GUI click-through remains pending because the computer-use surface exposes no app. Native PZ runtime remains unrun by instruction.
 **ONE Next Chunk:** **4C — perform the GUI author → compile-preview → approved-generate → worker-restart click-through when a native app surface is available.**
