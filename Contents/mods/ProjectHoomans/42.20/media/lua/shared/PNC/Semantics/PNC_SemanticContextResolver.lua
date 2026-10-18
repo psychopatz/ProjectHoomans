@@ -167,10 +167,20 @@ function Resolver.ResolvePendingFollowUp(ir, store, options)
 
     local pendingTopic = normalized(pending.topic)
     local inputTopic = topicForIR(ir)
+    local proposalAcceptance = pending.kind == "PROPOSAL"
+        and (ir.intent == "ACCEPT" or ir.intent == "AGREE")
+    if proposalAcceptance then
+        -- Lexical topic hints such as "okay" may point at wellbeing, but an
+        -- acceptance of an open proposal belongs to that proposal's topic.
+        inputTopic = pendingTopic
+    end
     local matched = inputTopic == nil or inputTopic == pendingTopic
     local output = copyValue(ir)
     output.extensions = type(output.extensions) == "table"
         and output.extensions or {}
+    if proposalAcceptance and pending.topic then
+        output.extensions.topic = pending.topic
+    end
     output.extensions.contextualFollowUp = {
         status = matched and "matched" or "interrupted",
         pendingID = pending.id,

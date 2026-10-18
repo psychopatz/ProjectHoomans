@@ -25,7 +25,7 @@ class ContextualConversationC0Tests(unittest.TestCase):
             "How many?",
             "I'll get some",
             "What's the weather?",
-            "How many?",
+            "Okay",
         )
         with LuaSemanticWorker(scenario) as worker:
             turns = [worker.input(text) for text in inputs]
@@ -92,14 +92,37 @@ class ContextualConversationC0Tests(unittest.TestCase):
             ["confirmation"],
         )
         self.assertIsNone(turns[4]["result"].get("actionResult"))
+        self.assertEqual(turns[5]["result"]["ir"]["subject"], "WEATHER")
         self.assertEqual(
             turns[5]["result"]["decision"]["response"]["templateID"],
-            "semantic.ask_clarification",
+            "semantic.flow.weather.clear.default",
         )
-        self.assertTrue(turns[5]["result"]["ir"]["diagnostics"]["noMatch"])
+        self.assertEqual(
+            turns[5]["observation"]["flow"]["transition"],
+            "interrupt_start",
+        )
+        self.assertEqual(
+            turns[5]["contextAfter"]["dialogue"]["currentTopic"],
+            "weather",
+        )
+        self.assertEqual(
+            turns[5]["contextAfter"]["dialogue"]["pendingFollowUp"][
+                "kind"
+            ],
+            "PROPOSAL",
+        )
         self.assertEqual(
             turns[6]["result"]["decision"]["response"]["templateID"],
-            "semantic.question.needs.quantity.unknown",
+            "semantic.question.needs.proposal.unknown",
+        )
+        self.assertEqual(
+            turns[6]["observation"]["flow"]["transition"], "resume_match"
+        )
+        self.assertEqual(
+            turns[6]["contextAfter"]["dialogue"]["currentTopic"], "needs"
+        )
+        self.assertEqual(
+            turns[6]["contextAfter"]["dialogue"]["previousTopic"], "weather"
         )
         self.assertEqual(
             turns[6]["contextAfter"]["dialogue"]["pendingFollowUp"]["kind"],

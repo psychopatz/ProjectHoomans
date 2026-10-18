@@ -275,7 +275,8 @@ function Internal.RegisterVocabulary()
         "what's the date", "what date is it", "today's date",
     }, 5)
     registerConcept("WEATHER", {
-        "weather", "what is the weather", "is it raining", "raining",
+        "weather", "what is the weather", "what's the weather",
+        "is it raining", "raining",
         "rain", "fog", "foggy", "mist", "temperature",
     })
     registerConcept("IDENTITY", {
