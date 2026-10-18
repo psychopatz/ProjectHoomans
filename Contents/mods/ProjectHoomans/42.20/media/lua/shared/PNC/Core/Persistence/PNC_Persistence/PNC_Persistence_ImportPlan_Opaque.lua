@@ -18,7 +18,6 @@ local REPRESENTED = {
     spawn = true,
     anchor = true,
     travel = true,
-    generation = true,
 }
 
 local function add(decisions, ...)

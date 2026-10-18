@@ -11,6 +11,12 @@ local Fixtures = require
     "tests/support/pnc_npc_foundation_import_plan_fixtures"
 local sourceRecord, relationshipTarget =
     Fixtures.PrepareContinuitySourceRecord("npc:p0b:continuity")
+sourceRecord.generation = {
+    source = "starting_companion_trait",
+    traitID = "PNC_HasBrother",
+    relationshipKind = "brother",
+    playerCharacterUUID = "char:p0b:continuity",
+}
 local rawPayload = PNC.Persistence.SerializeRecord(sourceRecord)
 local sourceSnapshot = ImportPlan.Copy(sourceRecord)
 sourceSnapshot.schemaVersion = rawPayload.schemaVersion
@@ -47,6 +53,14 @@ T.truthy(Fixtures.HasDecision(ready, "location.journey", "copied"),
 T.truthy(Fixtures.HasDecision(ready, "source.opaque", "projected",
     "canonical_mapping_deferred"),
     "deferred serialized roots were not surfaced")
+T.truthy(Fixtures.EqualValue(
+    ready.candidate.source.opaque.generation,
+    rawPayload.generation
+), "generation provenance was discarded")
+T.truthy(Fixtures.HasDecision(
+    ready, "source.opaque.generation", "projected",
+    "canonical_mapping_deferred"
+), "generation provenance mapping decision missing")
 T.truthy(ready.rollback and ready.rollback.sourcePreserved,
     "ready rollback source-preservation record missing")
 T.falsy(ready.rollback and ready.rollback.writesPerformed,
