@@ -12,6 +12,7 @@ from tools.semantic_compiler.compiler import (
     load_semantic_source,
     render_semantic_lua_shards,
 )
+from tools.semantic_compiler.build import write_semantic_output
 
 
 REPOSITORY = Path(__file__).resolve().parents[2]
@@ -91,4 +92,42 @@ def preview_semantic_source(
         },
         "generatedPaths": _planned_paths(compiled),
         "writes": [],
+    }
+
+
+def generate_semantic_source(
+    source_path: Path,
+    *,
+    repository: Path | None = None,
+    runtime_root: Path | None = None,
+) -> dict[str, Any]:
+    """Write approved generated artifacts through the existing compiler writer."""
+    repository = (repository or REPOSITORY).expanduser().resolve()
+    runtime_root = (runtime_root or repository).expanduser().resolve()
+    preview = preview_semantic_source(
+        source_path, repository=repository, runtime_root=runtime_root
+    )
+    if preview.get("ok") is not True:
+        return preview
+    try:
+        source = load_semantic_source(source_path.expanduser().resolve())
+        compiled = compile_semantic_definitions(
+            source,
+            discover_registered_capability_ids(runtime_root),
+        )
+        written = write_semantic_output(repository, compiled)
+    except (CompileError, OSError, ValueError) as error:
+        return {
+            **preview,
+            "ok": False,
+            "generationApproved": True,
+            "diagnostics": [{"severity": "error", "message": str(error)}],
+            "writes": [],
+        }
+    return {
+        **preview,
+        "generationApproved": True,
+        "generatedPaths": [str(path) for path in preview["generatedPaths"]],
+        "writes": [str(path) for path in written],
+        "reloadedBy": "caller_restart_required",
     }

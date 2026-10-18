@@ -118,6 +118,7 @@ class FlowEditorPane:
         on_validate: Callable[[dict[str, Any]], Any],
         on_register: Callable[[dict[str, Any]], Any],
         on_compile_source: Callable[[Path], Any] | None = None,
+        on_generate_source: Callable[[Path], Any] | None = None,
     ) -> None:
         self._tk = tk_module
         self._ttk = ttk
@@ -128,6 +129,7 @@ class FlowEditorPane:
         self._on_validate = on_validate
         self._on_register = on_register
         self._on_compile_source = on_compile_source
+        self._on_generate_source = on_generate_source
         self._catalog: dict[str, dict[str, Any]] = {}
         self._draft: dict[str, Any] | None = None
         self._selected_node: str | None = None
@@ -158,7 +160,7 @@ class FlowEditorPane:
         ttk = self._ttk
         toolbar = ttk.Frame(self.frame)
         toolbar.grid(row=0, column=0, sticky="ew", pady=(0, 6))
-        toolbar.columnconfigure(17, weight=1)
+        toolbar.columnconfigure(18, weight=1)
         self.flow_var = self._tk.StringVar()
 
         self.refresh_button = ttk.Button(
@@ -207,9 +209,13 @@ class FlowEditorPane:
             toolbar, text="Compile source…", command=self.compile_source
         )
         self.compile_source_button.grid(row=0, column=16, padx=(8, 0))
+        self.generate_source_button = ttk.Button(
+            toolbar, text="Generate source…", command=self.generate_source
+        )
+        self.generate_source_button.grid(row=0, column=17, padx=(4, 0))
         self.status_var = self._tk.StringVar()
         ttk.Label(toolbar, textvariable=self.status_var).grid(
-            row=0, column=17, sticky="e", padx=(10, 0)
+            row=0, column=18, sticky="e", padx=(10, 0)
         )
         self._action_buttons = (
             self.refresh_button,
@@ -229,6 +235,7 @@ class FlowEditorPane:
             self.load_button,
             self.save_button,
             self.compile_source_button,
+            self.generate_source_button,
         )
 
     def _build_body(self) -> None:
@@ -990,8 +997,33 @@ class FlowEditorPane:
             return
         self._on_compile_source(Path(filename))
 
+    def generate_source(self) -> None:
+        filename = self._filedialog.askopenfilename(
+            title="Generate approved semantic source",
+            filetypes=[("Semantic definitions", "*.json"), ("All files", "*")],
+        )
+        if not filename:
+            return
+        if self._on_generate_source is None:
+            self.set_status("Source generation is unavailable")
+            return
+        if not self._messagebox.askyesno(
+            "Generate semantic source",
+            "Write the validated Lua, EN/TL, and manifest artifacts and restart the worker?",
+        ):
+            self.set_status("Source generation cancelled; preview remains unchanged")
+            return
+        self._on_generate_source(Path(filename))
+
     def show_source_report(self, report: dict[str, Any]) -> None:
         if report.get("ok") is True:
+            writes = report.get("writes") or []
+            if writes:
+                self.set_status(
+                    "Generated and ready for worker restart "
+                    f"({len(writes)} files written)"
+                )
+                return
             self.set_status(
                 "Compiler preview valid; no files written "
                 f"({len(report.get('generatedPaths', []))} planned paths)"

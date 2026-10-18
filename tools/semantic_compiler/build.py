@@ -44,7 +44,7 @@ DEFAULT_SEMANTIC_SOURCE = Path(__file__).with_name("semantic_definitions.json")
 DEFAULT_SEMANTIC_OUTPUT_ROOT = ROOT
 
 
-def _write_semantic_output(output_root: Path, compiled: dict) -> list[Path]:
+def write_semantic_output(output_root: Path, compiled: dict) -> list[Path]:
     semantic_dir = (
         output_root
         / "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics"
@@ -259,7 +259,7 @@ def main(arguments: list[str] | None = None) -> int:
         )
     if compiled_semantic is not None:
         output_root = options.semantic_output_root.expanduser().resolve()
-        paths = _write_semantic_output(output_root, compiled_semantic)
+        paths = write_semantic_output(output_root, compiled_semantic)
         print(
             f"wrote semantic source manifest and {len(paths) - 1} generated files "
             f"({len(compiled_semantic['patterns'])} patterns, "

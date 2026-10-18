@@ -9,7 +9,10 @@ from pathlib import Path
 from typing import Any, Callable
 
 from .config import ConfigurationError
-from .authoring import preview_semantic_source
+from .authoring import (
+    generate_semantic_source as generate_source_artifacts,
+    preview_semantic_source,
+)
 from .flow_editor import FlowEditorPane
 from .rendering import pretty
 from .scenario import load_scenario, save_scenario
@@ -161,6 +164,7 @@ class SemanticHarnessApp:
             on_validate=self.validate_flow_draft,
             on_register=self.register_flow_draft,
             on_compile_source=self.compile_semantic_source,
+            on_generate_source=self.generate_semantic_source,
         )
 
         self._append("SYSTEM", "Window ready. Starting the isolated Lua worker…")
@@ -454,6 +458,23 @@ class SemanticHarnessApp:
             diagnostics = report.get("diagnostics") or []
             message = diagnostics[0].get("message") if diagnostics else "invalid source"
             self._append("SYSTEM", f"Compiler preview rejected: {message}")
+
+    def generate_semantic_source(self, source_path: Path) -> None:
+        """Generate approved artifacts, then restart the existing worker."""
+        report = generate_source_artifacts(source_path)
+        self.flow_editor.show_source_report(report)
+        self._set_text(self.inspector, pretty(report))
+        self._set_text(self.trace, pretty(report))
+        if report.get("ok") is not True:
+            diagnostics = report.get("diagnostics") or []
+            message = diagnostics[0].get("message") if diagnostics else "generation failed"
+            self._append("SYSTEM", f"Source generation rejected: {message}")
+            return
+        self._append(
+            "SYSTEM",
+            f"Generated {len(report.get('writes', []))} files; restarting Lua worker.",
+        )
+        self.restart()
 
     def set_language(self) -> None:
         if not self.session.ready or self.busy:

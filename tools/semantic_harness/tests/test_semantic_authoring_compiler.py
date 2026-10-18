@@ -3,11 +3,15 @@
 from __future__ import annotations
 
 import json
+import hashlib
 import tempfile
 import unittest
 from pathlib import Path
 
-from tools.semantic_harness.authoring import preview_semantic_source
+from tools.semantic_harness.authoring import (
+    generate_semantic_source,
+    preview_semantic_source,
+)
 from tools.semantic_harness.scenario import DEFAULT_SCENARIO
 from tools.semantic_harness.worker import LuaSemanticWorker
 
@@ -57,6 +61,30 @@ class SemanticAuthoringCompilerWorkerTests(unittest.TestCase):
         self.assertEqual(report["generatedPaths"], [])
         self.assertEqual(report["writes"], [])
         self.assertIn("unregistered capability", report["diagnostics"][0]["message"])
+
+    def test_approved_generation_writes_modular_artifacts_byte_stably(self) -> None:
+        source = REPOSITORY / "tools/semantic_compiler/semantic_definitions.json"
+        with tempfile.TemporaryDirectory() as directory:
+            output_root = Path(directory)
+            first = generate_semantic_source(
+                source, repository=output_root, runtime_root=REPOSITORY
+            )
+            self.assertTrue(first["ok"])
+            self.assertTrue(first["generationApproved"])
+            self.assertTrue(first["writes"])
+            hashes_before = {
+                path: hashlib.sha256(Path(path).read_bytes()).hexdigest()
+                for path in first["writes"]
+            }
+            second = generate_semantic_source(
+                source, repository=output_root, runtime_root=REPOSITORY
+            )
+            hashes_after = {
+                path: hashlib.sha256(Path(path).read_bytes()).hexdigest()
+                for path in second["writes"]
+            }
+        self.assertEqual(hashes_before, hashes_after)
+        self.assertEqual(second["reloadedBy"], "caller_restart_required")
 
     def test_generated_definition_loads_routes_and_survives_restart(self) -> None:
         with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
