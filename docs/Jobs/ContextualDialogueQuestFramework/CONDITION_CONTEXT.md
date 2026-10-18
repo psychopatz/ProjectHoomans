@@ -1,49 +1,30 @@
-# Condition gates, engine hooks and dialogue context — design contract
+# Context, conditions, facts and observations — source-backed contract
 
-## Reuse-before-rewrite audit
+## Already implemented
 
-Two existing interfaces must be reconciled before implementing new rule types:
+On `382e93a3` the production `ConversationRules` condition evaluator is reused by `PNC_SemanticDialogueFlowKernel.lua` via `EvaluateGateStatus`. Flow Registry accepts a bounded gate with `onPass/onFail/onUnknown`; the `weather_context` flow proves one response-only rain/clear/unknown example in previously recorded tests. `PNC_SemanticEngineFacts.lua` registers typed world/game facts; `PNC_SemanticEngineEvents.lua` exposes bounded observations, and a server zombie-kill detector adapter publishes `engine:zombie_killed`. Latest branch behavior has not been freshly rerun by this doc update.
 
-A. **Conversation Blocks** (docs/Systems/ConversationBlocks.md): typed conditions including pnc:skill, pnc:trait, pnc:personality, pnc:relationship, pnc:relationship_state, pnc:audience, pnc:time, pnc:history; all/any/not composition; hidden/disabled locked presentation; handler registration; server authority for effects.
+Those are read-only condition/event inputs, **not** action execution and not automatic quest completions. The flow authoring UI should discover actual registered fact IDs, known/unknown values and provenance, and visibly show branch gate results. Never wire observed engine event payload directly into arbitrary Lua callbacks from the editor.
 
-B. **Semantic flows** (PNC_SemanticDialogueFlowRegistry.lua and FlowKernel.lua): version-1 data-only trigger/accept frames, response pool, slots, next/onMatch/onRefuse/onUnrelated, bounded sessions, preview and commit. V1 NormalizeNode does NOT accept arbitrary gate fields. Any new node condition must have an explicit versioned validation/normalization and migration strategy.
+## Shared typed condition domain
 
-Do not fork the gate language unnecessarily. First audit whether Conversation Blocks' pure evaluator and registered typed handlers can be consumed through a small, side-effect-free public adapter in semantic flow preview/commit. If not, extract the smallest genuinely shared pure condition primitive while keeping current IDs/contracts stable. The authoritative engine/source of truth remains each owning domain.
+Existing Conversation Blocks own condition families: skill, trait, personality, relationship, relationship_state, audience, time, history, plus all/any/not. Existing flow gate bridge must consume that public evaluator. Extend a typed fact only via a registered provider, explicit validation and tri-state behavior. Do not build a second condition evaluator in Python or in an independent semantic flow runtime.
 
-## Typed fact providers (planned public contract, not current API)
+Facts requested for future context: npc health/need/activity, personal perception of weather and threat, time/time band, player/NPC relationships, validated NPC memory, quest status. Store `known`, value, observer/source, revision/time and freshness where appropriate; `UNKNOWN` never implies healthy/safe/allowed. At server commit, re-read authoritative conditions.
 
-- world.time: in-game hour, game day, time band, season when exposed reliably.
-- world.weather: raining, precipitation severity, fog; whether NPC/player actually observes it.
-- npc.self: injury/needs/activity/threat/mood derived from existing NPC systems.
-- social: directed trust/familiarity/relationship state, traits, personality.
-- knowledge: observed facts and verified shared history, with source and age.
-- quest: definition/instance status, objective completion, availability and reward claim, from Quest queries.
-- optional addon facts: named and registered capability-gated providers, not arbitrary filesystem/eval.
+## Dialogue context and reference lifecycle
 
-Fact shape must distinguish {known, value, provenance, sampledAtOrRevision} to avoid treating unknown as clean/false. Server authority reads from server APIs during action commit; client/world snapshot can optimize presentation/preview but cannot authorize rewards, inventory moves or quest progress.
+Current Core/Hoomans context state has topic/pending question/active or suspended flow; future work should add only bounded, participant-scoped discourse references when evidence shows a gap. Pronouns ("it", "there", "some"), pending promises, resumed offers and remembered prior conversation must be resolved using actual verified NPC memory, quest and facts with source/expiry; do not invent an injury cause, promised item, shared knowledge or cross-NPC memory.
 
-## Example behavior matrix
+A player's text is an assertion/request; a world event is evidence only if source/actor is authoritative and target-relevant. Distinguish **meaning recognized**, **fact observed**, **gate eligible**, **action admitted**, **result completed** throughout tests and UI.
 
-| Input | Additional facts | Expected branch behavior |
-| --- | --- | --- |
-| "Are you okay?" | npc.healthState=injured, known | Genuine injury disclosure, not fabricated cause |
-| "What happened?" | prior accepted injury disclosure | Resolve "what" to current topic; if no verified incident memory, say unknown |
-| "How's the weather?" | outdoor NPC, rain observed | Weather-appropriate answer |
-| "How's the weather?" | indoor/offscreen NPC, unknown observation | Qualify ignorance rather than claim direct observation |
-| "Do you need help?" | injury or need, quest AVAILABLE | Allowed help/offer branch; does not autostart quest |
-| "I'll bring some." | pending bandage offer; matching reference | Resolve referent; request explicit confirmation as needed |
-| "Did I bring the bandages?" | quest ACTIVE, no authenticated delivery event | Do not report completion |
-| "Let's return to my name" | identity flow suspended | Resume only matching participant's identity flow |
-| "You owe me the reward" | quest REWARDED | Refuse duplicate reward with correct status |
+## Examples
 
-## Context reference resolution
+- Rainy outdoor NPC can truthfully discuss observed rain; sheltered or unloaded NPC with no reliable observation should qualify uncertainty.
+- "What happened?" following an injury disclosure resolves injury topic only; unknown cause is answered as unknown.
+- "I'll bring some" after a bandage request refers to those bandages if confidence/provenance support it; ambiguous context triggers clarification, never a random inventory action.
+- "Follow me" is a requested command and must still be authorized even if personality wants to help.
+- "I've already delivered it" cannot complete an item quest without an authenticated delivery event.
+- Resumption, gifts and quests must use exact speaker/addressee/scope; player A's promise is not automatically player B's.
 
-Reuses current semanticDialogueState's currentTopic/previousTopic/pendingQuestion/pendingRequest and flow active/suspended stacks. Introduce only a bounded discourse reference table when a verified gap exists: referent kind/id, utterance index, speaker, addressee, source memory/quest ID, confidence, expiry. Entity/reference resolution must check topic, grammatical compatibility, authority, available memory and participant identity; tie/unknown -> clarify, not guessed action.
-
-A request may be interpreted when PBrainZ is off. The semantic plan is the single bridge to optional LLM realization; never send a giant NPC history or source-owned private state wholesale to the provider.
-
-## Security, rollback and testing
-
-Pure preview cannot write context/memory/quest/inventory. A successful turn may record a bounded conversation pointer; any meaningful gameplay transition requires an accepted authoritative command. Handle world changes between preview and commit by re-evaluating. Observe gate status and reason in the Semantic Lab Turn facts and Raw record.
-
-Proof requires at least one **real-Lua weather or time branch** that changes when a harness scenario fact changes, plus the same branch refusing or clarifying when the value is unknown. Test established identity/wellbeing flow interleaving and the previously reported "im fine thanks" false identity-capture regression. Record selected reply, transition, gate and side effects, not just green fixture status.
+No per-tick context enumeration across all NPCs or full history serialization. Use event/turn-driven snapshots and bounded references. See `CAPABILITY_ACTION_BINDINGS.md` for action safety and `QUEST_CONTRACT.md` for later server-owned state.

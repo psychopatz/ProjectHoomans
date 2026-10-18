@@ -1,36 +1,28 @@
-# Codex operating runbook — Contextual Dialogue & Quest Framework
+# Agent runbook — Contextual Dialogue & Quest Framework
 
-## Ownership and authorization
+## Purpose / permitted work
 
-This is a NEW goal under docs/Jobs/ContextualDialogueQuestFramework/. Do not rewrite the SemanticDialogueDecoupling or ContextualSemanticIntelligence roadmaps/progress ledgers as a shortcut. Their historical observations remain separately attributable. The user owns real Project Zomboid singleplayer/multiplayer live tests and all Steam Workshop publishing decisions. A local directory named Workshop does NOT authorize uploading.
+Execute the ONE Next Chunk in `PROGRESS.md` autonomously with repository-safe, small source/test/documentation commits, using actual Semantic Lab's production Lua worker as the primary behavioral evidence. Keep one goal; do not start a new roadmap for every correction. This job now prioritizes *complete procedural semantic interactions* over more attractive graph visuals, synthetic fixture churn or documentation-only "progress."
 
-Source edits and production-Lua Semantic Lab tests are normal development work when repository/branch authority and working-tree safety permit them. Do NOT run Project Zomboid, start/stop/poll its process, run MP servers, use steamcmd, upload Workshop content or present headless tests as native PZ acceptance. Missing GUI desktop automation is not automatic "blocked"; use a direct UI launch/click test where safely available and preserve untested labels otherwise.
+**Developer work authorization ≠ native release authority.** Source editing, syntax/test runs and existing real-Lua Semantic Lab authoring/debugging are permitted after safe checkout verification. The user alone runs Project Zomboid SP/MP live acceptance and makes Workshop publish/republish/upload/install decisions. Never start/poll PZ, run MP hosting, use steamcmd, upload or claim game acceptance. Absence of a native UI/process does not block developer work.
 
-## Repository and parallel-agent discipline
+## Read and act
 
-1. Inspect actual checkout, branch, HEAD, remote/upstream, status and open work before any write. This planning commit was authored against remote main a3eb2e4; it does NOT prove any local checkout is clean or equal. Verify the job documents are in the chosen working checkout before starting; do not assume the planning branch has merged.
-2. Preserve unstaged/staged/untracked/user edits, unrelated radio/image assets, JSON fixtures and other agents' work. Never stash/reset/force-push/rebase uncertain changes, use ambiguous git pull, or destroy another agent's branch.
-3. Scope production changes to one vertical slice at a time. If shared files are concurrently owned, coordinate before editing. Do not duplicate or replace existing Core/Conversation/Quest mechanisms on speculation.
-4. Follow root AGENTS.md: executable PZ B42.20 Lua in the versioned media tree, portable authored definitions/translations in common/media. Never stage transient directories inside a running mod's watched media tree. No routine pcall/xpcall; only documented external callback boundaries.
-5. Do not modify PsychopatzCore, MarketSense, PBrainZ or other repositories without independently verifying need, authority and their current state. Reuse public API boundaries.
+1. Inspect actual checkout, branch/HEAD/upstream, status, shared file owners and linked Core revision. Remote `382e93a3` audit is a checkpoint, not proof of local cleanliness. Preserve staged/unstaged/untracked assets, unrelated work and other-agent branches; never force push, reset or stash uncertain work; no ambiguous `git pull`.
+2. Read root `AGENTS.md` and all job docs in `README.md` read order, ending with `PROGRESS.md`. Select ONE bounded Next Chunk; implement it rather than endlessly re-audit or rewrite plan. Follow current Build 42.20 vs common/media placement, Kahlua restrictions and translation conventions. Never put generated deliverables solely in `tools`, temp JSON or an uncommitted asset directory.
+3. Reuse published production contracts. Core parses language; Hoomans owns policy/flow/context; domain command/task/gift/inventory/Quest services own effects; no new generic parser, runtime scripting VM, duplicate dispatch or parallel quest/task engine. No arbitrary code executed from graph editor, copied raw functions in compiler definitions or insecure client-side reward claims.
+4. Test a *real end-to-end production Lua behavior* each chunk: specific input → selected pattern/IR → eligible gate/flow → actual adapter + mock-authority result (when action) → NPC text/translation and side effects. Include useful negative cases. Save/reload generated source where phase requires; GUI click-through when environment available. Python-only graph/unit tests and JSON conflict ledgers supplement, never replace this.
+5. Run focused command/flow tests, compiler tests when changed, worker doctor, syntax/Kahlua checks, translation validation and `git diff --check`. Report tool and exact outputs, skipped gates and source revision. Don't waste quota generating dozens of redundant JSON fixtures when a small real-Lua scenario is more diagnostic.
+6. Update **only this job's `PROGRESS.md`** as live phase ledger, edit `ROADMAP.md` only at meaningful transitions, keep architecture contracts in dedicated files. When chunk accepted, select precisely one next chunk. Do not modify historical `SemanticDialogueDecoupling` or `ContextualSemanticIntelligence` records.
 
-## Autonomous development loop
+## Crucial safety and error policy
 
-1. Read PROGRESS's single Next Chunk and compare its baseline to current source; update evidence if HEAD has moved.
-2. Implement that chunk rather than writing another vague plan. Audit a claimed existing feature before adding or replacing it. Preserve stable public parser/IR, presentation, translation and networking contracts.
-3. Exercise the **real production Lua worker** through Semantic Lab. Inspect input, IR/candidates, context projection, selected gate + reason, flow transition, rendered response, effects, transport and LLM calls. A valid JSON object, pretty graph, isolated Python graph test, or conflict-free ledger alone is NOT product acceptance.
-4. Run focused regression tests, syntax/Kahlua checks when Lua changed, and harness doctor/smokes where feasible. Test meaningful behavior with PBrainZ disabled, unknown facts and denial cases. Test GUI interaction where a display is available; record not-run otherwise.
-5. Update only this job's PROGRESS current state and ROADMAP gates as evidence changes. Link real commits/test artifacts. Keep stable contracts in ARCHITECTURE/other design documents; do not duplicate diaries across documents.
-6. Finish one Next Chunk, publish coherent code/docs only to an already authorized exact destination, then select the next bounded chunk from the roadmap. Stop for genuine conflicts or maintenance-ready completion.
+- Action trigger catalog ≠ action binding ≠ authorized dispatch ≠ actual completion. Simulator must never claim success just because it chose a response pool. No synthetic-success camouflage.
+- Preview has zero commands/effects and does not consume pending dialog. Committed action uses existing approved dispatcher, exact identity/target/session, relevant capability and server-side authorization, with correlated result. Unresolved/negated/question/ambiguous command fails closed; duplicate messages never cause unbounded repeated effects.
+- Engine fact/event bus remains observational; server owns gameplay truth. Unknown facts never unlock sensitive actions; NPC cannot know events or promises without source evidence. Reuse existing Social, Personality, Memory, Conversation Blocks and Inventory owners.
+- PBrainZ optional, not default. Avoid per-frame population-wide polling, huge ModData transcripts, unsafe WordNet expansions and generated monoliths. Keep generated Lua load order explicit and checksum/diff reproducible.
+- Coordinate if another agent owns target files or remote branch advanced; a real unsafe conflict is a blocker, not justification for stomping local user work.
 
-## Invariants
+## Completion and reporting
 
-- Client input/preview cannot grant rewards, mutate quest truth, inventory, relationship, NPC health, or memory commitments. Authoritative server commands revalidate all conditions at commit.
-- Missing/unknown world facts cannot be assumed true; player claims are not authoritative quest completion evidence; one NPC must not inherit another NPC's knowledge.
-- No second lexical parser or free-form Lua execution from an editor draft. No new per-tick full-population NLP/quest scan. Cache and dirty invalidation must be measured and explicit.
-- Offline Lua is the baseline. PBrainZ is optional and cannot override deterministic authorization.
-- Preserve EN/TL translation fallbacks and group participant isolation. Never store entire chat transcripts indiscriminately as NPC ModData.
-
-## Stop conditions and reporting
-
-Use blocked only for unsafe parallel worktree divergence, unavailable essential source/toolchain with no accepted fallback, proven missing capability or authorization. GUI automation absence, native PZ unavailability, Workshop publication, and normal test fixes are not blockers. When complete, mark implementation READY FOR USER LIVE TEST and provide a concise manual SP/MP test handoff; do not call native acceptance passed. Report exact branch/SHA, changed behavior, actual test results, skipped verification, known limitations and one Next Chunk or maintenance-ready.
+Report: exact repo branch SHA, modified canonical source files, production Lua input/IR/actual response/command/authority results, test commands and outcomes, limitations, GUI status, current PROGRESS Next Chunk. Never say native PZ SP/MP passed or use Workshop publication to satisfy a goal gate. Once development acceptance gates pass and no mandatory chunks remain, record **READY FOR USER LIVE TEST** and stop; user performs live acceptance independently.

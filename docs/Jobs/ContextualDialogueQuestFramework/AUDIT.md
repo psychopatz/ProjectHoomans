@@ -1,48 +1,46 @@
-# Baseline audit — code evidence versus proposed features
+# Verified branch audit — 2026-10-18
 
-**Source date:** 2026-10-18. **Remote main inspected:** a3eb2e4db553f9c03b7f66a6ff6717878e1668e0. This is a remote-source audit, NOT a fresh local worktree, live GUI click-through, native Project Zomboid run or hosted CI rerun.
+**Inspected ref:** `docs/contextual-dialogue-quest-framework-20261018` commit `382e93a342f1d6ee13fc2007a7fbbdf66a7afa7c`; main remains `a3eb2e4db553f9c03b7f66a6ff6717878e1668e0` at audit time. The branch is 4 commits ahead of main, and PR #4 remains open. **Evidence:** remote code read and screenshot supplied by user. No new checkout-local tests, GUI click-through or native PZ run performed for this documentation update.
 
-## Implemented or source-verified foundations
+## Source-confirmed, not necessarily accepted
 
-| Evidence | What it establishes | What it does NOT establish |
+| Component | What the current branch implements | Remaining distinction |
 | --- | --- | --- |
-| tools/semantic_harness/README.md; worker.py; gui.py | Existing Tk/Python console and persistent worker load actual Project Hoomans/PsychopatzCore semantic modules; preview and turn observations include production facts | GUI CRUD/edit ergonomics or real in-game correctness |
-| tools/semantic_harness/flow_editor.py | Canvas renders nodes/edges; selecting a node and changing response/accept/transition fields is implemented; drafts validate/register through Lua | Creating/deleting/dragging/linking nodes, rich code editor, persistent Lua export |
-| tools/semantic_harness/tests/test_flow_editor.py | Tests author/register a new flow and route turns through real Lua; rejects unreachable graph node | User click-through; production restart-persistent authoring; quest completion |
-| 42.20/media/lua/shared/PNC/Semantics/PNC_SemanticDialogueFlowRegistry.lua | Validates data-only triggers, accepted frames, nodes, slots, transitions and reachability; current defaults MAX_NODES=32, DEFAULT_MAX_FLOWS=32 | Context condition gates or quests as valid V1 flow fields |
-| .../PNC_SemanticDialogueFlowKernel.lua | Has bounded active/suspended flow states, preview/commit lifecycle and speaker/addressee keys | Durable cross-session semantic memory of arbitrary commitments |
-| client/PNC/Semantics/PNC_SemanticWorldContext.lua | Samples game time, weather, environment, and caches snapshots | Server-authoritative revalidation or NPC-local omniscience |
-| shared/PNC/Semantics/PNC_SemanticDialogueSituation_Public.lua | Projects activity, needs, health, emotion, social context and world time/rain/fog/indoors | Quest-state projection |
-| docs/Systems/ConversationBlocks.md | Existing separate Conversation Blocks gate API: skill/trait/personality/relationship/audience/time/history, composite all/any/not, locked choice modes, repeat policy, addon condition/effect handlers, server-owned effects | Those gates already being reused by new semantic flows |
-| docs/Systems/SocialProfiles.md | Persistent NPC personality profile with compassion, sociability, forgiveness, bravery, materialism, aggression, loyalty and social style | A new quest-specific disposition or willingness model |
-| docs/Systems/NPCKnowledge.md | Existing knowledge/evidence and bounded knowledge storage concepts | General open-ended, durable conversation-memory recall across all sessions |
-| docs/Jobs/SemanticDialogueDecoupling/PROGRESS.md | Older job reports D6 READY FOR USER LIVE TEST and prior production-worker results | Current session's fresh runtime test results |
+| `tools/semantic_harness/flow_editor.py` (about 1322 lines) | Graph visualization; add/duplicate/rename/delete/connect nodes; drag, pan, zoom, undo/redo; add trigger/action frame; gate fields; register/validate; JSON draft open/save | Does not compile source; node edits can leave invalid unreachable/empty accepts; layout and history are not fully round-tripped; action button is trigger-only |
+| `gui.py`; `lua/worker/FlowEditor.lua` | Simulation and Flow Editor tabs; live worker registry, action/trigger/fact/event/catalog discovery, production Validate/Register | No committed action-result node type or source generator; worker registration ephemeral |
+| `PNC_SemanticCapabilityCatalog.lua` | Introspects policy actions, command/task adapters, context constraints and Core registered patterns. Rows expose sources/transports/recognized/dispatchable fields | Discovery is not executability: a policy action or NLU pattern can be recognized yet have a separate multi-stage or unavailable dispatcher. No verified handler execution just from catalog listing |
+| `PNC_SemanticEngineFacts.lua`; `PNC_SemanticEngineEvents.lua` | Typed facts and bounded recent event bus; server zombie-kill producer via Core detector | Fact/event names are not executable actions; an event catalog is not itself a quest objective engine or event-triggered dialogue |
+| `PNC_SemanticDialogueFlowRegistry.lua`; `FlowKernel.lua` | Gate field and PASS/FAIL/UNKNOWN transitions on real flow nodes, existing active/suspended sessions | V1 schema lacks a typed action-result binding, compiler/source export and general quest/memory behavior |
+| `PNC_ConversationRules_Conditions/Evaluation.lua` | Shared gate status reused by flows; weather pilot | Preserve existing Blocks behavior and non-action preview purity |
+| `PNC_SemanticDialogueFlow_Weather.lua` and test `test_contextual_weather_gate.py` | Response-only rain/clear/unknown contextual flow | Not evidence that Follow/Gift/Wait functionality can be authored end-to-end |
+| `PNC_SemanticDialoguePolicy_Core/IntentBranch.lua` | Static action classification and branch selection (including FOLLOW, STAY, WAIT_AT, GIVE/FETCH etc.) | Hardcoded dispatch semantics are not derived automatically from new flow graphs |
+| `PNC_SemanticDialogueInput_Actions.lua` | Explicit approved branches dispatch gifts, inventory, command then task | Flow editor has no exposed authoritative result binding; do not route directly around this safety layer |
+| `PNC_SemanticCommandAdapter.lua` | FOLLOW→follow, STAY/STOP→stay, GO HOME→return_home, CAMP→camp via SendCompanionCommand | Requires existing command permission and transport; not arbitrary node function invocation |
+| `PNC_SemanticTaskAdapter.lua`; server `PNC_SemanticTaskRequestService.lua` | WAIT_AT, GIVE/FETCH, consumption etc. via registered handlers and server admission | No direct action execution in FlowKernel |
+| `PNC_SemanticDialogueInput_Gifts.lua` | Gift offer/consent/selection/transfer path | Multi-stage; cannot safely be modeled as an unconditional GIFT command |
+| `tools/semantic_compiler/build.py`; README; generated Lua shards | Compiles narrow reviewed WordNet verbs and common-dialogue seed into Lua patterns, forms and responses | No unified graph/flow/action/gate compilation or Semantic Lab source round-trip |
 
-Additional quest-themed map marker/role strings occur in the repository, but search did not establish a standalone authoritative quest registry, journal/objective state machine or idempotent reward service. Treat **Quest domain as not yet proven implemented**; re-audit targeted files before writing it.
+## Observed usability and correctness gaps
 
-## Concrete present gaps
+1. **User-visible mismatch:** screenshot shows four loaded flows and a huge sparse canvas, manual JSON triggers/accepts, low-level gate fields and Add action. User cannot author an actual command/result interaction from that UI.
+2. **Trigger ≠ binding:** `FlowEditorPane.add_command_trigger` appends a parser frame to `draft.triggers`, not an executable `actionBinding`. The flow registry stores responses/transitions/gates only.
+3. **Misleading catalog semantics:** `CapabilityCatalog.addAction` sets `recognized=true` for discovered policy/adapter rows; that does not prove an input phrase matches or the route dispatches in this worker/session. Separate **recognized/eligible/dispatchable/authorized/admitted/completed**.
+4. **Graph structural safety:** `add_node` can make selected terminal node nonterminal without required accepts, duplicate can make unreachable state, delete removes incoming edges; validator diagnoses later but UI does not prevent/recover transactionally. Drag layout is held separately from serialized definition.
+5. **Generator gap:** save draft writes JSON and Register only changes this Lua worker; no checked-in modular Lua + translation + require/manifest export, no restart proof.
+6. **Test coverage gap:** branch tests prove recognition catalog, weather gate validation and some Lua flow behavior; do not prove GUI editing, source compiles/loads, real action acceptance/rejection, gift consent or multiplayer server authority.
+7. **Ledger drift:** `PROGRESS.md` and `GOAL_PROMPT.md` on branch still say Phase 1 not implemented and start at 0A, although `382e93a3` contains Phase 1 code and engine fact catalog additions.
 
-1. **Flow authoring UX:** graph drawing uses fixed two-column positions, only click-to-select; fields require manual transition IDs and JSON arrays; no node creation/removal, drag/drop, connect or code-first editor.
-2. **Persistence:** Register draft is worker-local and disappears after restart; saved draft is JSON, not packaged production Lua. Avoid a separate runtime JSON dialogue engine.
-3. **Gate mismatch:** mature Conversation Blocks conditions and new semantic flows use different contracts. Design an adapter/shared pure evaluator rather than blindly grafting fields or duplicating rules.
-4. **Context continuity:** fields for current/previous topic and active/suspended state are present, but safe cross-session promises, speaker-scoped references and provenance-aware retrieval are not yet demonstrated end-to-end.
-5. **Quests:** no source-verified canonical server-owned quest lifecycle/reward pathway in this audit.
-6. **Acceptance:** no new job-specific production Lua traces, UI click-through, native game acceptance, CI or performance measurements have been executed.
+## Evidence level and safe interpretation
 
-## Specific first inspection targets
+- Weather gate: **recorded developer acceptance** in older `PROGRESS.md` at `1a754dc8`: real worker rain true/false/unknown, no side effects; 108 unittests documented **at that earlier checkpoint**, not rerun at `382e93a3`.
+- Graph CRUD: **source-present but acceptance incomplete**; do not claim no implementation, or "all passed".
+- Capability catalog and EngineFacts/Events: **source-present, unverified on newest branch**.
+- Action-binding, unified procedural compiler/source export, full durable contextual memory and quests: **not yet implemented/accepted**.
+- GitHub had **no workflow runs** returned for newest `382e93a3` at the prior audit. Actual local dirty state unknown.
+- PZ SP/MP and Workshop: **user-owned, not executed**, not development blockers.
 
-- Core and Hoomans parser/candidate/flow router public contracts and required upstream revision in the actual local pair.
-- Conversation Blocks RegisterConditionHandler and gate evaluation/validation implementation and compatibility with flow preview/commit.
-- Flow Registry.NormalizeNode and Kernel Preview/Commit: side-effect-free evaluation placement and scope, including special target semantics.
-- Current world context provider's observation scope/client-local nature; server-side authoritative fact sources.
-- Existing knowledge/memory APIs and conversation obligations: prove reuse boundary before creating storage.
-- Existing quest-like UI markers/roles/jobs: do not mistake labels for quest infrastructure.
+## Ownership pointers
 
-## Evidence labels
+For action lifecycle inspect: `PNC_SemanticDialoguePolicy_Flow.lua`, `PNC_SemanticDialoguePolicy_Decision.lua`, `PNC_SemanticDialogueInput_Actions.lua`, `PNC_SemanticCommandAdapter.lua`, `PNC_SemanticTaskAdapter.lua`, `PNC_SemanticDialogueInput_Gifts.lua`, `PNC_SemanticTaskRequestService.lua` and command/Inventory registry. Avoid changing five services when one small binding/trace hook works.
 
-- **Source-verified:** claims above for named remote files.
-- **Documented but not rerun:** earlier job's unittest counts, X11 launch probe, EN/TL semantic traces.
-- **Planned, not implemented:** shared condition bridge, cross-session context, quest domain, editor CRUD/code round trip.
-- **User-owned not tested here:** native SP/MP and Workshop/install parity.
-
-Do not inflate an agent's historical "D3 complete" into this goal's stronger requirement for full graph CRUD, persistent authoring, code sync and contextual gating. These are additional acceptance outcomes, not grounds to erase historical D3 evidence.
+For compiler review inspect `tools/semantic_compiler`, `PNC_SemanticCatalog.lua`, `PNC_SemanticGeneratedDialogue.lua`, flow catalog require order and translation manifest. Verify these actual paths in local checkout before generating files.

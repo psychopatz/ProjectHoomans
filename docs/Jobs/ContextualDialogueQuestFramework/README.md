@@ -1,37 +1,34 @@
 # Contextual Dialogue & Quest Framework — Project Hoomans
 
-**Status:** NEW GOAL, PLANNED; implementation not started by this documentation commit.
-**Created:** 2026-10-18. **Audited remote baseline:** ProjectHoomans main at a3eb2e4db553f9c03b7f66a6ff6717878e1668e0.
+**Purpose:** Make Semantic Lab the primary **procedural authoring, compilation, inspection and real-Lua testing workbench** for Project Hoomans' lightweight offline NLP, contextual dialogue, existing game actions and eventual quests. Preserve an optional PBrainZ realization path without making it a requirement.
 
-## Product outcome
+**Current source checkpoint:** `docs/contextual-dialogue-quest-framework-20261018` @ `382e93a342f1d6ee13fc2007a7fbbdf66a7afa7c` (2026-10-18). This is branch-source evidence, not a local worktree/GUI/runtime verification. See `PROGRESS.md` for the single current phase and Next Chunk.
 
-Evolve the existing offline production-Lua semantic conversation pipeline and Semantic Lab into a contextual NPC dialogue and quest framework. A player should be able to speak naturally about an NPC's situation, change topics, return to an earlier commitment, offer help, accept or discuss a quest, and receive a response grounded in what this specific NPC knows, remembers and can legitimately do. The system must remain useful with PBrainZ disabled. PBrainZ can optionally verbalize an already authorized dialogue plan, but is not the authority for NPC memory, quest state or gameplay changes.
+## User-facing outcome
 
-This job also upgrades the *existing* Semantic Lab into a genuinely usable human/agent authoring tool: create/rename/delete/drag/link branches, edit their semantic and contextual conditions, use a code-style definition view, test through real production Lua, and produce restart-persistent mod definitions rather than worker-only drafts.
+In ONE existing Semantic Lab environment, a human or coding agent should be able to:
+1. Choose a gameplay capability (e.g. Follow, Wait Here, Wait At, gift, quest offer) from **live registered production owners**, not guess Lua functions.
+2. Add or generate reviewed phrases, speech acts, intents, slots and contextual conditions; see parsing collisions and unsafe ambiguity.
+3. Visually connect conversation, condition, action-binding, result and response states; use a synchronized supported code/source editor for precise changes.
+4. Run preview and committed turns through the **actual production PsychopatzCore + Project Hoomans Lua** pipeline; see accepted/rejected action route, side effects and real NPC wording.
+5. Compile reviewed semantic definitions into deterministic **modular Lua modules/manifests and existing EN/TL translation layout**, review source diffs, restart the worker and confirm the compiled content is loaded and working.
 
-## Boundaries and prior work
+The generator procedurally creates **supported deterministic semantic artifacts**; it cannot promise unlimited free-form understanding or automatically prove unsafe unreviewed synonyms. Its job is less repetitive authoring, explicit boundaries, fewer collisions/errors, and new commands/flows without giant centralized conditionals.
 
-- Reuse PsychopatzCore's parser, candidate IR and existing Hoomans dialogue policy/flow registry/kernel; do not create a second NLP interpreter.
-- Reuse current world/time/weather providers, NPC social/personality and relationships, NPC knowledge/memory and Conversation Blocks condition gates wherever real contracts support reuse.
-- Quests are a NEW separately owned Project Hoomans gameplay domain; dialogue only interprets/requests and renders outcomes.
-- Preserve older jobs and their independently recorded evidence. SemanticDialogueDecoupling is READY FOR USER LIVE TEST in its own PROGRESS; ContextualSemanticIntelligence carries older phase evidence and is not silently declared finished or rewritten.
-- This documentation does not authorize starting Project Zomboid, running multiplayer hosting, or publishing to Steam Workshop. Those remain user-owned live acceptance/release activities.
+## Scope and ownership
 
-## Read these files in order
+- **Existing production owners stay intact.** Core owns generic NLU and IR; Hoomans owns policy, flow state, game context, registered game-action adapters, conversations, social state and quests; gameplay domains own actual effects. `tools/semantic_compiler` is an existing generator seed, not a new runtime parser.
+- Engine facts/events are read-only observations. They **do not** execute gameplay commands. Action bindings are allowlisted references to existing dispatchers and server authorization, never arbitrary Lua source in a node.
+- Reuse Conversation Blocks' typed condition evaluation and Hoomans Knowledge/Personality/Relationship data. Avoid a second gate engine, item taxonomy, quest authority, task scheduler or NPC memory store.
+- Keep Project Zomboid Build 42.20 source conventions. Core/MarketSense/PBrainZ sibling repositories are not changed without source-backed necessity and authorization.
+- Existing `SemanticDialogueDecoupling` live-testing status and `ContextualSemanticIntelligence` historical evidence remain independently owned; do not rewrite their ledgers.
 
-1. Root **AGENTS.md**, then this job's **AGENT_RUNBOOK.md** — safety and execution policy.
-2. **AUDIT.md** — baseline truth and unresolved verification.
-3. **ARCHITECTURE.md** — ownership, context, state, authority and invariants.
-4. **CONDITION_CONTEXT.md** — source-backed condition and dialogue-context model.
-5. **QUEST_CONTRACT.md** — quest lifecycle and gameplay event contract.
-6. **AUTHORING_WORKBENCH.md** — Semantic Lab visual/code editing and persistence design.
-7. **ROADMAP.md** — sequence and measurable gates.
-8. **HARNESS_ACCEPTANCE.md** — real worker / UI / negative-case acceptance.
-9. **PROGRESS.md** — sole source for the CURRENT phase and exactly ONE Next Chunk.
-10. **GOAL_PROMPT.md** — compact Codex /goal bootstrap; do not execute every phase at once.
+## Read order
 
-Reference systems: **docs/Systems/Semantics.md**, **docs/Systems/ConversationBlocks.md**, **docs/Systems/SocialProfiles.md**, **docs/Systems/NPCKnowledge.md**, **docs/architecture/PROJECT_HOOMANS_DOMAIN_CONTRACT.md**, **tools/semantic_harness/README.md**.
+`AGENTS.md` → this job's `AGENT_RUNBOOK.md` → `AUDIT.md` → `ARCHITECTURE.md` → **`CAPABILITY_ACTION_BINDINGS.md`** → **`PROCEDURAL_NLP_COMPILER.md`** → `AUTHORING_WORKBENCH.md` → `CONDITION_CONTEXT.md` → `QUEST_CONTRACT.md` → `ROADMAP.md` → `HARNESS_ACCEPTANCE.md` → **`PROGRESS.md`** (sole Next Chunk) → `GOAL_PROMPT.md`.
 
-## Done means
+Technical reference: `tools/semantic_harness/README.md`, `tools/semantic_compiler/README.md`, `docs/Systems/Semantics.md`, `docs/Systems/ConversationBlocks.md`, `docs/Systems/CompanionCommands.md`.
 
-A newly authored dialogue and one representative quest travel the *production* semantic parser/flow/response route in Semantic Lab, use authoritative contextual gates and quest transitions, preserve a real bounded memory/commitment across a conversation boundary, survive worker restart via checked-in mod source, and show actual response, selected IR/flow, gate decisions and effects. Offline, EN/TL, deterministic repeatability, unrelated-flow regressions, negative/permission scenarios and measured idle-cost limits are mandatory developer gates. Actual PZ SP/MP remains a separate user-owned acceptance handoff.
+## Finished product / handoff
+
+A new interaction is *authored → validated against actual registry/capabilities → compiled to properly packaged source → loaded on fresh worker → run with contextual, EN/TL and negative cases → traces actual dispatch or denial*. Representative Follow, Stay/Wait At and Gift cases prove different ownership paths. Quest and durable-context slices use these same contracts. Performance/scalability bounds measured; developer work ends at **READY FOR USER LIVE TEST**. Native PZ SP/MP tests, Workshop publication and final distribution remain user-owned, never prerequisites for autonomous source development.
