@@ -18,7 +18,10 @@ local ResponsePlan = require
     "PNC/Semantics/PNC_SemanticDialogueResponsePlan"
 
 Catalog.VERSION = 1
-Catalog.MAX_POOLS = 64
+-- Automatic capability generation can register one bounded pool per result
+-- outcome. Keep the catalog bounded, but leave room for every compatible
+-- production capability without silently truncating generated flows.
+Catalog.MAX_POOLS = 128
 Catalog.MAX_VARIANTS = 16
 Catalog.POOLS = Catalog.POOLS or {}
 Catalog.LAST_VARIANTS = Catalog.LAST_VARIANTS or {}

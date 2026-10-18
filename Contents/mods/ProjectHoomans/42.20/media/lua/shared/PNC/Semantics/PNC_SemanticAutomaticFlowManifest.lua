@@ -12,7 +12,13 @@ return {
     generator = "PNC/Semantics/PNC_SemanticAutomaticFlowGenerator",
     generatedDefinitions = "PNC/Semantics/PNC_SemanticGeneratedAutomaticFlows",
     translationPaths = {
-        EN = "EN/Conversation/Semantic/Generated.json",
-        TL = "TL/Conversation/Semantic/Generated.json",
+        EN = {
+            "EN/Conversation/Semantic/Generated.json",
+            "EN/Conversation/Semantic/GeneratedTaskCommands.json",
+        },
+        TL = {
+            "TL/Conversation/Semantic/Generated.json",
+            "TL/Conversation/Semantic/GeneratedTaskCommands.json",
+        },
     },
 }

@@ -123,8 +123,8 @@ class GiftCapabilityBindingTests(unittest.TestCase):
             {"authorize", "request", "selection_required", "pending",
              "completed", "rejected", "failed"},
         )
-        self.assertEqual(generation["summary"]["generated"], 5)
-        self.assertEqual(generation["summary"]["unsupported_workflow"], 6)
+        self.assertEqual(generation["summary"]["generated"], 13)
+        self.assertEqual(generation["summary"]["unsupported_workflow"], 0)
         self.assertEqual(
             next(row for row in generation["coverage"] if row["id"] == "GIFT")["classification"],
             "generated",

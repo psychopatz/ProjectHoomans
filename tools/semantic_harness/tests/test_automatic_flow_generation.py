@@ -18,8 +18,8 @@ class AutomaticFlowGenerationTests(unittest.TestCase):
         generation = catalog["generation"]
         self.assertEqual(generation["templateVersion"], 1)
         self.assertIn("simple_command:v1", generation["templateFingerprint"])
-        self.assertEqual(generation["summary"]["generated"], 5)
-        self.assertEqual(generation["summary"]["unsupported_workflow"], 6)
+        self.assertEqual(generation["summary"]["generated"], 13)
+        self.assertEqual(generation["summary"]["unsupported_workflow"], 0)
         self.assertEqual(generation["summary"]["metadata_incomplete"], 0)
         rows = {
             row["id"]: row for row in generation["coverage"]
@@ -47,7 +47,7 @@ class AutomaticFlowGenerationTests(unittest.TestCase):
             for flow in catalog["flows"]
             if flow.get("workflowKind") == "simple_command"
         }
-        self.assertEqual(len(flows), 2)
+        self.assertEqual(len(flows), 5)
         follow = flows[rows["FOLLOW"]["flowID"]]
         stay = flows[rows["STAY"]["flowID"]]
         self.assertEqual(set(follow["nodes"]), set(stay["nodes"]))
@@ -76,7 +76,15 @@ class AutomaticFlowGenerationTests(unittest.TestCase):
         ]
         self.assertEqual(
             {flow["capabilityID"] for flow in task_flows},
-            {"pnc:task.fetch", "pnc:task.wait_at"},
+            {
+                "pnc:task.consume",
+                "pnc:task.drink",
+                "pnc:task.eat",
+                "pnc:task.fetch",
+                "pnc:task.give",
+                "pnc:task.refill",
+                "pnc:task.wait_at",
+            },
         )
         for flow in task_flows:
             action = flow["nodes"]["request"]["action"]
@@ -104,6 +112,50 @@ class AutomaticFlowGenerationTests(unittest.TestCase):
             self.assertEqual(result["result"]["actionResult"]["handlerID"], "PNC.Client.RequestSemanticTask")
             self.assertEqual(len(result["transport"]), 1)
             self.assertEqual(result["messages"][0]["payload"]["text"], text)
+
+    def test_all_dispatchable_registered_capabilities_use_existing_handlers(self) -> None:
+        phrases = {
+            "CAMP": "Camp here",
+            "GO": "Go home",
+            "STOP": "Stop following me",
+            "GIVE": "Give me the can opener",
+            "EAT": "Eat the apple",
+            "DRINK": "Drink the water",
+            "REFILL": "Refill the bottle",
+            "CONSUME": "Use the bandage",
+        }
+        expected_handlers = {
+            "CAMP": "PNC.Client.SendCompanionCommand",
+            "GO": "PNC.Client.SendCompanionCommand",
+            "STOP": "PNC.Client.SendCompanionCommand",
+            "GIVE": "PNC.Client.RequestSemanticTask",
+            "EAT": "PNC.Client.RequestSemanticTask",
+            "DRINK": "PNC.Client.RequestSemanticTask",
+            "REFILL": "PNC.Client.RequestSemanticTask",
+            "CONSUME": "PNC.Client.RequestSemanticTask",
+        }
+        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+            catalog = worker.flow_catalog()
+            turns = {
+                action: worker.input(phrase)
+                for action, phrase in phrases.items()
+            }
+
+        coverage = {row["id"]: row for row in catalog["generation"]["coverage"]}
+        self.assertEqual(catalog["generation"]["summary"]["generated"], 13)
+        self.assertEqual(catalog["generation"]["summary"]["legacy"], 0)
+        self.assertEqual(catalog["generation"]["summary"]["unsupported_workflow"], 0)
+        self.assertEqual(coverage["HELP"]["classification"], "recognition_only")
+        self.assertEqual(coverage["TAKE"]["classification"], "recognition_only")
+
+        for action, result in turns.items():
+            flow = result["result"]["flow"]
+            action_result = result["result"]["actionResult"]
+            self.assertTrue(flow["generated"], action)
+            self.assertEqual(flow["dispatchCount"], 1, action)
+            self.assertEqual(action_result["handlerID"], expected_handlers[action])
+            self.assertEqual(len(result["transport"]), 1, action)
+            self.assertTrue(result["messages"], action)
 
     def test_parameterized_task_result_branches_and_gate_are_truthful(self) -> None:
         rejected_scenario = merge(

@@ -91,18 +91,13 @@ class FlowEditorTests(unittest.TestCase):
         summary = coverage_summary(coverage)
         lines = coverage_lines(coverage)
         self.assertEqual(sum(summary.values()), 15)
-        self.assertEqual(summary["generated"], 5)
-        self.assertEqual(summary["unsupported_workflow"], 6)
+        self.assertEqual(summary["generated"], 13)
+        self.assertEqual(summary.get("unsupported_workflow", 0), 0)
         self.assertTrue(
             any(line.startswith("GIFT: generated") for line in lines)
         )
-        self.assertTrue(
-            any(
-                line.startswith("CAMP: unsupported_workflow")
-                and "task_adapter_requires_parameterized_task_template" in line
-                for line in lines
-            )
-        )
+        self.assertTrue(any(line.startswith("CAMP: generated") for line in lines))
+        self.assertTrue(any(line.startswith("HELP: recognition_only") for line in lines))
 
     def test_catalog_exposes_engine_facts_and_commands(self) -> None:
         with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
@@ -159,10 +154,18 @@ class FlowEditorTests(unittest.TestCase):
                     "weather_context",
                     "greeting",
                 "pnc.dialogue.follow.flow",
+                "pnc.generated.parameterized_task.pnc.task.consume",
+                "pnc.generated.parameterized_task.pnc.task.drink",
+                "pnc.generated.parameterized_task.pnc.task.eat",
                 "pnc.generated.parameterized_task.pnc.task.fetch",
+                "pnc.generated.parameterized_task.pnc.task.give",
+                "pnc.generated.parameterized_task.pnc.task.refill",
                 "pnc.generated.parameterized_task.pnc.task.wait.at",
+                "pnc.generated.simple_command.pnc.companion.camp",
                 "pnc.generated.simple_command.pnc.companion.follow",
+                "pnc.generated.simple_command.pnc.companion.go.home",
                 "pnc.generated.simple_command.pnc.companion.stay",
+                "pnc.generated.simple_command.pnc.companion.stop",
                 "pnc.generated.multi_stage_gift.pnc.gift.offer",
                 ],
             )
