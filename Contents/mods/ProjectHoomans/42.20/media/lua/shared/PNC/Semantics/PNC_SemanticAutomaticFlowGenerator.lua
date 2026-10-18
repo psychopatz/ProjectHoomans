@@ -369,6 +369,7 @@ function Generator.Register(capabilityCatalog, artifact)
     artifact = type(artifact) == "table" and artifact or Generator.Build(
         capabilityCatalog
     )
+    artifact.regeneratedFlowIDs = {}
     for index = 1, #artifact.responsePools do
         local pool = artifact.responsePools[index]
         local registered = responses.Register(pool.id, pool)
@@ -379,14 +380,26 @@ function Generator.Register(capabilityCatalog, artifact)
     end
     for index = 1, #artifact.flows do
         local definition = artifact.flows[index]
-        if not registry.Get(definition.id) then
-            local registered, reason = registry.Register(definition)
-            if not registered then
-                error("automatic semantic flow registration failed: "
-                    .. tostring(definition.id) .. " (" .. tostring(reason) .. ")")
-            end
+        local existing = registry.Get(definition.id)
+        local registered
+        local reason
+        if type(registry.ReplaceGenerated) == "function" then
+            registered, reason = registry.ReplaceGenerated(definition)
+        elseif not existing then
+            registered, reason = registry.Register(definition)
+        else
+            registered = true
+        end
+        if not registered then
+            error("automatic semantic flow registration failed: "
+                .. tostring(definition.id) .. " (" .. tostring(reason) .. ")")
+        end
+        if existing then
+            artifact.regeneratedFlowIDs[#artifact.regeneratedFlowIDs + 1] =
+                definition.id
         end
     end
+    table.sort(artifact.regeneratedFlowIDs)
     markGenerated(artifact, registry)
     artifact.registryRevision = registry.GetRevision()
     artifact.capabilityCatalogVersion = capabilityCatalog.VERSION

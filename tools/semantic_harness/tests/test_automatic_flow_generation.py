@@ -215,6 +215,7 @@ class AutomaticFlowGenerationTests(unittest.TestCase):
             first = worker.preview("Follow me")
             second = worker.preview("Follow me")
             generated = worker.generate_flows()
+            regenerated = worker.generate_flows()
             worker.restart()
             after_restart = worker.flow_catalog()
 
@@ -230,6 +231,14 @@ class AutomaticFlowGenerationTests(unittest.TestCase):
         self.assertEqual(
             generated["generation"]["generatedFlowIDs"],
             after_restart["generation"]["generatedFlowIDs"],
+        )
+        self.assertEqual(
+            regenerated["generation"]["regeneratedFlowIDs"],
+            generated["generation"]["generatedFlowIDs"],
+        )
+        self.assertEqual(
+            regenerated["generation"]["generatedFlowIDs"],
+            generated["generation"]["generatedFlowIDs"],
         )
 
 

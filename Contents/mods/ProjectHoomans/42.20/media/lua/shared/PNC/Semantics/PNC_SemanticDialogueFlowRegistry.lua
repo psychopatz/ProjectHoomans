@@ -476,6 +476,27 @@ function Registry.Register(definition)
     return true, normalized
 end
 
+-- Regeneration may update a flow that was produced by the automatic
+-- generator, but it must never overwrite an authored or otherwise-owned flow
+-- with the same ID. Validation remains the single registry contract.
+function Registry.ReplaceGenerated(definition)
+    local valid, normalized = Registry.Validate(definition)
+    if not valid then return false, normalized end
+    local existing = Registry.Flows[normalized.id]
+    if not existing then
+        return Registry.Register(definition)
+    end
+    if existing.workflowKind == nil
+        or normalized.workflowKind == nil
+        or existing.workflowKind ~= normalized.workflowKind
+    then
+        return false, "generated_replace_requires_matching_workflow_kind"
+    end
+    Registry.Flows[normalized.id] = normalized
+    Registry.Revision = Registry.Revision + 1
+    return true, normalized
+end
+
 function Registry.Get(flowID)
     return Registry.Flows[flowID]
 end
