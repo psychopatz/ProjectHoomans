@@ -117,6 +117,7 @@ class FlowEditorPane:
         on_refresh: Callable[[], Any],
         on_validate: Callable[[dict[str, Any]], Any],
         on_register: Callable[[dict[str, Any]], Any],
+        on_compile_source: Callable[[Path], Any] | None = None,
     ) -> None:
         self._tk = tk_module
         self._ttk = ttk
@@ -126,6 +127,7 @@ class FlowEditorPane:
         self._on_refresh = on_refresh
         self._on_validate = on_validate
         self._on_register = on_register
+        self._on_compile_source = on_compile_source
         self._catalog: dict[str, dict[str, Any]] = {}
         self._draft: dict[str, Any] | None = None
         self._selected_node: str | None = None
@@ -156,7 +158,7 @@ class FlowEditorPane:
         ttk = self._ttk
         toolbar = ttk.Frame(self.frame)
         toolbar.grid(row=0, column=0, sticky="ew", pady=(0, 6))
-        toolbar.columnconfigure(16, weight=1)
+        toolbar.columnconfigure(17, weight=1)
         self.flow_var = self._tk.StringVar()
 
         self.refresh_button = ttk.Button(
@@ -201,9 +203,13 @@ class FlowEditorPane:
             toolbar, text="Save draft", command=self.save_draft
         )
         self.save_button.grid(row=0, column=11, padx=(6, 0))
+        self.compile_source_button = ttk.Button(
+            toolbar, text="Compile source…", command=self.compile_source
+        )
+        self.compile_source_button.grid(row=0, column=16, padx=(8, 0))
         self.status_var = self._tk.StringVar()
         ttk.Label(toolbar, textvariable=self.status_var).grid(
-            row=0, column=16, sticky="e", padx=(10, 0)
+            row=0, column=17, sticky="e", padx=(10, 0)
         )
         self._action_buttons = (
             self.refresh_button,
@@ -222,6 +228,7 @@ class FlowEditorPane:
             self.zoom_button,
             self.load_button,
             self.save_button,
+            self.compile_source_button,
         )
 
     def _build_body(self) -> None:
@@ -970,6 +977,29 @@ class FlowEditorPane:
         draft = self._commit_fields()
         if draft is not None:
             self._on_register(flow_draft(draft))
+
+    def compile_source(self) -> None:
+        filename = self._filedialog.askopenfilename(
+            title="Preview canonical semantic source",
+            filetypes=[("Semantic definitions", "*.json"), ("All files", "*")],
+        )
+        if not filename:
+            return
+        if self._on_compile_source is None:
+            self.set_status("Compiler preview is unavailable")
+            return
+        self._on_compile_source(Path(filename))
+
+    def show_source_report(self, report: dict[str, Any]) -> None:
+        if report.get("ok") is True:
+            self.set_status(
+                "Compiler preview valid; no files written "
+                f"({len(report.get('generatedPaths', []))} planned paths)"
+            )
+        else:
+            diagnostics = report.get("diagnostics") or []
+            message = diagnostics[0].get("message") if diagnostics else "invalid source"
+            self.set_status(f"Compiler preview rejected: {message}")
 
     def show_validation(self, response: dict[str, Any]) -> None:
         if response.get("valid") is True:

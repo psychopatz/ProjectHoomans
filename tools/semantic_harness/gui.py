@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any, Callable
 
 from .config import ConfigurationError
+from .authoring import preview_semantic_source
 from .flow_editor import FlowEditorPane
 from .rendering import pretty
 from .scenario import load_scenario, save_scenario
@@ -159,6 +160,7 @@ class SemanticHarnessApp:
             on_refresh=self.refresh_flow_catalog,
             on_validate=self.validate_flow_draft,
             on_register=self.register_flow_draft,
+            on_compile_source=self.compile_semantic_source,
         )
 
         self._append("SYSTEM", "Window ready. Starting the isolated Lua worker…")
@@ -436,6 +438,22 @@ class SemanticHarnessApp:
             lambda worker: worker.register_flow(definition),
             self.flow_editor.show_registration,
         )
+
+    def compile_semantic_source(self, source_path: Path) -> None:
+        """Preview canonical source offline; do not mutate the Lua worker."""
+        report = preview_semantic_source(source_path)
+        self.flow_editor.show_source_report(report)
+        self._set_text(self.inspector, pretty(report))
+        self._set_text(self.trace, pretty(report))
+        if report.get("ok") is True:
+            self._append(
+                "SYSTEM",
+                f"Compiler preview valid; no files written: {source_path.name}",
+            )
+        else:
+            diagnostics = report.get("diagnostics") or []
+            message = diagnostics[0].get("message") if diagnostics else "invalid source"
+            self._append("SYSTEM", f"Compiler preview rejected: {message}")
 
     def set_language(self) -> None:
         if not self.session.ready or self.busy:

@@ -844,6 +844,22 @@ def load_semantic_source(path: Path) -> dict[str, Any]:
     return document
 
 
+def discover_registered_capability_ids(runtime_root: Path) -> set[str]:
+    """Read capability IDs from existing production semantic descriptors."""
+    pattern = re.compile(r'capabilityID\s*=\s*["\']([^"\']+)["\']')
+    paths = runtime_root.glob(
+        "Contents/mods/ProjectHoomans/*/media/lua/**/PNC_Semantic*.lua"
+    )
+    capabilities: set[str] = set()
+    for path in sorted(paths):
+        try:
+            text = path.read_text(encoding="utf-8")
+        except OSError:
+            continue
+        capabilities.update(pattern.findall(text))
+    return capabilities
+
+
 def _semantic_id(value: Any, label: str) -> str:
     if not isinstance(value, str) or not DIALOGUE_ID.fullmatch(value):
         raise CompileError(f"{label} must be a lowercase dotted identifier")

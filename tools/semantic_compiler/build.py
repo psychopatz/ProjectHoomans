@@ -5,7 +5,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import re
 import sys
 from pathlib import Path
 
@@ -22,6 +21,7 @@ from tools.semantic_compiler.compiler import (  # noqa: E402
     load_dialogue_dataset,
     load_allowlist,
     load_semantic_source,
+    discover_registered_capability_ids,
     render_dialogue_lua,
     render_dialogue_lua_shards,
     render_semantic_lua_shards,
@@ -42,22 +42,6 @@ DEFAULT_DIALOGUE_OUTPUT = (
 )
 DEFAULT_SEMANTIC_SOURCE = Path(__file__).with_name("semantic_definitions.json")
 DEFAULT_SEMANTIC_OUTPUT_ROOT = ROOT
-
-
-def _discover_capability_ids(runtime_root: Path) -> set[str]:
-    """Read capability IDs from the existing production adapter descriptors."""
-    pattern = re.compile(r'capabilityID\s*=\s*["\']([^"\']+)["\']')
-    paths = runtime_root.glob(
-        "Contents/mods/ProjectHoomans/*/media/lua/**/PNC_Semantic*.lua"
-    )
-    capabilities: set[str] = set()
-    for path in sorted(paths):
-        try:
-            text = path.read_text(encoding="utf-8")
-        except OSError:
-            continue
-        capabilities.update(pattern.findall(text))
-    return capabilities
 
 
 def _write_semantic_output(output_root: Path, compiled: dict) -> list[Path]:
@@ -240,7 +224,7 @@ def main(arguments: list[str] | None = None) -> int:
         if options.semantic_source is not None:
             compiled_semantic = compile_semantic_definitions(
                 load_semantic_source(options.semantic_source),
-                registered_capability_ids=_discover_capability_ids(
+                registered_capability_ids=discover_registered_capability_ids(
                     options.semantic_runtime_root.expanduser().resolve()
                 ),
             )

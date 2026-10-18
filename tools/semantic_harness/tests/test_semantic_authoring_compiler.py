@@ -2,13 +2,62 @@
 
 from __future__ import annotations
 
+import json
+import tempfile
 import unittest
+from pathlib import Path
 
+from tools.semantic_harness.authoring import preview_semantic_source
 from tools.semantic_harness.scenario import DEFAULT_SCENARIO
 from tools.semantic_harness.worker import LuaSemanticWorker
 
 
+REPOSITORY = Path(__file__).resolve().parents[3]
+
+
 class SemanticAuthoringCompilerWorkerTests(unittest.TestCase):
+    def test_lab_source_preview_is_effect_free_and_reports_mod_paths(self) -> None:
+        report = preview_semantic_source(
+            REPOSITORY / "tools/semantic_compiler/semantic_definitions.json"
+        )
+        self.assertTrue(report["ok"])
+        self.assertTrue(report["previewOnly"])
+        self.assertTrue(report["effectFree"])
+        self.assertEqual(report["writes"], [])
+        self.assertIn(
+            "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/PNC_SemanticGeneratedDefinitions.lua",
+            report["generatedPaths"],
+        )
+        self.assertIn(
+            "Contents/mods/ProjectHoomans/common/media/translation/EN/Conversation/Semantic/Generated.json",
+            report["generatedPaths"],
+        )
+        self.assertEqual(report["capabilityIDs"], ["pnc:companion.follow"])
+        self.assertEqual(
+            report["translationKeys"],
+            {
+                "EN": ["UI_PNC_Conversation_Semantic_AuthoredFollowAccepted"],
+                "TL": ["UI_PNC_Conversation_Semantic_AuthoredFollowAccepted"],
+            },
+        )
+
+    def test_lab_source_preview_returns_diagnostic_without_writing(self) -> None:
+        source = json.loads(
+            (REPOSITORY / "tools/semantic_compiler/semantic_definitions.json")
+            .read_text(encoding="utf-8")
+        )
+        source["definitions"][0]["capability"] = "pnc:missing.action"
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "invalid.json"
+            path.write_text(json.dumps(source), encoding="utf-8")
+            report = preview_semantic_source(path)
+        self.assertFalse(report["ok"])
+        self.assertTrue(report["previewOnly"])
+        self.assertTrue(report["effectFree"])
+        self.assertEqual(report["generatedPaths"], [])
+        self.assertEqual(report["writes"], [])
+        self.assertIn("unregistered capability", report["diagnostics"][0]["message"])
+
     def test_generated_definition_loads_routes_and_survives_restart(self) -> None:
         with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
             catalog = worker.flow_catalog()
