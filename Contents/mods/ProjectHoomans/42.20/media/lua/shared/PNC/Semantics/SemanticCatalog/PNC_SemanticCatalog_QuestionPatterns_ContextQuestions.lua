@@ -337,6 +337,67 @@ function Internal.RegisterWorldFactQuestions()
     )
 
     registerPattern(
+        "pnc.question.needs_offer",
+        {
+            { kind = "literal", value = "do" },
+            { kind = "literal", value = "you" },
+            { kind = "concept", id = "WANT" },
+            { kind = "concept", id = "ANY_ITEM" },
+        },
+        {
+            intent = "QUESTION",
+            speechAct = "QUESTION",
+            subject = "NEEDS",
+            extensions = {
+                topic = "needs",
+                dialogueFollowUp = "NEEDS_QUANTITY",
+            },
+        },
+        0.98,
+        96
+    )
+
+    registerPattern(
+        "pnc.question.needs_offer_plain",
+        {
+            { kind = "literal", value = "do" },
+            { kind = "literal", value = "you" },
+            { kind = "literal", value = "need" },
+            { kind = "literal", value = "anything" },
+        },
+        {
+            intent = "QUESTION",
+            speechAct = "QUESTION",
+            subject = "NEEDS",
+            extensions = {
+                topic = "needs",
+                dialogueFollowUp = "NEEDS_QUANTITY",
+            },
+        },
+        0.99,
+        97
+    )
+
+    registerPattern(
+        "pnc.question.quantity_follow_up",
+        {
+            { kind = "literal", value = "how" },
+            { kind = "literal", value = "many" },
+        },
+        {
+            intent = "QUESTION",
+            speechAct = "QUESTION",
+            subject = "QUANTITY",
+            extensions = {
+                topic = "needs",
+                dialogueFollowUp = "NEEDS_QUANTITY",
+            },
+        },
+        0.99,
+        98
+    )
+
+    registerPattern(
         "pnc.question.gift_preference_like",
         {
             { kind = "literal", value = "do" },

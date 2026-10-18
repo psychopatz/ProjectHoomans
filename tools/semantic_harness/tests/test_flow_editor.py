@@ -174,10 +174,11 @@ class FlowEditorTests(unittest.TestCase):
             catalog = worker.flow_catalog()
             self.assertEqual(
                 [flow["id"] for flow in catalog["flows"]],
-                [
-                    "identity",
-                    "wellbeing",
-                    "weather_context",
+            [
+                "identity",
+                "wellbeing",
+                "needs",
+                "weather_context",
                     "greeting",
                 "pnc.dialogue.follow.flow",
                 "pnc.generated.parameterized_task.pnc.task.consume",

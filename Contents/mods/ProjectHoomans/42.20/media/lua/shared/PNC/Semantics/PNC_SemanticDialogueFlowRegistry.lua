@@ -159,6 +159,22 @@ local function normalizeSlots(slots, label)
     return output
 end
 
+local function normalizeNodeList(values, label)
+    if values == nil then return nil end
+    if type(values) ~= "table" then
+        return nil, label .. "_must_be_array"
+    end
+    local output = {}
+    for index = 1, math.min(#values, 8) do
+        local value = stringValue(values[index])
+        if not value or #value > 64 then
+            return nil, label .. "_item_invalid"
+        end
+        output[#output + 1] = value
+    end
+    return output
+end
+
 local function normalizeAction(action, nodes, label)
     if action == nil then return nil end
     if type(action) ~= "table" then
@@ -255,6 +271,20 @@ local function normalizeNode(nodeID, node, nodes)
         responsePool = stringValue(node.responsePool),
         responseTemplate = stringValue(node.responseTemplate),
     }
+    local requiredSlots, requiredSlotsReason = normalizeNodeList(
+        node.requiredSlots, "node_required_slots"
+    )
+    if node.requiredSlots ~= nil and not requiredSlots then
+        return nil, requiredSlotsReason .. ":" .. tostring(nodeID)
+    end
+    local sourceFactRefs, sourceFactRefsReason = normalizeNodeList(
+        node.sourceFactRefs, "node_source_fact_refs"
+    )
+    if node.sourceFactRefs ~= nil and not sourceFactRefs then
+        return nil, sourceFactRefsReason .. ":" .. tostring(nodeID)
+    end
+    output.requiredSlots = requiredSlots
+    output.sourceFactRefs = sourceFactRefs
     local gate, reason = normalizeGate(node.gate, "node_gate")
     if node.gate ~= nil and not gate then return nil, reason end
     output.gate = gate

@@ -170,6 +170,20 @@ local function semanticTranslationKey(response)
             "UI_PNC_Conversation_Semantic_QuestionWellbeingFollowUpUnknown",
         ["semantic.question.wellbeing.follow_up.default"] =
             "UI_PNC_Conversation_Semantic_QuestionWellbeingFollowUpDefault",
+        ["semantic.question.needs.offer.hunger"] =
+            "UI_PNC_Conversation_Semantic_QuestionNeedsOfferHunger",
+        ["semantic.question.needs.offer.thirst"] =
+            "UI_PNC_Conversation_Semantic_QuestionNeedsOfferThirst",
+        ["semantic.question.needs.offer.fatigue"] =
+            "UI_PNC_Conversation_Semantic_QuestionNeedsOfferFatigue",
+        ["semantic.question.needs.offer.unknown"] =
+            "UI_PNC_Conversation_Semantic_QuestionNeedsOfferUnknown",
+        ["semantic.question.needs.quantity.hunger"] =
+            "UI_PNC_Conversation_Semantic_QuestionNeedsQuantityHunger",
+        ["semantic.question.needs.quantity.thirst"] =
+            "UI_PNC_Conversation_Semantic_QuestionNeedsQuantityThirst",
+        ["semantic.question.needs.quantity.unknown"] =
+            "UI_PNC_Conversation_Semantic_QuestionNeedsQuantityUnknown",
         ["semantic.social.apology.friendly"] =
             "UI_PNC_Conversation_Semantic_ApologyFriendly",
         ["semantic.social.apology.trusted"] =

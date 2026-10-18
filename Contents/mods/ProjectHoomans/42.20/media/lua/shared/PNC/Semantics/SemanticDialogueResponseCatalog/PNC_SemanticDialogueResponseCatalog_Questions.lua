@@ -238,6 +238,224 @@ if groundedRegistered ~= true then
         .. tostring(groundedReason) .. ")")
 end
 
+Catalog.Register("semantic.question.needs.offer", {
+    variants = {
+        {
+            id = "semantic.question.needs.offer.hunger",
+            templateID = "semantic.question.needs.offer.hunger",
+            fallback = "Food would help, but I don't have an exact amount yet.",
+            when = {
+                needType = "hunger",
+                needUrgency = { "moderate", "severe", "emergency", "critical" },
+            },
+            priority = 3,
+            plan = {
+                dialogueAct = "NEEDS_REPORT",
+                sourcePoolID = "semantic.question.needs.offer",
+                topic = "NEEDS",
+                groundedFactRefs = { "npc.needs.hunger" },
+                uncertainty = "known",
+                tone = "direct",
+                turns = {
+                    {
+                        id = "needs_report",
+                        continuation = "continue",
+                        segments = {
+                            {
+                                kind = "translation",
+                                templateID = "semantic.question.needs.offer.hunger",
+                                fallback = "Food would help, but I don't have an exact amount yet.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        {
+            id = "semantic.question.needs.offer.thirst",
+            templateID = "semantic.question.needs.offer.thirst",
+            fallback = "Water would help, but I don't have an exact amount yet.",
+            when = {
+                needType = "thirst",
+                needUrgency = { "moderate", "severe", "emergency", "critical" },
+            },
+            priority = 3,
+            plan = {
+                dialogueAct = "NEEDS_REPORT",
+                sourcePoolID = "semantic.question.needs.offer",
+                topic = "NEEDS",
+                groundedFactRefs = { "npc.needs.thirst" },
+                uncertainty = "known",
+                tone = "direct",
+                turns = {
+                    {
+                        id = "needs_report",
+                        continuation = "continue",
+                        segments = {
+                            {
+                                kind = "translation",
+                                templateID = "semantic.question.needs.offer.thirst",
+                                fallback = "Water would help, but I don't have an exact amount yet.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        {
+            id = "semantic.question.needs.offer.fatigue",
+            templateID = "semantic.question.needs.offer.fatigue",
+            fallback = "A little rest would help, but this isn't something I can count.",
+            when = {
+                needType = "fatigue",
+                needUrgency = { "moderate", "severe", "emergency", "critical" },
+            },
+            priority = 2,
+            plan = {
+                dialogueAct = "NEEDS_REPORT",
+                sourcePoolID = "semantic.question.needs.offer",
+                topic = "NEEDS",
+                groundedFactRefs = { "npc.needs.fatigue" },
+                uncertainty = "known",
+                tone = "direct",
+                turns = {
+                    {
+                        id = "needs_report",
+                        continuation = "continue",
+                        segments = {
+                            {
+                                kind = "translation",
+                                templateID = "semantic.question.needs.offer.fatigue",
+                                fallback = "A little rest would help, but this isn't something I can count.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        {
+            id = "semantic.question.needs.offer.unknown",
+            templateID = "semantic.question.needs.offer.unknown",
+            fallback = "I don't know what I need right now.",
+            priority = 0,
+            plan = {
+                dialogueAct = "NEEDS_REPORT",
+                sourcePoolID = "semantic.question.needs.offer",
+                topic = "NEEDS",
+                uncertainty = "unknown",
+                tone = "uncertain",
+                turns = {
+                    {
+                        id = "needs_report",
+                        continuation = "continue",
+                        segments = {
+                            {
+                                kind = "translation",
+                                templateID = "semantic.question.needs.offer.unknown",
+                                fallback = "I don't know what I need right now.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+    },
+})
+
+Catalog.Register("semantic.question.needs.quantity", {
+    variants = {
+        {
+            id = "semantic.question.needs.quantity.hunger",
+            templateID = "semantic.question.needs.quantity.hunger",
+            fallback = "I know food is what I need, but I can't give you an exact amount yet.",
+            when = {
+                needType = "hunger",
+                needUrgency = { "moderate", "severe", "emergency", "critical" },
+            },
+            priority = 3,
+            plan = {
+                dialogueAct = "NEEDS_QUANTITY",
+                sourcePoolID = "semantic.question.needs.quantity",
+                topic = "NEEDS",
+                groundedFactRefs = { "npc.needs.hunger" },
+                uncertainty = "pending",
+                tone = "direct",
+                turns = {
+                    {
+                        id = "needs_quantity",
+                        continuation = "end",
+                        segments = {
+                            {
+                                kind = "translation",
+                                templateID = "semantic.question.needs.quantity.hunger",
+                                fallback = "I know food is what I need, but I can't give you an exact amount yet.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        {
+            id = "semantic.question.needs.quantity.thirst",
+            templateID = "semantic.question.needs.quantity.thirst",
+            fallback = "I know water is what I need, but I can't give you an exact amount yet.",
+            when = {
+                needType = "thirst",
+                needUrgency = { "moderate", "severe", "emergency", "critical" },
+            },
+            priority = 3,
+            plan = {
+                dialogueAct = "NEEDS_QUANTITY",
+                sourcePoolID = "semantic.question.needs.quantity",
+                topic = "NEEDS",
+                groundedFactRefs = { "npc.needs.thirst" },
+                uncertainty = "pending",
+                tone = "direct",
+                turns = {
+                    {
+                        id = "needs_quantity",
+                        continuation = "end",
+                        segments = {
+                            {
+                                kind = "translation",
+                                templateID = "semantic.question.needs.quantity.thirst",
+                                fallback = "I know water is what I need, but I can't give you an exact amount yet.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        {
+            id = "semantic.question.needs.quantity.unknown",
+            templateID = "semantic.question.needs.quantity.unknown",
+            fallback = "I can't confirm an exact amount yet. Which item do you mean?",
+            priority = 0,
+            plan = {
+                dialogueAct = "ASK_CLARIFICATION",
+                sourcePoolID = "semantic.question.needs.quantity",
+                topic = "NEEDS",
+                groundedFactRefs = {},
+                uncertainty = "ambiguous",
+                tone = "clarifying",
+                turns = {
+                    {
+                        id = "needs_quantity_clarification",
+                        continuation = "end",
+                        segments = {
+                            {
+                                kind = "translation",
+                                templateID = "semantic.question.needs.quantity.unknown",
+                                fallback = "I can't confirm an exact amount yet. Which item do you mean?",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+    },
+})
+
 -- Keep an unsupported wellbeing snapshot out of the normal response pool.
 -- That pool already includes the bounded generated response variants; this
 -- separate pool makes uncertainty explicit without expanding its limit.

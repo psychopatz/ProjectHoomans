@@ -15,6 +15,17 @@ local targetText = Internal.TargetText
 local factFor = Internal.FactFor
 local locationText = Internal.LocationText
 
+local function resolveNeeds(ir, state, context)
+    if ir and ir.subject == "QUANTITY" then
+        return catalogResponse(
+            "semantic.question.needs.quantity", ir, state, context
+        )
+    end
+    return catalogResponse(
+        "semantic.question.needs.offer", ir, state, context
+    )
+end
+
 local function resolveTime(world)
     local text = clockText(world)
     if not text then return nil end
@@ -313,6 +324,9 @@ return function(ir, state, context)
     end
     if ir.subject == "WELLBEING" then
         return resolveWellbeing(ir, state, context)
+    end
+    if ir.subject == "NEEDS" or ir.subject == "QUANTITY" then
+        return resolveNeeds(ir, state, context)
     end
     if ir.subject == "LOCATION" or ir.subject == "SEEN" then
         return resolveLocationOrSeen(ir)
