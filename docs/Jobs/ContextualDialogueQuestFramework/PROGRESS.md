@@ -1,10 +1,10 @@
 # Contextual Dialogue & Quest Framework — current progress
 
 **Updated:** 2026-10-18
-**Audited branch/ref:** `codex/contextual-dialogue-quest-framework-0a` @ `65748a6d86cb7af7d4ebddd1b90b5233cc8fdb74` (source commit)
+**Audited branch/ref:** `codex/contextual-dialogue-quest-framework-0a` @ `d9bc28caca0c0e601ece103f28b08638926a8d80` (source commit)
 **PR:** #4 → main, OPEN (not merged); **main baseline:** `a3eb2e4db553f9c03b7f66a6ff6717878e1668e0`
-**Status:** PHASE 3 — Procedural semantic compiler. **2A, 2B, 2C, and 3A ACCEPTED** bounded action routes plus one compiler-backed authored FOLLOW definition. Phase 4 is next; the native PZ runtime remains unrun by instruction.
-**ONE Next Chunk:** **4A — expose the canonical semantic source through the existing Semantic Lab authoring/preview seam with explicit compiler diagnostics and no effectful preview.**
+**Status:** PHASE 4 — Practical integrated authoring UX. **2A, 2B, 2C, and 3A ACCEPTED**; 4A source-preview seam implemented and worker/app tests pass, while GUI click-through remains unverified. Native PZ runtime remains unrun by instruction.
+**ONE Next Chunk:** **4B — add explicit approved generation/reload handoff from the source preview, preserving preview purity and exact post-restart route evidence.**
 
 ## 2A acceptance ledger — FOLLOW
 
@@ -93,6 +93,12 @@
 - **Production integration:** existing semantic catalog, flow catalog, and response catalog load the explicit manifest; generated flow triggers can match only their authored pattern provenance, so hand-authored `Follow me` remains `noFlow` while generated phrases enter `pnc.dialogue.follow.flow`.
 - **Fresh-worker trace:** `Keep close behind me` and `Please keep close behind me` → generated exact pattern → Core IR `REQUEST/FOLLOW` → existing `PNC.SemanticCommandAdapter` → one mocked-authority `CompanionCommand` with `commandID=follow` and `capabilityID=pnc:companion.follow`; negated/question/past examples clarify with zero transport/tool calls. Preview is side-effect-free; restart reloads the same generated artifacts and routes again.
 - **Negative/determinism coverage:** compiler rejects unknown capabilities, existing/reserved utterance collisions, duplicate cross-definition utterances, non-imperative positive examples, unknown authored flow patterns, unreachable nodes, and translation collisions. Rebuild hash comparison is byte-identical; `git diff --check`, JSON, Python, `luac5.3`, and Kahlua verification pass.
+
+## 4A acceptance ledger — effect-free source preview
+
+- **Semantic Lab seam:** existing Flow editor toolbar now exposes `Compile source…`; it opens the canonical JSON source and calls the offline compiler adapter, not the Lua worker or a second parser.
+- **Preview report:** valid source reports schema, definition/capability/pattern/flow/response IDs, EN/TL keys, exact planned Lua/translation/manifest paths, `previewOnly=true`, `effectFree=true`, and `writes=[]`. Invalid source reports a bounded diagnostic and zero planned writes.
+- **Focused proof:** compiler/worker/Flow editor/app/source-preview tests — PASS, 38/38. `py_compile`, `git diff --check`, and doctor remain PASS. Native PZ SP/MP and real GUI click-through are not claimed; CUA exposes no native app surface in this environment.
 
 ## Agent routing and Git
 
