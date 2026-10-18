@@ -180,6 +180,17 @@ function OutputProjection.observation(context, record)
         fallback = response.fallback,
         text = response.fallback,
         key = response.templateID,
+        dialogueAct = response.dialogueAct
+            or response.plan and response.plan.dialogueAct,
+        topic = response.topic or response.plan and response.plan.topic,
+        groundedFactRefs = Values.copy(response.groundedFactRefs
+            or response.plan and response.plan.groundedFactRefs),
+        uncertainty = response.uncertainty
+            or response.plan and response.plan.uncertainty,
+        tone = response.tone or response.plan and response.plan.tone,
+        personalityStyle = response.personalityStyle
+            or response.plan and response.plan.personalityStyle,
+        selectionID = response.selectionID,
         selectionSource = response.selectionSource,
         sourceFlowID = response.sourceFlowID,
         flowTransition = response.flowTransition,
@@ -201,6 +212,14 @@ function OutputProjection.observation(context, record)
                 fallback = fallback,
                 key = payload.key or payload.translationKey,
                 plan = Values.copy(payload.plan),
+                dialogueAct = payload.plan and payload.plan.dialogueAct,
+                topic = payload.plan and payload.plan.topic,
+                groundedFactRefs = Values.copy(payload.plan
+                    and payload.plan.groundedFactRefs),
+                uncertainty = payload.plan and payload.plan.uncertainty,
+                tone = payload.plan and payload.plan.tone,
+                personalityStyle = payload.plan
+                    and payload.plan.personalityStyle,
                 translationKey = payload.translationKey,
                 translationKeys = Values.copy(payload.translationKeys),
                 planTurn = payload.planTurn,
@@ -230,6 +249,15 @@ function OutputProjection.observation(context, record)
                 responseObservation.planTurnID = queued.planTurnID
                 responseObservation.planContinuation = queued.planContinuation
                 responseObservation.translated = queued.translated
+                responseObservation.dialogueAct = queued.dialogueAct
+                responseObservation.topic = queued.topic
+                responseObservation.groundedFactRefs = Values.copy(
+                    queued.groundedFactRefs
+                )
+                responseObservation.uncertainty = queued.uncertainty
+                responseObservation.tone = queued.tone
+                responseObservation.personalityStyle =
+                    queued.personalityStyle
             end
         end
     end

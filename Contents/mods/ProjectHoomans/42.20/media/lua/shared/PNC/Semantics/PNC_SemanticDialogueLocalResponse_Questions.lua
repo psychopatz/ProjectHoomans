@@ -102,6 +102,9 @@ local function resolveWellbeing(ir, state, context)
     local needs = npc and npc.needs or nil
     local emotion = npc and npc.emotion or nil
     local healthState = npc and npc.healthState or nil
+    local personality = context and context.npcPersonality
+    local authoredStyle = type(personality) == "table"
+        and personality.socialStyle or nil
     if extensions and extensions.dialogueFollowUp == "WELLBEING"
         and type(followsWellbeingAnswer) == "function"
         and followsWellbeingAnswer(context)
@@ -109,6 +112,19 @@ local function resolveWellbeing(ir, state, context)
         return catalogResponse(
             "semantic.question.wellbeing.follow_up", ir, state, context
         )
+    end
+    if type(healthState) == "string"
+        and (healthState == "injured"
+            or healthState == "wounded"
+            or healthState == "critical")
+        and (authoredStyle == "friendly"
+            or authoredStyle == "protective"
+            or authoredStyle == "withdrawn")
+    then
+        local grounded = catalogResponse(
+            "semantic.question.wellbeing.grounded", ir, state, context
+        )
+        if grounded then return grounded end
     end
     local healthUnknown = type(healthState) ~= "string"
         or healthState == ""

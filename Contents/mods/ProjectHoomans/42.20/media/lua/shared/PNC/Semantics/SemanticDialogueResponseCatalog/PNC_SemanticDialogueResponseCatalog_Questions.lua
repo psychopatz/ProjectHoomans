@@ -150,6 +150,94 @@ Catalog.Register("semantic.question.wellbeing", {
     },
 })
 
+-- Grounded wellbeing uses a separate bounded pool so the generated dataset
+-- cannot crowd out the base question variants. The resolver enters this
+-- pool only when the existing situation provider exposes a known injury and
+-- an authored personality style.
+local groundedRegistered, groundedReason = Catalog.Register(
+    "semantic.question.wellbeing.grounded", {
+    variants = {
+        {
+            id = "semantic.question.wellbeing.grounded.friendly",
+            templateID = "semantic.question.wellbeing.grounded.friendly",
+            fallback = "I took a bad hit, but I'm steady enough to keep moving. Thanks for checking in.",
+            when = {
+                healthState = { "injured", "wounded", "critical" },
+                socialStyle = { "friendly", "protective" },
+            },
+            priority = 5,
+            plan = {
+                dialogueAct = "WELLBEING_REPORT",
+                sourcePoolID = "semantic.question.wellbeing.grounded",
+                topic = "WELLBEING",
+                groundedFactRefs = { "npc.healthState" },
+                uncertainty = "known",
+                tone = "warm",
+                personalityStyle = "friendly",
+                turns = {
+                    {
+                        id = "grounded_fact",
+                        continuation = "continue",
+                        segments = {
+                            {
+                                kind = "translation",
+                                templateID = "semantic.question.wellbeing.grounded.friendly.fact",
+                                fallback = "I took a bad hit, but I'm steady enough to keep moving.",
+                            },
+                            {
+                                kind = "translation",
+                                templateID = "semantic.question.wellbeing.grounded.friendly.tone",
+                                fallback = "Thanks for checking in.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+        {
+            id = "semantic.question.wellbeing.grounded.withdrawn",
+            templateID = "semantic.question.wellbeing.grounded.withdrawn",
+            fallback = "I'm hurt, but I'm managing. I'd rather not make a big thing of it.",
+            when = {
+                healthState = { "injured", "wounded", "critical" },
+                socialStyle = "withdrawn",
+            },
+            priority = 5,
+            plan = {
+                dialogueAct = "WELLBEING_REPORT",
+                sourcePoolID = "semantic.question.wellbeing.grounded",
+                topic = "WELLBEING",
+                groundedFactRefs = { "npc.healthState" },
+                uncertainty = "known",
+                tone = "guarded",
+                personalityStyle = "withdrawn",
+                turns = {
+                    {
+                        id = "grounded_fact",
+                        continuation = "continue",
+                        segments = {
+                            {
+                                kind = "translation",
+                                templateID = "semantic.question.wellbeing.grounded.withdrawn.fact",
+                                fallback = "I'm hurt, but I'm managing.",
+                            },
+                            {
+                                kind = "translation",
+                                templateID = "semantic.question.wellbeing.grounded.withdrawn.tone",
+                                fallback = "I'd rather not make a big thing of it.",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+    },
+})
+if groundedRegistered ~= true then
+    error("grounded wellbeing response pool unavailable ("
+        .. tostring(groundedReason) .. ")")
+end
+
 -- Keep an unsupported wellbeing snapshot out of the normal response pool.
 -- That pool already includes the bounded generated response variants; this
 -- separate pool makes uncertainty explicit without expanding its limit.

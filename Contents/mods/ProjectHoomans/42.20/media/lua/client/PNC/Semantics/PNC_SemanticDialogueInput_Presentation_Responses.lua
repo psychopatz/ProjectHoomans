@@ -132,6 +132,14 @@ local function semanticTranslationKey(response)
             "UI_PNC_Conversation_Semantic_QuestionWellbeingFatigueAlt",
         ["semantic.question.wellbeing.injured"] =
             "UI_PNC_Conversation_Semantic_QuestionWellbeingInjured",
+        ["semantic.question.wellbeing.grounded.friendly.fact"] =
+            "UI_PNC_Conversation_Semantic_QuestionWellbeingGroundedFriendlyFact",
+        ["semantic.question.wellbeing.grounded.friendly.tone"] =
+            "UI_PNC_Conversation_Semantic_QuestionWellbeingGroundedFriendlyTone",
+        ["semantic.question.wellbeing.grounded.withdrawn.fact"] =
+            "UI_PNC_Conversation_Semantic_QuestionWellbeingGroundedWithdrawnFact",
+        ["semantic.question.wellbeing.grounded.withdrawn.tone"] =
+            "UI_PNC_Conversation_Semantic_QuestionWellbeingGroundedWithdrawnTone",
         ["semantic.question.wellbeing.default"] =
             "UI_PNC_Conversation_Semantic_QuestionWellbeingDefault",
         ["semantic.question.wellbeing.dataset.hanging_in"] =

@@ -198,6 +198,14 @@ local function normalizedVariant(poolID, index, value)
         templateID = tostring(value.templateID or id),
         fallback = fallback,
         plan = plan,
+        dialogueAct = value.dialogueAct,
+        topic = value.topic,
+        groundedFactRefs = copy(
+            value.groundedFactRefs or value.sourceFactRefs
+        ),
+        uncertainty = value.uncertainty,
+        tone = value.tone,
+        personalityStyle = value.personalityStyle,
         when = copy(value.when),
         priority = tonumber(value.priority) or 0,
     }
@@ -346,6 +354,12 @@ function Catalog.Select(id, context, salt)
         templateID = variant.templateID,
         fallback = variant.fallback,
         plan = variant.plan,
+        dialogueAct = variant.dialogueAct,
+        topic = variant.topic,
+        groundedFactRefs = copy(variant.groundedFactRefs),
+        uncertainty = variant.uncertainty,
+        tone = variant.tone,
+        personalityStyle = variant.personalityStyle,
     }, selectedIndex
 end
 

@@ -71,6 +71,13 @@ local function copyArgs(values)
     return output
 end
 
+local function copyList(values)
+    local output = {}
+    if type(values) ~= "table" then return output end
+    for index = 1, #values do output[index] = values[index] end
+    return output
+end
+
 local function socialCounts(state)
     local hostilityCount = 0
     local insultCount = 0
@@ -195,6 +202,14 @@ local function catalogResponse(poolID, ir, state, context, args)
         args = copyArgs(args),
         sourcePoolID = poolID,
         plan = plan,
+        dialogueAct = selected.dialogueAct,
+        topic = selected.topic,
+        groundedFactRefs = copyList(selected.groundedFactRefs),
+        uncertainty = selected.uncertainty,
+        tone = selected.tone,
+        personalityStyle = selected.personalityStyle,
+        selectionSource = "catalog",
+        selectionID = selected.id,
     }
 end
 
@@ -202,6 +217,7 @@ end
 Response.Internal = Response.Internal or {}
 local Internal = Response.Internal
 Internal.CopyArgs = copyArgs
+Internal.CopyList = copyList
 Internal.SocialCounts = socialCounts
 Internal.SelectorContext = selectorContext
 Internal.CatalogResponse = catalogResponse
