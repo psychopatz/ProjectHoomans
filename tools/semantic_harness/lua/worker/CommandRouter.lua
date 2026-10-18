@@ -6,6 +6,7 @@ local capabilities = {
     "CONFIG", "RESET", "INPUT", "LANGUAGE", "TOOL_REPLY",
     "PREVIEW", "SNAPSHOT", "FLOW_CATALOG", "FLOW_VALIDATE",
     "FLOW_REGISTER", "PING", "CAPABILITIES", "QUIT",
+    "FACT_CATALOG", "EVENT_CATALOG",
 }
 
 function CommandRouter.hello(context)
@@ -62,6 +63,20 @@ function CommandRouter.dispatch(context, request)
             return nil, "flow_definition_must_be_object"
         end
         return context.FlowEditor.register(context, payload)
+    elseif command == "FACT_CATALOG" then
+        return {
+            ok = true,
+            type = "fact_catalog",
+            facts = context.EngineFacts and context.EngineFacts.List
+                and context.EngineFacts.List() or {},
+        }
+    elseif command == "EVENT_CATALOG" then
+        return {
+            ok = true,
+            type = "event_catalog",
+            events = context.EngineEvents and context.EngineEvents.ListTypes
+                and context.EngineEvents.ListTypes() or {},
+        }
     elseif command == "PING" then
         return {
             ok = true,

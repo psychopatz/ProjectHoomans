@@ -60,10 +60,14 @@ local Context = {
     OutputProjection = OutputProjection,
     FlowEditor = FlowEditor,
     ScenarioSession = ScenarioSession,
+    EngineFacts = nil,
+    EngineEvents = nil,
 }
 
 ScenarioSession.configureRuntime(Context)
 ProductionModules.load(Context)
+Context.EngineFacts = PNC.Semantics.EngineFacts
+Context.EngineEvents = PNC.Semantics.EngineEvents
 ScenarioSession.reset(Context, ScenarioSession.initialScenario)
 
 Protocol.emit(CommandRouter.hello(Context), "__hello__")

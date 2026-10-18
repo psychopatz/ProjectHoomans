@@ -70,6 +70,7 @@ function Conversation.buildContext(context)
         relationship = copy(relationship),
         npcTraits = copy(npc.traits or {}),
         npcPersonality = copy(npc.personality or {}),
+        semanticFactValues = copy(context.semanticFactValues or {}),
         player = nil,
         playerNameKnown = true,
         playerName = context.SemanticAdapters.playerName(context, player),
@@ -145,15 +146,39 @@ function Conversation.relationshipSnapshot(context)
 end
 
 function Conversation.contextSnapshot(harnessContext, view)
+    local Values = harnessContext.Values
     local session = view and view.session
     local dialogueContext = session and session.semanticDialogueContext
     local semanticState = session and session.semanticDialogueState
     local null = harnessContext.Protocol.NULL
+    local worldContext = PNC.Semantics.WorldContext
+        and PNC.Semantics.WorldContext.Get
+        and PNC.Semantics.WorldContext.Get({ player = harnessContext.player })
+        or nil
+    local engineFacts = {}
+    local factCatalog = harnessContext.EngineFacts
+        and harnessContext.EngineFacts.List
+        and harnessContext.EngineFacts.List() or {}
+    local factIndex
+    for factIndex = 1, #factCatalog do
+        local factID = factCatalog[factIndex].id
+        local record = harnessContext.EngineFacts.Resolve(factID, {
+            worldContext = worldContext,
+            semanticFactValues = harnessContext.semanticFactValues,
+            engineFacts = harnessContext.engineFacts,
+            player = harnessContext.player,
+        })
+        engineFacts[factID] = Values.copy(record)
+    end
     return {
         dialogue = dialogueContext and dialogueContext.ToContext
             and dialogueContext:ToContext() or null,
         state = semanticState and semanticState.Snapshot
             and semanticState:Snapshot() or null,
+        engineFacts = engineFacts,
+        engineEvents = harnessContext.EngineEvents
+            and harnessContext.EngineEvents.Recent
+            and Values.copy(harnessContext.EngineEvents.Recent()) or {},
     }
 end
 

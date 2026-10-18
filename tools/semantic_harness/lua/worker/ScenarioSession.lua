@@ -21,7 +21,14 @@ ScenarioSession.initialScenario = {
         traits = { "reserved" },
         relationship = { approval = 0, respect = 0, familiarity = 0, revision = 1 },
     },
-    world = { hunger = 0.2, thirst = 0.4, fatigue = 0.1, timeOfDay = 13.5, worldAgeHours = 49.5 },
+    world = {
+        hunger = 0.2,
+        thirst = 0.4,
+        fatigue = 0.1,
+        timeOfDay = 13.5,
+        worldAgeHours = 49.5,
+        zombieKills = 0,
+    },
     conversation = { topic = "greeting", token = "harness-lease" },
     runtime = { mode = "singleplayer", language = "EN", llmEnabled = false, providerAvailable = false },
 }

@@ -62,7 +62,19 @@ class SemanticHarnessApp:
     def _build_ui(self) -> None:
         ttk = self._ttk
         ScrolledText = self._ScrolledText
-        container = ttk.Frame(self.root, padding=8)
+        self.main_tabs = ttk.Notebook(self.root)
+        self.main_tabs.pack(fill="both", expand=True, padx=6, pady=6)
+
+        simulation_tab = ttk.Frame(self.main_tabs, padding=8)
+        editor_tab = ttk.Frame(self.main_tabs, padding=8)
+        simulation_tab.rowconfigure(0, weight=1)
+        simulation_tab.columnconfigure(0, weight=1)
+        editor_tab.rowconfigure(0, weight=1)
+        editor_tab.columnconfigure(0, weight=1)
+        self.main_tabs.add(simulation_tab, text="Simulation")
+        self.main_tabs.add(editor_tab, text="Flow editor")
+
+        container = ttk.Frame(simulation_tab)
         container.pack(fill="both", expand=True)
         container.columnconfigure(0, weight=3)
         container.columnconfigure(1, weight=2)
@@ -133,7 +145,8 @@ class SemanticHarnessApp:
         self.trace.grid(row=0, column=0, sticky="nsew")
         self.trace_tabs.add(raw_frame, text="Raw worker record")
 
-        flow_frame = ttk.Frame(self.trace_tabs)
+        flow_frame = ttk.Frame(editor_tab)
+        flow_frame.grid(row=0, column=0, sticky="nsew")
         flow_frame.rowconfigure(0, weight=1)
         flow_frame.columnconfigure(0, weight=1)
         self.flow_editor = FlowEditorPane(
@@ -147,7 +160,6 @@ class SemanticHarnessApp:
             on_validate=self.validate_flow_draft,
             on_register=self.register_flow_draft,
         )
-        self.trace_tabs.add(flow_frame, text="Flow editor")
 
         self._append("SYSTEM", "Window ready. Starting the isolated Lua worker…")
         self._set_controls(False)
@@ -232,16 +244,22 @@ class SemanticHarnessApp:
         self._set_status(f"Ready · Lua PID {result.status.get('pid')}")
         self._set_controls(True)
         self._append("SYSTEM", "Lua worker ready. Production semantic modules are loaded.")
+        capabilities = result.capabilities or {}
+        flow_catalog = capabilities.get("flowCatalog", {})
         self._set_text(
             self.inspector,
             pretty({
                 "state": "ready",
                 "worker": result.status,
-                "capabilities": result.capabilities,
+                "flows": flow_catalog.get("flowCount", 0),
+                "engineFacts": len(flow_catalog.get("factCatalog", [])),
+                "engineEvents": len(flow_catalog.get("eventCatalog", [])),
+                "commands": len(flow_catalog.get("commandCatalog", [])),
+                "hint": "Use the Flow editor tab to build and validate production branches.",
             }),
         )
-        self._set_text(self.trace, pretty(result.capabilities))
-        self.flow_editor.set_catalog(result.capabilities.get("flowCatalog", {}))
+        self._set_text(self.trace, pretty(capabilities))
+        self.flow_editor.set_catalog(flow_catalog)
 
     def _start_operation(
         self,

@@ -6,9 +6,16 @@ local FlowEditor = {}
 local Registry = require
     "PNC/Semantics/PNC_SemanticDialogueFlowCatalog"
 
+local function capabilityCatalog()
+    return PNC.Semantics.CapabilityCatalog
+        or require "PNC/Semantics/PNC_SemanticCapabilityCatalog"
+end
+
 local function catalog(context)
     local Values = context.Values
     local flows = {}
+    local CapabilityCatalog = capabilityCatalog()
+    local semanticCatalog = CapabilityCatalog.Snapshot()
     local index
     local flowID
     local flow
@@ -25,6 +32,25 @@ local function catalog(context)
         registryRevision = Registry.GetRevision(),
         flowCount = #flows,
         flows = flows,
+        factCatalog = PNC.Semantics.EngineFacts
+            and PNC.Semantics.EngineFacts.List
+            and PNC.Semantics.EngineFacts.List() or {},
+        eventCatalog = PNC.Semantics.EngineEvents
+            and PNC.Semantics.EngineEvents.ListTypes
+            and PNC.Semantics.EngineEvents.ListTypes() or {},
+        commandCatalog = CapabilityCatalog.ListCommandActions(),
+        actionCatalog = semanticCatalog.actions,
+        triggerCatalog = semanticCatalog.triggers,
+        conceptCatalog = semanticCatalog.concepts,
+        speechActCatalog = semanticCatalog.speechActs,
+        semanticCatalog = {
+            schemaVersion = semanticCatalog.schemaVersion,
+            registryRevision = semanticCatalog.registryRevision,
+            actionCount = #semanticCatalog.actions,
+            triggerCount = #semanticCatalog.triggers,
+            conceptCount = #semanticCatalog.concepts,
+            speechActCount = #semanticCatalog.speechActs,
+        },
     }
 end
 

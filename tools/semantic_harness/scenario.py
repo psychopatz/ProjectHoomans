@@ -98,6 +98,8 @@ DEFAULT_SCENARIO: dict[str, Any] = {
         "weather": "clear",
         "timeOfDay": 13.5,
         "worldAgeHours": 49.5,
+        "zombieKills": 0,
+        "weatherTransition": None,
     },
     "conversation": {
         "topic": "greeting",

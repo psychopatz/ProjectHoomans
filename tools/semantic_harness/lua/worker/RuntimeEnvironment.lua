@@ -52,6 +52,35 @@ function RuntimeEnvironment.configure(context)
     context.npcData = npcData
     context.world = world
     context.runtime = runtime
+    context.semanticFactValues = {}
+    if world.zombieKills ~= nil then
+        context.semanticFactValues["player.stats.zombie_kills"] = {
+            status = "known",
+            value = Values.number(world.zombieKills, 0),
+            type = "number",
+            unit = "count",
+            authority = "harness",
+        }
+    end
+    if world.weatherTransition ~= nil then
+        context.semanticFactValues["world.weather.transition"] = {
+            status = "known",
+            value = tostring(world.weatherTransition),
+            type = "string",
+            unit = "transition",
+            authority = "harness",
+        }
+    end
+    if PNC.Semantics and PNC.Semantics.WorldContext
+        and type(PNC.Semantics.WorldContext.Clear) == "function"
+    then
+        PNC.Semantics.WorldContext.Clear()
+    end
+    if PNC.Semantics and PNC.Semantics.EngineEvents
+        and type(PNC.Semantics.EngineEvents.Reset) == "function"
+    then
+        PNC.Semantics.EngineEvents.Reset()
+    end
 
     Translator = {
         getLanguage = function()
@@ -95,6 +124,9 @@ function RuntimeEnvironment.configure(context)
         getZ = function() return 0 end,
         getHoursSurvived = function()
             return Values.number(world.worldAgeHours, 0)
+        end,
+        getZombieKills = function()
+            return world.zombieKills
         end,
         getInventory = function()
             return context.InventoryFixtures.nativeInventory(
@@ -147,6 +179,24 @@ function RuntimeEnvironment.configure(context)
                 or world.weather == "snow"
             then
                 return 0
+            end
+            return nil
+        end,
+        getSnowIntensity = function()
+            if world.weather == "snow" then return 0.8 end
+            if world.weather == "clear" or world.weather == "rain"
+                or world.weather == "fog"
+            then
+                return 0
+            end
+            return nil
+        end,
+        isSnowing = function()
+            if world.weather == "snow" then return true end
+            if world.weather == "clear" or world.weather == "rain"
+                or world.weather == "fog"
+            then
+                return false
             end
             return nil
         end,

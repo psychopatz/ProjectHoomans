@@ -257,6 +257,10 @@ function OutputProjection.observation(context, record)
             pendingIdentityExchange = record.contextAfter
                 and record.contextAfter.dialogue
                 and record.contextAfter.dialogue.pendingIdentityExchange,
+            engineFacts = Values.copy(record.contextAfter
+                and record.contextAfter.engineFacts),
+            engineEvents = Values.copy(record.contextAfter
+                and record.contextAfter.engineEvents),
         },
         selectedCandidate = {
             patternID = selectedCandidate.patternID,

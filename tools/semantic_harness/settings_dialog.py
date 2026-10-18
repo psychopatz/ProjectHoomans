@@ -62,9 +62,12 @@ def collect_scenario_settings(draft: dict[str, Any], values: Mapping[str, Any]) 
         updated_runtime[key] = str(read_value(f"runtime.{key}")).strip()
     for key in ("llmEnabled", "providerAvailable"):
         updated_runtime[key] = bool(read_value(f"runtime.{key}"))
-    for key in ("hunger", "thirst", "fatigue", "stress", "boredom", "panic", "timeOfDay", "worldAgeHours"):
-        updated_world[key] = number_value(f"world.{key}")
+    for key in ("hunger", "thirst", "fatigue", "stress", "boredom", "panic", "timeOfDay", "worldAgeHours", "zombieKills"):
+        if f"world.{key}" in values:
+            updated_world[key] = number_value(f"world.{key}")
     updated_world["weather"] = str(read_value("world.weather")).strip()
+    if "world.weatherTransition" in values:
+        updated_world["weatherTransition"] = str(read_value("world.weatherTransition")).strip() or None
     for key in ("characterUUID", "forename", "surname", "displayName"):
         updated_player[key] = str(read_value(f"player.{key}")).strip()
     for key in ("npcID", "forename", "surname", "identityState", "relationshipState"):
@@ -201,15 +204,16 @@ def open_runtime_settings(host: SettingsDialogHost) -> None:
 
     world_page = page("World")
     for row, key in enumerate(
-        ("hunger", "thirst", "fatigue", "stress", "boredom", "panic", "timeOfDay", "worldAgeHours")
+        ("hunger", "thirst", "fatigue", "stress", "boredom", "panic", "timeOfDay", "worldAgeHours", "zombieKills")
     ):
         text_field(world_page, row, f"world.{key}", key, world.get(key))
-    combo_field(world_page, 8, "world.weather", "Weather", world.get("weather"), ("clear", "rain", "fog"))
+    combo_field(world_page, 9, "world.weather", "Weather", world.get("weather"), ("clear", "rain", "fog", "snow"))
+    text_field(world_page, 10, "world.weatherTransition", "Weather transition", world.get("weatherTransition"))
     ttk.Label(
         world_page,
-        text="Needs use the game-style 0–1 scale. Time of day is in hours; world age is in hours.",
+        text="Needs use the game-style 0–1 scale. Time and zombie kills are engine facts; an optional transition simulates an observed weather event.",
         wraplength=560,
-    ).grid(row=9, column=0, columnspan=2, sticky="w", pady=(14, 4))
+    ).grid(row=11, column=0, columnspan=2, sticky="w", pady=(14, 4))
 
     actors_page = page("Player / NPC")
     actors_page.columnconfigure(1, weight=1)

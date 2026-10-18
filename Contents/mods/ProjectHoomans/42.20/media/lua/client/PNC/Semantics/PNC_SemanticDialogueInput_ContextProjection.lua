@@ -120,6 +120,17 @@ function Projection.Build(view, getProviderStatus)
             player = localPlayer(view, source),
         })
     end
+    local enginePlayer = localPlayer(view, source)
+    local nativeKills
+    if enginePlayer and type(enginePlayer.getZombieKills) == "function" then
+        local ok, value = pcall(enginePlayer.getZombieKills, enginePlayer)
+        if ok then nativeKills = tonumber(value) end
+    end
+    if nativeKills ~= nil then
+        output.engineFacts = type(output.engineFacts) == "table"
+            and output.engineFacts or {}
+        output.engineFacts["player.stats.zombie_kills"] = nativeKills
+    end
     if Situation and type(Situation.Build) == "function" then
         output.dialogueSituation = Situation.Build(output)
     end

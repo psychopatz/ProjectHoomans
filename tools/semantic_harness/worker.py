@@ -106,6 +106,16 @@ class LuaSemanticWorker:
 
         return self._request("FLOW_CATALOG")
 
+    def fact_catalog(self) -> list[dict[str, Any]]:
+        """Read typed engine facts exposed to semantic gates and context."""
+
+        return self._request("FACT_CATALOG").get("facts", [])
+
+    def event_catalog(self) -> list[dict[str, Any]]:
+        """Read bounded engine notification types."""
+
+        return self._request("EVENT_CATALOG").get("events", [])
+
     def validate_flow(self, definition: dict[str, Any]) -> dict[str, Any]:
         """Validate a draft through the production Lua flow registry."""
 

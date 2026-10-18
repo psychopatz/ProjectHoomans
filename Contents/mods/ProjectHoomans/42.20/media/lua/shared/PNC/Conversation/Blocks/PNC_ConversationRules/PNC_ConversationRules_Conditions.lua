@@ -1,6 +1,10 @@
 local Rules = PNC.Conversation.Rules
 local Internal = Rules.Internal
 local Registry = PNC.Conversation.Registry
+local EngineFacts = PNC.Semantics and PNC.Semantics.EngineFacts
+if type(EngineFacts) ~= "table" then
+    EngineFacts = require "PNC/Semantics/PNC_SemanticEngineFacts"
+end
 
 function Internal.Compare(actual, operator, expected)
     operator = operator or ">="
@@ -128,6 +132,27 @@ local function weatherMatches(context, gate)
     return false, gate.failReasonKey or "weather_mismatch"
 end
 
+local function engineFactMatches(context, gate)
+    local factID = gate.fact or gate.subject
+    local fact = EngineFacts.Resolve(factID, context)
+    local matches
+    if type(fact) ~= "table" or fact.status ~= "known" then
+        if gate.unknownPolicy == "pass" then
+            return true, gate.unknownReasonKey or "engine_fact_unknown_allowed"
+        end
+        if gate.unknownPolicy == "fail" then
+            return false, gate.unknownReasonKey or "engine_fact_unknown_failed"
+        end
+        return nil, gate.unknownReasonKey or fact.reason
+            or "engine_fact_unknown"
+    end
+    matches = EngineFacts.Compare(fact, gate.operator or "==", gate.value)
+    if matches then
+        return true, gate.passReasonKey or "engine_fact_matches"
+    end
+    return false, gate.failReasonKey or "engine_fact_mismatch"
+end
+
 local BUILTINS = {
     ["pnc:skill"] = function(context, gate)
         return Internal.Compare(
@@ -163,6 +188,7 @@ local BUILTINS = {
     ["pnc:time"] = timeMatches,
     ["pnc:history"] = historyMatches,
     ["pnc:weather"] = weatherMatches,
+    ["pnc:fact"] = engineFactMatches,
     ["pnc:base_not_established"] = function(context)
         return context.baseEstablished ~= true
     end,

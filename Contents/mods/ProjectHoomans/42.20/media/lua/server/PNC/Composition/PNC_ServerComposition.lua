@@ -92,6 +92,7 @@ require "PNC/Compatibility/Mods/ProjectALife/PNC_ProjectALife_RelationPersistenc
 require "PNC/Server/PNC_PersistenceCoordinator"
 require "PNC/Semantics/PNC_SemanticCognitionService"
 require "PNC/Semantics/PNC_SemanticCognitionEvidence"
+require "PNC/Semantics/PNC_SemanticEngineEvents_Server"
 require "PNC/Companions/PNC_StartingCompanionService"
 require "PNC/Knowledge/PNC_PlayerKnowledgeCommands"
 require "PNC/Knowledge/PNC_KnowledgeSocialEventAdapter"

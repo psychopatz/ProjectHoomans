@@ -44,6 +44,10 @@ local GATE_FIELDS = {
     endHour = true,
     gates = true,
     gate = true,
+    fact = true,
+    subject = true,
+    unit = true,
+    unknownPolicy = true,
 }
 
 local function copyValue(value, depth)
@@ -150,6 +154,9 @@ local function normalizeGate(gate, label)
     end
     local gateType = stringValue(gate.type)
     if not gateType then return nil, label .. "_requires_type" end
+    if gateType == "pnc:fact" and not stringValue(gate.fact or gate.subject) then
+        return nil, label .. "_fact_required"
+    end
     local output = { type = gateType }
     local key
     local value
