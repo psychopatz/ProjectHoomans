@@ -1,14 +1,14 @@
 # Contextual Dialogue & Quest Framework — current progress
 
-**Updated:** 2026-10-19, after the C5-B reviewed dataset preview/restart slice.
+**Updated:** 2026-10-19, after the C5-C reviewed artifact diff slice.
 
-**Local implementation:** branch `codex/contextual-dialogue-quest-framework-0a`; implementation is committed through `06b2afac` (C5-B reviewed dataset preview/restart), following C5-A `f78bc77c`, C4-D `eceec6c9`, C4-C `cbd1de71`, C4-B `fc6d450d`, C4-A `7eb42777`, C3-D `f41ad18a`, C3-C `536b7141`, C3-B `a22b1d78`, C3-A `9ef46d2e`, C2-A `8a4e0b0e`, C1-A `470bb915`, C0-A `ca65049c`, G3C `9946fe69`, and documentation commit `32aceac7`. Earlier accepted slices remain `0cfcc345` (all dispatchable actions), `b1102486` (safe regeneration), `68c313fe` (multi-stage gifts), `b242e78c` (parameterized tasks), and `6290b3f74279731c7d80e97e077e88c10d35d676` (simple commands). Shared branch history also preserves unrelated concurrent P0B import-planner commits.
+**Local implementation:** branch `codex/contextual-dialogue-quest-framework-0a`; implementation is committed through `e9c5b13f` (C5-C reviewed artifact diff), following C5-B `06b2afac`, C5-A `f78bc77c`, C4-D `eceec6c9`, C4-C `cbd1de71`, C4-B `fc6d450d`, C4-A `7eb42777`, C3-D `f41ad18a`, C3-C `536b7141`, C3-B `a22b1d78`, C3-A `9ef46d2e`, C2-A `8a4e0b0e`, C1-A `470bb915`, C0-A `ca65049c`, G3C `9946fe69`, and documentation commit `32aceac7`. Earlier accepted slices remain `0cfcc345` (all dispatchable actions), `b1102486` (safe regeneration), `68c313fe` (multi-stage gifts), `b242e78c` (parameterized tasks), and `6290b3f74279731c7d80e97e077e88c10d35d676` (simple commands). Shared branch history also preserves unrelated concurrent P0B import-planner commits.
 
 **Upstream baseline:** `origin/docs/contextual-dialogue-quest-framework-20261018` at `a79b01ff14be33178f699c50623a20524b04d46c`; the local implementation is intentionally ahead of that documentation baseline.
 
-**Current goal status:** **IN PROGRESS — G3C, C0-A, C1-A, C2-A, C3-A, C3-B, C3-C, C3-D, C4-A, C4-B, C4-C, C4-D, C5-A, and C5-B accepted; C5-C–C6, full production-harness/performance, and user-owned native-game gates remain open.**
+**Current goal status:** **IN PROGRESS — G3C, C0-A, C1-A, C2-A, C3-A, C3-B, C3-C, C3-D, C4-A, C4-B, C4-C, C4-D, C5-A, C5-B, and C5-C accepted; C5-D–C6, full production-harness/performance, and user-owned native-game gates remain open.**
 
-**ONE Next Chunk:** **C5-C — add a bounded Semantic Lab source/diff approval view for the reviewed dataset artifacts, reusing the C5-B report and existing generation confirmation without introducing a second source of truth or write path.**
+**ONE Next Chunk:** **C5-D — add an explicit approved dialogue-artifact generation and worker-reload path through the existing Code Builder writer, with no alternate write path or runtime dataset store.**
 
 ## Accepted historic foundation (do not redo)
 
@@ -410,7 +410,38 @@ Focused acceptance evidence `06b2afac`:
 - Codebase-memory coverage for `authoring.py`, `flow_editor.py`, `gui.py`, the new review test, `compiler.py`, and `common_interactions.json` returned `no_recorded_issue`; the indexed generation predates these edits and marks changed files `metadata_changed`/`not_tracked`, so acceptance relies on direct source reads and fresh-worker evidence rather than stale graph freshness.
 - No Project Zomboid process, multiplayer hosting, mod installation, Workshop publication, or native-game test was launched.
 
-C5-B does not implement persistent reviewer approvals, source diffs, performance/isolation measurement, optional PBrainZ parity, or the final mandatory conversation. C5-C is the single next bounded chunk.
+C5-B does not implement persistent reviewer approvals, source diffs, performance/isolation measurement, optional PBrainZ parity, or the final mandatory conversation. C5-C was the next bounded chunk and is now accepted below.
+
+## C5-C accepted — bounded generated-artifact diff view
+
+C5-C extends the C5-B read-only dataset report with a bounded comparison of
+the deterministic Code Builder preview against the checked-in generated Lua,
+EN/TL translation, and conversation-manifest files. Each artifact reports
+`unchanged`, `changed`, `added`, or `unreadable`, expected/current hashes and
+sizes, and a capped unified diff. The existing Semantic Lab status line and
+inspector expose the changed-artifact count; no comparison writes files or
+creates another source of truth.
+
+The current checkout reports all nine generated dialogue artifacts unchanged.
+A temporary stale artifact is reported as `changed` with a bounded diff, and
+an empty repository reports missing outputs as `added`; both fixtures keep an
+empty writes list. The existing real-worker restart test remains part of the
+same review suite, so the diff view is tied to actual production catalog
+output rather than a Python-only rendering.
+
+Focused acceptance evidence `e9c5b13f`:
+
+- `python3 -m unittest tools.semantic_harness.tests.test_dataset_review tools.semantic_harness.tests.test_app tools.semantic_harness.tests.test_flow_editor -q` — **22/22 passed**.
+- `python3 -m unittest discover -s tools/semantic_harness/tests -q` — **171/171 passed** (`testsRun=171`, `failures=0`, `errors=0`).
+- `python3 -m unittest discover -s tools/semantic_compiler/tests -q` — **15/15 passed**.
+- `./tools/semantic_harness/run_harness.sh --doctor --doctor-json` passed Python, repository, virtualenv, Tk/display, Core, Lua, worker syntax, boot, PING, and CAPABILITIES checks; `python3 -m py_compile` and `git diff --check` passed.
+- `pz_verify --kahlua --severity ERROR --no-snippets` scanned 2,938 Lua files and reported **0 errors / 0 warnings**.
+- Codebase-memory coverage for the changed Semantic Lab files and review test returned `no_recorded_issue`; changed files remain freshness-qualified (`metadata_changed`/`not_tracked`), so acceptance relies on direct reads and fresh-worker evidence rather than stale graph freshness.
+- No Project Zomboid process, multiplayer hosting, mod installation, Workshop publication, or native-game test was launched.
+
+C5-C does not add an artifact write/approval action, performance/isolation
+measurement, optional PBrainZ parity, or the final mandatory conversation.
+C5-D is the single next bounded chunk.
 
 ## Verification evidence
 
@@ -431,13 +462,13 @@ C5-B does not implement persistent reviewer approvals, source diffs, performance
 
 ## Scope boundary
 
-G0A, G0B, G0C, G0D/G0D-2, G0E, G0F, G0G, G0H, G0I, G3A, G3B, G3C, C0-A, C1-A, C2-A, C3-A, C3-B, C3-C, C3-D, C4-A, C4-B, C4-C, C4-D, C5-A, and C5-B are accepted implementation slices, not completion of the expanded goal. G3B's Semantic Lab/X11 gate, G3C's real-worker boundary, C0-A's worker authority regression gate, C1-A's context/resumption gate, C2-A's Knowledge commitment gate, C3-A/C3-B/C3-C/C3-D response-plan gates, C4-A's reviewed compiler/worker gate, C4-B's clarification/worker gate, C4-C's weather/resumption worker gate, C4-D's unknown-fact wellbeing gate, C5-A's read-only inspector gate, and C5-B's reviewed dataset preview/restart gate are verified; native Project Zomboid SP/MP and Workshop actions remain user-owned. Continue with the single C5-C chunk above before any READY FOR USER LIVE TEST claim.
+G0A, G0B, G0C, G0D/G0D-2, G0E, G0F, G0G, G0H, G0I, G3A, G3B, G3C, C0-A, C1-A, C2-A, C3-A, C3-B, C3-C, C3-D, C4-A, C4-B, C4-C, C4-D, C5-A, C5-B, and C5-C are accepted implementation slices, not completion of the expanded goal. G3B's Semantic Lab/X11 gate, G3C's real-worker boundary, C0-A's worker authority regression gate, C1-A's context/resumption gate, C2-A's Knowledge commitment gate, C3-A/C3-B/C3-C/C3-D response-plan gates, C4-A's reviewed compiler/worker gate, C4-B's clarification/worker gate, C4-C's weather/resumption worker gate, C4-D's unknown-fact wellbeing gate, C5-A's read-only inspector gate, C5-B's reviewed dataset preview/restart gate, and C5-C's artifact-diff gate are verified; native Project Zomboid SP/MP and Workshop actions remain user-owned. Continue with the single C5-D chunk above before any READY FOR USER LIVE TEST claim.
 
 
 ## Approved future goal expansion — Contextual Conversational Intelligence (2026-10-19 planning only)
 
 User-approved target: offline Lua NPCs should understand elliptical follow-ups, topic interruptions and resumption, pending questions/offers/corrections, personality-aware dialogue plans and sparse evidence-backed promises with relevant world/quest/knowledge context; optional PBrainZ may rephrase the SAME authorized plan. Improve `tools/semantic_compiler` and Semantic Lab with reviewed dataset-assisted language/conversation-state generation and a context/plan/evidence inspector. See NEW `CONVERSATIONAL_INTELLIGENCE.md`, `DATASET_CONVERSATION_PIPELINE.md` and `CONVERSATION_ACCEPTANCE.md`, and the refreshed `ROADMAP.md`.
 
-G3C, C0-A, C1-A, C2-A, C3-A, C3-B, C3-C, C3-D, C4-A, C4-B, C4-C, C4-D, C5-A, and C5-B are genuinely accepted locally with the evidence above. The next implementation task is exactly the single C5-C chunk named at the top; it is one bounded source/diff approval view through the existing Code Builder and Semantic Lab, not a claim of C5–C6 completion, corpus import, or native-game validation.
+G3C, C0-A, C1-A, C2-A, C3-A, C3-B, C3-C, C3-D, C4-A, C4-B, C4-C, C4-D, C5-A, C5-B, and C5-C are genuinely accepted locally with the evidence above. The next implementation task is exactly the single C5-D chunk named at the top; it is one explicit approved dialogue-artifact generation/reload path through the existing Code Builder writer, not a claim of C5–C6 completion, corpus import, or native-game validation.
 
 Remote branch may not reflect the local Codex working checkout. Agent must reconcile current local HEAD/dirty/parallel work, and not discard implementation changes. C0-A measured and repaired the previously recorded four social THREAT test failures and insult final-response problem at the canonical worker authority boundary; C1-A measured topic interruption/resumption at the same worker boundary. Neither slice claims the mandatory multi-turn conversation complete.
