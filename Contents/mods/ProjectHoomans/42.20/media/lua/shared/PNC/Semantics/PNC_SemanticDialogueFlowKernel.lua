@@ -300,7 +300,7 @@ local function addMatch(preview, match, transition, fromNodeID, toNodeID)
     preview.transition = transition
     preview.flowId = match.flow.id
     preview.workflowKind = match.flow.workflowKind
-    preview.generated = match.flow.workflowKind == "simple_command"
+    preview.generated = match.flow.workflowKind ~= nil
     preview.capabilityID = match.flow.capabilityID
     preview.fromNodeId = fromNodeID
     preview.toNodeId = toNodeID
@@ -416,7 +416,7 @@ function Kernel.Preview(ir, state, context, options)
             and "interrupt_start" or "start"
         preview.flowId = flow.id
         preview.workflowKind = flow.workflowKind
-        preview.generated = flow.workflowKind == "simple_command"
+        preview.generated = flow.workflowKind ~= nil
         preview.capabilityID = flow.capabilityID
         preview.fromNodeId = gate and flow.initial
             or (active and active.nodeId or nil)
@@ -616,12 +616,19 @@ local function resultOutcome(action, actionResult)
         end
         return "rejected", mapping.rejected or "rejected"
     end
-    if mapping[status] then return mapping[status], mapping[status] end
+    if mapping[detailStatus] then
+        return mapping[detailStatus], mapping[detailStatus]
+    end
+    if mapping[status] then
+        return mapping[status], mapping[status]
+    end
     if mapping[reason] then return mapping[reason], mapping[reason] end
     if status == "pending" or reason == "network_queued" then
-        return "queued", mapping.queued or "queued"
+        local fallback = mapping.queued and "queued" or "admitted"
+        return fallback, mapping.queued or mapping.admitted or fallback
     end
-    return "accepted", mapping.accepted or mapping.queued or "queued"
+    local fallback = mapping.admitted and "admitted" or "queued"
+    return fallback, mapping.accepted or mapping[fallback] or fallback
 end
 
 -- Apply an authoritative result to a generated action node. This is a flow

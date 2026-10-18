@@ -21,6 +21,56 @@ function TaskResponses.ActionName(payload, pending)
         or pending and pending.action or ""))
 end
 
+-- Generated task flows own the normal admission/rejection/failure wording,
+-- but keep existing domain-specific explanations when the authoritative task
+-- result contains a concrete reason (for example an unresolved location or
+-- missing item). This preserves useful context without adding action-specific
+-- branches to the flow generator.
+function TaskResponses.UseExistingResultResponse(payload, pending, action)
+    action = action or TaskResponses.ActionName(payload, pending)
+    local reason = string.lower(tostring(payload and payload.reason or ""))
+    if (action == "GIVE" or action == "FETCH")
+        and (string.find(reason, "item", 1, true)
+            or string.find(reason, "inventory", 1, true)
+            or string.find(reason, "classification", 1, true)
+            or reason == "fetch_source_unsupported"
+            or reason == "fetch_destination_unsupported")
+    then
+        return true
+    end
+    if (action == "EAT" or action == "DRINK" or action == "CONSUME")
+        and (string.find(reason, "item", 1, true)
+            or string.find(reason, "suitable", 1, true)
+            or string.find(reason, "consum", 1, true)
+            or string.find(reason, "classification", 1, true))
+    then
+        return true
+    end
+    if action == "REFILL"
+        and (string.find(reason, "water", 1, true)
+            or string.find(reason, "container", 1, true)
+            or string.find(reason, "source", 1, true))
+    then
+        return true
+    end
+    if action == "WAIT_AT"
+        and (string.find(reason, "not_found", 1, true)
+            or string.find(reason, "world_", 1, true)
+            or string.find(reason, "target", 1, true))
+    then
+        return true
+    end
+    if action == "CAMP"
+        or reason == "npc_action_plan_active"
+        or reason == "npc_action_plan_stale_cleanup_failed"
+        or string.find(reason, "path", 1, true)
+        or string.find(reason, "movement", 1, true)
+    then
+        return true
+    end
+    return false
+end
+
 -- The general presentation spoke loads before this one and reads these helpers
 -- when it formats immediate camp acknowledgments.
 Internal.CampSiteDetails = TaskResponses.CampSiteDetails

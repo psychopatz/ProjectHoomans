@@ -186,8 +186,14 @@ function Internal.QueueDeterministicResponse(
     end
     local generatedFlowResponse = false
     local localResponse = PNC.Semantics and PNC.Semantics.LocalResponse
+    local taskResponses = Internal.TaskResponses
+    local preserveTaskResponse = taskResponses
+        and type(taskResponses.UseExistingResultResponse) == "function"
+        and taskResponses.UseExistingResultResponse(
+            actionResult, nil, actionResult and actionResult.action)
     if not (actionResult and type(actionResult.response) == "table")
         and result.flow and result.flow.generated == true
+        and preserveTaskResponse ~= true
         and type(result.flow.responsePool) == "string"
         and localResponse
         and type(localResponse.ResolveFlow) == "function"

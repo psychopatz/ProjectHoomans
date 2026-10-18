@@ -15,12 +15,25 @@ Generator.TEMPLATE_FINGERPRINT =
     "simple_command:v1:context_gate:typed_binding:one_dispatch:result_map"
 Generator.WORKFLOW_KIND = "simple_command"
 
+local TEMPLATES = {
+    simple_command = {
+        version = 1,
+        fingerprint = Generator.TEMPLATE_FINGERPRINT,
+        outcomes = { "queued", "rejected", "failed" },
+    },
+    parameterized_task = {
+        version = 1,
+        fingerprint =
+            "parameterized_task:v1:context_gate:typed_slots:one_dispatch:admission_map",
+        outcomes = { "admitted", "active", "completed", "rejected", "failed" },
+    },
+}
+
 local REQUIRED_FIELDS = {
     "capabilityID", "workflowKind", "templateVersion", "contractVersion",
     "targetScope", "triggerFrames", "requiredSlots", "permissionGate",
     "outcomeMapping", "responsePools", "translationOwner",
 }
-local REQUIRED_OUTCOMES = { "queued", "rejected", "failed" }
 
 local function copyValue(value, depth)
     if type(value) ~= "table" then return value end
@@ -50,7 +63,7 @@ local function hasSource(row, source)
     return false
 end
 
-local function missingMetadata(row)
+local function missingMetadata(row, template)
     local missing = {}
     for index = 1, #REQUIRED_FIELDS do
         local field = REQUIRED_FIELDS[index]
@@ -70,8 +83,8 @@ local function missingMetadata(row)
         missing[#missing + 1] = "permissionGate.type"
     end
     if type(row.outcomeMapping) == "table" then
-        for index = 1, #REQUIRED_OUTCOMES do
-            local outcome = REQUIRED_OUTCOMES[index]
+        for index = 1, #template.outcomes do
+            local outcome = template.outcomes[index]
             if type(row.outcomeMapping[outcome]) ~= "string"
                 or row.outcomeMapping[outcome] == ""
             then
@@ -80,8 +93,8 @@ local function missingMetadata(row)
         end
     end
     if type(row.responsePools) == "table" then
-        for index = 1, #REQUIRED_OUTCOMES do
-            local outcome = REQUIRED_OUTCOMES[index]
+        for index = 1, #template.outcomes do
+            local outcome = template.outcomes[index]
             local response = row.responsePools[outcome]
             if type(response) ~= "table"
                 or tostring(response.key or "") == ""
@@ -95,13 +108,14 @@ local function missingMetadata(row)
     return missing
 end
 
-local function responsePoolID(action, outcome)
-    return "semantic.generated.simple_command."
+local function responsePoolID(action, outcome, workflowKind)
+    return "semantic.generated." .. tostring(workflowKind) .. "."
         .. lowerID(action) .. "." .. tostring(outcome)
 end
 
-local function flowID(capabilityID)
-    return "pnc.generated.simple_command." .. lowerID(capabilityID)
+local function flowID(capabilityID, workflowKind)
+    return "pnc.generated." .. tostring(workflowKind) .. "."
+        .. lowerID(capabilityID)
 end
 
 local function genericTrigger(action)
@@ -111,6 +125,8 @@ local function genericTrigger(action)
 end
 
 local function buildFlow(row)
+    local workflowKind = row.workflowKind
+    local template = TEMPLATES[workflowKind]
     local binding = row.binding
     local capabilityID = row.bindingID or binding.id
     local action = row.id
@@ -120,10 +136,10 @@ local function buildFlow(row)
     end
     local pools = {}
     local responsePools = {}
-    for index = 1, #REQUIRED_OUTCOMES do
-        local outcome = REQUIRED_OUTCOMES[index]
+    for index = 1, #template.outcomes do
+        local outcome = template.outcomes[index]
         local response = row.responsePools[outcome]
-        local poolID = responsePoolID(action, outcome)
+        local poolID = responsePoolID(action, outcome, workflowKind)
         pools[outcome] = poolID
         responsePools[#responsePools + 1] = {
             id = poolID,
@@ -137,54 +153,50 @@ local function buildFlow(row)
         }
     end
 
+    local nodes = {
+        authorize = {
+            id = "authorize",
+            gate = copyValue(row.permissionGate),
+            onPass = "request",
+            onFail = "rejected",
+            onUnknown = "rejected",
+        },
+        request = {
+            id = "request",
+            accepts = copyValue(row.triggerFrames)
+                or genericTrigger(action),
+            slots = copyValue(row.requiredSlots),
+            action = {
+                capabilityID = capabilityID,
+                route = binding.route,
+                targetScope = row.targetScope,
+                binding = copyValue(binding),
+                resultTransitions = mapping,
+                dispatchCount = 1,
+            },
+            onMatch = "request",
+        },
+    }
+    for index = 1, #template.outcomes do
+        local outcome = template.outcomes[index]
+        nodes[outcome] = {
+            id = outcome,
+            terminal = true,
+            responsePool = pools[outcome],
+        }
+    end
+
     return {
-        id = flowID(capabilityID),
+        id = flowID(capabilityID, workflowKind),
         version = tonumber(row.contractVersion) or 1,
         owner = binding.owner or row.translationOwner or "ProjectHoomans",
-        workflowKind = Generator.WORKFLOW_KIND,
-        templateVersion = Generator.TEMPLATE_VERSION,
+        workflowKind = workflowKind,
+        templateVersion = tonumber(row.templateVersion) or template.version,
+        templateFingerprint = template.fingerprint,
         capabilityID = capabilityID,
         initial = "authorize",
         triggers = copyValue(row.triggerFrames) or genericTrigger(action),
-        nodes = {
-            authorize = {
-                id = "authorize",
-                gate = copyValue(row.permissionGate),
-                onPass = "request",
-                onFail = "rejected",
-                onUnknown = "rejected",
-            },
-            request = {
-                id = "request",
-                accepts = copyValue(row.triggerFrames)
-                    or genericTrigger(action),
-                slots = copyValue(row.requiredSlots),
-                action = {
-                    capabilityID = capabilityID,
-                    route = binding.route,
-                    targetScope = row.targetScope,
-                    binding = copyValue(binding),
-                    resultTransitions = mapping,
-                    dispatchCount = 1,
-                },
-                onMatch = "request",
-            },
-            queued = {
-                id = "queued",
-                terminal = true,
-                responsePool = pools.queued,
-            },
-            rejected = {
-                id = "rejected",
-                terminal = true,
-                responsePool = pools.rejected,
-            },
-            failed = {
-                id = "failed",
-                terminal = true,
-                responsePool = pools.failed,
-            },
-        },
+        nodes = nodes,
         responsePools = responsePools,
     }
 end
@@ -236,26 +248,27 @@ function Generator.Build(capabilityCatalog)
             sources = copyValue(action.sources),
             transports = copyValue(action.transports),
         }
-        local missing = missingMetadata(row)
+        local template = TEMPLATES[row.workflowKind]
+        local missing = template and missingMetadata(row, template) or {}
         local capabilityID = tostring(row.capabilityID or "")
         if capabilityID ~= "" and byCapability[capabilityID] then
             row.classification = "conflicting"
             row.reason = "capabilityID_registered_by_multiple_actions:"
                 .. tostring(byCapability[capabilityID]) .. "," .. row.id
             row.missingMetadata = {}
-        elseif row.workflowKind == Generator.WORKFLOW_KIND and #missing > 0 then
+        elseif template and #missing > 0 then
             row.classification = "metadata_incomplete"
-            row.reason = "simple_command_metadata_missing"
+            row.reason = tostring(row.workflowKind) .. "_metadata_missing"
             row.missingMetadata = missing
-        elseif row.workflowKind ~= nil
-            and row.workflowKind ~= Generator.WORKFLOW_KIND
+        elseif row.workflowKind ~= nil and not template
         then
             row.classification = "unsupported_workflow"
-            row.reason = "workflow_kind_not_supported_by_g0a:" .. tostring(row.workflowKind)
+            row.reason = "workflow_kind_not_supported_by_automatic_generator:"
+                .. tostring(row.workflowKind)
             row.missingMetadata = {}
-        elseif row.workflowKind == Generator.WORKFLOW_KIND then
+        elseif template then
             row.classification = "eligible"
-            row.reason = "complete_simple_command_metadata"
+            row.reason = "complete_" .. tostring(row.workflowKind) .. "_metadata"
             row.missingMetadata = {}
             candidates[#candidates + 1] = action
         elseif hasSource(action, "task_adapter")
@@ -297,6 +310,7 @@ function Generator.Build(capabilityCatalog)
         templateVersion = Generator.TEMPLATE_VERSION,
         templateFingerprint = Generator.TEMPLATE_FINGERPRINT,
         workflowKind = Generator.WORKFLOW_KIND,
+        templates = copyValue(TEMPLATES),
         flows = definitions,
         responsePools = responsePools,
         coverage = rows,

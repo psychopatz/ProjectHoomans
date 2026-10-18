@@ -18,15 +18,16 @@ class AutomaticFlowGenerationTests(unittest.TestCase):
         generation = catalog["generation"]
         self.assertEqual(generation["templateVersion"], 1)
         self.assertIn("simple_command:v1", generation["templateFingerprint"])
-        self.assertEqual(generation["summary"]["generated"], 2)
+        self.assertEqual(generation["summary"]["generated"], 4)
+        self.assertEqual(generation["summary"]["unsupported_workflow"], 7)
         self.assertEqual(generation["summary"]["metadata_incomplete"], 0)
         rows = {
             row["id"]: row for row in generation["coverage"]
         }
         self.assertEqual(rows["FOLLOW"]["classification"], "generated")
         self.assertEqual(rows["STAY"]["classification"], "generated")
-        self.assertTrue(rows["WAIT_AT"]["reason"])
-        self.assertEqual(rows["WAIT_AT"]["classification"], "unsupported_workflow")
+        self.assertEqual(rows["WAIT_AT"]["classification"], "generated")
+        self.assertEqual(rows["FETCH"]["classification"], "generated")
         self.assertEqual(
             {row["id"] for row in coverage},
             set(rows),
@@ -62,6 +63,96 @@ class AutomaticFlowGenerationTests(unittest.TestCase):
                 set(action["resultTransitions"].values()),
                 {"queued", "rejected", "failed"},
             )
+
+    def test_parameterized_task_template_generates_wait_at_and_fetch(self) -> None:
+        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+            catalog = worker.flow_catalog()
+            wait_at = worker.input("Wait at the campfire")
+            fetch = worker.input("Bring me the can opener")
+
+        task_flows = [
+            flow for flow in catalog["flows"]
+            if flow.get("workflowKind") == "parameterized_task"
+        ]
+        self.assertEqual(
+            {flow["capabilityID"] for flow in task_flows},
+            {"pnc:task.fetch", "pnc:task.wait_at"},
+        )
+        for flow in task_flows:
+            action = flow["nodes"]["request"]["action"]
+            self.assertEqual(action["route"], "existing_semantic_task")
+            self.assertEqual(action["dispatchCount"], 1)
+            self.assertEqual(
+                set(action["resultTransitions"].values()),
+                {"admitted", "active", "completed", "rejected", "failed"},
+            )
+            self.assertEqual(
+                set(flow["nodes"]),
+                {"authorize", "request", "admitted", "active", "completed", "rejected", "failed"},
+            )
+        for result, capability, node, text in (
+            (wait_at, "pnc:task.wait_at", "admitted", "Okay, I'll wait there."),
+            (fetch, "pnc:task.fetch", "admitted", "I'll fetch that."),
+        ):
+            flow = result["result"]["flow"]
+            self.assertTrue(flow["generated"])
+            self.assertEqual(flow["workflowKind"], "parameterized_task")
+            self.assertEqual(flow["capabilityID"], capability)
+            self.assertEqual(flow["resultNodeId"], node)
+            self.assertEqual(flow["resultOutcome"], node)
+            self.assertEqual(flow["dispatchCount"], 1)
+            self.assertEqual(result["result"]["actionResult"]["handlerID"], "PNC.Client.RequestSemanticTask")
+            self.assertEqual(len(result["transport"]), 1)
+            self.assertEqual(result["messages"][0]["payload"]["text"], text)
+
+    def test_parameterized_task_result_branches_and_gate_are_truthful(self) -> None:
+        rejected_scenario = merge(
+            DEFAULT_SCENARIO,
+            {"runtime": {"taskResponses": {
+                "WAIT_AT": {
+                    "accepted": False,
+                    "reason": "task_denied",
+                    "details": {"status": "rejected"},
+                },
+            }}},
+        )
+        failed_scenario = merge(
+            DEFAULT_SCENARIO,
+            {"runtime": {"taskResponses": {
+                "WAIT_AT": {
+                    "accepted": False,
+                    "reason": "task_failed",
+                    "details": {"status": "failed"},
+                },
+            }}},
+        )
+        gated_scenario = merge(
+            DEFAULT_SCENARIO,
+            {"conversation": {"semanticAuthorization": {"authorized": False}}},
+        )
+        with LuaSemanticWorker(rejected_scenario) as worker:
+            rejected = worker.input("Wait at the campfire")
+        with LuaSemanticWorker(failed_scenario) as worker:
+            failed = worker.input("Wait at the campfire")
+        with LuaSemanticWorker(gated_scenario) as worker:
+            gated = worker.input("Wait at the campfire")
+
+        self.assertEqual(rejected["result"]["flow"]["resultNodeId"], "rejected")
+        self.assertEqual(
+            rejected["messages"][0]["payload"]["text"],
+            "I can't wait there right now.",
+        )
+        self.assertEqual(failed["result"]["flow"]["resultNodeId"], "failed")
+        self.assertEqual(
+            failed["messages"][0]["payload"]["text"],
+            "I couldn't wait there.",
+        )
+        self.assertEqual(gated["result"]["flow"]["toNodeId"], "rejected")
+        self.assertEqual(gated["transport"], [])
+        self.assertEqual(
+            gated["result"]["actionResult"]["status"],
+            "semantic_dispatch_blocked",
+        )
 
     def test_real_worker_records_result_nodes_and_one_dispatch(self) -> None:
         with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:

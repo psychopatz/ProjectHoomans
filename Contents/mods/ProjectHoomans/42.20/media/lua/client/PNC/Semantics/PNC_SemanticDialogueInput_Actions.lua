@@ -266,6 +266,7 @@ function Internal.DispatchAction(view, result, value)
         return blockedDispatch(actionBlockReason)
     end
     local context = actionContext(view, result, value)
+    context.generatedFlow = generatedFlow
     local actionIntent = ActionTargetHints.AttachCampSiteHint(
         decision.actionIntent, context, CampSite, CampSiteHints, audit)
     if actionIntent and actionIntent.action == "CAMP"

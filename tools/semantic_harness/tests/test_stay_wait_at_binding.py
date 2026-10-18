@@ -99,7 +99,13 @@ class StayWaitAtBindingTests(unittest.TestCase):
             "CompanionCommand",
             [event["command"] for event in wait_at["transport"]],
         )
-        self.assertEqual(wait_at["messages"][0]["payload"]["text"], "Okay.")
+        self.assertTrue(wait_at["result"]["flow"]["generated"])
+        self.assertEqual(
+            wait_at["result"]["flow"]["workflowKind"], "parameterized_task"
+        )
+        self.assertEqual(
+            wait_at["messages"][0]["payload"]["text"], "Okay, I'll wait there."
+        )
 
         unresolved_result = unresolved["result"]
         self.assertFalse(unresolved_result["actionResult"]["accepted"])

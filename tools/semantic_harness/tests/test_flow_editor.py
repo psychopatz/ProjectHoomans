@@ -129,6 +129,8 @@ class FlowEditorTests(unittest.TestCase):
                     "weather_context",
                     "greeting",
                     "pnc.dialogue.follow.flow",
+                    "pnc.generated.parameterized_task.pnc.task.fetch",
+                    "pnc.generated.parameterized_task.pnc.task.wait.at",
                     "pnc.generated.simple_command.pnc.companion.follow",
                     "pnc.generated.simple_command.pnc.companion.stay",
                 ],
