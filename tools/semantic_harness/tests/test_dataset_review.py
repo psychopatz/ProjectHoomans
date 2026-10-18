@@ -7,7 +7,10 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from tools.semantic_harness.authoring import preview_dialogue_source
+from tools.semantic_harness.authoring import (
+    generate_dialogue_source,
+    preview_dialogue_source,
+)
 from tools.semantic_harness.scenario import DEFAULT_SCENARIO, merge
 from tools.semantic_harness.worker import LuaSemanticWorker
 
@@ -73,6 +76,41 @@ class DatasetReviewTests(unittest.TestCase):
         self.assertIn("preview/", changed["diff"])
         self.assertLessEqual(len(changed["diff"]), 12_000)
         self.assertFalse(report["writes"])
+
+    def test_explicit_generation_uses_existing_writer_and_is_byte_stable(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            repository = Path(directory)
+            first = generate_dialogue_source(DATASET, repository=repository)
+            first_hashes = {
+                path: Path(path).read_bytes()
+                for path in first["writes"]
+            }
+            second = generate_dialogue_source(DATASET, repository=repository)
+            second_hashes = {
+                path: Path(path).read_bytes()
+                for path in second["writes"]
+            }
+
+        self.assertTrue(first["ok"])
+        self.assertTrue(first["generationApproved"])
+        self.assertEqual(len(first["writes"]), 9)
+        self.assertEqual(first_hashes, second_hashes)
+        self.assertTrue(all(row["status"] == "unchanged" for row in second["artifactDiffs"]))
+        self.assertEqual(second["reloadedBy"], "caller_restart_required")
+
+    def test_generation_refuses_an_explicitly_rejected_candidate(self) -> None:
+        document = json.loads(DATASET.read_text(encoding="utf-8"))
+        document["responsePools"][0]["variants"][0]["reviewed"] = False
+        with tempfile.TemporaryDirectory() as directory:
+            source_path = Path(directory) / "rejected.json"
+            output_root = Path(directory) / "output"
+            source_path.write_text(json.dumps(document), encoding="utf-8")
+            report = generate_dialogue_source(source_path, repository=output_root)
+
+        self.assertFalse(report["ok"])
+        self.assertFalse(report["generationApproved"])
+        self.assertEqual(report["writes"], [])
+        self.assertIn("rejected dataset candidates", report["diagnostics"][0]["message"])
 
     def test_code_builder_reports_collision_and_rejects_the_affected_candidate(self) -> None:
         document = json.loads(DATASET.read_text(encoding="utf-8"))

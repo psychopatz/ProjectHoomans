@@ -143,7 +143,7 @@ def _dialogue_translation_root(output: Path) -> Path | None:
     return None
 
 
-def _write_dialogue_output(output: Path, compiled: dict) -> list[Path]:
+def write_dialogue_output(output: Path, compiled: dict) -> list[Path]:
     module_prefix = _dialogue_module_prefix(output)
     shards = render_dialogue_lua_shards(compiled, module_prefix)
     pattern_modules = [
@@ -287,7 +287,7 @@ def main(arguments: list[str] | None = None) -> int:
     if compiled_dialogue is not None:
         output = options.dialogue_output.expanduser().resolve()
         output.parent.mkdir(parents=True, exist_ok=True)
-        paths = _write_dialogue_output(output, compiled_dialogue)
+        paths = write_dialogue_output(output, compiled_dialogue)
         pattern_count = len(compiled_dialogue["patterns"])
         variant_count = sum(
             len(pool["variants"]) for pool in compiled_dialogue["responsePools"])

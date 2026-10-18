@@ -11,6 +11,7 @@ from typing import Any, Callable
 from .config import ConfigurationError
 from .conversation_inspector import build_conversation_inspector
 from .authoring import (
+    generate_dialogue_source as generate_dialogue_artifacts,
     generate_semantic_source as generate_source_artifacts,
     preview_dialogue_source,
     preview_semantic_source,
@@ -168,6 +169,7 @@ class SemanticHarnessApp:
             on_compile_source=self.compile_semantic_source,
             on_generate_source=self.generate_semantic_source,
             on_review_dataset=self.review_dialogue_source,
+            on_generate_dataset=self.generate_dialogue_source,
         )
 
         self._append("SYSTEM", "Window ready. Starting the isolated Lua worker…")
@@ -481,6 +483,24 @@ class SemanticHarnessApp:
             diagnostics = report.get("diagnostics") or []
             message = diagnostics[0].get("message") if diagnostics else "invalid dataset"
             self._append("SYSTEM", f"Dataset review rejected: {message}")
+
+    def generate_dialogue_source(self, source_path: Path) -> None:
+        """Write approved dialogue artifacts through the existing Code Builder writer."""
+        report = generate_dialogue_artifacts(source_path)
+        self.flow_editor.show_dataset_report(report)
+        self._set_text(self.inspector, pretty(report))
+        self._set_text(self.trace, pretty(report))
+        if report.get("ok") is not True:
+            diagnostics = report.get("diagnostics") or []
+            message = diagnostics[0].get("message") if diagnostics else "generation failed"
+            self._append("SYSTEM", f"Dialogue generation rejected: {message}")
+            return
+        writes = report.get("writes") or []
+        self._append(
+            "SYSTEM",
+            f"Generated {len(writes)} dialogue artifacts; restarting Lua worker.",
+        )
+        self.restart()
 
     def generate_semantic_source(self, source_path: Path) -> None:
         """Generate approved artifacts, then restart the existing worker."""

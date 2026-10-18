@@ -22,7 +22,7 @@ from tools.semantic_compiler.compiler import (
     render_semantic_lua_shards,
 )
 from tools.semantic_compiler.compiler import load_dialogue_dataset
-from tools.semantic_compiler.build import write_semantic_output
+from tools.semantic_compiler.build import write_dialogue_output, write_semantic_output
 
 
 REPOSITORY = Path(__file__).resolve().parents[2]
@@ -37,6 +37,9 @@ DIALOGUE_RELATIVE_ROOT = Path(
 )
 DIALOGUE_TRANSLATION_RELATIVE_ROOT = Path(
     "Contents/mods/ProjectHoomans/common/media/translation"
+)
+DIALOGUE_OUTPUT_RELATIVE_PATH = (
+    DIALOGUE_RELATIVE_ROOT / "PNC_SemanticGeneratedDialogue.lua"
 )
 MAX_DATASET_REVIEW_ROWS = 64
 MAX_DATASET_COLLISIONS = 16
@@ -510,3 +513,53 @@ def preview_dialogue_source(
         "writes": [],
     })
     return base
+
+
+def generate_dialogue_source(
+    source_path: Path,
+    *,
+    repository: Path | None = None,
+) -> dict[str, Any]:
+    """Write approved dialogue artifacts through the existing Code Builder writer."""
+
+    repository = (repository or REPOSITORY).expanduser().resolve()
+    source_path = source_path.expanduser().resolve()
+    preview = preview_dialogue_source(source_path, repository=repository)
+    if preview.get("ok") is not True:
+        return preview
+    rejected = (preview.get("candidateReview") or {}).get("summary", {}).get("rejected", 0)
+    if rejected:
+        return {
+            **preview,
+            "ok": False,
+            "generationApproved": False,
+            "diagnostics": [{
+                "severity": "error",
+                "message": f"dialogue source contains {rejected} rejected dataset candidates",
+            }],
+            "writes": [],
+        }
+    try:
+        source = load_dialogue_dataset(source_path)
+        compiled = compile_dialogue_dataset(source)
+        output = repository / DIALOGUE_OUTPUT_RELATIVE_PATH
+        output.parent.mkdir(parents=True, exist_ok=True)
+        written = write_dialogue_output(
+            output,
+            compiled,
+        )
+    except (CompileError, OSError, ValueError) as error:
+        return {
+            **preview,
+            "ok": False,
+            "generationApproved": True,
+            "diagnostics": [{"severity": "error", "message": str(error)}],
+            "writes": [],
+        }
+    post_write = preview_dialogue_source(source_path, repository=repository)
+    return {
+        **post_write,
+        "generationApproved": True,
+        "writes": [str(path) for path in written],
+        "reloadedBy": "caller_restart_required",
+    }

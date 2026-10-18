@@ -209,6 +209,7 @@ class FlowEditorPane:
         on_compile_source: Callable[[Path], Any] | None = None,
         on_generate_source: Callable[[Path], Any] | None = None,
         on_review_dataset: Callable[[Path], Any] | None = None,
+        on_generate_dataset: Callable[[Path], Any] | None = None,
     ) -> None:
         self._tk = tk_module
         self._ttk = ttk
@@ -221,6 +222,7 @@ class FlowEditorPane:
         self._on_compile_source = on_compile_source
         self._on_generate_source = on_generate_source
         self._on_review_dataset = on_review_dataset
+        self._on_generate_dataset = on_generate_dataset
         self._catalog: dict[str, dict[str, Any]] = {}
         self._flow_id_to_label: dict[str, str] = {}
         self._flow_label_to_id: dict[str, str] = {}
@@ -339,6 +341,10 @@ class FlowEditorPane:
             secondary_toolbar, text="Review dataset…", command=self.review_dataset
         )
         self.review_dataset_button.grid(row=0, column=8, padx=(8, 0))
+        self.generate_dataset_button = ttk.Button(
+            secondary_toolbar, text="Generate dialogue…", command=self.generate_dataset
+        )
+        self.generate_dataset_button.grid(row=0, column=9, padx=(4, 0))
 
         self.status_var = self._tk.StringVar()
         ttk.Label(toolbar, textvariable=self.status_var).grid(
@@ -365,6 +371,7 @@ class FlowEditorPane:
             self.compile_source_button,
             self.generate_source_button,
             self.review_dataset_button,
+            self.generate_dataset_button,
         )
 
     def _build_body(self) -> None:
@@ -1224,6 +1231,24 @@ class FlowEditorPane:
             return
         self._on_review_dataset(Path(filename))
 
+    def generate_dataset(self) -> None:
+        filename = self._filedialog.askopenfilename(
+            title="Generate approved dialogue artifacts",
+            filetypes=[("Dialogue datasets", "*.json"), ("All files", "*")],
+        )
+        if not filename:
+            return
+        if self._on_generate_dataset is None:
+            self.set_status("Dialogue generation is unavailable")
+            return
+        if not self._messagebox.askyesno(
+            "Generate dialogue artifacts",
+            "Write the reviewed Lua, EN/TL, and manifest artifacts and restart the worker?",
+        ):
+            self.set_status("Dialogue generation cancelled; diff preview remains unchanged")
+            return
+        self._on_generate_dataset(Path(filename))
+
     def show_source_report(self, report: dict[str, Any]) -> None:
         if report.get("ok") is True:
             writes = report.get("writes") or []
@@ -1247,16 +1272,21 @@ class FlowEditorPane:
         summary = review.get("summary") or {}
         collisions = review.get("collisions") or []
         artifact_diffs = report.get("artifactDiffs") or []
+        writes = report.get("writes") or []
         changed = sum(
             1 for row in artifact_diffs
             if isinstance(row, dict) and row.get("status") != "unchanged"
         )
         if report.get("ok") is True:
+            write_status = (
+                f"{len(writes)} files written; worker restart required"
+                if writes else "no files written"
+            )
             self.set_status(
                 "Dataset preview valid; "
                 f"{summary.get('approved', 0)} approved, "
                 f"{summary.get('rejected', 0)} rejected, "
-                f"{len(collisions)} collisions, {changed} artifact diffs, no files written"
+                f"{len(collisions)} collisions, {changed} artifact diffs, {write_status}"
             )
             return
         diagnostics = report.get("diagnostics") or []
