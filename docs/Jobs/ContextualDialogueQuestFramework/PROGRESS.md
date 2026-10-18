@@ -1,14 +1,14 @@
 # Contextual Dialogue & Quest Framework — CURRENT progress
 
-**Updated:** 2026-10-18, after fresh local worker verification of G0C.
+**Updated:** 2026-10-18, after fresh local worker verification of the G0D safe-regeneration sub-slice.
 
-**Local implementation:** branch `codex/contextual-dialogue-quest-framework-0a`, current commit `68c313fe` (G0C; G0B `b242e78c`; G0A `6290b3f74279731c7d80e97e077e88c10d35d676`).
+**Local implementation:** branch `codex/contextual-dialogue-quest-framework-0a`, current commit `b1102486` (G0D safe regeneration; G0C `68c313fe`; G0B `b242e78c`; G0A `6290b3f74279731c7d80e97e077e88c10d35d676`).
 
 **Upstream baseline:** `origin/docs/contextual-dialogue-quest-framework-20261018` at `d117d861730eaaf94c20e7b372c6ba37ac1f1b59`; PR #4 remains open/unmerged. The local implementation is intentionally ahead of that baseline.
 
-**Current goal status:** **IN PROGRESS — G0C accepted; the expanded automatic-generation goal remains open.**
+**Current goal status:** **IN PROGRESS — G0D safe-regeneration sub-slice accepted; automatic coverage/reporting and visual-editing work remains open.**
 
-**ONE Next Chunk:** **G0D — Complete automatic-generation coverage and safe regeneration: make every remaining registered capability classification actionable, expose deterministic coverage/regeneration in Semantic Lab, and add visual editing safeguards without bypassing production registry validation.**
+**ONE Next Chunk:** **G0D-2 — Make remaining capability coverage actionable in Semantic Lab: expose exact metadata gaps/conflicts and add production-registry-backed visual editing/regeneration checks without allowing authored/generated collisions.**
 
 ## Accepted historic foundation (do not redo)
 
@@ -46,7 +46,7 @@ Generated task IDs were `pnc.generated.parameterized_task.pnc.task.fetch` and `p
 
 ## G0C accepted — generic multi-stage gift template
 
-G0C added a reusable versioned `multi_stage_gift` template to the shared automatic generator and completed the metadata on the existing `pnc:gift.offer` capability. The existing lifecycle remains authoritative: selection is owned by `GiftSelection`, dispatch by `PNC.Client.SendInventoryTransfer`, server validation/transfer by the inventory authority, and contextual success/failure/relationship replies by the existing gift receiver. The generator observes and progresses that route; it does not create a second gift dispatcher.
+G0C added a reusable versioned `multi_stage_gift` template to the shared automatic generator and completed metadata on the existing `pnc:gift.offer` capability. The existing lifecycle remains authoritative: selection is owned by `GiftSelection`, dispatch by `PNC.Client.SendInventoryTransfer`, server validation/transfer by the inventory authority, and contextual success/failure/relationship replies by the existing gift receiver. The generator observes and progresses that route; it does not create a second gift dispatcher.
 
 The live worker’s 15-capability inventory now reports:
 
@@ -58,25 +58,26 @@ The live worker’s 15-capability inventory now reports:
 
 Generated gift ID: `pnc.generated.multi_stage_gift.pnc.gift.offer`. Its nodes are `authorize`, `request`, `selection_required`, `pending`, `completed`, `rejected`, and `failed`; `pending` is a nonterminal lifecycle stage, while the other result stages are terminal. The typed binding is `existing_inventory_transfer` → `PNC.Client.SendInventoryTransfer` with `dispatchCount=1`, and result mappings cover selector, pending, completion, rejection and failure outcomes.
 
-Fresh worker traces verified:
+Fresh worker traces verified `I want to give you an apple` selecting the generated flow, reaching `pending`, using the existing binding once, emitting one client `InventoryTransfer` and one mocked authoritative `InventoryResult`, and producing exactly one contextual NPC reply: `Thank you for the Apple.` The vague gift path reached `selection_required` with zero transport. Missing semantic authorization reached generated `rejected` before transfer with zero transport; the same gate resolved the generated TL rejection key. The production `ReceiveGiftResult` path now applies authoritative success/failure to the stored generated pending flow, advancing it to `completed` or `failed` while preserving the existing item-specific/preference-aware gift reply and duplicate protection.
 
-- `I want to give you an apple` selected the generated `multi_stage_gift` flow, reached `pending`, used the existing gift binding once, emitted one client `InventoryTransfer` and one mocked authoritative `InventoryResult`, and produced exactly one contextual NPC reply: `Thank you for the Apple.`
-- `I have a gift for you` reached `selection_required` with zero transport and retained the existing selector-unavailable response rather than inventing a transfer.
-- Missing semantic authorization reached generated `rejected` before transfer with zero transport and the generated EN rejection. The same gate resolved the generated TL key `UI_PNC_Conversation_Semantic_GeneratedGiftRejected` to `Hindi ko matanggap ang regalong iyan ngayon.`
-- The production `ReceiveGiftResult` path now applies the authoritative success/failure result to the stored generated pending flow, advancing it to `completed` or `failed` while preserving the existing item-specific/preference-aware gift reply and duplicate protection.
+## G0D safe-regeneration sub-slice accepted
+
+The production Flow Registry now exposes `ReplaceGenerated`, which revalidates a generated definition and replaces an existing flow only when both definitions carry the same workflow kind. An authored or otherwise mismatched flow cannot be silently overwritten. The automatic generator uses this path on regeneration and reports `regeneratedFlowIDs`; the manifest now declares `simple_command`, `parameterized_task`, and `multi_stage_gift` template families.
+
+Real worker `FLOW_GENERATE` called twice after all five generated flows were registered. Both calls returned the same generated flow IDs and replaced only matching generated definitions; no duplicate flow IDs were created. Registry validation, generated response registration, and deterministic coverage remained intact. The broader coverage/actionability and visual-editing portion is deliberately left as the single next chunk above.
 
 ## Verification evidence
 
 - Focused automatic/task/gift/editor/binding suite: 21/21 passed.
-- Full suite: `python3 -m unittest discover tools/semantic_harness/tests -v` — 131 tests, 127 passed. The only four failures are the pre-existing `ContextualSocialReactionTests.test_threat_uses_guarded_emotion_relationship_and_precedence` cases `trusted`, `withdrawn`, `stressed`, and `stress_precedes_withdrawn_and_busy`; they report the known unavailable semantic-social transport fallback and are unrelated to automatic flow generation.
+- Full suite after G0D: `python3 -m unittest discover tools/semantic_harness/tests -v` — 131 tests, 127 passed. The only four failures are the pre-existing `ContextualSocialReactionTests.test_threat_uses_guarded_emotion_relationship_and_precedence` cases `trusted`, `withdrawn`, `stressed`, and `stress_precedes_withdrawn_and_busy`; they report the known unavailable semantic-social transport fallback and are unrelated to automatic flow generation.
 - Harness doctor: `./tools/semantic_harness/run_harness.sh --doctor --doctor-json` — required Python, repository, virtualenv, Tkinter, display, core repository, Lua, worker syntax, worker boot, PING and CAPABILITIES checks passed.
-- `luac5.3 -p` passed for every changed G0C Lua file; touched Python files compiled with `py_compile`; both generated EN/TL JSON files parse; `git diff --check` passed.
-- G0C code commit: `68c313fe` (`feat: generate multi-stage gift flows from lifecycle metadata`).
+- `luac5.3 -p` passed for every changed G0D Lua file; touched Python files compiled with `py_compile`; generated EN/TL JSON files parse; `git diff --check` passed.
+- G0D code commit: `b1102486` (`feat: make generated flow regeneration safe`).
 
 ## Worktree boundary
 
-Unrelated P0B persistence/import-plan edits from another agent are present as unstaged/untracked files and were deliberately preserved, not included in the G0C commit. They are not a blocker to continuing this job.
+Unrelated P0B persistence/import-plan edits from another agent are present as unstaged/untracked files and were deliberately preserved, not included in the G0D commit. They are not a blocker to continuing this job.
 
 ## Scope boundary
 
-G0A, G0B and G0C are accepted implementation slices, not completion of all supported capability families. The next bounded chunk is G0D above. Do not mark the expanded goal READY FOR USER LIVE TEST until remaining compatible coverage/regeneration, visual editing, contextual/personality/memory integration, server-authoritative quest generation, full production-harness acceptance, performance checks, and the user-owned native-game gate are actually verified.
+G0A, G0B, G0C, and the G0D safe-regeneration sub-slice are accepted implementation slices, not completion of all supported capability families. Do not mark the expanded goal READY FOR USER LIVE TEST until G0D-2, contextual/personality/memory integration, server-authoritative quest generation, full production-harness acceptance, performance checks, and the user-owned native-game gate are actually verified.
