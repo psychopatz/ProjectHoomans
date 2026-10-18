@@ -1,10 +1,10 @@
 # Contextual Dialogue & Quest Framework — current progress
 
 **Updated:** 2026-10-18
-**Audited branch/ref:** `codex/contextual-dialogue-quest-framework-0a` @ `d411158e` (fresh source-generation callback and unavailable-CUA audit)
+**Audited branch/ref:** `codex/contextual-dialogue-quest-framework-0a` @ `cb2b07e7` (source/headless gates plus real X11 GUI acceptance)
 **PR:** #4 → main, OPEN (not merged); **main baseline:** `a3eb2e4db553f9c03b7f66a6ff6717878e1668e0`
-**Status:** PHASE 4 — Practical integrated authoring UX. **2A, 2B, 2C, 3A, 4A, and 4B ACCEPTED** at source/headless gates; GUI click-through remains pending because the computer-use surface exposes no app. Native PZ runtime remains unrun by instruction.
-**ONE Next Chunk:** **4C — perform the GUI author → compile-preview → approved-generate → worker-restart click-through when a native app surface is available.**
+**Status:** **READY FOR USER LIVE TEST.** **2A, 2B, 2C, 3A, 4A, 4B, and 4C ACCEPTED** at source/headless and real X11 GUI gates. Native PZ runtime remains user-owned and unrun by instruction.
+**ONE Next Chunk:** **User-owned live Project Zomboid SP/MP acceptance** of the checked-out mod; no developer-side implementation chunk remains.
 
 ## 2A acceptance ledger — FOLLOW
 
@@ -106,9 +106,13 @@
 - **Determinism proof:** temp-repository generation writes the modular Lua/EN/TL/manifest set; a second generation over unchanged source produces identical SHA-256 hashes. Invalid source remains diagnostic-only and writes nothing.
 - **Focused proof:** compiler/source-preview/worker/Flow editor/app tests — PASS, 39/39; Lua smoke tests — PASS, 4/4; doctor, Python compilation, JSON, Kahlua, `luac5.3`, and `git diff --check` pass.
 
-## 4C pending GUI gate
+## 4C acceptance ledger — real X11 GUI click-through
 
-- The GUI entrypoint constructs successfully and the source controls are wired. A bounded launch probe with `DISPLAY=:0` entered the Tk mainloop and exited only at the intentional 12-second timeout (`124`); no worker process remained. A machine-driven Tk widget probe then invoked the actual `Compile source…` and approved `Generate source…` buttons against the canonical source: preview reported zero writes and seven planned paths, generation wrote six isolated artifacts to a temporary output root, and the existing worker restarted from PID `179226` to `179250` before the GUI returned ready. This verifies the GUI callback path, but it is not human/CUA click-through. A fresh CUA check while the actual GUI process was running still returned `apps=[]`, `browsers=[]`; the probe was stopped cleanly and left no worker. Do not claim human GUI authoring acceptance until that surface is available. Native PZ SP/MP remains user-owned.
+- On `DISPLAY=:0`, the actual Tk window was located with `wmctrl`; X11 XTest mouse/keyboard events drove the visible controls and native file chooser. This is real desktop input, not `Button.invoke()` or a programmatic callback substitute.
+- The click-through opened **Flow editor**, clicked **Compile source…**, navigated `tools/semantic_compiler` and double-clicked `semantic_definitions.json`, then exposed the preview in the existing Semantic Lab trace: `schema=pnc.semantic_authoring.v1`, `capabilityID=pnc:companion.follow`, authored pattern/flow/response IDs, `previewOnly=true`, `effectFree=true`, `writes=[]`, and the exact watched-mod Lua/EN/TL/manifest paths.
+- The same UI clicked **Generate source…**, selected the source in the native chooser, clicked the explicit **Yes** approval dialog, and visibly reported `Generated 7 files; restarting Lua worker.` followed by `Lua worker restarted and the scenario was restored.` The GUI showed the worker changing from PID `210848` before generation to PID `231385` after restart and returned `Ready`.
+- After restart, the same visible chat input submitted `Keep close behind me`. The GUI rendered `NPC: Okay.` and showed one accepted `follow` action; the trace exposed `REQUEST/FOLLOW`, capability `pnc:companion.follow`, command `follow`, handler `PNC.Client.SendCompanionCommand`, `requestID=1`, `reason=network_queued`, target `npc_mara`, and accepted authority result.
+- Focused proof on this checkout: doctor PASS; compiler 9/9; authoring/Flow/App/worker 21/21; action/context regressions 30/30; Lua smoke 4/4; `git diff --check` PASS. Full Python harness discovery also ran: 123 tests with four already-known failures in `ContextualSocialReactionTests.test_threat_uses_guarded_emotion_relationship_and_precedence` (trusted/withdrawn/stressed/stress-precedes cases); the semantic authoring, compiler, worker, and GUI gates remain green and the failures are outside this chunk. An unrelated untracked `tests/pnc_npc_foundation_parity_baseline_smoke.lua` appeared during the session and was preserved untouched. Native PZ SP/MP and Workshop publication remain user-owned.
 
 ## Agent routing and Git
 
