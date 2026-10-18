@@ -8,6 +8,70 @@ return {
                 ["speechAct"] = "QUESTION",
                 ["subject"] = "IDENTITY",
             },
+            ["id"] = "pnc.dataset.question.identity.mind_telling_me_your_name",
+            ["match"] = {
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "mind",
+                },
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "telling",
+                },
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "me",
+                },
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "your",
+                },
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "name",
+                },
+            },
+            ["priority"] = 120,
+        },
+    {
+            ["confidence"] = 0.98,
+            ["emit"] = {
+                ["intent"] = "QUESTION",
+                ["speechAct"] = "QUESTION",
+                ["subject"] = "IDENTITY",
+            },
+            ["id"] = "pnc.dataset.question.identity.what_do_people_call_you",
+            ["match"] = {
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "what",
+                },
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "do",
+                },
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "people",
+                },
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "call",
+                },
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "you",
+                },
+            },
+            ["priority"] = 120,
+        },
+    {
+            ["confidence"] = 0.98,
+            ["emit"] = {
+                ["intent"] = "QUESTION",
+                ["speechAct"] = "QUESTION",
+                ["subject"] = "IDENTITY",
+            },
             ["id"] = "pnc.dataset.question.identity.what_do_you_go_by",
             ["match"] = {
                 {

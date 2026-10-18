@@ -24,6 +24,7 @@ from tools.semantic_compiler.compiler import (  # noqa: E402
     discover_registered_capability_ids,
     render_dialogue_lua,
     render_dialogue_lua_shards,
+    render_dialogue_translation,
     render_semantic_lua_shards,
     render_semantic_manifest,
     render_lua,
@@ -129,6 +130,19 @@ def _dialogue_module_prefix(output: Path) -> str:
         "dialogue output must be under a Project Zomboid media/lua/shared tree")
 
 
+def _dialogue_translation_root(output: Path) -> Path | None:
+    parts = output.parts
+    for index in range(len(parts) - 3):
+        if parts[index:index + 3] != ("Contents", "mods", "ProjectHoomans"):
+            continue
+        if "42.20" not in parts[index + 3:]:
+            continue
+        return Path(*parts[:index]) / (
+            "Contents/mods/ProjectHoomans/common/media/translation"
+        )
+    return None
+
+
 def _write_dialogue_output(output: Path, compiled: dict) -> list[Path]:
     module_prefix = _dialogue_module_prefix(output)
     shards = render_dialogue_lua_shards(compiled, module_prefix)
@@ -150,6 +164,31 @@ def _write_dialogue_output(output: Path, compiled: dict) -> list[Path]:
         shard_path = output.parent / (Path(module).name + ".lua")
         shard_path.write_text(source, encoding="utf-8", newline="\n")
         paths.append(shard_path)
+    translation_root = _dialogue_translation_root(output)
+    if translation_root is not None:
+        manifest_path = translation_root / "manifests/Conversation.json"
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8")) \
+            if manifest_path.is_file() else {"version": 1, "languages": {}}
+        for language in ("EN", "TL"):
+            relative_path = f"{language}/Conversation/Semantic/GeneratedDialogue.json"
+            translation_path = translation_root / relative_path
+            translation_path.parent.mkdir(parents=True, exist_ok=True)
+            translation_path.write_text(
+                render_dialogue_translation(compiled, language),
+                encoding="utf-8",
+                newline="\n",
+            )
+            paths.append(translation_path)
+            entries = manifest.setdefault("languages", {}).setdefault(language, [])
+            if relative_path not in entries:
+                entries.append(relative_path)
+        manifest_path.parent.mkdir(parents=True, exist_ok=True)
+        manifest_path.write_text(
+            json.dumps(manifest, ensure_ascii=False, indent=2) + "\n",
+            encoding="utf-8",
+            newline="\n",
+        )
+        paths.append(manifest_path)
     return paths
 
 

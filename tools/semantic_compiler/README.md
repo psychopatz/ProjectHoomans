@@ -116,6 +116,21 @@ their current pools. The compiler rejects unsupported intents, fuzzy patterns,
 unknown response conditions, duplicate IDs/utterances, and oversized pools.
 No external corpus or linguistic package is loaded by Lua at runtime.
 
+Dialogue sources record a license and review date for every reference. A
+reviewed contextual mapping may add only an exact, bounded PROMISE/NEEDS
+pattern when it names the existing `FETCH` concept and `NEEDS_PROPOSAL` state.
+Its negative examples are compiler-only collision/false-command checks; they
+are never emitted into Lua. A response may carry a reviewed response plan and
+EN/TL text, which is emitted as a small translation shard beside the Lua
+artifacts. The C4-A sample uses WordNet 3.0 lexical guidance, MASSIVE
+English/Tagalog intent-slot guidance, and SGD dialogue-state guidance without
+shipping any of those datasets.
+
+The dialogue build also writes
+`common/media/translation/<LANG>/Conversation/Semantic/GeneratedDialogue.json`
+and adds both paths to the Conversation translation manifest. Re-running the
+command with unchanged input is byte-stable.
+
 ## Canonical semantic definitions
 
 `semantic_definitions.json` is the reviewed `pnc.semantic_authoring.v1` source

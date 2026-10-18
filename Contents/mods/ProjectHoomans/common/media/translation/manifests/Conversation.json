@@ -10,14 +10,15 @@
       "EN/Conversation/Identity/Responses.json",
       "EN/Conversation/Journal/Events.json",
       "EN/Conversation/PBrainZ/Interface.json",
-    "EN/Conversation/Semantic/Generated.json",
-    "EN/Conversation/Semantic/GeneratedTaskCommandContext.json",
-    "EN/Conversation/Semantic/GeneratedTaskCommands.json",
-    "EN/Conversation/Semantic/GeneratedTaskCommandMemory.json",
+      "EN/Conversation/Semantic/Generated.json",
+      "EN/Conversation/Semantic/GeneratedTaskCommandContext.json",
+      "EN/Conversation/Semantic/GeneratedTaskCommands.json",
+      "EN/Conversation/Semantic/GeneratedTaskCommandMemory.json",
       "EN/Conversation/Semantic/Responses.json",
       "EN/Conversation/Telemetry/Diagnostics.json",
       "EN/Conversation/ToolReplies/Commands.json",
-      "EN/Conversation/WorldEvents/Events.json"
+      "EN/Conversation/WorldEvents/Events.json",
+      "EN/Conversation/Semantic/GeneratedDialogue.json"
     ],
     "TL": [
       "TL/Conversation/Flavor/Address.json",
@@ -28,14 +29,15 @@
       "TL/Conversation/Identity/Responses.json",
       "TL/Conversation/Journal/Events.json",
       "TL/Conversation/PBrainZ/Interface.json",
-    "TL/Conversation/Semantic/Generated.json",
-    "TL/Conversation/Semantic/GeneratedTaskCommandContext.json",
-    "TL/Conversation/Semantic/GeneratedTaskCommands.json",
-    "TL/Conversation/Semantic/GeneratedTaskCommandMemory.json",
+      "TL/Conversation/Semantic/Generated.json",
+      "TL/Conversation/Semantic/GeneratedTaskCommandContext.json",
+      "TL/Conversation/Semantic/GeneratedTaskCommands.json",
+      "TL/Conversation/Semantic/GeneratedTaskCommandMemory.json",
       "TL/Conversation/Semantic/Responses.json",
       "TL/Conversation/Telemetry/Diagnostics.json",
       "TL/Conversation/ToolReplies/Commands.json",
-      "TL/Conversation/WorldEvents/Events.json"
+      "TL/Conversation/WorldEvents/Events.json",
+      "TL/Conversation/Semantic/GeneratedDialogue.json"
     ]
   }
 }

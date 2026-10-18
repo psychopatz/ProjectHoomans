@@ -122,6 +122,55 @@ return {
             ["priority"] = 120,
         },
     {
+            ["confidence"] = 0.99,
+            ["emit"] = {
+                ["extensions"] = {
+                    ["dialogueFollowUp"] = "NEEDS_PROPOSAL",
+                    ["topic"] = "NEEDS",
+                },
+                ["intent"] = "PROMISE",
+                ["speechAct"] = "PROMISE",
+                ["subject"] = "NEEDS",
+            },
+            ["id"] = "pnc.dataset.promise.needs.i_ll_pick_some_up",
+            ["match"] = {
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "i'll",
+                },
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "pick",
+                },
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "some",
+                },
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "up",
+                },
+            },
+            ["metadata"] = {
+                ["mapping"] = {
+                    ["canonicalConcept"] = "FETCH",
+                    ["dialogueState"] = "NEEDS_PROPOSAL",
+                    ["sourceRefs"] = {
+                        "WordNet 3.0",
+                        "MASSIVE",
+                        "SGD",
+                    },
+                },
+                ["reviewed"] = true,
+                ["sourceRefs"] = {
+                    "WordNet 3.0",
+                    "MASSIVE",
+                    "SGD",
+                },
+            },
+            ["priority"] = 166,
+        },
+    {
             ["confidence"] = 0.97,
             ["emit"] = {
                 ["intent"] = "QUESTION",
@@ -389,70 +438,6 @@ return {
                 {
                     ["kind"] = "literal",
                     ["value"] = "name",
-                },
-            },
-            ["priority"] = 120,
-        },
-    {
-            ["confidence"] = 0.98,
-            ["emit"] = {
-                ["intent"] = "QUESTION",
-                ["speechAct"] = "QUESTION",
-                ["subject"] = "IDENTITY",
-            },
-            ["id"] = "pnc.dataset.question.identity.mind_telling_me_your_name",
-            ["match"] = {
-                {
-                    ["kind"] = "literal",
-                    ["value"] = "mind",
-                },
-                {
-                    ["kind"] = "literal",
-                    ["value"] = "telling",
-                },
-                {
-                    ["kind"] = "literal",
-                    ["value"] = "me",
-                },
-                {
-                    ["kind"] = "literal",
-                    ["value"] = "your",
-                },
-                {
-                    ["kind"] = "literal",
-                    ["value"] = "name",
-                },
-            },
-            ["priority"] = 120,
-        },
-    {
-            ["confidence"] = 0.98,
-            ["emit"] = {
-                ["intent"] = "QUESTION",
-                ["speechAct"] = "QUESTION",
-                ["subject"] = "IDENTITY",
-            },
-            ["id"] = "pnc.dataset.question.identity.what_do_people_call_you",
-            ["match"] = {
-                {
-                    ["kind"] = "literal",
-                    ["value"] = "what",
-                },
-                {
-                    ["kind"] = "literal",
-                    ["value"] = "do",
-                },
-                {
-                    ["kind"] = "literal",
-                    ["value"] = "people",
-                },
-                {
-                    ["kind"] = "literal",
-                    ["value"] = "call",
-                },
-                {
-                    ["kind"] = "literal",
-                    ["value"] = "you",
                 },
             },
             ["priority"] = 120,

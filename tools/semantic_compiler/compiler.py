@@ -22,8 +22,19 @@ VOWELS = frozenset("aeiou")
 CONCEPT_ID = re.compile(r"^[A-Z][A-Z0-9_]*$")
 WORDNET_OFFSET = re.compile(r"^\d{8}$")
 DIALOGUE_ID = re.compile(r"^[a-z][a-z0-9_.-]{0,95}$")
+DIALOGUE_TEMPLATE_ID = re.compile(r"^[A-Za-z][A-Za-z0-9_.-]{0,95}$")
 DIALOGUE_UTTERANCE = re.compile(r"^[a-z0-9']+(?: [a-z0-9']+)*$")
 DIALOGUE_PATTERN_SUBJECTS = frozenset({"ACTIVITY", "IDENTITY", "WELLBEING"})
+DIALOGUE_PROMISE_SUBJECTS = frozenset({"NEEDS"})
+DIALOGUE_PROMISE_EXTENSIONS = frozenset({"topic", "dialogueFollowUp"})
+DIALOGUE_MAPPING_FIELDS = frozenset({
+    "canonicalConcept", "dialogueState", "sourceRefs",
+})
+DIALOGUE_MAPPING_CONCEPTS = frozenset({"FETCH"})
+DIALOGUE_MAPPING_STATES = frozenset({"NEEDS_PROPOSAL"})
+DIALOGUE_PLAN_UNCERTAINTIES = frozenset({
+    "known", "unknown", "ambiguous", "pending",
+})
 DIALOGUE_RESPONSE_CONDITIONS = frozenset({
     "topic", "previousTopic", "intent", "action", "subject",
     "relationshipState", "identityTrust", "timeBand", "raining", "foggy",
@@ -471,16 +482,22 @@ def _validate_dialogue_source(value: Any) -> dict[str, Any]:
         reference_name = reference.get("name")
         url = reference.get("url")
         use = reference.get("use")
+        license_name = reference.get("license")
+        reviewed_on = reference.get("reviewedOn")
         if not all(isinstance(item, str) and item.strip()
-                   for item in (reference_name, url, use)):
+                   for item in (reference_name, url, use, license_name,
+                                reviewed_on)):
             raise CompileError(
-                "each dialogue reference requires name, url, and use")
-        if len(reference_name) > 128 or len(url) > 512 or len(use) > 256:
+                "each dialogue reference requires name, url, use, license, and reviewedOn")
+        if (len(reference_name) > 128 or len(url) > 512 or len(use) > 256
+                or len(license_name) > 128 or len(reviewed_on) > 32):
             raise CompileError("dialogue dataset reference exceeds its length limit")
         normalized_references.append({
             "name": reference_name.strip(),
             "url": url.strip(),
             "use": use.strip(),
+            "license": license_name.strip(),
+            "reviewedOn": reviewed_on.strip(),
         })
     return {
         "name": name.strip(),
@@ -490,10 +507,36 @@ def _validate_dialogue_source(value: Any) -> dict[str, Any]:
     }
 
 
-def _compile_dialogue_pattern(value: Any) -> dict[str, Any]:
+def _validate_source_refs(
+    value: Any,
+    available: set[str],
+    label: str,
+) -> list[str]:
+    if not isinstance(value, list) or not value or len(value) > 4:
+        raise CompileError(f"{label} requires 1 to 4 source references")
+    normalized = []
+    for item in value:
+        if not isinstance(item, str) or not item.strip():
+            raise CompileError(f"{label} contains an invalid source reference")
+        item = item.strip()
+        if item not in available:
+            raise CompileError(f"{label} references unknown source {item!r}")
+        if item not in normalized:
+            normalized.append(item)
+    return normalized
+
+
+def _compile_dialogue_pattern(
+    value: Any,
+    source_names: set[str],
+) -> tuple[dict[str, Any], list[str]]:
     if not isinstance(value, dict):
         raise CompileError("dialogue patterns must be objects")
-    if set(value) - {"id", "utterance", "emit", "confidence", "priority"}:
+    allowed_fields = {
+        "id", "utterance", "emit", "confidence", "priority", "negatives",
+        "reviewed", "sourceRefs", "mapping",
+    }
+    if set(value) - allowed_fields:
         raise CompileError("dialogue pattern contains unsupported fields")
     pattern_id = value.get("id")
     if not isinstance(pattern_id, str) or not DIALOGUE_ID.fullmatch(pattern_id):
@@ -525,9 +568,82 @@ def _compile_dialogue_pattern(value: Any) -> dict[str, Any]:
             raise CompileError(
                 f"dialogue greeting pattern {pattern_id} has an unsupported emit")
         normalized_emit = {"intent": "GREET", "speechAct": "GREET"}
+    elif intent == "PROMISE":
+        extensions = emit.get("extensions")
+        if (speech_act != "PROMISE"
+                or emit.get("subject") not in DIALOGUE_PROMISE_SUBJECTS
+                or set(emit) != {
+                    "intent", "speechAct", "subject", "extensions",
+                }
+                or not isinstance(extensions, dict)
+                or set(extensions) != DIALOGUE_PROMISE_EXTENSIONS
+                or extensions.get("topic") != "NEEDS"
+                or extensions.get("dialogueFollowUp") != "NEEDS_PROPOSAL"):
+            raise CompileError(
+                f"dialogue promise pattern {pattern_id} must target the existing needs proposal flow")
+        normalized_emit = {
+            "intent": "PROMISE",
+            "speechAct": "PROMISE",
+            "subject": "NEEDS",
+            "extensions": {
+                "topic": "NEEDS",
+                "dialogueFollowUp": "NEEDS_PROPOSAL",
+            },
+        }
     else:
         raise CompileError(
             f"dialogue pattern {pattern_id} targets an unsupported interaction")
+
+    reviewed = value.get("reviewed", False)
+    if not isinstance(reviewed, bool):
+        raise CompileError(f"dialogue pattern {pattern_id} reviewed must be boolean")
+    source_refs = []
+    if "sourceRefs" in value:
+        source_refs = _validate_source_refs(
+            value["sourceRefs"], source_names,
+            f"dialogue pattern {pattern_id} sourceRefs",
+        )
+    mapping = value.get("mapping")
+    normalized_mapping = None
+    if mapping is not None:
+        if not isinstance(mapping, dict) or set(mapping) - DIALOGUE_MAPPING_FIELDS:
+            raise CompileError(f"dialogue pattern {pattern_id} has invalid mapping")
+        concept = mapping.get("canonicalConcept")
+        state = mapping.get("dialogueState")
+        mapping_refs = _validate_source_refs(
+            mapping.get("sourceRefs"), source_names,
+            f"dialogue pattern {pattern_id} mapping sourceRefs",
+        )
+        if concept not in DIALOGUE_MAPPING_CONCEPTS:
+            raise CompileError(
+                f"dialogue pattern {pattern_id} maps to an unsupported canonical concept")
+        if state not in DIALOGUE_MAPPING_STATES:
+            raise CompileError(
+                f"dialogue pattern {pattern_id} maps to an unsupported dialogue state")
+        if source_refs and mapping_refs != source_refs:
+            raise CompileError(
+                f"dialogue pattern {pattern_id} mapping/sourceRefs disagree")
+        source_refs = mapping_refs
+        normalized_mapping = {
+            "canonicalConcept": concept,
+            "dialogueState": state,
+            "sourceRefs": mapping_refs,
+        }
+    if intent == "PROMISE" and (not reviewed or not source_refs or not normalized_mapping):
+        raise CompileError(
+            f"dialogue promise pattern {pattern_id} requires reviewed canonical mapping metadata")
+
+    negatives = value.get("negatives", [])
+    if not isinstance(negatives, list) or len(negatives) > 8:
+        raise CompileError(f"dialogue pattern {pattern_id} negatives must be bounded")
+    normalized_negatives = []
+    for negative in negatives:
+        normalized_negative, _negative_tokens = _normalize_dialogue_utterance(negative)
+        if normalized_negative == _normalized:
+            raise CompileError(
+                f"dialogue pattern {pattern_id} has a positive/negative collision")
+        if normalized_negative not in normalized_negatives:
+            normalized_negatives.append(normalized_negative)
 
     confidence = value.get("confidence", 0.98)
     if (isinstance(confidence, bool)
@@ -541,13 +657,21 @@ def _compile_dialogue_pattern(value: Any) -> dict[str, Any]:
         raise CompileError(
             f"dialogue pattern {pattern_id} priority must be an integer from 0 to 255")
 
-    return {
+    compiled = {
         "id": pattern_id,
         "match": [{"kind": "literal", "value": token} for token in tokens],
         "emit": normalized_emit,
         "confidence": float(confidence),
         "priority": priority,
     }
+    if reviewed:
+        compiled["metadata"] = {
+            "reviewed": True,
+            "sourceRefs": source_refs,
+        }
+    if normalized_mapping is not None:
+        compiled.setdefault("metadata", {})["mapping"] = normalized_mapping
+    return compiled, normalized_negatives
 
 
 def _validate_response_condition(value: Any, pool_id: str, variant_id: str) -> dict[str, Any]:
@@ -581,7 +705,107 @@ def _validate_response_condition(value: Any, pool_id: str, variant_id: str) -> d
     return output
 
 
-def _compile_dialogue_response_pool(value: Any) -> dict[str, Any]:
+def _validate_dialogue_plan(
+    value: Any,
+    pool_id: str,
+    variant_id: str,
+    template_id: str,
+    fallback: str,
+) -> dict[str, Any]:
+    if not isinstance(value, dict):
+        raise CompileError(f"dialogue response plan for {pool_id}:{variant_id} must be an object")
+    allowed = {
+        "dialogueAct", "sourcePoolID", "topic", "groundedFactRefs",
+        "uncertainty", "tone", "personalityStyle", "turns",
+    }
+    if set(value) - allowed:
+        raise CompileError(f"dialogue response plan for {pool_id}:{variant_id} has unsupported fields")
+    dialogue_act = value.get("dialogueAct")
+    if not isinstance(dialogue_act, str) or not dialogue_act.strip():
+        raise CompileError(f"dialogue response plan for {pool_id}:{variant_id} requires dialogueAct")
+    source_pool = value.get("sourcePoolID", pool_id)
+    if not isinstance(source_pool, str) or not DIALOGUE_TEMPLATE_ID.fullmatch(source_pool):
+        raise CompileError(f"dialogue response plan for {pool_id}:{variant_id} has invalid sourcePoolID")
+    topic = value.get("topic")
+    if topic is not None and (not isinstance(topic, str) or not topic.strip()):
+        raise CompileError(f"dialogue response plan for {pool_id}:{variant_id} has invalid topic")
+    refs = value.get("groundedFactRefs", value.get("sourceFactRefs", []))
+    if not isinstance(refs, list) or len(refs) > 8:
+        raise CompileError(f"dialogue response plan for {pool_id}:{variant_id} has invalid fact refs")
+    normalized_refs = []
+    for ref in refs:
+        if not isinstance(ref, str) or not ref or len(ref) > 128:
+            raise CompileError(f"dialogue response plan for {pool_id}:{variant_id} has invalid fact ref")
+        if not re.fullmatch(r"[A-Za-z0-9_.:-]+", ref):
+            raise CompileError(f"dialogue response plan for {pool_id}:{variant_id} has invalid fact ref")
+        if ref not in normalized_refs:
+            normalized_refs.append(ref)
+    uncertainty = value.get("uncertainty")
+    if uncertainty not in DIALOGUE_PLAN_UNCERTAINTIES:
+        raise CompileError(f"dialogue response plan for {pool_id}:{variant_id} has invalid uncertainty")
+    normalized = {
+        "dialogueAct": dialogue_act.strip(),
+        "sourcePoolID": source_pool,
+        "topic": topic.strip() if isinstance(topic, str) else None,
+        "groundedFactRefs": normalized_refs,
+        "uncertainty": uncertainty,
+        "tone": value.get("tone"),
+        "personalityStyle": value.get("personalityStyle"),
+        "turns": [],
+    }
+    for field in ("tone", "personalityStyle"):
+        item = normalized[field]
+        if item is not None and (not isinstance(item, str) or not item.strip()):
+            raise CompileError(f"dialogue response plan for {pool_id}:{variant_id} has invalid {field}")
+        if isinstance(item, str):
+            normalized[field] = item.strip()
+    turns = value.get("turns")
+    if not isinstance(turns, list) or not turns or len(turns) > 4:
+        raise CompileError(f"dialogue response plan for {pool_id}:{variant_id} requires 1 to 4 turns")
+    for turn in turns:
+        if not isinstance(turn, dict) or set(turn) - {"id", "continuation", "segments"}:
+            raise CompileError(f"dialogue response plan for {pool_id}:{variant_id} has invalid turn")
+        segments = turn.get("segments")
+        if not isinstance(segments, list) or not segments or len(segments) > 6:
+            raise CompileError(f"dialogue response plan for {pool_id}:{variant_id} has invalid segments")
+        normalized_segments = []
+        for segment in segments:
+            if not isinstance(segment, dict):
+                raise CompileError(f"dialogue response plan for {pool_id}:{variant_id} has invalid segment")
+            kind = segment.get("kind")
+            if kind == "translation":
+                segment_template = segment.get("templateID", template_id)
+                segment_fallback = segment.get("fallback", fallback)
+                if (not isinstance(segment_template, str)
+                        or not DIALOGUE_TEMPLATE_ID.fullmatch(segment_template)
+                        or not isinstance(segment_fallback, str)
+                        or not segment_fallback.strip()
+                        or len(segment_fallback) > 256):
+                    raise CompileError(f"dialogue response plan for {pool_id}:{variant_id} has invalid translation segment")
+                normalized_segments.append({
+                    "kind": "translation",
+                    "templateID": segment_template,
+                    "fallback": segment_fallback.strip(),
+                })
+            elif kind == "literal":
+                segment_text = segment.get("text")
+                if not isinstance(segment_text, str) or not segment_text.strip() or len(segment_text) > 256:
+                    raise CompileError(f"dialogue response plan for {pool_id}:{variant_id} has invalid literal segment")
+                normalized_segments.append({"kind": "literal", "text": segment_text.strip()})
+            else:
+                raise CompileError(f"dialogue response plan for {pool_id}:{variant_id} has unsupported segment kind")
+        normalized["turns"].append({
+            "id": str(turn.get("id", len(normalized["turns"]) + 1)),
+            "continuation": str(turn.get("continuation", "end")),
+            "segments": normalized_segments,
+        })
+    return normalized
+
+
+def _compile_dialogue_response_pool(
+    value: Any,
+    source_names: set[str],
+) -> tuple[dict[str, Any], dict[str, dict[str, str]]]:
     if not isinstance(value, dict):
         raise CompileError("dialogue response pools must be objects")
     pool_id = value.get("id")
@@ -613,16 +837,42 @@ def _compile_dialogue_response_pool(value: Any) -> dict[str, Any]:
             or re.search(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]", fallback)):
             raise CompileError(f"invalid fallback text for {pool_id}:{variant_id}")
         template_id = variant.get("templateID", variant_id)
-        if not isinstance(template_id, str) or not DIALOGUE_ID.fullmatch(template_id):
+        if (not isinstance(template_id, str)
+                or not DIALOGUE_TEMPLATE_ID.fullmatch(template_id)):
             raise CompileError(f"invalid template id for {pool_id}:{variant_id}")
         priority = variant.get("priority", 0)
         if isinstance(priority, bool) or not isinstance(priority, int) or not -10 <= priority <= 10:
             raise CompileError(
                 f"response priority for {pool_id}:{variant_id} must be from -10 to 10")
-        allowed_keys = {"id", "templateID", "fallback", "when", "priority"}
+        allowed_keys = {
+            "id", "templateID", "fallback", "when", "priority", "en", "tl",
+            "plan", "reviewed", "sourceRefs",
+        }
         if set(variant) - allowed_keys:
             raise CompileError(
                 f"unsupported fields for dialogue response {pool_id}:{variant_id}")
+        if (not isinstance(template_id, str)
+                or not DIALOGUE_TEMPLATE_ID.fullmatch(template_id)):
+            raise CompileError(f"invalid template id for {pool_id}:{variant_id}")
+        english = variant.get("en", fallback)
+        tagalog = variant.get("tl")
+        if "en" in variant or "tl" in variant:
+            if (not isinstance(english, str) or not english.strip()
+                    or not isinstance(tagalog, str) or not tagalog.strip()):
+                raise CompileError(
+                    f"dialogue response {pool_id}:{variant_id} requires both EN and TL text")
+        reviewed = variant.get("reviewed", False)
+        if not isinstance(reviewed, bool):
+            raise CompileError(f"dialogue response {pool_id}:{variant_id} reviewed must be boolean")
+        source_refs = []
+        if "sourceRefs" in variant:
+            source_refs = _validate_source_refs(
+                variant["sourceRefs"], source_names,
+                f"dialogue response {pool_id}:{variant_id} sourceRefs",
+            )
+        if "plan" in variant and (not reviewed or not source_refs):
+            raise CompileError(
+                f"dialogue response {pool_id}:{variant_id} plan requires reviewed source metadata")
         compiled_variant = {
             "id": variant_id,
             "templateID": template_id,
@@ -633,8 +883,30 @@ def _compile_dialogue_response_pool(value: Any) -> dict[str, Any]:
             compiled_variant["when"] = condition
         if priority != 0:
             compiled_variant["priority"] = priority
+        if "plan" in variant:
+            compiled_variant["plan"] = _validate_dialogue_plan(
+                variant["plan"], pool_id, variant_id, template_id, fallback.strip()
+            )
+        if reviewed:
+            compiled_variant["metadata"] = {
+                "reviewed": True,
+                "sourceRefs": source_refs,
+            }
+        if "en" in variant or "tl" in variant:
+            compiled_variant.setdefault("metadata", {})["translationKey"] = template_id
         compiled_variants.append(compiled_variant)
-    return {"id": pool_id, "variants": compiled_variants}
+    translations = {"EN": {}, "TL": {}}
+    for variant in variants:
+        if "en" not in variant and "tl" not in variant:
+            continue
+        variant_id = variant["id"]
+        compiled_variant = next(item for item in compiled_variants if item["id"] == variant_id)
+        key = compiled_variant["templateID"]
+        if key in translations["EN"] or key in translations["TL"]:
+            raise CompileError(f"duplicate dialogue translation key {key}")
+        translations["EN"][key] = variant["en"].strip()
+        translations["TL"][key] = variant["tl"].strip()
+    return {"id": pool_id, "variants": compiled_variants}, translations
 
 
 def compile_dialogue_dataset(document: dict[str, Any]) -> dict[str, Any]:
@@ -655,11 +927,13 @@ def compile_dialogue_dataset(document: dict[str, Any]) -> dict[str, Any]:
         raise CompileError(
             f"dialogue dataset requires at most {DIALOGUE_MAX_POOLS} response pools")
 
+    source_names = {reference["name"] for reference in source["references"]}
     compiled_patterns = []
     seen_pattern_ids: set[str] = set()
     seen_utterances: dict[str, str] = {}
+    seen_negatives: dict[str, str] = {}
     for pattern in patterns:
-        compiled = _compile_dialogue_pattern(pattern)
+        compiled, negatives = _compile_dialogue_pattern(pattern, source_names)
         if compiled["id"] in seen_pattern_ids:
             raise CompileError(f"duplicate dialogue pattern id {compiled['id']}")
         seen_pattern_ids.add(compiled["id"])
@@ -670,14 +944,31 @@ def compile_dialogue_dataset(document: dict[str, Any]) -> dict[str, Any]:
             raise CompileError(
                 f"dialogue utterance {normalized_utterance!r} is mapped by both "
                 f"{previous} and {compiled['id']}")
+        previous = seen_negatives.get(normalized_utterance)
+        if previous is not None:
+            raise CompileError(
+                f"dialogue positive {normalized_utterance!r} collides with negative pattern {previous}")
         seen_utterances[normalized_utterance] = compiled["id"]
+        for negative in negatives:
+            previous = seen_utterances.get(negative)
+            if previous is not None:
+                raise CompileError(
+                    f"dialogue negative {negative!r} collides with positive pattern {previous}")
+            previous = seen_negatives.get(negative)
+            if previous is not None and previous != compiled["id"]:
+                raise CompileError(
+                    f"dialogue negative {negative!r} is repeated by {previous} and {compiled['id']}")
+            seen_negatives[negative] = compiled["id"]
         compiled_patterns.append(compiled)
 
     compiled_pools = []
+    translations = {"EN": {}, "TL": {}}
     seen_pool_ids: set[str] = set()
     seen_response_ids: set[str] = set()
     for pool in response_pools:
-        compiled = _compile_dialogue_response_pool(pool)
+        compiled, pool_translations = _compile_dialogue_response_pool(
+            pool, source_names
+        )
         if compiled["id"] in seen_pool_ids:
             raise CompileError(f"duplicate dialogue response pool {compiled['id']}")
         seen_pool_ids.add(compiled["id"])
@@ -685,6 +976,11 @@ def compile_dialogue_dataset(document: dict[str, Any]) -> dict[str, Any]:
             if variant["id"] in seen_response_ids:
                 raise CompileError(f"duplicate dialogue response id {variant['id']}")
             seen_response_ids.add(variant["id"])
+        for language in ("EN", "TL"):
+            for key, text in pool_translations[language].items():
+                if key in translations[language]:
+                    raise CompileError(f"duplicate dialogue translation key {key}")
+                translations[language][key] = text
         compiled_pools.append(compiled)
 
     compiled_patterns.sort(key=lambda item: item["id"])
@@ -693,6 +989,13 @@ def compile_dialogue_dataset(document: dict[str, Any]) -> dict[str, Any]:
         "source": source,
         "patterns": compiled_patterns,
         "responsePools": compiled_pools,
+        "translations": {
+            language: {
+                key: translations[language][key]
+                for key in sorted(translations[language])
+            }
+            for language in ("EN", "TL")
+        },
     }
 
 
@@ -831,6 +1134,21 @@ def render_dialogue_lua(
             f'append(result["responsePools"], require "{module}")')
     lines.extend(["return result", ""])
     return "\n".join(lines)
+
+
+def render_dialogue_translation(compiled: dict[str, Any], language: str) -> str:
+    """Render the small localized shard emitted beside generated dialogue Lua."""
+    if language not in ("EN", "TL"):
+        raise CompileError(f"unsupported dialogue translation language {language}")
+    translations = compiled.get("translations", {})
+    values = translations.get(language, {})
+    if not isinstance(values, dict):
+        raise CompileError(f"dialogue translations for {language} must be an object")
+    return json.dumps(
+        {key: values[key] for key in sorted(values)},
+        ensure_ascii=False,
+        separators=(",", ":"),
+    ) + "\n"
 
 
 def load_semantic_source(path: Path) -> dict[str, Any]:

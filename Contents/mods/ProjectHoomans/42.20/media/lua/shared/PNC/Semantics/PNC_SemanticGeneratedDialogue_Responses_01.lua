@@ -148,6 +148,58 @@ return {
             },
         },
     {
+            ["id"] = "semantic.question.needs.proposal",
+            ["variants"] = {
+                {
+                    ["fallback"] = "I can keep that as a proposal, but I still need the item and amount before I record a commitment.",
+                    ["id"] = "semantic.question.needs.proposal.dataset.thirst",
+                    ["metadata"] = {
+                        ["reviewed"] = true,
+                        ["sourceRefs"] = {
+                            "MASSIVE",
+                            "SGD",
+                        },
+                        ["translationKey"] = "UI_PNC_Conversation_Semantic_DatasetNeedsPromiseThirst",
+                    },
+                    ["plan"] = {
+                        ["dialogueAct"] = "PROMISE_ACKNOWLEDGEMENT",
+                        ["groundedFactRefs"] = {
+                            "npc.needs.thirst",
+                        },
+                        ["personalityStyle"] = nil,
+                        ["sourcePoolID"] = "semantic.question.needs.proposal",
+                        ["tone"] = "direct",
+                        ["topic"] = "NEEDS",
+                        ["turns"] = {
+                            {
+                                ["continuation"] = "continue",
+                                ["id"] = "dataset_proposal_acknowledged",
+                                ["segments"] = {
+                                    {
+                                        ["fallback"] = "I can keep that as a proposal, but I still need the item and amount before I record a commitment.",
+                                        ["kind"] = "translation",
+                                        ["templateID"] = "UI_PNC_Conversation_Semantic_DatasetNeedsPromiseThirst",
+                                    },
+                                },
+                            },
+                        },
+                        ["uncertainty"] = "pending",
+                    },
+                    ["priority"] = 4,
+                    ["templateID"] = "UI_PNC_Conversation_Semantic_DatasetNeedsPromiseThirst",
+                    ["when"] = {
+                        ["needType"] = "thirst",
+                        ["needUrgency"] = {
+                            "moderate",
+                            "severe",
+                            "emergency",
+                            "critical",
+                        },
+                    },
+                },
+            },
+        },
+    {
             ["id"] = "semantic.question.wellbeing",
             ["variants"] = {
                 {

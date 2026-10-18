@@ -8,16 +8,64 @@
       {
         "name": "DailyDialog",
         "url": "https://aclanthology.org/I17-1099/",
-        "use": "Everyday dialogue-act coverage guidance; no corpus turns are copied."
+        "use": "Everyday dialogue-act coverage guidance; no corpus turns are copied.",
+        "license": "ACL Anthology terms; metadata-only reference",
+        "reviewedOn": "2026-10-19"
       },
       {
         "name": "EmpatheticDialogues",
         "url": "https://github.com/facebookresearch/EmpatheticDialogues",
-        "use": "Emotion-aware interaction coverage guidance; no corpus turns are copied."
+        "use": "Emotion-aware interaction coverage guidance; no corpus turns are copied.",
+        "license": "CC BY 4.0; metadata-only reference",
+        "reviewedOn": "2026-10-19"
+      },
+      {
+        "name": "WordNet 3.0",
+        "url": "https://wordnet.princeton.edu/",
+        "use": "Reviewed FETCH lexical sense guidance for the pick-up paraphrase; no dictionary files ship at runtime.",
+        "license": "WordNet 3.0 license",
+        "reviewedOn": "2026-10-19"
+      },
+      {
+        "name": "MASSIVE",
+        "url": "https://github.com/alexa/massive",
+        "use": "Reviewed English/Tagalog intent-slot paraphrase guidance; no corpus turns are copied.",
+        "license": "CC BY 4.0",
+        "reviewedOn": "2026-10-19"
+      },
+      {
+        "name": "SGD",
+        "url": "https://github.com/google-research-datasets/dstc8-schema-guided-dialogue",
+        "use": "Reviewed missing-slot and dialogue-state transition guidance; no corpus turns are copied.",
+        "license": "CC BY-SA 4.0",
+        "reviewedOn": "2026-10-19"
       }
     ]
   },
   "patterns": [
+    {
+      "id": "pnc.dataset.promise.needs.i_ll_pick_some_up",
+      "utterance": "i'll pick some up",
+      "emit": {
+        "intent": "PROMISE",
+        "speechAct": "PROMISE",
+        "subject": "NEEDS",
+        "extensions": {
+          "topic": "NEEDS",
+          "dialogueFollowUp": "NEEDS_PROPOSAL"
+        }
+      },
+      "negatives": ["i won't pick some up"],
+      "reviewed": true,
+      "sourceRefs": ["WordNet 3.0", "MASSIVE", "SGD"],
+      "mapping": {
+        "canonicalConcept": "FETCH",
+        "dialogueState": "NEEDS_PROPOSAL",
+        "sourceRefs": ["WordNet 3.0", "MASSIVE", "SGD"]
+      },
+      "confidence": 0.99,
+      "priority": 166
+    },
     {
       "id": "pnc.dataset.question.wellbeing.how_are_things_going",
       "utterance": "how are things going",
@@ -424,6 +472,46 @@
           "fallback": "After that lie, I'm not telling you my name. Tell me the truth about yours.",
           "when": { "identityTrust": "untrustworthy" },
           "priority": 2
+        }
+      ]
+    },
+    {
+      "id": "semantic.question.needs.proposal",
+      "variants": [
+        {
+          "id": "semantic.question.needs.proposal.dataset.thirst",
+          "templateID": "UI_PNC_Conversation_Semantic_DatasetNeedsPromiseThirst",
+          "fallback": "I can keep that as a proposal, but I still need the item and amount before I record a commitment.",
+          "en": "I can keep that as a proposal, but I still need the item and amount before I record a commitment.",
+          "tl": "Maaari ko iyong ituring na panukala, pero kailangan ko pa ang item at dami bago ako magtala ng pangako.",
+          "when": {
+            "needType": "thirst",
+            "needUrgency": ["moderate", "severe", "emergency", "critical"]
+          },
+          "priority": 4,
+          "reviewed": true,
+          "sourceRefs": ["MASSIVE", "SGD"],
+          "plan": {
+            "dialogueAct": "PROMISE_ACKNOWLEDGEMENT",
+            "sourcePoolID": "semantic.question.needs.proposal",
+            "topic": "NEEDS",
+            "groundedFactRefs": ["npc.needs.thirst"],
+            "uncertainty": "pending",
+            "tone": "direct",
+            "turns": [
+              {
+                "id": "dataset_proposal_acknowledged",
+                "continuation": "continue",
+                "segments": [
+                  {
+                    "kind": "translation",
+                    "templateID": "UI_PNC_Conversation_Semantic_DatasetNeedsPromiseThirst",
+                    "fallback": "I can keep that as a proposal, but I still need the item and amount before I record a commitment."
+                  }
+                ]
+              }
+            ]
+          }
         }
       ]
     }
