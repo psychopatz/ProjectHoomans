@@ -1,14 +1,14 @@
 # Contextual Dialogue & Quest Framework — current progress
 
-**Updated:** 2026-10-19, after the C3-B real-worker quantity-aware needs slice.
+**Updated:** 2026-10-19, after the C3-C real-worker confirmation-safe needs proposal slice.
 
-**Local implementation:** branch `codex/contextual-dialogue-quest-framework-0a`; implementation is committed through `a22b1d78` (C3-B quantity-aware needs follow-up), following C3-A `9ef46d2e`, C2-A `8a4e0b0e`, C1-A `470bb915`, C0-A `ca65049c`, G3C `9946fe69`, and documentation commit `32aceac7`. Earlier accepted slices remain `0cfcc345` (all dispatchable actions), `b1102486` (safe regeneration), `68c313fe` (multi-stage gifts), `b242e78c` (parameterized tasks), and `6290b3f74279731c7d80e97e077e88c10d35d676` (simple commands). Shared branch history also preserves unrelated concurrent P0B import-planner commits.
+**Local implementation:** branch `codex/contextual-dialogue-quest-framework-0a`; implementation is committed through `536b7141` (C3-C confirmation-safe needs proposal), following C3-B `a22b1d78`, C3-A `9ef46d2e`, C2-A `8a4e0b0e`, C1-A `470bb915`, C0-A `ca65049c`, G3C `9946fe69`, and documentation commit `32aceac7`. Earlier accepted slices remain `0cfcc345` (all dispatchable actions), `b1102486` (safe regeneration), `68c313fe` (multi-stage gifts), `b242e78c` (parameterized tasks), and `6290b3f74279731c7d80e97e077e88c10d35d676` (simple commands). Shared branch history also preserves unrelated concurrent P0B import-planner commits.
 
 **Upstream baseline:** `origin/docs/contextual-dialogue-quest-framework-20261018` at `a79b01ff14be33178f699c50623a20524b04d46c`; the local implementation is intentionally ahead of that documentation baseline.
 
-**Current goal status:** **IN PROGRESS — G3C, C0-A, C1-A, C2-A, C3-A, and C3-B accepted; C3-C–C6, full production-harness/performance, and user-owned native-game gates remain open.**
+**Current goal status:** **IN PROGRESS — G3C, C0-A, C1-A, C2-A, C3-A, C3-B, and C3-C accepted; C3-D–C6, full production-harness/performance, and user-owned native-game gates remain open.**
 
-**ONE Next Chunk:** **C3-C — route one confirmation-safe “I’ll get some” needs offer through the existing response-plan/context path, preserving unconfirmed-promise state without creating an authoritative quest commitment or dispatch.**
+**ONE Next Chunk:** **C3-D — exercise the existing weather interruption/resumption path from the open needs proposal, preserving the proposal’s topic/focus and returning to it without creating an action or authoritative commitment.**
 
 ## Accepted historic foundation (do not redo)
 
@@ -174,7 +174,25 @@ Focused and regression evidence for `a22b1d78`:
 - `luac5.3 -p`, `python3 -m py_compile`, EN/TL `python3 -m json.tool`, and `git diff --check` passed; `pz_verify --kahlua --severity ERROR` reported **0 errors / 0 warnings** for every changed production Lua file.
 - No Project Zomboid process, multiplayer hosting, mod installation, Workshop publication, or native-game test was launched.
 
-C3-B does not yet implement an authoritative numeric supply amount, the confirmation-safe “I’ll get some” offer/promise path, the full weather interruption/resumption sequence, dataset-assisted compilation, Semantic Lab context inspection, performance/isolation measurement, optional PBrainZ parity measurement, or the final mandatory conversation. Those remain later bounded chunks.
+C3-B did not implement an authoritative numeric supply amount, the confirmation-safe “I’ll get some” offer/promise path, the full weather interruption/resumption sequence, dataset-assisted compilation, Semantic Lab context inspection, performance/isolation measurement, optional PBrainZ parity measurement, or the final mandatory conversation. C3-C now covers only the confirmation-safe offer/promise path; the other items remain later bounded chunks.
+
+## C3-C accepted — confirmation-safe needs proposal
+
+C3-C routes the authored “I’ll get some” / “I will get some” utterance through the existing deterministic Lua semantic worker and the existing `needs` FlowKernel/response-plan path. The new exact patterns emit `PROMISE` with `subject=NEEDS` and deliberately omit `action=FETCH`, so the promise cannot enter the gameplay task dispatcher. The `needs` flow now advances from its quantity answer into an open `PROPOSAL` agenda entry requiring confirmation; generic `ACCEPT`/`AGREE` keeps that proposal open until a later authority-backed confirmation slice exists. The generalized flow registry preserves a bounded node `pendingKind`, and the kernel closes the prior quantity/offer obligation as fulfilled before opening the next bounded obligation.
+
+Known hunger/thirst responses select the existing response catalog with `PROMISE_ACKNOWLEDGEMENT`, `NEEDS` topic, `pending` uncertainty, and the corresponding `npc.needs.*` fact provenance. Unknown needs remain fact-empty and clarifying. No numeric amount, quest instance, Knowledge commitment, task dispatch, inventory mutation, transport, tool call, or PBrainZ call is created. EN/TL presentation keys are authored in the existing semantic response files.
+
+Focused and regression evidence for `536b7141`:
+
+- `python3 -m unittest tools.semantic_harness.tests.test_contextual_conversation_c3c -v` — **1/1 passed** across EN/TL subcases.
+- C0/C3-B/C3-C production-worker regression slice — **5/5 passed**; the offer path verifies semantic IR, flow transition, pending proposal, prior-obligation closure, selected plan, final displayed response, and zero side effects.
+- Full worker suite via `unittest` discovery — **155/155 passed** (`testsRun=155`, `failures=0`, `errors=0`).
+- `./tools/semantic_harness/run_harness.sh --doctor --doctor-json` passed Python, repository, virtualenv, Tk/display, Core, Lua, worker syntax, boot, PING, and CAPABILITIES checks.
+- `luac5.3 -p`, `python3 -m py_compile`, EN/TL `python3 -m json.tool`, and `git diff --check` passed. `pz_verify --kahlua --severity ERROR` reported **0 errors / 0 warnings** for each of the six changed production Lua files.
+- Codebase-memory coverage for all nine changed source/test paths returned `no_recorded_issue`; the indexed generation predates the edits and marked changed files `metadata_changed`/`not_tracked`, so the acceptance relies on direct source reads and real-worker tests rather than stale graph freshness.
+- No Project Zomboid process, multiplayer hosting, mod installation, Workshop publication, or native-game test was launched.
+
+C3-C intentionally does not confirm the proposal into an authoritative quest or Knowledge commitment, implement an exact weather interruption/resumption turn after the proposal, supply a numeric item amount, add dataset-assisted compilation, extend Semantic Lab inspection, measure performance/isolation, measure optional PBrainZ parity, or claim the final mandatory conversation. C3-D is the next bounded topic-interruption/resumption slice.
 
 ## Semantic Lab naming audit
 
@@ -199,13 +217,13 @@ The generator's canonical IDs remain unchanged for registry lookup, persisted ma
 
 ## Scope boundary
 
-G0A, G0B, G0C, G0D/G0D-2, G0E, G0F, G0G, G0H, G0I, G3A, G3B, G3C, C0-A, C1-A, C2-A, C3-A, and C3-B are accepted implementation slices, not completion of the expanded goal. G3B's Semantic Lab/X11 gate, G3C's real-worker boundary, C0-A's worker authority regression gate, C1-A's context/resumption gate, C2-A's Knowledge commitment gate, and C3-A/C3-B response-plan gates are verified; native Project Zomboid SP/MP and Workshop actions remain user-owned. Continue with the single C3-C chunk above before any READY FOR USER LIVE TEST claim.
+G0A, G0B, G0C, G0D/G0D-2, G0E, G0F, G0G, G0H, G0I, G3A, G3B, G3C, C0-A, C1-A, C2-A, C3-A, C3-B, and C3-C are accepted implementation slices, not completion of the expanded goal. G3B's Semantic Lab/X11 gate, G3C's real-worker boundary, C0-A's worker authority regression gate, C1-A's context/resumption gate, C2-A's Knowledge commitment gate, and C3-A/C3-B/C3-C response-plan gates are verified; native Project Zomboid SP/MP and Workshop actions remain user-owned. Continue with the single C3-D chunk above before any READY FOR USER LIVE TEST claim.
 
 
 ## Approved future goal expansion — Contextual Conversational Intelligence (2026-10-19 planning only)
 
 User-approved target: offline Lua NPCs should understand elliptical follow-ups, topic interruptions and resumption, pending questions/offers/corrections, personality-aware dialogue plans and sparse evidence-backed promises with relevant world/quest/knowledge context; optional PBrainZ may rephrase the SAME authorized plan. Improve `tools/semantic_compiler` and Semantic Lab with reviewed dataset-assisted language/conversation-state generation and a context/plan/evidence inspector. See NEW `CONVERSATIONAL_INTELLIGENCE.md`, `DATASET_CONVERSATION_PIPELINE.md` and `CONVERSATION_ACCEPTANCE.md`, and the refreshed `ROADMAP.md`.
 
-G3C, C0-A, C1-A, C2-A, C3-A, and C3-B are genuinely accepted locally with the evidence above. The next implementation task is exactly the single C3-C chunk named at the top; it is a confirmation-safe needs offer/promise slice, not a claim of C4–C6 completion, corpus import, or native-game validation.
+G3C, C0-A, C1-A, C2-A, C3-A, C3-B, and C3-C are genuinely accepted locally with the evidence above. The next implementation task is exactly the single C3-D chunk named at the top; it is a weather interruption/resumption slice for the open needs proposal, not a claim of C4–C6 completion, corpus import, or native-game validation.
 
 Remote branch may not reflect the local Codex working checkout. Agent must reconcile current local HEAD/dirty/parallel work, and not discard implementation changes. C0-A measured and repaired the previously recorded four social THREAT test failures and insult final-response problem at the canonical worker authority boundary; C1-A measured topic interruption/resumption at the same worker boundary. Neither slice claims the mandatory multi-turn conversation complete.
