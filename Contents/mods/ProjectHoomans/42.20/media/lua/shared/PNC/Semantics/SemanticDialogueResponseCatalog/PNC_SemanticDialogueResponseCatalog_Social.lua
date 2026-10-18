@@ -176,6 +176,13 @@ Catalog.Register("semantic.refuse", {
 Catalog.Register("semantic.gossip", {
     variants = {
         {
+            id = "semantic.gossip.memory",
+            templateID = "semantic.gossip.memory",
+            fallback = "I have something I remember about that.",
+            when = { memoryAvailable = true },
+            priority = 2,
+        },
+        {
             id = "semantic.gossip.unknown",
             templateID = "semantic.gossip.unknown",
             fallback = "I haven't heard anything about that yet.",

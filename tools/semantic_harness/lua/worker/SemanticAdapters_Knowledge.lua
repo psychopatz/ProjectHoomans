@@ -52,6 +52,50 @@ function Provider.configure(deps)
         end
     end
 
+    -- Model the already-authoritative cognition service at the worker
+    -- boundary. The response is scenario-owned test evidence; production
+    -- cognition still arrives through the normal client request and server
+    -- payload path, and no client-side fact is invented.
+    PNC.Semantics = PNC.Semantics or {}
+    PNC.Semantics.CognitionService = PNC.Semantics.CognitionService or {}
+    PNC.Semantics.CognitionService.HandleRequest = function(
+        dispatchPlayer, args
+    )
+        args = type(args) == "table" and args or {}
+        local responses = runtime.semanticCognitionResponses or {}
+        local configured = responses[string.upper(tostring(args.subject or ""))]
+        local gossip = type(configured) == "table"
+            and configured.gossip or nil
+        if configured == nil or configured == false then
+            return false, "cognition_unavailable"
+        end
+        Runtime.transport[#Runtime.transport + 1] = {
+            direction = "client_to_server",
+            mode = runtime.mode,
+            command = "SemanticCognitionRequest",
+            payload = Values.copy(args),
+        }
+        local projection = {}
+        if type(gossip) == "table" then
+            projection._memoryGossip = {
+                subject = gossip.subject,
+                codes = Values.copy(gossip.codes or {}),
+            }
+        end
+        local network = PNC.Network
+        if network and type(network.SendSemanticCognition) == "function" then
+            network.SendSemanticCognition(
+                dispatchPlayer,
+                projection,
+                tostring(configured.reason or "harness_authoritative"),
+                args.requestID,
+                args.npcID
+            )
+            return true, "harness_authoritative"
+        end
+        return false, "cognition_transport_unavailable"
+    end
+
     PNC.Client.SendCompanionCommand = function(
         commandID, npcID, scope, commandContext
     )

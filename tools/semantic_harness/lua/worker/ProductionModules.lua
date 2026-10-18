@@ -49,6 +49,8 @@ function ProductionModules.load(context)
     )
     load("PsychopatzCore", "common", "PsychopatzCore/Translation/PsychopatzCustomTranslationManager.lua", "translation")
     load("PsychopatzCore", "common", "PsychopatzCore/Translation/PsychopatzCoreTranslation.lua", "translation")
+    load("ProjectHoomans", "shared", "PNC/Core/Base/PNC_Constants.lua", "network")
+    load("ProjectHoomans", "shared", "PNC/Core/Networking/PNC_Network.lua", "network")
     load("ProjectHoomans", "shared", "PNC/Translation/PNC_TranslationBootstrap.lua", "translation")
     load("PsychopatzCore", "common_client", "PsychopatzCore/UI/Conversation/PsychopatzConversationText.lua", "conversation_text")
     load("ProjectHoomans", "shared", "PNC/Semantics/PNC_SemanticMarketSenseAdapter.lua", "inventory")
@@ -125,11 +127,23 @@ function ProductionModules.load(context)
             .. ": " .. reason)
     end
     load("ProjectHoomans", "client", "PNC/Semantics/PNC_SemanticDialogueInput.lua", "semantic_entry")
+    load(
+        "ProjectHoomans", "common_lua",
+        "PNC/Conversation/Definitions/Memory/00_PNC_ConversationMemoryDefinitions.lua",
+        "conversation_memory"
+    )
+    load(
+        "ProjectHoomans", "shared",
+        "PNC/Core/Networking/PNC_Network_Server/PNC_Network_Server_Cognition.lua",
+        "network"
+    )
     require = originalRequire
 
     load("ProjectHoomans", "client", "PNC/Networking/ClientCommandRouter/PNC_ClientCommandRouter_Registry.lua", "network")
+    load("ProjectHoomans", "client", "PNC/Networking/ClientCommandRouter/PNC_ClientCommandRouter_Semantics.lua", "network")
     load("ProjectHoomans", "client", "PNC/Networking/ClientCommandRouter/PNC_ClientCommandRouter_SemanticIdentity.lua", "network")
     load("ProjectHoomans", "client", "PNC/Networking/ClientRequests/PNC_ClientRequests_Internal.lua", "network")
+    load("ProjectHoomans", "client", "PNC/Networking/ClientRequests/PNC_ClientRequests_SemanticCognition.lua", "network")
     load("ProjectHoomans", "client", "PNC/Networking/ClientRequests/PNC_ClientRequests_Identity.lua", "network")
 
     PsychopatzConversationLLMInput = originalInputClass

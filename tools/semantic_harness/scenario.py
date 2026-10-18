@@ -111,6 +111,7 @@ DEFAULT_SCENARIO: dict[str, Any] = {
         "llmEnabled": False,
         "providerAvailable": False,
         "nativeTranslations": {},
+        "semanticCognitionResponses": {},
         "commandResponses": {
             "follow": {"accepted": True, "reason": "network_queued"},
             "stay": {"accepted": True, "reason": "network_queued"},

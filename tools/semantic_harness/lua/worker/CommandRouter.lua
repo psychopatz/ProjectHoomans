@@ -95,7 +95,6 @@ function CommandRouter.dispatch(context, request)
             loadedModules = Runtime.loadedModules,
             moduleManifest = Runtime.moduleManifest,
             headlessRequires = Runtime.headlessRequires,
-            flowCatalog = context.FlowEditor.catalog(context),
             translation = context.OutputProjection.translationSnapshot(context),
         }
     elseif command == "QUIT" then

@@ -350,6 +350,43 @@ class AutomaticFlowGenerationTests(unittest.TestCase):
             generated["generation"]["generatedFlowIDs"],
         )
 
+    def test_authoritative_gossip_memory_reaches_response_selection_in_en_and_tl(self) -> None:
+        for language, expected in (
+            ("EN", "Mara has been looking out for people."),
+            ("TL", "Inaalalayan ni Mara ang mga tao."),
+        ):
+            scenario = merge(
+                DEFAULT_SCENARIO,
+                {"runtime": {
+                    "language": language,
+                    "semanticCognitionResponses": {
+                        "GOSSIP": {
+                            "gossip": {"subject": "Mara", "codes": [1001]},
+                        },
+                    },
+                }},
+            )
+            with self.subTest(language=language):
+                with LuaSemanticWorker(scenario) as worker:
+                    result = worker.input("any gossip?")
+
+                response = result["result"]["decision"]["response"]
+                self.assertEqual(response["templateID"], "semantic.gossip.memory")
+                self.assertEqual(result["messages"][0]["payload"]["text"], expected)
+                self.assertEqual(
+                    [
+                        event["command"]
+                        for event in result["transport"]
+                        if event.get("command") == "SemanticCognitionRequest"
+                    ],
+                    ["SemanticCognitionRequest"],
+                )
+                self.assertTrue(any(
+                    event.get("eventName") == "OnServerCommand"
+                    and event.get("command") == "SemanticCognition"
+                    for event in result["transport"]
+                ))
+
 
 if __name__ == "__main__":
     unittest.main()

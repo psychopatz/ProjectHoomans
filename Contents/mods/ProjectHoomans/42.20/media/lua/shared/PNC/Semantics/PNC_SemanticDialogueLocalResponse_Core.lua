@@ -157,6 +157,9 @@ local function selectorContext(ir, state, context)
         timeBand = world.timeBand or time.band or context.timeBand,
         activity = activity.id,
         busy = activity.busy,
+        memoryAvailable = type(context.npcGossip) == "table"
+            and type(context.npcGossip.statements) == "table"
+            and #context.npcGossip.statements > 0 or false,
         needType = needs.highest,
         needUrgency = needs.urgency,
         emotionType = emotion.highest,

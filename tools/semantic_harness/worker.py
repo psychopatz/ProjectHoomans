@@ -140,7 +140,14 @@ class LuaSemanticWorker:
         return self._request("PING")
 
     def capabilities(self) -> dict[str, Any]:
-        return self._request("CAPABILITIES")
+        capabilities = self._request("CAPABILITIES")
+        # Keep the capability handshake bounded as the generated production
+        # catalog grows. The catalog remains available through the same
+        # production FlowEditor seam, but is fetched as its own bounded
+        # response instead of being duplicated in CAPABILITIES.
+        if "flowCatalog" not in capabilities:
+            capabilities["flowCatalog"] = self.flow_catalog()
+        return capabilities
 
     def restart(self) -> dict[str, Any]:
         """Restart the isolated worker and restore the current scenario."""

@@ -31,6 +31,7 @@ local CONDITION_FIELDS = {
     "intent", "action", "subject",
     "relationshipState", "identityTrust", "timeBand", "raining", "foggy", "snowing",
     "indoors", "hasPendingRequest", "npcID", "activity", "busy",
+    "memoryAvailable",
     "needType", "needUrgency", "relationshipAttitude", "healthState",
     "socialStyle", "emotionType", "emotionUrgency", "hostilityCount",
     "insultCount", "lastSpeechAct",
@@ -109,6 +110,7 @@ local function conditionContext(context)
     local needs = npc.needs or {}
     local emotion = npc.emotion or {}
     local social = situation.social or {}
+    local gossip = context.npcGossip
     local healthState = context.healthState or npc.healthState
     -- Keep missing health evidence distinct from a known healthy state for
     -- response selection. The routed situation remains source-faithful and
@@ -137,6 +139,9 @@ local function conditionContext(context)
         npcID = context.npcID,
         activity = context.activity or activity.id,
         busy = context.busy ~= nil and context.busy or activity.busy,
+        memoryAvailable = type(gossip) == "table"
+            and type(gossip.statements) == "table"
+            and #gossip.statements > 0 or false,
         needType = context.needType or needs.highest,
         needUrgency = context.needUrgency or needs.urgency,
         emotionType = context.emotionType or emotion.highest,
