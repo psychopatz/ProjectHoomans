@@ -99,6 +99,34 @@ class DialogueDatasetCompilerTests(unittest.TestCase):
         self.assertIn(variant["templateID"], compiled["translations"]["EN"])
         self.assertIn(variant["templateID"], compiled["translations"]["TL"])
 
+    def test_reviewed_wellbeing_mapping_keeps_unknown_causal_answer_grounded(self) -> None:
+        compiled = compile_dialogue_dataset(self.source)
+        pattern = next(
+            item for item in compiled["patterns"]
+            if item["id"] == "pnc.dataset.question.wellbeing.what_is_going_on_with_you"
+        )
+        self.assertEqual(pattern["emit"]["subject"], "WELLBEING")
+        self.assertEqual(pattern["metadata"]["mapping"]["canonicalConcept"], "WELLBEING")
+        self.assertEqual(
+            pattern["metadata"]["mapping"]["dialogueState"],
+            "WELLBEING_FOLLOW_UP",
+        )
+        self.assertNotIn("what is going on with me", json.dumps(pattern))
+
+        pool = next(
+            item for item in compiled["responsePools"]
+            if item["id"] == "semantic.question.wellbeing.unknown"
+        )
+        variant = next(
+            item for item in pool["variants"]
+            if item["id"] == "semantic.question.wellbeing.unknown.dataset.causal_followup"
+        )
+        self.assertEqual(variant["when"]["healthState"], "unknown")
+        self.assertEqual(variant["plan"]["uncertainty"], "unknown")
+        self.assertEqual(variant["plan"]["groundedFactRefs"], [])
+        self.assertIn(variant["templateID"], compiled["translations"]["EN"])
+        self.assertIn(variant["templateID"], compiled["translations"]["TL"])
+
     def test_negative_examples_cannot_become_runtime_patterns(self) -> None:
         invalid = copy.deepcopy(self.source)
         invalid["patterns"][0]["negatives"] = [

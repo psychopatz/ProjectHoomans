@@ -92,7 +92,8 @@ greetings, identity questions, wellbeing/activity questions, and state-aware
 response variety. Its utterance patterns are exact full-phrase matches that
 emit only existing `GREET` or `QUESTION` semantics. Question subjects use
 existing `IDENTITY`, `WELLBEING`, `ACTIVITY`, and `WEATHER` response paths.
-Reviewed `PROMISE`/`NEEDS`, `CLARIFY`/`NEEDS`, and weather topic mappings reuse
+Reviewed `PROMISE`/`NEEDS`, `CLARIFY`/`NEEDS`, weather topic, and
+causal/wellbeing follow-up mappings reuse
 their existing canonical flow states; supplemental response plans extend the
 existing pools and are localized into EN/TL. Identity
 responses retain the existing name-disclosure trust gate, while supplemental

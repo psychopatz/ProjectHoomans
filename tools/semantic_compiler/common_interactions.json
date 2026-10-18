@@ -59,6 +59,21 @@
       "priority": 165
     },
     {
+      "id": "pnc.dataset.question.wellbeing.what_is_going_on_with_you",
+      "utterance": "what is going on with you",
+      "emit": { "intent": "QUESTION", "speechAct": "QUESTION", "subject": "WELLBEING" },
+      "negatives": ["what is going on with me"],
+      "reviewed": true,
+      "sourceRefs": ["MASSIVE", "SGD"],
+      "mapping": {
+        "canonicalConcept": "WELLBEING",
+        "dialogueState": "WELLBEING_FOLLOW_UP",
+        "sourceRefs": ["MASSIVE", "SGD"]
+      },
+      "confidence": 0.99,
+      "priority": 164
+    },
+    {
       "id": "pnc.dataset.clarify.needs.which_item_do_you_mean",
       "utterance": "which item do you mean",
       "emit": {
@@ -627,6 +642,47 @@
                     "kind": "translation",
                     "templateID": "UI_PNC_Conversation_Semantic_DatasetWeatherContextualSwitch",
                     "fallback": "It is raining right now. We can return to that proposal when you are ready."
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "semantic.question.wellbeing.unknown",
+      "variants": [
+        {
+          "id": "semantic.question.wellbeing.unknown.dataset.causal_followup",
+          "templateID": "UI_PNC_Conversation_Semantic_DatasetWellbeingCausalUnknown",
+          "fallback": "I can tell something is off, but I do not know what caused it yet.",
+          "en": "I can tell something is off, but I do not know what caused it yet.",
+          "tl": "Alam kong may hindi tama, pero hindi ko pa alam kung ano ang sanhi nito.",
+          "when": {
+            "pattern": "pnc.dataset.question.wellbeing.what_is_going_on_with_you",
+            "healthState": "unknown"
+          },
+          "priority": 4,
+          "reviewed": true,
+          "sourceRefs": ["MASSIVE", "SGD"],
+          "plan": {
+            "dialogueAct": "ASK_CLARIFICATION",
+            "sourcePoolID": "semantic.question.wellbeing.unknown",
+            "topic": "WELLBEING",
+            "groundedFactRefs": [],
+            "uncertainty": "unknown",
+            "tone": "clarifying",
+            "personalityStyle": "truthful",
+            "turns": [
+              {
+                "id": "dataset_causal_wellbeing_unknown",
+                "continuation": "continue",
+                "segments": [
+                  {
+                    "kind": "translation",
+                    "templateID": "UI_PNC_Conversation_Semantic_DatasetWellbeingCausalUnknown",
+                    "fallback": "I can tell something is off, but I do not know what caused it yet."
                   }
                 ]
               }

@@ -54,6 +54,57 @@ return {
             ["priority"] = 120,
         },
     {
+            ["confidence"] = 0.99,
+            ["emit"] = {
+                ["intent"] = "QUESTION",
+                ["speechAct"] = "QUESTION",
+                ["subject"] = "WELLBEING",
+            },
+            ["id"] = "pnc.dataset.question.wellbeing.what_is_going_on_with_you",
+            ["match"] = {
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "what",
+                },
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "is",
+                },
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "going",
+                },
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "on",
+                },
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "with",
+                },
+                {
+                    ["kind"] = "literal",
+                    ["value"] = "you",
+                },
+            },
+            ["metadata"] = {
+                ["mapping"] = {
+                    ["canonicalConcept"] = "WELLBEING",
+                    ["dialogueState"] = "WELLBEING_FOLLOW_UP",
+                    ["sourceRefs"] = {
+                        "MASSIVE",
+                        "SGD",
+                    },
+                },
+                ["reviewed"] = true,
+                ["sourceRefs"] = {
+                    "MASSIVE",
+                    "SGD",
+                },
+            },
+            ["priority"] = 164,
+        },
+    {
             ["confidence"] = 0.97,
             ["emit"] = {
                 ["intent"] = "QUESTION",

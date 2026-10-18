@@ -67,6 +67,51 @@ return {
             },
         },
     {
+            ["id"] = "semantic.question.wellbeing.unknown",
+            ["variants"] = {
+                {
+                    ["fallback"] = "I can tell something is off, but I do not know what caused it yet.",
+                    ["id"] = "semantic.question.wellbeing.unknown.dataset.causal_followup",
+                    ["metadata"] = {
+                        ["reviewed"] = true,
+                        ["sourceRefs"] = {
+                            "MASSIVE",
+                            "SGD",
+                        },
+                        ["translationKey"] = "UI_PNC_Conversation_Semantic_DatasetWellbeingCausalUnknown",
+                    },
+                    ["plan"] = {
+                        ["dialogueAct"] = "ASK_CLARIFICATION",
+                        ["groundedFactRefs"] = {},
+                        ["personalityStyle"] = "truthful",
+                        ["sourcePoolID"] = "semantic.question.wellbeing.unknown",
+                        ["tone"] = "clarifying",
+                        ["topic"] = "WELLBEING",
+                        ["turns"] = {
+                            {
+                                ["continuation"] = "continue",
+                                ["id"] = "dataset_causal_wellbeing_unknown",
+                                ["segments"] = {
+                                    {
+                                        ["fallback"] = "I can tell something is off, but I do not know what caused it yet.",
+                                        ["kind"] = "translation",
+                                        ["templateID"] = "UI_PNC_Conversation_Semantic_DatasetWellbeingCausalUnknown",
+                                    },
+                                },
+                            },
+                        },
+                        ["uncertainty"] = "unknown",
+                    },
+                    ["priority"] = 4,
+                    ["templateID"] = "UI_PNC_Conversation_Semantic_DatasetWellbeingCausalUnknown",
+                    ["when"] = {
+                        ["healthState"] = "unknown",
+                        ["pattern"] = "pnc.dataset.question.wellbeing.what_is_going_on_with_you",
+                    },
+                },
+            },
+        },
+    {
             ["id"] = "semantic.refuse",
             ["variants"] = {
                 {

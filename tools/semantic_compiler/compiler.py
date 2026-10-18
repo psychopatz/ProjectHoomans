@@ -32,9 +32,12 @@ DIALOGUE_PROMISE_EXTENSIONS = frozenset({"topic", "dialogueFollowUp"})
 DIALOGUE_MAPPING_FIELDS = frozenset({
     "canonicalConcept", "dialogueState", "sourceRefs",
 })
-DIALOGUE_MAPPING_CONCEPTS = frozenset({"ANY_ITEM", "FETCH", "WEATHER"})
+DIALOGUE_MAPPING_CONCEPTS = frozenset({
+    "ANY_ITEM", "FETCH", "WEATHER", "WELLBEING",
+})
 DIALOGUE_MAPPING_STATES = frozenset({
     "NEEDS_PROPOSAL", "NEEDS_QUANTITY", "WEATHER_TOPIC",
+    "WELLBEING_FOLLOW_UP",
 })
 DIALOGUE_PLAN_UNCERTAINTIES = frozenset({
     "known", "unknown", "ambiguous", "pending",
