@@ -71,6 +71,10 @@ function Context:ToContext()
         lastAction = self.lastAction,
         lastSpeaker = self.lastSpeaker,
         pendingIdentityExchange = self.pendingIdentityExchange,
+        pendingFollowUp = self:GetPendingFollowUp(),
+        lastFollowUp = copyValue(self.lastFollowUp),
+        agenda = self:AgendaSnapshot(self.maxAgenda),
+        priorTopics = copyValue(self.priorTopics or {}),
         flowSessions = self:FlowSnapshot(),
         sequence = self.sequence,
         recentTurns = self:RecentTurns(6, true),
@@ -86,6 +90,8 @@ function Context:Snapshot()
     output.maxFocus = self.maxFocus
     output.maxFlows = self.maxFlows
     output.maxFlowStack = self.maxFlowStack
+    output.maxAgenda = self.maxAgenda
+    output.maxTopicHistory = self.maxTopicHistory
     return output
 end
 

@@ -112,6 +112,66 @@ local function nodeFor(flow, nodeID)
     return flow and flow.nodes and flow.nodes[nodeID] or nil
 end
 
+local function topicForIR(ir)
+    if type(ir) ~= "table" then return nil end
+    local extensions = type(ir.extensions) == "table"
+        and ir.extensions or {}
+    local topic = extensions.topic or extensions.dialogueFollowUp
+        or ir.subject or ir.action or ir.intent
+    if type(topic) == "table" then
+        topic = topic.id or topic.key or topic.name
+    end
+    return topic
+end
+
+local function pendingFor(flow, node, topic)
+    if type(flow) ~= "table" or type(node) ~= "table"
+        or type(node.accepts) ~= "table" or #node.accepts == 0
+    then
+        return nil
+    end
+    return {
+        id = "flow:" .. tostring(flow.id) .. ":" .. tostring(node.id),
+        kind = "QUESTION",
+        topic = topic or flow.topic or flow.id,
+        owner = "flow",
+        flowID = flow.id,
+        nodeID = node.id,
+        requiredSlots = node.requiredSlots,
+        sourceFactRefs = node.sourceFactRefs,
+    }
+end
+
+local function setPending(storage, preview)
+    if type(storage) ~= "table"
+        or type(preview) ~= "table"
+        or type(preview.pendingFollowUp) ~= "table"
+        or type(storage.SetPendingFollowUp) ~= "function"
+    then
+        return false
+    end
+    local pending = copyValue(preview.pendingFollowUp)
+    pending.openedTurn = pending.openedTurn
+        or sequenceFor(nil, storage)
+    return storage:SetPendingFollowUp(pending)
+end
+
+local function completePendingFor(storage, flowID, reason)
+    if type(storage) ~= "table"
+        or type(storage.GetPendingFollowUp) ~= "function"
+        or type(storage.CompletePendingFollowUp) ~= "function"
+    then
+        return false
+    end
+    local pending = storage:GetPendingFollowUp()
+    if type(pending) ~= "table" or tostring(pending.flowID or "")
+        ~= tostring(flowID or "")
+    then
+        return false
+    end
+    return storage:CompletePendingFollowUp("fulfilled", reason)
+end
+
 local function gateResult(flow, node, context)
     if not node or not node.gate then return nil end
     local status
@@ -261,12 +321,14 @@ local function suspendedMatch(session, ir)
 end
 
 local function basePreview(ir, speakerID, addresseeID, key)
+    local topic = topicForIR(ir)
     return {
         schemaVersion = Kernel.VERSION,
         kind = "semantic_dialogue_flow_preview",
         key = key,
         speakerID = speakerID,
         addresseeID = addresseeID,
+        topic = topic,
         matched = false,
         transition = "hold",
         diagnostics = {
@@ -274,6 +336,7 @@ local function basePreview(ir, speakerID, addresseeID, key)
             registryRevision = Registry.GetRevision(),
             key = key,
             candidateFlows = {},
+            topic = topic,
             reason = "no_flow_trigger",
         },
     }
@@ -313,6 +376,11 @@ local function addMatch(preview, match, transition, fromNodeID, toNodeID)
     preview.diagnostics.flowId = match.flow.id
     preview.diagnostics.fromNodeId = fromNodeID
     preview.diagnostics.toNodeId = toNodeID
+    preview.pendingFollowUp = pendingFor(
+        match.flow,
+        nodeFor(match.flow, toNodeID),
+        preview.topic
+    )
 end
 
 local function attachGate(preview, gate)
@@ -425,6 +493,7 @@ function Kernel.Preview(ir, state, context, options)
         preview.responsePool = node and node.responsePool or nil
         preview.responseTemplate = node and node.responseTemplate or nil
         attachNodeContract(preview, node)
+        preview.pendingFollowUp = pendingFor(flow, node, preview.topic)
         preview.diagnostics.reason = preview.transition
         preview.diagnostics.flowId = flow.id
         preview.diagnostics.toNodeId = target
@@ -504,6 +573,20 @@ function Kernel.Commit(preview, ir, state, context, options)
         local previewNode = previewFlow
             and nodeFor(previewFlow, preview.toNodeId) or nil
         if previewNode and previewNode.terminal then
+            if session and preview.transition == "interrupt_start" then
+                -- A terminal response-only flow still interrupts the active
+                -- conversation topic. Preserve the active flow as suspended
+                -- so the next compatible turn can resume it.
+                pushActive(session, maximum)
+                session.active = nil
+                session.lastTransition = preview.transition
+                session.revision = (tonumber(session.revision) or 0) + 1
+                storeSession(storage, session)
+                result.status = "retired"
+                result.active = nil
+                result.suspended = copyValue(session.suspended)
+                return result
+            end
             -- A terminal gated branch is a response-only route. It must not
             -- create or interrupt a longer-lived flow session.
             result.status = "retired"
@@ -534,6 +617,7 @@ function Kernel.Commit(preview, ir, state, context, options)
             session.active.lastSequence = sequence
         end
         session.lastTransition = preview.transition
+        setPending(storage, preview)
         storeSession(storage, session)
         result.status = "started"
         result.active = copyValue(session.active)
@@ -568,6 +652,7 @@ function Kernel.Commit(preview, ir, state, context, options)
 
     if preview.transition == "cancel" then
         completeActive(session, preview)
+        completePendingFor(storage, preview.flowId, "flow_cancelled")
     elseif session.active then
         session.active.nodeId = preview.toNodeId
         session.active.lastSequence = sequence
@@ -582,8 +667,11 @@ function Kernel.Commit(preview, ir, state, context, options)
             or node and node.terminal == true
         then
             completeActive(session, preview)
+            completePendingFor(storage, preview.flowId, "flow_transition")
         end
     end
+
+    setPending(storage, preview)
 
     session.lastTransition = preview.transition
     if session.active or #session.suspended > 0 then
