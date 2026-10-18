@@ -59,6 +59,10 @@ return function(dependencies)
         elseif ir.intent == "OFFER" or ir.speechAct == "OFFER" then
             branch = "OFFER_RECEIVED"
             reason = "recognized_offer"
+        elseif ir.action and commandActions[ir.action] then
+            branch = ir.action == "FETCH"
+                and "REQUEST_ACKNOWLEDGED" or "COMMAND_ACCEPTED"
+            reason = "recognized_registered_action"
         elseif ir.intent == "REQUEST" then
             if commandActions[ir.action] then
                 branch = ir.action == "FETCH"

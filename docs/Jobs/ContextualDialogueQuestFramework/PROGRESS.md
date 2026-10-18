@@ -1,14 +1,14 @@
 # Contextual Dialogue & Quest Framework — current progress
 
-**Updated:** 2026-10-19, after the G3A server-owned quest slice, Lua regressions, and semantic-worker verification.
+**Updated:** 2026-10-19, after the G3B generated quest wiring, Lua regressions, real-worker and X11/Tk verification.
 
-**Local implementation:** branch `codex/contextual-dialogue-quest-framework-0a`; implementation is committed through the current G3A slice (server-owned Clinic Supplies quest contract), following `77300f59` (G0I stale scoped-cognition rejection). Earlier accepted slices remain `0cfcc345` (all dispatchable actions), `b1102486` (safe regeneration), `68c313fe` (multi-stage gifts), `b242e78c` (parameterized tasks), and `6290b3f74279731c7d80e97e077e88c10d35d676` (simple commands). Shared branch history also preserves unrelated concurrent P0B import-planner commits.
+**Local implementation:** branch `codex/contextual-dialogue-quest-framework-0a`; implementation is committed through the current G3B commit (generated Clinic Supplies semantic flows and existing quest transport), following `77300f59` (G0I stale scoped-cognition rejection). Earlier accepted slices remain `0cfcc345` (all dispatchable actions), `b1102486` (safe regeneration), `68c313fe` (multi-stage gifts), `b242e78c` (parameterized tasks), and `6290b3f74279731c7d80e97e077e88c10d35d676` (simple commands). Shared branch history also preserves unrelated concurrent P0B import-planner commits.
 
 **Upstream baseline:** `origin/docs/contextual-dialogue-quest-framework-20261018` at `d117d861730eaaf94c20e7b372c6ba37ac1f1b59`; PR #4 remains open and unmerged. The local implementation is intentionally ahead of that baseline.
 
-**Current goal status:** **IN PROGRESS — G3A accepted; semantic quest wiring, full production-harness/performance, and native-game gates remain open.**
+**Current goal status:** **IN PROGRESS — G3B accepted; full production-harness/performance and user-owned native-game gates remain open.**
 
-**ONE Next Chunk:** **G3B — wire the accepted Clinic Supplies contract into the existing semantic flow/response path for offer, accept, progress, query, and turn-in results without adding a parser or dispatcher.**
+**ONE Next Chunk:** **G3C — exercise generated quest flows through the real client/server semantic command boundary and worker restart/reload, preserving one authoritative result per request.**
 
 ## Accepted historic foundation (do not redo)
 
@@ -82,13 +82,22 @@ The first bounded quest slice now uses a versioned data-only `pnc.quest.clinic_s
 
 `QuestService.OfferQuest` and `AcceptQuest` revalidate the live giver and the existing `MedicalCareService` missing-bandage supply task. `ServerInventory.Transfer` emits the existing task-event-bus seam only after an authoritative player-to-NPC item mutation commits. The quest subscriber accepts only a committed, character-scoped, giver-scoped `Base.Bandage` transfer tied to the source medical task; free-text claims, wrong-character evidence, stale scope, and repeated transfer events do not advance it. Turn-in transitions `READY_TO_TURN_IN` → `COMPLETED` → `REWARDED`, emits the authored dialogue-acknowledgement reward event, and is idempotent across repeats and reloads. No quest VM, parser, inventory mutation, or second dispatcher was introduced.
 
+## G3B accepted — generated Clinic Supplies semantic wiring
+
+The existing metadata-driven `simple_command` generator now discovers and registers `HELP`, `QUEST_ACCEPT`, `QUEST_STATUS`, and `QUEST_TURN_IN` for the server-owned Clinic Supplies contract. All four use the reusable production template, typed `existing_quest_contract` binding, one authoritative quest request, queued/rejected/failed flow outcomes, and modular EN/TL response pools. Live coverage is **17 generated / 18 registered capabilities**, with one explicit recognition-only capability and no metadata-incomplete, conflicting, or unsupported generated quest row.
+
+The real production Lua worker verified input → PsychopatzCore IR → generated flow → typed binding → mocked authoritative result → one NPC response for offer, accept, status, and turn-in. Available, accepted, active, and rewarded results; denied/failed responses; preview-only and repeated-request behavior; EN/TL fallbacks; client/server command envelopes; worker restart-safe catalog loading; and bounded handshake/catalog payloads are covered. The existing Semantic Lab was operated through X11 pointer/button events: Flow editor, Refresh registry, Coverage (`22 production flows loaded`, `coverage generated=17/18`), and Compile source preview (`valid; no files written`, seven planned paths) all completed. This is real mouse-event evidence, not programmatic callback equivalence.
+
 ## Verification evidence
+
+- G3B focused semantic generation/worker suite: `python3 -m unittest tools.semantic_harness.tests.test_quest_flow_binding tools.semantic_harness.tests.test_automatic_flow_generation tools.semantic_harness.tests.test_flow_editor tools.semantic_harness.tests.test_gift_capability_binding -q` — **25/25 passed**. The broader automatic-flow, translation, and harness regression slice passed **36/36**; authoritative quest service smoke `python3 tests/run_tests.py pnc_quest_service_smoke --verbose` passed **1/1**.
+- G3B source checks: `pz_verify --kahlua --severity ERROR` passed all touched mod Lua files; the only harness Lua finding is the intentional worker `dofile()` sandbox warning outside the PZ mod scan. `luac5.3 -p` passed all touched Lua files. `git diff --check` and deterministic worker catalog/handshake checks passed.
 
 - G3A Lua evidence: `python3 tests/run_tests.py pnc_quest_service_smoke --verbose` passed; the affected medical/inventory/gift regression set passed **6/6**. The test covers existing medical-task eligibility, authoritative committed-transfer event subscription, free-text and wrong-character rejection, stale/repeated evidence, revisioned turn-in, reward idempotency, and ModData reload persistence.
 - G3A source checks: `luac5.3 -p` passed for the new quest definition/repository/service, server composition, and inventory transfer boundary; `pz_verify --kahlua` reported **0 errors / 0 warnings** for each touched Lua file; `git diff --check` passed.
 
 - Current G0I real-worker checks: **2/2 passed**; cognition client/service/fact Lua smoke tests: **3/3 passed**; the broader automatic-flow, translation, and harness slice: **36/36 passed**.
-- Full suite: `python3 -m unittest discover -s tools/semantic_harness/tests -p 'test_*.py'` — **137 tests, 133 passed**. Four failures remain the known pre-existing `ContextualSocialReactionTests.test_threat_uses_guarded_emotion_relationship_and_precedence` cases (`trusted`, `withdrawn`, `stressed`, and `stress_precedes_withdrawn_and_busy`), which exercise unavailable semantic-social transport fallback and are unrelated to automatic flow generation or G0I cognition correlation.
+- Full suite: `python3 -m unittest discover -s tools/semantic_harness/tests -p 'test_*.py'` — **141 tests, 137 passed**. Four failures remain the known pre-existing `ContextualSocialReactionTests.test_threat_uses_guarded_emotion_relationship_and_precedence` cases (`trusted`, `withdrawn`, `stressed`, and `stress_precedes_withdrawn_and_busy`), which exercise unavailable semantic-social transport fallback and are unrelated to automatic flow generation or G0I cognition correlation.
 - Harness doctor: `./tools/semantic_harness/run_harness.sh --doctor --doctor-json` passed Python, repository, virtualenv, Tkinter/display, core repository, Lua, worker syntax, worker boot, and PING/CAPABILITIES checks.
 - Touched Lua passed `luac5.3 -p`; touched Python passed `py_compile`; generated EN/TL JSON parsed; and `git diff --check` passed.
 - X11/XTest evidence used real pointer motion/button events against the Tk Semantic Lab. It is distinct from invoking Tk callbacks programmatically. No repeated CUA probing was needed.
@@ -96,4 +105,4 @@ The first bounded quest slice now uses a versioned data-only `pnc.quest.clinic_s
 
 ## Scope boundary
 
-G0A, G0B, G0C, G0D/G0D-2, G0E, G0F, G0G, G0H, G0I, and G3A are accepted implementation slices, not completion of the expanded goal. Do not mark the expanded goal READY FOR USER LIVE TEST until semantic quest wiring, full automatic coverage, production-harness/performance, and user-owned native-game gates are actually verified.
+G0A, G0B, G0C, G0D/G0D-2, G0E, G0F, G0G, G0H, G0I, G3A, and G3B are accepted implementation slices, not completion of the expanded goal. G3B's Semantic Lab/X11 gate is verified; native Project Zomboid SP/MP and Workshop actions remain user-owned. Continue with G3C before any READY FOR USER LIVE TEST claim.

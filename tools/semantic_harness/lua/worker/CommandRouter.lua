@@ -19,7 +19,8 @@ function CommandRouter.hello(context)
         loadedModules = Runtime.loadedModules,
         moduleManifest = Runtime.moduleManifest,
         headlessRequires = Runtime.headlessRequires,
-        flowCatalog = context.FlowEditor.catalog(context),
+        -- The full production flow catalog is fetched through FLOW_CATALOG.
+        -- Keeping the handshake bounded matters as automatic generation grows.
         translation = context.OutputProjection.translationSnapshot(context),
     }
 end

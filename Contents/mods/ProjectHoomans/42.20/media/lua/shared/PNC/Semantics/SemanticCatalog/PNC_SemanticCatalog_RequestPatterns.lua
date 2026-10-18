@@ -284,6 +284,86 @@ function Internal.RegisterRequests()
         0.90,
         90
     )
+
+    -- Quest operations use explicit utterances so a bare social "yes" or a
+    -- generic question cannot mutate quest state. The action-aware policy
+    -- routes these frames through the same generated flow/dispatcher seam.
+    registerPattern(
+        "pnc.quest.accept.supplies",
+        {
+            { kind = "literal", value = "yes" },
+            { kind = "literal", value = "i", optional = true },
+            { kind = "literal", value = "will", optional = true },
+            { kind = "literal", value = "help", optional = true },
+            { kind = "literal", value = "with", optional = true },
+            { kind = "literal", value = "the", optional = true },
+            { kind = "literal", value = "supplies", optional = true },
+        },
+        { intent = "ACCEPT", speechAct = "ACCEPT", action = "QUEST_ACCEPT" },
+        0.97,
+        180
+    )
+
+    registerPattern(
+        "pnc.quest.accept.supplies.sure",
+        {
+            { kind = "literal", value = "sure" },
+            { kind = "literal", value = "i", optional = true },
+            { kind = "literal", value = "can", optional = true },
+            { kind = "literal", value = "help", optional = true },
+            { kind = "literal", value = "with", optional = true },
+            { kind = "literal", value = "the", optional = true },
+            { kind = "literal", value = "supplies", optional = true },
+        },
+        { intent = "ACCEPT", speechAct = "ACCEPT", action = "QUEST_ACCEPT" },
+        0.97,
+        181
+    )
+
+    registerPattern(
+        "pnc.quest.status.supplies",
+        {
+            { kind = "literal", value = "is" },
+            { kind = "literal", value = "the", optional = true },
+            { kind = "literal", value = "clinic", optional = true },
+            { kind = "literal", value = "supplies", optional = true },
+            { kind = "literal", value = "quest", optional = true },
+            { kind = "literal", value = "done" },
+        },
+        { intent = "QUESTION", speechAct = "QUESTION", action = "QUEST_STATUS" },
+        0.97,
+        182
+    )
+
+    registerPattern(
+        "pnc.quest.status.supplies.finished",
+        {
+            { kind = "literal", value = "did" },
+            { kind = "literal", value = "we" },
+            { kind = "literal", value = "finish" },
+            { kind = "literal", value = "the", optional = true },
+            { kind = "literal", value = "supplies", optional = true },
+        },
+        { intent = "QUESTION", speechAct = "QUESTION", action = "QUEST_STATUS" },
+        0.97,
+        183
+    )
+
+    registerPattern(
+        "pnc.quest.turn_in.supplies",
+        {
+            { kind = "literal", value = "i" },
+            { kind = "literal", value = "want" },
+            { kind = "literal", value = "to" },
+            { kind = "literal", value = "turn" },
+            { kind = "literal", value = "in" },
+            { kind = "literal", value = "the", optional = true },
+            { kind = "literal", value = "supplies", optional = true },
+        },
+        { intent = "REQUEST", speechAct = "REQUEST", action = "QUEST_TURN_IN" },
+        0.97,
+        184
+    )
 end
 
 return Internal

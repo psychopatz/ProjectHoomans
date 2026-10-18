@@ -314,6 +314,7 @@ function OutputProjection.normalizedToolCalls(context, trace, transport, result,
         InventoryTransfer = "transfer_item",
         CompanionCommand = "companion_command",
         SemanticTaskRequest = "semantic_task_request",
+        SemanticQuestRequest = "semantic_quest_request",
         AdjustRelationship = "adjust_relationship",
     }
     local function add(kind, name, values)

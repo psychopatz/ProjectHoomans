@@ -135,6 +135,12 @@ DEFAULT_SCENARIO: dict[str, Any] = {
                 },
             },
         },
+        "questResponses": {
+            "offer": {"accepted": True, "status": "available", "reason": "available"},
+            "accept": {"accepted": True, "status": "accepted", "reason": "accepted"},
+            "status": {"accepted": True, "status": "active", "reason": "status_returned"},
+            "turn_in": {"accepted": True, "status": "rewarded", "reason": "rewarded"},
+        },
     },
 }
 

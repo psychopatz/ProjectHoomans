@@ -192,6 +192,73 @@ function Provider.configure(deps)
         }
         return accepted, reason, details
     end
+
+    -- The worker keeps the production semantic/action/response path intact
+    -- and replaces only the remote authoritative quest reply with bounded
+    -- scenario data, just as it does for companion and task handlers.
+    PNC.Client.RequestSemanticQuest = function(request, context)
+        request = type(request) == "table" and request or {}
+        context = type(context) == "table" and context or {}
+        local operation = string.lower(tostring(request.operation or ""))
+        local configured = runtime.questResponses
+            and runtime.questResponses[operation]
+        local accepted = true
+        local status = operation == "offer" and "available"
+            or operation == "accept" and "accepted"
+            or operation == "status" and "active"
+            or operation == "turn_in" and "rewarded" or "failed"
+        local reason = operation == "offer" and "available"
+            or operation == "accept" and "accepted"
+            or operation == "status" and "status_returned"
+            or operation == "turn_in" and "rewarded" or "quest_operation_invalid"
+        local details = {}
+        if configured == false then
+            accepted = false
+            status = "rejected"
+            reason = "mock_quest_rejected"
+        elseif type(configured) == "table" then
+            if configured.accepted ~= nil then
+                accepted = configured.accepted == true
+            end
+            status = tostring(configured.status or status)
+            reason = tostring(configured.reason
+                or (accepted and reason or "mock_quest_rejected"))
+            details = Values.copy(configured)
+        end
+        local result = details.result and Values.copy(details.result)
+            or details
+        result.accepted = accepted
+        result.status = status
+        result.reason = reason
+        result.requestID = result.requestID or request.requestID
+        result.npcID = result.npcID or request.npcID or context.npcID
+        result.giverNPCID = result.giverNPCID or result.npcID
+        result.questID = result.questID
+            or request.questID or "pnc.quest.clinic_supplies"
+        result.operation = result.operation or operation
+        result.responsePoolID = result.responsePoolID
+            or "semantic.quest.clinic_supplies." .. operation
+        result.objective = result.objective or {
+            id = "deliver_bandage",
+            required = 1,
+            delivered = (status == "ready" or status == "rewarded") and 1 or 0,
+            itemFullType = "Base.Bandage",
+            direction = "player_to_npc",
+        }
+        Runtime.transport[#Runtime.transport + 1] = {
+            direction = "client_to_server",
+            mode = runtime.mode,
+            command = "SemanticQuestRequest",
+            payload = Values.copy(request),
+        }
+        Runtime.transport[#Runtime.transport + 1] = {
+            direction = "server_to_client",
+            mode = runtime.mode,
+            command = "SemanticQuestResult",
+            payload = Values.copy(result),
+        }
+        return accepted, reason, result
+    end
 end
 
 return Provider

@@ -187,6 +187,17 @@ function Internal.QueueDeterministicResponse(
     local generatedFlowResponse = false
     local localResponse = PNC.Semantics and PNC.Semantics.LocalResponse
     local taskResponses = Internal.TaskResponses
+    local questResponses = Internal.QuestResponses
+    local preserveQuestResponse = questResponses
+        and type(questResponses.UseExistingResultResponse) == "function"
+        and questResponses.UseExistingResultResponse(
+            actionResult, actionResult and actionResult.action)
+    if preserveQuestResponse then
+        -- The authoritative quest-result spoke owns both accepted and rejected
+        -- wording. Never leak the generated admission line or add a second
+        -- generic ActionRejected line while its result is pending.
+        return true
+    end
     local preserveTaskResponse = taskResponses
         and type(taskResponses.UseExistingResultResponse) == "function"
         and taskResponses.UseExistingResultResponse(

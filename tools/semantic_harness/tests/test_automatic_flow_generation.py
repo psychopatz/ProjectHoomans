@@ -18,7 +18,7 @@ class AutomaticFlowGenerationTests(unittest.TestCase):
         generation = catalog["generation"]
         self.assertEqual(generation["templateVersion"], 1)
         self.assertIn("simple_command:v1", generation["templateFingerprint"])
-        self.assertEqual(generation["summary"]["generated"], 13)
+        self.assertEqual(generation["summary"]["generated"], 17)
         self.assertEqual(generation["summary"]["unsupported_workflow"], 0)
         self.assertEqual(generation["summary"]["metadata_incomplete"], 0)
         rows = {
@@ -47,7 +47,7 @@ class AutomaticFlowGenerationTests(unittest.TestCase):
             for flow in catalog["flows"]
             if flow.get("workflowKind") == "simple_command"
         }
-        self.assertEqual(len(flows), 5)
+        self.assertEqual(len(flows), 9)
         follow = flows[rows["FOLLOW"]["flowID"]]
         stay = flows[rows["STAY"]["flowID"]]
         self.assertEqual(set(follow["nodes"]), set(stay["nodes"]))
@@ -142,10 +142,10 @@ class AutomaticFlowGenerationTests(unittest.TestCase):
             }
 
         coverage = {row["id"]: row for row in catalog["generation"]["coverage"]}
-        self.assertEqual(catalog["generation"]["summary"]["generated"], 13)
+        self.assertEqual(catalog["generation"]["summary"]["generated"], 17)
         self.assertEqual(catalog["generation"]["summary"]["legacy"], 0)
         self.assertEqual(catalog["generation"]["summary"]["unsupported_workflow"], 0)
-        self.assertEqual(coverage["HELP"]["classification"], "recognition_only")
+        self.assertEqual(coverage["HELP"]["classification"], "generated")
         self.assertEqual(coverage["TAKE"]["classification"], "recognition_only")
 
         for action, result in turns.items():

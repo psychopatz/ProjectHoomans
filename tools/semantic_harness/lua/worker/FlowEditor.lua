@@ -16,6 +16,20 @@ local function automaticGenerator()
         or require "PNC/Semantics/PNC_SemanticAutomaticFlowGenerator"
 end
 
+local function publicGeneration(values, generation)
+    local output = {}
+    generation = type(generation) == "table" and generation or {}
+    -- The top-level `flows` field already carries the normalized production
+    -- registry. Exclude the generator's duplicate flow/response-pool payload
+    -- from the bounded Lab envelope while retaining coverage and fingerprints.
+    for key, value in pairs(generation) do
+        if key ~= "flows" and key ~= "responsePools" then
+            output[key] = values.copy(value)
+        end
+    end
+    return output
+end
+
 local function catalog(context)
     local Values = context.Values
     local flows = {}
@@ -60,7 +74,7 @@ local function catalog(context)
             conceptCount = #semanticCatalog.concepts,
             speechActCount = #semanticCatalog.speechActs,
         },
-        generation = Values.copy(generation),
+        generation = publicGeneration(Values, generation),
         capabilityCoverage = Values.copy(generation.coverage or {}),
     }
 end
@@ -130,7 +144,7 @@ function FlowEditor.generate(context)
     local response = catalog(context)
     response.type = "flow_generation"
     response.generated = true
-    response.generation = Values.copy(artifact)
+    response.generation = publicGeneration(Values, artifact)
     response.capabilityCoverage = Values.copy(artifact.coverage or {})
     return response
 end

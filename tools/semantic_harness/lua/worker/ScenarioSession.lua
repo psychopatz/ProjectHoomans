@@ -53,6 +53,8 @@ function ScenarioSession.reset(context, scenario)
     PNC.Network.ClientState.pendingSemanticIdentity = {}
     PNC.Network.ClientState.identityTrust = {}
     PNC.Network.ClientState.semanticIdentityResults = {}
+    PNC.Network.ClientState.semanticQuestResults = {}
+    PNC.Network.ClientState.semanticQuestResultOrder = {}
     PNC.Network.ClientState.npcPresentations = {}
     local npc = scenario.npc or {}
     PNC.Network.ClientState.conversationRelationships[npc.npcID] =

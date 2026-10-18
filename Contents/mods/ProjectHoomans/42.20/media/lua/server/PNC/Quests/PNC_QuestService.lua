@@ -446,6 +446,129 @@ function Service.AbandonQuest(player, questID, giverNPCID, reason)
     return summary(instance), "abandoned"
 end
 
+-- Network/dialogue ingress for the fixed Clinic Supplies contract. The
+-- operation table is deliberately closed: semantic input can request only
+-- these authored lifecycle operations and never an arbitrary Lua callback.
+function Service.HandleRequest(player, request, options)
+    request = type(request) == "table" and request or {}
+    options = type(options) == "table" and options or {}
+    local operation = string.lower(tostring(request.operation or ""))
+    local questID = text(request.questID) or "pnc.quest.clinic_supplies"
+    local giverNPCID = text(request.giverNPCID or request.npcID)
+    local requestID = text(request.requestID)
+    local result
+    local reason
+    local instance
+    local definition = definitionFor(questID)
+    local output = {
+        accepted = false,
+        status = "failed",
+        reason = "quest_operation_invalid",
+        requestID = requestID,
+        questID = questID,
+        giverNPCID = giverNPCID,
+        operation = operation,
+    }
+    if not definition then
+        output.reason = "quest_definition_unavailable"
+        return output
+    end
+    if not giverNPCID then
+        output.reason = "giver_identity_missing"
+        return output
+    end
+
+    if operation == "offer" then
+        result, reason = Service.OfferQuest(player, questID, giverNPCID)
+        if result then
+            local rawStatus = string.upper(tostring(result.status or ""))
+            local available = rawStatus == "AVAILABLE"
+            local existing = type(result.instance) == "table"
+                and result.instance or nil
+            local existingStatus = existing and string.upper(
+                tostring(existing.status or "")) or ""
+            output.accepted = available or existing ~= nil
+            output.status = available and "available"
+                or existingStatus == Status.ACTIVE and "active"
+                or existingStatus == Status.READY_TO_TURN_IN and "ready"
+                or existingStatus == Status.REWARDED and "rewarded"
+                or "locked"
+            output.responsePoolID = result.responsePoolID
+                or definition.responses and definition.responses.offer
+            output.sourceTaskID = result.sourceTaskID
+            output.instance = copy(existing)
+            output.objective = existing and copy(existing.objective) or nil
+            output.revision = result.revision
+            output.reason = reason
+        else
+            output.reason = reason or output.reason
+            output.status = "locked"
+        end
+    elseif operation == "accept" then
+        result, reason = Service.AcceptQuest(player, questID, giverNPCID, {
+            expectedRevision = request.expectedRevision,
+        })
+        if result then
+            output.accepted = reason == "accepted" or reason == "already_active"
+            output.status = reason == "accepted" and "accepted"
+                or string.upper(tostring(result.status or ""))
+                    == Status.READY_TO_TURN_IN and "ready"
+                or "active"
+            output.responsePoolID = definition.responses
+                and definition.responses.accepted
+            output.instance = copy(result)
+            output.objective = copy(result.objective)
+            output.revision = result.revision
+            output.reason = reason
+        else
+            output.reason = reason or output.reason
+            output.status = "rejected"
+        end
+    elseif operation == "status" then
+        result, reason = Service.GetInstance(player, questID, giverNPCID)
+        if result then
+            local rawStatus = string.upper(tostring(result.status or ""))
+            output.accepted = true
+            output.status = rawStatus == Status.ACTIVE and "active"
+                or rawStatus == Status.READY_TO_TURN_IN and "ready"
+                or rawStatus == Status.COMPLETED and "completed"
+                or rawStatus == Status.REWARDED and "rewarded"
+                or "unknown"
+            output.responsePoolID = definition.responses
+                and (output.status == "ready" and definition.responses.ready
+                    or output.status == "rewarded"
+                        and definition.responses.rewarded
+                    or definition.responses.progress)
+            output.instance = copy(result)
+            output.objective = copy(result.objective)
+            output.revision = result.revision
+            output.reason = "status_returned"
+        else
+            output.status = "unknown"
+            output.reason = reason or "quest_instance_not_found"
+        end
+    elseif operation == "turn_in" then
+        result, reason = Service.SubmitTurnIn(player, questID, giverNPCID, {
+            expectedRevision = request.expectedRevision,
+        })
+        if result then
+            output.accepted = reason == "rewarded" or reason == "already_rewarded"
+            output.status = output.accepted and "rewarded" or "rejected"
+            output.responsePoolID = definition.responses
+                and definition.responses.rewarded
+            output.instance = copy(result)
+            output.objective = copy(result.objective)
+            output.revision = result.revision
+            output.reason = reason
+        else
+            output.status = "rejected"
+            output.reason = reason or output.reason
+        end
+    end
+    output.network = options.network == true
+    return output
+end
+
 function Service.ObserveInventoryTransfer(_, event)
     return Service.ApplyObjectiveEvent(event)
 end

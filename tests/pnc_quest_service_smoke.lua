@@ -95,8 +95,31 @@ T.equal(offer.status, "AVAILABLE", "offer does not allocate state")
 T.equal(offer.sourceTaskID, medicalTask.id,
     "offer binds the existing medical supply task")
 
-local active, acceptReason = service.AcceptQuest(
-    player, questID, giver.id, { expectedRevision = offer.revision })
+local semanticOffer = service.HandleRequest(player, {
+    requestID = "semantic-offer-1",
+    operation = "offer",
+    questID = questID,
+    npcID = giver.id,
+})
+T.truthy(semanticOffer.accepted, "semantic offer remains authoritative")
+T.equal(semanticOffer.status, "available", "semantic offer status")
+T.equal(semanticOffer.responsePoolID, "semantic.quest.clinic_supplies.offer",
+    "semantic offer carries authored response pool")
+
+local semanticAccept = service.HandleRequest(player, {
+    requestID = "semantic-accept-1",
+    operation = "accept",
+    questID = questID,
+    npcID = giver.id,
+    expectedRevision = offer.revision,
+})
+T.truthy(semanticAccept.accepted, "semantic accept reaches quest service")
+T.equal(semanticAccept.status, "accepted", "semantic accept status")
+T.equal(semanticAccept.instance.ownerCharacterUUID, player.characterUUID,
+    "semantic accept remains character scoped")
+
+local active = service.GetInstance(player, questID, giver.id)
+local acceptReason = "accepted"
 T.truthy(active, "quest accepted by authoritative service")
 T.equal(acceptReason, "accepted", "quest acceptance result")
 T.equal(active.status, "ACTIVE", "accepted quest is active")

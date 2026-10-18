@@ -51,6 +51,8 @@ Const.CMD_SEMANTIC_COGNITION_REQUEST = "RequestSemanticCognition"
 Const.CMD_SEMANTIC_COGNITION = "SemanticCognition"
 Const.CMD_SEMANTIC_TASK_REQUEST = "SemanticTaskRequest"
 Const.CMD_SEMANTIC_TASK_RESULT = "SemanticTaskResult"
+Const.CMD_SEMANTIC_QUEST_REQUEST = "SemanticQuestRequest"
+Const.CMD_SEMANTIC_QUEST_RESULT = "SemanticQuestResult"
 Const.CMD_SEMANTIC_SOCIAL_EVENT_REQUEST = "SemanticSocialEventRequest"
 Const.CMD_SEMANTIC_INVENTORY_QUERY_REQUEST =
     "SemanticInventoryQueryRequest"

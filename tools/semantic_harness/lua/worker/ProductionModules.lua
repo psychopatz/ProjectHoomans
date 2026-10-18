@@ -144,6 +144,7 @@ function ProductionModules.load(context)
     load("ProjectHoomans", "client", "PNC/Networking/ClientCommandRouter/PNC_ClientCommandRouter_SemanticIdentity.lua", "network")
     load("ProjectHoomans", "client", "PNC/Networking/ClientRequests/PNC_ClientRequests_Internal.lua", "network")
     load("ProjectHoomans", "client", "PNC/Networking/ClientRequests/PNC_ClientRequests_SemanticCognition.lua", "network")
+    load("ProjectHoomans", "client", "PNC/Networking/ClientRequests/PNC_ClientRequests_Semantic.lua", "network")
     load("ProjectHoomans", "client", "PNC/Networking/ClientRequests/PNC_ClientRequests_Identity.lua", "network")
 
     PsychopatzConversationLLMInput = originalInputClass

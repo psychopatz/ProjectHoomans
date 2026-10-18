@@ -67,6 +67,7 @@ Input.Internal = Input.Internal or {}
 
 require "PNC/Semantics/PNC_SemanticDialogueInput_Context"
 require "PNC/Semantics/PNC_SemanticDialogueInput_Recovery"
+require "PNC/Semantics/PNC_SemanticDialogueInput_QuestResults"
 require "PNC/Semantics/PNC_SemanticDialogueInput_Presentation"
 require "PNC/Semantics/PNC_SemanticDialogueInput_Actions"
 require "PNC/Semantics/PNC_SemanticDialogueInput_GiftPresentation"

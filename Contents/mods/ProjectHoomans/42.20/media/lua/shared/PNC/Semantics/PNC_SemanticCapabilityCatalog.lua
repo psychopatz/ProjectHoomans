@@ -129,6 +129,7 @@ local function addAction(rows, byID, action, source, definition)
                 owner = definition.owner,
                 route = definition.route,
                 commandID = definition.commandID,
+                operation = definition.operation,
                 handlerID = definition.handlerID,
                 arguments = copyPublic(definition.arguments),
                 requires = copyPublic(definition.requires),
