@@ -14,6 +14,7 @@ local Knowledge = PNC.NPCKnowledge
 local safeID = Internal.SafeID
 local contextFor = Internal.ContextFor
 local recordFor = Internal.RecordFor
+local validateConversation = Internal.ValidateConversation
 local commit = Internal.Commit
 local authorizeDisclosure = Internal.AuthorizeDisclosure
 local discloseGiftPreference = Internal.DiscloseGiftPreference
@@ -55,6 +56,115 @@ function API.RecordGiftPreferencesForPlayer(
     }
     if committed ~= true then return result, reason end
     return result
+end
+
+-- A promise is admitted only from the existing conversation authority. The
+-- request must name a successful processed conversation outcome in the live
+-- lease; free-text acknowledgement flags are deliberately ignored.
+function API.RecordConversationCommitmentForPlayer(player, npcID, options)
+    options = type(options) == "table" and options or {}
+    npcID = safeID(npcID)
+    if not npcID then return nil, "invalid_npc_id" end
+
+    local origin = tostring(options.origin or "semantic_dialogue")
+    if origin ~= "conversation" and origin ~= "semantic_dialogue" then
+        return nil, "invalid_commitment_origin"
+    end
+    local context, reason = contextFor(player, "conversation_commitment")
+    local record = recordFor(npcID)
+    if not context then return nil, reason end
+    if not record then return nil, "npc_not_found" end
+
+    local token = safeID(options.conversationToken or options.token)
+    if not token then return nil, "conversation_token_required" end
+    local valid, leaseReason, lease = validateConversation(
+        player, record, token
+    )
+    if valid ~= true then return nil, leaseReason or "invalid_lease" end
+
+    local acknowledgementRequestID = safeID(
+        options.acknowledgementRequestID or options.sourceEventID
+    )
+    local processed = lease and lease.processedConversationRequests or nil
+    local outcome = processed and acknowledgementRequestID
+        and processed[acknowledgementRequestID] or nil
+    if type(outcome) ~= "table" or outcome.success ~= true then
+        return nil, "acknowledgement_event_not_found"
+    end
+    if outcome.npcID ~= nil
+        and tostring(outcome.npcID) ~= tostring(npcID)
+    then
+        return nil, "acknowledgement_owner_mismatch"
+    end
+
+    local questID = safeID(options.questID)
+    local questInstanceID
+    if questID then
+        local quests = PNC.QuestService
+        if not quests or type(quests.GetInstance) ~= "function" then
+            return nil, "quest_authority_unavailable"
+        end
+        local instance = quests.GetInstance(
+            { characterUUID = context.characterUUID }, questID, npcID
+        )
+        if not instance then return nil, "quest_owner_unverified" end
+        questInstanceID = safeID(instance.id)
+        if not questInstanceID then return nil, "quest_owner_unverified" end
+    end
+
+    if type(Knowledge.RecordConversationCommitment) ~= "function" then
+        return nil, "commitment_knowledge_unavailable"
+    end
+    local commitment, writeReason = Knowledge.RecordConversationCommitment({
+        characterUUID = context.characterUUID,
+        npcID = npcID,
+        commitmentID = options.commitmentID,
+        topic = options.topic,
+        intent = options.intent,
+        sourceFactRefs = options.sourceFactRefs,
+        acknowledged = true,
+        acknowledgedBy = npcID,
+        acknowledgementEventID = acknowledgementRequestID,
+        acknowledgementOutcomeID = outcome.outcomeID,
+        questID = questID,
+        questInstanceID = questInstanceID,
+        expiresAt = options.expiresAt,
+    })
+    if not commitment then return nil, writeReason end
+
+    local committed = true
+    if writeReason ~= "already_recorded" then
+        committed, reason = commit(
+            player, acknowledgementRequestID, "conversation_commitment"
+        )
+        if committed ~= true then
+            return nil, reason or "knowledge_save_failed"
+        end
+    end
+    return {
+        accepted = true,
+        committed = committed == true,
+        duplicate = writeReason == "already_recorded",
+        characterUUID = context.characterUUID,
+        npcID = npcID,
+        acknowledgementEventID = acknowledgementRequestID,
+        commitment = commitment,
+        lease = lease and { token = lease.token } or nil,
+    }
+end
+
+function API.GetConversationCommitmentsForPlayer(player, npcID, limit)
+    npcID = safeID(npcID)
+    if not npcID then return nil, "invalid_npc_id" end
+    local context, reason = contextFor(player, "conversation_commitment_read")
+    if not context then return nil, reason end
+    if not recordFor(npcID) then return nil, "npc_not_found" end
+    if type(Knowledge.GetConversationCommitments) ~= "function" then
+        return nil, "commitment_knowledge_unavailable"
+    end
+    return Knowledge.GetConversationCommitments(
+        context.characterUUID, npcID, limit
+    ), nil, context
 end
 
 -- Mutating disclosure is one small contract for native UI and LLM tools.

@@ -8,6 +8,7 @@ local capabilities = {
     "FLOW_REGISTER", "PING", "CAPABILITIES", "QUIT",
     "FACT_CATALOG", "EVENT_CATALOG", "FLOW_GENERATE", "FLOW_COVERAGE",
     "REPLAY_SEMANTIC_QUEST",
+    "COMMITMENT",
 }
 
 function CommandRouter.hello(context)
@@ -79,6 +80,11 @@ function CommandRouter.dispatch(context, request)
                 payload
             ) or false
         return { ok = true, type = "semantic_quest_replay", handled = handled }
+    elseif command == "COMMITMENT" then
+        if type(payload) ~= "table" then
+            return nil, "commitment_request_must_be_object"
+        end
+        return context.Commitments.dispatch(context, payload)
     elseif command == "FACT_CATALOG" then
         return {
             ok = true,

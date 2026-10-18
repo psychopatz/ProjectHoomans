@@ -106,6 +106,11 @@ class LuaSemanticWorker:
 
         return self._request("REPLAY_SEMANTIC_QUEST", request)
 
+    def commitment(self, payload: dict[str, Any]) -> dict[str, Any]:
+        """Exercise the production NPC Knowledge commitment boundary."""
+
+        return self._request("COMMITMENT", payload)
+
     def flow_catalog(self) -> dict[str, Any]:
         """Read normalized production flow definitions from the Lua registry."""
 

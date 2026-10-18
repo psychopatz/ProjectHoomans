@@ -91,6 +91,29 @@ function ProductionModules.load(context)
         "PNC/Core/Identity/PNC_Identity.lua",
         "social_authority"
     )
+    -- Keep the production NPC Knowledge service on the worker boundary.
+    -- The adapter later fills these same tables with scenario-owned identity
+    -- and registry methods; the service never receives a second store.
+    PNC = PNC or {}
+    PNC.Registry = PNC.Registry or {}
+    PNC.PlayerCharacters = PNC.PlayerCharacters or {}
+    PNC.PlayerContext = PNC.PlayerContext or {}
+    PNC.Relationships = PNC.Relationships or {}
+    load(
+        "ProjectHoomans", "shared",
+        "PNC/Core/Knowledge/PNC_KnowledgeRegistry.lua",
+        "knowledge_authority"
+    )
+    load(
+        "ProjectHoomans", "shared",
+        "PNC/Core/Knowledge/PNC_KnowledgeBuiltins.lua",
+        "knowledge_authority"
+    )
+    load(
+        "ProjectHoomans", "server",
+        "PNC/Knowledge/PNC_NPCKnowledgeService.lua",
+        "knowledge_authority"
+    )
     load(
         "ProjectHoomans", "shared",
         "PNC/Core/Relationships/PNC_SocialProfileConstants.lua",
@@ -217,6 +240,11 @@ function ProductionModules.load(context)
         "ProjectHoomans", "server",
         "PNC/Conversation/ConversationAuthority/PNC_ConversationAuthority_Validation.lua",
         "authority"
+    )
+    load(
+        "ProjectHoomans", "server",
+        "PNC/Knowledge/PNC_NPCKnowledgeAPI.lua",
+        "knowledge_authority"
     )
     load(
         "ProjectHoomans", "server",

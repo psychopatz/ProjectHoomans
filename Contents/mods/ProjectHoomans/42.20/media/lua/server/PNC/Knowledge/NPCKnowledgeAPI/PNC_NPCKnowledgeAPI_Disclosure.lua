@@ -59,12 +59,13 @@ local function authorizeDisclosure(player, npcID, options)
     return context, record, nil, lease
 end
 
-local function commit(player, requestID)
+local function commit(player, requestID, operation)
     if not PNC.PersistenceCoordinator
         or not PNC.PersistenceCoordinator.Commit
     then return false, "persistence_unavailable" end
     return PNC.PersistenceCoordinator.Commit(
-        "knowledge_disclosure:" .. tostring(requestID or "retry")
+        tostring(operation or "knowledge_disclosure") .. ":"
+            .. tostring(requestID or "retry")
     )
 end
 

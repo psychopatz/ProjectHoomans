@@ -35,6 +35,24 @@ function Provider.configure(deps)
     PNC.Core.IsAuthority = function()
         return true
     end
+    -- Exercise the real Knowledge commit path while keeping the worker
+    -- independent from the native world-save coordinator. This is a bounded
+    -- persistence seam, not a second journal or a replacement authority.
+    PNC.PersistenceCoordinator = PNC.PersistenceCoordinator or {}
+    PNC.PersistenceCoordinator.Commit = function(reason)
+        Runtime.persistenceCommits = Runtime.persistenceCommits or {}
+        Runtime.persistenceCommits[#Runtime.persistenceCommits + 1] =
+            tostring(reason or "worker")
+        local knowledge = PNC.NPCKnowledge
+        if not knowledge or type(knowledge.Save) ~= "function" then
+            return false, "knowledge_persistence_unavailable"
+        end
+        local saved, saveReason = knowledge.Save(false)
+        if saved == false and saveReason == "not_dirty" then
+            return true, "not_dirty"
+        end
+        return saved, saveReason
+    end
     PNC.MedicalCareService = PNC.MedicalCareService or {}
     PNC.MedicalCareService.List = function()
         if runtime.questEligible == false then return {} end
