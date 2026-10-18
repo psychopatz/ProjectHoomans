@@ -106,6 +106,31 @@ local function selectorContext(ir, state, context)
     local emotion = type(npc.emotion) == "table" and npc.emotion or {}
     local social = type(situation.social) == "table" and situation.social or {}
     local hostilityCount, insultCount, lastSpeechAct = socialCounts(state)
+    local previousAction
+    local dialogue = type(context.semanticDialogueContext) == "table"
+        and context.semanticDialogueContext or nil
+    local recentTurns = dialogue and dialogue.recentTurns or nil
+    local currentSequence = dialogue and tonumber(dialogue.sequence) or nil
+    local skippedCurrent = false
+    if type(recentTurns) == "table" then
+        for index = 1, math.min(#recentTurns, 8) do
+            local turn = recentTurns[index]
+            if type(turn) == "table" and turn.speaker == "player"
+                and type(turn.action) == "string"
+            then
+                if currentSequence ~= nil
+                    and tonumber(turn.sequence) == currentSequence
+                then
+                    skippedCurrent = true
+                elseif not skippedCurrent then
+                    skippedCurrent = true
+                else
+                    previousAction = turn.action
+                    break
+                end
+            end
+        end
+    end
     local topic = ir and ir.extensions and ir.extensions.topic or nil
     if type(topic) == "table" then
         topic = topic.id or topic.key
@@ -116,6 +141,10 @@ local function selectorContext(ir, state, context)
             or context.currentTopic,
         previousTopic = state and state.previousTopic
             or context.previousTopic,
+        previousAction = previousAction,
+        lastIntent = state and state.lastIntent or context.lastIntent,
+        lastAction = state and state.lastAction or context.lastAction,
+        lastSpeaker = state and state.lastSpeaker or context.lastSpeaker,
         intent = ir and ir.intent,
         action = ir and ir.action,
         subject = ir and ir.subject,

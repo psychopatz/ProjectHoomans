@@ -265,6 +265,23 @@ class AutomaticFlowGenerationTests(unittest.TestCase):
             self.assertEqual(result["result"]["flow"]["dispatchCount"], 1)
             self.assertEqual(len(result["transport"]), 1)
 
+    def test_generated_simple_command_uses_bounded_previous_action_memory(self) -> None:
+        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+            first = worker.input("Follow me")
+            repeated = worker.input("Follow me")
+
+        self.assertEqual(
+            first["messages"][0]["payload"]["translationKey"],
+            "UI_PNC_Conversation_Semantic_GeneratedFollowQueuedWithdrawn",
+        )
+        self.assertEqual(
+            repeated["messages"][0]["payload"]["translationKey"],
+            "UI_PNC_Conversation_Semantic_GeneratedFollowQueuedRepeated",
+        )
+        self.assertEqual(repeated["result"]["flow"]["resultOutcome"], "queued")
+        self.assertEqual(repeated["result"]["flow"]["dispatchCount"], 1)
+        self.assertEqual(len(repeated["transport"]), 1)
+
     def test_denied_failed_and_context_gate_are_truthful(self) -> None:
         denied_scenario = merge(
             DEFAULT_SCENARIO,

@@ -27,7 +27,8 @@ Catalog.POOLS = Catalog.POOLS or {}
 Catalog.LAST_VARIANTS = Catalog.LAST_VARIANTS or {}
 
 local CONDITION_FIELDS = {
-    "topic", "previousTopic", "intent", "action", "subject",
+    "topic", "previousTopic", "previousAction", "lastIntent", "lastAction", "lastSpeaker",
+    "intent", "action", "subject",
     "relationshipState", "identityTrust", "timeBand", "raining", "foggy", "snowing",
     "indoors", "hasPendingRequest", "npcID", "activity", "busy",
     "needType", "needUrgency", "relationshipAttitude", "healthState",
@@ -118,6 +119,10 @@ local function conditionContext(context)
     return {
         topic = context.currentTopic or context.topic,
         previousTopic = context.previousTopic,
+        previousAction = context.previousAction,
+        lastIntent = context.lastIntent,
+        lastAction = context.lastAction,
+        lastSpeaker = context.lastSpeaker,
         intent = context.intent,
         action = context.action,
         subject = context.subject,

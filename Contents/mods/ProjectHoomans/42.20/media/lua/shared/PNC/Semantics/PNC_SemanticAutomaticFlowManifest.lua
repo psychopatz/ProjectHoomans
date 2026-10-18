@@ -16,11 +16,13 @@ return {
             "EN/Conversation/Semantic/Generated.json",
             "EN/Conversation/Semantic/GeneratedTaskCommandContext.json",
             "EN/Conversation/Semantic/GeneratedTaskCommands.json",
+            "EN/Conversation/Semantic/GeneratedTaskCommandMemory.json",
         },
         TL = {
             "TL/Conversation/Semantic/Generated.json",
             "TL/Conversation/Semantic/GeneratedTaskCommandContext.json",
             "TL/Conversation/Semantic/GeneratedTaskCommands.json",
+            "TL/Conversation/Semantic/GeneratedTaskCommandMemory.json",
         },
     },
 }
