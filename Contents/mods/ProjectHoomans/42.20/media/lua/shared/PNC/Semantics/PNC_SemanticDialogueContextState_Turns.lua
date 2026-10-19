@@ -8,8 +8,24 @@ local Internal = Context.Internal
 local function topicFor(ir, options)
     local topic = type(options) == "table" and options.topic or nil
     if topic == nil and type(ir) == "table" then
+        -- Short acknowledgements continue the current exchange when the
+        -- caller has no open flow obligation. Flow-owned ACCEPT turns must
+        -- still move the topic to the resumed needs/proposal exchange.
+        if ir.intent == "ACKNOWLEDGE"
+            or ir.intent == "AGREE"
+            or ir.intent == "THANK"
+            or type(options) == "table"
+            and options.preserveCurrentTopic == true
+        then
+            return nil
+        end
         local extensions = type(ir.extensions) == "table"
             and ir.extensions or nil
+        if extensions
+            and extensions.dialogueFollowUp == "CONVERSATION_CONTINUATION"
+        then
+            return nil
+        end
         topic = extensions and extensions.topic or nil
         topic = topic or ir.action or ir.subject
         if topic == nil and type(ir.object) == "table" then

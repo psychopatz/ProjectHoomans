@@ -25,20 +25,34 @@ end
 
 Internal.RecentTurns = recentTurnsFrom
 
-local function followsRelationshipStatusAnswer(context)
-    local recentTurns = recentTurnsFrom(context, 2)
-    if #recentTurns == 0 then return false end
+local function recentAnswer(context, limit)
+    local recentTurns = recentTurnsFrom(context, limit or 4)
+    if #recentTurns == 0 then return nil, nil end
 
     local responseTurn = recentTurns[1]
-    -- Some callers snapshot context before recording the player's input;
-    -- others record it before resolving the response. Support both orders.
+    local playerTurn
+    -- The normal lifecycle resolves before recording the current player turn;
+    -- direct callers and preview tooling may record it first.  In both cases
+    -- only the immediately preceding NPC answer can continue the topic.
     if type(responseTurn) == "table"
         and responseTurn.speaker == "player"
-        and responseTurn.intent == "ACKNOWLEDGE"
     then
+        playerTurn = responseTurn
         responseTurn = recentTurns[2]
     end
+    if type(responseTurn) ~= "table"
+        or responseTurn.speaker ~= "npc"
+        or responseTurn.speechAct ~= "ANSWER"
+    then
+        return nil, playerTurn
+    end
+    return responseTurn, playerTurn
+end
 
+Internal.RecentAnswer = recentAnswer
+
+local function followsRelationshipStatusAnswer(context)
+    local responseTurn = recentAnswer(context, 3)
     return type(responseTurn) == "table"
         and responseTurn.speaker == "npc"
         and responseTurn.speechAct == "ANSWER"
@@ -48,24 +62,30 @@ local function followsRelationshipStatusAnswer(context)
 end
 
 local function followsWellbeingAnswer(context)
-    local recentTurns = recentTurnsFrom(context, 3)
-    if #recentTurns == 0 then return false end
-
-    local responseTurn = recentTurns[1]
-    -- The current player turn may already be recorded by a direct caller;
-    -- the normal input lifecycle evaluates the response before recording it.
-    if type(responseTurn) == "table"
-        and responseTurn.speaker == "player"
-        and responseTurn.intent == "QUESTION"
-    then
-        responseTurn = recentTurns[2]
-    end
-
+    local responseTurn = recentAnswer(context, 4)
     return type(responseTurn) == "table"
         and responseTurn.speaker == "npc"
         and responseTurn.speechAct == "ANSWER"
         and responseTurn.branch == "QUESTION_RECEIVED"
         and responseTurn.subject == "WELLBEING"
+end
+
+local function followsQuestionAnswer(context)
+    local responseTurn = recentAnswer(context, 4)
+    local subject = responseTurn and responseTurn.subject
+    local topic = responseTurn and responseTurn.topic
+    return type(responseTurn) == "table"
+        and responseTurn.branch == "QUESTION_RECEIVED"
+        and (subject == "WELLBEING"
+            or subject == "RELATIONSHIP_STATUS"
+            or subject == "NPC_RESIDENCE"
+            or subject == "NPC_HEALTH_STATE"
+            or subject == "NPC_BITE_STATUS"
+            or subject == "NPC_KNOWLEDGE"
+            or topic == "medical"
+            or topic == "location"
+            or topic == "residence"
+            or topic == "knowledge")
 end
 
 local resolveQuestion = require
@@ -74,6 +94,7 @@ local resolveQuestion = require
 
 Internal.FollowsRelationshipStatusAnswer = followsRelationshipStatusAnswer
 Internal.FollowsWellbeingAnswer = followsWellbeingAnswer
+Internal.FollowsQuestionAnswer = followsQuestionAnswer
 Internal.ResolveQuestion = resolveQuestion
 
 return Response

@@ -103,9 +103,17 @@ local function recordNPCResponseTurn(
     local branch = decision and decision.branch or nil
     local responseSpeechAct = branch == "COMPLIMENT_RECEIVED"
         and "COMPLIMENT_RESPONSE" or "ANSWER"
-    local topic = inputIR and inputIR.extensions
+    local topic = response and response.topic or nil
+    topic = topic or inputIR and inputIR.extensions
         and inputIR.extensions.topic or nil
     if type(topic) == "table" then topic = topic.id or topic.key end
+    if inputIR and (inputIR.intent == "ACCEPT"
+            or inputIR.intent == "ACKNOWLEDGE"
+            or inputIR.intent == "AGREE"
+            or inputIR.intent == "THANK")
+    then
+        topic = context.currentTopic or context.previousTopic or topic
+    end
     topic = topic or inputIR and (inputIR.subject or inputIR.action)
     if topic == nil then
         -- An acknowledgment gets its own topic in the turn state. Preserve

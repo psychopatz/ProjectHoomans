@@ -11,6 +11,7 @@ local targetText = Internal.TargetText
 local socialCounts = Internal.SocialCounts
 local followsRelationshipStatusAnswer =
     Internal.FollowsRelationshipStatusAnswer
+local followsQuestionAnswer = Internal.FollowsQuestionAnswer
 local resolveQuestion = Internal.ResolveQuestion
 
 local function wellbeingFactsUnknown(context)
@@ -236,11 +237,27 @@ function Response.Resolve(ir, state, context, branch)
         if ir.intent == "APOLOGIZE" then
             return catalogResponse("semantic.apology", ir, state, context)
         end
-        if ir.intent == "ACKNOWLEDGE"
+        if (ir.intent == "ACKNOWLEDGE"
+                or ir.intent == "ACCEPT"
+                or ir.intent == "AGREE"
+                or ir.intent == "THANK")
             and followsRelationshipStatusAnswer(context)
         then
             return catalogResponse(
                 "semantic.question.relationship_status.acknowledged",
+                ir,
+                state,
+                context
+            )
+        end
+        if (ir.intent == "ACKNOWLEDGE"
+                or ir.intent == "ACCEPT"
+                or ir.intent == "AGREE")
+            and type(followsQuestionAnswer) == "function"
+            and followsQuestionAnswer(context)
+        then
+            return catalogResponse(
+                "semantic.conversation.acknowledged",
                 ir,
                 state,
                 context

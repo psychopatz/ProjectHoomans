@@ -198,6 +198,28 @@ local function semanticTranslationKey(response)
             "UI_PNC_Conversation_Semantic_QuestionKnowledgeKnown",
         ["semantic.question.knowledge.unknown"] =
             "UI_PNC_Conversation_Semantic_QuestionKnowledgeUnknown",
+        ["semantic.conversation.acknowledged.default"] =
+            "UI_PNC_Conversation_Semantic_ConversationAcknowledged",
+        ["semantic.conversation.acknowledged.friendly"] =
+            "UI_PNC_Conversation_Semantic_ConversationAcknowledgedFriendly",
+        ["semantic.conversation.acknowledged.withdrawn"] =
+            "UI_PNC_Conversation_Semantic_ConversationAcknowledgedWithdrawn",
+        ["semantic.conversation.continuation.gossip_memory"] =
+            "UI_PNC_Conversation_Semantic_ConversationContinuationGossipMemory",
+        ["semantic.conversation.continuation.gossip_unknown"] =
+            "UI_PNC_Conversation_Semantic_ConversationContinuationGossipUnknown",
+        ["semantic.conversation.continuation.residence"] =
+            "UI_PNC_Conversation_Semantic_ConversationContinuationResidence",
+        ["semantic.conversation.continuation.medical"] =
+            "UI_PNC_Conversation_Semantic_ConversationContinuationMedical",
+        ["semantic.conversation.continuation.medical_known"] =
+            "UI_PNC_Conversation_Semantic_ConversationContinuationMedicalKnown",
+        ["semantic.conversation.continuation.medical_unknown"] =
+            "UI_PNC_Conversation_Semantic_ConversationContinuationMedicalUnknown",
+        ["semantic.conversation.continuation.knowledge"] =
+            "UI_PNC_Conversation_Semantic_ConversationContinuationKnowledge",
+        ["semantic.conversation.continuation.default"] =
+            "UI_PNC_Conversation_Semantic_ConversationContinuationDefault",
         ["semantic.question.needs.offer.hunger"] =
             "UI_PNC_Conversation_Semantic_QuestionNeedsOfferHunger",
         ["semantic.question.needs.offer.thirst"] =
@@ -307,6 +329,7 @@ local function payloadForPlanTurn(response, rendered, fallbackRendered)
         planTurn = rendered.index,
         planTurnID = rendered.id,
         planContinuation = rendered.continuation,
+        topic = response.topic,
         segments = rendered.segments,
     }
 end
@@ -363,6 +386,7 @@ local function payloadsForResponse(response)
             translationKey = translationKey,
             plan = response.plan,
             planTurn = 1,
+            topic = response.topic,
         },
     }
 end

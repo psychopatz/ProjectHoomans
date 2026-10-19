@@ -33,6 +33,7 @@ local function primaryClassification(ir, decision, extra)
         reason = extra.actionReason,
     } or nil
     local diagnostics = ir and ir.diagnostics or nil
+    local extensions = ir and ir.extensions or nil
     local intent = tostring(ir and ir.intent or "")
     local speechAct = tostring(ir and ir.speechAct or "")
     if ir and ir.action and type(actionResult) == "table"
@@ -46,6 +47,9 @@ local function primaryClassification(ir, decision, extra)
     if intent == "QUESTION" or speechAct == "QUESTION" then
         if type(diagnostics) == "table"
             and diagnostics.factStatus == "unknown"
+            and not (type(extensions) == "table"
+                and extensions.dialogueFollowUp
+                    == "CONVERSATION_CONTINUATION")
         then
             return "recognized_question_unknown_fact"
         end
@@ -141,6 +145,7 @@ function DialogueInputTrace.RecordTurn(view, value, result, event, extra)
         response = response and {
             templateID = response.templateID,
             sourcePoolID = response.sourcePoolID,
+            selectionSource = response.selectionSource,
             selectionID = response.selectionID,
             uncertainty = response.uncertainty,
             groundedFactRefs = response.groundedFactRefs,

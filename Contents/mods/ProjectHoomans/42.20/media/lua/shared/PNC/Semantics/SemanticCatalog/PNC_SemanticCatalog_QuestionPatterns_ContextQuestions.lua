@@ -536,6 +536,19 @@ function Internal.RegisterWorldFactQuestions()
         124
     )
 
+    registerPattern(
+        "pnc.question.health.what_about_your_health",
+        {
+            { kind = "literal", value = "what" },
+            { kind = "literal", value = "about" },
+            { kind = "literal", value = "your" },
+            { kind = "concept", id = "HEALTH_STATUS" },
+        },
+        healthQuestion,
+        0.98,
+        125
+    )
+
     local knowledgeQuestion = {
         intent = "QUESTION",
         speechAct = "QUESTION",

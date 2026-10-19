@@ -295,6 +295,91 @@ local function resolveKnowledgeQuestion(ir, state, context)
     return response
 end
 
+local function continuationResponse(templateID, fallback, topic)
+    return {
+        templateID = templateID,
+        fallback = fallback,
+        dialogueAct = "CONVERSATION_CONTINUATION",
+        topic = topic,
+        uncertainty = "unknown",
+        tone = "conversational",
+        selectionSource = "conversation_context",
+    }
+end
+
+local function resolveConversationContinuation(ir, state, context)
+    local recentAnswer = type(Internal.RecentAnswer) == "function"
+        and Internal.RecentAnswer(context, 4) or nil
+    local subject = recentAnswer and recentAnswer.subject or nil
+    local topic = recentAnswer and recentAnswer.topic or nil
+
+    if subject == "WELLBEING" or topic == "wellbeing" then
+        local response = catalogResponse(
+            "semantic.question.wellbeing.follow_up", ir, state, context
+        )
+        if response then
+            response.dialogueAct = "CONVERSATION_CONTINUATION"
+            response.selectionSource = "conversation_context"
+            return response
+        end
+    end
+    if subject == "GOSSIP" or topic == "gossip" then
+        local gossip = context and context.npcGossip
+        local hasMemory = type(gossip) == "table"
+            and type(gossip.statements) == "table"
+            and #gossip.statements > 0
+        return continuationResponse(
+            hasMemory
+                and "semantic.conversation.continuation.gossip_memory"
+                or "semantic.conversation.continuation.gossip_unknown",
+            hasMemory
+                and "That's all I know about it for now."
+                or "I don't have anything else to add right now.",
+            "gossip"
+        )
+    end
+    if subject == "NPC_RESIDENCE" or topic == "location"
+        or topic == "residence"
+    then
+        return continuationResponse(
+            "semantic.conversation.continuation.residence",
+            "That's all I can confirm about where I live right now.",
+            "RESIDENCE"
+        )
+    end
+    if subject == "NPC_BITE_STATUS" or subject == "NPC_HEALTH_STATE"
+        or topic == "medical"
+    then
+        local situation = context and context.dialogueSituation
+        local npc = situation and situation.npc
+        local healthState = npc and npc.healthState
+        local healthKnown = type(healthState) == "string"
+            and healthState ~= ""
+            and healthState ~= "unknown"
+        return continuationResponse(
+            healthKnown
+                and "semantic.conversation.continuation.medical_known"
+                or "semantic.conversation.continuation.medical_unknown",
+            healthKnown
+                and "I don't have anything more to add about my health right now."
+                or "I can't confirm anything more about my health right now.",
+            "MEDICAL"
+        )
+    end
+    if subject == "NPC_KNOWLEDGE" or topic == "knowledge" then
+        return continuationResponse(
+            "semantic.conversation.continuation.knowledge",
+            "I don't have anything else reliable to add about that.",
+            "KNOWLEDGE"
+        )
+    end
+    return continuationResponse(
+        "semantic.conversation.continuation.default",
+        "I don't have anything else to add about that right now.",
+        topic or "conversation"
+    )
+end
+
 local function isCommittedRelation(value)
     if type(value) ~= "string" then return false end
     value = string.lower(value)
@@ -447,6 +532,11 @@ end
 return function(ir, state, context)
     if type(ir) ~= "table" then return nil end
     local world = type(context) == "table" and context.worldContext or nil
+    if ir.extensions
+        and ir.extensions.dialogueFollowUp == "CONVERSATION_CONTINUATION"
+    then
+        return resolveConversationContinuation(ir, state, context)
+    end
     if ir.subject == "TIME" then return resolveTime(world) end
     if ir.subject == "DATE" then return resolveDate(world) end
     if ir.subject == "WEATHER" then return resolveWeather(world) end

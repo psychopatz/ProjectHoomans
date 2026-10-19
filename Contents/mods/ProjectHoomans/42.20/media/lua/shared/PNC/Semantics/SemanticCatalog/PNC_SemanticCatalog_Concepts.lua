@@ -261,6 +261,14 @@ function Internal.RegisterVocabulary()
         "i understand", "i understand what you mean", "i hear you",
         "i see what you mean", "understood",
     }, 3)
+    -- Keep requests for conversational continuation distinct from ACCEPT and
+    -- generic open-ended captures.  The exact continuation patterns require
+    -- a complete utterance, so this vocabulary cannot authorize a gameplay
+    -- action or steal an item phrase such as "give me more food".
+    registerConcept("MORE", {
+        "more", "anything else", "what else", "go on", "continue",
+        "keep going",
+    }, 3)
     registerConcept("DISAGREE", {
         "i disagree", "i don't agree", "i do not agree", "not really",
         "not this time", "that doesn't work", "that does not work",
