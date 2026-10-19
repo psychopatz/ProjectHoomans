@@ -5,6 +5,7 @@ from __future__ import annotations
 import unittest
 
 from tools.semantic_harness.conversation_inspector import build_conversation_inspector
+from tools.semantic_harness.rendering import conversation_first
 from tools.semantic_harness.scenario import DEFAULT_SCENARIO, merge
 from tools.semantic_harness.worker import LuaSemanticWorker
 
@@ -104,6 +105,65 @@ class ConversationInspectorTests(unittest.TestCase):
         self.assertEqual(
             view["execution"]["finalText"],
             "I heard you, but I couldn't apply that social reaction.",
+        )
+
+    def test_conversation_first_projection_separates_understanding_and_authority(self) -> None:
+        scenario = merge(
+            DEFAULT_SCENARIO,
+            {"npc": {"residence": {"label": "Riverside Camp"}}},
+        )
+        with LuaSemanticWorker(scenario) as worker:
+            worker.input("where is your home")
+            reference_turn = worker.input("what about it")
+            command_turn = worker.input("wait here")
+
+        reference_view = build_conversation_inspector(reference_turn)
+        self.assertEqual(
+            reference_view["understanding"]["classification"],
+            "recognized_question",
+        )
+        self.assertEqual(
+            reference_view["understanding"]["reference"]["resolvedReference"],
+            "IT",
+        )
+        self.assertEqual(
+            reference_view["understanding"]["reference"]["concept"],
+            "NPC_RESIDENCE",
+        )
+        self.assertEqual(reference_view["facts"]["status"], "known")
+        self.assertEqual(
+            reference_view["dialoguePlanning"]["selectionSource"],
+            "conversation_reference",
+        )
+        self.assertIn(
+            "Riverside Camp",
+            reference_view["finalResponse"]["text"],
+        )
+        self.assertFalse(reference_view["commandAuthority"]["isGameplayAction"])
+        self.assertEqual(
+            reference_view["commandAuthority"]["effects"]["transportCount"],
+            0,
+        )
+
+        command_view = build_conversation_inspector(command_turn)
+        self.assertTrue(command_view["commandAuthority"]["isGameplayAction"])
+        self.assertEqual(command_view["commandAuthority"]["action"], "STAY")
+        self.assertEqual(
+            command_view["commandAuthority"]["capabilityID"],
+            "pnc:companion.stay",
+        )
+        self.assertEqual(
+            command_view["commandAuthority"]["effects"]["transportCount"],
+            1,
+        )
+
+        rendered = conversation_first(reference_view)
+        self.assertLess(
+            rendered.index("UNDERSTANDING"), rendered.index("CONTEXT")
+        )
+        self.assertLess(
+            rendered.index("FINAL NPC RESPONSE"),
+            rendered.index("COMMAND AUTHORITY (SEPARATE)"),
         )
 
 

@@ -71,6 +71,43 @@ def _plan(response: dict[str, Any]) -> dict[str, Any] | None:
     return plan if isinstance(plan, dict) else None
 
 
+def _trace_data(record: dict[str, Any]) -> dict[str, Any]:
+    trace = record.get("trace", [])
+    if not isinstance(trace, list):
+        return {}
+    for event in trace:
+        if not isinstance(event, dict):
+            continue
+        data = event.get("data")
+        if isinstance(data, dict):
+            return data
+    return {}
+
+
+def _reference(target: Any) -> dict[str, Any] | None:
+    if not isinstance(target, dict):
+        return None
+    return _bounded({
+        "surface": target.get("text") or target.get("reference"),
+        "reference": target.get("reference"),
+        "resolvedReference": target.get("resolvedReference"),
+        "unresolved": target.get("unresolved"),
+        "concept": target.get("concept"),
+        "value": target.get("value"),
+        "entityType": target.get("entityType"),
+        "resolution": target.get("resolution"),
+    }, limit=16)
+
+
+def _fact_providers(facts: dict[str, Any]) -> list[str]:
+    providers = {
+        str(fact.get("provider"))
+        for fact in facts.values()
+        if isinstance(fact, dict) and fact.get("provider")
+    }
+    return sorted(providers)
+
+
 def _visible_text(record: dict[str, Any], response: dict[str, Any]) -> dict[str, Any]:
     messages = record.get("messages", [])
     npc_message = next(
@@ -130,6 +167,9 @@ def build_conversation_inspector(record: dict[str, Any]) -> dict[str, Any]:
         action_result = {}
     decision = result.get("decision", {})
     decision = decision if isinstance(decision, dict) else {}
+    diagnostics = ir.get("diagnostics", {})
+    diagnostics = diagnostics if isinstance(diagnostics, dict) else {}
+    trace_data = _trace_data(record)
     visible_response = _visible_text(record, response)
     flow_owner = "flow" if flow.get("matched") is True else "policy"
     execution = {
@@ -147,6 +187,72 @@ def build_conversation_inspector(record: dict[str, Any]) -> dict[str, Any]:
         "finalText": visible_response.get("text"),
         "responseTemplate": response.get("templateID"),
         "responsePool": response.get("sourcePoolID"),
+    }
+    selected_binding = selected.get("binding")
+    if not isinstance(selected_binding, dict):
+        selected_binding = action_result.get("binding")
+    effects = {
+        "transportCount": len(record.get("transport", []))
+        if isinstance(record.get("transport", []), list) else 0,
+        "toolCallCount": len(record.get("toolCalls", []))
+        if isinstance(record.get("toolCalls", []), list) else 0,
+        "sideEffects": _bounded(observation.get("sideEffects", {})),
+    }
+    is_gameplay_action = bool(
+        ir.get("action")
+        or action_result
+        or selected_binding
+    )
+    fact_status = diagnostics.get("factStatus")
+    if fact_status is None:
+        fact_status = response.get("uncertainty")
+    understanding = {
+        "classification": trace_data.get("classification"),
+        "intent": ir.get("intent") or observation.get("ir", {}).get("intent"),
+        "speechAct": ir.get("speechAct") or observation.get("ir", {}).get("speechAct"),
+        "subject": ir.get("subject") or observation.get("ir", {}).get("subject"),
+        "pattern": ir.get("provenance", {}).get("pattern")
+        if isinstance(ir.get("provenance"), dict)
+        else observation.get("ir", {}).get("pattern"),
+        "confidence": ir.get("confidence") or observation.get("ir", {}).get("confidence"),
+        "reference": _reference(ir.get("target")),
+    }
+    facts_view = {
+        "status": fact_status,
+        "providers": _fact_providers(facts),
+        "groundedFactRefs": _bounded(response_refs),
+        "entries": _bounded(facts, limit=32),
+        "planFactRefs": _bounded(plan_refs),
+    }
+    dialogue_planning = {
+        "topic": (plan or {}).get("topic") or response.get("topic"),
+        "dialogueAct": (plan or {}).get("dialogueAct")
+        or response.get("dialogueAct"),
+        "sourcePoolID": (plan or {}).get("sourcePoolID")
+        or response.get("sourcePoolID"),
+        "selectionSource": response.get("selectionSource"),
+        "tone": (plan or {}).get("tone") or response.get("tone"),
+        "uncertainty": (plan or {}).get("uncertainty")
+        or response.get("uncertainty"),
+        "groundedFactRefs": _bounded(
+            (plan or {}).get("groundedFactRefs") or response_refs
+        ),
+        "turns": _bounded((plan or {}).get("turns", []), limit=8),
+        "flow": _bounded(flow, limit=24),
+    }
+    command_authority = {
+        "isGameplayAction": is_gameplay_action,
+        "action": ir.get("action"),
+        "route": decision.get("route"),
+        "branch": decision.get("branch"),
+        "accepted": action_result.get("accepted"),
+        "status": action_result.get("status"),
+        "authority": action_result.get("authority"),
+        "capabilityID": action_result.get("capabilityID")
+        or selected.get("capabilityID"),
+        "binding": _bounded(selected_binding, limit=24),
+        "effects": effects,
+        "result": _bounded(action_result, limit=24),
     }
 
     return {
@@ -179,6 +285,16 @@ def build_conversation_inspector(record: dict[str, Any]) -> dict[str, Any]:
             "irFacts": _bounded(facts),
             "uncertainty": plan.get("uncertainty") if plan else response.get("uncertainty"),
         },
+        "understanding": _bounded(understanding, limit=16),
+        "facts": _bounded(facts_view, limit=32),
+        "dialoguePlanning": _bounded(dialogue_planning, limit=24),
+        "finalResponse": _bounded({
+            **visible_response,
+            "templateID": response.get("templateID"),
+            "selectionSource": response.get("selectionSource"),
+            "groundedFactRefs": response_refs,
+        }, limit=16),
+        "commandAuthority": _bounded(command_authority, limit=24),
         "semantic": {
             "intent": ir.get("intent") or observation.get("ir", {}).get("intent"),
             "speechAct": ir.get("speechAct") or observation.get("ir", {}).get("speechAct"),

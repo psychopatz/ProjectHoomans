@@ -16,7 +16,7 @@ from .dataset_library import DatasetLibraryPane
 from .flow_editor import FlowEditorPane
 from .interaction_explorer_pane import InteractionExplorerPane
 from .interaction_spec_pane import InteractionSpecPane
-from .rendering import pretty
+from .rendering import conversation_first, pretty
 from .scenario import load_scenario, save_scenario
 from .settings_dialog import open_runtime_settings as show_runtime_settings
 from .transcript import TranscriptBuffer
@@ -159,12 +159,23 @@ class SemanticHarnessApp:
         self.trace_tabs = ttk.Notebook(right)
         self.trace_tabs.grid(row=0, column=0, sticky="nsew", padx=6, pady=6)
 
-        facts_frame = ttk.Frame(self.trace_tabs)
-        facts_frame.rowconfigure(0, weight=1)
-        facts_frame.columnconfigure(0, weight=1)
-        self.inspector = ScrolledText(facts_frame, wrap="word", state="disabled")
+        conversation_frame = ttk.Frame(self.trace_tabs)
+        conversation_frame.rowconfigure(0, weight=1)
+        conversation_frame.columnconfigure(0, weight=1)
+        self.inspector = ScrolledText(
+            conversation_frame, wrap="word", state="disabled"
+        )
         self.inspector.grid(row=0, column=0, sticky="nsew")
-        self.trace_tabs.add(facts_frame, text="Conversation state")
+        self.trace_tabs.add(conversation_frame, text="Conversation understanding")
+
+        authority_frame = ttk.Frame(self.trace_tabs)
+        authority_frame.rowconfigure(0, weight=1)
+        authority_frame.columnconfigure(0, weight=1)
+        self.authority = ScrolledText(
+            authority_frame, wrap="word", state="disabled"
+        )
+        self.authority.grid(row=0, column=0, sticky="nsew")
+        self.trace_tabs.add(authority_frame, text="Command authority")
 
         raw_frame = ttk.Frame(self.trace_tabs)
         raw_frame.rowconfigure(0, weight=1)
@@ -382,7 +393,9 @@ class SemanticHarnessApp:
         self._messagebox.showerror("Harness error", str(error))
 
     def _show_response(self, response: dict[str, Any]) -> None:
-        self._set_text(self.inspector, pretty(build_conversation_inspector(response)))
+        view = build_conversation_inspector(response)
+        self._set_text(self.inspector, conversation_first(view))
+        self._set_text(self.authority, pretty(view.get("commandAuthority", {})))
         self._set_text(self.trace, pretty(response))
 
     def submit(self) -> None:
@@ -427,6 +440,7 @@ class SemanticHarnessApp:
         def finish(_: dict[str, Any]) -> None:
             self._set_text(self.transcript, "")
             self._set_text(self.inspector, "")
+            self._set_text(self.authority, "")
             self._set_text(self.trace, "")
             self._append("SYSTEM", "Scenario reset.")
 
