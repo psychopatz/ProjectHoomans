@@ -9,6 +9,7 @@ implementation for its report shapes and public helper functions.
 from __future__ import annotations
 
 import json
+import hashlib
 from pathlib import Path
 from typing import Any
 
@@ -16,8 +17,10 @@ from tools.semantic_harness import authoring
 from .blocks import SemanticBlockRegistry
 from .codeblocks import validate_codeblock_document
 from .compiler import CompileError
+from .compiler import discover_registered_capability_ids, render_semantic_lua_shards
 from .dataset_adapters import preview_dataset_adapter, promote_reviewed_candidates
 from ..interaction_explorer import build_interaction_rows, search_interactions
+from .interaction_spec import compile_interaction_spec, validate_interaction_spec
 
 
 DATASET_SOURCE_SPECS = (
@@ -351,12 +354,134 @@ class SemanticLabAuthoringService:
         })
         return selection
 
+    def validate_interaction_spec(
+        self,
+        spec: dict[str, Any],
+        *,
+        production_catalog: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
+        return validate_interaction_spec(spec, production_catalog=production_catalog)
+
+    def preview_interaction_spec(
+        self,
+        spec: dict[str, Any],
+        *,
+        source_id: str = "semantic_definitions",
+        production_catalog: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
+        """Compile one canonical typed spec without writing or reloading Lua."""
+
+        source_spec = self._dataset_spec(source_id)
+        if source_spec["kind"] != "semantic":
+            return {
+                "ok": False,
+                "valid": False,
+                "type": "semantic_interaction_spec_preview",
+                "sourceID": source_id,
+                "diagnostics": [{
+                    "severity": "error",
+                    "message": f"interaction specs require a semantic source, not {source_id}",
+                }],
+                "previewOnly": True,
+                "effectFree": True,
+                "writes": [],
+            }
+        base_document = self.load_dataset_document(source_id)
+        registered = discover_registered_capability_ids(self.runtime_root)
+        report = compile_interaction_spec(
+            spec,
+            base_document,
+            production_catalog=production_catalog,
+            registered_capability_ids=registered,
+        )
+        report.update({
+            "type": "semantic_interaction_spec_preview",
+            "sourceID": source_id,
+            "sourcePath": str(source_spec["path"]),
+            "previewOnly": True,
+            "effectFree": True,
+            "writes": [],
+        })
+        compiled = report.get("compiled")
+        if not isinstance(compiled, dict):
+            return report
+        rendered = render_semantic_lua_shards(
+            compiled,
+            "PNC/Semantics/PNC_SemanticGeneratedDefinitions",
+        )
+        report["generatedLua"] = [
+            {
+                "module": module,
+                "sha256": hashlib.sha256(source.encode("utf-8")).hexdigest(),
+                "source": source,
+            }
+            for module, source in rendered
+        ]
+        report["generatedSourceFingerprint"] = hashlib.sha256(
+            "\n".join(source for _module, source in rendered).encode("utf-8")
+        ).hexdigest()
+        report["compiledSummary"] = {
+            "patternIDs": [item["id"] for item in compiled["patterns"]],
+            "flowIDs": [item["id"] for item in compiled["flows"]],
+            "responsePoolIDs": [item["id"] for item in compiled["responsePools"]],
+        }
+        return report
+
+    def generate_interaction_spec(
+        self,
+        spec: dict[str, Any],
+        *,
+        approved: bool,
+        source_id: str = "semantic_definitions",
+        production_catalog: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
+        """Write an approved spec through the existing canonical Lua writer."""
+
+        if approved is not True:
+            return {
+                "ok": False,
+                "valid": False,
+                "type": "semantic_interaction_spec_generation",
+                "generationApproved": False,
+                "previewOnly": True,
+                "effectFree": True,
+                "writes": [],
+                "diagnostics": [{
+                    "severity": "error",
+                    "message": "interaction spec generation requires explicit approval",
+                }],
+            }
+        preview = self.preview_interaction_spec(
+            spec,
+            source_id=source_id,
+            production_catalog=production_catalog,
+        )
+        if preview.get("ok") is not True:
+            return {
+                **preview,
+                "type": "semantic_interaction_spec_generation",
+                "generationApproved": False,
+            }
+        from .build import write_semantic_output
+
+        writes = write_semantic_output(self.repository, preview["compiled"])
+        return {
+            **preview,
+            "type": "semantic_interaction_spec_generation",
+            "generationApproved": True,
+            "previewOnly": False,
+            "effectFree": False,
+            "writes": [str(path) for path in writes],
+            "reloadedBy": "caller_restart_required",
+        }
+
     def preview_workflow(
         self,
         source_id: str,
         block_ids: list[str],
         *,
         production_catalog: dict[str, Any] | None = None,
+        interaction_spec: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
         """Preview the complete select → compose → validate → source-build plan."""
         selection = self.validate_workflow_selection(
@@ -375,6 +500,20 @@ class SemanticLabAuthoringService:
         }
         if selection.get("ok") is not True:
             report["diagnostics"] = selection.get("diagnostics", [])
+            return report
+        if interaction_spec is not None:
+            composition = self.preview_interaction_spec(
+                interaction_spec,
+                source_id=source_id,
+                production_catalog=production_catalog,
+            )
+            report.update({
+                "ok": composition.get("ok") is True,
+                "composition": composition,
+                "sourcePreview": composition,
+                "diagnostics": composition.get("diagnostics", []),
+                "readyForApproval": composition.get("ok") is True,
+            })
             return report
         spec = self._dataset_spec(source_id)
         source_path = self._dataset_path(source_id)
@@ -397,6 +536,7 @@ class SemanticLabAuthoringService:
         *,
         approved: bool,
         production_catalog: dict[str, Any] | None = None,
+        interaction_spec: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
         """Generate through the existing writer after explicit workflow approval."""
         if approved is not True:
@@ -416,12 +556,27 @@ class SemanticLabAuthoringService:
             source_id,
             block_ids,
             production_catalog=production_catalog,
+            interaction_spec=interaction_spec,
         )
         if preview.get("ok") is not True:
             return {
                 **preview,
                 "type": "semantic_lab_workflow_generation",
                 "generationApproved": False,
+            }
+        if interaction_spec is not None:
+            generation = self.generate_interaction_spec(
+                interaction_spec,
+                approved=True,
+                source_id=source_id,
+                production_catalog=production_catalog,
+            )
+            return {
+                **generation,
+                "type": "semantic_lab_workflow_generation",
+                "workflow": preview["workflow"],
+                "selection": preview["selection"],
+                "sourcePreview": preview.get("sourcePreview"),
             }
         spec = self._dataset_spec(source_id)
         source_path = self._dataset_path(source_id)
