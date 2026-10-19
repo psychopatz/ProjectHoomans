@@ -65,6 +65,43 @@ def stay_spec() -> dict:
 
 
 class InteractionSpecTests(unittest.TestCase):
+    @staticmethod
+    def gated_collection() -> dict:
+        first = stay_spec()
+        first["id"] = "pnc.lab.stay.week"
+        first["blocks"].append({"id": "week_fact", "use": "shared.week_fact"})
+        first["blocks"].append({
+            "id": "week_gate",
+            "type": "conditions.gate",
+            "parameters": {
+                "type": "pnc:fact",
+                "factBlockID": "week_fact",
+                "operator": ">=",
+                "value": 1,
+            },
+        })
+        first["connections"].extend([
+            {"from": "week_fact", "to": "week_gate", "type": "fact"},
+            {"from": "week_gate", "to": "capability", "type": "gate"},
+        ])
+        second = deepcopy(first)
+        second["id"] = "pnc.lab.remain.week"
+        second["blocks"][0]["parameters"]["utterance"] = "remain with me"
+        second["blocks"][0]["parameters"]["negativeUtterance"] = "don't remain with me"
+        second["blocks"][2]["parameters"]["poolID"] = "semantic.lab.remain.week"
+        second["blocks"][2]["parameters"]["variants"][0]["key"] = (
+            "UI_PNC_Conversation_Semantic_LabRemainWeekAccepted"
+        )
+        return {
+            "schema": "semantic.interaction_collection.v1",
+            "sharedBlocks": [{
+                "id": "shared.week_fact",
+                "type": "world_facts.engine_fact",
+                "parameters": {"factID": "world.time.week"},
+            }],
+            "interactions": [first, second],
+        }
+
     def test_typed_spec_compiles_through_existing_semantic_builder(self) -> None:
         service = SemanticLabAuthoringService(repository=REPOSITORY)
         with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
@@ -112,6 +149,30 @@ class InteractionSpecTests(unittest.TestCase):
     def test_generation_requires_explicit_approval(self) -> None:
         service = SemanticLabAuthoringService(repository=REPOSITORY)
         report = service.generate_interaction_spec(stay_spec(), approved=False)
+        self.assertFalse(report["ok"])
+        self.assertFalse(report["generationApproved"])
+        self.assertEqual(report["writes"], [])
+
+    def test_one_shared_world_fact_block_compiles_into_two_flows(self) -> None:
+        service = SemanticLabAuthoringService(repository=REPOSITORY)
+        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+            catalog = worker.flow_catalog()
+        report = service.preview_interaction_collection(
+            self.gated_collection(),
+            production_catalog=catalog,
+        )
+        self.assertTrue(report["ok"], report)
+        self.assertEqual(report["sharedBlockIDs"], ["shared.week_fact"])
+        self.assertIn("pnc.lab.stay.week.flow", report["compiledSummary"]["flowIDs"])
+        self.assertIn("pnc.lab.remain.week.flow", report["compiledSummary"]["flowIDs"])
+        generated = "\n".join(item["source"] for item in report["generatedLua"])
+        self.assertGreaterEqual(generated.count("world.time.week"), 2)
+
+    def test_collection_generation_requires_explicit_approval(self) -> None:
+        service = SemanticLabAuthoringService(repository=REPOSITORY)
+        report = service.generate_interaction_collection(
+            self.gated_collection(), approved=False,
+        )
         self.assertFalse(report["ok"])
         self.assertFalse(report["generationApproved"])
         self.assertEqual(report["writes"], [])

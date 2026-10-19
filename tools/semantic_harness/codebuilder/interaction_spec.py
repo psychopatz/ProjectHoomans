@@ -10,12 +10,15 @@ from .compiler import CompileError, compile_semantic_definitions
 
 
 SCHEMA = "semantic.interaction_spec.v1"
+COLLECTION_SCHEMA = "semantic.interaction_collection.v1"
 BLOCK_TYPES = frozenset({
     "language.trigger",
     "gameplay_actions.capability",
     "dialogue_responses.response_pool",
+    "world_facts.engine_fact",
+    "conditions.gate",
 })
-CONNECTION_TYPES = frozenset({"semantic", "capability", "response"})
+CONNECTION_TYPES = frozenset({"semantic", "capability", "response", "fact", "gate"})
 
 
 def _text(value: Any, label: str) -> str:
@@ -41,6 +44,15 @@ def _known_capabilities(production_catalog: dict[str, Any] | None) -> set[str]:
                 if isinstance(value, str) and value:
                     known.add(value)
     return known
+
+
+def _known_facts(production_catalog: dict[str, Any] | None) -> set[str]:
+    catalog = production_catalog if isinstance(production_catalog, dict) else {}
+    return {
+        str(fact["id"])
+        for fact in catalog.get("factCatalog", [])
+        if isinstance(fact, dict) and fact.get("id")
+    }
 
 
 def validate_interaction_spec(
@@ -100,6 +112,23 @@ def validate_interaction_spec(
             known = _known_capabilities(production_catalog)
             if known and capability_id not in known:
                 diagnostics.append({"severity": "error", "blockID": block_id, "message": f"capability is not registered: {capability_id}"})
+        elif block_type == "world_facts.engine_fact":
+            fact_id = parameters.get("factID")
+            if not isinstance(fact_id, str) or not fact_id:
+                diagnostics.append({"severity": "error", "blockID": block_id, "message": "engine-fact block requires factID"})
+            known_facts = _known_facts(production_catalog)
+            if known_facts and fact_id not in known_facts:
+                diagnostics.append({"severity": "error", "blockID": block_id, "message": f"fact is not registered: {fact_id}"})
+        elif block_type == "conditions.gate":
+            fact_block_id = parameters.get("factBlockID")
+            if not isinstance(fact_block_id, str) or not fact_block_id:
+                diagnostics.append({"severity": "error", "blockID": block_id, "message": "gate requires factBlockID"})
+            if parameters.get("type") not in {"pnc:fact", "pnc:relationship", "pnc:time", "pnc:weather"}:
+                diagnostics.append({"severity": "error", "blockID": block_id, "message": "gate requires a supported production gate type"})
+            if not isinstance(parameters.get("operator"), str) or not parameters.get("operator"):
+                diagnostics.append({"severity": "error", "blockID": block_id, "message": "gate requires operator"})
+            if "value" not in parameters:
+                diagnostics.append({"severity": "error", "blockID": block_id, "message": "gate requires value"})
         elif block_type == "dialogue_responses.response_pool":
             try:
                 _text(parameters.get("poolID"), f"response {block_id} poolID")
@@ -125,6 +154,10 @@ def validate_interaction_spec(
     for block_type, label in required.items():
         if typed[block_type] != 1:
             diagnostics.append({"severity": "error", "message": f"spec requires exactly one {label}"})
+    if typed["conditions.gate"] > 1 or typed["world_facts.engine_fact"] > 1:
+        diagnostics.append({"severity": "error", "message": "spec supports at most one gate and one engine-fact block"})
+    if typed["conditions.gate"] != typed["world_facts.engine_fact"]:
+        diagnostics.append({"severity": "error", "message": "gate and engine-fact blocks must be provided together"})
 
     connections = spec.get("connections")
     if not isinstance(connections, list):
@@ -150,6 +183,8 @@ def validate_interaction_spec(
             expected_type = {
                 ("language.trigger", "gameplay_actions.capability"): "semantic",
                 ("gameplay_actions.capability", "dialogue_responses.response_pool"): "response",
+                ("world_facts.engine_fact", "conditions.gate"): "fact",
+                ("conditions.gate", "gameplay_actions.capability"): "gate",
             }.get((block_map[source]["type"], block_map[target]["type"]))
             if expected_type and connection_type != expected_type:
                 diagnostics.append({
@@ -187,6 +222,14 @@ def compile_interaction_spec(
     trigger = next(block for block in spec["blocks"] if block["type"] == "language.trigger")
     capability = next(block for block in spec["blocks"] if block["type"] == "gameplay_actions.capability")
     response = next(block for block in spec["blocks"] if block["type"] == "dialogue_responses.response_pool")
+    fact_block = next(
+        (block for block in spec["blocks"] if block["type"] == "world_facts.engine_fact"),
+        None,
+    )
+    gate_block = next(
+        (block for block in spec["blocks"] if block["type"] == "conditions.gate"),
+        None,
+    )
     trigger_parameters = _parameters(trigger)
     capability_parameters = _parameters(capability)
     response_parameters = _parameters(response)
@@ -224,6 +267,16 @@ def compile_interaction_spec(
             "variants": copy.deepcopy(response_parameters["variants"]),
         },
     }
+    if fact_block is not None and gate_block is not None:
+        fact_parameters = _parameters(fact_block)
+        gate_parameters = _parameters(gate_block)
+        definition["flow"]["nodes"]["accepted"]["gate"] = {
+            "type": gate_parameters["type"],
+            "fact": fact_parameters["factID"],
+            "operator": gate_parameters["operator"],
+            "value": copy.deepcopy(gate_parameters["value"]),
+            "unknownPolicy": gate_parameters.get("unknownPolicy", "tri_state"),
+        }
     source_document = copy.deepcopy(base_document)
     definitions = source_document.setdefault("definitions", [])
     definitions = [item for item in definitions if item.get("id") != definition_id]
@@ -253,5 +306,96 @@ def compile_interaction_spec(
         "patternID": pattern_id,
         "flowID": f"{definition_id}.flow",
         "responsePoolID": pool_id,
+        "writes": [],
+    }
+
+
+def _materialize_shared_blocks(
+    spec: dict[str, Any],
+    shared_blocks: dict[str, dict[str, Any]],
+) -> dict[str, Any]:
+    materialized = copy.deepcopy(spec)
+    blocks: list[dict[str, Any]] = []
+    for block in materialized.get("blocks", []):
+        if not isinstance(block, dict) or not block.get("use"):
+            blocks.append(block)
+            continue
+        shared = shared_blocks.get(str(block["use"]))
+        if not isinstance(shared, dict):
+            blocks.append(block)
+            continue
+        resolved = copy.deepcopy(shared)
+        resolved["id"] = block.get("id", resolved.get("id"))
+        parameters = copy.deepcopy(resolved.get("parameters", {}))
+        parameters.update(copy.deepcopy(block.get("parameters", {})))
+        resolved["parameters"] = parameters
+        blocks.append(resolved)
+    materialized["blocks"] = blocks
+    return materialized
+
+
+def compile_interaction_collection(
+    collection: dict[str, Any],
+    base_document: dict[str, Any],
+    *,
+    production_catalog: dict[str, Any] | None = None,
+    registered_capability_ids: set[str] | frozenset[str] | None = None,
+) -> dict[str, Any]:
+    """Compile multiple specs that may reuse canonical typed block instances."""
+
+    diagnostics: list[dict[str, str]] = []
+    if not isinstance(collection, dict) or collection.get("schema") != COLLECTION_SCHEMA:
+        return {
+            "ok": False,
+            "valid": False,
+            "schema": COLLECTION_SCHEMA,
+            "diagnostics": [{"severity": "error", "message": f"collection requires schema {COLLECTION_SCHEMA}"}],
+            "writes": [],
+        }
+    shared_blocks = {
+        str(block.get("id")): block
+        for block in collection.get("sharedBlocks", [])
+        if isinstance(block, dict) and block.get("id")
+    }
+    interactions = collection.get("interactions")
+    if not isinstance(interactions, list) or not interactions:
+        return {
+            "ok": False,
+            "valid": False,
+            "schema": COLLECTION_SCHEMA,
+            "diagnostics": [{"severity": "error", "message": "collection requires interactions"}],
+            "writes": [],
+        }
+    source_document = copy.deepcopy(base_document)
+    reports: list[dict[str, Any]] = []
+    compiled: dict[str, Any] | None = None
+    for spec in interactions:
+        if not isinstance(spec, dict):
+            diagnostics.append({"severity": "error", "message": "collection interactions must be objects"})
+            continue
+        resolved = _materialize_shared_blocks(spec, shared_blocks)
+        report = compile_interaction_spec(
+            resolved,
+            source_document,
+            production_catalog=production_catalog,
+            registered_capability_ids=registered_capability_ids,
+        )
+        reports.append(report)
+        if report.get("ok") is not True:
+            diagnostics.extend(report.get("diagnostics", []))
+            continue
+        source_document = report["sourceDocument"]
+        compiled = report.get("compiled")
+    return {
+        "ok": not diagnostics and compiled is not None,
+        "valid": not diagnostics and compiled is not None,
+        "schema": COLLECTION_SCHEMA,
+        "sharedBlockIDs": sorted(shared_blocks),
+        "interactionReports": reports,
+        "compiled": compiled,
+        "sourceDocument": source_document if compiled is not None else None,
+        "diagnostics": diagnostics,
+        "previewOnly": True,
+        "effectFree": True,
         "writes": [],
     }
