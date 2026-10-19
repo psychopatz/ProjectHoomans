@@ -1,31 +1,25 @@
-# Source audit and phase transition — 2026-10-18
+# Current architecture audit — Semantic Lab vs standalone semantic compiler
 
-**Remote branch source:** `docs/contextual-dialogue-quest-framework-20261018` @ `f0b6e41b90b025d64ccd7578e526d80876de4969` (PR #4 open at inspection). This is GitHub code inspection plus prior recorded test evidence, not new local GUI/worker reexecution or native Project Zomboid acceptance.
+**Remote source examined 2026-10-19:** `71162cb4f78cc4cd408a4a145486d5ebadc943c1` on `docs/contextual-dialogue-quest-framework-20261018`, PR #4 open/unmerged. GitHub source + user GUI screenshot, **not** a local worktree or fresh test rerun.
 
-## Existing accepted/observed building blocks
+| Concern | Source evidence | Result |
+| --- | --- | --- |
+| GUI application | `tools/semantic_harness/app.py`, `gui.py`, `flow_editor.py`, `run_harness.sh` | One actual Tk application, persistent production Lua worker; compiler is NOT a second GUI |
+| Standalone compiler | `tools/semantic_compiler/compiler.py`, `build.py`, JSON reviewed sources, tests, README with independent `python3 tools/semantic_compiler/build.py` commands | A second peer-level Python package and CLI/build pipeline |
+| Cross-import | `semantic_harness/authoring.py` imports compiler parsing/rendering and `build.py` writer from `tools.semantic_compiler` | Compiler is used as library today, but authoring/report/path ownership split |
+| Duplicated orchestration | `semantic_harness/authoring.py` defines `SEMANTIC_RELATIVE_ROOT`, `TRANSLATION_RELATIVE_ROOT`, `DIALOGUE_OUTPUT_RELATIVE_PATH`, `_planned_paths`; compiler `build.py` owns `DEFAULT_OUTPUT`, `DEFAULT_DIALOGUE_OUTPUT`, `write_*_output`, manifest writing | Overlapping configuration/orchestration; NOT proof that NLP compiler algorithms are duplicated |
+| UI authoring | Flow Editor `compile_source()`, `generate_source()`, `review_dataset()`, `generate_dataset()` call Tk file picker and show report summary | Real helper workflows, not integrated dataset/block/code studio |
+| Accepted runtime | Prior `PROGRESS.md` at this SHA reports G0–G3/C0–C6 Lua + compiler + X11 gates and READY FOR USER LIVE TEST | Preserve as historical previous-scope success, don't claim new UI requirements met |
+| Asset layout | Root AGENTS.md: `42.20/media/` runtime Lua, portable content under common and translations under `common/media/lua/shared/Translate/<LANG>/*.json`; compiler `build.py` currently targets `common/media/translation/<LANG>/Conversation/Semantic/` | Verify actual bootstrap/installed layout and migrate only under a separate approved packaging fix, not during artifact-parity S0A |
 
-- Four manually authored response/state flows (`greeting`, `identity`, `weather_context`, `wellbeing`) plus one compiled `pnc.dialogue.follow.flow` in `PNC_SemanticDialogueFlowCatalog.lua` / generated manifest; the user's screenshot shows five.
-- `PNC_SemanticGeneratedDefinitions_Flows_01.lua` defines FOLLOW only as `accepted` terminal node with `responsePool = semantic.authored.follow`. No function binding, permission check or result/denial transition is serialized into that flow.
-- `PNC_SemanticDialogueFlowRegistry.lua` `normalizeNode` accepts frames, response, gate, slots and basic transitions. It does **not** accept a typed action node/capability/result outcome. Kernel Preview/Commit owns dialogue state, not gameplay dispatch.
-- `PNC_SemanticDialoguePolicy_Decision.lua` `flowResponseEligible` rejects `result.action ~= nil`. Generated FOLLOW action responsePool is therefore not the authority-selected response on the executable path.
-- `PNC_SemanticDialogueInput_Actions.lua` handles `COMMAND_ACCEPTED`, gift, inventory and task branches via existing `PNC_SemanticCommandAdapter`, `PNC_SemanticTaskAdapter`, gift lifecycle, and server/domain authority. **These are real production routes to reuse**. Recorded worker tests showed FOLLOW, STAY/WAIT_AT and GIFT requests and results through those adapters with mock authority, and an X11 click-through proved current GUI compilation/generation/restart for one reviewed source. See `HISTORY_20261018.md`.
-- `tools/semantic_compiler/semantic_definitions.json` contains exactly one top-level authored FOLLOW definition (two new positive phrases). `compile_semantic_definitions` requires `REQUEST/REQUEST` and emits basic flows. This excludes `OFFER/GIFT` and workflow kinds beyond simple request; action capability reference is validated at top level but is not preserved as an executable flow node.
-- `tools/semantic_harness/flow_editor.py` has Add action, but `add_command_trigger` only appends a trigger frame. `Compile source…` and `Generate source…` use an external reviewed file chooser, not "enumerate all capabilities" with coverage and generated flow edits.
-- Prior `PROGRESS.md` marked READY FOR USER LIVE TEST for narrow phases, despite `ROADMAP.md` still listing context/memory/quest stages as PLANNED; full suite recorded contextual social reaction failures. These older claims remain available verbatim in history, but cannot satisfy the clarified goal.
+## Findings and work classification
 
-## Newly mandatory gaps
+**Confirmed architecture gap:** two peer-level tool directories and build ownership split. User's desired CodeBuilder is an internal reusable subsystem in Semantic Lab. **Confirmed usability gap:** dataset/definition selection by external JSON picker rather than searchable in-app dataset library and synchronized reusable block/code authoring. **Not established:** duplicate parsing engines or a separately launched compiler GUI; do not claim those exist.
 
-1. No registry-backed **automatic inventory of all flow-eligible capabilities**, classification by workflow template or explicit missing-metadata coverage report.
-2. No generic **complete production action-flow schema** with named binding, typed slots, outcomes and condition/transitions.
-3. No automatic generation for multiple existing registered capabilities from a single template; one hand-authored FOLLOW definition is not procedural population.
-4. No producer-agnostic handling of OFFER/GIFT, target-dependent WAIT_AT or future memory/quest dialogue through the same compiler.
-5. No coherent source-of-truth/round-trip flow editing where author changes graph and regenerates structured definition and modular source while protecting manual customizations.
-6. No all-compatible-capabilities worker acceptance matrix, including negative cases, correct response ownership and idempotent reruns.
+**Not yet implemented:** embedded CodeBuilder, one canonical writer/configuration/authoring source-of-truth, dataset browse/edit GUI, typed semantic block composition, synchronized code editor and fully end-to-end in-app generation.
 
-## Distinguish evidence
+**Historical acceptance:** prior `PROGRESS.md` archived verbatim in `HISTORY_C0_C6_20261019.md`; current goal opens an additional productization phase. **New phase test state:** no new source edits, compiler artifact parity tests, GUI clickthrough or worker regressions executed by this docs change.
 
-**Code-verified:** named files/limitations above at remote SHA. **Recorded but not rerun:** earlier developer real-worker Follow/Stay/WaitAt/Gift and X11 compiler generation tests. **New goal not done:** automatic broad generation and authoritative flow-level lifecycle. **User-owned/unrun:** native PZ SP/MP or Workshop publication.
+## Required developer approach
 
-Current phase is **G0 — Automatic Flow Generation Foundation**; the Next Chunk in `PROGRESS.md` is ONE generic simple-command template slice (discover all matching registered simple commands, prove multiple generated action flows), not another single hardcoded FOLLOW.
-
-The generator may use explicit supported templates, but it must never infer arbitrary callable function names from action strings or automatically create fictitious NPC game primitives.
+Read `SEMANTIC_STUDIO_CONSOLIDATION.md`. Start with S0A no-behavior-change migration; avoid a bulk folder move that reflows translations/normalization, breaks CLI consumers or overwrites manually authored definitions. Then unify authoring service before designing actual dataset explorer/semantic block composition. No native PZ or Workshop work by Codex.

@@ -43,3 +43,10 @@ This new major phase extends the existing semantic parser/flow action architectu
 The same typed ContextState + DialogueActPlan supports offline Lua and optional PBrainZ realization. PBrainZ may phrase a grounded authorized plan but cannot independently create facts or effects. The build-time dataset ingest and `tools/semantic_compiler` integration are specified in `DATASET_CONVERSATION_PIPELINE.md`; no corpus download or embeddings at game runtime.
 
 Existing generated companion/task/gift/quest flows remain intact; conversational agenda helps interpret requests and follow-ups but does not introduce a second dispatcher. Re-run the social-action final response/INSULT regression and recorded four THREAT social-reaction failures as acceptance gates, not by counting successful IR recognition alone.
+
+
+## Semantic Studio tool ownership update (2026-10-19; S phase planned)
+
+Developer-facing tooling now has ONE ownership root: `tools/semantic_harness/`. The existing compiler package is to be embedded as `semantic_harness/codebuilder/`, sharing a single canonical authoring spec, one build/write/path authority and one service used by GUI and headless CLI. `tools/semantic_compiler/` may temporarily hold compatibility wrappers for verified callers but must not maintain another writer/definition source/compiler implementation. Dataset library and reusable block composition are internal Semantic Lab subsystems, not standalone applications.
+
+**This changes developer-tool organization, NOT production Lua semantic/gameplay authority.** Compilation produces deterministic modular Lua/EN-TL/manifest outputs; Core remains the parser, Hoomans remains flow/policy/context, and gameplay domains remain side-effect owners. Schema validation/collision checks happen at authoring time; arbitrary typed blocks must not execute untrusted Lua. Details and staged acceptance in `SEMANTIC_STUDIO_CONSOLIDATION.md`. Previous C0–C6 accepted evidence archived in `HISTORY_C0_C6_20261019.md`.

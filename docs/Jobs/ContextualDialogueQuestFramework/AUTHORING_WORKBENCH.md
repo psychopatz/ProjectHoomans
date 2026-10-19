@@ -1,23 +1,24 @@
-# Semantic Lab — all-supported automatic flow generation UX
+# Semantic Lab — integrated reusable Semantic Studio workspace
 
-Existing Flow Editor (Tk) has registered flows, node editing, Add action trigger, Compile source…, Generate source…, Simulation, and earlier recorded X11 click-through. It still lists only four legacy conversation flows + one generated FOLLOW terminal flow at audited branch. Its Add action triggers recognition, **not** generation of an executable production flow; source compiler requires selecting an authored JSON file. Keep and improve this SAME application rather than invent another UI.
+**Current acceptance note:** at `71162cb4f78cc4cd408a4a145486d5ebadc943c1`, code provides Flow Editor graph, 23-ish registered flow entries, action/fact gates and generation buttons, Conversation State Inspector, reviewed dataset preview and source approval; prior X11 and Lua worker gates recorded. **Still missing:** in-app searchable dataset library, shared semantic block palette, synchronized structured source editing and one canonical codebuilder/writer service. Do not repeat old claims of only 5 loaded flows.
 
-## Primary actions that must exist
+## Target single-app work areas
 
-- **Discover Capabilities / Show Coverage:** automatic inventory of registered parser frames, command/task/gift workflows and legacy conversational flows. Show total, template-eligible, generated, unsupported/manual, and detailed missing contract reasons. Do not hide recognition-only actions.
-- **Generate Missing Flows:** map supported capabilities to generic workflow templates; show proposed flow graphs, source module/translation/manifest diffs, collision diagnostics. Explicit approve before any write; regenerate only changed fingerprints.
-- **Regenerate Selected:** edit template parameters, trigger frames, condition gates, result-to-response mapping, EN/TL and layout from typed canonical spec. Custom edits/overlays survive deterministic regeneration. Never overwrite handwritten legacy modules.
-- **Validate All / Test All:** run exact production Lua worker traces for every generated *template class* and focused all-compatible-catalog integrity checks; distinguish real engine mocks from native PZ. Show loaded flow ID, selected node and outcome, binding, outgoing request, denial/timeout and rendered response.
-- **Graph/Code/Language/Actions/Simulator/Compiler views:** group functions by meaningful labels; render actual action-capability nodes and outcome edges, clickable handler detail, raw IR/JSON in advanced inspector. Context/quest/personality gates are reusable registered condition descriptors, not free-form scripts.
+1. **Dataset Library:** discover canonical reviewed `common_interactions`, `semantic_definitions`, WordNet concepts, licensed source metadata and approved/rejected mappings, with counts, search, EN/TL status and linked generated flow/source. Existing data must be visible without a file picker. Review/approve/reject with versioned provenance, collision report and no automatic gameplay execution.
+2. **Block Library:** typed reusable modular language/pattern, context/agenda, world fact, condition, response-plan, memory, registered action and quest blocks. Blocks are declared reusable fragments with stable IDs, typed ports, source owner, version and dependency graph; composing a block does not duplicate Lua implementation or invent native handlers.
+3. **Conversation Composer:** searchable tree/graph with nested subflow references, add/rename/remove/duplicate/connect/auto-layout/pan/zoom, result edges, contextual and game-state inspection. One **canonical typed definition** shared by graph and code view; editor layout metadata not runtime semantics.
+4. **Code/Source Builder:** real syntax-aware supported declarative editing (codeblock-style with snippets/validation/diagnostics), visual/code two-way synchronization, review exactly affected modular Lua/EN+TL/manifests, safe output paths, preview vs approved write clearly separated. Unsupported handwritten Lua must be kept unmodified and safely marked non-round-trippable, not eval'd.
+5. **Simulation & Trace:** real Core + Hoomans Lua worker, chat history, selected IR/pattern, current topic/reference/agenda/knowledge/response plan, generated flow result, actual approved action/authority trace and rendered NPC text, with direct links back to originating dataset and blocks.
 
-## Three essential UI invariants
+All five areas are views into **one Semantic Lab process and one headless authoring/build service**, not separate apps with their own source files or semantic engines.
 
-1. Node drag/link/delete/rename and code editing modify **one canonical versioned source definition**, not only a worker-memory copy. Save draft, preview compilation, approved generate/write, fresh worker restart have separately labeled controls and state.
-2. A flow's action graph must reflect the **real production route**. Generated FLOW with response-only terminal does not qualify as "Follow command flow" unless authorization/request/result stages are present and executed. Display actual selected branch and reason for noFlow/legacy fallback.
-3. All lists and generation are **registry-driven**. The author should not have to remember manually each `PNC_*.lua` source file or edit JSON frames just to add a known game primitive; incomplete metadata is surfaced explicitly.
+## UX acceptance sequence
 
-## Phased UI delivery and acceptance
+- **S0A:** preserving current interface/runtime, make compiler an embedded library and unify imports; no extra UX controls required yet. Behavior/artifact parity mandatory.
+- **S0B:** centralize preview/compile/write/worker-reload service shared by buttons and CLI, eliminate independent file/path policies.
+- **S1:** browse and edit actual existing patterns/response pools *within* UI, preview source diff and trace; no manual JSON selection for ordinary workflow.
+- **S2–S3:** share typed block registry and canonical spec between visual graph and supported code editor. Reuse a Fact+Context block in two different graphs without duplicate code or invalid edge type.
+- **S4–S5:** import reviewed large dataset candidates; generate Lua through same codebuilder; allow visual edits and deterministic regeneration, with exact diff approval and fresh-worker behavioral test.
+- **S6:** human/agent authors and verifies one multi-turn contextual dialogue entirely in Semantic Lab, with low-latency UI and no separate compiler invocation.
 
-First G0A exposes coverage and displays the two generated simple-command flows, can inspect exact binding/result traces. Advanced graph/code editing and bulk buttons may follow in G1 only after worker and compiler correctness; a temporary CLI/worker discovery query plus minimal existing UI coverage is acceptable *for the first chunk*, but eventual product requires complete UI generation. Do not declare final acceptance with only a headless generator or a copied source file.
-
-Native PZ/Steam/Workshop are not part of automated developer acceptance. For Codex CLI, use X11/Xvfb/xdotool or other actually available desktop tools; don't spin forever polling `apps=[]`. Actual mouse click evidence stays separate from direct Tk callback tests.
+No Tk-to-Electron rewrite by default. Inspect actual user click-through and performance before changing UI framework. Avoid giant raw JSON fields as the main authoring experience. Headless Python-only tests can't prove real UI editability; real X11/Tk testing can cover it where available. Native Project Zomboid remains user-owned.

@@ -1,29 +1,23 @@
 # Contextual Dialogue & Quest Framework — Project Hoomans
 
-**Product objective:** Semantic Lab is the primary offline procedural authoring, generation, debugging and real-production-Lua verification environment for Project Hoomans' NPC language, contextual conversations, gameplay actions and quests. **Newly approved expansion:** LLM-like multi-turn contextual intelligence with NO required LLM or large runtime corpus.
+**Current product direction (2026-10-19):** Make **Semantic Lab the sole user/agent-facing NLP development application**. The existing semantic compiler becomes its **embedded CodeBuilder**; datasets, reusable semantic blocks, visual/code authoring, approved generation and real-Lua simulation are all subparts of ONE workspace. We are consolidating the developer workflow, not changing the current authoritative game runtime.
 
-**Planning baseline:** remote branch `docs/contextual-dialogue-quest-framework-20261018` at `b06533f909acec8ad838df8c3aa0259d9143a30c`, reviewed 2026-10-19. This is remote source evidence; local Codex state may be ahead or dirty. Recorded work through G3B includes 17 generated / 18 registered capability flows, quest foundation, bounded prior-action and cognition memory, and worker/X11 tests. Those are narrower slices; they do NOT establish arbitrary multi-turn contextual dialogue. Historical ledger remains `HISTORY_20261018.md`.
+The repository already records accepted action-flow, quest, context/memory, reviewed dataset and optional-provider developer slices through C6-C at `71162cb4f78cc4cd408a4a145486d5ebadc943c1`. Those are archived in `HISTORY_C0_C6_20261019.md`, and their READY FOR USER LIVE TEST status remains true **for that narrower previous scope**. The new Semantic Studio productization goal S0–S6 is **IN PROGRESS**, beginning with a no-output-change compiler integration.
 
-## Product outcome
+## What a finished Semantic Lab must enable
 
-Players should converse naturally with the *same* NPC about wellbeing, injuries, needs, weather, inventory, personality, social relationships and quests, including elliptical follow-ups ("Why?", "What happened?", "How many?", "And him?"), pronouns ("it", "some", "there"), corrections, clarifications, interruption/resumption and follow-up commitments. An NPC can recall a truly acknowledged promise or known event later, with provenance and participant scoping; cannot invent injury causes, weather observations, inventories or quest progress.
+Browse a registered dataset/concept/capability → inspect provenance and examples → reuse typed semantic blocks → visually edit a contextual conversation tree OR its synchronized declarative codeblock source → validate actual Core/production flow contract → preview and approve modular Lua/EN+TL/manifest diff → reload real Lua worker → click an actual response and inspect IR, context agenda/memory, selected flow, action authority and generated source. Most operations must no longer depend on manually locating JSON files and editing multiple Lua modules.
 
-The language understanding pipeline remains **PsychopatzCore → Hoomans Context/Flow/Plan → authoritative gameplay owners → EN/TL grounded responses**, optionally passing the approved response plan to PBrainZ for richer wording. No PBrainZ-specific duplicate memory or action service. Different response phrasing is not proof of context comprehension; real IR→discourse-state→fact→plan→final text evidence is mandatory.
+**No second NLP parser, no separate compiler app, no duplicate artifact generator, no arbitrary executable node Lua and no full corpus at game runtime.** The UI and CLI must call the same headless authoring/build service. Preserve lightweight offline Lua and optional PBrainZ using authorized facts.
 
-## Current sequence, without disrupting ongoing work
+## Developer sequence
 
-1. **G3C (current ONE Next Chunk)** — complete existing generated quest-flow command-boundary and worker-restart verification, unless the agent's actual local checkout has already accepted it with proof. Do not redo historically accepted G0/G3B implementation.
-2. **C0–C6 (next major phase)** — baseline, conversation frames, sparse memory/commitments, dialogue planning, dataset-assisted Code Builder, Semantic Lab trace/editor and performance/EN+TL/PBrainZ acceptance.
-3. Quest, gift, command, task and social-action regressions remain protected. Never infer completion from a GitHub branch or agent report without checking runtime evidence.
+**S0A:** embed compiler in Semantic Lab with byte-identical compiled output and compatibility shim; **S0B:** one authoring/artifact service; **S1:** dataset library; **S2:** typed reusable block registry; **S3:** graph+source synchronized composer; **S4:** licensed corpus imports; **S5:** complete one-app generation loop; **S6:** UX/performance and parity acceptance.
 
-## Read order
+Only `PROGRESS.md` determines ONE current Next Chunk. Full target architecture and migration gates: `SEMANTIC_STUDIO_CONSOLIDATION.md`; phase ordering: `ROADMAP.md`.
 
-Root `AGENTS.md` → job `AGENT_RUNBOOK.md`, `AUDIT.md`, `ARCHITECTURE.md`, `AUTOMATIC_FLOW_GENERATION.md`, `CAPABILITY_ACTION_BINDINGS.md`, `CONDITION_CONTEXT.md`, `QUEST_CONTRACT.md`, **`CONVERSATIONAL_INTELLIGENCE.md`**, **`DATASET_CONVERSATION_PIPELINE.md`**, `PROCEDURAL_NLP_COMPILER.md`, `AUTHORING_WORKBENCH.md`, `ROADMAP.md`, `HARNESS_ACCEPTANCE.md`, **`CONVERSATION_ACCEPTANCE.md`**, **`PROGRESS.md` LAST**. `GOAL_PROMPT.md` is a bootstrap, not the source of architectural truth.
+## Read order for /goal
 
-Implementation references: `PNC_SemanticDialogueContextState{,_Turns,_Mentions,_Snapshot}.lua`, `PNC_SemanticContextResolver.lua`, `PNC_SemanticDialogueReferenceResolver.lua`, `PNC_SemanticDialogueFlowKernel.lua`, `PNC_SemanticDialogueResponsePlan.lua`, Knowledge/Cognition/Quest owners, `tools/semantic_compiler/`, `tools/semantic_harness/`.
+Root `AGENTS.md` → job `AGENT_RUNBOOK.md`, `AUDIT.md`, `ARCHITECTURE.md`, `SEMANTIC_STUDIO_CONSOLIDATION.md`, `AUTOMATIC_FLOW_GENERATION.md`, `CAPABILITY_ACTION_BINDINGS.md`, `CONDITION_CONTEXT.md`, `QUEST_CONTRACT.md`, `CONVERSATIONAL_INTELLIGENCE.md`, `DATASET_CONVERSATION_PIPELINE.md`, `PROCEDURAL_NLP_COMPILER.md`, `AUTHORING_WORKBENCH.md`, `ROADMAP.md`, `HARNESS_ACCEPTANCE.md`, `CONVERSATION_ACCEPTANCE.md`, **`PROGRESS.md` LAST**. Historical ledgers for evidence only: `HISTORY_20261018.md` and `HISTORY_C0_C6_20261019.md`.
 
-## Mandatory boundaries
-
-Do not implement new generic NLP interpreter, runtime embeddings/large corpus, runtime LLM requirement, command dispatcher, social memory silo or quest authority. Offline Lua remains first-class; versioned modular source and deterministic compilation; single authoritative action, zero effect during Preview; no per-frame all-NPC scans. Keep translations in `common/media/lua/shared/Translate/<LANG>/*.json`. Real Project Zomboid SP/MP testing and Workshop publishing/installing remain user-owned; Codex CLI CUA discovery is not a required development tool.
-
-**Completion:** actual worker shows contextual multi-turn decisions, grounded facts and explanations, topic suspension/resumption and correctly scoped memory across conversation boundary; corpus-assisted compiler safely generates supported language/state definitions; the existing Semantic Lab can inspect and edit them; measured performance and modularity gates pass. Work ends developer **READY FOR USER LIVE TEST**, never native PZ claim.
+**No production code changed by this documentation commit.** Codex must inspect its own checkout; remote planning baseline `71162cb4f78cc4cd408a4a145486d5ebadc943c1` is not proof of local status. Only the user performs native Project Zomboid SP/MP acceptance and any Steam Workshop install/publish/release. Missing Codex CLI CUA `apps=[]` is not an implementation blocker; use available X11/Tk and production worker instead.

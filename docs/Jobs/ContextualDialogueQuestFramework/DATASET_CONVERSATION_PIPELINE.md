@@ -1,6 +1,6 @@
 # Dataset-assisted contextual language Code Builder — proposed pipeline
 
-**Status:** PLANNED. Datasets are **offline development-time sources for linguistic and dialogue-state candidate generation**, not a runtime LLM, executable capability authority, or megabyte-scale in-game corpus. Preserve existing `tools/semantic_compiler/compiler.py`, `build.py`, `wordnet_concepts.json`, `common_interactions.json`, `semantic_definitions.json`, and automatic capability/flow generator.
+**Status:** PLANNED. Datasets are **offline development-time sources for linguistic and dialogue-state candidate generation**, not a runtime LLM, executable capability authority, or megabyte-scale in-game corpus. Preserve the existing parser/compiler algorithms, reviewed WordNet/common-interaction/semantic-definition sources and automatic capability/flow generator **while relocating compiler implementation and canonical sources into `tools/semantic_harness/codebuilder/`** during the S0 migration. The old `tools/semantic_compiler` paths are historical entrypoints and may remain only as temporary delegated shims; no dual editable copies.
 
 ## Evidence and candidate sources
 
@@ -48,3 +48,8 @@ The adapter should first convert a **bounded fixed sample** and produce an *offl
 ## Quality bar
 
 Measure recognition precision and recall for scoped tests, false executable dispatch rate (target zero on adversarial negative set), wrong referent rate, clarification/abstention, unknown-fact fabrication, EN/TL parity and incremental Lua size/startup cost. Preserve provenance from selected pattern to reviewed dataset candidate. Avoid "millions of examples loaded" and "NLP accuracy 100%" claims. Data volume is not a quality metric.
+
+
+## Semantic Studio ownership supersession (2026-10-19)
+
+Implementation entry point for future corpus adapters and review is **`tools/semantic_harness/datasets/`**; the existing CodeBuilder lives **`tools/semantic_harness/codebuilder/`** after S0. The only top-level product entry point is Semantic Lab GUI/CLI; do not construct a new dataset application or an independent compiler runner. The reviewed canonical authoring definition is shared by dataset view, graph, code and compiler. S0A must preserve current behavior byte-for-byte before S4 actual corpus ingestion.

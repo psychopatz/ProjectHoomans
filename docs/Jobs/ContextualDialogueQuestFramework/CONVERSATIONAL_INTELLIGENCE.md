@@ -1,3 +1,5 @@
+> **Current evidence update (2026-10-19):** C0–C6 were subsequently recorded developer-accepted in the previous PROGRESS at commit `71162cb4f78cc4cd408a4a145486d5ebadc943c1` (archived in `HISTORY_C0_C6_20261019.md`). Any "PLANNED" status or "start after G3C" text below is **historical design language**, not the current Next Chunk. The active new workstream is Semantic Studio consolidation S0A in `PROGRESS.md`.
+
 # Contextual Conversational Intelligence — stable design contract
 
 **Status:** PLANNED; no new source or tests implemented by this documentation update. Start only after the current G3C quest gate has been accepted or explicitly reclassified with evidence. This subsystem extends existing Hoomans context and flow modules; it is NOT a second chatbot or replacement semantic engine.
