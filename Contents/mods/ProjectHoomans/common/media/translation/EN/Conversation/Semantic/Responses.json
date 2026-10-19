@@ -126,5 +126,9 @@
   "UI_PNC_Conversation_Semantic_QuestionNeedsProposalHunger": "I can keep that as a proposal, but I still need the item and amount before I record a commitment.",
   "UI_PNC_Conversation_Semantic_QuestionNeedsProposalThirst": "I can keep that as a proposal, but I still need the item and amount before I record a commitment.",
   "UI_PNC_Conversation_Semantic_QuestionNeedsProposalUnknown": "I can keep that as a proposal, but I need to confirm the item and amount before I record a commitment.",
-  "UI_PNC_Conversation_Semantic_FlowGreetingOpeningRain": "Hey there. Wet one today."
+  "UI_PNC_Conversation_Semantic_FlowGreetingOpeningRain": "Hey there. Wet one today.",
+  "UI_PNC_Conversation_Semantic_ContextReferenceUnknown": "I'm not sure what you're referring to.",
+  "UI_PNC_Conversation_Semantic_ContextReferenceLocationSafetyUnknown": "I don't have reliable information about whether it's safe there.",
+  "UI_PNC_Conversation_Semantic_ContextReferenceDescriptionUnknown": "I don't know enough about that place to describe it.",
+  "UI_PNC_Conversation_Semantic_ContextReferenceMedicalUnknown": "I can't confirm anything about that pain right now."
 }

@@ -26,6 +26,11 @@ local function topicFor(ir, options)
         then
             return nil
         end
+        if extensions
+            and extensions.dialogueFollowUp == "CONTEXT_REFERENCE"
+        then
+            return nil
+        end
         topic = extensions and extensions.topic or nil
         topic = topic or ir.action or ir.subject
         if topic == nil and type(ir.object) == "table" then

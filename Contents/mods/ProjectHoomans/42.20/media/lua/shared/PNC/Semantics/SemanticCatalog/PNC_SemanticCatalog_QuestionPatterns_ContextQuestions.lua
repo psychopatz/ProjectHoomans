@@ -605,6 +605,105 @@ function Internal.RegisterWorldFactQuestions()
         { allowFuzzyCapture = true }
     )
 
+    -- Bounded discourse-reference questions.  The literal pronoun is
+    -- captured by PsychopatzCore so the existing dialogue reference resolver
+    -- can bind it to the current topic/focus; these exact utterance shapes
+    -- never become an open-ended fuzzy parser or a gameplay request.
+    local function contextReferenceQuestion(questionKind)
+        return {
+            intent = "QUESTION",
+            speechAct = "QUESTION",
+            subject = "CONTEXT_REFERENCE",
+            target = "$capture.reference",
+            modifiers = { directed = true },
+            socialContext = {
+                directed = true,
+                informationalQuestion = true,
+                contextReference = true,
+            },
+            extensions = {
+                dialogueFollowUp = "CONTEXT_REFERENCE",
+                topic = "conversation",
+                contextQuestion = questionKind,
+            },
+        }
+    end
+
+    local function referencePattern(id, match, priority, questionKind)
+        registerPattern(
+            id,
+            match,
+            contextReferenceQuestion(questionKind),
+            0.98,
+            priority
+        )
+    end
+
+    referencePattern(
+        "pnc.question.context_reference.what_about_it",
+        {
+            { kind = "literal", value = "what" },
+            { kind = "literal", value = "about" },
+            { kind = "literal", value = "it", capture = "reference" },
+        },
+        128,
+        "ABOUT"
+    )
+    referencePattern(
+        "pnc.question.context_reference.what_about_that",
+        {
+            { kind = "literal", value = "what" },
+            { kind = "literal", value = "about" },
+            { kind = "literal", value = "that", capture = "reference" },
+        },
+        128,
+        "ABOUT"
+    )
+    referencePattern(
+        "pnc.question.context_reference.what_about_this",
+        {
+            { kind = "literal", value = "what" },
+            { kind = "literal", value = "about" },
+            { kind = "literal", value = "this", capture = "reference" },
+        },
+        128,
+        "ABOUT"
+    )
+    referencePattern(
+        "pnc.question.context_reference.safe_there",
+        {
+            { kind = "literal", value = "is" },
+            { kind = "literal", value = "it", capture = "reference" },
+            { kind = "literal", value = "safe" },
+            { kind = "literal", value = "there" },
+        },
+        127,
+        "SAFETY"
+    )
+    referencePattern(
+        "pnc.question.context_reference.like_there",
+        {
+            { kind = "literal", value = "what" },
+            { kind = "literal", value = "is" },
+            { kind = "literal", value = "it", capture = "reference" },
+            { kind = "literal", value = "like" },
+            { kind = "literal", value = "there" },
+        },
+        127,
+        "DESCRIPTION"
+    )
+    referencePattern(
+        "pnc.question.context_reference.still_hurt",
+        {
+            { kind = "literal", value = "does" },
+            { kind = "literal", value = "it", capture = "reference" },
+            { kind = "literal", value = "still" },
+            { kind = "literal", value = "hurt" },
+        },
+        127,
+        "MEDICAL_PAIN"
+    )
+
     registerPattern(
         "pnc.question.wellbeing_follow_up_whats_wrong",
         {

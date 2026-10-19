@@ -120,10 +120,37 @@ local function recordNPCResponseTurn(
         -- the question topic that its response is continuing.
         topic = context.previousTopic or context.currentTopic
     end
+    local responseSubject = response and response.referenceSubject
+        or inputIR and inputIR.subject
+
+    -- Keep one compact, participant-scoped discourse focus for the existing
+    -- reference resolver.  This is a topic mention, not a fabricated world
+    -- entity or fact; authoritative providers still answer the follow-up.
+    local mentions
+    -- Gameplay-action responses must not add a competing conversational topic
+    -- candidate.  Existing command/task target resolution relies on the
+    -- authoritative world target remaining the only candidate for "there".
+    if inputIR and inputIR.action == nil
+        and topic ~= nil and tostring(topic) ~= ""
+    then
+        local referenceTopic = response and response.referenceTopic or topic
+        mentions = {
+            {
+                entityType = "topic",
+                kind = "topic",
+                concept = responseSubject
+                    or "CONVERSATION_TOPIC",
+                text = tostring(referenceTopic),
+                value = tostring(referenceTopic),
+                topic = tostring(topic),
+                source = "semantic_response",
+            },
+        }
+    end
     return context:RecordNPCResponse({
         intent = "RESPONSE",
         speechAct = responseSpeechAct,
-        subject = inputIR and inputIR.subject,
+        subject = responseSubject,
         rawText = responseText,
         extensions = {
             topic = topic,
@@ -134,6 +161,7 @@ local function recordNPCResponseTurn(
         source = "semantic_response",
         branch = branch,
         topic = topic,
+        mentions = mentions,
     })
 end
 

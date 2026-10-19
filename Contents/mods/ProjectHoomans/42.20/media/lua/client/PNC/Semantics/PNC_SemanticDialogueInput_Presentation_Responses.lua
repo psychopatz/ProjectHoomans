@@ -220,6 +220,22 @@ local function semanticTranslationKey(response)
             "UI_PNC_Conversation_Semantic_ConversationContinuationKnowledge",
         ["semantic.conversation.continuation.default"] =
             "UI_PNC_Conversation_Semantic_ConversationContinuationDefault",
+        ["semantic.conversation.context_reference.unknown"] =
+
+            "UI_PNC_Conversation_Semantic_ContextReferenceUnknown",
+
+        ["semantic.conversation.context_reference.location_safety_unknown"] =
+
+            "UI_PNC_Conversation_Semantic_ContextReferenceLocationSafetyUnknown",
+
+        ["semantic.conversation.context_reference.description_unknown"] =
+
+            "UI_PNC_Conversation_Semantic_ContextReferenceDescriptionUnknown",
+
+        ["semantic.conversation.context_reference.medical_unknown"] =
+
+            "UI_PNC_Conversation_Semantic_ContextReferenceMedicalUnknown",
+
         ["semantic.question.needs.offer.hunger"] =
             "UI_PNC_Conversation_Semantic_QuestionNeedsOfferHunger",
         ["semantic.question.needs.offer.thirst"] =
@@ -330,6 +346,8 @@ local function payloadForPlanTurn(response, rendered, fallbackRendered)
         planTurnID = rendered.id,
         planContinuation = rendered.continuation,
         topic = response.topic,
+        referenceTopic = response.referenceTopic,
+        referenceSubject = response.referenceSubject,
         segments = rendered.segments,
     }
 end
@@ -387,6 +405,8 @@ local function payloadsForResponse(response)
             plan = response.plan,
             planTurn = 1,
             topic = response.topic,
+            referenceTopic = response.referenceTopic,
+            referenceSubject = response.referenceSubject,
         },
     }
 end

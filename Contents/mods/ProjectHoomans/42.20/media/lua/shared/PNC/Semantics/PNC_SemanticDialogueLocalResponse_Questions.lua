@@ -14,6 +14,13 @@ local identityText = Internal.IdentityText
 local targetText = Internal.TargetText
 local factFor = Internal.FactFor
 local locationText = Internal.LocationText
+local Facts = PNC.Semantics.DialogueFacts
+if type(Facts) ~= "table" then
+    local loaded = require "PNC/Semantics/PNC_SemanticDialogueFacts"
+    Facts = type(loaded) == "table" and loaded or nil
+end
+local Semantic = PsychopatzCore and PsychopatzCore.Semantics or nil
+local IR = Semantic and Semantic.IR or nil
 
 local function resolveNeeds(ir, state, context)
     if ir and ir.subject == "QUANTITY" then
@@ -199,6 +206,7 @@ local function factResponse(templateID, fallback, poolID, fact, topic, refs)
             or "unknown",
         tone = "direct",
         selectionSource = "fact_provider",
+        referenceTopic = topic,
     }
 end
 
@@ -282,6 +290,7 @@ local function resolveKnowledgeQuestion(ir, state, context)
                 and (topic .. ". " .. string.gsub(answer, "[%s%.!?]+$", ""))
                 or topic,
         })
+        response.referenceTopic = topic
         return response
     end
     local response = factResponse(
@@ -293,6 +302,206 @@ local function resolveKnowledgeQuestion(ir, state, context)
     )
     response.args = copyArgs({ topic = topic })
     return response
+end
+
+local function contextReferenceResponse(
+    templateID,
+    fallback,
+    topic,
+    uncertainty,
+    factRefs
+)
+    return {
+        templateID = templateID,
+        fallback = fallback,
+        dialogueAct = "FACT_ANSWER",
+        topic = topic or "CONVERSATION",
+        groundedFactRefs = factRefs or {},
+        uncertainty = uncertainty or "unknown",
+        tone = "direct",
+        selectionSource = "conversation_reference",
+    }
+end
+
+local function recentReferenceAnswer(context)
+    local responseTurn = type(Internal.RecentAnswer) == "function"
+        and Internal.RecentAnswer(context, 4) or nil
+    if type(responseTurn) ~= "table"
+        or responseTurn.branch ~= "QUESTION_RECEIVED"
+    then
+        return nil
+    end
+    return responseTurn
+end
+
+local function derivedQuestion(ir, subject, state, context)
+    if not IR or type(IR.Clone) ~= "function" then return nil end
+    if not Facts or type(Facts.Annotate) ~= "function" then return nil end
+    local output = IR.Clone(ir)
+    output.subject = subject
+    output.extensions = type(output.extensions) == "table"
+        and output.extensions or {}
+    output.extensions.facts = nil
+    output.diagnostics = type(output.diagnostics) == "table"
+        and output.diagnostics or {}
+    Facts.Annotate(output, state, context)
+    return output
+end
+
+local function adoptDerivedFact(ir, derived)
+    local fact = derived and derived.extensions
+        and derived.extensions.facts and derived.extensions.facts[derived.subject]
+    if type(fact) ~= "table" then return nil end
+    ir.extensions = type(ir.extensions) == "table" and ir.extensions or {}
+    ir.extensions.facts = type(ir.extensions.facts) == "table"
+        and ir.extensions.facts or {}
+    ir.extensions.facts["CONTEXT_REFERENCE"] = fact
+    ir.diagnostics = type(ir.diagnostics) == "table"
+        and ir.diagnostics or {}
+    ir.diagnostics.factSubject = derived.subject
+    ir.diagnostics.factStatus = fact.status
+    ir.diagnostics.factProvider = fact.provider
+    ir.diagnostics.factReason = fact.reason
+    ir.provenance = type(ir.provenance) == "table" and ir.provenance or {}
+    ir.provenance.factResolver = fact.provider or "none"
+    return fact
+end
+
+local function resolveContextReferenceQuestion(ir, state, context)
+    local target = ir and ir.target
+    if type(target) ~= "table" or target.unresolved == true
+        or target.resolvedReference == nil
+    then
+        return contextReferenceResponse(
+            "semantic.conversation.context_reference.unknown",
+            "I'm not sure what you're referring to.",
+            "CONVERSATION",
+            "unknown"
+        )
+    end
+
+    local answer = recentReferenceAnswer(context)
+    local subject = answer and answer.subject or nil
+    local extensions = type(ir.extensions) == "table" and ir.extensions or {}
+    local questionKind = extensions.contextQuestion
+
+    if questionKind == "SAFETY" then
+        local response = contextReferenceResponse(
+            "semantic.conversation.context_reference.location_safety_unknown",
+            "I don't have reliable information about whether it's safe there.",
+            "RESIDENCE",
+            "unknown"
+        )
+        response.referenceSubject = subject
+        return response
+    end
+
+    if questionKind == "DESCRIPTION"
+        and subject ~= "NPC_KNOWLEDGE"
+    then
+        local response = contextReferenceResponse(
+            "semantic.conversation.context_reference.description_unknown",
+            "I don't know enough about that place to describe it.",
+            answer and answer.topic or "CONVERSATION",
+            "unknown"
+        )
+        response.referenceSubject = subject
+        return response
+    end
+
+    if questionKind == "MEDICAL_PAIN"
+        and subject ~= "NPC_HEALTH_STATE"
+        and subject ~= "NPC_BITE_STATUS"
+    then
+        local response = contextReferenceResponse(
+            "semantic.conversation.context_reference.medical_unknown",
+            "I can't confirm anything about that pain right now.",
+            "MEDICAL",
+            "unknown"
+        )
+        response.referenceSubject = subject
+        return response
+    end
+
+    if subject == "NPC_BITE_STATUS" or subject == "NPC_HEALTH_STATE" then
+        local derived = derivedQuestion(
+            ir,
+            questionKind == "MEDICAL_PAIN" and "NPC_HEALTH_STATE"
+                or subject,
+            state,
+            context
+        )
+        local fact = adoptDerivedFact(ir, derived)
+        local response
+        if derived and derived.subject == "NPC_BITE_STATUS" then
+            response = resolveMedicalBiteStatus(derived, state, context)
+        elseif derived then
+            response = resolveHealthStateQuestion(derived, state, context)
+        end
+        if response then
+            response.selectionSource = "conversation_reference"
+            response.referenceResolution = "dialogue_context"
+            response.referenceSubject = subject
+            return response
+        end
+        local fallback = contextReferenceResponse(
+            "semantic.conversation.context_reference.medical_unknown",
+            "I can't confirm anything about my health right now.",
+            "MEDICAL",
+            fact and fact.status == "known" and "known" or "unknown"
+        )
+        fallback.referenceSubject = subject
+        return fallback
+    end
+
+    if subject == "NPC_RESIDENCE" then
+        local derived = derivedQuestion(ir, subject, state, context)
+        local fact = adoptDerivedFact(ir, derived)
+        local response = derived
+            and resolveResidenceQuestion(derived, state, context) or nil
+        if response then
+            response.selectionSource = "conversation_reference"
+            response.referenceResolution = "dialogue_context"
+            response.referenceSubject = subject
+            return response
+        end
+        local fallback = contextReferenceResponse(
+            "semantic.conversation.context_reference.unknown",
+            "I don't have enough confirmed information about that place.",
+            "RESIDENCE",
+            fact and fact.status == "known" and "known" or "unknown"
+        )
+        fallback.referenceSubject = subject
+        return fallback
+    end
+
+    if subject == "NPC_KNOWLEDGE" then
+        local derived = derivedQuestion(ir, subject, state, context)
+        local fact = adoptDerivedFact(ir, derived)
+        local response = derived
+            and resolveKnowledgeQuestion(derived, state, context) or nil
+        if response then
+            response.selectionSource = "conversation_reference"
+            response.referenceResolution = "dialogue_context"
+            response.referenceSubject = subject
+            return response
+        end
+        local fallback = contextReferenceResponse(
+            "semantic.conversation.context_reference.unknown",
+            "I don't have enough reliable information about that.",
+            "KNOWLEDGE",
+            fact and fact.status == "known" and "known" or "unknown"
+        )
+        fallback.referenceSubject = subject
+        return fallback
+    end
+
+    return contextReferenceResponse(
+        "semantic.conversation.context_reference.unknown",
+        "I'm not sure what you're referring to.",
+        answer and answer.topic or "CONVERSATION",
+        "unknown"
+    )
 end
 
 local function continuationResponse(templateID, fallback, topic)
@@ -563,6 +772,9 @@ return function(ir, state, context)
     end
     if ir.subject == "NPC_KNOWLEDGE" then
         return resolveKnowledgeQuestion(ir, state, context)
+    end
+    if ir.subject == "CONTEXT_REFERENCE" then
+        return resolveContextReferenceQuestion(ir, state, context)
     end
     if ir.subject == "NEEDS" or ir.subject == "QUANTITY" then
         return resolveNeeds(ir, state, context)
