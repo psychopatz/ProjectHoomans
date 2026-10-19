@@ -14,7 +14,7 @@
 
 ## Status
 
-R0A and R0B are accepted. R1 typed/shared semantic composition is accepted for the implemented scope, including a reusable world-fact block proven in the real Lua worker. R2 has a usable first-pass Studio/Simulation workbench. R3 is accepted for the reviewed WordNet expansion and bounded real MASSIVE/SGD production slice described below. Overall status remains **IN PROGRESS** and is not ready for user live testing because R4, R5, and four legacy Lua failures remain open.
+R0A and R0B are accepted. R1 typed/shared semantic composition is accepted for the implemented scope, including a reusable world-fact block proven in the real Lua worker. R2 has a usable first-pass Studio/Simulation workbench. R3 is accepted for the reviewed WordNet expansion and bounded real MASSIVE/SGD production slice described below. R4 is accepted for the bounded contextual-reference slice described below. Overall status remains **IN PROGRESS** and is not ready for user live testing because R5 and four legacy Lua failures remain open.
 
 The checkout, branch, HEAD, upstream, dirty files, and Core dependency were verified before implementation. No Project Zomboid process, multiplayer host, mod installation, or Workshop publish was used.
 
@@ -53,14 +53,19 @@ Both records carry source version/hash, source record references, canonical WEAT
 
 After a fresh production Lua worker restart, the two utterances resolve to their distinct generated pattern IDs, select `QUESTION_RECEIVED`, produce the existing weather response text `The weather looks clear right now.`, emit no transport event, and report no side effects. This is actual worker evidence, not JSON-only validation.
 
+### R4 — Contextual conversational intelligence slice
+
+Commit `633f54a9` extends the existing movement catalog with `pnc.command.wait_at_reference`, so `Wait there` and `Stay there` are resolved through the existing discourse-reference resolver instead of falling through to generic clarification. The same resolver now marks an unresolved reference explicitly before policy/flow evaluation. A fresh real Lua worker proves `Wait at the campfire` → `Wait there` and `Stay there` reuse the grounded `CAMPFIRE` target, retain the existing `pnc:task.wait_at` route, produce `Okay, I'll wait there.`, and emit real task transport. An ungrounded `Wait there` is blocked with `clarification_required`, truthful `I can't wait there right now.`, no transport, and no successful action. Existing C1–C6 contextual tests continue to cover interruptions, follow-ups, topic switches, references, confirmations, grounded facts, personality/relationship state, EN/TL output, and no-effect branches.
+
 ## Verification evidence
 
-- Full Python harness discovery: `237/237 PASS`.
+- Full Python harness discovery: `238/238 PASS`.
 - Focused interaction-spec suite: `6/6 PASS`.
 - Focused dataset review/worker suite: `7/7 PASS`.
 - Compiler unit suite: `8/8 PASS`.
 - Generated WordNet Lua smoke: `1/1 PASS`.
 - Focused real-Lua social smoke: `2/2 PASS` (`pnc_semantic_social_chat_smoke`, `pnc_semantic_social_smoke`).
+- Focused movement/reference worker suite: `3/3 PASS`.
 - Existing `pnc_semantic` suite: `64/68 PASS`; the same four legacy failures remain:
   - `pnc_semantic_gift_offer_smoke`: agreement without live offer expected `SOCIAL_ACKNOWLEDGED`, got `COMMAND_ACCEPTED`.
   - `pnc_semantic_local_route_smoke`: local greeting expected one queued response, got two.
@@ -72,8 +77,8 @@ After a fresh production Lua worker restart, the two utterances resolve to their
 
 ## Remaining defects and boundaries
 
-The four legacy Lua failures above remain open and must not be hidden by the R3 data work. R4 still needs broader evidence that multi-turn interpretation preserves grounded memory, world facts, personality, relationship state, discourse context, topic switching, references, and confirmations while avoiding false authority. R5 still needs the complete in-app edit → changed source/diff → approval → generation → worker reload → conversation → revision workflow and measured resource evidence. Native Project Zomboid single-player and multiplayer behavior remain user-owned and untested.
+The four legacy Lua failures above remain open and must not be hidden by the R3/R4 work. R5 still needs the complete in-app edit → changed source/diff → approval → generation → worker reload → conversation → revision workflow and measured resource evidence. Native Project Zomboid single-player and multiplayer behavior remain user-owned and untested.
 
 ## ONE next chunk
 
-**R4 — Contextual conversational intelligence:** use the existing production Lua worker and Semantic Lab Simulation inspector to expand and verify a bounded multi-turn matrix for follow-ups, topic switches, references, and confirmations across NPC memory, world facts, personality, relationship state, and dialogue planning; preserve authoritative action boundaries, EN/TL output, and truthful no-effect branches. Record final NPC wording and remaining ambiguity before addressing R5.
+**R5 — Complete developer acceptance:** drive the existing Semantic Lab Studio and Simulation path end to end with an actual changed interaction: edit one supported interaction through the in-app authoring controls, preview the changed canonical source and generated Lua/EN/TL diff, approve and generate through CodeBuilder, restart the production worker, converse using the changed route, inspect final text/authority/effects, and revise or document the first remaining in-app workflow defect. Preserve the existing canonical pipeline and measure the worker/UI path without launching Project Zomboid.
