@@ -12,6 +12,10 @@ from tools.semantic_harness.flow_editor import (
     flow_graph_model,
     graph_render_mode,
 )
+from tools.semantic_harness.interaction_explorer import (
+    interaction_summary,
+    search_interactions,
+)
 from tools.semantic_harness.scenario import DEFAULT_SCENARIO
 from tools.semantic_harness.worker import LuaSemanticWorker
 
@@ -152,6 +156,42 @@ class FlowEditorTests(unittest.TestCase):
             action for action in catalog["actionCatalog"] if action["id"] == "WAIT_AT"
         )
         self.assertNotIn("target", wait_at_action["frame"])
+
+    def test_interaction_explorer_searches_live_policy_flows_and_core_routes(self) -> None:
+        with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:
+            catalog = worker.flow_catalog()
+
+        policy = catalog["policyCatalog"]
+        hostile = next(
+            branch for branch in policy["branches"]
+            if branch["id"] == "HOSTILE_REMARK_RECEIVED"
+        )
+        self.assertIn("pnc.social.insult", hostile["triggerIDs"])
+        self.assertIn("pnc.social.threaten", next(
+            branch for branch in policy["branches"]
+            if branch["id"] == "THREAT_RECEIVED"
+        )["triggerIDs"])
+        self.assertTrue(catalog["responsePoolCatalog"])
+
+        insult = search_interactions(catalog, "INSULT", limit=128)
+        insult_summary = interaction_summary(insult)
+        self.assertGreaterEqual(insult_summary["policy_branch"], 1)
+        self.assertGreaterEqual(insult_summary["trigger"], 1)
+        hostile_row = next(
+            row for row in insult
+            if row.get("id") == "policy:HOSTILE_REMARK_RECEIVED"
+        )
+        self.assertIn("directed social authority / transport", hostile_row["routeSteps"])
+
+        follow = search_interactions(catalog, "FOLLOW", limit=128)
+        self.assertTrue(any(row.get("kind") == "flow" for row in follow))
+        self.assertTrue(any(row.get("kind") == "capability" for row in follow))
+        self.assertTrue(any(row.get("kind") == "generated" for row in follow))
+
+        needs = search_interactions(catalog, "NEEDS", limit=128)
+        self.assertTrue(any(row.get("kind") == "flow" for row in needs))
+        self.assertTrue(any(row.get("kind") == "trigger" for row in needs))
+        self.assertTrue(any(row.get("kind") == "policy_branch" for row in needs))
 
     def test_fact_gate_is_accepted_by_production_registry(self) -> None:
         with LuaSemanticWorker(DEFAULT_SCENARIO) as worker:

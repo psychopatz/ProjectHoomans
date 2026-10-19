@@ -701,6 +701,17 @@ class FlowEditorPane:
                 self.flow_list.see(index)
                 return
 
+    def select_flow(self, flow_id: str) -> None:
+        """Open a registered flow selected from the interaction explorer."""
+
+        flow_id = str(flow_id)
+        if flow_id not in self._catalog:
+            self.set_status(f"Flow is not in the live catalog: {flow_id}")
+            return
+        self.flow_var.set(flow_id)
+        self._select_flow_list_item(flow_id)
+        self._select_flow()
+
     def _select_flow(self) -> None:
         flow = self._catalog.get(self.flow_var.get())
         if flow is None:

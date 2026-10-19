@@ -16,6 +16,77 @@ local function automaticGenerator()
         or require "PNC/Semantics/PNC_SemanticAutomaticFlowGenerator"
 end
 
+local function policyCatalog(Values, semanticCatalog)
+    local Policy = PNC.Semantics.DialoguePolicy
+        or require "PNC/Semantics/PNC_SemanticDialoguePolicy"
+    local branches = {}
+    local byID = {}
+    local templates = type(Policy.ResponseTemplates) == "table"
+        and Policy.ResponseTemplates or {}
+    local branchID
+    local definition
+    for branchID, definition in pairs(templates) do
+        if type(branchID) == "string" and type(definition) == "table" then
+            byID[branchID] = {
+                id = branchID,
+                kind = "policy_branch",
+                owner = "PNC.Semantics.DialoguePolicy",
+                route = "DialoguePolicy.Internal.ResolveIntentBranch",
+                triggerIDs = {},
+                responseTemplate = Values.copy(definition),
+            }
+        end
+    end
+
+    local resolver = Policy.Internal
+        and Policy.Internal.ResolveIntentBranch or nil
+    if type(resolver) == "function" then
+        for _, trigger in ipairs(semanticCatalog.triggers or {}) do
+            local frame = type(trigger.frame) == "table"
+                and Values.copy(trigger.frame) or {}
+            local branch, reason = resolver(frame, {}, {}, nil)
+            local row = byID[branch]
+            if row then
+                row.triggerIDs[#row.triggerIDs + 1] = trigger.id
+                row.reason = row.reason or reason
+            end
+        end
+    end
+
+    for _, row in pairs(byID) do
+        table.sort(row.triggerIDs)
+        branches[#branches + 1] = row
+    end
+    table.sort(branches, function(left, right)
+        return tostring(left.id) < tostring(right.id)
+    end)
+    return {
+        schemaVersion = 1,
+        owner = "PNC.Semantics.DialoguePolicy",
+        branchCount = #branches,
+        branches = branches,
+    }
+end
+
+local function responsePoolCatalog(Values, responseCatalog)
+    local output = {}
+    local pools = type(responseCatalog) == "table"
+        and responseCatalog.POOLS or {}
+    for poolID, pool in pairs(pools) do
+        if type(pool) == "table" and type(pool.id) == "string" then
+            output[#output + 1] = {
+                id = pool.id or tostring(poolID),
+                variantCount = type(pool.variants) == "table"
+                    and #pool.variants or 0,
+            }
+        end
+    end
+    table.sort(output, function(left, right)
+        return tostring(left.id) < tostring(right.id)
+    end)
+    return output
+end
+
 local function publicGeneration(values, generation)
     local output = {}
     generation = type(generation) == "table" and generation or {}
@@ -39,6 +110,10 @@ local function catalog(context)
     end
     local semanticCatalog = CapabilityCatalog.Snapshot()
     local generation = CapabilityCatalog.AutomaticFlowGeneration or {}
+    local policy = policyCatalog(Values, semanticCatalog)
+    local ResponseCatalog = PNC.Semantics.ResponseCatalog
+        or require "PNC/Semantics/PNC_SemanticDialogueResponseCatalog"
+    local responsePools = responsePoolCatalog(Values, ResponseCatalog)
     local index
     local flowID
     local flow
@@ -75,6 +150,8 @@ local function catalog(context)
             speechActCount = #semanticCatalog.speechActs,
         },
         generation = publicGeneration(Values, generation),
+        policyCatalog = policy,
+        responsePoolCatalog = responsePools,
         capabilityCoverage = Values.copy(generation.coverage or {}),
     }
 end

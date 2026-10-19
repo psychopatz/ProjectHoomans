@@ -17,6 +17,7 @@ from .blocks import SemanticBlockRegistry
 from .codeblocks import validate_codeblock_document
 from .compiler import CompileError
 from .dataset_adapters import preview_dataset_adapter, promote_reviewed_candidates
+from ..interaction_explorer import build_interaction_rows, search_interactions
 
 
 DATASET_SOURCE_SPECS = (
@@ -266,6 +267,23 @@ class SemanticLabAuthoringService:
             production_catalog=production_catalog,
             limit=limit,
         )
+
+    @staticmethod
+    def list_interactions(
+        production_catalog: dict[str, Any] | None,
+    ) -> list[dict[str, Any]]:
+        """Return searchable rows from the live production interaction catalog."""
+
+        return build_interaction_rows(production_catalog)
+
+    @staticmethod
+    def search_interactions(
+        query: str = "",
+        *,
+        production_catalog: dict[str, Any] | None = None,
+        limit: int = 128,
+    ) -> list[dict[str, Any]]:
+        return search_interactions(production_catalog, query, limit=limit)
 
     def validate_semantic_blocks(
         self,

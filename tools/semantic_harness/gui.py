@@ -14,6 +14,7 @@ from .codebuilder.service import SemanticLabAuthoringService
 from .block_registry import SemanticBlockRegistryPane
 from .dataset_library import DatasetLibraryPane
 from .flow_editor import FlowEditorPane
+from .interaction_explorer_pane import InteractionExplorerPane
 from .rendering import pretty
 from .scenario import load_scenario, save_scenario
 from .settings_dialog import open_runtime_settings as show_runtime_settings
@@ -168,10 +169,16 @@ class SemanticHarnessApp:
         self.trace.grid(row=0, column=0, sticky="nsew")
         self.trace_tabs.add(raw_frame, text="Raw worker record")
 
-        flow_frame = ttk.Frame(editor_tab)
-        flow_frame.grid(row=0, column=0, sticky="nsew")
+        editor_notebook = ttk.Notebook(editor_tab)
+        editor_notebook.grid(row=0, column=0, sticky="nsew")
+        flow_frame = ttk.Frame(editor_notebook)
         flow_frame.rowconfigure(0, weight=1)
         flow_frame.columnconfigure(0, weight=1)
+        interaction_frame = ttk.Frame(editor_notebook)
+        interaction_frame.rowconfigure(0, weight=1)
+        interaction_frame.columnconfigure(0, weight=1)
+        editor_notebook.add(interaction_frame, text="Interaction explorer")
+        editor_notebook.add(flow_frame, text="Flow graph")
         self.flow_editor = FlowEditorPane(
             flow_frame,
             self._tk,
@@ -186,6 +193,14 @@ class SemanticHarnessApp:
             on_generate_source=self.generate_semantic_source,
             on_review_dataset=self.review_dialogue_source,
             on_generate_dataset=self.generate_dialogue_source,
+        )
+        self.interaction_explorer = InteractionExplorerPane(
+            interaction_frame,
+            self._tk,
+            ttk,
+            ScrolledText,
+            self.authoring_service,
+            on_open_flow=self.flow_editor.select_flow,
         )
         self.dataset_library = DatasetLibraryPane(
             library_tab,
@@ -235,6 +250,7 @@ class SemanticHarnessApp:
             state="normal" if self.session.ready and not self.busy else "disabled"
         )
         self.flow_editor.set_enabled(enabled and not self.busy)
+        self.interaction_explorer.set_enabled(enabled and not self.busy)
         self.workflow_pane.set_enabled(enabled and not self.busy)
 
     @property
@@ -315,6 +331,7 @@ class SemanticHarnessApp:
         )
         self._set_text(self.trace, pretty(capabilities))
         self.flow_editor.set_catalog(flow_catalog)
+        self.interaction_explorer.set_catalog(flow_catalog)
         self.block_registry.set_catalog(flow_catalog)
         self._production_catalog = flow_catalog
         self.workflow_pane.set_production_catalog(flow_catalog)
@@ -467,6 +484,7 @@ class SemanticHarnessApp:
 
     def _flow_catalog_finished(self, response: dict[str, Any]) -> None:
         self.flow_editor.set_catalog(response)
+        self.interaction_explorer.set_catalog(response)
         self.block_registry.set_catalog(response)
         self._production_catalog = response
         self.workflow_pane.set_production_catalog(response)
