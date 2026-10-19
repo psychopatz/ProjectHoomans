@@ -12,6 +12,8 @@ Base HEAD before Semantic Lab recovery: `3b5004889ddceace8d6d95ca2dca6260b117591
 
 Earlier R5 implementation commit: `25f7bd38785f89454876514d5e79fbd31d0ab824`
 
+R5B final real-Lua acceptance commit: `23d1cd1106cf9fe301c705ff62c64052b549a957`
+
 Core dependency: `/home/psychopatz/Zomboid/Workshop/psychopatzCore` at `50022acf90d5a39995be552b7a1e1de21b59168b`
 
 Historical S0–S6 evidence remains preserved in `HISTORY_S0_S6_20261019.md`.
