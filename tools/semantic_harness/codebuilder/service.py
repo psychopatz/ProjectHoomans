@@ -13,6 +13,7 @@ from pathlib import Path
 from typing import Any
 
 from tools.semantic_harness import authoring
+from .blocks import SemanticBlockRegistry
 from .compiler import CompileError
 
 
@@ -51,6 +52,10 @@ class SemanticLabAuthoringService:
         self.runtime_root = (
             runtime_root or self.repository
         ).expanduser().resolve()
+        self.block_registry = SemanticBlockRegistry(
+            self.repository,
+            DATASET_SOURCE_SPECS,
+        )
 
     def list_dataset_sources(self) -> list[dict[str, Any]]:
         """Return the bounded canonical dataset catalog for the UI/CLI."""
@@ -223,6 +228,39 @@ class SemanticLabAuthoringService:
             "effectFree": False,
             "writes": [str(path)],
         }
+
+    def list_semantic_blocks(
+        self,
+        production_catalog: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
+        """Return reusable blocks over the supplied live production catalog."""
+        return self.block_registry.catalog(production_catalog)
+
+    def search_semantic_blocks(
+        self,
+        query: str = "",
+        *,
+        category: str | None = None,
+        production_catalog: dict[str, Any] | None = None,
+        limit: int = 64,
+    ) -> list[dict[str, Any]]:
+        return self.block_registry.search(
+            query,
+            category=category,
+            production_catalog=production_catalog,
+            limit=limit,
+        )
+
+    def validate_semantic_blocks(
+        self,
+        block_ids: list[str],
+        *,
+        production_catalog: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
+        return self.block_registry.validate_selection(
+            block_ids,
+            production_catalog=production_catalog,
+        )
 
     def preview_semantic_source(self, source_path: Path) -> dict[str, Any]:
         return authoring.preview_semantic_source(

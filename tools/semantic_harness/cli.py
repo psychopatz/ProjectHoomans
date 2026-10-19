@@ -23,6 +23,9 @@ AUTHORING_OPERATIONS = (
     "search_datasets",
     "show_dataset",
     "validate_dataset",
+    "list_blocks",
+    "search_blocks",
+    "validate_blocks",
 )
 
 
@@ -73,6 +76,22 @@ def _run_authoring_operation(
             source_id,
             service.load_dataset_document(source_id),
         )
+    if arguments.list_blocks:
+        return service.list_semantic_blocks()
+    if arguments.search_blocks is not None:
+        return {
+            "ok": True,
+            "type": "semantic_block_search",
+            "query": arguments.search_blocks,
+            "results": service.search_semantic_blocks(arguments.search_blocks),
+        }
+    if arguments.validate_blocks is not None:
+        block_ids = [
+            value.strip()
+            for value in arguments.validate_blocks.split(",")
+            if value.strip()
+        ]
+        return service.validate_semantic_blocks(block_ids)
     if arguments.compile_source:
         return service.preview_semantic_source(
             _resolve_authoring_source(service, arguments.compile_source)
@@ -201,6 +220,21 @@ def _parser() -> argparse.ArgumentParser:
         "--validate-dataset",
         metavar="SOURCE_ID",
         help="validate the current canonical Dataset Library source without writing",
+    )
+    authoring.add_argument(
+        "--list-blocks",
+        action="store_true",
+        help="list reusable Semantic Lab blocks and their production contracts",
+    )
+    authoring.add_argument(
+        "--search-blocks",
+        metavar="QUERY",
+        help="search reusable Semantic Lab blocks",
+    )
+    authoring.add_argument(
+        "--validate-blocks",
+        metavar="IDS",
+        help="validate comma-separated reusable block IDs without writing or dispatching",
     )
     parser.add_argument("--doctor", action="store_true", help="run bounded headless runtime diagnostics")
     parser.add_argument("--doctor-json", action="store_true", help="emit doctor diagnostics as one JSON record")

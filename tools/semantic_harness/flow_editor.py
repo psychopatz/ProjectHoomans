@@ -7,18 +7,13 @@ import json
 from pathlib import Path
 from typing import Any, Callable
 
+from .codebuilder.blocks import GATE_TYPES
+
 
 TRANSITION_FIELDS = (
     "next", "onMatch", "onRefuse", "onUnrelated",
     "onPass", "onFail", "onUnknown",
 )
-
-GATE_TYPES = (
-    "none", "pnc:fact", "pnc:weather", "pnc:time", "pnc:skill",
-    "pnc:trait", "pnc:personality", "pnc:relationship",
-    "pnc:relationship_state", "pnc:audience", "pnc:history",
-)
-
 
 def graph_transform(point: tuple[float, float], zoom: float, pan: tuple[float, float]) -> tuple[float, float]:
     """Transform model coordinates into canvas coordinates."""

@@ -11,6 +11,7 @@ from typing import Any, Callable
 from .config import ConfigurationError
 from .conversation_inspector import build_conversation_inspector
 from .codebuilder.service import SemanticLabAuthoringService
+from .block_registry import SemanticBlockRegistryPane
 from .dataset_library import DatasetLibraryPane
 from .flow_editor import FlowEditorPane
 from .rendering import pretty
@@ -76,15 +77,19 @@ class SemanticHarnessApp:
         simulation_tab = ttk.Frame(self.main_tabs, padding=8)
         editor_tab = ttk.Frame(self.main_tabs, padding=8)
         library_tab = ttk.Frame(self.main_tabs, padding=8)
+        blocks_tab = ttk.Frame(self.main_tabs, padding=8)
         simulation_tab.rowconfigure(0, weight=1)
         simulation_tab.columnconfigure(0, weight=1)
         editor_tab.rowconfigure(0, weight=1)
         editor_tab.columnconfigure(0, weight=1)
         library_tab.rowconfigure(0, weight=1)
         library_tab.columnconfigure(0, weight=1)
+        blocks_tab.rowconfigure(0, weight=1)
+        blocks_tab.columnconfigure(0, weight=1)
         self.main_tabs.add(simulation_tab, text="Simulation")
         self.main_tabs.add(editor_tab, text="Flow editor")
         self.main_tabs.add(library_tab, text="Dataset library")
+        self.main_tabs.add(blocks_tab, text="Block registry")
 
         container = ttk.Frame(simulation_tab)
         container.pack(fill="both", expand=True)
@@ -183,6 +188,14 @@ class SemanticHarnessApp:
             ScrolledText,
             self._messagebox,
             self.authoring_service,
+        )
+        self.block_registry = SemanticBlockRegistryPane(
+            blocks_tab,
+            self._tk,
+            ttk,
+            ScrolledText,
+            self.authoring_service,
+            on_refresh=self.refresh_flow_catalog,
         )
 
         self._append("SYSTEM", "Window ready. Starting the isolated Lua worker…")
@@ -284,6 +297,7 @@ class SemanticHarnessApp:
         )
         self._set_text(self.trace, pretty(capabilities))
         self.flow_editor.set_catalog(flow_catalog)
+        self.block_registry.set_catalog(flow_catalog)
 
     def _start_operation(
         self,
@@ -433,6 +447,7 @@ class SemanticHarnessApp:
 
     def _flow_catalog_finished(self, response: dict[str, Any]) -> None:
         self.flow_editor.set_catalog(response)
+        self.block_registry.set_catalog(response)
         self._append(
             "SYSTEM",
             f"Loaded {response.get('flowCount', 0)} normalized production flows.",

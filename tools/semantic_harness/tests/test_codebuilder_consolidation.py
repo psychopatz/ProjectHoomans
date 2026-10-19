@@ -183,6 +183,20 @@ class CodeBuilderConsolidationTests(unittest.TestCase):
         self.assertEqual(record["type"], report["type"])
         self.assertEqual(record["sources"], report["sources"])
 
+    def test_headless_cli_routes_block_registry_operation(self) -> None:
+        arguments = _parser().parse_args(["--list-blocks", "--jsonl"])
+        output = io.StringIO()
+        report = {"ok": True, "type": "semantic_block_registry", "blocks": []}
+        with patch.object(
+            SemanticLabAuthoringService,
+            "list_semantic_blocks",
+            return_value=report,
+        ) as list_blocks:
+            with redirect_stdout(output):
+                self.assertEqual(cli(arguments), 0)
+        list_blocks.assert_called_once()
+        self.assertEqual(json.loads(output.getvalue()), report)
+
     def test_app_selects_headless_mode_for_authoring_operation(self) -> None:
         with patch.object(app, "install_shutdown_handler"), patch.object(app, "cli", return_value=0) as run_cli:
             self.assertEqual(app.main(["--list-datasets"]), 0)

@@ -1,5 +1,37 @@
 # Contextual Dialogue & Quest Framework — current progress
 
+## S2 accepted — reusable Semantic Lab block registry
+
+Semantic Lab now has a shared `SemanticBlockRegistry` inside CodeBuilder and a
+Block registry tab in the existing application. It exposes bounded reusable
+contracts for language, conditions, world facts, context, memory, dialogue
+responses, gameplay actions, and quests. The live FlowEditor catalog supplies
+registered speech acts, concepts, triggers, typed facts/events, action
+bindings, quest bindings, and production ownership; canonical JSON supplies
+reviewed response pools. Block selection validation is effect-free and fails
+closed for unknown or duplicate IDs. The registry does not evaluate gates,
+interpret NLU, dispatch actions, or create quest state.
+
+S2 evidence:
+
+- `python3 -m unittest tools.semantic_harness.tests.test_semantic_blocks tools.semantic_harness.tests.test_codebuilder_consolidation tools.semantic_harness.tests.test_app tools.semantic_harness.tests.test_flow_editor -q` — **29/29 passed**, including static/live category coverage, production action/quest/fact/event values, effect-free selection validation, CLI routing, and GUI startup with the Block registry tab.
+- `python3 -m unittest discover -s tools/semantic_harness/tests -p 'test_*.py' -q` — **191/191 passed**, including actual Lua-worker conversations and GUI startup.
+- `./tools/semantic_harness/run_harness.sh --no-gui --jsonl --list-blocks` — **PASS**, returned 28 static reusable block/type records across all eight categories.
+- `./tools/semantic_harness/run_harness.sh --no-gui --jsonl --search-blocks memory` — **PASS**, returned the registered knowledge and gossip contracts.
+- `./tools/semantic_harness/run_harness.sh --no-gui --jsonl --validate-blocks conditions.gate,memory.gossip` — **PASS**, valid and effect-free with no writes or dispatch.
+- Actual Lua-worker catalog/conversation probe — **PASS**: live production catalog produced **61** bounded blocks; FOLLOW resolved to the existing `pnc:companion.follow` binding; `Keep close behind me` produced `FOLLOW` with exactly one `CompanionCommand` transport.
+- `./tools/semantic_harness/run_harness.sh --doctor --doctor-json` — **PASS** for Python 3.12.3, repository/Core paths, Tk/display, Lua 5.3, worker syntax, boot, PING, and CAPABILITIES.
+- `./tools/semantic_harness/run_harness.sh --test pnc_semantic` — **4 pre-existing Lua smoke failures** in gift/inventory/local-route/state-response behavior; S2 changed no production Lua and did not alter the documented baseline.
+- Python compilation and `git diff --check` — **PASS**.
+
+**Current goal status:** **S2 accepted; S0A/S0B, S1, and prior C6 developer
+gates remain preserved. Native Project Zomboid SP/MP plus live external
+PBrainZ validation remain user-owned.**
+
+**ONE Next Chunk:** **S3 — synchronize the existing visual flow graph with a
+declarative codeblock editor, including reusable nested flows, typed
+connections, safe round-trip editing, and production-registry validation.**
+
 ## S1 accepted — Dataset Library inside Semantic Lab
 
 Semantic Lab now contains a Dataset Library tab backed by the shared
@@ -29,15 +61,6 @@ The graph coverage check for the changed Semantic Lab files reported no
 recorded parse gaps, but marked the new files as not tracked and the edited
 files as metadata-changed in the older 2026-10-07 generation; direct source
 reads and the executable tests above are therefore the authority for S1.
-
-**Current goal status:** **S1 accepted; S0A/S0B and prior C6 developer gates
-remain preserved. Native Project Zomboid SP/MP plus live external PBrainZ
-validation remain user-owned.**
-
-**ONE Next Chunk:** **S2 — create the reusable semantic block registry inside
-Semantic Lab for language, conditions, world facts, context, memory, dialogue
-responses, gameplay actions, and quests, with bounded validation and reuse
-metadata backed by the existing production contracts.**
 
 **S0A update (2026-10-19):** The existing semantic compiler is now embedded
 under `tools/semantic_harness/codebuilder/`. Its reviewed JSON inputs remain
@@ -88,8 +111,8 @@ references in the historical records refer to their pre-rebase commit IDs.
 The previous `PROGRESS.md` has been archived verbatim in `HISTORY_C0_C6_20261019.md` and remains recoverable in Git at `71162cb4f78cc4cd408a4a145486d5ebadc943c1`. It records the action-flow/quest work and C0–C6 contextual conversation, small reviewed dataset codebuilding, Tk X11, worker, performance, EN/TL and optional-provider parity acceptance, ending READY FOR USER LIVE TEST for that **earlier scoped implementation**. Native PZ SP/MP and live external PBrainZ validation remain user-owned, unclaimed.
 
 The prior user-live-test handoff is historical evidence and is superseded for
-this consolidation goal by the single S2 chunk above; it was not re-run or
-claimed as part of S1.
+this consolidation goal by the single S3 chunk above; it was not re-run or
+claimed as part of S2.
 
 ## Productization roadmap
 

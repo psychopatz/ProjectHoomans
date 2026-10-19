@@ -27,3 +27,10 @@ tools/semantic_harness/run_harness.sh --no-gui --jsonl \
 
 `--generate-source` and `--generate-dataset` are explicit write operations;
 preview operations remain effect-free.
+
+The same service exposes `SemanticBlockRegistry`, a bounded catalog of
+reusable language, condition, world-fact, context, memory, response, action,
+and quest blocks. Live Semantic Lab passes the existing Lua FlowEditor catalog
+into it; the registry only describes and validates references. Gate evaluation,
+NLU interpretation, gameplay dispatch, and quest authority remain in their
+existing production owners.
