@@ -1,0 +1,140 @@
+"""S0A proof that Semantic Lab owns one compiler and preserves old entrypoints."""
+
+from __future__ import annotations
+
+from contextlib import redirect_stdout
+import io
+import json
+from pathlib import Path
+import tempfile
+import unittest
+from unittest.mock import patch
+
+from tools.semantic_compiler.compiler import (
+    compile_dialogue_dataset as legacy_compile_dialogue,
+    compile_semantic_definitions as legacy_compile_semantic,
+    load_dialogue_dataset as legacy_load_dialogue,
+    load_semantic_source as legacy_load_semantic,
+)
+from tools.semantic_compiler.build import (
+    write_dialogue_output as legacy_write_dialogue,
+    write_semantic_output as legacy_write_semantic,
+)
+from tools.semantic_harness import app
+from tools.semantic_harness.cli import _parser, cli
+from tools.semantic_harness.codebuilder.compiler import (
+    compile_dialogue_dataset,
+    compile_semantic_definitions,
+    load_dialogue_dataset,
+    load_semantic_source,
+)
+from tools.semantic_harness.codebuilder.build import (
+    write_dialogue_output,
+    write_semantic_output,
+)
+
+
+REPOSITORY = Path(__file__).resolve().parents[3]
+DIALOGUE_SOURCE = REPOSITORY / "tools/semantic_compiler/common_interactions.json"
+SEMANTIC_SOURCE = REPOSITORY / "tools/semantic_compiler/semantic_definitions.json"
+DIALOGUE_OUTPUT = Path(
+    "Contents/mods/ProjectHoomans/42.20/media/lua/shared/PNC/Semantics/"
+    "PNC_SemanticGeneratedDialogue.lua"
+)
+SEMANTIC_MANIFEST = Path(
+    "Contents/mods/ProjectHoomans/common/media/translation/manifests/Conversation.json"
+)
+
+
+def _files(root: Path, paths: list[Path]) -> dict[Path, bytes]:
+    return {
+        path.relative_to(root): path.read_bytes()
+        for path in paths
+    }
+
+
+def _seed_translation_manifest(root: Path) -> None:
+    target = root / SEMANTIC_MANIFEST
+    target.parent.mkdir(parents=True, exist_ok=True)
+    source = REPOSITORY / SEMANTIC_MANIFEST
+    target.write_bytes(source.read_bytes())
+
+
+class CodeBuilderConsolidationTests(unittest.TestCase):
+    def test_legacy_modules_are_thin_identity_wrappers(self) -> None:
+        self.assertIs(legacy_compile_dialogue, compile_dialogue_dataset)
+        self.assertIs(legacy_compile_semantic, compile_semantic_definitions)
+        self.assertIs(legacy_load_dialogue, load_dialogue_dataset)
+        self.assertIs(legacy_load_semantic, load_semantic_source)
+        self.assertIs(legacy_write_dialogue, write_dialogue_output)
+        self.assertIs(legacy_write_semantic, write_semantic_output)
+
+    def test_dialogue_writer_matches_checked_in_artifacts(self) -> None:
+        source = load_dialogue_dataset(DIALOGUE_SOURCE)
+        compiled = compile_dialogue_dataset(source)
+        snapshots: list[dict[Path, bytes]] = []
+        with tempfile.TemporaryDirectory() as first_dir, tempfile.TemporaryDirectory() as second_dir:
+            for directory, writer in (
+                (Path(first_dir), write_dialogue_output),
+                (Path(second_dir), legacy_write_dialogue),
+            ):
+                _seed_translation_manifest(directory)
+                output = directory / DIALOGUE_OUTPUT
+                output.parent.mkdir(parents=True, exist_ok=True)
+                written = writer(output, compiled)
+                snapshots.append(_files(directory, written))
+        self.assertEqual(snapshots[0], snapshots[1])
+        for relative, content in snapshots[0].items():
+            expected = REPOSITORY / relative
+            if relative.name.endswith("Generated.json"):
+                # These two files are shared translation catalogs and contain
+                # other approved generation families in the checked-in tree.
+                self.assertTrue(content, relative)
+                continue
+            self.assertTrue(expected.is_file(), relative)
+            self.assertEqual(content, expected.read_bytes(), relative)
+
+    def test_semantic_writer_matches_legacy_entrypoint_and_artifacts(self) -> None:
+        source = load_semantic_source(SEMANTIC_SOURCE)
+        compiled = compile_semantic_definitions(source)
+        snapshots: list[dict[Path, bytes]] = []
+        with tempfile.TemporaryDirectory() as first_dir, tempfile.TemporaryDirectory() as second_dir:
+            for directory, writer in (
+                (Path(first_dir), write_semantic_output),
+                (Path(second_dir), legacy_write_semantic),
+            ):
+                _seed_translation_manifest(directory)
+                written = writer(directory, compiled)
+                snapshots.append(_files(directory, written))
+        self.assertEqual(snapshots[0], snapshots[1])
+        for relative, content in snapshots[0].items():
+            expected = REPOSITORY / relative
+            if relative.name.endswith("Generated.json"):
+                # The checked-in translation files are shared with the larger
+                # generated dialogue catalog; wrapper parity is the exact
+                # comparison for this source-scoped build.
+                self.assertTrue(content, relative)
+                continue
+            self.assertTrue(expected.is_file(), relative)
+            self.assertEqual(content, expected.read_bytes(), relative)
+
+    def test_headless_cli_routes_source_preview_through_authoring_service(self) -> None:
+        arguments = _parser().parse_args([
+            "--compile-source", str(SEMANTIC_SOURCE), "--jsonl",
+        ])
+        output = io.StringIO()
+        report = {"ok": True, "type": "semantic_compile_preview", "writes": []}
+        with patch("tools.semantic_harness.cli.preview_semantic_source", return_value=report) as preview:
+            with redirect_stdout(output):
+                self.assertEqual(cli(arguments), 0)
+        preview.assert_called_once()
+        self.assertEqual(json.loads(output.getvalue()), report)
+
+    def test_app_selects_headless_mode_for_authoring_operation(self) -> None:
+        with patch.object(app, "install_shutdown_handler"), patch.object(app, "cli", return_value=0) as run_cli:
+            self.assertEqual(app.main(["--compile-source", str(SEMANTIC_SOURCE)]), 0)
+        run_cli.assert_called_once()
+
+
+if __name__ == "__main__":
+    unittest.main()

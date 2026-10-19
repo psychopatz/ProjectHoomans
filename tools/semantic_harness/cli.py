@@ -7,16 +7,61 @@ from pathlib import Path
 import sys
 
 from .config import ConfigurationError
+from .authoring import (
+    REPOSITORY as AUTHORING_REPOSITORY,
+    generate_dialogue_source,
+    generate_semantic_source,
+    preview_dialogue_source,
+    preview_semantic_source,
+)
 from .rendering import print_result as _print_result
 from .runner import ConflictLedger, load_case, run_case
 from .scenario import load_scenario
 from .worker import HarnessError, LuaSemanticWorker
 
 PARSER_DESCRIPTION = "Tkinter chat UI and CLI for the real-Lua semantic dialogue harness."
+AUTHORING_OPERATIONS = (
+    "compile_source",
+    "generate_source",
+    "review_dataset",
+    "generate_dataset",
+)
+
+
+def _resolve_authoring_source(arguments: argparse.Namespace, value: str) -> tuple[Path, Path]:
+    repository = (
+        Path(arguments.repository).expanduser().resolve()
+        if arguments.repository
+        else AUTHORING_REPOSITORY
+    )
+    source = Path(value).expanduser()
+    if not source.is_absolute():
+        source = repository / source
+    return repository, source.resolve()
+
+
+def _run_authoring_operation(arguments: argparse.Namespace) -> dict | None:
+    if arguments.compile_source:
+        repository, source = _resolve_authoring_source(arguments, arguments.compile_source)
+        return preview_semantic_source(source, repository=repository, runtime_root=repository)
+    if arguments.generate_source:
+        repository, source = _resolve_authoring_source(arguments, arguments.generate_source)
+        return generate_semantic_source(source, repository=repository, runtime_root=repository)
+    if arguments.review_dataset:
+        repository, source = _resolve_authoring_source(arguments, arguments.review_dataset)
+        return preview_dialogue_source(source, repository=repository)
+    if arguments.generate_dataset:
+        repository, source = _resolve_authoring_source(arguments, arguments.generate_dataset)
+        return generate_dialogue_source(source, repository=repository)
+    return None
 
 
 def cli(arguments: argparse.Namespace) -> int:
     try:
+        authoring_report = _run_authoring_operation(arguments)
+        if authoring_report is not None:
+            _print_result(authoring_report, arguments.jsonl)
+            return 0 if authoring_report.get("ok") is True else 2
         worker_kwargs = {
             "lua_bin": arguments.lua,
             "repository": Path(arguments.repository) if arguments.repository else None,
@@ -75,6 +120,27 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--interactive", action="store_true", help="read one conversation input per stdin line")
     parser.add_argument("--jsonl", action="store_true", help="emit compact one-record-per-line JSON")
     parser.add_argument("--audit", action="store_true", help="emit a bounded conflict audit after turns")
+    authoring = parser.add_mutually_exclusive_group()
+    authoring.add_argument(
+        "--compile-source",
+        metavar="PATH",
+        help="preview one canonical semantic source through the embedded CodeBuilder",
+    )
+    authoring.add_argument(
+        "--generate-source",
+        metavar="PATH",
+        help="write one approved canonical semantic source through the embedded CodeBuilder",
+    )
+    authoring.add_argument(
+        "--review-dataset",
+        metavar="PATH",
+        help="preview one reviewed dialogue dataset through the embedded CodeBuilder",
+    )
+    authoring.add_argument(
+        "--generate-dataset",
+        metavar="PATH",
+        help="write one approved dialogue dataset through the embedded CodeBuilder",
+    )
     parser.add_argument("--doctor", action="store_true", help="run bounded headless runtime diagnostics")
     parser.add_argument("--doctor-json", action="store_true", help="emit doctor diagnostics as one JSON record")
     parser.add_argument("--snapshot", action="store_true")

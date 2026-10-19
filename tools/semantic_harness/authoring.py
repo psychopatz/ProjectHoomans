@@ -10,7 +10,7 @@ from collections import Counter, defaultdict
 from pathlib import Path
 from typing import Any
 
-from tools.semantic_compiler.compiler import (
+from tools.semantic_harness.codebuilder.compiler import (
     CompileError,
     compile_dialogue_dataset,
     compile_semantic_definitions,
@@ -21,8 +21,11 @@ from tools.semantic_compiler.compiler import (
     load_semantic_source,
     render_semantic_lua_shards,
 )
-from tools.semantic_compiler.compiler import load_dialogue_dataset
-from tools.semantic_compiler.build import write_dialogue_output, write_semantic_output
+from tools.semantic_harness.codebuilder.compiler import load_dialogue_dataset
+from tools.semantic_harness.codebuilder.build import (
+    write_dialogue_output,
+    write_semantic_output,
+)
 
 
 REPOSITORY = Path(__file__).resolve().parents[2]

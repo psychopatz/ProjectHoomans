@@ -159,3 +159,11 @@ and the existing Conversation translation manifest is updated with explicit
 paths. Re-running the command with unchanged input is byte-stable. Generated
 flow triggers may scope to an authored pattern so an authored flow cannot claim
 an unrelated hand-written route with the same action frame.
+# Compatibility
+
+The compiler implementation and artifact writers are now owned by Semantic
+Lab under `tools/semantic_harness/codebuilder/`. This directory keeps the
+reviewed JSON inputs as the canonical source data and thin Python wrappers for
+legacy direct-script and module entry points. See
+`tools/semantic_harness/codebuilder/README.md` for the unified authoring/build
+commands.
