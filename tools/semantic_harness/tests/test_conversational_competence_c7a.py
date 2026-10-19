@@ -57,9 +57,19 @@ class ConversationalCompetenceC7ATests(unittest.TestCase):
         self.assertTrue(stay["result"]["actionResult"]["accepted"])
         self.assertEqual(stay["trace"][0]["data"]["classification"], "authorized_gameplay_action")
 
-        self.assertEqual(residence["result"]["ir"]["diagnostics"]["noMatch"], True)
-        self.assertEqual(residence["result"]["decision"]["branch"], "ASK_CLARIFICATION")
-        self.assertEqual(residence["trace"][0]["data"]["classification"], "unrecognized_language")
+        self.assertEqual(residence["result"]["ir"]["subject"], "NPC_RESIDENCE")
+        self.assertEqual(
+            residence["result"]["ir"]["diagnostics"]["factStatus"],
+            "unknown",
+        )
+        self.assertEqual(
+            residence["result"]["decision"]["branch"],
+            "QUESTION_RECEIVED",
+        )
+        self.assertEqual(
+            residence["trace"][0]["data"]["classification"],
+            "recognized_question_unknown_fact",
+        )
         self.assertEqual(residence["transport"], [])
 
         self.assertEqual(bite["result"]["ir"]["subject"], "NPC_BITE_STATUS")

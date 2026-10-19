@@ -79,6 +79,13 @@ function Internal.RegisterVocabulary()
     })
     registerConcept("BITTEN", { "bitten", "got bitten", "was bitten" })
     registerConcept("BITE", { "bite", "bites", "biting" })
+    registerConcept("RESIDENCE", {
+        "house", "residence", "settlement", "where i live",
+    })
+    registerConcept("HEALTH_STATUS", {
+        "health", "hurt", "injured", "wounded", "wounds",
+    })
+    registerConcept("KNOW", { "know", "knows", "aware" })
     registerConcept("WATER", {
         "water", "drinking water",
     })

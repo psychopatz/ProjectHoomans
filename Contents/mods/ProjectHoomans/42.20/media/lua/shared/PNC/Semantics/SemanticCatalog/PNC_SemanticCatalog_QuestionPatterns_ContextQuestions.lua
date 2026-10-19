@@ -389,6 +389,209 @@ function Internal.RegisterWorldFactQuestions()
         121
     )
 
+    local residenceQuestion = {
+        intent = "QUESTION",
+        speechAct = "QUESTION",
+        subject = "NPC_RESIDENCE",
+        target = "SELF",
+        slots = { attribute = "residence" },
+        modifiers = { directed = true },
+        socialContext = {
+            directed = true,
+            personalQuestion = true,
+            target = "SELF",
+        },
+        extensions = { topic = "residence" },
+    }
+
+    registerPattern(
+        "pnc.question.residence.where_do_you_live",
+        {
+            { kind = "literal", value = "where" },
+            { kind = "literal", value = "do" },
+            { kind = "literal", value = "you" },
+            { kind = "literal", value = "live" },
+            { kind = "literal", value = "exactly", optional = true },
+        },
+        residenceQuestion,
+        0.99,
+        124
+    )
+
+    registerPattern(
+        "pnc.question.residence.where_is_home",
+        {
+            { kind = "literal", value = "where" },
+            { kind = "literal", value = "is" },
+            { kind = "literal", value = "your" },
+            { kind = "literal", value = "home" },
+        },
+        residenceQuestion,
+        0.98,
+        123
+    )
+
+    registerPattern(
+        "pnc.question.residence.where_do_you_stay",
+        {
+            { kind = "literal", value = "where" },
+            { kind = "literal", value = "do" },
+            { kind = "literal", value = "you" },
+            { kind = "literal", value = "stay" },
+        },
+        residenceQuestion,
+        0.98,
+        123
+    )
+
+    registerPattern(
+        "pnc.question.residence.where_is_house",
+        {
+            { kind = "literal", value = "where" },
+            { kind = "literal", value = "is" },
+            { kind = "literal", value = "your" },
+            { kind = "literal", value = "house" },
+        },
+        residenceQuestion,
+        0.98,
+        123
+    )
+
+    registerPattern(
+        "pnc.question.residence.what_settlement",
+        {
+            { kind = "literal", value = "what" },
+            { kind = "concept", id = "RESIDENCE" },
+            { kind = "literal", value = "are" },
+            { kind = "literal", value = "you" },
+            { kind = "literal", value = "from" },
+        },
+        residenceQuestion,
+        0.97,
+        122
+    )
+
+    local healthQuestion = {
+        intent = "QUESTION",
+        speechAct = "QUESTION",
+        subject = "NPC_HEALTH_STATE",
+        target = "SELF",
+        slots = { attribute = "health_state" },
+        modifiers = { directed = true },
+        socialContext = {
+            directed = true,
+            personalQuestion = true,
+            target = "SELF",
+        },
+        extensions = { topic = "medical" },
+    }
+
+    registerPattern(
+        "pnc.question.health.are_you_injured",
+        {
+            { kind = "literal", value = "are" },
+            { kind = "literal", value = "you" },
+            { kind = "literal", value = "injured" },
+        },
+        healthQuestion,
+        0.99,
+        124
+    )
+
+    registerPattern(
+        "pnc.question.health.are_you_hurt",
+        {
+            { kind = "literal", value = "are" },
+            { kind = "literal", value = "you" },
+            { kind = "literal", value = "hurt" },
+        },
+        healthQuestion,
+        0.99,
+        124
+    )
+
+    registerPattern(
+        "pnc.question.health.how_is_your_health",
+        {
+            { kind = "literal", value = "how" },
+            { kind = "literal", value = "is" },
+            { kind = "literal", value = "your" },
+            { kind = "concept", id = "HEALTH_STATUS" },
+        },
+        healthQuestion,
+        0.98,
+        123
+    )
+
+    registerPattern(
+        "pnc.question.health.how_are_your_wounds",
+        {
+            { kind = "literal", value = "how" },
+            { kind = "literal", value = "are" },
+            { kind = "literal", value = "your" },
+            { kind = "literal", value = "wounds" },
+        },
+        healthQuestion,
+        0.99,
+        124
+    )
+
+    local knowledgeQuestion = {
+        intent = "QUESTION",
+        speechAct = "QUESTION",
+        subject = "NPC_KNOWLEDGE",
+        slots = {
+            attribute = "knowledge",
+            topic = "$capture.topic",
+        },
+        modifiers = { directed = true },
+        socialContext = {
+            directed = true,
+            informationalQuestion = true,
+        },
+        extensions = { topic = "knowledge" },
+    }
+
+    registerPattern(
+        "pnc.question.knowledge.do_you_know_about",
+        {
+            { kind = "literal", value = "do" },
+            { kind = "literal", value = "you" },
+            { kind = "concept", id = "KNOW" },
+            { kind = "literal", value = "about" },
+            {
+                kind = "any_phrase",
+                capture = "topic",
+                minTokens = 1,
+                maxTokens = 4,
+            },
+        },
+        knowledgeQuestion,
+        0.96,
+        119,
+        { allowFuzzyCapture = true }
+    )
+
+    registerPattern(
+        "pnc.question.knowledge.have_you_heard_of",
+        {
+            { kind = "literal", value = "have" },
+            { kind = "literal", value = "you" },
+            { kind = "literal", value = "heard" },
+            { kind = "literal", value = "of" },
+            {
+                kind = "any_phrase",
+                capture = "topic",
+                minTokens = 1,
+                maxTokens = 4,
+            },
+        },
+        knowledgeQuestion,
+        0.96,
+        119,
+        { allowFuzzyCapture = true }
+    )
+
     registerPattern(
         "pnc.question.wellbeing_follow_up_whats_wrong",
         {

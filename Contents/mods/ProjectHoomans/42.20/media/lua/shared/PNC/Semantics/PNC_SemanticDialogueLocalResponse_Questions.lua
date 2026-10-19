@@ -175,6 +175,126 @@ local function resolveMedicalBiteStatus(ir, state, context)
     })
 end
 
+local function factTopic(ir, fact)
+    local target = ir and ir.target
+    local slot = ir and ir.slots and ir.slots.topic
+    local value = fact and fact.topic
+        or type(target) == "table" and (target.text or target.value)
+        or target
+        or type(slot) == "table" and (slot.text or slot.value)
+        or slot
+    value = tostring(value or "")
+    return value ~= "" and value or "that"
+end
+
+local function factResponse(templateID, fallback, poolID, fact, topic, refs)
+    return {
+        templateID = templateID,
+        fallback = fallback,
+        sourcePoolID = poolID,
+        dialogueAct = "FACT_ANSWER",
+        topic = topic,
+        groundedFactRefs = refs or {},
+        uncertainty = fact and fact.status == "known" and "known"
+            or "unknown",
+        tone = "direct",
+        selectionSource = "fact_provider",
+    }
+end
+
+local function resolveResidenceQuestion(ir, state, context)
+    local fact = factFor(ir)
+    local value = fact and fact.value
+    local label = type(value) == "table" and value.label or nil
+    if fact and fact.status == "known" and label then
+        return {
+            templateID = "semantic.question.residence.known",
+            fallback = "I live at " .. tostring(label) .. ".",
+            args = copyArgs({ location = label }),
+            sourcePoolID = "semantic.question.residence",
+            dialogueAct = "FACT_ANSWER",
+            topic = "RESIDENCE",
+            groundedFactRefs = { "npc.residence" },
+            uncertainty = "known",
+            tone = "direct",
+            selectionSource = "fact_provider",
+        }
+    end
+    return factResponse(
+        "semantic.question.residence.unknown",
+        "I don't have a confirmed home to tell you about.",
+        "semantic.question.residence",
+        fact,
+        "RESIDENCE"
+    )
+end
+
+local function resolveHealthStateQuestion(ir, state, context)
+    local fact = factFor(ir)
+    local value = tostring(fact and fact.value or "")
+    local fallback
+    local templateID
+    if fact and fact.status == "known" then
+        if value == "injured" or value == "wounded" or value == "critical" then
+            templateID = "semantic.question.health_state.injured"
+            fallback = "I'm hurt, but I'm managing."
+        elseif value == "healthy" or value == "normal" then
+            templateID = "semantic.question.health_state.healthy"
+            fallback = "I'm doing okay."
+        end
+        if templateID then
+            return factResponse(
+                templateID,
+                fallback,
+                "semantic.question.health_state",
+                fact,
+                "MEDICAL",
+                { "npc.healthState" }
+            )
+        end
+    end
+    return factResponse(
+        "semantic.question.health_state.unknown",
+        "I can't confirm my health status right now.",
+        "semantic.question.health_state",
+        fact,
+        "MEDICAL"
+    )
+end
+
+local function resolveKnowledgeQuestion(ir, state, context)
+    local fact = factFor(ir)
+    local topic = factTopic(ir, fact)
+    if fact and fact.status == "known" and fact.value == true then
+        local answer = tostring(fact.answer or "")
+        local fallback = "I know about " .. topic .. "."
+        if answer ~= "" then fallback = fallback .. " " .. answer end
+        local response = factResponse(
+            "semantic.question.knowledge.known",
+            fallback,
+            "semantic.question.knowledge",
+            fact,
+            "KNOWLEDGE",
+            { "npc.knowledge.topic" }
+        )
+        response.args = copyArgs({
+            topic = answer ~= ""
+                and (topic .. ". " .. string.gsub(answer, "[%s%.!?]+$", ""))
+                or topic,
+        })
+        return response
+    end
+    local response = factResponse(
+        "semantic.question.knowledge.unknown",
+        "I don't have reliable information about " .. topic .. ".",
+        "semantic.question.knowledge",
+        fact,
+        "KNOWLEDGE"
+    )
+    response.args = copyArgs({ topic = topic })
+    return response
+end
+
 local function isCommittedRelation(value)
     if type(value) ~= "string" then return false end
     value = string.lower(value)
@@ -344,6 +464,15 @@ return function(ir, state, context)
     end
     if ir.subject == "NPC_BITE_STATUS" then
         return resolveMedicalBiteStatus(ir, state, context)
+    end
+    if ir.subject == "NPC_RESIDENCE" then
+        return resolveResidenceQuestion(ir, state, context)
+    end
+    if ir.subject == "NPC_HEALTH_STATE" then
+        return resolveHealthStateQuestion(ir, state, context)
+    end
+    if ir.subject == "NPC_KNOWLEDGE" then
+        return resolveKnowledgeQuestion(ir, state, context)
     end
     if ir.subject == "NEEDS" or ir.subject == "QUANTITY" then
         return resolveNeeds(ir, state, context)

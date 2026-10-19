@@ -184,6 +184,20 @@ local function semanticTranslationKey(response)
             "UI_PNC_Conversation_Semantic_QuestionMedicalBiteNegative",
         ["semantic.question.medical_bite.unknown"] =
             "UI_PNC_Conversation_Semantic_QuestionMedicalBiteUnknown",
+        ["semantic.question.residence.known"] =
+            "UI_PNC_Conversation_Semantic_QuestionResidenceKnown",
+        ["semantic.question.residence.unknown"] =
+            "UI_PNC_Conversation_Semantic_QuestionResidenceUnknown",
+        ["semantic.question.health_state.injured"] =
+            "UI_PNC_Conversation_Semantic_QuestionHealthStateInjured",
+        ["semantic.question.health_state.healthy"] =
+            "UI_PNC_Conversation_Semantic_QuestionHealthStateHealthy",
+        ["semantic.question.health_state.unknown"] =
+            "UI_PNC_Conversation_Semantic_QuestionHealthStateUnknown",
+        ["semantic.question.knowledge.known"] =
+            "UI_PNC_Conversation_Semantic_QuestionKnowledgeKnown",
+        ["semantic.question.knowledge.unknown"] =
+            "UI_PNC_Conversation_Semantic_QuestionKnowledgeUnknown",
         ["semantic.question.needs.offer.hunger"] =
             "UI_PNC_Conversation_Semantic_QuestionNeedsOfferHunger",
         ["semantic.question.needs.offer.thirst"] =
@@ -258,6 +272,7 @@ local function localizedSegment(templateID, fallback, args)
     end
     args = type(args) == "table" and args or {}
     local firstArg = args.npcName or args.target or args.object
+        or args.location or args.topic
     if type(firstArg) == "table" then firstArg = nil end
     local ok, value = pcall(translation.TrFormat, key, fallback, firstArg)
     if ok and value ~= nil and tostring(value) ~= "" then
