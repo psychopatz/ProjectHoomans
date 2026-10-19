@@ -1,5 +1,51 @@
 # Contextual Dialogue & Quest Framework — current progress
 
+## S6 accepted — deterministic EN/TL and live-worker handoff
+
+The unified Semantic Lab has completed the repository-verifiable roadmap
+work. Its Build workflow, Dataset Library, reusable block registry, visual
+Flow editor, declarative codeblocks, embedded CodeBuilder, headless CLI, and
+real Lua worker now share the same authoring/build boundary. The remaining
+native Project Zomboid SP/MP session, UI/world integration, and live external
+PBrainZ validation are deliberately user-owned.
+
+S6 evidence:
+
+- `python3 -m unittest discover -s tools/semantic_harness/tests -p 'test_*.py' -q` — **203/203 passed in 80.888s**, including GUI startup, real Lua-worker conversations, worker restart, deterministic authoring, and the full accepted contextual matrix.
+- `python3 -m unittest tools.semantic_harness.tests.test_dataset_review tools.semantic_harness.tests.test_semantic_translation_integration tools.semantic_harness.tests.test_phase6_performance -q` — **10/10 passed**, covering generated artifact determinism, EN/TL translation integration, and bounded performance/scope isolation.
+- Workflow artifact hash comparison — **9/9 generated dialogue Lua/EN/TL/manifest artifacts unchanged**, with every current/expected SHA-256 pair equal and all preview statuses `unchanged`.
+- `./tools/semantic_harness/run_harness.sh --doctor --doctor-json` — **PASS** for Python 3.12.3, repository/Core paths, Tk/display, Lua 5.3, worker syntax, boot, PING, and CAPABILITIES.
+- `./tools/semantic_harness/run_harness.sh --test pnc_semantic` — **4 pre-existing Lua smoke failures / 68 executed** in gift/inventory/local-route/state-response behavior; the Semantic Lab work changed no production Lua and did not alter the documented baseline.
+- Python compilation and `git diff --check` — **PASS**; generated output paths remain clean in Git after the approved workflow generation.
+
+**Current goal status:** **S6 accepted; the integrated Semantic Lab is READY
+FOR USER LIVE TEST. Native Project Zomboid SP/MP and live external PBrainZ
+validation remain user-owned.**
+
+**ONE Next Chunk:** **USER LIVE TEST — launch the native Project Zomboid
+workflow, inspect the Build workflow and Simulation tabs, and exercise the
+generated EN/TL dialogue in the user-owned game environment.**
+
+## S5 accepted — one in-app build-to-worker workflow
+
+Semantic Lab now has a Build workflow tab inside the existing application. It
+selects a generation-ready canonical dataset, composes reusable blocks from
+the live production catalog, validates the dataset and block selection,
+previews the existing Lua/EN/TL/manifest artifacts, requires an explicit
+approval, delegates generation to the existing CodeBuilder writer, restarts
+the existing Lua worker, and returns to the Simulation tab for real dialogue
+inspection. The headless CLI and direct service callers use the same workflow
+methods. WordNet remains available through the Dataset Library but is not
+silently treated as a Lua-generating workflow source.
+
+S5 evidence:
+
+- `python3 -m unittest tools.semantic_harness.tests.test_codebuilder_consolidation tools.semantic_harness.tests.test_dataset_review tools.semantic_harness.tests.test_app -q` — **28/28 passed**, including workflow composition/preview, explicit approval gating, CLI routing, GUI startup, artifact parity, and actual worker restart/conversation behavior.
+- `./tools/semantic_harness/run_harness.sh --no-gui --jsonl --workflow-preview common_interactions --workflow-blocks language.speech_act` — **PASS**, effect-free workflow preview ready for approval with 9 generated artifact paths.
+- `./tools/semantic_harness/run_harness.sh --no-gui --jsonl --workflow-generate common_interactions --workflow-blocks language.speech_act --approve-workflow` — **PASS**, explicit approval generated 9 existing dialogue artifacts and reported `restartRequired=true`; all checked-in bytes remained unchanged.
+- `./tools/semantic_harness/run_harness.sh --no-gui --jsonl --workflow-generate common_interactions --workflow-blocks language.speech_act` — **PASS as a safety check**, rejected without approval, wrote nothing, and returned exit code 2.
+- The shared service, GUI, CLI, and direct-Codex boundary all delegate to the existing compiler/writer; no second interpreter, dataset store, artifact writer, translation layout, or gameplay authority was added.
+
 ## S4 accepted — reviewed build-time MASSIVE/SGD dataset adapters
 
 Semantic Lab's embedded CodeBuilder now contains reviewed build-time adapters
@@ -25,15 +71,6 @@ The graph coverage check for the S4 files reported no recorded parse gaps,
 but the new files were not tracked and edited files were metadata-changed in
 the older 2026-10-07 generation; direct source reads and the executable tests
 above are therefore the authority for this slice.
-
-**Current goal status:** **S4 accepted; S0A/S0B, S1, S2, S3, and prior C6
-developer gates remain preserved. Native Project Zomboid SP/MP plus live
-external PBrainZ validation remain user-owned.**
-
-**ONE Next Chunk:** **S5 — complete the in-app workflow: select dataset →
-compose blocks → validate → preview generated source → approve → generate
-modular Lua/EN-TL/manifests → restart the production worker → inspect real NPC
-dialogue.**
 
 ## S3 accepted — synchronized visual graph and codeblock editing
 
@@ -150,18 +187,18 @@ S0B evidence:
 - `./tools/semantic_harness/run_harness.sh --no-gui --jsonl --compile-source tools/semantic_compiler/semantic_definitions.json` — **PASS**, effect-free canonical preview through the shared service.
 - `./tools/semantic_harness/run_harness.sh --doctor --doctor-json` — **PASS**.
 
-**Updated:** 2026-10-19, after the S4 reviewed dataset-adapter acceptance slice.
+**Updated:** 2026-10-19, after the S6 live-worker handoff acceptance slice.
 
 **Local implementation:** branch `codex/contextual-dialogue-quest-framework-0a`;
-S0A, S0B, S1, S3, and S4 are accepted in the rebased local history. The earlier
+S0A, S0B, and S1–S6 are accepted in the rebased local history. The earlier
 acceptance commits were rewritten by this rebase; preserved source-history
 references in the historical records refer to their pre-rebase commit IDs.
 
 The previous `PROGRESS.md` has been archived verbatim in `HISTORY_C0_C6_20261019.md` and remains recoverable in Git at `71162cb4f78cc4cd408a4a145486d5ebadc943c1`. It records the action-flow/quest work and C0–C6 contextual conversation, small reviewed dataset codebuilding, Tk X11, worker, performance, EN/TL and optional-provider parity acceptance, ending READY FOR USER LIVE TEST for that **earlier scoped implementation**. Native PZ SP/MP and live external PBrainZ validation remain user-owned, unclaimed.
 
 The prior user-live-test handoff is historical evidence and is superseded for
-this consolidation goal by the single S5 chunk above; it was not re-run or
-claimed as part of S4.
+this consolidation goal by the single user-live-test chunk above; it was not
+re-run or claimed as part of S6.
 
 ## Productization roadmap
 

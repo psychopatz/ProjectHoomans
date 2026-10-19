@@ -40,6 +40,8 @@ DATASET_SOURCE_SPECS = (
     },
 )
 
+WORKFLOW_DATASET_KINDS = frozenset(("semantic", "dialogue"))
+
 
 class SemanticLabAuthoringService:
     """Bind one repository/runtime configuration to all authoring operations."""
@@ -71,6 +73,18 @@ class SemanticLabAuthoringService:
                 "editable": True,
             }
             for spec in DATASET_SOURCE_SPECS
+        ]
+
+    def list_workflow_datasets(self) -> list[dict[str, Any]]:
+        """Return canonical sources that have an existing Lua generation path."""
+        return [
+            {
+                **source,
+                "generationKind": source["kind"],
+                "workflowReady": True,
+            }
+            for source in self.list_dataset_sources()
+            if source["kind"] in WORKFLOW_DATASET_KINDS
         ]
 
     def _dataset_spec(self, source_id: str) -> dict[str, Any]:
@@ -263,6 +277,152 @@ class SemanticLabAuthoringService:
             block_ids,
             production_catalog=production_catalog,
         )
+
+    def validate_workflow_selection(
+        self,
+        source_id: str,
+        block_ids: list[str],
+        *,
+        production_catalog: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
+        """Validate a selected canonical source and composed blocks without writing."""
+        spec = self._dataset_spec(source_id)
+        selection: dict[str, Any] = {
+            "ok": False,
+            "type": "semantic_lab_workflow_selection",
+            "workflow": {
+                "datasetID": source_id,
+                "sourcePath": str(spec["path"]),
+                "generationKind": spec["kind"],
+                "blockIDs": [str(block_id) for block_id in block_ids],
+            },
+            "previewOnly": True,
+            "effectFree": True,
+            "writes": [],
+        }
+        if spec["kind"] not in WORKFLOW_DATASET_KINDS:
+            selection["diagnostics"] = [{
+                "severity": "error",
+                "message": f"dataset {source_id} has no modular Lua generation path",
+            }]
+            return selection
+        try:
+            document = self.load_dataset_document(source_id)
+            dataset_report = self.preview_dataset_edit(source_id, document)
+        except (CompileError, OSError, ValueError, TypeError) as error:
+            dataset_report = {
+                "ok": False,
+                "type": "dataset_edit_preview",
+                "sourceID": source_id,
+                "diagnostics": [{"severity": "error", "message": str(error)}],
+                "previewOnly": True,
+                "effectFree": True,
+                "writes": [],
+            }
+        block_report = self.validate_semantic_blocks(
+            block_ids,
+            production_catalog=production_catalog,
+        )
+        diagnostics = list(dataset_report.get("diagnostics") or [])
+        diagnostics.extend(block_report.get("diagnostics") or [])
+        selection.update({
+            "ok": dataset_report.get("ok") is True and block_report.get("ok") is True,
+            "dataset": dataset_report,
+            "blocks": block_report,
+            "diagnostics": diagnostics,
+        })
+        return selection
+
+    def preview_workflow(
+        self,
+        source_id: str,
+        block_ids: list[str],
+        *,
+        production_catalog: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
+        """Preview the complete select → compose → validate → source-build plan."""
+        selection = self.validate_workflow_selection(
+            source_id,
+            block_ids,
+            production_catalog=production_catalog,
+        )
+        report: dict[str, Any] = {
+            "ok": False,
+            "type": "semantic_lab_workflow_preview",
+            "workflow": selection["workflow"],
+            "selection": selection,
+            "previewOnly": True,
+            "effectFree": True,
+            "writes": [],
+        }
+        if selection.get("ok") is not True:
+            report["diagnostics"] = selection.get("diagnostics", [])
+            return report
+        spec = self._dataset_spec(source_id)
+        source_path = self._dataset_path(source_id)
+        if spec["kind"] == "semantic":
+            source_preview = self.preview_semantic_source(source_path)
+        else:
+            source_preview = self.preview_dialogue_source(source_path)
+        report.update({
+            "ok": source_preview.get("ok") is True,
+            "sourcePreview": source_preview,
+            "diagnostics": source_preview.get("diagnostics", []),
+            "readyForApproval": source_preview.get("ok") is True,
+        })
+        return report
+
+    def generate_workflow(
+        self,
+        source_id: str,
+        block_ids: list[str],
+        *,
+        approved: bool,
+        production_catalog: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
+        """Generate through the existing writer after explicit workflow approval."""
+        if approved is not True:
+            return {
+                "ok": False,
+                "type": "semantic_lab_workflow_generation",
+                "generationApproved": False,
+                "diagnostics": [{
+                    "severity": "error",
+                    "message": "workflow generation requires explicit approval",
+                }],
+                "previewOnly": True,
+                "effectFree": True,
+                "writes": [],
+            }
+        preview = self.preview_workflow(
+            source_id,
+            block_ids,
+            production_catalog=production_catalog,
+        )
+        if preview.get("ok") is not True:
+            return {
+                **preview,
+                "type": "semantic_lab_workflow_generation",
+                "generationApproved": False,
+            }
+        spec = self._dataset_spec(source_id)
+        source_path = self._dataset_path(source_id)
+        if spec["kind"] == "semantic":
+            generation = self.generate_semantic_source(source_path)
+        else:
+            generation = self.generate_dialogue_source(source_path)
+        return {
+            "ok": generation.get("ok") is True,
+            "type": "semantic_lab_workflow_generation",
+            "workflow": preview["workflow"],
+            "selection": preview["selection"],
+            "sourcePreview": preview.get("sourcePreview"),
+            "generation": generation,
+            "generationApproved": True,
+            "restartRequired": generation.get("ok") is True,
+            "diagnostics": generation.get("diagnostics", []),
+            "writes": generation.get("writes", []),
+        }
 
     def validate_codeblock_source(self, source_path: Path) -> dict[str, Any]:
         """Validate a declarative codeblock file without writing or dispatching."""

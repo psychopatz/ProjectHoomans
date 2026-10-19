@@ -197,6 +197,53 @@ class CodeBuilderConsolidationTests(unittest.TestCase):
         list_blocks.assert_called_once()
         self.assertEqual(json.loads(output.getvalue()), report)
 
+    def test_workflow_service_composes_blocks_and_previews_existing_artifacts(self) -> None:
+        service = SemanticLabAuthoringService(repository=REPOSITORY)
+        report = service.preview_workflow(
+            "common_interactions",
+            ["language.speech_act", "dialogue_responses.response_pool"],
+        )
+        self.assertTrue(report["ok"], report)
+        self.assertTrue(report["previewOnly"])
+        self.assertTrue(report["effectFree"])
+        self.assertEqual(report["writes"], [])
+        self.assertEqual(report["workflow"]["datasetID"], "common_interactions")
+        self.assertEqual(report["selection"]["blocks"]["blockIDs"], [
+            "language.speech_act",
+            "dialogue_responses.response_pool",
+        ])
+        self.assertTrue(report["sourcePreview"]["generatedPaths"])
+
+    def test_workflow_generation_requires_explicit_approval(self) -> None:
+        service = SemanticLabAuthoringService(repository=REPOSITORY)
+        report = service.generate_workflow(
+            "common_interactions",
+            ["language.speech_act"],
+            approved=False,
+        )
+        self.assertFalse(report["ok"])
+        self.assertFalse(report["generationApproved"])
+        self.assertTrue(report["previewOnly"])
+        self.assertEqual(report["writes"], [])
+
+    def test_headless_cli_routes_workflow_preview_through_semantic_lab(self) -> None:
+        arguments = _parser().parse_args([
+            "--workflow-preview", "common_interactions",
+            "--workflow-blocks", "language.speech_act",
+            "--jsonl",
+        ])
+        output = io.StringIO()
+        report = {"ok": True, "type": "semantic_lab_workflow_preview", "writes": []}
+        with patch.object(
+            SemanticLabAuthoringService,
+            "preview_workflow",
+            return_value=report,
+        ) as preview:
+            with redirect_stdout(output):
+                self.assertEqual(cli(arguments), 0)
+        preview.assert_called_once_with("common_interactions", ["language.speech_act"])
+        self.assertEqual(json.loads(output.getvalue()), report)
+
     def test_app_selects_headless_mode_for_authoring_operation(self) -> None:
         with patch.object(app, "install_shutdown_handler"), patch.object(app, "cli", return_value=0) as run_cli:
             self.assertEqual(app.main(["--list-datasets"]), 0)

@@ -20,6 +20,7 @@ from .settings_dialog import open_runtime_settings as show_runtime_settings
 from .transcript import TranscriptBuffer
 from .worker import HarnessError, LuaSemanticWorker
 from .worker_session import WorkerReady, WorkerResult, WorkerSession
+from .workflow import SemanticLabWorkflowPane
 
 
 def npc_message_text(message: dict[str, Any]) -> str:
@@ -60,6 +61,7 @@ class SemanticHarnessApp:
         )
         self.closed = False
         self.busy = False
+        self._production_catalog: dict[str, Any] | None = None
         self.settings_window: Any | None = None
         self._future: Future[Any] | None = None
         self._transcript_buffer = TranscriptBuffer()
@@ -74,10 +76,13 @@ class SemanticHarnessApp:
         self.main_tabs = ttk.Notebook(self.root)
         self.main_tabs.pack(fill="both", expand=True, padx=6, pady=6)
 
+        workflow_tab = ttk.Frame(self.main_tabs, padding=8)
         simulation_tab = ttk.Frame(self.main_tabs, padding=8)
         editor_tab = ttk.Frame(self.main_tabs, padding=8)
         library_tab = ttk.Frame(self.main_tabs, padding=8)
         blocks_tab = ttk.Frame(self.main_tabs, padding=8)
+        workflow_tab.rowconfigure(0, weight=1)
+        workflow_tab.columnconfigure(0, weight=1)
         simulation_tab.rowconfigure(0, weight=1)
         simulation_tab.columnconfigure(0, weight=1)
         editor_tab.rowconfigure(0, weight=1)
@@ -86,6 +91,7 @@ class SemanticHarnessApp:
         library_tab.columnconfigure(0, weight=1)
         blocks_tab.rowconfigure(0, weight=1)
         blocks_tab.columnconfigure(0, weight=1)
+        self.main_tabs.add(workflow_tab, text="Build workflow")
         self.main_tabs.add(simulation_tab, text="Simulation")
         self.main_tabs.add(editor_tab, text="Flow editor")
         self.main_tabs.add(library_tab, text="Dataset library")
@@ -197,6 +203,17 @@ class SemanticHarnessApp:
             self.authoring_service,
             on_refresh=self.refresh_flow_catalog,
         )
+        self.workflow_pane = SemanticLabWorkflowPane(
+            workflow_tab,
+            self._tk,
+            ttk,
+            ScrolledText,
+            self._messagebox,
+            self.authoring_service,
+            on_generate=self.generate_workflow,
+            on_inspect=self.inspect_live_worker,
+        )
+        self.simulation_tab = simulation_tab
 
         self._append("SYSTEM", "Window ready. Starting the isolated Lua worker…")
         self._set_controls(False)
@@ -218,6 +235,7 @@ class SemanticHarnessApp:
             state="normal" if self.session.ready and not self.busy else "disabled"
         )
         self.flow_editor.set_enabled(enabled and not self.busy)
+        self.workflow_pane.set_enabled(enabled and not self.busy)
 
     @property
     def worker_ready(self) -> bool:
@@ -298,6 +316,8 @@ class SemanticHarnessApp:
         self._set_text(self.trace, pretty(capabilities))
         self.flow_editor.set_catalog(flow_catalog)
         self.block_registry.set_catalog(flow_catalog)
+        self._production_catalog = flow_catalog
+        self.workflow_pane.set_production_catalog(flow_catalog)
 
     def _start_operation(
         self,
@@ -448,6 +468,8 @@ class SemanticHarnessApp:
     def _flow_catalog_finished(self, response: dict[str, Any]) -> None:
         self.flow_editor.set_catalog(response)
         self.block_registry.set_catalog(response)
+        self._production_catalog = response
+        self.workflow_pane.set_production_catalog(response)
         self._append(
             "SYSTEM",
             f"Loaded {response.get('flowCount', 0)} normalized production flows.",
@@ -547,6 +569,28 @@ class SemanticHarnessApp:
         )
         self.restart()
 
+    def generate_workflow(self, source_id: str, block_ids: list[str]) -> None:
+        """Generate the approved in-app workflow through the shared service."""
+        report = self.authoring_service.generate_workflow(
+            source_id,
+            block_ids,
+            approved=True,
+            production_catalog=self._production_catalog,
+        )
+        self.workflow_pane.show_generation(report)
+        self._set_text(self.inspector, pretty(report))
+        self._set_text(self.trace, pretty(report))
+        if report.get("ok") is not True:
+            diagnostics = report.get("diagnostics") or []
+            message = diagnostics[0].get("message") if diagnostics else "workflow generation failed"
+            self._append("SYSTEM", f"Workflow generation rejected: {message}")
+            return
+        self._append(
+            "SYSTEM",
+            f"Generated {len(report.get('writes', []))} artifacts; restarting Lua worker.",
+        )
+        self.restart()
+
     def set_language(self) -> None:
         if not self.session.ready or self.busy:
             return
@@ -559,6 +603,11 @@ class SemanticHarnessApp:
             self._append("SYSTEM", f"Production translation language set to {selected}.")
 
         self._start_operation(lambda worker: worker.set_language(selected), finish)
+
+    def inspect_live_worker(self) -> None:
+        """Return to the real-worker conversation surface after a build."""
+        self.main_tabs.select(self.simulation_tab)
+        self._append("SYSTEM", "Live worker inspection is ready in the Simulation tab.")
 
     def restart(self) -> None:
         if not self.session.ready or self.busy:

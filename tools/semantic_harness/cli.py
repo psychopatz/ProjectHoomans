@@ -27,6 +27,8 @@ AUTHORING_OPERATIONS = (
     "search_blocks",
     "validate_blocks",
     "validate_codeblocks",
+    "workflow_preview",
+    "workflow_generate",
     "adapt_dataset",
 )
 
@@ -97,6 +99,21 @@ def _run_authoring_operation(
     if arguments.validate_codeblocks:
         return service.validate_codeblock_source(
             _resolve_authoring_source(service, arguments.validate_codeblocks)
+        )
+    if arguments.workflow_preview or arguments.workflow_generate:
+        if not arguments.workflow_blocks:
+            raise ValueError("workflow operations require --workflow-blocks IDS")
+        block_ids = [
+            value.strip()
+            for value in arguments.workflow_blocks.split(",")
+            if value.strip()
+        ]
+        if arguments.workflow_preview:
+            return service.preview_workflow(arguments.workflow_preview, block_ids)
+        return service.generate_workflow(
+            arguments.workflow_generate,
+            block_ids,
+            approved=arguments.approve_workflow,
         )
     if arguments.adapt_dataset:
         if not arguments.dataset_source or not arguments.dataset_manifest:
@@ -256,6 +273,16 @@ def _parser() -> argparse.ArgumentParser:
         help="validate a declarative semantic.codeblocks.v1 file without writing or dispatching",
     )
     authoring.add_argument(
+        "--workflow-preview",
+        metavar="SOURCE_ID",
+        help="preview one canonical dataset plus a composed block selection",
+    )
+    authoring.add_argument(
+        "--workflow-generate",
+        metavar="SOURCE_ID",
+        help="generate one approved workflow through the existing CodeBuilder writer",
+    )
+    authoring.add_argument(
         "--adapt-dataset",
         choices=("massive", "sgd"),
         metavar="ADAPTER",
@@ -270,6 +297,16 @@ def _parser() -> argparse.ArgumentParser:
         "--dataset-manifest",
         metavar="PATH",
         help="provenance/license manifest path for --adapt-dataset",
+    )
+    parser.add_argument(
+        "--workflow-blocks",
+        metavar="IDS",
+        help="comma-separated reusable block IDs for a Semantic Lab workflow",
+    )
+    parser.add_argument(
+        "--approve-workflow",
+        action="store_true",
+        help="explicitly approve --workflow-generate after its preview contract",
     )
     parser.add_argument("--doctor", action="store_true", help="run bounded headless runtime diagnostics")
     parser.add_argument("--doctor-json", action="store_true", help="emit doctor diagnostics as one JSON record")
