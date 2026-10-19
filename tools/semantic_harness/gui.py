@@ -15,6 +15,7 @@ from .block_registry import SemanticBlockRegistryPane
 from .dataset_library import DatasetLibraryPane
 from .flow_editor import FlowEditorPane
 from .interaction_explorer_pane import InteractionExplorerPane
+from .interaction_spec_pane import InteractionSpecPane
 from .rendering import pretty
 from .scenario import load_scenario, save_scenario
 from .settings_dialog import open_runtime_settings as show_runtime_settings
@@ -89,13 +90,15 @@ class SemanticHarnessApp:
         editor_tab = ttk.Frame(studio_notebook, padding=8)
         library_tab = ttk.Frame(studio_notebook, padding=8)
         blocks_tab = ttk.Frame(studio_notebook, padding=8)
-        for panel in (workflow_tab, editor_tab, library_tab, blocks_tab):
+        composer_tab = ttk.Frame(studio_notebook, padding=8)
+        for panel in (workflow_tab, editor_tab, library_tab, blocks_tab, composer_tab):
             panel.rowconfigure(0, weight=1)
             panel.columnconfigure(0, weight=1)
         studio_notebook.add(workflow_tab, text="Build workflow")
         studio_notebook.add(editor_tab, text="Flow + interactions")
         studio_notebook.add(library_tab, text="Dataset library")
         studio_notebook.add(blocks_tab, text="Block palette")
+        studio_notebook.add(composer_tab, text="Interaction composer")
         self.main_tabs.add(studio_tab, text="Studio")
         self.main_tabs.add(simulation_tab, text="Simulation")
 
@@ -203,6 +206,16 @@ class SemanticHarnessApp:
             self.authoring_service,
             on_open_flow=self.flow_editor.select_flow,
         )
+        self.interaction_composer = InteractionSpecPane(
+            composer_tab,
+            self._tk,
+            ttk,
+            ScrolledText,
+            self._messagebox,
+            on_preview=self.preview_interaction_spec,
+            on_generate=self.generate_interaction_spec,
+            on_inspect=self.inspect_live_worker,
+        )
         self.dataset_library = DatasetLibraryPane(
             library_tab,
             self._tk,
@@ -252,6 +265,7 @@ class SemanticHarnessApp:
         )
         self.flow_editor.set_enabled(enabled and not self.busy)
         self.interaction_explorer.set_enabled(enabled and not self.busy)
+        self.interaction_composer.set_enabled(enabled and not self.busy)
         self.workflow_pane.set_enabled(enabled and not self.busy)
 
     @property
@@ -333,6 +347,7 @@ class SemanticHarnessApp:
         self._set_text(self.trace, pretty(capabilities))
         self.flow_editor.set_catalog(flow_catalog)
         self.interaction_explorer.set_catalog(flow_catalog)
+        self.interaction_composer.set_production_catalog(flow_catalog)
         self.block_registry.set_catalog(flow_catalog)
         self._production_catalog = flow_catalog
         self.workflow_pane.set_production_catalog(flow_catalog)
@@ -486,6 +501,7 @@ class SemanticHarnessApp:
     def _flow_catalog_finished(self, response: dict[str, Any]) -> None:
         self.flow_editor.set_catalog(response)
         self.interaction_explorer.set_catalog(response)
+        self.interaction_composer.set_production_catalog(response)
         self.block_registry.set_catalog(response)
         self._production_catalog = response
         self.workflow_pane.set_production_catalog(response)
@@ -585,6 +601,39 @@ class SemanticHarnessApp:
         self._append(
             "SYSTEM",
             f"Generated {len(report.get('writes', []))} files; restarting Lua worker.",
+        )
+        self.restart()
+
+    def preview_interaction_spec(self, spec: dict[str, Any]) -> dict[str, Any]:
+        """Preview a configured Studio interaction through the embedded builder."""
+
+        report = self.authoring_service.preview_interaction_spec(
+            spec,
+            production_catalog=self._production_catalog,
+        )
+        self._set_text(self.inspector, pretty(report))
+        self._set_text(self.trace, pretty(report))
+        return report
+
+    def generate_interaction_spec(self, spec: dict[str, Any]) -> None:
+        """Write an approved InteractionSpec, then restart the real Lua worker."""
+
+        report = self.authoring_service.generate_interaction_spec(
+            spec,
+            approved=True,
+            production_catalog=self._production_catalog,
+        )
+        self.interaction_composer.show_generation(report)
+        self._set_text(self.inspector, pretty(report))
+        self._set_text(self.trace, pretty(report))
+        if report.get("ok") is not True:
+            diagnostics = report.get("diagnostics") or []
+            message = diagnostics[0].get("message") if diagnostics else "generation failed"
+            self._append("SYSTEM", f"Interaction generation rejected: {message}")
+            return
+        self._append(
+            "SYSTEM",
+            f"Generated {len(report.get('writes', []))} interaction artifacts; restarting Lua worker.",
         )
         self.restart()
 
