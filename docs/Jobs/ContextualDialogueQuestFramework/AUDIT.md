@@ -23,3 +23,7 @@
 ## Required developer approach
 
 Read `SEMANTIC_STUDIO_CONSOLIDATION.md`. Start with S0A no-behavior-change migration; avoid a bulk folder move that reflows translations/normalization, breaks CLI consumers or overwrites manually authored definitions. Then unify authoring service before designing actual dataset explorer/semantic block composition. No native PZ or Workshop work by Codex.
+
+## Source-backed product audit — 2026-10-19
+
+At remote 36f0beb2dc8a280094307700d601adc60c93d07b: service.py validates selected block IDs then previews/generates unchanged original dataset sources, rather than instantiated typed connected block definitions. Flow editor set_catalog lists FlowRegistry flows only; INSULT is a real SocialCatalog/Policy/Actions/Response route but is not a registered flow there. WordNet JSON pins FETCH/FOLLOW extraction and source hashes; actual runtime aliases are generated Lua and loaded into PsychopatzCore, without PZ runtime WordNet URL or ZIP. MASSIVE/SGD-shaped adapter tests do not prove broad approved actual corpus generation. Generic ActionRejected may explain user's shown insult response when social transport unavailable; it is a hypothesis pending R0A real worker trace. 203 Python pass and four Lua smoke failures are previously recorded, not rerun in this docs-only update. See SEMANTIC_STUDIO_RECOVERY.md for acceptance.

@@ -1,23 +1,13 @@
 # Contextual Dialogue & Quest Framework — Project Hoomans
 
-**Current product direction (2026-10-19):** Make **Semantic Lab the sole user/agent-facing NLP development application**. The existing semantic compiler becomes its **embedded CodeBuilder**; datasets, reusable semantic blocks, visual/code authoring, approved generation and real-Lua simulation are all subparts of ONE workspace. We are consolidating the developer workflow, not changing the current authoritative game runtime.
+**ACTIVE goal: Semantic Studio Recovery (2026-10-19).** The earlier S0–S6 compiler, worker, dataset adapter and GUI-pane milestones are recorded technical achievements, but do not yet satisfy the user's original product goal: create and debug new modular NPC conversations inside Semantic Lab, inspect all semantic paths including INSULT, and verify actual final NPC responses. The expanded goal is IN PROGRESS, not READY FOR USER LIVE TEST.
 
-The repository already records accepted action-flow, quest, context/memory, reviewed dataset and optional-provider developer slices through C6-C at `71162cb4f78cc4cd408a4a145486d5ebadc943c1`. Those are archived in `HISTORY_C0_C6_20261019.md`, and their READY FOR USER LIVE TEST status remains true **for that narrower previous scope**. The new Semantic Studio productization goal S0–S6 is **IN PROGRESS**, beginning with a no-output-change compiler integration.
+**Audited remote baseline:** 36f0beb2dc8a280094307700d601adc60c93d07b on branch docs/contextual-dialogue-quest-framework-20261018, PR #4 open at inspection. No local agent checkout, GUI test or native game runtime has been inspected during this documentation-only transition. The previous S0–S6 PROGRESS ledger is preserved in HISTORY_S0_S6_20261019.md.
 
-## What a finished Semantic Lab must enable
+The user journey must be: search an interaction or lexical source -> inspect real parser/policy/flow/action/response ownership -> instantiate and connect reusable semantic blocks -> edit one canonical composition in graph or supported code view -> validate -> preview the ACTUAL changed Lua/EN/TL/manifest diff -> approve -> generate -> restart REAL Lua worker -> talk to NPC and inspect final text, context, errors and side effects. CodeBuilder remains a subsystem of the existing Semantic Lab, not a separate engine or app.
 
-Browse a registered dataset/concept/capability → inspect provenance and examples → reuse typed semantic blocks → visually edit a contextual conversation tree OR its synchronized declarative codeblock source → validate actual Core/production flow contract → preview and approve modular Lua/EN+TL/manifest diff → reload real Lua worker → click an actual response and inspect IR, context agenda/memory, selected flow, action authority and generated source. Most operations must no longer depend on manually locating JSON files and editing multiple Lua modules.
+**Current authoritative design:** SEMANTIC_STUDIO_RECOVERY.md. Ordered phases: ROADMAP.md. **Exactly one Next Chunk:** PROGRESS.md (read LAST). Earlier accepted infrastructure is not to be reimplemented.
 
-**No second NLP parser, no separate compiler app, no duplicate artifact generator, no arbitrary executable node Lua and no full corpus at game runtime.** The UI and CLI must call the same headless authoring/build service. Preserve lightweight offline Lua and optional PBrainZ using authorized facts.
+Read root AGENTS.md then job AGENT_RUNBOOK.md, AUDIT.md, ARCHITECTURE.md, SEMANTIC_STUDIO_RECOVERY.md, SEMANTIC_STUDIO_CONSOLIDATION.md, AUTOMATIC_FLOW_GENERATION.md, CAPABILITY_ACTION_BINDINGS.md, CONVERSATIONAL_INTELLIGENCE.md, DATASET_CONVERSATION_PIPELINE.md, PROCEDURAL_NLP_COMPILER.md, AUTHORING_WORKBENCH.md, ROADMAP.md, HARNESS_ACCEPTANCE.md, CONVERSATION_ACCEPTANCE.md, PROGRESS.md LAST. Historical records only for evidence.
 
-## Developer sequence
-
-**S0A:** embed compiler in Semantic Lab with byte-identical compiled output and compatibility shim; **S0B:** one authoring/artifact service; **S1:** dataset library; **S2:** typed reusable block registry; **S3:** graph+source synchronized composer; **S4:** licensed corpus imports; **S5:** complete one-app generation loop; **S6:** UX/performance and parity acceptance.
-
-Only `PROGRESS.md` determines ONE current Next Chunk. Full target architecture and migration gates: `SEMANTIC_STUDIO_CONSOLIDATION.md`; phase ordering: `ROADMAP.md`.
-
-## Read order for /goal
-
-Root `AGENTS.md` → job `AGENT_RUNBOOK.md`, `AUDIT.md`, `ARCHITECTURE.md`, `SEMANTIC_STUDIO_CONSOLIDATION.md`, `AUTOMATIC_FLOW_GENERATION.md`, `CAPABILITY_ACTION_BINDINGS.md`, `CONDITION_CONTEXT.md`, `QUEST_CONTRACT.md`, `CONVERSATIONAL_INTELLIGENCE.md`, `DATASET_CONVERSATION_PIPELINE.md`, `PROCEDURAL_NLP_COMPILER.md`, `AUTHORING_WORKBENCH.md`, `ROADMAP.md`, `HARNESS_ACCEPTANCE.md`, `CONVERSATION_ACCEPTANCE.md`, **`PROGRESS.md` LAST**. Historical ledgers for evidence only: `HISTORY_20261018.md` and `HISTORY_C0_C6_20261019.md`.
-
-**No production code changed by this documentation commit.** Codex must inspect its own checkout; remote planning baseline `71162cb4f78cc4cd408a4a145486d5ebadc943c1` is not proof of local status. Only the user performs native Project Zomboid SP/MP acceptance and any Steam Workshop install/publish/release. Missing Codex CLI CUA `apps=[]` is not an implementation blocker; use available X11/Tk and production worker instead.
+The user alone handles native Project Zomboid SP/MP testing, Steam Workshop install/publish/republish and live external PBrainZ. Codex CLI CUA absence is not a developer blocker; use actual production Lua worker and X11/Tk automation where appropriate.

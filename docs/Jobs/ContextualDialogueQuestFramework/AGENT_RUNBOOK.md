@@ -2,6 +2,10 @@
 
 **Current job:** `docs/Jobs/ContextualDialogueQuestFramework/`. **Current Next Chunk:** always read `PROGRESS.md` LAST; at remote `71162cb4f78cc4cd408a4a145486d5ebadc943c1` the new S0A migration is planned and older G0/C0–C6 recorded accepted.
 
+## New active recovery policy — 2026-10-19 (supersedes obsolete S0A Next Chunk instructions)
+
+The current ONE next chunk is R0A in PROGRESS.md; S0A–S6 were already recorded completed and archived in HISTORY_S0_S6_20261019.md. Do not repeat compiler relocation or start another standalone app. SEMANTIC_STUDIO_RECOVERY.md is the active detailed phase contract. Execute actual code and real-Lua-worker behavioral tests, not only audits/JSON/test-count progress. INSULT must show IR→actual policy→social authority→final NPC response without fake success. Block catalog types are not working compositions until instances/edges change compiled Lua and actual behavior. WordNet URL in source JSON is build provenance; Kahlua reads generated Lua, never WordNet archive/URL. MASSIVE/SGD test fixtures do not imply broad live corpus coverage. Do not poll unavailable native CUA; use worker/X11 where available. Preserve unrelated agent work and user-owned PZ/Workshop boundaries.
+
 ## Workflow and safety
 
 1. Read root `AGENTS.md`, then this job's README/read order, architecture, consolidation contract, roadmap and progress. Inspect real local checkout/branch/head/upstream, uncommitted user files, parallel agent work and installed Core revision. Remote planning SHA is a checkpoint, not permission to discard local changes. No force push, reset, stash, ambiguous pull or destructive media folder staging.
